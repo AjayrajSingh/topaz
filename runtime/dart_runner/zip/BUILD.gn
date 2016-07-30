@@ -1,0 +1,17 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+source_set("zip") {
+  sources = [
+    "unique_zip_archive.cc",
+    "unique_zip_archive.h",
+    "zip_archive.cc",
+    "zip_archive.h",
+  ]
+
+  public_deps = [
+    "//lib/ftl",
+    "//third_party/zlib:minizip",
+  ]
+}

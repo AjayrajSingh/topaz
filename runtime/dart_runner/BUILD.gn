@@ -14,17 +14,17 @@ executable("dart_content_handler") {
   ]
 
   deps = [
+    "//apps/dart_content_handler/zip",
     "//dart/runtime:libdart",
     "//dart/runtime/bin:libdart_embedder_noio",
     "//lib/ftl",
+    "//lib/mtl",
     "//mojo/public/c/system",
-    "//mojo/public/cpp/application:standalone",
+    "//mojo/public/cpp/application",
     "//mojo/public/cpp/bindings",
-    "//mojo/public/cpp/system",
     "//mojo/public/cpp/utility",
     "//mojo/public/interfaces/network",
     "//mojo/public/platform/dart:mojo_internal_impl",
     "//mojo/services/content_handler/interfaces",
-    "//mojo/system",
   ]
 }
