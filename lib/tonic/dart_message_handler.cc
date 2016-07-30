@@ -37,10 +37,11 @@ void DartMessageHandler::OnMessage(DartState* dart_state) {
   auto task_runner = dart_state->message_handler().task_runner();
 
   // Schedule a task to run on the message loop thread.
-  task_runner->PostTask([dart_state = dart_state->GetWeakPtr()]() {
-    if (!dart_state)
+  ftl::WeakPtr<DartState> dart_state_ptr = dart_state->GetWeakPtr();
+  task_runner->PostTask([dart_state_ptr]() {
+    if (!dart_state_ptr)
       return;
-    dart_state->message_handler().OnHandleMessage(dart_state.get());
+    dart_state_ptr->message_handler().OnHandleMessage(dart_state_ptr.get());
   });
 }
 

@@ -5,6 +5,8 @@
 #ifndef LIB_TONIC_DART_STATE_H_
 #define LIB_TONIC_DART_STATE_H_
 
+#include <memory>
+
 #include "lib/ftl/logging.h"
 #include "lib/ftl/memory/weak_ptr.h"
 #include "dart/runtime/include/dart_api.h"

@@ -4,6 +4,8 @@
 
 #include "lib/tonic/uint8_list.h"
 
+#include <string.h>
+
 #include "lib/tonic/dart_error.h"
 
 namespace tonic {
