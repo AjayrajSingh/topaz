@@ -1,0 +1,18 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+source_set("file_loader") {
+  sources = [
+    "file_loader.cc",
+    "file_loader.h",
+    "string_converter.cc",
+    "string_converter.h",
+  ]
+
+  deps = [
+    "//dart/runtime:libdart",
+    "//lib/ftl",
+    "//lib/tonic/parsers",
+  ]
+}
