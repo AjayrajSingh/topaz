@@ -5,15 +5,15 @@
 #include <string>
 #include <vector>
 
-#include "apps/dart_content_handler/zip/unique_zip_archive.h"
+#include "apps/dart_content_handler/zip/unique_unzipper.h"
 #include "lib/ftl/macros.h"
 
-namespace dart_content_handler {
+namespace zip {
 
-class ZipArchive {
+class Unzipper {
  public:
-  explicit ZipArchive(std::vector<char> buffer);
-  ~ZipArchive();
+  explicit Unzipper(std::vector<char> buffer);
+  ~Unzipper();
 
   std::vector<char> Extract(const std::string& path);
 
@@ -21,9 +21,9 @@ class ZipArchive {
 
  private:
   std::vector<char> buffer_;
-  UniqueZipArchive archive_;
+  UniqueUnzipper decoder_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(ZipArchive);
+  FTL_DISALLOW_COPY_AND_ASSIGN(Unzipper);
 };
 
-}  // namespace dart_content_handler
+}  // namespace zip

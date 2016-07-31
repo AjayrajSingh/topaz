@@ -4,9 +4,12 @@
 
 #include "apps/dart_content_handler/dart_init.h"
 
+#include "apps/dart_content_handler/builtin_libraries.h"
+#include "apps/dart_content_handler/embedder/snapshot.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
+#include "mojo/public/platform/dart/dart_handle_watcher.h"
 
 namespace dart_content_handler {
 namespace {
@@ -19,13 +22,15 @@ const char* kDartArgs[] = {
 }  // namespace
 
 void InitDartVM() {
+  SetHandleWatcherProducerHandle(mojo::dart::HandleWatcher::Start());
+
   // TODO(abarth): Make checked mode configurable.
   FTL_CHECK(Dart_SetVMFlags(arraysize(kDartArgs), kDartArgs));
 
   // TODO(abarth): Link in a VM snapshot.
-  char* error = Dart_Initialize(nullptr, nullptr, nullptr, nullptr, nullptr,
-                                nullptr, nullptr, nullptr, nullptr, nullptr,
-                                nullptr, nullptr, nullptr, nullptr);
+  char* error = Dart_Initialize(
+      vm_isolate_snapshot_buffer, nullptr, nullptr, nullptr, nullptr, nullptr,
+      nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
   if (error)
     FTL_LOG(FATAL) << error;
 }

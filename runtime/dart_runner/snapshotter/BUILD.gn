@@ -1,0 +1,20 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+executable("snapshotter") {
+  output_name = "dart_snapshotter"
+
+  sources = [
+    "main.cc",
+  ]
+
+  deps = [
+    "//apps/dart_content_handler/embedder:dart_snapshot_cc",
+    "//apps/dart_content_handler/zip",
+    "//dart/runtime:libdart",
+    "//dart/runtime/vm:libdart_platform",
+    "//lib/ftl",
+    "//lib/tonic/file_loader",
+  ]
+}

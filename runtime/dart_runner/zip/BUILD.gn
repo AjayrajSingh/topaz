@@ -4,10 +4,16 @@
 
 source_set("zip") {
   sources = [
-    "unique_zip_archive.cc",
-    "unique_zip_archive.h",
-    "zip_archive.cc",
-    "zip_archive.h",
+    "memory_io.cc",
+    "memory_io.h",
+    "unique_unzipper.cc",
+    "unique_unzipper.h",
+    "unique_zipper.cc",
+    "unique_zipper.h",
+    "unzipper.cc",
+    "unzipper.h",
+    "zipper.cc",
+    "zipper.h",
   ]
 
   public_deps = [

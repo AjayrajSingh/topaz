@@ -2,15 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "lib/ftl/memory/unique_object.h"
+#include <stdint.h>
 
 namespace dart_content_handler {
 
-struct UniqueZipArchiveTraits {
-  static void* InvalidValue() { return nullptr; }
-  static void Free(void* file);
-};
-
-using UniqueZipArchive = ftl::UniqueObject<void*, UniqueZipArchiveTraits>;
+extern uint8_t const * const vm_isolate_snapshot_buffer;
+extern uint8_t const * const isolate_snapshot_buffer;
 
 }  // namespace dart_content_handler

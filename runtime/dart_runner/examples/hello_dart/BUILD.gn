@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# TODO(abarth): Create a snapshot and a dartx archive.
-copy("hello_dart") {
-  sources = [ "hello_dart.dart" ]
-  outputs = [ "$root_out_dir/{{source_file_part}}" ]
+import("//apps/dart_content_handler/dartx.gni")
+
+dartx("hello_dart") {
+  main_dart = "hello_dart.dart"
 }

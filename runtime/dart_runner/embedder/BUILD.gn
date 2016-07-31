@@ -1,0 +1,96 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+action("generate_snapshot_bin") {
+  deps = [
+    "//dart/runtime/bin:gen_snapshot($host_toolchain)",
+  ]
+
+  inputs = [
+    "//mojo/dart/packages/mojo/sdk_ext/internal.dart",
+    "//mojo/dart/packages/mojo/sdk_ext/src/handle_watcher.dart",
+    "//mojo/dart/packages/mojo/sdk_ext/src/natives.dart",
+    "builtin.dart",
+    "snapshot.dart",
+  ]
+
+  vm_isolate_snapshot = "$target_gen_dir/vm_isolate_snapshot.bin"
+  isolate_snapshot = "$target_gen_dir/isolate_snapshot.bin"
+
+  outputs = [
+    vm_isolate_snapshot,
+    isolate_snapshot,
+  ]
+
+  gen_snapshot_dir =
+      get_label_info("//dart/runtime/bin:gen_snapshot($host_toolchain)",
+                     "root_out_dir")
+  script = "//dart/runtime/tools/create_snapshot_bin.py"
+
+  builtin_path = rebase_path("builtin.dart")
+  internal_path = rebase_path("//mojo/dart/packages/mojo/sdk_ext/internal.dart")
+  io_path = rebase_path("//dart/sdk/lib/io/io.dart")
+
+  args = [
+     "--executable",
+     rebase_path("$gen_snapshot_dir/gen_snapshot"),
+     "--package_root",
+     rebase_path("$root_gen_dir/dart-gen"),
+     "--script",
+     rebase_path("snapshot.dart"),
+     "--vm_output_bin",
+     rebase_path(vm_isolate_snapshot, root_build_dir),
+     "--output_bin",
+     rebase_path(isolate_snapshot, root_build_dir),
+     "--target_os",
+     current_os,
+     "--url_mapping=dart:mojo.builtin,$builtin_path",
+     "--url_mapping=dart:mojo.internal,$internal_path",
+     "--url_mapping=dart:io,$io_path",
+   ]
+}
+
+action("generate_snapshot_file") {
+  deps = [
+    ":generate_snapshot_bin",
+  ]
+
+  vm_input_bin = "$target_gen_dir/vm_isolate_snapshot.bin"
+  input_bin = "$target_gen_dir/isolate_snapshot.bin"
+  snapshot_template = "snapshot.cc.tmpl"
+  snapshot_file = "$target_gen_dir/dart_snapshot.cc"
+
+  inputs = [
+    snapshot_template,
+    vm_input_bin,
+    input_bin,
+  ]
+
+  outputs = [
+    snapshot_file,
+  ]
+
+  script = "//dart/runtime/tools/create_snapshot_file.py"
+  args = [
+    "--vm_input_bin",
+    rebase_path(vm_input_bin),
+    "--input_bin",
+    rebase_path(input_bin),
+    "--input_cc",
+    rebase_path(snapshot_template),
+    "--output",
+    rebase_path(snapshot_file),
+  ]
+}
+
+source_set("dart_snapshot_cc") {
+  deps = [
+    ":generate_snapshot_file",
+  ]
+
+  sources = [
+    "snapshot.h",
+    "$target_gen_dir/dart_snapshot.cc",
+  ]
+}

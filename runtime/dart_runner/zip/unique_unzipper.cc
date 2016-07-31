@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/dart_content_handler/zip/unique_zip_archive.h"
+#include "apps/dart_content_handler/zip/unique_unzipper.h"
 
 #include "third_party/zlib/contrib/minizip/unzip.h"
 
-namespace dart_content_handler {
+namespace zip {
 
-void UniqueZipArchiveTraits::Free(void* file) {
+void UniqueUnzipperTraits::Free(void* file) {
   unzClose(file);
 }
 
-}  // namespace dart_content_handler
+}  // namespace zip
