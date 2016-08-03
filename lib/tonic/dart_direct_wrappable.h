@@ -6,10 +6,10 @@
 #define LIB_TONIC_DART_DIRECT_WRAPPABLE_H_
 
 #include "dart/runtime/include/dart_api.h"
-#include "lib/tonic/dart_converter.h"
+#include "lib/tonic/converter/dart_converter.h"
+#include "lib/tonic/dart_state.h"
 
 namespace tonic {
-class DartState;
 struct DartWrapperInfo;
 
 template <typename T>

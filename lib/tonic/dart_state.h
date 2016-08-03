@@ -7,16 +7,15 @@
 
 #include <memory>
 
+#include "dart/runtime/include/dart_api.h"
 #include "lib/ftl/logging.h"
 #include "lib/ftl/memory/weak_ptr.h"
-#include "dart/runtime/include/dart_api.h"
-#include "lib/tonic/dart_api_scope.h"
-#include "lib/tonic/dart_isolate_scope.h"
 #include "lib/tonic/dart_persistent_value.h"
+#include "lib/tonic/scopes/dart_api_scope.h"
+#include "lib/tonic/scopes/dart_isolate_scope.h"
 
 namespace tonic {
 class DartClassLibrary;
-class DartExceptionFactory;
 class DartTimerHeap;
 class DartMessageHandler;
 
@@ -49,20 +48,14 @@ class DartState {
   void SetIsolate(Dart_Isolate isolate);
 
   DartClassLibrary& class_library() { return *class_library_; }
-  DartExceptionFactory& exception_factory() { return *exception_factory_; }
   DartMessageHandler& message_handler() { return *message_handler_; }
-
-  Dart_Handle index_handle() { return index_handle_.value(); }
 
   virtual void DidSetIsolate() {}
 
  private:
   Dart_Isolate isolate_;
   std::unique_ptr<DartClassLibrary> class_library_;
-  std::unique_ptr<DartExceptionFactory> exception_factory_;
   std::unique_ptr<DartMessageHandler> message_handler_;
-
-  DartPersistentValue index_handle_;
 
  protected:
   ftl::WeakPtrFactory<DartState> weak_factory_;

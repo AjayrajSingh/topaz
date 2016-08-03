@@ -5,7 +5,7 @@
 #include "lib/tonic/dart_direct_wrappable.h"
 
 #include "lib/tonic/dart_class_library.h"
-#include "lib/tonic/dart_error.h"
+#include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/dart_state.h"
 #include "lib/tonic/dart_wrappable.h"
 #include "lib/tonic/dart_wrapper_info.h"

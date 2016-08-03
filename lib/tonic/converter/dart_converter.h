@@ -1,13 +1,15 @@
-// Copyright 2015 The Fuchsia Authors. All rights reserved.
+// Copyright 2016 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef LIB_TONIC_DART_CONVERTER_H_
-#define LIB_TONIC_DART_CONVERTER_H_
+#ifndef LIB_CONVERTER_TONIC_DART_CONVERTER_H_
+#define LIB_CONVERTER_TONIC_DART_CONVERTER_H_
 
 #include <string>
 #include <vector>
-#include "lib/tonic/dart_state.h"
+
+#include "dart/runtime/include/dart_api.h"
+#include "lib/ftl/logging.h"
 
 namespace tonic {
 
@@ -165,27 +167,6 @@ template <>
 struct DartConverter<double> : public DartConverterFloatingPoint<double> {};
 
 ////////////////////////////////////////////////////////////////////////////////
-// Enums
-
-template <typename T>
-struct DartConverterEnum {
-  static T FromArguments(Dart_NativeArguments args,
-                         int index,
-                         Dart_Handle& exception) {
-    return FromDart(Dart_GetNativeArgument(args, index));
-  }
-
-  static T FromDart(Dart_Handle handle) {
-    Dart_Handle index_handle =
-        Dart_GetField(handle, DartState::Current()->index_handle());
-
-    uint64_t enum_index = 0;
-    Dart_IntegerToUint64(index_handle, &enum_index);
-    return static_cast<T>(enum_index);
-  }
-};
-
-////////////////////////////////////////////////////////////////////////////////
 // Strings
 
 template <>
@@ -302,7 +283,7 @@ struct DartConverter<std::vector<T>> {
 
 template <>
 struct DartConverter<Dart_Handle> {
-  static Dart_Handle ToDart(DartState* state, Dart_Handle val) { return val; }
+  static Dart_Handle ToDart(Dart_Handle val) { return val; }
 
   static void SetReturnValue(Dart_NativeArguments args, Dart_Handle val) {
     Dart_SetReturnValue(args, val);
@@ -343,4 +324,4 @@ inline Dart_Handle ToDart(const char* val) {
 
 }  // namespace tonic
 
-#endif  // LIB_TONIC_DART_CONVERTER_H_
+#endif  // LIB_CONVERTER_TONIC_DART_CONVERTER_H_

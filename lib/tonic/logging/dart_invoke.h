@@ -1,9 +1,9 @@
-// Copyright 2015 The Fuchsia Authors. All rights reserved.
+// Copyright 2016 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef LIB_TONIC_DART_INVOKE_H_
-#define LIB_TONIC_DART_INVOKE_H_
+#ifndef LIB_TONIC_LOGGING_DART_INVOKE_H_
+#define LIB_TONIC_LOGGING_DART_INVOKE_H_
 
 #include <initializer_list>
 
@@ -20,4 +20,4 @@ void DartInvokeVoid(Dart_Handle closure);
 
 }  // namespace tonic
 
-#endif  // LIB_TONIC_DART_INVOKE_H_
+#endif  // LIB_TONIC_LOGGING_DART_INVOKE_H_

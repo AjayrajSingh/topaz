@@ -5,7 +5,7 @@
 #ifndef LIB_TONIC_MOJO_CONVERTER_H_
 #define LIB_TONIC_MOJO_CONVERTER_H_
 
-#include "lib/tonic/dart_converter.h"
+#include "lib/tonic/converter/dart_converter.h"
 #include "mojo/public/cpp/system/handle.h"
 
 namespace tonic {

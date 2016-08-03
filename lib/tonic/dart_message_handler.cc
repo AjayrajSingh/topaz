@@ -8,7 +8,7 @@
 #include "dart/runtime/include/dart_native_api.h"
 #include "dart/runtime/include/dart_tools_api.h"
 #include "lib/ftl/logging.h"
-#include "lib/tonic/dart_error.h"
+#include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/dart_state.h"
 
 namespace tonic {

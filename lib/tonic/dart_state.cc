@@ -5,8 +5,7 @@
 #include "lib/tonic/dart_state.h"
 
 #include "lib/tonic/dart_class_library.h"
-#include "lib/tonic/dart_converter.h"
-#include "lib/tonic/dart_exception_factory.h"
+#include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_message_handler.h"
 
 namespace tonic {
@@ -19,7 +18,6 @@ DartState::Scope::~Scope() {}
 DartState::DartState()
     : isolate_(nullptr),
       class_library_(std::unique_ptr<DartClassLibrary>(new DartClassLibrary)),
-      exception_factory_(new DartExceptionFactory(this)),
       message_handler_(
           std::unique_ptr<DartMessageHandler>(new DartMessageHandler())),
       weak_factory_(this) {}
@@ -30,12 +28,6 @@ void DartState::SetIsolate(Dart_Isolate isolate) {
   isolate_ = isolate;
   if (!isolate_)
     return;
-
-  {
-    Scope dart_scope(this);
-    index_handle_.Set(this, ToDart("index"));
-  }
-
   DidSetIsolate();
 }
 

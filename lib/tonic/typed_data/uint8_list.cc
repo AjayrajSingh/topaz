@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "lib/tonic/uint8_list.h"
+#include "lib/tonic/typed_data/uint8_list.h"
 
 #include <string.h>
 
-#include "lib/tonic/dart_error.h"
+#include "lib/tonic/logging/dart_error.h"
 
 namespace tonic {
 

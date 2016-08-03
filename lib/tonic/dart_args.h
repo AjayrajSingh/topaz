@@ -9,7 +9,7 @@
 #include <utility>
 
 #include "dart/runtime/include/dart_api.h"
-#include "lib/tonic/dart_converter.h"
+#include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_wrappable.h"
 
 namespace tonic {

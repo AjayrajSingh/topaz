@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include "lib/tonic/dart_invoke.h"
+#include "lib/tonic/logging/dart_invoke.h"
 #include "lib/tonic/dart_persistent_value.h"
 #include "lib/tonic/dart_state.h"
 

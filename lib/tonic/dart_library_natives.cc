@@ -4,7 +4,7 @@
 
 #include "lib/tonic/dart_library_natives.h"
 
-#include "lib/tonic/dart_converter.h"
+#include "lib/tonic/converter/dart_converter.h"
 
 namespace tonic {
 

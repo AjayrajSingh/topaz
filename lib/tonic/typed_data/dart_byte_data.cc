@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "lib/tonic/dart_byte_data.h"
+#include "lib/tonic/typed_data/dart_byte_data.h"
 
-#include "lib/tonic/dart_error.h"
+#include "lib/tonic/logging/dart_error.h"
 
 namespace tonic {
 

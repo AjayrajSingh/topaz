@@ -8,8 +8,8 @@
 #include "dart/runtime/include/dart_api.h"
 #include "lib/ftl/logging.h"
 #include "lib/ftl/memory/ref_counted.h"
-#include "lib/tonic/dart_converter.h"
-#include "lib/tonic/dart_error.h"
+#include "lib/tonic/converter/dart_converter.h"
+#include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/dart_state.h"
 #include "lib/tonic/dart_wrapper_info.h"
 

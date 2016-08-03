@@ -1,12 +1,12 @@
-// Copyright 2015 The Fuchsia Authors. All rights reserved.
+// Copyright 2016 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef LIB_TONIC_INT32_LIST_H_
-#define LIB_TONIC_INT32_LIST_H_
+#ifndef LIB_TONIC_TYPED_DATA_INT32_LIST_H_
+#define LIB_TONIC_TYPED_DATA_INT32_LIST_H_
 
 #include "dart/runtime/include/dart_api.h"
-#include "lib/tonic/dart_converter.h"
+#include "lib/tonic/converter/dart_converter.h"
 
 namespace tonic {
 
@@ -58,4 +58,4 @@ struct DartConverter<Int32List> {
 
 }  // namespace tonic
 
-#endif  // LIB_TONIC_INT32_LIST_H_
+#endif  // LIB_TONIC_TYPED_DATA_INT32_LIST_H_

@@ -4,8 +4,8 @@
 
 #include "lib/tonic/dart_class_provider.h"
 
-#include "lib/tonic/dart_converter.h"
-#include "lib/tonic/dart_error.h"
+#include "lib/tonic/converter/dart_converter.h"
+#include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/dart_state.h"
 
 namespace tonic {

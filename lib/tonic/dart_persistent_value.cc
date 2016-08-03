@@ -4,7 +4,7 @@
 
 #include "lib/tonic/dart_persistent_value.h"
 
-#include "lib/tonic/dart_isolate_scope.h"
+#include "lib/tonic/scopes/dart_isolate_scope.h"
 #include "lib/tonic/dart_state.h"
 
 namespace tonic {

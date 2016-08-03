@@ -1,0 +1,25 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+source_set("typed_data") {
+  sources = [
+    "dart_byte_data.cc",
+    "dart_byte_data.h",
+    "float32_list.cc",
+    "float32_list.h",
+    "float64_list.cc",
+    "float64_list.h",
+    "int32_list.cc",
+    "int32_list.h",
+    "uint8_list.cc",
+    "uint8_list.h",
+  ]
+
+  public_deps = [
+    "//dart/runtime:libdart",
+    "//lib/ftl",
+    "//lib/tonic/converter",
+    "//lib/tonic/logging",
+  ]
+}
