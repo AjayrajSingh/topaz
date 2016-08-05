@@ -110,7 +110,7 @@ std::string FileLoader::GetFilePathForPackageURL(std::string url) {
   std::string package_path = packages_map_->Resolve(package);
   if (package_path.empty())
     return std::string();
-  if (url.find(kFileURLPrefix) == 0u)
+  if (package_path.find(kFileURLPrefix) == 0u)
     return package_path.substr(kFileURLPrefixLength) + library_path;
   return files::GetDirectoryName(packages_) + "/" + package_path + "/" +
          library_path;
