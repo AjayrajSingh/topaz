@@ -16,7 +16,6 @@
 #include <type_traits>
 
 namespace tonic {
-struct DartWrapperInfo;
 
 // DartWrappable is a base class that you can inherit from in order to be
 // exposed to Dart code as an interface.
@@ -53,33 +52,36 @@ class DartWrappable {
   FTL_DISALLOW_COPY_AND_ASSIGN(DartWrappable);
 };
 
-#define DEFINE_WRAPPERTYPEINFO()                               \
- public:                                                       \
-  const DartWrapperInfo& GetDartWrapperInfo() const override { \
-    return dart_wrapper_info_;                                 \
-  }                                                            \
-                                                               \
- private:                                                      \
-  static const DartWrapperInfo& dart_wrapper_info_
+#define DEFINE_WRAPPERTYPEINFO()                                      \
+ public:                                                              \
+  const tonic::DartWrapperInfo& GetDartWrapperInfo() const override { \
+    return dart_wrapper_info_;                                        \
+  }                                                                   \
+                                                                      \
+ private:                                                             \
+  static const tonic::DartWrapperInfo& dart_wrapper_info_
 
-#define IMPLEMENT_WRAPPERTYPEINFO(LibraryName, ClassName)                     \
-  static void RefObject_##LibraryName_##ClassName(DartWrappable* impl) {      \
-    static_cast<ClassName*>(impl)->AddRef();                                  \
-  }                                                                           \
-  static void DerefObject_##LibraryName_##ClassName(DartWrappable* impl) {    \
-    static_cast<ClassName*>(impl)->Release();                                 \
-  }                                                                           \
-  static const DartWrapperInfo kDartWrapperInfo_##LibraryName_##ClassName = { \
-      #LibraryName,                                                           \
-      #ClassName,                                                             \
-      sizeof(ClassName),                                                      \
-      &RefObject_##LibraryName_##ClassName,                                   \
-      &DerefObject_##LibraryName_##ClassName,                                 \
-  };                                                                          \
-  const DartWrapperInfo& ClassName::dart_wrapper_info_ =                      \
-      kDartWrapperInfo_##LibraryName_##ClassName;                             \
-  static_assert(std::is_base_of<ftl::internal::RefCountedThreadSafeBase,      \
-                                ClassName>::value,                            \
+#define IMPLEMENT_WRAPPERTYPEINFO(LibraryName, ClassName)                \
+  static void RefObject_##LibraryName_##ClassName(                       \
+      tonic::DartWrappable* impl) {                                      \
+    static_cast<ClassName*>(impl)->AddRef();                             \
+  }                                                                      \
+  static void DerefObject_##LibraryName_##ClassName(                     \
+      tonic::DartWrappable* impl) {                                      \
+    static_cast<ClassName*>(impl)->Release();                            \
+  }                                                                      \
+  static const tonic::DartWrapperInfo                                    \
+      kDartWrapperInfo_##LibraryName_##ClassName = {                     \
+          #LibraryName,                                                  \
+          #ClassName,                                                    \
+          sizeof(ClassName),                                             \
+          &RefObject_##LibraryName_##ClassName,                          \
+          &DerefObject_##LibraryName_##ClassName,                        \
+  };                                                                     \
+  const tonic::DartWrapperInfo& ClassName::dart_wrapper_info_ =          \
+      kDartWrapperInfo_##LibraryName_##ClassName;                        \
+  static_assert(std::is_base_of<ftl::internal::RefCountedThreadSafeBase, \
+                                ClassName>::value,                       \
                 #ClassName " must be thread-safe reference-countable.");
 
 struct DartConverterWrappable {

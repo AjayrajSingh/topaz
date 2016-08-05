@@ -16,7 +16,6 @@
 
 namespace tonic {
 class DartClassLibrary;
-class DartTimerHeap;
 class DartMessageHandler;
 
 // DartState represents the state associated with a given Dart isolate. The
@@ -50,7 +49,7 @@ class DartState {
   DartClassLibrary& class_library() { return *class_library_; }
   DartMessageHandler& message_handler() { return *message_handler_; }
 
-  virtual void DidSetIsolate() {}
+  virtual void DidSetIsolate();
 
  private:
   Dart_Isolate isolate_;

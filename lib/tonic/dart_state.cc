@@ -43,4 +43,7 @@ ftl::WeakPtr<DartState> DartState::GetWeakPtr() {
   return weak_factory_.GetWeakPtr();
 }
 
+void DartState::DidSetIsolate() {
+}
+
 }  // namespace tonic
