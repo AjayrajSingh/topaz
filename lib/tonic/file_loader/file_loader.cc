@@ -13,7 +13,7 @@
 #include "lib/ftl/files/path.h"
 #include "lib/ftl/files/symlink.h"
 #include "lib/ftl/logging.h"
-#include "lib/tonic/file_loader/string_converter.h"
+#include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/parsers/packages_map.h"
 
 namespace tonic {
@@ -45,7 +45,7 @@ std::string ExtractPath(std::string url) {
     return url.substr(kPackageSchemeLength);
   if (url.find(kFileScheme) == 0u)
     return url.substr(kFileSchemeLength);
-  return std::move(url);
+  return url;
 }
 
 }  // namespace
@@ -75,20 +75,20 @@ bool FileLoader::LoadPackagesMap(const std::string& packages) {
 }
 
 Dart_Handle FileLoader::CanonicalizeURL(Dart_Handle library, Dart_Handle url) {
-  std::string string = StringFromDart(url);
+  std::string string = StdStringFromDart(url);
   if (string.find(kDartScheme) == 0u)
     return url;
   if (string.find(kPackageScheme) == 0u)
     return url;
   if (string.find(kFileScheme) == 0u)
-    return StringToDart(string.substr(kFileSchemeLength));
+    return StdStringToDart(string.substr(kFileSchemeLength));
 
-  std::string library_url = StringFromDart(Dart_LibraryUrl(library));
+  std::string library_url = StdStringFromDart(Dart_LibraryUrl(library));
   std::string prefix = ExtractSchemePrefix(library_url);
   std::string base_path = ExtractPath(library_url);
   std::string simplified_path =
       files::SimplifyPath(files::GetDirectoryName(base_path) + "/" + string);
-  return StringToDart(prefix + simplified_path);
+  return StdStringToDart(prefix + simplified_path);
 }
 
 std::string FileLoader::GetFilePathForURL(std::string url) {
@@ -96,7 +96,7 @@ std::string FileLoader::GetFilePathForURL(std::string url) {
     return GetFilePathForPackageURL(std::move(url));
   if (url.find(kFileScheme) == 0u)
     return GetFilePathForFileURL(std::move(url));
-  return std::move(url);
+  return url;
 }
 
 std::string FileLoader::GetFilePathForPackageURL(std::string url) {
@@ -134,14 +134,14 @@ std::string FileLoader::Fetch(const std::string& url) {
 }
 
 Dart_Handle FileLoader::Import(Dart_Handle url) {
-  Dart_Handle source = StringToDart(Fetch(StringFromDart(url)));
+  Dart_Handle source = StdStringToDart(Fetch(StdStringFromDart(url)));
   Dart_Handle result = Dart_LoadLibrary(url, Dart_Null(), source, 0, 0);
   DART_CHECK_VALID(result);
   return result;
 }
 
 Dart_Handle FileLoader::Source(Dart_Handle library, Dart_Handle url) {
-  Dart_Handle source = StringToDart(Fetch(StringFromDart(url)));
+  Dart_Handle source = StdStringToDart(Fetch(StdStringFromDart(url)));
   Dart_Handle result = Dart_LoadSource(library, url, Dart_Null(), source, 0, 0);
   DART_CHECK_VALID(result);
   return result;

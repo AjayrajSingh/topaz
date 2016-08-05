@@ -11,6 +11,7 @@ source_set("file_loader") {
   deps = [
     "//dart/runtime:libdart",
     "//lib/ftl",
+    "//lib/tonic/converter",
     "//lib/tonic/parsers",
   ]
 }
