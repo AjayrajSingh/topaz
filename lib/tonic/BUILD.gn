@@ -10,8 +10,6 @@ source_set("tonic") {
     "dart_class_library.h",
     "dart_class_provider.cc",
     "dart_class_provider.h",
-    "dart_direct_wrappable.cc",
-    "dart_direct_wrappable.h",
     "dart_library_natives.cc",
     "dart_library_natives.h",
     "dart_library_provider.cc",

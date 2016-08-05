@@ -15,7 +15,6 @@ namespace tonic {
 
 DartMessageHandler::DartMessageHandler()
     : handled_first_message_(false),
-      quit_message_loop_when_isolate_exits_(true),
       isolate_exited_(false),
       isolate_had_uncaught_exception_error_(false),
       task_runner_(nullptr) {}
@@ -99,11 +98,6 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
       Dart_SetPausedOnExit(true);
     } else {
       isolate_exited_ = true;
-      if (quit_message_loop_when_isolate_exits()) {
-        // Quit.
-        // XYZZY
-        // base::MessageLoop::current()->QuitWhenIdle();
-      }
     }
   }
 }

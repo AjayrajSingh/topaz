@@ -21,17 +21,6 @@ class DartMessageHandler {
   // Messages for the current isolate will be scheduled on |runner|.
   void Initialize(const ftl::RefPtr<ftl::TaskRunner>& runner);
 
-  // Request the message loop to quit when isolate exits? Default is true.
-  void set_quit_message_loop_when_isolate_exits(
-      bool quit_message_loop_when_isolate_exits) {
-    quit_message_loop_when_isolate_exits_ =
-        quit_message_loop_when_isolate_exits;
-  }
-
-  bool quit_message_loop_when_isolate_exits() const {
-    return quit_message_loop_when_isolate_exits_;
-  }
-
   // Did the isolate exit?
   bool isolate_exited() const { return isolate_exited_; }
 
@@ -57,7 +46,6 @@ class DartMessageHandler {
   }
 
   bool handled_first_message_;
-  bool quit_message_loop_when_isolate_exits_;
   bool isolate_exited_;
   bool isolate_had_uncaught_exception_error_;
   ftl::RefPtr<ftl::TaskRunner> task_runner_;
