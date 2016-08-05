@@ -15,6 +15,7 @@ executable("snapshotter") {
     "//dart/runtime:libdart",
     "//dart/runtime/vm:libdart_platform",
     "//lib/ftl",
+    "//lib/tonic/converter",
     "//lib/tonic/file_loader",
   ]
 }

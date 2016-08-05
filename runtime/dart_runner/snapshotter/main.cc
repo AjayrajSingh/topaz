@@ -20,14 +20,13 @@
 #include "lib/ftl/files/symlink.h"
 #include "lib/ftl/files/unique_fd.h"
 #include "lib/ftl/logging.h"
+#include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/file_loader/file_loader.h"
-#include "lib/tonic/file_loader/string_converter.h"
 
 namespace dart_snapshotter {
 namespace {
 
-using tonic::StringFromDart;
-using tonic::StringToDart;
+using tonic::ToDart;
 
 constexpr char kHelp[] = "help";
 constexpr char kPackages[] = "packages";
@@ -223,9 +222,8 @@ int CreateSnapshot(const ftl::CommandLine& command_line) {
   DartScope scope(isolate);
 
   DART_CHECK_VALID(Dart_SetLibraryTagHandler(HandleLibraryTag));
-  DART_CHECK_VALID(Dart_LoadScript(StringToDart(main_dart), Dart_Null(),
-                                   StringToDart(loader.Fetch(main_dart)), 0,
-                                   0));
+  DART_CHECK_VALID(Dart_LoadScript(ToDart(main_dart), Dart_Null(),
+                                   ToDart(loader.Fetch(main_dart)), 0, 0));
 
   std::vector<char> snapshot_blob = CreateSnapshot();
 
