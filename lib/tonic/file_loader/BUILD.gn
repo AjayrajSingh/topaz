@@ -6,8 +6,6 @@ source_set("file_loader") {
   sources = [
     "file_loader.cc",
     "file_loader.h",
-    "string_converter.cc",
-    "string_converter.h",
   ]
 
   deps = [
