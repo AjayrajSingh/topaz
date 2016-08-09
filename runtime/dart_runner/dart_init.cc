@@ -27,10 +27,11 @@ void InitDartVM() {
   // TODO(abarth): Make checked mode configurable.
   FTL_CHECK(Dart_SetVMFlags(arraysize(kDartArgs), kDartArgs));
 
+  Dart_InitializeParams params = {};
+  params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
+  params.vm_isolate_snapshot = dart_content_handler::vm_isolate_snapshot_buffer;
   // TODO(abarth): Link in a VM snapshot.
-  char* error = Dart_Initialize(
-      vm_isolate_snapshot_buffer, nullptr, nullptr, nullptr, nullptr, nullptr,
-      nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+  char* error = Dart_Initialize(&params);
   if (error)
     FTL_LOG(FATAL) << error;
 }
