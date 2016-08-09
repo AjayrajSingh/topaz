@@ -47,7 +47,7 @@ void DartMessageHandler::OnMessage(DartState* dart_state) {
 void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
   DartIsolateScope scope(dart_state->isolate());
   DartApiScope dart_api_scope;
-
+  Dart_Handle result = Dart_Null();
   bool error = false;
 
   // On the first message, check if we should pause on isolate start.
@@ -69,7 +69,8 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
       }
       Dart_SetPausedOnStart(false);
       // We've resumed, handle *all* normal messages that are in the queue.
-      error = LogIfError(Dart_HandleMessages());
+      result = Dart_HandleMessages();
+      error = LogIfError(result);
     }
   } else if (Dart_IsPausedOnExit()) {
     // We are paused on isolate exit. Only handle service messages until we are
@@ -83,17 +84,19 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
     }
   } else {
     // We are processing messages normally.
-    error = LogIfError(Dart_HandleMessage());
+    result = Dart_HandleMessages();
+    error = LogIfError(result);
   }
 
   if (error) {
-    // Remember that we had an uncaught exception error.
-    isolate_had_uncaught_exception_error_ = true;
-  }
-
-  if (error || !Dart_HasLivePorts()) {
+    if (!Dart_HasStickyError()) {
+      // Remember that we had an uncaught exception error.
+      isolate_had_uncaught_exception_error_ = true;
+      Dart_SetStickyError(result);
+    }
+  } else if (!Dart_HasLivePorts()) {
     // The isolate has no live ports and would like to exit.
-    if (Dart_ShouldPauseOnExit()) {
+    if (!Dart_IsPausedOnExit() && Dart_ShouldPauseOnExit()) {
       // Mark that we are paused on exit.
       Dart_SetPausedOnExit(true);
     } else {
