@@ -129,6 +129,7 @@ std::string FileLoader::Fetch(const std::string& url) {
               << std::endl;
     exit(1);
   }
+  url_dependencies_.insert(url);
   dependencies_.insert(path);
   return source;
 }

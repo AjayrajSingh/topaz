@@ -22,8 +22,15 @@ class FileLoader {
 
   bool LoadPackagesMap(const std::string& packages);
 
+  // Fully resolved file paths to dependencies. For example,
+  // "package:foo/bar.dart" will be resolved to
+  // "/path/to/package/foo/lib/bar.dart".
   const std::set<std::string>& dependencies() const { return dependencies_; }
-
+  // Canonicalized urls to dependencies. No package resolution is done,
+  // For example, "package:foo/bar.dart" will be "package:foo/bar.dart".
+  const std::set<std::string>& url_dependencies() const {
+    return url_dependencies_;
+  }
   Dart_Handle CanonicalizeURL(Dart_Handle library, Dart_Handle url);
   Dart_Handle Import(Dart_Handle url);
   Dart_Handle Source(Dart_Handle library, Dart_Handle url);
@@ -36,6 +43,7 @@ class FileLoader {
   std::string GetFilePathForFileURL(std::string url);
 
   std::set<std::string> dependencies_;
+  std::set<std::string> url_dependencies_;
   std::string packages_;
   std::unique_ptr<PackagesMap> packages_map_;
 
