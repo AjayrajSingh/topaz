@@ -42,6 +42,7 @@ class FileLoader {
   Dart_Handle Script(Dart_Handle url);
 
   Dart_Handle LoadLibrary(const std::string& url);
+  Dart_Handle LoadScript(const std::string& url);
 
   std::string Fetch(const std::string& url,
                     std::string* resolved_url = nullptr);

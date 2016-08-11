@@ -77,7 +77,7 @@ bool FileLoader::LoadPackagesMap(const std::string& packages) {
 Dart_Handle FileLoader::HandleLibraryTag(Dart_LibraryTag tag,
                                          Dart_Handle library,
                                          Dart_Handle url) {
-  FTL_DCHECK(Dart_IsLibrary(library));
+  FTL_DCHECK(Dart_IsNull(library) || Dart_IsLibrary(library));
   FTL_DCHECK(Dart_IsString(url));
   if (tag == Dart_kCanonicalizeUrl)
     return CanonicalizeURL(library, url);
@@ -160,9 +160,19 @@ std::string FileLoader::Fetch(const std::string& url,
 Dart_Handle FileLoader::LoadLibrary(const std::string& url) {
   std::string resolved_url;
   Dart_Handle source = ToDart(Fetch(url, &resolved_url));
+  return Dart_LoadLibrary(ToDart(url), ToDart(resolved_url), source, 0, 0);
+}
+
+Dart_Handle FileLoader::LoadScript(const std::string& url) {
+  std::string resolved_url;
+  Dart_Handle source = ToDart(Fetch(url, &resolved_url));
   Dart_Handle result =
-      Dart_LoadLibrary(ToDart(url), ToDart(resolved_url), source, 0, 0);
-  DART_CHECK_VALID(result);
+      Dart_LoadScript(ToDart(url), ToDart(resolved_url), source, 0, 0);
+  if (!Dart_IsError(result)) {
+    Dart_Handle finalize_result = Dart_FinalizeLoading(true);
+    if (Dart_IsError(finalize_result))
+      return finalize_result;
+  }
   return result;
 }
 
@@ -173,18 +183,11 @@ Dart_Handle FileLoader::Import(Dart_Handle url) {
 Dart_Handle FileLoader::Source(Dart_Handle library, Dart_Handle url) {
   std::string resolved_url;
   Dart_Handle source = ToDart(Fetch(StdStringFromDart(url), &resolved_url));
-  Dart_Handle result =
-      Dart_LoadSource(library, url, ToDart(resolved_url), source, 0, 0);
-  DART_CHECK_VALID(result);
-  return result;
+  return Dart_LoadSource(library, url, ToDart(resolved_url), source, 0, 0);
 }
 
 Dart_Handle FileLoader::Script(Dart_Handle url) {
-  std::string resolved_url;
-  Dart_Handle source = ToDart(Fetch(StdStringFromDart(url), &resolved_url));
-  Dart_Handle result = Dart_LoadScript(url, ToDart(resolved_url), source, 0, 0);
-  DART_CHECK_VALID(result);
-  return result;
+  return LoadScript(StdStringFromDart(url));
 }
 
 }  // namespace tonic
