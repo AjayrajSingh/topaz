@@ -4,9 +4,10 @@
 
 #include "lib/tonic/dart_state.h"
 
-#include "lib/tonic/dart_class_library.h"
 #include "lib/tonic/converter/dart_converter.h"
+#include "lib/tonic/dart_class_library.h"
 #include "lib/tonic/dart_message_handler.h"
+#include "lib/tonic/file_loader/file_loader.h"
 
 namespace tonic {
 
@@ -17,9 +18,9 @@ DartState::Scope::~Scope() {}
 
 DartState::DartState()
     : isolate_(nullptr),
-      class_library_(std::unique_ptr<DartClassLibrary>(new DartClassLibrary)),
-      message_handler_(
-          std::unique_ptr<DartMessageHandler>(new DartMessageHandler())),
+      class_library_(new DartClassLibrary),
+      message_handler_(new DartMessageHandler()),
+      file_loader_(new FileLoader()),
       weak_factory_(this) {}
 
 DartState::~DartState() {}
@@ -43,7 +44,12 @@ ftl::WeakPtr<DartState> DartState::GetWeakPtr() {
   return weak_factory_.GetWeakPtr();
 }
 
-void DartState::DidSetIsolate() {
+void DartState::DidSetIsolate() {}
+
+Dart_Handle DartState::HandleLibraryTag(Dart_LibraryTag tag,
+                                        Dart_Handle library,
+                                        Dart_Handle url) {
+  return Current()->file_loader().HandleLibraryTag(tag, library, url);
 }
 
 }  // namespace tonic

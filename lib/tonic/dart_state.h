@@ -17,6 +17,7 @@
 namespace tonic {
 class DartClassLibrary;
 class DartMessageHandler;
+class FileLoader;
 
 // DartState represents the state associated with a given Dart isolate. The
 // lifetime of this object is controlled by the DartVM. If you want to hold a
@@ -48,13 +49,19 @@ class DartState {
 
   DartClassLibrary& class_library() { return *class_library_; }
   DartMessageHandler& message_handler() { return *message_handler_; }
+  FileLoader& file_loader() { return *file_loader_; }
 
   virtual void DidSetIsolate();
+
+  static Dart_Handle HandleLibraryTag(Dart_LibraryTag tag,
+                                      Dart_Handle library,
+                                      Dart_Handle url);
 
  private:
   Dart_Isolate isolate_;
   std::unique_ptr<DartClassLibrary> class_library_;
   std::unique_ptr<DartMessageHandler> message_handler_;
+  std::unique_ptr<FileLoader> file_loader_;
 
  protected:
   ftl::WeakPtrFactory<DartState> weak_factory_;

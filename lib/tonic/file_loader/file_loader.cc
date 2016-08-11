@@ -74,6 +74,22 @@ bool FileLoader::LoadPackagesMap(const std::string& packages) {
   return true;
 }
 
+Dart_Handle FileLoader::HandleLibraryTag(Dart_LibraryTag tag,
+                                         Dart_Handle library,
+                                         Dart_Handle url) {
+  FTL_DCHECK(Dart_IsLibrary(library));
+  FTL_DCHECK(Dart_IsString(url));
+  if (tag == Dart_kCanonicalizeUrl)
+    return CanonicalizeURL(library, url);
+  if (tag == Dart_kImportTag)
+    return Import(url);
+  if (tag == Dart_kSourceTag)
+    return Source(library, url);
+  if (tag == Dart_kScriptTag)
+    return Script(url);
+  return Dart_NewApiError("Unknown library tag.");
+}
+
 Dart_Handle FileLoader::CanonicalizeURL(Dart_Handle library, Dart_Handle url) {
   std::string string = StdStringFromDart(url);
   if (string.find(kDartScheme) == 0u)
@@ -121,8 +137,15 @@ std::string FileLoader::GetFilePathForFileURL(std::string url) {
   return url.substr(kFileURLPrefixLength);
 }
 
-std::string FileLoader::Fetch(const std::string& url) {
+std::string FileLoader::GetFileURLForPath(const std::string& path) {
+  return std::string(kFileURLPrefix) + path;
+}
+
+std::string FileLoader::Fetch(const std::string& url,
+                              std::string* resolved_url) {
   std::string path = GetFilePathForURL(url);
+  if (resolved_url)
+    *resolved_url = GetFileURLForPath(path);
   std::string source;
   if (!files::ReadFileToString(files::GetAbsoluteFilePath(path), &source)) {
     std::cerr << "error: Unable to find Dart library '" << url << "'."
@@ -134,16 +157,32 @@ std::string FileLoader::Fetch(const std::string& url) {
   return source;
 }
 
-Dart_Handle FileLoader::Import(Dart_Handle url) {
-  Dart_Handle source = StdStringToDart(Fetch(StdStringFromDart(url)));
-  Dart_Handle result = Dart_LoadLibrary(url, Dart_Null(), source, 0, 0);
+Dart_Handle FileLoader::LoadLibrary(const std::string& url) {
+  std::string resolved_url;
+  Dart_Handle source = ToDart(Fetch(url, &resolved_url));
+  Dart_Handle result =
+      Dart_LoadLibrary(ToDart(url), ToDart(resolved_url), source, 0, 0);
   DART_CHECK_VALID(result);
   return result;
 }
 
+Dart_Handle FileLoader::Import(Dart_Handle url) {
+  return LoadLibrary(StdStringFromDart(url));
+}
+
 Dart_Handle FileLoader::Source(Dart_Handle library, Dart_Handle url) {
-  Dart_Handle source = StdStringToDart(Fetch(StdStringFromDart(url)));
-  Dart_Handle result = Dart_LoadSource(library, url, Dart_Null(), source, 0, 0);
+  std::string resolved_url;
+  Dart_Handle source = ToDart(Fetch(StdStringFromDart(url), &resolved_url));
+  Dart_Handle result =
+      Dart_LoadSource(library, url, ToDart(resolved_url), source, 0, 0);
+  DART_CHECK_VALID(result);
+  return result;
+}
+
+Dart_Handle FileLoader::Script(Dart_Handle url) {
+  std::string resolved_url;
+  Dart_Handle source = ToDart(Fetch(StdStringFromDart(url), &resolved_url));
+  Dart_Handle result = Dart_LoadScript(url, ToDart(resolved_url), source, 0, 0);
   DART_CHECK_VALID(result);
   return result;
 }

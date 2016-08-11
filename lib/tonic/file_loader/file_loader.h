@@ -31,16 +31,27 @@ class FileLoader {
   const std::set<std::string>& url_dependencies() const {
     return url_dependencies_;
   }
+
+  Dart_Handle HandleLibraryTag(Dart_LibraryTag tag,
+                               Dart_Handle library,
+                               Dart_Handle url);
+
   Dart_Handle CanonicalizeURL(Dart_Handle library, Dart_Handle url);
   Dart_Handle Import(Dart_Handle url);
   Dart_Handle Source(Dart_Handle library, Dart_Handle url);
+  Dart_Handle Script(Dart_Handle url);
 
-  std::string Fetch(const std::string& url);
+  Dart_Handle LoadLibrary(const std::string& url);
+
+  std::string Fetch(const std::string& url,
+                    std::string* resolved_url = nullptr);
 
  private:
   std::string GetFilePathForURL(std::string url);
   std::string GetFilePathForPackageURL(std::string url);
   std::string GetFilePathForFileURL(std::string url);
+
+  std::string GetFileURLForPath(const std::string& path);
 
   std::set<std::string> dependencies_;
   std::set<std::string> url_dependencies_;
