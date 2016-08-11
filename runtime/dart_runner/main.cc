@@ -2,12 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <mojo/system/main.h>
+
 #include <utility>
 
 #include "apps/dart_content_handler/content_handler_impl.h"
 #include "apps/dart_content_handler/dart_init.h"
 #include "lib/ftl/macros.h"
-#include "mojo/public/c/system/main.h"
 #include "mojo/public/cpp/application/application_impl_base.h"
 #include "mojo/public/cpp/application/run_application.h"
 #include "mojo/public/cpp/application/service_provider_impl.h"
