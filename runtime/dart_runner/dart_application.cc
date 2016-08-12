@@ -14,7 +14,7 @@
 #include "lib/ftl/logging.h"
 #include "lib/mtl/data_pipe/vector.h"
 #include "lib/tonic/logging/dart_error.h"
-#include "lib/tonic/mojo_converter.h"
+#include "lib/tonic/mojo/mojo_converter.h"
 
 using tonic::ToDart;
 

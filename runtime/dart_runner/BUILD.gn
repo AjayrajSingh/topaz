@@ -39,6 +39,7 @@ executable("app") {
     "//lib/ftl",
     "//lib/mtl",
     "//lib/tonic",
+    "//lib/tonic/mojo",
     "//mojo/public/c:system",
     "//mojo/public/cpp/application",
     "//mojo/public/cpp/bindings",
