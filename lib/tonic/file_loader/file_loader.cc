@@ -148,8 +148,11 @@ std::string FileLoader::Fetch(const std::string& url,
     *resolved_url = GetFileURLForPath(path);
   std::string source;
   if (!files::ReadFileToString(files::GetAbsoluteFilePath(path), &source)) {
-    std::cerr << "error: Unable to find Dart library '" << url << "'."
-              << std::endl;
+    // TODO(johnmccutchan): The file loader should not explicitly log the error
+    // or exit the process. Instead these errors should be reported to the
+    // caller of the FileLoader who can implement the application-specific error
+    // handling policy.
+    FTL_LOG(ERROR) << "error: Unable to read Dart source '" << url << "'.";
     exit(1);
   }
   url_dependencies_.insert(url);
