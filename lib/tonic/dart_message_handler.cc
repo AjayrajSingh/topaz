@@ -89,7 +89,7 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
   }
 
   if (error) {
-    if (!Dart_HasStickyError()) {
+    if (!Dart_HasStickyError() && Dart_IsUnhandledExceptionError(result)) {
       // Remember that we had an uncaught exception error.
       isolate_had_uncaught_exception_error_ = true;
       Dart_SetStickyError(result);
