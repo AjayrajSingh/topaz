@@ -9,6 +9,7 @@
 #include "lib/tonic/logging/dart_invoke.h"
 #include "lib/tonic/dart_persistent_value.h"
 #include "lib/tonic/dart_state.h"
+#include "lib/tonic/dart_sticky_error.h"
 
 namespace tonic {
 namespace {
@@ -36,7 +37,14 @@ void DartMicrotaskQueue::RunMicrotasks() {
       if (!dart_state.get())
         continue;
       DartState::Scope dart_scope(dart_state.get());
-      DartInvokeVoid(callback.value());
+      if (DartStickyError::IsSet()) {
+        break;
+      }
+      Dart_Handle result = DartInvokeVoid(callback.value());
+      // Let the isolate remember any uncaught exceptions.
+      if (DartStickyError::MaybeSet(result)) {
+        break;
+      }
     }
   }
 }

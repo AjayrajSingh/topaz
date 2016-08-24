@@ -24,9 +24,10 @@ void DartInvoke(Dart_Handle closure, std::initializer_list<Dart_Handle> args) {
   LogIfError(handle);
 }
 
-void DartInvokeVoid(Dart_Handle closure) {
+Dart_Handle DartInvokeVoid(Dart_Handle closure) {
   Dart_Handle handle = Dart_InvokeClosure(closure, 0, nullptr);
   LogIfError(handle);
+  return handle;
 }
 
 }  // namespace tonic

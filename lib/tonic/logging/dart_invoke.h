@@ -16,7 +16,7 @@ bool DartInvokeField(Dart_Handle target,
                      std::initializer_list<Dart_Handle> args);
 
 void DartInvoke(Dart_Handle closure, std::initializer_list<Dart_Handle> args);
-void DartInvokeVoid(Dart_Handle closure);
+Dart_Handle DartInvokeVoid(Dart_Handle closure);
 
 }  // namespace tonic
 

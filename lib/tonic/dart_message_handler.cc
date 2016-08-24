@@ -10,6 +10,7 @@
 #include "lib/ftl/logging.h"
 #include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/dart_state.h"
+#include "lib/tonic/dart_sticky_error.h"
 
 namespace tonic {
 
@@ -82,6 +83,11 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
       }
       Dart_SetPausedOnExit(false);
     }
+  } else if (DartStickyError::IsSet()) {
+    // Only process service messages if we have a sticky error set.
+    if (Dart_HasServiceMessages()) {
+      Dart_HandleServiceMessages();
+    }
   } else {
     // We are processing messages normally.
     result = Dart_HandleMessages();
@@ -89,10 +95,9 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
   }
 
   if (error) {
-    if (!Dart_HasStickyError() && Dart_IsUnhandledExceptionError(result)) {
+    if (DartStickyError::MaybeSet(result)) {
       // Remember that we had an uncaught exception error.
       isolate_had_uncaught_exception_error_ = true;
-      Dart_SetStickyError(result);
     }
   } else if (!Dart_HasLivePorts()) {
     // The isolate has no live ports and would like to exit.
