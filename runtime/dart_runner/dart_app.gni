@@ -2,8 +2,33 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# This template is now DEPRECATED, please use dart_app instead.
-template("dartx") {
+import("//build/dart/dart_package.gni")
+
+# Defines a Dart application that can be run in the Dart content handler
+#
+# Parameters
+#
+#   package_name (required)
+#     Name of the dart package.
+#
+#   main_dart (required)
+#     File containing the main function of the application.
+#
+#   deps (optional)
+#     Dependencies of this application
+#
+#   output_name (optional)
+#     Name of the output file to generate. Defaults to ${target_name}.dartx
+template("dart_app") {
+  assert(defined(invoker.package_name), "Must specify package name")
+  assert(defined(invoker.main_dart), "Must specify main_dart file")
+
+  dart_package_target_name = target_name + "_dart_package"
+
+  dart_package(dart_package_target_name) {
+    forward_variables_from(invoker, ["package_name", "deps"])
+  }
+
   if (defined(invoker.output_name)) {
     bundle_name = invoker.output_name
   } else {
@@ -14,15 +39,6 @@ template("dartx") {
   snapshot_path = "$target_gen_dir/${target_name}_snapshot.bin"
   depfile_path = "${snapshot_path}.d"
 
-  main_dart = invoker.main_dart
-
-  if (defined(invoker.packages)) {
-    packages_path = invoker.packages
-  } else {
-    main_dir = get_path_info(main_dart, "dir")
-    packages_path = "$main_dir/.packages"
-  }
-
   dart_snapshotter_label = "//apps/dart_content_handler/snapshotter($host_toolchain)"
   dart_snapshotter_dir =
       get_label_info(dart_snapshotter_label, "root_out_dir")
@@ -31,23 +47,14 @@ template("dartx") {
   action(target_name) {
     depfile = depfile_path
 
-    inputs = [
-      main_dart,
-      packages_path,
-    ]
-
     outputs = [
       bundle_path,
       snapshot_path,
     ]
 
-    if (defined(invoker.sources)) {
-      sources = invoker.sources
-    }
-
     script = dart_snapshotter
 
-    rebased_packages_path = rebase_path(packages_path)
+    rebased_packages_path = rebase_path("$target_gen_dir/.packages")
     rebased_bundle_path = rebase_path(bundle_path)
     rebased_snapshot_path = rebase_path(snapshot_path)
     rebased_depfile_path = rebase_path(depfile_path)
@@ -59,15 +66,12 @@ template("dartx") {
       "--snapshot=$rebased_snapshot_path",
       "--depfile=$rebased_depfile_path",
       "--build-output=$rebased_build_output_path",
-      rebase_path(main_dart),
+      rebase_path(invoker.main_dart)
     ]
 
     deps = [
+      ":$dart_package_target_name",
       dart_snapshotter_label,
     ]
-
-    if (defined(invoker.deps)) {
-      deps += invoker.deps
-    }
   }
 }
