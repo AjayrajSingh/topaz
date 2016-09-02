@@ -58,7 +58,7 @@ template("dart_app") {
 
     script = dart_snapshotter
 
-    rebased_packages_path = rebase_path("$target_gen_dir/.packages")
+    rebased_packages_path = rebase_path("$target_gen_dir/$dart_package_target_name.packages")
     rebased_bundle_path = rebase_path(bundle_path)
     rebased_snapshot_path = rebase_path(snapshot_path)
     rebased_depfile_path = rebase_path(depfile_path)

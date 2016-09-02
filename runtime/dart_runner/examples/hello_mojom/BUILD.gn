@@ -1,0 +1,13 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//apps/dart_content_handler/dart_app.gni")
+
+dart_app("hello_mojom") {
+  main_dart = "hello_mojom.dart"
+  deps = [
+    "//mojo/services/geometry/interfaces:interfaces_dart",
+    "//mojo/dart/packages/mojo",
+  ]
+}
