@@ -2,8 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//apps/dart_content_handler/dartx.gni")
+import("//apps/dart_content_handler/dart_app.gni")
 
-dartx("hello_dart") {
+dart_app("hello_dart") {
   main_dart = "hello_dart.dart"
+
+  deps = [
+    "//apps/dart_content_handler/examples/hello_dart/greeting"
+  ]
 }

@@ -8,7 +8,7 @@ import("//build/dart/dart_package.gni")
 #
 # Parameters
 #
-#   package_name (required)
+#   package_name (optional)
 #     Name of the dart package.
 #
 #   main_dart (required)
@@ -20,13 +20,17 @@ import("//build/dart/dart_package.gni")
 #   output_name (optional)
 #     Name of the output file to generate. Defaults to ${target_name}.dartx
 template("dart_app") {
-  assert(defined(invoker.package_name), "Must specify package name")
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   dart_package_target_name = target_name + "_dart_package"
 
   dart_package(dart_package_target_name) {
-    forward_variables_from(invoker, ["package_name", "deps"])
+    forward_variables_from(invoker, ["deps"])
+    if (defined(invoker.package_name)) {
+      package_name = invoker.package_name
+    } else {
+      infer_package_name = true
+    }
   }
 
   if (defined(invoker.output_name)) {
