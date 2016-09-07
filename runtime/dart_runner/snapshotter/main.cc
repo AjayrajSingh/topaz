@@ -9,7 +9,6 @@
 #include <string>
 
 #include "apps/dart_content_handler/embedder/snapshot.h"
-#include "apps/dart_content_handler/zip/zipper.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/command_line.h"
@@ -22,6 +21,7 @@
 #include "lib/ftl/logging.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/file_loader/file_loader.h"
+#include "lib/zip/zipper.h"
 
 namespace dart_snapshotter {
 namespace {

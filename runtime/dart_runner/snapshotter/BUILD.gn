@@ -11,11 +11,11 @@ executable("snapshotter") {
 
   deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
-    "//apps/dart_content_handler/zip",
     "//dart/runtime:libdart",
     "//dart/runtime/vm:libdart_platform",
     "//lib/ftl",
     "//lib/tonic/converter",
     "//lib/tonic/file_loader",
+    "//lib/zip",
   ]
 }

@@ -29,7 +29,6 @@ executable("app") {
 
   deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
-    "//apps/dart_content_handler/zip",
     "//dart/runtime:libdart",
     "//dart/runtime/bin:embedded_dart_io",
     # TODO(abarth): We shouldn't need to depend on libdart_builtin but we fail
@@ -40,6 +39,7 @@ executable("app") {
     "//lib/mtl",
     "//lib/tonic",
     "//lib/tonic/mojo",
+    "//lib/zip",
     "//mojo/public/c:system",
     "//mojo/public/cpp/application",
     "//mojo/public/cpp/bindings",

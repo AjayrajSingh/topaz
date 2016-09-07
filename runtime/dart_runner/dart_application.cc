@@ -8,13 +8,13 @@
 
 #include "apps/dart_content_handler/builtin_libraries.h"
 #include "apps/dart_content_handler/embedder/snapshot.h"
-#include "apps/dart_content_handler/zip/unzipper.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
 #include "lib/mtl/data_pipe/vector.h"
 #include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/mojo/mojo_converter.h"
+#include "lib/zip/unzipper.h"
 
 using tonic::ToDart;
 
