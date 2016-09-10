@@ -76,7 +76,7 @@ void DartApplication::Run() {
   Dart_ExitScope();
 
   Dart_EnterScope();
-  Dart_RunLoop();
+  tonic::LogIfError(Dart_RunLoop());
   Dart_ExitScope();
 
   Dart_ShutdownIsolate();
