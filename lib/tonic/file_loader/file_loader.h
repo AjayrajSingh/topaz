@@ -22,6 +22,11 @@ class FileLoader {
 
   bool LoadPackagesMap(const std::string& packages);
 
+  // The path to the `.packages` file the packages map was loaded from.
+  const std::string& packages() const {
+    return packages_;
+  }
+
   // Fully resolved file paths to dependencies. For example,
   // "package:foo/bar.dart" will be resolved to
   // "/path/to/package/foo/lib/bar.dart".
