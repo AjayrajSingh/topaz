@@ -98,6 +98,8 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
     if (DartStickyError::MaybeSet(result)) {
       // Remember that we had an uncaught exception error.
       isolate_had_uncaught_exception_error_ = true;
+      // Mark that we are paused on exit.
+      Dart_SetPausedOnExit(true);
     }
   } else if (!Dart_HasLivePorts()) {
     // The isolate has no live ports and would like to exit.
