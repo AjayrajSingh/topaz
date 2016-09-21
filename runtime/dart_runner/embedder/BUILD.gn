@@ -30,7 +30,6 @@ action("generate_snapshot_bin") {
 
   builtin_path = rebase_path("builtin.dart")
   internal_path = rebase_path("//mojo/dart/packages/mojo/sdk_ext/internal.dart")
-  io_path = rebase_path("//dart/sdk/lib/io/io.dart")
 
   args = [
      "--executable",
@@ -44,10 +43,9 @@ action("generate_snapshot_bin") {
      "--output_bin",
      rebase_path(isolate_snapshot, root_build_dir),
      "--target_os",
-     current_os,
+     target_os,
      "--url_mapping=dart:mojo.builtin,$builtin_path",
      "--url_mapping=dart:mojo.internal,$internal_path",
-     "--url_mapping=dart:io,$io_path",
    ]
 }
 

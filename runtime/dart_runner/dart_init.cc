@@ -6,6 +6,7 @@
 
 #include "apps/dart_content_handler/builtin_libraries.h"
 #include "apps/dart_content_handler/embedder/snapshot.h"
+#include "dart/runtime/bin/embedded_dart_io.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
@@ -23,6 +24,7 @@ const char* kDartArgs[] = {
 
 void InitDartVM() {
   SetHandleWatcherProducerHandle(mojo::dart::HandleWatcher::Start());
+  dart::bin::BootstrapDartIo();
 
   // TODO(abarth): Make checked mode configurable.
   FTL_CHECK(Dart_SetVMFlags(arraysize(kDartArgs), kDartArgs));
