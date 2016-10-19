@@ -167,6 +167,36 @@ template <>
 struct DartConverter<double> : public DartConverterFloatingPoint<double> {};
 
 ////////////////////////////////////////////////////////////////////////////////
+// Enum Classes
+
+template <typename T>
+struct DartConverter<T, typename std::enable_if<std::is_enum<T>::value>::type> {
+  static Dart_Handle ToDart(T val) {
+    return Dart_NewInteger(
+        static_cast<typename std::underlying_type<T>::type>(val));
+  }
+
+  static void SetReturnValue(Dart_NativeArguments args, T val) {
+    Dart_SetIntegerReturnValue(
+        args, static_cast<typename std::underlying_type<T>::type>(val));
+  }
+
+  static T FromDart(Dart_Handle handle) {
+    int64_t result = 0;
+    Dart_IntegerToInt64(handle, &result);
+    return static_cast<T>(result);
+  }
+
+  static T FromArguments(Dart_NativeArguments args,
+                         int index,
+                         Dart_Handle& exception) {
+    int64_t result = 0;
+    Dart_GetNativeIntegerArgument(args, index, &result);
+    return static_cast<T>(result);
+  }
+};
+
+////////////////////////////////////////////////////////////////////////////////
 // Strings
 
 template <>
