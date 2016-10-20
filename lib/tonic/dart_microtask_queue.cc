@@ -37,14 +37,7 @@ void DartMicrotaskQueue::RunMicrotasks() {
       if (!dart_state.get())
         continue;
       DartState::Scope dart_scope(dart_state.get());
-      if (DartStickyError::IsSet()) {
-        break;
-      }
-      Dart_Handle result = DartInvokeVoid(callback.value());
-      // Let the isolate remember any uncaught exceptions.
-      if (DartStickyError::MaybeSet(result)) {
-        break;
-      }
+      DartInvokeVoid(callback.value());
     }
   }
 }

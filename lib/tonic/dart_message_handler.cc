@@ -83,11 +83,6 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
       }
       Dart_SetPausedOnExit(false);
     }
-  } else if (DartStickyError::IsSet()) {
-    // Only process service messages if we have a sticky error set.
-    if (Dart_HasServiceMessages()) {
-      Dart_HandleServiceMessages();
-    }
   } else {
     // We are processing messages normally.
     result = Dart_HandleMessages();
@@ -95,11 +90,9 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
   }
 
   if (error) {
-    if (DartStickyError::MaybeSet(result)) {
+    if (Dart_IsError(result)) {
       // Remember that we had an uncaught exception error.
       isolate_had_uncaught_exception_error_ = true;
-      // Mark that we are paused on exit.
-      Dart_SetPausedOnExit(true);
     }
   } else if (!Dart_HasLivePorts()) {
     // The isolate has no live ports and would like to exit.
