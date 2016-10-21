@@ -12,6 +12,7 @@
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
 #include "lib/mtl/data_pipe/vector.h"
+#include "lib/mtl/shared_buffer/strings.h"
 #include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/mojo/mojo_converter.h"
 #include "lib/zip/unzipper.h"
@@ -40,10 +41,22 @@ DartApplication::~DartApplication() {}
 void DartApplication::Run() {
   std::vector<char> bundle;
 
-  bool result = mtl::BlockingCopyToVector(std::move(response_->body), &bundle);
-  if (!result) {
-    FTL_LOG(ERROR) << "Failed to receive bundle.";
-    return;
+  if (response_->body->is_stream()) {
+    bool result = mtl::BlockingCopyToVector(std::move(response_->body->get_stream()), &bundle);
+    if (!result) {
+      FTL_LOG(ERROR) << "Failed to receive bundle.";
+      return;
+    }
+  } else if (response_->body->is_buffer()) {
+    std::string string;
+    bool result = mtl::StringFromSharedBuffer(std::move(response_->body->get_buffer()), &string);
+    if (!result) {
+      FTL_LOG(ERROR) << "Failed to receive bundle.";
+      return;
+    }
+    bundle.assign(string.begin(), string.end());
+  } else {
+    FTL_NOTREACHED();
   }
 
   std::vector<char> snapshot = ExtractSnapshot(std::move(bundle));
