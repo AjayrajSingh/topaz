@@ -32,8 +32,16 @@ Float64List::Float64List(Float64List&& other)
 }
 
 Float64List::~Float64List() {
-  if (data_)
+  Release();
+}
+
+void Float64List::Release() {
+  if (data_) {
     Dart_TypedDataReleaseData(dart_handle_);
+    data_ = nullptr;
+    num_elements_ = 0;
+    dart_handle_ = nullptr;
+  }
 }
 
 Float64List DartConverter<Float64List>::FromArguments(Dart_NativeArguments args,

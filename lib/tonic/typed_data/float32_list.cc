@@ -32,8 +32,16 @@ Float32List::Float32List(Float32List&& other)
 }
 
 Float32List::~Float32List() {
-  if (data_)
+  Release();
+}
+
+void Float32List::Release() {
+  if (data_) {
     Dart_TypedDataReleaseData(dart_handle_);
+    data_ = nullptr;
+    num_elements_ = 0;
+    dart_handle_ = nullptr;
+  }
 }
 
 Float32List DartConverter<Float32List>::FromArguments(Dart_NativeArguments args,

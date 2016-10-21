@@ -34,8 +34,16 @@ Uint8List::Uint8List(Uint8List&& other)
 }
 
 Uint8List::~Uint8List() {
-  if (data_)
+  Release();
+}
+
+void Uint8List::Release() {
+  if (data_) {
     Dart_TypedDataReleaseData(dart_handle_);
+    data_ = nullptr;
+    num_elements_ = 0;
+    dart_handle_ = nullptr;
+  }
 }
 
 Uint8List DartConverter<Uint8List>::FromArguments(Dart_NativeArguments args,

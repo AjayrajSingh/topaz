@@ -38,6 +38,8 @@ class Float64List {
   intptr_t num_elements() const { return num_elements_; }
   Dart_Handle dart_handle() const { return dart_handle_; }
 
+  void Release();
+
  private:
   double* data_;
   intptr_t num_elements_;

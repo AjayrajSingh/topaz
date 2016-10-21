@@ -39,6 +39,8 @@ void Int32List::Release() {
   if (data_) {
     Dart_TypedDataReleaseData(dart_handle_);
     data_ = nullptr;
+    num_elements_ = 0;
+    dart_handle_ = nullptr;
   }
 }
 
