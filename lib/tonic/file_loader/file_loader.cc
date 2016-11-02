@@ -152,7 +152,8 @@ std::string FileLoader::Fetch(const std::string& url,
     // or exit the process. Instead these errors should be reported to the
     // caller of the FileLoader who can implement the application-specific error
     // handling policy.
-    FTL_LOG(ERROR) << "error: Unable to read Dart source '" << url << "'.";
+    std::cerr << "error: Unable to read Dart source '" << url << "'."
+              << std::endl;
     exit(1);
   }
   url_dependencies_.insert(url);
