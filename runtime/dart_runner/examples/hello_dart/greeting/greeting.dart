@@ -3,5 +3,5 @@
 // found in the LICENSE file.
 
 String greeting() {
-    return 'Hello';
+  return 'Hello';
 }

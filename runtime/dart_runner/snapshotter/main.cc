@@ -35,7 +35,7 @@ constexpr char kDartX[] = "dartx";
 constexpr char kDepfile[] = "depfile";
 constexpr char kBuildOutput[] = "build-output";
 
-constexpr char kShebang[] = "#!mojo mojo:dart_content_handler\n";
+constexpr char kShebang[] = "#!fuchsia mojo:dart_content_handler\n";
 constexpr size_t kShebangLength = sizeof(kShebang) - 1;
 
 constexpr char kSnapshotKey[] = "snapshot_blob.bin";
@@ -56,15 +56,13 @@ void Usage() {
       << std::endl
       << "                        MAIN_DART" << std::endl
       << " * PACKAGES is the '.packages' file that defines where to find Dart "
-         "packages."
-      << std::endl
+         "packages." << std::endl
       << " * OUTPUT_BUNDLE is the file to write the '.dartx' bundle into."
       << std::endl
       << " * OUTPUT_SNAPSHOT is the file to write the snapshot into."
       << std::endl
       << " * DEPFILE is the file into which to write the '.d' depedendency "
-         "information into."
-      << std::endl
+         "information into." << std::endl
       << " * BUILD_OUTPUT determines the target name used in the " << std::endl
       << "   DEPFILE. (Required if DEPFILE is provided.) " << std::endl;
 }

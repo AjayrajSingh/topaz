@@ -4,10 +4,10 @@
 
 import("//apps/dart_content_handler/dart_app.gni")
 
-dart_app("hello_mojom") {
-  main_dart = "hello_mojom.dart"
+dart_app("hello_fidl") {
+  main_dart = "hello_fidl.dart"
   deps = [
-    "//mojo/services/geometry/interfaces:interfaces_dart",
-    "//mojo/dart/packages/mojo",
+    "//lib/fidl/dart",
+    "//lib/fidl/examples/interfaces:interfaces_dart",
   ]
 }

@@ -6,7 +6,7 @@
 
 namespace dart_content_handler {
 
-extern uint8_t const * const vm_isolate_snapshot_buffer;
-extern uint8_t const * const isolate_snapshot_buffer;
+extern uint8_t const* const vm_isolate_snapshot_buffer;
+extern uint8_t const* const isolate_snapshot_buffer;
 
 }  // namespace dart_content_handler

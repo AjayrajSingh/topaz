@@ -9,6 +9,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
-import 'dart:mojo.builtin';
-import 'dart:mojo.internal';
+import 'dart:fidl.builtin';
+import 'dart:fidl.internal';
 import 'dart:typed_data';

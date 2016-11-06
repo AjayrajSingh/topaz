@@ -6,14 +6,18 @@
 #define APPS_DART_CONTENT_HANDLER_EMBEDDER_BUILTIN_H_
 
 #include <string>
+#include <mx/channel.h>
 
-#include "mojo/public/cpp/system/handle.h"
+#include "apps/modular/services/application/application_runner.fidl.h"
 
 namespace dart_content_handler {
 
-void SetHandleWatcherProducerHandle(MojoHandle handle);
-void InitBuiltinLibrariesForIsolate(const std::string& base_uri,
-                                    const std::string& script_uri);
+void SetHandleWatcherProducerHandle(mx::channel handle);
+void InitBuiltinLibrariesForIsolate(
+    const std::string& base_uri,
+    const std::string& script_uri,
+    modular::ServiceProviderPtr environment_services,
+    fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services);
 
 }  // namespace dart_content_handler
 

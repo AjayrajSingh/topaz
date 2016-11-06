@@ -8,9 +8,9 @@ action("generate_snapshot_bin") {
   ]
 
   inputs = [
-    "//mojo/dart/packages/mojo/sdk_ext/internal.dart",
-    "//mojo/dart/packages/mojo/sdk_ext/src/handle_watcher.dart",
-    "//mojo/dart/packages/mojo/sdk_ext/src/natives.dart",
+    "//lib/fidl/dart/sdk_ext/internal.dart",
+    "//lib/fidl/dart/sdk_ext/src/handle_watcher.dart",
+    "//lib/fidl/dart/sdk_ext/src/natives.dart",
     "builtin.dart",
     "snapshot.dart",
   ]
@@ -29,24 +29,24 @@ action("generate_snapshot_bin") {
   script = "//dart/runtime/tools/create_snapshot_bin.py"
 
   builtin_path = rebase_path("builtin.dart")
-  internal_path = rebase_path("//mojo/dart/packages/mojo/sdk_ext/internal.dart")
+  internal_path = rebase_path("//lib/fidl/dart/sdk_ext/internal.dart")
 
   args = [
-     "--executable",
-     rebase_path("$gen_snapshot_dir/gen_snapshot"),
-     "--package_root",
-     rebase_path("$root_gen_dir/dart-gen"),
-     "--script",
-     rebase_path("snapshot.dart"),
-     "--vm_output_bin",
-     rebase_path(vm_isolate_snapshot, root_build_dir),
-     "--output_bin",
-     rebase_path(isolate_snapshot, root_build_dir),
-     "--target_os",
-     target_os,
-     "--url_mapping=dart:mojo.builtin,$builtin_path",
-     "--url_mapping=dart:mojo.internal,$internal_path",
-   ]
+    "--executable",
+    rebase_path("$gen_snapshot_dir/gen_snapshot"),
+    "--package_root",
+    rebase_path("$root_gen_dir/dart-gen"),
+    "--script",
+    rebase_path("snapshot.dart"),
+    "--vm_output_bin",
+    rebase_path(vm_isolate_snapshot, root_build_dir),
+    "--output_bin",
+    rebase_path(isolate_snapshot, root_build_dir),
+    "--target_os",
+    target_os,
+    "--url_mapping=dart:fidl.builtin,$builtin_path",
+    "--url_mapping=dart:fidl.internal,$internal_path",
+  ]
 }
 
 action("generate_snapshot_file") {
@@ -88,7 +88,7 @@ source_set("dart_snapshot_cc") {
   ]
 
   sources = [
-    "snapshot.h",
     "$target_gen_dir/dart_snapshot.cc",
+    "snapshot.h",
   ]
 }

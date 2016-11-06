@@ -4,32 +4,40 @@
 
 #include "apps/dart_content_handler/builtin_libraries.h"
 
+#include <mx/channel.h>
+
 #include "dart/runtime/bin/io_natives.h"
 #include "dart/runtime/include/dart_api.h"
+#include "lib/fidl/dart/sdk_ext/src/natives.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/logging/dart_error.h"
-#include "mojo/public/platform/dart/mojo_natives.h"
+#include "lib/tonic/mx/mx_converter.h"
 
 using tonic::ToDart;
 
 namespace dart_content_handler {
 namespace {
 
-MojoHandle g_handle_watcher_producer_handle = MOJO_HANDLE_INVALID;
+mx::channel g_handle_watcher_producer_handle;
 
-void SetHandleWatcherControlHandle(Dart_Handle mojo_internal) {
-  FTL_CHECK(g_handle_watcher_producer_handle != MOJO_HANDLE_INVALID);
+void SetHandleWatcherControlHandle(Dart_Handle fidl_internal) {
+  FTL_CHECK(g_handle_watcher_producer_handle);
   Dart_Handle handle_watcher_type =
-      Dart_GetType(mojo_internal, ToDart("MojoHandleWatcher"), 0, nullptr);
-  Dart_Handle field_name = ToDart("mojoControlHandle");
-  Dart_Handle control_port_value = ToDart(g_handle_watcher_producer_handle);
+      Dart_GetType(fidl_internal, ToDart("HandleWatcher"), 0, nullptr);
+  Dart_Handle field_name = ToDart("controlHandle");
+  // TODO(ianloic): work out how to get tonic::ToDart to work with move-only
+  // types
+  Dart_Handle control_port_value = tonic::DartConverter<mx::channel>::ToDart(
+      std::move(g_handle_watcher_producer_handle));
   DART_CHECK_VALID(
       Dart_SetField(handle_watcher_type, field_name, control_port_value));
 }
 
-#define REGISTER_FUNCTION(name, count) {#name, name, count},
+#define REGISTER_FUNCTION(name, count) \
+  { #name, name, count }               \
+  ,
 #define DECLARE_FUNCTION(name, count) \
   extern void name(Dart_NativeArguments args);
 
@@ -88,24 +96,26 @@ void Logger_PrintString(Dart_NativeArguments args) {
 
 }  // namespace
 
-void SetHandleWatcherProducerHandle(MojoHandle handle) {
-  FTL_CHECK(g_handle_watcher_producer_handle == MOJO_HANDLE_INVALID);
-  g_handle_watcher_producer_handle = handle;
+void SetHandleWatcherProducerHandle(mx::channel handle) {
+  FTL_CHECK(!g_handle_watcher_producer_handle);
+  g_handle_watcher_producer_handle = std::move(handle);
 }
 
-void InitBuiltinLibrariesForIsolate(const std::string& base_uri,
-                                    const std::string& script_uri) {
-  // dart:mojo.internal --------------------------------------------------------
+void InitBuiltinLibrariesForIsolate(
+    const std::string& base_uri,
+    const std::string& script_uri,
+    modular::ServiceProviderPtr environment_services,
+    fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services) {
+  // dart:fidl.internal --------------------------------------------------------
 
-  Dart_Handle mojo_internal = Dart_LookupLibrary(ToDart("dart:mojo.internal"));
-  DART_CHECK_VALID(Dart_SetNativeResolver(mojo_internal,
-                                          mojo::dart::MojoNativeLookup,
-                                          mojo::dart::MojoNativeSymbol));
-  SetHandleWatcherControlHandle(mojo_internal);
+  Dart_Handle fidl_internal = Dart_LookupLibrary(ToDart("dart:fidl.internal"));
+  DART_CHECK_VALID(Dart_SetNativeResolver(
+      fidl_internal, fidl::dart::NativeLookup, fidl::dart::NativeSymbol));
+  SetHandleWatcherControlHandle(fidl_internal);
 
-  // dart:mojo.builtin ---------------------------------------------------------
+  // dart:fidl.builtin ---------------------------------------------------------
 
-  Dart_Handle builtin_lib = Dart_LookupLibrary(ToDart("dart:mojo.builtin"));
+  Dart_Handle builtin_lib = Dart_LookupLibrary(ToDart("dart:fidl.builtin"));
   DART_CHECK_VALID(Dart_SetNativeResolver(builtin_lib, BuiltinNativeLookup,
                                           BuiltinNativeSymbol));
 
@@ -126,7 +136,7 @@ void InitBuiltinLibrariesForIsolate(const std::string& base_uri,
   // as we are about to invoke some Dart code below to setup closures.
   DART_CHECK_VALID(Dart_FinalizeLoading(false));
 
-  // Import dart:_internal into dart:mojo.builtin for setting up hooks.
+  // Import dart:_internal into dart:fidl.builtin for setting up hooks.
   DART_CHECK_VALID(
       Dart_LibraryImportLibrary(builtin_lib, internal_lib, Dart_Null()));
 
@@ -154,12 +164,24 @@ void InitBuiltinLibrariesForIsolate(const std::string& base_uri,
   DART_CHECK_VALID(
       Dart_SetField(builtin_lib, ToDart("_rawUriBase"), ToDart(base_uri)));
 
-  // Setup the uriBase with the base uri of the mojo app.
+  // Setup the uriBase with the base uri of the fidl app.
   Dart_Handle uri_base =
       Dart_Invoke(builtin_lib, ToDart("_getUriBaseClosure"), 0, nullptr);
   DART_CHECK_VALID(uri_base);
   DART_CHECK_VALID(
       Dart_SetField(core_lib, ToDart("_uriBaseClosure"), uri_base));
+
+  // Set the environment services channel.
+  DART_CHECK_VALID(Dart_SetField(
+      builtin_lib, ToDart("_rawEnvironmentServicesHandle"),
+      tonic::DartConverter<mx::channel>::ToDart(
+          environment_services.PassInterfaceHandle().PassHandle())));
+
+  // Set the outgoing services channel.
+  DART_CHECK_VALID(Dart_SetField(builtin_lib,
+                                 ToDart("_rawOutgoingServicesHandle"),
+                                 tonic::DartConverter<mx::channel>::ToDart(
+                                     outgoing_services.PassMessagePipe())));
 
   DART_CHECK_VALID(Dart_Invoke(builtin_lib, ToDart("_setupHooks"), 0, nullptr));
   DART_CHECK_VALID(Dart_Invoke(isolate_lib, ToDart("_setupHooks"), 0, nullptr));

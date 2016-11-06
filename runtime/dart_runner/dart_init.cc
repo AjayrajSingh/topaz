@@ -10,20 +10,23 @@
 #include "dart/runtime/include/dart_api.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
-#include "mojo/public/platform/dart/dart_handle_watcher.h"
+#include "lib/fidl/dart/sdk_ext/src/handle_watcher.h"
 
 namespace dart_content_handler {
 namespace {
 
 const char* kDartArgs[] = {
-    "--enable_asserts",        "--enable_type_checks",   "--error_on_bad_type",
-    "--error_on_bad_override", "--enable_mirrors=false",
+    "--enable_asserts",
+    "--enable_type_checks",
+    "--error_on_bad_type",
+    "--error_on_bad_override",
+    "--enable_mirrors=false",
 };
 
 }  // namespace
 
 void InitDartVM() {
-  SetHandleWatcherProducerHandle(mojo::dart::HandleWatcher::Start());
+  SetHandleWatcherProducerHandle(fidl::dart::HandleWatcher::Start());
   dart::bin::BootstrapDartIo();
 
   // TODO(abarth): Make checked mode configurable.

@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-library mojo_builtin;
+library fidl_builtin;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:mojo.internal';
+import 'dart:fidl.internal';
 
 // Corelib 'print' implementation.
 void _print(arg) {
@@ -37,6 +37,9 @@ Uri _scriptUri() {
     return Uri.base.resolveUri(new Uri.file(_rawScript));
   }
 }
+
+int _rawEnvironmentServicesHandle;
+int _rawOutgoingServicesHandle;
 
 _setupHooks() {
   VMLibraryHooks.eventHandlerSendData = MojoHandleWatcher.timer;
