@@ -32,6 +32,7 @@ class DartApplicationController : public modular::ApplicationController {
  private:
   std::string url_;
   fidl::Array<fidl::String> arguments_;
+  std::vector<char> snapshot_;
   modular::ServiceProviderPtr environment_services_;
   fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services_;
   fidl::Binding<modular::ApplicationController> binding_;

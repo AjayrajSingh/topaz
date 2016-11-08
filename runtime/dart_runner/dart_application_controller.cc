@@ -28,6 +28,7 @@ DartApplicationController::DartApplicationController(
     fidl::InterfaceRequest<modular::ApplicationController> controller)
     : url_(url),
       arguments_(std::move(arguments)),
+      snapshot_(std::move(snapshot)),
       environment_services_(std::move(environment_services)),
       outgoing_services_(std::move(outgoing_services)),
       binding_(this) {
@@ -39,10 +40,16 @@ DartApplicationController::DartApplicationController(
     });
   }
 
+}
+
+DartApplicationController::~DartApplicationController() {
+}
+
+void DartApplicationController::Run() {
   // Create the isolate from the snapshot.
   char* error = nullptr;
   isolate_ =
-      Dart_CreateIsolate(url_.c_str(), "main", (const uint8_t*)snapshot.data(),
+      Dart_CreateIsolate(url_.c_str(), "main", isolate_snapshot_buffer,
                          nullptr, nullptr, &error);
   if (!isolate_) {
     FTL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
@@ -52,14 +59,7 @@ DartApplicationController::DartApplicationController(
   Dart_EnterScope();
 
   script_ = Dart_LoadScriptFromSnapshot(
-      reinterpret_cast<uint8_t*>(snapshot.data()), snapshot.size());
-}
-
-DartApplicationController::~DartApplicationController() {
-}
-
-void DartApplicationController::Run() {
-  // TODO(abarth): Pass the appropriate arguments to |main|.
+      reinterpret_cast<uint8_t*>(snapshot_.data()), snapshot_.size());
 
   InitBuiltinLibrariesForIsolate(url_, url_, std::move(environment_services_),
                                  std::move(outgoing_services_));
