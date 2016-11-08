@@ -17,7 +17,7 @@ void SetHandleWatcherProducerHandle(mx::channel handle);
 void InitBuiltinLibrariesForIsolate(
     const std::string& base_uri,
     const std::string& script_uri,
-    mx::channel environment,
+    fidl::InterfaceHandle<modular::ApplicationEnvironment> environment,
     fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services);
 
 }  // namespace dart_content_handler

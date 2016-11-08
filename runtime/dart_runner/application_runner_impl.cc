@@ -35,8 +35,7 @@ void RunApplication(
 
   DartApplicationController app(
       startup_info->url.get(), std::move(startup_info->arguments), snapshot,
-      modular::ServiceProviderPtr::Create(
-          std::move(startup_info->environment_services)),
+      std::move(startup_info->environment),
       std::move(startup_info->outgoing_services), std::move(controller));
   app.Run();
 }

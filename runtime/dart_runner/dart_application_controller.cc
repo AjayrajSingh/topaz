@@ -23,13 +23,13 @@ DartApplicationController::DartApplicationController(
     const std::string& url,
     fidl::Array<fidl::String> arguments,
     std::vector<char> snapshot,
-    modular::ServiceProviderPtr environment_services,
+    fidl::InterfaceHandle<modular::ApplicationEnvironment> environment,
     fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services,
     fidl::InterfaceRequest<modular::ApplicationController> controller)
     : url_(url),
       arguments_(std::move(arguments)),
       snapshot_(std::move(snapshot)),
-      environment_services_(std::move(environment_services)),
+      environment_(std::move(environment)),
       outgoing_services_(std::move(outgoing_services)),
       binding_(this) {
   if (controller.is_pending()) {
@@ -58,7 +58,7 @@ void DartApplicationController::Run() {
   script_ = Dart_LoadScriptFromSnapshot(
       reinterpret_cast<uint8_t*>(snapshot_.data()), snapshot_.size());
 
-  InitBuiltinLibrariesForIsolate(url_, url_, mx::channel(),
+  InitBuiltinLibrariesForIsolate(url_, url_, std::move(environment_),
                                  std::move(outgoing_services_));
 
   Dart_Handle arguments = Dart_NewList(arguments_.size());

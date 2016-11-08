@@ -102,7 +102,7 @@ void SetHandleWatcherProducerHandle(mx::channel handle) {
 void InitBuiltinLibrariesForIsolate(
     const std::string& base_uri,
     const std::string& script_uri,
-    mx::channel environment,
+    fidl::InterfaceHandle<modular::ApplicationEnvironment> environment,
     fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services) {
   // dart:fidl.internal --------------------------------------------------------
 
@@ -114,7 +114,7 @@ void InitBuiltinLibrariesForIsolate(
   // Set the environment services channel.
   DART_CHECK_VALID(Dart_SetField(
       fidl_internal, ToDart("_environmentHandle"),
-      tonic::DartConverter<mx::channel>::ToDart(std::move(environment))));
+      tonic::DartConverter<mx::channel>::ToDart(environment.PassHandle())));
 
   // Set the outgoing services channel.
   DART_CHECK_VALID(Dart_SetField(fidl_internal,

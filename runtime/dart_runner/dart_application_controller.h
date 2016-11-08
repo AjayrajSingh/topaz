@@ -18,7 +18,7 @@ class DartApplicationController : public modular::ApplicationController {
       const std::string& url,
       fidl::Array<fidl::String> arguments,
       std::vector<char> snapshot,
-      modular::ServiceProviderPtr environment_services,
+      fidl::InterfaceHandle<modular::ApplicationEnvironment> environment,
       fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services,
       fidl::InterfaceRequest<modular::ApplicationController> controller);
   ~DartApplicationController() override;
@@ -33,7 +33,7 @@ class DartApplicationController : public modular::ApplicationController {
   std::string url_;
   fidl::Array<fidl::String> arguments_;
   std::vector<char> snapshot_;
-  modular::ServiceProviderPtr environment_services_;
+  fidl::InterfaceHandle<modular::ApplicationEnvironment> environment_;
   fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services_;
   fidl::Binding<modular::ApplicationController> binding_;
   Dart_Handle script_;
