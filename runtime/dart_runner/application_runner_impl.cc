@@ -45,11 +45,9 @@ void RunApplication(
 
 ApplicationRunnerImpl::ApplicationRunnerImpl(
     fidl::InterfaceRequest<modular::ApplicationRunner> app_runner)
-    : binding_(this, std::move(app_runner)) {
-}
+    : binding_(this, std::move(app_runner)) {}
 
-ApplicationRunnerImpl::~ApplicationRunnerImpl() {
-}
+ApplicationRunnerImpl::~ApplicationRunnerImpl() {}
 
 void ApplicationRunnerImpl::StartApplication(
     modular::ApplicationPackagePtr application,

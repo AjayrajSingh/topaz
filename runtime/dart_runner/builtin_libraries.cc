@@ -35,9 +35,7 @@ void SetHandleWatcherControlHandle(Dart_Handle fidl_internal) {
       Dart_SetField(handle_watcher_type, field_name, control_port_value));
 }
 
-#define REGISTER_FUNCTION(name, count) \
-  { #name, name, count }               \
-  ,
+#define REGISTER_FUNCTION(name, count) {#name, name, count},
 #define DECLARE_FUNCTION(name, count) \
   extern void name(Dart_NativeArguments args);
 
@@ -104,7 +102,7 @@ void SetHandleWatcherProducerHandle(mx::channel handle) {
 void InitBuiltinLibrariesForIsolate(
     const std::string& base_uri,
     const std::string& script_uri,
-    modular::ServiceProviderPtr environment_services,
+    mx::channel environment,
     fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services) {
   // dart:fidl.internal --------------------------------------------------------
 
@@ -112,6 +110,17 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(Dart_SetNativeResolver(
       fidl_internal, fidl::dart::NativeLookup, fidl::dart::NativeSymbol));
   SetHandleWatcherControlHandle(fidl_internal);
+
+  // Set the environment services channel.
+  DART_CHECK_VALID(Dart_SetField(
+      fidl_internal, ToDart("_environmentHandle"),
+      tonic::DartConverter<mx::channel>::ToDart(std::move(environment))));
+
+  // Set the outgoing services channel.
+  DART_CHECK_VALID(Dart_SetField(fidl_internal,
+                                 ToDart("_outgoingServicesHandle"),
+                                 tonic::DartConverter<mx::channel>::ToDart(
+                                     outgoing_services.PassChannel())));
 
   // dart:fidl.builtin ---------------------------------------------------------
 
@@ -170,18 +179,6 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(uri_base);
   DART_CHECK_VALID(
       Dart_SetField(core_lib, ToDart("_uriBaseClosure"), uri_base));
-
-  // Set the environment services channel.
-  DART_CHECK_VALID(Dart_SetField(
-      builtin_lib, ToDart("_rawEnvironmentServicesHandle"),
-      tonic::DartConverter<mx::channel>::ToDart(
-          environment_services.PassInterfaceHandle().PassHandle())));
-
-  // Set the outgoing services channel.
-  DART_CHECK_VALID(Dart_SetField(builtin_lib,
-                                 ToDart("_rawOutgoingServicesHandle"),
-                                 tonic::DartConverter<mx::channel>::ToDart(
-                                     outgoing_services.PassMessagePipe())));
 
   DART_CHECK_VALID(Dart_Invoke(builtin_lib, ToDart("_setupHooks"), 0, nullptr));
   DART_CHECK_VALID(Dart_Invoke(isolate_lib, ToDart("_setupHooks"), 0, nullptr));

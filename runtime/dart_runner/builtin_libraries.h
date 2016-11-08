@@ -8,6 +8,7 @@
 #include <string>
 #include <mx/channel.h>
 
+#include "apps/modular/services/application/application_environment.fidl.h"
 #include "apps/modular/services/application/application_runner.fidl.h"
 
 namespace dart_content_handler {
@@ -16,7 +17,7 @@ void SetHandleWatcherProducerHandle(mx::channel handle);
 void InitBuiltinLibrariesForIsolate(
     const std::string& base_uri,
     const std::string& script_uri,
-    modular::ServiceProviderPtr environment_services,
+    mx::channel environment,
     fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services);
 
 }  // namespace dart_content_handler

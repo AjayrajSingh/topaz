@@ -6,7 +6,7 @@ group("examples") {
   testonly = true
 
   deps = [
-    "//apps/dart_content_handler/examples/hello_dart",
-    "//apps/dart_content_handler/examples/hello_fidl",
+    "hello_app_dart",
+    "hello_dart",
   ]
 }

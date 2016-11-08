@@ -4,10 +4,11 @@
 
 import("//apps/dart_content_handler/dart_app.gni")
 
-dart_app("hello_fidl") {
-  main_dart = "hello_fidl.dart"
+dart_app("hello_app_dart") {
+  main_dart = "main.dart"
+
   deps = [
+    "//apps/modular/lib/app/dart",
     "//lib/fidl/dart",
-    "//lib/fidl/examples/interfaces:interfaces_dart",
   ]
 }

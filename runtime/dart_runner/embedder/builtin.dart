@@ -38,12 +38,9 @@ Uri _scriptUri() {
   }
 }
 
-int _rawEnvironmentServicesHandle;
-int _rawOutgoingServicesHandle;
-
 _setupHooks() {
-  VMLibraryHooks.eventHandlerSendData = MojoHandleWatcher.timer;
-  VMLibraryHooks.timerMillisecondClock = MojoCoreNatives.timerMillisecondClock;
+  VMLibraryHooks.eventHandlerSendData = HandleWatcher.timer;
+  VMLibraryHooks.timerMillisecondClock = MxTime.timerMillisecondClock;
 
   // TODO(zra): When the Dart issue here:
   // https://github.com/dart-lang/sdk/issues/25603
