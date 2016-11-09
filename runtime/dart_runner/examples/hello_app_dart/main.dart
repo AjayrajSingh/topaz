@@ -9,7 +9,7 @@ import 'package:apps.modular.examples.hello_app/hello.fidl.dart';
 
 class HelloImpl extends Hello {
   @override
-  void Say(String request, void callback(String response)) {
+  void say(String request, void callback(String response)) {
     callback((request == "hello") ? "hola from Dart!" : "adios from Dart!");
   }
 }
