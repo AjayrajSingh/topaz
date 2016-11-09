@@ -32,13 +32,8 @@ DartApplicationController::DartApplicationController(
       environment_(std::move(environment)),
       outgoing_services_(std::move(outgoing_services)),
       binding_(this) {
-  if (controller.is_pending()) {
-    binding_.Bind(std::move(controller));
-    binding_.set_connection_error_handler([this] {
-      // Kill the application when the controller channel closes.
-      Kill(ftl::Closure());
-    });
-  }
+  // TODO(abarth): We need to bind the application controller on another thread
+  // because this thread uses a Dart run loop.
 }
 
 DartApplicationController::~DartApplicationController() {}

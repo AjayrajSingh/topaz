@@ -113,12 +113,11 @@ void InitBuiltinLibrariesForIsolate(
 
   // Set the environment services channel.
   DART_CHECK_VALID(Dart_SetField(
-      fidl_internal, ToDart("_environmentHandle"),
+      fidl_internal, ToDart("_environment"),
       tonic::DartConverter<mx::channel>::ToDart(environment.PassHandle())));
 
   // Set the outgoing services channel.
-  DART_CHECK_VALID(Dart_SetField(fidl_internal,
-                                 ToDart("_outgoingServicesHandle"),
+  DART_CHECK_VALID(Dart_SetField(fidl_internal, ToDart("_outgoingServices"),
                                  tonic::DartConverter<mx::channel>::ToDart(
                                      outgoing_services.PassChannel())));
 
