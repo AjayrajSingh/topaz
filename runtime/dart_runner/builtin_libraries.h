@@ -13,7 +13,6 @@
 
 namespace dart_content_handler {
 
-void SetHandleWatcherProducerHandle(mx::channel handle);
 void InitBuiltinLibrariesForIsolate(
     const std::string& base_uri,
     const std::string& script_uri,

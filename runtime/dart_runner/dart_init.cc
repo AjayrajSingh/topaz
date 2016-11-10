@@ -16,17 +16,18 @@ namespace dart_content_handler {
 namespace {
 
 const char* kDartArgs[] = {
+    // clang-format off
     "--enable_asserts",
     "--enable_type_checks",
     "--error_on_bad_type",
     "--error_on_bad_override",
     "--enable_mirrors=false",
+    // clang-format on
 };
 
 }  // namespace
 
 void InitDartVM() {
-  SetHandleWatcherProducerHandle(fidl::dart::HandleWatcher::Start());
   dart::bin::BootstrapDartIo();
 
   // TODO(abarth): Make checked mode configurable.

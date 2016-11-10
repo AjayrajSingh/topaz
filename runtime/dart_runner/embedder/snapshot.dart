@@ -9,6 +9,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
-import 'dart:fidl.builtin';
+import 'dart:fuchsia.builtin';
 import 'dart:fidl.internal';
 import 'dart:typed_data';

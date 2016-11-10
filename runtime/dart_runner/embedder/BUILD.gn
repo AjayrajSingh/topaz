@@ -2,15 +2,14 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//lib/fidl/dart/sdk_ext/sdk_ext.gni")
+
 action("generate_snapshot_bin") {
   deps = [
     "//dart/runtime/bin:gen_snapshot($host_toolchain)",
   ]
 
-  inputs = [
-    "//lib/fidl/dart/sdk_ext/internal.dart",
-    "//lib/fidl/dart/sdk_ext/src/handle_watcher.dart",
-    "//lib/fidl/dart/sdk_ext/src/natives.dart",
+  inputs = fidl_dart_sdk_ext_files + [
     "builtin.dart",
     "snapshot.dart",
   ]
@@ -28,8 +27,8 @@ action("generate_snapshot_bin") {
                      "root_out_dir")
   script = "//dart/runtime/tools/create_snapshot_bin.py"
 
-  builtin_path = rebase_path("builtin.dart")
-  internal_path = rebase_path("//lib/fidl/dart/sdk_ext/internal.dart")
+  fuchsia_builtin_path = rebase_path("builtin.dart")
+  fidl_internal_path = rebase_path(fidl_dart_sdk_ext_lib)
 
   args = [
     "--executable",
@@ -44,8 +43,8 @@ action("generate_snapshot_bin") {
     rebase_path(isolate_snapshot, root_build_dir),
     "--target_os",
     target_os,
-    "--url_mapping=dart:fidl.builtin,$builtin_path",
-    "--url_mapping=dart:fidl.internal,$internal_path",
+    "--url_mapping=dart:fuchsia.builtin,$fuchsia_builtin_path",
+    "--url_mapping=dart:fidl.internal,$fidl_internal_path",
   ]
 }
 

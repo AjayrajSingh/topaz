@@ -8,6 +8,7 @@
 
 #include "dart/runtime/bin/io_natives.h"
 #include "dart/runtime/include/dart_api.h"
+#include "lib/fidl/dart/sdk_ext/src/handle_watcher.h"
 #include "lib/fidl/dart/sdk_ext/src/natives.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
@@ -20,17 +21,17 @@ using tonic::ToDart;
 namespace dart_content_handler {
 namespace {
 
-mx::channel g_handle_watcher_producer_handle;
-
 void SetHandleWatcherControlHandle(Dart_Handle fidl_internal) {
-  FTL_CHECK(g_handle_watcher_producer_handle);
+  // TODO(abarth): We leak the handle watcher thread.
+  mx::channel producer = fidl::dart::HandleWatcher::Start();
+
   Dart_Handle handle_watcher_type =
       Dart_GetType(fidl_internal, ToDart("HandleWatcher"), 0, nullptr);
   Dart_Handle field_name = ToDart("controlHandle");
   // TODO(ianloic): work out how to get tonic::ToDart to work with move-only
   // types
-  Dart_Handle control_port_value = tonic::DartConverter<mx::channel>::ToDart(
-      std::move(g_handle_watcher_producer_handle));
+  Dart_Handle control_port_value =
+      tonic::DartConverter<mx::channel>::ToDart(std::move(producer));
   DART_CHECK_VALID(
       Dart_SetField(handle_watcher_type, field_name, control_port_value));
 }
@@ -94,11 +95,6 @@ void Logger_PrintString(Dart_NativeArguments args) {
 
 }  // namespace
 
-void SetHandleWatcherProducerHandle(mx::channel handle) {
-  FTL_CHECK(!g_handle_watcher_producer_handle);
-  g_handle_watcher_producer_handle = std::move(handle);
-}
-
 void InitBuiltinLibrariesForIsolate(
     const std::string& base_uri,
     const std::string& script_uri,
@@ -121,9 +117,9 @@ void InitBuiltinLibrariesForIsolate(
                                  tonic::DartConverter<mx::channel>::ToDart(
                                      outgoing_services.PassChannel())));
 
-  // dart:fidl.builtin ---------------------------------------------------------
+  // dart:fuchsia.builtin ------------------------------------------------------
 
-  Dart_Handle builtin_lib = Dart_LookupLibrary(ToDart("dart:fidl.builtin"));
+  Dart_Handle builtin_lib = Dart_LookupLibrary(ToDart("dart:fuchsia.builtin"));
   DART_CHECK_VALID(Dart_SetNativeResolver(builtin_lib, BuiltinNativeLookup,
                                           BuiltinNativeSymbol));
 
@@ -144,7 +140,7 @@ void InitBuiltinLibrariesForIsolate(
   // as we are about to invoke some Dart code below to setup closures.
   DART_CHECK_VALID(Dart_FinalizeLoading(false));
 
-  // Import dart:_internal into dart:fidl.builtin for setting up hooks.
+  // Import dart:_internal into dart:fuchsia.builtin for setting up hooks.
   DART_CHECK_VALID(
       Dart_LibraryImportLibrary(builtin_lib, internal_lib, Dart_Null()));
 

@@ -1,3 +1,3 @@
-# Dart Content Handler
+# Dart Application Runner
 
-A content handler that runs Dart code.
+An ApplicationRunner that runs Dart programs.
