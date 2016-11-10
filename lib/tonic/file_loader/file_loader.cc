@@ -190,7 +190,13 @@ Dart_Handle FileLoader::Source(Dart_Handle library, Dart_Handle url) {
   return Dart_LoadSource(library, url, ToDart(resolved_url), source, 0, 0);
 }
 
+// This is invoked upon a reload request.
 Dart_Handle FileLoader::Script(Dart_Handle url) {
+  // Clear dependencies.
+  dependencies_.clear();
+  url_dependencies_.clear();
+  // Reload the packages map.
+  LoadPackagesMap(packages());
   return LoadScript(StdStringFromDart(url));
 }
 
