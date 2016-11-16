@@ -108,14 +108,18 @@ void InitBuiltinLibrariesForIsolate(
   SetHandleWatcherControlHandle(fidl_internal);
 
   // Set the environment services channel.
-  DART_CHECK_VALID(Dart_SetField(
-      fidl_internal, ToDart("_environment"),
-      tonic::DartConverter<mx::channel>::ToDart(environment.PassHandle())));
+  if (environment) {
+    DART_CHECK_VALID(Dart_SetField(
+        fidl_internal, ToDart("_environment"),
+        tonic::DartConverter<mx::channel>::ToDart(environment.PassHandle())));
+  }
 
   // Set the outgoing services channel.
-  DART_CHECK_VALID(Dart_SetField(fidl_internal, ToDart("_outgoingServices"),
-                                 tonic::DartConverter<mx::channel>::ToDart(
-                                     outgoing_services.PassChannel())));
+  if (outgoing_services) {
+    DART_CHECK_VALID(Dart_SetField(fidl_internal, ToDart("_outgoingServices"),
+                                   tonic::DartConverter<mx::channel>::ToDart(
+                                       outgoing_services.PassChannel())));
+  }
 
   // dart:fuchsia.builtin ------------------------------------------------------
 
