@@ -15,11 +15,8 @@ namespace dart_content_handler {
 class DartApplicationController : public modular::ApplicationController {
  public:
   DartApplicationController(
-      const std::string& url,
-      fidl::Array<fidl::String> arguments,
       std::vector<char> snapshot,
-      fidl::InterfaceHandle<modular::ApplicationEnvironment> environment,
-      fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services,
+      modular::ApplicationStartupInfoPtr startup_info,
       fidl::InterfaceRequest<modular::ApplicationController> controller);
   ~DartApplicationController() override;
 
@@ -30,11 +27,8 @@ class DartApplicationController : public modular::ApplicationController {
   void Detach() override;
 
  private:
-  std::string url_;
-  fidl::Array<fidl::String> arguments_;
   std::vector<char> snapshot_;
-  fidl::InterfaceHandle<modular::ApplicationEnvironment> environment_;
-  fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services_;
+  modular::ApplicationStartupInfoPtr startup_info_;
   fidl::Binding<modular::ApplicationController> binding_;
   Dart_Handle script_;
   Dart_Isolate isolate_;

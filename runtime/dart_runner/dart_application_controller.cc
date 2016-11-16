@@ -20,17 +20,11 @@ using tonic::ToDart;
 namespace dart_content_handler {
 
 DartApplicationController::DartApplicationController(
-    const std::string& url,
-    fidl::Array<fidl::String> arguments,
     std::vector<char> snapshot,
-    fidl::InterfaceHandle<modular::ApplicationEnvironment> environment,
-    fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services,
+    modular::ApplicationStartupInfoPtr startup_info,
     fidl::InterfaceRequest<modular::ApplicationController> controller)
-    : url_(url),
-      arguments_(std::move(arguments)),
-      snapshot_(std::move(snapshot)),
-      environment_(std::move(environment)),
-      outgoing_services_(std::move(outgoing_services)),
+    : snapshot_(std::move(snapshot)),
+      startup_info_(std::move(startup_info)),
       binding_(this) {
   // TODO(abarth): We need to bind the application controller on another thread
   // because this thread uses a Dart run loop.
@@ -40,8 +34,9 @@ DartApplicationController::~DartApplicationController() {}
 
 void DartApplicationController::Run() {
   // Create the isolate from the snapshot.
+  const std::string& url = startup_info_->launch_info->url.get();
   char* error = nullptr;
-  isolate_ = Dart_CreateIsolate(url_.c_str(), "main", isolate_snapshot_buffer,
+  isolate_ = Dart_CreateIsolate(url.c_str(), "main", isolate_snapshot_buffer,
                                 nullptr, nullptr, &error);
   if (!isolate_) {
     FTL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
@@ -53,21 +48,27 @@ void DartApplicationController::Run() {
   script_ = Dart_LoadScriptFromSnapshot(
       reinterpret_cast<uint8_t*>(snapshot_.data()), snapshot_.size());
 
-  InitBuiltinLibrariesForIsolate(url_, url_, std::move(environment_),
-                                 std::move(outgoing_services_));
+  // TODO(jeffbrown): Decide what we should do with any startup handles.
+  // eg. Redirect stdin, stdout, and stderr.
 
-  Dart_Handle arguments = Dart_NewList(arguments_.size());
-  if (Dart_IsError(arguments)) {
+  InitBuiltinLibrariesForIsolate(
+      url, url, std::move(startup_info_->environment),
+      std::move(startup_info_->launch_info->services));
+
+  const fidl::Array<fidl::String>& arguments =
+      startup_info_->launch_info->arguments;
+  Dart_Handle dart_arguments = Dart_NewList(arguments.size());
+  if (Dart_IsError(dart_arguments)) {
     FTL_LOG(ERROR) << "Failed to allocate Dart arguments list";
     return;
   }
-  for (size_t i = 0; i < arguments_.size(); i++) {
+  for (size_t i = 0; i < arguments.size(); i++) {
     tonic::LogIfError(
-        Dart_ListSetAt(arguments, i, ToDart(arguments_[i].To<std::string>())));
+        Dart_ListSetAt(dart_arguments, i, ToDart(arguments[i].get())));
   }
 
   Dart_Handle argv[] = {
-      arguments,
+      dart_arguments,
   };
   tonic::LogIfError(Dart_Invoke(script_, Dart_NewStringFromCString("main"),
                                 arraysize(argv), argv));

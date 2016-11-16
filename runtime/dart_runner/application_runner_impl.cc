@@ -33,10 +33,8 @@ void RunApplication(
   }
   std::vector<char> snapshot = ExtractSnapshot(std::move(bundle));
 
-  DartApplicationController app(
-      startup_info->url.get(), std::move(startup_info->arguments), snapshot,
-      std::move(startup_info->environment),
-      std::move(startup_info->outgoing_services), std::move(controller));
+  DartApplicationController app(snapshot, std::move(startup_info),
+                                std::move(controller));
   app.Run();
 }
 

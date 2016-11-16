@@ -4,6 +4,6 @@
 
 import 'package:apps.dart_content_handler.examples.hello_dart.greeting/greeting.dart';
 
-void main(List args, Object request) {
+void main(List args) {
   print(greeting() + ', Dart!');
 }
