@@ -77,7 +77,9 @@ bool FileLoader::LoadPackagesMap(const std::string& packages) {
 Dart_Handle FileLoader::HandleLibraryTag(Dart_LibraryTag tag,
                                          Dart_Handle library,
                                          Dart_Handle url) {
-  FTL_DCHECK(Dart_IsNull(library) || Dart_IsLibrary(library));
+  FTL_DCHECK(Dart_IsNull(library) || 
+             Dart_IsLibrary(library) ||
+             Dart_IsString(library));
   FTL_DCHECK(Dart_IsString(url));
   if (tag == Dart_kCanonicalizeUrl)
     return CanonicalizeURL(library, url);
@@ -85,8 +87,15 @@ Dart_Handle FileLoader::HandleLibraryTag(Dart_LibraryTag tag,
     return Import(url);
   if (tag == Dart_kSourceTag)
     return Source(library, url);
-  if (tag == Dart_kScriptTag)
+  if (tag == Dart_kScriptTag) {
+    // Clear dependencies.
+    dependencies_.clear();
+    url_dependencies_.clear();
+    // Reload packages map.
+    SetPackagesUrl(library);
+    // Load the root script.
     return Script(url);
+  }
   return Dart_NewApiError("Unknown library tag.");
 }
 
@@ -192,12 +201,17 @@ Dart_Handle FileLoader::Source(Dart_Handle library, Dart_Handle url) {
 
 // This is invoked upon a reload request.
 Dart_Handle FileLoader::Script(Dart_Handle url) {
-  // Clear dependencies.
-  dependencies_.clear();
-  url_dependencies_.clear();
-  // Reload the packages map.
-  LoadPackagesMap(packages());
   return LoadScript(StdStringFromDart(url));
+}
+
+void FileLoader::SetPackagesUrl(Dart_Handle url) {
+  if (url == Dart_Null()) {
+    // No packages url specified.
+    LoadPackagesMap(packages());
+    return;
+  }
+  const std::string& packages_url = StdStringFromDart(url);
+  LoadPackagesMap(packages_url);
 }
 
 }  // namespace tonic

@@ -45,6 +45,7 @@ class FileLoader {
   Dart_Handle Import(Dart_Handle url);
   Dart_Handle Source(Dart_Handle library, Dart_Handle url);
   Dart_Handle Script(Dart_Handle url);
+  void SetPackagesUrl(Dart_Handle url);
 
   Dart_Handle LoadLibrary(const std::string& url);
   Dart_Handle LoadScript(const std::string& url);
