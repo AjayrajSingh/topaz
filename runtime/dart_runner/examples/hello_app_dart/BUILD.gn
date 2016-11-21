@@ -8,8 +8,9 @@ dart_app("hello_app_dart") {
   main_dart = "main.dart"
 
   deps = [
-    "//apps/modular/examples/hello_app:interfaces_dart",
+    "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
     "//apps/modular/lib/app/dart",
     "//lib/fidl/dart",
   ]
 }
+
