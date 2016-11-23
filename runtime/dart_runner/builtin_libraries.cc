@@ -8,7 +8,6 @@
 
 #include "dart/runtime/bin/io_natives.h"
 #include "dart/runtime/include/dart_api.h"
-#include "lib/fidl/dart/sdk_ext/src/handle_watcher.h"
 #include "lib/fidl/dart/sdk_ext/src/natives.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
@@ -20,21 +19,6 @@ using tonic::ToDart;
 
 namespace dart_content_handler {
 namespace {
-
-void SetHandleWatcherControlHandle(Dart_Handle fidl_internal) {
-  // TODO(abarth): We leak the handle watcher thread.
-  mx::channel producer = fidl::dart::HandleWatcher::Start();
-
-  Dart_Handle handle_watcher_type =
-      Dart_GetType(fidl_internal, ToDart("HandleWatcher"), 0, nullptr);
-  Dart_Handle field_name = ToDart("controlHandle");
-  // TODO(ianloic): work out how to get tonic::ToDart to work with move-only
-  // types
-  Dart_Handle control_port_value =
-      tonic::DartConverter<mx::channel>::ToDart(std::move(producer));
-  DART_CHECK_VALID(
-      Dart_SetField(handle_watcher_type, field_name, control_port_value));
-}
 
 #define REGISTER_FUNCTION(name, count) {#name, name, count},
 #define DECLARE_FUNCTION(name, count) \
@@ -105,7 +89,6 @@ void InitBuiltinLibrariesForIsolate(
   Dart_Handle fidl_internal = Dart_LookupLibrary(ToDart("dart:fidl.internal"));
   DART_CHECK_VALID(Dart_SetNativeResolver(
       fidl_internal, fidl::dart::NativeLookup, fidl::dart::NativeSymbol));
-  SetHandleWatcherControlHandle(fidl_internal);
 
   // Set the environment services channel.
   if (environment) {

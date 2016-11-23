@@ -10,7 +10,6 @@
 #include "dart/runtime/include/dart_api.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
-#include "lib/fidl/dart/sdk_ext/src/handle_watcher.h"
 
 namespace dart_content_handler {
 namespace {

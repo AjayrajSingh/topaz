@@ -39,7 +39,6 @@ Uri _scriptUri() {
 }
 
 _setupHooks() {
-  VMLibraryHooks.eventHandlerSendData = HandleWatcher.timer;
   VMLibraryHooks.timerMillisecondClock = MxTime.timerMillisecondClock;
 
   // TODO(zra): When the Dart issue here:

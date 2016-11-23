@@ -34,6 +34,7 @@ class App {
 }  // dart_content_handler
 
 int main(int argc, const char** argv) {
+  FTL_CHECK(false) << "dart_content_handler currently not implemented.";
   mtl::MessageLoop loop;
   dart_content_handler::App app;
   loop.Run();
