@@ -1,0 +1,49 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+executable("web_view") {
+  output_name = "web_view"
+
+  sources = [
+    "main.cpp",
+  ]
+  libs = [
+      "//third_party/webkit/WebKitBuild/Debug/lib/libWTF.a",
+      "//third_party/webkit/WebKitBuild/Debug/lib/libWebKitLegacy.a",
+      "//third_party/webkit/WebKitBuild/Debug/lib/libJavaScriptCore.a",
+      "//third_party/webkit/WebKitBuild/Debug/lib/libWebCore.a",
+      "//third_party/webkit/WebKitBuild/Debug/lib/libWebCoreDerivedSources.a",
+      "//out/debug-x86-64/wmdeps/lib/libfontconfig.a",
+      "//out/debug-x86-64/wmdeps/lib/libcairo.a",
+      "//out/debug-x86-64/wmdeps/lib/libcurl.a",
+      "//out/debug-x86-64/wmdeps/lib/libpng.a",
+      "//out/debug-x86-64/wmdeps/lib/libpixman-1.a",
+      "//out/debug-x86-64/wmdeps/lib/libz.a",
+      "//out/debug-x86-64/wmdeps/lib/libfreetype.a",
+      "//out/debug-x86-64/wmdeps/lib/libxml2.a",
+      "//out/debug-x86-64/wmdeps/lib/libicuuc.a",
+      "//out/debug-x86-64/wmdeps/lib/libicudata.a",
+      "//out/debug-x86-64/wmdeps/lib/libicui18n.a",
+      "//out/debug-x86-64/wmdeps/lib/libexpat.a",
+      "//out/debug-x86-64/wmdeps/lib/libsqlite3.a",
+      "//out/debug-x86-64/wmdeps/lib/libturbojpeg.a",
+      "//out/debug-x86-64/wmdeps/lib/libharfbuzz.a",
+      "//out/debug-x86-64/wmdeps/lib/libharfbuzz-icu.a",
+  ]
+
+  include_dirs = [ 
+      "//third_party/webkit/Source/WebKit/fuchsia",
+  ]
+
+  deps = [
+    "//apps/modular/services/application",
+    "//apps/mozart/lib/view_framework:view_provider",
+    "//apps/mozart/services/buffers/cpp",
+    "//apps/mozart/services/composition",
+    "//apps/mozart/services/geometry",
+    "//apps/mozart/services/views",
+    "//lib/ftl",
+    "//lib/mtl",
+  ]
+}
