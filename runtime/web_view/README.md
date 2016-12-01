@@ -1,5 +1,4 @@
-Fuchsia Open Source Template Repository
+Fuchsia Web View
 =======================================
 
-This repository is a template that we will use when creating new open source
-repositories for Fuchsia.
+This repository contains the Fuchsia-specific code wrapping the web view class from third_party/webkit/Source/WebKit/fuchsia/WebView.h.
