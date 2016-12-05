@@ -8,32 +8,33 @@ executable("web_view") {
   sources = [
     "main.cpp",
   ]
+  
   libs = [
-      "//third_party/webkit/WebKitBuild/Debug/lib/libWTF.a",
-      "//third_party/webkit/WebKitBuild/Debug/lib/libWebKitLegacy.a",
-      "//third_party/webkit/WebKitBuild/Debug/lib/libJavaScriptCore.a",
-      "//third_party/webkit/WebKitBuild/Debug/lib/libWebCore.a",
-      "//third_party/webkit/WebKitBuild/Debug/lib/libWebCoreDerivedSources.a",
-      "//out/debug-x86-64/wmdeps/lib/libfontconfig.a",
-      "//out/debug-x86-64/wmdeps/lib/libcairo.a",
-      "//out/debug-x86-64/wmdeps/lib/libcurl.a",
-      "//out/debug-x86-64/wmdeps/lib/libpng.a",
-      "//out/debug-x86-64/wmdeps/lib/libpixman-1.a",
-      "//out/debug-x86-64/wmdeps/lib/libz.a",
-      "//out/debug-x86-64/wmdeps/lib/libfreetype.a",
-      "//out/debug-x86-64/wmdeps/lib/libxml2.a",
-      "//out/debug-x86-64/wmdeps/lib/libicuuc.a",
-      "//out/debug-x86-64/wmdeps/lib/libicudata.a",
-      "//out/debug-x86-64/wmdeps/lib/libicui18n.a",
-      "//out/debug-x86-64/wmdeps/lib/libexpat.a",
-      "//out/debug-x86-64/wmdeps/lib/libsqlite3.a",
-      "//out/debug-x86-64/wmdeps/lib/libturbojpeg.a",
-      "//out/debug-x86-64/wmdeps/lib/libharfbuzz.a",
-      "//out/debug-x86-64/wmdeps/lib/libharfbuzz-icu.a",
+      "prebuilt/x86-64/lib/libWTF.a",
+      "prebuilt/x86-64/lib/libWebKitLegacy.a",
+      "prebuilt/x86-64/lib/libJavaScriptCore.a",
+      "prebuilt/x86-64/lib/libWebCore.a",
+      "prebuilt/x86-64/lib/libWebCoreDerivedSources.a",
+      "prebuilt/x86-64/lib/libfontconfig.a",
+      "prebuilt/x86-64/lib/libcairo.a",
+      "prebuilt/x86-64/lib/libcurl.a",
+      "prebuilt/x86-64/lib/libpng.a",
+      "prebuilt/x86-64/lib/libpixman-1.a",
+      "prebuilt/x86-64/lib/libz.a",
+      "prebuilt/x86-64/lib/libfreetype.a",
+      "prebuilt/x86-64/lib/libxml2.a",
+      "prebuilt/x86-64/lib/libicuuc.a",
+      "prebuilt/x86-64/lib/libicudata.a",
+      "prebuilt/x86-64/lib/libicui18n.a",
+      "prebuilt/x86-64/lib/libexpat.a",
+      "prebuilt/x86-64/lib/libsqlite3.a",
+      "prebuilt/x86-64/lib/libturbojpeg.a",
+      "prebuilt/x86-64/lib/libharfbuzz.a",
+      "prebuilt/x86-64/lib/libharfbuzz-icu.a",
   ]
 
   include_dirs = [ 
-      "//third_party/webkit/Source/WebKit/fuchsia",
+      "prebuilt/include",
   ]
 
   deps = [
