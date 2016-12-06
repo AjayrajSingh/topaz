@@ -11,16 +11,17 @@
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <algorithm>
@@ -34,11 +35,11 @@
 #include <assert.h>
 #include <dirent.h>
 #include <hid/hid.h>
-#include <magenta/types.h>
 #include <magenta/device/console.h>
 #include <magenta/device/display.h>
 #include <magenta/pixelformat.h>
 #include <magenta/syscalls.h>
+#include <magenta/types.h>
 #include <mxio/io.h>
 #include <stdlib.h>
 
@@ -48,8 +49,10 @@
 #include "apps/mozart/lib/view_framework/input_handler.h"
 #include "apps/mozart/lib/view_framework/view_provider_app.h"
 #include "apps/mozart/services/buffers/cpp/buffer_producer.h"
+#include "lib/ftl/command_line.h"
 #include "lib/ftl/logging.h"
 #include "lib/ftl/macros.h"
+#include "lib/ftl/memory/weak_ptr.h"
 #include "lib/mtl/tasks/message_loop.h"
 
 using namespace WebCore;
@@ -61,18 +64,18 @@ using std::cerr;
 namespace {
 constexpr uint32_t kContentImageResourceId = 1;
 constexpr uint32_t kRootNodeId = mozart::kSceneRootNodeId;
-}  // namespace
+constexpr char kDefaultUrl[] = "http://google.com/index.html";
+} // namespace
 
-static void* MakeImage(int width, int height,
-                               mozart::BufferProducer* producer,
-                               mozart::ImagePtr* out_image) {
-using namespace mozart;
+static void *MakeImage(int width, int height, mozart::BufferProducer *producer,
+                       mozart::ImagePtr *out_image) {
+  using namespace mozart;
   FTL_DCHECK(producer);
   FTL_DCHECK(producer->map_flags() &
              (MX_VM_FLAG_PERM_READ | MX_VM_FLAG_PERM_WRITE));
   FTL_DCHECK(out_image);
 
-  size_t row_bytes = 4*width;
+  size_t row_bytes = 4 * width;
   size_t total_bytes = row_bytes * height;
   auto buffer_holder = producer->ProduceBuffer(total_bytes);
   if (!buffer_holder) {
@@ -86,7 +89,7 @@ using namespace mozart;
     return nullptr;
   }
 
-  void* bufferMem = buffer_holder->shared_vmo()->Map();
+  void *bufferMem = buffer_holder->shared_vmo()->Map();
   if (!bufferMem) {
     FTL_LOG(ERROR) << "Could not map surface into memory";
     return nullptr;
@@ -106,39 +109,49 @@ using namespace mozart;
 }
 
 class MozWebView : public mozart::BaseView, public mozart::InputListener {
- public:
+public:
   MozWebView(mozart::ViewManagerPtr view_manager,
-            fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request)
-      : BaseView(std::move(view_manager),
-                 std::move(view_owner_request),
+             fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+             const std::string &url)
+      : BaseView(std::move(view_manager), std::move(view_owner_request),
                  "WebView"),
-        input_handler_(GetViewServiceProvider(), this) {
-            mtl::MessageLoop::GetCurrent()->task_runner()->PostTask(([this]() { CallIdle();}));
-        }
+        input_handler_(GetViewServiceProvider(), this), weak_factory_(this),
+        url_(url) {
+    mtl::MessageLoop::GetCurrent()->task_runner()->PostTask(
+        ([weak = weak_factory_.GetWeakPtr()]() {
+          if (weak)
+            weak->CallIdle();
+        }));
+  }
 
   ~MozWebView() override {}
 
- private:
+private:
   void OnEvent(mozart::EventPtr event,
-               const OnEventCallback& callback) override {
+               const OnEventCallback &callback) override {
     bool handled = false;
     if (event->pointer_data) {
       switch (event->action) {
-        case mozart::EventType::POINTER_DOWN:
-        case mozart::EventType::POINTER_MOVE:
-          if (event->pointer_data->kind == mozart::PointerKind::TOUCH ||
-              (event->pointer_data->kind == mozart::PointerKind::MOUSE &&
-               event->flags == mozart::EventFlags::LEFT_MOUSE_BUTTON)) {
-               web_view_.handleMouseEvent(event->pointer_data->x, event->pointer_data->y, event->action == mozart::EventType::POINTER_DOWN? WebView::kMouseDown : WebView::kMouseMoved);
-          }
-          handled = true;
-          break;
-        case mozart::EventType::POINTER_UP:
-           web_view_.handleMouseEvent(event->pointer_data->x, event->pointer_data->y, WebView::kMouseUp);
-          handled = true;
-          break;
-        default:
-          break;
+      case mozart::EventType::POINTER_DOWN:
+      case mozart::EventType::POINTER_MOVE:
+        if (event->pointer_data->kind == mozart::PointerKind::TOUCH ||
+            (event->pointer_data->kind == mozart::PointerKind::MOUSE &&
+             event->flags == mozart::EventFlags::LEFT_MOUSE_BUTTON)) {
+          web_view_.handleMouseEvent(
+              event->pointer_data->x, event->pointer_data->y,
+              event->action == mozart::EventType::POINTER_DOWN
+                  ? WebView::kMouseDown
+                  : WebView::kMouseMoved);
+        }
+        handled = true;
+        break;
+      case mozart::EventType::POINTER_UP:
+        web_view_.handleMouseEvent(event->pointer_data->x,
+                                   event->pointer_data->y, WebView::kMouseUp);
+        handled = true;
+        break;
+      default:
+        break;
       }
     } else if (event->key_data) {
     }
@@ -153,17 +166,21 @@ class MozWebView : public mozart::BaseView, public mozart::InputListener {
 
     auto update = mozart::SceneUpdate::New();
 
-    const mozart::Size& size = *properties()->view_layout->size;
+    const mozart::Size &size = *properties()->view_layout->size;
     if (size.width > 0 && size.height > 0) {
       mozart::RectF bounds;
       bounds.width = size.width;
       bounds.height = size.height;
 
       mozart::ImagePtr image;
-      void* buffer = MakeImage(size.width, size.height, &buffer_producer_, &image);
-      web_view_.setup(reinterpret_cast<unsigned char*>(buffer), MX_PIXEL_FORMAT_ARGB_8888, size.width, size.height, size.width * 4);
+      void *buffer =
+          MakeImage(size.width, size.height, &buffer_producer_, &image);
+      web_view_.setup(reinterpret_cast<unsigned char *>(buffer),
+                      MX_PIXEL_FORMAT_ARGB_8888, size.width, size.height,
+                      size.width * 4);
       if (!url_set_) {
-        const char* urlToOpen = "http://google.com/index.html";
+        const char *urlToOpen = url_.c_str();
+        FTL_LOG(INFO) << "Loading " << urlToOpen;
         web_view_.setURL(urlToOpen);
         url_set_ = true;
       }
@@ -195,26 +212,39 @@ class MozWebView : public mozart::BaseView, public mozart::InputListener {
   }
 
   void CallIdle() {
-      web_view_.iterateEventLoop();
-      Invalidate();
-      mtl::MessageLoop::GetCurrent()->task_runner()->PostTask(([this]() { CallIdle();}));
+    web_view_.iterateEventLoop();
+    Invalidate();
+    mtl::MessageLoop::GetCurrent()->task_runner()->PostTask(
+        ([weak = weak_factory_.GetWeakPtr()]() {
+          if (weak)
+            weak->CallIdle();
+        }));
   }
 
   mozart::InputHandler input_handler_;
   mozart::BufferProducer buffer_producer_;
   WebView web_view_;
+  ftl::WeakPtrFactory<MozWebView> weak_factory_;
   bool url_set_ = {false};
+  const std::string &url_;
 
   FTL_DISALLOW_COPY_AND_ASSIGN(MozWebView);
 };
 
-int main(int argc, const char** argv) {
+int main(int argc, const char **argv) {
+  auto command_line = ftl::CommandLineFromArgcArgv(argc, argv);
+  std::vector<std::string> urls = command_line.positional_args();
+  std::string url = kDefaultUrl;
+  if (!urls.empty()) {
+    url = urls.front();
+  }
+
   mtl::MessageLoop loop;
 
-  mozart::ViewProviderApp app([](mozart::ViewContext view_context) {
+  mozart::ViewProviderApp app([&url](mozart::ViewContext view_context) {
     return std::make_unique<MozWebView>(
         std::move(view_context.view_manager),
-        std::move(view_context.view_owner_request));
+        std::move(view_context.view_owner_request), url);
   });
 
   loop.Run();
