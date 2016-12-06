@@ -1,11 +1,19 @@
 Fuchsia Web View
 =======================================
 
-This repository contains the Fuchsia-specific code wrapping the web view class from third_party/webkit/Source/WebKit/fuchsia/WebView.h.
+This repository contains the Fuchsia-specific code wrapping the web view class from third_party/webkit/Source/WebKit/fuchsia/WebView.h. 
 
-Before building this package you must follow the build instructions at https://fuchsia.googlesource.com/third_party/webkit/
+To get the source for the web view:
 
-After that
+        cd apps
+        git clone https://fuchsia.googlesource.com/web_view
+        
+To get the prebuilt dependencies:
+
+        cd apps/web_view
+        ./scripts/download-web-view-prebuilts.sh
+
+After that, to build:
 
         ./packages/gn/gen.py -m default,web_view
         ./buildtools/ninja -C out/debug-x86-64
