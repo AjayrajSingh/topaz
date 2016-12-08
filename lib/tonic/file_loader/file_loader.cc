@@ -137,8 +137,8 @@ std::string FileLoader::GetFilePathForPackageURL(std::string url) {
     return std::string();
   if (package_path.find(kFileURLPrefix) == 0u)
     return package_path.substr(kFileURLPrefixLength) + library_path;
-  return files::GetDirectoryName(packages_) + "/" + package_path + "/" +
-         library_path;
+  return files::GetDirectoryName(files::AbsolutePath(packages_)) + "/" +
+         package_path + "/" + library_path;
 }
 
 std::string FileLoader::GetFilePathForFileURL(std::string url) {
