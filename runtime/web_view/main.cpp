@@ -158,6 +158,13 @@ class MozWebView : public mozart::BaseView, public mozart::InputListener {
           break;
       }
     } else if (event->key_data) {
+      if (event->key_data->code_point == 'c' &&
+          event->key_data->modifiers & mozart::kModifierControl) {
+        exit(0);
+      }
+      web_view_.handleKeyEvent(event->key_data->hid_usage,
+                               event->key_data->code_point,
+                               event->action == mozart::EventType::KEY_PRESSED);
     }
 
     callback(handled);
