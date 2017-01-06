@@ -1,0 +1,13 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("xi") {
+  deps = [
+    "//apps/xi/services",
+    # NOTE: comment out the line below to build only the services before
+    # manually compiling xi-core.
+    "//apps/xi/modules",
+    "//apps/xi/xi_flutter",
+  ]
+}

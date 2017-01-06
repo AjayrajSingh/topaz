@@ -2,10 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//lib/fidl/fidl.gni")
-
-fidl("services") {
-  sources = [
-    "xi.fidl",
-  ]
-}
+name: widgets
+description: Flutter UI Widgets for Xi
+dependencies:
+  flutter:
+    sdk: flutter
+dev_dependencies:
+  test: any
+  flutter_test:
+    sdk: flutter
