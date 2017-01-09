@@ -4,10 +4,10 @@
 
 group("xi") {
   deps = [
-    "//apps/xi/services",
-    # NOTE: comment out the line below to build only the services before
-    # manually compiling xi-core.
+    # NOTE: comment out the `//apps/xi/modules` line below to build only the
+    # services before manually compiling xi-core.
     "//apps/xi/modules",
+    "//apps/xi/services",
     "//apps/xi/xi_flutter",
   ]
 }

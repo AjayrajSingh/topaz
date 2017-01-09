@@ -147,7 +147,7 @@ Generate and build:
     fbuild
     ${FUCHSIA_DIR}/scripts/symlink-dot-packages.py --tree=//apps/xi/*
 
-Assuming you have a working Acer setup an running `fboot` in a different terminal session, you can reboot the Acer with the new build using:
+Assuming you have a working Acer setup and are running `fboot` in a different terminal session, you can reboot the Acer with the new build using:
 
     freboot
 
