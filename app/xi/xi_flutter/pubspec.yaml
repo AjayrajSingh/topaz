@@ -7,5 +7,10 @@ description: Vanilla Flutter Xi UI
 dependencies:
   flutter:
     sdk: flutter
+  path: 1.4.1
   widgets:
     path: ../packages/widgets
+  xi_client:
+    path: ../packages/xi_client
+flutter:
+  uses-material-design: true

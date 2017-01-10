@@ -4,13 +4,12 @@
 
 import("//build/dart/dart_package.gni")
 
-dart_package("xi_widgets") {
-  package_name = "xi_widgets"
+dart_package("xi_client") {
+  package_name = "xi_client"
 
   source_dir = "lib"
 
   deps = [
-    "//apps/xi/packages/xi_client",
     "//lib/flutter/packages/flutter",
   ]
 

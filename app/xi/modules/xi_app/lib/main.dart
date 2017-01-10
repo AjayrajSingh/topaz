@@ -2,21 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.lib.app.dart/app.dart';
 import 'package:apps.modular.services.application/service_provider.fidl.dart';
-import 'package:apps.modular.services.application/application_launcher.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/module.fidl.dart';
 import 'package:apps.modular.services.story/story.fidl.dart';
 import 'package:flutter/material.dart';
-import 'package:widgets/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:xi_widgets/widgets.dart';
 
-import 'src/peer.dart';
-
-final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
-
-const String _kXiCoreURL = 'file:///system/apps/xi-core';
+import 'src/xi_fuchsia_client.dart';
 
 ModuleImpl _module;
 
@@ -60,61 +54,11 @@ class ModuleImpl extends Module {
   }
 }
 
-/// A light wrapper around [XiApp] for tracking state changes for handling UI
-/// actions.
-class App extends StatefulWidget {
-  @override
-  AppState createState() => new AppState();
-}
-
-/// State for [App].
-class AppState extends State<App> {
-  final ServiceProviderProxy _serviceProvider = new ServiceProviderProxy();
-  final ApplicationLaunchInfo _launchInfo = new ApplicationLaunchInfo();
-  final XiPeer _xi = new XiPeer();
-
-  /// State value for holding the [message] populated as a result of UI
-  /// actions triggered via [handlePingButtonPressed].
-  String message;
-
-  @override
-  void initState() {
-    _launchInfo.url = _kXiCoreURL;
-    _launchInfo.services = _serviceProvider.ctrl.request();
-    _context.launcher.createApplication(_launchInfo, null);
-    _xi.bind(connectToServiceByName(_serviceProvider, 'xi.Json'));
-    _xi.onRead = _handleXiRead;
-    super.initState();
-  }
-
-  void _handleXiRead(String data) {
-    setState(() => message = "got string $data");
-  }
-
-  /// Handler passed into [XiApp] for negotiaing IPC calls to the xi-core
-  /// service. Currently this is unsupported for vanilla Flutter.
-  void handlePingButtonPressed() {
-    setState(() {
-      message = 'Sending request...';
-      _log(message);
-      _xi.send("{\"method\": \"new_tab\", \"params\": \"[]\", \"id\": 1}\n");
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new XiApp(
-      message: message,
-      onPingButtonPressed: handlePingButtonPressed,
-    );
-  }
-}
-
 /// Main entry point to the example parent module.
 void main() {
   _log('Module main called');
 
-  _context.outgoingServices.addServiceForName(
+  kContext.outgoingServices.addServiceForName(
     (InterfaceRequest<Module> request) {
       _log('Received binding request for Module');
       if (_module != null) {
@@ -129,5 +73,10 @@ void main() {
   );
 
   _log('Starting Flutter app...');
-  runApp(new App());
+
+  XiFuchsiaClient xi = new XiFuchsiaClient();
+
+  runApp(new XiApp(
+    xi: xi,
+  ));
 }

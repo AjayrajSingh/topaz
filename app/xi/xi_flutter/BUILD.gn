@@ -11,8 +11,10 @@ dart_package("xi_flutter") {
   source_dir = "lib"
 
   deps = [
-    "//apps/xi/packages/widgets",
+    "//apps/xi/packages/widgets:xi_widgets",
+    "//apps/xi/packages/xi_client",
     "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/pub/path",
   ]
 
   analysis_options = "//apps/xi/.analysis_options"

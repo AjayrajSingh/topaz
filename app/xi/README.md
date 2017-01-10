@@ -123,14 +123,20 @@ and then running:
 
 This will error but it will generate the artifacts needed to continue.
 
-Build the Rust binary for Xi core using the new `rustc`:
+Configure xi-core for building with the Fuchsia Rust toolchain. First:
 
     fgo apps/xi/modules/xi-core
     mkdir .cargo
+
+Then create a configuration file with:
+
     cat - <<EOF >.cargo/config
     [target.x86_64-unknown-fuchsia]
     linker = "${RUST_TOOLS}/x86-64-unknown-fuchsia-cc"
     EOF
+
+Build the Rust binary for Xi core using the new `rustc`:
+
     RUSTC=${RUST_ROOT}/build/x86_64-apple-darwin/stage1/bin/rustc cargo build --target=x86_64-unknown-fuchsia
 
 The command above will generate the binary in `target/x86_64-unknown-fuchsia/debug/xi-core`.
@@ -164,6 +170,42 @@ You won't see any output, if you run `example_mx_toy` on the device you should s
 To run Xi from your host machine:
 
     netruncmd : "@ bootstrap device_runner --user-shell=dev_user_shell --user-shell-args=--root-module=xi_app"
+
+## Android & Flutter
+
+To run Xi on Android (via the Flutter framework) you will first need to build the `xi-core` binary for the Android target:
+
+    git clone https://github.com/google/xi-editor.git ${FUCHSIA_DIR}/apps/xi-editor
+    cd ${FUCHSIA_DIR}/apps/xi-editor/rust
+    brew install android-ndk
+    export NDK_HOME="$(brew --prefix)/opt/android-ndk"
+    ${NDK_HOME}/build/tools/make-standalone-toolchain.sh \
+      --platform=android-18 --toolchain=arm-linux-androideabi-clang3.6 \
+      --install-dir=android-18-toolchain
+
+Add a config for the android target:
+
+    mkdir .cargo
+    cat - <<EOF >.cargo/config
+    [build]
+    target = "arm-linux-androideabi"
+
+    [target.arm-linux-androideabi]
+    linker = "${FUCHSIA_DIR}/apps/xi-editor/rust/android-18-toolchain/bin/clang"
+    EOF
+
+Finally, build the binary and push it to a connected Android device:
+
+    cargo build
+    adb push target/arm-linux-androideabi/debug/xi-core data/local/tmp/
+
+Run the Flutter app:
+
+    cd ${FUCHSIA_DIR}/apps/xi/xi_flutter
+    fgen -m=default,rust
+    fbuild
+    ${FUCHSIA_DIR}/scripts/symlink-dot-packages.py --tree=//apps/xi/*
+    ${FUCHSIA_DIR}/lib/flutter/bin/flutter run
 
 [flutter]: https://flutter.io/
 [fuchsia]: https://fuchsia.googlesource.com/fuchsia/
