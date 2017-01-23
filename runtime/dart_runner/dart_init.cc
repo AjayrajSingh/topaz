@@ -34,7 +34,7 @@ void InitDartVM() {
 
   Dart_InitializeParams params = {};
   params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
-  params.vm_isolate_snapshot = dart_content_handler::vm_isolate_snapshot_buffer;
+  params.vm_snapshot_data = dart_content_handler::vm_isolate_snapshot_buffer;
   // TODO(abarth): Link in a VM snapshot.
   char* error = Dart_Initialize(&params);
   if (error)

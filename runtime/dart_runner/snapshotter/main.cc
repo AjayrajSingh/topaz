@@ -84,7 +84,7 @@ void InitDartVM() {
   FTL_CHECK(Dart_SetVMFlags(arraysize(kDartArgs), kDartArgs));
   Dart_InitializeParams params = {};
   params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
-  params.vm_isolate_snapshot = dart_content_handler::vm_isolate_snapshot_buffer;
+  params.vm_snapshot_data = dart_content_handler::vm_isolate_snapshot_buffer;
   char* error = Dart_Initialize(&params);
   if (error)
     FTL_LOG(FATAL) << error;
