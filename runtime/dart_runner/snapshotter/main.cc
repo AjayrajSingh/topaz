@@ -95,7 +95,7 @@ Dart_Isolate CreateDartIsolate() {
   char* error = nullptr;
   Dart_Isolate isolate = Dart_CreateIsolate(
       "dart:snapshot", "main", dart_content_handler::isolate_snapshot_buffer,
-      nullptr, nullptr, &error);
+      nullptr, nullptr, nullptr, &error);
   FTL_CHECK(isolate) << error;
   Dart_ExitIsolate();
   return isolate;

@@ -37,7 +37,7 @@ void DartApplicationController::Run() {
   const std::string& url = startup_info_->launch_info->url.get();
   char* error = nullptr;
   isolate_ = Dart_CreateIsolate(url.c_str(), "main", isolate_snapshot_buffer,
-                                nullptr, nullptr, &error);
+                                nullptr, nullptr, nullptr, &error);
   if (!isolate_) {
     FTL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
     return;
