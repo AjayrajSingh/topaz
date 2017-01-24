@@ -16,6 +16,8 @@ namespace {
 
 typedef std::vector<DartPersistentValue> MicrotaskQueue;
 
+DartErrorHandleType g_last_error = kNoError;
+
 static MicrotaskQueue& GetQueue() {
   static MicrotaskQueue* queue = new MicrotaskQueue();
   return *queue;
@@ -37,8 +39,16 @@ void DartMicrotaskQueue::RunMicrotasks() {
       if (!dart_state.get())
         continue;
       DartState::Scope dart_scope(dart_state.get());
-      DartInvokeVoid(callback.value());
+      Dart_Handle result = DartInvokeVoid(callback.value());
+      DartErrorHandleType error = GetErrorHandleType(result);
+      if (error != kNoError)
+        g_last_error = error;
     }
   }
 }
+
+DartErrorHandleType DartMicrotaskQueue::GetLastError() {
+  return g_last_error;
+}
+
 }

@@ -15,6 +15,15 @@ extern const char kInvalidArgument[];
 
 bool LogIfError(Dart_Handle handle);
 
+enum DartErrorHandleType {
+  kNoError,
+  kUnknownErrorType,
+  kApiErrorType,
+  kCompilationErrorType,
+};
+
+DartErrorHandleType GetErrorHandleType(Dart_Handle handle);
+
 }  // namespace tonic
 
 #endif  // LIB_TONIC_DART_ERROR_H_

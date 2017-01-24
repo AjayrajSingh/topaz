@@ -19,4 +19,16 @@ bool LogIfError(Dart_Handle handle) {
   return false;
 }
 
+DartErrorHandleType GetErrorHandleType(Dart_Handle handle) {
+  if (Dart_IsCompilationError(handle)) {
+    return kCompilationErrorType;
+  } else if (Dart_IsApiError(handle)) {
+    return kApiErrorType;
+  } else if (Dart_IsError(handle)) {
+    return kUnknownErrorType;
+  } else {
+    return kNoError;
+  }
+}
+
 }  // namespace tonic

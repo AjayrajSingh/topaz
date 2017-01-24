@@ -9,6 +9,7 @@
 #include "lib/ftl/memory/ref_ptr.h"
 #include "lib/ftl/memory/weak_ptr.h"
 #include "lib/ftl/tasks/task_runner.h"
+#include "lib/tonic/logging/dart_error.h"
 
 namespace tonic {
 class DartState;
@@ -27,6 +28,10 @@ class DartMessageHandler {
   // Did the isolate have an uncaught exception error?
   bool isolate_had_uncaught_exception_error() const {
     return isolate_had_uncaught_exception_error_;
+  }
+
+  DartErrorHandleType isolate_last_error() const {
+    return isolate_last_error_;
   }
 
  protected:
@@ -48,6 +53,7 @@ class DartMessageHandler {
   bool handled_first_message_;
   bool isolate_exited_;
   bool isolate_had_uncaught_exception_error_;
+  DartErrorHandleType isolate_last_error_;
   ftl::RefPtr<ftl::TaskRunner> task_runner_;
 
  private:

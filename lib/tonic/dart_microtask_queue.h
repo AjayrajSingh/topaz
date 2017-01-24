@@ -6,6 +6,7 @@
 #define LIB_TONIC_DART_MICROTASK_QUEUE_H_
 
 #include "dart/runtime/include/dart_api.h"
+#include "lib/tonic/logging/dart_error.h"
 
 namespace tonic {
 
@@ -13,6 +14,7 @@ class DartMicrotaskQueue {
  public:
   static void ScheduleMicrotask(Dart_Handle callback);
   static void RunMicrotasks();
+  static DartErrorHandleType GetLastError();
 };
 
 }  // namespace tonic

@@ -18,6 +18,7 @@ DartMessageHandler::DartMessageHandler()
     : handled_first_message_(false),
       isolate_exited_(false),
       isolate_had_uncaught_exception_error_(false),
+      isolate_last_error_(kNoError),
       task_runner_(nullptr) {}
 
 DartMessageHandler::~DartMessageHandler() {
@@ -90,6 +91,7 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
   }
 
   if (error) {
+    isolate_last_error_ = GetErrorHandleType(result);
     if (Dart_IsError(result)) {
       // Remember that we had an uncaught exception error.
       isolate_had_uncaught_exception_error_ = true;
