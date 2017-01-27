@@ -9,6 +9,7 @@
 #include "dart/runtime/include/dart_api.h"
 #include "lib/fidl/cpp/bindings/binding.h"
 #include "lib/ftl/macros.h"
+#include "lib/ftl/tasks/task_runner.h"
 
 namespace dart_content_handler {
 
@@ -20,13 +21,15 @@ class DartApplicationController : public modular::ApplicationController {
       fidl::InterfaceRequest<modular::ApplicationController> controller);
   ~DartApplicationController() override;
 
-  void Run();
+  bool Main();
 
   void Kill(const KillCallback& callback) override;
 
   void Detach() override;
 
  private:
+  void Kill();
+
   std::vector<char> snapshot_;
   modular::ApplicationStartupInfoPtr startup_info_;
   fidl::Binding<modular::ApplicationController> binding_;

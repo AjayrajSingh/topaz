@@ -13,4 +13,3 @@ dart_app("hello_app_dart") {
     "//lib/fidl/dart",
   ]
 }
-

@@ -11,7 +11,11 @@
 #include "apps/dart_content_handler/embedder/snapshot.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/ftl/arraysize.h"
+#include "lib/ftl/functional/make_copyable.h"
 #include "lib/ftl/logging.h"
+#include "lib/mtl/tasks/message_loop.h"
+#include "lib/tonic/dart_message_handler.h"
+#include "lib/tonic/dart_state.h"
 #include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/mx/mx_converter.h"
 
@@ -26,22 +30,27 @@ DartApplicationController::DartApplicationController(
     : snapshot_(std::move(snapshot)),
       startup_info_(std::move(startup_info)),
       binding_(this) {
-  // TODO(abarth): We need to bind the application controller on another thread
-  // because this thread uses a Dart run loop.
+  if (controller.is_pending()) {
+    binding_.Bind(std::move(controller));
+    binding_.set_connection_error_handler([this] { Kill(); });
+  }
 }
 
 DartApplicationController::~DartApplicationController() {}
 
-void DartApplicationController::Run() {
+bool DartApplicationController::Main() {
   // Create the isolate from the snapshot.
   const std::string& url = startup_info_->launch_info->url.get();
   char* error = nullptr;
+  auto state = new tonic::DartState();
   isolate_ = Dart_CreateIsolate(url.c_str(), "main", isolate_snapshot_buffer,
-                                nullptr, nullptr, nullptr, &error);
+                                nullptr, nullptr, state, &error);
   if (!isolate_) {
     FTL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
-    return;
+    return false;
   }
+
+  state->SetIsolate(isolate_);
 
   Dart_EnterScope();
 
@@ -60,7 +69,8 @@ void DartApplicationController::Run() {
   Dart_Handle dart_arguments = Dart_NewList(arguments.size());
   if (Dart_IsError(dart_arguments)) {
     FTL_LOG(ERROR) << "Failed to allocate Dart arguments list";
-    return;
+    Dart_ExitScope();
+    return false;
   }
   for (size_t i = 0; i < arguments.size(); i++) {
     tonic::LogIfError(
@@ -70,21 +80,29 @@ void DartApplicationController::Run() {
   Dart_Handle argv[] = {
       dart_arguments,
   };
-  tonic::LogIfError(Dart_Invoke(script_, Dart_NewStringFromCString("main"),
-                                arraysize(argv), argv));
+
+  Dart_Handle main =
+      Dart_Invoke(script_, ToDart("main"), arraysize(argv), argv);
+  if (Dart_IsError(main)) {
+    FTL_LOG(ERROR) << Dart_GetError(main);
+    Dart_ExitScope();
+    return false;
+  }
+
+  state->message_handler().Initialize(
+      mtl::MessageLoop::GetCurrent()->task_runner());
 
   Dart_ExitScope();
-
-  Dart_EnterScope();
-  tonic::LogIfError(Dart_RunLoop());
-  Dart_ExitScope();
-
-  Dart_ShutdownIsolate();
+  return true;
 }
 
 void DartApplicationController::Kill(const KillCallback& callback) {
-  Dart_ShutdownIsolate();
+  Kill();
   callback();
+}
+
+void DartApplicationController::Kill() {
+  Dart_ShutdownIsolate();
 }
 
 void DartApplicationController::Detach() {

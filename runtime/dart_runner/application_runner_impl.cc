@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "apps/dart_content_handler/dart_application_controller.h"
+#include "lib/mtl/tasks/message_loop.h"
 #include "lib/mtl/vmo/vector.h"
 #include "lib/zip/unzipper.h"
 
@@ -33,9 +34,12 @@ void RunApplication(
   }
   std::vector<char> snapshot = ExtractSnapshot(std::move(bundle));
 
-  DartApplicationController app(snapshot, std::move(startup_info),
+  mtl::MessageLoop loop;
+
+  DartApplicationController app(std::move(snapshot), std::move(startup_info),
                                 std::move(controller));
-  app.Run();
+  if (app.Main())
+    loop.Run();
 }
 
 }  // namespace
