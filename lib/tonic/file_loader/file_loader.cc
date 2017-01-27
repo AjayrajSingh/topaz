@@ -125,6 +125,8 @@ std::string FileLoader::GetFilePathForURL(std::string url) {
 }
 
 std::string FileLoader::GetFilePathForPackageURL(std::string url) {
+  if (!packages_map_)
+    return std::string();
   FTL_DCHECK(url.find(kPackageScheme) == 0u);
   url = url.substr(kPackageSchemeLength);
   size_t slash = url.find('/');
