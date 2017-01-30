@@ -1,0 +1,19 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//apps/dart_content_handler/dart_app.gni")
+
+dart_app("integration") {
+  testonly = true
+
+  output_name = "dart_content_handler_test.dartx"
+
+  main_dart = "main.dart"
+
+  deps = [
+    "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//apps/modular/lib/app/dart",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}

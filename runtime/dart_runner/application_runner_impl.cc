@@ -38,8 +38,15 @@ void RunApplication(
 
   DartApplicationController app(std::move(snapshot), std::move(startup_info),
                                 std::move(controller));
-  if (app.Main())
+
+  if (app.CreateIsolate()) {
+    loop.task_runner()->PostTask([&loop, &app] {
+      if (!app.Main())
+        loop.PostQuitTask();
+    });
+
     loop.Run();
+  }
 }
 
 }  // namespace

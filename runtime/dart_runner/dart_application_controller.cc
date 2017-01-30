@@ -9,9 +9,7 @@
 
 #include "apps/dart_content_handler/builtin_libraries.h"
 #include "apps/dart_content_handler/embedder/snapshot.h"
-#include "dart/runtime/include/dart_api.h"
 #include "lib/ftl/arraysize.h"
-#include "lib/ftl/functional/make_copyable.h"
 #include "lib/ftl/logging.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "lib/tonic/dart_message_handler.h"
@@ -38,19 +36,27 @@ DartApplicationController::DartApplicationController(
 
 DartApplicationController::~DartApplicationController() {}
 
-bool DartApplicationController::Main() {
+bool DartApplicationController::CreateIsolate() {
   // Create the isolate from the snapshot.
-  const std::string& url = startup_info_->launch_info->url.get();
   char* error = nullptr;
-  auto state = new tonic::DartState();
-  isolate_ = Dart_CreateIsolate(url.c_str(), "main", isolate_snapshot_buffer,
-                                nullptr, nullptr, state, &error);
+  auto state = new tonic::DartState();  // owned by Dart_CreateIsolate
+  isolate_ = Dart_CreateIsolate(startup_info_->launch_info->url.get().c_str(),
+                                "main", isolate_snapshot_buffer, nullptr,
+                                nullptr, state, &error);
   if (!isolate_) {
     FTL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
     return false;
   }
 
   state->SetIsolate(isolate_);
+
+  state->message_handler().Initialize(
+      mtl::MessageLoop::GetCurrent()->task_runner());
+  return true;
+}
+
+bool DartApplicationController::Main() {
+  const std::string& url = startup_info_->launch_info->url.get();
 
   Dart_EnterScope();
 
@@ -88,9 +94,6 @@ bool DartApplicationController::Main() {
     Dart_ExitScope();
     return false;
   }
-
-  state->message_handler().Initialize(
-      mtl::MessageLoop::GetCurrent()->task_runner());
 
   Dart_ExitScope();
   return true;

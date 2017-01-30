@@ -11,7 +11,9 @@
 #include "lib/fidl/dart/sdk_ext/src/natives.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
+#include "lib/mtl/tasks/message_loop.h"
 #include "lib/tonic/converter/dart_converter.h"
+#include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/mx/mx_converter.h"
 
@@ -24,7 +26,9 @@ namespace {
 #define DECLARE_FUNCTION(name, count) \
   extern void name(Dart_NativeArguments args);
 
-#define BUILTIN_NATIVE_LIST(V) V(Logger_PrintString, 1)
+#define BUILTIN_NATIVE_LIST(V) \
+  V(Logger_PrintString, 1)     \
+  V(ScheduleMicrotask, 1)
 
 BUILTIN_NATIVE_LIST(DECLARE_FUNCTION);
 
@@ -77,6 +81,13 @@ void Logger_PrintString(Dart_NativeArguments args) {
   }
 }
 
+void ScheduleMicrotask(Dart_NativeArguments args) {
+  Dart_Handle closure = Dart_GetNativeArgument(args, 0);
+  if (tonic::LogIfError(closure) || !Dart_IsClosure(closure))
+    return;
+  tonic::DartMicrotaskQueue::ScheduleMicrotask(closure);
+}
+
 }  // namespace
 
 void InitBuiltinLibrariesForIsolate(
@@ -112,8 +123,8 @@ void InitBuiltinLibrariesForIsolate(
 
   // dart:io -------------------------------------------------------------------
 
-  DART_CHECK_VALID(Dart_SetNativeResolver(Dart_LookupLibrary(ToDart("dart:io")),
-                                          dart::bin::IONativeLookup,
+  Dart_Handle io_lib = Dart_LookupLibrary(ToDart("dart:io"));
+  DART_CHECK_VALID(Dart_SetNativeResolver(io_lib, dart::bin::IONativeLookup,
                                           dart::bin::IONativeSymbol));
 
   // Core libraries ------------------------------------------------------------
@@ -137,9 +148,9 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(print);
   DART_CHECK_VALID(Dart_SetField(internal_lib, ToDart("_printClosure"), print));
 
-  // Setup the 'scheduleImmediate' closure.
+  // Set up the 'scheduleImmediate' closure.
   Dart_Handle schedule_immediate_closure = Dart_Invoke(
-      isolate_lib, ToDart("_getIsolateScheduleImmediateClosure"), 0, nullptr);
+      builtin_lib, ToDart("_getScheduleMicrotaskClosure"), 0, nullptr);
   DART_CHECK_VALID(schedule_immediate_closure);
 
   Dart_Handle schedule_args[1];
@@ -162,8 +173,13 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(
       Dart_SetField(core_lib, ToDart("_uriBaseClosure"), uri_base));
 
-  DART_CHECK_VALID(Dart_Invoke(builtin_lib, ToDart("_setupHooks"), 0, nullptr));
-  DART_CHECK_VALID(Dart_Invoke(isolate_lib, ToDart("_setupHooks"), 0, nullptr));
+  Dart_Handle setup_hooks = ToDart("_setupHooks");
+  DART_CHECK_VALID(Dart_Invoke(builtin_lib, setup_hooks, 0, nullptr));
+  DART_CHECK_VALID(Dart_Invoke(io_lib, setup_hooks, 0, nullptr));
+  DART_CHECK_VALID(Dart_Invoke(isolate_lib, setup_hooks, 0, nullptr));
+
+  mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(
+      tonic::DartMicrotaskQueue::RunMicrotasks);
 }
 
 }  // namespace dart_content_handler

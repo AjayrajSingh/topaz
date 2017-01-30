@@ -9,7 +9,6 @@
 #include <mx/channel.h>
 
 #include "apps/modular/services/application/application_environment.fidl.h"
-#include "apps/modular/services/application/application_runner.fidl.h"
 
 namespace dart_content_handler {
 

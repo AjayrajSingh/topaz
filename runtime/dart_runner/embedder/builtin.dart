@@ -38,6 +38,9 @@ Uri _scriptUri() {
   }
 }
 
+void _scheduleMicrotask(void callback()) native "ScheduleMicrotask";
+_getScheduleMicrotaskClosure() => _scheduleMicrotask;
+
 _setupHooks() {
   VMLibraryHooks.timerMillisecondClock = MxTime.timerMillisecondClock;
 
