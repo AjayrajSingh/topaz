@@ -105,6 +105,11 @@ void DartApplicationController::Kill(const KillCallback& callback) {
 }
 
 void DartApplicationController::Kill() {
+  // TODO(rosswang): The docs warn of threading issues if doing this again, but
+  // without this, attempting to shut down the isolate finalizes app contexts
+  // that can't tell a shutdown is in progress and so fatal.
+  Dart_SetMessageNotifyCallback(nullptr);
+
   Dart_ShutdownIsolate();
 }
 

@@ -6,12 +6,14 @@ import 'dart:async';
 
 import 'package:apps.dart_content_handler.examples.hello_app_dart.interfaces/hello.fidl.dart';
 import 'package:apps.modular.lib.app.dart/app.dart';
+import 'package:apps.modular.services.application/application_controller.fidl.dart';
 import 'package:apps.modular.services.application/application_launcher.fidl.dart';
 import 'package:apps.modular.services.application/service_provider.fidl.dart';
 import 'package:test/test.dart';
 
 main(List<String> args) {
   final context = new ApplicationContext.fromStartupInfo();
+  tearDownAll(context.close);
 
   // TODO(rosswang): nested environments and determinism
 
@@ -24,20 +26,26 @@ main(List<String> args) {
     context.launcher.createApplication(info, null);
   });
 
-  // TODO(rosswang): This fatals most of the time; diagnose and fix.
   test("communicate with a fidl service (hello_app_dart)", () async {
-    final ServiceProviderProxy services = new ServiceProviderProxy();
-    final HelloProxy service = new HelloProxy();
+    final services = new ServiceProviderProxy();
+    final service = new HelloProxy();
+
+    final actl = new ApplicationControllerProxy();
 
     final info = new ApplicationLaunchInfo();
     info.url = "file:///system/apps/hello_app_dart.dartx";
     info.services = services.ctrl.request();
-    context.launcher.createApplication(info, null);
+    context.launcher.createApplication(info, actl.ctrl.request());
     connectToService(services, service.ctrl);
+    services.ctrl.close();
 
+    // TODO(rosswang): let's see if we can generate a future-based fidl dart
     final hello = new Completer();
     service.say("hello", hello.complete);
 
     expect(await hello.future, equals("hola from Dart!"));
+
+    actl.ctrl.close();
+    expect(service.ctrl.error.timeout(new Duration(seconds: 2)), throws);
   });
 }
