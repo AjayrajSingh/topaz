@@ -12,8 +12,8 @@ dart_app("integration") {
   main_dart = "main.dart"
 
   deps = [
+    "//application/lib/app/dart",
     "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
-    "//apps/modular/lib/app/dart",
     "//third_party/dart-pkg/pub/test",
   ]
 }

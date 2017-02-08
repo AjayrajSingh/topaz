@@ -8,7 +8,7 @@
 #include <string>
 #include <mx/channel.h>
 
-#include "apps/modular/services/application/application_environment.fidl.h"
+#include "application/services/application_environment.fidl.h"
 
 namespace dart_content_handler {
 

@@ -4,11 +4,11 @@
 
 #include <utility>
 
+#include "application/lib/app/application_context.h"
+#include "application/lib/app/connect.h"
+#include "application/services/application_runner.fidl.h"
 #include "apps/dart_content_handler/application_runner_impl.h"
 #include "apps/dart_content_handler/dart_init.h"
-#include "apps/modular/lib/app/application_context.h"
-#include "apps/modular/lib/app/connect.h"
-#include "apps/modular/services/application/application_runner.fidl.h"
 #include "lib/ftl/macros.h"
 #include "lib/mtl/tasks/message_loop.h"
 

@@ -5,10 +5,10 @@
 import 'dart:async';
 
 import 'package:apps.dart_content_handler.examples.hello_app_dart.interfaces/hello.fidl.dart';
-import 'package:apps.modular.lib.app.dart/app.dart';
-import 'package:apps.modular.services.application/application_controller.fidl.dart';
-import 'package:apps.modular.services.application/application_launcher.fidl.dart';
-import 'package:apps.modular.services.application/service_provider.fidl.dart';
+import 'package:application.lib.app.dart/app.dart';
+import 'package:application.services/application_controller.fidl.dart';
+import 'package:application.services/application_launcher.fidl.dart';
+import 'package:application.services/service_provider.fidl.dart';
 import 'package:test/test.dart';
 
 main(List<String> args) {

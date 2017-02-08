@@ -5,7 +5,7 @@
 #ifndef APPS_DART_CONTENT_HANDLER_DART_APPLICATION_CONTROLLER_H_
 #define APPS_DART_CONTENT_HANDLER_DART_APPLICATION_CONTROLLER_H_
 
-#include "apps/modular/services/application/application_runner.fidl.h"
+#include "application/services/application_runner.fidl.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/fidl/cpp/bindings/binding.h"
 #include "lib/ftl/macros.h"

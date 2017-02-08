@@ -7,7 +7,7 @@
 
 #include "lib/ftl/macros.h"
 #include "lib/fidl/cpp/bindings/binding.h"
-#include "apps/modular/services/application/application_runner.fidl.h"
+#include "application/services/application_runner.fidl.h"
 
 namespace dart_content_handler {
 
