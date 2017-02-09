@@ -33,12 +33,12 @@ executable("web_view") {
       "prebuilt/x86-64/lib/libharfbuzz-icu.a",
   ]
 
-  include_dirs = [ 
+  include_dirs = [
       "prebuilt/include",
   ]
 
   deps = [
-    "//apps/modular/services/application",
+    "services",
     "//apps/mozart/lib/view_framework:view_provider",
     "//apps/mozart/services/buffers/cpp",
     "//apps/mozart/services/composition",
