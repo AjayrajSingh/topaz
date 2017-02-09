@@ -12,7 +12,7 @@
 namespace tonic {
 
 template <typename HandleType>
-struct DartConverter<HandleType, typename std::enable_if<std::is_base_of<mx::handle<HandleType>, HandleType>::value>::type> {
+struct DartConverter<HandleType, typename std::enable_if<std::is_base_of<mx::object<HandleType>, HandleType>::value>::type> {
   static HandleType FromDart(Dart_Handle handle) {
     uint64_t raw_handle = 0;
     Dart_Handle result = Dart_IntegerToUint64(handle, &raw_handle);
