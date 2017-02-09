@@ -28,7 +28,7 @@ class XiFlutterClient extends XiClient {
   Future<Null> init() async {
     // Guard for ensuring the following initialization code is only executed
     // once.
-    if (!initialized) {
+    if (initialized) {
       return;
     }
 

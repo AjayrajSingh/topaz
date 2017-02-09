@@ -8,12 +8,29 @@ import 'dart:async';
 /// A callback for data sent by xi-core.
 ///
 /// TODO(jasoncampbell): Allow typed structures to be sent instead of strings.
-typedef void XiClientListener(String data);
+typedef void XiClientListener(dynamic data);
+
+/// Callback for receiving result from a json-rpc request
+typedef void XiRpcCallback(dynamic data);
+
+/// Handler, for handling requests (both notification and RPC) from core
+abstract class XiRpcHandler {
+  /// Handle a json-rpc notification
+  void handleNotification(String method, dynamic params);
+
+  /// Handle a json-rpc request. Note: the signature is currently
+  /// synchronous (so that the handler must immediately return), but
+  /// this may change. Not currently exercised.
+  dynamic handleRpc(String method, dynamic params);
+}
 
 /// Generic abstract class for wrapping xi-core process/service
 abstract class XiClient {
   /// Flag marking wether the client has been initialized or not.
   bool initialized = false;
+  int _id = 0;
+  Map<int, XiRpcCallback> _pending = <int, XiRpcCallback>{};
+  XiRpcHandler _handler;
 
   /// Callbacks fired whenever a message from xi-core is received. Add with
   /// [onMessage].
@@ -51,7 +68,13 @@ abstract class XiClient {
   void send(String data);
 
   /// Override this method and add any required initialization work.
-  void init();
+  Future<Null> init();
+
+  /// Register a handler. This causes incoming json-rpc requests to be
+  /// routed to that handler.
+  void registerHandler(XiRpcHandler h) {
+    _handler = h;
+  }
 
   /// Register an event listener.
   void onMessage(XiClientListener callback) {
@@ -61,9 +84,52 @@ abstract class XiClient {
   /// Classes that extend [XiClient] should use this method to trigger any
   /// [listeners].
   void handleData(String data) {
-    if (listeners.length > 0) {
-      listeners.forEach((XiClientListener callback) => callback(data));
+    //print(data);
+    Map<String, dynamic> json = JSON.decode(data);
+    if (json.containsKey('result')) {
+      int id = json['id'];
+      XiRpcCallback callback = _pending.remove(id);
+      if (callback != null) {
+        callback(json['result']);
+      } else {
+        print('missing callback for id=$id');
+      }
+    } else if (_handler == null) {
+      // not a response, so it must be a request
+      print('no handler registered for request');
+    } else {
+      String method = json['method'];
+      dynamic params = json['params'];
+      if (json.containsKey('id')) {
+        Map<String, dynamic> response =
+          <String, dynamic>{'result': _handler.handleRpc(method, params), 'id': json['id']};
+        _sendJson(response);
+      } else {
+        _handler.handleNotification(method, params);
+      }
     }
+    if (listeners.length > 0) {
+      listeners.forEach((XiClientListener callback) => callback(json));
+    }
+  }
+
+  void _sendJson(dynamic json) {
+    send(JSON.encode(json));
+  }
+
+  /// Send an asynchronous notification to the core.
+  void sendNotification(String method, dynamic params) {
+    Map<String, dynamic> json = <String, dynamic>{'method': method, 'params': params};
+    _sendJson(json);
+  }
+
+  /// Send an RPC request to the core. The callback will be invoked when there
+  /// is a response.
+  void sendRpc(String method, dynamic params, XiRpcCallback callback) {
+    _pending[_id] = callback;
+    Map<String, dynamic> json = <String, dynamic>{'method': method, 'params': params, 'id': _id};
+    _sendJson(json);
+    _id++;
   }
 
   /// Generic error handler that can be used or everyone by implementations of [XiClient].

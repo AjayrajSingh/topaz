@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-name: widgets
+name: xi_widgets
 description: Flutter UI Widgets for Xi
 dependencies:
   flutter:

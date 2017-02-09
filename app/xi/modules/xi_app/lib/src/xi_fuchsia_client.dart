@@ -4,6 +4,7 @@
 
 import 'dart:typed_data';
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/application_launcher.fidl.dart';
@@ -25,8 +26,8 @@ class XiFuchsiaClient extends XiClient {
   Uint8List _data = new Uint8List(4096);
 
   @override
-  void init() {
-    if (initialized == true) {
+  Future<Null> init() async {
+    if (initialized) {
       return;
     }
 
@@ -47,7 +48,6 @@ class XiFuchsiaClient extends XiClient {
     _reader.onReadable = handleRead;
 
     initialized = true;
-    return;
   }
 
   @override

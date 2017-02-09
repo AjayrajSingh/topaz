@@ -5,6 +5,9 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
+import 'editor.dart';
+import 'xi_app.dart';
+
 /// Callback for when the FAB is pressed.
 typedef void HomePageFabPressed();
 
@@ -51,10 +54,15 @@ class _HomePageState extends State<HomePage> {
         title: new Text(config.title),
       ),
       body: new Center(
-        child: new Text(
-          'Button tapped $counter time${ counter == 1 ? '' : 's' }. \n'
-              'Message: ${config.message}',
-        ),
+        child: new Column(
+          children: <Widget>[
+            new Text(
+              'Button tapped $counter time${ counter == 1 ? '' : 's' }. \n'
+                  'Message: ${config.message}',
+            ),
+            new Editor(),
+          ]
+        )
       ),
       floatingActionButton: new FloatingActionButton(
         onPressed: handleFabPressed,
