@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.services.application/service_provider.fidl.dart';
+import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/module.fidl.dart';
 import 'package:apps.modular.services.story/story.fidl.dart';
