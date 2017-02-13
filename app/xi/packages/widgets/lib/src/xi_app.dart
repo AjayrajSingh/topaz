@@ -81,11 +81,11 @@ class XiAppState extends State<XiApp> {
   void initState() {
     super.initState();
     config.xi.onMessage(handleMessage);
-    config.xi.init().then((Null) =>
+    config.xi.init().then((Null _) =>
       // Arguably the new_tab should be sent by the editor (and the editor should plumb
       // the tab id through to the connectEditor call). However, that would require holding
       // a pending queue of new_tab requests, waiting for init to complete. This is easier.
-      config.xi.sendRpc('new_tab', [], (String id) {
+      config.xi.sendRpc('new_tab', <dynamic>[], (String id) {
         _tabId = id;
         print('id = $id');
       })

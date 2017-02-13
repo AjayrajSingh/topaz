@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import 'editor.dart';
-import 'xi_app.dart';
 
 /// Callback for when the FAB is pressed.
 typedef void HomePageFabPressed();
