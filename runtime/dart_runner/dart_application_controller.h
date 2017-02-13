@@ -12,12 +12,12 @@
 
 namespace dart_content_handler {
 
-class DartApplicationController : public modular::ApplicationController {
+class DartApplicationController : public app::ApplicationController {
  public:
   DartApplicationController(
       std::vector<char> snapshot,
-      modular::ApplicationStartupInfoPtr startup_info,
-      fidl::InterfaceRequest<modular::ApplicationController> controller);
+      app::ApplicationStartupInfoPtr startup_info,
+      fidl::InterfaceRequest<app::ApplicationController> controller);
   ~DartApplicationController() override;
 
   bool CreateIsolate();
@@ -32,8 +32,8 @@ class DartApplicationController : public modular::ApplicationController {
   void Kill();
 
   std::vector<char> snapshot_;
-  modular::ApplicationStartupInfoPtr startup_info_;
-  fidl::Binding<modular::ApplicationController> binding_;
+  app::ApplicationStartupInfoPtr startup_info_;
+  fidl::Binding<app::ApplicationController> binding_;
   Dart_Handle script_;
   Dart_Isolate isolate_;
 

@@ -93,8 +93,8 @@ void ScheduleMicrotask(Dart_NativeArguments args) {
 void InitBuiltinLibrariesForIsolate(
     const std::string& base_uri,
     const std::string& script_uri,
-    fidl::InterfaceHandle<modular::ApplicationEnvironment> environment,
-    fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services) {
+    fidl::InterfaceHandle<app::ApplicationEnvironment> environment,
+    fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
   // dart:fidl.internal --------------------------------------------------------
 
   Dart_Handle fidl_internal = Dart_LookupLibrary(ToDart("dart:fidl.internal"));

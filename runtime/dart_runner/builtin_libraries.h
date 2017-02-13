@@ -15,8 +15,8 @@ namespace dart_content_handler {
 void InitBuiltinLibrariesForIsolate(
     const std::string& base_uri,
     const std::string& script_uri,
-    fidl::InterfaceHandle<modular::ApplicationEnvironment> environment,
-    fidl::InterfaceRequest<modular::ServiceProvider> outgoing_services);
+    fidl::InterfaceHandle<app::ApplicationEnvironment> environment,
+    fidl::InterfaceRequest<app::ServiceProvider> outgoing_services);
 
 }  // namespace dart_content_handler
 

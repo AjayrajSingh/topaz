@@ -23,8 +23,8 @@ namespace dart_content_handler {
 
 DartApplicationController::DartApplicationController(
     std::vector<char> snapshot,
-    modular::ApplicationStartupInfoPtr startup_info,
-    fidl::InterfaceRequest<modular::ApplicationController> controller)
+    app::ApplicationStartupInfoPtr startup_info,
+    fidl::InterfaceRequest<app::ApplicationController> controller)
     : snapshot_(std::move(snapshot)),
       startup_info_(std::move(startup_info)),
       binding_(this) {

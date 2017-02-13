@@ -23,9 +23,9 @@ std::vector<char> ExtractSnapshot(std::vector<char> bundle) {
 }
 
 void RunApplication(
-    modular::ApplicationPackagePtr application,
-    modular::ApplicationStartupInfoPtr startup_info,
-    ::fidl::InterfaceRequest<modular::ApplicationController> controller) {
+    app::ApplicationPackagePtr application,
+    app::ApplicationStartupInfoPtr startup_info,
+    ::fidl::InterfaceRequest<app::ApplicationController> controller) {
   // Extract a dart snapshot from the application package data.
   std::vector<char> bundle;
   if (!mtl::VectorFromVmo(application->data, &bundle)) {
@@ -52,15 +52,15 @@ void RunApplication(
 }  // namespace
 
 ApplicationRunnerImpl::ApplicationRunnerImpl(
-    fidl::InterfaceRequest<modular::ApplicationRunner> app_runner)
+    fidl::InterfaceRequest<app::ApplicationRunner> app_runner)
     : binding_(this, std::move(app_runner)) {}
 
 ApplicationRunnerImpl::~ApplicationRunnerImpl() {}
 
 void ApplicationRunnerImpl::StartApplication(
-    modular::ApplicationPackagePtr application,
-    modular::ApplicationStartupInfoPtr startup_info,
-    ::fidl::InterfaceRequest<modular::ApplicationController> controller) {
+    app::ApplicationPackagePtr application,
+    app::ApplicationStartupInfoPtr startup_info,
+    ::fidl::InterfaceRequest<app::ApplicationController> controller) {
   std::thread thread(RunApplication, std::move(application),
                      std::move(startup_info), std::move(controller));
   thread.detach();

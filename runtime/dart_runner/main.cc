@@ -19,8 +19,8 @@ class App {
  public:
   App() : context_(modular::ApplicationContext::CreateFromStartupInfo()) {
     InitDartVM();
-    context_->outgoing_services()->AddService<modular::ApplicationRunner>(
-        [this](fidl::InterfaceRequest<modular::ApplicationRunner> app_runner) {
+    context_->outgoing_services()->AddService<app::ApplicationRunner>(
+        [this](fidl::InterfaceRequest<app::ApplicationRunner> app_runner) {
           new ApplicationRunnerImpl(std::move(app_runner));
         });
   }

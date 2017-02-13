@@ -11,20 +11,20 @@
 
 namespace dart_content_handler {
 
-class ApplicationRunnerImpl : public modular::ApplicationRunner {
+class ApplicationRunnerImpl : public app::ApplicationRunner {
  public:
   explicit ApplicationRunnerImpl(
-      fidl::InterfaceRequest<modular::ApplicationRunner> app_runner);
+      fidl::InterfaceRequest<app::ApplicationRunner> app_runner);
   ~ApplicationRunnerImpl() override;
 
  private:
-  // |modular::ApplicationRunner| implementation:
-  void StartApplication(modular::ApplicationPackagePtr application,
-                        modular::ApplicationStartupInfoPtr startup_info,
-                        ::fidl::InterfaceRequest<modular::ApplicationController>
+  // |app::ApplicationRunner| implementation:
+  void StartApplication(app::ApplicationPackagePtr application,
+                        app::ApplicationStartupInfoPtr startup_info,
+                        ::fidl::InterfaceRequest<app::ApplicationController>
                             controller) override;
 
-  fidl::Binding<modular::ApplicationRunner> binding_;
+  fidl::Binding<app::ApplicationRunner> binding_;
 
   FTL_DISALLOW_COPY_AND_ASSIGN(ApplicationRunnerImpl);
 };
