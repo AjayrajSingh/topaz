@@ -9,14 +9,14 @@ import 'package:contact_widgets/contact.dart';
 
 void main() {
   testWidgets(
-      'Test to see if tapping on a single phone entry '
+      'Test to see if tapping on a single phone number '
       'will call the appropriate callbacks', (WidgetTester tester) async {
-    List<PhoneEntry> phoneNumbers = <PhoneEntry>[
-      new PhoneEntry(
+    List<PhoneNumber> phoneNumbers = <PhoneNumber>[
+      new PhoneNumber(
         label: 'Work',
         number: '13371337',
       ),
-      new PhoneEntry(
+      new PhoneNumber(
         label: 'Home',
         number: '10101010',
       ),
@@ -27,11 +27,11 @@ void main() {
     await tester.pumpWidget(new StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
       return new Material(
-        child: new PhoneEntryGroup(
-          phoneEntries: phoneNumbers,
-          onSelectPhoneEntry: (PhoneEntry phone) {
+        child: new PhoneDetailsGroup(
+          phoneNumbers: phoneNumbers,
+          onSelectPhoneNumber: (PhoneNumber phoneNumber) {
             workPhoneTaps++;
-            expect(phone, phoneNumbers[0]);
+            expect(phoneNumber, phoneNumbers[0]);
           },
         ),
       );

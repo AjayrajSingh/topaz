@@ -5,20 +5,21 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-/// Widget that renders a given Contact Entry row in the Contact Details view
-/// The child of the entry must be provided itself as a Widget.
-class ContactEntryRow extends StatelessWidget {
-  /// Main child child to render for entry
+/// Widget that renders a row for a given contact entry (address, phone...)
+/// This is meant to be inside the ContactDetailsGroup
+/// The child of the contact entry must be provided itself as a Widget.
+class ContactDetailsRow extends StatelessWidget {
+  /// Main child to render for the contact entry
   final Widget child;
 
-  /// Callback for when an entry is selected;
+  /// Callback for when an contact entry is selected;
   final VoidCallback onSelect;
 
-  /// Label text for entry
+  /// Label text for contact entry
   final String label;
 
   /// Constructor
-  ContactEntryRow({
+  ContactDetailsRow({
     Key key,
     @required this.child,
     this.label,

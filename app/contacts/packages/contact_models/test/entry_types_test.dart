@@ -6,9 +6,9 @@ import 'package:contact_models/contact.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('EmailEntry', () {
+  group('EmailAddress', () {
     test('toString()', () {
-      EmailEntry email = new EmailEntry(
+      EmailAddress email = new EmailAddress(
         label: 'Personal',
         value: 'coco@puppy.cute',
       );
@@ -16,9 +16,9 @@ void main() {
     });
   });
 
-  group('AddressEntry', () {
+  group('Address', () {
     test('toString()', () {
-      AddressEntry addressEntry = new AddressEntry(
+      Address addressEntry = new Address(
         street: '1842 N Shoreline Blvd',
         city: 'Mountain View',
         region: 'California',
@@ -33,9 +33,9 @@ void main() {
     });
   });
 
-  group('SocialNetworkEntry', () {
+  group('SocialNetwork', () {
     test('toString()', () {
-      SocialNetworkEntry socialNetworkEntry = new SocialNetworkEntry(
+      SocialNetwork socialNetworkEntry = new SocialNetwork(
         type: SocialNetworkType.twitter,
         account: 'google',
       );
@@ -51,12 +51,12 @@ void main() {
       });
       test('Should return first address if contact contains addresses', () {
         Contact contact = new Contact(
-          addresses: <AddressEntry>[
-            new AddressEntry(
+          addresses: <Address>[
+            new Address(
               label: 'Work',
               city: 'Mountain View',
             ),
-            new AddressEntry(
+            new Address(
               label: 'Home',
               city: 'San Francisco',
             ),
@@ -66,24 +66,24 @@ void main() {
       });
     });
     group('primaryEmail', () {
-      test('Should return null if contact contains no emails', () {
+      test('Should return null if contact contains no email addresses', () {
         Contact contact = new Contact();
         expect(contact.primaryEmail, null);
       });
       test('Should return first address if contact contains addresses', () {
         Contact contact = new Contact(
-          emails: <EmailEntry>[
-            new EmailEntry(
+          emailAddresses: <EmailAddress>[
+            new EmailAddress(
               label: 'Work',
               value: 'coco@work',
             ),
-            new EmailEntry(
+            new EmailAddress(
               label: 'Home',
               value: 'coco@home',
             ),
           ],
         );
-        expect(contact.primaryEmail, contact.emails[0]);
+        expect(contact.primaryEmail, contact.emailAddresses[0]);
       });
     });
     group('primaryPhoneNumber', () {
@@ -94,12 +94,12 @@ void main() {
       test('Should return first phone number if contact contains phone numbers',
           () {
         Contact contact = new Contact(
-          phoneNumbers: <PhoneEntry>[
-            new PhoneEntry(
+          phoneNumbers: <PhoneNumber>[
+            new PhoneNumber(
               label: 'Work',
               number: '13371337',
             ),
-            new PhoneEntry(
+            new PhoneNumber(
               label: 'Home',
               number: '101010101',
             ),
@@ -117,8 +117,8 @@ void main() {
           'Should return null if contact has primary address but no city nor region is given',
           () {
         Contact contact = new Contact(
-          addresses: <AddressEntry>[
-            new AddressEntry(
+          addresses: <Address>[
+            new Address(
               country: 'USA',
               label: 'Work',
             )
@@ -130,8 +130,8 @@ void main() {
           'Should return city if contact has primary address with a city and no region',
           () {
         Contact contact = new Contact(
-          addresses: <AddressEntry>[
-            new AddressEntry(
+          addresses: <Address>[
+            new Address(
               city: 'Mountain View',
               country: 'USA',
               label: 'Work',
@@ -144,8 +144,8 @@ void main() {
           'Should return region if contact has primary address with a region and no city',
           () {
         Contact contact = new Contact(
-          addresses: <AddressEntry>[
-            new AddressEntry(
+          addresses: <Address>[
+            new Address(
               region: 'CA',
               country: 'USA',
               label: 'Work',
@@ -158,8 +158,8 @@ void main() {
           'Should return city, region if contact has primary address with a region and city',
           () {
         Contact contact = new Contact(
-          addresses: <AddressEntry>[
-            new AddressEntry(
+          addresses: <Address>[
+            new Address(
               city: 'Mountain View',
               region: 'CA',
               country: 'USA',

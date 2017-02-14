@@ -11,6 +11,9 @@ flutter_app("contacts") {
 
   deps = [
     "//application/lib/app/dart",
+    "//apps/contacts/packages/contact_api",
+    "//apps/contacts/packages/contact_models",
+    "//apps/contacts/packages/contact_widgets",
     "//apps/modular/services/story:story_dart",
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",

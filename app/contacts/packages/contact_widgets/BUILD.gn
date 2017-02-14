@@ -10,7 +10,7 @@ dart_package("contact_widgets") {
   source_dir = "lib"
 
   deps = [
-    "//apps/modules/packages/widgets"
+    "//apps/modules/packages/widgets",
     "//apps/contacts/packages/contact_models",
     "//lib/flutter/packages/flutter",
   ]

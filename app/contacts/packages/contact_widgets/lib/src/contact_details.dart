@@ -6,48 +6,48 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:contact_models/contact.dart';
 
-import 'address_entry_group.dart';
-import 'email_entry_group.dart';
-import 'phone_entry_group.dart';
+import 'address_details_group.dart';
+import 'email_details_group.dart';
+import 'phone_details_group.dart';
 import 'type_defs.dart';
 
-/// Contact Details that usually contains information about a contact's phone,
-/// email and address.
+/// Contact Details that usually contains information about a contact's phone
+/// number, email addresses and addresses,
 class ContactDetails extends StatelessWidget {
   /// User [Contact] that is being rendered
   final Contact contact;
 
-  /// Callback when given address entry is selected
-  final AddressActionCallback onSelectAddressEntry;
+  /// Callback when given address is selected
+  final AddressActionCallback onSelectAddress;
 
-  /// Callback when given email entry is selected
-  final EmailActionCallback onSelectEmailEntry;
+  /// Callback when given email address is selected
+  final EmailAddressActionCallback onSelectEmailAddress;
 
-  /// Callback when given phone entry is selected
-  final PhoneActionCallback onSelectPhoneEntry;
+  /// Callback when given phone number is selected
+  final PhoneNumberActionCallback onSelectPhoneNumber;
 
   /// Constructor
   ContactDetails({
     Key key,
     @required this.contact,
-    this.onSelectAddressEntry,
-    this.onSelectEmailEntry,
-    this.onSelectPhoneEntry,
+    this.onSelectAddress,
+    this.onSelectEmailAddress,
+    this.onSelectPhoneNumber,
   })
       : super(key: key) {
     assert(contact != null);
   }
 
-  void _handleSelectEmailEntry(EmailEntry emailEntry) {
-    onSelectEmailEntry?.call(emailEntry);
+  void _handleSelectEmailAddress(EmailAddress emailAddress) {
+    onSelectEmailAddress?.call(emailAddress);
   }
 
-  void _handleSelectPhoneEntry(PhoneEntry phoneEntry) {
-    onSelectPhoneEntry?.call(phoneEntry);
+  void _handleSelectPhoneNumber(PhoneNumber phoneNumber) {
+    onSelectPhoneNumber?.call(phoneNumber);
   }
 
-  void _handleSelectAddressEntry(AddressEntry addressEntry) {
-    onSelectAddressEntry?.call(addressEntry);
+  void _handleSelectAddress(Address address) {
+    onSelectAddress?.call(address);
   }
 
   @override
@@ -57,19 +57,19 @@ class ContactDetails extends StatelessWidget {
     if (contact.phoneNumbers.isNotEmpty) {
       entryGroups.add(new Container(
         padding: const EdgeInsets.all(16.0),
-        child: new PhoneEntryGroup(
-          phoneEntries: contact.phoneNumbers,
-          onSelectPhoneEntry: _handleSelectPhoneEntry,
+        child: new PhoneDetailsGroup(
+          phoneNumbers: contact.phoneNumbers,
+          onSelectPhoneNumber: _handleSelectPhoneNumber,
         ),
       ));
     }
 
-    if (contact.emails.isNotEmpty) {
+    if (contact.emailAddresses.isNotEmpty) {
       entryGroups.add(new Container(
         padding: const EdgeInsets.all(16.0),
-        child: new EmailEntryGroup(
-          emailEntries: contact.emails,
-          onSelectEmailEntry: _handleSelectEmailEntry,
+        child: new EmailDetailsGroup(
+          emailAddresses: contact.emailAddresses,
+          onSelectEmailAddress: _handleSelectEmailAddress,
         ),
       ));
     }
@@ -77,9 +77,9 @@ class ContactDetails extends StatelessWidget {
     if (contact.addresses.isNotEmpty) {
       entryGroups.add(new Container(
         padding: const EdgeInsets.all(16.0),
-        child: new AddressEntryGroup(
-          addressEntries: contact.addresses,
-          onSelectAddressEntry: _handleSelectAddressEntry,
+        child: new AddressDetailsGroup(
+          addresses: contact.addresses,
+          onSelectAddress: _handleSelectAddress,
         ),
       ));
     }

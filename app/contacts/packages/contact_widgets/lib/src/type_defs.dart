@@ -10,10 +10,10 @@ import 'package:contact_models/contact.dart';
 typedef void ContactActionCallback(Contact contact);
 
 /// Callback function signature for an action on a PhoneEntry
-typedef void PhoneActionCallback(PhoneEntry phone);
+typedef void PhoneNumberActionCallback(PhoneNumber phone);
 
 /// Callback function signature for an action on a EmailEntry
-typedef void EmailActionCallback(EmailEntry email);
+typedef void EmailAddressActionCallback(EmailAddress email);
 
 /// Callback function signature for an action on a AddressEntry
-typedef void AddressActionCallback(AddressEntry address);
+typedef void AddressActionCallback(Address address);

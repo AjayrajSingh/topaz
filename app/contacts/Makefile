@@ -56,7 +56,7 @@ PHONY: dart-lint
 dart-lint: build
 	$(fuchsia_root)/scripts/run-dart-analysis.py \
 			--out=$(fuchsia_out)/debug-x86-64 \
-			--tree=//apps/chat/* \
+			--tree=//apps/contacts/* \
 			--lints --fatal-lints --fatal-warnings
 
 PHONY: copyright-check

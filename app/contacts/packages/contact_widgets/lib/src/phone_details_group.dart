@@ -6,35 +6,35 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:contact_models/contact.dart';
 
-import 'contact_entry_group.dart';
-import 'contact_entry_row.dart';
+import 'contact_details_group.dart';
+import 'contact_details_row.dart';
 import 'type_defs.dart';
 
-/// A widget representing a contact group of phone entries (phone numbers)
-class PhoneEntryGroup extends StatelessWidget {
-  /// List of phone entries to show
-  final List<PhoneEntry> phoneEntries;
+/// A widget representing a group of email address for the ContactsDetails view
+class PhoneDetailsGroup extends StatelessWidget {
+  /// List of phone numbers to show
+  final List<PhoneNumber> phoneNumbers;
 
-  /// Callback for when a phone entry is selected
-  final PhoneActionCallback onSelectPhoneEntry;
+  /// Callback for when a phone number is selected
+  final PhoneNumberActionCallback onSelectPhoneNumber;
 
   /// Constructor
-  PhoneEntryGroup({
+  PhoneDetailsGroup({
     Key key,
-    @required this.phoneEntries,
-    this.onSelectPhoneEntry,
+    @required this.phoneNumbers,
+    this.onSelectPhoneNumber,
   })
       : super(key: key) {
-    assert(phoneEntries != null);
+    assert(phoneNumbers != null);
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = phoneEntries
-        .map((PhoneEntry entry) => new ContactEntryRow(
-            label: entry.label,
+    List<Widget> children = phoneNumbers
+        .map((PhoneNumber phoneNumber) => new ContactDetailsRow(
+            label: phoneNumber.label,
             child: new Text(
-              entry.number,
+              phoneNumber.number,
               softWrap: false,
               overflow: TextOverflow.ellipsis,
               style: new TextStyle(
@@ -42,10 +42,10 @@ class PhoneEntryGroup extends StatelessWidget {
               ),
             ),
             onSelect: () {
-              onSelectPhoneEntry?.call(entry);
+              onSelectPhoneNumber?.call(phoneNumber);
             }))
         .toList();
-    return new ContactEntryGroup(
+    return new ContactDetailsGroup(
       child: new Column(children: children),
       icon: Icons.phone,
     );

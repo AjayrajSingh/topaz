@@ -87,7 +87,7 @@ class ContactAPI {
       givenName: person.names.first?.givenName,
       familyName: person.names.first?.familyName,
       addresses: person.addresses?.map(_address)?.toList(),
-      emails: person.emailAddresses?.map(_email)?.toList(),
+      emailAddresses: person.emailAddresses?.map(_email)?.toList(),
       phoneNumbers: person.phoneNumbers?.map(_phoneNumber)?.toList(),
       photoUrl: person.photos?.first?.url,
       backgroundImageUrl: person.coverPhotos?.first?.url,
@@ -132,17 +132,16 @@ class ContactAPI {
       givenName: person.names.first?.givenName,
       familyName: person.names.first?.familyName,
       addresses: person.addresses?.map(_address)?.toList(),
-      emails: person.emailAddresses?.map(_email)?.toList(),
+      emailAddresses: person.emailAddresses?.map(_email)?.toList(),
       phoneNumbers: person.phoneNumbers?.map(_phoneNumber)?.toList(),
       photoUrl: person.photos?.first?.url,
       backgroundImageUrl: person.coverPhotos?.first?.url,
     );
   }
 
-  /// Maps a Google People API address to the AddressEntry used in the Contacts
-  /// module.
-  AddressEntry _address(contact.Address address) {
-    return new AddressEntry(
+  /// Maps a Google People API address to the Contacts Address model
+  Address _address(contact.Address address) {
+    return new Address(
       city: address.city,
       street: address.streetAddress,
       region: address.region,
@@ -153,19 +152,17 @@ class ContactAPI {
     );
   }
 
-  /// Maps a Google People API email address to the EmailEntry used in the
-  /// Contacts module
-  EmailEntry _email(contact.EmailAddress emailAddress) {
-    return new EmailEntry(
+  /// Maps a Google People API email address to the Contacts Email Address model
+  EmailAddress _email(contact.EmailAddress emailAddress) {
+    return new EmailAddress(
       value: emailAddress.value,
       label: emailAddress.formattedType,
     );
   }
 
-  /// Maps a Google People API phone number to the PhoneEntry used in the
-  /// Contacts module
-  PhoneEntry _phoneNumber(contact.PhoneNumber phoneNumber) {
-    return new PhoneEntry(
+  /// Maps a Google People API phone number to the Contacts Phone Number Model
+  PhoneNumber _phoneNumber(contact.PhoneNumber phoneNumber) {
+    return new PhoneNumber(
       number: phoneNumber.value,
       label: phoneNumber.formattedType,
     );

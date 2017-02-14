@@ -4,8 +4,8 @@
 
 // Various Contact Entry Types
 
-/// A Contacts Email Entry
-class EmailEntry {
+/// A Contacts Email Address
+class EmailAddress {
   /// Email address, e.g. littlePuppyCoco@cute.org
   final String value;
 
@@ -13,7 +13,7 @@ class EmailEntry {
   final String label;
 
   /// Constructor
-  EmailEntry({
+  EmailAddress({
     this.value,
     this.label,
   });
@@ -24,8 +24,8 @@ class EmailEntry {
   }
 }
 
-/// An Contacts Address Entry
-class AddressEntry {
+/// An Contacts "Physical" Address
+class Address {
   /// City, ex Mountain View
   final String city;
 
@@ -50,7 +50,7 @@ class AddressEntry {
   final String label;
 
   /// Constructor
-  AddressEntry({
+  Address({
     this.city,
     this.street,
     this.region,
@@ -67,8 +67,8 @@ class AddressEntry {
   }
 }
 
-/// A Contacts Phone Number Entry
-class PhoneEntry {
+/// A Contacts Phone Number
+class PhoneNumber {
   /// Phone number, e.g. 911, 1-408-111-2222
   final String number;
 
@@ -76,7 +76,7 @@ class PhoneEntry {
   final String label;
 
   /// Constructor
-  PhoneEntry({
+  PhoneNumber({
     this.number,
     this.label,
   });
@@ -101,7 +101,7 @@ enum SocialNetworkType {
 }
 
 /// Social network account associated with given Contact
-class SocialNetworkEntry {
+class SocialNetwork {
   /// Type of social network, e.g. Facebook, Twitter ...
   final SocialNetworkType type;
 
@@ -112,7 +112,7 @@ class SocialNetworkEntry {
   final String account;
 
   /// Constructor
-  SocialNetworkEntry({
+  SocialNetwork({
     this.type,
     this.account,
   });

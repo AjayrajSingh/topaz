@@ -5,9 +5,9 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-/// A container for a group of contact entries
-/// eg. Phone Numbers or Email Addresses
-class ContactEntryGroup extends StatelessWidget {
+/// A container for a group of ContactDetailsRow meant for the ContactDetails
+/// view.
+class ContactDetailsGroup extends StatelessWidget {
   /// Child content
   final Widget child;
 
@@ -15,7 +15,7 @@ class ContactEntryGroup extends StatelessWidget {
   final IconData icon;
 
   /// Constructor
-  ContactEntryGroup({
+  ContactDetailsGroup({
     Key key,
     @required this.child,
     @required this.icon,

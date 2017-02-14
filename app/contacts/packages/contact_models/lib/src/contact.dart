@@ -19,16 +19,16 @@ class Contact {
   final String familyName;
 
   /// Physical addresses associated with contact
-  final List<AddressEntry> addresses;
+  final List<Address> addresses;
 
   /// Email addresses associated with contact
-  final List<EmailEntry> emails;
+  final List<EmailAddress> emailAddresses;
 
   /// Phone numbers associated with contact
-  final List<PhoneEntry> phoneNumbers;
+  final List<PhoneNumber> phoneNumbers;
 
   /// Social Networks associated with contact
-  final List<SocialNetworkEntry> socialNetworks;
+  final List<SocialNetwork> socialNetworks;
 
   /// URL for background image
   final String backgroundImageUrl;
@@ -44,22 +44,22 @@ class Contact {
     this.familyName,
     this.backgroundImageUrl,
     this.photoUrl,
-    List<AddressEntry> addresses,
-    List<EmailEntry> emails,
-    List<PhoneEntry> phoneNumbers,
-    List<SocialNetworkEntry> socialNetworks,
+    List<Address> addresses,
+    List<EmailAddress> emailAddresses,
+    List<PhoneNumber> phoneNumbers,
+    List<SocialNetwork> socialNetworks,
   })
       : addresses =
-            new List<AddressEntry>.unmodifiable(addresses ?? <AddressEntry>[]),
-        emails = new List<EmailEntry>.unmodifiable(emails ?? <EmailEntry>[]),
+            new List<Address>.unmodifiable(addresses ?? <Address>[]),
+        emailAddresses = new List<EmailAddress>.unmodifiable(emailAddresses ?? <EmailAddress>[]),
         phoneNumbers =
-            new List<PhoneEntry>.unmodifiable(phoneNumbers ?? <PhoneEntry>[]),
-        socialNetworks = new List<SocialNetworkEntry>.unmodifiable(
-            socialNetworks ?? <SocialNetworkEntry>[]);
+            new List<PhoneNumber>.unmodifiable(phoneNumbers ?? <PhoneNumber>[]),
+        socialNetworks = new List<SocialNetwork>.unmodifiable(
+            socialNetworks ?? <SocialNetwork>[]);
 
   /// The primary address is the first address in the list of addresses
   /// Returns null if there is no address for contact
-  AddressEntry get primaryAddress {
+  Address get primaryAddress {
     if (addresses.isEmpty) {
       return null;
     } else {
@@ -69,17 +69,17 @@ class Contact {
 
   /// The primary email is the first entry in the list of emails
   /// Returns null if there is no email for contact
-  EmailEntry get primaryEmail {
-    if (emails.isEmpty) {
+  EmailAddress get primaryEmail {
+    if (emailAddresses.isEmpty) {
       return null;
     } else {
-      return emails[0];
+      return emailAddresses[0];
     }
   }
 
   /// The primary phone number is the first entry in the list of phone numbers
   /// Returns null if there is no phone number for contact
-  PhoneEntry get primaryPhoneNumber {
+  PhoneNumber get primaryPhoneNumber {
     if (phoneNumbers.isEmpty) {
       return null;
     } else {

@@ -9,36 +9,36 @@ import 'package:contact_widgets/contact.dart';
 
 void main() {
   testWidgets(
-      'Test to see if tapping on a single address entry '
+      'Test to see if tapping on a single email address '
       'will call the appropriate callbacks', (WidgetTester tester) async {
-    List<AddressEntry> addresses = <AddressEntry>[
-      new AddressEntry(
+    List<EmailAddress> emails = <EmailAddress>[
+      new EmailAddress(
         label: 'Work',
-        street: 'Work Street',
+        value: 'coco@work',
       ),
-      new AddressEntry(
+      new EmailAddress(
         label: 'Home',
-        street: 'Home Street',
+        value: 'coco@home',
       ),
     ];
 
-    int workAddressTaps = 0;
+    int workEmailTaps = 0;
 
     await tester.pumpWidget(new StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
       return new Material(
-        child: new AddressEntryGroup(
-          addressEntries: addresses,
-          onSelectAddressEntry: (AddressEntry entry) {
-            workAddressTaps++;
-            expect(entry, addresses[0]);
+        child: new EmailDetailsGroup(
+          emailAddresses: emails,
+          onSelectEmailAddress: (EmailAddress address) {
+            workEmailTaps++;
+            expect(address, emails[0]);
           },
         ),
       );
     }));
 
-    expect(workAddressTaps, 0);
-    await tester.tap(find.text(addresses[0].label));
-    expect(workAddressTaps, 1);
+    expect(workEmailTaps, 0);
+    await tester.tap(find.text(emails[0].label));
+    expect(workEmailTaps, 1);
   });
 }
