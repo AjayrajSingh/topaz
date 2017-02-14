@@ -17,7 +17,7 @@ namespace {
 
 class App {
  public:
-  App() : context_(modular::ApplicationContext::CreateFromStartupInfo()) {
+  App() : context_(app::ApplicationContext::CreateFromStartupInfo()) {
     InitDartVM();
     context_->outgoing_services()->AddService<app::ApplicationRunner>(
         [this](fidl::InterfaceRequest<app::ApplicationRunner> app_runner) {
@@ -26,7 +26,7 @@ class App {
   }
 
  private:
-  std::unique_ptr<modular::ApplicationContext> context_;
+  std::unique_ptr<app::ApplicationContext> context_;
   FTL_DISALLOW_COPY_AND_ASSIGN(App);
 };
 
