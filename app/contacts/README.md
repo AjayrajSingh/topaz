@@ -26,6 +26,10 @@ It is recommended you set up the [Fuchsia environment helpers][fuchsia-env] in `
 
     source scripts/env.sh
 
+## Authenticate
+
+Follow authentication instructions for [Modules][modules-auth]: 
+
 ## Workflow
 
 There are Makefile tasks setup to help simplify common development tasks. Use `make help` to see what they are.
@@ -61,3 +65,4 @@ Optional: In another terminal you can tail the logs
 [fuchsia-setup]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md
 [fuchsia-env]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md#Setup-Build-Environment
 [clang-wrapper]: https://fuchsia.googlesource.com/magenta-rs/+/HEAD/tools
+[modules-auth]: https://fuchsia.googlesource.com/modules/#Authenticate

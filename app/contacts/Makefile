@@ -47,7 +47,7 @@ PHONY: flutter
 flutter-run: ## Run via `flutter run`.
 	# TODO(jasoncampbell): Trap and remove .packages when this process is
 	# done.
-	cd $(root)/modules/chat && \
+	cd $(root)/modules/contacts && \
 		$(flutter) upgrade && \
 		$(flutter) build clean && \
 		$(flutter) run --hot

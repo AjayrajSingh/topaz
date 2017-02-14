@@ -15,7 +15,9 @@ class App extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new MyHomePage(title: 'Contacts'),
+      home: new Material(
+        child: new ContactListScreen(),
+      ),
     );
   }
 }
