@@ -9,7 +9,8 @@ import 'package:googleapis/people/v1.dart' as contact;
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
-import 'package:contact_models/contact.dart';
+
+import 'models.dart';
 
 /// The order in which a list of contact connections should be sorted.
 enum ContactSortOrder {

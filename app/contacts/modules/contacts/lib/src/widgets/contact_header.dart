@@ -4,8 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:contact_models/contact.dart';
 import 'package:widgets/user.dart';
+
+import '../models.dart';
 
 const String _kDefaultBackgroundImage =
     'https://static.pexels.com/photos/2042/sea-city-mountains-landmark.jpg';

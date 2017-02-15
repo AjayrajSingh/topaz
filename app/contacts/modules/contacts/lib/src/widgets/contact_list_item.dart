@@ -4,9 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:contact_models/contact.dart';
 import 'package:widgets/user.dart';
 
+import '../models.dart';
 import 'type_defs.dart';
 
 const double _kAvatarSize = 40.0;

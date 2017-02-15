@@ -11,13 +11,14 @@ flutter_app("contacts") {
 
   deps = [
     "//application/lib/app/dart",
-    "//apps/contacts/packages/contact_api",
-    "//apps/contacts/packages/contact_models",
-    "//apps/contacts/packages/contact_widgets",
     "//apps/modular/services/story:story_dart",
+    "//apps/modules/packages/config_flutter",
+    "//apps/modules/packages/widgets",
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/pub/googleapis_auth",
+    "//third_party/dart-pkg/pub/googleapis",
   ]
 
   analysis_options = "//apps/contacts/.analysis_options"

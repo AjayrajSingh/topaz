@@ -7,17 +7,17 @@ description: Flutter app to run Contacts
 dependencies:
   config_flutter:
     path: ../../../modules/packages/config_flutter
+  widgets:
+    path: ../../../modules/packages/widgets
   flutter:
     sdk: flutter
-  contact_api:
-    path: ../../packages/contact_api
-  contact_widgets:
-    path: ../../packages/contact_widgets
-  contact_models:
-    path: ../../packages/contact_models
 dependency_overrides:
   http:
     path: ../../../modules/packages/flutter-http/
+dev_dependencies:
+  test: any
+  flutter_test:
+    sdk: flutter
 flutter:
   uses-material-design: true
   assets:

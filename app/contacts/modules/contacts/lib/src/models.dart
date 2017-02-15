@@ -2,5 +2,5 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-export 'src/contact.dart';
-export 'src/entry_types.dart';
+export 'models/contact.dart';
+export 'models/entry_types.dart';

@@ -4,8 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:contact_models/contact.dart';
-import 'package:contact_widgets/contact.dart';
+
+import '../../lib/src/models.dart';
+import '../../lib/src/widgets.dart';
 
 void main() {
   testWidgets(

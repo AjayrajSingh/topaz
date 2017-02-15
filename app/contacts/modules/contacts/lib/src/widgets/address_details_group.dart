@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:contact_models/contact.dart';
 
+import '../models.dart';
 import 'contact_details_group.dart';
 import 'contact_details_row.dart';
 import 'type_defs.dart';

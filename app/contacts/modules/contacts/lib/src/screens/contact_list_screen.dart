@@ -4,11 +4,11 @@
 
 import 'dart:async';
 
-import 'package:contact_api/contact_api.dart';
 import 'package:flutter/material.dart';
-import 'package:contact_models/contact.dart';
-import 'package:contact_widgets/contact.dart';
 
+import '../contact_api.dart';
+import '../models.dart';
+import '../widgets.dart';
 import 'contact_card_screen.dart';
 
 /// UI Widget that shows the authenticated User's list of contacts

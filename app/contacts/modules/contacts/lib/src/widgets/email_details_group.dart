@@ -1,40 +1,40 @@
-// Copyright 2016 The Fuchsia Authors. All rights reserved.
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:contact_models/contact.dart';
 
+import '../models.dart';
 import 'contact_details_group.dart';
 import 'contact_details_row.dart';
 import 'type_defs.dart';
 
 /// A widget representing a group of email address for the ContactsDetails view
-class PhoneDetailsGroup extends StatelessWidget {
-  /// List of phone numbers to show
-  final List<PhoneNumber> phoneNumbers;
+class EmailDetailsGroup extends StatelessWidget {
+  /// List of email addresses to show
+  final List<EmailAddress> emailAddresses;
 
-  /// Callback for when a phone number is selected
-  final PhoneNumberActionCallback onSelectPhoneNumber;
+  /// Callback for when a email address is selected
+  final EmailAddressActionCallback onSelectEmailAddress;
 
   /// Constructor
-  PhoneDetailsGroup({
+  EmailDetailsGroup({
     Key key,
-    @required this.phoneNumbers,
-    this.onSelectPhoneNumber,
+    @required this.emailAddresses,
+    this.onSelectEmailAddress,
   })
       : super(key: key) {
-    assert(phoneNumbers != null);
+    assert(emailAddresses != null);
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = phoneNumbers
-        .map((PhoneNumber phoneNumber) => new ContactDetailsRow(
-            label: phoneNumber.label,
+    List<Widget> children = emailAddresses
+        .map((EmailAddress emailAddress) => new ContactDetailsRow(
+            label: emailAddress.label,
             child: new Text(
-              phoneNumber.number,
+              emailAddress.value,
               softWrap: false,
               overflow: TextOverflow.ellipsis,
               style: new TextStyle(
@@ -42,12 +42,12 @@ class PhoneDetailsGroup extends StatelessWidget {
               ),
             ),
             onSelect: () {
-              onSelectPhoneNumber?.call(phoneNumber);
+              onSelectEmailAddress?.call(emailAddress);
             }))
         .toList();
     return new ContactDetailsGroup(
       child: new Column(children: children),
-      icon: Icons.phone,
+      icon: Icons.mail,
     );
   }
 }
