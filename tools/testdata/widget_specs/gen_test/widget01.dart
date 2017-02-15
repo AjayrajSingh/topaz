@@ -22,6 +22,7 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
 This is a public [StatefulWidget].''',
   exampleWidth: 200.0,
   exampleHeight: 300.0,
+  hasSizeParam: false,
 );
 
 /// Generated state object for this widget.
@@ -44,14 +45,19 @@ class _GeneratedWidget01State extends GeneratedState {
   }
 
   @override
-  Widget buildWidget(BuildContext context, Key key) {
+  Widget buildWidget(
+    BuildContext context,
+    Key key,
+    double width,
+    double height,
+  ) {
     return new Widget01(
       key: key,
-      intParam: intParam,
-      boolParam: boolParam,
-      doubleParam: doubleParam,
-      stringParam: stringParam,
-      noExampleValueParam: noExampleValueParam,
+      intParam: this.intParam,
+      boolParam: this.boolParam,
+      doubleParam: this.doubleParam,
+      stringParam: this.stringParam,
+      noExampleValueParam: this.noExampleValueParam,
     );
   }
 

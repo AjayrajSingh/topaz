@@ -18,6 +18,7 @@ class WidgetSpecs implements Comparable<WidgetSpecs> {
     this.doc,
     this.exampleWidth,
     this.exampleHeight,
+    this.hasSizeParam,
     this.classElement,
   });
 
@@ -41,6 +42,11 @@ class WidgetSpecs implements Comparable<WidgetSpecs> {
 
   /// Example height to be used as the initial height.
   final double exampleHeight;
+
+  /// Indicates whether the widget has a parameter annotated with `@sizeParam`,
+  /// whih implies that this widget's width and height values should always be
+  /// the same.
+  final bool hasSizeParam;
 
   /// The [ClassElement] corresponding to this widget.
   final ClassElement classElement;

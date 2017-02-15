@@ -62,12 +62,14 @@ void main() {
           'no_comment_widget.dart',
           'config_key_widget.dart',
           'generator_widget.dart',
+          'size_param_widget.dart',
         ]));
 
     // Verify the generated file contents.
     List<String> filesToVerify = <String>[
       'config_key_widget.dart',
       'generator_widget.dart',
+      'size_param_widget.dart',
       'widget01.dart',
       'widget03.dart',
     ];

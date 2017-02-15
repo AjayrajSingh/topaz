@@ -177,6 +177,7 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
 {{ doc }}\'\'\',
   exampleWidth: {{ example_width }},
   exampleHeight: {{ example_height }},
+  hasSizeParam: {{ has_size_param }},
 );
 
 /// Generated state object for this widget.
@@ -198,11 +199,16 @@ class _Generated{{ name }}State extends GeneratedState {
   }
 
   @override
-  Widget buildWidget(BuildContext context, Key key) {
+  Widget buildWidget(
+    BuildContext context,
+    Key key,
+    double width,
+    double height,
+  ) {
     return new {{ name }}(
       key: key,
       {{# params }}
-      {{ param_name }}: {{ param_name }},
+      {{ param_name }}: {{ param_expr }},
       {{/ params }}
     );
   }
@@ -277,6 +283,7 @@ Future<Null> writeWidgetSpecs(String outputDir, WidgetSpecs specs) async {
               specs,
               param,
             ),
+            'param_expr': _generateParameterExpression(param),
           })
       .toList();
 
@@ -299,6 +306,7 @@ Future<Null> writeWidgetSpecs(String outputDir, WidgetSpecs specs) async {
     'doc': escapedDoc,
     'example_width': _doubleValueToCode(specs.exampleWidth),
     'example_height': _doubleValueToCode(specs.exampleHeight),
+    'has_size_param': specs.hasSizeParam,
     'additional_imports': additionalImports
         .map((String uri) => <String, String>{
               'additional_import': uri,
@@ -318,6 +326,19 @@ String _generateParamControllerCode(
   ParameterElement param,
 ) {
   // TODO(youngseokyoon): handle more types of values.
+
+  // Handle size parameters.
+  if (_isWidthParam(param)) {
+    return "new InfoText('width value is used')";
+  }
+
+  if (_isHeightParam(param)) {
+    return "new InfoText('height value is used')";
+  }
+
+  if (_isSizeParam(param)) {
+    return "new InfoText('size value is used')";
+  }
 
   // For int type, use a TextField where the user can type in the integer value.
   if (param.type.name == 'int') {
@@ -543,6 +564,24 @@ String _generateInitialValueCode(
   return 'null';
 }
 
+String _generateParameterExpression(ParameterElement param) {
+  if (_isWidthParam(param)) {
+    return 'width';
+  }
+
+  if (_isHeightParam(param)) {
+    return 'height';
+  }
+
+  if (_isSizeParam(param)) {
+    // In this case, the width and height value must be the same, and it doesn't
+    // matter which one we use. Just using the width value here.
+    return 'width';
+  }
+
+  return 'this.${param.name}';
+}
+
 /// Determines whether the provided parameter is of an enum type.
 bool _isEnumParameter(ParameterElement param) {
   if (param?.type?.element is! ClassElement) {
@@ -583,6 +622,18 @@ ElementAnnotation _getGenerator(ParameterElement param) {
 /// Gets the code for invoking the generator.
 String _getGeneratorInvocationCode(DartType generatorType, String methodName) {
   return '${lowerCamelize(generatorType.name)}.$methodName()';
+}
+
+bool _isWidthParam(ParameterElement param) {
+  return getAnnotationWithName(param, '_WidthParam') != null;
+}
+
+bool _isHeightParam(ParameterElement param) {
+  return getAnnotationWithName(param, '_HeightParam') != null;
+}
+
+bool _isSizeParam(ParameterElement param) {
+  return getAnnotationWithName(param, '_SizeParam') != null;
 }
 
 /// Escape all single quotes in the given string with a leading backslash,

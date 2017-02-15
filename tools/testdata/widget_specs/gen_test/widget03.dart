@@ -24,6 +24,7 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
 This is a public [StatelessWidget].''',
   exampleWidth: null,
   exampleHeight: null,
+  hasSizeParam: false,
 );
 
 /// Generated state object for this widget.
@@ -41,11 +42,16 @@ class _GeneratedWidget03State extends GeneratedState {
   }
 
   @override
-  Widget buildWidget(BuildContext context, Key key) {
+  Widget buildWidget(
+    BuildContext context,
+    Key key,
+    double width,
+    double height,
+  ) {
     return new Widget03(
       key: key,
-      callbackWithNoParams: callbackWithNoParams,
-      callbackWithParams: callbackWithParams,
+      callbackWithNoParams: this.callbackWithNoParams,
+      callbackWithParams: this.callbackWithParams,
     );
   }
 

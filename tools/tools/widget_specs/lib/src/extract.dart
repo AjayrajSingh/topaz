@@ -199,6 +199,16 @@ class _WidgetSpecsCreator {
       exampleHeight = exampleSizeObject.getField('height')?.toDoubleValue();
     }
 
+    // Fill in the hasSizeParam information.
+    bool hasSizeParam;
+    ConstructorElement constructor = c.constructors.firstWhere(
+      (ConstructorElement constructor) => constructor.isDefaultConstructor,
+      orElse: () => null,
+    );
+    hasSizeParam = constructor?.parameters?.any((ParameterElement param) =>
+            getAnnotationWithName(param, '_SizeParam') != null) ??
+        false;
+
     return new WidgetSpecs(
       packageName: source.uri.pathSegments[0],
       name: name,
@@ -207,6 +217,7 @@ class _WidgetSpecsCreator {
       doc: doc,
       exampleWidth: exampleWidth,
       exampleHeight: exampleHeight,
+      hasSizeParam: hasSizeParam,
       classElement: c,
     );
   }

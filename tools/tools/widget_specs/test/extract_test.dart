@@ -52,6 +52,7 @@ Future<Null> main() async {
           'NoCommentWidget',
           'ConfigKeyWidget',
           'GeneratorWidget',
+          'SizeParamWidget',
         ]));
   });
 
@@ -88,6 +89,7 @@ Future<Null> main() async {
       'NoCommentWidget': 'sample_widgets.dart',
       'ConfigKeyWidget': 'config_key_widget.dart',
       'GeneratorWidget': 'generator_widget.dart',
+      'SizeParamWidget': 'size_param_widget.dart',
     };
 
     widgetMap.keys.forEach((String key) {
@@ -137,5 +139,14 @@ Future<Null> main() async {
       expect(ws.exampleWidth, isNull);
       expect(ws.exampleHeight, isNull);
     });
+  });
+
+  test('The hasSizeParam value should be correctly extracted.', () {
+    WidgetSpecs sizeParamWidget = widgetMap['SizeParamWidget'];
+    expect(sizeParamWidget.hasSizeParam, isTrue);
+
+    widgetMap.values
+        .where((WidgetSpecs ws) => ws != sizeParamWidget)
+        .forEach((WidgetSpecs ws) => expect(ws.hasSizeParam, isFalse));
   });
 }

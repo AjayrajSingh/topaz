@@ -7,3 +7,4 @@ export 'src/generator_widget.dart';
 export 'src/mock_generator.dart';
 export 'src/mock_models.dart';
 export 'src/sample_widgets.dart';
+export 'src/size_param_widget.dart';

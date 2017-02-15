@@ -11,6 +11,7 @@ import 'package:widget_specs/widget_specs.dart';
 
 const double _kMaxWidth = 1000.0;
 const double _kMaxHeight = 1000.0;
+const double _kMaxSize = 1000.0;
 const double _kDefaultWidth = 500.0;
 const double _kDefaultHeight = 500.0;
 
@@ -123,10 +124,29 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
         margin: const EdgeInsets.all(16.0),
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _buildSizeRow('Width', size.width, _adjustWidth, _kMaxWidth),
-            _buildSizeRow('Height', size.height, _adjustHeight, _kMaxHeight),
-          ],
+          children: kWidgetSpecs[selectedWidget].hasSizeParam
+              ? <Widget>[
+                  _buildSizeRow(
+                    'Size',
+                    size.width,
+                    _adjustWidthAndHeight,
+                    _kMaxSize,
+                  ),
+                ]
+              : <Widget>[
+                  _buildSizeRow(
+                    'Width',
+                    size.width,
+                    _adjustWidth,
+                    _kMaxWidth,
+                  ),
+                  _buildSizeRow(
+                    'Height',
+                    size.height,
+                    _adjustHeight,
+                    _kMaxHeight,
+                  ),
+                ],
         ),
       ),
     );
@@ -189,6 +209,10 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
 
   void _adjustHeight(double height) {
     _adjustSize(height: height);
+  }
+
+  void _adjustWidthAndHeight(double size) {
+    _adjustSize(width: size, height: size);
   }
 
   void _adjustSize({double width, double height}) {

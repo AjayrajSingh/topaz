@@ -26,6 +26,7 @@ Sample widget for demonstrating the use of model classes annotated with
 @Generator annotation.''',
   exampleWidth: null,
   exampleHeight: null,
+  hasSizeParam: false,
 );
 
 /// Generated state object for this widget.
@@ -47,13 +48,18 @@ class _GeneratedGeneratorWidgetState extends GeneratedState {
   }
 
   @override
-  Widget buildWidget(BuildContext context, Key key) {
+  Widget buildWidget(
+    BuildContext context,
+    Key key,
+    double width,
+    double height,
+  ) {
     return new GeneratorWidget(
       key: key,
-      foo: foo,
-      foo2: foo2,
-      bar: bar,
-      baz: baz,
+      foo: this.foo,
+      foo2: this.foo2,
+      bar: this.bar,
+      baz: this.baz,
     );
   }
 

@@ -39,7 +39,12 @@ abstract class GeneratedState {
   void initState(Config config);
 
   /// Builds the target widget with the current values.
-  Widget buildWidget(BuildContext context, Key key);
+  Widget buildWidget(
+    BuildContext context,
+    Key key,
+    double width,
+    double height,
+  );
 
   /// Builds the [TableRow]s, each of which represents a parameter description
   /// and its controller widgets.
@@ -105,7 +110,12 @@ class GalleryWidgetWrapperState extends State<GalleryWidgetWrapper> {
   Widget build(BuildContext context) {
     Widget widget;
     try {
-      widget = genState.buildWidget(context, uniqueKey);
+      widget = genState.buildWidget(
+        context,
+        uniqueKey,
+        config.width,
+        config.height,
+      );
     } catch (e) {
       widget = new Text('Failed to build the widget.\n'
           'See the error message below:\n\n'
