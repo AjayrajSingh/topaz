@@ -7,6 +7,9 @@ import 'package:flutter/services.dart';
 
 import 'xi_app.dart';
 import 'line_cache.dart';
+import 'text_line.dart';
+
+import 'dart:async';
 
 /// Widget for one editor tab
 class Editor extends StatefulWidget {
@@ -82,7 +85,17 @@ const int _modifierAltCtrlMask = 0x78;
 
 /// State for editor tab
 class EditorState extends State<Editor> {
-  LineCache _lines = new LineCache();
+  LineCache _lines;
+  ScrollController _controller = new ScrollController();
+  double _lineHeight = 16.0;
+
+  /// Creates a new editor state.
+  EditorState() {
+    Color color = const Color(0xFF000000);
+    TextStyle style = new TextStyle(color: color);
+    // TODO: make style configurable
+    _lines = new LineCache(style);
+  }
 
   XiAppState get _xiAppState =>
     context.ancestorStateOfType(new TypeMatcher<XiAppState>());
@@ -91,11 +104,28 @@ class EditorState extends State<Editor> {
   void initState() {
     super.initState();
     _xiAppState.connectEditor(this);
+    scheduleMicrotask(() {
+      _sendScrollViewport();
+    });
   }
 
   /// Handler for "update" method from core
   void update(List<Map<String, dynamic>> ops) {
     setState(() => _lines.applyUpdate(ops));
+  }
+
+  /// Handler for "scroll_to" method from core
+  void scrollTo(int line, int col) {
+    if (_controller.hasClients) {
+      ScrollPosition pos = _controller.position;
+      double topY = line * _lineHeight;
+      double botY = topY + _lineHeight;
+      if (topY < pos.pixels) {
+        pos.jumpTo(topY);
+      } else if (botY > pos.pixels + pos.viewportDimension) {
+        pos.jumpTo(botY - pos.viewportDimension);
+      }
+    }
   }
 
   // Send a notification to the core. If params are not given,
@@ -166,6 +196,10 @@ class EditorState extends State<Editor> {
       _doMovement('up', modifiers);
     } else if (hidUsage == 0x51) { // Keyboard DownArrow
       _doMovement('down', modifiers);
+
+    } else if ((modifiers & _modifierAltRight) != 0 && hidUsage == 0x04) {
+      // altgr-a inserts emoji, to test unicode ability
+      _sendNotification('insert', <String, dynamic>{'chars': '\u{1f601}'});
     }
   }
 
@@ -202,19 +236,89 @@ class EditorState extends State<Editor> {
     }
   }
 
+  void _handleTapDown(TapDownDetails details) {
+    RenderBox renderObject = context.findRenderObject();
+    Point local = renderObject.globalToLocal(details.globalPosition);
+    double x = local.x;
+    double y = local.y + _controller.offset;
+    int line = y ~/ _lineHeight;
+    print('tap down ($x, $y), line $line');
+    int col = 0;
+    Line text = _lines.getLine(line);
+    if (text != null) {
+      col = _utf16ToUtf8Offset(text.text.text, text.getIndexForHorizontal(x));
+    }
+    _sendNotification('click', <int>[line, col, 0, 1]);
+  }
+
+  void _sendScrollViewport() {
+    ScrollPosition pos = _controller.position;
+    int viewHeight = 1 + pos.viewportDimension ~/ _lineHeight;
+    if (viewHeight == 1) {
+      // TODO: horrible hack, remove when we reliably get viewport height
+      viewHeight = 42;
+    }
+    int start = pos.pixels ~/ _lineHeight;
+    // TODO: be less noisy, send only if changed
+    _sendNotification('scroll', <int>[start, start + viewHeight]);
+    print('sending scroll $start $viewHeight');
+  }
+
+  TextLine _itemBuilder(BuildContext ctx, int ix) {
+    Line line = _lines.getLine(ix);
+    if (line == null) {
+      _sendNotification('request_lines', <int>[ix, ix + 1]);
+    }
+    return new TextLine(
+      // TODO: the string '[invalid]' is debug painting, replace with actual UX.
+      line?.text ?? new TextSpan(text: '[invalid]', style: _lines.style),
+      line?.cursor,
+      line?.styles,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = <Widget>[];
-    int height = _lines.height;
-    for (int i = 0; i < height; i++) {
-      children.add(new Text(_lines.getLine(i)?.text ?? '[invalid]'));
-    }
-    Widget textCol = new Column(children: children);
-    RawKeyboardListener keyListener = new RawKeyboardListener(
+    return new RawKeyboardListener(
       focused: true,
-      child: textCol,
       onKey: _handleKey,
+      child: new GestureDetector(
+        onTapDown: _handleTapDown,
+        behavior: HitTestBehavior.opaque,
+        child: new NotificationListener<ScrollUpdateNotification>(
+          onNotification: (ScrollUpdateNotification update) {
+            _sendScrollViewport();
+            return true;
+          },
+          child: new ListView.builder(
+            itemExtent: _lineHeight,
+            itemCount: _lines.height,
+            itemBuilder: _itemBuilder,
+            controller: _controller,
+          )
+        )
+      )
     );
-    return keyListener;
   }
+}
+
+/// Convert a UTF-16 offset within a string to the corresponding UTF-8 offset
+int _utf16ToUtf8Offset(String s, int utf16Offset) {
+  int utf8Ix = 0;
+  int utf16Ix = 0;
+  while (utf16Ix < utf16Offset) {
+    int codeUnit = s.codeUnitAt(utf16Ix);
+    if (codeUnit < 0x80) {
+      utf8Ix += 1;
+    } else if (codeUnit < 0x800) {
+      utf8Ix += 2;
+    } else if (codeUnit >= 0xDC00 && codeUnit < 0xE000) {
+      // We count the leading surrogate as 3, trailing as 1, total 4
+      utf8Ix += 1;
+    } else {
+      utf8Ix += 3;
+    }
+    utf16Ix++;
+  }
+  return utf8Ix;
 }

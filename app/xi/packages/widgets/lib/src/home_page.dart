@@ -52,17 +52,7 @@ class _HomePageState extends State<HomePage> {
       appBar: new AppBar(
         title: new Text(config.title),
       ),
-      body: new Center(
-        child: new Column(
-          children: <Widget>[
-            new Text(
-              'Button tapped $counter time${ counter == 1 ? '' : 's' }. \n'
-                  'Message: ${config.message}',
-            ),
-            new Editor(),
-          ]
-        )
-      ),
+      body: new Editor(),
       floatingActionButton: new FloatingActionButton(
         onPressed: handleFabPressed,
         tooltip: 'Ping xi-core',

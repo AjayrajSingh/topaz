@@ -5,28 +5,46 @@
 // A data structure for holding a cache of lines, and receiving incremental updates
 // based on deltas from xi-core.
 
-/// One line in the editor view, with cursor and style information
+import 'package:flutter/widgets.dart';
+
+/// One line in the editor view, with cursor and style information.
 class Line {
   /// The text of the line
-  final String text;
-  /// A list of cursor locations (at utf-8 offset)
+  final TextSpan text;
+  /// A list of cursor locations (at utf-16 offset)
   final List<int> cursor;
-  /// The style info, in the xi-core update protocol triple format
+  /// The style info, in triple format (start, end, styleId), where
+  /// start and end are utf-16 offsets. Note that this is similar to
+  /// the xi protocol triple format, but with absolute rather than
+  /// relative offsets, and utf-16 rather than utf-8.
   final List<int> styles;
 
   /// Constructor
   Line(this.text, this.cursor, this.styles);
 
   /// Constructor, from json data (xi-core update protocol format)
-  Line.fromJson(Map<String, dynamic> json)
-    : text = json['text'],
-      cursor = json['cursor'] ?? <int>[],
-      styles = json['styles'] ?? <int>[];
+  Line.fromJson(Map<String, dynamic> json, TextStyle style)
+    : text = new TextSpan(text: json['text'], style: style),
+      cursor = _transformCursor(json['text'], json) ?? <int>[],
+      styles = _transformStyles(json['text'], json) ?? <int>[];
 
   /// Update cursor and styles for a line, retaining text, using json
   /// from the xi-core "update" op
   Line updateFromJson(Map<String, dynamic> json) =>
-    new Line(text, json['cursor'] ?? cursor, json['styles'] ?? styles);
+    new Line(
+      text,
+      _transformCursor(text.text, json) ?? cursor,
+      _transformStyles(text.text, json) ?? styles,
+    );
+
+  /// Return the utf-16 offset closest to the given horizontal position.
+  int getIndexForHorizontal(double horizontal) {
+    TextPainter textPainter = new TextPainter(text: text);
+    textPainter.layout();
+    Offset offset = new Offset(horizontal, 0.0);
+    TextPosition pos = textPainter.getPositionForOffset(offset);
+    return pos.offset;
+  }
 
   @override
   String toString() {
@@ -34,8 +52,14 @@ class Line {
   }
 }
 
-/// A cache containing lines
+/// A cache containing lines of text
 class LineCache {
+  /// Creates a line cache.
+  LineCache(this.style);
+
+  /// The style for rendering the text.
+  TextStyle style;
+
   // TODO: optimization for larger documents (run-lengths of invalid lines)
   // note: line is nullable, indicating an invalid line
   List<Line> _lines = <Line>[];
@@ -49,7 +73,7 @@ class LineCache {
       switch (op['op']) {
         case 'ins':
           for (Map<String, dynamic> line in op['lines']) {
-            newLines.add(new Line.fromJson(line));
+            newLines.add(new Line.fromJson(line, style));
           }
           break;
         case 'invalidate':
@@ -80,14 +104,59 @@ class LineCache {
       }
     }
     _lines = newLines;
-    print('update result: $_lines');
   }
 
-  /// The height, in other words the number of visible lines
+  /// The height, in other words the number of visible lines.
   int get height => _lines.length;
 
-  /// Get a line. Returns null if line is invalid
+  /// Get a line. Returns null if line is invalid.
   Line getLine(int ix) {
-    return _lines[ix];
+    return ix < height ? _lines[ix] : null;
   }
+}
+
+/// Convert a UTF-8 offset within a string to the corresponding UTF-16 offset
+int _utf8ToUtf16Offset(String s, int utf8Offset) {
+  int result = 0;
+  int utf8Ix = 0;
+  while (utf8Ix < utf8Offset) {
+    int codeUnit = s.codeUnitAt(result);
+    if (codeUnit < 0x80) {
+      utf8Ix += 1;
+    } else if (codeUnit < 0x800) {
+      utf8Ix += 2;
+    } else if (codeUnit >= 0xDC00 && codeUnit < 0xE000) {
+      // We count the leading surrogate as 3, trailing as 1, total 4
+      utf8Ix += 1;
+    } else {
+      utf8Ix += 3;
+    }
+    result++;
+  }
+  return result;
+}
+
+// Transform a list of utf-8 offsets to utf-16 offsets
+List<int> _transformCursor(String s, Map<String, dynamic> json) {
+  return json['cursor']?.map((int offset) =>_utf8ToUtf16Offset(s, offset))?.toList();
+}
+
+// Convert style triples from utf-8 to utf-16 and relative to absolute offsets.
+List<int> _transformStyles(String s, Map<String, dynamic> json) {
+  List<int> styles = json['styles'];
+  if (styles == null) {
+    return null;
+  }
+  List<int> result = <int>[];
+  int ix = 0;
+  for (int i = 0; i < styles.length; i += 3) {
+    int start = ix + styles[i];
+    int end = start + styles[i + 1];
+    int styleId = styles[i + 2];
+    result.add(_utf8ToUtf16Offset(s, start));
+    result.add(_utf8ToUtf16Offset(s, end));
+    result.add(styleId);
+    ix = end;
+  }
+  return result;
 }

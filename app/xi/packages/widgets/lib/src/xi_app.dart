@@ -41,9 +41,17 @@ class XiAppHandler extends XiRpcHandler {
     switch (method) {
       case 'update':
         Map<String, dynamic> update = params['update'];
-        print('update, update=$update');
+        //print('update, update=$update');
         List<Map<String, dynamic>> ops = update['ops'];
         _editorState.update(ops);
+        break;
+      case 'scroll_to':
+        Map<String, int> scrollInfo = params;
+        int line = scrollInfo['line'];
+        int col = scrollInfo['col'];
+        // TODO: dispatch based on tab
+        _editorState.scrollTo(line, col);
+        //print('scroll_to: $params');
         break;
       default:
         print('notification, unknown method $method, params=$params');
@@ -57,18 +65,31 @@ class XiAppHandler extends XiRpcHandler {
   }
 }
 
+class _PendingNotification {
+  _PendingNotification(this.method, this.params);
+  String method;
+  dynamic params;
+}
+
 /// State for XiApp.
 class XiAppState extends State<XiApp> {
   /// Allows parent [Widget]s in either vanilla Flutter or Fuchsia to modify
   /// the [HomePage]'s [message].
   String message;
   String _tabId;
+  List<_PendingNotification> _pendingReqs;
   EditorState _editorState;
 
-  /// Route a notification to the xi core. Called by [Editor] widget.
+  /// Route a notification to the xi core. Called by [Editor] widget. If the tab
+  /// has not yet initialized, notifications are queued up until it has.
   void sendNotification(String method, dynamic params) {
-    Map<String, dynamic> innerParams = <String, dynamic>{'method': method, 'params': params, 'tab': _tabId};
-    config.xi.sendNotification('edit', innerParams);
+    if (_tabId == null) {
+      _pendingReqs ??= <_PendingNotification>[];
+      _pendingReqs.add(new _PendingNotification(method, params));
+    } else {
+      Map<String, dynamic> innerParams = <String, dynamic>{'method': method, 'params': params, 'tab': _tabId};
+      config.xi.sendNotification('edit', innerParams);
+    }
   }
 
   /// Connect editor state, so that notifications from the core are routed to
@@ -88,6 +109,12 @@ class XiAppState extends State<XiApp> {
       config.xi.sendRpc('new_tab', <dynamic>[], (String id) {
         _tabId = id;
         print('id = $id');
+        if (_pendingReqs != null) {
+          for (_PendingNotification pending in _pendingReqs) {
+            sendNotification(pending.method, pending.params);
+          }
+          _pendingReqs = null;
+        }
       })
     );
   }

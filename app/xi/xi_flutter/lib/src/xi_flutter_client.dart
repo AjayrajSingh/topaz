@@ -35,7 +35,14 @@ class XiFlutterClient extends XiClient {
     // Copy the xi-core binary to tmp.
     Directory tmp = await PathProvider.getTemporaryDirectory();
     String filename = path.join(tmp.uri.path, 'xi-core');
-    await new File('/data/local/tmp/xi-core').copy(filename);
+    try {
+      await new File('/data/local/tmp/xi-core').copy(filename);
+    } catch (e) {
+      // Note: we'll get a "text file busy" error when doing a reload from
+      // "flutter run", so best to log the error and go on. Might want to
+      // make error catching more fine-grained here.
+      print('Error copying file: $e');
+    }
 
     // Make the xi-core copy executable and start it.
     await Process.run('chmod', <String>['+x', filename]);
