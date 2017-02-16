@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 
 /// ThemeData used across all contact widgets
-ThemeData contactTheme = new ThemeData(
+ThemeData kContactTheme = new ThemeData(
   primarySwatch: Colors.orange,
   primaryColor: Colors.orange[700],
   buttonColor: Colors.orange[700],

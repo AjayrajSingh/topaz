@@ -27,22 +27,25 @@ class ContactDetailsGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        new Container(
-          margin: const EdgeInsets.symmetric(
-            horizontal: 24.0,
-            vertical: 4.0,
+    return new Container(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          new Container(
+            margin: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 4.0,
+            ),
+            child: new Icon(
+              icon,
+              color: Colors.grey[500],
+            ),
           ),
-          child: new Icon(
-            icon,
-            color: Colors.grey[500],
-          ),
-        ),
-        child,
-      ],
+          child,
+        ],
+      ),
     );
   }
 }

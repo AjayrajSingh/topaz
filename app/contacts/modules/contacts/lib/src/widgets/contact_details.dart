@@ -53,6 +53,16 @@ class ContactDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> entryGroups = <Widget>[];
+    Widget divider = new Container(
+      margin: const EdgeInsets.only(left: 90.0),
+      decoration: new BoxDecoration(
+        border: new Border(
+          top: new BorderSide(
+            color: Colors.grey[300],
+          ),
+        ),
+      ),
+    );
 
     if (contact.phoneNumbers.isNotEmpty) {
       entryGroups.add(new Container(
@@ -65,6 +75,9 @@ class ContactDetails extends StatelessWidget {
     }
 
     if (contact.emailAddresses.isNotEmpty) {
+      if(entryGroups.isNotEmpty) {
+        entryGroups.add(divider);
+      }
       entryGroups.add(new Container(
         padding: const EdgeInsets.all(16.0),
         child: new EmailDetailsGroup(
@@ -75,6 +88,9 @@ class ContactDetails extends StatelessWidget {
     }
 
     if (contact.addresses.isNotEmpty) {
+      if(entryGroups.isNotEmpty) {
+        entryGroups.add(divider);
+      }
       entryGroups.add(new Container(
         padding: const EdgeInsets.all(16.0),
         child: new AddressDetailsGroup(

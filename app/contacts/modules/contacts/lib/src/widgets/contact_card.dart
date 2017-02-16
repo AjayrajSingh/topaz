@@ -28,7 +28,7 @@ class ContactCard extends StatelessWidget {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return new DefaultTabController(
-      length: 3,
+      length: 2,
       child: new ListView(children: <Widget>[
         new ContactHeader(contact: contact),
         new Container(
@@ -51,8 +51,7 @@ class ContactCard extends StatelessWidget {
             unselectedLabelColor: Colors.grey[700],
             tabs: <Widget>[
               new Tab(text: 'DETAILS'),
-              new Tab(text: 'YOU AND ${contact.givenName.toUpperCase()}'),
-              new Tab(text: 'OTHER ACTIVITY')
+              new Tab(text: 'ACTIVITY'),
             ],
           ),
         ),
@@ -84,12 +83,8 @@ class ContactCard extends StatelessWidget {
             new Container(
               height: 800.0,
               child: new Text(
-                'You and ${contact.givenName.toUpperCase()} Content',
+                'ACTIVITY',
               ),
-            ),
-            new Container(
-              height: 800.0,
-              child: new Text('Other Activty Content'),
             ),
           ]),
         ),

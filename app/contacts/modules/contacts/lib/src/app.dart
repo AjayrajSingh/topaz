@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 
 import 'screens.dart';
+import 'widgets.dart';
 
 /// The root application.
 class App extends StatelessWidget {
@@ -12,9 +13,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       title: 'Contacts',
-      theme: new ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: kContactTheme,
       home: new Material(
         child: new ContactListScreen(),
       ),
