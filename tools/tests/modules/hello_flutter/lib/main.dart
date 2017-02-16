@@ -22,6 +22,7 @@ void _log(String msg) {
 /// An implementation of the [Module] interface.
 class ModuleImpl extends Module {
   final ModuleBinding _binding = new ModuleBinding();
+
   /// Bind an [InterfaceRequest] for a [Module] interface to this object.
   void bind(InterfaceRequest<Module> request) {
     _binding.bind(this, request);
