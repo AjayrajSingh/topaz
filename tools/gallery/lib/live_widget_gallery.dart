@@ -16,25 +16,25 @@ const double _kDefaultWidth = 500.0;
 const double _kDefaultHeight = 500.0;
 
 /// A gallery screen that lists all the auto-generated widgets and their specs.
-class WidgetsGalleryScreen extends StatefulWidget {
+class LiveWidgetGallery extends StatefulWidget {
   /// Config provider.
   final Config config;
 
-  /// Creates a new instance of [WidgetsGalleryScreen].
-  WidgetsGalleryScreen({Key key, this.config}) : super(key: key);
+  /// Creates a new instance of [LiveWidgetGallery].
+  LiveWidgetGallery({Key key, this.config}) : super(key: key);
 
   @override
-  _WidgetsGalleryState createState() => new _WidgetsGalleryState();
+  _LiveWidgetGalleryState createState() => new _LiveWidgetGalleryState();
 }
 
-class _WidgetsGalleryState extends State<WidgetsGalleryScreen> {
+class _LiveWidgetGalleryState extends State<LiveWidgetGallery> {
   String selectedWidget;
-  Key wrapperKey;
+  Key contentKey;
   Size size;
   Map<String, Size> widgetSizes;
 
-  _WidgetsGalleryState() {
-    wrapperKey = new UniqueKey();
+  _LiveWidgetGalleryState() {
+    contentKey = new UniqueKey();
     size = new Size(_kDefaultWidth, _kDefaultHeight);
     widgetSizes = <String, Size>{};
   }
@@ -90,6 +90,7 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
     return new Align(
       alignment: FractionalOffset.topLeft,
       child: new ListView(
+        key: contentKey,
         children: <Widget>[
           new Container(
             padding: const EdgeInsets.all(16.0),
@@ -101,7 +102,6 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
           ),
           _buildSizeControl(),
           new GalleryWidgetWrapper(
-            key: wrapperKey,
             config: config.config,
             width: size.width,
             height: size.height,
@@ -184,12 +184,12 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
     setState(() {
       selectedWidget = specs.name;
 
-      /// This key used to force the GalleryWidgetWrapper state to be recreated
+      /// This key used to force the top-level ListView state to be recreated
       /// and initialized, when the user selects a new widget from the menu.
       ///
-      /// Without this key, the GalleryWidgetWrapper state is unintentionally
-      /// reused and thus incorrectly displays the previous widget information.
-      wrapperKey = new UniqueKey();
+      /// Without this key, the ListView state is unintentionally reused and
+      /// thus incorrectly displays the previous widget information.
+      contentKey = new UniqueKey();
 
       // If there is a size remembered for this widget, restore that value.
       // Otherwise, use the default size for this widget.

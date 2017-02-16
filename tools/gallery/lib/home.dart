@@ -4,8 +4,9 @@
 
 import 'package:flutter/material.dart';
 
-import 'collection.dart';
+import 'app.dart';
 import 'drawer.dart';
+import 'live_widget_gallery.dart';
 
 /// This [Widget] displays the homepage of the gallery.
 class Home extends StatefulWidget {
@@ -31,9 +32,11 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    App app = context.ancestorWidgetOfExactType(App);
+
     return new Scaffold(
-      appBar: new AppBar(title: new Text('FX Modules')),
-      body: new ListView(children: kGalleryCollection),
+      appBar: new AppBar(title: new Text('FX Live Widget Gallery')),
+      body: new LiveWidgetGallery(config: app?.config),
       drawer: new GalleryDrawer(
         showPerformanceOverlay: config.showPerformanceOverlay,
         onShowPerformanceOverlayChanged: config.onShowPerformanceOverlayChanged,

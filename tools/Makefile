@@ -83,7 +83,7 @@ ALL_SOURCE_FILES = $(DART_FILES) $(FIDL_FILES) $(GN_FILES) $(JS_FILES) $(PYTHON_
 ################################################################################
 ## Common targets
 .PHONY: all
-all: dart-base ## Default task to build dependencies.
+all: dart-base dart-gen-specs ## Default task to build dependencies.
 	@true
 
 # SEE: http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html

@@ -9,14 +9,10 @@ dependencies:
     path: ../packages/config_flutter
   flutter:
     sdk: flutter
-  flutter_flux:
-    path: ../../../third_party/dart-pkg/pub/flutter_flux
   flutter_markdown:
     sdk: flutter
   models:
     path: ../packages/models
-  util:
-    path: ../packages/util
   widgets:
     path: ../packages/widgets
   widget_specs:

@@ -6,8 +6,7 @@ import 'package:config_flutter/config.dart';
 import 'package:email_session_store/email_session_store_mock.dart';
 import 'package:flutter/material.dart';
 
-import 'gallery/home.dart';
-import 'routes.dart';
+import 'home.dart';
 
 /// An Application Widget.
 ///
@@ -42,9 +41,8 @@ class AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'FX Modules',
+      title: 'FX Live Widget Gallery',
       theme: new ThemeData(primarySwatch: Colors.blue),
-      routes: kRoutes,
       home: new Home(
         showPerformanceOverlay: showPerformanceOverlay,
         onShowPerformanceOverlayChanged: (bool value) {
