@@ -24,12 +24,10 @@ class DartApplicationController : public app::ApplicationController {
 
   bool Main();
 
-  void Kill(const KillCallback& callback) override;
-
-  void Detach() override;
-
  private:
-  void Kill();
+  // |ApplicationController|
+  void Kill() override;
+  void Detach() override;
 
   std::vector<char> snapshot_;
   app::ApplicationStartupInfoPtr startup_info_;
