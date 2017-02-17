@@ -1,0 +1,35 @@
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+module contacts_service;
+
+// This service is implemented by an application that is meant to store contacts
+// for a given user.
+interface Contacts {
+
+  // Adds a contact to the contact collection
+  // This will be called by contact providers (Google People API) to populate
+  // the contact collection
+  put(Contact contact);
+};
+
+// Representation of a contact that is expected by the ContactCollection.
+// For prototyping purposes, we will initially use a subset of contact fields.
+struct Contact {
+  string name;
+  array<EmailAddress> emails;
+  array<PhoneNumber> phoneNumbers;
+  string backgroundImageUrl;
+  string photoUrl;
+};
+
+struct EmailAddress {
+  string value;
+  string label;
+};
+
+struct PhoneNumber {
+  string value;
+  string label;
+};
