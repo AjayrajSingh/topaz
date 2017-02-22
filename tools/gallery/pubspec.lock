@@ -24,13 +24,13 @@ packages:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.11.3"
+    version: "1.13.2"
   charcode:
     description:
       name: charcode
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   cli_util:
     description:
       name: cli_util
@@ -42,7 +42,7 @@ packages:
       name: collection
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.11.0"
+    version: "1.13.0"
   config:
     description:
       path: "../packages/config"
@@ -72,7 +72,7 @@ packages:
       name: csslib
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.13.2+2"
+    version: "0.13.3+1"
   dart_style:
     description:
       name: dart_style
@@ -100,7 +100,7 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.21"
+    version: "0.0.22"
   flutter_flux:
     description:
       path: "../../../third_party/dart-pkg/pub/flutter_flux"
@@ -146,7 +146,7 @@ packages:
       name: http_parser
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.3"
+    version: "3.1.1"
   intl:
     description:
       name: intl
@@ -224,13 +224,13 @@ packages:
       name: path
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.0"
+    version: "1.4.1"
   petitparser:
     description:
       name: petitparser
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.5.3"
+    version: "1.5.4"
   plugin:
     description:
       name: plugin
@@ -254,13 +254,13 @@ packages:
       name: source_span
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.3.0"
+    version: "1.3.1"
   stack_trace:
     description:
       name: stack_trace
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.7.0"
+    version: "1.7.1"
   string_scanner:
     description:
       name: string_scanner
@@ -308,7 +308,7 @@ packages:
       name: vector_math
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.3"
+    version: "2.0.4"
   watcher:
     description:
       name: watcher
@@ -350,7 +350,7 @@ packages:
       name: xml
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.4.3"
+    version: "2.5.0"
   yaml:
     description:
       name: yaml
@@ -358,4 +358,4 @@ packages:
     source: hosted
     version: "2.1.12"
 sdks:
-  dart: ">=1.21.0-dev.2.0 <2.0.0"
+  dart: ">=1.22.0 <2.0.0"

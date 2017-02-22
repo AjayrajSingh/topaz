@@ -14,8 +14,8 @@ SHELL := /bin/bash
 
 DIRNAME := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 FUCHSIA_ROOT := $(realpath $(DIRNAME)/../..)
-FLUTTER_DIR := $(FUCHSIA_ROOT)/lib/flutter
-FLUTTER_BIN := $(FLUTTER_DIR)/bin
+FLUTTER_ROOT := $(FUCHSIA_ROOT)/lib/flutter
+FLUTTER_BIN := $(FLUTTER_ROOT)/bin
 DART_BIN := $(FLUTTER_BIN)/cache/dart-sdk/bin
 OUT_DIR := $(FUCHSIA_ROOT)/out
 MAGENTA_BUILD_DIR := $(OUT_DIR)/build-magenta/build-magenta-pc-x86-64
@@ -138,6 +138,10 @@ lint: dart-lint ## Lint everything.
 presubmit: build-fuchsia copyright-check dart-presubmit ## Run the presubmit tests.
 	@true
 
+.PHONY: presubmit-cq
+presubmit-cq: build-fuchsia copyright-check dart-presubmit-cq ## Run the presubmit specifically for CQ.
+	@true
+
 .PHONY: test
 test: dart-test ## Run tests for all modules.
 	@true
@@ -202,7 +206,7 @@ dart-clean:
 dart-gen-specs: $(DART_BIN) tools/widget_specs/.packages packages/widgets/.packages
 	@rm -rf gallery/lib/src/generated/*.dart
 	@cd tools/widget_specs && \
-	pub run gen_widget_specs.dart \
+	FLUTTER_ROOT=$(FLUTTER_ROOT) pub run gen_widget_specs.dart \
 		$(DIRNAME)/packages/widgets \
 		$(DIRNAME)/gallery/lib/src/generated \
 		$(FUCHSIA_ROOT)
@@ -246,13 +250,13 @@ dart-fmt-check: $(DART_BIN)
 .PHONY: dart-fmt-extras
 dart-fmt-extras: $(DART_BIN) tools/dartfmt_extras/.packages
 	@cd tools/dartfmt_extras; \
-	pub run bin/main.dart fix $(DIRNAME) $(DART_FILES)
+	FLUTTER_ROOT=$(FLUTTER_ROOT) pub run bin/main.dart fix $(DIRNAME) $(DART_FILES)
 
 .PHONY: dart-fmt-extras-check
 dart-fmt-extras-check: $(DART_BIN) tools/dartfmt_extras/.packages
 	@echo "** Checking for more dart formatting issues ..."
 	@cd tools/dartfmt_extras; \
-	pub run bin/main.dart check $(DIRNAME) $(DART_FILES); \
+	FLUTTER_ROOT=$(FLUTTER_ROOT) pub run bin/main.dart check $(DIRNAME) $(DART_FILES); \
 	if [ $$? -ne 0 ] ; then \
 		echo; \
 		echo "The above dart files have formatting issues."; \
@@ -287,6 +291,12 @@ dart-test: dart-base
 
 .PHONY: dart-presubmit
 dart-presubmit: dart-gen-specs dart-fmt-check dart-fmt-extras-check dart-lint dart-test
+	@true
+
+# TODO(youngseokyoon): put the dart-test back in to the CQ tests, once the libGL dependency issue is resolved.
+# SEE: https://github.com/flutter/flutter/issues/8306
+.PHONY: dart-presubmit-cq
+dart-presubmit-cq: dart-gen-specs dart-fmt-check dart-fmt-extras-check dart-lint
 	@true
 
 ################################################################################
