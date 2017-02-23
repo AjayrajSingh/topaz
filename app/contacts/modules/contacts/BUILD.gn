@@ -13,6 +13,7 @@ flutter_app("contacts") {
     "//application/lib/app/dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modules/packages/config_flutter",
+    "//apps/modules/packages/fixtures",
     "//apps/modules/packages/widgets",
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",

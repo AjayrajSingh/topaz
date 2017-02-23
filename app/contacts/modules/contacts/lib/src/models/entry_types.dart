@@ -22,6 +22,16 @@ class EmailAddress {
   String toString() {
     return '$value';
   }
+
+  /// Helper function to encode a Contact model into a json string
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = <String, dynamic>{};
+
+    json['label'] = label;
+    json['value'] = value;
+
+    return json;
+  }
 }
 
 /// An Contacts "Physical" Address
@@ -65,6 +75,21 @@ class Address {
     return '$street, $city, $region, $postalCode, $country, '
         '$countryCode';
   }
+
+  /// Helper function to encode a Contact model into a json string
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = <String, dynamic>{};
+
+    json['city'] = city;
+    json['street'] = street;
+    json['region'] = region;
+    json['postalCode'] = postalCode;
+    json['country'] = country;
+    json['countryCode'] = countryCode;
+    json['label'] = label;
+
+    return json;
+  }
 }
 
 /// A Contacts Phone Number
@@ -80,6 +105,21 @@ class PhoneNumber {
     this.number,
     this.label,
   });
+
+  @override
+  String toString() {
+    return '$label $number';
+  }
+
+  /// Helper function to encode a Contact model into a json string
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = <String, dynamic>{};
+
+    json['number'] = number;
+    json['label'] = label;
+
+    return json;
+  }
 }
 
 /// Various common social network types
@@ -120,5 +160,15 @@ class SocialNetwork {
   @override
   String toString() {
     return '$account';
+  }
+
+  /// Helper function to encode a Contact model into a json string
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = <String, dynamic>{};
+
+    json['type'] = type.index;
+    json['account'] = account;
+
+    return json;
   }
 }

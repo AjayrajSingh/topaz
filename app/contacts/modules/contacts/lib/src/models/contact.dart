@@ -102,4 +102,27 @@ class Contact {
       return primaryAddress.city ?? primaryAddress.region;
     }
   }
+
+  /// Helper function to encode a Contact model into a json string
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = <String, dynamic>{};
+
+    json['id'] = id;
+    json['displayName'] = displayName;
+    json['givenName'] = givenName;
+    json['familyName'] = familyName;
+    json['backgroundImageUrl'] = backgroundImageUrl;
+    json['photoUrl'] = photoUrl;
+    json['id'] = id;
+    json['addresses'] =
+        addresses.map((Address a) => a.toJson()).toList();
+    json['emailAddresses'] =
+        emailAddresses.map((EmailAddress e) => e.toJson()).toList();
+    json['phoneNumbers'] =
+        phoneNumbers.map((PhoneNumber n) => n.toJson()).toList();
+    json['socialNetworks'] =
+        socialNetworks.map((SocialNetwork n) => n.toJson()).toList();
+
+    return json;
+  }
 }

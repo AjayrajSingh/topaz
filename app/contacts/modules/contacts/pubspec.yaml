@@ -11,6 +11,8 @@ dependencies:
     path: ../../../modules/packages/widgets
   flutter:
     sdk: flutter
+  fixtures:
+    path: ../../../modules/packages/fixtures
 dependency_overrides:
   http:
     path: ../../../modules/packages/flutter-http/

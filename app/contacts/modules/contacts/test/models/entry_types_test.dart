@@ -15,6 +15,15 @@ void main() {
       );
       expect(email.toString(), 'coco@puppy.cute');
     });
+    test('toJson()', () {
+      EmailAddress email = new EmailAddress(
+        label: 'Personal',
+        value: 'coco@puppy.cute',
+      );
+      Map<String, dynamic> json = email.toJson();
+      expect(json['label'], email.label);
+      expect(json['value'], email.value);
+    });
   });
 
   group('Address', () {
@@ -32,6 +41,45 @@ void main() {
           '1842 N Shoreline Blvd, '
           'Mountain View, California, 94043, United States of America, US');
     });
+    test('toJson()', () {
+      Address addressEntry = new Address(
+        label: 'work',
+        street: '1842 N Shoreline Blvd',
+        city: 'Mountain View',
+        region: 'California',
+        postalCode: '94043',
+        country: 'United States of America',
+        countryCode: 'US',
+      );
+      Map<String, dynamic> json = addressEntry.toJson();
+      expect(json['label'], addressEntry.label);
+      expect(json['street'], addressEntry.street);
+      expect(json['city'], addressEntry.city);
+      expect(json['region'], addressEntry.region);
+      expect(json['postalCode'], addressEntry.postalCode);
+      expect(json['country'], addressEntry.country);
+      expect(json['countryCode'], addressEntry.countryCode);
+    });
+  });
+
+  group('PhoneNumber', () {
+    test('toString()', () {
+      PhoneNumber phoneNumber = new PhoneNumber(
+        number: '1231234',
+        label: 'work',
+      );
+      expect(phoneNumber.toString(),
+          '${phoneNumber.label} ${phoneNumber.number}');
+    });
+    test('toJson()', () {
+      PhoneNumber phoneNumber = new PhoneNumber(
+        number: '1231234',
+        label: 'work',
+      );
+      Map<String, dynamic> json = phoneNumber.toJson();
+      expect(json['number'], phoneNumber.number);
+      expect(json['label'], phoneNumber.label);
+    });
   });
 
   group('SocialNetwork', () {
@@ -41,6 +89,15 @@ void main() {
         account: 'google',
       );
       expect(socialNetworkEntry.toString(), 'google');
+    });
+    test('toJson()', () {
+      SocialNetwork socialNetworkEntry = new SocialNetwork(
+        type: SocialNetworkType.twitter,
+        account: 'google',
+      );
+      Map<String, dynamic> json = socialNetworkEntry.toJson();
+      expect(json['type'], 2);
+      expect(json['account'], 'google');
     });
   });
 
