@@ -22,5 +22,5 @@ flutter_app("contacts") {
     "//third_party/dart-pkg/pub/googleapis",
   ]
 
-  analysis_options = "//apps/contacts/.analysis_options"
+  analysis_options = "//apps/modules/.analysis_options"
 }

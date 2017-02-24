@@ -15,6 +15,8 @@ import 'src/app.dart';
 final ApplicationContext _appContext =
     new ApplicationContext.fromStartupInfo();
 
+ModuleImpl _module;
+
 /// An implementation of the [Module] interface.
 class ModuleImpl extends Module {
   final ModuleBinding _binding = new ModuleBinding();
@@ -29,13 +31,7 @@ class ModuleImpl extends Module {
       InterfaceHandle<Story> storyHandle,
       InterfaceHandle<Link> linkHandle,
       InterfaceHandle<ServiceProvider> incomingServices,
-      InterfaceRequest<ServiceProvider> outgoingServices) {
-    StoryProxy story = new StoryProxy();
-    story.ctrl.bind(storyHandle);
-
-    LinkProxy link = new LinkProxy();
-    link.ctrl.bind(linkHandle);
-  }
+      InterfaceRequest<ServiceProvider> outgoingServices) {}
 
   @override
   void stop(void callback()) {
@@ -47,7 +43,11 @@ class ModuleImpl extends Module {
 void main() {
   _appContext.outgoingServices.addServiceForName(
     (InterfaceRequest<Module> request) {
-      new ModuleImpl().bind(request);
+      if (_module == null) {
+        _module = new ModuleImpl();
+      }
+
+      _module.bind(request);
     },
     Module.serviceName,
   );
