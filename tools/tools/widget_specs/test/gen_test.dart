@@ -36,7 +36,7 @@ void main() {
     // Run the gen script.
     ProcessResult result = await Process.run(
       'pub',
-      <String>['run', 'gen_widget_specs.dart', mockPackagePath, outputPath],
+      <String>['run', 'gen_widget_specs.dart', outputPath, mockPackagePath],
       workingDirectory: packagePath,
     );
 

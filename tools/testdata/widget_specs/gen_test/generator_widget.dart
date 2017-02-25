@@ -21,6 +21,8 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
   packageName: 'mock_package',
   name: 'GeneratorWidget',
   path: 'exported.dart',
+  pathFromFuchsiaRoot:
+      'apps/modules/testdata/widget_specs/extract_test/mock_package/lib/src/generator_widget.dart',
   doc: '''
 Sample widget for demonstrating the use of model classes annotated with
 @Generator annotation.''',

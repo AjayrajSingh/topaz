@@ -5,8 +5,16 @@
 name: gallery
 description: View UI Widgets and screens.
 dependencies:
+  calendar:
+    path: ../../calendar/modules/calendar
+  chat:
+    path: ../../chat/modules/chat
   config_flutter:
     path: ../packages/config_flutter
+  contacts:
+    path: ../../contacts/modules/contacts
+  email:
+    path: ../../email/modules/email
   flutter:
     sdk: flutter
   flutter_markdown:

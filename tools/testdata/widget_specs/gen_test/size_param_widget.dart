@@ -18,6 +18,8 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
   packageName: 'mock_package',
   name: 'SizeParamWidget',
   path: 'exported.dart',
+  pathFromFuchsiaRoot:
+      'apps/modules/testdata/widget_specs/extract_test/mock_package/lib/src/size_param_widget.dart',
   doc: '''
 Sample widget for demonstrating the use of @sizeParam annotation.''',
   exampleWidth: null,

@@ -200,14 +200,15 @@ dart-clean:
 	@rm -rf gallery/lib/src/generated/*.dart
 	@rm -rf coverage
 
+WIDGET_PACKAGE_DIRS := $(addprefix $(DIRNAME)/, packages/widgets ../calendar/modules/calendar ../chat/modules/chat ../contacts/modules/contacts ../email/modules/email)
+
 .PHONY: dart-gen-specs
-dart-gen-specs: $(DART_BIN) tools/widget_specs/.packages packages/widgets/.packages
+dart-gen-specs: $(DART_BIN) tools/widget_specs/.packages $(addsuffix /.packages, $(WIDGET_PACKAGE_DIRS))
 	@rm -rf gallery/lib/src/generated/*.dart
 	@cd tools/widget_specs && \
 	FLUTTER_ROOT=$(FLUTTER_ROOT) pub run gen_widget_specs.dart \
-		$(DIRNAME)/packages/widgets \
 		$(DIRNAME)/gallery/lib/src/generated \
-		$(FUCHSIA_ROOT)
+        $(WIDGET_PACKAGE_DIRS)
 
 .PHONY: dart-coverage
 dart-coverage: dart-base

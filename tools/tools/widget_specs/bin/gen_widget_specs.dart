@@ -22,20 +22,23 @@ const double _kMargin = 16.0;
 final DartFormatter _formatter = new DartFormatter();
 
 Future<Null> main(List<String> args) async {
-  String error = checkArgs(args);
+  String fuchsiaRoot = findFuchsiaRoot();
+
+  String error = checkArgs(args, fuchsiaRoot);
   if (error != null) {
     stderr.writeln(error);
     stdout.writeln('Usage: pub run gen_widget_specs.dart '
-        '<widgets_package_dir> <output_dir> [<fuchsia_root>]');
+        '<output_dir> <widgets_package_dir> [<widgets_package_dir> ...]');
     exit(1);
   }
 
-  String packageDir = args[0];
-  String outputDir = args[1];
-  String fuchsiaRoot = args.length == 3 ? args[2] : null;
+  String outputDir = args[0];
+  List<String> packageDirs = args.sublist(1);
 
-  List<WidgetSpecs> allWidgetSpecs =
-      extractWidgetSpecs(packageDir, fuchsiaRoot: fuchsiaRoot)..sort();
+  List<WidgetSpecs> allWidgetSpecs = packageDirs
+      .expand((String packageDir) =>
+          extractWidgetSpecs(packageDir, fuchsiaRoot: fuchsiaRoot))
+      .toList()..sort();
 
   await writeIndex(outputDir, allWidgetSpecs);
   await Future.forEach(
@@ -44,25 +47,44 @@ Future<Null> main(List<String> args) async {
   );
 }
 
+/// Try finding the fuchsia root from the current directory.
+///
+/// Walk up the directories until finding the .jiri_root directory. Returns null
+/// if it fails to find the fuchsia root.
+String findFuchsiaRoot() {
+  Directory current = Directory.current;
+  while (true) {
+    FileSystemEntity jiriRoot = current.listSync().firstWhere(
+          (FileSystemEntity entity) =>
+              path.basename(entity.path) == '.jiri_root' && entity is Directory,
+          orElse: () => null,
+        );
+
+    if (jiriRoot != null) {
+      return current.absolute.path;
+    }
+
+    // Break out if we reach the system root directory.
+    Directory parent = current.parent;
+    if (parent == current) {
+      break;
+    }
+
+    current = parent;
+  }
+
+  return null;
+}
+
 /// Check if the provided arguments are valid.
 ///
 /// Returns the reason when there is an error; returns null otherwise.
-String checkArgs(List<String> args) {
-  if (args.length < 2 || args.length > 3) {
+String checkArgs(List<String> args, String fuchsiaRoot) {
+  if (args.length < 2) {
     return 'Invalid number of arguments.';
   }
 
-  String packageDir = args[0];
-  if (!new Directory(packageDir).existsSync()) {
-    return 'The specified package directory "$packageDir" does not exist.';
-  }
-
-  if (!new File(path.join(packageDir, 'pubspec.yaml')).existsSync()) {
-    return 'The specified package directory "$packageDir" '
-        'does not contain "pubspec.yaml" file.';
-  }
-
-  String outputDir = args[1];
+  String outputDir = args[0];
   if (!new Directory(outputDir).existsSync()) {
     // Try creating the directory.
     try {
@@ -72,18 +94,23 @@ String checkArgs(List<String> args) {
     }
   }
 
-  if (args.length == 2) {
-    return null;
-  }
+  for (int i = 1; i < args.length; ++i) {
+    String packageDir = args[i];
+    if (!new Directory(packageDir).existsSync()) {
+      return 'The specified package directory "$packageDir" does not exist.';
+    }
 
-  String fuchsiaRoot = args[2];
-  if (!new Directory(fuchsiaRoot).existsSync()) {
-    return 'The specified fuchsia root "$fuchsiaRoot" does not exist.';
-  }
+    if (!new File(path.join(packageDir, 'pubspec.yaml')).existsSync()) {
+      return 'The specified package directory "$packageDir" '
+          'does not contain "pubspec.yaml" file.';
+    }
 
-  // The fuchsia root dir should be an ancestor of the given package dir.
-  if (!path.isWithin(fuchsiaRoot, packageDir)) {
-    return 'The fuchsia root should be an ancestor of the package dir.';
+    if (fuchsiaRoot != null) {
+      // The fuchsia root dir should be an ancestor of the given package dir.
+      if (!path.isWithin(fuchsiaRoot, packageDir)) {
+        return 'The fuchsia root should be an ancestor of the package dir.';
+      }
+    }
   }
 
   return null;
