@@ -2,7 +2,7 @@
 name = "xi-core"
 version = "0.0.0"
 dependencies = [
- "apps_modular_services_application_service_provider 0.1.0",
+ "application_services_service_provider 0.1.0",
  "apps_xi_services 0.1.0",
  "fidl 0.1.0",
  "magenta 0.1.0",
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "apps_modular_services_application_service_provider"
+name = "application_services_service_provider"
 version = "0.1.0"
 dependencies = [
  "fidl 0.1.0",

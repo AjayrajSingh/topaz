@@ -15,4 +15,4 @@ magenta = { path = "../../../../rust/magenta-rs" }
 mxruntime = { path = "../../../../rust/mxruntime" }
 fidl = { path = "../../../../lib/fidl/rust/fidl" }
 apps_xi_services = { path = "../../../../out/debug-x86-64/gen/apps/xi/services/services" }
-apps_modular_services_application_service_provider = { path = "../../../../out/debug-x86-64/gen/apps/modular/services/application/service_provider" }
+application_services_service_provider = { path = "../../../../out/debug-x86-64/gen/application/services/service_provider" }
