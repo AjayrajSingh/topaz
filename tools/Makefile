@@ -200,13 +200,16 @@ dart-clean:
 	@rm -rf gallery/lib/src/generated/*.dart
 	@rm -rf coverage
 
+# To debug the generation process, pass in "--observe --pause-isolates-on-start"
+# as the DART_FLAGS
+DART_FLAGS ?=
 WIDGET_PACKAGE_DIRS := $(addprefix $(DIRNAME)/, packages/widgets ../calendar/modules/calendar ../chat/modules/chat ../contacts/modules/contacts ../email/modules/email)
 
 .PHONY: dart-gen-specs
 dart-gen-specs: $(DART_BIN) tools/widget_specs/.packages $(addsuffix /.packages, $(WIDGET_PACKAGE_DIRS))
 	@rm -rf gallery/lib/src/generated/*.dart
 	@cd tools/widget_specs && \
-	FLUTTER_ROOT=$(FLUTTER_ROOT) pub run gen_widget_specs.dart \
+	FLUTTER_ROOT=$(FLUTTER_ROOT) dart $(DART_FLAGS) bin/gen_widget_specs.dart \
 		$(DIRNAME)/gallery/lib/src/generated \
         $(WIDGET_PACKAGE_DIRS)
 

@@ -11,6 +11,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
+import 'package:analyzer/src/context/builder.dart';
 import 'package:analyzer/src/dart/sdk/sdk.dart';
 import 'package:analyzer/src/generated/engine.dart';
 import 'package:analyzer/src/generated/sdk.dart';
@@ -141,10 +142,23 @@ AnalysisContext _initContext(String packagePath) {
     sdkDir = cli_util.getSdkDir()?.path;
   }
 
-  DartSdk sdk = new FolderBasedDartSdk(
-    resourceProvider,
-    resourceProvider.getFolder(sdkDir),
+  // Try locating an Embedder SDK.
+  EmbedderYamlLocator locator = new EmbedderYamlLocator(
+    _convertPackagesToMap(resourceProvider, packages),
   );
+  DartSdk sdk;
+
+  if (locator.embedderYamls.isNotEmpty) {
+    // Create and configure an embedded SDK.
+    sdk = new EmbedderSdk(
+        PhysicalResourceProvider.INSTANCE, locator.embedderYamls);
+  } else {
+    sdk = new FolderBasedDartSdk(
+      resourceProvider,
+      resourceProvider.getFolder(sdkDir),
+    );
+  }
+
   List<UriResolver> resolvers = <UriResolver>[
     new DartUriResolver(sdk),
     new ResourceUriResolver(resourceProvider),
@@ -153,6 +167,21 @@ AnalysisContext _initContext(String packagePath) {
   context.sourceFactory = new SourceFactory(resolvers, packages);
 
   return context;
+}
+
+Map<String, List<Folder>> _convertPackagesToMap(
+  ResourceProvider resourceProvider,
+  Packages packages,
+) {
+  if (packages == null || packages == Packages.noPackages) {
+    return null;
+  }
+  Map<String, List<Folder>> folderMap = new HashMap<String, List<Folder>>();
+  packages.asMap().forEach((String packagePath, Uri uri) {
+    String path = resourceProvider.pathContext.fromUri(uri);
+    folderMap[packagePath] = <Folder>[resourceProvider.getFolder(path)];
+  });
+  return folderMap;
 }
 
 /// A helper class for creating [WidgetSpecs] from [ClassDeclaration]s.
