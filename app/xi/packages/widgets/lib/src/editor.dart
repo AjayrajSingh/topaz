@@ -10,6 +10,7 @@ import 'line_cache.dart';
 import 'text_line.dart';
 
 import 'dart:async';
+import 'dart:ui' as ui show Paragraph, ParagraphBuilder, ParagraphConstraints, ParagraphStyle;
 
 /// Widget for one editor tab
 class Editor extends StatefulWidget {
@@ -83,17 +84,33 @@ const int _modifierAltRight = 0x40;
 const int _modifierAltMask = 0x60;
 const int _modifierAltCtrlMask = 0x78;
 
+/// A simple class representing a line and column location in the view.
+class LineCol {
+  /// Create a new location for the given line and column
+  LineCol({this.line, this.col});
+  /// The line number, 0-based
+  final int line;
+  /// The column, as a utf-8 offset from beginning of line
+  final int col;
+}
+
+final String _zeroWidthSpace = '\u{200b}';
+
 /// State for editor tab
 class EditorState extends State<Editor> {
   LineCache _lines;
   ScrollController _controller = new ScrollController();
-  double _lineHeight = 16.0;
+  // Height of lines (currently fixed, all lines have the same height)
+  double _lineHeight;
+  // location of last tap (used to expand selection on long press)
+  LineCol _lastTapLocation;
 
   /// Creates a new editor state.
   EditorState() {
     Color color = const Color(0xFF000000);
     TextStyle style = new TextStyle(color: color);
     // TODO: make style configurable
+    _lineHeight = _lineHeightForStyle(style);
     _lines = new LineCache(style);
   }
 
@@ -107,6 +124,15 @@ class EditorState extends State<Editor> {
     scheduleMicrotask(() {
       _sendScrollViewport();
     });
+  }
+
+  double _lineHeightForStyle(TextStyle style) {
+    ui.ParagraphBuilder builder = new ui.ParagraphBuilder(new ui.ParagraphStyle());
+    builder.pushStyle(style.getTextStyle());
+    builder.addText(_zeroWidthSpace);
+    ui.Paragraph layout = builder.build()
+      ..layout(new ui.ParagraphConstraints(width: double.INFINITY));
+    return layout.height;
   }
 
   /// Handler for "update" method from core
@@ -200,6 +226,9 @@ class EditorState extends State<Editor> {
     } else if ((modifiers & _modifierAltRight) != 0 && hidUsage == 0x04) {
       // altgr-a inserts emoji, to test unicode ability
       _sendNotification('insert', <String, dynamic>{'chars': '\u{1f601}'});
+    } else if ((modifiers & _modifierAltRight) != 0 && hidUsage == 0x0f) {
+      // altgr-l inserts arabic lam, to test bidi ability
+      _sendNotification('insert', <String, dynamic>{'chars': '\u{0644}'});
     }
   }
 
@@ -236,9 +265,9 @@ class EditorState extends State<Editor> {
     }
   }
 
-  void _handleTapDown(TapDownDetails details) {
+  LineCol _getLineColFromGlobal(Point globalPosition) {
     RenderBox renderObject = context.findRenderObject();
-    Point local = renderObject.globalToLocal(details.globalPosition);
+    Point local = renderObject.globalToLocal(globalPosition);
     double x = local.x;
     double y = local.y + _controller.offset;
     int line = y ~/ _lineHeight;
@@ -248,7 +277,25 @@ class EditorState extends State<Editor> {
     if (text != null) {
       col = _utf16ToUtf8Offset(text.text.text, text.getIndexForHorizontal(x));
     }
-    _sendNotification('click', <int>[line, col, 0, 1]);
+    return new LineCol(line: line, col: col);
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    _lastTapLocation = _getLineColFromGlobal(details.globalPosition);
+    _sendNotification('click', <int>[_lastTapLocation.line, _lastTapLocation.col, 0, 1]);
+  }
+
+  void _handleLongPress() {
+    if (_lastTapLocation != null) {
+      // Send a double-click, as this implements word selection, same as a long
+      // press.
+      _sendNotification('click', <int>[_lastTapLocation.line, _lastTapLocation.col, 0, 2]);
+    }
+  }
+
+  void _handleHorizontalDragUpdate(DragUpdateDetails details) {
+    LineCol lineCol = _getLineColFromGlobal(details.globalPosition);
+    _sendNotification('drag', <int>[lineCol.line, lineCol.col, 0, 1]);
   }
 
   void _sendScrollViewport() {
@@ -274,6 +321,7 @@ class EditorState extends State<Editor> {
       line?.text ?? new TextSpan(text: '[invalid]', style: _lines.style),
       line?.cursor,
       line?.styles,
+      _lineHeight,
     );
   }
 
@@ -284,6 +332,8 @@ class EditorState extends State<Editor> {
       onKey: _handleKey,
       child: new GestureDetector(
         onTapDown: _handleTapDown,
+        onLongPress: _handleLongPress,
+        onHorizontalDragUpdate: _handleHorizontalDragUpdate,
         behavior: HitTestBehavior.opaque,
         child: new NotificationListener<ScrollUpdateNotification>(
           onNotification: (ScrollUpdateNotification update) {

@@ -38,6 +38,8 @@ class Line {
     );
 
   /// Return the utf-16 offset closest to the given horizontal position.
+  // TODO: should conversion to utf-8 offset happen here or be caller's
+  // responsibility?
   int getIndexForHorizontal(double horizontal) {
     TextPainter textPainter = new TextPainter(text: text);
     textPainter.layout();

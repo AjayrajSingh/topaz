@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'dart:ui';
 
 /// A simple utility function to test equality (==) for all elements of a list.
 bool listEq<T>(List<T> l1, List<T> l2) {
@@ -24,26 +25,32 @@ bool listEq<T>(List<T> l1, List<T> l2) {
   return true;
 }
 
+// We want to use some reasonable value for width, in case this widget gets
+// used by itself instead of inside Editor. TODO: is there a more principled
+// way to set this?
+final double _nominalWidth = 200.0;
+
 /// A widget that draws one line of text, with cursor and styles.
 class TextLine extends LeafRenderObjectWidget {
   /// Creates a widget for displaying one line of text, with optional
   /// cursor decoration (when it's done).
-  TextLine(this.text, this.cursor, this.styles, {Key key}) : super(key: key);
+  TextLine(this.text, this.cursor, this.styles, this.height, {Key key}) : super(key: key);
 
   /// The text displayed in the widget.
   TextSpan text;
 
-  /// List of cursor positions (in utf-8 offsets)
-  // TODO: figure out exactly where's best for utf-8/16 conversion
+  /// List of cursor positions (in utf-16 offsets)
   List<int> cursor;
 
-  /// List of styles (in xi triple format)
-  // TODO: figure out exactly where's best for utf-8/16 conversion
+  /// List of styles (in decoded triple format)
   List<int> styles;
+
+  /// The height of a line (currently fixed, all lines have the same height)
+  double height;
 
   @override
   _RenderTextLine createRenderObject(BuildContext context) {
-    return new _RenderTextLine(text, cursor, styles);
+    return new _RenderTextLine(text, cursor, styles, height);
   }
 
   @override
@@ -60,9 +67,11 @@ class _RenderTextLine extends RenderBox {
     TextSpan text,
     List<int> cursor,
     List<int> styles,
+    double height,
   ) : _textPainter = new TextPainter(text: text),
       _cursor = cursor,
-      _styles = styles;
+      _styles = styles,
+      _height = height;
 
   TextPainter _textPainter;
 
@@ -75,6 +84,8 @@ class _RenderTextLine extends RenderBox {
   // Rectangles for drawing the selection highlight
   List<Rect> _selectionRects;
   bool _needRecomputeSelection = true;
+
+  double _height;
 
   bool _needsLayout = true;
 
@@ -112,19 +123,19 @@ class _RenderTextLine extends RenderBox {
 
   @override
   double computeMinIntrinsicWidth(double height) {
-    return 200.0;
+    return 0.0;
   }
   @override
   double computeMaxIntrinsicWidth(double height) {
-    return 200.0;
+    return _nominalWidth;
   }
   @override
   double computeMinIntrinsicHeight(double width) {
-    return 16.0;
+    return _height;
   }
   @override
   double computeMaxIntrinsicHeight(double width) {
-    return 16.0;
+    return _height;
   }
 
   void _layoutIfNeeded() {
@@ -137,7 +148,7 @@ class _RenderTextLine extends RenderBox {
       // TODO: if we stop building TextLine objects for cache misses, can't be null
       if (_cursor != null) {
         for (int ix in _cursor) {
-          Rect caretPrototype = new Rect.fromLTWH(0.0, 0.0, 1.0, 16.0);
+          Rect caretPrototype = new Rect.fromLTWH(0.0, 0.0, 1.0, _height);
           TextPosition position = new TextPosition(offset: ix);
           Offset caretOffset = _textPainter.getOffsetForCaret(position, caretPrototype);
           _cursorRects.add(caretPrototype.shift(caretOffset));
@@ -154,12 +165,10 @@ class _RenderTextLine extends RenderBox {
           int end = _styles[i + 1];
           int styleId = _styles[i + 2];
           if (styleId == 0) {
-            // TODO: getBoxesForSelection is probably better (more bidi-friendly)
-            TextPosition startPos = new TextPosition(offset: start);
-            TextPosition endPos = new TextPosition(offset: end);
-            Offset startOffset = _textPainter.getOffsetForCaret(startPos, Rect.zero);
-            Offset endOffset = _textPainter.getOffsetForCaret(endPos, Rect.zero);
-            _selectionRects.add(new Rect.fromLTRB(startOffset.dx, 0.0, endOffset.dx, 16.0));
+            TextSelection selection = new TextSelection(baseOffset: start, extentOffset: end);
+            for (TextBox box in _textPainter.getBoxesForSelection(selection)) {
+              _selectionRects.add(box.toRect());
+            }
           }
         }
       }
@@ -169,7 +178,7 @@ class _RenderTextLine extends RenderBox {
 
   @override
   void performLayout() {
-    size = constraints.constrain(new Size(200.0, 16.0));
+    size = constraints.constrain(new Size(_nominalWidth, _height));
     // TODO: necessary?
     _textPainter.layout();
   }
@@ -186,7 +195,7 @@ class _RenderTextLine extends RenderBox {
       paint.color = selectionColor;
       context.canvas.drawRect(selectionRect.shift(offset), paint);
     }
-    _textPainter.paint(context.canvas, offset + new Offset(0.0, 0.0));
+    _textPainter.paint(context.canvas, offset);
     for (Rect cursorRect in _cursorRects) {
       paint.color = cursorColor;
       context.canvas.drawRect(cursorRect.shift(offset), paint);
