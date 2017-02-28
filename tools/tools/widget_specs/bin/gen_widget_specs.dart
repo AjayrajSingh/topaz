@@ -186,7 +186,7 @@ import 'package:widget_specs/widget_specs.dart';
 import 'package:{{ package_name }}/{{ path }}';
 
 {{# additional_imports }}
-import '{{ additional_import }}';
+import '{{ additional_import }}' as {{ import_id }};
 {{/ additional_imports }}
 
 /// Name of the widget.
@@ -210,7 +210,7 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
 /// Generated state object for this widget.
 class _Generated{{ name }}State extends GeneratedState {
   {{# params }}
-  {{ param_type }} {{ param_name }};
+  {{ param_import_id }}{{ param_type }} {{ param_name }};
   {{/ params }}
   {{# generators }}
   {{ generator_declaration }};
@@ -276,6 +276,7 @@ Future<Null> writeWidgetSpecs(String outputDir, WidgetSpecs specs) async {
   String escapedDoc = _escapeQuotes(specs.doc);
 
   Set<String> additionalImports = new SplayTreeSet<String>();
+  Map<String, String> importIdMap = <String, String>{};
   Set<DartType> generators = new SplayTreeSet<DartType>(
     (DartType t1, DartType t2) => t1.name.compareTo(t2.name),
   );
@@ -289,23 +290,27 @@ Future<Null> writeWidgetSpecs(String outputDir, WidgetSpecs specs) async {
     params = new List<ParameterElement>.from(constructor.parameters);
     params.removeWhere((ParameterElement param) => param.type.name == 'Key');
     params.forEach((ParameterElement param) =>
-        _addImportForElement(additionalImports, param.type.element));
+        _addImportForType(additionalImports, importIdMap, param.type));
   }
 
   // The parameter controllers / initial values should be generated here first
   // so that the additional imports can be safely added.
   List<Map<String, String>> paramList = params
       .map((ParameterElement param) => <String, String>{
-            'param_type': param.type.name,
+            'param_import_id':
+                _getImportIdPrefixForType(importIdMap, param.type),
+            'param_type': _getParamTypeName(param),
             'param_name': param.name,
             'param_controller': _generateParamControllerCode(
               additionalImports,
+              importIdMap,
               generators,
               specs,
               param,
             ),
             'param_initial_value': _generateInitialValueCode(
               additionalImports,
+              importIdMap,
               generators,
               specs,
               param,
@@ -316,9 +321,12 @@ Future<Null> writeWidgetSpecs(String outputDir, WidgetSpecs specs) async {
 
   List<Map<String, String>> generatorList = generators
       .map((DartType generatorType) => <String, String>{
-            'generator_declaration': '${generatorType.name} '
+            'generator_declaration':
+                '${_getImportIdPrefixForType(importIdMap, generatorType)}'
+                '${generatorType.name} '
                 '${lowerCamelize(generatorType.name)} = '
-                'new ${generatorType.name}()',
+                'new ${_getImportIdPrefixForType(importIdMap, generatorType)}'
+                '${generatorType.name}()',
           })
       .toList();
 
@@ -337,6 +345,7 @@ Future<Null> writeWidgetSpecs(String outputDir, WidgetSpecs specs) async {
     'additional_imports': additionalImports
         .map((String uri) => <String, String>{
               'additional_import': uri,
+              'import_id': importIdMap[uri],
             })
         .toList(),
     'params': paramList,
@@ -348,6 +357,7 @@ Future<Null> writeWidgetSpecs(String outputDir, WidgetSpecs specs) async {
 
 String _generateParamControllerCode(
   Set<String> additionalImports,
+  Map<String, String> importIdMap,
   Set<DartType> generators,
   WidgetSpecs specs,
   ParameterElement param,
@@ -449,17 +459,17 @@ String _generateParamControllerCode(
 
   // Handle enum parameters with a popup menu button.
   if (_isEnumParameter(param)) {
-    return '''new PopupMenuButton<${param.type.name}>(
+    return '''new PopupMenuButton<${_getQualifiedTypeName(importIdMap, param.type)}>(
       itemBuilder: (BuildContext context) {
-        return ${param.type.name}.values.map((${param.type.name} value) {
-          return new PopupMenuItem<${param.type.name}>(
+        return ${_getQualifiedTypeName(importIdMap, param.type)}.values.map((${_getQualifiedTypeName(importIdMap, param.type)} value) {
+          return new PopupMenuItem<${_getQualifiedTypeName(importIdMap, param.type)}>(
             value: value,
             child: new Text(value.toString()),
           );
         }).toList();
       },
-      initialValue: ${param.type.name}.values[0],
-      onSelected: (${param.type.name} value) {
+      initialValue: ${_getQualifiedTypeName(importIdMap, param.type)}.values[0],
+      onSelected: (${_getQualifiedTypeName(importIdMap, param.type)} value) {
         setState(() {
           ${param.name} = value;
         });
@@ -481,7 +491,7 @@ String _generateParamControllerCode(
     String methodName = generatorObj.getField('methodName').toStringValue();
 
     // Add the generator type to the list of additional imports and generators.
-    _addImportForElement(additionalImports, generatorType.element);
+    _addImportForType(additionalImports, importIdMap, generatorType);
     generators.add(generatorType);
 
     // The actual code to invoke (e.g. `modelFixtures.thread()`).
@@ -504,6 +514,7 @@ String _generateParamControllerCode(
 
 String _generateInitialValueCode(
   Set<String> additionalImports,
+  Map<String, String> importIdMap,
   Set<DartType> generators,
   WidgetSpecs specs,
   ParameterElement param,
@@ -553,7 +564,7 @@ String _generateInitialValueCode(
 
   // Handle enum types.
   if (_isEnumParameter(param)) {
-    return '${param.type.name}.values[0]';
+    return '${_getQualifiedTypeName(importIdMap, param.type)}.values[0]';
   }
 
   // Handle callback parameters.
@@ -607,6 +618,23 @@ String _generateParameterExpression(ParameterElement param) {
   }
 
   return 'this.${param.name}';
+}
+
+/// Returns the type name of the given parameter.
+///
+/// If the type has generic type arguments, returns 'dynamic' instead, to avoid
+/// having to deal with analyzer errors for now.
+String _getParamTypeName(ParameterElement param) {
+  // TODO(youngseokyoon): Handle generic type arguments correctly.
+  // https://fuchsia.atlassian.net/browse/SO-259
+  if (param.type is InterfaceType) {
+    InterfaceType interfaceType = param.type;
+    if (interfaceType.typeArguments?.isNotEmpty ?? false) {
+      return 'dynamic';
+    }
+  }
+
+  return param.type.name;
 }
 
 /// Determines whether the provided parameter is of an enum type.
@@ -672,11 +700,59 @@ String _escapeQuotes(String str) {
   );
 }
 
-void _addImportForElement(Set<String> additionalImports, Element element) {
-  String importUri = element?.librarySource?.uri?.toString();
-  if (importUri != null && importUri != 'dart:core') {
-    additionalImports.add(importUri);
+void _addImportForType(
+  Set<String> additionalImports,
+  Map<String, String> importIdMap,
+  DartType type,
+) {
+  Uri importUri = type?.element?.librarySource?.uri;
+  String importUriString = importUri?.toString();
+  if (importUriString != null &&
+      importUriString != 'dart:core' &&
+      !additionalImports.contains(importUriString)) {
+    additionalImports.add(importUriString);
+    // Specify an identifier (i.e. import '..' as foo) to avoid name collision.
+    String idBase = strings.underscore(
+      path.basenameWithoutExtension(importUri.pathSegments.last),
+    );
+    String id = idBase;
+
+    // Here, just in case the import id name is already in use, add a number at
+    // the end of the id name by increasing the number until it doesn't collide
+    // with an existing id.
+    int count = 1;
+    while (importIdMap.values.contains(id)) {
+      ++count;
+      id = '$idBase$count';
+    }
+    importIdMap[importUriString] = id;
   }
+}
+
+/// Returns the import identifier prefix for the given type.
+///
+/// For example, if "foo.dart" was imported as "foo",
+///     import 'foo.dart' as foo;
+///
+/// and the `Foo` type was given as the second parameter, this function returns
+/// `'foo.'` with the trailing dot.
+///
+/// Otherwise, this function returns empty string.
+String _getImportIdPrefixForType(
+  Map<String, String> importIdMap,
+  DartType type,
+) {
+  String importUriString = type?.element?.librarySource?.uri?.toString();
+  String importId = importIdMap[importUriString];
+  return importId != null ? '$importId.' : '';
+}
+
+/// Returns the fully qualified name for the given type.
+String _getQualifiedTypeName(
+  Map<String, String> importIdMap,
+  DartType type,
+) {
+  return _getImportIdPrefixForType(importIdMap, type) + type.name;
 }
 
 String _doubleValueToCode(double value) {

@@ -10,7 +10,7 @@ import 'package:gallery/src/widget_specs/utils.dart';
 import 'package:widget_specs/widget_specs.dart';
 import 'package:mock_package/exported.dart';
 
-import 'package:mock_package/src/sample_widgets.dart';
+import 'package:mock_package/src/sample_widgets.dart' as sample_widgets;
 
 /// Name of the widget.
 const String kName = 'Widget03';
@@ -31,8 +31,8 @@ This is a public [StatelessWidget].''',
 
 /// Generated state object for this widget.
 class _GeneratedWidget03State extends GeneratedState {
-  CallbackWithNoParams callbackWithNoParams;
-  CallbackWithParams callbackWithParams;
+  sample_widgets.CallbackWithNoParams callbackWithNoParams;
+  sample_widgets.CallbackWithParams callbackWithParams;
 
   _GeneratedWidget03State(SetStateFunc setState) : super(setState);
 

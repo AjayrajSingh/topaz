@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:widgets_meta/widgets_meta.dart';
 
+import 'extras/mock_models.dart';
 import 'mock_generator.dart';
 import 'mock_models.dart';
 
@@ -15,6 +16,7 @@ class GeneratorWidget extends StatelessWidget {
   final ModelFoo foo2;
   final ModelBar bar;
   final ModelBaz baz;
+  final ModelQux qux;
 
   GeneratorWidget({
     Key key,
@@ -24,6 +26,7 @@ class GeneratorWidget extends StatelessWidget {
     @Generator(MockGenerator, 'foo2') this.foo2,
     this.bar,
     @Generator(MockGenerator, 'baz') this.baz,
+    this.qux,
   })
       : super(key: key);
 

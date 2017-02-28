@@ -10,8 +10,9 @@ import 'package:gallery/src/widget_specs/utils.dart';
 import 'package:widget_specs/widget_specs.dart';
 import 'package:mock_package/exported.dart';
 
-import 'package:mock_package/src/mock_generator.dart';
-import 'package:mock_package/src/mock_models.dart';
+import 'package:mock_package/src/extras/mock_models.dart' as mock_models2;
+import 'package:mock_package/src/mock_generator.dart' as mock_generator;
+import 'package:mock_package/src/mock_models.dart' as mock_models;
 
 /// Name of the widget.
 const String kName = 'GeneratorWidget';
@@ -33,11 +34,13 @@ Sample widget for demonstrating the use of model classes annotated with
 
 /// Generated state object for this widget.
 class _GeneratedGeneratorWidgetState extends GeneratedState {
-  ModelFoo foo;
-  ModelFoo foo2;
-  ModelBar bar;
-  ModelBaz baz;
-  MockGenerator mockGenerator = new MockGenerator();
+  mock_models.ModelFoo foo;
+  mock_models.ModelFoo foo2;
+  mock_models.ModelBar bar;
+  mock_models.ModelBaz baz;
+  mock_models2.ModelQux qux;
+  mock_generator.MockGenerator mockGenerator =
+      new mock_generator.MockGenerator();
 
   _GeneratedGeneratorWidgetState(SetStateFunc setState) : super(setState);
 
@@ -47,6 +50,7 @@ class _GeneratedGeneratorWidgetState extends GeneratedState {
     foo2 = mockGenerator.foo2();
     bar = mockGenerator.bar();
     baz = mockGenerator.baz();
+    qux = null;
   }
 
   @override
@@ -62,6 +66,7 @@ class _GeneratedGeneratorWidgetState extends GeneratedState {
       foo2: this.foo2,
       bar: this.bar,
       baz: this.baz,
+      qux: this.qux,
     );
   }
 
@@ -126,6 +131,14 @@ class _GeneratedGeneratorWidgetState extends GeneratedState {
             },
             codeToDisplay: 'mockGenerator.baz()',
           ),
+        ],
+      ),
+      buildTableRow(
+        context,
+        <Widget>[
+          new Text('ModelQux'),
+          new Text('qux'),
+          new InfoText('null (this type of parameter is not supported yet)'),
         ],
       ),
     ];
