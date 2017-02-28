@@ -154,7 +154,7 @@ std::string FileLoader::GetFileURLForPath(const std::string& path) {
 
 std::string FileLoader::Fetch(const std::string& url,
                               std::string* resolved_url) {
-  std::string path = GetFilePathForURL(url);
+  std::string path = files::SimplifyPath(GetFilePathForURL(url));
   if (resolved_url)
     *resolved_url = GetFileURLForPath(path);
   std::string source;
