@@ -117,7 +117,7 @@ class MozWebView : public mozart::BaseView,
  public:
   MozWebView(mozart::ViewManagerPtr view_manager,
              fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-             fidl::InterfaceRequest<modular::ServiceProvider>
+             fidl::InterfaceRequest<app::ServiceProvider>
                  outgoing_services_request,
              const std::string& url)
       : BaseView(std::move(view_manager),
@@ -153,42 +153,43 @@ class MozWebView : public mozart::BaseView,
     Invalidate();
   }
 
-  // |InputListener|:
-  void OnEvent(mozart::EventPtr event,
+  void OnEvent(mozart::InputEventPtr event,
                const OnEventCallback& callback) override {
     bool handled = false;
-    if (event->pointer_data) {
-      switch (event->action) {
-        case mozart::EventType::POINTER_DOWN:
-        case mozart::EventType::POINTER_MOVE:
-          if (event->pointer_data->kind == mozart::PointerKind::TOUCH ||
-              (event->pointer_data->kind == mozart::PointerKind::MOUSE &&
-               event->flags == mozart::EventFlags::LEFT_MOUSE_BUTTON)) {
+    if (event->is_pointer()) {
+      const mozart::PointerEventPtr& pointer = event->get_pointer();
+      switch (pointer->phase) {
+        case mozart::PointerEvent::Phase::DOWN:
+        case mozart::PointerEvent::Phase::MOVE:
+          if (pointer->type == mozart::PointerEvent::Type::TOUCH ||
+              (pointer->type == mozart::PointerEvent::Type::MOUSE &&
+               pointer->buttons & mozart::kMousePrimaryButton)) {
             web_view_.handleMouseEvent(
-                event->pointer_data->x, event->pointer_data->y,
-                event->action == mozart::EventType::POINTER_DOWN
+                pointer->x, pointer->y,
+                pointer->phase == mozart::PointerEvent::Phase::DOWN
                     ? ::WebView::kMouseDown
                     : ::WebView::kMouseMoved);
           }
           handled = true;
           break;
-        case mozart::EventType::POINTER_UP:
-          web_view_.handleMouseEvent(event->pointer_data->x,
-                                     event->pointer_data->y,
-                                     ::WebView::kMouseUp);
+        case mozart::PointerEvent::Phase::UP:
+          web_view_.handleMouseEvent(pointer->x,
+                                     pointer->y, ::WebView::kMouseUp);
           handled = true;
           break;
         default:
           break;
       }
-    } else if (event->key_data) {
-      if (event->key_data->code_point == 'c' &&
-          event->key_data->modifiers & mozart::kModifierControl) {
+    } else if (event->is_keyboard()) {
+      const mozart::KeyboardEventPtr& keyboard = event->get_keyboard();
+      cerr << "Key event" << endl;
+      if (keyboard->code_point == 'c' &&
+          keyboard->modifiers & mozart::kModifierControl) {
         exit(0);
       }
-      web_view_.handleKeyEvent(event->key_data->hid_usage,
-                               event->key_data->code_point,
-                               event->action == mozart::EventType::KEY_PRESSED);
+      web_view_.handleKeyEvent(keyboard->hid_usage,
+                               keyboard->code_point,
+                               keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED);
     }
 
     callback(handled);

@@ -39,6 +39,7 @@ executable("web_view") {
 
   deps = [
     "services",
+    "//application/lib/app",
     "//apps/mozart/lib/view_framework:view_provider",
     "//apps/mozart/services/buffers/cpp",
     "//apps/mozart/services/composition",
