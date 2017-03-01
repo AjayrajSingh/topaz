@@ -2,9 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:widgets_meta/widgets_meta.dart';
+
 import 'entry_types.dart';
+import 'fixtures.dart';
 
 /// A Model representing a contact entry
+@Generator(ContactModelFixtures, 'contact')
 class Contact {
   /// Unique Identifier for given contact
   final String id;

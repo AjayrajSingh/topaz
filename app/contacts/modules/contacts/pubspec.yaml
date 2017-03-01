@@ -7,12 +7,14 @@ description: Flutter app to run Contacts
 dependencies:
   config_flutter:
     path: ../../../modules/packages/config_flutter
-  widgets:
-    path: ../../../modules/packages/widgets
   flutter:
     sdk: flutter
   fixtures:
     path: ../../../modules/packages/fixtures
+  widgets:
+    path: ../../../modules/packages/widgets
+  widgets_meta:
+    path: ../../../modules/packages/widgets_meta
 dependency_overrides:
   http:
     path: ../../../modules/packages/flutter-http/
