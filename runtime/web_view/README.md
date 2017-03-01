@@ -15,10 +15,13 @@ To get the prebuilt dependencies:
 
 After that, to build:
 
-        ./packages/gn/gen.py -m default,web_view
+        ./packages/gn/gen.py --args=netstack2=false -m default,web_view
         ./buildtools/ninja -C out/debug-x86-64
-        ./magenta/scripts/run-magenta-x86-64 -g -x out/debug-x86-64/user.bootfs
 
-Once in mxsh
+Once built, load the user.bootfs on your device as normal.
 
-        @ bootstrap launch web_view
+Once in a non-mxsh shell
+
+        launch web_view
+
+You can pass a URL as a parameter to the launch. Control-C will exit the web module.
