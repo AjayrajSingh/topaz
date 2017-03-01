@@ -273,12 +273,18 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.6"
+  term_glyph:
+    description:
+      name: term_glyph
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   test:
     description:
       name: test
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.18+2"
+    version: "0.12.20"
   typed_data:
     description:
       name: typed_data
