@@ -210,7 +210,7 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
 /// Generated state object for this widget.
 class _Generated{{ name }}State extends GeneratedState {
   {{# params }}
-  {{ param_import_id }}{{ param_type }} {{ param_name }};
+  {{ qualified_param_type }} {{ param_name }};
   {{/ params }}
   {{# generators }}
   {{ generator_declaration }};
@@ -297,9 +297,9 @@ Future<Null> writeWidgetSpecs(String outputDir, WidgetSpecs specs) async {
   // so that the additional imports can be safely added.
   List<Map<String, String>> paramList = params
       .map((ParameterElement param) => <String, String>{
-            'param_import_id':
-                _getImportIdPrefixForType(importIdMap, param.type),
-            'param_type': _getParamTypeName(param),
+            'qualified_param_type':
+                _getQualifiedTypeName(importIdMap, param.type),
+            'param_type': _getTypeName(param.type),
             'param_name': param.name,
             'param_controller': _generateParamControllerCode(
               additionalImports,
@@ -620,21 +620,21 @@ String _generateParameterExpression(ParameterElement param) {
   return 'this.${param.name}';
 }
 
-/// Returns the type name of the given parameter.
+/// Returns the display name of the given type.
 ///
 /// If the type has generic type arguments, returns 'dynamic' instead, to avoid
 /// having to deal with analyzer errors for now.
-String _getParamTypeName(ParameterElement param) {
+String _getTypeName(DartType type) {
   // TODO(youngseokyoon): Handle generic type arguments correctly.
   // https://fuchsia.atlassian.net/browse/SO-259
-  if (param.type is InterfaceType) {
-    InterfaceType interfaceType = param.type;
-    if (interfaceType.typeArguments?.isNotEmpty ?? false) {
+  if (type is ParameterizedType) {
+    ParameterizedType parameterizedType = type;
+    if (parameterizedType.typeArguments?.isNotEmpty ?? false) {
       return 'dynamic';
     }
   }
 
-  return param.type.name;
+  return type.name;
 }
 
 /// Determines whether the provided parameter is of an enum type.
@@ -752,7 +752,10 @@ String _getQualifiedTypeName(
   Map<String, String> importIdMap,
   DartType type,
 ) {
-  return _getImportIdPrefixForType(importIdMap, type) + type.name;
+  String typeName = _getTypeName(type);
+  String prefix =
+      typeName == 'dynamic' ? '' : _getImportIdPrefixForType(importIdMap, type);
+  return prefix + typeName;
 }
 
 String _doubleValueToCode(double value) {
