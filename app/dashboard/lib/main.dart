@@ -13,6 +13,9 @@ enum BuildStatus {
 
 // ----------------------------------------------------------------------------
 // EDIT BELOW TO ADD configs
+
+final String kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
+
 var targets_map = {
   'fuchsia': [
     ['fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'],
@@ -85,10 +88,11 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   BuildStatus _status = BuildStatus.UNKNOWN;
-  final String kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
   var targets_results;
+  Timer _refreshTimer;
 
-  _DashboardPageState() {
+  @override
+  initState() {
     // From the targets map, create a data structure which we'll be populating
     // the build results into, as they come in async.
     targets_results = new Map();
@@ -100,6 +104,13 @@ class _DashboardPageState extends State<DashboardPage> {
         }
         targets_results[categoryName] = this_map;
       });
+
+    _refreshTimer = new Timer.periodic(const Duration(seconds: 5), _refreshTimerFired);
+    _refreshStatus();
+  }
+
+  void _refreshTimerFired(Timer t) {
+    _refreshStatus();
   }
 
   // Refresh status an ALL builds.
@@ -130,6 +141,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
         targets_results['${categoryName}']['${buildName}'] = status;
         // invalidate the state
+        setState( () {} );
       }); 
 
     }
