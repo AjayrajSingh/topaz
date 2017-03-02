@@ -59,8 +59,7 @@ class DashboardApp extends StatelessWidget {
         // the application has a blue toolbar. Then, without quitting
         // the app, try changing the primarySwatch below to Colors.green
         // and press "r" in the console where you ran "flutter run".
-        // We call this a "hot reload". Notice that the counter didn't
-        // reset back to zero -- the application is not restarted.
+        // We call this a "hot reload". 
         primarySwatch: Colors.blue,
       ),
       home: new DashboardPage(title: 'Fuchsia Build Status'),
@@ -161,9 +160,7 @@ class _DashboardPageState extends State<DashboardPage> {
       // This call to setState tells the Flutter framework that
       // something has changed in this State, which causes it to rerun
       // the build method below so that the display can reflect the
-      // updated values. If we changed _counter without calling
-      // setState(), then the build method would not be called again,
-      // and so nothing would appear to happen.
+      // updated values.
     });
   }
 
@@ -201,10 +198,6 @@ class _DashboardPageState extends State<DashboardPage> {
 
         rows.add(
           new Container(
-           // decoration: new BoxDecoration(
-           //         border: new Border(top:new BorderSide(color: Colors.black)),
-           //       ),
-
             padding: new EdgeInsets.fromLTRB(0.0, 32.0, 0.0, 0.0),
             child:
           new Row(children:[new Text(k, 
