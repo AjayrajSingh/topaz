@@ -183,7 +183,7 @@ class _DashboardPageState extends State<DashboardPage> {
         decoration: new BoxDecoration(backgroundColor: _colorFromBuildStatus(status)),
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: new Text(name,
-          style:new TextStyle(color:Colors.black, fontSize:12.0)),
+          style:new TextStyle(color:Colors.black, fontSize:24.0)),
       );
   }
 
@@ -198,14 +198,29 @@ class _DashboardPageState extends State<DashboardPage> {
 
     var rows = new List();
     targets_results.forEach((k,v) {
-        rows.add(new Row(children:[new Text(k)]));
+
+        rows.add(
+          new Container(
+           // decoration: new BoxDecoration(
+           //         border: new Border(top:new BorderSide(color: Colors.black)),
+           //       ),
+
+            padding: new EdgeInsets.fromLTRB(0.0, 32.0, 0.0, 0.0),
+            child:
+          new Row(children:[new Text(k, 
+          style: new TextStyle(fontSize:16.0))]),
+          ),
+        );
 
         var builds = new List();
         v.forEach((name, status) {
           builds.add(_buildResultWidget(name,status));
           });
 
-        rows.add(new Row(children:builds));
+        rows.add(new Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.max,
+              children:builds));
       });
 
 
@@ -213,9 +228,11 @@ class _DashboardPageState extends State<DashboardPage> {
       appBar: new AppBar(
         title: new Text('Fuchsia Build Status'),
       ),
-      body: new Column (
+      body: new Container( 
+        padding: new EdgeInsets.all(20.0),
+        child: new Column (
           children: rows,
-        ),
+        ), ),
 
       floatingActionButton: new FloatingActionButton(
         onPressed: _refreshStatus,
