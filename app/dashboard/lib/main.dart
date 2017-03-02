@@ -57,8 +57,10 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   BuildStatus _status = BuildStatus.UNKNOWN;
-  String _buildConfig = "";
+  final String kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
 
+  // ----------------------------------------------------------------------------
+  // EDIT BELOW TO ADD configs
   var targets_map = {
     'fuchsia': [
       ['fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'],
@@ -98,16 +100,12 @@ class _DashboardPageState extends State<DashboardPage> {
         }
         targets_results[categoryName] = this_map;
       });
-    print(targets_results);
   }
 
-
+  // Refresh status an ALL builds.
   void _refreshStatus() {
-    final String kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
-    final String kTarget = 'fuchsia/linux-x86-64-debug';
 
-    _buildConfig = "linux-x86-64-debug";
-
+    // fetch config status for ONE item.
     void _fetchConfigStatus(categoryName, buildName, url) {
       BuildStatus status = BuildStatus.PARSEERROR;
       http.get(url).then<Null>((http.Response response) {
@@ -129,21 +127,23 @@ class _DashboardPageState extends State<DashboardPage> {
             break;
           }
         }
-        print('${categoryName} ${buildName} ${status}');
-        //targets_results['${categoryName}']['${buildName}'] = status;
+        //print('${categoryName} ${buildName} ${status}');
+
+        targets_results['${categoryName}']['${buildName}'] = status;
+        print(targets_results);
       }); 
 
     }
 
-    // kick off requests for all the build configs desired.
-    void _processCategory(categoryName, buildConfigs) {
-      for(var config in buildConfigs) {
-        String url = kBaseURL + config[0];
-        //print(url);
-        _fetchConfigStatus(categoryName, config[1], url);
-      }
-    }
-    targets_map.forEach(_processCategory);
+    // kick off requests for all the build configs desired. As 
+    // these reults come in they will be stuffed into the targets_results map.
+    targets_map.forEach((categoryName, buildConfigs){
+        for(var config in buildConfigs) {
+          String url = kBaseURL + config[0];
+          //print(url);
+          _fetchConfigStatus(categoryName, config[1], url);
+        }
+      });
 
 
     setState(() {
@@ -154,8 +154,9 @@ class _DashboardPageState extends State<DashboardPage> {
       // setState(), then the build method would not be called again,
       // and so nothing would appear to happen.
 
+
       // TODO : there is an array of things to fetch here.
-      String url = kBaseURL + kTarget;
+      /*String url = kBaseURL + kTarget;
 
       http.get(url).then<Null>((http.Response response) {
         String html = response.body;
@@ -177,7 +178,7 @@ class _DashboardPageState extends State<DashboardPage> {
             break;
           }
         }
-      });
+      });*/
 
     });
   }
@@ -206,6 +207,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    String _buildConfig ="huh?";
  
     // This method is rerun every time setState is called, for instance
     // as done by the _refreshStatus method above.
