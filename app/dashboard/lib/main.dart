@@ -84,7 +84,22 @@ class _DashboardPageState extends State<DashboardPage> {
     ]
   };
 
-  var targets_results = [];
+  var targets_results;
+
+  _DashboardPageState() {
+    // From the targets map, create a data structure which we'll be populating
+    // the build results into, as they come in async.
+    targets_results = new Map();
+
+    targets_map.forEach((categoryName,buildConfigs) {
+        var this_map = new Map<String, BuildStatus>();
+        for(var config in buildConfigs) {
+         this_map[config[1]] =BuildStatus.UNKNOWN;
+        }
+        targets_results[categoryName] = this_map;
+      });
+    print(targets_results);
+  }
 
 
   void _refreshStatus() {
