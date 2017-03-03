@@ -2,7 +2,8 @@ name: fuchsia_build_status
 description: A new flutter project.
 
 dependencies:
-  html: any
+  html:
+    path: ./html
   flutter:
     sdk: flutter
 
