@@ -15,7 +15,7 @@ To get the prebuilt dependencies:
 
 After that, to build:
 
-        ./packages/gn/gen.py --args=netstack2=false -m default,web_view
+        ./packages/gn/gen.py -m default,web_view
         ./buildtools/ninja -C out/debug-x86-64
 
 Once built, load the user.bootfs on your device as normal.
