@@ -12,8 +12,7 @@ import 'package:lib.fidl.dart/bindings.dart';
 
 import 'src/app.dart';
 
-final ApplicationContext _appContext =
-    new ApplicationContext.fromStartupInfo();
+final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
 ModuleImpl _module;
 

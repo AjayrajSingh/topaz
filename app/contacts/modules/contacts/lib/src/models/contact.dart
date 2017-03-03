@@ -53,9 +53,9 @@ class Contact {
     List<PhoneNumber> phoneNumbers,
     List<SocialNetwork> socialNetworks,
   })
-      : addresses =
-            new List<Address>.unmodifiable(addresses ?? <Address>[]),
-        emailAddresses = new List<EmailAddress>.unmodifiable(emailAddresses ?? <EmailAddress>[]),
+      : addresses = new List<Address>.unmodifiable(addresses ?? <Address>[]),
+        emailAddresses = new List<EmailAddress>.unmodifiable(
+            emailAddresses ?? <EmailAddress>[]),
         phoneNumbers =
             new List<PhoneNumber>.unmodifiable(phoneNumbers ?? <PhoneNumber>[]),
         socialNetworks = new List<SocialNetwork>.unmodifiable(
@@ -118,8 +118,7 @@ class Contact {
     json['backgroundImageUrl'] = backgroundImageUrl;
     json['photoUrl'] = photoUrl;
     json['id'] = id;
-    json['addresses'] =
-        addresses.map((Address a) => a.toJson()).toList();
+    json['addresses'] = addresses.map((Address a) => a.toJson()).toList();
     json['emailAddresses'] =
         emailAddresses.map((EmailAddress e) => e.toJson()).toList();
     json['phoneNumbers'] =

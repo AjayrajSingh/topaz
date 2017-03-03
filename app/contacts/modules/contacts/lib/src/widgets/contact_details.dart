@@ -75,7 +75,7 @@ class ContactDetails extends StatelessWidget {
     }
 
     if (contact.emailAddresses.isNotEmpty) {
-      if(entryGroups.isNotEmpty) {
+      if (entryGroups.isNotEmpty) {
         entryGroups.add(divider);
       }
       entryGroups.add(new Container(
@@ -88,7 +88,7 @@ class ContactDetails extends StatelessWidget {
     }
 
     if (contact.addresses.isNotEmpty) {
-      if(entryGroups.isNotEmpty) {
+      if (entryGroups.isNotEmpty) {
         entryGroups.add(divider);
       }
       entryGroups.add(new Container(

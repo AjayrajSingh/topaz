@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import 'contact.dart';
 import 'entry_types.dart';
 
+/// Fixtures for Contacts
 class ContactModelFixtures extends Fixtures {
   static final String _uuidContact =
       Fixtures.uuid.v5(Uuid.NAMESPACE_URL, namespace('contacts'));

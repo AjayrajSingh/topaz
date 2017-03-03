@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../lib/src/models.dart';
 import '../../lib/src/widgets.dart';
 
-
 void main() {
   testWidgets(
       'Test to see if tapping on a ContactListItem will call the'

@@ -68,8 +68,8 @@ void main() {
         number: '1231234',
         label: 'work',
       );
-      expect(phoneNumber.toString(),
-          '${phoneNumber.label} ${phoneNumber.number}');
+      expect(
+          phoneNumber.toString(), '${phoneNumber.label} ${phoneNumber.number}');
     });
     test('toJson()', () {
       PhoneNumber phoneNumber = new PhoneNumber(
