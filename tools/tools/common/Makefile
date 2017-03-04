@@ -34,6 +34,7 @@ flutter_bin := $(flutter_root)/bin
 dart_bin := $(flutter_bin)/cache/dart-sdk/bin
 
 flutter := $(flutter_bin)/flutter
+dart := $(dart_bin)/dart
 pub := $(dart_bin)/pub
 
 ignored_dirs := _book generated infra node_modules testdata
@@ -41,6 +42,8 @@ ignore_flags := $(shell echo $(addprefix '! -wholename "*/',$(addsuffix '/*"',$(
 sfind := find $(root) $(ignore_flags)
 
 dart_sources := $(shell $(sfind) -name "*.dart")
+
+dart_packages := $(shell $(sfind) -name "pubspec.yaml" -exec dirname {} \;)
 
 sources := $(shell $(sfind) \
 	-name "*.dart" \
@@ -60,6 +63,9 @@ all: build
 .PHONY: build
 build: ## Build Fuchsia with project.
 	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/build.sh
+
+.PHONY: clean
+clean: dart-clean ## Clean build artifacts from this project.
 
 .PHONY: reboot
 reboot: ## Reboot connected Fuchsia device.
@@ -83,6 +89,9 @@ fmt: dart-fmt ## Format the code in this project.
 .PHONY: test
 test: dart-test ## Run the tests in this project.
 
+.PHONY: coverage
+coverage: dart-coverage ## Show coverage for this project.
+
 .PHONY: presubmit
 presubmit: build lint test ## Run the presubmit tests for this project.
 
@@ -98,6 +107,22 @@ lint: copyright-check dart-lint dart-fmt-check ## Lint the code.
 .PHONY: $(dart_bin)
 $(dart_bin):
 	@$(flutter) precache
+
+.PHONY: dart-clean
+dart-clean:
+	@# Remove all build artifacts, including the coverage information.
+	@# Also, if there is a pubspec.lock file that is not tracked by git, remove
+	@# it as well.
+	@for pkg in $(dart_packages); do \
+		pushd $${pkg} > /dev/null; \
+		rm -rf .packages packages .pub build coverage; \
+		git ls-files pubspec.lock --error-unmatch &> /dev/null; \
+		if [ $$? -ne 0 ]; then \
+			rm -f pubspec.lock; \
+		fi; \
+		popd > /dev/null; \
+	done
+	@rm -rf coverage
 
 .PHONY: dart-lint
 dart-lint: build
@@ -129,6 +154,12 @@ dart-fmt-check: $(dart_bin) $(tools_root)/dartfmt_extras/.packages
 .PHONY: dart-test
 dart-test: $(dart_bin)
 	@$(common_root)/run_dart_tests.py
+
+.PHONY: dart-coverage
+dart-coverage: $(dart_bin)
+	@$(common_root)/run_dart_tests.py --coverage
+	@$(common_root)/merge_coverage.sh
+	@$(dart) $(common_root)/report_coverage.dart coverage/lcov.info
 
 .PHONY: copyright-check
 copyright-check: ## Check source files for missing copyright.

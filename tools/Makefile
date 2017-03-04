@@ -213,7 +213,7 @@ dart-gen-specs: $(DART_BIN) tools/widget_specs/.packages $(addsuffix /.packages,
 
 .PHONY: dart-coverage
 dart-coverage: dart-base
-	@tools/run_dart_tests.py --coverage
+	@tools/common/run_dart_tests.py --coverage
 	@$(MAKE) dart-report-coverage
 
 .PHONY: dart-report-coverage
@@ -221,8 +221,8 @@ dart-report-coverage:
 	@echo
 	@echo "** Code coverage for dart files **"
 	@echo
-	@tools/merge_coverage.sh
-	@dart tools/report_coverage.dart coverage/lcov.info
+	@tools/common/merge_coverage.sh
+	@dart tools/common/report_coverage.dart coverage/lcov.info
 
 .PHONY: dart-fmt
 dart-fmt: $(DART_BIN)
