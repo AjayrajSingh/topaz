@@ -5,8 +5,6 @@
 MAKEFLAGS += --warn-undefined-variables --no-print-directory
 SHELL := /bin/bash
 
-# TODO(jxson): Add appropriate PATH based on deps/tools.
-
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := all
 .DELETE_ON_ERROR:
@@ -289,7 +287,7 @@ dart-lint: dart-base
 
 .PHONY: dart-test
 dart-test: dart-base
-	@tools/run_dart_tests.py
+	@tools/common/run_dart_tests.py
 
 .PHONY: dart-presubmit
 dart-presubmit: dart-gen-specs dart-fmt-check dart-fmt-extras-check dart-lint dart-test

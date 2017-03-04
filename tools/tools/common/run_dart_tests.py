@@ -20,8 +20,9 @@ import subprocess
 import sys
 import threading
 
-REPO_ROOT = os.path.dirname(sys.path[0])
+REPO_ROOT = os.path.dirname(os.path.dirname(sys.path[0]))
 FUCHSIA_ROOT = os.path.dirname(os.path.dirname(REPO_ROOT))
+WORKING_DIR = os.getcwd()
 
 
 class WorkerThread(threading.Thread):
@@ -61,8 +62,8 @@ Extra flags will be passed to the flutter test command.
 
     # Find all the dart packages.
     dart_packages = []
-    for root, dirnames, filenames in os.walk(REPO_ROOT):
-        for filename in fnmatch.filter(filenames, '.packages'):
+    for root, dirnames, filenames in os.walk(WORKING_DIR):
+        for filename in fnmatch.filter(filenames, 'pubspec.yaml'):
             dart_packages.append(root)
     # Add all the dart package directories.
     target_packages = []
@@ -73,7 +74,7 @@ Extra flags will be passed to the flutter test command.
             target_packages.append(dart_package)
         else:
             print "** WARNING: No tests found in '%s'." % os.path.relpath(
-                dart_package, REPO_ROOT)
+                dart_package, WORKING_DIR)
 
     # Put all the target packages in a queue that workers will work from
     package_queue = Queue.Queue()
@@ -98,14 +99,14 @@ Extra flags will be passed to the flutter test command.
             failed_tests.append(package)
         print '----------------------------------------------------------'
         print "Test results of package '%s'\n" % os.path.relpath(package,
-                                                                 REPO_ROOT)
+                                                                 WORKING_DIR)
         print output
 
     if len(failed_tests):
         failed_tests.sort()
         print 'Tests failed in:'
         for package in failed_tests:
-            print '  %s' % os.path.relpath(package, REPO_ROOT)
+            print '  %s' % os.path.relpath(package, WORKING_DIR)
         exit(1)
 
 

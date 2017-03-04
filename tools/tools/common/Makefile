@@ -27,56 +27,110 @@ endif
 root ?= $(shell git rev-parse --show-toplevel)
 fuchsia_root ?= $(realpath $(root)/../..)
 common_root ?= $(realpath $(fuchsia_root)/apps/modules/tools/common)
+tools_root := $(realpath $(common_root)/..)
 fuchsia_out := $(realpath $(fuchsia_root)/out)
-flutter_bin := $(fuchsia_root)/lib/flutter/bin
+flutter_root := $(fuchsia_root)/lib/flutter
+flutter_bin := $(flutter_root)/bin
 dart_bin := $(flutter_bin)/cache/dart-sdk/bin
+
 flutter := $(flutter_bin)/flutter
-sources := $(shell find $(root) \
-    -name "*.dart" \
-    -o -name "*.py" \
-    -o -name "*.fidl" \
-    -o -name "*.gn" \
-    -o -name "*.sh" \
-    -o -name "*.yaml")
+pub := $(dart_bin)/pub
+
+ignored_dirs := _book generated infra node_modules testdata
+ignore_flags := $(shell echo $(addprefix '! -wholename "*/',$(addsuffix '/*"',$(ignored_dirs))))
+sfind := find $(root) $(ignore_flags)
+
+dart_sources := $(shell $(sfind) -name "*.dart")
+
+sources := $(shell $(sfind) \
+	-name "*.dart" \
+	-o -name "*.py" \
+	-o -name "*.fidl" \
+	-o -name "*.gn" \
+	-o -name "*.sh" \
+	-o -name "*.yaml")
+
 makefiles := $(foreach file, $(MAKEFILE_LIST), $(realpath $(file)))
 
 PATH := $(flutter_bin):$(dart_bin):$(PATH)
 
-PHONY: all
+.PHONY: all
 all: build
 
-PHONY: build
+.PHONY: build
 build: ## Build Fuchsia with project.
 	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/build.sh
 
-PHONY: reboot
+.PHONY: reboot
 reboot: ## Reboot connected Fuchsia device.
 	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/reboot.sh
 
-PHONY: run
+.PHONY: run
 run: ## Run project on Fuchsia.
 	@echo "=== Don't forget to reboot between builds! ==="
 	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/run.sh $(PROJECT)
 
-PHONY: flutter-run
+.PHONY: flutter-run
 flutter-run: ## Run UI application in modules/<project> via `flutter run`.
 	cd $(root)/modules/$(PROJECT) && \
 		$(flutter) upgrade && \
 		$(flutter) build clean && \
 		$(flutter) run --hot
 
-PHONY: dart-lint
+.PHONY: fmt
+fmt: dart-fmt ## Format the code in this project.
+
+.PHONY: test
+test: dart-test ## Run the tests in this project.
+
+.PHONY: presubmit
+presubmit: build lint test ## Run the presubmit tests for this project.
+
+.PHONY: presubmit-cq
+presubmit-cq: build lint
+
+.PHONY: lint
+lint: copyright-check dart-lint dart-fmt-check ## Lint the code.
+
+%/.packages: %/pubspec.yaml
+	@cd $* && flutter packages get
+
+.PHONY: $(dart_bin)
+$(dart_bin):
+	@$(flutter) precache
+
+.PHONY: dart-lint
 dart-lint: build
-	$(fuchsia_root)/scripts/run-dart-analysis.py \
+	@$(fuchsia_root)/scripts/run-dart-analysis.py \
 			--out=$(fuchsia_out)/debug-x86-64 \
 			--tree=//apps/$(PROJECT)/* \
 			--lints --fatal-lints --fatal-warnings
 
 .PHONY: dart-fmt
-dart-fmt: $(dart_bin)
-	@dartfmt -w $(shell find $(root) -name "*.dart")
+dart-fmt: $(dart_bin) $(tools_root)/dartfmt_extras/.packages
+	@dartfmt -w $(dart_sources)
+	@cd $(tools_root)/dartfmt_extras; \
+	FLUTTER_ROOT=$(flutter_root) $(pub) run bin/main.dart fix / $(dart_sources)
 
-PHONY: copyright-check
+.PHONY: dart-fmt-check
+dart-fmt-check: $(dart_bin) $(tools_root)/dartfmt_extras/.packages
+	@dartfmt --dry-run --set-exit-if-changed $(dart_sources); \
+	error=$$?; \
+	cd $(tools_root)/dartfmt_extras; \
+	FLUTTER_ROOT=$(flutter_root) $(pub) run bin/main.dart check / $(dart_sources); \
+	if [ $$? -ne 0 -o $$error -ne 0 ] ; then \
+		echo; \
+		echo "The above dart files have formatting issues."; \
+		echo "Run \"make fmt\" to fix the formatting."; \
+		echo; \
+		exit 1; \
+	fi
+
+.PHONY: dart-test
+dart-test: $(dart_bin)
+	@$(common_root)/run_dart_tests.py
+
+.PHONY: copyright-check
 copyright-check: ## Check source files for missing copyright.
 	@$(common_root)/copyright-check.sh $(sources)
 
