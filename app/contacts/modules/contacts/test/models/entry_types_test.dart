@@ -2,9 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:contacts/src/models.dart';
 import 'package:test/test.dart';
-
-import '../../lib/src/models.dart';
 
 void main() {
   group('EmailAddress', () {
