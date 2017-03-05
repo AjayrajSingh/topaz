@@ -2,16 +2,19 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_package.gni")
+import("//flutter/build/flutter_app.gni")
 
-dart_package("dashboard") {
-  package_name = "dashboard"
-
-  #analysis_options="//apps/sysui/.analysis_options"
+flutter_app("dashboard") {
+  main_dart = "lib/main.dart"
 
   source_dir = "lib"
 
   deps = [
+    "//application/lib/app/dart",
+    "//lib/fidl/dart",
+    "//third_party/dart-pkg/pub/html",
     "//lib/flutter/packages/flutter",
   ]
+
+  analysis_options = "//apps/modules/.analysis_options"
 }

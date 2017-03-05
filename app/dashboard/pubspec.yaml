@@ -1,14 +1,10 @@
-name: fuchsia_build_status
-description: A new flutter project.
+name: dashboard
+description: Display the Fuchsia build status
 
 dependencies:
-  html:
-    path: ./html
+  html: ^0.13.1
   flutter:
     sdk: flutter
-
-# For information on the generic Dart part of this file, see the
-# following page: https://www.dartlang.org/tools/pub/pubspec
 
 # The following section is specific to Flutter.
 flutter:

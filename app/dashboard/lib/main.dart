@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/http.dart' as http;
+import 'package:flutter/material.dart';
+
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
-import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:core';
 import 'dart:async';
