@@ -5,14 +5,20 @@
 import("//flutter/build/flutter_app.gni")
 
 flutter_app("dashboard") {
-  main_dart = "lib/main.dart"
+  main_dart = "lib/modular_main.dart"
 
   source_dir = "lib"
 
   deps = [
+    "//third_party/dart-pkg/pub/html",
+    "//apps/modular/services/story:story_dart",
+    "//apps/modules/packages/models",
+    "//apps/modules/packages/util",
+    "//apps/modules/packages/widgets",
+    "//apps/modules/packages/widgets_meta",
+    "//apps/mozart/services/views:views_dart",
     "//application/lib/app/dart",
     "//lib/fidl/dart",
-    "//third_party/dart-pkg/pub/html",
     "//lib/flutter/packages/flutter",
   ]
 
