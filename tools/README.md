@@ -62,8 +62,8 @@ terminal session you can run email two different ways.
 
 Running with the full sysui
 
-    netruncmd : "@ bootstrap device_runner"
+    netruncmd : "@boot device_runner"
 
 Running the email story directly
 
-    netruncmd : "@ bootstrap device_runner --user-shell=dev_user_shell --user-shell-args=--root-module=email_story"
+    netruncmd : "@boot device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=email_story"
