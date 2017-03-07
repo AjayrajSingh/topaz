@@ -11,6 +11,7 @@ dart_package("widgets") {
 
   deps = [
     "//apps/modules/packages/email_session_store",
+    "//apps/modules/packages/google_search_api",
     "//apps/modules/packages/models",
     "//apps/modules/packages/music_api",
     "//apps/modules/packages/widgets_meta",

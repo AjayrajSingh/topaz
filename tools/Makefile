@@ -153,6 +153,9 @@ run: dart-gen-specs ## Run the gallery flutter app.
 run-email: ## Run the email flutter app.
 	@cd email/email_flutter && flutter run --hot
 
+run-image-picker: ## Run the image picker android app.
+	@cd image_picker/image_picker_android && flutter run --hot
+
 # TODO(jxson): Add gitbook as a third-party dependency.
 .PHONY: doc
 doc:
@@ -305,7 +308,7 @@ dart-presubmit-cq: dart-gen-specs dart-fmt-check dart-fmt-extras-check dart-lint
 auth: email/config.json ## Update email auth credentials with a refresh token.
 	@cd email/tools; \
 	pub run bin/oauth.dart
-	@for dir in ../contacts/modules/contacts/assets email/email_flutter/assets email/email_service/assets email/map/assets email/usps/assets email/youtube_related_videos/assets email/youtube_video/assets gallery/assets; do \
+	@for dir in ../contacts/modules/contacts/assets email/email_flutter/assets email/email_service/assets email/map/assets email/usps/assets email/youtube_related_videos/assets email/youtube_video/assets gallery/assets image_picker/image_picker_android/assets; do \
 		mkdir -p $${dir}; \
 		cp email/config.json $${dir}/config.json; \
 	done

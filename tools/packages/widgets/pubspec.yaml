@@ -11,6 +11,8 @@ dependencies:
     path: ../email_session_store
   flutter:
     sdk: flutter
+  google_search_api:
+    path: ../google_search_api
   models:
     path: ../models
   music_api:

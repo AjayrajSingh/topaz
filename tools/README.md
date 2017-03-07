@@ -33,6 +33,13 @@ Then add two values required for OAuth.
       "oauth_secret: "<Google APIs client secret>"
     }
 
+To setup Google Image Search for the Image Picker, add these additional values
+
+  {
+    "google_search_key": "<Google API key for Custom Search Engine>"
+    "google_search_id": "<ID of Custom Search Engine>"
+  }
+
 ## Authenticate
 
 Once you have the OAuth id and secret it is possible to generate refresh
