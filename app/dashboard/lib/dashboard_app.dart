@@ -6,6 +6,7 @@ import 'package:html/dom.dart' as dom;
 import 'dart:io';
 import 'dart:core';
 import 'dart:async';
+import 'dart:ui' as ui;
 
 enum BuildStatus {
   UNKNOWN, NETWORKERROR, PARSEERROR, SUCCESS, FAILURE
@@ -188,6 +189,18 @@ class _DashboardPageState extends State<DashboardPage> {
     // build methods fast, so that you can just rebuild anything that
     // needs updating rather than having to individually change
     // instances of widgets.
+
+    if (ui.window.physicalSize.width > ui.window.physicalSize.height)
+      return buildLandcape(context);
+    else
+      return buildPortrait(context);
+  }
+
+  Widget buildPortrait(BuildContext context) {
+    return buildLandcape(context); // TODO
+  }
+
+  Widget buildLandcape(BuildContext context) {
 
     var rows = new List();
     targets_results.forEach((k,v) {
