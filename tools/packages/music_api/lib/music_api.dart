@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:convert' show JSON;
 
-import 'package:flutter/http.dart' as http;
+import 'package:http/http.dart' as http;
 import 'package:models/music.dart';
 
 const String _kApiBaseUrl = 'api.spotify.com';

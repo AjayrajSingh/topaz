@@ -5,8 +5,8 @@
 import 'dart:async';
 import 'dart:convert' show JSON;
 
-import 'package:flutter/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:models/youtube.dart';

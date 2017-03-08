@@ -4,8 +4,8 @@
 
 import 'dart:async';
 
-import 'package:flutter/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:models/usps.dart';
 import 'package:widgets_meta/widgets_meta.dart';
