@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
+import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:core';
 import 'dart:async';
@@ -171,6 +172,11 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
+  void _launchUrl(String url) {
+    UrlLauncher.launch(url);
+  }
+
+
   Color _colorFromBuildStatus(BuildStatus status) {
     switch (status) {
       case BuildStatus.SUCCESS:
@@ -183,12 +189,18 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildResultWidget(String name, BuildStatus status) {
-    return new Container(
-        decoration: new BoxDecoration(backgroundColor: _colorFromBuildStatus(status)),
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: new Text(name,
-          style:new TextStyle(color:Colors.black, fontSize:24.0)),
-      );
+    return new Expanded( child: new GestureDetector(
+      onTap: () {
+        _launchUrl("https://luci-scheduler.appspot.com");
+      },
+      child:
+        new Container(
+          decoration: new BoxDecoration(backgroundColor: _colorFromBuildStatus(status)),
+          padding: const EdgeInsets.symmetric(vertical:16.0,
+                      horizontal: 8.0),
+          child: new Text(name,
+            style:new TextStyle(color:Colors.black, fontSize:24.0)),
+        )) );
   }
 
   @override
@@ -215,19 +227,21 @@ class _DashboardPageState extends State<DashboardPage> {
     var rows = new List();
     targets_results.forEach((k,v) {
 
+        // Category
         rows.add(
           new Container(
             padding: new EdgeInsets.fromLTRB(0.0, 32.0, 0.0, 0.0),
             child:
           new Row(children:[new Text(k, 
-          style: new TextStyle(fontSize:16.0))]),
+          style: new TextStyle(fontSize:18.0))]),
           ),
         );
 
+        // the builds
         var builds = new List();
         v.forEach((name, status) {
           builds.add(_buildResultWidget(name,status));
-          });
+        });
 
         rows.add(new Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
