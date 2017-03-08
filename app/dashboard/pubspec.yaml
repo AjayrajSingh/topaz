@@ -2,7 +2,7 @@ name: dashboard
 description: Display the Fuchsia build status
 
 dependencies:
-  html: ^0.13.1
+  html: any
   flutter:
     sdk: flutter
 

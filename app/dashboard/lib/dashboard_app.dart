@@ -252,7 +252,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Fuchsia Build Status'),
+        title: new Text('Fuchsia Build Status ${ui.window.physicalSize.width}x${ui.window.physicalSize.height}'),
       ),
       body: new Container( 
         padding: new EdgeInsets.all(20.0),
