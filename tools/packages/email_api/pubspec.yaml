@@ -14,9 +14,6 @@ dependencies:
     path: ../models
   util:
     path: ../util
-dependency_overrides:
-  http:
-    path: ../../packages/flutter-http/
 dev_dependencies:
   flutter_test:
     sdk: flutter

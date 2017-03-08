@@ -13,9 +13,6 @@ dependencies:
     sdk: flutter
   widgets:
     path: ../../packages/widgets
-dependency_overrides:
-  http:
-    path: ../../packages/flutter-http/
 flutter:
   uses-material-design: true
   assets:

@@ -15,6 +15,3 @@ dependencies:
     path: ../../../../third_party/dart-pkg/pub/flutter_flux
   models:
     path: ../models
-dependency_overrides:
-  http:
-    path: ../../packages/flutter-http/
