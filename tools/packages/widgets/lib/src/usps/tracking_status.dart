@@ -110,11 +110,10 @@ class _TrackingStatusState extends State<TrackingStatus> {
     if (_trackingEntries.isEmpty) {
       return 'Package En Route';
     }
-
     if (_trackingEntries.first.entryDetails
         .toLowerCase()
         .contains('delivered')) {
-      return 'Package Delievered';
+      return 'Package Delivered';
     } else {
       return 'Package En Route';
     }

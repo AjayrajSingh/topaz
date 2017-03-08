@@ -29,13 +29,19 @@ class TrackingEntry {
 
   /// Constructor
   TrackingEntry({
-    this.time,
-    this.date,
-    this.city,
-    this.state,
-    this.zipCode,
-    this.entryDetails,
-  });
+    String time,
+    String date,
+    String city,
+    String state,
+    String zipCode,
+    String entryDetails,
+  })
+      : this.time = time ?? '',
+        this.date = date ?? '',
+        this.city = city ?? '',
+        this.state = state ?? '',
+        this.zipCode = zipCode ?? '',
+        this.entryDetails = entryDetails ?? '';
 
   /// Creates a TrackingEntry from XML data
   factory TrackingEntry.fromXML(xml.XmlNode xmlNode) {
