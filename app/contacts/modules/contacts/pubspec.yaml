@@ -15,9 +15,6 @@ dependencies:
     path: ../../../modules/packages/widgets
   widgets_meta:
     path: ../../../modules/packages/widgets_meta
-dependency_overrides:
-  http:
-    path: ../../../modules/packages/flutter-http/
 dev_dependencies:
   test: any
   flutter_test:
