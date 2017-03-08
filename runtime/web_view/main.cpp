@@ -185,10 +185,17 @@ class MozWebView : public mozart::BaseView,
       if (keyboard->code_point == 'c' &&
           keyboard->modifiers & mozart::kModifierControl) {
         exit(0);
+      } else if (keyboard->code_point == '[' &&
+                 keyboard->modifiers & mozart::kModifierControl) {
+        web_view_.goBack();
+      } else if (keyboard->code_point == ']' &&
+                 keyboard->modifiers & mozart::kModifierControl) {
+        web_view_.goForward();
+      } else {
+        web_view_.handleKeyEvent(keyboard->hid_usage,
+                                 keyboard->code_point,
+                                 keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED);
       }
-      web_view_.handleKeyEvent(keyboard->hid_usage,
-                               keyboard->code_point,
-                               keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED);
     }
 
     callback(handled);
