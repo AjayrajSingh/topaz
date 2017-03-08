@@ -11,11 +11,8 @@ flutter_app("dashboard") {
 
   deps = [
     "//third_party/dart-pkg/pub/html",
+    "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
-    "//apps/modules/packages/models",
-    "//apps/modules/packages/util",
-    "//apps/modules/packages/widgets",
-    "//apps/modules/packages/widgets_meta",
     "//apps/mozart/services/views:views_dart",
     "//application/lib/app/dart",
     "//lib/fidl/dart",
