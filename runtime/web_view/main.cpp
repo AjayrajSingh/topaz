@@ -182,7 +182,6 @@ class MozWebView : public mozart::BaseView,
       }
     } else if (event->is_keyboard()) {
       const mozart::KeyboardEventPtr& keyboard = event->get_keyboard();
-      cerr << "Key event" << endl;
       if (keyboard->code_point == 'c' &&
           keyboard->modifiers & mozart::kModifierControl) {
         exit(0);
@@ -218,6 +217,7 @@ class MozWebView : public mozart::BaseView,
         const char* urlToOpen = url_.c_str();
         FTL_LOG(INFO) << "Loading " << urlToOpen;
         web_view_.setURL(urlToOpen);
+        web_view_.setPageAndTextZoomFactors(2.0, 1.0);
         url_set_ = true;
       }
       web_view_.iterateEventLoop();
