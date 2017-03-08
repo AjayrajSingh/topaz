@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/http.dart' as http;
-
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
 import 'dart:io';
 import 'dart:core';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui' as ui;
 
 enum BuildStatus {
@@ -114,30 +113,41 @@ class _DashboardPageState extends State<DashboardPage> {
 
     // fetch config status for ONE item.
     void _fetchConfigStatus(categoryName, buildName, url) {
-      BuildStatus status = BuildStatus.PARSEERROR;
-      http.get(url).then<Null>((http.Response response) {
-        String html = response.body;
-        if (html == null) {
-          print("Failed to load dashboard page ${url}");
-          status = BuildStatus.NETWORKERROR;
-          return null;
-        }
-        var dom_tree = parse(html);
-        List<dom.Element> trs = dom_tree.querySelectorAll('tr');
-        for (var tr in trs) {
-          if (tr.className == "danger") {
-            status = BuildStatus.FAILURE;
-            break;
-          }
-          else if (tr.className == "success") {
-            status = BuildStatus.SUCCESS;
-            break;
-          }
-        }
 
-        targets_results['${categoryName}']['${buildName}'] = status;
-        // invalidate the state
-        setState( () {} );
+      BuildStatus status = BuildStatus.PARSEERROR;
+
+      HttpClient client = new HttpClient();
+      client.getUrl(Uri.parse(url))
+        .then((HttpClientRequest request) => request.close())
+        .then((HttpClientResponse response) {
+
+          var contents = new StringBuffer();
+          response.transform(UTF8.decoder).listen((String data) {
+            contents.write(data);
+          }, onDone: () {
+
+           var html_string = contents.toString();
+
+           client.close();
+           var dom_tree = parse(html_string);
+           List<dom.Element> trs = dom_tree.querySelectorAll('TR');
+           for (var tr in trs) {
+             if (tr.className == "danger") {
+               status = BuildStatus.FAILURE;
+               break;
+             }
+             if (tr.className == "success") {
+               status = BuildStatus.SUCCESS;
+               break;
+             }
+           }
+
+           targets_results['${categoryName}']['${buildName}'] = status;
+           // invalidate the state
+           setState( () {} );
+
+         });
+
       }); 
 
     }
