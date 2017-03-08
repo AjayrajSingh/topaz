@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <dirent.h>
 #include <hid/hid.h>
+#include <hid/usages.h>
 #include <magenta/device/console.h>
 #include <magenta/device/display.h>
 #include <magenta/pixelformat.h>
@@ -192,9 +193,16 @@ class MozWebView : public mozart::BaseView,
                  keyboard->modifiers & mozart::kModifierControl) {
         web_view_.goForward();
       } else {
-        web_view_.handleKeyEvent(keyboard->hid_usage,
-                                 keyboard->code_point,
-                                 keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED);
+        bool handled = web_view_.handleKeyEvent(keyboard->hid_usage,
+                                                keyboard->code_point,
+                                                keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED);
+        if (!handled) {
+          if (keyboard->hid_usage == HID_USAGE_KEY_DOWN) {
+            web_view_.scrollDownOneLine();
+          } else if (keyboard->hid_usage == HID_USAGE_KEY_UP) {
+            web_view_.scrollUpOneLine();
+          }
+        }
       }
     }
 
