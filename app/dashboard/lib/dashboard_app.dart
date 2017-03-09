@@ -101,7 +101,7 @@ class _DashboardPageState extends State<DashboardPage> {
         targets_results[categoryName] = this_map;
       });
 
-    _refreshTimer = new Timer.periodic(const Duration(seconds: 5), _refreshTimerFired);
+    _refreshTimer = new Timer.periodic(const Duration(seconds: 60), _refreshTimerFired);
     _refreshStatus();
   }
 
@@ -129,9 +129,13 @@ class _DashboardPageState extends State<DashboardPage> {
 
            var html_string = contents.toString();
 
-           client.close();
+           // DEBUG : comment out this next line to cause quick OOM errors
+           // when running on fuchsia.
+           contents.clear(); // drop reference to memory
+
+           client.close(true); // free up the HttpClient connection
            var dom_tree = parse(html_string);
-           List<dom.Element> trs = dom_tree.querySelectorAll('TR');
+           List<dom.Element> trs = dom_tree.querySelectorAll('tr');
            for (var tr in trs) {
              if (tr.className == "danger") {
                status = BuildStatus.FAILURE;
@@ -143,11 +147,16 @@ class _DashboardPageState extends State<DashboardPage> {
              }
            }
 
-           targets_results['${categoryName}']['${buildName}'] = status;
-           // invalidate the state
+           if (status != BuildStatus.PARSEERROR)
+             targets_results['${categoryName}']['${buildName}'] = status;
+
            setState( () {} );
 
-         });
+         }, onError: () {
+
+           targets_results['${categoryName}']['${buildName}'] = BuildStatus.NETWORKERROR;
+           setState( () {} );
+          });
 
       }); 
 
@@ -183,8 +192,10 @@ class _DashboardPageState extends State<DashboardPage> {
         return Colors.green[100];
       case BuildStatus.FAILURE:
         return Colors.red[100];
+      case BuildStatus.NETWORKERROR:
+        return Colors.purple[400];
       default:
-        return Colors.white;
+        return Colors.black12;
     }
   }
 
@@ -199,7 +210,7 @@ class _DashboardPageState extends State<DashboardPage> {
           padding: const EdgeInsets.symmetric(vertical:16.0,
                       horizontal: 8.0),
           child: new Text(name,
-            style:new TextStyle(color:Colors.black, fontSize:24.0)),
+            style:new TextStyle(color:Colors.black, fontSize:12.0)),
         )) );
   }
 
@@ -233,7 +244,7 @@ class _DashboardPageState extends State<DashboardPage> {
             padding: new EdgeInsets.fromLTRB(0.0, 32.0, 0.0, 0.0),
             child:
           new Row(children:[new Text(k, 
-          style: new TextStyle(fontSize:18.0))]),
+          style: new TextStyle(fontSize:9.0))]),
           ),
         );
 
@@ -252,7 +263,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Fuchsia Build Status ${ui.window.physicalSize.width}x${ui.window.physicalSize.height}'),
+        title: new Text('Fuchsia Build Status ${ui.window.physicalSize.width.toInt()}x${ui.window.physicalSize.height.toInt()} DPI=${ui.window.devicePixelRatio.toInt()}'),
       ),
       body: new Container( 
         padding: new EdgeInsets.all(20.0),
