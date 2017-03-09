@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:core';
 import 'dart:async';
@@ -113,73 +114,47 @@ class _DashboardPageState extends State<DashboardPage> {
   void _refreshStatus() {
 
     // fetch config status for ONE item.
-    void _fetchConfigStatus(categoryName, buildName, url) {
+    void __fetchConfigStatus(categoryName, buildName, url) {
 
       BuildStatus status = BuildStatus.PARSEERROR;
 
-      HttpClient client = new HttpClient();
-      client.getUrl(Uri.parse(url))
-        .then((HttpClientRequest request) => request.close())
-        .then((HttpClientResponse response) {
+      http.get(url).then<Null>((http.Response response) {
+        String html = response.body;
+        if (html == null) {
+          status = BuildStatus.NETWORKERROR;
+        } else {
 
-          var contents = new StringBuffer();
-          response.transform(UTF8.decoder).listen((String data) {
-            contents.write(data);
-          }, onDone: () {
+          var dom_tree = parse(html);
+          List<dom.Element> trs = dom_tree.querySelectorAll('tr');
+          for (var tr in trs) {
+              if (tr.className == "danger") {
+              status = BuildStatus.FAILURE;
+              break;
+            }
+            else if (tr.className == "success") {
+              status = BuildStatus.SUCCESS;
+              break;
+            }
+          }
+        }
 
-           var html_string = contents.toString();
+        targets_results['${categoryName}']['${buildName}'] = status;
+        setState( () {} );
 
-           // DEBUG : comment out this next line to cause quick OOM errors
-           // when running on fuchsia.
-           contents.clear(); // drop reference to memory
+      }); // http.get
 
-           client.close(true); // free up the HttpClient connection
-           var dom_tree = parse(html_string);
-           List<dom.Element> trs = dom_tree.querySelectorAll('tr');
-           for (var tr in trs) {
-             if (tr.className == "danger") {
-               status = BuildStatus.FAILURE;
-               break;
-             }
-             if (tr.className == "success") {
-               status = BuildStatus.SUCCESS;
-               break;
-             }
-           }
-
-           if (status != BuildStatus.PARSEERROR)
-             targets_results['${categoryName}']['${buildName}'] = status;
-
-           setState( () {} );
-
-         }, onError: () {
-
-           targets_results['${categoryName}']['${buildName}'] = BuildStatus.NETWORKERROR;
-           setState( () {} );
-          });
-
-      }); 
-
-    }
+    } // _fetchConfigStatus
 
     // kick off requests for all the build configs desired. As 
     // these reults come in they will be stuffed into the targets_results map.
     targets_map.forEach((categoryName, buildConfigs){
         for(var config in buildConfigs) {
           String url = kBaseURL + config[0];
-          //print(url);
-          _fetchConfigStatus(categoryName, config[1], url);
+          __fetchConfigStatus(categoryName, config[1], url);
         }
-      });
+      }); // targets_forEach
 
-
-    setState(() {
-      // This call to setState tells the Flutter framework that
-      // something has changed in this State, which causes it to rerun
-      // the build method below so that the display can reflect the
-      // updated values.
-    });
-  }
+  } // _refreshStatus
 
   void _launchUrl(String url) {
     UrlLauncher.launch(url);
