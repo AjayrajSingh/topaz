@@ -192,6 +192,9 @@ class MozWebView : public mozart::BaseView,
       } else if (keyboard->code_point == ']' &&
                  keyboard->modifiers & mozart::kModifierControl) {
         web_view_.goForward();
+      } else if (keyboard->code_point == 'r' &&
+                 keyboard->modifiers & mozart::kModifierControl) {
+        web_view_.reload();
       } else {
         bool handled = web_view_.handleKeyEvent(keyboard->hid_usage,
                                                 keyboard->code_point,
