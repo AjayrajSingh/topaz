@@ -116,11 +116,11 @@ class MozWebView : public mozart::BaseView,
                    public mozart::InputListener,
                    public web_view::WebView {
  public:
-  MozWebView(mozart::ViewManagerPtr view_manager,
-             fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-             fidl::InterfaceRequest<app::ServiceProvider>
-                 outgoing_services_request,
-             const std::string& url)
+  MozWebView(
+      mozart::ViewManagerPtr view_manager,
+      fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+      fidl::InterfaceRequest<app::ServiceProvider> outgoing_services_request,
+      const std::string& url)
       : BaseView(std::move(view_manager),
                  std::move(view_owner_request),
                  "WebView"),
@@ -157,6 +157,8 @@ class MozWebView : public mozart::BaseView,
   void OnEvent(mozart::InputEventPtr event,
                const OnEventCallback& callback) override {
     bool handled = false;
+    web_view_.setFocused(true);
+    web_view_.setVisible(true);
     if (event->is_pointer()) {
       const mozart::PointerEventPtr& pointer = event->get_pointer();
       switch (pointer->phase) {
@@ -174,8 +176,8 @@ class MozWebView : public mozart::BaseView,
           handled = true;
           break;
         case mozart::PointerEvent::Phase::UP:
-          web_view_.handleMouseEvent(pointer->x,
-                                     pointer->y, ::WebView::kMouseUp);
+          web_view_.handleMouseEvent(pointer->x, pointer->y,
+                                     ::WebView::kMouseUp);
           handled = true;
           break;
         default:
@@ -183,26 +185,26 @@ class MozWebView : public mozart::BaseView,
       }
     } else if (event->is_keyboard()) {
       const mozart::KeyboardEventPtr& keyboard = event->get_keyboard();
-      if (keyboard->code_point == 'c' &&
+      bool pressed = keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED;
+      if (pressed && keyboard->code_point == 'c' &&
           keyboard->modifiers & mozart::kModifierControl) {
         exit(0);
-      } else if (keyboard->code_point == '[' &&
+      } else if (pressed && keyboard->code_point == '[' &&
                  keyboard->modifiers & mozart::kModifierControl) {
         web_view_.goBack();
-      } else if (keyboard->code_point == ']' &&
+      } else if (pressed && keyboard->code_point == ']' &&
                  keyboard->modifiers & mozart::kModifierControl) {
         web_view_.goForward();
-      } else if (keyboard->code_point == 'r' &&
+      } else if (pressed && keyboard->code_point == 'r' &&
                  keyboard->modifiers & mozart::kModifierControl) {
         web_view_.reload();
       } else {
         bool handled = web_view_.handleKeyEvent(keyboard->hid_usage,
-                                                keyboard->code_point,
-                                                keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED);
+                                                keyboard->code_point, pressed);
         if (!handled) {
-          if (keyboard->hid_usage == HID_USAGE_KEY_DOWN) {
+          if (keyboard->hid_usage == HID_USAGE_KEY_DOWN && pressed) {
             web_view_.scrollDownOneLine();
-          } else if (keyboard->hid_usage == HID_USAGE_KEY_UP) {
+          } else if (keyboard->hid_usage == HID_USAGE_KEY_UP && pressed) {
             web_view_.scrollUpOneLine();
           }
         }
