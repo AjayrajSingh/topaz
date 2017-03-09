@@ -183,7 +183,8 @@ class _DashboardPageState extends State<DashboardPage> {
         new Container(
           decoration: new BoxDecoration(backgroundColor: _colorFromBuildStatus(status)),
           padding: const EdgeInsets.symmetric(vertical:16.0,
-                      horizontal: 8.0),
+                      horizontal: 4.0),
+          margin: const EdgeInsets.symmetric(horizontal:8.0),
           child: new Text(name,
             style:new TextStyle(color:Colors.black, fontSize:12.0)),
         )) );
