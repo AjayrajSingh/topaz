@@ -201,6 +201,7 @@ class MozWebView : public mozart::BaseView,
     } else if (event->is_keyboard()) {
       const mozart::KeyboardEventPtr& keyboard = event->get_keyboard();
       bool pressed = keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED;
+      bool repeating = keyboard->phase == mozart::KeyboardEvent::Phase::REPEAT;
       if (pressed && keyboard->code_point == 'c' &&
           keyboard->modifiers & mozart::kModifierControl) {
         exit(0);
@@ -214,13 +215,20 @@ class MozWebView : public mozart::BaseView,
                  keyboard->modifiers & mozart::kModifierControl) {
         web_view_.reload();
       } else {
-        bool handled = web_view_.handleKeyEvent(keyboard->hid_usage,
-                                                keyboard->code_point, pressed);
+        bool handled =
+            web_view_.handleKeyEvent(keyboard->hid_usage, keyboard->code_point,
+                                     pressed || repeating, repeating);
         if (!handled) {
-          if (keyboard->hid_usage == HID_USAGE_KEY_DOWN && pressed) {
-            web_view_.scrollDownOneLine();
-          } else if (keyboard->hid_usage == HID_USAGE_KEY_UP && pressed) {
-            web_view_.scrollUpOneLine();
+          if (pressed || repeating) {
+            if (keyboard->hid_usage == HID_USAGE_KEY_DOWN) {
+              web_view_.scrollDownOneLine();
+            } else if (keyboard->hid_usage == HID_USAGE_KEY_UP) {
+              web_view_.scrollUpOneLine();
+            } else if (keyboard->hid_usage == HID_USAGE_KEY_RIGHT) {
+              web_view_.scrollRightOneLine();
+            } else if (keyboard->hid_usage == HID_USAGE_KEY_LEFT) {
+              web_view_.scrollLeftOneLine();
+            }
           }
         }
       }
