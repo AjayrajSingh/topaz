@@ -30,6 +30,9 @@ class EmailAPI {
   AutoRefreshingAuthClient _client;
   gmail.GmailApi _gmail;
 
+  // TODO(vardhan): Do we need to track separate historyIds per-label?
+  String _latestHistoryId;
+
   /// The [EmailAPI] constructor.
   EmailAPI({
     @required String id,
@@ -55,8 +58,8 @@ class EmailAPI {
   }
 
   /// Create an instance of [EmailAPI] by loading a config file.
-  static Future<EmailAPI> fromConfig(String src) async {
-    Config config = await Config.read(src);
+  static Future<EmailAPI> fromConfig(String configPath) async {
+    Config config = await Config.read(configPath);
     List<String> keys = <String>[
       'oauth_id',
       'oauth_secret',
@@ -173,16 +176,26 @@ class EmailAPI {
     );
   }
 
+  /// Returns the number of new email for the given labelId since the previous
+  /// threads() call on the labelId.
+  // TODO(vardhan): This returns a false positive for all history events, not
+  // just new email. Filter, or rework the behaviour of updating emails.
+  Future<int> fetchNewEmail({String labelId: 'INBOX', int max: 15}) async {
+    // It could be that we have not finished fetching initial emails yet. In
+    // which case, there are no new emails.
+    if (_latestHistoryId == null) {
+      return 0;
+    }
+
+    gmail.ListHistoryResponse response = await _gmail.users.history.list('me',
+        labelId: labelId, maxResults: max, startHistoryId: _latestHistoryId);
+    return response.history == null ? 0 : response.history.length;
+  }
+
   /// Get a list of [Thread]s from the Gmail REST API.
-  Future<List<Thread>> threads({
-    String labelId: 'INBOX',
-    int max: 15,
-  }) async {
-    gmail.ListThreadsResponse response = await _gmail.users.threads.list(
-      'me',
-      labelIds: <String>[labelId],
-      maxResults: max,
-    );
+  Future<List<Thread>> threads({String labelId: 'INBOX', int max: 15}) async {
+    gmail.ListThreadsResponse response = await _gmail.users.threads
+        .list('me', labelIds: <String>[labelId], maxResults: max);
 
     // TODO(jasoncampbell): handle error and empty cases.
     if (response.threads == null) {
@@ -198,6 +211,8 @@ class EmailAPI {
 
     Stream<Thread> stream = new Stream<Thread>.fromFutures(requests);
     List<Thread> threads = await stream.toList();
+    // According to the Gmail API, the response is ordered from newest->oldest.
+    _latestHistoryId = threads[0].historyId;
 
     return threads;
   }
@@ -317,22 +332,16 @@ List<Attachment> _attachments(List<Uri> links) {
         link.path == '/watch' &&
         link.queryParameters['v'] != null) {
       return new Attachment(
-        type: AttachmentType.youtubeVideo,
-        value: link.queryParameters['v'],
-      );
+          type: AttachmentType.youtubeVideo, value: link.queryParameters['v']);
     } else if (link.host == 'tools.usps.com' &&
         link.path == '/go/TrackConfirmAction' &&
         link.queryParameters['qtc_tLabels1'] != null) {
       return new Attachment(
-        type: AttachmentType.uspsShipping,
-        value: link.queryParameters['qtc_tLabels1'],
-      );
+          type: AttachmentType.uspsShipping,
+          value: link.queryParameters['qtc_tLabels1']);
     } else if (link.host == 'www.aplusmobile.com' &&
         link.path == '/yourorder') {
-      return new Attachment(
-        type: AttachmentType.orderReceipt,
-        value: '',
-      );
+      return new Attachment(type: AttachmentType.orderReceipt, value: '');
     }
   }).toList();
 }

@@ -6,6 +6,7 @@ import("//lib/fidl/fidl.gni")
 
 fidl("services") {
   sources = [
+    "email_content_provider.fidl",
     "email_service.fidl",
     "email_session.fidl",
   ]
