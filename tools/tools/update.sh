@@ -14,8 +14,8 @@ if [ ! -f email/config.json ]; then
   echo "{}" >> email/config.json
 fi
 
-# Similarly, make one for each of the flutter modules. 
-for name in email/email_flutter email/email_service email/map email/usps email/youtube_related_videos email/youtube_video gallery; do
+# Similarly, make one for each of the flutter modules.
+for name in email/email_flutter email/email_service email/map email/usps email/youtube_related_videos email/youtube_video gallery image_picker/image_picker; do
   CONFIG="${REPO_DIR}/${name}/assets/config.json"
   if [ ! -f "${CONFIG}" ]; then
     mkdir -p "$( dirname ${CONFIG} )"
