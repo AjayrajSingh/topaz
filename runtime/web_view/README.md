@@ -25,3 +25,17 @@ Once in a non-mxsh shell
         launch web_view
 
 You can pass a URL as a parameter to the launch. Control-C will exit the web module.
+
+### Updating the Prebuilts
+
+Follow the instructions at https://fuchsia.googlesource.com/third_party/webkit/ to build webkit. Then
+
+    ./build_webkit.sh -p -l
+
+to build the release version of webkit and copy it, the webview header and all of the dependencies to ./prebuilt.
+
+Edit prebuilt.tag and replace the git commit hash in that file with the one for the latest commit in the webkit directory. Then
+
+    ./scripts/upload-web-view-prebuilts.sh
+
+Commit the changed prebuild.tag file and the next time web_view users update they will get the updated prebuilts.  
