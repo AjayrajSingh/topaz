@@ -169,6 +169,12 @@ class MozWebView : public mozart::BaseView,
     Invalidate();
   }
 
+  void SetWebRequestDelegate(
+      ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) final {
+    webRequestDelegate_ =
+        web_view::WebRequestDelegatePtr::Create(std::move(delegate));
+  }
+
   void OnEvent(mozart::InputEventPtr event,
                const OnEventCallback& callback) override {
     bool handled = false;
@@ -260,8 +266,16 @@ class MozWebView : public mozart::BaseView,
         const char* urlToOpen = url_.c_str();
         FTL_LOG(INFO) << "Loading " << urlToOpen;
         web_view_.setURL(urlToOpen);
-        web_view_.setPageAndTextZoomFactors(2.0, 1.0);
         url_set_ = true;
+        web_view_.setPageAndTextZoomFactors(2.0, 1.0);
+
+        auto requestCallback = [this](std::string url) {
+          if (webRequestDelegate_) {
+            webRequestDelegate_->WillSendRequest(url);
+          }
+          return url;
+        };
+        web_view_.setWebRequestDelegate(requestCallback);
       }
       web_view_.iterateEventLoop();
       web_view_.layoutAndPaint();
@@ -342,6 +356,9 @@ class MozWebView : public mozart::BaseView,
   modular::LinkPtr main_link_;
   fidl::Binding<modular::Module> module_binding_;
   fidl::Binding<modular::LinkWatcher> main_link_watcher_binding_;
+
+  // Delegate that receives WillSendRequest calls. Can be null.
+  web_view::WebRequestDelegatePtr webRequestDelegate_;
 
   // We use this |ServiceProvider| to expose the |WebView| interface to others.
   modular::ServiceProviderImpl outgoing_services_;
