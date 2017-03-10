@@ -28,11 +28,15 @@ class GoogleSearchImagePicker extends StatefulWidget {
   /// images and wants to "add them"
   final ImageSelectCallback onAdd;
 
+  /// optional initial image search query
+  final String query;
+
   /// Constructor
   GoogleSearchImagePicker({
     Key key,
     @required this.apiKey,
     @required this.customSearchId,
+    this.query,
     this.onAdd,
   })
       : super(key: key) {
@@ -97,6 +101,25 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (config.query != null && config.query.isNotEmpty) {
+      _currentInput = new InputValue(text: config.query);
+      _search(config.query);
+    }
+  }
+
+  @override
+  void didUpdateConfig(GoogleSearchImagePicker oldState) {
+    super.didUpdateConfig(oldState);
+    // Make a new search if config.query has been changed
+    if (oldState.query == _currentInput.text) {
+      _currentInput = new InputValue(text: config.query);
+      _search(config.query);
     }
   }
 
