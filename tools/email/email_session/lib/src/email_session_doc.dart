@@ -72,7 +72,6 @@ class EmailSessionDoc {
     visibleLabels = fixtures.labels();
     visibleThreads = fixtures.threads();
     focusedThreadId = visibleThreads[0].id;
-    focusedLabelId = 'INBOX';
     fetchingLabels = false;
     fetchingThreads = false;
   }

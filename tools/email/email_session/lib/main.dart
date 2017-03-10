@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
+import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
@@ -28,14 +29,12 @@ void _log(String msg) {
 class ModuleImpl extends Module {
   final ModuleBinding _binding = new ModuleBinding();
 
-  /// A [ServiceProvider] provided from the parent module.
-  final ServiceProviderProxy _incomingServices = new ServiceProviderProxy();
-
   /// A [ServiceProvider] implementation for exposing [EmailSession] service.
   final ServiceProviderImpl _serviceProviderImpl = new ServiceProviderImpl();
 
   /// [Link] for watching the[EmailSession] state.
   final LinkProxy emailSessionLinkProxy = new LinkProxy();
+  final ModuleContextProxy _emailModuleContextProxy = new ModuleContextProxy();
 
   /// A [EmailSessionImpl] instance.
   EmailSessionImpl _emailSessionImpl;
@@ -54,33 +53,37 @@ class ModuleImpl extends Module {
     InterfaceRequest<ServiceProvider> outgoingServices,
   ) {
     _log('ModuleImpl::initialize call');
-
+    _emailModuleContextProxy.ctrl.bind(moduleContextHandle);
     emailSessionLinkProxy.ctrl.bind(linkHandle);
-
-    _incomingServices.ctrl.bind(incomingServices);
 
     // TODO(alangardner): Temporarily start with mock data
     EmailSessionDoc sessionState = new EmailSessionDoc.withMockData();
 
-    _emailSessionImpl = new EmailSessionImpl(
-      emailSessionLinkProxy,
-      sessionState,
-    )..initialize(_incomingServices);
+    /// Setup [ComponentContextProxy]
+    ComponentContextProxy componentContextProxy = new ComponentContextProxy();
+    _emailModuleContextProxy
+        .getComponentContext(componentContextProxy.ctrl.request());
 
-    _serviceProviderImpl.addServiceForName(
-      (InterfaceRequest<es.EmailSession> request) {
-        _log('Received binding request for EmailSession');
-        _emailSessionImpl.bind(request);
-      },
-      es.EmailSession.serviceName,
-    );
-    _serviceProviderImpl.bind(outgoingServices);
+    /// Get [storyId] and [MessageQueue], and initialize [EmailSessionImpl]
+    _emailModuleContextProxy.getStoryId((String storyId) {
+      _emailSessionImpl = new EmailSessionImpl(
+          storyId, emailSessionLinkProxy, sessionState, componentContextProxy)
+        ..initialize();
+
+      _serviceProviderImpl.addServiceForName(
+        (InterfaceRequest<es.EmailSession> request) {
+          _log('Received binding request for EmailSession');
+          _emailSessionImpl.bind(request);
+        },
+        es.EmailSession.serviceName,
+      );
+      _serviceProviderImpl.bind(outgoingServices);
+    });
   }
 
   @override
   void stop(void callback()) {
     _log('ModuleImpl::stop call');
-    _incomingServices.ctrl.close();
     _emailSessionImpl?.close();
     _serviceProviderImpl.close();
     emailSessionLinkProxy.ctrl.close();

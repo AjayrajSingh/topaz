@@ -83,7 +83,7 @@ class ModuleImpl extends Module {
     _binding.bind(this, request);
   }
 
-  /// Implementation of the Initialize(Story story, Link link) method.
+  /// Implementation of the Initialize(ModuleContext moduleContext, Link link) method.
   @override
   void initialize(
     InterfaceHandle<ModuleContext> moduleContextHandle,
@@ -96,18 +96,8 @@ class ModuleImpl extends Module {
     moduleContext.ctrl.bind(moduleContextHandle);
     link.ctrl.bind(linkHandle);
 
-    // Binding between email service and email session.
-    InterfacePair<ServiceProvider> emailServiceBinding =
-        new InterfacePair<ServiceProvider>();
-
-    // Obtain the email service provider from the email_service module.
-    startModule(
-      url: _kEmailServiceUrl,
-      incomingServices: emailServiceBinding.passRequest(),
-    );
     startModule(
       url: _kEmailSessionUrl,
-      outgoingServices: emailServiceBinding.passHandle(),
       incomingServices: emailSessionProvider.ctrl.request(),
     );
 

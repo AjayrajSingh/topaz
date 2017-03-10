@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:config_flutter/config.dart';
+import 'package:config/config.dart';
 import 'package:googleapis/gmail/v1.dart' as gmail;
 import 'package:googleapis/oauth2/v2.dart' as oauth;
 import 'package:googleapis_auth/auth_io.dart';
@@ -21,6 +21,25 @@ const List<String> _kLabelSortOrder = const <String>[
   'DRAFT',
   'TRASH',
 ];
+
+/// Provides functionality to read json config files. We use it to read in auth
+/// tokens.
+class Config extends BaseConfig {
+  /// Convienence method for creating a config object by loading a
+  /// configuration file at [configPath].
+  static Future<Config> read(String configPath) async {
+    Config config = new Config();
+    await config.load(configPath);
+    return config;
+  }
+
+  @override
+  Future<Null> load(String configPath) async {
+    String data = await (new File(configPath).readAsString());
+    dynamic json = JSON.decode(data);
+    json.forEach((String key, String value) => this.put(key, value));
+  }
+}
 
 /// The interface to the Gmail REST API.
 class EmailAPI {
