@@ -8,38 +8,39 @@ executable("web_view") {
   sources = [
     "main.cpp",
   ]
-  
+
   libs = [
-      "prebuilt/x86-64/lib/libWTF.a",
-      "prebuilt/x86-64/lib/libWebKitLegacy.a",
-      "prebuilt/x86-64/lib/libJavaScriptCore.a",
-      "prebuilt/x86-64/lib/libWebCore.a",
-      "prebuilt/x86-64/lib/libWebCoreDerivedSources.a",
-      "prebuilt/x86-64/lib/libfontconfig.a",
-      "prebuilt/x86-64/lib/libcairo.a",
-      "prebuilt/x86-64/lib/libcurl.a",
-      "prebuilt/x86-64/lib/libpng.a",
-      "prebuilt/x86-64/lib/libpixman-1.a",
-      "prebuilt/x86-64/lib/libz.a",
-      "prebuilt/x86-64/lib/libfreetype.a",
-      "prebuilt/x86-64/lib/libxml2.a",
-      "prebuilt/x86-64/lib/libicuuc.a",
-      "prebuilt/x86-64/lib/libicudata.a",
-      "prebuilt/x86-64/lib/libicui18n.a",
-      "prebuilt/x86-64/lib/libexpat.a",
-      "prebuilt/x86-64/lib/libsqlite3.a",
-      "prebuilt/x86-64/lib/libturbojpeg.a",
-      "prebuilt/x86-64/lib/libharfbuzz.a",
-      "prebuilt/x86-64/lib/libharfbuzz-icu.a",
+    "prebuilt/x86-64/lib/libWTF.a",
+    "prebuilt/x86-64/lib/libWebKitLegacy.a",
+    "prebuilt/x86-64/lib/libJavaScriptCore.a",
+    "prebuilt/x86-64/lib/libWebCore.a",
+    "prebuilt/x86-64/lib/libWebCoreDerivedSources.a",
+    "prebuilt/x86-64/lib/libfontconfig.a",
+    "prebuilt/x86-64/lib/libcairo.a",
+    "prebuilt/x86-64/lib/libcurl.a",
+    "prebuilt/x86-64/lib/libpng.a",
+    "prebuilt/x86-64/lib/libpixman-1.a",
+    "prebuilt/x86-64/lib/libz.a",
+    "prebuilt/x86-64/lib/libfreetype.a",
+    "prebuilt/x86-64/lib/libxml2.a",
+    "prebuilt/x86-64/lib/libicuuc.a",
+    "prebuilt/x86-64/lib/libicudata.a",
+    "prebuilt/x86-64/lib/libicui18n.a",
+    "prebuilt/x86-64/lib/libexpat.a",
+    "prebuilt/x86-64/lib/libsqlite3.a",
+    "prebuilt/x86-64/lib/libturbojpeg.a",
+    "prebuilt/x86-64/lib/libharfbuzz.a",
+    "prebuilt/x86-64/lib/libharfbuzz-icu.a",
   ]
 
-  include_dirs = [
-      "prebuilt/include",
-  ]
+  include_dirs = [ "prebuilt/include" ]
 
   deps = [
     "services",
     "//application/lib/app",
+    "//apps/modular/lib/rapidjson",
+    "//apps/modular/services/module",
+    "//apps/modular/services/story",
     "//apps/mozart/lib/view_framework:view_provider",
     "//apps/mozart/services/buffers/cpp",
     "//apps/mozart/services/composition",
@@ -47,6 +48,7 @@ executable("web_view") {
     "//apps/mozart/services/views",
     "//lib/ftl",
     "//lib/mtl",
-    "//third_party/boringssl"
+    "//third_party/boringssl",
+    "//third_party/rapidjson",
   ]
 }

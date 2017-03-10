@@ -46,6 +46,9 @@
 
 #include "WebView.h"
 
+#include "apps/modular/lib/rapidjson/rapidjson.h"
+#include "apps/modular/services/module/module.fidl.h"
+#include "apps/modular/services/story/link.fidl.h"
 #include "apps/mozart/lib/view_framework/base_view.h"
 #include "apps/mozart/lib/view_framework/input_handler.h"
 #include "apps/mozart/lib/view_framework/view_provider_app.h"
@@ -114,19 +117,24 @@ static void* MakeImage(int width,
 
 class MozWebView : public mozart::BaseView,
                    public mozart::InputListener,
+                   public modular::Module,
+                   public modular::LinkWatcher,
                    public web_view::WebView {
  public:
   MozWebView(
       mozart::ViewManagerPtr view_manager,
       fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
       fidl::InterfaceRequest<app::ServiceProvider> outgoing_services_request,
+      app::ApplicationContext* application_context,
       const std::string& url)
       : BaseView(std::move(view_manager),
                  std::move(view_owner_request),
                  "WebView"),
         input_handler_(GetViewServiceProvider(), this),
         weak_factory_(this),
-        url_(url) {
+        url_(url),
+        module_binding_(this),
+        main_link_watcher_binding_(this) {
     if (outgoing_services_request) {
       // Expose |WebView| interface to caller
       outgoing_services_.AddService<web_view::WebView>(
@@ -136,6 +144,13 @@ class MozWebView : public mozart::BaseView,
       outgoing_services_.AddBinding(std::move(outgoing_services_request));
     }
 
+    // Register this application as a single module. Note that this is a
+    // different opinion on ownership from Mozart, which assumes multiple views
+    // can exists (although they currently don't).
+    application_context->outgoing_services()->AddService<modular::Module>(
+        [this](fidl::InterfaceRequest<modular::Module> request) {
+          module_binding_.Bind(std::move(request));
+        });
     mtl::MessageLoop::GetCurrent()->task_runner()->PostTask(
         ([weak = weak_factory_.GetWeakPtr()]() {
           if (weak)
@@ -277,12 +292,48 @@ class MozWebView : public mozart::BaseView,
         }));
   }
 
+  // modular::Module
+  void Initialize(
+      fidl::InterfaceHandle<modular::ModuleContext> context,
+      fidl::InterfaceHandle<modular::Link> link,
+      fidl::InterfaceHandle<app::ServiceProvider> incoming_services,
+      fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) final {
+    main_link_.Bind(std::move(link));
+    main_link_->Watch(main_link_watcher_binding_.NewBinding());
+  }
+
+  void Stop(const StopCallback& done) final { done(); }
+
+  // modular::LinkWatcher
+  void Notify(const fidl::String& json) final {
+    modular::JsonDoc parsed_json;
+    parsed_json.Parse(json.To<std::string>());
+    auto url_it = parsed_json.FindMember("url");
+    if (url_it == parsed_json.MemberEnd()) {
+      FTL_LOG(WARNING) << "web_view expected \"url\" field in link json, got"
+                       << json;
+      return;
+    }
+    auto& url_value = url_it->value;
+    if (!url_value.IsString()) {
+      FTL_LOG(WARNING) << "web_view expected string in json \"url\" field, got "
+                       << json;
+      return;
+    }
+    SetUrl(fidl::String(url_value.GetString()));
+  }
+
   mozart::InputHandler input_handler_;
   mozart::BufferProducer buffer_producer_;
   ::WebView web_view_;
   ftl::WeakPtrFactory<MozWebView> weak_factory_;
   bool url_set_ = false;
   std::string url_;
+
+  // Link state, used to gather URL updates for the story
+  modular::LinkPtr main_link_;
+  fidl::Binding<modular::Module> module_binding_;
+  fidl::Binding<modular::LinkWatcher> main_link_watcher_binding_;
 
   // We use this |ServiceProvider| to expose the |WebView| interface to others.
   modular::ServiceProviderImpl outgoing_services_;
@@ -306,7 +357,8 @@ int main(int argc, const char** argv) {
     return std::make_unique<MozWebView>(
         std::move(view_context.view_manager),
         std::move(view_context.view_owner_request),
-        std::move(view_context.outgoing_services), url);
+        std::move(view_context.outgoing_services),
+        view_context.application_context, url);
   });
 
   loop.Run();
