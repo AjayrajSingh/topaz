@@ -28,7 +28,7 @@ void _log(String msg) {
 /// listen for new email. It communicates email content updates to other modules
 /// over a [Link].
 class EmailSessionImpl extends es.EmailSession {
-  final String kContentProviderAgentUrl =
+  final String _kContentProviderAgentUrl =
       'file:///system/apps/email_content_provider';
 
   final String _storyId;
@@ -63,7 +63,7 @@ class EmailSessionImpl extends es.EmailSession {
     /// Connect to the EmailContentProvider agent and get the
     /// [EmailContentProvider] service.
     ServiceProviderProxy incomingServices = new ServiceProviderProxy();
-    _componentContext.connectToAgent(kContentProviderAgentUrl,
+    _componentContext.connectToAgent(_kContentProviderAgentUrl,
         incomingServices.ctrl.request(), _emailAgentController.ctrl.request());
     _log('connecting to email provider..');
     connectToService(incomingServices, _emailProvider.ctrl);

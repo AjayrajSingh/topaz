@@ -38,6 +38,7 @@ class EmailContentProviderAgent extends Agent {
 
   EmailContentProviderImpl _emailContentProviderImpl;
 
+  /// Constructor.
   EmailContentProviderAgent(InterfaceRequest<Agent> request) {
     _agentBinding = new AgentBinding()..bind(this, request);
   }
