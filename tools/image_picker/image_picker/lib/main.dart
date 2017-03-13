@@ -10,7 +10,7 @@ import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:config_flutter/config.dart';
+import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:widgets/image_picker.dart';
@@ -95,7 +95,6 @@ class ModuleImpl extends Module {
 
 /// Main screen for this module.
 class HomeScreen extends StatefulWidget {
-
   /// Creates a new instance of [HomeScreen].
   HomeScreen({Key key}) : super(key: key);
 
@@ -118,7 +117,7 @@ class HomeScreenState extends State<HomeScreen> {
       _log(
           '"google_search_key" and "google_search_id" must be specified in config.json.');
     } else {
-      setState((){
+      setState(() {
         _apiKey = searchKey;
         _customSearchId = searchId;
       });

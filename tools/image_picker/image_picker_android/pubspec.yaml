@@ -5,7 +5,7 @@
 name: image_picker_android
 description: Android Flutter app to run the image picker
 dependencies:
-  config_flutter:
+  config:
     path: ../../packages/config_flutter
   flutter:
     sdk: flutter

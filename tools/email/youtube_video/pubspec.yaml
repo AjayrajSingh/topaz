@@ -5,5 +5,3 @@
 name: youtube_video
 flutter:
   uses-material-design: true
-  assets:
-    - assets/config.json

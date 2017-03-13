@@ -9,7 +9,7 @@ import 'package:config/config.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 /// Config implementation for flutter environment.
-class Config extends BaseConfig {
+class FlutterConfig extends Config {
   /// Convienence method for creating a config object by loading a
   /// configuration file at [src].
   static Future<Config> read(String src) async {
@@ -20,7 +20,14 @@ class Config extends BaseConfig {
 
   @override
   Future<Null> load(String src) async {
-    String data = await rootBundle.loadString(src);
+    String data;
+
+    try {
+      data = await rootBundle.loadString(src);
+    } catch (err) {
+      throw new StateError('error loading "$src"');
+    }
+
     dynamic json = JSON.decode(data);
     json.forEach((String key, String value) => this.put(key, value));
   }

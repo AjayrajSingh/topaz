@@ -50,7 +50,7 @@ void main() {
     }));
 
     expect(taps, 0);
-    await tester.tap(find.byType(ListItem));
+    await tester.tap(find.byType(ListTile));
     expect(taps, 1);
   });
 

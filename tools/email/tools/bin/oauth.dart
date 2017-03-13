@@ -11,8 +11,8 @@ import 'package:tools/resolve.dart';
 
 /// Generate OAuth refesh credentials and save them to email/config.json.
 Future<Null> main(List<String> args) async {
-  String filename = resolve('config.json');
-  Config config = await Config.read(filename);
+  String filename = resolve('../config.json');
+  ToolsConfig config = await ToolsConfig.read(filename);
 
   if (config.has('oauth_id') == false || config.has('oauth_secret') == false) {
     String message = '''

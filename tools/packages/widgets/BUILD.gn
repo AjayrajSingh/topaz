@@ -10,7 +10,7 @@ dart_package("widgets") {
   source_dir = "lib"
 
   deps = [
-    "//apps/modules/packages/email_session_store",
+    "//apps/email/packages/email_session_store",
     "//apps/modules/packages/google_search_api",
     "//apps/modules/packages/models",
     "//apps/modules/packages/music_api",

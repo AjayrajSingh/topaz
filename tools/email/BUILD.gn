@@ -4,19 +4,10 @@
 
 group("email") {
   deps = [
-    "email_list",
-    "email_list_grid",
-    "email_nav",
-    "email_service:email_service_app",
-    "email_session:email_session_app",
-    "email_story",
-    "email_thread",
-    "email_content_provider",
     "interactive_receipt",
     "interactive_receipt_http",
     "map",
     "music_story",
-    "services",
     "usps",
     "youtube_related_videos",
     "youtube_story",

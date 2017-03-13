@@ -179,7 +179,7 @@ Future<Null> writeIndex(String outputDir, List<WidgetSpecs> widgetSpecs) async {
 const String _kSpecFileTemplate = '''
 {{ header }}
 
-import 'package:config_flutter/config.dart';
+import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:gallery/src/widget_specs/utils.dart';
 import 'package:widget_specs/widget_specs.dart';

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:config_flutter/config.dart';
+import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:widgets/map.dart';
 import 'package:widgets/shopping.dart';

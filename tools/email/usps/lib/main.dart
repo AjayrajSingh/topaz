@@ -13,7 +13,7 @@ import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
-import 'package:config_flutter/config.dart';
+import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:widgets/usps.dart';
@@ -206,7 +206,7 @@ class HomeScreenState extends State<HomeScreen> {
 }
 
 Future<Null> _readAPIKey() async {
-  Config config = await Config.read('assets/config.json');
+  Config config = await Config.read('/system/data/modules/config.json');
   String uspsApiKey = config.get('usps_api_key');
   if (uspsApiKey == null) {
     _log('"usps_aki_key" value is not specified in config.json.');

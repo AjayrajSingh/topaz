@@ -9,13 +9,13 @@ REPO_DIR="$( dirname ${SCRIPT_DIR} )"
 # If config.json files are missing create empty ones so the build doesn't
 # break.
 
-# If email/config.json doesn't exist, make one.
-if [ ! -f email/config.json ]; then
-  echo "{}" >> email/config.json
+# If config.json doesn't exist, make one.
+if [ ! -f config.json ]; then
+  echo "{}" >> config.json
 fi
 
 # Similarly, make one for each of the flutter modules.
-for name in email/email_flutter email/email_service email/map email/usps email/youtube_related_videos email/youtube_video gallery image_picker/image_picker; do
+for name in gallery image_picker/image_picker_android; do
   CONFIG="${REPO_DIR}/${name}/assets/config.json"
   if [ ! -f "${CONFIG}" ]; then
     mkdir -p "$( dirname ${CONFIG} )"

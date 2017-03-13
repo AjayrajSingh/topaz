@@ -97,21 +97,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.11+1"
-  email:
-    description:
-      path: "../../email/modules/email"
-      relative: true
-    source: path
-    version: "0.0.0"
   email_api:
     description:
-      path: "../packages/email_api"
+      path: "../../email/packages/email_api"
       relative: true
     source: path
     version: "0.0.0"
   email_session_store:
     description:
-      path: "../packages/email_session_store"
+      path: "../../email/packages/email_session_store"
       relative: true
     source: path
     version: "0.0.0"

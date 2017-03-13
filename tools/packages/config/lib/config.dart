@@ -3,10 +3,12 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 /// Abstract class providing a basic configuration to be implemented in both
 /// Flutter and CLI/tooling environements.
-abstract class BaseConfig {
+class Config {
   /// OAuth Scopes.
   /// SEE: https://developers.google.com/identity/protocols/googlescopes
   List<String> scopes = <String>[
@@ -21,9 +23,37 @@ abstract class BaseConfig {
 
   final Map<String, dynamic> _data = <String, dynamic>{};
 
-  /// Configuration loading needs to be defined separately for each unique
-  /// environement, Flutter versus CLI.
-  Future<Null> load(String src);
+  /// Convienence method for creating a config object by loading a
+  /// configuration file at [src].
+  static Future<Config> read(String src) async {
+    Config config = new Config();
+    await config.load(src);
+    return config;
+  }
+
+  /// Load configuration from the filesystem.
+  Future<Null> load(String src) async {
+    File file = new File(src);
+
+    String data;
+    dynamic json;
+
+    try {
+      data = await file.readAsString();
+    } catch (err) {
+      String message = 'unable to read file "$src"';
+      throw new StateError(message);
+    }
+
+    try {
+      json = JSON.decode(data);
+    } catch (err) {
+      String message = 'unable to decode JSON \n$data';
+      throw new StateError(message);
+    }
+
+    json.forEach((String key, String value) => this.put(key, value));
+  }
 
   /// Check is the configuration has a value for [key].
   bool has(String key) {

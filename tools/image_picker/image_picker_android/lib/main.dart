@@ -10,7 +10,7 @@ import 'package:widgets/image_picker.dart';
 
 Future<Null> main() async {
   // Get the config object.
-  Config config = await Config.read('assets/config.json');
+  FlutterConfig config = await FlutterConfig.read('assets/config.json');
 
   runApp(new MaterialApp(
     title: 'Image Picker',

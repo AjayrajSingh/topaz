@@ -10,7 +10,7 @@ import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:config_flutter/config.dart';
+import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:widgets/map.dart';
@@ -167,7 +167,7 @@ class HomeScreenState extends State<HomeScreen> {
 }
 
 Future<Null> _readAPIKey() async {
-  Config config = await Config.read('assets/config.json');
+  Config config = await Config.read('/system/data/modules/config.json');
   String googleApiKey = config.get('google_api_key');
   if (googleApiKey == null) {
     _log('"google_api_key" value is not specified in config.json.');

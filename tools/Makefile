@@ -204,7 +204,7 @@ dart-clean:
 # To debug the generation process, pass in "--observe --pause-isolates-on-start"
 # as the DART_FLAGS
 DART_FLAGS ?=
-WIDGET_PACKAGE_DIRS := $(addprefix $(DIRNAME)/, packages/widgets ../calendar/modules/calendar ../chat/modules/chat ../contacts/modules/contacts ../email/modules/email)
+WIDGET_PACKAGE_DIRS := $(addprefix $(DIRNAME)/, packages/widgets ../calendar/modules/calendar ../chat/modules/chat ../contacts/modules/contacts)
 
 .PHONY: dart-gen-specs
 dart-gen-specs: $(DART_BIN) tools/widget_specs/.packages $(addsuffix /.packages, $(WIDGET_PACKAGE_DIRS))
@@ -305,16 +305,17 @@ dart-presubmit-cq: dart-gen-specs dart-fmt-check dart-fmt-extras-check dart-lint
 ################################################################################
 ## Email related targets
 .PHONY: auth
-auth: email/config.json ## Update email auth credentials with a refresh token.
+auth: config.json ## Update email auth credentials with a refresh token.
 	@cd email/tools; \
+	pub get; \
 	pub run bin/oauth.dart
-	@for dir in ../contacts/modules/contacts/assets email/email_flutter/assets email/email_service/assets email/map/assets email/usps/assets email/youtube_related_videos/assets email/youtube_video/assets gallery/assets image_picker/image_picker/assets image_picker/image_picker_android/assets; do \
+	@for dir in ../contacts/modules/contacts/assets gallery/assets image_picker/image_picker/assets image_picker/image_picker_android/assets; do \
 		mkdir -p $${dir}; \
-		cp email/config.json $${dir}/config.json; \
+		cp config.json $${dir}/config.json; \
 	done
 
-email/config.json:
-	@echo "{}" >> email/config.json
+config.json:
+	@echo "{}" >> config.json
 	@echo "==> Config file added."
 	@echo "==> Add missing values and run: make auth."
 

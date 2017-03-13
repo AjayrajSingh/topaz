@@ -11,7 +11,7 @@ dart_package("image_picker_android") {
   source_dir = "lib"
 
   deps = [
-    "//apps/modules/packages/config_flutter",
+    "//apps/modules/packages/config",
     "//apps/modules/packages/widgets",
     "//lib/flutter/packages/flutter",
   ]

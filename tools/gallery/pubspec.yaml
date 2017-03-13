@@ -13,8 +13,6 @@ dependencies:
     path: ../packages/config_flutter
   contacts:
     path: ../../contacts/modules/contacts
-  email:
-    path: ../../email/modules/email
   flutter:
     sdk: flutter
   flutter_markdown:

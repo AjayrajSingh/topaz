@@ -4,14 +4,14 @@
 
 import 'dart:async';
 
-import 'package:config_flutter/config.dart';
+import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 
 import 'app.dart';
 import 'embedded_child_builders.dart';
 
 Future<Null> main() async {
-  Config config = await Config.read('assets/config.json');
+  Config config = await Config.read('/system/data/modules/config.json');
   addEmbeddedChildBuilders(config);
   runApp(new App(config: config));
 }

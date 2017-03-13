@@ -5,5 +5,3 @@
 name: map
 flutter:
   uses-material-design: true
-  assets:
-    - assets/config.json

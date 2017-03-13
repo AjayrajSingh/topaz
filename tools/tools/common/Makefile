@@ -12,15 +12,30 @@ SHELL := /bin/bash
 
 # This Makefile is expected to be included in a parent Makefile for a given
 # project. In order for the conventions used by the tasks defined in this file
-# a PROJECT variable must be set, for example:
+# a PROJECT, FLUTTER_TARGET, and FUCHSIA_TARGET variables must be set, for
+# example:
 #
-#     PROJECT := <project>
+#     PROJECT := email
+#     FLUTTER_TARGET := modules/story
+#     FUCHSIA_TARGET := email_story
 #
 #     include <path to this Makefile>
 #
 ifndef PROJECT
 $(error PROJECT is not set. \
 Before including the common Makefile add "PROJECT := <project>" to \
+"$(firstword $(realpath $(MAKEFILE_LIST)))")
+endif
+
+ifndef FLUTTER_TARGET
+$(error FLUTTER_TARGET is not set. \
+Before including the common Makefile add "FLUTTER_TARGET := <target>" variable to \
+"$(firstword $(realpath $(MAKEFILE_LIST)))")
+endif
+
+ifndef FUCHSIA_TARGET
+$(error PROJECT is not set. \
+Before including the common Makefile add "FUCHSIA_TARGET := <target>" to \
 "$(firstword $(realpath $(MAKEFILE_LIST)))")
 endif
 
@@ -74,11 +89,11 @@ reboot: ## Reboot connected Fuchsia device.
 .PHONY: run
 run: ## Run project on Fuchsia.
 	@echo "=== Don't forget to reboot between builds! ==="
-	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/run.sh $(PROJECT)
+	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/run.sh $(FUCHSIA_TARGET)
 
 .PHONY: flutter-run
 flutter-run: ## Run UI application in modules/<project> via `flutter run`.
-	cd $(root)/modules/$(PROJECT) && \
+	cd $(root)/$(FLUTTER_TARGET) && \
 		$(flutter) upgrade && \
 		$(flutter) build clean && \
 		$(flutter) run --hot

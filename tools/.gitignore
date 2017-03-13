@@ -5,3 +5,4 @@ coverage
 *.mojom.*
 **/.analysis_options
 .packages
+config.json

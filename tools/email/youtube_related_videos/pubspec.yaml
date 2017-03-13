@@ -5,5 +5,3 @@
 name: youtube_related_videos
 flutter:
   uses-material-design: true
-  assets:
-    - assets/config.json

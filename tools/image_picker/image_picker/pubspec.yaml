@@ -5,5 +5,3 @@
 name: image_picker
 flutter:
   uses-material-design: true
-  assets:
-    - assets/config.json
