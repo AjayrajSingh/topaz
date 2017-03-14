@@ -114,34 +114,33 @@ class _DashboardPageState extends State<DashboardPage> {
   void _refreshStatus() {
 
     // fetch config status for ONE item.
-    void __fetchConfigStatus(categoryName, buildName, url) {
+    _fetchConfigStatus(categoryName, buildName, url) async {
 
       BuildStatus status = BuildStatus.PARSEERROR;
 
-      http.get(url).then<Null>((http.Response response) {
-        String html = response.body;
-        if (html == null) {
-          status = BuildStatus.NETWORKERROR;
-        } else {
+      var response = await http.get(url);
+      String html = response.body;
 
-          var dom_tree = parse(html);
-          List<dom.Element> trs = dom_tree.querySelectorAll('tr');
-          for (var tr in trs) {
-              if (tr.className == "danger") {
-              status = BuildStatus.FAILURE;
-              break;
-            }
-            else if (tr.className == "success") {
-              status = BuildStatus.SUCCESS;
-              break;
-            }
+      if (html == null) {
+        status = BuildStatus.NETWORKERROR;
+      } else {
+
+        var dom_tree = parse(html);
+        List<dom.Element> trs = dom_tree.querySelectorAll('tr');
+        for (var tr in trs) {
+            if (tr.className == "danger") {
+            status = BuildStatus.FAILURE;
+            break;
+          }
+          else if (tr.className == "success") {
+            status = BuildStatus.SUCCESS;
+            break;
           }
         }
+      }
 
-        targets_results['${categoryName}']['${buildName}'] = status;
-        setState( () {} );
-
-      }); // http.get
+      targets_results['${categoryName}']['${buildName}'] = status;
+      setState( () {} );
 
     } // _fetchConfigStatus
 
@@ -150,7 +149,7 @@ class _DashboardPageState extends State<DashboardPage> {
     targets_map.forEach((categoryName, buildConfigs){
         for(var config in buildConfigs) {
           String url = kBaseURL + config[0];
-          __fetchConfigStatus(categoryName, config[1], url);
+          _fetchConfigStatus(categoryName, config[1], url);
         }
       }); // targets_forEach
 
@@ -194,10 +193,6 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) { 
     // This method is rerun every time setState is called, for instance
     // as done by the _refreshStatus method above.
-    // The Flutter framework has been optimized to make rerunning
-    // build methods fast, so that you can just rebuild anything that
-    // needs updating rather than having to individually change
-    // instances of widgets.
 
     if (ui.window.physicalSize.width > ui.window.physicalSize.height)
       return buildLandcape(context);
@@ -239,7 +234,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Fuchsia Build Status ${ui.window.physicalSize.width.toInt()}x${ui.window.physicalSize.height.toInt()} DPI=${ui.window.devicePixelRatio.toInt()}'),
+        title: new Text('Fuchsia Build Status ${ui.window.physicalSize.width.toInt()}x${ui.window.physicalSize.height.toInt()} DPR=${ui.window.devicePixelRatio.toInt()}'),
       ),
       body: new Container( 
         padding: new EdgeInsets.all(20.0),
