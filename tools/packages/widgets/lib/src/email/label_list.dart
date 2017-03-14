@@ -99,7 +99,7 @@ class LabelList extends StatelessWidget {
     return new Container(
       alignment: FractionalOffset.centerLeft,
       height: _kProfileHeaderHeight,
-      child: new ListItem(
+      child: new ListTile(
         title: new Text(
           user.name,
           softWrap: false,

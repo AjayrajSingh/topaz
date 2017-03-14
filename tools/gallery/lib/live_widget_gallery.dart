@@ -51,9 +51,9 @@ class _LiveWidgetGalleryState extends State<LiveWidgetGallery> {
 
   Widget _buildMenu() {
     List<String> widgetNames = kWidgetSpecs.keys.toList()..sort();
-    List<ListItem> items = widgetNames
+    List<ListTile> tiles = widgetNames
         .map((String name) => kWidgetSpecs[name])
-        .map((WidgetSpecs specs) => new ListItem(
+        .map((WidgetSpecs specs) => new ListTile(
               title: new Text(specs.name),
               subtitle: new Text(specs.doc?.split('\n')?.first),
               onTap: () => _selectWidget(specs),
@@ -61,7 +61,7 @@ class _LiveWidgetGalleryState extends State<LiveWidgetGallery> {
         .toList();
 
     return new Drawer(
-      child: new ListView(children: items),
+      child: new ListView(children: tiles),
       elevation: 4,
     );
   }

@@ -120,7 +120,7 @@ class ThreadListItemSingleLine extends StatelessWidget {
 
     final Widget listItem = new Material(
       color: Colors.white,
-      child: new ListItem(
+      child: new ListTile(
         enabled: true,
         onTap: _handleSelect,
         isThreeLine: false,

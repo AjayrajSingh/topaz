@@ -127,7 +127,7 @@ class ThreadListItem extends StatelessWidget {
 
     final Widget listItem = new Material(
       color: isSelected ? _kSelectedBgColor : Colors.white,
-      child: new ListItem(
+      child: new ListTile(
         enabled: true,
         onTap: _handleSelect,
         isThreeLine: true,

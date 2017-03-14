@@ -86,21 +86,21 @@ class MessageListItem extends StatelessWidget {
                 <PopupMenuItem<MessageActionCallback>>[
                   new PopupMenuItem<MessageActionCallback>(
                     value: onReply,
-                    child: new ListItem(
+                    child: new ListTile(
                       leading: new Icon(Icons.reply),
                       title: new Text('Reply'),
                     ),
                   ),
                   new PopupMenuItem<MessageActionCallback>(
                     value: onReplyAll,
-                    child: new ListItem(
+                    child: new ListTile(
                       leading: new Icon(Icons.reply_all),
                       title: new Text('Reply All'),
                     ),
                   ),
                   new PopupMenuItem<MessageActionCallback>(
                     value: onForward,
-                    child: new ListItem(
+                    child: new ListTile(
                       leading: new Icon(Icons.forward),
                       title: new Text('Forward'),
                     ),
@@ -163,7 +163,7 @@ class MessageListItem extends StatelessWidget {
     final Widget messageSubtitle = _buildMessageSubtitle();
 
     final List<Widget> childWidgets = <Widget>[
-      new ListItem(
+      new ListTile(
         key: new ObjectKey(message),
         enabled: true,
         onTap: _handleHeaderTap,

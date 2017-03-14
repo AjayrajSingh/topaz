@@ -69,7 +69,7 @@ class LabelListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Material(
       color: selected ? Colors.grey[200] : Colors.white,
-      child: new ListItem(
+      child: new ListTile(
         enabled: true,
         onTap: _handleSelect,
         isThreeLine: false,
