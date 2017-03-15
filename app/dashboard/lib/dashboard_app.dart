@@ -117,9 +117,14 @@ class _DashboardPageState extends State<DashboardPage> {
     _fetchConfigStatus(categoryName, buildName, url) async {
 
       BuildStatus status = BuildStatus.PARSEERROR;
+      String html = null;
 
-      var response = await http.get(url);
-      String html = response.body;
+      try {
+        var response = await http.get(url);
+        html = response.body;
+      } catch (error) {
+          status = BuildStatus.NETWORKERROR;
+      }
 
       if (html == null) {
         status = BuildStatus.NETWORKERROR;
