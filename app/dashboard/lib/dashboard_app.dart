@@ -211,16 +211,16 @@ class _DashboardPageState extends State<DashboardPage> {
     // as done by the _refreshStatus method above.
 
     if (ui.window.physicalSize.width > ui.window.physicalSize.height)
-      return buildLandcape(context);
+      return _buildLandcape(context);
     else
-      return buildPortrait(context);
+      return _buildPortrait(context);
   }
 
-  Widget buildPortrait(BuildContext context) {
-    return buildLandcape(context); // TODO
+  Widget _buildPortrait(BuildContext context) {
+    return _buildLandcape(context); // TODO
   }
 
-  Widget buildLandcape(BuildContext context) {
+  Widget _buildLandcape(BuildContext context) {
 
     var rows = new List();
     targets_results.forEach((k,v) {
