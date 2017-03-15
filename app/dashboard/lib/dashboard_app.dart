@@ -18,6 +18,13 @@ enum BuildStatus {
 
 final String kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
 
+class BuildInfo {
+  BuildStatus status = BuildStatus.UNKNOWN;
+  String url;
+
+  BuildInfo({this.status, this.url});
+}
+
 var targets_map = {
   'fuchsia': [
     ['fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'],
@@ -95,9 +102,12 @@ class _DashboardPageState extends State<DashboardPage> {
     targets_results = new Map();
 
     targets_map.forEach((categoryName,buildConfigs) {
-        var this_map = new Map<String, BuildStatus>();
+        var this_map = new Map<String, BuildInfo>();
         for(var config in buildConfigs) {
-         this_map[config[1]] =BuildStatus.UNKNOWN;
+         this_map[config[1]] = new BuildInfo(
+            status: BuildStatus.UNKNOWN,
+            url: "http://www.google.com"
+          );
         }
         targets_results[categoryName] = this_map;
       });
@@ -144,7 +154,8 @@ class _DashboardPageState extends State<DashboardPage> {
         }
       }
 
-      targets_results['${categoryName}']['${buildName}'] = status;
+      targets_results['${categoryName}']['${buildName}'].status = status;
+      targets_results['${categoryName}']['${buildName}'].url = url;
       setState( () {} );
 
     } // _fetchConfigStatus
@@ -178,14 +189,14 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  Widget _buildResultWidget(String name, BuildStatus status) {
+  Widget _buildResultWidget(String name, BuildInfo bi) {
     return new Expanded( child: new GestureDetector(
       onTap: () {
-        _launchUrl("https://luci-scheduler.appspot.com");
+        _launchUrl(bi.url);
       },
       child:
         new Container(
-          decoration: new BoxDecoration(backgroundColor: _colorFromBuildStatus(status)),
+          decoration: new BoxDecoration(backgroundColor: _colorFromBuildStatus(bi.status)),
           padding: const EdgeInsets.symmetric(vertical:16.0,
                       horizontal: 4.0),
           margin: const EdgeInsets.symmetric(horizontal:8.0),
@@ -226,8 +237,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
         // the builds
         var builds = new List();
-        v.forEach((name, status) {
-          builds.add(_buildResultWidget(name,status));
+        v.forEach((name, status_obj) {
+          builds.add(_buildResultWidget(name,status_obj));
         });
 
         rows.add(new Row(
