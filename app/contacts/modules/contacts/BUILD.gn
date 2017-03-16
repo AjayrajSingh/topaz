@@ -13,10 +13,9 @@ flutter_app("contacts") {
     "//application/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
-    "//apps/modules/packages/config_flutter",
-    "//apps/modules/packages/fixtures",
-    "//apps/modules/packages/widgets",
-    "//apps/modules/packages/widgets_meta",
+    "//apps/modules/common/packages/fixtures",
+    "//apps/modules/common/packages/widgets",
+    "//apps/modules/common/packages/widgets_meta",
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
@@ -24,5 +23,5 @@ flutter_app("contacts") {
     "//third_party/dart-pkg/pub/googleapis",
   ]
 
-  analysis_options = "//apps/modules/.analysis_options"
+  analysis_options = "//apps/modules/common/.analysis_options"
 }

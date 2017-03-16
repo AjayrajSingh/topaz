@@ -44,7 +44,7 @@ class ContactListItem extends StatelessWidget {
 
     return new Material(
       color: Colors.white,
-      child: new ListItem(
+      child: new ListTile(
         enabled: true,
         onTap: _handleSelect,
         isThreeLine: false,

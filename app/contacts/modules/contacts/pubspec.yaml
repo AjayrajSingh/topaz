@@ -5,16 +5,14 @@
 name: contacts
 description: Flutter app to run Contacts
 dependencies:
-  config_flutter:
-    path: ../../../modules/packages/config_flutter
   flutter:
     sdk: flutter
   fixtures:
-    path: ../../../modules/packages/fixtures
+    path: ../../../common/packages/fixtures
   widgets:
-    path: ../../../modules/packages/widgets
+    path: ../../../common/packages/widgets
   widgets_meta:
-    path: ../../../modules/packages/widgets_meta
+    path: ../../../common/packages/widgets_meta
 dev_dependencies:
   test: any
   flutter_test:

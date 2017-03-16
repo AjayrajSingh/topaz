@@ -4,7 +4,7 @@
 
 group("contacts") {
   deps = [
-    "//apps/contacts/modules",
-    "//apps/contacts/services",
+    "//apps/modules/contacts/modules",
+    "//apps/modules/contacts/services",
   ]
 }

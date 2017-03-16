@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:config_flutter/config.dart';
+// import 'package:config_flutter/config.dart';
 import 'package:googleapis/people/v1.dart' as contact;
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
@@ -58,23 +58,26 @@ class ContactAPI {
 
   /// Create an instance of [ContactAPI] by loading a config file.
   static Future<ContactAPI> fromConfig(String src) async {
-    Config config = await Config.read(src);
-    List<String> keys = <String>[
-      'oauth_id',
-      'oauth_secret',
-      'oauth_token',
-      'oauth_token_expiry',
-      'oauth_refresh_token',
-    ];
-    config.validate(keys);
-
-    return new ContactAPI(
-        id: config.get('oauth_id'),
-        secret: config.get('oauth_secret'),
-        token: config.get('oauth_token'),
-        expiry: DateTime.parse(config.get('oauth_token_expiry')),
-        refreshToken: config.get('oauth_refresh_token'),
-        scopes: config.scopes);
+    // TODO(youngseokyoon): restore the config.
+    // https://fuchsia.atlassian.net/browse/SO-285
+    return new ContactAPI();
+    // Config config = await Config.read(src);
+    // List<String> keys = <String>[
+    //   'oauth_id',
+    //   'oauth_secret',
+    //   'oauth_token',
+    //   'oauth_token_expiry',
+    //   'oauth_refresh_token',
+    // ];
+    // config.validate(keys);
+    //
+    // return new ContactAPI(
+    //     id: config.get('oauth_id'),
+    //     secret: config.get('oauth_secret'),
+    //     token: config.get('oauth_token'),
+    //     expiry: DateTime.parse(config.get('oauth_token_expiry')),
+    //     refreshToken: config.get('oauth_refresh_token'),
+    //     scopes: config.scopes);
   }
 
   /// Gets a [Contact] from the Google People API
