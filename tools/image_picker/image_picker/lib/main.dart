@@ -110,7 +110,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   // Fetches the search key and search ID from config.json
   Future<Null> _readConfig() async {
-    Config config = await Config.read('assets/config.json');
+    Config config = await Config.read('/system/data/modules/config.json');
     String searchKey = config.get('google_search_key');
     String searchId = config.get('google_search_id');
     if (searchKey == null || searchId == null) {
