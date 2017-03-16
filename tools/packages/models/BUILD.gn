@@ -10,9 +10,9 @@ dart_package("models") {
   source_dir = "lib"
 
   deps = [
-    "//apps/modules/packages/fixtures",
-    "//apps/modules/packages/util",
-    "//apps/modules/packages/widgets_meta",
+    "//apps/modules/common/packages/fixtures",
+    "//apps/modules/common/packages/util",
+    "//apps/modules/common/packages/widgets_meta",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/intl",
@@ -20,5 +20,5 @@ dart_package("models") {
     "//third_party/dart-pkg/pub/xml",
   ]
 
-  analysis_options = "//apps/modules/.analysis_options"
+  analysis_options = "//apps/modules/common/.analysis_options"
 }

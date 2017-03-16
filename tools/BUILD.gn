@@ -2,11 +2,11 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("modules") {
+group("common") {
   deps = [
-    "//apps/modules/color",
-    "//apps/modules/email",
-    "//apps/modules/image_picker/image_picker",
+    "//apps/modules/common/color",
+    "//apps/modules/common/email",
+    "//apps/modules/common/image_picker/image_picker",
   ]
 }
 
@@ -14,9 +14,9 @@ group("test") {
   testonly = true
 
   deps = [
-    "//apps/modules/packages/fixtures/test",
-    "//apps/modules/packages/models/test",
-    "//apps/modules/packages/util/test",
-    "//apps/modules/packages/widgets/test",
+    "//apps/modules/common/packages/fixtures/test",
+    "//apps/modules/common/packages/models/test",
+    "//apps/modules/common/packages/util/test",
+    "//apps/modules/common/packages/widgets/test",
   ]
 }

@@ -14,5 +14,5 @@ dart_package("util") {
     "//third_party/dart-pkg/pub/intl",
   ]
 
-  analysis_options = "//apps/modules/.analysis_options"
+  analysis_options = "//apps/modules/common/.analysis_options"
 }

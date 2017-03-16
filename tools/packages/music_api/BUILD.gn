@@ -10,10 +10,10 @@ dart_package("music_api") {
   source_dir = "lib"
 
   deps = [
-    "//apps/modules/packages/models",
+    "//apps/modules/common/packages/models",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/http",
   ]
 
-  analysis_options = "//apps/modules/.analysis_options"
+  analysis_options = "//apps/modules/common/.analysis_options"
 }

@@ -40,8 +40,8 @@ Before including the common Makefile add "FUCHSIA_TARGET := <target>" to \
 endif
 
 root ?= $(shell git rev-parse --show-toplevel)
-fuchsia_root ?= $(realpath $(root)/../..)
-common_root ?= $(realpath $(fuchsia_root)/apps/modules/tools/common)
+fuchsia_root ?= $(realpath $(root)/../../..)
+common_root ?= $(realpath $(fuchsia_root)/apps/modules/common/tools/common)
 tools_root := $(realpath $(common_root)/..)
 fuchsia_out := $(realpath $(fuchsia_root)/out)
 flutter_root := $(fuchsia_root)/lib/flutter

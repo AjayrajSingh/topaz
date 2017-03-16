@@ -10,15 +10,15 @@ dart_package("widgets") {
   source_dir = "lib"
 
   deps = [
-    "//apps/email/packages/email_session_store",
-    "//apps/modules/packages/google_search_api",
-    "//apps/modules/packages/models",
-    "//apps/modules/packages/music_api",
-    "//apps/modules/packages/widgets_meta",
+    "//apps/modules/common/packages/google_search_api",
+    "//apps/modules/common/packages/models",
+    "//apps/modules/common/packages/music_api",
+    "//apps/modules/common/packages/widgets_meta",
+    "//apps/modules/email/packages/email_session_store",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/xml",
     "//third_party/dart-pkg/pub/http",
   ]
 
-  analysis_options = "//apps/modules/.analysis_options"
+  analysis_options = "//apps/modules/common/.analysis_options"
 }

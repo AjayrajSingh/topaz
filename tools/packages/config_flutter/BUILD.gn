@@ -10,9 +10,9 @@ dart_package("config_flutter") {
   source_dir = "lib"
 
   deps = [
-    "//apps/modules/packages/config",
+    "//apps/modules/common/packages/config",
     "//lib/flutter/packages/flutter",
   ]
 
-  analysis_options = "//apps/modules/.analysis_options"
+  analysis_options = "//apps/modules/common/.analysis_options"
 }

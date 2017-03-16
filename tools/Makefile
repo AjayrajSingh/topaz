@@ -11,7 +11,7 @@ SHELL := /bin/bash
 .SUFFIXES:
 
 DIRNAME := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-FUCHSIA_ROOT := $(realpath $(DIRNAME)/../..)
+FUCHSIA_ROOT := $(realpath $(DIRNAME)/../../..)
 FLUTTER_ROOT := $(FUCHSIA_ROOT)/lib/flutter
 FLUTTER_BIN := $(FLUTTER_ROOT)/bin
 DART_BIN := $(FLUTTER_BIN)/cache/dart-sdk/bin
@@ -277,7 +277,7 @@ dart-lint: dart-base
 	@# with BUILD.gn files.
 	@$(FUCHSIA_ROOT)/scripts/run-dart-analysis.py \
 			--out=$(OUT_DIR)/$(FUCHSIA_VARIANT)-x86-64 \
-			--tree=//apps/modules/* \
+			--tree=//apps/modules/common/common/* \
 			$(DART_ANALYSIS_FLAGS)
 	@# Next, run the dartanalyzer for regular dart packages without BUILD.gn
 	@for pkg in $(DART_PACKAGES_NO_FUCHSIA); do \

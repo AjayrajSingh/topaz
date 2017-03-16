@@ -13,5 +13,5 @@ dart_package("google_search_api") {
     "//lib/flutter/packages/flutter",
   ]
 
-  analysis_options = "//apps/modules/.analysis_options"
+  analysis_options = "//apps/modules/common/.analysis_options"
 }

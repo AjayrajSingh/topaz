@@ -10,11 +10,11 @@ dart_package("fixtures") {
   source_dir = "lib"
 
   deps = [
-    "//apps/modules/packages/util",
+    "//apps/modules/common/packages/util",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/lorem",
     "//third_party/dart-pkg/pub/uuid",
   ]
 
-  analysis_options = "//apps/modules/.analysis_options"
+  analysis_options = "//apps/modules/common/.analysis_options"
 }
