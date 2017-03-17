@@ -49,7 +49,7 @@ class YoutubeThumbnail extends StatelessWidget {
         onTap: _handleSelect,
         child: new Image.network(
           _getYoutubeThumbnailUrl(),
-          fit: ImageFit.cover,
+          fit: BoxFit.cover,
         ),
       ),
     );

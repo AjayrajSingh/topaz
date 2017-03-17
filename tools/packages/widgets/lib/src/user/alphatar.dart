@@ -82,7 +82,7 @@ class Alphatar extends StatelessWidget {
                   avatarUrl,
                   width: size,
                   height: size,
-                  fit: ImageFit.cover,
+                  fit: BoxFit.cover,
                 )
               : null,
           letter: letter,

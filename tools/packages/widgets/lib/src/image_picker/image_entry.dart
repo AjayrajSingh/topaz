@@ -66,7 +66,7 @@ class ImageEntry extends StatelessWidget {
                 height: selected ? size * _kSelectSizeRatio : size,
                 child: new Image.network(
                   imageUrl,
-                  fit: ImageFit.cover,
+                  fit: BoxFit.cover,
                   gaplessPlayback: true,
                 ),
               ),

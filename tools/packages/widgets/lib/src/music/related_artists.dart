@@ -75,7 +75,7 @@ class _RelatedArtistsState extends State<RelatedArtists> {
             margin: const EdgeInsets.only(right: 16.0),
             child: new Image.network(
               artist.images.first.url,
-              fit: ImageFit.cover,
+              fit: BoxFit.cover,
             ),
           ),
           new Expanded(

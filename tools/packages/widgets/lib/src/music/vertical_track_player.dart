@@ -131,7 +131,7 @@ class VerticalTrackPlayer extends StatelessWidget {
           flex: 3,
           child: new Image.network(
             album.images.first.url,
-            fit: ImageFit.cover,
+            fit: BoxFit.cover,
           ),
         ),
         // Track Info

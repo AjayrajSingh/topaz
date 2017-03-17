@@ -206,7 +206,7 @@ class _YoutubeSlideShowState extends State<_YoutubeSlideShow> {
     return new Image.network(
       _currentThumbnailURL,
       gaplessPlayback: true,
-      fit: ImageFit.cover,
+      fit: BoxFit.cover,
     );
   }
 }

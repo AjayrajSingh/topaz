@@ -60,7 +60,7 @@ class StaticMap extends StatelessWidget {
         height: height,
         width: width,
         gaplessPlayback: true,
-        fit: ImageFit.cover,
+        fit: BoxFit.cover,
       );
     }
   }
