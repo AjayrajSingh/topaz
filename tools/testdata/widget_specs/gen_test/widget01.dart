@@ -19,7 +19,7 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
   name: 'Widget01',
   path: 'exported.dart',
   pathFromFuchsiaRoot:
-      'apps/modules/testdata/widget_specs/extract_test/mock_package/lib/src/sample_widgets.dart',
+      'apps/modules/common/testdata/widget_specs/extract_test/mock_package/lib/src/sample_widgets.dart',
   doc: '''
 This is a public [StatefulWidget].''',
   exampleWidth: 200.0,

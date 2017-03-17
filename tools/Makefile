@@ -277,7 +277,7 @@ dart-lint: dart-base
 	@# with BUILD.gn files.
 	@$(FUCHSIA_ROOT)/scripts/run-dart-analysis.py \
 			--out=$(OUT_DIR)/$(FUCHSIA_VARIANT)-x86-64 \
-			--tree=//apps/modules/common/common/* \
+			--tree=//apps/modules/common/* \
 			$(DART_ANALYSIS_FLAGS)
 	@# Next, run the dartanalyzer for regular dart packages without BUILD.gn
 	@for pkg in $(DART_PACKAGES_NO_FUCHSIA); do \

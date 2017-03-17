@@ -19,7 +19,7 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
   name: 'ConfigKeyWidget',
   path: 'exported.dart',
   pathFromFuchsiaRoot:
-      'apps/modules/testdata/widget_specs/extract_test/mock_package/lib/src/config_key_widget.dart',
+      'apps/modules/common/testdata/widget_specs/extract_test/mock_package/lib/src/config_key_widget.dart',
   doc: '''
 Sample widget for demonstrating the use of @ConfigKey annotation.''',
   exampleWidth: null,

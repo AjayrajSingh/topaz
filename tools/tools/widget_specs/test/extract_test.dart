@@ -22,6 +22,7 @@ Future<Null> main() async {
     '..',
     '..',
     '..',
+    '..',
   );
 
   // Run 'flutter packages get'
@@ -96,7 +97,7 @@ Future<Null> main() async {
       expect(
           widgetMap[key].pathFromFuchsiaRoot,
           equals(
-              'apps/modules/testdata/widget_specs/extract_test/mock_package/lib/src/${expected[key]}'));
+              'apps/modules/common/testdata/widget_specs/extract_test/mock_package/lib/src/${expected[key]}'));
     });
   });
 

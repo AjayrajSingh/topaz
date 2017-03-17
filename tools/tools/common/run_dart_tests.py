@@ -21,7 +21,7 @@ import sys
 import threading
 
 REPO_ROOT = os.path.dirname(os.path.dirname(sys.path[0]))
-FUCHSIA_ROOT = os.path.dirname(os.path.dirname(REPO_ROOT))
+FUCHSIA_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(REPO_ROOT)))
 WORKING_DIR = os.getcwd()
 
 

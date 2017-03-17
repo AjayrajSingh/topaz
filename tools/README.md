@@ -17,14 +17,12 @@ Listen to device logs:
 
     $FUCHSIA_DIR/out/build-magenta/tools/loglistener
 
-# Email
+# Configure
 
-## Configure
-
-Add `email/config.json` in this directory, it will be ignored by version control.
+Add `config.json` in this directory, it will be ignored by version control.
 
     # Using make
-    make email/config.json
+    make config.json
 
 Then add two values required for OAuth.
 
@@ -40,7 +38,7 @@ To setup Google Image Search for the Image Picker, add these additional values
     "google_search_id": "<ID of Custom Search Engine>"
   }
 
-## Authenticate
+# Authenticate
 
 Once you have the OAuth id and secret it is possible to generate refresh
 credentials with:
@@ -49,7 +47,7 @@ credentials with:
 
 Follow the link in the instructions.
 
-## Build
+# Build
 
 Make sure to start from a "very clean build" (remove $FUCHSIA_DIR/out) if you have built before but didn't do the auth steps above. There is a make task to help with this:
 
@@ -62,7 +60,7 @@ This will clean and create a release build. To do this manually you can use:
     fset x86-64 --release --modules default
     fbuild
 
-## Run
+# Run
 
 Assuming you have an Acer properly networked and running `fboot` in another
 terminal session you can run email two different ways.
@@ -74,3 +72,6 @@ Running with the full sysui
 Running the email story directly
 
     netruncmd : "@boot device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=email_story"
+
+You can run any top-level module in the same way by replacing `email_story` with
+the name of the top-level module.
