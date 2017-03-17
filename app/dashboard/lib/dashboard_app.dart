@@ -56,7 +56,6 @@ var targets_map = {
 
 
 class DashboardApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -97,7 +96,9 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   BuildStatus _status = BuildStatus.UNKNOWN;
   var targets_results;
-  Timer _refreshTimer;
+  Timer _refresh_timer;
+  DateTime _start_time = new DateTime.now();
+
 
   @override
   initState() {
@@ -116,7 +117,7 @@ class _DashboardPageState extends State<DashboardPage> {
         targets_results[categoryName] = this_map;
       });
 
-    _refreshTimer = new Timer.periodic(const Duration(seconds: 60), _refreshTimerFired);
+    _refresh_timer = new Timer.periodic(const Duration(seconds: 60), _refreshTimerFired);
     _refreshStatus();
   }
 
@@ -185,9 +186,9 @@ class _DashboardPageState extends State<DashboardPage> {
       case BuildStatus.SUCCESS:
         return Colors.green[100];
       case BuildStatus.FAILURE:
-        return Colors.red[100];
+        return Colors.red[400];
       case BuildStatus.NETWORKERROR:
-        return Colors.purple[400];
+        return Colors.purple[100];
       default:
         return Colors.black12;
     }
@@ -201,10 +202,9 @@ class _DashboardPageState extends State<DashboardPage> {
       child:
         new Container(
           decoration: new BoxDecoration(backgroundColor: _colorFromBuildStatus(bi.status)),
-          padding: const EdgeInsets.symmetric(vertical:16.0,
-                      horizontal: 4.0),
-          margin: const EdgeInsets.symmetric(horizontal:8.0),
-          child: new Text(name,
+          padding: const EdgeInsets.symmetric(vertical:16.0, horizontal: 4.0),
+          margin: const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 8.0),
+            child: new Text(name,
             style:new TextStyle(color:Colors.black, fontSize:12.0)),
         )) );
   }
@@ -227,22 +227,19 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildLandcape(BuildContext context) {
 
     var rows = new List();
-    targets_results.forEach((k,v) {
 
-        // Category
-        rows.add(
-          new Container(
-            padding: new EdgeInsets.fromLTRB(0.0, 32.0, 0.0, 0.0),
-            child:
-          new Row(children:[new Text(k, 
-          style: new TextStyle(fontSize:9.0))]),
-          ),
-        );
+    Duration uptime = new DateTime.now().difference(_start_time);
+
+    rows.add(
+      new Container(
+        child: new Text("${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m uptime", style: new TextStyle(fontSize:11.0))));
+
+    targets_results.forEach((k,v) {
 
         // the builds
         var builds = new List();
         v.forEach((name, status_obj) {
-          builds.add(_buildResultWidget(name,status_obj));
+          builds.add(_buildResultWidget("${k}\n${name}",status_obj));
         });
 
         rows.add(new Row(
@@ -254,10 +251,10 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Fuchsia Build Status ${ui.window.physicalSize.width.toInt()}x${ui.window.physicalSize.height.toInt()} DPR=${ui.window.devicePixelRatio.toInt()}'),
+      title: new Text('Fuchsia Build Status ${ui.window.physicalSize.width.toInt()}x${ui.window.physicalSize.height.toInt()}'),
       ),
       body: new Container( 
-        padding: new EdgeInsets.all(20.0),
+        //padding: new EdgeInsets.all(20.0),
         child: new Column (
           children: rows,
         ), ),
