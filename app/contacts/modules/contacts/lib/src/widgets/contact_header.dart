@@ -45,7 +45,7 @@ class ContactHeader extends StatelessWidget {
           image: new NetworkImage(contact.backgroundImageUrl != null
               ? contact.backgroundImageUrl
               : _kDefaultBackgroundImage),
-          fit: ImageFit.cover,
+          fit: BoxFit.cover,
           colorFilter: new ColorFilter.mode(
             primaryColor.withAlpha(30),
             BlendMode.color,
