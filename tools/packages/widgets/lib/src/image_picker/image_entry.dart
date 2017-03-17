@@ -67,6 +67,7 @@ class ImageEntry extends StatelessWidget {
                 child: new Image.network(
                   imageUrl,
                   fit: ImageFit.cover,
+                  gaplessPlayback: true,
                 ),
               ),
             ),

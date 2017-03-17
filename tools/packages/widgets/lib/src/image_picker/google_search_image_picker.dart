@@ -54,6 +54,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   InputValue _currentInput = InputValue.empty;
   bool _isLoading = false;
   Timer _timer;
+  String _lastSearchQuery;
   // Give a Google query a "count" so that a slower query doesn't overwrite
   // a later query that resolves faster.
   int _counter = 0;
@@ -80,6 +81,9 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       _isLoading || _sourceImages.isNotEmpty || _currentInput.text.isNotEmpty;
 
   Future<Null> _search(String query) async {
+    if(query == _lastSearchQuery) {
+      return null;
+    }
     if (query.isEmpty) {
       setState(() {
         _sourceImages = <String>[];
@@ -97,6 +101,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       );
       if (currentCount == _counter) {
         setState(() {
+          _lastSearchQuery = query;
           _sourceImages = images;
           _isLoading = false;
         });
