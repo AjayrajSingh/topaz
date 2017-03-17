@@ -4,7 +4,6 @@
 
 import 'dart:async';
 
-// import 'package:config_flutter/config.dart';
 import 'package:googleapis/people/v1.dart' as contact;
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
