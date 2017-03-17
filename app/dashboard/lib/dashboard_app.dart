@@ -232,7 +232,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
     rows.add(
       new Container(
-        child: new Text("${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m uptime", style: new TextStyle(fontSize:11.0))));
+        child: new Text("${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m uptime", 
+              style: new TextStyle(fontSize:11.0)
+          )
+        )
+      );
 
     targets_results.forEach((k,v) {
 
@@ -251,7 +255,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return new Scaffold(
       appBar: new AppBar(
-      title: new Text('Fuchsia Build Status ${ui.window.physicalSize.width.toInt()}x${ui.window.physicalSize.height.toInt()}'),
+      title: new Text('Fuchsia Build Status'),
       ),
       body: new Container( 
         //padding: new EdgeInsets.all(20.0),
