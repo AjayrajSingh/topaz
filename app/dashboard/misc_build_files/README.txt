@@ -1,4 +1,4 @@
-1. Place 'dashboard' into //packages/gn/
+1. Place 'fuchsia_build_status' into //packages/gn/
 
 2. Edit //packages/gn/modules to include "dashboard" in the "imports" section.
 
