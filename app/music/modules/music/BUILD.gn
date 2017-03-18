@@ -13,6 +13,7 @@ flutter_app("music") {
     "//application/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
+    "//apps/modules/common/packages/fixtures",
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",

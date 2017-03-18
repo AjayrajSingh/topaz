@@ -8,6 +8,8 @@ description: Music Story.
 dependencies:
   flutter:
     sdk: flutter
+  fixtures:
+    path: ../../../common/packages/fixtures
 flutter:
   uses-material-design: true
 dev_dependencies:
