@@ -10,8 +10,6 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:core';
 import 'dart:async';
-import 'dart:convert';
-import 'dart:ui' as ui;
 
 enum BuildStatus { UNKNOWN, NETWORKERROR, PARSEERROR, SUCCESS, FAILURE }
 
@@ -27,28 +25,29 @@ class BuildInfo {
   BuildInfo({this.status, this.url});
 }
 
-var targets_map = {
-  'fuchsia': [
-    ['fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'],
-    ['fuchsia/linux-arm64-debug', 'linux-arm64-debug'],
-    ['fuchsia/linux-x86-64-release', 'linux-x86-64-release'],
-    ['fuchsia/linux-arm64-release', 'linux-arm64-release'],
+const Map<String, List<List<String>>> targets_map =
+    const <String, List<List<String>>>{
+  'fuchsia': const [
+    const ['fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'],
+    const ['fuchsia/linux-arm64-debug', 'linux-arm64-debug'],
+    const ['fuchsia/linux-x86-64-release', 'linux-x86-64-release'],
+    const ['fuchsia/linux-arm64-release', 'linux-arm64-release'],
   ],
-  'fuchsia-drivers': [
-    ['fuchsia/drivers-linux-x86-64-debug', 'linux-x86-64-debug'],
-    ['fuchsia/drivers-linux-arm64-debug', 'linux-arm64-debug'],
-    ['fuchsia/drivers-linux-x86-64-release', 'linux-x86-64-release'],
-    ['fuchsia/drivers-linux-arm64-release', 'linux-arm64-release'],
+  'fuchsia-drivers': const [
+    const ['fuchsia/drivers-linux-x86-64-debug', 'linux-x86-64-debug'],
+    const ['fuchsia/drivers-linux-arm64-debug', 'linux-arm64-debug'],
+    const ['fuchsia/drivers-linux-x86-64-release', 'linux-x86-64-release'],
+    const ['fuchsia/drivers-linux-arm64-release', 'linux-arm64-release'],
   ],
-  'magenta': [
-    ['magenta/arm64-linux-gcc', 'arm64-linux-gcc'],
-    ['magenta/x86-64-linux-gcc', 'x86-64-linux-gcc'],
-    ['magenta/arm64-linux-clang', 'arm64-linux-clang'],
-    ['magenta/x86-64-linux-clang', 'x86-64-linux-clang'],
+  'magenta': const [
+    const ['magenta/arm64-linux-gcc', 'arm64-linux-gcc'],
+    const ['magenta/x86-64-linux-gcc', 'x86-64-linux-gcc'],
+    const ['magenta/arm64-linux-clang', 'arm64-linux-clang'],
+    const ['magenta/x86-64-linux-clang', 'x86-64-linux-clang'],
   ],
-  'jiri': [
-    ['jiri/linux-x86-64', 'linux-x86-64'],
-    ['jiri/mac-x86-64', 'mac-x86-64'],
+  'jiri': const [
+    const ['jiri/linux-x86-64', 'linux-x86-64'],
+    const ['jiri/mac-x86-64', 'mac-x86-64'],
   ]
 };
 
@@ -58,13 +57,6 @@ class DashboardApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Fuchsia Build Status',
       theme: new ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting
-        // the app, try changing the primarySwatch below to Colors.green
-        // and press "r" in the console where you ran "flutter run".
-        // We call this a "hot reload".
         primarySwatch: Colors.blue,
       ),
       home: new DashboardPage(title: 'Fuchsia Build Status'),
@@ -75,15 +67,6 @@ class DashboardApp extends StatelessWidget {
 class DashboardPage extends StatefulWidget {
   DashboardPage({Key key, this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful,
-  // meaning that it has a State object (defined below) that contains
-  // fields that affect how it looks.
-
-  // This class is the configuration for the state. It holds the
-  // values (in this case the title) provided by the parent (in this
-  // case the App widget) and used by the build method of the State.
-  // Fields in a Widget subclass are always marked "final".
-
   final String title;
 
   @override
@@ -91,13 +74,12 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  BuildStatus _status = BuildStatus.UNKNOWN;
   var targets_results;
-  Timer _refresh_timer;
   DateTime _start_time = new DateTime.now();
 
   @override
-  initState() {
+  void initState() {
+    super.initState();
     // From the targets map, create a data structure which we'll be populating
     // the build results into, as they come in async.
     targets_results = new Map();
@@ -106,19 +88,21 @@ class _DashboardPageState extends State<DashboardPage> {
       var this_map = new Map<String, BuildInfo>();
       for (var config in buildConfigs) {
         this_map[config[1]] = new BuildInfo(
-            status: BuildStatus.UNKNOWN, url: "http://www.google.com");
+          status: BuildStatus.UNKNOWN,
+          url: "http://www.google.com",
+        );
       }
       targets_results[categoryName] = this_map;
     });
 
-    _refresh_timer =
-        new Timer.periodic(const Duration(seconds: 60), _refreshTimerFired);
+    new Timer.periodic(
+      const Duration(seconds: 60),
+      _refreshTimerFired,
+    );
     _refreshStatus();
   }
 
-  void _refreshTimerFired(Timer t) {
-    _refreshStatus();
-  }
+  void _refreshTimerFired(Timer t) => _refreshStatus();
 
   // Refresh status an ALL builds.
   void _refreshStatus() {
@@ -172,7 +156,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Color _colorFromBuildStatus(BuildStatus status) {
     switch (status) {
       case BuildStatus.SUCCESS:
-        return Colors.green[100];
+        return Colors.green[300];
       case BuildStatus.FAILURE:
         return Colors.red[400];
       case BuildStatus.NETWORKERROR:
@@ -182,78 +166,97 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  Widget _buildResultWidget(String name, BuildInfo bi) {
-    return new Expanded(
+  Widget _buildResultWidget(String type, String name, BuildInfo bi) =>
+      new Expanded(
         child: new GestureDetector(
-            onTap: () {
-              _launchUrl(bi.url);
-            },
-            child: new Container(
-              decoration: new BoxDecoration(
-                  backgroundColor: _colorFromBuildStatus(bi.status)),
-              padding:
-                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 4.0),
-              margin: const EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 8.0),
-              child: new Text(name,
-                  style: new TextStyle(color: Colors.black, fontSize: 12.0)),
-            )));
-  }
+          onTap: () {
+            _launchUrl(bi.url);
+          },
+          child: new Container(
+            color: _colorFromBuildStatus(bi.status),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            margin: const EdgeInsets.only(right: 8.0, bottom: 8.0),
+            child: new Center(
+              child: new Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  new Text(
+                    type,
+                    textAlign: TextAlign.center,
+                    style: new TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w300,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                  new Container(height: 4.0),
+                  new Text(
+                    name,
+                    textAlign: TextAlign.center,
+                    style: new TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14.0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance
-    // as done by the _refreshStatus method above.
-
-    if (ui.window.physicalSize.width > ui.window.physicalSize.height)
-      return _buildLandcape(context);
-    else
-      return _buildPortrait(context);
-  }
-
-  Widget _buildPortrait(BuildContext context) {
-    return _buildLandcape(context); // TODO
-  }
-
-  Widget _buildLandcape(BuildContext context) {
     var rows = new List();
 
     Duration uptime = new DateTime.now().difference(_start_time);
 
-    rows.add(new Container(
-        child: new Text(
-            "${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m uptime",
-            style: new TextStyle(fontSize: 11.0))));
+    rows.add(
+      new Container(
+        height: 32.0,
+        child: new Center(
+          child: new Text(
+            "${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m",
+            textAlign: TextAlign.center,
+            style: new TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+          ),
+        ),
+      ),
+    );
 
     targets_results.forEach((k, v) {
       // the builds
       var builds = new List();
       v.forEach((name, status_obj) {
-        builds.add(_buildResultWidget("${k}\n${name}", status_obj));
+        builds.add(_buildResultWidget('$k', '$name', status_obj));
       });
 
-      rows.add(new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          mainAxisSize: MainAxisSize.max,
-          children: builds));
+      rows.add(
+        new Expanded(
+          child: new Container(
+            margin: const EdgeInsets.only(left: 8.0),
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.max,
+              children: builds,
+            ),
+          ),
+        ),
+      );
     });
 
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Fuchsia Build Status'),
-      ),
-      body: new Container(
-        //padding: new EdgeInsets.all(20.0),
-        child: new Column(
-          children: rows,
-        ),
-      ),
-
+      appBar: Platform.isFuchsia
+          ? null
+          : new AppBar(title: new Text('Fuchsia Build Status')),
+      body: new Column(children: rows),
       floatingActionButton: new FloatingActionButton(
         onPressed: _refreshStatus,
         tooltip: 'Increment',
         child: new Icon(Icons.refresh),
-      ), // This trailing comma tells the Dart formatter to use
-      // a style that looks nicer for build methods.
+      ),
     );
   }
 }
