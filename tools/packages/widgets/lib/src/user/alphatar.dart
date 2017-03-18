@@ -68,27 +68,27 @@ class Alphatar extends StatelessWidget {
   /// Creates a new [Alphatar] with the given URL.
   ///
   /// Either the avatarUrl or the letter must be provided.
-  Alphatar.withUrl({
+  factory Alphatar.withUrl({
     Key key,
     @required String avatarUrl,
     String letter,
     double size: 40.0,
     Color backgroundColor,
-  })
-      : this(
-          key: key,
-          avatarImage: avatarUrl != null
-              ? new Image.network(
-                  avatarUrl,
-                  width: size,
-                  height: size,
-                  fit: BoxFit.cover,
-                )
-              : null,
-          letter: letter,
-          size: size,
-          backgroundColor: backgroundColor,
-        );
+  }) {
+    assert(avatarUrl != null);
+    return new Alphatar(
+      key: key,
+      avatarImage: new Image.network(
+        avatarUrl,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+      ),
+      letter: letter,
+      size: size,
+      backgroundColor: backgroundColor,
+    );
+  }
 
   /// Creates a new [Alphatar] based on the [User] data.
   factory Alphatar.fromUser({
@@ -98,10 +98,17 @@ class Alphatar extends StatelessWidget {
     Color backgroundColor,
   }) {
     assert(user != null);
-    return new Alphatar.withUrl(
+    return new Alphatar(
       key: key,
-      avatarUrl: user.picture,
-      letter: user.name[0],
+      avatarImage: user?.picture != null
+          ? new Image.network(
+              user.picture,
+              width: size,
+              height: size,
+              fit: BoxFit.cover,
+            )
+          : null,
+      letter: user?.name[0],
       size: size,
       backgroundColor: backgroundColor ?? _pickColorForUser(user),
     );

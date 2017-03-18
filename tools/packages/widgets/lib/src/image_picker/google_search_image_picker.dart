@@ -81,7 +81,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       _isLoading || _sourceImages.isNotEmpty || _currentInput.text.isNotEmpty;
 
   Future<Null> _search(String query) async {
-    if(query == _lastSearchQuery) {
+    if (query == _lastSearchQuery) {
       return null;
     }
     if (query.isEmpty) {
