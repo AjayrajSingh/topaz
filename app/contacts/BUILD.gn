@@ -8,3 +8,11 @@ group("contacts") {
     "//apps/modules/contacts/services",
   ]
 }
+
+group("test") {
+  testonly = true
+
+  deps = [
+    "//apps/modules/contacts/modules/contacts/test",
+  ]
+}

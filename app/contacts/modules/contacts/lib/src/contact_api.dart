@@ -59,6 +59,7 @@ class ContactAPI {
   static Future<ContactAPI> fromConfig(String src) async {
     // TODO(youngseokyoon): restore the config.
     // https://fuchsia.atlassian.net/browse/SO-285
+    // ignore: MISSING_REQUIRED_PARAM
     return new ContactAPI();
     // Config config = await Config.read(src);
     // List<String> keys = <String>[
