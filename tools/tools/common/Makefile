@@ -143,7 +143,7 @@ dart-clean:
 dart-lint: build
 	@$(fuchsia_root)/scripts/run-dart-analysis.py \
 			--out=$(fuchsia_out)/debug-x86-64 \
-			--tree=//apps/$(PROJECT)/* \
+			--tree=//apps/modules/$(PROJECT)/* \
 			--lints --fatal-lints --fatal-warnings
 
 .PHONY: dart-fmt
