@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 import 'package:models/email.dart';
 
 import '../user/alphatar.dart';
-import 'archive_dismissable_background.dart';
+import 'archive_dismissible_background.dart';
 import 'thread_participant_list.dart';
 import 'type_defs.dart';
 
@@ -131,15 +131,15 @@ class ThreadListItemSingleLine extends StatelessWidget {
 
     //Wrap list item in Dissmissable if onArchive callback is given
     if (onArchive != null) {
-      return new Dismissable(
+      return new Dismissible(
         key: new UniqueKey(),
         direction: DismissDirection.horizontal,
         onDismissed: _handleDismissed,
         child: listItem,
-        background: new ArchiveDismissableBackground(
+        background: new ArchiveDismissibleBackground(
           direction: DismissDirection.startToEnd,
         ),
-        secondaryBackground: new ArchiveDismissableBackground(
+        secondaryBackground: new ArchiveDismissibleBackground(
           direction: DismissDirection.endToStart,
         ),
       );

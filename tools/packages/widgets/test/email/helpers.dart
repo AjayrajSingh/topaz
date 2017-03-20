@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Helper Functions for Testing
 
-/// Simulates a swipe on the given direction for a Dismissable Widget
+/// Simulates a swipe on the given direction for a Dismissible Widget
 ///
 /// Returns true if the direction (has to be 'startToEnd' or 'endToStart') is
 /// valid and once the full sequence of animations is completed.
@@ -24,8 +24,8 @@ Future<bool> swipeDissmissable(
       return false;
   }
 
-  // Need to pump the widget for all the animations in a Dismissable swipe
-  // Copied from flutter/packages/flutter/test/widget/dismissable_test.dart
+  // Need to pump the widget for all the animations in a Dismissible swipe
+  // Copied from flutter/packages/flutter/test/widget/dismissible_test.dart
   await tester.pump(); // start the slide
   await tester.pump(
       const Duration(seconds: 1)); // finish the slide and start shrinking...

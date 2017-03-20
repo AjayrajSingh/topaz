@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-export 'src/email/archive_dismissable_background.dart';
+export 'src/email/archive_dismissible_background.dart';
 export 'src/email/editor_action_bar_header.dart';
 export 'src/email/label_list.dart';
 export 'src/email/label_list_item.dart';

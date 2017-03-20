@@ -5,18 +5,18 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-/// Builds the background for the [Dismissable] in a ThreadListItem and SingleLineThreadListItem.
+/// Builds the background for the [Dismissible] in a ThreadListItem and SingleLineThreadListItem.
 ///
-/// A [Dismissable.direction] must be set to determine if the archive [Icon]
+/// A [Dismissible.direction] must be set to determine if the archive [Icon]
 /// should be on the right or left.
 /// If the user swipes left, then the archive [Icon] needs to be on the right
 /// and vice versa.
-class ArchiveDismissableBackground extends StatelessWidget {
-  /// Swipe direction for [Dismissable]
+class ArchiveDismissibleBackground extends StatelessWidget {
+  /// Swipe direction for [Dismissible]
   DismissDirection direction;
 
-  /// Creates a archive background for a [Dismissable]
-  ArchiveDismissableBackground({
+  /// Creates a archive background for a [Dismissible]
+  ArchiveDismissibleBackground({
     Key key,
     @required this.direction,
   })
