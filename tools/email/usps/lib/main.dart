@@ -192,7 +192,9 @@ class HomeScreenState extends State<HomeScreen> {
                     _log('selecting location: $location');
                     _module.updateLocation(location);
                   })
-              : new CircularProgressIndicator(),
+              : new Text('Error: either _trackingCode or _apiKey is null. '
+                  'Please check if you have "usps_api_key" in your'
+                  'config.json file.'),
         ),
       ),
     );
