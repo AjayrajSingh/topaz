@@ -4,8 +4,8 @@
 
 import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:apps.modular.services.story/module.fidl.dart';
-import 'package:apps.modular.services.story/story.fidl.dart';
+import 'package:apps.modular.services.module/module.fidl.dart';
+import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:xi_widgets/widgets.dart';
@@ -21,7 +21,7 @@ void _log(String msg) {
 /// An implementation of the [Module] interface.
 class ModuleImpl extends Module {
   final ModuleBinding _binding = new ModuleBinding();
-  final StoryProxy _story = new StoryProxy();
+  final ModuleContextProxy _moduleContext = new ModuleContextProxy();
   final LinkProxy _link = new LinkProxy();
 
   /// Bind an [InterfaceRequest] for a [Module] interface to this object.
@@ -31,13 +31,13 @@ class ModuleImpl extends Module {
 
   @override
   void initialize(
-      InterfaceHandle<Story> storyHandle,
+      InterfaceHandle<ModuleContext> moduleContextHandle,
       InterfaceHandle<Link> linkHandle,
       InterfaceHandle<ServiceProvider> incomingServices,
       InterfaceRequest<ServiceProvider> outgoingServices) {
     _log('ModuleImpl::initialize call');
 
-    _story.ctrl.bind(storyHandle);
+    _moduleContext.ctrl.bind(moduleContextHandle);
     _link.ctrl.bind(linkHandle);
   }
 
@@ -47,7 +47,7 @@ class ModuleImpl extends Module {
 
     // Cleaning up.
     _link.ctrl.close();
-    _story.ctrl.close();
+    _moduleContext.ctrl.close();
 
     // Invoke the callback to signal that the clean-up process is done.
     callback();
