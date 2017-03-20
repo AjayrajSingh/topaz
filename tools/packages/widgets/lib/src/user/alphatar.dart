@@ -70,20 +70,22 @@ class Alphatar extends StatelessWidget {
   /// Either the avatarUrl or the letter must be provided.
   factory Alphatar.withUrl({
     Key key,
-    @required String avatarUrl,
+    String avatarUrl,
     String letter,
     double size: 40.0,
     Color backgroundColor,
   }) {
-    assert(avatarUrl != null);
+    assert(avatarUrl != null || letter != null);
     return new Alphatar(
       key: key,
-      avatarImage: new Image.network(
-        avatarUrl,
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-      ),
+      avatarImage: avatarUrl != null
+          ? new Image.network(
+              avatarUrl,
+              width: size,
+              height: size,
+              fit: BoxFit.cover,
+            )
+          : null,
       letter: letter,
       size: size,
       backgroundColor: backgroundColor,
