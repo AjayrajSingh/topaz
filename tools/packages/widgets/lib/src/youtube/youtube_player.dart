@@ -55,7 +55,7 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
 
   /// Track the current thumbnail that is being shown
   /// Youtube provides 4 thumbnails (0,1,2,3)
-  int _thumbnailIndex = 0;
+  final int _thumbnailIndex = 0;
 
   /// Show the play-button overlay on top of the video
   /// The play overlay will auto-hide after 1 second if the video is currently

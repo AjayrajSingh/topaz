@@ -14,6 +14,7 @@ class Sequence {
   /// The [int] value returned will be sequentially increased by one every
   /// time it is retrieved.
   int get value {
-    return ++_value;
+    ++_value;
+    return _value;
   }
 }
