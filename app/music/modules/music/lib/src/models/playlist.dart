@@ -62,7 +62,7 @@ class Playlist {
       user: new User.fromJson(json['user']),
       tracks: json['tracks']
           ?.map((dynamic trackJson) => new Track.fromJson(trackJson))
-          .toList(),
+          ?.toList(),
     );
   }
 }
