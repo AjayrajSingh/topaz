@@ -7,6 +7,7 @@ import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'dart:io';
 import 'dart:core';
 import 'dart:async';
@@ -17,6 +18,9 @@ enum _BuildStatus { unknown, networkError, parseError, success, failure }
 // EDIT BELOW TO ADD configs
 
 final String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
+
+const double _kFontSize = 20.0;
+const Color _kFuchsiaColor = const Color(0xFFFF00C0);
 
 class _BuildInfo {
   _BuildStatus status = _BuildStatus.unknown;
@@ -64,7 +68,7 @@ class DashboardApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Fuchsia Build Status',
       theme: new ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: _kFuchsiaColor,
       ),
       home: new _DashboardPage(title: 'Fuchsia Build Status'),
     );
@@ -188,7 +192,7 @@ class _DashboardPageState extends State<_DashboardPage> {
           child: new Container(
             color: _colorFromBuildStatus(bi.status),
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            margin: const EdgeInsets.only(right: 8.0, bottom: 8.0),
+            margin: const EdgeInsets.only(right: 8.0, top: 8.0),
             child: new Center(
               child: new Column(
                 mainAxisSize: MainAxisSize.min,
@@ -199,7 +203,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                     style: new TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w300,
-                      fontSize: 14.0,
+                      fontSize: _kFontSize,
                     ),
                   ),
                   new Container(height: 4.0),
@@ -209,7 +213,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                     style: new TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w500,
-                      fontSize: 14.0,
+                      fontSize: _kFontSize,
                     ),
                   ),
                 ],
@@ -222,21 +226,6 @@ class _DashboardPageState extends State<_DashboardPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> rows = <Widget>[];
-
-    Duration uptime = new DateTime.now().difference(_startTime);
-
-    rows.add(
-      new Container(
-        height: 32.0,
-        child: new Center(
-          child: new Text(
-            "${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m",
-            textAlign: TextAlign.center,
-            style: new TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
-          ),
-        ),
-      ),
-    );
 
     _targetsResults.forEach((String k, Map<String, _BuildInfo> v) {
       // the builds
@@ -260,12 +249,79 @@ class _DashboardPageState extends State<_DashboardPage> {
       );
     });
 
+    Duration uptime = new DateTime.now().difference(_startTime);
+
+    rows.add(
+      new Container(
+        height: 80.0,
+        child: new Center(
+          child: new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              new Expanded(
+                child: new Center(
+                  child: new Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        new Text(
+                          'Last updated:  ',
+                          textAlign: TextAlign.center,
+                          style: new TextStyle(
+                            fontSize: _kFontSize,
+                            fontWeight: FontWeight.w100,
+                          ),
+                        ),
+                        new Text(
+                          new DateFormat('EEEE MMMM d h:mm a', 'en_US').format(
+                            new DateTime.now().toLocal(),
+                          ),
+                          textAlign: TextAlign.center,
+                          style: new TextStyle(
+                            fontSize: _kFontSize,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ]),
+                ),
+              ),
+              new Expanded(
+                child: new Center(
+                  child: new Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      new Text(
+                        'Up time:  ',
+                        textAlign: TextAlign.center,
+                        style: new TextStyle(
+                          fontSize: _kFontSize,
+                          fontWeight: FontWeight.w100,
+                        ),
+                      ),
+                      new Text(
+                        '${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m',
+                        textAlign: TextAlign.center,
+                        style: new TextStyle(
+                          fontSize: _kFontSize,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
     return new Scaffold(
       appBar: Platform.isFuchsia
           ? null
           : new AppBar(title: new Text('Fuchsia Build Status')),
       body: new Column(children: rows),
       floatingActionButton: new FloatingActionButton(
+        backgroundColor: _kFuchsiaColor,
         onPressed: _refreshStatus,
         tooltip: 'Increment',
         child: new Icon(Icons.refresh),
