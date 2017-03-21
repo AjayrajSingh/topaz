@@ -2,38 +2,73 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-/// Returns the human-readable form of a given duration of the the typical
-/// format that is used for music tracks: h:mm:ss.
-///
-/// This only needs to be precise to the second
-String getDurationText(Duration duration) {
-  assert(duration != null);
-  final int hours = (duration.inSeconds / Duration.SECONDS_PER_HOUR).floor();
-  final int minutes =
-      ((duration.inSeconds - (hours * Duration.SECONDS_PER_HOUR)) /
-              Duration.SECONDS_PER_MINUTE)
-          .floor();
-  final int seconds = duration.inSeconds -
-      (hours * Duration.SECONDS_PER_HOUR) -
-      (minutes * Duration.SECONDS_PER_MINUTE);
+/// Formats a given [Duration] in various human-friendly formats
+class DurationFormat {
+  int _hours;
+  int _minutes;
+  int _seconds;
 
-  String output = '';
-
-  if (hours > 0) {
-    output += '$hours:';
+  /// Constructor
+  DurationFormat(Duration duration) {
+    assert(duration != null);
+    _hours = (duration.inSeconds / Duration.SECONDS_PER_HOUR).floor();
+    _minutes =
+        ((duration.inSeconds - (_hours * Duration.SECONDS_PER_HOUR)) /
+                Duration.SECONDS_PER_MINUTE)
+            .floor();
+    _seconds = duration.inSeconds -
+        (_hours * Duration.SECONDS_PER_HOUR) -
+        (_minutes * Duration.SECONDS_PER_MINUTE);
   }
 
-  if (minutes < 10 && hours > 0) {
-    output += '0$minutes:';
-  } else {
-    output += '$minutes:';
+  /// Returns the human-readable form of a given duration of the the typical
+  /// format that is used for music track playback: h:mm:ss.
+  ///
+  /// This only needs to be precise to the second
+  String get playbackText  {
+    String output = '';
+
+    if (_hours > 0) {
+      output += '$_hours:';
+    }
+
+    if (_minutes < 10 && _hours > 0) {
+      output += '0$_minutes:';
+    } else {
+      output += '$_minutes:';
+    }
+
+    if (_seconds < 10) {
+      output += '0$_seconds';
+    } else {
+      output += '$_seconds';
+    }
+
+    return output;
   }
 
-  if (seconds < 10) {
-    output += '0$seconds';
-  } else {
-    output += '$seconds';
-  }
+  /// Returns the human-readable form of a given duration that is usually used for
+  /// total duration of a playlist: 1hr 2m or 39s
+  ///
+  /// Only show seconds if the duration is below a minute
+  String get totalText {
+    String output = '';
 
-  return output;
+    if (_hours > 0) {
+      output += '${_hours}hr';
+      if (_minutes > 0) {
+        output += ' ';
+      }
+    }
+
+    if (_minutes > 0) {
+      output += '${_minutes}m';
+    }
+
+    if(_hours == 0 && _minutes ==0) {
+      output +='${_seconds}s';
+    }
+
+    return output;
+  }
 }

@@ -74,11 +74,11 @@ class PlaybackSlider extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   new Text(
-                    getDurationText(playbackPosition),
+                    new DurationFormat(playbackPosition).playbackText,
                     style: _kTimeTextStyle,
                   ),
                   new Text(
-                    getDurationText(duration),
+                    new DurationFormat(duration).playbackText,
                     style: _kTimeTextStyle,
                   ),
                 ],
