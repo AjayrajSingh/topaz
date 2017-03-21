@@ -4,6 +4,7 @@
 
 import 'package:fixtures/fixtures.dart';
 
+import 'playlist.dart';
 import 'track.dart';
 import 'user.dart';
 
@@ -36,6 +37,28 @@ class MusicModelFixtures extends Fixtures {
       playbackCount: 110,
       artworkUrl:
           'https://static1.squarespace.com/static/54ce5022e4b047e0ce41d15f/t/56aacd8289a60a49487afd52/1454034307698/NaSons.png',
+    );
+  }
+
+  /// Generate a playlist
+  Playlist playlist() {
+    return new Playlist(
+      title: 'Native Sons',
+      description: '',
+      duration: new Duration(seconds: 1640),
+      id: 2,
+      playlistType: 'album',
+      trackCount: 5,
+      artworkUrl:
+          'https://static1.squarespace.com/static/54ce5022e4b047e0ce41d15f/t/56aacd8289a60a49487afd52/1454034307698/NaSons.png',
+      user: user(),
+      tracks: <Track>[
+        track(),
+        track(),
+        track(),
+        track(),
+        track(),
+      ],
     );
   }
 }
