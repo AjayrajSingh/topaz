@@ -27,5 +27,6 @@ void main() {
     expect(playlist.user.avatarUrl, json['user']['avatar_url']);
     expect(playlist.tracks.length, json['tracks'].length);
     expect(playlist.tracks[0].title, json['tracks'][0]['title']);
+    expect(playlist.createdAt.year, 2010);
   });
 }

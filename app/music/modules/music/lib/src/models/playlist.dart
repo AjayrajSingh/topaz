@@ -2,8 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:intl/intl.dart';
+
 import './track.dart';
 import './user.dart';
+
+const String _kExpectedDateFormat = 'yyyy/MM/dd HH:mm:ss z';
 
 /// Model representing a SoundCloud playlist
 ///
@@ -36,6 +40,9 @@ class Playlist {
   /// Tracks of this playlist
   final List<Track> tracks;
 
+  /// Date that this playlist was created at
+  DateTime createdAt;
+
   /// Constructor
   Playlist({
     this.title,
@@ -47,6 +54,7 @@ class Playlist {
     this.artworkUrl,
     this.user,
     this.tracks,
+    this.createdAt,
   });
 
   /// Create a new playlist from JSON data
@@ -63,6 +71,9 @@ class Playlist {
       tracks: json['tracks']
           ?.map((dynamic trackJson) => new Track.fromJson(trackJson))
           ?.toList(),
+      createdAt: json['created_at'] is String
+          ? new DateFormat(_kExpectedDateFormat).parse(json['created_at'])
+          : null,
     );
   }
 }
