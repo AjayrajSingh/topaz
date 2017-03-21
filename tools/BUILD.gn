@@ -4,9 +4,7 @@
 
 group("common") {
   deps = [
-    "//apps/modules/common/color",
-    "//apps/modules/common/email",
-    "//apps/modules/common/image_picker/image_picker",
+    "//apps/modules/common/modules",
   ]
 }
 

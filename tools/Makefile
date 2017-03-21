@@ -306,10 +306,10 @@ dart-presubmit-cq: dart-gen-specs dart-fmt-check dart-fmt-extras-check dart-lint
 ## Email related targets
 .PHONY: auth
 auth: config.json ## Update email auth credentials with a refresh token.
-	@cd email/tools; \
+	@cd tools/auth; \
 	pub get; \
 	pub run bin/oauth.dart
-	@for dir in ../contacts/modules/contacts/assets gallery/assets image_picker/image_picker/assets image_picker/image_picker_android/assets; do \
+	@for dir in ../contacts/modules/contacts/assets gallery/assets modules/gallery/assets; do \
 		mkdir -p $${dir}; \
 		cp config.json $${dir}/config.json; \
 	done

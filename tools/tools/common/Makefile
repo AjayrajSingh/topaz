@@ -93,7 +93,7 @@ run: ## Run project on Fuchsia.
 
 .PHONY: flutter-run
 flutter-run: ## Run UI application in modules/<project> via `flutter run`.
-	cd $(root)/$(FLUTTER_TARGET) && \
+	cd $(FLUTTER_TARGET) && \
 		$(flutter) packages upgrade && \
 		$(flutter) build clean && \
 		$(flutter) run --hot

@@ -1,0 +1,18 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("modules") {
+  deps = [
+    "color",
+    "gallery",
+    "interactive_receipt",
+    "map",
+    "music_story",
+    "usps",
+    "youtube_related_videos",
+    "youtube_story",
+    "youtube_thumbnail",
+    "youtube_video",
+  ]
+}

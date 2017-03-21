@@ -1,17 +1,31 @@
 Modules
 =======
 
-> This repository is a workspace and incubator for Fuchsia modules.
+> This repository is a workspace for module exploration and common functionality.
 
-# Running Modules
+# Pro-tips
 
-NOTE: On OS X there can be an annoying firewall dialog every time the Magenta tools are rebuilt. To prevent the dialog disable the firewall or sign the new binaries, for instance to sign the `netruncmd`:
+## OS X Firewall Warnings
+
+On OS X there can be an annoying firewall dialog every time the Magenta tools are rebuilt. To prevent the dialog disable the firewall or sign the new binaries, for instance to sign the `netruncmd`:
 
     sudo codesign --force --sign - $FUCHSIA_DIR/out/build-magenta/tools/netruncmd
 
 The dialog will now only appear the first time the command is run, at least until it gets rebuilt.
 
-# Debugging
+## Invalid Certificate Errors
+
+On new or newly provisioned devices it is possible to trigger an SSL error caused by the system clock being set in the future. To prevent this you must set the device clock:
+
+    # On Darwin
+    (fgo && DATE=`date +%Y-%m-%dT%T`; ./out/build-magenta/tools/netruncmd : "clock --set $DATE")
+
+    # On Linux
+    (fgo && DATE=`date -Iseconds`; ./out/build-magenta/tools/netruncmd : "clock --set $DATE")
+
+This only needs to be done once.
+
+# Logging
 
 Listen to device logs:
 
@@ -71,7 +85,4 @@ Running with the full sysui
 
 Running the email story directly
 
-    netruncmd : "@boot device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=email_story"
-
-You can run any top-level module in the same way by replacing `email_story` with
-the name of the top-level module.
+    netruncmd : "@boot device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=<target>"
