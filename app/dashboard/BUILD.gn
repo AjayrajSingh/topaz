@@ -4,20 +4,15 @@
 
 import("//flutter/build/flutter_app.gni")
 
-flutter_app("fuchsia_build_status") {
-  main_dart = "lib/modular_main.dart"
+flutter_app("dashboard") {
+  main_dart = "lib/main.dart"
 
   source_dir = "lib"
 
   deps = [
+    "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/html",
     "//third_party/dart-pkg/pub/http",
-    "//apps/modular/services/module:module_dart",
-    "//apps/modular/services/story:story_dart",
-    "//apps/mozart/services/views:views_dart",
-    "//application/lib/app/dart",
-    "//lib/fidl/dart",
-    "//lib/flutter/packages/flutter",
   ]
 
   analysis_options = "//apps/modules/.analysis_options"
