@@ -32,20 +32,20 @@ class _BuildInfo {
 const Map<String, List<List<String>>> _kTargetsMap =
     const <String, List<List<String>>>{
   'fuchsia': const <List<String>>[
-    const <String>['fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'],
-    const <String>['fuchsia/linux-arm64-debug', 'linux-arm64-debug'],
-    const <String>['fuchsia/linux-x86-64-release', 'linux-x86-64-release'],
-    const <String>['fuchsia/linux-arm64-release', 'linux-arm64-release'],
+    const <String>['manifest/linux-x86-64-debug', 'linux-x86-64-debug'],
+    const <String>['manifest/linux-arm64-debug', 'linux-arm64-debug'],
+    const <String>['manifest/linux-x86-64-release', 'linux-x86-64-release'],
+    const <String>['manifest/linux-arm64-release', 'linux-arm64-release'],
   ],
   'fuchsia-drivers': const <List<String>>[
-    const <String>['fuchsia/drivers-linux-x86-64-debug', 'linux-x86-64-debug'],
-    const <String>['fuchsia/drivers-linux-arm64-debug', 'linux-arm64-debug'],
+    const <String>['manifest/drivers-linux-x86-64-debug', 'linux-x86-64-debug'],
+    const <String>['manifest/drivers-linux-arm64-debug', 'linux-arm64-debug'],
     const <String>[
-      'fuchsia/drivers-linux-x86-64-release',
+      'manifest/drivers-linux-x86-64-release',
       'linux-x86-64-release'
     ],
     const <String>[
-      'fuchsia/drivers-linux-arm64-release',
+      'manifest/drivers-linux-arm64-release',
       'linux-arm64-release'
     ],
   ],
