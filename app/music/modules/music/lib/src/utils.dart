@@ -12,10 +12,9 @@ class DurationFormat {
   DurationFormat(Duration duration) {
     assert(duration != null);
     _hours = (duration.inSeconds / Duration.SECONDS_PER_HOUR).floor();
-    _minutes =
-        ((duration.inSeconds - (_hours * Duration.SECONDS_PER_HOUR)) /
-                Duration.SECONDS_PER_MINUTE)
-            .floor();
+    _minutes = ((duration.inSeconds - (_hours * Duration.SECONDS_PER_HOUR)) /
+            Duration.SECONDS_PER_MINUTE)
+        .floor();
     _seconds = duration.inSeconds -
         (_hours * Duration.SECONDS_PER_HOUR) -
         (_minutes * Duration.SECONDS_PER_MINUTE);
@@ -25,7 +24,7 @@ class DurationFormat {
   /// format that is used for music track playback: h:mm:ss.
   ///
   /// This only needs to be precise to the second
-  String get playbackText  {
+  String get playbackText {
     String output = '';
 
     if (_hours > 0) {
@@ -65,8 +64,8 @@ class DurationFormat {
       output += '${_minutes}m';
     }
 
-    if(_hours == 0 && _minutes ==0) {
-      output +='${_seconds}s';
+    if (_hours == 0 && _minutes == 0) {
+      output += '${_seconds}s';
     }
 
     return output;

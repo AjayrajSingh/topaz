@@ -13,7 +13,7 @@ void main() {
     Key key = new UniqueKey();
     await tester.pumpWidget(new Material(
       child: new Center(
-        child: new FallbackTrackArt(key: key),
+        child: new TrackArt(key: key),
       ),
     ));
 
@@ -30,7 +30,7 @@ void main() {
     Key key = new UniqueKey();
     await tester.pumpWidget(new Material(
       child: new Center(
-        child: new FallbackTrackArt(
+        child: new TrackArt(
           key: key,
           size: size,
         ),

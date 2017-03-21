@@ -10,13 +10,15 @@ void main() {
   test('DurationFormat.playbackText', () {
     // hours, minutes and seconds
     expect(
-      new DurationFormat(new Duration(hours: 1, minutes: 23, seconds: 31)).playbackText,
+      new DurationFormat(new Duration(hours: 1, minutes: 23, seconds: 31))
+          .playbackText,
       '1:23:31',
     );
 
     // hours, minutes and seconds with minutes < 10
     expect(
-        new DurationFormat(new Duration(hours: 1, minutes: 2, seconds: 31)).playbackText,
+      new DurationFormat(new Duration(hours: 1, minutes: 2, seconds: 31))
+          .playbackText,
       '1:02:31',
     );
 

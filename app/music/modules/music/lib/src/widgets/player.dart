@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import '../models/track.dart';
-import 'fallback_track_art.dart';
+import 'track_art.dart';
 import 'playback_slider.dart';
 
 const double _kSmallPlayerMaxWidth = 450.0;
@@ -32,6 +32,12 @@ class Player extends StatelessWidget {
 
   /// The playback position of the current tack
   final Duration playbackPosition;
+
+  /// [Color] used as the highlight.
+  /// This is used for important UI elements such as primary buttons.
+  ///
+  /// Defaults to the theme primary color
+  final Color highlightColor;
 
   /// True is the current song is being played, false if it is paused
   final bool isPlaying;
@@ -68,6 +74,7 @@ class Player extends StatelessWidget {
     Key key,
     @required this.currentTrack,
     @required this.playbackPosition,
+    this.highlightColor,
     this.isPlaying: false,
     this.isShuffled: false,
     this.isRepeated: false,
@@ -232,28 +239,13 @@ class Player extends StatelessWidget {
     );
   }
 
-  Widget _buildTrackArt() {
-    List<Widget> children = <Widget>[
-      new FallbackTrackArt(size: _kPlayerHeight),
-    ];
-
-    if (currentTrack.artworkUrl != null) {
-      children.add(new Image.network(
-        currentTrack.artworkUrl,
-        height: _kPlayerHeight,
-        width: _kPlayerHeight,
-        fit: BoxFit.cover,
-        gaplessPlayback: true,
-      ));
-    }
-
-    return new Stack(children: children);
-  }
-
   Widget _buildLargePlayer(Color primaryColor) {
     return new Row(
       children: <Widget>[
-        _buildTrackArt(),
+        new TrackArt(
+          artworkUrl: currentTrack.artworkUrl,
+          size: _kPlayerHeight,
+        ),
         new Expanded(
           flex: 2,
           child: _buildTrackTitle(),
@@ -298,9 +290,9 @@ class Player extends StatelessWidget {
         child: new LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
           if (constraints.maxWidth <= _kSmallPlayerMaxWidth) {
-            return _buildSmallPlayer(theme.primaryColor);
+            return _buildSmallPlayer(highlightColor ?? theme.primaryColor);
           } else {
-            return _buildLargePlayer(theme.primaryColor);
+            return _buildLargePlayer(highlightColor ?? theme.primaryColor);
           }
         }),
       ),

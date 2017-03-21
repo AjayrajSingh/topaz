@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../models/fixtures.dart';
 import 'player.dart';
+import 'playlist_surface.dart';
 
 /// MyHomePage widget.
 class MyHomePage extends StatelessWidget {
@@ -17,10 +18,8 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget player = new Player(
-      currentTrack: new MusicModelFixtures().track(),
-      playbackPosition: new Duration(seconds: 60),
-    );
+    Color highlightColor = Colors.pink[400];
+    MusicModelFixtures fixture = new MusicModelFixtures();
     return new Scaffold(
       backgroundColor: Colors.grey[800],
       appBar: new AppBar(
@@ -29,13 +28,21 @@ class MyHomePage extends StatelessWidget {
       body: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // to show the player in smaller form
-          new Container(
-            margin: const EdgeInsets.symmetric(vertical: 16.0),
-            width: 360.0,
-            child: player,
+          new Expanded(
+            child: new PlaylistSurface(
+              playlist: fixture.playlist(),
+              highlightColor: higlightColor,
+              isFollowing: true,
+            ),
           ),
-          player,
+          new Material(
+            elevation: 4,
+            child: new Player(
+              currentTrack: fixture.track(),
+              playbackPosition: new Duration(seconds: 60),
+              highlightColor: higlightColor,
+            ),
+          ),
         ],
       ),
     );

@@ -59,6 +59,7 @@ class MusicModelFixtures extends Fixtures {
         track(),
         track(),
       ],
+      createdAt: new DateTime(2014),
     );
   }
 }
