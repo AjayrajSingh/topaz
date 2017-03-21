@@ -13,7 +13,7 @@ class FlutterConfig extends Config {
   /// Convienence method for creating a config object by loading a
   /// configuration file at [src].
   static Future<Config> read(String src) async {
-    Config config = new Config();
+    FlutterConfig config = new FlutterConfig();
     await config.load(src);
     return config;
   }
