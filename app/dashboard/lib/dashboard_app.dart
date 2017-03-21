@@ -11,46 +11,53 @@ import 'dart:io';
 import 'dart:core';
 import 'dart:async';
 
-enum BuildStatus { UNKNOWN, NETWORKERROR, PARSEERROR, SUCCESS, FAILURE }
+enum _BuildStatus { unknown, networkError, parseError, success, failure }
 
 // ----------------------------------------------------------------------------
 // EDIT BELOW TO ADD configs
 
-final String kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
+final String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
 
-class BuildInfo {
-  BuildStatus status = BuildStatus.UNKNOWN;
+class _BuildInfo {
+  _BuildStatus status = _BuildStatus.unknown;
   String url;
 
-  BuildInfo({this.status, this.url});
+  _BuildInfo({this.status, this.url});
 }
 
-const Map<String, List<List<String>>> targets_map =
+const Map<String, List<List<String>>> _kTargetsMap =
     const <String, List<List<String>>>{
-  'fuchsia': const [
-    const ['fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'],
-    const ['fuchsia/linux-arm64-debug', 'linux-arm64-debug'],
-    const ['fuchsia/linux-x86-64-release', 'linux-x86-64-release'],
-    const ['fuchsia/linux-arm64-release', 'linux-arm64-release'],
+  'fuchsia': const <List<String>>[
+    const <String>['fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'],
+    const <String>['fuchsia/linux-arm64-debug', 'linux-arm64-debug'],
+    const <String>['fuchsia/linux-x86-64-release', 'linux-x86-64-release'],
+    const <String>['fuchsia/linux-arm64-release', 'linux-arm64-release'],
   ],
-  'fuchsia-drivers': const [
-    const ['fuchsia/drivers-linux-x86-64-debug', 'linux-x86-64-debug'],
-    const ['fuchsia/drivers-linux-arm64-debug', 'linux-arm64-debug'],
-    const ['fuchsia/drivers-linux-x86-64-release', 'linux-x86-64-release'],
-    const ['fuchsia/drivers-linux-arm64-release', 'linux-arm64-release'],
+  'fuchsia-drivers': const <List<String>>[
+    const <String>['fuchsia/drivers-linux-x86-64-debug', 'linux-x86-64-debug'],
+    const <String>['fuchsia/drivers-linux-arm64-debug', 'linux-arm64-debug'],
+    const <String>[
+      'fuchsia/drivers-linux-x86-64-release',
+      'linux-x86-64-release'
+    ],
+    const <String>[
+      'fuchsia/drivers-linux-arm64-release',
+      'linux-arm64-release'
+    ],
   ],
-  'magenta': const [
-    const ['magenta/arm64-linux-gcc', 'arm64-linux-gcc'],
-    const ['magenta/x86-64-linux-gcc', 'x86-64-linux-gcc'],
-    const ['magenta/arm64-linux-clang', 'arm64-linux-clang'],
-    const ['magenta/x86-64-linux-clang', 'x86-64-linux-clang'],
+  'magenta': const <List<String>>[
+    const <String>['magenta/arm64-linux-gcc', 'arm64-linux-gcc'],
+    const <String>['magenta/x86-64-linux-gcc', 'x86-64-linux-gcc'],
+    const <String>['magenta/arm64-linux-clang', 'arm64-linux-clang'],
+    const <String>['magenta/x86-64-linux-clang', 'x86-64-linux-clang'],
   ],
-  'jiri': const [
-    const ['jiri/linux-x86-64', 'linux-x86-64'],
-    const ['jiri/mac-x86-64', 'mac-x86-64'],
+  'jiri': const <List<String>>[
+    const <String>['jiri/linux-x86-64', 'linux-x86-64'],
+    const <String>['jiri/mac-x86-64', 'mac-x86-64'],
   ]
 };
 
+/// Displays the fuchsia dashboard.
 class DashboardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -59,13 +66,13 @@ class DashboardApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new DashboardPage(title: 'Fuchsia Build Status'),
+      home: new _DashboardPage(title: 'Fuchsia Build Status'),
     );
   }
 }
 
-class DashboardPage extends StatefulWidget {
-  DashboardPage({Key key, this.title}) : super(key: key);
+class _DashboardPage extends StatefulWidget {
+  _DashboardPage({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -73,26 +80,27 @@ class DashboardPage extends StatefulWidget {
   _DashboardPageState createState() => new _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
-  var targets_results;
-  DateTime _start_time = new DateTime.now();
+class _DashboardPageState extends State<_DashboardPage> {
+  Map<String, Map<String, _BuildInfo>> _targetsResults;
+  DateTime _startTime = new DateTime.now();
 
   @override
   void initState() {
     super.initState();
     // From the targets map, create a data structure which we'll be populating
     // the build results into, as they come in async.
-    targets_results = new Map();
+    _targetsResults = new Map<String, Map<String, _BuildInfo>>();
 
-    targets_map.forEach((categoryName, buildConfigs) {
-      var this_map = new Map<String, BuildInfo>();
-      for (var config in buildConfigs) {
-        this_map[config[1]] = new BuildInfo(
-          status: BuildStatus.UNKNOWN,
-          url: "http://www.google.com",
+    _kTargetsMap
+        .forEach((String categoryName, List<List<String>> buildConfigs) {
+      Map<String, _BuildInfo> map = new Map<String, _BuildInfo>();
+      buildConfigs.forEach((List<String> config) {
+        map[config[1]] = new _BuildInfo(
+          status: _BuildStatus.unknown,
+          url: 'http://www.google.com',
         );
-      }
-      targets_results[categoryName] = this_map;
+      });
+      _targetsResults[categoryName] = map;
     });
 
     new Timer.periodic(
@@ -107,45 +115,50 @@ class _DashboardPageState extends State<DashboardPage> {
   // Refresh status an ALL builds.
   void _refreshStatus() {
     // fetch config status for ONE item.
-    _fetchConfigStatus(categoryName, buildName, url) async {
-      BuildStatus status = BuildStatus.PARSEERROR;
-      String html = null;
+    Future<Null> _fetchConfigStatus(
+      String categoryName,
+      String buildName,
+      String url,
+    ) async {
+      _BuildStatus status = _BuildStatus.parseError;
+      String html;
 
       try {
-        var response = await http.get(url);
+        http.Response response = await http.get(url);
         html = response.body;
       } catch (error) {
-        status = BuildStatus.NETWORKERROR;
+        status = _BuildStatus.networkError;
       }
 
       if (html == null) {
-        status = BuildStatus.NETWORKERROR;
+        status = _BuildStatus.networkError;
       } else {
-        var dom_tree = parse(html);
-        List<dom.Element> trs = dom_tree.querySelectorAll('tr');
-        for (var tr in trs) {
+        dom.Document domTree = parse(html);
+        List<dom.Element> trs = domTree.querySelectorAll('tr');
+        for (dom.Element tr in trs) {
           if (tr.className == "danger") {
-            status = BuildStatus.FAILURE;
+            status = _BuildStatus.failure;
             break;
           } else if (tr.className == "success") {
-            status = BuildStatus.SUCCESS;
+            status = _BuildStatus.success;
             break;
           }
         }
       }
 
-      targets_results['${categoryName}']['${buildName}'].status = status;
-      targets_results['${categoryName}']['${buildName}'].url = url;
+      _targetsResults['$categoryName']['$buildName'].status = status;
+      _targetsResults['$categoryName']['$buildName'].url = url;
       setState(() {});
     } // _fetchConfigStatus
 
     // kick off requests for all the build configs desired. As
     // these reults come in they will be stuffed into the targets_results map.
-    targets_map.forEach((categoryName, buildConfigs) {
-      for (var config in buildConfigs) {
-        String url = kBaseURL + config[0];
+    _kTargetsMap
+        .forEach((String categoryName, List<List<String>> buildConfigs) {
+      buildConfigs.forEach((List<String> config) {
+        String url = _kBaseURL + config[0];
         _fetchConfigStatus(categoryName, config[1], url);
-      }
+      });
     }); // targets_forEach
   } // _refreshStatus
 
@@ -153,20 +166,20 @@ class _DashboardPageState extends State<DashboardPage> {
     UrlLauncher.launch(url);
   }
 
-  Color _colorFromBuildStatus(BuildStatus status) {
+  Color _colorFromBuildStatus(_BuildStatus status) {
     switch (status) {
-      case BuildStatus.SUCCESS:
+      case _BuildStatus.success:
         return Colors.green[300];
-      case BuildStatus.FAILURE:
+      case _BuildStatus.failure:
         return Colors.red[400];
-      case BuildStatus.NETWORKERROR:
+      case _BuildStatus.networkError:
         return Colors.purple[100];
       default:
         return Colors.black12;
     }
   }
 
-  Widget _buildResultWidget(String type, String name, BuildInfo bi) =>
+  Widget _buildResultWidget(String type, String name, _BuildInfo bi) =>
       new Expanded(
         child: new GestureDetector(
           onTap: () {
@@ -179,7 +192,7 @@ class _DashboardPageState extends State<DashboardPage> {
             child: new Center(
               child: new Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
+                children: <Widget>[
                   new Text(
                     type,
                     textAlign: TextAlign.center,
@@ -208,9 +221,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    var rows = new List();
+    List<Widget> rows = <Widget>[];
 
-    Duration uptime = new DateTime.now().difference(_start_time);
+    Duration uptime = new DateTime.now().difference(_startTime);
 
     rows.add(
       new Container(
@@ -225,11 +238,11 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
     );
 
-    targets_results.forEach((k, v) {
+    _targetsResults.forEach((String k, Map<String, _BuildInfo> v) {
       // the builds
-      var builds = new List();
-      v.forEach((name, status_obj) {
-        builds.add(_buildResultWidget('$k', '$name', status_obj));
+      List<Widget> builds = <Widget>[];
+      v.forEach((String name, _BuildInfo statusObj) {
+        builds.add(_buildResultWidget(k, name, statusObj));
       });
 
       rows.add(
