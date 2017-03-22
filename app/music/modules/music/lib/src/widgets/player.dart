@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import '../models/track.dart';
-import 'track_art.dart';
 import 'playback_slider.dart';
+import 'track_art.dart';
 
 const double _kSmallPlayerMaxWidth = 450.0;
 const double _kPlayerHeight = 64.0;
