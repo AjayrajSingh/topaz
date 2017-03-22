@@ -11,14 +11,19 @@ typedef EmbeddedChild EmbeddedChildBuilder(dynamic args);
 /// Dispose method for an embedded child view.
 typedef void EmbeddedChildDisposer();
 
-/// A widget build function that returns a child based on the module specified
-/// by moduleUrl.
+/// A function which accepts an EmbeddedChild. Passed as a callback to a
+/// GeneralEmbeddedChildBuilder.
+typedef void EmbeddedChildAdder(EmbeddedChild child);
+
+/// A widget build function that creates an embedded child and passes it
+/// to childAdder.
 typedef EmbeddedChild GeneralEmbeddedChildBuilder({
   String docRoot,
   String type,
-  String moduleUrl,
   String propKey,
+  String contract,
   dynamic value,
+  EmbeddedChildAdder childAdder,
 });
 
 /// A class representing an embedded child view.
@@ -158,16 +163,18 @@ class EmbeddedChildProvider {
   EmbeddedChild buildGeneralEmbeddedChild({
     String docRoot,
     String type,
-    String moduleUrl,
     String propKey,
+    String contract,
     dynamic value,
+    EmbeddedChildAdder childAdder,
   }) {
     return _generalBuilder(
       docRoot: docRoot,
       type: type,
-      moduleUrl: moduleUrl,
       propKey: propKey,
+      contract: contract,
       value: value,
+      childAdder: childAdder,
     );
   }
 }

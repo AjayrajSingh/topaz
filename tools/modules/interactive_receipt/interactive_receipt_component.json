@@ -10,9 +10,6 @@
     "main": "interactive_receipt_component"
   },
   "fuchsia:module": {
-    "contract": "display_attachment",
-    "data_preconditions": {
-      "@type": "order-receipt"
-    }
+    "contract": "interactive_receipt"
   }
 }

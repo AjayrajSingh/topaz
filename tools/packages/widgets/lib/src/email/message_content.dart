@@ -37,40 +37,41 @@ class _MessageContentState extends State<MessageContent> {
   void initState() {
     super.initState();
 
+    void childAdder(EmbeddedChild child) {
+      embeddedChildren.add(child);
+    }
+
     config.message.attachments.forEach((Attachment attachment) {
       try {
         switch (attachment.type) {
           case AttachmentType.uspsShipping:
-            embeddedChildren.add(
-              kEmbeddedChildProvider.buildGeneralEmbeddedChild(
-                docRoot: 'usps-doc',
-                type: 'usps-shipping',
-                moduleUrl: 'file:///system/apps/usps',
-                propKey: 'usps-tracking-key',
-                value: attachment.value,
-              ),
+            kEmbeddedChildProvider.buildGeneralEmbeddedChild(
+              docRoot: 'usps-doc',
+              type: 'usps-shipping',
+              propKey: 'usps-tracking-key',
+              contract: 'display_attachment',
+              value: attachment.value,
+              childAdder: childAdder,
             );
             break;
 
           case AttachmentType.youtubeVideo:
-            embeddedChildren.add(
-              kEmbeddedChildProvider.buildGeneralEmbeddedChild(
-                docRoot: 'youtube-doc',
-                type: 'youtube-video',
-                moduleUrl: 'file:///system/apps/youtube_video',
-                propKey: 'youtube-video-id',
-                value: attachment.value,
-              ),
+            kEmbeddedChildProvider.buildGeneralEmbeddedChild(
+              docRoot: 'youtube-doc',
+              type: 'youtube-video',
+              propKey: 'youtube-video-id',
+              contract: 'display_attachment',
+              value: attachment.value,
+              childAdder: childAdder,
             );
             break;
 
           case AttachmentType.orderReceipt:
-            embeddedChildren.add(
-              kEmbeddedChildProvider.buildGeneralEmbeddedChild(
-                type: 'order-receipt',
-                moduleUrl: 'file:///system/apps/interactive_receipt_http',
-                value: null,
-              ),
+            kEmbeddedChildProvider.buildGeneralEmbeddedChild(
+              type: 'order-receipt',
+              contract: 'interactive_receipt',
+              value: null,
+              childAdder: childAdder,
             );
         }
       } catch (e) {
