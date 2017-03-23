@@ -5,9 +5,8 @@
 import 'dart:convert' show JSON;
 import 'dart:io';
 
+import 'package:music/src/models/user.dart';
 import 'package:test/test.dart';
-
-import '../../lib/src/models/user.dart';
 
 void main() {
   test('fromJSON() constructor', () async {

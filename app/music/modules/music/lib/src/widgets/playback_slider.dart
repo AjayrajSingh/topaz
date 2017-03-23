@@ -107,10 +107,10 @@ class _PlaybackBarPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final backgroundPaint = new Paint()
+    final Paint backgroundPaint = new Paint()
       ..color = _kBackgroundColor
       ..style = PaintingStyle.fill;
-    final foregroundPaint = new Paint()
+    final Paint foregroundPaint = new Paint()
       ..color = _kBarColor
       ..style = PaintingStyle.fill;
     canvas.drawRect(

@@ -5,11 +5,11 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import 'track_art.dart';
-import 'track_list_item.dart';
 import '../models/playlist.dart';
 import '../models/track.dart';
 import '../utils.dart';
+import 'track_art.dart';
+import 'track_list_item.dart';
 
 /// This is the height that the header (playlist name...) should take up
 const double _kHeaderHeight = 200.0;
@@ -187,22 +187,23 @@ class PlaylistSurface extends StatelessWidget {
       new Container(
         height: _kHeaderBackgroundOverflow,
         decoration: new BoxDecoration(
-          border: new Border(bottom: new BorderSide(
+          border: new Border(
+              bottom: new BorderSide(
             color: Colors.grey[300],
           )),
         ),
       ),
     ];
     listChildren.addAll(playlist.tracks.map((Track track) => new Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-      child: new TrackListItem(
-        track: track,
-        highlightColor: highlightColor,
-        isPlaying: currentTrack == track,
-        onTap: () => onTapTrack?.call(track),
-        showUser: playlist.playlistType != 'album',
-      ),
-    )));
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: new TrackListItem(
+            track: track,
+            highlightColor: highlightColor,
+            isPlaying: currentTrack == track,
+            onTap: () => onTapTrack?.call(track),
+            showUser: playlist.playlistType != 'album',
+          ),
+        )));
 
     return new Container(
       margin: const EdgeInsets.only(top: _kHeaderHeight),
@@ -216,9 +217,7 @@ class PlaylistSurface extends StatelessWidget {
             maxWidth: _kMainContentMaxWidth,
           ),
           child: new Column(
-            mainAxisSize: MainAxisSize.min,
-            children: listChildren
-          ),
+              mainAxisSize: MainAxisSize.min, children: listChildren),
         ),
       ),
     );

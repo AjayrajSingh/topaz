@@ -7,3 +7,11 @@ group("music") {
     "//apps/modules/music/modules",
   ]
 }
+
+group("test") {
+  testonly = true
+
+  deps = [
+    "//apps/modules/music/modules/music/test",
+  ]
+}

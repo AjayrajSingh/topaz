@@ -2,9 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:music/src/utils.dart';
 import 'package:test/test.dart';
-
-import '../lib/src/utils.dart';
 
 void main() {
   test('DurationFormat.playbackText', () {

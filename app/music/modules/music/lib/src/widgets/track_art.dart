@@ -10,7 +10,7 @@ final Color _kIconColor = Colors.grey[600];
 /// Renders the artwork for a track or playlist at a given size and provices
 /// a fallback for situations when a track or playlist does not have artwork.
 class TrackArt extends StatelessWidget {
-  /// Size of the [FallbackTrackArt].
+  /// Size of the [TrackArt].
   ///
   /// Defaults to 48.0
   final double size;
