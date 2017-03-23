@@ -59,6 +59,10 @@ sfind := find $(root) $(ignore_flags)
 dart_sources := $(shell $(sfind) -name "*.dart")
 
 dart_packages := $(shell $(sfind) -name "pubspec.yaml" -exec dirname {} \;)
+# find all dart packages defined in BUILD.gn
+dart_gn_packages := $(shell grep -Rwl . --include="*.gn" -e "^\(flutter_app\|dart_package\)" | xargs -n1 dirname | sort -u)
+dart_all_packages := $(sort $(dart_packages) $(dart_gn_packages))
+dart_analysis_options := $(addsuffix /.analysis_options, $(dart_all_packages))
 
 sources := $(shell $(sfind) \
 	-name "*.dart" \
@@ -76,7 +80,7 @@ PATH := $(flutter_bin):$(dart_bin):$(PATH)
 all: build
 
 .PHONY: build
-build: ## Build Fuchsia with project.
+build: $(dart_analysis_options) ## Build Fuchsia with project.
 	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/build.sh
 
 .PHONY: clean
@@ -119,6 +123,11 @@ lint: copyright-check dart-lint dart-fmt-check ## Lint the code.
 %/.packages: %/pubspec.yaml
 	@cd $* && flutter packages get
 
+# Each dart package needs the .analysis_options file so that the IDE can run the
+# live analysis with the correct options.
+$(dart_analysis_options): $(fuchsia_root)/apps/modules/common/.analysis_options
+	cp $< $@
+
 .PHONY: $(dart_bin)
 $(dart_bin):
 	@$(flutter) precache
@@ -128,9 +137,9 @@ dart-clean:
 	@# Remove all build artifacts, including the coverage information.
 	@# Also, if there is a pubspec.lock file that is not tracked by git, remove
 	@# it as well.
-	@for pkg in $(dart_packages); do \
+	@for pkg in $(dart_all_packages); do \
 		pushd $${pkg} > /dev/null; \
-		rm -rf .packages packages .pub build coverage; \
+		rm -rf .packages packages .pub build coverage .analysis_options; \
 		git ls-files pubspec.lock --error-unmatch &> /dev/null; \
 		if [ $$? -ne 0 ]; then \
 			rm -f pubspec.lock; \
@@ -169,12 +178,16 @@ dart-fmt-check: $(dart_bin) $(tools_root)/dartfmt_extras/.packages
 .PHONY: dart-test
 dart-test: $(dart_bin)
 	@$(common_root)/run_dart_tests.py
+	@## Remove the .packages files to sanitize the Atom dart analysis.
+	@rm -f $(addsuffix "/.packages",$(dart_all_packages))
 
 .PHONY: dart-coverage
 dart-coverage: $(dart_bin)
 	@$(common_root)/run_dart_tests.py --coverage
 	@$(common_root)/merge_coverage.sh
 	@$(dart) $(common_root)/report_coverage.dart coverage/lcov.info
+	@## Remove the .packages files to sanitize the Atom dart analysis.
+	@rm -f $(addsuffix "/.packages",$(dart_all_packages))
 
 .PHONY: copyright-check
 copyright-check: ## Check source files for missing copyright.
