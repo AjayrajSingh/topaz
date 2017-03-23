@@ -20,13 +20,16 @@ enum _BuildStatus { unknown, networkError, parseError, success, failure }
 final String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
 
 const double _kFontSize = 20.0;
+const double _kErrorFontSize = 12.0;
+
 const Color _kFuchsiaColor = const Color(0xFFFF00C0);
 
 class _BuildInfo {
   _BuildStatus status = _BuildStatus.unknown;
   String url;
+  String errorMessage;
 
-  _BuildInfo({this.status, this.url});
+  _BuildInfo({this.status, this.url, this.errorMessage});
 }
 
 const Map<String, List<List<String>>> _kTargetsMap =
@@ -87,6 +90,7 @@ class _DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<_DashboardPage> {
   Map<String, Map<String, _BuildInfo>> _targetsResults;
   DateTime _startTime = new DateTime.now();
+  DateTime _firstErrorTime;
 
   @override
   void initState() {
@@ -126,12 +130,24 @@ class _DashboardPageState extends State<_DashboardPage> {
     ) async {
       _BuildStatus status = _BuildStatus.parseError;
       String html;
+      String errorMessage;
 
       try {
         http.Response response = await http.get(url);
         html = response.body;
+        if (html == null) {
+          errorMessage =
+              'Status ${response.statusCode}\n${response.reasonPhrase}';
+          if (_firstErrorTime == null) {
+            _firstErrorTime = new DateTime.now();
+          }
+        }
       } catch (error) {
         status = _BuildStatus.networkError;
+        errorMessage = 'Error receiving response:\n$error';
+        if (_firstErrorTime == null) {
+          _firstErrorTime = new DateTime.now();
+        }
       }
 
       if (html == null) {
@@ -152,6 +168,8 @@ class _DashboardPageState extends State<_DashboardPage> {
 
       _targetsResults['$categoryName']['$buildName'].status = status;
       _targetsResults['$categoryName']['$buildName'].url = url;
+      _targetsResults['$categoryName']['$buildName'].errorMessage =
+          errorMessage;
       setState(() {});
     } // _fetchConfigStatus
 
@@ -183,45 +201,61 @@ class _DashboardPageState extends State<_DashboardPage> {
     }
   }
 
-  Widget _buildResultWidget(String type, String name, _BuildInfo bi) =>
-      new Expanded(
-        child: new GestureDetector(
-          onTap: () {
-            _launchUrl(bi.url);
-          },
-          child: new Container(
-            color: _colorFromBuildStatus(bi.status),
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            margin: const EdgeInsets.only(right: 8.0, top: 8.0),
-            child: new Center(
-              child: new Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  new Text(
-                    type,
-                    textAlign: TextAlign.center,
-                    style: new TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w300,
-                      fontSize: _kFontSize,
-                    ),
-                  ),
-                  new Container(height: 4.0),
-                  new Text(
-                    name,
-                    textAlign: TextAlign.center,
-                    style: new TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                      fontSize: _kFontSize,
-                    ),
-                  ),
-                ],
-              ),
+  Widget _buildResultWidget(String type, String name, _BuildInfo bi) {
+    List<Widget> columnChildren = <Widget>[
+      new Text(
+        type,
+        textAlign: TextAlign.center,
+        style: new TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w300,
+          fontSize: _kFontSize,
+        ),
+      ),
+      new Container(height: 4.0),
+      new Text(
+        name,
+        textAlign: TextAlign.center,
+        style: new TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w500,
+          fontSize: _kFontSize,
+        ),
+      ),
+    ];
+    if (bi.errorMessage?.isNotEmpty ?? false) {
+      columnChildren.addAll(<Widget>[
+        new Container(height: 8.0),
+        new Text(
+          bi.errorMessage,
+          textAlign: TextAlign.center,
+          style: new TextStyle(
+            color: Colors.red[900],
+            fontWeight: FontWeight.w900,
+            fontSize: _kErrorFontSize,
+          ),
+        ),
+      ]);
+    }
+    return new Expanded(
+      child: new GestureDetector(
+        onTap: () {
+          _launchUrl(bi.url);
+        },
+        child: new Container(
+          color: _colorFromBuildStatus(bi.status),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          margin: const EdgeInsets.only(right: 8.0, top: 8.0),
+          child: new Center(
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              children: columnChildren,
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -251,65 +285,97 @@ class _DashboardPageState extends State<_DashboardPage> {
 
     Duration uptime = new DateTime.now().difference(_startTime);
 
+    List<Widget> rowChildren = <Widget>[
+      new Expanded(
+        child: new Center(
+          child: new Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+            new Text(
+              'Last updated:  ',
+              textAlign: TextAlign.center,
+              style: new TextStyle(
+                fontSize: _kFontSize,
+                fontWeight: FontWeight.w100,
+              ),
+            ),
+            new Text(
+              new DateFormat('EEEE MMMM d h:mm a', 'en_US').format(
+                new DateTime.now().toLocal(),
+              ),
+              textAlign: TextAlign.center,
+              style: new TextStyle(
+                fontSize: _kFontSize,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ]),
+        ),
+      ),
+      new Expanded(
+        child: new Center(
+          child: new Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              new Text(
+                'Up time:  ',
+                textAlign: TextAlign.center,
+                style: new TextStyle(
+                  fontSize: _kFontSize,
+                  fontWeight: FontWeight.w100,
+                ),
+              ),
+              new Text(
+                '${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m',
+                textAlign: TextAlign.center,
+                style: new TextStyle(
+                  fontSize: _kFontSize,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ];
+
+    if (_firstErrorTime != null) {
+      Duration firstFailureTime = _firstErrorTime.difference(_startTime);
+
+      rowChildren.add(
+        new Expanded(
+          child: new Center(
+            child: new Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new Text(
+                  'Time before first network failure:  ',
+                  textAlign: TextAlign.center,
+                  style: new TextStyle(
+                    fontSize: _kFontSize,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+                new Text(
+                  '${firstFailureTime.inDays}d ${firstFailureTime.inHours % 24}h ${firstFailureTime.inMinutes % 60}m',
+                  textAlign: TextAlign.center,
+                  style: new TextStyle(
+                    fontSize: _kFontSize,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     rows.add(
       new Container(
         height: 80.0,
         child: new Center(
           child: new Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              new Expanded(
-                child: new Center(
-                  child: new Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        new Text(
-                          'Last updated:  ',
-                          textAlign: TextAlign.center,
-                          style: new TextStyle(
-                            fontSize: _kFontSize,
-                            fontWeight: FontWeight.w100,
-                          ),
-                        ),
-                        new Text(
-                          new DateFormat('EEEE MMMM d h:mm a', 'en_US').format(
-                            new DateTime.now().toLocal(),
-                          ),
-                          textAlign: TextAlign.center,
-                          style: new TextStyle(
-                            fontSize: _kFontSize,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ]),
-                ),
-              ),
-              new Expanded(
-                child: new Center(
-                  child: new Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      new Text(
-                        'Up time:  ',
-                        textAlign: TextAlign.center,
-                        style: new TextStyle(
-                          fontSize: _kFontSize,
-                          fontWeight: FontWeight.w100,
-                        ),
-                      ),
-                      new Text(
-                        '${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m',
-                        textAlign: TextAlign.center,
-                        style: new TextStyle(
-                          fontSize: _kFontSize,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            children: rowChildren,
           ),
         ),
       ),
