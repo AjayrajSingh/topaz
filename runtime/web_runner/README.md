@@ -1,5 +1,5 @@
-Fuchsia Open Source Template Repository
+Web View Services Repository
 =======================================
 
-This repository is a template that we will use when creating new open source
-repositories for Fuchsia.
+This repository provides a FIDL interface and dart constants for web_view and
+dependents of web_view.
