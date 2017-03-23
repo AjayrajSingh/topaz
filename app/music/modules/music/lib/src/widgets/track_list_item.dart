@@ -47,7 +47,7 @@ class TrackListItem extends StatelessWidget {
     assert(track != null);
   }
 
-  TextStyle getTextStyle(Color primaryColor) {
+  TextStyle _getTextStyle(Color primaryColor) {
     return new TextStyle(
       color: isPlaying ? primaryColor : Colors.black,
     );
@@ -61,7 +61,7 @@ class TrackListItem extends StatelessWidget {
       new Expanded(
         child: new Text(
           track.title,
-          style: getTextStyle(_highlightColor),
+          style: _getTextStyle(_highlightColor),
         ),
       ),
       new Container(
@@ -69,7 +69,7 @@ class TrackListItem extends StatelessWidget {
         alignment: FractionalOffset.centerRight,
         child: new Text(
           new DurationFormat(track.duration).playbackText,
-          style: getTextStyle(_highlightColor),
+          style: _getTextStyle(_highlightColor),
         ),
       ),
     ];
@@ -80,7 +80,7 @@ class TrackListItem extends StatelessWidget {
         new Expanded(
           child: new Text(
             track.user.username,
-            style: getTextStyle(_highlightColor),
+            style: _getTextStyle(_highlightColor),
           ),
         ),
       );

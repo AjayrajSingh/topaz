@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 export 'widgets/home_page.dart';
+export 'widgets/inline_playlist.dart';
 export 'widgets/playback_slider.dart';
 export 'widgets/player.dart';
 export 'widgets/playlist_surface.dart';
