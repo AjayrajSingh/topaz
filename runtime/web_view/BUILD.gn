@@ -36,7 +36,7 @@ executable("web_view") {
   include_dirs = [ "prebuilt/include" ]
 
   deps = [
-    "services",
+    "//apps/web_runner/services",
     "//application/lib/app",
     "//apps/modular/lib/rapidjson",
     "//apps/modular/services/module",
