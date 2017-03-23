@@ -230,7 +230,7 @@ class Player extends StatelessWidget {
             ),
           ),
           new Text(
-            currentTrack.user.username.toUpperCase(),
+            currentTrack.user.username,
             overflow: TextOverflow.ellipsis,
             style: _kTrackUserStyle,
           ),
