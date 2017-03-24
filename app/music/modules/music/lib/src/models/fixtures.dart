@@ -4,54 +4,67 @@
 
 import 'package:fixtures/fixtures.dart';
 
-import 'playlist.dart';
+import 'album.dart';
+import 'artist.dart';
+import 'music_image.dart';
 import 'track.dart';
-import 'user.dart';
 
 /// Fixtures for Music
 class MusicModelFixtures extends Fixtures {
-  /// Generate a user
-  User user() {
-    return new User(
-      id: 1,
-      username: 'Nonch Harpin\'',
-      avatarUrl:
-          'https://static1.squarespace.com/static/54ce5022e4b047e0ce41d15f/t/56aacf959cadb6c10d1c8c32/1454293330651/?format=600w',
-      city: 'SF Bay',
-      country: 'United States',
-      trackCount: 12,
-      playlistCount: 1,
-      followersCount: 12,
-      websiteUrl: 'http://www.nonch-harpin.com/',
+  /// Generate an artist
+  Artist artist() {
+    return new Artist(
+      name: 'Nonch Harpin\'',
+      images: <MusicImage>[
+        new MusicImage(
+          height: 600.0,
+          width: 600.0,
+          url:
+              'https://static1.squarespace.com/static/54ce5022e4b047e0ce41d15f/t/56aacf959cadb6c10d1c8c32/1454293330651/?format=600w',
+        ),
+      ],
+      genres: <String>['Post Modern Jazz', 'Rap'],
+      id: 'artist_1',
+      followersCount: 6,
     );
   }
 
   /// Generate a track
   Track track() {
     return new Track(
-      title: 'Lil\' Antonin Scalia',
-      duration: new Duration(seconds: 328),
-      id: 1,
-      user: user(),
-      favoriteCount: 2,
-      playbackCount: 110,
-      artworkUrl:
-          'https://static1.squarespace.com/static/54ce5022e4b047e0ce41d15f/t/56aacd8289a60a49487afd52/1454034307698/NaSons.png',
-    );
+        name: 'Lil\' Antonin Scalia',
+        duration: new Duration(seconds: 328),
+        id: 'track_1',
+        trackNumber: 1,
+        artists: <Artist>[artist()],
+        album: new Album(
+          name: 'Native Sons',
+          artists: <Artist>[artist()],
+          images: <MusicImage>[
+            new MusicImage(
+              height: 100.0,
+              width: 100.0,
+              url:
+                  'https://static1.squarespace.com/static/54ce5022e4b047e0ce41d15f/t/56aacd8289a60a49487afd52/1454034307698/NaSons.png',
+            ),
+          ],
+          id: 'album_1',
+        ));
   }
 
-  /// Generate a playlist
-  Playlist playlist() {
-    return new Playlist(
-      title: 'Native Sons',
-      description: '',
-      duration: new Duration(seconds: 1640),
-      id: 2,
-      playlistType: 'album',
-      trackCount: 5,
-      artworkUrl:
-          'https://static1.squarespace.com/static/54ce5022e4b047e0ce41d15f/t/56aacd8289a60a49487afd52/1454034307698/NaSons.png',
-      user: user(),
+  /// Generate an album
+  Album album() {
+    return new Album(
+      name: 'Native Sons',
+      artists: <Artist>[artist()],
+      images: <MusicImage>[
+        new MusicImage(
+          height: 100.0,
+          width: 100.0,
+          url:
+              'https://static1.squarespace.com/static/54ce5022e4b047e0ce41d15f/t/56aacd8289a60a49487afd52/1454034307698/NaSons.png',
+        ),
+      ],
       tracks: <Track>[
         track(),
         track(),
@@ -59,7 +72,10 @@ class MusicModelFixtures extends Fixtures {
         track(),
         track(),
       ],
-      createdAt: new DateTime(2014),
+      releaseDate: DateTime.parse('2015-11-18'),
+      albumType: 'album',
+      genres: <String>['Post Modern Jazz', 'Rap'],
+      id: 'album_1',
     );
   }
 }

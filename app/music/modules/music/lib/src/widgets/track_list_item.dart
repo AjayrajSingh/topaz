@@ -20,9 +20,9 @@ class TrackListItem extends StatelessWidget {
   /// Defaults to false.
   final bool isPlaying;
 
-  /// Whether to show the user of the given track. This is usually used when an
+  /// Whether to show the artist of the given track. This is usually used when an
   /// album is shown where all the tracks are
-  final bool showUser;
+  final bool showArtist;
 
   /// Callback for when the [TrackListItem] is tapped
   final VoidCallback onTap;
@@ -39,7 +39,7 @@ class TrackListItem extends StatelessWidget {
     Key key,
     @required this.track,
     this.isPlaying: false,
-    this.showUser: true,
+    this.showArtist: true,
     this.onTap,
     this.highlightColor,
   })
@@ -60,7 +60,7 @@ class TrackListItem extends StatelessWidget {
     List<Widget> children = <Widget>[
       new Expanded(
         child: new Text(
-          track.title,
+          track.name,
           style: _getTextStyle(_highlightColor),
         ),
       ),
@@ -74,12 +74,12 @@ class TrackListItem extends StatelessWidget {
       ),
     ];
 
-    if (showUser) {
+    if (showArtist) {
       children.insert(
         1,
         new Expanded(
           child: new Text(
-            track.user.username,
+            track.artists.first.name,
             style: _getTextStyle(_highlightColor),
           ),
         ),

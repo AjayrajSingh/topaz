@@ -184,13 +184,13 @@ class Player extends StatelessWidget {
                           ),
                           children: <TextSpan>[
                             new TextSpan(
-                              text: currentTrack.title,
+                              text: currentTrack.name,
                               style: _kTrackTitleStyle,
                             ),
                             // Spacing between the title and user text
                             new TextSpan(text: '  '),
                             new TextSpan(
-                              text: currentTrack.user.username,
+                              text: currentTrack.artists.first.name,
                               style: _kTrackUserStyle,
                             ),
                           ],
@@ -224,13 +224,13 @@ class Player extends StatelessWidget {
           new Container(
             padding: const EdgeInsets.only(bottom: 4.0),
             child: new Text(
-              currentTrack.title,
+              currentTrack.name,
               overflow: TextOverflow.ellipsis,
               style: _kTrackTitleStyle,
             ),
           ),
           new Text(
-            currentTrack.user.username,
+            currentTrack.artists.first.name,
             overflow: TextOverflow.ellipsis,
             style: _kTrackUserStyle,
           ),
@@ -243,7 +243,7 @@ class Player extends StatelessWidget {
     return new Row(
       children: <Widget>[
         new TrackArt(
-          artworkUrl: currentTrack.artworkUrl,
+          artworkUrl: currentTrack.defaultArtworkUrl,
           size: _kPlayerHeight,
         ),
         new Expanded(

@@ -5,7 +5,7 @@
 import 'dart:convert' show JSON;
 import 'dart:io';
 
-import 'package:music/src/models/track.dart';
+import 'package:music/src/models.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -14,17 +14,28 @@ void main() {
         await new File('models/mock_json/track.json').readAsString();
     dynamic json = JSON.decode(rawJson);
     Track track = new Track.fromJson(json);
-    expect(track.title, json['title']);
-    expect(track.description, json['description']);
-    expect(track.duration.inMilliseconds, json['duration']);
+    expect(track.name, json['name']);
+    expect(track.artists[0].name, json['artists'][0]['name']);
+    expect(track.album.name, json['album']['name']);
+    expect(track.duration, new Duration(milliseconds: json['duration_ms']));
+    expect(track.trackNumber, json['track_number']);
     expect(track.id, json['id']);
-    expect(track.user.id, json['user']['id']);
-    expect(track.user.username, json['user']['username']);
-    expect(track.user.avatarUrl, json['user']['avatar_url']);
-    expect(track.favoriteCount, json['favoritings_count']);
-    expect(track.playbackCount, json['playback_count']);
-    expect(track.artworkUrl, json['artwork_url']);
-    expect(track.streamUrl, json['stream_url']);
-    expect(track.videoUrl, json['video_url']);
+  });
+
+  test('getter: defaultArtworkUrl', () async {
+    String imageUrl = 'imageUrl';
+    Track track = new Track(
+      album: new Album(
+        images: <MusicImage>[
+          new MusicImage(url: 'imageUrl'),
+        ],
+      ),
+    );
+    expect(track.defaultArtworkUrl, imageUrl);
+  });
+
+  test('getter: defaultArtworkUrl with no images', () async {
+    Track track = new Track();
+    expect(track.defaultArtworkUrl, null);
   });
 }

@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import '../models/playlist.dart';
+import '../models/album.dart';
 import '../models/track.dart';
 import '../utils.dart';
 import 'track_art.dart';
@@ -37,10 +37,10 @@ const double _kMainContentMaxWidth = 1000.0;
 /// Callback function signature for an action on a track
 typedef void TrackActionCallback(Track track);
 
-/// UI Widget that represents a playlist surface
-class PlaylistSurface extends StatelessWidget {
-  /// The [Playlist] to represent for this [PlaylistSurface]
-  final Playlist playlist;
+/// UI Widget that represents a album surface
+class AlbumSurface extends StatelessWidget {
+  /// The [Album] to represent for this [AlbumSurface]
+  final Album album;
 
   /// [Color] used as the highlight.
   /// This is used for the background of the header and also as highlights
@@ -62,9 +62,9 @@ class PlaylistSurface extends StatelessWidget {
   final TrackActionCallback onTapTrack;
 
   /// Constructor
-  PlaylistSurface({
+  AlbumSurface({
     Key key,
-    @required this.playlist,
+    @required this.album,
     this.highlightColor,
     this.onToggleFollow,
     this.isFollowing: false,
@@ -72,7 +72,15 @@ class PlaylistSurface extends StatelessWidget {
     this.onTapTrack,
   })
       : super(key: key) {
-    assert(playlist != null);
+    assert(album != null);
+  }
+
+  String get _totalDurationText {
+    Duration totalDuration = album.tracks.fold(
+      new Duration(),
+      (Duration duration, Track track) => duration + track.duration,
+    );
+    return new DurationFormat(totalDuration).totalText;
   }
 
   Widget _buildHeaderDetails() {
@@ -91,14 +99,13 @@ class PlaylistSurface extends StatelessWidget {
             ),
           ),
           new TextSpan(
-            text: '${playlist.user.username}  -  ',
+            text: '${album.artists.first.name}  -  ',
             style: new TextStyle(
               fontWeight: FontWeight.w500,
             ),
           ),
           new TextSpan(
-            text: '${playlist.trackCount} tracks, '
-                '${new DurationFormat(playlist.duration).totalText}',
+            text: '${album.tracks.length} tracks, $_totalDurationText',
             style: new TextStyle(
               fontWeight: FontWeight.w300,
             ),
@@ -139,7 +146,7 @@ class PlaylistSurface extends StatelessWidget {
       children: <Widget>[
         // Playlist Type
         new Text(
-          playlist.playlistType.toUpperCase(),
+          album.albumType.toUpperCase(),
           style: new TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w300,
@@ -147,7 +154,7 @@ class PlaylistSurface extends StatelessWidget {
         ),
         // Title
         new Text(
-          playlist.title,
+          album.name,
           style: new TextStyle(
             color: Colors.white,
             fontSize: 32.0,
@@ -194,14 +201,14 @@ class PlaylistSurface extends StatelessWidget {
         ),
       ),
     ];
-    listChildren.addAll(playlist.tracks.map((Track track) => new Container(
+    listChildren.addAll(album.tracks.map((Track track) => new Container(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: new TrackListItem(
             track: track,
             highlightColor: highlightColor,
             isPlaying: currentTrack == track,
             onTap: () => onTapTrack?.call(track),
-            showUser: playlist.playlistType != 'album',
+            showArtist: album.albumType != 'album',
           ),
         )));
 
@@ -240,7 +247,7 @@ class PlaylistSurface extends StatelessWidget {
             margin: const EdgeInsets.all(4.0),
             child: new TrackArt(
               size: _kArtworkSize,
-              artworkUrl: playlist.artworkUrl,
+              artworkUrl: album.images.first?.url,
             ),
           ),
         ),

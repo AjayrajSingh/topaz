@@ -1,0 +1,29 @@
+{
+  "external_urls" : {
+    "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+  },
+  "followers" : {
+    "href" : null,
+    "total" : 6
+  },
+  "genres" : ["Post Modern Jazz"],
+  "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+  "id" : "6E1rccfBuIsyLUBH81PYoG",
+  "images" : [ {
+    "height" : 640,
+    "url" : "https://i.scdn.co/image/36fa6374df504e39033932377494a5c3c260ba9e",
+    "width" : 640
+  }, {
+    "height" : 300,
+    "url" : "https://i.scdn.co/image/47026847db3f7666b87bdb180ebd6746c9c676ef",
+    "width" : 300
+  }, {
+    "height" : 64,
+    "url" : "https://i.scdn.co/image/48df42ae766fa772003a1db5435f9fc9a0042fe9",
+    "width" : 64
+  } ],
+  "name" : "Nonch Harpin'",
+  "popularity" : 0,
+  "type" : "artist",
+  "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+}

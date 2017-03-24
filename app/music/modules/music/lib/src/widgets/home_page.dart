@@ -4,10 +4,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../models/album.dart';
 import '../models/fixtures.dart';
-import '../models/playlist.dart';
+import 'album_surface.dart';
 import 'player.dart';
-import 'playlist_surface.dart';
 
 /// MyHomePage widget.
 class MyHomePage extends StatelessWidget {
@@ -21,7 +21,7 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     Color highlightColor = Colors.pink[400];
     MusicModelFixtures fixture = new MusicModelFixtures();
-    Playlist playlist = fixture.playlist();
+    Album album = fixture.album();
     return new Scaffold(
       backgroundColor: Colors.grey[800],
       appBar: new AppBar(
@@ -31,11 +31,11 @@ class MyHomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Expanded(
-            child: new PlaylistSurface(
-              playlist: playlist,
+            child: new AlbumSurface(
+              album: album,
               highlightColor: highlightColor,
               isFollowing: true,
-              currentTrack: playlist.tracks[2],
+              currentTrack: album.tracks[2],
             ),
           ),
           new Material(

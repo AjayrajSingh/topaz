@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import '../models/playlist.dart';
+import '../models/album.dart';
 import '../models/track.dart';
 import 'track_art.dart';
 import 'track_list_item.dart';
@@ -13,13 +13,13 @@ import 'track_list_item.dart';
 const double _kArtworkSize = 88.0;
 final TextStyle _kSubtitleStyle = new TextStyle(color: Colors.grey[500]);
 
-/// UI widget that represents a playlist that will be shown inline with other
-/// elements, such as other playlists for tracks.
+/// UI widget that represents a album that will be shown inline with other
+/// elements, such as other albums
 ///
-/// This will be typically used in the user surface
-class InlinePlaylist extends StatelessWidget {
-  /// The given [playlist] to render
-  final Playlist playlist;
+/// This will be typically used in the artist surface
+class InlineAlbum extends StatelessWidget {
+  /// The given [album] to render
+  final Album album;
 
   /// The track that is currently playing
   final Track currentTrack;
@@ -31,14 +31,14 @@ class InlinePlaylist extends StatelessWidget {
   final Color highlightColor;
 
   /// Constructor
-  InlinePlaylist({
+  InlineAlbum({
     Key key,
-    @required this.playlist,
+    @required this.album,
     this.currentTrack,
     this.highlightColor,
   })
       : super(key: key) {
-    assert(playlist != null);
+    assert(album != null);
   }
 
   Widget _buildListSection(Color highlightColor) {
@@ -65,16 +65,16 @@ class InlinePlaylist extends StatelessWidget {
                   ),
                   children: <TextSpan>[
                     new TextSpan(
-                      text: playlist.title,
+                      text: album.name,
                       style: new TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    // Spacing between the title and playlist type
+                    // Spacing between the title and album type
                     new TextSpan(text: '  '),
                     new TextSpan(
-                      text: playlist.playlistType.toUpperCase(),
+                      text: album.albumType.toUpperCase(),
                       style: _kSubtitleStyle,
                     ),
                   ],
@@ -83,7 +83,7 @@ class InlinePlaylist extends StatelessWidget {
             ),
             // Year
             new Text(
-              '${playlist.createdAt.year}',
+              '${album.releaseDate.year}',
               style: _kSubtitleStyle,
             ),
           ],
@@ -91,11 +91,11 @@ class InlinePlaylist extends StatelessWidget {
       ),
     ];
 
-    children.addAll(playlist.tracks.map((Track track) => new TrackListItem(
+    children.addAll(album.tracks.map((Track track) => new TrackListItem(
           track: track,
           isPlaying: track == currentTrack,
           highlightColor: highlightColor,
-          showUser: false,
+          showArtist: false,
         )));
 
     return new Column(
@@ -117,7 +117,7 @@ class InlinePlaylist extends StatelessWidget {
             right: 32.0,
           ),
           child: new TrackArt(
-            artworkUrl: playlist.artworkUrl,
+            artworkUrl: album.defaultArtworkUrl,
             size: _kArtworkSize,
           ),
         ),

@@ -2,69 +2,66 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import './user.dart';
+import 'album.dart';
+import 'artist.dart';
 
-/// Model representing a SoundCloud track
+/// Model representing a Spotify track
 ///
-/// https://developers.soundcloud.com/docs/api/reference#tracks
+/// https://developer.spotify.com/web-api/object-model/#track-object-full
 class Track {
-  /// Title of the track
-  final String title;
+  /// Name of track
+  final String name;
 
-  /// Description for the track
-  final String description;
+  /// Artists who performed in track
+  final List<Artist> artists;
 
-  /// Duration of the track
+  /// Album that the track appears in
+  final Album album;
+
+  /// Duration of track
   final Duration duration;
 
-  /// ID for the track
-  final int id;
+  /// The track number of this track in the album
+  final int trackNumber;
 
-  /// User who is the owner of this track
-  final User user;
-
-  /// Number of times this track has been favorited
-  final int favoriteCount;
-
-  /// Number of times this track has been played
-  final int playbackCount;
-
-  /// URL for artwork image of track
-  final String artworkUrl;
-
-  /// URL to stream this track
-  final String streamUrl;
-
-  /// URL of external video for this track
-  final String videoUrl;
+  /// ID of track
+  final String id;
 
   /// Constructor
   Track({
-    this.title,
-    this.description,
+    this.name,
+    this.artists,
+    this.album,
     this.duration,
+    this.trackNumber,
     this.id,
-    this.user,
-    this.favoriteCount,
-    this.playbackCount,
-    this.artworkUrl,
-    this.streamUrl,
-    this.videoUrl,
   });
 
   /// Create a new track from JSON data
   factory Track.fromJson(dynamic json) {
     return new Track(
-      title: json['title'],
-      description: json['description'],
-      duration: new Duration(milliseconds: json['duration']),
+      name: json['name'],
+      artists: json['artists'] is List<dynamic>
+          ? json['artists']
+              .map((dynamic artistJson) => new Artist.fromJson(artistJson))
+              .toList()
+          : <Artist>[],
+      // Tracks accessed within an album will have this as null
+      album: json['album'] != null ? new Album.fromJson(json['album']) : null,
+      duration: new Duration(milliseconds: json['duration_ms']),
+      trackNumber: json['track_number'],
       id: json['id'],
-      user: new User.fromJson(json['user']),
-      favoriteCount: json['favoritings_count'],
-      playbackCount: json['playback_count'],
-      artworkUrl: json['artwork_url'],
-      streamUrl: json['stream_url'],
-      videoUrl: json['video_url'],
     );
+  }
+
+  /// Gets the default artwork for this track.
+  /// Spotify uses the first image as the largest image.
+  /// Returns NULL is there is no image in this track.
+  String get defaultArtworkUrl {
+    if(album != null && album.images != null && album.images.isNotEmpty) {
+      return album.images.first.url;
+    } else {
+      return null;
+    }
   }
 }
