@@ -53,7 +53,7 @@
 #include "apps/mozart/lib/view_framework/input_handler.h"
 #include "apps/mozart/lib/view_framework/view_provider_app.h"
 #include "apps/mozart/services/buffers/cpp/buffer_producer.h"
-#include "apps/web_view_services/services/web_view.fidl.h"
+#include "apps/web_runner/services/web_view.fidl.h"
 #include "lib/ftl/command_line.h"
 #include "lib/ftl/logging.h"
 #include "lib/ftl/macros.h"
