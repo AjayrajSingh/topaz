@@ -4,6 +4,7 @@
 
 group("modules") {
   deps = [
+    "chess",
     "color",
     "gallery",
     "interactive_receipt",
