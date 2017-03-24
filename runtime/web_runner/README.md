@@ -1,5 +1,5 @@
-Web View Services Repository
-=======================================
+Web Runner
+==========
 
-This repository provides a FIDL interface and dart constants for web_view and
-dependents of web_view.
+Eventually, this repository will contain an application that display web pages.
+For now, it just contains FIDL interfaces for controlling a web view.
