@@ -15,3 +15,10 @@ FLUTTER_TARGET := modules/music
 FUCHSIA_TARGET := music
 
 include $(common_makefile)
+
+
+################################################################################
+## Project specific build
+.PHONY: build-override
+build-override:
+	@true
