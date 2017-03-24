@@ -52,36 +52,82 @@ flutter := $(flutter_bin)/flutter
 dart := $(dart_bin)/dart
 pub := $(dart_bin)/pub
 
-ignored_dirs := _book generated infra node_modules testdata
+ignored_dirs := _book generated infra node_modules testdata ios .pub
 ignore_flags := $(shell echo $(addprefix '! -wholename "*/',$(addsuffix '/*"',$(ignored_dirs))))
 sfind := find $(root) $(ignore_flags)
 
 dart_sources := $(shell $(sfind) -name "*.dart")
 
-dart_packages := $(shell $(sfind) -name "pubspec.yaml" -exec dirname {} \;)
+dart_packages := $(realpath $(shell $(sfind) -name "pubspec.yaml" -exec dirname {} \;))
 # find all dart packages defined in BUILD.gn
-dart_gn_packages := $(shell grep -Rwl . --include="*.gn" -e "^\(flutter_app\|dart_package\)" | xargs -n1 dirname | sort -u)
+dart_gn_packages := $(realpath $(shell grep -Rwl . --include="*.gn" -e "^\(flutter_app\|dart_package\)" | xargs -n1 dirname | sort -u))
 dart_all_packages := $(sort $(dart_packages) $(dart_gn_packages))
 dart_analysis_options := $(addsuffix /.analysis_options, $(dart_all_packages))
 
 sources := $(shell $(sfind) \
-	-name "*.dart" \
+	\( -name "*.dart" \
 	-o -name "*.py" \
 	-o -name "*.fidl" \
 	-o -name "*.gn" \
 	-o -name "*.sh" \
-	-o -name "*.yaml")
+	-o -name "*.yaml" \))
 
 makefiles := $(foreach file, $(MAKEFILE_LIST), $(realpath $(file)))
 
 PATH := $(flutter_bin):$(dart_bin):$(PATH)
 
+################################################################################
+## Fuchsia build / LUCI bot related flags
+
+# Specify GOMA=1 to force use goma, GOMA=0 to force not use goma.
+# Auto-detect if not specified.
+FSET_FLAGS :=
+GOMA ?=
+ifeq ($(GOMA),1)
+	FSET_FLAGS += --goma
+endif
+ifeq ($(GOMA),0)
+	FSET_FLAGS += --no-goma
+endif
+
+GOMA_DIR ?=
+ifneq ($(strip $(GOMA_DIR)),)
+	FSET_FLAGS += --goma-dir $(GOMA_DIR)
+endif
+
+# If NO_ENSURE_GOMA=1 then we tell fbuild not to run the goma script directly.
+NO_ENSURE_GOMA ?=
+ifeq ($(NO_ENSURE_GOMA),1)
+	FSET_FLAGS += --no-ensure-goma
+endif
+
+# If MINIMAL=1 then we perform a minimal build of only the "modules" package and
+# its dependencies.
+MINIMAL ?=
+ifeq ($(MINIMAL),1)
+	FSET_FLAGS += --modules modules
+endif
+
+# Respect the fuchsia build variant if already set by fset command externally.
+# Otherwise, default to debug build.
+FUCHSIA_VARIANT ?= debug
+ifeq ($(FUCHSIA_VARIANT),release)
+	FSET_FLAGS += --release
+endif
+
+################################################################################
+
+
 .PHONY: all
 all: build
 
+.PHONY: init
+init: ## Set path to pick up deps with: eval $(make init)
+	@echo "export PATH=${PATH}"
+
 .PHONY: build
-build: $(dart_analysis_options) ## Build Fuchsia with project.
-	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/build.sh
+build: $(dart_analysis_options) build-override ## Build Fuchsia with project.
+	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/build.sh $(FSET_FLAGS)
 
 .PHONY: clean
 clean: dart-clean ## Clean build artifacts from this project.
@@ -150,8 +196,9 @@ dart-clean:
 
 .PHONY: dart-lint
 dart-lint: build
-	@$(fuchsia_root)/scripts/run-dart-analysis.py \
-			--out=$(fuchsia_out)/debug-x86-64 \
+	@source $(fuchsia_root)/scripts/env.sh && fset x86-64 $(FSET_FLAGS) && \
+	$(fuchsia_root)/scripts/run-dart-analysis.py \
+			--out=$(fuchsia_out)/$(FUCHSIA_VARIANT)-$(FUCHSIA_GEN_TARGET) \
 			--tree=//apps/modules/$(PROJECT)/* \
 			--lints --fatal-lints --fatal-warnings
 
@@ -179,7 +226,7 @@ dart-fmt-check: $(dart_bin) $(tools_root)/dartfmt_extras/.packages
 dart-test: $(dart_bin)
 	@$(common_root)/run_dart_tests.py
 	@## Remove the .packages files to sanitize the Atom dart analysis.
-	@rm -f $(addsuffix "/.packages",$(dart_all_packages))
+	@rm -f $(addsuffix "/.packages",$(dart_gn_packages))
 
 .PHONY: dart-coverage
 dart-coverage: $(dart_bin)
@@ -187,7 +234,7 @@ dart-coverage: $(dart_bin)
 	@$(common_root)/merge_coverage.sh
 	@$(dart) $(common_root)/report_coverage.dart coverage/lcov.info
 	@## Remove the .packages files to sanitize the Atom dart analysis.
-	@rm -f $(addsuffix "/.packages",$(dart_all_packages))
+	@rm -f $(addsuffix "/.packages",$(dart_gn_packages))
 
 .PHONY: copyright-check
 copyright-check: ## Check source files for missing copyright.
