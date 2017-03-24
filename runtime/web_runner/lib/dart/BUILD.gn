@@ -2,4 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-name: web_view
+import("//build/dart/dart_package.gni")
+
+dart_package("web_view") {
+  package_name = "web_view"
+}
