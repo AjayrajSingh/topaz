@@ -15,3 +15,10 @@ FLUTTER_TARGET := modules/contacts
 FUCHSIA_TARGET := contacts
 
 include $(common_makefile)
+
+
+################################################################################
+## Project specific build
+.PHONY: build-override
+build-override:
+	@true
