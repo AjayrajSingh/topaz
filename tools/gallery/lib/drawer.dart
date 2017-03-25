@@ -41,13 +41,14 @@ class _GalleryDrawerState extends State<GalleryDrawer> {
       color: subheaderStyle.color.withOpacity(0.54),
     );
 
-    drawerItems.add(new DrawerItem(
-      icon: null,
-      child: new Text(
-        'Debug Menu',
-        style: subheaderStyle,
+    drawerItems.add(
+      new ListTile(
+        title: new Text(
+          'Debug Menu',
+          style: subheaderStyle,
+        ),
       ),
-    ));
+    );
 
     // Performance overlay
     if (config.onShowPerformanceOverlayChanged != null) {
@@ -119,14 +120,10 @@ class _GalleryDrawerState extends State<GalleryDrawer> {
     bool value,
     ValueChanged<bool> onChanged,
   }) {
-    return new DrawerItem(
-      icon: icon,
-      child: new Row(
-        children: <Widget>[
-          new Expanded(child: new Text(text)),
-          new Checkbox(value: value, onChanged: onChanged),
-        ],
-      ),
+    return new ListTile(
+      leading: icon,
+      title: new Text(text),
+      trailing: new Checkbox(value: value, onChanged: onChanged),
     );
   }
 }
