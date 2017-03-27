@@ -19,3 +19,19 @@ dart_app("integration") {
     "//third_party/dart-pkg/pub/test",
   ]
 }
+
+dart_aot_app("integration_aot") {
+  testonly = true
+
+  output_name = "dart_aot_runner_test.dartx"
+
+  main_dart = "main.dart"
+
+  source_dir = "."
+
+  deps = [
+    "//application/lib/app/dart",
+    "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}

@@ -15,3 +15,13 @@ dart_app("hello_app_dart") {
     "//lib/fidl/dart",
   ]
 }
+
+dart_aot_app("hello_app_dart_aot") {
+  main_dart = "main.dart"
+
+  deps = [
+    "//application/lib/app/dart",
+    "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//lib/fidl/dart",
+  ]
+}

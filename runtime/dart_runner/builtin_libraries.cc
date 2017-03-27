@@ -133,6 +133,9 @@ void InitBuiltinLibrariesForIsolate(
   Dart_Handle internal_lib = Dart_LookupLibrary(ToDart("dart:_internal"));
   Dart_Handle isolate_lib = Dart_LookupLibrary(ToDart("dart:isolate"));
 
+#if !defined(AOT_RUNTIME)
+  // AOT: These steps already happened at compile time in snapshotter/main.cc.
+
   // We need to ensure that all the scripts loaded so far are finalized
   // as we are about to invoke some Dart code below to setup closures.
   DART_CHECK_VALID(Dart_FinalizeLoading(false));
@@ -140,6 +143,7 @@ void InitBuiltinLibrariesForIsolate(
   // Import dart:_internal into dart:fuchsia.builtin for setting up hooks.
   DART_CHECK_VALID(
       Dart_LibraryImportLibrary(builtin_lib, internal_lib, Dart_Null()));
+#endif
 
   // Setup the internal library's 'internalPrint' function.
   Dart_Handle print =
