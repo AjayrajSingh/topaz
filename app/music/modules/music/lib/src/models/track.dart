@@ -58,7 +58,7 @@ class Track {
   /// Spotify uses the first image as the largest image.
   /// Returns NULL is there is no image in this track.
   String get defaultArtworkUrl {
-    if(album != null && album.images != null && album.images.isNotEmpty) {
+    if (album != null && album.images != null && album.images.isNotEmpty) {
       return album.images.first.url;
     } else {
       return null;

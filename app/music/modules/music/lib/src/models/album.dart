@@ -72,12 +72,11 @@ class Album {
     );
   }
 
-
   /// Gets the default artwork for this album.
   /// Spotify uses the first image as the largest image.
   /// Returns NULL is there is no image in this album.
   String get defaultArtworkUrl {
-    if(images != null && images.isNotEmpty) {
+    if (images != null && images.isNotEmpty) {
       return images.first.url;
     } else {
       return null;
