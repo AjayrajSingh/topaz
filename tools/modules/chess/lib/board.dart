@@ -40,41 +40,14 @@ class _BoardState extends State<Board> {
   void initState() {
     super.initState();
     chessGame = new ChessGame();
-    // Proper Starting Positions
-    positions = <int, BoardPiece>{
-      0: new BoardPiece(0, 'R', movePiece, pieceInHand),
-      1: new BoardPiece(1, 'N', movePiece, pieceInHand),
-      2: new BoardPiece(2, 'B', movePiece, pieceInHand),
-      3: new BoardPiece(3, 'Q', movePiece, pieceInHand),
-      4: new BoardPiece(4, 'K', movePiece, pieceInHand),
-      5: new BoardPiece(5, 'B', movePiece, pieceInHand),
-      6: new BoardPiece(6, 'N', movePiece, pieceInHand),
-      7: new BoardPiece(7, 'R', movePiece, pieceInHand),
-      8: new BoardPiece(8, 'P', movePiece, pieceInHand),
-      9: new BoardPiece(9, 'P', movePiece, pieceInHand),
-      10: new BoardPiece(10, 'P', movePiece, pieceInHand),
-      11: new BoardPiece(11, 'P', movePiece, pieceInHand),
-      12: new BoardPiece(12, 'P', movePiece, pieceInHand),
-      13: new BoardPiece(13, 'P', movePiece, pieceInHand),
-      14: new BoardPiece(14, 'P', movePiece, pieceInHand),
-      15: new BoardPiece(15, 'P', movePiece, pieceInHand),
-      48: new BoardPiece(48, 'p', movePiece, pieceInHand),
-      49: new BoardPiece(49, 'p', movePiece, pieceInHand),
-      50: new BoardPiece(50, 'p', movePiece, pieceInHand),
-      51: new BoardPiece(51, 'p', movePiece, pieceInHand),
-      52: new BoardPiece(52, 'p', movePiece, pieceInHand),
-      53: new BoardPiece(53, 'p', movePiece, pieceInHand),
-      54: new BoardPiece(54, 'p', movePiece, pieceInHand),
-      55: new BoardPiece(55, 'p', movePiece, pieceInHand),
-      56: new BoardPiece(56, 'r', movePiece, pieceInHand),
-      57: new BoardPiece(57, 'n', movePiece, pieceInHand),
-      58: new BoardPiece(58, 'b', movePiece, pieceInHand),
-      59: new BoardPiece(59, 'q', movePiece, pieceInHand),
-      60: new BoardPiece(60, 'k', movePiece, pieceInHand),
-      61: new BoardPiece(61, 'b', movePiece, pieceInHand),
-      62: new BoardPiece(62, 'n', movePiece, pieceInHand),
-      63: new BoardPiece(63, 'r', movePiece, pieceInHand)
-    };
+    Map<int, String> boardPositions = chessGame.getPositions();
+    boardPositions
+        .forEach((int index, String piece) => positions[index] = new BoardPiece(
+              index: index,
+              name: piece,
+              onMove: handleMovePiece,
+              onDragStart: handleSelectPiece,
+            ));
   }
 
   @override
@@ -82,13 +55,11 @@ class _BoardState extends State<Board> {
     super.dispose();
   }
 
-  void clickSquare(int index) {
+  void handleTapSquare(int index) {
+    print('index: $index');
     if (pieceSelected == null) {
-      if (positions.containsKey(index)) {
-        pieceSelected = index;
-        setState(() {
-          highlights = chessGame.validMoves(index);
-        });
+      if (chessGame.getPositions().containsKey(index)) {
+        handleSelectPiece(index);
       }
     } else {
       if (highlights.contains(index)) {
@@ -96,49 +67,55 @@ class _BoardState extends State<Board> {
           'from': pieceSelected,
           'to': index,
         };
-        movePiece(move);
-        pieceSelected == null;
-      } else if (positions.containsKey(index)) {
-        pieceSelected = index;
-        setState(() {
-          highlights = chessGame.validMoves(index);
-        });
+        handleMovePiece(move);
+      } else if (chessGame.getPositions().containsKey(index)) {
+        handleSelectPiece(index);
       } else {
-        pieceSelected = null;
-        setState(() {
-          highlights = <int>[];
-        });
+        clearSelection();
       }
     }
   }
 
-  void pieceInHand(int index) {
-    List<int> setOfMoves = chessGame.validMoves(index);
+  // Update the visual presentation of board pieces
+  void updatePositions() {
+    positions.clear();
+    Map<int, String> boardPositions = chessGame.getPositions();
+    boardPositions
+        .forEach((int index, String piece) => positions[index] = new BoardPiece(
+              index: index,
+              name: piece,
+              onMove: handleMovePiece,
+              onDragStart: handleSelectPiece,
+            ));
+  }
+
+  // Highlights the drop targets for the current piece
+  void handleSelectPiece(int index) {
+    pieceSelected = index;
+    List<int> setOfMoves = chessGame.validMoves(position: index);
     setState(() {
       highlights = setOfMoves;
     });
   }
 
-  void movePiece(Map<String, int> data) {
+  void clearSelection() {
+    pieceSelected = null;
+    setState(() {
+      highlights = <int>[];
+    });
+  }
+
+  // Attempt to move the piece
+  // If successful highlight the origin and destination of the move
+  // Otherwise reset the highlights
+  void handleMovePiece(Map<String, int> data) {
     int from = data['from'];
     int to = data['to'];
-    List<int> setOfMoves = chessGame.validMoves(from);
-    if (setOfMoves.contains(to)) {
-      print('valid move');
-      BoardPiece piece = positions[from];
-      BoardPiece capture = positions[to];
-      undo = <String, dynamic>{
-        'piece': piece,
-        'from': from,
-        'to': to,
-        'capture': capture,
-      };
+    bool validMove = chessGame.movePiece(from: from, to: to);
+    if (validMove) {
       setState(() {
         highlights = <int>[from, to];
-        BoardPiece piece = positions[from];
-        positions.remove(from);
-        piece.index = to;
-        positions[to] = piece;
+        updatePositions();
       });
       confirmMove();
     } else {
@@ -146,6 +123,7 @@ class _BoardState extends State<Board> {
         highlights = <int>[];
       });
     }
+    pieceSelected = null;
   }
 
   void cancelMove() {
@@ -187,8 +165,13 @@ class _BoardState extends State<Board> {
           Color colorval = (i % 2 == (j % 2)) ? _kDarkColor : _kLightColor;
           index = ((7 - i) * 8) + j;
           bool highlight = highlights.contains(index);
-          grids.add(new BoardSquare(index, colorval, this.clickSquare,
-              piece: this.positions[index], highlight: highlight));
+          grids.add(new BoardSquare(
+            index: index,
+            color: colorval,
+            onTap: this.handleTapSquare,
+            piece: this.positions[index],
+            highlight: highlight,
+          ));
         }
       }
     } else {
@@ -197,8 +180,12 @@ class _BoardState extends State<Board> {
           Color colorval = (i % 2 == (j % 2)) ? _kDarkColor : _kLightColor;
           index = ((7 - i) * 8) + j;
           bool highlight = highlights.contains(index);
-          grids.add(new BoardSquare(index, colorval, this.clickSquare,
-              piece: this.positions[index], highlight: highlight));
+          grids.add(new BoardSquare(
+              index: index,
+              color: colorval,
+              onTap: this.handleTapSquare,
+              piece: this.positions[index],
+              highlight: highlight));
         }
       }
     }

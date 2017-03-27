@@ -16,7 +16,7 @@ class BoardPiece extends StatelessWidget {
   String name;
 
   /// Image of the piece
-  Image piece;
+  Image pieceImage;
 
   /// Board piece opacity
   double opacity = 1.0;
@@ -34,35 +34,32 @@ class BoardPiece extends StatelessWidget {
   final ValueChanged<int> onDragStart;
 
   /// Creates a new [BoardPiece].
-  BoardPiece(
+  BoardPiece({
     this.index,
     this.name,
     this.onMove,
-    this.onDragStart, {
+    this.onDragStart,
     Key key,
   })
       : super(key: key) {
     String filename;
+    // The difference between white and black is capitalization in FEN
     if (name.toUpperCase() == name) {
       filename = 'w${name.toUpperCase()}';
     } else {
       filename = 'b${name.toUpperCase()}';
     }
-    this.piece = new Image.asset('assets/$filename.png');
+    this.pieceImage = new Image.asset('assets/$filename.png');
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     double height = (min(size.height, size.width) * 0.9) / 8;
-//    GridSpecification gspec = _boardGridDelegate.getGridSpecification(
-//        new BoxConstraints.loose(screenSize), 64);
-//    double height = gspec.gridSize.height / gspec.rowCount;
 
     return new Draggable<BoardPiece>(
         data: this,
-        child: piece,
-        //childWhenDragging: new Opacity(opacity: 0.0, child: piece),
+        child: pieceImage,
         childWhenDragging: new Container(
             child: null,
             decoration:
@@ -72,22 +69,13 @@ class BoardPiece extends StatelessWidget {
 //                    width: 2.0,
 //                    ),
                     )),
-        feedback: new Image(image: this.piece.image, height: height),
+        feedback: new Image(image: this.pieceImage.image, height: height),
         maxSimultaneousDrags: 1,
         onDragStarted: () {
           onDragStart(this.index);
         },
         onDraggableCanceled: (Velocity velocity, Offset offset) {
           onDragStart(null);
-        }
-//        onDragStarted: (){
-//          from = index;
-//          callback({'name': name, 'from': index, 'to' : 64});
-//        },
-//        onDraggableCanceled: (Velocity velocity, Offset offset) {
-//          print(index);
-//          callback({'name': name, 'from': 64, 'to' : from});
-//        },
-        );
+        });
   }
 }

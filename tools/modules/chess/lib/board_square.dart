@@ -29,10 +29,10 @@ class BoardSquare extends StatelessWidget {
   final ValueChanged<int> onTap;
 
   /// Creates a new [BoardSquare]
-  BoardSquare(
+  BoardSquare({
     this.index,
     this.color,
-    this.onTap, {
+    this.onTap,
     this.piece,
     this.highlight,
     Key key,

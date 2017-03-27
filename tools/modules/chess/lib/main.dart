@@ -33,10 +33,11 @@ class ModuleImpl extends Module {
   /// Implementation of the Initialize method.
   @override
   void initialize(
-      InterfaceHandle<ModuleContext> moduleContextHandle,
-      InterfaceHandle<Link> linkHandle,
-      InterfaceHandle<ServiceProvider> incomingServices,
-      InterfaceRequest<ServiceProvider> outgoingServices) {
+    InterfaceHandle<ModuleContext> moduleContextHandle,
+    InterfaceHandle<Link> linkHandle,
+    InterfaceHandle<ServiceProvider> incomingServices,
+    InterfaceRequest<ServiceProvider> outgoingServices,
+  ) {
     _log('ModuleImpl::initialize call');
   }
 
