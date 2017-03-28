@@ -45,4 +45,15 @@ class Artist {
       id: json['id'],
     );
   }
+
+  /// Gets the default artwork for this artist.
+  /// Spotify uses the first image as the largest image.
+  /// Returns NULL if there is no image for this artist.
+  String get defaultArtworkUrl {
+    if (images != null && images.isNotEmpty) {
+      return images.first.url;
+    } else {
+      return null;
+    }
+  }
 }

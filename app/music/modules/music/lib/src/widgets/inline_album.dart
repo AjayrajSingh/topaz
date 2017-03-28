@@ -7,6 +7,7 @@ import 'package:meta/meta.dart';
 
 import '../models/album.dart';
 import '../models/track.dart';
+import '../typedefs.dart';
 import 'track_art.dart';
 import 'track_list_item.dart';
 
@@ -30,12 +31,16 @@ class InlineAlbum extends StatelessWidget {
   /// Defaults to the theme primary color
   final Color highlightColor;
 
+  /// Callback for when a track is tapped
+  final TrackActionCallback onTapTrack;
+
   /// Constructor
   InlineAlbum({
     Key key,
     @required this.album,
     this.currentTrack,
     this.highlightColor,
+    this.onTapTrack,
   })
       : super(key: key) {
     assert(album != null);
@@ -96,6 +101,7 @@ class InlineAlbum extends StatelessWidget {
           isPlaying: track == currentTrack,
           highlightColor: highlightColor,
           showArtist: false,
+          onTap: () => onTapTrack?.call(track),
         )));
 
     return new Column(

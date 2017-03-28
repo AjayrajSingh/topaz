@@ -117,7 +117,10 @@ class HeroBannerScaffold extends StatelessWidget {
 
   Widget _buildBody() {
     return new Container(
-      margin: const EdgeInsets.only(top: _kHeroBannerHeight),
+      margin: const EdgeInsets.only(
+        top: _kHeroBannerHeight,
+        bottom: 32.0,
+      ),
       alignment: FractionalOffset.topCenter,
       child: new Material(
         elevation: 4,

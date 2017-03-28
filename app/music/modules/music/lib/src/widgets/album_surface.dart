@@ -5,15 +5,13 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import '../models/album.dart';
-import '../models/track.dart';
+import '../models.dart';
+import '../typedefs.dart';
 import '../utils.dart';
+import 'follow_button.dart';
 import 'hero_banner_scaffold.dart';
 import 'track_art.dart';
 import 'track_list_item.dart';
-
-/// Callback function signature for an action on a track
-typedef void TrackActionCallback(Track track);
 
 /// UI Widget that represents a album surface
 class AlbumSurface extends StatelessWidget {
@@ -30,7 +28,7 @@ class AlbumSurface extends StatelessWidget {
   /// Callback for when the follow/following button is tapped
   final VoidCallback onToggleFollow;
 
-  /// True if the authenticated user is following this playlist
+  /// True if the authenticated user is following this album
   final bool isFollowing;
 
   /// The track that is currently playing
@@ -93,30 +91,6 @@ class AlbumSurface extends StatelessWidget {
     );
   }
 
-  Widget _buildFollowButton(Color highlightColor) {
-    return new Material(
-      borderRadius: const BorderRadius.all(const Radius.circular(24.0)),
-      color: isFollowing ? Colors.white : Colors.white.withAlpha(100),
-      type: MaterialType.button,
-      child: new InkWell(
-        splashColor: isFollowing ? highlightColor : Colors.white,
-        onTap: () => onToggleFollow?.call(),
-        child: new Container(
-          width: 130.0,
-          height: 40.0,
-          child: new Center(
-            child: new Text(
-              isFollowing ? 'FOLLOWING' : 'FOLLOW',
-              style: new TextStyle(
-                color: isFollowing ? highlightColor : Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildBannerContent(Color highlightColor) {
     return new Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,7 +116,11 @@ class AlbumSurface extends StatelessWidget {
         // This is used as a spacer so that the follow button is aligned to
         // the bottom, while the title and playlist type is aligned to the top.
         new Expanded(child: new Container()),
-        _buildFollowButton(highlightColor),
+        new FollowButton(
+          highlightColor: highlightColor,
+          onTap: onToggleFollow,
+          isFollowing: isFollowing,
+        ),
       ],
     );
   }
