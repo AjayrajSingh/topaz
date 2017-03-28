@@ -225,12 +225,6 @@ packages:
       relative: true
     source: path
     version: "0.0.0"
-  music_api:
-    description:
-      path: "../packages/music_api"
-      relative: true
-    source: path
-    version: "0.0.0"
   mustache:
     description:
       name: mustache

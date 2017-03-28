@@ -15,8 +15,6 @@ dependencies:
     path: ../google_search_api
   models:
     path: ../models
-  music_api:
-    path: ../music_api
   widgets_meta:
     path: ../widgets_meta
   xml: ^2.4.3

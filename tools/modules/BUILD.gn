@@ -9,7 +9,6 @@ group("modules") {
     "gallery",
     "interactive_receipt",
     "map",
-    "music_story",
     "usps",
     "youtube_related_videos",
     "youtube_story",
