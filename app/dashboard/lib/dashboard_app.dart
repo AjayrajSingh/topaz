@@ -374,14 +374,16 @@ class _InfoText extends StatefulWidget {
 }
 
 class _InfoTextState extends State<_InfoText> {
+  Duration _uptime;
   Timer _timer;
 
   @override
   void initState() {
     super.initState();
-    _timer = new Timer.periodic(
+    _uptime = const Duration();
+    _timer = new Timer(
       const Duration(seconds: 1),
-      (_) => setState(() {}),
+      _updateUptime,
     );
   }
 
@@ -394,8 +396,6 @@ class _InfoTextState extends State<_InfoText> {
 
   @override
   Widget build(BuildContext context) {
-    Duration uptime = new DateTime.now().difference(config.startTime);
-
     List<Widget> rowChildren = <Widget>[
       new RichText(
         textAlign: TextAlign.right,
@@ -419,7 +419,7 @@ class _InfoTextState extends State<_InfoText> {
           style: _kUnimportantStyle,
           children: <TextSpan>[
             new TextSpan(
-              text: _toStringFromDuration(uptime),
+              text: _toConciseString(_uptime),
               style: _kImportantStyle,
             ),
           ],
@@ -438,7 +438,7 @@ class _InfoTextState extends State<_InfoText> {
             style: _kUnimportantStyle,
             children: <TextSpan>[
               new TextSpan(
-                text: _toStringFromDuration(firstFailureTime),
+                text: _toConciseString(firstFailureTime),
                 style: _kImportantStyle,
               ),
             ],
@@ -459,9 +459,26 @@ class _InfoTextState extends State<_InfoText> {
     );
   }
 
-  static String _toTwoDigitString(int x) => x > 9 ? '$x' : '0$x';
-  static String _toStringFromDuration(Duration duration) => duration.inMinutes <
-          60
-      ? '${duration.inMinutes}:${_toTwoDigitString(duration.inSeconds % 60)}'
-      : '${_toTwoDigitString(duration.inHours)}:${_toTwoDigitString(duration.inMinutes % 60)}:${_toTwoDigitString(duration.inSeconds % 60)}';
+  void _updateUptime() {
+    setState(() {
+      _uptime = new DateTime.now().difference(config.startTime);
+      _timer = new Timer(
+          _uptime.inSeconds < 60
+              ? const Duration(seconds: 1)
+              : _uptime.inMinutes < 60
+                  ? const Duration(seconds: 10)
+                  : _uptime.inHours < 24
+                      ? const Duration(minutes: 10)
+                      : const Duration(hours: 4),
+          _updateUptime);
+    });
+  }
+
+  static String _toConciseString(Duration duration) => duration.inSeconds < 60
+      ? '${duration.inSeconds}s'
+      : duration.inMinutes < 60
+          ? '${duration.inMinutes}m'
+          : duration.inHours < 24
+              ? '${duration.inHours}h'
+              : '${duration.inDays}d';
 }
