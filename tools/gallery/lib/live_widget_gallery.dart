@@ -96,8 +96,8 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
             padding: const EdgeInsets.all(16.0),
             child: new MarkdownBody(
               data: markdownText,
-              markdownStyle:
-                  new MarkdownStyle.largeFromTheme(Theme.of(context)),
+              styleSheet:
+                  new MarkdownStyleSheet.largeFromTheme(Theme.of(context)),
             ),
           ),
           _buildSizeControl(),
