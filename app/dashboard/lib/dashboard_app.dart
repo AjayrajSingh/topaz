@@ -2,32 +2,41 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart' as dom;
 import 'package:flutter/services.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'dart:io';
-import 'dart:core';
-import 'dart:async';
 
 enum _BuildStatus { unknown, networkError, parseError, success, failure }
 
-// ----------------------------------------------------------------------------
-// EDIT BELOW TO ADD configs
-
-final String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
-
 const double _kFontSize = 20.0;
 const double _kErrorFontSize = 12.0;
+const double _kSpaceBetween = 4.0;
 
+final TextStyle _kImportantStyle = new TextStyle(
+  color: Colors.black,
+  fontSize: _kFontSize,
+  fontWeight: FontWeight.w500,
+);
+
+final TextStyle _kUnimportantStyle = _kImportantStyle.copyWith(
+  fontWeight: FontWeight.w300,
+);
+
+const String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
 const Color _kFuchsiaColor = const Color(0xFFFF00C0);
 
 class _BuildInfo {
   _BuildStatus status = _BuildStatus.unknown;
   String url;
   String errorMessage;
+  DateTime lastRefreshStarted;
+  DateTime lastRefreshEnded;
 
   _BuildInfo({this.status, this.url, this.errorMessage});
 }
@@ -91,6 +100,7 @@ class _DashboardPageState extends State<_DashboardPage> {
   Map<String, Map<String, _BuildInfo>> _targetsResults;
   DateTime _startTime = new DateTime.now();
   DateTime _firstErrorTime;
+  DateTime _lastRefreshed;
 
   @override
   void initState() {
@@ -113,15 +123,14 @@ class _DashboardPageState extends State<_DashboardPage> {
 
     new Timer.periodic(
       const Duration(seconds: 60),
-      _refreshTimerFired,
+      (_) => _refreshStatus(),
     );
     _refreshStatus();
   }
 
-  void _refreshTimerFired(Timer t) => _refreshStatus();
-
   // Refresh status an ALL builds.
   void _refreshStatus() {
+    _lastRefreshed = new DateTime.now().toLocal();
     // fetch config status for ONE item.
     Future<Null> _fetchConfigStatus(
       String categoryName,
@@ -131,6 +140,9 @@ class _DashboardPageState extends State<_DashboardPage> {
       _BuildStatus status = _BuildStatus.parseError;
       String html;
       String errorMessage;
+      _targetsResults['$categoryName']['$buildName'].lastRefreshStarted =
+          new DateTime.now();
+      _targetsResults['$categoryName']['$buildName'].lastRefreshEnded = null;
 
       try {
         http.Response response = await http.get(url);
@@ -149,6 +161,8 @@ class _DashboardPageState extends State<_DashboardPage> {
           _firstErrorTime = new DateTime.now();
         }
       }
+      _targetsResults['$categoryName']['$buildName'].lastRefreshEnded =
+          new DateTime.now();
 
       if (html == null) {
         status = _BuildStatus.networkError;
@@ -182,6 +196,7 @@ class _DashboardPageState extends State<_DashboardPage> {
         _fetchConfigStatus(categoryName, config[1], url);
       });
     }); // targets_forEach
+    setState(() {});
   } // _refreshStatus
 
   void _launchUrl(String url) {
@@ -197,38 +212,35 @@ class _DashboardPageState extends State<_DashboardPage> {
       case _BuildStatus.networkError:
         return Colors.purple[100];
       default:
-        return Colors.black12;
+        return Colors.grey[300];
     }
   }
 
   Widget _buildResultWidget(String type, String name, _BuildInfo bi) {
+    bool hasError = bi.errorMessage?.isNotEmpty ?? false;
     List<Widget> columnChildren = <Widget>[
       new Text(
         type,
         textAlign: TextAlign.center,
-        style: new TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.w300,
-          fontSize: _kFontSize,
-        ),
+        style: hasError
+            ? _kUnimportantStyle.copyWith(fontSize: _kErrorFontSize)
+            : _kUnimportantStyle,
       ),
       new Container(height: 4.0),
       new Text(
         name,
         textAlign: TextAlign.center,
-        style: new TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.w500,
-          fontSize: _kFontSize,
-        ),
+        style: hasError
+            ? _kImportantStyle.copyWith(fontSize: _kErrorFontSize)
+            : _kImportantStyle,
       ),
     ];
-    if (bi.errorMessage?.isNotEmpty ?? false) {
+    if (hasError) {
       columnChildren.addAll(<Widget>[
-        new Container(height: 8.0),
+        new Container(height: 4.0),
         new Text(
           bi.errorMessage,
-          textAlign: TextAlign.center,
+          textAlign: TextAlign.left,
           style: new TextStyle(
             color: Colors.red[900],
             fontWeight: FontWeight.w900,
@@ -237,21 +249,65 @@ class _DashboardPageState extends State<_DashboardPage> {
         ),
       ]);
     }
+
+    List<Widget> stackChildren = <Widget>[
+      new Center(
+        child: new Column(
+          mainAxisSize: MainAxisSize.min,
+          children: columnChildren,
+        ),
+      ),
+    ];
+
+    if (bi.lastRefreshEnded == null) {
+      stackChildren.add(
+        new Align(
+          alignment: FractionalOffset.bottomCenter,
+          child: new Container(
+            margin: const EdgeInsets.only(bottom: 8.0),
+            width: 16.0,
+            height: 16.0,
+            child: new CircularProgressIndicator(
+              valueColor: new AlwaysStoppedAnimation<Color>(_kFuchsiaColor),
+            ),
+          ),
+        ),
+      );
+    } else {
+      stackChildren.add(
+        new Align(
+          alignment: FractionalOffset.bottomCenter,
+          child: new Container(
+            margin: const EdgeInsets.only(bottom: 8.0, right: 8.0),
+            child: new Text(
+              '${bi.lastRefreshEnded.difference(bi.lastRefreshStarted).inMilliseconds} ms',
+              style: new TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w100,
+                fontSize: _kErrorFontSize,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return new Expanded(
       child: new GestureDetector(
         onTap: () {
           _launchUrl(bi.url);
         },
         child: new Container(
-          color: _colorFromBuildStatus(bi.status),
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          margin: const EdgeInsets.only(right: 8.0, top: 8.0),
-          child: new Center(
-            child: new Column(
-              mainAxisSize: MainAxisSize.min,
-              children: columnChildren,
-            ),
+          decoration: new BoxDecoration(
+            backgroundColor: _colorFromBuildStatus(bi.status),
+            borderRadius: new BorderRadius.circular(8.0),
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          margin: const EdgeInsets.only(
+            right: _kSpaceBetween,
+            top: _kSpaceBetween,
+          ),
+          child: new Stack(children: stackChildren),
         ),
       ),
     );
@@ -263,17 +319,16 @@ class _DashboardPageState extends State<_DashboardPage> {
 
     _targetsResults.forEach((String k, Map<String, _BuildInfo> v) {
       // the builds
-      List<Widget> builds = <Widget>[];
-      v.forEach((String name, _BuildInfo statusObj) {
-        builds.add(_buildResultWidget(k, name, statusObj));
-      });
+      List<Widget> builds = v.keys
+          .map((String name) => _buildResultWidget(k, name, v[name]))
+          .toList();
 
       rows.add(
         new Expanded(
           child: new Container(
-            margin: const EdgeInsets.only(left: 8.0),
+            margin: const EdgeInsets.only(left: _kSpaceBetween),
             child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.max,
               children: builds,
@@ -286,53 +341,33 @@ class _DashboardPageState extends State<_DashboardPage> {
     Duration uptime = new DateTime.now().difference(_startTime);
 
     List<Widget> rowChildren = <Widget>[
-      new Expanded(
-        child: new Center(
-          child: new Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-            new Text(
-              'Last updated:  ',
-              textAlign: TextAlign.center,
-              style: new TextStyle(
-                fontSize: _kFontSize,
-                fontWeight: FontWeight.w100,
+      new RichText(
+        textAlign: TextAlign.right,
+        text: new TextSpan(
+          text: 'Updated ',
+          style: _kUnimportantStyle,
+          children: <TextSpan>[
+            new TextSpan(
+              text: new DateFormat('EEEE MMMM d h:mm a', 'en_US').format(
+                _lastRefreshed,
               ),
+              style: _kImportantStyle,
             ),
-            new Text(
-              new DateFormat('EEEE MMMM d h:mm a', 'en_US').format(
-                new DateTime.now().toLocal(),
-              ),
-              textAlign: TextAlign.center,
-              style: new TextStyle(
-                fontSize: _kFontSize,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ]),
+          ],
         ),
       ),
-      new Expanded(
-        child: new Center(
-          child: new Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              new Text(
-                'Up time:  ',
-                textAlign: TextAlign.center,
-                style: new TextStyle(
-                  fontSize: _kFontSize,
-                  fontWeight: FontWeight.w100,
-                ),
-              ),
-              new Text(
-                '${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m',
-                textAlign: TextAlign.center,
-                style: new TextStyle(
-                  fontSize: _kFontSize,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
+      new RichText(
+        textAlign: TextAlign.right,
+        text: new TextSpan(
+          text: 'Up for ',
+          style: _kUnimportantStyle,
+          children: <TextSpan>[
+            new TextSpan(
+              text:
+                  '${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m',
+              style: _kImportantStyle,
+            ),
+          ],
         ),
       ),
     ];
@@ -341,29 +376,17 @@ class _DashboardPageState extends State<_DashboardPage> {
       Duration firstFailureTime = _firstErrorTime.difference(_startTime);
 
       rowChildren.add(
-        new Expanded(
-          child: new Center(
-            child: new Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                new Text(
-                  'Time before first network failure:  ',
-                  textAlign: TextAlign.center,
-                  style: new TextStyle(
-                    fontSize: _kFontSize,
-                    fontWeight: FontWeight.w100,
-                  ),
-                ),
-                new Text(
-                  '${firstFailureTime.inDays}d ${firstFailureTime.inHours % 24}h ${firstFailureTime.inMinutes % 60}m',
-                  textAlign: TextAlign.center,
-                  style: new TextStyle(
-                    fontSize: _kFontSize,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+        new RichText(
+          text: new TextSpan(
+            text: 'Failed after ',
+            style: _kUnimportantStyle,
+            children: <TextSpan>[
+              new TextSpan(
+                text:
+                    '${firstFailureTime.inDays}d ${firstFailureTime.inHours % 24}h ${firstFailureTime.inMinutes % 60}m',
+                style: _kImportantStyle,
+              ),
+            ],
           ),
         ),
       );
@@ -371,7 +394,8 @@ class _DashboardPageState extends State<_DashboardPage> {
 
     rows.add(
       new Container(
-        height: 80.0,
+        height: 44.0,
+        margin: const EdgeInsets.only(left: 12.0, right: 92.0),
         child: new Center(
           child: new Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -382,6 +406,7 @@ class _DashboardPageState extends State<_DashboardPage> {
     );
 
     return new Scaffold(
+      backgroundColor: Colors.white70,
       appBar: Platform.isFuchsia
           ? null
           : new AppBar(title: new Text('Fuchsia Build Status')),
@@ -389,7 +414,7 @@ class _DashboardPageState extends State<_DashboardPage> {
       floatingActionButton: new FloatingActionButton(
         backgroundColor: _kFuchsiaColor,
         onPressed: _refreshStatus,
-        tooltip: 'Increment',
+        tooltip: 'Refresh',
         child: new Icon(Icons.refresh),
       ),
     );
