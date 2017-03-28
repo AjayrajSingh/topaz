@@ -338,70 +338,11 @@ class _DashboardPageState extends State<_DashboardPage> {
       );
     });
 
-    Duration uptime = new DateTime.now().difference(_startTime);
-
-    List<Widget> rowChildren = <Widget>[
-      new RichText(
-        textAlign: TextAlign.right,
-        text: new TextSpan(
-          text: 'Updated ',
-          style: _kUnimportantStyle,
-          children: <TextSpan>[
-            new TextSpan(
-              text: new DateFormat('EEEE MMMM d h:mm a', 'en_US').format(
-                _lastRefreshed,
-              ),
-              style: _kImportantStyle,
-            ),
-          ],
-        ),
-      ),
-      new RichText(
-        textAlign: TextAlign.right,
-        text: new TextSpan(
-          text: 'Up for ',
-          style: _kUnimportantStyle,
-          children: <TextSpan>[
-            new TextSpan(
-              text:
-                  '${uptime.inDays}d ${uptime.inHours % 24}h ${uptime.inMinutes % 60}m',
-              style: _kImportantStyle,
-            ),
-          ],
-        ),
-      ),
-    ];
-
-    if (_firstErrorTime != null) {
-      Duration firstFailureTime = _firstErrorTime.difference(_startTime);
-
-      rowChildren.add(
-        new RichText(
-          text: new TextSpan(
-            text: 'Failed after ',
-            style: _kUnimportantStyle,
-            children: <TextSpan>[
-              new TextSpan(
-                text:
-                    '${firstFailureTime.inDays}d ${firstFailureTime.inHours % 24}h ${firstFailureTime.inMinutes % 60}m',
-                style: _kImportantStyle,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     rows.add(
-      new Container(
-        height: 44.0,
-        margin: const EdgeInsets.only(left: 12.0, right: 92.0),
-        child: new Center(
-          child: new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: rowChildren,
-          ),
-        ),
+      new _InfoText(
+        startTime: _startTime,
+        firstErrorTime: _firstErrorTime,
+        lastRefreshed: _lastRefreshed,
       ),
     );
 
@@ -419,4 +360,110 @@ class _DashboardPageState extends State<_DashboardPage> {
       ),
     );
   }
+}
+
+class _InfoText extends StatefulWidget {
+  final DateTime startTime;
+  final DateTime firstErrorTime;
+  final DateTime lastRefreshed;
+
+  _InfoText({this.startTime, this.firstErrorTime, this.lastRefreshed});
+
+  @override
+  _InfoTextState createState() => new _InfoTextState();
+}
+
+class _InfoTextState extends State<_InfoText> {
+  Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = new Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => setState(() {
+            print('tick');
+          }),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Duration uptime = new DateTime.now().difference(config.startTime);
+
+    List<Widget> rowChildren = <Widget>[
+      new RichText(
+        textAlign: TextAlign.right,
+        text: new TextSpan(
+          text: 'Updated ',
+          style: _kUnimportantStyle,
+          children: <TextSpan>[
+            new TextSpan(
+              text: new DateFormat('MM/dd h:mm a', 'en_US').format(
+                config.lastRefreshed,
+              ),
+              style: _kImportantStyle,
+            ),
+          ],
+        ),
+      ),
+      new RichText(
+        textAlign: TextAlign.right,
+        text: new TextSpan(
+          text: 'Up for ',
+          style: _kUnimportantStyle,
+          children: <TextSpan>[
+            new TextSpan(
+              text: _toStringFromDuration(uptime),
+              style: _kImportantStyle,
+            ),
+          ],
+        ),
+      ),
+    ];
+
+    if (config.firstErrorTime != null) {
+      Duration firstFailureTime =
+          config.firstErrorTime.difference(config.startTime);
+
+      rowChildren.add(
+        new RichText(
+          text: new TextSpan(
+            text: 'Failed after ',
+            style: _kUnimportantStyle,
+            children: <TextSpan>[
+              new TextSpan(
+                text: _toStringFromDuration(firstFailureTime),
+                style: _kImportantStyle,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return new Container(
+      height: 44.0,
+      margin: const EdgeInsets.only(left: 12.0, right: 92.0),
+      child: new Center(
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: rowChildren,
+        ),
+      ),
+    );
+  }
+
+  static String _toTwoDigitString(int x) => x > 9 ? '$x' : '0$x';
+  static String _toStringFromDuration(Duration duration) => duration.inMinutes <
+          60
+      ? '${duration.inMinutes}:${_toTwoDigitString(duration.inSeconds % 60)}'
+      : '${_toTwoDigitString(duration.inHours)}:${_toTwoDigitString(duration.inMinutes % 60)}:${_toTwoDigitString(duration.inSeconds % 60)}';
 }
