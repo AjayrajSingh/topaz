@@ -381,9 +381,7 @@ class _InfoTextState extends State<_InfoText> {
     super.initState();
     _timer = new Timer.periodic(
       const Duration(seconds: 1),
-      (_) => setState(() {
-            print('tick');
-          }),
+      (_) => setState(() {}),
     );
   }
 
