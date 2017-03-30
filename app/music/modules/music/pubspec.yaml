@@ -10,6 +10,8 @@ dependencies:
     sdk: flutter
   fixtures:
     path: ../../../common/packages/fixtures
+  widgets:
+    path: ../../../common/packages/widgets
   intl: ^0.14.0
 flutter:
   uses-material-design: true

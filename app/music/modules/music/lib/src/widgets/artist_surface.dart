@@ -7,6 +7,7 @@ import 'package:meta/meta.dart';
 
 import '../models.dart';
 import '../typedefs.dart';
+import 'artist_grid.dart';
 import 'follow_button.dart';
 import 'hero_banner_scaffold.dart';
 import 'inline_album.dart';
@@ -19,6 +20,9 @@ class ArtistSurface extends StatelessWidget {
 
   /// [Album]s for the given [Artist]
   final List<Album> albums;
+
+  /// Related [Artist]s for the given [Artist]
+  final List<Artist> relatedArtists;
 
   /// [Color] used as the highlight.
   /// This is used for the background of the banner and also as highlights
@@ -39,16 +43,21 @@ class ArtistSurface extends StatelessWidget {
   /// Callback for when a track is tapped
   final TrackActionCallback onTapTrack;
 
+  /// Callback for when a related artist is selected
+  final ArtistActionCallback onTapArtist;
+
   /// Constructor
   ArtistSurface({
     Key key,
     @required this.artist,
     @required this.albums,
+    this.relatedArtists,
     this.onToggleFollow,
     this.isFollowing: false,
     this.highlightColor,
     this.currentTrack,
     this.onTapTrack,
+    this.onTapArtist,
   })
       : super(key: key);
 
@@ -128,15 +137,52 @@ class ArtistSurface extends StatelessWidget {
     );
   }
 
+  Widget _buildRelatedArtists() {
+    return new Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        new Container(
+          margin: const EdgeInsets.only(
+            left: 32.0,
+            top: 16.0,
+          ),
+          child: new Text(
+            'RELATED ARTISTS',
+            style: new TextStyle(
+              fontSize: 16.0,
+            ),
+          ),
+        ),
+        new ArtistGrid(
+          artists: relatedArtists,
+          onTapArtist: onTapArtist,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     Color _highlightColor = highlightColor ?? theme.primaryColor;
+
+    List<Widget> bodyChildren = <Widget>[
+      _buildAlbumList(highlightColor),
+    ];
+    if (relatedArtists != null && relatedArtists.isNotEmpty) {
+      bodyChildren.add(_buildRelatedArtists());
+    }
+
     return new HeroBannerScaffold(
       heroBannerBackgroundColor: _highlightColor,
       heroBanner: _buildBannerContent(),
       heroImage: new TrackArt(artworkUrl: artist.defaultArtworkUrl),
-      body: _buildAlbumList(highlightColor),
+      body: new Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: bodyChildren,
+      ),
     );
   }
 }

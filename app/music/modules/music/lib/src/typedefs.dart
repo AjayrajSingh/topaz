@@ -6,3 +6,6 @@ import 'models.dart';
 
 /// Callback function signature for an action on a track
 typedef void TrackActionCallback(Track track);
+
+/// Callback function signature for an action on an artist
+typedef void ArtistActionCallback(Artist artist);
