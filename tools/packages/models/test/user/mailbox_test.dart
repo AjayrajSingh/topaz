@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:models/email.dart';
+import 'package:models/user.dart';
 import 'package:test/test.dart';
 
 void main() {

@@ -13,7 +13,6 @@ dart_package("widgets") {
     "//apps/modules/common/packages/google_search_api",
     "//apps/modules/common/packages/models",
     "//apps/modules/common/packages/widgets_meta",
-    "//apps/modules/email/packages/email_session_store",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/xml",
     "//third_party/dart-pkg/pub/http",

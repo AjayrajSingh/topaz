@@ -15,6 +15,7 @@ flutter_app("usps") {
     "//application/services:services_dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
+    "//apps/modules/common/packages/config",
     "//apps/modules/common/packages/models",
     "//apps/modules/common/packages/widgets",
     "//apps/mozart/lib/flutter",

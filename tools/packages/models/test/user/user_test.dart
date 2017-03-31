@@ -4,12 +4,12 @@
 
 import 'dart:convert';
 
-import 'package:models/fixtures.dart';
+import 'package:fixtures/fixtures.dart';
 import 'package:models/user.dart';
 import 'package:test/test.dart';
 
 void main() {
-  ModelFixtures fixtures = new ModelFixtures();
+  Fixtures fixtures = new Fixtures();
 
   test('User JSON encode/decode', () {
     User user = fixtures.user();

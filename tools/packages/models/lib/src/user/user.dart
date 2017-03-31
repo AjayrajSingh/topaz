@@ -2,16 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fixtures/fixtures.dart';
 import 'package:meta/meta.dart';
+import 'package:quiver/core.dart' as quiver;
 import 'package:widgets_meta/widgets_meta.dart';
 
-import '../email/mailbox.dart';
-import '../fixtures/fixtures.dart';
+import 'mailbox.dart';
 
 /// Represents a Google User Account
 /// Fields are based off the data from the Google Identity API:
 /// https://developers.google.com/identity/
-@Generator(ModelFixtures, 'user')
+@Generator(Fixtures, 'user')
 class User {
   /// Unique ID for user
   final String id;
@@ -85,4 +86,15 @@ class User {
 
     return _mailbox;
   }
+
+  @override
+  bool operator ==(Object o) =>
+      o is User && o.id == id && o.email == email && o.name == name;
+
+  @override
+  int get hashCode => quiver.hashObjects(<dynamic>[
+        id.hashCode,
+        email.hashCode,
+        name.hashCode,
+      ]);
 }

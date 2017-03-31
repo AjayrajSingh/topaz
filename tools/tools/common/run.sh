@@ -25,7 +25,9 @@ function main() {
   echo "=== running ${package}"
 
   # TODO(jasoncampbell): Look into setting up persistent storage and stories.
-  $FUCHSIA_DIR/out/build-magenta/tools/netruncmd : "@ bootstrap device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=${package}"
+  $FUCHSIA_DIR/out/build-magenta/tools/netruncmd : "@boot device_runner  --device_shell=dev_device_shell \
+  --user_shell=dev_user_shell \
+  --user_shell_args=--root_module=${package}"
 }
 
 main "$@"

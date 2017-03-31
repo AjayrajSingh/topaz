@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:config/config.dart';
-import 'package:email_session_store/email_session_store_mock.dart';
+import 'package:email_session/session.dart';
 import 'package:flutter/material.dart';
 
 import 'home.dart';
