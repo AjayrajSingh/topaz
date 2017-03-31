@@ -63,18 +63,6 @@ class _RecipientInputState extends State<RecipientInput> {
   final GlobalKey<EditableTextState> _inputFieldKey =
       new GlobalKey<EditableTextState>();
 
-  /// If parent widget has a specified GlobalKey use that as the focusKey of
-  /// the EditableText.
-  /// Use a new GlobalKey otherwise.
-  GlobalKey get focusKey {
-    Key parentKey = config.key;
-    if (parentKey is GlobalKey) {
-      return parentKey;
-    } else {
-      return _inputFieldKey;
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -158,7 +146,6 @@ class _RecipientInputState extends State<RecipientInput> {
         onChanged: _handleInputChange,
         onSubmitted: _handleInputSubmit,
         value: _currentInput,
-        focusKey: focusKey,
         key: _inputFieldKey,
         style: inputStyle,
       ),
