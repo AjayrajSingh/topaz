@@ -57,16 +57,11 @@ class _RecipientInputState extends State<RecipientInput> {
   List<Mailbox> _recipientList;
 
   /// The 'in progress' text of the new recipient being composed in the input
-  InputValue _currentInput;
-
-  /// GlobalKey that is required for an EditableText
-  final GlobalKey<EditableTextState> _inputFieldKey =
-      new GlobalKey<EditableTextState>();
+  TextEditingController _controller = new TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _currentInput = const InputValue();
     _recipientList = new List<Mailbox>.from(config.recipientList);
   }
 
@@ -75,24 +70,21 @@ class _RecipientInputState extends State<RecipientInput> {
         ?.call(new List<Mailbox>.unmodifiable(_recipientList));
   }
 
-  void _handleInputChange(InputValue input) {
+  void _handleInputChange(String value) {
     // TODO(dayang): If current newRecipient text is a valid email address
     // that is an existing contact, automatically add it to the recipientList.
     // https://fuchsia.atlassian.net/browse/SO-107
-    setState(() {
-      _currentInput = input;
-    });
   }
 
-  void _handleInputSubmit(InputValue input) {
+  void _handleInputSubmit(String value) {
     // TODO(dayang): Email validation + cleanup (white spaces)
     // https://fuchsia.atlassian.net/browse/SO-108
-    if (input.text.isNotEmpty) {
+    if (value.isNotEmpty) {
       setState(() {
         _recipientList.add(new Mailbox(
-          address: input.text,
+          address: value,
         ));
-        _currentInput = const InputValue();
+        _controller.clear();
         _notifyRecipientsChanged();
       });
     }
@@ -142,17 +134,17 @@ class _RecipientInputState extends State<RecipientInput> {
     //add text input
     rowChildren.add(new Container(
       width: 100.0,
-      child: new InputField(
+      child: new TextField(
+        controller: _controller,
         onChanged: _handleInputChange,
         onSubmitted: _handleInputSubmit,
-        value: _currentInput,
-        key: _inputFieldKey,
         style: inputStyle,
+        decoration: null,
       ),
     ));
 
     // TODO(dayang): Tapping on the entire container should bring focus to the
-    // InputField.
+    // TextField.
     // https://fuchsia.atlassian.net/browse/SO-188
     //
     // This is blocked by Flutter Issue #7985

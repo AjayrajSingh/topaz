@@ -39,21 +39,12 @@ class SubjectInput extends StatefulWidget {
 }
 
 class _SubjectInputState extends State<SubjectInput> {
-  InputValue _currentInput;
+  TextEditingController _controller;
 
   @override
   void initState() {
     super.initState();
-    _currentInput = new InputValue(
-      text: config.initialText ?? '',
-    );
-  }
-
-  void _handleInputChange(InputValue input) {
-    setState(() {
-      _currentInput = input;
-      config.onTextChange?.call(_currentInput.text);
-    });
+    _controller = new TextEditingController(text: config.initialText);
   }
 
   @override
@@ -64,7 +55,7 @@ class _SubjectInputState extends State<SubjectInput> {
         config.labelStyle ?? inputStyle.copyWith(color: Colors.grey[500]);
 
     // TODO(dayang): Tapping on the entire container should bring focus to the
-    // InputField.
+    // TextField.
     // https://fuchsia.atlassian.net/browse/SO-188
     //
     // This is blocked by Flutter Issue #7985
@@ -80,12 +71,14 @@ class _SubjectInputState extends State<SubjectInput> {
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: new InputField(
-        onChanged: _handleInputChange,
-        value: _currentInput,
+      child: new TextField(
+        controller: _controller,
+        onChanged: config.onTextChange,
         style: inputStyle,
-        hintText: 'Subject',
-        hintStyle: labelStyle,
+        decoration: new InputDecoration.collapsed(
+          hintText: 'Subject',
+          hintStyle: labelStyle,
+        ),
       ),
     );
   }

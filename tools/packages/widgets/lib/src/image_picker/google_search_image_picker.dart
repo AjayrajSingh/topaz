@@ -51,7 +51,8 @@ class GoogleSearchImagePicker extends StatefulWidget {
 
 class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   List<String> _sourceImages = <String>[];
-  InputValue _currentInput = InputValue.empty;
+  String _lastInputValue;
+  TextInputController _controller;
   bool _isLoading = false;
   Timer _timer;
   String _lastSearchQuery;
@@ -59,14 +60,14 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   // a later query that resolves faster.
   int _counter = 0;
 
-  void _handleInputChange(InputValue input) {
+  void _handleInputChange(String value) {
     setState(() {
       // Only call a Google Search query if the text has changed.
-      // For example onChanged for an InputField will fire for cursor events.
-      if (input.text != _currentInput.text) {
+      // For example onChanged for an TextField will fire for cursor events.
+      if (value != _lastInputValue) {
         _setTimer();
       }
-      _currentInput = input;
+      _lastInputValue = value;
     });
   }
 
@@ -74,11 +75,11 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   // keystrokes.
   void _setTimer() {
     _timer?.cancel();
-    _timer = new Timer(_kSearchDelay, () => _search(_currentInput.text));
+    _timer = new Timer(_kSearchDelay, () => _search(_controller.text));
   }
 
   bool get _hideEmptyState =>
-      _isLoading || _sourceImages.isNotEmpty || _currentInput.text.isNotEmpty;
+      _isLoading || _sourceImages.isNotEmpty || _controller.text.isNotEmpty;
 
   Future<Null> _search(String query) async {
     if (query == _lastSearchQuery) {
@@ -112,8 +113,9 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   @override
   void initState() {
     super.initState();
+    _controller = new TextEditingController(text: config.query);
+    _lastInputValue = _controller.text;
     if (config.query != null && config.query.isNotEmpty) {
-      _currentInput = new InputValue(text: config.query);
       _search(config.query);
     }
   }
@@ -123,7 +125,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
     super.didUpdateConfig(oldState);
     // Make a new search if config.query has been changed
     if (oldState.query == _currentInput.text) {
-      _currentInput = new InputValue(text: config.query);
+      _controller.text = config.query ?? '';
       _search(config.query);
     }
   }
@@ -151,10 +153,12 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
             ),
           ),
           new Expanded(
-            child: new InputField(
-              hintText: 'search images',
-              value: _currentInput,
+            child: new TextField(
+              controller: _controller,
               onChanged: _handleInputChange,
+              decoration: new InputDecoration.collapsed(
+                hintText: 'search images',
+              ),
             ),
           ),
         ],
@@ -175,8 +179,17 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       ),
     );
     Widget emptyState = new Positioned.fill(
-      child: new Offstage(
-        offstage: _hideEmptyState,
+      child: new AnimatedBuilder(
+        animation: _controller,
+        builder: (BuildContext context, Widget child) {
+          // _hideEmptyState depends on _controller.text, which means we need to
+          // listen to _controller to make sure we rebuild this widget when
+          // _controller.text changes.
+          return new Offstage(
+            offstage: _hideEmptyState,
+            child: child,
+          );
+        },
         child: new Material(
           color: Colors.white,
           child: new Center(
