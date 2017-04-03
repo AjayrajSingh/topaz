@@ -30,12 +30,12 @@ void main() {
       of: find.byType(SubjectInput),
       matching: find.byType(EditableText),
     ));
-    expect(subjectEditableText.value.text, message.subject);
+    expect(subjectEditableText.controller.text, message.subject);
     EditableText messageEditableText = tester.widget(find.descendant(
       of: find.byType(MessageTextInput),
       matching: find.byType(EditableText),
     ));
-    expect(messageEditableText.value.text, message.text);
+    expect(messageEditableText.controller.text, message.text);
     expect(
         find.descendant(
           of: find.byType(RecipientInput),

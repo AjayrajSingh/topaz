@@ -36,7 +36,7 @@ void main() {
     ));
     await tester.idle();
     EditableText editableText = tester.widget(find.byType(EditableText));
-    expect(editableText.value.text, initialText);
+    expect(editableText.controller.text, initialText);
   });
 
   testWidgets('Input text should use style specified in inputStyle',

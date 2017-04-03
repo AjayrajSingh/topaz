@@ -52,7 +52,7 @@ class GoogleSearchImagePicker extends StatefulWidget {
 class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   List<String> _sourceImages = <String>[];
   String _lastInputValue;
-  TextInputController _controller;
+  TextEditingController _controller;
   bool _isLoading = false;
   Timer _timer;
   String _lastSearchQuery;
@@ -124,7 +124,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   void didUpdateConfig(GoogleSearchImagePicker oldState) {
     super.didUpdateConfig(oldState);
     // Make a new search if config.query has been changed
-    if (oldState.query == _currentInput.text) {
+    if (oldState.query == _controller.text) {
       _controller.text = config.query ?? '';
       _search(config.query);
     }
