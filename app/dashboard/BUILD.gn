@@ -10,6 +10,9 @@ flutter_app("dashboard") {
   source_dir = "lib"
 
   deps = [
+    "//application/lib/app/dart",
+    "//apps/modular/services/module:module_dart",
+    "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/html",
     "//third_party/dart-pkg/pub/http",
