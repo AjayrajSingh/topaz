@@ -247,6 +247,7 @@ void _addEmbeddedChildBuilders() {
 
       _log('before startModule!');
       _module.moduleContext.startModule(
+        'map',
         _kMapModuleUrl,
         _module.duplicateLink(),
         null,
