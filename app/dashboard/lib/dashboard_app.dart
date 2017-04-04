@@ -29,7 +29,7 @@ final TextStyle _kUnimportantStyle = _kImportantStyle.copyWith(
 );
 
 const String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
-const Color _kFuchsiaColor = const Color(0xFFFF00C0);
+const Color _kFuchsiaColor = const Color(0xFFFF0080);
 
 class _BuildInfo {
   _BuildStatus status = _BuildStatus.unknown;
@@ -99,7 +99,8 @@ class _DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<_DashboardPage> {
   Map<String, Map<String, _BuildInfo>> _targetsResults;
   DateTime _startTime = new DateTime.now();
-  DateTime _firstErrorTime;
+  DateTime _lastFailTime;
+  DateTime _lastPassTime;
   DateTime _lastRefreshed;
 
   @override
@@ -150,15 +151,17 @@ class _DashboardPageState extends State<_DashboardPage> {
         if (html == null) {
           errorMessage =
               'Status ${response.statusCode}\n${response.reasonPhrase}';
-          if (_firstErrorTime == null) {
-            _firstErrorTime = new DateTime.now();
+          if (_lastFailTime == null) {
+            _lastFailTime = new DateTime.now();
+            _lastPassTime = null;
           }
         }
       } catch (error) {
         status = _BuildStatus.networkError;
         errorMessage = 'Error receiving response:\n$error';
-        if (_firstErrorTime == null) {
-          _firstErrorTime = new DateTime.now();
+        if (_lastFailTime == null) {
+          _lastFailTime = new DateTime.now();
+          _lastPassTime = null;
         }
       }
       _targetsResults['$categoryName']['$buildName'].lastRefreshEnded =
@@ -167,6 +170,11 @@ class _DashboardPageState extends State<_DashboardPage> {
       if (html == null) {
         status = _BuildStatus.networkError;
       } else {
+        if (_lastPassTime == null) {
+          _lastPassTime = new DateTime.now();
+          _lastFailTime = null;
+        }
+
         dom.Document domTree = parse(html);
         List<dom.Element> trs = domTree.querySelectorAll('tr');
         for (dom.Element tr in trs) {
@@ -341,7 +349,8 @@ class _DashboardPageState extends State<_DashboardPage> {
     rows.add(
       new _InfoText(
         startTime: _startTime,
-        firstErrorTime: _firstErrorTime,
+        lastFailTime: _lastFailTime,
+        lastPassTime: _lastPassTime,
         lastRefreshed: _lastRefreshed,
       ),
     );
@@ -364,10 +373,16 @@ class _DashboardPageState extends State<_DashboardPage> {
 
 class _InfoText extends StatefulWidget {
   final DateTime startTime;
-  final DateTime firstErrorTime;
+  final DateTime lastFailTime;
+  final DateTime lastPassTime;
   final DateTime lastRefreshed;
 
-  _InfoText({this.startTime, this.firstErrorTime, this.lastRefreshed});
+  _InfoText({
+    this.startTime,
+    this.lastFailTime,
+    this.lastPassTime,
+    this.lastRefreshed,
+  });
 
   @override
   _InfoTextState createState() => new _InfoTextState();
@@ -427,18 +442,37 @@ class _InfoTextState extends State<_InfoText> {
       ),
     ];
 
-    if (config.firstErrorTime != null) {
-      Duration firstFailureTime =
-          config.firstErrorTime.difference(config.startTime);
+    if (config.lastFailTime != null) {
+      Duration lastFailureTime =
+          new DateTime.now().difference(config.lastFailTime);
 
       rowChildren.add(
         new RichText(
           text: new TextSpan(
-            text: 'Failed after ',
+            text: 'Failing for ',
             style: _kUnimportantStyle,
             children: <TextSpan>[
               new TextSpan(
-                text: _toConciseString(firstFailureTime),
+                text: _toConciseString(lastFailureTime),
+                style: _kImportantStyle,
+              ),
+            ],
+          ),
+        ),
+      );
+    } else if (config.lastPassTime != null) {
+      Duration lastPassTime = new DateTime.now().difference(
+        config.lastPassTime,
+      );
+
+      rowChildren.add(
+        new RichText(
+          text: new TextSpan(
+            text: 'Passing for ',
+            style: _kUnimportantStyle,
+            children: <TextSpan>[
+              new TextSpan(
+                text: _toConciseString(lastPassTime),
                 style: _kImportantStyle,
               ),
             ],
@@ -462,15 +496,7 @@ class _InfoTextState extends State<_InfoText> {
   void _updateUptime() {
     setState(() {
       _uptime = new DateTime.now().difference(config.startTime);
-      _timer = new Timer(
-          _uptime.inSeconds < 60
-              ? const Duration(seconds: 1)
-              : _uptime.inMinutes < 60
-                  ? const Duration(seconds: 10)
-                  : _uptime.inHours < 24
-                      ? const Duration(minutes: 10)
-                      : const Duration(hours: 4),
-          _updateUptime);
+      _timer = new Timer(const Duration(seconds: 1), _updateUptime);
     });
   }
 
