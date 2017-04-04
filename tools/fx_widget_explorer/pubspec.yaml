@@ -2,13 +2,15 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-name: gallery
+name: fx_widget_explorer
 description: View UI Widgets and screens.
 dependencies:
   calendar:
     path: ../../calendar/modules/calendar
-  chat_story:
-    path: ../../chat/modules/story
+  chat_conversation:
+    path: ../../chat/modules/conversation
+  chat_conversation_list:
+    path: ../../chat/modules/conversation_list
   config_flutter:
     path: ../packages/config_flutter
   contacts:

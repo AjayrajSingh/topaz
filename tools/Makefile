@@ -11,7 +11,7 @@ common_root := $(realpath $(fuchsia_root)/apps/modules/common/tools/common)
 common_makefile := $(realpath $(common_root)/Makefile)
 
 PROJECT := common
-FLUTTER_TARGET := gallery
+FLUTTER_TARGET := fx_widget_explorer
 FUCHSIA_TARGET := color # The common_makefile expects this variable to be set.
 
 include $(common_makefile)
@@ -31,7 +31,7 @@ auth: config.json ## Update email auth credentials with a refresh token.
 	@cd tools/auth; \
 	pub get; \
 	pub run bin/oauth.dart
-	@for dir in ../contacts/modules/contacts/assets gallery/assets modules/gallery/assets; do \
+	@for dir in ../contacts/modules/contacts/assets fx_widget_explorer/assets modules/gallery/assets; do \
 		mkdir -p $${dir}; \
 		cp config.json $${dir}/config.json; \
 	done
@@ -43,19 +43,19 @@ config.json:
 
 
 ################################################################################
-## Styleguide related targets
+## Widget Explorer related targets
 
 # To debug the generation process, pass in "--observe --pause-isolates-on-start"
 # as the DART_FLAGS
 dart_flags ?=
-widget_package_dirs := $(realpath $(addprefix $(root)/, packages/widgets ../calendar/modules/calendar ../chat/modules/story ../contacts/modules/contacts))
+widget_package_dirs := $(realpath $(addprefix $(root)/, packages/widgets ../calendar/modules/calendar ../chat/modules/conversation ../chat/modules/conversation_list ../contacts/modules/contacts))
 widget_dot_packages := $(addsuffix /.packages, $(widget_package_dirs))
 
 .PHONY: dart-gen-specs
 dart-gen-specs: $(dart_bin) tools/widget_specs/.packages $(widget_dot_packages)
-	@rm -rf gallery/lib/src/generated/*.dart
+	@rm -rf fx_widget_explorer/lib/src/generated/*.dart
 	@cd tools/widget_specs && \
 	FLUTTER_ROOT=$(flutter_root) $(dart) $(dart_flags) bin/gen_widget_specs.dart \
-		$(root)/gallery/lib/src/generated \
+		$(root)/fx_widget_explorer/lib/src/generated \
 		$(widget_package_dirs)
 	@rm -f $(widget_dot_packages)

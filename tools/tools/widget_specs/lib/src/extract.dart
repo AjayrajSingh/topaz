@@ -65,7 +65,8 @@ List<WidgetSpecs> extractWidgetSpecs(String packagePath, {String fuchsiaRoot}) {
   return sources
       .expand((Source source) => _extractWidgetSpecsFromSource(
           context, source, libraries, fuchsiaRoot))
-      .toList()..sort();
+      .toList()
+        ..sort();
 }
 
 List<WidgetSpecs> _extractWidgetSpecsFromSource(

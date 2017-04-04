@@ -38,7 +38,8 @@ Future<Null> main(List<String> args) async {
   List<WidgetSpecs> allWidgetSpecs = packageDirs
       .expand((String packageDir) =>
           extractWidgetSpecs(packageDir, fuchsiaRoot: fuchsiaRoot))
-      .toList()..sort();
+      .toList()
+        ..sort();
 
   await writeIndex(outputDir, allWidgetSpecs);
   await Future.forEach(

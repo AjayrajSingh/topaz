@@ -37,9 +37,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.1"
-  chat_story:
+  chat_conversation:
     description:
-      path: "../../chat/modules/story"
+      path: "../../chat/modules/conversation"
+      relative: true
+    source: path
+    version: "0.0.0"
+  chat_conversation_list:
+    description:
+      path: "../../chat/modules/conversation_list"
       relative: true
     source: path
     version: "0.0.0"
