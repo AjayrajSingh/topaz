@@ -3,7 +3,7 @@
 packages:
   analyzer:
     description:
-      path: "../../../../../lib/flutter/bin/cache/dart-sdk/lib/analyzer"
+      path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/analyzer"
       relative: true
     source: path
     version: "0.30.0-alpha.1"
@@ -83,7 +83,7 @@ packages:
     version: "0.0.0"
   front_end:
     description:
-      path: "../../../../../lib/flutter/bin/cache/dart-sdk/lib/front_end"
+      path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/front_end"
       relative: true
     source: path
     version: "0.1.0-alpha.1"
@@ -131,7 +131,7 @@ packages:
     version: "1.0.0"
   kernel:
     description:
-      path: "../../../../../lib/flutter/bin/cache/dart-sdk/lib/kernel"
+      path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/kernel"
       relative: true
     source: path
     version: "0.2.0"
@@ -239,7 +239,7 @@ packages:
     version: "0.2.1"
   sky_engine:
     description:
-      path: "../../../../../lib/flutter/bin/cache/pkg/sky_engine"
+      path: "../../../../../../lib/flutter/bin/cache/pkg/sky_engine"
       relative: true
     source: path
     version: "0.0.99"

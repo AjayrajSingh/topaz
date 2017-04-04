@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 import 'util.dart';
 
 void main() {
-  test('gen_widget_specs tool should correctly generate the expected files.',
+  test('widget_explorer_gen tool should correctly generate the expected files.',
       () async {
     String mockPackagePath =
         path.join(getTestDataPath(basename: 'extract_test'), 'mock_package');
@@ -36,7 +36,7 @@ void main() {
     // Run the gen script.
     ProcessResult result = await Process.run(
       'pub',
-      <String>['run', 'gen_widget_specs.dart', outputPath, mockPackagePath],
+      <String>['run', 'widget_explorer_gen.dart', outputPath, mockPackagePath],
       workingDirectory: packagePath,
     );
 

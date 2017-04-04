@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-name: widget_specs
-description: Tools and APIs for extracting widget specs and generating gallery screens.
+name: widget_explorer_core
+description: APIs for extracting widget specs and generating widget explorer pages.
 dependencies:
   analyzer: any # See the dependency override below.
   cli_util: ^0.0.1+2
@@ -19,8 +19,8 @@ dev_dependencies:
 dependency_overrides:
   # Use the analyzer directly from the Dart SDK under flutter.
   analyzer:
-    path: ../../../../../lib/flutter/bin/cache/dart-sdk/lib/analyzer
+    path: ../../../../../../lib/flutter/bin/cache/dart-sdk/lib/analyzer
   front_end:
-    path: ../../../../../lib/flutter/bin/cache/dart-sdk/lib/front_end
+    path: ../../../../../../lib/flutter/bin/cache/dart-sdk/lib/front_end
   kernel:
-    path: ../../../../../lib/flutter/bin/cache/dart-sdk/lib/kernel
+    path: ../../../../../../lib/flutter/bin/cache/dart-sdk/lib/kernel

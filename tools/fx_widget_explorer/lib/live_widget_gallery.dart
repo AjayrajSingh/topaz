@@ -5,9 +5,9 @@
 import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:gallery/src/generated/index.dart';
-import 'package:gallery/src/widget_specs/utils.dart';
-import 'package:widget_specs/widget_specs.dart';
+import 'package:fx_widget_explorer/src/generated/index.dart';
+import 'package:widget_explorer_core/widget_specs.dart';
+import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
 
 const double _kMaxWidth = 1000.0;
 const double _kMaxHeight = 1000.0;

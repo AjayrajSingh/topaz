@@ -13,8 +13,8 @@ import 'package:dart_style/dart_style.dart';
 import 'package:mustache/mustache.dart';
 import 'package:path/path.dart' as path;
 import 'package:strings/strings.dart' as strings;
-import 'package:widget_specs/src/utils.dart';
-import 'package:widget_specs/widget_specs.dart';
+import 'package:widget_explorer_core/src/utils.dart';
+import 'package:widget_explorer_core/widget_specs.dart';
 
 const double _kBoxRadius = 4.0;
 const double _kMargin = 16.0;
@@ -127,8 +127,8 @@ const String _kHeader = '''
 const String _kIndexFileTemplate = '''
 {{ header }}
 
-import 'package:gallery/src/widget_specs/utils.dart';
-import 'package:widget_specs/widget_specs.dart';
+import 'package:widget_explorer_core/widget_specs.dart';
+import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
 
 {{ imports }}
 
@@ -182,8 +182,8 @@ const String _kSpecFileTemplate = '''
 
 import 'package:config/config.dart';
 import 'package:flutter/material.dart';
-import 'package:gallery/src/widget_specs/utils.dart';
-import 'package:widget_specs/widget_specs.dart';
+import 'package:widget_explorer_core/widget_specs.dart';
+import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
 import 'package:{{ package_name }}/{{ path }}';
 
 {{# additional_imports }}

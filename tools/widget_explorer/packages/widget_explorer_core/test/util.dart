@@ -23,6 +23,7 @@ String getTestDataPath({String basename}) {
       '..',
       '..',
       '..',
+      '..',
       'testdata',
       'widget_specs',
       basename,

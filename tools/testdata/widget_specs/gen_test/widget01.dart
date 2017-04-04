@@ -6,8 +6,8 @@
 
 import 'package:config/config.dart';
 import 'package:flutter/material.dart';
-import 'package:gallery/src/widget_specs/utils.dart';
-import 'package:widget_specs/widget_specs.dart';
+import 'package:widget_explorer_core/widget_specs.dart';
+import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
 import 'package:mock_package/exported.dart';
 
 /// Name of the widget.

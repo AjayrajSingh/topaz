@@ -52,10 +52,10 @@ widget_package_dirs := $(realpath $(addprefix $(root)/, packages/widgets ../cale
 widget_dot_packages := $(addsuffix /.packages, $(widget_package_dirs))
 
 .PHONY: dart-gen-specs
-dart-gen-specs: $(dart_bin) tools/widget_specs/.packages $(widget_dot_packages)
+dart-gen-specs: $(dart_bin) widget_explorer/tools/widget_explorer_gen/.packages $(widget_dot_packages)
 	@rm -rf fx_widget_explorer/lib/src/generated/*.dart
-	@cd tools/widget_specs && \
-	FLUTTER_ROOT=$(flutter_root) $(dart) $(dart_flags) bin/gen_widget_specs.dart \
+	@cd widget_explorer/tools/widget_explorer_gen && \
+	FLUTTER_ROOT=$(flutter_root) $(dart) $(dart_flags) bin/widget_explorer_gen.dart \
 		$(root)/fx_widget_explorer/lib/src/generated \
 		$(widget_package_dirs)
 	@rm -f $(widget_dot_packages)

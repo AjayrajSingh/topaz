@@ -8,7 +8,7 @@ import 'dart:io';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
-import 'package:widget_specs/widget_specs.dart';
+import 'package:widget_explorer_core/widget_specs.dart';
 
 import 'util.dart';
 
