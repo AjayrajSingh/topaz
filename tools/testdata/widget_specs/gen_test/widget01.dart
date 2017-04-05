@@ -70,13 +70,12 @@ class _GeneratedWidget01State extends GeneratedState {
         <Widget>[
           new Text('int'),
           new Text('intParam'),
-          new TextField(
-            initialValue: new InputValue(text: (intParam ?? 0).toString()),
-            isDense: true,
+          new TextFieldWithInitialValue(
+            initialValue: (intParam ?? 0).toString(),
             keyboardType: TextInputType.number,
-            onChanged: (InputValue value) {
+            onChanged: (String value) {
               try {
-                int intValue = int.parse(value.text);
+                int intValue = int.parse(value);
                 setState(() {
                   intParam = intValue;
                 });
@@ -112,13 +111,12 @@ class _GeneratedWidget01State extends GeneratedState {
         <Widget>[
           new Text('double'),
           new Text('doubleParam'),
-          new TextField(
-            initialValue: new InputValue(text: (doubleParam ?? 0.0).toString()),
-            isDense: true,
+          new TextFieldWithInitialValue(
+            initialValue: (doubleParam ?? 0.0).toString(),
             keyboardType: TextInputType.number,
-            onChanged: (InputValue value) {
+            onChanged: (String value) {
               try {
-                double doubleValue = double.parse(value.text);
+                double doubleValue = double.parse(value);
                 setState(() {
                   doubleParam = doubleValue;
                 });
@@ -134,12 +132,11 @@ class _GeneratedWidget01State extends GeneratedState {
         <Widget>[
           new Text('String'),
           new Text('stringParam'),
-          new TextField(
-            initialValue: new InputValue(text: stringParam ?? ''),
-            isDense: true,
-            onChanged: (InputValue value) {
+          new TextFieldWithInitialValue(
+            initialValue: stringParam,
+            onChanged: (String value) {
               setState(() {
-                stringParam = value.text;
+                stringParam = value;
               });
             },
           ),

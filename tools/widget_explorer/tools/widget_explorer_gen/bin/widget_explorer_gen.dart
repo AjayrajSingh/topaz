@@ -27,7 +27,7 @@ Future<Null> main(List<String> args) async {
   String error = checkArgs(args, fuchsiaRoot);
   if (error != null) {
     stderr.writeln(error);
-    stdout.writeln('Usage: pub run gen_widget_specs.dart '
+    stdout.writeln('Usage: pub run widget_explorer_gen.dart '
         '<output_dir> <widgets_package_dir> [<widgets_package_dir> ...]');
     exit(1);
   }
@@ -379,13 +379,12 @@ String _generateParamControllerCode(
 
   // For int type, use a TextField where the user can type in the integer value.
   if (param.type.name == 'int') {
-    return '''new TextField(
-      initialValue: new InputValue(text: (${param.name} ?? 0).toString()),
-      isDense: true,
+    return '''new TextFieldWithInitialValue(
+      initialValue: (${param.name} ?? 0).toString(),
       keyboardType: TextInputType.number,
-      onChanged: (InputValue value) {
+      onChanged: (String value) {
         try {
-          int intValue = int.parse(value.text);
+          int intValue = int.parse(value);
           setState(() {
             ${param.name} = intValue;
           });
@@ -417,13 +416,12 @@ String _generateParamControllerCode(
 
   // For double type, use a TextField where the user can type the value.
   if (param.type.name == 'double') {
-    return '''new TextField(
-        initialValue: new InputValue(text: (${param.name} ?? 0.0).toString()),
-        isDense: true,
+    return '''new TextFieldWithInitialValue(
+        initialValue: (${param.name} ?? 0.0).toString(),
         keyboardType: TextInputType.number,
-        onChanged: (InputValue value) {
+        onChanged: (String value) {
           try {
-            double doubleValue = double.parse(value.text);
+            double doubleValue = double.parse(value);
             setState(() {
               ${param.name} = doubleValue;
             });
@@ -446,12 +444,11 @@ String _generateParamControllerCode(
       )""";
     }
 
-    return '''new TextField(
-      initialValue: new InputValue(text: ${param.name} ?? ''),
-      isDense: true,
-      onChanged: (InputValue value) {
+    return '''new TextFieldWithInitialValue(
+      initialValue: ${param.name},
+      onChanged: (String value) {
         setState(() {
-          ${param.name} = value.text;
+          ${param.name} = value;
         });
       },
     )''';

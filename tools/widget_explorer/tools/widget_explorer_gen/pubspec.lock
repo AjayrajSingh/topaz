@@ -3,10 +3,10 @@
 packages:
   analyzer:
     description:
-      name: analyzer
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.29.10"
+      path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/analyzer"
+      relative: true
+    source: path
+    version: "0.30.0-alpha.1"
   args:
     description:
       name: args
@@ -81,6 +81,12 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  front_end:
+    description:
+      path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/front_end"
+      relative: true
+    source: path
+    version: "0.1.0-alpha.1"
   glob:
     description:
       name: glob
@@ -123,6 +129,12 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  kernel:
+    description:
+      path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/kernel"
+      relative: true
+    source: path
+    version: "0.2.0"
   lists:
     description:
       name: lists

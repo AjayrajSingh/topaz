@@ -309,3 +309,52 @@ class ConfigKeyText extends StatelessWidget {
     );
   }
 }
+
+/// A helper widget for text input, which can take an initial value string.
+class TextFieldWithInitialValue extends StatefulWidget {
+  /// Initial text value to be used (can be null).
+  final String initialValue;
+
+  /// Keyboard type.
+  final TextInputType keyboardType;
+
+  /// Callback for when the text value changes.
+  final ValueChanged<String> onChanged;
+
+  /// Callback for when the current text is submitted.
+  final ValueChanged<String> onSubmitted;
+
+  /// Creates a new instance of [TextFieldWithInitialValue].
+  TextFieldWithInitialValue({
+    Key key,
+    this.initialValue,
+    this.keyboardType,
+    this.onChanged,
+    this.onSubmitted,
+  });
+
+  @override
+  _TextFieldWithInitialValueState createState() =>
+      new _TextFieldWithInitialValueState();
+}
+
+class _TextFieldWithInitialValueState extends State<TextFieldWithInitialValue> {
+  TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = new TextEditingController(text: config.initialValue ?? '');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new TextField(
+      controller: _controller,
+      decoration: const InputDecoration(isDense: true),
+      keyboardType: config.keyboardType,
+      onChanged: config.onChanged,
+      onSubmitted: config.onSubmitted,
+    );
+  }
+}
