@@ -391,6 +391,7 @@ class _InfoText extends StatefulWidget {
 class _InfoTextState extends State<_InfoText> {
   Duration _uptime;
   Timer _timer;
+  DateTime _targetTime;
 
   @override
   void initState() {
@@ -400,6 +401,17 @@ class _InfoTextState extends State<_InfoText> {
       const Duration(seconds: 1),
       _updateUptime,
     );
+    new File('/data/dashboard_target').readAsString().then((String timestamp) {
+      try {
+        setState(() {
+          _targetTime = (timestamp != null && timestamp.isNotEmpty)
+              ? DateTime.parse(timestamp.trim())
+              : 0;
+        });
+      } catch (_, __) {
+        print('Error: Could not parse ${timestamp.trim()} as a DateTime!');
+      }
+    });
   }
 
   @override
@@ -481,6 +493,25 @@ class _InfoTextState extends State<_InfoText> {
       );
     }
 
+    if (_targetTime != null) {
+      rowChildren.add(
+        new RichText(
+          text: new TextSpan(
+            text: 'Remaining ',
+            style: _kUnimportantStyle,
+            children: <TextSpan>[
+              new TextSpan(
+                text: _toConciseString(
+                  _targetTime.difference(new DateTime.now()),
+                ),
+                style: _kImportantStyle,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return new Container(
       height: 44.0,
       margin: const EdgeInsets.only(left: 12.0, right: 92.0),
@@ -500,11 +531,13 @@ class _InfoTextState extends State<_InfoText> {
     });
   }
 
-  static String _toConciseString(Duration duration) => duration.inSeconds < 60
-      ? '${duration.inSeconds}s'
-      : duration.inMinutes < 60
-          ? '${duration.inMinutes}m'
-          : duration.inHours < 24
-              ? '${duration.inHours}h'
-              : '${duration.inDays}d';
+  static String _toConciseString(
+          Duration duration) =>
+      duration.inSeconds.abs() < 60
+          ? '${duration.inSeconds}s'
+          : duration.inMinutes.abs() < 60
+              ? '${duration.inMinutes}m'
+              : duration.inHours.abs() < 24
+                  ? '${duration.inHours}h'
+                  : '${duration.inDays}d';
 }
