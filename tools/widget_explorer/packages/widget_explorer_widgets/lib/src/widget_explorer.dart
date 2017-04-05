@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:fx_widget_explorer/src/generated/index.dart';
+import 'package:meta/meta.dart';
 import 'package:widget_explorer_core/widget_specs.dart';
 import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
 
@@ -14,25 +14,47 @@ const double _kMaxSize = 1000.0;
 const double _kDefaultWidth = 500.0;
 const double _kDefaultHeight = 500.0;
 
-/// A gallery screen that lists all the auto-generated widgets and their specs.
-class LiveWidgetGallery extends StatefulWidget {
+/// The main screen of a Widget Explorer app that lists all the widgets and
+/// their specs.
+class WidgetExplorer extends StatefulWidget {
   /// Config provider.
   final Map<String, dynamic> config;
 
-  /// Creates a new instance of [LiveWidgetGallery].
-  LiveWidgetGallery({Key key, this.config}) : super(key: key);
+  /// Map of all the widget names and their widget specs.
+  ///
+  /// This value should be the `kWidgetSpecs` variable, which can be found in
+  /// the `index.dart` file in the `widget_explorer_gen` tool's output dir.
+  final Map<String, WidgetSpecs> widgetSpecs;
+
+  /// Map of all the widget names and their generated state builders.
+  ///
+  /// This value should be the `kStateBuilders` variable, which can be found in
+  /// the `index.dart` file in the `widget_explorer_gen` tool's output dir.
+  final Map<String, GeneratedStateBuilder> stateBuilders;
+
+  /// Creates a new instance of [WidgetExplorer].
+  WidgetExplorer({
+    Key key,
+    this.config,
+    @required this.widgetSpecs,
+    @required this.stateBuilders,
+  })
+      : super(key: key) {
+    assert(widgetSpecs != null);
+    assert(stateBuilders != null);
+  }
 
   @override
-  _LiveWidgetGalleryState createState() => new _LiveWidgetGalleryState();
+  _WidgetExplorerState createState() => new _WidgetExplorerState();
 }
 
-class _LiveWidgetGalleryState extends State<LiveWidgetGallery> {
+class _WidgetExplorerState extends State<WidgetExplorer> {
   String selectedWidget;
   Key contentKey;
   Size size;
   Map<String, Size> widgetSizes;
 
-  _LiveWidgetGalleryState() {
+  _WidgetExplorerState() {
     contentKey = new UniqueKey();
     size = new Size(_kDefaultWidth, _kDefaultHeight);
     widgetSizes = <String, Size>{};
@@ -49,9 +71,9 @@ class _LiveWidgetGalleryState extends State<LiveWidgetGallery> {
   }
 
   Widget _buildMenu() {
-    List<String> widgetNames = kWidgetSpecs.keys.toList()..sort();
+    List<String> widgetNames = config.widgetSpecs.keys.toList()..sort();
     List<ListTile> tiles = widgetNames
-        .map((String name) => kWidgetSpecs[name])
+        .map((String name) => config.widgetSpecs[name])
         .map((WidgetSpecs specs) => new ListTile(
               title: new Text(specs.name),
               subtitle: new Text(specs.doc?.split('\n')?.first),
@@ -66,7 +88,7 @@ class _LiveWidgetGalleryState extends State<LiveWidgetGallery> {
   }
 
   Widget _buildContents() {
-    WidgetSpecs specs = kWidgetSpecs[selectedWidget];
+    WidgetSpecs specs = config.widgetSpecs[selectedWidget];
     if (specs == null) {
       return new Center(
         child: new Text('Please select a widget from the left pane.'),
@@ -100,11 +122,11 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
             ),
           ),
           _buildSizeControl(),
-          new GalleryWidgetWrapper(
+          new WidgetExplorerWrapper(
             config: config.config,
             width: size.width,
             height: size.height,
-            stateBuilder: kStateBuilders[specs.name],
+            stateBuilder: config.stateBuilders[specs.name],
           ),
         ],
       ),
@@ -123,7 +145,7 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
         margin: const EdgeInsets.all(16.0),
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: kWidgetSpecs[selectedWidget].hasSizeParam
+          children: config.widgetSpecs[selectedWidget].hasSizeParam
               ? <Widget>[
                   _buildSizeRow(
                     'Size',

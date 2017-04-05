@@ -3,10 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
 
 import 'app.dart';
 import 'drawer.dart';
-import 'live_widget_gallery.dart';
+import 'src/generated/index.dart';
 
 /// This [Widget] displays the homepage of the gallery.
 class Home extends StatefulWidget {
@@ -36,7 +37,11 @@ class _HomeState extends State<Home> {
 
     return new Scaffold(
       appBar: new AppBar(title: new Text('FX Live Widget Gallery')),
-      body: new LiveWidgetGallery(config: app?.config?.toJson()),
+      body: new WidgetExplorer(
+        config: app?.config?.toJSON(),
+        widgetSpecs: kWidgetSpecs,
+        stateBuilders: kStateBuilders,
+      ),
       drawer: new GalleryDrawer(
         showPerformanceOverlay: config.showPerformanceOverlay,
         onShowPerformanceOverlayChanged: config.onShowPerformanceOverlayChanged,

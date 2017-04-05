@@ -9,3 +9,6 @@ dependencies:
     sdk: flutter
   flutter_markdown:
     sdk: flutter
+  meta: ^1.0.5
+  widget_explorer_core:
+    path: ../widget_explorer_core
