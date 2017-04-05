@@ -4,7 +4,6 @@
 
 // THIS IS A GENERATED FILE. DO NOT MODIFY MANUALLY.
 
-import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:widget_explorer_core/widget_specs.dart';
 import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
@@ -45,7 +44,7 @@ class _GeneratedGeneratorWidgetState extends GeneratedState {
   _GeneratedGeneratorWidgetState(SetStateFunc setState) : super(setState);
 
   @override
-  void initState(Config config) {
+  void initState(Map<String, dynamic> config) {
     foo = mockGenerator.foo();
     foo2 = mockGenerator.foo2();
     bar = mockGenerator.bar();

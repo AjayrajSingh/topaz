@@ -180,7 +180,6 @@ Future<Null> writeIndex(String outputDir, List<WidgetSpecs> widgetSpecs) async {
 const String _kSpecFileTemplate = '''
 {{ header }}
 
-import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:widget_explorer_core/widget_specs.dart';
 import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
@@ -220,7 +219,7 @@ class _Generated{{ name }}State extends GeneratedState {
   _Generated{{ name }}State(SetStateFunc setState) : super(setState);
 
   @override
-  void initState(Config config) {
+  void initState(Map<String, dynamic> config) {
     {{# params }}
     {{ param_name }} = {{ param_initial_value }};
     {{/ params }}
@@ -538,7 +537,7 @@ String _generateInitialValueCode(
   // Retrieve the config value associated with the specified config key.
   String configKey = specs.getConfigKey(param);
   if (configKey != null) {
-    return "config.get('${_escapeQuotes(configKey)}')";
+    return "config['${_escapeQuotes(configKey)}']";
   }
 
   // TODO(youngseokyoon): See if the parameter type has a default constructor

@@ -15,7 +15,7 @@ if [ ! -f config.json ]; then
 fi
 
 # Similarly, make one for each of the flutter modules.
-for name in gallery modules/gallery; do
+for name in modules/gallery; do
   CONFIG="${REPO_DIR}/${name}/assets/config.json"
   if [ ! -f "${CONFIG}" ]; then
     mkdir -p "$( dirname ${CONFIG} )"

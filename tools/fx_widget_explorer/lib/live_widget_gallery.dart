@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fx_widget_explorer/src/generated/index.dart';
@@ -18,7 +17,7 @@ const double _kDefaultHeight = 500.0;
 /// A gallery screen that lists all the auto-generated widgets and their specs.
 class LiveWidgetGallery extends StatefulWidget {
   /// Config provider.
-  final Config config;
+  final Map<String, dynamic> config;
 
   /// Creates a new instance of [LiveWidgetGallery].
   LiveWidgetGallery({Key key, this.config}) : super(key: key);

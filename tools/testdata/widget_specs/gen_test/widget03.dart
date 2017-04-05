@@ -4,7 +4,6 @@
 
 // THIS IS A GENERATED FILE. DO NOT MODIFY MANUALLY.
 
-import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:widget_explorer_core/widget_specs.dart';
 import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
@@ -37,7 +36,7 @@ class _GeneratedWidget03State extends GeneratedState {
   _GeneratedWidget03State(SetStateFunc setState) : super(setState);
 
   @override
-  void initState(Config config) {
+  void initState(Map<String, dynamic> config) {
     callbackWithNoParams = () => print('Widget03.callbackWithNoParams called');
     callbackWithParams = (dynamic foo, dynamic bar) => print(
         'Widget03.callbackWithParams called with parameters: ${<dynamic>[foo, bar]}');

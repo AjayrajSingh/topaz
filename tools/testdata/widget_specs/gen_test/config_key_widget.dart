@@ -4,7 +4,6 @@
 
 // THIS IS A GENERATED FILE. DO NOT MODIFY MANUALLY.
 
-import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:widget_explorer_core/widget_specs.dart';
 import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
@@ -34,8 +33,8 @@ class _GeneratedConfigKeyWidgetState extends GeneratedState {
   _GeneratedConfigKeyWidgetState(SetStateFunc setState) : super(setState);
 
   @override
-  void initState(Config config) {
-    apiKey = config.get('api_key');
+  void initState(Map<String, dynamic> config) {
+    apiKey = config['api_key'];
   }
 
   @override

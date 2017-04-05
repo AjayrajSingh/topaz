@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -36,7 +35,7 @@ abstract class GeneratedState {
   GeneratedState(this.setState);
 
   /// Initialize all the parameter values.
-  void initState(Config config);
+  void initState(Map<String, dynamic> config);
 
   /// Builds the target widget with the current values.
   Widget buildWidget(
@@ -56,8 +55,8 @@ typedef GeneratedState GeneratedStateBuilder(SetStateFunc setState);
 
 /// A widget that wraps the target widget and its size control panel.
 class GalleryWidgetWrapper extends StatefulWidget {
-  /// Config object.
-  final Config config;
+  /// Configuration map.
+  final Map<String, dynamic> config;
 
   /// Current width value.
   final double width;

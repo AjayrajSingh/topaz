@@ -36,7 +36,7 @@ class _HomeState extends State<Home> {
 
     return new Scaffold(
       appBar: new AppBar(title: new Text('FX Live Widget Gallery')),
-      body: new LiveWidgetGallery(config: app?.config),
+      body: new LiveWidgetGallery(config: app?.config?.toJson()),
       drawer: new GalleryDrawer(
         showPerformanceOverlay: config.showPerformanceOverlay,
         onShowPerformanceOverlayChanged: config.onShowPerformanceOverlayChanged,
