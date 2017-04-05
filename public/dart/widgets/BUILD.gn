@@ -12,6 +12,8 @@ dart_package("lib.widgets") {
   source_dir = "lib"
 
   deps = [
+    "//application/lib/app/dart",
+    "//apps/modular/services/module:module_dart",
     "//lib/flutter/packages/flutter",
   ]
 }
