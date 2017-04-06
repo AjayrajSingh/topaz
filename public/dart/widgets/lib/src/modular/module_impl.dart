@@ -43,13 +43,19 @@ class ModuleImpl extends Module {
     if (onReady != null) {
       _moduleContextProxy.ctrl.bind(moduleContext);
       _linkProxy.ctrl.bind(link);
-      _incomingServiceProviderProxy.ctrl.bind(incomingServices);
+
+      if (incomingServices != null) {
+        _incomingServiceProviderProxy.ctrl.bind(incomingServices);
+      }
+
       onReady(_moduleContextProxy, _linkProxy, _incomingServiceProviderProxy);
     }
 
-    if (outgoingServices != null) {
+    if (outgoingServices != null && outgoingServiceProvider != null) {
       _outgoingServiceProviderBinding.bind(
-          outgoingServiceProvider, outgoingServices);
+        outgoingServiceProvider,
+        outgoingServices,
+      );
     }
   }
 
