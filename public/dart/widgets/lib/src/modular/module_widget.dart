@@ -6,6 +6,7 @@ import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:meta/meta.dart';
 
 import 'module_impl.dart';
 import 'module_model.dart';
@@ -18,14 +19,13 @@ import 'module_model.dart';
 /// Also for convienence, the [ModuleModel] given to this widget will be
 /// made available to [child] and [child]'s descendants.
 class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
-  /// The [ApplicationContext] to [advertise] its [Module] services to.
-  final ApplicationContext _applicationContext =
-      new ApplicationContext.fromStartupInfo();
-
   final ModuleBinding _binding = new ModuleBinding();
 
   /// The [Module] to [advertise].
   final Module _module;
+
+  /// The [ApplicationContext] to [advertise] its [Module] services to.
+  final ApplicationContext applicationContext;
 
   /// The [ModuleModel] to notify when the [Module] is ready.
   final T _moduleModel;
@@ -34,7 +34,11 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
   final Widget child;
 
   /// Constructor.
-  ModuleWidget({T moduleModel, this.child})
+  ModuleWidget({
+    @required this.applicationContext,
+    @required T moduleModel,
+    @required this.child,
+  })
       : _moduleModel = moduleModel,
         _module = new ModuleImpl(
           onReady: moduleModel?.onReady,
@@ -50,8 +54,8 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
         );
 
   /// Advertises [_module] as a [Module] to the rest of the system via the
-  /// [_applicationContext].
-  void advertise() => _applicationContext.outgoingServices.addServiceForName(
+  /// [applicationContext].
+  void advertise() => applicationContext.outgoingServices.addServiceForName(
         (InterfaceRequest<Module> request) => _binding.bind(_module, request),
         Module.serviceName,
       );
