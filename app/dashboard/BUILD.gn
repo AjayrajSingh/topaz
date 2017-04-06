@@ -12,6 +12,7 @@ flutter_app("dashboard") {
   deps = [
     "//application/lib/app/dart",
     "//apps/modular/services/module:module_dart",
+    "//apps/modular/services/user:user_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//lib/widgets/packages/widgets:lib.widgets",
