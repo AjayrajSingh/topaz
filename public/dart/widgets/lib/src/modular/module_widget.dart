@@ -16,7 +16,7 @@ import 'module_model.dart';
 /// For convienence, [advertise] does the advertising of the app as a
 /// [Module] to the rest of the system via the [ApplicationContext].
 /// Also for convienence, the [ModuleModel] given to this widget will be
-/// made avialable to [child] and [child]'s descendants.
+/// made available to [child] and [child]'s descendants.
 class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
   /// The [ApplicationContext] to [advertise] its [Module] services to.
   final ApplicationContext _applicationContext =

@@ -27,10 +27,16 @@ class ModuleImpl extends Module {
   final ServiceProviderBinding _outgoingServiceProviderBinding =
       new ServiceProviderBinding();
 
+  /// The [ServiceProvider] to provide when outgoing services are requested.
   final ServiceProvider outgoingServiceProvider;
+
+  /// Called when [Module] is initialied with its services.
   final OnReady onReady;
+
+  /// Called when [Module] is stopped.
   final VoidCallback onStop;
 
+  /// Constuctor.
   ModuleImpl({this.outgoingServiceProvider, this.onReady, this.onStop});
 
   @override
