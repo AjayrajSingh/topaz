@@ -8,7 +8,7 @@ source_set("mx") {
   ]
 
   public_deps = [
-    "//dart/runtime:libdart",
+    "//dart/runtime:dart_api",
     "//lib/tonic/converter",
     "//magenta/system/ulib/mx",
   ]

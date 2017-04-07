@@ -9,7 +9,7 @@ source_set("converter") {
   ]
 
   public_deps = [
-    "//dart/runtime:libdart",
+    "//dart/runtime:dart_api",
     "//lib/ftl",
   ]
 }
