@@ -104,6 +104,7 @@ class EditorState extends State<Editor> {
   double _lineHeight;
   // location of last tap (used to expand selection on long press)
   LineCol _lastTapLocation;
+  final FocusNode _focusNode = new FocusNode();
 
   /// Creates a new editor state.
   EditorState() {
@@ -265,13 +266,16 @@ class EditorState extends State<Editor> {
     }
   }
 
+  void _requestKeyboard() {
+    FocusScope.of(context).requestFocus(_focusNode);
+  }
+
   LineCol _getLineColFromGlobal(Point globalPosition) {
     RenderBox renderObject = context.findRenderObject();
     Point local = renderObject.globalToLocal(globalPosition);
     double x = local.x;
     double y = local.y + _controller.offset;
     int line = y ~/ _lineHeight;
-    print('tap down ($x, $y), line $line');
     int col = 0;
     Line text = _lines.getLine(line);
     if (text != null) {
@@ -281,6 +285,7 @@ class EditorState extends State<Editor> {
   }
 
   void _handleTapDown(TapDownDetails details) {
+    _requestKeyboard();
     _lastTapLocation = _getLineColFromGlobal(details.globalPosition);
     _sendNotification('click', <int>[_lastTapLocation.line, _lastTapLocation.col, 0, 1]);
   }
@@ -326,9 +331,16 @@ class EditorState extends State<Editor> {
   }
 
   @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    FocusScope.of(context).reparentIfNeeded(_focusNode);
     return new RawKeyboardListener(
-      focused: true,
+      focusNode: _focusNode,
       onKey: _handleKey,
       child: new GestureDetector(
         onTapDown: _handleTapDown,

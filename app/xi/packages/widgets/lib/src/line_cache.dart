@@ -6,6 +6,7 @@
 // based on deltas from xi-core.
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 
 /// One line in the editor view, with cursor and style information.
 class Line {
