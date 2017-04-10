@@ -3,8 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/model.dart';
 
-enum BuildStatus { unknown, networkError, parseError, success, failure }
+import 'build_status_model.dart';
 
 const double _kFontSize = 20.0;
 const double _kErrorFontSize = 12.0;
@@ -22,23 +23,10 @@ final TextStyle _kUnimportantStyle = _kImportantStyle.copyWith(
 
 const Color _kFuchsiaColor = const Color(0xFFFF0080);
 
-class BuildInfo {
-  BuildStatus status = BuildStatus.unknown;
-  String url;
-  String errorMessage;
-  DateTime lastRefreshStarted;
-  DateTime lastRefreshEnded;
-
-  BuildInfo({this.status, this.url, this.errorMessage});
-}
-
 class BuildStatusWidget extends StatelessWidget {
-  final String type;
-  final String name;
-  final BuildInfo bi;
   final VoidCallback onTap;
 
-  BuildStatusWidget({this.type, this.name, this.bi, this.onTap});
+  BuildStatusWidget({this.onTap});
 
   Color _colorFromBuildStatus(BuildStatus status) {
     switch (status) {
@@ -54,92 +42,96 @@ class BuildStatusWidget extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    bool hasError = bi.errorMessage?.isNotEmpty ?? false;
-    List<Widget> columnChildren = <Widget>[
-      new Text(
-        type,
-        textAlign: TextAlign.center,
-        style: hasError
-            ? _kUnimportantStyle.copyWith(fontSize: _kErrorFontSize)
-            : _kUnimportantStyle,
-      ),
-      new Container(height: 4.0),
-      new Text(
-        name,
-        textAlign: TextAlign.center,
-        style: hasError
-            ? _kImportantStyle.copyWith(fontSize: _kErrorFontSize)
-            : _kImportantStyle,
-      ),
-    ];
-    if (hasError) {
-      columnChildren.addAll(<Widget>[
-        new Container(height: 4.0),
-        new Text(
-          bi.errorMessage,
-          textAlign: TextAlign.left,
-          style: new TextStyle(
-            color: Colors.red[900],
-            fontWeight: FontWeight.w900,
-            fontSize: _kErrorFontSize,
-          ),
-        ),
-      ]);
-    }
-
-    List<Widget> stackChildren = <Widget>[
-      new Center(
-        child: new Column(
-          mainAxisSize: MainAxisSize.min,
-          children: columnChildren,
-        ),
-      ),
-    ];
-
-    if (bi.lastRefreshEnded == null) {
-      stackChildren.add(
-        new Align(
-          alignment: FractionalOffset.bottomCenter,
-          child: new Container(
-            margin: const EdgeInsets.only(bottom: 8.0),
-            width: 16.0,
-            height: 16.0,
-            child: new CircularProgressIndicator(
-              valueColor: new AlwaysStoppedAnimation<Color>(_kFuchsiaColor),
+  Widget build(BuildContext context) =>
+      new ScopedModelDescendant<BuildStatusModel>(
+        builder: (BuildContext context, Widget child, BuildStatusModel model) {
+          bool hasError = model.errorMessage?.isNotEmpty ?? false;
+          List<Widget> columnChildren = <Widget>[
+            new Text(
+              model.type,
+              textAlign: TextAlign.center,
+              style: hasError
+                  ? _kUnimportantStyle.copyWith(fontSize: _kErrorFontSize)
+                  : _kUnimportantStyle,
             ),
-          ),
-        ),
-      );
-    } else {
-      stackChildren.add(
-        new Align(
-          alignment: FractionalOffset.bottomCenter,
-          child: new Container(
-            margin: const EdgeInsets.only(bottom: 8.0, right: 8.0),
-            child: new Text(
-              '${bi.lastRefreshEnded.difference(bi.lastRefreshStarted).inMilliseconds} ms',
-              style: new TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w100,
-                fontSize: _kErrorFontSize,
+            new Container(height: 4.0),
+            new Text(
+              model.name,
+              textAlign: TextAlign.center,
+              style: hasError
+                  ? _kImportantStyle.copyWith(fontSize: _kErrorFontSize)
+                  : _kImportantStyle,
+            ),
+          ];
+          if (hasError) {
+            columnChildren.addAll(<Widget>[
+              new Container(height: 4.0),
+              new Text(
+                model.errorMessage,
+                textAlign: TextAlign.left,
+                style: new TextStyle(
+                  color: Colors.red[900],
+                  fontWeight: FontWeight.w900,
+                  fontSize: _kErrorFontSize,
+                ),
+              ),
+            ]);
+          }
+
+          List<Widget> stackChildren = <Widget>[
+            new Center(
+              child: new Column(
+                mainAxisSize: MainAxisSize.min,
+                children: columnChildren,
               ),
             ),
-          ),
-        ),
-      );
-    }
+          ];
 
-    return new GestureDetector(
-      onTap: onTap,
-      child: new Container(
-        decoration: new BoxDecoration(
-          backgroundColor: _colorFromBuildStatus(bi.status),
-          borderRadius: new BorderRadius.circular(8.0),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: new Stack(children: stackChildren),
-      ),
-    );
-  }
+          if (model.lastRefreshEnded == null) {
+            stackChildren.add(
+              new Align(
+                alignment: FractionalOffset.bottomCenter,
+                child: new Container(
+                  margin: const EdgeInsets.only(bottom: 8.0),
+                  width: 16.0,
+                  height: 16.0,
+                  child: new CircularProgressIndicator(
+                    valueColor:
+                        new AlwaysStoppedAnimation<Color>(_kFuchsiaColor),
+                  ),
+                ),
+              ),
+            );
+          } else {
+            stackChildren.add(
+              new Align(
+                alignment: FractionalOffset.bottomCenter,
+                child: new Container(
+                  margin: const EdgeInsets.only(bottom: 8.0, right: 8.0),
+                  child: new Text(
+                    '${model.lastRefreshEnded.difference(model.lastRefreshStarted).inMilliseconds} ms',
+                    style: new TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w100,
+                      fontSize: _kErrorFontSize,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return new GestureDetector(
+            onTap: onTap,
+            child: new Container(
+              decoration: new BoxDecoration(
+                backgroundColor: _colorFromBuildStatus(model.buildStatus),
+                borderRadius: new BorderRadius.circular(8.0),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: new Stack(children: stackChildren),
+            ),
+          );
+        },
+      );
 }
