@@ -23,9 +23,12 @@ final TextStyle _kUnimportantStyle = _kImportantStyle.copyWith(
 
 const Color _kFuchsiaColor = const Color(0xFFFF0080);
 
+/// Displays a build status using its ancestor [BuildStatusModel].
 class BuildStatusWidget extends StatelessWidget {
+  /// Called then the widget is tapped.
   final VoidCallback onTap;
 
+  /// Constructor.
   BuildStatusWidget({this.onTap});
 
   Color _colorFromBuildStatus(BuildStatus status) {
@@ -121,15 +124,16 @@ class BuildStatusWidget extends StatelessWidget {
             );
           }
 
-          return new GestureDetector(
-            onTap: onTap,
-            child: new Container(
-              decoration: new BoxDecoration(
-                backgroundColor: _colorFromBuildStatus(model.buildStatus),
-                borderRadius: new BorderRadius.circular(8.0),
+          return new Material(
+            elevation: 2,
+            color: _colorFromBuildStatus(model.buildStatus),
+            borderRadius: new BorderRadius.circular(8.0),
+            child: new InkWell(
+              onTap: onTap,
+              child: new Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: new Stack(children: stackChildren),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: new Stack(children: stackChildren),
             ),
           );
         },

@@ -9,26 +9,61 @@ import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 import 'package:lib.widgets/modular.dart';
 
-enum BuildStatus { unknown, networkError, parseError, success, failure }
+/// Indicates the last known status of a particular build.
+enum BuildStatus {
+  /// The build status hasn't been determined yet.
+  unknown,
 
+  /// A network error occurred getting the build status.
+  networkError,
+
+  /// A parse error occurred while determining the build status.
+  parseError,
+
+  /// The build was successful.
+  success,
+
+  /// The build failed.
+  failure,
+}
+
+/// Manages a build status and associated metadata.
 class BuildStatusModel extends ModuleModel {
+  /// The build type.
   final String type;
+
+  /// The build name.
   final String name;
+
+  /// The url of the page used to determine the build status.
   final String url;
+
   DateTime _lastRefreshed;
   DateTime _lastRefreshStarted;
   DateTime _lastRefreshEnded;
   BuildStatus _buildStatus = BuildStatus.unknown;
   String _errorMessage;
 
+  /// Constructor.
   BuildStatusModel({this.type, this.name, this.url});
 
+  /// Returns the time when the status was refreshed.
   DateTime get lastRefreshed => _lastRefreshed;
+
+  /// Returns the time when the status is starting to refresh.
   DateTime get lastRefreshStarted => _lastRefreshStarted;
+
+  /// Returns the time when the status is finished refreshing.
   DateTime get lastRefreshEnded => _lastRefreshEnded;
+
+  /// Returns the current build status.
   BuildStatus get buildStatus => _buildStatus;
+
+  /// If the build status isn't [BuildStatus.success] this will indicate any
+  /// additional information about why not.
   String get errorMessage => _errorMessage;
 
+  /// Starts the model refreshing periodically.
   void start() {
     new Timer.periodic(
       const Duration(seconds: 60),
@@ -37,6 +72,7 @@ class BuildStatusModel extends ModuleModel {
     refresh();
   }
 
+  /// Initiates a refresh of the build status.
   void refresh() {
     _lastRefreshed = new DateTime.now().toLocal();
     _fetchConfigStatus();

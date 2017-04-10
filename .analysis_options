@@ -36,7 +36,7 @@ linter:
     - package_names
     - package_prefixed_library_names
     - prefer_is_not_empty
-    # - public_member_api_docs
+    - public_member_api_docs
     - slash_for_doc_comments
     - sort_constructors_first
     - sort_unnamed_constructors_first

@@ -15,14 +15,21 @@ const double _kSpaceBetween = 4.0;
 
 const Color _kFuchsiaColor = const Color(0xFFFF0080);
 
+/// Callback to launch a module that displays the [url].
 typedef void OnLaunchUrl(String url);
 
 /// Displays the fuchsia dashboard.
 class DashboardApp extends StatelessWidget {
+  /// Models for the build status widgets to display.
   final List<List<BuildStatusModel>> buildStatusModels;
+
+  /// Called when the refresh FAB is pressed.
   final VoidCallback onRefresh;
+
+  /// Called when a build status widget is pressed.
   final OnLaunchUrl onLaunchUrl;
 
+  /// Constructor.
   DashboardApp({this.buildStatusModels, this.onRefresh, this.onLaunchUrl});
 
   @override
@@ -49,7 +56,7 @@ class DashboardApp extends StatelessWidget {
                             child: new ScopedModel<BuildStatusModel>(
                               model: model,
                               child: new BuildStatusWidget(
-                                onTap: () => onLaunchUrl(model.url),
+                                onTap: () => onLaunchUrl?.call(model.url),
                               ),
                             ),
                           ),
@@ -77,7 +84,7 @@ class DashboardApp extends StatelessWidget {
         body: new Column(children: rows),
         floatingActionButton: new FloatingActionButton(
           backgroundColor: _kFuchsiaColor,
-          onPressed: onRefresh,
+          onPressed: () => onRefresh?.call(),
           tooltip: 'Refresh',
           child: new Icon(Icons.refresh),
         ),

@@ -23,6 +23,7 @@ final TextStyle _kUnimportantStyle = _kImportantStyle.copyWith(
   fontWeight: FontWeight.w300,
 );
 
+/// Displays important info about the builds.
 class InfoText extends StatefulWidget {
   @override
   _InfoTextState createState() => new _InfoTextState();
