@@ -1,0 +1,16 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//apps/dart_content_handler/dart_app.gni")
+
+dart_app("hard_kb_ime") {
+  main_dart = "main.dart"
+
+  deps = [
+    "//application/lib/app/dart",
+    "//apps/mozart/services/input:input_dart",
+    "//lib/fidl/examples/interfaces:interfaces_dart",
+    "//lib/fidl/dart",
+  ]
+}
