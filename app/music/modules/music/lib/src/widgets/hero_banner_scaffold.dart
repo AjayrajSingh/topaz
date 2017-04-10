@@ -3,7 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
+
+import 'loading_status.dart';
 
 /// This is the height that the Hero Banner should take up (not including the
 /// background overflow).
@@ -28,8 +29,15 @@ const double _kHeroBannerHorizontalPadding = 52.0;
 /// The maximum width of the main content section below the header.
 const double _kBodyMaxWidth = 1000.0;
 
+/// The mininum height of the body section, primarily used to reduce "flow jank"
+/// during the transition from loading to completed states.
+const double _kMinBodyHeight = 200.0;
+
 /// Default background color used behind the body
 final Color _kDefaultBackgroundColor = Colors.grey[300];
+
+/// Color for default failure message
+final Color _kFailureTextColor = Colors.grey[500];
 
 /// Scaffold for typical Music layouts that will include:
 ///   1. A Hero Banner
@@ -55,20 +63,20 @@ class HeroBannerScaffold extends StatelessWidget {
   /// Child Widget (content) that goes inside the main body section
   final Widget body;
 
+  /// Loading Status of the content for this scaffold
+  final LoadingStatus loadingStatus;
+
   /// Constructor
   HeroBannerScaffold({
     Key key,
     this.heroBannerBackgroundColor,
     this.backgroundColor,
-    @required this.heroBanner,
-    @required this.heroImage,
-    @required this.body,
+    this.loadingStatus: LoadingStatus.completed,
+    this.heroBanner,
+    this.heroImage,
+    this.body,
   })
-      : super(key: key) {
-    assert(heroBanner != null);
-    assert(heroImage != null);
-    assert(body != null);
-  }
+      : super(key: key);
 
   Widget _buildHeroBanner(Color backgroundColor) {
     return new Container(
@@ -84,7 +92,9 @@ class HeroBannerScaffold extends StatelessWidget {
         ),
         padding: const EdgeInsets.only(left: _kHeroImageSize + 32.0),
         height: _kHeroBannerHeight - (_kHeroBannerVerticalPadding * 2),
-        child: heroBanner,
+        child: loadingStatus == LoadingStatus.completed
+            ? heroBanner ?? new Container()
+            : null,
       ),
     );
   }
@@ -107,7 +117,9 @@ class HeroBannerScaffold extends StatelessWidget {
             child: new Container(
               width: _kHeroImageSize,
               height: _kHeroImageSize,
-              child: heroImage,
+              child: loadingStatus == LoadingStatus.completed
+                  ? heroImage ?? new Container()
+                  : new Container(color: Colors.grey[300]),
             ),
           ),
         ),
@@ -116,11 +128,51 @@ class HeroBannerScaffold extends StatelessWidget {
   }
 
   Widget _buildBody() {
+    Widget child;
+    switch (loadingStatus) {
+      case LoadingStatus.inProgress:
+        child = new Center(
+          child: new CircularProgressIndicator(
+            value: null,
+            valueColor: new AlwaysStoppedAnimation<Color>(
+              heroBannerBackgroundColor,
+            ),
+          ),
+        );
+        break;
+      case LoadingStatus.failed:
+        child = new Center(
+          child: new Column(
+            children: <Widget>[
+              new Container(
+                margin: const EdgeInsets.only(bottom: 8.0),
+                child: new Icon(
+                  Icons.sentiment_dissatisfied,
+                  size: 48.0,
+                  color: _kFailureTextColor,
+                ),
+              ),
+              new Text(
+                'Content failed to load',
+                style: new TextStyle(
+                  fontSize: 16.0,
+                  color: _kFailureTextColor,
+                ),
+              ),
+            ],
+          ),
+        );
+        break;
+      case LoadingStatus.completed:
+        child = body ?? new Container();
+        break;
+    }
     return new Container(
       margin: const EdgeInsets.only(
         top: _kHeroBannerHeight,
         bottom: 32.0,
       ),
+      constraints: new BoxConstraints(minHeight: _kMinBodyHeight),
       alignment: FractionalOffset.topCenter,
       child: new Material(
         elevation: 4,
@@ -133,7 +185,6 @@ class HeroBannerScaffold extends StatelessWidget {
           child: new Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              // Initial "empty spacer"
               new Container(
                 height: _kHeroBannerBackgroundOverflow,
                 decoration: new BoxDecoration(
@@ -143,7 +194,12 @@ class HeroBannerScaffold extends StatelessWidget {
                   )),
                 ),
               ),
-              body,
+              new Container(
+                constraints: new BoxConstraints(
+                  minHeight: _kMinBodyHeight,
+                ),
+                child: child,
+              ),
             ],
           ),
         ),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../models.dart';
 import 'album_surface.dart';
 import 'artist_surface.dart';
+import 'loading_status.dart';
 import 'player.dart';
 
 enum _View {
@@ -69,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
             album,
             album,
           ],
+          loadingStatus: LoadingStatus.completed,
         ),
       );
     } else {
@@ -77,6 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
         highlightColor: highlightColor,
         isFollowing: true,
         currentTrack: album.tracks[2],
+        loadingStatus: LoadingStatus.completed,
       );
     }
 

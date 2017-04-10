@@ -11,6 +11,7 @@ import 'artist_grid.dart';
 import 'follow_button.dart';
 import 'hero_banner_scaffold.dart';
 import 'inline_album.dart';
+import 'loading_status.dart';
 import 'track_art.dart';
 
 /// UI Widget that represents an artist surface
@@ -46,11 +47,14 @@ class ArtistSurface extends StatelessWidget {
   /// Callback for when a related artist is selected
   final ArtistActionCallback onTapArtist;
 
+  /// Current loading status of the artist
+  final LoadingStatus loadingStatus;
+
   /// Constructor
   ArtistSurface({
     Key key,
-    @required this.artist,
-    @required this.albums,
+    this.artist,
+    this.albums,
     this.relatedArtists,
     this.onToggleFollow,
     this.isFollowing: false,
@@ -58,6 +62,7 @@ class ArtistSurface extends StatelessWidget {
     this.currentTrack,
     this.onTapTrack,
     this.onTapArtist,
+    this.loadingStatus: LoadingStatus.completed,
   })
       : super(key: key);
 
@@ -137,6 +142,22 @@ class ArtistSurface extends StatelessWidget {
     );
   }
 
+  Widget _buildBody(Color highlightColor) {
+    List<Widget> bodyChildren = <Widget>[
+      _buildAlbumList(highlightColor),
+    ];
+
+    if (relatedArtists != null && relatedArtists.isNotEmpty) {
+      bodyChildren.add(_buildRelatedArtists());
+    }
+
+    return new Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: bodyChildren,
+    );
+  }
+
   Widget _buildRelatedArtists() {
     return new Column(
       mainAxisSize: MainAxisSize.min,
@@ -162,27 +183,28 @@ class ArtistSurface extends StatelessWidget {
     );
   }
 
+  /// Builds the given child widget if both albums and artist are not null
+  Widget _conditionalBuilder(Widget child) {
+    if (artist != null && albums != null) {
+      return child;
+    } else {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     Color _highlightColor = highlightColor ?? theme.primaryColor;
 
-    List<Widget> bodyChildren = <Widget>[
-      _buildAlbumList(highlightColor),
-    ];
-    if (relatedArtists != null && relatedArtists.isNotEmpty) {
-      bodyChildren.add(_buildRelatedArtists());
-    }
-
     return new HeroBannerScaffold(
       heroBannerBackgroundColor: _highlightColor,
-      heroBanner: _buildBannerContent(),
-      heroImage: new TrackArt(artworkUrl: artist.defaultArtworkUrl),
-      body: new Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: bodyChildren,
+      heroBanner: _conditionalBuilder(_buildBannerContent()),
+      heroImage: _conditionalBuilder(
+        new TrackArt(artworkUrl: artist.defaultArtworkUrl),
       ),
+      body: _conditionalBuilder(_buildBody(_highlightColor)),
+      loadingStatus: loadingStatus,
     );
   }
 }

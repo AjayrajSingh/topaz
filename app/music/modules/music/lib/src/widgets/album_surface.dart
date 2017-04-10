@@ -3,13 +3,13 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 
 import '../models.dart';
 import '../typedefs.dart';
 import '../utils.dart';
 import 'follow_button.dart';
 import 'hero_banner_scaffold.dart';
+import 'loading_status.dart';
 import 'track_art.dart';
 import 'track_list_item.dart';
 
@@ -37,19 +37,20 @@ class AlbumSurface extends StatelessWidget {
   /// Callback for when a track is tapped
   final TrackActionCallback onTapTrack;
 
+  /// Current loading status of the album
+  final LoadingStatus loadingStatus;
+
   /// Constructor
   AlbumSurface({
     Key key,
-    @required this.album,
+    this.album,
     this.highlightColor,
     this.onToggleFollow,
     this.isFollowing: false,
     this.currentTrack,
     this.onTapTrack,
-  })
-      : super(key: key) {
-    assert(album != null);
-  }
+    this.loadingStatus: LoadingStatus.completed,
+  });
 
   String get _totalDurationText {
     Duration totalDuration = album.tracks.fold(
@@ -143,15 +144,27 @@ class AlbumSurface extends StatelessWidget {
     );
   }
 
+  /// Builds the given child widget if the album is not null
+  Widget _conditionalBuilder(Widget child) {
+    if (album != null) {
+      return child;
+    } else {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     Color _highlightColor = highlightColor ?? theme.primaryColor;
     return new HeroBannerScaffold(
       heroBannerBackgroundColor: _highlightColor,
-      heroBanner: _buildBannerContent(_highlightColor),
-      heroImage: new TrackArt(artworkUrl: album.defaultArtworkUrl),
-      body: _buildTrackList(_highlightColor),
+      heroBanner: _conditionalBuilder(_buildBannerContent(_highlightColor)),
+      heroImage: _conditionalBuilder(
+        new TrackArt(artworkUrl: album.defaultArtworkUrl),
+      ),
+      body: _conditionalBuilder(_buildTrackList(_highlightColor)),
+      loadingStatus: loadingStatus,
     );
   }
 }
