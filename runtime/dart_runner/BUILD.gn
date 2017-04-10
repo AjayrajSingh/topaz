@@ -30,7 +30,7 @@ executable("app") {
   deps = [
     "//application/lib/app",
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
-    "//dart/runtime:libdart",
+    "//dart/runtime:libdart_jit",
     "//dart/runtime/bin:embedded_dart_io",
 
     # TODO(abarth): We shouldn't need to depend on libdart_builtin but we fail

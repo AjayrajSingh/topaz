@@ -11,7 +11,7 @@ executable("snapshotter") {
 
   deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
-    "//dart/runtime:libdart",
+    "//dart/runtime:libdart_jit",
     "//dart/runtime/vm:libdart_platform",
     "//lib/ftl",
     "//lib/tonic/converter",
