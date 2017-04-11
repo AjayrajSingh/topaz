@@ -41,6 +41,8 @@ class BuildStatusModel extends ModuleModel {
   DateTime _lastRefreshed;
   DateTime _lastRefreshStarted;
   DateTime _lastRefreshEnded;
+  DateTime _lastFailTime;
+  DateTime _lastPassTime;
   BuildStatus _buildStatus = BuildStatus.unknown;
   String _errorMessage;
 
@@ -58,6 +60,12 @@ class BuildStatusModel extends ModuleModel {
 
   /// Returns the current build status.
   BuildStatus get buildStatus => _buildStatus;
+
+  /// The time the build started failing.
+  DateTime get lastFailTime => _lastFailTime;
+
+  /// The time the build started passing.
+  DateTime get lastPassTime => _lastPassTime;
 
   /// If the build status isn't [BuildStatus.success] this will indicate any
   /// additional information about why not.
@@ -117,6 +125,18 @@ class BuildStatusModel extends ModuleModel {
 
     _buildStatus = status;
     _errorMessage = errorMessage;
+
+    if (_buildStatus == BuildStatus.success) {
+      if (_lastPassTime == null) {
+        _lastPassTime = new DateTime.now();
+        _lastFailTime = null;
+      }
+    } else {
+      if (_lastFailTime == null) {
+        _lastFailTime = new DateTime.now();
+        _lastPassTime = null;
+      }
+    }
     notifyListeners();
   }
 }

@@ -2,12 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'build_status_model.dart';
+import 'info_text.dart' show toConciseString;
 
 const double _kFontSize = 20.0;
+const double _kTimerFontSize = 12.0;
 const double _kErrorFontSize = 12.0;
 const double _kSpaceBetween = 4.0;
 
@@ -21,27 +25,50 @@ final TextStyle _kUnimportantStyle = _kImportantStyle.copyWith(
   fontWeight: FontWeight.w300,
 );
 
+final TextStyle _kTimerStyle = _kImportantStyle.copyWith(
+  fontSize: _kTimerFontSize,
+);
+
+final TextStyle _kErrorStyle = new TextStyle(
+  color: Colors.red[900],
+  fontWeight: FontWeight.w900,
+  fontSize: _kErrorFontSize,
+);
+
+final TextStyle _kRefreshDurationStyle = new TextStyle(
+  color: Colors.black,
+  fontWeight: FontWeight.w100,
+  fontSize: _kErrorFontSize,
+);
+
 const Color _kFuchsiaColor = const Color(0xFFFF0080);
 
 /// Displays a build status using its ancestor [BuildStatusModel].
-class BuildStatusWidget extends StatelessWidget {
+class BuildStatusWidget extends StatefulWidget {
   /// Called then the widget is tapped.
   final VoidCallback onTap;
 
   /// Constructor.
   BuildStatusWidget({this.onTap});
 
-  Color _colorFromBuildStatus(BuildStatus status) {
-    switch (status) {
-      case BuildStatus.success:
-        return Colors.green[300];
-      case BuildStatus.failure:
-        return Colors.red[400];
-      case BuildStatus.networkError:
-        return Colors.purple[100];
-      default:
-        return Colors.grey[300];
-    }
+  @override
+  _BuildStatusWidgetState createState() => new _BuildStatusWidgetState();
+}
+
+class _BuildStatusWidgetState extends State<BuildStatusWidget> {
+  Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = new Timer(const Duration(seconds: 1), _updateTimers);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _timer?.cancel();
+    _timer = null;
   }
 
   @override
@@ -72,11 +99,7 @@ class BuildStatusWidget extends StatelessWidget {
               new Text(
                 model.errorMessage,
                 textAlign: TextAlign.left,
-                style: new TextStyle(
-                  color: Colors.red[900],
-                  fontWeight: FontWeight.w900,
-                  fontSize: _kErrorFontSize,
-                ),
+                style: _kErrorStyle,
               ),
             ]);
           }
@@ -113,11 +136,40 @@ class BuildStatusWidget extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 8.0, right: 8.0),
                   child: new Text(
                     '${model.lastRefreshEnded.difference(model.lastRefreshStarted).inMilliseconds} ms',
-                    style: new TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w100,
-                      fontSize: _kErrorFontSize,
-                    ),
+                    style: _kRefreshDurationStyle,
+                  ),
+                ),
+              ),
+            );
+          }
+
+          if (model.lastFailTime != null) {
+            Duration lastFailureTime =
+                new DateTime.now().difference(model.lastFailTime);
+            stackChildren.add(
+              new Align(
+                alignment: FractionalOffset.topRight,
+                child: new Container(
+                  margin: const EdgeInsets.only(top: 8.0),
+                  child: new Text(
+                    toConciseString(lastFailureTime),
+                    style: _kTimerStyle,
+                  ),
+                ),
+              ),
+            );
+          } else if (model.lastPassTime != null) {
+            Duration lastPassTime = new DateTime.now().difference(
+              model.lastPassTime,
+            );
+            stackChildren.add(
+              new Align(
+                alignment: FractionalOffset.topRight,
+                child: new Container(
+                  margin: const EdgeInsets.only(top: 8.0),
+                  child: new Text(
+                    toConciseString(lastPassTime),
+                    style: _kTimerStyle,
                   ),
                 ),
               ),
@@ -129,7 +181,7 @@ class BuildStatusWidget extends StatelessWidget {
             color: _colorFromBuildStatus(model.buildStatus),
             borderRadius: new BorderRadius.circular(8.0),
             child: new InkWell(
-              onTap: onTap,
+              onTap: () => config.onTap?.call(),
               child: new Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: new Stack(children: stackChildren),
@@ -138,4 +190,23 @@ class BuildStatusWidget extends StatelessWidget {
           );
         },
       );
+
+  Color _colorFromBuildStatus(BuildStatus status) {
+    switch (status) {
+      case BuildStatus.success:
+        return Colors.green[300];
+      case BuildStatus.failure:
+        return Colors.red[400];
+      case BuildStatus.networkError:
+        return Colors.purple[100];
+      default:
+        return Colors.grey[300];
+    }
+  }
+
+  void _updateTimers() {
+    setState(() {
+      _timer = new Timer(const Duration(seconds: 1), _updateTimers);
+    });
+  }
 }

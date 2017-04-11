@@ -26,8 +26,6 @@ class DashboardModuleModel extends ModuleModel {
   final List<List<BuildStatusModel>> buildStatusModels;
 
   DateTime _startTime = new DateTime.now();
-  DateTime _lastFailTime;
-  DateTime _lastPassTime;
   DateTime _lastRefreshed;
   List<String> _devices;
   ModuleControllerProxy _moduleControllerProxy;
@@ -53,12 +51,6 @@ class DashboardModuleModel extends ModuleModel {
 
   /// The time the dashboard started.
   DateTime get startTime => _startTime;
-
-  /// The time the dashboard started failing.
-  DateTime get lastFailTime => _lastFailTime;
-
-  /// The time the dashboard started passing.
-  DateTime get lastPassTime => _lastPassTime;
 
   /// The time the dashboard was last refreshed.
   DateTime get lastRefreshed => _lastRefreshed;
@@ -113,20 +105,6 @@ class DashboardModuleModel extends ModuleModel {
   }
 
   void _updatePassFailTime() {
-    if (buildStatusModels
-        .expand((List<BuildStatusModel> models) => models)
-        .every((BuildStatusModel model) =>
-            model.buildStatus == BuildStatus.success)) {
-      if (_lastPassTime == null) {
-        _lastPassTime = new DateTime.now();
-        _lastFailTime = null;
-      }
-    } else {
-      if (_lastFailTime == null) {
-        _lastFailTime = new DateTime.now();
-        _lastPassTime = null;
-      }
-    }
     _lastRefreshed = new DateTime.now();
     notifyListeners();
   }

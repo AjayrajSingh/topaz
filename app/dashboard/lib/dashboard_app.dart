@@ -36,7 +36,45 @@ class DashboardApp extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> rows = <Widget>[];
 
+    // Get the max number of children a row can have.
+    int maxRowChildren = 0;
     buildStatusModels.forEach((List<BuildStatusModel> models) {
+      if (models.length > maxRowChildren) {
+        maxRowChildren = models.length;
+      }
+    });
+
+    buildStatusModels.forEach((List<BuildStatusModel> models) {
+      List<Widget> rowChildren = models
+          .map(
+            (BuildStatusModel model) => new Expanded(
+                  child: new Container(
+                    margin: const EdgeInsets.only(
+                      right: _kSpaceBetween,
+                      top: _kSpaceBetween,
+                    ),
+                    child: new ScopedModel<BuildStatusModel>(
+                      model: model,
+                      child: new BuildStatusWidget(
+                        onTap: () => onLaunchUrl?.call(model.url),
+                      ),
+                    ),
+                  ),
+                ),
+          )
+          .toList();
+
+      // Add fillers for rows that don't have as many children as the max.
+      bool addToEnd = true;
+      while (rowChildren.length < maxRowChildren) {
+        if (addToEnd) {
+          rowChildren.add(new Expanded(child: new Container()));
+        } else {
+          rowChildren.insert(0, new Expanded(child: new Container()));
+        }
+        addToEnd = !addToEnd;
+      }
+
       rows.add(
         new Expanded(
           child: new Container(
@@ -45,24 +83,7 @@ class DashboardApp extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.max,
-              children: models
-                  .map(
-                    (BuildStatusModel model) => new Expanded(
-                          child: new Container(
-                            margin: const EdgeInsets.only(
-                              right: _kSpaceBetween,
-                              top: _kSpaceBetween,
-                            ),
-                            child: new ScopedModel<BuildStatusModel>(
-                              model: model,
-                              child: new BuildStatusWidget(
-                                onTap: () => onLaunchUrl?.call(model.url),
-                              ),
-                            ),
-                          ),
-                        ),
-                  )
-                  .toList(),
+              children: rowChildren,
             ),
           ),
         ),

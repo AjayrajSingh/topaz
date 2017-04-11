@@ -92,7 +92,7 @@ class _InfoTextState extends State<InfoText> {
               style: _kUnimportantStyle,
               children: <TextSpan>[
                 new TextSpan(
-                  text: _toConciseString(
+                  text: toConciseString(
                     new DateTime.now().difference(model.startTime),
                   ),
                   style: _kImportantStyle,
@@ -101,45 +101,6 @@ class _InfoTextState extends State<InfoText> {
             ),
           ),
         ];
-
-        if (model.lastFailTime != null) {
-          Duration lastFailureTime =
-              new DateTime.now().difference(model.lastFailTime);
-
-          rowChildren.add(
-            new RichText(
-              text: new TextSpan(
-                text: 'Failing ',
-                style: _kUnimportantStyle,
-                children: <TextSpan>[
-                  new TextSpan(
-                    text: _toConciseString(lastFailureTime),
-                    style: _kImportantStyle,
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else if (model.lastPassTime != null) {
-          Duration lastPassTime = new DateTime.now().difference(
-            model.lastPassTime,
-          );
-
-          rowChildren.add(
-            new RichText(
-              text: new TextSpan(
-                text: 'Passing ',
-                style: _kUnimportantStyle,
-                children: <TextSpan>[
-                  new TextSpan(
-                    text: _toConciseString(lastPassTime),
-                    style: _kImportantStyle,
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
 
         if (model.devices != null) {
           rowChildren.add(
@@ -166,7 +127,7 @@ class _InfoTextState extends State<InfoText> {
                 style: _kUnimportantStyle,
                 children: <TextSpan>[
                   new TextSpan(
-                    text: _toConciseString(
+                    text: toConciseString(
                       _targetTime.difference(new DateTime.now()),
                     ),
                     style: _kImportantStyle,
@@ -194,14 +155,12 @@ class _InfoTextState extends State<InfoText> {
       _timer = new Timer(const Duration(seconds: 1), _updateUptime);
     });
   }
-
-  static String _toConciseString(
-          Duration duration) =>
-      duration.inSeconds.abs() < 60
-          ? '${duration.inSeconds}s'
-          : duration.inMinutes.abs() < 60
-              ? '${duration.inMinutes}m'
-              : duration.inHours.abs() < 24
-                  ? '${duration.inHours}h'
-                  : '${duration.inDays}d';
 }
+
+String toConciseString(Duration duration) => duration.inSeconds.abs() < 60
+    ? '${duration.inSeconds}s'
+    : duration.inMinutes.abs() < 60
+        ? '${duration.inMinutes}m'
+        : duration.inHours.abs() < 24
+            ? '${duration.inHours}h'
+            : '${duration.inDays}d';
