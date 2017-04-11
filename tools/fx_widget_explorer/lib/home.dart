@@ -43,8 +43,8 @@ class _HomeState extends State<Home> {
         stateBuilders: kStateBuilders,
       ),
       drawer: new GalleryDrawer(
-        showPerformanceOverlay: config.showPerformanceOverlay,
-        onShowPerformanceOverlayChanged: config.onShowPerformanceOverlayChanged,
+        showPerformanceOverlay: widget.showPerformanceOverlay,
+        onShowPerformanceOverlayChanged: widget.onShowPerformanceOverlayChanged,
       ),
     );
   }

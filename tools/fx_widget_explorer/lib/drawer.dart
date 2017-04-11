@@ -51,12 +51,12 @@ class _GalleryDrawerState extends State<GalleryDrawer> {
     );
 
     // Performance overlay
-    if (config.onShowPerformanceOverlayChanged != null) {
+    if (widget.onShowPerformanceOverlayChanged != null) {
       drawerItems.add(createCheckboxItem(
         icon: new Icon(Icons.assessment),
         text: 'Performance Overlay',
-        value: config.showPerformanceOverlay,
-        onChanged: config.onShowPerformanceOverlayChanged,
+        value: widget.showPerformanceOverlay,
+        onChanged: widget.onShowPerformanceOverlayChanged,
       ));
     }
 

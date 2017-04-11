@@ -71,9 +71,9 @@ class _WidgetExplorerState extends State<WidgetExplorer> {
   }
 
   Widget _buildMenu() {
-    List<String> widgetNames = config.widgetSpecs.keys.toList()..sort();
+    List<String> widgetNames = widget.widgetSpecs.keys.toList()..sort();
     List<ListTile> tiles = widgetNames
-        .map((String name) => config.widgetSpecs[name])
+        .map((String name) => widget.widgetSpecs[name])
         .map((WidgetSpecs specs) => new ListTile(
               title: new Text(specs.name),
               subtitle: new Text(specs.doc?.split('\n')?.first),
@@ -88,7 +88,7 @@ class _WidgetExplorerState extends State<WidgetExplorer> {
   }
 
   Widget _buildContents() {
-    WidgetSpecs specs = config.widgetSpecs[selectedWidget];
+    WidgetSpecs specs = widget.widgetSpecs[selectedWidget];
     if (specs == null) {
       return new Center(
         child: new Text('Please select a widget from the left pane.'),
@@ -123,10 +123,10 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
           ),
           _buildSizeControl(),
           new WidgetExplorerWrapper(
-            config: config.config,
+            config: widget.config,
             width: size.width,
             height: size.height,
-            stateBuilder: config.stateBuilders[specs.name],
+            stateBuilder: widget.stateBuilders[specs.name],
           ),
         ],
       ),
@@ -145,7 +145,7 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
         margin: const EdgeInsets.all(16.0),
         child: new Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: config.widgetSpecs[selectedWidget].hasSizeParam
+          children: widget.widgetSpecs[selectedWidget].hasSizeParam
               ? <Widget>[
                   _buildSizeRow(
                     'Size',

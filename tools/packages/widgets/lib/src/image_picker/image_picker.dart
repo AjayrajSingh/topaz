@@ -59,7 +59,7 @@ class _ImagePickerState extends State<ImagePicker> {
   }
 
   @override
-  void didUpdateConfig(ImagePicker oldState) {
+  void didUpdateWidget(ImagePicker oldState) {
     // Reset selected images if the source has changed
     if (oldState.imageUrls != widget.imageUrls) {
       setState(() {

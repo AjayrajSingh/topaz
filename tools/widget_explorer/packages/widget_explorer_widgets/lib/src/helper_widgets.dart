@@ -95,28 +95,28 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
   void initState() {
     super.initState();
 
-    genState = config.stateBuilder((VoidCallback fn) {
+    genState = widget.stateBuilder((VoidCallback fn) {
       setState(() {
         fn?.call();
         _updateKey();
       });
     });
 
-    genState.initState(config.config);
+    genState.initState(widget.config);
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget widget;
+    Widget targetWidget;
     try {
-      widget = genState.buildWidget(
+      targetWidget = genState.buildWidget(
         context,
         uniqueKey,
-        config.width,
-        config.height,
+        widget.width,
+        widget.height,
       );
     } catch (e) {
-      widget = new Text('Failed to build the widget.\n'
+      targetWidget = new Text('Failed to build the widget.\n'
           'See the error message below:\n\n'
           '$e');
     }
@@ -167,9 +167,9 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
             child: new Row(
               children: <Widget>[
                 new Container(
-                  width: config.width,
-                  height: config.height,
-                  child: widget,
+                  width: widget.width,
+                  height: widget.height,
+                  child: targetWidget,
                 ),
                 new Expanded(child: new Container()),
               ],
@@ -344,7 +344,7 @@ class _TextFieldWithInitialValueState extends State<TextFieldWithInitialValue> {
   @override
   void initState() {
     super.initState();
-    _controller = new TextEditingController(text: config.initialValue ?? '');
+    _controller = new TextEditingController(text: widget.initialValue ?? '');
   }
 
   @override
@@ -352,9 +352,9 @@ class _TextFieldWithInitialValueState extends State<TextFieldWithInitialValue> {
     return new TextField(
       controller: _controller,
       decoration: const InputDecoration(isDense: true),
-      keyboardType: config.keyboardType,
-      onChanged: config.onChanged,
-      onSubmitted: config.onSubmitted,
+      keyboardType: widget.keyboardType,
+      onChanged: widget.onChanged,
+      onSubmitted: widget.onSubmitted,
     );
   }
 }
