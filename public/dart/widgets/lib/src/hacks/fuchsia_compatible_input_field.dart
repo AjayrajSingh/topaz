@@ -166,13 +166,13 @@ class RawKeyboardTextField extends StatefulWidget {
 class _RawKeyboardTextFieldState extends State<RawKeyboardTextField> {
   FocusNode _focusNode;
   FocusNode get _effectiveFocusNode =>
-      config.focusNode ?? (_focusNode ??= new FocusNode());
+      widget.focusNode ?? (_focusNode ??= new FocusNode());
 
   TextEditingController _controller;
   TextEditingController get _effectiveController =>
-      config.controller ?? _controller;
+      widget.controller ?? _controller;
 
-  String get _displayText => (config.obscureText ?? false)
+  String get _displayText => (widget.obscureText ?? false)
       ? new String.fromCharCodes(
           new List<int>.filled(_effectiveController.text.length, 0x2022))
       : _effectiveController.text;
@@ -180,15 +180,15 @@ class _RawKeyboardTextFieldState extends State<RawKeyboardTextField> {
   @override
   void initState() {
     super.initState();
-    if (config.controller == null) _controller = new TextEditingController();
+    if (widget.controller == null) _controller = new TextEditingController();
   }
 
   @override
-  void didUpdateConfig(RawKeyboardTextField oldConfig) {
-    if (config.controller == null && oldConfig.controller != null)
+  void didUpdateWidget(RawKeyboardTextField oldWidget) {
+    if (widget.controller == null && oldWidget.controller != null)
       _controller ==
-          new TextEditingController.fromValue(oldConfig.controller.value);
-    else if (config.controller != null && oldConfig.controller == null)
+          new TextEditingController.fromValue(oldWidget.controller.value);
+    else if (widget.controller != null && oldWidget.controller == null)
       _controller = null;
   }
 
@@ -214,10 +214,10 @@ class _RawKeyboardTextFieldState extends State<RawKeyboardTextField> {
           animation: new Listenable.merge(<Listenable>[focusNode, controller]),
           builder: (BuildContext context, Widget _) {
             final Widget editable = _buildEditableText(context);
-            if (config.decoration != null) {
+            if (widget.decoration != null) {
               return new InputDecorator(
-                decoration: config.decoration,
-                baseStyle: config.style,
+                decoration: widget.decoration,
+                baseStyle: widget.style,
                 isFocused: focusNode.hasFocus,
                 isEmpty: controller.value.text.isEmpty,
                 child: editable,
@@ -232,7 +232,7 @@ class _RawKeyboardTextFieldState extends State<RawKeyboardTextField> {
 
   Widget _buildEditableText(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
-    final TextStyle style = config.style ?? themeData.textTheme.subhead;
+    final TextStyle style = widget.style ?? themeData.textTheme.subhead;
 
     Text text = new Text(_displayText, style: style, maxLines: 1);
 
@@ -286,8 +286,8 @@ class _RawKeyboardTextFieldState extends State<RawKeyboardTextField> {
           controller.text + new String.fromCharCode(data.codePoint);
       _notifyTextChanged(controller.text);
     } else if (data.hidUsage == _kHidUsageKeyboardReturn) {
-      if (config.onSubmitted != null) {
-        config.onSubmitted(controller.text);
+      if (widget.onSubmitted != null) {
+        widget.onSubmitted(controller.text);
       }
     } else if (data.hidUsage == _kHidUsageKeyboardBackspace) {
       if (controller.text.isNotEmpty) {
@@ -299,8 +299,8 @@ class _RawKeyboardTextFieldState extends State<RawKeyboardTextField> {
   }
 
   void _notifyTextChanged(String newText) {
-    if (config.onChanged != null) {
-      config.onChanged(newText);
+    if (widget.onChanged != null) {
+      widget.onChanged(newText);
     }
   }
 }
