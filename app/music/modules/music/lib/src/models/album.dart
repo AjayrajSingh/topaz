@@ -60,7 +60,7 @@ class Album {
       images: MusicImage.listFromJson(json['images']),
       tracks: json['tracks'] != null && json['tracks']['items'] is List<dynamic>
           ? json['tracks']['items']
-              .map((dynamic trackJson) => new Artist.fromJson(trackJson))
+              .map((dynamic trackJson) => new Track.fromJson(trackJson))
               .toList()
           : <Track>[],
       releaseDate: json['release_date'] != null

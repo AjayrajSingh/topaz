@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 
 import '../models.dart';
 import '../typedefs.dart';
@@ -66,7 +65,7 @@ class ArtistSurface extends StatelessWidget {
   })
       : super(key: key);
 
-  Widget _buildBannerContent() {
+  Widget _buildBannerContent(Color highlightColor) {
     return new Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -183,10 +182,10 @@ class ArtistSurface extends StatelessWidget {
     );
   }
 
-  /// Builds the given child widget if both albums and artist are not null
-  Widget _conditionalBuilder(Widget child) {
+  /// Builds the given child widget if the album is not null
+  Widget _conditionalBuilder(BuildContext context, WidgetBuilder builder) {
     if (artist != null && albums != null) {
-      return child;
+      return builder(context);
     } else {
       return null;
     }
@@ -199,11 +198,18 @@ class ArtistSurface extends StatelessWidget {
 
     return new HeroBannerScaffold(
       heroBannerBackgroundColor: _highlightColor,
-      heroBanner: _conditionalBuilder(_buildBannerContent()),
-      heroImage: _conditionalBuilder(
-        new TrackArt(artworkUrl: artist.defaultArtworkUrl),
+      heroBanner: _conditionalBuilder(
+        context,
+        (_) => _buildBannerContent(_highlightColor),
       ),
-      body: _conditionalBuilder(_buildBody(_highlightColor)),
+      heroImage: _conditionalBuilder(
+        context,
+        (_) => new TrackArt(artworkUrl: artist.defaultArtworkUrl),
+      ),
+      body: _conditionalBuilder(
+        context,
+        (_) => _buildBody(_highlightColor),
+      ),
       loadingStatus: loadingStatus,
     );
   }

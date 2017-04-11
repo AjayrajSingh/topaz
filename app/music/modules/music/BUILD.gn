@@ -7,7 +7,7 @@ import("//flutter/build/flutter_app.gni")
 flutter_app("music") {
   package_name = "music"
 
-  main_dart = "lib/modular_main.dart"
+  main_dart = "lib/album_surface_module.dart"
 
   source_dir = "lib"
 
@@ -20,6 +20,7 @@ flutter_app("music") {
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/intl",
   ]
 

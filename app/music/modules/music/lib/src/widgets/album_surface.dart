@@ -99,7 +99,7 @@ class AlbumSurface extends StatelessWidget {
       children: <Widget>[
         // Playlist Type
         new Text(
-          album.albumType.toUpperCase(),
+          album.albumType?.toUpperCase() ?? 'ALBUM',
           style: new TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w300,
@@ -145,9 +145,9 @@ class AlbumSurface extends StatelessWidget {
   }
 
   /// Builds the given child widget if the album is not null
-  Widget _conditionalBuilder(Widget child) {
+  Widget _conditionalBuilder(BuildContext context, WidgetBuilder builder) {
     if (album != null) {
-      return child;
+      return builder(context);
     } else {
       return null;
     }
@@ -159,11 +159,18 @@ class AlbumSurface extends StatelessWidget {
     Color _highlightColor = highlightColor ?? theme.primaryColor;
     return new HeroBannerScaffold(
       heroBannerBackgroundColor: _highlightColor,
-      heroBanner: _conditionalBuilder(_buildBannerContent(_highlightColor)),
-      heroImage: _conditionalBuilder(
-        new TrackArt(artworkUrl: album.defaultArtworkUrl),
+      heroBanner: _conditionalBuilder(
+        context,
+        (_) => _buildBannerContent(_highlightColor),
       ),
-      body: _conditionalBuilder(_buildTrackList(_highlightColor)),
+      heroImage: _conditionalBuilder(
+        context,
+        (_) => new TrackArt(artworkUrl: album.defaultArtworkUrl),
+      ),
+      body: _conditionalBuilder(
+        context,
+        (_) => _buildTrackList(_highlightColor),
+      ),
       loadingStatus: loadingStatus,
     );
   }
