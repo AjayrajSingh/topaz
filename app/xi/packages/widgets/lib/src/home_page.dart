@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
   void handleFabPressed() {
     setState(() {
       counter++;
-      config.onFabPressed();
+      widget.onFabPressed();
     });
   }
 
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(config.title),
+        title: new Text(widget.title),
       ),
       body: new Editor(),
       floatingActionButton: new FloatingActionButton(

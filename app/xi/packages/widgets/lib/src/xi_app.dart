@@ -88,25 +88,25 @@ class XiAppState extends State<XiApp> {
       _pendingReqs.add(new _PendingNotification(method, params));
     } else {
       Map<String, dynamic> innerParams = <String, dynamic>{'method': method, 'params': params, 'tab': _tabId};
-      config.xi.sendNotification('edit', innerParams);
+      widget.xi.sendNotification('edit', innerParams);
     }
   }
 
   /// Connect editor state, so that notifications from the core are routed to
   /// the editor. Called by [Editor] widget.
   void connectEditor(EditorState editorState) {
-    config.xi.registerHandler(new XiAppHandler(editorState));
+    widget.xi.registerHandler(new XiAppHandler(editorState));
   }
 
   @override
   void initState() {
     super.initState();
-    config.xi.onMessage(handleMessage);
-    config.xi.init().then((Null _) =>
+    widget.xi.onMessage(handleMessage);
+    widget.xi.init().then((Null _) =>
       // Arguably the new_tab should be sent by the editor (and the editor should plumb
       // the tab id through to the connectEditor call). However, that would require holding
       // a pending queue of new_tab requests, waiting for init to complete. This is easier.
-      config.xi.sendRpc('new_tab', <dynamic>[], (String id) {
+      widget.xi.sendRpc('new_tab', <dynamic>[], (String id) {
         _tabId = id;
         print('id = $id');
         if (_pendingReqs != null) {
