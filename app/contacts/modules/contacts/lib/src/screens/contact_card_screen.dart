@@ -36,7 +36,7 @@ class _ContactCardScreenState extends State<ContactCardScreen> {
   Future<Null> _loadContact() async {
     try {
       ContactAPI api = await ContactAPI.fromConfig('assets/config.json');
-      Contact contact = await api.getUser(config.contactId ?? 'people/me');
+      Contact contact = await api.getUser(widget.contactId ?? 'people/me');
       setState(() {
         _contact = contact;
         _loading = false;
@@ -48,7 +48,7 @@ class _ContactCardScreenState extends State<ContactCardScreen> {
   }
 
   @override
-  void didUpdateConfig(_) {
+  void didUpdateWidget(_) {
     _loadContact();
   }
 
