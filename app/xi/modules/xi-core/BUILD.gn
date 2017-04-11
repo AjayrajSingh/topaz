@@ -2,7 +2,14 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-copy("xi-core") {
-  sources = [ "target/x86_64-unknown-fuchsia/debug/xi-core" ]
-  outputs = [ "$root_out_dir/xi-core" ]
+import("//build/rust/rust_binary.gni")
+
+rust_binary("xi-core") {
+  deps = [
+    "//application/services:service_provider_rust_library",
+    "//apps/xi/services:services_rust_library",
+    "//lib/fidl/rust/fidl",
+    "//rust/magenta-rs:magenta",
+    "//rust/mxruntime",
+  ]
 }
