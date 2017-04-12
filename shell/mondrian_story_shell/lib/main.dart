@@ -26,15 +26,15 @@ void _log(String msg) {
 
 /// Frame for child views
 class SurfaceWidget extends StatelessWidget {
-  ChildViewConnection _connection;
+  ChildViewNode _childView;
 
-  SurfaceWidget(this._connection) {}
+  SurfaceWidget(this._childView) {}
 
   @override
   Widget build(BuildContext context) {
     return new Container(
       margin: const EdgeInsets.all(5.0),
-      child: new ChildView(connection: _connection),
+      child: new ChildView(connection: _childView.connection),
     );
   }
 }
@@ -47,28 +47,43 @@ class SurfaceLayout extends StatefulWidget {
   SurfaceLayoutState createState() => new SurfaceLayoutState();
 }
 
+class ChildViewNode {
+  final int id;
+  final ChildViewConnection connection;
+  final int parentId;
+  final String relationship;
+
+  ChildViewNode(this.connection, this.id, this.parentId, this.relationship) {}
+}
+
 /// Maintains state for the avaialble views to display.
 class SurfaceLayoutState extends State<SurfaceLayout> {
-  final List<ChildViewConnection> children = <ChildViewConnection>[];
-  ChildViewConnection connToBeAppended;
+  final List<ChildViewNode> children = <ChildViewNode>[];
+  ChildViewNode nodeToBeAppended;
 
-  void addChild(InterfaceHandle<ViewOwner> viewHandle) {
+  void addChild(InterfaceHandle<ViewOwner> view, int view_id, int parent_id,
+      String view_type) {
     setState(() {
-      if (connToBeAppended != null) {
-        children.add(connToBeAppended);
-        connToBeAppended = null;
+      if (nodeToBeAppended != null) {
+        children.add(nodeToBeAppended);
+        nodeToBeAppended = null;
       }
-      connToBeAppended = new ChildViewConnection(viewHandle,
-          onUnavailable: (ChildViewConnection c) {
-        setState(() {
-          // TODO(alangardner): Remove it with timer after 500 ms
-          if (c == connToBeAppended) {
-            connToBeAppended = null;
-          } else {
-            children.remove(c);
-          }
-        });
-      });
+      nodeToBeAppended = new ChildViewNode(
+          new ChildViewConnection(view, onUnavailable: (ChildViewConnection c) {
+            setState(() {
+              // TODO(alangardner): Remove it with timer after 500 ms
+              if (nodeToBeAppended.connection == c) {
+                nodeToBeAppended = null;
+              } else {
+                children.removeWhere((ChildViewNode v) {
+                  v.connection == c;
+                });
+              }
+            });
+          }),
+          view_id,
+          parent_id,
+          view_type);
     });
   }
 
@@ -95,8 +110,8 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
             child: new SurfaceWidget(children.first)));
       } else {
         // Two children are 1/3 for previous focus, 2/3 for current focus
-        ChildViewConnection leftView = children[children.length - 2];
-        ChildViewConnection rightView = children.last;
+        ChildViewNode leftView = children[children.length - 2];
+        ChildViewNode rightView = children.last;
         childViews.add(new AnimatedPositioned(
             key: new ObjectKey(leftView),
             top: 0.0,
@@ -117,7 +132,7 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
             child: new SurfaceWidget(rightView)));
         if (children.length > 2) {
           // The previous previous view animates out to the left
-          ChildViewConnection offscreenLeftView = children[children.length - 3];
+          ChildViewNode offscreenLeftView = children[children.length - 3];
           childViews.add(new AnimatedPositioned(
               key: new ObjectKey(offscreenLeftView),
               top: 0.0,
@@ -129,21 +144,21 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
               child: new SurfaceWidget(offscreenLeftView)));
         }
       }
-      if (connToBeAppended != null) {
+      if (nodeToBeAppended != null) {
         // Upcoming current views animate in from the right
         childViews.add(new AnimatedPositioned(
-            key: new ObjectKey(connToBeAppended),
+            key: new ObjectKey(nodeToBeAppended),
             top: 0.0,
             bottom: 0.0,
             left: totalWidth,
             width: children.isEmpty ? totalWidth : rightWidth,
             curve: Curves.fastOutSlowIn,
             duration: _kAnimationDuration,
-            child: new SurfaceWidget(connToBeAppended)));
+            child: new SurfaceWidget(nodeToBeAppended)));
         scheduleMicrotask(() {
           setState(() {
-            children.add(connToBeAppended);
-            connToBeAppended = null;
+            children.add(nodeToBeAppended);
+            nodeToBeAppended = null;
           });
         });
       }
@@ -170,7 +185,8 @@ class StoryShellImpl extends StoryShell {
   @override
   void connectView(InterfaceHandle<ViewOwner> view, int view_id, int parent_id,
       String view_type) {
-    _surfaceLayoutKey.currentState.addChild(view);
+    _surfaceLayoutKey.currentState
+        .addChild(view, view_id, parent_id, view_type);
   }
 
   /// StoryShell
