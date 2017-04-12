@@ -1,5 +1,3 @@
-Fuchsia Open Source Template Repository
+Mondrian
 =======================================
-
-This repository is a template that we will use when creating new open source
-repositories for Fuchsia.
+A story shell that pleasantly arranges rectangular views.
