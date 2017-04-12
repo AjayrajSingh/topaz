@@ -71,15 +71,34 @@ class LaunchModuleButton extends StatelessWidget {
   }
 }
 
+class TitleText extends StatelessWidget {
+  final String _title;
+
+  TitleText(this._title) {}
+
+  @override
+  Widget build(BuildContext context) {
+    return new Container(
+        color: new Color(0xFFFFFFFF),
+        child: new Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: new Text(_title),
+        ));
+  }
+}
+
 /// Main UI Widget
 class MainWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    DateTime now = new DateTime.now().toLocal();
     return new Scaffold(
       body: new Center(
           child: new Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          new TitleText(
+              "Module ${now.minute}:${now.second.toString().padLeft(2, '0')}"),
           new LaunchModuleButton('s', 'Serial'),
           new LaunchModuleButton('h', 'Hierarchical'),
           new LaunchModuleButton('d', 'Dependent')
@@ -131,10 +150,11 @@ void main() {
     Module.serviceName,
   );
 
+  Color randomColor = new Color(new Random().nextInt(0xFFFFFFFF));
+
   runApp(new MaterialApp(
     title: 'Manual Module',
     home: new MainWidget(),
-    theme:
-        new ThemeData(canvasColor: new Color(new Random().nextInt(0xFFFFFFFF))),
+    theme: new ThemeData(canvasColor: randomColor),
   ));
 }
