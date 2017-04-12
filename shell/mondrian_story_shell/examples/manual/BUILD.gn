@@ -4,18 +4,17 @@
 
 import("//flutter/build/flutter_app.gni")
 
-group("mondrian") {
+group("manual") {
   deps = [
-    "examples",
-    ":flutter_mondrian",
+    ":example_manual_relationships",
   ]
 }
 
-flutter_app("flutter_mondrian") {
+flutter_app("example_manual_relationships") {
   main_dart = "lib/main.dart"
   deps = [
     "//application/lib/app/dart",
-    "//apps/mozart/lib/flutter",
+    "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
