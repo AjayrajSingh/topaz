@@ -50,7 +50,7 @@ impl io::Read for MySocket {
             Err(status) => return Err(status_to_io_err(status))
         }
         self.0.read(Default::default(), buf).or_else(|status|
-            if status == Status::ErrRemoteClosed {
+            if status == Status::ErrPeerClosed {
                 Ok(0)
             } else {
                 Err(status_to_io_err(status))
