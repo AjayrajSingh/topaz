@@ -157,6 +157,8 @@ class _InfoTextState extends State<InfoText> {
   }
 }
 
+/// Converts [duration] to a short string representing the duration based on
+/// it's largest unit.  Examples include '6s', '42m', '3h', and '12d'.
 String toConciseString(Duration duration) => duration.inSeconds.abs() < 60
     ? '${duration.inSeconds}s'
     : duration.inMinutes.abs() < 60

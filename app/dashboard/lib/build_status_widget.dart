@@ -181,7 +181,7 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
             color: _colorFromBuildStatus(model.buildStatus),
             borderRadius: new BorderRadius.circular(8.0),
             child: new InkWell(
-              onTap: () => config.onTap?.call(),
+              onTap: () => widget.onTap?.call(),
               child: new Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: new Stack(children: stackChildren),
