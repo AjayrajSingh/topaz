@@ -9,6 +9,8 @@ import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
+import 'link_watcher_impl.dart';
+
 /// Called when [Module.initialize] occurs.
 typedef void OnReady(
   ModuleContext moduleContext,
@@ -27,6 +29,9 @@ class ModuleImpl extends Module {
   final ServiceProviderBinding _outgoingServiceProviderBinding =
       new ServiceProviderBinding();
 
+  LinkWatcherBinding _linkWatcherBinding;
+  LinkWatcherImpl _linkWatcherImpl;
+
   /// The [ServiceProvider] to provide when outgoing services are requested.
   final ServiceProvider outgoingServiceProvider;
 
@@ -36,8 +41,24 @@ class ModuleImpl extends Module {
   /// Called when [Module] is stopped.
   final VoidCallback onStop;
 
+  /// Called when [LinkWatcher.notify] is called.
+  final OnNotify onNotify;
+
+  /// Indicates whether the [LinkWatcher] should watch for all changes including
+  /// the changes made by this [Module]. If [true], it calls [Link.watchAll] to
+  /// register the [LinkWatcher], and [Link.watch] otherwise. Only takes effect
+  /// when the [onNotify] callback is also provided. Defaults to false.
+  final bool watchAll;
+
   /// Constuctor.
-  ModuleImpl({this.outgoingServiceProvider, this.onReady, this.onStop});
+  ModuleImpl({
+    this.outgoingServiceProvider,
+    this.onReady,
+    this.onStop,
+    this.onNotify,
+    bool watchAll,
+  })
+      : watchAll = watchAll ?? false;
 
   @override
   void initialize(
@@ -63,11 +84,23 @@ class ModuleImpl extends Module {
         outgoingServices,
       );
     }
+
+    if (onNotify != null) {
+      _linkWatcherImpl = new LinkWatcherImpl(onNotify: onNotify);
+      _linkWatcherBinding = new LinkWatcherBinding();
+
+      if (watchAll) {
+        _linkProxy.watchAll(_linkWatcherBinding.wrap(_linkWatcherImpl));
+      } else {
+        _linkProxy.watch(_linkWatcherBinding.wrap(_linkWatcherImpl));
+      }
+    }
   }
 
   @override
   void stop(void done()) {
     onStop?.call();
+    _linkWatcherBinding?.close();
     _moduleContextProxy.ctrl.close();
     _linkProxy.ctrl.close();
     _incomingServiceProviderProxy.ctrl.close();

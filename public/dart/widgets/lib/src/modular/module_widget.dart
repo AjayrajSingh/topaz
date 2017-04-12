@@ -43,6 +43,8 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
         _module = new ModuleImpl(
           onReady: moduleModel?.onReady,
           onStop: moduleModel?.onStop,
+          onNotify: moduleModel?.onNotify,
+          watchAll: moduleModel?.watchAll,
         );
 
   @override

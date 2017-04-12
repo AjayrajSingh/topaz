@@ -20,6 +20,15 @@ class ModuleModel extends Model {
   Link _link;
   ServiceProvider _incomingServiceProvider;
 
+  /// Indicates whether the [LinkWatcher] should watch for all changes including
+  /// the changes made by this [Module]. If [true], it calls [Link.watchAll] to
+  /// register the [LinkWatcher], and [Link.watch] otherwise. Only takes effect
+  /// when the [onNotify] callback is also provided. Defaults to false.
+  final bool watchAll;
+
+  /// Creates a new instance of [ModuleModel].
+  ModuleModel({bool watchAll}) : watchAll = watchAll ?? false;
+
   /// The [ModuleContext] given to this [Module].
   ModuleContext get moduleContext => _moduleContext;
 
@@ -44,4 +53,7 @@ class ModuleModel extends Model {
 
   /// Called when the [Module] stops.
   void onStop() => null;
+
+  /// Called when [LinkWatcher.notify] is called.
+  void onNotify(String json) => null;
 }
