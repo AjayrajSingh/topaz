@@ -1,0 +1,13 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+name: music_api
+description: API for the music modules
+dependencies:
+  music_models:
+    path: ../music_models
+dev_dependencies:
+  test: any
+  flutter_test:
+    sdk: flutter
