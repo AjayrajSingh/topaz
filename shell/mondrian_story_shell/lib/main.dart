@@ -2,16 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:application.lib.app.dart/app.dart';
-import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.story/story_shell.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
-import 'package:apps.mozart.services.views/views.fidl.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'package:flutter/widgets.dart';
 
+const Duration _kAnimationDuration = const Duration(milliseconds: 500);
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 final GlobalKey<SurfaceLayoutState> _surfaceLayoutKey =
     new GlobalKey<SurfaceLayoutState>();
@@ -20,7 +21,22 @@ final GlobalKey<SurfaceLayoutState> _surfaceLayoutKey =
 StoryShellFactoryImpl _storyShellFactory;
 
 void _log(String msg) {
-  print('[FlutterStoryShell] $msg');
+  print('[MondrianFlutter] $msg');
+}
+
+/// Frame for child views
+class SurfaceWidget extends StatelessWidget {
+  ChildViewConnection _connection;
+
+  SurfaceWidget(this._connection) {}
+
+  @override
+  Widget build(BuildContext context) {
+    return new Container(
+      margin: const EdgeInsets.all(5.0),
+      child: new ChildView(connection: _connection),
+    );
+  }
 }
 
 /// Main layout widget for displaying Surfaces.
@@ -34,28 +50,105 @@ class SurfaceLayout extends StatefulWidget {
 /// Maintains state for the avaialble views to display.
 class SurfaceLayoutState extends State<SurfaceLayout> {
   final List<ChildViewConnection> children = <ChildViewConnection>[];
+  ChildViewConnection connToBeAppended;
 
   void addChild(InterfaceHandle<ViewOwner> viewHandle) {
     setState(() {
-      children.add(new ChildViewConnection(viewHandle,
+      if (connToBeAppended != null) {
+        children.add(connToBeAppended);
+        connToBeAppended = null;
+      }
+      connToBeAppended = new ChildViewConnection(viewHandle,
           onUnavailable: (ChildViewConnection c) {
         setState(() {
-          children.remove(c);
+          // TODO(alangardner): Remove it with timer after 500 ms
+          if (c == connToBeAppended) {
+            connToBeAppended = null;
+          } else {
+            children.remove(c);
+          }
         });
-      }));
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> childViews = <Widget>[];
-    for (ChildViewConnection conn in children) {
-      childViews.add(new Expanded(
-          child: new Container(
-              margin: const EdgeInsets.all(5.0),
-              child: new ChildView(connection: conn))));
-    }
-    return new Center(child: new Row(children: childViews));
+    return new LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      final double totalWidth = constraints.maxWidth;
+      final double leftWidth = totalWidth / 3.0;
+      final double rightWidth = totalWidth - leftWidth;
+      final List<Widget> childViews = <Widget>[];
+      if (children.isEmpty) {
+        // Add no children
+      } else if (children.length == 1) {
+        // One child is full screen
+        childViews.add(new AnimatedPositioned(
+            key: new ObjectKey(children.first),
+            top: 0.0,
+            bottom: 0.0,
+            left: 0.0,
+            width: totalWidth,
+            curve: Curves.fastOutSlowIn,
+            duration: _kAnimationDuration,
+            child: new SurfaceWidget(children.first)));
+      } else {
+        // Two children are 1/3 for previous focus, 2/3 for current focus
+        ChildViewConnection leftView = children[children.length - 2];
+        ChildViewConnection rightView = children.last;
+        childViews.add(new AnimatedPositioned(
+            key: new ObjectKey(leftView),
+            top: 0.0,
+            bottom: 0.0,
+            left: 0.0,
+            width: leftWidth,
+            curve: Curves.fastOutSlowIn,
+            duration: _kAnimationDuration,
+            child: new SurfaceWidget(leftView)));
+        childViews.add(new AnimatedPositioned(
+            key: new ObjectKey(rightView),
+            top: 0.0,
+            bottom: 0.0,
+            left: leftWidth,
+            width: rightWidth,
+            curve: Curves.fastOutSlowIn,
+            duration: _kAnimationDuration,
+            child: new SurfaceWidget(rightView)));
+        if (children.length > 2) {
+          // The previous previous view animates out to the left
+          ChildViewConnection offscreenLeftView = children[children.length - 3];
+          childViews.add(new AnimatedPositioned(
+              key: new ObjectKey(offscreenLeftView),
+              top: 0.0,
+              bottom: 0.0,
+              left: -leftWidth,
+              width: leftWidth,
+              curve: Curves.fastOutSlowIn,
+              duration: _kAnimationDuration,
+              child: new SurfaceWidget(offscreenLeftView)));
+        }
+      }
+      if (connToBeAppended != null) {
+        // Upcoming current views animate in from the right
+        childViews.add(new AnimatedPositioned(
+            key: new ObjectKey(connToBeAppended),
+            top: 0.0,
+            bottom: 0.0,
+            left: totalWidth,
+            width: children.isEmpty ? totalWidth : rightWidth,
+            curve: Curves.fastOutSlowIn,
+            duration: _kAnimationDuration,
+            child: new SurfaceWidget(connToBeAppended)));
+        scheduleMicrotask(() {
+          setState(() {
+            children.add(connToBeAppended);
+            connToBeAppended = null;
+          });
+        });
+      }
+      return new Stack(children: childViews);
+    });
   }
 }
 
@@ -107,7 +200,7 @@ class StoryShellFactoryImpl extends StoryShellFactory {
 
 /// Entry point.
 void main() {
-  _log('Flutter StoryShell started');
+  _log('Mondrian started');
 
   // Note: This implementation only supports one StoryShell at a time.
   // Initialize the one Flutter application we support
