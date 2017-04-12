@@ -22,15 +22,35 @@ final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 ModuleImpl _module;
 ModuleContextProxy _moduleContext = new ModuleContextProxy();
 LinkProxy _link = new LinkProxy();
+List<ModuleWatcher> _watchers = <ModuleWatcher>[];
 
 void _log(String msg) {
   print('[Manual Relationships Module] $msg');
 }
 
+class _ModuleStopperWatcher extends ModuleWatcher {
+  ModuleControllerProxy _moduleController;
+  ModuleWatcherBinding _binding = new ModuleWatcherBinding();
+
+  _ModuleStopperWatcher(this._moduleController) {
+    _moduleController.watch(_binding.wrap(this));
+  }
+
+  void onStateChange(ModuleState newState) {
+    _log("Module state changed to $newState");
+    if (newState == ModuleState.done) {
+      _moduleController.stop(() {
+        _log("Module stopped!");
+        _binding.unbind();
+        _watchers.remove(this);
+      });
+    }
+  }
+}
+
 /// Starts a new module
 void startModuleInShell(String viewType) {
-  InterfacePair<ModuleController> moduleControllerPair =
-      new InterfacePair<ModuleController>();
+  ModuleControllerProxy moduleController = new ModuleControllerProxy();
 
   _moduleContext.startModuleInShell(
     '',
@@ -38,10 +58,12 @@ void startModuleInShell(String viewType) {
     duplicateLink(),
     null, // outgoingServices,
     null, // incomingServices,
-    moduleControllerPair.passRequest(),
+    moduleController.ctrl.request(),
     viewType,
   );
   _log('Started sub-module');
+
+  _watchers.add(new _ModuleStopperWatcher(moduleController));
 }
 
 /// Obtains a duplicated [InterfaceHandle] for the current [Link] object.
@@ -101,7 +123,17 @@ class MainWidget extends StatelessWidget {
               "Module ${now.minute}:${now.second.toString().padLeft(2, '0')}"),
           new LaunchModuleButton('', 'Serial'),
           new LaunchModuleButton('h', 'Hierarchical'),
-          new LaunchModuleButton('d', 'Dependent')
+          new LaunchModuleButton('d', 'Dependent'),
+          new Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: new RaisedButton(
+              child: new Text("Close"),
+              onPressed: () {
+                _log('Module done...');
+                _moduleContext.done();
+              },
+            ),
+          ),
         ],
       )),
     );

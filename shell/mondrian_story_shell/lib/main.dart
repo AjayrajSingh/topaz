@@ -80,13 +80,16 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
   }
 
   void _removeChildView(ChildViewConnection c) {
+    _log("Removing child view!");
     setState(() {
       // TODO(alangardner): Remove it with timer after 500 ms
       if (nodeToBeAppended?.connection == c) {
+        _log("Removing nodeToBeAppended");
         nodeToBeAppended = null;
       } else {
         children.removeWhere((ChildViewNode n) {
-          n.connection == c;
+          _log("Removing existing ChildViewNode");
+          return n.connection == c;
         });
       }
     });
