@@ -7,24 +7,89 @@ import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
+import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+const String _kModuleUrl = 'file:///system/apps/example_manual_relationships';
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
 /// This is used for keeping the reference around.
 ModuleImpl _module;
+ModuleContextProxy _moduleContext = new ModuleContextProxy();
+LinkProxy _link = new LinkProxy();
 
 void _log(String msg) {
   print('[Manual Relationships Module] $msg');
 }
 
+/// Starts a new module
+void startModuleInShell(String viewType) {
+  InterfacePair<ModuleController> moduleControllerPair =
+      new InterfacePair<ModuleController>();
+
+  _moduleContext.startModuleInShell(
+    '',
+    _kModuleUrl,
+    duplicateLink(),
+    null, // outgoingServices,
+    null, // incomingServices,
+    moduleControllerPair.passRequest(),
+    viewType,
+  );
+  _log('Started sub-module');
+}
+
+/// Obtains a duplicated [InterfaceHandle] for the current [Link] object.
+InterfaceHandle<Link> duplicateLink() {
+  InterfacePair<Link> linkPair = new InterfacePair<Link>();
+  _link.dup(linkPair.passRequest());
+  return linkPair.passHandle();
+}
+
+/// Button widget to start module
+class LaunchModuleButton extends StatelessWidget {
+  final String _relationship;
+  final String _display;
+
+  LaunchModuleButton(this._relationship, this._display) {}
+
+  @override
+  Widget build(BuildContext context) {
+    return new Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: new RaisedButton(
+          child: new Text(_display),
+          onPressed: () {
+            startModuleInShell(_relationship);
+          },
+        ));
+  }
+}
+
+/// Main UI Widget
+class MainWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      body: new Center(
+          child: new Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          new LaunchModuleButton('s', 'Serial'),
+          new LaunchModuleButton('h', 'Hierarchical'),
+          new LaunchModuleButton('d', 'Dependent')
+        ],
+      )),
+    );
+  }
+}
+
+/// Module Service
 class ModuleImpl extends Module {
   final ModuleBinding _binding = new ModuleBinding();
-
-  final ModuleContextProxy _moduleContext = new ModuleContextProxy();
-  final LinkProxy _link = new LinkProxy();
 
   void bind(InterfaceRequest<Module> request) {
     _binding.bind(this, request);
@@ -64,5 +129,8 @@ void main() {
     Module.serviceName,
   );
 
-  runApp(new Text("Manual Relationships."));
+  runApp(new MaterialApp(
+    title: 'Manual Module',
+    home: new MainWidget(),
+  ));
 }
