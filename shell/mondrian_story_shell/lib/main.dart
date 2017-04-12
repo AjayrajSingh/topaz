@@ -12,6 +12,9 @@ import 'package:lib.fidl.dart/bindings.dart';
 
 import 'package:flutter/widgets.dart';
 
+const String _kSerial = '';
+const String _kHierarchical = 'h';
+const String _kDependent = 'd';
 const Duration _kAnimationDuration = const Duration(milliseconds: 500);
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 final GlobalKey<SurfaceLayoutState> _surfaceLayoutKey =
@@ -26,15 +29,15 @@ void _log(String msg) {
 
 /// Frame for child views
 class SurfaceWidget extends StatelessWidget {
-  ChildViewNode _childView;
+  ChildViewNode _node;
 
-  SurfaceWidget(this._childView) {}
+  SurfaceWidget(this._node) {}
 
   @override
   Widget build(BuildContext context) {
     return new Container(
       margin: const EdgeInsets.all(5.0),
-      child: new ChildView(connection: _childView.connection),
+      child: new ChildView(connection: _node.connection),
     );
   }
 }
@@ -61,29 +64,31 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
   final List<ChildViewNode> children = <ChildViewNode>[];
   ChildViewNode nodeToBeAppended;
 
-  void addChild(InterfaceHandle<ViewOwner> view, int view_id, int parent_id,
-      String view_type) {
+  void addChild(InterfaceHandle<ViewOwner> view, int viewId, int parentId,
+      String viewType) {
     setState(() {
       if (nodeToBeAppended != null) {
         children.add(nodeToBeAppended);
         nodeToBeAppended = null;
       }
       nodeToBeAppended = new ChildViewNode(
-          new ChildViewConnection(view, onUnavailable: (ChildViewConnection c) {
-            setState(() {
-              // TODO(alangardner): Remove it with timer after 500 ms
-              if (nodeToBeAppended.connection == c) {
-                nodeToBeAppended = null;
-              } else {
-                children.removeWhere((ChildViewNode v) {
-                  v.connection == c;
-                });
-              }
-            });
-          }),
-          view_id,
-          parent_id,
-          view_type);
+          new ChildViewConnection(view, onUnavailable: this._removeChildView),
+          viewId,
+          parentId,
+          viewType);
+    });
+  }
+
+  void _removeChildView(ChildViewConnection c) {
+    setState(() {
+      // TODO(alangardner): Remove it with timer after 500 ms
+      if (nodeToBeAppended?.connection == c) {
+        nodeToBeAppended = null;
+      } else {
+        children.removeWhere((ChildViewNode n) {
+          n.connection == c;
+        });
+      }
     });
   }
 
@@ -97,51 +102,91 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
       final List<Widget> childViews = <Widget>[];
       if (children.isEmpty) {
         // Add no children
-      } else if (children.length == 1) {
-        // One child is full screen
-        childViews.add(new AnimatedPositioned(
-            key: new ObjectKey(children.first),
-            top: 0.0,
-            bottom: 0.0,
-            left: 0.0,
-            width: totalWidth,
-            curve: Curves.fastOutSlowIn,
-            duration: _kAnimationDuration,
-            child: new SurfaceWidget(children.first)));
       } else {
-        // Two children are 1/3 for previous focus, 2/3 for current focus
-        ChildViewNode leftView = children[children.length - 2];
-        ChildViewNode rightView = children.last;
-        childViews.add(new AnimatedPositioned(
-            key: new ObjectKey(leftView),
-            top: 0.0,
-            bottom: 0.0,
-            left: 0.0,
-            width: leftWidth,
-            curve: Curves.fastOutSlowIn,
-            duration: _kAnimationDuration,
-            child: new SurfaceWidget(leftView)));
-        childViews.add(new AnimatedPositioned(
-            key: new ObjectKey(rightView),
-            top: 0.0,
-            bottom: 0.0,
-            left: leftWidth,
-            width: rightWidth,
-            curve: Curves.fastOutSlowIn,
-            duration: _kAnimationDuration,
-            child: new SurfaceWidget(rightView)));
-        if (children.length > 2) {
-          // The previous previous view animates out to the left
-          ChildViewNode offscreenLeftView = children[children.length - 3];
+        if (children.length == 1 || children.last.relationship == _kSerial) {
+          // One child is full screen
           childViews.add(new AnimatedPositioned(
-              key: new ObjectKey(offscreenLeftView),
+              key: new ObjectKey(children.last),
               top: 0.0,
               bottom: 0.0,
-              left: -leftWidth,
+              left: 0.0,
+              width: totalWidth,
+              curve: Curves.fastOutSlowIn,
+              duration: _kAnimationDuration,
+              child: new SurfaceWidget(children.last)));
+          // Animate off previous
+          if (children.length > 1) {
+            ChildViewNode previousView = children[children.length - 2];
+            if (previousView.relationship == _kSerial || children.length == 2) {
+              childViews.add(new AnimatedPositioned(
+                  key: new ObjectKey(previousView),
+                  top: 0.0,
+                  bottom: 0.0,
+                  left: -totalWidth,
+                  width: totalWidth,
+                  curve: Curves.fastOutSlowIn,
+                  duration: _kAnimationDuration,
+                  child: new SurfaceWidget(previousView)));
+            } else if (previousView.relationship == _kHierarchical) {
+              ChildViewNode previousPreviousView =
+                  children[children.length - 3];
+              childViews.add(new AnimatedPositioned(
+                  key: new ObjectKey(previousPreviousView),
+                  top: 0.0,
+                  bottom: 0.0,
+                  left: -totalWidth,
+                  width: leftWidth,
+                  curve: Curves.fastOutSlowIn,
+                  duration: _kAnimationDuration,
+                  child: new SurfaceWidget(previousPreviousView)));
+              childViews.add(new AnimatedPositioned(
+                  key: new ObjectKey(previousView),
+                  top: 0.0,
+                  bottom: 0.0,
+                  left: -rightWidth,
+                  width: rightWidth,
+                  curve: Curves.fastOutSlowIn,
+                  duration: _kAnimationDuration,
+                  child: new SurfaceWidget(previousView)));
+            }
+          }
+        }
+        if (children.length > 1 &&
+            children.last.relationship == _kHierarchical) {
+          // Two children are 1/3 for previous focus, 2/3 for current focus
+          ChildViewNode leftView = children[children.length - 2];
+          ChildViewNode rightView = children.last;
+          childViews.add(new AnimatedPositioned(
+              key: new ObjectKey(leftView),
+              top: 0.0,
+              bottom: 0.0,
+              left: 0.0,
               width: leftWidth,
               curve: Curves.fastOutSlowIn,
               duration: _kAnimationDuration,
-              child: new SurfaceWidget(offscreenLeftView)));
+              child: new SurfaceWidget(leftView)));
+          childViews.add(new AnimatedPositioned(
+              key: new ObjectKey(rightView),
+              top: 0.0,
+              bottom: 0.0,
+              left: leftWidth,
+              width: rightWidth,
+              curve: Curves.fastOutSlowIn,
+              duration: _kAnimationDuration,
+              child: new SurfaceWidget(rightView)));
+          // Animate off previous
+          if (children.length > 2) {
+            ChildViewNode offscreenLeftView = children[children.length - 3];
+            childViews.add(new AnimatedPositioned(
+                key: new ObjectKey(offscreenLeftView),
+                top: 0.0,
+                bottom: 0.0,
+                left: -leftWidth,
+                width: leftWidth,
+                curve: Curves.fastOutSlowIn,
+                duration: _kAnimationDuration,
+                child: new SurfaceWidget(offscreenLeftView)));
+          }
         }
       }
       if (nodeToBeAppended != null) {
@@ -151,7 +196,9 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
             top: 0.0,
             bottom: 0.0,
             left: totalWidth,
-            width: children.isEmpty ? totalWidth : rightWidth,
+            width: nodeToBeAppended.relationship == _kSerial || children.isEmpty
+                ? totalWidth
+                : rightWidth,
             curve: Curves.fastOutSlowIn,
             duration: _kAnimationDuration,
             child: new SurfaceWidget(nodeToBeAppended)));

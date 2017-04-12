@@ -99,7 +99,7 @@ class MainWidget extends StatelessWidget {
         children: <Widget>[
           new TitleText(
               "Module ${now.minute}:${now.second.toString().padLeft(2, '0')}"),
-          new LaunchModuleButton('s', 'Serial'),
+          new LaunchModuleButton('', 'Serial'),
           new LaunchModuleButton('h', 'Hierarchical'),
           new LaunchModuleButton('d', 'Dependent')
         ],
