@@ -133,7 +133,7 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
             onTap: _showPlayOverlay,
             child: new _YoutubeSlideShow(
               key: _slideShowKey,
-              videoId: config.videoId,
+              videoId: widget.videoId,
             ),
           ),
           new Offstage(
@@ -173,7 +173,7 @@ class _YoutubeSlideShowState extends State<_YoutubeSlideShow> {
   Timer _currentTimer;
 
   String get _currentThumbnailURL =>
-      'http://img.youtube.com/vi/${config.videoId}/$_thumbnailIndex.jpg';
+      'http://img.youtube.com/vi/${widget.videoId}/$_thumbnailIndex.jpg';
 
   /// "Pause" the video by stopping the slideshow
   void pause() {

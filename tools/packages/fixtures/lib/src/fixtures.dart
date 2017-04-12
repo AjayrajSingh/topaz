@@ -6,11 +6,9 @@ import 'dart:math';
 
 import 'package:lorem/lorem.dart';
 import 'package:meta/meta.dart';
-import 'package:models/user.dart';
 import 'package:uuid/uuid.dart';
 
 import 'name.dart';
-import 'namespace.dart';
 import 'sequence.dart';
 
 /// The operation was not allowed by the current state of the [Fixtures]
@@ -43,8 +41,6 @@ class Fixtures {
 
   /// Global [Uuid] generator.
   static final Uuid _uuid = new Uuid();
-  static final String _uuidUser =
-      Fixtures.uuid.v5(Uuid.NAMESPACE_URL, namespace('users'));
 
   /// Uniqueness [nameThreshold].
   ///
@@ -152,28 +148,5 @@ class Fixtures {
   String id(String key) {
     int seq = sequence(key);
     return '$key-$seq';
-  }
-
-  /// Generate a [User].
-  ///
-  /// Generate a random [User]:
-  ///
-  ///     User user = fixtures.user();
-  ///
-  /// Generate a [User] with a specific name:
-  ///
-  ///     User user = fixtures.user(name: 'Alice');
-  ///
-  User user({String name, String email}) {
-    name ??= this.name(name);
-    email ??= 'user-${sequence(email)}@example.org';
-
-    String id = Fixtures.uuid.v5(_uuidUser, email);
-    return new User(
-      id: id,
-      name: name,
-      email: email,
-      locale: 'en',
-    );
   }
 }

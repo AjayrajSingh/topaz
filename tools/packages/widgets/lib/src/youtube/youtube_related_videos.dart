@@ -56,8 +56,8 @@ class _YoutubeRelatedVideosState extends State<YoutubeRelatedVideos> {
   void initState() {
     super.initState();
     _getRelatedVideoData(
-      videoId: config.videoId,
-      apiKey: config.apiKey,
+      videoId: widget.videoId,
+      apiKey: widget.apiKey,
     ).then((List<VideoData> videos) {
       if (mounted) {
         if (videos == null) {

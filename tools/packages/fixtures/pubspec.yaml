@@ -6,9 +6,9 @@ name: fixtures
 description: Generate programatic fixtures for UI mocks and tests.
 dependencies:
   lorem: ^0.1.0
-  models:
-    path: ../models
   uuid: 0.5.3
+  util:
+    path: ../util
 dev_dependencies:
   flutter_test:
     sdk: flutter

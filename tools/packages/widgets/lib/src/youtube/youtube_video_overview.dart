@@ -55,8 +55,8 @@ class _YoutubeVideoOverviewState extends State<YoutubeVideoOverview> {
 
   Future<VideoData> _getVideoData() async {
     Map<String, String> params = <String, String>{
-      'id': config.videoId,
-      'key': config.apiKey,
+      'id': widget.videoId,
+      'key': widget.apiKey,
       'part': _kApiQueryParts,
     };
 

@@ -47,7 +47,7 @@ class ChessGame {
   // ignore: unused_field
   Map<String, dynamic> _undo;
 
-  List<String> _castling = <String>[];
+  final List<String> _castling = <String>[];
 
   // ignore: unused_field
   String _enPassentTarget;

@@ -61,7 +61,7 @@ class _ImagePickerState extends State<ImagePicker> {
   @override
   void didUpdateConfig(ImagePicker oldState) {
     // Reset selected images if the source has changed
-    if (oldState.imageUrls != config.imageUrls) {
+    if (oldState.imageUrls != widget.imageUrls) {
       setState(() {
         _selectedImages.clear();
       });
@@ -96,7 +96,7 @@ class _ImagePickerState extends State<ImagePicker> {
                     ? _kGridPadding
                     : _kGridPadding + _kFooterHeight,
               ),
-              children: config.imageUrls
+              children: widget.imageUrls
                   .map((String url) => new ImageEntry(
                         imageUrl: url,
                         size: columnSize,
@@ -134,7 +134,7 @@ class _ImagePickerState extends State<ImagePicker> {
                           color: theme.primaryColor,
                         ),
                       ),
-                      onPressed: () => config.onAdd?.call(_selectedImages),
+                      onPressed: () => widget.onAdd?.call(_selectedImages),
                     ),
                   ],
                 ),

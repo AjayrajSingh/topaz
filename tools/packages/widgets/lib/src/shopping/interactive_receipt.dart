@@ -265,7 +265,7 @@ class _InteractiveReceiptState extends State<InteractiveReceipt>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         new _AnimatedPhoneImage(
-          imageUrl: config.useHttps
+          imageUrl: widget.useHttps
               ? imageUrl
               : imageUrl.replaceFirst('https:', 'http:'),
           animation: _imageAnimation,
@@ -465,7 +465,7 @@ class _InteractiveReceiptState extends State<InteractiveReceipt>
                   _buildMainItemCard(),
                 ]),
           ),
-          new AdditionalItems(useHttps: config.useHttps),
+          new AdditionalItems(useHttps: widget.useHttps),
         ],
       ),
     );

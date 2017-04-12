@@ -32,7 +32,7 @@ class _BoardState extends State<Board> {
   int pieceSelected;
   bool confirming = false;
   _Player player = _Player.black;
-  _Player _turn = _Player.white;
+  final _Player _turn = _Player.white;
   ChessGame chessGame;
   Map<int, BoardPiece> positions = <int, BoardPiece>{};
 

@@ -97,8 +97,8 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       });
       List<String> images = await GoogleSearchAPI.images(
         query: query,
-        apiKey: config.apiKey,
-        customSearchId: config.customSearchId,
+        apiKey: widget.apiKey,
+        customSearchId: widget.customSearchId,
       );
       if (currentCount == _counter) {
         setState(() {
@@ -113,20 +113,20 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   @override
   void initState() {
     super.initState();
-    _controller = new TextEditingController(text: config.query);
+    _controller = new TextEditingController(text: widget.query);
     _lastInputValue = _controller.text;
-    if (config.query != null && config.query.isNotEmpty) {
-      _search(config.query);
+    if (widget.query != null && widget.query.isNotEmpty) {
+      _search(widget.query);
     }
   }
 
   @override
-  void didUpdateConfig(GoogleSearchImagePicker oldState) {
-    super.didUpdateConfig(oldState);
-    // Make a new search if config.query has been changed
+  void didUpdateWidget(GoogleSearchImagePicker oldState) {
+    super.didUpdateWidget(oldState);
+    // Make a new search if widget.query has been changed
     if (oldState.query == _controller.text) {
-      _controller.text = config.query ?? '';
-      _search(config.query);
+      _controller.text = widget.query ?? '';
+      _search(widget.query);
     }
   }
 

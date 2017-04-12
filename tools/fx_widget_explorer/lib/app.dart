@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:config/config.dart';
-import 'package:email_session/session.dart';
 import 'package:flutter/material.dart';
 
 import 'home.dart';
@@ -29,14 +28,6 @@ class AppState extends State<App> {
   /// This state should be kept at this top level, because it needs to be passed
   /// as one of the MaterialApp constructor arguments.
   bool showPerformanceOverlay = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Initialize the mock email session store here.
-    kEmailSessionStoreToken ??= new StoreToken(new EmailSessionStoreMock());
-  }
 
   @override
   Widget build(BuildContext context) {

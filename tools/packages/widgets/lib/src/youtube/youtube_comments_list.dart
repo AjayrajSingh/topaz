@@ -56,8 +56,8 @@ class _YoutubeCommentsListState extends State<YoutubeCommentsList> {
 
   Future<List<VideoComment>> _getCommentsData() async {
     Map<String, String> params = <String, String>{
-      'videoId': config.videoId,
-      'key': config.apiKey,
+      'videoId': widget.videoId,
+      'key': widget.apiKey,
       'part': _kApiQueryParts,
       'order': 'relevance',
       'textFormat': 'plainText',

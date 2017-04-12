@@ -78,8 +78,8 @@ class _TrackingStatusState extends State<TrackingStatus> {
     params['API'] = 'TrackV2';
     // Do not use the ''' syntax because the newlines and spaces also get
     // encoded.
-    params['XML'] = '<TrackFieldRequest USERID="${config.apiKey}">'
-        '<TrackID ID="${config.trackingCode}" />'
+    params['XML'] = '<TrackFieldRequest USERID="${widget.apiKey}">'
+        '<TrackID ID="${widget.trackingCode}" />'
         '</TrackFieldRequest>';
 
     Uri uri = new Uri.http(_kApiBaseUrl, _kApiRestOfUrl, params);
@@ -101,7 +101,7 @@ class _TrackingStatusState extends State<TrackingStatus> {
     setState(() {
       _selectedEntry = entry;
     });
-    config.onLocationSelect?.call(entry?.fullLocation);
+    widget.onLocationSelect?.call(entry?.fullLocation);
   }
 
   // HACK(dayang): Assume the package to be delivered if the phrase "delivered"

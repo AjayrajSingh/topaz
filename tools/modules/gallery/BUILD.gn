@@ -16,6 +16,7 @@ flutter_app("gallery") {
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modules/common/packages/config",
+    "//apps/modules/common/packages/config_flutter",
     "//apps/modules/common/packages/widgets",
     "//apps/mozart/lib/flutter",
     "//apps/mozart/services/views:views_dart",
