@@ -6,8 +6,6 @@
 # Exit this script if one command fails.
 set -e
 
-# TODO(jasoncampbell): Do something a little better than requiring an env var
-# to be set.
 source "${FUCHSIA_DIR}/scripts/env.sh"
 
 function usage() {
@@ -24,10 +22,10 @@ function main() {
 
   echo "=== running ${package}"
 
-  # TODO(jasoncampbell): Look into setting up persistent storage and stories.
-  $FUCHSIA_DIR/out/build-magenta/tools/netruncmd : "@boot device_runner  --device_shell=dev_device_shell \
-  --user_shell=dev_user_shell \
-  --user_shell_args=--root_module=${package}"
+  $FUCHSIA_DIR/out/build-magenta/tools/netruncmd : "@boot device_runner \
+    --device_shell=dev_device_shell \
+    --user_shell=dev_user_shell \
+    --user_shell_args='--root_module=${package}'"
 }
 
 main "$@"
