@@ -42,14 +42,18 @@ class LinkWatcherImpl extends LinkWatcher {
     _log('LinkWatcherImpl::notify call');
 
     final dynamic doc = JSON.decode(json);
-    if (doc is! Map ||
-        doc[_kImagePickerDocRoot] is! Map ||
-        doc[_kImagePickerDocRoot][_kImagePickerQueryKey] is! String) {
+    String queryString;
+    // TODO(rosswang): remove after latest Kronk is released
+    if (doc is Map &&
+        doc[_kImagePickerDocRoot] is Map &&
+        doc[_kImagePickerDocRoot][_kImagePickerQueryKey] is String) {
+      queryString = doc[_kImagePickerDocRoot][_kImagePickerQueryKey];
+    } else if (doc is Map && doc['query'] is String) {
+      queryString = doc['query'];
+    } else {
       _log('No image picker query key found in json.');
       return;
     }
-
-    String queryString = doc[_kImagePickerDocRoot][_kImagePickerQueryKey];
 
     _log('queryString: $queryString');
     _kHomeKey.currentState.queryString = queryString;

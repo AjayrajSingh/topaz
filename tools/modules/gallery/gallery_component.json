@@ -9,5 +9,7 @@
   "fuchsia:resources": {
     "main": "gallery_component"
   },
-  "fuchsia:module": {}
+  "fuchsia:module": {
+    "contract": "image_search"
+  }
 }
