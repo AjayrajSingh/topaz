@@ -10,36 +10,30 @@ import 'build_status_model.dart';
 import 'dashboard_app.dart';
 import 'dashboard_module_model.dart';
 
-const String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/';
+const String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/fuchsia/';
 const Map<String, List<List<String>>> _kTargetsMap =
     const <String, List<List<String>>>{
   'fuchsia': const <List<String>>[
-    const <String>['fuchsia/linux-x86-64-debug', 'linux-x86-64-debug'],
-    const <String>['fuchsia/linux-arm64-debug', 'linux-arm64-debug'],
-    const <String>['fuchsia/linux-x86-64-release', 'linux-x86-64-release'],
-    const <String>['fuchsia/linux-arm64-release', 'linux-arm64-release'],
+    const <String>['fuchsia-x86_64-linux-debug', 'x86_64-linux-debug'],
+    const <String>['fuchsia-aarch64-linux-debug', 'aarch64-linux-debug'],
+    const <String>['fuchsia-x86_64-linux-release', 'x86_64-linux-release'],
+    const <String>['fuchsia-aarch64-linux-release', 'aarch64-linux-release'],
   ],
   'fuchsia-drivers': const <List<String>>[
-    const <String>['fuchsia/drivers-linux-x86-64-debug', 'linux-x86-64-debug'],
-    const <String>['fuchsia/drivers-linux-arm64-debug', 'linux-arm64-debug'],
-    const <String>[
-      'fuchsia/drivers-linux-x86-64-release',
-      'linux-x86-64-release'
-    ],
-    const <String>[
-      'fuchsia/drivers-linux-arm64-release',
-      'linux-arm64-release'
-    ],
+    const <String>['drivers-x86_64-linux-debug', 'x86_64-linux-debug'],
+    const <String>['drivers-aarch64-linux-debug', 'aarch64-linux-debug'],
+    const <String>['drivers-x86_64-linux-release', 'x86_64-linux-release'],
+    const <String>['drivers-aarch64-linux-release', 'aarch64-linux-release'],
   ],
   'magenta': const <List<String>>[
-    const <String>['magenta/arm64-linux-gcc', 'arm64-linux-gcc'],
-    const <String>['magenta/x86-64-linux-gcc', 'x86-64-linux-gcc'],
-    const <String>['magenta/arm64-linux-clang', 'arm64-linux-clang'],
-    const <String>['magenta/x86-64-linux-clang', 'x86-64-linux-clang'],
+    const <String>['magenta-aarch64-linux-gcc', 'aarch64-linux-gcc'],
+    const <String>['magenta-x86_64-linux-gcc', 'x86_64-linux-gcc'],
+    const <String>['magenta-aarch64-linux-clang', 'aarch64-linux-clang'],
+    const <String>['magenta-x86_64-linux-clang', 'x86_64-linux-clang'],
   ],
   'jiri': const <List<String>>[
-    const <String>['jiri/linux-x86-64', 'linux-x86-64'],
-    const <String>['jiri/mac-x86-64', 'mac-x86-64'],
+    const <String>['jiri-x86_64-linux', 'x86_64-linux'],
+    const <String>['jiri-x86_64-mac', 'x86_64-mac'],
   ]
 };
 

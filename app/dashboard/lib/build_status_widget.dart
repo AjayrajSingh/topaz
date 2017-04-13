@@ -61,7 +61,10 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
   @override
   void initState() {
     super.initState();
-    _timer = new Timer(const Duration(seconds: 1), _updateTimers);
+    _timer = new Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => setState(() {}),
+    );
   }
 
   @override
@@ -202,11 +205,5 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
       default:
         return Colors.grey[300];
     }
-  }
-
-  void _updateTimers() {
-    setState(() {
-      _timer = new Timer(const Duration(seconds: 1), _updateTimers);
-    });
   }
 }

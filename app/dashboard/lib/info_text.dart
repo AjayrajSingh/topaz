@@ -36,9 +36,9 @@ class _InfoTextState extends State<InfoText> {
   @override
   void initState() {
     super.initState();
-    _timer = new Timer(
-      const Duration(seconds: 1),
-      _updateUptime,
+    _timer = new Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => setState(() {}),
     );
     new File('/data/dashboard_target').readAsString().then((String timestamp) {
       try {
@@ -149,18 +149,12 @@ class _InfoTextState extends State<InfoText> {
           ),
         );
       });
-
-  void _updateUptime() {
-    setState(() {
-      _timer = new Timer(const Duration(seconds: 1), _updateUptime);
-    });
-  }
 }
 
 /// Converts [duration] to a short string representing the duration based on
 /// it's largest unit.  Examples include '6s', '42m', '3h', and '12d'.
 String toConciseString(Duration duration) => duration.inSeconds.abs() < 60
-    ? '${duration.inSeconds}s'
+    ? '<1m'
     : duration.inMinutes.abs() < 60
         ? '${duration.inMinutes}m'
         : duration.inHours.abs() < 24
