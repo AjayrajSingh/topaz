@@ -27,18 +27,55 @@ void _log(String msg) {
   print('[MondrianFlutter] $msg');
 }
 
-/// Frame for child views
-class SurfaceWidget extends StatelessWidget {
-  ChildViewNode _node;
+typedef void SurfaceHandleOffsetCallback(double offset);
+typedef void SurfaceHandleEndCallback(double velocity);
 
-  SurfaceWidget(this._node) {}
+/// Frame for child views
+class SurfaceWidget extends StatefulWidget {
+  final ChildViewNode _node;
+  final SurfaceHandleOffsetCallback _offsetCallback;
+  final SurfaceHandleEndCallback _endCallback;
+
+  SurfaceWidget(this._node, this._offsetCallback, this._endCallback, {Key key})
+      : super(key: key);
+
+  @override
+  SurfaceWidgetState createState() =>
+      new SurfaceWidgetState(_node, _offsetCallback, _endCallback);
+}
+
+/// Frame for child views
+class SurfaceWidgetState extends State<SurfaceWidget> {
+  ChildViewNode _node;
+  final SurfaceHandleOffsetCallback _offsetCallback;
+  final SurfaceHandleEndCallback _endCallback;
+  double _offset = 0.0;
+
+  SurfaceWidgetState(this._node, this._offsetCallback, this._endCallback) {}
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      margin: const EdgeInsets.all(5.0),
-      child: new ChildView(connection: _node.connection),
-    );
+    return new GestureDetector(
+        key: new ObjectKey(this),
+        onHorizontalDragStart: (DragStartDetails details) {
+          _log("Drag started.");
+          _offset = 0.0;
+        },
+        onHorizontalDragUpdate: (DragUpdateDetails details) {
+          if (details.primaryDelta != 0.0) {
+            _offset += details.primaryDelta;
+            _offsetCallback(_offset);
+          }
+        },
+        onHorizontalDragEnd: (DragEndDetails details) {
+          _log("Drag ended.");
+          _endCallback(details.primaryVelocity);
+        },
+        behavior: HitTestBehavior.opaque,
+        child: new Container(
+          padding: const EdgeInsets.only(right: 20.0, left: 20.0),
+          child: new ChildView(connection: _node.connection),
+        ));
   }
 }
 
@@ -54,7 +91,7 @@ class ChildViewNode {
   final int id;
   final ChildViewConnection connection;
   final int parentId;
-  final String relationship;
+  String relationship;
 
   ChildViewNode(this.connection, this.id, this.parentId, this.relationship) {}
 }
@@ -63,6 +100,8 @@ class ChildViewNode {
 class SurfaceLayoutState extends State<SurfaceLayout> {
   final List<ChildViewNode> children = <ChildViewNode>[];
   ChildViewNode nodeToBeAppended;
+  ChildViewNode nodeToBeRemoved;
+  double offset = 0.0;
 
   void addChild(InterfaceHandle<ViewOwner> view, int viewId, int parentId,
       String viewType) {
@@ -95,6 +134,29 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
     });
   }
 
+  void _setOffset(double offset) {
+    setState(() {
+      this.offset = offset;
+      // HACK(alangardner): No better time to ensure removed items are released
+      // Prevents dismissed views from reappearing
+      nodeToBeRemoved = null;
+    });
+  }
+
+  void _endOffset(double velocity) {
+    _log("Offset finished w/ velocity: $velocity");
+    setState(() {
+      // HACK(alangardner): Harcoded distances for swipe gesture
+      // to avoid complicated layout work for this throwaway version.
+      if (offset > 200.0) {
+        nodeToBeRemoved = children.removeLast();
+      } else if (offset < 200.0) {
+        children.last.relationship = _kSerial;
+      }
+      this.offset = 0.0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return new LayoutBuilder(
@@ -102,6 +164,8 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
       final double totalWidth = constraints.maxWidth;
       final double leftWidth = totalWidth / 3.0;
       final double rightWidth = totalWidth - leftWidth;
+      final Duration animationDuration =
+          offset == 0.0 ? _kAnimationDuration : const Duration(milliseconds: 1);
       final List<Widget> childViews = <Widget>[];
       if (children.isEmpty) {
         // Add no children
@@ -112,11 +176,12 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
               key: new ObjectKey(children.last),
               top: 0.0,
               bottom: 0.0,
-              left: 0.0,
+              left: offset,
               width: totalWidth,
               curve: Curves.fastOutSlowIn,
-              duration: _kAnimationDuration,
-              child: new SurfaceWidget(children.last)));
+              duration: animationDuration,
+              child: new SurfaceWidget(
+                  children.last, this._setOffset, this._endOffset)));
           // Animate off previous
           if (children.length > 1) {
             ChildViewNode previousView = children[children.length - 2];
@@ -125,11 +190,12 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
                   key: new ObjectKey(previousView),
                   top: 0.0,
                   bottom: 0.0,
-                  left: -totalWidth,
+                  left: -totalWidth + offset,
                   width: totalWidth,
                   curve: Curves.fastOutSlowIn,
-                  duration: _kAnimationDuration,
-                  child: new SurfaceWidget(previousView)));
+                  duration: animationDuration,
+                  child: new SurfaceWidget(
+                      previousView, this._setOffset, this._endOffset)));
             } else if (previousView.relationship == _kHierarchical) {
               ChildViewNode previousPreviousView =
                   children[children.length - 3];
@@ -137,20 +203,22 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
                   key: new ObjectKey(previousPreviousView),
                   top: 0.0,
                   bottom: 0.0,
-                  left: -totalWidth,
+                  left: -totalWidth + offset,
                   width: leftWidth,
                   curve: Curves.fastOutSlowIn,
-                  duration: _kAnimationDuration,
-                  child: new SurfaceWidget(previousPreviousView)));
+                  duration: animationDuration,
+                  child: new SurfaceWidget(
+                      previousPreviousView, this._setOffset, this._endOffset)));
               childViews.add(new AnimatedPositioned(
                   key: new ObjectKey(previousView),
                   top: 0.0,
                   bottom: 0.0,
-                  left: -rightWidth,
+                  left: -rightWidth + offset,
                   width: rightWidth,
                   curve: Curves.fastOutSlowIn,
-                  duration: _kAnimationDuration,
-                  child: new SurfaceWidget(previousView)));
+                  duration: animationDuration,
+                  child: new SurfaceWidget(
+                      previousView, this._setOffset, this._endOffset)));
             }
           }
         }
@@ -163,20 +231,22 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
               key: new ObjectKey(leftView),
               top: 0.0,
               bottom: 0.0,
-              left: 0.0,
+              left: offset,
               width: leftWidth,
               curve: Curves.fastOutSlowIn,
-              duration: _kAnimationDuration,
-              child: new SurfaceWidget(leftView)));
+              duration: animationDuration,
+              child: new SurfaceWidget(
+                  leftView, this._setOffset, this._endOffset)));
           childViews.add(new AnimatedPositioned(
               key: new ObjectKey(rightView),
               top: 0.0,
               bottom: 0.0,
-              left: leftWidth,
+              left: leftWidth + offset,
               width: rightWidth,
               curve: Curves.fastOutSlowIn,
-              duration: _kAnimationDuration,
-              child: new SurfaceWidget(rightView)));
+              duration: animationDuration,
+              child: new SurfaceWidget(
+                  rightView, this._setOffset, this._endOffset)));
           // Animate off previous
           if (children.length > 2) {
             ChildViewNode offscreenLeftView = children[children.length - 3];
@@ -184,11 +254,12 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
                 key: new ObjectKey(offscreenLeftView),
                 top: 0.0,
                 bottom: 0.0,
-                left: -leftWidth,
+                left: -leftWidth + offset,
                 width: leftWidth,
                 curve: Curves.fastOutSlowIn,
-                duration: _kAnimationDuration,
-                child: new SurfaceWidget(offscreenLeftView)));
+                duration: animationDuration,
+                child: new SurfaceWidget(
+                    offscreenLeftView, this._setOffset, this._endOffset)));
           }
         }
       }
@@ -198,19 +269,34 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
             key: new ObjectKey(nodeToBeAppended),
             top: 0.0,
             bottom: 0.0,
-            left: totalWidth,
+            left: totalWidth + offset,
             width: nodeToBeAppended.relationship == _kSerial || children.isEmpty
                 ? totalWidth
                 : rightWidth,
             curve: Curves.fastOutSlowIn,
-            duration: _kAnimationDuration,
-            child: new SurfaceWidget(nodeToBeAppended)));
+            duration: animationDuration,
+            child: new SurfaceWidget(
+                nodeToBeAppended, this._setOffset, this._endOffset)));
         scheduleMicrotask(() {
           setState(() {
             children.add(nodeToBeAppended);
             nodeToBeAppended = null;
           });
         });
+      }
+      if (nodeToBeRemoved != null) {
+        childViews.add(new AnimatedPositioned(
+            key: new ObjectKey(nodeToBeRemoved),
+            top: 0.0,
+            bottom: 0.0,
+            left: totalWidth + offset,
+            width: nodeToBeRemoved.relationship == _kSerial || children.isEmpty
+                ? totalWidth
+                : rightWidth,
+            curve: Curves.fastOutSlowIn,
+            duration: animationDuration,
+            child: new SurfaceWidget(
+                nodeToBeRemoved, this._setOffset, this._endOffset)));
       }
       return new Stack(children: childViews);
     });
