@@ -123,7 +123,6 @@ class MainWidget extends StatelessWidget {
               "Module ${now.minute}:${now.second.toString().padLeft(2, '0')}"),
           new LaunchModuleButton('', 'Serial'),
           new LaunchModuleButton('h', 'Hierarchical'),
-          new LaunchModuleButton('d', 'Dependent'),
           new Padding(
             padding: const EdgeInsets.all(16.0),
             child: new RaisedButton(
@@ -182,7 +181,7 @@ void main() {
     Module.serviceName,
   );
 
-  Color randomColor = new Color(new Random().nextInt(0xFFFFFFFF));
+  Color randomColor = new Color(0xFF000000 + new Random().nextInt(0xFFFFFF));
 
   runApp(new MaterialApp(
     title: 'Manual Module',
