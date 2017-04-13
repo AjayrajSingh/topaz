@@ -10,17 +10,17 @@ import 'package:lib.widgets/model.dart';
 export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
 
 /// The [Model] that provides a [DeviceContext] and [UserProvider].
-class DeviceShellFactoryModel extends Model {
+class DeviceShellModel extends Model {
   DeviceContext _deviceContext;
   UserProvider _userProvider;
 
-  /// The [DeviceContext] given to this app's [DeviceShellFactory].
+  /// The [DeviceContext] given to this app's [DeviceShell].
   DeviceContext get deviceContext => _deviceContext;
 
-  /// The [UserProvider] given to this app's [DeviceShellFactory].
+  /// The [UserProvider] given to this app's [DeviceShell].
   UserProvider get userProvider => _userProvider;
 
-  /// Called when this app's [DeviceShellFactory] is given its [DeviceContext]
+  /// Called when this app's [DeviceShell] is given its [DeviceContext]
   /// and [UserProvider].
   void onReady(UserProvider userProvider, DeviceContext deviceContext) {
     _userProvider = userProvider;

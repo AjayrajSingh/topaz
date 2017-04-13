@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-export 'src/modular/device_shell_factory_model.dart';
-export 'src/modular/device_shell_factory_widget.dart';
+export 'src/modular/device_shell_model.dart';
+export 'src/modular/device_shell_widget.dart';
 export 'src/modular/link_watcher_impl.dart';
 export 'src/modular/module_model.dart';
 export 'src/modular/module_widget.dart';
