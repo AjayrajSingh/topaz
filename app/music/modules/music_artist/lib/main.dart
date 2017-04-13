@@ -7,32 +7,34 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_widgets/music_widgets.dart';
 
-import 'modular/album_surface_model.dart';
+import 'modular/artist_surface_model.dart';
 
 void main() {
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
 
   // TODO(dayang@): Actually get the ID from the link store
-  AlbumSurfaceModel albumSurfaceModel = new AlbumSurfaceModel(
-    albumId: '3e3AbSasv8baYuhNRWylG5',
+  ArtistSurfaceModel albumSurfaceModel = new ArtistSurfaceModel(
+    artistId: '6E1rccfBuIsyLUBH81PYoG',
   );
 
-  ModuleWidget<AlbumSurfaceModel> moduleWidget =
-      new ModuleWidget<AlbumSurfaceModel>(
+  ModuleWidget<ArtistSurfaceModel> moduleWidget =
+      new ModuleWidget<ArtistSurfaceModel>(
     applicationContext: applicationContext,
     moduleModel: albumSurfaceModel,
     child: new Scaffold(
       backgroundColor: Colors.grey[300],
       body: new SingleChildScrollView(
         controller: new ScrollController(),
-        child: new ScopedModelDescendant<AlbumSurfaceModel>(builder: (
+        child: new ScopedModelDescendant<ArtistSurfaceModel>(builder: (
           _,
           __,
-          AlbumSurfaceModel model,
+          ArtistSurfaceModel model,
         ) {
-          return new AlbumSurface(
-            album: model.album,
+          return new ArtistSurface(
+            artist: model.artist,
+            albums: model.albums,
+            relatedArtists: model.relatedArtists,
             loadingStatus: model.loadingStatus,
             // TODO(dayang@): hook up other actions to real stuff
           );
@@ -42,6 +44,6 @@ void main() {
   );
 
   runApp(moduleWidget);
-  albumSurfaceModel.fetchAlbum();
+  albumSurfaceModel.fetchArtist();
   moduleWidget.advertise();
 }

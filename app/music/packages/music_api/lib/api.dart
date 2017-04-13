@@ -51,15 +51,38 @@ class Api {
 
   /// Retreives albums for given artist id
   static Future<List<Album>> getAlbumsForArtist(String id) async {
-    Uri uri = new Uri.https(_kApiBaseUrl, '/v1/artists/$id/albums ');
+    Uri uri = new Uri.https(_kApiBaseUrl, '/v1/artists/$id/albums');
+    http.Response response = await http.get(uri);
+    if (response.statusCode != 200) {
+      return null;
+    }
+    dynamic jsonData = JSON.decode(response.body);
+    List<Album> simplifiedAlbums = <Album>[];
+    if (jsonData['items'] is List<dynamic>) {
+      jsonData['items'].forEach((dynamic albumJson) {
+        simplifiedAlbums.add(new Album.fromJson(albumJson));
+      });
+    }
+    // We only get simplified album data (no track list), so an additional query
+    // must be made to retrieve the full data for each album.
+    List<String> albumIds =
+        simplifiedAlbums.map((Album album) => album.id).toList();
+    return getAlbumsById(albumIds);
+  }
+
+  /// Retrieve list of albums given a list of album IDs
+  static Future<List<Album>> getAlbumsById(List<String> ids) async {
+    Map<String, String> query = new Map<String, String>();
+    query['ids'] = ids.join(',');
+    Uri uri = new Uri.https(_kApiBaseUrl, '/v1/albums', query);
     http.Response response = await http.get(uri);
     if (response.statusCode != 200) {
       return null;
     }
     dynamic jsonData = JSON.decode(response.body);
     List<Album> albums = <Album>[];
-    if (jsonData['items'] is List<dynamic>) {
-      jsonData['items'].forEach((dynamic albumJson) {
+    if (jsonData['albums'] is List<dynamic>) {
+      jsonData['albums'].forEach((dynamic albumJson) {
         albums.add(new Album.fromJson(albumJson));
       });
     }

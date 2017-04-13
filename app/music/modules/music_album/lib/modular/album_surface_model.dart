@@ -9,8 +9,7 @@ import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
 
-/// [ModuleModel] that manages the state of the
-/// AlbumSurface.
+/// [ModuleModel] that manages the state of the Album Surface.
 class AlbumSurfaceModel extends ModuleModel {
   /// ID of the album for this AlbumSurface
   final String albumId;

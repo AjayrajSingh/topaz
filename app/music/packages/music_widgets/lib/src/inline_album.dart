@@ -87,7 +87,7 @@ class InlineAlbum extends StatelessWidget {
             ),
             // Year
             new Text(
-              '${album.releaseDate.year}',
+              '${album.releaseDate?.year ?? ''}',
               style: _kSubtitleStyle,
             ),
           ],

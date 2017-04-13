@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 export 'src/album_surface.dart';
+export 'src/artist_surface.dart';
 export 'src/hero_banner_scaffold.dart';
 export 'src/home_page.dart';
 export 'src/inline_album.dart';
