@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:lib.widgets/modular.dart';
 import 'package:music_api/api.dart';
@@ -11,26 +12,17 @@ import 'package:music_widgets/music_widgets.dart';
 
 /// [ModuleModel] that manages the state of the Album Surface.
 class AlbumSurfaceModel extends ModuleModel {
-  /// ID of the album for this AlbumSurface
-  final String albumId;
 
   /// The album for this given surface
   Album album;
 
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
 
-  /// Constructor
-  AlbumSurfaceModel({
-    this.albumId,
-  }) {
-    assert(albumId != null);
-  }
-
   /// Get the current loading status
   LoadingStatus get loadingStatus => _loadingStatus;
 
   /// Retrieves the full album based on the given ID
-  Future<Null> fetchAlbum() async {
+  Future<Null> fetchAlbum(String albumId) async {
     try {
       album = await Api.getAlbumById(albumId);
       if (album != null) {
@@ -42,5 +34,14 @@ class AlbumSurfaceModel extends ModuleModel {
       _loadingStatus = LoadingStatus.failed;
     }
     notifyListeners();
+  }
+
+  /// Update the album ID
+  @override
+  void onNotify(String json) {
+    final dynamic doc = JSON.decode(json);
+    if(doc is Map && doc['spotify:albumId'] is String) {
+      fetchAlbum(doc['spotify:albumId']);
+    }
   }
 }

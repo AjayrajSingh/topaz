@@ -13,10 +13,7 @@ void main() {
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
 
-  // TODO(dayang@): Actually get the ID from the link store
-  AlbumSurfaceModel albumSurfaceModel = new AlbumSurfaceModel(
-    albumId: '3e3AbSasv8baYuhNRWylG5',
-  );
+  AlbumSurfaceModel albumSurfaceModel = new AlbumSurfaceModel();
 
   ModuleWidget<AlbumSurfaceModel> moduleWidget =
       new ModuleWidget<AlbumSurfaceModel>(
@@ -42,6 +39,5 @@ void main() {
   );
 
   runApp(moduleWidget);
-  albumSurfaceModel.fetchAlbum();
   moduleWidget.advertise();
 }

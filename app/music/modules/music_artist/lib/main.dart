@@ -13,15 +13,12 @@ void main() {
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
 
-  // TODO(dayang@): Actually get the ID from the link store
-  ArtistSurfaceModel albumSurfaceModel = new ArtistSurfaceModel(
-    artistId: '6E1rccfBuIsyLUBH81PYoG',
-  );
+  ArtistSurfaceModel artistSurfaceModel = new ArtistSurfaceModel();
 
   ModuleWidget<ArtistSurfaceModel> moduleWidget =
       new ModuleWidget<ArtistSurfaceModel>(
     applicationContext: applicationContext,
-    moduleModel: albumSurfaceModel,
+    moduleModel: artistSurfaceModel,
     child: new Scaffold(
       backgroundColor: Colors.grey[300],
       body: new SingleChildScrollView(
@@ -44,6 +41,5 @@ void main() {
   );
 
   runApp(moduleWidget);
-  albumSurfaceModel.fetchArtist();
   moduleWidget.advertise();
 }

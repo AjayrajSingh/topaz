@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:lib.widgets/modular.dart';
 import 'package:music_api/api.dart';
@@ -11,9 +12,6 @@ import 'package:music_widgets/music_widgets.dart';
 
 /// [ModuleModel] that manages the state of the Artist Surface.
 class ArtistSurfaceModel extends ModuleModel {
-  /// ID of the artist for this ArtistSurface
-  final String artistId;
-
   /// The artist for this given surface
   Artist artist;
 
@@ -25,18 +23,12 @@ class ArtistSurfaceModel extends ModuleModel {
 
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
 
-  /// Constructor
-  ArtistSurfaceModel({
-    this.artistId,
-  }) {
-    assert(artistId != null);
-  }
 
   /// Get the current loading status
   LoadingStatus get loadingStatus => _loadingStatus;
 
   /// Retrieves all the data necessary to render the artist surface
-  Future<Null> fetchArtist() async {
+  Future<Null> fetchArtist(String artistId) async {
     try {
       List<dynamic> response = await Future.wait(<Future<Object>>[
         Api.getArtistById(artistId),
@@ -55,5 +47,14 @@ class ArtistSurfaceModel extends ModuleModel {
       _loadingStatus = LoadingStatus.failed;
     }
     notifyListeners();
+  }
+
+  /// Update the artist ID
+  @override
+  void onNotify(String json) {
+    final dynamic doc = JSON.decode(json);
+    if(doc is Map && doc['spotify:artistId'] is String) {
+      fetchArtist(doc['spotify:artistId']);
+    }
   }
 }
