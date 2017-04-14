@@ -2,29 +2,31 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.services.device/device_context.fidl.dart';
 import 'package:apps.modular.services.device/device_shell.fidl.dart';
 import 'package:apps.modular.services.device/user_provider.fidl.dart';
 import 'package:lib.widgets/model.dart';
 
 export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
 
-/// The [Model] that provides a [DeviceContext] and [UserProvider].
+/// The [Model] that provides a [DeviceShellContext] and [UserProvider].
 class DeviceShellModel extends Model {
-  DeviceContext _deviceContext;
+  DeviceShellContext _deviceShellContext;
   UserProvider _userProvider;
 
-  /// The [DeviceContext] given to this app's [DeviceShell].
-  DeviceContext get deviceContext => _deviceContext;
+  /// The [DeviceShellContext] given to this app's [DeviceShell].
+  DeviceShellContext get deviceShellContext => _deviceShellContext;
 
   /// The [UserProvider] given to this app's [DeviceShell].
   UserProvider get userProvider => _userProvider;
 
-  /// Called when this app's [DeviceShell] is given its [DeviceContext]
+  /// Called when this app's [DeviceShell] is given its [DeviceShellContext]
   /// and [UserProvider].
-  void onReady(UserProvider userProvider, DeviceContext deviceContext) {
+  void onReady(
+    UserProvider userProvider,
+    DeviceShellContext deviceShellContext,
+  ) {
     _userProvider = userProvider;
-    _deviceContext = deviceContext;
+    _deviceShellContext = deviceShellContext;
     notifyListeners();
   }
 

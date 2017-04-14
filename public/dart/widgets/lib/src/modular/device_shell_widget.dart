@@ -24,29 +24,22 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
   final DeviceShellBinding _binding = new DeviceShellBinding();
 
   /// The [DeviceShell] to [advertise].
-  DeviceShellImpl _deviceShell;
-
-  final T _deviceShellModel;
+  final DeviceShellImpl _deviceShell;
 
   /// The rest of the application.
   final Widget child;
 
+  final T _deviceShellModel;
+
   /// Constructor.
   DeviceShellWidget({T deviceShellModel, this.child})
-      : _deviceShellModel = deviceShellModel {
-    _deviceShell = new DeviceShellImpl(
-      onReady: deviceShellModel?.onReady,
-      onStop: _handleStop,
-    );
-  }
+      : _deviceShellModel = deviceShellModel,
+        _deviceShell = _createDeviceShell(deviceShellModel);
 
   @override
   Widget build(BuildContext context) => _deviceShellModel == null
       ? child
-      : new ScopedModel<T>(
-          model: _deviceShellModel,
-          child: child,
-        );
+      : new ScopedModel<T>(model: _deviceShellModel, child: child);
 
   /// Advertises [_deviceShell] as a [DeviceShell] to the rest of the system via
   /// the [ApplicationContext].
@@ -56,8 +49,16 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
         DeviceShell.serviceName,
       );
 
-  void _handleStop() {
-    _deviceShellModel?.onStop?.call();
-    _deviceShell.onStop();
+  static DeviceShell _createDeviceShell(DeviceShellModel deviceShellModel) {
+    DeviceShellImpl deviceShell;
+    VoidCallback onStop = () {
+      deviceShellModel?.onStop?.call();
+      deviceShell.onStop();
+    };
+    deviceShell = new DeviceShellImpl(
+      onReady: deviceShellModel?.onReady,
+      onStop: onStop,
+    );
+    return deviceShell;
   }
 }
