@@ -6,14 +6,13 @@ import 'dart:math';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
-import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
-
+import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.fidl.dart/bindings.dart';
 
 const String _kModuleUrl = 'file:///system/apps/example_manual_relationships';
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
