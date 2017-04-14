@@ -4,10 +4,7 @@
 
 import 'package:fixtures/fixtures.dart';
 import 'package:meta/meta.dart';
-import 'package:quiver/core.dart' as quiver;
 import 'package:widgets_meta/widgets_meta.dart';
-
-import 'mailbox.dart';
 
 /// Represents a Google User Account
 /// Fields are based off the data from the Google Identity API:
@@ -35,8 +32,6 @@ class User {
   /// Location that user is associated with
   final String locale;
 
-  Mailbox _mailbox;
-
   /// Constructor to create a new user
   User({
     this.id,
@@ -56,13 +51,23 @@ class User {
   }
 
   /// Construct a new User from JSON.
-  factory User.fromJson(Map<String, dynamic> json) {
-    return new User(
-      id: json['id'],
-      email: json['email'],
-      name: json['name'],
-      picture: json['picture'],
-    );
+  factory User.fromJson(Map<String, String> json) {
+    assert(json != null);
+
+    User user;
+
+    try {
+      user = new User(
+        id: json['id'],
+        email: json['email'],
+        name: json['name'],
+        picture: json['picture'],
+      );
+    } catch (err) {
+      throw new FormatException('Unable to cast User properties: $err');
+    }
+
+    return user;
   }
 
   /// Helper function for JSON.encode() creates JSON-encoded User object.
@@ -76,25 +81,4 @@ class User {
 
     return json;
   }
-
-  /// Get an instance of Mailbox that maps to this user.
-  Mailbox get mailbox {
-    _mailbox ??= new Mailbox(
-      displayName: name,
-      address: email,
-    );
-
-    return _mailbox;
-  }
-
-  @override
-  bool operator ==(Object o) =>
-      o is User && o.id == id && o.email == email && o.name == name;
-
-  @override
-  int get hashCode => quiver.hashObjects(<dynamic>[
-        id.hashCode,
-        email.hashCode,
-        name.hashCode,
-      ]);
 }

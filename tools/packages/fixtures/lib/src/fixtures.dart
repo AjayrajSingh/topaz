@@ -140,6 +140,16 @@ class Fixtures {
     return rng.nextInt(max);
   }
 
+  /// [DateTime] for now.
+  DateTime now() {
+    return new DateTime.now();
+  }
+
+  /// Miliseconds since the epoch.
+  int timestamp() {
+    return now().millisecondsSinceEpoch;
+  }
+
   /// Generates sequenced String ids based on key.
   ///
   ///     // The id value will be 'foo-1'
