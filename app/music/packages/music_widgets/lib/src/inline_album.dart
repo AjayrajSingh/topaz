@@ -33,6 +33,9 @@ class InlineAlbum extends StatelessWidget {
   /// Callback for when a track is tapped
   final TrackActionCallback onTapTrack;
 
+  /// Callback for when the album image is tapped
+  final AlbumActionCallback onTapAlbum;
+
   /// Constructor
   InlineAlbum({
     Key key,
@@ -40,6 +43,7 @@ class InlineAlbum extends StatelessWidget {
     this.currentTrack,
     this.highlightColor,
     this.onTapTrack,
+    this.onTapAlbum,
   })
       : super(key: key) {
     assert(album != null);
@@ -121,9 +125,14 @@ class InlineAlbum extends StatelessWidget {
             top: 16.0,
             right: 32.0,
           ),
-          child: new TrackArt(
-            artworkUrl: album.defaultArtworkUrl,
-            size: _kArtworkSize,
+          child: new Material(
+            child: new InkWell(
+              onTap: () => onTapAlbum?.call(album),
+              child: new TrackArt(
+                artworkUrl: album.defaultArtworkUrl,
+                size: _kArtworkSize,
+              ),
+            ),
           ),
         ),
         new Expanded(

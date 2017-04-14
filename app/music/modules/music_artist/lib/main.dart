@@ -5,6 +5,7 @@
 import 'package:application.lib.app.dart/app.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/modular.dart';
+import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
 
 import 'modular/artist_surface_model.dart';
@@ -33,7 +34,8 @@ void main() {
             albums: model.albums,
             relatedArtists: model.relatedArtists,
             loadingStatus: model.loadingStatus,
-            // TODO(dayang@): hook up other actions to real stuff
+            onTapArtist: (Artist artist) => model.goToArtist(artist.id),
+            onTapAblum: (Album album) => model.goToAlbum(album.id),
           );
         }),
       ),

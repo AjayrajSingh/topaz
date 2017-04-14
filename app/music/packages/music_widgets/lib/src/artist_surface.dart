@@ -46,6 +46,9 @@ class ArtistSurface extends StatelessWidget {
   /// Callback for when a related artist is selected
   final ArtistActionCallback onTapArtist;
 
+  /// Callback for when an album is selected
+  final AlbumActionCallback onTapAblum;
+
   /// Current loading status of the artist
   final LoadingStatus loadingStatus;
 
@@ -61,6 +64,7 @@ class ArtistSurface extends StatelessWidget {
     this.currentTrack,
     this.onTapTrack,
     this.onTapArtist,
+    this.onTapAblum,
     this.loadingStatus: LoadingStatus.completed,
   })
       : super(key: key);
@@ -134,6 +138,7 @@ class ArtistSurface extends StatelessWidget {
                     currentTrack: currentTrack,
                     highlightColor: highlightColor,
                     onTapTrack: onTapTrack,
+                    onTapAlbum: onTapAblum,
                   ),
                 ))
             .toList(),

@@ -5,6 +5,9 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:apps.modular.services.story/link.fidl.dart';
+import 'package:apps.modular.services.module/module_controller.fidl.dart';
+import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
@@ -22,7 +25,6 @@ class ArtistSurfaceModel extends ModuleModel {
   List<Artist> relatedArtists;
 
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
-
 
   /// Get the current loading status
   LoadingStatus get loadingStatus => _loadingStatus;
@@ -53,8 +55,50 @@ class ArtistSurfaceModel extends ModuleModel {
   @override
   void onNotify(String json) {
     final dynamic doc = JSON.decode(json);
-    if(doc is Map && doc['spotify:artistId'] is String) {
+    if (doc is Map && doc['spotify:artistId'] is String) {
       fetchArtist(doc['spotify:artistId']);
+    }
+  }
+
+  /// Creates a new module for the given artist
+  void goToArtist(String artistId) {
+    _startModule(
+      url: 'file:///system/apps/music_artist',
+      initialData: JSON.encode(
+        <String, String>{"spotify:artistId": artistId},
+      ),
+    );
+  }
+
+  /// Creates a new module for the given album
+  void goToAlbum(String albumId) {
+    _startModule(
+      url: 'file:///system/apps/music_album',
+      initialData: JSON.encode(<String, String>{"spotify:albumId": albumId}),
+    );
+  }
+
+  /// Starts a module in the story shell
+  void _startModule({
+    String moduleName: 'module',
+    String linkName: 'link',
+    String url,
+    String initialData: '',
+  }) {
+    if (moduleContext != null) {
+      LinkProxy link = new LinkProxy();
+      moduleContext.createLink(linkName, link.ctrl.request());
+      link.set(<String>[], initialData);
+
+      moduleContext.startModuleInShell(
+        moduleName,
+        url,
+        link.ctrl.unbind(),
+        null, // outgoingServices,
+        null, // incomingServices,
+        new InterfacePair<ModuleController>().passRequest(),
+        '',
+      );
     }
   }
 }
