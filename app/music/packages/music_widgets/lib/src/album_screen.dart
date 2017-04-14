@@ -13,9 +13,9 @@ import 'track_list_item.dart';
 import 'typedefs.dart';
 import 'utils.dart';
 
-/// UI Widget that represents a album surface
-class AlbumSurface extends StatelessWidget {
-  /// The [Album] to represent for this [AlbumSurface]
+/// UI Widget that represents a album
+class AlbumScreen extends StatelessWidget {
+  /// The [Album] to represent for this [AlbumScreen]
   final Album album;
 
   /// [Color] used as the highlight.
@@ -41,7 +41,7 @@ class AlbumSurface extends StatelessWidget {
   final LoadingStatus loadingStatus;
 
   /// Constructor
-  AlbumSurface({
+  AlbumScreen({
     Key key,
     this.album,
     this.highlightColor,

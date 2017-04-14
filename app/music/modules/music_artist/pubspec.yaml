@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 name: music_artist
-description: Music Artist Surface
+description: Music Artist Module
 
 dependencies:
   flutter:

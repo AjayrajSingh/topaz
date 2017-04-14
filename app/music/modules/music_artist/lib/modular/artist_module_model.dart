@@ -13,9 +13,9 @@ import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
 
-/// [ModuleModel] that manages the state of the Artist Surface.
-class ArtistSurfaceModel extends ModuleModel {
-  /// The artist for this given surface
+/// [ModuleModel] that manages the state of the Artist Module.
+class ArtistModuleModel extends ModuleModel {
+  /// The artist for this given module
   Artist artist;
 
   /// Albums for the given artist
@@ -29,7 +29,7 @@ class ArtistSurfaceModel extends ModuleModel {
   /// Get the current loading status
   LoadingStatus get loadingStatus => _loadingStatus;
 
-  /// Retrieves all the data necessary to render the artist surface
+  /// Retrieves all the data necessary to render the artist module
   Future<Null> fetchArtist(String artistId) async {
     try {
       List<dynamic> response = await Future.wait(<Future<Object>>[

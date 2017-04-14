@@ -10,9 +10,9 @@ import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
 
-/// [ModuleModel] that manages the state of the Album Surface.
-class AlbumSurfaceModel extends ModuleModel {
-  /// The album for this given surface
+/// [ModuleModel] that manages the state of the Album Module.
+class AlbumModuleModel extends ModuleModel {
+  /// The album for this given module
   Album album;
 
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;

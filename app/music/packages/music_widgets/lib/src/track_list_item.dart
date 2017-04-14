@@ -10,7 +10,7 @@ import 'utils.dart';
 
 /// List Item for a given [Track]
 ///
-/// This will be typically used in the Playlist Surface
+/// This will be typically used in playlist views
 class TrackListItem extends StatelessWidget {
   /// The [Track] to render
   final Track track;

@@ -13,9 +13,9 @@ import 'loading_status.dart';
 import 'track_art.dart';
 import 'typedefs.dart';
 
-/// UI Widget that represents an artist surface
-class ArtistSurface extends StatelessWidget {
-  /// The [Artist] to represent for this [ArtistSurface]
+/// UI Widget that represents an artist
+class ArtistScreen extends StatelessWidget {
+  /// The [Artist] to represent for this [ArtistScreen]
   final Artist artist;
 
   /// [Album]s for the given [Artist]
@@ -53,7 +53,7 @@ class ArtistSurface extends StatelessWidget {
   final LoadingStatus loadingStatus;
 
   /// Constructor
-  ArtistSurface({
+  ArtistScreen({
     Key key,
     this.artist,
     this.albums,

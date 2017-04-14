@@ -22,9 +22,9 @@ final TextStyle _kTrackUserStyle = new TextStyle(
 );
 const double _kSecondaryIconSize = 20.0;
 
-/// UI widget for the music playback surface.
+/// UI widget for the music playback module.
 ///
-/// The music playback surface will has playback controls and album art
+/// The music playback module will has playback controls and album art
 /// for the current track.
 class Player extends StatelessWidget {
   /// The current track that is being played

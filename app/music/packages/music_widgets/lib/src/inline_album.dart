@@ -16,7 +16,7 @@ final TextStyle _kSubtitleStyle = new TextStyle(color: Colors.grey[500]);
 /// UI widget that represents a album that will be shown inline with other
 /// elements, such as other albums
 ///
-/// This will be typically used in the artist surface
+/// This will be typically used in the artist screen
 class InlineAlbum extends StatelessWidget {
   /// The given [album] to render
   final Album album;

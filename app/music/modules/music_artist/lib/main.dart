@@ -8,28 +8,28 @@ import 'package:lib.widgets/modular.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
 
-import 'modular/artist_surface_model.dart';
+import 'modular/artist_module_model.dart';
 
 void main() {
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
 
-  ArtistSurfaceModel artistSurfaceModel = new ArtistSurfaceModel();
+  ArtistModuleModel artistModuleModel = new ArtistModuleModel();
 
-  ModuleWidget<ArtistSurfaceModel> moduleWidget =
-      new ModuleWidget<ArtistSurfaceModel>(
+  ModuleWidget<ArtistModuleModel> moduleWidget =
+      new ModuleWidget<ArtistModuleModel>(
     applicationContext: applicationContext,
-    moduleModel: artistSurfaceModel,
+    moduleModel: artistModuleModel,
     child: new Scaffold(
       backgroundColor: Colors.grey[300],
       body: new SingleChildScrollView(
         controller: new ScrollController(),
-        child: new ScopedModelDescendant<ArtistSurfaceModel>(builder: (
+        child: new ScopedModelDescendant<ArtistModuleModel>(builder: (
           _,
           __,
-          ArtistSurfaceModel model,
+          ArtistModuleModel model,
         ) {
-          return new ArtistSurface(
+          return new ArtistScreen(
             artist: model.artist,
             albums: model.albums,
             relatedArtists: model.relatedArtists,

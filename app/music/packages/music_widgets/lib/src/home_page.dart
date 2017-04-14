@@ -5,8 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:music_models/music_models.dart';
 
-import 'album_surface.dart';
-import 'artist_surface.dart';
+import 'album_screen.dart';
+import 'artist_screen.dart';
 import 'loading_status.dart';
 import 'player.dart';
 
@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_currentView == _View.artist) {
       view = new SingleChildScrollView(
         controller: new ScrollController(),
-        child: new ArtistSurface(
+        child: new ArtistScreen(
           artist: artist,
           highlightColor: highlightColor,
           isFollowing: true,
@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
     } else {
-      view = new AlbumSurface(
+      view = new AlbumScreen(
         album: album,
         highlightColor: highlightColor,
         isFollowing: true,
@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
               playbackPosition: new Duration(seconds: 60),
               highlightColor: highlightColor,
               // For testing purposes only, tapping Play will toggle between
-              // the two surfaces
+              // the two screens
               onTogglePlay: _toggleCurrentView,
             ),
           ),
