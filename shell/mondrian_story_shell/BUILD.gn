@@ -20,5 +20,6 @@ flutter_app("flutter_mondrian") {
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/pub/graphlib",
   ]
 }

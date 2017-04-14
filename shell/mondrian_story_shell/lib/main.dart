@@ -10,6 +10,7 @@ import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:graphlib/graphlib.dart';
 
 const String _kSerial = '';
 const String _kHierarchical = 'h';
@@ -21,6 +22,16 @@ final GlobalKey<SurfaceLayoutState> _surfaceLayoutKey =
 
 /// This is used for keeping the reference around.
 StoryShellFactoryImpl _storyShellFactory;
+
+/// Surface-graph representation
+/// Nodes are surfaces, edges are relationships
+Graph _surfaceGraph;
+
+/// The currently focused surface
+int _focusedSurfaceId;
+
+/// The list of previous focusedSurfaces
+List _focusedSurfaces;
 
 void _log(String msg) {
   print('[MondrianFlutter] $msg');
@@ -309,6 +320,7 @@ class StoryShellImpl extends StoryShell {
 
   StoryShellImpl(InterfaceHandle<StoryContext> contextHandle) {
     _storyContext.ctrl.bind(contextHandle);
+    _surfaceGraph = new Graph();
   }
 
   /// Bind an [InterfaceRequest] for a [StoryShell] interface to this object.
@@ -322,6 +334,11 @@ class StoryShellImpl extends StoryShell {
       String view_type) {
     _surfaceLayoutKey.currentState
         .addChild(view, view_id, parent_id, view_type);
+    // TODO(djmurphy) determine when graph is purged
+    _surfaceGraph.setNode(view_id.toString(), view);
+    _surfaceGraph.setEdge(parent_id.toString(), view_id.toString(), view_type);
+    _log("Connected new view: surfaceGraph is now:");
+    _log(writeDot(_surfaceGraph));
   }
 
   /// StoryShell
