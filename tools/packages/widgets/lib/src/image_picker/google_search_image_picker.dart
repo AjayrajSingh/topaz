@@ -124,7 +124,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   void didUpdateWidget(GoogleSearchImagePicker oldState) {
     super.didUpdateWidget(oldState);
     // Make a new search if widget.query has been changed
-    if (oldState.query == _controller.text) {
+    if (oldState.query ?? '' == _controller.text) {
       _controller.text = widget.query ?? '';
       _search(widget.query);
     }
