@@ -2,6 +2,7 @@
 *.pyc
 *~
 .*.sw?
+.analysis_options
 .DS_Store
 .checkstyle
 .clang_complete
