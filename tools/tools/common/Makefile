@@ -43,7 +43,7 @@ root ?= $(shell git rev-parse --show-toplevel)
 fuchsia_root ?= $(realpath $(root)/../../..)
 common_root ?= $(realpath $(fuchsia_root)/apps/modules/common/tools/common)
 tools_root := $(realpath $(common_root)/..)
-fuchsia_out := $(realpath $(fuchsia_root)/out)
+fuchsia_out := $(abspath $(fuchsia_root)/out)
 flutter_root := $(fuchsia_root)/lib/flutter
 flutter_bin := $(flutter_root)/bin
 dart_bin := $(flutter_bin)/cache/dart-sdk/bin
@@ -114,6 +114,8 @@ FUCHSIA_VARIANT ?= debug
 ifeq ($(FUCHSIA_VARIANT),release)
 	FSET_FLAGS += --release
 endif
+
+FUCHSIA_GEN_TARGET ?= x86-64
 
 ################################################################################
 
@@ -196,7 +198,8 @@ dart-clean:
 
 .PHONY: dart-lint
 dart-lint: build
-	@source $(fuchsia_root)/scripts/env.sh && fset x86-64 $(FSET_FLAGS) && \
+	@source $(fuchsia_root)/scripts/env.sh && \
+	fset $(FUCHSIA_GEN_TARGET) $(FSET_FLAGS) && \
 	$(fuchsia_root)/scripts/run-dart-analysis.py \
 			--out=$(fuchsia_out)/$(FUCHSIA_VARIANT)-$(FUCHSIA_GEN_TARGET) \
 			--tree=//apps/modules/$(PROJECT)/* \
