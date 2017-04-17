@@ -14,6 +14,7 @@ dart_package("widgets") {
     "//apps/modules/common/packages/models",
     "//apps/modules/common/packages/widgets_meta",
     "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/xml",
     "//third_party/dart-pkg/pub/http",
   ]

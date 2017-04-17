@@ -7,11 +7,12 @@ import 'dart:convert' show JSON;
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:models/youtube.dart';
 import 'package:widgets_meta/widgets_meta.dart';
 
-import '../user/alphatar.dart';
+
 import 'example_video_id.dart';
 import 'loading_state.dart';
 
