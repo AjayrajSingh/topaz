@@ -16,11 +16,11 @@ flutter_app("contacts") {
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modules/common/packages/fixtures",
-    "//apps/modules/common/packages/widgets",
     "//apps/modules/common/packages/widgets_meta",
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/googleapis_auth",
     "//third_party/dart-pkg/pub/googleapis",
   ]

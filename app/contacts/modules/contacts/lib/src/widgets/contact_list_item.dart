@@ -3,8 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:widgets/user.dart';
+
 
 import '../models.dart';
 import 'type_defs.dart';
