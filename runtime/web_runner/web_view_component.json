@@ -1,0 +1,18 @@
+{
+  "fuchsia:component": {
+    "name": "web_view",
+    "url": "https://fuchsia-build.storage.googleapis.com/apps/web_view/web_view_38c49f3f87ca35505e6249e25ff05e73ddf8fac7"
+  },
+  "fuchsia:program": {
+    "resource": "main"
+  },
+  "fuchsia:resources": {
+    "main": "web_view"
+  },
+  "fuchsia:module": {
+    "contract": "view",
+    "data_preconditions": {
+      "protocol": [ "http", "https" ]
+    }
+  }
+}
