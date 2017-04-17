@@ -47,4 +47,10 @@ class DeviceShellImpl extends DeviceShell {
     _deviceShellContextProxy.ctrl.close();
     done();
   }
+
+  @override
+  void getAuthenticationContext(
+      String username, InterfaceRequest<AuthenticationContext> request) {
+    request.close();
+  }
 }
