@@ -7,10 +7,10 @@ description: Flutter widgets used by the music module
 dependencies:
   flutter:
     sdk: flutter
+  lib.widgets:
+    path: ../../../../../lib/widgets/packages/widgets
   music_models:
     path: ../music_models
-  widgets:
-    path: ../../../common/packages/widgets
   intl: ^0.14.0
 dev_dependencies:
   test: any

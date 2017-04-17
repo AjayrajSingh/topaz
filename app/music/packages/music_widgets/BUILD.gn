@@ -13,6 +13,7 @@ dart_package("music_widgets") {
     "//apps/modules/common/packages/fixtures",
     "//apps/modules/common/packages/widgets",
     "//apps/modules/music/packages/music_models",
+    "//lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/intl",
   ]
 

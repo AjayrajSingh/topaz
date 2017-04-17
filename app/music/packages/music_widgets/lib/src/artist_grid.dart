@@ -6,9 +6,9 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:music_models/music_models.dart';
-import 'package:widgets/user.dart';
 
 import 'typedefs.dart';
 
