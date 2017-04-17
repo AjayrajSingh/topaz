@@ -270,11 +270,11 @@ class EditorState extends State<Editor> {
     FocusScope.of(context).requestFocus(_focusNode);
   }
 
-  LineCol _getLineColFromGlobal(Point globalPosition) {
+  LineCol _getLineColFromGlobal(Offset globalPosition) {
     RenderBox renderObject = context.findRenderObject();
-    Point local = renderObject.globalToLocal(globalPosition);
-    double x = local.x;
-    double y = local.y + _controller.offset;
+    Offset local = renderObject.globalToLocal(globalPosition);
+    double x = local.dx;
+    double y = local.dy + _controller.offset;
     int line = y ~/ _lineHeight;
     int col = 0;
     Line text = _lines.getLine(line);
