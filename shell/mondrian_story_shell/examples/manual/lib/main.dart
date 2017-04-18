@@ -35,7 +35,7 @@ class _ModuleStopperWatcher extends ModuleWatcher {
   _ModuleStopperWatcher(this._moduleController) {
     _moduleController.watch(_binding.wrap(this));
   }
-
+  @override
   void onStateChange(ModuleState newState) {
     _log("Module state changed to $newState");
     if (newState == ModuleState.done) {
@@ -75,10 +75,14 @@ InterfaceHandle<Link> duplicateLink() {
 
 /// Button widget to start module
 class LaunchModuleButton extends StatelessWidget {
+  /// The  relationship to introduce a new surface with
   final String _relationship;
+
+  /// The display text for the relationship
   final String _display;
 
-  LaunchModuleButton(this._relationship, this._display) {}
+  /// Construct a button [Widget] to add new surface with given relationship
+  LaunchModuleButton(this._relationship, this._display);
 
   @override
   Widget build(BuildContext context) {
@@ -93,10 +97,12 @@ class LaunchModuleButton extends StatelessWidget {
   }
 }
 
+/// Container Widget with Title
 class TitleText extends StatelessWidget {
   final String _title;
 
-  TitleText(this._title) {}
+  /// Construct TitleText
+  TitleText(this._title);
 
   @override
   Widget build(BuildContext context) {
@@ -143,6 +149,7 @@ class MainWidget extends StatelessWidget {
 class ModuleImpl extends Module {
   final ModuleBinding _binding = new ModuleBinding();
 
+  /// Bind an [InterfaceRequest] for a [Module] to this
   void bind(InterfaceRequest<Module> request) {
     _binding.bind(this, request);
   }
@@ -174,7 +181,7 @@ class ModuleImpl extends Module {
 void main() {
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices.addServiceForName(
-    (request) {
+    (InterfaceRequest<Module> request) {
       _log('Received binding request for Module');
       _module = new ModuleImpl()..bind(request);
     },

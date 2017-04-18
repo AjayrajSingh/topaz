@@ -31,13 +31,17 @@ Graph _surfaceGraph;
 int _focusedSurfaceId;
 
 /// The list of previous focusedSurfaces
-List _focusedSurfaces;
+List<int> _focusedSurfaces;
 
 void _log(String msg) {
   print('[MondrianFlutter] $msg');
 }
 
+/// Sets initial offset, used to determine if a surface is being dismissed
 typedef void SurfaceHandleOffsetCallback(double offset);
+
+/// Callback for handling surface drag ends,
+/// determines if surface is being dismissed
 typedef void SurfaceHandleEndCallback(double velocity);
 
 /// Frame for child views
@@ -46,6 +50,10 @@ class SurfaceWidget extends StatefulWidget {
   final SurfaceHandleOffsetCallback _offsetCallback;
   final SurfaceHandleEndCallback _endCallback;
 
+  /// SurfaceWidget
+  /// @param _node The ChildViewNode
+  /// @param _offsetCallback The callback used to capture initial offset
+  /// @param _endCallback The callback to handle determine surface dismissal
   SurfaceWidget(this._node, this._offsetCallback, this._endCallback, {Key key})
       : super(key: key);
 
@@ -56,12 +64,20 @@ class SurfaceWidget extends StatefulWidget {
 
 /// Frame for child views
 class SurfaceWidgetState extends State<SurfaceWidget> {
-  ChildViewNode _node;
+  final ChildViewNode _node;
+
+  /// Used for surface dismissal
   final SurfaceHandleOffsetCallback _offsetCallback;
+
+  /// Called when surface drags end to determine surface dismissal
   final SurfaceHandleEndCallback _endCallback;
   double _offset = 0.0;
 
-  SurfaceWidgetState(this._node, this._offsetCallback, this._endCallback) {}
+  /// SurfaceWidgetState
+  /// @params _node The ChildViewNode
+  /// @param _offsetCallback The callback used to capture initial offset
+  /// @param _endCallback The callback to handle determine surface dismissal
+  SurfaceWidgetState(this._node, this._offsetCallback, this._endCallback);
 
   @override
   Widget build(BuildContext context) {
@@ -91,28 +107,51 @@ class SurfaceWidgetState extends State<SurfaceWidget> {
 
 /// Main layout widget for displaying Surfaces.
 class SurfaceLayout extends StatefulWidget {
+  /// SurfaceLayout
   SurfaceLayout({Key key}) : super(key: key);
 
   @override
   SurfaceLayoutState createState() => new SurfaceLayoutState();
 }
 
+/// Class describing a surface node: id, view, parent and surface relationship
 class ChildViewNode {
+  /// The ID of this child
   final int id;
+
+  /// Connection to underlying view
   final ChildViewConnection connection;
+
+  /// ID of parent
   final int parentId;
+
+  /// Relationship to parent
   String relationship;
 
-  ChildViewNode(this.connection, this.id, this.parentId, this.relationship) {}
+  /// ChildViewNode
+  /// @params connection The Mozart View
+  /// @params id The id of this view
+  /// @params parentId The id of the parent surface's view
+  /// @params relationship The relationship between this view and the parent
+  ChildViewNode(this.connection, this.id, this.parentId, this.relationship);
 }
 
 /// Maintains state for the avaialble views to display.
 class SurfaceLayoutState extends State<SurfaceLayout> {
+  /// The list of all child views
   final List<ChildViewNode> children = <ChildViewNode>[];
+
+  /// Candidate view for addition
   ChildViewNode nodeToBeAppended;
+
+  /// Candidate view for removal
   ChildViewNode nodeToBeRemoved;
+
+  /// Layout offset
   double offset = 0.0;
 
+  /// Add a child surface showing view, with ID viewID to the parent with
+  /// ID parentID, with surface relatinonship viewType
   void addChild(InterfaceHandle<ViewOwner> view, int viewId, int parentId,
       String viewType) {
     setState(() {
@@ -318,6 +357,8 @@ class StoryShellImpl extends StoryShell {
   final StoryShellBinding _storyShellBinding = new StoryShellBinding();
   final StoryContextProxy _storyContext = new StoryContextProxy();
 
+  /// StoryShwllImpl
+  /// @params contextHandle: The [InterfaceHandle] to [StoryContext]
   StoryShellImpl(InterfaceHandle<StoryContext> contextHandle) {
     _storyContext.ctrl.bind(contextHandle);
     _surfaceGraph = new Graph();
@@ -328,20 +369,24 @@ class StoryShellImpl extends StoryShell {
     _storyShellBinding.bind(this, request);
   }
 
-  /// StoryShell
+  /// Introduce a new [ViewOwner] to the current Story, with relationship
+  /// of viewType between this view and the [ViewOwner] of id parentId
+  /// @params view The [ViewOwner]
+  /// @params viewId The ID of the view being added
+  /// @params parentId The ID of the parent view
+  /// @params viewType The relationship between this view and its parent
   @override
-  void connectView(InterfaceHandle<ViewOwner> view, int view_id, int parent_id,
-      String view_type) {
-    _surfaceLayoutKey.currentState
-        .addChild(view, view_id, parent_id, view_type);
+  void connectView(InterfaceHandle<ViewOwner> view, int viewId, int parentId,
+      String viewType) {
+    _surfaceLayoutKey.currentState.addChild(view, viewId, parentId, viewType);
     // TODO(djmurphy) determine when graph is purged
-    _surfaceGraph.setNode(view_id.toString(), view);
-    _surfaceGraph.setEdge(parent_id.toString(), view_id.toString(), view_type);
+    _surfaceGraph.setNode(viewId.toString(), view);
+    _surfaceGraph.setEdge(parentId.toString(), viewId.toString(), viewType);
     _log("Connected new view: surfaceGraph is now:");
     _log(writeDot(_surfaceGraph));
   }
 
-  /// StoryShell
+  /// Terminate the StoryShell
   @override
   void terminate(void done()) {
     _log('StoryShellImpl::terminate call');
@@ -352,6 +397,9 @@ class StoryShellImpl extends StoryShell {
 /// An implemenation of the [StoryShellFactory] interface.
 class StoryShellFactoryImpl extends StoryShellFactory {
   final StoryShellFactoryBinding _binding = new StoryShellFactoryBinding();
+
+  /// Implementation of StoryShell service
+  // ignore: unused_field
   StoryShellImpl _storyShell;
 
   /// Bind an [InterfaceRequest] for a [StoryShellFactory] interface to this.
@@ -359,6 +407,7 @@ class StoryShellFactoryImpl extends StoryShellFactory {
     _binding.bind(this, request);
   }
 
+  @override
   void create(InterfaceHandle<StoryContext> context,
       InterfaceRequest<StoryShell> request) {
     _storyShell = new StoryShellImpl(context)..bind(request);
@@ -376,7 +425,7 @@ void main() {
 
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices.addServiceForName(
-    (request) {
+    (InterfaceRequest<StoryShellFactory> request) {
       _log('Received binding request for StoryShellFactory');
       _storyShellFactory = new StoryShellFactoryImpl()..bind(request);
     },
