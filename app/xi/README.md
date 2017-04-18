@@ -88,7 +88,7 @@ Create a config file:
 
 Configure and build rustc (this will take a while):
 
-    ./configure --enable-rustbuild --target=x86_64-unknown-fuchsia
+    ./configure --target=x86_64-unknown-fuchsia
     ./x.py build --stage 1
 
 ## Verify Rust Build
