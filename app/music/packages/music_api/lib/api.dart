@@ -51,7 +51,10 @@ class Api {
 
   /// Retreives albums for given artist id
   static Future<List<Album>> getAlbumsForArtist(String id) async {
-    Uri uri = new Uri.https(_kApiBaseUrl, '/v1/artists/$id/albums');
+    // Only retrieve albums for US market to avoid duplicates
+    Map<String, String> query = new Map<String, String>();
+    query['market'] = 'us';
+    Uri uri = new Uri.https(_kApiBaseUrl, '/v1/artists/$id/albums', query);
     http.Response response = await http.get(uri);
     if (response.statusCode != 200) {
       return null;

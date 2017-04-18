@@ -5,8 +5,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
+import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_api/api.dart';
@@ -65,7 +65,7 @@ class ArtistModuleModel extends ModuleModel {
     _startModule(
       url: 'file:///system/apps/music_artist',
       initialData: JSON.encode(
-        <String, String>{"spotify:artistId": artistId},
+        <String, String>{'spotify:artistId': artistId},
       ),
     );
   }
@@ -74,7 +74,7 @@ class ArtistModuleModel extends ModuleModel {
   void goToAlbum(String albumId) {
     _startModule(
       url: 'file:///system/apps/music_album',
-      initialData: JSON.encode(<String, String>{"spotify:albumId": albumId}),
+      initialData: JSON.encode(<String, String>{'spotify:albumId': albumId}),
     );
   }
 
