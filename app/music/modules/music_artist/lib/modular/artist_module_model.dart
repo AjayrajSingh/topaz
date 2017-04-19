@@ -5,6 +5,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
+import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -12,6 +14,12 @@ import 'package:lib.widgets/modular.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
+
+/// Key used for storing the artist ID in the link and context store
+const String _kArtistDocKey = 'spotify:artistId';
+
+/// Key used for storing the album ID in the link and context store
+const String _kAlbumDocKey = 'spotify:albumId';
 
 /// [ModuleModel] that manages the state of the Artist Module.
 class ArtistModuleModel extends ModuleModel {
@@ -55,8 +63,29 @@ class ArtistModuleModel extends ModuleModel {
   @override
   void onNotify(String json) {
     final dynamic doc = JSON.decode(json);
-    if (doc is Map && doc['spotify:artistId'] is String) {
-      fetchArtist(doc['spotify:artistId']);
+    if (doc is Map && doc[_kArtistDocKey] is String) {
+      fetchArtist(doc[_kArtistDocKey]);
+
+      // Publish artist data to Maxwell
+      ContextPublisherProxy publisher = new ContextPublisherProxy();
+      IntelligenceServicesProxy intelligenceServices =
+          new IntelligenceServicesProxy();
+      moduleContext
+          .getIntelligenceServices(intelligenceServices.ctrl.request());
+      intelligenceServices.getContextPublisher(publisher.ctrl.request());
+
+      publisher.publish(
+        'spotify',
+        JSON.encode(
+          <String, String>{_kArtistDocKey: doc[_kArtistDocKey]},
+        ),
+      );
+
+      // Close all ctrls, onNotify will not be called again for the music
+      // experience since a new module with a new link is launched for
+      // any new view
+      publisher.ctrl.close();
+      intelligenceServices.ctrl.close();
     }
   }
 
@@ -65,7 +94,7 @@ class ArtistModuleModel extends ModuleModel {
     _startModule(
       url: 'file:///system/apps/music_artist',
       initialData: JSON.encode(
-        <String, String>{'spotify:artistId': artistId},
+        <String, String>{_kArtistDocKey: artistId},
       ),
     );
   }
@@ -74,7 +103,7 @@ class ArtistModuleModel extends ModuleModel {
   void goToAlbum(String albumId) {
     _startModule(
       url: 'file:///system/apps/music_album',
-      initialData: JSON.encode(<String, String>{'spotify:albumId': albumId}),
+      initialData: JSON.encode(<String, String>{_kAlbumDocKey: albumId}),
     );
   }
 

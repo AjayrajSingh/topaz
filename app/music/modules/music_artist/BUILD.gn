@@ -13,6 +13,8 @@ flutter_app("music_artist") {
 
   deps = [
     "//application/lib/app/dart",
+    "//apps/maxwell/services/context:context_dart",
+    "//apps/maxwell/services/user:user_dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modules/music/packages/music_api",
