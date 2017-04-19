@@ -185,8 +185,9 @@ class _RawKeyboardTextFieldState extends State<RawKeyboardTextField> {
 
   @override
   void didUpdateWidget(RawKeyboardTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
     if (widget.controller == null && oldWidget.controller != null)
-      _controller ==
+      _controller =
           new TextEditingController.fromValue(oldWidget.controller.value);
     else if (widget.controller != null && oldWidget.controller == null)
       _controller = null;
