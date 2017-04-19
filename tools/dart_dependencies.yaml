@@ -4,7 +4,7 @@
 
 name: modules
 dependencies:
-  flutter_flux: ^4.0.0
+  flutter_flux: ^4.0.1
   googleapis_auth: ^0.2.3
   googleapis: ^0.32.0
   lorem: ^0.1.0
