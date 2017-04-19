@@ -40,16 +40,23 @@ class _InfoTextState extends State<InfoText> {
       const Duration(minutes: 1),
       (_) => setState(() {}),
     );
-    new File('/data/dashboard_target').readAsString().then((String timestamp) {
-      try {
-        setState(() {
-          _targetTime = (timestamp != null && timestamp.isNotEmpty)
-              ? DateTime.parse(timestamp.trim())
-              : 0;
-        });
-      } catch (_, __) {
-        print('Error: Could not parse ${timestamp.trim()} as a DateTime!');
+    new File('/data/dashboard_target').exists().then((bool exists) {
+      if (!exists) {
+        return;
       }
+      new File('/data/dashboard_target')
+          .readAsString()
+          .then((String timestamp) {
+        try {
+          setState(() {
+            _targetTime = (timestamp != null && timestamp.isNotEmpty)
+                ? DateTime.parse(timestamp.trim())
+                : 0;
+          });
+        } catch (_, __) {
+          print('Error: Could not parse ${timestamp.trim()} as a DateTime!');
+        }
+      });
     });
   }
 
