@@ -17,7 +17,7 @@ typedef void EmbeddedChildAdder(EmbeddedChild child);
 
 /// A widget build function that creates an embedded child and passes it
 /// to childAdder.
-typedef EmbeddedChild GeneralEmbeddedChildBuilder({
+typedef void GeneralEmbeddedChildBuilder({
   String docRoot,
   String type,
   String propKey,
@@ -168,7 +168,7 @@ class EmbeddedChildProvider {
     dynamic value,
     EmbeddedChildAdder childAdder,
   }) {
-    return _generalBuilder(
+    _generalBuilder(
       docRoot: docRoot,
       type: type,
       propKey: propKey,
