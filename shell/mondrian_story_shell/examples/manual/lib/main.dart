@@ -29,8 +29,8 @@ void _log(String msg) {
 }
 
 class _ModuleStopperWatcher extends ModuleWatcher {
-  ModuleControllerProxy _moduleController;
-  ModuleWatcherBinding _binding = new ModuleWatcherBinding();
+  final ModuleControllerProxy _moduleController;
+  final ModuleWatcherBinding _binding = new ModuleWatcherBinding();
 
   _ModuleStopperWatcher(this._moduleController) {
     _moduleController.watch(_binding.wrap(this));

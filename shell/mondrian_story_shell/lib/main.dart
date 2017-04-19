@@ -159,11 +159,16 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
         children.add(nodeToBeAppended);
         nodeToBeAppended = null;
       }
-      nodeToBeAppended = new ChildViewNode(
+      ChildViewNode node = new ChildViewNode(
           new ChildViewConnection(view, onUnavailable: this._removeChildView),
           viewId,
           parentId,
           viewType);
+      if (children.isEmpty) {
+        children.add(node);
+      } else {
+        nodeToBeAppended = node;
+      }
     });
   }
 
@@ -219,10 +224,23 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
       if (children.isEmpty) {
         // Add no children
       } else {
-        if (children.length == 1 || children.last.relationship == _kSerial) {
-          // One child is full screen
+        if (children.length == 1) {
+          ChildViewNode soleView = children.first;
           childViews.add(new AnimatedPositioned(
-              key: new ObjectKey(children.last),
+              key: new ObjectKey(soleView),
+              top: 0.0,
+              bottom: 0.0,
+              left: offset,
+              width: totalWidth,
+              curve: Curves.fastOutSlowIn,
+              duration: animationDuration,
+              child: new Container(
+                  child: new ChildView(connection: soleView.connection))));
+        } else if (children.last.relationship == _kSerial) {
+          // One child is full screen
+          ChildViewNode topView = children.last;
+          childViews.add(new AnimatedPositioned(
+              key: new ObjectKey(topView),
               top: 0.0,
               bottom: 0.0,
               left: offset,
@@ -230,7 +248,7 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
               curve: Curves.fastOutSlowIn,
               duration: animationDuration,
               child: new SurfaceWidget(
-                  children.last, this._setOffset, this._endOffset)));
+                  topView, this._setOffset, this._endOffset)));
           // Animate off previous
           if (children.length > 1) {
             ChildViewNode previousView = children[children.length - 2];
