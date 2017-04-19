@@ -59,9 +59,10 @@ sfind := find $(root) $(ignore_flags)
 dart_sources := $(shell $(sfind) -name "*.dart")
 
 dart_packages := $(realpath $(shell $(sfind) -name "pubspec.yaml" -exec dirname {} \;))
+dart_tools_packages := $(realpath $(shell find $(tools_root) $(ignore_flags) -name "pubspec.yaml" -exec dirname {} \;))
 # find all dart packages defined in BUILD.gn
 dart_gn_packages := $(realpath $(shell grep -Rwl . --include="*.gn" -e "^\(flutter_app\|dart_package\)" | xargs -n1 dirname | sort -u))
-dart_all_packages := $(sort $(dart_packages) $(dart_gn_packages))
+dart_all_packages := $(sort $(dart_packages) $(dart_tools_packages) $(dart_gn_packages))
 dart_analysis_options := $(addsuffix /.analysis_options, $(dart_all_packages))
 
 sources := $(shell $(sfind) \
