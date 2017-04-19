@@ -37,10 +37,10 @@ class _ModuleStopperWatcher extends ModuleWatcher {
   }
   @override
   void onStateChange(ModuleState newState) {
-    _log("Module state changed to $newState");
+    _log('Module state changed to $newState');
     if (newState == ModuleState.done) {
       _moduleController.stop(() {
-        _log("Module stopped!");
+        _log('Module stopped!');
         _binding.unbind();
         _watchers.remove(this);
       });
@@ -132,7 +132,7 @@ class MainWidget extends StatelessWidget {
           new Padding(
             padding: const EdgeInsets.all(16.0),
             child: new RaisedButton(
-              child: new Text("Close"),
+              child: new Text('Close'),
               onPressed: () {
                 _log('Module done...');
                 _moduleContext.done();
