@@ -15,7 +15,6 @@ executable("web_view") {
     "prebuilt/x86-64/lib/libJavaScriptCore.a",
     "prebuilt/x86-64/lib/libWebCore.a",
     "prebuilt/x86-64/lib/libWebCoreDerivedSources.a",
-    "prebuilt/x86-64/lib/libfontconfig.a",
     "prebuilt/x86-64/lib/libcairo.a",
     "prebuilt/x86-64/lib/libcurl.a",
     "prebuilt/x86-64/lib/libpng.a",
