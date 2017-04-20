@@ -12,6 +12,7 @@ group("test") {
   testonly = true
 
   deps = [
+    "//apps/modules/music/packages/concert_models:test",
     "//apps/modules/music/packages/music_models:test",
     "//apps/modules/music/packages/music_widgets:test",
   ]
