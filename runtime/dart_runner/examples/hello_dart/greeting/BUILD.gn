@@ -6,4 +6,6 @@ import("//build/dart/dart_package.gni")
 
 dart_package("greeting") {
   infer_package_name = true
+
+  source_dir = "."
 }
