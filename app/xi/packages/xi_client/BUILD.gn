@@ -7,11 +7,9 @@ import("//build/dart/dart_package.gni")
 dart_package("xi_client") {
   package_name = "xi_client"
 
-  source_dir = "lib"
-
   deps = [
     "//lib/flutter/packages/flutter",
   ]
 
-  analysis_options = "//apps/xi/dart/.analysis_options"
+  analysis_options = "//apps/xi/.analysis_options"
 }
