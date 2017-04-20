@@ -7,3 +7,5 @@ name: lib.widgets
 dependencies:
   flutter:
     sdk: flutter
+  widgets_meta:
+    path: ../../../../apps/modules/common/packages/widgets_meta
