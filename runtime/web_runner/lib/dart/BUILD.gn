@@ -6,4 +6,6 @@ import("//build/dart/dart_package.gni")
 
 dart_package("web_view") {
   package_name = "web_view"
+
+  source_dir = "."
 }
