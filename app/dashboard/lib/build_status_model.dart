@@ -38,6 +38,9 @@ class BuildStatusModel extends ModuleModel {
   /// The url of the page used to determine the build status.
   final String url;
 
+  /// The client to perform get requests with.
+  final http.Client client;
+
   DateTime _lastRefreshed;
   DateTime _lastRefreshStarted;
   DateTime _lastRefreshEnded;
@@ -47,7 +50,7 @@ class BuildStatusModel extends ModuleModel {
   String _errorMessage;
 
   /// Constructor.
-  BuildStatusModel({this.type, this.name, this.url});
+  BuildStatusModel({this.type, this.name, this.url, this.client});
 
   /// Returns the time when the status was refreshed.
   DateTime get lastRefreshed => _lastRefreshed;
@@ -95,7 +98,7 @@ class BuildStatusModel extends ModuleModel {
     _lastRefreshEnded = null;
 
     try {
-      http.Response response = await http.get(url);
+      http.Response response = await client.get(url);
       html = response.body;
       if (html == null) {
         errorMessage =

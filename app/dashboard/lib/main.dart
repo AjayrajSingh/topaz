@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:application.lib.app.dart/app.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
 import 'package:lib.widgets/modular.dart';
 
 import 'build_status_model.dart';
@@ -38,6 +40,7 @@ const Map<String, List<List<String>>> _kTargetsMap =
 };
 
 void main() {
+  http.Client client = createHttpClient();
   final List<List<BuildStatusModel>> buildStatusModels =
       <List<BuildStatusModel>>[];
 
@@ -48,6 +51,7 @@ void main() {
         type: categoryName,
         name: config[1],
         url: _kBaseURL + config[0],
+        client: client,
       );
       buildStatusModel.start();
       categoryModels.add(buildStatusModel);
