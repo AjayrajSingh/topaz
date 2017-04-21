@@ -13,6 +13,6 @@ group("test") {
   testonly = true
 
   deps = [
-    "//apps/modules/contacts/modules/contacts/test",
+    "//apps/modules/contacts/modules/contacts:test",
   ]
 }
