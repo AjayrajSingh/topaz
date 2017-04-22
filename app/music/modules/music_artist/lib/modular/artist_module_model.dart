@@ -15,10 +15,10 @@ import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
 
-/// Key used for storing the artist ID in the link and context store
+/// Key used for storing the artist ID in the link
 const String _kArtistDocKey = 'spotify:artistId';
 
-/// Key used for storing the album ID in the link and context store
+/// Key used for storing the album ID in the link
 const String _kAlbumDocKey = 'spotify:albumId';
 
 /// [ModuleModel] that manages the state of the Artist Module.
@@ -61,31 +61,36 @@ class ArtistModuleModel extends ModuleModel {
 
   /// Update the artist ID
   @override
-  void onNotify(String json) {
+  Future<Null> onNotify(String json) async {
     final dynamic doc = JSON.decode(json);
     if (doc is Map && doc[_kArtistDocKey] is String) {
-      fetchArtist(doc[_kArtistDocKey]);
+      await fetchArtist(doc[_kArtistDocKey]);
 
-      // Publish artist data to Maxwell
-      ContextPublisherProxy publisher = new ContextPublisherProxy();
-      IntelligenceServicesProxy intelligenceServices =
-          new IntelligenceServicesProxy();
-      moduleContext
-          .getIntelligenceServices(intelligenceServices.ctrl.request());
-      intelligenceServices.getContextPublisher(publisher.ctrl.request());
+      if (artist != null) {
+        // Publish artist data to Maxwell
+        ContextPublisherProxy publisher = new ContextPublisherProxy();
+        IntelligenceServicesProxy intelligenceServices =
+            new IntelligenceServicesProxy();
+        moduleContext
+            .getIntelligenceServices(intelligenceServices.ctrl.request());
+        intelligenceServices.getContextPublisher(publisher.ctrl.request());
 
-      publisher.publish(
-        'spotify',
-        JSON.encode(
-          <String, String>{_kArtistDocKey: doc[_kArtistDocKey]},
-        ),
-      );
+        publisher.publish(
+          'music/artist',
+          JSON.encode(
+            <String, String>{
+              'name': artist.name,
+              'spotifyId': artist.id,
+            },
+          ),
+        );
 
-      // Close all ctrls, onNotify will not be called again for the music
-      // experience since a new module with a new link is launched for
-      // any new view
-      publisher.ctrl.close();
-      intelligenceServices.ctrl.close();
+        // Close all ctrls, onNotify will not be called again for the music
+        // experience since a new module with a new link is launched for
+        // any new view
+        publisher.ctrl.close();
+        intelligenceServices.ctrl.close();
+      }
     }
   }
 
