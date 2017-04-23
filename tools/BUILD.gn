@@ -12,9 +12,9 @@ group("test") {
   testonly = true
 
   deps = [
-    "//apps/modules/common/packages/fixtures/test",
-    "//apps/modules/common/packages/models/test",
-    "//apps/modules/common/packages/util/test",
-    "//apps/modules/common/packages/widgets/test",
+    "//apps/modules/common/packages/fixtures:test",
+    "//apps/modules/common/packages/models:test",
+    "//apps/modules/common/packages/util:test",
+    "//apps/modules/common/packages/widgets:test",
   ]
 }

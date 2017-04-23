@@ -3,11 +3,10 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_package.gni")
+import("//build/dart/dart_test.gni")
 
 dart_package("models") {
   package_name = "models"
-
-  source_dir = "lib"
 
   deps = [
     "//apps/modules/common/packages/fixtures",
@@ -18,6 +17,16 @@ dart_package("models") {
     "//third_party/dart-pkg/pub/intl",
     "//third_party/dart-pkg/pub/quiver",
     "//third_party/dart-pkg/pub/xml",
+  ]
+
+  analysis_options = "//apps/modules/common/.analysis_options"
+}
+
+dart_test("test") {
+  deps = [
+    "//apps/modules/common/packages/models",
+    "//lib/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/pub/test",
   ]
 
   analysis_options = "//apps/modules/common/.analysis_options"
