@@ -32,9 +32,16 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
   final T _deviceShellModel;
 
   /// Constructor.
-  DeviceShellWidget({T deviceShellModel, this.child})
+  DeviceShellWidget({
+    T deviceShellModel,
+    AuthenticationContext authenticationContext,
+    this.child,
+  })
       : _deviceShellModel = deviceShellModel,
-        _deviceShell = _createDeviceShell(deviceShellModel);
+        _deviceShell = _createDeviceShell(
+          deviceShellModel,
+          authenticationContext,
+        );
 
   @override
   Widget build(BuildContext context) => _deviceShellModel == null
@@ -49,13 +56,17 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
         DeviceShell.serviceName,
       );
 
-  static DeviceShell _createDeviceShell(DeviceShellModel deviceShellModel) {
+  static DeviceShell _createDeviceShell(
+    DeviceShellModel deviceShellModel,
+    AuthenticationContext authenticationContext,
+  ) {
     DeviceShellImpl deviceShell;
     VoidCallback onStop = () {
       deviceShellModel?.onStop?.call();
       deviceShell.onStop();
     };
     deviceShell = new DeviceShellImpl(
+      authenticationContext: authenticationContext,
       onReady: deviceShellModel?.onReady,
       onStop: onStop,
     );

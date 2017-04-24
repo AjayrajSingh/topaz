@@ -6,6 +6,7 @@ import 'package:apps.modular.services.device/device_shell.fidl.dart';
 import 'package:apps.modular.services.device/user_provider.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:meta/meta.dart';
 
 /// Called when [DeviceShell.initialize] occurs.
 typedef void OnReady(
@@ -19,6 +20,8 @@ class DeviceShellImpl extends DeviceShell {
   final DeviceShellContextProxy _deviceShellContextProxy =
       new DeviceShellContextProxy();
   final UserProviderProxy _userProviderProxy = new UserProviderProxy();
+  final Set<AuthenticationContextBinding> _bindingSet =
+      new Set<AuthenticationContextBinding>();
 
   /// Called when [initialize] occurs.
   final OnReady onReady;
@@ -26,12 +29,20 @@ class DeviceShellImpl extends DeviceShell {
   /// Called when the [DeviceShell] terminates.
   final VoidCallback onStop;
 
+  /// The [AuthenticationContext] to provide when requested.
+  final AuthenticationContext authenticationContext;
+
   /// Constructor.
-  DeviceShellImpl({this.onReady, this.onStop});
+  DeviceShellImpl({
+    @required this.authenticationContext,
+    this.onReady,
+    this.onStop,
+  });
 
   @override
   void initialize(
-      InterfaceHandle<DeviceShellContext> deviceShellContextHandle) {
+    InterfaceHandle<DeviceShellContext> deviceShellContextHandle,
+  ) {
     if (onReady != null) {
       _deviceShellContextProxy.ctrl.bind(deviceShellContextHandle);
       _deviceShellContextProxy
@@ -45,12 +56,19 @@ class DeviceShellImpl extends DeviceShell {
     onStop?.call();
     _userProviderProxy.ctrl.close();
     _deviceShellContextProxy.ctrl.close();
+    _bindingSet.forEach(
+      (AuthenticationContextBinding binding) => binding.close(),
+    );
     done();
   }
 
   @override
   void getAuthenticationContext(
-      String username, InterfaceRequest<AuthenticationContext> request) {
-    request.close();
+    String username,
+    InterfaceRequest<AuthenticationContext> request,
+  ) {
+    AuthenticationContextBinding binding = new AuthenticationContextBinding();
+    binding.bind(authenticationContext, request);
+    _bindingSet.add(binding);
   }
 }
