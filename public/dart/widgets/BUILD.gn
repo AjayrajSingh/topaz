@@ -3,13 +3,12 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_package.gni")
+import("//build/dart/dart_test.gni")
 
 dart_package("lib.widgets") {
   package_name = "lib.widgets"
 
   analysis_options = ".analysis_options"
-
-  source_dir = "lib"
 
   deps = [
     "//application/lib/app/dart",
@@ -17,5 +16,15 @@ dart_package("lib.widgets") {
     "//apps/modular/services/device:device_dart",
     "//apps/modular/services/module:module_dart",
     "//lib/flutter/packages/flutter",
+  ]
+}
+
+dart_test("test") {
+  analysis_options = ".analysis_options"
+
+  deps = [
+    "//lib/widgets/packages/widgets:lib.widgets",
+    "//lib/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/pub/test",
   ]
 }
