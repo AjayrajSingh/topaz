@@ -7,6 +7,7 @@ import 'dart:math';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'package:application.lib.app.dart/app.dart';
+import 'package:apps.mozart.services.input/ime_service.fidl.dart';
 import 'package:apps.mozart.services.input/input_connection.fidl.dart';
 import 'package:apps.mozart.services.input/input_events.fidl.dart';
 import 'package:apps.mozart.services.input/text_editing.fidl.dart';
