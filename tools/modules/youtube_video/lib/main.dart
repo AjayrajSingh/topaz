@@ -54,17 +54,30 @@ class LinkWatcherImpl extends LinkWatcher {
     _log('LinkWatcherImpl::notify call');
 
     final dynamic doc = JSON.decode(json);
-    if (doc is! Map ||
-        doc[_kYoutubeDocRoot] is! Map ||
-        doc[_kYoutubeDocRoot][_kYoutubeVideoIdKey] is! String) {
-      _log('No youtube key found in json.');
-      return;
+    try {
+      _videoId = doc[_kYoutubeDocRoot][_kYoutubeVideoIdKey];
+    } catch (_) {
+      try {
+        final Map<String, dynamic> contract = doc['view'];
+        if (contract['host'] == 'youtu.be') {
+          // https://youtu.be/<video id>
+          _videoId = contract['path'].substring(1);
+        } else {
+          // https://www.youtube.com/watch?v=<video id>
+          final Map<String, String> params = contract['query parameters'];
+          _videoId = params['v'] ?? params['video_ids'];
+        }
+      } catch (_) {
+        _videoId = null;
+      }
     }
 
-    _videoId = doc[_kYoutubeDocRoot][_kYoutubeVideoIdKey];
-
-    _log('_videoId: $_videoId');
-    _kHomeKey.currentState?.updateUI();
+    if (_videoId == null) {
+      _log('No youtube video ID found in json.');
+    } else {
+      _log('_videoId: $_videoId');
+      _kHomeKey.currentState?.updateUI();
+    }
   }
 }
 

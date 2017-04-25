@@ -10,9 +10,10 @@
     "main": "usps_component"
   },
   "fuchsia:module": {
-    "contract": "display_attachment",
+    "contract": "view",
     "data_preconditions": {
-      "@type": "usps-shipping"
+      "host": "tools.usps.com",
+      "path": "/go/TrackConfirmAction"
     }
   }
 }

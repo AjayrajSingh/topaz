@@ -17,8 +17,8 @@ import 'package:widgets/image_picker.dart';
 
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 final GlobalKey<HomeScreenState> _kHomeKey = new GlobalKey<HomeScreenState>();
-const String _kImagePickerDocRoot = 'image-picker-doc';
-const String _kImagePickerQueryKey = 'image-picker-query';
+const String _kContract = 'image search';
+const String _kQueryKey = 'query';
 ModuleImpl _module;
 
 void _log(String msg) {
@@ -43,14 +43,9 @@ class LinkWatcherImpl extends LinkWatcher {
 
     final dynamic doc = JSON.decode(json);
     String queryString;
-    // TODO(rosswang): remove after latest Kronk is released
-    if (doc is Map &&
-        doc[_kImagePickerDocRoot] is Map &&
-        doc[_kImagePickerDocRoot][_kImagePickerQueryKey] is String) {
-      queryString = doc[_kImagePickerDocRoot][_kImagePickerQueryKey];
-    } else if (doc is Map && doc['query'] is String) {
-      queryString = doc['query'];
-    } else {
+    try {
+      queryString = doc[_kContract][_kQueryKey];
+    } catch (_) {
       _log('No image picker query key found in json.');
       return;
     }

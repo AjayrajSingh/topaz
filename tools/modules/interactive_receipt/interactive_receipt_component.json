@@ -10,6 +10,10 @@
     "main": "interactive_receipt_component"
   },
   "fuchsia:module": {
-    "contract": "interactive_receipt"
+    "contract": "view",
+    "data_preconditions": {
+      "host": "www.aplusmobile.com",
+      "path": "/yourorder"
+    }
   }
 }

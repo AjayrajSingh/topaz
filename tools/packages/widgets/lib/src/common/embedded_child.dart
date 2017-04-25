@@ -18,11 +18,8 @@ typedef void EmbeddedChildAdder(EmbeddedChild child);
 /// A widget build function that creates an embedded child and passes it
 /// to childAdder.
 typedef void GeneralEmbeddedChildBuilder({
-  String docRoot,
-  String type,
-  String propKey,
   String contract,
-  dynamic value,
+  dynamic initialData,
   EmbeddedChildAdder childAdder,
 });
 
@@ -161,19 +158,13 @@ class EmbeddedChildProvider {
   /// The `dispose()` method of the returned [EmbeddedChild] must be called when
   /// the child is no longer in use.
   EmbeddedChild buildGeneralEmbeddedChild({
-    String docRoot,
-    String type,
-    String propKey,
     String contract,
-    dynamic value,
+    dynamic initialData,
     EmbeddedChildAdder childAdder,
   }) {
     _generalBuilder(
-      docRoot: docRoot,
-      type: type,
-      propKey: propKey,
       contract: contract,
-      value: value,
+      initialData: initialData,
       childAdder: childAdder,
     );
   }

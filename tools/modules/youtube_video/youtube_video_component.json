@@ -10,9 +10,12 @@
     "main": "youtube_video_component"
   },
   "fuchsia:module": {
-    "contract": "display_attachment",
-    "data_preconditions": {
-      "@type": "youtube-video"
-    }
+    "contract": "view",
+    "data_preconditions": [{
+      "host": [ "www.youtube.com", "music.youtube.com", "m.youtube.com" ],
+      "path": [ "/watch", "/watch_videos" ]
+    }, {
+      "host": "youtu.be"
+    }]
   }
 }

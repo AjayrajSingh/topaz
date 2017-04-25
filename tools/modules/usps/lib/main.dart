@@ -24,8 +24,6 @@ final GlobalKey<HomeScreenState> _kHomeKey = new GlobalKey<HomeScreenState>();
 
 // This module expects to obtain the USPS tracking code string through the link
 // provided from the parent, in the following document id / property key.
-final String _kUspsDocRoot = 'usps-doc';
-final String _kUspsTrackingKey = 'usps-tracking-key';
 final String _kMapDocRoot = 'map-doc';
 final String _kMapLocationKey = 'map-location-key';
 final String _kMapHeightKey = 'map-height-key';
@@ -69,17 +67,18 @@ class LinkWatcherImpl extends LinkWatcher {
     _log('LinkWatcherImpl::notify call');
 
     final dynamic doc = JSON.decode(json);
-    if (doc is! Map ||
-        doc[_kUspsDocRoot] is! Map ||
-        doc[_kUspsDocRoot][_kUspsTrackingKey] is! String) {
-      _log('No usps tracking key found in json.');
-      return;
+    try {
+      _trackingCode = doc['view']['query parameters']['qtc_tLabels1'];
+    } catch (_) {
+      _trackingCode = null;
     }
 
-    _trackingCode = doc[_kUspsDocRoot][_kUspsTrackingKey];
-
-    _log('_trackingCode: $_trackingCode');
-    _kHomeKey.currentState?.updateUI();
+    if (_trackingCode == null) {
+      _log('No usps tracking key found in json.');
+    } else {
+      _log('_trackingCode: $_trackingCode');
+      _kHomeKey.currentState?.updateUI();
+    }
   }
 }
 

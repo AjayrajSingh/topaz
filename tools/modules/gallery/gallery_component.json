@@ -10,6 +10,6 @@
     "main": "gallery_component"
   },
   "fuchsia:module": {
-    "contract": "image_search"
+    "contract": "image search"
   }
 }
