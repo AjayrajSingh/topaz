@@ -81,8 +81,11 @@ class DashboardModuleModel extends ModuleModel {
   /// Starts a web view module pointing to the given [url].
   void launchWebView(String url) {
     LinkProxy linkProxy = new LinkProxy();
-    moduleContext.createLink('', linkProxy.ctrl.request());
-    linkProxy.set(<String>[], JSON.encode(<String, String>{"url": url}));
+    const String webViewLinkName = 'web_view';
+    moduleContext.getLink(webViewLinkName, linkProxy.ctrl.request());
+    linkProxy
+      ..set(<String>[], JSON.encode(<String, String>{"url": url}))
+      ..ctrl.close();
 
     _moduleControllerProxy?.ctrl?.close();
     _moduleControllerProxy = new ModuleControllerProxy();
@@ -90,7 +93,7 @@ class DashboardModuleModel extends ModuleModel {
     moduleContext.startModuleInShell(
       '',
       web_view.kWebViewURL,
-      linkProxy.ctrl.unbind(),
+      webViewLinkName,
       null,
       null,
       _moduleControllerProxy.ctrl.request(),
