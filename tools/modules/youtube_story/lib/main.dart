@@ -56,7 +56,6 @@ class ModuleImpl extends Module {
   @override
   void initialize(
     InterfaceHandle<ModuleContext> moduleContextHandle,
-    InterfaceHandle<Link> linkHandle,
     InterfaceHandle<ServiceProvider> incomingServicesHandle,
     InterfaceRequest<ServiceProvider> outgoingServices,
   ) {
@@ -65,7 +64,7 @@ class ModuleImpl extends Module {
     moduleContext.ctrl.bind(moduleContextHandle);
 
     // Bind the link handle and write the video id.
-    link.ctrl.bind(linkHandle);
+    moduleContext.getLink(null, link.ctrl.request());
 
     Map<String, dynamic> doc = <String, dynamic>{
       _kYoutubeVideoIdKey: _kVideoId
@@ -102,7 +101,7 @@ class ModuleImpl extends Module {
     moduleContext.startModule(
       url, // module name
       url,
-      duplicateLink(),
+      null,  // Pass our default link to our child
       outgoingServices,
       incomingServices,
       moduleControllerPair.passRequest(),
@@ -111,13 +110,6 @@ class ModuleImpl extends Module {
     _log('Started sub-module: $url');
 
     return viewOwnerPair.passHandle();
-  }
-
-  /// Obtains a duplicated [InterfaceHandle] for the given [Link] object.
-  InterfaceHandle<Link> duplicateLink() {
-    InterfacePair<Link> linkPair = new InterfacePair<Link>();
-    link.dup(linkPair.passRequest());
-    return linkPair.passHandle();
   }
 }
 

@@ -103,16 +103,13 @@ class ModuleImpl extends Module {
   @override
   void initialize(
     InterfaceHandle<ModuleContext> moduleContextHandle,
-    InterfaceHandle<Link> linkHandle,
     InterfaceHandle<ServiceProvider> incomingServicesHandle,
     InterfaceRequest<ServiceProvider> outgoingServices,
   ) {
     _log('ModuleImpl::initialize call');
 
     moduleContext.ctrl.bind(moduleContextHandle);
-
-    // Bind the link handle and register the link watcher.
-    link.ctrl.bind(linkHandle);
+    moduleContext.getLink(null, link.ctrl.request());
     link.watchAll(_linkWatcher.getHandle());
 
     _readAPIKey();
@@ -143,13 +140,6 @@ class ModuleImpl extends Module {
     };
 
     link.updateObject(<String>[_kMapDocRoot], JSON.encode(mapDoc));
-  }
-
-  /// Obtains a duplicated [InterfaceHandle] for the given [Link] object.
-  InterfaceHandle<Link> duplicateLink() {
-    InterfacePair<Link> linkPair = new InterfacePair<Link>();
-    link.dup(linkPair.passRequest());
-    return linkPair.passHandle();
   }
 
   @override
@@ -249,7 +239,7 @@ void _addEmbeddedChildBuilders() {
       _module.moduleContext.startModule(
         'map',
         _kMapModuleUrl,
-        _module.duplicateLink(),
+        null, // Pass our default link down.
         null,
         null,
         moduleController.ctrl.request(),

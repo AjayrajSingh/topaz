@@ -85,14 +85,16 @@ class ModuleImpl extends Module {
   @override
   void initialize(
     InterfaceHandle<ModuleContext> moduleContextHandle,
-    InterfaceHandle<Link> linkHandle,
     InterfaceHandle<ServiceProvider> incomingServicesHandle,
     InterfaceRequest<ServiceProvider> outgoingServices,
   ) {
     _log('ModuleImpl::initialize call');
 
     // Bind the link handle and register the link watcher.
-    link.ctrl.bind(linkHandle);
+    new ModuleContextProxy()
+      ..ctrl.bind(moduleContextHandle)
+      ..getLink(null, link.ctrl.request())
+      ..ctrl.close();
     link.watchAll(_linkWatcher.getHandle());
   }
 
