@@ -12,7 +12,7 @@
   "fuchsia:module": {
     "contract": "view",
     "data_preconditions": {
-      "protocol": [ "http", "https" ]
+      "scheme": [ "http", "https" ]
     }
   }
 }
