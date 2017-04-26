@@ -63,13 +63,12 @@ class ModuleImpl extends Module {
   @override
   void initialize(
     InterfaceHandle<ModuleContext> moduleContext,
-    InterfaceHandle<Link> link,
     InterfaceHandle<ServiceProvider> incomingServices,
     InterfaceRequest<ServiceProvider> outgoingServices,
   ) {
     if (onReady != null) {
       _moduleContextProxy.ctrl.bind(moduleContext);
-      _linkProxy.ctrl.bind(link);
+      _moduleContextProxy.getLink(null, _linkProxy.ctrl.request());
 
       if (incomingServices != null) {
         _incomingServiceProviderProxy.ctrl.bind(incomingServices);
