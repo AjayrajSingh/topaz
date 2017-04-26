@@ -21,7 +21,6 @@ final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 /// This is used for keeping the reference around.
 ModuleImpl _module;
 ModuleContextProxy _moduleContext = new ModuleContextProxy();
-LinkProxy _link = new LinkProxy();
 List<ModuleWatcher> _watchers = <ModuleWatcher>[];
 
 void _log(String msg) {
@@ -55,7 +54,7 @@ void startModuleInShell(String viewType) {
   _moduleContext.startModuleInShell(
     '',
     _kModuleUrl,
-    duplicateLink(),
+    null, // pass our default link forward
     null, // outgoingServices,
     null, // incomingServices,
     moduleController.ctrl.request(),
@@ -64,13 +63,6 @@ void startModuleInShell(String viewType) {
   _log('Started sub-module');
 
   _watchers.add(new _ModuleStopperWatcher(moduleController));
-}
-
-/// Obtains a duplicated [InterfaceHandle] for the current [Link] object.
-InterfaceHandle<Link> duplicateLink() {
-  InterfacePair<Link> linkPair = new InterfacePair<Link>();
-  _link.dup(linkPair.passRequest());
-  return linkPair.passHandle();
 }
 
 /// Button widget to start module
@@ -157,13 +149,11 @@ class ModuleImpl extends Module {
   @override
   void initialize(
       InterfaceHandle<ModuleContext> moduleContextHandle,
-      InterfaceHandle<Link> linkHandle,
       InterfaceHandle<ServiceProvider> incomingServices,
       InterfaceRequest<ServiceProvider> outgoingServices) {
     _log('ModuleImpl::initialize call');
 
     _moduleContext.ctrl.bind(moduleContextHandle);
-    _link.ctrl.bind(linkHandle);
   }
 
   @override
@@ -171,7 +161,6 @@ class ModuleImpl extends Module {
     _log('ModuleImpl::stop call');
 
     _moduleContext.ctrl.close();
-    _link.ctrl.close();
 
     done();
   }
