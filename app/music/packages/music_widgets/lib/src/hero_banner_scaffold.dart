@@ -213,6 +213,7 @@ class HeroBannerScaffold extends StatelessWidget {
     return new Container(
       color: backgroundColor ?? _kDefaultBackgroundColor,
       child: new Stack(
+        fit: StackFit.passthrough,
         children: <Widget>[
           new Positioned(
             top: 0.0,

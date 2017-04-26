@@ -53,6 +53,9 @@ class TrackArt extends StatelessWidget {
       ));
     }
 
-    return new Stack(children: children);
+    return new Stack(
+      fit: StackFit.passthrough,
+      children: children,
+    );
   }
 }
