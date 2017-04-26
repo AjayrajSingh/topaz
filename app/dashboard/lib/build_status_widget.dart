@@ -187,7 +187,10 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
               onTap: () => widget.onTap?.call(),
               child: new Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: new Stack(children: stackChildren),
+                child: new Stack(
+                  fit: StackFit.passthrough,
+                  children: stackChildren,
+                ),
               ),
             ),
           );
