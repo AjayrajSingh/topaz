@@ -121,13 +121,15 @@ class ArtistModuleModel extends ModuleModel {
   }) {
     if (moduleContext != null) {
       LinkProxy link = new LinkProxy();
-      moduleContext.createLink(linkName, link.ctrl.request());
-      link.set(<String>[], initialData);
+      moduleContext.getLink(linkName, link.ctrl.request());
+      link
+        ..set(<String>[], initialData)
+        ..ctrl.close();
 
       moduleContext.startModuleInShell(
         moduleName,
         url,
-        link.ctrl.unbind(),
+        linkName,
         null, // outgoingServices,
         null, // incomingServices,
         new InterfacePair<ModuleController>().passRequest(),
