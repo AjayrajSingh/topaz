@@ -137,6 +137,7 @@ class Alphatar extends StatelessWidget {
     Widget image;
     if (avatarImage != null) {
       image = new Stack(
+        fit: StackFit.passthrough,
         children: <Widget>[
           _buildLetter(),
           avatarImage,

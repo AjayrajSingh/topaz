@@ -122,6 +122,7 @@ class _MondrianSpinnerState extends State<MondrianSpinner> {
               child: new ClipRRect(
                 borderRadius: new BorderRadius.circular(_kClipRadius),
                 child: new Stack(
+                  fit: StackFit.passthrough,
                   children: <Widget>[
                     new Container(
                       margin: const EdgeInsets.all(_kBorderWidth),
