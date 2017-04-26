@@ -54,6 +54,7 @@ class ImageEntry extends StatelessWidget {
       child: new InkWell(
         onTap: () => onTap?.call(),
         child: new Stack(
+          fit: StackFit.passthrough,
           children: <Widget>[
             new Container(
               alignment: FractionalOffset.center,

@@ -220,6 +220,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
         searchInput,
         new Expanded(
           child: new Stack(
+            fit: StackFit.passthrough,
             children: <Widget>[
               new ImagePicker(
                 imageUrls: _sourceImages,

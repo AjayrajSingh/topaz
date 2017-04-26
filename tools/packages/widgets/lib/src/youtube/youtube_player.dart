@@ -128,6 +128,7 @@ class _YoutubePlayerState extends State<YoutubePlayer> {
       // https://fuchsia.atlassian.net/browse/SO-117
       height: 250.0,
       child: new Stack(
+        fit: StackFit.passthrough,
         children: <Widget>[
           new InkWell(
             onTap: _showPlayOverlay,

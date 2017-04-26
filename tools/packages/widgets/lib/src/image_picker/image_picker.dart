@@ -72,6 +72,7 @@ class _ImagePickerState extends State<ImagePicker> {
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     return new Stack(
+      fit: StackFit.passthrough,
       children: <Widget>[
         new LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {

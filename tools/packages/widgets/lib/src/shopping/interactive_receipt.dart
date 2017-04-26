@@ -459,11 +459,13 @@ class _InteractiveReceiptState extends State<InteractiveReceipt>
             ),
             padding: const EdgeInsets.only(bottom: 32.0),
             child: new Stack(
-                alignment: FractionalOffset.topLeft,
-                children: <Widget>[
-                  _buildBrandHeader(),
-                  _buildMainItemCard(),
-                ]),
+              fit: StackFit.passthrough,
+              alignment: FractionalOffset.topLeft,
+              children: <Widget>[
+                _buildBrandHeader(),
+                _buildMainItemCard(),
+              ],
+            ),
           ),
           new AdditionalItems(useHttps: widget.useHttps),
         ],
