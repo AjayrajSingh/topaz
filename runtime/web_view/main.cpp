@@ -330,19 +330,17 @@ class MozWebView : public mozart::BaseView,
   void Notify(const fidl::String& json) final {
     modular::JsonDoc parsed_json;
     parsed_json.Parse(json.To<std::string>());
-    auto url_it = parsed_json.FindMember("url");
-    if (url_it == parsed_json.MemberEnd()) {
-      FTL_LOG(WARNING) << "web_view expected \"url\" field in link json, got"
-                       << json;
-      return;
+
+    const auto contract_it = parsed_json.FindMember("view");
+    if (contract_it != parsed_json.MemberEnd()) {
+      const auto& contract = contract_it->value;
+      auto url_it = contract.FindMember("uri");
+      if (url_it == contract.MemberEnd() || !url_it->value.IsString()) {
+        FTL_LOG(WARNING) << "/view/uri must be a string in " << json;
+      } else {
+        SetUrl(url_it->value.GetString());
+      }
     }
-    auto& url_value = url_it->value;
-    if (!url_value.IsString()) {
-      FTL_LOG(WARNING) << "web_view expected string in json \"url\" field, got "
-                       << json;
-      return;
-    }
-    SetUrl(fidl::String(url_value.GetString()));
   }
 
   mozart::InputHandler input_handler_;
