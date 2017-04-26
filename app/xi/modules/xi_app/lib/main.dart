@@ -22,7 +22,6 @@ void _log(String msg) {
 class ModuleImpl extends Module {
   final ModuleBinding _binding = new ModuleBinding();
   final ModuleContextProxy _moduleContext = new ModuleContextProxy();
-  final LinkProxy _link = new LinkProxy();
 
   /// Bind an [InterfaceRequest] for a [Module] interface to this object.
   void bind(InterfaceRequest<Module> request) {
@@ -32,13 +31,11 @@ class ModuleImpl extends Module {
   @override
   void initialize(
       InterfaceHandle<ModuleContext> moduleContextHandle,
-      InterfaceHandle<Link> linkHandle,
       InterfaceHandle<ServiceProvider> incomingServices,
       InterfaceRequest<ServiceProvider> outgoingServices) {
     _log('ModuleImpl::initialize call');
 
     _moduleContext.ctrl.bind(moduleContextHandle);
-    _link.ctrl.bind(linkHandle);
   }
 
   @override
@@ -46,7 +43,6 @@ class ModuleImpl extends Module {
     _log('ModuleImpl::stop call');
 
     // Cleaning up.
-    _link.ctrl.close();
     _moduleContext.ctrl.close();
 
     // Invoke the callback to signal that the clean-up process is done.
