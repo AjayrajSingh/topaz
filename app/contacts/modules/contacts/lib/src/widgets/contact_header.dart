@@ -125,6 +125,7 @@ class ContactHeader extends StatelessWidget {
     ThemeData theme = Theme.of(context);
     return new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
       new Stack(
+        fit: StackFit.passthrough,
         children: <Widget>[
           _buildBackgroundImage(theme.primaryColor),
           _buildAlphatarSection(theme.primaryColor),

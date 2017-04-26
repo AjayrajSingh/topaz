@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 
-
 import '../models.dart';
 import 'type_defs.dart';
 
