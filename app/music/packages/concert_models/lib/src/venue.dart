@@ -15,14 +15,20 @@ class Venue {
   /// Website of venue
   final String website;
 
-  /// [MetroArea] that this venue belongs to
+  /// [MetroArea] that this venue is in
   final MetroArea metroArea;
+
+  /// [City] that this venue is in
+  final City city;
 
   /// Street address of venue
   final String street;
 
   /// Zip Code of venue
   final String zip;
+
+  /// Phone number of venue
+  final String phoneNumber;
 
   /// ID of venue
   final int id;
@@ -33,8 +39,10 @@ class Venue {
     this.description,
     this.website,
     this.metroArea,
+    this.city,
     this.street,
     this.zip,
+    this.phoneNumber,
     this.id,
   });
 
@@ -47,8 +55,12 @@ class Venue {
       metroArea: json['metroArea'] is Map<String, dynamic>
           ? new MetroArea.fromJson(json['metroArea'])
           : null,
+      city: json['city'] is Map<String, dynamic>
+          ? new City.fromJson(json['metroArea'])
+          : null,
       street: json['street'],
       zip: json['zip'],
+      phoneNumber: json['phone'],
       id: json['id'],
     );
   }
@@ -81,6 +93,40 @@ class MetroArea {
   /// Creates a MetroArea from JSON data
   factory MetroArea.fromJson(Map<String, dynamic> json) {
     return new MetroArea(
+      name: json['displayName'],
+      country: json['country'] is Map<String, String>
+          ? json['country']['displayName']
+          : null,
+      id: json['id'],
+    );
+  }
+}
+
+/// Data model representing a Songkick city
+///
+/// Even though Songkick uses the Metro Area for event grouping, the city is
+/// needed for more canonical address representation for use in other modules,
+/// such as maps.
+class City {
+  /// Name of city
+  final String name;
+
+  /// Country of city
+  final String country;
+
+  /// ID of city
+  final int id;
+
+  /// Constructor
+  City({
+    this.name,
+    this.country,
+    this.id,
+  });
+
+  /// Creates a City from JSON data
+  factory City.fromJson(Map<String, dynamic> json) {
+    return new City(
       name: json['displayName'],
       country: json['country'] is Map<String, String>
           ? json['country']['displayName']

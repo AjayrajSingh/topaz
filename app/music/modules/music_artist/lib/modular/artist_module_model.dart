@@ -105,7 +105,10 @@ class ArtistModuleModel extends ModuleModel {
   /// Creates a new module for the given artist
   void goToArtist(String artistId) {
     final Uri arg = new Uri(
-        scheme: 'spotify', host: 'artist', pathSegments: <String>[artistId]);
+      scheme: 'spotify',
+      host: 'artist',
+      pathSegments: <String>[artistId],
+    );
     _startModule(
       url: 'file:///system/apps/music_artist',
       initialData: JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}),
@@ -115,7 +118,10 @@ class ArtistModuleModel extends ModuleModel {
   /// Creates a new module for the given album
   void goToAlbum(String albumId) {
     final Uri arg = new Uri(
-        scheme: 'spotify', host: 'album', pathSegments: <String>[albumId]);
+      scheme: 'spotify',
+      host: 'album',
+      pathSegments: <String>[albumId],
+    );
     _startModule(
       url: 'file:///system/apps/music_album',
       initialData: JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}),

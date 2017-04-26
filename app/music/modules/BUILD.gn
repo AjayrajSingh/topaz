@@ -4,6 +4,7 @@
 
 group("modules") {
   deps = [
+    "concert_event",
     "music_album",
     "music_album:music_album_component",
     "music_artist",

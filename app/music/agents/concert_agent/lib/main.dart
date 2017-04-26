@@ -90,7 +90,7 @@ class ContextListenerImpl extends ContextListener {
           ..createStory = (new CreateStory()
             // TODO (dayang@): Update once the Concert module is implemented
             // https://fuchsia.atlassian.net/browse/SO-376
-            ..moduleId = 'file:///'
+            ..moduleId = 'file:///system/apps/concert_event'
             ..initialData = JSON.encode(
               <String, dynamic>{'songkick:eventId': events[0].id},
             ))

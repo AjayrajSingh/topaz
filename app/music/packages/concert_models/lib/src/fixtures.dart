@@ -27,8 +27,14 @@ class MusicModelFixtures extends Fixtures {
         country: 'UK',
         id: 24426,
       ),
+      city: new City(
+        name: 'London',
+        country: 'UK',
+        id: 24426,
+      ),
       street: '211 Stockwell Road',
       zip: 'SW9 9SL',
+      phoneNumber: '020 7771 3000',
       id: 17522,
     );
   }

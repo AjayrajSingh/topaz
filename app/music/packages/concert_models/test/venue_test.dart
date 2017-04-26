@@ -22,8 +22,12 @@ void main() {
     expect(venue.metroArea.name, venueFixture.metroArea.name);
     expect(venue.metroArea.country, venueFixture.metroArea.country);
     expect(venue.metroArea.id, venueFixture.metroArea.id);
+    expect(venue.city.name, venueFixture.city.name);
+    expect(venue.city.country, venueFixture.city.country);
+    expect(venue.city.id, venueFixture.city.id);
     expect(venue.street, venueFixture.street);
     expect(venue.zip, venueFixture.zip);
+    expect(venue.phoneNumber, venueFixture.phoneNumber);
     expect(venue.id, venueFixture.id);
   });
 }
