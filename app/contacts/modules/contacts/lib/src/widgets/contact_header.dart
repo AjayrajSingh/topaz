@@ -41,7 +41,7 @@ class ContactHeader extends StatelessWidget {
           bottom: _kAlphatarDiameter / 2.0 + _kAlphatarBorderWidth),
       height: _kHeaderHeight,
       decoration: new BoxDecoration(
-        backgroundImage: new BackgroundImage(
+        image: new DecorationImage(
           image: new NetworkImage(contact.backgroundImageUrl != null
               ? contact.backgroundImageUrl
               : _kDefaultBackgroundImage),
@@ -64,7 +64,7 @@ class ContactHeader extends StatelessWidget {
           height: _kAlphatarDiameter + _kAlphatarBorderWidth * 2.0,
           padding: const EdgeInsets.all(_kAlphatarBorderWidth),
           decoration: new BoxDecoration(
-            backgroundColor: primaryColor,
+            color: primaryColor,
             shape: BoxShape.circle,
           ),
           child: new Alphatar.fromNameAndUrl(

@@ -70,9 +70,7 @@ class ContactCard extends StatelessWidget {
         // Jira Issue SO-180: https://fuchsia.atlassian.net/browse/SO-180
         new Container(
           height: 800.0,
-          decoration: new BoxDecoration(
-            backgroundColor: Colors.grey[300],
-          ),
+          color: Colors.grey[300],
           child: new TabBarView(children: <Widget>[
             new Container(
               height: 800.0,
