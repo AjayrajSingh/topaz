@@ -109,7 +109,7 @@ class _MondrianSpinnerState extends State<MondrianSpinner> {
               width: diameter,
               height: diameter,
               decoration: new BoxDecoration(
-                backgroundColor: Colors.black,
+                color: Colors.black,
                 borderRadius: new BorderRadius.circular(_kBorderRadius),
               ),
               foregroundDecoration: new BoxDecoration(
@@ -126,9 +126,7 @@ class _MondrianSpinnerState extends State<MondrianSpinner> {
                   children: <Widget>[
                     new Container(
                       margin: const EdgeInsets.all(_kBorderWidth),
-                      decoration: new BoxDecoration(
-                        backgroundColor: Colors.red[700],
-                      ),
+                      color: Colors.red[700],
                     ),
                     new AnimatedPositioned(
                       left: _yellowPosition.left,
@@ -138,9 +136,7 @@ class _MondrianSpinnerState extends State<MondrianSpinner> {
                       curve: Curves.fastOutSlowIn,
                       duration: const Duration(milliseconds: 250),
                       child: new Container(
-                        decoration: new BoxDecoration(
-                          backgroundColor: Colors.yellow[700],
-                        ),
+                        color: Colors.yellow[700],
                         foregroundDecoration: new BoxDecoration(
                           border: new Border.all(
                             color: Colors.black,
@@ -157,9 +153,7 @@ class _MondrianSpinnerState extends State<MondrianSpinner> {
                       curve: Curves.fastOutSlowIn,
                       duration: const Duration(milliseconds: 250),
                       child: new Container(
-                        decoration: new BoxDecoration(
-                          backgroundColor: Colors.blue[700],
-                        ),
+                        color: Colors.blue[700],
                         foregroundDecoration: new BoxDecoration(
                           border: new Border.all(
                             color: Colors.black,

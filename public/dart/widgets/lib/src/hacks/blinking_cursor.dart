@@ -56,6 +56,5 @@ class _BlinkingCursorState extends State<BlinkingCursor> {
   Widget build(_) => new Container(
       width: 1.0,
       height: widget.height,
-      decoration: new BoxDecoration(
-          backgroundColor: _on ? widget.color : new Color(0x00000000)));
+      color: _on ? widget.color : new Color(0x00000000));
 }

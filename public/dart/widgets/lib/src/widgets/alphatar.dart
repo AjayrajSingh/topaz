@@ -160,7 +160,7 @@ class Alphatar extends StatelessWidget {
     return new Container(
       alignment: FractionalOffset.center,
       decoration: new BoxDecoration(
-        backgroundColor: backgroundColor,
+        color: backgroundColor,
         shape: BoxShape.circle,
       ),
       child: new Text(
