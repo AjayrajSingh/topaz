@@ -44,7 +44,7 @@ class StaticMap extends StatelessWidget {
   Widget build(BuildContext context) {
     if (location == null || location.isEmpty) {
       return new Container(
-        decoration: new BoxDecoration(backgroundColor: Colors.blueGrey[300]),
+        color: Colors.blueGrey[300],
         child: new Center(child: new Text('No Maps')),
       );
     } else {

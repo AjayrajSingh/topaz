@@ -82,7 +82,7 @@ class ImageEntry extends StatelessWidget {
                   height: _selectedIconSize,
                   decoration: new BoxDecoration(
                     shape: BoxShape.circle,
-                    backgroundColor: Colors.blue[500],
+                    color: Colors.blue[500],
                   ),
                   alignment: FractionalOffset.center,
                   child: new Icon(

@@ -132,9 +132,7 @@ class _InteractiveReceiptState extends State<InteractiveReceipt>
       height: 130.0,
       padding: const EdgeInsets.only(top: 24.0),
       alignment: FractionalOffset.topCenter,
-      decoration: new BoxDecoration(
-        backgroundColor: Colors.grey[800],
-      ),
+      color: Colors.grey[800],
       child: new Text(
         'A+ Mobile',
         style: new TextStyle(
@@ -233,7 +231,7 @@ class _InteractiveReceiptState extends State<InteractiveReceipt>
                     _controller.reverse();
                     _scaffoldKey.currentState.showSnackBar(new SnackBar(
                       duration: _kSnackBarDisplayDuration,
-                      backgroundColor: Colors.green[500],
+                      color: Colors.green[500],
                       content: new Text(
                         'Your order has been successfully modified',
                         textAlign: TextAlign.center,
@@ -401,9 +399,7 @@ class _InteractiveReceiptState extends State<InteractiveReceipt>
                   flex: 1,
                   child: new Container(
                     alignment: FractionalOffset.center,
-                    decoration: new BoxDecoration(
-                      backgroundColor: Colors.grey[300],
-                    ),
+                    color: Colors.grey[300],
                     padding: const EdgeInsets.symmetric(vertical: 36.0),
                     child: new Column(
                       children: <Widget>[
@@ -454,9 +450,7 @@ class _InteractiveReceiptState extends State<InteractiveReceipt>
       body: new ListView(
         children: <Widget>[
           new Container(
-            decoration: new BoxDecoration(
-              backgroundColor: Colors.grey[100],
-            ),
+            color: Colors.grey[100],
             padding: const EdgeInsets.only(bottom: 32.0),
             child: new Stack(
               fit: StackFit.passthrough,

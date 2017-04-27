@@ -63,7 +63,7 @@ class BoardPiece extends StatelessWidget {
         childWhenDragging: new Container(
             child: null,
             decoration:
-                new BoxDecoration(backgroundColor: Theme.of(context).accentColor
+                new BoxDecoration(color: Theme.of(context).accentColor
 //                border: new Border.all(
 //                    color: Colors.cyan[400],
 //                    width: 2.0,

@@ -169,9 +169,7 @@ class HomeScreenState extends State<HomeScreen> {
       child: new Container(
         alignment: FractionalOffset.center,
         constraints: const BoxConstraints.expand(),
-        decoration: new BoxDecoration(
-          backgroundColor: Colors.white,
-        ),
+        color: Colors.white,
         child: new Container(
           constraints: const BoxConstraints.expand(),
           child: _trackingCode != null && _apiKey != null

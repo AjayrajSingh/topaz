@@ -122,9 +122,5 @@ class _ColorWidgetState extends State<_ColorWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => new Container(
-        decoration: new BoxDecoration(
-          backgroundColor: _color,
-        ),
-      );
+  Widget build(BuildContext context) => new Container(color: _color);
 }

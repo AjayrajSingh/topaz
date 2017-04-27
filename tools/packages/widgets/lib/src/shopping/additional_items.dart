@@ -38,9 +38,7 @@ class AdditionalItems extends StatelessWidget {
             padding: const EdgeInsets.all(15.0),
             width: 180.0,
             height: 180.0,
-            decoration: new BoxDecoration(
-              backgroundColor: Colors.grey[300],
-            ),
+            color: Colors.grey[300],
             child: new Image.network(
               useHttps ? imageUrl : imageUrl.replaceFirst('https:', 'http:'),
             ),
@@ -64,9 +62,7 @@ class AdditionalItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Container(
-      decoration: new BoxDecoration(
-        backgroundColor: Colors.white,
-      ),
+      color: Colors.white,
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[

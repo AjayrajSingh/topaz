@@ -158,10 +158,7 @@ class _TrackingStatusState extends State<TrackingStatus> {
     // background container with some padding on the left to emulate a border
     return new Container(
       padding: const EdgeInsets.only(left: 4.0),
-      decoration: new BoxDecoration(
-        backgroundColor:
-            entry == _selectedEntry ? Colors.indigo[500] : Colors.white,
-      ),
+      color: entry == _selectedEntry ? Colors.indigo[500] : Colors.white,
       child: new Material(
         color: Colors.white,
         child: new InkWell(
@@ -231,9 +228,7 @@ class _TrackingStatusState extends State<TrackingStatus> {
         horizontal: 24.0,
         vertical: 16.0,
       ),
-      decoration: new BoxDecoration(
-        backgroundColor: Colors.indigo[500],
-      ),
+      color: Colors.indigo[500],
       child: new Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

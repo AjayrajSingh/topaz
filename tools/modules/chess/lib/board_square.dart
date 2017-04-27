@@ -49,7 +49,7 @@ class BoardSquare extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BoxDecoration decoration = new BoxDecoration(backgroundColor: color
+    BoxDecoration decoration = new BoxDecoration(color: color
 //        border: this.highlight ==null ? null : new Border.all(
 //            color: Colors.cyan[400],
 //            width: 2.0,
