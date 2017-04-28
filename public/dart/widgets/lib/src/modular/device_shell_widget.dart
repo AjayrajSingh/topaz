@@ -7,6 +7,7 @@ import 'package:apps.modular.services.device/device_shell.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
+import '../widgets/window_media_query.dart';
 import 'device_shell_impl.dart';
 import 'device_shell_model.dart';
 
@@ -44,9 +45,11 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
         );
 
   @override
-  Widget build(BuildContext context) => _deviceShellModel == null
-      ? child
-      : new ScopedModel<T>(model: _deviceShellModel, child: child);
+  Widget build(BuildContext context) => new WindowMediaQuery(
+        child: _deviceShellModel == null
+            ? child
+            : new ScopedModel<T>(model: _deviceShellModel, child: child),
+      );
 
   /// Advertises [_deviceShell] as a [DeviceShell] to the rest of the system via
   /// the [ApplicationContext].

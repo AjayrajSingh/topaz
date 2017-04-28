@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:meta/meta.dart';
 
+import '../widgets/window_media_query.dart';
 import 'module_impl.dart';
 import 'module_model.dart';
 
@@ -48,12 +49,14 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
         );
 
   @override
-  Widget build(BuildContext context) => _moduleModel == null
-      ? child
-      : new ScopedModel<T>(
-          model: _moduleModel,
-          child: child,
-        );
+  Widget build(BuildContext context) => new WindowMediaQuery(
+        child: _moduleModel == null
+            ? child
+            : new ScopedModel<T>(
+                model: _moduleModel,
+                child: child,
+              ),
+      );
 
   /// Advertises [_module] as a [Module] to the rest of the system via the
   /// [applicationContext].
