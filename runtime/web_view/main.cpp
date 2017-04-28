@@ -46,6 +46,7 @@
 
 #include "WebView.h"
 
+#include "apps/icu_data/lib/icu_data.h"
 #include "apps/modular/lib/rapidjson/rapidjson.h"
 #include "apps/modular/services/module/module.fidl.h"
 #include "apps/modular/services/story/link.fidl.h"
@@ -156,6 +157,10 @@ class MozWebView : public mozart::BaseView,
           if (weak)
             weak->CallIdle();
         }));
+
+    if (!icu_data::Initialize(application_context->environment_services().get())) {
+      printf("Could not load ICU data\n");
+    }
   }
 
   ~MozWebView() override {}
