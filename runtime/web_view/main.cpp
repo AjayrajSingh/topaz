@@ -317,10 +317,10 @@ class MozWebView : public mozart::BaseView,
   // modular::Module
   void Initialize(
       fidl::InterfaceHandle<modular::ModuleContext> context,
-      fidl::InterfaceHandle<modular::Link> link,
       fidl::InterfaceHandle<app::ServiceProvider> incoming_services,
       fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) final {
-    main_link_.Bind(std::move(link));
+    auto context_ptr = modular::ModuleContextPtr::Create(std::move(context));
+    context_ptr->GetLink(nullptr, main_link_.NewRequest());
     main_link_->Watch(main_link_watcher_binding_.NewBinding());
   }
 
