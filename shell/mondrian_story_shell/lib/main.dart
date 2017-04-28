@@ -9,6 +9,7 @@ import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:graphlib/graphlib.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'surface_layout.dart';
 
@@ -105,7 +106,9 @@ void main() {
 
   // Note: This implementation only supports one StoryShell at a time.
   // Initialize the one Flutter application we support
-  runApp(new SurfaceLayout(key: _surfaceLayoutKey));
+  runApp(
+    new WindowMediaQuery(child: new SurfaceLayout(key: _surfaceLayoutKey)),
+  );
 
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices.addServiceForName(
