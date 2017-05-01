@@ -27,7 +27,7 @@ class DashboardModuleModel extends ModuleModel {
 
   DateTime _startTime = new DateTime.now();
   DateTime _lastRefreshed;
-  List<DeviceMapEntry> _devices;
+  List<String> _devices;
   ModuleControllerProxy _moduleControllerProxy;
   Timer _deviceMapTimer;
 
@@ -56,7 +56,7 @@ class DashboardModuleModel extends ModuleModel {
   DateTime get lastRefreshed => _lastRefreshed;
 
   /// The devices for the current user.
-  List<DeviceMapEntry> get devices => _devices;
+  List<String> get devices => _devices;
 
   /// Starts loading the device map from the environment.
   void loadDeviceMap() {
@@ -71,8 +71,10 @@ class DashboardModuleModel extends ModuleModel {
 
   void _queryDeviceMap() {
     _deviceMapProxy.query((List<DeviceMapEntry> devices) {
-      if (!const ListEquality<DeviceMapEntry>().equals(_devices, devices)) {
-        _devices = new List<DeviceMapEntry>.unmodifiable(devices);
+      List<String> newDeviceList =
+          devices.map((DeviceMapEntry entry) => entry.deviceId).toList();
+      if (!const ListEquality<String>().equals(_devices, newDeviceList)) {
+        _devices = new List<String>.unmodifiable(newDeviceList);
         notifyListeners();
       }
     });
@@ -84,7 +86,12 @@ class DashboardModuleModel extends ModuleModel {
     const String webViewLinkName = 'web_view';
     moduleContext.getLink(webViewLinkName, linkProxy.ctrl.request());
     linkProxy
-      ..set(<String>[], JSON.encode(<String, String>{"url": url}))
+      ..set(
+        <String>[],
+        JSON.encode(<String, Map<String, String>>{
+          'view': <String, String>{'uri': url}
+        }),
+      )
       ..ctrl.close();
 
     _moduleControllerProxy?.ctrl?.close();
