@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/component/component.gni")
 import("//flutter/build/flutter_app.gni")
 
 flutter_app("music_album") {
@@ -26,4 +27,9 @@ flutter_app("music_album") {
   ]
 
   analysis_options = "//apps/modules/common/.analysis_options"
+}
+
+fuchsia_component("music_album_component") {
+  manifest = "music_album_component.json"
+  flutter_program = ":music_album"
 }

@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:apps.maxwell.lib.dart/decomposition.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
@@ -14,12 +15,6 @@ import 'package:lib.widgets/modular.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
-
-/// Key used for storing the artist ID in the link
-const String _kArtistDocKey = 'spotify:artistId';
-
-/// Key used for storing the album ID in the link
-const String _kAlbumDocKey = 'spotify:albumId';
 
 /// [ModuleModel] that manages the state of the Artist Module.
 class ArtistModuleModel extends ModuleModel {
@@ -63,52 +58,59 @@ class ArtistModuleModel extends ModuleModel {
   @override
   Future<Null> onNotify(String json) async {
     final dynamic doc = JSON.decode(json);
-    if (doc is Map && doc[_kArtistDocKey] is String) {
-      await fetchArtist(doc[_kArtistDocKey]);
+    String artistId;
+    try {
+      artistId = Uri.parse(doc['view']['uri']).pathSegments[0];
+    } catch (_) {
+      return;
+    }
 
-      if (artist != null) {
-        // Publish artist data to Maxwell
-        ContextPublisherProxy publisher = new ContextPublisherProxy();
-        IntelligenceServicesProxy intelligenceServices =
-            new IntelligenceServicesProxy();
-        moduleContext
-            .getIntelligenceServices(intelligenceServices.ctrl.request());
-        intelligenceServices.getContextPublisher(publisher.ctrl.request());
+    await fetchArtist(artistId);
 
-        publisher.publish(
-          'music/artist',
-          JSON.encode(
-            <String, String>{
-              'name': artist.name,
-              'spotifyId': artist.id,
-            },
-          ),
-        );
+    if (artist != null) {
+      // Publish artist data to Maxwell
+      ContextPublisherProxy publisher = new ContextPublisherProxy();
+      IntelligenceServicesProxy intelligenceServices =
+          new IntelligenceServicesProxy();
+      moduleContext
+          .getIntelligenceServices(intelligenceServices.ctrl.request());
+      intelligenceServices.getContextPublisher(publisher.ctrl.request());
 
-        // Close all ctrls, onNotify will not be called again for the music
-        // experience since a new module with a new link is launched for
-        // any new view
-        publisher.ctrl.close();
-        intelligenceServices.ctrl.close();
-      }
+      publisher.publish(
+        'music/artist',
+        JSON.encode(
+          <String, String>{
+            'name': artist.name,
+            'spotifyId': artist.id,
+          },
+        ),
+      );
+
+      // Close all ctrls, onNotify will not be called again for the music
+      // experience since a new module with a new link is launched for
+      // any new view
+      publisher.ctrl.close();
+      intelligenceServices.ctrl.close();
     }
   }
 
   /// Creates a new module for the given artist
   void goToArtist(String artistId) {
+    final Uri arg =
+        new Uri(scheme: 'spotify', host: 'artist', pathSegments: [artistId]);
     _startModule(
       url: 'file:///system/apps/music_artist',
-      initialData: JSON.encode(
-        <String, String>{_kArtistDocKey: artistId},
-      ),
+      initialData: JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}),
     );
   }
 
   /// Creates a new module for the given album
   void goToAlbum(String albumId) {
+    final Uri arg =
+        new Uri(scheme: 'spotify', host: 'album', pathSegments: [albumId]);
     _startModule(
       url: 'file:///system/apps/music_album',
-      initialData: JSON.encode(<String, String>{_kAlbumDocKey: albumId}),
+      initialData: JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}),
     );
   }
 

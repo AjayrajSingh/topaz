@@ -1,0 +1,19 @@
+{
+  "fuchsia:component": {
+    "name": "music_artist",
+    "url": "file:///system/apps/music_artist"
+  },
+  "fuchsia:program": {
+    "resource": "main"
+  },
+  "fuchsia:resources": {
+    "main": "music_artist_component"
+  },
+  "fuchsia:module": {
+    "contract": "view",
+    "data_preconditions": {
+      "scheme": "spotify",
+      "host": "artist"
+    }
+  }
+}

@@ -5,6 +5,8 @@
 group("modules") {
   deps = [
     "music_album",
+    "music_album:music_album_component",
     "music_artist",
+    "music_artist:music_artist_component",
   ]
 }

@@ -39,8 +39,13 @@ class AlbumModuleModel extends ModuleModel {
   @override
   void onNotify(String json) {
     final dynamic doc = JSON.decode(json);
-    if (doc is Map && doc['spotify:albumId'] is String) {
-      fetchAlbum(doc['spotify:albumId']);
+    String albumId;
+    try {
+      albumId = Uri.parse(doc['view']['uri']).pathSegments[0];
+    } catch (_) {
+      return;
     }
+
+    fetchAlbum(albumId);
   }
 }

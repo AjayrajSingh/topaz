@@ -1,0 +1,19 @@
+{
+  "fuchsia:component": {
+    "name": "music_album",
+    "url": "file:///system/apps/music_album"
+  },
+  "fuchsia:program": {
+    "resource": "main"
+  },
+  "fuchsia:resources": {
+    "main": "music_album_component"
+  },
+  "fuchsia:module": {
+    "contract": "view",
+    "data_preconditions": {
+      "scheme": "spotify",
+      "host": "album"
+    }
+  }
+}

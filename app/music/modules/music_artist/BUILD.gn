@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/component/component.gni")
 import("//flutter/build/flutter_app.gni")
 
 flutter_app("music_artist") {
@@ -13,6 +14,7 @@ flutter_app("music_artist") {
 
   deps = [
     "//application/lib/app/dart",
+    "//apps/maxwell/lib/dart",
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/user:user_dart",
     "//apps/modular/services/module:module_dart",
@@ -28,4 +30,9 @@ flutter_app("music_artist") {
   ]
 
   analysis_options = "//apps/modules/common/.analysis_options"
+}
+
+fuchsia_component("music_artist_component") {
+  manifest = "music_artist_component.json"
+  flutter_program = ":music_artist"
 }
