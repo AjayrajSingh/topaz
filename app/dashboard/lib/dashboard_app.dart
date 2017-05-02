@@ -3,12 +3,15 @@
 // found in the LICENSE file.
 
 import 'dart:io';
+import 'dart:ui' show lerpDouble;
 
+import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'build_status_model.dart';
 import 'build_status_widget.dart';
+import 'dashboard_module_model.dart';
 import 'info_text.dart';
 
 const double _kSpaceBetween = 4.0;
@@ -102,12 +105,80 @@ class DashboardApp extends StatelessWidget {
         appBar: Platform.isFuchsia
             ? null
             : new AppBar(title: new Text('Fuchsia Build Status')),
-        body: new Column(children: rows),
-        floatingActionButton: new FloatingActionButton(
-          backgroundColor: _kFuchsiaColor,
-          onPressed: () => onRefresh?.call(),
-          tooltip: 'Refresh',
-          child: new Icon(Icons.refresh),
+        body: new LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            double chatWidth = constraints.maxWidth / 5.0;
+            return new ScopedModelDescendant<DashboardModuleModel>(
+              builder: (
+                _,
+                Widget child,
+                DashboardModuleModel model,
+              ) =>
+                  new AnimatedBuilder(
+                    animation: model.animation,
+                    builder: (_, __) => new Stack(
+                          children: <Widget>[
+                            new Positioned.fill(
+                              right: lerpDouble(
+                                0.0,
+                                chatWidth,
+                                model.animation.value,
+                              ),
+                              child: new Stack(children: <Widget>[
+                                child,
+                                new Align(
+                                  alignment: FractionalOffset.bottomRight,
+                                  child: new Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      new Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 16.0,
+                                          right: 16.0,
+                                        ),
+                                        child: new FloatingActionButton(
+                                          backgroundColor: _kFuchsiaColor,
+                                          onPressed: () => model.toggleChat(),
+                                          tooltip: 'Chat',
+                                          child: new Icon(Icons.chat),
+                                        ),
+                                      ),
+                                      new Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 16.0,
+                                          right: 16.0,
+                                        ),
+                                        child: new FloatingActionButton(
+                                          backgroundColor: _kFuchsiaColor,
+                                          onPressed: () => onRefresh?.call(),
+                                          tooltip: 'Refresh',
+                                          child: new Icon(Icons.refresh),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]),
+                            ),
+                            new Positioned(
+                              top: 0.0,
+                              bottom: 0.0,
+                              right: lerpDouble(
+                                -chatWidth,
+                                0.0,
+                                model.animation.value,
+                              ),
+                              width: chatWidth,
+                              child: new ChildView(
+                                connection: model.chatChildViewConnection,
+                              ),
+                            ),
+                          ],
+                        ),
+                  ),
+              child: new Column(children: rows),
+            );
+          },
         ),
       ),
     );

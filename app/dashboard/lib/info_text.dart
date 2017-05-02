@@ -10,6 +10,7 @@ import 'package:lib.widgets/model.dart';
 import 'package:intl/intl.dart';
 
 import 'dashboard_module_model.dart';
+import 'debug.dart';
 
 const double _kFontSize = 20.0;
 
@@ -54,7 +55,8 @@ class _InfoTextState extends State<InfoText> {
                 : 0;
           });
         } catch (_, __) {
-          print('Error: Could not parse ${timestamp.trim()} as a DateTime!');
+          dashboardPrint(
+              'Error: Could not parse ${timestamp.trim()} as a DateTime!');
         }
       });
     });

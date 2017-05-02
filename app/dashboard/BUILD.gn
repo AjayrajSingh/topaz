@@ -13,6 +13,8 @@ flutter_app("dashboard") {
     "//application/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/user:user_dart",
+    "//apps/modules/chat/services:services_dart",
+    "//apps/mozart/lib/flutter",
     "//apps/web_runner/lib/dart:web_view",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
