@@ -201,7 +201,7 @@ dart-clean:
 dart-lint: build
 	@source $(fuchsia_root)/scripts/env.sh && \
 	fset $(FUCHSIA_GEN_TARGET) $(FSET_FLAGS) && \
-	$(fuchsia_root)/scripts/run-dart-analysis.py \
+	$(fuchsia_root)/scripts/run-dart-action.py analyze \
 			--out=$(fuchsia_out)/$(FUCHSIA_VARIANT)-$(FUCHSIA_GEN_TARGET) \
 			--tree=//apps/modules/$(PROJECT)/* \
 			--lints --fatal-lints --fatal-warnings
