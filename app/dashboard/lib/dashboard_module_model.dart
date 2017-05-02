@@ -27,7 +27,7 @@ class DashboardModuleModel extends ModuleModel {
 
   DateTime _startTime = new DateTime.now();
   DateTime _lastRefreshed;
-  List<String> _devices;
+  List<DeviceMapEntry> _devices;
   ModuleControllerProxy _moduleControllerProxy;
   Timer _deviceMapTimer;
 
@@ -56,7 +56,7 @@ class DashboardModuleModel extends ModuleModel {
   DateTime get lastRefreshed => _lastRefreshed;
 
   /// The devices for the current user.
-  List<String> get devices => _devices;
+  List<DeviceMapEntry> get devices => _devices;
 
   /// Starts loading the device map from the environment.
   void loadDeviceMap() {
@@ -70,9 +70,9 @@ class DashboardModuleModel extends ModuleModel {
   }
 
   void _queryDeviceMap() {
-    _deviceMapProxy.query((List<String> devices) {
-      if (!const ListEquality<String>().equals(_devices, devices)) {
-        _devices = new List<String>.unmodifiable(devices);
+    _deviceMapProxy.query((List<DeviceMapEntry> devices) {
+      if (!const ListEquality<DeviceMapEntry>().equals(_devices, devices)) {
+        _devices = new List<DeviceMapEntry>.unmodifiable(devices);
         notifyListeners();
       }
     });
