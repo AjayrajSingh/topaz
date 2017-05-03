@@ -148,13 +148,13 @@ class HomeScreenState extends State<HomeScreen> {
 
 Future<Null> _readAPIKey() async {
   Config config = await Config.read('/system/data/modules/config.json');
-  String googleApiKey = config.get('google_api_key');
-  if (googleApiKey == null) {
-    _log('"google_api_key" value is not specified in config.json.');
-  } else {
-    _apiKey = googleApiKey;
-    _kHomeKey.currentState?.updateUI();
-  }
+
+  config.validate(<String>[
+    'google_api_key',
+  ]);
+
+  _apiKey = config.get('google_api_key');
+  _kHomeKey.currentState?.updateUI();
 }
 
 /// Main entry point to the email folder list module.

@@ -14,14 +14,10 @@ Future<Null> main(List<String> args) async {
   String filename = resolve('../config.json');
   ToolsConfig config = await ToolsConfig.read(filename);
 
-  if (config.has('oauth_id') == false || config.has('oauth_secret') == false) {
-    String message = '''
-Config keys for "oauth_id" and "oauth_secret" are required in file:
-
-  $filename
-    ''';
-    throw new StateError(message);
-  }
+  config.validate(<String>[
+    'oauth_id',
+    'oauth_secret',
+  ]);
 
   ClientId clientId =
       new ClientId(config.get('oauth_id'), config.get('oauth_secret'));

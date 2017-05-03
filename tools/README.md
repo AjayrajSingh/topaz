@@ -31,35 +31,46 @@ Listen to device logs:
 
     $FUCHSIA_DIR/out/build-magenta/tools/loglistener
 
-# Configure
+# Configuration
 
-Add `config.json` in this directory, it will be ignored by version control.
+Checking out the Fuchsia tree ([instructions][get-started]) will create an
+empty `config.json` in this directory. To enable functionality for the modules
+living in `//apps/modules/` some values will need to be set.
 
-    # Using make
-    make config.json
+When the config file is updated a build will be required to load it onto the
+target device (see the Build section below).
 
-Then add two values required for OAuth.
+Email, and Chat require values for:
 
-    {
-      "oauth_id": "<Google APIs client id>"
-      "oauth_secret: "<Google APIs client secret>"
-    }
+* oauth_id: Google APIs client id, used by Email, Chat, etc.
+* oauth_secret: Google APIs client secret, used by Email, Chat, etc.
+* chat_firebase_api_key: Firebase API key, used by Chat.
+* chat_firebase_project_id: Firebase project ID, used by Chat.
+* songkick_api_key: Used by the experimental Music modules.
+* google_api_key: Used by prototype modules; YouTube, Maps, ...
+* google_search_key: Used by the Gallery for image search.
+* google_search_id: Used by the Gallery for image search.
+* usps_api_key: Used by the experimental USPS embedded module.
 
-To setup Google Image Search for the Image Picker, add these additional values
+## Authenticate
 
-  {
-    "google_search_key": "<Google API key for Custom Search Engine>"
-    "google_search_id": "<ID of Custom Search Engine>"
-  }
-
-# Authenticate
-
-Once you have the OAuth id and secret it is possible to generate refresh
-credentials with:
+To authenticate (login) with OAuth make sure the oauth_id, and oauth_secret
+values are set. Generate auth credentials derived from oauth_id, and
+oauth_secret with:
 
     make auth
 
-Follow the link in the instructions.
+This will prompt you to follow a link to login via an OAuth flow.
+
+**NOTE** Re-build to load the new credential values (stored in config.json)
+onto the target device.
+
+The `make auth` task adds generated credentials to the config.json file used by several modules:
+
+* id_token: Needed by the Chat modules.
+* oauth_token: Needed by Chat and Email to make authenticated requests.
+* oauth_token_expiry: Needed by Chat and Email to make authenticated requests.
+* oauth_refresh_token: Needed by Chat and Email to make authenticated requests.
 
 # Build
 
@@ -86,3 +97,5 @@ Running with the full sysui
 Running the email story directly
 
     netruncmd : "@boot device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=<target>"
+
+[get-started]: https://fuchsia.googlesource.com/docs/+/master/getting_started.md

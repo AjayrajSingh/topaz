@@ -36,12 +36,6 @@ auth: config.json ## Update email auth credentials with a refresh token.
 		cp config.json $${dir}/config.json; \
 	done
 
-config.json:
-	@echo "{}" >> config.json
-	@echo "==> Config file added."
-	@echo "==> Add missing values and run: make auth."
-
-
 ################################################################################
 ## Widget Explorer related targets
 
