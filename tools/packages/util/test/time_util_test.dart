@@ -20,7 +20,7 @@ void main() {
   });
 
   test(
-      'relativeDisplayDate() should return minutes/hour/period'
+      'relativeDisplayDate() should return minutes/hour/period '
       'format if the date is the same day as the reference date', () {
     DateTime date = DateTime.parse('1969-07-20 20:18:00');
     DateTime referenceDate = DateTime.parse('1969-07-20 23:18:00');
@@ -32,7 +32,7 @@ void main() {
   });
 
   test(
-      'relativeDisplayDate() should return Month/Day'
+      'relativeDisplayDate() should return Month/Day '
       'format if the date is not same day as the reference date', () {
     DateTime date = DateTime.parse('1969-07-19 20:18:00');
     DateTime referenceDate = DateTime.parse('1969-07-20 23:18:00');
@@ -41,5 +41,19 @@ void main() {
       relativeTo: referenceDate,
     );
     expect(displayDate, 'Jul 19');
+  });
+
+  test(
+      'relativeDisplayDate() should return Month/Day, minutes/hour/period '
+      'format if the date is not same day as the reference date and the '
+      'alwaysIncludeTime is set to true', () {
+    DateTime date = DateTime.parse('1969-07-19 20:18:00');
+    DateTime referenceDate = DateTime.parse('1969-07-20 23:18:00');
+    String displayDate = TimeUtil.relativeDisplayDate(
+      date: date,
+      relativeTo: referenceDate,
+      alwaysIncludeTime: true,
+    );
+    expect(displayDate, 'Jul 19, 8:18 PM');
   });
 }

@@ -17,13 +17,20 @@ class TimeUtil {
         time1.day == time2.day;
   }
 
+  static final DateFormat _timeFormat = new DateFormat.jm();
+  static final DateFormat _dateFormat = new DateFormat.MMMd();
+
   /// Relative user-readable display date
   ///
   /// Rules for Display Date:
   /// 1. Show minutes/hour/am-pm for timestamps in the same day.
   ///    Ex: 10:44 pm
   /// 2. Show month abbreviation + day for timestamps not in the same day.
-  ///    Ex. Aug 15
+  ///    Ex: Aug 15
+  ///
+  /// If [alwaysIncludeTime] is set to [true], the time information is also
+  /// shown even when the timestamps are not in the same day.
+  ///    Ex: Aut 15, 10:44pm
   static String relativeDisplayDate({
     /// The date to render
     DateTime date,
@@ -31,15 +38,22 @@ class TimeUtil {
     /// The relative date (current time) to base the display date off of
     /// Defaults to DateTime.now()
     DateTime relativeTo,
+
+    /// Indicates whether the time information should always be displayed.
+    bool alwaysIncludeTime,
   }) {
     assert(date != null);
     if (relativeTo == null) {
       relativeTo = new DateTime.now();
     }
     if (TimeUtil.isSameDay(relativeTo, date)) {
-      return new DateFormat.jm().format(date);
+      return _timeFormat.format(date);
     } else {
-      return new DateFormat.MMMd().format(date);
+      String result = _dateFormat.format(date);
+      if (alwaysIncludeTime ?? false) {
+        result += ', ${_timeFormat.format(date)}';
+      }
+      return result;
     }
   }
 }
