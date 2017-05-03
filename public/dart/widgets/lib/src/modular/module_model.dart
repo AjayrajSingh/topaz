@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
@@ -19,6 +21,8 @@ class ModuleModel extends Model {
   ModuleContext _moduleContext;
   Link _link;
   ServiceProvider _incomingServiceProvider;
+
+  Completer<Null> _readyCompleter = new Completer<Null>();
 
   /// Indicates whether the [LinkWatcher] should watch for all changes including
   /// the changes made by this [Module]. If [true], it calls [Link.watchAll] to
@@ -38,6 +42,9 @@ class ModuleModel extends Model {
   /// The [ServiceProvider] given to this [Module] as incoming services.
   ServiceProvider get incomingServiceProvider => _incomingServiceProvider;
 
+  /// Gets a [Future] object which completes when [onReady] is called.
+  Future<Null> get ready => _readyCompleter.future;
+
   /// Called when this [Module] is given its [ModuleContext],
   /// [Link], an incoming services [ServiceProvider].
   void onReady(
@@ -48,6 +55,9 @@ class ModuleModel extends Model {
     _moduleContext = moduleContext;
     _link = link;
     _incomingServiceProvider = incomingServiceProvider;
+
+    _readyCompleter.complete();
+
     notifyListeners();
   }
 
