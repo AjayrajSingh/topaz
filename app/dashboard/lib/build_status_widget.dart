@@ -180,7 +180,7 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
           }
 
           return new Material(
-            elevation: 2,
+            elevation: 2.0,
             color: _colorFromBuildStatus(model.buildStatus),
             borderRadius: new BorderRadius.circular(8.0),
             child: new InkWell(
