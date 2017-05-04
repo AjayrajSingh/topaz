@@ -17,8 +17,7 @@ dependencies:
     path: ../../contacts/modules/contacts
   flutter:
     sdk: flutter
-  flutter_markdown:
-    sdk: flutter
+  flutter_markdown: ^0.0.9
   models:
     path: ../packages/models
   widgets:

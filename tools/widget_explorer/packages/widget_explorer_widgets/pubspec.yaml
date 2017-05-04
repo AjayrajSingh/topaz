@@ -7,8 +7,7 @@ description: A collection of helper widgets for building a widget explorer app.
 dependencies:
   flutter:
     sdk: flutter
-  flutter_markdown:
-    sdk: flutter
+  flutter_markdown: ^0.0.9
   meta: ^1.0.5
   widget_explorer_core:
     path: ../widget_explorer_core
