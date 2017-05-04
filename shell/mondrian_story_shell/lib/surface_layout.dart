@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
@@ -10,10 +11,9 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'child_view_node.dart';
+import 'simulated_positioned.dart';
 import 'story_relationships.dart';
 import 'surface_widget.dart';
-
-const Duration _kAnimationDuration = const Duration(milliseconds: 500);
 
 void _log(String msg) {
   print('[MondrianFlutter] $msg');
@@ -80,27 +80,18 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
     });
   }
 
-  void _setOffset(double offset) {
-    setState(() {
-      this.offset = offset;
-      // HACK(alangardner): No better time to ensure removed items are released
-      // Prevents dismissed views from reappearing
-      nodeToBeRemoved = null;
-    });
-  }
-
-  void _endOffset(double velocity) {
-    _log('Offset finished w/ velocity: $velocity');
-    setState(() {
-      // HACK(alangardner): Harcoded distances for swipe gesture
-      // to avoid complicated layout work for this throwaway version.
-      if (offset > 200.0) {
-        nodeToBeRemoved = children.removeLast();
-      } else if (offset < 200.0) {
-        children.last.relationship = kSerial;
-      }
-      this.offset = 0.0;
-    });
+  void _endDrag(ChildViewNode node, SimulatedDragEndDetails details) {
+    // HACK(alangardner): Harcoded distances for swipe gesture
+    // to avoid complicated layout work for this throwaway version.
+    Offset expectedOffset =
+        details.offset + (details.velocity.pixelsPerSecond / 5.0);
+    _log('ExpectedOffset: $expectedOffset ${expectedOffset.distance}');
+    if (expectedOffset.distance > 200.0) {
+      setState(() {
+        children.remove(node);
+        nodeToBeRemoved = node;
+      });
+    }
   }
 
   @override
@@ -110,132 +101,93 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
       final double totalWidth = constraints.maxWidth;
       final double leftWidth = totalWidth / 3.0;
       final double rightWidth = totalWidth - leftWidth;
-      final Duration animationDuration =
-          offset == 0.0 ? _kAnimationDuration : const Duration(milliseconds: 1);
+      final double totalHeight = constraints.maxHeight;
       final List<Widget> childViews = <Widget>[];
+      int numActiveViews = 0;
       if (children.isEmpty) {
         // Add no children
-      } else {
-        if (children.length == 1) {
-          ChildViewNode soleView = children.first;
-          childViews.add(new AnimatedPositioned(
-              key: new ObjectKey(soleView),
-              top: 0.0,
-              bottom: 0.0,
-              left: offset,
-              width: totalWidth,
-              curve: Curves.fastOutSlowIn,
-              duration: animationDuration,
-              child: new Container(
-                  child: new ChildView(connection: soleView.connection))));
-        } else if (children.last.relationship == kSerial) {
-          // One child is full screen
-          ChildViewNode topView = children.last;
-          childViews.add(new AnimatedPositioned(
-              key: new ObjectKey(topView),
-              top: 0.0,
-              bottom: 0.0,
-              left: offset,
-              width: totalWidth,
-              curve: Curves.fastOutSlowIn,
-              duration: animationDuration,
-              child: new SurfaceWidget(
-                  topView, this._setOffset, this._endOffset)));
-          // Animate off previous
-          if (children.length > 1) {
-            ChildViewNode previousView = children[children.length - 2];
-            if (previousView.relationship == kSerial || children.length == 2) {
-              childViews.add(new AnimatedPositioned(
-                  key: new ObjectKey(previousView),
-                  top: 0.0,
-                  bottom: 0.0,
-                  left: -totalWidth + offset,
-                  width: totalWidth,
-                  curve: Curves.fastOutSlowIn,
-                  duration: animationDuration,
-                  child: new SurfaceWidget(
-                      previousView, this._setOffset, this._endOffset)));
-            } else if (previousView.relationship == kHierarchical) {
-              ChildViewNode previousPreviousView =
-                  children[children.length - 3];
-              childViews.add(new AnimatedPositioned(
-                  key: new ObjectKey(previousPreviousView),
-                  top: 0.0,
-                  bottom: 0.0,
-                  left: -totalWidth + offset,
-                  width: leftWidth,
-                  curve: Curves.fastOutSlowIn,
-                  duration: animationDuration,
-                  child: new SurfaceWidget(
-                      previousPreviousView, this._setOffset, this._endOffset)));
-              childViews.add(new AnimatedPositioned(
-                  key: new ObjectKey(previousView),
-                  top: 0.0,
-                  bottom: 0.0,
-                  left: -rightWidth + offset,
-                  width: rightWidth,
-                  curve: Curves.fastOutSlowIn,
-                  duration: animationDuration,
-                  child: new SurfaceWidget(
-                      previousView, this._setOffset, this._endOffset)));
-            }
-          }
-        }
-        if (children.length > 1 &&
-            children.last.relationship == kHierarchical) {
-          // Two children are 1/3 for previous focus, 2/3 for current focus
-          ChildViewNode leftView = children[children.length - 2];
-          ChildViewNode rightView = children.last;
-          childViews.add(new AnimatedPositioned(
-              key: new ObjectKey(leftView),
-              top: 0.0,
-              bottom: 0.0,
-              left: offset,
-              width: leftWidth,
-              curve: Curves.fastOutSlowIn,
-              duration: animationDuration,
-              child: new SurfaceWidget(
-                  leftView, this._setOffset, this._endOffset)));
-          childViews.add(new AnimatedPositioned(
-              key: new ObjectKey(rightView),
-              top: 0.0,
-              bottom: 0.0,
-              left: leftWidth + offset,
-              width: rightWidth,
-              curve: Curves.fastOutSlowIn,
-              duration: animationDuration,
-              child: new SurfaceWidget(
-                  rightView, this._setOffset, this._endOffset)));
-          // Animate off previous
-          if (children.length > 2) {
-            ChildViewNode offscreenLeftView = children[children.length - 3];
-            childViews.add(new AnimatedPositioned(
-                key: new ObjectKey(offscreenLeftView),
+      } else if (children.length == 1) {
+        ChildViewNode soleView = children.first;
+        childViews.add(new SimulatedPositioned(
+            key: new ObjectKey(soleView),
+            top: 0.0,
+            left: 0.0,
+            width: totalWidth,
+            height: totalHeight,
+            child: new Container(
+                child: new ChildView(connection: soleView.connection))));
+      } else if (children.last.relationship == kSerial) {
+        // One child is full screen
+        ChildViewNode topView = children.last;
+        numActiveViews = 1;
+        childViews.add(new SimulatedPositioned(
+            key: new ObjectKey(topView),
+            top: 0.0,
+            left: 0.0,
+            width: totalWidth,
+            height: totalHeight,
+            child: new SurfaceWidget(topView),
+            onDragEnd: (SimulatedDragEndDetails details) {
+              _endDrag(topView, details);
+            }));
+      } else if (children.last.relationship == kHierarchical) {
+        ChildViewNode leftView = children[children.length - 2];
+        ChildViewNode rightView = children.last;
+        numActiveViews = 2;
+        childViews.add(new SimulatedPositioned(
+            key: new ObjectKey(leftView),
+            top: 0.0,
+            left: 0.0,
+            width: leftWidth,
+            height: totalHeight,
+            child: new SurfaceWidget(leftView),
+            onDragEnd: (SimulatedDragEndDetails details) {
+              _endDrag(leftView, details);
+            }));
+        childViews.add(new SimulatedPositioned(
+            key: new ObjectKey(rightView),
+            top: 0.0,
+            left: leftWidth,
+            width: rightWidth,
+            height: totalHeight,
+            child: new SurfaceWidget(rightView),
+            onDragEnd: (SimulatedDragEndDetails details) {
+              _endDrag(rightView, details);
+            }));
+      }
+      List<ChildViewNode> backgroundNodes = children.sublist(
+          max(0, children.length - numActiveViews - 2),
+          max(0, children.length - numActiveViews));
+      for (ChildViewNode backgroundNode in backgroundNodes.reversed) {
+        _log('Background node: $backgroundNode');
+        // Reversed because we insert backward
+        childViews.insert(
+            0,
+            new SimulatedPositioned(
+                key: new ObjectKey(backgroundNode),
                 top: 0.0,
-                bottom: 0.0,
-                left: -leftWidth + offset,
-                width: leftWidth,
-                curve: Curves.fastOutSlowIn,
-                duration: animationDuration,
-                child: new SurfaceWidget(
-                    offscreenLeftView, this._setOffset, this._endOffset)));
-          }
-        }
+                left: 0.0,
+                width: totalWidth,
+                height: totalHeight,
+                child: new SurfaceWidget(backgroundNode),
+                onDragEnd: (SimulatedDragEndDetails details) {
+                  _endDrag(backgroundNode, details);
+                }));
       }
       if (nodeToBeAppended != null) {
         // Upcoming current views animate in from the right
-        childViews.add(new AnimatedPositioned(
+        childViews.add(new SimulatedPositioned(
             key: new ObjectKey(nodeToBeAppended),
             top: 0.0,
-            bottom: 0.0,
-            left: totalWidth + offset,
+            left: totalWidth,
             width: nodeToBeAppended.relationship == kSerial || children.isEmpty
                 ? totalWidth
                 : rightWidth,
-            curve: Curves.fastOutSlowIn,
-            duration: animationDuration,
-            child: new SurfaceWidget(
-                nodeToBeAppended, this._setOffset, this._endOffset)));
+            height: totalHeight,
+            child: new SurfaceWidget(nodeToBeAppended),
+            onDragEnd: (SimulatedDragEndDetails details) {
+              _endDrag(nodeToBeAppended, details);
+            }));
         scheduleMicrotask(() {
           setState(() {
             children.add(nodeToBeAppended);
@@ -244,18 +196,18 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
         });
       }
       if (nodeToBeRemoved != null) {
-        childViews.add(new AnimatedPositioned(
+        childViews.add(new SimulatedPositioned(
             key: new ObjectKey(nodeToBeRemoved),
             top: 0.0,
-            bottom: 0.0,
-            left: totalWidth + offset,
+            left: totalWidth,
             width: nodeToBeRemoved.relationship == kSerial || children.isEmpty
                 ? totalWidth
                 : rightWidth,
-            curve: Curves.fastOutSlowIn,
-            duration: animationDuration,
-            child: new SurfaceWidget(
-                nodeToBeRemoved, this._setOffset, this._endOffset)));
+            height: totalHeight,
+            child: new SurfaceWidget(nodeToBeRemoved),
+            onDragEnd: (SimulatedDragEndDetails details) {
+              _endDrag(nodeToBeRemoved, details);
+            }));
       }
       return new Stack(children: childViews);
     });
