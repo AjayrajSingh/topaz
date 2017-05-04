@@ -83,7 +83,7 @@ class _WidgetExplorerState extends State<WidgetExplorer> {
 
     return new Drawer(
       child: new ListView(children: tiles),
-      elevation: 4,
+      elevation: 4.0,
     );
   }
 

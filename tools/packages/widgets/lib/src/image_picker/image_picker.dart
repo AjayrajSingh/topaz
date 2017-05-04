@@ -117,7 +117,7 @@ class _ImagePickerState extends State<ImagePicker> {
             offstage: _selectedImages.isEmpty,
             child: new Material(
               color: Colors.white,
-              elevation: 2,
+              elevation: 2.0,
               child: new Container(
                 padding: const EdgeInsets.only(
                   right: 8.0,
