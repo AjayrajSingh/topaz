@@ -109,7 +109,7 @@ class HeroBannerScaffold extends StatelessWidget {
         ),
         alignment: FractionalOffset.topLeft,
         child: new Material(
-          elevation: 6,
+          elevation: 6.0,
           type: MaterialType.card,
           color: Colors.white,
           child: new Container(
@@ -175,7 +175,7 @@ class HeroBannerScaffold extends StatelessWidget {
       constraints: new BoxConstraints(minHeight: _kMinBodyHeight),
       alignment: FractionalOffset.topCenter,
       child: new Material(
-        elevation: 4,
+        elevation: 4.0,
         type: MaterialType.card,
         color: Colors.white,
         child: new Container(

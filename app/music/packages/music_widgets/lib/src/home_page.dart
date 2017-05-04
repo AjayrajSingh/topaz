@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: view,
           ),
           new Material(
-            elevation: 4,
+            elevation: 4.0,
             child: new Player(
               currentTrack: fixture.track(),
               playbackPosition: new Duration(seconds: 60),
