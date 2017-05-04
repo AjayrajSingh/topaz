@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:io';
 import 'dart:ui' show lerpDouble;
 
 import 'package:apps.mozart.lib.flutter/child_view.dart';
@@ -97,15 +96,10 @@ class DashboardApp extends StatelessWidget {
 
     return new MaterialApp(
       title: 'Fuchsia Build Status',
-      theme: new ThemeData(
-        primaryColor: _kFuchsiaColor,
-      ),
-      home: new Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: Platform.isFuchsia
-            ? null
-            : new AppBar(title: new Text('Fuchsia Build Status')),
-        body: new LayoutBuilder(
+      theme: new ThemeData(primaryColor: _kFuchsiaColor),
+      home: new Container(
+        color: Colors.grey[200],
+        child: new LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             double chatWidth = constraints.maxWidth / 5.0;
             return new ScopedModelDescendant<DashboardModuleModel>(
