@@ -85,7 +85,7 @@ void ScheduleMicrotask(Dart_NativeArguments args) {
   Dart_Handle closure = Dart_GetNativeArgument(args, 0);
   if (tonic::LogIfError(closure) || !Dart_IsClosure(closure))
     return;
-  tonic::DartMicrotaskQueue::ScheduleMicrotask(closure);
+  tonic::DartMicrotaskQueue::GetForCurrentThread()->ScheduleMicrotask(closure);
 }
 
 }  // namespace
@@ -177,9 +177,6 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(Dart_Invoke(builtin_lib, setup_hooks, 0, nullptr));
   DART_CHECK_VALID(Dart_Invoke(io_lib, setup_hooks, 0, nullptr));
   DART_CHECK_VALID(Dart_Invoke(isolate_lib, setup_hooks, 0, nullptr));
-
-  mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(
-      tonic::DartMicrotaskQueue::RunMicrotasks);
 }
 
 }  // namespace dart_content_handler

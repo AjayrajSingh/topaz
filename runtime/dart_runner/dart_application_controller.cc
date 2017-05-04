@@ -13,6 +13,7 @@
 #include "lib/ftl/logging.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "lib/tonic/dart_message_handler.h"
+#include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/dart_state.h"
 #include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/mx/mx_converter.h"
@@ -20,6 +21,13 @@
 using tonic::ToDart;
 
 namespace dart_content_handler {
+namespace {
+
+void RunMicrotasks() {
+  tonic::DartMicrotaskQueue::GetForCurrentThread()->RunMicrotasks();
+}
+
+} // namespace
 
 DartApplicationController::DartApplicationController(
     std::vector<char> snapshot,
@@ -66,6 +74,9 @@ bool DartApplicationController::Main() {
   // TODO(jeffbrown): Decide what we should do with any startup handles.
   // eg. Redirect stdin, stdout, and stderr.
 
+  tonic::DartMicrotaskQueue::StartForCurrentThread();
+  mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(RunMicrotasks);
+
   InitBuiltinLibrariesForIsolate(
       url, url, std::move(startup_info_->environment),
       std::move(startup_info_->launch_info->services));
@@ -101,6 +112,11 @@ bool DartApplicationController::Main() {
 
 void DartApplicationController::Kill() {
   if (Dart_CurrentIsolate()) {
+    mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
+    tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
+
+    mtl::MessageLoop::GetCurrent()->QuitNow();
+
     // TODO(rosswang): The docs warn of threading issues if doing this again, but
     // without this, attempting to shut down the isolate finalizes app contexts
     // that can't tell a shutdown is in progress and so fatal.
