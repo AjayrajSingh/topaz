@@ -4,36 +4,39 @@
 
 #include "lib/tonic/dart_microtask_queue.h"
 
-#include <vector>
-
 #include "lib/tonic/logging/dart_invoke.h"
-#include "lib/tonic/dart_persistent_value.h"
 #include "lib/tonic/dart_state.h"
 #include "lib/tonic/dart_sticky_error.h"
 
 namespace tonic {
 namespace {
 
-typedef std::vector<DartPersistentValue> MicrotaskQueue;
+thread_local DartMicrotaskQueue* g_queue = nullptr;
 
-DartErrorHandleType g_last_error = kNoError;
-
-static MicrotaskQueue& GetQueue() {
-  static MicrotaskQueue* queue = new MicrotaskQueue();
-  return *queue;
 }
 
-}  // namespace
+DartMicrotaskQueue::DartMicrotaskQueue() : last_error_(kNoError) {}
+
+DartMicrotaskQueue::~DartMicrotaskQueue() = default;
+
+void DartMicrotaskQueue::StartForCurrentThread() {
+  FTL_CHECK(!g_queue);
+  g_queue = new DartMicrotaskQueue();
+}
+
+DartMicrotaskQueue* DartMicrotaskQueue::GetForCurrentThread() {
+  FTL_DCHECK(g_queue);
+  return g_queue;
+}
 
 void DartMicrotaskQueue::ScheduleMicrotask(Dart_Handle callback) {
-  GetQueue().emplace_back(DartState::Current(), callback);
+  queue_.emplace_back(DartState::Current(), callback);
 }
 
 void DartMicrotaskQueue::RunMicrotasks() {
-  MicrotaskQueue& queue = GetQueue();
-  while (!queue.empty()) {
+  while (!queue_.empty()) {
     MicrotaskQueue local;
-    std::swap(queue, local);
+    std::swap(queue_, local);
     for (const auto& callback : local) {
       ftl::WeakPtr<DartState> dart_state = callback.dart_state();
       if (!dart_state.get())
@@ -42,13 +45,19 @@ void DartMicrotaskQueue::RunMicrotasks() {
       Dart_Handle result = DartInvokeVoid(callback.value());
       DartErrorHandleType error = GetErrorHandleType(result);
       if (error != kNoError)
-        g_last_error = error;
+        last_error_ = error;
     }
   }
 }
 
+void DartMicrotaskQueue::Destroy() {
+  FTL_DCHECK(g_queue);
+  delete g_queue;
+  g_queue = nullptr;
+}
+
 DartErrorHandleType DartMicrotaskQueue::GetLastError() {
-  return g_last_error;
+  return last_error_;
 }
 
 }
