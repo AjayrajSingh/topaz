@@ -85,8 +85,8 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
     // to avoid complicated layout work for this throwaway version.
     Offset expectedOffset =
         details.offset + (details.velocity.pixelsPerSecond / 5.0);
-    _log('ExpectedOffset: $expectedOffset ${expectedOffset.distance}');
-    if (expectedOffset.distance > 200.0) {
+    // Only remove if greater than threshold ant not root surface.
+    if (expectedOffset.distance > 200.0 && children.indexOf(node) != 0) {
       setState(() {
         children.remove(node);
         nodeToBeRemoved = node;
@@ -164,15 +164,13 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
         childViews.insert(
             0,
             new SimulatedPositioned(
-                key: new ObjectKey(backgroundNode),
-                top: 0.0,
-                left: 0.0,
-                width: totalWidth,
-                height: totalHeight,
-                child: new SurfaceWidget(backgroundNode),
-                onDragEnd: (SimulatedDragEndDetails details) {
-                  _endDrag(backgroundNode, details);
-                }));
+              key: new ObjectKey(backgroundNode),
+              top: 0.0,
+              left: 0.0,
+              width: totalWidth,
+              height: totalHeight,
+              child: new SurfaceWidget(backgroundNode, interactable: false),
+            ));
       }
       if (nodeToBeAppended != null) {
         // Upcoming current views animate in from the right
