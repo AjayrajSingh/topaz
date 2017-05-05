@@ -4,29 +4,64 @@
 
 #include "lib/tonic/dart_microtask_queue.h"
 
+#include "lib/ftl/build_config.h"
 #include "lib/tonic/logging/dart_invoke.h"
 #include "lib/tonic/dart_state.h"
 #include "lib/tonic/dart_sticky_error.h"
 
+#ifdef OS_IOS
+#include <pthread.h>
+#endif
+
 namespace tonic {
 namespace {
 
+#ifdef OS_IOS
+// iOS doesn't support the thread_local keyword.
+
+pthread_key_t g_queue_key;
+pthread_once_t g_queue_key_once = PTHREAD_ONCE_INIT;
+
+void MakeKey() {
+  pthread_key_create(&g_queue_key, nullptr);
+}
+
+void SetQueue(DartMicrotaskQueue* queue) {
+  pthread_once(&g_queue_key_once, MakeKey);
+  pthread_setspecific(g_queue_key, queue);
+}
+
+DartMicrotaskQueue* GetQueue() {
+  return static_cast<tonic::DartMicrotaskQueue*>(
+      pthread_getspecific(g_queue_key));
+}
+
+#else
+
 thread_local DartMicrotaskQueue* g_queue = nullptr;
 
+void SetQueue(DartMicrotaskQueue* queue) {
+  g_queue = queue;
 }
+
+DartMicrotaskQueue* GetQueue() {
+  return g_queue;
+}
+
+#endif
+
+} // namespace
 
 DartMicrotaskQueue::DartMicrotaskQueue() : last_error_(kNoError) {}
 
 DartMicrotaskQueue::~DartMicrotaskQueue() = default;
 
 void DartMicrotaskQueue::StartForCurrentThread() {
-  FTL_CHECK(!g_queue);
-  g_queue = new DartMicrotaskQueue();
+  SetQueue(new DartMicrotaskQueue());
 }
 
 DartMicrotaskQueue* DartMicrotaskQueue::GetForCurrentThread() {
-  FTL_DCHECK(g_queue);
-  return g_queue;
+  return GetQueue();
 }
 
 void DartMicrotaskQueue::ScheduleMicrotask(Dart_Handle callback) {
@@ -51,9 +86,9 @@ void DartMicrotaskQueue::RunMicrotasks() {
 }
 
 void DartMicrotaskQueue::Destroy() {
-  FTL_DCHECK(g_queue);
-  delete g_queue;
-  g_queue = nullptr;
+  FTL_DCHECK(this == GetForCurrentThread());
+  SetQueue(nullptr);
+  delete this;
 }
 
 DartErrorHandleType DartMicrotaskQueue::GetLastError() {
