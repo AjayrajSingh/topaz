@@ -22,7 +22,7 @@ class ModuleModel extends Model {
   Link _link;
   ServiceProvider _incomingServiceProvider;
 
-  Completer<Null> _readyCompleter = new Completer<Null>();
+  final Completer<Null> _readyCompleter = new Completer<Null>();
 
   /// Indicates whether the [LinkWatcher] should watch for all changes including
   /// the changes made by this [Module]. If [true], it calls [Link.watchAll] to
