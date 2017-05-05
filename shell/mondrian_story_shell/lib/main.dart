@@ -7,12 +7,15 @@ import 'package:apps.modular.services.story/story_shell.fidl.dart';
 import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
+import 'logo.dart';
 import 'model.dart';
+import 'overview.dart';
 import 'surface_details.dart';
 import 'surface_layout.dart';
 
@@ -94,6 +97,52 @@ class StoryShellFactoryImpl extends StoryShellFactory {
   }
 }
 
+/// High level class for choosing between presentations
+class Mondrian extends StatefulWidget {
+  /// Constructor
+  Mondrian({Key key}) : super(key: key);
+
+  @override
+  MondrianState createState() => new MondrianState();
+}
+
+/// State
+class MondrianState extends State<Mondrian> {
+  bool _showOverview = false;
+
+  @override
+  Widget build(BuildContext context) => new Stack(
+        children: <Widget>[
+          new ScopedModel<SurfaceGraph>(
+            model: _surfaceGraph,
+            child: _showOverview ? new Overview() : new SurfaceLayout(),
+          ),
+          new Positioned(
+            left: 0.0,
+            bottom: 0.0,
+            child: new Material(
+              color: const Color.fromARGB(0, 0, 0, 0),
+              child: new InkWell(
+                child: new Container(
+                    width: 40.0,
+                    height: 40.0,
+                    child: new AnimatedOpacity(
+                        child: new MondrianLogo(),
+                        opacity: _showOverview ? 1.0 : 0.0,
+                        curve: Curves.decelerate,
+                        duration: const Duration(milliseconds: 250))),
+                onTap: () {
+                  setState(() {
+                    _showOverview = !_showOverview;
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      );
+}
+
 /// Entry point.
 void main() {
   _log('Mondrian started');
@@ -101,9 +150,7 @@ void main() {
   _surfaceGraph = new SurfaceGraph();
   // Note: This implementation only supports one StoryShell at a time.
   // Initialize the one Flutter application we support
-  runApp(new WindowMediaQuery(
-      child: new ScopedModel<SurfaceGraph>(
-          model: _surfaceGraph, child: new SurfaceLayout())));
+  runApp(new WindowMediaQuery(child: new Mondrian()));
 
   _appContext.outgoingServices.addServiceForName(
     (InterfaceRequest<StoryShellFactory> request) {
