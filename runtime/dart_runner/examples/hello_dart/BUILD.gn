@@ -7,6 +7,8 @@ import("//apps/dart_content_handler/dart_app.gni")
 dart_app("hello_dart") {
   main_dart = "hello_dart.dart"
 
+  source_dir = "."
+
   deps = [
     "//apps/dart_content_handler/examples/hello_dart/greeting",
   ]

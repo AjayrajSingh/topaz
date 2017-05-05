@@ -11,7 +11,7 @@ import 'package:application.services/application_launcher.fidl.dart';
 import 'package:application.services/service_provider.fidl.dart';
 import 'package:test/test.dart';
 
-main(List<String> args) {
+void main(List<String> args) {
   final context = new ApplicationContext.fromStartupInfo();
   tearDownAll(context.close);
 

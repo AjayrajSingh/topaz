@@ -11,6 +11,8 @@ dart_app("integration") {
 
   main_dart = "main.dart"
 
+  source_dir = "."
+
   deps = [
     "//application/lib/app/dart",
     "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
