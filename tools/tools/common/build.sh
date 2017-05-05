@@ -13,7 +13,25 @@ source "${FUCHSIA_DIR}/scripts/env.sh"
 function main() {
   echo "=== buidling Fuchsia"
 
-  fset x86-64 $@
+  local gen_args=""
+
+  while [[ $# -ne 0 ]]; do
+    case $1 in
+      --gen-arg)
+        gen_args="${gen_args} $2"
+        shift
+        ;;
+    esac
+    shift
+  done
+
+  fset x86-64 "$@"
+  if [[ -z "${gen_args}" ]]; then
+    fgen
+  else
+    fgen "${gen_args}"
+  fi
+
   fbuild
 }
 

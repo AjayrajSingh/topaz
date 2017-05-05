@@ -83,6 +83,7 @@ PATH := $(flutter_bin):$(dart_bin):$(PATH)
 # Specify GOMA=1 to force use goma, GOMA=0 to force not use goma.
 # Auto-detect if not specified.
 FSET_FLAGS :=
+FGEN_FLAGS :=
 GOMA ?=
 ifeq ($(GOMA),1)
 	FSET_FLAGS += --goma
@@ -107,6 +108,7 @@ endif
 MINIMAL ?=
 ifeq ($(MINIMAL),1)
 	FSET_FLAGS += --modules modules
+	FGEN_FLAGS += --ignore-skia
 endif
 
 # Respect the fuchsia build variant if already set by fset command externally.
@@ -116,6 +118,7 @@ ifeq ($(FUCHSIA_VARIANT),release)
 	FSET_FLAGS += --release
 endif
 
+BUILD_FLAGS := $(addprefix --gen-arg ,$(FGEN_FLAGS)) $(FSET_FLAGS)
 FUCHSIA_GEN_TARGET ?= x86-64
 
 ################################################################################
@@ -130,7 +133,7 @@ init: ## Set path to pick up deps with: eval $(make init)
 
 .PHONY: build
 build: $(dart_analysis_options) build-override ## Build Fuchsia with project.
-	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/build.sh $(FSET_FLAGS)
+	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/build.sh $(BUILD_FLAGS)
 
 .PHONY: clean
 clean: dart-clean ## Clean build artifacts from this project.
