@@ -16,12 +16,20 @@ function main() {
   local gen_args=""
 
   while [[ $# -ne 0 ]]; do
+    local exit_loop=""
     case $1 in
       --gen-arg)
         gen_args="${gen_args} $2"
         shift
         ;;
+      *)
+        exit_loop=true
+        break
+        ;;
     esac
+    if [ "${exit_loop}" = true ]; then
+      break
+    fi
     shift
   done
 
@@ -29,7 +37,7 @@ function main() {
   if [[ -z "${gen_args}" ]]; then
     fgen
   else
-    fgen "${gen_args}"
+    fgen "${gen_args:1}"
   fi
 
   fbuild
