@@ -101,7 +101,7 @@ class ModuleImpl extends Module {
     moduleContext.startModule(
       url, // module name
       url,
-      null,  // Pass our default link to our child
+      null, // Pass our default link to our child
       outgoingServices,
       incomingServices,
       moduleControllerPair.passRequest(),

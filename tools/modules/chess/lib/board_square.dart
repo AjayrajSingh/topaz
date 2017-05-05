@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'board_piece.dart';
 
 /// A [Widget] for a board square.
+// ignore: must_be_immutable
 class BoardSquare extends StatelessWidget {
   // TODO: ColorTween
 

@@ -18,4 +18,6 @@ flutter_app("chess") {
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
   ]
+
+  analysis_options = "//apps/modules/common/.analysis_options"
 }

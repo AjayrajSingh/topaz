@@ -12,7 +12,6 @@ import 'package:meta/meta.dart';
 import 'package:models/youtube.dart';
 import 'package:widgets_meta/widgets_meta.dart';
 
-
 import 'example_video_id.dart';
 import 'loading_state.dart';
 

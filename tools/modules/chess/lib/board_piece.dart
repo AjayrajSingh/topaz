@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// A class representing a board piece
+// ignore: must_be_immutable
 class BoardPiece extends StatelessWidget {
   /// The index at which the board piece located
   int index;
