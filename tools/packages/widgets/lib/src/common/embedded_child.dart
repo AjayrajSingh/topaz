@@ -157,7 +157,7 @@ class EmbeddedChildProvider {
   ///
   /// The `dispose()` method of the returned [EmbeddedChild] must be called when
   /// the child is no longer in use.
-  EmbeddedChild buildGeneralEmbeddedChild({
+  void buildGeneralEmbeddedChild({
     String contract,
     dynamic initialData,
     EmbeddedChildAdder childAdder,

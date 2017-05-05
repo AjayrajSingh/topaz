@@ -10,17 +10,18 @@ class GalleryDrawer extends StatefulWidget {
   /// Create a [GalleryDrawer] instance, which is a material navigation drawer.
   GalleryDrawer({
     Key key,
-    this.showPerformanceOverlay,
+    bool showPerformanceOverlay,
     this.onShowPerformanceOverlayChanged,
   })
-      : super(key: key);
+      : showPerformanceOverlay = showPerformanceOverlay ?? false,
+        super(key: key);
 
   /// Indicates whether the performance overlay should be shown.
-  bool showPerformanceOverlay = false;
+  final bool showPerformanceOverlay;
 
   /// A callback function to be called when the 'Performance Overlay' checkbox
   /// value is changed.
-  ValueChanged<bool> onShowPerformanceOverlayChanged;
+  final ValueChanged<bool> onShowPerformanceOverlayChanged;
 
   @override
   _GalleryDrawerState createState() => new _GalleryDrawerState();

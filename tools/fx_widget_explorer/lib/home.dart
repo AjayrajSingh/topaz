@@ -14,17 +14,18 @@ class Home extends StatefulWidget {
   /// Creates an instance of [Home].
   Home({
     Key key,
-    this.showPerformanceOverlay,
+    bool showPerformanceOverlay,
     this.onShowPerformanceOverlayChanged,
   })
-      : super(key: key);
+      : showPerformanceOverlay = showPerformanceOverlay ?? false,
+        super(key: key);
 
   /// Indicates whether the performance overlay should be shown.
-  bool showPerformanceOverlay = false;
+  final bool showPerformanceOverlay;
 
   /// A callback function to be called when the 'Performance Overlay' checkbox
   /// value is changed.
-  ValueChanged<bool> onShowPerformanceOverlayChanged;
+  final ValueChanged<bool> onShowPerformanceOverlayChanged;
 
   @override
   _HomeState createState() => new _HomeState();

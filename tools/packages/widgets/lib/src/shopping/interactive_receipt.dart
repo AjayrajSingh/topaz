@@ -231,7 +231,7 @@ class _InteractiveReceiptState extends State<InteractiveReceipt>
                     _controller.reverse();
                     _scaffoldKey.currentState.showSnackBar(new SnackBar(
                       duration: _kSnackBarDisplayDuration,
-                      color: Colors.green[500],
+                      backgroundColor: Colors.green[500],
                       content: new Text(
                         'Your order has been successfully modified',
                         textAlign: TextAlign.center,
@@ -469,6 +469,7 @@ class _InteractiveReceiptState extends State<InteractiveReceipt>
 }
 
 /// Animates the Phone Image from 100dp to 200dp
+// ignore: must_be_immutable
 class _AnimatedPhoneImage extends AnimatedWidget {
   final String imageUrl;
 

@@ -13,7 +13,7 @@ class BoardPiece extends StatelessWidget {
   int index;
 
   /// Name of the piece represented as a single character (one of "RNBQKPrnbqkp")
-  String name;
+  final String name;
 
   /// Image of the piece
   Image pieceImage;
@@ -62,13 +62,12 @@ class BoardPiece extends StatelessWidget {
         child: pieceImage,
         childWhenDragging: new Container(
             child: null,
-            decoration:
-                new BoxDecoration(color: Theme.of(context).accentColor
+            decoration: new BoxDecoration(color: Theme.of(context).accentColor
 //                border: new Border.all(
 //                    color: Colors.cyan[400],
 //                    width: 2.0,
 //                    ),
-                    )),
+                )),
         feedback: new Image(image: this.pieceImage.image, height: height),
         maxSimultaneousDrags: 1,
         onDragStarted: () {

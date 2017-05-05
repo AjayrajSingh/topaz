@@ -121,7 +121,7 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
           '$e');
     }
 
-    return new BlockBody(
+    return new ListBody(
       children: <Widget>[
         new Container(
           decoration: new BoxDecoration(
@@ -133,7 +133,7 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
           child: new Container(
             child: new Container(
               margin: const EdgeInsets.all(_kMargin),
-              child: new BlockBody(
+              child: new ListBody(
                 children: <Widget>[
                   new Text(
                     'Parameters',
@@ -212,16 +212,14 @@ TableRow buildTableRow(BuildContext context, List<Widget> children) {
   return new TableRow(
     children: <Widget>[
       new _TopMargined(
-        child: new DefaultTextStyle.merge(
-          context: context,
+        child: DefaultTextStyle.merge(
           style: _kCodeStyle,
           child: children[0],
         ),
       ),
       new Container(), // Empty column
       new _TopMargined(
-        child: new DefaultTextStyle.merge(
-          context: context,
+        child: DefaultTextStyle.merge(
           style: _kCodeStyle,
           child: children[1],
         ),
@@ -267,14 +265,19 @@ class RegenerateButton extends StatelessWidget {
 }
 
 /// A text widget for information displayed in the parameter tuning panel.
-class InfoText extends Text {
+class InfoText extends StatelessWidget {
+  /// Text to display.
+  final String text;
+
   /// Creates a new instance of [InfoText].
-  InfoText(String text, {Key key})
-      : super(
-          text,
-          key: key,
-          style: _kInfoStyle,
-        );
+  InfoText(this.text, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => new Text(
+        text,
+        key: key,
+        style: _kInfoStyle,
+      );
 }
 
 /// A widget indicating whether a config value has been successfully retrieved.
