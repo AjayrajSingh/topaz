@@ -48,7 +48,8 @@ class _ContactCardScreenState extends State<ContactCardScreen> {
   }
 
   @override
-  void didUpdateWidget(_) {
+  void didUpdateWidget(ContactCardScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
     _loadContact();
   }
 
