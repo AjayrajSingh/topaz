@@ -9,6 +9,8 @@ flutter_app("latin-ime") {
 
   manifest = "pubspec.yaml"
 
+  source_dir = "."
+
   deps = [
     "//application/lib/app/dart",
     "//application/services:services_dart",

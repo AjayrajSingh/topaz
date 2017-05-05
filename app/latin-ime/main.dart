@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:application.lib.app.dart/app.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard/keyboard.dart';
 
@@ -11,9 +10,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Theme(
       data: new ThemeData.light(),
-      child: new Keyboard(
-
-      ),
+      child: new Keyboard(),
     );
   }
 }

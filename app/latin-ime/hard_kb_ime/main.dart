@@ -21,7 +21,8 @@ _EditSession _currentSession;
 
 /// A class representing an editing session.
 class _EditSession {
-  InputMethodEditorClient _client = new InputMethodEditorClientProxy();
+  final InputMethodEditorClientProxy _client =
+    new InputMethodEditorClientProxy();
   TextInputState _state;
   int _maxRev = 0;
 
@@ -29,6 +30,10 @@ class _EditSession {
 
   void init(InterfaceHandle<InputMethodEditorClient> clientHandle) {
     _client.ctrl.bind(clientHandle);
+  }
+
+  void close() {
+    _client.ctrl.close();
   }
 
   void updateState(String text, TextSelection selection, TextRange composing,
@@ -77,7 +82,7 @@ class InputListenerImpl extends InputListener {
   }
 
   @override
-  onEvent(InputEvent event, void callback(bool consumed)) {
+  void onEvent(InputEvent event, void callback(bool consumed)) {
     callback(_currentSession?.onEvent(event));
   }
 }
@@ -93,7 +98,7 @@ class InputMethodEditorImpl extends InputMethodEditor {
   }
 
   @override
-  void setKeyboardType(KeyboardType keyboard_type) {
+  void setKeyboardType(KeyboardType keyboardType) {
     // nothing to do for hw kb
   }
 
@@ -115,13 +120,14 @@ class ImeServiceImpl extends ImeService {
     KeyboardType keyboardType,
     TextInputState initialState,
     InterfaceHandle<InputMethodEditorClient> client,
-    InterfaceRequest<InputMethodEditor> session
+    InterfaceRequest<InputMethodEditor> editor
   ) {
     // Shut down the old session; we only have one active at a time.
-    _currentSession?.ctrl?.close();
+    _currentSession?.close();
 
     _EditSession session = new _EditSession(initialState);
     session.init(client);
+    // ignore: unused_local_variable
     InputMethodEditorImpl imeImpl = new InputMethodEditorImpl(session);
     _currentSession = session;
   }
