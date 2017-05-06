@@ -59,8 +59,16 @@ class ArtistModuleModel extends ModuleModel {
   Future<Null> onNotify(String json) async {
     final dynamic doc = JSON.decode(json);
     String artistId;
+
     try {
-      artistId = Uri.parse(doc['view']['uri']).pathSegments[0];
+      final dynamic uri = doc['view'];
+      if (uri['scheme'] == 'spotify' && uri['host'] == 'artist') {
+        artistId = uri['path segments'][0];
+      } else if (uri['path segments'][0] == 'artist') {
+        artistId = uri['path segments'][1];
+      } else {
+        return;
+      }
     } catch (_) {
       return;
     }

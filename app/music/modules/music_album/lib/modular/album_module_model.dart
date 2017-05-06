@@ -40,8 +40,16 @@ class AlbumModuleModel extends ModuleModel {
   void onNotify(String json) {
     final dynamic doc = JSON.decode(json);
     String albumId;
+
     try {
-      albumId = Uri.parse(doc['view']['uri']).pathSegments[0];
+      final dynamic uri = doc['view'];
+      if (uri['scheme'] == 'spotify' && uri['host'] == 'album') {
+        albumId = uri['path segments'][0];
+      } else if (uri['path segments'][0] == 'album') {
+        albumId = uri['path segments'][1];
+      } else {
+        return;
+      }
     } catch (_) {
       return;
     }

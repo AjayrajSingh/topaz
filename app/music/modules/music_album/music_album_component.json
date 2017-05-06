@@ -11,9 +11,22 @@
   },
   "fuchsia:module": {
     "contract": "view",
-    "data_preconditions": {
-      "scheme": "spotify",
-      "host": "album"
+    "data_schema": {
+      "type": "object",
+      "anyOf": [{
+        "properties" : {
+          "scheme" : { "enum": ["spotify"] },
+          "host" : { "enum": ["album"] }
+        }
+      }, {
+        "properties": {
+          "host": { "enum": ["open.spotify.com"] },
+          "path segments": {
+            "type": "array",
+            "items": [{ "enum": ["album"] }]
+          }
+        }
+      }]
     }
   }
 }
