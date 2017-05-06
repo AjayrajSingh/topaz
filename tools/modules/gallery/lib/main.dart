@@ -2,32 +2,22 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
+import 'package:application.lib.app.dart/app.dart';
+import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/modular.dart';
 
-import 'package:config_flutter/config.dart';
-import 'package:flutter/material.dart';
-import 'package:widgets/image_picker.dart';
+import 'src/modular/gallery_screen.dart';
+import 'src/modular/module_model.dart';
 
-Future<Null> main() async {
-  // Get the config object.
-  FlutterConfig config = await FlutterConfig.read('assets/config.json');
+void main() {
+  ModuleWidget<GalleryModuleModel> moduleWidget =
+      new ModuleWidget<GalleryModuleModel>(
+    applicationContext: new ApplicationContext.fromStartupInfo(),
+    moduleModel: new GalleryModuleModel(),
+    child: new GalleryScreen(),
+  );
 
-  runApp(new MaterialApp(
-    title: 'Image Picker',
-    theme: new ThemeData(
-      primarySwatch: Colors.blue,
-    ),
-    home: new Scaffold(
-      body: new Container(
-        margin: const EdgeInsets.only(top: 30.0),
-        child: new GoogleSearchImagePicker(
-            apiKey: config.get('google_search_key'),
-            customSearchId: config.get('google_search_id'),
-            onAdd: (List<String> images) {
-              print('added:');
-              print(images);
-            }),
-      ),
-    ),
-  ));
+  moduleWidget.advertise();
+
+  runApp(moduleWidget);
 }
