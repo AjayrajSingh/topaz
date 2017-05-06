@@ -46,6 +46,6 @@ void main(List<String> args) {
     expect(await hello.future, equals("hola from Dart!"));
 
     actl.ctrl.close();
-    expect(service.ctrl.error.timeout(new Duration(seconds: 2)), throws);
+    expect(service.ctrl.error.timeout(new Duration(seconds: 2)), throwsA(anything));
   });
 }
