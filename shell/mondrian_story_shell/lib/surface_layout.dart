@@ -108,6 +108,7 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
         // Add no children
       } else if (children.length == 1) {
         ChildViewNode soleView = children.first;
+        numActiveViews = 1;
         childViews.add(new SimulatedPositioned(
             key: new ObjectKey(soleView),
             top: 0.0,
