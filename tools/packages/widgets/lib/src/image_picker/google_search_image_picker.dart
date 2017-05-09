@@ -4,13 +4,15 @@
 
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:google_search_api/google_search_api.dart';
+import 'package:lib.widgets/hacks.dart';
 import 'package:meta/meta.dart';
 
 import 'image_picker.dart';
 
-const Duration _kSearchDelay = const Duration(milliseconds: 500);
+const Duration _kSearchDelay = const Duration(milliseconds: 1000);
 
 /// Wrapper around a [ImagePicker] that uses Google Custom Search to populate
 /// images based on a given query.
@@ -24,12 +26,18 @@ class GoogleSearchImagePicker extends StatefulWidget {
   /// ID of the Custom Google Search instance
   final String customSearchId;
 
+  /// Optional initial image search query
+  final String query;
+
+  /// Optional list of initial list of selected image urls.
+  final List<String> initialSelection;
+
+  /// Callback that is fired when the set of selected images is changed
+  final ImageSelectCallback onSelectionChanged;
+
   /// Callback that is fired when the user has completed selecting all the
   /// images and wants to "add them"
   final ImageSelectCallback onAdd;
-
-  /// optional initial image search query
-  final String query;
 
   /// Constructor
   GoogleSearchImagePicker({
@@ -37,6 +45,8 @@ class GoogleSearchImagePicker extends StatefulWidget {
     @required this.apiKey,
     @required this.customSearchId,
     this.query,
+    this.initialSelection,
+    this.onSelectionChanged,
     this.onAdd,
   })
       : super(key: key) {
@@ -56,6 +66,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   bool _isLoading = false;
   Timer _timer;
   String _lastSearchQuery;
+  List<String> _initialSelection;
   // Give a Google query a "count" so that a slower query doesn't overwrite
   // a later query that resolves faster.
   int _counter = 0;
@@ -75,13 +86,13 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   // keystrokes.
   void _setTimer() {
     _timer?.cancel();
-    _timer = new Timer(_kSearchDelay, () => _search(_controller.text));
+    _timer = new Timer(_kSearchDelay, () => _search(_controller.text, null));
   }
 
   bool get _hideEmptyState =>
       _isLoading || _sourceImages.isNotEmpty || _controller.text.isNotEmpty;
 
-  Future<Null> _search(String query) async {
+  Future<Null> _search(String query, List<String> initialSelection) async {
     if (query == _lastSearchQuery) {
       return null;
     }
@@ -104,6 +115,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
         setState(() {
           _lastSearchQuery = query;
           _sourceImages = images;
+          _initialSelection = initialSelection;
           _isLoading = false;
         });
       }
@@ -113,20 +125,27 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   @override
   void initState() {
     super.initState();
+
     _controller = new TextEditingController(text: widget.query);
     _lastInputValue = _controller.text;
+
     if (widget.query != null && widget.query.isNotEmpty) {
-      _search(widget.query);
+      _search(widget.query, widget.initialSelection);
     }
   }
 
   @override
-  void didUpdateWidget(GoogleSearchImagePicker oldState) {
-    super.didUpdateWidget(oldState);
+  void didUpdateWidget(GoogleSearchImagePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
     // Make a new search if widget.query has been changed
-    if (oldState.query ?? '' == _controller.text) {
-      _controller.text = widget.query ?? '';
-      _search(widget.query);
+    if (oldWidget.query != widget.query ||
+        !const ListEquality<String>()
+            .equals(oldWidget.initialSelection, widget.initialSelection)) {
+      if (oldWidget.query ?? '' == _controller.text) {
+        _controller.text = widget.query ?? '';
+        _search(widget.query, widget.initialSelection);
+      }
     }
   }
 
@@ -153,7 +172,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
             ),
           ),
           new Expanded(
-            child: new TextField(
+            child: new FuchsiaCompatibleTextField(
               controller: _controller,
               onChanged: _handleInputChange,
               decoration: new InputDecoration.collapsed(
@@ -224,6 +243,9 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
             children: <Widget>[
               new ImagePicker(
                 imageUrls: _sourceImages,
+                initialSelection: _initialSelection,
+                onSelectionChanged: widget.onSelectionChanged,
+                onAdd: widget.onAdd,
               ),
               loadingOverlay,
               emptyState,

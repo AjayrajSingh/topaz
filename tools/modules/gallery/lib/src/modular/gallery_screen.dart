@@ -29,6 +29,9 @@ class GalleryScreen extends StatelessWidget {
                     apiKey: model.apiKey,
                     customSearchId: model.customSearchId,
                     query: model.queryString,
+                    initialSelection: model.initialSelection,
+                    onSelectionChanged: model.handleSelectionChanged,
+                    onAdd: model.handleAdd,
                   )
                 : new Center(child: new CircularProgressIndicator());
           },

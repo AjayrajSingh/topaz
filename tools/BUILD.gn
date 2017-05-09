@@ -5,6 +5,7 @@
 group("common") {
   deps = [
     "//apps/modules/common/modules",
+    "//apps/modules/common/services",
   ]
 }
 

@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:collection';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -19,6 +22,12 @@ class ImagePicker extends StatefulWidget {
   /// List of source image urls to populate the image picker
   final List<String> imageUrls;
 
+  /// Optional list of initially selected images
+  final List<String> initialSelection;
+
+  /// Callback that is fired when the set of selected images is changed
+  final ImageSelectCallback onSelectionChanged;
+
   /// Callback that is fired when the user has completed selecting all the
   /// images and wants to "add them"
   final ImageSelectCallback onAdd;
@@ -27,6 +36,8 @@ class ImagePicker extends StatefulWidget {
   ImagePicker({
     Key key,
     @required this.imageUrls,
+    this.initialSelection,
+    this.onSelectionChanged,
     this.onAdd,
   })
       : super(key: key) {
@@ -38,16 +49,24 @@ class ImagePicker extends StatefulWidget {
 }
 
 class _ImagePickerState extends State<ImagePicker> {
-  final List<String> _selectedImages = <String>[];
+  List<String> _selectedImages;
 
   void _handleTap(String url) {
     setState(() {
       if (_selectedImages.contains(url)) {
         _selectedImages.remove(url);
+        _notifySelectionChanged();
       } else {
         _selectedImages.add(url);
+        _notifySelectionChanged();
       }
     });
+  }
+
+  void _notifySelectionChanged() {
+    widget.onSelectionChanged?.call(
+      new UnmodifiableListView<String>(_selectedImages),
+    );
   }
 
   String get _selectionText {
@@ -59,15 +78,33 @@ class _ImagePickerState extends State<ImagePicker> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    _setInitialSelection();
+  }
+
+  @override
   void didUpdateWidget(ImagePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     // Reset selected images if the source has changed
-    if (oldWidget.imageUrls != widget.imageUrls) {
+    if (oldWidget.imageUrls != widget.imageUrls ||
+        !const ListEquality<String>()
+            .equals(oldWidget.initialSelection, widget.initialSelection)) {
       setState(() {
-        _selectedImages.clear();
+        _setInitialSelection();
+        _notifySelectionChanged();
       });
     }
+  }
+
+  void _setInitialSelection() {
+    _selectedImages = widget.initialSelection != null
+        ? widget.initialSelection
+            .where((String url) => widget.imageUrls.contains(url))
+            .toList()
+        : <String>[];
   }
 
   @override
