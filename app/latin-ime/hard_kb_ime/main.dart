@@ -58,12 +58,12 @@ class _EditSession {
       if (kbEvent.phase == KeyboardEventPhase.pressed && kbEvent.codePoint != 0) {
         // TODO: handle combining characters
         String newChar = new String.fromCharCode(kbEvent.codePoint);
-        int start = min(_state.selection.baseOffset, _state.selection.extentOffset);
-        int end = max(_state.selection.baseOffset, _state.selection.extentOffset);
+        int start = min(_state.selection.base, _state.selection.extent);
+        int end = max(_state.selection.base, _state.selection.extent);
         String newText = _state.text.replaceRange(start, end, newChar);
         int cursor = start + newChar.length;
         TextSelection newSelection = new TextSelection.init(
-          cursor, cursor, cursor, cursor, TextAffinity.downstream);
+          cursor, cursor, TextAffinity.downstream);
         updateState(newText, newSelection, new TextRange(), event);
         return true;
       }
