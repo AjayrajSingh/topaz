@@ -46,6 +46,7 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
           onStop: moduleModel?.onStop,
           onNotify: moduleModel?.onNotify,
           watchAll: moduleModel?.watchAll,
+          outgoingServiceProvider: moduleModel?.outgoingServiceProvider,
         );
 
   @override

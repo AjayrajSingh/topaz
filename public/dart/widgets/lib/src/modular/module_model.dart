@@ -42,6 +42,11 @@ class ModuleModel extends Model {
   /// The [ServiceProvider] given to this [Module] as incoming services.
   ServiceProvider get incomingServiceProvider => _incomingServiceProvider;
 
+  /// The [ServiceProvider] exposed to the parent module. Modules should
+  /// override this to provide an actual instance, if they wish to expose
+  /// outgoing services to their parents.
+  ServiceProvider get outgoingServiceProvider => null;
+
   /// Gets a [Future] object which completes when [onReady] is called.
   Future<Null> get ready => _readyCompleter.future;
 
