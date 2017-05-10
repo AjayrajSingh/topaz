@@ -241,7 +241,8 @@ class _RawKeyboardTextFieldState extends State<RawKeyboardTextField> {
 
     List<Widget> children = <Widget>[text];
     if (_effectiveFocusNode.hasFocus) {
-      children.add(
+      children.insert(
+        0,
         new BlinkingCursor(
           color: themeData.textSelectionColor,
           height: lineHeight,
@@ -252,9 +253,19 @@ class _RawKeyboardTextFieldState extends State<RawKeyboardTextField> {
 
     return new Container(
       height: lineHeight,
-      child: new ListView(
-        scrollDirection: Axis.horizontal,
-        children: children,
+      child: new Row(
+        children: <Widget>[
+          new Flexible(
+            child: new Container(
+              child: new ListView(
+                reverse: true,
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                children: children,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
