@@ -8,6 +8,8 @@ dependencies:
     sdk: flutter
   keyboard:
     path: ../keyboard
+  lib.widgets:
+    path: ../../../lib/widgets/packages/widgets
   models:
     path: ../../modules/common/packages/models
   sysui_widgets:

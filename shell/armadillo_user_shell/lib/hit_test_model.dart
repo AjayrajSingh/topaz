@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:armadillo/model.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
-export 'package:armadillo/model.dart'
+export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
 /// Determines which stories can be hit testable.

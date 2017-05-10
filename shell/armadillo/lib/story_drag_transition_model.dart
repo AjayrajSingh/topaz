@@ -6,7 +6,8 @@ import 'package:sysui_widgets/rk4_spring_simulation.dart';
 
 import 'ticking_model.dart';
 
-export 'model.dart' show ScopedModel, Model, ScopedModelDescendant;
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 const RK4SpringDescription _kSimulationDesc =
     const RK4SpringDescription(tension: 750.0, friction: 50.0);

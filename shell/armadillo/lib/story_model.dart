@@ -6,16 +6,17 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'display_mode.dart';
-import 'model.dart';
 import 'panel.dart';
 import 'story.dart';
 import 'story_cluster.dart';
 import 'story_cluster_id.dart';
 import 'story_list_layout.dart';
 
-export 'model.dart' show ScopedModel, Model;
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 /// A simple story model that gets its stories from calls
 /// [onStoryClustersChanged] and  reorders them with user interaction.

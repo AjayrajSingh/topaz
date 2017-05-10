@@ -6,10 +6,10 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
 import 'conductor.dart';
-import 'model.dart';
 import 'default_scroll_configuration.dart';
 import 'wrapper_builder.dart';
 

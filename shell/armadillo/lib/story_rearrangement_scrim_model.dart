@@ -3,13 +3,14 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:sysui_widgets/rk4_spring_simulation.dart';
 
-import 'model.dart';
 import 'story_cluster_drag_state_model.dart';
 import 'ticking_model.dart';
 
-export 'model.dart' show ScopedModel, Model;
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 const RK4SpringDescription _kSimulationDesc =
     const RK4SpringDescription(tension: 750.0, friction: 50.0);

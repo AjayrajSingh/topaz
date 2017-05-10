@@ -4,18 +4,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'dart:ui' show lerpDouble;
 
 import 'important_info.dart';
-import 'model.dart';
 import 'now.dart';
 import 'opacity_model.dart';
 import 'quick_settings.dart';
 import 'time_stringer.dart';
 import 'user_context_text.dart';
 
-export 'model.dart' show ScopedModel, Model;
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 const String _kUserImage = 'packages/armadillo/res/User.png';
 const String _kBatteryImageWhite =

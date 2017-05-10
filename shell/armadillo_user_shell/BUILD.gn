@@ -29,6 +29,7 @@ flutter_app("armadillo_user_shell") {
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//lib/flutter/packages/flutter_test",
+    "//lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/intl",
   ]
 }

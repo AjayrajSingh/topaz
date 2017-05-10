@@ -2,9 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'model.dart';
+import 'package:lib.widgets/model.dart';
 
-export 'model.dart' show ScopedModel, Model;
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 /// Tracks debug parameters, notifying listeners when they changes.
 /// Using an [DebugModel] allows the debug parameters it tracks to be passed

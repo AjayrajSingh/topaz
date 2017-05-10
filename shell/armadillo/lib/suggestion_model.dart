@@ -3,12 +3,13 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
-import 'model.dart';
 import 'story_cluster.dart';
 import 'suggestion.dart';
 
-export 'model.dart' show ScopedModel, Model, ScopedModelDescendant;
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 /// The base class for suggestion models.
 abstract class SuggestionModel extends Model {

@@ -24,9 +24,11 @@ import 'package:armadillo/suggestion_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:lib.widgets/modular.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:sysui_widgets/default_bundle.dart';
 
+import 'armadillo_user_shell_model.dart';
 import 'focus_request_watcher_impl.dart';
 import 'hit_test_model.dart';
 import 'initial_focus_setter.dart';
@@ -34,8 +36,6 @@ import 'initial_story_generator.dart';
 import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
-import 'user_shell_impl.dart';
-import 'user_shell_widget.dart';
 
 /// Set to true to enable the performance overlay.
 const bool _kShowPerformanceOverlay = false;
@@ -175,9 +175,10 @@ Future<Null> main() async {
     hitTestModel: hitTestModel,
   );
 
-  UserShellWidget userShellWidget = new UserShellWidget(
+  UserShellWidget<ArmadilloUserShellModel> userShellWidget =
+      new UserShellWidget<ArmadilloUserShellModel>(
     applicationContext: new ApplicationContext.fromStartupInfo(),
-    userShell: new UserShellImpl(
+    userShellModel: new ArmadilloUserShellModel(
       storyProviderStoryGenerator: storyProviderStoryGenerator,
       suggestionProviderSuggestionModel: suggestionProviderSuggestionModel,
       focusRequestWatcher: focusRequestWatcher,

@@ -3,14 +3,15 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'now.dart';
-import 'model.dart';
 import 'peeking_overlay.dart';
 import 'story_cluster_id.dart';
 import 'story_list.dart';
 
-export 'model.dart' show ScopedModel, Model, ScopedModelDescendant;
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 /// Tracks which story clusters are currently being dragged.  This is used by
 /// some UI elements to scale ([StoryList]), fade out ([Now]), or slide away

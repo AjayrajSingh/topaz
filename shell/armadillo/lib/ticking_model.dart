@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:flutter/scheduler.dart';
+import 'package:lib.widgets/model.dart';
 
-import 'model.dart';
-
-export 'model.dart' show ScopedModel, Model;
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 /// Base class for [Model]s that depend on a Ticker.
 abstract class TickingModel extends Model {

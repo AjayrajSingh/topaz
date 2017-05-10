@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
-import 'model.dart';
-
-export 'model.dart' show ScopedModel, Model, ScopedModelDescendant;
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 /// Tracks the [Size] of something, notifying listeners when it changes.
 /// Using a [SizeModel] allows the [Size] it tracks to be passed down the
