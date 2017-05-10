@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
 import 'dart:math';
 
 import 'package:apps.mozart.lib.flutter/child_view.dart';
@@ -33,9 +32,6 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
   /// The list of all child views
   final List<ChildViewNode> children = <ChildViewNode>[];
 
-  /// Candidate view for addition
-  ChildViewNode nodeToBeAppended;
-
   /// Candidate view for removal
   ChildViewNode nodeToBeRemoved;
 
@@ -47,20 +43,11 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
   void addChild(InterfaceHandle<ViewOwner> view, int viewId, int parentId,
       String viewType) {
     setState(() {
-      if (nodeToBeAppended != null) {
-        children.add(nodeToBeAppended);
-        nodeToBeAppended = null;
-      }
-      ChildViewNode node = new ChildViewNode(
+      children.add(new ChildViewNode(
           new ChildViewConnection(view, onUnavailable: this._removeChildView),
           viewId,
           parentId,
-          viewType);
-      if (children.isEmpty) {
-        children.add(node);
-      } else {
-        nodeToBeAppended = node;
-      }
+          viewType));
     });
   }
 
@@ -68,15 +55,10 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
     _log('Removing child view!');
     setState(() {
       // TODO(alangardner): Remove it with timer after 500 ms
-      if (nodeToBeAppended?.connection == c) {
-        _log('Removing nodeToBeAppended');
-        nodeToBeAppended = null;
-      } else {
-        children.removeWhere((ChildViewNode n) {
-          _log('Removing existing ChildViewNode');
-          return n.connection == c;
-        });
-      }
+      children.removeWhere((ChildViewNode n) {
+        _log('Removing existing ChildViewNode');
+        return n.connection == c;
+      });
     });
   }
 
@@ -94,14 +76,27 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
     }
   }
 
+  Widget _surface({ChildViewNode node, Rect rect, Rect initRect}) =>
+      new SimulatedPositioned(
+        key: new ObjectKey(node),
+        rect: rect,
+        initRect: initRect,
+        child: new SurfaceWidget(node),
+        onDragEnd: (SimulatedDragEndDetails details) {
+          _endDrag(node, details);
+        },
+      );
+
   @override
   Widget build(BuildContext context) {
     return new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      final double totalWidth = constraints.maxWidth;
-      final double leftWidth = totalWidth / 3.0;
-      final double rightWidth = totalWidth - leftWidth;
-      final double totalHeight = constraints.maxHeight;
+      final Offset topLeft = Offset.zero;
+      final Offset offscreen = constraints.biggest.topRight(Offset.zero);
+      final Rect full = topLeft & constraints.biggest;
+      final Rect left = topLeft & new Size(full.width / 3.0, full.height);
+      final Rect right = (topLeft + left.topRight) &
+          new Size(full.width - left.width, full.height);
       final List<Widget> childViews = <Widget>[];
       int numActiveViews = 0;
       if (children.isEmpty) {
@@ -111,50 +106,29 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
         numActiveViews = 1;
         childViews.add(new SimulatedPositioned(
             key: new ObjectKey(soleView),
-            top: 0.0,
-            left: 0.0,
-            width: totalWidth,
-            height: totalHeight,
+            rect: full,
+            initRect: full.shift(offscreen),
             child: new Container(
                 child: new ChildView(connection: soleView.connection))));
       } else if (children.last.relationship == kSerial) {
-        // One child is full screen
-        ChildViewNode topView = children.last;
         numActiveViews = 1;
-        childViews.add(new SimulatedPositioned(
-            key: new ObjectKey(topView),
-            top: 0.0,
-            left: 0.0,
-            width: totalWidth,
-            height: totalHeight,
-            child: new SurfaceWidget(topView),
-            onDragEnd: (SimulatedDragEndDetails details) {
-              _endDrag(topView, details);
-            }));
+        childViews.add(_surface(
+          node: children.last,
+          rect: full,
+          initRect: full.shift(offscreen),
+        ));
       } else if (children.last.relationship == kHierarchical) {
-        ChildViewNode leftView = children[children.length - 2];
-        ChildViewNode rightView = children.last;
         numActiveViews = 2;
-        childViews.add(new SimulatedPositioned(
-            key: new ObjectKey(leftView),
-            top: 0.0,
-            left: 0.0,
-            width: leftWidth,
-            height: totalHeight,
-            child: new SurfaceWidget(leftView),
-            onDragEnd: (SimulatedDragEndDetails details) {
-              _endDrag(leftView, details);
-            }));
-        childViews.add(new SimulatedPositioned(
-            key: new ObjectKey(rightView),
-            top: 0.0,
-            left: leftWidth,
-            width: rightWidth,
-            height: totalHeight,
-            child: new SurfaceWidget(rightView),
-            onDragEnd: (SimulatedDragEndDetails details) {
-              _endDrag(rightView, details);
-            }));
+        childViews.add(_surface(
+          node: children[children.length - 2],
+          rect: left,
+          initRect: left.shift(offscreen),
+        ));
+        childViews.add(_surface(
+          node: children.last,
+          rect: right,
+          initRect: right.shift(offscreen),
+        ));
       }
       List<ChildViewNode> backgroundNodes = children.sublist(
           max(0, children.length - numActiveViews - 2),
@@ -163,50 +137,24 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
         _log('Background node: $backgroundNode');
         // Reversed because we insert backward
         childViews.insert(
-            0,
-            new SimulatedPositioned(
-              key: new ObjectKey(backgroundNode),
-              top: 0.0,
-              left: 0.0,
-              width: totalWidth,
-              height: totalHeight,
-              child: new SurfaceWidget(backgroundNode, interactable: false),
-            ));
+          0,
+          new SimulatedPositioned(
+            key: new ObjectKey(backgroundNode),
+            rect: full,
+            child: new SurfaceWidget(backgroundNode, interactable: false),
+          ),
+        );
       }
-      if (nodeToBeAppended != null) {
-        // Upcoming current views animate in from the right
-        childViews.add(new SimulatedPositioned(
-            key: new ObjectKey(nodeToBeAppended),
-            top: 0.0,
-            left: totalWidth,
-            width: nodeToBeAppended.relationship == kSerial || children.isEmpty
-                ? totalWidth
-                : rightWidth,
-            height: totalHeight,
-            child: new SurfaceWidget(nodeToBeAppended),
-            onDragEnd: (SimulatedDragEndDetails details) {
-              _endDrag(nodeToBeAppended, details);
-            }));
-        scheduleMicrotask(() {
-          setState(() {
-            children.add(nodeToBeAppended);
-            nodeToBeAppended = null;
-          });
-        });
-      }
+      // Outgoing views animate to/from the right
       if (nodeToBeRemoved != null) {
-        childViews.add(new SimulatedPositioned(
-            key: new ObjectKey(nodeToBeRemoved),
-            top: 0.0,
-            left: totalWidth,
-            width: nodeToBeRemoved.relationship == kSerial || children.isEmpty
-                ? totalWidth
-                : rightWidth,
-            height: totalHeight,
-            child: new SurfaceWidget(nodeToBeRemoved),
-            onDragEnd: (SimulatedDragEndDetails details) {
-              _endDrag(nodeToBeRemoved, details);
-            }));
+        Rect offscreenRect = offscreen &
+            (nodeToBeRemoved.relationship == kSerial || children.isEmpty
+                ? full.size
+                : right.size);
+        childViews.add(_surface(
+          node: nodeToBeRemoved,
+          rect: offscreenRect,
+        ));
       }
       return new Stack(children: childViews);
     });

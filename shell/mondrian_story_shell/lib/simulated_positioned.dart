@@ -38,54 +38,22 @@ class SimulatedPositioned extends StatefulWidget {
   /// modified directly by gesture, or animated by repositioning.
   SimulatedPositioned({
     Key key,
-    @required this.left,
-    @required this.top,
-    @required this.width,
-    @required this.height,
+    @required this.rect,
+    Rect initRect,
     @required this.child,
     this.onDragEnd,
   })
-      : rect = new Offset(left, top) & new Size(width, height),
+      : this.initRect = initRect ?? rect,
         super(key: key);
-
-  /// Creates a Positioned object with the values from the given [Rect].
-  ///
-  /// This sets the [left], [top], [width], and [height] properties
-  /// from the given [Rect].
-  factory SimulatedPositioned.fromRect({
-    Key key,
-    Rect rect,
-    Widget child,
-    GestureDragEndCallback onDragEnd,
-  }) {
-    return new SimulatedPositioned(
-      key: key,
-      child: child,
-      left: rect.left,
-      top: rect.top,
-      width: rect.width,
-      height: rect.height,
-      onDragEnd: onDragEnd,
-    );
-  }
 
   /// The widget below this widget in the tree.
   final Widget child;
 
-  /// The distance that child's left edge is inset from the left of the stack.
-  final double left;
-
-  /// The distance that child's top edge is inset from the top of the stack.
-  final double top;
-
-  /// The child's width.
-  final double width;
-
-  /// The child's height.
-  final double height;
-
   /// The child's rect.
   final Rect rect;
+
+  /// The original position
+  final Rect initRect;
 
   /// Callback called when a drag of this ends, if not null.
   final SimulatedDragEndCallback onDragEnd;
@@ -96,10 +64,9 @@ class SimulatedPositioned extends StatefulWidget {
   @override
   void debugFillDescription(List<String> description) {
     super.debugFillDescription(description);
-    description.add('left: $left');
-    description.add('top: $top');
-    description.add('width: $width');
-    description.add('height: $height');
+    description.add('child: $child');
+    description.add('rect: $rect');
+    description.add('initRect: $initRect');
   }
 }
 
@@ -114,12 +81,13 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
     super.initState();
     _positionAnimation = new _SimAnimationController(
       vsync: this,
-      position: widget.rect.center,
+      position: widget.initRect.center,
     );
     _sizeAnimation = new _SimAnimationController(
       vsync: this,
-      position: widget.rect.size.bottomRight(Offset.zero),
+      position: widget.initRect.size.bottomRight(Offset.zero),
     );
+    _setTarget();
   }
 
   @override
