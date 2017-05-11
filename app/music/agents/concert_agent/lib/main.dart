@@ -23,6 +23,7 @@ import 'package:meta/meta.dart';
 const String _kMusicArtistTopic = 'music/artist';
 
 /// Global scoping to prevent garbage collection
+final ContextProviderProxy _contextProvider = new ContextProviderProxy();
 ContextListenerImpl _contextListenerImpl;
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
@@ -119,12 +120,10 @@ Future<Null> main(List<dynamic> args) async {
   String apiKey = await _readAPIKey();
   if (apiKey != null) {
     // final ApplicationContext context = new ApplicationContext.fromStartupInfo();
-    final ContextProviderProxy contextProvider = new ContextProviderProxy();
-    connectToService(_context.environmentServices, contextProvider.ctrl);
+    connectToService(_context.environmentServices, _contextProvider.ctrl);
     connectToService(_context.environmentServices, _proposalPublisher.ctrl);
     ContextQuery query = new ContextQuery.init(<String>[_kMusicArtistTopic]);
     _contextListenerImpl = new ContextListenerImpl(apiKey: apiKey);
-    contextProvider.subscribe(query, _contextListenerImpl.getHandle());
-    contextProvider.ctrl.close();
+    _contextProvider.subscribe(query, _contextListenerImpl.getHandle());
   }
 }
