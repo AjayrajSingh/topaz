@@ -28,23 +28,23 @@ class GoogleSearchAPI extends SearchAPI {
   Future<List<String>> images({
     String query,
   }) async {
-    Map<String, String> queryParams = new Map<String, String>();
-    queryParams['q'] = query;
-    queryParams['key'] = apiKey;
-    queryParams['cx'] = customSearchId;
-    queryParams['searchType'] = 'image';
-    queryParams['num'] = '10';
+    Map<String, String> queryParams = <String, String>{
+      'q': query,
+      'key': apiKey,
+      'cx': customSearchId,
+      'searchType': 'image',
+      'num': '10'
+    };
     Uri uri = new Uri.https(_kApiBaseUrl, '/customsearch/v1', queryParams);
     http.Response response = await http.get(uri);
     if (response.statusCode != 200) {
       return null;
     }
-    dynamic results = JSON.decode(response.body);
+
+    Map<String, dynamic> results = JSON.decode(response.body);
     if (results['searchInformation']['totalResults'] == '0') {
       return <String>[];
     }
-    return results['items']
-        .map((dynamic item) => item['image']['thumbnailLink'])
-        .toList();
+    return results['items'].map((dynamic item) => item['link']).toList();
   }
 }
