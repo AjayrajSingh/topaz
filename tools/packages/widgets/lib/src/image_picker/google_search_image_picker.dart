@@ -7,7 +7,6 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:google_search_api/google_search_api.dart';
-import 'package:lib.widgets/hacks.dart';
 import 'package:meta/meta.dart';
 
 import 'image_picker.dart';
@@ -172,7 +171,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
             ),
           ),
           new Expanded(
-            child: new FuchsiaCompatibleTextField(
+            child: new TextField(
               controller: _controller,
               onChanged: _handleInputChange,
               decoration: new InputDecoration.collapsed(
