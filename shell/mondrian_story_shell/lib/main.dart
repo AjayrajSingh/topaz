@@ -12,7 +12,9 @@ import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
 import 'model.dart';
+import 'surface_details.dart';
 import 'surface_layout.dart';
+import 'story_relationships.dart';
 
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
@@ -51,7 +53,15 @@ class StoryShellImpl extends StoryShell {
   void connectView(InterfaceHandle<ViewOwner> view, int viewId, int parentId,
       String viewType) {
     _log('Connecting view $viewId with parent $parentId');
-    _surfaceGraph.addSurface(viewId.toString(), parentId.toString(), viewType);
+    SurfaceArrangement arrangement = (viewType == kHierarchical)
+        ? SurfaceArrangement.copresent
+        : SurfaceArrangement.none;
+    _surfaceGraph.addSurface(
+      viewId.toString(),
+      new SurfaceProperties(),
+      parentId.toString(),
+      new SurfaceRelation(arrangement: arrangement),
+    );
 
     // Separated calls in prep for asynchronous availability of view
     _surfaceGraph.connectView(viewId.toString(), view);

@@ -10,6 +10,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
+/// DragStartDetails with drag Offset
+class SimulatedDragStartDetails extends DragStartDetails {
+  /// Construct a SimulatedDragStartDetails
+  SimulatedDragStartDetails({Offset globalPosition})
+      : super(globalPosition: globalPosition);
+}
+
 /// DragEndDetails with drag Offset
 class SimulatedDragEndDetails extends DragEndDetails {
   /// Construct a SimulatedDragEndDetails
@@ -27,6 +34,9 @@ class SimulatedDragEndDetails extends DragEndDetails {
   final Offset offset;
 }
 
+/// Callback to get SimulatedDragStartDetails onDragStart
+typedef void SimulatedDragStartCallback(SimulatedDragStartDetails details);
+
 /// Callback to get SimulatedDragEndDetails onDragEnd
 typedef void SimulatedDragEndCallback(SimulatedDragEndDetails details);
 
@@ -41,6 +51,8 @@ class SimulatedPositioned extends StatefulWidget {
     @required this.rect,
     Rect initRect,
     @required this.child,
+    this.draggable: true,
+    this.onDragStart,
     this.onDragEnd,
   })
       : this.initRect = initRect ?? rect,
@@ -54,6 +66,12 @@ class SimulatedPositioned extends StatefulWidget {
 
   /// The original position
   final Rect initRect;
+
+  /// If true the SimulatedPositioned can be manipulated directly via touch
+  final bool draggable;
+
+  /// Callback called when a drag of this ends, if not null.
+  final SimulatedDragStartCallback onDragStart;
 
   /// Callback called when a drag of this ends, if not null.
   final SimulatedDragEndCallback onDragEnd;
@@ -106,13 +124,15 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
   @override
   Widget build(BuildContext context) {
     return new AnimatedBuilder(
-      child: new GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onPanStart: _startDrag,
-        onPanUpdate: _updateDrag,
-        onPanEnd: _endDrag,
-        child: widget.child,
-      ),
+      child: widget.draggable
+          ? new GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onPanStart: _startDrag,
+              onPanUpdate: _updateDrag,
+              onPanEnd: _endDrag,
+              child: widget.child,
+            )
+          : widget.child,
       animation: new Listenable.merge(<Listenable>[
         _positionAnimation,
         _sizeAnimation,
@@ -144,6 +164,9 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
       _offset = _positionAnimation.value;
       _positionAnimation.stop(canceled: true);
       _sizeAnimation.stop();
+      widget.onDragStart?.call(new SimulatedDragStartDetails(
+        globalPosition: details.globalPosition,
+      ));
     });
   }
 

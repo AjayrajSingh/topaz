@@ -23,6 +23,17 @@ class Tree<T> extends Iterable<Tree<T>> {
       ? const Iterable<Tree<T>>.empty()
       : _parent.children.where((Tree<T> node) => node != this);
 
+  /// Direct ancestors of this, starting at parent to root
+  Iterable<Tree<T>> get ancestors {
+    List<Tree<T>> ancestors = <Tree<T>>[];
+    Tree<T> ancestor = this;
+    while (ancestor._parent != null) {
+      ancestor = ancestor._parent;
+      ancestors.add(ancestor);
+    }
+    return ancestors;
+  }
+
   /// Direct ancestor of this
   Tree<T> get parent => _parent;
   Tree<T> _parent;

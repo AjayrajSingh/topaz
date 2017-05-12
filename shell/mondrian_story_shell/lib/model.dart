@@ -7,6 +7,7 @@ import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/model.dart';
 
+import 'surface_details.dart';
 import 'tree.dart';
 
 void _log(String msg) {
@@ -16,9 +17,11 @@ void _log(String msg) {
 /// The parentId that means no parent
 const String kNoParent = '0';
 
+typedef bool _SurfaceSpanningTreeCondition(Surface s);
+
 /// Details of a surface child view
 class Surface extends Model {
-  Surface._internal(this._graph, this._node, this.relationship);
+  Surface._internal(this._graph, this._node, this.properties, this.relation);
 
   final SurfaceGraph _graph;
   final Tree<String> _node;
@@ -29,15 +32,45 @@ class Surface extends Model {
   /// The ChildViewConnection that can be used to create ChildViews
   ChildViewConnection get connection => _connection;
 
+  /// The properties of this surface
+  final SurfaceProperties properties;
+
   /// The relationship this node has with its parent
-  final String relationship;
+  final SurfaceRelation relation;
 
   /// The parent of this node
   Surface get parent => _surface(_node.parent);
 
+  /// The children of this node
+  Iterable<Surface> get children => _surfaces(_node.children);
+
   /// The siblings of this node
-  Iterable<Surface> get siblings =>
-      _node.siblings.map((Tree<String> node) => _surface(node));
+  Iterable<Surface> get siblings => _surfaces(_node.siblings);
+
+  /// The ancestors of this node
+  Iterable<Surface> get ancestors => _surfaces(_node.ancestors);
+
+  /// Spans the full tree of all copresenting surfaces starting with this
+  Tree<Surface> get copresentSpanningTree => _spanningTree(
+      null,
+      _surface(_node),
+      (Surface s) => s.relation.arrangement == SurfaceArrangement.copresent);
+
+  Tree<Surface> _spanningTree(Surface previous, Surface current,
+      _SurfaceSpanningTreeCondition condition) {
+    Tree<Surface> tree = new Tree<Surface>(value: current);
+    if (current.parent != previous &&
+        current.parent != null &&
+        condition(current)) {
+      tree.add(_spanningTree(current, current.parent, condition));
+    }
+    for (Surface child in current.children) {
+      if (child != previous && condition(child)) {
+        tree.add(_spanningTree(current, child, condition));
+      }
+    }
+    return tree;
+  }
 
   /// Remove this node from graph
   /// Returns true if this was removed
@@ -55,9 +88,13 @@ class Surface extends Model {
       ? null
       : _graph._surfaces[node.value];
 
+  Iterable<Surface> _surfaces(Iterable<Tree<String>> nodes) => nodes
+      .where((Tree<String> node) => (node != null && node.value != null))
+      .map((Tree<String> node) => _surface(node));
+
   @override
   String toString() {
-    String edgeLabel = relationship ?? '';
+    String edgeLabel = relation?.toString() ?? '';
     String edgeArrow = '$edgeLabel->'.padLeft(6, '-');
     String disconnected = _connection == null ? '[DISCONNECTED]' : '';
     return '${edgeArrow}Surface${_node.value} $disconnected';
@@ -80,14 +117,15 @@ class SurfaceGraph extends Model {
       _focusedSurfaces.isEmpty ? null : _surfaces[_focusedSurfaces.last];
 
   /// The history of focused [Surface]s
-  Iterable<Surface> get focusedSurfaceHistory =>
-      _focusedSurfaces.reversed.map((String id) => _surfaces[id]);
+  Iterable<Surface> get focusStack =>
+      _focusedSurfaces.map((String id) => _surfaces[id]);
 
   /// Add [Surface] to graph
   void addSurface(
     String id,
+    SurfaceProperties properties,
     String parentId,
-    String type,
+    SurfaceRelation relation,
   ) {
     assert(!_surfaces.keys.contains(id));
     Tree<String> node = new Tree<String>(value: id);
@@ -95,7 +133,7 @@ class SurfaceGraph extends Model {
         (parentId == kNoParent) ? _tree : _tree.search(parentId);
     assert(parent != null);
     parent.add(node);
-    _surfaces[id] = new Surface._internal(this, node, type);
+    _surfaces[id] = new Surface._internal(this, node, properties, relation);
     notifyListeners();
   }
 
