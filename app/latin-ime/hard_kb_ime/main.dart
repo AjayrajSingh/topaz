@@ -98,8 +98,19 @@ class InputMethodEditorImpl extends InputMethodEditor {
   }
 
   @override
+  void show() {}
+
+  @override
+  void hide() {}
+
+  @override
   void setKeyboardType(KeyboardType keyboardType) {
     // nothing to do for hw kb
+  }
+
+  @override
+  void injectInput(InputEvent event) {
+    session.onEvent(event);
   }
 
   @override
@@ -130,11 +141,6 @@ class ImeServiceImpl extends ImeService {
     // ignore: unused_local_variable
     InputMethodEditorImpl imeImpl = new InputMethodEditorImpl(session);
     _currentSession = session;
-  }
-
-  @override
-  void injectInput(InputEvent event) {
-    _currentSession?.onEvent(event);
   }
 }
 
