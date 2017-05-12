@@ -220,11 +220,11 @@ class _ScreenManagerState extends State<_ScreenManager>
     });
 
     final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
-    userProvider?.login(
-      accountId,
-      viewOwner.passRequest(),
-      _userControllerProxy.ctrl.request(),
-    );
+    final UserLoginParams params = new UserLoginParams()
+      ..accountId = accountId
+      ..viewOwner = viewOwner.passRequest()
+      ..userController = _userControllerProxy.ctrl.request();
+    userProvider?.login(params);
     _userControllerProxy.watch(_userWatcherImpl.getHandle());
 
     setState(() {
