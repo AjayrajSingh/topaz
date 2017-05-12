@@ -7,30 +7,19 @@ import 'package:apps.modular.services.story/story_shell.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:flutter/widgets.dart';
-import 'package:graphlib/graphlib.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
+import 'model.dart';
 import 'surface_layout.dart';
 
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
-/// Unique identifier for surfaceLayout Widget
-final GlobalKey<SurfaceLayoutState> _surfaceLayoutKey =
-    new GlobalKey<SurfaceLayoutState>();
-
 /// This is used for keeping the reference around.
 StoryShellFactoryImpl _storyShellFactory;
 
-/// Surface-graph representation
-/// Nodes are surfaces, edges are relationships
-Graph _surfaceGraph;
-
-/// The currently focused surface
-int _focusedSurfaceId;
-
-/// The list of previous focusedSurfaces
-List<int> _focusedSurfaces;
+SurfaceGraph _surfaceGraph;
 
 void _log(String msg) {
   print('[MondrianFlutter] $msg');
@@ -41,11 +30,10 @@ class StoryShellImpl extends StoryShell {
   final StoryShellBinding _storyShellBinding = new StoryShellBinding();
   final StoryContextProxy _storyContext = new StoryContextProxy();
 
-  /// StoryShwllImpl
+  /// StoryShellImpl
   /// @params contextHandle: The [InterfaceHandle] to [StoryContext]
   StoryShellImpl(InterfaceHandle<StoryContext> contextHandle) {
     _storyContext.ctrl.bind(contextHandle);
-    _surfaceGraph = new Graph();
   }
 
   /// Bind an [InterfaceRequest] for a [StoryShell] interface to this object.
@@ -62,13 +50,12 @@ class StoryShellImpl extends StoryShell {
   @override
   void connectView(InterfaceHandle<ViewOwner> view, int viewId, int parentId,
       String viewType) {
-    _surfaceLayoutKey.currentState.addChild(view, viewId, parentId, viewType);
-    // TODO(djmurphy) determine when graph is purged
-    _surfaceGraph.setNode(viewId.toString(), view);
-    // parentId 0 is the 'null' parent case for the first added node
-    if (parentId > 0) {
-      _surfaceGraph.setEdge(parentId.toString(), viewId.toString(), viewType);
-    }
+    _log('Connecting view $viewId with parent $parentId');
+    _surfaceGraph.addSurface(viewId.toString(), parentId.toString(), viewType);
+
+    // Separated calls in prep for asynchronous availability of view
+    _surfaceGraph.connectView(viewId.toString(), view);
+    _surfaceGraph.focusSurface(viewId.toString());
   }
 
   /// Terminate the StoryShell
@@ -104,13 +91,13 @@ class StoryShellFactoryImpl extends StoryShellFactory {
 void main() {
   _log('Mondrian started');
 
+  _surfaceGraph = new SurfaceGraph();
   // Note: This implementation only supports one StoryShell at a time.
   // Initialize the one Flutter application we support
-  runApp(
-    new WindowMediaQuery(child: new SurfaceLayout(key: _surfaceLayoutKey)),
-  );
+  runApp(new WindowMediaQuery(
+      child: new ScopedModel<SurfaceGraph>(
+          model: _surfaceGraph, child: new SurfaceLayout())));
 
-  /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices.addServiceForName(
     (InterfaceRequest<StoryShellFactory> request) {
       _log('Received binding request for StoryShellFactory');

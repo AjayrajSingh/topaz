@@ -21,7 +21,6 @@ flutter_app("flutter_mondrian") {
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//lib/widgets/packages/widgets:lib.widgets",
-    "//third_party/dart-pkg/pub/graphlib",
     "//third_party/dart-pkg/pub/meta",
   ]
 }

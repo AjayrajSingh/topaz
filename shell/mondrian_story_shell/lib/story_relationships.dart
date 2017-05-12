@@ -7,6 +7,3 @@ const String kSerial = '';
 
 /// The string representation of a hierarchical semantic relationship
 const String kHierarchical = 'h';
-
-/// The string representation of a dependent semantic relationship
-const String kDependent = 'd';
