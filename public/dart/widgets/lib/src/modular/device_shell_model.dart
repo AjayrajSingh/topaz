@@ -5,6 +5,7 @@
 import 'package:apps.modular.services.device/device_shell.fidl.dart';
 import 'package:apps.modular.services.device/user_provider.fidl.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:meta/meta.dart';
 
 export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
 
@@ -21,6 +22,7 @@ class DeviceShellModel extends Model {
 
   /// Called when this app's [DeviceShell] is given its [DeviceShellContext]
   /// and [UserProvider].
+  @mustCallSuper
   void onReady(
     UserProvider userProvider,
     DeviceShellContext deviceShellContext,

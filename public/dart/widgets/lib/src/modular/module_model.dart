@@ -9,6 +9,7 @@ import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:meta/meta.dart';
 
 import 'module_widget.dart';
 
@@ -52,6 +53,7 @@ class ModuleModel extends Model {
 
   /// Called when this [Module] is given its [ModuleContext],
   /// [Link], an incoming services [ServiceProvider].
+  @mustCallSuper
   void onReady(
     ModuleContext moduleContext,
     Link link,

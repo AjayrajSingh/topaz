@@ -1,0 +1,64 @@
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'package:apps.modular.services.story/story_provider.fidl.dart';
+import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
+import 'package:apps.modular.services.user/focus.fidl.dart';
+import 'package:apps.modular.services.user/user_context.fidl.dart';
+import 'package:apps.modular.services.user/user_shell.fidl.dart';
+import 'package:lib.widgets/model.dart';
+import 'package:meta/meta.dart';
+
+export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
+
+/// The [Model] that provides services provided to this app's [UserShell].
+class UserShellModel extends Model {
+  UserContext _userContext;
+  FocusProvider _focusProvider;
+  FocusController _focusController;
+  VisibleStoriesController _visibleStoriesController;
+  StoryProvider _storyProvider;
+  SuggestionProvider _suggestionProvider;
+
+  /// The [UserContext] given to this app's [UserShell].
+  UserContext get userContext => _userContext;
+
+  /// The [FocusProvider] given to this app's [UserShell].
+  FocusProvider get focusProvider => _focusProvider;
+
+  /// The [FocusController] given to this app's [UserShell].
+  FocusController get focusController => _focusController;
+
+  /// The [VisibleStoriesController] given to this app's [UserShell].
+  VisibleStoriesController get visibleStoriesController =>
+      _visibleStoriesController;
+
+  /// The [StoryProvider] given to this app's [UserShell].
+  StoryProvider get storyProvider => _storyProvider;
+
+  /// The [SuggestionProvider] given to this app's [UserShell].
+  SuggestionProvider get suggestionProvider => _suggestionProvider;
+
+  /// Called when this app's [UserShell] is given its services.
+  @mustCallSuper
+  void onReady(
+    UserContext userContext,
+    FocusProvider focusProvider,
+    FocusController focusController,
+    VisibleStoriesController visibleStoriesController,
+    StoryProvider storyProvider,
+    SuggestionProvider suggestionProvider,
+  ) {
+    _userContext = userContext;
+    _focusProvider = focusProvider;
+    _focusController = focusController;
+    _visibleStoriesController = visibleStoriesController;
+    _storyProvider = storyProvider;
+    _suggestionProvider = suggestionProvider;
+    notifyListeners();
+  }
+
+  /// Called when the app's [UserShell] stops.
+  void onStop() => null;
+}

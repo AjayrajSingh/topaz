@@ -12,9 +12,10 @@ dart_package("lib.widgets") {
 
   deps = [
     "//application/lib/app/dart",
-    "//apps/modules/common/packages/widgets_meta",
     "//apps/modular/services/device:device_dart",
     "//apps/modular/services/module:module_dart",
+    "//apps/modular/services/user:user_dart",
+    "//apps/modules/common/packages/widgets_meta",
     "//lib/flutter/packages/flutter",
   ]
 }
@@ -23,8 +24,8 @@ dart_test("test") {
   analysis_options = ".analysis_options"
 
   deps = [
-    "//lib/widgets/packages/widgets:lib.widgets",
     "//lib/flutter/packages/flutter_test",
+    "//lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/test",
   ]
 }
