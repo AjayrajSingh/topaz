@@ -6,6 +6,7 @@ group("music") {
   deps = [
     "//apps/modules/music/agents",
     "//apps/modules/music/modules",
+    "//apps/modules/music/services",
   ]
 }
 

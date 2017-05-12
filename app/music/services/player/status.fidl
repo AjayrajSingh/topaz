@@ -1,0 +1,21 @@
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+module music;
+
+import "apps/modules/music/services/player/track.fidl";
+
+// Represents the playback status
+struct PlayerStatus {
+
+  // True is the track is currently being played, false if the track is paused.
+  bool isPlaying;
+
+  // The current track that is being played.
+  Track track;
+
+  // TODO(dayang@): Represent scrub position as a subscription/channel
+  // separately so that it can be managed at a higher velocity
+
+};

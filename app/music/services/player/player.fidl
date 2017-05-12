@@ -1,0 +1,50 @@
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+module music;
+
+import "apps/modules/music/services/player/status.fidl";
+import "apps/modules/music/services/player/track.fidl";
+
+[ServiceName="music.Player"]
+interface Player {
+
+  // Special value for GetStatus version_last_seen parameter to get the current
+  // status immediately.
+  const uint64 kInitialStatus = 0;
+
+  // Play the given track
+  Play(Track track);
+
+  // Toggles between pause and play for the given track.
+  // This will not do anything if no track is set.
+  TogglePlayPause();
+
+  // Jumps to the next track in the play queue and plays the track
+  Next();
+
+  // Jumps to the previous track in the play queue and plays the track
+  Previous();
+
+  // Adds the given track(s) to the end of the play queue
+  Enqueue(array<string> trackIds);
+
+  // Removes the given track(s) from the play queue
+  Dequeue(array<string> trackIds);
+
+  // Gets the playback status and the current track being played.
+  // To get the status immediately, call GetStatus(kInitialStatus).
+  // To get updates thereafter, pass the version sent in the previous callback.
+  GetStatus(uint64 version_last_seen) => (uint64 version, PlayerStatus status);
+
+  // Register the PlayerStatusListener to receive Status and Track updates.
+  // The subscription will continue to stay open as long as the listener handle
+  // is not closed.
+  AddPlayerListener(PlayerStatusListener listener);
+};
+
+interface PlayerStatusListener {
+  // Receives an update for the track and playback status
+  OnUpdate(PlayerStatus status);
+};
