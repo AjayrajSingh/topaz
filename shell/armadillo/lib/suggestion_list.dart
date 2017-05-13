@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sysui_widgets/raw_keyboard_input.dart';
 
 import 'suggestion.dart';
 import 'suggestion_model.dart';
@@ -32,9 +31,6 @@ class SuggestionList extends StatefulWidget {
   /// Called when a suggestion is selected.
   final OnSuggestionSelected onSuggestionSelected;
 
-  /// Called when the text representation of what the user is asking changes.
-  final ValueChanged<String> onAskTextChanged;
-
   /// The number of columns to use for displaying suggestions.
   final int columnCount;
 
@@ -45,7 +41,6 @@ class SuggestionList extends StatefulWidget {
     this.onAskingStarted,
     this.onAskingEnded,
     this.onSuggestionSelected,
-    this.onAskTextChanged,
     this.columnCount: 1,
   })
       : super(key: key);
@@ -57,8 +52,8 @@ class SuggestionList extends StatefulWidget {
 /// Manages the asking state for the [SuggestionList].
 class SuggestionListState extends State<SuggestionList>
     with TickerProviderStateMixin {
-  final GlobalKey<RawKeyboardInputState> _inputKey =
-      new GlobalKey<RawKeyboardInputState>();
+  final TextEditingController _askTextController = new TextEditingController();
+  final FocusNode _askFocusNode = new FocusNode();
   bool _asking = false;
   Suggestion _selectedSuggestion;
   DateTime _lastBuildTime;
@@ -77,29 +72,23 @@ class SuggestionListState extends State<SuggestionList>
       parent: _fadeInAnimation,
       curve: Curves.fastOutSlowIn,
     );
-  }
-
-  /// The current ask text.
-  String get text => _inputKey.currentState?.text;
-
-  /// Appends [text] to the ask text.
-  void append(String text) {
-    _inputKey.currentState?.append(text);
-    widget.onAskTextChanged?.call(text);
-    SuggestionModel.of(context).askText = this.text;
-  }
-
-  /// Removes the last character of the ask text.
-  void backspace() {
-    _inputKey.currentState?.backspace();
-    widget.onAskTextChanged?.call(text);
-    SuggestionModel.of(context).askText = text;
+    _askFocusNode.addListener(() {
+      print('ask focus changed: ${_askFocusNode.hasFocus}');
+      if (_askFocusNode.hasFocus) {
+        if (_asking == false) {
+          setState(() {
+            _asking = true;
+          });
+          SuggestionModel.of(context).asking = _asking;
+          widget.onAskingStarted?.call();
+        }
+      }
+    });
   }
 
   /// Clears the ask text.
-  void clear() {
-    _inputKey.currentState?.clear();
-    widget.onAskTextChanged?.call(text);
+  void _clear() {
+    _askTextController.clear();
     SuggestionModel.of(context).askText = null;
   }
 
@@ -111,34 +100,16 @@ class SuggestionListState extends State<SuggestionList>
     });
   }
 
-  /// Called when a suggestion is selected from an IME when asking.
-  void onSuggestion(String suggestion) {
-    if (suggestion == null || suggestion.isEmpty) {
-      return;
-    }
-    final List<String> stringList = text.split(' ');
-    if (stringList.isEmpty) {
-      return;
-    }
-
-    // Remove last word.
-    for (int i = 0; i < stringList[stringList.length - 1].length; i++) {
-      backspace();
-    }
-
-    // Add the suggested word.
-    append(suggestion + ' ');
-  }
-
   /// Stops asking and clears the the ask text.
   void stopAsking() {
+    _askFocusNode.unfocus();
+    _clear();
     if (!_asking) {
       return;
     }
     setState(() {
       _asking = false;
       SuggestionModel.of(context).asking = _asking;
-      clear();
       widget.onAskingEnded?.call();
     });
   }
@@ -152,89 +123,110 @@ class SuggestionListState extends State<SuggestionList>
   }
 
   @override
-  Widget build(BuildContext context) => new Stack(
-        fit: StackFit.passthrough,
-        children: <Widget>[
-          new Positioned(
-            top: 0.0,
-            left: 0.0,
-            right: 0.0,
-            height: 84.0,
-            child: new GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                if (_asking) {
-                  return;
-                }
-                setState(() {
-                  _asking = true;
-                });
-                SuggestionModel.of(context).asking = _asking;
-                widget.onAskingStarted?.call();
-              },
-              child: new Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  // Image.
-                  new Padding(
-                    padding: const EdgeInsets.only(
-                      right: 16.0,
-                      left: 32.0,
-                      top: 32.0,
-                      bottom: 32.0,
-                    ),
-                    child: new Image.asset(_kImage, fit: BoxFit.cover),
-                  ),
-                  // Ask Anything text field.
-                  new Expanded(
-                    child: new Align(
-                      alignment: FractionalOffset.centerLeft,
-                      child: new RawKeyboardInput(
-                        key: _inputKey,
-                        focused: _asking,
-                        onTextChanged: (String text) {
-                          SuggestionModel.of(context).askText = text;
+  Widget build(BuildContext context) => new Overlay(
+        initialEntries: <OverlayEntry>[
+          new OverlayEntry(
+            builder: (BuildContext context) => new Stack(
+                  fit: StackFit.passthrough,
+                  children: <Widget>[
+                    new Positioned(
+                      top: 0.0,
+                      left: 0.0,
+                      right: 0.0,
+                      height: 84.0,
+                      child: new GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          FocusScope.of(context).requestFocus(_askFocusNode);
                         },
-                        onTextCommitted: (String text) {
-                          // Select the first suggestion on text commit (ie.
-                          // Pressing enter or tapping 'Go').
-                          List<Suggestion> suggestions =
-                              SuggestionModel.of(context).suggestions;
-                          if (suggestions.isNotEmpty) {
-                            _onSuggestionSelected(suggestions.first);
-                          }
+                        child: new Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            // Image.
+                            new Padding(
+                              padding: const EdgeInsets.only(
+                                right: 16.0,
+                                left: 32.0,
+                                top: 32.0,
+                                bottom: 32.0,
+                              ),
+                              child:
+                                  new Image.asset(_kImage, fit: BoxFit.cover),
+                            ),
+                            // Ask Anything text field.
+                            new Expanded(
+                              child: new Align(
+                                alignment: FractionalOffset.centerLeft,
+                                child: new Material(
+                                  color: Colors.transparent,
+                                  child: new TextField(
+                                    decoration: new InputDecoration(
+                                      hintText: 'Ask for anything',
+                                      hintStyle: new TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.grey[600],
+                                      ),
+                                      hideDivider: true,
+                                    ),
+                                    style: new TextStyle(
+                                      fontSize: 16.0,
+                                      color: Colors.grey[600],
+                                    ),
+                                    focusNode: _askFocusNode,
+                                    controller: _askTextController,
+                                    onChanged: (String text) {
+                                      SuggestionModel.of(context).askText =
+                                          text;
+                                    },
+                                    onSubmitted: (String text) {
+                                      // Select the first suggestion on text commit (ie.
+                                      // Pressing enter or tapping 'Go').
+                                      List<Suggestion> suggestions =
+                                          SuggestionModel
+                                              .of(context)
+                                              .suggestions;
+                                      if (suggestions.isNotEmpty) {
+                                        _onSuggestionSelected(
+                                            suggestions.first);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    new Positioned(
+                      top: 84.0,
+                      left: 0.0,
+                      right: 0.0,
+                      bottom: 0.0,
+                      child: new ScopedModelDescendant<SuggestionModel>(
+                        builder: (
+                          BuildContext context,
+                          Widget child,
+                          SuggestionModel suggestionModel,
+                        ) {
+                          _lastBuildTime = new DateTime.now();
+                          _fadeInAnimation.value = 0.0;
+                          _fadeInAnimation.forward();
+                          return widget.columnCount == 3
+                              ? _createThreeColumnBlock(
+                                  suggestionModel.suggestions)
+                              : widget.columnCount == 2
+                                  ? _createTwoColumnBlock(
+                                      suggestionModel.suggestions)
+                                  : _createSingleColumnBlock(
+                                      suggestionModel.suggestions,
+                                    );
                         },
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          new Positioned(
-            top: 84.0,
-            left: 0.0,
-            right: 0.0,
-            bottom: 0.0,
-            child: new ScopedModelDescendant<SuggestionModel>(
-              builder: (
-                BuildContext context,
-                Widget child,
-                SuggestionModel suggestionModel,
-              ) {
-                _lastBuildTime = new DateTime.now();
-                _fadeInAnimation.value = 0.0;
-                _fadeInAnimation.forward();
-                return widget.columnCount == 3
-                    ? _createThreeColumnBlock(suggestionModel.suggestions)
-                    : widget.columnCount == 2
-                        ? _createTwoColumnBlock(suggestionModel.suggestions)
-                        : _createSingleColumnBlock(
-                            suggestionModel.suggestions,
-                          );
-              },
-            ),
+                  ],
+                ),
           ),
         ],
       );

@@ -78,8 +78,9 @@ Future<Null> main() async {
   );
 
   UserLogoutter userLogoutter = new UserLogoutter();
+  GlobalKey<ConductorState> conductorKey = new GlobalKey<ConductorState>();
   Conductor conductor = new Conductor(
-    useSoftKeyboard: false,
+    key: conductorKey,
     blurScrimmedChildren: false,
     onQuickSettingsOverlayChanged: hitTestModel.onQuickSettingsOverlayChanged,
     onSuggestionsOverlayChanged: hitTestModel.onSuggestionsOverlayChanged,
@@ -100,12 +101,12 @@ Future<Null> main() async {
 
   suggestionProviderSuggestionModel.storyModel = storyModel;
   suggestionProviderSuggestionModel.addOnFocusLossListener(() {
-    conductor.goToOrigin(storyModel);
+    conductorKey.currentState.goToOrigin(storyModel);
   });
 
   StoryFocuser storyFocuser = (String storyId) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      conductor.requestStoryFocus(
+      conductorKey.currentState.requestStoryFocus(
         new StoryId(storyId),
         storyModel,
         jumpToFinish: false,

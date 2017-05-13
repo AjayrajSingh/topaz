@@ -6,14 +6,10 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:keyboard/keyboard.dart';
-import 'package:sysui_widgets/device_extension_state.dart';
 
 import 'armadillo_overlay.dart';
-import 'device_extender.dart';
 import 'edge_scroll_drag_target.dart';
 import 'expand_suggestion.dart';
-import 'keyboard_device_extension.dart';
 import 'quick_settings.dart';
 import 'nothing.dart';
 import 'now.dart';
@@ -61,51 +57,13 @@ const double _kSuggestionListThreeColumnWidthThreshold = 1000.0;
 const double _kSuggestionOverlayPullScrollOffset = 100.0;
 const double _kSuggestionOverlayScrollFactor = 1.2;
 
-final GlobalKey<SuggestionListState> _suggestionListKey =
-    new GlobalKey<SuggestionListState>();
-final ScrollController _suggestionListScrollController = new ScrollController();
-final GlobalKey<NowState> _nowKey = new GlobalKey<NowState>();
-final GlobalKey<QuickSettingsOverlayState> _quickSettingsOverlayKey =
-    new GlobalKey<QuickSettingsOverlayState>();
-final GlobalKey<PeekingOverlayState> _suggestionOverlayKey =
-    new GlobalKey<PeekingOverlayState>();
-final GlobalKey<DeviceExtensionState<KeyboardDeviceExtension>>
-    _keyboardDeviceExtensionKey =
-    new GlobalKey<DeviceExtensionState<KeyboardDeviceExtension>>();
-final GlobalKey<KeyboardState> _keyboardKey = new GlobalKey<KeyboardState>();
-
-/// The [VerticalShifter] is used to shift the [StoryList] up when [Now]'s
-/// inline quick settings are activated.
-final GlobalKey<VerticalShifterState> _verticalShifterKey =
-    new GlobalKey<VerticalShifterState>();
-
-final ScrollController _scrollController = new ScrollController();
-final GlobalKey<ScrollLockerState> _scrollLockerKey =
-    new GlobalKey<ScrollLockerState>();
-final GlobalKey<EdgeScrollDragTargetState> _edgeScrollDragTargetKey =
-    new GlobalKey<EdgeScrollDragTargetState>();
-
-/// The key for adding [Suggestion]s to the [SelectedSuggestionOverlay].  This
-/// is to allow us to animate from a [Suggestion] in an open [SuggestionList]
-/// to a [Story] focused in the [StoryList].
-final GlobalKey<SelectedSuggestionOverlayState> _selectedSuggestionOverlayKey =
-    new GlobalKey<SelectedSuggestionOverlayState>();
-
-final GlobalKey<ArmadilloOverlayState> _overlayKey =
-    new GlobalKey<ArmadilloOverlayState>();
-
 /// Called when an overlay becomes active or inactive.
 typedef void OnOverlayChanged(bool active);
 
 /// Manages the position, size, and state of the story list, user context,
 /// suggestion overlay, device extensions. interruption overlay, and quick
 /// settings overlay.
-// TODO(pylaligand): mark class as @immutable.
-// ignore: must_be_immutable
-class Conductor extends StatelessWidget {
-  /// Set to true to use a software keyboard when asking.
-  final bool useSoftKeyboard;
-
+class Conductor extends StatefulWidget {
   /// Set to true to blur scrimmed children when performing an inline preview.
   final bool blurScrimmedChildren;
 
@@ -118,23 +76,73 @@ class Conductor extends StatelessWidget {
   /// Called when the user selects log out from the quick settings.
   final VoidCallback onLogoutSelected;
 
-  final PeekManager _peekManager;
-  bool _ignoreNextScrollOffsetChange = false;
+  /// Used to manage peeking.
+  final StoryClusterDragStateModel storyClusterDragStateModel;
 
   /// Constructor.  [storyClusterDragStateModel] is used to create a
   /// [PeekManager] for the suggestion list's peeking overlay.
   Conductor({
-    this.useSoftKeyboard: true,
+    Key key,
     this.blurScrimmedChildren,
     this.onQuickSettingsOverlayChanged,
     this.onSuggestionsOverlayChanged,
     this.onLogoutSelected,
-    StoryClusterDragStateModel storyClusterDragStateModel,
+    this.storyClusterDragStateModel,
   })
-      : _peekManager = new PeekManager(
-          peekingOverlayKey: _suggestionOverlayKey,
-          storyClusterDragStateModel: storyClusterDragStateModel,
-        );
+      : super(key: key);
+
+  @override
+  ConductorState createState() => new ConductorState();
+}
+
+/// Manages the state for [Conductor].
+class ConductorState extends State<Conductor> {
+  final GlobalKey<SuggestionListState> _suggestionListKey =
+      new GlobalKey<SuggestionListState>();
+  final ScrollController _suggestionListScrollController =
+      new ScrollController();
+  final GlobalKey<NowState> _nowKey = new GlobalKey<NowState>();
+  final GlobalKey<QuickSettingsOverlayState> _quickSettingsOverlayKey =
+      new GlobalKey<QuickSettingsOverlayState>();
+  final GlobalKey<PeekingOverlayState> _suggestionOverlayKey =
+      new GlobalKey<PeekingOverlayState>();
+
+  /// The [VerticalShifter] is used to shift the [StoryList] up when [Now]'s
+  /// inline quick settings are activated.
+  final GlobalKey<VerticalShifterState> _verticalShifterKey =
+      new GlobalKey<VerticalShifterState>();
+
+  final ScrollController _scrollController = new ScrollController();
+  final GlobalKey<ScrollLockerState> _scrollLockerKey =
+      new GlobalKey<ScrollLockerState>();
+  final GlobalKey<EdgeScrollDragTargetState> _edgeScrollDragTargetKey =
+      new GlobalKey<EdgeScrollDragTargetState>();
+
+  /// The key for adding [Suggestion]s to the [SelectedSuggestionOverlay].  This
+  /// is to allow us to animate from a [Suggestion] in an open [SuggestionList]
+  /// to a [Story] focused in the [StoryList].
+  final GlobalKey<SelectedSuggestionOverlayState>
+      _selectedSuggestionOverlayKey =
+      new GlobalKey<SelectedSuggestionOverlayState>();
+
+  final GlobalKey<ArmadilloOverlayState> _overlayKey =
+      new GlobalKey<ArmadilloOverlayState>();
+
+  final FocusScopeNode _conductorFocusNode = new FocusScopeNode();
+
+  PeekManager _peekManager;
+
+  bool _ignoreNextScrollOffsetChange = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _peekManager = new PeekManager(
+      peekingOverlayKey: _suggestionOverlayKey,
+      storyClusterDragStateModel: widget.storyClusterDragStateModel,
+    );
+  }
 
   /// Note in particular the magic we're employing here to make the user
   /// state appear to be a part of the story list:
@@ -207,12 +215,12 @@ class Conductor extends StatelessWidget {
                 minimizedNowBarHeight: _kMinimizedNowHeight,
                 onProgressChanged: (double progress) {
                   if (progress == 0.0) {
-                    onQuickSettingsOverlayChanged?.call(false);
+                    widget.onQuickSettingsOverlayChanged?.call(false);
                   } else {
-                    onQuickSettingsOverlayChanged?.call(true);
+                    widget.onQuickSettingsOverlayChanged?.call(true);
                   }
                 },
-                onLogoutSelected: onLogoutSelected,
+                onLogoutSelected: widget.onLogoutSelected,
               ),
 
               // Top and bottom edge scrolling drag targets.
@@ -247,24 +255,11 @@ class Conductor extends StatelessWidget {
               ),
             ],
           );
-          return useSoftKeyboard
-              ? new DeviceExtender(
-                  deviceExtensions: <Widget>[_getKeyboard()],
-                  child: stack,
-                )
-              : stack;
-        },
-      );
-
-  Widget _getKeyboard() => new KeyboardDeviceExtension(
-        key: _keyboardDeviceExtensionKey,
-        keyboardKey: _keyboardKey,
-        onText: (String text) => _suggestionListKey.currentState.append(text),
-        onSuggestion: (String suggestion) =>
-            _suggestionListKey.currentState.onSuggestion(suggestion),
-        onDelete: () => _suggestionListKey.currentState.backspace(),
-        onGo: () {
-          _suggestionListKey.currentState.selectFirstSuggestions();
+          return new FocusScope(
+            node: _conductorFocusNode,
+            autofocus: true,
+            child: stack,
+          );
         },
       );
 
@@ -287,7 +282,7 @@ class Conductor extends StatelessWidget {
                 new StoryList(
                   scrollController: _scrollController,
                   overlayKey: _overlayKey,
-                  blurScrimmedChildren: blurScrimmedChildren,
+                  blurScrimmedChildren: widget.blurScrimmedChildren,
                   bottomPadding: _kMaximizedNowHeight +
                       lerpDouble(
                         0.0,
@@ -367,7 +362,7 @@ class Conductor extends StatelessWidget {
           onOverscrollThresholdRelease: () =>
               _suggestionOverlayKey.currentState.show(),
           scrollController: _scrollController,
-          onLogoutSelected: onLogoutSelected,
+          onLogoutSelected: widget.onLogoutSelected,
         ),
       );
 
@@ -381,10 +376,7 @@ class Conductor extends StatelessWidget {
         peekHeight: _kSuggestionOverlayPeekHeight,
         parentWidth: maxWidth,
         onHide: () {
-          onSuggestionsOverlayChanged?.call(false);
-          if (useSoftKeyboard) {
-            _keyboardDeviceExtensionKey.currentState?.hide();
-          }
+          widget.onSuggestionsOverlayChanged?.call(false);
           if (_suggestionListScrollController.hasClients) {
             _suggestionListScrollController.animateTo(
               0.0,
@@ -392,11 +384,10 @@ class Conductor extends StatelessWidget {
               curve: Curves.fastOutSlowIn,
             );
           }
-          _suggestionListKey.currentState?.clear();
           _suggestionListKey.currentState?.stopAsking();
         },
         onShow: () {
-          onSuggestionsOverlayChanged?.call(true);
+          widget.onSuggestionsOverlayChanged?.call(true);
         },
         child: new SuggestionList(
           key: _suggestionListKey,
@@ -406,21 +397,6 @@ class Conductor extends StatelessWidget {
               : maxWidth > _kSuggestionListTwoColumnWidthThreshold ? 2 : 1,
           onAskingStarted: () {
             _suggestionOverlayKey.currentState.show();
-            if (useSoftKeyboard) {
-              _keyboardDeviceExtensionKey.currentState.show();
-            }
-          },
-          onAskingEnded: () {
-            if (useSoftKeyboard) {
-              _keyboardDeviceExtensionKey.currentState.hide();
-            }
-          },
-          onAskTextChanged: (String text) {
-            if (useSoftKeyboard) {
-              _keyboardKey.currentState.updateSuggestions(
-                _suggestionListKey.currentState.text,
-              );
-            }
           },
           onSuggestionSelected: (Suggestion suggestion, Rect globalBounds) {
             suggestionModel.onSuggestionSelected(suggestion);
