@@ -26,10 +26,13 @@ class GoogleSearchImagePicker extends StatefulWidget {
   final String customSearchId;
 
   /// Optional initial image search query
-  final String query;
+  final String initialQuery;
 
-  /// Optional list of initial list of selected image urls.
+  /// Optional list of initial list of selected image urls
   final List<String> initialSelection;
+
+  /// Callback that is fired when the query string is changed
+  final ValueChanged<String> onQueryChanged;
 
   /// Callback that is fired when the set of selected images is changed
   final ImageSelectCallback onSelectionChanged;
@@ -43,8 +46,9 @@ class GoogleSearchImagePicker extends StatefulWidget {
     Key key,
     @required this.apiKey,
     @required this.customSearchId,
-    this.query,
+    this.initialQuery,
     this.initialSelection,
+    this.onQueryChanged,
     this.onSelectionChanged,
     this.onAdd,
   })
@@ -76,6 +80,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       // For example onChanged for an TextField will fire for cursor events.
       if (value != _lastInputValue) {
         _setTimer();
+        widget.onQueryChanged?.call(value);
       }
       _lastInputValue = value;
     });
@@ -125,11 +130,11 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   void initState() {
     super.initState();
 
-    _controller = new TextEditingController(text: widget.query);
+    _controller = new TextEditingController(text: widget.initialQuery);
     _lastInputValue = _controller.text;
 
-    if (widget.query != null && widget.query.isNotEmpty) {
-      _search(widget.query, widget.initialSelection);
+    if (widget.initialQuery != null && widget.initialQuery.isNotEmpty) {
+      _search(widget.initialQuery, widget.initialSelection);
     }
   }
 
@@ -138,12 +143,12 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
     super.didUpdateWidget(oldWidget);
 
     // Make a new search if widget.query has been changed
-    if (oldWidget.query != widget.query ||
+    if (oldWidget.initialQuery != widget.initialQuery ||
         !const ListEquality<String>()
             .equals(oldWidget.initialSelection, widget.initialSelection)) {
-      if (oldWidget.query ?? '' == _controller.text) {
-        _controller.text = widget.query ?? '';
-        _search(widget.query, widget.initialSelection);
+      if ((oldWidget.initialQuery ?? '') == _controller.text) {
+        _controller.text = widget.initialQuery ?? '';
+        _search(widget.initialQuery, widget.initialSelection);
       }
     }
   }

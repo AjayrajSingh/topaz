@@ -28,8 +28,9 @@ class GalleryScreen extends StatelessWidget {
                 ? new GoogleSearchImagePicker(
                     apiKey: model.apiKey,
                     customSearchId: model.customSearchId,
-                    query: model.queryString,
+                    initialQuery: model.queryString,
                     initialSelection: model.initialSelection,
+                    onQueryChanged: model.handleQueryChanged,
                     onSelectionChanged: model.handleSelectionChanged,
                     onAdd: model.handleAdd,
                   )

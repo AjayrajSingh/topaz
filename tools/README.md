@@ -3,6 +3,10 @@ Modules
 
 > This repository is a workspace for module exploration and common functionality.
 
+# Module-Specific Instructions
+
+* [Gallery](modules/gallery/README.md)
+
 # Pro-tips
 
 ## OS X Firewall Warnings

@@ -132,6 +132,11 @@ class GalleryModuleModel extends ModuleModel {
     }
   }
 
+  /// This is called when the query string is changed by the user from the UI.
+  void handleQueryChanged(String query) {
+    link.set(const <String>[_kContract, _kQueryKey], JSON.encode(query));
+  }
+
   /// This handles the notification coming from the UI of any changes that the
   /// user made on the selection. We have to store this information to Link, so
   /// that the selection may be restored correctly later.
@@ -142,7 +147,14 @@ class GalleryModuleModel extends ModuleModel {
 
   /// Called when the user clicks the "Add" button from the UI.
   void handleAdd(List<String> imageUrls) {
-    _log('handleAdd call: $imageUrls');
+    // Once we notify, it is expected that our parent will stop this gallery
+    // module instance. We should erase what's in the Links, so that when
+    // another gallery module is launched later by the same parent we don't
+    // accidentally show all the residual states in the new gallery.
+    link.erase(const <String>[]);
+    _selectionLink.erase(const <String>[]);
+
+    // Notify the subscribers via message queue.
     _galleryServiceImpl.notify(imageUrls);
   }
 }
