@@ -27,7 +27,7 @@ class ModelFixtures extends Fixtures {
   ///
   User user({String name, String email}) {
     name ??= this.name(name);
-    email ??= 'user-${sequence(email)}@example.org';
+    email ??= this.email();
 
     String id = Fixtures.uuid.v5(_uuidUser, email);
     return new User(
