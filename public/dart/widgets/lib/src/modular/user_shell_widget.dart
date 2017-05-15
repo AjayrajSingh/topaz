@@ -14,7 +14,7 @@ import 'user_shell_model.dart';
 /// A wrapper widget intended to be the root of the application that is
 /// a [UserShell].  Its main purpose is to hold the [ApplicationContext] and
 /// [UserShell] instances so they aren't garbage collected.
-/// For convienence, [advertise] does the advertising of the app as a
+/// For convenience, [advertise] does the advertising of the app as a
 /// [UserShell] to the rest of the system via the [ApplicationContext].
 /// Also for convienence, the [UserShellModel] given to this widget
 /// will be made available to [child] and [child]'s descendants.

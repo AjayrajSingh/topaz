@@ -15,7 +15,7 @@ import 'module_model.dart';
 /// A wrapper widget intended to be the root of the application that is
 /// a [Module].  Its main purpose is to hold the [ApplicationContext] and
 /// [Module] instances so they aren't garbage collected.
-/// For convienence, [advertise] does the advertising of the app as a
+/// For convenience, [advertise] does the advertising of the app as a
 /// [Module] to the rest of the system via the [ApplicationContext].
 /// Also for convienence, the [ModuleModel] given to this widget will be
 /// made available to [child] and [child]'s descendants.
