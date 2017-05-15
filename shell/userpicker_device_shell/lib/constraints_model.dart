@@ -42,7 +42,6 @@ class ConstraintsModel extends Model {
               ),
         )
         .toList();
-    _currentConstraints.insert(0, const BoxConstraints());
     notifyListeners();
   }
 

@@ -38,6 +38,7 @@ class _ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
   final GlobalKey _containerKey = new GlobalKey();
   List<BoxConstraints> _constraints;
   int _currentConstraintIndex = 0;
+  bool _useConstraints = false;
 
   @override
   void initState() {
@@ -53,81 +54,102 @@ class _ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
   }
 
   @override
-  Widget build(BuildContext context) => (_constraints?.isEmpty ?? true) ||
-          (_constraints.length == 1 &&
-              _constraints[0] == const BoxConstraints())
-      ? widget.child
-      : new Stack(
-          fit: StackFit.passthrough,
-          children: <Widget>[
-            _constrainedChild,
-            _constraintSwitchingButton,
-          ],
-        );
-
-  Widget get _constrainedChild => new LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints parentConstraints) =>
-            new Container(
-              color: new Color(0xFF404040),
-              child: new Center(
-                child: new Container(
-                  padding: _currentConstraint == const BoxConstraints()
-                      ? null
-                      : new EdgeInsets.only(
-                          bottom: _currentConstraint.maxHeight >
-                                  _currentConstraint.maxWidth
-                              ? _kBezelExtension
-                              : 0.0,
-                          right: _currentConstraint.maxHeight >
-                                  _currentConstraint.maxWidth
-                              ? 0.0
-                              : _kBezelExtension),
-                  decoration: _currentConstraint == const BoxConstraints()
-                      ? null
-                      : new BoxDecoration(
-                          color: Colors.black,
-                          border: new Border.all(
-                            color: Colors.black,
-                            width: _kBezelMinimumWidth,
-                          ),
-                          borderRadius: new BorderRadius.circular(
-                            _kOuterBezelRadius,
-                          ),
-                          boxShadow: kElevationToShadow[12],
-                        ),
-                  child: new AnimatedContainer(
-                    key: _containerKey,
-                    width: _currentConstraint == const BoxConstraints()
-                        ? parentConstraints.maxWidth
-                        : _currentConstraint.maxWidth,
-                    height: _currentConstraint == const BoxConstraints()
-                        ? parentConstraints.maxHeight
-                        : _currentConstraint.maxHeight,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.fastOutSlowIn,
-                    child: new ClipRect(
-                      child: new Container(
-                        foregroundDecoration: new RoundedCornerDecoration(
-                          radius: _kInnerBezelRadius,
-                          color: Colors.black,
-                        ),
-                        child: widget.child,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+  Widget build(BuildContext context) => new Stack(
+        fit: StackFit.loose,
+        alignment: FractionalOffset.center,
+        children:
+            _useConstraints && _constraints != null && _constraints.isNotEmpty
+                ? <Widget>[
+                    _exitConstraintsChild,
+                    _switchConstraintsButton,
+                    _constrainedChild,
+                  ]
+                : <Widget>[
+                    _exitConstraintsChild,
+                    _switchConstraintsButton,
+                    _unconstrainedChild,
+                    _enterConstraintsChild,
+                  ],
       );
 
-  Widget get _constraintSwitchingButton => new Positioned(
+  Widget get _constrainedChild => _decoratedChild(
+      _currentConstraint.maxWidth, _currentConstraint.maxHeight);
+
+  Widget get _unconstrainedChild => new LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) =>
+            _decoratedChild(constraints.maxWidth, constraints.maxHeight,
+                bezel: false),
+      );
+
+  Widget _decoratedChild(double width, double height, {bool bezel: true}) =>
+      new AnimatedContainer(
+        key: _containerKey,
+        width: width,
+        height: height,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.fastOutSlowIn,
+        padding: new EdgeInsets.only(
+            bottom: bezel && height > width ? _kBezelExtension : 0.0,
+            right: bezel && height <= width ? _kBezelExtension : 0.0),
+        decoration: new BoxDecoration(
+          color: Colors.black,
+          border: new Border.all(
+            color: Colors.black,
+            width: bezel ? _kBezelMinimumWidth : 0.0,
+          ),
+          borderRadius: new BorderRadius.circular(
+            _kOuterBezelRadius,
+          ),
+          boxShadow: kElevationToShadow[12],
+        ),
+        child: new ClipRect(
+          child: new Container(
+            foregroundDecoration: new RoundedCornerDecoration(
+              radius: _kInnerBezelRadius,
+              color: Colors.black,
+            ),
+            child: widget.child,
+          ),
+        ),
+      );
+
+  Widget get _enterConstraintsChild => new Positioned(
         right: 0.0,
-        top: 0.0,
-        width: 50.0,
-        height: 50.0,
+        bottom: 0.0,
+        width: 80.0,
+        height: 80.0,
         child: new GestureDetector(
           behavior: HitTestBehavior.translucent,
-          onTap: _switchConstraints,
+          onTap: _enterConstraints,
+        ),
+      );
+
+  Widget get _switchConstraintsButton => new Positioned(
+        right: 20.0,
+        bottom: 20.0,
+        width: 60.0,
+        height: 60.0,
+        child: new FloatingActionButton(
+          backgroundColor: const Color(0xFFFFFFFF),
+          child: new Icon(
+            Icons.devices,
+            color: const Color(0xFF404040),
+          ),
+          onPressed: _switchConstraints,
+        ),
+      );
+
+  Widget get _exitConstraintsChild => new Positioned(
+        left: 0.0,
+        right: 0.0,
+        top: 0.0,
+        bottom: 0.0,
+        child: new Container(
+          color: const Color(0xFF404040),
+          child: new GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: _exitConstraints,
+          ),
         ),
       );
 
@@ -138,8 +160,16 @@ class _ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
     return _constraints[_currentConstraintIndex % _constraints.length];
   }
 
+  void _enterConstraints() => setState(() {
+        _useConstraints = true;
+      });
+
   void _switchConstraints() => setState(() {
         _currentConstraintIndex++;
+      });
+
+  void _exitConstraints() => setState(() {
+        _useConstraints = false;
       });
 
   void _onChange() {
