@@ -97,6 +97,13 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
   }
 
   @override
+  void dispose() {
+    _positionAnimation.dispose();
+    _sizeAnimation.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return new AnimatedBuilder(
       child: new GestureDetector(
