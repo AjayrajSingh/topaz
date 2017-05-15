@@ -155,9 +155,10 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       padding: const EdgeInsets.all(8.0),
       margin: const EdgeInsets.only(bottom: 4.0),
       decoration: new BoxDecoration(
+        color: Colors.grey[50],
         border: new Border(
           bottom: new BorderSide(
-            color: Colors.grey[300],
+            color: Colors.grey[200],
           ),
         ),
       ),
@@ -167,7 +168,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
             margin: const EdgeInsets.only(right: 8.0),
             child: new Icon(
               Icons.search,
-              color: theme.primaryColor,
+              color: Colors.grey[900],
             ),
           ),
           new Expanded(
@@ -175,7 +176,11 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
               controller: _controller,
               onChanged: _handleInputChange,
               decoration: new InputDecoration.collapsed(
-                hintText: 'search images',
+                hintText: 'Search',
+                hintStyle: new TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: 14.0,
+                ),
               ),
             ),
           ),
@@ -209,21 +214,22 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
           );
         },
         child: new Material(
-          color: Colors.white,
+          color: Colors.grey[50],
           child: new Center(
             child: new Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 new Icon(
-                  Icons.image,
-                  color: Colors.grey[400],
-                  size: 56.0,
+                  Icons.collections,
+                  color: Colors.grey[300],
+                  size: 100.0,
                 ),
                 new Text(
-                  'type to search for images',
+                  'Search for images',
                   style: new TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.grey[400],
+                    fontSize: 16.0,
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
