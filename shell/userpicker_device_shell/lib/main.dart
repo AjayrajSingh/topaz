@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:application.lib.app.dart/app.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/modular.dart';
@@ -13,41 +14,48 @@ import 'child_constraints_changer.dart';
 import 'constraints_model.dart';
 import 'debug_text.dart';
 import 'screen_manager.dart';
+import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
 
 void main() {
   GlobalKey screenManagerKey = new GlobalKey();
   ConstraintsModel constraintsModel = new ConstraintsModel();
-
   UserPickerDeviceShellModel model = new UserPickerDeviceShellModel();
   AuthenticationOverlayModel authenticationOverlayModel =
       new AuthenticationOverlayModel();
-  AuthenticationContextImpl authenticationContext =
-      new AuthenticationContextImpl(
-    onStartOverlay: authenticationOverlayModel.onStartOverlay,
-    onStopOverlay: authenticationOverlayModel.onStopOverlay,
-  );
+  SoftKeyboardContainerImpl softKeyboardContainerImpl =
+      new SoftKeyboardContainerImpl();
+
+  ApplicationContext applicationContext =
+      new ApplicationContext.fromStartupInfo();
 
   DeviceShellWidget<UserPickerDeviceShellModel> deviceShellWidget =
       new DeviceShellWidget<UserPickerDeviceShellModel>(
+    applicationContext: applicationContext,
+    softKeyboardContainer: softKeyboardContainerImpl,
     deviceShellModel: model,
-    authenticationContext: authenticationContext,
+    authenticationContext: new AuthenticationContextImpl(
+      onStartOverlay: authenticationOverlayModel.onStartOverlay,
+      onStopOverlay: authenticationOverlayModel.onStopOverlay,
+    ),
     child: new ChildConstraintsChanger(
       constraintsModel: constraintsModel,
-      child: new Stack(
-        fit: StackFit.passthrough,
-        children: <Widget>[
-          new ScreenManager(
-            key: screenManagerKey,
-            onLogout: model.refreshUsers,
-            onAddUser: model.showNewUserForm,
-            onRemoveUser: model.removeUser,
-          ),
-          new ScopedModel<AuthenticationOverlayModel>(
-            model: authenticationOverlayModel,
-            child: new AuthenticationOverlay(),
-          ),
-        ],
+      child: softKeyboardContainerImpl.wrap(
+        child: new Stack(
+          fit: StackFit.passthrough,
+          children: <Widget>[
+            new ScreenManager(
+              key: screenManagerKey,
+              onLogout: model.refreshUsers,
+              onAddUser: model.showNewUserForm,
+              onRemoveUser: model.removeUser,
+            ),
+            new ScopedModel<AuthenticationOverlayModel>(
+              model: authenticationOverlayModel,
+              child: new AuthenticationOverlay(),
+            ),
+          ],
+        ),
       ),
     ),
   );

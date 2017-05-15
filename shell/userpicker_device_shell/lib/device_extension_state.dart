@@ -1,10 +1,9 @@
-// Copyright 2016 The Fuchsia Authors. All rights reserved.
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-
-import 'ticking_height_state.dart';
+import 'package:sysui_widgets/ticking_height_state.dart';
 
 /// A [TickingHeightState] that changes its height to 0% of the child's height
 /// via [hide] and 100% of the child's height via [show].
@@ -38,12 +37,17 @@ abstract class DeviceExtensionState<T extends StatefulWidget>
   Widget build(BuildContext context) {
     /// TODO(apwilson): This is crapping out with new skia!
     return new ClipRect(
-        child: new Align(
-            alignment: FractionalOffset.topCenter,
-            heightFactor: height / 100.0,
-            child: new Offstage(
-                offstage: height == 0.0,
-                child: new RepaintBoundary(child: createWidget(context)))));
+      child: new Align(
+        alignment: FractionalOffset.topCenter,
+        heightFactor: height / 100.0,
+        child: new Offstage(
+          offstage: height == 0.0,
+          child: new RepaintBoundary(
+            child: createWidget(context),
+          ),
+        ),
+      ),
+    );
   }
 
   /// Returns true if we're showing any amount of this device extension.
