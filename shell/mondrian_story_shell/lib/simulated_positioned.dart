@@ -157,13 +157,11 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
     setState(() {
       _positionAnimation.reset(_offset, details.velocity.pixelsPerSecond);
       _setTarget();
-      widget?.onDragEnd(
-        new SimulatedDragEndDetails(
-          velocity: details.velocity,
-          primaryVelocity: details.primaryVelocity,
-          offset: _offset - widget.rect.center,
-        ),
-      );
+      widget.onDragEnd?.call(new SimulatedDragEndDetails(
+        velocity: details.velocity,
+        primaryVelocity: details.primaryVelocity,
+        offset: _offset - widget.rect.center,
+      ));
       _offset = null;
     });
   }
