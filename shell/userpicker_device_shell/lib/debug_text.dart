@@ -18,9 +18,27 @@ class _DebugTextState extends State<DebugText> {
   final List<InternetAddress> _addresses = <InternetAddress>[];
   int _dataSize;
   bool _networkingReady;
+  bool _showHostInformation = true;
+  bool _showNetworkingInformation = false;
   @override
   void initState() {
     super.initState();
+    new Timer(
+      const Duration(minutes: 1),
+      () => setState(() {
+            _showHostInformation = false;
+          }),
+    );
+
+    /// TODO(apwilson): Remove this delay when NET-77 is fixed.
+    new Timer(const Duration(seconds: 10), _checkNetworking);
+
+    new Timer(
+      const Duration(seconds: 11),
+      () => setState(() {
+            _showNetworkingInformation = true;
+          }),
+    );
 
     /// TODO(apwilson): Reenable this code when it doesn't blow the app up.
     /*
@@ -37,16 +55,18 @@ class _DebugTextState extends State<DebugText> {
     */
 
     _checkData();
-    _checkNetworking();
   }
 
   void _checkData() {
-    new Directory('file:///data').stat().then((FileStat stat) {
+    new Directory('/data').stat().then((FileStat stat) {
       setState(() {
         if (!mounted) {
           return;
         }
         _dataSize = stat.size;
+        if (_dataSize == 0) {
+          new Timer(const Duration(seconds: 5), _checkData);
+        }
       });
     }).catchError((_, __) {
       new Timer(const Duration(seconds: 5), _checkData);
@@ -54,6 +74,7 @@ class _DebugTextState extends State<DebugText> {
   }
 
   void _checkNetworking() {
+    print('Checking network status...');
     http.get('http://www.example.com').then((http.Response response) {
       setState(() {
         if (!mounted) {
@@ -71,37 +92,73 @@ class _DebugTextState extends State<DebugText> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> columnChildren = <String>[];
-    if (_dataSize == null) {
-      columnChildren.add('Data is NOT ready!');
-    } else if (_dataSize == 0) {
-      columnChildren.add('Data is NOT persistant!');
-    }
-
-    if (_networkingReady != true) {
-      columnChildren.add('Networking is NOT ready!');
-    }
-
-    columnChildren.addAll(
-      _addresses.map((InternetAddress address) => address.address).toList(),
-    );
-    columnChildren.add(Platform.localHostname);
-    return new Column(
-        mainAxisSize: MainAxisSize.min,
-        children: columnChildren
+    List<_DebugEntry> columnChildren = <_DebugEntry>[];
+    if (_showHostInformation) {
+      columnChildren.add(new _DebugEntry(text: Platform.localHostname));
+      columnChildren.addAll(
+        _addresses
             .map(
-              (String text) => new Container(
-                    padding: const EdgeInsets.all(12.0),
-                    color: Colors.black54,
-                    child: new Text(
-                      text,
-                      style: new TextStyle(
-                        fontFamily: 'RobotoMono',
-                        color: Colors.white,
-                      ),
+              (InternetAddress address) =>
+                  new _DebugEntry(text: address.address),
+            )
+            .toList(),
+      );
+    }
+    if (!_showNetworkingInformation) {
+      columnChildren.add(
+        new _DebugEntry(
+          text: 'Delaying network check due to NET-77...',
+          color: Colors.yellow,
+        ),
+      );
+    } else if (_networkingReady != true) {
+      columnChildren.add(
+        new _DebugEntry(
+          text: 'Networking is NOT ready!',
+          color: Colors.redAccent,
+        ),
+      );
+    }
+    if (_dataSize == null) {
+      columnChildren.add(
+        new _DebugEntry(text: 'Data is NOT ready!', color: Colors.yellow),
+      );
+    } else if (_dataSize == 0) {
+      columnChildren.add(
+        new _DebugEntry(
+          text: 'Data is NOT persistant!',
+          color: Colors.redAccent,
+        ),
+      );
+    }
+    return new Offstage(
+      offstage: columnChildren.isEmpty,
+      child: new Container(
+        padding: const EdgeInsets.all(8.0),
+        color: Colors.black54,
+        child: new Column(
+          mainAxisSize: MainAxisSize.min,
+          children: new List<Widget>.generate(
+            columnChildren.length,
+            (int i) => new Container(
+                  padding: new EdgeInsets.only(top: (i == 0) ? 0.0 : 8.0),
+                  child: new Text(
+                    columnChildren[i].text,
+                    style: new TextStyle(
+                      fontFamily: 'RobotoMono',
+                      color: columnChildren[i].color,
                     ),
                   ),
-            )
-            .toList());
+                ),
+          ),
+        ),
+      ),
+    );
   }
+}
+
+class _DebugEntry {
+  final Color color;
+  final String text;
+  _DebugEntry({this.text, this.color: Colors.white});
 }

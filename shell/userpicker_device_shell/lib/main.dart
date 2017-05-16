@@ -114,25 +114,27 @@ void main() {
   );
 
   runApp(
-    new Overlay(
-      initialEntries: <OverlayEntry>[
-        new OverlayEntry(
-          builder: (BuildContext context) => new MediaQuery(
-                data: const MediaQueryData(),
-                child: new FocusScope(
-                  node: new FocusScopeNode(),
-                  autofocus: true,
-                  child: deviceShellWidget,
+    new CheckedModeBanner(
+      child: new Overlay(
+        initialEntries: <OverlayEntry>[
+          new OverlayEntry(
+            builder: (BuildContext context) => new MediaQuery(
+                  data: const MediaQueryData(),
+                  child: new FocusScope(
+                    node: new FocusScopeNode(),
+                    autofocus: true,
+                    child: deviceShellWidget,
+                  ),
                 ),
-              ),
-        ),
-        new OverlayEntry(
-          builder: (_) => new Align(
-                alignment: FractionalOffset.bottomCenter,
-                child: new DebugText(),
-              ),
-        )
-      ],
+          ),
+          new OverlayEntry(
+            builder: (_) => new Align(
+                  alignment: FractionalOffset.topCenter,
+                  child: new DebugText(),
+                ),
+          )
+        ],
+      ),
     ),
   );
 
