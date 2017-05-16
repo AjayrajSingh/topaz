@@ -158,7 +158,7 @@ class MozWebView : public mozart::BaseView,
             weak->CallIdle();
         }));
 
-    if (!icu_data::Initialize(application_context->environment_services().get())) {
+    if (!icu_data::Initialize(application_context)) {
       printf("Could not load ICU data\n");
     }
   }
