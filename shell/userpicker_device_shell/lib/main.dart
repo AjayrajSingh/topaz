@@ -11,6 +11,7 @@ import 'authentication_overlay_model.dart';
 import 'authentication_context_impl.dart';
 import 'child_constraints_changer.dart';
 import 'constraints_model.dart';
+import 'debug_text.dart';
 import 'screen_manager.dart';
 import 'user_picker_device_shell_model.dart';
 
@@ -64,6 +65,12 @@ void main() {
                 ),
               ),
         ),
+        new OverlayEntry(
+          builder: (_) => new Align(
+                alignment: FractionalOffset.bottomCenter,
+                child: new DebugText(),
+              ),
+        )
       ],
     ),
   );
