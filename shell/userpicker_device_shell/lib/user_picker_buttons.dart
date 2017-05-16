@@ -12,8 +12,18 @@ class UserPickerButtons extends StatelessWidget {
   /// Called when the add user button is pressed.
   final VoidCallback onAddUser;
 
+  /// Called when the user shell chooser button is pressed.
+  final VoidCallback onUserShellChange;
+
+  /// The asset name of the user shell the user will be logged in with.
+  final String userShellAssetName;
+
   /// Constructor.
-  UserPickerButtons({this.onAddUser});
+  UserPickerButtons({
+    this.onAddUser,
+    this.onUserShellChange,
+    this.userShellAssetName,
+  });
 
   @override
   Widget build(BuildContext context) =>
@@ -37,6 +47,24 @@ class UserPickerButtons extends StatelessWidget {
                       onTap: () => onAddUser?.call(),
                     ),
                   ),
+                  new Container(
+                      margin: const EdgeInsets.only(left: 16.0),
+                      child: new Material(
+                        type: MaterialType.circle,
+                        elevation: 2.0,
+                        color: Colors.grey[200],
+                        child: new InkWell(
+                          onTap: () => onUserShellChange?.call(),
+                          child: new Container(
+                            padding: const EdgeInsets.all(12.0),
+                            child: new Image.asset(
+                              userShellAssetName,
+                              height: 24.0,
+                              width: 24.0,
+                            ),
+                          ),
+                        ),
+                      )),
                 ],
               ));
 }

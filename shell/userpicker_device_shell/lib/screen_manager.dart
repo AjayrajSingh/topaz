@@ -5,13 +5,16 @@
 import 'dart:async';
 
 import 'package:apps.modular.services.auth.account/account.fidl.dart';
+import 'package:apps.modular.services.config/config.fidl.dart';
 import 'package:apps.modular.services.device/user_provider.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'user_picker.dart';
+import 'user_picker_buttons.dart';
 import 'user_picker_screen.dart';
+import 'user_shell_chooser.dart';
 import 'user_watcher_impl.dart';
 
 /// The root widget which displays all the other windows of this app.
@@ -46,6 +49,7 @@ class _ScreenManagerState extends State<ScreenManager>
   final FocusNode _userNameFocusNode = new FocusNode();
   final FocusNode _serverNameFocusNode = new FocusNode();
   final Set<Account> _draggedUsers = new Set<Account>();
+  final UserShellChooser _userShellChooser = new UserShellChooser();
 
   UserControllerProxy _userControllerProxy;
   UserWatcherImpl _userWatcherImpl;
@@ -103,15 +107,6 @@ class _ScreenManagerState extends State<ScreenManager>
                   ),
         child: new UserPickerScreen(
           showBlackHole: _draggedUsers.isNotEmpty,
-          onAddUser: () {
-            //TODO(apwilson): Remove the delay.  It's a workaround to raw
-            // keyboard focus bug.
-            new Timer(
-              const Duration(milliseconds: 1000),
-              () => FocusScope.of(context).requestFocus(_userNameFocusNode),
-            );
-            widget.onAddUser?.call();
-          },
           userPicker: new UserPicker(
             onLoginRequest: _login,
             onAddUserStarted: _addUserStarted,
@@ -132,6 +127,21 @@ class _ScreenManagerState extends State<ScreenManager>
             onUserDragCanceled: (Account account) => setState(() {
                   _draggedUsers.remove(account);
                 }),
+          ),
+          userPickerButtons: new UserPickerButtons(
+            onAddUser: () {
+              //TODO(apwilson): Remove the delay.  It's a workaround to raw
+              // keyboard focus bug.
+              new Timer(
+                const Duration(milliseconds: 1000),
+                () => FocusScope.of(context).requestFocus(_userNameFocusNode),
+              );
+              widget.onAddUser?.call();
+            },
+            onUserShellChange: () => setState(() {
+                  _userShellChooser.next();
+                }),
+            userShellAssetName: _userShellChooser.assetName,
           ),
           onRemoveUser: (Account account) => setState(() {
                 _draggedUsers.remove(account);
@@ -161,7 +171,8 @@ class _ScreenManagerState extends State<ScreenManager>
     final UserLoginParams params = new UserLoginParams()
       ..accountId = accountId
       ..viewOwner = viewOwner.passRequest()
-      ..userController = _userControllerProxy.ctrl.request();
+      ..userController = _userControllerProxy.ctrl.request()
+      ..userShellConfig = new AppConfig.init(_userShellChooser.appUrl, null);
     userProvider?.login(params);
     _userControllerProxy.watch(_userWatcherImpl.getHandle());
 

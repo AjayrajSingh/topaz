@@ -20,8 +20,8 @@ class UserPickerScreen extends StatelessWidget {
   /// The widget that allows a user to be picked.
   final UserPicker userPicker;
 
-  /// Called when the add user button is pressed.
-  final VoidCallback onAddUser;
+  /// The widget that allows a user shutdown, add a user, and more.
+  final UserPickerButtons userPickerButtons;
 
   /// Called when the user is removing an account.
   final OnRemoveUser onRemoveUser;
@@ -32,7 +32,7 @@ class UserPickerScreen extends StatelessWidget {
   /// Constructor.
   UserPickerScreen({
     this.userPicker,
-    this.onAddUser,
+    this.userPickerButtons,
     this.onRemoveUser,
     this.showBlackHole,
   });
@@ -67,7 +67,7 @@ class UserPickerScreen extends StatelessWidget {
                 alignment: FractionalOffset.bottomLeft,
                 child: new Container(
                   margin: const EdgeInsets.all(16.0),
-                  child: new UserPickerButtons(onAddUser: onAddUser),
+                  child: userPickerButtons,
                 ),
               ),
 
