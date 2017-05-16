@@ -19,6 +19,7 @@ void main() {
     expect(track.duration, new Duration(milliseconds: json['duration_ms']));
     expect(track.trackNumber, json['track_number']);
     expect(track.id, json['id']);
+    expect(track.playbackUrl, json['preview_url']);
   });
 
   test('getter: defaultArtworkUrl', () async {

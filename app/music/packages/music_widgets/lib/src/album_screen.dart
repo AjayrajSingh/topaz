@@ -136,7 +136,7 @@ class AlbumScreen extends StatelessWidget {
                   track: track,
                   highlightColor: highlightColor,
                   isPlaying: currentTrack == track,
-                  onTap: () => onTapTrack?.call(track),
+                  onTap: () => onTapTrack?.call(track, album),
                   showArtist: album.albumType != 'album',
                 ),
               ))

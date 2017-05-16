@@ -5,16 +5,27 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:application.lib.app.dart/app.dart';
+import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.maxwell.lib.dart/decomposition.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
+import 'package:apps.modular.services.agent.agent_controller/agent_controller.fidl.dart';
+import 'package:apps.modular.services.component/component_context.fidl.dart';
+import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
+import 'package:apps.modules.music.services.player/player.fidl.dart'
+    as player_fidl;
+import 'package:apps.modules.music.services.player/track.fidl.dart'
+    as track_fidl;
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
+
+const String _kPlayerUrl = 'file:///system/apps/music_playback_agent';
 
 /// [ModuleModel] that manages the state of the Artist Module.
 class ArtistModuleModel extends ModuleModel {
@@ -28,6 +39,11 @@ class ArtistModuleModel extends ModuleModel {
   List<Artist> relatedArtists;
 
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
+
+  final AgentControllerProxy _playbackAgentController =
+      new AgentControllerProxy();
+
+  final player_fidl.PlayerProxy _player = new player_fidl.PlayerProxy();
 
   /// Get the current loading status
   LoadingStatus get loadingStatus => _loadingStatus;
@@ -52,6 +68,39 @@ class ArtistModuleModel extends ModuleModel {
       _loadingStatus = LoadingStatus.failed;
     }
     notifyListeners();
+  }
+
+  @override
+  void onReady(
+    ModuleContext moduleContext,
+    Link link,
+    ServiceProvider incomingServices,
+  ) {
+    super.onReady(moduleContext, link, incomingServices);
+
+    // Obtain the component context.
+    ComponentContextProxy componentContext = new ComponentContextProxy();
+    moduleContext.getComponentContext(componentContext.ctrl.request());
+
+    // Obtain the Player service
+    ServiceProviderProxy playerServices = new ServiceProviderProxy();
+    componentContext.connectToAgent(
+      _kPlayerUrl,
+      playerServices.ctrl.request(),
+      _playbackAgentController.ctrl.request(),
+    );
+    connectToService(playerServices, _player.ctrl);
+
+    // Close all the unnecessary bindings.
+    playerServices.ctrl.close();
+    componentContext.ctrl.close();
+  }
+
+  @override
+  Future<Null> onStop() async {
+    _player.ctrl.close();
+    _playbackAgentController.ctrl.close();
+    super.onStop();
   }
 
   /// Update the artist ID
@@ -126,6 +175,19 @@ class ArtistModuleModel extends ModuleModel {
       url: 'file:///system/apps/music_album',
       initialData: JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}),
     );
+  }
+
+  /// Plays the given track
+  void playTrack(Track track, Album album) {
+    track_fidl.Track trackFidl = new track_fidl.Track()
+      ..title = track.name
+      ..id = track.id
+      ..artist = track.artists.first?.name
+      ..album = album.name
+      ..cover = album.defaultArtworkUrl
+      ..playbackUrl = track.playbackUrl
+      ..durationInSeconds = track.duration.inSeconds;
+    _player.play(trackFidl);
   }
 
   /// Starts a module in the story shell

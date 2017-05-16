@@ -22,6 +22,7 @@ flutter_app("music_artist") {
     "//apps/modules/music/packages/music_api",
     "//apps/modules/music/packages/music_models",
     "//apps/modules/music/packages/music_widgets",
+    "//apps/modules/music/services/player:player_dart",
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",

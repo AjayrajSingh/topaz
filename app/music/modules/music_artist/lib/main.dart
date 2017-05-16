@@ -36,6 +36,8 @@ void main() {
             loadingStatus: model.loadingStatus,
             onTapArtist: (Artist artist) => model.goToArtist(artist.id),
             onTapAblum: (Album album) => model.goToAlbum(album.id),
+            onTapTrack: (Track track, Album album) =>
+                model.playTrack(track, album),
           );
         }),
       ),

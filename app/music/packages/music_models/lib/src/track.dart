@@ -27,6 +27,9 @@ class Track {
   /// ID of track
   final String id;
 
+  /// URL for media playback
+  final String playbackUrl;
+
   /// Constructor
   Track({
     this.name,
@@ -35,6 +38,7 @@ class Track {
     this.duration,
     this.trackNumber,
     this.id,
+    this.playbackUrl,
   });
 
   /// Create a new track from JSON data
@@ -51,6 +55,7 @@ class Track {
       duration: new Duration(milliseconds: json['duration_ms']),
       trackNumber: json['track_number'],
       id: json['id'],
+      playbackUrl: json['preview_url'],
     );
   }
 

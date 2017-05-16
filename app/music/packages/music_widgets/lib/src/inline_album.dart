@@ -104,7 +104,7 @@ class InlineAlbum extends StatelessWidget {
           isPlaying: track == currentTrack,
           highlightColor: highlightColor,
           showArtist: false,
-          onTap: () => onTapTrack?.call(track),
+          onTap: () => onTapTrack?.call(track, album),
         )));
 
     return new Column(
