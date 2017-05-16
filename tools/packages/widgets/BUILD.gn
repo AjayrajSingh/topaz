@@ -9,7 +9,7 @@ dart_package("widgets") {
   package_name = "widgets"
 
   deps = [
-    "//apps/modules/common/packages/google_search_api",
+    "//apps/modules/common/packages/search_api",
     "//apps/modules/common/packages/models",
     "//apps/modules/common/packages/widgets_meta",
     "//lib/flutter/packages/flutter",

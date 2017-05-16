@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:search_api/google_search_api.dart';
 import 'package:widgets/image_picker.dart';
 
 import 'module_model.dart';
@@ -26,8 +27,10 @@ class GalleryScreen extends StatelessWidget {
           ) {
             return model.apiKey != null && model.customSearchId != null
                 ? new GoogleSearchImagePicker(
-                    apiKey: model.apiKey,
-                    customSearchId: model.customSearchId,
+                    searchApi: new GoogleSearchAPI(
+                      apiKey: model.apiKey,
+                      customSearchId: model.customSearchId,
+                    ),
                     initialQuery: model.queryString,
                     initialSelection: model.initialSelection,
                     onQueryChanged: model.handleQueryChanged,

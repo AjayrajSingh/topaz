@@ -6,16 +6,27 @@ import 'dart:async';
 import 'dart:convert' show JSON;
 
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
+
+import 'search_api.dart';
 
 const String _kApiBaseUrl = 'www.googleapis.com';
 
 /// Client to retreive Google search data
-class GoogleSearchAPI {
+class GoogleSearchAPI extends SearchAPI {
+  /// API key used for a custom Google Search
+  final String apiKey;
+
+  /// ID of the custom Google Search instance
+  final String customSearchId;
+
+  /// Returns a list of images
+  GoogleSearchAPI({@required this.apiKey, @required this.customSearchId});
+
   /// Perform a Google image search for a given query string
-  static Future<List<String>> images({
+  @override
+  Future<List<String>> images({
     String query,
-    String apiKey,
-    String customSearchId,
   }) async {
     Map<String, String> queryParams = new Map<String, String>();
     queryParams['q'] = query;

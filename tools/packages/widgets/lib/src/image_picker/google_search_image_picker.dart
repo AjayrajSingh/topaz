@@ -6,27 +6,31 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:google_search_api/google_search_api.dart';
 import 'package:meta/meta.dart';
+import 'package:search_api/search_api.dart';
 
 import 'image_picker.dart';
+
+/// Callback function signature for selecting a group of images
+typedef void ImageSelectCallback(List<String> imageUrls);
 
 const Duration _kSearchDelay = const Duration(milliseconds: 1000);
 const String _kSearchMessage = 'Search for images';
 const String _kNoImagesMessage = 'No images returned';
 const String _kLoadErrorMessage = 'Can\'t load images';
+const double _kOverlayHeight = 48.0;
+const double _kDefaultFontSize = 14.0;
 
 /// Wrapper around a [ImagePicker] that uses Google Custom Search to populate
 /// images based on a given query.
 ///
 /// Requires a valid Google API key and a Custom Search ID:
 /// https://developers.google.com/custom-search/
+// TODO SO-436:
+// Rename this to a general ImagePicker since we now pass in the searchApi
 class GoogleSearchImagePicker extends StatefulWidget {
-  /// API key used for a Custom Google Search
-  final String apiKey;
-
-  /// ID of the Custom Google Search instance
-  final String customSearchId;
+  /// Search API to use for search
+  final SearchAPI searchApi;
 
   /// Optional initial image search query
   final String initialQuery;
@@ -47,8 +51,7 @@ class GoogleSearchImagePicker extends StatefulWidget {
   /// Constructor
   GoogleSearchImagePicker({
     Key key,
-    @required this.apiKey,
-    @required this.customSearchId,
+    @required this.searchApi,
     this.initialQuery,
     this.initialSelection,
     this.onQueryChanged,
@@ -56,8 +59,7 @@ class GoogleSearchImagePicker extends StatefulWidget {
     this.onAdd,
   })
       : super(key: key) {
-    assert(apiKey != null);
-    assert(customSearchId != null);
+    assert(searchApi != null);
   }
 
   @override
@@ -65,18 +67,22 @@ class GoogleSearchImagePicker extends StatefulWidget {
       new _GoogleSearchImagePickerState();
 }
 
-class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
+class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker>
+    with TickerProviderStateMixin {
   List<String> _sourceImages = <String>[];
   String _lastInputValue;
   TextEditingController _controller;
   bool _isLoading = false;
   Timer _timer;
   String _lastSearchQuery;
-  List<String> _initialSelection;
+  List<String> _selectedImages = <String>[];
+  AnimationController _animationController;
+  Animation<double> _selectedImagesAnimation;
   // Give a Google query a "count" so that a slower query doesn't overwrite
   // a later query that resolves faster.
   int _counter = 0;
   String _emptyStateMessage = _kSearchMessage;
+  bool _enableClearButton = false;
 
   void _handleInputChange(String value) {
     setState(() {
@@ -88,6 +94,30 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       }
       _lastInputValue = value;
     });
+  }
+
+  // Clears search input text when the clear IconButton is pressed
+  void _clearInputText() {
+    _controller.text = '';
+    _handleInputChange(_controller.text);
+  }
+
+  // Clears all selected images
+  void clearSelection() {
+    if (_selectedImages.isNotEmpty) {
+      _animationController.reverse();
+    }
+    setState(() {
+      _selectedImages = <String>[];
+    });
+  }
+
+  String get _selectionText {
+    if (_selectedImages.length == 1) {
+      return '1 image selected';
+    } else {
+      return '${_selectedImages.length} images selected';
+    }
   }
 
   // Sets a delay so that we don't make search queries for consecutive
@@ -107,6 +137,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       setState(() {
         _sourceImages = <String>[];
         _emptyStateMessage = _kSearchMessage;
+        _enableClearButton = false;
       });
     } else {
       _counter++;
@@ -114,17 +145,12 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       setState(() {
         _isLoading = true;
       });
-      List<String> images = await GoogleSearchAPI.images(
-        query: query,
-        apiKey: widget.apiKey,
-        customSearchId: widget.customSearchId,
-      );
-
+      List<String> images = await widget.searchApi.images(query: query);
       if (currentCount == _counter) {
         setState(() {
           _lastSearchQuery = query;
           _sourceImages = images ?? <String>[];
-          _initialSelection = initialSelection;
+          _enableClearButton = true;
           _isLoading = false;
 
           if (images == null) {
@@ -185,6 +211,15 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
 
     _controller = new TextEditingController(text: widget.initialQuery);
     _lastInputValue = _controller.text;
+    _animationController = new AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _selectedImagesAnimation = new CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.fastOutSlowIn,
+    );
 
     if (widget.initialQuery != null && widget.initialQuery.isNotEmpty) {
       _search(widget.initialQuery, widget.initialSelection);
@@ -207,11 +242,17 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    _animationController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     Widget searchInput = new Container(
-      padding: const EdgeInsets.all(8.0),
-      margin: const EdgeInsets.only(bottom: 4.0),
       decoration: new BoxDecoration(
         color: Colors.grey[50],
         border: new Border(
@@ -223,7 +264,7 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
       child: new Row(
         children: <Widget>[
           new Container(
-            margin: const EdgeInsets.only(right: 8.0),
+            padding: const EdgeInsets.all(12.0),
             child: new Icon(
               Icons.search,
               color: Colors.grey[900],
@@ -237,10 +278,16 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
                 hintText: 'Search',
                 hintStyle: new TextStyle(
                   color: Colors.grey[500],
-                  fontSize: 14.0,
+                  fontSize: _kDefaultFontSize,
                 ),
               ),
             ),
+          ),
+          new IconButton(
+            icon: new Icon(Icons.clear),
+            color: Colors.grey[900],
+            disabledColor: Colors.grey[50],
+            onPressed: _enableClearButton ? _clearInputText : null,
           ),
         ],
       ),
@@ -259,20 +306,123 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker> {
         ),
       ),
     );
+    Widget emptyState = new Positioned.fill(
+      child: new AnimatedBuilder(
+        animation: _controller,
+        builder: (BuildContext context, Widget child) {
+          // _hideEmptyState depends on _controller.text, which means we need to
+          // listen to _controller to make sure we rebuild this widget when
+          // _controller.text changes.
+          return new Offstage(
+            offstage: _hideEmptyState,
+            child: child,
+          );
+        },
+        child: new Material(
+          color: Colors.grey[50],
+          child: new Center(
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new Icon(
+                  Icons.collections,
+                  color: Colors.grey[300],
+                  size: 100.0,
+                ),
+                new Text(
+                  'Search for images',
+                  style: new TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    ImagePicker imagePicker = new ImagePicker(
+      imageUrls: _sourceImages,
+      selectedImages: _selectedImages,
+      onImageTap: (String url) {
+        setState(() {
+          if (_selectedImages.contains(url)) {
+            _selectedImages.remove(url);
+            if (_selectedImages.length == 0) {
+              _animationController.reverse();
+            }
+          } else {
+            _selectedImages.add(url);
+            if (_selectedImages.length == 1) {
+              _animationController.forward();
+            }
+          }
+        });
+        widget.onSelectionChanged?.call(_selectedImages);
+      },
+    );
+    Widget selectedImagesOverlay = new AnimatedBuilder(
+      animation: _animationController,
+      builder: (BuildContext context, Widget child) {
+        return new Positioned(
+          height: _kOverlayHeight,
+          left: 0.0,
+          right: 0.0,
+          top: -(_kOverlayHeight + 16.0) *
+              (1.0 - _selectedImagesAnimation.value),
+          child: new Offstage(
+            offstage: _animationController.isDismissed,
+            child: child,
+          ),
+        );
+      },
+      child: new Material(
+        elevation: 2.0,
+        child: new Container(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: new Row(
+            children: <Widget>[
+              new Expanded(
+                child: new Text(
+                  _selectionText,
+                  style: new TextStyle(
+                    fontSize: _kDefaultFontSize,
+                  ),
+                ),
+              ),
+              new IconButton(
+                icon: new Icon(Icons.check),
+                color: Colors.grey[900],
+                onPressed: () => widget.onAdd?.call(_selectedImages),
+              ),
+              new IconButton(
+                icon: new Icon(Icons.clear),
+                color: Colors.grey[900],
+                onPressed: clearSelection,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
     return new Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        searchInput,
+        new Stack(
+          fit: StackFit.passthrough,
+          children: <Widget>[
+            searchInput,
+            selectedImagesOverlay,
+          ],
+        ),
         new Expanded(
           child: new Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
-              new ImagePicker(
-                imageUrls: _sourceImages,
-                initialSelection: _initialSelection,
-                onSelectionChanged: widget.onSelectionChanged,
-                onAdd: widget.onAdd,
-              ),
+              imagePicker,
               loadingOverlay,
               _createEmptyState(),
             ],

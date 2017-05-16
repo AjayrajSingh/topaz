@@ -8,8 +8,8 @@ import 'package:widgets_meta/widgets_meta.dart';
 
 const Duration _kAnimationDuration = const Duration(milliseconds: 100);
 const double _kDefaultSize = 150.0;
-const double _kSelectedIconSizeRatio = 0.20;
-const double _kSelectSizeRatio = 0.70;
+const double _kSelectedIconSizeRatio = 0.15;
+const double _kSelectSizeRatio = 0.80;
 const String _kExampleImage =
     'https://github.com/dvdwasibi/DogsOfFuchsia/blob/master/coco.jpg?raw=true';
 
@@ -88,7 +88,7 @@ class ImageEntry extends StatelessWidget {
                   child: new Icon(
                     Icons.check,
                     color: Colors.white,
-                    size: _selectedIconSize - 8.0,
+                    size: _selectedIconSize - 2.0,
                   ),
                 ),
               ),

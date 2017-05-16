@@ -4,8 +4,8 @@
 
 import("//build/dart/dart_package.gni")
 
-dart_package("google_search_api") {
-  package_name = "google_search_api"
+dart_package("search_api") {
+  package_name = "search_api"
 
   source_dir = "lib"
 
