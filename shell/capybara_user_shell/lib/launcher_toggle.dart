@@ -21,46 +21,82 @@ class LauncherToggleWidget extends StatefulWidget {
 }
 
 /// Manages the state of a [LauncherToggleWidget].
-class LauncherToggleState extends State<LauncherToggleWidget> {
+class LauncherToggleState extends State<LauncherToggleWidget>
+    with TickerProviderStateMixin {
   bool _toggled = false;
+
+  AnimationController _controller;
+  Animation<double> _animation;
+
+  final Tween<double> _backgroundOpacityTween =
+      new Tween<double>(begin: 0.0, end: 0.33);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = new AnimationController(
+        duration: const Duration(milliseconds: 200), vsync: this);
+    _animation = new CurvedAnimation(
+      parent: _controller,
+      curve: Curves.linear,
+      reverseCurve: Curves.linear,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => new RepaintBoundary(
         child: new GestureDetector(
           onTap: () {
             setState(() {
-              _toggled = !_toggled;
+              toggled = !_toggled;
               widget._callback?.call(_toggled);
             });
           },
           behavior: HitTestBehavior.opaque,
           child: new AspectRatio(
             aspectRatio: 1.0,
-            child: new CustomPaint(
-              painter: new _Painter(_toggled),
+            child: new AnimatedBuilder(
+              animation: _animation,
+              builder: (BuildContext context, Widget child) => new CustomPaint(
+                    painter: new _Painter(
+                      _backgroundOpacityTween.evaluate(_animation),
+                    ),
+                  ),
             ),
           ),
         ),
       );
 
-  /// Deactivates the toggle.
+  /// Sets the toggle state.
   set toggled(bool value) {
-    setState(() => _toggled = value);
+    if (value == _toggled) {
+      return;
+    }
+    setState(() {
+      _toggled = value;
+      _toggled ? _controller.forward() : _controller.reverse();
+    });
   }
 }
 
 class _Painter extends CustomPainter {
-  final bool _withBackground;
+  final double _backgroundOpacity;
 
-  _Painter(this._withBackground);
+  _Painter(this._backgroundOpacity);
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (_withBackground) {
+    if (_backgroundOpacity > 0) {
       canvas.drawCircle(
         size.center(Offset.zero),
         max(size.shortestSide / 2 - 10.0, 0.0),
-        new Paint()..color = Colors.grey.withOpacity(0.33),
+        new Paint()..color = Colors.grey.withOpacity(_backgroundOpacity),
       );
     }
     canvas.drawArc(
@@ -79,6 +115,6 @@ class _Painter extends CustomPainter {
 
   @override
   bool shouldRepaint(_Painter oldDelegate) {
-    return _withBackground != oldDelegate._withBackground;
+    return _backgroundOpacity != oldDelegate._backgroundOpacity;
   }
 }

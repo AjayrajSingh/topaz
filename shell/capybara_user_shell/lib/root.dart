@@ -16,17 +16,47 @@ class RootWidget extends StatefulWidget {
   _RootState createState() => new _RootState();
 }
 
-class _RootState extends State<RootWidget> {
+class _RootState extends State<RootWidget> with TickerProviderStateMixin {
   final GlobalKey<LauncherToggleState> _launcherToggleKey =
       new GlobalKey<LauncherToggleState>();
 
   /// Whether the Launcher should be displayed.
   bool _isLauncherShowing = false;
 
+  AnimationController _controller;
+  Animation<double> _launcherAnimation;
+
+  final Tween<double> _launcherScaleTween =
+      new Tween<double>(begin: 0.9, end: 1.0);
+  final Tween<double> _launcherOpacityTween =
+      new Tween<double>(begin: 0.0, end: 1.0);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = new AnimationController(
+        duration: const Duration(milliseconds: 150), vsync: this);
+    _launcherAnimation = new CurvedAnimation(
+      parent: _controller,
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.fastOutSlowIn,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   /// Controls the visibility of the launcher and the state of its toggle.
   void _showLauncher(bool show) {
+    if (show == _isLauncherShowing) {
+      return;
+    }
     setState(() {
       _isLauncherShowing = show;
+      _isLauncherShowing ? _controller.forward() : _controller.reverse();
     });
     _launcherToggleKey.currentState.toggled = show;
   }
@@ -48,8 +78,13 @@ class _RootState extends State<RootWidget> {
         // 3 - Launcher, overlaid on top of all the windows.
         // TODO(pylaligand): Offstage still lays its children out, consider
         // editing the list directly instead.
-        new Offstage(
-          offstage: !_isLauncherShowing,
+        new AnimatedBuilder(
+          animation: _launcherAnimation,
+          builder: (BuildContext context, Widget child) => new Offstage(
+                // Only include the Launcher if it is actually visible.
+                offstage: _launcherAnimation.isDismissed,
+                child: child,
+              ),
           child: new Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
@@ -59,7 +94,12 @@ class _RootState extends State<RootWidget> {
                 onTap: () => _showLauncher(false),
               ),
               new Center(
-                child: new Launcher(),
+                child: new FadeTransition(
+                    opacity: _launcherOpacityTween.animate(_launcherAnimation),
+                    child: new ScaleTransition(
+                      scale: _launcherScaleTween.animate(_launcherAnimation),
+                      child: new Launcher(),
+                    )),
               ),
             ],
           ),
