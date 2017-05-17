@@ -140,4 +140,5 @@ void main() {
 
   constraintsModel.load(rootBundle);
   deviceShellWidget.advertise();
+  softKeyboardContainerImpl.advertise();
 }

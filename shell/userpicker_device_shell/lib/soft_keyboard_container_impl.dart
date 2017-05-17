@@ -3,9 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:apps.mozart.lib.flutter/child_view.dart';
+import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.mozart.services.input/ime_service.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.fidl.dart/core.dart';
 import 'package:meta/meta.dart';
 
 import 'device_extender.dart';
@@ -15,6 +17,9 @@ import 'device_extension_state.dart';
 class SoftKeyboardContainerImpl extends SoftKeyboardContainer {
   final GlobalKey<_KeyboardDeviceExtensionState> _keyboardDeviceExtensionKey =
       new GlobalKey<_KeyboardDeviceExtensionState>();
+  final ServiceProviderBinding _binding = new ServiceProviderBinding();
+  _SoftKeyboardContainerServiceProviderImpl
+      _softKeyboardContainerServiceProvider;
 
   /// The connection to the IME.
   final ChildViewConnection _connection;
@@ -23,7 +28,12 @@ class SoftKeyboardContainerImpl extends SoftKeyboardContainer {
   SoftKeyboardContainerImpl({
     @required InterfaceHandle<ViewOwner> softKeyboardView,
   })
-      : _connection = new ChildViewConnection(softKeyboardView);
+      : _connection = new ChildViewConnection(softKeyboardView) {
+    _softKeyboardContainerServiceProvider =
+        new _SoftKeyboardContainerServiceProviderImpl(
+      softKeyboardContainer: this,
+    );
+  }
 
   @override
   void show(void callback(bool shown)) {
@@ -51,6 +61,35 @@ class SoftKeyboardContainerImpl extends SoftKeyboardContainer {
         ],
         child: child,
       );
+
+  /// Advertises this [SoftKeyboardContainer] to its view.
+  void advertise() {
+    InterfacePair<ServiceProvider> serviceProvider =
+        new InterfacePair<ServiceProvider>();
+    _binding.bind(
+      _softKeyboardContainerServiceProvider,
+      serviceProvider.passRequest(),
+    );
+    View.offerServiceProvider(serviceProvider.passHandle());
+  }
+}
+
+class _SoftKeyboardContainerServiceProviderImpl extends ServiceProvider {
+  final SoftKeyboardContainerImpl softKeyboardContainer;
+  final SoftKeyboardContainerBinding _binding =
+      new SoftKeyboardContainerBinding();
+
+  _SoftKeyboardContainerServiceProviderImpl({this.softKeyboardContainer});
+
+  @override
+  void connectToService(String serviceName, Channel channel) {
+    if (serviceName == SoftKeyboardContainer.serviceName) {
+      _binding.bind(
+        softKeyboardContainer,
+        new InterfaceRequest<SoftKeyboardContainer>(channel),
+      );
+    }
+  }
 }
 
 class _KeyboardDeviceExtension extends StatefulWidget {
