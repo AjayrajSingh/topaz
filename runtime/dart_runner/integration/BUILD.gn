@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//apps/dart_content_handler/dart_app.gni")
+import("//packages/package.gni")
 
 dart_app("integration") {
   testonly = true
@@ -17,5 +18,18 @@ dart_app("integration") {
     "//application/lib/app/dart",
     "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
     "//third_party/dart-pkg/pub/test",
+  ]
+}
+
+package("package") {
+  testonly = true
+
+  package_name = "dart_content_handler_test"
+  deps = [ ":integration" ]
+
+  binaries = [
+    {
+      name = "dart_content_handler_test.dartx"
+    }
   ]
 }

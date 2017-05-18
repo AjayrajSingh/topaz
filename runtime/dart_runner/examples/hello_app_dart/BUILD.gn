@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//apps/dart_content_handler/dart_app.gni")
+import("//packages/package.gni")
 
 dart_app("hello_app_dart") {
   main_dart = "main.dart"
@@ -13,5 +14,16 @@ dart_app("hello_app_dart") {
     "//application/lib/app/dart",
     "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
     "//lib/fidl/dart",
+  ]
+}
+
+package("package") {
+  package_name = "hello_app_dart"
+  deps = [ ":hello_app_dart" ]
+
+  binaries = [
+    {
+      name = "hello_app_dart"
+    }
   ]
 }
