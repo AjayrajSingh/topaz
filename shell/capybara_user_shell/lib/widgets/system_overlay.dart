@@ -4,21 +4,19 @@
 
 import 'package:flutter/widgets.dart';
 
-/// Builds the content of an overlay.
-/// [animation] represents the show/hide transition of the overlay.
-typedef Widget OverlayContentBuilder(Animation<double> animation);
+import 'animated_content_builder.dart';
 
 /// An overlay which animates its content and dismisses it if a click occurs
 /// outside of the content bounds.
 class SystemOverlay extends StatefulWidget {
-  final OverlayContentBuilder _builder;
+  final AnimatedContentBuilder _builder;
   final ValueChanged<bool> _callback;
 
   /// Constructor.
   /// [builder] is invoked to build the content of the overlay. [callback]
   /// receives notifications when the overlay is shown or hidden.
   SystemOverlay(
-      {Key key, OverlayContentBuilder builder, ValueChanged<bool> callback})
+      {Key key, AnimatedContentBuilder builder, ValueChanged<bool> callback})
       : _builder = builder,
         _callback = callback,
         super(key: key);
