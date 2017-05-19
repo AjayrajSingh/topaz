@@ -24,6 +24,7 @@ package("package") {
   binaries = [
     {
       name = "hello_app_dart"
+      source = "hello_app_dart.dartx"
     }
   ]
 }
