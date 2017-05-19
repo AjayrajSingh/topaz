@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//packages/package.gni")
-
 group("dart_content_handler") {
   testonly = true
 
@@ -45,15 +43,5 @@ executable("app") {
     "//lib/tonic",
     "//lib/tonic/mx",
     "//lib/zip",
-  ]
-}
-
-package("package") {
-  package_name = "dart_content_handler"
-  deps = [ ":app" ]
-  binaries = [
-    {
-      name = "dart_content_handler"
-    }
   ]
 }
