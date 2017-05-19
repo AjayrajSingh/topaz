@@ -23,7 +23,6 @@ class _RootState extends State<RootWidget> with TickerProviderStateMixin {
   final GlobalKey<SystemOverlayState> _launcherOverlayKey =
       new GlobalKey<SystemOverlayState>();
 
-
   final Tween<double> _launcherScaleTween =
       new Tween<double>(begin: 0.9, end: 1.0);
   final Tween<double> _launcherOpacityTween =
@@ -48,16 +47,15 @@ class _RootState extends State<RootWidget> with TickerProviderStateMixin {
           key: _launcherOverlayKey,
           builder: (Animation<double> animation) => new Center(
                 child: new FadeTransition(
-                    opacity: _overlayOpacityTween.animate(animation),
+                    opacity: _launcherScaleTween.animate(animation),
                     child: new ScaleTransition(
-                      scale: _overlayScaleTween.animate(animation),
+                      scale: _launcherOpacityTween.animate(animation),
                       child: new Launcher(),
                     )),
               ),
           callback: (bool visible) {
             _launcherToggleKey.currentState.toggled = visible;
           },
-        ),
         ),
 
         // 4 - The bottom bar.
@@ -80,7 +78,6 @@ class _RootState extends State<RootWidget> with TickerProviderStateMixin {
                   key: _launcherToggleKey,
                   callback: (bool toggled) =>
                       _launcherOverlayKey.currentState.visible = toggled,
-                ),
                 ),
                 new StatusTrayWidget(isStandalone: false),
               ],
