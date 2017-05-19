@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'launcher.dart';
 import 'launcher_toggle.dart';
 import 'status_tray.dart';
+import 'widgets/system_overlay.dart';
 import 'window_playground.dart';
 
 /// Base widget of the user shell.
@@ -19,47 +20,14 @@ class RootWidget extends StatefulWidget {
 class _RootState extends State<RootWidget> with TickerProviderStateMixin {
   final GlobalKey<LauncherToggleState> _launcherToggleKey =
       new GlobalKey<LauncherToggleState>();
+  final GlobalKey<SystemOverlayState> _launcherOverlayKey =
+      new GlobalKey<SystemOverlayState>();
 
-  /// Whether the Launcher should be displayed.
-  bool _isLauncherShowing = false;
-
-  AnimationController _controller;
-  Animation<double> _launcherAnimation;
 
   final Tween<double> _launcherScaleTween =
       new Tween<double>(begin: 0.9, end: 1.0);
   final Tween<double> _launcherOpacityTween =
       new Tween<double>(begin: 0.0, end: 1.0);
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = new AnimationController(
-        duration: const Duration(milliseconds: 150), vsync: this);
-    _launcherAnimation = new CurvedAnimation(
-      parent: _controller,
-      curve: Curves.fastOutSlowIn,
-      reverseCurve: Curves.fastOutSlowIn,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  /// Controls the visibility of the launcher and the state of its toggle.
-  void _showLauncher(bool show) {
-    if (show == _isLauncherShowing) {
-      return;
-    }
-    setState(() {
-      _isLauncherShowing = show;
-      _isLauncherShowing ? _controller.forward() : _controller.reverse();
-    });
-    _launcherToggleKey.currentState.toggled = show;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,33 +44,20 @@ class _RootState extends State<RootWidget> with TickerProviderStateMixin {
         new WindowPlaygroundWidget(),
 
         // 3 - Launcher, overlaid on top of all the windows.
-        // TODO(pylaligand): Offstage still lays its children out, consider
-        // editing the list directly instead.
-        new AnimatedBuilder(
-          animation: _launcherAnimation,
-          builder: (BuildContext context, Widget child) => new Offstage(
-                // Only include the Launcher if it is actually visible.
-                offstage: _launcherAnimation.isDismissed,
-                child: child,
-              ),
-          child: new Stack(
-            fit: StackFit.passthrough,
-            children: <Widget>[
-              // Dismiss the launcher if a click occurs outside of its bounds.
-              new GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => _showLauncher(false),
-              ),
-              new Center(
+        new SystemOverlay(
+          key: _launcherOverlayKey,
+          builder: (Animation<double> animation) => new Center(
                 child: new FadeTransition(
-                    opacity: _launcherOpacityTween.animate(_launcherAnimation),
+                    opacity: _overlayOpacityTween.animate(animation),
                     child: new ScaleTransition(
-                      scale: _launcherScaleTween.animate(_launcherAnimation),
+                      scale: _overlayScaleTween.animate(animation),
                       child: new Launcher(),
                     )),
               ),
-            ],
-          ),
+          callback: (bool visible) {
+            _launcherToggleKey.currentState.toggled = visible;
+          },
+        ),
         ),
 
         // 4 - The bottom bar.
@@ -123,7 +78,9 @@ class _RootState extends State<RootWidget> with TickerProviderStateMixin {
               children: <Widget>[
                 new LauncherToggleWidget(
                   key: _launcherToggleKey,
-                  callback: _showLauncher,
+                  callback: (bool toggled) =>
+                      _launcherOverlayKey.currentState.visible = toggled,
+                ),
                 ),
                 new StatusTrayWidget(isStandalone: false),
               ],
