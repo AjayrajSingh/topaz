@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -132,6 +133,7 @@ class SurfaceGraph extends Model {
     Tree<String> parent =
         (parentId == kNoParent) ? _tree : _tree.search(parentId);
     assert(parent != null);
+    assert(relation != null);
     parent.add(node);
     _surfaces[id] = new Surface._internal(this, node, properties, relation);
     notifyListeners();

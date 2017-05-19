@@ -4,6 +4,7 @@
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.modular.services.story/story_shell.fidl.dart';
+import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:flutter/widgets.dart';
@@ -14,7 +15,6 @@ import 'package:lib.widgets/widgets.dart';
 import 'model.dart';
 import 'surface_details.dart';
 import 'surface_layout.dart';
-import 'story_relationships.dart';
 
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
@@ -51,16 +51,13 @@ class StoryShellImpl extends StoryShell {
   /// @params viewType The relationship between this view and its parent
   @override
   void connectView(InterfaceHandle<ViewOwner> view, int viewId, int parentId,
-      String viewType) {
+      SurfaceRelation surfaceRelation) {
     _log('Connecting view $viewId with parent $parentId');
-    SurfaceArrangement arrangement = (viewType == kHierarchical)
-        ? SurfaceArrangement.copresent
-        : SurfaceArrangement.none;
     _surfaceGraph.addSurface(
       viewId.toString(),
       new SurfaceProperties(),
       parentId.toString(),
-      new SurfaceRelation(arrangement: arrangement),
+      surfaceRelation ?? new SurfaceRelation(),
     );
 
     // Separated calls in prep for asynchronous availability of view

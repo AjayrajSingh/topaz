@@ -10,6 +10,7 @@ import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.module/module_state.fidl.dart';
+import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -47,7 +48,7 @@ class _ModuleStopperWatcher extends ModuleWatcher {
 }
 
 /// Starts a new module
-void startModuleInShell(String viewType) {
+void startModuleInShell(SurfaceRelation relation) {
   ModuleControllerProxy moduleController = new ModuleControllerProxy();
 
   _moduleContext.startModuleInShell(
@@ -57,7 +58,7 @@ void startModuleInShell(String viewType) {
     null, // outgoingServices,
     null, // incomingServices,
     moduleController.ctrl.request(),
-    viewType,
+    relation,
   );
   _log('Started sub-module');
 
@@ -67,13 +68,13 @@ void startModuleInShell(String viewType) {
 /// Button widget to start module
 class LaunchModuleButton extends StatelessWidget {
   /// The  relationship to introduce a new surface with
-  final String _relationship;
+  final SurfaceRelation _relation;
 
   /// The display text for the relationship
   final String _display;
 
   /// Construct a button [Widget] to add new surface with given relationship
-  LaunchModuleButton(this._relationship, this._display);
+  LaunchModuleButton(this._relation, this._display);
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +83,7 @@ class LaunchModuleButton extends StatelessWidget {
         child: new RaisedButton(
           child: new Text(_display),
           onPressed: () {
-            startModuleInShell(_relationship);
+            startModuleInShell(_relation);
           },
         ));
   }
@@ -118,8 +119,15 @@ class MainWidget extends StatelessWidget {
         children: <Widget>[
           new TitleText(
               "Module ${now.minute}:${now.second.toString().padLeft(2, '0')}"),
-          new LaunchModuleButton('', 'Serial'),
-          new LaunchModuleButton('h', 'Hierarchical'),
+          new LaunchModuleButton(null, 'No Relation'),
+          new LaunchModuleButton(
+              new SurfaceRelation()..arrangement = SurfaceArrangement.copresent,
+              'Copresent'),
+          new LaunchModuleButton(
+              new SurfaceRelation()
+                ..arrangement = SurfaceArrangement.copresent
+                ..emphasis = 2.0,
+              'Copresent 2:1'),
           new Padding(
             padding: const EdgeInsets.all(16.0),
             child: new RaisedButton(

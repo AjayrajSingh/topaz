@@ -4,30 +4,6 @@
 
 import 'package:flutter/rendering.dart';
 
-/// A presentation arrangement in respect to another surface
-enum SurfaceArrangement {
-  /// No defined arrangement
-  none,
-
-  /// Should be copresented with other surface, if possible
-  copresent
-}
-
-/// A presentation relationship with another surface
-class SurfaceRelation {
-  /// Const contructor
-  const SurfaceRelation({this.arrangement: SurfaceArrangement.none});
-
-  /// The arrangement relation to another surface
-  final SurfaceArrangement arrangement;
-
-  /// No relation to the other surface
-  static const SurfaceRelation none = const SurfaceRelation();
-
-  @override
-  String toString() => 'arrangement:$arrangement';
-}
-
 /// Inherent properties of a surface
 class SurfaceProperties {
   /// Const constructor
