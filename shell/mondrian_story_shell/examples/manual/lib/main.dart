@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:io';
 import 'dart:math';
 
 import 'package:application.lib.app.dart/app.dart';
@@ -128,16 +127,6 @@ class MainWidget extends StatelessWidget {
               onPressed: () {
                 _log('Module done...');
                 _moduleContext.done();
-              },
-            ),
-          ),
-          new Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: new RaisedButton(
-              child: new Text('Kill'),
-              onPressed: () {
-                _log('Killing module...');
-                exit(0);
               },
             ),
           ),
