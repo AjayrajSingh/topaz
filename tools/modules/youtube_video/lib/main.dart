@@ -7,8 +7,6 @@ import 'dart:convert';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
-import 'package:apps.maxwell.services.action_log/component.fidl.dart';
-import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
@@ -28,7 +26,6 @@ final String _kYoutubeDocRoot = 'youtube-doc';
 final String _kYoutubeVideoIdKey = 'youtube-video-id';
 
 ModuleImpl _module;
-final ModuleContextProxy _moduleContext = new ModuleContextProxy();
 
 // The youtube video id.
 String _videoId;
@@ -78,13 +75,6 @@ class LinkWatcherImpl extends LinkWatcher {
     if (_videoId == null) {
       _log('No youtube video ID found in json.');
     } else {
-      IntelligenceServicesProxy intelligenceServices =
-          new IntelligenceServicesProxy();
-      _moduleContext
-          .getIntelligenceServices(intelligenceServices.ctrl.request());
-      ComponentActionLogProxy actionLog = new ComponentActionLogProxy();
-      intelligenceServices.GetActionLog(actionLog.ctrl.request());
-      actionLog.LogAction("ViewVideo", json);
       _log('_videoId: $_videoId');
       _kHomeKey.currentState?.updateUI();
     }
@@ -114,15 +104,15 @@ class ModuleImpl extends Module {
     _log('ModuleImpl::initialize call');
 
     // Bind the link handle and register the link watcher.
-    ModuleContextProxy _moduleContext = new ModuleContextProxy();
-    _moduleContext.ctrl.bind(moduleContextHandle);
-    _moduleContext.getLink(null, link.ctrl.request());
+    new ModuleContextProxy()
+      ..ctrl.bind(moduleContextHandle)
+      ..getLink(null, link.ctrl.request())
+      ..ctrl.close();
     link.watchAll(_linkWatcher.getHandle());
   }
 
   @override
   void stop(void callback()) {
-    _moduleContext.ctrl.close();
     _log('ModuleImpl::stop call');
     _linkWatcher.close();
     link.ctrl.close();
