@@ -149,7 +149,7 @@ class ArtistModuleModel extends ModuleModel {
         null, // outgoingServices,
         null, // incomingServices,
         new InterfacePair<ModuleController>().passRequest(),
-        '',
+        null,
       );
     }
   }
