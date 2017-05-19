@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io';
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
@@ -340,6 +341,17 @@ class _QuickSettingsState extends State<QuickSettings> {
                         ? _buildForWideScreen(context)
                         : _buildForNarrowScreen(context),
                   ),
+            ),
+          ),
+          new Container(
+            padding: const EdgeInsets.all(16.0),
+            child: new Text(
+              '${Platform.localHostname}',
+              textAlign: TextAlign.center,
+              style: new TextStyle(
+                fontFamily: 'RobotoMono',
+                color: Colors.grey[600],
+              ),
             ),
           ),
           _divider(opacity: widget.opacity),
