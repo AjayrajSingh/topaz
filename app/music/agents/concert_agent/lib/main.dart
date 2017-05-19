@@ -16,11 +16,16 @@ import 'package:config/config.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:meta/meta.dart';
 
-/// The Concert Agents subscribes to the 'music/artist' topic and will propose
-/// event/concert suggestions if th given artist has upcoming concerts.
+/// The Concert Agents subscribes to the 'focal_entities' topic and will
+/// propose event/concert suggestions if any of those Entities is an artist and
+/// has upcoming concerts.
 
-/// 'music/artist' topic to subscribe to
-const String _kMusicArtistTopic = 'music/artist';
+/// The context topic for "focal entities" for the current story.
+const String _kCurrentFocalEntitiesTopic =
+    '/story/focused/explicit/focal_entities';
+
+/// The Entity type for a music artist.
+const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
 
 /// Global scoping to prevent garbage collection
 final ContextProviderProxy _contextProvider = new ContextProviderProxy();
@@ -46,20 +51,25 @@ class ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onUpdate(ContextUpdate result) async {
-    if (result.values.containsKey(_kMusicArtistTopic)) {
-      Map<String, dynamic> data =
-          JSON.decode(result.values[_kMusicArtistTopic]);
-      if (data.containsKey('name')) {
-        print('[concerts_agent] artist update: ${data['name']}');
+    if (!result.values.containsKey(_kCurrentFocalEntitiesTopic)) {
+      return;
+    }
+
+    List<dynamic> data =
+        JSON.decode(result.values[_kCurrentFocalEntitiesTopic]);
+    for (var entity in data) {
+      if (!(entity is Map<String, dynamic>)) continue;
+      if (entity.containsKey('@type') && entity['@type'] == _kMusicArtistType) {
+        print('[concerts_agent] artist update: ${entity['name']}');
         List<Event> events = await Api.searchEventsByArtist(
-          data['name'],
+          entity['name'],
           apiKey,
         );
         if (events != null && events.length > 0) {
-          print('[concerts_agent] concerts found for: ${data['name']}');
-          _createProposal(events, data['name']);
+          print('[concerts_agent] concerts found for: ${entity['name']}');
+          _createProposal(events, entity['name']);
         } else {
-          print('[concerts_agent] no concerts found for: ${data['name']}');
+          print('[concerts_agent] no concerts found for: ${entity['name']}');
         }
       }
     }
@@ -122,7 +132,8 @@ Future<Null> main(List<dynamic> args) async {
     // final ApplicationContext context = new ApplicationContext.fromStartupInfo();
     connectToService(_context.environmentServices, _contextProvider.ctrl);
     connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-    ContextQuery query = new ContextQuery.init(<String>[_kMusicArtistTopic]);
+    ContextQuery query =
+        new ContextQuery.init(<String>[_kCurrentFocalEntitiesTopic]);
     _contextListenerImpl = new ContextListenerImpl(apiKey: apiKey);
     _contextProvider.subscribe(query, _contextListenerImpl.getHandle());
   }

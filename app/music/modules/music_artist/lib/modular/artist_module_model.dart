@@ -28,6 +28,12 @@ import 'package:music_widgets/music_widgets.dart';
 
 const String _kPlayerUrl = 'file:///system/apps/music_playback_agent';
 
+/// The context topic for "focal entities"
+const String _kFocalEntitiesTopic = 'focal_entities';
+
+/// The Entity type for a music artist.
+const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
+
 /// [ModuleModel] that manages the state of the Artist Module.
 class ArtistModuleModel extends ModuleModel {
   /// The artist for this given module
@@ -154,9 +160,10 @@ class ArtistModuleModel extends ModuleModel {
       intelligenceServices.getContextPublisher(publisher.ctrl.request());
 
       publisher.publish(
-        'music/artist',
+        _kFocalEntitiesTopic,
         JSON.encode(
           <String, String>{
+            '@type': _kMusicArtistType,
             'name': artist.name,
             'spotifyId': artist.id,
           },
