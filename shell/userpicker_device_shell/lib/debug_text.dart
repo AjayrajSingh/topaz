@@ -93,7 +93,7 @@ class _DebugTextState extends State<DebugText> {
   @override
   Widget build(BuildContext context) {
     List<_DebugEntry> columnChildren = <_DebugEntry>[];
-    if (_showHostInformation) {
+    if (_showNetworkingInformation && _showHostInformation) {
       columnChildren.add(new _DebugEntry(text: Platform.localHostname));
       columnChildren.addAll(
         _addresses

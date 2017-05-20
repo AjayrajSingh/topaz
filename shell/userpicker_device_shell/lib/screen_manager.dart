@@ -3,13 +3,17 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io';
 
+import 'package:application.services/application_launcher.fidl.dart';
 import 'package:apps.modular.services.auth.account/account.fidl.dart';
 import 'package:apps.modular.services.config/config.fidl.dart';
 import 'package:apps.modular.services.device/user_provider.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.widgets/widgets.dart';
+import 'package:meta/meta.dart';
 
 import 'user_picker.dart';
 import 'user_picker_buttons.dart';
@@ -28,12 +32,16 @@ class ScreenManager extends StatefulWidget {
   /// Called when the user requests to remove a user.
   final OnRemoveUser onRemoveUser;
 
+  /// Launcher to launch the kernel panic module if needed.
+  final ApplicationLauncher launcher;
+
   /// Constructor.
   ScreenManager({
     Key key,
     this.onLogout,
     this.onAddUser,
     this.onRemoveUser,
+    @required this.launcher,
   })
       : super(key: key);
 
@@ -60,10 +68,21 @@ class _ScreenManagerState extends State<ScreenManager>
   CurvedAnimation _curvedTransitionAnimation;
 
   bool _addingUser = false;
+  bool _showKernelPanic = false;
 
   @override
   void initState() {
     super.initState();
+
+    File lastPanic = new File('/boot/log/last-panic.txt');
+    lastPanic.exists().then((bool exists) {
+      if (exists) {
+        setState(() {
+          _showKernelPanic = true;
+        });
+      }
+    });
+
     _transitionAnimation = new AnimationController(
       value: 0.0,
       duration: const Duration(seconds: 1),
@@ -90,65 +109,91 @@ class _ScreenManagerState extends State<ScreenManager>
   void _onStatusChange(_) => setState(() {});
 
   @override
-  Widget build(BuildContext context) => new AnimatedBuilder(
-        animation: _transitionAnimation,
-        builder: (BuildContext context, Widget child) =>
-            _childViewConnection == null
-                ? child
-                : new Stack(
-                    fit: StackFit.passthrough,
-                    children: <Widget>[
-                      new ChildView(connection: _childViewConnection),
-                      new Opacity(
-                        opacity: 1.0 - _curvedTransitionAnimation.value,
-                        child: child,
-                      ),
-                    ],
-                  ),
-        child: new UserPickerScreen(
-          showBlackHole: _draggedUsers.isNotEmpty,
-          userPicker: new UserPicker(
-            onLoginRequest: _login,
-            onAddUserStarted: _addUserStarted,
-            onAddUserFinished: _addUserFinished,
-            userNameController: _userNameController,
-            serverNameController: _serverNameController,
-            userNameFocusNode: _userNameFocusNode,
-            serverNameFocusNode: _serverNameFocusNode,
-            loggingIn: _addingUser ||
-                (_childViewConnection != null &&
-                    (_curvedTransitionAnimation.status ==
-                            AnimationStatus.dismissed ||
-                        _curvedTransitionAnimation.status ==
-                            AnimationStatus.forward)),
-            onUserDragStarted: (Account account) => setState(() {
-                  _draggedUsers.add(account);
-                }),
-            onUserDragCanceled: (Account account) => setState(() {
-                  _draggedUsers.remove(account);
-                }),
-          ),
-          userPickerButtons: new UserPickerButtons(
-            onAddUser: () {
-              //TODO(apwilson): Remove the delay.  It's a workaround to raw
-              // keyboard focus bug.
-              new Timer(
-                const Duration(milliseconds: 1000),
-                () => FocusScope.of(context).requestFocus(_userNameFocusNode),
-              );
-              widget.onAddUser?.call();
-            },
-            onUserShellChange: () => setState(() {
-                  _userShellChooser.next();
-                }),
-            userShellAssetName: _userShellChooser.assetName,
-          ),
-          onRemoveUser: (Account account) => setState(() {
+  Widget build(BuildContext context) {
+    List<Widget> stackChildren = <Widget>[
+      new UserPickerScreen(
+        showBlackHole: _draggedUsers.isNotEmpty,
+        userPicker: new UserPicker(
+          onLoginRequest: _login,
+          onAddUserStarted: _addUserStarted,
+          onAddUserFinished: _addUserFinished,
+          userNameController: _userNameController,
+          serverNameController: _serverNameController,
+          userNameFocusNode: _userNameFocusNode,
+          serverNameFocusNode: _serverNameFocusNode,
+          loggingIn: _addingUser ||
+              (_childViewConnection != null &&
+                  (_curvedTransitionAnimation.status ==
+                          AnimationStatus.dismissed ||
+                      _curvedTransitionAnimation.status ==
+                          AnimationStatus.forward)),
+          onUserDragStarted: (Account account) => setState(() {
+                _draggedUsers.add(account);
+              }),
+          onUserDragCanceled: (Account account) => setState(() {
                 _draggedUsers.remove(account);
-                widget.onRemoveUser?.call(account);
               }),
         ),
+        userPickerButtons: new UserPickerButtons(
+          onAddUser: () {
+            //TODO(apwilson): Remove the delay.  It's a workaround to raw
+            // keyboard focus bug.
+            new Timer(
+              const Duration(milliseconds: 1000),
+              () => FocusScope.of(context).requestFocus(_userNameFocusNode),
+            );
+            widget.onAddUser?.call();
+          },
+          onUserShellChange: () => setState(() {
+                _userShellChooser.next();
+              }),
+          userShellAssetName: _userShellChooser.assetName,
+        ),
+        onRemoveUser: (Account account) => setState(() {
+              _draggedUsers.remove(account);
+              widget.onRemoveUser?.call(account);
+            }),
+      ),
+    ];
+
+    if (_showKernelPanic) {
+      stackChildren.add(
+        /// TODO(apwilson): Remove gesture detector and make kernel_panic
+        /// hittestable when DNO-86 is fixed.
+        new GestureDetector(
+          onTap: () => setState(() {
+                _showKernelPanic = false;
+              }),
+          child: new ApplicationWidget(
+            url: 'file:///system/apps/kernel_panic',
+            launcher: widget.launcher,
+            onDone: () => setState(() {
+                  _showKernelPanic = false;
+                }),
+            hitTestable: false,
+          ),
+        ),
       );
+    }
+
+    return new AnimatedBuilder(
+      animation: _transitionAnimation,
+      builder: (BuildContext context, Widget child) =>
+          _childViewConnection == null
+              ? child
+              : new Stack(
+                  fit: StackFit.passthrough,
+                  children: <Widget>[
+                    new ChildView(connection: _childViewConnection),
+                    new Opacity(
+                      opacity: 1.0 - _curvedTransitionAnimation.value,
+                      child: child,
+                    ),
+                  ],
+                ),
+      child: new Stack(fit: StackFit.expand, children: stackChildren),
+    );
+  }
 
   void _addUserStarted() => setState(() {
         _addingUser = true;

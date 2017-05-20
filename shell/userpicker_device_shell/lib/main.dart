@@ -3,15 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:application.lib.app.dart/app.dart';
-import 'package:application.services/application_launcher.fidl.dart';
-import 'package:application.services/service_provider.fidl.dart';
-import 'package:apps.mozart.services.views/view_provider.fidl.dart';
-import 'package:application.services/application_controller.fidl.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:apps.mozart.lib.flutter/child_view.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'authentication_overlay.dart';
 import 'authentication_overlay_model.dart';
@@ -26,31 +21,6 @@ import 'user_picker_device_shell_model.dart';
 
 const double _kInnerBezelRadius = 8.0;
 
-final ApplicationControllerProxy _imeApplicationController =
-    new ApplicationControllerProxy();
-
-/// Creates a [ViewProviderProxy] from a [ServiceProviderProxy], closing it in
-/// the process.
-ViewProviderProxy _consumeServiceProvider(
-  ServiceProviderProxy serviceProvider,
-) {
-  ViewProviderProxy viewProvider = new ViewProviderProxy();
-  connectToService(serviceProvider, viewProvider.ctrl);
-  serviceProvider.ctrl.close();
-  return viewProvider;
-}
-
-/// Creates a handle to a [ViewOwner] from a [ViewProviderProxy], closing it in
-/// the process.
-InterfaceHandle<ViewOwner> _consumeViewProvider(
-  ViewProviderProxy viewProvider,
-) {
-  InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
-  viewProvider.createView(viewOwner.passRequest(), null);
-  viewProvider.ctrl.close();
-  return viewOwner.passHandle();
-}
-
 void main() {
   GlobalKey screenManagerKey = new GlobalKey();
   ConstraintsModel constraintsModel = new ConstraintsModel();
@@ -61,18 +31,11 @@ void main() {
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
 
-  ServiceProviderProxy incomingServices = new ServiceProviderProxy();
-  applicationContext.launcher.createApplication(
-    new ApplicationLaunchInfo()
-      ..url = 'file:///system/apps/latin-ime'
-      ..services = incomingServices.ctrl.request(),
-    _imeApplicationController.ctrl.request(),
-  );
-
   SoftKeyboardContainerImpl softKeyboardContainerImpl =
       new SoftKeyboardContainerImpl(
-    softKeyboardView: _consumeViewProvider(
-      _consumeServiceProvider(incomingServices),
+    child: new ApplicationWidget(
+      url: 'file:///system/apps/latin-ime',
+      launcher: applicationContext.launcher,
     ),
   );
 
@@ -101,6 +64,7 @@ void main() {
                 onLogout: model.refreshUsers,
                 onAddUser: model.showNewUserForm,
                 onRemoveUser: model.removeUser,
+                launcher: applicationContext.launcher,
               ),
               new ScopedModel<AuthenticationOverlayModel>(
                 model: authenticationOverlayModel,

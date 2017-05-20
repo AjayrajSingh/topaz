@@ -21,14 +21,11 @@ class SoftKeyboardContainerImpl extends SoftKeyboardContainer {
   _SoftKeyboardContainerServiceProviderImpl
       _softKeyboardContainerServiceProvider;
 
-  /// The connection to the IME.
-  final ChildViewConnection _connection;
+  /// The IME.
+  final Widget child;
 
   /// Constructor.
-  SoftKeyboardContainerImpl({
-    @required InterfaceHandle<ViewOwner> softKeyboardView,
-  })
-      : _connection = new ChildViewConnection(softKeyboardView) {
+  SoftKeyboardContainerImpl({@required this.child}) {
     _softKeyboardContainerServiceProvider =
         new _SoftKeyboardContainerServiceProviderImpl(
       softKeyboardContainer: this,
@@ -55,7 +52,7 @@ class SoftKeyboardContainerImpl extends SoftKeyboardContainer {
               height: 256.0, // TODO(apwilson): This should be communicated to
               //                                me from the IME
               color: Colors.green[600],
-              child: new ChildView(connection: _connection),
+              child: this.child,
             ),
           )
         ],
