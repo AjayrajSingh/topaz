@@ -16,6 +16,9 @@ dart_package("lib.widgets") {
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/user:user_dart",
     "//apps/modules/common/packages/widgets_meta",
+    "//apps/mozart/lib/flutter",
+    "//apps/mozart/services/views:views_dart",
+    "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
   ]
 }
