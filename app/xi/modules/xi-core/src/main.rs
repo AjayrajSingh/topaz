@@ -14,7 +14,9 @@ extern crate fidl;
 
 extern crate application_services_service_provider;
 extern crate apps_xi_services;
+extern crate apps_ledger_services_public;
 use self::application_services_service_provider::{ServiceProvider, ServiceProvider_Stub};
+use self::apps_ledger_services_public::{Ledger_Client, Ledger_Proxy, Ledger_Metadata, Ledger_new_Proxy};
 use self::apps_xi_services::{Json, Json_Stub};
 
 use std::thread;
@@ -72,8 +74,9 @@ impl io::Write for MySocket {
     }
 }
 
-fn editor_main(sock: Socket) {
+fn editor_main(sock: Socket, ledger: Ledger_Proxy) {
     let mut state = MainState::new();
+    state.set_ledger(ledger);
     let arc_sock = Arc::new(sock);
     let my_in = io::BufReader::new(MySocket(arc_sock.clone()));
     let my_out = MySocket(arc_sock);
@@ -85,8 +88,11 @@ fn editor_main(sock: Socket) {
 struct JsonServer;
 
 impl Json for JsonServer {
-    fn connect_socket(&mut self, sock: Socket) {
-        let _ = thread::spawn(move || editor_main(sock));
+    fn connect_socket(&mut self, sock: Socket, sync_ledger: fidl::InterfacePtr<Ledger_Client>) {
+        let fidl::InterfacePtr { version, inner } = sync_ledger;
+        assert_eq!(Ledger_Metadata::VERSION, version);
+        let ledger = Ledger_new_Proxy(inner);
+        let _ = thread::spawn(move || editor_main(sock, ledger));
     }
 }
 

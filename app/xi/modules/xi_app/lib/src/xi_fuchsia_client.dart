@@ -9,6 +9,7 @@ import 'dart:async';
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/application_launcher.fidl.dart';
 import 'package:application.services/service_provider.fidl.dart';
+import 'package:apps.ledger.services.public/ledger.fidl.dart';
 import 'package:apps.xi.services/xi.fidl.dart' as service;
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.fidl.dart/core.dart' as core;
@@ -19,9 +20,11 @@ final ApplicationContext kContext = new ApplicationContext.fromStartupInfo();
 
 /// Fuchsia specific [XiClient].
 class XiFuchsiaClient extends XiClient {
+  XiFuchsiaClient(this._ledgerHandle);
   final ServiceProviderProxy _serviceProvider = new ServiceProviderProxy();
   final ApplicationLaunchInfo _launchInfo = new ApplicationLaunchInfo();
   final service.JsonProxy _jsonProxy = new service.JsonProxy();
+  final InterfaceHandle<Ledger> _ledgerHandle;
   core.SocketReader _reader = new core.SocketReader();
   Uint8List _data = new Uint8List(4096);
 
@@ -43,7 +46,7 @@ class XiFuchsiaClient extends XiClient {
     );
     _jsonProxy.ctrl.bind(handle);
     final core.SocketPair pair = new core.SocketPair();
-    _jsonProxy.connectSocket(pair.socket0);
+    _jsonProxy.connectSocket(pair.socket0, _ledgerHandle);
     _reader.bind(pair.passSocket1());
     _reader.onReadable = handleRead;
 

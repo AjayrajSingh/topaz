@@ -87,7 +87,7 @@ class XiAppState extends State<XiApp> {
       _pendingReqs ??= <_PendingNotification>[];
       _pendingReqs.add(new _PendingNotification(method, params));
     } else {
-      Map<String, dynamic> innerParams = <String, dynamic>{'method': method, 'params': params, 'tab': _tabId};
+      Map<String, dynamic> innerParams = <String, dynamic>{'method': method, 'params': params, 'view_id': _tabId};
       widget.xi.sendNotification('edit', innerParams);
     }
   }
@@ -106,7 +106,7 @@ class XiAppState extends State<XiApp> {
       // Arguably the new_tab should be sent by the editor (and the editor should plumb
       // the tab id through to the connectEditor call). However, that would require holding
       // a pending queue of new_tab requests, waiting for init to complete. This is easier.
-      widget.xi.sendRpc('new_tab', <dynamic>[], (String id) {
+      widget.xi.sendRpc('new_view', <String, dynamic>{'file_path': '/data/test_xi_sync'}, (String id) {
         _tabId = id;
         print('id = $id');
         if (_pendingReqs != null) {

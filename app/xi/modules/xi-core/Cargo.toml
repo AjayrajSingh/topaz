@@ -6,6 +6,3 @@ authors = ["Raph Levien <raph@google.com>"]
 description = "Main binary for xi-core in Fuchsia, using fidl for communication"
 repository = "https://fuchsia.googlesource.com/xi"
 
-[dependencies]
-xi-core-lib = "0.2.0"
-xi-rpc = "0.2.0"

@@ -4,8 +4,10 @@
 
 module xi;
 
+import "apps/ledger/services/public/ledger.fidl";
+
 [ServiceName="xi.Json"]
 interface Json {
 	// connect a socket, which then has the same behavior as stdin/stdout in Unix/Windows
-	ConnectSocket(handle<socket> sock);
+	ConnectSocket(handle<socket> sock, ledger.Ledger sync_ledger);
 };

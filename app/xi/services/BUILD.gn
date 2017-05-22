@@ -8,4 +8,7 @@ fidl("services") {
   sources = [
     "xi.fidl",
   ]
+  deps = [
+    "//apps/ledger/services/public",
+  ]
 }
