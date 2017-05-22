@@ -29,6 +29,9 @@ class GoogleSearchAPI {
       return null;
     }
     dynamic results = JSON.decode(response.body);
+    if (results['searchInformation']['totalResults'] == '0') {
+      return <String>[];
+    }
     return results['items']
         .map((dynamic item) => item['image']['thumbnailLink'])
         .toList();
