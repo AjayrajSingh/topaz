@@ -4,9 +4,10 @@
 
 #include "apps/dart_content_handler/dart_application_controller.h"
 
-#include <utility>
 #include <magenta/status.h>
+#include <utility>
 
+#include "application/lib/app/application_context.h"
 #include "apps/dart_content_handler/builtin_libraries.h"
 #include "apps/dart_content_handler/embedder/snapshot.h"
 #include "lib/ftl/arraysize.h"
@@ -27,7 +28,7 @@ void RunMicrotasks() {
   tonic::DartMicrotaskQueue::GetForCurrentThread()->RunMicrotasks();
 }
 
-} // namespace
+}  // namespace
 
 DartApplicationController::DartApplicationController(
     std::vector<char> snapshot,
@@ -77,12 +78,16 @@ bool DartApplicationController::Main() {
   tonic::DartMicrotaskQueue::StartForCurrentThread();
   mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(RunMicrotasks);
 
-  InitBuiltinLibrariesForIsolate(
-      url, url, std::move(startup_info_->environment),
-      std::move(startup_info_->launch_info->services));
+  fidl::Array<fidl::String> arguments =
+      std::move(startup_info_->launch_info->arguments);
 
-  const fidl::Array<fidl::String>& arguments =
-      startup_info_->launch_info->arguments;
+  fidl::InterfaceRequest<app::ServiceProvider> outgoing_services =
+      std::move(startup_info_->launch_info->services);
+
+  InitBuiltinLibrariesForIsolate(
+      url, url, app::ApplicationContext::CreateFrom(std::move(startup_info_)),
+      std::move(outgoing_services));
+
   Dart_Handle dart_arguments = Dart_NewList(arguments.size());
   if (Dart_IsError(dart_arguments)) {
     FTL_LOG(ERROR) << "Failed to allocate Dart arguments list";
@@ -117,9 +122,9 @@ void DartApplicationController::Kill() {
 
     mtl::MessageLoop::GetCurrent()->QuitNow();
 
-    // TODO(rosswang): The docs warn of threading issues if doing this again, but
-    // without this, attempting to shut down the isolate finalizes app contexts
-    // that can't tell a shutdown is in progress and so fatal.
+    // TODO(rosswang): The docs warn of threading issues if doing this again,
+    // but without this, attempting to shut down the isolate finalizes app
+    // contexts that can't tell a shutdown is in progress and so fatal.
     Dart_SetMessageNotifyCallback(nullptr);
 
     Dart_ShutdownIsolate();

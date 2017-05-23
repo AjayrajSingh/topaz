@@ -5,17 +5,18 @@
 #ifndef APPS_DART_CONTENT_HANDLER_EMBEDDER_BUILTIN_H_
 #define APPS_DART_CONTENT_HANDLER_EMBEDDER_BUILTIN_H_
 
+#include <memory>
 #include <string>
-#include <mx/channel.h>
 
-#include "application/services/application_environment.fidl.h"
+#include "application/lib/app/application_context.h"
+#include "application/services/service_provider.fidl.h"
 
 namespace dart_content_handler {
 
 void InitBuiltinLibrariesForIsolate(
     const std::string& base_uri,
     const std::string& script_uri,
-    fidl::InterfaceHandle<app::ApplicationEnvironment> environment,
+    std::unique_ptr<app::ApplicationContext> context,
     fidl::InterfaceRequest<app::ServiceProvider> outgoing_services);
 
 }  // namespace dart_content_handler

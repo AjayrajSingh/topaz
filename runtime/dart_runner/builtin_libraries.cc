@@ -93,7 +93,7 @@ void ScheduleMicrotask(Dart_NativeArguments args) {
 void InitBuiltinLibrariesForIsolate(
     const std::string& base_uri,
     const std::string& script_uri,
-    fidl::InterfaceHandle<app::ApplicationEnvironment> environment,
+    std::unique_ptr<app::ApplicationContext> context,
     fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
   // dart:fidl.internal --------------------------------------------------------
 
@@ -101,14 +101,13 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(Dart_SetNativeResolver(
       fidl_internal, fidl::dart::NativeLookup, fidl::dart::NativeSymbol));
 
-  // Set the environment services channel.
-  if (environment) {
-    DART_CHECK_VALID(Dart_SetField(
-        fidl_internal, ToDart("_environment"),
-        tonic::DartConverter<mx::channel>::ToDart(environment.PassHandle())));
-  }
+  fidl::InterfaceHandle<app::ApplicationEnvironment> environment;
+  context->ConnectToEnvironmentService(environment.NewRequest());
 
-  // Set the outgoing services channel.
+  DART_CHECK_VALID(Dart_SetField(
+      fidl_internal, ToDart("_environment"),
+      tonic::DartConverter<mx::channel>::ToDart(environment.PassHandle())));
+
   if (outgoing_services) {
     DART_CHECK_VALID(Dart_SetField(fidl_internal, ToDart("_outgoingServices"),
                                    tonic::DartConverter<mx::channel>::ToDart(
