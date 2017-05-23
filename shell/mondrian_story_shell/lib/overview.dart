@@ -18,16 +18,18 @@ void _log(String msg) {
   print('[MondrianFlutter] $msg');
 }
 
+/// Printable names for relation arrangement
 const Map<SurfaceArrangement, String> relName =
     const <SurfaceArrangement, String>{
-  SurfaceArrangement.none: "no opinion",
-  SurfaceArrangement.copresent: "co-present",
+  SurfaceArrangement.none: 'no opinion',
+  SurfaceArrangement.copresent: 'co-present',
 };
 
+/// Printable names for relation dependency
 const Map<SurfaceDependency, String> depName =
     const <SurfaceDependency, String>{
-  SurfaceDependency.dependent: "dependent",
-  SurfaceDependency.none: "independent",
+  SurfaceDependency.dependent: 'dependent',
+  SurfaceDependency.none: 'independent',
 };
 
 /// Show overview of all currently active surfaces in a story
@@ -44,16 +46,17 @@ class Overview extends StatelessWidget {
       itemExtent: constraints.maxHeight / 3.5,
       itemBuilder: (BuildContext context, int index) {
         Surface s = graph.focusStack.toList().reversed.elementAt(index);
+        String arrangement = relName[s.relation.arrangement] ?? 'unknown';
+        String dependency = depName[s.relation.dependency] ?? 'unknown';
         return new Row(
           children: <Widget>[
             new Flexible(
               flex: 1,
               child: new Center(
                 child: index < graph.focusStack.length - 1
-                    ? new Text(
-                        'Presentation: ${relName[s.relation.arrangement] ?? "unknown"}' +
-                            '\nDependency: ${depName[s.relation.dependency] ?? "unknown"}' +
-                            '\nEmphasis: ${s.relation.emphasis}')
+                    ? new Text('Presentation: $arrangement' +
+                        '\nDependency: $dependency' +
+                        '\nEmphasis: ${s.relation.emphasis}')
                     : null,
               ),
             ),
