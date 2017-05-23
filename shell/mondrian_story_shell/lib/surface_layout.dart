@@ -14,7 +14,7 @@ import 'simulated_positioned.dart';
 import 'surface_widget.dart';
 import 'tree.dart';
 
-const double _kMinScreenWidth = 300.0;
+const double _kMinScreenWidth = 250.0;
 const double _kMinScreenRatio = 1.0 / 4.0;
 
 void _log(String msg) {
@@ -120,76 +120,83 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
     BoxConstraints constraints,
     List<Surface> focusStack,
   ) {
-    if (focusStack.isEmpty) {
-      return new Map<Surface, Rect>();
-    }
+    assert(focusStack != null && focusStack.isNotEmpty);
     Surface focused = focusStack.last;
 
-    // Crawl through surfaces' parent and children
-    // and put equally distant relatives in focus order
-    List<Surface> related = <Surface>[];
-    Iterable<Tree<Surface>> descendents = <Tree<Surface>>[
-      focused.copresentSpanningTree
-    ];
-    while (descendents.isNotEmpty) {
-      List<Surface> copresSurfaces =
-          descendents.map((Tree<Surface> n) => n.value).toList();
-      // Ensure more focused items get higher priority
-      copresSurfaces.sort(
-          (Surface l, Surface r) => _compareByOtherList(l, r, focusStack));
-      related.addAll(copresSurfaces);
-      descendents = descendents.expand((Tree<Surface> n) => n.children);
-    }
-
-    List<Surface> arrangement = <Surface>[];
-    final double maxWidth = constraints.biggest.width;
-    Iterable<Surface> ancestors = focused.ancestors;
+    final double totalWidth = constraints.biggest.width;
     final double absoluteMinWidth = max(
         MediaQuery.of(context).size.width * _kMinScreenRatio, _kMinScreenWidth);
-    double arrangementWidth = arrangement.fold(
-        0.0,
-        (double width, Surface s) =>
-            width +
-            max(s.properties?.constraints?.minWidth ?? 0.0, absoluteMinWidth));
-    for (Surface surface in related) {
-      double minWidth = max(
-          surface.properties?.constraints?.minWidth ?? 0.0, absoluteMinWidth);
-      if (arrangementWidth + minWidth > maxWidth) {
-        break;
-      }
-      // Adding each to the left (ancestor) or right (descendent)
-      if (arrangement.isEmpty) {
-        arrangement.add(surface);
-      } else if (ancestors.contains(surface)) {
-        arrangement.insert(0, surface);
-      } else {
-        // Maintain stability of sibling order to prevent unecessary movement
-        List<Surface> siblings =
-            surface.parent?.children?.toList(growable: false);
-        if (siblings == null || siblings.length == 1) {
-          arrangement.add(surface);
-        } else {
-          for (Surface arranged in arrangement.reversed) {
-            if (_compareByOtherList(arranged, surface, siblings) < 0) {
-              arrangement.insert(arrangement.indexOf(arranged) + 1, surface);
-              break;
-            }
-          }
-        }
-      }
-      arrangementWidth += minWidth;
-    }
+    Tree<Surface> copresTree = focused.copresentSpanningTree;
 
+    dynamic focusOrder = (Tree<Surface> l, Tree<Surface> r) =>
+        _compareByOtherList(l.value, r.value, focusStack);
+
+    // Prune less focused surfaces where their min constraints do not fit
+    double totalMinWidth = 0.0;
+    copresTree
+        .flatten(orderChildren: focusOrder)
+        .skipWhile((Tree<Surface> node) {
+      double minWidth = node.value.minWidth(min: absoluteMinWidth);
+      if (totalMinWidth + minWidth > totalWidth) {
+        return false;
+      }
+      totalMinWidth += minWidth;
+      return true;
+    }).forEach((Tree<Surface> node) => node.detach());
+
+    // Prune less focused surfaces where emphasis values cannot be respected
+    double totalEmphasis = 0.0;
+    Surface top = focused;
+    Surface tightestFit = focused;
+    copresTree
+        .flatten(orderChildren: focusOrder)
+        .skipWhile((Tree<Surface> node) {
+      Surface prevTop = top;
+      double prevTotalEmphasis = totalEmphasis;
+
+      // Update top
+      if (top.parent == node.value) {
+        top = node.value;
+        totalEmphasis *= prevTop.absoluteEmphasis(top);
+      }
+      double emphasis = node.value.absoluteEmphasis(top);
+      totalEmphasis += emphasis;
+
+      // Calculate min width available
+      double tightestFitEmphasis = tightestFit.absoluteEmphasis(top);
+      double extraWidth = emphasis / totalEmphasis * totalWidth -
+          node.value.minWidth(min: absoluteMinWidth);
+      double tightestFitExtraWidth =
+          tightestFitEmphasis / totalEmphasis * totalWidth -
+              tightestFit.minWidth(min: absoluteMinWidth);
+
+      // Break if smallest or this doesn't fit
+      if (min(tightestFitExtraWidth, extraWidth) < 0.0) {
+        // Restore previous values
+        top = prevTop;
+        totalEmphasis = prevTotalEmphasis;
+        return false;
+      }
+
+      // Update tightest fit
+      if (extraWidth < tightestFitExtraWidth) {
+        tightestFit = node.value;
+      }
+      return true;
+    }).forEach((Tree<Surface> node) => node.detach());
+
+    List<Surface> surfacesToDisplay =
+        copresTree.map((Tree<Surface> t) => t.value).toList(growable: false);
+    Iterable<Surface> arrangement =
+        top.flattened.where((Surface s) => surfacesToDisplay.contains(s));
+
+    // Layout rects for arrangement
     final Map<Surface, Rect> layout = new LinkedHashMap<Surface, Rect>();
-    final double totalWidth = constraints.biggest.width;
     final double totalHeight = constraints.biggest.height;
-    final double minWidth = arrangement.fold(0.0,
-        (double width, Surface s) => width + s.properties.constraints.minWidth);
-    final double extraWidth = (totalWidth - minWidth) / arrangement.length;
     Offset offset = Offset.zero;
     for (Surface surface in arrangement) {
       Size size = new Size(
-        surface.properties.constraints.minWidth + extraWidth,
+        surface.absoluteEmphasis(top) / totalEmphasis * totalWidth,
         totalHeight,
       );
       layout[surface] = offset & size;

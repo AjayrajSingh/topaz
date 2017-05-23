@@ -107,6 +107,48 @@ class TitleText extends StatelessWidget {
   }
 }
 
+/// Specify an emphasis and launch a copresented surface
+class CopresentLauncher extends StatefulWidget {
+  /// CopresentLauncher
+  CopresentLauncher({Key key}) : super(key: key);
+
+  @override
+  CopresentLauncherState createState() => new CopresentLauncherState();
+}
+
+/// Copresent Launch State
+class CopresentLauncherState extends State<CopresentLauncher> {
+  double _copresentEmphasisExp = 0.0;
+
+  double get _emphasis =>
+      (pow(2, _copresentEmphasisExp) * 10.0).roundToDouble() / 10.0;
+
+  @override
+  Widget build(BuildContext context) => new Container(
+        alignment: FractionalOffset.center,
+        constraints: new BoxConstraints(maxWidth: 200.0),
+        padding: new EdgeInsets.only(bottom: 20.0),
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Slider(
+              min: -1.6,
+              max: 1.6,
+              value: _copresentEmphasisExp,
+              label: 'Emphasis: $_emphasis',
+              onChanged: (double value) =>
+                  setState(() => _copresentEmphasisExp = value),
+            ),
+            new LaunchModuleButton(
+                new SurfaceRelation()
+                  ..emphasis = _emphasis
+                  ..arrangement = SurfaceArrangement.copresent,
+                'Copresent'),
+          ],
+        ),
+      );
+}
+
 /// Main UI Widget
 class MainWidget extends StatelessWidget {
   @override
@@ -120,14 +162,7 @@ class MainWidget extends StatelessWidget {
           new TitleText(
               "Module ${now.minute}:${now.second.toString().padLeft(2, '0')}"),
           new LaunchModuleButton(null, 'No Relation'),
-          new LaunchModuleButton(
-              new SurfaceRelation()..arrangement = SurfaceArrangement.copresent,
-              'Copresent'),
-          new LaunchModuleButton(
-              new SurfaceRelation()
-                ..arrangement = SurfaceArrangement.copresent
-                ..emphasis = 2.0,
-              'Copresent 2:1'),
+          new CopresentLauncher(),
           new Padding(
             padding: const EdgeInsets.all(16.0),
             child: new RaisedButton(

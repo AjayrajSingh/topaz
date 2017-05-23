@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:math';
+
 import 'package:meta/meta.dart';
 
 /// Simple mutable tree data structure
@@ -13,6 +15,11 @@ class Tree<T> extends Iterable<Tree<T>> {
 
   /// The nodes value
   final T value;
+
+  /// The longest path of edges to a leaf
+  int get height => _children.isEmpty
+      ? 0
+      : 1 + _children.fold(0, (int h, Tree<T> t) => max(h, t.height));
 
   /// Direct descendents of this
   Iterable<Tree<T>> get children => _children.toList(growable: false);
@@ -42,29 +49,38 @@ class Tree<T> extends Iterable<Tree<T>> {
   Tree<T> get root {
     Tree<T> node = this;
     while (node._parent != null) {
-      node = _parent;
+      node = node._parent;
     }
     return node;
   }
 
   @override
   Iterator<Tree<T>> get iterator {
-    List<Tree<T>> nodes = <Tree<T>>[];
-    _traverse(nodes);
-    return nodes.iterator;
+    return flatten().iterator;
   }
 
-  void _traverse(List<Tree<T>> nodes) {
-    nodes.add(this);
-    for (Tree<T> child in _children) {
-      child._traverse(nodes);
+  /// Breadth first flattening of tree
+  Iterable<Tree<T>> flatten({
+    int orderChildren(Tree<T> l, Tree<T> r),
+  }) {
+    List<Tree<T>> nodes = <Tree<T>>[this];
+    for (int i = 0; i < nodes.length; i++) {
+      Tree<T> node = nodes[i];
+      if (orderChildren == null) {
+        nodes.addAll(node._children);
+      } else {
+        nodes.addAll(node._children.toList()..sort(orderChildren));
+      }
     }
+    return nodes;
   }
 
   /// Detach this tree from its parents tree
   void detach() {
-    _parent._children.remove(this);
-    _parent = null;
+    if (parent != null) {
+      _parent._children.remove(this);
+      _parent = null;
+    }
   }
 
   /// Add a child to this tree
@@ -77,6 +93,6 @@ class Tree<T> extends Iterable<Tree<T>> {
   /// Find the single Tree node with the following value
   ///
   /// Note: Search order not specified (so make sure values are unique)
-  Tree<T> search(T value) =>
-      this.firstWhere((Tree<T> node) => node.value == value);
+  Tree<T> find(T value) => this
+      .firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
 }

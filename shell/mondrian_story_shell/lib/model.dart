@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:math';
+
 import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
@@ -39,8 +41,32 @@ class Surface extends Model {
   /// The relationship this node has with its parent
   final SurfaceRelation relation;
 
+  /// Return the min width of this Surface
+  double minWidth({double min: 0.0}) =>
+      max(properties?.constraints?.minWidth ?? 0.0, min);
+
+  /// Return the absolute emphasis given some root displayed Surface
+  double absoluteEmphasis(Surface top) {
+    assert(top == this || ancestors.contains(top));
+    Surface ancestor = this;
+    double emphasis = 1.0;
+    while (ancestor != top) {
+      emphasis *= ancestor.relation.emphasis;
+      ancestor = ancestor.parent;
+    }
+    return emphasis;
+  }
+
   /// The parent of this node
   Surface get parent => _surface(_node.parent);
+
+  /// The root surface
+  Surface get root {
+    List<Tree<String>> nodeAncestors = _node.ancestors;
+    return _surface(nodeAncestors.length > 1
+        ? nodeAncestors[nodeAncestors.length - 2]
+        : _node);
+  }
 
   /// The children of this node
   Iterable<Surface> get children => _surfaces(_node.children);
@@ -50,6 +76,18 @@ class Surface extends Model {
 
   /// The ancestors of this node
   Iterable<Surface> get ancestors => _surfaces(_node.ancestors);
+
+  /// This node and its descendents flattened into an Iterable
+  Iterable<Surface> get flattened => _surfaces(_node);
+
+  /// Returns a Tree for this surface
+  Tree<Surface> get tree {
+    Tree<Surface> t = new Tree<Surface>(value: this);
+    for (Surface child in children) {
+      t.add(child.tree);
+    }
+    return t;
+  }
 
   /// Spans the full tree of all copresenting surfaces starting with this
   Tree<Surface> get copresentSpanningTree => _spanningTree(
@@ -95,7 +133,7 @@ class Surface extends Model {
 
   @override
   String toString() {
-    String edgeLabel = relation?.toString() ?? '';
+    String edgeLabel = relation?.arrangement?.toString() ?? '';
     String edgeArrow = '$edgeLabel->'.padLeft(6, '-');
     String disconnected = _connection == null ? '[DISCONNECTED]' : '';
     return '${edgeArrow}Surface${_node.value} $disconnected';
@@ -131,7 +169,7 @@ class SurfaceGraph extends Model {
     assert(!_surfaces.keys.contains(id));
     Tree<String> node = new Tree<String>(value: id);
     Tree<String> parent =
-        (parentId == kNoParent) ? _tree : _tree.search(parentId);
+        (parentId == kNoParent) ? _tree : _tree.find(parentId);
     assert(parent != null);
     assert(relation != null);
     parent.add(node);
@@ -143,7 +181,7 @@ class SurfaceGraph extends Model {
   void removeSurface(String id) {
     // TODO(alangardner): Remap edges to transitive nodes appropriately
     if (_surfaces.keys.contains(id)) {
-      Tree<String> node = _tree.search(id);
+      Tree<String> node = _tree.find(id);
       Tree<String> parent = node.parent;
       node.detach();
       for (Tree<String> child in node.children) {
