@@ -10,7 +10,6 @@ import 'package:lib.widgets/widgets.dart';
 import 'user_picker_device_shell_model.dart';
 
 const String _kGuestUserName = 'Guest';
-const String _kDefaultDeviceName = 'fuchsia';
 const String _kDefaultServerName = 'ledger.fuchsia.com';
 const Color _kFuchsiaColor = const Color(0xFFFF0080);
 const double _kButtonContentWidth = 220.0;
@@ -308,7 +307,7 @@ class UserPicker extends StatelessWidget {
       model.userProvider?.addUser(
         IdentityProvider.google,
         user,
-        _kDefaultDeviceName,
+        null,
         serverName,
         (Account account, String errorCode) {
           if (errorCode == null) {
