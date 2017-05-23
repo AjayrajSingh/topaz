@@ -11,6 +11,7 @@ dart_app("music_playback_agent") {
   deps = [
     "//application/lib/app/dart",
     "//application/services:services_dart",
+    "//apps/media/lib/dart",
     "//apps/modular/services/agent:agent_dart",
     "//apps/modules/music/services/player:player_dart",
     "//lib/fidl/dart",

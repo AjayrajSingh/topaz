@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:application.lib.app.dart/app.dart';
+import 'package:apps.media.lib.dart/audio_player_controller.dart';
 import 'package:apps.modules.music.services.player/player.fidl.dart';
 import 'package:apps.modules.music.services.player/status.fidl.dart';
 import 'package:apps.modules.music.services.player/track.fidl.dart';
@@ -19,11 +21,23 @@ class PlayerImpl extends Player {
   // Keeps the list of bindings.
   final List<PlayerBinding> _bindings = <PlayerBinding>[];
 
+  // The current track that the player is on
+  Track _currentTrack;
+
+  AudioPlayerController _audioPlayerController;
+
+  /// Constructor
+  PlayerImpl(ApplicationContext context) {
+    _audioPlayerController =
+        new AudioPlayerController(context.environmentServices);
+  }
+
   @override
   void play(Track track) {
-    // TODO (dayang@): Play the current track
-    // Make a call to the media service
-    _log('Play Track');
+    _currentTrack = track;
+    _audioPlayerController.open(Uri.parse(track.playbackUrl));
+    _audioPlayerController.play();
+    _log('Playing: ${_currentTrack.title}');
   }
 
   @override
@@ -40,7 +54,12 @@ class PlayerImpl extends Player {
 
   @override
   void togglePlayPause() {
-    // TODO (dayang@): Toggle the play / pause status
+    if (_audioPlayerController.playing) {
+      _audioPlayerController.pause();
+    } else {
+      _audioPlayerController.play();
+    }
+
     _log('Toggle Play Pause');
   }
 

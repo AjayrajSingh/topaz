@@ -41,12 +41,12 @@ class MusicPlaybackAgent extends Agent {
     _log('Agent::initialize start.');
 
     // Initialize the player service
-    _playerImpl = new PlayerImpl();
+    _playerImpl = new PlayerImpl(_context);
 
     // Register the player service to the outgoingServices service provider
     _outgoingServicesImpl.addServiceForName(
       (InterfaceRequest<PlayerImpl> request) {
-        _log('Received a ChatContentProvider request');
+        _log('Received a Player request');
         _playerImpl.addBinding(request);
       },
       Player.serviceName,
