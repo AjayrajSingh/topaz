@@ -126,7 +126,7 @@ class _DebugTextState extends State<DebugText> {
     } else if (_dataSize == 0) {
       columnChildren.add(
         new _DebugEntry(
-          text: 'Data is NOT persistant!',
+          text: 'Data is NOT persistent!',
           color: Colors.redAccent,
         ),
       );
