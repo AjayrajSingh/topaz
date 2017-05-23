@@ -2,20 +2,36 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:qrcodegen/qrcodegen.dart';
 
-const bool _kSmoothed = true;
+const double _kSmoothingThreshold = 2.0;
 
 /// Displays a QR Code.
-class QrCodeWidget extends StatelessWidget {
+class QrCodeWidget extends StatefulWidget {
   /// The QR code for the kernel panic info.
   final QrCode qrCode;
 
   /// Encodes [text] into a QR Code image.
   QrCodeWidget(String text) : qrCode = QrCode.encodeText(text, EccEnum.low);
+
+  @override
+  _QrCodeWidgetState createState() => new _QrCodeWidgetState();
+}
+
+class _QrCodeWidgetState extends State<QrCodeWidget> {
+  double _lastPixelRatio;
+  bool _smooth = false;
+  Timer _timer;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _timer?.cancel();
+  }
 
   @override
   Widget build(BuildContext context) => new Material(
@@ -25,22 +41,37 @@ class QrCodeWidget extends StatelessWidget {
         child: new Container(
           child: new LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              double pixelRatio =
-                  ((constraints.biggest.shortestSide) / (qrCode.size + 4))
-                      .clamp(
+              double pixelRatio = ((constraints.biggest.shortestSide) /
+                      (widget.qrCode.size + 4))
+                  .clamp(
                 0.0,
                 4.0,
               );
+              if (_lastPixelRatio != pixelRatio) {
+                _smooth = false;
+                _timer?.cancel();
+                _timer = null;
+                if (pixelRatio >= _kSmoothingThreshold) {
+                  _timer = new Timer(const Duration(seconds: 3), () {
+                    if (mounted) {
+                      setState(() {
+                        _smooth = true;
+                      });
+                    }
+                  });
+                }
+                _lastPixelRatio = pixelRatio;
+              }
 
               return new Container(
                 margin: new EdgeInsets.all(pixelRatio * 2.0),
-                width: qrCode.size * pixelRatio,
-                height: qrCode.size * pixelRatio,
+                width: widget.qrCode.size * pixelRatio,
+                height: widget.qrCode.size * pixelRatio,
                 child: new RepaintBoundary(
                   child: new CustomPaint(
-                    painter: _kSmoothed
-                        ? new _SmoothQrCodePainter(qrCode: qrCode)
-                        : new _QrCodePainter(qrCode: qrCode),
+                    painter: pixelRatio >= _kSmoothingThreshold && _smooth
+                        ? new _SmoothQrCodePainter(qrCode: widget.qrCode)
+                        : new _QrCodePainter(qrCode: widget.qrCode),
                   ),
                 ),
               );
@@ -62,16 +93,12 @@ class _QrCodePainter extends CustomPainter {
     for (int x = 0; x < qrCode.size; x++) {
       for (int y = 0; y < qrCode.size; y++) {
         if (qrCode.getModule(x, y) != 0) {
-          canvas.drawRRect(
-            new RRect.fromRectXY(
-              new Rect.fromLTWH(
-                x * pixelSize,
-                y * pixelSize,
-                pixelSize,
-                pixelSize,
-              ),
-              pixelSize / 4.0,
-              pixelSize / 4.0,
+          canvas.drawRect(
+            new Rect.fromLTWH(
+              x * pixelSize,
+              y * pixelSize,
+              pixelSize,
+              pixelSize,
             ),
             blackPaint,
           );
