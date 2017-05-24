@@ -41,6 +41,9 @@ class Surface extends Model {
   /// The relationship this node has with its parent
   final SurfaceRelation relation;
 
+  /// Whether or not this surface is currently dismissed
+  bool get dismissed => _graph.isDismissed(_node.value);
+
   /// Return the min width of this Surface
   double minWidth({double min: 0.0}) =>
       max(properties?.constraints?.minWidth ?? 0.0, min);
@@ -111,6 +114,15 @@ class Surface extends Model {
     return tree;
   }
 
+  /// Dismiss this node hiding it from layouts
+  bool dismiss() {
+    if (_node.parent?.value != null) {
+      _graph.dismissSurface(_node.value);
+      return true;
+    }
+    return false;
+  }
+
   /// Remove this node from graph
   /// Returns true if this was removed
   bool remove() {
@@ -151,6 +163,9 @@ class SurfaceGraph extends Model {
   /// The stack of previous focusedSurfaces, most focused at end
   final List<String> _focusedSurfaces = <String>[];
 
+  /// The stack of previous focusedSurfaces, most focused at end
+  final Set<String> _dismissedSurfaces = new Set<String>();
+
   /// The currently most focused [Surface]
   Surface get focused =>
       _focusedSurfaces.isEmpty ? null : _surfaces[_focusedSurfaces.last];
@@ -188,7 +203,9 @@ class SurfaceGraph extends Model {
         parent.add(child);
       }
       _focusedSurfaces.remove(id);
+      _dismissedSurfaces.remove(id);
       _surfaces.remove(id);
+      notifyListeners();
     }
   }
 
@@ -196,11 +213,22 @@ class SurfaceGraph extends Model {
   void focusSurface(String id) {
     assert(_surfaces.keys.contains(id));
     if (_focusedSurfaces.isEmpty || _focusedSurfaces.last != id) {
+      _dismissedSurfaces.remove(id);
       _focusedSurfaces.remove(id);
       _focusedSurfaces.add(id);
       notifyListeners();
     }
   }
+
+  /// When called surface is no longer displayed
+  void dismissSurface(String id) {
+    _focusedSurfaces.removeWhere((String fid) => fid == id);
+    _dismissedSurfaces.add(id);
+    notifyListeners();
+  }
+
+  /// True if surface has been dismissed and not subsequently focused
+  bool isDismissed(String id) => _dismissedSurfaces.contains(id);
 
   /// Used to update a [Surface] with a live ChildViewConnection
   void connectView(String id, InterfaceHandle<ViewOwner> viewOwner) {

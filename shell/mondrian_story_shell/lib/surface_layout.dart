@@ -33,7 +33,7 @@ class SurfaceLayout extends StatefulWidget {
 /// Maintains state for the avaialble views to display.
 class _SurfaceLayoutState extends State<SurfaceLayout> {
   /// Surfaces currently animating away
-  Map<Surface, Size> removedSurfaces = new Map<Surface, Size>();
+  Map<Surface, Size> dismissedSurfaces = new Map<Surface, Size>();
 
   /// Surfaces currently being directly manipulated by user
   List<Surface> touchedSurfaces = new List<Surface>();
@@ -60,8 +60,8 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
     // Only remove if greater than threshold ant not root surface.
     if (expectedOffset.distance > 200.0) {
       setState(() {
-        if (surface.remove()) {
-          removedSurfaces[surface] = rect.size;
+        if (surface.dismiss()) {
+          dismissedSurfaces[surface] = rect.size;
         }
       });
     }
@@ -131,6 +131,16 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
     dynamic focusOrder = (Tree<Surface> l, Tree<Surface> r) =>
         _compareByOtherList(l.value, r.value, focusStack);
 
+    // Remove dismissed surfaces and collapse tree
+    copresTree.forEach((Tree<Surface> node) {
+      if (node.value.dismissed) {
+        node.children.forEach((Tree<Surface> child) {
+          node.parent.add(child);
+        });
+        node.detach();
+      }
+    });
+
     // Prune less focused surfaces where their min constraints do not fit
     double totalMinWidth = 0.0;
     copresTree
@@ -155,7 +165,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
       double prevTotalEmphasis = totalEmphasis;
 
       // Update top
-      if (top.parent == node.value) {
+      if (top.ancestors.contains(node.value)) {
         top = node.value;
         totalEmphasis *= prevTop.absoluteEmphasis(top);
       }
@@ -284,7 +294,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
             }
 
             // Animating out surfaces
-            removedSurfaces.forEach((Surface surface, Size size) {
+            dismissedSurfaces.forEach((Surface surface, Size size) {
               childViews.add(_inactiveSurface(
                 surface: surface,
                 rect: offscreen & size,
