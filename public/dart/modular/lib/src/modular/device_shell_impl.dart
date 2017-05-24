@@ -4,15 +4,17 @@
 
 import 'package:apps.modular.services.device/device_shell.fidl.dart';
 import 'package:apps.modular.services.device/user_provider.fidl.dart';
-import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:meta/meta.dart';
 
 /// Called when [DeviceShell.initialize] occurs.
-typedef void OnReady(
+typedef void OnDeviceShellReady(
   UserProvider userProvider,
   DeviceShellContext deviceShellContext,
 );
+
+/// Called when [DeviceShell.terminate] occurs.
+typedef void OnDeviceShellStop();
 
 /// Implements a DeviceShell for receiving the services a [DeviceShell] needs to
 /// operate.
@@ -24,10 +26,10 @@ class DeviceShellImpl extends DeviceShell {
       new Set<AuthenticationContextBinding>();
 
   /// Called when [initialize] occurs.
-  final OnReady onReady;
+  final OnDeviceShellReady onReady;
 
   /// Called when the [DeviceShell] terminates.
-  final VoidCallback onStop;
+  final OnDeviceShellStop onStop;
 
   /// The [AuthenticationContext] to provide when requested.
   final AuthenticationContext authenticationContext;

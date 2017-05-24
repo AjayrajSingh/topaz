@@ -6,10 +6,10 @@ import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.modular/modular.dart';
 import 'package:meta/meta.dart';
 
 import '../widgets/window_media_query.dart';
-import 'module_impl.dart';
 import 'module_model.dart';
 
 /// A wrapper widget intended to be the root of the application that is

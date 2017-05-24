@@ -6,9 +6,9 @@ import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.modular/modular.dart';
 
 import '../widgets/window_media_query.dart';
-import 'user_shell_impl.dart';
 import 'user_shell_model.dart';
 
 /// A wrapper widget intended to be the root of the application that is

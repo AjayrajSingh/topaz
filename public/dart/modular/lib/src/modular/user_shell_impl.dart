@@ -7,11 +7,10 @@ import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_context.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
-import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 /// Called when [UserShell.initialize] occurs.
-typedef void OnReady(
+typedef void OnUserShellReady(
   UserContext userContext,
   FocusProvider focusProvider,
   FocusController focusController,
@@ -19,6 +18,9 @@ typedef void OnReady(
   StoryProvider storyProvider,
   SuggestionProvider suggestionProvider,
 );
+
+/// Called when [UserShell.terminate] occurs.
+typedef void OnUserShellStop();
 
 /// Implements a UserShell for receiving the services a [UserShell] needs to
 /// operate.
@@ -33,10 +35,10 @@ class UserShellImpl extends UserShell {
       new SuggestionProviderProxy();
 
   /// Called when [initialize] occurs.
-  final OnReady onReady;
+  final OnUserShellReady onReady;
 
   /// Called when the [UserShell] terminates.
-  final VoidCallback onStop;
+  final OnUserShellStop onStop;
 
   /// Constructor.
   UserShellImpl({

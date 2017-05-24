@@ -7,10 +7,10 @@ import 'package:apps.modular.services.device/device_shell.fidl.dart';
 import 'package:apps.mozart.services.input/ime_service.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.modular/modular.dart';
 import 'package:meta/meta.dart';
 
 import '../widgets/window_media_query.dart';
-import 'device_shell_impl.dart';
 import 'device_shell_model.dart';
 
 /// A wrapper widget intended to be the root of the application that is

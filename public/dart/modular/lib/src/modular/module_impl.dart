@@ -6,17 +6,19 @@ import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'link_watcher_impl.dart';
 
 /// Called when [Module.initialize] occurs.
-typedef void OnReady(
+typedef void OnModuleReady(
   ModuleContext moduleContext,
   Link link,
   ServiceProvider incomingServiceProvider,
 );
+
+/// Called when [Module.stop] occurs.
+typedef void OnModuleStop();
 
 /// Implements a Module for receiving the services a [Module] needs to
 /// operate.  When [initialize] is called, the services it receives are routed
@@ -36,10 +38,10 @@ class ModuleImpl extends Module {
   final ServiceProvider outgoingServiceProvider;
 
   /// Called when [Module] is initialied with its services.
-  final OnReady onReady;
+  final OnModuleReady onReady;
 
   /// Called when [Module] is stopped.
-  final VoidCallback onStop;
+  final OnModuleStop onStop;
 
   /// Called when [LinkWatcher.notify] is called.
   final OnNotify onNotify;
