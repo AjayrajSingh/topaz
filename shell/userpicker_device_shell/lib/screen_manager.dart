@@ -12,7 +12,7 @@ import 'package:apps.modular.services.device/user_provider.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
-import 'package:lib.widgets/widgets.dart';
+import 'package:lib.widgets/application.dart';
 import 'package:meta/meta.dart';
 
 import 'user_picker.dart';

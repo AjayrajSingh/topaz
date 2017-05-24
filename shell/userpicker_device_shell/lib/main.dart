@@ -5,8 +5,8 @@
 import 'package:application.lib.app.dart/app.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:lib.widgets/widgets.dart';
 
 import 'authentication_overlay.dart';
 import 'authentication_overlay_model.dart';
