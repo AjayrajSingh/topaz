@@ -67,7 +67,8 @@ class SoftKeyboardContainerImpl extends SoftKeyboardContainer {
       _softKeyboardContainerServiceProvider,
       serviceProvider.passRequest(),
     );
-    View.offerServiceProvider(serviceProvider.passHandle());
+    View.offerServiceProvider(serviceProvider.passHandle(), 
+                              <String>[SoftKeyboardContainer.serviceName],);
   }
 }
 
