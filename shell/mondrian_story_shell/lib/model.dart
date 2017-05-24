@@ -18,7 +18,7 @@ void _log(String msg) {
 }
 
 /// The parentId that means no parent
-const String kNoParent = '0';
+const String kNoParent = '';
 
 typedef bool _SurfaceSpanningTreeCondition(Surface s);
 

@@ -53,8 +53,8 @@ class StoryShellImpl extends StoryShell {
   /// @params parentId The ID of the parent view
   /// @params viewType The relationship between this view and its parent
   @override
-  void connectView(InterfaceHandle<ViewOwner> view, int viewId, int parentId,
-      SurfaceRelation surfaceRelation) {
+  void connectView(InterfaceHandle<ViewOwner> view, String viewId,
+      String parentId, SurfaceRelation surfaceRelation) {
     _log('Connecting view $viewId with parent $parentId');
     _surfaceGraph.addSurface(
       viewId.toString(),
