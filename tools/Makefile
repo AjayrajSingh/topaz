@@ -25,18 +25,6 @@ build-override: dart-gen-specs $(addsuffix /.packages,$(filter-out $(dart_gn_pac
 
 
 ################################################################################
-## Auth related targets
-.PHONY: auth
-auth: config.json ## Update email auth credentials with a refresh token.
-	@cd tools/auth; \
-	pub get; \
-	pub run bin/oauth.dart
-	@for dir in ../contacts/modules/contacts/assets fx_widget_explorer/assets modules/gallery/assets; do \
-		mkdir -p $${dir}; \
-		cp config.json $${dir}/config.json; \
-	done
-
-################################################################################
 ## Widget Explorer related targets
 
 # To debug the generation process, pass in "--observe --pause-isolates-on-start"

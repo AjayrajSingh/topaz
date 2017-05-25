@@ -44,10 +44,8 @@ living in `//apps/modules/` some values will need to be set.
 When the config file is updated a build will be required to load it onto the
 target device (see the Build section below).
 
-Email, and Chat require values for:
+Various modules require values for:
 
-* oauth_id: Google APIs client id, used by Email, Chat, etc.
-* oauth_secret: Google APIs client secret, used by Email, Chat, etc.
 * chat_firebase_api_key: Firebase API key, used by Chat.
 * chat_firebase_project_id: Firebase project ID, used by Chat.
 * songkick_api_key: Used by the experimental Music modules.
@@ -58,23 +56,12 @@ Email, and Chat require values for:
 
 ## Authenticate
 
-To authenticate (login) with OAuth make sure the oauth_id, and oauth_secret
-values are set. Generate auth credentials derived from oauth_id, and
-oauth_secret with:
+Email and Chat modules require authenticating with the google apis to function
+properly. Make sure to create a new user from the user picker screen, and login
+with a test google account in the login UI. This is a one-time process, and once
+a user profile is properly created, you can simply select that user later.
 
-    make auth
-
-This will prompt you to follow a link to login via an OAuth flow.
-
-**NOTE** Re-build to load the new credential values (stored in config.json)
-onto the target device.
-
-The `make auth` task adds generated credentials to the config.json file used by several modules:
-
-* id_token: Needed by the Chat modules.
-* oauth_token: Needed by Chat and Email to make authenticated requests.
-* oauth_token_expiry: Needed by Chat and Email to make authenticated requests.
-* oauth_refresh_token: Needed by Chat and Email to make authenticated requests.
+Email and Chat modules will not work properly in Guest user mode.
 
 # Build
 

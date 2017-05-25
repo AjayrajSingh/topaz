@@ -9,18 +9,6 @@ import 'dart:io';
 /// Abstract class providing a basic configuration to be implemented in both
 /// Flutter and CLI/tooling environements.
 class Config {
-  /// OAuth Scopes.
-  /// SEE: https://developers.google.com/identity/protocols/googlescopes
-  List<String> scopes = <String>[
-    'https://www.googleapis.com/auth/gmail.modify',
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-    'https://www.googleapis.com/auth/youtube.readonly',
-    'https://www.googleapis.com/auth/contacts',
-    'https://www.googleapis.com/auth/plus.login',
-    'https://www.googleapis.com/auth/firebase.database',
-  ];
-
   final Map<String, dynamic> _data = <String, dynamic>{};
 
   /// Convienence method for creating a config object by loading a
