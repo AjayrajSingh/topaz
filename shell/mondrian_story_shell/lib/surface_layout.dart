@@ -10,7 +10,6 @@ import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
 import 'model.dart';
-import 'simulated_positioned.dart';
 import 'surface_widget.dart';
 import 'tree.dart';
 
