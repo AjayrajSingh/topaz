@@ -40,6 +40,18 @@ typedef void SimulatedDragStartCallback(SimulatedDragStartDetails details);
 /// Callback to get SimulatedDragEndDetails onDragEnd
 typedef void SimulatedDragEndCallback(SimulatedDragEndDetails details);
 
+/// Called to determine a new offset from an ongoing drag.
+typedef Offset DragOffsetTransform(
+  Offset currentOffset,
+  DragUpdateDetails details,
+);
+
+Offset _kDirectDragOffsetTransform(
+  Offset currentOffset,
+  DragUpdateDetails details,
+) =>
+    currentOffset + details.delta;
+
 /// An automatically animated widget that keeps stateful position and momentum.
 ///
 /// Only works if it's the child of a [Stack].
@@ -54,8 +66,11 @@ class SimulatedPositioned extends StatefulWidget {
     this.draggable: true,
     this.onDragStart,
     this.onDragEnd,
+    DragOffsetTransform dragOffsetTransform,
   })
       : this.initRect = initRect ?? rect,
+        this.dragOffsetTransform =
+            dragOffsetTransform ?? _kDirectDragOffsetTransform,
         super(key: key);
 
   /// The widget below this widget in the tree.
@@ -75,6 +90,9 @@ class SimulatedPositioned extends StatefulWidget {
 
   /// Callback called when a drag of this ends, if not null.
   final SimulatedDragEndCallback onDragEnd;
+
+  /// Called to determine a new offset from an ongoing drag.
+  final DragOffsetTransform dragOffsetTransform;
 
   @override
   State<SimulatedPositioned> createState() => new _SimulatedPositionedState();
@@ -172,7 +190,7 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
 
   void _updateDrag(DragUpdateDetails details) {
     setState(() {
-      _offset += details.delta;
+      _offset = widget.dragOffsetTransform(_offset, details);
     });
   }
 
