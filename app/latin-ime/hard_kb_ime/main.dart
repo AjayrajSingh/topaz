@@ -23,10 +23,12 @@ _EditSession _currentSession;
 class _EditSession {
   final InputMethodEditorClientProxy _client =
     new InputMethodEditorClientProxy();
+  KeyboardType _keyboardType;
+  InputMethodAction _action;
   TextInputState _state;
   int _maxRev = 0;
 
-  _EditSession(this._state);
+  _EditSession(this._keyboardType, this._action, this._state);
 
   void init(InterfaceHandle<InputMethodEditorClient> clientHandle) {
     _client.ctrl.bind(clientHandle);
@@ -129,6 +131,7 @@ class ImeServiceImpl extends ImeService {
   @override
   void getInputMethodEditor(
     KeyboardType keyboardType,
+    InputMethodAction action,
     TextInputState initialState,
     InterfaceHandle<InputMethodEditorClient> client,
     InterfaceRequest<InputMethodEditor> editor
@@ -136,7 +139,7 @@ class ImeServiceImpl extends ImeService {
     // Shut down the old session; we only have one active at a time.
     _currentSession?.close();
 
-    _EditSession session = new _EditSession(initialState);
+    _EditSession session = new _EditSession(keyboardType, action, initialState);
     session.init(client);
     // ignore: unused_local_variable
     InputMethodEditorImpl imeImpl = new InputMethodEditorImpl(session);
