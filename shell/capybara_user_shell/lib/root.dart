@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 
 import 'launcher.dart';
 import 'launcher_toggle.dart';
@@ -99,31 +100,58 @@ class _RootState extends State<RootWidget> with TickerProviderStateMixin {
           left: 0.0,
           right: 0.0,
           bottom: 0.0,
-          child: new Container(
-            height: 48.0,
-            padding: const EdgeInsets.all(8.0),
-            decoration: const BoxDecoration(
-              color: Colors.black87,
-            ),
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                new LauncherToggleWidget(
-                  toggleKey: _launcherToggleKey,
-                  callback: (bool toggled) =>
-                      _launcherOverlayKey.currentState.visible = toggled,
-                ),
-                new StatusTrayWidget(
-                  toggleKey: _statusToggleKey,
-                  callback: (bool toggled) =>
-                      _statusOverlayKey.currentState.visible = toggled,
-                ),
-              ],
+          child: new GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _hideOverlays,
+            child: new Container(
+              height: 48.0,
+              padding: const EdgeInsets.all(8.0),
+              decoration: const BoxDecoration(
+                color: Colors.black87,
+              ),
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  new LauncherToggleWidget(
+                    toggleKey: _launcherToggleKey,
+                    callback: (bool toggled) => _setOverlayVisibility(
+                        overlay: _launcherOverlayKey, visible: toggled),
+                  ),
+                  new StatusTrayWidget(
+                    toggleKey: _statusToggleKey,
+                    callback: (bool toggled) => _setOverlayVisibility(
+                        overlay: _statusOverlayKey, visible: toggled),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ],
     );
+  }
+
+  /// Hides all overlays except [except] if applicable.
+  void _hideOverlays({GlobalKey<SystemOverlayState> except}) {
+    <GlobalKey<SystemOverlayState>>[
+      _launcherOverlayKey,
+      _statusOverlayKey,
+    ]
+        .where((GlobalKey<SystemOverlayState> overlay) => overlay != except)
+        .forEach((GlobalKey<SystemOverlayState> overlay) =>
+            overlay.currentState.visible = false);
+  }
+
+  /// Sets the given [overlay]'s visibility to [visible].
+  /// When showing an overlay, this also hides every other overlay.
+  void _setOverlayVisibility({
+    @required GlobalKey<SystemOverlayState> overlay,
+    @required bool visible,
+  }) {
+    if (visible) {
+      _hideOverlays(except: overlay);
+    }
+    overlay.currentState.visible = visible;
   }
 }
