@@ -57,15 +57,21 @@ class StoryShellImpl extends StoryShell {
       String parentId, SurfaceRelation surfaceRelation) {
     _log('Connecting view $viewId with parent $parentId');
     _surfaceGraph.addSurface(
-      viewId.toString(),
+      viewId,
       new SurfaceProperties(),
-      parentId.toString(),
+      parentId,
       surfaceRelation ?? new SurfaceRelation(),
     );
 
     // Separated calls in prep for asynchronous availability of view
     _surfaceGraph.connectView(viewId.toString(), view);
     _surfaceGraph.focusSurface(viewId.toString());
+  }
+
+  /// Focus the view with this id
+  @override
+  void focusView(String viewId) {
+    _surfaceGraph.focusSurface(viewId);
   }
 
   /// Terminate the StoryShell

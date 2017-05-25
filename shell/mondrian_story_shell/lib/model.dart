@@ -49,13 +49,19 @@ class Surface extends Model {
       max(properties?.constraints?.minWidth ?? 0.0, min);
 
   /// Return the absolute emphasis given some root displayed Surface
-  double absoluteEmphasis(Surface top) {
-    assert(top == this || ancestors.contains(top));
+  double absoluteEmphasis(Surface relative) {
+    assert(root == relative.root);
+    Iterable<Surface> relativeAncestors = relative.ancestors;
     Surface ancestor = this;
     double emphasis = 1.0;
-    while (ancestor != top) {
+    while (ancestor != relative && !relativeAncestors.contains(ancestor)) {
       emphasis *= ancestor.relation.emphasis;
       ancestor = ancestor.parent;
+    }
+    Surface aRelative = relative;
+    while (ancestor != aRelative) {
+      emphasis /= aRelative.relation.emphasis;
+      aRelative = aRelative.parent;
     }
     return emphasis;
   }
@@ -211,7 +217,8 @@ class SurfaceGraph extends Model {
 
   /// Push a new focus onto the focus stack, replacing the current focus
   void focusSurface(String id) {
-    assert(_surfaces.keys.contains(id));
+    _log('focusSurface($id)');
+    assert(_surfaces.containsKey(id));
     if (_focusedSurfaces.isEmpty || _focusedSurfaces.last != id) {
       _dismissedSurfaces.remove(id);
       _focusedSurfaces.remove(id);

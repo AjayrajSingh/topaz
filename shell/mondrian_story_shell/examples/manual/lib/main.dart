@@ -21,7 +21,11 @@ final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 /// This is used for keeping the reference around.
 ModuleImpl _module;
 ModuleContextProxy _moduleContext = new ModuleContextProxy();
-List<ModuleWatcher> _watchers = <ModuleWatcher>[];
+List<_ModuleStopperWatcher> _watchers = <_ModuleStopperWatcher>[];
+int _childId = 0;
+
+/// The key for the child modules list
+final GlobalKey<ChildModulesViewState> kChildModulesKey = new GlobalKey();
 
 void _log(String msg) {
   print('[Manual Relationships Module] $msg');
@@ -30,8 +34,9 @@ void _log(String msg) {
 class _ModuleStopperWatcher extends ModuleWatcher {
   final ModuleControllerProxy _moduleController;
   final ModuleWatcherBinding _binding = new ModuleWatcherBinding();
+  final String name;
 
-  _ModuleStopperWatcher(this._moduleController) {
+  _ModuleStopperWatcher(this._moduleController, this.name) {
     _moduleController.watch(_binding.wrap(this));
   }
   @override
@@ -42,8 +47,13 @@ class _ModuleStopperWatcher extends ModuleWatcher {
         _log('Module stopped!');
         _binding.unbind();
         _watchers.remove(this);
+        kChildModulesKey.currentState.refresh();
       });
     }
+  }
+
+  void focus() {
+    _moduleController.focus();
   }
 }
 
@@ -51,18 +61,22 @@ class _ModuleStopperWatcher extends ModuleWatcher {
 void startModuleInShell(SurfaceRelation relation) {
   ModuleControllerProxy moduleController = new ModuleControllerProxy();
 
+  _childId++;
+  String name = 'C$_childId';
+
   _moduleContext.startModuleInShell(
-    '',
+    name,
     _kModuleUrl,
-    null, // pass our default link forward
+    null, // link
     null, // outgoingServices,
     null, // incomingServices,
     moduleController.ctrl.request(),
     relation,
   );
-  _log('Started sub-module');
+  _log('Started sub-module $name');
 
-  _watchers.add(new _ModuleStopperWatcher(moduleController));
+  _watchers.add(new _ModuleStopperWatcher(moduleController, name));
+  kChildModulesKey.currentState.refresh();
 }
 
 /// Button widget to start module
@@ -149,6 +163,37 @@ class CopresentLauncherState extends State<CopresentLauncher> {
       );
 }
 
+/// View for currently live child modules
+class ChildModulesView extends StatefulWidget {
+  /// ChildModulesView
+  ChildModulesView({Key key}) : super(key: key);
+
+  @override
+  ChildModulesViewState createState() => new ChildModulesViewState();
+}
+
+/// Copresent Launch State
+class ChildModulesViewState extends State<ChildModulesView> {
+  /// Reload the child list
+  void refresh() {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) => new Container(
+      alignment: FractionalOffset.center,
+      constraints: new BoxConstraints(maxWidth: 200.0),
+      child: new ButtonBar(
+          alignment: MainAxisAlignment.center,
+          children: _watchers
+              .map((_ModuleStopperWatcher w) => new RaisedButton(
+                    child: new Text(w.name),
+                    color: Colors.white,
+                    onPressed: () => w.focus(),
+                  ))
+              .toList()));
+}
+
 /// Main UI Widget
 class MainWidget extends StatelessWidget {
   @override
@@ -173,6 +218,7 @@ class MainWidget extends StatelessWidget {
               },
             ),
           ),
+          new ChildModulesView(key: kChildModulesKey),
         ],
       )),
     );

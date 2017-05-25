@@ -196,6 +196,10 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
 
     List<Surface> surfacesToDisplay =
         copresTree.map((Tree<Surface> t) => t.value).toList(growable: false);
+
+    // Remove any dismissed surfaces we are about to layout
+    surfacesToDisplay.forEach((Surface s) => dismissedSurfaces.remove(s));
+
     Iterable<Surface> arrangement =
         top.flattened.where((Surface s) => surfacesToDisplay.contains(s));
 
