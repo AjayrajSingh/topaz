@@ -9,7 +9,9 @@ executable("web_view") {
     "main.cpp",
   ]
 
-  deps = [ "//third_party/webkit" ]
+  deps = [
+    "//third_party/webkit",
+  ]
 
   deps += [
     "//application/lib/app",
@@ -28,4 +30,6 @@ executable("web_view") {
     "//third_party/boringssl",
     "//third_party/rapidjson",
   ]
+
+  ldflags = [ "-Wl,-z,stack-size=1048576" ]
 }
