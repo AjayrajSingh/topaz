@@ -215,16 +215,35 @@ class SurfaceGraph extends Model {
     }
   }
 
-  /// Push a new focus onto the focus stack, replacing the current focus
-  void focusSurface(String id) {
+  /// Move the surface up in the focus stack, undismissing it if needed.
+  ///
+  /// If relativeId is null, the surface is re-inserted  at the top of the stack
+  /// If relativeId is provided, the surface is re-inserted at the higher of
+  /// above the relative surface or any of its direct children, or its original
+  /// position.
+  void focusSurface(String id, String relativeId) {
     _log('focusSurface($id)');
     assert(_surfaces.containsKey(id));
-    if (_focusedSurfaces.isEmpty || _focusedSurfaces.last != id) {
-      _dismissedSurfaces.remove(id);
+    _dismissedSurfaces.remove(id);
+    if (relativeId == null || relativeId == kNoParent) {
       _focusedSurfaces.remove(id);
       _focusedSurfaces.add(id);
-      notifyListeners();
+    } else {
+      assert(_surfaces.containsKey(relativeId));
+      int currentIndex = _focusedSurfaces.indexOf(id);
+      _focusedSurfaces.remove(id);
+      int relativeIndex = _focusedSurfaces.indexOf(relativeId);
+      for (Tree<String> childNode in _tree.find(relativeId).children) {
+        String childId = childNode.value;
+        relativeIndex = max(relativeIndex, _focusedSurfaces.indexOf(childId));
+      }
+      // Insert to the highest of one past relative index, or the original index
+      int index = max(relativeIndex < 0 ? -1 : relativeIndex + 1, currentIndex);
+      if (index >= 0) {
+        _focusedSurfaces.insert(index, id);
+      }
     }
+    notifyListeners();
   }
 
   /// When called surface is no longer displayed

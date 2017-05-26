@@ -64,14 +64,14 @@ class StoryShellImpl extends StoryShell {
     );
 
     // Separated calls in prep for asynchronous availability of view
-    _surfaceGraph.connectView(viewId.toString(), view);
-    _surfaceGraph.focusSurface(viewId.toString());
+    _surfaceGraph.connectView(viewId, view);
+    _surfaceGraph.focusSurface(viewId, parentId);
   }
 
   /// Focus the view with this id
   @override
-  void focusView(String viewId) {
-    _surfaceGraph.focusSurface(viewId);
+  void focusView(String viewId, String relativeViewId) {
+    _surfaceGraph.focusSurface(viewId, relativeViewId);
   }
 
   /// Defocus the view with this id
