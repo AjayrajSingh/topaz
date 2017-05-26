@@ -1,4 +1,3 @@
 /.DS_Store
-/prebuilt
-/prebuilt.stamp
+/prebuilt/
 .clang_complete

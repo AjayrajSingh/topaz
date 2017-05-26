@@ -2,6 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+declare_args() {
+  use_prebuilt_webkit = true
+}
+
 executable("web_view") {
   output_name = "web_view"
 
@@ -9,9 +13,12 @@ executable("web_view") {
     "main.cpp",
   ]
 
-  deps = [
-    "//third_party/webkit",
-  ]
+  deps = []
+  if (use_prebuilt_webkit) {
+    deps += [ ":prebuilt_webkit" ]
+  } else {
+    deps += [ "//third_party/webkit" ]
+  }
 
   deps += [
     "//application/lib/app",
@@ -32,4 +39,53 @@ executable("web_view") {
   ]
 
   ldflags = [ "-Wl,-z,stack-size=1048576" ]
+}
+
+if (use_prebuilt_webkit) {
+  group("prebuilt_webkit") {
+    deps = [
+      ":copy_prebuilt_webkit_so",
+      ":prebuilt_webkit_shared_deps(//build/toolchain/fuchsia:${target_cpu}-shared)",
+    ]
+
+    public_configs = [ ":prebuilt_webkit_config" ]
+  }
+
+  config("prebuilt_webkit_config") {
+    include_dirs = [ "//third_party/webkit/Source/WebKit/fuchsia" ]
+    ldflags = [ "x64-shared/libwebkit.so" ]
+  }
+
+  copy("copy_prebuilt_webkit_so") {
+    if (target_cpu == "x64") {
+      arch = "x86_64"
+    } else if (target_cpu == "arm64") {
+      arch = "aarch64"
+    } else {
+      assert(false, "Target architecture not supported")
+    }
+    sources = [
+      "prebuilt/$arch/libwebkit.so",
+    ]
+    outputs = [
+      "$root_out_dir/x64-shared/libwebkit.so",
+    ]
+  }
+
+  group("prebuilt_webkit_shared_deps") {
+    deps = [
+      "//third_party/boringssl:ssl",
+      "//third_party/cairo",
+      "//third_party/curl:libcurl",
+      "//third_party/freetype2",
+      "//third_party/harfbuzz",
+      "//third_party/icu:icui18n",
+      "//third_party/icu:icuuc",
+      "//third_party/libjpeg-turbo:libjpeg",
+      "//third_party/libpng",
+      "//third_party/libxml2",
+      "//third_party/sqlite",
+      "//third_party/zlib",
+    ]
+  }
 }
