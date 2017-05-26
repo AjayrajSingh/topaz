@@ -74,6 +74,12 @@ class StoryShellImpl extends StoryShell {
     _surfaceGraph.focusSurface(viewId);
   }
 
+  /// Defocus the view with this id
+  @override
+  void defocusView(String viewId) {
+    _surfaceGraph.dismissSurface(viewId);
+  }
+
   /// Terminate the StoryShell
   @override
   void terminate(void done()) {

@@ -32,10 +32,10 @@ class SurfaceLayout extends StatefulWidget {
 /// Maintains state for the avaialble views to display.
 class _SurfaceLayoutState extends State<SurfaceLayout> {
   /// Surfaces currently animating away
-  Map<Surface, Size> dismissedSurfaces = new Map<Surface, Size>();
+  final Map<Surface, Rect> activeSurfaces = new Map<Surface, Rect>();
 
   /// Surfaces currently being directly manipulated by user
-  List<Surface> touchedSurfaces = new List<Surface>();
+  final List<Surface> touchedSurfaces = new List<Surface>();
 
   /// Layout offset
   double offset = 0.0;
@@ -59,9 +59,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
     // Only remove if greater than threshold ant not root surface.
     if (expectedOffset.distance > 200.0) {
       setState(() {
-        if (surface.dismiss()) {
-          dismissedSurfaces[surface] = rect.size;
-        }
+        surface.dismiss();
       });
     }
   }
@@ -198,7 +196,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
         copresTree.map((Tree<Surface> t) => t.value).toList(growable: false);
 
     // Remove any dismissed surfaces we are about to layout
-    surfacesToDisplay.forEach((Surface s) => dismissedSurfaces.remove(s));
+    surfacesToDisplay.forEach((Surface s) => activeSurfaces.remove(s));
 
     Iterable<Surface> arrangement =
         top.flattened.where((Surface s) => surfacesToDisplay.contains(s));
@@ -230,6 +228,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
             final Offset offscreen = constraints.biggest.topRight(topLeft);
 
             final List<Widget> touchedSurfaceWidgets = <Widget>[];
+            final Map<Surface, Rect> laidOut = new Map<Surface, Rect>();
 
             if (graph.size == 0) {
               childViews.add(new MondrianSpinner());
@@ -254,14 +253,14 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
               }
               // Take second most focused and repeat layout algorithm
               // Add any unlaid out and add them to background
-              List<Surface> laidOut = layout.keys.toList();
+              laidOut.addAll(layout);
               focusStack.removeLast();
               while (focusStack.isNotEmpty) {
                 List<Widget> backgroundChildViews = <Widget>[];
                 Map<Surface, Rect> backgroundLayout =
                     _layout(constraints, focusStack);
-                laidOut.forEach((Surface s) => backgroundLayout.remove(s));
-                laidOut.addAll(backgroundLayout.keys);
+                laidOut.keys.forEach((Surface s) => backgroundLayout.remove(s));
+                laidOut.addAll(backgroundLayout);
                 if (backgroundLayout.isNotEmpty) {
                   backgroundLayout.forEach((Surface s, Rect rect) {
                     // TODO(alangardner): Ensure a proper order
@@ -297,15 +296,17 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
             }
 
             // Animating out surfaces
-            dismissedSurfaces.forEach((Surface surface, Size size) {
+            activeSurfaces.forEach((Surface surface, Rect rect) {
               childViews.add(_inactiveSurface(
                 surface: surface,
-                rect: offscreen & size,
+                rect: offscreen & rect.size,
               ));
             });
 
             // Draw touched surfaces on top, with first touched on top
             childViews.addAll(touchedSurfaceWidgets);
+
+            activeSurfaces.addAll(laidOut);
 
             return new Stack(children: childViews);
           }));
