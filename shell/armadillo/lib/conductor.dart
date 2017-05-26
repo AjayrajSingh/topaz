@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'armadillo_overlay.dart';
 import 'edge_scroll_drag_target.dart';
 import 'expand_suggestion.dart';
+import 'interruption_overlay.dart';
 import 'quick_settings.dart';
 import 'nothing.dart';
 import 'now.dart';
@@ -125,6 +126,9 @@ class ConductorState extends State<Conductor> {
       _selectedSuggestionOverlayKey =
       new GlobalKey<SelectedSuggestionOverlayState>();
 
+  final GlobalKey<InterruptionOverlayState> _interruptionOverlayKey =
+      new GlobalKey<InterruptionOverlayState>();
+
   final GlobalKey<ArmadilloOverlayState> _overlayKey =
       new GlobalKey<ArmadilloOverlayState>();
 
@@ -137,7 +141,6 @@ class ConductorState extends State<Conductor> {
   @override
   void initState() {
     super.initState();
-
     _peekManager = new PeekManager(
       peekingOverlayKey: _suggestionOverlayKey,
       storyClusterDragStateModel: widget.storyClusterDragStateModel,
@@ -204,10 +207,21 @@ class ConductorState extends State<Conductor> {
                 SuggestionModel.of(context),
                 storyModel,
                 constraints.maxWidth,
-              ),
+                (BuildContext context, double overlayHeight) => new Stack(
+                      children: <Widget>[
+                        // Selected Suggestion Overlay.
+                        _getSelectedSuggestionOverlay(),
 
-              // Selected Suggestion Overlay.
-              _getSelectedSuggestionOverlay(),
+                        // Interruption Overlay.
+                        _buildInterruptionOverlay(
+                          SuggestionModel.of(context),
+                          storyModel,
+                          context,
+                          overlayHeight,
+                        ),
+                      ],
+                    ),
+              ),
 
               // Quick Settings Overlay.
               new QuickSettingsOverlay(
@@ -224,11 +238,7 @@ class ConductorState extends State<Conductor> {
               ),
 
               // Top and bottom edge scrolling drag targets.
-              new Positioned(
-                top: 0.0,
-                left: 0.0,
-                right: 0.0,
-                bottom: 0.0,
+              new Positioned.fill(
                 child: new EdgeScrollDragTarget(
                   key: _edgeScrollDragTargetKey,
                   scrollController: _scrollController,
@@ -370,6 +380,7 @@ class ConductorState extends State<Conductor> {
     SuggestionModel suggestionModel,
     StoryModel storyModel,
     double maxWidth,
+    ChildAboveBuilder childAboveBuilder,
   ) =>
       new PeekingOverlay(
         key: _suggestionOverlayKey,
@@ -389,6 +400,7 @@ class ConductorState extends State<Conductor> {
         onShow: () {
           widget.onSuggestionsOverlayChanged?.call(true);
         },
+        childAboveBuilder: childAboveBuilder,
         child: new SuggestionList(
           key: _suggestionListKey,
           scrollController: _suggestionListScrollController,
@@ -398,45 +410,73 @@ class ConductorState extends State<Conductor> {
           onAskingStarted: () {
             _suggestionOverlayKey.currentState.show();
           },
-          onSuggestionSelected: (Suggestion suggestion, Rect globalBounds) {
-            suggestionModel.onSuggestionSelected(suggestion);
-
-            if (suggestion.selectionType == SelectionType.closeSuggestions) {
-              _suggestionOverlayKey.currentState.hide();
-            } else {
-              _selectedSuggestionOverlayKey.currentState.suggestionSelected(
-                expansionBehavior:
-                    suggestion.selectionType == SelectionType.launchStory
-                        ? new ExpandSuggestion(
-                            suggestion: suggestion,
-                            suggestionInitialGlobalBounds: globalBounds,
-                            onSuggestionExpanded: (Suggestion suggestion) =>
-                                _focusOnStory(
-                                  suggestion.selectionStoryId,
-                                  storyModel,
-                                ),
-                            bottomMargin: _kMinimizedNowHeight,
-                          )
-                        : new SplashSuggestion(
-                            suggestion: suggestion,
-                            suggestionInitialGlobalBounds: globalBounds,
-                            onSuggestionExpanded: (Suggestion suggestion) =>
-                                _focusOnStory(
-                                  suggestion.selectionStoryId,
-                                  storyModel,
-                                ),
-                          ),
-              );
-              _minimizeNow();
-            }
-          },
+          onSuggestionSelected: (Suggestion suggestion, Rect globalBounds) =>
+              _onSuggestionSelected(
+                suggestionModel,
+                storyModel,
+                suggestion,
+                globalBounds,
+              ),
         ),
       );
+
+  void _onSuggestionSelected(
+    SuggestionModel suggestionModel,
+    StoryModel storyModel,
+    Suggestion suggestion,
+    Rect globalBounds,
+  ) {
+    suggestionModel.onSuggestionSelected(suggestion);
+
+    if (suggestion.selectionType == SelectionType.closeSuggestions) {
+      _suggestionOverlayKey.currentState.hide();
+    } else {
+      _selectedSuggestionOverlayKey.currentState.suggestionSelected(
+        expansionBehavior: suggestion.selectionType == SelectionType.launchStory
+            ? new ExpandSuggestion(
+                suggestion: suggestion,
+                suggestionInitialGlobalBounds: globalBounds,
+                onSuggestionExpanded: (Suggestion suggestion) => _focusOnStory(
+                      suggestion.selectionStoryId,
+                      storyModel,
+                    ),
+                bottomMargin: _kMinimizedNowHeight,
+              )
+            : new SplashSuggestion(
+                suggestion: suggestion,
+                suggestionInitialGlobalBounds: globalBounds,
+                onSuggestionExpanded: (Suggestion suggestion) => _focusOnStory(
+                      suggestion.selectionStoryId,
+                      storyModel,
+                    ),
+              ),
+      );
+      _minimizeNow();
+    }
+  }
 
   // This is only visible in transitoning the user from a Suggestion
   // in an open SuggestionList to a focused Story in the StoryList.
   Widget _getSelectedSuggestionOverlay() => new SelectedSuggestionOverlay(
         key: _selectedSuggestionOverlayKey,
+      );
+
+  Widget _buildInterruptionOverlay(
+    SuggestionModel suggestionModel,
+    StoryModel storyModel,
+    BuildContext context,
+    double overlayHeight,
+  ) =>
+      new InterruptionOverlay(
+        key: _interruptionOverlayKey,
+        overlayHeight: overlayHeight,
+        onSuggestionSelected: (Suggestion suggestion, Rect globalBounds) =>
+            _onSuggestionSelected(
+              suggestionModel,
+              storyModel,
+              suggestion,
+              globalBounds,
+            ),
       );
 
   void _defocus(StoryModel storyModel) {

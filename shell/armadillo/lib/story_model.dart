@@ -23,9 +23,9 @@ export 'package:lib.widgets/model.dart'
 class StoryModel extends Model {
   /// Called when the currently focused [StoryCluster] changes.
   final OnStoryClusterEvent onFocusChanged;
-  List<StoryCluster> _storyClusters = const <StoryCluster>[];
-  List<StoryCluster> _activeSortedStoryClusters = const <StoryCluster>[];
-  List<StoryCluster> _inactiveStoryClusters = const <StoryCluster>[];
+  List<StoryCluster> _storyClusters = <StoryCluster>[];
+  List<StoryCluster> _activeSortedStoryClusters = <StoryCluster>[];
+  List<StoryCluster> _inactiveStoryClusters = <StoryCluster>[];
   Size _lastLayoutSize = Size.zero;
   double _listHeight = 0.0;
 

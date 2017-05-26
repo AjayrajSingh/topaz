@@ -16,6 +16,9 @@ const double _kStartOverlayTransitionHeight = 28.0;
 /// fully hidden.
 const double _kAngleOffsetY = 0.0;
 
+/// Builds the child which floats vertically above this overlay.
+typedef Widget ChildAboveBuilder(BuildContext context, double overlayHeight);
+
 /// A bottom aligned overlay which peeks up over the bottom.
 class PeekingOverlay extends StatefulWidget {
   /// The amount the overlay should peek above the bottom of its parent when
@@ -27,6 +30,9 @@ class PeekingOverlay extends StatefulWidget {
 
   /// The widget to display within the overlay.
   final Widget child;
+
+  /// The widget to display above the overlay.
+  final ChildAboveBuilder childAboveBuilder;
 
   /// Called when the overlay is hidden.
   final VoidCallback onHide;
@@ -42,6 +48,7 @@ class PeekingOverlay extends StatefulWidget {
     this.onHide,
     this.onShow,
     this.child,
+    this.childAboveBuilder,
   })
       : super(key: key);
 
@@ -62,44 +69,24 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
   static final double _kSnapVelocityThreshold = 500.0;
   bool _hiding = true;
   bool _peeking;
-  Widget _dragTarget;
-  Widget _tapDetector;
 
   @override
   void initState() {
     super.initState();
     maxHeight = widget.peekHeight;
     peek = true;
-    _dragTarget = new Positioned(
-      top: 0.0,
-      left: 0.0,
-      right: 0.0,
-      height: widget.peekHeight,
-      child: new GestureDetector(
-        onVerticalDragUpdate: onVerticalDragUpdate,
-        onVerticalDragEnd: onVerticalDragEnd,
-      ),
-    );
-    _tapDetector = new Listener(
-      onPointerUp: (_) => hide(),
-      behavior: HitTestBehavior.opaque,
-    );
   }
 
   /// Hides the overlay.
   void hide() {
-    if (widget.onHide != null) {
-      widget.onHide();
-    }
+    widget.onHide?.call();
     _hiding = true;
     setHeight(minHeight);
   }
 
   /// Shows the overlay.
   void show() {
-    if (widget.onShow != null) {
-      widget.onShow();
-    }
+    widget.onShow?.call();
     _hiding = false;
     setHeight(maxHeight);
   }
@@ -122,9 +109,12 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
   /// fully 'unpeeked'. This tracks from [0.0 to 1.0] for [height]s of
   /// [_kAngleOffsetY to widget.peekHeight].
   double get _peekProgress => math.max(
-      0.0,
-      math.min((height - _kAngleOffsetY) / (widget.peekHeight - _kAngleOffsetY),
-          1.0));
+        0.0,
+        math.min(
+          (height - _kAngleOffsetY) / (widget.peekHeight - _kAngleOffsetY),
+          1.0,
+        ),
+      );
 
   /// Updates the overlay as if it was being dragged vertically.
   void onVerticalDragUpdate(DragUpdateDetails details) =>
@@ -159,7 +149,10 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
           ),
           new Offstage(
             offstage: hiding,
-            child: _tapDetector,
+            child: new Listener(
+              onPointerUp: (_) => hide(),
+              behavior: HitTestBehavior.opaque,
+            ),
           ),
           new Positioned(
             left: 0.0,
@@ -189,11 +182,21 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
                     ),
                   ),
                   widget.child,
-                  _dragTarget,
+                  new Positioned(
+                    top: 0.0,
+                    left: 0.0,
+                    right: 0.0,
+                    height: widget.peekHeight,
+                    child: new GestureDetector(
+                      onVerticalDragUpdate: onVerticalDragUpdate,
+                      onVerticalDragEnd: onVerticalDragEnd,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
+          widget.childAboveBuilder(context, height),
         ],
       );
 

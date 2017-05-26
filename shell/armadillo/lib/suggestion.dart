@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 
 import 'story.dart';
 
@@ -34,9 +35,9 @@ enum ImageType {
 }
 
 /// The unique id of a [Suggestion].
-class SuggestionId extends ValueKey<dynamic> {
+class SuggestionId extends ValueKey<String> {
   /// Constructor.
-  SuggestionId(dynamic value) : super(value);
+  SuggestionId(String value) : super(value);
 }
 
 /// The model for displaying a suggestion in the suggestion overlay.
@@ -67,7 +68,7 @@ class Suggestion {
 
   /// Constructor.
   Suggestion({
-    this.id,
+    @required this.id,
     this.title,
     this.themeColor,
     this.selectionType,
