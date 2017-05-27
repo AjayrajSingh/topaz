@@ -207,7 +207,7 @@ dart-lint: build
 	$(fuchsia_root)/scripts/run-dart-action.py analyze \
 			--out=$(fuchsia_out)/$(FUCHSIA_VARIANT)-$(FUCHSIA_GEN_TARGET) \
 			--tree=//apps/modules/$(PROJECT)/* \
-			--lints --fatal-lints --fatal-warnings
+			--lints --fatal-lints --fatal-warnings --fatal-hints
 
 .PHONY: dart-fmt
 dart-fmt: $(dart_bin) $(tools_root)/dartfmt_extras/.packages

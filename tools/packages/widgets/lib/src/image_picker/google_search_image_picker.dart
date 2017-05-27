@@ -306,43 +306,6 @@ class _GoogleSearchImagePickerState extends State<GoogleSearchImagePicker>
         ),
       ),
     );
-    Widget emptyState = new Positioned.fill(
-      child: new AnimatedBuilder(
-        animation: _controller,
-        builder: (BuildContext context, Widget child) {
-          // _hideEmptyState depends on _controller.text, which means we need to
-          // listen to _controller to make sure we rebuild this widget when
-          // _controller.text changes.
-          return new Offstage(
-            offstage: _hideEmptyState,
-            child: child,
-          );
-        },
-        child: new Material(
-          color: Colors.grey[50],
-          child: new Center(
-            child: new Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                new Icon(
-                  Icons.collections,
-                  color: Colors.grey[300],
-                  size: 100.0,
-                ),
-                new Text(
-                  'Search for images',
-                  style: new TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
     ImagePicker imagePicker = new ImagePicker(
       imageUrls: _sourceImages,
       selectedImages: _selectedImages,
