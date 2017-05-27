@@ -25,18 +25,18 @@ abstract class AgentImpl extends Agent {
   final AgentBinding _binding = new AgentBinding();
   final ApplicationContext _applicationContext;
 
-  AgentContextProxy _agentContext;
-  ComponentContextProxy _componentContext;
-  TokenProviderProxy _tokenProvider;
+  final AgentContextProxy _agentContext = new AgentContextProxy();
+  final ComponentContextProxy _componentContext = new ComponentContextProxy();
+  final TokenProviderProxy _tokenProvider = new TokenProviderProxy();
 
   final ServiceProviderImpl _outgoingServicesImpl = new ServiceProviderImpl();
   final List<ServiceProviderBinding> _outgoingServicesBindings =
       <ServiceProviderBinding>[];
 
+  Completer<Null> _ready;
+
   /// Creates a new instance of [AgentImpl].
-  AgentImpl({
-    @required ApplicationContext applicationContext,
-  })
+  AgentImpl({@required ApplicationContext applicationContext})
       : _applicationContext = applicationContext {
     assert(applicationContext != null);
   }
@@ -56,16 +56,16 @@ abstract class AgentImpl extends Agent {
     InterfaceHandle<AgentContext> agentContext,
     void callback(),
   ) async {
-    // Bind the AgentContext handle
-    _agentContext = new AgentContextProxy();
+    // We would like to suppress the initialize() logic being run multiple times
+    // and just reuse the same entities.
+    // SEE: https://fuchsia.atlassian.net/browse/FW-190
+    if (_ready != null) {
+      return _ready.future;
+    }
+    _ready = new Completer<Null>();
+
     _agentContext.ctrl.bind(agentContext);
-
-    // Get the ComponentContext
-    _componentContext = new ComponentContextProxy();
     _agentContext.getComponentContext(_componentContext.ctrl.request());
-
-    // Get the TokenProvider
-    _tokenProvider = new TokenProviderProxy();
     _agentContext.getTokenProvider(_tokenProvider.ctrl.request());
 
     await onReady(
@@ -77,6 +77,8 @@ abstract class AgentImpl extends Agent {
     );
 
     callback();
+
+    _ready.complete();
   }
 
   @override
@@ -94,11 +96,8 @@ abstract class AgentImpl extends Agent {
     await onStop();
 
     _tokenProvider?.ctrl?.close();
-    _tokenProvider = null;
     _componentContext?.ctrl?.close();
-    _componentContext = null;
     _agentContext?.ctrl?.close();
-    _agentContext = null;
 
     _outgoingServicesBindings
         .forEach((ServiceProviderBinding binding) => binding.close());
