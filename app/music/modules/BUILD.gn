@@ -9,5 +9,6 @@ group("modules") {
     "music_album:music_album_component",
     "music_artist",
     "music_artist:music_artist_component",
+    "music_playback",
   ]
 }
