@@ -47,16 +47,23 @@ class PlaybackSlider extends StatelessWidget {
     assert(duration.compareTo(this.playbackPosition) >= 0);
   }
 
+  double get _playbackRatio {
+    if (duration.inMilliseconds == 0) {
+      // This handles the situation when there is no track and when the duration
+      // will be set to 0
+      return 0.0;
+    } else {
+      return playbackPosition.inMilliseconds / duration.inMilliseconds;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final Widget progressBar = new CustomPaint(
         size: new Size(constraints.maxWidth, _kSliderHeight),
-        painter: new _PlaybackBarPainter(
-          playbackRatio:
-              playbackPosition.inMilliseconds / duration.inMilliseconds,
-        ),
+        painter: new _PlaybackBarPainter(playbackRatio: _playbackRatio),
       );
       if (showTimeText) {
         return new Column(
