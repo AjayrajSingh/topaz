@@ -4,16 +4,35 @@
 
 import 'package:flutter/widgets.dart';
 
+import 'window/window.dart';
+
 /// Displays a set of windows.
 class WindowPlaygroundWidget extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => new Center(
-        child: new Container(
-          padding: const EdgeInsets.all(12.0),
-          decoration: const BoxDecoration(
-            color: const Color(0xccbcbcbc),
+  Widget build(BuildContext context) => new Overlay(
+        initialEntries: <OverlayEntry>[
+          new OverlayEntry(
+            builder: (BuildContext context) => new Stack(children: <Widget>[
+                  new Positioned(
+                    left: 50.0,
+                    top: 50.0,
+                    child: new Container(
+                      width: 500.0,
+                      height: 200.0,
+                      child: new Window(),
+                    ),
+                  ),
+                  new Positioned(
+                    left: 350.0,
+                    top: 300.0,
+                    child: new Container(
+                      width: 500.0,
+                      height: 200.0,
+                      child: new Window(),
+                    ),
+                  ),
+                ]),
           ),
-          child: new Text("I display windows"),
-        ),
+        ],
       );
 }
