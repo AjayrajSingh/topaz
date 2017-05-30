@@ -83,10 +83,10 @@ terminal session you can run email two different ways.
 
 Running with the full sysui
 
-    netruncmd : "@boot device_runner"
+    netruncmd : "device_runner"
 
 Running the email story directly
 
-    netruncmd : "@boot device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=<target>"
+    netruncmd : "device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=<target>"
 
 [get-started]: https://fuchsia.googlesource.com/docs/+/master/getting_started.md
