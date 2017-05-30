@@ -10,6 +10,7 @@ import 'package:armadillo/armadillo_drag_target.dart';
 import 'package:armadillo/conductor.dart';
 import 'package:armadillo/debug_enabler.dart';
 import 'package:armadillo/debug_model.dart';
+import 'package:armadillo/interruption_overlay.dart';
 import 'package:armadillo/now_model.dart';
 import 'package:armadillo/panel_resizing_model.dart';
 import 'package:armadillo/story_cluster.dart';
@@ -20,6 +21,7 @@ import 'package:armadillo/story_drag_transition_model.dart';
 import 'package:armadillo/story_model.dart';
 import 'package:armadillo/story_rearrangement_scrim_model.dart';
 import 'package:armadillo/story_time_randomizer.dart';
+import 'package:armadillo/suggestion.dart';
 import 'package:armadillo/suggestion_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -79,6 +81,8 @@ Future<Null> main() async {
 
   UserLogoutter userLogoutter = new UserLogoutter();
   GlobalKey<ConductorState> conductorKey = new GlobalKey<ConductorState>();
+  GlobalKey<InterruptionOverlayState> interruptionOverlayKey =
+      new GlobalKey<InterruptionOverlayState>();
   Conductor conductor = new Conductor(
     key: conductorKey,
     blurScrimmedChildren: false,
@@ -86,9 +90,20 @@ Future<Null> main() async {
     onSuggestionsOverlayChanged: hitTestModel.onSuggestionsOverlayChanged,
     storyClusterDragStateModel: storyClusterDragStateModel,
     onLogoutSelected: userLogoutter.logout,
+    interruptionOverlayKey: interruptionOverlayKey,
   );
   SuggestionProviderSuggestionModel suggestionProviderSuggestionModel =
-      new SuggestionProviderSuggestionModel(hitTestModel: hitTestModel);
+      new SuggestionProviderSuggestionModel(
+    hitTestModel: hitTestModel,
+    interruptionListener: new InterruptionListener(
+      onInterruptionAdded: (Suggestion interruption) =>
+          interruptionOverlayKey.currentState.onInterruptionAdded(interruption),
+      onInterruptionRemoved: (String uuid) =>
+          interruptionOverlayKey.currentState.onInterruptionRemoved(uuid),
+      onInterruptionsRemoved: () =>
+          interruptionOverlayKey.currentState.onInterruptionsRemoved(),
+    ),
+  );
 
   StoryModel storyModel = new StoryModel(
     onFocusChanged: suggestionProviderSuggestionModel.storyClusterFocusChanged,

@@ -60,9 +60,10 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
   Timer _currentInterruptionTimer;
   final List<Widget> _exitingInterruptionWidgets = <Widget>[];
   BoxConstraints _constraints;
+  bool _removeImmediatelyOnPanEnd = false;
 
   /// Adds an interruption to the overlay.
-  void addInterruption(Suggestion interruption) {
+  void onInterruptionAdded(Suggestion interruption) {
     if (_currentInterruption == null) {
       setState(() {
         _currentInterruption = interruption;
@@ -70,6 +71,38 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
       _startInterruptionTimer();
     } else {
       _queuedInterruptions.add(interruption);
+    }
+  }
+
+  /// Removes the interruption from the overlay.
+  void onInterruptionRemoved(String uuid) {
+    // Remove the interruption if its in the queue.
+    _queuedInterruptions.removeWhere(
+      (Suggestion interruption) => interruption.id.value == uuid,
+    );
+    if (_currentInterruption?.id?.value == uuid) {
+      _removeCurrentInterruption();
+    }
+  }
+
+  /// Removes all interruptions from the overlay.
+  void onInterruptionsRemoved() {
+    // Remove all interruptions in the queue.
+    _queuedInterruptions.clear();
+
+    if (_currentInterruption != null) {
+      _removeCurrentInterruption();
+    }
+  }
+
+  // If an interruption is being displayed and not being interacted with the
+  // user, dismiss it.  Otherwise, wait until the pan ends to dismiss it.
+  void _removeCurrentInterruption() {
+    if (_currentInterruptionTimer != null) {
+      _stopInterruptionTimer();
+      _removeInterruption(_RemoveDirection.down, Offset.zero);
+    } else {
+      _removeImmediatelyOnPanEnd = true;
     }
   }
 
@@ -117,6 +150,9 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
                     _removeInterruption(_RemoveDirection.down, details.offset);
                   } else if (details.offset.dx > 100.0) {
                     _removeInterruption(_RemoveDirection.right, details.offset);
+                  } else if (_removeImmediatelyOnPanEnd) {
+                    _removeInterruption(_RemoveDirection.down, Offset.zero);
+                    _removeImmediatelyOnPanEnd = false;
                   } else {
                     _startInterruptionTimer();
                   }

@@ -80,6 +80,9 @@ class Conductor extends StatefulWidget {
   /// Used to manage peeking.
   final StoryClusterDragStateModel storyClusterDragStateModel;
 
+  /// The key of the interruption overlay.
+  final GlobalKey<InterruptionOverlayState> interruptionOverlayKey;
+
   /// Constructor.  [storyClusterDragStateModel] is used to create a
   /// [PeekManager] for the suggestion list's peeking overlay.
   Conductor({
@@ -89,6 +92,7 @@ class Conductor extends StatefulWidget {
     this.onSuggestionsOverlayChanged,
     this.onLogoutSelected,
     this.storyClusterDragStateModel,
+    this.interruptionOverlayKey,
   })
       : super(key: key);
 
@@ -125,9 +129,6 @@ class ConductorState extends State<Conductor> {
   final GlobalKey<SelectedSuggestionOverlayState>
       _selectedSuggestionOverlayKey =
       new GlobalKey<SelectedSuggestionOverlayState>();
-
-  final GlobalKey<InterruptionOverlayState> _interruptionOverlayKey =
-      new GlobalKey<InterruptionOverlayState>();
 
   final GlobalKey<ArmadilloOverlayState> _overlayKey =
       new GlobalKey<ArmadilloOverlayState>();
@@ -468,7 +469,7 @@ class ConductorState extends State<Conductor> {
     double overlayHeight,
   ) =>
       new InterruptionOverlay(
-        key: _interruptionOverlayKey,
+        key: widget.interruptionOverlayKey,
         overlayHeight: overlayHeight,
         onSuggestionSelected: (Suggestion suggestion, Rect globalBounds) =>
             _onSuggestionSelected(

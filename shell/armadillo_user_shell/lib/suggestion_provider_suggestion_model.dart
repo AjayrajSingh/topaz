@@ -17,7 +17,7 @@ import 'package:armadillo/suggestion.dart';
 import 'package:armadillo/suggestion_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:meta/meta.dart';
 
 import 'hit_test_model.dart';
 
@@ -32,37 +32,18 @@ final Map<maxwell.SuggestionImageType, ImageType> _kImageTypeMap =
 class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
   final String prefix;
   final VoidCallback suggestionListener;
-  final maxwell.SuggestionListenerBinding _binding =
-      new maxwell.SuggestionListenerBinding();
   final Map<String, Suggestion> _suggestions = <String, Suggestion>{};
 
   _MaxwellSuggestionListenerImpl({this.prefix, this.suggestionListener});
-
-  InterfaceHandle<maxwell.SuggestionListener> getHandle() =>
-      _binding.wrap(this);
 
   List<Suggestion> get suggestions => _suggestions.values.toList();
 
   @override
   void onAdd(List<maxwell.Suggestion> suggestions) {
-    suggestions.forEach((maxwell.Suggestion suggestion) {
-      _suggestions[suggestion.uuid] = new Suggestion(
-        id: new SuggestionId(suggestion.uuid),
-        title: suggestion.display.headline,
-        themeColor: new Color(suggestion.display.color),
-        selectionType: SelectionType.closeSuggestions,
-        icons: const <WidgetBuilder>[],
-        image: suggestion.display.imageUrl?.isNotEmpty ?? false
-            ? (_) => new Image.network(
-                  suggestion.display.imageUrl,
-                  fit: BoxFit.cover,
-                )
-            : null,
-        imageType: suggestion.display.imageUrl?.isNotEmpty ?? false
-            ? _kImageTypeMap[suggestion.display.imageType]
-            : ImageType.circular,
-      );
-    });
+    suggestions.forEach(
+      (maxwell.Suggestion suggestion) =>
+          _suggestions[suggestion.uuid] = _convert(suggestion),
+    );
     suggestionListener?.call();
   }
 
@@ -79,6 +60,69 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
   }
 }
 
+/// Called when an interruption occurs.
+typedef void OnInterruptionAdded(Suggestion interruption);
+
+/// Called when an interruption has been removed.
+typedef void OnInterruptionRemoved(String id);
+
+/// Listens for interruptions from maxwell.
+class InterruptionListener extends maxwell.SuggestionListener {
+  /// Called when an interruption occurs.
+  final OnInterruptionAdded onInterruptionAdded;
+
+  /// Called when an interruption is finished.
+  final OnInterruptionRemoved onInterruptionRemoved;
+
+  /// Called when all interruptions are finished.
+  final VoidCallback onInterruptionsRemoved;
+
+  /// Constructor.
+  InterruptionListener({
+    @required this.onInterruptionAdded,
+    @required this.onInterruptionRemoved,
+    @required this.onInterruptionsRemoved,
+  });
+
+  @override
+  void onAdd(List<maxwell.Suggestion> suggestions) => suggestions.forEach(
+        (maxwell.Suggestion suggestion) =>
+            onInterruptionAdded(_convert(suggestion)),
+      );
+
+  @override
+  void onRemove(String uuid) {
+    // TODO(apwilson): decide what to do with a removed interruption.
+    onInterruptionRemoved(uuid);
+  }
+
+  @override
+  void onRemoveAll() {
+    // TODO(apwilson): decide what to do with a removed interruption.
+    onInterruptionsRemoved();
+  }
+}
+
+Suggestion _convert(maxwell.Suggestion suggestion) {
+  bool hasImage = suggestion.display.imageUrl?.isNotEmpty ?? false;
+  return new Suggestion(
+    id: new SuggestionId(suggestion.uuid),
+    title: suggestion.display.headline,
+    themeColor: new Color(suggestion.display.color),
+    selectionType: SelectionType.closeSuggestions,
+    icons: const <WidgetBuilder>[],
+    image: hasImage
+        ? (_) => new Image.network(
+              suggestion.display.imageUrl,
+              fit: BoxFit.cover,
+            )
+        : null,
+    imageType: hasImage
+        ? _kImageTypeMap[suggestion.display.imageType]
+        : ImageType.circular,
+  );
+}
+
 /// Creates a list of suggestions for the SuggestionList using the
 /// [maxwell.SuggestionProvider].
 class SuggestionProviderSuggestionModel extends SuggestionModel {
@@ -86,6 +130,9 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   // stream as well as indicates what the user is asking.
   final maxwell.AskControllerProxy _askControllerProxy =
       new maxwell.AskControllerProxy();
+
+  final maxwell.SuggestionListenerBinding _askListenerBinding =
+      new maxwell.SuggestionListenerBinding();
 
   // Listens for changes to maxwell's ask suggestion list.
   _MaxwellSuggestionListenerImpl _askListener;
@@ -95,8 +142,17 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   final maxwell.NextControllerProxy _nextControllerProxy =
       new maxwell.NextControllerProxy();
 
+  final maxwell.SuggestionListenerBinding _nextListenerBinding =
+      new maxwell.SuggestionListenerBinding();
+
   // Listens for changes to maxwell's next suggestion list.
   _MaxwellSuggestionListenerImpl _nextListener;
+
+  final maxwell.SuggestionListenerBinding _interruptionListenerBinding =
+      new maxwell.SuggestionListenerBinding();
+
+  /// Listens for changes to maxwell's interruption list.
+  final InterruptionListener interruptionListener;
 
   List<Suggestion> _currentSuggestions = const <Suggestion>[];
 
@@ -125,7 +181,10 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   final HitTestModel hitTestModel;
 
   /// Constructor.
-  SuggestionProviderSuggestionModel({this.hitTestModel});
+  SuggestionProviderSuggestionModel({
+    this.hitTestModel,
+    this.interruptionListener,
+  });
 
   /// Setting [suggestionProvider] triggers the loading on suggestions.
   /// This is typically set by the UserShell.
@@ -171,16 +230,20 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   void _load() {
     _suggestionProviderProxy.initiateAsk(
-      _askListener.getHandle(),
+      _askListenerBinding.wrap(_askListener),
       _askControllerProxy.ctrl.request(),
     );
     _askControllerProxy.setResultCount(20);
 
     _suggestionProviderProxy.subscribeToNext(
-      _nextListener.getHandle(),
+      _nextListenerBinding.wrap(_nextListener),
       _nextControllerProxy.ctrl.request(),
     );
     _nextControllerProxy.setResultCount(20);
+
+    _suggestionProviderProxy.subscribeToInterruptions(
+      _interruptionListenerBinding.wrap(interruptionListener),
+    );
   }
 
   @override
