@@ -50,7 +50,7 @@ Offset _kDirectDragOffsetTransform(
   Offset currentOffset,
   DragUpdateDetails details,
 ) =>
-    currentOffset + details.delta;
+    details.delta;
 
 /// An automatically animated widget that keeps stateful position and momentum.
 ///
@@ -58,6 +58,8 @@ Offset _kDirectDragOffsetTransform(
 class SimulatedPositioned extends StatefulWidget {
   /// Creates a widget that has stateful position and momentum, which can be
   /// modified directly by gesture, or animated by repositioning.
+  /// TODO(apwilson): Rename rect to target, initRect to init, and onRectReached
+  /// to onTargetReached.  Or maybe use a tween?
   SimulatedPositioned({
     Key key,
     @required this.rect,
@@ -66,6 +68,7 @@ class SimulatedPositioned extends StatefulWidget {
     this.draggable: true,
     this.onDragStart,
     this.onDragEnd,
+    this.onRectReached,
     DragOffsetTransform dragOffsetTransform,
   })
       : this.initRect = initRect ?? rect,
@@ -94,6 +97,9 @@ class SimulatedPositioned extends StatefulWidget {
   /// Called to determine a new offset from an ongoing drag.
   final DragOffsetTransform dragOffsetTransform;
 
+  /// Called when the position of this widget reaches [rect].
+  final VoidCallback onRectReached;
+
   @override
   State<SimulatedPositioned> createState() => new _SimulatedPositionedState();
 
@@ -115,6 +121,7 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
   @override
   void initState() {
     super.initState();
+    // TODO(apwilson): Consider increasing tolerance.
     _positionAnimation = new _SimAnimationController(
       vsync: this,
       position: widget.initRect.center,
@@ -123,7 +130,15 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
       vsync: this,
       position: widget.initRect.size.bottomRight(Offset.zero),
     );
+    _positionAnimation.addStatusListener((_) => _onStatusChanged());
+    _sizeAnimation.addStatusListener((_) => _onStatusChanged());
     _setTarget();
+  }
+
+  void _onStatusChanged() {
+    if (_positionAnimation.isCompleted && _sizeAnimation.isCompleted) {
+      widget.onRectReached?.call();
+    }
   }
 
   @override
@@ -190,7 +205,10 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
 
   void _updateDrag(DragUpdateDetails details) {
     setState(() {
-      _offset = widget.dragOffsetTransform(_offset, details);
+      _offset += widget.dragOffsetTransform(
+        _offset - widget.rect.center,
+        details,
+      );
     });
   }
 
@@ -225,7 +243,7 @@ class _SimAnimationController extends Animation<Offset>
     Offset velocity: Offset.zero,
     @required TickerProvider vsync,
   })
-      : _status = AnimationStatus.forward {
+      : _status = AnimationStatus.dismissed {
     assert(vsync != null);
     assert(position != null);
     assert(velocity != null);
@@ -259,6 +277,7 @@ class _SimAnimationController extends Animation<Offset>
       _velocity.dy,
     );
     _ticker.start();
+    _setStatus(AnimationStatus.forward);
   }
 
   void reset(Offset position, Offset velocity) {
@@ -267,11 +286,18 @@ class _SimAnimationController extends Animation<Offset>
     _ticker.stop(canceled: true);
     _value = position;
     _velocity = velocity;
+    _setStatus(AnimationStatus.dismissed);
   }
 
   @override
   AnimationStatus get status => _status;
   AnimationStatus _status;
+  void _setStatus(AnimationStatus status) {
+    if (status != _status) {
+      _status = status;
+      notifyStatusListeners(_status);
+    }
+  }
 
   /// The current value of the animation.
   @override
@@ -306,7 +332,7 @@ class _SimAnimationController extends Animation<Offset>
     );
     if (_xSimulation.isDone(elapsedInSeconds) &&
         _ySimulation.isDone(elapsedInSeconds)) {
-      _status = AnimationStatus.completed;
+      _setStatus(AnimationStatus.completed);
       stop(canceled: false);
     }
     notifyListeners();
