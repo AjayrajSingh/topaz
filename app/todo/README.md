@@ -50,7 +50,7 @@ To build the system run:
 ## Run
 
     # Or use `make run`.
-    netruncmd : "@boot device_runner \
+    netruncmd : "device_runner \
       --device_shell=dev_device_shell \
       --user_shell=dev_user_shell \
       --user_shell_args='--root_module=todo_story'"
