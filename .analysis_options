@@ -11,7 +11,6 @@ analyzer:
   exclude:
     - '**/generated/**'
     - '**.fidl.dart'
-    - '**.mojom.dart'
 linter:
   # Full list available at http://dart-lang.github.io/linter/lints/options/options.html.
   rules:

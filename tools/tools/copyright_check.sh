@@ -16,7 +16,7 @@ YEAR="201[6-7]"
 # Determine the file type.
 FILETYPE=$(basename ${1##*.})
 case "${FILETYPE}" in
-	dart|fidl|js|mojom)
+	dart|fidl|js)
 		COMMENT_PREFIX="// "
 		;;
 	gn|py|sh|yaml)
