@@ -12,26 +12,12 @@ class WindowPlaygroundWidget extends StatelessWidget {
   Widget build(BuildContext context) => new Overlay(
         initialEntries: <OverlayEntry>[
           new OverlayEntry(
-            builder: (BuildContext context) => new Stack(children: <Widget>[
-                  new Positioned(
-                    left: 50.0,
-                    top: 50.0,
-                    child: new Container(
-                      width: 500.0,
-                      height: 200.0,
-                      child: new Window(),
-                    ),
-                  ),
-                  new Positioned(
-                    left: 350.0,
-                    top: 300.0,
-                    child: new Container(
-                      width: 500.0,
-                      height: 200.0,
-                      child: new Window(),
-                    ),
-                  ),
-                ]),
+            builder: (BuildContext context) => new Stack(
+                  children: <Widget>[
+                    new Window(),
+                    new Window(initialPosition: const Offset(150.0, 250.0)),
+                  ],
+                ),
           ),
         ],
       );
