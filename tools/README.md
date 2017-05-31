@@ -49,6 +49,8 @@ Various modules require values for:
 * chat_firebase_api_key: Firebase API key, used by Chat.
 * chat_firebase_project_id: Firebase project ID, used by Chat.
 * songkick_api_key: Used by the experimental Music modules.
+* spotify_client_id: Used by the experimental Music modules.
+* spotify_client_secret: Used by the experimental Music modules.
 * google_api_key: Used by prototype modules; YouTube, Maps, ...
 * google_search_key: Used by the Gallery for image search.
 * google_search_id: Used by the Gallery for image search.
