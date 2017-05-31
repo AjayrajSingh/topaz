@@ -6,25 +6,30 @@ import 'package:flutter/widgets.dart';
 
 import 'tab_data.dart';
 
+/// Signature of window interaction callbacks.
+typedef void WindowInteractionCallback();
+
 /// A window container.
 class Window extends StatefulWidget {
-  /// The window's initial position within its parent.
-  final Offset initialPosition;
+  /// Called when the user started interacting with this window.
+  final WindowInteractionCallback onWindowInteraction;
 
   /// Constructor.
-  Window({this.initialPosition: Offset.zero});
+  Window({Key key, this.onWindowInteraction}) : super(key: key);
 
   @override
-  _WindowState createState() => new _WindowState();
+  WindowState createState() => new WindowState();
 }
 
-class _WindowState extends State<Window> {
+/// Holds the state of a Window widget.
+class WindowState extends State<Window> {
   final List<TabData> _tabs = <TabData>[];
   TabData _selectedTab;
   Offset _position = Offset.zero;
   Size _size = new Size(500.0, 200.0);
 
-  _WindowState() {
+  /// Constructor.
+  WindowState() {
     _tabs.add(new TabData('Alpha', const Color(0xff008744))
       ..onOwnerChanged = _onTabOwnerChanged);
     _tabs.add(new TabData('Beta', const Color(0xff0057e7))
@@ -34,12 +39,6 @@ class _WindowState extends State<Window> {
     _tabs.add(new TabData('Delta', const Color(0xffffa700))
       ..onOwnerChanged = _onTabOwnerChanged);
     _selectedTab = _tabs[0];
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _position = widget.initialPosition;
   }
 
   /// Called when a new tab was added to this window.
@@ -68,6 +67,9 @@ class _WindowState extends State<Window> {
     });
   }
 
+  /// Registers that some interaction has occurred with the present window.
+  void _registerInteraction() => widget.onWindowInteraction?.call();
+
   /// Constructs the visual representation of a tab.
   Widget _buildTab(TabData data) {
     final Widget visual = new Container(
@@ -94,6 +96,7 @@ class _WindowState extends State<Window> {
         childWhenDragging: new Container(),
         feedback: visual,
         data: data,
+        onDraggableCanceled: (_, __) => _registerInteraction(),
       ),
     );
   }
@@ -102,72 +105,79 @@ class _WindowState extends State<Window> {
   Widget build(BuildContext context) => new Positioned(
         left: _position.dx,
         top: _position.dy,
-        child: new Container(
-          width: _size.width,
-          height: _size.height,
-          padding: const EdgeInsets.all(8.0),
-          decoration: new BoxDecoration(
-            color: const Color(0xffbcbcbc),
-            borderRadius: new BorderRadius.circular(4.0),
-          ),
-          child: new Stack(
-            children: <Widget>[
-              new Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  new GestureDetector(
+        child: new GestureDetector(
+          onTapDown: (_) => _registerInteraction(),
+          child: new Container(
+            width: _size.width,
+            height: _size.height,
+            padding: const EdgeInsets.all(8.0),
+            decoration: new BoxDecoration(
+              color: const Color(0xffbcbcbc),
+              borderRadius: new BorderRadius.circular(4.0),
+            ),
+            child: new Stack(
+              children: <Widget>[
+                new Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    new GestureDetector(
+                      onPanUpdate: (DragUpdateDetails details) {
+                        setState(() {
+                          _position += details.delta;
+                        });
+                      },
+                      child: new DragTarget<TabData>(
+                        builder: (BuildContext context,
+                                List<TabData> candidateData,
+                                List<dynamic> rejectedData) =>
+                            new Container(
+                              height: 64.0,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12.0,
+                                horizontal: 8.0,
+                              ),
+                              color: candidateData.isEmpty
+                                  ? const Color(0x003377bb)
+                                  : const Color(0x33111111),
+                              child: new Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: _tabs.map(_buildTab).toList(),
+                              ),
+                            ),
+                        onWillAccept: (_) {
+                          _registerInteraction();
+                          return true;
+                        },
+                        onAccept: _onTabAdded,
+                      ),
+                    ),
+                    new Flexible(
+                      child: new Container(
+                        color: _selectedTab != null ? _selectedTab.color : null,
+                      ),
+                    ),
+                  ],
+                ),
+                new Positioned(
+                  right: 0.0,
+                  bottom: 0.0,
+                  child: new GestureDetector(
                     onPanUpdate: (DragUpdateDetails details) {
                       setState(() {
-                        _position += details.delta;
+                        _size += details.delta;
                       });
                     },
-                    child: new DragTarget<TabData>(
-                      builder: (BuildContext context,
-                              List<TabData> candidateData,
-                              List<dynamic> rejectedData) =>
-                          new Container(
-                            height: 64.0,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 12.0,
-                              horizontal: 8.0,
-                            ),
-                            color: candidateData.isEmpty
-                                ? const Color(0x003377bb)
-                                : const Color(0x33111111),
-                            child: new Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: _tabs.map(_buildTab).toList(),
-                            ),
-                          ),
-                      onAccept: _onTabAdded,
-                    ),
-                  ),
-                  new Flexible(
                     child: new Container(
-                      color: _selectedTab != null ? _selectedTab.color : null,
+                      width: 20.0,
+                      height: 20.0,
+                      color: const Color(0xffcccccc),
                     ),
-                  ),
-                ],
-              ),
-              new Positioned(
-                right: 0.0,
-                bottom: 0.0,
-                child: new GestureDetector(
-                  onPanUpdate: (DragUpdateDetails details) {
-                    setState(() {
-                      _size += details.delta;
-                    });
-                  },
-                  child: new Container(
-                    width: 20.0,
-                    height: 20.0,
-                    color: const Color(0xffcccccc),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
