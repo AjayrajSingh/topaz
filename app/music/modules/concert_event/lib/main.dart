@@ -20,10 +20,10 @@ Future<String> _readAPIKey() async {
 }
 
 Future<Null> main() async {
+  String apiKey = await _readAPIKey();
+
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
-
-  String apiKey = await _readAPIKey();
 
   EventModuleModel eventModuleModel = new EventModuleModel(apiKey: apiKey);
 

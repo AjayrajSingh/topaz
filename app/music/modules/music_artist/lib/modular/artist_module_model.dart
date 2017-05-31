@@ -21,6 +21,7 @@ import 'package:apps.modules.music.services.player/track.fidl.dart'
     as track_fidl;
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
+import 'package:meta/meta.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
@@ -38,6 +39,12 @@ class ArtistModuleModel extends ModuleModel {
   /// List of relatedArtists for the given artist
   List<Artist> relatedArtists;
 
+  /// Spotify API client ID
+  final String clientId;
+
+  /// Spotify API client escret
+  final String clientSecret;
+
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
 
   final AgentControllerProxy _playbackAgentController =
@@ -45,16 +52,29 @@ class ArtistModuleModel extends ModuleModel {
 
   final player_fidl.PlayerProxy _player = new player_fidl.PlayerProxy();
 
+  /// Constructor
+  ArtistModuleModel({
+    @required this.clientId,
+    @required this.clientSecret,
+  }) {
+    assert(clientId != null);
+    assert(clientSecret != null);
+  }
+
   /// Get the current loading status
   LoadingStatus get loadingStatus => _loadingStatus;
 
   /// Retrieves all the data necessary to render the artist module
   Future<Null> fetchArtist(String artistId) async {
     try {
+      Api api = new Api(
+        clientId: clientId,
+        clientSecret: clientSecret,
+      );
       List<dynamic> response = await Future.wait(<Future<Object>>[
-        Api.getArtistById(artistId),
-        Api.getAlbumsForArtist(artistId),
-        Api.getRelatedArtists(artistId),
+        api.getArtistById(artistId),
+        api.getAlbumsForArtist(artistId),
+        api.getRelatedArtists(artistId),
       ]);
       artist = response[0];
       albums = response[1];

@@ -16,6 +16,7 @@ flutter_app("music_album") {
     "//application/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
+    "//apps/modules/common/packages/config",
     "//apps/modules/music/packages/music_api",
     "//apps/modules/music/packages/music_models",
     "//apps/modules/music/packages/music_widgets",

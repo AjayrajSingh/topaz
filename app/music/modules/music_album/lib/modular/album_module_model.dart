@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:lib.widgets/modular.dart';
+import 'package:meta/meta.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
@@ -17,13 +18,32 @@ class AlbumModuleModel extends ModuleModel {
 
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
 
+  /// Spotify API client ID
+  final String clientId;
+
+  /// Spotify API client escret
+  final String clientSecret;
+
+  /// Constructor
+  AlbumModuleModel({
+    @required this.clientId,
+    @required this.clientSecret,
+  }) {
+    assert(clientId != null);
+    assert(clientSecret != null);
+  }
+
   /// Get the current loading status
   LoadingStatus get loadingStatus => _loadingStatus;
 
   /// Retrieves the full album based on the given ID
   Future<Null> fetchAlbum(String albumId) async {
+    Api api = new Api(
+      clientId: clientId,
+      clientSecret: clientSecret,
+    );
     try {
-      album = await Api.getAlbumById(albumId);
+      album = await api.getAlbumById(albumId);
       if (album != null) {
         _loadingStatus = LoadingStatus.completed;
       } else {

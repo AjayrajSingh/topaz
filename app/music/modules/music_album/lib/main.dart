@@ -2,18 +2,27 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:application.lib.app.dart/app.dart';
+import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_widgets/music_widgets.dart';
 
 import 'modular/album_module_model.dart';
 
-void main() {
+Future<Null> main() async {
+  Config config = await Config.read('/system/data/modules/config.json');
+  config.validate(<String>['spotify_client_id', 'spotify_client_secret']);
+
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
 
-  AlbumModuleModel albumModuleModel = new AlbumModuleModel();
+  AlbumModuleModel albumModuleModel = new AlbumModuleModel(
+    clientId: config.get('spotify_client_id'),
+    clientSecret: config.get('spotify_client_secret'),
+  );
 
   ModuleWidget<AlbumModuleModel> moduleWidget =
       new ModuleWidget<AlbumModuleModel>(
