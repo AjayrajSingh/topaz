@@ -85,6 +85,8 @@ class LinkWatcherImpl extends LinkWatcher {
       ComponentActionLogProxy actionLog = new ComponentActionLogProxy();
       intelligenceServices.getActionLog(actionLog.ctrl.request());
       actionLog.logAction('ViewVideo', json);
+      intelligenceServices.ctrl.close();
+      actionLog.ctrl.close();
       _log('_videoId: $_videoId');
       _kHomeKey.currentState?.updateUI();
     }
@@ -114,7 +116,6 @@ class ModuleImpl extends Module {
     _log('ModuleImpl::initialize call');
 
     // Bind the link handle and register the link watcher.
-    ModuleContextProxy _moduleContext = new ModuleContextProxy();
     _moduleContext.ctrl.bind(moduleContextHandle);
     _moduleContext.getLink(null, link.ctrl.request());
     link.watchAll(_linkWatcher.getHandle());
