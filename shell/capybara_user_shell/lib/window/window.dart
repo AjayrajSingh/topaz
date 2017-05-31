@@ -20,18 +20,20 @@ class Window extends StatefulWidget {
 
 class _WindowState extends State<Window> {
   final List<TabData> _tabs = <TabData>[];
+  TabData _selectedTab;
   Offset _position = Offset.zero;
   Size _size = new Size(500.0, 200.0);
 
   _WindowState() {
-    _tabs.add(new TabData(const Color(0xff008744))
+    _tabs.add(new TabData('Alpha', const Color(0xff008744))
       ..onOwnerChanged = _onTabOwnerChanged);
-    _tabs.add(new TabData(const Color(0xff0057e7))
+    _tabs.add(new TabData('Beta', const Color(0xff0057e7))
       ..onOwnerChanged = _onTabOwnerChanged);
-    _tabs.add(new TabData(const Color(0xffd62d20))
+    _tabs.add(new TabData('Gamma', const Color(0xffd62d20))
       ..onOwnerChanged = _onTabOwnerChanged);
-    _tabs.add(new TabData(const Color(0xffffa700))
+    _tabs.add(new TabData('Delta', const Color(0xffffa700))
       ..onOwnerChanged = _onTabOwnerChanged);
+    _selectedTab = _tabs[0];
   }
 
   @override
@@ -43,8 +45,15 @@ class _WindowState extends State<Window> {
   /// Called when a new tab was added to this window.
   void _onTabAdded(TabData data) {
     setState(() {
-      data.onOwnerChanged?.call(data);
-      _tabs.add(data..onOwnerChanged = _onTabOwnerChanged);
+      if (_tabs.contains(data)) {
+        // Just relocate the tab to the end.
+        _tabs.remove(data);
+        _tabs.add(data);
+      } else {
+        data.onOwnerChanged?.call(data);
+        _tabs.add(data..onOwnerChanged = _onTabOwnerChanged);
+      }
+      _selectedTab = data;
     });
   }
 
@@ -53,7 +62,40 @@ class _WindowState extends State<Window> {
   void _onTabOwnerChanged(TabData data) {
     setState(() {
       _tabs.remove(data);
+      if (data == _selectedTab) {
+        _selectedTab = _tabs.isEmpty ? null : _tabs.last;
+      }
     });
+  }
+
+  /// Constructs the visual representation of a tab.
+  Widget _buildTab(TabData data) {
+    final Widget visual = new Container(
+      width: 80.0,
+      height: 40.0,
+      padding: const EdgeInsets.all(4.0),
+      child: new Container(
+          decoration: new BoxDecoration(
+            color: data == _selectedTab ? const Color(0xff777777) : null,
+            border: new Border.all(color: data.color),
+          ),
+          child: new Center(
+            child: new Text(data.name, overflow: TextOverflow.ellipsis),
+          )),
+    );
+    return new GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedTab = data;
+        });
+      },
+      child: new Draggable<TabData>(
+        child: visual,
+        childWhenDragging: new Container(),
+        feedback: visual,
+        data: data,
+      ),
+    );
   }
 
   @override
@@ -85,43 +127,28 @@ class _WindowState extends State<Window> {
                               List<TabData> candidateData,
                               List<dynamic> rejectedData) =>
                           new Container(
-                            height: 60.0,
-                            padding: const EdgeInsets.all(10.0),
-                            decoration: candidateData.isEmpty
-                                ? const BoxDecoration(
-                                    color: const Color(0x003377bb))
-                                : const BoxDecoration(
-                                    color: const Color(0x33111111)),
+                            height: 64.0,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 12.0,
+                              horizontal: 8.0,
+                            ),
+                            color: candidateData.isEmpty
+                                ? const Color(0x003377bb)
+                                : const Color(0x33111111),
                             child: new Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: _tabs
-                                  .map(
-                                    (TabData data) => new Draggable<TabData>(
-                                          child: new Container(
-                                            width: 50.0,
-                                            decoration: new BoxDecoration(
-                                              color: data.color,
-                                            ),
-                                          ),
-                                          childWhenDragging: new Container(),
-                                          feedback: new Container(
-                                            width: 50.0,
-                                            height: 40.0,
-                                            decoration: new BoxDecoration(
-                                              color: data.color,
-                                            ),
-                                          ),
-                                          data: data,
-                                        ),
-                                  )
-                                  .toList(),
+                              children: _tabs.map(_buildTab).toList(),
                             ),
                           ),
                       onAccept: _onTabAdded,
                     ),
                   ),
-                  new Center(child: new Text('I am a window')),
+                  new Flexible(
+                    child: new Container(
+                      color: _selectedTab != null ? _selectedTab.color : null,
+                    ),
+                  ),
                 ],
               ),
               new Positioned(
@@ -136,9 +163,7 @@ class _WindowState extends State<Window> {
                   child: new Container(
                     width: 20.0,
                     height: 20.0,
-                    decoration: const BoxDecoration(
-                      color: const Color(0xffffffff),
-                    ),
+                    color: const Color(0xffcccccc),
                   ),
                 ),
               ),

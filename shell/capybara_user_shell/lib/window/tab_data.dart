@@ -9,6 +9,9 @@ typedef void OwnershipChangeCallback(TabData data);
 
 /// Data associated with a tab.
 class TabData {
+  /// The tab's name.
+  final String name;
+
   /// The tab's color.
   final Color color;
 
@@ -16,5 +19,5 @@ class TabData {
   OwnershipChangeCallback onOwnerChanged;
 
   /// Constructor.
-  TabData(this.color);
+  TabData(this.name, this.color);
 }
