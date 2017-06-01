@@ -98,13 +98,16 @@ class LaunchModuleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: new RaisedButton(
+      padding: const EdgeInsets.all(16.0),
+      child: new RaisedButton(
+        child: new Center(
           child: new Text(_display),
-          onPressed: () {
-            startModuleInShell(_relation);
-          },
-        ));
+        ),
+        onPressed: () {
+          startModuleInShell(_relation);
+        },
+      ),
+    );
   }
 }
 
@@ -121,7 +124,7 @@ class Grouping extends StatelessWidget {
     return new Container(
       color: new Color(0xFFFFFFFF),
       margin: const EdgeInsets.all(10.0),
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(10.0),
       child: new Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: children,
@@ -150,7 +153,6 @@ class CopresentLauncherState extends State<CopresentLauncher> {
   Widget build(BuildContext context) => new Container(
         alignment: FractionalOffset.center,
         constraints: new BoxConstraints(maxWidth: 200.0),
-        padding: new EdgeInsets.only(bottom: 20.0),
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -167,6 +169,12 @@ class CopresentLauncherState extends State<CopresentLauncher> {
                   ..emphasis = _emphasis
                   ..arrangement = SurfaceArrangement.copresent,
                 'Copresent'),
+            new LaunchModuleButton(
+                new SurfaceRelation()
+                  ..emphasis = _emphasis
+                  ..arrangement = SurfaceArrangement.copresent
+                  ..dependency = SurfaceDependency.dependent,
+                'Dependent\nCopresent'),
           ],
         ),
       );
@@ -180,19 +188,43 @@ class ChildController extends StatelessWidget {
   final _ModuleStopperWatcher _watcher;
 
   @override
-  Widget build(BuildContext context) => new Row(
-        children: <Widget>[
-          new Text('${_watcher.name}'),
-          new RaisedButton(
-            child: new Text('Focus'),
-            onPressed: () => _watcher.focus(),
+  Widget build(BuildContext context) {
+    return new Row(
+      children: <Widget>[
+        new Text('${_watcher.name} '),
+        new Expanded(
+          child: new Padding(
+            padding: new EdgeInsets.all(2.0),
+            child: new ButtonTheme(
+              padding: new EdgeInsets.all(1.0),
+              child: new RaisedButton(
+                child: new Text(
+                  'Focus',
+                  style: new TextStyle(fontSize: 10.0),
+                ),
+                onPressed: () => _watcher.focus(),
+              ),
+            ),
           ),
-          new RaisedButton(
-            child: new Text('Dismiss'),
-            onPressed: () => _watcher.defocus(),
+        ),
+        new Expanded(
+          child: new Padding(
+            padding: new EdgeInsets.all(2.0),
+            child: new ButtonTheme(
+              padding: new EdgeInsets.all(1.0),
+              child: new RaisedButton(
+                child: new Text(
+                  'Dismiss',
+                  style: new TextStyle(fontSize: 10.0),
+                ),
+                onPressed: () => _watcher.defocus(),
+              ),
+            ),
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 }
 
 /// View for currently live child modules
@@ -213,15 +245,18 @@ class ChildModulesViewState extends State<ChildModulesView> {
 
   @override
   Widget build(BuildContext context) => new Container(
-      alignment: FractionalOffset.center,
-      constraints: new BoxConstraints(maxWidth: 200.0),
-      child: new Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: _watchers.isEmpty
-              ? <Widget>[new Text('NONE')]
-              : _watchers
-                  .map((_ModuleStopperWatcher w) => new ChildController(w))
-                  .toList()));
+        alignment: FractionalOffset.center,
+        height: 60.0,
+        constraints: new BoxConstraints(maxWidth: 200.0),
+        child: new Scrollbar(
+          child: new ListView.builder(
+            itemCount: _watchers.length,
+            itemBuilder: (BuildContext context, int index) {
+              return new ChildController(_watchers[index]);
+            },
+          ),
+        ),
+      );
 }
 
 /// Main UI Widget
@@ -231,42 +266,47 @@ class MainWidget extends StatelessWidget {
     DateTime now = new DateTime.now().toLocal();
     return new Scaffold(
       body: new Center(
+        child: new Container(
+          constraints: new BoxConstraints(maxWidth: 200.0),
           child: new Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          new Grouping(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              new Text(
-                  "Module ${now.minute}:${now.second.toString().padLeft(2, '0')}"),
-              new Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: new RaisedButton(
-                  child: new Text('Close'),
-                  onPressed: () {
-                    _log('Module done...');
-                    _moduleContext.done();
-                  },
-                ),
+              new Grouping(
+                children: <Widget>[
+                  new Text(
+                      "Module ${now.minute}:${now.second.toString().padLeft(2, '0')}"),
+                  new Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: new RaisedButton(
+                      child: new Text('Close'),
+                      onPressed: () {
+                        _log('Module done...');
+                        _moduleContext.done();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              new Grouping(
+                children: <Widget>[
+                  new CopresentLauncher(),
+                  new Divider(),
+                  new LaunchModuleButton(
+                      new SurfaceRelation()
+                        ..arrangement = SurfaceArrangement.sequential,
+                      'Sequential'),
+                ],
+              ),
+              new Grouping(
+                children: <Widget>[
+                  new Text('Children'),
+                  new ChildModulesView(key: kChildModulesKey),
+                ],
               ),
             ],
           ),
-          new Grouping(
-            children: <Widget>[
-              new CopresentLauncher(),
-              new LaunchModuleButton(
-                  new SurfaceRelation()
-                    ..arrangement = SurfaceArrangement.sequential,
-                  'Sequential'),
-            ],
-          ),
-          new Grouping(
-            children: <Widget>[
-              new Text('Children'),
-              new ChildModulesView(key: kChildModulesKey),
-            ],
-          ),
-        ],
-      )),
+        ),
+      ),
     );
   }
 }

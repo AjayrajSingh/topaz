@@ -106,6 +106,14 @@ class Surface extends Model {
           s.relation.arrangement == SurfaceArrangement.copresent ||
           s.relation.arrangement == SurfaceArrangement.none);
 
+  /// Spans the tree of dependent surfaces connected with this
+  Tree<Surface> get dependentSpanningTree => _spanningTree(
+      null,
+      _surface(_node),
+      (Surface s) => s.relation.dependency == SurfaceDependency.dependent);
+  // TODO(djmurphy) add co-dependency:
+  // && s.relation.dependency == SurfaceDependency.codependent
+
   Tree<Surface> _spanningTree(Surface previous, Surface current,
       _SurfaceSpanningTreeCondition condition) {
     Tree<Surface> tree = new Tree<Surface>(value: current);
@@ -125,6 +133,7 @@ class Surface extends Model {
   /// Dismiss this node hiding it from layouts
   bool dismiss() => _graph.dismissSurface(_node.value);
 
+  /// Check if surface is dismissible (will not result in no surfaces in story)
   bool canDismiss() => _graph.canDismissSurface(_node.value);
 
   /// Remove this node from graph
@@ -252,10 +261,29 @@ class SurfaceGraph extends Model {
     notifyListeners();
   }
 
-  /// When called surface is no longer displayed
+  /// Returns the list of surfaces that would be dismissed if this surface
+  /// were dismissed - e.g. as a result of dependency - including this surface
+  List<String> dismissedSet(String id) {
+    Surface dismissed = _surfaces[id];
+    List<Surface> ancestors = dismissed.ancestors.toList();
+    List<Surface> dependentTree = dismissed.dependentSpanningTree
+        .map((Tree<Surface> t) => t.value)
+        .toList();
+    // TODO(djmurphy) - when codependent comes in this needs to change
+    // this only removes down the tree, codependents would remove their
+    // ancestors
+    dependentTree.removeWhere((Surface s) => ancestors.contains(s));
+    List<String> depIds =
+        dependentTree.map((Surface s) => s._node.value).toList();
+    return depIds;
+  }
+
+  /// Check if given surface can be dismissed
   bool canDismissSurface(String id) {
-    // TODO(djmurphy) add Dependency consequences
-    return _focusedSurfaces.where((String fid) => fid != id).isNotEmpty;
+    List<String> wouldDismiss = dismissedSet(id);
+    return _focusedSurfaces
+        .where((String fid) => !wouldDismiss.contains(fid))
+        .isNotEmpty;
   }
 
   /// When called surface is no longer displayed
@@ -263,9 +291,9 @@ class SurfaceGraph extends Model {
     if (!canDismissSurface(id)) {
       return false;
     }
-    // TODO(djmurphy) add Dependency consequences
-    _focusedSurfaces.removeWhere((String fid) => fid == id);
-    _dismissedSurfaces.add(id);
+    List<String> depIds = dismissedSet(id);
+    _focusedSurfaces.removeWhere((String fid) => depIds.contains(fid));
+    _dismissedSurfaces.addAll(depIds);
     notifyListeners();
     return true;
   }

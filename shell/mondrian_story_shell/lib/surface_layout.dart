@@ -9,7 +9,9 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
+import 'dependent_simulated_positioned.dart';
 import 'model.dart';
+import 'sized_surface.dart';
 import 'surface_widget.dart';
 import 'tree.dart';
 
@@ -95,7 +97,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
 
   // A surface that cannot be manipulated or interacted with by the user
   Widget _inactiveSurface(
-          {Surface surface, Rect rect, Rect initRect, int distance = 0}) =>
+          {Surface surface, Rect rect, Rect initRect, int distance: 0}) =>
       new SimulatedPositioned(
         key: new GlobalObjectKey(surface),
         rect: rect,
@@ -272,25 +274,79 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
                     ));
                   });
                   childViews.insertAll(0, backgroundChildViews);
-
                   distance += 1;
                 }
                 focusStack.removeLast();
               }
+              // Add order of the layout surfaces:
+              List<Widget> addOrder = <Widget>[];
+              // The surfaces to be laid out
+              List<Surface> layoutKeys = layout.keys.toList();
+              // So we can pull out the widget holding a touched surface
+              Map<Surface, Widget> touchedWidgetIndex = <Surface, Widget>{};
 
-              layout.forEach((Surface s, Rect rect) {
-                // TODO(alangardner): Ensure a proper order
-                Widget surfaceWidget = _activeSurface(
-                  surface: s,
-                  rect: rect,
-                  initRect: offscreen & rect.size,
-                );
-                if (touchedSurfaces.contains(s)) {
-                  touchedSurfaceWidgets.add(surfaceWidget);
+              while (layout.isNotEmpty) {
+                // remove from layout
+                SizedSurface sizedSurface = new SizedSurface(
+                    surface: layout.keys.first,
+                    rect: layout.remove(layout.keys.first));
+                // If dependent
+                if (sizedSurface.surface.dependentSpanningTree.length > 1) {
+                  // this is a dependent surface
+                  List<Surface> depSpanTree = sizedSurface
+                      .surface.dependentSpanningTree.root
+                      .flatten()
+                      .map((Tree<Surface> t) => t.value)
+                      .toList();
+                  List<SizedSurface> dependentGroup = <SizedSurface>[
+                    sizedSurface
+                  ];
+
+                  // Find other to-be-laid-out surfaces in this group
+                  for (Surface s in depSpanTree) {
+                    if (layout.keys.contains(s)) {
+                      SizedSurface sized =
+                          new SizedSurface(surface: s, rect: layout.remove(s));
+                      laidOut[sizedSurface.surface] = sizedSurface.rect;
+                      dependentGroup.add(sized);
+                      layout.remove(s);
+                    }
+                  }
+                  // Add the widget
+                  DependentSimulatedPositioned depSimPos =
+                      new DependentSimulatedPositioned(
+                    surfaces: dependentGroup,
+                    onDragStart: _startDrag,
+                    onDragEnd: _endDrag,
+                  );
+                  addOrder.add(depSimPos);
+                  // add the lookup
+                  for (SizedSurface s in dependentGroup) {
+                    touchedWidgetIndex[s.surface] = depSimPos;
+                  }
                 } else {
-                  childViews.add(surfaceWidget);
+                  Widget surfaceWidget = _activeSurface(
+                    surface: sizedSurface.surface,
+                    rect: sizedSurface.rect,
+                    initRect: offscreen & sizedSurface.rect.size,
+                  );
+                  addOrder.add(surfaceWidget);
+                  touchedWidgetIndex[sizedSurface.surface] = surfaceWidget;
+                  laidOut[sizedSurface.surface] = sizedSurface.rect;
                 }
-              });
+              } // end of layout loop
+
+              for (Surface surface in layoutKeys) {
+                if (touchedSurfaces.contains(surface)) {
+                  assert(touchedWidgetIndex.containsKey(surface));
+                  touchedSurfaceWidgets.add(touchedWidgetIndex[surface]);
+                  addOrder.remove(touchedWidgetIndex[surface]);
+                }
+              }
+
+              addOrder
+                  .removeWhere((Widget w) => touchedSurfaceWidgets.contains(w));
+              childViews.addAll(addOrder);
             }
 
             // Animating out surfaces
