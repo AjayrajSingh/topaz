@@ -16,6 +16,7 @@ flutter_app("capybara_user_shell") {
 
   deps = [
     "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/meta",
   ]
 }
