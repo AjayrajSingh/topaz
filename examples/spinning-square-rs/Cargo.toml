@@ -1,0 +1,9 @@
+[package]
+name = "rust_sample_module"
+version = "0.1.0"
+license = "BSD-3-Clause"
+authors = ["Rob Tsuk <robtsuk@google.com>"]
+description = "Example of a Fuchsia module in Rust"
+repository = "https://fuchsia.googlesource.com/rust_sample_module"
+
+[dependencies]
