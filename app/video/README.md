@@ -1,5 +1,15 @@
-Fuchsia Open Source Template Repository
+Fuchsia Video Module
 =======================================
 
-This repository is a template that we will use when creating new open source
-repositories for Fuchsia.
+> Status: Experimental
+
+# Structure
+This repo contains a module that plays back a video.
+
+# Setup
+
+# Workflow
+
+# Running Tests
+
+# Contibution Guidelines
