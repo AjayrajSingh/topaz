@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 /// The screen to video player.
 class VideoScreen extends StatelessWidget {
+  /// The screen for video player
   VideoScreen({
     Key key,
   })
