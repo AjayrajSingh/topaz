@@ -8,10 +8,17 @@ import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
+import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:lib.modular/modular.dart';
 import 'package:meta/meta.dart';
+
+const List<String> _kWalkingProposals = const <String>[
+  'Walking Suggestion 1',
+  'Walking Suggestion 2',
+  'Walking Suggestion 3',
+];
 
 const String _kActivityWalkingTopic = '/activity/walking';
 
@@ -27,6 +34,9 @@ class WalkingAgent extends AgentImpl {
   final ProposalPublisherProxy _proposalPublisher =
       new ProposalPublisherProxy();
   final ContextPublisherProxy _contextPublisher = new ContextPublisherProxy();
+  final ContextProviderProxy _contextProvider = new ContextProviderProxy();
+  final ContextListenerBinding _contextListenerBinding =
+      new ContextListenerBinding();
   final Set<CustomActionBinding> _bindingSet = new Set<CustomActionBinding>();
 
   _Activity _currentActivity = _Activity.unknown;
@@ -52,15 +62,40 @@ class WalkingAgent extends AgentImpl {
     intelligenceServices.getProposalPublisher(
       _proposalPublisher.ctrl.request(),
     );
+    intelligenceServices.getContextProvider(_contextProvider.ctrl.request());
     intelligenceServices.ctrl.close();
+
+    _contextProvider.subscribe(
+      new ContextQuery()..topics = <String>[_kActivityWalkingTopic],
+      _contextListenerBinding.wrap(
+        new _ContextListenerImpl(
+          proposalPublisher: _proposalPublisher,
+          onTopicChanged: (String location) {
+            _kWalkingProposals.forEach(_proposalPublisher.remove);
+            _proposalPublisher.propose(_proposal);
+            switch (location) {
+              case 'walking':
+                _kWalkingProposals
+                    .map(_createDummyProposal)
+                    .forEach(_proposalPublisher.propose);
+                break;
+              default:
+                break;
+            }
+          },
+        ),
+      ),
+    );
+
     _publish();
-    _propose();
   }
 
   @override
   Future<Null> onStop() async {
     _contextPublisher.ctrl.close();
+    _contextProvider.ctrl.close();
     _proposalPublisher.ctrl.close();
+    _contextListenerBinding.close();
     _bindingSet.forEach((CustomActionBinding binding) => binding.close());
   }
 
@@ -68,22 +103,18 @@ class WalkingAgent extends AgentImpl {
   void publishWalking() {
     _currentActivity = _Activity.walking;
     _publish();
-    _propose();
   }
 
   /// Publishes context indicating the user is not walking.
   void publishUnknown() {
     _currentActivity = _Activity.unknown;
     _publish();
-    _propose();
   }
 
   void _publish() => _contextPublisher.publish(
         _kActivityWalkingTopic,
         _activityToString(_currentActivity),
       );
-
-  void _propose() => _proposalPublisher.propose(_proposal);
 
   String _activityToString(_Activity activity) {
     switch (activity) {
@@ -125,6 +156,27 @@ class WalkingAgent extends AgentImpl {
       ];
   }
 
+  Proposal _createDummyProposal(String title) {
+    CustomActionBinding binding = new CustomActionBinding();
+    _bindingSet.add(binding);
+    return new Proposal()
+      ..id = title
+      ..display = (new SuggestionDisplay()
+        ..headline = title
+        ..subheadline = ''
+        ..details = ''
+        ..color = 0xFFFF0080
+        ..iconUrls = const <String>[]
+        ..imageType = SuggestionImageType.other
+        ..imageUrl = '')
+      ..onSelected = <Action>[
+        new Action()
+          ..customAction = binding.wrap(
+            new _CustomActionImpl(onExecute: () => null),
+          )
+      ];
+  }
+
   _Activity _getNextActivity(_Activity activity) {
     switch (activity) {
       case _Activity.walking:
@@ -133,6 +185,19 @@ class WalkingAgent extends AgentImpl {
         return _Activity.walking;
     }
   }
+}
+
+typedef void _OnTopicChanged(String topicValue);
+
+class _ContextListenerImpl extends ContextListener {
+  final ProposalPublisher proposalPublisher;
+  final _OnTopicChanged onTopicChanged;
+
+  _ContextListenerImpl({this.proposalPublisher, this.onTopicChanged});
+
+  @override
+  void onUpdate(ContextUpdate result) =>
+      onTopicChanged(result.values[_kActivityWalkingTopic]);
 }
 
 typedef void _OnExecute();
