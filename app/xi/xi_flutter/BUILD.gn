@@ -15,6 +15,7 @@ dart_package("xi_flutter") {
     "//apps/xi/packages/xi_client",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/path",
+    "//third_party/dart-pkg/pub/path_provider",
   ]
 
   analysis_options = "//apps/xi/.analysis_options"

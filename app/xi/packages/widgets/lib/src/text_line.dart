@@ -34,19 +34,20 @@ final double _nominalWidth = 200.0;
 class TextLine extends LeafRenderObjectWidget {
   /// Creates a widget for displaying one line of text, with optional
   /// cursor decoration (when it's done).
-  TextLine(this.text, this.cursor, this.styles, this.height, {Key key}) : super(key: key);
+  TextLine(this.text, this.cursor, this.styles, this.height, {Key key})
+      : super(key: key);
 
   /// The text displayed in the widget.
-  TextSpan text;
+  final TextSpan text;
 
   /// List of cursor positions (in utf-16 offsets)
-  List<int> cursor;
+  final List<int> cursor;
 
   /// List of styles (in decoded triple format)
-  List<int> styles;
+  final List<int> styles;
 
   /// The height of a line (currently fixed, all lines have the same height)
-  double height;
+  final double height;
 
   @override
   _RenderTextLine createRenderObject(BuildContext context) {
@@ -68,10 +69,11 @@ class _RenderTextLine extends RenderBox {
     List<int> cursor,
     List<int> styles,
     double height,
-  ) : _textPainter = new TextPainter(text: text),
-      _cursor = cursor,
-      _styles = styles,
-      _height = height;
+  )
+      : _textPainter = new TextPainter(text: text),
+        _cursor = cursor,
+        _styles = styles,
+        _height = height;
 
   TextPainter _textPainter;
 
@@ -90,7 +92,7 @@ class _RenderTextLine extends RenderBox {
   bool _needsLayout = true;
 
   /// The text displayed in the render object.
-  set text (TextSpan value) {
+  set text(TextSpan value) {
     if (value == _textPainter.text) {
       return;
     }
@@ -102,7 +104,7 @@ class _RenderTextLine extends RenderBox {
   }
 
   /// List of cursor positions (in utf-16 offsets)
-  set cursor (List<int> value) {
+  set cursor(List<int> value) {
     if (listEq(value, _cursor)) {
       return;
     }
@@ -112,7 +114,7 @@ class _RenderTextLine extends RenderBox {
   }
 
   /// List of styles; see LineCache for a description of the format
-  set styles (List<int> value) {
+  set styles(List<int> value) {
     if (listEq(value, _styles)) {
       return;
     }
@@ -125,14 +127,17 @@ class _RenderTextLine extends RenderBox {
   double computeMinIntrinsicWidth(double height) {
     return 0.0;
   }
+
   @override
   double computeMaxIntrinsicWidth(double height) {
     return _nominalWidth;
   }
+
   @override
   double computeMinIntrinsicHeight(double width) {
     return _height;
   }
+
   @override
   double computeMaxIntrinsicHeight(double width) {
     return _height;
@@ -150,7 +155,8 @@ class _RenderTextLine extends RenderBox {
         for (int ix in _cursor) {
           Rect caretPrototype = new Rect.fromLTWH(0.0, 0.0, 1.0, _height);
           TextPosition position = new TextPosition(offset: ix);
-          Offset caretOffset = _textPainter.getOffsetForCaret(position, caretPrototype);
+          Offset caretOffset =
+              _textPainter.getOffsetForCaret(position, caretPrototype);
           _cursorRects.add(caretPrototype.shift(caretOffset));
         }
       }
@@ -165,7 +171,8 @@ class _RenderTextLine extends RenderBox {
           int end = _styles[i + 1];
           int styleId = _styles[i + 2];
           if (styleId == 0) {
-            TextSelection selection = new TextSelection(baseOffset: start, extentOffset: end);
+            TextSelection selection =
+                new TextSelection(baseOffset: start, extentOffset: end);
             for (TextBox box in _textPainter.getBoxesForSelection(selection)) {
               _selectionRects.add(box.toRect());
             }

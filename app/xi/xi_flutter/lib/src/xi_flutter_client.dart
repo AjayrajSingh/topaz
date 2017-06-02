@@ -6,8 +6,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:xi_client/client.dart';
 
 /// [XiFlutterClient] constructor.
@@ -33,7 +33,7 @@ class XiFlutterClient extends XiClient {
     }
 
     // Copy the xi-core binary to tmp.
-    Directory tmp = await PathProvider.getTemporaryDirectory();
+    Directory tmp = await getTemporaryDirectory();
     String filename = path.join(tmp.uri.path, 'xi-core');
     try {
       await new File('/data/local/tmp/xi-core').copy(filename);
