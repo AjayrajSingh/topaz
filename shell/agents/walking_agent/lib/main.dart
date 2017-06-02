@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
@@ -79,12 +78,10 @@ class WalkingAgent extends AgentImpl {
     _propose();
   }
 
-  void _publish() {
-    String context = JSON.encode(<String, String>{
-      'activity': _activityToString(_currentActivity),
-    });
-    _contextPublisher.publish(_kActivityWalkingTopic, context);
-  }
+  void _publish() => _contextPublisher.publish(
+        _kActivityWalkingTopic,
+        _activityToString(_currentActivity),
+      );
 
   void _propose() => _proposalPublisher.propose(_proposal);
 

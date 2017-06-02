@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
@@ -88,12 +87,10 @@ class HomeWorkAgent extends AgentImpl {
     _propose();
   }
 
-  void _publish() {
-    String context = JSON.encode(<String, String>{
-      'location': _locationToString(_currentLocation),
-    });
-    _contextPublisher.publish(_kLocationHomeWorkTopic, context);
-  }
+  void _publish() => _contextPublisher.publish(
+        _kLocationHomeWorkTopic,
+        _locationToString(_currentLocation),
+      );
 
   void _propose() => _proposalPublisher.propose(_proposal);
 
