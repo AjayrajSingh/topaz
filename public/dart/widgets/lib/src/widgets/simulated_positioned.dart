@@ -159,7 +159,7 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
     return new AnimatedBuilder(
       child: widget.draggable
           ? new GestureDetector(
-              behavior: HitTestBehavior.translucent,
+              behavior: HitTestBehavior.deferToChild,
               onPanStart: _startDrag,
               onPanUpdate: _updateDrag,
               onPanEnd: _endDrag,
