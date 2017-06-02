@@ -295,7 +295,7 @@ class _SimAnimationController extends Animation<Offset>
   void _setStatus(AnimationStatus status) {
     if (status != _status) {
       _status = status;
-      notifyStatusListeners(_status);
+      _checkStatusChanged();
     }
   }
 
