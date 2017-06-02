@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.services.story/story_provider.fidl.dart';
+import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
+import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
+import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_context.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
@@ -17,6 +19,8 @@ typedef void OnUserShellReady(
   VisibleStoriesController visibleStoriesController,
   StoryProvider storyProvider,
   SuggestionProvider suggestionProvider,
+  ContextProvider contextProvider,
+  ContextPublisher contextPublisher,
 );
 
 /// Called when [UserShell.terminate] occurs.
@@ -33,6 +37,9 @@ class UserShellImpl extends UserShell {
   final StoryProviderProxy _storyProviderProxy = new StoryProviderProxy();
   final SuggestionProviderProxy _suggestionProviderProxy =
       new SuggestionProviderProxy();
+  final ContextProviderProxy _contextProviderProxy = new ContextProviderProxy();
+  final ContextPublisherProxy _contextPublisherProxy =
+      new ContextPublisherProxy();
 
   /// Called when [initialize] occurs.
   final OnUserShellReady onReady;
@@ -55,17 +62,29 @@ class UserShellImpl extends UserShell {
       _userContextProxy.ctrl.bind(userContextHandle);
       UserShellContextProxy userShellContextProxy = new UserShellContextProxy();
       userShellContextProxy.ctrl.bind(userShellContextHandle);
-      userShellContextProxy
-          .getStoryProvider(_storyProviderProxy.ctrl.request());
-      userShellContextProxy
-          .getSuggestionProvider(_suggestionProviderProxy.ctrl.request());
+      userShellContextProxy.getStoryProvider(
+        _storyProviderProxy.ctrl.request(),
+      );
+      userShellContextProxy.getSuggestionProvider(
+        _suggestionProviderProxy.ctrl.request(),
+      );
       userShellContextProxy.getVisibleStoriesController(
         _visibleStoriesControllerProxy.ctrl.request(),
       );
-      userShellContextProxy
-          .getFocusController(_focusControllerProxy.ctrl.request());
-      userShellContextProxy
-          .getFocusProvider(_focusProviderProxy.ctrl.request());
+      userShellContextProxy.getFocusController(
+        _focusControllerProxy.ctrl.request(),
+      );
+      userShellContextProxy.getFocusProvider(
+        _focusProviderProxy.ctrl.request(),
+      );
+
+      userShellContextProxy.getContextProvider(
+        _contextProviderProxy.ctrl.request(),
+      );
+      userShellContextProxy.getContextPublisher(
+        _contextPublisherProxy.ctrl.request(),
+      );
+
       userShellContextProxy.ctrl.close();
       onReady(
         _userContextProxy,
@@ -74,6 +93,8 @@ class UserShellImpl extends UserShell {
         _visibleStoriesControllerProxy,
         _storyProviderProxy,
         _suggestionProviderProxy,
+        _contextProviderProxy,
+        _contextPublisherProxy,
       );
     }
   }
@@ -87,6 +108,8 @@ class UserShellImpl extends UserShell {
     _visibleStoriesControllerProxy.ctrl.close();
     _focusControllerProxy.ctrl.close();
     _focusProviderProxy.ctrl.close();
+    _contextProviderProxy.ctrl.close();
+    _contextPublisherProxy.ctrl.close();
     done();
   }
 }

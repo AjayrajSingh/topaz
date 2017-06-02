@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.services.story/story_provider.fidl.dart';
+import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
+import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
+import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_context.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
@@ -20,6 +22,8 @@ class UserShellModel extends Model {
   VisibleStoriesController _visibleStoriesController;
   StoryProvider _storyProvider;
   SuggestionProvider _suggestionProvider;
+  ContextProvider _contextProvider;
+  ContextPublisher _contextPublisher;
 
   /// The [UserContext] given to this app's [UserShell].
   UserContext get userContext => _userContext;
@@ -40,6 +44,12 @@ class UserShellModel extends Model {
   /// The [SuggestionProvider] given to this app's [UserShell].
   SuggestionProvider get suggestionProvider => _suggestionProvider;
 
+  /// The [ContextProvider] given to this app's [UserShell].
+  ContextProvider get contextProvider => _contextProvider;
+
+  /// The [SuggestionProvider] given to this app's [UserShell].
+  ContextPublisher get contextPublisher => _contextPublisher;
+
   /// Called when this app's [UserShell] is given its services.
   @mustCallSuper
   void onReady(
@@ -49,6 +59,8 @@ class UserShellModel extends Model {
     VisibleStoriesController visibleStoriesController,
     StoryProvider storyProvider,
     SuggestionProvider suggestionProvider,
+    ContextProvider contextProvider,
+    ContextPublisher contextPublisher,
   ) {
     _userContext = userContext;
     _focusProvider = focusProvider;
@@ -56,6 +68,8 @@ class UserShellModel extends Model {
     _visibleStoriesController = visibleStoriesController;
     _storyProvider = storyProvider;
     _suggestionProvider = suggestionProvider;
+    _contextProvider = contextProvider;
+    _contextPublisher = contextPublisher;
     notifyListeners();
   }
 
