@@ -269,12 +269,14 @@ class _SimAnimationController extends Animation<Offset>
       _value.dx,
       _target.dx,
       _velocity.dx,
+      tolerance: const Tolerance(distance: 1e-2, time: 1e-2, velocity: 1e-2),
     );
     _ySimulation = new SpringSimulation(
       _kSimSpringDescription,
       _value.dy,
       _target.dy,
       _velocity.dy,
+      tolerance: const Tolerance(distance: 1e-2, time: 1e-2, velocity: 1e-2),
     );
     _ticker.start();
     _setStatus(AnimationStatus.forward);
