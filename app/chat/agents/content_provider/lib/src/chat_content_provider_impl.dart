@@ -47,6 +47,9 @@ final List<_ReservedPage> _kReservedPages = <_ReservedPage>[
   ),
 ];
 
+/// Called when a new message is received.
+typedef void OnMessageReceived(Conversation conversation, Message message);
+
 /// Implementation of the [ChatContentProvider] fidl interface.
 class ChatContentProviderImpl extends ChatContentProvider {
   // Keeps the list of bindings.
@@ -94,11 +97,15 @@ class ChatContentProviderImpl extends ChatContentProvider {
   /// Indicates whether the [Ledger] initialization is successfully done.
   final Completer<Null> _ledgerReady = new Completer<Null>();
 
+  /// Called when a new message is received.
+  final OnMessageReceived onMessageReceived;
+
   /// Creates a new [ChatContentProviderImpl] instance.
   ChatContentProviderImpl({
     @required this.componentContext,
     @required this.chatMessageTransporter,
     this.deviceId,
+    this.onMessageReceived,
   })
       : deviceIdBytes = deviceId != null
             ? new Uint8List.fromList(UTF8.encode(deviceId))
@@ -799,6 +806,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
           _log('Page::Put() returned an error status: $status');
           return;
         }
+
+        onMessageReceived?.call(conversation, message);
       } finally {
         conversationPage.ctrl.close();
       }
