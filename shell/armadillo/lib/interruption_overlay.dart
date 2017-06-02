@@ -3,13 +3,12 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/widgets.dart';
 
 import 'suggestion.dart';
-import 'suggestion_list.dart' show OnSuggestionSelected;
+import 'suggestion_list.dart' show OnSuggestionSelected, kAskHeight;
 import 'suggestion_widget.dart';
 
 const Duration _kInterruptionShowingTimeout =
@@ -18,20 +17,38 @@ const Duration _kInterruptionShowingTimeout =
 const Duration _kInterruptionExitingTimeout =
     const Duration(milliseconds: 3500);
 
-double _kSpacingBetween = 16.0;
-double _kBottomSpacing = 32.0;
-double _kHorizontalSpacing = 16.0;
-double _kHeight = 100.0;
-double _kMaxWidth = 300.0;
+double _kBottomSpacing = 24.0;
+
+// Current suggestion height is 120.0.
+// Vertical margin of 12.0 is added to each suggestion in the list.
+// Adding them together gives proper alignment when sliding down.
+double _kMaxHeight = 120.0 + 12.0;
 
 enum _RemoveDirection {
-  right,
+  left,
   down,
 }
 
-/// Right dismiss with prejudice.
-/// Down is dismiss/snooze.
-/// Up and left, resist.
+/// The reason why an interruption was dismissed.
+enum DismissalReason {
+  /// The interruption was snoozed due to user interaction.
+  snoozed,
+
+  /// The interruption was discarded due to user interaction.
+  discarded,
+
+  /// The interruption display timed out.
+  timedOut,
+
+  /// The interruption was programatically removed.
+  removed,
+}
+
+/// Called when an interruption is no longer showing.
+typedef void OnInterruptionDismissed(
+  Suggestion interruption,
+  DismissalReason dismissalReason,
+);
 
 /// Displays interruptions.
 class InterruptionOverlay extends StatefulWidget {
@@ -41,11 +58,23 @@ class InterruptionOverlay extends StatefulWidget {
   /// Called when an interruption is selected.
   final OnSuggestionSelected onSuggestionSelected;
 
+  /// The width of the suggestion.
+  final double suggestionWidth;
+
+  /// The horizontal margin of the suggestion.
+  final double suggestionHorizontalMargin;
+
+  /// Called when an interruption is no longer showing.
+  final OnInterruptionDismissed onInterruptionDismissed;
+
   /// Constructor.
   InterruptionOverlay({
     Key key,
     this.overlayHeight,
     this.onSuggestionSelected,
+    this.suggestionWidth,
+    this.suggestionHorizontalMargin,
+    this.onInterruptionDismissed,
   })
       : super(key: key);
 
@@ -100,7 +129,11 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
   void _removeCurrentInterruption() {
     if (_currentInterruptionTimer != null) {
       _stopInterruptionTimer();
-      _removeInterruption(_RemoveDirection.down, Offset.zero);
+      _removeInterruption(
+        _RemoveDirection.down,
+        Offset.zero,
+        DismissalReason.removed,
+      );
     } else {
       _removeImmediatelyOnPanEnd = true;
     }
@@ -110,10 +143,6 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
   Widget build(BuildContext context) => new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           _constraints = constraints;
-          double width = math.min(
-            constraints.maxWidth - (2.0 * _kHorizontalSpacing),
-            _kMaxWidth,
-          );
 
           List<Widget> stackChildren = new List<Widget>.from(
             _exitingInterruptionWidgets,
@@ -123,16 +152,16 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
               new SimulatedPositioned(
                 key: new ObjectKey(_currentInterruption),
                 initRect: new Rect.fromLTWH(
-                  constraints.maxWidth - _kHorizontalSpacing - width,
-                  constraints.maxHeight + _kBottomSpacing,
-                  width,
-                  _kHeight,
+                  widget.suggestionHorizontalMargin,
+                  constraints.maxHeight + kAskHeight,
+                  widget.suggestionWidth,
+                  _kMaxHeight,
                 ),
                 rect: new Rect.fromLTWH(
-                  constraints.maxWidth - _kHorizontalSpacing - width,
-                  constraints.maxHeight - _kBottomSpacing - _kHeight,
-                  width,
-                  _kHeight,
+                  widget.suggestionHorizontalMargin,
+                  constraints.maxHeight - _kBottomSpacing - _kMaxHeight,
+                  widget.suggestionWidth,
+                  _kMaxHeight,
                 ),
                 dragOffsetTransform: (
                   Offset currentOffset,
@@ -140,31 +169,53 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
                 ) {
                   Offset newOffset = currentOffset + details.delta;
                   return new Offset(
-                    details.delta.dx * ((newOffset.dx >= 0.0) ? 1.0 : 0.3),
-                    details.delta.dy * ((newOffset.dy >= 0.0) ? 1.0 : 0.3),
+                    details.delta.dx * ((newOffset.dx <= 0.0) ? 1.0 : 0.3),
+                    details.delta.dy *
+                        ((newOffset.dy >= 0.0 &&
+                                newOffset.dy <=
+                                    (kAskHeight +
+                                        _kBottomSpacing +
+                                        _kMaxHeight))
+                            ? 1.0
+                            : 0.3),
                   );
                 },
                 onDragStart: (_) => _stopInterruptionTimer(),
                 onDragEnd: (SimulatedDragEndDetails details) {
-                  if (details.offset.dy > 100.0) {
-                    _removeInterruption(_RemoveDirection.down, details.offset);
-                  } else if (details.offset.dx > 100.0) {
-                    _removeInterruption(_RemoveDirection.right, details.offset);
+                  if (details.offset.dy > 50.0) {
+                    _removeInterruption(
+                      _RemoveDirection.down,
+                      details.offset,
+                      DismissalReason.snoozed,
+                    );
+                  } else if (details.offset.dx < -100.0) {
+                    _removeInterruption(
+                      _RemoveDirection.left,
+                      details.offset,
+                      DismissalReason.discarded,
+                    );
                   } else if (_removeImmediatelyOnPanEnd) {
-                    _removeInterruption(_RemoveDirection.down, Offset.zero);
+                    _removeInterruption(
+                      _RemoveDirection.down,
+                      Offset.zero,
+                      DismissalReason.removed,
+                    );
                     _removeImmediatelyOnPanEnd = false;
                   } else {
                     _startInterruptionTimer();
                   }
                 },
-                child: new _FadeInWidget(
-                  opacity: 1.0,
-                  child: new SuggestionWidget(
-                    key: new GlobalObjectKey(_currentInterruption),
-                    suggestion: _currentInterruption,
-                    onSelected: () => _onSuggestionSelected(
-                          _currentInterruption,
-                        ),
+                child: new Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  child: new _FadeInWidget(
+                    opacity: 1.0,
+                    child: new SuggestionWidget(
+                      key: new GlobalObjectKey(_currentInterruption),
+                      suggestion: _currentInterruption,
+                      onSelected: () => _onSuggestionSelected(
+                            _currentInterruption,
+                          ),
+                    ),
                   ),
                 ),
               ),
@@ -188,26 +239,28 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
         },
       );
 
-  void _removeInterruption(_RemoveDirection direction, Offset offset) {
+  void _removeInterruption(
+    _RemoveDirection direction,
+    Offset offset,
+    DismissalReason reason,
+  ) {
     Suggestion interruptionToRemove = _currentInterruption;
     assert(interruptionToRemove != null);
-    double width = math.min(
-      _constraints.maxWidth - (2.0 * _kHorizontalSpacing),
-      _kMaxWidth,
-    );
-
     Widget exitingWidget;
     exitingWidget = new SimulatedPositioned(
       key: new ObjectKey(interruptionToRemove),
       rect: new Rect.fromLTWH(
         direction == _RemoveDirection.down
-            ? _constraints.maxWidth - _kHorizontalSpacing - width
-            : _constraints.maxWidth + _kHorizontalSpacing,
+            ? widget.suggestionHorizontalMargin
+            : -widget.suggestionWidth - widget.suggestionHorizontalMargin,
         direction == _RemoveDirection.down
-            ? _constraints.maxHeight + _kBottomSpacing
-            : _constraints.maxHeight - _kBottomSpacing - _kHeight + offset.dy,
-        width,
-        _kHeight,
+            ? _constraints.maxHeight + kAskHeight
+            : _constraints.maxHeight -
+                _kBottomSpacing -
+                _kMaxHeight +
+                offset.dy,
+        widget.suggestionWidth,
+        _kMaxHeight,
       ),
       onRectReached: () {
         if (mounted) {
@@ -215,9 +268,13 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
             _exitingInterruptionWidgets.remove(exitingWidget);
           });
         }
+        widget.onInterruptionDismissed?.call(
+          interruptionToRemove,
+          reason,
+        );
       },
-      child: new _FadeInWidget(
-        opacity: 0.0,
+      child: new Align(
+        alignment: FractionalOffset.bottomCenter,
         child: new SuggestionWidget(
           key: new GlobalObjectKey(interruptionToRemove),
           suggestion: interruptionToRemove,
@@ -240,7 +297,11 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
     _stopInterruptionTimer();
     _currentInterruptionTimer = new Timer(_kInterruptionShowingTimeout, () {
       if (mounted) {
-        _removeInterruption(_RemoveDirection.down, Offset.zero);
+        _removeInterruption(
+          _RemoveDirection.down,
+          Offset.zero,
+          DismissalReason.timedOut,
+        );
       }
     });
   }
@@ -306,7 +367,8 @@ class _FadeInWidgetState extends State<_FadeInWidget> {
 
     return new AnimatedOpacity(
       opacity: opacity,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
+      curve: const Interval(0.33, 1.0, curve: Curves.fastOutSlowIn),
       child: widget.child,
     );
   }

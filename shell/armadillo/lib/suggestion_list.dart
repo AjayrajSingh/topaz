@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -11,6 +13,9 @@ import 'suggestion_widget.dart';
 
 const String _kImage = 'packages/armadillo/res/logo_googleg_24dpx4.png';
 const Duration _kFadeInDuration = const Duration(milliseconds: 500);
+
+/// The height of the ask section of the suggerion list.
+const double kAskHeight = 84.0;
 
 /// Called when a suggestion is selected.  [globalBounds] indicates the location
 /// of the widget representing [suggestion] was on screen when it was selected.
@@ -133,7 +138,7 @@ class SuggestionListState extends State<SuggestionList>
                       top: 0.0,
                       left: 0.0,
                       right: 0.0,
-                      height: 84.0,
+                      height: kAskHeight,
                       child: new GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () {
@@ -200,7 +205,7 @@ class SuggestionListState extends State<SuggestionList>
                       ),
                     ),
                     new Positioned(
-                      top: 84.0,
+                      top: kAskHeight,
                       left: 0.0,
                       right: 0.0,
                       bottom: 0.0,
@@ -375,4 +380,33 @@ class SuggestionListState extends State<SuggestionList>
           ),
         ),
       );
+
+  /// Determines the width of a suggestion in the suggestion list.
+  static double getSuggestionWidth(
+    double maxWidth,
+    int suggestionColumnCount,
+  ) {
+    switch (suggestionColumnCount) {
+      case 1:
+        return maxWidth - (2 * 8.0);
+      case 2:
+        return (math.min(960.0, maxWidth) - (3 * 24.0)) / 2.0;
+      case 3:
+        return (math.min(1440.0, maxWidth) - (4 * 24.0)) / 3.0;
+      default:
+        return 300.0;
+    }
+  }
+
+  /// Determines the horizontal margin of suggestions in the suggestion list.
+  static double getSuggestionHorizontalMargin(
+    int suggestionColumnCount,
+  ) {
+    switch (suggestionColumnCount) {
+      case 1:
+        return 8.0;
+      default:
+        return 24.0;
+    }
+  }
 }

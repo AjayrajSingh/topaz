@@ -83,4 +83,7 @@ class Suggestion {
 
   @override
   bool operator ==(dynamic other) => (other is Suggestion && other.id == id);
+
+  @override
+  String toString() => 'Suggestion(title: $title)';
 }

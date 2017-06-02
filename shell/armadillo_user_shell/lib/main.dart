@@ -22,7 +22,6 @@ import 'package:armadillo/story_drag_transition_model.dart';
 import 'package:armadillo/story_model.dart';
 import 'package:armadillo/story_rearrangement_scrim_model.dart';
 import 'package:armadillo/story_time_randomizer.dart';
-import 'package:armadillo/suggestion.dart';
 import 'package:armadillo/suggestion_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -84,6 +83,11 @@ Future<Null> main() async {
   GlobalKey<ConductorState> conductorKey = new GlobalKey<ConductorState>();
   GlobalKey<InterruptionOverlayState> interruptionOverlayKey =
       new GlobalKey<InterruptionOverlayState>();
+  SuggestionProviderSuggestionModel suggestionProviderSuggestionModel =
+      new SuggestionProviderSuggestionModel(
+    hitTestModel: hitTestModel,
+    interruptionOverlayKey: interruptionOverlayKey,
+  );
   Conductor conductor = new Conductor(
     key: conductorKey,
     blurScrimmedChildren: false,
@@ -92,18 +96,8 @@ Future<Null> main() async {
     storyClusterDragStateModel: storyClusterDragStateModel,
     onLogoutSelected: userLogoutter.logout,
     interruptionOverlayKey: interruptionOverlayKey,
-  );
-  SuggestionProviderSuggestionModel suggestionProviderSuggestionModel =
-      new SuggestionProviderSuggestionModel(
-    hitTestModel: hitTestModel,
-    interruptionListener: new InterruptionListener(
-      onInterruptionAdded: (Suggestion interruption) =>
-          interruptionOverlayKey.currentState.onInterruptionAdded(interruption),
-      onInterruptionRemoved: (String uuid) =>
-          interruptionOverlayKey.currentState.onInterruptionRemoved(uuid),
-      onInterruptionsRemoved: () =>
-          interruptionOverlayKey.currentState.onInterruptionsRemoved(),
-    ),
+    onInterruptionDismissed:
+        suggestionProviderSuggestionModel.onInterruptionDismissal,
   );
 
   StoryModel storyModel = new StoryModel(

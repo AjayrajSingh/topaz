@@ -83,6 +83,9 @@ class Conductor extends StatefulWidget {
   /// The key of the interruption overlay.
   final GlobalKey<InterruptionOverlayState> interruptionOverlayKey;
 
+  /// Called when an interruption is no longer showing.
+  final OnInterruptionDismissed onInterruptionDismissed;
+
   /// Constructor.  [storyClusterDragStateModel] is used to create a
   /// [PeekManager] for the suggestion list's peeking overlay.
   Conductor({
@@ -93,6 +96,7 @@ class Conductor extends StatefulWidget {
     this.onLogoutSelected,
     this.storyClusterDragStateModel,
     this.interruptionOverlayKey,
+    this.onInterruptionDismissed,
   })
       : super(key: key);
 
@@ -208,7 +212,13 @@ class ConductorState extends State<Conductor> {
                 SuggestionModel.of(context),
                 storyModel,
                 constraints.maxWidth,
-                (BuildContext context, double overlayHeight) => new Stack(
+                (
+                  BuildContext context,
+                  double overlayHeight,
+                  double suggestionWidth,
+                  double suggestionHorizontalMargin,
+                ) =>
+                    new Stack(
                       children: <Widget>[
                         // Selected Suggestion Overlay.
                         _getSelectedSuggestionOverlay(),
@@ -219,6 +229,8 @@ class ConductorState extends State<Conductor> {
                           storyModel,
                           context,
                           overlayHeight,
+                          suggestionWidth,
+                          suggestionHorizontalMargin,
                         ),
                       ],
                     ),
@@ -381,45 +393,65 @@ class ConductorState extends State<Conductor> {
     SuggestionModel suggestionModel,
     StoryModel storyModel,
     double maxWidth,
-    ChildAboveBuilder childAboveBuilder,
-  ) =>
-      new PeekingOverlay(
-        key: _suggestionOverlayKey,
-        peekHeight: _kSuggestionOverlayPeekHeight,
-        parentWidth: maxWidth,
-        onHide: () {
-          widget.onSuggestionsOverlayChanged?.call(false);
-          if (_suggestionListScrollController.hasClients) {
-            _suggestionListScrollController.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 1000),
-              curve: Curves.fastOutSlowIn,
-            );
-          }
-          _suggestionListKey.currentState?.stopAsking();
+    childAboveBuilder(
+      BuildContext context,
+      double overlayHeight,
+      double suggestionWidth,
+      double suggestionHorizontalMargin,
+    ),
+  ) {
+    int suggestionColumnCount =
+        maxWidth > _kSuggestionListThreeColumnWidthThreshold
+            ? 3
+            : maxWidth > _kSuggestionListTwoColumnWidthThreshold ? 2 : 1;
+    return new PeekingOverlay(
+      key: _suggestionOverlayKey,
+      peekHeight: _kSuggestionOverlayPeekHeight,
+      parentWidth: maxWidth,
+      onHide: () {
+        widget.onSuggestionsOverlayChanged?.call(false);
+        if (_suggestionListScrollController.hasClients) {
+          _suggestionListScrollController.animateTo(
+            0.0,
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.fastOutSlowIn,
+          );
+        }
+        _suggestionListKey.currentState?.stopAsking();
+      },
+      onShow: () {
+        widget.onSuggestionsOverlayChanged?.call(true);
+      },
+      childAboveBuilder: (_, __) => childAboveBuilder(
+            _,
+            __,
+            SuggestionListState.getSuggestionWidth(
+              maxWidth,
+              suggestionColumnCount,
+            ),
+            SuggestionListState.getSuggestionHorizontalMargin(
+              suggestionColumnCount,
+            ),
+          ),
+      child: new SuggestionList(
+        key: _suggestionListKey,
+        scrollController: _suggestionListScrollController,
+        columnCount: maxWidth > _kSuggestionListThreeColumnWidthThreshold
+            ? 3
+            : maxWidth > _kSuggestionListTwoColumnWidthThreshold ? 2 : 1,
+        onAskingStarted: () {
+          _suggestionOverlayKey.currentState.show();
         },
-        onShow: () {
-          widget.onSuggestionsOverlayChanged?.call(true);
-        },
-        childAboveBuilder: childAboveBuilder,
-        child: new SuggestionList(
-          key: _suggestionListKey,
-          scrollController: _suggestionListScrollController,
-          columnCount: maxWidth > _kSuggestionListThreeColumnWidthThreshold
-              ? 3
-              : maxWidth > _kSuggestionListTwoColumnWidthThreshold ? 2 : 1,
-          onAskingStarted: () {
-            _suggestionOverlayKey.currentState.show();
-          },
-          onSuggestionSelected: (Suggestion suggestion, Rect globalBounds) =>
-              _onSuggestionSelected(
-                suggestionModel,
-                storyModel,
-                suggestion,
-                globalBounds,
-              ),
-        ),
-      );
+        onSuggestionSelected: (Suggestion suggestion, Rect globalBounds) =>
+            _onSuggestionSelected(
+              suggestionModel,
+              storyModel,
+              suggestion,
+              globalBounds,
+            ),
+      ),
+    );
+  }
 
   void _onSuggestionSelected(
     SuggestionModel suggestionModel,
@@ -467,6 +499,8 @@ class ConductorState extends State<Conductor> {
     StoryModel storyModel,
     BuildContext context,
     double overlayHeight,
+    double suggestionWidth,
+    double suggestionHorizontalMargin,
   ) =>
       new InterruptionOverlay(
         key: widget.interruptionOverlayKey,
@@ -478,6 +512,9 @@ class ConductorState extends State<Conductor> {
               suggestion,
               globalBounds,
             ),
+        suggestionWidth: suggestionWidth,
+        suggestionHorizontalMargin: suggestionHorizontalMargin,
+        onInterruptionDismissed: widget.onInterruptionDismissed,
       );
 
   void _defocus(StoryModel storyModel) {

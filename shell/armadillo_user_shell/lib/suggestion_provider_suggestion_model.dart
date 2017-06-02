@@ -9,6 +9,7 @@ import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart'
 import 'package:apps.maxwell.services.suggestion/user_input.fidl.dart'
     as maxwell;
 import 'package:apps.modular.services.user/focus.fidl.dart';
+import 'package:armadillo/interruption_overlay.dart';
 import 'package:armadillo/story.dart';
 import 'package:armadillo/story_cluster.dart';
 import 'package:armadillo/story_cluster_id.dart';
@@ -151,10 +152,11 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   final maxwell.SuggestionListenerBinding _interruptionListenerBinding =
       new maxwell.SuggestionListenerBinding();
 
-  /// Listens for changes to maxwell's interruption list.
-  final InterruptionListener interruptionListener;
+  /// The key for the interruption overlay.
+  final GlobalKey<InterruptionOverlayState> interruptionOverlayKey;
 
   List<Suggestion> _currentSuggestions = const <Suggestion>[];
+  final List<Suggestion> _currentInterruptions = <Suggestion>[];
 
   /// When the user is asking via text or voice we want to show the maxwell ask
   /// suggestions rather than the normal maxwell suggestion list.
@@ -183,7 +185,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   /// Constructor.
   SuggestionProviderSuggestionModel({
     this.hitTestModel,
-    this.interruptionListener,
+    this.interruptionOverlayKey,
   });
 
   /// Setting [suggestionProvider] triggers the loading on suggestions.
@@ -228,6 +230,36 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     _focusLossListeners.add(listener);
   }
 
+  /// Called when an interruption is no longer showing.
+  void onInterruptionDismissal(
+    Suggestion interruption,
+    DismissalReason reason,
+  ) {
+    switch (reason) {
+      case DismissalReason.snoozed:
+      case DismissalReason.timedOut:
+        _currentInterruptions.insert(0, interruption);
+        notifyListeners();
+        break;
+      default:
+        break;
+    }
+  }
+
+  /// Called when an interruption has been removed.
+  void _onInterruptionRemoved(String uuid) {
+    _currentInterruptions.removeWhere(
+      (Suggestion interruption) => interruption.id.value == uuid,
+    );
+    notifyListeners();
+  }
+
+  /// Called when an interruption has been removed.
+  void _onInterruptionsRemoved() {
+    _currentInterruptions.clear();
+    notifyListeners();
+  }
+
   void _load() {
     _suggestionProviderProxy.initiateAsk(
       _askListenerBinding.wrap(_askListener),
@@ -242,12 +274,35 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     _nextControllerProxy.setResultCount(20);
 
     _suggestionProviderProxy.subscribeToInterruptions(
-      _interruptionListenerBinding.wrap(interruptionListener),
+      _interruptionListenerBinding.wrap(
+        new InterruptionListener(
+          onInterruptionAdded: (Suggestion interruption) =>
+              interruptionOverlayKey.currentState
+                  .onInterruptionAdded(interruption),
+          onInterruptionRemoved: (String uuid) {
+            interruptionOverlayKey.currentState.onInterruptionRemoved(uuid);
+            _onInterruptionRemoved(uuid);
+          },
+          onInterruptionsRemoved: () {
+            interruptionOverlayKey.currentState.onInterruptionsRemoved();
+            _onInterruptionsRemoved();
+          },
+        ),
+      ),
     );
   }
 
   @override
-  List<Suggestion> get suggestions => _currentSuggestions;
+  List<Suggestion> get suggestions {
+    if (_asking) {
+      return new List<Suggestion>.from(_currentSuggestions);
+    }
+    List<Suggestion> suggestions = new List<Suggestion>.from(
+      _currentInterruptions,
+    );
+    suggestions.addAll(_currentSuggestions);
+    return suggestions;
+  }
 
   @override
   void onSuggestionSelected(Suggestion suggestion) {
