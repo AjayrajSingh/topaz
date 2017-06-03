@@ -18,6 +18,10 @@ void _log(String msg) {
 
 /// Implementation of the [Player] fidl interface.
 class PlayerImpl extends Player {
+  // Keeps the list of listeners
+  final List<PlayerStatusListenerProxy> _listeners =
+      <PlayerStatusListenerProxy>[];
+
   // Keeps the list of bindings.
   final List<PlayerBinding> _bindings = <PlayerBinding>[];
 
@@ -30,6 +34,7 @@ class PlayerImpl extends Player {
   PlayerImpl(ApplicationContext context) {
     _audioPlayerController =
         new AudioPlayerController(context.environmentServices);
+    _audioPlayerController.updateCallback = _updateListeners;
   }
 
   @override
@@ -70,8 +75,10 @@ class PlayerImpl extends Player {
   }
 
   @override
-  void addPlayerListener(InterfaceHandle<PlayerStatusListener> listener) {
-    // TODO (dayang@): Add listener to group
+  void addPlayerListener(InterfaceHandle<PlayerStatusListener> handle) {
+    PlayerStatusListenerProxy listener = new PlayerStatusListenerProxy();
+    listener.ctrl.bind(handle);
+    _listeners.add(listener);
     _log('Add Player Listener');
   }
 
@@ -95,8 +102,19 @@ class PlayerImpl extends Player {
 
   /// Close all the bindings.
   void close() {
-    _bindings.forEach(
-      (PlayerBinding binding) => binding.close(),
-    );
+    _bindings.forEach((PlayerBinding binding) => binding.close());
+    _listeners
+        .forEach((PlayerStatusListenerProxy listener) => listener.ctrl.close());
+  }
+
+  void _updateListeners() {
+    PlayerStatus status = new PlayerStatus()
+      ..isPlaying = _audioPlayerController.playing
+      ..track = _currentTrack
+      ..playbackPositionInMilliseconds = _currentTrack != null
+          ? _audioPlayerController.progress.inMilliseconds
+          : 0;
+    _listeners.forEach(
+        (PlayerStatusListenerProxy listener) => listener.onUpdate(status));
   }
 }

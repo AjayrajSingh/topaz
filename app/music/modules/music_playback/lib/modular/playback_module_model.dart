@@ -79,10 +79,9 @@ class PlaybackModuleModel extends ModuleModel {
       onStatusUpdate: (PlayerStatus status) {
         // TODO (dayang@) Serialize player track struct to widget track
         // https://fuchsia.atlassian.net/browse/SO-459
-        //
-        // TODO (dayang@) Retrieve playback position
-        // https://fuchsia.atlassian.net/browse/SO-461
         _isPlaying = status.isPlaying;
+        _playbackPosition =
+            new Duration(milliseconds: status.playbackPositionInMilliseconds);
         notifyListeners();
       },
     );

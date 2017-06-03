@@ -13,9 +13,9 @@ struct PlayerStatus {
   bool isPlaying;
 
   // The current track that is being played.
-  Track track;
+  Track? track;
 
-  // TODO(dayang@): Represent scrub position as a subscription/channel
-  // separately so that it can be managed at a higher velocity
-
+  // Playback position of the current track in milliseconds.
+  // Should default to 0 if no track is currently being played.
+  int64 playbackPositionInMilliseconds;
 };
