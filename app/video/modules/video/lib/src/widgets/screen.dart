@@ -5,24 +5,19 @@
 import 'package:flutter/material.dart';
 
 /// The screen to video player.
-class VideoScreen extends StatelessWidget {
+class Screen extends StatelessWidget {
   /// The screen for video player
-  VideoScreen({
+  Screen({
     Key key,
   })
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(
-          'Video Player',
-        ),
-        backgroundColor: Colors.white,
-      ),
-      body: new Center(
-        child: new Text('Video Player'),
+    return new Expanded(
+      child: new Center(
+        child: new Text('screen goes here!',
+            style: new TextStyle(color: Colors.grey[50])),
       ),
     );
   }

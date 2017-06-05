@@ -7,14 +7,14 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'src/modular/module_model.dart';
-import 'src/screen.dart';
+import 'src/widgets.dart';
 
 void main() {
   ModuleWidget<VideoModuleModel> moduleWidget =
       new ModuleWidget<VideoModuleModel>(
     moduleModel: new VideoModuleModel(),
     applicationContext: new ApplicationContext.fromStartupInfo(),
-    child: new VideoScreen(),
+    child: new VideoApp(),
   );
 
   moduleWidget.advertise();

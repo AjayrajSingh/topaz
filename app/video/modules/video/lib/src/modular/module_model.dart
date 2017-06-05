@@ -9,6 +9,11 @@ import 'package:lib.widgets/modular.dart';
 
 /// The [ModuleModel] for the video player.
 class VideoModuleModel extends ModuleModel {
+  bool _isPlaying = false;
+
+  /// Returns whether the video is playing
+  bool get isPlaying => _isPlaying;
+
   @override
   void onReady(
     ModuleContext moduleContext,
@@ -23,5 +28,10 @@ class VideoModuleModel extends ModuleModel {
   @override
   void onStop() {
     super.onStop();
+  }
+
+  /// Toggles the play icon to a pause icon, or vice versa
+  void togglePlayPause() {
+    _isPlaying = !_isPlaying;
   }
 }
