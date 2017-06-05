@@ -64,15 +64,26 @@ class TrackListItem extends StatelessWidget {
           style: _getTextStyle(_highlightColor),
         ),
       ),
-      new Container(
-        width: 100.0,
-        alignment: FractionalOffset.centerRight,
-        child: new Text(
-          new DurationFormat(track.duration).playbackText,
-          style: _getTextStyle(_highlightColor),
-        ),
-      ),
     ];
+
+    if (track.playbackUrl == null) {
+      children.add(new Text(
+        'Playback Unavailable',
+        style: new TextStyle(
+          fontSize: 12.0,
+          color: Colors.grey[400],
+        ),
+      ));
+    }
+
+    children.add(new Container(
+      width: 100.0,
+      alignment: FractionalOffset.centerRight,
+      child: new Text(
+        new DurationFormat(track.duration).playbackText,
+        style: _getTextStyle(_highlightColor),
+      ),
+    ));
 
     if (showArtist) {
       children.insert(

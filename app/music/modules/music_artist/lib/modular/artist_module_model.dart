@@ -206,15 +206,17 @@ class ArtistModuleModel extends ModuleModel {
 
   /// Plays the given track
   void playTrack(Track track, Album album) {
-    track_fidl.Track trackFidl = new track_fidl.Track()
-      ..title = track.name
-      ..id = track.id
-      ..artist = track.artists.first?.name
-      ..album = album.name
-      ..cover = album.defaultArtworkUrl
-      ..playbackUrl = track.playbackUrl
-      ..durationInSeconds = track.duration.inSeconds;
-    _player.play(trackFidl);
+    if (track.playbackUrl != null) {
+      track_fidl.Track trackFidl = new track_fidl.Track()
+        ..title = track.name
+        ..id = track.id
+        ..artist = track.artists.first?.name
+        ..album = album.name
+        ..cover = album.defaultArtworkUrl
+        ..playbackUrl = track.playbackUrl
+        ..durationInSeconds = track.duration.inSeconds;
+      _player.play(trackFidl);
+    }
   }
 
   /// Starts a module in the story shell
