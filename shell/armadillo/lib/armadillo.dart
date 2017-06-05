@@ -10,13 +10,13 @@ import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
 import 'conductor.dart';
+import 'context_model.dart';
 import 'default_scroll_configuration.dart';
 import 'wrapper_builder.dart';
 
 export 'wrapper_builder.dart' show WrapperBuilder;
 
 const Color _kBackgroundOverlayColor = const Color(0xB0000000);
-const String _kBackgroundImage = 'packages/armadillo/res/Background.jpg';
 const double _kDeviceScreenInnerBezelRadius = 8.0;
 
 /// [Armadillo] is the main Widget.  Its purpose is to set up [Model]s the rest
@@ -35,27 +35,31 @@ class Armadillo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget currentChild = new DefaultScrollConfiguration(child: conductor);
+    Widget currentChild = new ScopedModelDescendant<ContextModel>(
+      child: new DefaultScrollConfiguration(child: conductor),
+      builder: (BuildContext context, Widget child, ContextModel model) =>
+          new Container(
+            decoration: new BoxDecoration(
+              color: Colors.black,
+              image: new DecorationImage(
+                image: model.backgroundImageProvider,
+                alignment: new FractionalOffset(0.4, 0.5),
+                fit: BoxFit.cover,
+                colorFilter: new ui.ColorFilter.mode(
+                  _kBackgroundOverlayColor,
+                  ui.BlendMode.srcATop,
+                ),
+              ),
+            ),
+            child: child,
+          ),
+    );
 
     scopedModelBuilders.forEach((WrapperBuilder scopedModelBuilder) {
       currentChild = scopedModelBuilder(context, currentChild);
       assert(currentChild is ScopedModel);
     });
 
-    return new Container(
-      decoration: new BoxDecoration(
-        color: Colors.black,
-        image: new DecorationImage(
-          image: new AssetImage(_kBackgroundImage),
-          alignment: new FractionalOffset(0.4, 0.5),
-          fit: BoxFit.cover,
-          colorFilter: new ui.ColorFilter.mode(
-            _kBackgroundOverlayColor,
-            ui.BlendMode.srcATop,
-          ),
-        ),
-      ),
-      child: currentChild,
-    );
+    return currentChild;
   }
 }

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'dart:math' as math;
 
-import 'time_stringer.dart';
+import 'context_model.dart';
 
 const TextStyle _kTimeTextStyle = const TextStyle(
   color: Colors.white,
@@ -38,88 +38,85 @@ const double _kTextVerticalGap = 4.0;
 
 /// Displays the time, date, and location context for the user.
 class UserContextText extends StatelessWidget {
-  final TimeStringer _timeStringer = new TimeStringer();
-
   /// The color the text in this widget will have.
   final Color textColor;
-
-  /// The device's current contextual location.
-  final String contextualLocation;
 
   /// Constructor.
   UserContextText({
     Key key,
     this.textColor,
-    this.contextualLocation: 'Mountain View',
   })
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) => new LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-        bool tight = constraints.maxWidth <= _kWidthThreshold;
-        List<LayoutId> children = <LayoutId>[
-          new LayoutId(
-            id: _UserContextLayoutDelegateParts.location,
-            child: new Text(
-              contextualLocation.toUpperCase(),
-              softWrap: false,
-              overflow: TextOverflow.fade,
-              style: _kLocationTextStyle.copyWith(
-                color: textColor,
-                fontSize: tight ? 10.0 : 12.0,
-              ),
-            ),
-          ),
-        ];
-        if (tight) {
-          children.add(
-            new LayoutId(
-              id: _UserContextLayoutDelegateParts.time,
-              child: new Text(
-                _timeStringer.timeOnly,
-                softWrap: false,
-                overflow: TextOverflow.fade,
-                style: _kDateTextStyle.copyWith(
-                  color: textColor,
-                  fontSize: 10.0,
+  Widget build(BuildContext context) => new ScopedModelDescendant<ContextModel>(
+        builder: (BuildContext context, Widget child, ContextModel model) =>
+            new LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+              bool tight = constraints.maxWidth <= _kWidthThreshold;
+              List<LayoutId> children = <LayoutId>[
+                new LayoutId(
+                  id: _UserContextLayoutDelegateParts.location,
+                  child: new Text(
+                    model.contextualLocation.toUpperCase(),
+                    softWrap: false,
+                    overflow: TextOverflow.fade,
+                    style: _kLocationTextStyle.copyWith(
+                      color: textColor,
+                      fontSize: tight ? 10.0 : 12.0,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        } else {
-          children.addAll(<LayoutId>[
-            new LayoutId(
-              id: _UserContextLayoutDelegateParts.time,
-              child: new Text(
-                _timeStringer.timeOnly,
-                softWrap: false,
-                overflow: TextOverflow.fade,
-                style: _kTimeTextStyle.copyWith(color: textColor),
-              ),
-            ),
-            new LayoutId(
-              id: _UserContextLayoutDelegateParts.date,
-              child: new Text(
-                _timeStringer.dateOnly,
-                softWrap: false,
-                overflow: TextOverflow.fade,
-                style: _kDateTextStyle.copyWith(color: textColor),
-              ),
-            ),
-          ]);
-        }
-        return new CustomMultiChildLayout(
-          delegate: new _UserContextLayoutDelegate(
-            time: _timeStringer.timeOnly,
-            date: (constraints.maxWidth > _kWidthThreshold)
-                ? _timeStringer.dateOnly
-                : null,
-            location: contextualLocation.toUpperCase(),
-          ),
-          children: children,
-        );
-      });
+              ];
+              if (tight) {
+                children.add(
+                  new LayoutId(
+                    id: _UserContextLayoutDelegateParts.time,
+                    child: new Text(
+                      model.timeOnly,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      style: _kDateTextStyle.copyWith(
+                        color: textColor,
+                        fontSize: 10.0,
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                children.addAll(<LayoutId>[
+                  new LayoutId(
+                    id: _UserContextLayoutDelegateParts.time,
+                    child: new Text(
+                      model.timeOnly,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      style: _kTimeTextStyle.copyWith(color: textColor),
+                    ),
+                  ),
+                  new LayoutId(
+                    id: _UserContextLayoutDelegateParts.date,
+                    child: new Text(
+                      model.dateOnly,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      style: _kDateTextStyle.copyWith(color: textColor),
+                    ),
+                  ),
+                ]);
+              }
+              return new CustomMultiChildLayout(
+                delegate: new _UserContextLayoutDelegate(
+                  time: model.timeOnly,
+                  date: (constraints.maxWidth > _kWidthThreshold)
+                      ? model.dateOnly
+                      : null,
+                  location: model.contextualLocation.toUpperCase(),
+                ),
+                children: children,
+              );
+            }),
+      );
 }
 
 enum _UserContextLayoutDelegateParts {

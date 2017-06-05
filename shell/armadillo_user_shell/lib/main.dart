@@ -8,6 +8,7 @@ import 'package:application.lib.app.dart/app.dart';
 import 'package:armadillo/armadillo.dart';
 import 'package:armadillo/armadillo_drag_target.dart';
 import 'package:armadillo/conductor.dart';
+import 'package:armadillo/context_model.dart';
 import 'package:armadillo/debug_enabler.dart';
 import 'package:armadillo/debug_model.dart';
 import 'package:armadillo/interruption_overlay.dart';
@@ -143,6 +144,7 @@ Future<Null> main() async {
     },
   );
 
+  ContextModel contextModel = new ContextModel();
   NowModel nowModel = new NowModel();
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();
@@ -153,6 +155,10 @@ Future<Null> main() async {
     debugModel: debugModel,
     armadillo: new Armadillo(
       scopedModelBuilders: <WrapperBuilder>[
+        (_, Widget child) => new ScopedModel<ContextModel>(
+              model: contextModel,
+              child: child,
+            ),
         (_, Widget child) => new ScopedModel<StoryModel>(
               model: storyModel,
               child: child,

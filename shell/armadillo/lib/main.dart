@@ -11,6 +11,7 @@ import 'package:sysui_widgets/default_bundle.dart';
 
 import 'armadillo.dart';
 import 'conductor.dart';
+import 'context_model.dart';
 import 'debug_enabler.dart';
 import 'debug_model.dart';
 import 'json_story_generator.dart';
@@ -49,7 +50,7 @@ Future<Null> main() async {
   jsonStoryGenerator.addListener(
     () => storyModel.onStoryClustersChanged(jsonStoryGenerator.storyClusters),
   );
-
+  ContextModel contextModel = new ContextModel();
   NowModel nowModel = new NowModel();
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();
@@ -78,6 +79,7 @@ Future<Null> main() async {
     storyDragTransitionModel: storyDragTransitionModel,
     debugModel: debugModel,
     panelResizingModel: panelResizingModel,
+    contextModel: contextModel,
   );
 
   runApp(_kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app);
@@ -94,6 +96,7 @@ Widget _buildApp({
   StoryDragTransitionModel storyDragTransitionModel,
   DebugModel debugModel,
   PanelResizingModel panelResizingModel,
+  ContextModel contextModel,
 }) =>
     new CheckedModeBanner(
       child: new StoryTimeRandomizer(
@@ -104,6 +107,10 @@ Widget _buildApp({
             bundle: defaultBundle,
             child: new Armadillo(
               scopedModelBuilders: <WrapperBuilder>[
+                (_, Widget child) => new ScopedModel<ContextModel>(
+                      model: contextModel,
+                      child: child,
+                    ),
                 (_, Widget child) => new ScopedModel<StoryModel>(
                       model: storyModel,
                       child: child,

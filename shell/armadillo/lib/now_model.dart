@@ -8,11 +8,11 @@ import 'package:lib.widgets/model.dart';
 
 import 'dart:ui' show lerpDouble;
 
+import 'context_model.dart';
 import 'important_info.dart';
 import 'now.dart';
 import 'opacity_model.dart';
 import 'quick_settings.dart';
-import 'time_stringer.dart';
 import 'user_context_text.dart';
 
 export 'package:lib.widgets/model.dart'
@@ -24,28 +24,10 @@ const String _kBatteryImageWhite =
 
 /// Manages the contents of [Now].
 class NowModel extends Model {
-  final TimeStringer _timeStringer = new TimeStringer();
-
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
   static NowModel of(BuildContext context) =>
       new ModelFinder<NowModel>().of(context);
-
-  @override
-  void addListener(VoidCallback listener) {
-    super.addListener(listener);
-    if (listenerCount == 1) {
-      _timeStringer.addListener(notifyListeners);
-    }
-  }
-
-  @override
-  void removeListener(VoidCallback listener) {
-    super.removeListener(listener);
-    if (listenerCount == 0) {
-      _timeStringer.removeListener(notifyListeners);
-    }
-  }
 
   // These are animation values, updated by the Now widget through the two
   // listeners below
@@ -97,7 +79,11 @@ class NowModel extends Model {
                   opacity: opacityModel.opacity,
                   child: child,
                 ),
-            child: new Text('${_timeStringer.shortString}'),
+            child: new ScopedModelDescendant<ContextModel>(
+              builder:
+                  (BuildContext context, Widget child, ContextModel model) =>
+                      new Text('${model.timeOnly}'),
+            ),
           ),
         ),
       );

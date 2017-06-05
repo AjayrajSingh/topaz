@@ -4,6 +4,8 @@
 
 import 'package:flutter/widgets.dart';
 
+import 'context_model.dart';
+
 const String _kBatteryImageWhite =
     'packages/armadillo/res/ic_battery_90_white_1x_web_24dp.png';
 const String _kBatteryImageGrey600 =
@@ -42,71 +44,66 @@ class ImportantInfo extends StatelessWidget {
   /// The color of the text of the importnatn info.  This also colors the icons.
   final Color textColor;
 
-  /// The device's current battery level.
-  final String batteryLevel;
-
-  /// The wifi network the device is connected to.
-  final String wifiNetwork;
-
   /// Constructor
   ImportantInfo({
     Key key,
     this.textColor,
-    this.batteryLevel: '84%',
-    this.wifiNetwork: 'GoogleGuest',
   })
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) => new LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          List<LayoutId> children = <LayoutId>[
-            new LayoutId(
-              id: _ImportantInfoLayoutDelegateParts.batteryIcon,
-              child: new Image.asset(
-                _kBatteryImageWhite,
-                height: _kIconHeight,
-                color: textColor,
-                fit: BoxFit.cover,
-              ),
+  Widget build(BuildContext context) => new ScopedModelDescendant<ContextModel>(
+        builder: (BuildContext context, Widget child, ContextModel model) =>
+            new LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                List<LayoutId> children = <LayoutId>[
+                  new LayoutId(
+                    id: _ImportantInfoLayoutDelegateParts.batteryIcon,
+                    child: new Image.asset(
+                      _kBatteryImageWhite,
+                      height: _kIconHeight,
+                      color: textColor,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  new LayoutId(
+                    id: _ImportantInfoLayoutDelegateParts.batteryText,
+                    child: new Text(
+                      model.batteryPercentage,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      style: _kTextStyle.copyWith(color: textColor),
+                    ),
+                  ),
+                ];
+                if (constraints.maxWidth > _kWidthThreshold) {
+                  children.addAll(<LayoutId>[
+                    new LayoutId(
+                      id: _ImportantInfoLayoutDelegateParts.wifiIcon,
+                      child: new Image.asset(
+                        _kWifiImageGrey600,
+                        height: _kIconHeight,
+                        color: textColor,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    new LayoutId(
+                      id: _ImportantInfoLayoutDelegateParts.wifiText,
+                      child: new Text(
+                        model.wifiNetwork,
+                        softWrap: false,
+                        overflow: TextOverflow.fade,
+                        style: _kTextStyle.copyWith(color: textColor),
+                      ),
+                    ),
+                  ]);
+                }
+                return new CustomMultiChildLayout(
+                  delegate: new _ImportantInfoLayoutDelegate(),
+                  children: children,
+                );
+              },
             ),
-            new LayoutId(
-              id: _ImportantInfoLayoutDelegateParts.batteryText,
-              child: new Text(
-                batteryLevel,
-                softWrap: false,
-                overflow: TextOverflow.fade,
-                style: _kTextStyle.copyWith(color: textColor),
-              ),
-            ),
-          ];
-          if (constraints.maxWidth > _kWidthThreshold) {
-            children.addAll(<LayoutId>[
-              new LayoutId(
-                id: _ImportantInfoLayoutDelegateParts.wifiIcon,
-                child: new Image.asset(
-                  _kWifiImageGrey600,
-                  height: _kIconHeight,
-                  color: textColor,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              new LayoutId(
-                id: _ImportantInfoLayoutDelegateParts.wifiText,
-                child: new Text(
-                  wifiNetwork,
-                  softWrap: false,
-                  overflow: TextOverflow.fade,
-                  style: _kTextStyle.copyWith(color: textColor),
-                ),
-              ),
-            ]);
-          }
-          return new CustomMultiChildLayout(
-            delegate: new _ImportantInfoLayoutDelegate(),
-            children: children,
-          );
-        },
       );
 }
 
