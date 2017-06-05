@@ -11,6 +11,7 @@ dart_package("music_models") {
   deps = [
     "//apps/modules/common/packages/fixtures",
     "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/pub/intl",
   ]
 
   analysis_options = "//apps/modules/common/.analysis_options"

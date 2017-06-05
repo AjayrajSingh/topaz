@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:intl/intl.dart';
+
 import 'artist.dart';
 import 'music_image.dart';
 import 'track.dart';
@@ -36,6 +38,8 @@ class Album {
   /// ID of album
   final String id;
 
+  static final DateFormat _yearFormat = new DateFormat.y();
+
   /// Constructor
   Album({
     this.name,
@@ -50,6 +54,18 @@ class Album {
 
   /// Create album model from json data
   factory Album.fromJson(dynamic json) {
+    DateTime releaseDate;
+    if (json['release_date'] != null) {
+      try {
+        releaseDate = DateTime.parse(json['release_date']);
+      } catch (_) {
+        // Sometimes release dates are given only as a year
+        try {
+          releaseDate = _yearFormat.parse(json['release_date']);
+        } catch (_) {}
+      }
+    }
+
     return new Album(
       name: json['name'],
       artists: json['artists'] is List<dynamic>
@@ -63,9 +79,7 @@ class Album {
               .map((dynamic trackJson) => new Track.fromJson(trackJson))
               .toList()
           : <Track>[],
-      releaseDate: json['release_date'] != null
-          ? DateTime.parse(json['release_date'])
-          : null,
+      releaseDate: releaseDate,
       albumType: json['album_type'],
       genres: json['genres'] is List<String> ? json['genres'] : null,
       id: json['id'],
