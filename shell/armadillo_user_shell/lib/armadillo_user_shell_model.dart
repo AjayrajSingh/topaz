@@ -17,6 +17,8 @@ import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
 
+typedef void _OnContextUpdated(Map<String, String> context);
+
 /// Connects [UserShell]'s services to Armadillo's associated classes.
 class ArmadilloUserShellModel extends UserShellModel {
   /// Receives the [StoryProvider].
@@ -35,6 +37,15 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// Receives the [UserContext].
   final UserLogoutter userLogoutter;
 
+  /// Called when the context updates.
+  final _OnContextUpdated onContextUpdated;
+
+  /// The list of context topics to listen for changes to.
+  final List<String> contextTopics;
+
+  final ContextListenerBinding _contextListenerBinding =
+      new ContextListenerBinding();
+
   /// Constructor.
   ArmadilloUserShellModel({
     this.storyProviderStoryGenerator,
@@ -42,6 +53,8 @@ class ArmadilloUserShellModel extends UserShellModel {
     this.focusRequestWatcher,
     this.initialFocusSetter,
     this.userLogoutter,
+    this.onContextUpdated,
+    this.contextTopics: const <String>[],
   });
 
   @override
@@ -73,5 +86,26 @@ class ArmadilloUserShellModel extends UserShellModel {
     suggestionProviderSuggestionModel.focusController = focusController;
     suggestionProviderSuggestionModel.visibleStoriesController =
         visibleStoriesController;
+    contextProvider.subscribe(
+      new ContextQuery()..topics = contextTopics,
+      _contextListenerBinding.wrap(new _ContextListenerImpl(onContextUpdated)),
+    );
+  }
+
+  @override
+  void onStop() {
+    _contextListenerBinding.close();
+    super.onStop();
+  }
+}
+
+class _ContextListenerImpl extends ContextListener {
+  final _OnContextUpdated onContextUpdated;
+
+  _ContextListenerImpl(this.onContextUpdated);
+
+  @override
+  void onUpdate(ContextUpdate result) {
+    onContextUpdated?.call(result.values);
   }
 }

@@ -31,6 +31,7 @@ import 'package:lib.widgets/widgets.dart';
 import 'package:sysui_widgets/default_bundle.dart';
 
 import 'armadillo_user_shell_model.dart';
+import 'context_provider_context_model.dart';
 import 'focus_request_watcher_impl.dart';
 import 'hit_test_model.dart';
 import 'initial_focus_setter.dart';
@@ -138,7 +139,8 @@ Future<Null> main() async {
     },
   );
 
-  ContextModel contextModel = new ContextModel();
+  ContextProviderContextModel contextProviderContextModel =
+      new ContextProviderContextModel();
   NowModel nowModel = new NowModel();
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();
@@ -150,7 +152,7 @@ Future<Null> main() async {
     armadillo: new Armadillo(
       scopedModelBuilders: <WrapperBuilder>[
         (_, Widget child) => new ScopedModel<ContextModel>(
-              model: contextModel,
+              model: contextProviderContextModel,
               child: child,
             ),
         (_, Widget child) => new ScopedModel<StoryModel>(
@@ -200,6 +202,8 @@ Future<Null> main() async {
       focusRequestWatcher: focusRequestWatcher,
       initialFocusSetter: initialFocusSetter,
       userLogoutter: userLogoutter,
+      onContextUpdated: contextProviderContextModel.onContextUpdated,
+      contextTopics: ContextProviderContextModel.topics,
     ),
     child:
         _kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app,
@@ -210,6 +214,8 @@ Future<Null> main() async {
       child: userShellWidget,
     ),
   );
+
+  await contextProviderContextModel.load();
 }
 
 Widget _buildApp({
