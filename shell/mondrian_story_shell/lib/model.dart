@@ -122,11 +122,7 @@ class Surface extends Model {
 
   /// Dismiss this node hiding it from layouts
   bool dismiss() {
-    if (_node.parent?.value != null) {
-      _graph.dismissSurface(_node.value);
-      return true;
-    }
-    return false;
+    return _graph.dismissSurface(_node.value);
   }
 
   /// Remove this node from graph
@@ -247,10 +243,17 @@ class SurfaceGraph extends Model {
   }
 
   /// When called surface is no longer displayed
-  void dismissSurface(String id) {
+  bool dismissSurface(String id) {
+    List<String> backup = new List<String>.from(_focusedSurfaces);
+    // TODO(djmurphy) add Dependency consequences
     _focusedSurfaces.removeWhere((String fid) => fid == id);
+    if (_focusedSurfaces.isEmpty) {
+      _focusedSurfaces.addAll(backup);
+      return false;
+    }
     _dismissedSurfaces.add(id);
     notifyListeners();
+    return true;
   }
 
   /// True if surface has been dismissed and not subsequently focused
