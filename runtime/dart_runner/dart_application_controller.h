@@ -5,6 +5,7 @@
 #ifndef APPS_DART_CONTENT_HANDLER_DART_APPLICATION_CONTROLLER_H_
 #define APPS_DART_CONTENT_HANDLER_DART_APPLICATION_CONTROLLER_H_
 
+#include "application/lib/svc/service_provider_bridge.h"
 #include "application/services/application_runner.fidl.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/fidl/cpp/bindings/binding.h"
@@ -31,6 +32,7 @@ class DartApplicationController : public app::ApplicationController {
 
   std::vector<char> snapshot_;
   app::ApplicationStartupInfoPtr startup_info_;
+  app::ServiceProviderBridge service_provider_bridge_;
   fidl::Binding<app::ApplicationController> binding_;
   Dart_Handle script_;
   Dart_Isolate isolate_;

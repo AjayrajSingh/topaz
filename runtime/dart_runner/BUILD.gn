@@ -29,6 +29,7 @@ executable("app") {
 
   deps = [
     "//application/lib/app",
+    "//application/lib/svc",
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
     "//dart/runtime:libdart_jit",
     "//dart/runtime/bin:embedded_dart_io",

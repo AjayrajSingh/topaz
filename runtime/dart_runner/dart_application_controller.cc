@@ -81,8 +81,21 @@ bool DartApplicationController::Main() {
   fidl::Array<fidl::String> arguments =
       std::move(startup_info_->launch_info->arguments);
 
-  fidl::InterfaceRequest<app::ServiceProvider> outgoing_services =
-      std::move(startup_info_->launch_info->services);
+  if (startup_info_->launch_info->services) {
+    service_provider_bridge_.AddBinding(
+        std::move(startup_info_->launch_info->services));
+  }
+
+  // TODO(abarth): Remove service_provider_bridge once we have an
+  // implementation of rio.Directory in Dart.
+  if (startup_info_->launch_info->service_request.is_valid()) {
+    service_provider_bridge_.ServeDirectory(
+        std::move(startup_info_->launch_info->service_request));
+  }
+
+  app::ServiceProviderPtr service_provider;
+  auto outgoing_services = service_provider.NewRequest();
+  service_provider_bridge_.set_backend(std::move(service_provider));
 
   InitBuiltinLibrariesForIsolate(
       url, url, app::ApplicationContext::CreateFrom(std::move(startup_info_)),
