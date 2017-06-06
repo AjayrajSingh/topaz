@@ -11,7 +11,10 @@ import 'package:meta/meta.dart';
 typedef void OwnershipChangeCallback(TabData data);
 
 /// Representation of tab ids.
-class TabId {}
+class TabId {
+  @override
+  String toString() => hashCode.toString();
+}
 
 /// Data associated with a tab.
 class TabData {
@@ -35,7 +38,10 @@ class TabData {
 typedef TabData ClaimTabCallback(TabId id);
 
 /// Representation of window ids.
-class WindowId {}
+class WindowId {
+  @override
+  String toString() => hashCode.toString();
+}
 
 /// Data associated with a window.
 class WindowData extends Model {
@@ -85,6 +91,18 @@ class WindowData extends Model {
       notifyListeners();
     }
     return result;
+  }
+
+  /// Returns the tab adjacent to [id] in the list in the direction specified by
+  /// [forward].
+  TabId next({@required TabId id, @required bool forward}) {
+    final int index = new List<int>.generate(tabs.length, (int x) => x)
+        .firstWhere((int i) => tabs[i].id == id, orElse: () => -1);
+    if (index == -1) {
+      return null;
+    }
+    final int nextIndex = (index + (forward ? 1 : -1)) % tabs.length;
+    return tabs[nextIndex].id;
   }
 }
 
