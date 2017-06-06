@@ -107,6 +107,9 @@ class Now extends StatefulWidget {
   /// Called when the user selects log out from the quick settings.
   final VoidCallback onLogoutSelected;
 
+  /// Called when the user taps the user context.
+  final VoidCallback onUserContextTapped;
+
   /// Constructor.
   Now({
     Key key,
@@ -125,6 +128,7 @@ class Now extends StatefulWidget {
     this.onOverscrollThresholdRelease,
     this.scrollController,
     this.onLogoutSelected,
+    this.onUserContextTapped,
   })
       : super(key: key);
 
@@ -298,11 +302,15 @@ class NowState extends TickingState<Now> {
                                   children: <Widget>[
                                     // User Context Text when maximized.
                                     new Expanded(
-                                      child: new Container(
-                                        key: _userContextTextKey,
-                                        height: _userImageSize,
-                                        child: nowModel.userContextMaximized(
-                                          opacity: _fallAwayOpacity,
+                                      child: new GestureDetector(
+                                        onTap: widget.onUserContextTapped,
+                                        behavior: HitTestBehavior.opaque,
+                                        child: new Container(
+                                          key: _userContextTextKey,
+                                          height: _userImageSize,
+                                          child: nowModel.userContextMaximized(
+                                            opacity: _fallAwayOpacity,
+                                          ),
                                         ),
                                       ),
                                     ),

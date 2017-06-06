@@ -89,17 +89,6 @@ Future<Null> main() async {
     hitTestModel: hitTestModel,
     interruptionOverlayKey: interruptionOverlayKey,
   );
-  Conductor conductor = new Conductor(
-    key: conductorKey,
-    blurScrimmedChildren: false,
-    onQuickSettingsOverlayChanged: hitTestModel.onQuickSettingsOverlayChanged,
-    onSuggestionsOverlayChanged: hitTestModel.onSuggestionsOverlayChanged,
-    storyClusterDragStateModel: storyClusterDragStateModel,
-    onLogoutSelected: userLogoutter.logout,
-    interruptionOverlayKey: interruptionOverlayKey,
-    onInterruptionDismissed:
-        suggestionProviderSuggestionModel.onInterruptionDismissal,
-  );
 
   StoryModel storyModel = new StoryModel(
     onFocusChanged: suggestionProviderSuggestionModel.storyClusterFocusChanged,
@@ -141,6 +130,30 @@ Future<Null> main() async {
 
   ContextProviderContextModel contextProviderContextModel =
       new ContextProviderContextModel();
+
+  ArmadilloUserShellModel model = new ArmadilloUserShellModel(
+    storyProviderStoryGenerator: storyProviderStoryGenerator,
+    suggestionProviderSuggestionModel: suggestionProviderSuggestionModel,
+    focusRequestWatcher: focusRequestWatcher,
+    initialFocusSetter: initialFocusSetter,
+    userLogoutter: userLogoutter,
+    onContextUpdated: contextProviderContextModel.onContextUpdated,
+    contextTopics: ContextProviderContextModel.topics,
+  );
+
+  Conductor conductor = new Conductor(
+    key: conductorKey,
+    blurScrimmedChildren: false,
+    onQuickSettingsOverlayChanged: hitTestModel.onQuickSettingsOverlayChanged,
+    onSuggestionsOverlayChanged: hitTestModel.onSuggestionsOverlayChanged,
+    storyClusterDragStateModel: storyClusterDragStateModel,
+    onLogoutSelected: userLogoutter.logout,
+    interruptionOverlayKey: interruptionOverlayKey,
+    onInterruptionDismissed:
+        suggestionProviderSuggestionModel.onInterruptionDismissal,
+    onUserContextTapped: model.onUserContextTapped,
+  );
+
   NowModel nowModel = new NowModel();
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();
@@ -196,15 +209,7 @@ Future<Null> main() async {
   UserShellWidget<ArmadilloUserShellModel> userShellWidget =
       new UserShellWidget<ArmadilloUserShellModel>(
     applicationContext: new ApplicationContext.fromStartupInfo(),
-    userShellModel: new ArmadilloUserShellModel(
-      storyProviderStoryGenerator: storyProviderStoryGenerator,
-      suggestionProviderSuggestionModel: suggestionProviderSuggestionModel,
-      focusRequestWatcher: focusRequestWatcher,
-      initialFocusSetter: initialFocusSetter,
-      userLogoutter: userLogoutter,
-      onContextUpdated: contextProviderContextModel.onContextUpdated,
-      contextTopics: ContextProviderContextModel.topics,
-    ),
+    userShellModel: model,
     child:
         _kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app,
   )..advertise();

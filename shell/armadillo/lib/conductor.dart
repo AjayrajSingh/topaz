@@ -77,6 +77,9 @@ class Conductor extends StatefulWidget {
   /// Called when the user selects log out from the quick settings.
   final VoidCallback onLogoutSelected;
 
+  /// Called when the user taps the user context.
+  final VoidCallback onUserContextTapped;
+
   /// Used to manage peeking.
   final StoryClusterDragStateModel storyClusterDragStateModel;
 
@@ -94,6 +97,7 @@ class Conductor extends StatefulWidget {
     this.onQuickSettingsOverlayChanged,
     this.onSuggestionsOverlayChanged,
     this.onLogoutSelected,
+    this.onUserContextTapped,
     this.storyClusterDragStateModel,
     this.interruptionOverlayKey,
     this.onInterruptionDismissed,
@@ -386,6 +390,7 @@ class ConductorState extends State<Conductor> {
               _suggestionOverlayKey.currentState.show(),
           scrollController: _scrollController,
           onLogoutSelected: widget.onLogoutSelected,
+          onUserContextTapped: widget.onUserContextTapped,
         ),
       );
 

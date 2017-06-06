@@ -17,6 +17,8 @@ import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
 
+const String _kLocationTopic = '/location/home_work';
+
 typedef void _OnContextUpdated(Map<String, String> context);
 
 /// Connects [UserShell]'s services to Armadillo's associated classes.
@@ -96,6 +98,24 @@ class ArmadilloUserShellModel extends UserShellModel {
   void onStop() {
     _contextListenerBinding.close();
     super.onStop();
+  }
+
+  /// Called when the user context is tapped.
+  void onUserContextTapped() {
+    _currentLocation = _nextLocation;
+    contextPublisher.publish(_kLocationTopic, _currentLocation);
+  }
+
+  String _currentLocation = 'unknown';
+  String get _nextLocation {
+    switch (_currentLocation) {
+      case 'home':
+        return 'unknown';
+      case 'work':
+        return 'home';
+      default:
+        return 'work';
+    }
   }
 }
 
