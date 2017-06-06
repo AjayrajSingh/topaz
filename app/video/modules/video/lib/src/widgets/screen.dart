@@ -2,7 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
+
+import '../modular/module_model.dart';
 
 /// The screen to video player.
 class Screen extends StatelessWidget {
@@ -12,13 +17,31 @@ class Screen extends StatelessWidget {
   })
       : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildScreen(VideoModuleModel model) {
     return new Expanded(
       child: new Center(
-        child: new Text('screen goes here!',
-            style: new TextStyle(color: Colors.grey[50])),
+        child: new GestureDetector(
+          onTap: null,
+          child: model.videoViewConnection != null
+              ? new ChildView(connection: model.videoViewConnection)
+              : new Container(),
+        ),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new ScopedModelDescendant<VideoModuleModel>(
+      builder: (
+        BuildContext context,
+        Widget child,
+        VideoModuleModel model,
+      ) {
+        // TODO(maryxia) SO-480 make this conditional via onTap
+        model.brieflyShowControlOverlay();
+        return _buildScreen(model);
+      },
     );
   }
 }

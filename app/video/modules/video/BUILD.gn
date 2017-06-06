@@ -11,9 +11,12 @@ flutter_app("video") {
 
   deps = [
     "//application/lib/app/dart",
+    "//apps/media/lib/flutter",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
+    "//apps/modular/services/user:user_dart",
     "//apps/mozart/services/views:views_dart",
+    "//apps/netconnector/services:services_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//lib/widgets/packages/widgets:lib.widgets",

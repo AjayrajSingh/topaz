@@ -21,7 +21,7 @@ class VideoApp extends StatelessWidget {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(
-          'Video Player!!',
+          'Video Player',
         ),
         backgroundColor: Colors.blue.shade200,
       ),
@@ -32,9 +32,7 @@ class VideoApp extends StatelessWidget {
             Widget child,
             VideoModuleModel model,
           ) {
-            return new Player(
-              model: model,
-            );
+            return new Player();
           },
         ),
       ),

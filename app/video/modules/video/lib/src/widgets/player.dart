@@ -3,37 +3,56 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/model.dart';
 
 import '../modular/module_model.dart';
-import 'play_bar.dart';
-import 'screen.dart';
+import '../widgets.dart';
 
 /// The screen to video player.
 class Player extends StatelessWidget {
-  /// Model that stores video playback state
-  final VideoModuleModel model;
-
   /// The screen for video player
   Player({
     Key key,
-    this.model,
   })
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Widget screen = new Screen();
-    Widget playbar = new PlayBar(
-      model: model,
+    Widget screen = new ScopedModelDescendant<VideoModuleModel>(
+      builder: (
+        BuildContext context,
+        Widget child,
+        VideoModuleModel model,
+      ) {
+        return new Screen();
+      },
     );
-    return new Container(
-      color: Colors.black,
-      child: new Column(
-        children: <Widget>[
-          screen,
-          playbar,
-        ],
-      ),
+
+    Widget playbar = new ScopedModelDescendant<VideoModuleModel>(
+      builder: (
+        BuildContext context,
+        Widget child,
+        VideoModuleModel model,
+      ) {
+        return new PlayBar();
+      },
     );
+
+    // TODO(maryxia) SO-477 optimize aspect ratio
+    return new ScopedModelDescendant<VideoModuleModel>(builder: (
+      BuildContext context,
+      Widget child,
+      VideoModuleModel model,
+    ) {
+      return new Container(
+        color: Colors.black,
+        child: new Column(
+          children: <Widget>[
+            screen,
+            playbar,
+          ],
+        ),
+      );
+    });
   }
 }

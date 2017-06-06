@@ -10,13 +10,15 @@ import 'src/modular/module_model.dart';
 import 'src/widgets.dart';
 
 void main() {
+  ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
   ModuleWidget<VideoModuleModel> moduleWidget =
       new ModuleWidget<VideoModuleModel>(
-    moduleModel: new VideoModuleModel(),
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    moduleModel: new VideoModuleModel(
+      appContext: _appContext,
+    ),
+    applicationContext: _appContext,
     child: new VideoApp(),
   );
-
   moduleWidget.advertise();
 
   runApp(moduleWidget);
