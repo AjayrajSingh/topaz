@@ -13,42 +13,83 @@ import 'dashboard_app.dart';
 import 'dashboard_module_model.dart';
 
 const String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/fuchsia/';
-const Map<String, List<List<String>>> _kTargetsMap =
-    const <String, List<List<String>>>{
-  'fuchsia': const <List<String>>[
-    const <String>['fuchsia-x86_64-linux-debug', 'x86_64-linux-debug'],
-    const <String>['fuchsia-aarch64-linux-debug', 'aarch64-linux-debug'],
-    const <String>['fuchsia-x86_64-linux-release', 'x86_64-linux-release'],
-    const <String>['fuchsia-aarch64-linux-release', 'aarch64-linux-release'],
+const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
+  const <List<String>>[
+    const <String>[
+      'fuchsia-x86_64-linux-debug',
+      'x86_64-linux-debug',
+      'fuchsia'
+    ],
+    const <String>[
+      'fuchsia-aarch64-linux-debug',
+      'aarch64-linux-debug',
+      'fuchsia'
+    ],
+    const <String>[
+      'fuchsia-x86_64-linux-release',
+      'x86_64-linux-release',
+      'fuchsia'
+    ],
+    const <String>[
+      'fuchsia-aarch64-linux-release',
+      'aarch64-linux-release',
+      'fuchsia'
+    ],
   ],
-  'fuchsia-drivers': const <List<String>>[
-    const <String>['drivers-x86_64-linux-debug', 'x86_64-linux-debug'],
-    const <String>['drivers-aarch64-linux-debug', 'aarch64-linux-debug'],
-    const <String>['drivers-x86_64-linux-release', 'x86_64-linux-release'],
-    const <String>['drivers-aarch64-linux-release', 'aarch64-linux-release'],
+  const <List<String>>[
+    const <String>[
+      'drivers-x86_64-linux-debug',
+      'x86_64-linux-debug',
+      'drivers'
+    ],
+    const <String>[
+      'drivers-aarch64-linux-debug',
+      'aarch64-linux-debug',
+      'drivers'
+    ],
+    const <String>[
+      'drivers-x86_64-linux-release',
+      'x86_64-linux-release',
+      'drivers'
+    ],
+    const <String>[
+      'drivers-aarch64-linux-release',
+      'aarch64-linux-release',
+      'drivers'
+    ],
   ],
-  'magenta': const <List<String>>[
-    const <String>['magenta-aarch64-linux-gcc', 'aarch64-linux-gcc'],
-    const <String>['magenta-x86_64-linux-gcc', 'x86_64-linux-gcc'],
-    const <String>['magenta-aarch64-linux-clang', 'aarch64-linux-clang'],
-    const <String>['magenta-x86_64-linux-clang', 'x86_64-linux-clang'],
+  const <List<String>>[
+    const <String>['magenta-aarch64-linux-gcc', 'aarch64-linux-gcc', 'magenta'],
+    const <String>['magenta-x86_64-linux-gcc', 'x86_64-linux-gcc', 'magenta'],
+    const <String>[
+      'magenta-aarch64-linux-clang',
+      'aarch64-linux-clang',
+      'magenta'
+    ],
+    const <String>[
+      'magenta-x86_64-linux-clang',
+      'x86_64-linux-clang',
+      'magenta'
+    ],
   ],
-  'jiri': const <List<String>>[
-    const <String>['jiri-x86_64-linux', 'x86_64-linux'],
-    const <String>['jiri-x86_64-mac', 'x86_64-mac'],
+  const <List<String>>[
+    const <String>['web_view-x86_64-linux', 'x86_64-linux', 'web_view'],
+    const <String>['web_view-aarch64-linux', 'aarch64-linux', 'web_view'],
+    const <String>['jiri-x86_64-linux', 'x86_64-linux', 'jiri'],
+    const <String>['jiri-x86_64-mac', 'x86_64-mac', 'jiri'],
   ]
-};
+];
 
 void main() {
   http.Client client = createHttpClient();
   final List<List<BuildStatusModel>> buildStatusModels =
       <List<BuildStatusModel>>[];
 
-  _kTargetsMap.forEach((String categoryName, List<List<String>> buildConfigs) {
+  _kTargetsMap.forEach((List<List<String>> buildConfigs) {
     List<BuildStatusModel> categoryModels = <BuildStatusModel>[];
     buildConfigs.forEach((List<String> config) {
       BuildStatusModel buildStatusModel = new BuildStatusModel(
-        type: categoryName,
+        type: config[2],
         name: config[1],
         url: _kBaseURL + config[0],
         client: client,
