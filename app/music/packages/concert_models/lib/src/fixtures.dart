@@ -32,6 +32,8 @@ class MusicModelFixtures extends Fixtures {
         country: 'UK',
         id: 24426,
       ),
+      latitude: 51.4650846,
+      longitude: -0.1150322,
       street: '211 Stockwell Road',
       zip: 'SW9 9SL',
       phoneNumber: '020 7771 3000',
@@ -46,6 +48,7 @@ class MusicModelFixtures extends Fixtures {
           'Vampire Weekend with Fan Death at O2 Academy Brixton (February 16, 2010)',
       type: 'Concert',
       startTime: DateTime.parse('2010-02-16T19:30:00+0000'),
+      date: DateTime.parse('2010-02-16'),
       venue: venue(),
       performances: <Performance>[
         new Performance(

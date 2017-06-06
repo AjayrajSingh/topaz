@@ -19,6 +19,7 @@ void main() {
     expect(event.name, eventFixture.name);
     expect(event.type, eventFixture.type);
     expect(event.startTime, eventFixture.startTime);
+    expect(event.date, eventFixture.date);
     expect(event.venue.id, eventFixture.venue.id);
     expect(event.performances[0].id, eventFixture.performances[0].id);
     expect(event.performances[0].name, eventFixture.performances[0].name);

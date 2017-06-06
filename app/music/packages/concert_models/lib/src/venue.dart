@@ -30,6 +30,12 @@ class Venue {
   /// Phone number of venue
   final String phoneNumber;
 
+  /// Latitude of venue
+  final double latitude;
+
+  /// Longitude of venue
+  final double longitude;
+
   /// ID of venue
   final int id;
 
@@ -43,6 +49,8 @@ class Venue {
     this.street,
     this.zip,
     this.phoneNumber,
+    this.latitude,
+    this.longitude,
     this.id,
   });
 
@@ -61,6 +69,8 @@ class Venue {
       street: json['street'],
       zip: json['zip'],
       phoneNumber: json['phone'],
+      latitude: json['lat'],
+      longitude: json['lng'],
       id: json['id'],
     );
   }

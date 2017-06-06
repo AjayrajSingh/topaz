@@ -28,6 +28,8 @@ void main() {
     expect(venue.street, venueFixture.street);
     expect(venue.zip, venueFixture.zip);
     expect(venue.phoneNumber, venueFixture.phoneNumber);
+    expect(venue.latitude, venueFixture.latitude);
+    expect(venue.longitude, venueFixture.longitude);
     expect(venue.id, venueFixture.id);
   });
 }

@@ -20,6 +20,9 @@ class Event {
   /// Time that this event starts at
   final DateTime startTime;
 
+  /// The date of the concert
+  final DateTime date;
+
   /// [Venue] of this event
   final Venue venue;
 
@@ -34,6 +37,7 @@ class Event {
     this.name,
     this.type,
     this.startTime,
+    this.date,
     this.venue,
     this.performances,
     this.id,
@@ -48,6 +52,10 @@ class Event {
               json['start']['datetime'] != null
           ? DateTime.parse(json['start']['datetime'])
           : null,
+      date:
+          json['start'] is Map<String, String> && json['start']['date'] != null
+              ? DateTime.parse(json['start']['date'])
+              : null,
       venue: json['venue'] is Map<String, dynamic>
           ? new Venue.fromJson(json['venue'])
           : null,
