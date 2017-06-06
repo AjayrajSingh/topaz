@@ -422,9 +422,10 @@ class ConductorState extends State<Conductor> {
       onShow: () {
         widget.onSuggestionsOverlayChanged?.call(true);
       },
-      childAboveBuilder: (_, __) => childAboveBuilder(
-            _,
-            __,
+      childAboveBuilder: (BuildContext context, double overlayHeight) =>
+          childAboveBuilder(
+            context,
+            overlayHeight,
             SuggestionListState.getSuggestionWidth(
               maxWidth,
               suggestionColumnCount,
@@ -436,9 +437,7 @@ class ConductorState extends State<Conductor> {
       child: new SuggestionList(
         key: _suggestionListKey,
         scrollController: _suggestionListScrollController,
-        columnCount: maxWidth > _kSuggestionListThreeColumnWidthThreshold
-            ? 3
-            : maxWidth > _kSuggestionListTwoColumnWidthThreshold ? 2 : 1,
+        columnCount: suggestionColumnCount,
         onAskingStarted: () {
           _suggestionOverlayKey.currentState.show();
         },
