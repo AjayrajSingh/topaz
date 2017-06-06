@@ -28,12 +28,6 @@ const List<String> _kHomeProposals = const <String>[
 
 const String _kLocationHomeWorkTopic = '/location/home_work';
 
-enum _Location {
-  home,
-  work,
-  unknown,
-}
-
 HomeWorkAgent _agent;
 
 /// An implementation of the [Agent] interface.
@@ -45,8 +39,6 @@ class HomeWorkAgent extends AgentImpl {
   final ContextListenerBinding _contextListenerBinding =
       new ContextListenerBinding();
   final Set<CustomActionBinding> _bindingSet = new Set<CustomActionBinding>();
-
-  _Location _currentLocation = _Location.unknown;
 
   /// Constructor.
   HomeWorkAgent({
@@ -80,7 +72,6 @@ class HomeWorkAgent extends AgentImpl {
           onTopicChanged: (String location) {
             _kHomeProposals.forEach(_proposalPublisher.remove);
             _kWorkProposals.forEach(_proposalPublisher.remove);
-            _proposalPublisher.propose(_proposal);
             switch (location) {
               case 'work':
                 _kWorkProposals
@@ -99,8 +90,6 @@ class HomeWorkAgent extends AgentImpl {
         ),
       ),
     );
-
-    _publish();
   }
 
   @override
@@ -110,74 +99,6 @@ class HomeWorkAgent extends AgentImpl {
     _proposalPublisher.ctrl.close();
     _contextListenerBinding.close();
     _bindingSet.forEach((CustomActionBinding binding) => binding.close());
-  }
-
-  /// Publishes context indicating the user is at home.
-  void publishHome() {
-    _currentLocation = _Location.home;
-    _publish();
-  }
-
-  /// Publishes context indicating the user is at work.
-  void publishWork() {
-    _currentLocation = _Location.work;
-    _publish();
-  }
-
-  /// Publishes context indicating the user is neither at home nor work.
-  void publishUnknown() {
-    _currentLocation = _Location.unknown;
-    _publish();
-  }
-
-  void _publish() => _contextPublisher.publish(
-        _kLocationHomeWorkTopic,
-        _locationToString(_currentLocation),
-      );
-
-  String _locationToString(_Location location) {
-    switch (location) {
-      case _Location.home:
-        return 'home';
-      case _Location.work:
-        return 'work';
-      default:
-        return 'unknown';
-    }
-  }
-
-  Proposal get _proposal {
-    CustomActionBinding binding = new CustomActionBinding();
-    _bindingSet.add(binding);
-    final _Location nextLocation = _getNextLocation(_currentLocation);
-    return new Proposal()
-      ..id = 'Home/Work ${_locationToString(_currentLocation)}'
-      ..display = (new SuggestionDisplay()
-        ..headline = 'Set location to ${_locationToString(nextLocation)}.'
-        ..subheadline = ''
-        ..details = ''
-        ..color = 0xFFFF0080
-        ..iconUrls = const <String>[]
-        ..imageType = SuggestionImageType.other
-        ..imageUrl = '')
-      ..onSelected = <Action>[
-        new Action()
-          ..customAction = binding.wrap(
-            new _CustomActionImpl(onExecute: () {
-              switch (nextLocation) {
-                case _Location.home:
-                  publishHome();
-                  break;
-                case _Location.work:
-                  publishWork();
-                  break;
-                default:
-                  publishUnknown();
-                  break;
-              }
-            }),
-          )
-      ];
   }
 
   Proposal _createDummyProposal(String title) {
@@ -199,17 +120,6 @@ class HomeWorkAgent extends AgentImpl {
             new _CustomActionImpl(onExecute: () => null),
           )
       ];
-  }
-
-  _Location _getNextLocation(_Location location) {
-    switch (location) {
-      case _Location.home:
-        return _Location.work;
-      case _Location.work:
-        return _Location.unknown;
-      default:
-        return _Location.home;
-    }
   }
 }
 

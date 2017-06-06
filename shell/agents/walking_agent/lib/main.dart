@@ -22,11 +22,6 @@ const List<String> _kWalkingProposals = const <String>[
 
 const String _kActivityWalkingTopic = '/activity/walking';
 
-enum _Activity {
-  walking,
-  unknown,
-}
-
 WalkingAgent _agent;
 
 /// An implementation of the [Agent] interface.
@@ -38,8 +33,6 @@ class WalkingAgent extends AgentImpl {
   final ContextListenerBinding _contextListenerBinding =
       new ContextListenerBinding();
   final Set<CustomActionBinding> _bindingSet = new Set<CustomActionBinding>();
-
-  _Activity _currentActivity = _Activity.unknown;
 
   /// Constructor.
   WalkingAgent({
@@ -72,7 +65,6 @@ class WalkingAgent extends AgentImpl {
           proposalPublisher: _proposalPublisher,
           onTopicChanged: (String location) {
             _kWalkingProposals.forEach(_proposalPublisher.remove);
-            _proposalPublisher.propose(_proposal);
             switch (location) {
               case 'walking':
                 _kWalkingProposals
@@ -86,8 +78,6 @@ class WalkingAgent extends AgentImpl {
         ),
       ),
     );
-
-    _publish();
   }
 
   @override
@@ -97,63 +87,6 @@ class WalkingAgent extends AgentImpl {
     _proposalPublisher.ctrl.close();
     _contextListenerBinding.close();
     _bindingSet.forEach((CustomActionBinding binding) => binding.close());
-  }
-
-  /// Publishes context indicating the user is walking.
-  void publishWalking() {
-    _currentActivity = _Activity.walking;
-    _publish();
-  }
-
-  /// Publishes context indicating the user is not walking.
-  void publishUnknown() {
-    _currentActivity = _Activity.unknown;
-    _publish();
-  }
-
-  void _publish() => _contextPublisher.publish(
-        _kActivityWalkingTopic,
-        _activityToString(_currentActivity),
-      );
-
-  String _activityToString(_Activity activity) {
-    switch (activity) {
-      case _Activity.walking:
-        return 'walking';
-      default:
-        return 'unknown';
-    }
-  }
-
-  Proposal get _proposal {
-    CustomActionBinding binding = new CustomActionBinding();
-    _bindingSet.add(binding);
-    final _Activity nextActivity = _getNextActivity(_currentActivity);
-    return new Proposal()
-      ..id = 'Activity ${_activityToString(_currentActivity)}'
-      ..display = (new SuggestionDisplay()
-        ..headline = 'Set activity to ${_activityToString(nextActivity)}.'
-        ..subheadline = ''
-        ..details = ''
-        ..color = 0xFFFF0080
-        ..iconUrls = const <String>[]
-        ..imageType = SuggestionImageType.other
-        ..imageUrl = '')
-      ..onSelected = <Action>[
-        new Action()
-          ..customAction = binding.wrap(
-            new _CustomActionImpl(onExecute: () {
-              switch (nextActivity) {
-                case _Activity.walking:
-                  publishWalking();
-                  break;
-                default:
-                  publishUnknown();
-                  break;
-              }
-            }),
-          )
-      ];
   }
 
   Proposal _createDummyProposal(String title) {
@@ -175,15 +108,6 @@ class WalkingAgent extends AgentImpl {
             new _CustomActionImpl(onExecute: () => null),
           )
       ];
-  }
-
-  _Activity _getNextActivity(_Activity activity) {
-    switch (activity) {
-      case _Activity.walking:
-        return _Activity.unknown;
-      default:
-        return _Activity.walking;
-    }
   }
 }
 
