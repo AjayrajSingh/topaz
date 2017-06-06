@@ -1,4 +1,4 @@
-// Copyright 2016 The Fuchsia Authors. All rights reserved.
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -48,15 +48,17 @@ class Api {
   }
 
   /// List upcoming Songkick events for the given artist name.
+  /// If no artist name is given, then all nearby events will be retrieved.
   /// Only nearby (based on client IP address) events will shown.
   static Future<List<Event>> searchEventsByArtist(
-    @required String name,
+    String name,
     @required String apiKey,
   ) async {
-    assert(name != null);
     assert(apiKey != null);
     Map<String, String> query = new Map<String, String>();
-    query['artist_name'] = name;
+    if (name != null) {
+      query['artist_name'] = name;
+    }
     query['location'] = 'clientip';
     query['apikey'] = apiKey;
     Uri uri = new Uri.https(
