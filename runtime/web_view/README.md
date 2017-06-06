@@ -9,7 +9,7 @@ dependencies locally, add 'use_prebuilt_webkit=false' to your GN arguments and
 add 'webkit' to your module set:
 
 ```
-./packages/gn.gen.py -m default,webkit --args use_prebuilt_webkit=false
+./packages/gn/gen.py -m default,webkit --args use_prebuilt_webkit=false
 
 # or (if you're using env.sh)
 fset x86-64 --modules default,webkit --args use_prebuilt_webkit=false
