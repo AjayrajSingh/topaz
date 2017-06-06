@@ -1,5 +1,9 @@
 {
   "background_image": {
+    "default": "/system/data/sysui/WallpaperImage_004.jpg",
+    "home": "/system/data/sysui/WallpaperImage_001.jpg",
+    "walking": "/system/data/sysui/WallpaperImage_003.jpg",
+    "work": "/system/data/sysui/WallpaperImage_002.jpg"
   },
   "battery_percentage": {
   },

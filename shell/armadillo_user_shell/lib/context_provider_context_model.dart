@@ -39,7 +39,8 @@ class ContextProviderContextModel extends ContextModel {
   @override
   ImageProvider get backgroundImageProvider {
     String backgroundImageFile = _contextualBackgroundImages[_activity] ??
-        _contextualBackgroundImages[_location];
+        _contextualBackgroundImages[_location] ??
+        _contextualBackgroundImages['default'];
     if (backgroundImageFile == null) {
       return super.backgroundImageProvider;
     }
