@@ -3,4 +3,7 @@
 // found in the LICENSE file.
 
 export 'src/event_card.dart';
+export 'src/event_list.dart';
+export 'src/event_list_item.dart';
+export 'src/loader.dart';
 export 'src/loading_status.dart';

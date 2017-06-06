@@ -1,0 +1,22 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+name: concert_event_list
+description: Concert Event List Module
+
+dependencies:
+  flutter:
+    sdk: flutter
+  concert_api:
+    path: ../../packages/concert_api
+  concert_models:
+    path: ../../packages/concert_models
+  concert_widgets:
+    path: ../../packages/concert_widgets
+dev_dependencies:
+  test: any
+  flutter_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true
