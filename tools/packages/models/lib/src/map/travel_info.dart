@@ -2,6 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// Travel Modes used to calculate travel duration
+enum TravelMode {
+  /// Driving a car
+  driving,
+
+  /// Walking
+  walking,
+
+  /// Biking
+  bicycling,
+
+  /// Using public transit
+  transit,
+}
+
 /// This represents the travel time and distance between two locations
 ///
 /// Based off the Google Maps Distance Matrix API:
