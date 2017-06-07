@@ -4,10 +4,15 @@
 
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 
+import 'package:apps.modular.services.module/module_controller.fidl.dart';
+import 'package:apps.modular.services.story/link.fidl.dart';
+import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
+import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
 
 /// [ModuleModel] that manages the state of the Event Module.
@@ -20,6 +25,10 @@ class EventListModuleModel extends ModuleModel {
   Event _selectedEvent;
 
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
+
+  /// Link meant to be used by the event page module
+  /// This link contains the ID of the event that is focused
+  LinkProxy _eventLink;
 
   /// Constructor
   EventListModuleModel({this.apiKey}) : super() {
@@ -36,6 +45,17 @@ class EventListModuleModel extends ModuleModel {
   /// Get the currently selected event
   Event get selectedEvent => _selectedEvent;
 
+  String get _selectedEventLinkData {
+    if (_selectedEvent == null) {
+      return '';
+    } else {
+      Map<String, dynamic> data = <String, dynamic>{
+        'songkick:eventId': _selectedEvent.id,
+      };
+      return JSON.encode(data);
+    }
+  }
+
   /// Retrieves the events
   Future<Null> _fetchEvents() async {
     try {
@@ -45,9 +65,7 @@ class EventListModuleModel extends ModuleModel {
       } else {
         _loadingStatus = LoadingStatus.failed;
       }
-    } catch (error, stackTrace) {
-      print(error);
-      print(stackTrace);
+    } catch (_) {
       _loadingStatus = LoadingStatus.failed;
     }
     notifyListeners();
@@ -57,8 +75,36 @@ class EventListModuleModel extends ModuleModel {
   void selectEvent(Event event) {
     _selectedEvent = event;
 
-    //TODO(dayang@): Create new EventPage Module using the presenter
+    if (_eventLink == null) {
+      _eventLink = new LinkProxy();
+      moduleContext.getLink('event_link', _eventLink.ctrl.request());
+      _eventLink.set(<String>[], _selectedEventLinkData);
+
+      // TODO(dayang@) : Preserve module/surface relationship when this story is
+      // rehydrated by the framework
+      // https://fuchsia.atlassian.net/browse/SO-482
+
+      moduleContext.startModuleInShell(
+        'event_module',
+        'file:///system/apps/concert_event_page',
+        'event_link',
+        null, // outgoingServices,
+        null, // incomingServices,
+        new InterfacePair<ModuleController>().passRequest(),
+        new SurfaceRelation()
+          ..arrangement = SurfaceArrangement.copresent
+          ..emphasis = 1.7
+          ..dependency = SurfaceDependency.dependent,
+      );
+    } else {
+      _eventLink.set(<String>[], _selectedEventLinkData);
+    }
 
     notifyListeners();
+  }
+
+  @override
+  void onStop() {
+    _eventLink?.ctrl?.close();
   }
 }
