@@ -97,6 +97,7 @@ class ChatContentProviderAgent extends AgentImpl {
       ChatContentProvider.serviceName,
     );
 
+    proposer.load();
     _log('onReady end.');
   }
 
