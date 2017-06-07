@@ -101,8 +101,10 @@ class Surface extends Model {
   /// Spans the full tree of all copresenting surfaces starting with this
   Tree<Surface> get copresentSpanningTree => _spanningTree(
       null,
-      _surface(_node),
-      (Surface s) => s.relation.arrangement == SurfaceArrangement.copresent);
+      _surface(_node), // default to co-present if no opinion presented
+      (Surface s) =>
+          s.relation.arrangement == SurfaceArrangement.copresent ||
+          s.relation.arrangement == SurfaceArrangement.none);
 
   Tree<Surface> _spanningTree(Surface previous, Surface current,
       _SurfaceSpanningTreeCondition condition) {

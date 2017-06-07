@@ -252,7 +252,10 @@ class MainWidget extends StatelessWidget {
           new Grouping(
             children: <Widget>[
               new CopresentLauncher(),
-              new LaunchModuleButton(null, 'No Relation'),
+              new LaunchModuleButton(
+                  new SurfaceRelation()
+                    ..arrangement = SurfaceArrangement.sequential,
+                  'Sequential'),
             ],
           ),
           new Grouping(
