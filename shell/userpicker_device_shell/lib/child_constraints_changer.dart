@@ -27,14 +27,16 @@ class ChildConstraintsChanger extends StatefulWidget {
   final Widget child;
 
   /// Constructor.
-  ChildConstraintsChanger({this.constraintsModel, this.child});
+  ChildConstraintsChanger({Key key, this.constraintsModel, this.child})
+      : super(key: key);
 
   @override
-  _ChildConstraintsChangerState createState() =>
-      new _ChildConstraintsChangerState();
+  ChildConstraintsChangerState createState() =>
+      new ChildConstraintsChangerState();
 }
 
-class _ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
+/// Keeps track of the current constraints.
+class ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
   final GlobalKey _containerKey = new GlobalKey();
   List<BoxConstraints> _constraints;
   int _currentConstraintIndex = 0;
@@ -171,6 +173,18 @@ class _ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
   void _exitConstraints() => setState(() {
         _useConstraints = false;
       });
+
+  /// Toggles through the constraints.
+  void toggleConstraints() {
+    if (!_useConstraints) {
+      _enterConstraints();
+    } else {
+      _switchConstraints();
+      if (_currentConstraintIndex % _constraints.length == 0) {
+        _exitConstraints();
+      }
+    }
+  }
 
   void _onChange() {
     setState(() {

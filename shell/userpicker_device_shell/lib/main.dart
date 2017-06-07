@@ -39,6 +39,8 @@ void main() {
     ),
   );
 
+  GlobalKey<ChildConstraintsChangerState> childConstraintsChangerKey =
+      new GlobalKey<ChildConstraintsChangerState>();
   DeviceShellWidget<UserPickerDeviceShellModel> deviceShellWidget =
       new DeviceShellWidget<UserPickerDeviceShellModel>(
     applicationContext: applicationContext,
@@ -49,6 +51,7 @@ void main() {
       onStopOverlay: authenticationOverlayModel.onStopOverlay,
     ),
     child: new ChildConstraintsChanger(
+      key: childConstraintsChangerKey,
       constraintsModel: constraintsModel,
       child: softKeyboardContainerImpl.wrap(
         child: new Container(
@@ -105,4 +108,16 @@ void main() {
   constraintsModel.load(rootBundle);
   deviceShellWidget.advertise();
   softKeyboardContainerImpl.advertise();
+  RawKeyboard.instance.addListener((RawKeyEvent event) {
+    final bool isDown = event is RawKeyDownEvent;
+    final RawKeyEventDataFuchsia data = event.data;
+    // Flip through constraints with Ctrl-`.
+    // Trigger on up to avoid repeats.
+    if (!isDown &&
+            (data.codePoint == 96) && // `
+            (data.modifiers & 24) != 0 // Ctrl down
+        ) {
+      childConstraintsChangerKey.currentState.toggleConstraints();
+    }
+  });
 }
