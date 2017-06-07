@@ -13,5 +13,3 @@ dependencies:
     path: ../../packages/widgets
 flutter:
   uses-material-design: true
-  assets:
-    - assets/config.json
