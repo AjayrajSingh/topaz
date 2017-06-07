@@ -33,8 +33,6 @@ abstract class AgentImpl extends Agent {
   final List<ServiceProviderBinding> _outgoingServicesBindings =
       <ServiceProviderBinding>[];
 
-  Completer<Null> _ready;
-
   /// Creates a new instance of [AgentImpl].
   AgentImpl({@required ApplicationContext applicationContext})
       : _applicationContext = applicationContext {
@@ -56,14 +54,6 @@ abstract class AgentImpl extends Agent {
     InterfaceHandle<AgentContext> agentContext,
     void callback(),
   ) async {
-    // We would like to suppress the initialize() logic being run multiple times
-    // and just reuse the same entities.
-    // SEE: https://fuchsia.atlassian.net/browse/FW-190
-    if (_ready != null) {
-      return _ready.future;
-    }
-    _ready = new Completer<Null>();
-
     _agentContext.ctrl.bind(agentContext);
     _agentContext.getComponentContext(_componentContext.ctrl.request());
     _agentContext.getTokenProvider(_tokenProvider.ctrl.request());
@@ -77,8 +67,6 @@ abstract class AgentImpl extends Agent {
     );
 
     callback();
-
-    _ready.complete();
   }
 
   @override
