@@ -19,6 +19,8 @@ import 'package:apps.modules.music.services.player/player.fidl.dart'
     as player_fidl;
 import 'package:apps.modules.music.services.player/track.fidl.dart'
     as track_fidl;
+import 'package:apps.mozart.lib.flutter/child_view.dart';
+import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
@@ -28,6 +30,8 @@ import 'package:music_widgets/music_widgets.dart';
 
 const String _kPlayerUrl = 'file:///system/apps/music_playback_agent';
 
+const String _kPlaybackModuleUrl = 'file:///system/apps/music_playback';
+
 /// The context topic for "focal entities"
 const String _kFocalEntitiesTopic = 'focal_entities';
 
@@ -36,6 +40,15 @@ const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
 
 /// [ModuleModel] that manages the state of the Artist Module.
 class ArtistModuleModel extends ModuleModel {
+  /// Constructor
+  ArtistModuleModel({
+    @required this.clientId,
+    @required this.clientSecret,
+  }) {
+    assert(clientId != null);
+    assert(clientSecret != null);
+  }
+
   /// The artist for this given module
   Artist artist;
 
@@ -53,22 +66,19 @@ class ArtistModuleModel extends ModuleModel {
 
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
 
+  /// Get the current loading status
+  LoadingStatus get loadingStatus => _loadingStatus;
+
+  /// Child View Connection for the Playback Module
+  ChildViewConnection _playbackViewConn;
+
+  /// Getter for the Playback Module child view connection
+  ChildViewConnection get playbackViewConn => _playbackViewConn;
+
   final AgentControllerProxy _playbackAgentController =
       new AgentControllerProxy();
 
   final player_fidl.PlayerProxy _player = new player_fidl.PlayerProxy();
-
-  /// Constructor
-  ArtistModuleModel({
-    @required this.clientId,
-    @required this.clientSecret,
-  }) {
-    assert(clientId != null);
-    assert(clientSecret != null);
-  }
-
-  /// Get the current loading status
-  LoadingStatus get loadingStatus => _loadingStatus;
 
   /// Retrieves all the data necessary to render the artist module
   Future<Null> fetchArtist(String artistId) async {
@@ -116,6 +126,8 @@ class ArtistModuleModel extends ModuleModel {
       _playbackAgentController.ctrl.request(),
     );
     connectToService(playerServices, _player.ctrl);
+
+    _startPlaybackModule();
 
     // Close all the unnecessary bindings.
     playerServices.ctrl.close();
@@ -243,5 +255,21 @@ class ArtistModuleModel extends ModuleModel {
         null,
       );
     }
+  }
+
+  /// Starts the embedded Playback Module
+  void _startPlaybackModule() {
+    InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
+    moduleContext.startModule(
+      'Music Playback',
+      _kPlaybackModuleUrl,
+      '',
+      null,
+      null,
+      new InterfacePair<ModuleController>().passRequest(),
+      viewOwner.passRequest(),
+    );
+    _playbackViewConn = new ChildViewConnection(viewOwner.passHandle());
+    notifyListeners();
   }
 }
