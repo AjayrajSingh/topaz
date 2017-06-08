@@ -10,7 +10,6 @@ common_makefile := $(realpath $(common_root)/Makefile)
 # Assumes that the project is located three levels deep in the Fuchsia tree,
 # specifically: $FUCHSIA_DIR/apps/modules/<project>.
 PROJECT := ../mondrian
-FLUTTER_TARGET := mondrian # UNUSED, but required
 FUCHSIA_TARGET := mondrian
 
 include $(common_makefile)
