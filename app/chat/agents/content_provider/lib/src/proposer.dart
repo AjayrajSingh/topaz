@@ -87,7 +87,8 @@ class Proposer extends ContextListener {
       ..color = 0xFFFF0080
       ..iconUrls = const <String>[]
       ..imageType = SuggestionImageType.other
-      ..imageUrl = '')
+      ..imageUrl = ''
+      ..annoyance = AnnoyanceType.none)
     ..onSelected = <Action>[
       new Action()..focusStory = (new FocusStory()..storyId = '')
     ];
