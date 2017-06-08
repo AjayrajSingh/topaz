@@ -12,8 +12,9 @@ SHELL := /bin/bash
 
 # This Makefile is expected to be included in a parent Makefile for a given
 # project. In order for the conventions used by the tasks defined in this file
-# a PROJECT, FLUTTER_TARGET, and FUCHSIA_TARGET variables must be set, for
-# example:
+# PROJECT and FUCHSIA_TARGET variables must be set. Optionally, you may define
+# FLUTTER_TARGET variable if your project has a regular flutter app that runs on
+# Android / iOS. For example:
 #
 #     PROJECT := email
 #     FLUTTER_TARGET := modules/story
@@ -24,12 +25,6 @@ SHELL := /bin/bash
 ifndef PROJECT
 $(error PROJECT is not set. \
 Before including the common Makefile add "PROJECT := <project>" to \
-"$(firstword $(realpath $(MAKEFILE_LIST)))")
-endif
-
-ifndef FLUTTER_TARGET
-$(error FLUTTER_TARGET is not set. \
-Before including the common Makefile add "FLUTTER_TARGET := <target>" variable to \
 "$(firstword $(realpath $(MAKEFILE_LIST)))")
 endif
 
@@ -149,6 +144,11 @@ run: ## Run project on Fuchsia.
 
 .PHONY: flutter-run
 flutter-run: ## Run UI application in modules/<project> via `flutter run`.
+ifndef FLUTTER_TARGET
+	$(error FLUTTER_TARGET is not set. \
+	Before including the common Makefile add "FLUTTER_TARGET := <target>" variable to \
+	"$(firstword $(realpath $(MAKEFILE_LIST)))")
+endif
 	cd $(FLUTTER_TARGET) && \
 		$(flutter) packages upgrade && \
 		$(flutter) build clean && \
