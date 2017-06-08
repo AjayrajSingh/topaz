@@ -11,7 +11,6 @@ common_root := $(realpath $(fuchsia_root)/apps/modules/common/tools/common)
 common_makefile := $(realpath $(common_root)/Makefile)
 
 PROJECT := music
-FLUTTER_TARGET := modules/music
 FUCHSIA_TARGET := music
 
 include $(common_makefile)
