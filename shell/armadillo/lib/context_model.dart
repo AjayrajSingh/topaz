@@ -29,7 +29,7 @@ class ContextModel extends Model {
   String get wifiNetwork => 'GoogleGuest';
 
   /// The current contextual location.
-  String get contextualLocation => 'Mountain View';
+  String get contextualLocation => 'in Mountain View';
 
   /// The current time.
   String get timeOnly => _timeStringer.timeOnly;
