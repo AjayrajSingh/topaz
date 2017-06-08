@@ -101,7 +101,8 @@ class WalkingAgent extends AgentImpl {
         ..color = 0xFFFF0080
         ..iconUrls = const <String>[]
         ..imageType = SuggestionImageType.other
-        ..imageUrl = '')
+        ..imageUrl = ''
+        ..annoyance = AnnoyanceType.none)
       ..onSelected = <Action>[
         new Action()
           ..customAction = binding.wrap(
