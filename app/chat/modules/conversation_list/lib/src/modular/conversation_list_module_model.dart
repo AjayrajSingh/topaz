@@ -18,7 +18,6 @@ import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart'
     as chat_fidl;
 import 'package:collection/collection.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:models/user.dart';
 
@@ -43,6 +42,9 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   final chat_fidl.ChatContentProviderProxy _chatContentProvider =
       new chat_fidl.ChatContentProviderProxy();
+
+  final ModuleControllerProxy _conversationModuleController =
+      new ModuleControllerProxy();
 
   final MessageQueueProxy _messageQueue = new MessageQueueProxy();
   final Completer<String> _mqTokenCompleter = new Completer<String>();
@@ -70,6 +72,9 @@ class ChatConversationListModuleModel extends ModuleModel {
 
       notifyListeners();
     }
+
+    // Refocus the conversation module.
+    _conversationModuleController.focus();
   }
 
   /// Gets the list of chat conversations.
@@ -130,16 +135,13 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   /// Start the chat_conversation module in story shell.
   void _startConversationModule() {
-    InterfacePair<ModuleController> moduleControllerPair =
-        new InterfacePair<ModuleController>();
-
     moduleContext.startModuleInShell(
       'chat_conversation',
       _kChatConversationModuleUrl,
       null, // Pass on our default link to the child.
       null,
       null,
-      moduleControllerPair.passRequest(),
+      _conversationModuleController.ctrl.request(),
       new SurfaceRelation()
         ..arrangement = SurfaceArrangement.copresent
         ..emphasis = 2.0,
@@ -231,6 +233,7 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   @override
   void onStop() {
+    _conversationModuleController.ctrl.close();
     _chatContentProvider.ctrl.close();
     _chatContentProviderController.ctrl.close();
 
