@@ -6,7 +6,7 @@ packages:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.29.10"
+    version: "0.29.5"
   args:
     description:
       name: args
@@ -30,7 +30,7 @@ packages:
       name: cli_util
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1+2"
+    version: "0.1.1"
   collection:
     description:
       name: collection
@@ -64,11 +64,13 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.22"
+    version: "0.0.28-dev"
   flutter_markdown:
-    description: flutter
-    source: sdk
-    version: "0.1.0"
+    description:
+      name: flutter_markdown
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.9"
   glob:
     description:
       name: glob
@@ -104,7 +106,7 @@ packages:
       name: isolate
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "0.2.3"
   lists:
     description:
       name: lists
@@ -213,18 +215,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.9.7+3"
-  when:
-    description:
-      name: when
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.0"
-  which:
-    description:
-      name: which
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.3"
   widget_explorer_core:
     description:
       path: "../widget_explorer_core"

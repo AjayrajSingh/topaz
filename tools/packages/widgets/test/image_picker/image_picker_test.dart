@@ -29,11 +29,11 @@ void main() {
   List<String> _selectedImages = <String>[];
   List<String> _imagesToAdd = <String>[];
 
-  GoogleSearchImagePicker _createGoogleSearchImagePicker() {
+  ImagePicker _createImagePicker() {
     _selectedImages = <String>[];
     _imagesToAdd = <String>[];
 
-    return new GoogleSearchImagePicker(
+    return new ImagePicker(
       searchApi: new MockSearchAPI(),
       initialQuery: _query,
       initialSelection: null,
@@ -59,7 +59,7 @@ void main() {
         'clear when the user clicks the clear (x) icon',
     (WidgetTester tester) async {
       await tester.pumpWidget(new Material(
-        child: _createGoogleSearchImagePicker(),
+        child: _createImagePicker(),
       ));
       // rebuild imagePicker with new _sourceImages and _lastSearchQuery
       await tester.pump();
@@ -88,7 +88,7 @@ void main() {
     'The "x images selected" overlay should not appear when no images are selected',
     (WidgetTester tester) async {
       await tester.pumpWidget(new Material(
-        child: _createGoogleSearchImagePicker(),
+        child: _createImagePicker(),
       ));
       await tester.pump(); // rebuild imagePicker with new _sourceImages
 
@@ -102,7 +102,7 @@ void main() {
         ' one image is selected. Tapping on a selected image should unselect it',
     (WidgetTester tester) async {
       await tester.pumpWidget(new Material(
-        child: _createGoogleSearchImagePicker(),
+        child: _createImagePicker(),
       ));
       await tester.pump(); // rebuild imagePicker with new _sourceImages
 
@@ -131,7 +131,7 @@ void main() {
         ' with all the selected images',
     (WidgetTester tester) async {
       await tester.pumpWidget(new Material(
-        child: _createGoogleSearchImagePicker(),
+        child: _createImagePicker(),
       ));
       await tester.pump(); // rebuild imagePicker with new _sourceImages
 
@@ -162,7 +162,7 @@ void main() {
     'Tapping on the clear icon ("cancel" button) should unselect all images',
     (WidgetTester tester) async {
       await tester.pumpWidget(new Material(
-        child: _createGoogleSearchImagePicker(),
+        child: _createImagePicker(),
       ));
       await tester.pump(); // rebuild imagePicker with new _sourceImages
 

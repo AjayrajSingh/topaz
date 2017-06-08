@@ -6,7 +6,7 @@ name: widget_explorer_core
 description: APIs for extracting widget specs and generating widget explorer pages.
 dependencies:
   analyzer: any # See the dependency override below.
-  cli_util: ^0.0.1+2
+  cli_util: ^0.1.0
   dart_style: ^0.2.11+1
   glob: ^1.1.3
   mustache: ^0.2.5+1

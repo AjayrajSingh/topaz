@@ -26,7 +26,7 @@ class GalleryScreen extends StatelessWidget {
             GalleryModuleModel model,
           ) {
             return model.apiKey != null && model.customSearchId != null
-                ? new GoogleSearchImagePicker(
+                ? new ImagePicker(
                     searchApi: new GoogleSearchAPI(
                       apiKey: model.apiKey,
                       customSearchId: model.customSearchId,

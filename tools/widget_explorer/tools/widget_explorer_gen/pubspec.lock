@@ -6,7 +6,7 @@ packages:
       path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/analyzer"
       relative: true
     source: path
-    version: "0.30.0-alpha.1"
+    version: "0.30.0+2"
   args:
     description:
       name: args
@@ -42,7 +42,7 @@ packages:
       name: cli_util
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1+2"
+    version: "0.1.1"
   collection:
     description:
       name: collection
@@ -76,17 +76,17 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.25-dev"
+    version: "0.0.28-dev"
   flutter_test:
     description: flutter
     source: sdk
-    version: "0.0.3-dev"
+    version: "0.0.6-dev"
   front_end:
     description:
       path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/front_end"
       relative: true
     source: path
-    version: "0.1.0-alpha.1"
+    version: "0.1.0-alpha.4"
   glob:
     description:
       name: glob
@@ -134,7 +134,7 @@ packages:
       path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/kernel"
       relative: true
     source: path
-    version: "0.2.0"
+    version: "0.3.0-alpha.1"
   lists:
     description:
       name: lists
@@ -152,7 +152,7 @@ packages:
       name: matcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.0+2"
+    version: "0.12.1+1"
   meta:
     description:
       name: meta
@@ -296,7 +296,7 @@ packages:
       name: test
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.20"
+    version: "0.12.21"
   typed_data:
     description:
       name: typed_data
@@ -333,18 +333,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
-  when:
-    description:
-      name: when
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.0"
-  which:
-    description:
-      name: which
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.3"
   widget_explorer_core:
     description:
       path: "../../packages/widget_explorer_core"
