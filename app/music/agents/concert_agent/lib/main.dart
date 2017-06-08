@@ -95,7 +95,8 @@ class ContextListenerImpl extends ContextListener {
         ..color = 0xFFFF0080
         ..iconUrls = const <String>[]
         ..imageType = SuggestionImageType.other
-        ..imageUrl = events[0].venue.imageUrl)
+        ..imageUrl = events[0].venue.imageUrl
+        ..annoyance = AnnoyanceType.none)
       ..onSelected = <Action>[
         new Action()
           ..createStory = (new CreateStory()
