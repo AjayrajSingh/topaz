@@ -12,7 +12,6 @@ import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
 
 /// [ModuleModel] that manages the state of the Event Module.
@@ -25,6 +24,9 @@ class EventListModuleModel extends ModuleModel {
   Event _selectedEvent;
 
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
+
+  final ModuleControllerProxy _eventPageModuleController =
+      new ModuleControllerProxy();
 
   /// Link meant to be used by the event page module
   /// This link contains the ID of the event that is focused
@@ -90,7 +92,7 @@ class EventListModuleModel extends ModuleModel {
         'event_link',
         null, // outgoingServices,
         null, // incomingServices,
-        new InterfacePair<ModuleController>().passRequest(),
+        _eventPageModuleController.ctrl.request(),
         new SurfaceRelation()
           ..arrangement = SurfaceArrangement.copresent
           ..emphasis = 1.7
@@ -100,11 +102,14 @@ class EventListModuleModel extends ModuleModel {
       _eventLink.set(<String>[], _selectedEventLinkData);
     }
 
+    // Always focus on the EventPageModule surface in case it has been dismissed
+    _eventPageModuleController.focus();
     notifyListeners();
   }
 
   @override
   void onStop() {
+    _eventPageModuleController.ctrl.close();
     _eventLink?.ctrl?.close();
   }
 }
