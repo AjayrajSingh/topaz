@@ -21,13 +21,21 @@ void main() {
     moduleModel: playbackModuleModel,
     child: new Scaffold(
       backgroundColor: Colors.grey[300],
-      body: new Player(
-        currentTrack: playbackModuleModel.currentTrack,
-        playbackPosition: playbackModuleModel.playbackPosition,
-        isPlaying: playbackModuleModel.isPlaying,
-        onTogglePlay: playbackModuleModel.togglePlayPause,
-        onSkipNext: playbackModuleModel.next,
-        onSkipPrevious: playbackModuleModel.previous,
+      body: new ScopedModelDescendant<PlaybackModuleModel>(
+        builder: (
+          _,
+          __,
+          PlaybackModuleModel model,
+        ) {
+          return new Player(
+            currentTrack: playbackModuleModel.currentTrack,
+            playbackPosition: playbackModuleModel.playbackPosition,
+            isPlaying: playbackModuleModel.isPlaying,
+            onTogglePlay: playbackModuleModel.togglePlayPause,
+            onSkipNext: playbackModuleModel.next,
+            onSkipPrevious: playbackModuleModel.previous,
+          );
+        },
       ),
     ),
   );

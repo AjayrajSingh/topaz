@@ -77,11 +77,26 @@ class PlaybackModuleModel extends ModuleModel {
     // Attach listener to player status updates
     _statusListener = new PlayerStatusListenerImpl(
       onStatusUpdate: (PlayerStatus status) {
-        // TODO (dayang@) Serialize player track struct to widget track
-        // https://fuchsia.atlassian.net/browse/SO-459
         _isPlaying = status.isPlaying;
         _playbackPosition =
             new Duration(milliseconds: status.playbackPositionInMilliseconds);
+        _currentTrack = new Track(
+          name: status.track.title,
+          id: status.track.title,
+          duration: new Duration(seconds: status.track.durationInSeconds),
+          playbackUrl: status.track.playbackUrl,
+          artists: <Artist>[
+            new Artist(name: status.track.artist),
+          ],
+          album: new Album(
+            name: status.track.album,
+            images: <MusicImage>[
+              new MusicImage(
+                url: status.track.cover,
+              ),
+            ],
+          ),
+        );
         notifyListeners();
       },
     );
