@@ -13,6 +13,9 @@ flutter_app("concert_event_page") {
 
   deps = [
     "//application/lib/app/dart",
+    "//apps/maxwell/lib/dart",
+    "//apps/maxwell/services/context:context_dart",
+    "//apps/maxwell/services/user:user_dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modules/common/packages/config",

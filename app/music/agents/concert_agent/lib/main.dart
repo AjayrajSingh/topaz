@@ -57,7 +57,7 @@ class ContextListenerImpl extends ContextListener {
 
     List<dynamic> data =
         JSON.decode(result.values[_kCurrentFocalEntitiesTopic]);
-    for (var entity in data) {
+    for (dynamic entity in data) {
       if (!(entity is Map<String, dynamic>)) continue;
       if (entity.containsKey('@type') && entity['@type'] == _kMusicArtistType) {
         print('[concerts_agent] artist update: ${entity['name']}');
