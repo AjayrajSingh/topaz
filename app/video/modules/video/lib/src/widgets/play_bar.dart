@@ -128,6 +128,11 @@ class PlayBar extends StatelessWidget {
               model.progress.inMicroseconds == model.duration.inMicroseconds
                   ? null
                   : () => _forward(model)),
+          model.remote
+              ? _createIconButton(
+                  new Icon(Icons.local_activity), model.playLocal)
+              : _createIconButton(
+                  new Icon(Icons.settings_remote), model.playRemote)
         ],
       ),
     );

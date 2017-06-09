@@ -98,7 +98,7 @@ class Asset {
   Asset.remote({
     @required this.device,
     @required this.service,
-    @required this.position,
+    this.position,
     this.title,
     this.uri,
   })
