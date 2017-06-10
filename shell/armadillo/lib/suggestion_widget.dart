@@ -6,15 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'suggestion.dart';
+import 'suggestion_layout.dart';
 
-const String _kMicImageGrey600 =
-    'packages/armadillo/res/ic_mic_grey600_1x_web_24dp.png';
-
-/// Size of the suggestion text.
-const double _kFontSize = 16.0;
-
-/// Extra spacing between the characters in the suggestion text in ems.
-const double _kFontSpacingEm = _kFontSize * 0.12;
+const bool _kIconsDisabled = true;
 
 /// Spacing between lines of text and between the text and icon bar.
 const double _kVerticalSpacing = 8.0;
@@ -30,24 +24,13 @@ const double _kIconSize = 16.0;
 /// Spacing between icons in the icon bar.
 const double _kIconSpacing = 8.0;
 
-/// The suggestion text and icons are horizontally inset by this amount.
-const double _kHorizontalMargin = 24.0;
-
 /// Gives each suggestion a slight rounded edge.
 /// TODO(apwilson): We may want to animate this to zero when expanding the card
 /// to fill the screen.
-const double _kSuggestionCornerRadius = 4.0;
-
-/// The height of the suggestion.
-const double _kSuggestionHeight = 120.0;
+const double _kSuggestionCornerRadius = 8.0;
 
 /// The diameter of the person image.
-const double _kPersonImageDiameter = 80.0;
-
-/// The margin around the person image such that it sits in the center of the
-/// space allocated for the suggestion image.
-const double _kPersonImageInset =
-    (_kSuggestionHeight - _kPersonImageDiameter) / 2.0;
+const double _kPersonImageDiameter = 48.0;
 
 /// Displays a [Suggestion].
 class SuggestionWidget extends StatelessWidget {
@@ -70,92 +53,113 @@ class SuggestionWidget extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) => new Container(
-        height: _kSuggestionHeight,
-        child: new Offstage(
-          offstage: !visible,
-          child: new ClipRRect(
-            borderRadius: new BorderRadius.circular(_kSuggestionCornerRadius),
-            child: new Container(
-              color: Colors.white,
-              child: new GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: onSelected,
-                child: new Row(
-                  children: <Widget>[
-                    new Expanded(
-                      child: new Align(
-                        alignment: FractionalOffset.centerLeft,
-                        child: new Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: _kHorizontalMargin,
-                          ),
-                          child: new Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              new Text(
-                                suggestion.title,
-                                textAlign: TextAlign.left,
-                                style: new TextStyle(
-                                  fontSize: _kFontSize,
-                                  height: (_kFontSize + _kVerticalSpacing) /
-                                      _kFontSize,
-                                  letterSpacing: _kFontSpacingEm,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              new Offstage(
-                                offstage: suggestion.icons.length == 0,
-                                child: new Container(
-                                  margin: const EdgeInsets.only(
-                                    top: _kVerticalSpacing,
-                                    bottom: _kIconBarBottomMargin,
-                                  ),
-                                  height: _kIconSize,
-                                  child: new Row(
-                                    children: suggestion.icons
-                                        .map(
-                                          (WidgetBuilder builder) =>
-                                              new Container(
-                                                margin: const EdgeInsets.only(
-                                                    right: _kIconSpacing),
-                                                width: _kIconSize,
-                                                child: builder(context),
-                                              ),
-                                        )
-                                        .toList(),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    new Container(
-                      width: _kSuggestionHeight,
-                      child: suggestion.imageType == ImageType.circular
-                          ? new Padding(
-                              padding: const EdgeInsets.all(_kPersonImageInset),
-                              child: new ClipOval(
-                                child: new Container(
-                                  color: suggestion.themeColor,
-                                  child: suggestion.image?.call(context),
-                                ),
-                              ),
-                            )
-                          : new Container(
-                              color: suggestion.themeColor,
-                              constraints: new BoxConstraints.expand(),
-                              child: suggestion.image?.call(context),
-                            ),
-                    ),
-                  ],
+  Widget build(BuildContext context) => new LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints boxConstraints) {
+          suggestion.suggestionLayout.layout(boxConstraints.maxWidth);
+          Widget image = _buildImage(
+            context,
+            suggestion.suggestionLayout.suggestionHeight,
+          );
+          Widget textAndIcons = _buildTextAndIcons(
+            context,
+            suggestion.suggestionLayout.suggestionText,
+          );
+
+          List<Widget> rowChildren = suggestion.imageSide == ImageSide.left
+              ? <Widget>[image, textAndIcons]
+              : <Widget>[textAndIcons, image];
+
+          return new Container(
+            height: suggestion.suggestionLayout.suggestionHeight,
+            width: suggestion.suggestionLayout.suggestionWidth,
+            child: new Offstage(
+              offstage: !visible,
+              child: new ClipRRect(
+                borderRadius: new BorderRadius.circular(
+                  _kSuggestionCornerRadius,
+                ),
+                child: new Container(
+                  color: Colors.white,
+                  child: new GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onSelected,
+                    child: new Row(children: rowChildren),
+                  ),
                 ),
               ),
+            ),
+          );
+        },
+      );
+
+  Widget _buildTextAndIcons(BuildContext context, Widget suggestionText) =>
+      new Expanded(
+        child: new Align(
+          alignment: FractionalOffset.centerLeft,
+          child: new Padding(
+            padding: new EdgeInsets.only(
+              left: suggestion.suggestionLayout.leftTextPadding,
+              right: suggestion.suggestionLayout.rightTextPadding,
+            ),
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                suggestionText,
+                _buildIconBar(context),
+              ],
             ),
           ),
         ),
       );
+
+  Widget _buildIconBar(BuildContext context) => new Offstage(
+        offstage: suggestion.icons.length == 0 || _kIconsDisabled,
+        child: new Container(
+          margin: const EdgeInsets.only(
+            top: _kVerticalSpacing,
+            bottom: _kIconBarBottomMargin,
+          ),
+          height: _kIconSize,
+          child: new Row(
+            children: suggestion.icons
+                .map(
+                  (WidgetBuilder builder) => new Container(
+                        margin: const EdgeInsets.only(right: _kIconSpacing),
+                        width: _kIconSize,
+                        child: builder(context),
+                      ),
+                )
+                .toList(),
+          ),
+        ),
+      );
+
+  Widget _buildImage(BuildContext context, double suggestionHeight) =>
+      suggestion.image == null
+          ? new Container(width: 0.0)
+          : new Container(
+              width: kSuggestionImageWidth,
+              child: suggestion.imageType == ImageType.circular
+                  ? new Padding(
+                      padding: new EdgeInsets.symmetric(
+                        vertical:
+                            (suggestionHeight - _kPersonImageDiameter) / 2.0,
+                        horizontal:
+                            (kSuggestionImageWidth - _kPersonImageDiameter) /
+                                2.0,
+                      ),
+                      child: new ClipOval(
+                        child: new SizedBox(
+                          width: _kPersonImageDiameter,
+                          height: _kPersonImageDiameter,
+                          child: suggestion.image.call(context),
+                        ),
+                      ),
+                    )
+                  : new Container(
+                      constraints: new BoxConstraints.expand(),
+                      child: suggestion.image.call(context),
+                    ),
+            );
 }

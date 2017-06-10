@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io';
+
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart'
     as maxwell;
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart'
@@ -21,6 +23,8 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 import 'hit_test_model.dart';
+
+const int _kMaxSuggestions = 100;
 
 final Map<maxwell.SuggestionImageType, ImageType> _kImageTypeMap =
     <maxwell.SuggestionImageType, ImageType>{
@@ -106,21 +110,43 @@ class InterruptionListener extends maxwell.SuggestionListener {
 
 Suggestion _convert(maxwell.Suggestion suggestion) {
   bool hasImage = suggestion.display.imageUrl?.isNotEmpty ?? false;
+  bool hasIcon = suggestion.display.iconUrls?.isNotEmpty ?? false
+      ? suggestion.display.iconUrls[0]?.isNotEmpty ?? false
+      : false;
+  ImageType imageType = (hasImage &&
+              suggestion.display.imageType ==
+                  maxwell.SuggestionImageType.person) ||
+          (!hasImage && hasIcon)
+      ? ImageType.circular
+      : ImageType.rectangular;
+  String imageUrl = hasImage
+      ? suggestion.display.imageUrl
+      : hasIcon ? suggestion.display.iconUrls[0] : null;
   return new Suggestion(
     id: new SuggestionId(suggestion.uuid),
     title: suggestion.display.headline,
+    description: suggestion.display.subheadline,
     themeColor: new Color(suggestion.display.color),
-    selectionType: SelectionType.closeSuggestions,
+    selectionType: SelectionType.launchStory,
     icons: const <WidgetBuilder>[],
-    image: hasImage
-        ? (_) => new Image.network(
-              suggestion.display.imageUrl,
-              fit: BoxFit.cover,
-            )
+    image: imageUrl != null
+        ? (_) => imageUrl.startsWith('http')
+            ? new Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                alignment: FractionalOffset.center,
+              )
+            : new Image.file(
+                new File(imageUrl),
+                fit: BoxFit.cover,
+                alignment: FractionalOffset.center,
+              )
         : null,
-    imageType: hasImage
-        ? _kImageTypeMap[suggestion.display.imageType]
-        : ImageType.circular,
+    imageType: imageType,
+    imageSide: hasImage &&
+            suggestion.display.imageType == maxwell.SuggestionImageType.person
+        ? ImageSide.left
+        : ImageSide.right,
   );
 }
 
@@ -265,13 +291,13 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       _askListenerBinding.wrap(_askListener),
       _askControllerProxy.ctrl.request(),
     );
-    _askControllerProxy.setResultCount(20);
+    _askControllerProxy.setResultCount(_kMaxSuggestions);
 
     _suggestionProviderProxy.subscribeToNext(
       _nextListenerBinding.wrap(_nextListener),
       _nextControllerProxy.ctrl.request(),
     );
-    _nextControllerProxy.setResultCount(20);
+    _nextControllerProxy.setResultCount(_kMaxSuggestions);
 
     _suggestionProviderProxy.subscribeToInterruptions(
       _interruptionListenerBinding.wrap(

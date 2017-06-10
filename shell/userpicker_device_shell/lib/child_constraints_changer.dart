@@ -75,7 +75,17 @@ class ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
       );
 
   Widget get _constrainedChild => _decoratedChild(
-      _currentConstraint.maxWidth, _currentConstraint.maxHeight);
+        _currentConstraint.maxWidth +
+            (2.0 * _kBezelMinimumWidth) +
+            (_currentConstraint.maxHeight <= _currentConstraint.maxWidth
+                ? _kBezelExtension
+                : 0.0),
+        _currentConstraint.maxHeight +
+            (2.0 * _kBezelMinimumWidth) +
+            (_currentConstraint.maxHeight > _currentConstraint.maxWidth
+                ? _kBezelExtension
+                : 0.0),
+      );
 
   Widget get _unconstrainedChild => new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) =>
@@ -91,8 +101,9 @@ class ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
         duration: const Duration(milliseconds: 500),
         curve: Curves.fastOutSlowIn,
         padding: new EdgeInsets.only(
-            bottom: bezel && height > width ? _kBezelExtension : 0.0,
-            right: bezel && height <= width ? _kBezelExtension : 0.0),
+          bottom: bezel && height > width ? _kBezelExtension : 0.0,
+          right: bezel && height <= width ? _kBezelExtension : 0.0,
+        ),
         decoration: new BoxDecoration(
           color: Colors.black,
           border: new Border.all(

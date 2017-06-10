@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 import 'story.dart';
+import 'suggestion_layout.dart';
 
 /// Specifies the type of action to perform when the suggestion is selected.
 enum SelectionType {
@@ -34,6 +35,16 @@ enum ImageType {
   rectangular
 }
 
+/// Determines what the suggestion looks like with respect to
+/// [Suggestion.image].
+enum ImageSide {
+  /// The image should display to the right.
+  right,
+
+  /// The image should display to the left.
+  left,
+}
+
 /// The unique id of a [Suggestion].
 class SuggestionId extends ValueKey<String> {
   /// Constructor.
@@ -47,6 +58,9 @@ class Suggestion {
 
   /// The suggestion's title.
   final String title;
+
+  /// The suggestion's description.
+  final String description;
 
   /// The color to use for the suggestion's background.
   final Color themeColor;
@@ -66,17 +80,29 @@ class Suggestion {
   /// The type of [image].
   final ImageType imageType;
 
+  /// The side the image should appear on.
+  final ImageSide imageSide;
+
+  SuggestionLayout _suggestionLayout;
+
   /// Constructor.
   Suggestion({
     @required this.id,
     this.title,
+    this.description,
     this.themeColor,
     this.selectionType,
     this.selectionStoryId,
     this.icons: const <WidgetBuilder>[],
     this.image,
     this.imageType,
-  });
+    this.imageSide: ImageSide.right,
+  }) {
+    _suggestionLayout = new SuggestionLayout(suggestion: this);
+  }
+
+  /// How the suggestion should be laid out.
+  SuggestionLayout get suggestionLayout => _suggestionLayout;
 
   @override
   int get hashCode => id.hashCode;

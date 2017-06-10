@@ -42,19 +42,11 @@ const double _kMaximizedNowHeight = 440.0;
 const double _kQuickSettingsHeightBump = 120.0;
 
 /// How far above the bottom the suggestions overlay peeks.
-const double _kSuggestionOverlayPeekHeight = 116.0;
+const double _kSuggestionOverlayPeekHeight = 192.0;
 
 /// If the width of the [Conductor] exceeds this value we will switch to
 /// multicolumn mode for the [StoryList].
 const double _kStoryListMultiColumnWidthThreshold = 500.0;
-
-/// If the width of the [Conductor] exceeds this value we will switch to
-/// two column mode for the [SuggestionList].
-const double _kSuggestionListTwoColumnWidthThreshold = 700.0;
-
-/// If the width of the [Conductor] exceeds this value we will switch to
-/// three column mode for the [SuggestionList].
-const double _kSuggestionListThreeColumnWidthThreshold = 1000.0;
 
 const double _kSuggestionOverlayPullScrollOffset = 100.0;
 const double _kSuggestionOverlayScrollFactor = 1.2;
@@ -411,10 +403,6 @@ class ConductorState extends State<Conductor> {
       double suggestionHorizontalMargin,
     ),
   ) {
-    int suggestionColumnCount =
-        maxWidth > _kSuggestionListThreeColumnWidthThreshold
-            ? 3
-            : maxWidth > _kSuggestionListTwoColumnWidthThreshold ? 2 : 1;
     return new PeekingOverlay(
       key: _suggestionOverlayKey,
       peekHeight: _kSuggestionOverlayPeekHeight,
@@ -439,16 +427,12 @@ class ConductorState extends State<Conductor> {
             overlayHeight,
             SuggestionListState.getSuggestionWidth(
               maxWidth,
-              suggestionColumnCount,
             ),
-            SuggestionListState.getSuggestionHorizontalMargin(
-              suggestionColumnCount,
-            ),
+            SuggestionListState.getSuggestionHorizontalMargin(),
           ),
       child: new SuggestionList(
         key: _suggestionListKey,
         scrollController: _suggestionListScrollController,
-        columnCount: suggestionColumnCount,
         onAskingStarted: () {
           _suggestionOverlayKey.currentState.show();
         },

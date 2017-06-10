@@ -4,10 +4,13 @@
 
 import 'dart:math' as math;
 
+import 'package:collection/collection.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'suggestion.dart';
+import 'suggestion_layout.dart';
 import 'suggestion_model.dart';
 import 'suggestion_widget.dart';
 
@@ -15,7 +18,23 @@ const String _kImage = 'packages/armadillo/res/logo_googleg_24dpx4.png';
 const Duration _kFadeInDuration = const Duration(milliseconds: 500);
 
 /// The height of the ask section of the suggerion list.
-const double kAskHeight = 84.0;
+const double kAskHeight = 64.0;
+
+/// The gap between suggestions.
+const double _kSuggestionGap = 16.0;
+
+const double _kThreeColumnWidthThreshold =
+    kSuggestionWidth * 3 + _kSuggestionGap * 4;
+const double _kTwoColumnWidthThreshold =
+    kSuggestionWidth * 2 + _kSuggestionGap * 3;
+const double _kOneColumnWidthThreshold = kSuggestionWidth + _kSuggestionGap * 2;
+const double _kThreeColumnWidth = kSuggestionWidth * 3 + _kSuggestionGap * 2;
+const double _kTwoColumnWidth = kSuggestionWidth * 2 + _kSuggestionGap;
+const double _kOneColumnWidth = kSuggestionWidth;
+const double _kSuggestionListBottomPadding = 32.0;
+
+const ListEquality<Suggestion> _kSuggestionListEquality =
+    const ListEquality<Suggestion>();
 
 /// Called when a suggestion is selected.  [globalBounds] indicates the location
 /// of the widget representing [suggestion] was on screen when it was selected.
@@ -36,9 +55,6 @@ class SuggestionList extends StatefulWidget {
   /// Called when a suggestion is selected.
   final OnSuggestionSelected onSuggestionSelected;
 
-  /// The number of columns to use for displaying suggestions.
-  final int columnCount;
-
   /// Constructor.
   SuggestionList({
     Key key,
@@ -46,7 +62,6 @@ class SuggestionList extends StatefulWidget {
     this.onAskingStarted,
     this.onAskingEnded,
     this.onSuggestionSelected,
-    this.columnCount: 1,
   })
       : super(key: key);
 
@@ -78,7 +93,6 @@ class SuggestionListState extends State<SuggestionList>
       curve: Curves.fastOutSlowIn,
     );
     _askFocusNode.addListener(() {
-      print('ask focus changed: ${_askFocusNode.hasFocus}');
       if (_askFocusNode.hasFocus) {
         if (_asking == false) {
           setState(() {
@@ -131,85 +145,9 @@ class SuggestionListState extends State<SuggestionList>
   Widget build(BuildContext context) => new Overlay(
         initialEntries: <OverlayEntry>[
           new OverlayEntry(
-            builder: (BuildContext context) => new Stack(
-                  fit: StackFit.passthrough,
-                  children: <Widget>[
-                    new Positioned(
-                      top: 0.0,
-                      left: 0.0,
-                      right: 0.0,
-                      height: kAskHeight,
-                      child: new GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {
-                          FocusScope.of(context).requestFocus(_askFocusNode);
-                        },
-                        child: new Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            // Image.
-                            new Padding(
-                              padding: const EdgeInsets.only(
-                                right: 16.0,
-                                left: 32.0,
-                                top: 32.0,
-                                bottom: 32.0,
-                              ),
-                              child:
-                                  new Image.asset(_kImage, fit: BoxFit.cover),
-                            ),
-                            // Ask Anything text field.
-                            new Expanded(
-                              child: new Align(
-                                alignment: FractionalOffset.centerLeft,
-                                child: new Material(
-                                  color: Colors.transparent,
-                                  child: new TextField(
-                                    decoration: new InputDecoration(
-                                      hintText: 'Ask for anything',
-                                      hintStyle: new TextStyle(
-                                        fontSize: 16.0,
-                                        color: Colors.grey[600],
-                                      ),
-                                      hideDivider: true,
-                                    ),
-                                    style: new TextStyle(
-                                      fontSize: 16.0,
-                                      color: Colors.grey[600],
-                                    ),
-                                    focusNode: _askFocusNode,
-                                    controller: _askTextController,
-                                    onChanged: (String text) {
-                                      SuggestionModel.of(context).askText =
-                                          text;
-                                    },
-                                    onSubmitted: (String text) {
-                                      // Select the first suggestion on text commit (ie.
-                                      // Pressing enter or tapping 'Go').
-                                      List<Suggestion> suggestions =
-                                          SuggestionModel
-                                              .of(context)
-                                              .suggestions;
-                                      if (suggestions.isNotEmpty) {
-                                        _onSuggestionSelected(
-                                            suggestions.first);
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    new Positioned(
-                      top: kAskHeight,
-                      left: 0.0,
-                      right: 0.0,
-                      bottom: 0.0,
-                      child: new ScopedModelDescendant<SuggestionModel>(
+            builder: (BuildContext context) => new LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) =>
+                      new ScopedModelDescendant<SuggestionModel>(
                         builder: (
                           BuildContext context,
                           Widget child,
@@ -218,123 +156,106 @@ class SuggestionListState extends State<SuggestionList>
                           _lastBuildTime = new DateTime.now();
                           _fadeInAnimation.value = 0.0;
                           _fadeInAnimation.forward();
-                          return widget.columnCount == 3
-                              ? _createThreeColumnBlock(
-                                  suggestionModel.suggestions)
-                              : widget.columnCount == 2
-                                  ? _createTwoColumnBlock(
-                                      suggestionModel.suggestions)
-                                  : _createSingleColumnBlock(
-                                      suggestionModel.suggestions,
-                                    );
+                          List<Suggestion> suggestions =
+                              suggestionModel.suggestions;
+                          return new Stack(
+                            children: <Widget>[
+                              new Positioned(
+                                left: _getLeftOffset(constraints.maxWidth),
+                                right: 0.0,
+                                top: 0.0,
+                                height: kAskHeight,
+                                child: _buildAsk(context),
+                              ),
+                              new Positioned.fill(
+                                top: kAskHeight,
+                                child: new CustomScrollView(
+                                  controller: widget.scrollController,
+                                  slivers: <Widget>[
+                                    new SliverGrid(
+                                      gridDelegate:
+                                          new _SuggestionListSliverGridDelegate(
+                                        suggestions: suggestions,
+                                      ),
+                                      delegate: new SliverChildBuilderDelegate(
+                                        (BuildContext context, int index) =>
+                                            _createSuggestion(
+                                              suggestions[index],
+                                            ),
+                                        childCount: suggestions.length,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
                         },
                       ),
-                    ),
-                  ],
                 ),
           ),
         ],
       );
 
-  Widget _createSingleColumnBlock(List<Suggestion> suggestions) => new Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8.0,
-        ),
-        child: new ListView(
-          controller: widget.scrollController,
-          children: suggestions
-              .map((Suggestion suggestion) => _createSuggestion(suggestion))
-              .toList(),
+  Widget _buildAsk(BuildContext context) => new GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          FocusScope.of(context).requestFocus(_askFocusNode);
+        },
+        child: new Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            // Image.
+            new Center(
+              child: new Image.asset(
+                _kImage,
+                width: 24.0,
+                height: 24.0,
+                fit: BoxFit.cover,
+              ),
+            ),
+            new Container(width: 16.0),
+            // Ask Anything text field.
+            new Expanded(
+              child: new Align(
+                alignment: FractionalOffset.centerLeft,
+                child: new Material(
+                  color: Colors.transparent,
+                  child: new TextField(
+                    decoration: new InputDecoration(
+                      hintText: 'Ask for anything',
+                      hintStyle: new TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.grey[600],
+                      ),
+                      hideDivider: true,
+                    ),
+                    style: new TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.grey[600],
+                    ),
+                    focusNode: _askFocusNode,
+                    controller: _askTextController,
+                    onChanged: (String text) {
+                      SuggestionModel.of(context).askText = text;
+                    },
+                    onSubmitted: (String text) {
+                      // Select the first suggestion on text commit (ie.
+                      // Pressing enter or tapping 'Go').
+                      List<Suggestion> suggestions =
+                          SuggestionModel.of(context).suggestions;
+                      if (suggestions.isNotEmpty) {
+                        _onSuggestionSelected(suggestions.first);
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       );
-
-  Widget _createTwoColumnBlock(List<Suggestion> suggestions) {
-    int minSuggestionsPerColumn = (suggestions.length / 2).floor();
-    int additionalLeftSuggestions = suggestions.length % 2;
-    int additionalRightSuggestions =
-        (suggestions.length + additionalLeftSuggestions) % 2;
-    List<Suggestion> leftSuggestions = new List<Suggestion>.generate(
-      minSuggestionsPerColumn + additionalLeftSuggestions,
-      (int index) => suggestions[index * 2],
-    );
-    List<Suggestion> rightSuggestions = new List<Suggestion>.generate(
-      minSuggestionsPerColumn + additionalRightSuggestions,
-      (int index) => suggestions[index * 2 + 1],
-    );
-    return new Align(
-      alignment: FractionalOffset.topCenter,
-      child: new ConstrainedBox(
-        constraints: new BoxConstraints(maxWidth: 960.0),
-        child: new ListView.builder(
-          controller: widget.scrollController,
-          itemCount: leftSuggestions.length,
-          itemBuilder: (BuildContext context, int index) => new Row(
-                children: <Widget>[
-                  new Container(height: 0.0, width: 24.0),
-                  new Expanded(
-                      child: _createSuggestion(leftSuggestions[index])),
-                  new Container(height: 0.0, width: 24.0),
-                  new Expanded(
-                    child: index < rightSuggestions.length
-                        ? _createSuggestion(rightSuggestions[index])
-                        : new Offstage(offstage: true),
-                  ),
-                  new Container(height: 0.0, width: 24.0),
-                ],
-              ),
-        ),
-      ),
-    );
-  }
-
-  Widget _createThreeColumnBlock(List<Suggestion> suggestions) {
-    int minSuggestionsPerColumn = (suggestions.length / 3).floor();
-    int additionalLeftSuggestions = suggestions.length % 3 > 0 ? 1 : 0;
-    int additionalMiddleSuggestions = suggestions.length % 3 > 1 ? 1 : 0;
-    List<Suggestion> leftSuggestions = new List<Suggestion>.generate(
-      minSuggestionsPerColumn + additionalLeftSuggestions,
-      (int index) => suggestions[index * 3],
-    );
-    List<Suggestion> middleSuggestions = new List<Suggestion>.generate(
-      minSuggestionsPerColumn + additionalMiddleSuggestions,
-      (int index) => suggestions[index * 3 + 1],
-    );
-    List<Suggestion> rightSuggestions = new List<Suggestion>.generate(
-      minSuggestionsPerColumn,
-      (int index) => suggestions[index * 3 + 2],
-    );
-    return new Align(
-      alignment: FractionalOffset.topCenter,
-      child: new ConstrainedBox(
-        constraints: new BoxConstraints(maxWidth: 1440.0),
-        child: new ListView.builder(
-          controller: widget.scrollController,
-          itemCount: leftSuggestions.length,
-          itemBuilder: (BuildContext context, int index) => new Row(
-                children: <Widget>[
-                  new Container(height: 0.0, width: 24.0),
-                  new Expanded(
-                    child: _createSuggestion(leftSuggestions[index]),
-                  ),
-                  new Container(height: 0.0, width: 24.0),
-                  new Expanded(
-                    child: index < middleSuggestions.length
-                        ? _createSuggestion(middleSuggestions[index])
-                        : new Offstage(offstage: true),
-                  ),
-                  new Container(height: 0.0, width: 24.0),
-                  new Expanded(
-                    child: index < rightSuggestions.length
-                        ? _createSuggestion(rightSuggestions[index])
-                        : new Offstage(offstage: true),
-                  ),
-                  new Container(height: 0.0, width: 24.0),
-                ],
-              ),
-        ),
-      ),
-    );
-  }
 
   void _onSuggestionSelected(Suggestion suggestion) {
     if (new DateTime.now().difference(_lastBuildTime) < _kFadeInDuration) {
@@ -367,46 +288,130 @@ class SuggestionListState extends State<SuggestionList>
   Widget _createSuggestion(Suggestion suggestion) => new RepaintBoundary(
         child: new FadeTransition(
           opacity: _curvedFadeInAnimation,
-          child: new Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 12.0,
-            ),
-            child: new SuggestionWidget(
-              key: new GlobalObjectKey(suggestion),
-              visible: _selectedSuggestion?.id != suggestion.id,
-              suggestion: suggestion,
-              onSelected: () => _onSuggestionSelected(suggestion),
-            ),
+          child: new SuggestionWidget(
+            key: new GlobalObjectKey(suggestion),
+            visible: _selectedSuggestion?.id != suggestion.id,
+            suggestion: suggestion,
+            onSelected: () => _onSuggestionSelected(suggestion),
           ),
         ),
       );
 
   /// Determines the width of a suggestion in the suggestion list.
-  static double getSuggestionWidth(
-    double maxWidth,
-    int suggestionColumnCount,
-  ) {
-    switch (suggestionColumnCount) {
-      case 1:
-        return maxWidth - (2 * 8.0);
-      case 2:
-        return (math.min(960.0, maxWidth) - (3 * 24.0)) / 2.0;
-      case 3:
-        return (math.min(1440.0, maxWidth) - (4 * 24.0)) / 3.0;
-      default:
-        return 300.0;
-    }
-  }
+  static double getSuggestionWidth(double maxWidth) =>
+      math.min(kSuggestionWidth, maxWidth - -2.0 * _kSuggestionGap);
 
   /// Determines the horizontal margin of suggestions in the suggestion list.
-  static double getSuggestionHorizontalMargin(
-    int suggestionColumnCount,
-  ) {
-    switch (suggestionColumnCount) {
-      case 1:
-        return 8.0;
-      default:
-        return 24.0;
+  static double getSuggestionHorizontalMargin() => _kSuggestionGap;
+}
+
+class _SuggestionListSliverGridDelegate extends SliverGridDelegate {
+  final List<Suggestion> suggestions;
+
+  _SuggestionListSliverGridDelegate({this.suggestions});
+
+  @override
+  SliverGridLayout getLayout(SliverConstraints constraints) =>
+      new _SuggestionListSliverGridLayout(
+        suggestions: suggestions,
+        width: constraints.crossAxisExtent,
+      );
+
+  @override
+  bool shouldRelayout(_SuggestionListSliverGridDelegate oldDelegate) =>
+      !_kSuggestionListEquality.equals(suggestions, oldDelegate.suggestions);
+}
+
+class _SuggestionListSliverGridLayout extends SliverGridLayout {
+  final List<Suggestion> suggestions;
+  final double width;
+
+  _SuggestionListSliverGridLayout({this.suggestions, this.width});
+
+  /// The minimum child index that is visible at (or after) this scroll offset.
+  @override
+  int getMinChildIndexForScrollOffset(double scrollOffset) =>
+      suggestions.isEmpty ? -1 : 0;
+
+  /// The maximum child index that is visible at (or before) this scroll offset.
+  @override
+  int getMaxChildIndexForScrollOffset(double scrollOffset) =>
+      suggestions.isEmpty ? -1 : suggestions.length - 1;
+
+  /// The size and position of the child with the given index.
+  @override
+  SliverGridGeometry getGeometryForChildIndex(int index) {
+    if (index < 0 || index >= suggestions.length) {
+      return new SliverGridGeometry(
+        scrollOffset: 0.0,
+        crossAxisOffset: 0.0,
+        mainAxisExtent: 0.0,
+        crossAxisExtent: 0.0,
+      );
     }
+    int columnCount = _getColumnCount(width);
+    double leftOffset = _getLeftOffset(width);
+    double crossAxisExtent = width >= kSuggestionWidth + 2 * _kSuggestionGap
+        ? kSuggestionWidth
+        : width - 2 * _kSuggestionGap;
+    double crossAxisOffset = (columnCount == 1)
+        ? leftOffset
+        : (columnCount == 2 && ((index % 2) == 0))
+            ? leftOffset
+            : (columnCount == 2 && ((index % 2) == 1))
+                ? leftOffset + _kSuggestionGap + kSuggestionWidth
+                : ((index % 3) == 0)
+                    ? leftOffset
+                    : ((index % 3) == 1)
+                        ? leftOffset + _kSuggestionGap + kSuggestionWidth
+                        : leftOffset +
+                            _kSuggestionGap * 2 +
+                            kSuggestionWidth * 2;
+    suggestions[index].suggestionLayout.layout(width);
+    double mainAxisExtent =
+        suggestions[index].suggestionLayout.suggestionHeight;
+    double scrollOffset = 0.0;
+    for (int i = index - columnCount; i >= 0; i -= columnCount) {
+      scrollOffset += _kSuggestionGap;
+      suggestions[i].suggestionLayout.layout(width);
+      scrollOffset += suggestions[i].suggestionLayout.suggestionHeight;
+    }
+    return new SliverGridGeometry(
+      scrollOffset: scrollOffset,
+      crossAxisOffset: crossAxisOffset,
+      mainAxisExtent: mainAxisExtent,
+      crossAxisExtent: crossAxisExtent,
+    );
+  }
+
+  /// An estimate of the scroll extent needed to fully display all the tiles if
+  /// there are `childCount` children in total.
+  @override
+  double estimateMaxScrollOffset(int childCount) {
+    int columnCount = _getColumnCount(width);
+    double maxScrollOffset = 0.0;
+    for (int i = 0; i < math.min(childCount, columnCount); i++) {
+      SliverGridGeometry geometry =
+          getGeometryForChildIndex(childCount - 1 - i);
+      maxScrollOffset = math.max(
+        maxScrollOffset,
+        geometry.scrollOffset +
+            geometry.mainAxisExtent +
+            _kSuggestionListBottomPadding,
+      );
+    }
+    return maxScrollOffset;
   }
 }
+
+double _getLeftOffset(double width) => width >= _kThreeColumnWidthThreshold
+    ? (width - _kThreeColumnWidth) / 2.0
+    : width >= _kTwoColumnWidthThreshold
+        ? (width - _kTwoColumnWidth) / 2.0
+        : width >= _kOneColumnWidthThreshold
+            ? (width - _kOneColumnWidth) / 2.0
+            : _kSuggestionGap;
+
+int _getColumnCount(double width) => width >= _kThreeColumnWidthThreshold
+    ? 3
+    : width >= _kTwoColumnWidthThreshold ? 2 : 1;
