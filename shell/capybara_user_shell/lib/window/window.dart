@@ -65,6 +65,9 @@ class WindowState extends State<Window> {
     super.dispose();
   }
 
+  /// Requests this window to be focused.
+  void focus() => FocusScope.of(context).requestFocus(_focusNode);
+
   /// Called when a new tab was dropped on this window.
   void _onTabDropped(WindowData window, TabId id) {
     if (window.claim(id)) {
@@ -75,7 +78,7 @@ class WindowState extends State<Window> {
   /// Registers that some interaction has occurred with the present window.
   void _registerInteraction() {
     widget.onWindowInteraction?.call();
-    FocusScope.of(context).requestFocus(_focusNode);
+    focus();
   }
 
   /// Constructs the visual representation of a tab.

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
@@ -20,10 +21,47 @@ class _PlaygroundState extends State<WindowPlaygroundWidget> {
       new Map<WindowId, GlobalKey<WindowState>>();
   final FocusScopeNode _focusNode = new FocusScopeNode();
 
+  /// Currently highlighted window when paging through windows.
+  WindowId _highlightedWindow;
+
+  @override
+  void initState() {
+    super.initState();
+    RawKeyboard.instance.addListener(_handleKeyEvent);
+  }
+
   @override
   void dispose() {
     _focusNode.detach();
+    RawKeyboard.instance.removeListener(_handleKeyEvent);
     super.dispose();
+  }
+
+  /// Interprets key chords.
+  void _handleKeyEvent(RawKeyEvent event) {
+    final bool isDown = event is RawKeyDownEvent;
+    final RawKeyEventDataFuchsia data = event.data;
+    // Switch the focused window with Ctrl-(Shift-)A
+    if (isDown &&
+            (data.codePoint == 97 || data.codePoint == 65) // a or A
+            &&
+            (data.modifiers & 24) != 0 // Ctrl down
+        ) {
+      setState(() {
+        _highlightedWindow = _windows.next(
+          id: _highlightedWindow ?? _windows.windows.last.id,
+          forward: data.codePoint == 65, // A means shift is down
+        );
+      });
+    } else if (!isDown && (data.codePoint == 97 || data.codePoint == 65)) {
+      setState(() {
+        if (_highlightedWindow != null) {
+          _windows.moveToFront(_windows.find(_highlightedWindow));
+          _windowKeys[_highlightedWindow].currentState.focus();
+          _highlightedWindow = null;
+        }
+      });
+    }
   }
 
   /// Builds the widget representations of the current windows.
@@ -37,7 +75,18 @@ class _PlaygroundState extends State<WindowPlaygroundWidget> {
       }
     });
     obsoleteIds.forEach((WindowId id) => _windowKeys.remove(id));
-    return model.windows
+
+    // Adjust window order if there's a highlighted window.
+    final List<WindowData> windows = new List<WindowData>.from(model.windows);
+    if (_highlightedWindow != null) {
+      final WindowData window = model.find(_highlightedWindow);
+      if (window != null) {
+        windows.remove(window);
+        windows.add(window);
+      }
+    }
+
+    return windows
         .map((WindowData window) => new ScopedModel<WindowData>(
               model: window,
               child: new Window(

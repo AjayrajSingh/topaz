@@ -156,4 +156,23 @@ class WindowsData extends Model {
     windows.add(window);
     notifyListeners();
   }
+
+  /// Returns the data for the [id] window, or the result of calling [orElse],
+  /// or [null].
+  WindowData find(WindowId id, {WindowData orElse()}) => windows.firstWhere(
+        (WindowData window) => window.id == id,
+        orElse: orElse ?? () => null,
+      );
+
+  /// Returns the window adjacent to [id] in the list in the direction specified
+  /// by [forward].
+  WindowId next({@required WindowId id, @required bool forward}) {
+    final int index = new List<int>.generate(windows.length, (int x) => x)
+        .firstWhere((int i) => windows[i].id == id, orElse: () => -1);
+    if (index == -1) {
+      return null;
+    }
+    final int nextIndex = (index + (forward ? 1 : -1)) % windows.length;
+    return windows[nextIndex].id;
+  }
 }
