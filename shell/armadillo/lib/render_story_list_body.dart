@@ -156,13 +156,15 @@ class RenderStoryListBody extends RenderListBody {
 
     if (_scrimColor.alpha != 0) {
       if (_blurScrimmedChildren) {
-        context.pushBackdropFilter(
-          offset,
-          new ImageFilter.blur(
-            sigmaX: _scrimColor.alpha * _kAlphaToBlurRatio,
-            sigmaY: _scrimColor.alpha * _kAlphaToBlurRatio,
+        context.pushLayer(
+          new BackdropFilterLayer(
+            filter: new ImageFilter.blur(
+              sigmaX: _scrimColor.alpha * _kAlphaToBlurRatio,
+              sigmaY: _scrimColor.alpha * _kAlphaToBlurRatio,
+            ),
           ),
           _paintScrim,
+          offset,
         );
       } else {
         _paintScrim(context, offset);
