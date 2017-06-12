@@ -2,25 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
-import 'dart:convert' show JSON;
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:models/youtube.dart';
 import 'package:widgets_meta/widgets_meta.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 import 'example_video_id.dart';
 import 'loading_state.dart';
 import 'youtube_thumbnail.dart';
-
-const String _kApiBaseUrl = 'content.googleapis.com';
-
-const String _kApiRestOfUrl = '/youtube/v3/search';
-
-const String _kMaxResults = '10';
 
 /// Callback signature for selecting a video
 typedef void SelectVideoCallback(String id);
@@ -30,8 +21,8 @@ class YoutubeRelatedVideos extends StatefulWidget {
   /// ID of youtube video to show related videos for
   final String videoId;
 
-  /// Youtube API key needed to access the Youtube Public APIs
-  final String apiKey;
+  /// The Youtube API.
+  final YoutubeApi api;
 
   /// Callback to run when a related video is selected
   final SelectVideoCallback onSelectVideo;
@@ -41,11 +32,11 @@ class YoutubeRelatedVideos extends StatefulWidget {
     Key key,
     this.onSelectVideo,
     @required @ExampleValue(kExampleVideoId) this.videoId,
-    @required @ConfigKey('google_api_key') this.apiKey,
+    @required this.api,
   })
       : super(key: key) {
     assert(videoId != null);
-    assert(apiKey != null);
+    assert(api != null);
   }
 
   @override
@@ -60,10 +51,9 @@ class _YoutubeRelatedVideosState extends State<YoutubeRelatedVideos> {
   LoadingState _loadingState = LoadingState.inProgress;
 
   void _updateRelatedVideos() {
-    _getRelatedVideoData(
-      videoId: widget.videoId,
-      apiKey: widget.apiKey,
-    ).then((List<VideoData> videos) {
+    widget.api
+        .getRelatedVideoData(videoId: widget.videoId)
+        .then((List<VideoData> videos) {
       if (mounted) {
         if (videos == null) {
           setState(() {
@@ -193,34 +183,4 @@ class _YoutubeRelatedVideosState extends State<YoutubeRelatedVideos> {
     }
     return videoList;
   }
-}
-
-/// Calls Youtube API to retrieve related videos for given videoId
-/// TODO(dayang): Use googleapis package
-Future<List<VideoData>> _getRelatedVideoData({
-  String videoId,
-  String apiKey,
-}) async {
-  Map<String, String> params = <String, String>{
-    'part': 'snippet',
-    'relatedToVideoId': videoId,
-    'maxResults': _kMaxResults,
-    'type': 'video',
-    'key': apiKey,
-  };
-
-  Uri uri = new Uri.https(_kApiBaseUrl, _kApiRestOfUrl, params);
-  http.Response response = await http.get(uri);
-  if (response.statusCode != 200) {
-    return null;
-  }
-
-  dynamic jsonData = JSON.decode(response.body);
-
-  if (jsonData['items'] is List<Map<String, dynamic>>) {
-    return jsonData['items'].map((dynamic json) {
-      return new VideoData.fromJson(json);
-    }).toList();
-  }
-  return null;
 }

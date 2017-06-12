@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:widgets/youtube.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 import 'module_model.dart';
 
@@ -36,7 +37,7 @@ class YoutubeVideoScreen extends StatelessWidget {
             child: model.videoId != null && apiKey != null
                 ? new YoutubeVideo(
                     videoId: model.videoId,
-                    apiKey: apiKey,
+                    api: new HttpsYoutubeApi(apiKey: apiKey),
                   )
                 : new CircularProgressIndicator(),
           ),

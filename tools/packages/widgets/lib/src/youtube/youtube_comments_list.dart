@@ -2,24 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
-import 'dart:convert' show JSON;
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:models/youtube.dart';
 import 'package:widgets_meta/widgets_meta.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 import 'example_video_id.dart';
 import 'loading_state.dart';
-
-final String _kApiBaseUrl = 'content.googleapis.com';
-
-final String _kApiRestOfUrl = '/youtube/v3/commentThreads';
-
-final String _kApiQueryParts = 'id,snippet';
 
 // TODO(dayang): Render "one hour before.." style timestamps for comments
 // https://fuchsia.atlassian.net/browse/SO-118
@@ -29,18 +20,17 @@ class YoutubeCommentsList extends StatefulWidget {
   /// ID for given youtube video to render comments for
   final String videoId;
 
-  /// Youtube API key needed to access the Youtube Public APIs
-  final String apiKey;
+  /// The Youtube API.
+  final YoutubeApi api;
 
   /// Constructor
   YoutubeCommentsList({
     Key key,
     @required @ExampleValue(kExampleVideoId) this.videoId,
-    @required @ConfigKey('google_api_key') this.apiKey,
+    @required this.api,
   })
       : super(key: key) {
     assert(videoId != null);
-    assert(apiKey != null);
   }
 
   @override
@@ -54,33 +44,10 @@ class _YoutubeCommentsListState extends State<YoutubeCommentsList> {
   /// Loading State for video comments
   LoadingState _loadingState = LoadingState.inProgress;
 
-  Future<List<VideoComment>> _getCommentsData() async {
-    Map<String, String> params = <String, String>{
-      'videoId': widget.videoId,
-      'key': widget.apiKey,
-      'part': _kApiQueryParts,
-      'order': 'relevance',
-      'textFormat': 'plainText',
-    };
-
-    Uri uri = new Uri.https(_kApiBaseUrl, _kApiRestOfUrl, params);
-    http.Response response = await http.get(uri);
-    if (response.statusCode != 200) {
-      return null;
-    }
-    dynamic jsonData = JSON.decode(response.body);
-
-    if (jsonData['items'] is List<dynamic>) {
-      return jsonData['items']
-          .map((dynamic json) => new VideoComment.fromJson(json))
-          .toList();
-    } else {
-      return null;
-    }
-  }
-
   void _updateComments() {
-    _getCommentsData().then((List<VideoComment> comments) {
+    widget.api
+        .getCommentsData(videoId: widget.videoId)
+        .then((List<VideoComment> comments) {
       if (mounted) {
         if (comments == null) {
           setState(() {

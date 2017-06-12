@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:widgets_meta/widgets_meta.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 import 'youtube_comments_list.dart';
 import 'youtube_player.dart';
@@ -19,18 +20,18 @@ class YoutubeVideo extends StatelessWidget {
   /// ID for given youtube video
   final String videoId;
 
-  /// Youtube API key needed to access the Youtube Public APIs
-  final String apiKey;
+  /// The Youtube API.
+  final YoutubeApi api;
 
   /// Constructor
   YoutubeVideo({
     Key key,
     @required @ExampleValue('a6KGPBflhiM') this.videoId,
-    @required @ConfigKey('google_api_key') this.apiKey,
+    @required this.api,
   })
       : super(key: key) {
     assert(videoId != null);
-    assert(apiKey != null);
+    assert(api != null);
   }
 
   @override
@@ -39,15 +40,14 @@ class YoutubeVideo extends StatelessWidget {
       children: <Widget>[
         new YoutubePlayer(
           videoId: videoId,
-          apiKey: apiKey,
         ),
         new YoutubeVideoOverview(
           videoId: videoId,
-          apiKey: apiKey,
+          api: api,
         ),
         new YoutubeCommentsList(
           videoId: videoId,
-          apiKey: apiKey,
+          api: api,
         ),
       ],
     );

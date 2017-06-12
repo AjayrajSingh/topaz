@@ -2,25 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
-import 'dart:convert' show JSON;
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:models/youtube.dart';
 import 'package:widgets_meta/widgets_meta.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 import 'example_video_id.dart';
 import 'loading_state.dart';
-
-const String _kApiBaseUrl = 'content.googleapis.com';
-
-const String _kApiRestOfUrl = '/youtube/v3/videos';
-
-const String _kApiQueryParts = 'contentDetails,snippet,statistics';
 
 /// UI Widget that loads and shows the basic information about a Youtube
 /// video such as: title, likes, channel title, description...
@@ -28,18 +19,18 @@ class YoutubeVideoOverview extends StatefulWidget {
   /// ID for given youtube video
   final String videoId;
 
-  /// Youtube API key needed to access the Youtube Public APIs
-  final String apiKey;
+  /// The Youtube API.
+  final YoutubeApi api;
 
   /// Constructor
   YoutubeVideoOverview({
     Key key,
     @required @ExampleValue(kExampleVideoId) this.videoId,
-    @required @ConfigKey('google_api_key') this.apiKey,
+    @required this.api,
   })
       : super(key: key) {
     assert(videoId != null);
-    assert(apiKey != null);
+    assert(api != null);
   }
 
   @override
@@ -53,29 +44,10 @@ class _YoutubeVideoOverviewState extends State<YoutubeVideoOverview> {
   /// Loading State for video data
   LoadingState _loadingState = LoadingState.inProgress;
 
-  Future<VideoData> _getVideoData() async {
-    Map<String, String> params = <String, String>{
-      'id': widget.videoId,
-      'key': widget.apiKey,
-      'part': _kApiQueryParts,
-    };
-
-    Uri uri = new Uri.https(_kApiBaseUrl, _kApiRestOfUrl, params);
-    http.Response response = await http.get(uri);
-    if (response.statusCode != 200) {
-      return null;
-    }
-    dynamic jsonData = JSON.decode(response.body);
-
-    if (jsonData['items'] is List<Map<String, dynamic>> &&
-        jsonData['items'].isNotEmpty) {
-      return new VideoData.fromJson(jsonData['items'][0]);
-    }
-    return null;
-  }
-
   void _updateVideo() {
-    _getVideoData().then((VideoData videoData) {
+    widget.api
+        .getVideoData(videoId: widget.videoId)
+        .then((VideoData videoData) {
       if (mounted) {
         if (videoData == null) {
           setState(() {

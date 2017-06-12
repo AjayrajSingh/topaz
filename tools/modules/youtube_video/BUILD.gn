@@ -16,6 +16,7 @@ flutter_app("youtube_video") {
     "//apps/maxwell/services/user:user_dart",
     "//apps/modules/common/packages/config",
     "//apps/modules/common/packages/widgets",
+    "//apps/modules/common/packages/youtube_api",
     "//lib/flutter/packages/flutter",
     "//lib/widgets/packages/logging:lib.logging",
     "//lib/widgets/packages/widgets:lib.widgets",

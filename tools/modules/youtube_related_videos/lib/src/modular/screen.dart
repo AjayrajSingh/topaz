@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:widgets/youtube.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 import 'module_model.dart';
 
@@ -37,7 +38,7 @@ class YoutubeRelatedVideosScreen extends StatelessWidget {
                   ? new SingleChildScrollView(
                       child: new YoutubeRelatedVideos(
                         videoId: model.videoId,
-                        apiKey: apiKey,
+                        api: new HttpsYoutubeApi(apiKey: apiKey),
                         onSelectVideo: model.selectVideo,
                       ),
                     )

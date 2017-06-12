@@ -8,6 +8,7 @@ import 'package:widgets/map.dart';
 import 'package:widgets/shopping.dart';
 import 'package:widgets/usps.dart';
 import 'package:widgets/youtube.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 /// Adds all the [EmbeddedChildBuilder]s that this application supports.
 void addEmbeddedChildBuilders(Config config) {
@@ -50,7 +51,7 @@ void addEmbeddedChildBuilders(Config config) {
         return new EmbeddedChild(
           widgetBuilder: (BuildContext context) => new YoutubeVideo(
                 videoId: args,
-                apiKey: config.get('google_api_key'),
+                api: new HttpsYoutubeApi(apiKey: config.get('google_api_key')),
               ),
           // Flutter version doesn't need a specific disposer.
           disposer: () {},

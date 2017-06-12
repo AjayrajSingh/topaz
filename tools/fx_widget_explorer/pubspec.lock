@@ -106,7 +106,7 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.29-dev"
+    version: "0.0.32-dev"
   flutter_markdown:
     description:
       name: flutter_markdown
@@ -149,6 +149,12 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.3"
+  "lib.logging":
+    description:
+      path: "../../../../lib/widgets/packages/logging"
+      relative: true
+    source: path
+    version: "0.0.0"
   "lib.widgets":
     description:
       path: "../../../../lib/widgets/packages/widgets"
@@ -347,5 +353,11 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.12"
+  youtube_api:
+    description:
+      path: "../packages/youtube_api"
+      relative: true
+    source: path
+    version: "0.0.0"
 sdks:
   dart: ">=1.23.0-dev.0.0 <2.0.0"

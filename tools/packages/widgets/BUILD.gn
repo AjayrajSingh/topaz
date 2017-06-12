@@ -12,6 +12,7 @@ dart_package("widgets") {
     "//apps/modules/common/packages/search_api",
     "//apps/modules/common/packages/models",
     "//apps/modules/common/packages/widgets_meta",
+    "//apps/modules/common/packages/youtube_api",
     "//lib/flutter/packages/flutter",
     "//lib/widgets/packages/logging:lib.logging",
     "//lib/widgets/packages/widgets:lib.widgets",

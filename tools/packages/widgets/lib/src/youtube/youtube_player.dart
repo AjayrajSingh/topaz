@@ -24,18 +24,13 @@ class YoutubePlayer extends StatefulWidget {
   /// ID for given youtube video
   final String videoId;
 
-  /// Youtube API key needed to access the Youtube Public APIs
-  final String apiKey;
-
   /// Constructor
   YoutubePlayer({
     Key key,
     @required @ExampleValue(kExampleVideoId) this.videoId,
-    @required @ConfigKey('google_api_key') this.apiKey,
   })
       : super(key: key) {
     assert(videoId != null);
-    assert(apiKey != null);
   }
 
   @override
