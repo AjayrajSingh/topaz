@@ -10,7 +10,7 @@ import 'package:meta/meta.dart';
 import 'fallback_image.dart';
 import 'typedefs.dart';
 
-const double _kHeight = 96.0;
+const double _kHeight = 64.0;
 
 /// UI Widget that represents a list item for an [Event]
 class EventListItem extends StatelessWidget {
@@ -49,55 +49,63 @@ class EventListItem extends StatelessWidget {
       : event.name ?? '';
 
   Widget _buildTextSection() {
-    return new Container(
-      padding: const EdgeInsets.all(16.0),
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          new Container(
-            margin: const EdgeInsets.only(bottom: 4.0),
-            child: new Text(_readableDate),
-          ),
-          new Container(
-            margin: const EdgeInsets.only(bottom: 4.0),
-            child: new Text(
-              _eventTitle,
-              overflow: TextOverflow.ellipsis,
-              style: new TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w600,
-              ),
+    return new Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        new Container(
+          margin: const EdgeInsets.only(bottom: 4.0),
+          child: new Text(
+            _readableDate.toUpperCase(),
+            style: new TextStyle(
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w400,
+              fontSize: 12.0,
             ),
           ),
-          new Text(event.venue?.name ?? ''),
-        ],
-      ),
+        ),
+        new Container(
+          margin: const EdgeInsets.only(bottom: 4.0),
+          child: new Text(
+            _eventTitle,
+            overflow: TextOverflow.ellipsis,
+            style: new TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        new Text(
+          event.venue?.name ?? '',
+          style: new TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return new Material(
-      color: isSelected ? Colors.pink[200] : Colors.white,
+      color: isSelected ? Colors.grey[200] : Colors.white,
       child: new InkWell(
         onTap: () => onSelect?.call(event),
         child: new Container(
-          decoration: new BoxDecoration(
-            border: new Border(
-              bottom: new BorderSide(
-                color: Colors.pink[100],
-                width: 1.0,
-              ),
-            ),
-          ),
+          padding: const EdgeInsets.all(16.0),
           child: new Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              new FallbackImage(
-                url: _eventImage,
-                height: _kHeight,
-                width: _kHeight,
+              new Container(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: new ClipRRect(
+                  borderRadius: new BorderRadius.circular(8.0),
+                  child: new FallbackImage(
+                    url: _eventImage,
+                    height: _kHeight,
+                    width: _kHeight,
+                  ),
+                ),
               ),
               new Expanded(
                 child: _buildTextSection(),
