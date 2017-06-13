@@ -24,8 +24,8 @@ class MockChatMessageTransporter extends ChatMessageTransporter {
   /// Pretends that a new message has arrived from another user and notify the
   /// client.
   Future<Null> mockReceiveMessage(
-    @required Conversation conversation,
-    @required Message message,
+    Conversation conversation,
+    Message message,
   ) async {
     if (this.onReceived != null) {
       await onReceived(conversation, message);
