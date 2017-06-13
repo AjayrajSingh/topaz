@@ -18,6 +18,9 @@ class ChatConversationScreen extends StatelessWidget {
     return new MaterialApp(
       theme: new ThemeData(primarySwatch: Colors.purple),
       home: new Material(
+        // TODO(youngseokyoon): remove this color setting later
+        // https://fuchsia.atlassian.net/browse/SO-502
+        color: Colors.white,
         child: new ScopedModelDescendant<ChatConversationModuleModel>(
           builder: (
             BuildContext context,
