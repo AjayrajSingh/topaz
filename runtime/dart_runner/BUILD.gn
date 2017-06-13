@@ -2,18 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("dart_content_handler") {
-  testonly = true
+import("//packages/package.gni")
 
-  deps = [
-    ":app",
-    "//apps/dart_content_handler/examples",
-    "//apps/dart_content_handler/snapshotter($host_toolchain)",
-  ]
-}
-
-executable("app") {
-  output_name = "dart_content_handler"
+executable("dart_runner_bin") {
+  output_name = "dart_runner"
 
   sources = [
     "application_runner_impl.cc",
@@ -44,5 +36,31 @@ executable("app") {
     "//lib/tonic",
     "//lib/tonic/mx",
     "//lib/zip",
+  ]
+}
+
+package("dart_runner") {
+  testonly = true
+  app = true
+
+  deps = [
+    ":dart_runner_bin",
+    "examples",
+    "integration",
+  ]
+
+  binaries = [
+    {
+      name = "dart_runner"
+    },
+    {
+      name = "dart_runner_test.dartx"
+    },
+    {
+      name = "hello_app_dart.dartx"
+    },
+    {
+      name = "hello_dart.dartx"
+    },
   ]
 }

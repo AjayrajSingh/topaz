@@ -5,7 +5,7 @@
 group("examples") {
   testonly = true
 
-  deps = [
+  public_deps = [
     "hello_app_dart",
     "hello_dart",
   ]

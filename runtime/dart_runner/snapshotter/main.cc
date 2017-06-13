@@ -35,8 +35,7 @@ constexpr char kDartX[] = "dartx";
 constexpr char kDepfile[] = "depfile";
 constexpr char kBuildOutput[] = "build-output";
 
-constexpr char kShebang[] =
-    "#!fuchsia file:///system/apps/dart_content_handler\n";
+constexpr char kShebang[] = "#!fuchsia dart_runner\n";
 constexpr size_t kShebangLength = sizeof(kShebang) - 1;
 
 constexpr char kSnapshotKey[] = "snapshot_blob.bin";
