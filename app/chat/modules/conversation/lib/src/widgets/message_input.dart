@@ -104,8 +104,8 @@ class _MessageInputState extends State<MessageInput> {
               onPressed: () => widget.onTapSharePhoto?.call(),
             ),
             new Expanded(
-              flex: 1,
               child: new TextField(
+                maxLines: null,
                 controller: _controller,
                 onSubmitted: (_) => _handleSubmit(),
                 decoration: const InputDecoration.collapsed(
