@@ -65,21 +65,7 @@ class ChatConversationList extends StatelessWidget {
               ),
             ),
             new Expanded(
-              flex: 1,
-              child: new ListView(
-                shrinkWrap: true,
-                children: conversations
-                    .map(
-                      (Conversation c) => new ChatConversationListItem(
-                          conversation: c,
-                          onSelect: () => onSelectConversation?.call(c),
-                          selected: _intListEquality.equals(
-                            selectedId,
-                            c.conversationId,
-                          )),
-                    )
-                    .toList(),
-              ),
+              child: _buildListArea(),
             ),
           ],
         ),
@@ -92,6 +78,60 @@ class ChatConversationList extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildListArea() => conversations.isNotEmpty
+      ? _buildConversationList()
+      : _buildNoConversationsMessage();
+
+  Widget _buildConversationList() {
+    return new ListView(
+      shrinkWrap: true,
+      children: conversations
+          .map(
+            (Conversation c) => new ChatConversationListItem(
+                conversation: c,
+                onSelect: () => onSelectConversation?.call(c),
+                selected: _intListEquality.equals(
+                  selectedId,
+                  c.conversationId,
+                )),
+          )
+          .toList(),
+    );
+  }
+
+  Widget _buildNoConversationsMessage() {
+    return new Center(
+      child: new Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          new Icon(
+            Icons.chat_bubble,
+            color: Colors.grey[300],
+            size: 140.0,
+          ),
+          new Container(height: 16.0),
+          new Text(
+            'No conversations yet',
+            style: new TextStyle(
+              fontSize: 16.0,
+              color: Colors.grey[500],
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          new Text(
+            'Start a chat and it will show up here',
+            style: new TextStyle(
+              fontSize: 16.0,
+              color: Colors.grey[500],
+              height: 2.0,
+            ),
+          ),
+          new Container(height: 48.0),
+        ],
+      ),
     );
   }
 }
