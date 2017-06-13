@@ -22,6 +22,9 @@ const String _kApiRestOfUrl = '/youtube/v3/search';
 
 const String _kMaxResults = '10';
 
+/// Callback signature for selecting a video
+typedef void SelectVideoCallback(String id);
+
 /// UI widget that loads and shows related videos for a given Youtube video
 class YoutubeRelatedVideos extends StatefulWidget {
   /// ID of youtube video to show related videos for
@@ -30,9 +33,13 @@ class YoutubeRelatedVideos extends StatefulWidget {
   /// Youtube API key needed to access the Youtube Public APIs
   final String apiKey;
 
+  /// Callback to run when a related video is selected
+  final SelectVideoCallback onSelectVideo;
+
   /// Constructor
   YoutubeRelatedVideos({
     Key key,
+    this.onSelectVideo,
     @required @ExampleValue(kExampleVideoId) this.videoId,
     @required @ConfigKey('google_api_key') this.apiKey,
   })
@@ -52,9 +59,7 @@ class _YoutubeRelatedVideosState extends State<YoutubeRelatedVideos> {
   /// Loading State
   LoadingState _loadingState = LoadingState.inProgress;
 
-  @override
-  void initState() {
-    super.initState();
+  void _updateRelatedVideos() {
     _getRelatedVideoData(
       videoId: widget.videoId,
       apiKey: widget.apiKey,
@@ -80,54 +85,75 @@ class _YoutubeRelatedVideosState extends State<YoutubeRelatedVideos> {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _updateRelatedVideos();
+  }
+
+  @override
+  void didUpdateWidget(YoutubeRelatedVideos oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.videoId != widget.videoId) {
+      _updateRelatedVideos();
+    }
+  }
+
   Widget _buildVideoPreview(VideoData videoData) {
-    return new Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: new Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          new Container(
-            width: 200.0,
-            height: 110.0,
-            child: new YoutubeThumbnail(videoId: videoData.id),
-          ),
-          new Expanded(
-            flex: 1,
-            child: new Container(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  new Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: new Text(
-                      videoData.title,
-                      style: new TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  new Container(
-                    margin: const EdgeInsets.only(bottom: 4.0),
-                    child: new Text(
-                      videoData.channelTitle,
-                      style: new TextStyle(
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ),
-                  new Text(
-                    new DateFormat.yMMMMd().format(videoData.publishedAt),
-                    style: new TextStyle(
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+    return new Material(
+      color: Colors.white,
+      child: new InkWell(
+        onTap: () => widget.onSelectVideo?.call(videoData.id),
+        child: new Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: new Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              new Container(
+                width: 200.0,
+                height: 110.0,
+                child: new YoutubeThumbnail(videoId: videoData.id),
               ),
-            ),
+              new Expanded(
+                flex: 1,
+                child: new Container(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      new Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: new Text(
+                          videoData.title,
+                          style: new TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      new Container(
+                        margin: const EdgeInsets.only(bottom: 4.0),
+                        child: new Text(
+                          videoData.channelTitle,
+                          style: new TextStyle(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ),
+                      new Text(
+                        new DateFormat.yMMMMd().format(videoData.publishedAt),
+                        style: new TextStyle(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

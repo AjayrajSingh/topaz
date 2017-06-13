@@ -38,6 +38,7 @@ class YoutubeRelatedVideosScreen extends StatelessWidget {
                       child: new YoutubeRelatedVideos(
                         videoId: model.videoId,
                         apiKey: apiKey,
+                        onSelectVideo: model.selectVideo,
                       ),
                     )
                   : new CircularProgressIndicator(),

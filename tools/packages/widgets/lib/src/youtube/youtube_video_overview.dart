@@ -74,10 +74,7 @@ class _YoutubeVideoOverviewState extends State<YoutubeVideoOverview> {
     return null;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // Load up Video Metadata
+  void _updateVideo() {
     _getVideoData().then((VideoData videoData) {
       if (mounted) {
         if (videoData == null) {
@@ -98,6 +95,21 @@ class _YoutubeVideoOverviewState extends State<YoutubeVideoOverview> {
         });
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _updateVideo();
+  }
+
+  @override
+  void didUpdateWidget(YoutubeVideoOverview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.videoId != widget.videoId) {
+      _updateVideo();
+    }
   }
 
   Widget _buildLikeCount() {

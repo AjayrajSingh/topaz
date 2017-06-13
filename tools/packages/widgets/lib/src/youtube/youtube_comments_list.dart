@@ -79,9 +79,7 @@ class _YoutubeCommentsListState extends State<YoutubeCommentsList> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
+  void _updateComments() {
     _getCommentsData().then((List<VideoComment> comments) {
       if (mounted) {
         if (comments == null) {
@@ -102,6 +100,21 @@ class _YoutubeCommentsListState extends State<YoutubeCommentsList> {
         });
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _updateComments();
+  }
+
+  @override
+  void didUpdateWidget(YoutubeCommentsList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.videoId != widget.videoId) {
+      _updateComments();
+    }
   }
 
   Widget _buildCommentFooter(VideoComment comment) {

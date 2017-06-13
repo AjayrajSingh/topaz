@@ -106,7 +106,7 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.28-dev"
+    version: "0.0.29-dev"
   flutter_markdown:
     description:
       name: flutter_markdown

@@ -16,6 +16,9 @@ const String _kYoutubeVideoIdKey = 'youtube-video-id';
 
 /// The model class for the youtube_related_videos module.
 class YoutubeRelatedVideosModuleModel extends ModuleModel {
+  /// Constructor
+  YoutubeRelatedVideosModuleModel() : super(watchAll: true);
+
   /// Gets the Youtube video id.
   String get videoId => _videoId;
   String _videoId;
@@ -35,6 +38,14 @@ class YoutubeRelatedVideosModuleModel extends ModuleModel {
     _videoId = doc[_kYoutubeDocRoot][_kYoutubeVideoIdKey];
 
     log.fine('_videoId: $_videoId');
+    notifyListeners();
+  }
+
+  /// Makes the selected video the main video and updates the link
+  void selectVideo(String videoId) {
+    Map<String, dynamic> doc = <String, dynamic>{_kYoutubeVideoIdKey: videoId};
+    link.updateObject(<String>[_kYoutubeDocRoot], JSON.encode(doc));
+    _videoId = videoId;
     notifyListeners();
   }
 }
