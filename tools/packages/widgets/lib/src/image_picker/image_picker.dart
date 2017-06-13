@@ -150,6 +150,13 @@ class _ImagePickerState extends State<ImagePicker>
           _enableClearButton = true;
           _isLoading = false;
 
+          if (initialSelection?.isNotEmpty ?? false) {
+            _selectedImages = new List<String>.from(initialSelection);
+            _animationController.forward();
+          } else {
+            clearSelection();
+          }
+
           if (images == null) {
             _emptyStateMessage = _kLoadErrorMessage;
           } else if (_sourceImages.isEmpty &&
