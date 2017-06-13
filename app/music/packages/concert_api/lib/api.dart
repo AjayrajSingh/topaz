@@ -7,7 +7,6 @@ import 'dart:convert' show JSON;
 
 import 'package:concert_models/concert_models.dart';
 import 'package:http/http.dart' as http;
-import 'package:meta/meta.dart';
 
 const String _kApiBaseUrl = 'api.songkick.com';
 
@@ -15,8 +14,8 @@ const String _kApiBaseUrl = 'api.songkick.com';
 class Api {
   /// Searches for Songkick artists given a name
   static Future<List<Artist>> searchArtist(
-    @required String name,
-    @required String apiKey,
+    String name,
+    String apiKey,
   ) async {
     assert(name != null);
     assert(apiKey != null);
@@ -52,7 +51,7 @@ class Api {
   /// Only nearby (based on client IP address) events will shown.
   static Future<List<Event>> searchEventsByArtist(
     String name,
-    @required String apiKey,
+    String apiKey,
   ) async {
     assert(apiKey != null);
     Map<String, String> query = new Map<String, String>();
