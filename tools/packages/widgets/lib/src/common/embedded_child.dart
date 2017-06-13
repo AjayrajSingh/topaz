@@ -133,7 +133,7 @@ class EmbeddedChildProvider {
   /// The `dispose()` method of the returned [EmbeddedChild] must be called when
   /// the child is no longer in use.
   EmbeddedChild buildEmbeddedChild(
-    @required String type,
+    String type,
     dynamic args,
   ) {
     assert(type != null);
