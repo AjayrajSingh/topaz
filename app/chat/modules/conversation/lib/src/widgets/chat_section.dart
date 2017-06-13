@@ -41,16 +41,20 @@ class ChatSection extends StatelessWidget {
 
     Widget chatColumn = _buildBubbles(theme, section.messages);
 
+    // Reserve 1/3 of the width as a padding, so that the chat bubbles do not
+    // take up the entire width.
+    Widget paddingColumn = new Expanded(flex: 1, child: new Container());
+
     // Order avatar & chat bubbles depending on orientation
     List<Widget> rowChildren;
     if (section.isMyMessage) {
-      rowChildren = <Widget>[chatColumn];
+      rowChildren = <Widget>[paddingColumn, chatColumn];
     } else {
       Widget alphatar = new Container(
         margin: const EdgeInsets.symmetric(horizontal: 4.0),
         child: new Alphatar.fromName(name: section.sender),
       );
-      rowChildren = <Widget>[alphatar, chatColumn];
+      rowChildren = <Widget>[alphatar, chatColumn, paddingColumn];
     }
 
     Widget result = new Container(
@@ -131,6 +135,7 @@ class ChatSection extends StatelessWidget {
         : ChatBubbleOrientation.left;
 
     return new Expanded(
+      flex: 2,
       child: new DefaultTextStyle(
         style: section.isMyMessage
             ? theme.textTheme.body1
