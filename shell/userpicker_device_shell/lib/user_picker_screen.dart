@@ -53,7 +53,10 @@ class UserPickerScreen extends StatelessWidget {
               new Align(
                 alignment: FractionalOffset.bottomRight,
                 child: new Container(
-                  margin: const EdgeInsets.all(16.0),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 10.0,
+                  ),
                   child: new Image.asset(
                     'packages/userpicker_device_shell/res/fuchsia.png',
                     width: 64.0,
