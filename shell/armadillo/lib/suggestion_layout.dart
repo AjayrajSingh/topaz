@@ -76,7 +76,6 @@ class SuggestionLayout {
   double _suggestionHeight;
   double _suggestionWidth;
   Widget _suggestionText;
-  double _lastLayoutMaxWidth;
 
   /// Constructor.
   SuggestionLayout({Suggestion suggestion})
@@ -111,12 +110,12 @@ class SuggestionLayout {
 
   /// Sets [suggestionText] or [suggestionHeight] up for the given [maxWidth].
   void layout(double maxWidth) {
-    if (maxWidth == _lastLayoutMaxWidth) {
+    double suggestionWidth = math.min(kSuggestionWidth, maxWidth);
+    if (_suggestionWidth == suggestionWidth) {
       return;
     }
-    _lastLayoutMaxWidth = maxWidth;
+    _suggestionWidth = suggestionWidth;
 
-    _suggestionWidth = math.min(kSuggestionWidth, maxWidth);
     double textMaxWidth = suggestionWidth -
         (_suggestion.image == null ? 0.0 : kSuggestionImageWidth) -
         ((isCircularSuggestionImage ? 1 : 2) * _kHorizontalMargin);

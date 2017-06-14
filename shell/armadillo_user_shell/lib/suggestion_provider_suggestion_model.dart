@@ -37,29 +37,60 @@ final Map<maxwell.SuggestionImageType, ImageType> _kImageTypeMap =
 class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
   final String prefix;
   final VoidCallback suggestionListener;
-  final Map<String, Suggestion> _suggestions = <String, Suggestion>{};
+  final List<Suggestion> _suggestions = <Suggestion>[];
+  final List<Suggestion> _interruptions = <Suggestion>[];
+  final _InterruptionListener interruptionListener;
 
-  _MaxwellSuggestionListenerImpl({this.prefix, this.suggestionListener});
+  _MaxwellSuggestionListenerImpl({
+    this.prefix,
+    this.suggestionListener,
+    this.interruptionListener,
+  });
 
-  List<Suggestion> get suggestions => _suggestions.values.toList();
+  List<Suggestion> get suggestions => _suggestions.toList();
+  List<Suggestion> get interruptions => _interruptions.toList();
 
   @override
   void onAdd(List<maxwell.Suggestion> suggestions) {
     suggestions.forEach(
-      (maxwell.Suggestion suggestion) =>
-          _suggestions[suggestion.uuid] = _convert(suggestion),
+      (maxwell.Suggestion suggestion) {
+        if (suggestion.display.annoyance == maxwell.AnnoyanceType.none) {
+          _suggestions.add(_convert(suggestion));
+        } else {
+          Suggestion interruption = _convert(suggestion);
+          _interruptions.add(interruption);
+          interruptionListener.onInterruptionAdded(interruption);
+        }
+      },
     );
     suggestionListener?.call();
   }
 
   @override
   void onRemove(String uuid) {
-    _suggestions.remove(uuid);
+    _suggestions.removeWhere(
+      (Suggestion suggestion) => suggestion.id.value == uuid,
+    );
+    if (_interruptions
+        .where((Suggestion suggestion) => suggestion.id.value == uuid)
+        .isNotEmpty) {
+      _interruptions.removeWhere(
+        (Suggestion suggestion) => suggestion.id.value == uuid,
+      );
+      interruptionListener.onInterruptionRemoved(uuid);
+    }
     suggestionListener?.call();
   }
 
   @override
   void onRemoveAll() {
+    List<Suggestion> interruptionsToRemove = _interruptions.toList();
+    _interruptions.clear();
+    interruptionsToRemove.forEach(
+      (Suggestion suggestion) => interruptionListener.onInterruptionRemoved(
+            suggestion.id.value,
+          ),
+    );
     _suggestions.clear();
     suggestionListener?.call();
   }
@@ -72,7 +103,7 @@ typedef void OnInterruptionAdded(Suggestion interruption);
 typedef void OnInterruptionRemoved(String id);
 
 /// Listens for interruptions from maxwell.
-class InterruptionListener extends maxwell.SuggestionListener {
+class _InterruptionListener extends maxwell.SuggestionListener {
   /// Called when an interruption occurs.
   final OnInterruptionAdded onInterruptionAdded;
 
@@ -83,7 +114,7 @@ class InterruptionListener extends maxwell.SuggestionListener {
   final VoidCallback onInterruptionsRemoved;
 
   /// Constructor.
-  InterruptionListener({
+  _InterruptionListener({
     @required this.onInterruptionAdded,
     @required this.onInterruptionRemoved,
     @required this.onInterruptionsRemoved,
@@ -175,8 +206,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   // Listens for changes to maxwell's next suggestion list.
   _MaxwellSuggestionListenerImpl _nextListener;
 
-  final maxwell.SuggestionListenerBinding _interruptionListenerBinding =
-      new maxwell.SuggestionListenerBinding();
+  _InterruptionListener _interruptionListener;
 
   /// The key for the interruption overlay.
   final GlobalKey<InterruptionOverlayState> interruptionOverlayKey;
@@ -220,7 +250,6 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     _askListenerBinding.close();
     _nextControllerProxy.ctrl.close();
     _nextListenerBinding.close();
-    _interruptionListenerBinding.close();
   }
 
   /// Setting [suggestionProvider] triggers the loading on suggestions.
@@ -229,13 +258,28 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     maxwell.SuggestionProviderProxy suggestionProviderProxy,
   ) {
     _suggestionProviderProxy = suggestionProviderProxy;
+    _interruptionListener = new _InterruptionListener(
+      onInterruptionAdded: (Suggestion interruption) {
+        interruptionOverlayKey.currentState.onInterruptionAdded(interruption);
+      },
+      onInterruptionRemoved: (String uuid) {
+        interruptionOverlayKey.currentState.onInterruptionRemoved(uuid);
+        _onInterruptionRemoved(uuid);
+      },
+      onInterruptionsRemoved: () {
+        interruptionOverlayKey.currentState.onInterruptionsRemoved();
+        _onInterruptionsRemoved();
+      },
+    );
     _askListener = new _MaxwellSuggestionListenerImpl(
       prefix: 'ask',
       suggestionListener: _onAskSuggestionsChanged,
+      interruptionListener: _interruptionListener,
     );
     _nextListener = new _MaxwellSuggestionListenerImpl(
       prefix: 'next',
       suggestionListener: _onNextSuggestionsChanged,
+      interruptionListener: _interruptionListener,
     );
     _load();
   }
@@ -270,9 +314,14 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     Suggestion interruption,
     DismissalReason reason,
   ) {
+    // Ignore the interruption dismissal if its stale.
     switch (reason) {
       case DismissalReason.snoozed:
       case DismissalReason.timedOut:
+        if (!_askListener.interruptions.contains(interruption) &&
+            !_nextListener.interruptions.contains(interruption)) {
+          return;
+        }
         _currentInterruptions.insert(0, interruption);
         notifyListeners();
         break;
@@ -307,31 +356,10 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       _nextControllerProxy.ctrl.request(),
     );
     _nextControllerProxy.setResultCount(_kMaxSuggestions);
-
-    _suggestionProviderProxy.subscribeToInterruptions(
-      _interruptionListenerBinding.wrap(
-        new InterruptionListener(
-          onInterruptionAdded: (Suggestion interruption) =>
-              interruptionOverlayKey.currentState
-                  .onInterruptionAdded(interruption),
-          onInterruptionRemoved: (String uuid) {
-            interruptionOverlayKey.currentState.onInterruptionRemoved(uuid);
-            _onInterruptionRemoved(uuid);
-          },
-          onInterruptionsRemoved: () {
-            interruptionOverlayKey.currentState.onInterruptionsRemoved();
-            _onInterruptionsRemoved();
-          },
-        ),
-      ),
-    );
   }
 
   @override
   List<Suggestion> get suggestions {
-    if (_asking) {
-      return new List<Suggestion>.from(_currentSuggestions);
-    }
     List<Suggestion> suggestions = new List<Suggestion>.from(
       _currentInterruptions,
     );

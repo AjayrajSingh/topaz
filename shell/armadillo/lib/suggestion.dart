@@ -85,6 +85,8 @@ class Suggestion {
 
   SuggestionLayout _suggestionLayout;
 
+  GlobalKey _suggestionKey;
+
   /// Constructor.
   Suggestion({
     @required this.id,
@@ -99,6 +101,7 @@ class Suggestion {
     this.imageSide: ImageSide.right,
   }) {
     _suggestionLayout = new SuggestionLayout(suggestion: this);
+    _suggestionKey = new GlobalObjectKey(this);
   }
 
   /// How the suggestion should be laid out.
@@ -112,4 +115,7 @@ class Suggestion {
 
   @override
   String toString() => 'Suggestion(title: $title)';
+
+  /// The global key to use when this suggestion is in a widget.
+  GlobalKey get globalKey => _suggestionKey;
 }

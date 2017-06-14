@@ -43,12 +43,16 @@ class SuggestionWidget extends StatelessWidget {
   /// If false, the widget will be invisible.
   final bool visible;
 
+  /// If true, the widget has a shadow under it.
+  final bool shadow;
+
   /// Constructor.
   SuggestionWidget({
     Key key,
     this.suggestion,
     this.onSelected,
     this.visible: true,
+    this.shadow: false,
   })
       : super(key: key);
 
@@ -74,17 +78,16 @@ class SuggestionWidget extends StatelessWidget {
             width: suggestion.suggestionLayout.suggestionWidth,
             child: new Offstage(
               offstage: !visible,
-              child: new ClipRRect(
+              child: new Material(
+                color: Colors.white,
                 borderRadius: new BorderRadius.circular(
                   kSuggestionCornerRadius,
                 ),
-                child: new Container(
-                  color: Colors.white,
-                  child: new GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: onSelected,
-                    child: new Row(children: rowChildren),
-                  ),
+                elevation: shadow ? 3.0 : 0.0,
+                child: new GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: onSelected,
+                  child: new Row(children: rowChildren),
                 ),
               ),
             ),
@@ -157,9 +160,17 @@ class SuggestionWidget extends StatelessWidget {
                         ),
                       ),
                     )
-                  : new Container(
-                      constraints: new BoxConstraints.expand(),
-                      child: suggestion.image.call(context),
+                  : new ClipRRect(
+                      borderRadius: new BorderRadius.only(
+                        topRight: new Radius.circular(kSuggestionCornerRadius),
+                        bottomRight: new Radius.circular(
+                          kSuggestionCornerRadius,
+                        ),
+                      ),
+                      child: new Container(
+                        constraints: new BoxConstraints.expand(),
+                        child: suggestion.image.call(context),
+                      ),
                     ),
             );
 }

@@ -19,11 +19,6 @@ const Duration _kInterruptionExitingTimeout =
 
 double _kBottomSpacing = 24.0;
 
-// Current suggestion height is 120.0.
-// Vertical margin of 12.0 is added to each suggestion in the list.
-// Adding them together gives proper alignment when sliding down.
-double _kMaxHeight = 120.0 + 12.0;
-
 enum _RemoveDirection {
   left,
   down,
@@ -148,6 +143,9 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
             _exitingInterruptionWidgets,
           );
           if (_currentInterruption != null) {
+            _currentInterruption.suggestionLayout.layout(_constraints.maxWidth);
+            double suggestionHeight =
+                _currentInterruption.suggestionLayout.suggestionHeight;
             stackChildren.add(
               new SimulatedPositioned(
                 key: new ObjectKey(_currentInterruption),
@@ -155,13 +153,13 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
                   widget.suggestionHorizontalMargin,
                   constraints.maxHeight + kAskHeight,
                   widget.suggestionWidth,
-                  _kMaxHeight,
+                  suggestionHeight,
                 ),
                 rect: new Rect.fromLTWH(
                   widget.suggestionHorizontalMargin,
-                  constraints.maxHeight - _kBottomSpacing - _kMaxHeight,
+                  constraints.maxHeight - _kBottomSpacing - suggestionHeight,
                   widget.suggestionWidth,
-                  _kMaxHeight,
+                  suggestionHeight,
                 ),
                 dragOffsetTransform: (
                   Offset currentOffset,
@@ -175,7 +173,7 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
                                 newOffset.dy <=
                                     (kAskHeight +
                                         _kBottomSpacing +
-                                        _kMaxHeight))
+                                        suggestionHeight))
                             ? 1.0
                             : 0.3),
                   );
@@ -208,13 +206,15 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
                 child: new Align(
                   alignment: FractionalOffset.bottomCenter,
                   child: new _FadeInWidget(
+                    key: new ObjectKey(_currentInterruption),
                     opacity: 1.0,
                     child: new SuggestionWidget(
-                      key: new GlobalObjectKey(_currentInterruption),
+                      key: _currentInterruption.globalKey,
                       suggestion: _currentInterruption,
                       onSelected: () => _onSuggestionSelected(
                             _currentInterruption,
                           ),
+                      shadow: true,
                     ),
                   ),
                 ),
@@ -246,6 +246,9 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
   ) {
     Suggestion interruptionToRemove = _currentInterruption;
     assert(interruptionToRemove != null);
+    interruptionToRemove.suggestionLayout.layout(_constraints.maxWidth);
+    double suggestionHeight =
+        interruptionToRemove.suggestionLayout.suggestionHeight;
     Widget exitingWidget;
     exitingWidget = new SimulatedPositioned(
       key: new ObjectKey(interruptionToRemove),
@@ -257,10 +260,10 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
             ? _constraints.maxHeight + kAskHeight
             : _constraints.maxHeight -
                 _kBottomSpacing -
-                _kMaxHeight +
+                suggestionHeight +
                 offset.dy,
         widget.suggestionWidth,
-        _kMaxHeight,
+        suggestionHeight,
       ),
       onRectReached: () {
         if (mounted) {
@@ -275,9 +278,14 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
       },
       child: new Align(
         alignment: FractionalOffset.bottomCenter,
-        child: new SuggestionWidget(
-          key: new GlobalObjectKey(interruptionToRemove),
-          suggestion: interruptionToRemove,
+        child: new _FadeInWidget(
+          key: new ObjectKey(interruptionToRemove),
+          opacity: 1.0,
+          child: new SuggestionWidget(
+            key: interruptionToRemove.globalKey,
+            suggestion: interruptionToRemove,
+            shadow: true,
+          ),
         ),
       ),
     );
@@ -329,8 +337,7 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
         // global coordinates so it can be mapped back to
         // local coordinates when it's displayed in the
         // SelectedSuggestionOverlay.
-        RenderBox box =
-            new GlobalObjectKey(suggestion).currentContext.findRenderObject();
+        RenderBox box = suggestion.globalKey.currentContext.findRenderObject();
         widget.onSuggestionSelected(
           suggestion,
           box.localToGlobal(Offset.zero) & box.size,

@@ -272,8 +272,7 @@ class SuggestionListState extends State<SuggestionList>
         // global coordinates so it can be mapped back to
         // local coordinates when it's displayed in the
         // SelectedSuggestionOverlay.
-        RenderBox box =
-            new GlobalObjectKey(suggestion).currentContext.findRenderObject();
+        RenderBox box = suggestion.globalKey.currentContext.findRenderObject();
         widget.onSuggestionSelected(
           suggestion,
           box.localToGlobal(Offset.zero) & box.size,
@@ -289,7 +288,7 @@ class SuggestionListState extends State<SuggestionList>
         child: new FadeTransition(
           opacity: _curvedFadeInAnimation,
           child: new SuggestionWidget(
-            key: new GlobalObjectKey(suggestion),
+            key: suggestion.globalKey,
             visible: _selectedSuggestion?.id != suggestion.id,
             suggestion: suggestion,
             onSelected: () => _onSuggestionSelected(suggestion),
@@ -299,7 +298,7 @@ class SuggestionListState extends State<SuggestionList>
 
   /// Determines the width of a suggestion in the suggestion list.
   static double getSuggestionWidth(double maxWidth) =>
-      math.min(kSuggestionWidth, maxWidth - -2.0 * _kSuggestionGap);
+      math.min(kSuggestionWidth, maxWidth - 2 * _kSuggestionGap);
 
   /// Determines the horizontal margin of suggestions in the suggestion list.
   static double getSuggestionHorizontalMargin() => _kSuggestionGap;
