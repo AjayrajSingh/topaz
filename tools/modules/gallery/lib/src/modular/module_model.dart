@@ -134,6 +134,7 @@ class GalleryModuleModel extends ModuleModel {
 
   /// This is called when the query string is changed by the user from the UI.
   void handleQueryChanged(String query) {
+    _queryString = query;
     link.set(const <String>[_kContract, _kQueryKey], JSON.encode(query));
   }
 
@@ -141,6 +142,10 @@ class GalleryModuleModel extends ModuleModel {
   /// user made on the selection. We have to store this information to Link, so
   /// that the selection may be restored correctly later.
   void handleSelectionChanged(List<String> imageUrls) {
+    _initialSelection
+      ..clear()
+      ..addAll(imageUrls);
+
     String json = JSON.encode(imageUrls);
     _selectionLink.set(const <String>[], json);
   }

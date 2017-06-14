@@ -4,7 +4,6 @@
 
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:search_api/search_api.dart';
@@ -99,8 +98,24 @@ class _ImagePickerState extends State<ImagePicker>
     _handleInputChange(_controller.text);
   }
 
+  // Update the selection from the given list.
+  void _updateSelection(List<String> newSelection) {
+    List<String> selection = newSelection != null
+        ? newSelection
+            .where((String url) => _sourceImages.contains(url))
+            .toList()
+        : <String>[];
+
+    if (selection.isNotEmpty) {
+      _selectedImages = selection;
+      _animationController.forward();
+    } else {
+      _clearSelection();
+    }
+  }
+
   // Clears all selected images
-  void clearSelection() {
+  void _clearSelection() {
     if (_selectedImages.isNotEmpty) {
       _animationController.reverse();
     }
@@ -149,13 +164,7 @@ class _ImagePickerState extends State<ImagePicker>
           _sourceImages = images ?? <String>[];
           _enableClearButton = true;
           _isLoading = false;
-
-          if (initialSelection?.isNotEmpty ?? false) {
-            _selectedImages = new List<String>.from(initialSelection);
-            _animationController.forward();
-          } else {
-            clearSelection();
-          }
+          _updateSelection(initialSelection);
 
           if (images == null) {
             _emptyStateMessage = _kLoadErrorMessage;
@@ -233,15 +242,10 @@ class _ImagePickerState extends State<ImagePicker>
   void didUpdateWidget(ImagePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Make a new search if widget.query has been changed
-    if (oldWidget.initialQuery != widget.initialQuery ||
-        !const ListEquality<String>()
-            .equals(oldWidget.initialSelection, widget.initialSelection)) {
-      if ((oldWidget.initialQuery ?? '') == _controller.text) {
-        _controller.text = widget.initialQuery ?? '';
-        _search(widget.initialQuery, widget.initialSelection);
-      }
-    }
+    String query = widget.initialQuery ?? '';
+    _controller.text = query;
+    _search(query, widget.initialSelection);
+    _updateSelection(widget.initialSelection);
   }
 
   @override
@@ -308,7 +312,7 @@ class _ImagePickerState extends State<ImagePicker>
         ),
       ),
     );
-    ImageGrid imagePicker = new ImageGrid(
+    ImageGrid imageGrid = new ImageGrid(
       imageUrls: _sourceImages,
       selectedImages: _selectedImages,
       onImageTap: (String url) {
@@ -365,7 +369,7 @@ class _ImagePickerState extends State<ImagePicker>
               new IconButton(
                 icon: new Icon(Icons.clear),
                 color: Colors.grey[900],
-                onPressed: clearSelection,
+                onPressed: _clearSelection,
               ),
             ],
           ),
@@ -387,7 +391,7 @@ class _ImagePickerState extends State<ImagePicker>
           child: new Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
-              imagePicker,
+              imageGrid,
               loadingOverlay,
               _createEmptyState(),
             ],
