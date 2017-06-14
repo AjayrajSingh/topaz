@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui' show lerpDouble;
+
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sysui_widgets/rk4_spring_simulation.dart';
 
@@ -92,21 +95,40 @@ class ExpandSuggestion extends ExpansionBehavior {
       fit: StackFit.passthrough,
       children: <Widget>[
         new Positioned(
-          left: (suggestionInitialGlobalBounds.left - topLeft.dx) *
-              (1.0 - _expansionProgress),
-          top: (suggestionInitialGlobalBounds.top - topLeft.dy) *
-              (1.0 - _expansionProgress),
-          width: suggestionInitialGlobalBounds.width +
-              (constraints.maxWidth - suggestionInitialGlobalBounds.width) *
-                  _expansionProgress,
-          height: suggestionInitialGlobalBounds.height +
-              (constraints.maxHeight -
-                      suggestionInitialGlobalBounds.height -
-                      bottomMargin) *
-                  _expansionProgress,
+          left: lerpDouble(
+            suggestionInitialGlobalBounds.left - topLeft.dx,
+            0.0,
+            _expansionProgress,
+          ),
+          top: lerpDouble(
+            suggestionInitialGlobalBounds.top - topLeft.dy,
+            0.0,
+            _expansionProgress,
+          ),
+          width: lerpDouble(
+            suggestionInitialGlobalBounds.width,
+            constraints.maxWidth,
+            _expansionProgress,
+          ),
+          height: lerpDouble(
+            suggestionInitialGlobalBounds.height,
+            constraints.maxHeight - bottomMargin,
+            _expansionProgress,
+          ),
           child: new Opacity(
             opacity: _opacityProgress,
-            child: new SuggestionWidget(suggestion: suggestion),
+            child: new Container(
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                borderRadius: new BorderRadius.circular(
+                  lerpDouble(kSuggestionCornerRadius, 0.0, _expansionProgress),
+                ),
+              ),
+              child: new Opacity(
+                opacity: lerpDouble(1.0, 0.0, _expansionProgress),
+                child: new SuggestionWidget(suggestion: suggestion),
+              ),
+            ),
           ),
         ),
       ],

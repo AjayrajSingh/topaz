@@ -463,19 +463,11 @@ class ConductorState extends State<Conductor> {
             ? new ExpandSuggestion(
                 suggestion: suggestion,
                 suggestionInitialGlobalBounds: globalBounds,
-                onSuggestionExpanded: (Suggestion suggestion) => _focusOnStory(
-                      suggestion.selectionStoryId,
-                      storyModel,
-                    ),
                 bottomMargin: _kMinimizedNowHeight,
               )
             : new SplashSuggestion(
                 suggestion: suggestion,
                 suggestionInitialGlobalBounds: globalBounds,
-                onSuggestionExpanded: (Suggestion suggestion) => _focusOnStory(
-                      suggestion.selectionStoryId,
-                      storyModel,
-                    ),
               ),
       );
       _minimizeNow();

@@ -27,7 +27,7 @@ const double _kIconSpacing = 8.0;
 /// Gives each suggestion a slight rounded edge.
 /// TODO(apwilson): We may want to animate this to zero when expanding the card
 /// to fill the screen.
-const double _kSuggestionCornerRadius = 8.0;
+const double kSuggestionCornerRadius = 8.0;
 
 /// The diameter of the person image.
 const double _kPersonImageDiameter = 48.0;
@@ -76,7 +76,7 @@ class SuggestionWidget extends StatelessWidget {
               offstage: !visible,
               child: new ClipRRect(
                 borderRadius: new BorderRadius.circular(
-                  _kSuggestionCornerRadius,
+                  kSuggestionCornerRadius,
                 ),
                 child: new Container(
                   color: Colors.white,
