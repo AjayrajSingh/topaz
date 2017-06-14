@@ -15,6 +15,7 @@ import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
+import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:apps.modules.music.services.player/player.fidl.dart'
     as player_fidl;
 import 'package:apps.modules.music.services.player/track.fidl.dart'
@@ -252,7 +253,7 @@ class ArtistModuleModel extends ModuleModel {
         null, // outgoingServices,
         null, // incomingServices,
         new InterfacePair<ModuleController>().passRequest(),
-        null,
+        new SurfaceRelation()..arrangement = SurfaceArrangement.sequential,
       );
     }
   }
