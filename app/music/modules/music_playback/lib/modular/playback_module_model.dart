@@ -19,6 +19,7 @@ import 'package:music_models/music_models.dart';
 import 'player_status_listener.dart';
 
 const String _kPlayerUrl = 'file:///system/apps/music_playback_agent';
+final Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
 
 /// [ModuleModel] that manages the state of the Playback Module.
 class PlaybackModuleModel extends ModuleModel {
@@ -53,6 +54,8 @@ class PlaybackModuleModel extends ModuleModel {
   /// Skip to previous track in queue
   void previous() => _player.previous();
 
+  Timer _progressTimer;
+
   @override
   void onReady(
     ModuleContext moduleContext,
@@ -77,26 +80,12 @@ class PlaybackModuleModel extends ModuleModel {
     // Attach listener to player status updates
     _statusListener = new PlayerStatusListenerImpl(
       onStatusUpdate: (PlayerStatus status) {
-        _isPlaying = status.isPlaying;
-        _playbackPosition =
-            new Duration(milliseconds: status.playbackPositionInMilliseconds);
-        _currentTrack = new Track(
-          name: status.track.title,
-          id: status.track.title,
-          duration: new Duration(seconds: status.track.durationInSeconds),
-          playbackUrl: status.track.playbackUrl,
-          artists: <Artist>[
-            new Artist(name: status.track.artist),
-          ],
-          album: new Album(
-            name: status.track.album,
-            images: <MusicImage>[
-              new MusicImage(
-                url: status.track.cover,
-              ),
-            ],
-          ),
-        );
+        _updatePlaybackStatus(status);
+        if (status.isPlaying) {
+          _ensureProgressTimer();
+        } else {
+          _ensureNoProgressTimer();
+        }
         notifyListeners();
       },
     );
@@ -109,8 +98,57 @@ class PlaybackModuleModel extends ModuleModel {
 
   @override
   Future<Null> onStop() async {
+    _ensureNoProgressTimer();
     _player.ctrl.close();
     _playbackAgentController.ctrl.close();
     super.onStop();
+  }
+
+  /// Ensure that the progress timer is running.
+  void _ensureProgressTimer() {
+    if (_progressTimer != null) {
+      return;
+    }
+
+    _progressTimer = new Timer.periodic(
+      _kProgressBarUpdateInterval,
+      (Timer timer) {
+        _player.getStatus(_updatePlaybackStatus);
+      },
+    );
+  }
+
+  /// Ensure that the progress timer is not running.
+  void _ensureNoProgressTimer() {
+    if (_progressTimer == null) {
+      return;
+    }
+
+    _progressTimer.cancel();
+    _progressTimer = null;
+  }
+
+  void _updatePlaybackStatus(PlayerStatus status) {
+    _isPlaying = status.isPlaying;
+    _playbackPosition =
+        new Duration(milliseconds: status.playbackPositionInMilliseconds);
+    _currentTrack = new Track(
+      name: status.track.title,
+      id: status.track.title,
+      duration: new Duration(seconds: status.track.durationInSeconds),
+      playbackUrl: status.track.playbackUrl,
+      artists: <Artist>[
+        new Artist(name: status.track.artist),
+      ],
+      album: new Album(
+        name: status.track.album,
+        images: <MusicImage>[
+          new MusicImage(
+            url: status.track.cover,
+          ),
+        ],
+      ),
+    );
+    notifyListeners();
   }
 }

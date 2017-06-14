@@ -10,7 +10,7 @@ import 'package:apps.modules.music.services.player/track.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 /// Function signature for status callback
-typedef void GetStatusCallback(int versionLastSeen, PlayerStatus status);
+typedef void GetStatusCallback(PlayerStatus status);
 
 void _log(String msg) {
   print('[music_player] $msg');
@@ -69,9 +69,8 @@ class PlayerImpl extends Player {
   }
 
   @override
-  void getStatus(int versionLastSeen, GetStatusCallback callback) {
-    // TODO (dayang@): Get the status
-    _log('Get Status');
+  void getStatus(GetStatusCallback callback) {
+    callback(_playerStatus);
   }
 
   @override
@@ -108,13 +107,14 @@ class PlayerImpl extends Player {
   }
 
   void _updateListeners() {
-    PlayerStatus status = new PlayerStatus()
-      ..isPlaying = _audioPlayerController.playing
-      ..track = _currentTrack
-      ..playbackPositionInMilliseconds = _currentTrack != null
-          ? _audioPlayerController.progress.inMilliseconds
-          : 0;
-    _listeners.forEach(
-        (PlayerStatusListenerProxy listener) => listener.onUpdate(status));
+    _listeners.forEach((PlayerStatusListenerProxy listener) =>
+        listener.onUpdate(_playerStatus));
   }
+
+  PlayerStatus get _playerStatus => new PlayerStatus()
+    ..isPlaying = _audioPlayerController.playing
+    ..track = _currentTrack
+    ..playbackPositionInMilliseconds = _currentTrack != null
+        ? _audioPlayerController.progress.inMilliseconds
+        : 0;
 }

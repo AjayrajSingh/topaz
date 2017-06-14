@@ -33,10 +33,8 @@ interface Player {
   // Removes the given track(s) from the play queue
   Dequeue(array<string> trackIds);
 
-  // Gets the playback status and the current track being played.
-  // To get the status immediately, call GetStatus(kInitialStatus).
-  // To get updates thereafter, pass the version sent in the previous callback.
-  GetStatus(uint64 version_last_seen) => (uint64 version, PlayerStatus status);
+  // Gets the playback status
+  GetStatus() => (PlayerStatus status);
 
   // Register the PlayerStatusListener to receive Status and Track updates.
   // The subscription will continue to stay open as long as the listener handle
