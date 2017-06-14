@@ -20,3 +20,6 @@ dev_dependencies:
     sdk: flutter
 flutter:
   uses-material-design: true
+  assets:
+    - packages/concert_widgets/res/concert_bg.jpg
+    - packages/concert_widgets/res/plat_logo.png
