@@ -25,6 +25,9 @@ class PeekingOverlay extends StatefulWidget {
   /// hiding.
   final double peekHeight;
 
+  /// The height to allow vertical drags to open/close the overlay.
+  final double dragHandleHeight;
+
   /// The overlay's parent's width.
   final double parentWidth;
 
@@ -44,6 +47,7 @@ class PeekingOverlay extends StatefulWidget {
   PeekingOverlay({
     Key key,
     this.peekHeight: _kStartOverlayTransitionHeight,
+    this.dragHandleHeight,
     this.parentWidth,
     this.onHide,
     this.onShow,
@@ -186,7 +190,8 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
                     top: 0.0,
                     left: 0.0,
                     right: 0.0,
-                    height: widget.peekHeight,
+                    height:
+                        hiding ? widget.peekHeight : widget.dragHandleHeight,
                     child: new GestureDetector(
                       onVerticalDragUpdate: onVerticalDragUpdate,
                       onVerticalDragEnd: onVerticalDragEnd,

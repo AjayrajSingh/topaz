@@ -406,6 +406,7 @@ class ConductorState extends State<Conductor> {
     return new PeekingOverlay(
       key: _suggestionOverlayKey,
       peekHeight: _kSuggestionOverlayPeekHeight,
+      dragHandleHeight: kAskHeight,
       parentWidth: maxWidth,
       onHide: () {
         widget.onSuggestionsOverlayChanged?.call(false);
