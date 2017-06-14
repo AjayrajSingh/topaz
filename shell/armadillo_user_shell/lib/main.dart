@@ -141,12 +141,15 @@ Future<Null> main() async {
     contextTopics: ContextProviderContextModel.topics,
   );
 
+  NowModel nowModel = new NowModel();
+
   Conductor conductor = new Conductor(
     key: conductorKey,
     blurScrimmedChildren: false,
     onQuickSettingsOverlayChanged: hitTestModel.onQuickSettingsOverlayChanged,
     onSuggestionsOverlayChanged: hitTestModel.onSuggestionsOverlayChanged,
     storyClusterDragStateModel: storyClusterDragStateModel,
+    nowModel: nowModel,
     onLogoutSelected: userLogoutter.logout,
     interruptionOverlayKey: interruptionOverlayKey,
     onInterruptionDismissed:
@@ -154,7 +157,6 @@ Future<Null> main() async {
     onUserContextTapped: model.onUserContextTapped,
   );
 
-  NowModel nowModel = new NowModel();
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();
 

@@ -39,6 +39,9 @@ class NowModel extends Model {
     notifyListeners();
   }
 
+  /// The current progress of the quick settings animation.
+  double get quickSettingsProgress => _quickSettingsProgress;
+
   /// Returns an avatar of the current user.
   Widget get user => new Image.asset(_kUserImage, fit: BoxFit.cover);
 

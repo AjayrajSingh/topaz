@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'now_model.dart';
 import 'peeking_overlay.dart';
 import 'story_cluster_drag_state_model.dart';
 
@@ -17,12 +18,22 @@ class PeekManager {
   /// Provides whether or not a drag is happening.
   final StoryClusterDragStateModel storyClusterDragStateModel;
 
+  /// Indicates if quick settings is active or not.
+  final NowModel nowModel;
+
   bool _nowMinimized = false;
   bool _isDragging = false;
+  bool _quickSettingsOpen = false;
+  double _lastQuickSettingsProgress = 0.0;
 
   /// Constructor.
-  PeekManager({this.peekingOverlayKey, this.storyClusterDragStateModel}) {
+  PeekManager({
+    this.peekingOverlayKey,
+    this.storyClusterDragStateModel,
+    this.nowModel,
+  }) {
     storyClusterDragStateModel.addListener(_onStoryClusterDragStateChanged);
+    nowModel.addListener(_onNowModelChanged);
   }
 
   /// Sets whether now is minimized or not.
@@ -40,7 +51,20 @@ class PeekManager {
     }
   }
 
+  void _onNowModelChanged() {
+    if (_lastQuickSettingsProgress != nowModel.quickSettingsProgress) {
+      bool quickSettingsOpen =
+          nowModel.quickSettingsProgress > _lastQuickSettingsProgress;
+      _lastQuickSettingsProgress = nowModel.quickSettingsProgress;
+      if (_quickSettingsOpen != quickSettingsOpen) {
+        _quickSettingsOpen = quickSettingsOpen;
+        _updatePeek();
+      }
+    }
+  }
+
   void _updatePeek() {
-    peekingOverlayKey.currentState.peek = (!_nowMinimized && !_isDragging);
+    peekingOverlayKey.currentState.peek =
+        (!_nowMinimized && !_isDragging && !_quickSettingsOpen);
   }
 }

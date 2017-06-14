@@ -14,6 +14,7 @@ import 'interruption_overlay.dart';
 import 'quick_settings.dart';
 import 'nothing.dart';
 import 'now.dart';
+import 'now_model.dart';
 import 'peek_manager.dart';
 import 'peeking_overlay.dart';
 import 'scroll_locker.dart';
@@ -83,6 +84,9 @@ class Conductor extends StatefulWidget {
   /// Used to manage peeking.
   final StoryClusterDragStateModel storyClusterDragStateModel;
 
+  /// Used to manage peeking.
+  final NowModel nowModel;
+
   /// The key of the interruption overlay.
   final GlobalKey<InterruptionOverlayState> interruptionOverlayKey;
 
@@ -99,6 +103,7 @@ class Conductor extends StatefulWidget {
     this.onLogoutSelected,
     this.onUserContextTapped,
     this.storyClusterDragStateModel,
+    this.nowModel,
     this.interruptionOverlayKey,
     this.onInterruptionDismissed,
   })
@@ -153,6 +158,7 @@ class ConductorState extends State<Conductor> {
     _peekManager = new PeekManager(
       peekingOverlayKey: _suggestionOverlayKey,
       storyClusterDragStateModel: widget.storyClusterDragStateModel,
+      nowModel: widget.nowModel,
     );
   }
 

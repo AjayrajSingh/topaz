@@ -148,6 +148,7 @@ Widget _buildApp({
               ],
               conductor: new Conductor(
                 storyClusterDragStateModel: storyClusterDragStateModel,
+                nowModel: nowModel,
               ),
             ),
           ),
