@@ -233,7 +233,6 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
             if (graph.size == 0) {
               childViews.add(new MondrianSpinner());
             } else if (graph.size == 1) {
-              _log('BUILD chromeless HACK');
               Surface sole = graph.focusStack.last;
               childViews.add(new SimulatedPositioned(
                 key: new ObjectKey(sole),
