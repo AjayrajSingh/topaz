@@ -57,7 +57,7 @@ class _ChatConversationListScreenState
                     color: Colors.black.withAlpha(180),
                   ),
                 ),
-                _buildNewConversationForm(model),
+                _buildNewConversationForm(context, model),
               ]);
             }
 
@@ -71,33 +71,72 @@ class _ChatConversationListScreenState
     );
   }
 
-  // TODO(youngseokyoon): make the form prettier.
-  // https://fuchsia.atlassian.net/browse/SO-369
-  Widget _buildNewConversationForm(ChatConversationListModuleModel model) {
+  /// Builds a new conversation form using material alert dialog.
+  Widget _buildNewConversationForm(
+    BuildContext context,
+    ChatConversationListModuleModel model,
+  ) {
+    ThemeData theme = Theme.of(context);
+
     return new Center(
-      child: new Material(
-        child: new Container(
-          padding: const EdgeInsets.all(8.0),
-          child: new Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              new TextField(
-                controller: _textController,
-                onSubmitted: (String text) =>
-                    _handleConversationFormSubmit(model, text),
+      child: new AnimatedBuilder(
+        animation: _textController,
+        builder: (BuildContext context, Widget child) {
+          return new AlertDialog(
+            title: new Text('New Chat'),
+            content: new Row(
+              children: <Widget>[
+                new Expanded(
+                  child: new TextField(
+                    autofocus: true,
+                    decoration: const InputDecoration(hintText: 'Enter email'),
+                    controller: _textController,
+                    onSubmitted: (String text) => text.isNotEmpty
+                        ? _handleConversationFormSubmit(model, text)
+                        : null,
+                  ),
+                ),
+                new IconButton(
+                  icon: new Icon(Icons.add_circle_outline),
+                  color: theme.primaryColor,
+                  onPressed: _shouldEnablePlusButton(_textController.text)
+                      ? _handlePlusButton
+                      : null,
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('CANCEL'),
+                onPressed: model.hideNewConversationForm,
               ),
-              new RaisedButton(
-                onPressed: () =>
-                    _handleConversationFormSubmit(model, _textController.text),
-                child: new Text('CREATE CONVERSATION'),
+              new FlatButton(
+                child: new Text('OK'),
+                onPressed: _textController.text.isNotEmpty
+                    ? () => _handleConversationFormSubmit(
+                        model, _textController.text)
+                    : null,
               ),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
+  /// Determines whether the circled plus button should be enabled or not.
+  bool _shouldEnablePlusButton(String text) =>
+      text.trim().isNotEmpty && !text.trim().endsWith(',');
+
+  /// Adds ', ' to the end of the text input and advances the cursor to the end.
+  void _handlePlusButton() {
+    _textController.text = _textController.text + ', ';
+    _textController.selection = new TextSelection.collapsed(
+      offset: _textController.text.length,
+    );
+  }
+
+  /// Creates a new conversation with the given participants.
   void _handleConversationFormSubmit(
     ChatConversationListModuleModel model,
     String text,
