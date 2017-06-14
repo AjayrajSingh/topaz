@@ -16,10 +16,6 @@ import 'tree.dart';
 const double _kMinScreenWidth = 250.0;
 const double _kMinScreenRatio = 1.0 / 4.0;
 
-void _log(String msg) {
-  print('[MondrianFlutter] $msg');
-}
-
 /// Main layout widget for displaying Surfaces.
 class SurfaceLayout extends StatefulWidget {
   /// SurfaceLayout
