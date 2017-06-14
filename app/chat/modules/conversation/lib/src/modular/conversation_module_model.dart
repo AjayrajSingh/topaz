@@ -421,6 +421,8 @@ class ChatConversationModuleModel extends ModuleModel {
 
   Future<Null> _onNotifyChild(String json) async {
     try {
+      bool shouldCloseChildModule = true;
+
       if (json != null) {
         dynamic decoded = JSON.decode(json);
         if (decoded is Map<String, String>) {
@@ -428,6 +430,8 @@ class ChatConversationModuleModel extends ModuleModel {
           String url = decoded['url'];
 
           if (name != null && url != null) {
+            shouldCloseChildModule = false;
+
             ServiceProviderProxy incomingServices = new ServiceProviderProxy();
 
             _startChildModule(
@@ -448,6 +452,10 @@ class ChatConversationModuleModel extends ModuleModel {
             incomingServices.ctrl.close();
           }
         }
+      }
+
+      if (shouldCloseChildModule) {
+        _closeChildModule();
       }
     } catch (e) {
       _log('Could not parse the child Link data: $json');
