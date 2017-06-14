@@ -151,8 +151,8 @@ class GalleryModuleModel extends ModuleModel {
     // module instance. We should erase what's in the Links, so that when
     // another gallery module is launched later by the same parent we don't
     // accidentally show all the residual states in the new gallery.
-    link.erase(const <String>[]);
-    _selectionLink.erase(const <String>[]);
+    link.set(const <String>[], 'null');
+    _selectionLink.set(const <String>[], 'null');
 
     // Notify the subscribers via message queue.
     _galleryServiceImpl.notify(imageUrls);
