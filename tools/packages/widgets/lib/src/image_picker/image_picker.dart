@@ -183,7 +183,6 @@ class _ImagePickerState extends State<ImagePicker>
           );
         },
         child: new Material(
-          color: Colors.grey[50],
           child: new Center(
             child: new Column(
               mainAxisSize: MainAxisSize.min,
@@ -258,7 +257,6 @@ class _ImagePickerState extends State<ImagePicker>
     ThemeData theme = Theme.of(context);
     Widget searchInput = new Container(
       decoration: new BoxDecoration(
-        color: Colors.grey[50],
         border: new Border(
           bottom: new BorderSide(
             color: Colors.grey[200],
