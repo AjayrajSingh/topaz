@@ -226,20 +226,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
             final List<Widget> touchedSurfaceWidgets = <Widget>[];
             final Map<Surface, Rect> laidOut = new Map<Surface, Rect>();
 
-            if (graph.size == 0) {
-              childViews.add(new MondrianSpinner());
-            } else if (graph.size == 1) {
-              Surface sole = graph.focusStack.last;
-              childViews.add(new SimulatedPositioned(
-                key: new ObjectKey(sole),
-                rect: full,
-                draggable: false,
-                child: new ScopedModel<Surface>(
-                  model: sole,
-                  child: new SurfaceWidget(chrome: false),
-                ),
-              ));
-            } else {
+            if (graph.size > 0) {
               List<Surface> focusStack = graph.focusStack.toList();
               Map<Surface, Rect> layout = _layout(constraints, focusStack);
               // If for some reason nothing fits, full screen focused
