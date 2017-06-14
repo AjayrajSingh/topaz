@@ -104,6 +104,26 @@ class StoryListLayout {
     // Convert the story list into [StoryMetadata]s determining juggling minutes
     // along the way.  See [_kJugglingThresholdMinutes].
     int jugglingStoryCount = 0; // The number of stories being juggled.
+
+    double minImportance = double.INFINITY;
+    double maxImportance = -double.INFINITY;
+    storyClustersToLayout
+        .map((StoryCluster storyCluster) => storyCluster.importance)
+        .forEach((double importance) {
+      minImportance = math.min(minImportance, importance);
+      maxImportance = math.max(maxImportance, importance);
+    });
+    double meanImportance = (maxImportance + minImportance) / 2.0;
+    Function importanceToScaleFactor = (double importance) {
+      if (importance > meanImportance) {
+        return 1.0 + math.min(importance - meanImportance, 0.25);
+      } else if (importance < meanImportance) {
+        return 1.0 - math.min(meanImportance - importance, 0.25);
+      } else {
+        return 1.0;
+      }
+    };
+
     List<_StoryMetadata> stories = new List<_StoryMetadata>.generate(
       storyClustersToLayout.length,
       (int index) {
@@ -133,6 +153,9 @@ class StoryListLayout {
           interactionMinutes:
               storyClusterToLayout.cumulativeInteractionDuration.inMinutes,
           jugglingMinutes: storyJugglingMinutes,
+          importanceScaleFactor: importanceToScaleFactor(
+            storyClusterToLayout.importance,
+          ),
         );
       },
     );
@@ -164,8 +187,10 @@ class StoryListLayout {
       // We only scale the width in multicolumn mode as we always stretch to fit
       // size.width in single column mode.
       story.size = new Size(
-        width * (_multiColumn ? jugglingScaling : 1.0),
-        height,
+        width *
+            (_multiColumn ? jugglingScaling : 1.0) *
+            (_multiColumn ? story.importanceScaleFactor : 1.0),
+        height * story.importanceScaleFactor,
       );
 
       storyIndex++;
@@ -451,6 +476,7 @@ class StoryListLayout {
 class _StoryMetadata extends StoryLayout {
   final int interactionMinutes;
   final int jugglingMinutes;
+  final double importanceScaleFactor;
 
   @override
   Offset offset = Offset.zero;
@@ -458,7 +484,11 @@ class _StoryMetadata extends StoryLayout {
   @override
   Size size = Size.zero;
 
-  _StoryMetadata({this.interactionMinutes, this.jugglingMinutes});
+  _StoryMetadata({
+    this.interactionMinutes,
+    this.jugglingMinutes,
+    this.importanceScaleFactor,
+  });
 
   double get right => offset.dx + size.width;
   double get bottom => offset.dy + size.height;

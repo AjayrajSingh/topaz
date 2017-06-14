@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 
 import 'armadillo_drag_target.dart';
@@ -204,6 +206,11 @@ class StoryCluster {
 
   /// Gets the cumulative interaction time this cluster has had.
   Duration get cumulativeInteractionDuration => _cumulativeInteractionDuration;
+
+  /// Gets the importance of the cluster relative to other clusters.
+  double get importance => (_stories.isEmpty)
+      ? 1.0
+      : _stories.map((Story s) => s.importance).reduce(math.max);
 
   @override
   int get hashCode => id.hashCode;

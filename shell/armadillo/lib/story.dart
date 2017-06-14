@@ -85,6 +85,9 @@ class Story {
   /// The location of the story's widget within its cluster.
   Panel panel;
 
+  /// The importance of the story relative to other stories.
+  double importance;
+
   /// Constructor.
   Story({
     this.id,
@@ -96,6 +99,7 @@ class Story {
     this.cumulativeInteractionDuration,
     this.themeColor,
     this.inactive: false,
+    this.importance: 1.0,
   })
       : this.clusterId = new StoryClusterId(),
         this.storyBarKey =

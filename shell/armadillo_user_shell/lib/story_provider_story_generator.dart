@@ -17,6 +17,7 @@ import 'package:lib.fidl.dart/bindings.dart' as bindings;
 
 import 'debug.dart';
 import 'hit_test_model.dart';
+import 'story_importance_watcher_impl.dart';
 import 'story_provider_watcher_impl.dart';
 
 const String _kUserImage = 'packages/armadillo/res/User.png';
@@ -38,6 +39,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   final Map<String, StoryControllerProxy> _storyControllerMap =
       <String, StoryControllerProxy>{};
   StoryProviderWatcherImpl _storyProviderWatcher;
+  StoryImportanceWatcherImpl _storyImportanceWatcher;
 
   /// Called when the [StoryProvider] returns no stories.
   final OnNoStories onNoStories;
@@ -56,6 +58,18 @@ class StoryProviderStoryGenerator extends StoryGenerator {
       onStoryDeleted: (String storyId) => _removeStory(storyId),
     );
     _storyProvider.watch(_storyProviderWatcher.handle);
+
+    _storyImportanceWatcher = new StoryImportanceWatcherImpl(
+      onImportanceChanged: () {
+        _storyProvider.getImportance((Map<String, double> importance) {
+          _currentStories.forEach((Story story) {
+            story.importance = importance[story.id.value] ?? 1.0;
+          });
+          _notifyListeners();
+        });
+      },
+    );
+    _storyProvider.watchImportance(_storyImportanceWatcher.handle);
     update();
   }
 
