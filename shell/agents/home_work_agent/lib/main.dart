@@ -75,12 +75,12 @@ class HomeWorkAgent extends AgentImpl {
             switch (location) {
               case 'work':
                 _kWorkProposals
-                    .map(_createDummyProposal)
+                    .map((String title) => _createDummyProposal(title, 'work'))
                     .forEach(_proposalPublisher.propose);
                 break;
               case 'home':
                 _kHomeProposals
-                    .map(_createDummyProposal)
+                    .map((String title) => _createDummyProposal(title, 'home'))
                     .forEach(_proposalPublisher.propose);
                 break;
               default:
@@ -101,7 +101,7 @@ class HomeWorkAgent extends AgentImpl {
     _bindingSet.forEach((CustomActionBinding binding) => binding.close());
   }
 
-  Proposal _createDummyProposal(String title) {
+  Proposal _createDummyProposal(String title, String location) {
     CustomActionBinding binding = new CustomActionBinding();
     _bindingSet.add(binding);
     return new Proposal()
@@ -117,9 +117,11 @@ class HomeWorkAgent extends AgentImpl {
         ..annoyance = AnnoyanceType.none)
       ..onSelected = <Action>[
         new Action()
-          ..customAction = binding.wrap(
-            new _CustomActionImpl(onExecute: () => null),
-          )
+          ..createStory = (new CreateStory()
+            ..moduleId = 'file:///system/apps/image'
+            ..initialData = (location == 'work'
+                ? '{"image_url":"https://i.redd.it/qh713wbo4r8y.jpg"}'
+                : '{"image_url":"/system/data/sysui/WallpaperImage_001.jpg"}'))
       ];
   }
 }
@@ -135,20 +137,6 @@ class _ContextListenerImpl extends ContextListener {
   @override
   void onUpdate(ContextUpdate result) =>
       onTopicChanged(result.values[_kLocationHomeWorkTopic]);
-}
-
-typedef void _OnExecute();
-
-class _CustomActionImpl extends CustomAction {
-  final _OnExecute onExecute;
-
-  _CustomActionImpl({this.onExecute});
-
-  @override
-  void execute(void callback(List<Action> actions)) {
-    onExecute();
-    callback(<Action>[]);
-  }
 }
 
 Future<Null> main(List<dynamic> args) async {
