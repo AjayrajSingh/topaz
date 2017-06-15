@@ -153,6 +153,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
       null,
       _moduleControllerProxy.ctrl.request(),
       null,
+      true,
     );
   }
 
