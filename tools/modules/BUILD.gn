@@ -8,6 +8,7 @@ group("modules") {
     "color",
     "gallery",
     "gallery:gallery_component",
+    "image",
     "interactive_receipt",
     "interactive_receipt:interactive_receipt_component",
     "map",
