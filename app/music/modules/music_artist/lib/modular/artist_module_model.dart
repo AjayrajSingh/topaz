@@ -254,6 +254,7 @@ class ArtistModuleModel extends ModuleModel {
         null, // incomingServices,
         new InterfacePair<ModuleController>().passRequest(),
         new SurfaceRelation()..arrangement = SurfaceArrangement.sequential,
+        true,
       );
     }
   }

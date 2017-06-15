@@ -97,6 +97,7 @@ class EventListModuleModel extends ModuleModel {
           ..arrangement = SurfaceArrangement.copresent
           ..emphasis = 1.7
           ..dependency = SurfaceDependency.dependent,
+        true,
       );
     } else {
       _eventLink.set(<String>[], _selectedEventLinkData);
