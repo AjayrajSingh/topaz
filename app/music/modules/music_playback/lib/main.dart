@@ -34,6 +34,8 @@ void main() {
             onTogglePlay: playbackModuleModel.togglePlayPause,
             onSkipNext: playbackModuleModel.next,
             onSkipPrevious: playbackModuleModel.previous,
+            onToggleRepeat: playbackModuleModel.toggleRepeat,
+            isRepeated: playbackModuleModel.isRepeated,
           );
         },
       ),

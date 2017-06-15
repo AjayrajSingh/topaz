@@ -12,6 +12,7 @@ import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modules.music.services.player/player.fidl.dart'
     as player_fidl;
+import 'package:apps.modules.music.services.player/repeat_mode.fidl.dart';
 import 'package:apps.modules.music.services.player/status.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_models/music_models.dart';
@@ -44,6 +45,14 @@ class PlaybackModuleModel extends ModuleModel {
 
   /// True if a track is current playing.
   bool get isPlaying => _isPlaying;
+
+  /// True is the current track should be repeated.
+  /// Currently only repeat one is supported because of the lack of play queues
+  ///
+  /// TODO(dayang): Support Repeat All
+  /// https://fuchsia.atlassian.net/browse/SO-513
+  bool get isRepeated => _repeatMode == RepeatMode.one;
+  RepeatMode _repeatMode = RepeatMode.none;
 
   /// Toggle play/pause for the current track
   void togglePlayPause() => _player.togglePlayPause();
@@ -91,6 +100,16 @@ class PlaybackModuleModel extends ModuleModel {
     );
     _player.addPlayerListener(_statusListener.getHandle());
 
+    // Get status at initialization
+    _player.getStatus((PlayerStatus status) {
+      _updatePlaybackStatus(status);
+      if (status.isPlaying) {
+        _ensureProgressTimer();
+      } else {
+        _ensureNoProgressTimer();
+      }
+    });
+
     // Close all the unnecessary bindings.
     playerServices.ctrl.close();
     componentContext.ctrl.close();
@@ -130,25 +149,41 @@ class PlaybackModuleModel extends ModuleModel {
 
   void _updatePlaybackStatus(PlayerStatus status) {
     _isPlaying = status.isPlaying;
+    _repeatMode = status.repeatMode;
     _playbackPosition =
         new Duration(milliseconds: status.playbackPositionInMilliseconds);
-    _currentTrack = new Track(
-      name: status.track.title,
-      id: status.track.title,
-      duration: new Duration(seconds: status.track.durationInSeconds),
-      playbackUrl: status.track.playbackUrl,
-      artists: <Artist>[
-        new Artist(name: status.track.artist),
-      ],
-      album: new Album(
-        name: status.track.album,
-        images: <MusicImage>[
-          new MusicImage(
-            url: status.track.cover,
-          ),
+    if (status.track != null) {
+      _currentTrack = new Track(
+        name: status.track.title,
+        id: status.track.title,
+        duration: new Duration(seconds: status.track.durationInSeconds),
+        playbackUrl: status.track.playbackUrl,
+        artists: <Artist>[
+          new Artist(name: status.track.artist),
         ],
-      ),
-    );
+        album: new Album(
+          name: status.track.album,
+          images: <MusicImage>[
+            new MusicImage(
+              url: status.track.cover,
+            ),
+          ],
+        ),
+      );
+    } else {
+      _currentTrack = null;
+    }
     notifyListeners();
+  }
+
+  /// Toggle the repeat mode
+  /// Currently only repeat one is supported because of the lack of play queues
+  void toggleRepeat() {
+    if (_repeatMode == RepeatMode.none) {
+      _player.setRepeatMode(RepeatMode.one);
+    }
+    if (_repeatMode == RepeatMode.one) {
+      _player.setRepeatMode(RepeatMode.none);
+    }
   }
 }
