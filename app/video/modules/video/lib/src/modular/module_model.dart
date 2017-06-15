@@ -39,6 +39,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   AnimationController _thumbnailAnimationController;
   Animation<double> _thumbnailAnimation;
   MediaPlayerController _controller;
+  bool _wasPlaying = false;
 
   /// App context passed in from starting the app
   final ApplicationContext appContext;
@@ -207,6 +208,11 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   }
 
   void _notifyTimerListeners() {
+    if (!_wasPlaying && _controller.playing) {
+      moduleContext.requestFocus();
+    }
+    _wasPlaying = _controller.playing;
+
     if (_controller.playing && _shouldShowControlOverlay()) {
       notifyListeners();
     }
