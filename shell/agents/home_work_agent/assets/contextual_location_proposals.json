@@ -1,0 +1,56 @@
+{
+  "home" : [
+    {
+      "id": "home_01",
+      "headline": "Home Suggestion 1",
+      "subheadline": "Click me!",
+      "image_url": "/system/data/sysui/WallpaperImage_001.jpg",
+      "type": "person",
+      "module_url": "file:///system/apps/image",
+      "module_data": "{\"image_url\":\"/system/data/sysui/WallpaperImage_001.jpg\"}"
+    },
+    {
+      "id": "home_02",
+      "headline": "Home Suggestion 2",
+      "icon_url": "/system/data/sysui/WallpaperImage_002.jpg",
+      "module_url": "file:///system/apps/image",
+      "module_data": "{\"image_url\":\"/system/data/sysui/WallpaperImage_002.jpg\"}"
+    },
+    {
+      "id": "home_03",
+      "headline": "Home Suggestion 3",
+      "subheadline": "Click me too!",
+      "image_url": "/system/data/sysui/WallpaperImage_003.jpg",
+      "module_url": "file:///system/apps/image",
+      "module_data": "{\"image_url\":\"/system/data/sysui/WallpaperImage_003.jpg\"}"
+    }
+  ],
+  "work" : [
+    {
+      "id": "work_01",
+      "headline": "Work Suggestion 1",
+      "subheadline": "Click me!",
+      "image_url": "https://i.redd.it/qh713wbo4r8y.jpg",
+      "module_url": "file:///system/apps/image",
+      "module_data": "{\"image_url\":\"https://i.redd.it/qh713wbo4r8y.jpg\"}"
+    },
+    {
+      "id": "work_02",
+      "headline": "Work Suggestion 2",
+      "subheadline": "Click me too!",
+      "image_url": "https://goo.gl/kmRQdt",
+      "type": "person",
+      "module_url": "file:///system/apps/image",
+      "module_data": "{\"image_url\":\"https://goo.gl/kmRQdt\"}"
+    },
+    {
+      "id": "work_03",
+      "headline": "Work Suggestion 3",
+      "icon_url": "https://goo.gl/2UH3p7",
+      "module_url": "file:///system/apps/image",
+      "module_data": "{\"image_url\":\"https://goo.gl/2UH3p7\"}"
+    }
+  ],
+  "unknown" : [
+  ]
+}

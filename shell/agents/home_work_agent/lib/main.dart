@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert' as convert;
+import 'dart:io';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
@@ -26,6 +28,9 @@ const List<String> _kHomeProposals = const <String>[
   'Home Suggestion 3',
 ];
 
+const String _kConfigFile =
+    '/system/data/sysui/contextual_location_proposals.json';
+
 const String _kLocationHomeWorkTopic = '/location/home_work';
 
 HomeWorkAgent _agent;
@@ -38,7 +43,6 @@ class HomeWorkAgent extends AgentImpl {
   final ContextProviderProxy _contextProvider = new ContextProviderProxy();
   final ContextListenerBinding _contextListenerBinding =
       new ContextListenerBinding();
-  final Set<CustomActionBinding> _bindingSet = new Set<CustomActionBinding>();
 
   /// Constructor.
   HomeWorkAgent({
@@ -64,27 +68,30 @@ class HomeWorkAgent extends AgentImpl {
     intelligenceServices.getContextProvider(_contextProvider.ctrl.request());
     intelligenceServices.ctrl.close();
 
+    final Map<String, List<Map<String, String>>> proposals =
+        convert.JSON.decode(
+      new File(_kConfigFile).readAsStringSync(),
+    );
+
     _contextProvider.subscribe(
       new ContextQuery()..topics = <String>[_kLocationHomeWorkTopic],
       _contextListenerBinding.wrap(
         new _ContextListenerImpl(
           proposalPublisher: _proposalPublisher,
           onTopicChanged: (String location) {
-            _kHomeProposals.forEach(_proposalPublisher.remove);
-            _kWorkProposals.forEach(_proposalPublisher.remove);
-            switch (location) {
-              case 'work':
-                _kWorkProposals
-                    .map((String title) => _createDummyProposal(title, 'work'))
-                    .forEach(_proposalPublisher.propose);
-                break;
-              case 'home':
-                _kHomeProposals
-                    .map((String title) => _createDummyProposal(title, 'home'))
-                    .forEach(_proposalPublisher.propose);
-                break;
-              default:
-                break;
+            // Remove all proposals.
+            proposals.values.forEach(
+              (List<Map<String, String>> proposalCategories) =>
+                  proposalCategories.forEach((Map<String, String> proposal) {
+                    _proposalPublisher.remove(proposal['id']);
+                  }),
+            );
+
+            // Add proposals for this location.
+            if (proposals.keys.contains(location)) {
+              proposals[location].forEach((Map<String, String> proposal) {
+                _proposalPublisher.propose(_createProposal(proposal));
+              });
             }
           },
         ),
@@ -98,32 +105,29 @@ class HomeWorkAgent extends AgentImpl {
     _contextProvider.ctrl.close();
     _proposalPublisher.ctrl.close();
     _contextListenerBinding.close();
-    _bindingSet.forEach((CustomActionBinding binding) => binding.close());
   }
 
-  Proposal _createDummyProposal(String title, String location) {
-    CustomActionBinding binding = new CustomActionBinding();
-    _bindingSet.add(binding);
-    return new Proposal()
-      ..id = title
-      ..display = (new SuggestionDisplay()
-        ..headline = title
-        ..subheadline = ''
-        ..details = ''
-        ..color = 0xFFFF0080
-        ..iconUrls = const <String>[]
-        ..imageType = SuggestionImageType.other
-        ..imageUrl = ''
-        ..annoyance = AnnoyanceType.none)
-      ..onSelected = <Action>[
-        new Action()
-          ..createStory = (new CreateStory()
-            ..moduleId = 'file:///system/apps/image'
-            ..initialData = (location == 'work'
-                ? '{"image_url":"https://i.redd.it/qh713wbo4r8y.jpg"}'
-                : '{"image_url":"/system/data/sysui/WallpaperImage_001.jpg"}'))
-      ];
-  }
+  Proposal _createProposal(Map<String, String> proposal) => new Proposal()
+    ..id = proposal['id']
+    ..display = (new SuggestionDisplay()
+      ..headline = proposal['headline'] ?? ''
+      ..subheadline = proposal['subheadline'] ?? ''
+      ..details = ''
+      ..color = 0xFFFF0080
+      ..iconUrls = proposal['icon_url'] != null
+          ? <String>[proposal['icon_url']]
+          : const <String>[]
+      ..imageType = 'person' == proposal['type']
+          ? SuggestionImageType.person
+          : SuggestionImageType.other
+      ..imageUrl = proposal['image_url'] ?? ''
+      ..annoyance = AnnoyanceType.none)
+    ..onSelected = <Action>[
+      new Action()
+        ..createStory = (new CreateStory()
+          ..moduleId = proposal['module_url'] ?? ''
+          ..initialData = proposal['module_data'] ?? '')
+    ];
 }
 
 typedef void _OnTopicChanged(String topicValue);
