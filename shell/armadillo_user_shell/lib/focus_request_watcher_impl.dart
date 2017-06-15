@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:apps.modular.services.user/focus.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 
 import 'debug.dart';
 
@@ -12,16 +11,11 @@ typedef void OnFocusRequest(String storyId);
 
 /// Listens for requests to change the currently focused story.
 class FocusRequestWatcherImpl extends FocusRequestWatcher {
-  final FocusRequestWatcherBinding _binding = new FocusRequestWatcherBinding();
-
   /// Called when we receive a request to focus on a story.
   final OnFocusRequest onFocusRequest;
 
   /// Constructor.
   FocusRequestWatcherImpl({this.onFocusRequest});
-
-  /// Returns the handle for this [FocusRequestWatcher].
-  InterfaceHandle<FocusRequestWatcher> getHandle() => _binding.wrap(this);
 
   @override
   void onRequest(String storyId) {

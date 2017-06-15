@@ -38,8 +38,12 @@ class StoryProviderStoryGenerator extends StoryGenerator {
 
   final Map<String, StoryControllerProxy> _storyControllerMap =
       <String, StoryControllerProxy>{};
-  StoryProviderWatcherImpl _storyProviderWatcher;
-  StoryImportanceWatcherImpl _storyImportanceWatcher;
+
+  final StoryProviderWatcherBinding _storyProviderWatcherBinding =
+      new StoryProviderWatcherBinding();
+
+  final StoryImportanceWatcherBinding _storyImportanceWatcherBinding =
+      new StoryImportanceWatcherBinding();
 
   /// Called when the [StoryProvider] returns no stories.
   final OnNoStories onNoStories;
@@ -50,26 +54,42 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   /// Constructor.
   StoryProviderStoryGenerator({this.onNoStories, this.onStoriesFirstAvailable});
 
+  /// Call to close all the handles opened by this story generator.
+  void close() {
+    _storyProviderWatcherBinding.close();
+    _storyImportanceWatcherBinding.close();
+    _storyControllerMap.values.forEach(
+      (StoryControllerProxy storyControllerProxy) =>
+          storyControllerProxy.ctrl.close(),
+    );
+  }
+
   /// Sets the [StoryProvider] used to get and start stories.
   set storyProvider(StoryProviderProxy storyProvider) {
     _storyProvider = storyProvider;
-    _storyProviderWatcher = new StoryProviderWatcherImpl(
-      onStoryChanged: _onStoryChanged,
-      onStoryDeleted: (String storyId) => _removeStory(storyId),
+    _storyProvider.watch(
+      _storyProviderWatcherBinding.wrap(
+        new StoryProviderWatcherImpl(
+          onStoryChanged: _onStoryChanged,
+          onStoryDeleted: (String storyId) => _removeStory(storyId),
+        ),
+      ),
     );
-    _storyProvider.watch(_storyProviderWatcher.handle);
 
-    _storyImportanceWatcher = new StoryImportanceWatcherImpl(
-      onImportanceChanged: () {
-        _storyProvider.getImportance((Map<String, double> importance) {
-          _currentStories.forEach((Story story) {
-            story.importance = importance[story.id.value] ?? 1.0;
-          });
-          _notifyListeners();
-        });
-      },
+    _storyProvider.watchImportance(
+      _storyImportanceWatcherBinding.wrap(
+        new StoryImportanceWatcherImpl(
+          onImportanceChanged: () {
+            _storyProvider.getImportance((Map<String, double> importance) {
+              _currentStories.forEach((Story story) {
+                story.importance = importance[story.id.value] ?? 1.0;
+              });
+              _notifyListeners();
+            });
+          },
+        ),
+      ),
     );
-    _storyProvider.watchImportance(_storyImportanceWatcher.handle);
     update();
   }
 

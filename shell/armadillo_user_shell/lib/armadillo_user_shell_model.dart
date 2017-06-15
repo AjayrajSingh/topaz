@@ -48,6 +48,9 @@ class ArmadilloUserShellModel extends UserShellModel {
   final ContextListenerBinding _contextListenerBinding =
       new ContextListenerBinding();
 
+  final FocusRequestWatcherBinding _focusRequestWatcherBinding =
+      new FocusRequestWatcherBinding();
+
   /// Constructor.
   ArmadilloUserShellModel({
     this.storyProviderStoryGenerator,
@@ -81,7 +84,9 @@ class ArmadilloUserShellModel extends UserShellModel {
       contextPublisher,
     );
     userLogoutter.userContext = userContext;
-    focusController.watchRequest(focusRequestWatcher.getHandle());
+    focusController.watchRequest(
+      _focusRequestWatcherBinding.wrap(focusRequestWatcher),
+    );
     initialFocusSetter.focusProvider = focusProvider;
     storyProviderStoryGenerator.storyProvider = storyProvider;
     suggestionProviderSuggestionModel.suggestionProvider = suggestionProvider;
@@ -90,13 +95,18 @@ class ArmadilloUserShellModel extends UserShellModel {
         visibleStoriesController;
     contextProvider.subscribe(
       new ContextQuery()..topics = contextTopics,
-      _contextListenerBinding.wrap(new _ContextListenerImpl(onContextUpdated)),
+      _contextListenerBinding.wrap(
+        new _ContextListenerImpl(onContextUpdated),
+      ),
     );
   }
 
   @override
   void onStop() {
     _contextListenerBinding.close();
+    _focusRequestWatcherBinding.close();
+    suggestionProviderSuggestionModel.close();
+    storyProviderStoryGenerator.close();
     super.onStop();
   }
 

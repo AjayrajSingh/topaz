@@ -5,7 +5,6 @@
 import 'package:apps.modular.services.story/story_info.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.story/story_state.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 
 /// Called when the story with [storyInfo] has changed.
 typedef void OnStoryChanged(StoryInfo storyInfo, StoryState state);
@@ -15,9 +14,6 @@ typedef void OnStoryDeleted(String storyId);
 
 /// Watches for changes to the [StoryProvider].
 class StoryProviderWatcherImpl extends StoryProviderWatcher {
-  final StoryProviderWatcherBinding _binding =
-      new StoryProviderWatcherBinding();
-
   /// Called when a story has changed.
   final OnStoryChanged onStoryChanged;
 
@@ -26,9 +22,6 @@ class StoryProviderWatcherImpl extends StoryProviderWatcher {
 
   /// Constructor.
   StoryProviderWatcherImpl({this.onStoryChanged, this.onStoryDeleted});
-
-  /// Gets the handle for this [StoryProviderWatcher].
-  InterfaceHandle<StoryProviderWatcher> get handle => _binding.wrap(this);
 
   @override
   void onChange(StoryInfo storyInfo, StoryState storyState) {

@@ -214,6 +214,15 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     this.interruptionOverlayKey,
   });
 
+  /// Call to close all the handles opened by this model.
+  void close() {
+    _askControllerProxy.ctrl.close();
+    _askListenerBinding.close();
+    _nextControllerProxy.ctrl.close();
+    _nextListenerBinding.close();
+    _interruptionListenerBinding.close();
+  }
+
   /// Setting [suggestionProvider] triggers the loading on suggestions.
   /// This is typically set by the UserShell.
   set suggestionProvider(
