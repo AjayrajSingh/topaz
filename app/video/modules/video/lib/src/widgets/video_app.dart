@@ -18,14 +18,9 @@ class VideoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(
-          'Video Player',
-        ),
-        backgroundColor: Colors.blue.shade200,
-      ),
-      body: new Material(
+    return new MaterialApp(
+      title: 'Video Player',
+      home: new Material(
         child: new ScopedModelDescendant<VideoModuleModel>(
           builder: (
             BuildContext context,

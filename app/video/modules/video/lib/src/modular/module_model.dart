@@ -11,6 +11,8 @@ import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.netconnector.services/netconnector.fidl.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:lib.widgets/modular.dart';
 
 import '../widgets.dart';
@@ -32,15 +34,20 @@ final Asset _defaultAsset = new Asset.movie(
 Asset _asset = _defaultAsset;
 
 /// The [ModuleModel] for the video player.
-class VideoModuleModel extends ModuleModel {
+class VideoModuleModel extends ModuleModel implements TickerProvider {
   final NetConnectorProxy _netConnector = new NetConnectorProxy();
   Timer _hideTimer;
   Timer _progressTimer;
-  bool _remote;
+  bool _remote = false;
+  AnimationController _thumbnailAnimationController;
+  Animation<double> _thumbnailAnimation;
+  MediaPlayerController _controller;
 
   /// App context passed in from starting the app
-  ApplicationContext appContext;
-  MediaPlayerController _controller;
+  final ApplicationContext appContext;
+
+  /// Whether or not the Device Chooser should be hidden
+  bool hideDeviceChooser = true;
 
   /// Create a video module model using the appContext
   VideoModuleModel({
@@ -49,8 +56,28 @@ class VideoModuleModel extends ModuleModel {
     _controller = new MediaPlayerController(appContext.environmentServices);
     _progressTimer = new Timer.periodic(
         _kProgressBarUpdateInterval, (Timer timer) => _notifyTimerListeners());
+    _thumbnailAnimationController = new AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _thumbnailAnimation = new CurvedAnimation(
+      parent: _thumbnailAnimationController,
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.fastOutSlowIn,
+    );
     connectToService(appContext.environmentServices, _netConnector.ctrl);
   }
+
+  @override
+  Ticker createTicker(TickerCallback onTick) => new Ticker(onTick);
+
+  /// Returns animation controller for shrinking video thumbnail on long press
+  // TODO(maryxia) SO-509 make this thumbnail into a cropped circle
+  AnimationController get thumbnailAnimationController =>
+      _thumbnailAnimationController;
+
+  /// Returns animation for shrinking video thumbnail on long press
+  Animation<double> get thumbnailAnimation => _thumbnailAnimation;
 
   /// Returns whether media player controller is playing
   bool get playing => _controller.playing;
@@ -96,11 +123,10 @@ class VideoModuleModel extends ModuleModel {
   }
 
   /// Currently this will start remote play on the first device found
-  //TODO(planders): add device chooser screen.
   void switchToRemotePlay(int version, List<String> devices) {
     for (String device in devices) {
       pause();
-      //TODO(planders): indicate to user that remote play has started.
+      //TODO(maryxia) SO-445 indicate to user that remote play has started
       _log('Starting remote play on ' + device);
       _asset = new Asset.remote(
           service: _kServiceName,
@@ -114,12 +140,13 @@ class VideoModuleModel extends ModuleModel {
       return;
     }
 
-    //TODO(planders): display message to the user.
+    //TODO(maryxia) SO-508: display message to the user
     _log('No devices found for remote play');
   }
 
   /// Start playing video on remote device if it is playing locally
   void playRemote() {
+    hideDeviceChooser = true;
     if (_asset.device == null) {
       _netConnector.getKnownDeviceNames(0, switchToRemotePlay);
     }
@@ -127,6 +154,7 @@ class VideoModuleModel extends ModuleModel {
 
   /// Start playing video on local device if it is controlling remotely
   void playLocal() {
+    hideDeviceChooser = true;
     if (_asset.device != null) {
       _asset = _defaultAsset;
       _controller.close();
@@ -156,6 +184,7 @@ class VideoModuleModel extends ModuleModel {
     _hideTimer?.cancel();
     _progressTimer?.cancel();
     _controller.removeListener(_handleControllerChanged);
+    _thumbnailAnimationController.dispose();
     super.onStop();
   }
 

@@ -18,6 +18,16 @@ class Player extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget deviceChooser = new ScopedModelDescendant<VideoModuleModel>(
+      builder: (
+        BuildContext context,
+        Widget child,
+        VideoModuleModel model,
+      ) {
+        return new DeviceChooser();
+      },
+    );
+
     Widget screen = new ScopedModelDescendant<VideoModuleModel>(
       builder: (
         BuildContext context,
@@ -28,13 +38,22 @@ class Player extends StatelessWidget {
       },
     );
 
-    Widget playbar = new ScopedModelDescendant<VideoModuleModel>(
+    Widget playControls = new ScopedModelDescendant<VideoModuleModel>(
       builder: (
         BuildContext context,
         Widget child,
         VideoModuleModel model,
       ) {
-        return new PlayBar();
+        return new PlayControls();
+      },
+    );
+    Widget scrubber = new ScopedModelDescendant<VideoModuleModel>(
+      builder: (
+        BuildContext context,
+        Widget child,
+        VideoModuleModel model,
+      ) {
+        return new Scrubber();
       },
     );
 
@@ -48,8 +67,17 @@ class Player extends StatelessWidget {
         color: Colors.black,
         child: new Column(
           children: <Widget>[
-            screen,
-            playbar,
+            deviceChooser,
+            new Expanded(
+              child: new Stack(
+                fit: StackFit.passthrough,
+                children: <Widget>[
+                  screen,
+                  playControls,
+                ],
+              ),
+            ),
+            scrubber,
           ],
         ),
       );

@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 export 'widgets/asset.dart';
-export 'widgets/play_bar.dart';
+export 'widgets/device_chooser.dart';
+export 'widgets/play_controls.dart';
 export 'widgets/player.dart';
 export 'widgets/screen.dart';
+export 'widgets/scrubber.dart';
 export 'widgets/video_app.dart';
