@@ -236,7 +236,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
             final List<Widget> touchedSurfaceWidgets = <Widget>[];
             final Map<Surface, Rect> laidOut = new Map<Surface, Rect>();
 
-            if (graph.size > 0) {
+            if (graph.focusStack.isNotEmpty) {
               List<Surface> focusStack = graph.focusStack.toList();
               Map<Surface, Rect> layout = _layout(constraints, focusStack);
               // If for some reason nothing fits, full screen focused
