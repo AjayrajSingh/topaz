@@ -65,7 +65,6 @@ class StoryShellImpl extends StoryShell {
 
     // Separated calls in prep for asynchronous availability of view
     _surfaceGraph.connectView(viewId, view);
-    _surfaceGraph.focusSurface(viewId, parentId);
   }
 
   /// Focus the view with this id

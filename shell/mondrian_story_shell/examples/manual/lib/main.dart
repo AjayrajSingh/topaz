@@ -76,6 +76,7 @@ void startModuleInShell(SurfaceRelation relation) {
     null, // incomingServices,
     moduleController.ctrl.request(),
     relation,
+    true,
   );
   _log('Started sub-module $name');
 
