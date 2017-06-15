@@ -393,6 +393,7 @@ class ChatConversationModuleModel extends ModuleModel {
       new SurfaceRelation()
         ..arrangement = SurfaceArrangement.copresent
         ..emphasis = 2.0,
+      true,
     );
 
     // Write to the child link so that this can be rehydrated later.

@@ -145,6 +145,7 @@ class ChatConversationListModuleModel extends ModuleModel {
       new SurfaceRelation()
         ..arrangement = SurfaceArrangement.copresent
         ..emphasis = 2.0,
+      true,
     );
   }
 
