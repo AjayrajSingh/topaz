@@ -4,6 +4,7 @@
 
 module music;
 
+import "apps/modules/music/services/player/repeat_mode.fidl";
 import "apps/modules/music/services/player/status.fidl";
 import "apps/modules/music/services/player/track.fidl";
 
@@ -40,6 +41,9 @@ interface Player {
   // The subscription will continue to stay open as long as the listener handle
   // is not closed.
   AddPlayerListener(PlayerStatusListener listener);
+
+  // Sets the repeat mode
+  SetRepeatMode(RepeatMode repeatMode);
 };
 
 interface PlayerStatusListener {

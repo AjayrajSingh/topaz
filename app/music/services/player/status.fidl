@@ -4,6 +4,7 @@
 
 module music;
 
+import "apps/modules/music/services/player/repeat_mode.fidl";
 import "apps/modules/music/services/player/track.fidl";
 
 // Represents the playback status
@@ -18,4 +19,7 @@ struct PlayerStatus {
   // Playback position of the current track in milliseconds.
   // Should default to 0 if no track is currently being played.
   int64 playbackPositionInMilliseconds;
+
+  // The current repeat mode
+  RepeatMode repeatMode;
 };

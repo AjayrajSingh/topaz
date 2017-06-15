@@ -5,6 +5,7 @@
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.media.lib.dart/audio_player_controller.dart';
 import 'package:apps.modules.music.services.player/player.fidl.dart';
+import 'package:apps.modules.music.services.player/repeat_mode.fidl.dart';
 import 'package:apps.modules.music.services.player/status.fidl.dart';
 import 'package:apps.modules.music.services.player/track.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -30,11 +31,13 @@ class PlayerImpl extends Player {
 
   AudioPlayerController _audioPlayerController;
 
+  RepeatMode _repeatMode = RepeatMode.one;
+
   /// Constructor
   PlayerImpl(ApplicationContext context) {
     _audioPlayerController =
         new AudioPlayerController(context.environmentServices);
-    _audioPlayerController.updateCallback = _updateListeners;
+    _audioPlayerController.updateCallback = _onAudioControllerUpdate;
   }
 
   @override
@@ -93,6 +96,12 @@ class PlayerImpl extends Player {
     _log('Dequeue');
   }
 
+  @override
+  void setRepeatMode(RepeatMode repeatMode) {
+    _repeatMode = repeatMode;
+    _updateListeners();
+  }
+
   /// Bind this instance with the given request, and keep the binding object
   /// in the binding list.
   void addBinding(InterfaceRequest<Player> request) {
@@ -106,6 +115,15 @@ class PlayerImpl extends Player {
         .forEach((PlayerStatusListenerProxy listener) => listener.ctrl.close());
   }
 
+  void _onAudioControllerUpdate() {
+    if (_repeatMode == RepeatMode.one &&
+        _audioPlayerController.ended &&
+        _currentTrack != null) {
+      _audioPlayerController.play();
+    }
+    _updateListeners();
+  }
+
   void _updateListeners() {
     _listeners.forEach((PlayerStatusListenerProxy listener) =>
         listener.onUpdate(_playerStatus));
@@ -114,6 +132,7 @@ class PlayerImpl extends Player {
   PlayerStatus get _playerStatus => new PlayerStatus()
     ..isPlaying = _audioPlayerController.playing
     ..track = _currentTrack
+    ..repeatMode = _repeatMode
     ..playbackPositionInMilliseconds = _currentTrack != null
         ? _audioPlayerController.progress.inMilliseconds
         : 0;
