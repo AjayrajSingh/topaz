@@ -16,6 +16,10 @@ import 'tree.dart';
 const double _kMinScreenWidth = 250.0;
 const double _kMinScreenRatio = 1.0 / 4.0;
 
+void _log(String msg) {
+  print('[MondrianFlutter] $msg');
+}
+
 /// Main layout widget for displaying Surfaces.
 class SurfaceLayout extends StatefulWidget {
   /// SurfaceLayout
@@ -217,6 +221,12 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
       builder: (BuildContext context, BoxConstraints constraints) =>
           new ScopedModelDescendant<SurfaceGraph>(builder:
               (BuildContext context, Widget child, SurfaceGraph graph) {
+            if (constraints.biggest.isInfinite) {
+              _log('WARNING: Infinite sized constraints. $constraints');
+              return new Container();
+            } else if (constraints.biggest.isEmpty) {
+              return new Container();
+            }
             final List<Widget> childViews = <Widget>[];
 
             final Rect full = Offset.zero & constraints.biggest;
