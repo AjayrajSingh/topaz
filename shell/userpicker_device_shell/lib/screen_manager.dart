@@ -165,7 +165,7 @@ class _ScreenManagerState extends State<ScreenManager>
                 _showKernelPanic = false;
               }),
           child: new ApplicationWidget(
-            url: 'file:///system/apps/kernel_panic',
+            url: 'kernel_panic',
             launcher: widget.launcher,
             onDone: () => setState(() {
                   _showKernelPanic = false;

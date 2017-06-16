@@ -34,7 +34,7 @@ void main() {
   SoftKeyboardContainerImpl softKeyboardContainerImpl =
       new SoftKeyboardContainerImpl(
     child: new ApplicationWidget(
-      url: 'file:///system/apps/latin-ime',
+      url: 'latin-ime',
       launcher: applicationContext.launcher,
     ),
   );

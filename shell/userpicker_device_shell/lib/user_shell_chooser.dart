@@ -7,11 +7,11 @@ class UserShellChooser {
   final List<_UserShellEntry> _userShells = <_UserShellEntry>[
     new _UserShellEntry(
       assetName: 'packages/userpicker_device_shell/res/ArmadilloSilhouette.png',
-      appUrl: 'file:///system/apps/armadillo_user_shell',
+      appUrl: 'armadillo_user_shell',
     ),
     new _UserShellEntry(
       assetName: 'packages/userpicker_device_shell/res/CapybaraSilhouette.png',
-      appUrl: 'file:///system/apps/capybara_user_shell',
+      appUrl: 'capybara_user_shell',
     ),
   ];
 
