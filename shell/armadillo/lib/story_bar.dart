@@ -17,6 +17,8 @@ const RK4SpringDescription _kHeightSimulationDesc =
     const RK4SpringDescription(tension: 450.0, friction: 50.0);
 const double _kPartMargin = 8.0;
 
+const bool _kShowTitleOnly = true;
+
 /// The bar to be shown at the top of a story.
 class StoryBar extends StatefulWidget {
   /// The [Story] this bar represents.
@@ -31,6 +33,9 @@ class StoryBar extends StatefulWidget {
   /// True if the story is in focus.
   final bool focused;
 
+  /// True if the story should show its title only.
+  final bool showTitleOnly;
+
   /// Constructor.
   StoryBar({
     Key key,
@@ -38,6 +43,7 @@ class StoryBar extends StatefulWidget {
     this.minimizedHeight,
     this.maximizedHeight,
     this.focused,
+    this.showTitleOnly: _kShowTitleOnly,
   })
       : super(key: key);
 
@@ -85,58 +91,66 @@ class StoryBarState extends TickingState<StoryBar> {
           minHeight: widget.maximizedHeight,
           maxHeight: widget.maximizedHeight,
           alignment: FractionalOffset.topCenter,
-          child: new Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 0.0,
-              vertical: 12.0,
-            ),
-            child: new CustomMultiChildLayout(
-              delegate: new ThreeColumnAlignedLayoutDelegate(
-                partMargin: _kPartMargin,
-              ),
-              children: <Widget>[
-                new LayoutId(
-                  id: ThreeColumnAlignedLayoutDelegateParts.left,
-                  child: new Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: widget.story.icons
-                        .map(
-                          (OpacityBuilder builder) => builder(
-                                context,
-                                _opacity,
-                              ),
-                        )
-                        .toList(),
-                  ),
-                ),
-                new LayoutId(
-                  id: ThreeColumnAlignedLayoutDelegateParts.center,
+          child: widget.showTitleOnly
+              ? new Center(
                   child: new StoryTitle(
                     title: widget.story.title,
                     opacity: _opacity,
                     baseColor: _textColor,
                   ),
-                ),
-                new LayoutId(
-                  id: ThreeColumnAlignedLayoutDelegateParts.right,
-                  child: new ClipOval(
-                    child: new Container(
-                      foregroundDecoration: new BoxDecoration(
-                        border: new Border.all(
-                          color: _textColor.withOpacity(_opacity),
-                          width: 1.0,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: widget.story.avatar(context, _opacity),
+                )
+              : new Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 0.0,
+                    vertical: 12.0,
+                  ),
+                  child: new CustomMultiChildLayout(
+                    delegate: new ThreeColumnAlignedLayoutDelegate(
+                      partMargin: _kPartMargin,
                     ),
+                    children: <Widget>[
+                      new LayoutId(
+                        id: ThreeColumnAlignedLayoutDelegateParts.left,
+                        child: new Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: widget.story.icons
+                              .map(
+                                (OpacityBuilder builder) => builder(
+                                      context,
+                                      _opacity,
+                                    ),
+                              )
+                              .toList(),
+                        ),
+                      ),
+                      new LayoutId(
+                        id: ThreeColumnAlignedLayoutDelegateParts.center,
+                        child: new StoryTitle(
+                          title: widget.story.title,
+                          opacity: _opacity,
+                          baseColor: _textColor,
+                        ),
+                      ),
+                      new LayoutId(
+                        id: ThreeColumnAlignedLayoutDelegateParts.right,
+                        child: new ClipOval(
+                          child: new Container(
+                            foregroundDecoration: new BoxDecoration(
+                              border: new Border.all(
+                                color: _textColor.withOpacity(_opacity),
+                                width: 1.0,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: widget.story.avatar(context, _opacity),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
         ),
       );
 

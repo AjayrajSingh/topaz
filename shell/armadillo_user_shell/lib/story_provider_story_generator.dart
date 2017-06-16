@@ -257,36 +257,47 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   }
 
   Story _createStory(
-          {StoryInfo storyInfo, ChildViewConnection childViewConnection}) =>
-      new Story(
-        id: new StoryId(storyInfo.id),
-        builder: (BuildContext context) =>
-            new ScopedModelDescendant<HitTestModel>(
-              builder: (
-                BuildContext context,
-                Widget child,
-                HitTestModel hitTestModel,
-              ) =>
-                  new ChildView(
-                    hitTestable: hitTestModel.isStoryHitTestable(storyInfo.id),
-                    connection: childViewConnection,
-                  ),
-            ),
-        // TODO(apwilson): Improve title.
-        title:
-            '[${Uri.parse(storyInfo.url).pathSegments[Uri.parse(storyInfo.url).pathSegments.length-1]?.toUpperCase()} // ${storyInfo.id}]',
-        icons: <OpacityBuilder>[],
-        avatar: (_, double opacity) => new Opacity(
-              opacity: opacity,
-              child: new Image.asset(_kUserImage, fit: BoxFit.cover),
-            ),
-        lastInteraction: new DateTime.now(),
-        cumulativeInteractionDuration: new Duration(
-          minutes: 0,
-        ),
-        themeColor: storyInfo.extra['color'] == null
-            ? Colors.grey[500]
-            : new Color(int.parse(storyInfo.extra['color'])),
-        inactive: false,
-      );
+      {StoryInfo storyInfo, ChildViewConnection childViewConnection}) {
+    String storyTitle = Uri
+        .parse(storyInfo.url)
+        .pathSegments[Uri.parse(storyInfo.url).pathSegments.length - 1]
+        ?.toUpperCase();
+
+    // Add story ID to title only when we're in debug mode.
+    assert(() {
+      storyTitle = '[$storyTitle // ${storyInfo.id}]';
+      return true;
+    });
+
+    return new Story(
+      id: new StoryId(storyInfo.id),
+      builder: (BuildContext context) =>
+          new ScopedModelDescendant<HitTestModel>(
+            builder: (
+              BuildContext context,
+              Widget child,
+              HitTestModel hitTestModel,
+            ) =>
+                new ChildView(
+                  hitTestable: hitTestModel.isStoryHitTestable(storyInfo.id),
+                  connection: childViewConnection,
+                ),
+          ),
+      // TODO(apwilson): Improve title.
+      title: storyTitle,
+      icons: <OpacityBuilder>[],
+      avatar: (_, double opacity) => new Opacity(
+            opacity: opacity,
+            child: new Image.asset(_kUserImage, fit: BoxFit.cover),
+          ),
+      lastInteraction: new DateTime.now(),
+      cumulativeInteractionDuration: new Duration(
+        minutes: 0,
+      ),
+      themeColor: storyInfo.extra['color'] == null
+          ? Colors.grey[500]
+          : new Color(int.parse(storyInfo.extra['color'])),
+      inactive: false,
+    );
+  }
 }
