@@ -19,5 +19,6 @@ dart_app("music_artist_agent") {
     "//apps/modules/music/packages/music_api",
     "//apps/modules/music/packages/music_models",
     "//lib/fidl/dart",
+    "//lib/widgets/packages/logging:lib.logging",
   ]
 }

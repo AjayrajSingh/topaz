@@ -14,6 +14,7 @@ import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:config/config.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 
 /// The Concert Agents subscribes to the 'focal_entities' topic and will
@@ -60,16 +61,16 @@ class ContextListenerImpl extends ContextListener {
     for (dynamic entity in data) {
       if (!(entity is Map<String, dynamic>)) continue;
       if (entity.containsKey('@type') && entity['@type'] == _kMusicArtistType) {
-        print('[concerts_agent] artist update: ${entity['name']}');
+        log.fine('artist update: ${entity['name']}');
         List<Event> events = await Api.searchEventsByArtist(
           entity['name'],
           apiKey,
         );
         if (events != null && events.length > 0) {
-          print('[concerts_agent] concerts found for: ${entity['name']}');
+          log.fine('concerts found for: ${entity['name']}');
           _createProposal(events, entity['name']);
         } else {
-          print('[concerts_agent] no concerts found for: ${entity['name']}');
+          log.fine('no concerts found for: ${entity['name']}');
         }
       }
     }
@@ -87,7 +88,7 @@ class ContextListenerImpl extends ContextListener {
     String headline = 'Buy tickets for $artistName at ${events[0].venue.name}';
 
     Proposal proposal = new Proposal()
-      ..id = 'Songkick Events'
+      ..id = 'Songkick Events ${events[0].id}'
       ..display = (new SuggestionDisplay()
         ..headline = headline
         ..subheadline = 'powered by Songkick'
@@ -108,9 +109,8 @@ class ContextListenerImpl extends ContextListener {
             ))
       ];
 
-    print('[concerts_agent] proposing concert suggestion');
+    log.fine('proposing concert suggestion');
     _proposalPublisher.propose(proposal);
-    _proposalPublisher.ctrl.close();
   }
 }
 
@@ -119,8 +119,7 @@ Future<String> _readAPIKey() async {
   Config config = await Config.read('/system/data/modules/config.json');
   String apiKey = config.get('songkick_api_key');
   if (apiKey == null) {
-    print(
-        '[concerts_agent] "songkick_api_key" value is not specified in config.json.');
+    log.fine('"songkick_api_key" value is not specified in config.json.');
     return null;
   } else {
     return apiKey;
@@ -130,7 +129,6 @@ Future<String> _readAPIKey() async {
 Future<Null> main(List<dynamic> args) async {
   String apiKey = await _readAPIKey();
   if (apiKey != null) {
-    // final ApplicationContext context = new ApplicationContext.fromStartupInfo();
     connectToService(_context.environmentServices, _contextProvider.ctrl);
     connectToService(_context.environmentServices, _proposalPublisher.ctrl);
     ContextQuery query =

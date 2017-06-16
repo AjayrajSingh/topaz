@@ -13,6 +13,7 @@ import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
 import 'package:config/config.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
@@ -27,8 +28,6 @@ const String _kCurrentFocalEntitiesTopic =
 
 /// The Entity type for a music artist.
 const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
-
-void _log(String msg) => print('[music_artist_agent] $msg');
 
 /// Global scoping to prevent garbage collection
 final ContextProviderProxy _contextProvider = new ContextProviderProxy();
@@ -74,15 +73,15 @@ class ContextListenerImpl extends ContextListener {
         if (!(entity is Map<String, dynamic>)) continue;
         if (entity.containsKey('@type') &&
             entity['@type'] == _kMusicArtistType) {
-          _log('artist update: ${entity['name']}');
+          log.fine('artist update: ${entity['name']}');
           List<Artist> artists = await _api.searchArtists(
             entity['name'],
           );
           if (artists != null && artists.length > 0) {
-            _log('found artist for: ${entity['name']}');
+            log.fine('found artist for: ${entity['name']}');
             _createProposal(artists.first);
           } else {
-            _log('no artist found for: ${entity['name']}');
+            log.fine('no artist found for: ${entity['name']}');
           }
         }
       } catch (_) {}
@@ -118,16 +117,14 @@ class ContextListenerImpl extends ContextListener {
                 JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}))
       ];
 
-    _log('proposing artist suggestion');
+    log.fine('proposing artist suggestion');
     _proposalPublisher.propose(proposal);
-    _proposalPublisher.ctrl.close();
   }
 }
 
 Future<Null> main(List<dynamic> args) async {
   Config config = await Config.read('/system/data/modules/config.json');
   config.validate(<String>['spotify_client_id', 'spotify_client_secret']);
-
   connectToService(_context.environmentServices, _contextProvider.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
   ContextQuery query =

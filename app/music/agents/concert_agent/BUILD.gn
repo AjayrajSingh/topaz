@@ -16,5 +16,6 @@ dart_app("concert_agent") {
     "//apps/modules/music/packages/concert_api",
     "//apps/modules/music/packages/concert_models",
     "//lib/fidl/dart",
+    "//lib/widgets/packages/logging:lib.logging",
   ]
 }
