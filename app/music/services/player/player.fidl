@@ -18,6 +18,9 @@ interface Player {
   // Play the given track
   Play(Track track);
 
+  // Sets the given track as the current track without playing it
+  SetTrack(Track track);
+
   // Toggles between pause and play for the given track.
   // This will not do anything if no track is set.
   TogglePlayPause();

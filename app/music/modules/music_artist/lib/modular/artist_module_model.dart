@@ -18,6 +18,7 @@ import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:apps.modules.music.services.player/player.fidl.dart'
     as player_fidl;
+import 'package:apps.modules.music.services.player/status.fidl.dart';
 import 'package:apps.modules.music.services.player/track.fidl.dart'
     as track_fidl;
 import 'package:apps.mozart.lib.flutter/child_view.dart';
@@ -104,6 +105,20 @@ class ArtistModuleModel extends ModuleModel {
     } catch (_) {
       _loadingStatus = LoadingStatus.failed;
     }
+
+    // Set the first track of the first album for playback if there is no track
+    // in the playback queue.
+    _player.getStatus((PlayerStatus playerStatus) {
+      if (playerStatus.track == null) {
+        if (albums.isNotEmpty && albums.first.tracks.isNotEmpty) {
+          _player.setTrack(_convertTrackToFidl(
+            albums.first.tracks.first,
+            albums.first,
+          ));
+        }
+      }
+    });
+
     notifyListeners();
   }
 
@@ -220,16 +235,20 @@ class ArtistModuleModel extends ModuleModel {
   /// Plays the given track
   void playTrack(Track track, Album album) {
     if (track.playbackUrl != null) {
-      track_fidl.Track trackFidl = new track_fidl.Track()
-        ..title = track.name
-        ..id = track.id
-        ..artist = track.artists.first?.name
-        ..album = album.name
-        ..cover = album.defaultArtworkUrl
-        ..playbackUrl = track.playbackUrl
-        ..durationInSeconds = track.duration.inSeconds;
+      track_fidl.Track trackFidl = _convertTrackToFidl(track, album);
       _player.play(trackFidl);
     }
+  }
+
+  track_fidl.Track _convertTrackToFidl(Track track, Album album) {
+    return new track_fidl.Track()
+      ..title = track.name
+      ..id = track.id
+      ..artist = track.artists.first?.name
+      ..album = album.name
+      ..cover = album.defaultArtworkUrl
+      ..playbackUrl = track.playbackUrl
+      ..durationInSeconds = track.duration.inSeconds;
   }
 
   /// Starts a module in the story shell

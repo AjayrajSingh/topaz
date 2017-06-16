@@ -49,6 +49,13 @@ class PlayerImpl extends Player {
   }
 
   @override
+  void setTrack(Track track) {
+    _currentTrack = track;
+    _audioPlayerController.open(Uri.parse(track.playbackUrl));
+    _updateListeners();
+  }
+
+  @override
   void next() {
     // TODO (dayang@): Play the current track
     _log('Next');
