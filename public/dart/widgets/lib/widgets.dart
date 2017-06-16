@@ -8,6 +8,7 @@
 // have. (See: https://fuchsia.atlassian.net/browse/SO-435)
 
 export 'src/widgets/alphatar.dart';
+export 'src/widgets/fuchsia_spinner.dart';
 export 'src/widgets/mondrian_spinner.dart';
 export 'src/widgets/simulated_positioned.dart';
 export 'src/widgets/window_media_query.dart';
