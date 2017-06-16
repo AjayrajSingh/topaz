@@ -23,7 +23,7 @@ const String _kRelatedVideoUrl = 'file:///system/apps/youtube_related_videos';
 // The youtube video id.
 // TODO(youngseokyoon): remove this hard-coded value.
 // https://fuchsia.atlassian.net/browse/SO-483
-final String _kVideoId = 'p336IIjZCl8';
+final String _kVideoId = 'fj_QMtYvGCM';
 
 /// The model class for the youtuve_story module.
 class YoutubeStoryModuleModel extends ModuleModel {
