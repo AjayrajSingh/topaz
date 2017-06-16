@@ -285,9 +285,7 @@ class UserPicker extends StatelessWidget {
           return new Container(
             width: 64.0,
             height: 64.0,
-            child: new CircularProgressIndicator(
-              valueColor: new AlwaysStoppedAnimation<Color>(_kFuchsiaColor),
-            ),
+            child: new FuchsiaSpinner(),
           );
         }
       });
