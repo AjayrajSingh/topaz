@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'build_status_model.dart';
 import 'info_text.dart' show toConciseString;
@@ -124,10 +125,7 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
                   margin: const EdgeInsets.only(bottom: 8.0),
                   width: 16.0,
                   height: 16.0,
-                  child: new CircularProgressIndicator(
-                    valueColor:
-                        new AlwaysStoppedAnimation<Color>(_kFuchsiaColor),
-                  ),
+                  child: new FuchsiaSpinner(),
                 ),
               ),
             );
