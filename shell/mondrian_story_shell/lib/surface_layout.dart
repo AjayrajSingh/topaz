@@ -71,12 +71,14 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
     Rect initRect,
   }) =>
       new SimulatedPositioned(
-        key: new ObjectKey(surface),
+        key: new GlobalObjectKey(surface),
         rect: rect,
         initRect: initRect,
         draggable: true,
         child: new ScopedModel<Surface>(
-            model: surface, child: new SurfaceWidget()),
+          model: surface,
+          child: new SurfaceWidget(),
+        ),
         onDragStart: (SimulatedDragStartDetails details) {
           _startDrag(surface, details);
         },
@@ -86,15 +88,17 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
       );
 
   // A surface that cannot be manipulated or interacted with by the user
-  Widget _inactiveSurface({Surface surface, Rect rect, Rect initRect}) =>
+  Widget _inactiveSurface(
+          {Surface surface, Rect rect, Rect initRect, int distance = 0}) =>
       new SimulatedPositioned(
-        key: new ObjectKey(surface),
+        key: new GlobalObjectKey(surface),
         rect: rect,
         initRect: initRect,
         draggable: false,
         child: new ScopedModel<Surface>(
           model: surface,
-          child: new SurfaceWidget(interactable: false),
+          child: new SurfaceWidget(
+              interactable: false, fade: max(0.0, min(distance * 0.5, 1.0))),
         ),
       );
 
@@ -195,9 +199,6 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
     List<Surface> surfacesToDisplay =
         copresTree.map((Tree<Surface> t) => t.value).toList(growable: false);
 
-    // Remove any dismissed surfaces we are about to layout
-    surfacesToDisplay.forEach((Surface s) => activeSurfaces.remove(s));
-
     Iterable<Surface> arrangement =
         top.flattened.where((Surface s) => surfacesToDisplay.contains(s));
 
@@ -247,27 +248,26 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
               // Add any unlaid out and add them to background
               laidOut.addAll(layout);
               focusStack.removeLast();
+              int distance = 1;
               while (focusStack.isNotEmpty) {
-                List<Widget> backgroundChildViews = <Widget>[];
                 Map<Surface, Rect> backgroundLayout =
                     _layout(constraints, focusStack);
                 laidOut.keys.forEach((Surface s) => backgroundLayout.remove(s));
                 laidOut.addAll(backgroundLayout);
                 if (backgroundLayout.isNotEmpty) {
+                  List<Widget> backgroundChildViews = <Widget>[];
                   backgroundLayout.forEach((Surface s, Rect rect) {
                     // TODO(alangardner): Ensure a proper order
                     backgroundChildViews.add(_inactiveSurface(
                       surface: s,
                       rect: rect,
                       initRect: offscreen & rect.size,
+                      distance: distance,
                     ));
                   });
-                  // Add scrim
-                  backgroundChildViews.add(new Container(
-                    constraints: constraints,
-                    color: const Color(0x44000000),
-                  ));
                   childViews.insertAll(0, backgroundChildViews);
+
+                  distance += 1;
                 }
                 focusStack.removeLast();
               }
@@ -288,6 +288,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
             }
 
             // Animating out surfaces
+            laidOut.forEach((Surface s, Rect r) => activeSurfaces.remove(s));
             activeSurfaces.forEach((Surface surface, Rect rect) {
               childViews.add(_inactiveSurface(
                 surface: surface,

@@ -27,7 +27,7 @@ class Tree<T> extends Iterable<Tree<T>> {
 
   /// Direct descendents of parent, except this
   Iterable<Tree<T>> get siblings => (_parent == null)
-      ? const Iterable<Tree<T>>.empty()
+      ? new Iterable<Tree<T>>.empty()
       : _parent.children.where((Tree<T> node) => node != this);
 
   /// Direct ancestors of this, starting at parent to root
