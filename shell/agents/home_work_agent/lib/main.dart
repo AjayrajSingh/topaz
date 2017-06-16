@@ -78,18 +78,25 @@ class HomeWorkAgent extends AgentImpl {
       _contextListenerBinding.wrap(
         new _ContextListenerImpl(
           proposalPublisher: _proposalPublisher,
-          onTopicChanged: (String location) {
+          onTopicChanged: (String locationJson) {
+            final Map<String, String> json = convert.JSON.decode(locationJson);
+            if (json['location']?.isEmpty ?? true) {
+              return;
+            }
+
             // Remove all proposals.
             proposals.values.forEach(
               (List<Map<String, String>> proposalCategories) =>
-                  proposalCategories.forEach((Map<String, String> proposal) {
-                    _proposalPublisher.remove(proposal['id']);
-                  }),
+                  proposalCategories.forEach(
+                    (Map<String, String> proposal) =>
+                        _proposalPublisher.remove(proposal['id']),
+                  ),
             );
 
             // Add proposals for this location.
-            if (proposals.keys.contains(location)) {
-              proposals[location].forEach((Map<String, String> proposal) {
+            if (proposals.keys.contains(json['location'])) {
+              proposals[json['location']]
+                  .forEach((Map<String, String> proposal) {
                 _proposalPublisher.propose(_createProposal(proposal));
               });
             }

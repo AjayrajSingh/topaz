@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
@@ -63,9 +64,10 @@ class WalkingAgent extends AgentImpl {
       _contextListenerBinding.wrap(
         new _ContextListenerImpl(
           proposalPublisher: _proposalPublisher,
-          onTopicChanged: (String location) {
+          onTopicChanged: (String activityJson) {
+            Map<String, String> activity = JSON.decode(activityJson);
             _kWalkingProposals.forEach(_proposalPublisher.remove);
-            switch (location) {
+            switch (activity['activity']) {
               case 'walking':
                 _kWalkingProposals
                     .map(_createDummyProposal)

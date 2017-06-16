@@ -113,9 +113,10 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// Called when the user context is tapped.
   void onUserContextTapped() {
     _currentLocation = _nextLocation;
-    contextPublisher.publish(_kLocationTopic, _currentLocation);
+    contextPublisher.publish(_kLocationTopic, _currentJsonLocation);
   }
 
+  String get _currentJsonLocation => '{"location":"$_currentLocation"}';
   String _currentLocation = 'unknown';
   String get _nextLocation {
     switch (_currentLocation) {

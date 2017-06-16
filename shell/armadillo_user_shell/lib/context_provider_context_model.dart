@@ -19,7 +19,6 @@ const String _kLocationHomeWorkTopic = '/location/home_work';
 const String _kActivityWalking = '/activity/walking';
 const List<String> _kTopics = const <String>[
   _kLocationHomeWorkTopic,
-  _kActivityWalking,
 ];
 
 const String _kContextConfig = '/system/data/sysui/contextual_config.json';
@@ -88,8 +87,19 @@ class ContextProviderContextModel extends ContextModel {
 
   /// Called when context changes.
   void onContextUpdated(Map<String, String> context) {
-    _location = context[_kLocationHomeWorkTopic];
-    _activity = context[_kActivityWalking];
+    if (context[_kLocationHomeWorkTopic] != null) {
+      Map<String, String> locationJson = convert.JSON.decode(
+        context[_kLocationHomeWorkTopic],
+      );
+      _location = locationJson['location'];
+    }
+
+    if (context[_kActivityWalking] != null) {
+      Map<String, String> activityJson = convert.JSON.decode(
+        context[_kActivityWalking],
+      );
+      _activity = activityJson['activity'];
+    }
     notifyListeners();
   }
 
