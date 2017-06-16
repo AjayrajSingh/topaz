@@ -11,9 +11,13 @@ final double _kZoomTimeInMicroseconds = 3000000.0;
 
 /// The time slider/scrubber for the video player
 class Scrubber extends StatelessWidget {
+  /// Height of scrubber
+  final double height;
+
   /// Constructor for the time slider/scrubber for the video player
   Scrubber({
     Key key,
+    this.height,
   })
       : super(key: key);
 
@@ -63,17 +67,72 @@ class Scrubber extends StatelessWidget {
     );
   }
 
-  Widget _buildTimestamp(Duration timestamp) {
-    return new Container(
-      padding: new EdgeInsets.symmetric(horizontal: 24.0),
-      child: new Text(
-        _convertDurationToString(timestamp),
-        style: new TextStyle(
-          color: Colors.grey[50],
-          fontSize: 14.0,
+  Widget _buildTimestamp(Duration timestamp, DisplayMode displayMode) {
+    return new Center(
+      child: new Container(
+        padding: new EdgeInsets.symmetric(
+            horizontal:
+                (displayMode == DisplayMode.remoteControl ? 3.0 : 24.0)),
+        child: new Text(
+          _convertDurationToString(timestamp),
+          style: new TextStyle(
+            color: displayMode == DisplayMode.remoteControl
+                ? Colors.grey[500]
+                : Colors.grey[50],
+            fontSize: 14.0,
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildScrubberMode(VideoModuleModel model) {
+    switch (model.displayMode) {
+      case DisplayMode.remoteControl:
+        return new Column(
+          children: <Widget>[
+            new Center(
+              child: new Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  _buildTimestamp(model.progress, DisplayMode.remoteControl),
+                  new Text(
+                    '/',
+                    style: new TextStyle(
+                      color: Colors.grey[500],
+                      fontSize: 14.0,
+                    ),
+                  ),
+                  _buildTimestamp(model.duration, DisplayMode.remoteControl),
+                ],
+              ),
+            ),
+            new Padding(
+              padding: new EdgeInsets.only(top: 40.0),
+              child: _buildProgressBar(model),
+            ),
+          ],
+        );
+      case DisplayMode.immersive:
+        return new Row(
+          children: <Widget>[
+            new Expanded(
+              child: _buildProgressBar(model),
+            ),
+          ],
+        );
+      case DisplayMode.local:
+      default:
+        return new Row(
+          children: <Widget>[
+            _buildTimestamp(model.progress, DisplayMode.local),
+            new Expanded(
+              child: _buildProgressBar(model),
+            ),
+            _buildTimestamp(model.duration, DisplayMode.local),
+          ],
+        );
+    }
   }
 
   @override
@@ -86,17 +145,8 @@ class Scrubber extends StatelessWidget {
       ) {
         // TODO(maryxia) SO-481 add offstage
         return new Container(
-          height: 30.0,
           color: Colors.black,
-          child: new Row(
-            children: <Widget>[
-              _buildTimestamp(model.progress),
-              new Expanded(
-                child: _buildProgressBar(model),
-              ),
-              _buildTimestamp(model.duration),
-            ],
-          ),
+          child: _buildScrubberMode(model),
         );
       },
     );

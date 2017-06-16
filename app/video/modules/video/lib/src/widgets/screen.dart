@@ -7,6 +7,7 @@ import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import '../modular/module_model.dart';
 
@@ -42,8 +43,7 @@ class Screen extends StatelessWidget {
       // TODO(maryxia) SO-480 wrap this in a GestureDetector
       return new Center(
         child: new LongPressDraggable<String>(
-          // TODO(maryxia) SO-449 use real device names, not hardcoded ones
-          data: 'Living Room TV',
+          data: '',
           dragAnchor: DragAnchor.pointer,
           childWhenDragging: new Container(),
           feedback: new AnimatedBuilder(
@@ -81,7 +81,7 @@ class Screen extends StatelessWidget {
               _animateIntoScreen(model),
           child: model.videoViewConnection != null
               ? new ChildView(connection: model.videoViewConnection)
-              : new Container(),
+              : new FuchsiaSpinner(),
         ),
       );
     });

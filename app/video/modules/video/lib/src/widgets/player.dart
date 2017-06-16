@@ -8,52 +8,73 @@ import 'package:lib.widgets/model.dart';
 import '../modular/module_model.dart';
 import '../widgets.dart';
 
-/// The screen to video player.
+/// Video player layout
 class Player extends StatelessWidget {
-  /// The screen for video player
-  Player({Key key}) : super(key: key);
+  /// Constructor for the video player layout
+  Player({
+    Key key,
+  })
+      : super(key: key);
+
+  final Widget _deviceChooser = new DeviceChooser();
+
+  final Widget _screen = new Screen();
+
+  final Widget _playControls = new PlayControls(
+    primaryIconSize: 80.0,
+    secondaryIconSize: 64.0,
+    padding: 0.0,
+  );
+
+  final Widget _scrubber = new ScopedModelDescendant<VideoModuleModel>(
+    builder: (
+      BuildContext context,
+      Widget child,
+      VideoModuleModel model,
+    ) {
+      return new Scrubber(
+          height: model.displayMode == DisplayMode.immersive ? 8.0 : 2.0);
+    },
+  );
+
+  Widget _buildPlayerMode(VideoModuleModel model) {
+    switch (model.displayMode) {
+      case DisplayMode.remoteControl:
+        return new RemoteControl(
+          playLocal: model.playLocal,
+          remoteDeviceName: model.remoteDeviceName,
+        );
+      case DisplayMode.immersive:
+        return new Column(
+          children: <Widget>[
+            new Expanded(
+              child: _screen,
+            ),
+            _scrubber,
+          ],
+        );
+      case DisplayMode.local:
+      default:
+        return new Column(
+          children: <Widget>[
+            _deviceChooser,
+            new Expanded(
+              child: new Stack(
+                fit: StackFit.passthrough,
+                children: <Widget>[
+                  _screen,
+                  _playControls,
+                ],
+              ),
+            ),
+            _scrubber,
+          ],
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    Widget deviceChooser = new ScopedModelDescendant<VideoModuleModel>(
-      builder: (
-        BuildContext context,
-        Widget child,
-        VideoModuleModel model,
-      ) {
-        return new DeviceChooser();
-      },
-    );
-
-    Widget screen = new ScopedModelDescendant<VideoModuleModel>(
-      builder: (
-        BuildContext context,
-        Widget child,
-        VideoModuleModel model,
-      ) {
-        return new Screen();
-      },
-    );
-
-    Widget playControls = new ScopedModelDescendant<VideoModuleModel>(
-      builder: (
-        BuildContext context,
-        Widget child,
-        VideoModuleModel model,
-      ) {
-        return new PlayControls();
-      },
-    );
-    Widget scrubber = new ScopedModelDescendant<VideoModuleModel>(
-      builder: (
-        BuildContext context,
-        Widget child,
-        VideoModuleModel model,
-      ) {
-        return new Scrubber();
-      },
-    );
-
     // TODO(maryxia) SO-477 optimize aspect ratio
     return new ScopedModelDescendant<VideoModuleModel>(builder: (
       BuildContext context,
@@ -62,21 +83,7 @@ class Player extends StatelessWidget {
     ) {
       return new Container(
         color: Colors.black,
-        child: new Column(
-          children: <Widget>[
-            deviceChooser,
-            new Expanded(
-              child: new Stack(
-                fit: StackFit.passthrough,
-                children: <Widget>[
-                  screen,
-                  playControls,
-                ],
-              ),
-            ),
-            scrubber,
-          ],
-        ),
+        child: _buildPlayerMode(model),
       );
     });
   }

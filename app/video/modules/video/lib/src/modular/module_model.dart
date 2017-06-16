@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
@@ -24,6 +25,18 @@ final Duration _kOverlayAutoHideDuration = const Duration(seconds: 30000);
 final Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
 final String _kServiceName = 'fling';
 
+/// Mode the video player should be in on the device
+enum DisplayMode {
+  /// Local video mode
+  local,
+
+  /// Remote control mode
+  remoteControl,
+
+  /// Immersive (a.k.a full-screen, presentation) mode
+  immersive,
+}
+
 final Asset _defaultAsset = new Asset.movie(
   uri: Uri.parse('file:///data/Gravity_1080p_vp8.mkv'),
   title: 'Gravity',
@@ -35,7 +48,8 @@ Asset _asset = _defaultAsset;
 class VideoModuleModel extends ModuleModel implements TickerProvider {
   Timer _hideTimer;
   Timer _progressTimer;
-  bool _remote = false;
+  String _remoteDeviceName;
+  DisplayMode _displayMode = DisplayMode.local;
   AnimationController _thumbnailAnimationController;
   Animation<double> _thumbnailAnimation;
   MediaPlayerController _controller;
@@ -93,8 +107,12 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   /// Returns whether media player controller is playing
   bool get playing => _controller.playing;
 
-  /// Returns whether media player is controlling a remote device
-  bool get remote => _remote;
+  /// Returns name of remote device that media player is controlling
+  String get remoteDeviceName => _remoteDeviceName;
+
+  /// Returns whether this device's media player should be in immersive mode
+  // TODO(maryxia) SO-529 figure out how device knows it's in immersive mode
+  DisplayMode get displayMode => _displayMode;
 
   /// Returns media player controller video duration
   Duration get duration => _controller.duration;
@@ -107,7 +125,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       _controller.videoViewConnection;
 
   /// Returns list of active devices by name
-  List<String> get activeDevices => deviceNames;
+  UnmodifiableListView<String> get activeDevices => deviceNames;
 
   /// Returns display name for a given device
   String getDisplayName(String deviceName) {
@@ -136,7 +154,6 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       );
 
       _controller.seek(lastLocalTime);
-      // _controller.open(_asset.uri, serviceName: _kServiceName, position: _asset.position);
     } else {
       _controller.play();
     }
@@ -161,7 +178,8 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
           title: _asset.title,
           position: _controller.progress);
 
-      _remote = true;
+      _remoteDeviceName = deviceName;
+      _displayMode = DisplayMode.remoteControl;
       play();
     }
   }
@@ -172,7 +190,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     if (_asset.device != null) {
       _asset = _defaultAsset;
       _controller.close();
-      _remote = false;
+      _remoteDeviceName = null;
       log.fine('Starting local play');
       _controller.open(_asset.uri, serviceName: _kServiceName);
       play();

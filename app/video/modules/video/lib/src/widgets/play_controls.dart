@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:meta/meta.dart';
 
 import '../modular/module_model.dart';
 
@@ -13,17 +14,30 @@ import '../modular/module_model.dart';
 class PlayControls extends StatelessWidget {
   final double _kZoomTimeInMicroseconds = 3000000.0;
 
+  /// Size of the play/pause icons
+  final double primaryIconSize;
+
+  /// Size of the fast forward and rewind icons
+  final double secondaryIconSize;
+
+  /// Padding around play control icons
+  final double padding;
+
   /// Constructor for the play controls in the video player
   PlayControls({
     Key key,
+    @required this.primaryIconSize,
+    @required this.secondaryIconSize,
+    @required this.padding,
   })
       : super(key: key);
 
-  Widget _createIconButton(Icon icon, VoidCallback callback) {
+  Widget _createIconButton(Icon icon, double iconSize, VoidCallback callback) {
     return new Container(
+      padding: new EdgeInsets.all(padding),
       child: new IconButton(
         icon: icon,
-        iconSize: 150.0,
+        iconSize: iconSize,
         color: Colors.grey[50],
         disabledColor: Colors.grey[500],
         onPressed: callback,
@@ -87,27 +101,21 @@ class PlayControls extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             _createIconButton(
-                new Icon(Icons.fast_rewind),
-                model.progress.inMicroseconds == 0
-                    ? null
-                    : () => _rewind(model)),
+              new Icon(Icons.fast_rewind),
+              secondaryIconSize,
+              model.progress.inMicroseconds == 0 ? null : () => _rewind(model),
+            ),
             model.playing
-                ? _createIconButton(
-                    new Icon(Icons.pause), () => _togglePlayPause(model))
-                : _createIconButton(
-                    new Icon(Icons.play_arrow), () => _togglePlayPause(model)),
+                ? _createIconButton(new Icon(Icons.pause), primaryIconSize,
+                    () => _togglePlayPause(model))
+                : _createIconButton(new Icon(Icons.play_arrow), primaryIconSize,
+                    () => _togglePlayPause(model)),
             _createIconButton(
                 new Icon(Icons.fast_forward),
+                secondaryIconSize,
                 model.progress.inMicroseconds == model.duration.inMicroseconds
                     ? null
                     : () => _forward(model)),
-            // TODO(maryxia) SO-445 add less-hideous "uncast" toast notification
-            model.remote
-                ? _createIconButton(
-                    new Icon(Icons.cancel),
-                    model.playLocal,
-                  )
-                : new Container(),
           ],
         ),
       ),
