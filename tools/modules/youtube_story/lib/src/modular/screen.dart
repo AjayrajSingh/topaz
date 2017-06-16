@@ -22,22 +22,29 @@ class YoutubeStoryScreen extends StatelessWidget {
           return new Container(
             alignment: FractionalOffset.center,
             constraints: const BoxConstraints.expand(),
-            child: new Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                new Expanded(
-                  flex: 3,
-                  child: model.videoPlayerConn != null
-                      ? new ChildView(connection: model.videoPlayerConn)
-                      : new CircularProgressIndicator(),
-                ),
-                new Expanded(
-                  flex: 2,
-                  child: model.relatedVideoConn != null
-                      ? new ChildView(connection: model.relatedVideoConn)
-                      : new CircularProgressIndicator(),
-                ),
-              ],
+            child: new LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                List<Widget> children = <Widget>[
+                  new Expanded(
+                    flex: 3,
+                    child: model.videoPlayerConn != null
+                        ? new ChildView(connection: model.videoPlayerConn)
+                        : new CircularProgressIndicator(),
+                  ),
+                ];
+                if (constraints.maxWidth >= 500.0) {
+                  children.add(new Expanded(
+                    flex: 2,
+                    child: model.relatedVideoConn != null
+                        ? new ChildView(connection: model.relatedVideoConn)
+                        : new CircularProgressIndicator(),
+                  ));
+                }
+                return new Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: children,
+                );
+              },
             ),
           );
         },
