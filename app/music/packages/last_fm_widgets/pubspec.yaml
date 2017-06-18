@@ -1,0 +1,17 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+name: last_fm_widgets
+description: Flutter widgets used by the Last FM module
+dependencies:
+  flutter:
+    sdk: flutter
+  lib.widgets:
+    path: ../../../../../lib/widgets/packages/widgets
+  last_fm_models:
+    path: ../last_fm_models
+dev_dependencies:
+  test: any
+  flutter_test:
+    sdk: flutter

@@ -17,11 +17,15 @@ class Artist {
   /// Biography of the artist
   final String bio;
 
+  /// Profile image of artist
+  final String imageUrl;
+
   /// Constructor
   Artist({
     this.name,
     this.mbid,
     this.bio,
+    this.imageUrl,
   });
 
   /// Create an artist object from json data
@@ -30,6 +34,11 @@ class Artist {
       name: json['name'],
       mbid: json['mbid'],
       bio: json['bio'] is Map<String, dynamic> ? json['bio']['content'] : null,
+      imageUrl: json['image'] is List<dynamic> &&
+              json['image'].isNotEmpty &&
+              json['image'].last is Map<String, String>
+          ? json['image'].last['#text']
+          : null,
     );
   }
 }

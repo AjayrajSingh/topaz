@@ -20,5 +20,6 @@ void main() {
     expect(artist.name, artistFixture.name);
     expect(artist.mbid, artistFixture.mbid);
     expect(artist.bio, artistFixture.bio);
+    expect(artist.imageUrl, artistFixture.imageUrl);
   });
 }
