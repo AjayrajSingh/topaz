@@ -15,6 +15,7 @@ group("test") {
 
   deps = [
     "//apps/modules/music/packages/concert_models:test",
+    "//apps/modules/music/packages/last_fm_models:test",
     "//apps/modules/music/packages/music_models:test",
     "//apps/modules/music/packages/music_widgets:test",
   ]

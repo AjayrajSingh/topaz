@@ -3,3 +3,4 @@
 // found in the LICENSE file.
 
 export 'src/artist_bio.dart';
+export 'src/loading_status.dart';

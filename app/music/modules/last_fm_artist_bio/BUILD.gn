@@ -1,0 +1,32 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/component/component.gni")
+import("//flutter/build/flutter_app.gni")
+
+flutter_app("last_fm_artist_bio") {
+  package_name = "last_fm_artist_bio"
+
+  main_dart = "lib/main.dart"
+
+  source_dir = "lib"
+
+  manifest = "pubspec.yaml"
+
+  deps = [
+    "//application/lib/app/dart",
+    "//apps/modular/services/module:module_dart",
+    "//apps/modular/services/story:story_dart",
+    "//apps/modules/common/packages/config",
+    "//apps/modules/music/packages/last_fm_api",
+    "//apps/modules/music/packages/last_fm_models",
+    "//apps/modules/music/packages/last_fm_widgets",
+    "//apps/mozart/services/views:views_dart",
+    "//lib/fidl/dart",
+    "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/widgets:lib.widgets",
+  ]
+
+  analysis_options = "//apps/modules/common/.analysis_options"
+}

@@ -2,11 +2,4 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("agents") {
-  deps = [
-    "concert_agent",
-    "last_fm_agent",
-    "music_playback_agent",
-    "music_artist_agent",
-  ]
-}
+# Dummy for atom Dart analysis.

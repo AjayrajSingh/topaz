@@ -7,6 +7,7 @@ group("modules") {
     "concert_event",
     "concert_event_list",
     "concert_event_page",
+    "last_fm_artist_bio",
     "music_album",
     "music_album:music_album_component",
     "music_artist",
