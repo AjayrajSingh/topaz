@@ -75,8 +75,11 @@ class StoryShellImpl extends StoryShell {
 
   /// Defocus the view with this id
   @override
-  void defocusView(String viewId) {
+  void defocusView(String viewId, void callback()) {
     _surfaceGraph.dismissSurface(viewId);
+    // TODO(alangardner, djmurphy): Make Mondrian not crash if the process
+    // associated with viewId is closed after callback returns.
+    callback();
   }
 
   /// Terminate the StoryShell
