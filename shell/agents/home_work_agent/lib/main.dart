@@ -7,9 +7,11 @@ import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:application.lib.app.dart/app.dart';
+import 'package:apps.maxwell.services.suggestion/ask_handler.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
+import 'package:apps.maxwell.services.suggestion/user_input.fidl.dart';
 import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
@@ -30,6 +32,7 @@ const List<String> _kHomeProposals = const <String>[
 
 const String _kConfigFile =
     '/system/data/sysui/contextual_location_proposals.json';
+const String _kAskProposalsFile = '/system/data/sysui/ask_proposals.json';
 
 const String _kLocationHomeWorkTopic = '/location/home_work';
 
@@ -43,6 +46,7 @@ class HomeWorkAgent extends AgentImpl {
   final ContextProviderProxy _contextProvider = new ContextProviderProxy();
   final ContextListenerBinding _contextListenerBinding =
       new ContextListenerBinding();
+  final AskHandlerBinding _askHandlerBinding = new AskHandlerBinding();
 
   /// Constructor.
   HomeWorkAgent({
@@ -104,6 +108,14 @@ class HomeWorkAgent extends AgentImpl {
         ),
       ),
     );
+
+    final List<Map<String, String>> askProposals = convert.JSON.decode(
+      new File(_kAskProposalsFile).readAsStringSync(),
+    );
+
+    _proposalPublisher.registerAskHandler(
+      _askHandlerBinding.wrap(new _AskHandlerImpl(askProposals: askProposals)),
+    );
   }
 
   @override
@@ -112,29 +124,8 @@ class HomeWorkAgent extends AgentImpl {
     _contextProvider.ctrl.close();
     _proposalPublisher.ctrl.close();
     _contextListenerBinding.close();
+    _askHandlerBinding.close();
   }
-
-  Proposal _createProposal(Map<String, String> proposal) => new Proposal()
-    ..id = proposal['id']
-    ..display = (new SuggestionDisplay()
-      ..headline = proposal['headline'] ?? ''
-      ..subheadline = proposal['subheadline'] ?? ''
-      ..details = ''
-      ..color = 0xFFFF0080
-      ..iconUrls = proposal['icon_url'] != null
-          ? <String>[proposal['icon_url']]
-          : const <String>[]
-      ..imageType = 'person' == proposal['type']
-          ? SuggestionImageType.person
-          : SuggestionImageType.other
-      ..imageUrl = proposal['image_url'] ?? ''
-      ..annoyance = AnnoyanceType.none)
-    ..onSelected = <Action>[
-      new Action()
-        ..createStory = (new CreateStory()
-          ..moduleId = proposal['module_url'] ?? ''
-          ..initialData = proposal['module_data'] ?? '')
-    ];
 }
 
 typedef void _OnTopicChanged(String topicValue);
@@ -150,6 +141,23 @@ class _ContextListenerImpl extends ContextListener {
       onTopicChanged(result.values[_kLocationHomeWorkTopic]);
 }
 
+class _AskHandlerImpl extends AskHandler {
+  final List<Map<String, String>> askProposals;
+
+  _AskHandlerImpl({this.askProposals});
+
+  @override
+  void ask(UserInput query, void callback(List<Proposal> proposals)) {
+    List<Proposal> proposals = <Proposal>[];
+
+    if (query.text?.toLowerCase()?.startsWith('demo') ?? false) {
+      proposals.addAll(askProposals.map(_createProposal));
+    }
+
+    callback(proposals);
+  }
+}
+
 Future<Null> main(List<dynamic> args) async {
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
@@ -158,3 +166,25 @@ Future<Null> main(List<dynamic> args) async {
   );
   _agent.advertise();
 }
+
+Proposal _createProposal(Map<String, String> proposal) => new Proposal()
+  ..id = proposal['id']
+  ..display = (new SuggestionDisplay()
+    ..headline = proposal['headline'] ?? ''
+    ..subheadline = proposal['subheadline'] ?? ''
+    ..details = ''
+    ..color = 0xFFFF0080
+    ..iconUrls = proposal['icon_url'] != null
+        ? <String>[proposal['icon_url']]
+        : const <String>[]
+    ..imageType = 'person' == proposal['type']
+        ? SuggestionImageType.person
+        : SuggestionImageType.other
+    ..imageUrl = proposal['image_url'] ?? ''
+    ..annoyance = AnnoyanceType.none)
+  ..onSelected = <Action>[
+    new Action()
+      ..createStory = (new CreateStory()
+        ..moduleId = proposal['module_url'] ?? ''
+        ..initialData = proposal['module_data'] ?? '')
+  ];

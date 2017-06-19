@@ -1,0 +1,40 @@
+[
+  {
+    "id": "ask_01",
+    "headline": "Read NatureSense's June Newsletter",
+    "subheadline": "Read now",
+    "image_url": "/system/data/sysui/panda.png.jpg",
+    "module_url": "image",
+    "module_data": "{\"image_url\":\"/system/data/sysui/story_natureSense.png\"}"
+  },
+  {
+    "id": "ask_02",
+    "headline": "Review your saved recipe",
+    "image_url": "/system/data/sysui/pavlova.jpg",
+    "module_url": "image",
+    "module_data": "{\"image_url\":\"/system/data/sysui/story_topcook.png\"}"
+  },
+  {
+    "id": "ask_03",
+    "headline": "Shamra release new album",
+    "subheadline": "Read more",
+    "image_url": "/system/data/sysui/shamra.jpg",
+    "module_url": "image",
+    "module_data": "{\"image_url\":\"/system/data/sysui/story_hype.png\"}"
+  },
+  {
+    "id": "ask_04",
+    "headline": "Read about Google I/O 2017",
+    "icon_url": "/system/data/sysui/slides.png",
+    "module_url": "image",
+    "module_data": "{\"image_url\":\"/system/data/sysui/story_googleIO.png\"}"
+  },
+  {
+    "id": "ask_05",
+    "headline": "Miguel added 5 photos to Flux Memories",
+    "subheadline": "View photos",
+    "icon_url": "/system/data/sysui/google_photos.png",
+    "module_url": "image",
+    "module_data": "{\"image_url\":\"/system/data/sysui/story_fluxMemories.png\"}"
+  }
+]
