@@ -6,4 +6,5 @@ export 'src/modular/agent_impl.dart';
 export 'src/modular/device_shell_impl.dart';
 export 'src/modular/link_watcher_impl.dart';
 export 'src/modular/module_impl.dart';
+export 'src/modular/message_receiver_impl.dart';
 export 'src/modular/user_shell_impl.dart';
