@@ -18,6 +18,7 @@ const double _kMultiColumnWidthThreshold = 500.0;
 const int _kJugglingThresholdMinutes = 120;
 const int _kMaxJugglingStoryCount = 4;
 const int _kMinSideMargin = 8;
+const double _kStoryRelevanceScaleFactor = 0.15;
 
 /// Indicates the size and position a story should have.
 abstract class StoryLayout {
@@ -116,9 +117,11 @@ class StoryListLayout {
     double meanImportance = (maxImportance + minImportance) / 2.0;
     Function importanceToScaleFactor = (double importance) {
       if (importance > meanImportance) {
-        return 1.0 + math.min(importance - meanImportance, 0.25);
+        return 1.0 +
+            math.min(importance - meanImportance, _kStoryRelevanceScaleFactor);
       } else if (importance < meanImportance) {
-        return 1.0 - math.min(meanImportance - importance, 0.25);
+        return 1.0 -
+            math.min(meanImportance - importance, _kStoryRelevanceScaleFactor);
       } else {
         return 1.0;
       }
