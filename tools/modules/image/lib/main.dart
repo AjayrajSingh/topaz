@@ -26,12 +26,12 @@ void main() {
                       ? new Image.network(
                           model.imageUri.toString(),
                           fit: BoxFit.cover,
-                          alignment: FractionalOffset.center,
+                          alignment: FractionalOffset.topCenter,
                         )
                       : new Image.file(
                           new File(model.imageUri.toString()),
                           fit: BoxFit.cover,
-                          alignment: FractionalOffset.center,
+                          alignment: FractionalOffset.topCenter,
                         )
                   : new Container(),
             ],
