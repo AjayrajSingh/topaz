@@ -134,7 +134,7 @@ Future<Null> main(List<dynamic> args) async {
     connectToService(_context.environmentServices, _contextProvider.ctrl);
     connectToService(_context.environmentServices, _proposalPublisher.ctrl);
     ContextQuery query =
-        new ContextQuery.init(<String>[_kCurrentFocalEntitiesTopic]);
+        new ContextQuery.init(<String>[_kCurrentFocalEntitiesTopic], null);
     _contextListenerImpl = new ContextListenerImpl(apiKey: apiKey);
     _contextProvider.subscribe(query, _contextListenerImpl.getHandle());
   }

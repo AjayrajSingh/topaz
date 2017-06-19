@@ -118,8 +118,8 @@ Future<Null> main(List<dynamic> args) async {
   config.validate(<String>['last_fm_api_key']);
   connectToService(_context.environmentServices, _contextProvider.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextQuery query =
-      new ContextQuery.init(<String>[_kCurrentFocalEntitiesTopic]);
+  ContextQuery query = new ContextQuery.init(
+      <String>[_kCurrentFocalEntitiesTopic], null /* filters */);
   _contextListenerImpl = new ContextListenerImpl(
     apiKey: config.get('last_fm_api_key'),
   );
