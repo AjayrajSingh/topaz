@@ -16,6 +16,7 @@ dart_app("chat_content_provider_test") {
     "//apps/modules/chat/services:services_dart",
     "//apps/test_runner/services:test_runner_dart",
     "//lib/widgets/packages/logging:lib.logging",
+    "//lib/widgets/packages/modular:lib.modular",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/matcher",
     "//third_party/dart-pkg/pub/meta",

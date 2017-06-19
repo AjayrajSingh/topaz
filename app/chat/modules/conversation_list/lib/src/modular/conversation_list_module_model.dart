@@ -44,6 +44,7 @@ class ChatConversationListModuleModel extends ModuleModel {
       new ModuleControllerProxy();
 
   final MessageQueueProxy _messageQueue = new MessageQueueProxy();
+  MessageReceiverImpl _messageQueueReceiver;
   final Completer<String> _mqTokenCompleter = new Completer<String>();
 
   Uint8List _conversationId;
@@ -123,7 +124,10 @@ class ChatConversationListModuleModel extends ModuleModel {
     );
     // Save the message queue token for later use.
     _messageQueue.getToken((String token) => _mqTokenCompleter.complete(token));
-    _messageQueue.receive(_handleNewConversation);
+    _messageQueueReceiver = new MessageReceiverImpl(
+      messageQueue: _messageQueue,
+      onReceiveMessage: _handleNewConversation,
+    );
 
     // Close all the unnecessary bindings.
     contentProviderServices.ctrl.close();
@@ -188,9 +192,11 @@ class ChatConversationListModuleModel extends ModuleModel {
   ///
   /// Refer to the `chat_content_provider.fidl` file for the expected message
   /// format coming from the content provider.
-  void _handleNewConversation(String message) {
+  void _handleNewConversation(String message, void ack()) {
     log.fine('handleNewConversation call with message: $message');
     try {
+      ack();
+
       Map<String, dynamic> decoded = JSON.decode(message);
       List<int> conversationId = decoded['conversation_id'];
       List<String> participants = decoded['participants'];
@@ -213,9 +219,6 @@ class ChatConversationListModuleModel extends ModuleModel {
       }
     } catch (e, stackTrace) {
       log.severe('Decoding error while processing the message', e, stackTrace);
-    } finally {
-      // Register the handler again to process further messages.
-      _messageQueue.receive(_handleNewConversation);
     }
   }
 
@@ -234,6 +237,8 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   @override
   void onStop() {
+    _messageQueue.ctrl.close();
+    _messageQueueReceiver.close();
     _conversationModuleController.ctrl.close();
     _chatContentProvider.ctrl.close();
     _chatContentProviderController.ctrl.close();

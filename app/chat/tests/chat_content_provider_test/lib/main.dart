@@ -17,6 +17,7 @@ import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
 import 'package:apps.test_runner.services..test_runner/test_runner.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' hide Message;
 import 'package:lib.logging/logging.dart';
+import 'package:lib.modular/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart' hide expect;
 
@@ -593,6 +594,8 @@ class ChatContentProviderTestModule extends Module {
 
 class _MessageQueueWrapper {
   final MessageQueueProxy queue;
+  MessageReceiverImpl _queueReceiver;
+
   final String token;
   final List<String> receivedMessages = <String>[];
 
@@ -604,12 +607,15 @@ class _MessageQueueWrapper {
   }) {
     assert(queue != null);
     assert(token != null);
-    queue.receive(handleMessage);
+    _queueReceiver = new MessageReceiverImpl(
+      messageQueue: queue,
+      onReceiveMessage: handleMessage,
+    );
   }
 
-  void handleMessage(String message) {
+  void handleMessage(String message, void ack()) {
     receivedMessages.add(message);
-    queue.receive(handleMessage);
+    ack();
 
     // If a completer is given from outside, complete it and set it to null.
     if (completer != null && !completer.isCompleted) {
@@ -619,6 +625,7 @@ class _MessageQueueWrapper {
   }
 
   void close() {
+    _queueReceiver.close();
     queue.ctrl.close();
   }
 }

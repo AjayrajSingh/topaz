@@ -45,9 +45,11 @@ class ChatConversationModuleModel extends ModuleModel {
       new chat_fidl.ChatContentProviderProxy();
 
   final MessageQueueProxy _mqNewMessages = new MessageQueueProxy();
+  MessageReceiverImpl _mqNewMessagesReceiver;
   final Completer<String> _mqNewMessagesToken = new Completer<String>();
 
   final MessageQueueProxy _mqSelectedImages = new MessageQueueProxy();
+  MessageReceiverImpl _mqSelectedImagesReceiver;
   final Completer<String> _mqSelectedImagesToken = new Completer<String>();
 
   GalleryServiceProxy _galleryService;
@@ -164,7 +166,10 @@ class ChatConversationModuleModel extends ModuleModel {
     // Save the message queue token for later use.
     _mqNewMessages
         .getToken((String token) => _mqNewMessagesToken.complete(token));
-    _mqNewMessages.receive(_handleNewMessage);
+    _mqNewMessagesReceiver = new MessageReceiverImpl(
+      messageQueue: _mqNewMessages,
+      onReceiveMessage: _handleNewMessage,
+    );
 
     // Obtain another message queue for getting notified of selected images from
     // gallery module.
@@ -175,7 +180,11 @@ class ChatConversationModuleModel extends ModuleModel {
     // Save the message queue token for later use.
     _mqSelectedImages
         .getToken((String token) => _mqSelectedImagesToken.complete(token));
-    _mqSelectedImages.receive(_handleSelectedImages);
+    // Start receiving stuff.
+    _mqSelectedImagesReceiver = new MessageReceiverImpl(
+      messageQueue: _mqSelectedImages,
+      onReceiveMessage: _handleSelectedImages,
+    );
 
     // Obtain a separate Link for storing the child module state.
     moduleContext.getLink('child', _childLink.ctrl.request());
@@ -265,9 +274,11 @@ class ChatConversationModuleModel extends ModuleModel {
   ///
   /// Refer to the `chat_content_provider.fidl` file for the expected message
   /// format coming from the content provider.
-  void _handleNewMessage(String message) {
+  void _handleNewMessage(String message, void ack()) {
     log.fine('handleNewMessage call with message: $message');
+
     try {
+      ack();
       Map<String, dynamic> decoded = JSON.decode(message);
       List<int> conversationId = decoded['conversation_id'];
       List<int> messageId = decoded['message_id'];
@@ -298,9 +309,6 @@ class ChatConversationModuleModel extends ModuleModel {
     } catch (e) {
       log.severe('Error occurred while processing the message received via the '
           'message queue: $e');
-    } finally {
-      // Register the handler again to process further messages.
-      _mqNewMessages.receive(_handleNewMessage);
     }
   }
 
@@ -316,8 +324,10 @@ class ChatConversationModuleModel extends ModuleModel {
     );
   }
 
-  void _handleSelectedImages(String message) {
+  void _handleSelectedImages(String message, void ack()) {
     log.fine('handleSelectedImages: $message');
+
+    ack();
 
     Map<String, dynamic> decoded = JSON.decode(message);
     if (decoded['selected_images'] != null) {
@@ -335,7 +345,6 @@ class ChatConversationModuleModel extends ModuleModel {
 
     // After adding the images, close the gallery module.
     _closeChildModule();
-    _mqSelectedImages.receive(_handleSelectedImages);
   }
 
   Message _createMessageFromFidl(chat_fidl.Message m) {
@@ -383,7 +392,9 @@ class ChatConversationModuleModel extends ModuleModel {
     _galleryService?.ctrl?.close();
     _childModuleController?.ctrl?.close();
     _mqNewMessages.ctrl.close();
+    _mqNewMessagesReceiver.close();
     _mqSelectedImages.ctrl.close();
+    _mqSelectedImagesReceiver.close();
     _childLinkWatcherBinding.close();
     _childLink.ctrl.close();
     _chatContentProvider.ctrl.close();
