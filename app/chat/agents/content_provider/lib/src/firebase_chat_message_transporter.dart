@@ -25,9 +25,6 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
   /// Config object obtained from the `/system/data/modules/config.json` file.
   Config _config;
 
-  /// Firebase User ID of the current user.
-  String _firebaseUid;
-
   /// The primary email address of this user.
   String _email;
 
@@ -114,67 +111,18 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
       config.validate(keys);
       _config = config;
 
-      // Make a call to identitytoolkit API to register the current user to the
-      // Firebase project, and obtain the Firebase UID for this user.
-      Uri identityToolkitUrl = new Uri.https(
-        'www.googleapis.com',
-        '/identitytoolkit/v3/relyingparty/verifyAssertion',
-        <String, String>{
-          'key': _config.get('chat_firebase_api_key'),
-        },
+      Completer<FirebaseToken> tokenCompleter = new Completer<FirebaseToken>();
+      _tokenProvider.getFirebaseAuthToken(
+        _config.get('chat_firebase_api_key'),
+        tokenCompleter.complete,
       );
-
-      // Obtain the id token from the TokenProvider.
-      Completer<String> idTokenCompleter = new Completer<String>();
-      _tokenProvider.getIdToken(idTokenCompleter.complete);
-      String idToken = await idTokenCompleter.future;
-
-      http.Response identityToolkitResponse = await _client.post(
-        identityToolkitUrl,
-        headers: <String, String>{
-          'accept': 'application/json',
-          'content-type': 'application/json',
-        },
-        body: JSON.encode(<String, dynamic>{
-          'postBody': 'id_token=$idToken&providerId=google.com',
-          'requestUri': 'http://localhost',
-          'returnIdpCredential': true,
-          'returnSecureToken': true,
-        }),
-      );
-
-      if (identityToolkitResponse.statusCode != 200 ||
-          (identityToolkitResponse.body?.isEmpty ?? true)) {
-        throw new Exception(
-            'identityToolkit#verifyAssertion call was unsuccessful.\n'
-            'status code: ${identityToolkitResponse.statusCode}\n'
-            'body: ${identityToolkitResponse.body}');
+      FirebaseToken firebaseToken = await tokenCompleter.future;
+      if (firebaseToken == null) {
+        throw new Exception('Could not obtain the Firebase token.');
       }
 
-      // Parse the response.
-      String responseBody = identityToolkitResponse.body;
-      dynamic responseJson;
-      try {
-        responseJson = JSON.decode(responseBody);
-      } catch (e) {
-        throw new Exception(
-            'Error parsing JSON response from identityToolkit#verifyAssertion '
-            'response.\n'
-            'body: $responseBody');
-      }
-
-      _firebaseUid = responseJson['localId'];
-      _email = _normalizeEmail(responseJson['email']);
-      _firebaseAuthToken = responseJson['idToken'];
-
-      if (_firebaseUid == null ||
-          _email == null ||
-          _firebaseAuthToken == null) {
-        throw new Exception(
-            'identityToolkit#verifyAssertion response is missing one of the '
-            'expected parameters (localId, email, idToken).\n'
-            'body: $responseBody');
-      }
+      _email = _normalizeEmail(firebaseToken.email);
+      _firebaseAuthToken = firebaseToken.idToken;
 
       await _connectToEventStream();
 
