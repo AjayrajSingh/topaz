@@ -17,6 +17,7 @@ flutter_app("chess") {
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/logging:lib.logging",
   ]
 
   analysis_options = "//apps/modules/common/.analysis_options"

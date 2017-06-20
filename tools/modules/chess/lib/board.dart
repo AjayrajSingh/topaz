@@ -2,10 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math';
+import 'dart:math' hide log;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.logging/logging.dart';
 
 import 'board_logic.dart';
 import 'board_piece.dart';
@@ -56,7 +57,7 @@ class _BoardState extends State<Board> {
   }
 
   void handleTapSquare(int index) {
-    print('index: $index');
+    log.fine('index: $index');
     if (pieceSelected == null) {
       if (chessGame.getPositions().containsKey(index)) {
         handleSelectPiece(index);
@@ -128,7 +129,7 @@ class _BoardState extends State<Board> {
 
   void cancelMove() {
     confirming = false;
-    print('cancelled');
+    log.fine('cancelled');
     Navigator.pop(context);
     setState(() {
       highlights = <int>[];
@@ -146,7 +147,7 @@ class _BoardState extends State<Board> {
 
   void confirmed() {
     confirming = false;
-    print('confirmed');
+    log.fine('confirmed');
   }
 
   void confirmMove() {
@@ -156,7 +157,7 @@ class _BoardState extends State<Board> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    print(size);
+    log.fine(size);
     List<Widget> grids = <Widget>[];
     int index = 0;
     if (player == _Player.white) {
@@ -189,7 +190,7 @@ class _BoardState extends State<Board> {
         }
       }
     }
-    print('turn: $_turn');
+    log.fine('turn: $_turn');
     String turntext = _turn.toString().split('.')[1];
     turntext = turntext[0].toUpperCase() + turntext.substring(1);
 

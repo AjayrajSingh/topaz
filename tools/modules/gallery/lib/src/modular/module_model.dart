@@ -13,16 +13,13 @@ import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modules.common.services.gallery/gallery.fidl.dart';
 import 'package:config/config.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'gallery_service_impl.dart';
 
 const String _kContract = 'image search';
 const String _kQueryKey = 'query';
-
-void _log(String msg) {
-  print('[gallery_module_model] $msg');
-}
 
 /// A [ModuleModel] providing the api id / key values for the gallery module.
 class GalleryModuleModel extends ModuleModel {
@@ -85,7 +82,7 @@ class GalleryModuleModel extends ModuleModel {
       _apiKey = config.get('google_search_key');
       notifyListeners();
     } catch (e) {
-      _log('$e');
+      log.severe('Could not find the google search keys', e);
     }
 
     // Obtain the selection Link.
@@ -101,7 +98,7 @@ class GalleryModuleModel extends ModuleModel {
     try {
       _queryString = decoded[_kContract][_kQueryKey];
     } catch (e) {
-      _log('No image picker query key found in json.');
+      log.fine('No image picker query key found in json.');
     }
     notifyListeners();
   }

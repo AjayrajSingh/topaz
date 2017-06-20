@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:models/usps.dart';
 import 'package:widgets_meta/widgets_meta.dart';
@@ -124,7 +125,7 @@ class _TrackingStatusState extends State<TrackingStatus> {
     super.initState();
 
     _embeddedMap = kEmbeddedChildProvider.buildEmbeddedChild('map', '');
-    print('[tracking_status] _embeddedMap: $_embeddedMap');
+    log.fine('_embeddedMap: $_embeddedMap');
 
     _getTrackingData().then((List<TrackingEntry> entries) {
       if (mounted) {

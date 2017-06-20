@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:application.lib.app.dart/app.dart';
 import 'package:config/config.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'src/modular/module_model.dart';
@@ -21,6 +22,8 @@ Future<String> _readAPIKey() async {
 }
 
 Future<Null> main() async {
+  setupLogger();
+
   String googleApiKey = await _readAPIKey();
 
   ModuleWidget<MapModuleModel> moduleWidget = new ModuleWidget<MapModuleModel>(

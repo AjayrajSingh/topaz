@@ -8,6 +8,7 @@ import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.component/message_queue.fidl.dart';
 import 'package:apps.modules.common.services.gallery/gallery.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 
 /// A concrete implementation of the [GalleryService] FIDL interface.
 class GalleryServiceImpl extends GalleryService {
@@ -53,7 +54,7 @@ class GalleryServiceImpl extends GalleryService {
   /// Notifies all the subscribers of the list of selected images when the user
   /// clicked the "Add" button.
   void notify(List<String> imageUrls) {
-    print('[gallery_service_impl] notify call: $imageUrls');
+    log.fine('notify call: $imageUrls');
     // TODO(youngseokyoon): use a formal document object for encoding/decoding.
     // https://fuchsia.atlassian.net/browse/SO-404
     Map<String, dynamic> jsonObject = <String, dynamic>{

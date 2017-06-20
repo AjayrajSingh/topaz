@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:config/config.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'src/modular/module_model.dart';
@@ -20,6 +21,8 @@ Future<String> _readAPIKey() async {
 }
 
 Future<Null> main() async {
+  setupLogger();
+
   String uspsApiKey = await _readAPIKey();
 
   ModuleWidget<UspsModuleModel> moduleWidget =

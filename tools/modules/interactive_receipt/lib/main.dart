@@ -4,10 +4,13 @@
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:widgets/shopping.dart';
 
 void main() {
+  setupLogger();
+
   ModuleWidget<ModuleModel> moduleWidget = new ModuleWidget<ModuleModel>(
     applicationContext: new ApplicationContext.fromStartupInfo(),
     moduleModel: new ModuleModel(),

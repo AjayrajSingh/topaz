@@ -9,16 +9,13 @@ import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 
 import 'board.dart';
 
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
 ModuleImpl _module;
-
-void _log(String msg) {
-  print('[Chess] $msg');
-}
 
 /// An implementation of the [Module] interface.
 class ModuleImpl extends Module {
@@ -36,13 +33,13 @@ class ModuleImpl extends Module {
     InterfaceHandle<ServiceProvider> incomingServices,
     InterfaceRequest<ServiceProvider> outgoingServices,
   ) {
-    _log('ModuleImpl::initialize call');
+    log.fine('ModuleImpl::initialize call');
   }
 
   /// Implementation of the Stop() => (); method.
   @override
   void stop(void callback()) {
-    _log('ModuleImpl::stop call');
+    log.fine('ModuleImpl::stop call');
     // Do some clean up here.
 
     // Invoke the callback to signal that the clean-up process is done.
@@ -52,14 +49,16 @@ class ModuleImpl extends Module {
 
 /// Entry point for this module.
 void main() {
-  _log('Module started with ApplicationContext: $_appContext');
+  setupLogger();
+  log.fine('Module started with ApplicationContext: $_appContext');
 
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices.addServiceForName(
     (InterfaceRequest<Module> request) {
-      _log('Received binding request for Module');
+      log.fine('Received binding request for Module');
       if (_module != null) {
-        _log('Module interface can only be provided once. Rejecting request.');
+        log.warning(
+            'Module interface can only be provided once. Rejecting request.');
         request.channel.close();
         return;
       }

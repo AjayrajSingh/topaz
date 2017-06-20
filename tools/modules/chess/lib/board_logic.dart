@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// import 'board_piece.dart';
+import 'package:lib.logging/logging.dart';
+
 import 'helpers.dart';
 
 const String _kStartingFENString =
@@ -75,7 +76,7 @@ class ChessGame {
   }
 
   String _kindOf(String piece) {
-    print('piece: $piece');
+    log.fine('piece: $piece');
     return piece.toUpperCase();
   }
 
@@ -206,7 +207,7 @@ class ChessGame {
         break;
       case 'N':
         List<int> testPositions = <int>[];
-        print('right: $right, left: $left');
+        log.fine('right: $right, left: $left');
         if (left >= 2) {
           testPositions.addAll(<int>[position - 10, position + 6]);
         }
@@ -293,7 +294,7 @@ class ChessGame {
   }
 
   String _indexToNotation({int index}) {
-    print('index: $index');
+    log.fine('index: $index');
     int file = index % 8;
     int rank = index ~/ 8 + 1;
     return '${_kFiles[file - 1]}$rank';
@@ -303,8 +304,7 @@ class ChessGame {
     Map<int, String> pieces = <int, String>{};
     List<String> fenRanks = pieceField.split('/');
     if (fenRanks.length != 8) {
-      print(
-          'error - not enought ranks in parsed positions'); //TODO: make this a log
+      log.severe('not enough ranks in parsed positions');
       return pieces;
     }
 
@@ -342,8 +342,8 @@ class ChessGame {
 
   String _reversePieceSearch({String dest, String piece, String hint}) {
     // brute force this until the vector refactorization of move logic
-    print(
-        'Looking for $piece moving to ${_notationToIndex(coord: dest)} with hint: $hint');
+    log.fine('Looking for $piece moving to ${_notationToIndex(coord: dest)} '
+        'with hint: $hint');
     List<int> candidates = <int>[];
     List<int> searchSet = <int>[];
     if (hint != null) {
@@ -356,17 +356,17 @@ class ChessGame {
     }
     searchSet.forEach((int i) {
       if (this.positions[i] == piece) {
-        print('valid moves for $i: ${validMoves(position: i)}');
+        log.fine('valid moves for $i: ${validMoves(position: i)}');
         if (validMoves(position: i).contains(_notationToIndex(coord: dest))) {
           candidates.add(i);
         }
       }
     });
     if (candidates.length > 1) {
-      print('Warning! More than one candidate piece found...');
+      log.fine('Warning! More than one candidate piece found...');
     }
     if (candidates.length == 0) {
-      print('Warning! No candidates found!');
+      log.fine('Warning! No candidates found!');
     }
     return candidates.isEmpty ? null : _indexToNotation(index: candidates[0]);
   }
@@ -381,9 +381,9 @@ class ChessGame {
     this.activeColor = _PieceColor.white;
     for (int i = 1; i < moveList.length; i++) {
       List<String> moves = moveList[i].split(' ');
-      print('moves: $moves');
+      log.fine('moves: $moves');
       moves.forEach((String m) {
-        print(m);
+        log.fine(m);
         String piece, orig, dest = '';
         if (m.contains('x')) {
           // capture!
@@ -405,14 +405,14 @@ class ChessGame {
           orig = _reversePieceSearch(dest: dest, piece: piece);
         }
         movePairs.add(<String>[orig, dest]);
-        print(halfMoves);
+        log.fine(halfMoves);
         halfMoves++;
         this.activeColor =
             halfMoves % 2 == 0 ? _PieceColor.white : _PieceColor.black;
       });
     }
     //"Qa6xb7#", "fxg1=Q+"
-    print(movePairs);
+    log.fine(movePairs);
     return movePairs;
   }
 
@@ -424,7 +424,7 @@ class ChessGame {
   /// Request to move a piece from place to place - returns success of move
   bool movePiece({int from, int to}) {
     if (validMoves(position: from).contains(to)) {
-      print('valid move');
+      log.fine('valid move');
       String piece = positions[from];
       String captured = positions[to];
       _undo = <String, dynamic>{

@@ -76,11 +76,11 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.30-dev"
+    version: "0.0.31-dev"
   flutter_test:
     description: flutter
     source: sdk
-    version: "0.0.8-dev"
+    version: "0.0.9-dev"
   front_end:
     description:
       path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/front_end"

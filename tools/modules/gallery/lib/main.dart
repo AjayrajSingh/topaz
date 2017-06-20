@@ -4,12 +4,15 @@
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'src/modular/gallery_screen.dart';
 import 'src/modular/module_model.dart';
 
 void main() {
+  setupLogger();
+
   ModuleWidget<GalleryModuleModel> moduleWidget =
       new ModuleWidget<GalleryModuleModel>(
     applicationContext: new ApplicationContext.fromStartupInfo(),
