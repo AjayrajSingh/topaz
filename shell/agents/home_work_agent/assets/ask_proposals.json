@@ -36,5 +36,45 @@
     "icon_url": "/system/data/sysui/google_photos.png",
     "module_url": "image",
     "module_data": "{\"image_url\":\"/system/data/sysui/story_fluxMemories.png\"}"
+  },
+  {
+    "id": "ask_06",
+    "headline": "Listen to Portugal the Man",
+    "subheadline": "Play now",
+    "image_url": "/system/data/sysui/1-portugal-the-man.jpeg",
+    "module_url": "music_artist",
+    "module_data": "{\"view\":\"spotify://artist/4kI8Ie27vjvonwaB2ePh8T\"}"
+  },
+  {
+    "id": "ask_07",
+    "headline": "Reply to Danielle",
+    "image_url": "/system/data/sysui/danielle_cc0.jpg",
+    "type": "person",
+    "module_url": "chat_conversation_list"
+  },
+  {
+    "id": "ask_08",
+    "headline": "Play video",
+    "module_url": "video/video"
+  },
+  {
+    "id": "ask_09",
+    "headline": "Nonch Harpin' Live in Concert",
+    "subheadline": "Watch performance",
+    "image_url": "/system/data/sysui/9-nonch-harpin.png",
+    "module_url": "youtube_story"
+  },
+  {
+    "id": "ask_10",
+    "headline": "View hotel confirmation",
+    "image_url": "/system/data/sysui/9-hotel.jpg",
+    "module_url": "concert_event_list"
+  },
+  {
+    "id": "ask_11",
+    "headline": "Scroll through an infinite list",
+    "subheadline": "Launch now",
+    "icon_url": "/system/data/sysui/ic_stat_3_googblue_2x_web_24dp.png",
+    "module_url": "infinite_scroller"
   }
 ]
