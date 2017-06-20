@@ -11,10 +11,7 @@ import '../widgets.dart';
 /// The screen to video player.
 class Player extends StatelessWidget {
   /// The screen for video player
-  Player({
-    Key key,
-  })
-      : super(key: key);
+  Player({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

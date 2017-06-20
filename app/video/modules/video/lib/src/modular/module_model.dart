@@ -9,6 +9,7 @@ import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.media.lib.flutter/media_player_controller.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
+import 'package:apps.modular.services.user/device_map.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.netconnector.services/netconnector.fidl.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,6 @@ Asset _asset = _defaultAsset;
 
 /// The [ModuleModel] for the video player.
 class VideoModuleModel extends ModuleModel implements TickerProvider {
-  final NetConnectorProxy _netConnector = new NetConnectorProxy();
   Timer _hideTimer;
   Timer _progressTimer;
   bool _remote = false;
@@ -40,6 +40,17 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   Animation<double> _thumbnailAnimation;
   MediaPlayerController _controller;
   bool _wasPlaying = false;
+  final NetConnectorProxy _netConnector = new NetConnectorProxy();
+  final DeviceMapProxy _deviceMap = new DeviceMapProxy();
+
+  /// Last version we received from NetConnector
+  int lastVersion = 0;
+
+  /// List of device names received from NetConnector
+  List<String> deviceNames = <String>[];
+
+  /// List of device entries received from DeviceMap
+  Map<String, String> deviceNameMapping = <String, String>{};
 
   /// App context passed in from starting the app
   final ApplicationContext appContext;
@@ -63,7 +74,9 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       curve: Curves.fastOutSlowIn,
       reverseCurve: Curves.fastOutSlowIn,
     );
+
     connectToService(appContext.environmentServices, _netConnector.ctrl);
+    connectToService(appContext.environmentServices, _deviceMap.ctrl);
   }
 
   @override
@@ -93,6 +106,20 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   ChildViewConnection get videoViewConnection =>
       _controller.videoViewConnection;
 
+  /// Returns list of active devices by name
+  List<String> get activeDevices => deviceNames;
+
+  /// Returns display name for a given device
+  String getDisplayName(String deviceName) {
+    String displayName = deviceNameMapping[deviceName];
+
+    if (displayName == null) {
+      displayName = deviceName;
+    }
+
+    return displayName;
+  }
+
   /// Seeks to a duration in the video
   void seek(Duration duration) {
     _controller.seek(duration);
@@ -120,33 +147,22 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     _controller.pause();
   }
 
-  /// Currently this will start remote play on the first device found
-  void switchToRemotePlay(int version, List<String> devices) {
-    for (String device in devices) {
+  /// Start playing video on remote device if it is playing locally
+  void playRemote(String deviceName) {
+    hideDeviceChooser = true;
+    if (_asset.device == null) {
       pause();
       //TODO(maryxia) SO-445 indicate to user that remote play has started
-      log.fine('Starting remote play on ' + device);
+      log.fine('Starting remote play on ' + deviceName);
       _asset = new Asset.remote(
           service: _kServiceName,
-          device: device,
+          device: deviceName,
           uri: _asset.uri,
           title: _asset.title,
           position: _controller.progress);
 
       _remote = true;
       play();
-      return;
-    }
-
-    //TODO(maryxia) SO-508: display message to the user
-    log.warning('No devices found for remote play');
-  }
-
-  /// Start playing video on remote device if it is playing locally
-  void playRemote() {
-    hideDeviceChooser = true;
-    if (_asset.device == null) {
-      _netConnector.getKnownDeviceNames(0, switchToRemotePlay);
     }
   }
 
@@ -184,6 +200,25 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     _controller.removeListener(_handleControllerChanged);
     _thumbnailAnimationController.dispose();
     super.onStop();
+  }
+
+  /// NetConnector callback to set names of currently active remote devices
+  void setActiveRemoteDevices(int version, List<String> deviceNames) {
+    this.deviceNames = deviceNames;
+    this.lastVersion = version;
+  }
+
+  /// DeviceMap callback to set names/hostnames of all remote devices
+  void setRemoteDeviceNames(List<DeviceMapEntry> devices) {
+    for (DeviceMapEntry device in devices) {
+      deviceNameMapping[device.hostname] = device.name;
+    }
+  }
+
+  /// Refresh list of remote devices using deviceMap/netConnector
+  void refreshRemoteDevices() {
+    _deviceMap.query(setRemoteDeviceNames);
+    _netConnector.getKnownDeviceNames(this.lastVersion, setActiveRemoteDevices);
   }
 
   /// Handles change notifications from the controller
