@@ -10,6 +10,7 @@ import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
 import 'package:config/config.dart';
 import 'package:eventsource/eventsource.dart';
 import 'package:http/http.dart' as http;
+import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 
 import 'chat_message_transporter.dart';
@@ -17,10 +18,6 @@ import 'chat_message_transporter.dart';
 const int _kMaxRetryCount = 3;
 const Duration _kInitDebounceWindow = const Duration(seconds: 5);
 const Duration _kHealthCheckPeriod = const Duration(minutes: 3);
-
-void _log(String msg) {
-  print('[firebase_chat_message_transporter] $msg');
-}
 
 /// A [ChatMessageTransporter] implementation that uses a Firebase Realtime
 /// Database as its message transportation channel.
@@ -82,7 +79,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
   /// Sign in to the firebase DB using the given google auth credentials.
   @override
   Future<Null> initialize() async {
-    _log('initialize() start');
+    log.fine('initialize() start');
     try {
       // The initialize() method can be called by multiple reasons; the
       // 'auth_revoked' event from the event source, and any 401 unauthorized
@@ -92,7 +89,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
       DateTime now = new DateTime.now();
       if (_lastInitializeStartTime != null &&
           now.difference(_lastInitializeStartTime) < _kInitDebounceWindow) {
-        _log('debouncing initialize() call');
+        log.fine('debouncing initialize() call');
         return _ready.future;
       }
       _lastInitializeStartTime = now;
@@ -247,15 +244,15 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     );
 
     if (response.statusCode != 200) {
-      _log('ERROR: Failed to send message to $recipient. '
-          'Status Code: ${response.statusCode}');
-      _log('Response body: ${response.body}');
+      log.severe('Failed to send message to $recipient. '
+          'Status Code: ${response.statusCode}\n'
+          'Response body: ${response.body}');
 
       if (response.statusCode == 401) {
         // Retry after refreshing the auth token. If it still fails after the
         // maximum retry count, throw an authorization exception.
         if (retryCount < _kMaxRetryCount) {
-          _log('retrying _sendMessageTo(). count: $retryCount');
+          log.fine('retrying _sendMessageTo(). count: $retryCount');
           await initialize();
           await _sendMessageTo(recipient, key, value, retryCount + 1);
         } else {
@@ -281,7 +278,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
         _getFirebaseUrl('emails/${_encodeFirebaseKey(_email)}'),
       );
     } on EventSourceSubscriptionException catch (e) {
-      _log('Event Source Subscription Exception: ${e.data}');
+      log.severe('Event Source Subscription Exception: ${e.data}');
     }
   }
 
@@ -306,8 +303,8 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
 
         // Don't spam with the keep-alive event.
         if (eventType != 'keep-alive') {
-          _log('Event Received: ${eventType}');
-          _log('Data: ${event.data}');
+          log.fine('Event Received: ${eventType}');
+          log.fine('Data: ${event.data}');
         }
 
         switch (eventType) {
@@ -320,28 +317,27 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
             break;
 
           case 'cancel':
-            _log('"cancel" event received. No longer able to read the data.');
+            log.fine('"cancel" event received.');
             await _reconnectToEventStream();
             break;
 
           case 'auth_revoked':
-            _log('"auth_revoked" event received. The auth credential is no '
+            log.fine('"auth_revoked" event received. The auth credential is no '
                 'longer valid and should be renewed. Renewing the credential.');
             await _reconnectToEventStream();
             break;
 
           default:
-            _log('WARNING: Unknown event type from Firebase event stream: '
+            log.warning('WARNING: Unknown event type from Firebase: '
                 '${eventType}');
         }
       },
       onError: (dynamic e, StackTrace stackTrace) {
-        _log('Error occurred while processing the event stream: $e');
-        _log('$stackTrace');
-        _log('Continuing to receive events.');
+        log.severe('Error while processing the event stream', e, stackTrace);
+        log.severe('Continuing to receive events.');
       },
       onDone: () {
-        _log('Event stream is closed. Renewing the credential.');
+        log.fine('Event stream is closed. Renewing the credential.');
         _reconnectToEventStream();
       },
       cancelOnError: false,
@@ -351,7 +347,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
   void _resetHealthCheckTimer() {
     _healthCheckTimer?.cancel();
     _healthCheckTimer = new Timer(_kHealthCheckPeriod, () {
-      _log('Reinitializing: triggered by the health check timer.');
+      log.fine('Reinitializing: triggered by the health check timer.');
       initialize();
     });
   }
@@ -407,10 +403,10 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
         _cachedMessageKeys.remove(messageKey);
       }
     } else {
-      _log("ERROR: 'put' event received from the event stream, but could not "
+      log.warning("'put' event received from the event stream, but could not "
           'recognize the path.');
-      _log('path: $path');
-      _log('data: $data');
+      log.warning('path: $path');
+      log.warning('data: $data');
     }
   }
 
@@ -457,18 +453,21 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     );
 
     if (response.statusCode != 200) {
-      _log('Failed to delete the processed incoming message from Firebase DB. '
-          'Status Code: ${response.statusCode}');
+      log.severe(
+          'Failed to delete the processed incoming message from Firebase DB. '
+          'Status Code: ${response.statusCode}\n'
+          'Response Body: ${response.body}');
 
       if (response.statusCode == 401) {
         // Retry after refreshing the auth token. If it still fails after the
         // maximum retry count, throw an authorization exception.
         if (retryCount < _kMaxRetryCount) {
-          _log('retrying _deleteMessageFromFirebase(). count: $retryCount');
+          log.fine('retrying _deleteMessageFromFirebase(). count: $retryCount');
           await initialize();
           await _deleteMessageFromFirebase(messageKey, retryCount + 1);
         } else {
-          _log('Failed to delete the message from Firebase after the maximum '
+          log.severe(
+              'Failed to delete the message from Firebase after the maximum '
               'retry count.');
         }
       }

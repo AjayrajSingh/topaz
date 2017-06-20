@@ -18,6 +18,7 @@ import 'package:apps.modular.services.story/surface.fidl.dart';
 import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart'
     as chat_fidl;
 import 'package:collection/collection.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:models/user.dart';
 
@@ -27,10 +28,6 @@ const String _kChatContentProviderUrl =
     'file:///system/apps/chat_content_provider';
 const String _kChatConversationModuleUrl =
     'file:///system/apps/chat_conversation';
-
-void _log(String msg) {
-  print('[chat_conversation_list_module_model] $msg');
-}
 
 /// A [ModuleModel] providing chat conversation list specific data to the
 /// descendant widgets.
@@ -100,7 +97,7 @@ class ChatConversationListModuleModel extends ModuleModel {
   ) {
     super.onReady(moduleContext, link, incomingServices);
 
-    _log('ModuleModel::onReady call.');
+    log.fine('ModuleModel::onReady call.');
     // Start the chat conversation module.
     _startConversationModule();
 
@@ -155,7 +152,7 @@ class ChatConversationListModuleModel extends ModuleModel {
   ///
   /// The returned conversations will be stored in the [conversations] list.
   Future<Null> _fetchConversations() async {
-    _log('_fetchConversations call.');
+    log.fine('_fetchConversations call.');
 
     String messageQueueToken = await _mqTokenCompleter.future;
     chatContentProvider.getConversations(
@@ -164,12 +161,13 @@ class ChatConversationListModuleModel extends ModuleModel {
         chat_fidl.ChatStatus status,
         List<chat_fidl.Conversation> conversations,
       ) {
-        _log('getConversations callback.');
+        log.fine('getConversations callback.');
 
         // TODO(youngseokyoon): properly communicate the error status to the
         // user. (https://fuchsia.atlassian.net/browse/SO-365)
         if (status != chat_fidl.ChatStatus.ok) {
-          _log('ChatContentProvider::GetConversations() returned an error '
+          log.severe(
+              'ChatContentProvider::GetConversations() returned an error '
               'status: $status');
           _conversations = null;
           notifyListeners();
@@ -189,7 +187,7 @@ class ChatConversationListModuleModel extends ModuleModel {
   /// Refer to the `chat_content_provider.fidl` file for the expected message
   /// format coming from the content provider.
   void _handleNewConversation(String message) {
-    _log('handleNewConversation call with message: $message');
+    log.fine('handleNewConversation call with message: $message');
     try {
       Map<String, dynamic> decoded = JSON.decode(message);
       List<int> conversationId = decoded['conversation_id'];
@@ -210,9 +208,8 @@ class ChatConversationListModuleModel extends ModuleModel {
       } else {
         notifyListeners();
       }
-    } catch (e) {
-      _log('Error occurred while processing the message received via the '
-          'message queue: $e');
+    } catch (e, stackTrace) {
+      log.severe('Decoding error while processing the message', e, stackTrace);
     } finally {
       // Register the handler again to process further messages.
       _messageQueue.receive(_handleNewConversation);
@@ -266,7 +263,7 @@ class ChatConversationListModuleModel extends ModuleModel {
         // TODO(youngseokyoon): properly communicate the error status to the
         // user. (https://fuchsia.atlassian.net/browse/SO-365)
         if (status != chat_fidl.ChatStatus.ok) {
-          _log('ChatContentProvider::NewConversation() returned an error '
+          log.severe('ChatContentProvider::NewConversation() returned an error '
               'status: $status');
           return;
         }

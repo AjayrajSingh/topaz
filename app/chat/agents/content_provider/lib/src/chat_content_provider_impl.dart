@@ -15,6 +15,7 @@ import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
 import 'package:collection/collection.dart';
 import 'package:lib.fidl.dart/bindings.dart' show InterfaceRequest;
 import 'package:lib.fidl.dart/core.dart' show Vmo;
+import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:quiver/core.dart' as quiver;
 
@@ -23,10 +24,6 @@ import 'chat_message_transporter.dart';
 import 'ledger_utils.dart';
 import 'new_conversation_watcher.dart';
 import 'new_message_watcher.dart';
-
-void _log(String msg) {
-  print('[chat_content_provider_impl] $msg');
-}
 
 const int _kKeyLengthInBytes = 16;
 
@@ -128,8 +125,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         chatMessageTransporter.initialize(),
       ]);
     } catch (e, stackTrace) {
-      _log('Failed to initialize: $e');
-      _log(stackTrace.toString());
+      log.severe('Failed to initialize', e, stackTrace);
       return;
     }
   }
@@ -170,10 +166,10 @@ class ChatContentProviderImpl extends ChatContentProvider {
       });
 
       _ledgerReady.complete();
-      _log('Ledger Initialized');
+      log.fine('Ledger Initialized');
     } catch (e) {
       _ledgerReady.completeError(e);
-      _log('Failed to initialize Ledger');
+      log.fine('Failed to initialize Ledger');
       rethrow;
     }
   }
@@ -237,7 +233,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         Status status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Ledger::GetPage() returned an error status: $status');
+          log.severe('Ledger::GetPage() returned an error status: $status');
           callback(ChatStatus.ledgerOperationError, null);
           return;
         }
@@ -261,7 +257,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Page::Put() returned an error status: $status');
+          log.severe('Page::Put() returned an error status: $status');
           callback(ChatStatus.ledgerOperationError, null);
           return;
         }
@@ -278,8 +274,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         newConversationPage.ctrl.close();
       }
     } catch (e, stackTrace) {
-      _log('ERROR: Sending ChatStatus.unknownError caused by: $e.');
-      _log(stackTrace.toString());
+      log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError, null);
     }
   }
@@ -329,7 +324,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         Status status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Page::GetSnapshot() returned an error status: $status');
+          log.severe('Page::GetSnapshot() returned an error status: $status');
           callback(ChatStatus.ledgerOperationError, const <Conversation>[]);
           return;
         }
@@ -337,8 +332,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
         List<Entry> entries;
         try {
           entries = await getFullEntries(snapshot);
-        } catch (e) {
-          _log(e);
+        } catch (e, stackTrace) {
+          log.severe('Failed to get entries', e, stackTrace);
           callback(ChatStatus.ledgerOperationError, const <Conversation>[]);
           return;
         }
@@ -357,15 +352,14 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
           callback(ChatStatus.ok, conversations);
         } catch (e) {
-          _log(e);
+          log.severe('Decoding error', e);
           callback(ChatStatus.decodingError, const <Conversation>[]);
         }
       } finally {
         snapshot.ctrl.close();
       }
     } catch (e, stackTrace) {
-      _log('ERROR: Sending ChatStatus.unknownError caused by: $e.');
-      _log(stackTrace.toString());
+      log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError, const <Conversation>[]);
     }
   }
@@ -398,7 +392,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         Status status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Ledger::GetPage() returned an error status: $status');
+          log.severe('Ledger::GetPage() returned an error status: $status');
           callback(ChatStatus.ledgerOperationError, const <Message>[]);
           return;
         }
@@ -432,7 +426,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Page::GetSnapshot() returned an error status: $status');
+          log.severe('Page::GetSnapshot() returned an error status: $status');
           callback(ChatStatus.ledgerOperationError, const <Message>[]);
           return;
         }
@@ -440,8 +434,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
         List<Entry> entries;
         try {
           entries = await getFullEntries(snapshot);
-        } catch (e) {
-          _log(e);
+        } catch (e, stackTrace) {
+          log.severe('Failed to get entries', e, stackTrace);
           callback(ChatStatus.ledgerOperationError, const <Message>[]);
           return;
         }
@@ -453,8 +447,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
               .toList();
 
           callback(ChatStatus.ok, messages);
-        } catch (e) {
-          _log(e);
+        } catch (e, stackTrace) {
+          log.severe('Decoding error', e, stackTrace);
           callback(ChatStatus.decodingError, const <Message>[]);
         }
       } finally {
@@ -462,8 +456,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         conversationPage.ctrl.close();
       }
     } catch (e, stackTrace) {
-      _log('ERROR: Sending ChatStatus.unknownError caused by: $e.');
-      _log(stackTrace.toString());
+      log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError, const <Message>[]);
     }
   }
@@ -496,7 +489,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         Status status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Ledger::GetPage() returned an error status: $status');
+          log.severe('Ledger::GetPage() returned an error status: $status');
           callback(ChatStatus.ledgerOperationError, null);
           return;
         }
@@ -511,7 +504,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Page::GetSnapshot() returned an error status: $status');
+          log.severe('Page::GetSnapshot() returned an error status: $status');
           callback(ChatStatus.ledgerOperationError, null);
         }
 
@@ -530,7 +523,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
             return;
           }
 
-          _log('PageSnapshot::Get() returned an error status: $status');
+          log.severe('PageSnapshot::Get() returned an error status: $status');
           callback(ChatStatus.ledgerOperationError, null);
           return;
         }
@@ -539,8 +532,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
         try {
           Message message = _createMessageFromLedgerEntry(messageId, value);
           callback(ChatStatus.ok, message);
-        } catch (e) {
-          _log(e);
+        } catch (e, stackTrace) {
+          log.severe('Decoding error', e, stackTrace);
           callback(ChatStatus.decodingError, null);
         }
       } finally {
@@ -548,8 +541,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         conversationPage.ctrl.close();
       }
     } catch (e, stackTrace) {
-      _log('ERROR: Sending ChatStatus.unknownError caused by: $e.');
-      _log(stackTrace.toString());
+      log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError, null);
     }
   }
@@ -621,7 +613,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         Status status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Ledger::GetPage() returned an error status: $status');
+          log.severe('Ledger::GetPage() returned an error status: $status');
           callback(ChatStatus.ledgerOperationError, const <int>[]);
           return;
         }
@@ -636,7 +628,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Page::Put() returned an error status: $status');
+          log.severe('Page::Put() returned an error status: $status');
           callback(ChatStatus.ledgerOperationError, const <int>[]);
           return;
         }
@@ -666,8 +658,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
       callback(ChatStatus.ok, messageId);
     } catch (e, stackTrace) {
-      _log('ERROR: Sending ChatStatus.unknownError caused by: $e.');
-      _log(stackTrace.toString());
+      log.severe('Sending ChatStatus.unknownError caused by', e, stackTrace);
       callback(ChatStatus.unknownError, const <int>[]);
     }
   }
@@ -768,7 +759,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         Status status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Ledger::GetPage() returned an error status: $status');
+          log.severe('Ledger::GetPage() returned an error status: $status');
           return;
         }
 
@@ -785,7 +776,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
           status = await statusCompleter.future;
           if (status != Status.ok) {
-            _log('Page::Put() returned an error status: $status');
+            log.severe('Page::Put() returned an error status: $status');
           }
 
           _conversationCache[conversation.conversationId] = conversation;
@@ -803,7 +794,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         status = await statusCompleter.future;
         if (status != Status.ok) {
-          _log('Page::Put() returned an error status: $status');
+          log.severe('Page::Put() returned an error status: $status');
           return;
         }
 
@@ -812,9 +803,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         conversationPage.ctrl.close();
       }
     } catch (e, stackTrace) {
-      _log('An error occurred while processing an incoming message.');
-      _log('$e');
-      _log('$stackTrace');
+      log.severe('Error while processing an incoming message', e, stackTrace);
     }
   }
 

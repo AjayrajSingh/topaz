@@ -11,6 +11,7 @@ import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.device..info/device_info.fidl.dart';
 import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.modular/modular.dart';
 import 'package:meta/meta.dart';
 
@@ -19,10 +20,6 @@ import 'src/firebase_chat_message_transporter.dart';
 import 'src/proposer.dart';
 
 ChatContentProviderAgent _agent;
-
-void _log(String msg) {
-  print('[chat_content_provider] $msg');
-}
 
 /// An implementation of the [Agent] interface.
 class ChatContentProviderAgent extends AgentImpl {
@@ -44,7 +41,7 @@ class ChatContentProviderAgent extends AgentImpl {
     TokenProvider tokenProvider,
     ServiceProviderImpl outgoingServices,
   ) async {
-    _log('onReady start.');
+    log.fine('onReady start.');
 
     // Get the device id.
     DeviceInfoProxy deviceInfo = new DeviceInfoProxy();
@@ -91,14 +88,14 @@ class ChatContentProviderAgent extends AgentImpl {
     // service provider.
     outgoingServices.addServiceForName(
       (InterfaceRequest<ChatContentProvider> request) {
-        _log('Received a ChatContentProvider request');
+        log.fine('Received a ChatContentProvider request');
         _contentProviderImpl.addBinding(request);
       },
       ChatContentProvider.serviceName,
     );
 
     proposer.load();
-    _log('onReady end.');
+    log.fine('onReady end.');
   }
 
   @override
@@ -111,6 +108,7 @@ class ChatContentProviderAgent extends AgentImpl {
 
 /// Main entry point.
 Future<Null> main(List<String> args) async {
+  setupLogger(name: 'chat/agent');
   _agent = new ChatContentProviderAgent(
     applicationContext: new ApplicationContext.fromStartupInfo(),
   );

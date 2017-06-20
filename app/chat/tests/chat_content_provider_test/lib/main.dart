@@ -16,6 +16,7 @@ import 'package:apps.modules.chat.agents.content_provider..chat_content_provider
 import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
 import 'package:apps.test_runner.services..test_runner/test_runner.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' hide Message;
+import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart' hide expect;
 
@@ -26,11 +27,6 @@ const Duration _kTimeout = const Duration(seconds: 1);
 
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 ChatContentProviderTestModule _module;
-
-// ignore: unused_element
-void _log(String msg) {
-  print('[chat_content_provider_test] $msg');
-}
 
 /// Implementation of the [Module] interface which tests the functionalities of
 /// [ChatContentProvider].
@@ -87,7 +83,7 @@ class ChatContentProviderTestModule extends Module {
       await _testMessageQueues();
     } catch (e, stackTrace) {
       _testRunner.fail('Test Error. See the console logs for more details.');
-      _log('Test Error:\n$e\n$stackTrace');
+      log.severe('Test Error', e, stackTrace);
     }
 
     _testRunner.teardown(() {});
@@ -614,6 +610,8 @@ class _MessageQueueWrapper {
 
 /// Main entry point.
 Future<Null> main(List<String> args) async {
+  setupLogger(name: 'chat/agent_test');
+
   _context.outgoingServices.addServiceForName(
     (InterfaceRequest<Module> request) {
       if (_module == null) {

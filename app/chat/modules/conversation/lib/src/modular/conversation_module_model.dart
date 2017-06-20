@@ -21,6 +21,7 @@ import 'package:apps.modules.common.services.gallery/gallery.fidl.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart' hide Message;
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import '../models.dart';
@@ -31,10 +32,6 @@ const String _kChatContentProviderUrl =
 const String _kGalleryModuleUrl = 'file:///system/apps/gallery';
 
 const Duration _kScrollAnimationDuration = const Duration(milliseconds: 300);
-
-void _log(String msg) {
-  print('[chat_conversation_module_model] $msg');
-}
 
 /// A [ModuleModel] providing chat conversation specific data to the descendant
 /// widgets.
@@ -105,8 +102,7 @@ class ChatConversationModuleModel extends ModuleModel {
         sortedMessages.map(_createMessageFromFidl).toList(),
       );
     } catch (e, stackTrace) {
-      _log('Error occurred while setting _messages: $e');
-      _log('$stackTrace');
+      log.severe('Error occurred while setting _messages', e, stackTrace);
     } finally {
       notifyListeners();
     }
@@ -133,7 +129,7 @@ class ChatConversationModuleModel extends ModuleModel {
   ) {
     super.onReady(moduleContext, link, incomingServices);
 
-    _log('ModuleModel::onReady call.');
+    log.fine('ModuleModel::onReady call.');
 
     // Obtain the component context.
     ComponentContextProxy componentContext = new ComponentContextProxy();
@@ -189,7 +185,7 @@ class ChatConversationModuleModel extends ModuleModel {
   ///
   /// The returned messages will be stored in the [_messages] list.
   Future<Null> _fetchMessageHistory() async {
-    _log('fetchMessageHistory call.');
+    log.fine('fetchMessageHistory call.');
 
     if (conversationId == null) {
       return;
@@ -200,17 +196,17 @@ class ChatConversationModuleModel extends ModuleModel {
       conversationId,
       messageQueueToken,
       (chat_fidl.ChatStatus status, List<chat_fidl.Message> messages) {
-        _log('getMessageHistory callback.');
+        log.fine('getMessageHistory callback.');
 
         // TODO(youngseokyoon): properly communicate the error status to the
         // user. (https://fuchsia.atlassian.net/browse/SO-365)
         if (status != chat_fidl.ChatStatus.ok) {
-          _log('ChatContentProvider::GetMessages() returned an error '
+          log.severe('ChatContentProvider::GetMessages() returned an error '
               'status: $status');
           _setMessages(null);
         }
 
-        _log('setMessages call');
+        log.fine('setMessages call');
         _setMessages(new List<chat_fidl.Message>.from(messages));
       },
     );
@@ -221,7 +217,7 @@ class ChatConversationModuleModel extends ModuleModel {
   /// Refer to the `chat_content_provider.fidl` file for the expected message
   /// format coming from the content provider.
   void _handleNewMessage(String message) {
-    _log('handleNewMessage call with message: $message');
+    log.fine('handleNewMessage call with message: $message');
     try {
       Map<String, dynamic> decoded = JSON.decode(message);
       List<int> conversationId = decoded['conversation_id'];
@@ -232,26 +228,26 @@ class ChatConversationModuleModel extends ModuleModel {
         conversationId,
         messageId,
         (chat_fidl.ChatStatus status, chat_fidl.Message message) {
-          _log('getMessage() callback');
+          log.fine('getMessage() callback');
 
           // TODO(youngseokyoon): properly communicate the error status to the
           // user. (https://fuchsia.atlassian.net/browse/SO-365)
           if (status != chat_fidl.ChatStatus.ok) {
-            _log('ChatContentProvider::GetMessage() returned an error '
+            log.severe('ChatContentProvider::GetMessage() returned an error '
                 'status: $status');
             return;
           }
 
           if (message != null &&
               _intListEquality.equals(this.conversationId, conversationId)) {
-            _log('adding the new message.');
+            log.fine('adding the new message.');
             _setMessages(_messages..add(message));
             _scrollToEnd();
           }
         },
       );
     } catch (e) {
-      _log('Error occurred while processing the message received via the '
+      log.severe('Error occurred while processing the message received via the '
           'message queue: $e');
     } finally {
       // Register the handler again to process further messages.
@@ -272,13 +268,13 @@ class ChatConversationModuleModel extends ModuleModel {
   }
 
   void _handleSelectedImages(String message) {
-    _log('handleSelectedImages: $message');
+    log.fine('handleSelectedImages: $message');
 
     Map<String, dynamic> decoded = JSON.decode(message);
     if (decoded['selected_images'] != null) {
       List<String> imageUrls = decoded['selected_images'];
       imageUrls.forEach((String imageUrl) {
-        _log('sending image url message: $imageUrl');
+        log.fine('sending image url message: $imageUrl');
         _chatContentProvider.sendMessage(
           conversationId,
           'image-url',
@@ -312,7 +308,7 @@ class ChatConversationModuleModel extends ModuleModel {
         );
 
       default:
-        _log('Unsupported message type: ${m.type}');
+        log.fine('Unsupported message type: ${m.type}');
         return null;
     }
   }
@@ -458,8 +454,8 @@ class ChatConversationModuleModel extends ModuleModel {
       if (shouldCloseChildModule) {
         _closeChildModule();
       }
-    } catch (e) {
-      _log('Could not parse the child Link data: $json');
+    } catch (e, stackTrace) {
+      log.severe('Could not parse the child Link data: $json', e, stackTrace);
     }
   }
 
