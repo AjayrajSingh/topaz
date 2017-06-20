@@ -17,8 +17,7 @@ import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart'
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:collection/collection.dart';
 import 'package:lib.fidl.dart/bindings.dart';
-
-import 'debug.dart';
+import 'package:lib.logging/logging.dart';
 
 const String _kChatContentProviderUrl =
     'file:///system/apps/chat_content_provider';
@@ -56,10 +55,10 @@ class Chatter {
   Future<ChildViewConnection> load() async {
     List<int> conversationId = await _getConversationId();
     if (conversationId == null) {
-      dashboardPrint('ERROR: Failed to get conversation id.');
+      log.severe('Failed to get conversation id.');
       return null;
     }
-    dashboardPrint('Creating convo with id: $conversationId');
+    log.fine('Creating convo with id: $conversationId');
 
     LinkProxy linkProxy = new LinkProxy();
     const String chatLinkName = 'chatLink';
@@ -113,7 +112,7 @@ class Chatter {
         List<chat.Conversation> conversations,
       ) {
         if (status != chat.ChatStatus.ok) {
-          dashboardPrint('Couldn\'t retrieve existing accounts!');
+          log.severe('Couldn\'t retrieve existing accounts!');
           completer.complete(null);
         } else {
           List<chat.Conversation> conversationsWithFuchsia = conversations
@@ -126,16 +125,16 @@ class Chatter {
               )
               .toList();
           if (conversationsWithFuchsia.length == 1) {
-            dashboardPrint(
+            log.fine(
                 'Found chat with id: ${conversationsWithFuchsia[0].conversationId}');
             completer.complete(conversationsWithFuchsia[0].conversationId);
           } else {
-            dashboardPrint('No existing chat, create a new one!');
+            log.fine('No existing chat, create a new one!');
             _chatContentProvider.newConversation(
               _kDashboardParticipants,
               (chat.ChatStatus status, chat.Conversation conversation) {
                 if (status != chat.ChatStatus.ok) {
-                  dashboardPrint('Couldn\'t create new chat!');
+                  log.severe('Couldn\'t create new chat!');
                   completer.complete(null);
                   return;
                 }
