@@ -1,4 +1,9 @@
-Rust Sample Module (WIP)
+Rust Spinning Square
 =======================================
 
-This will be an example module for Fuchsia, written in Rust, that displays graphics and responds to input.
+This is an example of how to write a Fuchsia module in Rust. It draws a slowly spinning square
+and allows you to click or touch to control the square's angle.
+
+To run, from a Fuchsia shell type:
+
+    launch spinning_square_rs
