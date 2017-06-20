@@ -20,14 +20,13 @@ class AuthenticationOverlay extends StatelessWidget {
         ) =>
             new AnimatedBuilder(
               animation: model.animation,
-              builder: (BuildContext context, Widget child) {
-                return model.animation.isDismissed
-                    ? new Offstage()
-                    : new Opacity(
-                        opacity: model.animation.value,
-                        child: child,
-                      );
-              },
+              builder: (BuildContext context, Widget child) => new Offstage(
+                    offstage: model.animation.isDismissed,
+                    child: new Opacity(
+                      opacity: model.animation.value,
+                      child: child,
+                    ),
+                  ),
               child: new FractionallySizedBox(
                 widthFactor: 0.75,
                 heightFactor: 0.75,
