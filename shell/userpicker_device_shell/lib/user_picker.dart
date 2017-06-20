@@ -14,7 +14,6 @@ const String _kDefaultServerName = 'ledger.fuchsia.com';
 const Color _kFuchsiaColor = const Color(0xFFFF0080);
 const double _kButtonContentWidth = 220.0;
 const double _kButtonContentHeight = 80.0;
-const double _kUserCardHeight = 188.0;
 
 /// Called when the user wants to login as [accountId] using [userProvider].
 typedef void OnLoginRequest(String accountId, UserProvider userProvider);
@@ -75,52 +74,54 @@ class UserPicker extends StatelessWidget {
     BuildContext context,
     UserPickerDeviceShellModel model,
   ) =>
-      new Material(
-        color: Colors.grey[300],
-        borderRadius: new BorderRadius.circular(8.0),
-        elevation: 4.0,
-        child: new Container(
-          width: _kButtonContentWidth,
-          padding: const EdgeInsets.all(16.0),
-          child: new Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              new TextField(
-                decoration: new InputDecoration(hintText: 'username'),
-                focusNode: userNameFocusNode,
-                controller: userNameController,
-                onSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(
-                        serverNameFocusNode,
-                      );
-                },
-              ),
-              new TextField(
-                decoration: new InputDecoration(
-                  hintText: 'firebase_id',
+      new Center(
+        child: new Material(
+          color: Colors.grey[300],
+          borderRadius: new BorderRadius.circular(8.0),
+          elevation: 4.0,
+          child: new Container(
+            width: _kButtonContentWidth,
+            padding: const EdgeInsets.all(16.0),
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new TextField(
+                  decoration: new InputDecoration(hintText: 'username'),
+                  focusNode: userNameFocusNode,
+                  controller: userNameController,
+                  onSubmitted: (_) {
+                    FocusScope.of(context).requestFocus(
+                          serverNameFocusNode,
+                        );
+                  },
                 ),
-                focusNode: serverNameFocusNode,
-                controller: serverNameController,
-                onSubmitted: (_) => _onSubmit(model),
-              ),
-              new Container(
-                margin: const EdgeInsets.symmetric(vertical: 16.0),
-                child: new RaisedButton(
-                  color: Colors.blue[500],
-                  onPressed: () => _onSubmit(model),
-                  child: new Container(
-                    width: _kButtonContentWidth - 32.0,
-                    height: _kButtonContentHeight,
-                    child: new Center(
-                      child: new Text(
-                        'Create and Log in',
-                        style: new TextStyle(color: Colors.white),
+                new TextField(
+                  decoration: new InputDecoration(
+                    hintText: 'firebase_id',
+                  ),
+                  focusNode: serverNameFocusNode,
+                  controller: serverNameController,
+                  onSubmitted: (_) => _onSubmit(model),
+                ),
+                new Container(
+                  margin: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: new RaisedButton(
+                    color: Colors.blue[500],
+                    onPressed: () => _onSubmit(model),
+                    child: new Container(
+                      width: _kButtonContentWidth - 32.0,
+                      height: _kButtonContentHeight,
+                      child: new Center(
+                        child: new Text(
+                          'Create and Log in',
+                          style: new TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
@@ -235,11 +236,11 @@ class UserPicker extends StatelessWidget {
       ),
     );
 
-    return new Container(
-      height: _kUserCardHeight,
-      child: new ListView(
-        scrollDirection: Axis.horizontal,
-        shrinkWrap: true,
+    return new Material(
+      borderRadius: new BorderRadius.all(new Radius.circular(8.0)),
+      color: Colors.black.withAlpha(0),
+      child: new Row(
+        mainAxisSize: MainAxisSize.min,
         children: children,
       ),
     );
@@ -254,7 +255,14 @@ class UserPicker extends StatelessWidget {
       ) {
         if (model.accounts != null && !loggingIn) {
           List<Widget> stackChildren = <Widget>[
-            new Center(child: _buildUserList(model)),
+            new Center(
+              child: new Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  _buildUserList(model),
+                ],
+              ),
+            ),
           ];
 
           if (model.isShowingNewUserForm) {

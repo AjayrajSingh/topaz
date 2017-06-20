@@ -11,11 +11,19 @@ import 'package:lib.widgets/model.dart';
 /// Manages the connection and animation of the authentication window.
 class AuthenticationOverlayModel extends Model implements TickerProvider {
   ChildViewConnection _childViewConnection;
+
+  /// If not null, returns the handle of the current requested overlay.
+  ChildViewConnection get childViewConnection => _childViewConnection;
+
   AnimationController _transitionAnimation;
   CurvedAnimation _curvedTransitionAnimation;
 
-  /// Constructor.
-  AuthenticationOverlayModel() {
+  /// The animation controlling the fading in and out of the authentication
+  /// overlay.
+  CurvedAnimation get animation => _curvedTransitionAnimation;
+
+  /// Starts showing an overlay over all other content.
+  void onStartOverlay(InterfaceHandle<ViewOwner> overlay) {
     _transitionAnimation = new AnimationController(
       value: 0.0,
       duration: const Duration(seconds: 1),
@@ -26,17 +34,6 @@ class AuthenticationOverlayModel extends Model implements TickerProvider {
       curve: Curves.fastOutSlowIn,
       reverseCurve: Curves.fastOutSlowIn,
     );
-  }
-
-  /// If not null, returns the handle of the current requested overlay.
-  ChildViewConnection get childViewConnection => _childViewConnection;
-
-  /// The animation controlling the fading in and out of the authentication
-  /// overlay.
-  CurvedAnimation get animation => _curvedTransitionAnimation;
-
-  /// Starts showing an overlay over all other content.
-  void onStartOverlay(InterfaceHandle<ViewOwner> overlay) {
     _childViewConnection = new ChildViewConnection(
       overlay,
       onAvailable: (ChildViewConnection connection) {
