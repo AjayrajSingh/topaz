@@ -10,6 +10,7 @@ interface WebRequestDelegate {
 
 [ServiceName="web_view::WebView"]
 interface WebView {
+   ClearCookies();
    SetUrl(string url);
    SetWebRequestDelegate(WebRequestDelegate delegate);
 };
