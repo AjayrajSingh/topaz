@@ -174,6 +174,11 @@ class MozWebView : public mozart::BaseView,
     Invalidate();
   }
 
+  // |WebView|:
+  void ClearCookies() override {
+    // Call web_view_.ClearCookieJar()
+  }
+
   void SetWebRequestDelegate(
       ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) final {
     webRequestDelegate_ =
