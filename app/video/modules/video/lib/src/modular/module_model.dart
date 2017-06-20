@@ -13,6 +13,7 @@ import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.netconnector.services/netconnector.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import '../widgets.dart';
@@ -21,10 +22,6 @@ import '../widgets.dart';
 final Duration _kOverlayAutoHideDuration = const Duration(seconds: 30000);
 final Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
 final String _kServiceName = 'fling';
-
-void _log(String msg) {
-  print('[module_model Module] $msg');
-}
 
 final Asset _defaultAsset = new Asset.movie(
   uri: Uri.parse('file:///data/Gravity_1080p_vp8.mkv'),
@@ -127,7 +124,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     for (String device in devices) {
       pause();
       //TODO(maryxia) SO-445 indicate to user that remote play has started
-      _log('Starting remote play on ' + device);
+      log.fine('Starting remote play on ' + device);
       _asset = new Asset.remote(
           service: _kServiceName,
           device: device,
@@ -141,7 +138,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     }
 
     //TODO(maryxia) SO-508: display message to the user
-    _log('No devices found for remote play');
+    log.warning('No devices found for remote play');
   }
 
   /// Start playing video on remote device if it is playing locally
@@ -159,7 +156,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       _asset = _defaultAsset;
       _controller.close();
       _remote = false;
-      _log('Starting local play');
+      log.fine('Starting local play');
       _controller.open(_asset.uri, serviceName: _kServiceName);
       play();
     }

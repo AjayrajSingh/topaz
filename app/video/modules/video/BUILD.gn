@@ -19,6 +19,7 @@ flutter_app("video") {
     "//apps/netconnector/services:services_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/logging:lib.logging",
     "//lib/widgets/packages/widgets:lib.widgets",
   ]
 
