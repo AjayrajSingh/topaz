@@ -4,6 +4,7 @@
 
 #include "apps/dart_content_handler/application_runner_impl.h"
 
+#include <mx/process.h>
 #include <thread>
 #include <utility>
 
@@ -22,6 +23,13 @@ std::vector<char> ExtractSnapshot(std::vector<char> bundle) {
   return unzipper.Extract(kSnapshotKey);
 }
 
+std::string GetLabelFromURL(const std::string& url) {
+  size_t last_slash = url.rfind('/');
+  if (last_slash == std::string::npos || last_slash + 1 == url.length())
+    return url;
+  return url.substr(last_slash + 1);
+}
+
 void RunApplication(
     app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
@@ -35,6 +43,10 @@ void RunApplication(
   std::vector<char> snapshot = ExtractSnapshot(std::move(bundle));
 
   mtl::MessageLoop loop;
+
+  // Name this process after the url of the application being launched.
+  std::string label = "dart:" + GetLabelFromURL(startup_info->launch_info->url);
+  mx::process::self().set_property(MX_PROP_NAME, label.c_str(), label.size());
 
   DartApplicationController app(std::move(snapshot), std::move(startup_info),
                                 std::move(controller));
