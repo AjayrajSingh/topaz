@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../modular/module_model.dart';
+import 'device_target_icon.dart';
 
 /// Callback to start remote play on a particular device
 typedef void DeviceCallback(String deviceName);
@@ -18,34 +19,27 @@ class DeviceChooser extends StatelessWidget {
   })
       : super(key: key);
 
-  // Create drop target for a particular device
-  Widget _createDropTarget(String dropTargetName, String displayName,
-      IconData icon, DeviceCallback callback, VideoModuleModel model) {
-    return new DragTarget<String>(
-      onWillAccept: (String deviceName) => true,
-      onAccept: (String deviceName) => callback(dropTargetName),
-      builder: (BuildContext context, List<String> candidateData,
-              List<dynamic> rejectedData) =>
-          new Container(
-            child: new Column(
-              children: <Widget>[
-                new Padding(
-                  padding: new EdgeInsets.only(top: 40.0, bottom: 10.0),
-                  child: new Icon(
-                    icon,
-                    size: 100.0,
-                    color: Colors.grey[400],
-                  ),
-                ),
-                new Text(
-                  displayName.toUpperCase(),
-                  style: new TextStyle(
-                    color: Colors.grey[200],
-                  ),
-                ),
-              ],
-            ),
-          ),
+  Widget _createDropTarget(
+    String dropTargetName,
+    String displayName,
+    IconData icon,
+    DeviceCallback callback,
+    VideoModuleModel model,
+  ) {
+    return new Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: new DragTarget<String>(
+        onWillAccept: (String deviceName) => true,
+        onAccept: (String deviceName) => callback(dropTargetName),
+        builder: (BuildContext context, List<String> candidateData,
+            List<dynamic> rejectedData) {
+          return new DeviceTargetIcon(
+            focused: candidateData.isNotEmpty,
+            icon: icon,
+            deviceName: displayName,
+          );
+        },
+      ),
     );
   }
 
