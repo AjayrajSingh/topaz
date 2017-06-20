@@ -11,6 +11,7 @@ const Color _kDefaultColor = const Color(0xFFFF0080);
 const double _kInitialFractionalDiameter = 1.0 / 1.5;
 const double _kTargetFractionalDiameter = 1.0;
 const double _kRotationRadians = 6 * math.PI;
+const Curve _kDefaultCurve = const Cubic(0.3, 0.1, 0.3, 0.9);
 
 const Duration _kAnimationDuration = const Duration(seconds: 2);
 
@@ -43,7 +44,7 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
     end: -90.0,
   );
   final Curve _firstHalfCurve = const Cubic(0.75, 0.25, 0.25, 1.0);
-  final Curve _secondHalfCurve = Curves.linear;
+  final Curve _secondHalfCurve = _kDefaultCurve;
 
   AnimationController _controller;
 
@@ -85,7 +86,8 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
               return new Transform(
                 alignment: FractionalOffset.center,
                 transform: new Matrix4.rotationZ(
-                  _controller.value * _kRotationRadians,
+                  _kDefaultCurve.transform(_controller.value) *
+                      _kRotationRadians,
                 ),
                 child: new Center(
                   child: new Container(
