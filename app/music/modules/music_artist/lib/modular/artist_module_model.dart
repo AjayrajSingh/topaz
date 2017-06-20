@@ -15,7 +15,7 @@ import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:apps.modular.services.story/surface.fidl.dart';
+import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:apps.modules.music.services.player/player.fidl.dart'
     as player_fidl;
 import 'package:apps.modules.music.services.player/status.fidl.dart';

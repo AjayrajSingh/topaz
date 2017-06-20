@@ -8,7 +8,7 @@ import 'dart:convert';
 
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:apps.modular.services.story/surface.fidl.dart';
+import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
