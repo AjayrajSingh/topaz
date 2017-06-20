@@ -43,8 +43,9 @@ class _ChatConversationListScreenState
                     ? <Conversation>[]
                     : model.conversations,
                 onNewConversation: model.showNewConversationForm,
-                onSelectConversation: (Conversation c) =>
-                    model.setConversationId(c.conversationId),
+                onSelectConversation: (Conversation c) => model
+                  ..setConversationId(c.conversationId)
+                  ..focusConversation(),
                 selectedId: model.conversationId,
               ),
             ];

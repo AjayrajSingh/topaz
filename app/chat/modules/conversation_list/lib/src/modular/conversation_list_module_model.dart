@@ -69,8 +69,10 @@ class ChatConversationListModuleModel extends ModuleModel {
 
       notifyListeners();
     }
+  }
 
-    // Refocus the conversation module.
+  /// Focuses the conversation module
+  void focusConversation() {
     _conversationModuleController.focus();
   }
 
@@ -142,7 +144,7 @@ class ChatConversationListModuleModel extends ModuleModel {
       new SurfaceRelation()
         ..arrangement = SurfaceArrangement.copresent
         ..emphasis = 2.0,
-      true,
+      false,
     );
   }
 
@@ -205,6 +207,7 @@ class ChatConversationListModuleModel extends ModuleModel {
         _lastCreatedConversationId = null;
         // No need to notify here, because setConversationId does it already.
         setConversationId(conversationId);
+        focusConversation();
       } else {
         notifyListeners();
       }
@@ -283,6 +286,7 @@ class ChatConversationListModuleModel extends ModuleModel {
               conversation.conversationId,
             ))) {
           setConversationId(conversation.conversationId);
+          focusConversation();
         } else {
           _lastCreatedConversationId = new Uint8List.fromList(
             conversation.conversationId,
