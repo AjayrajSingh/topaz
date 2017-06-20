@@ -23,6 +23,7 @@ flutter_app("music_playback") {
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/logging:lib.logging",
     "//lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/intl",
   ]

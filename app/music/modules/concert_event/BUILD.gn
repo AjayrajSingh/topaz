@@ -22,6 +22,7 @@ flutter_app("concert_event") {
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/logging:lib.logging",
     "//lib/widgets/packages/widgets:lib.widgets",
   ]
 

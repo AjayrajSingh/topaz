@@ -5,6 +5,8 @@
 name: music_api
 description: API for the music modules
 dependencies:
+  lib.logging:
+    path: ../../../../../lib/widgets/packages/logging
   music_models:
     path: ../music_models
 dev_dependencies:

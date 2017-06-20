@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:application.lib.app.dart/app.dart';
 import 'package:config/config.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'modular/artist_bio_module_model.dart';
@@ -20,6 +21,8 @@ Future<String> _readAPIKey() async {
 }
 
 Future<Null> main() async {
+  setupLogger();
+
   String apiKey = await _readAPIKey();
 
   ApplicationContext applicationContext =

@@ -15,6 +15,7 @@ dart_app("music_playback_agent") {
     "//apps/modular/services/agent:agent_dart",
     "//apps/modules/music/services/player:player_dart",
     "//lib/fidl/dart",
+    "//lib/widgets/packages/logging:lib.logging",
   ]
 
   analysis_options = "//apps/modules/common/.analysis_options"

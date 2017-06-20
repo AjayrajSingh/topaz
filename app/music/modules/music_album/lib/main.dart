@@ -7,12 +7,15 @@ import 'dart:async';
 import 'package:application.lib.app.dart/app.dart';
 import 'package:config/config.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_widgets/music_widgets.dart';
 
 import 'modular/album_module_model.dart';
 
 Future<Null> main() async {
+  setupLogger();
+
   Config config = await Config.read('/system/data/modules/config.json');
   config.validate(<String>['spotify_client_id', 'spotify_client_secret']);
 

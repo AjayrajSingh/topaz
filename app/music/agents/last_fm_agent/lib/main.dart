@@ -113,6 +113,7 @@ class ContextListenerImpl extends ContextListener {
 
 Future<Null> main(List<dynamic> args) async {
   setupLogger();
+
   Config config = await Config.read('/system/data/modules/config.json');
   config.validate(<String>['last_fm_api_key']);
   connectToService(_context.environmentServices, _contextProvider.ctrl);

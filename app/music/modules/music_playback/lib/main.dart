@@ -4,12 +4,15 @@
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_widgets/music_widgets.dart';
 
 import 'modular/playback_module_model.dart';
 
 void main() {
+  setupLogger();
+
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
 

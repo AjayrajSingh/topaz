@@ -127,6 +127,8 @@ Future<String> _readAPIKey() async {
 }
 
 Future<Null> main(List<dynamic> args) async {
+  setupLogger();
+
   String apiKey = await _readAPIKey();
   if (apiKey != null) {
     connectToService(_context.environmentServices, _contextProvider.ctrl);

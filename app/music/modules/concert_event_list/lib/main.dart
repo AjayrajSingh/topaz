@@ -8,6 +8,7 @@ import 'package:application.lib.app.dart/app.dart';
 import 'package:concert_widgets/concert_widgets.dart';
 import 'package:config/config.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'modular/event_list_module_model.dart';
@@ -20,6 +21,8 @@ Future<String> _readAPIKey() async {
 }
 
 Future<Null> main() async {
+  setupLogger();
+
   String apiKey = await _readAPIKey();
 
   ApplicationContext applicationContext =

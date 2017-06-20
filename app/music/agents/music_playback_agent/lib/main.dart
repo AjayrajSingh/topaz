@@ -10,17 +10,16 @@ import 'package:apps.modular.services.agent/agent.fidl.dart';
 import 'package:apps.modular.services.agent/agent_context.fidl.dart';
 import 'package:apps.modules.music.services.player/player.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 
 import 'src/player_impl.dart';
 
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 MusicPlaybackAgent _agent;
 
-void _log(String msg) {
-  print('[music_playback_agent] $msg');
-}
-
 /// An [Agent] that provides access fo the music player service
+// TODO(youngseokyoon): use AgentImpl in music_playback_agent.
+// https://fuchsia.atlassian.net/browse/SO-539
 class MusicPlaybackAgent extends Agent {
   final AgentBinding _agentBinding = new AgentBinding();
 
@@ -38,7 +37,7 @@ class MusicPlaybackAgent extends Agent {
   @override
   Future<Null> initialize(
       InterfaceHandle<AgentContext> agentContextHandle, void callback()) async {
-    _log('Agent::initialize start.');
+    log.fine('Agent::initialize start.');
 
     // Initialize the player service
     _playerImpl = new PlayerImpl(_context);
@@ -46,13 +45,13 @@ class MusicPlaybackAgent extends Agent {
     // Register the player service to the outgoingServices service provider
     _outgoingServicesImpl.addServiceForName(
       (InterfaceRequest<PlayerImpl> request) {
-        _log('Received a Player request');
+        log.fine('Received a Player request');
         _playerImpl.addBinding(request);
       },
       Player.serviceName,
     );
 
-    _log('Agent::initialize end.');
+    log.fine('Agent::initialize end.');
 
     callback();
   }
@@ -63,7 +62,7 @@ class MusicPlaybackAgent extends Agent {
     String requestorUrl,
     InterfaceRequest<ServiceProvider> services,
   ) async {
-    _log('Agent::connect call from $requestorUrl.');
+    log.fine('Agent::connect call from $requestorUrl.');
     _outgoingServicesBindings.add(
       new ServiceProviderBinding()..bind(_outgoingServicesImpl, services),
     );
@@ -85,6 +84,8 @@ class MusicPlaybackAgent extends Agent {
 
 /// Main entry point.
 Future<Null> main(List<String> args) async {
+  setupLogger();
+
   _context.outgoingServices.addServiceForName(
       (InterfaceRequest<Agent> request) {
     if (_agent == null) {

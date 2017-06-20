@@ -9,13 +9,10 @@ import 'package:apps.modules.music.services.player/repeat_mode.fidl.dart';
 import 'package:apps.modules.music.services.player/status.fidl.dart';
 import 'package:apps.modules.music.services.player/track.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 
 /// Function signature for status callback
 typedef void GetStatusCallback(PlayerStatus status);
-
-void _log(String msg) {
-  print('[music_player] $msg');
-}
 
 /// Implementation of the [Player] fidl interface.
 class PlayerImpl extends Player {
@@ -45,7 +42,7 @@ class PlayerImpl extends Player {
     _currentTrack = track;
     _audioPlayerController.open(Uri.parse(track.playbackUrl));
     _audioPlayerController.play();
-    _log('Playing: ${_currentTrack.title}');
+    log.fine('Playing: ${_currentTrack.title}');
   }
 
   @override
@@ -58,13 +55,13 @@ class PlayerImpl extends Player {
   @override
   void next() {
     // TODO (dayang@): Play the current track
-    _log('Next');
+    log.info('TODO: Next');
   }
 
   @override
   void previous() {
     // TODO (dayang@): Play the previous track
-    _log('Previous');
+    log.info('TODO: Previous');
   }
 
   @override
@@ -75,7 +72,7 @@ class PlayerImpl extends Player {
       _audioPlayerController.play();
     }
 
-    _log('Toggle Play Pause');
+    log.fine('Toggle Play Pause');
   }
 
   @override
@@ -88,19 +85,19 @@ class PlayerImpl extends Player {
     PlayerStatusListenerProxy listener = new PlayerStatusListenerProxy();
     listener.ctrl.bind(handle);
     _listeners.add(listener);
-    _log('Add Player Listener');
+    log.fine('Add Player Listener');
   }
 
   @override
   void enqueue(List<String> trackIds) {
     // TODO (dayang@): Add tracks to queue
-    _log('Enqueue');
+    log.info('TODO: Enqueue');
   }
 
   @override
   void dequeue(List<String> trackIds) {
     // TODO (dayang@): Remove tracks from queue
-    _log('Dequeue');
+    log.info('TODO: Dequeue');
   }
 
   @override

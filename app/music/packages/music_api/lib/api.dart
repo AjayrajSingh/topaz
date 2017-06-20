@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:convert' show BASE64, JSON, UTF8;
 
 import 'package:http/http.dart' as http;
+import 'package:lib.logging/logging.dart';
 import 'package:music_models/music_models.dart';
 
 const String _kApiBaseUrl = 'api.spotify.com';
@@ -174,10 +175,10 @@ class Api {
     query['type'] = 'artist';
     query['q'] = name;
     Uri uri = new Uri.https(_kApiBaseUrl, '/v1/search', query);
-    print(uri.toString());
+    log.fine(uri.toString());
     http.Response response = await http.get(uri, headers: authHeader);
     if (response.statusCode != 200) {
-      print(response.statusCode);
+      log.fine(response.statusCode);
       return null;
     }
     dynamic jsonData = JSON.decode(response.body);

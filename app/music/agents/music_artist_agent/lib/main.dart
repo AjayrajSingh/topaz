@@ -123,6 +123,8 @@ class ContextListenerImpl extends ContextListener {
 }
 
 Future<Null> main(List<dynamic> args) async {
+  setupLogger();
+
   Config config = await Config.read('/system/data/modules/config.json');
   config.validate(<String>['spotify_client_id', 'spotify_client_secret']);
   connectToService(_context.environmentServices, _contextProvider.ctrl);
