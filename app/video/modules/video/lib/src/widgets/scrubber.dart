@@ -54,38 +54,23 @@ class Scrubber extends StatelessWidget {
   }
 
   Widget _buildProgressBar(VideoModuleModel model) {
-    return new Center(
-      child: new Stack(
-        children: <Widget>[
-          new Container(height: 2.0, color: Colors.grey[800]),
-          // TODO(maryxia) SO-476 extend slider edges
-          // TODO(maryxia) SO-481 increase tappable area
-          new Container(
-            height: 2.0,
-            child: new Slider(
-              min: 0.0,
-              max: 1.0,
-              activeColor: Colors.grey[50],
-              value: _getUnitProgress(model),
-              onChanged: (double value) => _unitSeek(value, model),
-            ),
-          ),
-        ],
-      ),
+    return new Slider(
+      min: 0.0,
+      max: 1.0,
+      activeColor: Colors.grey[50],
+      value: _getUnitProgress(model),
+      onChanged: (double value) => _unitSeek(value, model),
     );
   }
 
   Widget _buildTimestamp(Duration timestamp) {
-    return new Center(
-      child: new Container(
-        alignment: FractionalOffset.center,
-        padding: new EdgeInsets.only(left: 24.0, right: 24.0),
-        child: new Text(
-          _convertDurationToString(timestamp),
-          style: new TextStyle(
-            color: Colors.grey[50],
-            fontSize: 14.0,
-          ),
+    return new Container(
+      padding: new EdgeInsets.symmetric(horizontal: 24.0),
+      child: new Text(
+        _convertDurationToString(timestamp),
+        style: new TextStyle(
+          color: Colors.grey[50],
+          fontSize: 14.0,
         ),
       ),
     );
