@@ -10,7 +10,7 @@ import 'dart:typed_data';
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
 import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.component/message_queue.fidl.dart';
-import 'package:apps.modular.services.device..info/device_info.fidl.dart';
+import 'package:apps.modular.services.user/device_map.fidl.dart';
 import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
 import 'package:collection/collection.dart';
 import 'package:lib.fidl.dart/bindings.dart' show InterfaceRequest;
@@ -59,7 +59,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
   /// [ChatMessageTransporter] for sending / receiveing messages between users.
   final ChatMessageTransporter chatMessageTransporter;
 
-  /// The device id obtained from the [DeviceInfo] service.
+  /// The device id obtained from the [DeviceMap] service.
   final String deviceId;
 
   /// The device id encoded in UTF8.

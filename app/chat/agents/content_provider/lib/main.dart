@@ -8,7 +8,7 @@ import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
-import 'package:apps.modular.services.device..info/device_info.fidl.dart';
+import 'package:apps.modular.services.user/device_map.fidl.dart';
 import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
@@ -18,6 +18,8 @@ import 'package:meta/meta.dart';
 import 'src/chat_content_provider_impl.dart';
 import 'src/firebase_chat_message_transporter.dart';
 import 'src/proposer.dart';
+
+const Duration _kTimeout = const Duration(seconds: 3);
 
 ChatContentProviderAgent _agent;
 
@@ -44,12 +46,13 @@ class ChatContentProviderAgent extends AgentImpl {
     log.fine('onReady start.');
 
     // Get the device id.
-    DeviceInfoProxy deviceInfo = new DeviceInfoProxy();
-    connectToService(applicationContext.environmentServices, deviceInfo.ctrl);
-    Completer<String> deviceIdCompleter = new Completer<String>();
-    deviceInfo.getDeviceIdForSyncing(deviceIdCompleter.complete);
-    String deviceId = await deviceIdCompleter.future;
-    deviceInfo.ctrl.close();
+    DeviceMapProxy deviceMap = new DeviceMapProxy();
+    connectToService(applicationContext.environmentServices, deviceMap.ctrl);
+    Completer<DeviceMapEntry> entryCompleter = new Completer<DeviceMapEntry>();
+    deviceMap.getCurrentDevice(entryCompleter.complete);
+    DeviceMapEntry entry = await entryCompleter.future.timeout(_kTimeout);
+    String deviceId = entry.deviceId;
+    deviceMap.ctrl.close();
 
     IntelligenceServicesProxy intelligenceServices =
         new IntelligenceServicesProxy();
