@@ -2,55 +2,79 @@
   "home" : [
     {
       "id": "home_01",
-      "headline": "Home Suggestion 1",
-      "subheadline": "Click me!",
-      "image_url": "/system/data/sysui/WallpaperImage_001.jpg",
-      "type": "person",
+      "headline": "New Episode for Three Peaks available",
+      "image_url": "/system/data/sysui/threepeaks.png",
       "module_url": "image",
-      "module_data": "{\"image_url\":\"/system/data/sysui/WallpaperImage_001.jpg\"}"
+      "module_data": "{\"image_url\":\"/system/data/sysui/threepeaks.png\"}"
     },
     {
       "id": "home_02",
-      "headline": "Home Suggestion 2",
-      "icon_url": "/system/data/sysui/WallpaperImage_002.jpg",
+      "headline": "Danielle",
+      "subheadline": "\"Our wedding will be held at the Stanford Inn in Mendocino on the 25th of August. I hope you can make it!\"",
+      "image_url": "/system/data/sysui/danielle_cc0.jpg",
+      "type": "person",
       "module_url": "image",
-      "module_data": "{\"image_url\":\"/system/data/sysui/WallpaperImage_002.jpg\"}"
+      "module_data": "{\"image_url\":\"/system/data/sysui/danielle_cc0.jpg\"}"
     },
     {
       "id": "home_03",
-      "headline": "Home Suggestion 3",
-      "subheadline": "Click me too!",
-      "image_url": "/system/data/sysui/WallpaperImage_003.jpg",
+      "headline": "Complete your order from True Foods",
+      "icon_url": "/system/data/sysui/truefood.png",
       "module_url": "image",
-      "module_data": "{\"image_url\":\"/system/data/sysui/WallpaperImage_003.jpg\"}"
+      "module_data": "{\"image_url\":\"/system/data/sysui/truefood.png\"}"
+    },
+    {
+      "id": "home_04",
+      "headline": "Continue reading OverThrough Magazine",
+      "subheadline": "Finding peace in drawing. 10 easy lessons to start meditating with a pen in your hands.",
+      "image_url": "/system/data/sysui/drawing.jpeg",
+      "module_url": "image",
+      "module_data": "{\"image_url\":\"/system/data/sysui/drawing.jpeg\"}"
     }
   ],
   "work" : [
     {
       "id": "work_01",
-      "headline": "Work Suggestion 1",
-      "subheadline": "Click me!",
-      "image_url": "https://i.redd.it/qh713wbo4r8y.jpg",
+      "headline": "Flux Weekly Sync starts in 25 minutes",
+      "icon_url": "/system/data/sysui/calendar.png",
       "module_url": "image",
-      "module_data": "{\"image_url\":\"https://i.redd.it/qh713wbo4r8y.jpg\"}"
+      "module_data": "{\"image_url\":\"/system/data/sysui/calendar.png\"}"
     },
     {
       "id": "work_02",
-      "headline": "Work Suggestion 2",
-      "subheadline": "Click me too!",
-      "image_url": "https://goo.gl/kmRQdt",
+      "headline": "Miguel",
+      "subheadline": "\"Do you have other topics you want to discuss at the all hands?\"",
+      "image_url": "/system/data/sysui/miguel_cc0.png",
       "type": "person",
       "module_url": "image",
-      "module_data": "{\"image_url\":\"https://goo.gl/kmRQdt\"}"
+      "module_data": "{\"image_url\":\"/system/data/sysui/miguel_cc0.png\"}"
     },
     {
       "id": "work_03",
-      "headline": "Work Suggestion 3",
-      "icon_url": "https://goo.gl/2UH3p7",
+      "headline": "Q4'17 Marketing Plan",
+      "subheadline": "Continue working on this document",
+      "icon_url": "/system/data/sysui/docs.png",
       "module_url": "image",
-      "module_data": "{\"image_url\":\"https://goo.gl/2UH3p7\"}"
+      "module_data": "{\"image_url\":\"/system/data/sysui/docs.png\"}"
     }
   ],
   "unknown" : [
+    {
+      "id": "unknown_01",
+      "headline": "71F in San Francisco and sunny",
+      "subheadline": "It might get windy and colder later in the day",
+      "icon_url": "/system/data/sysui/logo_mostly_sunny_light_color_96dp.png",
+      "module_url": "image",
+      "module_data": "{\"image_url\":\"/system/data/sysui/logo_mostly_sunny_light_color_96dp.png\"}"
+    },
+    {
+      "id": "unknown_02",
+      "headline": "Call Sophie back",
+      "subheadline": "1 missed call 32 minutes ago",
+      "image_url": "/system/data/sysui/sophie_cc0.jpg",
+      "type": "person",
+      "module_url": "image",
+      "module_data": "{\"image_url\":\"/system/data/sysui/sophie_cc0.jpg\"}"
+    }
   ]
 }

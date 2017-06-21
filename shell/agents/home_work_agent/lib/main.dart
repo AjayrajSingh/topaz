@@ -79,6 +79,10 @@ class HomeWorkAgent extends AgentImpl {
       new File(_kConfigFile).readAsStringSync(),
     );
 
+    proposals['unknown'].forEach((Map<String, String> proposal) {
+      _proposalPublisher.propose(_createProposal(proposal));
+    });
+
     _contextProvider.subscribe(
       new ContextQuery()..topics = <String>[_kLocationHomeWorkTopic],
       _contextListenerBinding.wrap(
