@@ -53,8 +53,7 @@ class Player extends StatelessWidget {
             _scrubber,
           ],
         );
-      case DisplayMode.local:
-      default:
+      case DisplayMode.localSmall:
         return new Column(
           children: <Widget>[
             _deviceChooser,
@@ -70,6 +69,18 @@ class Player extends StatelessWidget {
             _scrubber,
           ],
         );
+      case DisplayMode.localLarge:
+      default:
+        return new Column(
+          children: <Widget>[
+            _deviceChooser,
+            new Expanded(
+              child: _screen,
+            ),
+            // Scrubber includes PlayControls
+            _scrubber,
+          ],
+        );
     }
   }
 
@@ -81,6 +92,12 @@ class Player extends StatelessWidget {
       Widget child,
       VideoModuleModel model,
     ) {
+      Size size = MediaQuery.of(context).size;
+      if (size.width <= 640.0 && size.height <= 360.0) {
+        model.displayMode = DisplayMode.localSmall;
+      } else if (model.displayMode != DisplayMode.remoteControl) {
+        model.displayMode = DisplayMode.localLarge;
+      }
       return new Container(
         color: Colors.black,
         child: _buildPlayerMode(model),

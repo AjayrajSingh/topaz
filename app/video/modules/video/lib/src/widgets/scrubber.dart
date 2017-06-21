@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../modular/module_model.dart';
+import '../widgets.dart';
 
 final double _kZoomTimeInMicroseconds = 3000000.0;
 
@@ -17,6 +18,7 @@ class Scrubber extends StatelessWidget {
   /// Constructor for the time slider/scrubber for the video player
   Scrubber({
     Key key,
+    // TODO(maryxia) SO-543 re-add height
     this.height,
   })
       : super(key: key);
@@ -77,12 +79,32 @@ class Scrubber extends StatelessWidget {
           _convertDurationToString(timestamp),
           style: new TextStyle(
             color: displayMode == DisplayMode.remoteControl
-                ? Colors.grey[500]
-                : Colors.grey[50],
-            fontSize: 14.0,
+                ? Colors.grey[50]
+                : Colors.grey[500],
+            fontSize: displayMode == DisplayMode.localSmall ? 14.0 : 20.0,
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildProgress(VideoModuleModel model) {
+    return new Positioned(
+      height: 80.0,
+      left: 0.0,
+      top: 0.0,
+      bottom: 0.0,
+      child: _buildTimestamp(model.progress, DisplayMode.localLarge),
+    );
+  }
+
+  Widget _buildDuration(VideoModuleModel model) {
+    return new Positioned(
+      height: 80.0,
+      right: 0.0,
+      top: 0.0,
+      bottom: 0.0,
+      child: _buildTimestamp(model.duration, DisplayMode.localLarge),
     );
   }
 
@@ -121,16 +143,32 @@ class Scrubber extends StatelessWidget {
             ),
           ],
         );
-      case DisplayMode.local:
-      default:
+      case DisplayMode.localSmall:
         return new Row(
           children: <Widget>[
-            _buildTimestamp(model.progress, DisplayMode.local),
+            _buildTimestamp(model.progress, DisplayMode.localSmall),
             new Expanded(
               child: _buildProgressBar(model),
             ),
-            _buildTimestamp(model.duration, DisplayMode.local),
+            _buildTimestamp(model.duration, DisplayMode.localSmall),
           ],
+        );
+      case DisplayMode.localLarge:
+      default:
+        return new Container(
+          color: Colors.black,
+          child: new Stack(
+            children: <Widget>[
+              _buildProgress(model),
+              _buildDuration(model),
+              new PlayControls(
+                primaryIconSize: 36.0,
+                secondaryIconSize: 36.0,
+                padding: 20.0,
+              ),
+              _buildProgressBar(model),
+            ],
+          ),
         );
     }
   }
@@ -143,11 +181,9 @@ class Scrubber extends StatelessWidget {
         Widget child,
         VideoModuleModel model,
       ) {
-        // TODO(maryxia) SO-481 add offstage
-        return new Container(
-          color: Colors.black,
-          child: _buildScrubberMode(model),
-        );
+        // TODO(maryxia) SO-481 add offstage to hide scrubber after
+        // user stops interacting with screen for x seconds
+        return new Container(child: _buildScrubberMode(model));
       },
     );
   }

@@ -27,8 +27,11 @@ final String _kServiceName = 'fling';
 
 /// Mode the video player should be in on the device
 enum DisplayMode {
-  /// Local video mode
-  local,
+  /// Local large (tablet) video mode
+  localLarge,
+
+  /// Local small (phone) video mode
+  localSmall,
 
   /// Remote control mode
   remoteControl,
@@ -49,7 +52,6 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   Timer _hideTimer;
   Timer _progressTimer;
   String _remoteDeviceName;
-  DisplayMode _displayMode = DisplayMode.local;
   AnimationController _thumbnailAnimationController;
   Animation<double> _thumbnailAnimation;
   MediaPlayerController _controller;
@@ -71,6 +73,10 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Whether or not the Device Chooser should be hidden
   bool hideDeviceChooser = true;
+
+  /// Returns whether this device's media player should be in immersive mode
+  // TODO(maryxia) SO-529 figure out how device knows it's in immersive mode
+  DisplayMode displayMode = DisplayMode.localLarge;
 
   /// Create a video module model using the appContext
   VideoModuleModel({
@@ -109,10 +115,6 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Returns name of remote device that media player is controlling
   String get remoteDeviceName => _remoteDeviceName;
-
-  /// Returns whether this device's media player should be in immersive mode
-  // TODO(maryxia) SO-529 figure out how device knows it's in immersive mode
-  DisplayMode get displayMode => _displayMode;
 
   /// Returns media player controller video duration
   Duration get duration => _controller.duration;
@@ -179,7 +181,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
           position: _controller.progress);
 
       _remoteDeviceName = deviceName;
-      _displayMode = DisplayMode.remoteControl;
+      displayMode = DisplayMode.remoteControl;
       play();
     }
   }
