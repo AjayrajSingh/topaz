@@ -33,7 +33,7 @@ class ChatConversationScreen extends StatelessWidget {
                   ? ''
                   : model.participants?.join(', '),
               onSubmitMessage: model.sendMessage,
-              onTapSharePhoto: model.toggleGalleryModule,
+              onTapSharePhoto: model.startGalleryModule,
               scrollController: model.scrollController,
             );
           },

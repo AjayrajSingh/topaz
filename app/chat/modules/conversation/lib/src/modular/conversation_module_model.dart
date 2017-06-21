@@ -397,13 +397,10 @@ class ChatConversationModuleModel extends ModuleModel {
     _setConversationId(JSON.decode(json));
   }
 
-  /// Toggle the gallery module on the right side.
-  ///
-  /// If the gallery module is already running as a child, close that module.
-  /// Otherwise, start the gallery module.
-  Future<Null> toggleGalleryModule() async {
+  /// Start or focus the gallery module on the right side.
+  Future<Null> startGalleryModule() async {
     if (_currentChildModuleName == 'gallery') {
-      _closeChildModule();
+      _childModuleController.focus();
     } else {
       ServiceProviderProxy incomingServices = new ServiceProviderProxy();
       _startChildModule(
