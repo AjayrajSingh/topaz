@@ -66,8 +66,9 @@ class _ChatConversationState extends State<ChatConversation> {
             border: new Border(bottom: new BorderSide(color: Colors.grey[300])),
           ),
           child: new Text(
-            widget.title ?? 'Chat',
+            widget.title ?? '(No Conversation Selected)',
             style: theme.textTheme.title,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         new Expanded(

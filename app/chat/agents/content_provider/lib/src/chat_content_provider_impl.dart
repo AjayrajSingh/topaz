@@ -280,6 +280,32 @@ class ChatContentProviderImpl extends ChatContentProvider {
   }
 
   @override
+  Future<Null> getConversation(
+    List<int> conversationId,
+    void callback(ChatStatus chatStatus, Conversation conversation),
+  ) async {
+    try {
+      try {
+        await _ledgerReady.future;
+      } catch (e) {
+        callback(ChatStatus.ledgerNotInitialized, null);
+        return;
+      }
+
+      try {
+        Conversation conversation = await _getConversation(conversationId);
+        callback(ChatStatus.ok, conversation);
+      } catch (e) {
+        log.warning('Specified conversation is not found.');
+        callback(ChatStatus.idNotFound, null);
+      }
+    } catch (e, stackTrace) {
+      log.severe('Sending ChatStatus.unknownError', e, stackTrace);
+      callback(ChatStatus.unknownError, null);
+    }
+  }
+
+  @override
   Future<Null> getConversations(
     String messageQueueToken,
     void callback(ChatStatus chatStatus, List<Conversation> conversations),
@@ -675,7 +701,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
   /// exception when the given id is not found in the `Conversations` page.
   Future<Conversation> _getConversation(List<int> conversationId) async {
     // Look for the conversation id from the local cache.
-    if (!_conversationCache.containsKey(conversationId)) {
+    if (_conversationCache.containsKey(conversationId)) {
       return _conversationCache[conversationId];
     }
 

@@ -57,13 +57,23 @@ class ChatConversationModuleModel extends ModuleModel {
   ModuleControllerProxy _childModuleController;
   String _currentChildModuleName;
 
+  chat_fidl.Conversation _conversation;
   List<chat_fidl.Message> _messages;
   List<Section> _sections;
+  bool _fetchingConversation = false;
 
   Uint8List _conversationId;
 
   /// Gets the current conversation id value.
   Uint8List get conversationId => _conversationId;
+
+  /// Gets the list of participants in this conversation.
+  List<String> get participants => _conversation != null
+      ? new UnmodifiableListView<String>(_conversation.participants)
+      : null;
+
+  /// Indicates whether the fetching is in progress or not.
+  bool get fetchingConversation => _fetchingConversation;
 
   /// Sets the current conversation id value.
   void _setConversationId(List<int> id) {
@@ -76,12 +86,14 @@ class ChatConversationModuleModel extends ModuleModel {
       // between different conversation rooms.
       _scrollController = new ScrollController();
 
-      // We set the messages as null and notify here first to indicate the
-      // conversation id value is changed.
+      // We set the conversation and messages as null and notify here first to
+      // indicate the conversation id value is changed.
+      _fetchingConversation = true;
+      _conversation = null;
       _setMessages(null);
 
       // After fetching is done, a second notification will be sent out.
-      _fetchMessageHistory();
+      _fetchConversation();
     }
   }
 
@@ -174,41 +186,78 @@ class ChatConversationModuleModel extends ModuleModel {
     // Close all the unnecessary bindings.
     contentProviderServices.ctrl.close();
     componentContext.ctrl.close();
-
-    // Fetch the message history.
-    _fetchMessageHistory();
   }
 
-  /// Fetches the message history from the content provider. It also gives our
-  /// message queue token to the agent so that the agent can notify us whenever
-  /// a new message appears in the current conversation.
+  /// Fetches the conversation metadata and the message history from the content
+  /// provider. It also gives our message queue token to the agent so that the
+  /// agent can notify us whenever a new message appears in the current
+  /// conversation.
   ///
-  /// The returned messages will be stored in the [_messages] list.
-  Future<Null> _fetchMessageHistory() async {
-    log.fine('fetchMessageHistory call.');
+  /// The returned conversation will be stored in [_conversation], and the
+  /// messages in the [_messages] list.
+  Future<Null> _fetchConversation() async {
+    log.fine('fetchConversation call.');
 
     if (conversationId == null) {
       return;
     }
 
+    Completer<chat_fidl.ChatStatus> statusCompleter =
+        new Completer<chat_fidl.ChatStatus>();
+    Completer<chat_fidl.Conversation> conversationCompleter =
+        new Completer<chat_fidl.Conversation>();
+    Completer<List<chat_fidl.Message>> messagesCompleter =
+        new Completer<List<chat_fidl.Message>>();
+
+    // Get the conversation metadata.
+    _chatContentProvider.getConversation(
+      conversationId,
+      (chat_fidl.ChatStatus status, chat_fidl.Conversation conversation) {
+        statusCompleter.complete(status);
+        conversationCompleter.complete(conversation);
+      },
+    );
+
+    // TODO(youngseokyoon): properly communicate the error status to the user.
+    // https://fuchsia.atlassian.net/browse/SO-365
+    chat_fidl.ChatStatus status = await statusCompleter.future;
+    if (status != chat_fidl.ChatStatus.ok) {
+      log.severe('ChatContentProvider::GetConversation() returned an error '
+          'status: $status');
+      _fetchingConversation = false;
+      _conversation = null;
+      _setMessages(null);
+      return;
+    }
+
+    _conversation = await conversationCompleter.future;
+
+    // Get the message history.
     String messageQueueToken = await _mqNewMessagesToken.future;
+    statusCompleter = new Completer<chat_fidl.ChatStatus>();
     _chatContentProvider.getMessages(
       conversationId,
       messageQueueToken,
       (chat_fidl.ChatStatus status, List<chat_fidl.Message> messages) {
-        log.fine('getMessageHistory callback.');
-
-        // TODO(youngseokyoon): properly communicate the error status to the
-        // user. (https://fuchsia.atlassian.net/browse/SO-365)
-        if (status != chat_fidl.ChatStatus.ok) {
-          log.severe('ChatContentProvider::GetMessages() returned an error '
-              'status: $status');
-          _setMessages(null);
-        }
-
-        log.fine('setMessages call');
-        _setMessages(new List<chat_fidl.Message>.from(messages));
+        statusCompleter.complete(status);
+        messagesCompleter.complete(messages);
       },
+    );
+
+    // TODO(youngseokyoon): properly communicate the error status to the user.
+    // https://fuchsia.atlassian.net/browse/SO-365
+    if (status != chat_fidl.ChatStatus.ok) {
+      log.severe('ChatContentProvider::GetMessages() returned an error '
+          'status: $status');
+      _fetchingConversation = false;
+      _conversation = null;
+      _setMessages(null);
+      return;
+    }
+
+    _fetchingConversation = false;
+    _setMessages(
+      new List<chat_fidl.Message>.from(await messagesCompleter.future),
     );
   }
 

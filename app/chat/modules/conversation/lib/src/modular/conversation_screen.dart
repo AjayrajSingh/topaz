@@ -25,13 +25,16 @@ class ChatConversationScreen extends StatelessWidget {
           builder: (
             BuildContext context,
             Widget child,
-            ChatConversationModuleModel conversationModel,
+            ChatConversationModuleModel model,
           ) {
             return new ChatConversation(
-              sections: conversationModel.sections,
-              onSubmitMessage: conversationModel.sendMessage,
-              onTapSharePhoto: conversationModel.toggleGalleryModule,
-              scrollController: conversationModel.scrollController,
+              sections: model.sections,
+              title: model.fetchingConversation
+                  ? ''
+                  : model.participants?.join(', '),
+              onSubmitMessage: model.sendMessage,
+              onTapSharePhoto: model.toggleGalleryModule,
+              scrollController: model.scrollController,
             );
           },
         ),

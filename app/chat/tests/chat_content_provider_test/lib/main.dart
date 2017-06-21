@@ -145,6 +145,21 @@ class ChatContentProviderTestModule extends Module {
     expect(conversation.participants, unorderedEquals(participants));
     // TODO: _testRunner.pass('NewConversation()');
 
+    // Test GetConversation() method.
+    await _chatContentProvider.getConversation(
+      conversation.conversationId,
+      (ChatStatus s, Conversation c) {
+        status = s;
+        conversation = c;
+      },
+    );
+
+    expect(status, equals(ChatStatus.ok));
+    expect(conversation, isNotNull);
+    expect(conversation.conversationId, isNotNull);
+    expect(conversation.conversationId, isNotEmpty);
+    expect(conversation.participants, unorderedEquals(participants));
+
     // Test GetConversations() method again.
     await _chatContentProvider.getConversations(
       null,

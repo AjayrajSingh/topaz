@@ -21,7 +21,7 @@ enum ChatStatus {
 // Contains metadata of a chat conversation (i.e. chat room).
 // This struct does not contain the actual message history, and the messages
 // must be retrieved from the |ChatContentProvider| interface using
-// |GetMessageHistory| method.
+// |GetMessages| method.
 struct Conversation {
   // Unique id of this conversation.
   array<uint8> conversation_id;
@@ -59,8 +59,14 @@ interface ChatContentProvider {
   NewConversation(array<string> participants)
       => (ChatStatus status, Conversation? conversation);
 
+  // Returns the metadata of the specified conversation.
+  // To obtain the conversation history, use the |GetMessages| method with the
+  // same conversation id.
+  GetConversation(array<uint8> conversation_id)
+      => (ChatStatus status, Conversation? conversation);
+
   // Returns the list of metadata of all existing conversations.
-  // To obtain the conversation history, use the |GetMessageHistory| method with
+  // To obtain the conversation history, use the |GetMessages| method with
   // the obtained conversation id.
   // When the |message_queue_token| value is provided, the client will be
   // notified with any new conversations added after the initial list of
