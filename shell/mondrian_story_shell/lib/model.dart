@@ -230,10 +230,18 @@ class SurfaceGraph extends Model {
       assert(_surfaces.containsKey(relativeId));
       int currentIndex = _focusedSurfaces.indexOf(id);
       _focusedSurfaces.remove(id);
-      int relativeIndex = _focusedSurfaces.indexOf(relativeId);
-      for (Tree<String> childNode in _tree.find(relativeId).children) {
+      final Tree<String> relative = _tree.find(relativeId);
+      int relativeIndex = _focusedSurfaces.indexOf(relative.value);
+      // Use the highest index of relative or its children
+      for (Tree<String> childNode in relative.children) {
         String childId = childNode.value;
         relativeIndex = max(relativeIndex, _focusedSurfaces.indexOf(childId));
+      }
+      // If none of those are focused, find the closest ancestor that is focused
+      Tree<String> ancestor = relative.parent;
+      while (relativeIndex < 0 && ancestor.value != null) {
+        relativeIndex = _focusedSurfaces.indexOf(ancestor.value);
+        ancestor = ancestor.parent;
       }
       // Insert to the highest of one past relative index, or the original index
       int index = max(relativeIndex < 0 ? -1 : relativeIndex + 1, currentIndex);
