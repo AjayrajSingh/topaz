@@ -146,7 +146,7 @@ class UserPicker extends StatelessWidget {
     serverNameController.clear();
   }
 
-  Widget _buildUserCard({String user, VoidCallback onTap}) => new Material(
+  Widget _buildUserCard({Account account, VoidCallback onTap}) => new Material(
         color: Colors.black.withAlpha(0),
         child: new InkWell(
           highlightColor: _kFuchsiaColor.withAlpha(200),
@@ -166,8 +166,9 @@ class UserPicker extends StatelessWidget {
                     ),
                     color: Colors.white,
                   ),
-                  child: new Alphatar.fromName(
-                    name: user.toUpperCase(),
+                  child: new Alphatar.withUrl(
+                    avatarUrl: account.imageUrl,
+                    letter: account.displayName.toUpperCase()[0],
                     size: 80.0,
                   ),
                 ),
@@ -180,7 +181,7 @@ class UserPicker extends StatelessWidget {
                     color: Colors.black.withAlpha(240),
                   ),
                   child: new Text(
-                    user.toUpperCase(),
+                    account.displayName.toUpperCase(),
                     style: new TextStyle(
                       color: Colors.grey[300],
                     ),
@@ -197,7 +198,7 @@ class UserPicker extends StatelessWidget {
     VoidCallback onTap,
     bool removable: true,
   }) {
-    Widget userCard = _buildUserCard(user: account.displayName, onTap: onTap);
+    Widget userCard = _buildUserCard(account: account, onTap: onTap);
 
     if (!removable) {
       return userCard;
