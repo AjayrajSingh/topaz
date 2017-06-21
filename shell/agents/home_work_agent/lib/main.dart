@@ -36,6 +36,8 @@ const String _kAskProposalsFile = '/system/data/sysui/ask_proposals.json';
 
 const String _kLocationHomeWorkTopic = '/location/home_work';
 
+const String _kLaunchEverythingProposalId = 'demo_all';
+
 HomeWorkAgent _agent;
 
 /// An implementation of the [Agent] interface.
@@ -152,10 +154,31 @@ class _AskHandlerImpl extends AskHandler {
 
     if (query.text?.toLowerCase()?.startsWith('demo') ?? false) {
       proposals.addAll(askProposals.map(_createProposal));
+      proposals.add(_launchEverythingProposal);
     }
 
     callback(proposals);
   }
+
+  Proposal get _launchEverythingProposal => new Proposal()
+    ..id = _kLaunchEverythingProposalId
+    ..display = (new SuggestionDisplay()
+      ..headline = 'Launch everything'
+      ..subheadline = ''
+      ..details = ''
+      ..color = 0xFFFF0080
+      ..iconUrls = const <String>[]
+      ..imageType = SuggestionImageType.other
+      ..imageUrl = ''
+      ..annoyance = AnnoyanceType.none)
+    ..onSelected = askProposals
+        .map(
+          (Map<String, String> proposal) => new Action()
+            ..createStory = (new CreateStory()
+              ..moduleId = proposal['module_url'] ?? ''
+              ..initialData = proposal['module_data'] ?? ''),
+        )
+        .toList();
 }
 
 Future<Null> main(List<dynamic> args) async {
