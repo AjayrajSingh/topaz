@@ -152,6 +152,8 @@ inline T* GetReceiver(Dart_NativeArguments args) {
   intptr_t receiver;
   Dart_Handle result = Dart_GetNativeReceiver(args, &receiver);
   FTL_DCHECK(!Dart_IsError(result));
+  if (!receiver)
+    Dart_ThrowException(ToDart("Object has been disposed."));
   return static_cast<T*>(reinterpret_cast<DartWrappable*>(receiver));
 }
 

@@ -22,7 +22,8 @@ Uint8List::Uint8List(Dart_Handle list)
   Dart_TypedDataAcquireData(list, &type, reinterpret_cast<void**>(&data_),
                             &num_elements_);
   FTL_DCHECK(!LogIfError(list));
-  FTL_DCHECK(type == Dart_TypedData_kUint8);
+  if (type != Dart_TypedData_kUint8)
+    Dart_ThrowException(ToDart("Non-genuine Uint8List passed to engine."));
 }
 
 Uint8List::Uint8List(Uint8List&& other)

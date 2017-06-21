@@ -20,7 +20,8 @@ Int32List::Int32List(Dart_Handle list)
   Dart_TypedDataAcquireData(list, &type, reinterpret_cast<void**>(&data_),
                             &num_elements_);
   FTL_DCHECK(!LogIfError(list));
-  FTL_DCHECK(type == Dart_TypedData_kInt32);
+  if (type != Dart_TypedData_kInt32)
+    Dart_ThrowException(ToDart("Non-genuine Int32List passed to engine."));
 }
 
 Int32List::Int32List(Int32List&& other)

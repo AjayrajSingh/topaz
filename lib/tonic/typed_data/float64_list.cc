@@ -20,7 +20,8 @@ Float64List::Float64List(Dart_Handle list)
   Dart_TypedDataAcquireData(list, &type, reinterpret_cast<void**>(&data_),
                             &num_elements_);
   FTL_DCHECK(!LogIfError(list));
-  FTL_DCHECK(type == Dart_TypedData_kFloat64);
+  if (type != Dart_TypedData_kFloat64)
+    Dart_ThrowException(ToDart("Non-genuine Float64List passed to engine."));
 }
 
 Float64List::Float64List(Float64List&& other)

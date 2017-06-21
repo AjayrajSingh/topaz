@@ -20,7 +20,8 @@ Float32List::Float32List(Dart_Handle list)
   Dart_TypedDataAcquireData(list, &type, reinterpret_cast<void**>(&data_),
                             &num_elements_);
   FTL_DCHECK(!LogIfError(list));
-  FTL_DCHECK(type == Dart_TypedData_kFloat32);
+  if (type != Dart_TypedData_kFloat32)
+    Dart_ThrowException(ToDart("Non-genuine Float32List passed to engine."));
 }
 
 Float32List::Float32List(Float32List&& other)
