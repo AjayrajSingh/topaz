@@ -14,15 +14,15 @@ import 'base_page_watcher.dart';
 /// A [PageWatcher] implementation that watches for new changes in a
 /// conversation log [Page] and sends notifications to the subscriber through
 /// the [MessageQueue].
-class NewMessageWatcher extends BasePageWatcher {
+class ConversationWatcher extends BasePageWatcher {
   /// The id of the conversation that this watcher is watching for.
   final List<int> conversationId;
 
   /// The [MessageSender] attached to the message queue of the subscriber.
   final MessageSenderProxy messageSender;
 
-  /// Creates a [NewMessageWatcher] instance.
-  NewMessageWatcher({
+  /// Creates a [ConversationWatcher] instance.
+  ConversationWatcher({
     @required this.conversationId,
     @required this.messageSender,
   }) {
@@ -37,23 +37,35 @@ class NewMessageWatcher extends BasePageWatcher {
     void callback(InterfaceRequest<PageSnapshot> snapshot),
   ) {
     // The underlying assumption is that there will be no changes to an existing
-    // message, and only new messages will be added to a conversation.
-    // Therefore, we can safely ignore whether this onChange notification is
-    // partial or complete, and just process the messages independently.
-    pageChange.changes.forEach(_processEntry);
+    // message. Therefore, we can safely ignore whether this onChange
+    // notification is partial or complete, and just process the messages
+    // independently.
+    pageChange.changes.forEach(_processNewEntry);
+    pageChange.deletedKeys.forEach(_processDeletedKey);
 
     callback(null);
   }
 
-  /// Process the provided [Entry] and sends notification to the subscriber.
+  /// Processes the provided [Entry] and sends notification to the subscriber.
   /// Refer to the `chat_content_provider.fidl` file for the message format.
-  void _processEntry(Entry entry) {
-    Map<String, dynamic> newMessageNotification = <String, dynamic>{
+  void _processNewEntry(Entry entry) {
+    _notifySubscribers('add', entry.key);
+  }
+
+  /// Processes the deleted key and sends notification to the subscriber.
+  /// Refer to the `chat_content_provider.fidl` file for the message format.
+  void _processDeletedKey(List<int> key) {
+    _notifySubscribers('delete', key);
+  }
+
+  void _notifySubscribers(String event, List<int> messageId) {
+    Map<String, dynamic> notification = <String, dynamic>{
+      'event': event,
       'conversation_id': conversationId,
-      'message_id': entry.key,
+      'message_id': messageId,
     };
 
-    messageSender.send(JSON.encode(newMessageNotification));
+    messageSender.send(JSON.encode(notification));
   }
 
   @override

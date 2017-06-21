@@ -44,9 +44,9 @@ class ChatConversationModuleModel extends ModuleModel {
   final chat_fidl.ChatContentProviderProxy _chatContentProvider =
       new chat_fidl.ChatContentProviderProxy();
 
-  final MessageQueueProxy _mqNewMessages = new MessageQueueProxy();
-  MessageReceiverImpl _mqNewMessagesReceiver;
-  final Completer<String> _mqNewMessagesToken = new Completer<String>();
+  final MessageQueueProxy _mqConversationEvents = new MessageQueueProxy();
+  MessageReceiverImpl _mqConversationReceiver;
+  final Completer<String> _mqConversationToken = new Completer<String>();
 
   final MessageQueueProxy _mqSelectedImages = new MessageQueueProxy();
   MessageReceiverImpl _mqSelectedImagesReceiver;
@@ -161,14 +161,14 @@ class ChatConversationModuleModel extends ModuleModel {
     // Obtain a message queue for new messages.
     componentContext.obtainMessageQueue(
       'chat_conversation',
-      _mqNewMessages.ctrl.request(),
+      _mqConversationEvents.ctrl.request(),
     );
     // Save the message queue token for later use.
-    _mqNewMessages
-        .getToken((String token) => _mqNewMessagesToken.complete(token));
-    _mqNewMessagesReceiver = new MessageReceiverImpl(
-      messageQueue: _mqNewMessages,
-      onReceiveMessage: _handleNewMessage,
+    _mqConversationEvents
+        .getToken((String token) => _mqConversationToken.complete(token));
+    _mqConversationReceiver = new MessageReceiverImpl(
+      messageQueue: _mqConversationEvents,
+      onReceiveMessage: _handleConversationEvent,
     );
 
     // Obtain another message queue for getting notified of selected images from
@@ -242,7 +242,7 @@ class ChatConversationModuleModel extends ModuleModel {
     _conversation = await conversationCompleter.future;
 
     // Get the message history.
-    String messageQueueToken = await _mqNewMessagesToken.future;
+    String messageQueueToken = await _mqConversationToken.future;
     statusCompleter = new Completer<chat_fidl.ChatStatus>();
     _chatContentProvider.getMessages(
       conversationId,
@@ -270,42 +270,64 @@ class ChatConversationModuleModel extends ModuleModel {
     );
   }
 
-  /// Handle the new message passed via the [MessageQueue].
+  /// Handle the message added / deleted event passed via the [MessageQueue].
   ///
   /// Refer to the `chat_content_provider.fidl` file for the expected message
   /// format coming from the content provider.
-  void _handleNewMessage(String message, void ack()) {
-    log.fine('handleNewMessage call with message: $message');
+  void _handleConversationEvent(String message, void ack()) {
+    log.fine('_handleConversationEvent call with message: $message');
 
     try {
       ack();
+
       Map<String, dynamic> decoded = JSON.decode(message);
+      String event = decoded['event'];
       List<int> conversationId = decoded['conversation_id'];
       List<int> messageId = decoded['message_id'];
 
-      // Ask for the new message content and add it to the message list.
-      _chatContentProvider.getMessage(
-        conversationId,
-        messageId,
-        (chat_fidl.ChatStatus status, chat_fidl.Message message) {
-          log.fine('getMessage() callback');
+      switch (event) {
+        case 'add':
+          // Ask for the new message content and add it to the message list.
+          _chatContentProvider.getMessage(
+            conversationId,
+            messageId,
+            (chat_fidl.ChatStatus status, chat_fidl.Message message) {
+              log.fine('getMessage() callback');
 
-          // TODO(youngseokyoon): properly communicate the error status to the
-          // user. (https://fuchsia.atlassian.net/browse/SO-365)
-          if (status != chat_fidl.ChatStatus.ok) {
-            log.severe('ChatContentProvider::GetMessage() returned an error '
-                'status: $status');
-            return;
-          }
+              // TODO(youngseokyoon): properly communicate the error status to
+              // the user. (https://fuchsia.atlassian.net/browse/SO-365)
+              if (status != chat_fidl.ChatStatus.ok) {
+                log.severe(
+                    'ChatContentProvider::GetMessage() returned an error '
+                    'status: $status');
+                return;
+              }
 
-          if (message != null &&
-              _intListEquality.equals(this.conversationId, conversationId)) {
-            log.fine('adding the new message.');
-            _setMessages(_messages..add(message));
-            _scrollToEnd();
+              if (message != null &&
+                  _intListEquality.equals(
+                      this.conversationId, conversationId)) {
+                log.fine('adding the new message.');
+                _setMessages(_messages..add(message));
+                _scrollToEnd();
+              }
+            },
+          );
+          break;
+
+        case 'delete':
+          // Remove the message from the message list.
+          if (_intListEquality.equals(this.conversationId, conversationId)) {
+            log.fine('deleting an existing message.');
+            _setMessages(_messages
+              ..removeWhere((chat_fidl.Message m) =>
+                  _intListEquality.equals(m.messageId, messageId)));
           }
-        },
-      );
+          break;
+
+        default:
+          log.severe('Not a valid conversation event: $event');
+          break;
+      }
     } catch (e) {
       log.severe('Error occurred while processing the message received via the '
           'message queue: $e');
@@ -353,15 +375,25 @@ class ChatConversationModuleModel extends ModuleModel {
     switch (m.type) {
       case 'text':
         return new TextMessage(
+          messageId: m.messageId,
           time: time,
           sender: m.sender,
+          onDelete: () {
+            log.fine('TextMessage::onDelete');
+            deleteMessage(m.messageId);
+          },
           text: m.jsonPayload,
         );
 
       case 'image-url':
         return new ImageUrlMessage(
+          messageId: m.messageId,
           time: time,
           sender: m.sender,
+          onDelete: () {
+            log.fine('ImageUrlMessage::onDelete');
+            deleteMessage(m.messageId);
+          },
           url: m.jsonPayload,
         );
 
@@ -379,8 +411,8 @@ class ChatConversationModuleModel extends ModuleModel {
 
   @override
   Future<Null> onStop() async {
-    if (_mqNewMessagesToken.isCompleted) {
-      String messageQueueToken = await _mqNewMessagesToken.future;
+    if (_mqConversationToken.isCompleted) {
+      String messageQueueToken = await _mqConversationToken.future;
       _chatContentProvider.unsubscribe(messageQueueToken);
     }
 
@@ -391,8 +423,8 @@ class ChatConversationModuleModel extends ModuleModel {
 
     _galleryService?.ctrl?.close();
     _childModuleController?.ctrl?.close();
-    _mqNewMessages.ctrl.close();
-    _mqNewMessagesReceiver.close();
+    _mqConversationEvents.ctrl.close();
+    _mqConversationReceiver.close();
     _mqSelectedImages.ctrl.close();
     _mqSelectedImagesReceiver.close();
     _childLinkWatcherBinding.close();
@@ -516,7 +548,7 @@ class ChatConversationModuleModel extends ModuleModel {
     }
   }
 
-  /// Send a new message to the current conversation.
+  /// Sends a new message to the current conversation.
   /// Internally, it invokes the [chat_fidl.ChatContentProvider.sendMessage]
   /// method.
   void sendMessage(String message) {
@@ -526,5 +558,10 @@ class ChatConversationModuleModel extends ModuleModel {
       message,
       (_, __) => null,
     );
+  }
+
+  /// Asks the content provider to delete the specified message.
+  void deleteMessage(List<int> messageId) {
+    _chatContentProvider.deleteMessage(conversationId, messageId, (_) => null);
   }
 }

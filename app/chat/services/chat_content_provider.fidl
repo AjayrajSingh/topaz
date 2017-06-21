@@ -85,12 +85,14 @@ interface ChatContentProvider {
 
   // Gets the list of all |Message|s in the specified conversation.
   // When the |message_queue_token| value is provided, the client will be
-  // notified with any new messages added after the initial snapshot is sent.
+  // notified with any new messages added and messages deleted after the initial
+  // snapshot is sent.
   //
   // The message sent from the content provider will be a JSON string formatted
   // as following:
   //
   //     {
+  //       "event":           "add|delete",
   //       "conversation_id": <conversation_id>,
   //       "message_id":      <message_id>
   //     }
@@ -127,6 +129,13 @@ interface ChatContentProvider {
   //    the same user.
   SendMessage(array<uint8> conversation_id, string type, string json_payload)
       => (ChatStatus status, array<uint8> message_id);
+
+  // Deletes the specified |Message| from the chat history.
+  //
+  // This only deletes the message from the current user's |Ledger|, which means
+  // that the message will still be shown in the other users' chat history.
+  DeleteMessage(array<uint8> conversation_id, array<uint8> message_id)
+      => (ChatStatus status);
 
   // Notifies the agent that the specified message queue should no longer be
   // used to send more notifications.

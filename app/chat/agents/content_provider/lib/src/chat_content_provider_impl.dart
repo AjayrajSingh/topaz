@@ -21,9 +21,9 @@ import 'package:quiver/core.dart' as quiver;
 
 import 'base_page_watcher.dart';
 import 'chat_message_transporter.dart';
+import 'conversation_list_watcher.dart';
+import 'conversation_watcher.dart';
 import 'ledger_utils.dart';
-import 'new_conversation_watcher.dart';
-import 'new_message_watcher.dart';
 
 const int _kKeyLengthInBytes = 16;
 
@@ -324,7 +324,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       try {
         // Here, we create a [NewconversationWatcher] instance in case the
         // client gave us a message queue token.
-        NewConversationWatcher newConversationWatcher;
+        ConversationListWatcher newConversationWatcher;
         if (messageQueueToken != null) {
           MessageSenderProxy messageSender = new MessageSenderProxy();
           componentContext.getMessageSender(
@@ -332,7 +332,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
             messageSender.ctrl.request(),
           );
 
-          newConversationWatcher = new NewConversationWatcher(
+          newConversationWatcher = new ConversationListWatcher(
             messageSender: messageSender,
           );
 
@@ -425,7 +425,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         // Here, we create a [NewMessageWatcher] instance in case the client
         // gave us a message queue token.
-        NewMessageWatcher newMessageWatcher;
+        ConversationWatcher newMessageWatcher;
         if (messageQueueToken != null) {
           MessageSenderProxy messageSender = new MessageSenderProxy();
           componentContext.getMessageSender(
@@ -433,7 +433,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
             messageSender.ctrl.request(),
           );
 
-          newMessageWatcher = new NewMessageWatcher(
+          newMessageWatcher = new ConversationWatcher(
             conversationId: conversationId,
             messageSender: messageSender,
           );
@@ -686,6 +686,62 @@ class ChatContentProviderImpl extends ChatContentProvider {
     } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError caused by', e, stackTrace);
       callback(ChatStatus.unknownError, const <int>[]);
+    }
+  }
+
+  @override
+  Future<Null> deleteMessage(
+    List<int> conversationId,
+    List<int> messageId,
+    void callback(ChatStatus chatStatus),
+  ) async {
+    try {
+      try {
+        await _ledgerReady.future;
+      } catch (e) {
+        callback(ChatStatus.ledgerNotInitialized);
+        return;
+      }
+
+      // Get the current snapshot of the specified conversation page.
+      PageProxy conversationPage = new PageProxy();
+
+      try {
+        Completer<Status> statusCompleter = new Completer<Status>();
+        _ledger.getPage(
+          conversationId,
+          conversationPage.ctrl.request(),
+          statusCompleter.complete,
+        );
+
+        Status status = await statusCompleter.future;
+        if (status != Status.ok) {
+          log.severe('Ledger::GetPage() returned an error status: $status');
+          callback(ChatStatus.ledgerOperationError);
+          return;
+        }
+
+        // Delete the message from the ledger.
+        statusCompleter = new Completer<Status>();
+        conversationPage.delete(
+          messageId,
+          statusCompleter.complete,
+        );
+
+        status = await statusCompleter.future;
+        if (status != Status.ok) {
+          log.severe('Page::Delete() returned an error status: $status');
+          callback(ChatStatus.ledgerOperationError);
+          return;
+        }
+      } finally {
+        conversationPage.ctrl.close();
+      }
+
+      callback(ChatStatus.ok);
+    } catch (e, stackTrace) {
+      log.severe('Sending ChatStatus.unknownError caused by', e, stackTrace);
+      callback(ChatStatus.unknownError);
     }
   }
 

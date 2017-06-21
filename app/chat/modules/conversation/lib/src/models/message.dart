@@ -8,16 +8,24 @@ import 'package:meta/meta.dart';
 /// An abstract chat [Message] model. Each [Message] contains the timestamp and
 /// the sender's email.
 abstract class Message {
+  /// The message id associated with this message.
+  final List<int> messageId;
+
   /// The local time at which this chat message was added.
   final DateTime time;
 
   /// The email address of the sender.
   final String sender;
 
+  /// Called when the user indicates that this message should be deleted.
+  final VoidCallback onDelete;
+
   /// Creates a new instance of [Message].
   Message({
+    @required this.messageId,
     @required this.time,
     @required this.sender,
+    this.onDelete,
   }) {
     assert(time != null);
     assert(sender != null);

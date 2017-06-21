@@ -14,13 +14,17 @@ class ImageUrlMessage extends Message {
 
   /// Creates a new instance of [ImageUrlMessage].
   ImageUrlMessage({
+    @required List<int> messageId,
     @required DateTime time,
     @required String sender,
+    VoidCallback onDelete,
     @required this.url,
   })
       : super(
+          messageId: messageId,
           time: time,
           sender: sender,
+          onDelete: onDelete,
         ) {
     assert(url != null);
   }

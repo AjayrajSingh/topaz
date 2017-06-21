@@ -14,14 +14,14 @@ import 'ledger_utils.dart';
 
 /// A [PageWatcher] implementation that watches for changes in the
 /// `conversations` [Page] which stores the list of all conversations. Whenever
-/// a new [Entry] is added to this page, this [NewConversationWatcher] sends
+/// a new [Entry] is added to this page, this [ConversationListWatcher] sends
 /// notifications to the subscriber through the [MessageQueue].
-class NewConversationWatcher extends BasePageWatcher {
+class ConversationListWatcher extends BasePageWatcher {
   /// The [MessageSender] attached to the message queue of the subscriber.
   final MessageSenderProxy messageSender;
 
-  /// Creates a [NewConversationWatcher] instance.
-  NewConversationWatcher({
+  /// Creates a [ConversationListWatcher] instance.
+  ConversationListWatcher({
     @required this.messageSender,
   }) {
     assert(this.messageSender != null);

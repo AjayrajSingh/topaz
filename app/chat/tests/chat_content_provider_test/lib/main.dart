@@ -124,7 +124,6 @@ class ChatContentProviderTestModule extends Module {
     expect(status, equals(ChatStatus.ok));
     expect(conversations, isNotNull);
     expect(conversations, isEmpty);
-    // TODO: _testRunner.pass('GetConversations()');
 
     // Test NewConversation() method.
     List<String> participants = <String>[
@@ -144,7 +143,6 @@ class ChatContentProviderTestModule extends Module {
     expect(conversation.conversationId, isNotNull);
     expect(conversation.conversationId, isNotEmpty);
     expect(conversation.participants, unorderedEquals(participants));
-    // TODO: _testRunner.pass('NewConversation()');
 
     // Test GetConversation() method.
     await _chatContentProvider.getConversation(
@@ -178,7 +176,6 @@ class ChatContentProviderTestModule extends Module {
       orderedEquals(conversation.conversationId),
     );
     expect(conversations[0].participants, unorderedEquals(participants));
-    // _testRunner.pass('GetConversations()');
 
     // Test GetMessages() method.
     await _chatContentProvider.getMessages(
@@ -193,7 +190,6 @@ class ChatContentProviderTestModule extends Module {
     expect(status, equals(ChatStatus.ok));
     expect(messages, isNotNull);
     expect(messages, isEmpty);
-    // _testRunner.pass('GetMessages() should return an empty message list');
 
     // Test SendMessage() method #1.
     await _chatContentProvider.sendMessage(
@@ -209,7 +205,6 @@ class ChatContentProviderTestModule extends Module {
     expect(status, equals(ChatStatus.ok));
     expect(messageId1, isNotNull);
     expect(messageId1, isNotEmpty);
-    // _testRunner.pass('SendMessage()');
 
     // Test SendMessage() method #2.
     await _chatContentProvider.sendMessage(
@@ -225,7 +220,6 @@ class ChatContentProviderTestModule extends Module {
     expect(status, equals(ChatStatus.ok));
     expect(messageId2, isNotNull);
     expect(messageId2, isNotEmpty);
-    // _testRunner.pass('SendMessage()');
 
     // Test GetMessages() method again.
     await _chatContentProvider.getMessages(
@@ -251,7 +245,6 @@ class ChatContentProviderTestModule extends Module {
     expect(messages[1].jsonPayload, equals('My Second Message'));
     expect(messages[1].timestamp, isNotNull);
     expect(messages[0].timestamp, lessThan(messages[1].timestamp));
-    // _testRunner.pass('GetMessages()');
 
     // Test GetMessage() method #1.
     await _chatContentProvider.getMessage(
@@ -270,7 +263,6 @@ class ChatContentProviderTestModule extends Module {
     expect(message.type, equals('text'));
     expect(message.jsonPayload, equals('My First Message'));
     expect(message.timestamp, isNotNull);
-    // _testRunner.pass('GetMessage() #1');
 
     // Test GetMessage() method #2.
     await _chatContentProvider.getMessage(
@@ -289,7 +281,6 @@ class ChatContentProviderTestModule extends Module {
     expect(message.type, equals('text'));
     expect(message.jsonPayload, equals('My Second Message'));
     expect(message.timestamp, isNotNull);
-    // _testRunner.pass('GetMessage() #2');
 
     // Test GetLastMessage() method.
     await _chatContentProvider.getLastMessage(
@@ -307,7 +298,33 @@ class ChatContentProviderTestModule extends Module {
     expect(message.type, equals('text'));
     expect(message.jsonPayload, equals('My Second Message'));
     expect(message.timestamp, isNotNull);
-    // _testRunner.pass('GetLastMessage()');
+
+    // Test DeleteMessage() method.
+    await _chatContentProvider
+        .deleteMessage(conversation.conversationId, messageId1, (ChatStatus s) {
+      status = s;
+    });
+
+    expect(status, equals(ChatStatus.ok));
+
+    // Test GetMessages() method again.
+    await _chatContentProvider.getMessages(
+      conversation.conversationId,
+      null,
+      (ChatStatus s, List<Message> m) {
+        status = s;
+        messages = m;
+      },
+    );
+
+    expect(status, equals(ChatStatus.ok));
+    expect(messages, isNotNull);
+    expect(messages, hasLength(1));
+    expect(messages[0].messageId, orderedEquals(messageId2));
+    expect(messages[0].sender, equals('me'));
+    expect(messages[0].type, equals('text'));
+    expect(messages[0].jsonPayload, equals('My Second Message'));
+    expect(messages[0].timestamp, isNotNull);
   }
 
   /// Test getting notified of new conversations / messages with message queues.
@@ -317,7 +334,7 @@ class ChatContentProviderTestModule extends Module {
     List<Conversation> conversations;
     Conversation conversation0, conversation1, conversation2;
     List<Message> messages;
-    List<int> messageId;
+    List<int> messageId1, messageId2;
     Completer<Null> completer1, completer2;
     dynamic decoded;
 
@@ -349,7 +366,7 @@ class ChatContentProviderTestModule extends Module {
       },
     );
     expect(status, equals(ChatStatus.ok));
-    expect(messages, allOf(isNotNull, hasLength(2)));
+    expect(messages, allOf(isNotNull, hasLength(1)));
     expect(mqMessage1.receivedMessages, allOf(isNotNull, isEmpty));
 
     // Add a new conversation and see if mqConversation1 gets notified.
@@ -455,7 +472,7 @@ class ChatContentProviderTestModule extends Module {
       JSON.encode('sample message1'),
       (ChatStatus s, List<int> mid) {
         status = s;
-        messageId = mid;
+        messageId1 = mid;
       },
     );
     expect(status, equals(ChatStatus.ok));
@@ -464,13 +481,14 @@ class ChatContentProviderTestModule extends Module {
     expect(mqMessage1.receivedMessages, hasLength(1));
     decoded = JSON.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
+    expect(decoded['event'], equals('add'));
     expect(
       decoded['conversation_id'],
       orderedEquals(conversation0.conversationId),
     );
     expect(
       decoded['message_id'],
-      orderedEquals(messageId),
+      orderedEquals(messageId1),
     );
 
     // Register another message queue on the initial conversation.
@@ -483,7 +501,7 @@ class ChatContentProviderTestModule extends Module {
       },
     );
     expect(status, equals(ChatStatus.ok));
-    expect(messages, allOf(isNotNull, hasLength(3)));
+    expect(messages, allOf(isNotNull, hasLength(2)));
 
     // Send another message and see if both message queues are notified.
     completer1 = new Completer<Null>();
@@ -497,7 +515,7 @@ class ChatContentProviderTestModule extends Module {
       JSON.encode('sample message2'),
       (ChatStatus s, List<int> mid) {
         status = s;
-        messageId = mid;
+        messageId2 = mid;
       },
     );
     expect(status, equals(ChatStatus.ok));
@@ -506,26 +524,72 @@ class ChatContentProviderTestModule extends Module {
     expect(mqMessage1.receivedMessages, hasLength(2));
     decoded = JSON.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
+    expect(decoded['event'], equals('add'));
     expect(
       decoded['conversation_id'],
       orderedEquals(conversation0.conversationId),
     );
     expect(
       decoded['message_id'],
-      orderedEquals(messageId),
+      orderedEquals(messageId2),
     );
 
     await completer2.future.timeout(_kTimeout);
     expect(mqMessage2.receivedMessages, hasLength(1));
     decoded = JSON.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
+    expect(decoded['event'], equals('add'));
     expect(
       decoded['conversation_id'],
       orderedEquals(conversation0.conversationId),
     );
     expect(
       decoded['message_id'],
-      orderedEquals(messageId),
+      orderedEquals(messageId2),
+    );
+
+    // Delete a message and see if both message queues are notified.
+    completer1 = new Completer<Null>();
+    completer2 = new Completer<Null>();
+    mqMessage1.completer = completer1;
+    mqMessage2.completer = completer2;
+
+    await _chatContentProvider.deleteMessage(
+      conversation0.conversationId,
+      messageId1,
+      (ChatStatus s) {
+        status = s;
+      },
+    );
+
+    expect(status, equals(ChatStatus.ok));
+
+    await completer1.future.timeout(_kTimeout);
+    expect(mqMessage1.receivedMessages, hasLength(3));
+    decoded = JSON.decode(mqMessage1.receivedMessages.last);
+    expect(decoded, isMap);
+    expect(decoded['event'], equals('delete'));
+    expect(
+      decoded['conversation_id'],
+      orderedEquals(conversation0.conversationId),
+    );
+    expect(
+      decoded['message_id'],
+      orderedEquals(messageId1),
+    );
+
+    await completer2.future.timeout(_kTimeout);
+    expect(mqMessage2.receivedMessages, hasLength(2));
+    decoded = JSON.decode(mqMessage1.receivedMessages.last);
+    expect(decoded, isMap);
+    expect(decoded['event'], equals('delete'));
+    expect(
+      decoded['conversation_id'],
+      orderedEquals(conversation0.conversationId),
+    );
+    expect(
+      decoded['message_id'],
+      orderedEquals(messageId1),
     );
 
     // Lastly, simulate the situation where a new message arrives from some
@@ -535,18 +599,18 @@ class ChatContentProviderTestModule extends Module {
     mqMessage1.completer = completer1;
     mqMessage2.completer = completer2;
 
-    messageId = const <int>[0, 1, 2, 3, 4];
+    messageId1 = const <int>[0, 1, 2, 3, 4];
     await _mockChatMessageTransporter.mockReceiveMessage(
       conversation0,
       new Message()
-        ..messageId = messageId
+        ..messageId = messageId1
         ..sender = 'alice@example.com'
         ..timestamp = new DateTime.now().millisecondsSinceEpoch
         ..jsonPayload = JSON.encode('A message from Alice!'),
     );
 
     await completer1.future.timeout(_kTimeout);
-    expect(mqMessage1.receivedMessages, hasLength(3));
+    expect(mqMessage1.receivedMessages, hasLength(4));
     decoded = JSON.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
     expect(
@@ -555,11 +619,11 @@ class ChatContentProviderTestModule extends Module {
     );
     expect(
       decoded['message_id'],
-      orderedEquals(messageId),
+      orderedEquals(messageId1),
     );
 
     await completer2.future.timeout(_kTimeout);
-    expect(mqMessage2.receivedMessages, hasLength(2));
+    expect(mqMessage2.receivedMessages, hasLength(3));
     decoded = JSON.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
     expect(
@@ -568,7 +632,7 @@ class ChatContentProviderTestModule extends Module {
     );
     expect(
       decoded['message_id'],
-      orderedEquals(messageId),
+      orderedEquals(messageId1),
     );
 
     mqConversation1.close();

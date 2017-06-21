@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:typed_data';
+
 import 'package:fixtures/fixtures.dart';
 
 import '../models.dart';
@@ -10,7 +12,11 @@ import '../models.dart';
 class ChatConversationFixtures extends Fixtures {
   /// Gets a randomly generated chat [Message].
   Message message({DateTime time, String sender}) {
+    Uint8List messageId = new Uint8List(16);
+    new ByteData.view(messageId.buffer).setUint16(0, sequence('message_id'));
+
     return new TextMessage(
+      messageId: messageId,
       time: time ?? new DateTime.now(),
       sender: sender ?? _sender(),
       text: lorem.createSentence(),

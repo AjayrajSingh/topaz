@@ -112,6 +112,7 @@ class ChatContentProviderAgent extends AgentImpl {
 /// Main entry point.
 Future<Null> main(List<String> args) async {
   setupLogger(name: 'chat/agent');
+
   _agent = new ChatContentProviderAgent(
     applicationContext: new ApplicationContext.fromStartupInfo(),
   );

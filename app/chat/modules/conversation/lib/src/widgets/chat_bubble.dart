@@ -37,12 +37,20 @@ class ChatBubble extends StatelessWidget {
   /// Indicates whether the message should fill the entire bubble area or not.
   final bool fillBubble;
 
+  /// Called when the bubble is tapped.
+  final GestureTapCallback onTap;
+
+  /// Called when the bubble is long pressed.
+  final GestureLongPressCallback onLongPress;
+
   /// Constructor
   ChatBubble({
     Key key,
     ChatBubbleOrientation orientation,
     this.backgroundColor,
     bool fillBubble,
+    this.onTap,
+    this.onLongPress,
     @required @Generator(WidgetFixtures, 'sentenceText') this.child,
   })
       : orientation = orientation ?? ChatBubbleOrientation.left,
@@ -95,14 +103,18 @@ class ChatBubble extends StatelessWidget {
 
     return new ClipRRect(
       borderRadius: borderRadius,
-      child: new Container(
-        padding: padding,
-        margin: const EdgeInsets.only(bottom: 2.0),
-        decoration: new BoxDecoration(
-          color: backgroundColor ?? theme.primaryColor,
-          borderRadius: borderRadius,
+      child: new GestureDetector(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: new Container(
+          padding: padding,
+          margin: const EdgeInsets.only(bottom: 2.0),
+          decoration: new BoxDecoration(
+            color: backgroundColor ?? theme.primaryColor,
+            borderRadius: borderRadius,
+          ),
+          child: wrappedChild,
         ),
-        child: wrappedChild,
       ),
     );
   }

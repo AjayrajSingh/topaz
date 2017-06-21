@@ -14,13 +14,17 @@ class TextMessage extends Message {
 
   /// Creates a new instance of [TextMessage].
   TextMessage({
+    @required List<int> messageId,
     @required DateTime time,
     @required String sender,
+    VoidCallback onDelete,
     @required this.text,
   })
       : super(
+          messageId: messageId,
           time: time,
           sender: sender,
+          onDelete: onDelete,
         ) {
     assert(text != null);
   }
