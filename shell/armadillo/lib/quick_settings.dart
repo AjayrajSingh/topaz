@@ -58,15 +58,19 @@ class QuickSettingsOverlay extends StatefulWidget {
   /// Called each tick as the overlay is shown or hidden.
   final ValueChanged<double> onProgressChanged;
 
-  /// Called when logout is selected.
-  final VoidCallback onLogoutSelected;
+  /// Called when logout is tapped.
+  final VoidCallback onLogoutTapped;
+
+  /// Called when logout is long pressed.
+  final VoidCallback onLogoutLongPressed;
 
   /// Constructor.
   QuickSettingsOverlay({
     Key key,
     this.minimizedNowBarHeight,
     this.onProgressChanged,
-    this.onLogoutSelected,
+    this.onLogoutTapped,
+    this.onLogoutLongPressed,
   })
       : super(key: key);
 
@@ -113,7 +117,8 @@ class QuickSettingsOverlayState extends TickingState<QuickSettingsOverlay> {
                   1.0,
                   _showProgress,
                 ),
-                onLogoutSelected: widget.onLogoutSelected,
+                onLogoutTapped: widget.onLogoutTapped,
+                onLogoutLongPressed: widget.onLogoutLongPressed,
               )),
         ),
       );
@@ -181,11 +186,14 @@ class QuickSettings extends StatefulWidget {
   /// The opacity of the quick settings.
   final double opacity;
 
-  /// Called when logout is selected.
-  final VoidCallback onLogoutSelected;
+  /// Called when logout is tapped.
+  final VoidCallback onLogoutTapped;
+
+  /// Called when logout is long pressed.
+  final VoidCallback onLogoutLongPressed;
 
   /// Constructor.
-  QuickSettings({this.opacity, this.onLogoutSelected});
+  QuickSettings({this.opacity, this.onLogoutTapped, this.onLogoutLongPressed});
 
   @override
   _QuickSettingsState createState() => new _QuickSettingsState();
@@ -357,7 +365,8 @@ class _QuickSettingsState extends State<QuickSettings> {
           _divider(opacity: widget.opacity),
           new GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () => widget.onLogoutSelected?.call(),
+            onTap: () => widget.onLogoutTapped?.call(),
+            onLongPress: () => widget.onLogoutLongPressed?.call(),
             child: new Container(
               padding: const EdgeInsets.all(16.0),
               child: new Opacity(

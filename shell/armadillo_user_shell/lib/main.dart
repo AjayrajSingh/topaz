@@ -150,7 +150,8 @@ Future<Null> main() async {
     onSuggestionsOverlayChanged: hitTestModel.onSuggestionsOverlayChanged,
     storyClusterDragStateModel: storyClusterDragStateModel,
     nowModel: nowModel,
-    onLogoutSelected: userLogoutter.logout,
+    onLogoutTapped: userLogoutter.logout,
+    onLogoutLongPressed: userLogoutter.logoutAndResetLedgerState,
     interruptionOverlayKey: interruptionOverlayKey,
     onInterruptionDismissed:
         suggestionProviderSuggestionModel.onInterruptionDismissal,

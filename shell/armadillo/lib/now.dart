@@ -104,8 +104,11 @@ class Now extends StatefulWidget {
   /// Provides story list scrolling information.
   final ScrollController scrollController;
 
-  /// Called when the user selects log out from the quick settings.
-  final VoidCallback onLogoutSelected;
+  /// Called when the user taps log out from the quick settings.
+  final VoidCallback onLogoutTapped;
+
+  /// Called when the user long presses log out from the quick settings.
+  final VoidCallback onLogoutLongPressed;
 
   /// Called when the user taps the user context.
   final VoidCallback onUserContextTapped;
@@ -127,7 +130,8 @@ class Now extends StatefulWidget {
     this.onBarVerticalDragEnd,
     this.onOverscrollThresholdRelease,
     this.scrollController,
-    this.onLogoutSelected,
+    this.onLogoutTapped,
+    this.onLogoutLongPressed,
     this.onUserContextTapped,
   })
       : super(key: key);
@@ -422,7 +426,8 @@ class NowState extends TickingState<Now> {
                   new Container(
                     child: nowModel.quickSettings(
                       opacity: _quickSettingsSlideUpProgress,
-                      onLogoutSelected: widget.onLogoutSelected,
+                      onLogoutTapped: widget.onLogoutTapped,
+                      onLogoutLongPressed: widget.onLogoutLongPressed,
                     ),
                   ),
                 ],
