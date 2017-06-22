@@ -7,20 +7,16 @@ import 'package:apps.modular.services.device/device_shell.fidl.dart';
 import 'package:apps.modular.services.device/user_provider.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 
-export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, ScopedModelDescendant, ModelFinder;
 
 /// Contains all the relevant data for displaying the list of users and for
 /// logging in and creating new users.
 class UserPickerDeviceShellModel extends DeviceShellModel {
   List<Account> _accounts;
 
-  bool _isShowingNewUserForm = false;
-
   /// The list of previously logged in accounts.
   List<Account> get accounts => _accounts;
-
-  /// True if the 'new user' form is showing.
-  bool get isShowingNewUserForm => _isShowingNewUserForm;
 
   @override
   void onReady(
@@ -44,22 +40,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel {
       _accounts = new List<Account>.from(accounts);
       notifyListeners();
     });
-  }
-
-  /// Shows the 'new user' form.
-  void showNewUserForm() {
-    if (!_isShowingNewUserForm) {
-      _isShowingNewUserForm = true;
-      notifyListeners();
-    }
-  }
-
-  /// Hides the 'new user' form.
-  void hideNewUserForm() {
-    if (_isShowingNewUserForm) {
-      _isShowingNewUserForm = false;
-      notifyListeners();
-    }
   }
 
   /// Permanently removes the user.

@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
 import 'dart:io';
 
 import 'package:application.services/application_launcher.fidl.dart';
@@ -17,6 +16,7 @@ import 'package:meta/meta.dart';
 
 import 'user_picker.dart';
 import 'user_picker_buttons.dart';
+import 'user_picker_device_shell_model.dart';
 import 'user_picker_screen.dart';
 import 'user_shell_chooser.dart';
 import 'user_watcher_impl.dart';
@@ -51,11 +51,6 @@ class ScreenManager extends StatefulWidget {
 
 class _ScreenManagerState extends State<ScreenManager>
     with TickerProviderStateMixin {
-  final TextEditingController _userNameController = new TextEditingController();
-  final TextEditingController _serverNameController =
-      new TextEditingController();
-  final FocusNode _userNameFocusNode = new FocusNode();
-  final FocusNode _serverNameFocusNode = new FocusNode();
   final Set<Account> _draggedUsers = new Set<Account>();
   final UserShellChooser _userShellChooser = new UserShellChooser();
 
@@ -115,12 +110,6 @@ class _ScreenManagerState extends State<ScreenManager>
         showBlackHole: _draggedUsers.isNotEmpty,
         userPicker: new UserPicker(
           onLoginRequest: _login,
-          onAddUserStarted: _addUserStarted,
-          onAddUserFinished: _addUserFinished,
-          userNameController: _userNameController,
-          serverNameController: _serverNameController,
-          userNameFocusNode: _userNameFocusNode,
-          serverNameFocusNode: _serverNameFocusNode,
           loggingIn: _addingUser ||
               (_childViewConnection != null &&
                   (_curvedTransitionAnimation.status ==
@@ -135,15 +124,7 @@ class _ScreenManagerState extends State<ScreenManager>
               }),
         ),
         userPickerButtons: new UserPickerButtons(
-          onAddUser: () {
-            //TODO(apwilson): Remove the delay.  It's a workaround to raw
-            // keyboard focus bug.
-            new Timer(
-              const Duration(milliseconds: 1000),
-              () => FocusScope.of(context).requestFocus(_userNameFocusNode),
-            );
-            widget.onAddUser?.call();
-          },
+          onAddUser: () => _createAndLoginUser(context),
           onUserShellChange: () => setState(() {
                 _userShellChooser.next();
               }),
@@ -192,6 +173,28 @@ class _ScreenManagerState extends State<ScreenManager>
                   ],
                 ),
       child: new Stack(fit: StackFit.expand, children: stackChildren),
+    );
+  }
+
+  void _createAndLoginUser(BuildContext context) {
+    _addUserStarted();
+    UserPickerDeviceShellModel model =
+        new ModelFinder<UserPickerDeviceShellModel>().of(
+      context,
+    );
+    model.userProvider?.addUser(
+      IdentityProvider.google,
+      'obsolete',
+      null,
+      'obsolete',
+      (Account account, String errorCode) {
+        if (errorCode == null) {
+          _login(account.id, model.userProvider);
+        } else {
+          print('ERROR adding user!  $errorCode');
+        }
+        _addUserFinished();
+      },
     );
   }
 

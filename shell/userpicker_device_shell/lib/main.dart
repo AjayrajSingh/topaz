@@ -65,7 +65,6 @@ void main() {
               new ScreenManager(
                 key: screenManagerKey,
                 onLogout: model.refreshUsers,
-                onAddUser: model.showNewUserForm,
                 onRemoveUser: model.removeUser,
                 launcher: applicationContext.launcher,
               ),
