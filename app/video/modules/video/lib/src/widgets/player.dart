@@ -96,7 +96,8 @@ class Player extends StatelessWidget {
       Size size = MediaQuery.of(context).size;
       if (size.width <= 640.0 && size.height <= 360.0) {
         model.displayMode = DisplayMode.localSmall;
-      } else if (model.displayMode != DisplayMode.remoteControl) {
+      } else if (model.displayMode != DisplayMode.remoteControl &&
+          model.displayMode != DisplayMode.immersive) {
         model.displayMode = DisplayMode.localLarge;
       }
       return new Container(

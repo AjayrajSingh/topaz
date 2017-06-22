@@ -57,6 +57,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   Animation<double> _thumbnailAnimation;
   MediaPlayerController _controller;
   bool _wasPlaying = false;
+  bool _locallyControlled = false;
   final NetConnectorProxy _netConnector = new NetConnectorProxy();
   final DeviceMapProxy _deviceMap = new DeviceMapProxy();
   Asset _asset = _defaultAsset;
@@ -148,11 +149,13 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Seeks to a duration in the video
   void seek(Duration duration) {
+    _locallyControlled = true;
     _controller.seek(duration);
   }
 
   /// Plays video
   void play() {
+    _locallyControlled = true;
     if (_asset.type == AssetType.remote) {
       Duration lastLocalTime = _controller.progress;
 
@@ -169,6 +172,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Pauses video
   void pause() {
+    _locallyControlled = true;
     _controller.pause();
   }
 
@@ -251,6 +255,13 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Handles change notifications from the controller
   void _handleControllerChanged() {
+    if (_controller.playing &&
+        !_locallyControlled &&
+        displayMode != DisplayMode.immersive) {
+      displayMode = DisplayMode.immersive;
+      notifyListeners();
+    }
+
     // TODO(maryxia) SO-480 make this conditional
     if (_shouldShowControlOverlay()) {
       notifyListeners();
