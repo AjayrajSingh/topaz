@@ -24,8 +24,6 @@ rust_binary("spinning_square_rs") {
     "//rust/magenta-rs:magenta",
     "//rust/mxruntime",
   ]
-
-  native_libs = [ "cairo" ]
 }
 
 package("package") {
