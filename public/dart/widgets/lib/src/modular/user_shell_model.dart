@@ -17,6 +17,7 @@ export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
 /// The [Model] that provides services provided to this app's [UserShell].
 class UserShellModel extends Model {
   UserContext _userContext;
+  UserShellContext _userShellContext;
   FocusProvider _focusProvider;
   FocusController _focusController;
   VisibleStoriesController _visibleStoriesController;
@@ -27,6 +28,9 @@ class UserShellModel extends Model {
 
   /// The [UserContext] given to this app's [UserShell].
   UserContext get userContext => _userContext;
+
+  /// The [UserShellContext] given to this app's [UserShell].
+  UserShellContext get userShellContext => _userShellContext;
 
   /// The [FocusProvider] given to this app's [UserShell].
   FocusProvider get focusProvider => _focusProvider;
@@ -54,6 +58,7 @@ class UserShellModel extends Model {
   @mustCallSuper
   void onReady(
     UserContext userContext,
+    UserShellContext userShellContext,
     FocusProvider focusProvider,
     FocusController focusController,
     VisibleStoriesController visibleStoriesController,
@@ -63,6 +68,7 @@ class UserShellModel extends Model {
     ContextPublisher contextPublisher,
   ) {
     _userContext = userContext;
+    _userShellContext = userShellContext;
     _focusProvider = focusProvider;
     _focusController = focusController;
     _visibleStoriesController = visibleStoriesController;

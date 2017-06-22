@@ -14,6 +14,7 @@ import 'package:lib.fidl.dart/bindings.dart';
 /// Called when [UserShell.initialize] occurs.
 typedef void OnUserShellReady(
   UserContext userContext,
+  UserShellContext userShellContext,
   FocusProvider focusProvider,
   FocusController focusController,
   VisibleStoriesController visibleStoriesController,
@@ -30,6 +31,8 @@ typedef void OnUserShellStop();
 /// operate.
 class UserShellImpl extends UserShell {
   final UserContextProxy _userContextProxy = new UserContextProxy();
+  final UserShellContextProxy _userShellContextProxy =
+      new UserShellContextProxy();
   final FocusProviderProxy _focusProviderProxy = new FocusProviderProxy();
   final FocusControllerProxy _focusControllerProxy = new FocusControllerProxy();
   final VisibleStoriesControllerProxy _visibleStoriesControllerProxy =
@@ -60,34 +63,33 @@ class UserShellImpl extends UserShell {
   ) {
     if (onReady != null) {
       _userContextProxy.ctrl.bind(userContextHandle);
-      UserShellContextProxy userShellContextProxy = new UserShellContextProxy();
-      userShellContextProxy.ctrl.bind(userShellContextHandle);
-      userShellContextProxy.getStoryProvider(
+      _userShellContextProxy.ctrl.bind(userShellContextHandle);
+      _userShellContextProxy.getStoryProvider(
         _storyProviderProxy.ctrl.request(),
       );
-      userShellContextProxy.getSuggestionProvider(
+      _userShellContextProxy.getSuggestionProvider(
         _suggestionProviderProxy.ctrl.request(),
       );
-      userShellContextProxy.getVisibleStoriesController(
+      _userShellContextProxy.getVisibleStoriesController(
         _visibleStoriesControllerProxy.ctrl.request(),
       );
-      userShellContextProxy.getFocusController(
+      _userShellContextProxy.getFocusController(
         _focusControllerProxy.ctrl.request(),
       );
-      userShellContextProxy.getFocusProvider(
+      _userShellContextProxy.getFocusProvider(
         _focusProviderProxy.ctrl.request(),
       );
 
-      userShellContextProxy.getContextProvider(
+      _userShellContextProxy.getContextProvider(
         _contextProviderProxy.ctrl.request(),
       );
-      userShellContextProxy.getContextPublisher(
+      _userShellContextProxy.getContextPublisher(
         _contextPublisherProxy.ctrl.request(),
       );
 
-      userShellContextProxy.ctrl.close();
       onReady(
         _userContextProxy,
+        _userShellContextProxy,
         _focusProviderProxy,
         _focusControllerProxy,
         _visibleStoriesControllerProxy,
@@ -103,6 +105,7 @@ class UserShellImpl extends UserShell {
   void terminate(void done()) {
     onStop?.call();
     _userContextProxy.ctrl.close();
+    _userShellContextProxy.ctrl.close();
     _storyProviderProxy.ctrl.close();
     _suggestionProviderProxy.ctrl.close();
     _visibleStoriesControllerProxy.ctrl.close();
