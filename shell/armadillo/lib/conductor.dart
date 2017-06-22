@@ -395,6 +395,8 @@ class ConductorState extends State<Conductor> {
           onLogoutTapped: widget.onLogoutTapped,
           onLogoutLongPressed: widget.onLogoutLongPressed,
           onUserContextTapped: widget.onUserContextTapped,
+          onMinimizedContextTapped: () =>
+              _suggestionOverlayKey.currentState.show(),
         ),
       );
 

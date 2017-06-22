@@ -113,6 +113,9 @@ class Now extends StatefulWidget {
   /// Called when the user taps the user context.
   final VoidCallback onUserContextTapped;
 
+  /// Called when minimized context is tapped.
+  final VoidCallback onMinimizedContextTapped;
+
   /// Constructor.
   Now({
     Key key,
@@ -133,6 +136,7 @@ class Now extends StatefulWidget {
     this.onLogoutTapped,
     this.onLogoutLongPressed,
     this.onUserContextTapped,
+    this.onMinimizedContextTapped,
   })
       : super(key: key);
 
@@ -481,6 +485,9 @@ class NowState extends TickingState<Now> {
                   onTapDown: (_) {
                     _fadingSpringSimulation.fadeIn();
                   },
+                  onTap: () {
+                    widget.onMinimizedContextTapped?.call();
+                  },
                 ),
               ),
               new GestureDetector(
@@ -494,6 +501,9 @@ class NowState extends TickingState<Now> {
                   behavior: HitTestBehavior.opaque,
                   onTapDown: (_) {
                     _fadingSpringSimulation.fadeIn();
+                  },
+                  onTap: () {
+                    widget.onMinimizedContextTapped?.call();
                   },
                 ),
               ),
