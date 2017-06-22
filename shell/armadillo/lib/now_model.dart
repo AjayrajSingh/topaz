@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'dart:ui' show lerpDouble;
 
@@ -18,7 +19,6 @@ import 'user_context_text.dart';
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
-const String _kUserImage = 'packages/armadillo/res/User.png';
 const String _kBatteryImageWhite =
     'packages/armadillo/res/ic_battery_90_white_1x_web_24dp.png';
 
@@ -43,7 +43,29 @@ class NowModel extends Model {
   double get quickSettingsProgress => _quickSettingsProgress;
 
   /// Returns an avatar of the current user.
-  Widget get user => new Image.asset(_kUserImage, fit: BoxFit.cover);
+  Widget get user => new ScopedModelDescendant<ContextModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          ContextModel contextModel,
+        ) =>
+            contextModel.userName?.isEmpty ?? true
+                ? new Offstage()
+                : new Alphatar.fromName(
+                    avatarImage: contextModel.userImageUrl == null
+                        ? null
+                        : contextModel.userImageUrl.startsWith('http')
+                            ? new Image.network(
+                                contextModel.userImageUrl,
+                                fit: BoxFit.cover,
+                              )
+                            : new Image.asset(
+                                contextModel.userImageUrl,
+                                fit: BoxFit.cover,
+                              ),
+                    name: contextModel.userName,
+                  ),
+      );
 
   /// Returns a verbose representation of the user's current context.
   Widget userContextMaximized({double opacity: 1.0}) => new Opacity(

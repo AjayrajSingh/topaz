@@ -37,6 +37,12 @@ class ContextModel extends Model {
   /// The current date.
   String get dateOnly => _timeStringer.dateOnly;
 
+  /// The user's name.
+  String get userName => 'Jane Doe';
+
+  /// The user's image url.
+  String get userImageUrl => 'packages/armadillo/res/User.png';
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);

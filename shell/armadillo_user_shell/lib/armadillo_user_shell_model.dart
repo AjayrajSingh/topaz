@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:apps.modular.services.auth.account/account.fidl.dart';
 import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
@@ -20,6 +21,7 @@ import 'user_logoutter.dart';
 const String _kLocationTopic = '/location/home_work';
 
 typedef void _OnContextUpdated(Map<String, String> context);
+typedef void _OnUserUpdated(String userName, String userImageUrl);
 
 /// Connects [UserShell]'s services to Armadillo's associated classes.
 class ArmadilloUserShellModel extends UserShellModel {
@@ -42,6 +44,9 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// Called when the context updates.
   final _OnContextUpdated onContextUpdated;
 
+  /// Called when the user information changes
+  final _OnUserUpdated onUserUpdated;
+
   /// The list of context topics to listen for changes to.
   final List<String> contextTopics;
 
@@ -59,12 +64,14 @@ class ArmadilloUserShellModel extends UserShellModel {
     this.initialFocusSetter,
     this.userLogoutter,
     this.onContextUpdated,
+    this.onUserUpdated,
     this.contextTopics: const <String>[],
   });
 
   @override
   void onReady(
     UserContext userContext,
+    UserShellContext userShellContext,
     FocusProvider focusProvider,
     FocusController focusController,
     VisibleStoriesController visibleStoriesController,
@@ -75,6 +82,7 @@ class ArmadilloUserShellModel extends UserShellModel {
   ) {
     super.onReady(
       userContext,
+      userShellContext,
       focusProvider,
       focusController,
       visibleStoriesController,
@@ -99,6 +107,13 @@ class ArmadilloUserShellModel extends UserShellModel {
         new _ContextListenerImpl(onContextUpdated),
       ),
     );
+    userShellContext.getAccount((Account account) {
+      if (account == null) {
+        onUserUpdated?.call('Guest', null);
+      } else {
+        onUserUpdated?.call(account.displayName, account.imageUrl);
+      }
+    });
   }
 
   @override

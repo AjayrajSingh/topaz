@@ -67,9 +67,9 @@ class UserPicker extends StatelessWidget {
                     ),
                     color: Colors.white,
                   ),
-                  child: new Alphatar.withUrl(
+                  child: new Alphatar.fromNameAndUrl(
+                    name: account.displayName,
                     avatarUrl: account.imageUrl,
-                    letter: account.displayName.toUpperCase()[0],
                     size: 80.0,
                   ),
                 ),

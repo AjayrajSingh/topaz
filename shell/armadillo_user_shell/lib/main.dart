@@ -138,6 +138,7 @@ Future<Null> main() async {
     initialFocusSetter: initialFocusSetter,
     userLogoutter: userLogoutter,
     onContextUpdated: contextProviderContextModel.onContextUpdated,
+    onUserUpdated: contextProviderContextModel.onUserUpdated,
     contextTopics: ContextProviderContextModel.topics,
   );
 

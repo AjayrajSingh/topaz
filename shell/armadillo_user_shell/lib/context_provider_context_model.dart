@@ -33,6 +33,8 @@ class ContextProviderContextModel extends ContextModel {
   Map<String, String> _contextualBackgroundImages = <String, String>{};
   String _location = 'unknown';
   String _activity = 'unknown';
+  String _userName;
+  String _userImageUrl;
 
   /// The current background image to use.
   @override
@@ -84,6 +86,19 @@ class ContextProviderContextModel extends ContextModel {
       _contextualDateOnly[_activity] ??
       _contextualDateOnly[_location] ??
       super.dateOnly;
+
+  @override
+  String get userName => _userName;
+
+  @override
+  String get userImageUrl => _userImageUrl;
+
+  /// Called when the user information changes.
+  void onUserUpdated(String userName, String userImageUrl) {
+    _userName = userName;
+    _userImageUrl = userImageUrl;
+    notifyListeners();
+  }
 
   /// Called when context changes.
   void onContextUpdated(Map<String, String> context) {
