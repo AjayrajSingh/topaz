@@ -44,6 +44,7 @@ class _ChatConversationListScreenState
                   ..setConversationId(c.conversationId)
                   ..focusConversation(),
                 selectedId: model.conversationId,
+                shouldDisplaySpinner: model.shouldDisplaySpinner,
               ),
             ];
 

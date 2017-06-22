@@ -393,6 +393,7 @@ class ChatContentProviderTestModule extends Module {
     expect(mqConversation1.receivedMessages, hasLength(1));
     decoded = JSON.decode(mqConversation1.receivedMessages.last);
     expect(decoded, isMap);
+    expect(decoded['event'], equals('new_conversation'));
     expect(
       decoded['conversation_id'],
       orderedEquals(conversation1.conversationId),
@@ -439,6 +440,7 @@ class ChatContentProviderTestModule extends Module {
     expect(mqConversation1.receivedMessages, hasLength(2));
     decoded = JSON.decode(mqConversation1.receivedMessages.last);
     expect(decoded, isMap);
+    expect(decoded['event'], equals('new_conversation'));
     expect(
       decoded['conversation_id'],
       orderedEquals(conversation2.conversationId),
@@ -452,6 +454,7 @@ class ChatContentProviderTestModule extends Module {
     expect(mqConversation2.receivedMessages, hasLength(1));
     decoded = JSON.decode(mqConversation1.receivedMessages.last);
     expect(decoded, isMap);
+    expect(decoded['event'], equals('new_conversation'));
     expect(
       decoded['conversation_id'],
       orderedEquals(conversation2.conversationId),

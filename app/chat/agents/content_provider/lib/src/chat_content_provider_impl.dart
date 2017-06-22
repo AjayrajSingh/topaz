@@ -322,7 +322,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       PageSnapshotProxy snapshot = new PageSnapshotProxy();
 
       try {
-        // Here, we create a [NewconversationWatcher] instance in case the
+        // Here, we create a [ConversationListWatcher] instance in case the
         // client gave us a message queue token.
         ConversationListWatcher newConversationWatcher;
         if (messageQueueToken != null) {
@@ -338,13 +338,23 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
           _pageWatchers[messageQueueToken]?.close();
           _pageWatchers[messageQueueToken] = newConversationWatcher;
+
+          // Register a sync state watcher.
+          _conversationsPage.setSyncStateWatcher(
+            newConversationWatcher.syncWatcherHandle,
+            (Status s) {
+              if (s != Status.ok) {
+                log.severe('Failed to set sync state watcher: $s');
+              }
+            },
+          );
         }
 
         Completer<Status> statusCompleter = new Completer<Status>();
         _conversationsPage.getSnapshot(
           snapshot.ctrl.request(),
           null,
-          newConversationWatcher?.handle,
+          newConversationWatcher?.pageWatcherHandle,
           statusCompleter.complete,
         );
 
@@ -446,7 +456,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         conversationPage.getSnapshot(
           snapshot.ctrl.request(),
           null,
-          newMessageWatcher?.handle,
+          newMessageWatcher?.pageWatcherHandle,
           statusCompleter.complete,
         );
 
@@ -764,41 +774,43 @@ class ChatContentProviderImpl extends ChatContentProvider {
     // Get the current snapshot of the 'conversations' page.
     PageSnapshotProxy snapshot = new PageSnapshotProxy();
 
-    _conversationsPage.getSnapshot(
-      snapshot.ctrl.request(),
-      null,
-      null,
-      (Status status) {
-        if (status != Status.ok) {
-          throw new Exception(
-            'Page::GetSnapshot() returned an error status: $status',
-          );
-        }
-      },
-    );
-
-    Completer<Status> statusCompleter = new Completer<Status>();
-    Completer<Vmo> valueCompleter = new Completer<Vmo>();
-    snapshot.get(conversationId, (Status status, Vmo value) {
-      statusCompleter.complete(status);
-      valueCompleter.complete(value);
-    });
-
-    Status status = await statusCompleter.future;
-    if (status != Status.ok) {
-      throw new Exception(
-        'PageSnapshot::Get() returned an error status: $status',
+    try {
+      _conversationsPage.getSnapshot(
+        snapshot.ctrl.request(),
+        null,
+        null,
+        (Status status) {
+          if (status != Status.ok) {
+            throw new Exception(
+              'Page::GetSnapshot() returned an error status: $status',
+            );
+          }
+        },
       );
+
+      Completer<Status> statusCompleter = new Completer<Status>();
+      Completer<Vmo> valueCompleter = new Completer<Vmo>();
+      snapshot.get(conversationId, (Status status, Vmo value) {
+        statusCompleter.complete(status);
+        valueCompleter.complete(value);
+      });
+
+      Status status = await statusCompleter.future;
+      if (status != Status.ok) {
+        throw new Exception(
+          'PageSnapshot::Get() returned an error status: $status',
+        );
+      }
+
+      Vmo value = await valueCompleter.future;
+      Conversation conversation =
+          _createConversationFromLedgerEntry(conversationId, value);
+      _conversationCache[conversationId] = conversation;
+
+      return conversation;
+    } finally {
+      snapshot.ctrl.close();
     }
-
-    Vmo value = await valueCompleter.future;
-    Conversation conversation =
-        _createConversationFromLedgerEntry(conversationId, value);
-    _conversationCache[conversationId] = conversation;
-
-    snapshot.ctrl.close();
-
-    return conversation;
   }
 
   Conversation _createConversationFromLedgerEntry(List<int> key, Vmo value) {

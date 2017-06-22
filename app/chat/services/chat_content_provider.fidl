@@ -68,16 +68,25 @@ interface ChatContentProvider {
   // Returns the list of metadata of all existing conversations.
   // To obtain the conversation history, use the |GetMessages| method with
   // the obtained conversation id.
+  //
   // When the |message_queue_token| value is provided, the client will be
   // notified with any new conversations added after the initial list of
-  // conversations is sent.
+  // conversations is sent, or when the ledger download status is changed.
   //
   // The message sent from the content provider will be a JSON string formatted
   // as following:
   //
   //     {
+  //       "event":           "new_conversation",
   //       "conversation_id": <conversation_id>,
   //       "participants":    <list of participant emails>
+  //     }
+  //
+  // OR
+  //
+  //     {
+  //       "event":  "download_status",
+  //       "status": "idle|pending|in_progress|error"
   //     }
   //
   GetConversations(string? message_queue_token)

@@ -18,16 +18,13 @@ class ConversationWatcher extends BasePageWatcher {
   /// The id of the conversation that this watcher is watching for.
   final List<int> conversationId;
 
-  /// The [MessageSender] attached to the message queue of the subscriber.
-  final MessageSenderProxy messageSender;
-
   /// Creates a [ConversationWatcher] instance.
   ConversationWatcher({
     @required this.conversationId,
-    @required this.messageSender,
-  }) {
+    @required MessageSenderProxy messageSender,
+  })
+      : super(messageSender: messageSender) {
     assert(this.conversationId != null);
-    assert(this.messageSender != null);
   }
 
   @override
@@ -44,6 +41,16 @@ class ConversationWatcher extends BasePageWatcher {
     pageChange.deletedKeys.forEach(_processDeletedKey);
 
     callback(null);
+  }
+
+  @override
+  void syncStateChanged(
+    SyncState downloadStatus,
+    SyncState uploadStatus,
+    void callback(),
+  ) {
+    // Don't do anything special here.
+    callback();
   }
 
   /// Processes the provided [Entry] and sends notification to the subscriber.
@@ -66,11 +73,5 @@ class ConversationWatcher extends BasePageWatcher {
     };
 
     messageSender.send(JSON.encode(notification));
-  }
-
-  @override
-  void close() {
-    messageSender.ctrl.close();
-    super.close();
   }
 }

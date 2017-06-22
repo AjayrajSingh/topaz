@@ -4,10 +4,13 @@
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 
 import '../models/conversation.dart';
 import 'chat_conversation_list_item.dart';
+
+const double _kSpinnerSize = 48.0;
 
 /// Callback function signature for an action on a conversation
 typedef void ConversationActionCallback(Conversation message);
@@ -28,6 +31,9 @@ class ChatConversationList extends StatelessWidget {
   /// Indicates the conversation id of the selected conversation. Can be null.
   final List<int> selectedId;
 
+  /// Indicates whether the spinner should be shown in the list area.
+  final bool shouldDisplaySpinner;
+
   /// Constructor
   ChatConversationList({
     Key key,
@@ -35,8 +41,10 @@ class ChatConversationList extends StatelessWidget {
     this.onNewConversation,
     this.onSelectConversation,
     this.selectedId,
+    bool shouldDisplaySpinner,
   })
-      : super(key: key) {
+      : shouldDisplaySpinner = shouldDisplaySpinner ?? false,
+        super(key: key) {
     assert(this.conversations != null);
   }
 
@@ -83,7 +91,7 @@ class ChatConversationList extends StatelessWidget {
 
   Widget _buildListArea() => conversations.isNotEmpty
       ? _buildConversationList()
-      : _buildNoConversationsMessage();
+      : _buildEmptyListArea();
 
   Widget _buildConversationList() {
     return new ListView(
@@ -102,36 +110,44 @@ class ChatConversationList extends StatelessWidget {
     );
   }
 
-  Widget _buildNoConversationsMessage() {
-    return new Center(
-      child: new Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          new Icon(
-            Icons.chat_bubble,
-            color: Colors.grey[300],
-            size: 140.0,
-          ),
-          new Container(height: 16.0),
-          new Text(
-            'No conversations yet',
-            style: new TextStyle(
-              fontSize: 16.0,
-              color: Colors.grey[500],
-              fontWeight: FontWeight.w700,
+  Widget _buildEmptyListArea() {
+    return shouldDisplaySpinner
+        ? new Center(
+            child: new SizedBox(
+              width: _kSpinnerSize,
+              height: _kSpinnerSize,
+              child: new FuchsiaSpinner(),
             ),
-          ),
-          new Text(
-            'Start a chat and it will show up here',
-            style: new TextStyle(
-              fontSize: 16.0,
-              color: Colors.grey[500],
-              height: 2.0,
+          )
+        : new Center(
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new Icon(
+                  Icons.chat_bubble,
+                  color: Colors.grey[300],
+                  size: 140.0,
+                ),
+                new Container(height: 16.0),
+                new Text(
+                  'No conversations yet',
+                  style: new TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                new Text(
+                  'Start a chat and it will show up here',
+                  style: new TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.grey[500],
+                    height: 2.0,
+                  ),
+                ),
+                new Container(height: 48.0),
+              ],
             ),
-          ),
-          new Container(height: 48.0),
-        ],
-      ),
-    );
+          );
   }
 }

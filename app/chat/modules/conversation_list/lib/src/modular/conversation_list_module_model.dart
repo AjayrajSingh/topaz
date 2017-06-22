@@ -51,6 +51,16 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   List<Conversation> _conversations;
 
+  /// Indicates whether the spinner UI should be shown.
+  bool get shouldDisplaySpinner => _isDownloading || _isFetching;
+
+  /// Indicates whether Ledger is currently downloading the conversations page
+  /// data from the cloud.
+  bool _isDownloading = false;
+
+  /// Indicates whether the data is being fetched from the local Ledger.
+  bool _isFetching = true;
+
   /// Gets the [ChatContentProvider] service provided by the agent.
   chat_fidl.ChatContentProvider get chatContentProvider => _chatContentProvider;
 
@@ -126,7 +136,7 @@ class ChatConversationListModuleModel extends ModuleModel {
     _messageQueue.getToken((String token) => _mqTokenCompleter.complete(token));
     _messageQueueReceiver = new MessageReceiverImpl(
       messageQueue: _messageQueue,
-      onReceiveMessage: _handleNewConversation,
+      onReceiveMessage: _handleConversationListEvent,
     );
 
     // Close all the unnecessary bindings.
@@ -160,62 +170,110 @@ class ChatConversationListModuleModel extends ModuleModel {
   Future<Null> _fetchConversations() async {
     log.fine('_fetchConversations call.');
 
-    String messageQueueToken = await _mqTokenCompleter.future;
-    chatContentProvider.getConversations(
-      messageQueueToken,
-      (
-        chat_fidl.ChatStatus status,
-        List<chat_fidl.Conversation> conversations,
-      ) {
-        log.fine('getConversations callback.');
+    try {
+      _isFetching = true;
 
-        // TODO(youngseokyoon): properly communicate the error status to the
-        // user. (https://fuchsia.atlassian.net/browse/SO-365)
-        if (status != chat_fidl.ChatStatus.ok) {
-          log.severe(
-              'ChatContentProvider::GetConversations() returned an error '
-              'status: $status');
-          _conversations = null;
-          notifyListeners();
-        }
+      String messageQueueToken = await _mqTokenCompleter.future;
+      Completer<chat_fidl.ChatStatus> statusCompleter =
+          new Completer<chat_fidl.ChatStatus>();
+      List<chat_fidl.Conversation> conversations;
+      chatContentProvider.getConversations(
+        messageQueueToken,
+        (
+          chat_fidl.ChatStatus s,
+          List<chat_fidl.Conversation> c,
+        ) {
+          log.fine('getConversations callback.');
+          statusCompleter.complete(s);
+          conversations = c;
+        },
+      );
 
-        _conversations = conversations == null
-            ? null
-            : conversations.map(_getConversationFromFidl).toList();
+      chat_fidl.ChatStatus status = await statusCompleter.future;
 
+      // TODO(youngseokyoon): properly communicate the error status to the
+      // user. (https://fuchsia.atlassian.net/browse/SO-365)
+      if (status != chat_fidl.ChatStatus.ok) {
+        log.severe('ChatContentProvider::GetConversations() returned an error '
+            'status: $status');
+        _conversations = null;
         notifyListeners();
-      },
-    );
+        return;
+      }
+
+      _conversations = conversations == null
+          ? null
+          : conversations.map(_getConversationFromFidl).toList();
+
+      notifyListeners();
+    } finally {
+      _isFetching = false;
+    }
   }
 
-  /// Handles the new message passed via the [MessageQueue].
+  /// Handles the conversation list level event passed via the [MessageQueue].
   ///
   /// Refer to the `chat_content_provider.fidl` file for the expected message
   /// format coming from the content provider.
-  void _handleNewConversation(String message, void ack()) {
+  void _handleConversationListEvent(String message, void ack()) {
     log.fine('handleNewConversation call with message: $message');
     try {
       ack();
 
       Map<String, dynamic> decoded = JSON.decode(message);
-      List<int> conversationId = decoded['conversation_id'];
-      List<String> participants = decoded['participants'];
+      String event = decoded['event'];
+      switch (event) {
+        case 'new_conversation':
+          List<int> conversationId = decoded['conversation_id'];
+          List<String> participants = decoded['participants'];
 
-      _conversations.add(new Conversation(
-        conversationId: conversationId,
-        participants: participants.map(_getUserFromEmail).toList(),
-      ));
+          _conversations.add(new Conversation(
+            conversationId: conversationId,
+            participants: participants.map(_getUserFromEmail).toList(),
+          ));
 
-      // If this conversation happens to be the last created conversation from
-      // the current user, select it immediately. If not, just notify that there
-      // is a new conversation added.
-      if (_intListEquality.equals(_lastCreatedConversationId, conversationId)) {
-        _lastCreatedConversationId = null;
-        // No need to notify here, because setConversationId does it already.
-        setConversationId(conversationId);
-        focusConversation();
-      } else {
-        notifyListeners();
+          // If this conversation happens to be the last created conversation
+          // from the current user, select it immediately. If not, just notify
+          // that there is a new conversation added.
+          if (_intListEquality.equals(
+              _lastCreatedConversationId, conversationId)) {
+            _lastCreatedConversationId = null;
+            // No need to notify here, because setConversationId does it.
+            setConversationId(conversationId);
+            focusConversation();
+          } else {
+            notifyListeners();
+          }
+          break;
+
+        case 'download_status':
+          String downloadStatus = decoded['status'];
+          log.info('Download status: $downloadStatus');
+          switch (downloadStatus) {
+            case 'idle':
+              _isDownloading = false;
+              break;
+
+            case 'pending':
+            case 'in_progress':
+              _isDownloading = true;
+              break;
+
+            case 'error':
+              _isDownloading = false;
+              log.severe('Ledger data download failed: $downloadStatus');
+              break;
+
+            default:
+              log.severe('Unknown download status: $downloadStatus');
+              break;
+          }
+          notifyListeners();
+          break;
+
+        default:
+          log.severe('Not a valid conversation list event: $event');
+          break;
       }
     } catch (e, stackTrace) {
       log.severe('Decoding error while processing the message', e, stackTrace);
