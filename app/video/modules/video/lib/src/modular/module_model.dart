@@ -127,7 +127,8 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       _controller.videoViewConnection;
 
   /// Returns list of active devices by name
-  UnmodifiableListView<String> get activeDevices => deviceNames;
+  List<String> get activeDevices =>
+      new UnmodifiableListView<String>(deviceNames);
 
   /// Returns display name for a given device
   String getDisplayName(String deviceName) {

@@ -93,7 +93,6 @@ class Scrubber extends StatelessWidget {
       height: 80.0,
       left: 0.0,
       top: 0.0,
-      bottom: 0.0,
       child: _buildTimestamp(model.progress, DisplayMode.localLarge),
     );
   }
@@ -103,7 +102,6 @@ class Scrubber extends StatelessWidget {
       height: 80.0,
       right: 0.0,
       top: 0.0,
-      bottom: 0.0,
       child: _buildTimestamp(model.duration, DisplayMode.localLarge),
     );
   }
