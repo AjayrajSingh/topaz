@@ -103,7 +103,6 @@ endif
 MINIMAL ?=
 ifeq ($(MINIMAL),1)
 	FSET_FLAGS += --modules modules
-	FGEN_FLAGS += --ignore-skia
 endif
 
 # Respect the fuchsia build variant if already set by fset command externally.
