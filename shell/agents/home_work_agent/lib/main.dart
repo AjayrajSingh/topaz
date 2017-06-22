@@ -32,6 +32,7 @@ const List<String> _kHomeProposals = const <String>[
 
 const String _kConfigFile =
     '/system/data/sysui/contextual_location_proposals.json';
+const String _kDataConfigFile = '/data/contextual_location_proposals.json';
 const String _kAskProposalsFile = '/system/data/sysui/ask_proposals.json';
 
 const String _kLocationHomeWorkTopic = '/location/home_work';
@@ -79,9 +80,26 @@ class HomeWorkAgent extends AgentImpl {
       new File(_kConfigFile).readAsStringSync(),
     );
 
-    proposals['unknown'].forEach((Map<String, String> proposal) {
-      _proposalPublisher.propose(_createProposal(proposal));
-    });
+    File dataProposalFile = new File(_kDataConfigFile);
+
+    final Map<String, List<Map<String, String>>> dataProposals =
+        dataProposalFile.existsSync()
+            ? convert.JSON.decode(
+                dataProposalFile.readAsStringSync(),
+              )
+            : <String, List<Map<String, String>>>{};
+
+    if (proposals.keys.contains('unknown')) {
+      proposals['unknown'].forEach((Map<String, String> proposal) {
+        _proposalPublisher.propose(_createProposal(proposal));
+      });
+    }
+
+    if (dataProposals.keys.contains('unknown')) {
+      dataProposals['unknown'].forEach((Map<String, String> proposal) {
+        _proposalPublisher.propose(_createProposal(proposal));
+      });
+    }
 
     _contextProvider.subscribe(
       new ContextQuery()..topics = <String>[_kLocationHomeWorkTopic],
@@ -103,9 +121,24 @@ class HomeWorkAgent extends AgentImpl {
                   ),
             );
 
+            dataProposals.values.forEach(
+              (List<Map<String, String>> proposalCategories) =>
+                  proposalCategories.forEach(
+                    (Map<String, String> proposal) =>
+                        _proposalPublisher.remove(proposal['id']),
+                  ),
+            );
+
             // Add proposals for this location.
             if (proposals.keys.contains(json['location'])) {
               proposals[json['location']]
+                  .forEach((Map<String, String> proposal) {
+                _proposalPublisher.propose(_createProposal(proposal));
+              });
+            }
+
+            if (dataProposals.keys.contains(json['location'])) {
+              dataProposals[json['location']]
                   .forEach((Map<String, String> proposal) {
                 _proposalPublisher.propose(_createProposal(proposal));
               });
