@@ -827,7 +827,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       await _ledgerReady.future;
 
       Conversation cachedConversation =
-          await _getConversation(conversation.conversationId);
+          _conversationCache[conversation.conversationId];
 
       PageProxy conversationPage = new PageProxy();
       try {
