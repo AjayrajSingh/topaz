@@ -123,9 +123,9 @@ class Surface extends Model {
   }
 
   /// Dismiss this node hiding it from layouts
-  bool dismiss() {
-    return _graph.dismissSurface(_node.value);
-  }
+  bool dismiss() => _graph.dismissSurface(_node.value);
+
+  bool canDismiss() => _graph.canDismissSurface(_node.value);
 
   /// Remove this node from graph
   /// Returns true if this was removed
@@ -253,14 +253,18 @@ class SurfaceGraph extends Model {
   }
 
   /// When called surface is no longer displayed
-  bool dismissSurface(String id) {
-    List<String> backup = new List<String>.from(_focusedSurfaces);
+  bool canDismissSurface(String id) {
     // TODO(djmurphy) add Dependency consequences
-    _focusedSurfaces.removeWhere((String fid) => fid == id);
-    if (_focusedSurfaces.isEmpty) {
-      _focusedSurfaces.addAll(backup);
+    return _focusedSurfaces.where((String fid) => fid != id).isNotEmpty;
+  }
+
+  /// When called surface is no longer displayed
+  bool dismissSurface(String id) {
+    if (!canDismissSurface(id)) {
       return false;
     }
+    // TODO(djmurphy) add Dependency consequences
+    _focusedSurfaces.removeWhere((String fid) => fid == id);
     _dismissedSurfaces.add(id);
     notifyListeners();
     return true;

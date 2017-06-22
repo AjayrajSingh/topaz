@@ -85,6 +85,12 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
         onDragEnd: (SimulatedDragEndDetails details) {
           _endDrag(surface, rect, details);
         },
+        dragOffsetTransform: surface.canDismiss()
+            ? null
+            : (Offset currentOffset, DragUpdateDetails details) {
+                double scale = max(1.0, currentOffset.distanceSquared / 100.0);
+                return details.delta / scale;
+              },
       );
 
   // A surface that cannot be manipulated or interacted with by the user
