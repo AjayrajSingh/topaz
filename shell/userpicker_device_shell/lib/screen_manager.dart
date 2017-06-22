@@ -184,9 +184,6 @@ class _ScreenManagerState extends State<ScreenManager>
     );
     model.userProvider?.addUser(
       IdentityProvider.google,
-      'obsolete',
-      null,
-      'obsolete',
       (Account account, String errorCode) {
         if (errorCode == null) {
           _login(account.id, model.userProvider);
