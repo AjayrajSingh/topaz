@@ -13,8 +13,8 @@ import 'model.dart';
 import 'surface_widget.dart';
 import 'tree.dart';
 
-const double _kMinScreenWidth = 250.0;
-const double _kMinScreenRatio = 1.0 / 4.0;
+const double _kMinScreenWidth = 200.0;
+const double _kMinScreenRatio = 1.0 / 5.0;
 
 void _log(String msg) {
   print('[MondrianFlutter] $msg');
