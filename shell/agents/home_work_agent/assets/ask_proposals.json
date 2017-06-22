@@ -76,5 +76,12 @@
     "subheadline": "Launch now",
     "icon_url": "/system/data/sysui/ic_stat_3_googblue_2x_web_24dp.png",
     "module_url": "infinite_scroller"
+  },
+  {
+    "id": "ask_12",
+    "headline": "Email",
+    "subheadline": "Read now",
+    "icon_url": "/system/data/sysui/docs.png",
+    "module_url": "email/nav"
   }
 ]
