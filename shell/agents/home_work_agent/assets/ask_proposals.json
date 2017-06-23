@@ -3,6 +3,7 @@
     "id": "ask_01",
     "headline": "Read NatureSense's June Newsletter",
     "subheadline": "Read now",
+    "color": "0xFF64944E",
     "image_url": "/system/data/sysui/panda.png.jpg",
     "module_url": "image",
     "module_data": "{\"image_url\":\"/system/data/sysui/story_natureSense.png\"}"
@@ -10,6 +11,7 @@
   {
     "id": "ask_02",
     "headline": "Review your saved recipe",
+    "color": "0xFF880E4F",
     "image_url": "/system/data/sysui/pavlova.jpg",
     "module_url": "image",
     "module_data": "{\"image_url\":\"/system/data/sysui/story_topcook.png\"}"
@@ -18,6 +20,7 @@
     "id": "ask_03",
     "headline": "Shamra release new album",
     "subheadline": "Read more",
+    "color": "0xFF423227",
     "image_url": "/system/data/sysui/shamra.jpg",
     "module_url": "image",
     "module_data": "{\"image_url\":\"/system/data/sysui/story_hype.png\"}"
@@ -25,6 +28,7 @@
   {
     "id": "ask_04",
     "headline": "Read about Google I/O 2017",
+    "color": "0xFF4285F4",
     "icon_url": "/system/data/sysui/slides.png",
     "module_url": "image",
     "module_data": "{\"image_url\":\"/system/data/sysui/story_googleIO.png\"}"
@@ -33,6 +37,7 @@
     "id": "ask_05",
     "headline": "Miguel added 5 photos to Flux Memories",
     "subheadline": "View photos",
+    "color": "0xFF4285F4",
     "icon_url": "/system/data/sysui/google_photos.png",
     "module_url": "image",
     "module_data": "{\"image_url\":\"/system/data/sysui/story_fluxMemories.png\"}"
@@ -41,6 +46,7 @@
     "id": "ask_06",
     "headline": "Listen to Portugal the Man",
     "subheadline": "Play now",
+    "color": "0xFF3E2723",
     "image_url": "/system/data/sysui/1-portugal-the-man.jpeg",
     "module_url": "music_artist",
     "module_data": "{\"view\":\"spotify://artist/4kI8Ie27vjvonwaB2ePh8T\"}"
@@ -48,25 +54,29 @@
   {
     "id": "ask_07",
     "headline": "Reply to Danielle",
+    "color": "0xFF9C26B0",
     "image_url": "/system/data/sysui/danielle_cc0.jpg",
     "type": "person",
     "module_url": "chat_conversation_list"
   },
   {
     "id": "ask_08",
-    "headline": "Play video",
+    "headline": "Watch Istanbul Travel Video",
+    "color": "0xFF424242",
     "module_url": "video/video"
   },
   {
     "id": "ask_09",
     "headline": "Nonch Harpin' Live in Concert",
     "subheadline": "Watch performance",
+    "color": "0xFFC62828",
     "image_url": "/system/data/sysui/9-nonch-harpin.png",
     "module_url": "youtube_story"
   },
   {
     "id": "ask_10",
     "headline": "View hotel confirmation",
+    "color": "0xFFE64A19",
     "image_url": "/system/data/sysui/9-hotel.jpg",
     "module_url": "concert_event_list"
   },

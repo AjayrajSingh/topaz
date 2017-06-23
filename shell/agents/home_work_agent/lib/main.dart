@@ -18,18 +18,6 @@ import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:lib.modular/modular.dart';
 import 'package:meta/meta.dart';
 
-const List<String> _kWorkProposals = const <String>[
-  'Work Suggestion 1',
-  'Work Suggestion 2',
-  'Work Suggestion 3',
-];
-
-const List<String> _kHomeProposals = const <String>[
-  'Home Suggestion 1',
-  'Home Suggestion 2',
-  'Home Suggestion 3',
-];
-
 const String _kConfigFile =
     '/system/data/sysui/contextual_location_proposals.json';
 const String _kDataConfigFile = '/data/contextual_location_proposals.json';
@@ -233,7 +221,9 @@ Proposal _createProposal(Map<String, String> proposal) => new Proposal()
     ..headline = proposal['headline'] ?? ''
     ..subheadline = proposal['subheadline'] ?? ''
     ..details = ''
-    ..color = 0xFFFF0080
+    ..color = (proposal['color'] != null && proposal['color'].isNotEmpty)
+        ? int.parse(proposal['color'], onError: (_) => 0xFFFF0080)
+        : 0xFFFF0080
     ..iconUrls = proposal['icon_url'] != null
         ? <String>[proposal['icon_url']]
         : const <String>[]
