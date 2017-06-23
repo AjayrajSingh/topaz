@@ -56,7 +56,7 @@ class NowModel extends Model {
                         ? null
                         : contextModel.userImageUrl.startsWith('http')
                             ? new Image.network(
-                                contextModel.userImageUrl,
+                                _getImageUrl(contextModel.userImageUrl),
                                 fit: BoxFit.cover,
                               )
                             : new Image.asset(
@@ -66,6 +66,21 @@ class NowModel extends Model {
                     name: contextModel.userName,
                   ),
       );
+
+  String _getImageUrl(String userImageUrl) {
+    if (userImageUrl == null) {
+      return null;
+    }
+    Uri uri = Uri.parse(userImageUrl);
+    if (uri.queryParameters['sz'] != null) {
+      Map<String, dynamic> queryParameters = new Map<String, dynamic>.from(
+        uri.queryParameters,
+      );
+      queryParameters['sz'] = '112';
+      uri = uri.replace(queryParameters: queryParameters);
+    }
+    return uri.toString();
+  }
 
   /// Returns a verbose representation of the user's current context.
   Widget userContextMaximized({double opacity: 1.0}) => new Opacity(

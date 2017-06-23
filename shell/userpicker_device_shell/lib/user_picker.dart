@@ -50,7 +50,7 @@ class UserPicker extends StatelessWidget {
   Widget _buildUserCard({Account account, VoidCallback onTap}) => new Material(
         color: Colors.black.withAlpha(0),
         child: new InkWell(
-          highlightColor: _kFuchsiaColor.withAlpha(200),
+          highlightColor: Colors.transparent,
           onTap: () => onTap(),
           borderRadius: new BorderRadius.all(new Radius.circular(8.0)),
           child: new Container(
@@ -69,7 +69,7 @@ class UserPicker extends StatelessWidget {
                   ),
                   child: new Alphatar.fromNameAndUrl(
                     name: account.displayName,
-                    avatarUrl: account.imageUrl,
+                    avatarUrl: _getImageUrl(account),
                     size: 80.0,
                   ),
                 ),
@@ -93,6 +93,21 @@ class UserPicker extends StatelessWidget {
           ),
         ),
       );
+
+  String _getImageUrl(Account account) {
+    if (account.imageUrl == null) {
+      return null;
+    }
+    Uri uri = Uri.parse(account.imageUrl);
+    if (uri.queryParameters['sz'] != null) {
+      Map<String, dynamic> queryParameters = new Map<String, dynamic>.from(
+        uri.queryParameters,
+      );
+      queryParameters['sz'] = '160';
+      uri = uri.replace(queryParameters: queryParameters);
+    }
+    return uri.toString();
+  }
 
   Widget _buildUserEntry({
     Account account,
@@ -141,6 +156,7 @@ class UserPicker extends StatelessWidget {
       height: _kUserCardHeight,
       child: new ListView(
         scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
         children: children,
       ),
