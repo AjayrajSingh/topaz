@@ -8,6 +8,9 @@ import 'package:lib.widgets/modular.dart';
 
 import 'module_model.dart';
 
+/// Mininum Width in order to show rleated videos
+const double _kRelatedVideosThreshold = 700.0;
+
 /// The top level widget for the youtube_story module.
 class YoutubeStoryScreen extends StatelessWidget {
   /// Creates a new instance of [YoutubeStoryScreen].
@@ -32,7 +35,7 @@ class YoutubeStoryScreen extends StatelessWidget {
                         : new CircularProgressIndicator(),
                   ),
                 ];
-                if (constraints.maxWidth >= 500.0) {
+                if (constraints.maxWidth >= _kRelatedVideosThreshold) {
                   children.add(new Expanded(
                     flex: 2,
                     child: model.relatedVideoConn != null
