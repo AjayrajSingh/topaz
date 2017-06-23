@@ -11,6 +11,11 @@ import 'message_input.dart';
 
 /// UI Widget that represents a single chat thread
 class ChatConversation extends StatefulWidget {
+  /// Indicates whether this conversation is interactive.
+  ///
+  /// If false, the message input will be inactive.
+  final bool enabled;
+
   /// List of [Section]s to render
   final List<Section> sections;
 
@@ -31,6 +36,7 @@ class ChatConversation extends StatefulWidget {
   /// Constructor
   ChatConversation({
     Key key,
+    this.enabled: true,
     @required this.sections,
     this.title,
     this.onSubmitMessage,
@@ -38,6 +44,7 @@ class ChatConversation extends StatefulWidget {
     this.scrollController,
   })
       : super(key: key) {
+    assert(this.enabled != null);
     assert(this.sections != null);
   }
 
@@ -67,7 +74,9 @@ class _ChatConversationState extends State<ChatConversation> {
           ),
           child: new Text(
             widget.title ?? '(No Conversation Selected)',
-            style: theme.textTheme.title,
+            style: widget.enabled
+                ? theme.textTheme.title
+                : theme.textTheme.title.copyWith(color: Colors.grey[500]),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -92,6 +101,7 @@ class _ChatConversationState extends State<ChatConversation> {
           ),
         ),
         new MessageInput(
+          enabled: widget.enabled,
           onSubmitMessage: widget.onSubmitMessage,
           onTapSharePhoto: widget.onTapSharePhoto,
         ),

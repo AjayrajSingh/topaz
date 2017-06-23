@@ -43,8 +43,10 @@ class ChatConversationListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
     return new Material(
-      color: selected ? kSelectedBgColor : Colors.white,
+      color: selected ? kSelectedBgColor : theme.canvasColor,
       child: new ListTile(
         leading: new ChatGroupAvatar(
           users: conversation.participants,

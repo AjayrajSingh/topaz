@@ -8,6 +8,9 @@ const double _kPaddingValue = 16.0;
 
 /// UI Widget for message text input
 class MessageInput extends StatefulWidget {
+  /// Indicates whether this message input is interactive.
+  final bool enabled;
+
   /// Callback for when a new message is submitted
   final ValueChanged<String> onSubmitMessage;
 
@@ -17,10 +20,13 @@ class MessageInput extends StatefulWidget {
   /// Constructor
   MessageInput({
     Key key,
+    this.enabled: true,
     this.onSubmitMessage,
     this.onTapSharePhoto,
   })
-      : super(key: key);
+      : super(key: key) {
+    assert(this.enabled != null);
+  }
 
   @override
   _MessageInputState createState() => new _MessageInputState();
@@ -28,6 +34,8 @@ class MessageInput extends StatefulWidget {
 
 class _MessageInputState extends State<MessageInput> {
   final TextEditingController _controller = new TextEditingController();
+
+  bool get _sendButtonEnabled => widget.enabled && _controller.text.isNotEmpty;
 
   void _handleSubmit() {
     if (_controller.text.isNotEmpty) {
@@ -41,12 +49,12 @@ class _MessageInputState extends State<MessageInput> {
     VoidCallback onPressed,
   }) {
     return new InkWell(
-      onTap: onPressed,
+      onTap: widget.enabled ? onPressed : null,
       child: new Container(
         padding: const EdgeInsets.all(_kPaddingValue),
         child: new Icon(
           icon,
-          color: Colors.grey[700],
+          color: widget.enabled ? Colors.grey[700] : Colors.grey[300],
         ),
       ),
     );
@@ -59,20 +67,18 @@ class _MessageInputState extends State<MessageInput> {
         animation: _controller,
         builder: (BuildContext context, Widget child) {
           return new Material(
-            color: _controller.text.isEmpty ? Colors.grey[300] : primaryColor,
+            color: _sendButtonEnabled ? primaryColor : Colors.grey[300],
             type: MaterialType.circle,
-            elevation: _controller.text.isEmpty ? 2.0 : 4.0,
+            elevation: _sendButtonEnabled ? 4.0 : 2.0,
             child: new Container(
               width: 40.0,
               height: 40.0,
               child: new InkWell(
-                onTap: _controller.text.isEmpty ? null : _handleSubmit,
+                onTap: _sendButtonEnabled ? _handleSubmit : null,
                 child: new Center(
                   child: new Icon(
                     Icons.send,
-                    color: _controller.text.isEmpty
-                        ? Colors.grey[500]
-                        : Colors.white,
+                    color: _sendButtonEnabled ? Colors.white : Colors.grey[700],
                     size: 16.0,
                   ),
                 ),
@@ -100,18 +106,20 @@ class _MessageInputState extends State<MessageInput> {
         child: new Row(
           children: <Widget>[
             buildAttachmentButton(
-              icon: Icons.photo,
+              icon: Icons.photo_library,
               onPressed: () => widget.onTapSharePhoto?.call(),
             ),
             new Expanded(
-              child: new TextField(
-                maxLines: null,
-                controller: _controller,
-                onSubmitted: (_) => _handleSubmit(),
-                decoration: const InputDecoration.collapsed(
-                  hintText: 'Type a message',
-                ),
-              ),
+              child: widget.enabled
+                  ? new TextField(
+                      maxLines: null,
+                      controller: _controller,
+                      onSubmitted: (_) => _handleSubmit(),
+                      decoration: const InputDecoration.collapsed(
+                        hintText: 'Type a message',
+                      ),
+                    )
+                  : new Container(),
             ),
             buildSendButton(theme.primaryColor),
           ],
