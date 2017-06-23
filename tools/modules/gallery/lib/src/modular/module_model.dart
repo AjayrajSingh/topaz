@@ -94,13 +94,18 @@ class GalleryModuleModel extends ModuleModel {
 
   @override
   void onNotify(String json) {
+    String oldQueryString = _queryString;
+
     dynamic decoded = JSON.decode(json);
     try {
       _queryString = decoded[_kContract][_kQueryKey];
     } catch (e) {
       log.fine('No image picker query key found in json.');
     }
-    notifyListeners();
+
+    if (oldQueryString != _queryString) {
+      notifyListeners();
+    }
   }
 
   @override

@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:search_api/search_api.dart';
 
@@ -19,6 +20,7 @@ const String _kNoImagesMessage = 'No images returned';
 const String _kLoadErrorMessage = 'Can\'t load images';
 const double _kOverlayHeight = 48.0;
 const double _kDefaultFontSize = 14.0;
+const double _kSpinnerSize = 48.0;
 
 /// Wrapper around a [ImageGrid] that uses Google Custom Search to populate
 /// images based on a given query.
@@ -242,9 +244,16 @@ class _ImagePickerState extends State<ImagePicker>
   void didUpdateWidget(ImagePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    String query = widget.initialQuery ?? '';
-    _controller.text = query;
-    _search(query, widget.initialSelection);
+    String oldQuery = _controller.text;
+    String newQuery = widget.initialQuery ?? '';
+    if (oldQuery != newQuery) {
+      _controller.text = newQuery;
+      _controller.selection = new TextSelection.collapsed(
+        offset: newQuery.length,
+      );
+      _search(newQuery, widget.initialSelection);
+    }
+
     _updateSelection(widget.initialSelection);
   }
 
@@ -258,7 +267,6 @@ class _ImagePickerState extends State<ImagePicker>
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
     Widget searchInput = new Container(
       decoration: new BoxDecoration(
         border: new Border(
@@ -304,9 +312,10 @@ class _ImagePickerState extends State<ImagePicker>
         child: new Material(
           color: Colors.white.withAlpha(100),
           child: new Center(
-            child: new CircularProgressIndicator(
-              value: null,
-              valueColor: new AlwaysStoppedAnimation<Color>(theme.primaryColor),
+            child: new SizedBox(
+              width: _kSpinnerSize,
+              height: _kSpinnerSize,
+              child: new FuchsiaSpinner(),
             ),
           ),
         ),
@@ -369,7 +378,10 @@ class _ImagePickerState extends State<ImagePicker>
               new IconButton(
                 icon: new Icon(Icons.clear),
                 color: Colors.grey[900],
-                onPressed: _clearSelection,
+                onPressed: () {
+                  _clearSelection();
+                  widget.onSelectionChanged?.call(_selectedImages);
+                },
               ),
             ],
           ),
