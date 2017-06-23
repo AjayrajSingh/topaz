@@ -19,9 +19,6 @@ class GalleryScreen extends StatelessWidget {
     return new MaterialApp(
       theme: new ThemeData(
         primarySwatch: Colors.blue,
-        // TODO(youngseokyoon): remove this color setting later
-        // https://fuchsia.atlassian.net/browse/SO-502
-        canvasColor: Colors.white,
       ),
       home: new Material(
         child: new ScopedModelDescendant<GalleryModuleModel>(
