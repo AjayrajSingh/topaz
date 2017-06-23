@@ -113,7 +113,10 @@ class _YoutubeRelatedVideosState extends State<YoutubeRelatedVideos> {
               new Container(
                 width: 200.0,
                 height: 110.0,
-                child: new YoutubeThumbnail(videoId: videoData.id),
+                child: new YoutubeThumbnail(
+                  videoId: videoData.id,
+                  onSelect: (_) => widget.onSelectVideo?.call(videoData.id),
+                ),
               ),
               new Expanded(
                 flex: 1,
