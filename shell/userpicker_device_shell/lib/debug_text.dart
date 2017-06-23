@@ -10,6 +10,12 @@ import 'package:http/http.dart' as http;
 
 /// Displays debug text like hostname and ip addresses.
 class DebugText extends StatefulWidget {
+  /// Called when network information is shown.
+  final VoidCallback onShowNetwork;
+
+  /// Constructor.
+  DebugText({this.onShowNetwork});
+
   @override
   _DebugTextState createState() => new _DebugTextState();
 }
@@ -30,13 +36,14 @@ class _DebugTextState extends State<DebugText> {
           }),
     );
 
-    /// TODO(apwilson): Remove this delay when NET-77 is fixed.
+    /// TODO(apwilson): Remove this delay when NET-79 is fixed.
     new Timer(const Duration(seconds: 10), _checkNetworking);
 
     new Timer(
       const Duration(seconds: 11),
       () => setState(() {
             _showNetworkingInformation = true;
+            widget.onShowNetwork?.call();
           }),
     );
 
@@ -107,7 +114,7 @@ class _DebugTextState extends State<DebugText> {
     if (!_showNetworkingInformation) {
       columnChildren.add(
         new _DebugEntry(
-          text: 'Delaying network check due to NET-77...',
+          text: 'Delaying network check due to NET-79...',
           color: Colors.yellow,
         ),
       );

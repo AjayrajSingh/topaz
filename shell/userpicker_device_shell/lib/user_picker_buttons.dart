@@ -35,9 +35,12 @@ class UserPickerButtons extends StatelessWidget {
           Widget child,
           UserPickerDeviceShellModel model,
         ) =>
-            new Row(
-              mainAxisSize: MainAxisSize.min,
-              children: _buildRowChildren(model),
+            new Offstage(
+              offstage: !model.showingNetworkInfo,
+              child: new Row(
+                mainAxisSize: MainAxisSize.min,
+                children: _buildRowChildren(model),
+              ),
             ),
       );
 

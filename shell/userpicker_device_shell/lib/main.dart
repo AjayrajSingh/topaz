@@ -96,7 +96,7 @@ void main() {
           new OverlayEntry(
             builder: (_) => new Align(
                   alignment: FractionalOffset.topCenter,
-                  child: new DebugText(),
+                  child: new DebugText(onShowNetwork: model.onShowNetwork),
                 ),
           )
         ],

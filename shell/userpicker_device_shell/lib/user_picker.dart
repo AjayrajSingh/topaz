@@ -154,7 +154,7 @@ class UserPicker extends StatelessWidget {
         Widget child,
         UserPickerDeviceShellModel model,
       ) {
-        if (model.accounts != null && !loggingIn) {
+        if (model.accounts != null && !loggingIn && model.showingNetworkInfo) {
           return new Stack(
             fit: StackFit.passthrough,
             children: <Widget>[

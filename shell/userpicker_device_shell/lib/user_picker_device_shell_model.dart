@@ -13,6 +13,7 @@ export 'package:lib.widgets/model.dart'
 /// Contains all the relevant data for displaying the list of users and for
 /// logging in and creating new users.
 class UserPickerDeviceShellModel extends DeviceShellModel {
+  bool _showingNetworkInfo = false;
   List<Account> _accounts;
 
   /// The list of previously logged in accounts.
@@ -49,4 +50,13 @@ class UserPickerDeviceShellModel extends DeviceShellModel {
     notifyListeners();
     _loadUsers();
   }
+
+  /// Called when the network information starts showing.
+  void onShowNetwork() {
+    _showingNetworkInfo = true;
+    notifyListeners();
+  }
+
+  /// Returns true once network information starts showing.
+  bool get showingNetworkInfo => _showingNetworkInfo;
 }
