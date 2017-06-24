@@ -3,3 +3,6 @@
 # found in the LICENSE file.
 
 name: video
+flutter:
+  assets:
+    - assets/video-thumbnail.png

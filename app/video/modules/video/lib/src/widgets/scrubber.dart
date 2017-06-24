@@ -72,16 +72,12 @@ class Scrubber extends StatelessWidget {
   Widget _buildTimestamp(Duration timestamp, DisplayMode displayMode) {
     return new Center(
       child: new Container(
-        padding: new EdgeInsets.symmetric(
-            horizontal:
-                (displayMode == DisplayMode.remoteControl ? 3.0 : 24.0)),
+        padding: new EdgeInsets.symmetric(horizontal: 24.0),
         child: new Text(
           _convertDurationToString(timestamp),
           style: new TextStyle(
-            color: displayMode == DisplayMode.remoteControl
-                ? Colors.grey[50]
-                : Colors.grey[500],
-            fontSize: displayMode == DisplayMode.localSmall ? 14.0 : 20.0,
+            color: Colors.grey[50],
+            fontSize: displayMode == DisplayMode.localLarge ? 20.0 : 14.0,
           ),
         ),
       ),
@@ -109,29 +105,24 @@ class Scrubber extends StatelessWidget {
   Widget _buildScrubberMode(VideoModuleModel model) {
     switch (model.displayMode) {
       case DisplayMode.remoteControl:
-        return new Column(
-          children: <Widget>[
-            new Center(
-              child: new Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  _buildTimestamp(model.progress, DisplayMode.remoteControl),
-                  new Text(
-                    '/',
-                    style: new TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 14.0,
-                    ),
-                  ),
-                  _buildTimestamp(model.duration, DisplayMode.remoteControl),
-                ],
+        return new Container(
+          child: new Stack(
+            children: <Widget>[
+              new PlayControls(
+                primaryIconSize: 48.0,
+                secondaryIconSize: 48.0,
+                padding: 36.0,
               ),
-            ),
-            new Padding(
-              padding: new EdgeInsets.only(top: 40.0),
-              child: _buildProgressBar(model),
-            ),
-          ],
+              _buildProgress(model),
+              _buildDuration(model),
+              new Positioned(
+                left: 0.0,
+                right: 0.0,
+                top: 0.0,
+                child: _buildProgressBar(model),
+              ),
+            ],
+          ),
         );
       case DisplayMode.immersive:
         return new Row(

@@ -43,6 +43,7 @@ class Player extends StatelessWidget {
         return new RemoteControl(
           playLocal: model.playLocal,
           remoteDeviceName: model.remoteDeviceName,
+          asset: model.asset,
         );
       case DisplayMode.immersive:
         return new Column(

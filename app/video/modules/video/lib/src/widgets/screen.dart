@@ -13,7 +13,7 @@ import '../modular/module_model.dart';
 
 /// The video screen for the video player
 class Screen extends StatelessWidget {
-  final double _circleDiameter = 100.0;
+  final double _circleDiameter = 120.0;
 
   /// Constructor for the video screen for the video player
   Screen({

@@ -31,6 +31,12 @@ class Asset {
   /// Title of the asset. May be null.
   final String title;
 
+  /// Description of asset. May be null.
+  final String description;
+
+  /// Thumbnail image file path for asset. May be null.
+  final String image;
+
   /// Artist to which the asset is attributed. May be null.
   final String artist;
 
@@ -54,15 +60,21 @@ class Asset {
   /// Constructs an asset describing a movie.
   Asset.movie({
     @required this.uri,
-    this.title,
-    this.artist,
-    this.album,
+    @required this.title,
+    @required this.description,
+    @required this.image,
   })
       : type = AssetType.movie,
+        artist = null,
+        album = null,
         children = null,
         device = null,
         service = null,
-        position = null;
+        position = null {
+    assert(uri != null);
+    assert(title != null);
+    assert(description != null);
+  }
 
   /// Constructs an asset describing a song.
   Asset.song({
@@ -73,6 +85,8 @@ class Asset {
   })
       : type = AssetType.song,
         children = null,
+        description = null,
+        image = null,
         device = null,
         service = null,
         position = null;
@@ -84,6 +98,8 @@ class Asset {
   })
       : type = AssetType.playlist,
         uri = null,
+        description = null,
+        image = null,
         artist = null,
         album = null,
         device = null,
@@ -98,12 +114,22 @@ class Asset {
   Asset.remote({
     @required this.device,
     @required this.service,
-    this.position,
-    this.title,
-    this.uri,
+    @required this.position,
+    @required this.title,
+    @required this.description,
+    @required this.image,
+    @required this.uri,
   })
       : type = AssetType.remote,
         artist = null,
         album = null,
-        children = null;
+        children = null {
+    assert(device != null);
+    assert(service != null);
+    assert(position != null);
+    assert(title != null);
+    assert(description != null);
+    assert(image != null);
+    assert(uri != null);
+  }
 }

@@ -14,60 +14,67 @@ class RemoteControl extends StatelessWidget {
   /// Play video locally
   final VoidCallback playLocal;
 
-  /// Play video locally
+  /// Name of remote device currently playing the video
   final String remoteDeviceName;
+
+  /// Video asset
+  final Asset asset;
 
   /// Constructor for remote control mode for the video player
   RemoteControl({
     Key key,
     @required this.playLocal,
     @required this.remoteDeviceName,
+    @required this.asset,
   })
-      : super(key: key);
-
-  // TODO(maryxia) SO-520 add real thumbnail image
-  final Widget _thumbnail = new Align(
-    alignment: FractionalOffset.bottomCenter,
-    child: new Container(
-      color: Colors.pink,
-      height: 180.0,
-      width: 320.0,
-    ),
-  );
-
-  // TODO(maryxia) SO-520 add real video text
-  final Widget _videoText = new Center(
-    child: new Column(
-      children: <Widget>[
-        new Padding(
-          padding: new EdgeInsets.symmetric(vertical: 8.0),
-          child: new Text(
-            'Video name',
-            style: new TextStyle(
-              color: Colors.grey[50],
-              fontSize: 20.0,
-              letterSpacing: 0.02,
-            ),
-          ),
-        ),
-        new Padding(
-          padding: new EdgeInsets.only(bottom: 4.0),
-          child: new Text(
-            'Video description',
-            style: new TextStyle(
-              color: Colors.grey[500],
-              fontSize: 14.0,
-              letterSpacing: 0.02,
-            ),
-          ),
-        ),
-        new Scrubber(height: 2.0),
-      ],
-    ),
-  );
+      : super(key: key) {
+    assert(playLocal != null);
+    assert(remoteDeviceName != null);
+    assert(asset != null);
+  }
 
   @override
   Widget build(BuildContext context) {
+    Widget thumbnail = new Align(
+      alignment: FractionalOffset.bottomCenter,
+      child: new Container(
+        margin: new EdgeInsets.all(24.0),
+        width: 400.0,
+        child: new Image.asset(asset.image),
+      ),
+    );
+
+    Widget videoText = new Center(
+      child: new Column(
+        children: <Widget>[
+          new Padding(
+            padding: new EdgeInsets.symmetric(vertical: 8.0),
+            child: new Text(
+              asset.title,
+              style: new TextStyle(
+                color: Colors.grey[50],
+                fontSize: 28.0,
+                letterSpacing: 0.02,
+              ),
+            ),
+          ),
+          new Container(
+            width: 550.0,
+            padding: new EdgeInsets.only(bottom: 4.0),
+            child: new Text(
+              asset.description,
+              textAlign: TextAlign.center,
+              style: new TextStyle(
+                color: Colors.grey[500],
+                fontSize: 18.0,
+                letterSpacing: 0.02,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
     Widget uncastToast = new Positioned(
       top: 16.0,
       right: 16.0,
@@ -107,6 +114,7 @@ class RemoteControl extends StatelessWidget {
         ),
       ),
     );
+
     return new ScopedModelDescendant<VideoModuleModel>(builder: (
       BuildContext context,
       Widget child,
@@ -117,25 +125,21 @@ class RemoteControl extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           new Expanded(
-            flex: 5,
+            flex: 3,
             child: new Stack(
               children: <Widget>[
                 uncastToast,
-                _thumbnail,
+                thumbnail,
               ],
             ),
           ),
           new Expanded(
-            flex: 2,
-            child: _videoText,
+            flex: 1,
+            child: videoText,
           ),
           new Expanded(
             flex: 2,
-            child: new PlayControls(
-              primaryIconSize: 48.0,
-              secondaryIconSize: 48.0,
-              padding: 36.0,
-            ),
+            child: new Scrubber(height: 2.0),
           ),
         ],
       );

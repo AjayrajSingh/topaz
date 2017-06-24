@@ -9,6 +9,8 @@ flutter_app("video") {
 
   main_dart = "lib/main.dart"
 
+  manifest = "pubspec.yaml"
+
   deps = [
     "//application/lib/app/dart",
     "//apps/media/lib/flutter",

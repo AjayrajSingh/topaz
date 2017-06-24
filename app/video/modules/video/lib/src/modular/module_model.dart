@@ -41,11 +41,12 @@ enum DisplayMode {
 }
 
 final Asset _defaultAsset = new Asset.movie(
-  uri: Uri.parse('file:///data/Gravity_1080p_vp8.mkv'),
-  title: 'Gravity',
+  uri: Uri.parse('file:///system/data/modules/video.mp4'),
+  title: 'Discover Istanbul',
+  description:
+      "There's a reason why Istanbul, Turkey is the new dream travel destination. Take a trip with us and explore the top experiences in Istanbul.",
+  image: 'assets/video-thumbnail.png',
 );
-
-Asset _asset = _defaultAsset;
 
 /// The [ModuleModel] for the video player.
 class VideoModuleModel extends ModuleModel implements TickerProvider {
@@ -58,6 +59,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   bool _wasPlaying = false;
   final NetConnectorProxy _netConnector = new NetConnectorProxy();
   final DeviceMapProxy _deviceMap = new DeviceMapProxy();
+  Asset _asset = _defaultAsset;
 
   /// Last version we received from NetConnector
   int lastVersion = 0;
@@ -130,6 +132,9 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   List<String> get activeDevices =>
       new UnmodifiableListView<String>(deviceNames);
 
+  /// Current playing asset
+  Asset get asset => _asset;
+
   /// Returns display name for a given device
   String getDisplayName(String deviceName) {
     String displayName = deviceNameMapping[deviceName];
@@ -179,6 +184,8 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
           device: deviceName,
           uri: _asset.uri,
           title: _asset.title,
+          description: _asset.description,
+          image: _asset.image,
           position: _controller.progress);
 
       _remoteDeviceName = deviceName;
