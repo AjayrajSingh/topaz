@@ -61,8 +61,9 @@
   },
   {
     "id": "ask_08",
-    "headline": "Watch Istanbul Travel Video",
+    "headline": "Watch Discover Istanbul",
     "color": "0xFF424242",
+    "image_url": "/system/data/sysui/istanbul_240.jpg",
     "module_url": "video/video"
   },
   {
@@ -84,6 +85,7 @@
     "id": "ask_11",
     "headline": "Scroll through an infinite list",
     "subheadline": "Launch now",
+    "color": "0xFF5D4037",
     "icon_url": "/system/data/sysui/ic_stat_3_googblue_2x_web_24dp.png",
     "module_url": "infinite_scroller"
   },
@@ -91,6 +93,7 @@
     "id": "ask_12",
     "headline": "Email",
     "subheadline": "Read now",
+    "color": "0xFF4285F4",
     "icon_url": "/system/data/sysui/docs.png",
     "module_url": "email/nav"
   }
