@@ -40,6 +40,8 @@ enum DisplayMode {
   immersive,
 }
 
+const DisplayMode _defaultDisplayMode = DisplayMode.localLarge;
+
 final Asset _defaultAsset = new Asset.movie(
   uri: Uri.parse('file:///system/data/modules/video.mp4'),
   title: 'Discover Istanbul',
@@ -79,7 +81,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Returns whether this device's media player should be in immersive mode
   // TODO(maryxia) SO-529 figure out how device knows it's in immersive mode
-  DisplayMode displayMode = DisplayMode.localLarge;
+  DisplayMode displayMode = _defaultDisplayMode;
 
   /// Create a video module model using the appContext
   VideoModuleModel({
@@ -202,11 +204,15 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   void playLocal() {
     hideDeviceChooser = true;
     if (_asset.device != null) {
-      _asset = _defaultAsset;
+      pause();
+      Duration progress = _controller.progress;
       _controller.close();
+      _asset = _defaultAsset;
       _remoteDeviceName = null;
+      displayMode = _defaultDisplayMode;
       log.fine('Starting local play');
       _controller.open(_asset.uri, serviceName: _kServiceName);
+      _controller.seek(progress);
       play();
     }
   }

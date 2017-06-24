@@ -96,7 +96,7 @@ class RemoteControl extends StatelessWidget {
               new Padding(
                 padding: new EdgeInsets.symmetric(horizontal: 8.0),
                 child: new Text(
-                  remoteDeviceName,
+                  remoteDeviceName ?? '',
                   style: new TextStyle(
                     fontSize: 14.0,
                     color: Colors.grey[50],
