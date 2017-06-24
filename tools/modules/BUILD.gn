@@ -15,6 +15,7 @@ group("modules") {
     "map:map_component",
     "usps",
     "usps:usps_component",
+    "weather_forecast",
     "youtube_related_videos",
     "youtube_related_videos:youtube_related_videos_component",
     "youtube_story",

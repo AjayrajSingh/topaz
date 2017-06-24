@@ -1,0 +1,23 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//flutter/build/flutter_app.gni")
+
+flutter_app("weather_forecast") {
+  main_dart = "lib/main.dart"
+
+  source_dir = "lib"
+
+  deps = [
+    "//application/lib/app/dart",
+    "//apps/modules/common/packages/config",
+    "//apps/modules/common/packages/weather_api",
+    "//apps/modules/common/packages/widgets",
+    "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/logging:lib.logging",
+    "//lib/widgets/packages/widgets:lib.widgets",
+  ]
+
+  analysis_options = "//apps/modules/common/.analysis_options"
+}
