@@ -76,8 +76,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   /// App context passed in from starting the app
   final ApplicationContext appContext;
 
-  /// Whether or not the Device Chooser should be hidden
-  bool hideDeviceChooser = true;
+  bool _hideDeviceChooser = true;
 
   /// Returns whether this device's media player should be in immersive mode
   // TODO(maryxia) SO-529 figure out how device knows it's in immersive mode
@@ -102,6 +101,18 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
     connectToService(appContext.environmentServices, _netConnector.ctrl);
     connectToService(appContext.environmentServices, _deviceMap.ctrl);
+  }
+
+  /// Gets and sets whether or not the Device Chooser should be hidden.
+  ///
+  /// Notifies listeners when this value is changed.
+  bool get hideDeviceChooser => _hideDeviceChooser;
+  set hideDeviceChooser(bool hide) {
+    assert(hide != null);
+    if (_hideDeviceChooser != hide) {
+      _hideDeviceChooser = hide;
+      notifyListeners();
+    }
   }
 
   @override

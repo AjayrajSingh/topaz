@@ -12,17 +12,26 @@ import 'package:lib.widgets/widgets.dart';
 import '../modular/module_model.dart';
 
 /// The video screen for the video player
-class Screen extends StatelessWidget {
-  final double _circleDiameter = 120.0;
-
+class Screen extends StatefulWidget {
   /// Constructor for the video screen for the video player
-  Screen({
-    Key key,
-  })
-      : super(key: key);
+  Screen({Key key}) : super(key: key);
+
+  @override
+  _ScreenState createState() => new _ScreenState();
+}
+
+class _ScreenState extends State<Screen> {
+  static const double _kCircleDiameter = 120.0;
+
+  /// Local variable to save the state immediately before animating the screen
+  /// into thumbnail.
+  bool wasPlayingBefore = false;
 
   Rect _animateIntoThumbnail(VideoModuleModel model) {
-    model.pause();
+    wasPlayingBefore = model.playing;
+    if (wasPlayingBefore) {
+      model.pause();
+    }
     model.hideDeviceChooser = false;
     model.thumbnailAnimationController.forward();
     return new Rect.fromLTWH(0.0, 0.0, 0.0, 0.0);
@@ -31,7 +40,9 @@ class Screen extends StatelessWidget {
   void _animateIntoScreen(VideoModuleModel model) {
     model.hideDeviceChooser = true;
     model.thumbnailAnimationController.reverse();
-    model.play();
+    if (wasPlayingBefore) {
+      model.play();
+    }
   }
 
   Widget _buildScreen(VideoModuleModel model, BuildContext context) {
@@ -50,9 +61,9 @@ class Screen extends StatelessWidget {
             animation: model.thumbnailAnimationController,
             child: new ChildView(connection: model.videoViewConnection),
             builder: (BuildContext context, Widget child) {
-              double lerpWidth = lerpDouble(currentWidth, _circleDiameter,
+              double lerpWidth = lerpDouble(currentWidth, _kCircleDiameter,
                   model.thumbnailAnimation.value);
-              double lerpHeight = lerpDouble(currentHeight, _circleDiameter,
+              double lerpHeight = lerpDouble(currentHeight, _kCircleDiameter,
                   model.thumbnailAnimation.value);
               double leftOffset = (currentWidth - lerpWidth) / 2.0;
               double topOffset = (currentHeight - lerpHeight) / 2.0;
@@ -67,7 +78,7 @@ class Screen extends StatelessWidget {
                   child: new Container(
                     child: new ClipRRect(
                       borderRadius: new BorderRadius.circular(
-                        _circleDiameter * model.thumbnailAnimation.value,
+                        _kCircleDiameter * model.thumbnailAnimation.value,
                       ),
                       child: child,
                     ),
