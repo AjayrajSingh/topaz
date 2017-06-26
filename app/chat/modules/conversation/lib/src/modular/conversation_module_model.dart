@@ -445,17 +445,6 @@ class ChatConversationModuleModel extends ModuleModel {
     if (_currentChildModuleName == 'gallery') {
       _childModuleController.focus();
     } else {
-      // HACK: pre-populate the query term.
-      // TODO(youngseokyoon): remove this hard-coded value.
-      // https://fuchsia.atlassian.net/browse/SO-553
-      LinkProxy galleryLink = new LinkProxy();
-      moduleContext.getLink('gallery', galleryLink.ctrl.request());
-      galleryLink.set(
-        const <String>['image search', 'query'],
-        JSON.encode('sf pride parade'),
-      );
-      galleryLink.ctrl.close();
-
       ServiceProviderProxy incomingServices = new ServiceProviderProxy();
       _startChildModule(
         'gallery',
