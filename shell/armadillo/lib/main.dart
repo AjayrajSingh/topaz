@@ -14,6 +14,7 @@ import 'conductor.dart';
 import 'context_model.dart';
 import 'debug_enabler.dart';
 import 'debug_model.dart';
+import 'dummy_volume_model.dart';
 import 'json_story_generator.dart';
 import 'json_suggestion_model.dart';
 import 'now_model.dart';
@@ -24,6 +25,7 @@ import 'story_model.dart';
 import 'story_time_randomizer.dart';
 import 'story_rearrangement_scrim_model.dart';
 import 'suggestion_model.dart';
+import 'volume_model.dart';
 
 /// Set to true to enable the performance overlay.
 const bool _kShowPerformanceOverlay = false;
@@ -70,6 +72,8 @@ Future<Null> main() async {
         .onDragStateChanged(storyClusterDragStateModel.isDragging),
   );
 
+  VolumeModel volumeModel = new DummyVolumeModel();
+
   Widget app = _buildApp(
     suggestionModel: jsonSuggestionModel,
     storyModel: storyModel,
@@ -80,6 +84,7 @@ Future<Null> main() async {
     debugModel: debugModel,
     panelResizingModel: panelResizingModel,
     contextModel: contextModel,
+    volumeModel: volumeModel,
   );
 
   runApp(_kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app);
@@ -97,6 +102,7 @@ Widget _buildApp({
   DebugModel debugModel,
   PanelResizingModel panelResizingModel,
   ContextModel contextModel,
+  VolumeModel volumeModel,
 }) =>
     new CheckedModeBanner(
       child: new StoryTimeRandomizer(
@@ -107,6 +113,10 @@ Widget _buildApp({
             bundle: defaultBundle,
             child: new Armadillo(
               scopedModelBuilders: <WrapperBuilder>[
+                (_, Widget child) => new ScopedModel<VolumeModel>(
+                      model: volumeModel,
+                      child: child,
+                    ),
                 (_, Widget child) => new ScopedModel<ContextModel>(
                       model: contextModel,
                       child: child,

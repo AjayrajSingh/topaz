@@ -19,6 +19,7 @@ flutter_app("armadillo_user_shell") {
     "//application/lib/app/dart",
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/suggestion:suggestion_dart",
+    "//apps/media/lib/dart",
     "//apps/modular/services/user:user_dart",
     "//apps/modules/common/packages/util",
     "//apps/modules/common/packages/widgets",

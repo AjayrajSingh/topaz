@@ -13,6 +13,7 @@ import 'package:sysui_widgets/ticking_state.dart';
 
 import 'now.dart';
 import 'toggle_icon.dart';
+import 'volume_model.dart';
 
 // Width and height of the icons
 const double _kIconSize = 24.0;
@@ -200,7 +201,6 @@ class QuickSettings extends StatefulWidget {
 }
 
 class _QuickSettingsState extends State<QuickSettings> {
-  double _volumeSliderValue = 0.0;
   double _brightnessSliderValue = 0.0;
 
   final GlobalKey _kAirplaneModeToggle = new GlobalKey();
@@ -214,17 +214,22 @@ class _QuickSettingsState extends State<QuickSettings> {
     );
   }
 
-  Widget _volumeIconSlider() => new IconSlider(
-        value: _volumeSliderValue,
-        min: 0.0,
-        max: 100.0,
-        activeColor: _kActiveSliderColor,
-        thumbImage: new AssetImage(_kVolumeUpGrey600),
-        onChanged: (double value) {
-          setState(() {
-            _volumeSliderValue = value;
-          });
-        },
+  Widget _volumeIconSlider() => new ScopedModelDescendant<VolumeModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          VolumeModel model,
+        ) =>
+            new IconSlider(
+              value: model.level,
+              min: 0.0,
+              max: 1.0,
+              activeColor: _kActiveSliderColor,
+              thumbImage: new AssetImage(_kVolumeUpGrey600),
+              onChanged: (double value) {
+                model.level = value;
+              },
+            ),
       );
 
   Widget _brightnessIconSlider() => new IconSlider(

@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:application.lib.app.dart/app.dart';
+import 'package:apps.media.lib.dart/audio_policy.dart';
 import 'package:armadillo/armadillo.dart';
 import 'package:armadillo/armadillo_drag_target.dart';
 import 'package:armadillo/conductor.dart';
@@ -23,14 +24,17 @@ import 'package:armadillo/story_model.dart';
 import 'package:armadillo/story_rearrangement_scrim_model.dart';
 import 'package:armadillo/story_time_randomizer.dart';
 import 'package:armadillo/suggestion_model.dart';
+import 'package:armadillo/volume_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:sysui_widgets/default_bundle.dart';
 
 import 'armadillo_user_shell_model.dart';
+import 'audio_policy_volume_model.dart';
 import 'context_provider_context_model.dart';
 import 'focus_request_watcher_impl.dart';
 import 'hit_test_model.dart';
@@ -47,6 +51,8 @@ const bool _kShowPerformanceOverlay = false;
 const bool _kDumpAllErrors = false;
 
 Future<Null> main() async {
+  setupLogger(name: 'armadillo');
+
   if (_kDumpAllErrors) {
     FlutterError.onError =
         (FlutterErrorDetails details) => FlutterError.dumpErrorToConsole(
@@ -161,6 +167,11 @@ Future<Null> main() async {
 
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();
+  ApplicationContext applicationContext =
+      new ApplicationContext.fromStartupInfo();
+  VolumeModel volumeModel = new AudioPolicyVolumeModel(
+    audioPolicy: new AudioPolicy(applicationContext.environmentServices),
+  );
 
   Widget app = _buildApp(
     storyModel: storyModel,
@@ -168,6 +179,10 @@ Future<Null> main() async {
     debugModel: debugModel,
     armadillo: new Armadillo(
       scopedModelBuilders: <WrapperBuilder>[
+        (_, Widget child) => new ScopedModel<VolumeModel>(
+              model: volumeModel,
+              child: child,
+            ),
         (_, Widget child) => new ScopedModel<ContextModel>(
               model: contextProviderContextModel,
               child: child,
@@ -212,7 +227,7 @@ Future<Null> main() async {
 
   UserShellWidget<ArmadilloUserShellModel> userShellWidget =
       new UserShellWidget<ArmadilloUserShellModel>(
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    applicationContext: applicationContext,
     userShellModel: model,
     child:
         _kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app,
