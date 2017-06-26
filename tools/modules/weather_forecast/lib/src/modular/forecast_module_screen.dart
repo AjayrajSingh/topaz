@@ -26,8 +26,10 @@ class ForecastModuleScreen extends StatelessWidget {
       ) {
         switch (model.loadingStatus) {
           case LoadingStatus.completed:
-            return new ForecastCard(
-              forecast: model.forecast,
+            return new Center(
+              child: new ForecastCard(
+                forecast: model.forecast,
+              ),
             );
           case LoadingStatus.failed:
             return new Container(
