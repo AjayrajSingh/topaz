@@ -60,14 +60,6 @@
   ],
   "unknown" : [
     {
-      "id": "unknown_01",
-      "headline": "71F in San Francisco and sunny",
-      "subheadline": "It might get windy and colder later in the day",
-      "icon_url": "/system/data/sysui/logo_mostly_sunny_light_color_96dp.png",
-      "module_url": "weather_forecast",
-      "module_data": "{\"latitude\":37.7749,\"longitude\":-122.4194}"
-    },
-    {
       "id": "unknown_02",
       "headline": "Call Sophie back",
       "subheadline": "1 missed call 32 minutes ago",
