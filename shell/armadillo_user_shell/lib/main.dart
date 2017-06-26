@@ -313,9 +313,34 @@ Widget _buildDiscardDragTarget({
           ),
       builder: (_, Map<StoryClusterDragData, Offset> candidateData, __) =>
           new IgnorePointer(
-            child: new Container(
-              color: new Color(
-                candidateData.isEmpty ? 0x00FF0000 : 0x40FF0000,
+            child: new AnimatedOpacity(
+              opacity: candidateData.isEmpty ? 0.0 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              child: new Container(
+                color: Colors.black38,
+                child: new Center(
+                  child: new Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      new Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                        size: 24.0,
+                      ),
+                      new Container(height: 8.0),
+                      new Text(
+                        'REMOVE',
+                        style: new TextStyle(
+                          fontSize: 10.0,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 1.2,
+                          color: Colors.white,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
