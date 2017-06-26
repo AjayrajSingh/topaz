@@ -52,8 +52,8 @@ class ArtistBioModuleModel extends ModuleModel {
   @override
   void onNotify(String json) {
     final dynamic doc = JSON.decode(json);
-    if (doc is Map && doc['artistName'] is String) {
-      fetchArtist(doc['artistName']);
+    if (doc is Map && doc['name'] is String) {
+      fetchArtist(doc['name']);
     }
   }
 }

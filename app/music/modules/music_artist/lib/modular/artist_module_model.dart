@@ -8,8 +8,6 @@ import 'dart:convert';
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.maxwell.lib.dart/decomposition.dart';
-import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
-import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.agent.agent_controller/agent_controller.fidl.dart';
 import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
@@ -39,6 +37,8 @@ const String _kFocalEntitiesTopic = 'focal_entities';
 
 /// The Entity type for a music artist.
 const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
+
+const String _kArtistContextLinkName = 'artist_context';
 
 /// [ModuleModel] that manages the state of the Artist Module.
 class ArtistModuleModel extends ModuleModel {
@@ -81,6 +81,8 @@ class ArtistModuleModel extends ModuleModel {
       new AgentControllerProxy();
 
   final player_fidl.PlayerProxy _player = new player_fidl.PlayerProxy();
+
+  final LinkProxy _contextLink = new LinkProxy();
 
   /// Retrieves all the data necessary to render the artist module
   Future<Null> fetchArtist(String artistId) async {
@@ -145,6 +147,9 @@ class ArtistModuleModel extends ModuleModel {
 
     _startPlaybackModule();
 
+    // Setup the Context Link
+    moduleContext.getLink(_kArtistContextLinkName, _contextLink.ctrl.request());
+
     // Close all the unnecessary bindings.
     playerServices.ctrl.close();
     componentContext.ctrl.close();
@@ -179,30 +184,16 @@ class ArtistModuleModel extends ModuleModel {
     await fetchArtist(artistId);
 
     if (artist != null) {
-      // Publish artist data to Maxwell
-      ContextPublisherProxy publisher = new ContextPublisherProxy();
-      IntelligenceServicesProxy intelligenceServices =
-          new IntelligenceServicesProxy();
-      moduleContext
-          .getIntelligenceServices(intelligenceServices.ctrl.request());
-      intelligenceServices.getContextPublisher(publisher.ctrl.request());
-
-      publisher.publish(
-        _kFocalEntitiesTopic,
-        JSON.encode(
-          <String, String>{
-            '@type': _kMusicArtistType,
-            'name': artist.name,
-            'spotifyId': artist.id,
-          },
-        ),
-      );
-
-      // Close all ctrls, onNotify will not be called again for the music
-      // experience since a new module with a new link is launched for
-      // any new view
-      publisher.ctrl.close();
-      intelligenceServices.ctrl.close();
+      // Publish artist data as 'context link'
+      Map<String, dynamic> contextLinkData = <String, dynamic>{
+        '@context': <String, dynamic>{
+          'topic': _kFocalEntitiesTopic,
+        },
+        '@type': _kMusicArtistType,
+        'name': artist.name,
+        'spotifyId': artist.id,
+      };
+      _contextLink.set(null, JSON.encode(contextLinkData));
     }
   }
 

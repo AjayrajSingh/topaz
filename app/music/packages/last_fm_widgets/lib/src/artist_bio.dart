@@ -28,7 +28,7 @@ class ArtistBio extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         new Container(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(32.0),
           decoration: new BoxDecoration(
             color: Colors.black,
             image: new DecorationImage(
@@ -42,6 +42,7 @@ class ArtistBio extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               new Alphatar.withUrl(
+                size: 56.0,
                 avatarUrl: artist.imageUrl,
               ),
               new Container(
@@ -51,7 +52,7 @@ class ArtistBio extends StatelessWidget {
                   style: new TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w500,
-                    fontSize: 18.0,
+                    fontSize: 20.0,
                   ),
                 ),
               ),
@@ -60,24 +61,27 @@ class ArtistBio extends StatelessWidget {
         ),
         new Container(
           color: Colors.white,
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(32.0),
           child: new Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               new Container(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: const EdgeInsets.only(bottom: 16.0),
                 child: new Text(
                   'Biography',
                   style: new TextStyle(
-                    color: Colors.white,
                     fontWeight: FontWeight.w500,
-                    fontSize: 18.0,
+                    fontSize: 20.0,
                   ),
                 ),
               ),
               new Text(
                 artist.bio,
-                softWrap: false,
+                softWrap: true,
+                style: new TextStyle(
+                  height: 1.7,
+                ),
               ),
             ],
           ),

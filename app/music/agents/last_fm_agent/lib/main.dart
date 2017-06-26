@@ -10,6 +10,7 @@ import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
+import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:config/config.dart';
 import 'package:last_fm_api/api.dart';
 import 'package:last_fm_models/last_fm_models.dart';
@@ -22,8 +23,7 @@ import 'package:meta/meta.dart';
 /// Spotify recognizes
 
 /// The context topic for "focal entities" for the current story.
-const String _kCurrentFocalEntitiesTopic =
-    '/story/focused/explicit/focal_entities';
+const String _kCurrentFocalEntitiesTopic = 'focal_entities';
 
 /// The Entity type for a music artist.
 const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
@@ -60,33 +60,25 @@ class ContextListenerImpl extends ContextListener {
       return;
     }
 
-    List<dynamic> data =
-        JSON.decode(result.values[_kCurrentFocalEntitiesTopic]);
-    for (dynamic entity in data) {
+    dynamic data = JSON.decode(result.values[_kCurrentFocalEntitiesTopic]);
+
+    if (_isValidArtistContextLink(data)) {
+      log.fine('artist update: ${data['name']}');
       try {
-        if (!(entity is Map<String, dynamic>)) continue;
-        if (entity.containsKey('@type') &&
-            entity['@type'] == _kMusicArtistType) {
-          log.fine('artist update: ${entity['name']}');
-          Artist artist = await _api.getArtist(entity['name']);
-          if (artist != null) {
-            log.fine('found artist for: ${entity['name']}');
-            _createProposal(artist);
-          } else {
-            log.fine('no artist found for: ${entity['name']}');
-          }
+        Artist artist = await _api.getArtist(data['name']);
+        if (artist != null) {
+          log.fine('found artist for: ${data['name']}');
+          _createProposal(artist, data);
+        } else {
+          log.fine('no artist found for: ${data['name']}');
         }
       } catch (_) {}
     }
   }
 
   /// Creates a proposal for the given Last FM artist
-  void _createProposal(Artist artist) {
+  void _createProposal(Artist artist, Map<String, dynamic> data) {
     String headline = 'Learn more about ${artist.name}';
-
-    final Map<String, String> data = <String, String>{
-      'artistName': artist.name,
-    };
 
     Proposal proposal = new Proposal()
       ..id = 'Last FM Artist bio: ${artist.mbid}'
@@ -101,13 +93,35 @@ class ContextListenerImpl extends ContextListener {
         ..annoyance = AnnoyanceType.none)
       ..onSelected = <Action>[
         new Action()
-          ..createStory = (new CreateStory()
-            ..moduleId = 'file:///system/apps/last_fm_artist_bio'
-            ..initialData = JSON.encode(data))
+          ..addModuleToStory = (new AddModuleToStory()
+            ..linkName = data['@source']['link_name']
+            ..storyId = data['@source']['story_id']
+            ..moduleName = 'Last FM: ${data['name']}'
+            ..modulePath = data['@source']['module_path']
+            ..moduleUrl = 'file:///system/apps/last_fm_artist_bio'
+            ..surfaceRelation = (new SurfaceRelation()
+              ..arrangement = SurfaceArrangement.copresent
+              ..emphasis = 0.5
+              ..dependency = SurfaceDependency.dependent))
       ];
 
     log.fine('proposing artist bio suggestion');
     _proposalPublisher.propose(proposal);
+  }
+
+  /// A valid artist context link must satisfy the following criteria:
+  /// * @type must be 'http://types.fuchsia.io/music/artist'.
+  /// * Must have a @source field which contains the story ID, link name and
+  ///   module path.
+  /// * Must specify a name
+  bool _isValidArtistContextLink(Map<String, dynamic> data) {
+    return data['@type'] is String &&
+        data['@type'] == _kMusicArtistType &&
+        data['@source'] is Map<String, dynamic> &&
+        data['@source']['story_id'] is String &&
+        data['@source']['link_name'] is String &&
+        data['@source']['module_path'] is List<String> &&
+        data['name'] is String;
   }
 }
 
