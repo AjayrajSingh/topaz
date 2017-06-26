@@ -251,7 +251,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
 
         // Don't spam with the keep-alive event.
         if (eventType != 'keep-alive') {
-          log.fine('Event Received: ${eventType}');
+          log.fine('Event Received: $eventType');
           log.fine('Data: ${event.data}');
         }
 
@@ -277,7 +277,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
 
           default:
             log.warning('WARNING: Unknown event type from Firebase: '
-                '${eventType}');
+                '$eventType');
         }
       },
       onError: (dynamic e, StackTrace stackTrace) {
