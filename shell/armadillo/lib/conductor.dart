@@ -32,9 +32,6 @@ import 'suggestion_list.dart';
 import 'suggestion_model.dart';
 import 'vertical_shifter.dart';
 
-/// The height of [Now]'s bar when minimized.
-const double _kMinimizedNowHeight = 50.0;
-
 /// The height of [Now] when maximized.
 const double _kMaximizedNowHeight = 440.0;
 
@@ -174,6 +171,8 @@ class ConductorState extends State<Conductor> {
             constraints.maxWidth,
             constraints.maxHeight,
           );
+          double minimizedNowHeight =
+              constraints.maxHeight >= 640.0 ? 48.0 : 32.0;
 
           StoryModel storyModel = StoryModel.of(context);
 
@@ -194,7 +193,7 @@ class ConductorState extends State<Conductor> {
                       right: 0.0,
                       top: 0.0,
                       bottom: lerpDouble(
-                        _kMinimizedNowHeight,
+                        minimizedNowHeight,
                         0.0,
                         storyDragTransitionModel.progress,
                       ),
@@ -205,13 +204,14 @@ class ConductorState extends State<Conductor> {
                   constraints.maxWidth,
                   new Size(
                     fullSize.width,
-                    fullSize.height - _kMinimizedNowHeight,
+                    fullSize.height - minimizedNowHeight,
                   ),
+                  minimizedNowHeight,
                 ),
               ),
 
               // Now.
-              _getNow(storyModel, constraints.maxWidth),
+              _getNow(storyModel, constraints.maxWidth, minimizedNowHeight),
 
               // Suggestions Overlay.
               _getSuggestionOverlay(
@@ -237,15 +237,17 @@ class ConductorState extends State<Conductor> {
                           overlayHeight,
                           suggestionWidth,
                           suggestionHorizontalMargin,
+                          minimizedNowHeight,
                         ),
                       ],
                     ),
+                minimizedNowHeight,
               ),
 
               // Quick Settings Overlay.
               new QuickSettingsOverlay(
                 key: _quickSettingsOverlayKey,
-                minimizedNowBarHeight: _kMinimizedNowHeight,
+                minimizedNowBarHeight: minimizedNowHeight,
                 onProgressChanged: (double progress) {
                   if (progress == 0.0) {
                     widget.onQuickSettingsOverlayChanged?.call(false);
@@ -297,6 +299,7 @@ class ConductorState extends State<Conductor> {
     StoryModel storyModel,
     double maxWidth,
     Size parentSize,
+    double minimizedNowHeight,
   ) =>
       new VerticalShifter(
         key: _verticalShifterKey,
@@ -316,7 +319,7 @@ class ConductorState extends State<Conductor> {
                   bottomPadding: _kMaximizedNowHeight +
                       lerpDouble(
                         0.0,
-                        _kMinimizedNowHeight,
+                        minimizedNowHeight,
                         storyDragTransitionModel.progress,
                       ),
                   onScroll: (double scrollOffset) {
@@ -355,12 +358,16 @@ class ConductorState extends State<Conductor> {
 
   // We place Now in a RepaintBoundary as its animations
   // don't require its parent and siblings to redraw.
-  Widget _getNow(StoryModel storyModel, double parentWidth) =>
+  Widget _getNow(
+    StoryModel storyModel,
+    double parentWidth,
+    double minimizedNowHeight,
+  ) =>
       new RepaintBoundary(
         child: new Now(
           key: _nowKey,
           parentWidth: parentWidth,
-          minHeight: _kMinimizedNowHeight,
+          minHeight: minimizedNowHeight,
           maxHeight: _kMaximizedNowHeight,
           quickSettingsHeightBump: _kQuickSettingsHeightBump,
           onQuickSettingsProgressChange: (double quickSettingsProgress) =>
@@ -410,6 +417,7 @@ class ConductorState extends State<Conductor> {
       double suggestionWidth,
       double suggestionHorizontalMargin,
     ),
+    double minimizedNowHeight,
   ) {
     return new PeekingOverlay(
       key: _suggestionOverlayKey,
@@ -451,6 +459,7 @@ class ConductorState extends State<Conductor> {
               storyModel,
               suggestion,
               globalBounds,
+              minimizedNowHeight,
             ),
       ),
     );
@@ -461,6 +470,7 @@ class ConductorState extends State<Conductor> {
     StoryModel storyModel,
     Suggestion suggestion,
     Rect globalBounds,
+    double minimizedNowHeight,
   ) {
     suggestionModel.onSuggestionSelected(suggestion);
 
@@ -472,7 +482,7 @@ class ConductorState extends State<Conductor> {
             ? new ExpandSuggestion(
                 suggestion: suggestion,
                 suggestionInitialGlobalBounds: globalBounds,
-                bottomMargin: _kMinimizedNowHeight,
+                bottomMargin: minimizedNowHeight,
               )
             : new SplashSuggestion(
                 suggestion: suggestion,
@@ -496,6 +506,7 @@ class ConductorState extends State<Conductor> {
     double overlayHeight,
     double suggestionWidth,
     double suggestionHorizontalMargin,
+    double minimizedNowHeight,
   ) =>
       new InterruptionOverlay(
         key: widget.interruptionOverlayKey,
@@ -506,6 +517,7 @@ class ConductorState extends State<Conductor> {
               storyModel,
               suggestion,
               globalBounds,
+              minimizedNowHeight,
             ),
         suggestionWidth: suggestionWidth,
         suggestionHorizontalMargin: suggestionHorizontalMargin,

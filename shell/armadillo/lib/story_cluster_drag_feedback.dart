@@ -21,7 +21,7 @@ import 'story_list_layout.dart';
 import 'story_panels.dart';
 
 const double _kStoryBarMinimizedHeight = 4.0;
-const double _kStoryBarMaximizedHeight = 48.0;
+const double _kStoryBarMaximizedHeight = 32.0;
 const double _kUnfocusedCornerRadius = 4.0;
 const double _kFocusedCornerRadius = 8.0;
 
