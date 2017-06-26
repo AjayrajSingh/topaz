@@ -173,56 +173,55 @@ Future<Null> main() async {
     audioPolicy: new AudioPolicy(applicationContext.environmentServices),
   );
 
-  Widget app = _buildApp(
-    storyModel: storyModel,
-    storyProviderStoryGenerator: storyProviderStoryGenerator,
-    debugModel: debugModel,
-    armadillo: new Armadillo(
-      scopedModelBuilders: <WrapperBuilder>[
-        (_, Widget child) => new ScopedModel<VolumeModel>(
-              model: volumeModel,
-              child: child,
-            ),
-        (_, Widget child) => new ScopedModel<ContextModel>(
-              model: contextProviderContextModel,
-              child: child,
-            ),
-        (_, Widget child) => new ScopedModel<StoryModel>(
-              model: storyModel,
-              child: child,
-            ),
-        (_, Widget child) => new ScopedModel<SuggestionModel>(
-              model: suggestionProviderSuggestionModel,
-              child: child,
-            ),
-        (_, Widget child) => new ScopedModel<NowModel>(
-              model: nowModel,
-              child: child,
-            ),
-        (_, Widget child) => new ScopedModel<StoryClusterDragStateModel>(
-              model: storyClusterDragStateModel,
-              child: child,
-            ),
-        (_, Widget child) => new ScopedModel<StoryRearrangementScrimModel>(
-              model: storyRearrangementScrimModel,
-              child: child,
-            ),
-        (_, Widget child) => new ScopedModel<StoryDragTransitionModel>(
-              model: storyDragTransitionModel,
-              child: child,
-            ),
-        (_, Widget child) => new ScopedModel<DebugModel>(
-              model: debugModel,
-              child: child,
-            ),
-        (_, Widget child) => new ScopedModel<PanelResizingModel>(
-              model: panelResizingModel,
-              child: child,
-            ),
-      ],
-      conductor: conductor,
+  Widget app = new ScopedModel<StoryDragTransitionModel>(
+    model: storyDragTransitionModel,
+    child: _buildApp(
+      storyModel: storyModel,
+      storyProviderStoryGenerator: storyProviderStoryGenerator,
+      debugModel: debugModel,
+      armadillo: new Armadillo(
+        scopedModelBuilders: <WrapperBuilder>[
+          (_, Widget child) => new ScopedModel<VolumeModel>(
+                model: volumeModel,
+                child: child,
+              ),
+          (_, Widget child) => new ScopedModel<ContextModel>(
+                model: contextProviderContextModel,
+                child: child,
+              ),
+          (_, Widget child) => new ScopedModel<StoryModel>(
+                model: storyModel,
+                child: child,
+              ),
+          (_, Widget child) => new ScopedModel<SuggestionModel>(
+                model: suggestionProviderSuggestionModel,
+                child: child,
+              ),
+          (_, Widget child) => new ScopedModel<NowModel>(
+                model: nowModel,
+                child: child,
+              ),
+          (_, Widget child) => new ScopedModel<StoryClusterDragStateModel>(
+                model: storyClusterDragStateModel,
+                child: child,
+              ),
+          (_, Widget child) => new ScopedModel<StoryRearrangementScrimModel>(
+                model: storyRearrangementScrimModel,
+                child: child,
+              ),
+          (_, Widget child) => new ScopedModel<DebugModel>(
+                model: debugModel,
+                child: child,
+              ),
+          (_, Widget child) => new ScopedModel<PanelResizingModel>(
+                model: panelResizingModel,
+                child: child,
+              ),
+        ],
+        conductor: conductor,
+      ),
+      hitTestModel: hitTestModel,
     ),
-    hitTestModel: hitTestModel,
   );
 
   UserShellWidget<ArmadilloUserShellModel> userShellWidget =
@@ -262,22 +261,18 @@ Widget _buildApp({
                 model: hitTestModel,
                 child: armadillo,
               ),
-              new FractionallySizedBox(
-                widthFactor: 0.1,
-                heightFactor: 1.0,
-                alignment: FractionalOffset.centerLeft,
+              new Positioned(
+                left: 0.0,
+                top: 0.0,
+                bottom: 0.0,
+                width: 108.0,
                 child: _buildDiscardDragTarget(
                   storyModel: storyModel,
                   storyProviderStoryGenerator: storyProviderStoryGenerator,
-                ),
-              ),
-              new FractionallySizedBox(
-                widthFactor: 0.1,
-                heightFactor: 1.0,
-                alignment: FractionalOffset.centerRight,
-                child: _buildDiscardDragTarget(
-                  storyModel: storyModel,
-                  storyProviderStoryGenerator: storyProviderStoryGenerator,
+                  controller: new AnimationController(
+                    vsync: new _TickerProvider(),
+                    duration: const Duration(milliseconds: 200),
+                  ),
                 ),
               ),
             ],
@@ -302,46 +297,77 @@ Widget _buildPerformanceOverlay({Widget child}) => new Stack(
 Widget _buildDiscardDragTarget({
   StoryModel storyModel,
   StoryProviderStoryGenerator storyProviderStoryGenerator,
-}) =>
-    new ArmadilloDragTarget<StoryClusterDragData>(
-      onWillAccept: (_, __) => storyModel.storyClusters.every(
-          (StoryCluster storyCluster) =>
-              storyCluster.focusSimulationKey.currentState.progress == 0.0),
-      onAccept: (StoryClusterDragData data, _, __) =>
-          storyProviderStoryGenerator.removeStoryCluster(
-            data.id,
-          ),
-      builder: (_, Map<StoryClusterDragData, Offset> candidateData, __) =>
-          new IgnorePointer(
-            child: new AnimatedOpacity(
-              opacity: candidateData.isEmpty ? 0.0 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              child: new Container(
-                color: Colors.black38,
-                child: new Center(
-                  child: new Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      new Icon(
-                        Icons.delete,
+  AnimationController controller,
+}) {
+  CurvedAnimation curve = new CurvedAnimation(
+    parent: controller,
+    curve: Curves.fastOutSlowIn,
+    reverseCurve: Curves.fastOutSlowIn,
+  );
+  bool wasEmpty = true;
+  return new ArmadilloDragTarget<StoryClusterDragData>(
+    onWillAccept: (_, __) => storyModel.storyClusters.every(
+        (StoryCluster storyCluster) =>
+            storyCluster.focusSimulationKey.currentState.progress == 0.0),
+    onAccept: (StoryClusterDragData data, _, __) =>
+        storyProviderStoryGenerator.removeStoryCluster(
+          data.id,
+        ),
+    builder: (_, Map<StoryClusterDragData, Offset> candidateData, __) {
+      if (candidateData.isEmpty && !wasEmpty) {
+        controller.reverse();
+      } else if (candidateData.isNotEmpty && wasEmpty) {
+        controller.forward();
+      }
+      wasEmpty = candidateData.isEmpty;
+
+      return new IgnorePointer(
+        child: new ScopedModelDescendant<StoryDragTransitionModel>(
+          builder: (
+            BuildContext context,
+            Widget child,
+            StoryDragTransitionModel model,
+          ) =>
+              new Opacity(
+                opacity: model.progress,
+                child: child,
+              ),
+          child: new Container(
+            color: Colors.black38,
+            child: new Center(
+              child: new ScaleTransition(
+                scale: new Tween<double>(begin: 1.0, end: 1.4).animate(curve),
+                child: new Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    new Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                      size: 24.0,
+                    ),
+                    new Container(height: 8.0),
+                    new Text(
+                      'REMOVE',
+                      style: new TextStyle(
+                        fontSize: 10.0,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 1.2,
                         color: Colors.white,
-                        size: 24.0,
                       ),
-                      new Container(height: 8.0),
-                      new Text(
-                        'REMOVE',
-                        style: new TextStyle(
-                          fontSize: 10.0,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.2,
-                          color: Colors.white,
-                        ),
-                      )
-                    ],
-                  ),
+                    )
+                  ],
                 ),
               ),
             ),
           ),
-    );
+        ),
+      );
+    },
+  );
+}
+
+class _TickerProvider extends TickerProvider {
+  @override
+  Ticker createTicker(TickerCallback onTick) => new Ticker(onTick);
+}
