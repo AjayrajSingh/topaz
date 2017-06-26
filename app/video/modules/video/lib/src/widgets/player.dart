@@ -68,7 +68,7 @@ class Player extends StatelessWidget {
                 fit: StackFit.passthrough,
                 children: <Widget>[
                   _screen,
-                  _playControls,
+                  model.showControlOverlay ? _playControls : new Container(),
                 ],
               ),
             ),

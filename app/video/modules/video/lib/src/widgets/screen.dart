@@ -45,13 +45,20 @@ class _ScreenState extends State<Screen> {
     }
   }
 
+  void _toggleControlOverlay(VideoModuleModel model) {
+    if (model.showControlOverlay) {
+      model.showControlOverlay = false;
+    } else {
+      model.showControlOverlay = true;
+      model.brieflyShowControlOverlay();
+    }
+  }
+
   Widget _buildScreen(VideoModuleModel model, BuildContext context) {
     LayoutBuilder layoutBuilder = new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       double currentWidth = constraints.maxWidth;
       double currentHeight = constraints.maxHeight;
-
-      // TODO(maryxia) SO-480 wrap this in a GestureDetector
       return new Center(
         child: new LongPressDraggable<String>(
           data: '',
@@ -108,7 +115,13 @@ class _ScreenState extends State<Screen> {
           onDraggableCanceled: (Velocity v, Offset o) =>
               _animateIntoScreen(model),
           child: model.videoViewConnection != null
-              ? new ChildView(connection: model.videoViewConnection)
+              ? new GestureDetector(
+                  onTap: () => _toggleControlOverlay(model),
+                  child: new AspectRatio(
+                    aspectRatio: 16.0 / 9.0,
+                    child: new ChildView(connection: model.videoViewConnection),
+                  ),
+                )
               : new FuchsiaSpinner(),
         ),
       );
@@ -124,8 +137,6 @@ class _ScreenState extends State<Screen> {
         Widget child,
         VideoModuleModel model,
       ) {
-        // TODO(maryxia) SO-480 make this conditional via onTap
-        model.brieflyShowControlOverlay();
         return _buildScreen(model, context);
       },
     );

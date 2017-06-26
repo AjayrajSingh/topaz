@@ -8,7 +8,8 @@ import 'package:lib.widgets/model.dart';
 import '../modular/module_model.dart';
 import '../widgets.dart';
 
-final double _kZoomTimeInMicroseconds = 3000000.0;
+const double _kZoomTimeInMicroseconds = 3000000.0;
+const Duration _kAnimationTime = const Duration(milliseconds: 200);
 
 /// The time slider/scrubber for the video player
 class Scrubber extends StatelessWidget {
@@ -106,6 +107,7 @@ class Scrubber extends StatelessWidget {
     switch (model.displayMode) {
       case DisplayMode.remoteControl:
         return new Container(
+          padding: new EdgeInsets.only(top: 40.0),
           child: new Stack(
             children: <Widget>[
               new PlayControls(
@@ -133,20 +135,27 @@ class Scrubber extends StatelessWidget {
           ],
         );
       case DisplayMode.localSmall:
-        return new Row(
-          children: <Widget>[
-            _buildTimestamp(model.progress, DisplayMode.localSmall),
-            new Expanded(
-              child: _buildProgressBar(model),
-            ),
-            _buildTimestamp(model.duration, DisplayMode.localSmall),
-          ],
+        return new AnimatedCrossFade(
+          duration: _kAnimationTime,
+          firstChild: new Row(
+            children: <Widget>[
+              _buildTimestamp(model.progress, DisplayMode.localSmall),
+              new Expanded(
+                child: _buildProgressBar(model),
+              ),
+              _buildTimestamp(model.duration, DisplayMode.localSmall),
+            ],
+          ),
+          secondChild: new Container(),
+          crossFadeState: model.showControlOverlay
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
         );
       case DisplayMode.localLarge:
       default:
-        return new Container(
-          color: Colors.black,
-          child: new Stack(
+        return new AnimatedCrossFade(
+          duration: _kAnimationTime,
+          firstChild: new Stack(
             children: <Widget>[
               _buildProgress(model),
               _buildDuration(model),
@@ -158,6 +167,10 @@ class Scrubber extends StatelessWidget {
               _buildProgressBar(model),
             ],
           ),
+          secondChild: new Container(),
+          crossFadeState: model.showControlOverlay
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
         );
     }
   }
@@ -170,8 +183,6 @@ class Scrubber extends StatelessWidget {
         Widget child,
         VideoModuleModel model,
       ) {
-        // TODO(maryxia) SO-481 add offstage to hide scrubber after
-        // user stops interacting with screen for x seconds
         return new Container(child: _buildScrubberMode(model));
       },
     );

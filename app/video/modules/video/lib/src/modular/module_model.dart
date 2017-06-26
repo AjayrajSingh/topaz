@@ -21,8 +21,7 @@ import 'package:lib.widgets/modular.dart';
 
 import '../widgets.dart';
 
-// TODO(maryxia) SO-480 adjust these
-const Duration _kOverlayAutoHideDuration = const Duration(seconds: 30000);
+const Duration _kOverlayAutoHideDuration = const Duration(seconds: 3);
 const Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
 const String _kServiceName = 'fling';
 const String _kRemoteDisplayMode = 'remoteDisplayMode';
@@ -68,6 +67,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   MediaPlayerController _controller;
   bool _wasPlaying = false;
   bool _locallyControlled = false;
+  bool _showControlOverlay = true;
   final NetConnectorProxy _netConnector = new NetConnectorProxy();
   final DeviceMapProxy _deviceMap = new DeviceMapProxy();
   Asset _asset = _defaultAsset;
@@ -110,6 +110,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       curve: Curves.fastOutSlowIn,
       reverseCurve: Curves.fastOutSlowIn,
     );
+
     connectToService(appContext.environmentServices, _netConnector.ctrl);
     connectToService(appContext.environmentServices, _deviceMap.ctrl);
   }
@@ -139,6 +140,16 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Returns whether media player controller is playing
   bool get playing => _controller.playing;
+
+  /// Gets and sets whether we should show play controls
+  bool get showControlOverlay => _showControlOverlay;
+  set showControlOverlay(bool show) {
+    assert(show != null);
+    if (_showControlOverlay != show) {
+      _showControlOverlay = show;
+      notifyListeners();
+    }
+  }
 
   /// Returns name of remote device that media player is controlling
   String get remoteDeviceName => _remoteDeviceName;
@@ -194,6 +205,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       _controller.seek(lastLocalTime);
     } else {
       _controller.play();
+      brieflyShowControlOverlay();
     }
   }
 
@@ -344,22 +356,21 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       displayMode = DisplayMode.immersive;
       notifyListeners();
     }
-    // TODO(maryxia) SO-480 make this conditional
-    if (_shouldShowControlOverlay()) {
+    if (_showControlOverlay) {
+      brieflyShowControlOverlay(); // restart the timer
       notifyListeners();
     }
   }
 
-  /// Determines if the play bar should be shown
-  // TODO(maryxia) SO-480 make this a conditional
-  bool _shouldShowControlOverlay() => true;
-
   /// Shows the control overlay for [_kOverlayAutoHideDuration].
   void brieflyShowControlOverlay() {
     _hideTimer?.cancel();
-
     _hideTimer = new Timer(_kOverlayAutoHideDuration, () {
       _hideTimer = null;
+      if (_controller.playing) {
+        _showControlOverlay = false;
+      }
+      notifyListeners();
     });
   }
 
@@ -369,7 +380,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     }
     _wasPlaying = _controller.playing;
 
-    if (_controller.playing && _shouldShowControlOverlay()) {
+    if (_controller.playing && _showControlOverlay) {
       notifyListeners();
     }
   }
