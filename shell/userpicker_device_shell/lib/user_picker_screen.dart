@@ -44,9 +44,13 @@ class UserPickerScreen extends StatelessWidget {
           child: new Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
-              new Image.asset(
-                'packages/userpicker_device_shell/res/bg.jpg',
-                fit: BoxFit.cover,
+              new FractionallySizedBox(
+                heightFactor: 1.1,
+                alignment: FractionalOffset.topCenter,
+                child: new Image.asset(
+                  'packages/userpicker_device_shell/res/bg.jpg',
+                  fit: BoxFit.cover,
+                ),
               ),
 
               /// Add Fuchsia logo.
