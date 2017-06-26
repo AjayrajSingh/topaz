@@ -127,7 +127,9 @@ init: ## Set path to pick up deps with: eval $(make init)
 
 .PHONY: build
 build: $(dart_analysis_options) build-override ## Build Fuchsia with project.
-	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/build.sh $(BUILD_FLAGS)
+	@FUCHSIA_DIR=$(fuchsia_root) \
+		MAKEFLAGS="$(filter-out --warn-undefined-variables,$(MAKEFLAGS))" \
+		$(common_root)/build.sh $(BUILD_FLAGS)
 
 .PHONY: clean
 clean: dart-clean ## Clean build artifacts from this project.
