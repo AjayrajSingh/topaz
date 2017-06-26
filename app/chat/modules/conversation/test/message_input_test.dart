@@ -22,7 +22,7 @@ void main() {
       // Tapping this icon must not crash the app.
       await tester.tap(
         find.byWidgetPredicate(
-          (Widget w) => (w is Icon && w.icon == Icons.photo),
+          (Widget w) => (w is Icon && w.icon == Icons.photo_library),
         ),
       );
 
@@ -39,10 +39,9 @@ void main() {
         ),
       );
 
-      // Tapping this must not crash the app.
       await tester.tap(
         find.byWidgetPredicate(
-          (Widget w) => (w is Icon && w.icon == Icons.photo),
+          (Widget w) => (w is Icon && w.icon == Icons.photo_library),
         ),
       );
 
