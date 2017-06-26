@@ -25,9 +25,7 @@ Future<Null> main() async {
                 maxHeight: constraints.maxHeight,
               ),
               child: new ListView.builder(
-                physics: new _FrictionlessScrollPhysics(
-                  parent: const BouncingScrollPhysics(),
-                ),
+                physics: new _FrictionlessScrollPhysics(),
                 itemExtent: cardHeight,
                 itemBuilder: (BuildContext context, int index) => new Container(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -51,22 +49,32 @@ class _FrictionlessScrollPhysics extends ScrollPhysics {
       : super(parent: parent);
 
   @override
+  ScrollPhysics applyTo(ScrollPhysics ancestor) {
+    return new _FrictionlessScrollPhysics();
+  }
+
+  @override
   Simulation createBallisticSimulation(
     ScrollMetrics position,
     double velocity,
   ) =>
-      new _FrictionlessSimulation(velocity: velocity);
+      new _FrictionlessSimulation(
+        initialPosition: position.pixels,
+        velocity: velocity,
+      );
 }
 
 class _FrictionlessSimulation extends Simulation {
+  final double initialPosition;
   final double velocity;
 
-  _FrictionlessSimulation({this.velocity}) {
-    print('velocity: $velocity');
-  }
+  _FrictionlessSimulation({this.initialPosition, this.velocity});
 
   @override
-  double x(double time) => velocity * time;
+  double x(double time) => math.max(
+        math.min(initialPosition, 0.0),
+        initialPosition + velocity * time,
+      );
 
   @override
   double dx(double time) => velocity;
