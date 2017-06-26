@@ -138,7 +138,7 @@ class Fixtures {
   /// Generate a random email address.
   String email() {
     int seq = sequence('email');
-    return 'email-${seq}@example.org';
+    return 'email-$seq@example.org';
   }
 
   /// Genrate a random [int] no greater than [max].
