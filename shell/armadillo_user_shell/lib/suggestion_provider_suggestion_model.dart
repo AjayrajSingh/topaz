@@ -20,6 +20,7 @@ import 'package:armadillo/suggestion.dart';
 import 'package:armadillo/suggestion_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 
 import 'hit_test_model.dart';
@@ -37,14 +38,16 @@ final Map<maxwell.SuggestionImageType, ImageType> _kImageTypeMap =
 class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
   final String prefix;
   final VoidCallback suggestionListener;
+  final _InterruptionListener interruptionListener;
+  final bool downgradeInterruptions;
   final List<Suggestion> _suggestions = <Suggestion>[];
   final List<Suggestion> _interruptions = <Suggestion>[];
-  final _InterruptionListener interruptionListener;
 
   _MaxwellSuggestionListenerImpl({
     this.prefix,
     this.suggestionListener,
     this.interruptionListener,
+    this.downgradeInterruptions: false,
   });
 
   List<Suggestion> get suggestions => _suggestions.toList();
@@ -52,9 +55,11 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
 
   @override
   void onAdd(List<maxwell.Suggestion> suggestions) {
+    log.fine('$prefix onAdd $suggestions');
     suggestions.forEach(
       (maxwell.Suggestion suggestion) {
-        if (suggestion.display.annoyance == maxwell.AnnoyanceType.none) {
+        if (downgradeInterruptions ||
+            suggestion.display.annoyance == maxwell.AnnoyanceType.none) {
           _suggestions.add(_convert(suggestion));
         } else {
           Suggestion interruption = _convert(suggestion);
@@ -68,6 +73,7 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
 
   @override
   void onRemove(String uuid) {
+    log.fine('$prefix onRemove $uuid');
     _suggestions.removeWhere(
       (Suggestion suggestion) => suggestion.id.value == uuid,
     );
@@ -84,6 +90,7 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
 
   @override
   void onRemoveAll() {
+    log.fine('$prefix onRemoveAll');
     List<Suggestion> interruptionsToRemove = _interruptions.toList();
     _interruptions.clear();
     interruptionsToRemove.forEach(
@@ -211,7 +218,6 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   /// The key for the interruption overlay.
   final GlobalKey<InterruptionOverlayState> interruptionOverlayKey;
 
-  List<Suggestion> _currentSuggestions = const <Suggestion>[];
   final List<Suggestion> _currentInterruptions = <Suggestion>[];
 
   /// When the user is asking via text or voice we want to show the maxwell ask
@@ -275,6 +281,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       prefix: 'ask',
       suggestionListener: _onAskSuggestionsChanged,
       interruptionListener: _interruptionListener,
+      downgradeInterruptions: true,
     );
     _nextListener = new _MaxwellSuggestionListenerImpl(
       prefix: 'next',
@@ -360,10 +367,13 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   @override
   List<Suggestion> get suggestions {
+    if (_asking) {
+      return _askListener?.suggestions ?? <Suggestion>[];
+    }
     List<Suggestion> suggestions = new List<Suggestion>.from(
       _currentInterruptions,
     );
-    suggestions.addAll(_currentSuggestions);
+    suggestions.addAll(_nextListener?.suggestions ?? <Suggestion>[]);
     return suggestions;
   }
 
@@ -388,10 +398,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   set asking(bool asking) {
     if (_asking != asking) {
       _asking = asking;
-      if (_asking) {
-        _currentSuggestions = _askListener.suggestions;
-      } else {
-        _currentSuggestions = _nextListener.suggestions;
+      if (!_asking) {
         _askControllerProxy.setUserInput(new maxwell.UserInput()..text = '');
       }
       notifyListeners();
@@ -444,14 +451,12 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   void _onAskSuggestionsChanged() {
     if (_asking) {
-      _currentSuggestions = _askListener.suggestions;
       notifyListeners();
     }
   }
 
   void _onNextSuggestionsChanged() {
     if (!_asking) {
-      _currentSuggestions = _nextListener.suggestions;
       notifyListeners();
     }
   }
