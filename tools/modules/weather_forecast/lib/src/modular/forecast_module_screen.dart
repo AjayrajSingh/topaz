@@ -18,7 +18,7 @@ class ForecastModuleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.blueGrey[100],
       body: new ScopedModelDescendant<ForecastModuleModel>(builder: (
         BuildContext context,
         Widget child,
