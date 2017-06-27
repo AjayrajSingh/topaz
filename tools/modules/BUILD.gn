@@ -11,6 +11,7 @@ group("modules") {
     "image",
     "interactive_receipt",
     "interactive_receipt:interactive_receipt_component",
+    "location_details",
     "map",
     "map:map_component",
     "usps",
