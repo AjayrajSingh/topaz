@@ -111,7 +111,7 @@ Future<Null> main() async {
   });
 
   StoryFocuser storyFocuser = (String storyId) {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    scheduleMicrotask(() {
       conductorKey.currentState.requestStoryFocus(
         new StoryId(storyId),
         storyModel,
@@ -127,6 +127,9 @@ Future<Null> main() async {
       // If we don't know about the story that we've been asked to focus, update
       // the story list first.
       if (!storyProviderStoryGenerator.containsStory(storyId)) {
+        log.info(
+          'Story $storyId isn\'t in the list, querying story provider...',
+        );
         storyProviderStoryGenerator.update(() => storyFocuser(storyId));
       } else {
         storyFocuser(storyId);
