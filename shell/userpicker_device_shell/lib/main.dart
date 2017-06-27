@@ -21,6 +21,12 @@ import 'user_picker_device_shell_model.dart';
 
 const double _kInnerBezelRadius = 8.0;
 
+/// Set to true to have this BaseShell provide IME services.
+const bool _kAdvertiseImeService = false;
+
+/// Set to true to enable the performance overlay.
+const bool _kShowPerformanceOverlay = false;
+
 void main() {
   GlobalKey screenManagerKey = new GlobalKey();
   ConstraintsModel constraintsModel = new ConstraintsModel();
@@ -31,16 +37,45 @@ void main() {
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
 
-  SoftKeyboardContainerImpl softKeyboardContainerImpl =
-      new SoftKeyboardContainerImpl(
-    child: new ApplicationWidget(
-      url: 'latin-ime',
-      launcher: applicationContext.launcher,
+  SoftKeyboardContainerImpl softKeyboardContainerImpl = _kAdvertiseImeService
+      ? new SoftKeyboardContainerImpl(
+          child: new ApplicationWidget(
+            url: 'latin-ime',
+            launcher: applicationContext.launcher,
+          ),
+        )
+      : null;
+
+  Widget mainWidget = new Container(
+    foregroundDecoration: new RoundedCornerDecoration(
+      radius: _kInnerBezelRadius,
+      color: Colors.black,
+    ),
+    child: new Stack(
+      fit: StackFit.passthrough,
+      children: <Widget>[
+        new ScreenManager(
+          key: screenManagerKey,
+          onLogout: model.refreshUsers,
+          onRemoveUser: model.removeUser,
+          launcher: applicationContext.launcher,
+        ),
+        new ScopedModel<AuthenticationOverlayModel>(
+          model: authenticationOverlayModel,
+          child: new AuthenticationOverlay(),
+        ),
+      ],
     ),
   );
 
   GlobalKey<ChildConstraintsChangerState> childConstraintsChangerKey =
       new GlobalKey<ChildConstraintsChangerState>();
+  Widget app = new ChildConstraintsChanger(
+    key: childConstraintsChangerKey,
+    constraintsModel: constraintsModel,
+    child: softKeyboardContainerImpl?.wrap(child: mainWidget) ?? mainWidget,
+  );
+
   DeviceShellWidget<UserPickerDeviceShellModel> deviceShellWidget =
       new DeviceShellWidget<UserPickerDeviceShellModel>(
     applicationContext: applicationContext,
@@ -50,33 +85,8 @@ void main() {
       onStartOverlay: authenticationOverlayModel.onStartOverlay,
       onStopOverlay: authenticationOverlayModel.onStopOverlay,
     ),
-    child: new ChildConstraintsChanger(
-      key: childConstraintsChangerKey,
-      constraintsModel: constraintsModel,
-      child: softKeyboardContainerImpl.wrap(
-        child: new Container(
-          foregroundDecoration: new RoundedCornerDecoration(
-            radius: _kInnerBezelRadius,
-            color: Colors.black,
-          ),
-          child: new Stack(
-            fit: StackFit.passthrough,
-            children: <Widget>[
-              new ScreenManager(
-                key: screenManagerKey,
-                onLogout: model.refreshUsers,
-                onRemoveUser: model.removeUser,
-                launcher: applicationContext.launcher,
-              ),
-              new ScopedModel<AuthenticationOverlayModel>(
-                model: authenticationOverlayModel,
-                child: new AuthenticationOverlay(),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
+    child:
+        _kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app,
   );
 
   runApp(
@@ -106,7 +116,7 @@ void main() {
 
   constraintsModel.load(rootBundle);
   deviceShellWidget.advertise();
-  softKeyboardContainerImpl.advertise();
+  softKeyboardContainerImpl?.advertise();
   RawKeyboard.instance.addListener((RawKeyEvent event) {
     final bool isDown = event is RawKeyDownEvent;
     final RawKeyEventDataFuchsia data = event.data;
@@ -120,3 +130,23 @@ void main() {
     }
   });
 }
+
+Widget _buildPerformanceOverlay({Widget child}) => new Stack(
+      fit: StackFit.passthrough,
+      children: <Widget>[
+        child,
+        new Positioned(
+          bottom: 0.0,
+          left: 0.0,
+          right: 0.0,
+          child: new IgnorePointer(child: new PerformanceOverlay.allEnabled()),
+        ),
+        new Align(
+          alignment: FractionalOffset.bottomCenter,
+          child: new Text(
+            'Base shell performance',
+            style: new TextStyle(color: Colors.black),
+          ),
+        ),
+      ],
+    );

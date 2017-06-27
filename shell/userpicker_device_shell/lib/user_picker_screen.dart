@@ -68,7 +68,7 @@ class UserPickerScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              new Center(child: userPicker),
+              new Center(child: new RepaintBoundary(child: userPicker)),
               // Add shutdown button and new user button.
               new Align(
                 alignment: FractionalOffset.bottomLeft,
@@ -81,20 +81,22 @@ class UserPickerScreen extends StatelessWidget {
               // Add black hole for removing users.
               new Align(
                 alignment: FractionalOffset.bottomCenter,
-                child: new Container(
-                  margin: const EdgeInsets.only(bottom: 56.0),
-                  child: new DragTarget<Account>(
-                    onWillAccept: (Account data) => true,
-                    onAccept: (Account data) => onRemoveUser?.call(data),
-                    builder: (
-                      _,
-                      List<Account> candidateData,
-                      __,
-                    ) =>
-                        new _BlackHole(
-                          show: showBlackHole,
-                          grow: candidateData.isNotEmpty,
-                        ),
+                child: new RepaintBoundary(
+                  child: new Container(
+                    margin: const EdgeInsets.only(bottom: 56.0),
+                    child: new DragTarget<Account>(
+                      onWillAccept: (Account data) => true,
+                      onAccept: (Account data) => onRemoveUser?.call(data),
+                      builder: (
+                        _,
+                        List<Account> candidateData,
+                        __,
+                      ) =>
+                          new _BlackHole(
+                            show: showBlackHole,
+                            grow: candidateData.isNotEmpty,
+                          ),
+                    ),
                   ),
                 ),
               ),

@@ -289,7 +289,14 @@ Widget _buildPerformanceOverlay({Widget child}) => new Stack(
           top: 0.0,
           left: 0.0,
           right: 0.0,
-          child: new PerformanceOverlay.allEnabled(),
+          child: new IgnorePointer(child: new PerformanceOverlay.allEnabled()),
+        ),
+        new Align(
+          alignment: FractionalOffset.topCenter,
+          child: new Text(
+            'User shell performance',
+            style: new TextStyle(color: Colors.black),
+          ),
         ),
       ],
     );
