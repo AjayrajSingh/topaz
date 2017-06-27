@@ -13,3 +13,13 @@ dart_app("hello_dart") {
     "//apps/dart_content_handler/examples/hello_dart/greeting",
   ]
 }
+
+dart_aot_app("hello_dart_aot") {
+  main_dart = "hello_dart.dart"
+
+  source_dir = "."
+
+  deps = [
+    "//apps/dart_content_handler/examples/hello_dart/greeting",
+  ]
+}

@@ -7,6 +7,8 @@ group("examples") {
 
   public_deps = [
     "hello_app_dart",
+    "hello_app_dart:hello_app_dart_aot",
     "hello_dart",
+    "hello_dart:hello_dart_aot",
   ]
 }

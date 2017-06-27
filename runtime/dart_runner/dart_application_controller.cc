@@ -9,7 +9,7 @@
 
 #include "application/lib/app/application_context.h"
 #include "apps/dart_content_handler/builtin_libraries.h"
-#include "apps/dart_content_handler/embedder/snapshot.h"
+#include "dart/runtime/bin/embedded_dart_io.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
 #include "lib/mtl/tasks/message_loop.h"
@@ -31,27 +31,67 @@ void RunMicrotasks() {
 }  // namespace
 
 DartApplicationController::DartApplicationController(
-    std::vector<char> snapshot,
+    const uint8_t* vm_snapshot_data,
+    const uint8_t* vm_snapshot_instructions,
+    const uint8_t* isolate_snapshot_data,
+    const uint8_t* isolate_snapshot_instructions,
+    std::vector<char> script_snapshot,
     app::ApplicationStartupInfoPtr startup_info,
     fidl::InterfaceRequest<app::ApplicationController> controller)
-    : snapshot_(std::move(snapshot)),
+    : vm_snapshot_data_(vm_snapshot_data),
+      vm_snapshot_instructions_(vm_snapshot_instructions),
+      isolate_snapshot_data_(isolate_snapshot_data),
+      isolate_snapshot_instructions_(isolate_snapshot_instructions),
+      script_snapshot_(std::move(script_snapshot)),
       startup_info_(std::move(startup_info)),
       binding_(this) {
   if (controller.is_pending()) {
     binding_.Bind(std::move(controller));
     binding_.set_connection_error_handler([this] { Kill(); });
   }
+
+  InitDartVM();
 }
 
 DartApplicationController::~DartApplicationController() {}
 
+const char* kDartVMArgs[] = {
+// clang-format off
+#if defined(AOT_RUNTIME)
+    "--precompilation",
+#else
+    "--enable_asserts",
+    "--enable_type_checks",
+    "--error_on_bad_type",
+    "--error_on_bad_override",
+    "--enable_mirrors=false",
+#endif
+// clang-format on
+};
+
+void DartApplicationController::InitDartVM() {
+  dart::bin::BootstrapDartIo();
+
+  // TODO(abarth): Make checked mode configurable.
+  FTL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
+
+  Dart_InitializeParams params = {};
+  params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
+  params.vm_snapshot_data = vm_snapshot_data_;
+  params.vm_snapshot_instructions = vm_snapshot_instructions_;
+  char* error = Dart_Initialize(&params);
+  if (error) FTL_LOG(FATAL) << "Dart_Initialize failed: " << error;
+}
+
 bool DartApplicationController::CreateIsolate() {
   // Create the isolate from the snapshot.
   char* error = nullptr;
+
   auto state = new tonic::DartState();  // owned by Dart_CreateIsolate
-  isolate_ = Dart_CreateIsolate(startup_info_->launch_info->url.get().c_str(),
-                                "main", isolate_snapshot_buffer, nullptr,
-                                nullptr, state, &error);
+  isolate_ =
+      Dart_CreateIsolate(startup_info_->launch_info->url.get().c_str(), "main",
+                         isolate_snapshot_data_, isolate_snapshot_instructions_,
+                         nullptr, state, &error);
   if (!isolate_) {
     FTL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
     return false;
@@ -69,8 +109,13 @@ bool DartApplicationController::Main() {
 
   Dart_EnterScope();
 
-  script_ = Dart_LoadScriptFromSnapshot(
-      reinterpret_cast<uint8_t*>(snapshot_.data()), snapshot_.size());
+#if defined(AOT_RUNTIME)
+  Dart_Handle root_library = Dart_RootLibrary();
+#else
+  Dart_Handle root_library = Dart_LoadScriptFromSnapshot(
+      reinterpret_cast<uint8_t*>(script_snapshot_.data()),
+      script_snapshot_.size());
+#endif
 
   // TODO(jeffbrown): Decide what we should do with any startup handles.
   // eg. Redirect stdin, stdout, and stderr.
@@ -117,7 +162,7 @@ bool DartApplicationController::Main() {
   };
 
   Dart_Handle main =
-      Dart_Invoke(script_, ToDart("main"), arraysize(argv), argv);
+      Dart_Invoke(root_library, ToDart("main"), arraysize(argv), argv);
   if (Dart_IsError(main)) {
     FTL_LOG(ERROR) << Dart_GetError(main);
     Dart_ExitScope();
