@@ -95,7 +95,7 @@ class EventListModuleModel extends ModuleModel {
         _eventPageModuleController.ctrl.request(),
         new SurfaceRelation()
           ..arrangement = SurfaceArrangement.copresent
-          ..emphasis = 1.7
+          ..emphasis = 1.5
           ..dependency = SurfaceDependency.dependent,
         true,
       );

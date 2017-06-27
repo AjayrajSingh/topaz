@@ -5,8 +5,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
+import 'package:apps.modular.services.module/module_context.fidl.dart';
+import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
@@ -17,6 +20,11 @@ const String _kFocalEntitiesTopic = 'focal_entities';
 
 /// The Entity type for a music artist.
 const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
+
+/// The Entity type for a location
+const String _kLocationType = 'http://types.fuchsia.io/location';
+
+const String _kContextLinkName = 'location_context';
 
 /// [ModuleModel] that manages the state of the Event Module.
 class EventPageModuleModel extends ModuleModel {
@@ -37,6 +45,8 @@ class EventPageModuleModel extends ModuleModel {
   /// Get the current loading status
   LoadingStatus get loadingStatus => _loadingStatus;
 
+  final LinkProxy _contextLink = new LinkProxy();
+
   /// Retrieves the full event based on the given ID
   Future<Null> fetchEvent(int eventId) async {
     try {
@@ -50,10 +60,21 @@ class EventPageModuleModel extends ModuleModel {
       _loadingStatus = LoadingStatus.failed;
     }
 
-    // TODO (dayang@): Publish the "Location Context" as "Context Link" once
-    // the API becomes available
+    _publishLocationContext();
     _publishArtistContext();
     notifyListeners();
+  }
+
+  @override
+  void onReady(
+    ModuleContext moduleContext,
+    Link link,
+    ServiceProvider incomingServices,
+  ) {
+    super.onReady(moduleContext, link, incomingServices);
+
+    // Setup the Context Link
+    moduleContext.getLink(_kContextLinkName, _contextLink.ctrl.request());
   }
 
   /// Fetch the event whenever the eventId is updated in the link
@@ -87,5 +108,19 @@ class EventPageModuleModel extends ModuleModel {
     }
     publisher.ctrl.close();
     intelligenceServices.ctrl.close();
+  }
+
+  void _publishLocationContext() {
+    if (event != null && event.venue != null) {
+      Map<String, dynamic> contextLinkData = <String, dynamic>{
+        '@context': <String, dynamic>{
+          'topic': _kFocalEntitiesTopic,
+        },
+        '@type': _kLocationType,
+        'longitude': event.venue.longitude,
+        'latitude': event.venue.latitude,
+      };
+      _contextLink.set(null, JSON.encode(contextLinkData));
+    }
   }
 }
