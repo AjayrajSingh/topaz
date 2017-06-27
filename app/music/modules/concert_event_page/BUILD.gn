@@ -11,6 +11,8 @@ flutter_app("concert_event_page") {
 
   source_dir = "lib"
 
+  manifest = "pubspec.yaml"
+
   deps = [
     "//application/lib/app/dart",
     "//apps/maxwell/lib/dart",
