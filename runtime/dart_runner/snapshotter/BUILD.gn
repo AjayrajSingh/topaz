@@ -16,26 +16,6 @@ executable("snapshotter") {
     "//lib/ftl",
     "//lib/tonic/converter",
     "//lib/tonic/file_loader",
-  ]
-}
-
-executable("aot_snapshotter") {
-  output_name = "dart_aot_snapshotter"
-
-  sources = [
-    "main.cc",
-  ]
-
-  defines = [
-    "AOT_COMPILER"
-  ]
-
-  deps = [
-    "//apps/dart_content_handler/embedder:dart_snapshot_cc",
-    "//dart/runtime:libdart_with_precompiler",
-    "//dart/runtime/vm:libdart_platform",
-    "//lib/ftl",
-    "//lib/tonic/converter",
-    "//lib/tonic/file_loader",
+    "//lib/zip",
   ]
 }

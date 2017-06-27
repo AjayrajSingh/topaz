@@ -8,6 +8,7 @@
 #include "application/lib/app/connect.h"
 #include "application/services/application_runner.fidl.h"
 #include "apps/dart_content_handler/application_runner_impl.h"
+#include "apps/dart_content_handler/dart_init.h"
 #include "lib/ftl/macros.h"
 #include "lib/mtl/tasks/message_loop.h"
 
@@ -17,6 +18,7 @@ namespace {
 class App {
  public:
   App() : context_(app::ApplicationContext::CreateFromStartupInfo()) {
+    InitDartVM();
     context_->outgoing_services()->AddService<app::ApplicationRunner>(
         [this](fidl::InterfaceRequest<app::ApplicationRunner> app_runner) {
           new ApplicationRunnerImpl(std::move(app_runner));
@@ -29,7 +31,7 @@ class App {
 };
 
 }  // namespace
-}  // namespace dart_content_handler
+}  // dart_content_handler
 
 int main(int argc, const char** argv) {
   mtl::MessageLoop loop;

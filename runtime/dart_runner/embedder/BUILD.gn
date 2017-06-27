@@ -91,10 +91,3 @@ source_set("dart_snapshot_cc") {
     "snapshot.h",
   ]
 }
-
-source_set("dart_snapshot_empty") {
-  sources = [
-    "snapshot.h",
-    "snapshot_empty.cc",
-  ]
-}

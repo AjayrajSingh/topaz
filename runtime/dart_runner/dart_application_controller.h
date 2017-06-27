@@ -16,15 +16,11 @@ namespace dart_content_handler {
 class DartApplicationController : public app::ApplicationController {
  public:
   DartApplicationController(
-      const uint8_t* vm_snapshot_data,
-      const uint8_t* vm_snapshot_instructions,
-      const uint8_t* isolate_snapshot_data,
-      const uint8_t* isolate_snapshot_instructions, std::vector<char> snapshot,
+      std::vector<char> snapshot,
       app::ApplicationStartupInfoPtr startup_info,
       fidl::InterfaceRequest<app::ApplicationController> controller);
   ~DartApplicationController() override;
 
-  void InitDartVM();
   bool CreateIsolate();
 
   bool Main();
@@ -34,14 +30,11 @@ class DartApplicationController : public app::ApplicationController {
   void Kill() override;
   void Detach() override;
 
-  const uint8_t* vm_snapshot_data_;
-  const uint8_t* vm_snapshot_instructions_;
-  const uint8_t* isolate_snapshot_data_;
-  const uint8_t* isolate_snapshot_instructions_;
-  std::vector<char> script_snapshot_;
+  std::vector<char> snapshot_;
   app::ApplicationStartupInfoPtr startup_info_;
   app::ServiceProviderBridge service_provider_bridge_;
   fidl::Binding<app::ApplicationController> binding_;
+  Dart_Handle script_;
   Dart_Isolate isolate_;
 
   FTL_DISALLOW_COPY_AND_ASSIGN(DartApplicationController);

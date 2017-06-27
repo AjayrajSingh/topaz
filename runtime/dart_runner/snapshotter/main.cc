@@ -14,13 +14,14 @@
 #include "lib/ftl/command_line.h"
 #include "lib/ftl/files/directory.h"
 #include "lib/ftl/files/eintr_wrapper.h"
-#include "lib/ftl/files/file.h"
 #include "lib/ftl/files/file_descriptor.h"
+#include "lib/ftl/files/file.h"
 #include "lib/ftl/files/symlink.h"
 #include "lib/ftl/files/unique_fd.h"
 #include "lib/ftl/logging.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/file_loader/file_loader.h"
+#include "lib/zip/zipper.h"
 
 namespace dart_snapshotter {
 namespace {
@@ -30,26 +31,23 @@ using tonic::ToDart;
 constexpr char kHelp[] = "help";
 constexpr char kPackages[] = "packages";
 constexpr char kSnapshot[] = "snapshot";
+constexpr char kDartX[] = "dartx";
 constexpr char kDepfile[] = "depfile";
 constexpr char kBuildOutput[] = "build-output";
 
-const char* kDartVMArgs[] = {
-// clang-format off
-#if defined(AOT_COMPILER)
-    "--precompilation",
-#else
-    "--enable_asserts",
-    "--enable_type_checks",
-    "--error_on_bad_type",
-    "--error_on_bad_override",
+constexpr char kShebang[] = "#!fuchsia dart_runner\n";
+constexpr size_t kShebangLength = sizeof(kShebang) - 1;
+
+constexpr char kSnapshotKey[] = "snapshot_blob.bin";
+
+const char* kDartArgs[] = {
     "--enable_mirrors=false",
-#endif
-// clang-format on
 };
 
 void Usage() {
   std::cerr
       << "Usage: dart_snapshotter --" << kPackages << "=PACKAGES" << std::endl
+      << "                        --" << kDartX << "OUTPUT_BUNDLE" << std::endl
       << "                      [ --" << kSnapshot << "=OUTPUT_SNAPSHOT ]"
       << std::endl
       << "                      [ --" << kDepfile << "=DEPFILE ]" << std::endl
@@ -59,6 +57,8 @@ void Usage() {
       << "                        MAIN_DART" << std::endl
       << " * PACKAGES is the '.packages' file that defines where to find Dart "
          "packages."
+      << std::endl
+      << " * OUTPUT_BUNDLE is the file to write the '.dartx' bundle into."
       << std::endl
       << " * OUTPUT_SNAPSHOT is the file to write the snapshot into."
       << std::endl
@@ -83,7 +83,7 @@ class DartScope {
 };
 
 void InitDartVM() {
-  FTL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
+  FTL_CHECK(Dart_SetVMFlags(arraysize(kDartArgs), kDartArgs));
   Dart_InitializeParams params = {};
   params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
   params.vm_snapshot_data = dart_content_handler::vm_isolate_snapshot_buffer;
@@ -127,73 +127,15 @@ Dart_Handle HandleLibraryTag(Dart_LibraryTag tag,
 }
 
 std::vector<char> CreateSnapshot() {
-#if !defined(AOT_COMPILER)
   uint8_t* buffer = nullptr;
   intptr_t size = 0;
   DART_CHECK_VALID(Dart_CreateScriptSnapshot(&buffer, &size));
   const char* begin = reinterpret_cast<const char*>(buffer);
   return std::vector<char>(begin, begin + size);
-#else
-  DART_CHECK_VALID(Dart_FinalizeLoading(false));
-
-  // Import dart:_internal into dart:fuchsia.builtin for setting up hooks.
-  Dart_Handle builtin_lib = Dart_LookupLibrary(ToDart("dart:fuchsia.builtin"));
-  Dart_Handle internal_lib = Dart_LookupLibrary(ToDart("dart:_internal"));
-  DART_CHECK_VALID(
-      Dart_LibraryImportLibrary(builtin_lib, internal_lib, Dart_Null()));
-
-  Dart_QualifiedFunctionName content_handler_entry_points[] = {
-      {"dart:async", "::", "_setScheduleImmediateClosure"},
-      {"dart:core", "::", "_uriBaseClosure"},
-      {"dart:fidl.internal", "::", "_environment"},
-      {"dart:fidl.internal", "::", "_outgoingServices"},
-      {"dart:fidl.internal", "HandleWaiter", "onWaitComplete"},
-      {"dart:fuchsia.builtin", "::", "_getPrintClosure"},
-      {"dart:fuchsia.builtin", "::", "_getScheduleMicrotaskClosure"},
-      {"dart:fuchsia.builtin", "::", "_getUriBaseClosure"},
-      {"dart:fuchsia.builtin", "::", "_rawScript"},
-      {"dart:fuchsia.builtin", "::", "_rawUriBase"},
-      {"dart:fuchsia.builtin", "::", "_setupHooks"},
-      {"dart:io", "::", "_getWatchSignalInternal"},
-      {"dart:io", "::", "_makeDatagram"},
-      {"dart:io", "::", "_makeUint8ListView"},
-      {"dart:io", "::", "_setupHooks"},
-      {"dart:io", "::", "_setupHooks"},
-      {"dart:io", "CertificateException", "CertificateException."},
-      {"dart:io", "Directory", "Directory."},
-      {"dart:io", "File", "File."},
-      {"dart:io", "FileSystemException", "FileSystemException."},
-      {"dart:io", "HandshakeException", "HandshakeException."},
-      {"dart:io", "Link", "Link."},
-      {"dart:io", "OSError", "OSError."},
-      {"dart:io", "TlsException", "TlsException."},
-      {"dart:io", "X509Certificate", "X509Certificate._"},
-      {"dart:io", "_ExternalBuffer", "get:end"},
-      {"dart:io", "_ExternalBuffer", "get:start"},
-      {"dart:io", "_ExternalBuffer", "set:data"},
-      {"dart:io", "_ExternalBuffer", "set:end"},
-      {"dart:io", "_ExternalBuffer", "set:start"},
-      {"dart:io", "_Platform", "set:_nativeScript"},
-      {"dart:io", "_ProcessStartStatus", "set:_errorCode"},
-      {"dart:io", "_ProcessStartStatus", "set:_errorMessage"},
-      {"dart:io", "_SecureFilterImpl", "get:ENCRYPTED_SIZE"},
-      {"dart:io", "_SecureFilterImpl", "get:SIZE"},
-      {"dart:io", "_SecureFilterImpl", "get:buffers"},
-      {"dart:isolate", "::", "_setupHooks"},
-      {"::", "::", "main"},
-      {NULL, NULL, NULL}  // Must be terminated with NULL entries.
-  };
-  DART_CHECK_VALID(Dart_Precompile(content_handler_entry_points, NULL, 0));
-
-  uint8_t* buffer = nullptr;
-  intptr_t size = 0;
-  DART_CHECK_VALID(Dart_CreateAppAOTSnapshotAsAssembly(&buffer, &size));
-  const char* begin = reinterpret_cast<const char*>(buffer);
-  return std::vector<char>(begin, begin + size);
-#endif
 }
 
-bool WriteDepfile(const std::string& path, const std::string& build_output,
+bool WriteDepfile(const std::string& path,
+                  const std::string& build_output,
                   const std::set<std::string>& deps) {
   std::string current_directory = files::GetCurrentDirectory();
   std::string output = build_output + ":";
@@ -211,6 +153,14 @@ bool WriteDepfile(const std::string& path, const std::string& build_output,
     }
   }
   return files::WriteFile(path, output.data(), output.size());
+}
+
+bool WriteBundle(const std::string& path, const char* archive, size_t size) {
+  ftl::UniqueFD fd(HANDLE_EINTR(creat(path.c_str(), 0666)));
+  if (!fd.is_valid())
+    return false;
+  return ftl::WriteFileDescriptor(fd.get(), kShebang, kShebangLength) &&
+         ftl::WriteFileDescriptor(fd.get(), archive, size);
 }
 
 int CreateSnapshot(const ftl::CommandLine& command_line) {
@@ -239,11 +189,15 @@ int CreateSnapshot(const ftl::CommandLine& command_line) {
 
   std::string main_dart = args[0];
 
+  std::string bundle;
+  command_line.GetOptionValue(kDartX, &bundle);
+
   std::string snapshot;
   command_line.GetOptionValue(kSnapshot, &snapshot);
 
-  if (snapshot.empty()) {
-    std::cerr << "error: Need --" << kSnapshot << "." << std::endl;
+  if (bundle.empty() && snapshot.empty()) {
+    std::cerr << "error: Need --" << kDartX << " or --" << kSnapshot << "."
+              << std::endl;
     return 1;
   }
 
@@ -278,6 +232,19 @@ int CreateSnapshot(const ftl::CommandLine& command_line) {
     std::cerr << "error: Failed to write snapshot to '" << snapshot << "'."
               << std::endl;
     return 1;
+  }
+
+  if (!bundle.empty()) {
+    zip::Zipper zipper;
+    if (!zipper.AddCompressedFile(kSnapshotKey, snapshot_blob.data(),
+                                  snapshot_blob.size()))
+      return 1;
+    std::vector<char> bundle_blob = zipper.Finish();
+    if (!WriteBundle(bundle, bundle_blob.data(), bundle_blob.size())) {
+      std::cerr << "error: Failed to write dartx bundle to '" << bundle << "'."
+                << std::endl;
+      return 1;
+    }
   }
 
   if (!depfile.empty() &&
