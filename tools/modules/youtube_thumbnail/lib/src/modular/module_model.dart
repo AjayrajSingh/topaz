@@ -25,16 +25,29 @@ class YoutubeThumbnailModuleModel extends ModuleModel {
     log.fine('onNotify call');
 
     final dynamic doc = JSON.decode(json);
-    if (doc is! Map ||
-        doc[_kYoutubeDocRoot] is! Map ||
-        doc[_kYoutubeDocRoot][_kYoutubeVideoIdKey] is! String) {
-      log.fine('No youtube key found in json.');
-      return;
+    try {
+      _videoId = doc[_kYoutubeDocRoot][_kYoutubeVideoIdKey];
+    } catch (_) {
+      try {
+        final Map<String, dynamic> contract = doc['view'];
+        if (contract['host'] == 'youtu.be') {
+          // https://youtu.be/<video id>
+          _videoId = contract['path'].substring(1);
+        } else {
+          // https://www.youtube.com/watch?v=<video id>
+          final Map<String, String> params = contract['query parameters'];
+          _videoId = params['v'] ?? params['video_ids'];
+        }
+      } catch (_) {
+        _videoId = null;
+      }
     }
 
-    _videoId = doc[_kYoutubeDocRoot][_kYoutubeVideoIdKey];
-
-    log.fine('_videoId: $_videoId');
-    notifyListeners();
+    if (_videoId == null) {
+      log.warning('No youtube video ID found in json.');
+    } else {
+      log.fine('_videoId: $_videoId');
+      notifyListeners();
+    }
   }
 }

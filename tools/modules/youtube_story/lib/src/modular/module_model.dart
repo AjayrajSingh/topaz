@@ -16,7 +16,6 @@ import 'package:lib.widgets/modular.dart';
 const String _kYoutubeDocRoot = 'youtube-doc';
 const String _kYoutubeVideoIdKey = 'youtube-video-id';
 
-const String _kChildUrl = 'file:///system/apps/youtube_thumbnail';
 const String _kVideoPlayerUrl = 'file:///system/apps/youtube_video';
 const String _kRelatedVideoUrl = 'file:///system/apps/youtube_related_videos';
 

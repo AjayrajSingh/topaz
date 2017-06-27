@@ -30,8 +30,8 @@ class YoutubeThumbnailScreen extends StatelessWidget {
       title: 'Youtube Thumbnail',
       home: new ScopedModelDescendant<YoutubeThumbnailModuleModel>(
         builder: (_, __, YoutubeThumbnailModuleModel model) {
+          log.fine('model.videoId = ${model.videoId}');
           return new Container(
-            alignment: FractionalOffset.center,
             constraints: const BoxConstraints.expand(),
             child: model.videoId != null
                 ? new YoutubeThumbnail(
