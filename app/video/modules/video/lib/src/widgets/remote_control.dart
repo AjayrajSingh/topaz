@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
-import '../modular/module_model.dart';
 import '../widgets.dart';
 
 /// Remote control mode for the video player
@@ -40,7 +38,7 @@ class RemoteControl extends StatelessWidget {
       child: new Container(
         margin: new EdgeInsets.all(24.0),
         width: 400.0,
-        child: new Image.asset(asset.image),
+        child: new Image.asset(asset.thumbnail),
       ),
     );
 
@@ -85,7 +83,7 @@ class RemoteControl extends StatelessWidget {
             borderRadius: new BorderRadius.circular(16.0),
             color: Colors.grey[800],
           ),
-          padding: new EdgeInsets.all(8.0),
+          padding: new EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: new Row(
             children: <Widget>[
               new Icon(
@@ -94,7 +92,7 @@ class RemoteControl extends StatelessWidget {
                 color: Colors.grey[50],
               ),
               new Padding(
-                padding: new EdgeInsets.symmetric(horizontal: 8.0),
+                padding: new EdgeInsets.symmetric(horizontal: 16.0),
                 child: new Text(
                   remoteDeviceName ?? '',
                   style: new TextStyle(
@@ -115,34 +113,28 @@ class RemoteControl extends StatelessWidget {
       ),
     );
 
-    return new ScopedModelDescendant<VideoModuleModel>(builder: (
-      BuildContext context,
-      Widget child,
-      VideoModuleModel model,
-    ) {
-      return new Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          new Expanded(
-            flex: 3,
-            child: new Stack(
-              children: <Widget>[
-                uncastToast,
-                thumbnail,
-              ],
-            ),
+    return new Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        new Expanded(
+          flex: 3,
+          child: new Stack(
+            children: <Widget>[
+              uncastToast,
+              thumbnail,
+            ],
           ),
-          new Expanded(
-            flex: 1,
-            child: videoText,
-          ),
-          new Expanded(
-            flex: 2,
-            child: new Scrubber(height: 2.0),
-          ),
-        ],
-      );
-    });
+        ),
+        new Expanded(
+          flex: 1,
+          child: videoText,
+        ),
+        new Expanded(
+          flex: 2,
+          child: new Scrubber(height: 2.0),
+        ),
+      ],
+    );
   }
 }

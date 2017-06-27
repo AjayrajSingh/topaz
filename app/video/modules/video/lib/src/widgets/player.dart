@@ -54,6 +54,11 @@ class Player extends StatelessWidget {
             _scrubber,
           ],
         );
+      case DisplayMode.standby:
+        return new Standby(
+          castingDeviceName: model.castingDeviceName,
+          asset: model.asset,
+        );
       case DisplayMode.localSmall:
         return new Column(
           children: <Widget>[
@@ -97,7 +102,8 @@ class Player extends StatelessWidget {
       if (size.width <= 640.0 && size.height <= 360.0) {
         model.displayMode = DisplayMode.localSmall;
       } else if (model.displayMode != DisplayMode.remoteControl &&
-          model.displayMode != DisplayMode.immersive) {
+          model.displayMode != DisplayMode.immersive &&
+          model.displayMode != DisplayMode.standby) {
         model.displayMode = DisplayMode.localLarge;
       }
       return new Container(

@@ -35,7 +35,10 @@ class Asset {
   final String description;
 
   /// Thumbnail image file path for asset. May be null.
-  final String image;
+  final String thumbnail;
+
+  /// Background image file path for asset. May be null.
+  final String background;
 
   /// Artist to which the asset is attributed. May be null.
   final String artist;
@@ -62,7 +65,8 @@ class Asset {
     @required this.uri,
     @required this.title,
     @required this.description,
-    @required this.image,
+    @required this.thumbnail,
+    @required this.background,
   })
       : type = AssetType.movie,
         artist = null,
@@ -74,6 +78,8 @@ class Asset {
     assert(uri != null);
     assert(title != null);
     assert(description != null);
+    assert(thumbnail != null);
+    assert(background != null);
   }
 
   /// Constructs an asset describing a song.
@@ -86,7 +92,8 @@ class Asset {
       : type = AssetType.song,
         children = null,
         description = null,
-        image = null,
+        thumbnail = null,
+        background = null,
         device = null,
         service = null,
         position = null;
@@ -99,7 +106,8 @@ class Asset {
       : type = AssetType.playlist,
         uri = null,
         description = null,
-        image = null,
+        thumbnail = null,
+        background = null,
         artist = null,
         album = null,
         device = null,
@@ -117,7 +125,8 @@ class Asset {
     @required this.position,
     @required this.title,
     @required this.description,
-    @required this.image,
+    @required this.thumbnail,
+    @required this.background,
     @required this.uri,
   })
       : type = AssetType.remote,
@@ -129,7 +138,8 @@ class Asset {
     assert(position != null);
     assert(title != null);
     assert(description != null);
-    assert(image != null);
+    assert(thumbnail != null);
+    assert(background != null);
     assert(uri != null);
   }
 }

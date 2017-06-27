@@ -5,4 +5,5 @@
 name: video
 flutter:
   assets:
-    - assets/video-thumbnail.png
+    - assets/video-thumbnail.jpg
+    - assets/video-background.jpg

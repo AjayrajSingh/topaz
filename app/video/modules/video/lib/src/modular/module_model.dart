@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert' show JSON;
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
@@ -21,9 +22,11 @@ import 'package:lib.widgets/modular.dart';
 import '../widgets.dart';
 
 // TODO(maryxia) SO-480 adjust these
-final Duration _kOverlayAutoHideDuration = const Duration(seconds: 30000);
-final Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
-final String _kServiceName = 'fling';
+const Duration _kOverlayAutoHideDuration = const Duration(seconds: 30000);
+const Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
+const String _kServiceName = 'fling';
+const String _kRemoteDisplayMode = 'remoteDisplayMode';
+const String _kCastingDeviceName = 'castingDeviceName';
 
 /// Mode the video player should be in on the device
 enum DisplayMode {
@@ -38,6 +41,9 @@ enum DisplayMode {
 
   /// Immersive (a.k.a full-screen, presentation) mode
   immersive,
+
+  /// Standby (ready-to-be-casted-on) mode
+  standby,
 }
 
 const DisplayMode _defaultDisplayMode = DisplayMode.localLarge;
@@ -47,7 +53,8 @@ final Asset _defaultAsset = new Asset.movie(
   title: 'Discover Istanbul',
   description:
       "There's a reason why Istanbul, Turkey is the new dream travel destination. Take a trip with us and explore the top experiences in Istanbul.",
-  image: 'assets/video-thumbnail.png',
+  thumbnail: 'assets/video-thumbnail.jpg',
+  background: 'assets/video-background.jpg',
 );
 
 /// The [ModuleModel] for the video player.
@@ -55,6 +62,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   Timer _hideTimer;
   Timer _progressTimer;
   String _remoteDeviceName;
+  String _castingDeviceName;
   AnimationController _thumbnailAnimationController;
   Animation<double> _thumbnailAnimation;
   MediaPlayerController _controller;
@@ -63,6 +71,11 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   final NetConnectorProxy _netConnector = new NetConnectorProxy();
   final DeviceMapProxy _deviceMap = new DeviceMapProxy();
   Asset _asset = _defaultAsset;
+
+  /// [Link] object for storing the remote displayMode and casting device name
+  final LinkProxy _remoteDeviceLink = new LinkProxy();
+  final LinkWatcherBinding _remoteDeviceLinkWatcherBinding =
+      new LinkWatcherBinding();
 
   /// Last version we received from NetConnector
   int lastVersion = 0;
@@ -78,8 +91,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   bool _hideDeviceChooser = true;
 
-  /// Returns whether this device's media player should be in immersive mode
-  // TODO(maryxia) SO-529 figure out how device knows it's in immersive mode
+  /// Returns this device's media player's display mode
   DisplayMode displayMode = _defaultDisplayMode;
 
   /// Create a video module model using the appContext
@@ -98,7 +110,6 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       curve: Curves.fastOutSlowIn,
       reverseCurve: Curves.fastOutSlowIn,
     );
-
     connectToService(appContext.environmentServices, _netConnector.ctrl);
     connectToService(appContext.environmentServices, _deviceMap.ctrl);
   }
@@ -131,6 +142,9 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Returns name of remote device that media player is controlling
   String get remoteDeviceName => _remoteDeviceName;
+
+  /// Returns name of currently-casting device
+  String get castingDeviceName => _castingDeviceName;
 
   /// Returns media player controller video duration
   Duration get duration => _controller.duration;
@@ -194,7 +208,6 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     hideDeviceChooser = true;
     if (_asset.device == null) {
       pause();
-      //TODO(maryxia) SO-445 indicate to user that remote play has started
       log.fine('Starting remote play on ' + deviceName);
       _asset = new Asset.remote(
           service: _kServiceName,
@@ -202,13 +215,20 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
           uri: _asset.uri,
           title: _asset.title,
           description: _asset.description,
-          image: _asset.image,
+          thumbnail: _asset.thumbnail,
+          background: _asset.background,
           position: _controller.progress);
 
       _remoteDeviceName = deviceName;
+      _setDisplayModeLink(DisplayMode.immersive.toString());
       displayMode = DisplayMode.remoteControl;
       play();
     }
+  }
+
+  void _setDisplayModeLink(String mode) {
+    _remoteDeviceLink.set(
+        <String>[_kRemoteDisplayMode, _remoteDeviceName], JSON.encode(mode));
   }
 
   /// Start playing video on local device if it is controlling remotely
@@ -219,11 +239,22 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       Duration progress = _controller.progress;
       _controller.close();
       _asset = _defaultAsset;
-      _remoteDeviceName = null;
       displayMode = _defaultDisplayMode;
       log.fine('Starting local play');
       _controller.open(_asset.uri, serviceName: _kServiceName);
       _controller.seek(progress);
+      _deviceMap.getCurrentDevice((DeviceMapEntry device) {
+        // TODO(maryxia): make separate set calls.
+        // https://fuchsia.atlassian.net/browse/SO-578
+        dynamic jsonObject = <String, dynamic>{
+          _kRemoteDisplayMode: <String, String>{
+            _remoteDeviceName: DisplayMode.standby.toString(),
+          },
+          _kCastingDeviceName: device.name,
+        };
+        _remoteDeviceLink.set(null, JSON.encode(jsonObject));
+        _remoteDeviceName = null;
+      });
       play();
     }
   }
@@ -235,11 +266,44 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     ServiceProvider incomingServices,
   ) {
     super.onReady(moduleContext, link, incomingServices);
-
     _controller.addListener(_handleControllerChanged);
     _controller.open(_asset.uri, serviceName: _kServiceName);
 
+    moduleContext.getLink(
+        _kRemoteDisplayMode, _remoteDeviceLink.ctrl.request());
+    _remoteDeviceLink
+        .watch(_remoteDeviceLinkWatcherBinding.wrap(new LinkWatcherImpl(
+      onNotify: _handleRemoteDeviceChange,
+    )));
     notifyListeners();
+  }
+
+  void _handleRemoteDeviceChange(String remoteInfoJson) {
+    Map<String, dynamic> remoteInfo = JSON.decode(remoteInfoJson);
+    if (remoteInfo != null) {
+      // TODO(maryxia) SO-577: save as a var
+      _deviceMap.getCurrentDevice((DeviceMapEntry device) {
+        String currentDevice = device.name;
+        if (remoteInfo[_kRemoteDisplayMode] != null &&
+            remoteInfo[_kRemoteDisplayMode] is Map<String, String>) {
+          String newMode = remoteInfo[_kRemoteDisplayMode][currentDevice];
+          if (displayMode == DisplayMode.standby &&
+              newMode == DisplayMode.immersive.toString()) {
+            displayMode = DisplayMode.immersive;
+            notifyListeners();
+          } else if (displayMode == DisplayMode.immersive &&
+              newMode == DisplayMode.standby.toString()) {
+            displayMode = DisplayMode.standby;
+            notifyListeners();
+          }
+        }
+      });
+      String castingDeviceName = remoteInfo[_kCastingDeviceName];
+      if (castingDeviceName != null && castingDeviceName is String) {
+        _castingDeviceName = castingDeviceName;
+        notifyListeners();
+      }
+    }
   }
 
   @override
@@ -248,6 +312,8 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     _progressTimer?.cancel();
     _controller.removeListener(_handleControllerChanged);
     _thumbnailAnimationController.dispose();
+    _remoteDeviceLinkWatcherBinding.close();
+    _remoteDeviceLink.ctrl.close();
     super.onStop();
   }
 
@@ -278,7 +344,6 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       displayMode = DisplayMode.immersive;
       notifyListeners();
     }
-
     // TODO(maryxia) SO-480 make this conditional
     if (_shouldShowControlOverlay()) {
       notifyListeners();
