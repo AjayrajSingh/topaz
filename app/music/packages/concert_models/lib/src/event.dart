@@ -32,6 +32,9 @@ class Event {
   /// ID of this event
   final int id;
 
+  /// Url of webpage for ticket purchase
+  final String url;
+
   /// Constructor
   Event({
     this.name,
@@ -41,6 +44,7 @@ class Event {
     this.venue,
     this.performances,
     this.id,
+    this.url,
   });
 
   /// Creates an Event from JSON data
@@ -66,6 +70,7 @@ class Event {
               .toList()
           : <Performance>[],
       id: json['id'],
+      url: json['uri'],
     );
   }
 }

@@ -70,6 +70,8 @@ class MusicModelFixtures extends Fixtures {
         )
       ],
       id: 3037536,
+      url:
+          'http://www.songkick.com/concerts/3037536-vampire-weekend-at-o2-academy-brixton?utm_source=PARTNER_ID&utm_medium=partner',
     );
   }
 }

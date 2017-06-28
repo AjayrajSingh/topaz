@@ -30,5 +30,6 @@ void main() {
       eventFixture.performances[0].billing,
     );
     expect(event.id, eventFixture.id);
+    expect(event.url, eventFixture.url);
   });
 }
