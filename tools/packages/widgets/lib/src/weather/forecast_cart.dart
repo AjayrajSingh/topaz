@@ -68,7 +68,7 @@ class ForecastCard extends StatelessWidget {
                   ),
                 ),
                 new Image.network(
-                  forecast.iconUrl,
+                  forecast.iconUrlDark,
                   height: _kIconSize,
                   width: _kIconSize,
                 ),

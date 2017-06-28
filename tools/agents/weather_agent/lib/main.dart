@@ -42,7 +42,6 @@ Future<Null> _createWeatherProposal({
     log.warning('Failed to retrieve weather forecast');
   }
 
-  print('forecast $forecast');
   if (forecast != null) {
     String forecastText =
         '${forecast.temperature.toInt()} °F in ${forecast.locationName}';
@@ -55,7 +54,7 @@ Future<Null> _createWeatherProposal({
         ..color = 0xFFFF0080
         ..iconUrls = const <String>[]
         ..imageType = SuggestionImageType.other
-        ..imageUrl = forecast.iconUrl
+        ..imageUrl = forecast.iconUrlLight
         ..annoyance = AnnoyanceType.none)
       ..onSelected = <Action>[
         new Action()

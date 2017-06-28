@@ -3,9 +3,10 @@
 // found in the LICENSE file.
 
 // Material Design Weather Icons from https://material.io/icons/
-final Map<String, String> _weatherIcons = <String, String>{
+// These are light icons for use on dark backgrounds
+final Map<String, String> _weatherIconsDark = <String, String>{
   '01d':
-      'https://www.gstatic.com/images/branding/product/2x/sunny_light_96dp.png',
+      'https://www.gstatic.com/images/branding/product/2x/sunny_dark_96dp.png',
   '02d':
       'https://www.gstatic.com/images/branding/product/2x/mostly_cloudy_day_dark_96dp.png',
   '03d':
@@ -40,6 +41,47 @@ final Map<String, String> _weatherIcons = <String, String>{
       'https://www.gstatic.com/images/branding/product/2x/scattered_snow_showers_night_dark_96dp.png',
   '50n':
       'https://www.gstatic.com/images/branding/product/2x/haze_fog_dust_smoke_dark_96dp.png',
+};
+
+// Material Design Weather Icons from https://material.io/icons/
+// These are dark icons for use on light backgrounds
+final Map<String, String> _weatherIconsLight = <String, String>{
+  '01d':
+      'https://www.gstatic.com/images/branding/product/2x/sunny_light_96dp.png',
+  '02d':
+      'https://www.gstatic.com/images/branding/product/2x/mostly_cloudy_day_light_96dp.png',
+  '03d':
+      'https://www.gstatic.com/images/branding/product/2x/cloudy_light_96dp.png',
+  '04d':
+      'https://www.gstatic.com/images/branding/product/2x/partly_cloudy_light_96dp.png',
+  '09d':
+      'https://www.gstatic.com/images/branding/product/2x/heavy_rain_light_96dp.png',
+  '10d':
+      'https://www.gstatic.com/images/branding/product/2x/scattered_showers_day_light_96dp.png',
+  '11d':
+      'https://www.gstatic.com/images/branding/product/2x/strong_tstorms_light_96dp.png',
+  '13d':
+      'https://www.gstatic.com/images/branding/product/2x/wintry_mix_rain_snow_light_96dp.png',
+  '50d':
+      'https://www.gstatic.com/images/branding/product/2x/haze_fog_dust_smoke_light_96dp.png',
+  '01n':
+      'https://www.gstatic.com/images/branding/product/2x/clear_night_light_96dp.png',
+  '02n':
+      'https://www.gstatic.com/images/branding/product/2x/mostly_cloudy_night_light_96dp.png',
+  '03n':
+      'https://www.gstatic.com/images/branding/product/2x/partly_cloudy_night_light_96dp.png',
+  '04n':
+      'https://www.gstatic.com/images/branding/product/2x/mostly_clear_night_light_96dp.png',
+  '09n':
+      'https://www.gstatic.com/images/branding/product/2x/heavy_rain_light_96dp.png',
+  '10n':
+      'https://www.gstatic.com/images/branding/product/2x/scattered_showers_night_light_96dp.png',
+  '11n':
+      'https://www.gstatic.com/images/branding/product/2x/isolated_scattered_tstorms_night_light_96dp.png',
+  '13n':
+      'https://www.gstatic.com/images/branding/product/2x/scattered_snow_showers_night_light_96dp.png',
+  '50n':
+      'https://www.gstatic.com/images/branding/product/2x/haze_fog_dust_smoke_light_96dp.png',
 };
 
 /// Represents a weather forecast for a given location
@@ -87,7 +129,11 @@ class Forecast {
     );
   }
 
-  /// Get URL for weather icon
-  String get iconUrl =>
-      _weatherIcons.containsKey(iconId) ? _weatherIcons[iconId] : null;
+  /// Get URL for weather icon for use on dark backgrounds
+  String get iconUrlDark =>
+      _weatherIconsDark.containsKey(iconId) ? _weatherIconsDark[iconId] : null;
+
+  /// Get URL for weather icon for use on light backgrounds
+  String get iconUrlLight =>
+      _weatherIconsDark.containsKey(iconId) ? _weatherIconsDark[iconId] : null;
 }
