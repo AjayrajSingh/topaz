@@ -24,6 +24,7 @@ flutter_app("userpicker_device_shell") {
     "//apps/sysui/widgets",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/logging:lib.logging",
     "//lib/widgets/packages/widgets:lib.widgets",
   ]
 }

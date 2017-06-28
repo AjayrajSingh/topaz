@@ -5,6 +5,7 @@
 import 'package:application.lib.app.dart/app.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/modular.dart';
 
@@ -14,6 +15,7 @@ import 'authentication_context_impl.dart';
 import 'child_constraints_changer.dart';
 import 'constraints_model.dart';
 import 'debug_text.dart';
+import 'memory_indicator.dart';
 import 'screen_manager.dart';
 import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
@@ -27,6 +29,7 @@ const bool _kAdvertiseImeService = false;
 const bool _kShowPerformanceOverlay = false;
 
 void main() {
+  setupLogger(name: 'userpicker_device_shell');
   GlobalKey screenManagerKey = new GlobalKey();
   ConstraintsModel constraintsModel = new ConstraintsModel();
   UserPickerDeviceShellModel model = new UserPickerDeviceShellModel();
@@ -82,28 +85,44 @@ void main() {
         _kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app,
   );
 
+  List<OverlayEntry> overlays = <OverlayEntry>[
+    new OverlayEntry(
+      builder: (BuildContext context) => new MediaQuery(
+            data: const MediaQueryData(),
+            child: new FocusScope(
+              node: new FocusScopeNode(),
+              autofocus: true,
+              child: deviceShellWidget,
+            ),
+          ),
+    ),
+    new OverlayEntry(
+      builder: (_) => new Align(
+            alignment: FractionalOffset.topCenter,
+            child: new DebugText(onShowNetwork: model.onShowNetwork),
+          ),
+    ),
+  ];
+
+  /// As querying free memory is expensive, only do in debug mode.
+  assert(() {
+    overlays.add(
+      new OverlayEntry(
+        builder: (_) => new Align(
+              alignment: FractionalOffset.topLeft,
+              child: new Container(
+                padding: const EdgeInsets.all(16.0),
+                child: new MemoryIndicator(),
+              ),
+            ),
+      ),
+    );
+    return true;
+  });
+
   runApp(
     new CheckedModeBanner(
-      child: new Overlay(
-        initialEntries: <OverlayEntry>[
-          new OverlayEntry(
-            builder: (BuildContext context) => new MediaQuery(
-                  data: const MediaQueryData(),
-                  child: new FocusScope(
-                    node: new FocusScopeNode(),
-                    autofocus: true,
-                    child: deviceShellWidget,
-                  ),
-                ),
-          ),
-          new OverlayEntry(
-            builder: (_) => new Align(
-                  alignment: FractionalOffset.topCenter,
-                  child: new DebugText(onShowNetwork: model.onShowNetwork),
-                ),
-          )
-        ],
-      ),
+      child: new Overlay(initialEntries: overlays),
     ),
   );
 
