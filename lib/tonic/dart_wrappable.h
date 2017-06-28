@@ -34,6 +34,10 @@ class DartWrappable {
   // base class's implementation of this function.
   virtual const DartWrapperInfo& GetDartWrapperInfo() const = 0;
 
+  // Override this to customize the object size reported to the Dart garbage
+  // collector.
+  virtual size_t GetAllocationSize();
+
   Dart_Handle CreateDartWrapper(DartState* dart_state);
   void AssociateWithDartWrapper(Dart_NativeArguments args);
   void ClearDartWrapper();  // Warning: Might delete this.

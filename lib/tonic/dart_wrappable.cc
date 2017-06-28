@@ -31,7 +31,7 @@ Dart_Handle DartWrappable::CreateDartWrapper(DartState* dart_state) {
 
   info.ref_object(this);  // Balanced in FinalizeDartWrapper.
   dart_wrapper_ = Dart_NewWeakPersistentHandle(
-      wrapper, this, info.size_in_bytes, &FinalizeDartWrapper);
+      wrapper, this, GetAllocationSize(), &FinalizeDartWrapper);
 
   return wrapper;
 }
@@ -56,7 +56,7 @@ void DartWrappable::AssociateWithDartWrapper(Dart_NativeArguments args) {
 
   info.ref_object(this);  // Balanced in FinalizeDartWrapper.
   dart_wrapper_ = Dart_NewWeakPersistentHandle(
-      wrapper, this, info.size_in_bytes, &FinalizeDartWrapper);
+      wrapper, this, GetAllocationSize(), &FinalizeDartWrapper);
 }
 
 void DartWrappable::ClearDartWrapper() {
@@ -77,6 +77,10 @@ void DartWrappable::FinalizeDartWrapper(void* isolate_callback_data,
   wrappable->dart_wrapper_ = nullptr;
   const DartWrapperInfo& info = wrappable->GetDartWrapperInfo();
   info.deref_object(wrappable);  // Balanced in CreateDartWrapper.
+}
+
+size_t DartWrappable::GetAllocationSize() {
+  return GetDartWrapperInfo().size_in_bytes;
 }
 
 DartWrappable* DartConverterWrappable::FromDart(Dart_Handle handle) {
