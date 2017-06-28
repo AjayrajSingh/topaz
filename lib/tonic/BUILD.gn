@@ -36,4 +36,12 @@ source_set("tonic") {
     "//lib/tonic/scopes",
     "//lib/tonic/typed_data",
   ]
+
+  if (is_fuchsia) {
+    sources += [
+      "handle_table.cc",
+      "handle_table.h",
+    ]
+    public_deps += [ "//magenta/system/ulib/mx" ]
+  }
 }

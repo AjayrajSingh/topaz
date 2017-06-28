@@ -22,6 +22,10 @@ class DartMicrotaskQueue {
   void RunMicrotasks();
   void Destroy();
 
+  bool HasMicrotasks() const {
+    return !queue_.empty();
+  }
+
   DartErrorHandleType GetLastError();
 
  private:
