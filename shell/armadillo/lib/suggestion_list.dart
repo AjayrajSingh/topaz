@@ -18,7 +18,7 @@ const String _kImage = 'packages/armadillo/res/logo_googleg_24dpx4.png';
 const Duration _kFadeInDuration = const Duration(milliseconds: 500);
 
 /// The height of the ask section of the suggerion list.
-const double kAskHeight = 64.0;
+const double kAskHeight = 72.0;
 
 /// The gap between suggestions.
 const double _kSuggestionGap = 16.0;
@@ -160,32 +160,54 @@ class SuggestionListState extends State<SuggestionList>
                               suggestionModel.suggestions;
                           return new Stack(
                             children: <Widget>[
+                              // We overlap a little to avoid aliasing issues.
+                              new Positioned.fill(
+                                top: kAskHeight - 8.0,
+                                child: new Container(
+                                  color: const Color(0xFFDBE2E5),
+                                  padding: new EdgeInsets.only(
+                                    top: 32.0,
+                                  ),
+                                  child: new CustomScrollView(
+                                    controller: widget.scrollController,
+                                    slivers: <Widget>[
+                                      new SliverGrid(
+                                        gridDelegate:
+                                            new _SuggestionListSliverGridDelegate(
+                                          suggestions: suggestions,
+                                        ),
+                                        delegate:
+                                            new SliverChildBuilderDelegate(
+                                          (BuildContext context, int index) =>
+                                              _createSuggestion(
+                                                suggestions[index],
+                                              ),
+                                          childCount: suggestions.length,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                               new Positioned(
-                                left: _getLeftOffset(constraints.maxWidth),
+                                left: 0.0,
                                 right: 0.0,
                                 top: 0.0,
                                 height: kAskHeight,
-                                child: _buildAsk(context),
-                              ),
-                              new Positioned.fill(
-                                top: kAskHeight,
-                                child: new CustomScrollView(
-                                  controller: widget.scrollController,
-                                  slivers: <Widget>[
-                                    new SliverGrid(
-                                      gridDelegate:
-                                          new _SuggestionListSliverGridDelegate(
-                                        suggestions: suggestions,
-                                      ),
-                                      delegate: new SliverChildBuilderDelegate(
-                                        (BuildContext context, int index) =>
-                                            _createSuggestion(
-                                              suggestions[index],
-                                            ),
-                                        childCount: suggestions.length,
-                                      ),
+                                child: new Container(
+                                  decoration: new BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: const Radius.circular(8.0),
+                                      topRight: const Radius.circular(8.0),
                                     ),
-                                  ],
+                                  ),
+                                  padding: new EdgeInsets.symmetric(
+                                    horizontal: _getLeftOffset(
+                                      constraints.maxWidth,
+                                    ),
+                                  ),
+                                  child: _buildAsk(context),
                                 ),
                               ),
                             ],
@@ -203,53 +225,48 @@ class SuggestionListState extends State<SuggestionList>
           FocusScope.of(context).requestFocus(_askFocusNode);
         },
         child: new Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             // Image.
-            new Center(
-              child: new Image.asset(
-                _kImage,
-                width: 24.0,
-                height: 24.0,
-                fit: BoxFit.cover,
-              ),
+            new Image.asset(
+              _kImage,
+              width: 24.0,
+              height: 24.0,
+              fit: BoxFit.cover,
             ),
             new Container(width: 16.0),
             // Ask Anything text field.
             new Expanded(
-              child: new Align(
-                alignment: FractionalOffset.centerLeft,
-                child: new Material(
-                  color: Colors.transparent,
-                  child: new TextField(
-                    decoration: new InputDecoration(
-                      hintText: 'Ask for anything',
-                      hintStyle: new TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.grey[600],
-                      ),
-                      hideDivider: true,
-                    ),
-                    style: new TextStyle(
+              child: new Material(
+                color: Colors.transparent,
+                child: new TextField(
+                  decoration: new InputDecoration(
+                    hintText: 'Ask for anything',
+                    hintStyle: new TextStyle(
                       fontSize: 16.0,
                       color: Colors.grey[600],
                     ),
-                    focusNode: _askFocusNode,
-                    controller: _askTextController,
-                    onChanged: (String text) {
-                      SuggestionModel.of(context).askText = text;
-                    },
-                    onSubmitted: (String text) {
-                      // Select the first suggestion on text commit (ie.
-                      // Pressing enter or tapping 'Go').
-                      List<Suggestion> suggestions =
-                          SuggestionModel.of(context).suggestions;
-                      if (suggestions.isNotEmpty) {
-                        _onSuggestionSelected(suggestions.first);
-                      }
-                    },
+                    hideDivider: true,
                   ),
+                  style: new TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.grey[600],
+                  ),
+                  focusNode: _askFocusNode,
+                  controller: _askTextController,
+                  onChanged: (String text) {
+                    SuggestionModel.of(context).askText = text;
+                  },
+                  onSubmitted: (String text) {
+                    // Select the first suggestion on text commit (ie.
+                    // Pressing enter or tapping 'Go').
+                    List<Suggestion> suggestions =
+                        SuggestionModel.of(context).suggestions;
+                    if (suggestions.isNotEmpty) {
+                      _onSuggestionSelected(suggestions.first);
+                    }
+                  },
                 ),
               ),
             ),

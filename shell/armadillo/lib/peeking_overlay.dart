@@ -6,7 +6,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sysui_widgets/quadrilateral_painter.dart';
 import 'package:sysui_widgets/ticking_height_state.dart';
 
 const double _kStartOverlayTransitionHeight = 28.0;
@@ -108,18 +107,6 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
   /// Returns true if the overlay is currently hiding.
   bool get hiding => _hiding;
 
-  /// Tracks how 'peeked' the overlay is taking [_kAngleOffsetY] into account.
-  /// This is used to ensure the angle of the overlay is flat as it becomes
-  /// fully 'unpeeked'. This tracks from [0.0 to 1.0] for [height]s of
-  /// [_kAngleOffsetY to widget.peekHeight].
-  double get _peekProgress => math.max(
-        0.0,
-        math.min(
-          (height - _kAngleOffsetY) / (widget.peekHeight - _kAngleOffsetY),
-          1.0,
-        ),
-      );
-
   /// Updates the overlay as if it was being dragged vertically.
   void onVerticalDragUpdate(DragUpdateDetails details) =>
       setHeight(height - details.primaryDelta, force: true);
@@ -172,19 +159,6 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
               child: new Stack(
                 fit: StackFit.passthrough,
                 children: <Widget>[
-                  new CustomPaint(
-                    painter: new QuadrilateralPainter(
-                      topLeftInset: new Offset(
-                        0.0,
-                        _kAngleOffsetY * (1.0 - _openingProgress),
-                      ),
-                      topRightInset: new Offset(
-                        0.0,
-                        _kAngleOffsetY * (1.0 - _peekProgress),
-                      ),
-                      color: new Color(0xFFDBE2E5),
-                    ),
-                  ),
                   widget.child,
                   new Positioned(
                     top: 0.0,
