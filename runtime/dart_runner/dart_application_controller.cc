@@ -12,6 +12,7 @@
 #include "dart/runtime/bin/embedded_dart_io.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
+#include "lib/ftl/synchronization/mutex.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "lib/tonic/dart_message_handler.h"
 #include "lib/tonic/dart_microtask_queue.h"
@@ -69,18 +70,26 @@ const char* kDartVMArgs[] = {
 // clang-format on
 };
 
+std::once_flag vm_initialized_;
+
 void DartApplicationController::InitDartVM() {
-  dart::bin::BootstrapDartIo();
+  // TODO(rmacnak): When AOT snapshots are refactored to generate the VM
+  // snapshot separately, move VM initialization before receiving the first
+  // bundle.
+  std::call_once(vm_initialized_, [this](){
+    dart::bin::BootstrapDartIo();
 
-  // TODO(abarth): Make checked mode configurable.
-  FTL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
+    // TODO(abarth): Make checked mode configurable.
+    FTL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
 
-  Dart_InitializeParams params = {};
-  params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
-  params.vm_snapshot_data = vm_snapshot_data_;
-  params.vm_snapshot_instructions = vm_snapshot_instructions_;
-  char* error = Dart_Initialize(&params);
-  if (error) FTL_LOG(FATAL) << "Dart_Initialize failed: " << error;
+    Dart_InitializeParams params = {};
+    params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
+    params.vm_snapshot_data = vm_snapshot_data_;
+    params.vm_snapshot_instructions = vm_snapshot_instructions_;
+    char* error = Dart_Initialize(&params);
+    if (error)
+      FTL_LOG(FATAL) << "Dart_Initialize failed: " << error;
+  });
 }
 
 bool DartApplicationController::CreateIsolate() {
