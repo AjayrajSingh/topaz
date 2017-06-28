@@ -81,7 +81,6 @@ class _DebugTextState extends State<DebugText> {
   }
 
   void _checkNetworking() {
-    print('Checking network status...');
     http.get('http://www.example.com').then((http.Response response) {
       setState(() {
         if (!mounted) {
