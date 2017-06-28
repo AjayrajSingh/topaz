@@ -34,10 +34,16 @@ class YoutubeThumbnailScreen extends StatelessWidget {
           return new Container(
             constraints: const BoxConstraints.expand(),
             child: model.videoId != null
-                ? new YoutubeThumbnail(
-                    videoId: model.videoId,
-                    onSelect: (String id) =>
-                        log.info('Thumbnail Selected: $id'),
+                ? new ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: const Radius.circular(16.0),
+                      bottomRight: const Radius.circular(16.0),
+                    ),
+                    child: new YoutubeThumbnail(
+                      videoId: model.videoId,
+                      onSelect: log.info,
+                      showVideoInfo: true,
+                    ),
                   )
                 : new CircularProgressIndicator(),
           );
