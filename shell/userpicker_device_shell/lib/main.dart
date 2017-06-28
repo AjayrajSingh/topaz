@@ -14,7 +14,6 @@ import 'authentication_context_impl.dart';
 import 'child_constraints_changer.dart';
 import 'constraints_model.dart';
 import 'debug_text.dart';
-import 'rounded_corner_decoration.dart';
 import 'screen_manager.dart';
 import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
@@ -46,26 +45,20 @@ void main() {
         )
       : null;
 
-  Widget mainWidget = new Container(
-    foregroundDecoration: new RoundedCornerDecoration(
-      radius: _kInnerBezelRadius,
-      color: Colors.black,
-    ),
-    child: new Stack(
-      fit: StackFit.passthrough,
-      children: <Widget>[
-        new ScreenManager(
-          key: screenManagerKey,
-          onLogout: model.refreshUsers,
-          onRemoveUser: model.removeUser,
-          launcher: applicationContext.launcher,
-        ),
-        new ScopedModel<AuthenticationOverlayModel>(
-          model: authenticationOverlayModel,
-          child: new AuthenticationOverlay(),
-        ),
-      ],
-    ),
+  Widget mainWidget = new Stack(
+    fit: StackFit.passthrough,
+    children: <Widget>[
+      new ScreenManager(
+        key: screenManagerKey,
+        onLogout: model.refreshUsers,
+        onRemoveUser: model.removeUser,
+        launcher: applicationContext.launcher,
+      ),
+      new ScopedModel<AuthenticationOverlayModel>(
+        model: authenticationOverlayModel,
+        child: new AuthenticationOverlay(),
+      ),
+    ],
   );
 
   GlobalKey<ChildConstraintsChangerState> childConstraintsChangerKey =

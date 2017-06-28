@@ -115,14 +115,12 @@ class ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
           ),
           boxShadow: kElevationToShadow[12],
         ),
-        child: new ClipRect(
-          child: new Container(
-            foregroundDecoration: new RoundedCornerDecoration(
-              radius: _kInnerBezelRadius,
-              color: Colors.black,
-            ),
-            child: widget.child,
+        child: new Container(
+          foregroundDecoration: new RoundedCornerDecoration(
+            radius: _kInnerBezelRadius,
+            color: Colors.black,
           ),
+          child: widget.child,
         ),
       );
 
