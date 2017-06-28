@@ -18,6 +18,9 @@ class EventPage extends StatelessWidget {
   /// The [Event] that this page renders
   final Event event;
 
+  /// Callback for when the user taps the buy button
+  final VoidCallback onTapBuy;
+
   static final DateFormat _dateFormat = new DateFormat('EEEE, d LLLL y');
 
   static final DateFormat _timeFormat = new DateFormat('h:mm aaa');
@@ -25,6 +28,7 @@ class EventPage extends StatelessWidget {
   /// Constructor
   EventPage({
     Key key,
+    this.onTapBuy,
     @required this.event,
   })
       : super(key: key) {
@@ -196,7 +200,7 @@ class EventPage extends StatelessWidget {
                 Icons.shopping_cart,
                 color: Colors.white,
               ),
-              onPressed: () {},
+              onPressed: () => onTapBuy?.call(),
               color: Colors.pink[500],
             ),
           ],

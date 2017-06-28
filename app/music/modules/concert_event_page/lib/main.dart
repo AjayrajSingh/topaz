@@ -47,6 +47,7 @@ Future<Null> main() async {
             loadingStatus: model.loadingStatus,
             builder: (BuildContext context) => new EventPage(
                   event: model.event,
+                  onTapBuy: model.purchaseTicket,
                 ),
           );
         }),

@@ -9,11 +9,14 @@ import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
+import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
+import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
 import 'package:lib.widgets/modular.dart';
+import 'package:web_view/web_view.dart' as web_view;
 
 /// The context topic for "focal entities"
 const String _kFocalEntitiesTopic = 'focal_entities';
@@ -25,6 +28,8 @@ const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
 const String _kLocationType = 'http://types.fuchsia.io/location';
 
 const String _kContextLinkName = 'location_context';
+
+const String _kWebViewLinkName = 'web_view';
 
 /// [ModuleModel] that manages the state of the Event Module.
 class EventPageModuleModel extends ModuleModel {
@@ -46,6 +51,11 @@ class EventPageModuleModel extends ModuleModel {
   LoadingStatus get loadingStatus => _loadingStatus;
 
   final LinkProxy _contextLink = new LinkProxy();
+
+  LinkProxy _webViewLink;
+
+  final ModuleControllerProxy _webViewModuleController =
+      new ModuleControllerProxy();
 
   /// Retrieves the full event based on the given ID
   Future<Null> fetchEvent(int eventId) async {
@@ -121,6 +131,34 @@ class EventPageModuleModel extends ModuleModel {
         'latitude': event.venue.latitude,
       };
       _contextLink.set(null, JSON.encode(contextLinkData));
+    }
+  }
+
+  /// Opens web view module to purchase tickets
+  void purchaseTicket() {
+    if (event != null && event.url != null) {
+      String linkData = JSON.encode(<String, Map<String, String>>{
+        'view': <String, String>{'uri': event.url},
+      });
+
+      if (_webViewLink == null) {
+        _webViewLink = new LinkProxy();
+        moduleContext.getLink(_kWebViewLinkName, _webViewLink.ctrl.request());
+        _webViewLink.set(null, linkData);
+        moduleContext.startModuleInShell(
+          'Purchase Web View',
+          web_view.kWebViewURL,
+          _kWebViewLinkName,
+          null, // outgoingServices,
+          null, // incomingServices,
+          _webViewModuleController.ctrl.request(),
+          new SurfaceRelation()..arrangement = SurfaceArrangement.sequential,
+          true,
+        );
+      } else {
+        _webViewLink.set(null, linkData);
+      }
+      _webViewModuleController.focus();
     }
   }
 }
