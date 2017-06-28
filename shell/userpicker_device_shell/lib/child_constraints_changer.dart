@@ -98,7 +98,7 @@ class ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
         key: _containerKey,
         width: width,
         height: height,
-        duration: const Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.fastOutSlowIn,
         padding: new EdgeInsets.only(
           bottom: bezel && height > width ? _kBezelExtension : 0.0,
@@ -111,9 +111,8 @@ class ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
             width: bezel ? _kBezelMinimumWidth : 0.0,
           ),
           borderRadius: new BorderRadius.circular(
-            _kOuterBezelRadius,
+            bezel ? _kOuterBezelRadius : 0.0,
           ),
-          boxShadow: kElevationToShadow[12],
         ),
         child: new Container(
           foregroundDecoration: new RoundedCornerDecoration(
