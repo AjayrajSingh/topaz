@@ -164,7 +164,7 @@ class Alphatar extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: new Text(
-        letter ?? '',
+        letter?.toUpperCase() ?? '',
         style: new TextStyle(
           color: Colors.white,
           fontSize: size / 2.0,
