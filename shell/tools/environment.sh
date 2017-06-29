@@ -56,7 +56,7 @@ function specgrep() {
 }
 
 function cgrep() {
-  find . $PRUNE_ARGS -o -type f \( -name "*\.cc" -o -name "*\.c" -o -name "*\.h" \) -print0 | xargs -0 $GREP_COMMAND "$@" 2>/dev/null
+  find . $PRUNE_ARGS -o -type f \( -name "*\.cpp" -o -name "*\.cc" -o -name "*\.c" -o -name "*\.h" \) -print0 | xargs -0 $GREP_COMMAND "$@" 2>/dev/null
 }
 
 function sysui_help() {
