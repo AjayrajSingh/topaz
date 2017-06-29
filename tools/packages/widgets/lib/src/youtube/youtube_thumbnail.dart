@@ -4,20 +4,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:models/youtube.dart';
 import 'package:widgets_meta/widgets_meta.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 import 'example_video_id.dart';
+import 'loading_state.dart';
 
 /// Callback function signature for selecting a Youtube video
 typedef void YoutubeSelectCallback(String videoId);
 
 const double _kVideoInfoHeight = 60.0;
 
-/// [YoutubeThumbnail] is a [StatelessWidget]
+/// A widget showing the thumbnail of a youtube video.
 ///
 /// Widget that shows a static Youtube thumbnail given a video id
-/// The thumbnail will stretch to fit its parent widget
-class YoutubeThumbnail extends StatelessWidget {
+/// The thumbnail will stretch to fit its parent widget.
+class YoutubeThumbnail extends StatefulWidget {
   /// ID for given youtube video
   final String videoId;
 
@@ -25,7 +28,11 @@ class YoutubeThumbnail extends StatelessWidget {
   final YoutubeSelectCallback onSelect;
 
   /// Indicates whether the video info should be shown below the thumbnail.
+  /// When this is true, the [YoutubeApi] must be provided.
   final bool showVideoInfo;
+
+  /// The Youtube API.
+  final YoutubeApi api;
 
   /// Constructor
   YoutubeThumbnail({
@@ -33,38 +40,80 @@ class YoutubeThumbnail extends StatelessWidget {
     @required @ExampleValue(kExampleVideoId) this.videoId,
     this.onSelect,
     this.showVideoInfo: false,
+    this.api,
   })
       : super(key: key) {
     assert(videoId != null);
     assert(showVideoInfo != null);
+    assert(!showVideoInfo || api != null);
   }
 
-  void _handleSelect() {
-    onSelect?.call(videoId);
-  }
+  @override
+  _YoutubeThumbnailState createState() => new _YoutubeThumbnailState();
+}
+
+class _YoutubeThumbnailState extends State<YoutubeThumbnail> {
+  /// Data for given video
+  VideoData _videoData;
+
+  /// Loading State for video data
+  LoadingState _loadingState = LoadingState.inProgress;
 
   /// Retrieves Youtube thumbnail from the video ID
-  String _getYoutubeThumbnailUrl() {
-    return 'http://img.youtube.com/vi/$videoId/0.jpg';
+  String get thumbnailUrl =>
+      'http://img.youtube.com/vi/${widget.videoId}/0.jpg';
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.showVideoInfo) {
+      _updateVideo();
+    }
+  }
+
+  void _updateVideo() {
+    widget.api
+        .getVideoData(videoId: widget.videoId)
+        .then((VideoData videoData) {
+      if (mounted) {
+        if (videoData == null) {
+          setState(() {
+            _loadingState = LoadingState.failed;
+          });
+        } else {
+          setState(() {
+            _loadingState = LoadingState.completed;
+            _videoData = videoData;
+          });
+        }
+      }
+    }).catchError((_) {
+      if (mounted) {
+        setState(() {
+          _loadingState = LoadingState.failed;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     Widget image = new Image.network(
-      _getYoutubeThumbnailUrl(),
+      thumbnailUrl,
       fit: BoxFit.cover,
     );
 
     List<Widget> children = <Widget>[new Expanded(child: image)];
 
-    if (showVideoInfo) {
+    if (widget.showVideoInfo) {
       children.add(_buildVideoInfo(context));
     }
 
     return new Material(
       color: Colors.white,
       child: new InkWell(
-        onTap: _handleSelect,
+        onTap: () => widget.onSelect?.call(widget.videoId),
         child: new Column(
           children: children,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -84,9 +133,7 @@ class YoutubeThumbnail extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             new Text(
-              // TODO(youngseokyoon): get the real title.
-              // https://fuchsia.atlassian.net/browse/SO-576
-              'Dummy Title',
+              _loadingState == LoadingState.completed ? _videoData.title : '',
               style: new TextStyle(fontSize: 14.0, color: Colors.black),
             ),
             new Container(height: 4.0),

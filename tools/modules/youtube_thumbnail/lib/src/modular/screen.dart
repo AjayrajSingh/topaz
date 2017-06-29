@@ -7,6 +7,7 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:widgets/youtube.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 import 'module_model.dart';
 
@@ -33,7 +34,7 @@ class YoutubeThumbnailScreen extends StatelessWidget {
           log.fine('model.videoId = ${model.videoId}');
           return new Container(
             constraints: const BoxConstraints.expand(),
-            child: model.videoId != null
+            child: model.videoId != null && apiKey != null
                 ? new ClipRRect(
                     borderRadius: const BorderRadius.only(
                       bottomLeft: const Radius.circular(16.0),
@@ -43,6 +44,7 @@ class YoutubeThumbnailScreen extends StatelessWidget {
                       videoId: model.videoId,
                       onSelect: log.info,
                       showVideoInfo: true,
+                      api: new GoogleApisYoutubeApi(apiKey: apiKey),
                     ),
                   )
                 : new CircularProgressIndicator(),
