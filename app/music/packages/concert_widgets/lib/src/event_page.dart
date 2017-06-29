@@ -13,6 +13,11 @@ const double _kHeroImageHeight = 240.0;
 const double _kLogoSize = 32.0;
 const double _kLineupAvatarSize = 48.0;
 
+final TextStyle _kVenueFontStyle = new TextStyle(
+  fontSize: 16.0,
+  height: 1.5,
+);
+
 /// UI widget that represents an entire concert page
 class EventPage extends StatelessWidget {
   /// The [Event] that this page renders
@@ -58,20 +63,21 @@ class EventPage extends StatelessWidget {
       ),
     ];
     if (event.venue.name != null) {
-      children.add(new Text(event.venue.name));
+      children.add(new Text(event.venue.name, style: _kVenueFontStyle));
     }
     if (event.venue.street != null) {
-      children.add(new Text(event.venue.street));
+      children.add(new Text(event.venue.street, style: _kVenueFontStyle));
     }
     if (event.venue.city?.name != null ||
         event.venue.city?.country != null ||
         event.venue.zip != null) {
       children.add(new Text(
         '${event.venue.city?.name + ', ' ?? ''}${event.venue.city?.country ?? ''} ${ event.venue.zip ?? ''}',
+        style: _kVenueFontStyle,
       ));
     }
     if (event.venue.phoneNumber != null) {
-      children.add(new Text(event.venue.phoneNumber));
+      children.add(new Text(event.venue.phoneNumber, style: _kVenueFontStyle));
     }
     return new Column(
       mainAxisSize: MainAxisSize.min,
