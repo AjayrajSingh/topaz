@@ -52,9 +52,9 @@ Future<Null> _createWeatherProposal({
         ..subheadline = '${forecast.description}'
         ..details = ''
         ..color = 0xFFFF0080
-        ..iconUrls = const <String>[]
+        ..iconUrls = <String>[forecast.iconUrlLight]
         ..imageType = SuggestionImageType.other
-        ..imageUrl = forecast.iconUrlLight
+        ..imageUrl = ''
         ..annoyance = AnnoyanceType.none)
       ..onSelected = <Action>[
         new Action()

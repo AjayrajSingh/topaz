@@ -135,5 +135,5 @@ class Forecast {
 
   /// Get URL for weather icon for use on light backgrounds
   String get iconUrlLight =>
-      _weatherIconsDark.containsKey(iconId) ? _weatherIconsDark[iconId] : null;
+      _weatherIconsDark.containsKey(iconId) ? _weatherIconsLight[iconId] : null;
 }
