@@ -57,6 +57,7 @@ DartApplicationController::DartApplicationController(
 DartApplicationController::~DartApplicationController() {}
 
 const char* kDartVMArgs[] = {
+    "--no_profiler",
 // clang-format off
 #if defined(AOT_RUNTIME)
     "--precompilation",
