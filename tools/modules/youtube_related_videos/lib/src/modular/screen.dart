@@ -38,7 +38,7 @@ class YoutubeRelatedVideosScreen extends StatelessWidget {
                   ? new SingleChildScrollView(
                       child: new YoutubeRelatedVideos(
                         videoId: model.videoId,
-                        api: new HttpsYoutubeApi(apiKey: apiKey),
+                        api: new GoogleApisYoutubeApi(apiKey: apiKey),
                         onSelectVideo: model.selectVideo,
                       ),
                     )

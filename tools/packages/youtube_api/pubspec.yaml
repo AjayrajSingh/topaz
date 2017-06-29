@@ -6,6 +6,8 @@ name: youtube_api
 dependencies:
   flutter:
     sdk: flutter
+  googleapis: ^0.32.0
+  googleapis_auth: ^0.2.3
   models:
     path: ../models
 dev_dependencies:

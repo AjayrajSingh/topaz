@@ -12,6 +12,8 @@ dart_package("youtube_api") {
   deps = [
     "//apps/modules/common/packages/models",
     "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/pub/googleapis",
+    "//third_party/dart-pkg/pub/googleapis_auth",
   ]
 
   analysis_options = "//apps/modules/common/.analysis_options"

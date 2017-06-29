@@ -51,7 +51,8 @@ void addEmbeddedChildBuilders(Config config) {
         return new EmbeddedChild(
           widgetBuilder: (BuildContext context) => new YoutubeVideo(
                 videoId: args,
-                api: new HttpsYoutubeApi(apiKey: config.get('google_api_key')),
+                api: new GoogleApisYoutubeApi(
+                    apiKey: config.get('google_api_key')),
               ),
           // Flutter version doesn't need a specific disposer.
           disposer: () {},

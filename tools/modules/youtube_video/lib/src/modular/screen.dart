@@ -37,7 +37,7 @@ class YoutubeVideoScreen extends StatelessWidget {
             child: model.videoId != null && apiKey != null
                 ? new YoutubeVideo(
                     videoId: model.videoId,
-                    api: new HttpsYoutubeApi(apiKey: apiKey),
+                    api: new GoogleApisYoutubeApi(apiKey: apiKey),
                   )
                 : new CircularProgressIndicator(),
           ),
