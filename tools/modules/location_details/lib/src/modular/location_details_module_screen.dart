@@ -36,6 +36,13 @@ class LocationsDetailModuleScreen extends StatelessWidget {
             child: new ChildView(connection: model.forecastViewConn),
           ));
         }
+        if (model.travelInfoViewConn != null) {
+          embeds.add(new Container(
+            height: 140.0,
+            width: 250.0,
+            child: new ChildView(connection: model.travelInfoViewConn),
+          ));
+        }
         return new Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,

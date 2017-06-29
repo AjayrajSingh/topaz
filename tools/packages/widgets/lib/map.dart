@@ -3,5 +3,6 @@
 // found in the LICENSE file.
 
 export 'src/map/static_map.dart';
+export 'src/map/travel_info_card.dart';
 
 export 'common.dart';

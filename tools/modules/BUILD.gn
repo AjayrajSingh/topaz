@@ -14,6 +14,7 @@ group("modules") {
     "location_details",
     "map",
     "map:map_component",
+    "travel_info",
     "usps",
     "usps:usps_component",
     "weather_forecast",

@@ -1,0 +1,28 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//flutter/build/flutter_app.gni")
+
+flutter_app("travel_info") {
+  package_name = "travel_info"
+
+  main_dart = "lib/main.dart"
+
+  source_dir = "lib"
+
+  deps = [
+    "//application/lib/app/dart",
+    "//apps/modular/services/module:module_dart",
+    "//apps/modular/services/story:story_dart",
+    "//apps/modules/common/packages/config",
+    "//apps/modules/common/packages/google_maps_api",
+    "//apps/modules/common/packages/models",
+    "//apps/modules/common/packages/widgets",
+    "//lib/fidl/dart",
+    "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/widgets:lib.widgets",
+  ]
+
+  analysis_options = "//apps/modules/common/.analysis_options"
+}

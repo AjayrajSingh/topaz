@@ -11,6 +11,7 @@ import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
 
+const String _kTravelInfoModuleUrl = 'file:///system/apps/travel_info';
 const String _kForecastModuleUrl = 'file:///system/apps/weather_forecast';
 const String _kMapModuleUrl = 'file:///system/apps/map';
 const String _kMapDocRoot = 'map-doc';
@@ -33,6 +34,10 @@ class LocationDetailsModuleModel extends ModuleModel {
   ChildViewConnection get forecastViewConn => _forecastViewConn;
   ChildViewConnection _forecastViewConn;
 
+  /// Child View Connection for Travel Info
+  ChildViewConnection get travelInfoViewConn => _travelInfoViewConn;
+  ChildViewConnection _travelInfoViewConn;
+
   /// Link for Embedded Map Module
   final LinkProxy _mapLink = new LinkProxy();
 
@@ -43,6 +48,7 @@ class LocationDetailsModuleModel extends ModuleModel {
     if (doc is Map<String, dynamic> &&
         doc['longitude'] is double &&
         doc['latitude'] is double) {
+      _updateTravelInfoModule();
       _updateForecastModule();
       _updateMapModule(
         latitude: doc['latitude'],
@@ -101,6 +107,27 @@ class LocationDetailsModuleModel extends ModuleModel {
         viewOwner.passRequest(),
       );
       _forecastViewConn = new ChildViewConnection(viewOwner.passHandle());
+    }
+    notifyListeners();
+  }
+
+  void _updateTravelInfoModule() {
+    if (_travelInfoViewConn != null) {
+      return;
+    } else {
+      InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
+      InterfacePair<ModuleController> moduleController =
+          new InterfacePair<ModuleController>();
+      moduleContext.startModule(
+        'Travel Info',
+        _kTravelInfoModuleUrl,
+        null, // Uses the link of the parent module
+        null,
+        null,
+        moduleController.passRequest(),
+        viewOwner.passRequest(),
+      );
+      _travelInfoViewConn = new ChildViewConnection(viewOwner.passHandle());
     }
     notifyListeners();
   }

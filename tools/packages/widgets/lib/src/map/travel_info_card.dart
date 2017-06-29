@@ -39,10 +39,22 @@ class TravelInfoCard extends StatelessWidget {
   }
 
   Widget _buildTabBar() {
-    return new TabBar(
-        tabs: _kTravelModeIcons.keys.map((TravelMode mode) {
-      return new Tab(icon: new Icon(_kTravelModeIcons[mode]));
-    }).toList());
+    return new Container(
+      decoration: new BoxDecoration(
+        border: new Border(
+          bottom: new BorderSide(
+            color: Colors.grey[300],
+          ),
+        ),
+      ),
+      child: new TabBar(
+          labelColor: Colors.blue[500],
+          unselectedLabelColor: Colors.grey[500],
+          indicatorColor: Colors.blue[500],
+          tabs: _kTravelModeIcons.keys.map((TravelMode mode) {
+            return new Tab(icon: new Icon(_kTravelModeIcons[mode]));
+          }).toList()),
+    );
   }
 
   Widget _buildTabBarView() {
@@ -54,34 +66,39 @@ class TravelInfoCard extends StatelessWidget {
   Widget _buildTravelInfo(TravelMode mode) {
     TravelInfo info = travelInfo[mode];
     return new Container(
-        padding: const EdgeInsets.all(16.0),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            new Container(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: new Text('${info.distanceText} away'),
+      padding: const EdgeInsets.all(16.0),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          new Container(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: new Text('${info.distanceText} away'),
+          ),
+          new Text(
+            '${info.durationText} ${_kTravelModeLabels[mode]}',
+            style: new TextStyle(
+              fontSize: 26.0,
+              fontWeight: FontWeight.w300,
             ),
-            new Text(
-              '${info.durationText} ${_kTravelModeLabels[mode]}',
-              style: new TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.w300,
-              ),
-            )
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return new DefaultTabController(
-      length: TravelMode.values.length,
-      child: new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-        _buildTabBar(),
-        _buildTabBarView(),
-      ]),
+    return new Material(
+      child: new DefaultTabController(
+        length: TravelMode.values.length,
+        child: new Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+          _buildTabBar(),
+          new Expanded(
+            child: _buildTabBarView(),
+          )
+        ]),
+      ),
     );
   }
 }
