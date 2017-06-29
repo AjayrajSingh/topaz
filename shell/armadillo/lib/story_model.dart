@@ -58,6 +58,21 @@ class StoryModel extends Model {
     notifyListeners();
   }
 
+  @override
+  void notifyListeners() {
+    // Update indicies
+    for (int i = 0; i < _activeSortedStoryClusters.length; i++) {
+      StoryCluster storyCluster = _activeSortedStoryClusters[i];
+      storyCluster.stories.forEach(
+        (Story story) {
+          story.clusterIndex = i;
+        },
+      );
+    }
+
+    super.notifyListeners();
+  }
+
   /// Updates the [size] used to layout the stories.
   void updateLayouts(Size size) {
     if (size.width == 0.0 || size.height == 0.0) {

@@ -65,6 +65,9 @@ class Story {
   /// The key of the container that sizes the story's widget in tab mode.
   final GlobalKey<SimulatedFractionallySizedBoxState> tabSizerKey;
 
+  /// Called when the cluster index of this story changes.
+  final ValueChanged<int> onClusterIndexChanged;
+
   /// A timestamp of the last time this story was interacted with.  This is used
   /// for sorting the story list and for determining the size of the story's
   /// widget in the story list.
@@ -88,6 +91,9 @@ class Story {
   /// The importance of the story relative to other stories.
   double importance;
 
+  /// The index of the cluster this story is in.
+  int _clusterIndex;
+
   /// Constructor.
   Story({
     this.id,
@@ -100,6 +106,7 @@ class Story {
     this.themeColor,
     this.inactive: false,
     this.importance: 1.0,
+    this.onClusterIndexChanged,
   })
       : this.clusterId = new StoryClusterId(),
         this.storyBarKey =
@@ -132,6 +139,14 @@ class Story {
 
   /// Shows the story's story bar.  See [StoryBarState.show].
   void showStoryBar() => storyBarKey.currentState?.show();
+
+  /// Sets the cluster index of this story.
+  set clusterIndex(int clusterIndex) {
+    if (_clusterIndex != clusterIndex) {
+      _clusterIndex = clusterIndex;
+      onClusterIndexChanged?.call(_clusterIndex);
+    }
+  }
 
   @override
   int get hashCode => id.hashCode;

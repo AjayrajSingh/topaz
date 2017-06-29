@@ -14,13 +14,14 @@ import 'package:armadillo/story_cluster_id.dart';
 import 'package:armadillo/story_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart' as bindings;
+import 'package:lib.logging/logging.dart';
 
-import 'debug.dart';
 import 'hit_test_model.dart';
 import 'story_importance_watcher_impl.dart';
 import 'story_provider_watcher_impl.dart';
 
 const String _kUserImage = 'packages/armadillo/res/User.png';
+const int _kMaxActiveClusters = 5;
 
 /// Called when the [StoryProvider] returns no stories.
 typedef void OnNoStories(StoryProviderProxy storyProvider);
@@ -136,7 +137,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
             .where((Story story) => !storyIds.contains(story.id.value))
             .toList()
             .forEach((Story story) {
-          armadilloPrint('Story ${story.id.value} has been removed!');
+          log.info('Story ${story.id.value} has been removed!');
           _removeStoryFromClusters(story);
         });
 
@@ -231,20 +232,16 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   }
 
   void _startStory(StoryInfo storyInfo) {
-    armadilloPrint('Adding story: $storyInfo');
+    log.info('Adding story: $storyInfo');
 
     // Start it!
-    bindings.InterfacePair<ViewOwner> viewOwner =
-        new bindings.InterfacePair<ViewOwner>();
-    _storyControllerMap[storyInfo.id].start(viewOwner.passRequest());
 
     // Create a flutter view from its view!
     StoryCluster storyCluster = new StoryCluster(stories: <Story>[
       _createStory(
         storyInfo: storyInfo,
-        childViewConnection: new ChildViewConnection(
-          viewOwner.passHandle(),
-        ),
+        storyController: _storyControllerMap[storyInfo.id],
+        startingIndex: _storyClusters.length,
       ),
     ]);
 
@@ -256,8 +253,11 @@ class StoryProviderStoryGenerator extends StoryGenerator {
     _listeners.toList().forEach((VoidCallback listener) => listener());
   }
 
-  Story _createStory(
-      {StoryInfo storyInfo, ChildViewConnection childViewConnection}) {
+  Story _createStory({
+    StoryInfo storyInfo,
+    StoryController storyController,
+    int startingIndex,
+  }) {
     String storyTitle = Uri
         .parse(storyInfo.url)
         .pathSegments[Uri.parse(storyInfo.url).pathSegments.length - 1]
@@ -270,34 +270,121 @@ class StoryProviderStoryGenerator extends StoryGenerator {
     });
 
     return new Story(
-      id: new StoryId(storyInfo.id),
-      builder: (BuildContext context) =>
-          new ScopedModelDescendant<HitTestModel>(
-            builder: (
-              BuildContext context,
-              Widget child,
-              HitTestModel hitTestModel,
-            ) =>
-                new ChildView(
-                  hitTestable: hitTestModel.isStoryHitTestable(storyInfo.id),
-                  connection: childViewConnection,
+        id: new StoryId(storyInfo.id),
+        builder: (BuildContext context) => new _StoryWidget(
+              key: new GlobalObjectKey<_StoryWidgetState>(storyController),
+              storyInfo: storyInfo,
+              storyController: storyController,
+              startingIndex: startingIndex,
+            ),
+        // TODO(apwilson): Improve title.
+        title: storyTitle,
+        icons: <OpacityBuilder>[],
+        avatar: (_, double opacity) => new Opacity(
+              opacity: opacity,
+              child: new Image.asset(_kUserImage, fit: BoxFit.cover),
+            ),
+        lastInteraction: new DateTime.now(),
+        cumulativeInteractionDuration: new Duration(
+          minutes: 0,
+        ),
+        themeColor: storyInfo.extra['color'] == null
+            ? Colors.grey[500]
+            : new Color(int.parse(storyInfo.extra['color'])),
+        inactive: false,
+        onClusterIndexChanged: (int clusterIndex) {
+          _StoryWidgetState state =
+              new GlobalObjectKey<_StoryWidgetState>(storyController)
+                  .currentState;
+          if (state != null) {
+            state.index = clusterIndex;
+          }
+        });
+  }
+}
+
+class _StoryWidget extends StatefulWidget {
+  final StoryInfo storyInfo;
+  final StoryController storyController;
+  final int startingIndex;
+
+  _StoryWidget({
+    Key key,
+    this.storyInfo,
+    this.storyController,
+    this.startingIndex,
+  })
+      : super(key: key);
+
+  @override
+  _StoryWidgetState createState() => new _StoryWidgetState();
+}
+
+class _StoryWidgetState extends State<_StoryWidget> {
+  ChildViewConnection _childViewConnection;
+  int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.startingIndex;
+    _toggleStartOrStop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new ScopedModelDescendant<HitTestModel>(
+      builder: (
+        BuildContext context,
+        Widget child,
+        HitTestModel hitTestModel,
+      ) =>
+          _childViewConnection == null
+              ? new Offstage()
+              : new ChildView(
+                  hitTestable:
+                      hitTestModel.isStoryHitTestable(widget.storyInfo.id),
+                  connection: _childViewConnection,
                 ),
-          ),
-      // TODO(apwilson): Improve title.
-      title: storyTitle,
-      icons: <OpacityBuilder>[],
-      avatar: (_, double opacity) => new Opacity(
-            opacity: opacity,
-            child: new Image.asset(_kUserImage, fit: BoxFit.cover),
-          ),
-      lastInteraction: new DateTime.now(),
-      cumulativeInteractionDuration: new Duration(
-        minutes: 0,
-      ),
-      themeColor: storyInfo.extra['color'] == null
-          ? Colors.grey[500]
-          : new Color(int.parse(storyInfo.extra['color'])),
-      inactive: false,
     );
+  }
+
+  set index(int index) {
+    if (_currentIndex != index) {
+      _currentIndex = index;
+      _toggleStartOrStop();
+    }
+  }
+
+  void _toggleStartOrStop() {
+    if (_currentIndex < _kMaxActiveClusters) {
+      _start();
+    } else {
+      _stop();
+    }
+  }
+
+  void _start() {
+    if (_childViewConnection == null) {
+      log.info('Starting story: ${widget.storyInfo.id}');
+      bindings.InterfacePair<ViewOwner> viewOwner =
+          new bindings.InterfacePair<ViewOwner>();
+      widget.storyController.start(viewOwner.passRequest());
+      setState(() {
+        _childViewConnection = new ChildViewConnection(
+          viewOwner.passHandle(),
+        );
+      });
+    }
+  }
+
+  void _stop() {
+    if (_childViewConnection != null) {
+      log.info('Stopping story: ${widget.storyInfo.id}');
+      setState(() {
+        _childViewConnection = null;
+      });
+      widget.storyController.stop(() {});
+    }
   }
 }
