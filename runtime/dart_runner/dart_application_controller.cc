@@ -14,19 +14,28 @@
 #include "lib/ftl/logging.h"
 #include "lib/ftl/synchronization/mutex.h"
 #include "lib/mtl/tasks/message_loop.h"
+#include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_message_handler.h"
 #include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/dart_state.h"
+#include "lib/tonic/handle_table.h"
 #include "lib/tonic/logging/dart_error.h"
-#include "lib/tonic/mx/mx_converter.h"
 
 using tonic::ToDart;
 
 namespace dart_content_handler {
 namespace {
 
-void RunMicrotasks() {
-  tonic::DartMicrotaskQueue::GetForCurrentThread()->RunMicrotasks();
+void AfterTask() {
+  tonic::DartMicrotaskQueue* queue =
+      tonic::DartMicrotaskQueue::GetForCurrentThread();
+  queue->RunMicrotasks();
+  if (!Dart_HasLivePorts() &&
+      tonic::HandleTable::Current().Empty() &&
+      !queue->HasMicrotasks()) {
+    FTL_LOG(INFO) << "Isolate has no ports, handles or microtasks and could be "
+                     "terminated.";
+  }
 }
 
 }  // namespace
@@ -125,7 +134,7 @@ bool DartApplicationController::Main() {
   // eg. Redirect stdin, stdout, and stderr.
 
   tonic::DartMicrotaskQueue::StartForCurrentThread();
-  mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(RunMicrotasks);
+  mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(AfterTask);
 
   fidl::Array<fidl::String> arguments =
       std::move(startup_info_->launch_info->arguments);

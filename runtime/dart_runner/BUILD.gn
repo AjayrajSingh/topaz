@@ -37,7 +37,6 @@ template("runner") {
       "//lib/ftl",
       "//lib/mtl",
       "//lib/tonic",
-      "//lib/tonic/mx",
       "//lib/zip",
     ] + extra_deps
   }

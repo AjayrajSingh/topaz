@@ -14,8 +14,8 @@
 #include "lib/mtl/tasks/message_loop.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_microtask_queue.h"
+#include "lib/tonic/handle_table.h"
 #include "lib/tonic/logging/dart_error.h"
-#include "lib/tonic/mx/mx_converter.h"
 
 using tonic::ToDart;
 
@@ -104,14 +104,16 @@ void InitBuiltinLibrariesForIsolate(
   fidl::InterfaceHandle<app::ApplicationEnvironment> environment;
   context->ConnectToEnvironmentService(environment.NewRequest());
 
+  tonic::HandleTable& handle_table = tonic::HandleTable::Current();
+
   DART_CHECK_VALID(Dart_SetField(
       fidl_internal, ToDart("_environment"),
-      tonic::DartConverter<mx::channel>::ToDart(environment.PassHandle())));
+      handle_table.AddAndWrap(environment.PassHandle())));
 
   if (outgoing_services) {
-    DART_CHECK_VALID(Dart_SetField(fidl_internal, ToDart("_outgoingServices"),
-                                   tonic::DartConverter<mx::channel>::ToDart(
-                                       outgoing_services.PassChannel())));
+    DART_CHECK_VALID(Dart_SetField(
+        fidl_internal, ToDart("_outgoingServices"),
+        handle_table.AddAndWrap(outgoing_services.PassChannel())));
   }
 
   // dart:fuchsia.builtin ------------------------------------------------------
