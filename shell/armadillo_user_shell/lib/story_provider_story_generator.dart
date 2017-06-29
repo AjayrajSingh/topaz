@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:apps.modular.services.story/story_controller.fidl.dart';
 import 'package:apps.modular.services.story/story_info.fidl.dart';
 import 'package:apps.modular.services.story/story_state.fidl.dart';
@@ -157,7 +159,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
           _getController(storyId);
           _storyControllerMap[storyId]
               .getInfo((StoryInfo storyInfo, StoryState state) {
-            _startStory(storyInfo);
+            _startStory(storyInfo, _storyClusters.length);
             added++;
             if (added == storiesToAdd.length) {
               if (_firstTime) {
@@ -186,7 +188,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
       assert(
           storyState == StoryState.initial || storyState == StoryState.stopped);
       _getController(storyInfo.id);
-      _startStory(storyInfo);
+      _startStory(storyInfo, 0);
     }
   }
 
@@ -231,7 +233,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
     );
   }
 
-  void _startStory(StoryInfo storyInfo) {
+  void _startStory(StoryInfo storyInfo, int startingIndex) {
     log.info('Adding story: $storyInfo');
 
     // Start it!
@@ -241,7 +243,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
       _createStory(
         storyInfo: storyInfo,
         storyController: _storyControllerMap[storyInfo.id],
-        startingIndex: _storyClusters.length,
+        startingIndex: startingIndex,
       ),
     ]);
 
@@ -269,14 +271,16 @@ class StoryProviderStoryGenerator extends StoryGenerator {
       return true;
     });
 
+    Widget builderWidget = new _StoryWidget(
+      key: new GlobalObjectKey<_StoryWidgetState>(storyController),
+      storyInfo: storyInfo,
+      storyController: storyController,
+      startingIndex: startingIndex,
+    );
+
     return new Story(
         id: new StoryId(storyInfo.id),
-        builder: (BuildContext context) => new _StoryWidget(
-              key: new GlobalObjectKey<_StoryWidgetState>(storyController),
-              storyInfo: storyInfo,
-              storyController: storyController,
-              startingIndex: startingIndex,
-            ),
+        builder: (BuildContext context) => builderWidget,
         // TODO(apwilson): Improve title.
         title: storyTitle,
         icons: <OpacityBuilder>[],
@@ -298,6 +302,13 @@ class StoryProviderStoryGenerator extends StoryGenerator {
                   .currentState;
           if (state != null) {
             state.index = clusterIndex;
+          } else {
+            builderWidget = new _StoryWidget(
+              key: new GlobalObjectKey<_StoryWidgetState>(storyController),
+              storyInfo: storyInfo,
+              storyController: storyController,
+              startingIndex: clusterIndex,
+            );
           }
         });
   }
@@ -321,8 +332,10 @@ class _StoryWidget extends StatefulWidget {
 }
 
 class _StoryWidgetState extends State<_StoryWidget> {
+  Completer<Null> _stoppingCompleter;
   ChildViewConnection _childViewConnection;
   int _currentIndex;
+  bool _shouldBeStopped = true;
 
   @override
   void initState() {
@@ -365,26 +378,46 @@ class _StoryWidgetState extends State<_StoryWidget> {
   }
 
   void _start() {
+    _shouldBeStopped = false;
     if (_childViewConnection == null) {
-      log.info('Starting story: ${widget.storyInfo.id}');
-      bindings.InterfacePair<ViewOwner> viewOwner =
-          new bindings.InterfacePair<ViewOwner>();
-      widget.storyController.start(viewOwner.passRequest());
-      setState(() {
-        _childViewConnection = new ChildViewConnection(
-          viewOwner.passHandle(),
-        );
-      });
+      if (_stoppingCompleter != null) {
+        _stoppingCompleter.future.then((_) => _startStory);
+      } else {
+        _startStory();
+      }
     }
   }
 
+  void _startStory() {
+    if (_shouldBeStopped) {
+      return;
+    }
+    log.info('Starting story: ${widget.storyInfo.id}');
+    bindings.InterfacePair<ViewOwner> viewOwner =
+        new bindings.InterfacePair<ViewOwner>();
+    widget.storyController.start(viewOwner.passRequest());
+    setState(() {
+      _childViewConnection = new ChildViewConnection(
+        viewOwner.passHandle(),
+      );
+    });
+  }
+
   void _stop() {
+    _shouldBeStopped = true;
     if (_childViewConnection != null) {
+      if (_stoppingCompleter != null) {
+        return;
+      }
+      _stoppingCompleter = new Completer<Null>();
       log.info('Stopping story: ${widget.storyInfo.id}');
       setState(() {
         _childViewConnection = null;
       });
-      widget.storyController.stop(() {});
+      widget.storyController.stop(() {
+        _stoppingCompleter.complete();
+        _stoppingCompleter = null;
+      });
     }
   }
 }
