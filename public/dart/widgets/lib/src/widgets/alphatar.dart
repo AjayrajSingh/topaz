@@ -101,7 +101,7 @@ class Alphatar extends StatelessWidget {
     return new Alphatar(
       key: key,
       avatarImage: avatarImage,
-      letter: name[0],
+      letter: name.isNotEmpty ? name[0] : '',
       size: size,
       backgroundColor: backgroundColor ?? _pickColorForString(name),
     );
@@ -119,7 +119,7 @@ class Alphatar extends StatelessWidget {
     return new Alphatar.withUrl(
       key: key,
       avatarUrl: avatarUrl,
-      letter: name[0],
+      letter: name.isNotEmpty ? name[0] : '',
       size: size,
       backgroundColor: backgroundColor ?? _pickColorForString(name),
     );
@@ -160,16 +160,22 @@ class Alphatar extends StatelessWidget {
     return new Container(
       alignment: FractionalOffset.center,
       decoration: new BoxDecoration(
-        color: backgroundColor,
+        color: letter.isNotEmpty ? backgroundColor : Colors.transparent,
         shape: BoxShape.circle,
       ),
-      child: new Text(
-        letter?.toUpperCase() ?? '',
-        style: new TextStyle(
-          color: Colors.white,
-          fontSize: size / 2.0,
-        ),
-      ),
+      child: letter.isNotEmpty
+          ? new Text(
+              letter?.toUpperCase() ?? '',
+              style: new TextStyle(
+                color: Colors.white,
+                fontSize: size / 2.0,
+              ),
+            )
+          : new Icon(
+              Icons.error,
+              size: size,
+              color: Colors.red,
+            ),
     );
   }
 
