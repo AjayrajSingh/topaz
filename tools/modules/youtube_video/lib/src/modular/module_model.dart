@@ -8,14 +8,29 @@ import 'package:apps.maxwell.services.action_log/component.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
+import 'package:meta/meta.dart';
+import 'package:models/youtube.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 // This module expects to obtain the youtube video id string through the link
 // provided from the parent, in the following document id / property key.
 const String _kYoutubeDocRoot = 'youtube-doc';
 const String _kYoutubeVideoIdKey = 'youtube-video-id';
 
+// This key is used to add the title to the action log.
+const String _kYoutubeVideoTitleKey = 'youtube-video-title';
+
 /// The model class for the youtube_video module.
 class YoutubeVideoModuleModel extends ModuleModel {
+  /// The Google api key.
+  final GoogleApisYoutubeApi youtubeApi;
+
+  /// Creates a new instance of [YoutubeVideoModuleModel].
+  YoutubeVideoModuleModel({@required String apiKey})
+      : youtubeApi = new GoogleApisYoutubeApi(apiKey: apiKey) {
+    assert(apiKey != null);
+  }
+
   /// Gets the Youtube video id.
   String get videoId => _videoId;
   String _videoId;
@@ -45,18 +60,34 @@ class YoutubeVideoModuleModel extends ModuleModel {
 
     if (_videoId == null) {
       log.fine('No youtube video ID found in json.');
-    } else {
+      return;
+    }
+
+    log.fine('_videoId: $_videoId');
+
+    // Retrieve the title with the youtube api, and log ViewVideo action.
+    youtubeApi.getVideoData(videoId: _videoId).then((VideoData data) {
+      if (data == null) {
+        return;
+      }
+
+      Map<String, dynamic> actionLogData = <String, dynamic>{
+        _kYoutubeDocRoot: <String, String>{
+          _kYoutubeVideoIdKey: data.id,
+          _kYoutubeVideoTitleKey: data.title,
+        },
+      };
+
       IntelligenceServicesProxy intelligenceServices =
           new IntelligenceServicesProxy();
       moduleContext
           .getIntelligenceServices(intelligenceServices.ctrl.request());
       ComponentActionLogProxy actionLog = new ComponentActionLogProxy();
       intelligenceServices.getActionLog(actionLog.ctrl.request());
-      actionLog.logAction('ViewVideo', json);
+      actionLog.logAction('ViewVideo', JSON.encode(actionLogData));
       intelligenceServices.ctrl.close();
       actionLog.ctrl.close();
-      log.fine('_videoId: $_videoId');
-      notifyListeners();
-    }
+    });
+    notifyListeners();
   }
 }

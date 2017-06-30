@@ -29,8 +29,8 @@ Future<Null> main() async {
   ModuleWidget<YoutubeVideoModuleModel> moduleWidget =
       new ModuleWidget<YoutubeVideoModuleModel>(
     applicationContext: new ApplicationContext.fromStartupInfo(),
-    moduleModel: new YoutubeVideoModuleModel(),
-    child: new YoutubeVideoScreen(apiKey: googleApiKey),
+    moduleModel: new YoutubeVideoModuleModel(apiKey: googleApiKey),
+    child: new YoutubeVideoScreen(),
   );
 
   moduleWidget.advertise();
