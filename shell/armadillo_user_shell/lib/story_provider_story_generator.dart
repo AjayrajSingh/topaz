@@ -23,7 +23,7 @@ import 'story_importance_watcher_impl.dart';
 import 'story_provider_watcher_impl.dart';
 
 const String _kUserImage = 'packages/armadillo/res/User.png';
-const int _kMaxActiveClusters = 5;
+const int _kMaxActiveClusters = 6;
 
 /// Called when the [StoryProvider] returns no stories.
 typedef void OnNoStories(StoryProviderProxy storyProvider);
