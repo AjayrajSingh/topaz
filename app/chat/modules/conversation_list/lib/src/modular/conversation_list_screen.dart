@@ -111,7 +111,7 @@ class _ChatConversationListScreenState
               ),
               new FlatButton(
                 child: new Text('OK'),
-                onPressed: _textController.text.isNotEmpty
+                onPressed: _shouldEnableSubmitButton(_textController.text)
                     ? () => _handleConversationFormSubmit(
                         model, _textController.text)
                     : null,
@@ -135,13 +135,23 @@ class _ChatConversationListScreenState
     );
   }
 
+  /// Determines whether the submit button should be enabled or not.
+  bool _shouldEnableSubmitButton(String text) => text
+      .split(',')
+      .map((String s) => s.trim())
+      .where((String s) => s.isNotEmpty)
+      .isNotEmpty;
+
   /// Creates a new conversation with the given participants.
   void _handleConversationFormSubmit(
     ChatConversationListModuleModel model,
     String text,
   ) {
-    List<String> participants =
-        text.split(',').map((String s) => s.trim()).toList();
+    List<String> participants = text
+        .split(',')
+        .map((String s) => s.trim())
+        .where((String s) => s.isNotEmpty)
+        .toList();
     model.hideNewConversationForm();
     model.newConversation(participants);
     _textController.clear();
