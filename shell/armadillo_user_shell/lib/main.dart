@@ -278,6 +278,20 @@ Widget _buildApp({
                   ),
                 ),
               ),
+              new Positioned(
+                right: 0.0,
+                top: 0.0,
+                bottom: 0.0,
+                width: 108.0,
+                child: _buildDiscardDragTarget(
+                  storyModel: storyModel,
+                  storyProviderStoryGenerator: storyProviderStoryGenerator,
+                  controller: new AnimationController(
+                    vsync: new _TickerProvider(),
+                    duration: const Duration(milliseconds: 200),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
