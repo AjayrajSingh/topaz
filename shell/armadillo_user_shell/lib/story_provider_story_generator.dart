@@ -270,17 +270,16 @@ class StoryProviderStoryGenerator extends StoryGenerator {
       storyTitle = '[$storyTitle // ${storyInfo.id}]';
       return true;
     });
-
-    Widget builderWidget = new _StoryWidget(
-      key: new GlobalObjectKey<_StoryWidgetState>(storyController),
-      storyInfo: storyInfo,
-      storyController: storyController,
-      startingIndex: startingIndex,
-    );
+    int initialIndex = startingIndex;
 
     return new Story(
         id: new StoryId(storyInfo.id),
-        builder: (BuildContext context) => builderWidget,
+        builder: (BuildContext context) => new _StoryWidget(
+              key: new GlobalObjectKey<_StoryWidgetState>(storyController),
+              storyInfo: storyInfo,
+              storyController: storyController,
+              startingIndex: initialIndex,
+            ),
         // TODO(apwilson): Improve title.
         title: storyTitle,
         icons: <OpacityBuilder>[],
@@ -288,7 +287,9 @@ class StoryProviderStoryGenerator extends StoryGenerator {
               opacity: opacity,
               child: new Image.asset(_kUserImage, fit: BoxFit.cover),
             ),
-        lastInteraction: new DateTime.now(),
+        lastInteraction: new DateTime.fromMicrosecondsSinceEpoch(
+          (storyInfo.lastFocusTime / 1000).round(),
+        ),
         cumulativeInteractionDuration: new Duration(
           minutes: 0,
         ),
@@ -303,12 +304,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
           if (state != null) {
             state.index = clusterIndex;
           } else {
-            builderWidget = new _StoryWidget(
-              key: new GlobalObjectKey<_StoryWidgetState>(storyController),
-              storyInfo: storyInfo,
-              storyController: storyController,
-              startingIndex: clusterIndex,
-            );
+            initialIndex = clusterIndex;
           }
         });
   }
