@@ -20,6 +20,9 @@ const String _kCurrentFocalEntitiesTopic = 'focal_entities';
 /// The Entity type for a location
 const String _kLocationType = 'http://types.fuchsia.io/location';
 
+const String _kSuggestionIconUrl =
+    'https://www.gstatic.com/images/icons/material/system/2x/directions_walk_googblue_48dp.png';
+
 final ContextProviderProxy _contextProvider = new ContextProviderProxy();
 ContextListenerImpl _contextListenerImpl;
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
@@ -47,11 +50,12 @@ class ContextListenerImpl extends ContextListener {
       Proposal proposal = new Proposal()
         ..id = 'Location Details'
         ..display = (new SuggestionDisplay()
-          ..headline = 'Get Location Details'
+          ..headline =
+              'See current weather and travel details for this location'
           ..subheadline = ''
           ..details = ''
           ..color = 0xFFFF0080
-          ..iconUrls = const <String>[]
+          ..iconUrls = const <String>[_kSuggestionIconUrl]
           ..imageType = SuggestionImageType.other
           ..imageUrl = ''
           ..annoyance = AnnoyanceType.none)
