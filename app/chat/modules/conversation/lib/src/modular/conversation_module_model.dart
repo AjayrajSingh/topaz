@@ -479,6 +479,7 @@ class ChatConversationModuleModel extends ModuleModel {
       _childModuleController.ctrl.request(),
       new SurfaceRelation()
         ..arrangement = SurfaceArrangement.copresent
+        ..dependency = SurfaceDependency.dependent
         ..emphasis = 0.5,
       true,
     );
