@@ -11,5 +11,7 @@ rust_binary("xi-core") {
     "//lib/fidl/rust/fidl",
     "//rust/magenta-rs:magenta",
     "//rust/mxruntime",
+    "//third_party/rust-crates:xi-core-lib-0.2.0",
+    "//third_party/rust-crates:xi-rpc-0.2.0",
   ]
 }
