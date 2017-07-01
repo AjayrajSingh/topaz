@@ -79,7 +79,7 @@
     "headline": "View hotel confirmation",
     "color": "0xFFE64A19",
     "image_url": "/system/data/sysui/9-hotel.jpg",
-    "module_url": "concert_event_list"
+    "module_url": "hotel_confirmation"
   },
   {
     "id": "ask_11",
