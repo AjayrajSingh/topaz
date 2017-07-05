@@ -8,6 +8,16 @@ const double _kMaxWidth = 650.0;
 
 /// Scaffold Hotel Confirmation Module
 class Confirmation extends StatelessWidget {
+  /// Callback for when the manage booking button is tapped
+  final VoidCallback onTapManageBooking;
+
+  /// Constructor
+  Confirmation({
+    Key key,
+    this.onTapManageBooking,
+  })
+      : super(key: key);
+
   Widget _buildTitleSection(ThemeData theme) {
     return new Container(
       padding: const EdgeInsets.all(40.0),
@@ -40,8 +50,7 @@ class Confirmation extends StatelessWidget {
               children: <Widget>[
                 new Container(
                   margin: new EdgeInsets.only(
-                    left: 20.0,
-                    right: 10.0,
+                    left: 8.0,
                     bottom: 20.0,
                   ),
                   child: new Text(
@@ -59,7 +68,7 @@ class Confirmation extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () => onTapManageBooking?.call(),
                 ),
               ],
             ),
@@ -166,7 +175,7 @@ class Confirmation extends StatelessWidget {
       ),
       color: Colors.white,
       child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           new Container(
             child: new Image.asset(
@@ -177,14 +186,12 @@ class Confirmation extends StatelessWidget {
           ),
           _buildTitleSection(theme),
           _buildDetailSection(theme),
-          new Center(
-            child: new Container(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
-              child: new Image.network(
-                'https://cdn.pixabay.com/photo/2016/06/10/01/05/hotel-room-1447201_960_720.jpg',
-                height: 250.0,
-                fit: BoxFit.cover,
-              ),
+          new Container(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: new Image.network(
+              'https://cdn.pixabay.com/photo/2016/06/10/01/05/hotel-room-1447201_960_720.jpg',
+              height: 250.0,
+              fit: BoxFit.cover,
             ),
           ),
         ],
