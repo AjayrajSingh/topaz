@@ -7,13 +7,11 @@ import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
-import 'package:apps.modular.services.user/user_context.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 /// Called when [UserShell.initialize] occurs.
 typedef void OnUserShellReady(
-  UserContext userContext,
   UserShellContext userShellContext,
   FocusProvider focusProvider,
   FocusController focusController,
@@ -30,7 +28,6 @@ typedef void OnUserShellStop();
 /// Implements a UserShell for receiving the services a [UserShell] needs to
 /// operate.
 class UserShellImpl extends UserShell {
-  final UserContextProxy _userContextProxy = new UserContextProxy();
   final UserShellContextProxy _userShellContextProxy =
       new UserShellContextProxy();
   final FocusProviderProxy _focusProviderProxy = new FocusProviderProxy();
@@ -58,11 +55,9 @@ class UserShellImpl extends UserShell {
 
   @override
   void initialize(
-    InterfaceHandle<UserContext> userContextHandle,
     InterfaceHandle<UserShellContext> userShellContextHandle,
   ) {
     if (onReady != null) {
-      _userContextProxy.ctrl.bind(userContextHandle);
       _userShellContextProxy.ctrl.bind(userShellContextHandle);
       _userShellContextProxy.getStoryProvider(
         _storyProviderProxy.ctrl.request(),
@@ -88,7 +83,6 @@ class UserShellImpl extends UserShell {
       );
 
       onReady(
-        _userContextProxy,
         _userShellContextProxy,
         _focusProviderProxy,
         _focusControllerProxy,
@@ -104,7 +98,6 @@ class UserShellImpl extends UserShell {
   @override
   void terminate(void done()) {
     onStop?.call();
-    _userContextProxy.ctrl.close();
     _userShellContextProxy.ctrl.close();
     _storyProviderProxy.ctrl.close();
     _suggestionProviderProxy.ctrl.close();

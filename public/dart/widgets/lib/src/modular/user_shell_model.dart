@@ -7,7 +7,6 @@ import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
-import 'package:apps.modular.services.user/user_context.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
@@ -16,7 +15,6 @@ export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
 
 /// The [Model] that provides services provided to this app's [UserShell].
 class UserShellModel extends Model {
-  UserContext _userContext;
   UserShellContext _userShellContext;
   FocusProvider _focusProvider;
   FocusController _focusController;
@@ -25,9 +23,6 @@ class UserShellModel extends Model {
   SuggestionProvider _suggestionProvider;
   ContextProvider _contextProvider;
   ContextPublisher _contextPublisher;
-
-  /// The [UserContext] given to this app's [UserShell].
-  UserContext get userContext => _userContext;
 
   /// The [UserShellContext] given to this app's [UserShell].
   UserShellContext get userShellContext => _userShellContext;
@@ -57,7 +52,6 @@ class UserShellModel extends Model {
   /// Called when this app's [UserShell] is given its services.
   @mustCallSuper
   void onReady(
-    UserContext userContext,
     UserShellContext userShellContext,
     FocusProvider focusProvider,
     FocusController focusController,
@@ -67,7 +61,6 @@ class UserShellModel extends Model {
     ContextProvider contextProvider,
     ContextPublisher contextPublisher,
   ) {
-    _userContext = userContext;
     _userShellContext = userShellContext;
     _focusProvider = focusProvider;
     _focusController = focusController;
