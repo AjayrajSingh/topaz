@@ -9,7 +9,6 @@ import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
-import 'package:apps.modular.services.user/user_context.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'focus_request_watcher_impl.dart';
@@ -38,7 +37,7 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// Receives the [FocusProvider].
   final InitialFocusSetter initialFocusSetter;
 
-  /// Receives the [UserContext].
+  /// Receives the [UserShellContext].
   final UserLogoutter userLogoutter;
 
   /// Called when the context updates.
@@ -70,7 +69,6 @@ class ArmadilloUserShellModel extends UserShellModel {
 
   @override
   void onReady(
-    UserContext userContext,
     UserShellContext userShellContext,
     FocusProvider focusProvider,
     FocusController focusController,
@@ -81,7 +79,6 @@ class ArmadilloUserShellModel extends UserShellModel {
     ContextPublisher contextPublisher,
   ) {
     super.onReady(
-      userContext,
       userShellContext,
       focusProvider,
       focusController,
@@ -91,7 +88,7 @@ class ArmadilloUserShellModel extends UserShellModel {
       contextProvider,
       contextPublisher,
     );
-    userLogoutter.userContext = userContext;
+    userLogoutter.userShellContext = userShellContext;
     focusController.watchRequest(
       _focusRequestWatcherBinding.wrap(focusRequestWatcher),
     );

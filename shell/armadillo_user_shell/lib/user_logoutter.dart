@@ -2,24 +2,24 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.services.user/user_context.fidl.dart';
+import 'package:apps.modular.services.user/user_shell.fidl.dart';
 
 /// Performs the logging out of the user.
 class UserLogoutter {
-  UserContext _userContext;
+  UserShellContext _userShellContext;
 
   /// Set from an external source - typically the UserShell.
-  set userContext(UserContext userContext) {
-    _userContext = userContext;
+  set userShellContext(UserShellContext userShellContext) {
+    _userShellContext = userShellContext;
   }
 
   /// Logs out the user.
   void logout() {
-    _userContext?.logout();
+    _userShellContext?.logout();
   }
 
   /// Logs out the user and resets the user's ledger state at the same time.
   void logoutAndResetLedgerState() {
-    _userContext?.logoutAndResetLedgerState();
+    _userShellContext?.logoutAndResetLedgerState();
   }
 }
