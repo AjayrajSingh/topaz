@@ -12,14 +12,15 @@ typedef void OnFocusRequest(String storyId);
 /// Listens for requests to change the currently focused story.
 class FocusRequestWatcherImpl extends FocusRequestWatcher {
   /// Called when we receive a request to focus on a story.
-  final OnFocusRequest onFocusRequest;
+  final OnFocusRequest _onFocusRequest;
 
   /// Constructor.
-  FocusRequestWatcherImpl({this.onFocusRequest});
+  FocusRequestWatcherImpl({OnFocusRequest onFocusRequest})
+      : _onFocusRequest = onFocusRequest;
 
   @override
-  void onRequest(String storyId) {
+  void onFocusRequest(String storyId) {
     armadilloPrint('Received request to focus story: $storyId');
-    onFocusRequest(storyId);
+    _onFocusRequest(storyId);
   }
 }
