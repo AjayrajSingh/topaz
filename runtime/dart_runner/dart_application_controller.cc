@@ -38,6 +38,7 @@ DartApplicationController::DartApplicationController(
     const uint8_t* isolate_snapshot_instructions,
     std::vector<char> script_snapshot,
     app::ApplicationStartupInfoPtr startup_info,
+    std::string url,
     fidl::InterfaceRequest<app::ApplicationController> controller)
     : vm_snapshot_data_(vm_snapshot_data),
       vm_snapshot_instructions_(vm_snapshot_instructions),
@@ -45,6 +46,7 @@ DartApplicationController::DartApplicationController(
       isolate_snapshot_instructions_(isolate_snapshot_instructions),
       script_snapshot_(std::move(script_snapshot)),
       startup_info_(std::move(startup_info)),
+      url_(std::move(url)),
       binding_(this) {
   if (controller.is_pending()) {
     binding_.Bind(std::move(controller));
@@ -68,7 +70,7 @@ const char* kDartVMArgs[] = {
     "--error_on_bad_override",
     "--enable_mirrors=false",
 #endif
-// clang-format on
+    // clang-format on
 };
 
 std::once_flag vm_initialized_;
@@ -77,7 +79,7 @@ void DartApplicationController::InitDartVM() {
   // TODO(rmacnak): When AOT snapshots are refactored to generate the VM
   // snapshot separately, move VM initialization before receiving the first
   // bundle.
-  std::call_once(vm_initialized_, [this](){
+  std::call_once(vm_initialized_, [this]() {
     dart::bin::BootstrapDartIo();
 
     // TODO(abarth): Make checked mode configurable.
@@ -98,10 +100,9 @@ bool DartApplicationController::CreateIsolate() {
   char* error = nullptr;
 
   auto state = new tonic::DartState();  // owned by Dart_CreateIsolate
-  isolate_ =
-      Dart_CreateIsolate(startup_info_->launch_info->url.get().c_str(), "main",
-                         isolate_snapshot_data_, isolate_snapshot_instructions_,
-                         nullptr, state, &error);
+  isolate_ = Dart_CreateIsolate(url_.c_str(), "main", isolate_snapshot_data_,
+                                isolate_snapshot_instructions_, nullptr, state,
+                                &error);
   if (!isolate_) {
     FTL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
     return false;
@@ -115,8 +116,6 @@ bool DartApplicationController::CreateIsolate() {
 }
 
 bool DartApplicationController::Main() {
-  const std::string& url = startup_info_->launch_info->url.get();
-
   Dart_EnterScope();
 
 #if defined(AOT_RUNTIME)
@@ -153,7 +152,7 @@ bool DartApplicationController::Main() {
   service_provider_bridge_.set_backend(std::move(service_provider));
 
   InitBuiltinLibrariesForIsolate(
-      url, url, app::ApplicationContext::CreateFrom(std::move(startup_info_)),
+      url_, url_, app::ApplicationContext::CreateFrom(std::move(startup_info_)),
       std::move(outgoing_services));
 
   Dart_Handle dart_arguments = Dart_NewList(arguments.size());

@@ -22,7 +22,7 @@ void main(List<String> args) {
 
   test("start hello_dart", () {
     final info = new ApplicationLaunchInfo();
-    info.url = "file:///system/apps/hello_dart.dartx";
+    info.url = "hello_dart.dartx";
     context.launcher.createApplication(info, null);
   });
 
@@ -33,7 +33,7 @@ void main(List<String> args) {
     final actl = new ApplicationControllerProxy();
 
     final info = new ApplicationLaunchInfo();
-    info.url = "file:///system/apps/hello_app_dart.dartx";
+    info.url = "hello_app_dart.dartx";
     info.services = services.ctrl.request();
     context.launcher.createApplication(info, actl.ctrl.request());
     connectToService(services, service.ctrl);
@@ -46,6 +46,7 @@ void main(List<String> args) {
     expect(await hello.future, equals("hola from Dart!"));
 
     actl.ctrl.close();
-    expect(service.ctrl.error.timeout(new Duration(seconds: 2)), throwsA(anything));
+    expect(service.ctrl.error.timeout(new Duration(seconds: 2)),
+        throwsA(anything));
   });
 }

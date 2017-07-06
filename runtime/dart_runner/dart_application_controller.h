@@ -19,8 +19,10 @@ class DartApplicationController : public app::ApplicationController {
       const uint8_t* vm_snapshot_data,
       const uint8_t* vm_snapshot_instructions,
       const uint8_t* isolate_snapshot_data,
-      const uint8_t* isolate_snapshot_instructions, std::vector<char> snapshot,
+      const uint8_t* isolate_snapshot_instructions,
+      std::vector<char> snapshot,
       app::ApplicationStartupInfoPtr startup_info,
+      std::string url,
       fidl::InterfaceRequest<app::ApplicationController> controller);
   ~DartApplicationController() override;
 
@@ -40,6 +42,7 @@ class DartApplicationController : public app::ApplicationController {
   const uint8_t* isolate_snapshot_instructions_;
   std::vector<char> script_snapshot_;
   app::ApplicationStartupInfoPtr startup_info_;
+  std::string url_;
   app::ServiceProviderBridge service_provider_bridge_;
   fidl::Binding<app::ApplicationController> binding_;
   Dart_Isolate isolate_;

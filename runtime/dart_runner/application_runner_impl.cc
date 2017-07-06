@@ -45,8 +45,8 @@ bool ExtractSnapshots(std::vector<char> bundle,
     return false;
   }
 
-  vm_snapshot_data = reinterpret_cast<const uint8_t*>(
-      dlsym(lib, "_kDartVmSnapshotData"));
+  vm_snapshot_data =
+      reinterpret_cast<const uint8_t*>(dlsym(lib, "_kDartVmSnapshotData"));
   if (vm_snapshot_data == NULL) {
     FTL_LOG(ERROR) << "dlsym(_kDartVmSnapshotData) failed: " << dlerror();
     return false;
@@ -58,8 +58,8 @@ bool ExtractSnapshots(std::vector<char> bundle,
                    << dlerror();
     return false;
   }
-  isolate_snapshot_data = reinterpret_cast<const uint8_t*>(
-      dlsym(lib, "_kDartIsolateSnapshotData"));
+  isolate_snapshot_data =
+      reinterpret_cast<const uint8_t*>(dlsym(lib, "_kDartIsolateSnapshotData"));
   if (isolate_snapshot_data == NULL) {
     FTL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotData) failed: " << dlerror();
     return false;
@@ -104,6 +104,7 @@ void RunApplication(
     FTL_LOG(ERROR) << "Failed to read application data.";
     return;
   }
+  std::string url = std::move(application->resolved_url);
 
   const uint8_t* vm_snapshot_data = NULL;
   const uint8_t* vm_snapshot_instructions = NULL;
@@ -119,13 +120,13 @@ void RunApplication(
   mtl::MessageLoop loop;
 
   // Name this process after the url of the application being launched.
-  std::string label = "dart:" + GetLabelFromURL(startup_info->launch_info->url);
+  std::string label = "dart:" + GetLabelFromURL(url);
   mx::process::self().set_property(MX_PROP_NAME, label.c_str(), label.size());
 
   DartApplicationController app(
       vm_snapshot_data, vm_snapshot_instructions, isolate_snapshot_data,
       isolate_snapshot_instructions, std::move(script_snapshot),
-      std::move(startup_info), std::move(controller));
+      std::move(startup_info), std::move(url), std::move(controller));
 
   if (app.CreateIsolate()) {
     loop.task_runner()->PostTask([&loop, &app] {
