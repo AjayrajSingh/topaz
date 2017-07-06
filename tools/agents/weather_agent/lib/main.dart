@@ -38,8 +38,8 @@ Future<Null> _createWeatherProposal({
       longitude: longitude,
       latitude: latitude,
     );
-  } catch (_) {
-    log.warning('Failed to retrieve weather forecast');
+  } catch (exception) {
+    log.warning('Failed to retrieve weather forecast: ' + exception.toString());
   }
 
   if (forecast != null) {
