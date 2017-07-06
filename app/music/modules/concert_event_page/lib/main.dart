@@ -37,21 +37,21 @@ Future<Null> main() async {
     moduleModel: eventPageModuleModel,
     child: new Scaffold(
       backgroundColor: Colors.white,
-      body: new SingleChildScrollView(
-        child: new ScopedModelDescendant<EventPageModuleModel>(builder: (
-          BuildContext context,
-          Widget child,
-          EventPageModuleModel model,
-        ) {
-          return new Loader(
-            loadingStatus: model.loadingStatus,
-            builder: (BuildContext context) => new EventPage(
+      body: new ScopedModelDescendant<EventPageModuleModel>(builder: (
+        BuildContext context,
+        Widget child,
+        EventPageModuleModel model,
+      ) {
+        return new Loader(
+          loadingStatus: model.loadingStatus,
+          builder: (BuildContext context) => new SingleChildScrollView(
+                child: new EventPage(
                   event: model.event,
                   onTapBuy: model.purchaseTicket,
                 ),
-          );
-        }),
-      ),
+              ),
+        );
+      }),
     ),
   );
 

@@ -11,6 +11,7 @@ dart_package("concert_widgets") {
   deps = [
     "//apps/modules/music/packages/concert_models",
     "//lib/flutter/packages/flutter",
+    "//lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/intl",
   ]
 

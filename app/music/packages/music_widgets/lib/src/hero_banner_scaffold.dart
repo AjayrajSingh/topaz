@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'loading_status.dart';
 
@@ -132,11 +133,10 @@ class HeroBannerScaffold extends StatelessWidget {
     switch (loadingStatus) {
       case LoadingStatus.inProgress:
         child = new Center(
-          child: new CircularProgressIndicator(
-            value: null,
-            valueColor: new AlwaysStoppedAnimation<Color>(
-              heroBannerBackgroundColor,
-            ),
+          child: new Container(
+            width: 40.0,
+            height: 40.0,
+            child: new FuchsiaSpinner(),
           ),
         );
         break;

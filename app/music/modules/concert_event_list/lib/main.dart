@@ -36,25 +36,26 @@ Future<Null> main() async {
     applicationContext: applicationContext,
     moduleModel: eventListModel,
     child: new Scaffold(
-      body: new SingleChildScrollView(
-        child: new ScopedModelDescendant<EventListModuleModel>(builder: (
-          BuildContext context,
-          Widget child,
-          EventListModuleModel model,
-        ) {
-          return new Material(
-            child: new Loader(
-                loadingStatus: model.loadingStatus,
-                builder: (BuildContext context) {
-                  return new EventList(
-                    events: model.events,
-                    onSelect: model.selectEvent,
-                    selectedEvent: model.selectedEvent,
-                  );
-                }),
-          );
-        }),
-      ),
+      body: new ScopedModelDescendant<EventListModuleModel>(builder: (
+        BuildContext context,
+        Widget child,
+        EventListModuleModel model,
+      ) {
+        return new Material(
+          child: new Loader(
+            loadingStatus: model.loadingStatus,
+            builder: (BuildContext context) {
+              return new SingleChildScrollView(
+                child: new EventList(
+                  events: model.events,
+                  onSelect: model.selectEvent,
+                  selectedEvent: model.selectedEvent,
+                ),
+              );
+            },
+          ),
+        );
+      }),
     ),
   );
 

@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 
 import 'loading_status.dart';
@@ -36,17 +37,17 @@ class Loader extends StatelessWidget {
     switch (loadingStatus) {
       case LoadingStatus.inProgress:
         output = new Center(
-          child: new CircularProgressIndicator(
-            value: null,
-            valueColor: new AlwaysStoppedAnimation<Color>(
-              Colors.pink[500],
-            ),
+          child: new Container(
+            height: 40.0,
+            width: 40.0,
+            child: new FuchsiaSpinner(),
           ),
         );
         break;
       case LoadingStatus.failed:
         output = new Center(
           child: new Column(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               new Container(
                 margin: const EdgeInsets.only(bottom: 8.0),

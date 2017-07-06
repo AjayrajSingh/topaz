@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:last_fm_widgets/last_fm_widgets.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'artist_bio_module_model.dart';
 
@@ -54,14 +55,12 @@ class ArtistBioModuleScreen extends StatelessWidget {
               );
             case LoadingStatus.inProgress:
             default:
-              // TODO(dayang@) Replace with Fuchsia Spinner
               return new Container(
                 child: new Center(
-                  child: new CircularProgressIndicator(
-                    value: null,
-                    valueColor: new AlwaysStoppedAnimation<Color>(
-                      Colors.pink[500],
-                    ),
+                  child: new Container(
+                    width: 40.0,
+                    height: 40.0,
+                    child: new FuchsiaSpinner(),
                   ),
                 ),
               );
