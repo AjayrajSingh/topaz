@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 group("agents") {
-  deps = [
+  public_deps = [
     "content_provider:chat_content_provider",
   ]
 }

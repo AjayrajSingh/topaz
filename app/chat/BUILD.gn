@@ -2,20 +2,58 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("chat") {
+import("//packages/package.gni")
+
+package("chat") {
+  app = true
+
   deps = [
     "//apps/modules/chat/agents",
     "//apps/modules/chat/modules",
     "//apps/modules/chat/services",
   ]
+
+  binaries = [
+    {
+      name = "chat_content_provider"
+      source = "chat_content_provider.dartx"
+    },
+
+    {
+      name = "chat_conversation"
+      source =
+          "gen/apps/modules/chat/modules/conversation/chat_conversation.flx"
+    },
+
+    {
+      name = "chat_conversation_list"
+      source = "gen/apps/modules/chat/modules/conversation_list/chat_conversation_list.flx"
+    },
+  ]
 }
 
-group("test") {
+package("chat_tests") {
   testonly = true
+  app = true
 
   deps = [
     "//apps/modules/chat/tests/chat_content_provider_test",
+
+    # The following gn targets do not build anything that ends up on the target, but need to be
+    # built in order to:
+    # 1) run the unit tests on the host side
+    # 2) enable dart analyzer support for test code in the IDE
     "//apps/modules/chat/modules/conversation:test",
     "//apps/modules/chat/modules/conversation_list:test",
   ]
+
+  binaries = [ {
+        name = "chat_content_provider_test"
+        source = "chat_content_provider_test.dartx"
+      } ]
+
+  resources = [ {
+        path = rebase_path("tests/chat_tests.json")
+        dest = "apps/chat_tests/chat_tests.json"
+      } ]
 }

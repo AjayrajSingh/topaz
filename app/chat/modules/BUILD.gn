@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 group("modules") {
-  deps = [
+  public_deps = [
     "conversation:chat_conversation",
     "conversation_list:chat_conversation_list",
   ]
