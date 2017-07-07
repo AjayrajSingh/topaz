@@ -59,7 +59,26 @@ class _ScreenState extends State<Screen> {
           childWhenDragging: new Container(),
           feedback: new AnimatedBuilder(
             animation: model.thumbnailAnimationController,
-            child: new ChildView(connection: model.videoViewConnection),
+            child: new Container(
+              margin: new EdgeInsets.only(right: 3.0, bottom: 3.0),
+              decoration: new BoxDecoration(
+                color: Colors.black,
+                boxShadow: <BoxShadow>[
+                  new BoxShadow(
+                    color: Colors.grey[500],
+                    offset: new Offset(1.0, 1.0),
+                    blurRadius: BoxShadow.convertRadiusToSigma(1.0),
+                  ),
+                ],
+                border: new Border.all(
+                  width: 1.0,
+                  color: Colors.grey[500],
+                ),
+              ),
+              child: model.videoViewConnection != null
+                  ? new ChildView(connection: model.videoViewConnection)
+                  : null,
+            ),
             builder: (BuildContext context, Widget child) {
               double lerpWidth = lerpDouble(currentWidth, _kCircleDiameter,
                   model.thumbnailAnimation.value);
