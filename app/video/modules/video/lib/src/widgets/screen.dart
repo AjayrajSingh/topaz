@@ -65,8 +65,6 @@ class _ScreenState extends State<Screen> {
                   model.thumbnailAnimation.value);
               double lerpHeight = lerpDouble(currentHeight, _kCircleDiameter,
                   model.thumbnailAnimation.value);
-              double leftOffset = (currentWidth - lerpWidth) / 2.0;
-              double topOffset = (currentHeight - lerpHeight) / 2.0;
               double x = -lerpWidth / 2.0;
               double y = -lerpHeight / 2.0;
 
