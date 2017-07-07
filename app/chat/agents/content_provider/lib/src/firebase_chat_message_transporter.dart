@@ -112,13 +112,22 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
       _config = config;
 
       Completer<FirebaseToken> tokenCompleter = new Completer<FirebaseToken>();
+      AuthErr authErr;
       _tokenProvider.getFirebaseAuthToken(
         _config.get('chat_firebase_api_key'),
-        tokenCompleter.complete,
+        (FirebaseToken token, AuthErr err) {
+          tokenCompleter.complete(token);
+          authErr = err;
+        },
       );
+
       FirebaseToken firebaseToken = await tokenCompleter.future;
       if (firebaseToken == null) {
         throw new Exception('Could not obtain the Firebase token.');
+      }
+
+      if (authErr.status != Status.ok) {
+        throw new Exception('Error fetching firebase token:${authErr.message}');
       }
 
       _email = _normalizeEmail(firebaseToken.email);
