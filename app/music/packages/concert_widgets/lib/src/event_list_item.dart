@@ -10,7 +10,7 @@ import 'package:meta/meta.dart';
 import 'fallback_image.dart';
 import 'typedefs.dart';
 
-const double _kHeight = 64.0;
+const double _kListHeight = 64.0;
 
 /// UI Widget that represents a list item for an [Event]
 class EventListItem extends StatelessWidget {
@@ -25,16 +25,20 @@ class EventListItem extends StatelessWidget {
   /// True if this [EventListItem] is selected
   final bool isSelected;
 
+  /// If true, show grid layout for this item.
+  final bool showGridLayout;
+
   /// Constructor
-  EventListItem({
-    Key key,
-    bool isSelected,
-    @required this.event,
-    this.onSelect,
-  })
+  EventListItem(
+      {Key key,
+      bool isSelected,
+      @required this.event,
+      this.onSelect,
+      this.showGridLayout: false})
       : isSelected = isSelected ?? false,
         super(key: key) {
     assert(event != null);
+    assert(showGridLayout != null);
   }
 
   String get _eventImage => event.performances.isNotEmpty
@@ -85,6 +89,47 @@ class EventListItem extends StatelessWidget {
     );
   }
 
+  Widget _buildMainContent() {
+    Widget image = new ClipRRect(
+      borderRadius: new BorderRadius.circular(8.0),
+      child: new FallbackImage(
+        url: _eventImage,
+      ),
+    );
+
+    return new AnimatedCrossFade(
+      firstChild: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          new Expanded(child: image),
+          new Container(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: _buildTextSection(),
+          ),
+        ],
+      ),
+      secondChild: new Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          new Container(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: new Container(
+              height: _kListHeight,
+              width: _kListHeight,
+              child: image,
+            ),
+          ),
+          new Expanded(
+            child: _buildTextSection(),
+          ),
+        ],
+      ),
+      crossFadeState:
+          showGridLayout ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+      duration: const Duration(microseconds: 200),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Material(
@@ -93,25 +138,7 @@ class EventListItem extends StatelessWidget {
         onTap: () => onSelect?.call(event),
         child: new Container(
           padding: const EdgeInsets.all(16.0),
-          child: new Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              new Container(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: new ClipRRect(
-                  borderRadius: new BorderRadius.circular(8.0),
-                  child: new FallbackImage(
-                    url: _eventImage,
-                    height: _kHeight,
-                    width: _kHeight,
-                  ),
-                ),
-              ),
-              new Expanded(
-                child: _buildTextSection(),
-              ),
-            ],
-          ),
+          child: _buildMainContent(),
         ),
       ),
     );

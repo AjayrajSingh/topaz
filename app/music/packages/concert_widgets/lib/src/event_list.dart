@@ -2,16 +2,22 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:math';
+
 import 'package:concert_models/concert_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
 import 'event_list_item.dart';
 import 'typedefs.dart';
 
-const double _kHeaderHeight = 160.0;
+const double _kMinHeaderHeight = 160.0;
 const double _kLogoSize = 48.0;
+const double _kEventGridMinWidth = 300.0;
+const double _kEventGridAspectRatio = 1.2;
+const double _kEventListHeight = 96.0;
 
 /// UI Widget that represents a list of [Event]s
 class EventList extends StatelessWidget {
@@ -25,6 +31,9 @@ class EventList extends StatelessWidget {
   final EventActionCallback onSelect;
 
   static final DateFormat _kMonthFormat = new DateFormat('MMMM y');
+
+  static final _EventListGridDelegate _eventListGridDelegate =
+      new _EventListGridDelegate();
 
   /// Constructor
   EventList({
@@ -40,54 +49,106 @@ class EventList extends StatelessWidget {
   String get _listTitle =>
       'Concert Guide  -  ${_kMonthFormat.format(new DateTime.now())}';
 
-  @override
-  Widget build(BuildContext context) {
-    List<Widget> children = <Widget>[
-      new Container(
-        height: _kHeaderHeight,
-        decoration: new BoxDecoration(
-          image: new DecorationImage(
-            image: new AssetImage(
-              'packages/concert_widgets/res/concert_bg.jpg',
+  Widget _buildHeader() {
+    return new Container(
+      constraints: new BoxConstraints(
+        minHeight: _kMinHeaderHeight,
+      ),
+      child: new AspectRatio(
+        aspectRatio: 4.5,
+        child: new Container(
+          decoration: new BoxDecoration(
+            image: new DecorationImage(
+              image: new AssetImage(
+                'packages/concert_widgets/res/concert_bg.jpg',
+              ),
+              fit: BoxFit.cover,
             ),
-            fit: BoxFit.cover,
           ),
-        ),
-        child: new Center(
-          child: new Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              new Container(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: new Image.asset(
-                  'packages/concert_widgets/res/plat_logo.png',
-                  height: _kLogoSize,
-                  width: _kLogoSize,
+          child: new Center(
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new Container(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: new Image.asset(
+                    'packages/concert_widgets/res/plat_logo.png',
+                    height: _kLogoSize,
+                    width: _kLogoSize,
+                  ),
                 ),
-              ),
-              new Text(
-                _listTitle,
-                style: new TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.0,
+                new Text(
+                  _listTitle,
+                  style: new TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.0,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ];
-
-    children.addAll(events
-        .map((Event event) => new EventListItem(
-              event: event,
-              onSelect: onSelect,
-              isSelected: event == selectedEvent,
-            ))
-        .toList());
-
-    return new Column(
-      children: children,
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        bool showGridLayout = constraints.maxWidth >= _kEventGridMinWidth * 2;
+        return new CustomScrollView(
+          slivers: <Widget>[
+            new SliverToBoxAdapter(
+              child: _buildHeader(),
+            ),
+            new SliverPadding(
+              padding: showGridLayout
+                  ? const EdgeInsets.all(16.0)
+                  : const EdgeInsets.all(0.0),
+              sliver: new SliverGrid(
+                gridDelegate: _eventListGridDelegate,
+                delegate: new SliverChildListDelegate(
+                  events
+                      .map((Event event) => new EventListItem(
+                            event: event,
+                            onSelect: onSelect,
+                            isSelected: event == selectedEvent,
+                            showGridLayout: showGridLayout,
+                          ))
+                      .toList(),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Grid delegate for Event Grid
+class _EventListGridDelegate extends SliverGridDelegate {
+  @override
+  SliverGridLayout getLayout(SliverConstraints constraints) {
+    final int crossAxisCount =
+        max((constraints.crossAxisExtent / _kEventGridMinWidth).floor(), 1);
+    final double childCrossAxisExtent =
+        constraints.crossAxisExtent / crossAxisCount;
+    final double childMainAxisExtent = crossAxisCount == 1
+        ? _kEventListHeight
+        : childCrossAxisExtent / _kEventGridAspectRatio;
+    return new SliverGridRegularTileLayout(
+      crossAxisCount: crossAxisCount,
+      mainAxisStride: childMainAxisExtent,
+      crossAxisStride: childCrossAxisExtent,
+      childMainAxisExtent: childMainAxisExtent,
+      childCrossAxisExtent: childCrossAxisExtent,
+    );
+  }
+
+  @override
+  bool shouldRelayout(_EventListGridDelegate oldDelegate) {
+    return false;
   }
 }
