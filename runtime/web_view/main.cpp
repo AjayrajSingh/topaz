@@ -369,7 +369,7 @@ class MozWebView : public mozart::BaseView,
   web_view::WebRequestDelegatePtr webRequestDelegate_;
 
   // We use this |ServiceProvider| to expose the |WebView| interface to others.
-  modular::ServiceProviderImpl outgoing_services_;
+  app::ServiceProviderImpl outgoing_services_;
 
   fidl::BindingSet<WebView> web_view_interface_bindings_;
 
