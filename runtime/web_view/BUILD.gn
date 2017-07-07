@@ -32,8 +32,6 @@ executable("web_view_bin") {
     "//apps/modular/services/module",
     "//apps/modular/services/story",
     "//apps/mozart/lib/view_framework:view_provider",
-    "//apps/mozart/services/buffers/cpp",
-    "//apps/mozart/services/composition",
     "//apps/mozart/services/geometry",
     "//apps/mozart/services/views",
     "//apps/web_runner/services",
