@@ -101,7 +101,7 @@ class Scrubber extends StatelessWidget {
               new Positioned(
                 left: 0.0,
                 right: 0.0,
-                top: -30.0,
+                top: 0.0,
                 child: _buildProgressBar(model),
               ),
             ],

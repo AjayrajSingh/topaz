@@ -71,6 +71,9 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   final NetConnectorProxy _netConnector = new NetConnectorProxy();
   final DeviceMapProxy _deviceMap = new DeviceMapProxy();
   Asset _asset = _defaultAsset;
+  // The video has ended but the user has not uncast.
+  // Replaying the video should still happen on remote device.
+  bool _replayRemotely = false;
 
   /// [Link] object for storing the remote displayMode and casting device name
   final LinkProxy _remoteDeviceLink = new LinkProxy();
@@ -207,6 +210,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   void seek(Duration duration) {
     _locallyControlled = true;
     _controller.seek(duration);
+    // TODO(maryxia) SO-589 seek after video has ended
   }
 
   /// Plays video
@@ -214,12 +218,15 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     _locallyControlled = true;
     if (_asset.type == AssetType.remote) {
       Duration lastLocalTime = _controller.progress;
-
       _controller.connectToRemote(
         device: _asset.device,
         service: _asset.service,
       );
 
+      if (_replayRemotely) {
+        lastLocalTime = new Duration(seconds: 0);
+        _replayRemotely = false;
+      }
       _controller.seek(lastLocalTime);
     } else {
       _controller.play();
@@ -263,6 +270,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Start playing video on local device if it is controlling remotely
   void playLocal() {
+    _replayRemotely = false;
     hideDeviceChooser = true;
     if (_asset.device != null) {
       pause();
@@ -380,6 +388,9 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     if (_showControlOverlay) {
       brieflyShowControlOverlay(); // restart the timer
       notifyListeners();
+    }
+    if (_controller.isRemote && _controller.ended) {
+      _replayRemotely = true;
     }
   }
 
