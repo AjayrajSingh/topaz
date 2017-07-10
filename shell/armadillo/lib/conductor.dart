@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
@@ -144,6 +145,8 @@ class ConductorState extends State<Conductor> {
   PeekManager _peekManager;
 
   bool _ignoreNextScrollOffsetChange = false;
+
+  Timer _storyFocusTimer;
 
   @override
   void initState() {
@@ -631,17 +634,44 @@ class ConductorState extends State<Conductor> {
         (StoryCluster storyCluster) => storyCluster.unFocus(),
       );
 
-      // Ensure the focused story is completely expanded.
-      targetStoryClusters[0].focusSimulationKey.currentState?.jump(1.0);
+      // The story might have not been initiated when _focusOnStory is called.
+      // This sets a periodic timer to wait for the story to be initiated
+      // before running the animation.
+      int timerCount = 0;
+      _storyFocusTimer =
+          new Timer.periodic(const Duration(milliseconds: 10), (Timer timer) {
+        if (targetStoryClusters[0].focusSimulationKey.currentState != null &&
+            mounted) {
+          // Ensure the focused story is completely expanded.
+          targetStoryClusters[0].focusSimulationKey.currentState.jump(1.0);
 
-      // Ensure the focused story's story bar is full open.
-      targetStoryClusters[0].maximizeStoryBars(jumpToFinish: jumpToFinish);
+          // Ensure the focused story's story bar is full open.
+          targetStoryClusters[0].maximizeStoryBars(jumpToFinish: jumpToFinish);
 
-      // Focus on the story cluster.
-      _focusStoryCluster(storyModel, targetStoryClusters[0]);
+          // Focus on the story cluster.
+          _focusStoryCluster(storyModel, targetStoryClusters[0]);
+
+          timer.cancel();
+        }
+
+        // Give up if story has not been initiated after 1 second
+        if (timerCount > 100) {
+          timer.cancel();
+        }
+
+        timerCount++;
+      });
     }
 
     // Unhide selected suggestion in suggestion list.
     _suggestionListKey.currentState.resetSelection();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (_storyFocusTimer != null && _storyFocusTimer.isActive) {
+      _storyFocusTimer.cancel();
+    }
   }
 }
