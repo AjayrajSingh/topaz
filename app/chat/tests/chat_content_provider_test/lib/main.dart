@@ -7,7 +7,7 @@ import 'dart:convert' show JSON;
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
-import 'package:apps.ledger.services.public/ledger.fidl.dart';
+import 'package:apps.ledger.services.public/ledger.fidl.dart' as ledger_fidl;
 import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.component/message_queue.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
@@ -36,7 +36,7 @@ class ChatContentProviderTestModule extends Module {
 
   final TestRunnerProxy _testRunner = new TestRunnerProxy();
   final ComponentContextProxy _componentContext = new ComponentContextProxy();
-  final LedgerProxy _ledger = new LedgerProxy();
+  final ledger_fidl.LedgerProxy _ledger = new ledger_fidl.LedgerProxy();
 
   ChatContentProviderImpl _chatContentProvider;
   final MockChatMessageTransporter _mockChatMessageTransporter =
@@ -65,8 +65,8 @@ class ChatContentProviderTestModule extends Module {
     moduleContextProxy.ctrl.close();
 
     // Obtain Ledger
-    _componentContext.getLedger(_ledger.ctrl.request(), (Status s) {
-      if (s != Status.ok) {
+    _componentContext.getLedger(_ledger.ctrl.request(), (ledger_fidl.Status s) {
+      if (s != ledger_fidl.Status.ok) {
         _testRunner.fail('ComponentContext::GetLedger() failed: $s');
       }
     });
