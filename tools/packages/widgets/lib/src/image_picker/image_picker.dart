@@ -126,13 +126,7 @@ class _ImagePickerState extends State<ImagePicker>
     });
   }
 
-  String get _selectionText {
-    if (_selectedImages.length == 1) {
-      return '1 image selected';
-    } else {
-      return '${_selectedImages.length} images selected';
-    }
-  }
+  String get _selectionText => '${_selectedImages.length} selected';
 
   // Sets a delay so that we don't make search queries for consecutive
   // keystrokes.
