@@ -56,7 +56,7 @@ class EventPage extends StatelessWidget {
         child: new Text(
           'Venue',
           style: new TextStyle(
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             fontSize: 18.0,
           ),
         ),
@@ -112,7 +112,7 @@ class EventPage extends StatelessWidget {
             'Lineup',
             style: new TextStyle(
               fontSize: 18.0,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -162,8 +162,8 @@ class EventPage extends StatelessWidget {
                     ? event.performances.first.artist?.name ?? ''
                     : '',
                 style: new TextStyle(
-                  fontSize: 28.0,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 34.0,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -197,7 +197,7 @@ class EventPage extends StatelessWidget {
                 _readableDate,
                 style: new TextStyle(
                   fontSize: 20.0,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -215,11 +215,14 @@ class EventPage extends StatelessWidget {
       _buildDetailsSection(),
     ];
 
-    return new Container(
-      padding: const EdgeInsets.all(32.0),
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
+    return DefaultTextStyle.merge(
+      style: new TextStyle(fontFamily: 'RobotoSlab'),
+      child: new Container(
+        padding: const EdgeInsets.all(32.0),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: children,
+        ),
       ),
     );
   }
