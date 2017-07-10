@@ -94,7 +94,6 @@ class PlayControls extends StatelessWidget {
 
   Widget _buildPlayControls(VideoModuleModel model) {
     return new Offstage(
-      // TODO(maryxia) SO-480 offstage depends on device chooser AND timeout
       offstage: false,
       child: new Center(
         child: new Row(

@@ -87,19 +87,20 @@ class Player extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(maryxia) SO-477 optimize aspect ratio
     return new ScopedModelDescendant<VideoModuleModel>(builder: (
       BuildContext context,
       Widget child,
       VideoModuleModel model,
     ) {
       Size size = MediaQuery.of(context).size;
-      if (size.width <= 640.0 && size.height <= 360.0) {
+      if (size.width + size.height <= 912.0) {
         model.displayMode = DisplayMode.localSmall;
+        model.notifyListeners();
       } else if (model.displayMode != DisplayMode.remoteControl &&
           model.displayMode != DisplayMode.immersive &&
           model.displayMode != DisplayMode.standby) {
         model.displayMode = DisplayMode.localLarge;
+        model.notifyListeners();
       }
       return new Container(
         color: Colors.black,

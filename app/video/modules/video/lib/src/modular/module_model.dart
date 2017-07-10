@@ -49,9 +49,9 @@ const DisplayMode _defaultDisplayMode = DisplayMode.localLarge;
 
 final Asset _defaultAsset = new Asset.movie(
   uri: Uri.parse('file:///system/data/modules/video.mp4'),
-  title: 'Discover Istanbul',
+  title: 'Discover Turkey',
   description:
-      "There's a reason why Istanbul, Turkey is the new dream travel destination. Take a trip with us and explore the top experiences in Istanbul.",
+      "There's a reason why Turkey is the new dream travel destination. Take a trip with us and explore the top experiences in Turkey.",
   thumbnail: 'assets/video-thumbnail.jpg',
   background: 'assets/video-background.jpg',
 );
