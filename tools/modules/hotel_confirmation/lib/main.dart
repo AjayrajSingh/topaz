@@ -30,9 +30,11 @@ void main() {
         Widget child,
         HotelConfirmationModuleModel model,
       ) {
-        return new Center(
-          child: new Confirmation(
-            onTapManageBooking: model.manageBooking,
+        return new SingleChildScrollView(
+          child: new Center(
+            child: new Confirmation(
+              onTapManageBooking: model.manageBooking,
+            ),
           ),
         );
       }),
