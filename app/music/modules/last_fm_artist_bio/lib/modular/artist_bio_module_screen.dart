@@ -18,55 +18,55 @@ class ArtistBioModuleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Scaffold(
       backgroundColor: Colors.white,
-      body: new SingleChildScrollView(
-        child: new ScopedModelDescendant<ArtistBioModuleModel>(builder: (
-          BuildContext context,
-          Widget child,
-          ArtistBioModuleModel model,
-        ) {
-          switch (model.loadingStatus) {
-            case LoadingStatus.completed:
-              return new ArtistBio(
+      body: new ScopedModelDescendant<ArtistBioModuleModel>(builder: (
+        BuildContext context,
+        Widget child,
+        ArtistBioModuleModel model,
+      ) {
+        switch (model.loadingStatus) {
+          case LoadingStatus.completed:
+            return new SingleChildScrollView(
+              child: new ArtistBio(
                 artist: model.artist,
-              );
-            case LoadingStatus.failed:
-              return new Container(
-                child: new Center(
-                  child: new Column(
-                    children: <Widget>[
-                      new Container(
-                        margin: const EdgeInsets.only(bottom: 8.0),
-                        child: new Icon(
-                          Icons.sentiment_dissatisfied,
-                          size: 48.0,
-                          color: Colors.grey[500],
-                        ),
+              ),
+            );
+          case LoadingStatus.failed:
+            return new Container(
+              child: new Center(
+                child: new Column(
+                  children: <Widget>[
+                    new Container(
+                      margin: const EdgeInsets.only(bottom: 8.0),
+                      child: new Icon(
+                        Icons.sentiment_dissatisfied,
+                        size: 48.0,
+                        color: Colors.grey[500],
                       ),
-                      new Text(
-                        'Content failed to load',
-                        style: new TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.grey[500],
-                        ),
+                    ),
+                    new Text(
+                      'Content failed to load',
+                      style: new TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.grey[500],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            case LoadingStatus.inProgress:
-            default:
-              return new Container(
-                child: new Center(
-                  child: new Container(
-                    width: 40.0,
-                    height: 40.0,
-                    child: new FuchsiaSpinner(),
-                  ),
+              ),
+            );
+          case LoadingStatus.inProgress:
+          default:
+            return new Container(
+              child: new Center(
+                child: new Container(
+                  width: 40.0,
+                  height: 40.0,
+                  child: new FuchsiaSpinner(),
                 ),
-              );
-          }
-        }),
-      ),
+              ),
+            );
+        }
+      }),
     );
   }
 }

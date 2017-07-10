@@ -44,6 +44,7 @@ class ArtistBio extends StatelessWidget {
               new Alphatar.withUrl(
                 size: 56.0,
                 avatarUrl: artist.imageUrl,
+                letter: artist.name.isNotEmpty ? artist.name[0] : '',
               ),
               new Container(
                 padding: const EdgeInsets.only(left: 16.0),
