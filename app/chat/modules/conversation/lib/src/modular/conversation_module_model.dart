@@ -339,11 +339,13 @@ class ChatConversationModuleModel extends ModuleModel {
   /// Because the [ListView] used inside the [ChatConversation] widget is a
   /// reversed list, we can simply animate to 0.0 to scroll to end.
   void _scrollToEnd() {
-    _scrollController.animateTo(
-      0.0,
-      curve: Curves.easeOut,
-      duration: _kScrollAnimationDuration,
-    );
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0.0,
+        curve: Curves.easeOut,
+        duration: _kScrollAnimationDuration,
+      );
+    }
   }
 
   void _handleSelectedImages(String message, void ack()) {
