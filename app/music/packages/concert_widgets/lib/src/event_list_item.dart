@@ -73,6 +73,7 @@ class EventListItem extends StatelessWidget {
           child: new Text(
             _eventTitle,
             overflow: TextOverflow.ellipsis,
+            softWrap: false,
             style: new TextStyle(
               fontSize: 18.0,
               fontWeight: FontWeight.w600,
@@ -81,6 +82,8 @@ class EventListItem extends StatelessWidget {
         ),
         new Text(
           event.venue?.name ?? '',
+          overflow: TextOverflow.ellipsis,
+          softWrap: false,
           style: new TextStyle(
             fontWeight: FontWeight.w500,
           ),
