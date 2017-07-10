@@ -87,6 +87,17 @@ class ChatContentProviderImpl extends ChatContentProvider {
     isValidKey: (dynamic key) => key is List<int>,
   );
 
+  /// Keeps the [PageProxy] and [PageSnapshotProxy] objects created in fidl
+  /// method implementations.
+  ///
+  /// For some unknown reason, closing the proxies in try-finally blocks wasn't
+  /// enough, and there were some instances where the "Failed to cancel wait for
+  /// waiter" error occurred on the page snapshot proxies. Keeping them here to
+  /// prevent the agent from crashing.
+  final List<PageProxy> _pageProxies = new List<PageProxy>();
+  final List<PageSnapshotProxy> _snapshotProxies =
+      new List<PageSnapshotProxy>();
+
   /// The last index of the messages that the current user sent to other people.
   /// This value is added to the message ids to prevent id collision.
   int _messageIndex = 0;
@@ -190,8 +201,10 @@ class ChatContentProviderImpl extends ChatContentProvider {
   /// Close all the bindings.
   void close() {
     _reservedPages.values.forEach((PageProxy page) => page?.ctrl?.close());
-
     _pageWatchers.values.forEach((BasePageWatcher watcher) => watcher.close());
+    _pageProxies.forEach((PageProxy page) => page?.ctrl?.close());
+    _snapshotProxies
+        .forEach((PageSnapshotProxy snapshot) => snapshot?.ctrl?.close());
 
     _bindings.forEach(
       (ChatContentProviderBinding binding) => binding.close(),
@@ -221,6 +234,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       }
 
       PageProxy newConversationPage = new PageProxy();
+      _pageProxies.add(newConversationPage);
 
       try {
         // Request a new page from Ledger.
@@ -272,6 +286,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         callback(ChatStatus.ok, conversation);
       } finally {
         newConversationPage.ctrl.close();
+        _pageProxies.remove(newConversationPage);
       }
     } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
@@ -320,6 +335,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
       // Get the current snapshot of the 'conversations' page.
       PageSnapshotProxy snapshot = new PageSnapshotProxy();
+      _snapshotProxies.add(snapshot);
 
       try {
         // Here, we create a [ConversationListWatcher] instance in case the
@@ -393,6 +409,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         }
       } finally {
         snapshot.ctrl.close();
+        _snapshotProxies.remove(snapshot);
       }
     } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
@@ -417,6 +434,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
       // Get the current snapshot of the specified conversation page.
       PageProxy conversationPage = new PageProxy();
       PageSnapshotProxy snapshot = new PageSnapshotProxy();
+      _pageProxies.add(conversationPage);
+      _snapshotProxies.add(snapshot);
 
       try {
         Completer<Status> statusCompleter = new Completer<Status>();
@@ -490,6 +509,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
       } finally {
         snapshot.ctrl.close();
         conversationPage.ctrl.close();
+        _snapshotProxies.remove(snapshot);
+        _pageProxies.remove(conversationPage);
       }
     } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
@@ -514,6 +535,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
       // Get the current snapshot of the specified conversation page.
       PageProxy conversationPage = new PageProxy();
       PageSnapshotProxy snapshot = new PageSnapshotProxy();
+      _pageProxies.add(conversationPage);
+      _snapshotProxies.add(snapshot);
 
       try {
         Completer<Status> statusCompleter = new Completer<Status>();
@@ -575,6 +598,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
       } finally {
         snapshot.ctrl.close();
         conversationPage.ctrl.close();
+        _snapshotProxies.remove(snapshot);
+        _pageProxies.remove(conversationPage);
       }
     } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
@@ -638,6 +663,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
       // Get the current snapshot of the specified conversation page.
       PageProxy conversationPage = new PageProxy();
+      _pageProxies.add(conversationPage);
 
       try {
         Completer<Status> statusCompleter = new Completer<Status>();
@@ -670,6 +696,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         }
       } finally {
         conversationPage.ctrl.close();
+        _pageProxies.remove(conversationPage);
       }
 
       Conversation conversation = await _getConversation(conversationId);
@@ -715,6 +742,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
       // Get the current snapshot of the specified conversation page.
       PageProxy conversationPage = new PageProxy();
+      _pageProxies.add(conversationPage);
 
       try {
         Completer<Status> statusCompleter = new Completer<Status>();
@@ -746,6 +774,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         }
       } finally {
         conversationPage.ctrl.close();
+        _pageProxies.remove(conversationPage);
       }
 
       callback(ChatStatus.ok);
@@ -773,6 +802,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
     // Get the current snapshot of the 'conversations' page.
     PageSnapshotProxy snapshot = new PageSnapshotProxy();
+    _snapshotProxies.add(snapshot);
 
     try {
       _conversationsPage.getSnapshot(
@@ -810,6 +840,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       return conversation;
     } finally {
       snapshot.ctrl.close();
+      _snapshotProxies.remove(snapshot);
     }
   }
 
@@ -842,6 +873,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
           _conversationCache[conversation.conversationId];
 
       PageProxy conversationPage = new PageProxy();
+      _pageProxies.add(conversationPage);
+
       try {
         // Request a new page from Ledger.
         Completer<Status> statusCompleter = new Completer<Status>();
@@ -895,6 +928,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         onMessageReceived?.call(conversation, message);
       } finally {
         conversationPage.ctrl.close();
+        _pageProxies.remove(conversationPage);
       }
     } catch (e, stackTrace) {
       log.severe('Error while processing an incoming message', e, stackTrace);
