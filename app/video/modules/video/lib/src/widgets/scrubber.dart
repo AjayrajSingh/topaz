@@ -9,18 +9,15 @@ import '../modular/module_model.dart';
 import '../widgets.dart';
 
 const double _kZoomTimeInMicroseconds = 3000000.0;
-const Duration _kAnimationTime = const Duration(milliseconds: 200);
+
+/// Duration to animate play controls showing/hiding
+const Duration kAnimationTime = const Duration(milliseconds: 200);
 
 /// The time slider/scrubber for the video player
 class Scrubber extends StatelessWidget {
-  /// Height of scrubber
-  final double height;
-
   /// Constructor for the time slider/scrubber for the video player
   Scrubber({
     Key key,
-    // TODO(maryxia) SO-543 re-add height
-    this.height,
   })
       : super(key: key);
 
@@ -42,12 +39,15 @@ class Scrubber extends StatelessWidget {
   }
 
   Widget _buildProgressBar(VideoModuleModel model) {
-    return new Slider(
-      min: 0.0,
-      max: 1.0,
-      activeColor: Colors.grey[50],
-      value: model.normalizedProgress,
-      onChanged: model.normalizedSeek,
+    return new Container(
+      child: new Slider(
+        min: 0.0,
+        max: 1.0,
+        activeColor: Colors.grey[50],
+        inactiveColor: Colors.grey[600],
+        value: model.normalizedProgress,
+        onChanged: model.normalizedSeek,
+      ),
     );
   }
 
@@ -101,7 +101,7 @@ class Scrubber extends StatelessWidget {
               new Positioned(
                 left: 0.0,
                 right: 0.0,
-                top: 0.0,
+                top: -30.0,
                 child: _buildProgressBar(model),
               ),
             ],
@@ -109,7 +109,7 @@ class Scrubber extends StatelessWidget {
         );
       case DisplayMode.localSmall:
         return new AnimatedCrossFade(
-          duration: _kAnimationTime,
+          duration: kAnimationTime,
           firstChild: new Row(
             children: <Widget>[
               _buildTimestamp(model.progress, DisplayMode.localSmall),
@@ -127,7 +127,7 @@ class Scrubber extends StatelessWidget {
       case DisplayMode.localLarge:
       default:
         return new AnimatedCrossFade(
-          duration: _kAnimationTime,
+          duration: kAnimationTime,
           firstChild: new Stack(
             children: <Widget>[
               _buildProgress(model),
@@ -137,7 +137,12 @@ class Scrubber extends StatelessWidget {
                 secondaryIconSize: 36.0,
                 padding: 20.0,
               ),
-              _buildProgressBar(model),
+              new Positioned(
+                left: 0.0,
+                right: 0.0,
+                top: 0.0,
+                child: _buildProgressBar(model),
+              ),
             ],
           ),
           secondChild: new Container(),

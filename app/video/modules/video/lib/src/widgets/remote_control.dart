@@ -132,7 +132,7 @@ class RemoteControl extends StatelessWidget {
         ),
         new Expanded(
           flex: 2,
-          child: new Scrubber(height: 2.0),
+          child: new Scrubber(),
         ),
       ],
     );

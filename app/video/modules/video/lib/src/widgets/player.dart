@@ -56,19 +56,41 @@ class Player extends StatelessWidget {
                 ],
               ),
             ),
-            new Scrubber(height: 2.0),
+            new Scrubber(),
           ],
         );
       case DisplayMode.localLarge:
       default:
-        return new Column(
+        // This is in a Stack to fake the appearance of the Slider directly
+        // below the video, while still allowing the Slider to have ample space
+        // above AND below, to be tapped on
+        return new Stack(
           children: <Widget>[
-            _deviceChooser,
-            new Expanded(
-              child: _screen,
+            new Column(
+              children: <Widget>[
+                _deviceChooser,
+                new Expanded(
+                  child: _screen,
+                ),
+                new AnimatedCrossFade(
+                    duration: kAnimationTime,
+                    firstChild: new Padding(
+                      // height of play controls + Slider._kReactionRadius
+                      padding: new EdgeInsets.only(bottom: 76.0),
+                    ),
+                    secondChild: new Container(),
+                    crossFadeState: model.showControlOverlay
+                        ? CrossFadeState.showFirst
+                        : CrossFadeState.showSecond)
+              ],
             ),
             // Scrubber for this Mode includes PlayControls
-            new Scrubber(height: 2.0),
+            new Positioned(
+              bottom: 0.0,
+              left: 0.0,
+              right: 0.0,
+              child: new Scrubber(),
+            ),
           ],
         );
     }
