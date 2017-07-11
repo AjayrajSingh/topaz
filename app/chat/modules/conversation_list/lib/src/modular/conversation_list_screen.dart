@@ -37,7 +37,7 @@ class _ChatConversationListScreenState
             List<Widget> stackChildren = <Widget>[
               new ChatConversationList(
                 conversations: model.conversations == null
-                    ? <Conversation>[]
+                    ? new Set<Conversation>()
                     : model.conversations,
                 onNewConversation: model.showNewConversationForm,
                 onSelectConversation: (Conversation c) => model

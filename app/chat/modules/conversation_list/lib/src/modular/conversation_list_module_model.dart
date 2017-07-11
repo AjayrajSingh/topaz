@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert' show JSON;
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:application.lib.app.dart/app.dart';
@@ -49,7 +51,14 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   Uint8List _conversationId;
 
-  List<Conversation> _conversations;
+  Set<Conversation> _conversations;
+
+  /// A temporary [Queue] for holding the new conversation notified via
+  /// [MessageQueue], while the conversation list is being fetched.
+  ///
+  /// This is necessary because the message queue notification can arrive before
+  /// the initial list of conversations are fetched.
+  final Queue<Conversation> _newConversationQueue = new Queue<Conversation>();
 
   /// Indicates whether the spinner UI should be shown.
   bool get shouldDisplaySpinner => _isDownloading || _isFetching;
@@ -87,12 +96,33 @@ class ChatConversationListModuleModel extends ModuleModel {
     _conversationModuleController.focus();
   }
 
-  /// Gets the list of chat conversations.
+  /// Compare the given two [Conversation]s for sorting.
+  ///
+  /// In the current implementation, it compares their conversation ids to be
+  /// consistent with the way the information is stored in Ledger. This can
+  /// change in the future, for example to place the most recently seen
+  /// conversation at the top.
+  int _compareConversation(Conversation c1, Conversation c2) {
+    // Compare the ids lexicographically.
+    int minLength =
+        math.min(c1.conversationId.length, c2.conversationId.length);
+    for (int i = 0; i < minLength; ++i) {
+      if (c1.conversationId[i] < c2.conversationId[i]) return -1;
+      if (c1.conversationId[i] > c2.conversationId[i]) return 1;
+    }
+
+    if (c2.conversationId.length > minLength) return -1;
+    if (c1.conversationId.length < minLength) return 1;
+    return 0;
+  }
+
+  /// Gets the set of chat conversations.
   ///
   /// Returns null when the conversation list is not yet retrieved.
-  List<Conversation> get conversations => _conversations == null
+  /// The returned [Set] is sorted by the [_compareConversation] method above.
+  Set<Conversation> get conversations => _conversations == null
       ? null
-      : new UnmodifiableListView<Conversation>(_conversations);
+      : new UnmodifiableSetView<Conversation>(_conversations);
 
   bool _shouldShowNewConversationForm = false;
 
@@ -201,9 +231,19 @@ class ChatConversationListModuleModel extends ModuleModel {
         return;
       }
 
+      // Use a SplayTreeSet to keep the list of conversations ordered.
       _conversations = conversations == null
           ? null
-          : conversations.map(_getConversationFromFidl).toList();
+          : new SplayTreeSet<Conversation>.from(
+              conversations.map(_getConversationFromFidl),
+              _compareConversation,
+            );
+
+      if (_conversations != null) {
+        while (_newConversationQueue.isNotEmpty) {
+          _addConversation(_newConversationQueue.removeFirst());
+        }
+      }
 
       notifyListeners();
     } finally {
@@ -216,7 +256,8 @@ class ChatConversationListModuleModel extends ModuleModel {
   /// Refer to the `chat_content_provider.fidl` file for the expected message
   /// format coming from the content provider.
   void _handleConversationListEvent(String message, void ack()) {
-    log.fine('handleNewConversation call with message: $message');
+    log.fine('_handleConversationListEvent call with message: $message');
+
     try {
       ack();
 
@@ -227,28 +268,21 @@ class ChatConversationListModuleModel extends ModuleModel {
           List<int> conversationId = decoded['conversation_id'];
           List<String> participants = decoded['participants'];
 
-          _conversations.add(new Conversation(
+          Conversation newConversation = new Conversation(
             conversationId: conversationId,
             participants: participants.map(_getUserFromEmail).toList(),
-          ));
+          );
 
-          // If this conversation happens to be the last created conversation
-          // from the current user, select it immediately. If not, just notify
-          // that there is a new conversation added.
-          if (_intListEquality.equals(
-              _lastCreatedConversationId, conversationId)) {
-            _lastCreatedConversationId = null;
-            // No need to notify here, because setConversationId does it.
-            setConversationId(conversationId);
-            focusConversation();
+          if (_conversations != null) {
+            _addConversation(newConversation);
           } else {
-            notifyListeners();
+            _newConversationQueue.add(newConversation);
           }
           break;
 
         case 'download_status':
           String downloadStatus = decoded['status'];
-          log.info('Download status: $downloadStatus');
+          log.fine('Download status: $downloadStatus');
           switch (downloadStatus) {
             case 'idle':
               _isDownloading = false;
@@ -277,6 +311,27 @@ class ChatConversationListModuleModel extends ModuleModel {
       }
     } catch (e, stackTrace) {
       log.severe('Decoding error while processing the message', e, stackTrace);
+    }
+  }
+
+  void _addConversation(Conversation conversation) {
+    assert(_conversations != null);
+
+    // Because we are using a [Set], duplicate conversation will not be added.
+    _conversations.add(conversation);
+
+    List<int> id = conversation.conversationId;
+
+    // If this conversation happens to be the last created conversation
+    // from the current user, select it immediately. If not, just notify
+    // that there is a new conversation added.
+    if (_intListEquality.equals(_lastCreatedConversationId, id)) {
+      _lastCreatedConversationId = null;
+      // No need to notify here, because setConversationId does it.
+      setConversationId(id);
+      focusConversation();
+    } else {
+      notifyListeners();
     }
   }
 

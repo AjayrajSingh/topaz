@@ -19,8 +19,8 @@ typedef void ConversationActionCallback(Conversation message);
 class ChatConversationList extends StatelessWidget {
   static final ListEquality<int> _intListEquality = const ListEquality<int>();
 
-  /// List of [Conversation]s to render.
-  final List<Conversation> conversations;
+  /// Set of [Conversation]s to render.
+  final Set<Conversation> conversations;
 
   /// Callback for when the new chat FAB is pressed.
   final VoidCallback onNewConversation;

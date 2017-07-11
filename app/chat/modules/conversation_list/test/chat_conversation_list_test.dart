@@ -15,7 +15,7 @@ void main() {
     int taps = 0;
     await tester.pumpWidget(new Material(
       child: new ChatConversationList(
-        conversations: <Conversation>[],
+        conversations: new Set<Conversation>(),
         onNewConversation: () {
           taps++;
         },
@@ -50,7 +50,7 @@ void main() {
               new User(name: 'Yoyo yang', email: 'Yoyo@cute')
             ],
           ),
-        ],
+        ].toSet(),
         onSelectConversation: (Conversation c) => taps[c.conversationId[0]]++,
       ),
     ));
