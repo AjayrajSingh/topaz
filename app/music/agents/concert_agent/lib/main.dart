@@ -56,7 +56,7 @@ class ContextListenerImpl extends ContextListener {
         ..headline = headline
         ..subheadline = 'powered by Songkick'
         ..details = ''
-        ..color = 0xFFFF0080
+        ..color = 0xFF467187
         ..iconUrls = const <String>[]
         ..imageType = SuggestionImageType.other
         ..imageUrl =
