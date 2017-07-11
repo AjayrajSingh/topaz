@@ -46,13 +46,8 @@ class Player extends StatelessWidget {
           asset: model.asset,
         );
       case DisplayMode.immersive:
-        return new Column(
-          children: <Widget>[
-            new Expanded(
-              child: _screen,
-            ),
-            _scrubber,
-          ],
+        return new Center(
+          child: _screen,
         );
       case DisplayMode.standby:
         return new Standby(

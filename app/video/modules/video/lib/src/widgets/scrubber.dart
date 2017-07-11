@@ -126,14 +126,6 @@ class Scrubber extends StatelessWidget {
             ],
           ),
         );
-      case DisplayMode.immersive:
-        return new Row(
-          children: <Widget>[
-            new Expanded(
-              child: _buildProgressBar(model),
-            ),
-          ],
-        );
       case DisplayMode.localSmall:
         return new AnimatedCrossFade(
           duration: _kAnimationTime,
