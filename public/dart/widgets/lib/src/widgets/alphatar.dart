@@ -157,15 +157,17 @@ class Alphatar extends StatelessWidget {
   }
 
   Widget _buildLetter() {
+    String text = letter?.toUpperCase() ?? '';
+
     return new Container(
       alignment: FractionalOffset.center,
       decoration: new BoxDecoration(
-        color: letter.isNotEmpty ? backgroundColor : Colors.transparent,
+        color: text.isNotEmpty ? backgroundColor : Colors.transparent,
         shape: BoxShape.circle,
       ),
-      child: letter.isNotEmpty
+      child: text.isNotEmpty
           ? new Text(
-              letter?.toUpperCase() ?? '',
+              text,
               style: new TextStyle(
                 color: Colors.white,
                 fontSize: size / 2.0,
