@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -20,12 +19,10 @@ import 'peek_manager.dart';
 import 'peeking_overlay.dart';
 import 'scroll_locker.dart';
 import 'selected_suggestion_overlay.dart';
-import 'size_model.dart';
 import 'splash_suggestion.dart';
 import 'story.dart';
 import 'story_cluster.dart';
 import 'story_cluster_drag_state_model.dart';
-import 'story_drag_transition_model.dart';
 import 'story_list.dart';
 import 'story_model.dart';
 import 'suggestion.dart';
