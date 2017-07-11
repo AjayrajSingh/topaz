@@ -185,23 +185,11 @@ class ConductorState extends State<Conductor> {
             fit: StackFit.passthrough,
             children: <Widget>[
               /// Story List.
-              new ScopedModelDescendant<StoryDragTransitionModel>(
-                builder: (
-                  BuildContext context,
-                  Widget child,
-                  StoryDragTransitionModel storyDragTransitionModel,
-                ) =>
-                    new Positioned(
-                      left: 0.0,
-                      right: 0.0,
-                      top: 0.0,
-                      bottom: lerpDouble(
-                        minimizedNowHeight,
-                        0.0,
-                        storyDragTransitionModel.progress,
-                      ),
-                      child: child,
-                    ),
+              new Positioned(
+                left: 0.0,
+                right: 0.0,
+                top: 0.0,
+                bottom: minimizedNowHeight,
                 child: _getStoryList(
                   storyModel,
                   constraints.maxWidth,
@@ -309,52 +297,39 @@ class ConductorState extends State<Conductor> {
         verticalShift: _kQuickSettingsHeightBump,
         child: new ScrollLocker(
           key: _scrollLockerKey,
-          child: new ScopedModelDescendant<StoryDragTransitionModel>(
-            builder: (
-              BuildContext context,
-              Widget child,
-              StoryDragTransitionModel storyDragTransitionModel,
-            ) =>
-                new StoryList(
-                  scrollController: _scrollController,
-                  overlayKey: _overlayKey,
-                  blurScrimmedChildren: widget.blurScrimmedChildren,
-                  bottomPadding: _kMaximizedNowHeight +
-                      lerpDouble(
-                        0.0,
-                        minimizedNowHeight,
-                        storyDragTransitionModel.progress,
-                      ),
-                  onScroll: (double scrollOffset) {
-                    if (_ignoreNextScrollOffsetChange) {
-                      _ignoreNextScrollOffsetChange = false;
-                      return;
-                    }
-                    _nowKey.currentState.scrollOffset = scrollOffset;
+          child: new StoryList(
+            scrollController: _scrollController,
+            overlayKey: _overlayKey,
+            blurScrimmedChildren: widget.blurScrimmedChildren,
+            bottomPadding: _kMaximizedNowHeight + minimizedNowHeight,
+            onScroll: (double scrollOffset) {
+              if (_ignoreNextScrollOffsetChange) {
+                _ignoreNextScrollOffsetChange = false;
+                return;
+              }
+              _nowKey.currentState.scrollOffset = scrollOffset;
 
-                    // Peak suggestion overlay more when overscrolling.
-                    if (scrollOffset < -_kSuggestionOverlayPullScrollOffset &&
-                        _suggestionOverlayKey.currentState.hiding) {
-                      _suggestionOverlayKey.currentState.setHeight(
-                        _kSuggestionOverlayPeekHeight -
-                            (scrollOffset +
-                                    _kSuggestionOverlayPullScrollOffset) *
-                                _kSuggestionOverlayScrollFactor,
-                      );
-                    }
-                  },
-                  onStoryClusterFocusStarted: () {
-                    // Lock scrolling.
-                    _scrollLockerKey.currentState.lock();
-                    _edgeScrollDragTargetKey.currentState.disable();
-                    _minimizeNow();
-                  },
-                  onStoryClusterFocusCompleted: (StoryCluster storyCluster) {
-                    _focusStoryCluster(storyModel, storyCluster);
-                  },
-                  parentSize: parentSize,
-                  onStoryClusterVerticalEdgeHover: () => goToOrigin(storyModel),
-                ),
+              // Peak suggestion overlay more when overscrolling.
+              if (scrollOffset < -_kSuggestionOverlayPullScrollOffset &&
+                  _suggestionOverlayKey.currentState.hiding) {
+                _suggestionOverlayKey.currentState.setHeight(
+                  _kSuggestionOverlayPeekHeight -
+                      (scrollOffset + _kSuggestionOverlayPullScrollOffset) *
+                          _kSuggestionOverlayScrollFactor,
+                );
+              }
+            },
+            onStoryClusterFocusStarted: () {
+              // Lock scrolling.
+              _scrollLockerKey.currentState.lock();
+              _edgeScrollDragTargetKey.currentState.disable();
+              _minimizeNow();
+            },
+            onStoryClusterFocusCompleted: (StoryCluster storyCluster) {
+              _focusStoryCluster(storyModel, storyCluster);
+            },
+            parentSize: parentSize,
+            onStoryClusterVerticalEdgeHover: () => goToOrigin(storyModel),
           ),
         ),
       );
