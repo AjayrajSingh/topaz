@@ -49,7 +49,7 @@
     "color": "0xFF3E2723",
     "image_url": "/system/data/sysui/1-portugal-the-man.jpeg",
     "module_url": "music_artist",
-    "module_data": "{\"view\":\"spotify://artist/4kI8Ie27vjvonwaB2ePh8T\"}"
+    "module_data": "{\"view\": {\"uri\": \"spotify://artist/4kI8Ie27vjvonwaB2ePh8T\", \"scheme\": \"spotify\", \"host\": \"artist\", \"path\": \"/4kI8Ie27vjvonwaB2ePh8T\", \"path segments\": [\"4kI8Ie27vjvonwaB2ePh8T\"], \"query parameters\": {}}}"
   },
   {
     "id": "ask_07",
