@@ -49,7 +49,6 @@ class _ScreenState extends State<Screen> {
     if (model.showControlOverlay) {
       model.showControlOverlay = false;
     } else {
-      model.showControlOverlay = true;
       model.brieflyShowControlOverlay();
     }
   }

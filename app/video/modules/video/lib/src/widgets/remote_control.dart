@@ -36,8 +36,8 @@ class RemoteControl extends StatelessWidget {
     Widget thumbnail = new Align(
       alignment: FractionalOffset.bottomCenter,
       child: new Container(
-        margin: new EdgeInsets.all(24.0),
-        width: 400.0,
+        margin: new EdgeInsets.all(20.0),
+        width: 360.0,
         child: new Image.asset(asset.thumbnail),
       ),
     );
@@ -51,20 +51,20 @@ class RemoteControl extends StatelessWidget {
               asset.title,
               style: new TextStyle(
                 color: Colors.grey[50],
-                fontSize: 28.0,
+                fontSize: 24.0,
                 letterSpacing: 0.02,
               ),
             ),
           ),
           new Container(
-            width: 550.0,
+            width: 400.0,
             padding: new EdgeInsets.only(bottom: 4.0),
             child: new Text(
               asset.description,
               textAlign: TextAlign.center,
               style: new TextStyle(
                 color: Colors.grey[500],
-                fontSize: 18.0,
+                fontSize: 16.0,
                 letterSpacing: 0.02,
               ),
             ),

@@ -141,9 +141,19 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   /// Returns whether media player controller is playing
   bool get playing => _controller.playing;
 
-  /// Gets and sets whether we should show play controls
+  /// Gets and sets whether we should show play controls and scrubber.
+  /// In remote control mode, we always show the control overlay with active
+  /// (i.e. actively moving, receiving timed notifications) progress bar.
   bool get showControlOverlay => _showControlOverlay;
   set showControlOverlay(bool show) {
+    if (displayMode == DisplayMode.remoteControl) {
+      if (!_showControlOverlay) {
+        _showControlOverlay = true;
+        notifyListeners();
+      }
+      return;
+    }
+
     assert(show != null);
     if (_showControlOverlay != show) {
       _showControlOverlay = show;
@@ -162,6 +172,14 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Returns media player controller video progress
   Duration get progress => _controller.progress;
+
+  /// Returns media player controller normalized video progress
+  double get normalizedProgress => _controller.normalizedProgress;
+
+  /// Seeks video to normalized position
+  void normalizedSeek(double normalizedPosition) {
+    _controller.normalizedSeek(normalizedPosition);
+  }
 
   /// Returns media player controller video view connection
   ChildViewConnection get videoViewConnection =>
@@ -267,6 +285,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
         _remoteDeviceLink.set(null, JSON.encode(jsonObject));
         _remoteDeviceName = null;
       });
+      brieflyShowControlOverlay();
       play();
     }
   }
@@ -364,11 +383,14 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Shows the control overlay for [_kOverlayAutoHideDuration].
   void brieflyShowControlOverlay() {
+    _showControlOverlay = true;
     _hideTimer?.cancel();
     _hideTimer = new Timer(_kOverlayAutoHideDuration, () {
       _hideTimer = null;
       if (_controller.playing) {
-        _showControlOverlay = false;
+        // We are using the public method set call because it has added logic on
+        // whether to set showControlOverlay based on displayMode
+        showControlOverlay = false;
       }
       notifyListeners();
     });

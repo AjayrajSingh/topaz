@@ -24,25 +24,6 @@ class Scrubber extends StatelessWidget {
   })
       : super(key: key);
 
-  /// Returns progress as a value from 0.0 to 1.0 inclusive.
-  double _getUnitProgress(VideoModuleModel model) {
-    int durationInMicroseconds = model.duration.inMicroseconds;
-    if (durationInMicroseconds == 0) {
-      return 0.0;
-    }
-    return model.progress.inMicroseconds / durationInMicroseconds;
-  }
-
-  /// Seeks to a position given as a value from 0.0 to 1.0 inclusive.
-  void _unitSeek(double unitPosition, VideoModuleModel model) {
-    int durationInMicroseconds = model.duration.inMicroseconds;
-    if (durationInMicroseconds == 0) {
-      return;
-    }
-    model.seek(new Duration(
-        microseconds: (unitPosition * durationInMicroseconds).round()));
-  }
-
   /// Converts a duration to a string indicating seconds, such as '1:15:00' or
   /// '2:40'
   static String _convertDurationToString(Duration duration) {
@@ -65,8 +46,8 @@ class Scrubber extends StatelessWidget {
       min: 0.0,
       max: 1.0,
       activeColor: Colors.grey[50],
-      value: _getUnitProgress(model),
-      onChanged: (double value) => _unitSeek(value, model),
+      value: model.normalizedProgress,
+      onChanged: model.normalizedSeek,
     );
   }
 
@@ -175,7 +156,7 @@ class Scrubber extends StatelessWidget {
         Widget child,
         VideoModuleModel model,
       ) {
-        return new Container(child: _buildScrubberMode(model));
+        return _buildScrubberMode(model);
       },
     );
   }

@@ -45,25 +45,6 @@ class PlayControls extends StatelessWidget {
     );
   }
 
-  /// Returns progress as a value from 0.0 to 1.0 inclusive.
-  double _getUnitProgress(VideoModuleModel model) {
-    int durationInMicroseconds = model.duration.inMicroseconds;
-    if (durationInMicroseconds == 0) {
-      return 0.0;
-    }
-    return model.progress.inMicroseconds / durationInMicroseconds;
-  }
-
-  /// Seeks to a position given as a value from 0.0 to 1.0 inclusive.
-  void _unitSeek(double unitPosition, VideoModuleModel model) {
-    int durationInMicroseconds = model.duration.inMicroseconds;
-    if (durationInMicroseconds == 0) {
-      return;
-    }
-    model.seek(new Duration(
-        microseconds: (unitPosition * durationInMicroseconds).round()));
-  }
-
   double _getZoomTime(VideoModuleModel model) {
     int durationInMicroseconds = model.duration.inMicroseconds;
     if (durationInMicroseconds == 0) {
@@ -74,13 +55,15 @@ class PlayControls extends StatelessWidget {
 
   void _forward(VideoModuleModel model) {
     model.pause();
-    _unitSeek(min(_getUnitProgress(model) + _getZoomTime(model), 1.0), model);
+    model.normalizedSeek(
+        min(model.normalizedProgress + _getZoomTime(model), 1.0));
     model.play();
   }
 
   void _rewind(VideoModuleModel model) {
     model.pause();
-    _unitSeek(max(_getUnitProgress(model) - _getZoomTime(model), 0.0), model);
+    model.normalizedSeek(
+        max(model.normalizedProgress - _getZoomTime(model), 0.0));
     model.play();
   }
 

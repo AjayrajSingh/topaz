@@ -26,17 +26,6 @@ class Player extends StatelessWidget {
     padding: 0.0,
   );
 
-  final Widget _scrubber = new ScopedModelDescendant<VideoModuleModel>(
-    builder: (
-      BuildContext context,
-      Widget child,
-      VideoModuleModel model,
-    ) {
-      return new Scrubber(
-          height: model.displayMode == DisplayMode.immersive ? 8.0 : 2.0);
-    },
-  );
-
   Widget _buildPlayerMode(VideoModuleModel model) {
     switch (model.displayMode) {
       case DisplayMode.remoteControl:
@@ -67,7 +56,7 @@ class Player extends StatelessWidget {
                 ],
               ),
             ),
-            _scrubber,
+            new Scrubber(height: 2.0),
           ],
         );
       case DisplayMode.localLarge:
@@ -78,8 +67,8 @@ class Player extends StatelessWidget {
             new Expanded(
               child: _screen,
             ),
-            // Scrubber includes PlayControls
-            _scrubber,
+            // Scrubber for this Mode includes PlayControls
+            new Scrubber(height: 2.0),
           ],
         );
     }
