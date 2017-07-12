@@ -13,7 +13,8 @@ import 'package:apps.modular.services.component/message_queue.fidl.dart';
 import 'package:apps.modular.services.user/device_map.fidl.dart';
 import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
 import 'package:collection/collection.dart';
-import 'package:lib.fidl.dart/bindings.dart' show InterfaceRequest;
+import 'package:lib.fidl.dart/bindings.dart'
+    show InterfaceHandle, InterfaceRequest;
 import 'package:lib.fidl.dart/core.dart' show Vmo;
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
@@ -43,6 +44,61 @@ final List<_ReservedPage> _kReservedPages = <_ReservedPage>[
     ),
   ),
 ];
+
+/// A [PageWatcher] watching for the specified conversation to appear in the
+/// conversations page. Used in [ChatContentProvider.getConversation()] when the
+/// `wait` parameter is set to true.
+// TODO(youngseokyoon): combine this with ConversationListWatcher.
+// https://fuchsia.atlassian.net/browse/SO-368
+class _NewConversationWatcher extends PageWatcher {
+  final List<int> conversationId;
+  final Completer<Conversation> completer = new Completer<Conversation>();
+
+  _NewConversationWatcher({
+    @required this.conversationId,
+  });
+
+  @override
+  void onChange(
+    PageChange pageChange,
+    ResultState resultState,
+    void callback(InterfaceRequest<PageSnapshot> snapshot),
+  ) {
+    for (Entry entry in pageChange.changes) {
+      if (const ListEquality<int>().equals(entry.key, conversationId)) {
+        completer.complete(_createConversationFromLedgerEntry(entry));
+        break;
+      }
+    }
+  }
+}
+
+/// Creates a [Conversation] object from the given ledger [Entry].
+Conversation _createConversationFromLedgerEntry(Entry entry) =>
+    _createConversationFromLedgerKeyValue(entry.key, entry.value);
+
+/// Creates a [Conversation] object from the given ledger entry's key-value.
+Conversation _createConversationFromLedgerKeyValue(List<int> key, Vmo value) {
+  Map<String, dynamic> decodedValue = decodeLedgerValue(value);
+  return new Conversation()
+    ..conversationId = key
+    ..participants = decodedValue['participants'];
+}
+
+/// Creates a [Message] object from the given ledger [Entry].
+Message _createMessageFromLedgerEntry(Entry entry) =>
+    _createMessageFromLedgerKeyValue(entry.key, entry.value);
+
+/// Creates a [Message] object from the given ledger entry's key-value.
+Message _createMessageFromLedgerKeyValue(List<int> key, Vmo value) {
+  Map<String, dynamic> decodedValue = decodeLedgerValue(value);
+  return new Message()
+    ..messageId = key
+    ..sender = decodedValue['sender']
+    ..timestamp = decodedValue['timestamp'] ?? 0
+    ..type = decodedValue['type']
+    ..jsonPayload = decodedValue['json_payload'];
+}
 
 /// Called when a new message is received.
 typedef void OnMessageReceived(Conversation conversation, Message message);
@@ -94,9 +150,10 @@ class ChatContentProviderImpl extends ChatContentProvider {
   /// enough, and there were some instances where the "Failed to cancel wait for
   /// waiter" error occurred on the page snapshot proxies. Keeping them here to
   /// prevent the agent from crashing.
-  final List<PageProxy> _pageProxies = new List<PageProxy>();
-  final List<PageSnapshotProxy> _snapshotProxies =
-      new List<PageSnapshotProxy>();
+  final List<PageProxy> _pageProxies = <PageProxy>[];
+  final List<PageSnapshotProxy> _snapshotProxies = <PageSnapshotProxy>[];
+  final List<PageWatcherBinding> _newConversationWatcherBindings =
+      <PageWatcherBinding>[];
 
   /// The last index of the messages that the current user sent to other people.
   /// This value is added to the message ids to prevent id collision.
@@ -205,6 +262,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
     _pageProxies.forEach((PageProxy page) => page?.ctrl?.close());
     _snapshotProxies
         .forEach((PageSnapshotProxy snapshot) => snapshot?.ctrl?.close());
+    _newConversationWatcherBindings
+        .forEach((PageWatcherBinding binding) => binding.close());
 
     _bindings.forEach(
       (ChatContentProviderBinding binding) => binding.close(),
@@ -297,6 +356,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
   @override
   Future<Null> getConversation(
     List<int> conversationId,
+    bool wait,
     void callback(ChatStatus chatStatus, Conversation conversation),
   ) async {
     try {
@@ -308,7 +368,10 @@ class ChatContentProviderImpl extends ChatContentProvider {
       }
 
       try {
-        Conversation conversation = await _getConversation(conversationId);
+        Conversation conversation = await _getConversation(
+          conversationId,
+          wait: wait,
+        );
         callback(ChatStatus.ok, conversation);
       } catch (e) {
         log.warning('Specified conversation is not found.');
@@ -394,10 +457,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
           List<Conversation> conversations = <Conversation>[];
 
           entries.forEach((Entry entry) {
-            Conversation conversation = _createConversationFromLedgerEntry(
-              entry.key,
-              entry.value,
-            );
+            Conversation conversation =
+                _createConversationFromLedgerEntry(entry);
             conversations.add(conversation);
             _conversationCache[entry.key] = conversation;
           });
@@ -496,10 +557,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
         }
 
         try {
-          List<Message> messages = entries
-              .map((Entry entry) =>
-                  _createMessageFromLedgerEntry(entry.key, entry.value))
-              .toList();
+          List<Message> messages =
+              entries.map(_createMessageFromLedgerEntry).toList();
 
           callback(ChatStatus.ok, messages);
         } catch (e, stackTrace) {
@@ -589,7 +648,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
         Vmo value = await valueCompleter.future;
         try {
-          Message message = _createMessageFromLedgerEntry(messageId, value);
+          Message message = _createMessageFromLedgerKeyValue(messageId, value);
           callback(ChatStatus.ok, message);
         } catch (e, stackTrace) {
           log.severe('Decoding error', e, stackTrace);
@@ -794,7 +853,10 @@ class ChatContentProviderImpl extends ChatContentProvider {
   ///
   /// The [conversationId] is assumed to be valid, and this method will throw an
   /// exception when the given id is not found in the `Conversations` page.
-  Future<Conversation> _getConversation(List<int> conversationId) async {
+  Future<Conversation> _getConversation(
+    List<int> conversationId, {
+    bool wait: false,
+  }) async {
     // Look for the conversation id from the local cache.
     if (_conversationCache.containsKey(conversationId)) {
       return _conversationCache[conversationId];
@@ -804,11 +866,25 @@ class ChatContentProviderImpl extends ChatContentProvider {
     PageSnapshotProxy snapshot = new PageSnapshotProxy();
     _snapshotProxies.add(snapshot);
 
+    // Create a [PageWatcher] in case we need to wait for the conversation info
+    // to appear in the page.
+    InterfaceHandle<PageWatcher> watcherHandle;
+    _NewConversationWatcher watcher;
+    PageWatcherBinding watcherBinding;
+    if (wait ?? false) {
+      watcher = new _NewConversationWatcher(
+        conversationId: conversationId,
+      );
+      watcherBinding = new PageWatcherBinding();
+      watcherHandle = watcherBinding.wrap(watcher);
+      _newConversationWatcherBindings.add(watcherBinding);
+    }
+
     try {
       _conversationsPage.getSnapshot(
         snapshot.ctrl.request(),
-        null,
-        null,
+        conversationId,
+        watcherHandle,
         (Status status) {
           if (status != Status.ok) {
             throw new Exception(
@@ -826,6 +902,20 @@ class ChatContentProviderImpl extends ChatContentProvider {
       });
 
       Status status = await statusCompleter.future;
+
+      // If the key is not found in the current snapshot and the wait parameter
+      // is set to true, we need to wait for the specified conversation to
+      // appear in the snapshot and use that.
+      if (wait && status == Status.keyNotFound) {
+        Conversation conversation = await watcher.completer.future;
+        _conversationCache[conversationId] = conversation;
+
+        watcherBinding.close();
+        _newConversationWatcherBindings.remove(watcherBinding);
+
+        return conversation;
+      }
+
       if (status != Status.ok) {
         throw new Exception(
           'PageSnapshot::Get() returned an error status: $status',
@@ -834,7 +924,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
       Vmo value = await valueCompleter.future;
       Conversation conversation =
-          _createConversationFromLedgerEntry(conversationId, value);
+          _createConversationFromLedgerKeyValue(conversationId, value);
       _conversationCache[conversationId] = conversation;
 
       return conversation;
@@ -842,23 +932,6 @@ class ChatContentProviderImpl extends ChatContentProvider {
       snapshot.ctrl.close();
       _snapshotProxies.remove(snapshot);
     }
-  }
-
-  Conversation _createConversationFromLedgerEntry(List<int> key, Vmo value) {
-    Map<String, dynamic> decodedValue = decodeLedgerValue(value);
-    return new Conversation()
-      ..conversationId = key
-      ..participants = decodedValue['participants'];
-  }
-
-  Message _createMessageFromLedgerEntry(List<int> key, Vmo value) {
-    Map<String, dynamic> decodedValue = decodeLedgerValue(value);
-    return new Message()
-      ..messageId = key
-      ..sender = decodedValue['sender']
-      ..timestamp = decodedValue['timestamp'] ?? 0
-      ..type = decodedValue['type']
-      ..jsonPayload = decodedValue['json_payload'];
   }
 
   /// Handles a newly received message from another user.

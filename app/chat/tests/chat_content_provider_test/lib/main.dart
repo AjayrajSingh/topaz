@@ -147,6 +147,7 @@ class ChatContentProviderTestModule extends Module {
     // Test GetConversation() method.
     await _chatContentProvider.getConversation(
       conversation.conversationId,
+      false,
       (ChatStatus s, Conversation c) {
         status = s;
         conversation = c;

@@ -62,7 +62,12 @@ interface ChatContentProvider {
   // Returns the metadata of the specified conversation.
   // To obtain the conversation history, use the |GetMessages| method with the
   // same conversation id.
-  GetConversation(array<uint8> conversation_id)
+  //
+  // If |wait| parameter is set to true, this method waits until the specified
+  // conversation appears in the list of conversations, if the conversation
+  // cannot be found. If set to false, this method returns |ID_NOT_FOUND| status
+  // in such cases.
+  GetConversation(array<uint8> conversation_id, bool wait)
       => (ChatStatus status, Conversation? conversation);
 
   // Returns the list of metadata of all existing conversations.

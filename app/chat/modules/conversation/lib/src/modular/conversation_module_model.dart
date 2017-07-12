@@ -221,6 +221,7 @@ class ChatConversationModuleModel extends ModuleModel {
     // Get the conversation metadata.
     _chatContentProvider.getConversation(
       conversationId,
+      true, // Wait until the conversation info is ready
       (chat_fidl.ChatStatus status, chat_fidl.Conversation conversation) {
         statusCompleter.complete(status);
         conversationCompleter.complete(conversation);
