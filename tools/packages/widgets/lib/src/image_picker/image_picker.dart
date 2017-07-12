@@ -143,6 +143,7 @@ class _ImagePickerState extends State<ImagePicker>
     }
     if (query.isEmpty) {
       setState(() {
+        _lastSearchQuery = null;
         _sourceImages = <String>[];
         _emptyStateMessage = _kSearchMessage;
         _enableClearButton = false;
