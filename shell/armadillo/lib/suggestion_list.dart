@@ -14,7 +14,10 @@ import 'suggestion_layout.dart';
 import 'suggestion_model.dart';
 import 'suggestion_widget.dart';
 
-const String _kImage = 'packages/armadillo/res/logo_googleg_24dpx4.png';
+const String _kLogoSmall = 'packages/armadillo/res/logo_googleg_24dpx4.png';
+const String _kLogoLarge =
+    'packages/armadillo/res/googlelogo_color_62x24dp.png';
+const String _kMicImage = 'packages/armadillo/res/googlemic_color_24dp.png';
 const Duration _kFadeInDuration = const Duration(milliseconds: 500);
 
 /// The height of the ask section of the suggerion list.
@@ -228,12 +231,10 @@ class SuggestionListState extends State<SuggestionList>
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            // Image.
             new Image.asset(
-              _kImage,
-              width: 24.0,
+              _askFocusNode.hasFocus ? _kLogoSmall : _kLogoLarge,
               height: 24.0,
-              fit: BoxFit.cover,
+              fit: BoxFit.fitHeight,
             ),
             new Container(width: 16.0),
             // Ask Anything text field.
@@ -241,14 +242,7 @@ class SuggestionListState extends State<SuggestionList>
               child: new Material(
                 color: Colors.transparent,
                 child: new TextField(
-                  decoration: new InputDecoration(
-                    hintText: 'Ask for anything',
-                    hintStyle: new TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.grey[600],
-                    ),
-                    hideDivider: true,
-                  ),
+                  decoration: new InputDecoration(hideDivider: true),
                   style: new TextStyle(
                     fontSize: 16.0,
                     color: Colors.grey[600],
@@ -269,6 +263,11 @@ class SuggestionListState extends State<SuggestionList>
                   },
                 ),
               ),
+            ),
+            new Image.asset(
+              _kMicImage,
+              height: 24.0,
+              fit: BoxFit.fitHeight,
             ),
           ],
         ),
