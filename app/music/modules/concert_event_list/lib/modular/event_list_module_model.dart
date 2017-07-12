@@ -6,6 +6,8 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:application.services/service_provider.fidl.dart';
+import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.surface/surface.fidl.dart';
@@ -21,7 +23,7 @@ class EventListModuleModel extends ModuleModel {
 
   List<Event> _events = <Event>[];
 
-  Event _selectedEvent;
+  int _selectedEventId;
 
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
 
@@ -30,7 +32,10 @@ class EventListModuleModel extends ModuleModel {
 
   /// Link meant to be used by the event page module
   /// This link contains the ID of the event that is focused
-  LinkProxy _eventLink;
+  final LinkProxy _eventLink = new LinkProxy();
+  final LinkWatcherBinding _eventLinkWatcherBinding = new LinkWatcherBinding();
+
+  bool _startedEventModule = false;
 
   /// Constructor
   EventListModuleModel({this.apiKey}) : super() {
@@ -45,16 +50,14 @@ class EventListModuleModel extends ModuleModel {
   LoadingStatus get loadingStatus => _loadingStatus;
 
   /// Get the currently selected event
-  Event get selectedEvent => _selectedEvent;
-
-  String get _selectedEventLinkData {
-    if (_selectedEvent == null) {
-      return '';
+  Event get selectedEvent {
+    if (events == null) {
+      return null;
     } else {
-      Map<String, dynamic> data = <String, dynamic>{
-        'songkick:eventId': _selectedEvent.id,
-      };
-      return JSON.encode(data);
+      return _events.firstWhere(
+        (Event event) => event.id == _selectedEventId,
+        orElse: () => null,
+      );
     }
   }
 
@@ -75,37 +78,52 @@ class EventListModuleModel extends ModuleModel {
 
   /// Mark the given [Event] as selected
   void selectEvent(Event event) {
-    _selectedEvent = event;
+    Map<String, dynamic> data = <String, dynamic>{
+      'songkick:eventId': event.id,
+    };
+    _eventLink.set(null, JSON.encode(data));
+  }
 
-    if (_eventLink == null) {
-      _eventLink = new LinkProxy();
-      moduleContext.getLink('event_link', _eventLink.ctrl.request());
-      _eventLink.set(<String>[], _selectedEventLinkData);
+  Future<Null> _onNotifyChild(String json) async {
+    Map<String, dynamic> decoded = JSON.decode(json);
+    if (decoded != null && decoded['songkick:eventId'] is int) {
+      _selectedEventId = decoded['songkick:eventId'];
 
-      // TODO(dayang@) : Preserve module/surface relationship when this story is
-      // rehydrated by the framework
-      // https://fuchsia.atlassian.net/browse/SO-482
+      // Start the Event Module if it hasn't been started
+      if (!_startedEventModule) {
+        moduleContext.startModuleInShell(
+          'event_module',
+          'file:///system/apps/concert_event_page',
+          'event_link',
+          null, // outgoingServices,
+          null, // incomingServices,
+          _eventPageModuleController.ctrl.request(),
+          new SurfaceRelation()
+            ..arrangement = SurfaceArrangement.copresent
+            ..emphasis = 1.5
+            ..dependency = SurfaceDependency.dependent,
+          true,
+        );
 
-      moduleContext.startModuleInShell(
-        'event_module',
-        'file:///system/apps/concert_event_page',
-        'event_link',
-        null, // outgoingServices,
-        null, // incomingServices,
-        _eventPageModuleController.ctrl.request(),
-        new SurfaceRelation()
-          ..arrangement = SurfaceArrangement.copresent
-          ..emphasis = 1.5
-          ..dependency = SurfaceDependency.dependent,
-        true,
-      );
-    } else {
-      _eventLink.set(<String>[], _selectedEventLinkData);
+        _startedEventModule = true;
+      }
+
+      _eventPageModuleController.focus();
+      notifyListeners();
     }
+  }
 
-    // Always focus on the EventPageModule surface in case it has been dismissed
-    _eventPageModuleController.focus();
-    notifyListeners();
+  @override
+  void onReady(
+    ModuleContext moduleContext,
+    Link link,
+    ServiceProvider incomingServices,
+  ) {
+    super.onReady(moduleContext, link, incomingServices);
+    moduleContext.getLink('event_link', _eventLink.ctrl.request());
+    _eventLink.watchAll(_eventLinkWatcherBinding.wrap(new LinkWatcherImpl(
+      onNotify: _onNotifyChild,
+    )));
   }
 
   @override
