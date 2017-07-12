@@ -18,8 +18,11 @@ import 'package:concert_widgets/concert_widgets.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
-/// The context topic for "focal entities"
-const String _kFocalEntitiesTopic = 'focal_entities';
+/// The context topic for "Music Artist"
+const String _kMusicArtistTopic = 'music_artist';
+
+/// The context topic for location
+const String _kLocationTopic = 'location';
 
 /// The Entity type for a music artist.
 const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
@@ -106,7 +109,7 @@ class EventPageModuleModel extends ModuleModel {
     if (event != null && event.performances.isNotEmpty) {
       if (event.performances.first.artist?.name != null) {
         publisher.publish(
-          _kFocalEntitiesTopic,
+          _kMusicArtistTopic,
           JSON.encode(
             <String, String>{
               '@type': _kMusicArtistType,
@@ -124,7 +127,7 @@ class EventPageModuleModel extends ModuleModel {
     if (event != null && event.venue != null) {
       Map<String, dynamic> contextLinkData = <String, dynamic>{
         '@context': <String, dynamic>{
-          'topic': _kFocalEntitiesTopic,
+          'topic': _kLocationTopic,
         },
         '@type': _kLocationType,
         'longitude': event.venue.longitude,

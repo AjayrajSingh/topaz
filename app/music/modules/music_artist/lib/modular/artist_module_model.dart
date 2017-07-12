@@ -32,8 +32,8 @@ const String _kPlayerUrl = 'file:///system/apps/music_playback_agent';
 
 const String _kPlaybackModuleUrl = 'file:///system/apps/music_playback';
 
-/// The context topic for "focal entities"
-const String _kFocalEntitiesTopic = 'focal_entities';
+/// The context topic for "Music Artist"
+const String _kMusicArtistTopic = 'music_artist';
 
 /// The Entity type for a music artist.
 const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
@@ -187,7 +187,7 @@ class ArtistModuleModel extends ModuleModel {
       // Publish artist data as 'context link'
       Map<String, dynamic> contextLinkData = <String, dynamic>{
         '@context': <String, dynamic>{
-          'topic': _kFocalEntitiesTopic,
+          'topic': _kMusicArtistTopic,
         },
         '@type': _kMusicArtistType,
         'name': artist.name,

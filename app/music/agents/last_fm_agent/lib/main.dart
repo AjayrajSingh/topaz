@@ -22,8 +22,8 @@ import 'package:meta/meta.dart';
 /// propose Music Artist suggestions if any of those Entities is an artist that
 /// Spotify recognizes
 
-/// The context topic for "focal entities" for the current story.
-const String _kCurrentFocalEntitiesTopic = 'focal_entities';
+/// The context topic for "Music Artist"
+const String _kMusicArtistTopic = 'music_artist';
 
 /// The Entity type for a music artist.
 const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
@@ -56,11 +56,11 @@ class ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onUpdate(ContextUpdate result) async {
-    if (!result.values.containsKey(_kCurrentFocalEntitiesTopic)) {
+    if (!result.values.containsKey(_kMusicArtistTopic)) {
       return;
     }
 
-    dynamic data = JSON.decode(result.values[_kCurrentFocalEntitiesTopic]);
+    dynamic data = JSON.decode(result.values[_kMusicArtistTopic]);
 
     if (_isValidArtistContextLink(data)) {
       log.fine('artist update: ${data['name']}');
@@ -132,8 +132,8 @@ Future<Null> main(List<dynamic> args) async {
   config.validate(<String>['last_fm_api_key']);
   connectToService(_context.environmentServices, _contextProvider.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextQuery query = new ContextQuery.init(
-      <String>[_kCurrentFocalEntitiesTopic], null /* filters */);
+  ContextQuery query =
+      new ContextQuery.init(<String>[_kMusicArtistTopic], null /* filters */);
   _contextListenerImpl = new ContextListenerImpl(
     apiKey: config.get('last_fm_api_key'),
   );
