@@ -46,6 +46,11 @@ const double _kStoryListMultiColumnWidthThreshold = 500.0;
 const double _kSuggestionOverlayPullScrollOffset = 100.0;
 const double _kSuggestionOverlayScrollFactor = 1.2;
 
+/// Target widths for the suggesiton section at different screen sizes.
+const double _kTargetLargeSuggestionWidth = 736.0;
+const double _kTargetSmallSuggestionWidth = 424.0;
+const double _kSuggestionMinPadding = 40.0;
+
 /// Called when an overlay becomes active or inactive.
 typedef void OnOverlayChanged(bool active);
 
@@ -178,6 +183,21 @@ class ConductorState extends State<Conductor> {
 
           storyModel.updateLayouts(fullSize);
 
+          // How sizing of the suggestion section works:
+          // 1. Try to accommodate the large target width with mininum padding
+          // 2. Try to accomodate the small target width with mininum padding
+          // 3. Stretch to the full width of the screen
+          double suggestionWidth;
+          if (constraints.maxWidth >=
+              _kTargetLargeSuggestionWidth + 2 * _kSuggestionMinPadding) {
+            suggestionWidth = _kTargetLargeSuggestionWidth;
+          } else if (constraints.maxWidth >
+              _kTargetSmallSuggestionWidth + 2 * _kSuggestionMinPadding) {
+            suggestionWidth = _kTargetSmallSuggestionWidth;
+          } else {
+            suggestionWidth = constraints.maxWidth;
+          }
+
           Widget stack = new Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
@@ -205,7 +225,7 @@ class ConductorState extends State<Conductor> {
               _getSuggestionOverlay(
                 SuggestionModel.of(context),
                 storyModel,
-                constraints.maxWidth,
+                suggestionWidth,
                 (
                   BuildContext context,
                   double overlayHeight,
