@@ -14,8 +14,8 @@ import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 
-/// The context topic for "focal entities" for the current story.
-const String _kCurrentFocalEntitiesTopic = 'focal_entities';
+/// The context topic for location
+const String _kLocationTopic = 'location';
 
 /// The Entity type for a location
 const String _kLocationType = 'http://types.fuchsia.io/location';
@@ -40,11 +40,11 @@ class ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onUpdate(ContextUpdate result) async {
-    if (!result.values.containsKey(_kCurrentFocalEntitiesTopic)) {
+    if (!result.values.containsKey(_kLocationTopic)) {
       return;
     }
 
-    dynamic data = JSON.decode(result.values[_kCurrentFocalEntitiesTopic]);
+    dynamic data = JSON.decode(result.values[_kLocationTopic]);
 
     if (data is Map<String, dynamic> && _isValidLocationContextLink(data)) {
       Proposal proposal = new Proposal()
@@ -100,8 +100,8 @@ void main(List<dynamic> args) {
   connectToService(_context.environmentServices, _contextProvider.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
 
-  ContextQuery query = new ContextQuery.init(
-      <String>[_kCurrentFocalEntitiesTopic], null /* filters */);
+  ContextQuery query =
+      new ContextQuery.init(<String>[_kLocationTopic], null /* filters */);
   _contextListenerImpl = new ContextListenerImpl();
   _contextProvider.subscribe(query, _contextListenerImpl.getHandle());
 }
