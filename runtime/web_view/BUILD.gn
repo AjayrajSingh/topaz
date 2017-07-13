@@ -2,25 +2,26 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//packages/package.gni")
+
 declare_args() {
   use_prebuilt_webkit = true
 }
 
-executable("web_view") {
+executable("web_view_bin") {
   output_name = "web_view"
 
   sources = [
     "main.cpp",
   ]
 
-  deps = []
   if (use_prebuilt_webkit) {
-    deps += [ ":prebuilt_webkit" ]
+    public_deps = [ ":prebuilt_webkit" ]
   } else {
-    deps += [ "//third_party/webkit" ]
+    public_deps = [ "//third_party/webkit" ]
   }
 
-  deps += [
+  deps = [
     "//application/lib/app",
     "//apps/icu_data/lib",
     "//apps/modular/lib/rapidjson",
@@ -43,7 +44,7 @@ executable("web_view") {
 
 if (use_prebuilt_webkit) {
   group("prebuilt_webkit") {
-    deps = [
+    public_deps = [
       ":copy_prebuilt_webkit_so",
       ":prebuilt_webkit_shared_deps(//build/toolchain/fuchsia:${target_cpu}-shared)",
     ]
@@ -88,4 +89,23 @@ if (use_prebuilt_webkit) {
       "//third_party/zlib",
     ]
   }
+}
+
+package("web_view") {
+  deps = [
+    ":web_view_bin",
+  ]
+
+  binaries = [ {
+        name = "web_view"
+      } ]
+
+  libraries = [ {
+        name = "libwebkit.so"
+      } ]
+
+  resources = [ {
+        path = rebase_path("apps/fonts/third_party/roboto/Roboto-Regular.ttf")
+        dest = "data/webkit/Roboto-Regular.ttf"
+      } ]
 }
