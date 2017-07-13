@@ -21,7 +21,8 @@ class Screen extends StatefulWidget {
 }
 
 class _ScreenState extends State<Screen> {
-  static const double _kCircleDiameter = 120.0;
+  static const double _kThumbWidth = 120.0;
+  static const double _kThumbHeight = 83.0;
 
   /// Local variable to save the state immediately before animating the screen
   /// into thumbnail.
@@ -86,10 +87,10 @@ class _ScreenState extends State<Screen> {
                   : null,
             ),
             builder: (BuildContext context, Widget child) {
-              double lerpWidth = lerpDouble(currentWidth, _kCircleDiameter,
-                  model.thumbnailAnimation.value);
-              double lerpHeight = lerpDouble(currentHeight, _kCircleDiameter,
-                  model.thumbnailAnimation.value);
+              double lerpWidth = lerpDouble(
+                  currentWidth, _kThumbWidth, model.thumbnailAnimation.value);
+              double lerpHeight = lerpDouble(
+                  currentHeight, _kThumbHeight, model.thumbnailAnimation.value);
               double x = -lerpWidth / 2.0;
               double y = -lerpHeight / 2.0;
 
@@ -101,7 +102,7 @@ class _ScreenState extends State<Screen> {
                   child: new Container(
                     child: new ClipRRect(
                       borderRadius: new BorderRadius.circular(
-                        _kCircleDiameter * model.thumbnailAnimation.value,
+                        _kThumbWidth * model.thumbnailAnimation.value,
                       ),
                       child: child,
                     ),
