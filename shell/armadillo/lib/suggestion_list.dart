@@ -149,8 +149,15 @@ class SuggestionListState extends State<SuggestionList>
         initialEntries: <OverlayEntry>[
           new OverlayEntry(
             builder: (BuildContext context) => new LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) =>
-                      new ScopedModelDescendant<SuggestionModel>(
+              builder: (BuildContext context, BoxConstraints constraints) =>
+                new PhysicalModel(
+                  elevation: 40.0,
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: const Radius.circular(8.0),
+                    topRight: const Radius.circular(8.0),
+                  ),
+                  child: new ScopedModelDescendant<SuggestionModel>(
                         builder: (
                           BuildContext context,
                           Widget child,
@@ -200,10 +207,6 @@ class SuggestionListState extends State<SuggestionList>
                                 child: new Container(
                                   decoration: new BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: const Radius.circular(8.0),
-                                      topRight: const Radius.circular(8.0),
-                                    ),
                                   ),
                                   padding: new EdgeInsets.symmetric(
                                     horizontal: _getLeftOffset(
@@ -218,6 +221,7 @@ class SuggestionListState extends State<SuggestionList>
                         },
                       ),
                 ),
+            ),
           ),
         ],
       );
