@@ -62,6 +62,7 @@ class DependentSimulatedPositioned extends StatelessWidget {
       return new SimulatedPositioned(
         key: new GlobalObjectKey(sizedSurface.surface),
         rect: sizedSurface.rect,
+        initRect: screenRect.topRight & sizedSurface.rect.size,
         child: childWidget,
         onDragStart: (SimulatedDragStartDetails details) {
           onDragStart?.call(sizedSurface.surface, details);
@@ -72,13 +73,15 @@ class DependentSimulatedPositioned extends StatelessWidget {
       );
     } else {
       return new SimulatedPositioned(
-        key: new GlobalObjectKey(sizedSurface.surface),
         rect: screenRect,
         child: new Stack(
           children: <Widget>[
-            new Positioned.fromRect(
+            new SimulatedPositioned(
+              key: new GlobalObjectKey(sizedSurface.surface),
               rect: sizedSurface.rect,
+              initRect: screenRect.topRight & sizedSurface.rect.size,
               child: childWidget,
+              draggable: false,
             ),
             new DependentSimulatedPositioned(
               surfaces: surfaces.sublist(1),

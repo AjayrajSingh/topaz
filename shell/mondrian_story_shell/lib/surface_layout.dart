@@ -306,7 +306,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
                   for (Surface s in depSpanTree) {
                     if (layout.keys.contains(s)) {
                       SizedSurface sized =
-                          new SizedSurface(surface: s, rect: layout.remove(s));
+                          new SizedSurface(surface: s, rect: layout[s]);
                       laidOut[sizedSurface.surface] = sizedSurface.rect;
                       dependentGroup.add(sized);
                       layout.remove(s);
