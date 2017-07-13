@@ -10,8 +10,8 @@ dart_package("weather_api") {
   source_dir = "lib"
 
   deps = [
-    "//lib/flutter/packages/flutter",
     "//apps/modules/common/packages/models",
+    "//lib/flutter/packages/flutter",
   ]
 
   analysis_options = "//apps/modules/common/.analysis_options"

@@ -60,6 +60,8 @@ dart_gn_packages := $(realpath $(shell grep -Rwl . --include="*.gn" -e "^\(flutt
 dart_all_packages := $(sort $(dart_packages) $(dart_tools_packages) $(dart_gn_packages))
 dart_analysis_options := $(addsuffix /.analysis_options, $(dart_all_packages))
 
+gn_sources := $(shell $(sfind) -name "*.gn")
+
 sources := $(shell $(sfind) \
 	\( -name "*.dart" \
 	-o -name "*.py" \
@@ -70,7 +72,7 @@ sources := $(shell $(sfind) \
 
 makefiles := $(foreach file, $(MAKEFILE_LIST), $(realpath $(file)))
 
-PATH := $(flutter_bin):$(dart_bin):$(PATH)
+PATH := $(flutter_bin):$(dart_bin):$(fuchsia_root)/buildtools:$(PATH)
 
 ################################################################################
 ## Fuchsia build / LUCI bot related flags
@@ -156,7 +158,7 @@ endif
 		$(flutter) run --hot
 
 .PHONY: fmt
-fmt: dart-fmt ## Format the code in this project.
+fmt: dart-fmt gn-fmt ## Format the code in this project.
 
 .PHONY: test
 test: dart-test ## Run the tests in this project.
@@ -171,7 +173,7 @@ presubmit: build lint test ## Run the presubmit tests for this project.
 presubmit-cq: build lint
 
 .PHONY: lint
-lint: copyright-check dart-lint dart-fmt-check ## Lint the code.
+lint: copyright-check dart-lint dart-fmt-check gn-fmt-check ## Lint the code.
 
 %/.packages: %/pubspec.yaml
 	@cd $* && flutter packages get
@@ -248,6 +250,27 @@ dart-coverage: $(dart_bin)
 .PHONY: copyright-check
 copyright-check: ## Check source files for missing copyright.
 	@$(common_root)/copyright-check.sh $(sources)
+
+.PHONY: gn-fmt
+gn-fmt:
+	@for src in $(gn_sources); do \
+		gn format $$src; \
+	done
+
+.PHONY: gn-fmt-check
+gn-fmt-check:
+	@export GN_FORMAT_ERROR=false; \
+	for src in $(gn_sources); do \
+		if ! $$(gn format --dry-run $$src); then \
+			export GN_FORMAT_ERROR=true; \
+			echo "Formatting issues found in: '$${src}'"; \
+		fi; \
+	done; \
+	if [ "$${GN_FORMAT_ERROR}" = true ]; then \
+		echo; \
+		echo "Run \"make fmt\" to fix the formatting."; \
+		exit 1; \
+	fi
 
 .PHONY: help
 help: ## Displays this help message.
