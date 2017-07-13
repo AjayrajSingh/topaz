@@ -50,47 +50,51 @@ abstract class AgentImpl extends Agent {
   }
 
   @override
-  Future<Null> initialize(
+  void initialize(
     InterfaceHandle<AgentContext> agentContext,
     void callback(),
-  ) async {
+  ) {
     _agentContext.ctrl.bind(agentContext);
     _agentContext.getComponentContext(_componentContext.ctrl.request());
     _agentContext.getTokenProvider(_tokenProvider.ctrl.request());
 
-    await onReady(
+    onReady(
       _applicationContext,
       _agentContext,
       _componentContext,
       _tokenProvider,
       _outgoingServicesImpl,
-    );
-
-    callback();
+    ).catchError((Exception e) {
+      throw e;
+    }).whenComplete(() {
+      callback();
+    });
   }
 
   @override
-  Future<Null> runTask(
+  void runTask(
     String taskId,
     void callback(),
-  ) async {
-    await onRunTask(taskId);
-
-    callback();
+  ) {
+    onRunTask(taskId).catchError((Exception e) {
+      throw e;
+    }).whenComplete(callback);
   }
 
   @override
-  Future<Null> stop(void callback()) async {
-    await onStop();
+  void stop(void callback()) {
+    onStop().catchError((Exception e) {
+      throw e;
+    }).whenComplete(() {
+      _tokenProvider?.ctrl?.close();
+      _componentContext?.ctrl?.close();
+      _agentContext?.ctrl?.close();
 
-    _tokenProvider?.ctrl?.close();
-    _componentContext?.ctrl?.close();
-    _agentContext?.ctrl?.close();
+      _outgoingServicesBindings
+          .forEach((ServiceProviderBinding binding) => binding.close());
 
-    _outgoingServicesBindings
-        .forEach((ServiceProviderBinding binding) => binding.close());
-
-    callback();
+      callback();
+    });
   }
 
   /// Advertises this [AgentImpl] as an [Agent] to the rest of the system via
@@ -112,6 +116,8 @@ abstract class AgentImpl extends Agent {
   /// Performs additional initialization after [Agent.initialize] is called.
   /// Subclasses must override this if additional work should be done at the
   /// initialization phase.
+  /// Note: Completing the future with an error will raise an unhandled
+  /// exception. Subclasses should handle recoverable errors internally.
   Future<Null> onReady(
     ApplicationContext applicationContext,
     AgentContext agentContext,
@@ -124,9 +130,13 @@ abstract class AgentImpl extends Agent {
   /// Performs additional cleanup work when [Agent.stop] is called.
   /// Subclasses must override this if there are additional resources to be
   /// cleaned up that are obtained from the [onReady] method.
+  /// Note: Completing the future with an error will raise an unhandled
+  /// exception. Subclasses should handle recoverable errors internally.
   Future<Null> onStop() async => null;
 
   /// Runs the task for the given [taskId]. Subclasses must override this
   /// instead of overriding the [runTask] method directly.
+  /// Note: Completing the future with an error will raise an unhandled
+  /// exception. Subclasses should handle recoverable errors internally.
   Future<Null> onRunTask(String taskId) async => null;
 }
