@@ -34,13 +34,17 @@ class MessageInput extends StatefulWidget {
 
 class _MessageInputState extends State<MessageInput> {
   final TextEditingController _controller = new TextEditingController();
+  final FocusNode _focusNode = new FocusNode();
 
   bool get _sendButtonEnabled => widget.enabled && _controller.text.isNotEmpty;
 
-  void _handleSubmit() {
+  void _handleSubmit(BuildContext context) {
     if (_controller.text.isNotEmpty) {
       widget.onSubmitMessage?.call(_controller.text);
       _controller.clear();
+
+      // Refocus the text input so that multiple messages can be typed in a row.
+      FocusScope.of(context).requestFocus(_focusNode);
     }
   }
 
@@ -60,7 +64,7 @@ class _MessageInputState extends State<MessageInput> {
     );
   }
 
-  Widget buildSendButton(Color primaryColor) {
+  Widget buildSendButton(BuildContext context, Color primaryColor) {
     return new Container(
       padding: const EdgeInsets.all(_kPaddingValue),
       child: new AnimatedBuilder(
@@ -74,7 +78,7 @@ class _MessageInputState extends State<MessageInput> {
               width: 40.0,
               height: 40.0,
               child: new InkWell(
-                onTap: _sendButtonEnabled ? _handleSubmit : null,
+                onTap: _sendButtonEnabled ? () => _handleSubmit(context) : null,
                 child: new Center(
                   child: new Icon(
                     Icons.send,
@@ -114,14 +118,15 @@ class _MessageInputState extends State<MessageInput> {
                   ? new TextField(
                       maxLines: null,
                       controller: _controller,
-                      onSubmitted: (_) => _handleSubmit(),
+                      focusNode: _focusNode,
+                      onSubmitted: (_) => _handleSubmit(context),
                       decoration: const InputDecoration.collapsed(
                         hintText: 'Type a message',
                       ),
                     )
                   : new Container(),
             ),
-            buildSendButton(theme.primaryColor),
+            buildSendButton(context, theme.primaryColor),
           ],
         ),
       ),
