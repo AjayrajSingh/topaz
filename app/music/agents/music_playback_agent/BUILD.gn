@@ -5,7 +5,6 @@
 import("//apps/dart_content_handler/dart_app.gni")
 
 dart_app("music_playback_agent") {
-
   main_dart = "lib/main.dart"
 
   deps = [

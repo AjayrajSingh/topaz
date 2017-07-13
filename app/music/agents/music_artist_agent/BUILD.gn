@@ -5,16 +5,15 @@
 import("//apps/dart_content_handler/dart_app.gni")
 
 dart_app("music_artist_agent") {
-
   main_dart = "lib/main.dart"
 
   deps = [
     "//application/lib/app/dart",
     "//apps/maxwell/lib/dart",
     "//apps/maxwell/services/context:context_dart",
-    "//apps/maxwell/services/user:user_dart",
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/suggestion:suggestion_dart",
+    "//apps/maxwell/services/user:user_dart",
     "//apps/modules/common/packages/config",
     "//apps/modules/music/packages/music_api",
     "//apps/modules/music/packages/music_models",

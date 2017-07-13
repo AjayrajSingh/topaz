@@ -6,7 +6,7 @@ group("agents") {
   deps = [
     "concert_agent",
     "last_fm_agent",
-    "music_playback_agent",
     "music_artist_agent",
+    "music_playback_agent",
   ]
 }
