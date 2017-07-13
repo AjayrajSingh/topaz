@@ -4,6 +4,6 @@
 
 group("modules") {
   deps = [
-    "video"
+    "video",
   ]
 }

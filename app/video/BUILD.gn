@@ -11,6 +11,5 @@ group("video") {
 group("test") {
   testonly = true
 
-  deps = [
-  ]
+  deps = []
 }
