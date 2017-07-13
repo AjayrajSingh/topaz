@@ -85,20 +85,20 @@ void main() {
   );
 
   testWidgets(
-    'The "x images selected" overlay should not appear when no images are selected',
+    'The "x selected" overlay should not appear when no images are selected',
     (WidgetTester tester) async {
       await tester.pumpWidget(new Material(
         child: _createImagePicker(),
       ));
       await tester.pump(); // rebuild imagePicker with new _sourceImages
 
-      expect(find.text('1 image selected'), findsNothing);
+      expect(find.text('1 selected'), findsNothing);
     },
   );
 
   testWidgets(
     'Tapping on an ImageEntry should set it as SELECTED and the '
-        ' "x images selected" overlay should appear when at least '
+        ' "x selected" overlay should appear when at least '
         ' one image is selected. Tapping on a selected image should unselect it',
     (WidgetTester tester) async {
       await tester.pumpWidget(new Material(
@@ -114,7 +114,7 @@ void main() {
       ImageEntry image = tester.widget(firstImage);
       expect(image.selected, true);
       expect(_selectedImages.length, 1);
-      Finder text = find.text('1 image selected');
+      Finder text = find.text('1 selected');
       expect(text, findsOneWidget);
 
       await tester.tap(firstImage);
@@ -177,7 +177,7 @@ void main() {
       // Two images are selected, each with a check icon + overlay's check icon
       Finder checkIcons = find.byIcon(Icons.check);
       expect(checkIcons, findsNWidgets(3));
-      Finder text = find.text('2 images selected');
+      Finder text = find.text('2 selected');
       expect(text, findsOneWidget);
 
       // There should be no more selected images, and no more overlay
