@@ -20,8 +20,8 @@ flutter_app("contacts") {
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//lib/widgets/packages/widgets:lib.widgets",
-    "//third_party/dart-pkg/pub/googleapis_auth",
     "//third_party/dart-pkg/pub/googleapis",
+    "//third_party/dart-pkg/pub/googleapis_auth",
   ]
 
   analysis_options = "//apps/modules/common/.analysis_options"
