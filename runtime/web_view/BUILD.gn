@@ -100,9 +100,11 @@ package("web_view") {
         name = "web_view"
       } ]
 
-  libraries = [ {
-        name = "libwebkit.so"
-      } ]
+  if (target_cpu == "x64") {
+    libraries = [ {
+          name = "libwebkit.so"
+        } ]
+  }
 
   resources = [ {
         path = rebase_path("apps/fonts/third_party/roboto/Roboto-Regular.ttf")
