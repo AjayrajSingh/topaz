@@ -59,16 +59,10 @@ DartApplicationController::DartApplicationController(
 DartApplicationController::~DartApplicationController() {}
 
 const char* kDartVMArgs[] = {
-    "--no_profiler",
-    "--no_support_timeline",
 // clang-format off
 #if defined(AOT_RUNTIME)
     "--precompilation",
 #else
-    "--enable_asserts",
-    "--enable_type_checks",
-    "--error_on_bad_type",
-    "--error_on_bad_override",
     "--enable_mirrors=false",
 #endif
     // clang-format on

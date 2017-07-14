@@ -38,10 +38,6 @@ const char* kDartVMArgs[] = {
 #if defined(AOT_COMPILER)
     "--precompilation",
 #else
-    "--enable_asserts",
-    "--enable_type_checks",
-    "--error_on_bad_type",
-    "--error_on_bad_override",
     "--enable_mirrors=false",
 #endif
 // clang-format on

@@ -27,12 +27,12 @@ template("runner") {
     deps = [
       "//application/lib/app",
       "//application/lib/svc",
-      "//dart/runtime/bin:embedded_dart_io",
+      "//dart/runtime/bin:embedded_dart_io_product",
 
       # TODO(abarth): We shouldn't need to depend on libdart_builtin but we fail
       # to link otherwise.
-      "//dart/runtime/bin:libdart_builtin",
-      "//dart/runtime/vm:libdart_platform",
+      "//dart/runtime/bin:libdart_builtin_product",
+      "//dart/runtime/vm:libdart_platform_product",
       "//lib/fidl/dart/sdk_ext",
       "//lib/ftl",
       "//lib/mtl",
@@ -48,7 +48,9 @@ runner("dart_runner_bin") {
   extra_defines = []
   extra_deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
-    "//dart/runtime:libdart_jit",
+    # Since the Dart content handlers don't have a vmservice, it is safe to
+    # link against the PRODUCT mode libraries in a Fuchsia release build.
+    "//dart/runtime:libdart_jit_product",
   ]
 }
 
@@ -57,7 +59,7 @@ runner("dart_aot_runner_bin") {
   extra_defines = [ "AOT_RUNTIME" ]
   extra_deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_empty",
-    "//dart/runtime:libdart_precompiled_runtime",
+    "//dart/runtime:libdart_precompiled_runtime_product",
   ]
 }
 
