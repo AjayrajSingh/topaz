@@ -16,7 +16,7 @@ import 'package:lib.logging/logging.dart';
 /// The Concert Agents subscribes to the hotel topic and makes proposals for
 /// upcoming concerts (concert list module).
 
-const String _kHotelTopic = 'hotel';
+const String _kHotelTopic = '/story/focused/link/hotel';
 
 /// Global scoping to prevent garbage collection
 final ContextProviderProxy _contextProvider = new ContextProviderProxy();
@@ -41,7 +41,7 @@ class ContextListenerImpl extends ContextListener {
     }
 
     dynamic data = JSON.decode(result.values[_kHotelTopic]);
-    if (data['name'] is String) {
+    if (data != null && data['name'] is String) {
       _createProposal(data['name']);
     }
   }

@@ -23,7 +23,7 @@ import 'package:meta/meta.dart';
 /// Spotify recognizes
 
 /// The context topic for "Music Artist"
-const String _kMusicArtistTopic = 'music_artist';
+const String _kMusicArtistTopic = '/story/focused/link/music_artist';
 
 /// The Entity type for a music artist.
 const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
@@ -115,7 +115,8 @@ class ContextListenerImpl extends ContextListener {
   ///   module path.
   /// * Must specify a name
   bool _isValidArtistContextLink(Map<String, dynamic> data) {
-    return data['@type'] is String &&
+    return data != null &&
+        data['@type'] is String &&
         data['@type'] == _kMusicArtistType &&
         data['@source'] is Map<String, dynamic> &&
         data['@source']['story_id'] is String &&
