@@ -15,7 +15,7 @@ import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 
 /// The context topic for location
-const String _kLocationTopic = 'location';
+const String _kLocationTopic = '/story/focused/link/location';
 
 /// The Entity type for a location
 const String _kLocationType = 'http://types.fuchsia.io/location';
@@ -83,7 +83,8 @@ class ContextListenerImpl extends ContextListener {
   /// * Must specify a latitude.
   /// * Must specify a longitude.
   bool _isValidLocationContextLink(Map<String, dynamic> data) {
-    return data['@type'] is String &&
+    return data != null &&
+        data['@type'] is String &&
         data['@type'] == _kLocationType &&
         data['@source'] is Map<String, dynamic> &&
         data['@source']['story_id'] is String &&
