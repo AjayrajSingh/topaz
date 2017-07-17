@@ -116,6 +116,7 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
     with TickerProviderStateMixin {
   _SimAnimationController _positionAnimation;
   _SimAnimationController _sizeAnimation;
+  Listenable _listenable;
   Offset _offset;
 
   @override
@@ -132,6 +133,10 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
     );
     _positionAnimation.addStatusListener((_) => _onStatusChanged());
     _sizeAnimation.addStatusListener((_) => _onStatusChanged());
+    _listenable = new Listenable.merge(<Listenable>[
+        _positionAnimation,
+        _sizeAnimation,
+      ]);
     _setTarget();
   }
 
@@ -166,10 +171,7 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
               child: widget.child,
             )
           : widget.child,
-      animation: new Listenable.merge(<Listenable>[
-        _positionAnimation,
-        _sizeAnimation,
-      ]),
+      animation: _listenable,
       builder: (BuildContext context, Widget child) {
         final Offset centerPos = _offset ?? _positionAnimation.value;
         final Size size = new Size(
