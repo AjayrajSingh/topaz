@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'logo.dart';
 import 'model.dart';
 
 const Duration _fadeAnimationDuration = const Duration(seconds: 1);
@@ -35,8 +34,8 @@ class SurfaceWidget extends StatelessWidget {
   Widget build(BuildContext context) => new ScopedModelDescendant<Surface>(
         child: new Center(
             child: new Container(
-                width: 100.0, height: 100.0, child: new MondrianLogo())),
-        builder: (BuildContext context, Widget logo, Surface surface) =>
+                width: 100.0, height: 100.0, child: new Container())),
+        builder: (BuildContext context, Widget blank, Surface surface) =>
             new LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 Widget childView = new Stack(children: <Widget>[
@@ -52,7 +51,7 @@ class SurfaceWidget extends StatelessWidget {
                     opacity: 1.0 - fade,
                     curve: _fadeCurve,
                     child: surface.connection == null
-                        ? logo
+                        ? blank
                         : new ChildView(
                             connection: surface.connection,
                             hitTestable: interactable,
