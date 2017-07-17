@@ -16,9 +16,13 @@ executable("web_view_bin") {
   ]
 
   if (use_prebuilt_webkit) {
-    public_deps = [ ":prebuilt_webkit" ]
+    public_deps = [
+      ":prebuilt_webkit",
+    ]
   } else {
-    public_deps = [ "//third_party/webkit" ]
+    public_deps = [
+      "//third_party/webkit",
+    ]
   }
 
   deps = [
@@ -109,5 +113,35 @@ package("web_view") {
   resources = [ {
         path = rebase_path("//apps/fonts/third_party/roboto/Roboto-Regular.ttf")
         dest = "webkit/Roboto-Regular.ttf"
+      } ]
+}
+
+executable("web_view_test") {
+  sources = [
+    "test_webview.cpp",
+  ]
+
+  deps = [
+    ":web_view_bin",
+  ]
+
+  if (use_prebuilt_webkit) {
+    public_deps = [
+      ":prebuilt_webkit",
+    ]
+  } else {
+    public_deps = [
+      "//third_party/webkit",
+    ]
+  }
+}
+
+package("web_view_test_package") {
+  deps = [
+    ":web_view_test",
+  ]
+
+  binaries = [ {
+        name = "web_view_test"
       } ]
 }
