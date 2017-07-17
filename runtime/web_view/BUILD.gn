@@ -108,6 +108,6 @@ package("web_view") {
 
   resources = [ {
         path = rebase_path("//apps/fonts/third_party/roboto/Roboto-Regular.ttf")
-        dest = "data/webkit/Roboto-Regular.ttf"
+        dest = "webkit/Roboto-Regular.ttf"
       } ]
 }
