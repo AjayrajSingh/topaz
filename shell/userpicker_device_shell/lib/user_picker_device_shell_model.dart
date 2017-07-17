@@ -14,6 +14,7 @@ export 'package:lib.widgets/model.dart'
 /// logging in and creating new users.
 class UserPickerDeviceShellModel extends DeviceShellModel {
   bool _showingNetworkInfo = false;
+  bool _showingUserActions = false;
   List<Account> _accounts;
 
   /// The list of previously logged in accounts.
@@ -57,6 +58,23 @@ class UserPickerDeviceShellModel extends DeviceShellModel {
     notifyListeners();
   }
 
+  /// Show advanced user actions such as:
+  /// * Guest login
+  /// * Create new account
+  void showUserActions() {
+    _showingUserActions = true;
+    notifyListeners();
+  }
+
+  /// Hide advanced user actions such as:
+  void hideUserActions() {
+    _showingUserActions = false;
+    notifyListeners();
+  }
+
   /// Returns true once network information starts showing.
   bool get showingNetworkInfo => _showingNetworkInfo;
+
+  /// If true, show advanced user actions
+  bool get showingUserActions => _showingUserActions;
 }

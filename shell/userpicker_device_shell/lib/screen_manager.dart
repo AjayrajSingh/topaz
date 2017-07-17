@@ -14,8 +14,8 @@ import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:meta/meta.dart';
 
+import 'clock.dart';
 import 'user_picker.dart';
-import 'user_picker_buttons.dart';
 import 'user_picker_device_shell_model.dart';
 import 'user_picker_screen.dart';
 import 'user_shell_chooser.dart';
@@ -103,32 +103,28 @@ class _ScreenManagerState extends State<ScreenManager>
 
   void _onStatusChange(_) => setState(() {});
 
+  bool get _isLoggingIn =>
+      _addingUser ||
+      (_childViewConnection != null &&
+          (_curvedTransitionAnimation.status == AnimationStatus.dismissed ||
+              _curvedTransitionAnimation.status == AnimationStatus.forward));
+
   @override
   Widget build(BuildContext context) {
     List<Widget> stackChildren = <Widget>[
       new UserPickerScreen(
-        showBlackHole: _draggedUsers.isNotEmpty,
+        showUserRemovalTarget: _draggedUsers.isNotEmpty,
         userPicker: new UserPicker(
           onLoginRequest: _login,
-          loggingIn: _addingUser ||
-              (_childViewConnection != null &&
-                  (_curvedTransitionAnimation.status ==
-                          AnimationStatus.dismissed ||
-                      _curvedTransitionAnimation.status ==
-                          AnimationStatus.forward)),
+          loggingIn: _isLoggingIn,
           onUserDragStarted: (Account account) => setState(() {
                 _draggedUsers.add(account);
               }),
           onUserDragCanceled: (Account account) => setState(() {
                 _draggedUsers.remove(account);
               }),
-        ),
-        userPickerButtons: new UserPickerButtons(
           onAddUser: () => _createAndLoginUser(context),
-          onUserShellChange: () => setState(() {
-                _userShellChooser.next();
-              }),
-          userShellAssetName: _userShellChooser.assetName,
+          userDragged: _draggedUsers.isNotEmpty,
         ),
         onRemoveUser: (Account account) => setState(() {
               _draggedUsers.remove(account);
@@ -156,6 +152,23 @@ class _ScreenManagerState extends State<ScreenManager>
         ),
       );
     }
+
+    // Add System Clock
+    stackChildren.add(new Align(
+      alignment: FractionalOffset.center,
+      child: new ScopedModelDescendant<UserPickerDeviceShellModel>(builder: (
+        BuildContext context,
+        Widget child,
+        UserPickerDeviceShellModel model,
+      ) {
+        return new Offstage(
+          offstage: model.accounts == null ||
+              _isLoggingIn ||
+              !model.showingNetworkInfo,
+          child: new Clock(),
+        );
+      }),
+    ));
 
     return new AnimatedBuilder(
       animation: _transitionAnimation,

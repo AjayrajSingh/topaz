@@ -9,12 +9,10 @@ import 'package:lib.widgets/widgets.dart';
 
 import 'user_picker_device_shell_model.dart';
 
-const String _kGuestUserName = 'Guest';
-const String _kDefaultServerName = 'ledger.fuchsia.com';
-const Color _kFuchsiaColor = const Color(0xFFFF0080);
-const double _kButtonContentWidth = 220.0;
-const double _kButtonContentHeight = 80.0;
-const double _kUserCardHeight = 188.0;
+const double _kUserAvatarSize = 64.0;
+final BorderRadius _kButtonBorderRadius =
+    new BorderRadius.circular(_kUserAvatarSize / 2.0);
+final Color _kButtonBackgroundColor = Colors.white.withAlpha(100);
 
 /// Called when the user wants to login as [accountId] using [userProvider].
 typedef void OnLoginRequest(String accountId, UserProvider userProvider);
@@ -39,60 +37,107 @@ class UserPicker extends StatelessWidget {
   /// Called when a user cancels its drag.
   final OnUserDragCanceled onUserDragCanceled;
 
+  /// Called when the add user button is pressed.
+  final VoidCallback onAddUser;
+
+  /// Flag for when user is being dragged
+  final bool userDragged;
+
   /// Constructor.
   UserPicker({
     this.onLoginRequest,
     this.loggingIn,
     this.onUserDragStarted,
     this.onUserDragCanceled,
+    this.onAddUser,
+    this.userDragged,
   });
 
-  Widget _buildUserCard({Account account, VoidCallback onTap}) => new Material(
-        color: Colors.black.withAlpha(0),
-        child: new InkWell(
-          highlightColor: Colors.transparent,
-          onTap: () => onTap(),
-          borderRadius: new BorderRadius.all(new Radius.circular(8.0)),
-          child: new Container(
-            margin: const EdgeInsets.all(16.0),
-            padding: const EdgeInsets.all(16.0),
-            child: new Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                new Container(
-                  padding: const EdgeInsets.all(2.0),
-                  decoration: new BoxDecoration(
-                    borderRadius: new BorderRadius.all(
-                      new Radius.circular(40.0),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: new Alphatar.fromNameAndUrl(
-                    name: account.displayName,
-                    avatarUrl: _getImageUrl(account),
-                    size: 80.0,
-                  ),
-                ),
-                new Container(
-                  margin: const EdgeInsets.only(top: 16.0),
-                  padding: const EdgeInsets.all(4.0),
-                  decoration: new BoxDecoration(
-                    borderRadius:
-                        new BorderRadius.all(new Radius.circular(4.0)),
-                    color: Colors.black.withAlpha(240),
-                  ),
-                  child: new Text(
-                    account.displayName.toUpperCase(),
-                    style: new TextStyle(
-                      color: Colors.grey[300],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+  Widget _buildUserCircle({
+    Account account,
+    VoidCallback onTap,
+  }) {
+    return new GestureDetector(
+      onTap: () => onTap?.call(),
+      child: new Container(
+        height: _kUserAvatarSize,
+        width: _kUserAvatarSize,
+        margin: const EdgeInsets.only(right: 16.0),
+        child: new Alphatar.fromNameAndUrl(
+          name: account.displayName,
+          avatarUrl: _getImageUrl(account),
+          size: _kUserAvatarSize,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNewUserButton({VoidCallback onTap}) {
+    return new GestureDetector(
+      onTap: () => onTap?.call(),
+      child: new Container(
+        height: _kUserAvatarSize,
+        width: _kUserAvatarSize,
+        decoration: new BoxDecoration(
+          borderRadius: _kButtonBorderRadius,
+          color: _kButtonBackgroundColor,
+        ),
+        child: new Center(
+          child: new Icon(
+            Icons.add,
+            color: Colors.grey[300].withAlpha(200),
+            size: _kUserAvatarSize / 2.0,
           ),
         ),
-      );
+      ),
+    );
+  }
+
+  Widget _buildUserActionButton({
+    String text,
+    VoidCallback onTap,
+  }) {
+    return new GestureDetector(
+      onTap: () => onTap?.call(),
+      child: new Container(
+        height: _kUserAvatarSize,
+        alignment: FractionalOffset.center,
+        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+        margin: const EdgeInsets.only(right: 16.0),
+        decoration: new BoxDecoration(
+          borderRadius: _kButtonBorderRadius,
+          color: _kButtonBackgroundColor,
+        ),
+        child: new Text(
+          text,
+          style: new TextStyle(
+            fontSize: 16.0,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserActions(UserPickerDeviceShellModel model) {
+    return new Row(
+      children: <Widget>[
+        _buildUserActionButton(
+            text: 'NEW',
+            onTap: () {
+              onAddUser?.call();
+              model.hideUserActions();
+            }),
+        _buildUserActionButton(
+          text: 'GUEST',
+          onTap: () {
+            _loginUser(null, model);
+            model.hideUserActions();
+          },
+        ),
+      ],
+    );
+  }
 
   String _getImageUrl(Account account) {
     if (account.imageUrl == null) {
@@ -114,7 +159,7 @@ class UserPicker extends StatelessWidget {
     VoidCallback onTap,
     bool removable: true,
   }) {
-    Widget userCard = _buildUserCard(account: account, onTap: onTap);
+    Widget userCard = _buildUserCircle(account: account, onTap: onTap);
 
     if (!removable) {
       return userCard;
@@ -134,32 +179,50 @@ class UserPicker extends StatelessWidget {
   }
 
   Widget _buildUserList(UserPickerDeviceShellModel model) {
-    List<Widget> children = <Widget>[];
-    // Default entry.
-    children.add(
-      _buildUserEntry(
-        account: new Account()..displayName = _kGuestUserName,
-        onTap: () => _loginUser(null, model),
-        removable: false,
-      ),
-    );
-    children.addAll(
-      model.accounts.map(
-        (Account account) => _buildUserEntry(
-              account: account,
-              onTap: () => _loginUser(account.id, model),
-            ),
-      ),
-    );
+    return new LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        List<Widget> children = <Widget>[];
 
-    return new Container(
-      height: _kUserCardHeight,
-      child: new ListView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        shrinkWrap: true,
-        children: children,
-      ),
+        if (!model.showingUserActions || constraints.maxWidth > 600.0) {
+          children.addAll(
+            model.accounts.map(
+              (Account account) => _buildUserEntry(
+                    account: account,
+                    onTap: () {
+                      _loginUser(account.id, model);
+                      model.hideUserActions();
+                    },
+                  ),
+            ),
+          );
+        }
+
+        if (model.showingUserActions) {
+          children.add(_buildUserActions(model));
+        } else {
+          children.add(_buildNewUserButton(
+            onTap: model.showUserActions,
+          ));
+        }
+
+        return new Container(
+          margin: const EdgeInsets.only(
+            bottom: 16.0,
+            left: 16.0,
+          ),
+          height: _kUserAvatarSize,
+          child: new AnimatedOpacity(
+            duration: new Duration(milliseconds: 250),
+            opacity: userDragged ? 0.0 : 1.0,
+            child: new ListView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              shrinkWrap: true,
+              children: children,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -174,14 +237,21 @@ class UserPicker extends StatelessWidget {
           return new Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
-              new Center(child: _buildUserList(model)),
+              _buildUserList(model),
             ],
           );
         } else {
-          return new Container(
-            width: 64.0,
-            height: 64.0,
-            child: new FuchsiaSpinner(),
+          return new Stack(
+            fit: StackFit.passthrough,
+            children: <Widget>[
+              new Center(
+                child: new Container(
+                  width: 64.0,
+                  height: 64.0,
+                  child: new FuchsiaSpinner(),
+                ),
+              ),
+            ],
           );
         }
       });

@@ -13,12 +13,13 @@ final DateFormat _kShortStringDateFormat = new DateFormat('h:mm', 'en_US');
 final DateFormat _kLongStringDateFormat = new DateFormat('EEEE h:mm', 'en_US');
 
 /// Creates time strings and notifies when they change.
-class TimeStringer {
+class TimeStringer extends Listenable {
   final Set<VoidCallback> _listeners = new Set<VoidCallback>();
   Timer _timer;
 
   /// [listener] will be called whenever [shortString] or [longString] have
   /// changed.
+  @override
   void addListener(VoidCallback listener) {
     _listeners.add(listener);
     if (_listeners.length == 1) {
@@ -28,6 +29,7 @@ class TimeStringer {
 
   /// [listener] will no longer be called whenever [shortString] or [longString]
   /// have changed.
+  @override
   void removeListener(VoidCallback listener) {
     _listeners.remove(listener);
     if (_listeners.length == 0) {

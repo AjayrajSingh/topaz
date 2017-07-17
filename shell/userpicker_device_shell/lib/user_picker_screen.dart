@@ -2,13 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:apps.modular.services.auth.account/account.fidl.dart';
 import 'package:flutter/material.dart';
 
-import 'user_picker_buttons.dart';
 import 'user_picker.dart';
 
 /// Called when the user is removing [account].
@@ -20,21 +18,17 @@ class UserPickerScreen extends StatelessWidget {
   /// The widget that allows a user to be picked.
   final UserPicker userPicker;
 
-  /// The widget that allows a user shutdown, add a user, and more.
-  final UserPickerButtons userPickerButtons;
-
   /// Called when the user is removing an account.
   final OnRemoveUser onRemoveUser;
 
   /// Indicates the remove user indicator should be shown.
-  final bool showBlackHole;
+  final bool showUserRemovalTarget;
 
   /// Constructor.
   UserPickerScreen({
     this.userPicker,
-    this.userPickerButtons,
     this.onRemoveUser,
-    this.showBlackHole,
+    this.showUserRemovalTarget,
   });
 
   @override
@@ -47,9 +41,15 @@ class UserPickerScreen extends StatelessWidget {
               new FractionallySizedBox(
                 heightFactor: 1.1,
                 alignment: FractionalOffset.topCenter,
-                child: new Image.asset(
-                  'packages/userpicker_device_shell/res/bg.jpg',
-                  fit: BoxFit.cover,
+                child: new Stack(
+                  fit: StackFit.passthrough,
+                  children: <Widget>[
+                    new Image.asset(
+                      'packages/userpicker_device_shell/res/bg.jpg',
+                      fit: BoxFit.cover,
+                    ),
+                    new Container(color: Colors.black.withAlpha(100)),
+                  ],
                 ),
               ),
 
@@ -58,8 +58,8 @@ class UserPickerScreen extends StatelessWidget {
                 alignment: FractionalOffset.bottomRight,
                 child: new Container(
                   margin: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 10.0,
+                    horizontal: 16.0,
+                    vertical: 16.0,
                   ),
                   child: new Image.asset(
                     'packages/userpicker_device_shell/res/fuchsia.png',
@@ -68,22 +68,21 @@ class UserPickerScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              new Center(child: new RepaintBoundary(child: userPicker)),
-              // Add shutdown button and new user button.
+
+              /// Add user picker for selecting users and adding new users
               new Align(
                 alignment: FractionalOffset.bottomLeft,
-                child: new Container(
-                  margin: const EdgeInsets.all(16.0),
-                  child: userPickerButtons,
+                child: new RepaintBoundary(
+                  child: userPicker,
                 ),
               ),
 
-              // Add black hole for removing users.
+              // Add user removal target
               new Align(
                 alignment: FractionalOffset.bottomCenter,
                 child: new RepaintBoundary(
                   child: new Container(
-                    margin: const EdgeInsets.only(bottom: 56.0),
+                    margin: const EdgeInsets.only(bottom: 80.0),
                     child: new DragTarget<Account>(
                       onWillAccept: (Account data) => true,
                       onAccept: (Account data) => onRemoveUser?.call(data),
@@ -92,8 +91,8 @@ class UserPickerScreen extends StatelessWidget {
                         List<Account> candidateData,
                         __,
                       ) =>
-                          new _BlackHole(
-                            show: showBlackHole,
+                          new _UserRemovalTarget(
+                            show: showUserRemovalTarget,
                             grow: candidateData.isNotEmpty,
                           ),
                     ),
@@ -106,23 +105,24 @@ class UserPickerScreen extends StatelessWidget {
       );
 }
 
-/// Displays a spinning black hole.
-class _BlackHole extends StatefulWidget {
-  /// Grows the black hole by some percentage.
+/// Displays a removal target for removing users
+class _UserRemovalTarget extends StatefulWidget {
+  /// Grows the target by some percentage.
   final bool grow;
 
-  /// Shows the black hole.
+  /// Shows the target.
   final bool show;
 
   /// Constructor.
-  _BlackHole({this.show, this.grow});
+  _UserRemovalTarget({this.show, this.grow});
 
   @override
-  _BlackHoleState createState() => new _BlackHoleState();
+  _UserRemovalTargetState createState() => new _UserRemovalTargetState();
 }
 
-class _BlackHoleState extends State<_BlackHole> with TickerProviderStateMixin {
-  AnimationController _rotationController;
+class _UserRemovalTargetState extends State<_UserRemovalTarget>
+    with TickerProviderStateMixin {
+  AnimationController _masterAnimationController;
   AnimationController _initialScaleController;
   CurvedAnimation _initialScaleCurvedAnimation;
   AnimationController _scaleController;
@@ -131,19 +131,14 @@ class _BlackHoleState extends State<_BlackHole> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _rotationController = new AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    );
-    _initialScaleController = new AnimationController(
+    _masterAnimationController = new AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _initialScaleController.addStatusListener((AnimationStatus status) {
-      if (!widget.show && _initialScaleController.isDismissed) {
-        _rotationController.stop();
-      }
-    });
+    _initialScaleController = new AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
     _initialScaleCurvedAnimation = new CurvedAnimation(
       parent: _initialScaleController,
       curve: Curves.fastOutSlowIn,
@@ -151,16 +146,21 @@ class _BlackHoleState extends State<_BlackHole> with TickerProviderStateMixin {
     );
     _scaleController = new AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 250),
     );
     _scaleCurvedAnimation = new CurvedAnimation(
       parent: _scaleController,
       curve: Curves.fastOutSlowIn,
       reverseCurve: Curves.fastOutSlowIn,
     );
+    _initialScaleController.addStatusListener((AnimationStatus status) {
+      if (!widget.show && _initialScaleController.isDismissed) {
+        _masterAnimationController.stop();
+      }
+    });
 
     if (widget.show) {
-      _rotationController.repeat();
+      _masterAnimationController.repeat();
       _initialScaleController.forward();
       if (widget.grow) {
         _scaleController.forward();
@@ -177,7 +177,7 @@ class _BlackHoleState extends State<_BlackHole> with TickerProviderStateMixin {
       _scaleController.reverse();
     }
     if (widget.show) {
-      _rotationController.repeat();
+      _masterAnimationController.repeat();
       _initialScaleController.forward();
     } else {
       _initialScaleController.reverse();
@@ -186,33 +186,41 @@ class _BlackHoleState extends State<_BlackHole> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _rotationController.dispose();
     _scaleController.dispose();
     _initialScaleController.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => new AnimatedBuilder(
-        animation: _rotationController,
-        builder: (BuildContext context, Widget child) => new Transform(
-              alignment: FractionalOffset.center,
-              transform: new Matrix4.rotationZ(
-                2.0 * math.PI * _rotationController.value,
-              )
-                  .scaled(
-                lerpDouble(1.0, 1.75, _scaleCurvedAnimation.value) *
-                    _initialScaleCurvedAnimation.value,
-                lerpDouble(1.0, 1.75, _scaleCurvedAnimation.value) *
-                    _initialScaleCurvedAnimation.value,
+  Widget build(BuildContext context) => new Container(
+        padding: const EdgeInsets.all(32.0),
+        child: new AnimatedBuilder(
+          animation: _masterAnimationController,
+          builder: (BuildContext context, Widget child) => new Transform(
+                alignment: FractionalOffset.center,
+                transform: new Matrix4.identity().scaled(
+                  lerpDouble(1.0, 1.5, _scaleCurvedAnimation.value) *
+                      _initialScaleCurvedAnimation.value,
+                  lerpDouble(1.0, 1.5, _scaleCurvedAnimation.value) *
+                      _initialScaleCurvedAnimation.value,
+                ),
+                child: new Container(
+                  width: 70.0,
+                  height: 70.0,
+                  decoration: new BoxDecoration(
+                    borderRadius: new BorderRadius.circular(35.0),
+                    border: new Border.all(color: Colors.white.withAlpha(200)),
+                    color: Colors.white.withAlpha(
+                        lerpDouble(0, 100.0, _scaleCurvedAnimation.value)
+                            .toInt()),
+                  ),
+                  child: new Icon(
+                    Icons.close,
+                    color: Colors.white.withAlpha(200),
+                    size: 32.0,
+                  ),
+                ),
               ),
-              child: child,
-            ),
-        child: new Image.asset(
-          'packages/userpicker_device_shell/res/BlackHole.png',
-          fit: BoxFit.cover,
-          width: 200.0,
-          height: 200.0,
         ),
       );
 }

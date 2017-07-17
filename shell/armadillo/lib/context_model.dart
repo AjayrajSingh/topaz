@@ -5,8 +5,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
-
-import 'time_stringer.dart';
+import 'package:sysui_widgets/time_stringer.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
