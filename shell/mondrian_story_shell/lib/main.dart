@@ -17,7 +17,7 @@ import 'logo.dart';
 import 'model.dart';
 import 'overview.dart';
 import 'surface_details.dart';
-import 'surface_layout.dart';
+import 'surface_director.dart';
 
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
@@ -129,7 +129,7 @@ class MondrianState extends State<Mondrian> {
         children: <Widget>[
           new ScopedModel<SurfaceGraph>(
             model: _surfaceGraph,
-            child: _showOverview ? new Overview() : new SurfaceLayout(),
+            child: _showOverview ? new Overview() : new SurfaceDirector(),
           ),
           new Positioned(
             left: 0.0,

@@ -1,0 +1,130 @@
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'dart:math' as math;
+
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
+
+import 'model.dart';
+import 'child_view.dart';
+import 'copresent_layout.dart';
+import 'surface_form.dart';
+import 'surface_space.dart';
+import 'tree.dart';
+
+const double _kFadeToDepthRatio = 3.0;
+
+/// Directs the layout of the SurfaceSpace
+class SurfaceDirector extends StatefulWidget {
+  @override
+  _SurfaceDirectorState createState() => new _SurfaceDirectorState();
+}
+
+class _SurfaceDirectorState extends State<SurfaceDirector> {
+  final Map<Surface, SurfaceForm> _forms = <Surface, SurfaceForm>{};
+
+  SurfaceForm _form(PositionedSurface ps, double depth, Offset offscreen) =>
+      new SurfaceForm.single(
+        key: new GlobalObjectKey(ps.surface),
+        child: new MondrianChildView(
+          connection: ps.surface.connection,
+          interactable: depth <= 0.0 ? true : false,
+          fade: (depth * _kFadeToDepthRatio).clamp(0.0, 1.0),
+        ),
+        position: ps.position,
+        initPosition: ps.position.shift(offscreen),
+        depth: depth,
+        friction: depth > 0.0
+            ? kDragFrictionInfinite
+            : ps.surface.canDismiss()
+                ? kDragFrictionNone
+                : (Offset offset, Offset delta) =>
+                    delta / math.max(1.0, offset.distanceSquared / 100.0),
+        onPositioned: () {
+          if (ps.surface.dismissed) {
+            setState(() {
+              _forms.remove(ps.surface);
+              // TODO(alangardner): Callback to notify framework
+            });
+          }
+        },
+        onDragStarted: () {
+          // Bring dragged items above
+          setState(() {
+            _forms[ps.surface] = _form(
+                new PositionedSurface(
+                    surface: ps.surface, position: ps.position),
+                -0.1,
+                offscreen);
+          });
+        },
+        onDragFinished: (Offset offset, Velocity velocity) {
+          // HACK(alangardner): Harcoded distances for swipe
+          // gesture to avoid complicated layout work for this
+          // throwaway version.
+          Offset expectedOffset = offset + (velocity.pixelsPerSecond / 5.0);
+          // Only remove if greater than threshold
+          if (expectedOffset.distance > 200.0) {
+            setState(() {
+              _forms[ps.surface] = _form(
+                  new PositionedSurface(
+                      surface: ps.surface,
+                      position: ps.position.shift(offscreen)),
+                  -0.1,
+                  Offset.zero);
+            });
+            ps.surface.dismiss();
+          } else {
+            // HACK: Force relayout to reset position and depth
+            setState(() {
+              _forms.remove(ps.surface);
+            });
+          }
+        },
+      );
+
+  @override
+  Widget build(BuildContext context) => new LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          if (constraints.biggest.isInfinite || constraints.biggest.isEmpty) {
+            return new Container();
+          }
+          final Offset offscreen = constraints.biggest.topRight(Offset.zero);
+          return new SizedBox(
+            width: constraints.maxWidth,
+            height: constraints.maxHeight,
+            child: new ScopedModelDescendant<SurfaceGraph>(
+              builder:
+                  (BuildContext context, Widget child, SurfaceGraph graph) {
+                List<Surface> focusStack = graph.focusStack.toList();
+                List<Surface> placedSurfaces = <Surface>[];
+                double depth = 0.0;
+                while (focusStack.isNotEmpty) {
+                  layoutSurfaces(context, constraints, focusStack)
+                      .forEach((PositionedSurface ps) {
+                    if (!placedSurfaces.contains(ps.surface)) {
+                      placedSurfaces.add(ps.surface);
+                      double oldDepth = _forms[ps.surface]?.depth ?? 0.0;
+                      _forms[ps.surface] = _form(
+                          ps, oldDepth < 0.0 ? oldDepth : depth, offscreen);
+                    }
+                  });
+                  depth = (depth + 0.1).clamp(0.0, 1.0);
+                  while (focusStack.isNotEmpty &&
+                      placedSurfaces.contains(focusStack.last)) {
+                    focusStack.removeLast();
+                  }
+                }
+                return new SurfaceSpace(
+                    forms: new Forest<SurfaceForm>(
+                        roots: _forms.values.map((SurfaceForm f) =>
+                            new Tree<SurfaceForm>(value: f))));
+              },
+            ),
+          );
+        },
+      );
+}

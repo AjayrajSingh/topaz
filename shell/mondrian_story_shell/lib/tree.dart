@@ -104,6 +104,9 @@ class Tree<T> extends Iterable<Tree<T>> {
 
   /// Get a flattened iterable of all of the values in the tree
   Iterable<T> get values => flatten().map((Tree<T> t) => t.value);
+
+  @override
+  String toString() => 'Tree($values)';
 }
 
 /// A collection of trees
@@ -183,4 +186,7 @@ class Forest<T> extends Iterable<Tree<T>> {
 
   /// Get a flattened iterable of all of the values in the forest
   Iterable<T> get values => flatten().map((Tree<T> t) => t.value);
+
+  @override
+  String toString() => 'Forest($roots)';
 }

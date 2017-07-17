@@ -133,7 +133,7 @@ class Surface extends Model {
   /// Dismiss this node hiding it from layouts
   bool dismiss() => _graph.dismissSurface(_node.value);
 
-  /// Check if surface is dismissible (will not result in no surfaces in story)
+  /// Returns true if this surface can be dismissed
   bool canDismiss() => _graph.canDismissSurface(_node.value);
 
   /// Remove this node from graph
