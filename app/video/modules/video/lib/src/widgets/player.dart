@@ -64,6 +64,7 @@ class Player extends StatelessWidget {
         // This is in a Stack to fake the appearance of the Slider directly
         // below the video, while still allowing the Slider to have ample space
         // above AND below, to be tapped on
+        // TODO(maryxia) SO-608 remove padding added due to no transparency
         return new Stack(
           children: <Widget>[
             new Column(
@@ -76,7 +77,7 @@ class Player extends StatelessWidget {
                     duration: kAnimationTime,
                     firstChild: new Padding(
                       // height of play controls + Slider._kReactionRadius
-                      padding: new EdgeInsets.only(bottom: 76.0),
+                      padding: new EdgeInsets.only(bottom: 86.0),
                     ),
                     secondChild: new Container(),
                     crossFadeState: model.showControlOverlay

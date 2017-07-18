@@ -62,6 +62,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   Timer _progressTimer;
   String _remoteDeviceName;
   String _castingDeviceName;
+  DeviceMapEntry _currentDevice;
   AnimationController _thumbnailAnimationController;
   Animation<double> _thumbnailAnimation;
   MediaPlayerController _controller;
@@ -281,29 +282,27 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       log.fine('Starting local play');
       _controller.open(_asset.uri, serviceName: _kServiceName);
       _controller.seek(progress);
-      _deviceMap.getCurrentDevice((DeviceMapEntry device) {
-        // TODO(maryxia): make separate set calls.
-        // https://fuchsia.atlassian.net/browse/SO-578
-        dynamic jsonObject = <String, dynamic>{
-          _kRemoteDisplayMode: <String, String>{
-            _remoteDeviceName: DisplayMode.standby.toString(),
-          },
-          _kCastingDeviceName: device.name,
-        };
-        _remoteDeviceLink.set(null, JSON.encode(jsonObject));
-        _remoteDeviceName = null;
-      });
+      // TODO(maryxia): make separate set calls.
+      // https://fuchsia.atlassian.net/browse/SO-578
+      dynamic jsonObject = <String, dynamic>{
+        _kRemoteDisplayMode: <String, String>{
+          _remoteDeviceName: DisplayMode.standby.toString(),
+        },
+        _kCastingDeviceName: _currentDevice.name,
+      };
+      _remoteDeviceLink.set(null, JSON.encode(jsonObject));
+      _remoteDeviceName = null;
       brieflyShowControlOverlay();
       play();
     }
   }
 
   @override
-  void onReady(
+  Future<Null> onReady(
     ModuleContext moduleContext,
     Link link,
     ServiceProvider incomingServices,
-  ) {
+  ) async {
     super.onReady(moduleContext, link, incomingServices);
     _controller.addListener(_handleControllerChanged);
     _controller.open(_asset.uri, serviceName: _kServiceName);
@@ -314,6 +313,10 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
         .watch(_remoteDeviceLinkWatcherBinding.wrap(new LinkWatcherImpl(
       onNotify: _handleRemoteDeviceChange,
     )));
+    Completer<DeviceMapEntry> currentDeviceCompleter =
+        new Completer<DeviceMapEntry>();
+    _deviceMap.getCurrentDevice(currentDeviceCompleter.complete);
+    _currentDevice = await currentDeviceCompleter.future;
     notifyListeners();
   }
 
@@ -321,22 +324,18 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     Map<String, dynamic> remoteInfo = JSON.decode(remoteInfoJson);
     assert(remoteInfo != null);
     bool shouldNotifyListeners = false;
-    // TODO(maryxia) SO-577: save as a var
-    _deviceMap.getCurrentDevice((DeviceMapEntry device) {
-      String currentDevice = device.hostname;
-      if (remoteInfo[_kRemoteDisplayMode] is Map<String, String>) {
-        String newMode = remoteInfo[_kRemoteDisplayMode][currentDevice];
-        if (displayMode == DisplayMode.standby &&
-            newMode == DisplayMode.immersive.toString()) {
-          displayMode = DisplayMode.immersive;
-          shouldNotifyListeners = true;
-        } else if (displayMode == DisplayMode.immersive &&
-            newMode == DisplayMode.standby.toString()) {
-          displayMode = DisplayMode.standby;
-          shouldNotifyListeners = true;
-        }
+    if (remoteInfo[_kRemoteDisplayMode] is Map<String, String>) {
+      String newMode = remoteInfo[_kRemoteDisplayMode][_currentDevice.hostname];
+      if (displayMode == DisplayMode.standby &&
+          newMode == DisplayMode.immersive.toString()) {
+        displayMode = DisplayMode.immersive;
+        shouldNotifyListeners = true;
+      } else if (displayMode == DisplayMode.immersive &&
+          newMode == DisplayMode.standby.toString()) {
+        displayMode = DisplayMode.standby;
+        shouldNotifyListeners = true;
       }
-    });
+    }
     String castingDeviceName = remoteInfo[_kCastingDeviceName];
     if (castingDeviceName is String) {
       _castingDeviceName = castingDeviceName;
