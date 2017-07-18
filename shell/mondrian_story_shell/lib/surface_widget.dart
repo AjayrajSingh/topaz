@@ -32,9 +32,7 @@ class SurfaceWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => new ScopedModelDescendant<Surface>(
-        child: new Center(
-            child: new Container(
-                width: 100.0, height: 100.0, child: new Container())),
+        child: new Container(),
         builder: (BuildContext context, Widget blank, Surface surface) =>
             new LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {

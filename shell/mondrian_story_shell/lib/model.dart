@@ -194,14 +194,15 @@ class SurfaceGraph extends Model {
     String parentId,
     SurfaceRelation relation,
   ) {
-    assert(!_surfaces.keys.contains(id));
-    Tree<String> node = new Tree<String>(value: id);
+    Tree<String> node = _tree.find(id) ?? new Tree<String>(value: id);
     Tree<String> parent =
         (parentId == kNoParent) ? _tree : _tree.find(parentId);
     assert(parent != null);
     assert(relation != null);
     parent.add(node);
+    Surface oldSurface = _surfaces[id];
     _surfaces[id] = new Surface._internal(this, node, properties, relation);
+    oldSurface?.notifyListeners();
     notifyListeners();
   }
 
@@ -313,8 +314,10 @@ class SurfaceGraph extends Model {
         },
         onUnavailable: (ChildViewConnection connection) {
           surface._connection = null;
-          removeSurface(id);
-          notifyListeners();
+          if (_surfaces.containsValue(surface)) {
+            removeSurface(id);
+            notifyListeners();
+          }
           // Also any existing listener
           surface.notifyListeners();
         },
