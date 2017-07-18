@@ -95,4 +95,92 @@ class Tree<T> extends Iterable<Tree<T>> {
   /// Note: Search order not specified (so make sure values are unique)
   Tree<T> find(T value) => this
       .firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
+
+  /// Generate a new tree with the same structure with transformed values
+  Tree<V> mapTree<V>(V f(T value)) => new Tree<V>(
+        value: f(value),
+        children: _children.map((Tree<T> n) => n.mapTree(f)),
+      );
+
+  /// Get a flattened iterable of all of the values in the tree
+  Iterable<T> get values => flatten().map((Tree<T> t) => t.value);
+}
+
+/// A collection of trees
+class Forest<T> extends Iterable<Tree<T>> {
+  /// Construct [Forest]
+  Forest({Iterable<Tree<T>> roots}) {
+    roots?.forEach((Tree<T> root) => add(root));
+  }
+
+  /// Root nodes of this forest
+  Iterable<Tree<T>> get roots => _roots.toList(growable: false);
+  final List<Tree<T>> _roots = <Tree<T>>[];
+
+  /// The longest path of edges to a leaf
+  int get height => _roots.isEmpty
+      ? 0
+      : _roots.fold(0, (int h, Tree<T> t) => max(h, t.height));
+
+  /// Add a root node to this forest
+  void add(Tree<T> node) {
+    assert(node != null);
+    node.detach();
+    _roots.add(node);
+  }
+
+  /// Removes the node from the tree, and reparents children.
+  ///
+  /// Reparents its children to the nodes parent or as root nodes.
+  void remove(Tree<T> node) {
+    assert(node != null);
+    if (this.contains(node)) {
+      Tree<T> parent = node.parent;
+      if (parent == null) {
+        for (Tree<T> child in node.children) {
+          add(child);
+        }
+        this._roots.remove(node);
+      } else {
+        node.detach();
+        for (Tree<T> child in node.children) {
+          parent.add(child);
+        }
+      }
+    }
+  }
+
+  @override
+  Iterator<Tree<T>> get iterator {
+    return flatten().iterator;
+  }
+
+  /// Breadth first flattening of tree
+  Iterable<Tree<T>> flatten({
+    int orderChildren(Tree<T> l, Tree<T> r),
+  }) {
+    List<Tree<T>> roots = _roots.toList();
+    if (orderChildren != null) {
+      roots.sort(orderChildren);
+    }
+    List<Tree<T>> nodes = <Tree<T>>[];
+    for (Tree<T> node in roots) {
+      nodes.addAll(node.flatten(orderChildren: orderChildren));
+    }
+    return nodes;
+  }
+
+  /// Find the single Tree node with the following value
+  ///
+  /// Note: Search order not specified (so make sure values are unique)
+  Tree<T> find(T value) => this
+      .firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
+
+  /// Generate a new forest with the same structure with transformed values
+  Forest<V> mapForest<V>(V f(T value)) => new Forest<V>(
+        roots: _roots.map((Tree<T> n) => n.mapTree(f)),
+      );
+
+  /// Get a flattened iterable of all of the values in the forest
+  Iterable<T> get values => flatten().map((Tree<T> t) => t.value);
 }
