@@ -12,7 +12,6 @@ import 'package:vector_math/vector_math_64.dart';
 const double _kGemCornerRadius = 16.0;
 const double _kGemOpacity = 1.0;
 const double _kFaceRotation = math.PI / 2.0;
-const Color _kFaceColor = const Color(0xFF009999);
 const double _kPerspectiveFieldOfViewRadians = math.PI / 6.0;
 const double _kPerspectiveNearZ = 100.0;
 const double _kPerspectiveAspectRatio = 1.0;
@@ -24,9 +23,10 @@ const double _kCubeAnimationXRotation = 6.0 * math.PI;
 class SpinningCubeGem extends StatelessWidget {
   /// Controlls the spinning animation.
   final AnimationController controller;
+  final Color color;
 
   /// Constructor.
-  SpinningCubeGem({this.controller});
+  SpinningCubeGem({this.controller, this.color});
 
   // The six cube faces are:
   //   1. Placed in a stack and rotated and translated into different positions
@@ -156,7 +156,7 @@ class SpinningCubeGem extends StatelessWidget {
           width: gemSize,
           height: gemSize,
           decoration: new BoxDecoration(
-            color: _kFaceColor,
+            color: color,
             borderRadius: new BorderRadius.circular(_kGemCornerRadius),
           ),
         ),
