@@ -64,7 +64,7 @@
     "headline": "Watch Discover Istanbul",
     "color": "0xFF424242",
     "image_url": "/system/data/sysui/istanbul_240.png",
-    "module_url": "video/video"
+    "module_url": "video"
   },
   {
     "id": "ask_09",
