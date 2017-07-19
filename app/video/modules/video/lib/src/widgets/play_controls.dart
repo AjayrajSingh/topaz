@@ -32,7 +32,8 @@ class PlayControls extends StatelessWidget {
   })
       : super(key: key);
 
-  Widget _createIconButton(Icon icon, double iconSize, VoidCallback callback) {
+  Widget _createIconButton(
+      {Icon icon, double iconSize, VoidCallback callback}) {
     return new Container(
       padding: new EdgeInsets.all(padding),
       child: new IconButton(
@@ -76,30 +77,28 @@ class PlayControls extends StatelessWidget {
   }
 
   Widget _buildPlayControls(VideoModuleModel model) {
-    return new Offstage(
-      offstage: false,
-      child: new Center(
-        child: new Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            _createIconButton(
-              new Icon(Icons.fast_rewind),
-              secondaryIconSize,
-              model.progress.inMicroseconds == 0 ? null : () => _rewind(model),
-            ),
-            model.playing
-                ? _createIconButton(new Icon(Icons.pause), primaryIconSize,
-                    () => _togglePlayPause(model))
-                : _createIconButton(new Icon(Icons.play_arrow), primaryIconSize,
-                    () => _togglePlayPause(model)),
-            _createIconButton(
-                new Icon(Icons.fast_forward),
-                secondaryIconSize,
-                model.progress.inMicroseconds == model.duration.inMicroseconds
-                    ? null
-                    : () => _forward(model)),
-          ],
-        ),
+    return new Center(
+      child: new Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          _createIconButton(
+              icon: new Icon(Icons.fast_rewind),
+              iconSize: secondaryIconSize,
+              callback: model.progress.inMicroseconds == 0
+                  ? null
+                  : () => _rewind(model)),
+          _createIconButton(
+              icon: new Icon(model.playing ? Icons.pause : Icons.play_arrow),
+              iconSize: primaryIconSize,
+              callback: () => _togglePlayPause(model)),
+          _createIconButton(
+              icon: new Icon(Icons.fast_forward),
+              iconSize: secondaryIconSize,
+              callback:
+                  model.progress.inMicroseconds == model.duration.inMicroseconds
+                      ? null
+                      : () => _forward(model)),
+        ],
       ),
     );
   }

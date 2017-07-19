@@ -104,14 +104,14 @@ class Player extends StatelessWidget {
       VideoModuleModel model,
     ) {
       Size size = MediaQuery.of(context).size;
-      if (size.width + size.height <= 912.0) {
-        model.displayMode = DisplayMode.localSmall;
-        model.notifyListeners();
-      } else if (model.displayMode != DisplayMode.remoteControl &&
+      if (model.displayMode != DisplayMode.remoteControl &&
           model.displayMode != DisplayMode.immersive &&
           model.displayMode != DisplayMode.standby) {
-        model.displayMode = DisplayMode.localLarge;
-        model.notifyListeners();
+        if (size.width + size.height <= 912.0) {
+          model.displayMode = DisplayMode.localSmall;
+        } else {
+          model.displayMode = DisplayMode.localLarge;
+        }
       }
       return new Container(
         color: Colors.black,
