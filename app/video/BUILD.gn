@@ -2,14 +2,21 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("video") {
+import("//packages/package.gni")
+
+package("video") {
+  app = true
+
   deps = [
-    "//apps/modules/video/modules",
+    "//apps/modules/video/modules/video",
   ]
-}
 
-group("test") {
-  testonly = true
-
-  deps = []
+  binaries = [ {
+        source = "gen/apps/modules/video/modules/video/video.flx"
+        name = "video"
+      } ]
+  resources = [ {
+        path = rebase_path("modules/video/assets/video.mp4")
+        dest = "modules/video.mp4"
+      } ]
 }
