@@ -6,6 +6,7 @@ import 'package:apps.modular.services.auth.account/account.fidl.dart';
 import 'package:apps.modular.services.device/device_shell.fidl.dart';
 import 'package:apps.modular.services.device/user_provider.fidl.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 export 'package:lib.widgets/model.dart'
@@ -61,10 +62,17 @@ class UserPickerDeviceShellModel extends DeviceShellModel {
 
   /// Permanently removes the user.
   void removeUser(Account account) {
-    userProvider.removeUser(account.id);
-    _accounts.remove(account);
-    notifyListeners();
-    _loadUsers();
+    userProvider.removeUser(account.id, (String errorCode) {
+      if (errorCode != null && errorCode != "") {
+        log.severe('Error in revoking credentials ${account.id}: $errorCode');
+        refreshUsers();
+        return;
+      }
+
+      _accounts.remove(account);
+      notifyListeners();
+      _loadUsers();
+    });
   }
 
   /// Called when the network information starts showing.
