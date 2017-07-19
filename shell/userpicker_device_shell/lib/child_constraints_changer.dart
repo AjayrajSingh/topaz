@@ -124,8 +124,8 @@ class ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
       );
 
   Widget get _enterConstraintsChild => new Positioned(
-        right: 0.0,
-        bottom: 0.0,
+        top: 0.0,
+        left: 0.0,
         width: 80.0,
         height: 80.0,
         child: new GestureDetector(
@@ -146,6 +146,7 @@ class ChildConstraintsChangerState extends State<ChildConstraintsChanger> {
             color: const Color(0xFF404040),
           ),
           onPressed: _switchConstraints,
+          elevation: 0.0,
         ),
       );
 

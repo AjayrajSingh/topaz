@@ -164,7 +164,8 @@ class _ScreenManagerState extends State<ScreenManager>
         return new Offstage(
           offstage: model.accounts == null ||
               _isLoggingIn ||
-              !model.showingNetworkInfo,
+              !model.showingNetworkInfo ||
+              _draggedUsers.isNotEmpty,
           child: new Clock(),
         );
       }),

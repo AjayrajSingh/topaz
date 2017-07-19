@@ -9,9 +9,17 @@ import 'package:lib.widgets/widgets.dart';
 
 import 'user_picker_device_shell_model.dart';
 
-const double _kUserAvatarSize = 64.0;
-final BorderRadius _kButtonBorderRadius =
-    new BorderRadius.circular(_kUserAvatarSize / 2.0);
+const double _kUserAvatarSizeLarge = 56.0;
+const double _kUserAvatarSizeSmall = 48.0;
+const double _kButtonWidthLarge = 128.0;
+const double _kButtonWidthSmall = 116.0;
+const double _kButtonFontSizeLarge = 16.0;
+const double _kButtonFontSizeSmall = 14.0;
+
+final BorderRadius _kButtonBorderRadiusPhone =
+    new BorderRadius.circular(_kUserAvatarSizeSmall / 2.0);
+final BorderRadius _kButtonBorderRadiusLarge =
+    new BorderRadius.circular(_kUserAvatarSizeLarge / 2.0);
 final Color _kButtonBackgroundColor = Colors.white.withAlpha(100);
 
 /// Called when the user wants to login as [accountId] using [userProvider].
@@ -56,84 +64,108 @@ class UserPicker extends StatelessWidget {
   Widget _buildUserCircle({
     Account account,
     VoidCallback onTap,
+    bool isSmall,
   }) {
+    double size = isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge;
     return new GestureDetector(
       onTap: () => onTap?.call(),
       child: new Container(
-        height: _kUserAvatarSize,
-        width: _kUserAvatarSize,
-        margin: const EdgeInsets.only(right: 16.0),
+        height: size,
+        width: size,
+        margin: const EdgeInsets.only(left: 16.0),
         child: new Alphatar.fromNameAndUrl(
           name: account.displayName,
           avatarUrl: _getImageUrl(account),
-          size: _kUserAvatarSize,
+          size: size,
         ),
       ),
     );
   }
 
-  Widget _buildNewUserButton({VoidCallback onTap}) {
-    return new GestureDetector(
+  Widget _buildIconButton({
+    VoidCallback onTap,
+    bool isSmall,
+    IconData icon,
+  }) {
+    double size = isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge;
+    return _buildUserActionButton(
       onTap: () => onTap?.call(),
-      child: new Container(
-        height: _kUserAvatarSize,
-        width: _kUserAvatarSize,
-        decoration: new BoxDecoration(
-          borderRadius: _kButtonBorderRadius,
-          color: _kButtonBackgroundColor,
-        ),
-        child: new Center(
-          child: new Icon(
-            Icons.add,
-            color: Colors.grey[300].withAlpha(200),
-            size: _kUserAvatarSize / 2.0,
-          ),
+      width: size,
+      child: new Center(
+        child: new Icon(
+          icon,
+          color: Colors.white,
+          size: size / 2.0,
         ),
       ),
     );
   }
 
   Widget _buildUserActionButton({
-    String text,
+    Widget child,
     VoidCallback onTap,
+    bool isSmall,
+    double width,
   }) {
     return new GestureDetector(
       onTap: () => onTap?.call(),
       child: new Container(
-        height: _kUserAvatarSize,
+        height: (isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge),
+        width: width ?? (isSmall ? _kButtonWidthSmall : _kButtonWidthLarge),
         alignment: FractionalOffset.center,
-        padding: const EdgeInsets.symmetric(horizontal: 32.0),
-        margin: const EdgeInsets.only(right: 16.0),
+        margin: const EdgeInsets.only(left: 16.0),
         decoration: new BoxDecoration(
-          borderRadius: _kButtonBorderRadius,
-          color: _kButtonBackgroundColor,
-        ),
-        child: new Text(
-          text,
-          style: new TextStyle(
-            fontSize: 16.0,
+          borderRadius:
+              isSmall ? _kButtonBorderRadiusPhone : _kButtonBorderRadiusLarge,
+          border: new Border.all(
             color: Colors.white,
+            width: 1.0,
           ),
         ),
+        child: child,
       ),
     );
   }
 
-  Widget _buildUserActions(UserPickerDeviceShellModel model) {
+  Widget _buildExpandedUserActions({
+    UserPickerDeviceShellModel model,
+    bool isSmall,
+  }) {
+    double fontSize = isSmall ? _kButtonFontSizeSmall : _kButtonFontSizeLarge;
     return new Row(
       children: <Widget>[
+        _buildIconButton(
+          onTap: () => model.hideUserActions(),
+          isSmall: isSmall,
+          icon: Icons.close,
+        ),
         _buildUserActionButton(
-            text: 'NEW',
-            onTap: () {
-              onAddUser?.call();
-              model.hideUserActions();
-            }),
+          child: new Text(
+            'LOGIN',
+            style: new TextStyle(
+              fontSize: fontSize,
+              color: Colors.white,
+            ),
+          ),
+          onTap: () {
+            onAddUser?.call();
+            model.hideUserActions();
+          },
+          isSmall: isSmall,
+        ),
         _buildUserActionButton(
-          text: 'GUEST',
+          child: new Text(
+            'GUEST',
+            style: new TextStyle(
+              fontSize: fontSize,
+              color: Colors.white,
+            ),
+          ),
           onTap: () {
             _loginUser(null, model);
             model.hideUserActions();
           },
+          isSmall: isSmall,
         ),
       ],
     );
@@ -158,8 +190,13 @@ class UserPicker extends StatelessWidget {
     Account account,
     VoidCallback onTap,
     bool removable: true,
+    bool isSmall,
   }) {
-    Widget userCard = _buildUserCircle(account: account, onTap: onTap);
+    Widget userCard = _buildUserCircle(
+      account: account,
+      onTap: onTap,
+      isSmall: isSmall,
+    );
 
     if (!removable) {
       return userCard;
@@ -183,39 +220,49 @@ class UserPicker extends StatelessWidget {
       builder: (BuildContext context, BoxConstraints constraints) {
         List<Widget> children = <Widget>[];
 
-        if (!model.showingUserActions || constraints.maxWidth > 600.0) {
-          children.addAll(
-            model.accounts.map(
-              (Account account) => _buildUserEntry(
-                    account: account,
-                    onTap: () {
-                      _loginUser(account.id, model);
-                      model.hideUserActions();
-                    },
-                  ),
-            ),
-          );
-        }
+        bool isSmall =
+            constraints.maxWidth < 600.0 || constraints.maxHeight < 600.0;
 
         if (model.showingUserActions) {
-          children.add(_buildUserActions(model));
+          children.add(_buildExpandedUserActions(
+            model: model,
+            isSmall: isSmall,
+          ));
         } else {
-          children.add(_buildNewUserButton(
+          children.add(_buildIconButton(
             onTap: model.showUserActions,
+            isSmall: isSmall,
+            icon: Icons.add,
           ));
         }
 
-        return new Container(
-          margin: const EdgeInsets.only(
-            bottom: 16.0,
-            left: 16.0,
+        children.addAll(
+          model.accounts.map(
+            (Account account) => _buildUserEntry(
+                  account: account,
+                  onTap: () {
+                    _loginUser(account.id, model);
+                    model.hideUserActions();
+                  },
+                  isSmall: isSmall,
+                ),
           ),
-          height: _kUserAvatarSize,
+        );
+
+        return new Container(
+          height:
+              (isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge) + 24.0,
           child: new AnimatedOpacity(
             duration: new Duration(milliseconds: 250),
             opacity: userDragged ? 0.0 : 1.0,
             child: new ListView(
+              controller: model.userPickerScrollController,
+              padding: const EdgeInsets.only(
+                bottom: 24.0,
+                right: 24.0,
+              ),
               scrollDirection: Axis.horizontal,
+              reverse: true,
               physics: const BouncingScrollPhysics(),
               shrinkWrap: true,
               children: children,

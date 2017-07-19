@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 
 import 'user_picker.dart';
 
+const double _kRemovalTargetSize = 112.0;
+
 /// Called when the user is removing [account].
 typedef void OnRemoveUser(Account account);
 
@@ -48,30 +50,30 @@ class UserPickerScreen extends StatelessWidget {
                       'packages/userpicker_device_shell/res/bg.jpg',
                       fit: BoxFit.cover,
                     ),
-                    new Container(color: Colors.black.withAlpha(100)),
+                    new Container(color: Colors.black.withAlpha(125)),
                   ],
                 ),
               ),
 
               /// Add Fuchsia logo.
               new Align(
-                alignment: FractionalOffset.bottomRight,
+                alignment: FractionalOffset.topLeft,
                 child: new Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 16.0,
                     vertical: 16.0,
                   ),
                   child: new Image.asset(
-                    'packages/userpicker_device_shell/res/fuchsia.png',
-                    width: 64.0,
-                    height: 64.0,
+                    'packages/userpicker_device_shell/res/Fuchsia_Logo_40dp_Accent.png',
+                    width: 40.0,
+                    height: 40.0,
                   ),
                 ),
               ),
 
               /// Add user picker for selecting users and adding new users
               new Align(
-                alignment: FractionalOffset.bottomLeft,
+                alignment: FractionalOffset.bottomRight,
                 child: new RepaintBoundary(
                   child: userPicker,
                 ),
@@ -79,10 +81,9 @@ class UserPickerScreen extends StatelessWidget {
 
               // Add user removal target
               new Align(
-                alignment: FractionalOffset.bottomCenter,
+                alignment: FractionalOffset.center,
                 child: new RepaintBoundary(
                   child: new Container(
-                    margin: const EdgeInsets.only(bottom: 80.0),
                     child: new DragTarget<Account>(
                       onWillAccept: (Account data) => true,
                       onAccept: (Account data) => onRemoveUser?.call(data),
@@ -180,7 +181,7 @@ class _UserRemovalTargetState extends State<_UserRemovalTarget>
       _masterAnimationController.repeat();
       _initialScaleController.forward();
     } else {
-      _initialScaleController.reverse();
+      _initialScaleController.value = 0.0;
     }
   }
 
@@ -193,31 +194,35 @@ class _UserRemovalTargetState extends State<_UserRemovalTarget>
 
   @override
   Widget build(BuildContext context) => new Container(
-        padding: const EdgeInsets.all(32.0),
         child: new AnimatedBuilder(
           animation: _masterAnimationController,
           builder: (BuildContext context, Widget child) => new Transform(
                 alignment: FractionalOffset.center,
                 transform: new Matrix4.identity().scaled(
-                  lerpDouble(1.0, 1.5, _scaleCurvedAnimation.value) *
+                  lerpDouble(1.0, 0.7, _scaleCurvedAnimation.value) *
                       _initialScaleCurvedAnimation.value,
-                  lerpDouble(1.0, 1.5, _scaleCurvedAnimation.value) *
+                  lerpDouble(1.0, 0.7, _scaleCurvedAnimation.value) *
                       _initialScaleCurvedAnimation.value,
                 ),
                 child: new Container(
-                  width: 70.0,
-                  height: 70.0,
+                  width: _kRemovalTargetSize,
+                  height: _kRemovalTargetSize,
                   decoration: new BoxDecoration(
-                    borderRadius: new BorderRadius.circular(35.0),
+                    borderRadius:
+                        new BorderRadius.circular(_kRemovalTargetSize / 2.0),
                     border: new Border.all(color: Colors.white.withAlpha(200)),
                     color: Colors.white.withAlpha(
                         lerpDouble(0, 100.0, _scaleCurvedAnimation.value)
                             .toInt()),
                   ),
-                  child: new Icon(
-                    Icons.close,
-                    color: Colors.white.withAlpha(200),
-                    size: 32.0,
+                  child: new Center(
+                    child: new Text(
+                      'REMOVE',
+                      style: new TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                      ),
+                    ),
                   ),
                 ),
               ),

@@ -5,6 +5,7 @@
 import 'package:apps.modular.services.auth.account/account.fidl.dart';
 import 'package:apps.modular.services.device/device_shell.fidl.dart';
 import 'package:apps.modular.services.device/user_provider.fidl.dart';
+import 'package:flutter/material.dart';
 import 'package:lib.widgets/modular.dart';
 
 export 'package:lib.widgets/model.dart'
@@ -16,9 +17,14 @@ class UserPickerDeviceShellModel extends DeviceShellModel {
   bool _showingNetworkInfo = false;
   bool _showingUserActions = false;
   List<Account> _accounts;
+  final ScrollController _userPickerScrollController = new ScrollController();
 
   /// The list of previously logged in accounts.
   List<Account> get accounts => _accounts;
+
+  /// Scroll Controller for the user picker
+  ScrollController get userPickerScrollController =>
+      _userPickerScrollController;
 
   @override
   void onReady(
@@ -27,6 +33,15 @@ class UserPickerDeviceShellModel extends DeviceShellModel {
   ) {
     super.onReady(userProvider, deviceShellContext);
     _loadUsers();
+    _userPickerScrollController.addListener(_scrollListener);
+  }
+
+  // Hide user actions on overscroll
+  void _scrollListener() {
+    if (_userPickerScrollController.offset >
+        _userPickerScrollController.position.maxScrollExtent + 40.0) {
+      hideUserActions();
+    }
   }
 
   /// Refreshes the list of users.
