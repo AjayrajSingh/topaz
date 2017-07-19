@@ -21,8 +21,7 @@ class Screen extends StatefulWidget {
 }
 
 class _ScreenState extends State<Screen> {
-  static const double _kThumbWidth = 120.0;
-  static const double _kThumbHeight = 83.0;
+  static const double _kThumbRadius = 120.0;
 
   /// Local variable to save the state immediately before animating the screen
   /// into thumbnail.
@@ -67,45 +66,54 @@ class _ScreenState extends State<Screen> {
           feedback: new AnimatedBuilder(
             animation: model.thumbnailAnimationController,
             child: new Container(
-              margin: new EdgeInsets.only(right: 3.0, bottom: 3.0),
-              decoration: new BoxDecoration(
-                color: Colors.black,
-                boxShadow: <BoxShadow>[
-                  new BoxShadow(
-                    color: Colors.grey[500],
-                    offset: new Offset(1.0, 1.0),
-                    blurRadius: BoxShadow.convertRadiusToSigma(1.0),
-                  ),
-                ],
-                border: new Border.all(
-                  width: 1.0,
-                  color: Colors.grey[500],
-                ),
-              ),
+              height: _kThumbRadius,
+              width: _kThumbRadius,
+              color: Colors.black,
               child: model.videoViewConnection != null
-                  ? new ChildView(connection: model.videoViewConnection)
+                  ? new FittedBox(
+                      fit: BoxFit.cover,
+                      child: new Container(
+                        width: _kThumbRadius,
+                        child: new AspectRatio(
+                          aspectRatio: 16.0 / 9.0,
+                          child: new ChildView(
+                              connection: model.videoViewConnection),
+                        ),
+                      ),
+                    )
                   : null,
             ),
             builder: (BuildContext context, Widget child) {
               double lerpWidth = lerpDouble(
-                  currentWidth, _kThumbWidth, model.thumbnailAnimation.value);
+                  currentWidth, _kThumbRadius, model.thumbnailAnimation.value);
               double lerpHeight = lerpDouble(
-                  currentHeight, _kThumbHeight, model.thumbnailAnimation.value);
+                  currentHeight, _kThumbRadius, model.thumbnailAnimation.value);
               double x = -lerpWidth / 2.0;
               double y = -lerpHeight / 2.0;
-
+              BorderRadius borderRadius = new BorderRadius.circular(
+                _kThumbRadius * model.thumbnailAnimation.value,
+              );
               return new Transform(
                 transform: new Matrix4.translationValues(x, y, 0.0),
                 child: new Container(
                   width: lerpWidth,
                   height: lerpHeight,
-                  child: new Container(
-                    child: new ClipRRect(
-                      borderRadius: new BorderRadius.circular(
-                        _kThumbWidth * model.thumbnailAnimation.value,
+                  decoration: new BoxDecoration(
+                    boxShadow: <BoxShadow>[
+                      new BoxShadow(
+                        color: Colors.grey[500],
+                        blurRadius: BoxShadow.convertRadiusToSigma(1.0),
                       ),
-                      child: child,
+                    ],
+                    border: new Border.all(
+                      width: 2.0,
+                      color: Colors.grey[500],
                     ),
+                    borderRadius: borderRadius,
+                  ),
+                  child: new ClipRRect(
+                    borderRadius: borderRadius,
+                    child: child,
                   ),
                 ),
               );
