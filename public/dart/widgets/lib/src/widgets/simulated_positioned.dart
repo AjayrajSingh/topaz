@@ -65,6 +65,7 @@ class SimulatedPositioned extends StatefulWidget {
     @required this.rect,
     Rect initRect,
     @required this.child,
+    this.hitTestBehavior: HitTestBehavior.deferToChild,
     this.draggable: true,
     this.onDragStart,
     this.onDragEnd,
@@ -74,7 +75,9 @@ class SimulatedPositioned extends StatefulWidget {
       : this.initRect = initRect ?? rect,
         this.dragOffsetTransform =
             dragOffsetTransform ?? _kDirectDragOffsetTransform,
-        super(key: key);
+        super(key: key) {
+    assert(hitTestBehavior != null);
+  }
 
   /// The widget below this widget in the tree.
   final Widget child;
@@ -84,6 +87,9 @@ class SimulatedPositioned extends StatefulWidget {
 
   /// The original position
   final Rect initRect;
+
+  /// HitTestBehaviour
+  final HitTestBehavior hitTestBehavior;
 
   /// If true the SimulatedPositioned can be manipulated directly via touch
   final bool draggable;
@@ -134,9 +140,9 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
     _positionAnimation.addStatusListener((_) => _onStatusChanged());
     _sizeAnimation.addStatusListener((_) => _onStatusChanged());
     _listenable = new Listenable.merge(<Listenable>[
-        _positionAnimation,
-        _sizeAnimation,
-      ]);
+      _positionAnimation,
+      _sizeAnimation,
+    ]);
     _setTarget();
   }
 
@@ -164,7 +170,7 @@ class _SimulatedPositionedState extends State<SimulatedPositioned>
     return new AnimatedBuilder(
       child: widget.draggable
           ? new GestureDetector(
-              behavior: HitTestBehavior.deferToChild,
+              behavior: widget.hitTestBehavior,
               onPanStart: _startDrag,
               onPanUpdate: _updateDrag,
               onPanEnd: _endDrag,
