@@ -39,23 +39,21 @@ class SurfaceWidget extends StatelessWidget {
             new LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 Widget childView = new Stack(children: <Widget>[
-                  new Container(
-                    decoration: new BoxDecoration(
-                      color: const Color(0xFFE6E6E6),
-                      boxShadow: _shadow(),
+                  new PhysicalModel(
+                    elevation: 10.0,
+                    color: const Color(0x00000000),
+                    child: new AnimatedOpacity(
+                      key: new ObjectKey(surface),
+                      duration: _fadeAnimationDuration,
+                      opacity: 1.0 - fade,
+                      curve: _fadeCurve,
+                      child: surface.connection == null
+                          ? blank
+                          : new ChildView(
+                              connection: surface.connection,
+                              hitTestable: interactable,
+                            ),
                     ),
-                  ),
-                  new AnimatedOpacity(
-                    key: new ObjectKey(surface),
-                    duration: _fadeAnimationDuration,
-                    opacity: 1.0 - fade,
-                    curve: _fadeCurve,
-                    child: surface.connection == null
-                        ? blank
-                        : new ChildView(
-                            connection: surface.connection,
-                            hitTestable: interactable,
-                          ),
                   ),
                 ]);
                 return new AnimatedContainer(
@@ -65,7 +63,6 @@ class SurfaceWidget extends StatelessWidget {
                   transform: _scale(constraints.biggest.center(Offset.zero)),
                   margin: const EdgeInsets.all(2.0),
                   padding: const EdgeInsets.all(20.0),
-                  color: const Color(0x00000000),
                   child: childView,
                 );
               },
@@ -80,8 +77,4 @@ class SurfaceWidget extends StatelessWidget {
     matrix.translate(-center.dx, -center.dy);
     return matrix;
   }
-
-  /// 12, 9, 6, and 3, as fade goes from 0.0->1.0
-  List<BoxShadow> _shadow() =>
-      kElevationToShadow[((((1.0 - fade) * 3.0).round() + 1) * 3)];
 }

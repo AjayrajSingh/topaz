@@ -134,23 +134,18 @@ class MondrianState extends State<Mondrian> {
           new Positioned(
             left: 0.0,
             bottom: 0.0,
-            child: new Material(
-              color: const Color.fromARGB(0, 0, 0, 0),
-              child: new InkWell(
-                child: new Container(
-                    width: 40.0,
-                    height: 40.0,
-                    child: new AnimatedOpacity(
-                        child: new MondrianLogo(),
-                        opacity: _showOverview ? 1.0 : 0.0,
-                        curve: Curves.decelerate,
-                        duration: const Duration(milliseconds: 250))),
-                onTap: () {
-                  setState(() {
-                    _showOverview = !_showOverview;
-                  });
-                },
+            child: new GestureDetector(
+              child: new Container(
+                width: 40.0,
+                height: 40.0,
+                child: _showOverview ? new MondrianLogo() : null,
               ),
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                setState(() {
+                  _showOverview = !_showOverview;
+                });
+              },
             ),
           ),
         ],

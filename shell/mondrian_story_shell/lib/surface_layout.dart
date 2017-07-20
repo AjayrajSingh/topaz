@@ -77,6 +77,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
         rect: rect,
         initRect: initRect,
         draggable: true,
+        hitTestBehavior: HitTestBehavior.opaque,
         child: new ScopedModel<Surface>(
           model: surface,
           child: new SurfaceWidget(),
@@ -103,6 +104,7 @@ class _SurfaceLayoutState extends State<SurfaceLayout> {
         rect: rect,
         initRect: initRect,
         draggable: false,
+        hitTestBehavior: HitTestBehavior.opaque,
         child: new ScopedModel<Surface>(
           model: surface,
           child: new SurfaceWidget(

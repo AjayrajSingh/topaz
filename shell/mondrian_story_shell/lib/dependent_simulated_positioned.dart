@@ -63,6 +63,7 @@ class DependentSimulatedPositioned extends StatelessWidget {
         key: new GlobalObjectKey(sizedSurface.surface),
         rect: sizedSurface.rect,
         initRect: screenRect.topRight & sizedSurface.rect.size,
+        hitTestBehavior: HitTestBehavior.opaque,
         child: childWidget,
         onDragStart: (SimulatedDragStartDetails details) {
           onDragStart?.call(sizedSurface.surface, details);
@@ -74,6 +75,7 @@ class DependentSimulatedPositioned extends StatelessWidget {
     } else {
       return new SimulatedPositioned(
         rect: screenRect,
+        hitTestBehavior: HitTestBehavior.opaque,
         child: new Stack(
           children: <Widget>[
             new SimulatedPositioned(
