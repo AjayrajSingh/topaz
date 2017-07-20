@@ -56,7 +56,7 @@ class ChatContentProviderTestModule extends Module {
   ) async {
     // Obtain TestRunner interface.
     connectToService(_context.environmentServices, _testRunner.ctrl);
-    _testRunner.identify('chat_content_provider_test');
+    _testRunner.identify('chat_content_provider_test', () {});
 
     // Obtain the ComponentContext interface.
     ModuleContextProxy moduleContextProxy = new ModuleContextProxy();
