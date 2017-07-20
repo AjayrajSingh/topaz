@@ -26,13 +26,14 @@ class Player extends StatelessWidget {
     padding: 0.0,
   );
 
-  Widget _buildPlayerMode(VideoModuleModel model) {
+  Widget _buildPlayerMode(VideoModuleModel model, bool smallScreen) {
     switch (model.displayMode) {
       case DisplayMode.remoteControl:
         return new RemoteControl(
           playLocal: model.playLocal,
           remoteDeviceName: model.getDisplayName(model.remoteDeviceName),
           asset: model.asset,
+          smallScreen: smallScreen,
         );
       case DisplayMode.immersive:
         return new Center(
@@ -105,10 +106,14 @@ class Player extends StatelessWidget {
       VideoModuleModel model,
     ) {
       Size size = MediaQuery.of(context).size;
+      bool smallScreen = false;
+      if (size.width + size.height <= 912.0) {
+        smallScreen = true;
+      }
       if (model.displayMode != DisplayMode.remoteControl &&
           model.displayMode != DisplayMode.immersive &&
           model.displayMode != DisplayMode.standby) {
-        if (size.width + size.height <= 912.0) {
+        if (smallScreen) {
           model.displayMode = DisplayMode.localSmall;
         } else {
           model.displayMode = DisplayMode.localLarge;
@@ -116,7 +121,7 @@ class Player extends StatelessWidget {
       }
       return new Container(
         color: Colors.black,
-        child: _buildPlayerMode(model),
+        child: _buildPlayerMode(model, smallScreen),
       );
     });
   }

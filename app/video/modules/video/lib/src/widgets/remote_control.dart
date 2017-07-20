@@ -18,17 +18,22 @@ class RemoteControl extends StatelessWidget {
   /// Video asset
   final Asset asset;
 
+  /// Remote control layout is on a small (phone-sized) screen
+  final bool smallScreen;
+
   /// Constructor for remote control mode for the video player
   RemoteControl({
     Key key,
     @required this.playLocal,
     @required this.remoteDeviceName,
     @required this.asset,
+    @required this.smallScreen,
   })
       : super(key: key) {
     assert(playLocal != null);
     assert(remoteDeviceName != null);
     assert(asset != null);
+    assert(smallScreen != null);
   }
 
   @override
@@ -46,7 +51,8 @@ class RemoteControl extends StatelessWidget {
       child: new Column(
         children: <Widget>[
           new Padding(
-            padding: new EdgeInsets.symmetric(vertical: 8.0),
+            padding: new EdgeInsets.symmetric(
+                vertical: this.smallScreen ? 0.0 : 8.0),
             child: new Text(
               asset.title,
               style: new TextStyle(
@@ -60,7 +66,7 @@ class RemoteControl extends StatelessWidget {
             width: 400.0,
             padding: new EdgeInsets.only(bottom: 4.0),
             child: new Text(
-              asset.description,
+              this.smallScreen ? '' : asset.description,
               textAlign: TextAlign.center,
               style: new TextStyle(
                 color: Colors.grey[500],
@@ -94,7 +100,7 @@ class RemoteControl extends StatelessWidget {
               new Padding(
                 padding: new EdgeInsets.symmetric(horizontal: 16.0),
                 child: new Text(
-                  remoteDeviceName ?? '',
+                  remoteDeviceName ?? 'Remote Device',
                   style: new TextStyle(
                     fontSize: 14.0,
                     color: Colors.grey[50],
@@ -121,8 +127,8 @@ class RemoteControl extends StatelessWidget {
           flex: 3,
           child: new Stack(
             children: <Widget>[
-              uncastToast,
               thumbnail,
+              uncastToast,
             ],
           ),
         ),
@@ -131,7 +137,7 @@ class RemoteControl extends StatelessWidget {
           child: videoText,
         ),
         new Expanded(
-          flex: 2,
+          flex: this.smallScreen ? 5 : 2,
           child: new Scrubber(),
         ),
       ],

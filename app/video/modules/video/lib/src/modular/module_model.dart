@@ -322,27 +322,29 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   void _handleRemoteDeviceChange(String remoteInfoJson) {
     Map<String, dynamic> remoteInfo = JSON.decode(remoteInfoJson);
-    assert(remoteInfo != null);
-    bool shouldNotifyListeners = false;
-    if (remoteInfo[_kRemoteDisplayMode] is Map<String, String>) {
-      String newMode = remoteInfo[_kRemoteDisplayMode][_currentDevice.hostname];
-      if (displayMode == DisplayMode.standby &&
-          newMode == DisplayMode.immersive.toString()) {
-        displayMode = DisplayMode.immersive;
-        shouldNotifyListeners = true;
-      } else if (displayMode == DisplayMode.immersive &&
-          newMode == DisplayMode.standby.toString()) {
-        displayMode = DisplayMode.standby;
+    if (remoteInfo != null) {
+      bool shouldNotifyListeners = false;
+      if (remoteInfo[_kRemoteDisplayMode] is Map<String, String>) {
+        String newMode =
+            remoteInfo[_kRemoteDisplayMode][_currentDevice.hostname];
+        if (displayMode == DisplayMode.standby &&
+            newMode == DisplayMode.immersive.toString()) {
+          displayMode = DisplayMode.immersive;
+          shouldNotifyListeners = true;
+        } else if (displayMode == DisplayMode.immersive &&
+            newMode == DisplayMode.standby.toString()) {
+          displayMode = DisplayMode.standby;
+          shouldNotifyListeners = true;
+        }
+      }
+      String castingDeviceName = remoteInfo[_kCastingDeviceName];
+      if (castingDeviceName is String) {
+        _castingDeviceName = castingDeviceName;
         shouldNotifyListeners = true;
       }
-    }
-    String castingDeviceName = remoteInfo[_kCastingDeviceName];
-    if (castingDeviceName is String) {
-      _castingDeviceName = castingDeviceName;
-      shouldNotifyListeners = true;
-    }
-    if (shouldNotifyListeners) {
-      notifyListeners();
+      if (shouldNotifyListeners) {
+        notifyListeners();
+      }
     }
   }
 
