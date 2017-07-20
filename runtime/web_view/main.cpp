@@ -89,6 +89,7 @@ class MozWebView : public mozart::BaseView,
         image_cycler_(session()),
         module_binding_(this),
         main_link_watcher_binding_(this) {
+    SetNeedSquareMetrics(true);
     parent_node().AddChild(image_cycler_);
 
     if (outgoing_services_request) {
@@ -154,7 +155,7 @@ class MozWebView : public mozart::BaseView,
               (pointer->type == mozart::PointerEvent::Type::MOUSE &&
                pointer->buttons & mozart::kMousePrimaryButton)) {
             web_view_.handleMouseEvent(
-                pointer->x, pointer->y,
+                pointer->x * metrics().scale_x, pointer->y * metrics().scale_y,
                 pointer->phase == mozart::PointerEvent::Phase::DOWN
                     ? ::WebView::kMouseDown
                     : ::WebView::kMouseMoved);
@@ -162,7 +163,8 @@ class MozWebView : public mozart::BaseView,
           handled = true;
           break;
         case mozart::PointerEvent::Phase::UP:
-          web_view_.handleMouseEvent(pointer->x, pointer->y,
+          web_view_.handleMouseEvent(pointer->x * metrics().scale_x,
+                                     pointer->y * metrics().scale_y,
                                      ::WebView::kMouseUp);
           handled = true;
           break;
@@ -210,35 +212,31 @@ class MozWebView : public mozart::BaseView,
   }
 
   // |BaseView|:
-  void OnPropertiesChanged(mozart::ViewPropertiesPtr old_properties) override {
-    if (!has_size())
-      return;
-
-    InvalidateScene();
-  }
-
   void OnSceneInvalidated(
       mozart2::PresentationInfoPtr presentation_info) override {
-    if (!has_size())
+    if (!has_physical_size())
       return;
 
     // Update the image.
     const mozart::client::HostImage* image = image_cycler_.AcquireImage(
-        size().width, size().height, size().width * 4u,
-        mozart2::ImageInfo::PixelFormat::BGRA_8,
+        physical_size().width, physical_size().height,
+        physical_size().width * 4u, mozart2::ImageInfo::PixelFormat::BGRA_8,
         mozart2::ImageInfo::ColorSpace::SRGB);
     FTL_DCHECK(image);
 
     // Paint the webview.
     web_view_.setup(reinterpret_cast<unsigned char*>(image->image_ptr()),
-                    MX_PIXEL_FORMAT_ARGB_8888, size().width, size().height,
-                    size().width * 4u);
+                    MX_PIXEL_FORMAT_ARGB_8888, physical_size().width,
+                    physical_size().height, physical_size().width * 4u);
     if (!url_set_) {
       const char* urlToOpen = url_.c_str();
       FTL_LOG(INFO) << "Loading " << urlToOpen;
       web_view_.setURL(urlToOpen);
       url_set_ = true;
-      web_view_.setPageAndTextZoomFactors(2.0, 1.0);
+
+      FTL_DCHECK(metrics().scale_x ==
+                 metrics().scale_y);  // we asked for square metrics
+      web_view_.setPageAndTextZoomFactors(metrics().scale_x, 1.0);
 
       auto requestCallback = [this](std::string url) {
         if (webRequestDelegate_) {
@@ -252,7 +250,10 @@ class MozWebView : public mozart::BaseView,
     web_view_.layoutAndPaint();
 
     image_cycler_.ReleaseAndSwapImage();
-    image_cycler_.SetTranslation(size().width * .5f, size().height * .5f, 0.f);
+    image_cycler_.SetScale(1.f / metrics().scale_x, 1.f / metrics().scale_y,
+                           1.f);
+    image_cycler_.SetTranslation(logical_size().width * .5f,
+                                 logical_size().height * .5f, 0.f);
   }
 
   void CallIdle() {
