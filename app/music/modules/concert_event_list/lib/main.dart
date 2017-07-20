@@ -21,7 +21,7 @@ Future<String> _readAPIKey() async {
 }
 
 Future<Null> main() async {
-  setupLogger();
+  setupLogger(name: 'Concert Event List Module');
 
   String apiKey = await _readAPIKey();
 

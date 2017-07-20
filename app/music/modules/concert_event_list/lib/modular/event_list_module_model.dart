@@ -14,6 +14,7 @@ import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 /// [ModuleModel] that manages the state of the Event Module.
@@ -70,7 +71,8 @@ class EventListModuleModel extends ModuleModel {
       } else {
         _loadingStatus = LoadingStatus.failed;
       }
-    } catch (_) {
+    } catch (exception) {
+      log.severe('Failed to Retrieve Concert Events', exception);
       _loadingStatus = LoadingStatus.failed;
     }
     notifyListeners();
