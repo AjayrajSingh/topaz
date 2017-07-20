@@ -106,18 +106,12 @@ class QuickSettingsOverlayState extends TickingState<QuickSettingsOverlay> {
         child: new RepaintBoundary(
           child: new Container(
               decoration: new BoxDecoration(
-                  color: Colors.white.withOpacity(
-                    lerpDouble(0.0, 1.0, _showProgress),
-                  ),
+                  color: Colors.white,
                   borderRadius: new BorderRadius.circular(
                     4.0,
                   )),
               child: new QuickSettings(
-                opacity: lerpDouble(
-                  0.0,
-                  1.0,
-                  _showProgress,
-                ),
+                opacity: 1.0,
                 onLogoutTapped: widget.onLogoutTapped,
                 onLogoutLongPressed: widget.onLogoutLongPressed,
               )),
@@ -125,52 +119,44 @@ class QuickSettingsOverlayState extends TickingState<QuickSettingsOverlay> {
       );
 
   @override
-  Widget build(BuildContext context) => new Offstage(
-        offstage: _showProgress == 0.0,
-        child: new Stack(
-          fit: StackFit.passthrough,
-          children: <Widget>[
-            new Positioned(
-              left: 0.0,
-              top: 0.0,
-              right: 0.0,
-              bottom: widget.minimizedNowBarHeight,
-              child: new IgnorePointer(
-                child: new Container(
-                  color: Color.lerp(
-                    Colors.transparent,
-                    Colors.black45,
-                    _showProgress,
+  Widget build(BuildContext context) => new PhysicalModel(
+        elevation: 24.0,
+        color: Colors.transparent,
+        child: new Offstage(
+          offstage: _showProgress == 0.0,
+          child: new Stack(
+            fit: StackFit.passthrough,
+            children: <Widget>[
+              new Positioned(
+                left: 0.0,
+                top: 0.0,
+                right: 0.0,
+                bottom: 0.0,
+                child: new Offstage(
+                  offstage: _showSimulation.target != _kShowSimulationTarget,
+                  child: new Listener(
+                    behavior: HitTestBehavior.opaque,
+                    onPointerDown: (_) {
+                      hide();
+                    },
                   ),
                 ),
               ),
-            ),
-            new Positioned(
-              left: 0.0,
-              top: 0.0,
-              right: 0.0,
-              bottom: 0.0,
-              child: new Offstage(
-                offstage: _showSimulation.target != _kShowSimulationTarget,
-                child: new Listener(
-                  behavior: HitTestBehavior.opaque,
-                  onPointerDown: (_) {
-                    hide();
-                  },
+              new Positioned(
+                bottom: lerpDouble(
+                  // Hack(dayang): We are not able to use transparencies with
+                  // Mozart 2.
+                  // MZ-221
+                  -220.0,
+                  8.0 + widget.minimizedNowBarHeight,
+                  _showProgress,
                 ),
+                left: 8.0,
+                right: 8.0,
+                child: _buildQuickSettingsOverlayContent(),
               ),
-            ),
-            new Positioned(
-              bottom: lerpDouble(
-                0.0,
-                8.0 + widget.minimizedNowBarHeight,
-                _showProgress,
-              ),
-              left: 8.0,
-              right: 8.0,
-              child: _buildQuickSettingsOverlayContent(),
-            ),
-          ],
+            ],
+          ),
         ),
       );
 
