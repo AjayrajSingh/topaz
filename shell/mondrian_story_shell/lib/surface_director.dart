@@ -17,6 +17,10 @@ import 'tree.dart';
 
 const double _kFadeToDepthRatio = 3.0;
 
+void _log(String msg) {
+  print('[MondrianFlutter] Director $msg');
+}
+
 /// Directs the layout of the SurfaceSpace
 class SurfaceDirector extends StatefulWidget {
   @override
@@ -92,6 +96,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           if (constraints.biggest.isInfinite || constraints.biggest.isEmpty) {
             return new Container();
           }
+          _log('Build');
           final Offset offscreen = constraints.biggest.topRight(Offset.zero);
           return new SizedBox(
             width: constraints.maxWidth,
@@ -118,10 +123,26 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
                     focusStack.removeLast();
                   }
                 }
-                return new SurfaceSpace(
-                    forms: new Forest<SurfaceForm>(
-                        roots: _forms.values.map((SurfaceForm f) =>
-                            new Tree<SurfaceForm>(value: f))));
+                Forest<Surface> dependentSpanningTrees = new Forest<Surface>();
+                // The actual node doesn't matter
+                if (placedSurfaces.length > 0) {
+                  // The actual surface doesn't matter
+                  dependentSpanningTrees =
+                      placedSurfaces.first.getDependentSpanningTrees();
+
+                  /// prune non-visible surfaces
+                  dependentSpanningTrees.flatten().forEach((Tree<Surface> t) {
+                    if (!placedSurfaces.contains(t.value)) {
+                      dependentSpanningTrees.remove(t);
+                    }
+                  });
+                }
+                SurfaceSpace space = new SurfaceSpace(
+                    forms: dependentSpanningTrees
+                        .mapForest((Surface s) => _forms[s]));
+
+                _forms.clear(); // need to get rid of removed surfaces
+                return space;
               },
             ),
           );

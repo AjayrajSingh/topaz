@@ -98,6 +98,17 @@ class Surface extends Model {
     return t;
   }
 
+  /// Gets the dependent spanning tree the current widget is part of
+  Tree<Surface> get dependentSpanningTree {
+    Tree<Surface> root = new Tree<Surface>(value: _surface(_node));
+    while (root.ancestors.isNotEmpty &&
+        root.value.relation.dependency == SurfaceDependency.dependent) {
+      root = root.ancestors.first;
+    }
+    return _spanningTree(null, root.value,
+        (Surface s) => s.relation.dependency == SurfaceDependency.dependent);
+  }
+
   /// Spans the full tree of all copresenting surfaces starting with this
   Tree<Surface> get copresentSpanningTree => _spanningTree(
       null,
@@ -105,14 +116,6 @@ class Surface extends Model {
       (Surface s) =>
           s.relation.arrangement == SurfaceArrangement.copresent ||
           s.relation.arrangement == SurfaceArrangement.none);
-
-  /// Spans the tree of dependent surfaces connected with this
-  Tree<Surface> get dependentSpanningTree => _spanningTree(
-      null,
-      _surface(_node),
-      (Surface s) => s.relation.dependency == SurfaceDependency.dependent);
-  // TODO(djmurphy) add co-dependency:
-  // && s.relation.dependency == SurfaceDependency.codependent
 
   Tree<Surface> _spanningTree(Surface previous, Surface current,
       _SurfaceSpanningTreeCondition condition) {
@@ -162,6 +165,39 @@ class Surface extends Model {
     String edgeArrow = '$edgeLabel->'.padLeft(6, '-');
     String disconnected = _connection == null ? '[DISCONNECTED]' : '';
     return '${edgeArrow}Surface${_node.value} $disconnected';
+  }
+
+  List<Tree<Surface>> _endsOfChain({Tree<Surface> current}) {
+    List<Tree<Surface>> ends = <Tree<Surface>>[];
+    current.children.forEach((Tree<Surface> s) {
+      if (s.value.relation.dependency != SurfaceDependency.dependent) {
+        ends.add(s);
+      } else {
+        ends.addAll(_endsOfChain(current: s));
+      }
+    });
+    return ends;
+  }
+
+  /// Returns the List (forest) of DependentSpanningTrees in the current graph
+  Forest<Surface> getDependentSpanningTrees() {
+    List<Tree<Surface>> queue = <Tree<Surface>>[];
+    Forest<Surface> forest = new Forest<Surface>();
+
+    Tree<Surface> tree =
+        _spanningTree(null, _surface(_node), (Surface s) => true);
+
+    queue.add(tree);
+    while (queue.isNotEmpty) {
+      Tree<Surface> t = queue.removeAt(0);
+      List<Tree<Surface>> ends = _endsOfChain(current: t);
+      queue.addAll(ends);
+      ends.forEach((Tree<Surface> s) {
+        t.find(s.value).detach();
+      });
+      forest.add(t);
+    }
+    return forest;
   }
 }
 

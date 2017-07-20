@@ -11,6 +11,10 @@ import 'positioned_builder.dart';
 import 'surface_frame.dart';
 import 'surface_form.dart';
 
+void _log(String msg) {
+  print('[MondrianFlutter] SurfaceInstance $msg');
+}
+
 /// Instantiation of a Surface in SurfaceSpace
 class SurfaceInstance extends StatefulWidget {
   /// SurfaceLayout
@@ -41,6 +45,7 @@ class _SurfaceInstanceState extends State<SurfaceInstance> {
   @override
   void initState() {
     super.initState();
+    _log('init');
     positionSim = widget.positionSim;
     positionSim.value = widget.form.initPosition.center;
     positionSim.start();
@@ -76,6 +81,7 @@ class _SurfaceInstanceState extends State<SurfaceInstance> {
           widget.form.onDragStarted();
         },
         onPanUpdate: (DragUpdateDetails details) {
+          positionSim.stop();
           positionSim.value = positionSim.value +
               widget.form.dragFriction(
                   positionSim.value - widget.form.position.center,

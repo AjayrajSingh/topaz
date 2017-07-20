@@ -43,38 +43,50 @@ class SurfaceSpace extends StatefulWidget {
 class _SurfaceSpaceState extends State<SurfaceSpace>
     with TickerProviderStateMixin {
   @override
-  Widget build(BuildContext context) {
-    List<SurfaceForm> flattened = <SurfaceForm>[];
-    for (Tree<SurfaceForm> formTree in widget.forms) {
-      flattened.addAll(formTree.values);
-    }
-    flattened
-        .sort((SurfaceForm a, SurfaceForm b) => b.depth.compareTo(a.depth));
-    // Order by depth
-    // Create SingleChild widgets, add to stack
-    return new Stack(
-      fit: StackFit.expand,
-      children: flattened
-          .map((SurfaceForm f) => new SurfaceInstance(
-                form: f,
-                positionSim: new Sim2DAnimation(
-                  vsync: this,
-                  xSim: _dimSim(),
-                  ySim: _dimSim(),
-                  target: f.position.center,
-                )..addStatusListener((AnimationStatus status) {
-                    if (status == AnimationStatus.completed) {
-                      f.onPositioned();
-                    }
-                  }),
-                sizeSim: new Sim2DAnimation(
-                  vsync: this,
-                  xSim: _dimSim(),
-                  ySim: _dimSim(),
-                  target: f.position.size.bottomRight(Offset.zero),
-                ),
-              ))
-          .toList(),
+  Widget build(BuildContext context) => new Stack(
+        fit: StackFit.expand,
+        children: widget.forms.roots
+            .map(_instances)
+            .expand((List<SurfaceInstance> i) => i)
+            .toList()
+              ..sort((SurfaceInstance a, SurfaceInstance b) =>
+                  b.form.depth.compareTo(a.form.depth)),
+      );
+
+  List<SurfaceInstance> _instances(Tree<SurfaceForm> formTree,
+      {SurfaceInstance parent}) {
+    SurfaceForm f = formTree.value;
+    SurfaceInstance current = new SurfaceInstance(
+      form: f,
+      positionSim: ((parent == null)
+          ? new Sim2DAnimation(
+              vsync: this,
+              xSim: _dimSim(),
+              ySim: _dimSim(),
+              target: f.position.center,
+            )
+          : new Sim2DAnimation.withMovingTarget(
+              vsync: this,
+              xSim: _dimSim(),
+              ySim: _dimSim(),
+              target: parent.positionSim,
+              offset: f.position.center - parent.positionSim.target,
+            ))
+        ..addStatusListener((AnimationStatus status) {
+          if (status == AnimationStatus.completed) {
+            f.onPositioned();
+          }
+        }),
+      sizeSim: new Sim2DAnimation(
+        vsync: this,
+        xSim: _dimSim(),
+        ySim: _dimSim(),
+        target: f.position.size.bottomRight(Offset.zero),
+      ),
     );
+    List<SurfaceInstance> instances = <SurfaceInstance>[current];
+    formTree.children.forEach((Tree<SurfaceForm> child) =>
+        instances.addAll(_instances(child, parent: current)));
+    return instances;
   }
 }
