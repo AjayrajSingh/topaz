@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sysui_widgets/rk4_spring_simulation.dart';
 
+import 'elevation_constants.dart';
 import 'selected_suggestion_overlay.dart';
 import 'suggestion.dart';
 import 'suggestion_widget.dart';
@@ -62,12 +63,16 @@ class ExpandSuggestion extends ExpansionBehavior {
     bool expansionWasDone = _expansionSimulation?.isDone ?? true;
     bool isDone = expansionWasDone;
 
-    _opacitySimulation.elapseTime(elapsedSeconds);
-    if (!_opacitySimulation.isDone) {
-      isDone = false;
-    } else if (_opacityProgress == 0.0) {
-      _expansionSimulation = null;
-    }
+    // Hack(dayang): Removing opacity transition for now until Mozart 2 supports
+    // opacity/transparency across physical models.
+    // MZ-221
+
+    // _opacitySimulation.elapseTime(elapsedSeconds);
+    // if (!_opacitySimulation.isDone) {
+    //   isDone = false;
+    // } else if (_opacityProgress == 0.0) {
+    //   _expansionSimulation = null;
+    // }
 
     if (!expansionWasDone) {
       // Tick the simulations.
@@ -115,19 +120,15 @@ class ExpandSuggestion extends ExpansionBehavior {
             constraints.maxHeight - bottomMargin,
             _expansionProgress,
           ),
-          child: new Opacity(
-            opacity: _opacityProgress,
-            child: new Container(
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                borderRadius: new BorderRadius.circular(
-                  lerpDouble(kSuggestionCornerRadius, 0.0, _expansionProgress),
-                ),
-              ),
-              child: new Opacity(
-                opacity: lerpDouble(1.0, 0.0, _expansionProgress),
-                child: new SuggestionWidget(suggestion: suggestion),
-              ),
+          child: new PhysicalModel(
+            color: Colors.white,
+            elevation: Elevations.suggestionExpand,
+            borderRadius: new BorderRadius.circular(
+              lerpDouble(kSuggestionCornerRadius, 0.0, _expansionProgress),
+            ),
+            child: new Opacity(
+              opacity: lerpDouble(1.0, 0.0, _expansionProgress),
+              child: new SuggestionWidget(suggestion: suggestion),
             ),
           ),
         ),
@@ -138,6 +139,10 @@ class ExpandSuggestion extends ExpansionBehavior {
   double get _expansionProgress =>
       _expansionSimulation.value / _kExpansionSimulationTarget;
 
-  double get _opacityProgress =>
-      _opacitySimulation.value / _kOpacitySimulationTarget;
+  // Hack(dayang): Removing opacity transition for now until Mozart 2 supports
+  // opacity/transparency across physical models.
+  // MZ-221
+
+  // double get _opacityProgress =>
+  //     _opacitySimulation.value / _kOpacitySimulationTarget;
 }
