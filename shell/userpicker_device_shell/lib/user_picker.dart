@@ -91,6 +91,7 @@ class UserPicker extends StatelessWidget {
     return _buildUserActionButton(
       onTap: () => onTap?.call(),
       width: size,
+      isSmall: isSmall,
       child: new Center(
         child: new Icon(
           icon,
