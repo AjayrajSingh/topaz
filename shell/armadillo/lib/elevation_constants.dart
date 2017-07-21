@@ -11,7 +11,7 @@ class Elevations {
   static const double draggedStoryCluster = 200.0;
 
   /// Elevation for story cluster when it is focused
-  static const double focusedStoryCluter = 100.0;
+  static const double focusedStoryCluster = 100.0;
 
   /// Elecvation for quick settings overlay
   static const double quickSettings = 220.0;

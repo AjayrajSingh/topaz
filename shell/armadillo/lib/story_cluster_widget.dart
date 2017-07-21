@@ -10,7 +10,6 @@ import 'package:flutter/widgets.dart';
 
 import 'armadillo_drag_target.dart';
 import 'armadillo_overlay.dart';
-import 'elevation_constants.dart';
 import 'display_mode.dart';
 import 'nothing.dart';
 import 'optional_wrapper.dart';
@@ -148,11 +147,7 @@ class StoryClusterWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               new Expanded(
-                child: new PhysicalModel(
-                  color: Colors.transparent,
-                  elevation: focused ? Elevations.focusedStoryCluter : 0.0,
-                  child: _getStoryCluster(context),
-                ),
+                child: _getStoryCluster(context),
               ),
               new InlineStoryTitle(
                 focusProgress: focusProgress,

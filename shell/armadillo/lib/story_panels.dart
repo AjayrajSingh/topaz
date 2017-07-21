@@ -2,20 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui' show lerpDouble;
-
 import 'package:flutter/material.dart';
 
 import 'armadillo_drag_target.dart';
 import 'armadillo_overlay.dart';
 import 'display_mode.dart';
+import 'elevation_constants.dart';
 import 'nothing.dart';
 import 'optional_wrapper.dart';
 import 'panel.dart';
 import 'place_holder_story.dart';
 import 'simulated_fractionally_sized_box.dart';
 import 'simulated_padding.dart';
-import 'simulated_transform.dart';
 import 'story.dart';
 import 'story_bar.dart';
 import 'story_cluster.dart';
@@ -55,6 +53,9 @@ class StoryPanels extends StatelessWidget {
   /// The size the cluster's widget should be.
   final Size currentSize;
 
+  /// If true, this StoryPanel is currently being dragged
+  final bool isBeingDragged;
+
   /// Constructor.
   StoryPanels({
     Key key,
@@ -64,6 +65,7 @@ class StoryPanels extends StatelessWidget {
     this.storyWidgets,
     this.paintShadows: false,
     this.currentSize,
+    this.isBeingDragged: false,
   })
       : super(key: key) {
     assert(() {
@@ -76,6 +78,20 @@ class StoryPanels extends StatelessWidget {
       );
       return true;
     });
+  }
+
+  /// Set elevation of this story cluster based on the state:
+  /// * Dragged
+  /// * Focused
+  /// * Nothing
+  double get _elevation {
+    if (isBeingDragged) {
+      return Elevations.draggedStoryCluster;
+    } else if (focusProgress > 0.0) {
+      return Elevations.focusedStoryCluster * focusProgress;
+    } else {
+      return 0.0;
+    }
   }
 
   @override
@@ -100,41 +116,6 @@ class StoryPanels extends StatelessWidget {
     );
 
     List<Widget> stackChildren = <Widget>[];
-
-    if (paintShadows) {
-      stackChildren.addAll(
-        storyCluster.realStories.map(
-          (Story story) => new StoryPositioned(
-                storyBarMaximizedHeight: _kStoryBarMaximizedHeight,
-                focusProgress: focusProgress,
-                displayMode: storyCluster.displayMode,
-                isFocused: (storyCluster.focusedStoryId == story.id),
-                panel: story.panel,
-                currentSize: currentSize,
-                clip: false,
-                childContainerKey: story.shadowPositionedKey,
-                child: new SimulatedTransform(
-                  initOpacity: 0.0,
-                  targetOpacity: 1.0,
-                  child: new Container(
-                    decoration: new BoxDecoration(
-                      boxShadow: kElevationToShadow[12],
-                      borderRadius: new BorderRadius.all(
-                        new Radius.circular(
-                          lerpDouble(
-                            _kUnfocusedCornerRadius,
-                            _kFocusedCornerRadius,
-                            focusProgress,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-        ),
-      );
-    }
 
     stackChildren.addAll(
       sortedStories.map(
@@ -399,12 +380,12 @@ class StoryPanels extends StatelessWidget {
                           focused: (storyCluster.displayMode ==
                                   DisplayMode.panels) ||
                               (storyCluster.focusedStoryId == story.id),
+                          elevation: _elevation,
                         ),
                       ),
                     ),
                   ),
                 ),
-
                 // The story itself.
                 new Expanded(
                   child: new SimulatedFractionallySizedBox(
@@ -416,7 +397,11 @@ class StoryPanels extends StatelessWidget {
                         : 0.0,
                     child: new Container(
                       color: story.themeColor,
-                      child: _getStoryContents(context, story),
+                      child: new PhysicalModel(
+                        color: story.themeColor,
+                        elevation: _elevation,
+                        child: _getStoryContents(context, story),
+                      ),
                     ),
                   ),
                 ),
