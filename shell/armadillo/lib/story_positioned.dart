@@ -84,14 +84,17 @@ class StoryPositioned extends StatelessWidget {
             Widget fractionalChild = !clip
                 ? child
                 : new ClipRRect(
-                    borderRadius: new BorderRadius.all(
-                      new Radius.circular(
-                        lerpDouble(
-                          _kUnfocusedCornerRadius,
-                          _kFocusedCornerRadius,
-                          focusProgress,
-                        ),
-                      ),
+                    borderRadius: new BorderRadius.vertical(
+                      top: new Radius.circular(lerpDouble(
+                        _kUnfocusedCornerRadius,
+                        _kFocusedCornerRadius,
+                        focusProgress,
+                      )),
+                      bottom: new Radius.circular(lerpDouble(
+                        _kUnfocusedCornerRadius,
+                        isFocused ? _kFocusedCornerRadius : 0.0,
+                        focusProgress,
+                      )),
                     ),
                     child: child);
 
