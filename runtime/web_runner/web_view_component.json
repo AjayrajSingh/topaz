@@ -1,7 +1,7 @@
 {
   "fuchsia:component": {
     "name": "web_view",
-    "url": "https://fuchsia-build.storage.googleapis.com/apps/web_view/web_view_b034f1a588a20e87198b83fd37f4ff676b093b6c"
+    "url": "file:///system/bin/web_view"
   },
   "fuchsia:program": {
     "resource": "main"
