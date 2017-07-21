@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import 'armadillo_overlay.dart';
 import 'display_mode.dart';
+import 'elevation_constants.dart';
 import 'simulated_sized_box.dart';
 import 'simulated_transform.dart';
 import 'size_model.dart';
@@ -271,14 +272,18 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         new Expanded(
-                          child: new StoryPanels(
-                            key: widget.storyCluster.panelsKey,
-                            storyCluster: widget.storyCluster,
-                            focusProgress: 0.0,
-                            overlayKey: widget.overlayKey,
-                            storyWidgets: widget.storyWidgets,
-                            paintShadows: true,
-                            currentSize: panelsCurrentSize,
+                          child: new PhysicalModel(
+                            elevation: Elevations.draggedStoryCluster,
+                            color: Colors.transparent,
+                            child: new StoryPanels(
+                              key: widget.storyCluster.panelsKey,
+                              storyCluster: widget.storyCluster,
+                              focusProgress: 0.0,
+                              overlayKey: widget.overlayKey,
+                              storyWidgets: widget.storyWidgets,
+                              paintShadows: true,
+                              currentSize: panelsCurrentSize,
+                            ),
                           ),
                         ),
                         new InlineStoryTitle(

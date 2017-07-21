@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 
 import 'armadillo_drag_target.dart';
 import 'armadillo_overlay.dart';
+import 'elevation_constants.dart';
 import 'display_mode.dart';
 import 'nothing.dart';
 import 'optional_wrapper.dart';
@@ -81,7 +82,7 @@ class StoryClusterWidget extends StatelessWidget {
   Widget build(BuildContext context) => storyCluster.wrapWithModels(
         child: _isUnfocused
             ? _getUnfocusedDragTargetChild(context)
-            : _getStoryClusterWithInlineStoryTitle(context),
+            : _getStoryClusterWithInlineStoryTitle(context, true),
       );
 
   Widget _getUnfocusedDragTargetChild(BuildContext context) {
@@ -132,11 +133,13 @@ class StoryClusterWidget extends StatelessWidget {
           ),
       child: _getStoryClusterWithInlineStoryTitle(
         context,
+        false,
       ),
     );
   }
 
-  Widget _getStoryClusterWithInlineStoryTitle(BuildContext context) =>
+  Widget _getStoryClusterWithInlineStoryTitle(
+          BuildContext context, bool focused) =>
       new Stack(
         fit: StackFit.passthrough,
         children: <Widget>[
@@ -144,7 +147,13 @@ class StoryClusterWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              new Expanded(child: _getStoryCluster(context)),
+              new Expanded(
+                child: new PhysicalModel(
+                  color: Colors.transparent,
+                  elevation: focused ? Elevations.focusedStoryCluter : 0.0,
+                  child: _getStoryCluster(context),
+                ),
+              ),
               new InlineStoryTitle(
                 focusProgress: focusProgress,
                 storyCluster: storyCluster,

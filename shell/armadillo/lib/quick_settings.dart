@@ -11,6 +11,7 @@ import 'package:sysui_widgets/icon_slider.dart';
 import 'package:sysui_widgets/rk4_spring_simulation.dart';
 import 'package:sysui_widgets/ticking_state.dart';
 
+import 'elevation_constants.dart';
 import 'now.dart';
 import 'toggle_icon.dart';
 import 'volume_model.dart';
@@ -122,7 +123,7 @@ class QuickSettingsOverlayState extends TickingState<QuickSettingsOverlay> {
   Widget build(BuildContext context) => new Offstage(
         offstage: _showProgress == 0.0,
         child: new PhysicalModel(
-          elevation: 24.0,
+          elevation: Elevations.quickSettings,
           color: Colors.transparent,
           child: new Stack(
             fit: StackFit.passthrough,
