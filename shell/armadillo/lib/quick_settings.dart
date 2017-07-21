@@ -119,11 +119,11 @@ class QuickSettingsOverlayState extends TickingState<QuickSettingsOverlay> {
       );
 
   @override
-  Widget build(BuildContext context) => new PhysicalModel(
-        elevation: 24.0,
-        color: Colors.transparent,
-        child: new Offstage(
-          offstage: _showProgress == 0.0,
+  Widget build(BuildContext context) => new Offstage(
+        offstage: _showProgress == 0.0,
+        child: new PhysicalModel(
+          elevation: 24.0,
+          color: Colors.transparent,
           child: new Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
