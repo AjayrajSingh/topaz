@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:application.lib.app.dart/app.dart';
-import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
+import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
@@ -29,7 +29,7 @@ const String _kMusicArtistTopic = '/story/focused/link/music_artist';
 const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
 
 /// Global scoping to prevent garbage collection
-final ContextProviderProxy _contextProvider = new ContextProviderProxy();
+final ContextReaderProxy _contextReader = new ContextReaderProxy();
 ContextListenerImpl _contextListenerImpl;
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
@@ -131,12 +131,12 @@ Future<Null> main(List<dynamic> args) async {
 
   Config config = await Config.read('/system/data/modules/config.json');
   config.validate(<String>['last_fm_api_key']);
-  connectToService(_context.environmentServices, _contextProvider.ctrl);
+  connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
   ContextQuery query =
       new ContextQuery.init(<String>[_kMusicArtistTopic], null /* filters */);
   _contextListenerImpl = new ContextListenerImpl(
     apiKey: config.get('last_fm_api_key'),
   );
-  _contextProvider.subscribe(query, _contextListenerImpl.getHandle());
+  _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 }

@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:application.lib.app.dart/app.dart';
-import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
+import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
@@ -19,7 +19,7 @@ import 'package:lib.logging/logging.dart';
 const String _kHotelTopic = '/story/focused/link/hotel';
 
 /// Global scoping to prevent garbage collection
-final ContextProviderProxy _contextProvider = new ContextProviderProxy();
+final ContextReaderProxy _contextReader = new ContextReaderProxy();
 ContextListenerImpl _contextListenerImpl;
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
@@ -76,9 +76,9 @@ class ContextListenerImpl extends ContextListener {
 Future<Null> main(List<dynamic> args) async {
   setupLogger();
 
-  connectToService(_context.environmentServices, _contextProvider.ctrl);
+  connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
   ContextQuery query = new ContextQuery.init(<String>[_kHotelTopic], null);
   _contextListenerImpl = new ContextListenerImpl();
-  _contextProvider.subscribe(query, _contextListenerImpl.getHandle());
+  _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 }
