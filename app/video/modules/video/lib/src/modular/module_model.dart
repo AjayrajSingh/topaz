@@ -52,7 +52,7 @@ final Asset _defaultAsset = new Asset.movie(
       'https://storage-download.googleapis.com/fuchsia/assets/video/151f74055baf7146586f6f0e7a2f3d2cd110d2cf'),
   title: 'Discover Tahiti',
   description:
-      " Take a trip and experience the ultimate island fantasy, Vahine Island in Tahiti.",
+      'Take a trip and experience the ultimate island fantasy, Vahine Island in Tahiti.',
   thumbnail: 'assets/video-thumbnail.png',
   background: 'assets/video-background.jpg',
 );

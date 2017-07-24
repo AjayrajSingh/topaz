@@ -15,8 +15,4 @@ package("video") {
         source = "gen/apps/modules/video/modules/video/video.flx"
         name = "video"
       } ]
-  resources = [ {
-        path = rebase_path("modules/video/assets/video.mp4")
-        dest = "modules/video.mp4"
-      } ]
 }
