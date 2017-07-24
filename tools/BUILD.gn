@@ -4,6 +4,17 @@
 
 import("//packages/package.gni")
 
+declare_args() {
+  # Provide a path for the config.json for the modules. This path will be
+  # interpretted as relative to this package's directory unless it starts with
+  # a "//" in which case it will be considered relative to the Fuchsia source
+  # directory. If the path starts with a single slash it will be treated as an
+  # absolute path
+  modules_override_config = "config.json"
+}
+
+assert(modules_override_config != "")
+
 package("modules") {
   app = true
 
@@ -100,12 +111,10 @@ package("modules") {
     },
   ]
 
-  resources = [
-    {
-      path = rebase_path("config.json")
-      dest = "modules/config.json"
-    },
-  ]
+  resources = [ {
+        path = rebase_path(modules_override_config)
+        dest = "modules/config.json"
+      } ]
 }
 
 package("modules_tests") {
