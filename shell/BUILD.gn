@@ -4,6 +4,17 @@
 
 import("//packages/package.gni")
 
+declare_args() {
+  # A path to the Armadillo contextual config file. This path will be
+  # interpretted as relative to this package's directory unless it starts with
+  # a "//" in which case it will be considered relative to the Fuchsia source
+  # directory. If the path starts with a single slash it will be treated as an
+  # absolute path
+  armadillo_path_context_config = "armadillo_user_shell/assets/contextual_config.json"
+}
+
+assert(armadillo_path_context_config != "")
+
 package("sysui") {
   app = true
 
@@ -66,11 +77,6 @@ package("sysui") {
       path = rebase_path(
               "agents/home_work_agent/assets/contextual_location_proposals.json")
       dest = "sysui/contextual_location_proposals.json"
-    },
-
-    {
-      path = rebase_path("armadillo_user_shell/assets/contextual_config.json")
-      dest = "sysui/contextual_config.json"
     },
 
     {
@@ -310,6 +316,10 @@ package("sysui") {
     {
       path = rebase_path("agents/home_work_agent/assets/tahiti_240.png")
       dest = "sysui/tahiti_240.png"
+    },
+    {
+      path = rebase_path(armadillo_path_context_config)
+      dest = "sysui/contextual_config.json"
     },
   ]
 }
