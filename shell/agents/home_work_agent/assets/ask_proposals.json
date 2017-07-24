@@ -61,9 +61,9 @@
   },
   {
     "id": "ask_08",
-    "headline": "Watch Discover Istanbul",
+    "headline": "Watch Discover Tahiti",
     "color": "0xFF424242",
-    "image_url": "/system/data/sysui/istanbul_240.png",
+    "image_url": "/system/data/sysui/tahiti_240.png",
     "module_url": "video"
   },
   {

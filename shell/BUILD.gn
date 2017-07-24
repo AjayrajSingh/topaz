@@ -308,8 +308,8 @@ package("sysui") {
     },
 
     {
-      path = rebase_path("agents/home_work_agent/assets/istanbul_240.png")
-      dest = "sysui/istanbul_240.png"
+      path = rebase_path("agents/home_work_agent/assets/tahiti_240.png")
+      dest = "sysui/tahiti_240.png"
     },
   ]
 }
