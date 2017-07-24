@@ -48,11 +48,12 @@ enum DisplayMode {
 const DisplayMode _defaultDisplayMode = DisplayMode.localLarge;
 
 final Asset _defaultAsset = new Asset.movie(
-  uri: Uri.parse('file:///system/data/modules/video.mp4'),
-  title: 'Discover Turkey',
+  uri: Uri.parse(
+      'https://storage-download.googleapis.com/fuchsia/assets/video/151f74055baf7146586f6f0e7a2f3d2cd110d2cf'),
+  title: 'Discover Tahiti',
   description:
-      "There's a reason why Turkey is the new dream travel destination. Take a trip with us and explore the top experiences in Turkey.",
-  thumbnail: 'assets/video-thumbnail.jpg',
+      " Take a trip and experience the ultimate island fantasy, Vahine Island in Tahiti.",
+  thumbnail: 'assets/video-thumbnail.png',
   background: 'assets/video-background.jpg',
 );
 
