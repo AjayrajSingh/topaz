@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:application.lib.app.dart/app.dart';
-import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
+import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.user/device_map.fidl.dart';
@@ -27,7 +27,7 @@ ChatContentProviderAgent _agent;
 class ChatContentProviderAgent extends AgentImpl {
   final ProposalPublisherProxy _proposalPublisher =
       new ProposalPublisherProxy();
-  final ContextProviderProxy _contextProvider = new ContextProviderProxy();
+  final ContextReaderProxy _contextReader = new ContextReaderProxy();
   final ContextListenerBinding _proposerBinding = new ContextListenerBinding();
   ChatContentProviderImpl _contentProviderImpl;
 
@@ -60,14 +60,14 @@ class ChatContentProviderAgent extends AgentImpl {
     intelligenceServices.getProposalPublisher(
       _proposalPublisher.ctrl.request(),
     );
-    intelligenceServices.getContextProvider(
-      _contextProvider.ctrl.request(),
+    intelligenceServices.getContextReader(
+      _contextReader.ctrl.request(),
     );
     intelligenceServices.ctrl.close();
 
     Proposer proposer = new Proposer(proposalPublisher: _proposalPublisher);
 
-    _contextProvider.subscribe(
+    _contextReader.subscribe(
       new ContextQuery()
         ..topics = <String>[
           '/location/home_work',
@@ -104,7 +104,7 @@ class ChatContentProviderAgent extends AgentImpl {
   @override
   Future<Null> onStop() async {
     _proposalPublisher.ctrl.close();
-    _contextProvider.ctrl.close();
+    _contextReader.ctrl.close();
     _proposerBinding.close();
   }
 }
