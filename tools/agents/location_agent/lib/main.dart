@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:application.lib.app.dart/app.dart';
-import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
+import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
@@ -23,7 +23,7 @@ const String _kLocationType = 'http://types.fuchsia.io/location';
 const String _kSuggestionIconUrl =
     'https://www.gstatic.com/images/icons/material/system/2x/directions_walk_googblue_48dp.png';
 
-final ContextProviderProxy _contextProvider = new ContextProviderProxy();
+final ContextReaderProxy _contextReader = new ContextReaderProxy();
 ContextListenerImpl _contextListenerImpl;
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
@@ -98,11 +98,11 @@ class ContextListenerImpl extends ContextListener {
 void main(List<dynamic> args) {
   setupLogger(name: 'Location Agent');
 
-  connectToService(_context.environmentServices, _contextProvider.ctrl);
+  connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
 
   ContextQuery query =
       new ContextQuery.init(<String>[_kLocationTopic], null /* filters */);
   _contextListenerImpl = new ContextListenerImpl();
-  _contextProvider.subscribe(query, _contextListenerImpl.getHandle());
+  _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 }
