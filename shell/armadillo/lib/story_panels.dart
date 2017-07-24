@@ -21,6 +21,7 @@ import 'story_cluster_drag_data.dart';
 import 'story_cluster_drag_feedback.dart';
 import 'story_cluster_drag_state_model.dart';
 import 'story_cluster_panels_model.dart';
+import 'story_drag_transition_model.dart';
 import 'story_full_size_simulated_sized_box.dart';
 import 'story_model.dart';
 import 'story_positioned.dart';
@@ -83,14 +84,24 @@ class StoryPanels extends StatelessWidget {
   /// Set elevation of this story cluster based on the state:
   /// * Dragged
   /// * Focused
+  /// * InlinePreview
+  /// * InlinePreviewHint
   /// * Nothing
-  double get _elevation {
+  double _getElevation(double dragProgress) {
     if (isBeingDragged) {
-      return Elevations.draggedStoryCluster;
+      return Elevations.draggedStoryCluster * dragProgress;
     } else if (focusProgress > 0.0) {
       return Elevations.focusedStoryCluster * focusProgress;
     } else {
-      return 0.0;
+      // This will progressively animate the the elevation of a story cluster
+      // when it goes from the inlinePreview hint state to the full blown inline
+      // preview state.
+      return (storyCluster
+                  .inlinePreviewScaleSimulationKey.currentState?.progress +
+              storyCluster
+                  .inlinePreviewHintScaleSimulationKey.currentState?.progress) *
+          Elevations.storyClusterInlinePreview /
+          2.0;
     }
   }
 
@@ -133,12 +144,20 @@ class StoryPanels extends StatelessWidget {
             panel: story.panel,
             currentSize: currentSize,
             childContainerKey: story.positionedKey,
-            child: _getStory(
-              context,
-              story,
-              fractionalPadding[0],
-              fractionalPadding[1],
-              currentSize,
+            child: new ScopedModelDescendant<StoryDragTransitionModel>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                StoryDragTransitionModel storyDragTransitionModel,
+              ) =>
+                  _getStory(
+                    context,
+                    story,
+                    fractionalPadding[0],
+                    fractionalPadding[1],
+                    currentSize,
+                    storyDragTransitionModel.progress,
+                  ),
             ),
           );
         },
@@ -334,9 +353,16 @@ class StoryPanels extends StatelessWidget {
     double fractionalLeftPadding,
     double fractionalRightPadding,
     Size currentSize,
+    double dragProgress,
   ) =>
       story.isPlaceHolder
-          ? story.builder(context)
+          ? isBeingDragged
+              ? Nothing.widget
+              : new PhysicalModel(
+                  elevation: _getElevation(dragProgress),
+                  color: Colors.black,
+                  child: story.builder(context),
+                )
           : new Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -380,7 +406,7 @@ class StoryPanels extends StatelessWidget {
                           focused: (storyCluster.displayMode ==
                                   DisplayMode.panels) ||
                               (storyCluster.focusedStoryId == story.id),
-                          elevation: _elevation,
+                          elevation: _getElevation(dragProgress),
                         ),
                       ),
                     ),
@@ -399,7 +425,7 @@ class StoryPanels extends StatelessWidget {
                       color: story.themeColor,
                       child: new PhysicalModel(
                         color: story.themeColor,
-                        elevation: _elevation,
+                        elevation: _getElevation(dragProgress),
                         child: _getStoryContents(context, story),
                       ),
                     ),
