@@ -95,8 +95,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   bool _hideDeviceChooser = true;
 
-  /// Returns this device's media player's display mode
-  DisplayMode displayMode = _defaultDisplayMode;
+  DisplayMode _displayMode = _defaultDisplayMode;
 
   /// Create a video module model using the appContext
   VideoModuleModel({
@@ -131,6 +130,18 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     }
   }
 
+  /// Gets and sets this device's media player's display mode
+  ///
+  /// Notifies listeners when this value is changed.
+  DisplayMode get displayMode => _displayMode;
+  set displayMode(DisplayMode mode) {
+    assert(mode != null);
+    if (displayMode != mode) {
+      _displayMode = mode;
+      notifyListeners();
+    }
+  }
+
   @override
   Ticker createTicker(TickerCallback onTick) => new Ticker(onTick);
 
@@ -151,7 +162,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
   bool get showControlOverlay => _showControlOverlay;
   set showControlOverlay(bool show) {
     if (displayMode == DisplayMode.remoteControl) {
-      if (!_showControlOverlay) {
+      if (!showControlOverlay) {
         _showControlOverlay = true;
         notifyListeners();
       }
@@ -159,7 +170,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     }
 
     assert(show != null);
-    if (_showControlOverlay != show) {
+    if (showControlOverlay != show) {
       _showControlOverlay = show;
       notifyListeners();
     }
@@ -304,6 +315,10 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     ServiceProvider incomingServices,
   ) async {
     super.onReady(moduleContext, link, incomingServices);
+    Completer<DeviceMapEntry> currentDeviceCompleter =
+        new Completer<DeviceMapEntry>();
+    _deviceMap.getCurrentDevice(currentDeviceCompleter.complete);
+    _currentDevice = await currentDeviceCompleter.future;
     _controller.addListener(_handleControllerChanged);
     _controller.open(_asset.uri, serviceName: _kServiceName);
 
@@ -313,10 +328,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
         .watch(_remoteDeviceLinkWatcherBinding.wrap(new LinkWatcherImpl(
       onNotify: _handleRemoteDeviceChange,
     )));
-    Completer<DeviceMapEntry> currentDeviceCompleter =
-        new Completer<DeviceMapEntry>();
-    _deviceMap.getCurrentDevice(currentDeviceCompleter.complete);
-    _currentDevice = await currentDeviceCompleter.future;
+
     notifyListeners();
   }
 
@@ -386,7 +398,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       displayMode = DisplayMode.immersive;
       notifyListeners();
     }
-    if (_showControlOverlay) {
+    if (showControlOverlay) {
       brieflyShowControlOverlay(); // restart the timer
       notifyListeners();
     }
@@ -397,13 +409,11 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
 
   /// Shows the control overlay for [_kOverlayAutoHideDuration].
   void brieflyShowControlOverlay() {
-    _showControlOverlay = true;
+    showControlOverlay = true;
     _hideTimer?.cancel();
     _hideTimer = new Timer(_kOverlayAutoHideDuration, () {
       _hideTimer = null;
       if (_controller.playing) {
-        // We are using the public method set call because it has added logic on
-        // whether to set showControlOverlay based on displayMode
         showControlOverlay = false;
       }
       notifyListeners();
@@ -416,7 +426,7 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     }
     _wasPlaying = _controller.playing;
 
-    if (_controller.playing && _showControlOverlay) {
+    if (_controller.playing && showControlOverlay) {
       notifyListeners();
     }
   }
