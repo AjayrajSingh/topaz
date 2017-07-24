@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
+import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
@@ -21,7 +21,7 @@ class UserShellModel extends Model {
   VisibleStoriesController _visibleStoriesController;
   StoryProvider _storyProvider;
   SuggestionProvider _suggestionProvider;
-  ContextProvider _contextProvider;
+  ContextReader _contextReader;
   ContextPublisher _contextPublisher;
 
   /// The [UserShellContext] given to this app's [UserShell].
@@ -43,8 +43,8 @@ class UserShellModel extends Model {
   /// The [SuggestionProvider] given to this app's [UserShell].
   SuggestionProvider get suggestionProvider => _suggestionProvider;
 
-  /// The [ContextProvider] given to this app's [UserShell].
-  ContextProvider get contextProvider => _contextProvider;
+  /// The [ContextReader] given to this app's [UserShell].
+  ContextReader get contextReader => _contextReader;
 
   /// The [SuggestionProvider] given to this app's [UserShell].
   ContextPublisher get contextPublisher => _contextPublisher;
@@ -58,7 +58,7 @@ class UserShellModel extends Model {
     VisibleStoriesController visibleStoriesController,
     StoryProvider storyProvider,
     SuggestionProvider suggestionProvider,
-    ContextProvider contextProvider,
+    ContextReader contextReader,
     ContextPublisher contextPublisher,
   ) {
     _userShellContext = userShellContext;
@@ -67,7 +67,7 @@ class UserShellModel extends Model {
     _visibleStoriesController = visibleStoriesController;
     _storyProvider = storyProvider;
     _suggestionProvider = suggestionProvider;
-    _contextProvider = contextProvider;
+    _contextReader = contextReader;
     _contextPublisher = contextPublisher;
     notifyListeners();
   }

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
+import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
@@ -18,7 +18,7 @@ typedef void OnUserShellReady(
   VisibleStoriesController visibleStoriesController,
   StoryProvider storyProvider,
   SuggestionProvider suggestionProvider,
-  ContextProvider contextProvider,
+  ContextReader contextReader,
   ContextPublisher contextPublisher,
 );
 
@@ -37,7 +37,7 @@ class UserShellImpl extends UserShell {
   final StoryProviderProxy _storyProviderProxy = new StoryProviderProxy();
   final SuggestionProviderProxy _suggestionProviderProxy =
       new SuggestionProviderProxy();
-  final ContextProviderProxy _contextProviderProxy = new ContextProviderProxy();
+  final ContextReaderProxy _contextReaderProxy = new ContextReaderProxy();
   final ContextPublisherProxy _contextPublisherProxy =
       new ContextPublisherProxy();
 
@@ -75,8 +75,8 @@ class UserShellImpl extends UserShell {
         _focusProviderProxy.ctrl.request(),
       );
 
-      _userShellContextProxy.getContextProvider(
-        _contextProviderProxy.ctrl.request(),
+      _userShellContextProxy.getContextReader(
+        _contextReaderProxy.ctrl.request(),
       );
       _userShellContextProxy.getContextPublisher(
         _contextPublisherProxy.ctrl.request(),
@@ -89,7 +89,7 @@ class UserShellImpl extends UserShell {
         _visibleStoriesControllerProxy,
         _storyProviderProxy,
         _suggestionProviderProxy,
-        _contextProviderProxy,
+        _contextReaderProxy,
         _contextPublisherProxy,
       );
     }
@@ -104,7 +104,7 @@ class UserShellImpl extends UserShell {
     _visibleStoriesControllerProxy.ctrl.close();
     _focusControllerProxy.ctrl.close();
     _focusProviderProxy.ctrl.close();
-    _contextProviderProxy.ctrl.close();
+    _contextReaderProxy.ctrl.close();
     _contextPublisherProxy.ctrl.close();
     done();
   }
