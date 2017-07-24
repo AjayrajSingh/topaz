@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:apps.modular.services.auth.account/account.fidl.dart';
-import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
+import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
@@ -75,7 +75,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     VisibleStoriesController visibleStoriesController,
     StoryProvider storyProvider,
     SuggestionProvider suggestionProvider,
-    ContextProvider contextProvider,
+    ContextReader contextReader,
     ContextPublisher contextPublisher,
   ) {
     super.onReady(
@@ -85,7 +85,7 @@ class ArmadilloUserShellModel extends UserShellModel {
       visibleStoriesController,
       storyProvider,
       suggestionProvider,
-      contextProvider,
+      contextReader,
       contextPublisher,
     );
     userLogoutter.userShellContext = userShellContext;
@@ -98,7 +98,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     suggestionProviderSuggestionModel.focusController = focusController;
     suggestionProviderSuggestionModel.visibleStoriesController =
         visibleStoriesController;
-    contextProvider.subscribe(
+    contextReader.subscribe(
       new ContextQuery()..topics = contextTopics,
       _contextListenerBinding.wrap(
         new _ContextListenerImpl(onContextUpdated),

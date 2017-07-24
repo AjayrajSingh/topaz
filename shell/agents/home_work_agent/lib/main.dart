@@ -7,13 +7,13 @@ import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:application.lib.app.dart/app.dart';
+import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
+import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/ask_handler.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/user_input.fidl.dart';
-import 'package:apps.maxwell.services.context/context_provider.fidl.dart';
-import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:lib.modular/modular.dart';
 import 'package:meta/meta.dart';
@@ -34,7 +34,7 @@ class HomeWorkAgent extends AgentImpl {
   final ProposalPublisherProxy _proposalPublisher =
       new ProposalPublisherProxy();
   final ContextPublisherProxy _contextPublisher = new ContextPublisherProxy();
-  final ContextProviderProxy _contextProvider = new ContextProviderProxy();
+  final ContextReaderProxy _contextReader = new ContextReaderProxy();
   final ContextListenerBinding _contextListenerBinding =
       new ContextListenerBinding();
   final AskHandlerBinding _askHandlerBinding = new AskHandlerBinding();
@@ -60,7 +60,7 @@ class HomeWorkAgent extends AgentImpl {
     intelligenceServices.getProposalPublisher(
       _proposalPublisher.ctrl.request(),
     );
-    intelligenceServices.getContextProvider(_contextProvider.ctrl.request());
+    intelligenceServices.getContextReader(_contextReader.ctrl.request());
     intelligenceServices.ctrl.close();
 
     final Map<String, List<Map<String, String>>> proposals =
@@ -89,7 +89,7 @@ class HomeWorkAgent extends AgentImpl {
       });
     }
 
-    _contextProvider.subscribe(
+    _contextReader.subscribe(
       new ContextQuery()..topics = <String>[_kLocationHomeWorkTopic],
       _contextListenerBinding.wrap(
         new _ContextListenerImpl(
@@ -148,7 +148,7 @@ class HomeWorkAgent extends AgentImpl {
   @override
   Future<Null> onStop() async {
     _contextPublisher.ctrl.close();
-    _contextProvider.ctrl.close();
+    _contextReader.ctrl.close();
     _proposalPublisher.ctrl.close();
     _contextListenerBinding.close();
     _askHandlerBinding.close();
