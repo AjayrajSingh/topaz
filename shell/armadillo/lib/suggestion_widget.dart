@@ -152,12 +152,14 @@ class SuggestionWidget extends StatelessWidget {
                             (kSuggestionImageWidth - _kPersonImageDiameter) /
                                 2.0,
                       ),
-                      child: new ClipOval(
-                        child: new SizedBox(
-                          width: _kPersonImageDiameter,
-                          height: _kPersonImageDiameter,
-                          child: suggestion.image.call(context),
-                        ),
+                      child: new SizedBox(
+                        width: _kPersonImageDiameter,
+                        height: _kPersonImageDiameter,
+                        child: suggestion.imageSide == ImageSide.left
+                            ? new ClipOval(
+                                child: suggestion.image.call(context),
+                              )
+                            : suggestion.image.call(context),
                       ),
                     )
                   : new ClipRRect(
