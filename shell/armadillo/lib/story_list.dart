@@ -86,30 +86,7 @@ class StoryList extends StatelessWidget {
           Widget child,
           StoryModel storyModel,
         ) {
-          // IMPORTANT:  In order for activation of inactive stories from suggestions
-          // to work we must have them in the widget tree.
-          List<Widget> stackChildren = new List<Widget>.from(
-            storyModel.inactiveStoryClusters.map(
-              (StoryCluster storyCluster) => new Positioned(
-                    width: 0.0,
-                    height: 0.0,
-                    child: new SimulationBuilder(
-                      key: storyCluster.focusSimulationKey,
-                      initValue: 0.0,
-                      targetValue: 1.0,
-                      builder: (BuildContext context, double progress) =>
-                          _createStoryCluster(
-                            storyModel.activeSortedStoryClusters,
-                            storyCluster,
-                            0.0,
-                            storyCluster.buildStoryWidgets(context),
-                          ),
-                    ),
-                  ),
-            ),
-          );
-
-          stackChildren.add(
+          List<Widget> stackChildren = <Widget>[
             new Positioned(
               top: 0.0,
               left: 0.0,
@@ -125,7 +102,7 @@ class StoryList extends StatelessWidget {
                 },
               ),
             ),
-          );
+          ];
 
           stackChildren.add(_createScrollableList(storyModel));
 
@@ -172,19 +149,13 @@ class StoryList extends StatelessWidget {
                               builder: (BuildContext context, Widget child) =>
                                   new _StoryListBody(
                                     children: new List<Widget>.generate(
-                                      storyModel
-                                          .activeSortedStoryClusters.length,
+                                      storyModel.storyClusters.length,
                                       (int index) =>
                                           _createFocusableStoryCluster(
                                             context,
-                                            storyModel
-                                                .activeSortedStoryClusters,
-                                            storyModel
-                                                    .activeSortedStoryClusters[
-                                                index],
-                                            storyModel
-                                                .activeSortedStoryClusters[
-                                                    index]
+                                            storyModel.storyClusters,
+                                            storyModel.storyClusters[index],
+                                            storyModel.storyClusters[index]
                                                 .buildStoryWidgets(
                                               context,
                                             ),

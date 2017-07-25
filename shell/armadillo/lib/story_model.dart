@@ -24,8 +24,6 @@ class StoryModel extends Model {
   /// Called when the currently focused [StoryCluster] changes.
   final OnStoryClusterEvent onFocusChanged;
   List<StoryCluster> _storyClusters = <StoryCluster>[];
-  List<StoryCluster> _activeSortedStoryClusters = <StoryCluster>[];
-  List<StoryCluster> _inactiveStoryClusters = <StoryCluster>[];
   Size _lastLayoutSize = Size.zero;
   double _listHeight = 0.0;
 
@@ -41,13 +39,6 @@ class StoryModel extends Model {
   /// Returns the current list of [StoryCluster]s.
   List<StoryCluster> get storyClusters => _storyClusters;
 
-  /// Returns the current list of [StoryCluster]s which are active.
-  List<StoryCluster> get activeSortedStoryClusters =>
-      _activeSortedStoryClusters;
-
-  /// Returns the current list of [StoryCluster]s which are inactive.
-  List<StoryCluster> get inactiveStoryClusters => _inactiveStoryClusters;
-
   /// The current height of the story list.
   double get listHeight => _listHeight;
 
@@ -61,8 +52,8 @@ class StoryModel extends Model {
   @override
   void notifyListeners() {
     // Update indicies
-    for (int i = 0; i < _activeSortedStoryClusters.length; i++) {
-      StoryCluster storyCluster = _activeSortedStoryClusters[i];
+    for (int i = 0; i < _storyClusters.length; i++) {
+      StoryCluster storyCluster = _storyClusters[i];
       storyCluster.stories.forEach(
         (Story story) {
           story.clusterIndex = i;
@@ -80,33 +71,19 @@ class StoryModel extends Model {
     }
     _lastLayoutSize = size;
 
-    _inactiveStoryClusters = new List<StoryCluster>.from(
-      _storyClusters,
-    );
-
-    _inactiveStoryClusters.retainWhere((StoryCluster storyCluster) =>
-        !storyCluster.stories.every((Story story) => !story.inactive));
-
-    _activeSortedStoryClusters = new List<StoryCluster>.from(
-      _storyClusters,
-    );
-
-    _activeSortedStoryClusters.removeWhere((StoryCluster storyCluster) =>
-        !storyCluster.stories.every((Story story) => !story.inactive));
-
     // Sort recently interacted with stories to the start of the list.
-    _activeSortedStoryClusters.sort((StoryCluster a, StoryCluster b) =>
+    _storyClusters.sort((StoryCluster a, StoryCluster b) =>
         b.lastInteraction.millisecondsSinceEpoch -
         a.lastInteraction.millisecondsSinceEpoch);
 
     List<StoryLayout> storyLayout = new StoryListLayout(size: size).layout(
-      storyClustersToLayout: _activeSortedStoryClusters,
+      storyClustersToLayout: _storyClusters,
       currentTime: new DateTime.now(),
     );
 
     double listHeight = 0.0;
     for (int i = 0; i < storyLayout.length; i++) {
-      _activeSortedStoryClusters[i].storyLayout = storyLayout[i];
+      _storyClusters[i].storyLayout = storyLayout[i];
       listHeight = math.max(listHeight, -storyLayout[i].offset.dy);
     }
     _listHeight = listHeight;
@@ -117,7 +94,6 @@ class StoryModel extends Model {
   /// comes into focus.
   void interactionStarted(StoryCluster storyCluster) {
     storyCluster.lastInteraction = new DateTime.now();
-    storyCluster.activate();
     updateLayouts(_lastLayoutSize);
     notifyListeners();
     onFocusChanged?.call(storyCluster);

@@ -521,7 +521,7 @@ class ConductorState extends State<Conductor> {
 
   void _defocus(StoryModel storyModel) {
     // Unfocus all story clusters.
-    storyModel.activeSortedStoryClusters.forEach(
+    storyModel.storyClusters.forEach(
       (StoryCluster storyCluster) => storyCluster.unFocus(),
     );
 
@@ -622,7 +622,7 @@ class ConductorState extends State<Conductor> {
       goToOrigin(storyModel);
     } else {
       // Unfocus all story clusters.
-      storyModel.activeSortedStoryClusters.forEach(
+      storyModel.storyClusters.forEach(
         (StoryCluster storyCluster) => storyCluster.unFocus(),
       );
 

@@ -176,13 +176,6 @@ class StoryCluster {
     _panelsModel.notifyListeners();
   }
 
-  /// Activates the cluster.  This is only used for demo purposes.
-  void activate() {
-    _stories.forEach((Story story) {
-      story.inactive = false;
-    });
-  }
-
   /// Sets the last interaction time for the cluster.  Used for ordering
   /// clusters in the story list.
   set lastInteraction(DateTime lastInteraction) {

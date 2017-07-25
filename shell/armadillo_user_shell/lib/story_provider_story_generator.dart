@@ -296,7 +296,6 @@ class StoryProviderStoryGenerator extends StoryGenerator {
         themeColor: storyInfo.extra['color'] == null
             ? Colors.grey[500]
             : new Color(int.parse(storyInfo.extra['color'])),
-        inactive: false,
         onClusterIndexChanged: (int clusterIndex) {
           _StoryWidgetState state =
               new GlobalObjectKey<_StoryWidgetState>(storyController)

@@ -125,9 +125,6 @@ class _DummyStoryModel extends StoryModel {
               storyLayout: new _DummyStoryLayout(),
             ),
       );
-
-  @override
-  List<StoryCluster> get activeSortedStoryClusters => storyClusters;
 }
 
 class _DummyStoryLayout extends StoryLayout {

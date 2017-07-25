@@ -77,10 +77,6 @@ class Story {
   /// is used for determining the size of the story's widget in the story list.
   Duration cumulativeInteractionDuration;
 
-  /// True if the story is inactive and should not be displayed in the story
-  /// list.
-  bool inactive;
-
   /// The key of the container that position's the story's widget within its
   /// cluster.
   GlobalKey<SimulatedFractionalState> positionedKey;
@@ -104,7 +100,6 @@ class Story {
     this.lastInteraction,
     this.cumulativeInteractionDuration,
     this.themeColor,
-    this.inactive: false,
     this.importance: 1.0,
     this.onClusterIndexChanged,
   })
