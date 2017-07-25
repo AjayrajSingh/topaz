@@ -24,9 +24,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - packages/armadillo/res/Armadillo.png
     - packages/armadillo/res/Background.jpg
-    - packages/armadillo/res/flutter-mark-square-100.png
     - packages/armadillo/res/googlelogo_color_62x24dp.png
     - packages/armadillo/res/googlemic_color_24dp.png
     - packages/armadillo/res/ic_airplanemode_active_black.png
@@ -44,8 +42,6 @@ flutter:
     - packages/armadillo/res/ic_volume_up_grey600.png
     - packages/armadillo/res/initial_story_generator_config.json
     - packages/armadillo/res/logo_googleg_24dpx4.png
-    - packages/armadillo/res/placeholder_grid.png
-    - packages/armadillo/res/stories.json
     - packages/armadillo/res/User.png
     - packages/keyboard/res/ArrowDown.png
     - packages/keyboard/res/ArrowUp.png

@@ -6,7 +6,7 @@ This repository contains System UI bits for the Fuchsia operating system.
 
 <p>
   <img
-    src="armadillo/lib/res/Armadillo.png"
+    src="Armadillo.png"
     alt="Early Screen Shot of Armadillo" style="width: 400px;"
     />
   <br/>
@@ -17,14 +17,12 @@ This repository contains System UI bits for the Fuchsia operating system.
 [Armadillo](armadillo)  is written in Flutter and is split into two separate
 apps: [Armadillo](armadillo) and [Armadillo User Shell](armadillo_user_shell).
 
-[Armadillo](armadillo) is a Flutter app that can run on Android and iOS and any
-other platforms Flutter supports.  It contains a majority of the code.
+[Armadillo](armadillo) is a library of Flutter code.
 
 [Armadillo User Shell](armadillo_user_shell) is a thin wrapper around
 [Armadillo](armadillo) that obtains its data from the Fuchsia system and
 interacts with the Fuchsia system's services via FIDL interfaces.  Thus,
-[Armadillo User Shell](armadillo_user_shell) only runs on Fuchsia while
-[Armadillo](armadillo) runs anywhere Flutter runs.
+[Armadillo User Shell](armadillo_user_shell) only runs on Fuchsia.
 
 ## Important Armadillo Non-Widget Classes
 
