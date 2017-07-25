@@ -336,7 +336,6 @@ class MozWebView : public mozart::BaseView,
 
       FTL_DCHECK(metrics().scale_x ==
                  metrics().scale_y);  // we asked for square metrics
-      web_view_.setPageAndTextZoomFactors(metrics().scale_x, 1.0);
 
       auto requestCallback = [this](std::string url) {
         if (webRequestDelegate_) {
@@ -346,6 +345,12 @@ class MozWebView : public mozart::BaseView,
       };
       web_view_.setWebRequestDelegate(requestCallback);
     }
+
+    if (page_scale_factor_ != metrics().scale_x) {
+        page_scale_factor_ = metrics().scale_x;
+        web_view_.setPageAndTextZoomFactors(page_scale_factor_, 1.0);
+    }
+
     web_view_.iterateEventLoop();
     web_view_.layoutAndPaint();
 
@@ -400,6 +405,7 @@ class MozWebView : public mozart::BaseView,
   bool url_set_ = false;
   std::string url_;
   std::map<uint32_t, TouchTracker> touch_trackers_;
+  float page_scale_factor_ = 0;
 
   mozart::client::HostImageCycler image_cycler_;
 
