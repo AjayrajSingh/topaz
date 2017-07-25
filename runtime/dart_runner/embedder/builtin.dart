@@ -43,11 +43,7 @@ _getScheduleMicrotaskClosure() => _scheduleMicrotask;
 
 _setupHooks() {
   VMLibraryHooks.timerMillisecondClock = MxTime.timerMillisecondClock;
-
-  // TODO(zra): When the Dart issue here:
-  // https://github.com/dart-lang/sdk/issues/25603
-  // is resolved, there will be no need to eagerly compute the script URI.
-  VMLibraryHooks.platformScript = _scriptUri();
+  VMLibraryHooks.platformScript = _scriptUri;
 }
 
 _getUriBaseClosure() => _uriBase;
