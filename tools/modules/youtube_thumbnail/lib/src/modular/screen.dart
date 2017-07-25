@@ -35,7 +35,9 @@ class YoutubeThumbnailScreen extends StatelessWidget {
           return new Container(
             constraints: const BoxConstraints.expand(),
             child: model.videoId != null && apiKey != null
-                ? new ClipRRect(
+                ? new PhysicalModel(
+                    elevation: 2.0,
+                    color: Colors.transparent,
                     borderRadius: const BorderRadius.only(
                       bottomLeft: const Radius.circular(16.0),
                       bottomRight: const Radius.circular(16.0),
