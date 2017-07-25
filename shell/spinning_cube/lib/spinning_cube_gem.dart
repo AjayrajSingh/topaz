@@ -21,8 +21,10 @@ const double _kCubeAnimationXRotation = 6.0 * math.PI;
 
 /// Creates a spinning unicolor cube with rounded corners.
 class SpinningCubeGem extends StatelessWidget {
-  /// Controlls the spinning animation.
+  /// Controls the spinning animation.
   final AnimationController controller;
+
+  /// The color of the cube faces.
   final Color color;
 
   /// Constructor.

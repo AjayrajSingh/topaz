@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// Draws rounded corners with a [radius] and [color] via a [Decoration] which
@@ -23,6 +24,28 @@ class RoundedCornerDecoration extends Decoration {
 
   @override
   bool hitTest(Size size, Offset position) => false;
+
+  @override
+  DiagnosticsNode toDiagnosticsNode({
+    String name,
+    DiagnosticsTreeStyle style: DiagnosticsTreeStyle.whitespace,
+  }) {
+    return new DiagnosticsNode.lazy(
+      name: name,
+      object: this,
+      description: '',
+      style: style,
+      emptyBodyDescription: '<no decorations specified>',
+      fillProperties: (List<DiagnosticsNode> properties) {
+        properties.add(
+          new DiagnosticsProperty<Color>('color', color, defaultValue: null),
+        );
+        properties.add(
+          new DiagnosticsProperty<double>('radius', radius, defaultValue: null),
+        );
+      },
+    );
+  }
 }
 
 class _RoundedCornerBoxPainter extends BoxPainter {

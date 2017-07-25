@@ -401,13 +401,31 @@ class _StoryListChild extends ParentDataWidget<_StoryListBody> {
   }
 
   @override
-  void debugFillDescription(List<String> description) {
-    super.debugFillDescription(description);
+  void debugFillProperties(List<DiagnosticsNode> description) {
+    super.debugFillProperties(description);
     description.add(
-      'storyLayout: $_storyLayout, '
-          'focusProgress: $_focusProgress, '
-          'inlinePreviewScaleProgress: $_inlinePreviewScaleProgress, '
-          'inlinePreviewHintScaleProgress: $_inlinePreviewHintScaleProgress',
+      new DiagnosticsProperty<StoryLayout>(
+        'storyLayout',
+        _storyLayout,
+      ),
+    );
+    description.add(
+      new DoubleProperty(
+        'focusProgress',
+        _focusProgress,
+      ),
+    );
+    description.add(
+      new DoubleProperty(
+        'inlinePreviewScaleProgress',
+        _inlinePreviewScaleProgress,
+      ),
+    );
+    description.add(
+      new DoubleProperty(
+        'inlinePreviewHintScaleProgress',
+        _inlinePreviewHintScaleProgress,
+      ),
     );
   }
 }
