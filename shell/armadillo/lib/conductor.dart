@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -23,6 +24,7 @@ import 'splash_suggestion.dart';
 import 'story.dart';
 import 'story_cluster.dart';
 import 'story_cluster_drag_state_model.dart';
+import 'story_drag_transition_model.dart';
 import 'story_list.dart';
 import 'story_model.dart';
 import 'suggestion.dart';
@@ -202,11 +204,23 @@ class ConductorState extends State<Conductor> {
             fit: StackFit.passthrough,
             children: <Widget>[
               /// Story List.
-              new Positioned(
-                left: 0.0,
-                right: 0.0,
-                top: 0.0,
-                bottom: minimizedNowHeight,
+              new ScopedModelDescendant<StoryDragTransitionModel>(
+                builder: (
+                  BuildContext context,
+                  Widget child,
+                  StoryDragTransitionModel storyDragTransitionModel,
+                ) =>
+                    new Positioned(
+                      left: 0.0,
+                      right: 0.0,
+                      top: 0.0,
+                      bottom: lerpDouble(
+                        minimizedNowHeight,
+                        0.0,
+                        storyDragTransitionModel.progress,
+                      ),
+                      child: child,
+                    ),
                 child: _getStoryList(
                   storyModel,
                   constraints.maxWidth,

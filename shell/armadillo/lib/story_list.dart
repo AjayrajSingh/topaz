@@ -11,7 +11,6 @@ import 'package:flutter/widgets.dart';
 import 'package:sysui_widgets/rk4_spring_simulation.dart';
 
 import 'armadillo_overlay.dart';
-import 'nothing.dart';
 import 'render_story_list_body.dart';
 import 'simulation_builder.dart';
 import 'size_model.dart';
@@ -86,33 +85,14 @@ class StoryList extends StatelessWidget {
           Widget child,
           StoryModel storyModel,
         ) {
-          List<Widget> stackChildren = <Widget>[
-            new Positioned(
-              top: 0.0,
-              left: 0.0,
-              bottom: 0.0,
-              right: 0.0,
-              child: new LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  _sizeModel.size = new Size(
-                    constraints.maxWidth,
-                    constraints.maxHeight,
-                  );
-                  return Nothing.widget;
-                },
-              ),
-            ),
-          ];
-
-          stackChildren.add(_createScrollableList(storyModel));
-
-          stackChildren.add(new ArmadilloOverlay(key: overlayKey));
-
           return new ScopedModel<SizeModel>(
             model: _sizeModel,
             child: new Stack(
               fit: StackFit.passthrough,
-              children: stackChildren,
+              children: <Widget>[
+                _createScrollableList(storyModel),
+                new ArmadilloOverlay(key: overlayKey),
+              ],
             ),
           );
         },
