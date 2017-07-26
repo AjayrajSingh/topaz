@@ -189,7 +189,7 @@ class MozWebView : public mozart::BaseView,
 
   // |WebView|:
   void ClearCookies() override {
-    // Call web_view_.ClearCookieJar()
+    web_view_.deleteAllCookies();
   }
 
   void SetWebRequestDelegate(
