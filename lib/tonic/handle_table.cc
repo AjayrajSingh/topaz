@@ -6,8 +6,6 @@
 
 #include <unordered_map>
 
-#include <magenta/crashlogger.h>
-
 #include "lib/ftl/logging.h"
 #include "lib/ftl/random/rand.h"
 #include "lib/tonic/dart_state.h"
@@ -125,7 +123,6 @@ mx_handle_t HandleTable::Unwrap(Dart_Handle dart_handle, Dart_Handle* error) {
   uint64_t dart = 0;
   Dart_Handle result = Dart_IntegerToUint64(dart_handle, &dart);
   if (Dart_IsError(result)) {
-    crashlogger_request_backtrace();
     if (error) {
       *error = result;
     }
