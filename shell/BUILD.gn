@@ -80,26 +80,6 @@ package("sysui") {
     },
 
     {
-      path = rebase_path("armadillo_user_shell/assets/WallpaperImage_001.jpg")
-      dest = "sysui/WallpaperImage_001.jpg"
-    },
-
-    {
-      path = rebase_path("armadillo_user_shell/assets/WallpaperImage_002.jpg")
-      dest = "sysui/WallpaperImage_002.jpg"
-    },
-
-    {
-      path = rebase_path("armadillo_user_shell/assets/WallpaperImage_003.jpg")
-      dest = "sysui/WallpaperImage_003.jpg"
-    },
-
-    {
-      path = rebase_path("armadillo_user_shell/assets/WallpaperImage_004.jpg")
-      dest = "sysui/WallpaperImage_004.jpg"
-    },
-
-    {
       path = rebase_path("armadillo_user_shell/assets/aparna-home.jpg")
       dest = "sysui/aparna-home.jpg"
     },
