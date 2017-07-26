@@ -16,7 +16,7 @@ import 'quick_settings.dart';
 import 'nothing.dart';
 import 'now.dart';
 import 'now_model.dart';
-import 'peek_manager.dart';
+import 'peek_model.dart';
 import 'peeking_overlay.dart';
 import 'scroll_locker.dart';
 import 'selected_suggestion_overlay.dart';
@@ -79,20 +79,13 @@ class Conductor extends StatefulWidget {
   /// Called when the user taps the user context.
   final VoidCallback onUserContextTapped;
 
-  /// Used to manage peeking.
-  final StoryClusterDragStateModel storyClusterDragStateModel;
-
-  /// Used to manage peeking.
-  final NowModel nowModel;
-
   /// The key of the interruption overlay.
   final GlobalKey<InterruptionOverlayState> interruptionOverlayKey;
 
   /// Called when an interruption is no longer showing.
   final OnInterruptionDismissed onInterruptionDismissed;
 
-  /// Constructor.  [storyClusterDragStateModel] is used to create a
-  /// [PeekManager] for the suggestion list's peeking overlay.
+  /// Constructor.
   Conductor({
     Key key,
     this.blurScrimmedChildren,
@@ -101,8 +94,6 @@ class Conductor extends StatefulWidget {
     this.onLogoutTapped,
     this.onLogoutLongPressed,
     this.onUserContextTapped,
-    this.storyClusterDragStateModel,
-    this.nowModel,
     this.interruptionOverlayKey,
     this.onInterruptionDismissed,
   })
@@ -147,21 +138,9 @@ class ConductorState extends State<Conductor> {
 
   final FocusScopeNode _conductorFocusNode = new FocusScopeNode();
 
-  PeekManager _peekManager;
-
   bool _ignoreNextScrollOffsetChange = false;
 
   Timer _storyFocusTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _peekManager = new PeekManager(
-      peekingOverlayKey: _suggestionOverlayKey,
-      storyClusterDragStateModel: widget.storyClusterDragStateModel,
-      nowModel: widget.nowModel,
-    );
-  }
 
   /// Note in particular the magic we're employing here to make the user
   /// state appear to be a part of the story list:
@@ -224,6 +203,7 @@ class ConductorState extends State<Conductor> {
               // Now.
               _getNow(
                 storyModel,
+                PeekModel.of(context),
                 constraints.maxWidth,
                 sizeModel.minimizedNowHeight,
               ),
@@ -359,6 +339,7 @@ class ConductorState extends State<Conductor> {
   // don't require its parent and siblings to redraw.
   Widget _getNow(
     StoryModel storyModel,
+    PeekModel peekModel,
     double parentWidth,
     double minimizedNowHeight,
   ) =>
@@ -384,11 +365,11 @@ class ConductorState extends State<Conductor> {
             );
           },
           onMinimize: () {
-            _peekManager.nowMinimized = true;
+            peekModel.nowMinimized = true;
             _suggestionOverlayKey.currentState.hide();
           },
           onMaximize: () {
-            _peekManager.nowMinimized = false;
+            peekModel.nowMinimized = false;
             _suggestionOverlayKey.currentState.hide();
           },
           onBarVerticalDragUpdate: (DragUpdateDetails details) =>
@@ -417,52 +398,51 @@ class ConductorState extends State<Conductor> {
       double suggestionHorizontalMargin,
     ),
     double minimizedNowHeight,
-  ) {
-    return new PeekingOverlay(
-      key: _suggestionOverlayKey,
-      peekHeight: _kSuggestionOverlayPeekHeight,
-      dragHandleHeight: kAskHeight,
-      parentWidth: maxWidth,
-      onHide: () {
-        widget.onSuggestionsOverlayChanged?.call(false);
-        if (_suggestionListScrollController.hasClients) {
-          _suggestionListScrollController.animateTo(
-            0.0,
-            duration: const Duration(milliseconds: 1000),
-            curve: Curves.fastOutSlowIn,
-          );
-        }
-        _suggestionListKey.currentState?.stopAsking();
-      },
-      onShow: () {
-        widget.onSuggestionsOverlayChanged?.call(true);
-      },
-      childAboveBuilder: (BuildContext context, double overlayHeight) =>
-          childAboveBuilder(
-            context,
-            overlayHeight,
-            SuggestionListState.getSuggestionWidth(
-              maxWidth,
-            ),
-            SuggestionListState.getSuggestionHorizontalMargin(),
-          ),
-      child: new SuggestionList(
-        key: _suggestionListKey,
-        scrollController: _suggestionListScrollController,
-        onAskingStarted: () {
-          _suggestionOverlayKey.currentState.show();
+  ) =>
+      new PeekingOverlay(
+        key: _suggestionOverlayKey,
+        peekHeight: _kSuggestionOverlayPeekHeight,
+        dragHandleHeight: kAskHeight,
+        parentWidth: maxWidth,
+        onHide: () {
+          widget.onSuggestionsOverlayChanged?.call(false);
+          if (_suggestionListScrollController.hasClients) {
+            _suggestionListScrollController.animateTo(
+              0.0,
+              duration: const Duration(milliseconds: 1000),
+              curve: Curves.fastOutSlowIn,
+            );
+          }
+          _suggestionListKey.currentState?.stopAsking();
         },
-        onSuggestionSelected: (Suggestion suggestion, Rect globalBounds) =>
-            _onSuggestionSelected(
-              suggestionModel,
-              storyModel,
-              suggestion,
-              globalBounds,
-              minimizedNowHeight,
+        onShow: () {
+          widget.onSuggestionsOverlayChanged?.call(true);
+        },
+        childAboveBuilder: (BuildContext context, double overlayHeight) =>
+            childAboveBuilder(
+              context,
+              overlayHeight,
+              SuggestionListState.getSuggestionWidth(
+                maxWidth,
+              ),
+              SuggestionListState.getSuggestionHorizontalMargin(),
             ),
-      ),
-    );
-  }
+        child: new SuggestionList(
+          key: _suggestionListKey,
+          scrollController: _suggestionListScrollController,
+          onAskingStarted: () {
+            _suggestionOverlayKey.currentState.show();
+          },
+          onSuggestionSelected: (Suggestion suggestion, Rect globalBounds) =>
+              _onSuggestionSelected(
+                suggestionModel,
+                storyModel,
+                suggestion,
+                globalBounds,
+                minimizedNowHeight,
+              ),
+        ),
+      );
 
   void _onSuggestionSelected(
     SuggestionModel suggestionModel,
@@ -572,7 +552,7 @@ class ConductorState extends State<Conductor> {
   void _minimizeNow() {
     _nowKey.currentState.minimize();
     _nowKey.currentState.hideQuickSettings();
-    _peekManager.nowMinimized = true;
+    PeekModel.of(context).nowMinimized = true;
     _suggestionOverlayKey.currentState.hide();
   }
 

@@ -6,7 +6,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:sysui_widgets/ticking_height_state.dart';
+
+import 'peek_model.dart';
 
 const double _kStartOverlayTransitionHeight = 28.0;
 
@@ -77,7 +80,7 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
   void initState() {
     super.initState();
     maxHeight = widget.peekHeight;
-    peek = true;
+    _setPeeking(true);
   }
 
   /// Hides the overlay.
@@ -96,7 +99,7 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
 
   /// If [peeking] is true, the overlay will pop up itself over the bottom of
   /// its parent by the [PeekingOverlay.peekHeight].
-  set peek(bool peeking) {
+  void _setPeeking(bool peeking) {
     if (peeking != _peeking) {
       _peeking = peeking;
       minHeight = _peeking ? widget.peekHeight : 0.0;
@@ -130,53 +133,61 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
   }
 
   @override
-  Widget build(BuildContext context) => new Stack(
-        fit: StackFit.passthrough,
-        children: <Widget>[
-          new IgnorePointer(
-            child: new Container(
-              color: _overlayBackgroundColor,
-            ),
-          ),
-          new Offstage(
-            offstage: hiding,
-            child: new Listener(
-              onPointerUp: (_) => hide(),
-              behavior: HitTestBehavior.opaque,
-            ),
-          ),
-          new Positioned(
-            left: 0.0,
-            right: 0.0,
-            bottom: 0.0,
-            height: height,
-            child: new OverflowBox(
-              minWidth: widget.parentWidth,
-              maxWidth: widget.parentWidth,
-              minHeight: math.max(height, maxHeight),
-              maxHeight: math.max(height, maxHeight),
-              alignment: FractionalOffset.topCenter,
-              child: new Stack(
-                fit: StackFit.passthrough,
-                children: <Widget>[
-                  widget.child,
-                  new Positioned(
-                    top: 0.0,
-                    left: 0.0,
-                    right: 0.0,
-                    height:
-                        hiding ? widget.peekHeight : widget.dragHandleHeight,
-                    child: new GestureDetector(
-                      onVerticalDragUpdate: onVerticalDragUpdate,
-                      onVerticalDragEnd: onVerticalDragEnd,
-                    ),
-                  ),
-                ],
+  Widget build(BuildContext context) => new ScopedModelDescendant<PeekModel>(
+        builder: (BuildContext context, Widget child, PeekModel model) {
+          // This triggers the height animation for this overlay if peek has
+          // changed.
+          _setPeeking(model.peek);
+          return child;
+        },
+        child: new Stack(
+          fit: StackFit.passthrough,
+          children: <Widget>[
+            new IgnorePointer(
+              child: new Container(
+                color: _overlayBackgroundColor,
               ),
             ),
-          ),
-          widget.childAboveBuilder(context, height),
-        ],
+            new Offstage(
+              offstage: hiding,
+              child: new Listener(
+                onPointerUp: (_) => hide(),
+                behavior: HitTestBehavior.opaque,
+              ),
+            ),
+            new Positioned(
+              left: 0.0,
+              right: 0.0,
+              bottom: 0.0,
+              height: height,
+              child: new OverflowBox(
+                minWidth: widget.parentWidth,
+                maxWidth: widget.parentWidth,
+                minHeight: math.max(height, maxHeight),
+                maxHeight: math.max(height, maxHeight),
+                alignment: FractionalOffset.topCenter,
+                child: new Stack(
+                  fit: StackFit.passthrough,
+                  children: <Widget>[
+                    widget.child,
+                    new Positioned(
+                      top: 0.0,
+                      left: 0.0,
+                      right: 0.0,
+                      height:
+                          hiding ? widget.peekHeight : widget.dragHandleHeight,
+                      child: new GestureDetector(
+                        onVerticalDragUpdate: onVerticalDragUpdate,
+                        onVerticalDragEnd: onVerticalDragEnd,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            widget.childAboveBuilder(context, height),
+          ],
+        ),
       );
 
   double get _openingProgress => (height > widget.peekHeight

@@ -15,6 +15,7 @@ import 'package:armadillo/debug_model.dart';
 import 'package:armadillo/interruption_overlay.dart';
 import 'package:armadillo/now_model.dart';
 import 'package:armadillo/panel_resizing_model.dart';
+import 'package:armadillo/peek_model.dart';
 import 'package:armadillo/size_model.dart';
 import 'package:armadillo/story_cluster.dart';
 import 'package:armadillo/story_cluster_drag_data.dart';
@@ -141,7 +142,7 @@ Future<Null> main() async {
   ContextProviderContextModel contextProviderContextModel =
       new ContextProviderContextModel();
 
-  ArmadilloUserShellModel model = new ArmadilloUserShellModel(
+  ArmadilloUserShellModel armadilloUserShellModel = new ArmadilloUserShellModel(
     storyProviderStoryGenerator: storyProviderStoryGenerator,
     suggestionProviderSuggestionModel: suggestionProviderSuggestionModel,
     focusRequestWatcher: focusRequestWatcher,
@@ -154,19 +155,25 @@ Future<Null> main() async {
 
   NowModel nowModel = new NowModel();
 
+  PeekModel peekModel = new PeekModel();
+  storyClusterDragStateModel.addListener(
+    () => peekModel.onStoryClusterDragStateModelChanged(
+          storyClusterDragStateModel,
+        ),
+  );
+  nowModel.addListener(() => peekModel.onNowModelChanged(nowModel));
+
   Conductor conductor = new Conductor(
     key: conductorKey,
     blurScrimmedChildren: false,
     onQuickSettingsOverlayChanged: hitTestModel.onQuickSettingsOverlayChanged,
     onSuggestionsOverlayChanged: hitTestModel.onSuggestionsOverlayChanged,
-    storyClusterDragStateModel: storyClusterDragStateModel,
-    nowModel: nowModel,
     onLogoutTapped: userLogoutter.logout,
     onLogoutLongPressed: userLogoutter.logoutAndResetLedgerState,
     interruptionOverlayKey: interruptionOverlayKey,
     onInterruptionDismissed:
         suggestionProviderSuggestionModel.onInterruptionDismissal,
-    onUserContextTapped: model.onUserContextTapped,
+    onUserContextTapped: armadilloUserShellModel.onUserContextTapped,
   );
 
   DebugModel debugModel = new DebugModel();
@@ -228,6 +235,10 @@ Future<Null> main() async {
                 model: sizeModel,
                 child: child,
               ),
+          (_, Widget child) => new ScopedModel<PeekModel>(
+                model: peekModel,
+                child: child,
+              ),
         ],
         conductor: conductor,
       ),
@@ -238,7 +249,7 @@ Future<Null> main() async {
   UserShellWidget<ArmadilloUserShellModel> userShellWidget =
       new UserShellWidget<ArmadilloUserShellModel>(
     applicationContext: applicationContext,
-    userShellModel: model,
+    userShellModel: armadilloUserShellModel,
     child:
         _kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app,
   )..advertise();
