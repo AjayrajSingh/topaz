@@ -543,7 +543,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
     _targets.clear();
     _targets.addAll(
       _panelDragTargetGenerator.createTargets(
-        size: SizeModel.of(context).size,
+        size: SizeModel.of(context).storySize,
         currentSize: widget.currentSize,
         clusterLayout: _originalClusterLayout,
         scale: widget.scale,

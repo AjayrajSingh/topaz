@@ -8,28 +8,44 @@ import 'package:lib.widgets/model.dart';
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
-/// Tracks the [Size] of something, notifying listeners when it changes.
-/// Using a [SizeModel] allows the [Size] it tracks to be passed down the
-/// widget tree using an [ScopedModel].
+/// The [SizeModel] tracks various global sizes that are required for rendering
+/// the various parts of Armadillo.
+///
+/// The sizes that are tracked:
+/// * ScreenSize: The size allocated to Armadillo.
+/// * MinimizedNowHeight: The height of the minimized now bar which is based on
+///   the total ScreenSize.
+///
+/// The [SizeModel] allows these values to be passed down the widget tree by
+/// using a [ScopedModel] to retrieve the model.
 class SizeModel extends Model {
-  Size _size;
-
-  /// [size] will be the initial size of this [Model].
-  SizeModel(Size size) : _size = size ?? Size.zero;
+  Size _screenSize;
 
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
   static SizeModel of(BuildContext context) =>
       new ModelFinder<SizeModel>().of(context);
 
-  /// Gets the [size] for this [Model].
-  Size get size => _size;
+  /// Gets the size of the entire space allocated to Armadillo
+  Size get screenSize => _screenSize;
 
-  /// Sets the [size] for this [Model].
-  set size(Size size) {
-    if (size != _size) {
-      _size = size;
+  /// Sets the screen size
+  set screenSize(Size size) {
+    if (size != _screenSize) {
+      _screenSize = size;
       notifyListeners();
     }
   }
+
+  /// Gets the size of a focused story.
+  ///
+  /// The story size is the screen size minus the minimized now bar height
+  Size get storySize => new Size(
+        _screenSize.width,
+        _screenSize.height - minimizedNowHeight,
+      );
+
+  /// Gets the height of the minimized now bar which is based on the height
+  /// of the screen.
+  double get minimizedNowHeight => _screenSize.height >= 640.0 ? 48.0 : 32.0;
 }

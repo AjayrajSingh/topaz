@@ -47,11 +47,12 @@ class StoryFullSizeSimulatedSizedBox extends StatelessWidget {
               key: containerKey,
               fractionalWidth:
                   displayMode == DisplayMode.panels ? panel.width : 1.0,
-              fractionalHeight:
-                  ((displayMode == DisplayMode.panels ? panel.height : 1.0) -
-                          (storyBarMaximizedHeight / sizeModel.size.height))
-                      .clamp(0.0, double.INFINITY),
-              size: sizeModel.size,
+              fractionalHeight: ((displayMode == DisplayMode.panels
+                          ? panel.height
+                          : 1.0) -
+                      (storyBarMaximizedHeight / sizeModel.storySize.height))
+                  .clamp(0.0, double.INFINITY),
+              size: sizeModel.storySize,
               child: child,
             ),
         child: child,

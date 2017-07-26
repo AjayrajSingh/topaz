@@ -20,6 +20,7 @@ import 'peek_manager.dart';
 import 'peeking_overlay.dart';
 import 'scroll_locker.dart';
 import 'selected_suggestion_overlay.dart';
+import 'size_model.dart';
 import 'splash_suggestion.dart';
 import 'story.dart';
 import 'story_cluster.dart';
@@ -174,16 +175,12 @@ class ConductorState extends State<Conductor> {
           if (constraints.maxWidth == 0.0 || constraints.maxHeight == 0.0) {
             return new Offstage(offstage: true);
           }
-          Size fullSize = new Size(
-            constraints.maxWidth,
-            constraints.maxHeight,
-          );
-          double minimizedNowHeight =
-              constraints.maxHeight >= 640.0 ? 48.0 : 32.0;
+
+          // Update size of the entire screen
+          SizeModel sizeModel = SizeModel.of(context);
+          sizeModel.screenSize = constraints.biggest;
 
           StoryModel storyModel = StoryModel.of(context);
-
-          storyModel.updateLayouts(fullSize);
 
           // How sizing of the suggestion section works:
           // 1. Try to accommodate the large target width with mininum padding
@@ -215,25 +212,21 @@ class ConductorState extends State<Conductor> {
                       right: 0.0,
                       top: 0.0,
                       bottom: lerpDouble(
-                        minimizedNowHeight,
+                        sizeModel.minimizedNowHeight,
                         0.0,
                         storyDragTransitionModel.progress,
                       ),
                       child: child,
                     ),
-                child: _getStoryList(
-                  storyModel,
-                  constraints.maxWidth,
-                  new Size(
-                    fullSize.width,
-                    fullSize.height - minimizedNowHeight,
-                  ),
-                  minimizedNowHeight,
-                ),
+                child: _getStoryList(storyModel, sizeModel),
               ),
 
               // Now.
-              _getNow(storyModel, constraints.maxWidth, minimizedNowHeight),
+              _getNow(
+                storyModel,
+                constraints.maxWidth,
+                sizeModel.minimizedNowHeight,
+              ),
 
               // Suggestions Overlay.
               _getSuggestionOverlay(
@@ -259,17 +252,17 @@ class ConductorState extends State<Conductor> {
                           overlayHeight,
                           suggestionWidth,
                           suggestionHorizontalMargin,
-                          minimizedNowHeight,
+                          sizeModel.minimizedNowHeight,
                         ),
                       ],
                     ),
-                minimizedNowHeight,
+                sizeModel.minimizedNowHeight,
               ),
 
               // Quick Settings Overlay.
               new QuickSettingsOverlay(
                 key: _quickSettingsOverlayKey,
-                minimizedNowBarHeight: minimizedNowHeight,
+                minimizedNowBarHeight: sizeModel.minimizedNowHeight,
                 onProgressChanged: (double progress) {
                   if (progress == 0.0) {
                     widget.onQuickSettingsOverlayChanged?.call(false);
@@ -319,9 +312,7 @@ class ConductorState extends State<Conductor> {
 
   Widget _getStoryList(
     StoryModel storyModel,
-    double maxWidth,
-    Size parentSize,
-    double minimizedNowHeight,
+    SizeModel sizeModel,
   ) =>
       new VerticalShifter(
         key: _verticalShifterKey,
@@ -332,7 +323,7 @@ class ConductorState extends State<Conductor> {
             scrollController: _scrollController,
             overlayKey: _overlayKey,
             blurScrimmedChildren: widget.blurScrimmedChildren,
-            bottomPadding: _kMaximizedNowHeight + minimizedNowHeight,
+            bottomPadding: _kMaximizedNowHeight + sizeModel.minimizedNowHeight,
             onScroll: (double scrollOffset) {
               if (_ignoreNextScrollOffsetChange) {
                 _ignoreNextScrollOffsetChange = false;
@@ -359,7 +350,6 @@ class ConductorState extends State<Conductor> {
             onStoryClusterFocusCompleted: (StoryCluster storyCluster) {
               _focusStoryCluster(storyModel, storyCluster);
             },
-            parentSize: parentSize,
             onStoryClusterVerticalEdgeHover: () => goToOrigin(storyModel),
           ),
         ),

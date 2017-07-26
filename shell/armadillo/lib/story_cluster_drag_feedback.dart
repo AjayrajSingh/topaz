@@ -157,14 +157,14 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                 double childScale;
                 double inlinePreviewScale =
                     StoryListLayout.getInlinePreviewScale(
-                  sizeModel.size,
+                  sizeModel.storySize,
                 );
                 bool isAcceptable = storyClusterDragStateModel.isAcceptable;
 
                 if (isAcceptable &&
                     widget.storyCluster.previewStories.isNotEmpty) {
-                  width = sizeModel.size.width;
-                  height = sizeModel.size.height;
+                  width = sizeModel.storySize.width;
+                  height = sizeModel.storySize.height;
                   childScale =
                       lerpDouble(inlinePreviewScale, 0.7, widget.focusProgress);
                 } else {

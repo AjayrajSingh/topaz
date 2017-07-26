@@ -58,9 +58,6 @@ class StoryList extends StatelessWidget {
   /// previewing.
   final bool blurScrimmedChildren;
 
-  /// Passes the parent size to all its [StoryClusterWidget]s
-  final SizeModel _sizeModel;
-
   /// Constructor.
   /// [parentSize] is the parent size when this [StoryList] was created.
   StoryList({
@@ -75,8 +72,7 @@ class StoryList extends StatelessWidget {
     this.onStoryClusterVerticalEdgeHover,
     this.blurScrimmedChildren,
   })
-      : _sizeModel = new SizeModel(parentSize),
-        super(key: key);
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) => new ScopedModelDescendant<StoryModel>(
@@ -85,20 +81,25 @@ class StoryList extends StatelessWidget {
           Widget child,
           StoryModel storyModel,
         ) {
-          return new ScopedModel<SizeModel>(
-            model: _sizeModel,
-            child: new Stack(
-              fit: StackFit.passthrough,
-              children: <Widget>[
-                _createScrollableList(storyModel),
-                new ArmadilloOverlay(key: overlayKey),
-              ],
-            ),
+          return new ScopedModelDescendant<SizeModel>(
+            builder: (
+              BuildContext context,
+              Widget child,
+              SizeModel sizeModel,
+            ) {
+              return new Stack(
+                fit: StackFit.passthrough,
+                children: <Widget>[
+                  _createScrollableList(storyModel, sizeModel),
+                  new ArmadilloOverlay(key: overlayKey),
+                ],
+              );
+            },
           );
         },
       );
 
-  Widget _createScrollableList(StoryModel storyModel) =>
+  Widget _createScrollableList(StoryModel storyModel, SizeModel sizeModel) =>
       new NotificationListener<ScrollNotification>(
         onNotification: (ScrollNotification notification) {
           if (notification is ScrollUpdateNotification &&
@@ -145,7 +146,18 @@ class StoryList extends StatelessWidget {
                                     scrollOffset:
                                         scrollController?.offset ?? 0.0,
                                     bottomPadding: bottomPadding,
-                                    parentSize: sizeModel.size,
+                                    // When we are dragging, the storyListSize
+                                    // takes up the entire screen since the now
+                                    // bar is hidden.
+                                    parentSize: new Size(
+                                      sizeModel.storySize.width,
+                                      sizeModel.storySize.height +
+                                          lerpDouble(
+                                            0.0,
+                                            sizeModel.minimizedNowHeight,
+                                            storyDragTransitionModel.progress,
+                                          ),
+                                    ),
                                     scrimColor:
                                         storyRearrangementScrimModel.scrimColor,
                                     blurScrimmedChildren: blurScrimmedChildren,

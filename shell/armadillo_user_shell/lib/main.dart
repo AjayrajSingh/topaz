@@ -15,6 +15,7 @@ import 'package:armadillo/debug_model.dart';
 import 'package:armadillo/interruption_overlay.dart';
 import 'package:armadillo/now_model.dart';
 import 'package:armadillo/panel_resizing_model.dart';
+import 'package:armadillo/size_model.dart';
 import 'package:armadillo/story_cluster.dart';
 import 'package:armadillo/story_cluster_drag_data.dart';
 import 'package:armadillo/story_cluster_drag_state_model.dart';
@@ -176,6 +177,9 @@ Future<Null> main() async {
     audioPolicy: new AudioPolicy(applicationContext.environmentServices),
   );
 
+  SizeModel sizeModel = new SizeModel();
+  sizeModel.addListener(() => storyModel.updateLayouts(sizeModel.screenSize));
+
   Widget app = new ScopedModel<StoryDragTransitionModel>(
     model: storyDragTransitionModel,
     child: _buildApp(
@@ -218,6 +222,10 @@ Future<Null> main() async {
               ),
           (_, Widget child) => new ScopedModel<PanelResizingModel>(
                 model: panelResizingModel,
+                child: child,
+              ),
+          (_, Widget child) => new ScopedModel<SizeModel>(
+                model: sizeModel,
                 child: child,
               ),
         ],

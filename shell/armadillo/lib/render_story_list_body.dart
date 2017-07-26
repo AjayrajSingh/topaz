@@ -371,8 +371,7 @@ class RenderStoryListBody extends RenderListBody {
     // story list to be that of the focusing child and shift all the children
     // down to compensate.
     double unfocusedHeight = _listHeight + _bottomPadding;
-    double deltaTooSmall =
-        (_parentSize.height * maxFocusProgress) - unfocusedHeight;
+    double deltaTooSmall = _parentSize.height - unfocusedHeight;
     double finalHeight = unfocusedHeight;
     if (deltaTooSmall > 0.0) {
       // shift all children down by deltaTooSmall.
@@ -386,7 +385,7 @@ class RenderStoryListBody extends RenderListBody {
         child = childParentData.nextSibling;
       }
 
-      finalHeight = (_parentSize.height * maxFocusProgress);
+      finalHeight = _parentSize.height;
     }
 
     size = constraints.constrain(
