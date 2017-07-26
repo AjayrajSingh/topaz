@@ -1,5 +1,5 @@
 {
-  "home" : [
+  "home": [
     {
       "id": "home_01",
       "headline": "See movies playing near me",
@@ -34,7 +34,7 @@
       "module_data": "{\"image_url\":\"/system/data/sysui/story_overthrough.png\"}"
     }
   ],
-  "work" : [
+  "work": [
     {
       "id": "work_01",
       "headline": "View Expenses",
@@ -71,7 +71,7 @@
       "module_data": "{\"image_url\":\"/system/data/sysui/story_marketing.png\"}"
     }
   ],
-  "unknown" : [
+  "unknown": [
     {
       "id": "unknown_01",
       "headline": "You've walked 11,302 steps today",
@@ -84,6 +84,7 @@
       "id": "unknown_02",
       "headline": "Call Danielle back",
       "subheadline": "1 missed call 32 minutes ago",
+      "color": "0xFF4054B2",
       "image_url": "/system/data/sysui/danielle_cc0.jpg",
       "type": "person",
       "module_url": "image",
