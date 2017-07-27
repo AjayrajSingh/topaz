@@ -48,7 +48,7 @@ package("chat_tests") {
   ]
 
   binaries = [ {
-        name = "chat_content_provider_test"
+        name = "chat_content_provider_test.dartx"
         source = "chat_content_provider_test.dartx"
       } ]
 

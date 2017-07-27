@@ -354,7 +354,7 @@ class ChatContentProviderTestModule extends Module {
     );
     expect(status, equals(ChatStatus.ok));
     expect(conversations, allOf(isNotNull, hasLength(1)));
-    expect(mqConversation1.receivedMessages, allOf(isNotNull, isEmpty));
+    expect(mqConversation1.messagesOfType('new_conversation'), isEmpty);
     conversation0 = conversations[0];
 
     // GetMessages() should return two messages in the conversation.
@@ -391,8 +391,9 @@ class ChatContentProviderTestModule extends Module {
 
     // Wait for the message queue notification.
     await completer1.future.timeout(_kTimeout);
-    expect(mqConversation1.receivedMessages, hasLength(1));
-    decoded = JSON.decode(mqConversation1.receivedMessages.last);
+    expect(mqConversation1.messagesOfType('new_conversation'), hasLength(1));
+    decoded =
+        JSON.decode(mqConversation1.messagesOfType('new_conversation').last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('new_conversation'));
     expect(
@@ -438,8 +439,9 @@ class ChatContentProviderTestModule extends Module {
 
     // Wait for the message queue notifications.
     await completer1.future.timeout(_kTimeout);
-    expect(mqConversation1.receivedMessages, hasLength(2));
-    decoded = JSON.decode(mqConversation1.receivedMessages.last);
+    expect(mqConversation1.messagesOfType('new_conversation'), hasLength(2));
+    decoded =
+        JSON.decode(mqConversation1.messagesOfType('new_conversation').last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('new_conversation'));
     expect(
@@ -452,8 +454,9 @@ class ChatContentProviderTestModule extends Module {
     );
 
     await completer2.future.timeout(_kTimeout);
-    expect(mqConversation2.receivedMessages, hasLength(1));
-    decoded = JSON.decode(mqConversation1.receivedMessages.last);
+    expect(mqConversation2.messagesOfType('new_conversation'), hasLength(1));
+    decoded =
+        JSON.decode(mqConversation1.messagesOfType('new_conversation').last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('new_conversation'));
     expect(
@@ -680,6 +683,9 @@ class _MessageQueueWrapper {
       onReceiveMessage: handleMessage,
     );
   }
+
+  Iterable<String> messagesOfType(String eventType) => receivedMessages
+      .where((String msg) => JSON.decode(msg)['event'] == eventType);
 
   void handleMessage(String message, void ack()) {
     receivedMessages.add(message);
