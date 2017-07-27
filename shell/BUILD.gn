@@ -291,10 +291,32 @@ package("sysui") {
       path = rebase_path("agents/home_work_agent/assets/tahiti_240.png")
       dest = "sysui/tahiti_240.png"
     },
+
+    {
+      path = rebase_path("agents/home_work_agent/assets/inbox_96dp.png")
+      dest = "sysui/inbox_96dp.png"
+    },
+
+    {
+      path = rebase_path("agents/home_work_agent/assets/music_96dp.png")
+      dest = "sysui/music_96dp.png"
+    },
+
+    {
+      path = rebase_path("agents/home_work_agent/assets/chat_96dp.png")
+      dest = "sysui/chat_96dp.png"
+    },
+
+    {
+      path = rebase_path("agents/home_work_agent/assets/youtube_96dp.png")
+      dest = "sysui/youtube_96dp.png"
+    },
+
     {
       path = rebase_path(armadillo_path_context_config)
       dest = "sysui/contextual_config.json"
     },
+
   ]
 }
 

@@ -182,6 +182,64 @@ class _AskHandlerImpl extends AskHandler {
       proposals.add(_launchEverythingProposal);
     }
 
+    if ((query.text?.length ?? 0) >= 4) {
+      void scanDirectory(Directory directory) {
+        directory
+            .listSync(recursive: true, followLinks: false)
+            .map((FileSystemEntity fileSystemEntity) => fileSystemEntity.path)
+            .where((String path) => path.contains(query.text))
+            .where((String path) => FileSystemEntity.isFileSync(path))
+            .forEach((String path) {
+          String name = Uri.parse(path).pathSegments.last;
+          String iconUrl =
+              'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png';
+          int color = 0xFF000000 + (name.hashCode % 0xFFFFFF);
+          if (name.contains('youtube')) {
+            iconUrl = '/system/data/sysui/youtube_96dp.png';
+            color = 0xFFEC2F01;
+          } else if (name.contains('music')) {
+            iconUrl = '/system/data/sysui/music_96dp.png';
+            color = 0xFF3E2723;
+          } else if (name.contains('email')) {
+            iconUrl = '/system/data/sysui/inbox_96dp.png';
+            color = 0xFF4285F4;
+          } else if (name.contains('chat')) {
+            iconUrl = '/system/data/sysui/chat_96dp.png';
+            color = 0xFF9C26B0;
+          } else if (path.contains('youtube')) {
+            iconUrl = '/system/data/sysui/youtube_96dp.png';
+            color = 0xFFEC2F01;
+          } else if (path.contains('music')) {
+            iconUrl = '/system/data/sysui/music_96dp.png';
+            color = 0xFF3E2723;
+          } else if (path.contains('email')) {
+            iconUrl = '/system/data/sysui/inbox_96dp.png';
+            color = 0xFF4285F4;
+          } else if (path.contains('chat')) {
+            iconUrl = '/system/data/sysui/chat_96dp.png';
+            color = 0xFF9C26B0;
+          }
+
+          proposals.add(
+            _createAppProposal(
+              id: 'open $name',
+              appUrl: 'file://$path',
+              headline: 'Launch $name',
+              // TODO(design): Find a better way to add indicators to the
+              // suggestions about their provenance, lack of safety, etc. that
+              // would be useful for developers but not distracting in demos
+              // subheadline: '(This is potentially unsafe)',
+              iconUrls: <String>[iconUrl],
+              color: color,
+            ),
+          );
+        });
+      }
+
+      scanDirectory(new Directory('/system/apps/'));
+      scanDirectory(new Directory('/system/pkgs/'));
+    }
+
     callback(proposals);
   }
 
@@ -238,3 +296,33 @@ Proposal _createProposal(Map<String, String> proposal) => new Proposal()
         ..moduleId = proposal['module_url'] ?? ''
         ..initialData = proposal['module_data'] ?? '')
   ];
+
+Proposal _createAppProposal({
+  String id,
+  String appUrl,
+  String headline,
+  String subheadline,
+  String imageUrl: '',
+  String initialData,
+  SuggestionImageType imageType: SuggestionImageType.other,
+  List<String> iconUrls = const <String>[],
+  int color,
+  AnnoyanceType annoyanceType: AnnoyanceType.none,
+}) =>
+    new Proposal()
+      ..id = id
+      ..display = (new SuggestionDisplay()
+        ..headline = headline
+        ..subheadline = subheadline ?? ''
+        ..details = ''
+        ..color = color
+        ..iconUrls = iconUrls
+        ..imageType = imageType
+        ..imageUrl = imageUrl
+        ..annoyance = annoyanceType)
+      ..onSelected = <Action>[
+        new Action()
+          ..createStory = (new CreateStory()
+            ..moduleId = appUrl
+            ..initialData = initialData)
+      ];
