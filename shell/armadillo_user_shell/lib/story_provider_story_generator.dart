@@ -25,9 +25,6 @@ import 'story_provider_watcher_impl.dart';
 const String _kUserImage = 'packages/armadillo/res/User.png';
 const int _kMaxActiveClusters = 6;
 
-/// Called when the [StoryProvider] returns no stories.
-typedef void OnNoStories(StoryProviderProxy storyProvider);
-
 /// Creates a list of stories for the StoryList using
 /// modular's [StoryProvider].
 class StoryProviderStoryGenerator extends StoryGenerator {
@@ -48,14 +45,11 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   final StoryImportanceWatcherBinding _storyImportanceWatcherBinding =
       new StoryImportanceWatcherBinding();
 
-  /// Called when the [StoryProvider] returns no stories.
-  final OnNoStories onNoStories;
-
   /// Called the first time the [StoryProvider] returns stories.
   final VoidCallback onStoriesFirstAvailable;
 
   /// Constructor.
-  StoryProviderStoryGenerator({this.onNoStories, this.onStoriesFirstAvailable});
+  StoryProviderStoryGenerator({this.onStoriesFirstAvailable});
 
   /// Call to close all the handles opened by this story generator.
   void close() {
@@ -131,46 +125,44 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   void update([VoidCallback callback]) {
     _storyProvider.previousStories((List<String> storyIds) {
       if (storyIds.isEmpty && storyClusters.isEmpty) {
-        // We have no previous stories, so create some!
-        onNoStories?.call(_storyProvider);
-      } else {
-        // Remove any stories that aren't in the previous story list.
-        _currentStories
-            .where((Story story) => !storyIds.contains(story.id.value))
-            .toList()
-            .forEach((Story story) {
-          log.info('Story ${story.id.value} has been removed!');
-          _removeStoryFromClusters(story);
-        });
-
-        // Add only those stories we don't already know about.
-        final List<String> storiesToAdd = storyIds
-            .where((String storyId) => !containsStory(storyId))
-            .toList();
-
-        if (storiesToAdd.isEmpty) {
-          callback?.call();
-        }
-
-        // We have previous stories so lets resume them so they can be
-        // displayed in a child view.
-        int added = 0;
-        storiesToAdd.forEach((String storyId) {
-          _getController(storyId);
-          _storyControllerMap[storyId]
-              .getInfo((StoryInfo storyInfo, StoryState state) {
-            _startStory(storyInfo, _storyClusters.length);
-            added++;
-            if (added == storiesToAdd.length) {
-              if (_firstTime) {
-                _firstTime = false;
-                onStoriesFirstAvailable();
-              }
-              callback?.call();
-            }
-          });
-        });
+        return;
       }
+
+      // Remove any stories that aren't in the previous story list.
+      _currentStories
+          .where((Story story) => !storyIds.contains(story.id.value))
+          .toList()
+          .forEach((Story story) {
+        log.info('Story ${story.id.value} has been removed!');
+        _removeStoryFromClusters(story);
+      });
+
+      // Add only those stories we don't already know about.
+      final List<String> storiesToAdd =
+          storyIds.where((String storyId) => !containsStory(storyId)).toList();
+
+      if (storiesToAdd.isEmpty) {
+        callback?.call();
+      }
+
+      // We have previous stories so lets resume them so they can be
+      // displayed in a child view.
+      int added = 0;
+      storiesToAdd.forEach((String storyId) {
+        _getController(storyId);
+        _storyControllerMap[storyId]
+            .getInfo((StoryInfo storyInfo, StoryState state) {
+          _startStory(storyInfo, _storyClusters.length);
+          added++;
+          if (added == storiesToAdd.length) {
+            if (_firstTime) {
+              _firstTime = false;
+              onStoriesFirstAvailable();
+            }
+            callback?.call();
+          }
+        });
+      });
     });
   }
 

@@ -41,7 +41,6 @@ import 'context_provider_context_model.dart';
 import 'focus_request_watcher_impl.dart';
 import 'hit_test_model.dart';
 import 'initial_focus_setter.dart';
-import 'initial_story_generator.dart';
 import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
@@ -64,13 +63,10 @@ Future<Null> main() async {
   }
 
   HitTestModel hitTestModel = new HitTestModel();
-  InitialStoryGenerator initialStoryGenerator = new InitialStoryGenerator()
-    ..load(defaultBundle);
   InitialFocusSetter initialFocusSetter = new InitialFocusSetter();
 
   StoryProviderStoryGenerator storyProviderStoryGenerator =
       new StoryProviderStoryGenerator(
-    onNoStories: initialStoryGenerator.createStories,
     onStoriesFirstAvailable: initialFocusSetter.onStoriesFirstAvailable,
   );
   StoryClusterDragStateModel storyClusterDragStateModel =
