@@ -261,7 +261,7 @@ Future<Null> main() async {
           sizeModel.screenSize = constraints.biggest;
           return Nothing.widget;
         }),
-        userShellWidget,
+        new CheckedModeBanner(child: userShellWidget),
       ]),
     ),
   );
