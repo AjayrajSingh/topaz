@@ -6,8 +6,6 @@ name: armadillo
 dependencies:
   flutter:
     sdk: flutter
-  keyboard:
-    path: ../keyboard
   lib.widgets:
     path: ../../../lib/widgets/packages/widgets
   models:
@@ -43,7 +41,3 @@ flutter:
     - packages/armadillo/res/initial_story_generator_config.json
     - packages/armadillo/res/logo_googleg_24dpx4.png
     - packages/armadillo/res/User.png
-    - packages/keyboard/res/ArrowDown.png
-    - packages/keyboard/res/ArrowUp.png
-    - packages/keyboard/res/Delete.png
-    - packages/keyboard/res/Space.png
