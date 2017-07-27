@@ -4,7 +4,6 @@
 
 group("agents") {
   deps = [
-    "walking_agent",
     "home_work_agent",
   ]
 }

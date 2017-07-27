@@ -20,7 +20,6 @@ package("sysui") {
 
   deps = [
     "//apps/sysui/agents/home_work_agent",
-    "//apps/sysui/agents/walking_agent",
     "//apps/sysui/armadillo_user_shell",
     "//apps/sysui/capybara_user_shell",
     "//apps/sysui/infinite_scroller",
@@ -64,11 +63,6 @@ package("sysui") {
     {
       name = "home_work_agent.dartx"
       dest = "agents/home_work_agent"
-    },
-
-    {
-      name = "walking_agent.dartx"
-      dest = "agents/walking_agent"
     },
   ]
 
