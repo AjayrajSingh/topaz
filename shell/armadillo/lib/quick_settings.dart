@@ -12,7 +12,7 @@ import 'package:sysui_widgets/rk4_spring_simulation.dart';
 import 'package:sysui_widgets/ticking_state.dart';
 
 import 'elevation_constants.dart';
-import 'now.dart';
+import 'size_model.dart';
 import 'toggle_icon.dart';
 import 'volume_model.dart';
 
@@ -54,9 +54,6 @@ const double _kShowSimulationTarget = 100.0;
 
 /// An overlay that slides up over the bottom of its parent when shown.
 class QuickSettingsOverlay extends StatefulWidget {
-  /// The size of [Now] when minimized.
-  final double minimizedNowBarHeight;
-
   /// Called each tick as the overlay is shown or hidden.
   final ValueChanged<double> onProgressChanged;
 
@@ -69,7 +66,6 @@ class QuickSettingsOverlay extends StatefulWidget {
   /// Constructor.
   QuickSettingsOverlay({
     Key key,
-    this.minimizedNowBarHeight,
     this.onProgressChanged,
     this.onLogoutTapped,
     this.onLogoutLongPressed,
@@ -125,38 +121,47 @@ class QuickSettingsOverlayState extends TickingState<QuickSettingsOverlay> {
         child: new PhysicalModel(
           elevation: Elevations.quickSettings,
           color: Colors.transparent,
-          child: new Stack(
-            fit: StackFit.passthrough,
-            children: <Widget>[
-              new Positioned(
-                left: 0.0,
-                top: 0.0,
-                right: 0.0,
-                bottom: 0.0,
-                child: new Offstage(
-                  offstage: _showSimulation.target != _kShowSimulationTarget,
-                  child: new Listener(
-                    behavior: HitTestBehavior.opaque,
-                    onPointerDown: (_) {
-                      hide();
-                    },
-                  ),
+          child: new ScopedModelDescendant<SizeModel>(
+            builder: (
+              BuildContext context,
+              Widget child,
+              SizeModel sizeModel,
+            ) =>
+                new Stack(
+                  fit: StackFit.passthrough,
+                  children: <Widget>[
+                    new Positioned(
+                      left: 0.0,
+                      top: 0.0,
+                      right: 0.0,
+                      bottom: 0.0,
+                      child: new Offstage(
+                        offstage:
+                            _showSimulation.target != _kShowSimulationTarget,
+                        child: new Listener(
+                          behavior: HitTestBehavior.opaque,
+                          onPointerDown: (_) {
+                            hide();
+                          },
+                        ),
+                      ),
+                    ),
+                    new Positioned(
+                      bottom: lerpDouble(
+                        // Hack(dayang): We are not able to use transparencies with
+                        // Mozart 2.
+                        // MZ-221
+                        -220.0,
+                        8.0 + sizeModel.minimizedNowHeight,
+                        _showProgress,
+                      ),
+                      left: 8.0,
+                      right: 8.0,
+                      child: child,
+                    ),
+                  ],
                 ),
-              ),
-              new Positioned(
-                bottom: lerpDouble(
-                  // Hack(dayang): We are not able to use transparencies with
-                  // Mozart 2.
-                  // MZ-221
-                  -220.0,
-                  8.0 + widget.minimizedNowBarHeight,
-                  _showProgress,
-                ),
-                left: 8.0,
-                right: 8.0,
-                child: _buildQuickSettingsOverlayContent(),
-              ),
-            ],
+            child: _buildQuickSettingsOverlayContent(),
           ),
         ),
       );

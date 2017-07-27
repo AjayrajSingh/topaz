@@ -13,6 +13,7 @@ import 'package:armadillo/context_model.dart';
 import 'package:armadillo/debug_enabler.dart';
 import 'package:armadillo/debug_model.dart';
 import 'package:armadillo/interruption_overlay.dart';
+import 'package:armadillo/nothing.dart';
 import 'package:armadillo/now_model.dart';
 import 'package:armadillo/panel_resizing_model.dart';
 import 'package:armadillo/peek_model.dart';
@@ -105,14 +106,13 @@ Future<Null> main() async {
 
   suggestionProviderSuggestionModel.storyModel = storyModel;
   suggestionProviderSuggestionModel.addOnFocusLossListener(() {
-    conductorKey.currentState.goToOrigin(storyModel);
+    conductorKey.currentState.goToOrigin();
   });
 
   StoryFocuser storyFocuser = (String storyId) {
     scheduleMicrotask(() {
       conductorKey.currentState.requestStoryFocus(
         new StoryId(storyId),
-        storyModel,
         jumpToFinish: false,
       );
     });
@@ -252,7 +252,17 @@ Future<Null> main() async {
 
   runApp(
     new WindowMediaQuery(
-      child: userShellWidget,
+      child: new Stack(children: <Widget>[
+        new LayoutBuilder(builder: (
+          BuildContext context,
+          BoxConstraints constraints,
+        ) {
+          // Update size of the entire screen
+          sizeModel.screenSize = constraints.biggest;
+          return Nothing.widget;
+        }),
+        userShellWidget,
+      ]),
     ),
   );
 

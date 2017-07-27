@@ -176,9 +176,7 @@ class SuggestionListState extends State<SuggestionList>
                                   top: kAskHeight - 8.0,
                                   child: new Container(
                                     color: const Color(0xFFDBE2E5),
-                                    padding: new EdgeInsets.only(
-                                      top: 32.0,
-                                    ),
+                                    padding: new EdgeInsets.only(top: 32.0),
                                     child: new CustomScrollView(
                                       controller: widget.scrollController,
                                       slivers: <Widget>[
@@ -206,9 +204,7 @@ class SuggestionListState extends State<SuggestionList>
                                   top: 0.0,
                                   height: kAskHeight,
                                   child: new Container(
-                                    decoration: new BoxDecoration(
-                                      color: Colors.white,
-                                    ),
+                                    color: Colors.white,
                                     padding: new EdgeInsets.symmetric(
                                       horizontal: _getLeftOffset(
                                         constraints.maxWidth,

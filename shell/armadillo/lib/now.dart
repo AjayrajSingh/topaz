@@ -13,6 +13,7 @@ import 'package:sysui_widgets/ticking_state.dart';
 import 'fading_spring_simulation.dart';
 import 'now_model.dart';
 import 'opacity_model.dart';
+import 'size_model.dart';
 import 'story_drag_transition_model.dart';
 
 /// Fraction of the minimization animation which should be used for falling away
@@ -57,16 +58,6 @@ const double _kOverscrollSnapDragDistanceThreshold = 200.0;
 /// Shows the user, the user's context, and important settings.  When minimized
 /// also shows an affordance for seeing missed interruptions.
 class Now extends StatefulWidget {
-  /// The height [Now] should collapse to when minimizing.
-  final double minHeight;
-
-  /// The height [Now] should expand to when maximizing.
-  final double maxHeight;
-
-  /// The width of [Now]'s parent.  Used to size Now's quick setting's
-  /// background.
-  final double parentWidth;
-
   /// How much to shift the quick settings vertically when shown.
   final double quickSettingsHeightBump;
 
@@ -119,9 +110,6 @@ class Now extends StatefulWidget {
   /// Constructor.
   Now({
     Key key,
-    this.minHeight,
-    this.maxHeight,
-    this.parentWidth,
     this.quickSettingsHeightBump,
     this.onQuickSettingsProgressChange,
     this.onMinimizedTap,
@@ -179,7 +167,7 @@ class NowState extends TickingState<Now> {
   double _lastScrollOffset = 0.0;
 
   // initialized in showQuickSettings
-  double _quickSettingsMaximizedHeight = 0.0;
+  final double _quickSettingsMaximizedHeight = 200.0;
   double _importantInfoMaximizedHeight = 0.0;
   double _userContextTextHeight = 0.0;
   double _userImageHeight = 0.0;
@@ -267,99 +255,126 @@ class NowState extends TickingState<Now> {
           ),
           new Align(
             alignment: FractionalOffset.bottomCenter,
-            child: new AnimatedBuilder(
-              animation: widget.scrollController,
-              builder: (BuildContext context, Widget child) => new Container(
-                    height: _getNowHeight(widget.scrollController.offset),
-                    child: child,
-                  ),
-              child: new ScopedModelDescendant<NowModel>(
-                builder: (
-                  BuildContext context,
-                  Widget child,
-                  NowModel nowModel,
-                ) =>
-                    new Stack(
-                      fit: StackFit.passthrough,
-                      children: <Widget>[
-                        // Quick Settings Background.
-                        new Positioned(
-                          left: _kQuickSettingsHorizontalPadding,
-                          right: _kQuickSettingsHorizontalPadding,
-                          top: _quickSettingsBackgroundTopOffset,
-                          child: new Center(
-                            child: new Container(
-                              height: _quickSettingsBackgroundHeight,
-                              width: _quickSettingsBackgroundWidth,
-                              decoration: new BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: new BorderRadius.circular(
-                                  _quickSettingsBackgroundBorderRadius,
+            child: new ScopedModelDescendant<SizeModel>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                SizeModel sizeModel,
+              ) =>
+                  new AnimatedBuilder(
+                    animation: widget.scrollController,
+                    builder: (BuildContext context, Widget child) =>
+                        new Container(
+                          height: _getNowHeight(
+                            sizeModel,
+                            widget.scrollController.offset,
+                          ),
+                          child: child,
+                        ),
+                    child: new ScopedModelDescendant<NowModel>(
+                      builder: (
+                        BuildContext context,
+                        Widget child,
+                        NowModel nowModel,
+                      ) =>
+                          new Stack(
+                            fit: StackFit.passthrough,
+                            children: <Widget>[
+                              // Quick Settings Background.
+                              new Positioned(
+                                left: _kQuickSettingsHorizontalPadding,
+                                right: _kQuickSettingsHorizontalPadding,
+                                top: _getQuickSettingsBackgroundTopOffset(
+                                  sizeModel,
+                                ),
+                                child: new Center(
+                                  child: new Container(
+                                    height: _getQuickSettingsBackgroundHeight(
+                                      sizeModel,
+                                    ),
+                                    width: _getQuickSettingsBackgroundWidth(
+                                      sizeModel,
+                                    ),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: new BorderRadius.circular(
+                                        _quickSettingsBackgroundBorderRadius,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                        // User Image, User Context Text, and Important Information when maximized.
-                        new Positioned(
-                          left: _kQuickSettingsHorizontalPadding,
-                          right: _kQuickSettingsHorizontalPadding,
-                          top: _userImageTopOffset,
-                          child: new Center(
-                            child: new Column(
-                              children: <Widget>[
-                                new Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    // User Context Text when maximized.
-                                    new Expanded(
-                                      child: new GestureDetector(
-                                        onTap: widget.onUserContextTapped,
-                                        behavior: HitTestBehavior.opaque,
-                                        child: new Container(
-                                          key: _userContextTextKey,
-                                          height: _userImageSize,
-                                          child: nowModel.userContextMaximized(
-                                            opacity: _fallAwayOpacity,
+                              // User Image, User Context Text, and Important Information when maximized.
+                              new Positioned(
+                                left: _kQuickSettingsHorizontalPadding,
+                                right: _kQuickSettingsHorizontalPadding,
+                                top: _getUserImageTopOffset(sizeModel),
+                                child: new Center(
+                                  child: new Column(
+                                    children: <Widget>[
+                                      new Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          // User Context Text when maximized.
+                                          new Expanded(
+                                            child: new GestureDetector(
+                                              onTap: widget.onUserContextTapped,
+                                              behavior: HitTestBehavior.opaque,
+                                              child: new Container(
+                                                key: _userContextTextKey,
+                                                height: _userImageSize,
+                                                child: nowModel
+                                                    .userContextMaximized(
+                                                  opacity: _fallAwayOpacity,
+                                                ),
+                                              ),
+                                            ),
                                           ),
+                                          // User Profile image
+                                          _buildUserImage(nowModel),
+                                          // Important Information when maximized.
+                                          new Expanded(
+                                            child: new Container(
+                                              key: _importantInfoMaximizedKey,
+                                              height: _userImageSize,
+                                              child: nowModel
+                                                  .importantInfoMaximized(
+                                                opacity: _fallAwayOpacity,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      // Quick Settings
+                                      new Container(
+                                        padding:
+                                            const EdgeInsets.only(top: 32.0),
+                                        child: _buildQuickSettings(
+                                          sizeModel,
+                                          nowModel,
                                         ),
                                       ),
-                                    ),
-                                    // User Profile image
-                                    _buildUserImage(nowModel),
-                                    // Important Information when maximized.
-                                    new Expanded(
-                                      child: new Container(
-                                        key: _importantInfoMaximizedKey,
-                                        height: _userImageSize,
-                                        child: nowModel.importantInfoMaximized(
-                                          opacity: _fallAwayOpacity,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                                // Quick Settings
-                                new Container(
-                                  padding: const EdgeInsets.only(top: 32.0),
-                                  child: _buildQuickSettings(nowModel),
-                                ),
-                              ],
-                            ),
+                              ),
+
+                              // User Context Text and Important Information when minimized.
+                              _buildMinimizedUserContextTextAndImportantInformation(
+                                sizeModel,
+                                nowModel,
+                              ),
+
+                              // Minimized button bar gesture detector. Only enabled when
+                              // we're nearly fully minimized.
+                              _buildMinimizedButtonBarGestureDetector(
+                                sizeModel,
+                              ),
+                            ],
                           ),
-                        ),
-
-                        // User Context Text and Important Information when minimized.
-                        _buildMinimizedUserContextTextAndImportantInformation(
-                          nowModel,
-                        ),
-
-                        // Minimized button bar gesture detector. Only enabled when
-                        // we're nearly fully minimized.
-                        _buildMinimizedButtonBarGestureDetector(),
-                      ],
                     ),
-              ),
+                  ),
             ),
           ),
         ],
@@ -408,49 +423,44 @@ class NowState extends TickingState<Now> {
             ),
           ]);
 
-  Widget _buildQuickSettings(NowModel nowModel) => new Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
+  Widget _buildQuickSettings(SizeModel sizeModel, NowModel nowModel) =>
+      new Padding(
+        padding: const EdgeInsets.symmetric(
+            horizontal: _kQuickSettingsInnerHorizontalPadding, vertical: 8.0),
         child: new Container(
-          height: _quickSettingsHeight,
-          width: _quickSettingsBackgroundWidth,
-          child: new ClipRect(
-            child: new OverflowBox(
-              // don't use parent height as constraint
-              maxHeight: double.INFINITY,
-              minHeight: 0.0,
-              maxWidth: _quickSettingsBackgroundMaximizedWidth -
-                  2.0 * _kQuickSettingsInnerHorizontalPadding,
-              minWidth: 0.0,
-              child: new Column(
-                key: _quickSettingsKey,
-                children: <Widget>[
-                  new Divider(
-                    height: 4.0,
-                    color: Colors.grey[300].withOpacity(
-                      _quickSettingsSlideUpProgress,
-                    ),
-                  ),
-                  new Container(
-                    child: nowModel.quickSettings(
-                      opacity: _quickSettingsSlideUpProgress,
-                      onLogoutTapped: widget.onLogoutTapped,
-                      onLogoutLongPressed: widget.onLogoutLongPressed,
-                    ),
-                  ),
-                ],
+          width: _getQuickSettingsBackgroundWidth(
+            sizeModel,
+          ),
+          child: new Column(
+            key: _quickSettingsKey,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              new Divider(
+                height: 4.0,
+                color: Colors.grey[300].withOpacity(
+                  _quickSettingsSlideUpProgress,
+                ),
               ),
-            ),
+              new Container(
+                child: nowModel.quickSettings(
+                  opacity: _quickSettingsSlideUpProgress,
+                  onLogoutTapped: widget.onLogoutTapped,
+                  onLogoutLongPressed: widget.onLogoutLongPressed,
+                ),
+              ),
+            ],
           ),
         ),
       );
 
   Widget _buildMinimizedUserContextTextAndImportantInformation(
+    SizeModel sizeModel,
     NowModel nowModel,
   ) =>
       new Align(
         alignment: FractionalOffset.bottomCenter,
         child: new Container(
-          height: widget.minHeight,
+          height: sizeModel.minimizedNowHeight,
           padding: new EdgeInsets.symmetric(horizontal: 8.0 + _slideInDistance),
           child: new RepaintBoundary(
             child: new ScopedModel<OpacityModel>(
@@ -473,7 +483,8 @@ class NowState extends TickingState<Now> {
         _fadingSpringSimulation.opacity * 0.6 * _slideInProgress;
   }
 
-  Widget _buildMinimizedButtonBarGestureDetector() => new Offstage(
+  Widget _buildMinimizedButtonBarGestureDetector(SizeModel sizeModel) =>
+      new Offstage(
         offstage: _buttonTapDisabled,
         child: new GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -497,7 +508,7 @@ class NowState extends TickingState<Now> {
                 behavior: HitTestBehavior.opaque,
                 onTap: widget.onMinimizedTap,
                 onLongPress: widget.onMinimizedLongPress,
-                child: new Container(width: widget.minHeight * 4.0),
+                child: new Container(width: sizeModel.minimizedNowHeight * 4.0),
               ),
               new Expanded(
                 child: new GestureDetector(
@@ -577,7 +588,6 @@ class NowState extends TickingState<Now> {
       return box.size.height;
     }
 
-    _quickSettingsMaximizedHeight = heightFromKey(_quickSettingsKey);
     _importantInfoMaximizedHeight = heightFromKey(_importantInfoMaximizedKey);
     _userContextTextHeight = heightFromKey(_userContextTextKey);
     _userImageHeight = heightFromKey(_userImageKey);
@@ -621,10 +631,10 @@ class NowState extends TickingState<Now> {
 
   bool get _buttonTapDisabled => _minimizationProgress < 1.0;
 
-  double _getNowHeight(double scrollOffset) => math.max(
-      widget.minHeight,
-      widget.minHeight +
-          ((widget.maxHeight - widget.minHeight) *
+  double _getNowHeight(SizeModel sizeModel, double scrollOffset) => math.max(
+      sizeModel.minimizedNowHeight,
+      sizeModel.minimizedNowHeight +
+          ((sizeModel.maximizedNowHeight - sizeModel.minimizedNowHeight) *
               (1.0 - _minimizationProgress)) +
           _quickSettingsRaiseDistance +
           _getScrollOffsetHeightDelta(scrollOffset));
@@ -634,30 +644,32 @@ class NowState extends TickingState<Now> {
   double get _userImageBorderWidth =>
       lerpDouble(2.0, 6.0, _minimizationProgress);
 
-  double get _userImageTopOffset =>
+  double _getUserImageTopOffset(SizeModel sizeModel) =>
       lerpDouble(100.0, 20.0, _quickSettingsProgress) *
           (1.0 - _minimizationProgress) +
-      ((widget.minHeight - _userImageSize) / 2.0) * _minimizationProgress;
+      ((sizeModel.minimizedNowHeight - _userImageSize) / 2.0) *
+          _minimizationProgress;
 
-  double get _quickSettingsBackgroundTopOffset =>
-      _userImageTopOffset + ((_userImageSize / 2.0) * _quickSettingsProgress);
+  double _getQuickSettingsBackgroundTopOffset(SizeModel sizeModel) =>
+      _getUserImageTopOffset(sizeModel) +
+      ((_userImageSize / 2.0) * _quickSettingsProgress);
 
   double get _quickSettingsBackgroundBorderRadius =>
       lerpDouble(50.0, 4.0, _quickSettingsProgress);
 
-  double get _quickSettingsBackgroundMaximizedWidth =>
-      math.min(_kMaxQuickSettingsBackgroundWidth, widget.parentWidth) -
+  double _getQuickSettingsBackgroundMaximizedWidth(SizeModel sizeModel) =>
+      math.min(_kMaxQuickSettingsBackgroundWidth, sizeModel.screenSize.width) -
       2 * _kQuickSettingsHorizontalPadding;
 
-  double get _quickSettingsBackgroundWidth => lerpDouble(
+  double _getQuickSettingsBackgroundWidth(SizeModel sizeModel) => lerpDouble(
       _userImageSize,
-      _quickSettingsBackgroundMaximizedWidth,
+      _getQuickSettingsBackgroundMaximizedWidth(sizeModel),
       _quickSettingsProgress * (1.0 - _minimizationProgress));
 
-  double get _quickSettingsBackgroundHeight {
+  double _getQuickSettingsBackgroundHeight(SizeModel sizeModel) {
     return lerpDouble(
         _userImageSize,
-        -_userImageTopOffset +
+        -_getUserImageTopOffset(sizeModel) +
             _userImageHeight +
             _userContextTextHeight +
             _importantInfoMaximizedHeight +

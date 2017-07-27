@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/widgets.dart';
 
+import 'size_model.dart';
 import 'suggestion.dart';
 import 'suggestion_list.dart' show OnSuggestionSelected, kAskHeight;
 import 'suggestion_widget.dart';
@@ -47,17 +48,8 @@ typedef void OnInterruptionDismissed(
 
 /// Displays interruptions.
 class InterruptionOverlay extends StatefulWidget {
-  /// The height of the peeking overlay this overlay floats vertically above.
-  final double overlayHeight;
-
   /// Called when an interruption is selected.
   final OnSuggestionSelected onSuggestionSelected;
-
-  /// The width of the suggestion.
-  final double suggestionWidth;
-
-  /// The horizontal margin of the suggestion.
-  final double suggestionHorizontalMargin;
 
   /// Called when an interruption is no longer showing.
   final OnInterruptionDismissed onInterruptionDismissed;
@@ -65,10 +57,7 @@ class InterruptionOverlay extends StatefulWidget {
   /// Constructor.
   InterruptionOverlay({
     Key key,
-    this.overlayHeight,
     this.onSuggestionSelected,
-    this.suggestionWidth,
-    this.suggestionHorizontalMargin,
     this.onInterruptionDismissed,
   })
       : super(key: key);
@@ -147,62 +136,73 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
             double suggestionHeight =
                 _currentInterruption.suggestionLayout.suggestionHeight;
             stackChildren.add(
-              new SimulatedPositioned(
-                key: new ObjectKey(_currentInterruption),
-                initRect: new Rect.fromLTWH(
-                  widget.suggestionHorizontalMargin,
-                  constraints.maxHeight + kAskHeight,
-                  widget.suggestionWidth,
-                  suggestionHeight,
-                ),
-                rect: new Rect.fromLTWH(
-                  widget.suggestionHorizontalMargin,
-                  constraints.maxHeight - _kBottomSpacing - suggestionHeight,
-                  widget.suggestionWidth,
-                  suggestionHeight,
-                ),
-                dragOffsetTransform: (
-                  Offset currentOffset,
-                  DragUpdateDetails details,
-                ) {
-                  Offset newOffset = currentOffset + details.delta;
-                  return new Offset(
-                    details.delta.dx * ((newOffset.dx <= 0.0) ? 1.0 : 0.3),
-                    details.delta.dy *
-                        ((newOffset.dy >= 0.0 &&
-                                newOffset.dy <=
-                                    (kAskHeight +
-                                        _kBottomSpacing +
-                                        suggestionHeight))
-                            ? 1.0
-                            : 0.3),
-                  );
-                },
-                onDragStart: (_) => _stopInterruptionTimer(),
-                onDragEnd: (SimulatedDragEndDetails details) {
-                  if (details.offset.dy > 50.0) {
-                    _removeInterruption(
-                      _RemoveDirection.down,
-                      details.offset,
-                      DismissalReason.snoozed,
-                    );
-                  } else if (details.offset.dx < -100.0) {
-                    _removeInterruption(
-                      _RemoveDirection.left,
-                      details.offset,
-                      DismissalReason.discarded,
-                    );
-                  } else if (_removeImmediatelyOnPanEnd) {
-                    _removeInterruption(
-                      _RemoveDirection.down,
-                      Offset.zero,
-                      DismissalReason.removed,
-                    );
-                    _removeImmediatelyOnPanEnd = false;
-                  } else {
-                    _startInterruptionTimer();
-                  }
-                },
+              new ScopedModelDescendant<SizeModel>(
+                builder: (
+                  BuildContext context,
+                  Widget child,
+                  SizeModel sizeModel,
+                ) =>
+                    new SimulatedPositioned(
+                      key: new ObjectKey(_currentInterruption),
+                      initRect: new Rect.fromLTWH(
+                        sizeModel.interruptionLeftMargin,
+                        constraints.maxHeight + kAskHeight,
+                        sizeModel.suggestionWidth,
+                        suggestionHeight,
+                      ),
+                      rect: new Rect.fromLTWH(
+                        sizeModel.interruptionLeftMargin,
+                        constraints.maxHeight -
+                            _kBottomSpacing -
+                            suggestionHeight,
+                        sizeModel.suggestionWidth,
+                        suggestionHeight,
+                      ),
+                      dragOffsetTransform: (
+                        Offset currentOffset,
+                        DragUpdateDetails details,
+                      ) {
+                        Offset newOffset = currentOffset + details.delta;
+                        return new Offset(
+                          details.delta.dx *
+                              ((newOffset.dx <= 0.0) ? 1.0 : 0.3),
+                          details.delta.dy *
+                              ((newOffset.dy >= 0.0 &&
+                                      newOffset.dy <=
+                                          (kAskHeight +
+                                              _kBottomSpacing +
+                                              suggestionHeight))
+                                  ? 1.0
+                                  : 0.3),
+                        );
+                      },
+                      onDragStart: (_) => _stopInterruptionTimer(),
+                      onDragEnd: (SimulatedDragEndDetails details) {
+                        if (details.offset.dy > 50.0) {
+                          _removeInterruption(
+                            _RemoveDirection.down,
+                            details.offset,
+                            DismissalReason.snoozed,
+                          );
+                        } else if (details.offset.dx < -100.0) {
+                          _removeInterruption(
+                            _RemoveDirection.left,
+                            details.offset,
+                            DismissalReason.discarded,
+                          );
+                        } else if (_removeImmediatelyOnPanEnd) {
+                          _removeInterruption(
+                            _RemoveDirection.down,
+                            Offset.zero,
+                            DismissalReason.removed,
+                          );
+                          _removeImmediatelyOnPanEnd = false;
+                        } else {
+                          _startInterruptionTimer();
+                        }
+                      },
+                      child: child,
+                    ),
                 child: new Align(
                   alignment: FractionalOffset.bottomCenter,
                   child: new _FadeInWidget(
@@ -223,18 +223,9 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
           }
 
           return new Stack(
+            fit: StackFit.expand,
             overflow: Overflow.visible,
-            children: <Widget>[
-              new Positioned.fill(
-                top: -widget.overlayHeight,
-                bottom: widget.overlayHeight,
-                child: new Stack(
-                  fit: StackFit.expand,
-                  overflow: Overflow.visible,
-                  children: stackChildren,
-                ),
-              ),
-            ],
+            children: stackChildren,
           );
         },
       );
@@ -244,6 +235,7 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
     Offset offset,
     DismissalReason reason,
   ) {
+    SizeModel sizeModel = SizeModel.of(context);
     Suggestion interruptionToRemove = _currentInterruption;
     assert(interruptionToRemove != null);
     interruptionToRemove.suggestionLayout.layout(_constraints.maxWidth);
@@ -254,15 +246,15 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
       key: new ObjectKey(interruptionToRemove),
       rect: new Rect.fromLTWH(
         direction == _RemoveDirection.down
-            ? widget.suggestionHorizontalMargin
-            : -widget.suggestionWidth - widget.suggestionHorizontalMargin,
+            ? sizeModel.interruptionLeftMargin
+            : -sizeModel.suggestionWidth - sizeModel.interruptionLeftMargin,
         direction == _RemoveDirection.down
             ? _constraints.maxHeight + kAskHeight
             : _constraints.maxHeight -
                 _kBottomSpacing -
                 suggestionHeight +
                 offset.dy,
-        widget.suggestionWidth,
+        sizeModel.suggestionWidth,
         suggestionHeight,
       ),
       onRectReached: () {

@@ -41,9 +41,6 @@ class StoryList extends StatelessWidget {
   /// focus animation finishes.
   final OnStoryClusterEvent onStoryClusterFocusCompleted;
 
-  /// The amount to shift up the list when at scroll position 0.0.
-  final double bottomPadding;
-
   /// Controls the scrolling of this list.
   final ScrollController scrollController;
 
@@ -64,7 +61,6 @@ class StoryList extends StatelessWidget {
     Key key,
     this.scrollController,
     this.overlayKey,
-    this.bottomPadding,
     this.onScroll,
     this.onStoryClusterFocusStarted,
     this.onStoryClusterFocusCompleted,
@@ -145,7 +141,9 @@ class StoryList extends StatelessWidget {
                                     listHeight: storyModel.listHeight,
                                     scrollOffset:
                                         scrollController?.offset ?? 0.0,
-                                    bottomPadding: bottomPadding,
+                                    bottomPadding:
+                                        sizeModel.maximizedNowHeight +
+                                            sizeModel.minimizedNowHeight,
                                     // When we are dragging, the storyListSize
                                     // takes up the entire screen since the now
                                     // bar is hidden.

@@ -10,6 +10,7 @@ import 'package:lib.widgets/model.dart';
 import 'package:sysui_widgets/ticking_height_state.dart';
 
 import 'peek_model.dart';
+import 'size_model.dart';
 
 const double _kStartOverlayTransitionHeight = 28.0;
 
@@ -30,14 +31,8 @@ class PeekingOverlay extends StatefulWidget {
   /// The height to allow vertical drags to open/close the overlay.
   final double dragHandleHeight;
 
-  /// The overlay's parent's width.
-  final double parentWidth;
-
   /// The widget to display within the overlay.
   final Widget child;
-
-  /// The widget to display above the overlay.
-  final ChildAboveBuilder childAboveBuilder;
 
   /// Called when the overlay is hidden.
   final VoidCallback onHide;
@@ -50,11 +45,9 @@ class PeekingOverlay extends StatefulWidget {
     Key key,
     this.peekHeight: _kStartOverlayTransitionHeight,
     this.dragHandleHeight,
-    this.parentWidth,
     this.onHide,
     this.onShow,
     this.child,
-    this.childAboveBuilder,
   })
       : super(key: key);
 
@@ -160,32 +153,39 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
               right: 0.0,
               bottom: 0.0,
               height: height,
-              child: new OverflowBox(
-                minWidth: widget.parentWidth,
-                maxWidth: widget.parentWidth,
-                minHeight: math.max(height, maxHeight),
-                maxHeight: math.max(height, maxHeight),
-                alignment: FractionalOffset.topCenter,
-                child: new Stack(
-                  fit: StackFit.passthrough,
-                  children: <Widget>[
-                    widget.child,
-                    new Positioned(
-                      top: 0.0,
-                      left: 0.0,
-                      right: 0.0,
-                      height:
-                          hiding ? widget.peekHeight : widget.dragHandleHeight,
-                      child: new GestureDetector(
-                        onVerticalDragUpdate: onVerticalDragUpdate,
-                        onVerticalDragEnd: onVerticalDragEnd,
+              child: new ScopedModelDescendant<SizeModel>(
+                  builder: (
+                    BuildContext context,
+                    Widget child,
+                    SizeModel sizeModel,
+                  ) =>
+                      new OverflowBox(
+                        minWidth: sizeModel.suggestionListWidth,
+                        maxWidth: sizeModel.suggestionListWidth,
+                        minHeight: math.max(height, maxHeight),
+                        maxHeight: math.max(height, maxHeight),
+                        alignment: FractionalOffset.topCenter,
+                        child: child,
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                  child: new Stack(
+                    fit: StackFit.passthrough,
+                    children: <Widget>[
+                      widget.child,
+                      new Positioned(
+                        top: 0.0,
+                        left: 0.0,
+                        right: 0.0,
+                        height: hiding
+                            ? widget.peekHeight
+                            : widget.dragHandleHeight,
+                        child: new GestureDetector(
+                          onVerticalDragUpdate: onVerticalDragUpdate,
+                          onVerticalDragEnd: onVerticalDragEnd,
+                        ),
+                      ),
+                    ],
+                  )),
             ),
-            widget.childAboveBuilder(context, height),
           ],
         ),
       );

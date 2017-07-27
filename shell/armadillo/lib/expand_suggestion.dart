@@ -10,6 +10,7 @@ import 'package:sysui_widgets/rk4_spring_simulation.dart';
 
 import 'elevation_constants.dart';
 import 'selected_suggestion_overlay.dart';
+import 'size_model.dart';
 import 'suggestion.dart';
 import 'suggestion_widget.dart';
 
@@ -23,10 +24,6 @@ const double _kOpacitySimulationTarget = 1000.0;
 /// Expands the [suggestion] to fill the screen (modulo the space for the now
 /// bar at the bottom) and then fades to reveal what's behind.
 class ExpandSuggestion extends ExpansionBehavior {
-  /// The margin to not draw into at the bottom of the parent when filling the
-  /// parent.
-  final double bottomMargin;
-
   /// The suggestion to expand.
   final Suggestion suggestion;
 
@@ -42,7 +39,6 @@ class ExpandSuggestion extends ExpansionBehavior {
 
   /// Constructor.
   ExpandSuggestion({
-    this.bottomMargin,
     this.suggestion,
     this.suggestionInitialGlobalBounds,
     this.onSuggestionExpanded,
@@ -96,43 +92,47 @@ class ExpandSuggestion extends ExpansionBehavior {
   Widget build(BuildContext context, BoxConstraints constraints) {
     RenderBox box = context.findRenderObject();
     Offset topLeft = box.localToGlobal(Offset.zero);
-    return new Stack(
-      fit: StackFit.passthrough,
-      children: <Widget>[
-        new Positioned(
-          left: lerpDouble(
-            suggestionInitialGlobalBounds.left - topLeft.dx,
-            0.0,
-            _expansionProgress,
+    return new ScopedModelDescendant<SizeModel>(
+      builder: (BuildContext context, Widget child, SizeModel sizeModel) =>
+          new Stack(
+            fit: StackFit.passthrough,
+            children: <Widget>[
+              new Positioned(
+                left: lerpDouble(
+                  suggestionInitialGlobalBounds.left - topLeft.dx,
+                  0.0,
+                  _expansionProgress,
+                ),
+                top: lerpDouble(
+                  suggestionInitialGlobalBounds.top - topLeft.dy,
+                  0.0,
+                  _expansionProgress,
+                ),
+                width: lerpDouble(
+                  suggestionInitialGlobalBounds.width,
+                  constraints.maxWidth,
+                  _expansionProgress,
+                ),
+                height: lerpDouble(
+                  suggestionInitialGlobalBounds.height,
+                  constraints.maxHeight - sizeModel.minimizedNowHeight,
+                  _expansionProgress,
+                ),
+                child: child,
+              ),
+            ],
           ),
-          top: lerpDouble(
-            suggestionInitialGlobalBounds.top - topLeft.dy,
-            0.0,
-            _expansionProgress,
-          ),
-          width: lerpDouble(
-            suggestionInitialGlobalBounds.width,
-            constraints.maxWidth,
-            _expansionProgress,
-          ),
-          height: lerpDouble(
-            suggestionInitialGlobalBounds.height,
-            constraints.maxHeight - bottomMargin,
-            _expansionProgress,
-          ),
-          child: new PhysicalModel(
-            color: Colors.white,
-            elevation: Elevations.suggestionExpand,
-            borderRadius: new BorderRadius.circular(
-              lerpDouble(kSuggestionCornerRadius, 0.0, _expansionProgress),
-            ),
-            child: new Opacity(
-              opacity: lerpDouble(1.0, 0.0, _expansionProgress),
-              child: new SuggestionWidget(suggestion: suggestion),
-            ),
-          ),
+      child: new PhysicalModel(
+        color: Colors.white,
+        elevation: Elevations.suggestionExpand,
+        borderRadius: new BorderRadius.circular(
+          lerpDouble(kSuggestionCornerRadius, 0.0, _expansionProgress),
         ),
-      ],
+        child: new Opacity(
+          opacity: lerpDouble(1.0, 0.0, _expansionProgress),
+          child: new SuggestionWidget(suggestion: suggestion),
+        ),
+      ),
     );
   }
 

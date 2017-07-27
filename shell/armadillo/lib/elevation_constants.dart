@@ -7,6 +7,9 @@ class Elevations {
   /// Elevation for the suggestion list overlay
   static const double suggestionList = 410.0;
 
+  /// Elevation for an interruption
+  static const double interruption = 420.0;
+
   /// Elevation for story cluster when it is being dragged
   static const double draggedStoryCluster = 400.0;
 

@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'elevation_constants.dart';
 import 'suggestion.dart';
 import 'suggestion_layout.dart';
 
@@ -78,12 +79,12 @@ class SuggestionWidget extends StatelessWidget {
             width: suggestion.suggestionLayout.suggestionWidth,
             child: new Offstage(
               offstage: !visible,
-              child: new Material(
+              child: new PhysicalModel(
                 color: Colors.white,
                 borderRadius: new BorderRadius.circular(
                   kSuggestionCornerRadius,
                 ),
-                elevation: shadow ? 3.0 : 0.0,
+                elevation: shadow ? Elevations.interruption : 0.0,
                 child: new GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: onSelected,
