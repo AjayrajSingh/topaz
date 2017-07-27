@@ -32,7 +32,7 @@ class RoundedCornerDecoration extends Decoration {
   }) {
     return new DiagnosticsNode.lazy(
       name: name,
-      object: this,
+      value: this,
       description: '',
       style: style,
       emptyBodyDescription: '<no decorations specified>',
