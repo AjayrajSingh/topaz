@@ -21,4 +21,7 @@ class Elevations {
 
   /// Elevation for a story cluster when it is in inline preview mode
   static const double storyClusterInlinePreview = 300.0;
+
+  /// Additional elevation to give a focused story tab
+  static const double focusedStoryTab = 8.0;
 }

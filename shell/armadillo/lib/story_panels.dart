@@ -350,85 +350,98 @@ class StoryPanels extends StatelessWidget {
     double fractionalRightPadding,
     Size currentSize,
     double dragProgress,
-  ) =>
-      story.isPlaceHolder
-          ? isBeingDragged
-              ? Nothing.widget
-              : new PhysicalModel(
-                  elevation: _getElevation(dragProgress),
-                  color: Colors.black,
-                  child: story.builder(context),
-                )
-          : new Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                // The story bar that pushes down the story.
-                new SimulatedPadding(
-                  key: story.storyBarPaddingKey,
-                  fractionalLeftPadding: fractionalLeftPadding,
-                  fractionalRightPadding: fractionalRightPadding,
-                  width: currentSize.width,
-                  child: new GestureDetector(
-                    onTap: () {
-                      storyCluster.focusedStoryId = story.id;
-                      // If we're in tabbed mode we want to jump the newly
-                      // focused story's size to full size instead of animating
-                      // it.
-                      if (storyCluster.displayMode == DisplayMode.tabs) {
-                        storyCluster.stories.forEach((Story story) {
-                          bool storyFocused =
-                              (storyCluster.focusedStoryId == story.id);
-                          story.tabSizerKey.currentState
-                              .jump(heightFactor: storyFocused ? 1.0 : 0.0);
-                          if (storyFocused) {
-                            story.positionedKey.currentState
-                                .jumpFractionalHeight(1.0);
-                          }
-                        });
-                      }
-                    },
-                    child: new ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxHeight: _kStoryBarMaximizedHeight,
-                      ),
-                      child: _getStoryBarDraggableWrapper(
-                        context: context,
+  ) {
+    double storyElevation = _getElevation(dragProgress);
+
+    // Add extra elevation if the given story is a focused tab in the story
+    // cluster with 2 or more stories
+    double storyElevationWithTabs = storyElevation;
+    if (storyCluster.displayMode == DisplayMode.tabs &&
+        storyCluster.stories.length > 1 &&
+        storyCluster.focusedStoryId == story.id) {
+      storyElevationWithTabs += Elevations.focusedStoryTab;
+    }
+
+    return story.isPlaceHolder
+        ? isBeingDragged
+            ? Nothing.widget
+            : new PhysicalModel(
+                // Placeholder elevation should not take tab focus into account
+                elevation: storyElevation,
+                color: Colors.black,
+                child: story.builder(context),
+              )
+        : new Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              // The story bar that pushes down the story.
+              new SimulatedPadding(
+                key: story.storyBarPaddingKey,
+                fractionalLeftPadding: fractionalLeftPadding,
+                fractionalRightPadding: fractionalRightPadding,
+                width: currentSize.width,
+                child: new GestureDetector(
+                  onTap: () {
+                    storyCluster.focusedStoryId = story.id;
+                    // If we're in tabbed mode we want to jump the newly
+                    // focused story's size to full size instead of animating
+                    // it.
+                    if (storyCluster.displayMode == DisplayMode.tabs) {
+                      storyCluster.stories.forEach((Story story) {
+                        bool storyFocused =
+                            (storyCluster.focusedStoryId == story.id);
+                        story.tabSizerKey.currentState
+                            .jump(heightFactor: storyFocused ? 1.0 : 0.0);
+                        if (storyFocused) {
+                          story.positionedKey.currentState
+                              .jumpFractionalHeight(1.0);
+                        }
+                      });
+                    }
+                  },
+                  child: new ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxHeight: _kStoryBarMaximizedHeight,
+                    ),
+                    child: _getStoryBarDraggableWrapper(
+                      context: context,
+                      story: story,
+                      child: new StoryBar(
+                        key: story.storyBarKey,
                         story: story,
-                        child: new StoryBar(
-                          key: story.storyBarKey,
-                          story: story,
-                          minimizedHeight: _kStoryBarMinimizedHeight,
-                          maximizedHeight: _kStoryBarMaximizedHeight,
-                          focused: (storyCluster.displayMode ==
-                                  DisplayMode.panels) ||
-                              (storyCluster.focusedStoryId == story.id),
-                          elevation: _getElevation(dragProgress),
-                        ),
+                        minimizedHeight: _kStoryBarMinimizedHeight,
+                        maximizedHeight: _kStoryBarMaximizedHeight,
+                        focused:
+                            (storyCluster.displayMode == DisplayMode.panels) ||
+                                (storyCluster.focusedStoryId == story.id),
+                        elevation: storyElevationWithTabs,
                       ),
                     ),
                   ),
                 ),
-                // The story itself.
-                new Expanded(
-                  child: new SimulatedFractionallySizedBox(
-                    key: story.tabSizerKey,
-                    alignment: FractionalOffset.topCenter,
-                    heightFactor: (storyCluster.focusedStoryId == story.id ||
-                            storyCluster.displayMode == DisplayMode.panels)
-                        ? 1.0
-                        : 0.0,
-                    child: new Container(
+              ),
+              // The story itself.
+              new Expanded(
+                child: new SimulatedFractionallySizedBox(
+                  key: story.tabSizerKey,
+                  alignment: FractionalOffset.topCenter,
+                  heightFactor: (storyCluster.focusedStoryId == story.id ||
+                          storyCluster.displayMode == DisplayMode.panels)
+                      ? 1.0
+                      : 0.0,
+                  child: new Container(
+                    color: story.themeColor,
+                    child: new PhysicalModel(
                       color: story.themeColor,
-                      child: new PhysicalModel(
-                        color: story.themeColor,
-                        elevation: _getElevation(dragProgress),
-                        child: _getStoryContents(context, story),
-                      ),
+                      elevation: storyElevationWithTabs,
+                      child: _getStoryContents(context, story),
                     ),
                   ),
                 ),
-              ],
-            );
+              ),
+            ],
+          );
+  }
 
   /// The scaled and clipped story.  When full size, the story will
   /// no longer be scaled or clipped.
