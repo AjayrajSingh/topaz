@@ -198,12 +198,13 @@ class _ImagePickerState extends State<ImagePicker>
                   color: Colors.grey[300],
                   size: 100.0,
                 ),
+                new Container(height: 12.0),
                 new Text(
                   _emptyStateMessage,
                   style: new TextStyle(
                     fontSize: 16.0,
                     color: Colors.grey[500],
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
