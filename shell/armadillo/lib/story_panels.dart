@@ -48,9 +48,6 @@ class StoryPanels extends StatelessWidget {
   /// The widgets for this cluster's stories.
   final Map<StoryId, Widget> storyWidgets;
 
-  /// If true, shadows will be painted behind each of the stories.
-  final bool paintShadows;
-
   /// The size the cluster's widget should be.
   final Size currentSize;
 
@@ -64,7 +61,6 @@ class StoryPanels extends StatelessWidget {
     this.focusProgress,
     this.overlayKey,
     this.storyWidgets,
-    this.paintShadows: false,
     this.currentSize,
     this.isBeingDragged: false,
   })

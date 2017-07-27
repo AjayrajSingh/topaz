@@ -277,7 +277,6 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                             focusProgress: 0.0,
                             overlayKey: widget.overlayKey,
                             storyWidgets: widget.storyWidgets,
-                            paintShadows: true,
                             currentSize: panelsCurrentSize,
                             isBeingDragged: true,
                           ),
