@@ -9,7 +9,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'elevation_constants.dart';
+import 'elevations.dart';
 import 'suggestion.dart';
 import 'suggestion_layout.dart';
 import 'suggestion_model.dart';

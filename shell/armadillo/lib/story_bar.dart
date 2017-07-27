@@ -10,6 +10,7 @@ import 'package:sysui_widgets/rk4_spring_simulation.dart';
 import 'package:sysui_widgets/three_column_aligned_layout_delegate.dart';
 import 'package:sysui_widgets/ticking_state.dart';
 
+import 'nothing.dart';
 import 'story.dart';
 import 'story_title.dart';
 
@@ -116,6 +117,7 @@ class StoryBarState extends TickingState<StoryBar> {
                         partMargin: _kPartMargin,
                       ),
                       children: <Widget>[
+                        /// Module icons for the current story.
                         new LayoutId(
                           id: ThreeColumnAlignedLayoutDelegateParts.left,
                           child: new Row(
@@ -132,6 +134,8 @@ class StoryBarState extends TickingState<StoryBar> {
                                 .toList(),
                           ),
                         ),
+
+                        /// Story title.
                         new LayoutId(
                           id: ThreeColumnAlignedLayoutDelegateParts.center,
                           child: new StoryTitle(
@@ -140,20 +144,11 @@ class StoryBarState extends TickingState<StoryBar> {
                             baseColor: _textColor,
                           ),
                         ),
+
+                        /// For future use.
                         new LayoutId(
                           id: ThreeColumnAlignedLayoutDelegateParts.right,
-                          child: new ClipOval(
-                            child: new Container(
-                              foregroundDecoration: new BoxDecoration(
-                                border: new Border.all(
-                                  color: _textColor.withOpacity(_opacity),
-                                  width: 1.0,
-                                ),
-                                shape: BoxShape.circle,
-                              ),
-                              child: widget.story.avatar(context, _opacity),
-                            ),
-                          ),
+                          child: Nothing.widget,
                         ),
                       ],
                     ),

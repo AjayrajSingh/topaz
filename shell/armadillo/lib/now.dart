@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:sysui_widgets/rk4_spring_simulation.dart';
 import 'package:sysui_widgets/ticking_state.dart';
 
+import 'elevations.dart';
 import 'fading_spring_simulation.dart';
 import 'now_model.dart';
 import 'opacity_model.dart';
@@ -380,48 +381,35 @@ class NowState extends TickingState<Now> {
         ],
       );
 
-  Widget _buildUserImage(NowModel nowModel) => new Stack(
-          fit: StackFit.passthrough,
-          key: _userImageKey,
-          children: <Widget>[
-            // Shadow.
-            new Opacity(
-              opacity: _quickSettingsProgress,
-              child: new Container(
-                width: _userImageSize,
-                height: _userImageSize,
-                decoration: new BoxDecoration(
-                  boxShadow: kElevationToShadow[12],
-                  shape: BoxShape.circle,
-                ),
+  Widget _buildUserImage(NowModel nowModel) => new GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          if (!_revealingQuickSettings) {
+            showQuickSettings();
+          } else {
+            hideQuickSettings();
+          }
+        },
+        child: new PhysicalModel(
+          color: Colors.transparent,
+          shape: BoxShape.circle,
+          elevation:
+              _quickSettingsProgress * Elevations.nowUserQuickSettingsOpen,
+          child: new Container(
+            key: _userImageKey,
+            width: _userImageSize,
+            height: _userImageSize,
+            foregroundDecoration: new BoxDecoration(
+              border: new Border.all(
+                color: new Color(0xFFFFFFFF),
+                width: _userImageBorderWidth,
               ),
+              shape: BoxShape.circle,
             ),
-            // The actual user image.
-            new ClipOval(
-              child: new GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  if (!_revealingQuickSettings) {
-                    showQuickSettings();
-                  } else {
-                    hideQuickSettings();
-                  }
-                },
-                child: new Container(
-                  width: _userImageSize,
-                  height: _userImageSize,
-                  foregroundDecoration: new BoxDecoration(
-                    border: new Border.all(
-                      color: new Color(0xFFFFFFFF),
-                      width: _userImageBorderWidth,
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: nowModel.user,
-                ),
-              ),
-            ),
-          ]);
+            child: nowModel.user,
+          ),
+        ),
+      );
 
   Widget _buildQuickSettings(SizeModel sizeModel, NowModel nowModel) =>
       new Padding(

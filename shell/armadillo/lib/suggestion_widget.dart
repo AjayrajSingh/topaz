@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'elevation_constants.dart';
+import 'elevations.dart';
 import 'suggestion.dart';
 import 'suggestion_layout.dart';
 

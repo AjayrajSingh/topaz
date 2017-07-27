@@ -27,4 +27,7 @@ class Elevations {
 
   /// Additional elevation to give a focused story tab
   static const double focusedStoryTab = 8.0;
+
+  /// THe elevation of Now's user when quick settings are open
+  static const double nowUserQuickSettingsOpen = 3.0;
 }

@@ -13,7 +13,7 @@ export 'package:lib.widgets/model.dart'
 const String _kBackgroundImage = 'packages/armadillo/res/Background.jpg';
 
 /// Provides assets and text based on context.
-class ContextModel extends Model {
+abstract class ContextModel extends Model {
   final TimeStringer _timeStringer = new TimeStringer();
 
   /// The current background image to use.
@@ -37,10 +37,10 @@ class ContextModel extends Model {
   String get dateOnly => _timeStringer.dateOnly;
 
   /// The user's name.
-  String get userName => 'Jane Doe';
+  String get userName;
 
   /// The user's image url.
-  String get userImageUrl => 'packages/armadillo/res/User.png';
+  String get userImageUrl;
 
   @override
   void addListener(VoidCallback listener) {

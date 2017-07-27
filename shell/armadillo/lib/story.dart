@@ -33,9 +33,6 @@ class Story {
   /// The icons indicating the source of the story.
   final List<OpacityBuilder> icons;
 
-  /// The image of the user this story belongs to.
-  final OpacityBuilder avatar;
-
   /// The title of the story.
   final String title;
 
@@ -96,7 +93,6 @@ class Story {
     this.builder,
     this.title: '',
     this.icons: const <OpacityBuilder>[],
-    this.avatar,
     this.lastInteraction,
     this.cumulativeInteractionDuration,
     this.themeColor,

@@ -22,7 +22,6 @@ import 'hit_test_model.dart';
 import 'story_importance_watcher_impl.dart';
 import 'story_provider_watcher_impl.dart';
 
-const String _kUserImage = 'packages/armadillo/res/User.png';
 const int _kMaxActiveClusters = 6;
 
 /// Creates a list of stories for the StoryList using
@@ -275,10 +274,6 @@ class StoryProviderStoryGenerator extends StoryGenerator {
         // TODO(apwilson): Improve title.
         title: storyTitle,
         icons: <OpacityBuilder>[],
-        avatar: (_, double opacity) => new Opacity(
-              opacity: opacity,
-              child: new Image.asset(_kUserImage, fit: BoxFit.cover),
-            ),
         lastInteraction: new DateTime.fromMicrosecondsSinceEpoch(
           (storyInfo.lastFocusTime / 1000).round(),
         ),

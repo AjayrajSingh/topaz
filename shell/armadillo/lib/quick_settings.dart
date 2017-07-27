@@ -11,7 +11,7 @@ import 'package:sysui_widgets/icon_slider.dart';
 import 'package:sysui_widgets/rk4_spring_simulation.dart';
 import 'package:sysui_widgets/ticking_state.dart';
 
-import 'elevation_constants.dart';
+import 'elevations.dart';
 import 'size_model.dart';
 import 'toggle_icon.dart';
 import 'volume_model.dart';

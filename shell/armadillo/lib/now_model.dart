@@ -49,22 +49,10 @@ class NowModel extends Model {
           Widget child,
           ContextModel contextModel,
         ) =>
-            contextModel.userName?.isEmpty ?? true
-                ? new Offstage()
-                : new Alphatar.fromName(
-                    avatarImage: contextModel.userImageUrl == null
-                        ? null
-                        : contextModel.userImageUrl.startsWith('http')
-                            ? new Image.network(
-                                _getImageUrl(contextModel.userImageUrl),
-                                fit: BoxFit.cover,
-                              )
-                            : new Image.asset(
-                                contextModel.userImageUrl,
-                                fit: BoxFit.cover,
-                              ),
-                    name: contextModel.userName,
-                  ),
+            new Alphatar.fromNameAndUrl(
+              avatarUrl: _getImageUrl(contextModel.userImageUrl) ?? '',
+              name: contextModel.userName ?? '',
+            ),
       );
 
   String _getImageUrl(String userImageUrl) {

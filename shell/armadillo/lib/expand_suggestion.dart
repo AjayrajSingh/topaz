@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sysui_widgets/rk4_spring_simulation.dart';
 
-import 'elevation_constants.dart';
+import 'elevations.dart';
 import 'selected_suggestion_overlay.dart';
 import 'size_model.dart';
 import 'suggestion.dart';
