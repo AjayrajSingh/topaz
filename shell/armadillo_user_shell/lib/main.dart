@@ -46,6 +46,8 @@ import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
 
+const double _kStoryBarMaximizedHeight = 32.0;
+
 /// Set to true to enable the performance overlay.
 const bool _kShowPerformanceOverlay = false;
 
@@ -180,7 +182,14 @@ Future<Null> main() async {
   );
 
   SizeModel sizeModel = new SizeModel();
-  sizeModel.addListener(() => storyModel.updateLayouts(sizeModel.screenSize));
+  sizeModel.addListener(
+    () => storyModel.updateLayouts(
+          new Size(
+            sizeModel.storySize.width,
+            sizeModel.storySize.height - _kStoryBarMaximizedHeight,
+          ),
+        ),
+  );
   sizeModel.screenSize = ui.window.physicalSize / ui.window.devicePixelRatio;
 
   Widget app = new ScopedModel<StoryDragTransitionModel>(
