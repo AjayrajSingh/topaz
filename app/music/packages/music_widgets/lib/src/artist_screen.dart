@@ -125,41 +125,29 @@ class ArtistScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAlbumList(Color highlightColor) {
-    return new Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-      child: new Column(
-        mainAxisSize: MainAxisSize.min,
-        children: albums
-            .map((Album album) => new Container(
-                  padding: const EdgeInsets.only(bottom: 32.0),
-                  child: new InlineAlbum(
-                    album: album,
-                    currentTrack: currentTrack,
-                    highlightColor: highlightColor,
-                    onTapTrack: onTapTrack,
-                    onTapAlbum: onTapAblum,
-                  ),
-                ))
-            .toList(),
-      ),
-    );
-  }
+  List<Widget> _buildChildren(Color highlightColor) {
+    if (artist != null && albums != null) {
+      List<Widget> bodyChildren = albums
+          .map((Album album) => new Container(
+                padding: const EdgeInsets.only(bottom: 32.0),
+                child: new InlineAlbum(
+                  album: album,
+                  currentTrack: currentTrack,
+                  highlightColor: highlightColor,
+                  onTapTrack: onTapTrack,
+                  onTapAlbum: onTapAblum,
+                ),
+              ))
+          .toList();
 
-  Widget _buildBody(Color highlightColor) {
-    List<Widget> bodyChildren = <Widget>[
-      _buildAlbumList(highlightColor),
-    ];
+      if (relatedArtists != null && relatedArtists.isNotEmpty) {
+        bodyChildren.add(_buildRelatedArtists());
+      }
 
-    if (relatedArtists != null && relatedArtists.isNotEmpty) {
-      bodyChildren.add(_buildRelatedArtists());
+      return bodyChildren;
+    } else {
+      return <Widget>[];
     }
-
-    return new Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: bodyChildren,
-    );
   }
 
   Widget _buildRelatedArtists() {
@@ -211,10 +199,7 @@ class ArtistScreen extends StatelessWidget {
         context,
         (_) => new TrackArt(artworkUrl: artist.defaultArtworkUrl),
       ),
-      body: _conditionalBuilder(
-        context,
-        (_) => _buildBody(_highlightColor),
-      ),
+      children: _buildChildren(_highlightColor),
       loadingStatus: loadingStatus,
     );
   }

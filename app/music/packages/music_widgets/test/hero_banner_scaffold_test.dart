@@ -15,7 +15,7 @@ void main() {
       child: new HeroBannerScaffold(
         loadingStatus: LoadingStatus.inProgress,
         heroBanner: new Container(key: heroBannerKey),
-        body: new Container(key: bodyKey),
+        children: <Widget>[new Container(key: bodyKey)],
         heroImage: new Container(key: heroImageKey),
       ),
     ));
@@ -34,7 +34,7 @@ void main() {
       child: new HeroBannerScaffold(
         loadingStatus: LoadingStatus.failed,
         heroBanner: new Container(key: heroBannerKey),
-        body: new Container(key: bodyKey),
+        children: <Widget>[new Container(key: bodyKey)],
         heroImage: new Container(key: heroImageKey),
       ),
     ));
@@ -56,7 +56,7 @@ void main() {
       child: new HeroBannerScaffold(
         loadingStatus: LoadingStatus.completed,
         heroBanner: new Container(key: heroBannerKey),
-        body: new Container(key: bodyKey),
+        children: <Widget>[new Container(key: bodyKey)],
         heroImage: new Container(key: heroImageKey),
       ),
     ));

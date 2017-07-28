@@ -61,8 +61,8 @@ class HeroBannerScaffold extends StatelessWidget {
   /// Child Widget (content) that goes inside the hero image section
   final Widget heroImage;
 
-  /// Child Widget (content) that goes inside the main body section
-  final Widget body;
+  /// List of widgets that goes inside the main content area
+  final List<Widget> children;
 
   /// Loading Status of the content for this scaffold
   final LoadingStatus loadingStatus;
@@ -75,9 +75,23 @@ class HeroBannerScaffold extends StatelessWidget {
     this.loadingStatus: LoadingStatus.completed,
     this.heroBanner,
     this.heroImage,
-    this.body,
+    this.children,
   })
       : super(key: key);
+
+  Widget _buildHeader(Color backgroundColor) {
+    return new Stack(
+      fit: StackFit.passthrough,
+      children: <Widget>[
+        _buildHeroBanner(backgroundColor),
+        _buildHeroImage(),
+        new Align(
+          alignment: FractionalOffset.bottomCenter,
+          child: _buildHeroSpacer(),
+        )
+      ],
+    );
+  }
 
   Widget _buildHeroBanner(Color backgroundColor) {
     return new Container(
@@ -128,20 +142,46 @@ class HeroBannerScaffold extends StatelessWidget {
     );
   }
 
-  Widget _buildBody() {
-    Widget child;
+  Widget _buildHeroSpacer() {
+    return new Container(
+      padding: const EdgeInsets.only(top: _kHeroBannerHeight),
+      child: new Material(
+        elevation: 4.0,
+        color: Colors.white,
+        child: new Container(
+          constraints: new BoxConstraints(
+            maxWidth: _kBodyMaxWidth,
+          ),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: new BorderSide(color: Colors.grey[200]),
+            ),
+          ),
+          height: _kHeroBannerBackgroundOverflow,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    List<Widget> listChildren = <Widget>[
+      _buildHeader(heroBannerBackgroundColor ?? theme.primaryColor),
+    ];
+
     switch (loadingStatus) {
       case LoadingStatus.inProgress:
-        child = new Center(
+        listChildren.add(new Center(
           child: new Container(
             width: 40.0,
             height: 40.0,
             child: new FuchsiaSpinner(),
           ),
-        );
+        ));
         break;
       case LoadingStatus.failed:
-        child = new Center(
+        listChildren.add(new Center(
           child: new Column(
             children: <Widget>[
               new Container(
@@ -161,71 +201,32 @@ class HeroBannerScaffold extends StatelessWidget {
               ),
             ],
           ),
-        );
+        ));
         break;
       case LoadingStatus.completed:
-        child = body ?? new Container();
-        break;
-    }
-    return new Container(
-      margin: const EdgeInsets.only(
-        top: _kHeroBannerHeight,
-        bottom: 32.0,
-      ),
-      constraints: new BoxConstraints(minHeight: _kMinBodyHeight),
-      alignment: FractionalOffset.topCenter,
-      child: new Material(
-        elevation: 4.0,
-        type: MaterialType.card,
-        color: Colors.white,
-        child: new Container(
-          constraints: new BoxConstraints(
-            maxWidth: _kBodyMaxWidth,
-          ),
-          child: new Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              new Container(
-                height: _kHeroBannerBackgroundOverflow,
-                decoration: new BoxDecoration(
-                  border: new Border(
-                      bottom: new BorderSide(
-                    color: Colors.grey[300],
-                  )),
-                ),
-              ),
-              new Container(
+        listChildren.addAll(children.map((Widget child) {
+          return new Align(
+            alignment: FractionalOffset.topCenter,
+            child: new Material(
+              elevation: 4.0,
+              color: Colors.white,
+              child: new Container(
                 constraints: new BoxConstraints(
-                  minHeight: _kMinBodyHeight,
+                  maxWidth: _kBodyMaxWidth,
                 ),
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: child,
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+            ),
+          );
+        }));
+        break;
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
     return new Container(
       color: backgroundColor ?? _kDefaultBackgroundColor,
-      child: new Stack(
-        fit: StackFit.passthrough,
-        children: <Widget>[
-          new Positioned(
-            top: 0.0,
-            left: 0.0,
-            right: 0.0,
-            child: _buildHeroBanner(
-              heroBannerBackgroundColor ?? theme.primaryColor,
-            ),
-          ),
-          _buildBody(),
-          _buildHeroImage(),
-        ],
+      child: new ListView(
+        children: listChildren,
       ),
     );
   }

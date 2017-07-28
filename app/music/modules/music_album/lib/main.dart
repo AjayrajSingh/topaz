@@ -33,20 +33,17 @@ Future<Null> main() async {
     moduleModel: albumModuleModel,
     child: new Scaffold(
       backgroundColor: Colors.grey[300],
-      body: new SingleChildScrollView(
-        controller: new ScrollController(),
-        child: new ScopedModelDescendant<AlbumModuleModel>(builder: (
-          _,
-          __,
-          AlbumModuleModel model,
-        ) {
-          return new AlbumScreen(
-            album: model.album,
-            loadingStatus: model.loadingStatus,
-            // TODO(dayang@): hook up other actions to real stuff
-          );
-        }),
-      ),
+      body: new ScopedModelDescendant<AlbumModuleModel>(builder: (
+        _,
+        __,
+        AlbumModuleModel model,
+      ) {
+        return new AlbumScreen(
+          album: model.album,
+          loadingStatus: model.loadingStatus,
+          // TODO(dayang@): hook up other actions to real stuff
+        );
+      }),
     ),
   );
 

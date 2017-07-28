@@ -28,17 +28,15 @@ class ArtistModuleScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             new Expanded(
-              child: new SingleChildScrollView(
-                child: new ArtistScreen(
-                  artist: model.artist,
-                  albums: model.albums,
-                  relatedArtists: model.relatedArtists,
-                  loadingStatus: model.loadingStatus,
-                  onTapArtist: (Artist artist) => model.goToArtist(artist.id),
-                  onTapAblum: (Album album) => model.goToAlbum(album.id),
-                  onTapTrack: (Track track, Album album) =>
-                      model.playTrack(track, album),
-                ),
+              child: new ArtistScreen(
+                artist: model.artist,
+                albums: model.albums,
+                relatedArtists: model.relatedArtists,
+                loadingStatus: model.loadingStatus,
+                onTapArtist: (Artist artist) => model.goToArtist(artist.id),
+                onTapAblum: (Album album) => model.goToAlbum(album.id),
+                onTapTrack: (Track track, Album album) =>
+                    model.playTrack(track, album),
               ),
             ),
             // Hack(dayang@): Embedding the Playback Module for now until this

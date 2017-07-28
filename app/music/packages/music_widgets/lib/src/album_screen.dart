@@ -126,10 +126,9 @@ class AlbumScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTrackList(Color highlightColor) {
-    return new Column(
-      mainAxisSize: MainAxisSize.min,
-      children: album.tracks
+  List<Widget> _buildTrackList(Color highlightColor) {
+    if (album != null) {
+      return album.tracks
           .map((Track track) => new Container(
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: new TrackListItem(
@@ -140,8 +139,10 @@ class AlbumScreen extends StatelessWidget {
                   showArtist: album.albumType != 'album',
                 ),
               ))
-          .toList(),
-    );
+          .toList();
+    } else {
+      return null;
+    }
   }
 
   /// Builds the given child widget if the album is not null
@@ -167,10 +168,7 @@ class AlbumScreen extends StatelessWidget {
         context,
         (_) => new TrackArt(artworkUrl: album.defaultArtworkUrl),
       ),
-      body: _conditionalBuilder(
-        context,
-        (_) => _buildTrackList(_highlightColor),
-      ),
+      children: _buildTrackList(_highlightColor),
       loadingStatus: loadingStatus,
     );
   }
