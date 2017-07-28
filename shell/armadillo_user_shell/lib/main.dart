@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.media.lib.dart/audio_policy.dart';
@@ -13,7 +14,6 @@ import 'package:armadillo/context_model.dart';
 import 'package:armadillo/debug_enabler.dart';
 import 'package:armadillo/debug_model.dart';
 import 'package:armadillo/interruption_overlay.dart';
-import 'package:armadillo/nothing.dart';
 import 'package:armadillo/now_model.dart';
 import 'package:armadillo/panel_resizing_model.dart';
 import 'package:armadillo/peek_model.dart';
@@ -181,6 +181,7 @@ Future<Null> main() async {
 
   SizeModel sizeModel = new SizeModel();
   sizeModel.addListener(() => storyModel.updateLayouts(sizeModel.screenSize));
+  sizeModel.screenSize = ui.window.physicalSize / ui.window.devicePixelRatio;
 
   Widget app = new ScopedModel<StoryDragTransitionModel>(
     model: storyDragTransitionModel,
@@ -251,17 +252,11 @@ Future<Null> main() async {
 
   runApp(
     new WindowMediaQuery(
-      child: new Stack(children: <Widget>[
-        new LayoutBuilder(builder: (
-          BuildContext context,
-          BoxConstraints constraints,
-        ) {
-          // Update size of the entire screen
-          sizeModel.screenSize = constraints.biggest;
-          return Nothing.widget;
-        }),
-        new CheckedModeBanner(child: userShellWidget),
-      ]),
+      onWindowMetricsChanged: () {
+        sizeModel.screenSize =
+            ui.window.physicalSize / ui.window.devicePixelRatio;
+      },
+      child: new CheckedModeBanner(child: userShellWidget),
     ),
   );
 
