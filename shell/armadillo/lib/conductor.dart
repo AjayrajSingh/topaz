@@ -13,7 +13,6 @@ import 'edge_scroll_drag_target.dart';
 import 'expand_suggestion.dart';
 import 'interruption_overlay.dart';
 import 'quick_settings.dart';
-import 'nothing.dart';
 import 'now.dart';
 import 'now_model.dart';
 import 'peek_model.dart';
@@ -211,25 +210,6 @@ class ConductorState extends State<Conductor> {
                 key: _edgeScrollDragTargetKey,
                 scrollController: _scrollController,
               ),
-            ),
-
-            // This layout builder tracks the size available for the
-            // suggestion overlay and sets its maxHeight appropriately.
-            // TODO(apwilson): refactor this to not be so weird.
-            new LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                double targetMaxHeight = 0.8 * constraints.maxHeight;
-                if (_suggestionOverlayKey.currentState.maxHeight !=
-                        targetMaxHeight &&
-                    targetMaxHeight != 0.0) {
-                  _suggestionOverlayKey.currentState.maxHeight =
-                      targetMaxHeight;
-                  if (!_suggestionOverlayKey.currentState.hiding) {
-                    _suggestionOverlayKey.currentState.show();
-                  }
-                }
-                return Nothing.widget;
-              },
             ),
           ],
         ),

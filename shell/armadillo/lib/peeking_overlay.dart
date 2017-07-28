@@ -134,13 +134,8 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
           return child;
         },
         child: new Stack(
-          fit: StackFit.passthrough,
+          fit: StackFit.expand,
           children: <Widget>[
-            new IgnorePointer(
-              child: new Container(
-                color: _overlayBackgroundColor,
-              ),
-            ),
             new Offstage(
               offstage: hiding,
               child: new Listener(
@@ -158,15 +153,26 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
                     BuildContext context,
                     Widget child,
                     SizeModel sizeModel,
-                  ) =>
-                      new OverflowBox(
-                        minWidth: sizeModel.suggestionListWidth,
-                        maxWidth: sizeModel.suggestionListWidth,
-                        minHeight: math.max(height, maxHeight),
-                        maxHeight: math.max(height, maxHeight),
-                        alignment: FractionalOffset.topCenter,
-                        child: child,
-                      ),
+                  ) {
+                    // Set maxHeight appropriately.
+                    double targetMaxHeight = 0.8 * sizeModel.screenSize.height;
+                    if (maxHeight != targetMaxHeight &&
+                        targetMaxHeight != 0.0) {
+                      maxHeight = targetMaxHeight;
+                      if (!hiding) {
+                        show();
+                      }
+                    }
+
+                    return new OverflowBox(
+                      minWidth: sizeModel.suggestionListWidth,
+                      maxWidth: sizeModel.suggestionListWidth,
+                      minHeight: math.max(height, maxHeight),
+                      maxHeight: math.max(height, maxHeight),
+                      alignment: FractionalOffset.topCenter,
+                      child: child,
+                    );
+                  },
                   child: new Stack(
                     fit: StackFit.passthrough,
                     children: <Widget>[
@@ -189,12 +195,4 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
           ],
         ),
       );
-
-  double get _openingProgress => (height > widget.peekHeight
-      ? math.min(
-          1.0, (height - widget.peekHeight) / (maxHeight - widget.peekHeight))
-      : 0.0);
-
-  Color get _overlayBackgroundColor =>
-      new Color(((0xD9 * _openingProgress).round() << 24) + 0x00000000);
 }
