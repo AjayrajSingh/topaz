@@ -7,9 +7,9 @@ import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:lib.widgets/widgets.dart';
 
 import '../modular/module_model.dart';
+import 'loading.dart';
 
 /// The video screen for the video player
 class Screen extends StatefulWidget {
@@ -153,7 +153,7 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
                     child: new ChildView(connection: model.videoViewConnection),
                   ),
                 )
-              : new FuchsiaSpinner(),
+              : new Loading(remoteDeviceName: model.remoteDeviceName),
         ),
       );
     });

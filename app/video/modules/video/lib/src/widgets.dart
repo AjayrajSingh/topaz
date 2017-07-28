@@ -4,6 +4,7 @@
 
 export 'widgets/asset.dart';
 export 'widgets/device_chooser.dart';
+export 'widgets/loading.dart';
 export 'widgets/play_controls.dart';
 export 'widgets/player.dart';
 export 'widgets/remote_control.dart';

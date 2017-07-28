@@ -26,6 +26,51 @@ class Player extends StatelessWidget {
     padding: 0.0,
   );
 
+  Widget _buildRetry(VideoModuleModel model) {
+    return new AnimatedCrossFade(
+      duration: kPlayControlsAnimationTime,
+      firstChild: new Center(
+        child: new Container(
+          decoration: new BoxDecoration(
+            borderRadius: new BorderRadius.circular(3.0),
+            color: Colors.black,
+          ),
+          padding: new EdgeInsets.all(16.0),
+          child: new Row(
+            children: <Widget>[
+              new Text(
+                'UNABLE TO CAST',
+                style: new TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.grey[50],
+                  letterSpacing: 0.02,
+                ),
+              ),
+              new GestureDetector(
+                onTap: () => model.playRemote(model.remoteDeviceName),
+                child: new Padding(
+                  padding: new EdgeInsets.only(left: 32.0),
+                  child: new Text(
+                    'RETRY',
+                    style: new TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.blue,
+                      letterSpacing: 0.02,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      secondChild: new Container(),
+      crossFadeState: model.failedCast
+          ? CrossFadeState.showFirst
+          : CrossFadeState.showSecond,
+    );
+  }
+
   Widget _buildPlayerMode(VideoModuleModel model, bool smallScreen) {
     switch (model.displayMode) {
       case DisplayMode.remoteControl:
@@ -45,19 +90,38 @@ class Player extends StatelessWidget {
           asset: model.asset,
         );
       case DisplayMode.localSmall:
-        return new Column(
+        return new Stack(
           children: <Widget>[
-            _deviceChooser,
-            new Expanded(
-              child: new Stack(
-                fit: StackFit.passthrough,
-                children: <Widget>[
-                  _screen,
-                  model.showControlOverlay ? _playControls : new Container(),
-                ],
+            new Column(
+              children: <Widget>[
+                _deviceChooser,
+                new Expanded(
+                  child: new Stack(
+                    fit: StackFit.passthrough,
+                    children: <Widget>[
+                      _screen,
+                      model.showControlOverlay
+                          ? _playControls
+                          : new Container(),
+                    ],
+                  ),
+                ),
+                new Scrubber(),
+              ],
+            ),
+            // TODO(maryxia) SO-609: transparency with PhysicalModel
+            new Positioned(
+              bottom: 40.0,
+              right: 48.0,
+              child: new PhysicalModel(
+                elevation: 2.0,
+                color: Colors.black,
+                child: new Offstage(
+                  offstage: !model.failedCast,
+                  child: _buildRetry(model),
+                ),
               ),
             ),
-            new Scrubber(),
           ],
         );
       case DisplayMode.localLarge:
@@ -75,7 +139,7 @@ class Player extends StatelessWidget {
                   child: _screen,
                 ),
                 new AnimatedCrossFade(
-                    duration: kAnimationTime,
+                    duration: kPlayControlsAnimationTime,
                     firstChild: new Padding(
                       // height of play controls + Slider._kReactionRadius
                       padding: new EdgeInsets.only(bottom: 86.0),
@@ -92,6 +156,19 @@ class Player extends StatelessWidget {
               left: 0.0,
               right: 0.0,
               child: new Scrubber(),
+            ),
+            // TODO(maryxia) SO-609: transparency with PhysicalModel
+            new Positioned(
+              bottom: 100.0,
+              right: 48.0,
+              child: new PhysicalModel(
+                elevation: 2.0,
+                color: Colors.black,
+                child: new Offstage(
+                  offstage: !model.failedCast,
+                  child: _buildRetry(model),
+                ),
+              ),
             ),
           ],
         );

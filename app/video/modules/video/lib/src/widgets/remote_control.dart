@@ -51,8 +51,8 @@ class RemoteControl extends StatelessWidget {
       child: new Column(
         children: <Widget>[
           new Padding(
-            padding: new EdgeInsets.symmetric(
-                vertical: this.smallScreen ? 0.0 : 8.0),
+            padding:
+                new EdgeInsets.symmetric(vertical: smallScreen ? 0.0 : 8.0),
             child: new Text(
               asset.title,
               style: new TextStyle(
@@ -66,7 +66,7 @@ class RemoteControl extends StatelessWidget {
             width: 400.0,
             padding: new EdgeInsets.only(bottom: 4.0),
             child: new Text(
-              this.smallScreen ? '' : asset.description,
+              smallScreen ? '' : asset.description,
               textAlign: TextAlign.center,
               style: new TextStyle(
                 color: Colors.grey[500],
@@ -137,7 +137,7 @@ class RemoteControl extends StatelessWidget {
           child: videoText,
         ),
         new Expanded(
-          flex: this.smallScreen ? 5 : 2,
+          flex: smallScreen ? 5 : 2,
           child: new Scrubber(),
         ),
       ],

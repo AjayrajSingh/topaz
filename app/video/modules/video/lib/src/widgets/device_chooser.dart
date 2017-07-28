@@ -49,17 +49,28 @@ class DeviceChooser extends StatelessWidget {
     model.refreshRemoteDevices();
     List<Widget> dropTargets = <Widget>[];
     if (model.activeDevices.isEmpty) {
-      dropTargets.add(new Container(
-        padding: new EdgeInsets.only(top: 32.0),
-        child: new Text(
-          'No devices detected',
-          style: new TextStyle(
-            color: Colors.grey[50],
-            fontSize: 24.0,
-            letterSpacing: 0.02,
+      dropTargets.add(
+        new Container(
+          child: new Column(
+            children: <Widget>[
+              new Padding(
+                padding: new EdgeInsets.only(top: 40.0, bottom: 10.0),
+                child: new Icon(
+                  Icons.error,
+                  size: 64.0,
+                  color: Colors.grey[500],
+                ),
+              ),
+              new Text(
+                'NO DEVICES FOUND',
+                style: new TextStyle(
+                  color: Colors.grey[500],
+                ),
+              ),
+            ],
           ),
         ),
-      ));
+      );
     } else {
       for (String deviceName in model.activeDevices) {
         String displayName = model.getDisplayName(deviceName);

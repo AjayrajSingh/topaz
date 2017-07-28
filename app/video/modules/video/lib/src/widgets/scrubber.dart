@@ -11,7 +11,7 @@ import '../widgets.dart';
 const double _kZoomTimeInMicroseconds = 3000000.0;
 
 /// Duration to animate play controls showing/hiding
-const Duration kAnimationTime = const Duration(milliseconds: 200);
+const Duration kPlayControlsAnimationTime = const Duration(milliseconds: 200);
 
 /// The time slider/scrubber for the video player
 class Scrubber extends StatelessWidget {
@@ -109,7 +109,7 @@ class Scrubber extends StatelessWidget {
         );
       case DisplayMode.localSmall:
         return new AnimatedCrossFade(
-          duration: kAnimationTime,
+          duration: kPlayControlsAnimationTime,
           firstChild: new Row(
             children: <Widget>[
               _buildTimestamp(model.progress, DisplayMode.localSmall),
@@ -127,7 +127,7 @@ class Scrubber extends StatelessWidget {
       case DisplayMode.localLarge:
       default:
         return new AnimatedCrossFade(
-          duration: kAnimationTime,
+          duration: kPlayControlsAnimationTime,
           firstChild: new Stack(
             children: <Widget>[
               _buildProgress(model),

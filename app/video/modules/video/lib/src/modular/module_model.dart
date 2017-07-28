@@ -9,6 +9,7 @@ import 'dart:convert' show JSON;
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.media.lib.flutter/media_player_controller.dart';
+import 'package:apps.media.services/problem.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.user/device_map.fidl.dart';
@@ -20,6 +21,7 @@ import 'package:lib.widgets/modular.dart';
 import '../widgets.dart';
 
 const Duration _kOverlayAutoHideDuration = const Duration(seconds: 3);
+const Duration _kLoadingDuration = const Duration(seconds: 2);
 const Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
 const String _kServiceName = 'fling';
 const String _kRemoteDisplayMode = 'remoteDisplayMode';
@@ -47,7 +49,7 @@ const DisplayMode _defaultDisplayMode = DisplayMode.localLarge;
 
 final Asset _defaultAsset = new Asset.movie(
   uri: Uri.parse(
-      'https://storage-download.googleapis.com/fuchsia/assets/video/151f74055baf7146586f6f0e7a2f3d2cd110d2cf'),
+      'https://storage.googleapis.com/fuchsia/assets/video/c8828ac5183b31f29535da61eb5f404801882320'),
   title: 'Discover Tahiti',
   description:
       'Take a trip and experience the ultimate island fantasy, Vahine Island in Tahiti.',
@@ -59,13 +61,15 @@ final Asset _defaultAsset = new Asset.movie(
 class VideoModuleModel extends ModuleModel {
   Timer _hideTimer;
   Timer _progressTimer;
-  String _remoteDeviceName;
+  Timer _errorTimer;
+  String _remoteDeviceName = 'REMOTE DEVICE';
   String _castingDeviceName;
   DeviceMapEntry _currentDevice;
   MediaPlayerController _controller;
   bool _wasPlaying = false;
   bool _locallyControlled = false;
   bool _showControlOverlay = true;
+  bool _failedCast = false;
   final NetConnectorProxy _netConnector = new NetConnectorProxy();
   final DeviceMapProxy _deviceMap = new DeviceMapProxy();
   Asset _asset = _defaultAsset;
@@ -152,6 +156,9 @@ class VideoModuleModel extends ModuleModel {
       notifyListeners();
     }
   }
+
+  /// Returns true when casting to remote device has failed
+  bool get failedCast => _failedCast;
 
   /// Returns name of remote device that media player is controlling
   String get remoteDeviceName => _remoteDeviceName;
@@ -279,7 +286,6 @@ class VideoModuleModel extends ModuleModel {
         _kCastingDeviceName: _currentDevice.name,
       };
       _remoteDeviceLink.set(null, JSON.encode(jsonObject));
-      _remoteDeviceName = null;
       brieflyShowControlOverlay();
       play();
     }
@@ -341,6 +347,7 @@ class VideoModuleModel extends ModuleModel {
   void onStop() {
     _hideTimer?.cancel();
     _progressTimer?.cancel();
+    _errorTimer?.cancel();
     _controller.removeListener(_handleControllerChanged);
     _remoteDeviceLinkWatcherBinding.close();
     _remoteDeviceLink.ctrl.close();
@@ -368,6 +375,27 @@ class VideoModuleModel extends ModuleModel {
 
   /// Handles change notifications from the controller
   void _handleControllerChanged() {
+    // If unable to connect and cast to remote device, show loading screen for
+    // 2 seconds and then return back to local video with error toast
+    if (_controller.problem?.type == Problem.kProblemConnectionFailed) {
+      _displayMode = DisplayMode.localLarge;
+      showControlOverlay = false; // hide play controls in loading screen
+      _errorTimer = new Timer(_kLoadingDuration, () {
+        _errorTimer?.cancel();
+        _errorTimer = new Timer(_kOverlayAutoHideDuration, () {
+          _errorTimer?.cancel();
+          _errorTimer = null;
+          _failedCast = false;
+          notifyListeners();
+        });
+        _failedCast = true;
+        notifyListeners();
+        playLocal();
+      });
+    } else if (_errorTimer == null && _failedCast) {
+      _failedCast = false;
+      notifyListeners();
+    }
     if (_controller.playing &&
         !_locallyControlled &&
         displayMode != DisplayMode.immersive) {
