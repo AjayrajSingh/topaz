@@ -8,11 +8,14 @@ import 'package:flutter/widgets.dart';
 
 /// Uses [ui.window] to create a [MediaQuery] parent for [child].
 class WindowMediaQuery extends StatefulWidget {
+  /// Called when the window metrics change.
+  final VoidCallback onWindowMetricsChanged;
+
   /// The [Widget] to be given a [MediaQuery] parent.
   final Widget child;
 
   /// Constructor.
-  WindowMediaQuery({this.child});
+  WindowMediaQuery({this.onWindowMetricsChanged, this.child});
 
   @override
   _WindowMediaQueryState createState() => new _WindowMediaQueryState();
@@ -39,5 +42,7 @@ class _WindowMediaQueryState extends State<WindowMediaQuery>
       );
 
   @override
-  void didChangeMetrics() => setState(() {});
+  void didChangeMetrics() => setState(() {
+        widget.onWindowMetricsChanged?.call();
+      });
 }
