@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:sysui_widgets/rk4_spring_simulation.dart';
 
@@ -29,9 +28,6 @@ class StoryRearrangementScrimModel extends TickingModel {
     _opacitySimulation.target = isAcceptable ? 0.6 : 0.0;
     startTicking();
   }
-
-  /// The current color the story rearrangement scrim should be.
-  Color get scrimColor => Colors.black.withOpacity(_opacitySimulation.value);
 
   /// The progress of the story rearrangement scrim animation.
   double get progress => _opacitySimulation.value / 0.6;

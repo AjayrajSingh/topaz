@@ -53,9 +53,6 @@ typedef void OnOverlayChanged(bool active);
 /// suggestion overlay, device extensions. interruption overlay, and quick
 /// settings overlay.
 class Conductor extends StatefulWidget {
-  /// Set to true to blur scrimmed children when performing an inline preview.
-  final bool blurScrimmedChildren;
-
   /// Called when the quick settings overlay becomes active or inactive.
   final OnOverlayChanged onQuickSettingsOverlayChanged;
 
@@ -80,7 +77,6 @@ class Conductor extends StatefulWidget {
   /// Constructor.
   Conductor({
     Key key,
-    this.blurScrimmedChildren,
     this.onQuickSettingsOverlayChanged,
     this.onSuggestionsOverlayChanged,
     this.onLogoutTapped,
@@ -247,7 +243,6 @@ class ConductorState extends State<Conductor> {
           child: new StoryList(
             scrollController: _scrollController,
             overlayKey: _overlayKey,
-            blurScrimmedChildren: widget.blurScrimmedChildren,
             onScroll: (double scrollOffset) {
               if (_ignoreNextScrollOffsetChange) {
                 _ignoreNextScrollOffsetChange = false;

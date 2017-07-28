@@ -35,7 +35,6 @@ void main() {
     StoryList storyList = new StoryList(
       key: storyListKey,
       overlayKey: new GlobalKey(),
-      parentSize: new Size(_kWidthSingleColumn, _kHeight),
       scrollController: scrollController,
     );
     StoryModel storyModel = new _DummyStoryModel(storyKeys: storyKeys);
@@ -73,7 +72,6 @@ void main() {
     StoryList storyList = new StoryList(
       key: storyListKey,
       overlayKey: new GlobalKey(),
-      parentSize: new Size(_kWidthMultiColumn, _kHeight),
       scrollController: scrollController,
     );
     StoryModel storyModel = new _DummyStoryModel(storyKeys: storyKeys);

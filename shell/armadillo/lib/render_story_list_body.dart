@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:math' as math;
-import 'dart:ui' show lerpDouble, ImageFilter;
+import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -24,13 +24,6 @@ const double _kSlideUnfocusedAwayOffsetY = -200.0;
 /// when the focused child's focus progress reaches this value and beyond.
 const double _kFocusProgressWhenUnfocusedFullyTransparent = 0.7;
 
-/// The ratio to use when converting the alpha of the scrim color to the
-/// gaussian blur sigma values.
-const double _kAlphaToBlurRatio = 1 / 25;
-
-/// If true, children behind the scrim will be blurred.
-const bool _kBlurScrimmedChildren = true;
-
 /// Overrides [RenderListBody]'s layout, paint, and hit-test behaviour to allow
 /// the following:
 ///   1) Stories are laid out as specified by [StoryListLayout].
@@ -38,8 +31,6 @@ const bool _kBlurScrimmedChildren = true;
 ///      focus.
 ///   3) Focused stories are above and overlap non-focused stories.
 class RenderStoryListBody extends RenderListBody {
-  bool _blurScrimmedChildren;
-  Color _scrimColor;
   Size _parentSize;
   double _scrollOffset;
   double _bottomPadding;
@@ -53,34 +44,14 @@ class RenderStoryListBody extends RenderListBody {
     double scrollOffset,
     double bottomPadding,
     double listHeight,
-    Color scrimColor,
     double liftScale,
-    bool blurScrimmedChildren,
   })
       : _parentSize = parentSize,
         _scrollOffset = scrollOffset,
         _bottomPadding = bottomPadding ?? 0.0,
         _listHeight = listHeight ?? 0.0,
-        _scrimColor = scrimColor ?? new Color(0x00000000),
         _liftScale = liftScale ?? 1.0,
-        _blurScrimmedChildren = blurScrimmedChildren ?? _kBlurScrimmedChildren,
         super(children: children, mainAxis: Axis.vertical);
-
-  /// Sets whether the children should be blurred when they are scrimmed.
-  set blurScrimmedChildren(bool value) {
-    if (_blurScrimmedChildren != (value ?? _kBlurScrimmedChildren)) {
-      _blurScrimmedChildren = (value ?? _kBlurScrimmedChildren);
-      markNeedsPaint();
-    }
-  }
-
-  /// Sets the color of the scrim placed in front of unfocused children.
-  set scrimColor(Color value) {
-    if (_scrimColor != value) {
-      _scrimColor = value;
-      markNeedsPaint();
-    }
-  }
 
   /// Sets the size of the parent.  Used to position/size the children.
   set parentSize(Size value) {
@@ -154,33 +125,7 @@ class RenderStoryListBody extends RenderListBody {
       _paintChild(context, offset, child, unfocusedAlpha);
     });
 
-    if (_scrimColor.alpha != 0) {
-      if (_blurScrimmedChildren) {
-        context.pushLayer(
-          new BackdropFilterLayer(
-            filter: new ImageFilter.blur(
-              sigmaX: _scrimColor.alpha * _kAlphaToBlurRatio,
-              sigmaY: _scrimColor.alpha * _kAlphaToBlurRatio,
-            ),
-          ),
-          _paintScrim,
-          offset,
-        );
-      } else {
-        _paintScrim(context, offset);
-      }
-    }
     _paintChild(context, offset, lastChild, unfocusedAlpha);
-  }
-
-  void _paintScrim(
-    PaintingContext context,
-    Offset offset,
-  ) {
-    context.canvas.drawRect(
-      new Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height),
-      new Paint()..color = _scrimColor,
-    );
   }
 
   void _paintChild(

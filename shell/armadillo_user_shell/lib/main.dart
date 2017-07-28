@@ -161,7 +161,6 @@ Future<Null> main() async {
 
   Conductor conductor = new Conductor(
     key: conductorKey,
-    blurScrimmedChildren: false,
     onQuickSettingsOverlayChanged: hitTestModel.onQuickSettingsOverlayChanged,
     onSuggestionsOverlayChanged: hitTestModel.onSuggestionsOverlayChanged,
     onLogoutTapped: userLogoutter.logout,
