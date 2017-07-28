@@ -348,14 +348,17 @@ class _QuickSettingsState extends State<QuickSettings> {
                   ),
             ),
           ),
-          new Container(
-            padding: const EdgeInsets.all(16.0),
-            child: new Text(
-              '${Platform.localHostname}',
-              textAlign: TextAlign.center,
-              style: new TextStyle(
-                fontFamily: 'RobotoMono',
-                color: Colors.grey[600],
+          new Opacity(
+            opacity: widget.opacity,
+            child: new Container(
+              padding: const EdgeInsets.all(16.0),
+              child: new Text(
+                '${Platform.localHostname}',
+                textAlign: TextAlign.center,
+                style: new TextStyle(
+                  fontFamily: 'RobotoMono',
+                  color: Colors.grey[600],
+                ),
               ),
             ),
           ),

@@ -14,9 +14,9 @@ import 'package:armadillo/context_model.dart';
 import 'package:armadillo/debug_enabler.dart';
 import 'package:armadillo/debug_model.dart';
 import 'package:armadillo/interruption_overlay.dart';
-import 'package:armadillo/now_model.dart';
 import 'package:armadillo/panel_resizing_model.dart';
 import 'package:armadillo/peek_model.dart';
+import 'package:armadillo/quick_settings_progress_model.dart';
 import 'package:armadillo/size_model.dart';
 import 'package:armadillo/story_cluster.dart';
 import 'package:armadillo/story_cluster_drag_data.dart';
@@ -151,7 +151,8 @@ Future<Null> main() async {
     contextTopics: ContextProviderContextModel.topics,
   );
 
-  NowModel nowModel = new NowModel();
+  QuickSettingsProgressModel quickSettingsProgressModel =
+      new QuickSettingsProgressModel();
 
   PeekModel peekModel = new PeekModel();
   storyClusterDragStateModel.addListener(
@@ -159,7 +160,11 @@ Future<Null> main() async {
           storyClusterDragStateModel,
         ),
   );
-  nowModel.addListener(() => peekModel.onNowModelChanged(nowModel));
+  quickSettingsProgressModel.addListener(
+    () => peekModel.onQuickSettingsProgressChanged(
+          quickSettingsProgressModel.quickSettingsProgress,
+        ),
+  );
 
   Conductor conductor = new Conductor(
     key: conductorKey,
@@ -216,8 +221,8 @@ Future<Null> main() async {
                 model: suggestionProviderSuggestionModel,
                 child: child,
               ),
-          (_, Widget child) => new ScopedModel<NowModel>(
-                model: nowModel,
+          (_, Widget child) => new ScopedModel<QuickSettingsProgressModel>(
+                model: quickSettingsProgressModel,
                 child: child,
               ),
           (_, Widget child) => new ScopedModel<StoryClusterDragStateModel>(

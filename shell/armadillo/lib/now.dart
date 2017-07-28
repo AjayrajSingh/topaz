@@ -7,15 +7,23 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:sysui_widgets/rk4_spring_simulation.dart';
 import 'package:sysui_widgets/ticking_state.dart';
 
+import 'context_model.dart';
 import 'elevations.dart';
 import 'fading_spring_simulation.dart';
-import 'now_model.dart';
+import 'important_info.dart';
 import 'opacity_model.dart';
+import 'quick_settings.dart';
+import 'quick_settings_progress_model.dart';
 import 'size_model.dart';
 import 'story_drag_transition_model.dart';
+import 'user_context_text.dart';
+
+const String _kBatteryImageWhite =
+    'packages/armadillo/res/ic_battery_90_white_1x_web_24dp.png';
 
 /// Fraction of the minimization animation which should be used for falling away
 /// and sliding in of the user context and battery icon.
@@ -272,108 +280,93 @@ class NowState extends TickingState<Now> {
                           ),
                           child: child,
                         ),
-                    child: new ScopedModelDescendant<NowModel>(
-                      builder: (
-                        BuildContext context,
-                        Widget child,
-                        NowModel nowModel,
-                      ) =>
-                          new Stack(
-                            fit: StackFit.passthrough,
-                            children: <Widget>[
-                              // Quick Settings Background.
-                              new Positioned(
-                                left: _kQuickSettingsHorizontalPadding,
-                                right: _kQuickSettingsHorizontalPadding,
-                                top: _getQuickSettingsBackgroundTopOffset(
-                                  sizeModel,
-                                ),
-                                child: new Center(
-                                  child: new Container(
-                                    height: _getQuickSettingsBackgroundHeight(
-                                      sizeModel,
-                                    ),
-                                    width: _getQuickSettingsBackgroundWidth(
-                                      sizeModel,
-                                    ),
-                                    decoration: new BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: new BorderRadius.circular(
-                                        _quickSettingsBackgroundBorderRadius,
-                                      ),
-                                    ),
-                                  ),
+                    child: new Stack(
+                      fit: StackFit.passthrough,
+                      children: <Widget>[
+                        // Quick Settings Background.
+                        new Positioned(
+                          left: _kQuickSettingsHorizontalPadding,
+                          right: _kQuickSettingsHorizontalPadding,
+                          top: _getQuickSettingsBackgroundTopOffset(
+                            sizeModel,
+                          ),
+                          child: new Center(
+                            child: new Container(
+                              height: _getQuickSettingsBackgroundHeight(
+                                sizeModel,
+                              ),
+                              width: _getQuickSettingsBackgroundWidth(
+                                sizeModel,
+                              ),
+                              decoration: new BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: new BorderRadius.circular(
+                                  _quickSettingsBackgroundBorderRadius,
                                 ),
                               ),
-                              // User Image, User Context Text, and Important Information when maximized.
-                              new Positioned(
-                                left: _kQuickSettingsHorizontalPadding,
-                                right: _kQuickSettingsHorizontalPadding,
-                                top: _getUserImageTopOffset(sizeModel),
-                                child: new Center(
-                                  child: new Column(
-                                    children: <Widget>[
-                                      new Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          // User Context Text when maximized.
-                                          new Expanded(
-                                            child: new GestureDetector(
-                                              onTap: widget.onUserContextTapped,
-                                              behavior: HitTestBehavior.opaque,
-                                              child: new Container(
-                                                key: _userContextTextKey,
-                                                height: _userImageSize,
-                                                child: nowModel
-                                                    .userContextMaximized(
-                                                  opacity: _fallAwayOpacity,
-                                                ),
-                                              ),
-                                            ),
+                            ),
+                          ),
+                        ),
+                        // User Image, User Context Text, and Important Information when maximized.
+                        new Positioned(
+                          left: _kQuickSettingsHorizontalPadding,
+                          right: _kQuickSettingsHorizontalPadding,
+                          top: _getUserImageTopOffset(sizeModel),
+                          child: new Center(
+                            child: new Column(
+                              children: <Widget>[
+                                new Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    // User Context Text when maximized.
+                                    new Expanded(
+                                      child: new GestureDetector(
+                                        onTap: widget.onUserContextTapped,
+                                        behavior: HitTestBehavior.opaque,
+                                        child: new Container(
+                                          key: _userContextTextKey,
+                                          height: _userImageSize,
+                                          child: _buildUserContextMaximized(
+                                            opacity: _fallAwayOpacity,
                                           ),
-                                          // User Profile image
-                                          _buildUserImage(nowModel),
-                                          // Important Information when maximized.
-                                          new Expanded(
-                                            child: new Container(
-                                              key: _importantInfoMaximizedKey,
-                                              height: _userImageSize,
-                                              child: nowModel
-                                                  .importantInfoMaximized(
-                                                opacity: _fallAwayOpacity,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      // Quick Settings
-                                      new Container(
-                                        padding:
-                                            const EdgeInsets.only(top: 32.0),
-                                        child: _buildQuickSettings(
-                                          sizeModel,
-                                          nowModel,
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    // User Profile image
+                                    _buildUserImage(),
+                                    // Important Information when maximized.
+                                    new Expanded(
+                                      child: new Container(
+                                        key: _importantInfoMaximizedKey,
+                                        height: _userImageSize,
+                                        child: _buildImportantInfoMaximized(
+                                          opacity: _fallAwayOpacity,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-
-                              // User Context Text and Important Information when minimized.
-                              _buildMinimizedUserContextTextAndImportantInformation(
-                                sizeModel,
-                                nowModel,
-                              ),
-
-                              // Minimized button bar gesture detector. Only enabled when
-                              // we're nearly fully minimized.
-                              _buildMinimizedButtonBarGestureDetector(
-                                sizeModel,
-                              ),
-                            ],
+                                // Quick Settings
+                                new Container(
+                                  padding: const EdgeInsets.only(top: 32.0),
+                                  child: _buildQuickSettings(sizeModel),
+                                ),
+                              ],
+                            ),
                           ),
+                        ),
+
+                        // User Context Text and Important Information when minimized.
+                        _buildMinimizedUserContextTextAndImportantInformation(
+                          sizeModel,
+                        ),
+
+                        // Minimized button bar gesture detector. Only enabled when
+                        // we're nearly fully minimized.
+                        _buildMinimizedButtonBarGestureDetector(
+                          sizeModel,
+                        ),
+                      ],
                     ),
                   ),
             ),
@@ -381,7 +374,7 @@ class NowState extends TickingState<Now> {
         ],
       );
 
-  Widget _buildUserImage(NowModel nowModel) => new GestureDetector(
+  Widget _buildUserImage() => new GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
           if (!_revealingQuickSettings) {
@@ -406,13 +399,12 @@ class NowState extends TickingState<Now> {
               ),
               shape: BoxShape.circle,
             ),
-            child: nowModel.user,
+            child: _buildUser(),
           ),
         ),
       );
 
-  Widget _buildQuickSettings(SizeModel sizeModel, NowModel nowModel) =>
-      new Padding(
+  Widget _buildQuickSettings(SizeModel sizeModel) => new Padding(
         padding: const EdgeInsets.symmetric(
             horizontal: _kQuickSettingsInnerHorizontalPadding, vertical: 8.0),
         child: new Container(
@@ -430,7 +422,7 @@ class NowState extends TickingState<Now> {
                 ),
               ),
               new Container(
-                child: nowModel.quickSettings(
+                child: new QuickSettings(
                   opacity: _quickSettingsSlideUpProgress,
                   onLogoutTapped: widget.onLogoutTapped,
                   onLogoutLongPressed: widget.onLogoutLongPressed,
@@ -443,7 +435,6 @@ class NowState extends TickingState<Now> {
 
   Widget _buildMinimizedUserContextTextAndImportantInformation(
     SizeModel sizeModel,
-    NowModel nowModel,
   ) =>
       new Align(
         alignment: FractionalOffset.bottomCenter,
@@ -457,14 +448,162 @@ class NowState extends TickingState<Now> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  nowModel.userContextMinimized,
-                  nowModel.importantInfoMinimized,
+                  _buildUserContextMinimized(),
+                  _buildImportantInfoMinimized(),
                 ],
               ),
             ),
           ),
         ),
       );
+
+  /// Returns a succinct representation of the user's current context.
+  Widget _buildUserContextMinimized() => new Padding(
+        padding: const EdgeInsets.only(left: 8.0),
+        child: new ScopedModelDescendant<OpacityModel>(
+          builder: (
+            BuildContext context,
+            Widget child,
+            OpacityModel opacityModel,
+          ) =>
+              new Opacity(
+                opacity: opacityModel.opacity,
+                child: child,
+              ),
+          child: new ScopedModelDescendant<ContextModel>(
+            builder: (BuildContext context, Widget child, ContextModel model) =>
+                new Text('${model.timeOnly}'),
+          ),
+        ),
+      );
+
+  /// Returns a succinct representation of the important information to the
+  /// user.
+  Widget _buildImportantInfoMinimized() => new Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          new Padding(
+            padding: const EdgeInsets.only(top: 4.0, right: 4.0),
+            child: new ScopedModelDescendant<OpacityModel>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                OpacityModel opacityModel,
+              ) =>
+                  new Opacity(
+                    opacity: opacityModel.opacity,
+                    child: child,
+                  ),
+              child: new Text('89%'),
+            ),
+          ),
+          new ScopedModelDescendant<OpacityModel>(
+            builder: (
+              BuildContext context,
+              Widget child,
+              OpacityModel opacityModel,
+            ) =>
+                new Image.asset(
+                  _kBatteryImageWhite,
+                  color: Colors.white.withOpacity(opacityModel.opacity),
+                  fit: BoxFit.cover,
+                ),
+          ),
+        ],
+      );
+
+  /// Returns an avatar of the current user.
+  Widget _buildUser() => new ScopedModelDescendant<ContextModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          ContextModel contextModel,
+        ) =>
+            new Alphatar.fromNameAndUrl(
+              avatarUrl: _getImageUrl(contextModel.userImageUrl) ?? '',
+              name: contextModel.userName ?? '',
+            ),
+      );
+
+  /// Returns a verbose representation of the user's current context.
+  Widget _buildUserContextMaximized({double opacity: 1.0}) => new Opacity(
+        opacity: opacity < 0.8 ? 0.0 : ((opacity - 0.8) / 0.2),
+        child: new ScopedModelDescendant<QuickSettingsProgressModel>(
+          builder: (
+            _,
+            __,
+            QuickSettingsProgressModel quickSettingsProgressModel,
+          ) =>
+              new Transform(
+                transform: new Matrix4.translationValues(
+                  lerpDouble(
+                    -16.0,
+                    0.0,
+                    opacity < 0.8 ? 0.0 : ((opacity - 0.8) / 0.2),
+                  ),
+                  lerpDouble(0.0, 32.0, _quickSettingsProgress),
+                  0.0,
+                ),
+                child: new UserContextText(
+                  textColor: Color.lerp(
+                    Colors.white,
+                    Colors.grey[600],
+                    _quickSettingsProgress,
+                  ),
+                ),
+              ),
+        ),
+      );
+
+  /// Returns a verbose representation of the important information to the user
+  /// with the given [opacity].
+  Widget _buildImportantInfoMaximized({double opacity: 1.0}) => new Opacity(
+        opacity: opacity < 0.8 ? 0.0 : ((opacity - 0.8) / 0.2),
+        child: new ScopedModelDescendant<QuickSettingsProgressModel>(
+          builder: (
+            _,
+            __,
+            QuickSettingsProgressModel quickSettingsProgressModel,
+          ) =>
+              new Transform(
+                transform: new Matrix4.translationValues(
+                  lerpDouble(
+                    16.0,
+                    0.0,
+                    opacity < 0.8 ? 0.0 : ((opacity - 0.8) / 0.2),
+                  ),
+                  lerpDouble(
+                    0.0,
+                    32.0,
+                    quickSettingsProgressModel.quickSettingsProgress,
+                  ),
+                  0.0,
+                ),
+                child: new ImportantInfo(
+                  textColor: Color.lerp(
+                    Colors.white,
+                    Colors.grey[600],
+                    quickSettingsProgressModel.quickSettingsProgress,
+                  ),
+                ),
+              ),
+        ),
+      );
+
+  String _getImageUrl(String userImageUrl) {
+    if (userImageUrl == null) {
+      return null;
+    }
+    Uri uri = Uri.parse(userImageUrl);
+    if (uri.queryParameters['sz'] != null) {
+      Map<String, dynamic> queryParameters = new Map<String, dynamic>.from(
+        uri.queryParameters,
+      );
+      queryParameters['sz'] = '112';
+      uri = uri.replace(queryParameters: queryParameters);
+    }
+    return uri.toString();
+  }
 
   void _updateMinimizedInfoOpacity() {
     _minimizedInfoOpacityModel.opacity =
@@ -541,8 +680,8 @@ class NowState extends TickingState<Now> {
       if (widget.onQuickSettingsProgressChange != null) {
         widget.onQuickSettingsProgressChange(_quickSettingsProgress);
       }
-      NowModel nowModel = NowModel.of(context);
-      nowModel.quickSettingsProgress = _quickSettingsProgress;
+      QuickSettingsProgressModel.of(context).quickSettingsProgress =
+          _quickSettingsProgress;
     }
 
     _updateMinimizedInfoOpacity();

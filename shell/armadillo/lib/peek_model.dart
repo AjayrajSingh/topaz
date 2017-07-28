@@ -5,8 +5,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'now_model.dart';
 import 'peeking_overlay.dart';
+import 'quick_settings_progress_model.dart';
 import 'story_cluster_drag_state_model.dart';
 
 /// Determines if a [PeekingOverlay] should be peeking or not.
@@ -39,12 +39,12 @@ class PeekModel extends Model {
     }
   }
 
-  /// Called when the [NowModel] changes.
-  void onNowModelChanged(NowModel nowModel) {
-    if (_lastQuickSettingsProgress != nowModel.quickSettingsProgress) {
+  /// Called when the quick settings opening progress changes.
+  void onQuickSettingsProgressChanged(double quickSettingsProgress) {
+    if (_lastQuickSettingsProgress != quickSettingsProgress) {
       bool quickSettingsOpen =
-          nowModel.quickSettingsProgress > _lastQuickSettingsProgress;
-      _lastQuickSettingsProgress = nowModel.quickSettingsProgress;
+          quickSettingsProgress > _lastQuickSettingsProgress;
+      _lastQuickSettingsProgress = quickSettingsProgress;
       if (_quickSettingsOpen != quickSettingsOpen) {
         _quickSettingsOpen = quickSettingsOpen;
         notifyListeners();
