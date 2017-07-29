@@ -9,7 +9,7 @@ import 'package:lib.widgets/widgets.dart';
 
 import 'size_model.dart';
 import 'suggestion.dart';
-import 'suggestion_list.dart' show OnSuggestionSelected, kAskHeight;
+import 'suggestion_list.dart' show OnSuggestionSelected;
 import 'suggestion_widget.dart';
 
 const Duration _kInterruptionShowingTimeout =
@@ -146,7 +146,7 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
                       key: new ObjectKey(_currentInterruption),
                       initRect: new Rect.fromLTWH(
                         sizeModel.interruptionLeftMargin,
-                        constraints.maxHeight + kAskHeight,
+                        constraints.maxHeight + sizeModel.askHeight,
                         sizeModel.suggestionWidth,
                         suggestionHeight,
                       ),
@@ -169,7 +169,7 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
                           details.delta.dy *
                               ((newOffset.dy >= 0.0 &&
                                       newOffset.dy <=
-                                          (kAskHeight +
+                                          (sizeModel.askHeight +
                                               _kBottomSpacing +
                                               suggestionHeight))
                                   ? 1.0
@@ -249,7 +249,7 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
             ? sizeModel.interruptionLeftMargin
             : -sizeModel.suggestionWidth - sizeModel.interruptionLeftMargin,
         direction == _RemoveDirection.down
-            ? _constraints.maxHeight + kAskHeight
+            ? _constraints.maxHeight + sizeModel.askHeight
             : _constraints.maxHeight -
                 _kBottomSpacing -
                 suggestionHeight +

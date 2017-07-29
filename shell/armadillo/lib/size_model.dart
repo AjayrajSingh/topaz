@@ -18,6 +18,10 @@ const double _kSuggestionMinPadding = 40.0;
 /// The height of Now when maximized.
 const double _kMaximizedNowHeight = 440.0;
 
+/// The height of the ask input section that is in the suggestion list
+const double _kAskHeightLarge = 72.0;
+const double _kAskHeightSmall = 56.0;
+
 /// The [SizeModel] tracks various global sizes that are required for rendering
 /// the various parts of Armadillo.
 ///
@@ -98,4 +102,8 @@ class SizeModel extends Model {
 
   /// The distance from the left of the screen interruptions should show up.
   double get interruptionLeftMargin => _interruptionLeftMargin;
+
+  /// The height of the ask input section of the suggestion list
+  double get askHeight =>
+      _screenSize.height >= 640.0 ? _kAskHeightLarge : _kAskHeightSmall;
 }

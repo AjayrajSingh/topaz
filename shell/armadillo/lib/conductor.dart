@@ -297,32 +297,39 @@ class ConductorState extends State<Conductor> {
         ),
       );
 
-  Widget _getSuggestionOverlay() => new PeekingOverlay(
-        key: _suggestionOverlayKey,
-        peekHeight: _kSuggestionOverlayPeekHeight,
-        dragHandleHeight: kAskHeight,
-        onHide: () {
-          widget.onSuggestionsOverlayChanged?.call(false);
-          if (_suggestionListScrollController.hasClients) {
-            _suggestionListScrollController.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 1000),
-              curve: Curves.fastOutSlowIn,
-            );
-          }
-          _suggestionListKey.currentState?.stopAsking();
-        },
-        onShow: () {
-          widget.onSuggestionsOverlayChanged?.call(true);
-        },
-        child: new SuggestionList(
-          key: _suggestionListKey,
-          scrollController: _suggestionListScrollController,
-          onAskingStarted: () {
-            _suggestionOverlayKey.currentState.show();
-          },
-          onSuggestionSelected: _onSuggestionSelected,
-        ),
+  Widget _getSuggestionOverlay() => new ScopedModelDescendant<SizeModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          SizeModel sizeModel,
+        ) =>
+            new PeekingOverlay(
+              key: _suggestionOverlayKey,
+              peekHeight: _kSuggestionOverlayPeekHeight,
+              dragHandleHeight: sizeModel.askHeight,
+              onHide: () {
+                widget.onSuggestionsOverlayChanged?.call(false);
+                if (_suggestionListScrollController.hasClients) {
+                  _suggestionListScrollController.animateTo(
+                    0.0,
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.fastOutSlowIn,
+                  );
+                }
+                _suggestionListKey.currentState?.stopAsking();
+              },
+              onShow: () {
+                widget.onSuggestionsOverlayChanged?.call(true);
+              },
+              child: new SuggestionList(
+                key: _suggestionListKey,
+                scrollController: _suggestionListScrollController,
+                onAskingStarted: () {
+                  _suggestionOverlayKey.currentState.show();
+                },
+                onSuggestionSelected: _onSuggestionSelected,
+              ),
+            ),
       );
 
   void _onSuggestionSelected(
