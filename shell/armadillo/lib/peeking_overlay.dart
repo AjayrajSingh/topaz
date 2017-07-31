@@ -76,6 +76,19 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
     _setPeeking(true);
   }
 
+  @override
+  void didUpdateWidget(PeekingOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.peekHeight != widget.peekHeight) {
+      minHeight = _peeking ? widget.peekHeight : 0.0;
+      if (_hiding) {
+        setHeight(minHeight);
+      } else {
+        setHeight(maxHeight);
+      }
+    }
+  }
+
   /// Hides the overlay.
   void hide() {
     widget.onHide?.call();

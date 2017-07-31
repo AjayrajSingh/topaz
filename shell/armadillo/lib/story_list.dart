@@ -134,9 +134,7 @@ class StoryList extends StatelessWidget {
                                     listHeight: storyModel.listHeight,
                                     scrollOffset:
                                         scrollController?.offset ?? 0.0,
-                                    bottomPadding:
-                                        sizeModel.maximizedNowHeight +
-                                            sizeModel.minimizedNowHeight,
+                                    bottomPadding: sizeModel.maximizedNowHeight,
                                     // When we are dragging, the storyListSize
                                     // takes up the entire screen since the now
                                     // bar is hidden.

@@ -10,17 +10,38 @@ export 'package:lib.widgets/model.dart'
 
 import 'suggestion_list.dart';
 
+/// The various device form factors
+enum FormFactor {
+  /// The typical tablet/laptop screen size
+  tablet,
+
+  /// Phone in landscape mode
+  phoneLandscape,
+
+  /// Phone in portrait mode
+  phonePortrait,
+}
+
 /// Target widths for the suggesiton section at different screen sizes.
 const double _kTargetLargeSuggestionWidth = 736.0;
 const double _kTargetSmallSuggestionWidth = 424.0;
 const double _kSuggestionMinPadding = 40.0;
 
-/// The height of Now when maximized.
-const double _kMaximizedNowHeight = 440.0;
+/// The height offset of Now when maximized in relation to the current peek
+/// height of the suggestion list.
+const double _kMaximizedNowHeightOffset = 220.0;
 
 /// The height of the ask input section that is in the suggestion list
 const double _kAskHeightLarge = 72.0;
 const double _kAskHeightSmall = 56.0;
+
+/// Peek height of the suggestion list for various form factors
+const Map<FormFactor, double> _kSuggestionPeekHeight =
+    const <FormFactor, double>{
+  FormFactor.tablet: 220.0,
+  FormFactor.phonePortrait: 140.0,
+  FormFactor.phoneLandscape: 80.0,
+};
 
 /// The [SizeModel] tracks various global sizes that are required for rendering
 /// the various parts of Armadillo.
@@ -37,6 +58,7 @@ class SizeModel extends Model {
   double _suggestionListWidth;
   double _suggestionWidth;
   double _interruptionLeftMargin;
+  FormFactor _formFactor = FormFactor.tablet;
 
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
@@ -75,6 +97,21 @@ class SizeModel extends Model {
           ? (_suggestionListWidth - _suggestionWidth) / 2.0
           : 16.0;
 
+      // Determine the form factor of the device.
+      // Right now, this is very basic and only works with the current
+      // "baked-in" device sizes of Armadillo.
+      //
+      // Eventually this should be more generic but we would need to also
+      // know the physical size of the screen as well as the resolution.
+      // https://fuchsia.atlassian.net/browse/SY-280
+      if (size.height > 640.0) {
+        _formFactor = FormFactor.tablet;
+      } else if (size.height > 360.0) {
+        _formFactor = FormFactor.phonePortrait;
+      } else {
+        _formFactor = FormFactor.phoneLandscape;
+      }
+
       notifyListeners();
     }
   }
@@ -89,10 +126,12 @@ class SizeModel extends Model {
 
   /// Gets the height of the minimized now bar which is based on the height
   /// of the screen.
-  double get minimizedNowHeight => _screenSize.height >= 640.0 ? 48.0 : 32.0;
+  double get minimizedNowHeight =>
+      _formFactor != FormFactor.phoneLandscape ? 48.0 : 32.0;
 
   /// Gets the height of the maximized now.
-  double get maximizedNowHeight => _kMaximizedNowHeight;
+  double get maximizedNowHeight =>
+      _kMaximizedNowHeightOffset + suggestionPeekHeight;
 
   /// The width of the suggestion list.
   double get suggestionListWidth => _suggestionListWidth;
@@ -104,6 +143,10 @@ class SizeModel extends Model {
   double get interruptionLeftMargin => _interruptionLeftMargin;
 
   /// The height of the ask input section of the suggestion list
-  double get askHeight =>
-      _screenSize.height >= 640.0 ? _kAskHeightLarge : _kAskHeightSmall;
+  double get askHeight => _formFactor != FormFactor.phoneLandscape
+      ? _kAskHeightLarge
+      : _kAskHeightSmall;
+
+  /// Peek height of the suggestion list
+  double get suggestionPeekHeight => _kSuggestionPeekHeight[_formFactor];
 }

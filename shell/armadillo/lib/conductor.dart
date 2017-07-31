@@ -35,9 +35,6 @@ import 'vertical_shifter.dart';
 /// How far [Now] should raise when quick settings is activated inline.
 const double _kQuickSettingsHeightBump = 120.0;
 
-/// How far above the bottom the suggestions overlay peeks.
-const double _kSuggestionOverlayPeekHeight = 192.0;
-
 /// If the width of the [Conductor] exceeds this value we will switch to
 /// multicolumn mode for the [StoryList].
 const double _kStoryListMultiColumnWidthThreshold = 500.0;
@@ -234,7 +231,7 @@ class ConductorState extends State<Conductor> {
               if (scrollOffset < -_kSuggestionOverlayPullScrollOffset &&
                   _suggestionOverlayKey.currentState.hiding) {
                 _suggestionOverlayKey.currentState.setHeight(
-                  _kSuggestionOverlayPeekHeight -
+                  SizeModel.of(context).suggestionPeekHeight -
                       (scrollOffset + _kSuggestionOverlayPullScrollOffset) *
                           _kSuggestionOverlayScrollFactor,
                 );
@@ -305,7 +302,7 @@ class ConductorState extends State<Conductor> {
         ) =>
             new PeekingOverlay(
               key: _suggestionOverlayKey,
-              peekHeight: _kSuggestionOverlayPeekHeight,
+              peekHeight: sizeModel.suggestionPeekHeight,
               dragHandleHeight: sizeModel.askHeight,
               onHide: () {
                 widget.onSuggestionsOverlayChanged?.call(false);
