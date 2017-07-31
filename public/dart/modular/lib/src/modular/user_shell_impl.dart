@@ -5,10 +5,13 @@
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
+import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+
+import 'link_watcher_impl.dart';
 
 /// Called when [UserShell.initialize] occurs.
 typedef void OnUserShellReady(
@@ -20,6 +23,7 @@ typedef void OnUserShellReady(
   SuggestionProvider suggestionProvider,
   ContextReader contextReader,
   ContextPublisher contextPublisher,
+  Link link,
 );
 
 /// Called when [UserShell.terminate] occurs.
@@ -40,6 +44,7 @@ class UserShellImpl extends UserShell {
   final ContextReaderProxy _contextReaderProxy = new ContextReaderProxy();
   final ContextPublisherProxy _contextPublisherProxy =
       new ContextPublisherProxy();
+  final LinkProxy _linkProxy = new LinkProxy();
 
   /// Called when [initialize] occurs.
   final OnUserShellReady onReady;
@@ -47,11 +52,26 @@ class UserShellImpl extends UserShell {
   /// Called when the [UserShell] terminates.
   final OnUserShellStop onStop;
 
+  /// Called when [LinkWatcher.notify] is called.
+  final OnNotify onNotify;
+
+  /// Indicates whether the [LinkWatcher] should watch for all changes including
+  /// the changes made by this [UserShell]. If [true], it calls [Link.watchAll]
+  /// to register the [LinkWatcher], and [Link.watch] otherwise. Only takes
+  /// effect when the [onNotify] callback is also provided. Defaults to false.
+  final bool watchAll;
+
+  LinkWatcherBinding _linkWatcherBinding;
+  LinkWatcherImpl _linkWatcherImpl;
+
   /// Constructor.
   UserShellImpl({
     this.onReady,
     this.onStop,
-  });
+    this.onNotify,
+    bool watchAll,
+  })
+      : watchAll = watchAll ?? false;
 
   @override
   void initialize(
@@ -82,6 +102,8 @@ class UserShellImpl extends UserShell {
         _contextPublisherProxy.ctrl.request(),
       );
 
+      _userShellContextProxy.getLink(_linkProxy.ctrl.request());
+
       onReady(
         _userShellContextProxy,
         _focusProviderProxy,
@@ -91,13 +113,27 @@ class UserShellImpl extends UserShell {
         _suggestionProviderProxy,
         _contextReaderProxy,
         _contextPublisherProxy,
+        _linkProxy,
       );
+    }
+
+    if (onNotify != null) {
+      _linkWatcherImpl = new LinkWatcherImpl(onNotify: onNotify);
+      _linkWatcherBinding = new LinkWatcherBinding();
+
+      if (watchAll) {
+        _linkProxy.watchAll(_linkWatcherBinding.wrap(_linkWatcherImpl));
+      } else {
+        _linkProxy.watch(_linkWatcherBinding.wrap(_linkWatcherImpl));
+      }
     }
   }
 
   @override
   void terminate(void done()) {
     onStop?.call();
+    _linkWatcherBinding?.close();
+    _linkProxy.ctrl.close();
     _userShellContextProxy.ctrl.close();
     _storyProviderProxy.ctrl.close();
     _suggestionProviderProxy.ctrl.close();

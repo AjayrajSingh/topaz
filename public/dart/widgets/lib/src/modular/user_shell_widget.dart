@@ -42,6 +42,8 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
         _userShell = new UserShellImpl(
           onReady: userShellModel?.onReady,
           onStop: userShellModel?.onStop,
+          onNotify: userShellModel?.onNotify,
+          watchAll: userShellModel?.watchAll,
         );
 
   @override

@@ -5,6 +5,7 @@
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
+import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
@@ -23,6 +24,16 @@ class UserShellModel extends Model {
   SuggestionProvider _suggestionProvider;
   ContextReader _contextReader;
   ContextPublisher _contextPublisher;
+  Link _link;
+
+  /// Indicates whether the [LinkWatcher] should watch for all changes including
+  /// the changes made by this [UserShell]. If [true], it calls [Link.watchAll]
+  /// to register the [LinkWatcher], and [Link.watch] otherwise. Only takes
+  /// effect when the [onNotify] callback is also provided. Defaults to false.
+  final bool watchAll;
+
+  /// Creates a new instance of [UserShellModel].
+  UserShellModel({bool watchAll}) : watchAll = watchAll ?? false;
 
   /// The [UserShellContext] given to this app's [UserShell].
   UserShellContext get userShellContext => _userShellContext;
@@ -49,6 +60,9 @@ class UserShellModel extends Model {
   /// The [SuggestionProvider] given to this app's [UserShell].
   ContextPublisher get contextPublisher => _contextPublisher;
 
+  /// The [Link] given to this [UserShell].
+  Link get link => _link;
+
   /// Called when this app's [UserShell] is given its services.
   @mustCallSuper
   void onReady(
@@ -60,6 +74,7 @@ class UserShellModel extends Model {
     SuggestionProvider suggestionProvider,
     ContextReader contextReader,
     ContextPublisher contextPublisher,
+    Link link,
   ) {
     _userShellContext = userShellContext;
     _focusProvider = focusProvider;
@@ -69,9 +84,13 @@ class UserShellModel extends Model {
     _suggestionProvider = suggestionProvider;
     _contextReader = contextReader;
     _contextPublisher = contextPublisher;
+    _link = link;
     notifyListeners();
   }
 
   /// Called when the app's [UserShell] stops.
   void onStop() => null;
+
+  /// Called when [LinkWatcher.notify] is called.
+  void onNotify(String json) => null;
 }
