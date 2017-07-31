@@ -20,27 +20,47 @@ class Screen extends StatefulWidget {
   _ScreenState createState() => new _ScreenState();
 }
 
-class _ScreenState extends State<Screen> {
+class _ScreenState extends State<Screen> with TickerProviderStateMixin {
   static const double _kThumbRadius = 120.0;
+  AnimationController _thumbnailAnimationController;
+  Animation<double> _thumbnailAnimation;
 
-  /// Local variable to save the state immediately before animating the screen
-  /// into thumbnail.
-  bool wasPlayingBefore = false;
+  // Save the state immediately before animating the frame into thumbnail
+  bool _wasPlayingBefore = false;
 
-  Rect _animateIntoThumbnail(VideoModuleModel model) {
-    wasPlayingBefore = model.playing;
-    if (wasPlayingBefore) {
+  @override
+  void initState() {
+    super.initState();
+    _thumbnailAnimationController = new AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _thumbnailAnimation = new CurvedAnimation(
+      parent: _thumbnailAnimationController,
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.fastOutSlowIn,
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _thumbnailAnimationController.dispose();
+  }
+
+  void _animateIntoThumbnail(VideoModuleModel model) {
+    _wasPlayingBefore = model.playing;
+    if (_wasPlayingBefore) {
       model.pause();
     }
     model.hideDeviceChooser = false;
-    model.thumbnailAnimationController.forward();
-    return new Rect.fromLTWH(0.0, 0.0, 0.0, 0.0);
+    _thumbnailAnimationController.forward();
   }
 
   void _animateIntoScreen(VideoModuleModel model) {
     model.hideDeviceChooser = true;
-    model.thumbnailAnimationController.reverse();
-    if (wasPlayingBefore) {
+    _thumbnailAnimationController.reverse();
+    if (_wasPlayingBefore) {
       model.play();
     }
   }
@@ -64,7 +84,7 @@ class _ScreenState extends State<Screen> {
           dragAnchor: DragAnchor.pointer,
           childWhenDragging: new Container(),
           feedback: new AnimatedBuilder(
-            animation: model.thumbnailAnimationController,
+            animation: _thumbnailAnimationController,
             child: new Container(
               height: _kThumbRadius,
               width: _kThumbRadius,
@@ -85,35 +105,38 @@ class _ScreenState extends State<Screen> {
             ),
             builder: (BuildContext context, Widget child) {
               double lerpWidth = lerpDouble(
-                  currentWidth, _kThumbRadius, model.thumbnailAnimation.value);
+                currentWidth,
+                _kThumbRadius,
+                _thumbnailAnimation.value,
+              );
               double lerpHeight = lerpDouble(
-                  currentHeight, _kThumbRadius, model.thumbnailAnimation.value);
+                currentHeight,
+                _kThumbRadius,
+                _thumbnailAnimation.value,
+              );
               double x = -lerpWidth / 2.0;
               double y = -lerpHeight / 2.0;
               BorderRadius borderRadius = new BorderRadius.circular(
-                _kThumbRadius * model.thumbnailAnimation.value,
+                _kThumbRadius * _thumbnailAnimation.value,
               );
               return new Transform(
                 transform: new Matrix4.translationValues(x, y, 0.0),
-                child: new Container(
-                  width: lerpWidth,
-                  height: lerpHeight,
-                  decoration: new BoxDecoration(
-                    boxShadow: <BoxShadow>[
-                      new BoxShadow(
+                child: new PhysicalModel(
+                  borderRadius: borderRadius,
+                  color: Colors.grey[500],
+                  child: new Container(
+                    width: lerpWidth,
+                    height: lerpHeight,
+                    decoration: new BoxDecoration(
+                      border: new Border.all(
+                        width: 2.0,
                         color: Colors.grey[500],
-                        blurRadius: BoxShadow.convertRadiusToSigma(1.0),
                       ),
-                    ],
-                    border: new Border.all(
-                      width: 2.0,
-                      color: Colors.grey[500],
                     ),
-                    borderRadius: borderRadius,
-                  ),
-                  child: new ClipRRect(
-                    borderRadius: borderRadius,
-                    child: child,
+                    child: new ClipRRect(
+                      borderRadius: borderRadius,
+                      child: child,
+                    ),
                   ),
                 ),
               );

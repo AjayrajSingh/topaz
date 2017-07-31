@@ -14,8 +14,6 @@ import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.user/device_map.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.netconnector.services/netconnector.fidl.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
@@ -58,14 +56,12 @@ final Asset _defaultAsset = new Asset.movie(
 );
 
 /// The [ModuleModel] for the video player.
-class VideoModuleModel extends ModuleModel implements TickerProvider {
+class VideoModuleModel extends ModuleModel {
   Timer _hideTimer;
   Timer _progressTimer;
   String _remoteDeviceName;
   String _castingDeviceName;
   DeviceMapEntry _currentDevice;
-  AnimationController _thumbnailAnimationController;
-  Animation<double> _thumbnailAnimation;
   MediaPlayerController _controller;
   bool _wasPlaying = false;
   bool _locallyControlled = false;
@@ -105,15 +101,6 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     _controller = new MediaPlayerController(appContext.environmentServices);
     _progressTimer = new Timer.periodic(
         _kProgressBarUpdateInterval, (Timer timer) => _notifyTimerListeners());
-    _thumbnailAnimationController = new AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _thumbnailAnimation = new CurvedAnimation(
-      parent: _thumbnailAnimationController,
-      curve: Curves.fastOutSlowIn,
-      reverseCurve: Curves.fastOutSlowIn,
-    );
 
     connectToService(appContext.environmentServices, _netConnector.ctrl);
     connectToService(appContext.environmentServices, _deviceMap.ctrl);
@@ -142,17 +129,6 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
       notifyListeners();
     }
   }
-
-  @override
-  Ticker createTicker(TickerCallback onTick) => new Ticker(onTick);
-
-  /// Returns animation controller for shrinking video thumbnail on long press
-  // TODO(maryxia) SO-509 make this thumbnail into a cropped circle
-  AnimationController get thumbnailAnimationController =>
-      _thumbnailAnimationController;
-
-  /// Returns animation for shrinking video thumbnail on long press
-  Animation<double> get thumbnailAnimation => _thumbnailAnimation;
 
   /// Returns whether media player controller is playing
   bool get playing => _controller.playing;
@@ -366,7 +342,6 @@ class VideoModuleModel extends ModuleModel implements TickerProvider {
     _hideTimer?.cancel();
     _progressTimer?.cancel();
     _controller.removeListener(_handleControllerChanged);
-    _thumbnailAnimationController.dispose();
     _remoteDeviceLinkWatcherBinding.close();
     _remoteDeviceLink.ctrl.close();
     super.onStop();

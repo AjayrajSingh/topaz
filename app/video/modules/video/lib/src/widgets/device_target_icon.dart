@@ -67,6 +67,12 @@ class _DeviceTargetIconState extends State<DeviceTargetIcon>
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _animationController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return new AnimatedBuilder(
         animation: _animationController,

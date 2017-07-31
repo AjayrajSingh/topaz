@@ -3,9 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/model.dart';
 
-import '../modular/module_model.dart';
 import '../widgets.dart';
 
 /// The screen to video player
@@ -21,15 +19,7 @@ class VideoApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Video Player',
       home: new Material(
-        child: new ScopedModelDescendant<VideoModuleModel>(
-          builder: (
-            BuildContext context,
-            Widget child,
-            VideoModuleModel model,
-          ) {
-            return new Player();
-          },
-        ),
+        child: new Player(),
       ),
     );
   }
