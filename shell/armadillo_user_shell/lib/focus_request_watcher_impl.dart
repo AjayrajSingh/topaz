@@ -3,8 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:apps.modular.services.user/focus.fidl.dart';
-
-import 'debug.dart';
+import 'package:lib.logging/logging.dart';
 
 /// Called when we receive a request to focus on [storyId];
 typedef void OnFocusRequest(String storyId);
@@ -20,7 +19,7 @@ class FocusRequestWatcherImpl extends FocusRequestWatcher {
 
   @override
   void onFocusRequest(String storyId) {
-    armadilloPrint('Received request to focus story: $storyId');
+    log.info('Received request to focus story: $storyId');
     _onFocusRequest(storyId);
   }
 }
