@@ -2,10 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.services.auth.account/account.fidl.dart';
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
+import 'package:apps.modular.services.auth.account/account.fidl.dart';
+import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
@@ -77,6 +78,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     SuggestionProvider suggestionProvider,
     ContextReader contextReader,
     ContextPublisher contextPublisher,
+    Link link,
   ) {
     super.onReady(
       userShellContext,
@@ -87,6 +89,7 @@ class ArmadilloUserShellModel extends UserShellModel {
       suggestionProvider,
       contextReader,
       contextPublisher,
+      link,
     );
     userLogoutter.userShellContext = userShellContext;
     focusController.watchRequest(
