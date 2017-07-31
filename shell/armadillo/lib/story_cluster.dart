@@ -512,6 +512,17 @@ class StoryCluster {
     }
   }
 
+  /// Returns the [Story] in this cluster with an id of [storyId].  Returns
+  /// null if that story is not within this cluster.
+  Story getStory(String storyId) {
+    Iterable<Story> storiesWithId =
+        realStories.where((Story story) => story.id.value == storyId);
+    if (storiesWithId.isEmpty) {
+      return null;
+    }
+    return storiesWithId.first;
+  }
+
   static String _getClusterTitle(List<Story> stories) {
     String title = '';
     stories.where((Story story) => !story.isPlaceHolder).forEach((Story story) {

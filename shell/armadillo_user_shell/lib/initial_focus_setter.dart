@@ -25,7 +25,8 @@ class InitialFocusSetter {
   /// If there is a focused stories stored, focus on it.
   void onStoriesFirstAvailable() {
     _focusProvider.query((List<FocusInfo> focusedStories) {
-      if (focusedStories?.isNotEmpty ?? false) {
+      if ((focusedStories?.isNotEmpty ?? false) &&
+          focusedStories.first.focusedStoryId != null) {
         _storyFocuser(focusedStories.first.focusedStoryId);
       }
     });

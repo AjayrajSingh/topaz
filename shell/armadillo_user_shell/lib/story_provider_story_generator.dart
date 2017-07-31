@@ -180,6 +180,23 @@ class StoryProviderStoryGenerator extends StoryGenerator {
           storyState == StoryState.initial || storyState == StoryState.stopped);
       _getController(storyInfo.id);
       _startStory(storyInfo, 0);
+    } else {
+      storyClusters.forEach((StoryCluster storyCluster) {
+        Story story = storyCluster.getStory(storyInfo.id);
+        if (story != null) {
+          DateTime lastInteraction = new DateTime.fromMicrosecondsSinceEpoch(
+            (storyInfo.lastFocusTime / 1000).round(),
+          );
+          bool lastInteractionChanged =
+              (lastInteraction != story.lastInteraction ||
+                  lastInteraction != storyCluster.lastInteraction);
+          story.lastInteraction = lastInteraction;
+          storyCluster.lastInteraction = lastInteraction;
+          if (lastInteractionChanged) {
+            _notifyListeners();
+          }
+        }
+      });
     }
   }
 
