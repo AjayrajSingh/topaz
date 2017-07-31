@@ -28,7 +28,11 @@ class Proposer extends ContextListener {
 
   /// Loads the contacts configuration used to make proposals.
   void load() {
-    String json = new File(_kContactsJsonFile).readAsStringSync();
+    File contactsJsonFile = new File(_kContactsJsonFile);
+    if (!contactsJsonFile.existsSync()) {
+      return;
+    }
+    String json = contactsJsonFile.readAsStringSync();
     final List<Map<String, dynamic>> decodedJson = JSON.decode(json);
     decodedJson.forEach((Map<String, dynamic> contact) {
       List<String> context = contact['context'] ?? <String>[];
