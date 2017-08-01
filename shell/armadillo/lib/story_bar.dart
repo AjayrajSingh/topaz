@@ -87,75 +87,78 @@ class StoryBarState extends TickingState<StoryBar> {
   }
 
   @override
-  Widget build(BuildContext context) => new PhysicalModel(
-        color: widget.story.themeColor,
-        elevation: widget.elevation,
-        child: new Container(
+  Widget build(BuildContext context) => widget.minimizedHeight == 0.0 &&
+          widget.maximizedHeight == 0.0
+      ? Nothing.widget
+      : new PhysicalModel(
           color: widget.story.themeColor,
-          height: _height - _focusedSimulation.value,
-          padding: new EdgeInsets.symmetric(horizontal: 12.0),
-          margin: new EdgeInsets.only(bottom: _focusedSimulation.value),
-          child: new OverflowBox(
-            minHeight: widget.maximizedHeight,
-            maxHeight: widget.maximizedHeight,
-            alignment: FractionalOffset.topCenter,
-            child: widget.showTitleOnly
-                ? new Center(
-                    child: new StoryTitle(
-                      title: widget.story.title,
-                      opacity: _opacity,
-                      baseColor: _textColor,
-                    ),
-                  )
-                : new Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 0.0,
-                      vertical: 12.0,
-                    ),
-                    child: new CustomMultiChildLayout(
-                      delegate: new ThreeColumnAlignedLayoutDelegate(
-                        partMargin: _kPartMargin,
+          elevation: widget.elevation,
+          child: new Container(
+            color: widget.story.themeColor,
+            height: _height - _focusedSimulation.value,
+            padding: new EdgeInsets.symmetric(horizontal: 12.0),
+            margin: new EdgeInsets.only(bottom: _focusedSimulation.value),
+            child: new OverflowBox(
+              minHeight: widget.maximizedHeight,
+              maxHeight: widget.maximizedHeight,
+              alignment: FractionalOffset.topCenter,
+              child: widget.showTitleOnly
+                  ? new Center(
+                      child: new StoryTitle(
+                        title: widget.story.title,
+                        opacity: _opacity,
+                        baseColor: _textColor,
                       ),
-                      children: <Widget>[
-                        /// Module icons for the current story.
-                        new LayoutId(
-                          id: ThreeColumnAlignedLayoutDelegateParts.left,
-                          child: new Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: widget.story.icons
-                                .map(
-                                  (OpacityBuilder builder) => builder(
-                                        context,
-                                        _opacity,
-                                      ),
-                                )
-                                .toList(),
+                    )
+                  : new Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 0.0,
+                        vertical: 12.0,
+                      ),
+                      child: new CustomMultiChildLayout(
+                        delegate: new ThreeColumnAlignedLayoutDelegate(
+                          partMargin: _kPartMargin,
+                        ),
+                        children: <Widget>[
+                          /// Module icons for the current story.
+                          new LayoutId(
+                            id: ThreeColumnAlignedLayoutDelegateParts.left,
+                            child: new Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: widget.story.icons
+                                  .map(
+                                    (OpacityBuilder builder) => builder(
+                                          context,
+                                          _opacity,
+                                        ),
+                                  )
+                                  .toList(),
+                            ),
                           ),
-                        ),
 
-                        /// Story title.
-                        new LayoutId(
-                          id: ThreeColumnAlignedLayoutDelegateParts.center,
-                          child: new StoryTitle(
-                            title: widget.story.title,
-                            opacity: _opacity,
-                            baseColor: _textColor,
+                          /// Story title.
+                          new LayoutId(
+                            id: ThreeColumnAlignedLayoutDelegateParts.center,
+                            child: new StoryTitle(
+                              title: widget.story.title,
+                              opacity: _opacity,
+                              baseColor: _textColor,
+                            ),
                           ),
-                        ),
 
-                        /// For future use.
-                        new LayoutId(
-                          id: ThreeColumnAlignedLayoutDelegateParts.right,
-                          child: Nothing.widget,
-                        ),
-                      ],
+                          /// For future use.
+                          new LayoutId(
+                            id: ThreeColumnAlignedLayoutDelegateParts.right,
+                            child: Nothing.widget,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+            ),
           ),
-        ),
-      );
+        );
 
   Color get _textColor {
     // See http://www.w3.org/TR/AERT#color-contrast for the details of this

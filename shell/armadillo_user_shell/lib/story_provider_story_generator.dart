@@ -31,6 +31,8 @@ const int _kMaxActiveClusters = 6;
 class StoryProviderStoryGenerator extends StoryGenerator {
   final Set<VoidCallback> _listeners = new Set<VoidCallback>();
   bool _firstTime = true;
+  bool _writeStoryClusterUpdatesToLink = false;
+  bool _reactToLinkUpdates = false;
 
   /// Set from an external source - typically the UserShell.
   StoryProviderProxy _storyProvider;
@@ -116,6 +118,10 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   void onLinkChanged(String json) {
     log.info('Link changed: $json');
 
+    if (!_reactToLinkUpdates) {
+      return;
+    }
+
     /// TODO: So something with the json.
     /// If the list of stories doesn't match the canonical list of stories,
     /// store this for later processing in the case that a story has been added
@@ -183,6 +189,9 @@ class StoryProviderStoryGenerator extends StoryGenerator {
           if (added == storiesToAdd.length) {
             if (_firstTime) {
               _firstTime = false;
+              _writeStoryClusterUpdatesToLink = true;
+              _reactToLinkUpdates = true;
+              //_onLinkUpdate();
               onStoriesFirstAvailable();
             }
             callback?.call();
@@ -296,6 +305,10 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   }
 
   void _onStoryClusterChange() {
+    if (!_writeStoryClusterUpdatesToLink) {
+      return;
+    }
+
     _link.set(
       null,
       JSON.encode(
@@ -342,9 +355,11 @@ class StoryProviderStoryGenerator extends StoryGenerator {
         cumulativeInteractionDuration: new Duration(
           minutes: 0,
         ),
-        themeColor: storyInfo.extra['color'] == null
-            ? Colors.grey[500]
-            : new Color(int.parse(storyInfo.extra['color'])),
+        themeColor:
+            // TODO: Determine if we want to use color from story info.
+            storyInfo.extra['color'] == null
+                ? Colors.grey[500]
+                : new Color(int.parse(storyInfo.extra['color'])),
         onClusterIndexChanged: (int clusterIndex) {
           _StoryWidgetState state =
               new GlobalObjectKey<_StoryWidgetState>(storyController)

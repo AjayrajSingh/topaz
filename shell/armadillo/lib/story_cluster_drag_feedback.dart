@@ -20,8 +20,6 @@ import 'story_cluster_widget.dart';
 import 'story_list_layout.dart';
 import 'story_panels.dart';
 
-const double _kStoryBarMinimizedHeight = 4.0;
-const double _kStoryBarMaximizedHeight = 32.0;
 const double _kUnfocusedCornerRadius = 4.0;
 const double _kFocusedCornerRadius = 8.0;
 
@@ -242,7 +240,7 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                     ? (widget.storyCluster.displayMode == DisplayMode.tabs)
                         ? widget.localDragStartPoint.dy -
                             targetHeight * realStoriesFractionalTopY -
-                            childScale * _kStoryBarMaximizedHeight
+                            childScale * SizeModel.kStoryBarMaximizedHeight
                         : widget.localDragStartPoint.dy -
                             targetHeight * realStoriesFractionalCenterY
                     : 0.0;

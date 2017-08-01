@@ -8,11 +8,10 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import 'size_model.dart';
 import 'story_cluster_widget.dart' show InlineStoryTitle;
 import 'story_list_layout.dart';
 import 'story_list_body_parent_data.dart';
-
-double _kStoryBarMinimizedHeight = 4.0;
 
 /// Set to true to slide the unfocused children of [RenderStoryListBody] as the
 /// focused child grows.
@@ -243,7 +242,7 @@ class RenderStoryListBody extends RenderListBody {
         double childHeight = lerpDouble(
           scaledLayoutHeight +
               InlineStoryTitle.getHeight(childParentData.focusProgress) +
-              _kStoryBarMinimizedHeight,
+              SizeModel.kStoryBarMinimizedHeight,
           _parentSize.height,
           childParentData.focusProgress,
         );

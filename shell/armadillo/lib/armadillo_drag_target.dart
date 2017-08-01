@@ -127,9 +127,9 @@ class ArmadilloLongPressDraggable<T> extends StatefulWidget {
   ///
   /// Subclasses can override this function to customize when they start
   /// recognizing a drag.
-  DelayedMultiDragGestureRecognizer createRecognizer(
+  HorizontalMultiDragGestureRecognizer createRecognizer(
           GestureMultiDragStartCallback onStart) =>
-      new DelayedMultiDragGestureRecognizer(delay: _kLongPressTimeout)
+      new HorizontalMultiDragGestureRecognizer()
         ..onStart = (Offset position) {
           Drag result = onStart(position);
           if (result != null) {

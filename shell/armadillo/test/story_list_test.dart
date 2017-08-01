@@ -21,7 +21,6 @@ const double _kWidthSingleColumn = 500.0;
 const double _kHorizontalMarginsSingleColumn = 16.0;
 const double _kWidthMultiColumn = 700.0;
 const double _kHeight = 600.0;
-const double _kStoryBarMaximizedHeight = 48.0;
 
 void main() {
   testWidgets('Single Column StoryList children extend to fit parent',
@@ -95,7 +94,7 @@ void main() {
       expect(finder, isNotNull);
       final Size size = tester.getSize(finder);
       expect(size.width, _kWidthMultiColumn);
-      expect(size.height, _kHeight - _kStoryBarMaximizedHeight);
+      expect(size.height, _kHeight - SizeModel.kStoryBarMaximizedHeight);
     });
   });
 }

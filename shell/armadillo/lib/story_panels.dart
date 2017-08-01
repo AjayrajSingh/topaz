@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/material.dart';
 
 import 'armadillo_drag_target.dart';
@@ -14,6 +16,7 @@ import 'panel.dart';
 import 'place_holder_story.dart';
 import 'simulated_fractionally_sized_box.dart';
 import 'simulated_padding.dart';
+import 'size_model.dart';
 import 'story.dart';
 import 'story_bar.dart';
 import 'story_cluster.dart';
@@ -26,10 +29,10 @@ import 'story_full_size_simulated_sized_box.dart';
 import 'story_model.dart';
 import 'story_positioned.dart';
 
-const double _kStoryBarMinimizedHeight = 4.0;
-const double _kStoryBarMaximizedHeight = 32.0;
 const double _kUnfocusedCornerRadius = 4.0;
 const double _kFocusedCornerRadius = 8.0;
+
+final Color _kStoryBackgroundColor = Colors.grey[300];
 
 /// Set to true to give the focused tab twice the space as an unfocused tab.
 const bool _kGrowFocusedTab = false;
@@ -133,7 +136,7 @@ class StoryPanels extends StatelessWidget {
           );
 
           return new StoryPositioned(
-            storyBarMaximizedHeight: _kStoryBarMaximizedHeight,
+            storyBarMaximizedHeight: SizeModel.kStoryBarMaximizedHeight,
             focusProgress: focusProgress,
             displayMode: storyCluster.displayMode,
             isFocused: (storyCluster.focusedStoryId == story.id),
@@ -401,7 +404,7 @@ class StoryPanels extends StatelessWidget {
                   },
                   child: new ConstrainedBox(
                     constraints: const BoxConstraints(
-                      maxHeight: _kStoryBarMaximizedHeight,
+                      maxHeight: SizeModel.kStoryBarMaximizedHeight,
                     ),
                     child: _getStoryBarDraggableWrapper(
                       context: context,
@@ -409,8 +412,8 @@ class StoryPanels extends StatelessWidget {
                       child: new StoryBar(
                         key: story.storyBarKey,
                         story: story,
-                        minimizedHeight: _kStoryBarMinimizedHeight,
-                        maximizedHeight: _kStoryBarMaximizedHeight,
+                        minimizedHeight: SizeModel.kStoryBarMinimizedHeight,
+                        maximizedHeight: SizeModel.kStoryBarMaximizedHeight,
                         focused:
                             (storyCluster.displayMode == DisplayMode.panels) ||
                                 (storyCluster.focusedStoryId == story.id),
@@ -425,14 +428,17 @@ class StoryPanels extends StatelessWidget {
                 child: new SimulatedFractionallySizedBox(
                   key: story.tabSizerKey,
                   alignment: FractionalOffset.topCenter,
+                  // TODO(SY-291): Remove the lerpDouble from 1.03 to 1.0 and
+                  // just use 1.0.  This was added to zoom the story in slightly
+                  // to hide Mondrain's drag bars.
                   heightFactor: (storyCluster.focusedStoryId == story.id ||
                           storyCluster.displayMode == DisplayMode.panels)
-                      ? 1.0
+                      ? lerpDouble(1.03, 1.0, focusProgress)
                       : 0.0,
                   child: new Container(
-                    color: story.themeColor,
+                    color: _kStoryBackgroundColor,
                     child: new PhysicalModel(
-                      color: story.themeColor,
+                      color: _kStoryBackgroundColor,
                       elevation: storyElevationWithTabs,
                       child: _getStoryContents(context, story),
                     ),
@@ -452,7 +458,7 @@ class StoryPanels extends StatelessWidget {
           displayMode: storyCluster.displayMode,
           panel: story.panel,
           containerKey: story.containerKey,
-          storyBarMaximizedHeight: _kStoryBarMaximizedHeight,
+          storyBarMaximizedHeight: SizeModel.kStoryBarMaximizedHeight,
           child: storyWidgets[story.id] ?? story.builder(context),
         ),
       );
