@@ -114,6 +114,14 @@ class Panel {
         heightFactor: bottom - top,
       );
 
+  /// Creates a [Panel] from the output of [toJsonObject].
+  factory Panel.fromJsonObject(List<double> jsonObject) => new Panel.fromLTRB(
+        jsonObject[0],
+        jsonObject[1],
+        jsonObject[2],
+        jsonObject[3],
+      );
+
   /// Creates a new [Panel] that is a copy of [panel].
   factory Panel.from(Panel panel) =>
       new Panel.fromLTRB(panel.left, panel.top, panel.right, panel.bottom);
@@ -305,6 +313,15 @@ class Panel {
       panelAbsorbedResultCallback(this, other);
     }
   }
+
+  /// Returns an object represeting the [Panel] suitable for conversion into
+  /// JSON.
+  List<double> toJsonObject() => <double>[
+        left,
+        top,
+        right,
+        bottom,
+      ];
 
   bool _overlaps(Panel other) {
     Rect fractionalRect = new Rect.fromLTRB(

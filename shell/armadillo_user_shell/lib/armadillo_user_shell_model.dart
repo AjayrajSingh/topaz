@@ -96,6 +96,7 @@ class ArmadilloUserShellModel extends UserShellModel {
       _focusRequestWatcherBinding.wrap(focusRequestWatcher),
     );
     initialFocusSetter.focusProvider = focusProvider;
+    storyProviderStoryGenerator.link = link;
     storyProviderStoryGenerator.storyProvider = storyProvider;
     suggestionProviderSuggestionModel.suggestionProvider = suggestionProvider;
     suggestionProviderSuggestionModel.focusController = focusController;
@@ -123,6 +124,11 @@ class ArmadilloUserShellModel extends UserShellModel {
     suggestionProviderSuggestionModel.close();
     storyProviderStoryGenerator.close();
     super.onStop();
+  }
+
+  @override
+  void onNotify(String json) {
+    storyProviderStoryGenerator.onLinkChanged(json);
   }
 
   /// Called when the user context is tapped.

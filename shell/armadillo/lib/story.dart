@@ -147,4 +147,14 @@ class Story {
 
   @override
   String toString() => 'Story( id: $id, title: $title, panel: $panel )';
+
+  /// Returns an object represeting the [Story] suitable for conversion
+  /// into JSON.
+  Map<String, dynamic> toJsonObject() {
+    Map<String, dynamic> storyData = <String, dynamic>{};
+    storyData['id'] = id.value;
+    storyData['panel'] = panel.toJsonObject();
+    storyData['cluster_index'] = _clusterIndex;
+    return storyData;
+  }
 }

@@ -163,7 +163,12 @@ class StoryModel extends Model {
     from.absorb(storyToSplit);
 
     clearPlaceHolderStoryClusters();
-    _storyClusters.add(new StoryCluster.fromStory(storyToSplit));
+    _storyClusters.add(
+      new StoryCluster.fromStory(
+        storyToSplit,
+        from.onStoryClusterChanged,
+      ),
+    );
     updateLayouts(_lastLayoutSize);
     notifyListeners();
   }

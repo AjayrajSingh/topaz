@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/story_controller.fidl.dart';
 import 'package:apps.modular.services.story/story_info.fidl.dart';
 import 'package:apps.modular.services.story/story_state.fidl.dart';
@@ -32,6 +34,9 @@ class StoryProviderStoryGenerator extends StoryGenerator {
 
   /// Set from an external source - typically the UserShell.
   StoryProviderProxy _storyProvider;
+
+  /// Set from an external source - typically the UserShell.
+  Link _link;
 
   final List<StoryCluster> _storyClusters = <StoryCluster>[];
 
@@ -89,6 +94,11 @@ class StoryProviderStoryGenerator extends StoryGenerator {
     update();
   }
 
+  /// Sets the [Link] used to set clustering information.
+  set link(Link link) {
+    _link = link;
+  }
+
   @override
   void addListener(VoidCallback listener) {
     _listeners.add(listener);
@@ -101,6 +111,23 @@ class StoryProviderStoryGenerator extends StoryGenerator {
 
   @override
   List<StoryCluster> get storyClusters => _storyClusters;
+
+  /// Called when the link changes.
+  void onLinkChanged(String json) {
+    log.info('Link changed: $json');
+
+    /// TODO: So something with the json.
+    /// If the list of stories doesn't match the canonical list of stories,
+    /// store this for later processing in the case that a story has been added
+    /// or removed and we don't know about it.
+    ///
+    /// If the list of stories matches, replace the current list of clusters
+    /// with this list by merging the data.
+    /// Map<String, List<Map<String, dynamic>>> decodedJson = JSON.decode(json);
+    /// decodedJson['story_clusters'].forEach(
+    ///   (Map<String, dynamic> storyClusterJsonObject) {},
+    /// );
+  }
 
   /// Removes all the stories in the [StoryCluster] with [storyClusterId] from
   /// the [StoryProvider].
@@ -165,6 +192,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
     });
   }
 
+  /// TODO: Determine if this should be expanding cluster.realStories instead
   Iterable<Story> get _currentStories => storyClusters.expand(
         (StoryCluster cluster) => cluster.stories,
       );
@@ -247,13 +275,16 @@ class StoryProviderStoryGenerator extends StoryGenerator {
     // Start it!
 
     // Create a flutter view from its view!
-    StoryCluster storyCluster = new StoryCluster(stories: <Story>[
-      _createStory(
-        storyInfo: storyInfo,
-        storyController: _storyControllerMap[storyInfo.id],
-        startingIndex: startingIndex,
-      ),
-    ]);
+    StoryCluster storyCluster = new StoryCluster(
+      stories: <Story>[
+        _createStory(
+          storyInfo: storyInfo,
+          storyController: _storyControllerMap[storyInfo.id],
+          startingIndex: startingIndex,
+        ),
+      ],
+      onStoryClusterChanged: _onStoryClusterChange,
+    );
 
     _storyClusters.add(storyCluster);
     _notifyListeners();
@@ -261,6 +292,20 @@ class StoryProviderStoryGenerator extends StoryGenerator {
 
   void _notifyListeners() {
     _listeners.toList().forEach((VoidCallback listener) => listener());
+    _onStoryClusterChange();
+  }
+
+  void _onStoryClusterChange() {
+    _link.set(
+      null,
+      JSON.encode(
+        <String, List<Map<String, dynamic>>>{
+          'story_clusters': _storyClusters
+              .map((StoryCluster storyCluster) => storyCluster.toJsonObject())
+              .toList()
+        },
+      ),
+    );
   }
 
   Story _createStory({

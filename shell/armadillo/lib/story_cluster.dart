@@ -58,6 +58,9 @@ class StoryCluster {
 
   final Set<VoidCallback> _storyListListeners;
 
+  /// Called when details about how the stories are clustered changes.
+  final VoidCallback onStoryClusterChanged;
+
   /// The title of a cluster is currently generated via
   /// [_getClusterTitle] whenever the list of stories in this cluster changes.
   /// [_getClusterTitle] currently just concatenates the titles of the stories
@@ -84,6 +87,7 @@ class StoryCluster {
     GlobalKey clusterDraggableKey,
     List<Story> stories,
     this.storyLayout,
+    this.onStoryClusterChanged,
   })
       : this._stories = stories,
         this.title = _getClusterTitle(stories),
@@ -112,10 +116,15 @@ class StoryCluster {
     _storiesModel = new StoryClusterStoriesModel(this);
     addStoryListListener(_storiesModel.notifyListeners);
     _panelsModel = new StoryClusterPanelsModel(this);
+    _storiesModel.addListener(onStoryClusterChanged);
+    _panelsModel.addListener(onStoryClusterChanged);
   }
 
   /// Creates a [StoryCluster] from [story].
-  factory StoryCluster.fromStory(Story story) {
+  factory StoryCluster.fromStory(
+    Story story,
+    VoidCallback onStoryClusterChanged,
+  ) {
     story.panel = new Panel();
     story.positionedKey =
         new GlobalKey(debugLabel: '${story.id} positionedKey');
@@ -123,6 +132,7 @@ class StoryCluster {
       id: story.clusterId,
       clusterDraggableKey: story.clusterDraggableKey,
       stories: <Story>[story],
+      onStoryClusterChanged: onStoryClusterChanged,
     );
   }
 
@@ -521,6 +531,19 @@ class StoryCluster {
       return null;
     }
     return storiesWithId.first;
+  }
+
+  /// Returns an object represeting the [StoryCluster] suitable for conversion
+  /// into JSON.
+  Map<String, dynamic> toJsonObject() {
+    Map<String, dynamic> clusterData = <String, dynamic>{};
+    clusterData['stories'] =
+        realStories.map((Story story) => story.toJsonObject()).toList();
+    clusterData['display_mode'] =
+        displayMode == DisplayMode.tabs ? 'tabs' : 'panels';
+    clusterData['focused_story_id'] = focusedStoryId.value;
+
+    return clusterData;
   }
 
   static String _getClusterTitle(List<Story> stories) {
