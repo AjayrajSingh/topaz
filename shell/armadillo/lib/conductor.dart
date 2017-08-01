@@ -163,7 +163,7 @@ class ConductorState extends State<Conductor> {
                           ),
                           child: child,
                         ),
-                    child: _getStoryList(),
+                    child: _getStoryList(sizeModel),
                   ),
             ),
 
@@ -212,7 +212,7 @@ class ConductorState extends State<Conductor> {
         ),
       );
 
-  Widget _getStoryList() => new VerticalShifter(
+  Widget _getStoryList(SizeModel sizeModel) => new VerticalShifter(
         key: _verticalShifterKey,
         verticalShift: _kQuickSettingsHeightBump,
         child: new ScrollLocker(
@@ -225,7 +225,11 @@ class ConductorState extends State<Conductor> {
                 _ignoreNextScrollOffsetChange = false;
                 return;
               }
-              _nowKey.currentState.scrollOffset = scrollOffset;
+
+              // Ignore top padding of storylist when looking at scroll offset
+              // to determine Now state.
+              _nowKey.currentState.scrollOffset =
+                  scrollOffset + sizeModel.storyListTopPadding;
 
               // Peak suggestion overlay more when overscrolling.
               if (scrollOffset < -_kSuggestionOverlayPullScrollOffset &&

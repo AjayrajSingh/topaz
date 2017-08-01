@@ -149,4 +149,7 @@ class SizeModel extends Model {
 
   /// Peek height of the suggestion list
   double get suggestionPeekHeight => _kSuggestionPeekHeight[_formFactor];
+
+  /// The top padding of the story list
+  double get storyListTopPadding => screenSize.height / 8.0;
 }

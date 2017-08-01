@@ -98,6 +98,7 @@ class StoryList extends StatelessWidget {
           return false;
         },
         child: new SingleChildScrollView(
+          padding: new EdgeInsets.only(top: sizeModel.storyListTopPadding),
           reverse: true,
           controller: scrollController,
           child: new ScopedModelDescendant<SizeModel>(
