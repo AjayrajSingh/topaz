@@ -82,6 +82,9 @@ package("dart_runner") {
       name = "dart_runner_test.dartx"
     },
     {
+      name = "goodbye_dart.dartx"
+    },
+    {
       name = "hello_app_dart.dartx"
     },
     {
@@ -92,6 +95,9 @@ package("dart_runner") {
     },
     {
       name = "dart_aot_runner_test.dartx"
+    },
+    {
+      name = "goodbye_dart_aot.dartx"
     },
     {
       name = "hello_app_dart_aot.dartx"

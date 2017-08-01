@@ -6,6 +6,8 @@ group("examples") {
   testonly = true
 
   public_deps = [
+    "goodbye_dart",
+    "goodbye_dart:goodbye_dart_aot",
     "hello_app_dart",
     "hello_app_dart:hello_app_dart_aot",
     "hello_dart",

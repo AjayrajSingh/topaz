@@ -30,12 +30,17 @@ void AfterTask() {
   tonic::DartMicrotaskQueue* queue =
       tonic::DartMicrotaskQueue::GetForCurrentThread();
   queue->RunMicrotasks();
-  if (!Dart_HasLivePorts() &&
-      tonic::HandleTable::Current().Empty() &&
-      !queue->HasMicrotasks()) {
-    FTL_LOG(INFO) << "Isolate has no ports, handles or microtasks and could be "
-                     "terminated.";
-  }
+}
+
+void IsolateShutdownCallback(void* callback_data) {
+  mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
+  tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
+  mtl::MessageLoop::GetCurrent()->QuitNow();
+}
+
+void IsolateCleanupCallback(void* callback_data) {
+  tonic::DartState* dart_state = static_cast<tonic::DartState*>(callback_data);
+  delete dart_state;
 }
 
 }  // namespace
@@ -93,6 +98,8 @@ void DartApplicationController::InitDartVM() {
     params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
     params.vm_snapshot_data = vm_snapshot_data_;
     params.vm_snapshot_instructions = vm_snapshot_instructions_;
+    params.shutdown = IsolateShutdownCallback;
+    params.cleanup = IsolateCleanupCallback;
     char* error = Dart_Initialize(&params);
     if (error)
       FTL_LOG(FATAL) << "Dart_Initialize failed: " << error;
@@ -103,7 +110,7 @@ bool DartApplicationController::CreateIsolate() {
   // Create the isolate from the snapshot.
   char* error = nullptr;
 
-  auto state = new tonic::DartState();  // owned by Dart_CreateIsolate
+  auto state = new tonic::DartState();  // Freed in IsolateShutdownCallback.
   isolate_ = Dart_CreateIsolate(url_.c_str(), "main", isolate_snapshot_data_,
                                 isolate_snapshot_instructions_, nullptr, state,
                                 &error);
