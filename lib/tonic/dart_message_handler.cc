@@ -95,6 +95,12 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
     if (Dart_IsError(result)) {
       // Remember that we had an uncaught exception error.
       isolate_had_uncaught_exception_error_ = true;
+      if (Dart_IsFatalError(result)) {
+        // Stop handling messages.
+        Dart_SetMessageNotifyCallback(nullptr);
+        // Shut down the isolate.
+        Dart_ShutdownIsolate();
+      }
     }
   } else if (!Dart_HasLivePorts()) {
     // The isolate has no live ports and would like to exit.

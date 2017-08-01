@@ -13,7 +13,10 @@ namespace tonic {
 class DartApiScope {
  public:
   DartApiScope() { Dart_EnterScope(); }
-  ~DartApiScope() { Dart_ExitScope(); }
+  ~DartApiScope() {
+    if (Dart_CurrentIsolate())
+      Dart_ExitScope();
+  }
 
  private:
   FTL_DISALLOW_COPY_AND_ASSIGN(DartApiScope);

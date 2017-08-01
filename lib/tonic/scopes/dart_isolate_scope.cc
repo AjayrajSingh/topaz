@@ -17,10 +17,12 @@ DartIsolateScope::DartIsolateScope(Dart_Isolate isolate) {
 }
 
 DartIsolateScope::~DartIsolateScope() {
-  FTL_DCHECK(Dart_CurrentIsolate() == isolate_);
+  Dart_Isolate current = Dart_CurrentIsolate();
+  FTL_DCHECK(!current || current == isolate_);
   if (previous_ == isolate_)
     return;
-  Dart_ExitIsolate();
+  if (current)
+    Dart_ExitIsolate();
   if (previous_)
     Dart_EnterIsolate(previous_);
 }
