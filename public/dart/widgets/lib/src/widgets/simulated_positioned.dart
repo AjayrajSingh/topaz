@@ -110,7 +110,7 @@ class SimulatedPositioned extends StatefulWidget {
   State<SimulatedPositioned> createState() => new _SimulatedPositionedState();
 
   @override
-  void debugFillProperties(List<DiagnosticsNode> description) {
+  void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
     description.add(new DiagnosticsProperty<Widget>('child', child));
     description.add(new DiagnosticsProperty<Rect>('rect', rect));
