@@ -107,8 +107,14 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
                 List<Surface> focusStack = graph.focusStack.toList();
                 List<Surface> placedSurfaces = <Surface>[];
                 double depth = 0.0;
+                // HACK(alangardner): Used to create illusion of symmetry
+                BoxConstraints adjustedConstraints = new BoxConstraints(
+                    minWidth: constraints.minWidth,
+                    minHeight: constraints.minHeight,
+                    maxHeight: constraints.maxHeight,
+                    maxWidth: constraints.maxWidth - 12.0);
                 while (focusStack.isNotEmpty) {
-                  layoutSurfaces(context, constraints, focusStack)
+                  layoutSurfaces(context, adjustedConstraints, focusStack)
                       .forEach((PositionedSurface ps) {
                     if (!placedSurfaces.contains(ps.surface)) {
                       placedSurfaces.add(ps.surface);

@@ -10,7 +10,7 @@ import 'model.dart';
 import 'tree.dart';
 
 const double _kMinScreenWidth = 200.0;
-const double _kMinScreenRatio = 1.1 / 5.0;
+const double _kMinScreenRatio = 1.0 / 5.0;
 
 /// A pair of Surface and a Rect position.
 class PositionedSurface {
