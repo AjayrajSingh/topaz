@@ -341,7 +341,7 @@ class _StoryListChild extends ParentDataWidget<_StoryListBody> {
   }
 
   @override
-  void debugFillProperties(List<DiagnosticsNode> description) {
+  void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
     description.add(
       new DiagnosticsProperty<StoryLayout>(
