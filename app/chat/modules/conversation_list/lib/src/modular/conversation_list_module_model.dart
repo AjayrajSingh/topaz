@@ -414,4 +414,10 @@ class ChatConversationListModuleModel extends ModuleModel {
       },
     );
   }
+
+  /// Callback that handles the user submitting a new conversation form
+  void handleNewConversationFormSubmit(List<String> participants) {
+    hideNewConversationForm();
+    newConversation(participants);
+  }
 }

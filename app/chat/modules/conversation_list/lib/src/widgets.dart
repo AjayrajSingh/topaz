@@ -5,3 +5,4 @@
 export 'widgets/chat_conversation_list.dart';
 export 'widgets/chat_conversation_list_item.dart';
 export 'widgets/chat_group_avatar.dart';
+export 'widgets/new_chat_conversation_form.dart';

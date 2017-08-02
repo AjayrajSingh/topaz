@@ -21,8 +21,6 @@ class ChatConversationListScreen extends StatefulWidget {
 
 class _ChatConversationListScreenState
     extends State<ChatConversationListScreen> {
-  final TextEditingController _textController = new TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -75,85 +73,11 @@ class _ChatConversationListScreenState
     BuildContext context,
     ChatConversationListModuleModel model,
   ) {
-    ThemeData theme = Theme.of(context);
-
     return new Center(
-      child: new AnimatedBuilder(
-        animation: _textController,
-        builder: (BuildContext context, Widget child) {
-          return new AlertDialog(
-            title: new Text('New Chat'),
-            content: new Row(
-              children: <Widget>[
-                new Expanded(
-                  child: new TextField(
-                    autofocus: true,
-                    decoration: const InputDecoration(hintText: 'Enter email'),
-                    controller: _textController,
-                    onSubmitted: (String text) => text.isNotEmpty
-                        ? _handleConversationFormSubmit(model, text)
-                        : null,
-                  ),
-                ),
-                new IconButton(
-                  icon: new Icon(Icons.add_circle_outline),
-                  color: theme.primaryColor,
-                  onPressed: _shouldEnablePlusButton(_textController.text)
-                      ? _handlePlusButton
-                      : null,
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text('CANCEL'),
-                onPressed: model.hideNewConversationForm,
-              ),
-              new FlatButton(
-                child: new Text('OK'),
-                onPressed: _shouldEnableSubmitButton(_textController.text)
-                    ? () => _handleConversationFormSubmit(
-                        model, _textController.text)
-                    : null,
-              ),
-            ],
-          );
-        },
+      child: new NewChatConversationForm(
+        onFormCancel: model.hideNewConversationForm,
+        onFormSubmit: model.handleNewConversationFormSubmit,
       ),
     );
-  }
-
-  /// Determines whether the circled plus button should be enabled or not.
-  bool _shouldEnablePlusButton(String text) =>
-      text.trim().isNotEmpty && !text.trim().endsWith(',');
-
-  /// Adds ', ' to the end of the text input and advances the cursor to the end.
-  void _handlePlusButton() {
-    _textController.text = _textController.text + ', ';
-    _textController.selection = new TextSelection.collapsed(
-      offset: _textController.text.length,
-    );
-  }
-
-  /// Determines whether the submit button should be enabled or not.
-  bool _shouldEnableSubmitButton(String text) => text
-      .split(',')
-      .map((String s) => s.trim())
-      .where((String s) => s.isNotEmpty)
-      .isNotEmpty;
-
-  /// Creates a new conversation with the given participants.
-  void _handleConversationFormSubmit(
-    ChatConversationListModuleModel model,
-    String text,
-  ) {
-    List<String> participants = text
-        .split(',')
-        .map((String s) => s.trim())
-        .where((String s) => s.isNotEmpty)
-        .toList();
-    model.hideNewConversationForm();
-    model.newConversation(participants);
-    _textController.clear();
   }
 }
