@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
+import 'constants.dart';
+
 /// Callback function signature for the action to submit the new conversation
 /// form
 typedef void NewConversationFormSubmitCallback(List<String> participants);
@@ -44,15 +46,15 @@ class _NewChatConversationFormState extends State<NewChatConversationForm> {
       animation: _textController,
       builder: (BuildContext context, Widget child) {
         return new AlertDialog(
-          title: new Text('New Chat'),
+          title: new Text(kNewChatFormTitle),
           content: _buildParticipantInputField(),
           actions: <Widget>[
             new FlatButton(
-              child: new Text('CANCEL'),
+              child: new Text(kNewChatFormCancel),
               onPressed: widget.onFormCancel,
             ),
             new FlatButton(
-              child: new Text('OK'),
+              child: new Text(kNewChatFormSubmit),
               onPressed: _shouldEnableSubmitButton(_textController.text)
                   ? () => _handleConversationFormSubmit(_textController.text)
                   : null,
@@ -94,7 +96,7 @@ class _NewChatConversationFormState extends State<NewChatConversationForm> {
         new TextField(
           autofocus: true,
           focusNode: _textFieldFocusNode,
-          decoration: const InputDecoration(hintText: 'Enter email'),
+          decoration: const InputDecoration(hintText: kNewChatFormHintText),
           controller: _textController,
           onSubmitted: _handleInputSubmit,
         ),
@@ -102,14 +104,15 @@ class _NewChatConversationFormState extends State<NewChatConversationForm> {
     );
   }
 
-  /// Convert a comma separated string into a list of values;
-  /// empty strings are not added to the resulting list
-  List<String> _getListFromCSV(String text) {
+  /// Convert a comma separated string into a set of distinct values that
+  /// maintains the insertion order;
+  /// empty strings are not added to the resulting set
+  Set<String> _getDistinctValuesFromCSV(String text) {
     return text
         .split(',')
         .map((String s) => s.trim())
         .where((String s) => s.isNotEmpty)
-        .toList();
+        .toSet();
   }
 
   /// Determines whether we should submit the list of participants
@@ -118,26 +121,29 @@ class _NewChatConversationFormState extends State<NewChatConversationForm> {
 
   /// Add the new text in the input field to the list of participants;
   /// if there are multiple values delimited by commas, it will add multiple
-  /// values
-  void _addNewParticipants(String text) {
-    _participants.addAll(
-        _getListFromCSV(text).where((String s) => !_participants.contains(s)));
+  /// values. By default [refocus] is true which will refocus back on the
+  /// text field.
+  void _addNewParticipants(String text, {bool refocus = true}) {
+    _participants.addAll(_getDistinctValuesFromCSV(text)
+        .where((String s) => !_participants.contains(s)));
     _textController.clear();
 
     // refocus back into the text field so that multiple values can be typed
-    FocusScope.of(context).requestFocus(_textFieldFocusNode);
+    if (refocus) {
+      FocusScope.of(context).requestFocus(_textFieldFocusNode);
+    }
   }
 
   /// Determines whether the submit button should be enabled or not.
   bool _shouldEnableSubmitButton(String text) {
-    return _getListFromCSV(text).isNotEmpty || _participants.isNotEmpty;
+    return _getDistinctValuesFromCSV(text).isNotEmpty ||
+        _participants.isNotEmpty;
   }
 
   /// Creates a new conversation with the given participants.
   void _handleConversationFormSubmit(String text) {
-    _participants.addAll(_getListFromCSV(text));
+    _addNewParticipants(text, refocus: false);
     widget.onFormSubmit(_participants);
-    _textController.clear();
   }
 
   /// Handles the text field submit action and determines whether to add the
