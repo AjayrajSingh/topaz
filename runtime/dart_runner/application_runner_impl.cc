@@ -6,6 +6,7 @@
 
 #include <dlfcn.h>
 #include <magenta/dlfcn.h>
+#include <magenta/status.h>
 #include <mx/process.h>
 #include <thread>
 #include <utility>
@@ -14,25 +15,40 @@
 #include "apps/dart_content_handler/embedder/snapshot.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "lib/mtl/vmo/vector.h"
-#include "lib/zip/unzipper.h"
 
 namespace dart_content_handler {
 namespace {
 
-bool ExtractSnapshots(std::vector<char> bundle,
+#if defined(AOT_RUNTIME)
+
+bool ExtractSnapshots(const mx::vmo& bundle,
                       const uint8_t*& vm_snapshot_data,
                       const uint8_t*& vm_snapshot_instructions,
                       const uint8_t*& isolate_snapshot_data,
                       const uint8_t*& isolate_snapshot_instructions,
-                      std::vector<char>& script_snapshot) {
-#if defined(AOT_RUNTIME)
-  constexpr char kDylibKey[] = "libapp.so";
-  zip::Unzipper unzipper(std::move(bundle));
-  std::vector<char> dylib = unzipper.Extract(kDylibKey);
+                      const uint8_t*& script_snapshot,
+                      intptr_t* script_snapshot_len) {
+  // The AOT bundle consists of:
+  //   1. The Fuchsia shebang: #!fuchsia dart_aot_runner\n
+  //   2. Padding up to the page size
+  //   3. The dylib containing the AOT compiled Dart snapshot.
+  // To make a vmo that we can pass to dlopen_vmo(), we clone the bundle vmo
+  // at an offset of one page.
+  mx_status_t status;
+  uint64_t bundle_size;
+  status = bundle.get_size(&bundle_size);
+  if (status != MX_OK) {
+    FTL_LOG(ERROR) << "bundle.get_size() failed: "
+                   << mx_status_get_string(status);
+    return false;
+  }
 
   mx::vmo dylib_vmo;
-  if (!mtl::VmoFromVector(dylib, &dylib_vmo)) {
-    FTL_LOG(ERROR) << "Failed to load dylib data";
+  const int pagesize = getpagesize();
+  status = bundle.clone(MX_VMO_CLONE_COPY_ON_WRITE | MX_RIGHT_EXECUTE, pagesize,
+                        bundle_size - pagesize, &dylib_vmo);
+  if (status != MX_OK) {
+    FTL_LOG(ERROR) << "bundle.clone() failed: " << mx_status_get_string(status);
     return false;
   }
 
@@ -73,19 +89,46 @@ bool ExtractSnapshots(std::vector<char> bundle,
   }
 
   return true;
-#else  // !AOT_RUNTIME
+}
+
+#else  // !defined(AOT_RUNTIME)
+
+bool ExtractSnapshots(const mx::vmo& bundle,
+                      const uint8_t*& vm_snapshot_data,
+                      const uint8_t*& vm_snapshot_instructions,
+                      const uint8_t*& isolate_snapshot_data,
+                      const uint8_t*& isolate_snapshot_instructions,
+                      const uint8_t*& script_snapshot,
+                      intptr_t* script_snapshot_len) {
   vm_snapshot_data = dart_content_handler::vm_isolate_snapshot_buffer;
   vm_snapshot_instructions = NULL;
   isolate_snapshot_data = dart_content_handler::isolate_snapshot_buffer;
   isolate_snapshot_instructions = NULL;
 
-  constexpr char kSnapshotKey[] = "snapshot_blob.bin";
-  zip::Unzipper unzipper(std::move(bundle));
-  script_snapshot = unzipper.Extract(kSnapshotKey);
+  mx_status_t status;
+  uint64_t bundle_size;
+  status = bundle.get_size(&bundle_size);
+  if (status != MX_OK) {
+    FTL_LOG(ERROR) << "bundle.get_size() failed: "
+                   << mx_status_get_string(status);
+    return false;
+  }
 
+  const int pagesize = getpagesize();
+  uintptr_t addr;
+  status = mx::vmar::root_self().map(
+      0, bundle, pagesize, bundle_size - pagesize, MX_VM_FLAG_PERM_READ, &addr);
+  if (status != MX_OK) {
+    FTL_LOG(ERROR) << "bundle map failed: " << mx_status_get_string(status);
+    return false;
+  }
+
+  script_snapshot = reinterpret_cast<uint8_t*>(addr);
+  *script_snapshot_len = bundle_size - pagesize;
   return true;
-#endif
 }
+
+#endif  // !defined(AOT_RUNTIME)
 
 std::string GetLabelFromURL(const std::string& url) {
   size_t last_slash = url.rfind('/');
@@ -98,22 +141,18 @@ void RunApplication(
     app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
     ::fidl::InterfaceRequest<app::ApplicationController> controller) {
-  // Extract a dart snapshot from the application package data.
-  std::vector<char> bundle;
-  if (!mtl::VectorFromVmo(application->data, &bundle)) {
-    FTL_LOG(ERROR) << "Failed to read application data.";
-    return;
-  }
   std::string url = std::move(application->resolved_url);
 
   const uint8_t* vm_snapshot_data = NULL;
   const uint8_t* vm_snapshot_instructions = NULL;
   const uint8_t* isolate_snapshot_data = NULL;
   const uint8_t* isolate_snapshot_instructions = NULL;
-  std::vector<char> script_snapshot;
-  if (!ExtractSnapshots(bundle, vm_snapshot_data, vm_snapshot_instructions,
-                        isolate_snapshot_data, isolate_snapshot_instructions,
-                        script_snapshot)) {
+  const uint8_t* script_snapshot = NULL;
+  intptr_t script_snapshot_len = 0;
+  if (!ExtractSnapshots(application->data, vm_snapshot_data,
+                        vm_snapshot_instructions, isolate_snapshot_data,
+                        isolate_snapshot_instructions, script_snapshot,
+                        &script_snapshot_len)) {
     return;
   }
 
@@ -125,7 +164,10 @@ void RunApplication(
 
   DartApplicationController app(
       vm_snapshot_data, vm_snapshot_instructions, isolate_snapshot_data,
-      isolate_snapshot_instructions, std::move(script_snapshot),
+      isolate_snapshot_instructions,
+#if !defined(AOT_RUNTIME)
+      script_snapshot, script_snapshot_len,
+#endif  // !defined(AOT_RUNTIME)
       std::move(startup_info), std::move(url), std::move(controller));
 
   if (app.CreateIsolate()) {

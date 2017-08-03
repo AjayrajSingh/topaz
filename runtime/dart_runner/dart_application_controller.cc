@@ -50,7 +50,10 @@ DartApplicationController::DartApplicationController(
     const uint8_t* vm_snapshot_instructions,
     const uint8_t* isolate_snapshot_data,
     const uint8_t* isolate_snapshot_instructions,
-    std::vector<char> script_snapshot,
+#if !defined(AOT_RUNTIME)
+    const uint8_t* script_snapshot,
+    intptr_t script_snapshot_len,
+#endif  // !defined(AOT_RUNTIE)
     app::ApplicationStartupInfoPtr startup_info,
     std::string url,
     fidl::InterfaceRequest<app::ApplicationController> controller)
@@ -58,7 +61,10 @@ DartApplicationController::DartApplicationController(
       vm_snapshot_instructions_(vm_snapshot_instructions),
       isolate_snapshot_data_(isolate_snapshot_data),
       isolate_snapshot_instructions_(isolate_snapshot_instructions),
-      script_snapshot_(std::move(script_snapshot)),
+#if !defined(AOT_RUNTIME)
+      script_snapshot_(script_snapshot),
+      script_snapshot_len_(script_snapshot_len),
+#endif  // !defined(AOT_RUNTIE)
       startup_info_(std::move(startup_info)),
       url_(std::move(url)),
       binding_(this) {
@@ -132,9 +138,8 @@ bool DartApplicationController::Main() {
 #if defined(AOT_RUNTIME)
   Dart_Handle root_library = Dart_RootLibrary();
 #else
-  Dart_Handle root_library = Dart_LoadScriptFromSnapshot(
-      reinterpret_cast<uint8_t*>(script_snapshot_.data()),
-      script_snapshot_.size());
+  Dart_Handle root_library =
+      Dart_LoadScriptFromSnapshot(script_snapshot_, script_snapshot_len_);
 #endif
 
   // TODO(jeffbrown): Decide what we should do with any startup handles.

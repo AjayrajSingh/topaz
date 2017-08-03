@@ -20,7 +20,10 @@ class DartApplicationController : public app::ApplicationController {
       const uint8_t* vm_snapshot_instructions,
       const uint8_t* isolate_snapshot_data,
       const uint8_t* isolate_snapshot_instructions,
-      std::vector<char> snapshot,
+#if !defined(AOT_RUNTIME)
+      const uint8_t* snapshot,
+      intptr_t snapshot_len,
+#endif  // !defined(AOT_RUNTIME)
       app::ApplicationStartupInfoPtr startup_info,
       std::string url,
       fidl::InterfaceRequest<app::ApplicationController> controller);
@@ -40,7 +43,10 @@ class DartApplicationController : public app::ApplicationController {
   const uint8_t* vm_snapshot_instructions_;
   const uint8_t* isolate_snapshot_data_;
   const uint8_t* isolate_snapshot_instructions_;
-  std::vector<char> script_snapshot_;
+#if !defined(AOT_RUNTIME)
+  const uint8_t* script_snapshot_;
+  intptr_t script_snapshot_len_;
+#endif  // !defined(AOT_RUNTIME)
   app::ApplicationStartupInfoPtr startup_info_;
   std::string url_;
   app::ServiceProviderBridge service_provider_bridge_;

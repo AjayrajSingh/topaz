@@ -17,7 +17,6 @@
 #include "lib/ftl/files/symlink.h"
 #include "lib/ftl/files/unique_fd.h"
 #include "lib/ftl/logging.h"
-#include "lib/zip/zipper.h"
 
 namespace dart_snapshotter {
 namespace {
@@ -39,13 +38,24 @@ void Usage() {
             << std::endl;
 }
 
-bool WriteBundle(const std::string& path, const std::string& interpreter_line,
-                 const char* archive, size_t size) {
+bool WriteBundle(const std::string& path,
+                 const std::string& interpreter_line,
+                 const char* payload,
+                 size_t size) {
   ftl::UniqueFD fd(HANDLE_EINTR(creat(path.c_str(), 0666)));
-  if (!fd.is_valid()) return false;
-  return ftl::WriteFileDescriptor(fd.get(), interpreter_line.c_str(),
-                                  interpreter_line.length()) &&
-         ftl::WriteFileDescriptor(fd.get(), archive, size);
+  if (!fd.is_valid())
+    return false;
+  bool success = ftl::WriteFileDescriptor(fd.get(), interpreter_line.c_str(),
+                                          interpreter_line.length());
+  // page align the start of the payload for easy mapping in the content
+  // handler.
+  const intptr_t pagesize = getpagesize();
+  char* padding = new char[pagesize];
+  success =
+      success && ftl::WriteFileDescriptor(fd.get(), padding,
+                                          pagesize - interpreter_line.length());
+  delete[] padding;
+  return success && ftl::WriteFileDescriptor(fd.get(), payload, size);
 }
 
 int CreateBundle(const ftl::CommandLine& command_line) {
@@ -75,12 +85,7 @@ int CreateBundle(const ftl::CommandLine& command_line) {
     return 1;
   }
 
-  zip::Zipper zipper;
-  if (!zipper.AddCompressedFile(snapshot_key, snapshot_blob.data(),
-                                snapshot_blob.size())) {
-    return 1;
-  }
-  std::vector<char> bundle_blob = zipper.Finish();
+  std::vector<char> bundle_blob = std::move(snapshot_blob);
 
   std::string interpreter_line = "#!fuchsia " + interpreter + "\n";
   if (!WriteBundle(bundle, interpreter_line, bundle_blob.data(),

@@ -9,12 +9,9 @@ executable("bundler") {
     "main.cc",
   ]
 
-  libs = [
-    "pthread"
-  ]
+  libs = [ "pthread" ]
 
   deps = [
     "//lib/ftl",
-    "//lib/zip",
   ]
 }
