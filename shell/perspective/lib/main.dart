@@ -60,6 +60,15 @@ Future<Null> main() async {
                               bottom: -100.0,
                               child: new _Sun(elevation: 10.0),
                             ),
+
+                            // A cloud.
+                            new Positioned(
+                              left: constraints.biggest.width * 0.65,
+                              bottom: 40.0,
+                              child: new _Cloud(
+                                elevation: 20.0,
+                              ),
+                            )
                           ],
                         ),
                   ),
@@ -220,6 +229,7 @@ class _Sun extends StatelessWidget {
                 ),
               ),
             ),
+
             // Top left ray.
             new Align(
               alignment: FractionalOffset.center,
@@ -241,6 +251,7 @@ class _Sun extends StatelessWidget {
                 ),
               ),
             ),
+
             // Top right ray.
             new Align(
               alignment: FractionalOffset.center,
@@ -262,6 +273,7 @@ class _Sun extends StatelessWidget {
                 ),
               ),
             ),
+
             // Top right ray.
             new Align(
               alignment: FractionalOffset.center,
@@ -281,6 +293,64 @@ class _Sun extends StatelessWidget {
                     child: new SizedBox(width: 18.0, height: 15.0),
                   ),
                 ),
+              ),
+            ),
+          ],
+        ),
+      );
+}
+
+class _Cloud extends StatelessWidget {
+  final double elevation;
+
+  _Cloud({this.elevation});
+
+  @override
+  Widget build(BuildContext context) => new SizedBox(
+        width: 75.0,
+        height: 50.0,
+        child: new Stack(
+          children: <Widget>[
+            /// Bottom base cloud.
+            new Positioned(
+              left: 10.0,
+              right: 0.0,
+              top: 25.0,
+              bottom: 0.0,
+              child: new PhysicalModel(
+                borderRadius: new BorderRadius.circular(50.0),
+                color: Colors.grey[200],
+                elevation: elevation,
+                child: new Container(),
+              ),
+            ),
+
+            /// Center cloud puff.
+            new Align(
+              alignment: FractionalOffset.center,
+              child: new SizedBox(
+                width: 50.0,
+                height: 50.0,
+                child: new PhysicalModel(
+                  shape: BoxShape.circle,
+                  color: Colors.grey[200],
+                  elevation: elevation,
+                  child: new Container(),
+                ),
+              ),
+            ),
+
+            /// Left cloud puff.
+            new Positioned(
+              left: 0.0,
+              bottom: 0.0,
+              width: 37.5,
+              height: 37.5,
+              child: new PhysicalModel(
+                shape: BoxShape.circle,
+                color: Colors.grey[200],
+                elevation: elevation,
+                child: new Container(),
               ),
             ),
           ],
