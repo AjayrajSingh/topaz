@@ -11,6 +11,7 @@ extern crate magenta;
 extern crate mxruntime;
 #[macro_use]
 extern crate fidl;
+extern crate byteorder;
 
 extern crate application_services_service_provider;
 extern crate apps_xi_services;
@@ -20,10 +21,10 @@ use self::apps_ledger_services_public::{Ledger_Client, Ledger_Proxy, Ledger_Meta
 use self::apps_xi_services::{Json, Json_Stub};
 
 use std::thread;
-use std::io::{self, Write};
+use std::io::{self, Write, Cursor};
 use std::sync::Arc;
 
-use self::magenta::{Channel, HandleBase, Socket, Status};
+use self::magenta::{Channel, HandleBase, Socket, Status, cprng_draw};
 use self::magenta::{MX_SOCKET_READABLE, MX_SOCKET_PEER_CLOSED, MX_TIME_INFINITE};
 use self::mxruntime::{HandleType, get_startup_handle};
 
@@ -32,6 +33,8 @@ use fidl::Server;
 use xi_rpc::RpcLoop;
 
 use xi_core_lib::MainState;
+
+use byteorder::{NativeEndian, ReadBytesExt};
 
 pub struct MySocket(Arc<Socket>);
 
@@ -74,9 +77,19 @@ impl io::Write for MySocket {
     }
 }
 
+fn gen_session_id() -> (u64,u32) {
+    let mut buf = vec![0; 12];
+    let actual = cprng_draw(&mut buf[..]).unwrap();
+    assert_eq!(12, actual);
+    let mut buf = Cursor::new(buf);
+    let first = buf.read_u64::<NativeEndian>().unwrap();
+    let second = buf.read_u32::<NativeEndian>().unwrap();
+    (first, second)
+}
+
 fn editor_main(sock: Socket, ledger: Ledger_Proxy) {
     let mut state = MainState::new();
-    state.set_ledger(ledger);
+    state.set_ledger(ledger, gen_session_id());
     let arc_sock = Arc::new(sock);
     let my_in = io::BufReader::new(MySocket(arc_sock.clone()));
     let my_out = MySocket(arc_sock);
