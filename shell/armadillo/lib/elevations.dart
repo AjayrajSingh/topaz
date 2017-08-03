@@ -28,7 +28,7 @@ class Elevations {
   /// Elevation for story cluster when it is focused
   static const double focusedStoryCluster = _storyShellWithModuleMaxElevation;
 
-  /// Elecvation for quick settings overlay
+  /// Elevation for quick settings overlay
   static const double quickSettings =
       (3 * _storyShellWithModuleMaxElevation) + 20.0;
 
@@ -43,6 +43,6 @@ class Elevations {
   /// Additional elevation to give a focused story tab
   static const double focusedStoryTab = 8.0;
 
-  /// THe elevation of Now's user when quick settings are open
+  /// The elevation of Now's user when quick settings are open
   static const double nowUserQuickSettingsOpen = 3.0;
 }

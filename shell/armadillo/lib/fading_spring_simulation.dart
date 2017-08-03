@@ -24,13 +24,22 @@ class FadingSpringSimulation {
   /// Provides the [Ticker] for the simulation.
   final TickerProvider tickerProvider;
 
+  /// If true, fading out will happen automatically a short timeout after
+  /// fading in.
+  final bool useFadeOutTimeout;
+
   RK4SpringSimulation _fadeSimulation;
   Timer _fadeTimer;
   Ticker _ticker;
   Duration _lastTick;
 
   /// Constructor.
-  FadingSpringSimulation({this.onChange, this.tickerProvider});
+  FadingSpringSimulation({
+    this.onChange,
+    this.tickerProvider,
+    this.useFadeOutTimeout: false,
+  })
+      : assert(useFadeOutTimeout != null);
 
   /// Starts the simulation forward.  If [force] is true, the simulation jumps
   /// to the end.
@@ -43,8 +52,10 @@ class FadingSpringSimulation {
     _startTicking();
 
     // Start a timer for fading out.
-    _fadeTimer?.cancel();
-    _fadeTimer = new Timer(const Duration(milliseconds: 1500), _fadeOut);
+    if (useFadeOutTimeout) {
+      _fadeTimer?.cancel();
+      _fadeTimer = new Timer(const Duration(milliseconds: 1500), _fadeOut);
+    }
   }
 
   void _fadeOut() {
