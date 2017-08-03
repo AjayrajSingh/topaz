@@ -6,7 +6,7 @@ packages:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.28.1"
+    version: "0.30.0+2"
   args:
     description:
       name: args
@@ -37,6 +37,12 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.1"
+  cli_util:
+    description:
+      name: cli_util
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.2"
   collection:
     description:
       name: collection
@@ -64,11 +70,17 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.29-dev"
+    version: "0.0.33-dev"
   flutter_test:
     description: flutter
     source: sdk
-    version: "0.0.7-dev"
+    version: "0.0.11-dev"
+  front_end:
+    description:
+      name: front_end
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0-alpha.4"
   glob:
     description:
       name: glob
@@ -111,6 +123,12 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.3"
+  kernel:
+    description:
+      name: kernel
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0-alpha.1"
   logging:
     description:
       name: logging
@@ -292,4 +310,4 @@ packages:
     source: hosted
     version: "2.1.12"
 sdks:
-  dart: ">=1.23.0-dev.0.0 <2.0.0"
+  dart: ">=1.23.0-dev.0.0 <2.0.0-dev.infinity"
