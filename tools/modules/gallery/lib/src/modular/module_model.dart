@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert' show JSON;
 
 import 'package:application.lib.app.dart/app.dart';
@@ -16,6 +15,8 @@ import 'package:config/config.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
+import '../models/query_document.dart';
+import '../models/selection_document.dart';
 import 'gallery_service_impl.dart';
 
 const String _kContract = 'image search';
@@ -32,13 +33,12 @@ class GalleryModuleModel extends ModuleModel {
   String _apiKey;
 
   /// Gets the initial query string provided by the [Link].
-  String get queryString => _queryString;
-  String _queryString;
+  String get queryString => _queryDoc.queryString;
+  GalleryQueryDocument _queryDoc = new GalleryQueryDocument();
 
   /// Gets the list of initially selected image urls.
-  List<String> get initialSelection =>
-      new UnmodifiableListView<String>(_initialSelection);
-  final List<String> _initialSelection = <String>[];
+  List<String> get initialSelection => _selectionDoc.selectedImages;
+  GallerySelectionDocument _selectionDoc = new GallerySelectionDocument();
 
   /// [Link] object for storing the internal state of the selected images.
   final LinkProxy _selectionLink = new LinkProxy();
@@ -94,16 +94,16 @@ class GalleryModuleModel extends ModuleModel {
 
   @override
   void onNotify(String json) {
-    String oldQueryString = _queryString;
+    String oldQueryString = queryString;
 
     dynamic decoded = JSON.decode(json);
-    try {
-      _queryString = decoded[_kContract][_kQueryKey];
-    } catch (e) {
-      log.fine('No image picker query key found in json.');
+    if (decoded is Map) {
+      _queryDoc = new GalleryQueryDocument.fromJson(
+        decoded[GalleryQueryDocument.docroot],
+      );
     }
 
-    if (oldQueryString != _queryString) {
+    if (oldQueryString != queryString) {
       notifyListeners();
     }
   }
@@ -121,35 +121,31 @@ class GalleryModuleModel extends ModuleModel {
   /// list of selected image urls. In this handler, we need to update the list
   /// of initial selection and pass it to the gallery widget so that the
   /// selection is rehydrated when the module is restored.
-  ///
-  /// We assume that the json simply contains the list of urls.
   void handleNotifySelection(String json) {
-    if (json != null) {
-      List<String> urls = JSON.decode(json);
-      if (urls != null) {
-        _initialSelection.clear();
-        _initialSelection.addAll(urls);
-        notifyListeners();
-      }
+    dynamic decoded = JSON.decode(json);
+    if (decoded is Map) {
+      _selectionDoc = new GallerySelectionDocument.fromJson(
+        decoded[GallerySelectionDocument.docroot],
+      );
+      notifyListeners();
     }
   }
 
   /// This is called when the query string is changed by the user from the UI.
   void handleQueryChanged(String query) {
-    _queryString = query;
-    link.set(const <String>[_kContract, _kQueryKey], JSON.encode(query));
+    _queryDoc.queryString = query;
+    link.updateObject(GalleryQueryDocument.path, JSON.encode(_queryDoc));
   }
 
   /// This handles the notification coming from the UI of any changes that the
   /// user made on the selection. We have to store this information to Link, so
   /// that the selection may be restored correctly later.
   void handleSelectionChanged(List<String> imageUrls) {
-    _initialSelection
-      ..clear()
-      ..addAll(imageUrls);
-
-    String json = JSON.encode(imageUrls);
-    _selectionLink.set(const <String>[], json);
+    _selectionDoc.selectedImages = imageUrls;
+    _selectionLink.updateObject(
+      GallerySelectionDocument.path,
+      JSON.encode(_selectionDoc),
+    );
   }
 
   /// Called when the user clicks the "Add" button from the UI.
@@ -158,7 +154,10 @@ class GalleryModuleModel extends ModuleModel {
     // module instance. We should erase what's in the Links, so that when
     // another gallery module is launched later by the same parent we don't
     // accidentally show all the residual states in the new gallery.
+    _queryDoc = new GalleryQueryDocument();
     link.set(const <String>[], 'null');
+
+    _selectionDoc = new GallerySelectionDocument();
     _selectionLink.set(const <String>[], 'null');
 
     // Notify the subscribers via message queue.
