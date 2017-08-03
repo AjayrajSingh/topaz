@@ -36,7 +36,7 @@ class SurfaceFrame extends StatelessWidget {
               transform: _scale(constraints.biggest.center(Offset.zero)),
               margin: const EdgeInsets.only(left: 12.0, bottom: 12.0),
               child: new PhysicalModel(
-                elevation: (1.0 - depth) * 250.0,
+                elevation: (1.0 - depth) * 125.0,
                 color: const Color(0x00000000),
                 child: child,
               ),
