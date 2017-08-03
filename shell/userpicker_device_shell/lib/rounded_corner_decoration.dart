@@ -26,24 +26,16 @@ class RoundedCornerDecoration extends Decoration {
   bool hitTest(Size size, Offset position) => false;
 
   @override
-  DiagnosticsNode toDiagnosticsNode({
-    String name,
-    DiagnosticsTreeStyle style: DiagnosticsTreeStyle.whitespace,
-  }) {
-    return new DiagnosticsNode.lazy(
-      name: name,
-      value: this,
-      description: '',
-      style: style,
-      emptyBodyDescription: '<no decorations specified>',
-      fillProperties: (List<DiagnosticsNode> properties) {
-        properties.add(
-          new DiagnosticsProperty<Color>('color', color, defaultValue: null),
-        );
-        properties.add(
-          new DiagnosticsProperty<double>('radius', radius, defaultValue: null),
-        );
-      },
+  void debugFillProperties(DiagnosticPropertiesBuilder description) {
+    super.debugFillProperties(description);
+    description
+      ..defaultDiagnosticsTreeStyle = DiagnosticsTreeStyle.whitespace
+      ..emptyBodyDescription = '<no decorations specified>';
+    description.add(
+      new DiagnosticsProperty<Color>('color', color, defaultValue: null),
+    );
+    description.add(
+      new DiagnosticsProperty<double>('radius', radius, defaultValue: null),
     );
   }
 }
