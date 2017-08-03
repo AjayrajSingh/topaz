@@ -24,6 +24,7 @@ package("sysui") {
     "//apps/sysui/capybara_user_shell",
     "//apps/sysui/infinite_scroller",
     "//apps/sysui/kernel_panic",
+    "//apps/sysui/perspective",
     "//apps/sysui/spinning_cube",
     "//apps/sysui/userpicker_device_shell",
   ]
@@ -58,6 +59,11 @@ package("sysui") {
     {
       source = "gen/apps/sysui/infinite_scroller/infinite_scroller.flx"
       name = "infinite_scroller"
+    },
+
+    {
+      source = "gen/apps/sysui/perspective/perspective.flx"
+      name = "perspective"
     },
 
     {
