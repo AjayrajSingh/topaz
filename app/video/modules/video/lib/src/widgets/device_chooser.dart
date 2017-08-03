@@ -4,8 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:meta/meta.dart';
 
-import '../modular/module_model.dart';
+import '../modular/video_module_model.dart';
 import 'device_target_icon.dart';
 
 /// Callback to start remote play on a particular device
@@ -13,11 +14,18 @@ typedef void DeviceCallback(String deviceName);
 
 /// The device chooser in the video player, for casting to another device
 class DeviceChooser extends StatelessWidget {
+  /// Function to call when playing remotely. Calls playRemote() of both
+  /// VideoModuleModel and PlayerModel.
+  final DeviceCallback playRemote;
+
   /// Constructor for the device chooser in the video player
   DeviceChooser({
     Key key,
+    @required this.playRemote,
   })
-      : super(key: key);
+      : super(key: key) {
+    assert(this.playRemote != null);
+  }
 
   Widget _createDropTarget(
     String dropTargetName,
@@ -98,8 +106,7 @@ class DeviceChooser extends StatelessWidget {
             child: new Center(
               child: new Row(
                 mainAxisSize: MainAxisSize.min,
-                children:
-                    _createDropTargets(Icons.cast, model.playRemote, model),
+                children: _createDropTargets(Icons.cast, playRemote, model),
               ),
             ),
           ),

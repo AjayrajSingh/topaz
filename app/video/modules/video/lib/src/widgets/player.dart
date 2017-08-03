@@ -5,7 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
-import '../modular/module_model.dart';
+import '../modular/player_model.dart';
+import '../modular/video_module_model.dart';
 import '../widgets.dart';
 
 /// Video player layout
@@ -16,8 +17,6 @@ class Player extends StatelessWidget {
   })
       : super(key: key);
 
-  final Widget _deviceChooser = new DeviceChooser();
-
   final Widget _screen = new Screen();
 
   final Widget _playControls = new PlayControls(
@@ -26,7 +25,7 @@ class Player extends StatelessWidget {
     padding: 0.0,
   );
 
-  Widget _buildRetry(VideoModuleModel model) {
+  Widget _buildRetry(VideoModuleModel moduleModel, PlayerModel playerModel) {
     return new AnimatedCrossFade(
       duration: kPlayControlsAnimationTime,
       firstChild: new Center(
@@ -47,7 +46,8 @@ class Player extends StatelessWidget {
                 ),
               ),
               new GestureDetector(
-                onTap: () => model.playRemote(model.remoteDeviceName),
+                onTap: () =>
+                    playerModel.playRemote(moduleModel.remoteDeviceName),
                 child: new Padding(
                   padding: new EdgeInsets.only(left: 32.0),
                   child: new Text(
@@ -65,19 +65,24 @@ class Player extends StatelessWidget {
         ),
       ),
       secondChild: new Container(),
-      crossFadeState: model.failedCast
+      crossFadeState: playerModel.failedCast
           ? CrossFadeState.showFirst
           : CrossFadeState.showSecond,
     );
   }
 
-  Widget _buildPlayerMode(VideoModuleModel model, bool smallScreen) {
-    switch (model.displayMode) {
+  Widget _buildPlayerMode(
+      VideoModuleModel moduleModel, PlayerModel playerModel, bool smallScreen) {
+    Widget _deviceChooser = new DeviceChooser(
+      playRemote: playerModel.playRemote,
+    );
+    switch (moduleModel.getDisplayMode()) {
       case DisplayMode.remoteControl:
         return new RemoteControl(
-          playLocal: model.playLocal,
-          remoteDeviceName: model.getDisplayName(model.remoteDeviceName),
-          asset: model.asset,
+          playLocal: playerModel.playLocal,
+          remoteDeviceName:
+              moduleModel.getDisplayName(moduleModel.remoteDeviceName),
+          asset: playerModel.asset,
           smallScreen: smallScreen,
         );
       case DisplayMode.immersive:
@@ -86,8 +91,8 @@ class Player extends StatelessWidget {
         );
       case DisplayMode.standby:
         return new Standby(
-          castingDeviceName: model.castingDeviceName,
-          asset: model.asset,
+          castingDeviceName: moduleModel.castingDeviceName,
+          asset: playerModel.asset,
         );
       case DisplayMode.localSmall:
         return new Stack(
@@ -100,7 +105,7 @@ class Player extends StatelessWidget {
                     fit: StackFit.passthrough,
                     children: <Widget>[
                       _screen,
-                      model.showControlOverlay
+                      playerModel.showControlOverlay
                           ? _playControls
                           : new Container(),
                     ],
@@ -117,8 +122,8 @@ class Player extends StatelessWidget {
                 elevation: 2.0,
                 color: Colors.black,
                 child: new Offstage(
-                  offstage: !model.failedCast,
-                  child: _buildRetry(model),
+                  offstage: !playerModel.failedCast,
+                  child: _buildRetry(moduleModel, playerModel),
                 ),
               ),
             ),
@@ -145,7 +150,7 @@ class Player extends StatelessWidget {
                       padding: new EdgeInsets.only(bottom: 86.0),
                     ),
                     secondChild: new Container(),
-                    crossFadeState: model.showControlOverlay
+                    crossFadeState: playerModel.showControlOverlay
                         ? CrossFadeState.showFirst
                         : CrossFadeState.showSecond)
               ],
@@ -165,8 +170,8 @@ class Player extends StatelessWidget {
                 elevation: 2.0,
                 color: Colors.black,
                 child: new Offstage(
-                  offstage: !model.failedCast,
-                  child: _buildRetry(model),
+                  offstage: !playerModel.failedCast,
+                  child: _buildRetry(moduleModel, playerModel),
                 ),
               ),
             ),
@@ -180,26 +185,32 @@ class Player extends StatelessWidget {
     return new ScopedModelDescendant<VideoModuleModel>(builder: (
       BuildContext context,
       Widget child,
-      VideoModuleModel model,
+      VideoModuleModel moduleModel,
     ) {
       Size size = MediaQuery.of(context).size;
       bool smallScreen = false;
       if (size.width + size.height <= 912.0) {
         smallScreen = true;
       }
-      if (model.displayMode != DisplayMode.remoteControl &&
-          model.displayMode != DisplayMode.immersive &&
-          model.displayMode != DisplayMode.standby) {
+      if (moduleModel.getDisplayMode() != DisplayMode.remoteControl &&
+          moduleModel.getDisplayMode() != DisplayMode.immersive &&
+          moduleModel.getDisplayMode() != DisplayMode.standby) {
         if (smallScreen) {
-          model.displayMode = DisplayMode.localSmall;
+          moduleModel.setDisplayMode(DisplayMode.localSmall);
         } else {
-          model.displayMode = DisplayMode.localLarge;
+          moduleModel.setDisplayMode(DisplayMode.localLarge);
         }
       }
-      return new Container(
-        color: Colors.black,
-        child: _buildPlayerMode(model, smallScreen),
-      );
+      return new ScopedModelDescendant<PlayerModel>(builder: (
+        BuildContext context,
+        Widget child,
+        PlayerModel playerModel,
+      ) {
+        return new Container(
+          color: Colors.black,
+          child: _buildPlayerMode(moduleModel, playerModel, smallScreen),
+        );
+      });
     });
   }
 }

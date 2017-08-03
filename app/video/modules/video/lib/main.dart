@@ -7,20 +7,33 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
-import 'src/modular/module_model.dart';
+import 'src/modular/player_model.dart';
+import 'src/modular/video_module_model.dart';
 import 'src/widgets.dart';
 
 void main() {
   setupLogger();
 
-  ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
+  ApplicationContext appContext = new ApplicationContext.fromStartupInfo();
+  VideoModuleModel videoModuleModel = new VideoModuleModel(
+    appContext: appContext,
+  );
+  PlayerModel playerModel = new PlayerModel(
+    appContext: appContext,
+    requestFocus: videoModuleModel.requestFocus,
+    getDisplayMode: videoModuleModel.getDisplayMode,
+    setDisplayMode: videoModuleModel.setDisplayMode,
+    onPlayRemote: videoModuleModel.onPlayRemote,
+    onPlayLocal: videoModuleModel.onPlayLocal,
+  );
   ModuleWidget<VideoModuleModel> moduleWidget =
       new ModuleWidget<VideoModuleModel>(
-    moduleModel: new VideoModuleModel(
-      appContext: _appContext,
+    moduleModel: videoModuleModel,
+    applicationContext: appContext,
+    child: new ScopedModel<PlayerModel>(
+      model: playerModel,
+      child: new VideoApp(),
     ),
-    applicationContext: _appContext,
-    child: new VideoApp(),
   );
   moduleWidget.advertise();
 

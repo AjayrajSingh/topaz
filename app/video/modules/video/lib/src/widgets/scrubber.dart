@@ -5,13 +5,10 @@
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
-import '../modular/module_model.dart';
+import '../modular/player_model.dart';
 import '../widgets.dart';
 
 const double _kZoomTimeInMicroseconds = 3000000.0;
-
-/// Duration to animate play controls showing/hiding
-const Duration kPlayControlsAnimationTime = const Duration(milliseconds: 200);
 
 /// The time slider/scrubber for the video player
 class Scrubber extends StatelessWidget {
@@ -38,7 +35,7 @@ class Scrubber extends StatelessWidget {
     return '$hoursString$minutesString$secondsString';
   }
 
-  Widget _buildProgressBar(VideoModuleModel model) {
+  Widget _buildProgressBar(PlayerModel model) {
     return new Container(
       child: new Slider(
         min: 0.0,
@@ -66,7 +63,7 @@ class Scrubber extends StatelessWidget {
     );
   }
 
-  Widget _buildProgress(VideoModuleModel model) {
+  Widget _buildProgress(PlayerModel model) {
     return new Positioned(
       height: 80.0,
       left: 0.0,
@@ -75,7 +72,7 @@ class Scrubber extends StatelessWidget {
     );
   }
 
-  Widget _buildDuration(VideoModuleModel model) {
+  Widget _buildDuration(PlayerModel model) {
     return new Positioned(
       height: 80.0,
       right: 0.0,
@@ -84,8 +81,8 @@ class Scrubber extends StatelessWidget {
     );
   }
 
-  Widget _buildScrubberMode(VideoModuleModel model) {
-    switch (model.displayMode) {
+  Widget _buildScrubberMode(PlayerModel model) {
+    switch (model.getDisplayMode()) {
       case DisplayMode.remoteControl:
         return new Container(
           padding: new EdgeInsets.only(top: 40.0),
@@ -155,11 +152,11 @@ class Scrubber extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<VideoModuleModel>(
+    return new ScopedModelDescendant<PlayerModel>(
       builder: (
         BuildContext context,
         Widget child,
-        VideoModuleModel model,
+        PlayerModel model,
       ) {
         return _buildScrubberMode(model);
       },

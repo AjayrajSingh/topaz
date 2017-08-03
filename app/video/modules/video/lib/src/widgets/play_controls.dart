@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
-import '../modular/module_model.dart';
+import '../modular/player_model.dart';
 
 /// The play controls in the video player
 class PlayControls extends StatelessWidget {
@@ -46,7 +46,7 @@ class PlayControls extends StatelessWidget {
     );
   }
 
-  double _getZoomTime(VideoModuleModel model) {
+  double _getZoomTime(PlayerModel model) {
     int durationInMicroseconds = model.duration.inMicroseconds;
     if (durationInMicroseconds == 0) {
       return 0.0;
@@ -54,21 +54,21 @@ class PlayControls extends StatelessWidget {
     return _kZoomTimeInMicroseconds / durationInMicroseconds;
   }
 
-  void _forward(VideoModuleModel model) {
+  void _forward(PlayerModel model) {
     model.pause();
     model.normalizedSeek(
         min(model.normalizedProgress + _getZoomTime(model), 1.0));
     model.play();
   }
 
-  void _rewind(VideoModuleModel model) {
+  void _rewind(PlayerModel model) {
     model.pause();
     model.normalizedSeek(
         max(model.normalizedProgress - _getZoomTime(model), 0.0));
     model.play();
   }
 
-  void _togglePlayPause(VideoModuleModel model) {
+  void _togglePlayPause(PlayerModel model) {
     if (model.playing) {
       model.pause();
     } else {
@@ -76,7 +76,7 @@ class PlayControls extends StatelessWidget {
     }
   }
 
-  Widget _buildPlayControls(VideoModuleModel model) {
+  Widget _buildPlayControls(PlayerModel model) {
     return new Center(
       child: new Row(
         mainAxisSize: MainAxisSize.min,
@@ -105,11 +105,11 @@ class PlayControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<VideoModuleModel>(
+    return new ScopedModelDescendant<PlayerModel>(
       builder: (
         BuildContext context,
         Widget child,
-        VideoModuleModel model,
+        PlayerModel model,
       ) {
         return _buildPlayControls(model);
       },

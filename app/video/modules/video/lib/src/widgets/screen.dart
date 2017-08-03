@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
-import '../modular/module_model.dart';
+import '../modular/player_model.dart';
+import '../modular/video_module_model.dart';
 import 'loading.dart';
 
 /// The video screen for the video player
@@ -48,32 +49,36 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
     _thumbnailAnimationController.dispose();
   }
 
-  void _animateIntoThumbnail(VideoModuleModel model) {
-    _wasPlayingBefore = model.playing;
+  void _animateIntoThumbnail(VideoModuleModel model, PlayerModel playerModel) {
+    _wasPlayingBefore = playerModel.playing;
     if (_wasPlayingBefore) {
-      model.pause();
+      playerModel.pause();
     }
     model.hideDeviceChooser = false;
     _thumbnailAnimationController.forward();
   }
 
-  void _animateIntoScreen(VideoModuleModel model) {
+  void _animateIntoScreen(VideoModuleModel model, PlayerModel playerModel) {
     model.hideDeviceChooser = true;
     _thumbnailAnimationController.reverse();
     if (_wasPlayingBefore) {
-      model.play();
+      playerModel.play();
     }
   }
 
-  void _toggleControlOverlay(VideoModuleModel model) {
-    if (model.showControlOverlay) {
-      model.showControlOverlay = false;
+  void _toggleControlOverlay(PlayerModel playerModel) {
+    if (playerModel.showControlOverlay) {
+      playerModel.showControlOverlay = false;
     } else {
-      model.brieflyShowControlOverlay();
+      playerModel.brieflyShowControlOverlay();
     }
   }
 
-  Widget _buildScreen(VideoModuleModel model, BuildContext context) {
+  Widget _buildScreen(
+    VideoModuleModel model,
+    PlayerModel playerModel,
+    BuildContext context,
+  ) {
     LayoutBuilder layoutBuilder = new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       double currentWidth = constraints.maxWidth;
@@ -89,7 +94,7 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
               height: _kThumbRadius,
               width: _kThumbRadius,
               color: Colors.black,
-              child: model.videoViewConnection != null
+              child: playerModel.videoViewConnection != null
                   ? new FittedBox(
                       fit: BoxFit.cover,
                       child: new Container(
@@ -97,7 +102,7 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
                         child: new AspectRatio(
                           aspectRatio: 16.0 / 9.0,
                           child: new ChildView(
-                              connection: model.videoViewConnection),
+                              connection: playerModel.videoViewConnection),
                         ),
                       ),
                     )
@@ -142,15 +147,16 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
               );
             },
           ),
-          onDragStarted: () => _animateIntoThumbnail(model),
+          onDragStarted: () => _animateIntoThumbnail(model, playerModel),
           onDraggableCanceled: (Velocity v, Offset o) =>
-              _animateIntoScreen(model),
-          child: model.videoViewConnection != null
+              _animateIntoScreen(model, playerModel),
+          child: playerModel.videoViewConnection != null
               ? new GestureDetector(
-                  onTap: () => _toggleControlOverlay(model),
+                  onTap: () => _toggleControlOverlay(playerModel),
                   child: new AspectRatio(
                     aspectRatio: 16.0 / 9.0,
-                    child: new ChildView(connection: model.videoViewConnection),
+                    child: new ChildView(
+                        connection: playerModel.videoViewConnection),
                   ),
                 )
               : new Loading(remoteDeviceName: model.remoteDeviceName),
@@ -162,14 +168,18 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<VideoModuleModel>(
-      builder: (
+    return new ScopedModelDescendant<VideoModuleModel>(builder: (
+      BuildContext context,
+      Widget child,
+      VideoModuleModel moduleModel,
+    ) {
+      return new ScopedModelDescendant<PlayerModel>(builder: (
         BuildContext context,
         Widget child,
-        VideoModuleModel model,
+        PlayerModel playerModel,
       ) {
-        return _buildScreen(model, context);
-      },
-    );
+        return _buildScreen(moduleModel, playerModel, context);
+      });
+    });
   }
 }
