@@ -82,6 +82,7 @@ class ChatContentProviderTestModule extends Module {
     try {
       await _testFromBlankSlate();
       await _testMessageQueues();
+      log.info('Test passed.');
     } catch (e, stackTrace) {
       _testRunner.fail('Test Error. See the console logs for more details.');
       log.severe('Test Error', e, stackTrace);
@@ -119,7 +120,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         conversations = c;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(conversations, isNotNull);
@@ -136,7 +137,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         conversation = c;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(conversation, isNotNull);
@@ -152,7 +153,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         conversation = c;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(conversation, isNotNull);
@@ -167,7 +168,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         conversations = c;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(conversations, isNotNull);
@@ -186,7 +187,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         messages = m;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(messages, isNotNull);
@@ -201,7 +202,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         messageId1 = mid;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(messageId1, isNotNull);
@@ -216,11 +217,13 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         messageId2 = mid;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(messageId2, isNotNull);
     expect(messageId2, isNotEmpty);
+
+    await new Future<Null>.delayed(const Duration(milliseconds: 100));
 
     // Test GetMessages() method again.
     await _chatContentProvider.getMessages(
@@ -230,7 +233,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         messages = m;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(messages, isNotNull);
@@ -255,7 +258,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         message = m;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(message, isNotNull);
@@ -273,7 +276,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         message = m;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(message, isNotNull);
@@ -290,7 +293,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         message = m;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(message, isNotNull);
@@ -304,9 +307,11 @@ class ChatContentProviderTestModule extends Module {
     await _chatContentProvider
         .deleteMessage(conversation.conversationId, messageId1, (ChatStatus s) {
       status = s;
-    });
+    }).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
+
+    await new Future<Null>.delayed(const Duration(milliseconds: 100));
 
     // Test GetMessages() method again.
     await _chatContentProvider.getMessages(
@@ -316,7 +321,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         messages = m;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
     expect(messages, isNotNull);
@@ -365,7 +370,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         messages = m;
       },
-    );
+    ).timeout(_kTimeout);
     expect(status, equals(ChatStatus.ok));
     expect(messages, allOf(isNotNull, hasLength(1)));
     expect(mqMessage1.receivedMessages, allOf(isNotNull, isEmpty));
@@ -385,7 +390,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         conversation1 = c;
       },
-    );
+    ).timeout(_kTimeout);
     expect(status, equals(ChatStatus.ok));
     expect(conversation1.participants, unorderedEquals(participants1));
 
@@ -412,7 +417,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         conversations = c;
       },
-    );
+    ).timeout(_kTimeout);
     expect(status, equals(ChatStatus.ok));
     expect(conversations, allOf(isNotNull, hasLength(2)));
 
@@ -433,7 +438,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         conversation2 = c;
       },
-    );
+    ).timeout(_kTimeout);
     expect(status, equals(ChatStatus.ok));
     expect(conversation2.participants, unorderedEquals(participants2));
 
@@ -481,7 +486,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         messageId1 = mid;
       },
-    );
+    ).timeout(_kTimeout);
     expect(status, equals(ChatStatus.ok));
 
     await completer1.future.timeout(_kTimeout);
@@ -506,7 +511,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         messages = m;
       },
-    );
+    ).timeout(_kTimeout);
     expect(status, equals(ChatStatus.ok));
     expect(messages, allOf(isNotNull, hasLength(2)));
 
@@ -524,7 +529,7 @@ class ChatContentProviderTestModule extends Module {
         status = s;
         messageId2 = mid;
       },
-    );
+    ).timeout(_kTimeout);
     expect(status, equals(ChatStatus.ok));
 
     await completer1.future.timeout(_kTimeout);
@@ -567,7 +572,7 @@ class ChatContentProviderTestModule extends Module {
       (ChatStatus s) {
         status = s;
       },
-    );
+    ).timeout(_kTimeout);
 
     expect(status, equals(ChatStatus.ok));
 
@@ -607,14 +612,16 @@ class ChatContentProviderTestModule extends Module {
     mqMessage2.completer = completer2;
 
     messageId1 = const <int>[0, 1, 2, 3, 4];
-    await _mockChatMessageTransporter.mockReceiveMessage(
-      conversation0,
-      new Message()
-        ..messageId = messageId1
-        ..sender = 'alice@example.com'
-        ..timestamp = new DateTime.now().millisecondsSinceEpoch
-        ..jsonPayload = JSON.encode('A message from Alice!'),
-    );
+    await _mockChatMessageTransporter
+        .mockReceiveMessage(
+          conversation0,
+          new Message()
+            ..messageId = messageId1
+            ..sender = 'alice@example.com'
+            ..timestamp = new DateTime.now().millisecondsSinceEpoch
+            ..jsonPayload = JSON.encode('A message from Alice!'),
+        )
+        .timeout(_kTimeout);
 
     await completer1.future.timeout(_kTimeout);
     expect(mqMessage1.receivedMessages, hasLength(4));

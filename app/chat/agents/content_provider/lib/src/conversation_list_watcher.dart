@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:convert' show JSON;
 
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
 import 'package:apps.modular.services.component/message_queue.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 
@@ -18,17 +18,21 @@ import 'ledger_utils.dart';
 /// a new [Entry] is added to this page, this [ConversationListWatcher] sends
 /// notifications to the subscriber through the [MessageQueue].
 class ConversationListWatcher extends BasePageWatcher {
+  final Map<List<int>, Completer<Entry>> _conversationCompleters =
+      createLedgerIdMap<Completer<Entry>>();
+
   /// Creates a [ConversationListWatcher] instance.
   ConversationListWatcher({
-    @required MessageSenderProxy messageSender,
+    @required PageSnapshotProxy initialSnapshot,
   })
-      : super(messageSender: messageSender);
+      : super(initialSnapshot: initialSnapshot) {
+    assert(initialSnapshot != null);
+  }
 
   @override
-  void onChange(
+  void onPageChange(
     PageChange pageChange,
     ResultState resultState,
-    void callback(InterfaceRequest<PageSnapshot> snapshot),
   ) {
     // The underlying assumption is that there will be no changes to an existing
     // conversation, and only new conversations will be added to the list of all
@@ -36,8 +40,6 @@ class ConversationListWatcher extends BasePageWatcher {
     // notification is partial or complete, and just process the changes
     // independently.
     pageChange.changes.forEach(_processEntry);
-
-    callback(null);
   }
 
   @override
@@ -75,8 +77,18 @@ class ConversationListWatcher extends BasePageWatcher {
       'status': statusString,
     };
 
-    messageSender.send(JSON.encode(downloadStatusNotification));
+    sendMessage(JSON.encode(downloadStatusNotification));
     callback();
+  }
+
+  /// Returns a [Future] that completes when the specified [conversationId]
+  /// appears in the conversations list.
+  Future<Entry> waitForConversation(List<int> conversationId) {
+    if (!_conversationCompleters.containsKey(conversationId)) {
+      _conversationCompleters[conversationId] = new Completer<Entry>();
+    }
+
+    return _conversationCompleters[conversationId].future;
   }
 
   /// Process the provided [Entry] and sends notification to the subscriber.
@@ -90,6 +102,8 @@ class ConversationListWatcher extends BasePageWatcher {
       'participants': decoded['participants'],
     };
 
-    messageSender.send(JSON.encode(newConversationNotification));
+    sendMessage(JSON.encode(newConversationNotification));
+
+    _conversationCompleters[entry.key]?.complete(entry);
   }
 }

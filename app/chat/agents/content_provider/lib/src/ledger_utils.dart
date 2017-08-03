@@ -3,12 +3,15 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert' show JSON, UTF8;
 import 'dart:math' show Random;
 import 'dart:typed_data' show ByteData, Uint8List;
 
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
+import 'package:collection/collection.dart';
 import 'package:lib.fidl.dart/core.dart';
+import 'package:quiver/core.dart' as quiver;
 
 // This file defines global functions that are useful for directly manipulating
 // Ledger data.
@@ -98,3 +101,10 @@ List<int> generateRandomId(int lengthInBytes) {
   }
   return id;
 }
+
+/// Creates a new [Map] where the key is a Ledger ID.
+Map<List<int>, T> createLedgerIdMap<T>() => new HashMap<List<int>, T>(
+      equals: const ListEquality<int>().equals,
+      hashCode: (List<int> key) => quiver.hashObjects(key),
+      isValidKey: (dynamic key) => key is List<int>,
+    );

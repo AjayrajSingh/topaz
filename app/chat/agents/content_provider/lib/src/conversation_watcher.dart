@@ -6,7 +6,6 @@ import 'dart:convert' show JSON;
 
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
 import 'package:apps.modular.services.component/message_queue.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:meta/meta.dart';
 
 import 'base_page_watcher.dart';
@@ -20,18 +19,18 @@ class ConversationWatcher extends BasePageWatcher {
 
   /// Creates a [ConversationWatcher] instance.
   ConversationWatcher({
+    @required PageSnapshotProxy initialSnapshot,
     @required this.conversationId,
-    @required MessageSenderProxy messageSender,
   })
-      : super(messageSender: messageSender) {
+      : super(initialSnapshot: initialSnapshot) {
+    assert(initialSnapshot != null);
     assert(this.conversationId != null);
   }
 
   @override
-  void onChange(
+  void onPageChange(
     PageChange pageChange,
     ResultState resultState,
-    void callback(InterfaceRequest<PageSnapshot> snapshot),
   ) {
     // The underlying assumption is that there will be no changes to an existing
     // message. Therefore, we can safely ignore whether this onChange
@@ -39,8 +38,6 @@ class ConversationWatcher extends BasePageWatcher {
     // independently.
     pageChange.changes.forEach(_processNewEntry);
     pageChange.deletedKeys.forEach(_processDeletedKey);
-
-    callback(null);
   }
 
   @override
@@ -72,6 +69,6 @@ class ConversationWatcher extends BasePageWatcher {
       'message_id': messageId,
     };
 
-    messageSender.send(JSON.encode(notification));
+    sendMessage(JSON.encode(notification));
   }
 }
