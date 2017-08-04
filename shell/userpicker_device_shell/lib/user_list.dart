@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:apps.modular.services.auth.account/account.fidl.dart';
-import 'package:apps.modular.services.device/user_provider.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/widgets.dart';
 
@@ -22,45 +21,8 @@ final BorderRadius _kButtonBorderRadiusLarge =
     new BorderRadius.circular(_kUserAvatarSizeLarge / 2.0);
 final Color _kButtonBackgroundColor = Colors.white.withAlpha(100);
 
-/// Called when the user wants to login as [accountId] using [userProvider].
-typedef void OnLoginRequest(String accountId, UserProvider userProvider);
-
-/// See [UserPicker.onUserDragStarted].
-typedef void OnUserDragStarted(Account account);
-
-/// See [UserPicker.onUserDragCanceled].
-typedef void OnUserDragCanceled(Account account);
-
-/// Provides a UI for picking a user.
-class UserPicker extends StatelessWidget {
-  /// Called when the user want's to log in.
-  final OnLoginRequest onLoginRequest;
-
-  /// Indicates if the user is currently logging in.
-  final bool loggingIn;
-
-  /// Called when a user starts being dragged.
-  final OnUserDragStarted onUserDragStarted;
-
-  /// Called when a user cancels its drag.
-  final OnUserDragCanceled onUserDragCanceled;
-
-  /// Called when the add user button is pressed.
-  final VoidCallback onAddUser;
-
-  /// Flag for when user is being dragged
-  final bool userDragged;
-
-  /// Constructor.
-  UserPicker({
-    this.onLoginRequest,
-    this.loggingIn,
-    this.onUserDragStarted,
-    this.onUserDragCanceled,
-    this.onAddUser,
-    this.userDragged,
-  });
-
+/// Shows the list of users and allows the user to add new users
+class UserList extends StatelessWidget {
   Widget _buildUserCircle({
     Account account,
     VoidCallback onTap,
@@ -149,7 +111,7 @@ class UserPicker extends StatelessWidget {
             ),
           ),
           onTap: () {
-            onAddUser?.call();
+            model.createAndLoginUser();
             model.hideUserActions();
           },
           isSmall: isSmall,
@@ -163,7 +125,7 @@ class UserPicker extends StatelessWidget {
             ),
           ),
           onTap: () {
-            _loginUser(null, model);
+            model.login(null);
             model.hideUserActions();
           },
           isSmall: isSmall,
@@ -192,6 +154,7 @@ class UserPicker extends StatelessWidget {
     VoidCallback onTap,
     bool removable: true,
     bool isSmall,
+    UserPickerDeviceShellModel model,
   }) {
     Widget userCard = _buildUserCircle(
       account: account,
@@ -211,8 +174,8 @@ class UserPicker extends StatelessWidget {
       feedbackOffset: Offset.zero,
       dragAnchor: DragAnchor.child,
       maxSimultaneousDrags: 1,
-      onDragStarted: () => onUserDragStarted?.call(account),
-      onDraggableCanceled: (_, __) => onUserDragCanceled?.call(account),
+      onDragStarted: () => model.addDraggedUser(account),
+      onDraggableCanceled: (_, __) => model.removeDraggedUser(account),
     );
   }
 
@@ -242,10 +205,11 @@ class UserPicker extends StatelessWidget {
             (Account account) => _buildUserEntry(
                   account: account,
                   onTap: () {
-                    _loginUser(account.id, model);
+                    model.login(account.id);
                     model.hideUserActions();
                   },
                   isSmall: isSmall,
+                  model: model,
                 ),
           ),
         );
@@ -255,7 +219,7 @@ class UserPicker extends StatelessWidget {
               (isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge) + 24.0,
           child: new AnimatedOpacity(
             duration: new Duration(milliseconds: 250),
-            opacity: userDragged ? 0.0 : 1.0,
+            opacity: model.showingRemoveUserTarget ? 0.0 : 1.0,
             child: new ListView(
               controller: model.userPickerScrollController,
               padding: const EdgeInsets.only(
@@ -281,14 +245,7 @@ class UserPicker extends StatelessWidget {
         Widget child,
         UserPickerDeviceShellModel model,
       ) {
-        if (model.accounts != null && !loggingIn && model.showingNetworkInfo) {
-          return new Stack(
-            fit: StackFit.passthrough,
-            children: <Widget>[
-              _buildUserList(model),
-            ],
-          );
-        } else {
+        if (model.showingLoadingSpinner) {
           return new Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
@@ -301,9 +258,13 @@ class UserPicker extends StatelessWidget {
               ),
             ],
           );
+        } else {
+          return new Stack(
+            fit: StackFit.passthrough,
+            children: <Widget>[
+              _buildUserList(model),
+            ],
+          );
         }
       });
-
-  void _loginUser(String accountId, UserPickerDeviceShellModel model) =>
-      onLoginRequest?.call(accountId, model.userProvider);
 }

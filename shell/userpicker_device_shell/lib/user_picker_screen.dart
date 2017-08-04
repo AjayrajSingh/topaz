@@ -7,103 +7,95 @@ import 'dart:ui' show lerpDouble;
 import 'package:apps.modular.services.auth.account/account.fidl.dart';
 import 'package:flutter/material.dart';
 
-import 'user_picker.dart';
+import 'user_picker_device_shell_model.dart';
+import 'user_list.dart';
 
 const double _kRemovalTargetSize = 112.0;
 
-/// Called when the user is removing [account].
-typedef void OnRemoveUser(Account account);
-
-/// Displays a [UserPicker] a shutdown button, a new user button, the
+/// Displays a [UserList] a shutdown button, a new user button, the
 /// fuchsia logo, and a background image.
 class UserPickerScreen extends StatelessWidget {
-  /// The widget that allows a user to be picked.
-  final UserPicker userPicker;
-
-  /// Called when the user is removing an account.
-  final OnRemoveUser onRemoveUser;
-
-  /// Indicates the remove user indicator should be shown.
-  final bool showUserRemovalTarget;
-
-  /// Constructor.
-  UserPickerScreen({
-    this.userPicker,
-    this.onRemoveUser,
-    this.showUserRemovalTarget,
-  });
-
   @override
-  Widget build(BuildContext context) => new Material(
-        color: Colors.grey[900],
-        child: new Container(
-          child: new Stack(
-            fit: StackFit.passthrough,
-            children: <Widget>[
-              new FractionallySizedBox(
-                heightFactor: 1.1,
-                alignment: FractionalOffset.topCenter,
-                child: new Stack(
-                  fit: StackFit.passthrough,
-                  children: <Widget>[
-                    new Image.asset(
-                      'packages/userpicker_device_shell/res/bg.jpg',
-                      fit: BoxFit.cover,
-                    ),
-                    new Container(color: Colors.black.withAlpha(125)),
-                  ],
-                ),
-              ),
-
-              /// Add Fuchsia logo.
-              new Align(
-                alignment: FractionalOffset.topLeft,
-                child: new Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 16.0,
-                  ),
-                  child: new Image.asset(
-                    'packages/userpicker_device_shell/res/Fuchsia_Logo_40dp_Accent.png',
-                    width: 40.0,
-                    height: 40.0,
+  Widget build(BuildContext context) {
+    return new ScopedModelDescendant<UserPickerDeviceShellModel>(
+      builder: (
+        BuildContext context,
+        Widget child,
+        UserPickerDeviceShellModel model,
+      ) {
+        return new Material(
+          color: Colors.grey[900],
+          child: new Container(
+            child: new Stack(
+              fit: StackFit.passthrough,
+              children: <Widget>[
+                new FractionallySizedBox(
+                  heightFactor: 1.1,
+                  alignment: FractionalOffset.topCenter,
+                  child: new Stack(
+                    fit: StackFit.passthrough,
+                    children: <Widget>[
+                      new Image.asset(
+                        'packages/userpicker_device_shell/res/bg.jpg',
+                        fit: BoxFit.cover,
+                      ),
+                      new Container(color: Colors.black.withAlpha(125)),
+                    ],
                   ),
                 ),
-              ),
 
-              /// Add user picker for selecting users and adding new users
-              new Align(
-                alignment: FractionalOffset.bottomRight,
-                child: new RepaintBoundary(
-                  child: userPicker,
-                ),
-              ),
-
-              // Add user removal target
-              new Align(
-                alignment: FractionalOffset.center,
-                child: new RepaintBoundary(
+                /// Add Fuchsia logo.
+                new Align(
+                  alignment: FractionalOffset.topLeft,
                   child: new Container(
-                    child: new DragTarget<Account>(
-                      onWillAccept: (Account data) => true,
-                      onAccept: (Account data) => onRemoveUser?.call(data),
-                      builder: (
-                        _,
-                        List<Account> candidateData,
-                        __,
-                      ) =>
-                          new _UserRemovalTarget(
-                            show: showUserRemovalTarget,
-                            grow: candidateData.isNotEmpty,
-                          ),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 16.0,
+                    ),
+                    child: new Image.asset(
+                      'packages/userpicker_device_shell/res/Fuchsia_Logo_40dp_Accent.png',
+                      width: 40.0,
+                      height: 40.0,
                     ),
                   ),
                 ),
-              ),
-            ],
+
+                /// Add user picker for selecting users and adding new users
+                new Align(
+                  alignment: FractionalOffset.bottomRight,
+                  child: new RepaintBoundary(
+                    child: new UserList(),
+                  ),
+                ),
+
+                // Add user removal target
+                new Align(
+                  alignment: FractionalOffset.center,
+                  child: new RepaintBoundary(
+                    child: new Container(
+                      child: new DragTarget<Account>(
+                        onWillAccept: (Account data) => true,
+                        onAccept: model.removeUser,
+                        builder: (
+                          _,
+                          List<Account> candidateData,
+                          __,
+                        ) =>
+                            new _UserRemovalTarget(
+                              show: model.showingRemoveUserTarget,
+                              grow: candidateData.isNotEmpty,
+                            ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      );
+        );
+      },
+    );
+  }
 }
 
 /// Displays a removal target for removing users

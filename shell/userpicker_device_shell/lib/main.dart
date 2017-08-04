@@ -16,11 +16,9 @@ import 'child_constraints_changer.dart';
 import 'constraints_model.dart';
 import 'debug_text.dart';
 import 'memory_indicator.dart';
-import 'screen_manager.dart';
+import 'user_picker_device_shell_screen.dart';
 import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
-
-const double _kInnerBezelRadius = 8.0;
 
 /// Set to true to have this BaseShell provide IME services.
 const bool _kAdvertiseImeService = false;
@@ -51,10 +49,8 @@ void main() {
   Widget mainWidget = new Stack(
     fit: StackFit.passthrough,
     children: <Widget>[
-      new ScreenManager(
+      new UserPickerDeviceShellScreen(
         key: screenManagerKey,
-        onLogout: model.refreshUsers,
-        onRemoveUser: model.removeUser,
         launcher: applicationContext.launcher,
       ),
       new ScopedModel<AuthenticationOverlayModel>(
