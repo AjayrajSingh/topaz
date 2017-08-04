@@ -49,12 +49,12 @@ const DisplayMode _defaultDisplayMode = DisplayMode.localLarge;
 
 final Asset _defaultAsset = new Asset.movie(
   uri: Uri.parse(
-      'https://storage.googleapis.com/fuchsia/assets/video/c8828ac5183b31f29535da61eb5f404801882320'),
+      'https://storage.googleapis.com/fuchsia/assets/video/656a7250025525ae5a44b43d23c51e38b466d146'),
   title: 'Discover Tahiti',
   description:
       'Take a trip and experience the ultimate island fantasy, Vahine Island in Tahiti.',
   thumbnail: 'assets/video-thumbnail.png',
-  background: 'assets/video-background.jpg',
+  background: 'assets/video-background.png',
 );
 
 /// The [ModuleModel] for the video player.
