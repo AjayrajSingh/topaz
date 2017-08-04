@@ -80,9 +80,8 @@ class _NewChatConversationFormState extends State<NewChatConversationForm> {
               spacing: 8.0,
               runSpacing: 4.0,
               children: _participants.map((String email) {
-                // TODO(meiyili): handle emails wider than container (SO-625)
                 return new Chip(
-                  label: new Text(email),
+                  label: new Text(email, overflow: TextOverflow.ellipsis),
                   onDeleted: () {
                     setState(() {
                       _participants.remove(email);
