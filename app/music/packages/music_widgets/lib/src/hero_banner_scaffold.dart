@@ -163,6 +163,20 @@ class HeroBannerScaffold extends StatelessWidget {
     );
   }
 
+  Widget _buildMaterialWrapper(Widget child) {
+    return new Material(
+      elevation: 4.0,
+      color: Colors.white,
+      child: new Container(
+        constraints: new BoxConstraints(
+          maxWidth: _kBodyMaxWidth,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+        child: child,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
@@ -172,52 +186,46 @@ class HeroBannerScaffold extends StatelessWidget {
 
     switch (loadingStatus) {
       case LoadingStatus.inProgress:
-        listChildren.add(new Center(
+        listChildren.add(_buildMaterialWrapper(new Center(
           child: new Container(
+            margin: const EdgeInsets.symmetric(vertical: 40.0),
             width: 40.0,
             height: 40.0,
             child: new FuchsiaSpinner(),
           ),
-        ));
+        )));
         break;
       case LoadingStatus.failed:
-        listChildren.add(new Center(
-          child: new Column(
-            children: <Widget>[
-              new Container(
-                margin: const EdgeInsets.only(bottom: 8.0),
-                child: new Icon(
-                  Icons.sentiment_dissatisfied,
-                  size: 48.0,
-                  color: _kFailureTextColor,
+        listChildren.add(_buildMaterialWrapper(new Center(
+          child: new Container(
+            margin: const EdgeInsets.symmetric(vertical: 40.0),
+            child: new Column(
+              children: <Widget>[
+                new Container(
+                  margin: const EdgeInsets.only(bottom: 8.0),
+                  child: new Icon(
+                    Icons.sentiment_dissatisfied,
+                    size: 48.0,
+                    color: _kFailureTextColor,
+                  ),
                 ),
-              ),
-              new Text(
-                'Content failed to load',
-                style: new TextStyle(
-                  fontSize: 16.0,
-                  color: _kFailureTextColor,
+                new Text(
+                  'Content failed to load',
+                  style: new TextStyle(
+                    fontSize: 16.0,
+                    color: _kFailureTextColor,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ));
+        )));
         break;
       case LoadingStatus.completed:
         listChildren.addAll(children.map((Widget child) {
           return new Align(
             alignment: FractionalOffset.topCenter,
-            child: new Material(
-              elevation: 4.0,
-              color: Colors.white,
-              child: new Container(
-                constraints: new BoxConstraints(
-                  maxWidth: _kBodyMaxWidth,
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: child,
-              ),
-            ),
+            child: _buildMaterialWrapper(child),
           );
         }));
         break;
