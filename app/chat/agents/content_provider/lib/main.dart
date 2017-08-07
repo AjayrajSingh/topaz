@@ -67,7 +67,7 @@ class ChatContentProviderAgent extends AgentImpl {
 
     Proposer proposer = new Proposer(proposalPublisher: _proposalPublisher);
 
-    _contextReader.subscribe(
+    _contextReader.subscribeToTopics(
       new ContextQuery()
         ..topics = <String>[
           '/location/home_work',
