@@ -11,6 +11,7 @@ import 'package:sysui_widgets/three_column_aligned_layout_delegate.dart';
 import 'package:sysui_widgets/ticking_state.dart';
 
 import 'nothing.dart';
+import 'size_model.dart';
 import 'story.dart';
 import 'story_title.dart';
 
@@ -25,12 +26,6 @@ class StoryBar extends StatefulWidget {
   /// The [Story] this bar represents.
   final Story story;
 
-  /// The height of the bar when minimized.
-  final double minimizedHeight;
-
-  /// The height of the bar when maximized.
-  final double maximizedHeight;
-
   /// True if the story is in focus.
   final bool focused;
 
@@ -44,8 +39,6 @@ class StoryBar extends StatefulWidget {
   StoryBar({
     Key key,
     this.story,
-    this.minimizedHeight,
-    this.maximizedHeight,
     this.focused,
     this.showTitleOnly: _kShowTitleOnly,
     this.elevation,
@@ -66,7 +59,7 @@ class StoryBarState extends TickingState<StoryBar> {
   void initState() {
     super.initState();
     _heightSimulation = new RK4SpringSimulation(
-      initValue: widget.minimizedHeight,
+      initValue: SizeModel.kStoryBarMinimizedHeight,
       desc: _kHeightSimulationDesc,
     );
     _focusedSimulation = new RK4SpringSimulation(
@@ -74,7 +67,7 @@ class StoryBarState extends TickingState<StoryBar> {
       desc: _kHeightSimulationDesc,
     );
     _focusedSimulation.target = widget.focused ? 0.0 : 4.0;
-    _showHeight = widget.minimizedHeight;
+    _showHeight = SizeModel.kStoryBarMinimizedHeight;
   }
 
   @override
@@ -87,8 +80,9 @@ class StoryBarState extends TickingState<StoryBar> {
   }
 
   @override
-  Widget build(BuildContext context) => widget.minimizedHeight == 0.0 &&
-          widget.maximizedHeight == 0.0
+  Widget build(BuildContext context) => SizeModel.kStoryBarMinimizedHeight ==
+              0.0 &&
+          SizeModel.kStoryBarMaximizedHeight == 0.0
       ? Nothing.widget
       : new PhysicalModel(
           color: widget.story.themeColor,
@@ -99,8 +93,8 @@ class StoryBarState extends TickingState<StoryBar> {
             padding: new EdgeInsets.symmetric(horizontal: 12.0),
             margin: new EdgeInsets.only(bottom: _focusedSimulation.value),
             child: new OverflowBox(
-              minHeight: widget.maximizedHeight,
-              maxHeight: widget.maximizedHeight,
+              minHeight: SizeModel.kStoryBarMaximizedHeight,
+              maxHeight: SizeModel.kStoryBarMaximizedHeight,
               alignment: FractionalOffset.topCenter,
               child: widget.showTitleOnly
                   ? new Center(
@@ -205,26 +199,29 @@ class StoryBarState extends TickingState<StoryBar> {
   void maximize({bool jumpToFinish: false}) {
     if (jumpToFinish) {
       _heightSimulation = new RK4SpringSimulation(
-        initValue: widget.maximizedHeight,
+        initValue: SizeModel.kStoryBarMaximizedHeight,
         desc: _kHeightSimulationDesc,
       );
     }
-    _showHeight = widget.maximizedHeight;
+    _showHeight = SizeModel.kStoryBarMaximizedHeight;
     _focusedSimulation.target = widget.focused ? 0.0 : 4.0;
     show();
   }
 
   /// Minimizes the height of the story bar when shown.
   void minimize() {
-    _showHeight = widget.minimizedHeight;
+    _showHeight = SizeModel.kStoryBarMinimizedHeight;
     _focusedSimulation.target = 0.0;
     show();
   }
 
-  double get _opacity => math.max(
-      0.0,
-      (_height - widget.minimizedHeight) /
-          (widget.maximizedHeight - widget.minimizedHeight));
+  double get _opacity => math
+      .max(
+          0.0,
+          (_height - SizeModel.kStoryBarMinimizedHeight) /
+              (SizeModel.kStoryBarMaximizedHeight -
+                  SizeModel.kStoryBarMinimizedHeight))
+      .clamp(0.0, 1.0);
 
   double get _height => _heightSimulation.value;
 }

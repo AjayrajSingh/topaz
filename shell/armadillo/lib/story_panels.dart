@@ -412,8 +412,6 @@ class StoryPanels extends StatelessWidget {
                       child: new StoryBar(
                         key: story.storyBarKey,
                         story: story,
-                        minimizedHeight: SizeModel.kStoryBarMinimizedHeight,
-                        maximizedHeight: SizeModel.kStoryBarMaximizedHeight,
                         focused:
                             (storyCluster.displayMode == DisplayMode.panels) ||
                                 (storyCluster.focusedStoryId == story.id),

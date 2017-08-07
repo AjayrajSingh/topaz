@@ -518,11 +518,18 @@ class NowState extends TickingState<Now> {
           BuildContext context,
           Widget child,
           ContextModel contextModel,
-        ) =>
-            new Alphatar.fromNameAndUrl(
-              avatarUrl: _getImageUrl(contextModel.userImageUrl) ?? '',
-              name: contextModel.userName ?? '',
-            ),
+        ) {
+          String avatarUrl = _getImageUrl(contextModel.userImageUrl) ?? '';
+          String name = contextModel.userName ?? '';
+          return avatarUrl.isNotEmpty
+              ? new Alphatar.fromNameAndUrl(
+                  avatarUrl: avatarUrl,
+                  name: name,
+                )
+              : new Alphatar.fromName(
+                  name: name,
+                );
+        },
       );
 
   /// Returns a verbose representation of the user's current context.
