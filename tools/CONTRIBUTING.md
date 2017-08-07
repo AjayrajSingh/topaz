@@ -1,8 +1,22 @@
-# Contributing
+We welcome contributions. If you have not already set up Fuchsia, follow the instructions [here](https://fuchsia.googlesource.com/docs/+/master/getting_started.md)
 
-This is an open source project and accepts contributions. All contributors must:
+Follow the Contribution Guidelines [here](https://fuchsia.googlesource.com/docs/+/master/CONTRIBUTING.md)
+This repo has some additional formatting nuances:
+1. Commit messages should be formatted according to the Commit Message Format section [here](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md)
+    i.e.
+    ```
+    <type>(<scope>): <subject>
+    <BLANK LINE>
+    <body>
+    <BLANK LINE>
+    <footer>
+    ```
+    e.g.
+    ```
+    feat(video): add play controls
 
-* Sign the [Google CLA](https://cla.developers.google.com/).
-* Submit changes via Gerrit (https://fuchsia-review.googlesource.com).
+    adds play controls and relevant tests
 
-Detailed contribution instructions can be found in the [doc directory](./doc/contributing/README.md).
+    JIRA-ISSUE-123 #done
+    ```
+2. Run `make fmt` and `make presubmit` and resolve any errors prior to `jiri upload`ing. This formats, lints, and runs tests on the code.
