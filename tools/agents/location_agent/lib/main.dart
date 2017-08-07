@@ -104,5 +104,5 @@ void main(List<dynamic> args) {
   ContextQuery query =
       new ContextQuery.init(<String>[_kLocationTopic], null /* filters */);
   _contextListenerImpl = new ContextListenerImpl();
-  _contextReader.subscribe(query, _contextListenerImpl.getHandle());
+  _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
 }
