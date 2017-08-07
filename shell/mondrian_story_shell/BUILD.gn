@@ -35,5 +35,4 @@ dart_test("test"){
     "//apps/mondrian:flutter_mondrian_dart_package",
     "//third_party/dart-pkg/pub/test",
   ]
-  analysis_options = ".analysis_options"
 }
