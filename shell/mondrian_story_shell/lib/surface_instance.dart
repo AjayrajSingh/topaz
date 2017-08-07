@@ -86,7 +86,10 @@ class _SurfaceInstanceState extends State<SurfaceInstance> {
           widget.form.onDragFinished(
               positionSim.value - widget.form.position.center,
               details.velocity);
-          positionSim.start(initState: details.velocity.pixelsPerSecond);
+          positionSim.start(
+              initState: widget.form.dragFriction(
+                  positionSim.value - widget.form.position.center,
+                  details.velocity.pixelsPerSecond));
         },
         child: new SurfaceFrame(
           child: widget.form.parts.keys.first,
