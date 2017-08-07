@@ -138,5 +138,5 @@ Future<Null> main(List<dynamic> args) async {
   _contextListenerImpl = new ContextListenerImpl(
     apiKey: config.get('last_fm_api_key'),
   );
-  _contextReader.subscribe(query, _contextListenerImpl.getHandle());
+  _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
 }

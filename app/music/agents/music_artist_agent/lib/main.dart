@@ -133,5 +133,5 @@ Future<Null> main(List<dynamic> args) async {
     clientId: config.get('spotify_client_id'),
     clientSecret: config.get('spotify_client_secret'),
   );
-  _contextReader.subscribe(query, _contextListenerImpl.getHandle());
+  _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
 }
