@@ -8,7 +8,7 @@ class Elevations {
   static const double moduleMaxElevation = 50.0;
 
   /// The maximum elevation story shell is using.  This is an estimate.
-  static const double storyShellMaxElevation = 250.0;
+  static const double storyShellMaxElevation = 200.0;
 
   static const double _storyShellWithModuleMaxElevation =
       moduleMaxElevation + storyShellMaxElevation;
