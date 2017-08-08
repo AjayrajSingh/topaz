@@ -116,6 +116,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       notifyListeners();
       _loadUsers();
     });
+
+    _draggedUsers.clear();
+    notifyListeners();
   }
 
   /// Create a new user and login with that user
@@ -210,11 +213,13 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   /// Add a user to the list of dragged users
   void addDraggedUser(Account account) {
     _draggedUsers.add(account);
+    notifyListeners();
   }
 
   /// Remove a user from the list of dragged users
   void removeDraggedUser(Account account) {
     _draggedUsers.remove(account);
+    notifyListeners();
   }
 
   /// Hide the kernel panic screen
