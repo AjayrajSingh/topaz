@@ -9,7 +9,16 @@
 export TREE_ROOT=`git rev-parse --show-toplevel`
 export FUCHSIA_ROOT="$TREE_ROOT/../.."
 
-export DART_SDK="$FUCHSIA_ROOT/out/debug-x86-64/host_x64/dart-sdk"
+host_os="$(uname -s)"
+if [[ "$host_os" = "Darwin" ]]; then
+  host_platform="mac"
+elif [[ "$host_os" = "Linux" ]]; then
+  host_platform="linux"
+else
+  echo "Unsupported platform: $platform"
+  exit 1
+fi
+export DART_SDK="$FUCHSIA_ROOT/dart/tools/sdks/$host_platform/dart-sdk"
 export PATH="$DART_SDK/bin:$PATH"
 
 
