@@ -15,6 +15,7 @@
 .project
 .pub
 .pubspec.lock
+pubspec.lock
 .pydevproject
 packages
 **/.atom/

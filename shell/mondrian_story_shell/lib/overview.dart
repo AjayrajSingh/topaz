@@ -2,21 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'isometric_widget.dart';
 import 'model.dart';
-
-// ignore: unused_element
-void _log(String msg) {
-  print('[MondrianFlutter] $msg');
-}
 
 /// Printable names for relation arrangement
 const Map<SurfaceArrangement, String> relName =
@@ -82,7 +78,7 @@ class Overview extends StatelessWidget {
         builder: (BuildContext context, BoxConstraints constraints) {
           return new Container(
             alignment: FractionalOffset.center,
-            width: min(constraints.maxWidth, constraints.maxHeight),
+            width: math.min(constraints.maxWidth, constraints.maxHeight),
             height: constraints.maxHeight,
             padding: const EdgeInsets.symmetric(horizontal: 44.0),
             child: new Scrollbar(
@@ -90,7 +86,7 @@ class Overview extends StatelessWidget {
                 builder:
                     (BuildContext context, Widget child, SurfaceGraph graph) {
                   if (graph.focusStack.isEmpty) {
-                    _log('focusedSurfaceHistory is empty');
+                    log.warning('focusedSurfaceHistory is empty');
                     return new Container();
                   }
                   return buildGraphList(constraints, graph);

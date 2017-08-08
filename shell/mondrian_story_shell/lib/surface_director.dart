@@ -8,18 +8,14 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'model.dart';
 import 'child_view.dart';
 import 'copresent_layout.dart';
+import 'model.dart';
 import 'surface_form.dart';
 import 'surface_space.dart';
 import 'tree.dart';
 
 const double _kFadeToDepthRatio = 3.0;
-
-void _log(String msg) {
-  print('[MondrianFlutter] Director $msg');
-}
 
 /// Directs the layout of the SurfaceSpace
 class SurfaceDirector extends StatefulWidget {
@@ -96,7 +92,6 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           if (constraints.biggest.isInfinite || constraints.biggest.isEmpty) {
             return new Container();
           }
-          _log('Build');
           final Offset offscreen = constraints.biggest.topRight(Offset.zero);
           return new SizedBox(
             width: constraints.maxWidth,

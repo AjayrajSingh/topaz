@@ -2,20 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'surface_details.dart';
 import 'tree.dart';
-
-void _log(String msg) {
-  print('[MondrianFlutter] SurfaceGraph $msg');
-}
 
 /// The parentId that means no parent
 const String kNoParent = '';
@@ -46,7 +43,7 @@ class Surface extends Model {
 
   /// Return the min width of this Surface
   double minWidth({double min: 0.0}) =>
-      max(properties?.constraints?.minWidth ?? 0.0, min);
+      math.max(properties?.constraints?.minWidth ?? 0.0, min);
 
   /// Return the absolute emphasis given some root displayed Surface
   double absoluteEmphasis(Surface relative) {
@@ -266,7 +263,6 @@ class SurfaceGraph extends Model {
   /// above the relative surface or any of its direct children, or its original
   /// position.
   void focusSurface(String id, String relativeId) {
-    _log('focusSurface($id)');
     assert(_surfaces.containsKey(id));
     _dismissedSurfaces.remove(id);
     if (relativeId == null || relativeId == kNoParent) {
@@ -281,7 +277,8 @@ class SurfaceGraph extends Model {
       // Use the highest index of relative or its children
       for (Tree<String> childNode in relative.children) {
         String childId = childNode.value;
-        relativeIndex = max(relativeIndex, _focusedSurfaces.indexOf(childId));
+        relativeIndex =
+            math.max(relativeIndex, _focusedSurfaces.indexOf(childId));
       }
       // If none of those are focused, find the closest ancestor that is focused
       Tree<String> ancestor = relative.parent;
@@ -290,7 +287,8 @@ class SurfaceGraph extends Model {
         ancestor = ancestor.parent;
       }
       // Insert to the highest of one past relative index, or the original index
-      int index = max(relativeIndex < 0 ? -1 : relativeIndex + 1, currentIndex);
+      int index =
+          math.max(relativeIndex < 0 ? -1 : relativeIndex + 1, currentIndex);
       if (index >= 0) {
         _focusedSurfaces.insert(index, id);
       }
@@ -342,7 +340,7 @@ class SurfaceGraph extends Model {
   void connectView(String id, InterfaceHandle<ViewOwner> viewOwner) {
     final Surface surface = _surfaces[id];
     if (surface != null) {
-      _log('connectView $surface');
+      log.fine('connectView $surface');
       surface._connection = new ChildViewConnection(
         viewOwner,
         onAvailable: (ChildViewConnection connection) {

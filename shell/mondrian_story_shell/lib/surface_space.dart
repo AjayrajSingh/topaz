@@ -8,10 +8,10 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
-import 'tree.dart';
 import 'positioned_builder.dart';
 import 'surface_form.dart';
 import 'surface_instance.dart';
+import 'tree.dart';
 
 const SpringDescription _kSimSpringDescription = const SpringDescription(
   mass: 1.0,

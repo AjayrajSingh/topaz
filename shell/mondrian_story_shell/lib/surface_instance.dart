@@ -8,12 +8,8 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 import 'positioned_builder.dart';
-import 'surface_frame.dart';
 import 'surface_form.dart';
-
-void _log(String msg) {
-  print('[MondrianFlutter] SurfaceInstance $msg');
-}
+import 'surface_frame.dart';
 
 /// Instantiation of a Surface in SurfaceSpace
 class SurfaceInstance extends StatefulWidget {
@@ -45,7 +41,6 @@ class _SurfaceInstanceState extends State<SurfaceInstance> {
   @override
   void initState() {
     super.initState();
-    _log('init');
     positionSim = widget.positionSim;
     positionSim.value = widget.form.initPosition.center;
     positionSim.start();

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
@@ -14,6 +14,7 @@ import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 
 const String _kModuleUrl = 'file:///system/apps/example_manual_relationships';
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
@@ -27,10 +28,6 @@ int _childId = 0;
 /// The key for the child modules list
 final GlobalKey<ChildModulesViewState> kChildModulesKey = new GlobalKey();
 
-void _log(String msg) {
-  print('[Manual Relationships Module] $msg');
-}
-
 class _ModuleStopperWatcher extends ModuleWatcher {
   final ModuleControllerProxy _moduleController;
   final ModuleWatcherBinding _binding = new ModuleWatcherBinding();
@@ -41,10 +38,10 @@ class _ModuleStopperWatcher extends ModuleWatcher {
   }
   @override
   void onStateChange(ModuleState newState) {
-    _log('Module state changed to $newState');
+    log.info('Module state changed to $newState');
     if (newState == ModuleState.done) {
       _moduleController.stop(() {
-        _log('Module stopped!');
+        log.info('Module stopped!');
         _binding.unbind();
         _watchers.remove(this);
         kChildModulesKey.currentState.refresh();
@@ -78,7 +75,7 @@ void startModuleInShell(SurfaceRelation relation) {
     relation,
     true,
   );
-  _log('Started sub-module $name');
+  log.info('Started sub-module $name');
 
   _watchers.add(new _ModuleStopperWatcher(moduleController, name));
   kChildModulesKey.currentState.refresh();
@@ -147,7 +144,7 @@ class CopresentLauncherState extends State<CopresentLauncher> {
   double _copresentEmphasisExp = 0.0;
 
   double get _emphasis =>
-      (pow(2, _copresentEmphasisExp) * 10.0).roundToDouble() / 10.0;
+      (math.pow(2, _copresentEmphasisExp) * 10.0).roundToDouble() / 10.0;
 
   @override
   Widget build(BuildContext context) => new Container(
@@ -280,7 +277,7 @@ class MainWidget extends StatelessWidget {
                     child: new RaisedButton(
                       child: new Text('Close'),
                       onPressed: () {
-                        _log('Module done...');
+                        log.info('Module done...');
                         _moduleContext.done();
                       },
                     ),
@@ -325,14 +322,14 @@ class ModuleImpl extends Module {
       InterfaceHandle<ModuleContext> moduleContextHandle,
       InterfaceHandle<ServiceProvider> incomingServices,
       InterfaceRequest<ServiceProvider> outgoingServices) {
-    _log('ModuleImpl::initialize call');
+    log.info('ModuleImpl::initialize call');
 
     _moduleContext.ctrl.bind(moduleContextHandle);
   }
 
   @override
   void stop(void done()) {
-    _log('ModuleImpl::stop call');
+    log.info('ModuleImpl::stop call');
 
     _moduleContext.ctrl.close();
 
@@ -342,16 +339,19 @@ class ModuleImpl extends Module {
 
 /// Entry point for this module.
 void main() {
+  setupLogger(name: 'exampleManualRelationships');
+
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices.addServiceForName(
     (InterfaceRequest<Module> request) {
-      _log('Received binding request for Module');
+      log.info('Received binding request for Module');
       _module = new ModuleImpl()..bind(request);
     },
     Module.serviceName,
   );
 
-  Color randomColor = new Color(0xFF000000 + new Random().nextInt(0xFFFFFF));
+  Color randomColor =
+      new Color(0xFF000000 + new math.Random().nextInt(0xFFFFFF));
 
   runApp(new MaterialApp(
     title: 'Manual Module',

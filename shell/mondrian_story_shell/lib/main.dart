@@ -10,6 +10,7 @@ import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
@@ -25,10 +26,6 @@ final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 StoryShellFactoryImpl _storyShellFactory;
 
 SurfaceGraph _surfaceGraph;
-
-void _log(String msg) {
-  print('[MondrianFlutter] $msg');
-}
 
 /// An implementation of the [StoryShell] interface.
 class StoryShellImpl extends StoryShell {
@@ -55,7 +52,7 @@ class StoryShellImpl extends StoryShell {
   @override
   void connectView(InterfaceHandle<ViewOwner> view, String viewId,
       String parentId, SurfaceRelation surfaceRelation) {
-    _log('Connecting view $viewId with parent $parentId');
+    log.fine('Connecting view $viewId with parent $parentId');
     _surfaceGraph.addSurface(
       viewId,
       new SurfaceProperties(),
@@ -85,7 +82,7 @@ class StoryShellImpl extends StoryShell {
   /// Terminate the StoryShell
   @override
   void terminate(void done()) {
-    _log('StoryShellImpl::terminate call');
+    log.info('StoryShellImpl::terminate call');
     done();
   }
 }
@@ -154,7 +151,8 @@ class MondrianState extends State<Mondrian> {
 
 /// Entry point.
 void main() {
-  _log('Mondrian started');
+  setupLogger(name: 'Mondrian');
+  log.info('Started');
 
   _surfaceGraph = new SurfaceGraph();
   // Note: This implementation only supports one StoryShell at a time.
@@ -163,7 +161,7 @@ void main() {
 
   _appContext.outgoingServices.addServiceForName(
     (InterfaceRequest<StoryShellFactory> request) {
-      _log('Received binding request for StoryShellFactory');
+      log.fine('Received binding request for StoryShellFactory');
       _storyShellFactory = new StoryShellFactoryImpl()..bind(request);
     },
     StoryShellFactory.serviceName,
