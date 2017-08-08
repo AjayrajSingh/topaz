@@ -149,6 +149,13 @@ void RunApplication(
     ::fidl::InterfaceRequest<app::ApplicationController> controller) {
   std::string url = std::move(application->resolved_url);
 
+  // Name the process and bundle after the url of the application being
+  // launched. Name the bundle before extract snapshot for the name to carry to
+  // the mappings.
+  std::string label = "dart:" + GetLabelFromURL(url);
+  mx::process::self().set_property(MX_PROP_NAME, label.c_str(), label.size());
+  application->data.set_property(MX_PROP_NAME, label.c_str(), label.size());
+
   const uint8_t* isolate_snapshot_data = NULL;
   const uint8_t* isolate_snapshot_instructions = NULL;
   const uint8_t* script_snapshot = NULL;
@@ -160,10 +167,6 @@ void RunApplication(
   }
 
   mtl::MessageLoop loop;
-
-  // Name this process after the url of the application being launched.
-  std::string label = "dart:" + GetLabelFromURL(url);
-  mx::process::self().set_property(MX_PROP_NAME, label.c_str(), label.size());
 
   DartApplicationController app(
       isolate_snapshot_data, isolate_snapshot_instructions,
