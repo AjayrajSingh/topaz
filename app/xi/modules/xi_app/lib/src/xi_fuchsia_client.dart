@@ -20,6 +20,7 @@ final ApplicationContext kContext = new ApplicationContext.fromStartupInfo();
 
 /// Fuchsia specific [XiClient].
 class XiFuchsiaClient extends XiClient {
+  /// Constructor.
   XiFuchsiaClient(this._ledgerHandle);
   final ServiceProviderProxy _serviceProvider = new ServiceProviderProxy();
   final ApplicationLaunchInfo _launchInfo = new ApplicationLaunchInfo();

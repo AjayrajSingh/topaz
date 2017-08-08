@@ -27,6 +27,7 @@ dynamic _handleResponse(String description) {
 
 /// An implementation of the [Module] interface.
 class ModuleImpl extends Module {
+  /// Constructor.
   ModuleImpl(this._ledgerRequest);
 
   final ModuleBinding _binding = new ModuleBinding();
@@ -68,7 +69,7 @@ void main() {
   _log('Module main called');
 
   InterfacePair<Ledger> pair = new InterfacePair<Ledger>();
-  final module = new ModuleImpl(pair.passRequest());
+  final ModuleImpl module = new ModuleImpl(pair.passRequest());
 
   kContext.outgoingServices.addServiceForName(
     (InterfaceRequest<Module> request) {
