@@ -114,12 +114,12 @@ class Panel {
         heightFactor: bottom - top,
       );
 
-  /// Creates a [Panel] from the output of [toJsonObject].
-  factory Panel.fromJsonObject(List<double> jsonObject) => new Panel.fromLTRB(
-        jsonObject[0],
-        jsonObject[1],
-        jsonObject[2],
-        jsonObject[3],
+  /// Creates a [Panel] from the output of [toJson].
+  factory Panel.fromJson(List<double> json) => new Panel.fromLTRB(
+        json[0],
+        json[1],
+        json[2],
+        json[3],
       );
 
   /// Creates a new [Panel] that is a copy of [panel].
@@ -316,7 +316,7 @@ class Panel {
 
   /// Returns an object represeting the [Panel] suitable for conversion into
   /// JSON.
-  List<double> toJsonObject() => <double>[
+  List<double> toJson() => <double>[
         left,
         top,
         right,

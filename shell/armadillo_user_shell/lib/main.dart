@@ -78,6 +78,10 @@ Future<Null> main() async {
     () => storyRearrangementScrimModel
         .onDragAcceptableStateChanged(storyClusterDragStateModel.isAcceptable),
   );
+  storyClusterDragStateModel.addListener(
+    () => storyProviderStoryGenerator
+        .onDraggingChanged(storyClusterDragStateModel.isDragging),
+  );
   StoryDragTransitionModel storyDragTransitionModel =
       new StoryDragTransitionModel();
   storyClusterDragStateModel.addListener(

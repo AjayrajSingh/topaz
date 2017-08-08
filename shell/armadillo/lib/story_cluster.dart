@@ -116,8 +116,10 @@ class StoryCluster {
     _storiesModel = new StoryClusterStoriesModel(this);
     addStoryListListener(_storiesModel.notifyListeners);
     _panelsModel = new StoryClusterPanelsModel(this);
-    _storiesModel.addListener(onStoryClusterChanged);
-    _panelsModel.addListener(onStoryClusterChanged);
+    if (onStoryClusterChanged != null) {
+      _storiesModel.addListener(onStoryClusterChanged);
+      _panelsModel.addListener(onStoryClusterChanged);
+    }
   }
 
   /// Creates a [StoryCluster] from [story].
@@ -134,6 +136,20 @@ class StoryCluster {
       stories: <Story>[story],
       onStoryClusterChanged: onStoryClusterChanged,
     );
+  }
+
+  /// Creates a StoryCluster from a json object returned by [toJson].
+  factory StoryCluster.fromJson(Map<String, dynamic> clusterData) {
+    StoryCluster storyCluster = new StoryCluster(
+      stories: clusterData['stories']
+          .map((Map<String, dynamic> json) => new Story.fromJson(json))
+          .toList(),
+    );
+    storyCluster.displayMode = clusterData['display_mode'] == 'tabs'
+        ? DisplayMode.tabs
+        : DisplayMode.panels;
+    storyCluster.focusedStoryId = new StoryId(clusterData['focused_story_id']);
+    return storyCluster;
   }
 
   /// Wraps [child] with the [Model]s corresponding to this [StoryCluster].
@@ -182,6 +198,10 @@ class StoryCluster {
 
   void _notifyStoryListListeners() {
     title = _getClusterTitle(realStories);
+    _lastInteraction = _getClusterLastInteraction(stories);
+    _cumulativeInteractionDuration = _getClusterCumulativeInteractionDuration(
+      stories,
+    );
     _storyListListeners.forEach((VoidCallback listener) => listener());
     _panelsModel.notifyListeners();
   }
@@ -252,6 +272,7 @@ class StoryCluster {
         storiesRemoved[story.associatedStoryId] = story;
       }
     });
+
     return storiesRemoved;
   }
 
@@ -355,6 +376,13 @@ class StoryCluster {
     Story story = _stories.where((Story story) => story.id == storyId).single;
     story.panel = withPanel;
     _panelsModel.notifyListeners();
+  }
+
+  /// Replaces the stories in this cluster with [replacementStories].
+  void replaceStories(List<Story> replacementStories) {
+    _stories.clear();
+    _stories.addAll(replacementStories);
+    _notifyStoryListListeners();
   }
 
   /// true if this cluster has become a placeholder via [becomePlaceholder].
@@ -535,15 +563,29 @@ class StoryCluster {
 
   /// Returns an object represeting the [StoryCluster] suitable for conversion
   /// into JSON.
-  Map<String, dynamic> toJsonObject() {
+  Map<String, dynamic> toJson() {
     Map<String, dynamic> clusterData = <String, dynamic>{};
-    clusterData['stories'] =
-        realStories.map((Story story) => story.toJsonObject()).toList();
+    clusterData['stories'] = stories.toList();
     clusterData['display_mode'] =
         displayMode == DisplayMode.tabs ? 'tabs' : 'panels';
     clusterData['focused_story_id'] = focusedStoryId.value;
 
     return clusterData;
+  }
+
+  /// Updates this story cluster to have the info as [other].
+  void update(StoryCluster other) {
+    /// 1. Replace stories.
+    _stories.clear();
+    _stories.addAll(other.stories);
+
+    /// 2. Set display mode.
+    displayMode = other.displayMode;
+
+    /// 3. Update focused story id.
+    focusedStoryId = other.focusedStoryId;
+
+    _notifyStoryListListeners();
   }
 
   static String _getClusterTitle(List<Story> stories) {

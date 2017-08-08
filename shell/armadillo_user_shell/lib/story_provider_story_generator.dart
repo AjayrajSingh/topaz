@@ -33,6 +33,9 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   bool _firstTime = true;
   bool _writeStoryClusterUpdatesToLink = false;
   bool _reactToLinkUpdates = false;
+  bool _dragging = false;
+  String _lastLinkJson;
+  String _lastProcessedLinkJson;
 
   /// Set from an external source - typically the UserShell.
   StoryProviderProxy _storyProvider;
@@ -114,25 +117,200 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   @override
   List<StoryCluster> get storyClusters => _storyClusters;
 
+  /// Called when the drag state of a cluster changes.
+  void onDraggingChanged(bool dragging) {
+    if (dragging != _dragging) {
+      _dragging = dragging;
+      _onLinkUpdate();
+    }
+  }
+
   /// Called when the link changes.
   void onLinkChanged(String json) {
-    log.info('Link changed: $json');
+    if (json == _lastLinkJson) {
+      return;
+    }
 
+    log.fine('Link changed: $json');
+
+    _lastLinkJson = json;
+
+    _onLinkUpdate();
+  }
+
+  void _onLinkUpdate() {
     if (!_reactToLinkUpdates) {
       return;
     }
 
-    /// TODO: So something with the json.
-    /// If the list of stories doesn't match the canonical list of stories,
-    /// store this for later processing in the case that a story has been added
-    /// or removed and we don't know about it.
-    ///
-    /// If the list of stories matches, replace the current list of clusters
-    /// with this list by merging the data.
-    /// Map<String, List<Map<String, dynamic>>> decodedJson = JSON.decode(json);
-    /// decodedJson['story_clusters'].forEach(
-    ///   (Map<String, dynamic> storyClusterJsonObject) {},
-    /// );
+    if (_dragging) {
+      return;
+    }
+
+    if (_lastProcessedLinkJson == _lastLinkJson) {
+      return;
+    }
+
+    log.fine('Processing link data...');
+
+    List<StoryCluster> jsonStoryClusters = _getStoryClustersFromJson(
+      _lastLinkJson,
+    );
+
+    log.fine(
+      'Current cluster count: ${storyClusters.length}, '
+          'decoded cluster count: ${jsonStoryClusters.length}',
+    );
+
+    /// If the list of stories doesn't match the canonical list of stories, do nothing.
+    Iterable<Story> jsonStories = jsonStoryClusters.expand(
+      (StoryCluster cluster) => cluster.stories,
+    );
+
+    Map<String, Story> currentStoriesMap = <String, Story>{};
+
+    _currentStories.forEach(
+      (Story story) => currentStoriesMap[story.id.value] = story,
+    );
+
+    /// Only continue processing if we have the same set of stories.
+    if (jsonStories.length != currentStoriesMap.length) {
+      log.fine('Not the same number of stories! Aborting JSON processing...');
+      return;
+    }
+
+    if (!jsonStories.every(
+      (Story jsonStory) => currentStoriesMap.containsKey(jsonStory.id.value),
+    )) {
+      log.fine('Not all stories exist! Aborting JSON processing...');
+      return;
+    }
+
+    _lastProcessedLinkJson = _lastLinkJson;
+
+    /// At this point the stories match, now we need move from the current
+    /// clustering arrangement to the one specified in the json.
+    /// Replace the current list of clusters with this list by merging the
+    /// clusters.
+    log.fine(
+      'Processing new Story Clusters from Link:\n$_lastProcessedLinkJson',
+    );
+
+    /// Currently, each StoryCluster created from the json has incomplete
+    /// stories.  Before messing with the clusters we replace these incomplete
+    /// stories with currently existing ones with some of their data updated
+    /// from the incomplete json stories.
+    jsonStoryClusters.forEach((StoryCluster jsonStoryCluster) {
+      List<Story> jsonStoryClusterStories = jsonStoryCluster.stories;
+      List<Story> replacementStories = <Story>[];
+      jsonStoryClusterStories.forEach((Story jsonStory) {
+        Story replacementStory = currentStoriesMap[jsonStory.id.value];
+        replacementStory.update(jsonStory);
+        replacementStories.add(replacementStory);
+      });
+      jsonStoryCluster.replaceStories(replacementStories);
+    });
+
+    List<StoryCluster> oldStoryClusters = _storyClusters.toList();
+    List<StoryCluster> newStoryClusters = <StoryCluster>[];
+
+    /// For each json story cluster...
+    jsonStoryClusters.forEach((StoryCluster jsonStoryCluster) {
+      List<Story> jsonStoryClusterStories = jsonStoryCluster.stories;
+      Iterable<String> jsonStoryClusterStoryIds =
+          jsonStoryClusterStories.map((Story story) => story.id.value);
+
+      /// Find a story cluster with all or some of the stories this cluster
+      /// has.
+      StoryCluster bestMatchingStoryCluster = _findBestMatchingStoryCluster(
+        jsonStoryCluster,
+        oldStoryClusters,
+      );
+
+      /// If such a cluster exists, replace its stories with the json cluster's
+      /// stories.
+      if (bestMatchingStoryCluster != null) {
+        oldStoryClusters.remove(bestMatchingStoryCluster);
+        newStoryClusters.add(bestMatchingStoryCluster);
+        bestMatchingStoryCluster.update(jsonStoryCluster);
+        return;
+      }
+
+      /// If no clusters exist with the stories, create a new cluster.
+      StoryCluster newStoryCluster = new StoryCluster(
+        stories: jsonStoryClusterStoryIds
+            .map((String storyId) => currentStoriesMap[storyId])
+            .toList(),
+        onStoryClusterChanged: _onStoryClusterChange,
+      );
+      newStoryClusters.add(newStoryCluster);
+      newStoryCluster.update(jsonStoryCluster);
+    });
+
+    /// We've merged all the clusters, update everyone with the new list.
+    _storyClusters.clear();
+    _storyClusters.addAll(newStoryClusters);
+    _notifyListeners();
+  }
+
+  /// Finds the story cluster in [storyClusters] that best matches the stories
+  /// in [storyClusterToMatch].
+  StoryCluster _findBestMatchingStoryCluster(
+    StoryCluster storyClusterToMatch,
+    List<StoryCluster> storyClusters,
+  ) {
+    Map<String, Story> storyMap = <String, Story>{};
+    storyClusterToMatch.stories.forEach(
+      (Story story) => storyMap[story.id.value] = story,
+    );
+
+    /// Find story clusters with same set of stories...
+    Iterable<StoryCluster> exactMatchingStoryClusters =
+        storyClusters.where((StoryCluster storyCluster) {
+      return storyCluster.stories.length == storyMap.length &&
+          storyCluster.stories.every(
+            (Story story) => storyMap.containsKey(story.id.value),
+          );
+    });
+
+    assert(exactMatchingStoryClusters.length <= 1);
+
+    if (exactMatchingStoryClusters.isNotEmpty) {
+      return exactMatchingStoryClusters.first;
+    }
+
+    /// If we don't have an exact match, search for the best match.
+    int bestMatchingStories = 0;
+    StoryCluster bestStoryCluster;
+
+    storyClusters.forEach((StoryCluster storyCluster) {
+      int matchingStories = 0;
+      storyCluster.stories.forEach((Story story) {
+        if (storyMap.containsKey(story.id.value)) {
+          matchingStories++;
+        }
+      });
+      if (matchingStories > bestMatchingStories) {
+        bestMatchingStories = matchingStories;
+        bestStoryCluster = storyCluster;
+      }
+    });
+
+    return bestStoryCluster;
+  }
+
+  List<StoryCluster> _getStoryClustersFromJson(String json) {
+    Map<String, dynamic> decodedJson = JSON.decode(_lastLinkJson);
+
+    List<StoryCluster> jsonStoryClusters = <StoryCluster>[];
+
+    decodedJson['story_clusters'].forEach(
+      (Map<String, dynamic> storyClusterJson) => jsonStoryClusters.add(
+            new StoryCluster.fromJson(storyClusterJson),
+          ),
+    );
+
+    return jsonStoryClusters;
   }
 
   /// Removes all the stories in the [StoryCluster] with [storyClusterId] from
@@ -157,6 +335,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   void update([VoidCallback callback]) {
     _storyProvider.previousStories((List<String> storyIds) {
       if (storyIds.isEmpty && storyClusters.isEmpty) {
+        _onUpdateComplete(callback);
         return;
       }
 
@@ -174,7 +353,8 @@ class StoryProviderStoryGenerator extends StoryGenerator {
           storyIds.where((String storyId) => !containsStory(storyId)).toList();
 
       if (storiesToAdd.isEmpty) {
-        callback?.call();
+        _onUpdateComplete(callback);
+        return;
       }
 
       // We have previous stories so lets resume them so they can be
@@ -187,18 +367,22 @@ class StoryProviderStoryGenerator extends StoryGenerator {
           _startStory(storyInfo, _storyClusters.length);
           added++;
           if (added == storiesToAdd.length) {
-            if (_firstTime) {
-              _firstTime = false;
-              _writeStoryClusterUpdatesToLink = true;
-              _reactToLinkUpdates = true;
-              //_onLinkUpdate();
-              onStoriesFirstAvailable();
-            }
-            callback?.call();
+            _onUpdateComplete(callback);
           }
         });
       });
     });
+  }
+
+  void _onUpdateComplete(VoidCallback callback) {
+    if (_firstTime) {
+      _firstTime = false;
+      _writeStoryClusterUpdatesToLink = true;
+      _reactToLinkUpdates = true;
+      _onLinkUpdate();
+      onStoriesFirstAvailable();
+    }
+    callback?.call();
   }
 
   /// TODO: Determine if this should be expanding cluster.realStories instead
@@ -235,6 +419,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
         }
       });
     }
+    _onLinkUpdate();
   }
 
   void _removeStory(String storyId, {bool notify: true}) {
@@ -306,19 +491,46 @@ class StoryProviderStoryGenerator extends StoryGenerator {
 
   void _onStoryClusterChange() {
     if (!_writeStoryClusterUpdatesToLink) {
+      log.fine('Aborting link write, not ready!');
       return;
     }
 
-    _link.set(
-      null,
-      JSON.encode(
-        <String, List<Map<String, dynamic>>>{
+    // If any of the story clusters that aren't placeholders have a place
+    // holder story inside the current clustering state is invalid - don't write
+    // it out to the link.
+    if (_storyClusters
+        .where((StoryCluster storyCluster) => !storyCluster.isPlaceholder)
+        .any(
+          (StoryCluster storyCluster) =>
+              storyCluster.stories.any((Story story) => story.isPlaceHolder),
+        )) {
+      String json = JSON.encode(
+        <String, List<StoryCluster>>{
           'story_clusters': _storyClusters
-              .map((StoryCluster storyCluster) => storyCluster.toJsonObject())
+              .where((StoryCluster storyCluster) =>
+                  !storyCluster.isPlaceholder &&
+                  storyCluster.stories
+                      .any((Story story) => story.isPlaceHolder))
               .toList()
         },
-      ),
+      );
+      log.fine('Aborting link write, placeholder story found!\n$json');
+      return;
+    }
+
+    String json = JSON.encode(
+      <String, dynamic>{
+        'story_clusters': _storyClusters
+            .where((StoryCluster storyCluster) => !storyCluster.isPlaceholder)
+            .toList(),
+      },
     );
+
+    if (json != _lastLinkJson) {
+      log.fine('Writing to link!');
+      _link.set(null, json);
+      _lastLinkJson = json;
+    }
   }
 
   Story _createStory({

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import 'panel.dart';
 import 'simulated_fractional.dart';
@@ -93,9 +93,9 @@ class Story {
     this.builder,
     this.title: '',
     this.icons: const <OpacityBuilder>[],
-    this.lastInteraction,
-    this.cumulativeInteractionDuration,
-    this.themeColor,
+    DateTime lastInteraction,
+    this.cumulativeInteractionDuration: Duration.ZERO,
+    this.themeColor: Colors.black,
     this.importance: 1.0,
     this.onClusterIndexChanged,
   })
@@ -112,7 +112,16 @@ class Story {
         this.containerKey = new GlobalKey(debugLabel: '$id containerKey'),
         this.tabSizerKey = new GlobalKey<SimulatedFractionallySizedBoxState>(
             debugLabel: '$id tabSizerKey'),
-        this.panel = new Panel();
+        this.panel = new Panel(),
+        this.lastInteraction = lastInteraction ?? new DateTime.now();
+
+  /// Creates a Story from a json object returned by [toJson].
+  factory Story.fromJson(Map<String, dynamic> storyData) {
+    Story story = new Story(id: new StoryId(storyData['id']));
+    story.panel = new Panel.fromJson(storyData['panel']);
+    story._clusterIndex = storyData['cluster_index'];
+    return story;
+  }
 
   /// Returns true if the [Story] has no content and should just take up empty
   /// space.
@@ -148,12 +157,18 @@ class Story {
   @override
   String toString() => 'Story( id: $id, title: $title, panel: $panel )';
 
+  /// Updates this story to have the info as [other].
+  void update(Story other) {
+    panel = other.panel;
+    _clusterIndex = other._clusterIndex;
+  }
+
   /// Returns an object represeting the [Story] suitable for conversion
   /// into JSON.
-  Map<String, dynamic> toJsonObject() {
+  Map<String, dynamic> toJson() {
     Map<String, dynamic> storyData = <String, dynamic>{};
     storyData['id'] = id.value;
-    storyData['panel'] = panel.toJsonObject();
+    storyData['panel'] = panel;
     storyData['cluster_index'] = _clusterIndex;
     return storyData;
   }
