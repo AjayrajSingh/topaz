@@ -57,7 +57,7 @@ runner("dart_aot_runner_bin") {
   output_name = "dart_aot_runner"
   extra_defines = [ "AOT_RUNTIME" ]
   extra_deps = [
-    "//apps/dart_content_handler/embedder:dart_snapshot_empty",
+    "//apps/dart_content_handler/embedder:dart_aot_snapshot_cc",
     "//dart/runtime:libdart_precompiled_runtime_product",
   ]
 }

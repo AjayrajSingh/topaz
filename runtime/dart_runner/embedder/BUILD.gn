@@ -92,9 +92,33 @@ source_set("dart_snapshot_cc") {
   ]
 }
 
-source_set("dart_snapshot_empty") {
+action("generate_aot_snapshot_assembly") {
+  aot_snapshotter_label = "//apps/dart_content_handler/snapshotter:aot_snapshotter($host_toolchain)"
+  aot_snapshotter_dir = get_label_info(aot_snapshotter_label, "root_out_dir")
+
+  snapshot_assembly = "$target_gen_dir/aot_vm_snapshot.S"
+
+  deps = [
+    aot_snapshotter_label
+  ]
+
+  outputs = [
+    snapshot_assembly,
+  ]
+
+  script = rebase_path("$aot_snapshotter_dir/dart_aot_snapshotter")
+  args = [
+    "--aot-vm-snapshot=" + rebase_path(snapshot_assembly),
+  ]
+}
+
+source_set("dart_aot_snapshot_cc") {
+  deps = [
+    ":generate_aot_snapshot_assembly",
+  ]
+
   sources = [
+    "$target_gen_dir/aot_vm_snapshot.S",
     "snapshot.h",
-    "snapshot_empty.cc",
   ]
 }

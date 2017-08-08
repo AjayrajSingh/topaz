@@ -16,8 +16,6 @@ namespace dart_content_handler {
 class DartApplicationController : public app::ApplicationController {
  public:
   DartApplicationController(
-      const uint8_t* vm_snapshot_data,
-      const uint8_t* vm_snapshot_instructions,
       const uint8_t* isolate_snapshot_data,
       const uint8_t* isolate_snapshot_instructions,
 #if !defined(AOT_RUNTIME)
@@ -29,7 +27,6 @@ class DartApplicationController : public app::ApplicationController {
       fidl::InterfaceRequest<app::ApplicationController> controller);
   ~DartApplicationController() override;
 
-  void InitDartVM();
   bool CreateIsolate();
 
   bool Main();
@@ -39,8 +36,6 @@ class DartApplicationController : public app::ApplicationController {
   void Kill() override;
   void Detach() override;
 
-  const uint8_t* vm_snapshot_data_;
-  const uint8_t* vm_snapshot_instructions_;
   const uint8_t* isolate_snapshot_data_;
   const uint8_t* isolate_snapshot_instructions_;
 #if !defined(AOT_RUNTIME)

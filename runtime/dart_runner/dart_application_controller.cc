@@ -9,7 +9,6 @@
 
 #include "application/lib/app/application_context.h"
 #include "apps/dart_content_handler/builtin_libraries.h"
-#include "dart/runtime/bin/embedded_dart_io.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
 #include "lib/ftl/synchronization/mutex.h"
@@ -32,22 +31,9 @@ void AfterTask() {
   queue->RunMicrotasks();
 }
 
-void IsolateShutdownCallback(void* callback_data) {
-  mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
-  tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
-  mtl::MessageLoop::GetCurrent()->QuitNow();
-}
-
-void IsolateCleanupCallback(void* callback_data) {
-  tonic::DartState* dart_state = static_cast<tonic::DartState*>(callback_data);
-  delete dart_state;
-}
-
 }  // namespace
 
 DartApplicationController::DartApplicationController(
-    const uint8_t* vm_snapshot_data,
-    const uint8_t* vm_snapshot_instructions,
     const uint8_t* isolate_snapshot_data,
     const uint8_t* isolate_snapshot_instructions,
 #if !defined(AOT_RUNTIME)
@@ -57,9 +43,7 @@ DartApplicationController::DartApplicationController(
     app::ApplicationStartupInfoPtr startup_info,
     std::string url,
     fidl::InterfaceRequest<app::ApplicationController> controller)
-    : vm_snapshot_data_(vm_snapshot_data),
-      vm_snapshot_instructions_(vm_snapshot_instructions),
-      isolate_snapshot_data_(isolate_snapshot_data),
+    : isolate_snapshot_data_(isolate_snapshot_data),
       isolate_snapshot_instructions_(isolate_snapshot_instructions),
 #if !defined(AOT_RUNTIME)
       script_snapshot_(script_snapshot),
@@ -72,45 +56,9 @@ DartApplicationController::DartApplicationController(
     binding_.Bind(std::move(controller));
     binding_.set_connection_error_handler([this] { Kill(); });
   }
-
-  InitDartVM();
 }
 
 DartApplicationController::~DartApplicationController() {}
-
-const char* kDartVMArgs[] = {
-// clang-format off
-#if defined(AOT_RUNTIME)
-    "--precompilation",
-#else
-    "--enable_mirrors=false",
-#endif
-    // clang-format on
-};
-
-std::once_flag vm_initialized_;
-
-void DartApplicationController::InitDartVM() {
-  // TODO(rmacnak): When AOT snapshots are refactored to generate the VM
-  // snapshot separately, move VM initialization before receiving the first
-  // bundle.
-  std::call_once(vm_initialized_, [this]() {
-    dart::bin::BootstrapDartIo();
-
-    // TODO(abarth): Make checked mode configurable.
-    FTL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
-
-    Dart_InitializeParams params = {};
-    params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
-    params.vm_snapshot_data = vm_snapshot_data_;
-    params.vm_snapshot_instructions = vm_snapshot_instructions_;
-    params.shutdown = IsolateShutdownCallback;
-    params.cleanup = IsolateCleanupCallback;
-    char* error = Dart_Initialize(&params);
-    if (error)
-      FTL_LOG(FATAL) << "Dart_Initialize failed: " << error;
-  });
-}
 
 bool DartApplicationController::CreateIsolate() {
   // Create the isolate from the snapshot.

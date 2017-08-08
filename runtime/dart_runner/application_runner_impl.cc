@@ -13,17 +13,40 @@
 
 #include "apps/dart_content_handler/dart_application_controller.h"
 #include "apps/dart_content_handler/embedder/snapshot.h"
+#include "dart/runtime/bin/embedded_dart_io.h"
+#include "lib/ftl/arraysize.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "lib/mtl/vmo/vector.h"
+#include "lib/tonic/dart_microtask_queue.h"
+#include "lib/tonic/dart_state.h"
 
 namespace dart_content_handler {
 namespace {
 
+const char* kDartVMArgs[] = {
+// clang-format off
+#if defined(AOT_RUNTIME)
+    "--precompilation",
+#else
+    "--enable_mirrors=false",
+#endif
+    // clang-format on
+};
+
+void IsolateShutdownCallback(void* callback_data) {
+  mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
+  tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
+  mtl::MessageLoop::GetCurrent()->QuitNow();
+}
+
+void IsolateCleanupCallback(void* callback_data) {
+  tonic::DartState* dart_state = static_cast<tonic::DartState*>(callback_data);
+  delete dart_state;
+}
+
 #if defined(AOT_RUNTIME)
 
 bool ExtractSnapshots(const mx::vmo& bundle,
-                      const uint8_t*& vm_snapshot_data,
-                      const uint8_t*& vm_snapshot_instructions,
                       const uint8_t*& isolate_snapshot_data,
                       const uint8_t*& isolate_snapshot_instructions,
                       const uint8_t*& script_snapshot,
@@ -61,19 +84,6 @@ bool ExtractSnapshots(const mx::vmo& bundle,
     return false;
   }
 
-  vm_snapshot_data =
-      reinterpret_cast<const uint8_t*>(dlsym(lib, "_kDartVmSnapshotData"));
-  if (vm_snapshot_data == NULL) {
-    FTL_LOG(ERROR) << "dlsym(_kDartVmSnapshotData) failed: " << dlerror();
-    return false;
-  }
-  vm_snapshot_instructions = reinterpret_cast<const uint8_t*>(
-      dlsym(lib, "_kDartVmSnapshotInstructions"));
-  if (vm_snapshot_instructions == NULL) {
-    FTL_LOG(ERROR) << "dlsym(_kDartVmSnapshotInstructions) failed: "
-                   << dlerror();
-    return false;
-  }
   isolate_snapshot_data =
       reinterpret_cast<const uint8_t*>(dlsym(lib, "_kDartIsolateSnapshotData"));
   if (isolate_snapshot_data == NULL) {
@@ -94,14 +104,10 @@ bool ExtractSnapshots(const mx::vmo& bundle,
 #else  // !defined(AOT_RUNTIME)
 
 bool ExtractSnapshots(const mx::vmo& bundle,
-                      const uint8_t*& vm_snapshot_data,
-                      const uint8_t*& vm_snapshot_instructions,
                       const uint8_t*& isolate_snapshot_data,
                       const uint8_t*& isolate_snapshot_instructions,
                       const uint8_t*& script_snapshot,
                       intptr_t* script_snapshot_len) {
-  vm_snapshot_data = dart_content_handler::vm_isolate_snapshot_buffer;
-  vm_snapshot_instructions = NULL;
   isolate_snapshot_data = dart_content_handler::isolate_snapshot_buffer;
   isolate_snapshot_instructions = NULL;
 
@@ -143,14 +149,11 @@ void RunApplication(
     ::fidl::InterfaceRequest<app::ApplicationController> controller) {
   std::string url = std::move(application->resolved_url);
 
-  const uint8_t* vm_snapshot_data = NULL;
-  const uint8_t* vm_snapshot_instructions = NULL;
   const uint8_t* isolate_snapshot_data = NULL;
   const uint8_t* isolate_snapshot_instructions = NULL;
   const uint8_t* script_snapshot = NULL;
   intptr_t script_snapshot_len = 0;
-  if (!ExtractSnapshots(application->data, vm_snapshot_data,
-                        vm_snapshot_instructions, isolate_snapshot_data,
+  if (!ExtractSnapshots(application->data, isolate_snapshot_data,
                         isolate_snapshot_instructions, script_snapshot,
                         &script_snapshot_len)) {
     return;
@@ -163,8 +166,7 @@ void RunApplication(
   mx::process::self().set_property(MX_PROP_NAME, label.c_str(), label.size());
 
   DartApplicationController app(
-      vm_snapshot_data, vm_snapshot_instructions, isolate_snapshot_data,
-      isolate_snapshot_instructions,
+      isolate_snapshot_data, isolate_snapshot_instructions,
 #if !defined(AOT_RUNTIME)
       script_snapshot, script_snapshot_len,
 #endif  // !defined(AOT_RUNTIME)
@@ -184,9 +186,33 @@ void RunApplication(
 
 ApplicationRunnerImpl::ApplicationRunnerImpl(
     fidl::InterfaceRequest<app::ApplicationRunner> app_runner)
-    : binding_(this, std::move(app_runner)) {}
+    : binding_(this, std::move(app_runner)) {
+  dart::bin::BootstrapDartIo();
 
-ApplicationRunnerImpl::~ApplicationRunnerImpl() {}
+  // TODO(abarth): Make checked mode configurable.
+  FTL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
+
+  Dart_InitializeParams params = {};
+  params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
+#if defined(AOT_RUNTIME)
+  params.vm_snapshot_data = ::_kDartVmSnapshotData;
+  params.vm_snapshot_instructions = ::_kDartVmSnapshotInstructions;
+#else
+  params.vm_snapshot_data = dart_content_handler::vm_isolate_snapshot_buffer;
+  params.vm_snapshot_instructions = NULL;
+#endif
+  params.shutdown = IsolateShutdownCallback;
+  params.cleanup = IsolateCleanupCallback;
+  char* error = Dart_Initialize(&params);
+  if (error)
+    FTL_LOG(FATAL) << "Dart_Initialize failed: " << error;
+}
+
+ApplicationRunnerImpl::~ApplicationRunnerImpl() {
+  char* error = Dart_Cleanup();
+  if (error)
+    FTL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
+}
 
 void ApplicationRunnerImpl::StartApplication(
     app::ApplicationPackagePtr application,
