@@ -29,18 +29,17 @@ class _MemoryIndicatorState extends State<MemoryIndicator> {
         (ProcessResult results) {
       List<String> lines = results.stdout.split('\n');
       if (lines.length < 2) {
-        log.warning('ERROR parsing kstats output:\n${results.stdout}');
-        return;
+        log.fine('ERROR parsing kstats output:\n${results.stdout}');
+      } else {
+        List<String> memories = lines[1].trim().split(new RegExp(r'(\s+)'));
+        if (memories.length < 2) {
+          log.fine('ERROR parsing kstats output:\n${results.stdout}');
+        } else {
+          setState(() {
+            _freeMemory = memories[1];
+          });
+        }
       }
-      List<String> memories = lines[1].trim().split(new RegExp(r'(\s+)'));
-      if (memories.length < 2) {
-        log.warning('ERROR parsing kstats output:\n${results.stdout}');
-        return;
-      }
-
-      setState(() {
-        _freeMemory = memories[1];
-      });
       new Timer(const Duration(seconds: 5), _checkMemory);
     });
   }
@@ -49,6 +48,10 @@ class _MemoryIndicatorState extends State<MemoryIndicator> {
   Widget build(BuildContext context) {
     return _freeMemory == null
         ? new Offstage()
-        : new Text('Free: $_freeMemory');
+        : new Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+            new Icon(Icons.memory, color: Colors.white, size: 12.0),
+            new Container(height: 0.0, width: 4.0),
+            new Text('$_freeMemory', style: const TextStyle(fontSize: 12.0))
+          ]);
   }
 }

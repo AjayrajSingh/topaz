@@ -95,7 +95,7 @@ void main() {
     new OverlayEntry(
       builder: (_) => new Align(
             alignment: FractionalOffset.topCenter,
-            child: new DebugText(onShowNetwork: model.onShowNetwork),
+            child: new DebugText(),
           ),
     ),
   ];
@@ -107,8 +107,16 @@ void main() {
         builder: (_) => new Align(
               alignment: FractionalOffset.topLeft,
               child: new Container(
-                padding: const EdgeInsets.all(16.0),
-                child: new MemoryIndicator(),
+                margin: const EdgeInsets.all(8.0),
+                child: new PhysicalModel(
+                  color: Colors.grey[900],
+                  elevation: 799.0, // Mouse pointer is at 800.0.
+                  borderRadius: new BorderRadius.circular(8.0),
+                  child: new Container(
+                    padding: const EdgeInsets.all(8.0),
+                    child: new MemoryIndicator(),
+                  ),
+                ),
               ),
             ),
       ),

@@ -26,7 +26,6 @@ import 'user_watcher_impl.dart';
 /// logging in and creating new users.
 class UserPickerDeviceShellModel extends DeviceShellModel
     implements TickerProvider {
-  bool _showingNetworkInfo = false;
   bool _showingUserActions = false;
   bool _addingUser = false;
   bool _loadingChildView = false;
@@ -175,12 +174,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     notifyListeners();
   }
 
-  /// Called when the network information starts showing.
-  void onShowNetwork() {
-    _showingNetworkInfo = true;
-    notifyListeners();
-  }
-
   /// Show advanced user actions such as:
   /// * Guest login
   /// * Create new account
@@ -215,19 +208,13 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Show the loading spinner if true
   bool get showingLoadingSpinner =>
-      _accounts == null ||
-      _addingUser ||
-      !showingNetworkInfo ||
-      _loadingChildView;
+      _accounts == null || _addingUser || _loadingChildView;
 
   /// Show the system clock if true
   bool get showingClock =>
       !showingLoadingSpinner &&
       _draggedUsers.isEmpty &&
       _childViewConnection == null;
-
-  /// Returns true once network information starts showing.
-  bool get showingNetworkInfo => _showingNetworkInfo;
 
   /// If true, show advanced user actions
   bool get showingUserActions => _showingUserActions;
