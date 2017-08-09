@@ -148,7 +148,6 @@ std::vector<char> CreateSnapshot() {
       {"dart:core", "::", "_uriBaseClosure"},
       {"dart:fidl.internal", "::", "_environment"},
       {"dart:fidl.internal", "::", "_outgoingServices"},
-      {"dart:fidl.internal", "HandleWaiter", "onWaitComplete"},
       {"dart:fuchsia.builtin", "::", "_getPrintClosure"},
       {"dart:fuchsia.builtin", "::", "_getScheduleMicrotaskClosure"},
       {"dart:fuchsia.builtin", "::", "_getUriBaseClosure"},

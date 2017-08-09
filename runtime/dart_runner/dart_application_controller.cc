@@ -17,7 +17,6 @@
 #include "lib/tonic/dart_message_handler.h"
 #include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/dart_state.h"
-#include "lib/tonic/handle_table.h"
 #include "lib/tonic/logging/dart_error.h"
 
 using tonic::ToDart;

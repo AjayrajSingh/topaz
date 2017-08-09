@@ -9,12 +9,12 @@
 #include "dart/runtime/bin/io_natives.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/fidl/dart/sdk_ext/src/natives.h"
+#include "lib/fidl/dart/sdk_ext/src/handle.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_microtask_queue.h"
-#include "lib/tonic/handle_table.h"
 #include "lib/tonic/logging/dart_error.h"
 
 using tonic::ToDart;
@@ -100,20 +100,20 @@ void InitBuiltinLibrariesForIsolate(
   Dart_Handle fidl_internal = Dart_LookupLibrary(ToDart("dart:fidl.internal"));
   DART_CHECK_VALID(Dart_SetNativeResolver(
       fidl_internal, fidl::dart::NativeLookup, fidl::dart::NativeSymbol));
+  fidl::dart::Initialize();
 
   fidl::InterfaceHandle<app::ApplicationEnvironment> environment;
   context->ConnectToEnvironmentService(environment.NewRequest());
 
-  tonic::HandleTable& handle_table = tonic::HandleTable::Current();
-
-  DART_CHECK_VALID(Dart_SetField(
-      fidl_internal, ToDart("_environment"),
-      handle_table.AddAndWrap(environment.PassHandle())));
+  DART_CHECK_VALID(Dart_SetField(fidl_internal, ToDart("_environment"),
+                                 ToDart(fidl::dart::Handle::Create(
+                                     environment.PassHandle().release()))));
 
   if (outgoing_services) {
-    DART_CHECK_VALID(Dart_SetField(
-        fidl_internal, ToDart("_outgoingServices"),
-        handle_table.AddAndWrap(outgoing_services.PassChannel())));
+    DART_CHECK_VALID(
+        Dart_SetField(fidl_internal, ToDart("_outgoingServices"),
+                      ToDart(fidl::dart::Handle::Create(
+                          outgoing_services.PassChannel().release()))));
   }
 
   // dart:fuchsia.builtin ------------------------------------------------------
