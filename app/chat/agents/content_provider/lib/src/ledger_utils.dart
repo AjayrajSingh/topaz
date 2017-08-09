@@ -24,21 +24,20 @@ List<int> encodeLedgerValue(dynamic value) => UTF8.encode(JSON.encode(value));
 ///
 /// This throws an exception when it fails to decode the given data.
 dynamic decodeLedgerValue(Vmo value) {
-  VmoGetSizeResult sizeResult = value.getSize();
+  GetSizeResult sizeResult = value.getSize();
   if (sizeResult.status != NO_ERROR) {
     throw new Exception('Unable to retrieve vmo size: ${sizeResult.status}');
   }
 
-  Uint8List data = new Uint8List(sizeResult.size);
-  VmoReadResult readResult = value.read(new ByteData.view(data.buffer));
+  ReadResult readResult = value.read(sizeResult.size);
   if (readResult.status != NO_ERROR) {
     throw new Exception('Unable to read from vmo: ${readResult.status}');
   }
-  if (readResult.bytesRead != sizeResult.size) {
+  if (readResult.bytes.lengthInBytes != sizeResult.size) {
     throw new Exception('Unexpected count of bytes read.');
   }
 
-  return JSON.decode(UTF8.decode(data));
+  return JSON.decode(readResult.bytesAsUTF8String());
 }
 
 /// Gets the full list of [Entry] objects from a given [PageSnapshot].
