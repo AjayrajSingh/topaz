@@ -9,10 +9,6 @@
 #include "lib/tonic/dart_message_handler.h"
 #include "lib/tonic/file_loader/file_loader.h"
 
-#ifdef OS_FUCHSIA
-#include "lib/tonic/handle_table.h"
-#endif
-
 namespace tonic {
 
 DartState::Scope::Scope(DartState* dart_state)
@@ -25,9 +21,6 @@ DartState::DartState()
       class_library_(new DartClassLibrary),
       message_handler_(new DartMessageHandler()),
       file_loader_(new FileLoader()),
-#ifdef OS_FUCHSIA
-      handle_table_(new HandleTable()),
-#endif
       weak_factory_(this) {}
 
 DartState::~DartState() {}

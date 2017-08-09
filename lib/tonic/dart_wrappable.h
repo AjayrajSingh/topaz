@@ -144,6 +144,14 @@ struct DartConverter<ftl::RefPtr<T>> {
     return DartConverter<T*>::FromDart(handle);
   }
 
+  static ftl::RefPtr<T> FromArguments(Dart_NativeArguments args,
+                                      int index,
+                                      Dart_Handle& exception,
+                                      bool auto_scope = true) {
+    return ftl::RefPtr<T>(
+        DartConverter<T*>::FromArguments(args, index, exception, auto_scope));
+  }
+
   static void SetReturnValue(Dart_NativeArguments args,
                              const ftl::RefPtr<T>& val,
                              bool auto_scope = true) {

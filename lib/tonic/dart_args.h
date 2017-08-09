@@ -76,6 +76,12 @@ struct IndicesForSignature<ResultType (C::*)(ArgTypes...)> {
   using type = typename IndicesGenerator<count>::type;
 };
 
+template <typename C, typename ResultType, typename... ArgTypes>
+struct IndicesForSignature<ResultType (C::*)(ArgTypes...) const> {
+  static const size_t count = sizeof...(ArgTypes);
+  using type = typename IndicesGenerator<count>::type;
+};
+
 template <size_t index, typename ArgType>
 struct DartArgHolder {
   using ValueType = typename std::remove_const<
@@ -143,6 +149,22 @@ struct DartDispatcher<IndicesHolder<indices...>, void (C::*)(ArgTypes...)>
   void Dispatch(FunctionPtr func) {
     (GetReceiver<C>(it_->args())->*func)(
         DartArgHolder<indices, ArgTypes>::value...);
+  }
+};
+
+template <size_t... indices, typename C, typename ReturnType, typename... ArgTypes>
+struct DartDispatcher<IndicesHolder<indices...>, ReturnType (C::*)(ArgTypes...) const>
+    : public DartArgHolder<indices, ArgTypes>... {
+  using FunctionPtr = ReturnType (C::*)(ArgTypes...) const;
+
+  DartArgIterator* it_;
+
+  explicit DartDispatcher(DartArgIterator* it)
+      : DartArgHolder<indices, ArgTypes>(it)..., it_(it) {}
+
+  void Dispatch(FunctionPtr func) {
+    DartReturn((GetReceiver<C>(it_->args())->*func)(
+        DartArgHolder<indices, ArgTypes>::value...), it_->args());
   }
 };
 

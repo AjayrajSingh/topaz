@@ -18,9 +18,6 @@ namespace tonic {
 class DartClassLibrary;
 class DartMessageHandler;
 class FileLoader;
-#ifdef OS_FUCHSIA
-class HandleTable;
-#endif
 
 // DartState represents the state associated with a given Dart isolate. The
 // lifetime of this object is controlled by the DartVM. If you want to hold a
@@ -53,9 +50,6 @@ class DartState {
   DartClassLibrary& class_library() { return *class_library_; }
   DartMessageHandler& message_handler() { return *message_handler_; }
   FileLoader& file_loader() { return *file_loader_; }
-#ifdef OS_FUCHSIA
-  HandleTable& handle_table() { return *handle_table_; }
-#endif
 
   virtual void DidSetIsolate();
 
@@ -68,9 +62,6 @@ class DartState {
   std::unique_ptr<DartClassLibrary> class_library_;
   std::unique_ptr<DartMessageHandler> message_handler_;
   std::unique_ptr<FileLoader> file_loader_;
-#ifdef OS_FUCHSIA
-  std::unique_ptr<HandleTable> handle_table_;
-#endif
 
  protected:
   ftl::WeakPtrFactory<DartState> weak_factory_;
