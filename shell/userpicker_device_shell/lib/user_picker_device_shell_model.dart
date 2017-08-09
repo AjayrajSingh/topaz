@@ -38,23 +38,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   final UserShellChooser _userShellChooser = new UserShellChooser();
   ChildViewConnection _childViewConnection;
   final Set<Account> _draggedUsers = new Set<Account>();
-  AnimationController _transitionAnimation;
-  CurvedAnimation _curvedTransitionAnimation;
 
   /// Constructor
   UserPickerDeviceShellModel() : super() {
-    _transitionAnimation = new AnimationController(
-      value: 0.0,
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    );
-    _curvedTransitionAnimation = new CurvedAnimation(
-      parent: _transitionAnimation,
-      curve: Curves.fastOutSlowIn,
-      reverseCurve: Curves.fastOutSlowIn,
-    );
-    _transitionAnimation.addListener(notifyListeners);
-
     // Check for last kernel panic
     File lastPanic = new File('/boot/log/last-panic.txt');
     lastPanic.exists().then((bool exists) {
@@ -163,11 +149,14 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       viewOwner.passHandle(),
       onAvailable: (ChildViewConnection connection) {
         log.info('UserPickerDeviceShell: Child view connection available!');
-        new Timer(const Duration(seconds: 4), () {
-          _transitionAnimation.forward();
+
+        // The User Shell child view takes about 2 seconds to full render so
+        // we fake the loading by showing a spinner for 2 seconds before
+        // jumping to the child view
+        new Timer(const Duration(seconds: 2), () {
           _loadingChildView = false;
+          notifyListeners();
         });
-        notifyListeners();
       },
       onUnavailable: (ChildViewConnection connection) {
         log.info('UserPickerDeviceShell: Child view connection unavailable!');
@@ -182,12 +171,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   /// Called when the the user shell logs out.
   void onLogout() {
     refreshUsers();
-    _transitionAnimation
-        .animateTo(0.0, duration: const Duration(milliseconds: 300))
-        .then((_) {
-      _childViewConnection = null;
-      notifyListeners();
-    });
+    _childViewConnection = null;
+    notifyListeners();
   }
 
   /// Called when the network information starts showing.
@@ -256,11 +241,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   /// Returns true the add user dialog is showing
   bool get addingUser => _addingUser;
 
-  /// Get animation controller for child view animation
-  AnimationController get transitionAnimation => _transitionAnimation;
-
-  /// Get curved animation for child view
-  CurvedAnimation get curvedTransitionAnimation => _curvedTransitionAnimation;
+  /// Returns true if we are "loading" the child view
+  bool get loadingChildView => _loadingChildView;
 
   /// Returns the authenticated child view connection
   ChildViewConnection get childViewConnection => _childViewConnection;

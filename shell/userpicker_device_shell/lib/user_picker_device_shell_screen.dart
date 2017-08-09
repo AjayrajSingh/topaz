@@ -60,43 +60,14 @@ class UserPickerDeviceShellScreen extends StatelessWidget {
           );
         }
 
-        return new LayoutBuilder(builder: (_, BoxConstraints constraints) {
-          return new SizedBox.fromSize(
-            size: constraints.biggest,
-            child: new AnimatedBuilder(
-              animation: model.transitionAnimation,
-              builder: (BuildContext context, Widget child) =>
-                  model.childViewConnection == null
-                      ? child
-                      : new Stack(
-                          fit: StackFit.expand,
-                          children: <Widget>[
-                            child,
-                            new Center(
-                              child: new SizedBox.fromSize(
-                                size: constraints.biggest *
-                                    model.curvedTransitionAnimation.value,
-                                child: new FittedBox(
-                                  fit: BoxFit.none,
-                                  child: new SizedBox.fromSize(
-                                    size: constraints.biggest,
-                                    child: new PhysicalModel(
-                                      color: Colors.black,
-                                      elevation: 5.0,
-                                      child: new ChildView(
-                                        connection: model.childViewConnection,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-              child: new Stack(fit: StackFit.expand, children: stackChildren),
-            ),
-          );
-        });
+        if (model.childViewConnection != null) {
+          stackChildren.add(new Offstage(
+            child: new ChildView(connection: model.childViewConnection),
+            offstage: model.loadingChildView,
+          ));
+        }
+
+        return new Stack(fit: StackFit.expand, children: stackChildren);
       },
     );
   }
