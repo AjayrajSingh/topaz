@@ -5,7 +5,6 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
@@ -123,21 +122,6 @@ class ArmadilloLongPressDraggable<T> extends StatefulWidget {
   /// The key of the overlay the drag avatar will be built in.
   final GlobalKey<ArmadilloOverlayState> overlayKey;
 
-  /// Creates a gesture recognizer that recognizes the start of the drag.
-  ///
-  /// Subclasses can override this function to customize when they start
-  /// recognizing a drag.
-  HorizontalMultiDragGestureRecognizer createRecognizer(
-          GestureMultiDragStartCallback onStart) =>
-      new HorizontalMultiDragGestureRecognizer()
-        ..onStart = (Offset position) {
-          Drag result = onStart(position);
-          if (result != null) {
-            HapticFeedback.vibrate();
-          }
-          return result;
-        };
-
   @override
   _DraggableState<T> createState() => new _DraggableState<T>();
 }
@@ -149,18 +133,18 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
   final GlobalKey<_DragAvatarWidgetState> _dragAvatarKey =
       new GlobalKey<_DragAvatarWidgetState>();
   final GlobalKey _nonDraggedChildKey = new GlobalKey();
-  GestureRecognizer _recognizer;
+  final List<GestureRecognizer> _recognizers = <GestureRecognizer>[];
   int _activeCount = 0;
 
   @override
   void initState() {
     super.initState();
-    _recognizer = widget.createRecognizer(_startDrag);
+    _createRecognizers();
   }
 
   @override
   void dispose() {
-    _recognizer.dispose();
+    _disposeRecognizers();
     super.dispose();
   }
 
@@ -176,13 +160,31 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
     );
   }
 
+  void _createRecognizers() {
+    _recognizers.add(
+      new HorizontalMultiDragGestureRecognizer()..onStart = _startDrag,
+    );
+    _recognizers.add(
+      new DelayedMultiDragGestureRecognizer(delay: _kLongPressTimeout)
+        ..onStart = _startDrag,
+    );
+  }
+
+  void _disposeRecognizers() {
+    _recognizers.forEach(
+      (GestureRecognizer recognizer) => recognizer.dispose(),
+    );
+  }
+
   bool get _canDrag =>
       (_activeCount < 1) &&
       !(widget.overlayKey.currentState?.hasBuilders ?? false);
 
   void _routePointer(PointerEvent event) {
     if (_canDrag) {
-      _recognizer.addPointer(event);
+      _recognizers.forEach(
+        (GestureRecognizer recognizer) => recognizer.addPointer(event),
+      );
     }
   }
 
