@@ -5,6 +5,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_image/network.dart';
 import 'package:meta/meta.dart';
 import 'package:widgets_meta/widgets_meta.dart';
 
@@ -76,8 +77,8 @@ class Alphatar extends StatelessWidget {
     return new Alphatar(
       key: key,
       avatarImage: avatarUrl != null
-          ? new Image.network(
-              avatarUrl,
+          ? new Image(
+              image: new NetworkImageWithRetry(avatarUrl),
               width: size,
               height: size,
               fit: BoxFit.cover,
