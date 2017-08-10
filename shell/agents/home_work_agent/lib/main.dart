@@ -89,7 +89,7 @@ class HomeWorkAgent extends AgentImpl {
       });
     }
 
-    _contextReader.subscribe(
+    _contextReader.subscribeToTopics(
       new ContextQuery()..topics = <String>[_kLocationHomeWorkTopic],
       _contextListenerBinding.wrap(
         new _ContextListenerImpl(
