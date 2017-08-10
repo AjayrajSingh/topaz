@@ -60,16 +60,24 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
     ],
   ],
   const <List<String>>[
-    const <String>['magenta-aarch64-linux-gcc', 'aarch64-linux-gcc', 'magenta'],
-    const <String>['magenta-x86_64-linux-gcc', 'x86_64-linux-gcc', 'magenta'],
     const <String>[
-      'magenta-aarch64-linux-clang',
-      'aarch64-linux-clang',
+      'magenta-qemu-arm64-gcc',
+      'magenta-qemu-arm64-gcc',
       'magenta'
     ],
     const <String>[
-      'magenta-x86_64-linux-clang',
-      'x86_64-linux-clang',
+      'magenta-pc-x86-64-gcc',
+      'magenta-pc-x86-64-gcc',
+      'magenta'
+    ],
+    const <String>[
+      'magenta-qemu-arm64-clang',
+      'magenta-qemu-arm64-clang',
+      'magenta'
+    ],
+    const <String>[
+      'magenta-pc-x86-64-clang',
+      'magenta-pc-x86-64-clang',
       'magenta'
     ],
   ],
