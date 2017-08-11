@@ -21,7 +21,6 @@ package("modules") {
   deps = [
     "//apps/modules/common/agents",
     "//apps/modules/common/modules",
-    "//apps/modules/common/services",
   ]
 
   binaries = [
@@ -38,11 +37,6 @@ package("modules") {
     {
       source = "gen/apps/modules/common/modules/image/image.flx"
       name = "image"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/gallery/gallery.flx"
-      name = "gallery"
     },
 
     {
@@ -121,7 +115,6 @@ package("modules_tests") {
   testonly = true
 
   deps = [
-    "//apps/modules/common/modules/gallery:test",
     "//apps/modules/common/packages/fixtures:test",
     "//apps/modules/common/packages/models:test",
     "//apps/modules/common/packages/util:test",

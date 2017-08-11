@@ -6,8 +6,6 @@ group("modules") {
   public_deps = [
     "chess",
     "color",
-    "gallery",
-    "gallery:gallery_component",
     "hotel_confirmation",
     "image",
     "interactive_receipt",

@@ -10,7 +10,6 @@ dart_package("widgets") {
 
   deps = [
     "//apps/modules/common/packages/models",
-    "//apps/modules/common/packages/search_api",
     "//apps/modules/common/packages/widgets_meta",
     "//apps/modules/common/packages/youtube_api",
     "//lib/flutter/packages/flutter",
