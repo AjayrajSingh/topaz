@@ -300,15 +300,17 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   }
 
   List<StoryCluster> _getStoryClustersFromJson(String json) {
-    Map<String, dynamic> decodedJson = JSON.decode(_lastLinkJson);
+    Map<String, dynamic> decodedJson = JSON.decode(json);
 
     List<StoryCluster> jsonStoryClusters = <StoryCluster>[];
 
-    decodedJson['story_clusters'].forEach(
-      (Map<String, dynamic> storyClusterJson) => jsonStoryClusters.add(
-            new StoryCluster.fromJson(storyClusterJson),
-          ),
-    );
+    if (decodedJson != null) {
+      decodedJson['story_clusters']?.forEach(
+        (Map<String, dynamic> storyClusterJson) => jsonStoryClusters.add(
+              new StoryCluster.fromJson(storyClusterJson),
+            ),
+      );
+    }
 
     return jsonStoryClusters;
   }
