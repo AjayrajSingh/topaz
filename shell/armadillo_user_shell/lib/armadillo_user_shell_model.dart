@@ -102,7 +102,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     suggestionProviderSuggestionModel.focusController = focusController;
     suggestionProviderSuggestionModel.visibleStoriesController =
         visibleStoriesController;
-    contextReader.subscribe(
+    contextReader.subscribeToTopics(
       new ContextQuery()..topics = contextTopics,
       _contextListenerBinding.wrap(
         new _ContextListenerImpl(onContextUpdated),
