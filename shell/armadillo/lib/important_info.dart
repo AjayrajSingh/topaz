@@ -5,15 +5,13 @@
 import 'package:flutter/widgets.dart';
 
 import 'context_model.dart';
+import 'nothing.dart';
+import 'power_model.dart';
 
-const String _kBatteryImageWhite =
-    'packages/armadillo/res/ic_battery_90_white_1x_web_24dp.png';
-const String _kBatteryImageGrey600 =
-    'packages/armadillo/res/ic_battery_90_grey600_1x_web_24dp.png';
 const String _kWifiImageGrey600 =
     'packages/armadillo/res/ic_signal_wifi_3_bar_grey600_24dp.png';
-const String _kNetworkSignalImageGrey600 =
-    'packages/armadillo/res/ic_signal_cellular_connected_no_internet_0_bar_grey600_24dp.png';
+const String _kNetworkSignalImageGrey600 = 'packages/armadillo/res/'
+    'ic_signal_cellular_connected_no_internet_0_bar_grey600_24dp.png';
 
 enum _ImportantInfoLayoutDelegateParts {
   batteryIcon,
@@ -53,56 +51,69 @@ class ImportantInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => new ScopedModelDescendant<ContextModel>(
-        builder: (BuildContext context, Widget child, ContextModel model) =>
+        builder: (BuildContext context, Widget child,
+                ContextModel contextModel) =>
             new LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                List<LayoutId> children = <LayoutId>[
-                  new LayoutId(
-                    id: _ImportantInfoLayoutDelegateParts.batteryIcon,
-                    child: new Image.asset(
-                      _kBatteryImageWhite,
-                      height: _kIconHeight,
-                      color: textColor,
-                      fit: BoxFit.cover,
-                    ),
+              builder: (BuildContext context, BoxConstraints constraints) =>
+                  new ScopedModelDescendant<PowerModel>(
+                    builder: (
+                      BuildContext context,
+                      Widget child,
+                      PowerModel powerModel,
+                    ) {
+                      List<LayoutId> children = <LayoutId>[];
+
+                      children
+                        ..addAll(<LayoutId>[
+                          new LayoutId(
+                            id: _ImportantInfoLayoutDelegateParts.batteryIcon,
+                            child: powerModel.hasBattery
+                                ? new Image.asset(
+                                    powerModel.batteryImageUrl,
+                                    height: _kIconHeight,
+                                    color: textColor,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Nothing.widget,
+                          ),
+                          new LayoutId(
+                            id: _ImportantInfoLayoutDelegateParts.batteryText,
+                            child: new Text(
+                              powerModel.batteryText,
+                              softWrap: false,
+                              overflow: TextOverflow.fade,
+                              style: _kTextStyle.copyWith(color: textColor),
+                            ),
+                          ),
+                        ]);
+                      if (constraints.maxWidth > _kWidthThreshold) {
+                        children.addAll(<LayoutId>[
+                          new LayoutId(
+                            id: _ImportantInfoLayoutDelegateParts.wifiIcon,
+                            child: new Image.asset(
+                              _kWifiImageGrey600,
+                              height: _kIconHeight,
+                              color: textColor,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          new LayoutId(
+                            id: _ImportantInfoLayoutDelegateParts.wifiText,
+                            child: new Text(
+                              contextModel.wifiNetwork,
+                              softWrap: false,
+                              overflow: TextOverflow.fade,
+                              style: _kTextStyle.copyWith(color: textColor),
+                            ),
+                          ),
+                        ]);
+                      }
+                      return new CustomMultiChildLayout(
+                        delegate: new _ImportantInfoLayoutDelegate(),
+                        children: children,
+                      );
+                    },
                   ),
-                  new LayoutId(
-                    id: _ImportantInfoLayoutDelegateParts.batteryText,
-                    child: new Text(
-                      model.batteryPercentage,
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      style: _kTextStyle.copyWith(color: textColor),
-                    ),
-                  ),
-                ];
-                if (constraints.maxWidth > _kWidthThreshold) {
-                  children.addAll(<LayoutId>[
-                    new LayoutId(
-                      id: _ImportantInfoLayoutDelegateParts.wifiIcon,
-                      child: new Image.asset(
-                        _kWifiImageGrey600,
-                        height: _kIconHeight,
-                        color: textColor,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    new LayoutId(
-                      id: _ImportantInfoLayoutDelegateParts.wifiText,
-                      child: new Text(
-                        model.wifiNetwork,
-                        softWrap: false,
-                        overflow: TextOverflow.fade,
-                        style: _kTextStyle.copyWith(color: textColor),
-                      ),
-                    ),
-                  ]);
-                }
-                return new CustomMultiChildLayout(
-                  delegate: new _ImportantInfoLayoutDelegate(),
-                  children: children,
-                );
-              },
             ),
       );
 }

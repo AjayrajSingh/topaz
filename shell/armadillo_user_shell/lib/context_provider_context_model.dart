@@ -29,7 +29,6 @@ class ContextProviderContextModel extends ContextModel {
   Map<String, String> _contextualLocations = <String, String>{};
   Map<String, String> _contextualTimeOnly = <String, String>{};
   Map<String, String> _contextualDateOnly = <String, String>{};
-  Map<String, String> _contextualBatteryPercentage = <String, String>{};
   Map<String, String> _contextualBackgroundImages = <String, String>{};
   String _location = 'unknown';
   String _activity = 'unknown';
@@ -47,14 +46,6 @@ class ContextProviderContextModel extends ContextModel {
     }
     return new FileImage(new File(backgroundImageFile));
   }
-
-  /// TODO(apwilson): Remove this.
-  /// The current battery percentage.  For testing purposes only.
-  @override
-  String get batteryPercentage =>
-      _contextualBatteryPercentage[_activity] ??
-      _contextualBatteryPercentage[_location] ??
-      super.batteryPercentage;
 
   /// TODO(apwilson): Remove this.
   /// The current wifi network.  For testing purposes only.
@@ -127,7 +118,6 @@ class ContextProviderContextModel extends ContextModel {
     _contextualLocations = decodedJson['location'];
     _contextualTimeOnly = decodedJson['time_only'];
     _contextualDateOnly = decodedJson['date_only'];
-    _contextualBatteryPercentage = decodedJson['battery_percentage'];
     _contextualBackgroundImages = decodedJson['background_image'];
     notifyListeners();
   }

@@ -32,8 +32,6 @@ const String _kScreenLockRotationBlack =
     'packages/armadillo/res/ic_screen_lock_rotation_black.png';
 const String _kScreenRotationBlack =
     'packages/armadillo/res/ic_screen_rotation_black.png';
-const String _kBatteryImageGrey600 =
-    'packages/armadillo/res/ic_battery_90_grey600_1x_web_24dp.png';
 const String _kMicImageGrey600 =
     'packages/armadillo/res/ic_mic_grey600_1x_web_24dp.png';
 const String _kBrightnessHighGrey600 =

@@ -15,15 +15,14 @@ import 'context_model.dart';
 import 'elevations.dart';
 import 'fading_spring_simulation.dart';
 import 'important_info.dart';
+import 'nothing.dart';
 import 'opacity_model.dart';
+import 'power_model.dart';
 import 'quick_settings.dart';
 import 'quick_settings_progress_model.dart';
 import 'size_model.dart';
 import 'story_drag_transition_model.dart';
 import 'user_context_text.dart';
-
-const String _kBatteryImageWhite =
-    'packages/armadillo/res/ic_battery_90_white_1x_web_24dp.png';
 
 /// Fraction of the minimization animation which should be used for falling away
 /// and sliding in of the user context and battery icon.
@@ -479,37 +478,48 @@ class NowState extends TickingState<Now> {
 
   /// Returns a succinct representation of the important information to the
   /// user.
-  Widget _buildImportantInfoMinimized() => new Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          new Padding(
-            padding: const EdgeInsets.only(top: 4.0, right: 4.0),
-            child: new ScopedModelDescendant<OpacityModel>(
-              builder: (
-                BuildContext context,
-                Widget child,
-                OpacityModel opacityModel,
-              ) =>
-                  new Opacity(
-                    opacity: opacityModel.opacity,
-                    child: child,
+  Widget _buildImportantInfoMinimized() =>
+      new ScopedModelDescendant<PowerModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          PowerModel powerModel,
+        ) =>
+            !powerModel.hasBattery
+                ? Nothing.widget
+                : new Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      new Padding(
+                        padding: const EdgeInsets.only(top: 4.0, right: 4.0),
+                        child: new ScopedModelDescendant<OpacityModel>(
+                          builder: (
+                            BuildContext context,
+                            Widget child,
+                            OpacityModel opacityModel,
+                          ) =>
+                              new Opacity(
+                                opacity: opacityModel.opacity,
+                                child: child,
+                              ),
+                          child: new Text(powerModel.batteryText),
+                        ),
+                      ),
+                      new ScopedModelDescendant<OpacityModel>(
+                          builder: (
+                        BuildContext context,
+                        Widget child,
+                        OpacityModel opacityModel,
+                      ) =>
+                              new Image.asset(
+                                powerModel.batteryImageUrl,
+                                color: Colors.white
+                                    .withOpacity(opacityModel.opacity),
+                                fit: BoxFit.cover,
+                                height: 24.0,
+                              )),
+                    ],
                   ),
-              child: new Text('89%'),
-            ),
-          ),
-          new ScopedModelDescendant<OpacityModel>(
-            builder: (
-              BuildContext context,
-              Widget child,
-              OpacityModel opacityModel,
-            ) =>
-                new Image.asset(
-                  _kBatteryImageWhite,
-                  color: Colors.white.withOpacity(opacityModel.opacity),
-                  fit: BoxFit.cover,
-                ),
-          ),
-        ],
       );
 
   /// Returns an avatar of the current user.

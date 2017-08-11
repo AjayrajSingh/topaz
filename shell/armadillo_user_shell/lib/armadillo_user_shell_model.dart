@@ -22,6 +22,7 @@ const String _kLocationTopic = '/location/home_work';
 
 typedef void _OnContextUpdated(Map<String, String> context);
 typedef void _OnUserUpdated(String userName, String userImageUrl);
+typedef void _OnStop();
 
 /// Connects [UserShell]'s services to Armadillo's associated classes.
 class ArmadilloUserShellModel extends UserShellModel {
@@ -56,6 +57,9 @@ class ArmadilloUserShellModel extends UserShellModel {
   final FocusRequestWatcherBinding _focusRequestWatcherBinding =
       new FocusRequestWatcherBinding();
 
+  /// Called when the [UserShell] stops.
+  final _OnStop onUserShellStopped;
+
   /// Constructor.
   ArmadilloUserShellModel({
     this.storyProviderStoryGenerator,
@@ -66,6 +70,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     this.onContextUpdated,
     this.onUserUpdated,
     this.contextTopics: const <String>[],
+    this.onUserShellStopped,
   });
 
   @override
@@ -123,6 +128,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     _focusRequestWatcherBinding.close();
     suggestionProviderSuggestionModel.close();
     storyProviderStoryGenerator.close();
+    onUserShellStopped?.call();
     super.onStop();
   }
 

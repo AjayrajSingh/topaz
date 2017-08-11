@@ -21,9 +21,6 @@ abstract class ContextModel extends Model {
         _kBackgroundImage,
       );
 
-  /// The current battery percentage.
-  String get batteryPercentage => '84%';
-
   /// The current wifi network.
   String get wifiNetwork => 'GoogleGuest';
 

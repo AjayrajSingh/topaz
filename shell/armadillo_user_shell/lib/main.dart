@@ -7,6 +7,7 @@ import 'dart:ui' as ui;
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.media.lib.dart/audio_policy.dart';
+import 'package:apps.power-service.services/power_manager.fidl.dart';
 import 'package:armadillo/armadillo.dart';
 import 'package:armadillo/armadillo_drag_target.dart';
 import 'package:armadillo/conductor.dart';
@@ -16,6 +17,7 @@ import 'package:armadillo/debug_model.dart';
 import 'package:armadillo/interruption_overlay.dart';
 import 'package:armadillo/panel_resizing_model.dart';
 import 'package:armadillo/peek_model.dart';
+import 'package:armadillo/power_model.dart';
 import 'package:armadillo/quick_settings_progress_model.dart';
 import 'package:armadillo/size_model.dart';
 import 'package:armadillo/story_cluster.dart';
@@ -42,6 +44,7 @@ import 'context_provider_context_model.dart';
 import 'focus_request_watcher_impl.dart';
 import 'hit_test_model.dart';
 import 'initial_focus_setter.dart';
+import 'power_manager_power_model.dart';
 import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
@@ -142,6 +145,26 @@ Future<Null> main() async {
   ContextProviderContextModel contextProviderContextModel =
       new ContextProviderContextModel();
 
+  ApplicationContext applicationContext =
+      new ApplicationContext.fromStartupInfo();
+
+  AudioPolicy audioPolicy = new AudioPolicy(
+    applicationContext.environmentServices,
+  );
+  VolumeModel volumeModel = new AudioPolicyVolumeModel(
+    audioPolicy: audioPolicy,
+  );
+
+  PowerManagerProxy powerManagerProxy = new PowerManagerProxy();
+  connectToService(
+    applicationContext.environmentServices,
+    powerManagerProxy.ctrl,
+  );
+
+  PowerManagerPowerModel powerModel = new PowerManagerPowerModel(
+    powerManager: powerManagerProxy,
+  );
+
   ArmadilloUserShellModel armadilloUserShellModel = new ArmadilloUserShellModel(
     storyProviderStoryGenerator: storyProviderStoryGenerator,
     suggestionProviderSuggestionModel: suggestionProviderSuggestionModel,
@@ -151,6 +174,11 @@ Future<Null> main() async {
     onContextUpdated: contextProviderContextModel.onContextUpdated,
     onUserUpdated: contextProviderContextModel.onUserUpdated,
     contextTopics: ContextProviderContextModel.topics,
+    onUserShellStopped: () {
+      audioPolicy.dispose();
+      powerManagerProxy.ctrl.close();
+      powerModel.close();
+    },
   );
 
   QuickSettingsProgressModel quickSettingsProgressModel =
@@ -182,11 +210,6 @@ Future<Null> main() async {
 
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();
-  ApplicationContext applicationContext =
-      new ApplicationContext.fromStartupInfo();
-  VolumeModel volumeModel = new AudioPolicyVolumeModel(
-    audioPolicy: new AudioPolicy(applicationContext.environmentServices),
-  );
 
   SizeModel sizeModel = new SizeModel();
   sizeModel.addListener(
@@ -207,6 +230,10 @@ Future<Null> main() async {
       debugModel: debugModel,
       armadillo: new Armadillo(
         scopedModelBuilders: <WrapperBuilder>[
+          (_, Widget child) => new ScopedModel<PowerModel>(
+                model: powerModel,
+                child: child,
+              ),
           (_, Widget child) => new ScopedModel<VolumeModel>(
                 model: volumeModel,
                 child: child,

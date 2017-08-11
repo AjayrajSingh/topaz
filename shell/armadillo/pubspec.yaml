@@ -27,8 +27,22 @@ flutter:
     - packages/armadillo/res/googlemic_color_24dp.png
     - packages/armadillo/res/ic_airplanemode_active_black.png
     - packages/armadillo/res/ic_airplanemode_inactive_grey600.png
-    - packages/armadillo/res/ic_battery_90_grey600_1x_web_24dp.png
-    - packages/armadillo/res/ic_battery_90_white_1x_web_24dp.png
+    - packages/armadillo/res/ic_battery_20_white_48dp.png
+    - packages/armadillo/res/ic_battery_30_white_48dp.png
+    - packages/armadillo/res/ic_battery_50_white_48dp.png
+    - packages/armadillo/res/ic_battery_60_white_48dp.png
+    - packages/armadillo/res/ic_battery_80_white_48dp.png
+    - packages/armadillo/res/ic_battery_90_white_48dp.png
+    - packages/armadillo/res/ic_battery_alert_white_48dp.png
+    - packages/armadillo/res/ic_battery_charging_20_white_48dp.png
+    - packages/armadillo/res/ic_battery_charging_30_white_48dp.png
+    - packages/armadillo/res/ic_battery_charging_50_white_48dp.png
+    - packages/armadillo/res/ic_battery_charging_60_white_48dp.png
+    - packages/armadillo/res/ic_battery_charging_80_white_48dp.png
+    - packages/armadillo/res/ic_battery_charging_90_white_48dp.png
+    - packages/armadillo/res/ic_battery_charging_full_white_48dp.png
+    - packages/armadillo/res/ic_battery_full_white_48dp.png
+    - packages/armadillo/res/ic_battery_unknown_white_48dp.png
     - packages/armadillo/res/ic_brightness_high_grey600.png
     - packages/armadillo/res/ic_do_not_disturb_off_grey600.png
     - packages/armadillo/res/ic_do_not_disturb_on_black.png
