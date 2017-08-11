@@ -17,7 +17,7 @@ import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart'
     as chat_fidl;
-import 'package:apps.modules.common.services.gallery/gallery.fidl.dart';
+import 'package:apps.modules.drive.services.gallery/gallery.fidl.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart' hide Message;
