@@ -48,15 +48,21 @@ if (use_prebuilt_webkit) {
   group("prebuilt_webkit") {
     public_deps = [
       ":copy_prebuilt_webkit_so",
-      ":prebuilt_webkit_shared_deps(//build/toolchain/fuchsia:${target_cpu}-shared)",
+      "//third_party/boringssl:ssl",
+      "//third_party/cairo",
+      "//third_party/curl:libcurl",
+      "//third_party/freetype2",
+      "//third_party/harfbuzz",
+      "//third_party/icu:icui18n",
+      "//third_party/icu:icuuc",
+      "//third_party/libjpeg-turbo:libjpeg",
+      "//third_party/libpng",
+      "//third_party/libxml2",
+      "//third_party/sqlite",
+      "//third_party/zlib",
     ]
 
     public_configs = [ ":prebuilt_webkit_config" ]
-  }
-
-  config("prebuilt_webkit_config") {
-    include_dirs = [ "//third_party/webkit/Source/WebKit/fuchsia" ]
-    ldflags = [ "x64-shared/libwebkit.so" ]
   }
 
   copy("copy_prebuilt_webkit_so") {
@@ -75,21 +81,10 @@ if (use_prebuilt_webkit) {
     ]
   }
 
-  group("prebuilt_webkit_shared_deps") {
-    deps = [
-      "//third_party/boringssl:ssl",
-      "//third_party/cairo",
-      "//third_party/curl:libcurl",
-      "//third_party/freetype2",
-      "//third_party/harfbuzz",
-      "//third_party/icu:icui18n",
-      "//third_party/icu:icuuc",
-      "//third_party/libjpeg-turbo:libjpeg",
-      "//third_party/libpng",
-      "//third_party/libxml2",
-      "//third_party/sqlite",
-      "//third_party/zlib",
-    ]
+  config("prebuilt_webkit_config") {
+    include_dirs = [ "//third_party/webkit/Source/WebKit/fuchsia" ]
+    ldflags = rebase_path(get_target_outputs(":copy_prebuilt_webkit_so"),
+                          root_out_dir)
   }
 }
 
