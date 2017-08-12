@@ -182,6 +182,19 @@ class _AskHandlerImpl extends AskHandler {
       proposals.add(_launchEverythingProposal);
     }
 
+    if ((query.text?.toLowerCase()?.startsWith('per') ?? false) ||
+        (query.text?.toLowerCase()?.contains('3d') ?? false)) {
+      proposals.add(
+        _createAppProposal(
+          id: 'Launch Perspective 3D demo',
+          appUrl: 'perspective',
+          headline: 'Launch Perspective 3D demo',
+          iconUrls: <String>['https://goo.gl/y1QTmk'],
+          color: 0xFF4A78C0,
+        ),
+      );
+    }
+
     if ((query.text?.length ?? 0) >= 4) {
       void scanDirectory(Directory directory) {
         directory
