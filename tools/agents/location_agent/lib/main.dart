@@ -24,22 +24,22 @@ const String _kSuggestionIconUrl =
     'https://www.gstatic.com/images/icons/material/system/2x/directions_walk_googblue_48dp.png';
 
 final ContextReaderProxy _contextReader = new ContextReaderProxy();
-ContextListenerImpl _contextListenerImpl;
+ContextListenerForTopicsImpl _contextListenerImpl;
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 
-/// Location ContextListener that makes a Location Module proposal given a
+/// Location ContextListenerForTopics that makes a Location Module proposal given a
 /// valid location Context Link
-class ContextListenerImpl extends ContextListener {
-  final ContextListenerBinding _binding = new ContextListenerBinding();
+class ContextListenerForTopicsImpl extends ContextListenerForTopics {
+  final ContextListenerForTopicsBinding _binding = new ContextListenerForTopicsBinding();
 
   /// Gets the [InterfaceHandle]
   ///
   /// The returned handle should only be used once.
-  InterfaceHandle<ContextListener> getHandle() => _binding.wrap(this);
+  InterfaceHandle<ContextListenerForTopics> getHandle() => _binding.wrap(this);
 
   @override
-  Future<Null> onUpdate(ContextUpdate result) async {
+  Future<Null> onUpdate(ContextUpdateForTopics result) async {
     if (!result.values.containsKey(_kLocationTopic)) {
       return;
     }
@@ -101,8 +101,8 @@ void main(List<dynamic> args) {
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
 
-  ContextQuery query =
-      new ContextQuery.init(<String>[_kLocationTopic], null /* filters */);
-  _contextListenerImpl = new ContextListenerImpl();
+  ContextQueryForTopics query =
+      new ContextQueryForTopics.init(<String>[_kLocationTopic], null /* filters */);
+  _contextListenerImpl = new ContextListenerForTopicsImpl();
   _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
 }
