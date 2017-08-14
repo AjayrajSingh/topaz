@@ -35,8 +35,8 @@ class HomeWorkAgent extends AgentImpl {
       new ProposalPublisherProxy();
   final ContextPublisherProxy _contextPublisher = new ContextPublisherProxy();
   final ContextReaderProxy _contextReader = new ContextReaderProxy();
-  final ContextListenerBinding _contextListenerBinding =
-      new ContextListenerBinding();
+  final ContextListenerForTopicsBinding _contextListenerBinding =
+      new ContextListenerForTopicsBinding();
   final AskHandlerBinding _askHandlerBinding = new AskHandlerBinding();
 
   /// Constructor.
@@ -90,9 +90,9 @@ class HomeWorkAgent extends AgentImpl {
     }
 
     _contextReader.subscribeToTopics(
-      new ContextQuery()..topics = <String>[_kLocationHomeWorkTopic],
+      new ContextQueryForTopics()..topics = <String>[_kLocationHomeWorkTopic],
       _contextListenerBinding.wrap(
-        new _ContextListenerImpl(
+        new _ContextListenerForTopicsImpl(
           proposalPublisher: _proposalPublisher,
           onTopicChanged: (String locationJson) {
             final Map<String, String> json = convert.JSON.decode(locationJson);
@@ -157,14 +157,14 @@ class HomeWorkAgent extends AgentImpl {
 
 typedef void _OnTopicChanged(String topicValue);
 
-class _ContextListenerImpl extends ContextListener {
+class _ContextListenerForTopicsImpl extends ContextListenerForTopics {
   final ProposalPublisher proposalPublisher;
   final _OnTopicChanged onTopicChanged;
 
-  _ContextListenerImpl({this.proposalPublisher, this.onTopicChanged});
+  _ContextListenerForTopicsImpl({this.proposalPublisher, this.onTopicChanged});
 
   @override
-  void onUpdate(ContextUpdate result) =>
+  void onUpdate(ContextUpdateForTopics result) =>
       onTopicChanged(result.values[_kLocationHomeWorkTopic]);
 }
 

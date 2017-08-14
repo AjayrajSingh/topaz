@@ -51,8 +51,8 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// The list of context topics to listen for changes to.
   final List<String> contextTopics;
 
-  final ContextListenerBinding _contextListenerBinding =
-      new ContextListenerBinding();
+  final ContextListenerForTopicsBinding _contextListenerBinding =
+      new ContextListenerForTopicsBinding();
 
   final FocusRequestWatcherBinding _focusRequestWatcherBinding =
       new FocusRequestWatcherBinding();
@@ -108,9 +108,9 @@ class ArmadilloUserShellModel extends UserShellModel {
     suggestionProviderSuggestionModel.visibleStoriesController =
         visibleStoriesController;
     contextReader.subscribeToTopics(
-      new ContextQuery()..topics = contextTopics,
+      new ContextQueryForTopics()..topics = contextTopics,
       _contextListenerBinding.wrap(
-        new _ContextListenerImpl(onContextUpdated),
+        new _ContextListenerForTopicsImpl(onContextUpdated),
       ),
     );
     userShellContext.getAccount((Account account) {
@@ -157,13 +157,13 @@ class ArmadilloUserShellModel extends UserShellModel {
   }
 }
 
-class _ContextListenerImpl extends ContextListener {
+class _ContextListenerForTopicsImpl extends ContextListenerForTopics {
   final _OnContextUpdated onContextUpdated;
 
-  _ContextListenerImpl(this.onContextUpdated);
+  _ContextListenerForTopicsImpl(this.onContextUpdated);
 
   @override
-  void onUpdate(ContextUpdate result) {
+  void onUpdate(ContextUpdateForTopics result) {
     onContextUpdated?.call(result.values);
   }
 }
