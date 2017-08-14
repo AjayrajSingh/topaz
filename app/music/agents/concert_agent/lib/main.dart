@@ -20,22 +20,22 @@ const String _kHotelTopic = '/story/focused/link/hotel';
 
 /// Global scoping to prevent garbage collection
 final ContextReaderProxy _contextReader = new ContextReaderProxy();
-ContextListenerImpl _contextListenerImpl;
+ContextListenerForTopicsImpl _contextListenerImpl;
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 
-/// Concert ContextListener listens to hotel reservations and makes a concert
+/// Concert ContextListenerForTopics listens to hotel reservations and makes a concert
 /// list proposal
-class ContextListenerImpl extends ContextListener {
-  final ContextListenerBinding _binding = new ContextListenerBinding();
+class ContextListenerForTopicsImpl extends ContextListenerForTopics {
+  final ContextListenerForTopicsBinding _binding = new ContextListenerForTopicsBinding();
 
   /// Gets the [InterfaceHandle]
   ///
   /// The returned handle should only be used once.
-  InterfaceHandle<ContextListener> getHandle() => _binding.wrap(this);
+  InterfaceHandle<ContextListenerForTopics> getHandle() => _binding.wrap(this);
 
   @override
-  Future<Null> onUpdate(ContextUpdate result) async {
+  Future<Null> onUpdate(ContextUpdateForTopics result) async {
     if (!result.values.containsKey(_kHotelTopic)) {
       return;
     }
@@ -78,7 +78,7 @@ Future<Null> main(List<dynamic> args) async {
 
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextQuery query = new ContextQuery.init(<String>[_kHotelTopic], null);
-  _contextListenerImpl = new ContextListenerImpl();
+  ContextQueryForTopics query = new ContextQueryForTopics.init(<String>[_kHotelTopic], null);
+  _contextListenerImpl = new ContextListenerForTopicsImpl();
   _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
 }

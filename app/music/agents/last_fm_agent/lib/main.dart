@@ -30,19 +30,19 @@ const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
 
 /// Global scoping to prevent garbage collection
 final ContextReaderProxy _contextReader = new ContextReaderProxy();
-ContextListenerImpl _contextListenerImpl;
+ContextListenerForTopicsImpl _contextListenerImpl;
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 
-/// Concert ContextListener that prints if the given artist has an upcoming
+/// Concert ContextListenerForTopics that prints if the given artist has an upcoming
 /// concert in the user's metro area.
-class ContextListenerImpl extends ContextListener {
-  final ContextListenerBinding _binding = new ContextListenerBinding();
+class ContextListenerForTopicsImpl extends ContextListenerForTopics {
+  final ContextListenerForTopicsBinding _binding = new ContextListenerForTopicsBinding();
 
   final LastFmApi _api;
 
   /// Constructor
-  ContextListenerImpl({
+  ContextListenerForTopicsImpl({
     @required String apiKey,
   })
       : _api = new LastFmApi(apiKey: apiKey) {
@@ -52,10 +52,10 @@ class ContextListenerImpl extends ContextListener {
   /// Gets the [InterfaceHandle]
   ///
   /// The returned handle should only be used once.
-  InterfaceHandle<ContextListener> getHandle() => _binding.wrap(this);
+  InterfaceHandle<ContextListenerForTopics> getHandle() => _binding.wrap(this);
 
   @override
-  Future<Null> onUpdate(ContextUpdate result) async {
+  Future<Null> onUpdate(ContextUpdateForTopics result) async {
     if (!result.values.containsKey(_kMusicArtistTopic)) {
       return;
     }
@@ -133,9 +133,9 @@ Future<Null> main(List<dynamic> args) async {
   config.validate(<String>['last_fm_api_key']);
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextQuery query =
-      new ContextQuery.init(<String>[_kMusicArtistTopic], null /* filters */);
-  _contextListenerImpl = new ContextListenerImpl(
+  ContextQueryForTopics query =
+      new ContextQueryForTopics.init(<String>[_kMusicArtistTopic], null /* filters */);
+  _contextListenerImpl = new ContextListenerForTopicsImpl(
     apiKey: config.get('last_fm_api_key'),
   );
   _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
