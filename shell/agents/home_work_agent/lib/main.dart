@@ -189,7 +189,8 @@ class _AskHandlerImpl extends AskHandler {
           id: 'Launch Perspective 3D demo',
           appUrl: 'perspective',
           headline: 'Launch Perspective 3D demo',
-          iconUrls: <String>['https://goo.gl/y1QTmk'],
+          imageType: SuggestionImageType.other,
+          imageUrl: 'https://goo.gl/bi9jBa',
           color: 0xFF4A78C0,
         ),
       );
