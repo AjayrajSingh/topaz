@@ -28,7 +28,7 @@ class ChatContentProviderAgent extends AgentImpl {
   final ProposalPublisherProxy _proposalPublisher =
       new ProposalPublisherProxy();
   final ContextReaderProxy _contextReader = new ContextReaderProxy();
-  final ContextListenerBinding _proposerBinding = new ContextListenerBinding();
+  final ContextListenerForTopicsBinding _proposerBinding = new ContextListenerForTopicsBinding();
   ChatContentProviderImpl _contentProviderImpl;
 
   /// Creates a new instance of [ChatContentProviderAgent].
@@ -68,7 +68,7 @@ class ChatContentProviderAgent extends AgentImpl {
     Proposer proposer = new Proposer(proposalPublisher: _proposalPublisher);
 
     _contextReader.subscribeToTopics(
-      new ContextQuery()
+      new ContextQueryForTopics()
         ..topics = <String>[
           '/location/home_work',
           '/story/visible_ids',

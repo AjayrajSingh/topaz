@@ -15,7 +15,7 @@ import 'package:lib.logging/logging.dart';
 const String _kContactsJsonFile = '/system/data/modules/contacts.json';
 
 /// Proposes suggestions when new messages come in based on the current context.
-class Proposer extends ContextListener {
+class Proposer extends ContextListenerForTopics {
   /// Publishes proposals.
   final ProposalPublisher proposalPublisher;
   final List<String> _homeContacts = <String>[];
@@ -67,7 +67,7 @@ class Proposer extends ContextListener {
   }
 
   @override
-  void onUpdate(ContextUpdate result) {
+  void onUpdate(ContextUpdateForTopics result) {
     log.fine('onUpdate: ${result.values}');
     _currentLocation = result.values['/location/home_work'] ?? 'unknown';
     if (result.values.keys.contains('/story/visible_ids')) {
