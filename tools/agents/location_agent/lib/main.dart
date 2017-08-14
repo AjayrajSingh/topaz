@@ -101,8 +101,8 @@ void main(List<dynamic> args) {
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
 
-  ContextQueryForTopics query =
-      new ContextQueryForTopics.init(<String>[_kLocationTopic], null /* filters */);
+  ContextQueryForTopics query = new ContextQueryForTopics()
+      ..topics = <String>[_kLocationTopic];
   _contextListenerImpl = new ContextListenerForTopicsImpl();
   _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
 }
