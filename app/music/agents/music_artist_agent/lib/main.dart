@@ -127,8 +127,8 @@ Future<Null> main(List<dynamic> args) async {
   config.validate(<String>['spotify_client_id', 'spotify_client_secret']);
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextQueryForTopics query =
-      new ContextQueryForTopics.init(<String>[_kMusicArtistTopic], null);
+  ContextQueryForTopics query = new ContextQueryForTopics()
+      ..topics = <String>[_kMusicArtistTopic];
   _contextListenerImpl = new ContextListenerForTopicsImpl(
     clientId: config.get('spotify_client_id'),
     clientSecret: config.get('spotify_client_secret'),

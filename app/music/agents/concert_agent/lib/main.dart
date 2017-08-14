@@ -78,7 +78,8 @@ Future<Null> main(List<dynamic> args) async {
 
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextQueryForTopics query = new ContextQueryForTopics.init(<String>[_kHotelTopic], null);
+  ContextQueryForTopics query = new ContextQueryForTopics()
+      ..topics = <String>[_kHotelTopic];
   _contextListenerImpl = new ContextListenerForTopicsImpl();
   _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
 }

@@ -133,8 +133,8 @@ Future<Null> main(List<dynamic> args) async {
   config.validate(<String>['last_fm_api_key']);
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextQueryForTopics query =
-      new ContextQueryForTopics.init(<String>[_kMusicArtistTopic], null /* filters */);
+  ContextQueryForTopics query = new ContextQueryForTopics()
+      ..topics = <String>[_kMusicArtistTopic];
   _contextListenerImpl = new ContextListenerForTopicsImpl(
     apiKey: config.get('last_fm_api_key'),
   );
