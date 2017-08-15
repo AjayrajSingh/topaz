@@ -12,7 +12,7 @@ executable("snapshotter") {
   deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
     "//dart/runtime:libdart_jit_product",
-    "//dart/runtime/vm:libdart_platform_product",
+    "//dart/runtime/platform:libdart_platform_product",
     "//lib/ftl",
     "//lib/tonic/converter",
     "//lib/tonic/file_loader",
@@ -33,7 +33,7 @@ executable("aot_snapshotter") {
   deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
     "//dart/runtime:libdart_with_precompiler_product",
-    "//dart/runtime/vm:libdart_platform_product",
+    "//dart/runtime/platform:libdart_platform_product",
     "//lib/ftl",
     "//lib/tonic/converter",
     "//lib/tonic/file_loader",
