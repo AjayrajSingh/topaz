@@ -5,8 +5,14 @@
 import("//lib/fidl/dart/sdk_ext/sdk_ext.gni")
 
 action("generate_snapshot_bin") {
+  if (is_debug) {
+    gen_snapshot_exe = "gen_snapshot"
+  } else {
+    gen_snapshot_exe = "gen_snapshot_product"
+  }
+
   deps = [
-    "//dart/runtime/bin:gen_snapshot_product($host_toolchain)",
+    "//dart/runtime/bin:$gen_snapshot_exe($host_toolchain)",
   ]
 
   inputs = fidl_dart_sdk_ext_files + [
@@ -23,7 +29,7 @@ action("generate_snapshot_bin") {
   ]
 
   gen_snapshot_dir =
-      get_label_info("//dart/runtime/bin:gen_snapshot_product($host_toolchain)",
+      get_label_info("//dart/runtime/bin:$gen_snapshot_exe($host_toolchain)",
                      "root_out_dir")
   script = "//dart/runtime/tools/create_snapshot_bin.py"
 
@@ -32,7 +38,7 @@ action("generate_snapshot_bin") {
 
   args = [
     "--executable",
-    rebase_path("$gen_snapshot_dir/gen_snapshot_product"),
+    rebase_path("$gen_snapshot_dir/$gen_snapshot_exe"),
     "--package_root",
     rebase_path("$root_gen_dir/dart-gen"),
     "--script",

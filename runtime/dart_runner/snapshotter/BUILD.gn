@@ -9,14 +9,24 @@ executable("snapshotter") {
     "main.cc",
   ]
 
+  if (is_debug) {
+    dart_deps = [
+      "//dart/runtime:libdart_jit",
+      "//dart/runtime/platform:libdart_platform",
+    ]
+  } else {
+    dart_deps = [
+      "//dart/runtime:libdart_jit_product",
+      "//dart/runtime/platform:libdart_platform_product",
+    ]
+  }
+
   deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
-    "//dart/runtime:libdart_jit_product",
-    "//dart/runtime/platform:libdart_platform_product",
     "//lib/ftl",
     "//lib/tonic/converter",
     "//lib/tonic/file_loader",
-  ]
+  ] + dart_deps
 }
 
 executable("aot_snapshotter") {
@@ -30,12 +40,22 @@ executable("aot_snapshotter") {
     "AOT_COMPILER"
   ]
 
+  if (is_debug) {
+    dart_deps = [
+      "//dart/runtime:libdart_with_precompiler",
+      "//dart/runtime/platform:libdart_platform",
+    ]
+  } else {
+    dart_deps = [
+      "//dart/runtime:libdart_with_precompiler_product",
+      "//dart/runtime/platform:libdart_platform_product",
+    ]
+  }
+
   deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
-    "//dart/runtime:libdart_with_precompiler_product",
-    "//dart/runtime/platform:libdart_platform_product",
     "//lib/ftl",
     "//lib/tonic/converter",
     "//lib/tonic/file_loader",
-  ]
+  ] + dart_deps
 }

@@ -4,7 +4,7 @@
 
 import("//apps/dart_content_handler/dart_app.gni")
 
-dart_app("hello_app_dart") {
+dart_jit_app("hello_app_dart") {
   main_dart = "main.dart"
 
   source_dir = "."

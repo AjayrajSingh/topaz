@@ -4,30 +4,15 @@
 
 import("//build/dart/dart_package.gni")
 
-# Defines a Dart application that can be run in the Dart content handler
-#
-# Parameters
-#
-#   package_name (optional)
-#     Name of the dart package.
-#
-#   main_dart (required)
-#     File containing the main function of the application.
-#
-#   deps (optional)
-#     Dependencies of this application
-#
-#   output_name (optional)
-#     Name of the output file to generate. Defaults to ${target_name}.dartx
-#
-#   analysis_options (optional)
-#     By default, a script to run the analyzer on the contents of the package is
-#     generated in the output directory. This parameter contains the path to an
-#     analysis options file for this target.
-#
-#   disable_analysis (optional)
-#     Prevents the analysis script from being generated.
-template("dart_app") {
+declare_args() {
+  # Controls whether dart_app() targets generate JIT or AOT Dart snapshots.
+  # In a debug build, the default is JIT so that attaching a debugger is
+  # possible. In a release build the default is AOT to save compilation time
+  # and memory footprint.
+  dart_app_default_is_jit = is_debug
+}
+
+template("dart_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   dart_package_target_name = target_name + "_dart_package"
@@ -250,5 +235,60 @@ template("dart_aot_app") {
       ":$dylib_target_name",
        dart_bundler_label,
     ]
+  }
+}
+
+# Defines a Dart application that can be run in the Dart content handler
+#
+# Parameters
+#
+#   package_name (optional)
+#     Name of the dart package.
+#
+#   main_dart (required)
+#     File containing the main function of the application.
+#
+#   deps (optional)
+#     Dependencies of this application
+#
+#   output_name (optional)
+#     Name of the output file to generate. Defaults to ${target_name}.dartx
+#
+#   analysis_options (optional)
+#     By default, a script to run the analyzer on the contents of the package is
+#     generated in the output directory. This parameter contains the path to an
+#     analysis options file for this target.
+#
+#   disable_analysis (optional)
+#     Prevents the analysis script from being generated.
+template("dart_app") {
+  if (dart_app_default_is_jit) {
+    dart_jit_app(target_name) {
+      forward_variables_from(invoker,
+          [
+            "package_name",
+            "main_dart",
+            "deps",
+            "output_name",
+            "analysis_options",
+            "disable_analysis",
+            "testonly",
+            "source_dir",
+          ])
+    }
+  } else {
+    dart_aot_app(target_name) {
+      forward_variables_from(invoker,
+          [
+            "package_name",
+            "main_dart",
+            "deps",
+            "output_name",
+            "analysis_options",
+            "disable_analysis",
+            "testonly",
+            "source_dir",
+          ])
+    }
   }
 }
