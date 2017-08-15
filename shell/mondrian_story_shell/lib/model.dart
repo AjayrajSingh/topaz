@@ -217,8 +217,9 @@ class SurfaceGraph extends Model {
       _focusedSurfaces.isEmpty ? null : _surfaces[_focusedSurfaces.last];
 
   /// The history of focused [Surface]s
-  Iterable<Surface> get focusStack =>
-      _focusedSurfaces.map((String id) => _surfaces[id]);
+  Iterable<Surface> get focusStack => _focusedSurfaces
+      .where((String id) => _surfaces.containsKey(id))
+      .map((String id) => _surfaces[id]);
 
   /// Add [Surface] to graph
   void addSurface(
@@ -263,28 +264,32 @@ class SurfaceGraph extends Model {
   /// above the relative surface or any of its direct children, or its original
   /// position.
   void focusSurface(String id, String relativeId) {
-    assert(_surfaces.containsKey(id));
+    if (!_surfaces.containsKey(id)) {
+      log.warning('Invalid surface id "$id"');
+      return;
+    }
+    int currentIndex = _focusedSurfaces.indexOf(id);
     _dismissedSurfaces.remove(id);
+    _focusedSurfaces.remove(id);
     if (relativeId == null || relativeId == kNoParent) {
-      _focusedSurfaces.remove(id);
       _focusedSurfaces.add(id);
     } else {
-      assert(_surfaces.containsKey(relativeId));
-      int currentIndex = _focusedSurfaces.indexOf(id);
-      _focusedSurfaces.remove(id);
+      int relativeIndex = -1;
       final Tree<String> relative = _tree.find(relativeId);
-      int relativeIndex = _focusedSurfaces.indexOf(relative.value);
-      // Use the highest index of relative or its children
-      for (Tree<String> childNode in relative.children) {
-        String childId = childNode.value;
-        relativeIndex =
-            math.max(relativeIndex, _focusedSurfaces.indexOf(childId));
-      }
-      // If none of those are focused, find the closest ancestor that is focused
-      Tree<String> ancestor = relative.parent;
-      while (relativeIndex < 0 && ancestor.value != null) {
-        relativeIndex = _focusedSurfaces.indexOf(ancestor.value);
-        ancestor = ancestor.parent;
+      if (relative != null) {
+        relativeIndex = _focusedSurfaces.indexOf(relative.value);
+        // Use the highest index of relative or its children
+        for (Tree<String> childNode in relative.children) {
+          String childId = childNode.value;
+          relativeIndex =
+              math.max(relativeIndex, _focusedSurfaces.indexOf(childId));
+        }
+        // If none of those are focused, find the closest ancestor that is focused
+        Tree<String> ancestor = relative.parent;
+        while (relativeIndex < 0 && ancestor.value != null) {
+          relativeIndex = _focusedSurfaces.indexOf(ancestor.value);
+          ancestor = ancestor.parent;
+        }
       }
       // Insert to the highest of one past relative index, or the original index
       int index =
