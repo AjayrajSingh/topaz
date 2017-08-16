@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 group("modules") {
-  deps = [
+  public_deps = [
     "xi-core",
     "xi_app",
   ]
