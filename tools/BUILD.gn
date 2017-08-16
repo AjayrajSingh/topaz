@@ -50,6 +50,11 @@ package("modules") {
     },
 
     {
+      source = "gen/apps/modules/common/modules/link_viewer/link_viewer.flx"
+      name = "link_viewer"
+    },
+
+    {
       source = "gen/apps/modules/common/modules/location_details/location_details.flx"
       name = "location_details"
     },
