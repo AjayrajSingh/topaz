@@ -6,7 +6,7 @@ packages:
       path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/analyzer"
       relative: true
     source: path
-    version: "0.30.0+2"
+    version: "0.31.0-alpha.0"
   args:
     description:
       name: args
@@ -76,17 +76,17 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.33-dev"
+    version: "0.0.34-dev"
   flutter_test:
     description: flutter
     source: sdk
-    version: "0.0.11-dev"
+    version: "0.0.12-dev"
   front_end:
     description:
       path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/front_end"
       relative: true
     source: path
-    version: "0.1.0-alpha.4"
+    version: "0.1.0-alpha.5"
   glob:
     description:
       name: glob
@@ -129,12 +129,18 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  js:
+    description:
+      name: js
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.1"
   kernel:
     description:
       path: "../../../../../../lib/flutter/bin/cache/dart-sdk/lib/kernel"
       relative: true
     source: path
-    version: "0.3.0-alpha.1"
+    version: "0.3.0-alpha.2"
   lists:
     description:
       name: lists
@@ -171,6 +177,12 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.5+1"
+  node_preamble:
+    description:
+      name: node_preamble
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.4.0"
   package_config:
     description:
       name: package_config
@@ -296,7 +308,7 @@ packages:
       name: test
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.21"
+    version: "0.12.24+2"
   typed_data:
     description:
       name: typed_data
@@ -340,4 +352,4 @@ packages:
     source: hosted
     version: "2.1.12"
 sdks:
-  dart: ">=1.23.0-dev.0.0 <2.0.0"
+  dart: ">=1.23.0 <2.0.0-dev.infinity"

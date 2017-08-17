@@ -31,7 +31,8 @@ final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 /// Location ContextListenerForTopics that makes a Location Module proposal given a
 /// valid location Context Link
 class ContextListenerForTopicsImpl extends ContextListenerForTopics {
-  final ContextListenerForTopicsBinding _binding = new ContextListenerForTopicsBinding();
+  final ContextListenerForTopicsBinding _binding =
+      new ContextListenerForTopicsBinding();
 
   /// Gets the [InterfaceHandle]
   ///
@@ -102,7 +103,7 @@ void main(List<dynamic> args) {
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
 
   ContextQueryForTopics query = new ContextQueryForTopics()
-      ..topics = <String>[_kLocationTopic];
+    ..topics = <String>[_kLocationTopic];
   _contextListenerImpl = new ContextListenerForTopicsImpl();
   _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
 }

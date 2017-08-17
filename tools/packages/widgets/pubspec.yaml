@@ -9,8 +9,6 @@ dependencies:
   intl: ^0.14.0
   flutter:
     sdk: flutter
-  search_api:
-    path: ../search_api
   models:
     path: ../models
   widgets_meta:
