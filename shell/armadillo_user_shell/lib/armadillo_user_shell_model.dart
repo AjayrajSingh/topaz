@@ -4,6 +4,7 @@
 
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
+import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.auth.account/account.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
@@ -83,6 +84,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     SuggestionProvider suggestionProvider,
     ContextReader contextReader,
     ContextPublisher contextPublisher,
+    ProposalPublisher proposalPublisher,
     Link link,
   ) {
     super.onReady(
@@ -94,6 +96,7 @@ class ArmadilloUserShellModel extends UserShellModel {
       suggestionProvider,
       contextReader,
       contextPublisher,
+      proposalPublisher,
       link,
     );
     userLogoutter.userShellContext = userShellContext;
