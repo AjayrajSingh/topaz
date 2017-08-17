@@ -8,6 +8,8 @@ dart_app("home_work_agent") {
 
   main_dart = "lib/main.dart"
 
+  analysis_options = "//apps/sysui/analysis_options.yaml"
+
   deps = [
     "//application/lib/app/dart",
     "//apps/maxwell/services/context:context_dart",

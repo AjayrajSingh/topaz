@@ -11,6 +11,8 @@ flutter_app("infinite_scroller") {
 
   manifest = "pubspec.yaml"
 
+  analysis_options = "//apps/sysui/analysis_options.yaml"
+
   deps = [
     "//lib/flutter/packages/flutter",
   ]
