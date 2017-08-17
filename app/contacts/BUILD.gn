@@ -2,17 +2,18 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("contacts") {
-  deps = [
-    "//apps/modules/contacts/modules",
-    "//apps/modules/contacts/services",
-  ]
-}
+import("//packages/package.gni")
 
-group("test") {
-  testonly = true
+package("contacts") {
+  app = true
 
   deps = [
+    "//apps/modules/contacts/modules/contacts",
     "//apps/modules/contacts/modules/contacts:test",
   ]
+
+  binaries = [ {
+        source = "gen/apps/modules/contacts/modules/contacts/contacts.flx"
+        name = "contacts"
+      } ]
 }
