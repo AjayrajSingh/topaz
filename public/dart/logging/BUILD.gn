@@ -7,7 +7,7 @@ import("//build/dart/dart_package.gni")
 dart_package("lib.logging") {
   package_name = "lib.logging"
 
-  analysis_options = ".analysis_options"
+  analysis_options = "analysis_options.yaml"
 
   deps = [
     "//lib/fidl/dart",

@@ -8,7 +8,7 @@ import("//build/dart/dart_test.gni")
 dart_package("lib.widgets") {
   package_name = "lib.widgets"
 
-  analysis_options = ".analysis_options"
+  analysis_options = "analysis_options.yaml"
 
   deps = [
     "//application/lib/app/dart",
@@ -27,7 +27,7 @@ dart_package("lib.widgets") {
 }
 
 dart_test("test") {
-  analysis_options = ".analysis_options"
+  analysis_options = "analysis_options.yaml"
 
   deps = [
     "//lib/flutter/packages/flutter_test",

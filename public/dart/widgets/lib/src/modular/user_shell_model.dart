@@ -4,6 +4,7 @@
 
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
+import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
@@ -24,6 +25,7 @@ class UserShellModel extends Model {
   SuggestionProvider _suggestionProvider;
   ContextReader _contextReader;
   ContextPublisher _contextPublisher;
+  ProposalPublisher _proposalPublisher;
   Link _link;
 
   /// Indicates whether the [LinkWatcher] should watch for all changes including
@@ -57,8 +59,11 @@ class UserShellModel extends Model {
   /// The [ContextReader] given to this app's [UserShell].
   ContextReader get contextReader => _contextReader;
 
-  /// The [SuggestionProvider] given to this app's [UserShell].
+  /// The [ContextPublisher] given to this app's [UserShell].
   ContextPublisher get contextPublisher => _contextPublisher;
+
+  /// The [ProposalPublisher] given to this app's [UserShell].
+  ProposalPublisher get proposalPublisher => _proposalPublisher;
 
   /// The [Link] given to this [UserShell].
   Link get link => _link;
@@ -74,6 +79,7 @@ class UserShellModel extends Model {
     SuggestionProvider suggestionProvider,
     ContextReader contextReader,
     ContextPublisher contextPublisher,
+    ProposalPublisher proposalPublisher,
     Link link,
   ) {
     _userShellContext = userShellContext;
@@ -84,6 +90,7 @@ class UserShellModel extends Model {
     _suggestionProvider = suggestionProvider;
     _contextReader = contextReader;
     _contextPublisher = contextPublisher;
+    _proposalPublisher = proposalPublisher;
     _link = link;
     notifyListeners();
   }

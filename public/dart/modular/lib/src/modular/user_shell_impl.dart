@@ -4,6 +4,7 @@
 
 import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
+import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
@@ -23,6 +24,7 @@ typedef void OnUserShellReady(
   SuggestionProvider suggestionProvider,
   ContextReader contextReader,
   ContextPublisher contextPublisher,
+  ProposalPublisher proposalPublisher,
   Link link,
 );
 
@@ -44,6 +46,8 @@ class UserShellImpl extends UserShell {
   final ContextReaderProxy _contextReaderProxy = new ContextReaderProxy();
   final ContextPublisherProxy _contextPublisherProxy =
       new ContextPublisherProxy();
+  final ProposalPublisherProxy _proposalPublisherProxy =
+      new ProposalPublisherProxy();
   final LinkProxy _linkProxy = new LinkProxy();
 
   /// Called when [initialize] occurs.
@@ -101,6 +105,9 @@ class UserShellImpl extends UserShell {
       _userShellContextProxy.getContextPublisher(
         _contextPublisherProxy.ctrl.request(),
       );
+      _userShellContextProxy.getProposalPublisher(
+        _proposalPublisherProxy.ctrl.request(),
+      );
 
       _userShellContextProxy.getLink(_linkProxy.ctrl.request());
 
@@ -113,6 +120,7 @@ class UserShellImpl extends UserShell {
         _suggestionProviderProxy,
         _contextReaderProxy,
         _contextPublisherProxy,
+        _proposalPublisherProxy,
         _linkProxy,
       );
     }
@@ -142,6 +150,7 @@ class UserShellImpl extends UserShell {
     _focusProviderProxy.ctrl.close();
     _contextReaderProxy.ctrl.close();
     _contextPublisherProxy.ctrl.close();
+    _proposalPublisherProxy.ctrl.close();
     done();
   }
 }
