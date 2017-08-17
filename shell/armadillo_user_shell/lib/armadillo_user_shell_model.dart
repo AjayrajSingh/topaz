@@ -11,6 +11,7 @@ import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
+import 'package:home_work_agent_lib/home_work_proposer.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'focus_request_watcher_impl.dart';
@@ -57,6 +58,8 @@ class ArmadilloUserShellModel extends UserShellModel {
 
   final FocusRequestWatcherBinding _focusRequestWatcherBinding =
       new FocusRequestWatcherBinding();
+
+  final HomeWorkProposer _homeWorkProposer = new HomeWorkProposer();
 
   /// Called when the [UserShell] stops.
   final _OnStop onUserShellStopped;
@@ -123,10 +126,13 @@ class ArmadilloUserShellModel extends UserShellModel {
         onUserUpdated?.call(account.displayName, account.imageUrl);
       }
     });
+
+    _homeWorkProposer.start(contextReader, proposalPublisher);
   }
 
   @override
   void onStop() {
+    _homeWorkProposer.stop();
     _contextListenerBinding.close();
     _focusRequestWatcherBinding.close();
     suggestionProviderSuggestionModel.close();

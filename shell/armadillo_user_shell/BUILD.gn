@@ -25,6 +25,7 @@ flutter_app("armadillo_user_shell") {
     "//apps/modules/common/packages/widgets",
     "//apps/mozart/lib/flutter",
     "//apps/power-service/services:services_dart",
+    "//apps/sysui/agents/home_work_agent:home_work_agent_lib",
     "//apps/sysui/armadillo",
     "//apps/sysui/keyboard",
     "//apps/sysui/widgets",
