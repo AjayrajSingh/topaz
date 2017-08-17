@@ -2,9 +2,11 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//packages/package.gni")
 import("//flutter/build/flutter_app.gni")
 
-flutter_app("dashboard") {
+flutter_app("dashboard_app") {
+  output_name = "dashboard"
   main_dart = "lib/main.dart"
 
   source_dir = "lib"
@@ -25,4 +27,17 @@ flutter_app("dashboard") {
   ]
 
   analysis_options = ".analysis_options"
+}
+
+package("dashboard") {
+  app = true
+
+  deps = [
+    ":dashboard_app",
+  ]
+
+  binaries = [ {
+        source = "gen/apps/modules/dashboard/dashboard.flx"
+        name = "dashboard"
+      } ]
 }
