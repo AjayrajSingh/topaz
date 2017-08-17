@@ -5,30 +5,11 @@
 import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:widgets/map.dart';
-import 'package:widgets/shopping.dart';
-import 'package:widgets/usps.dart';
 import 'package:widgets/youtube.dart';
 import 'package:youtube_api/youtube_api.dart';
 
 /// Adds all the [EmbeddedChildBuilder]s that this application supports.
 void addEmbeddedChildBuilders(Config config) {
-  // USPS Tracking
-  if (config.has('usps_api_key')) {
-    kEmbeddedChildProvider.addEmbeddedChildBuilder(
-      'usps-shipping',
-      (dynamic args) {
-        return new EmbeddedChild(
-          widgetBuilder: (BuildContext context) => new TrackingStatus(
-                apiKey: config.get('usps_api_key'),
-                trackingCode: args,
-              ),
-          // Flutter version doesn't need a specific disposer.
-          disposer: () {},
-        );
-      },
-    );
-  }
-
   // Map, Youtube video
   if (config.has('google_api_key')) {
     kEmbeddedChildProvider.addEmbeddedChildBuilder(
@@ -60,15 +41,4 @@ void addEmbeddedChildBuilders(Config config) {
       },
     );
   }
-
-  kEmbeddedChildProvider.addEmbeddedChildBuilder(
-    'order-receipt',
-    (dynamic args) {
-      return new EmbeddedChild(
-        widgetBuilder: (BuildContext context) => new InteractiveReceipt(),
-        // Flutter version doesn't need a specific disposer.
-        disposer: () {},
-      );
-    },
-  );
 }

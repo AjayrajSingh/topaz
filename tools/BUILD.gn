@@ -45,11 +45,6 @@ package("modules") {
     },
 
     {
-      source = "gen/apps/modules/common/modules/interactive_receipt/interactive_receipt.flx"
-      name = "interactive_receipt"
-    },
-
-    {
       source = "gen/apps/modules/common/modules/link_viewer/link_viewer.flx"
       name = "link_viewer"
     },
@@ -82,11 +77,6 @@ package("modules") {
     {
       source = "gen/apps/modules/common/modules/travel_info/travel_info.flx"
       name = "travel_info"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/usps/usps.flx"
-      name = "usps"
     },
 
     {
