@@ -98,9 +98,10 @@ class ChatContentProviderTestModule extends Module {
     _ledger.ctrl.close();
     _componentContext.ctrl.close();
     _testRunner.ctrl.close();
-    _moduleBinding.close();
 
     callback();
+
+    _moduleBinding.close();
   }
 
   /// Test adding a new conversation and a few messages, starting from a blank
