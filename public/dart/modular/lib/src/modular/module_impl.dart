@@ -17,7 +17,10 @@ typedef void OnModuleReady(
   ServiceProvider incomingServiceProvider,
 );
 
-/// Called when [Module.stop] occurs.
+/// Called at the beginning of [Module.stop].
+typedef void OnModuleStopping();
+
+/// Called at the conclusion of [Module.stop].
 typedef void OnModuleStop();
 
 /// Implements a Module for receiving the services a [Module] needs to
@@ -40,8 +43,11 @@ class ModuleImpl extends Module {
   /// Called when [Module] is initialied with its services.
   final OnModuleReady onReady;
 
-  /// Called when [Module] is stopped.
-  final OnModuleStop onStop;
+  /// Called at the beginning of [Module.stop].
+  final OnModuleStopping onStopping;
+
+  /// Called at the conclusion of [Module.stop].
+  OnModuleStop onStop;
 
   /// Called when [LinkWatcher.notify] is called.
   final OnNotify onNotify;
@@ -56,6 +62,7 @@ class ModuleImpl extends Module {
   ModuleImpl({
     this.outgoingServiceProvider,
     this.onReady,
+    this.onStopping,
     this.onStop,
     this.onNotify,
     bool watchAll,
@@ -100,12 +107,13 @@ class ModuleImpl extends Module {
 
   @override
   void stop(void done()) {
-    onStop?.call();
+    onStopping?.call();
     _linkWatcherBinding?.close();
     _moduleContextProxy.ctrl.close();
     _linkProxy.ctrl.close();
     _incomingServiceProviderProxy.ctrl.close();
     _outgoingServiceProviderBinding.close();
     done();
+    onStop?.call();
   }
 }

@@ -41,10 +41,16 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
       : _userShellModel = userShellModel,
         _userShell = new UserShellImpl(
           onReady: userShellModel?.onReady,
-          onStop: userShellModel?.onStop,
+          onStopping: userShellModel?.onStop,
           onNotify: userShellModel?.onNotify,
           watchAll: userShellModel?.watchAll,
-        );
+        ) {
+          _userShell.onStop = _onStop;
+        }
+
+  void _onStop() {
+    _binding.close();
+  }
 
   @override
   Widget build(BuildContext context) => new WindowMediaQuery(

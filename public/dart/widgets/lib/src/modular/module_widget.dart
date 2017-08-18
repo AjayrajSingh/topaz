@@ -23,7 +23,7 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
   final ModuleBinding _binding = new ModuleBinding();
 
   /// The [Module] to [advertise].
-  final Module _module;
+  final ModuleImpl _module;
 
   /// The [ApplicationContext] to [advertise] its [Module] services to.
   final ApplicationContext applicationContext;
@@ -43,11 +43,17 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
       : _moduleModel = moduleModel,
         _module = new ModuleImpl(
           onReady: moduleModel?.onReady,
-          onStop: moduleModel?.onStop,
+          onStopping: moduleModel?.onStop,
           onNotify: moduleModel?.onNotify,
           watchAll: moduleModel?.watchAll,
           outgoingServiceProvider: moduleModel?.outgoingServiceProvider,
-        );
+        ) {
+    _module.onStop = _onStop;
+  }
+
+  void _onStop() {
+    _binding.close();
+  }
 
   @override
   Widget build(BuildContext context) => new WindowMediaQuery(

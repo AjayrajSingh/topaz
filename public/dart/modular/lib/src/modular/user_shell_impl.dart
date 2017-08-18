@@ -28,12 +28,16 @@ typedef void OnUserShellReady(
   Link link,
 );
 
-/// Called when [UserShell.terminate] occurs.
+/// Called at the beginning of [UserShell.terminate].
+typedef void OnUserShellStopping();
+
+/// Called at the conclusion of [UserShell.terminate].
 typedef void OnUserShellStop();
 
 /// Implements a UserShell for receiving the services a [UserShell] needs to
 /// operate.
 class UserShellImpl extends UserShell {
+  /// Binding for the actual UserShell interface object.
   final UserShellContextProxy _userShellContextProxy =
       new UserShellContextProxy();
   final FocusProviderProxy _focusProviderProxy = new FocusProviderProxy();
@@ -53,8 +57,11 @@ class UserShellImpl extends UserShell {
   /// Called when [initialize] occurs.
   final OnUserShellReady onReady;
 
-  /// Called when the [UserShell] terminates.
-  final OnUserShellStop onStop;
+  /// Called at the beginning of [UserShell.terminate].
+  final OnUserShellStop onStopping;
+
+  /// Called at the conclusion of [UserShell.terminate].
+  OnUserShellStop onStop;
 
   /// Called when [LinkWatcher.notify] is called.
   final OnNotify onNotify;
@@ -71,6 +78,7 @@ class UserShellImpl extends UserShell {
   /// Constructor.
   UserShellImpl({
     this.onReady,
+    this.onStopping,
     this.onStop,
     this.onNotify,
     bool watchAll,
@@ -139,7 +147,7 @@ class UserShellImpl extends UserShell {
 
   @override
   void terminate(void done()) {
-    onStop?.call();
+    onStopping?.call();
     _linkWatcherBinding?.close();
     _linkProxy.ctrl.close();
     _userShellContextProxy.ctrl.close();
@@ -152,5 +160,6 @@ class UserShellImpl extends UserShell {
     _contextPublisherProxy.ctrl.close();
     _proposalPublisherProxy.ctrl.close();
     done();
+    onStop?.call();
   }
 }
