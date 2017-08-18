@@ -14,6 +14,7 @@ import 'package:apps.modular.services.user/user_shell.fidl.dart';
 import 'package:home_work_agent_lib/home_work_proposer.dart';
 import 'package:lib.widgets/modular.dart';
 
+import 'active_agents_manager.dart';
 import 'focus_request_watcher_impl.dart';
 import 'initial_focus_setter.dart';
 import 'story_provider_story_generator.dart';
@@ -61,6 +62,8 @@ class ArmadilloUserShellModel extends UserShellModel {
 
   final HomeWorkProposer _homeWorkProposer = new HomeWorkProposer();
 
+  final ActiveAgentsManager _activeAgentsManager = new ActiveAgentsManager();
+
   /// Called when the [UserShell] stops.
   final _OnStop onUserShellStopped;
 
@@ -102,6 +105,7 @@ class ArmadilloUserShellModel extends UserShellModel {
       proposalPublisher,
       link,
     );
+
     userLogoutter.userShellContext = userShellContext;
     focusController.watchRequest(
       _focusRequestWatcherBinding.wrap(focusRequestWatcher),
@@ -128,10 +132,18 @@ class ArmadilloUserShellModel extends UserShellModel {
     });
 
     _homeWorkProposer.start(contextReader, proposalPublisher);
+
+    _activeAgentsManager.start(
+      userShellContext,
+      focusProvider,
+      storyProvider,
+      proposalPublisher,
+    );
   }
 
   @override
   void onStop() {
+    _activeAgentsManager.stop();
     _homeWorkProposer.stop();
     _contextListenerBinding.close();
     _focusRequestWatcherBinding.close();

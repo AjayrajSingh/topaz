@@ -86,6 +86,11 @@ package("sysui") {
     },
 
     {
+      path = rebase_path("armadillo_user_shell/assets/AgentIcon.png")
+      dest = "sysui/AgentIcon.png"
+    },
+
+    {
       path = rebase_path("armadillo_user_shell/assets/aparna-home.jpg")
       dest = "sysui/aparna-home.jpg"
     },
