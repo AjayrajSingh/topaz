@@ -33,6 +33,8 @@ class ModuleImpl extends Module {
   @override
   void stop(void callback()) {
     callback();
+
+    _binding.close();
   }
 }
 
