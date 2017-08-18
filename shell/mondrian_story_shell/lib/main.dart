@@ -81,9 +81,10 @@ class StoryShellImpl extends StoryShell {
 
   /// Terminate the StoryShell
   @override
-  void terminate(void done()) {
+  void terminate() {
     log.info('StoryShellImpl::terminate call');
-    done();
+    _storyContext.ctrl.close();
+    _storyShellBinding.close();
   }
 }
 

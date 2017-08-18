@@ -334,6 +334,8 @@ class ModuleImpl extends Module {
     _moduleContext.ctrl.close();
 
     done();
+
+    _binding.close();
   }
 }
 
