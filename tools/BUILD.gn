@@ -16,90 +16,6 @@ declare_args() {
 assert(modules_override_config != "")
 
 package("modules") {
-  app = true
-
-  deps = [
-    "//apps/modules/common/agents",
-    "//apps/modules/common/modules",
-  ]
-
-  binaries = [
-    {
-      source = "gen/apps/modules/common/modules/chess/chess.flx"
-      name = "chess"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/color/color.flx"
-      name = "color"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/image/image.flx"
-      name = "image"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/hotel_confirmation/hotel_confirmation.flx"
-      name = "hotel_confirmation"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/link_viewer/link_viewer.flx"
-      name = "link_viewer"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/location_details/location_details.flx"
-      name = "location_details"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/map/map.flx"
-      name = "map"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/weather_forecast/weather_forecast.flx"
-      name = "weather_forecast"
-    },
-
-    {
-      source = "weather_agent.dartx"
-      name = "weather_agent"
-    },
-
-    {
-      source = "location_agent.dartx"
-      name = "location_agent"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/travel_info/travel_info.flx"
-      name = "travel_info"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/youtube_related_videos/youtube_related_videos.flx"
-      name = "youtube_related_videos"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/youtube_story/youtube_story.flx"
-      name = "youtube_story"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/youtube_thumbnail/youtube_thumbnail.flx"
-      name = "youtube_thumbnail"
-    },
-
-    {
-      source = "gen/apps/modules/common/modules/youtube_video/youtube_video.flx"
-      name = "youtube_video"
-    },
-  ]
-
   resources = [ {
         path = rebase_path(modules_override_config)
         dest = "modules/config.json"
@@ -113,6 +29,5 @@ package("modules_tests") {
     "//apps/modules/common/packages/fixtures:test",
     "//apps/modules/common/packages/models:test",
     "//apps/modules/common/packages/util:test",
-    "//apps/modules/common/packages/widgets:test",
   ]
 }
