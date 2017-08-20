@@ -62,6 +62,9 @@ group("webkit") {
 }
 
 if (use_prebuilt_webkit) {
+  assert(current_toolchain_variant == "",
+         "Set use_prebuilt_webkit=false when selecting variants for web_view.")
+
   if (target_cpu == "x64") {
     webkit_arch = "x86_64"
   } else if (target_cpu == "arm64") {
