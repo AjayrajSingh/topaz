@@ -15,17 +15,8 @@ executable("web_view_bin") {
     "main.cpp",
   ]
 
-  if (use_prebuilt_webkit) {
-    public_deps = [
-      ":prebuilt_webkit",
-    ]
-  } else {
-    public_deps = [
-      "//third_party/webkit",
-    ]
-  }
-
   deps = [
+    ":webkit",
     "//application/lib/app",
     "//apps/icu_data/lib",
     "//apps/modular/lib/rapidjson",
@@ -44,10 +35,12 @@ executable("web_view_bin") {
   ldflags = [ "-Wl,-z,stack-size=1048576" ]
 }
 
-if (use_prebuilt_webkit) {
-  group("prebuilt_webkit") {
-    public_deps = [
-      ":copy_prebuilt_webkit_so",
+group("webkit") {
+  visibility = [ ":*" ]
+
+  if (use_prebuilt_webkit) {
+    public_configs = [ ":prebuilt_webkit_config" ]
+    deps = [
       "//third_party/boringssl:ssl",
       "//third_party/cairo",
       "//third_party/curl:libcurl",
@@ -61,47 +54,58 @@ if (use_prebuilt_webkit) {
       "//third_party/sqlite",
       "//third_party/zlib",
     ]
-
-    public_configs = [ ":prebuilt_webkit_config" ]
-  }
-
-  copy("copy_prebuilt_webkit_so") {
-    if (target_cpu == "x64") {
-      arch = "x86_64"
-    } else if (target_cpu == "arm64") {
-      arch = "aarch64"
-    } else {
-      assert(false, "Target architecture not supported")
-    }
-    sources = [
-      "prebuilt/$arch/libwebkit.so",
-    ]
-    outputs = [
-      "$root_out_dir/x64-shared/libwebkit.so",
+  } else {
+    public_deps = [
+      "//third_party/webkit",
     ]
   }
+}
+
+if (use_prebuilt_webkit) {
+  if (target_cpu == "x64") {
+    webkit_arch = "x86_64"
+  } else if (target_cpu == "arm64") {
+    webkit_arch = "aarch64"
+  } else {
+    assert(false, "Target architecture not supported")
+  }
+  prebuilt_webkit = "prebuilt/${webkit_arch}/libwebkit.so"
 
   config("prebuilt_webkit_config") {
     include_dirs = [ "//third_party/webkit/Source/WebKit/fuchsia" ]
-    ldflags = rebase_path(get_target_outputs(":copy_prebuilt_webkit_so"),
-                          root_out_dir)
+    libs = [ prebuilt_webkit ]
+  }
+
+  if (current_toolchain == shlib_toolchain) {
+    # This is needed to get the prebuilt into the place that package.gni
+    # wants to find it.
+    copy("copy_prebuilt_webkit") {
+      sources = [
+        prebuilt_webkit,
+      ]
+      outputs = [
+        "$root_out_dir/libwebkit.so",
+      ]
+    }
   }
 }
 
 package("web_view") {
   deps = [
     ":web_view_bin",
+    ":webkit",
   ]
+  if (use_prebuilt_webkit) {
+    deps += [ ":copy_prebuilt_webkit($shlib_toolchain)" ]
+  }
 
   binaries = [ {
         name = "web_view"
       } ]
 
-  if (target_cpu == "x64") {
-    libraries = [ {
-          name = "libwebkit.so"
-        } ]
-  }
+  libraries = [ {
+        name = "libwebkit.so"
+      } ]
 
   resources = [ {
         path = rebase_path("//apps/fonts/third_party/roboto/Roboto-Regular.ttf")
@@ -115,26 +119,24 @@ executable("web_view_test") {
   ]
 
   deps = [
-    ":web_view_bin",
+    ":webkit",
   ]
-
-  if (use_prebuilt_webkit) {
-    public_deps = [
-      ":prebuilt_webkit",
-    ]
-  } else {
-    public_deps = [
-      "//third_party/webkit",
-    ]
-  }
 }
 
 package("web_view_test_package") {
   deps = [
     ":web_view_test",
+    ":webkit",
   ]
+  if (use_prebuilt_webkit) {
+    deps += [ ":copy_prebuilt_webkit($shlib_toolchain)" ]
+  }
 
   binaries = [ {
         name = "web_view_test"
+      } ]
+
+  libraries = [ {
+        name = "libwebkit.so"
       } ]
 }
