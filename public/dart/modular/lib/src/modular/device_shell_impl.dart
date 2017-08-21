@@ -54,14 +54,13 @@ class DeviceShellImpl extends DeviceShell {
   }
 
   @override
-  void terminate(void done()) {
+  void terminate() {
     onStop?.call();
     _userProviderProxy.ctrl.close();
     _deviceShellContextProxy.ctrl.close();
     _bindingSet.forEach(
       (AuthenticationContextBinding binding) => binding.close(),
     );
-    done();
   }
 
   @override

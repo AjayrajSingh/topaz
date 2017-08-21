@@ -146,7 +146,7 @@ class UserShellImpl extends UserShell {
   }
 
   @override
-  void terminate(void done()) {
+  void terminate() {
     onStopping?.call();
     _linkWatcherBinding?.close();
     _linkProxy.ctrl.close();
@@ -159,7 +159,6 @@ class UserShellImpl extends UserShell {
     _contextReaderProxy.ctrl.close();
     _contextPublisherProxy.ctrl.close();
     _proposalPublisherProxy.ctrl.close();
-    done();
     onStop?.call();
   }
 }
