@@ -27,6 +27,9 @@ abstract class SuggestionModel extends Model {
   /// Sets the asking state to [asking].
   set asking(bool asking);
 
+  /// Gets the asking state.
+  bool get asking;
+
   /// Updates the [suggestions] based on the currently focused storyCluster].  If no
   /// story is in focus, [storyCluster] should be null.
   void storyClusterFocusChanged(StoryCluster storyCluster);

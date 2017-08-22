@@ -121,10 +121,25 @@ class ConductorState extends State<Conductor> {
       new GlobalKey<ArmadilloOverlayState>();
 
   final FocusScopeNode _conductorFocusNode = new FocusScopeNode();
+  final FocusNode _askFocusNode = new FocusNode();
 
   bool _ignoreNextScrollOffsetChange = false;
 
   Timer _storyFocusTimer;
+
+  @override
+  Widget build(BuildContext context) => new Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (_) {
+          // TODO: remove this hack when Mozart focus is fixed (MZ-118)
+          // HACK: Due to a mozart focus issue we need to focus when the mozart
+          // window this widget is in is first tapped.
+          if (!_askFocusNode.hasFocus) {
+            _conductorFocusNode.requestFocus(_askFocusNode);
+          }
+        },
+        child: _buildParts(context),
+      );
 
   /// Note in particular the magic we're employing here to make the user
   /// state appear to be a part of the story list:
@@ -132,10 +147,9 @@ class ConductorState extends State<Conductor> {
   /// size of the final user state bar we have the user state appear to be
   /// a part of the story list and yet prevent the story list from painting
   /// behind it.
-  @override
-  Widget build(BuildContext context) => new FocusScope(
-        node: _conductorFocusNode,
+  Widget _buildParts(BuildContext context) => new FocusScope(
         autofocus: true,
+        node: _conductorFocusNode,
         child: new Stack(
           fit: StackFit.passthrough,
           children: <Widget>[
@@ -329,6 +343,7 @@ class ConductorState extends State<Conductor> {
                   _suggestionOverlayKey.currentState.show();
                 },
                 onSuggestionSelected: _onSuggestionSelected,
+                askFocusNode: _askFocusNode,
               ),
             ),
       );
@@ -500,9 +515,11 @@ class ConductorState extends State<Conductor> {
 
   @override
   void dispose() {
-    super.dispose();
+    _askFocusNode.dispose();
+    _conductorFocusNode.detach();
     if (_storyFocusTimer != null && _storyFocusTimer.isActive) {
       _storyFocusTimer.cancel();
     }
+    super.dispose();
   }
 }

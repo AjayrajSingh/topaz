@@ -57,6 +57,9 @@ class SuggestionList extends StatefulWidget {
   /// Called when a suggestion is selected.
   final OnSuggestionSelected onSuggestionSelected;
 
+  /// The [FocusNode] to be used by the ask text field.
+  final FocusNode askFocusNode;
+
   /// Constructor.
   SuggestionList({
     Key key,
@@ -64,6 +67,7 @@ class SuggestionList extends StatefulWidget {
     this.onAskingStarted,
     this.onAskingEnded,
     this.onSuggestionSelected,
+    this.askFocusNode,
   })
       : super(key: key);
 
@@ -75,8 +79,6 @@ class SuggestionList extends StatefulWidget {
 class SuggestionListState extends State<SuggestionList>
     with TickerProviderStateMixin {
   final TextEditingController _askTextController = new TextEditingController();
-  final FocusNode _askFocusNode = new FocusNode();
-  bool _asking = false;
   Suggestion _selectedSuggestion;
   DateTime _lastBuildTime;
   AnimationController _fadeInAnimation;
@@ -85,6 +87,7 @@ class SuggestionListState extends State<SuggestionList>
   @override
   void initState() {
     super.initState();
+
     _fadeInAnimation = new AnimationController(
       vsync: this,
       value: 0.0,
@@ -94,17 +97,16 @@ class SuggestionListState extends State<SuggestionList>
       parent: _fadeInAnimation,
       curve: Curves.fastOutSlowIn,
     );
-    _askFocusNode.addListener(() {
-      if (_askFocusNode.hasFocus) {
-        if (_asking == false) {
-          setState(() {
-            _asking = true;
-          });
-          SuggestionModel.of(context).asking = _asking;
-          widget.onAskingStarted?.call();
-        }
+    _askTextController.addListener(() {
+      if (_askTextController.text.isNotEmpty) {
+        _startAsking();
       }
     });
+  }
+
+  void _startAsking() {
+    SuggestionModel.of(context).asking = true;
+    widget.onAskingStarted?.call();
   }
 
   /// Clears the ask text.
@@ -123,16 +125,9 @@ class SuggestionListState extends State<SuggestionList>
 
   /// Stops asking and clears the the ask text.
   void stopAsking() {
-    _askFocusNode.unfocus();
     _clear();
-    if (!_asking) {
-      return;
-    }
-    setState(() {
-      _asking = false;
-      SuggestionModel.of(context).asking = _asking;
-      widget.onAskingEnded?.call();
-    });
+    SuggestionModel.of(context).asking = false;
+    widget.onAskingEnded?.call();
   }
 
   /// Selects the first suggestion in the list as if it had been tapped.
@@ -229,42 +224,60 @@ class SuggestionListState extends State<SuggestionList>
   Widget _buildAsk(BuildContext context) => new GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          FocusScope.of(context).requestFocus(_askFocusNode);
+          _startAsking();
         },
         child: new Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            new Image.asset(
-              _askFocusNode.hasFocus ? _kLogoSmall : _kLogoLarge,
-              height: 24.0,
-              fit: BoxFit.fitHeight,
+            new ScopedModelDescendant<SuggestionModel>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                SuggestionModel suggestionModel,
+              ) =>
+                  new Image.asset(
+                    suggestionModel.asking ? _kLogoSmall : _kLogoLarge,
+                    height: 24.0,
+                    fit: BoxFit.fitHeight,
+                  ),
             ),
             new Container(width: 16.0),
             // Ask Anything text field.
             new Expanded(
-              child: new Material(
-                color: Colors.transparent,
-                child: new TextField(
-                  decoration: new InputDecoration(hideDivider: true),
-                  style: new TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.grey[600],
+              child: new ScopedModelDescendant<SuggestionModel>(
+                builder: (
+                  BuildContext context,
+                  Widget child,
+                  SuggestionModel suggestionModel,
+                ) =>
+                    new Offstage(
+                      offstage: !suggestionModel.asking,
+                      child: child,
+                    ),
+                child: new Material(
+                  color: Colors.transparent,
+                  child: new TextField(
+                    decoration: new InputDecoration(hideDivider: true),
+                    style: new TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.grey[600],
+                    ),
+                    focusNode: widget.askFocusNode,
+                    controller: _askTextController,
+                    onChanged: (String text) {
+                      SuggestionModel.of(context).askText = text;
+                    },
+                    onSubmitted: (String text) {
+                      // Select the first suggestion on text commit (ie.
+                      // Pressing enter or tapping 'Go').
+                      List<Suggestion> suggestions =
+                          SuggestionModel.of(context).suggestions;
+                      if (suggestions.isNotEmpty) {
+                        _onSuggestionSelected(suggestions.first);
+                      }
+                    },
                   ),
-                  focusNode: _askFocusNode,
-                  controller: _askTextController,
-                  onChanged: (String text) {
-                    SuggestionModel.of(context).askText = text;
-                  },
-                  onSubmitted: (String text) {
-                    // Select the first suggestion on text commit (ie.
-                    // Pressing enter or tapping 'Go').
-                    List<Suggestion> suggestions =
-                        SuggestionModel.of(context).suggestions;
-                    if (suggestions.isNotEmpty) {
-                      _onSuggestionSelected(suggestions.first);
-                    }
-                  },
                 ),
               ),
             ),

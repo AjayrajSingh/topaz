@@ -406,6 +406,9 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   }
 
   @override
+  bool get asking => _asking;
+
+  @override
   void storyClusterFocusChanged(StoryCluster storyCluster) {
     _lastFocusedStoryCluster?.removeStoryListListener(_onStoryListChanged);
     storyCluster?.addStoryListListener(_onStoryListChanged);
