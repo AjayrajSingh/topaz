@@ -13,7 +13,7 @@ dart_package("util") {
     "//third_party/dart-pkg/pub/intl",
   ]
 
-  analysis_options = "//apps/modules/common/.analysis_options"
+  analysis_options = "//apps/modules/common/analysis_options.yaml"
 }
 
 dart_test("test") {
@@ -23,5 +23,5 @@ dart_test("test") {
     "//third_party/dart-pkg/pub/test",
   ]
 
-  analysis_options = "//apps/modules/common/.analysis_options"
+  analysis_options = "//apps/modules/common/analysis_options.yaml"
 }

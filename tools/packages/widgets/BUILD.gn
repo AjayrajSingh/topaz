@@ -13,5 +13,5 @@ dart_package("widgets") {
     "//lib/widgets/packages/logging:lib.logging",
   ]
 
-  analysis_options = "//apps/modules/common/.analysis_options"
+  analysis_options = "//apps/modules/common/analysis_options.yaml"
 }

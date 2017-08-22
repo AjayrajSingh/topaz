@@ -58,7 +58,7 @@ dart_tools_packages := $(realpath $(shell find $(tools_root) $(ignore_flags) -na
 # find all dart packages defined in BUILD.gn
 dart_gn_packages := $(realpath $(shell grep -Rwl . --include="*.gn" -e "^\(flutter_app\|dart_package\|dart_app\)" | xargs -n1 dirname | sort -u))
 dart_all_packages := $(sort $(dart_packages) $(dart_tools_packages) $(dart_gn_packages))
-dart_analysis_options := $(addsuffix /.analysis_options, $(dart_all_packages))
+dart_analysis_options := $(addsuffix /analysis_options.yaml, $(dart_all_packages))
 
 gn_sources := $(shell $(sfind) -name "*.gn")
 
@@ -178,9 +178,9 @@ lint: copyright-check dart-lint dart-fmt-check gn-fmt-check ## Lint the code.
 %/.packages: %/pubspec.yaml
 	@cd $* && flutter packages get
 
-# Each dart package needs the .analysis_options file so that the IDE can run the
-# live analysis with the correct options.
-$(dart_analysis_options): $(fuchsia_root)/apps/modules/common/.analysis_options
+# Each dart package needs the analysis_options.yaml file so that the IDE can run
+# the live analysis with the correct options.
+$(dart_analysis_options): $(fuchsia_root)/apps/modules/common/analysis_options.yaml
 	cp $< $@
 
 .PHONY: $(dart_bin)
@@ -194,7 +194,7 @@ dart-clean:
 	@# it as well.
 	@for pkg in $(dart_all_packages); do \
 		pushd $${pkg} > /dev/null; \
-		rm -rf .packages packages .pub build coverage .analysis_options; \
+		rm -rf .packages packages .pub build coverage .analysis_options analysis_options.yaml; \
 		git ls-files pubspec.lock --error-unmatch &> /dev/null; \
 		if [ $$? -ne 0 ]; then \
 			rm -f pubspec.lock; \

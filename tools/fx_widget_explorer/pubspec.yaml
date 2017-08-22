@@ -26,8 +26,6 @@ dependencies:
     path: ../widget_explorer/packages/widget_explorer_core
   widget_explorer_widgets:
     path: ../widget_explorer/packages/widget_explorer_widgets
-  youtube_api:
-    path: ../packages/youtube_api
 flutter:
   uses-material-design: true
   assets:

@@ -1,6 +1,10 @@
-# The .analysis_options file at the repository root is the source of truth, and
-# the other .analysis_options files under dart packages directories are mere
-# copies of it.
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# The analysis_options.yaml file at the repository root is the source of truth,
+# and the other analysis_options.yaml files under dart packages directories are
+# mere copies of it.
 #
 # The copy happens when you run "make" from the command line.
 analyzer:
