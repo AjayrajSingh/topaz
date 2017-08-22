@@ -13,5 +13,5 @@ dart_package("concert_api") {
     "//apps/modules/music/packages/concert_models",
   ]
 
-  analysis_options = "//apps/modules/common/.analysis_options"
+  analysis_options = "//apps/modules/common/analysis_options.yaml"
 }

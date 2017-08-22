@@ -17,5 +17,5 @@ dart_app("music_playback_agent") {
     "//lib/widgets/packages/logging:lib.logging",
   ]
 
-  analysis_options = "//apps/modules/common/.analysis_options"
+  analysis_options = "//apps/modules/common/analysis_options.yaml"
 }

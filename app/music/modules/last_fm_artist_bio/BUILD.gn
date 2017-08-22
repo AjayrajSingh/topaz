@@ -29,5 +29,5 @@ flutter_app("last_fm_artist_bio") {
     "//lib/widgets/packages/widgets:lib.widgets",
   ]
 
-  analysis_options = "//apps/modules/common/.analysis_options"
+  analysis_options = "//apps/modules/common/analysis_options.yaml"
 }

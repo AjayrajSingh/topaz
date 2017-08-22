@@ -32,7 +32,7 @@ flutter_app("music_artist") {
     "//third_party/dart-pkg/pub/intl",
   ]
 
-  analysis_options = "//apps/modules/common/.analysis_options"
+  analysis_options = "//apps/modules/common/analysis_options.yaml"
 }
 
 fuchsia_component("music_artist_component") {

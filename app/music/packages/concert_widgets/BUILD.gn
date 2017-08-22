@@ -15,5 +15,5 @@ dart_package("concert_widgets") {
     "//third_party/dart-pkg/pub/intl",
   ]
 
-  analysis_options = "//apps/modules/common/.analysis_options"
+  analysis_options = "//apps/modules/common/analysis_options.yaml"
 }
