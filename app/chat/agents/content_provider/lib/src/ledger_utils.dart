@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert' show JSON, UTF8;
 import 'dart:math' show Random;
-import 'dart:typed_data' show ByteData, Uint8List;
+import 'dart:typed_data' show Uint8List;
 
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
 import 'package:collection/collection.dart';
