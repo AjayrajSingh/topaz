@@ -23,5 +23,5 @@ dart_app("chat_content_provider_test") {
     "//third_party/dart-pkg/pub/test",
   ]
 
-  analysis_options = "//apps/modules/common/.analysis_options"
+  analysis_options = "//apps/modules/common/analysis_options.yaml"
 }
