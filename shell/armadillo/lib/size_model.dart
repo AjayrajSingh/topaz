@@ -4,11 +4,13 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:meta/meta.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
 import 'suggestion_list.dart';
+import 'user_shell_mode_model.dart';
 
 /// The various device form factors
 enum FormFactor {
@@ -54,6 +56,12 @@ const Map<FormFactor, double> _kSuggestionPeekHeight =
 /// The [SizeModel] allows these values to be passed down the widget tree by
 /// using a [ScopedModel] to retrieve the model.
 class SizeModel extends Model {
+  /// Constructor
+  SizeModel({@required UserShellModeModel userShellModeModel})
+      : _userShellModeModel = userShellModeModel {
+    assert(userShellModeModel != null);
+  }
+
   /// The height of the story bar when maximized.
   static const double kStoryBarMaximizedHeight = 24.0;
 
@@ -65,6 +73,7 @@ class SizeModel extends Model {
   double _suggestionWidth;
   double _interruptionLeftMargin;
   FormFactor _formFactor = FormFactor.tablet;
+  final UserShellModeModel _userShellModeModel;
 
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
@@ -140,7 +149,13 @@ class SizeModel extends Model {
       _kMaximizedNowHeightOffset + suggestionPeekHeight;
 
   /// The width of the suggestion list.
-  double get suggestionListWidth => _suggestionListWidth;
+  ///
+  /// This will be the width of the entire screen when the user shell is in
+  /// ambiet or idle mode
+  double get suggestionListWidth =>
+      _userShellModeModel.mode == UserShellMode.normal
+          ? _suggestionListWidth
+          : _screenSize.width;
 
   /// The width of a suggestion.
   double get suggestionWidth => _suggestionWidth;
@@ -155,6 +170,25 @@ class SizeModel extends Model {
 
   /// Peek height of the suggestion list
   double get suggestionPeekHeight => _kSuggestionPeekHeight[_formFactor];
+
+  /// Height of the suggestion list when it is expanded
+  ///
+  /// This will be the height of the entire screen when the user shell is in
+  /// ambient or idle mode
+  double get suggestionExpandedHeight {
+    if (_userShellModeModel.mode == UserShellMode.normal) {
+      return screenSize.height * 0.8;
+    } else {
+      return screenSize.height;
+    }
+  }
+
+  /// Whether the suggestion list should be expanded regardless of user
+  /// interaction.
+  ///
+  /// The suggestion list will always be exapnded in ambient for idle mode
+  bool get autoExpandSuggestion =>
+      _userShellModeModel.mode != UserShellMode.normal;
 
   /// The top padding of the story list
   double get storyListTopPadding => screenSize.height / 8.0;

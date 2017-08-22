@@ -11,6 +11,7 @@ import 'package:sysui_widgets/ticking_height_state.dart';
 
 import 'peek_model.dart';
 import 'size_model.dart';
+import 'user_shell_mode_model.dart';
 
 const double _kStartOverlayTransitionHeight = 28.0;
 
@@ -162,48 +163,53 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
               bottom: 0.0,
               height: height,
               child: new ScopedModelDescendant<SizeModel>(
-                  builder: (
-                    BuildContext context,
-                    Widget child,
-                    SizeModel sizeModel,
-                  ) {
-                    // Set maxHeight appropriately.
-                    double targetMaxHeight = 0.8 * sizeModel.screenSize.height;
-                    if (maxHeight != targetMaxHeight &&
-                        targetMaxHeight != 0.0) {
-                      maxHeight = targetMaxHeight;
-                      if (!hiding) {
-                        show();
-                      }
+                builder: (
+                  BuildContext context,
+                  Widget child,
+                  SizeModel sizeModel,
+                ) {
+                  // Set maxHeight appropriately. The overlay will take up
+                  // the entire size of the screen if the user shell is in
+                  // ambient or idle mode.
+                  double targetMaxHeight = sizeModel.suggestionExpandedHeight;
+                  if (maxHeight != targetMaxHeight && targetMaxHeight != 0.0) {
+                    maxHeight = targetMaxHeight;
+                    if (!hiding || sizeModel.autoExpandSuggestion) {
+                      show();
                     }
+                  }
 
-                    return new OverflowBox(
-                      minWidth: sizeModel.suggestionListWidth,
-                      maxWidth: sizeModel.suggestionListWidth,
-                      minHeight: math.max(height, maxHeight),
-                      maxHeight: math.max(height, maxHeight),
-                      alignment: FractionalOffset.topCenter,
-                      child: child,
-                    );
-                  },
-                  child: new Stack(
-                    fit: StackFit.passthrough,
-                    children: <Widget>[
-                      widget.child,
-                      new Positioned(
-                        top: 0.0,
-                        left: 0.0,
-                        right: 0.0,
-                        height: hiding
-                            ? widget.peekHeight
-                            : widget.dragHandleHeight,
-                        child: new GestureDetector(
-                          onVerticalDragUpdate: onVerticalDragUpdate,
-                          onVerticalDragEnd: onVerticalDragEnd,
-                        ),
+                  /// TODO(dayang): Animate the change of the suggestion
+                  /// list width.
+                  ///
+                  /// SY-310
+                  return new OverflowBox(
+                    minWidth: sizeModel.suggestionListWidth,
+                    maxWidth: sizeModel.suggestionListWidth,
+                    minHeight: math.max(height, maxHeight),
+                    maxHeight: math.max(height, maxHeight),
+                    alignment: FractionalOffset.topCenter,
+                    child: child,
+                  );
+                },
+                child: new Stack(
+                  fit: StackFit.passthrough,
+                  children: <Widget>[
+                    widget.child,
+                    new Positioned(
+                      top: 0.0,
+                      left: 0.0,
+                      right: 0.0,
+                      height:
+                          hiding ? widget.peekHeight : widget.dragHandleHeight,
+                      child: new GestureDetector(
+                        onVerticalDragUpdate: onVerticalDragUpdate,
+                        onVerticalDragEnd: onVerticalDragEnd,
                       ),
-                    ],
-                  )),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

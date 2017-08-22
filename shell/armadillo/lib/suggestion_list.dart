@@ -15,6 +15,7 @@ import 'suggestion.dart';
 import 'suggestion_layout.dart';
 import 'suggestion_model.dart';
 import 'suggestion_widget.dart';
+import 'user_shell_mode_model.dart';
 
 const String _kLogoSmall = 'packages/armadillo/res/logo_googleg_24dpx4.png';
 const String _kLogoLarge =
@@ -225,6 +226,18 @@ class SuggestionListState extends State<SuggestionList>
         behavior: HitTestBehavior.opaque,
         onTap: () {
           _startAsking();
+        },
+        // TODO(dayang): Have a better way of toggling ambient mode.
+        //
+        // SY-311
+        onDoubleTap: () {
+          UserShellModeModel userShellModeModel =
+              UserShellModeModel.of(context);
+          if (userShellModeModel.mode == UserShellMode.normal) {
+            userShellModeModel.mode = UserShellMode.ambient;
+          } else {
+            userShellModeModel.mode = UserShellMode.normal;
+          }
         },
         child: new Row(
           crossAxisAlignment: CrossAxisAlignment.center,

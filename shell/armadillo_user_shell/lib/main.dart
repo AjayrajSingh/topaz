@@ -29,6 +29,7 @@ import 'package:armadillo/story_model.dart';
 import 'package:armadillo/story_rearrangement_scrim_model.dart';
 import 'package:armadillo/story_time_randomizer.dart';
 import 'package:armadillo/suggestion_model.dart';
+import 'package:armadillo/user_shell_mode_model.dart';
 import 'package:armadillo/volume_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -211,7 +212,9 @@ Future<Null> main() async {
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();
 
-  SizeModel sizeModel = new SizeModel();
+  UserShellModeModel userShellModeModel = new UserShellModeModel();
+
+  SizeModel sizeModel = new SizeModel(userShellModeModel: userShellModeModel);
   sizeModel.addListener(
     () => storyModel.updateLayouts(
           new Size(
@@ -222,6 +225,8 @@ Future<Null> main() async {
   );
   sizeModel.screenSize = ui.window.physicalSize / ui.window.devicePixelRatio;
 
+  userShellModeModel.addListener(sizeModel.notifyListeners);
+
   Widget app = new ScopedModel<StoryDragTransitionModel>(
     model: storyDragTransitionModel,
     child: _buildApp(
@@ -230,6 +235,10 @@ Future<Null> main() async {
       debugModel: debugModel,
       armadillo: new Armadillo(
         scopedModelBuilders: <WrapperBuilder>[
+          (_, Widget child) => new ScopedModel<UserShellModeModel>(
+                model: userShellModeModel,
+                child: child,
+              ),
           (_, Widget child) => new ScopedModel<PowerModel>(
                 model: powerModel,
                 child: child,
