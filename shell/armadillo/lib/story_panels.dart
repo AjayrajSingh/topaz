@@ -31,6 +31,9 @@ import 'story_positioned.dart';
 
 final Color _kStoryBackgroundColor = Colors.grey[300];
 
+const double _kUnfocusedCornerRadius = 4.0;
+const double _kFocusedCornerRadius = 8.0;
+
 /// Set to true to give the focused tab twice the space as an unfocused tab.
 const bool _kGrowFocusedTab = false;
 
@@ -153,6 +156,8 @@ class StoryPanels extends StatelessWidget {
                     fractionalPadding[1],
                     currentSize,
                     storyDragTransitionModel.progress,
+                    focusProgress,
+                    (storyCluster.focusedStoryId == story.id),
                   ),
             ),
           );
@@ -349,6 +354,8 @@ class StoryPanels extends StatelessWidget {
     double fractionalRightPadding,
     Size currentSize,
     double dragProgress,
+    double focusProgress,
+    bool isFocused,
   ) {
     double storyElevation = _getElevation(dragProgress);
 
@@ -404,7 +411,8 @@ class StoryPanels extends StatelessWidget {
                         focused:
                             (storyCluster.displayMode == DisplayMode.panels) ||
                                 (storyCluster.focusedStoryId == story.id),
-                        elevation: storyElevationWithTabs,
+                        elevation: 0.0,
+                        borderRadius: _getStoryBarBorderRadius(story),
                       ),
                     ),
                   ),
@@ -422,19 +430,53 @@ class StoryPanels extends StatelessWidget {
                           storyCluster.displayMode == DisplayMode.panels)
                       ? lerpDouble(1.03, 1.0, focusProgress)
                       : 0.0,
-                  child: new Container(
+                  child: new PhysicalModel(
                     color: _kStoryBackgroundColor,
-                    child: new PhysicalModel(
-                      color: _kStoryBackgroundColor,
-                      elevation: storyElevationWithTabs,
-                      child: _getStoryContents(context, story),
+                    elevation: storyElevationWithTabs,
+                    borderRadius: new BorderRadius.vertical(
+                      bottom: new Radius.circular(
+                        lerpDouble(
+                          _kUnfocusedCornerRadius,
+                          _kFocusedCornerRadius,
+                          focusProgress,
+                        ),
+                      ),
                     ),
+                    child: _getStoryContents(context, story),
                   ),
                 ),
               ),
             ],
           );
   }
+
+  /// We want to round both story bar corners if the cluster is in panel mode.
+  /// If the cluster is in tab mode we want to round the top left corner if the
+  /// story is the first tab and the top right corner if the story is the last
+  /// tab.
+  BorderRadius _getStoryBarBorderRadius(Story story) => new BorderRadius.only(
+        topLeft: (storyCluster.displayMode != DisplayMode.tabs ||
+                storyCluster.stories[0].id == story.id)
+            ? new Radius.circular(
+                lerpDouble(
+                  _kUnfocusedCornerRadius,
+                  _kFocusedCornerRadius,
+                  focusProgress,
+                ),
+              )
+            : Radius.zero,
+        topRight: (storyCluster.displayMode != DisplayMode.tabs ||
+                storyCluster.stories[storyCluster.stories.length - 1].id ==
+                    story.id)
+            ? new Radius.circular(
+                lerpDouble(
+                  _kUnfocusedCornerRadius,
+                  _kFocusedCornerRadius,
+                  focusProgress,
+                ),
+              )
+            : Radius.zero,
+      );
 
   /// The scaled and clipped story.  When full size, the story will
   /// no longer be scaled or clipped.

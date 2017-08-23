@@ -35,6 +35,9 @@ class StoryBar extends StatefulWidget {
   /// Elevation for the Physical Model that wraps the StoryBar
   final double elevation;
 
+  /// BorderRadius for the Physical Model that wraps the StoryBar
+  final BorderRadius borderRadius;
+
   /// Constructor.
   StoryBar({
     Key key,
@@ -42,6 +45,7 @@ class StoryBar extends StatefulWidget {
     this.focused,
     this.showTitleOnly: _kShowTitleOnly,
     this.elevation,
+    this.borderRadius,
   })
       : super(key: key);
 
@@ -87,6 +91,7 @@ class StoryBarState extends TickingState<StoryBar> {
       : new PhysicalModel(
           color: widget.story.themeColor,
           elevation: widget.elevation,
+          borderRadius: widget.borderRadius,
           child: new Container(
             color: widget.story.themeColor,
             height: _height - _focusedSimulation.value,

@@ -16,8 +16,6 @@ import 'story_panels.dart';
 const double _kUnfocusedStoryMargin = 1.0;
 const double _kStoryMargin = 4.0;
 const double _kStoryMarginWhenResizing = 24.0;
-const double _kUnfocusedCornerRadius = 4.0;
-const double _kFocusedCornerRadius = 8.0;
 
 /// Positions the [child] in a [StoryPanels] within the given [currentSize] with
 /// a [SimulatedFractional] based on [panel], [displayMode], and
@@ -47,9 +45,6 @@ class StoryPositioned extends StatelessWidget {
   /// If key to use for the [SimulatedFractional] containing [child].
   final Key childContainerKey;
 
-  /// If true, the corners of [child] will be rounded with a clip.
-  final bool clip;
-
   /// Constructor.
   StoryPositioned({
     this.storyBarMaximizedHeight,
@@ -59,7 +54,6 @@ class StoryPositioned extends StatelessWidget {
     this.currentSize,
     this.focusProgress,
     this.childContainerKey,
-    this.clip: true,
     this.child,
   }) {
     assert(child != null);
@@ -81,22 +75,7 @@ class StoryPositioned extends StatelessWidget {
               panelResizingModel,
             );
 
-            Widget fractionalChild = !clip
-                ? child
-                : new ClipRRect(
-                    borderRadius: new BorderRadius.vertical(
-                      top: new Radius.circular(lerpDouble(
-                        _kUnfocusedCornerRadius,
-                        _kFocusedCornerRadius,
-                        focusProgress,
-                      )),
-                      bottom: new Radius.circular(lerpDouble(
-                        _kUnfocusedCornerRadius,
-                        isFocused ? _kFocusedCornerRadius : 0.0,
-                        focusProgress,
-                      )),
-                    ),
-                    child: child);
+            Widget fractionalChild = child;
 
             return displayMode == DisplayMode.panels
                 ? new SimulatedFractional(

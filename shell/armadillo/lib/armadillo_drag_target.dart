@@ -155,6 +155,7 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
             (_dragAvatarKey.currentState?.isDone ?? true);
     return new Listener(
       key: _nonDraggedChildKey,
+      behavior: HitTestBehavior.translucent,
       onPointerDown: _routePointer,
       child: showChild ? widget.child : widget.childWhenDragging,
     );
