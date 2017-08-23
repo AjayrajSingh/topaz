@@ -20,17 +20,11 @@ class PlaceHolderStory extends Story {
   /// The [StoryId] of the [Story] this place holder replacing.
   final StoryId associatedStoryId;
 
-  /// True if the [Widget] representing this [Story] should be invisible.
-  final bool transparent;
-
   /// Constructor.
-  PlaceHolderStory({this.associatedStoryId, bool transparent: false})
-      : this.transparent = transparent,
-        super(
+  PlaceHolderStory({this.associatedStoryId})
+      : super(
           id: new StoryId('PlaceHolder $associatedStoryId'),
-          builder: (_) => transparent
-              ? Nothing.widget
-              : new Container(color: _kBackgroundColor),
+          builder: (_) => Nothing.widget,
         );
 
   @override

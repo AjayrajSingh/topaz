@@ -392,7 +392,7 @@ class StoryCluster {
   /// with a single place holder story.
   void becomePlaceholder() {
     _stories.clear();
-    _stories.add(new PlaceHolderStory(transparent: true));
+    _stories.add(new PlaceHolderStory());
     _notifyStoryListListeners();
   }
 

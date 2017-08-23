@@ -29,9 +29,6 @@ import 'story_full_size_simulated_sized_box.dart';
 import 'story_model.dart';
 import 'story_positioned.dart';
 
-const double _kUnfocusedCornerRadius = 4.0;
-const double _kFocusedCornerRadius = 8.0;
-
 final Color _kStoryBackgroundColor = Colors.grey[300];
 
 /// Set to true to give the focused tab twice the space as an unfocused tab.
@@ -228,7 +225,6 @@ class StoryPanels extends StatelessWidget {
                       feedbackCluster.add(
                         story: new PlaceHolderStory(
                           associatedStoryId: storyId,
-                          transparent: true,
                         ),
                         withPanel: storyPanelsOnDrag[storyId],
                       );
@@ -366,14 +362,7 @@ class StoryPanels extends StatelessWidget {
     }
 
     return story.isPlaceHolder
-        ? isBeingDragged
-            ? Nothing.widget
-            : new PhysicalModel(
-                // Placeholder elevation should not take tab focus into account
-                elevation: storyElevation,
-                color: Colors.black,
-                child: story.builder(context),
-              )
+        ? Nothing.widget
         : new Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[

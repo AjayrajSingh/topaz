@@ -20,9 +20,6 @@ import 'story_cluster_widget.dart';
 import 'story_list_layout.dart';
 import 'story_panels.dart';
 
-const double _kUnfocusedCornerRadius = 4.0;
-const double _kFocusedCornerRadius = 8.0;
-
 /// Displays a representation of a StoryCluster while being dragged.
 class StoryClusterDragFeedback extends StatefulWidget {
   /// The cluster being dragged.

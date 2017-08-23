@@ -526,7 +526,6 @@ class PanelEventHandler {
           story: previews[story.id] ??
               new PlaceHolderStory(
                 associatedStoryId: story.id,
-                transparent: true,
               ),
           withPanel: story.panel,
           atIndex: 0,
