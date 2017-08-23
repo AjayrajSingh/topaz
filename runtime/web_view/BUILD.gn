@@ -94,25 +94,32 @@ if (use_prebuilt_webkit) {
 }
 
 package("web_view") {
+  app = true
+
   deps = [
     ":web_view_bin",
+  ]
+
+  binaries = [ {
+        name = "web_view"
+      } ]
+
+  resources = [ {
+        path = rebase_path("//apps/fonts/third_party/roboto/Roboto-Regular.ttf")
+        dest = "webkit/Roboto-Regular.ttf"
+      } ]
+}
+
+package("libwebkit") {
+  deps = [
     ":webkit",
   ]
   if (use_prebuilt_webkit) {
     deps += [ ":copy_prebuilt_webkit($shlib_toolchain)" ]
   }
 
-  binaries = [ {
-        name = "web_view"
-      } ]
-
   libraries = [ {
         name = "libwebkit.so"
-      } ]
-
-  resources = [ {
-        path = rebase_path("//apps/fonts/third_party/roboto/Roboto-Regular.ttf")
-        dest = "webkit/Roboto-Regular.ttf"
       } ]
 }
 
@@ -129,17 +136,8 @@ executable("web_view_test") {
 package("web_view_test_package") {
   deps = [
     ":web_view_test",
-    ":webkit",
   ]
-  if (use_prebuilt_webkit) {
-    deps += [ ":copy_prebuilt_webkit($shlib_toolchain)" ]
-  }
-
   binaries = [ {
         name = "web_view_test"
-      } ]
-
-  libraries = [ {
-        name = "libwebkit.so"
       } ]
 }
