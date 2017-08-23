@@ -7,5 +7,10 @@ import 'package:flutter/widgets.dart';
 import 'root.dart';
 
 void main() {
-  runApp(new RootWidget());
+  runApp(
+    new Directionality(
+      textDirection: TextDirection.ltr,
+      child: new RootWidget(),
+    ),
+  );
 }

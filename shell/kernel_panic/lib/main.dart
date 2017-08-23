@@ -10,7 +10,12 @@ import 'package:flutter/widgets.dart';
 import 'kernel_panic.dart';
 
 Future<Null> main() async {
-  runApp(new _KernelPanicReader());
+  runApp(
+    new Directionality(
+      textDirection: TextDirection.ltr,
+      child: new _KernelPanicReader(),
+    ),
+  );
 }
 
 class _KernelPanicReader extends StatefulWidget {
