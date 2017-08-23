@@ -322,6 +322,9 @@ class StoryPanels extends StatelessWidget {
                 StoryClusterDragStateModel.of(context).removeDragging(
                       story.clusterId,
                     ),
+            onDismiss: () => StoryModel.of(context).remove(
+                  StoryModel.of(context).getStoryCluster(story.clusterId),
+                ),
             childWhenDragging: Nothing.widget,
             feedbackBuilder: (
               Offset localDragStartPoint,

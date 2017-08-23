@@ -9,7 +9,6 @@ import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.media.lib.dart/audio_policy.dart';
 import 'package:apps.power-service.services/power_manager.fidl.dart';
 import 'package:armadillo/armadillo.dart';
-import 'package:armadillo/armadillo_drag_target.dart';
 import 'package:armadillo/conductor.dart';
 import 'package:armadillo/context_model.dart';
 import 'package:armadillo/debug_enabler.dart';
@@ -20,8 +19,6 @@ import 'package:armadillo/peek_model.dart';
 import 'package:armadillo/power_model.dart';
 import 'package:armadillo/quick_settings_progress_model.dart';
 import 'package:armadillo/size_model.dart';
-import 'package:armadillo/story_cluster.dart';
-import 'package:armadillo/story_cluster_drag_data.dart';
 import 'package:armadillo/story_cluster_drag_state_model.dart';
 import 'package:armadillo/story.dart';
 import 'package:armadillo/story_drag_transition_model.dart';
@@ -33,7 +30,6 @@ import 'package:armadillo/user_shell_mode_model.dart';
 import 'package:armadillo/volume_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:lib.widgets/widgets.dart';
@@ -328,42 +324,9 @@ Widget _buildApp({
         debugModel: debugModel,
         child: new DefaultAssetBundle(
           bundle: defaultBundle,
-          child: new Stack(
-            fit: StackFit.passthrough,
-            children: <Widget>[
-              new ScopedModel<HitTestModel>(
-                model: hitTestModel,
-                child: armadillo,
-              ),
-              new Positioned(
-                left: 0.0,
-                top: 0.0,
-                bottom: 0.0,
-                width: 108.0,
-                child: _buildDiscardDragTarget(
-                  storyModel: storyModel,
-                  storyProviderStoryGenerator: storyProviderStoryGenerator,
-                  controller: new AnimationController(
-                    vsync: new _TickerProvider(),
-                    duration: const Duration(milliseconds: 200),
-                  ),
-                ),
-              ),
-              new Positioned(
-                right: 0.0,
-                top: 0.0,
-                bottom: 0.0,
-                width: 108.0,
-                child: _buildDiscardDragTarget(
-                  storyModel: storyModel,
-                  storyProviderStoryGenerator: storyProviderStoryGenerator,
-                  controller: new AnimationController(
-                    vsync: new _TickerProvider(),
-                    duration: const Duration(milliseconds: 200),
-                  ),
-                ),
-              ),
-            ],
+          child: new ScopedModel<HitTestModel>(
+            model: hitTestModel,
+            child: armadillo,
           ),
         ),
       ),
@@ -388,81 +351,3 @@ Widget _buildPerformanceOverlay({Widget child}) => new Stack(
         ),
       ],
     );
-
-Widget _buildDiscardDragTarget({
-  StoryModel storyModel,
-  StoryProviderStoryGenerator storyProviderStoryGenerator,
-  AnimationController controller,
-}) {
-  CurvedAnimation curve = new CurvedAnimation(
-    parent: controller,
-    curve: Curves.fastOutSlowIn,
-    reverseCurve: Curves.fastOutSlowIn,
-  );
-  bool wasEmpty = true;
-  return new ArmadilloDragTarget<StoryClusterDragData>(
-    onWillAccept: (_, __) => storyModel.storyClusters.every(
-        (StoryCluster storyCluster) =>
-            storyCluster.focusSimulationKey.currentState.progress == 0.0),
-    onAccept: (StoryClusterDragData data, _, __) =>
-        storyProviderStoryGenerator.removeStoryCluster(
-          data.id,
-        ),
-    builder: (_, Map<StoryClusterDragData, Offset> candidateData, __) {
-      if (candidateData.isEmpty && !wasEmpty) {
-        controller.reverse();
-      } else if (candidateData.isNotEmpty && wasEmpty) {
-        controller.forward();
-      }
-      wasEmpty = candidateData.isEmpty;
-
-      return new IgnorePointer(
-        child: new ScopedModelDescendant<StoryDragTransitionModel>(
-          builder: (
-            BuildContext context,
-            Widget child,
-            StoryDragTransitionModel model,
-          ) =>
-              new Opacity(
-                opacity: model.progress,
-                child: child,
-              ),
-          child: new Container(
-            color: Colors.black38,
-            child: new Center(
-              child: new ScaleTransition(
-                scale: new Tween<double>(begin: 1.0, end: 1.4).animate(curve),
-                child: new Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    new Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                      size: 24.0,
-                    ),
-                    new Container(height: 8.0),
-                    new Text(
-                      'REMOVE',
-                      style: new TextStyle(
-                        fontSize: 10.0,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 1.2,
-                        color: Colors.white,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    },
-  );
-}
-
-class _TickerProvider extends TickerProvider {
-  @override
-  Ticker createTicker(TickerCallback onTick) => new Ticker(onTick);
-}

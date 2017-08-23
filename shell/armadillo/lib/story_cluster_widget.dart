@@ -24,6 +24,7 @@ import 'story_cluster_drag_state_model.dart';
 import 'story_cluster_panels_model.dart';
 import 'story_drag_transition_model.dart';
 import 'story_list.dart';
+import 'story_model.dart';
 import 'story_panels.dart';
 import 'story_rearrangement_scrim_model.dart';
 import 'story_title.dart';
@@ -115,6 +116,9 @@ class StoryClusterWidget extends StatelessWidget {
                 StoryClusterDragStateModel.of(context).removeDragging(
                       storyCluster.id,
                     ),
+            onDismiss: () => StoryModel.of(context).remove(
+                  StoryModel.of(context).getStoryCluster(storyCluster.id),
+                ),
             feedbackBuilder: (
               Offset localDragStartPoint,
               Rect initialBoundsOnDrag,

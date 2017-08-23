@@ -17,6 +17,11 @@ import 'armadillo_overlay.dart';
 /// The time to wait before triggering a long press.
 const Duration _kLongPressTimeout = const Duration(milliseconds: 300);
 
+/// Exceeding this speed horizontally or vertically will not trigger acceptance
+/// of a draggable in a drag target.
+/// Pixels per second.
+const double _kMaxAcceptanceSpeed = 1000.0;
+
 /// Much of this code is borrowed from the Flutter framework's inplementation
 /// of [Draggable] and [DragTarget].  What is different about this
 /// implementation is the addition of each piece of data having an associated
@@ -89,6 +94,7 @@ class ArmadilloLongPressDraggable<T> extends StatefulWidget {
     this.childWhenDragging,
     this.onDragStarted,
     this.onDragEnded,
+    this.onDismiss,
   })
       : super(key: key) {
     assert(overlayKey != null);
@@ -118,6 +124,9 @@ class ArmadilloLongPressDraggable<T> extends StatefulWidget {
 
   /// Called when a drag ends.
   final VoidCallback onDragEnded;
+
+  /// Called when the draggable is dismissed.
+  final VoidCallback onDismiss;
 
   /// The key of the overlay the drag avatar will be built in.
   final GlobalKey<ArmadilloOverlayState> overlayKey;
@@ -210,6 +219,7 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
               dragStartPoint: dragStartPoint,
               initialBoundsOnDrag: initialBoundsOnDrag,
               feedbackBuilder: widget.feedbackBuilder,
+              onDismiss: widget.onDismiss,
             );
     widget.overlayKey.currentState.addBuilder(builder);
 
@@ -217,15 +227,27 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
       data: widget.data,
       onDragUpdate: (Offset position) =>
           _dragAvatarKey.currentState?.updatePosition(position),
-      onDragEnd: (bool wasAccepted) {
+      onDragEnd: (bool wasAccepted, Velocity velocity) {
         setState(() {
           _activeCount -= 1;
           if (!wasAccepted) {
-            _dragAvatarKey.currentState?.startReturnSimulation(
-              () => setState(
-                    () => widget.overlayKey.currentState.removeBuilder(builder),
-                  ),
-            );
+            if (velocity.pixelsPerSecond.dx.abs() <= _kMaxAcceptanceSpeed) {
+              _dragAvatarKey.currentState?.startReturnSimulation(
+                velocity,
+                () => setState(
+                      () =>
+                          widget.overlayKey.currentState.removeBuilder(builder),
+                    ),
+              );
+            } else {
+              _dragAvatarKey.currentState?.startExitSimulation(
+                velocity,
+                () => setState(
+                      () =>
+                          widget.overlayKey.currentState.removeBuilder(builder),
+                    ),
+              );
+            }
           } else {
             widget.overlayKey.currentState.removeBuilder(builder);
           }
@@ -257,6 +279,7 @@ class _DragAvatarWidget extends StatefulWidget {
   final Offset dragStartPoint;
   final Rect initialBoundsOnDrag;
   final FeedbackBuilder feedbackBuilder;
+  final VoidCallback onDismiss;
 
   _DragAvatarWidget({
     Key key,
@@ -266,6 +289,7 @@ class _DragAvatarWidget extends StatefulWidget {
     this.dragStartPoint,
     this.initialBoundsOnDrag,
     this.feedbackBuilder,
+    this.onDismiss,
   })
       : super(key: key);
 
@@ -342,7 +366,10 @@ class _DragAvatarWidgetState extends TickingState<_DragAvatarWidget> {
 
   bool get isDone => _returnSimulation?.isDone ?? true;
 
-  void startReturnSimulation(VoidCallback onReturnSimulationDone) {
+  void startReturnSimulation(
+    Velocity velocity,
+    VoidCallback onReturnSimulationDone,
+  ) {
     _returnSimulation = new RK4SpringSimulation(
       initValue: 0.0,
       desc: _kDefaultSimulationDesc,
@@ -350,6 +377,14 @@ class _DragAvatarWidgetState extends TickingState<_DragAvatarWidget> {
     _returnSimulation.target = 1.0;
     startTicking();
     _onReturnSimulationDone = onReturnSimulationDone;
+  }
+
+  void startExitSimulation(
+    Velocity velocity,
+    VoidCallback onExitSimulationDone,
+  ) {
+    onExitSimulationDone.call();
+    widget.onDismiss?.call();
   }
 }
 
@@ -457,7 +492,7 @@ class _DragTargetState<T> extends State<ArmadilloDragTarget<T>> {
 }
 
 enum _DragEndKind { dropped, canceled }
-typedef void _OnDragEnd(bool wasAccepted);
+typedef void _OnDragEnd(bool wasAccepted, Velocity velocity);
 
 // The lifetime of this object is a little dubious right now. Specifically, it
 // lives as long as the pointer is down. Arguably it should self-immolate if the
@@ -493,7 +528,7 @@ class _DragAvatar<T> extends Drag {
       );
 
   @override
-  void cancel() => _finishDrag(_DragEndKind.canceled);
+  void cancel() => _finishDrag(_DragEndKind.canceled, Velocity.zero);
 
   void _updateDrag(Offset globalPosition) {
     onDragUpdate?.call(globalPosition);
@@ -573,18 +608,21 @@ class _DragAvatar<T> extends Drag {
     _enteredTargets.clear();
   }
 
-  void _finishDrag(_DragEndKind endKind, [Velocity velocity]) {
+  void _finishDrag(_DragEndKind endKind, Velocity velocity) {
     bool wasAccepted = false;
-    if (endKind == _DragEndKind.dropped && _activeTargets.isNotEmpty) {
-      _activeTargets.forEach((_DragTargetState<T> activeTarget) {
-        activeTarget.didDrop(data, velocity);
-        _enteredTargets.remove(activeTarget);
-      });
-      wasAccepted = true;
+    if (velocity.pixelsPerSecond.dx.abs() <= _kMaxAcceptanceSpeed &&
+        velocity.pixelsPerSecond.dy.abs() <= _kMaxAcceptanceSpeed) {
+      if (endKind == _DragEndKind.dropped && _activeTargets.isNotEmpty) {
+        _activeTargets.forEach((_DragTargetState<T> activeTarget) {
+          activeTarget.didDrop(data, velocity);
+          _enteredTargets.remove(activeTarget);
+        });
+        wasAccepted = true;
+      }
     }
     _leaveAllEntered();
     _activeTargets.clear();
     // TODO(ianh): consider passing _entry as well so the client can perform an animation.
-    onDragEnd?.call(wasAccepted);
+    onDragEnd?.call(wasAccepted, velocity);
   }
 }
