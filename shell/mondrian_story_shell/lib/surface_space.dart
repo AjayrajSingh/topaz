@@ -15,7 +15,7 @@ import 'tree.dart';
 
 const SpringDescription _kSimSpringDescription = const SpringDescription(
   mass: 1.0,
-  springConstant: 120.0,
+  stiffness: 120.0,
   damping: 19.0,
 );
 
