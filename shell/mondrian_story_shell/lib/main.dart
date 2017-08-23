@@ -158,7 +158,14 @@ void main() {
   _surfaceGraph = new SurfaceGraph();
   // Note: This implementation only supports one StoryShell at a time.
   // Initialize the one Flutter application we support
-  runApp(new WindowMediaQuery(child: new Mondrian()));
+  runApp(
+    new Directionality(
+      textDirection: TextDirection.ltr,
+      child: new WindowMediaQuery(
+        child: new Mondrian(),
+      ),
+    ),
+  );
 
   _appContext.outgoingServices.addServiceForName(
     (InterfaceRequest<StoryShellFactory> request) {
