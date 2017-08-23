@@ -44,7 +44,6 @@ class ActiveAgentsManager {
     StoryProvider storyProvider,
     ProposalPublisher proposalPublisher,
   ) {
-    _activeAgentProposer.start(proposalPublisher, _createStoryCustomAction);
     userShellContext.getAgentProvider(_agentProvider.ctrl.request());
     _agentProvider.watch(
       _agentProviderWatcherBinding.wrap(_agentProviderWatcherImpl),
