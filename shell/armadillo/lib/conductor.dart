@@ -248,7 +248,7 @@ class ConductorState extends State<Conductor> {
               // Peak suggestion overlay more when overscrolling.
               if (scrollOffset < -_kSuggestionOverlayPullScrollOffset &&
                   _suggestionOverlayKey.currentState.hiding) {
-                _suggestionOverlayKey.currentState.setHeight(
+                _suggestionOverlayKey.currentState.setValue(
                   SizeModel.of(context).suggestionPeekHeight -
                       (scrollOffset + _kSuggestionOverlayPullScrollOffset) *
                           _kSuggestionOverlayScrollFactor,

@@ -7,7 +7,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:sysui_widgets/ticking_height_state.dart';
+import 'package:meta/meta.dart';
+import 'package:sysui_widgets/ticking_double_state.dart';
 
 import 'peek_model.dart';
 import 'size_model.dart';
@@ -56,16 +57,16 @@ class PeekingOverlay extends StatefulWidget {
   PeekingOverlayState createState() => new PeekingOverlayState();
 }
 
-/// A [TickingHeightState] that changes its height to [minHeight] via [hide] and\
-/// [maxHeight] via [show].
+/// A [TickingDoubleState] that changes its height to [minValue] via [hide] and\
+/// [maxValue] via [show].
 ///
-/// As the [height] increases above [minHeight] [PeekingOverlay.child] will grow
+/// As the [value] increases above [minValue] [PeekingOverlay.child] will grow
 /// up from the bottom.  The area not given to that [Widget] will gradually
 /// darken.
 ///
-/// The [createWidget] [Widget] will be clipped to [height] but will be given
-/// [maxHeight] to be laid out in.
-class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
+/// The [createWidget] [Widget] will be clipped to [value] but will be given
+/// [maxValue] to be laid out in.
+class PeekingOverlayState extends TickingDoubleState<PeekingOverlay> {
   static final double _kSnapVelocityThreshold = 500.0;
   bool _hiding = true;
   bool _peeking;
@@ -73,7 +74,7 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
   @override
   void initState() {
     super.initState();
-    maxHeight = widget.peekHeight;
+    maxValue = widget.peekHeight;
     _setPeeking(true);
   }
 
@@ -81,11 +82,11 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
   void didUpdateWidget(PeekingOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.peekHeight != widget.peekHeight) {
-      minHeight = _peeking ? widget.peekHeight : 0.0;
+      minValue = _peeking ? widget.peekHeight : 0.0;
       if (_hiding) {
-        setHeight(minHeight);
+        setValue(minValue);
       } else {
-        setHeight(maxHeight);
+        setValue(maxValue);
       }
     }
   }
@@ -94,14 +95,14 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
   void hide() {
     widget.onHide?.call();
     _hiding = true;
-    setHeight(minHeight);
+    setValue(minValue);
   }
 
   /// Shows the overlay.
   void show() {
     widget.onShow?.call();
     _hiding = false;
-    setHeight(maxHeight);
+    setValue(maxValue);
   }
 
   /// If [peeking] is true, the overlay will pop up itself over the bottom of
@@ -109,7 +110,7 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
   void _setPeeking(bool peeking) {
     if (peeking != _peeking) {
       _peeking = peeking;
-      minHeight = _peeking ? widget.peekHeight : 0.0;
+      minValue = _peeking ? widget.peekHeight : 0.0;
       hide();
     }
   }
@@ -119,7 +120,7 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
 
   /// Updates the overlay as if it was being dragged vertically.
   void onVerticalDragUpdate(DragUpdateDetails details) =>
-      setHeight(height - details.primaryDelta, force: true);
+      setValue(value - details.primaryDelta, force: true);
 
   /// Updates the overlay as if it was finished being dragged vertically.
   void onVerticalDragEnd(DragEndDetails details) =>
@@ -132,7 +133,7 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
       show();
     } else if (verticalVelocity > _kSnapVelocityThreshold) {
       hide();
-    } else if (height - minHeight < maxHeight - height) {
+    } else if (value - minValue < maxValue - value) {
       hide();
     } else {
       show();
@@ -161,7 +162,7 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
               left: 0.0,
               right: 0.0,
               bottom: 0.0,
-              height: height,
+              height: value,
               child: new ScopedModelDescendant<SizeModel>(
                 builder: (
                   BuildContext context,
@@ -172,23 +173,16 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
                   // the entire size of the screen if the user shell is in
                   // ambient or idle mode.
                   double targetMaxHeight = sizeModel.suggestionExpandedHeight;
-                  if (maxHeight != targetMaxHeight && targetMaxHeight != 0.0) {
-                    maxHeight = targetMaxHeight;
+                  if (maxValue != targetMaxHeight && targetMaxHeight != 0.0) {
+                    maxValue = targetMaxHeight;
                     if (!hiding || sizeModel.autoExpandSuggestion) {
                       show();
                     }
                   }
 
-                  /// TODO(dayang): Animate the change of the suggestion
-                  /// list width.
-                  ///
-                  /// SY-310
-                  return new OverflowBox(
-                    minWidth: sizeModel.suggestionListWidth,
-                    maxWidth: sizeModel.suggestionListWidth,
-                    minHeight: math.max(height, maxHeight),
-                    maxHeight: math.max(height, maxHeight),
-                    alignment: FractionalOffset.topCenter,
+                  return new _HorizontalExpandingBox(
+                    width: sizeModel.suggestionListWidth,
+                    height: math.max(value, maxValue),
                     child: child,
                   );
                 },
@@ -214,4 +208,63 @@ class PeekingOverlayState extends TickingHeightState<PeekingOverlay> {
           ],
         ),
       );
+}
+
+/// Uses the RK4 simulation of the [TickingDoubleState] to animate the width
+/// of the suggestion box
+class _HorizontalExpandingBox extends StatefulWidget {
+  /// Height of the box
+  final double height;
+
+  /// Width of the box that will be animated with a RK4 simulation when changed
+  final double width;
+
+  final Widget child;
+
+  /// Constructor
+  _HorizontalExpandingBox({
+    @required this.height,
+    @required this.width,
+    @required this.child,
+  }) {
+    assert(height != null);
+    assert(width != null);
+    assert(child != null);
+  }
+
+  @override
+  _HorizontalExpandingBoxState createState() =>
+      new _HorizontalExpandingBoxState();
+}
+
+class _HorizontalExpandingBoxState
+    extends TickingDoubleState<_HorizontalExpandingBox> {
+  @override
+  void initState() {
+    super.initState();
+    maxValue = widget.width;
+    minValue = 0.0;
+    setValue(widget.width, force: true);
+  }
+
+  @override
+  void didUpdateWidget(_HorizontalExpandingBox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.width != widget.width) {
+      maxValue = widget.width;
+      setValue(widget.width);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new OverflowBox(
+      minWidth: value,
+      maxWidth: value,
+      minHeight: widget.height,
+      maxHeight: widget.height,
+      alignment: FractionalOffset.topCenter,
+      child: widget.child,
+    );
+  }
 }
