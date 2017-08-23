@@ -56,13 +56,16 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => new WindowMediaQuery(
-        child: _moduleModel == null
-            ? child
-            : new ScopedModel<T>(
-                model: _moduleModel,
-                child: child,
-              ),
+  Widget build(BuildContext context) => new Directionality(
+        textDirection: TextDirection.ltr,
+        child: new WindowMediaQuery(
+          child: _moduleModel == null
+              ? child
+              : new ScopedModel<T>(
+                  model: _moduleModel,
+                  child: child,
+                ),
+        ),
       );
 
   /// Advertises [_module] as a [Module] to the rest of the system via the

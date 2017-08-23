@@ -45,21 +45,24 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
           onNotify: userShellModel?.onNotify,
           watchAll: userShellModel?.watchAll,
         ) {
-          _userShell.onStop = _onStop;
-        }
+    _userShell.onStop = _onStop;
+  }
 
   void _onStop() {
     _binding.close();
   }
 
   @override
-  Widget build(BuildContext context) => new WindowMediaQuery(
-        child: _userShellModel == null
-            ? child
-            : new ScopedModel<T>(
-                model: _userShellModel,
-                child: child,
-              ),
+  Widget build(BuildContext context) => new Directionality(
+        textDirection: TextDirection.ltr,
+        child: new WindowMediaQuery(
+          child: _userShellModel == null
+              ? child
+              : new ScopedModel<T>(
+                  model: _userShellModel,
+                  child: child,
+                ),
+        ),
       );
 
   /// Advertises [_userShell] as a [UserShell] to the rest of the system via

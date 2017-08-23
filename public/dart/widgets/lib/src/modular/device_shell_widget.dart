@@ -54,10 +54,13 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
         );
 
   @override
-  Widget build(BuildContext context) => new WindowMediaQuery(
-        child: _deviceShellModel == null
-            ? child
-            : new ScopedModel<T>(model: _deviceShellModel, child: child),
+  Widget build(BuildContext context) => new Directionality(
+        textDirection: TextDirection.ltr,
+        child: new WindowMediaQuery(
+          child: _deviceShellModel == null
+              ? child
+              : new ScopedModel<T>(model: _deviceShellModel, child: child),
+        ),
       );
 
   /// Advertises [_deviceShell] as a [DeviceShell] to the rest of the system via
