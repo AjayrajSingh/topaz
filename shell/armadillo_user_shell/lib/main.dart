@@ -197,8 +197,8 @@ Future<Null> main() async {
     key: conductorKey,
     onQuickSettingsOverlayChanged: hitTestModel.onQuickSettingsOverlayChanged,
     onSuggestionsOverlayChanged: hitTestModel.onSuggestionsOverlayChanged,
-    onLogoutTapped: userLogoutter.logout,
-    onLogoutLongPressed: userLogoutter.logoutAndResetLedgerState,
+    onLogoutSelected: userLogoutter.logout,
+    onClearLedgerSelected: userLogoutter.logoutAndResetLedgerState,
     interruptionOverlayKey: interruptionOverlayKey,
     onInterruptionDismissed:
         suggestionProviderSuggestionModel.onInterruptionDismissal,

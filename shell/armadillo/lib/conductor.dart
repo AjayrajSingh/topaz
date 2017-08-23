@@ -55,11 +55,11 @@ class Conductor extends StatefulWidget {
   /// Called when the suggestions overlay becomes active or inactive.
   final OnOverlayChanged onSuggestionsOverlayChanged;
 
-  /// Called when the user taps log out from the quick settings.
-  final VoidCallback onLogoutTapped;
+  /// Called when the user selects log out.
+  final VoidCallback onLogoutSelected;
 
-  /// Called when the user long presses log out from the quick settings.
-  final VoidCallback onLogoutLongPressed;
+  /// Called when the user selects log out and clear the ledger.
+  final VoidCallback onClearLedgerSelected;
 
   /// Called when the user taps the user context.
   final VoidCallback onUserContextTapped;
@@ -75,8 +75,8 @@ class Conductor extends StatefulWidget {
     Key key,
     this.onQuickSettingsOverlayChanged,
     this.onSuggestionsOverlayChanged,
-    this.onLogoutTapped,
-    this.onLogoutLongPressed,
+    this.onLogoutSelected,
+    this.onClearLedgerSelected,
     this.onUserContextTapped,
     this.interruptionOverlayKey,
     this.onInterruptionDismissed,
@@ -211,8 +211,8 @@ class ConductorState extends State<Conductor> {
                   widget.onQuickSettingsOverlayChanged?.call(true);
                 }
               },
-              onLogoutTapped: widget.onLogoutTapped,
-              onLogoutLongPressed: widget.onLogoutLongPressed,
+              onLogoutSelected: widget.onLogoutSelected,
+              onClearLedgerSelected: widget.onClearLedgerSelected,
             ),
 
             // Top and bottom edge scrolling drag targets.
@@ -304,8 +304,8 @@ class ConductorState extends State<Conductor> {
           onOverscrollThresholdRelease: () =>
               _suggestionOverlayKey.currentState.show(),
           scrollController: _scrollController,
-          onLogoutTapped: widget.onLogoutTapped,
-          onLogoutLongPressed: widget.onLogoutLongPressed,
+          onLogoutSelected: widget.onLogoutSelected,
+          onClearLedgerSelected: widget.onClearLedgerSelected,
           onUserContextTapped: widget.onUserContextTapped,
           onMinimizedContextTapped: () =>
               _suggestionOverlayKey.currentState.show(),

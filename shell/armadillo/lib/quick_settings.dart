@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' show lerpDouble;
 
@@ -55,18 +56,18 @@ class QuickSettingsOverlay extends StatefulWidget {
   /// Called each tick as the overlay is shown or hidden.
   final ValueChanged<double> onProgressChanged;
 
-  /// Called when logout is tapped.
-  final VoidCallback onLogoutTapped;
+  /// Called when the user selects log out.
+  final VoidCallback onLogoutSelected;
 
-  /// Called when logout is long pressed.
-  final VoidCallback onLogoutLongPressed;
+  /// Called when the user selects log out and clear the ledger.
+  final VoidCallback onClearLedgerSelected;
 
   /// Constructor.
   QuickSettingsOverlay({
     Key key,
     this.onProgressChanged,
-    this.onLogoutTapped,
-    this.onLogoutLongPressed,
+    this.onLogoutSelected,
+    this.onClearLedgerSelected,
   })
       : super(key: key);
 
@@ -107,8 +108,8 @@ class QuickSettingsOverlayState extends TickingState<QuickSettingsOverlay> {
                   )),
               child: new QuickSettings(
                 opacity: 1.0,
-                onLogoutTapped: widget.onLogoutTapped,
-                onLogoutLongPressed: widget.onLogoutLongPressed,
+                onLogoutSelected: widget.onLogoutSelected,
+                onClearLedgerSelected: widget.onClearLedgerSelected,
               )),
         ),
       );
@@ -177,14 +178,18 @@ class QuickSettings extends StatefulWidget {
   /// The opacity of the quick settings.
   final double opacity;
 
-  /// Called when logout is tapped.
-  final VoidCallback onLogoutTapped;
+  /// Called when the user selects log out.
+  final VoidCallback onLogoutSelected;
 
-  /// Called when logout is long pressed.
-  final VoidCallback onLogoutLongPressed;
+  /// Called when the user selects log out and clear the ledger.
+  final VoidCallback onClearLedgerSelected;
 
   /// Constructor.
-  QuickSettings({this.opacity, this.onLogoutTapped, this.onLogoutLongPressed});
+  QuickSettings({
+    this.opacity,
+    this.onLogoutSelected,
+    this.onClearLedgerSelected,
+  });
 
   @override
   _QuickSettingsState createState() => new _QuickSettingsState();
@@ -361,23 +366,11 @@ class _QuickSettingsState extends State<QuickSettings> {
             ),
           ),
           _divider(opacity: widget.opacity),
-          new GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => widget.onLogoutTapped?.call(),
-            onLongPress: () => widget.onLogoutLongPressed?.call(),
-            child: new Container(
-              padding: const EdgeInsets.all(16.0),
-              child: new Opacity(
-                opacity: widget.opacity,
-                child: new Text(
-                  'LOG OUT',
-                  textAlign: TextAlign.center,
-                  style: new TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ),
+          new Opacity(
+            opacity: widget.opacity,
+            child: new _LogoutButton(
+              onLogoutSelected: widget.onLogoutSelected,
+              onClearLedgerSelected: widget.onClearLedgerSelected,
             ),
           ),
           _divider(opacity: widget.opacity),
@@ -400,9 +393,86 @@ class _QuickSettingsState extends State<QuickSettings> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
+  }
+}
+
+/// The logout button has two modes:
+/// 1. Tap to logout.
+/// 2. Tap to clear the ledger for the user and logout.
+///
+/// Longpress of the button switches modes.
+///
+/// We start in mode 1.
+///
+/// When entering mode 2 we present a different message and time out after a
+/// short time and switch back to mode 1.
+class _LogoutButton extends StatefulWidget {
+  /// Called when the user selects log out.
+  final VoidCallback onLogoutSelected;
+
+  /// Called when the user selects log out and clear the ledger.
+  final VoidCallback onClearLedgerSelected;
+
+  /// Constructor.
+  _LogoutButton({this.onLogoutSelected, this.onClearLedgerSelected});
+
+  @override
+  _LogoutButtonState createState() => new _LogoutButtonState();
+}
+
+class _LogoutButtonState extends State<_LogoutButton> {
+  bool _clearLedgerOnLogout = false;
+  Timer _clearLedgerTimer;
+  int _secondsRemaining = 0;
+
+  @override
+  Widget build(BuildContext context) => new GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _clearLedgerOnLogout
+            ? widget.onClearLedgerSelected?.call()
+            : widget.onLogoutSelected?.call(),
+        onLongPress: () => setState(() {
+              _clearLedgerOnLogout = !_clearLedgerOnLogout;
+              _clearLedgerTimer?.cancel();
+              if (_clearLedgerOnLogout) {
+                _secondsRemaining = 10;
+                _clearLedgerTimer = new Timer.periodic(
+                  const Duration(seconds: 1),
+                  (_) {
+                    setState(() {
+                      _secondsRemaining--;
+                      if (_secondsRemaining <= 0) {
+                        _clearLedgerOnLogout = false;
+                      }
+                    });
+                  },
+                );
+              }
+            }),
+        child: new Container(
+          padding: const EdgeInsets.all(16.0),
+          child: new Text(
+            _clearLedgerOnLogout
+                ? '($_secondsRemaining) '
+                    'CLEAR LEDGER AND LOG OUT'
+                    ' ($_secondsRemaining)'
+                : 'LOG OUT',
+            textAlign: TextAlign.center,
+            style: new TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Colors.grey[600],
+            ),
+          ),
+        ),
+      );
+
+  @override
+  void dispose() {
+    _clearLedgerTimer?.cancel();
+    super.dispose();
   }
 }
