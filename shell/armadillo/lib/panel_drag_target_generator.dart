@@ -15,11 +15,10 @@ import 'panel_drag_targets.dart';
 import 'story.dart';
 import 'story_cluster.dart';
 
-/// Three horizontal sets of targets are always at the top of the
+/// Two horizontal sets of targets are always at the top of the
 /// [PanelDragTargets]:
-/// 1. Discard.
-/// 2. Story Bar Targets.
-/// 3. Story Cluster Top Edge Target.
+/// 1. Story Bar Targets.
+/// 2. Story Cluster Top Edge Target.
 ///
 /// This is the gap to leave between them.
 const double _kGapBetweenTopTargets = 48.0;
@@ -29,8 +28,7 @@ const double _kTopEdgeTargetYOffset =
     _kStoryBarTargetYOffset + _kGapBetweenTopTargets + 16.0;
 const double _kStoryTopEdgeTargetYOffset =
     _kTopEdgeTargetYOffset + _kGapBetweenTopTargets;
-const double _kDiscardTargetTopEdgeYOffset = -48.0;
-const double _kBringToFrontTargetBottomEdgeYOffset = 48.0;
+const double _kDiscardTargetHorizontalEdgeOffset = 48.0;
 
 /// The distance inset story edge targets should be from the visual edge of the
 /// story.
@@ -248,16 +246,17 @@ class PanelDragTargetGenerator {
     }
 
     if (!inTimeline) {
-      // Top discard target.
+      // Left return-to-timeline target.
       targets.add(
-        new LineSegment.horizontal(
-          name: 'Top discard target',
+        new LineSegment.vertical(
+          name: 'Left return-to-timeline target',
           initiallyTargetable: false,
-          y: verticalMargin + _kDiscardTargetTopEdgeYOffset,
-          left: 0.0,
-          right: size.width,
+          x: verticalMargin + _kDiscardTargetHorizontalEdgeOffset,
+          top: 0.0,
+          bottom: size.height,
           color: _kDebugDiscardTargetColor,
-          validityDistance: verticalMargin + _kDiscardTargetTopEdgeYOffset,
+          validityDistance:
+              verticalMargin + _kDiscardTargetHorizontalEdgeOffset,
           maxStoriesCanAccept: maxStories,
           onHover: (BuildContext context, StoryCluster storyCluster) =>
               onLeaveCluster(
@@ -274,19 +273,17 @@ class PanelDragTargetGenerator {
         ),
       );
 
-      // Bottom bring-to-front target.
+      // Right return-to-timeline target.
       targets.add(
-        new LineSegment.horizontal(
-          name: 'Bottom bring-to-front target',
+        new LineSegment.vertical(
+          name: 'Right return-to-timeline target',
           initiallyTargetable: false,
-          y: size.height -
-              verticalMargin +
-              _kBringToFrontTargetBottomEdgeYOffset,
-          left: 0.0,
-          right: size.width,
+          x: size.width - verticalMargin - _kDiscardTargetHorizontalEdgeOffset,
+          top: 0.0,
+          bottom: size.height,
           color: _kDebugBringToFrontTargetColor,
           validityDistance:
-              verticalMargin - _kBringToFrontTargetBottomEdgeYOffset,
+              verticalMargin + _kDiscardTargetHorizontalEdgeOffset,
           maxStoriesCanAccept: maxStories,
           onHover: (BuildContext context, StoryCluster storyCluster) =>
               onLeaveCluster(
