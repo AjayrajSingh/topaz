@@ -20,11 +20,14 @@ class DartByteData {
   ~DartByteData();
 
   const void* data() const { return data_; }
+  void* data() { return data_; }
   size_t length_in_bytes() const { return length_in_bytes_; }
   Dart_Handle dart_handle() const { return dart_handle_; }
 
   std::vector<char> Copy() const;
   void Release() const;
+
+  explicit operator bool() const { return data_ != nullptr; }
 
  private:
   mutable void* data_;
