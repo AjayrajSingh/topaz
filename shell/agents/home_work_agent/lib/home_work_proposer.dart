@@ -167,7 +167,7 @@ class _AskHandlerImpl extends AskHandler {
   _AskHandlerImpl({this.askProposals});
 
   @override
-  void ask(UserInput query, void callback(List<Proposal> proposals)) {
+  void ask(UserInput query, void callback(AskResponse response)) {
     List<Proposal> proposals = <Proposal>[];
 
     if (query.text?.toLowerCase()?.startsWith('demo') ?? false) {
@@ -247,7 +247,7 @@ class _AskHandlerImpl extends AskHandler {
       scanDirectory(new Directory('/system/pkgs/'));
     }
 
-    callback(proposals);
+    callback(new AskResponse()..proposals = proposals);
   }
 
   Proposal get _launchEverythingProposal => new Proposal()

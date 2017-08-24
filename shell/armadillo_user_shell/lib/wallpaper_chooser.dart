@@ -117,7 +117,7 @@ class _AskHandlerImpl extends AskHandler {
   _AskHandlerImpl({this.customAction});
 
   @override
-  void ask(UserInput query, void callback(List<Proposal> proposals)) {
+  void ask(UserInput query, void callback(AskResponse response)) {
     List<Proposal> proposals = <Proposal>[];
 
     if ((query.text?.toLowerCase()?.startsWith('wal') ?? false) ||
@@ -143,7 +143,7 @@ class _AskHandlerImpl extends AskHandler {
       );
     }
 
-    callback(proposals);
+    callback(new AskResponse()..proposals = proposals);
   }
 
   void stop() {
