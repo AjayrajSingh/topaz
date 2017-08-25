@@ -77,7 +77,7 @@ bool FileLoader::LoadPackagesMap(const std::string& packages) {
 Dart_Handle FileLoader::HandleLibraryTag(Dart_LibraryTag tag,
                                          Dart_Handle library,
                                          Dart_Handle url) {
-  FTL_DCHECK(Dart_IsNull(library) || 
+  FTL_DCHECK(Dart_IsNull(library) ||
              Dart_IsLibrary(library) ||
              Dart_IsString(library));
   FTL_DCHECK(Dart_IsString(url));
@@ -96,6 +96,8 @@ Dart_Handle FileLoader::HandleLibraryTag(Dart_LibraryTag tag,
     // Load the root script.
     return Script(url);
   }
+  if (tag == Dart_kKernelTag)
+    return Kernel(url);
   return Dart_NewApiError("Unknown library tag.");
 }
 
@@ -193,6 +195,19 @@ Dart_Handle FileLoader::LoadScript(const std::string& url) {
 
 Dart_Handle FileLoader::Import(Dart_Handle url) {
   return LoadLibrary(StdStringFromDart(url));
+}
+
+Dart_Handle FileLoader::Kernel(Dart_Handle url) {
+  std::string url_string = StdStringFromDart(url);
+  std::string resolved_url;
+  std::string binary_file = Fetch(url_string, &resolved_url);
+  const uint8_t* kernel_ir = (const uint8_t*)binary_file.c_str();
+  intptr_t kernel_ir_size = binary_file.size();
+  void* kernel_program = Dart_ReadKernelBinary(kernel_ir, kernel_ir_size);
+  if (kernel_program == NULL) {
+    return Dart_NewApiError("Failed to read kernel binary");
+  }
+  return Dart_NewExternalTypedData(Dart_TypedData_kUint64, kernel_program, 1);
 }
 
 Dart_Handle FileLoader::Source(Dart_Handle library, Dart_Handle url) {
