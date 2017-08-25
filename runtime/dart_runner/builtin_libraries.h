@@ -8,14 +8,16 @@
 #include <memory>
 #include <string>
 
+#include <mxio/namespace.h>
+
 #include "application/lib/app/application_context.h"
 #include "application/services/service_provider.fidl.h"
 
 namespace dart_content_handler {
 
 void InitBuiltinLibrariesForIsolate(
-    const std::string& base_uri,
     const std::string& script_uri,
+    mxio_ns_t* namespc,
     std::unique_ptr<app::ApplicationContext> context,
     fidl::InterfaceRequest<app::ServiceProvider> outgoing_services);
 

@@ -5,6 +5,8 @@
 #ifndef APPS_DART_CONTENT_HANDLER_DART_APPLICATION_CONTROLLER_H_
 #define APPS_DART_CONTENT_HANDLER_DART_APPLICATION_CONTROLLER_H_
 
+#include <mxio/namespace.h>
+
 #include "application/lib/svc/service_provider_bridge.h"
 #include "application/services/application_runner.fidl.h"
 #include "dart/runtime/include/dart_api.h"
@@ -35,6 +37,8 @@ class DartApplicationController : public app::ApplicationController {
   // |ApplicationController|
   void Kill() override;
   void Detach() override;
+
+  mxio_ns_t* SetupNamespace();
 
   const uint8_t* isolate_snapshot_data_;
   const uint8_t* isolate_snapshot_instructions_;

@@ -4,11 +4,16 @@
 
 #include "apps/dart_content_handler/dart_application_controller.h"
 
+#include <fcntl.h>
 #include <magenta/status.h>
+#include <mxio/namespace.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <utility>
 
 #include "application/lib/app/application_context.h"
 #include "apps/dart_content_handler/builtin_libraries.h"
+#include "lib/fidl/cpp/bindings/string.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
 #include "lib/ftl/synchronization/mutex.h"
@@ -79,6 +84,35 @@ bool DartApplicationController::CreateIsolate() {
   return true;
 }
 
+constexpr char kServiceRootPath[] = "/svc";
+
+mxio_ns_t* DartApplicationController::SetupNamespace() {
+  mxio_ns_t* mxio_namespc;
+  const app::FlatNamespacePtr& flat = startup_info_->flat_namespace;
+  mx_status_t status = mxio_ns_create(&mxio_namespc);
+  if (status != MX_OK) {
+    FTL_LOG(ERROR) << "Failed to create namespace";
+    return nullptr;
+  }
+  for (size_t i = 0; i < flat->paths.size(); ++i) {
+    if (flat->paths[i] == kServiceRootPath) {
+      // Ownership of /svc goes to the ApplicationContext created below.
+      continue;
+    }
+    mx::channel dir = std::move(flat->directories[i]);
+    mx_handle_t dir_handle = dir.release();
+    const char* path = flat->paths[i].data();
+    status = mxio_ns_bind(mxio_namespc, path, dir_handle);
+    if (status != MX_OK) {
+      FTL_LOG(ERROR) << "Failed to bind " << flat->paths[i] << " to namespace";
+      mx_handle_close(dir_handle);
+      mxio_ns_destroy(mxio_namespc);
+      return nullptr;
+    }
+  }
+  return mxio_namespc;
+}
+
 bool DartApplicationController::Main() {
   Dart_EnterScope();
 
@@ -114,8 +148,13 @@ bool DartApplicationController::Main() {
   auto outgoing_services = service_provider.NewRequest();
   service_provider_bridge_.set_backend(std::move(service_provider));
 
+  mxio_ns_t* mxio_namespc = SetupNamespace();
+  if (mxio_namespc == nullptr)
+    return false;
+
   InitBuiltinLibrariesForIsolate(
-      url_, url_, app::ApplicationContext::CreateFrom(std::move(startup_info_)),
+      url_, mxio_namespc,
+      app::ApplicationContext::CreateFrom(std::move(startup_info_)),
       std::move(outgoing_services));
 
   Dart_Handle dart_arguments = Dart_NewList(arguments.size());

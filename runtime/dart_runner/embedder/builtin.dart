@@ -17,16 +17,6 @@ class _Logger {
   static void _printString(String s) native "Logger_PrintString";
 }
 
-String _rawUriBase;
-Uri _cachedUriBase;
-Uri _uriBase() {
-  if (_cachedUriBase != null) {
-    return _cachedUriBase;
-  }
-  _cachedUriBase = Uri.parse(_rawUriBase);
-  return _cachedUriBase;
-}
-
 String _rawScript;
 Uri _scriptUri() {
   if (_rawScript.startsWith('http:') ||
@@ -46,7 +36,6 @@ _setupHooks() {
   VMLibraryHooks.platformScript = _scriptUri;
 }
 
-_getUriBaseClosure() => _uriBase;
 _getPrintClosure() => _print;
 
 // import 'root_library'; happens here from C Code

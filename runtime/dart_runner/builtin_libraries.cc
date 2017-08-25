@@ -5,6 +5,7 @@
 #include "apps/dart_content_handler/builtin_libraries.h"
 
 #include <mx/channel.h>
+#include <mxio/namespace.h>
 
 #include "dart/runtime/bin/io_natives.h"
 #include "dart/runtime/include/dart_api.h"
@@ -91,8 +92,8 @@ void ScheduleMicrotask(Dart_NativeArguments args) {
 }  // namespace
 
 void InitBuiltinLibrariesForIsolate(
-    const std::string& base_uri,
     const std::string& script_uri,
+    mxio_ns_t* namespc,
     std::unique_ptr<app::ApplicationContext> context,
     fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
   // dart:fidl.internal --------------------------------------------------------
@@ -163,17 +164,22 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(Dart_Invoke(
       async_lib, ToDart("_setScheduleImmediateClosure"), 1, schedule_args));
 
+  Dart_Handle namespace_type =
+      Dart_GetType(io_lib, ToDart("_Namespace"), 0, nullptr);
+  DART_CHECK_VALID(namespace_type);
+  Dart_Handle namespace_args[1];
+  namespace_args[0] = Dart_NewInteger(reinterpret_cast<intptr_t>(namespc));
+  DART_CHECK_VALID(namespace_args[0]);
+  DART_CHECK_VALID(Dart_Invoke(
+      namespace_type, ToDart("_setupNamespace"), 1, namespace_args));
+
   // Set the script location.
   DART_CHECK_VALID(
       Dart_SetField(builtin_lib, ToDart("_rawScript"), ToDart(script_uri)));
 
-  // Set the base URI.
-  DART_CHECK_VALID(
-      Dart_SetField(builtin_lib, ToDart("_rawUriBase"), ToDart(base_uri)));
-
   // Setup the uriBase with the base uri of the fidl app.
   Dart_Handle uri_base =
-      Dart_Invoke(builtin_lib, ToDart("_getUriBaseClosure"), 0, nullptr);
+      Dart_Invoke(io_lib, ToDart("_getUriBaseClosure"), 0, nullptr);
   DART_CHECK_VALID(uri_base);
   DART_CHECK_VALID(
       Dart_SetField(core_lib, ToDart("_uriBaseClosure"), uri_base));
