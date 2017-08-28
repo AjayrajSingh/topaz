@@ -425,7 +425,7 @@ class _SuggestionListSliverGridLayout extends SliverGridLayout {
       scrollOffset: scrollOffset,
       crossAxisOffset: crossAxisOffset,
       mainAxisExtent: mainAxisExtent,
-      crossAxisExtent: crossAxisExtent,
+      crossAxisExtent: math.max(0.0, crossAxisExtent),
     );
   }
 

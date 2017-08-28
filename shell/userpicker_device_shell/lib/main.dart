@@ -68,19 +68,6 @@ void main() {
     child: softKeyboardContainerImpl?.wrap(child: mainWidget) ?? mainWidget,
   );
 
-  DeviceShellWidget<UserPickerDeviceShellModel> deviceShellWidget =
-      new DeviceShellWidget<UserPickerDeviceShellModel>(
-    applicationContext: applicationContext,
-    softKeyboardContainer: softKeyboardContainerImpl,
-    deviceShellModel: model,
-    authenticationContext: new AuthenticationContextImpl(
-      onStartOverlay: authenticationOverlayModel.onStartOverlay,
-      onStopOverlay: authenticationOverlayModel.onStopOverlay,
-    ),
-    child:
-        _kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app,
-  );
-
   List<OverlayEntry> overlays = <OverlayEntry>[
     new OverlayEntry(
       builder: (BuildContext context) => new MediaQuery(
@@ -88,7 +75,9 @@ void main() {
             child: new FocusScope(
               node: new FocusScopeNode(),
               autofocus: true,
-              child: deviceShellWidget,
+              child: _kShowPerformanceOverlay
+                  ? _buildPerformanceOverlay(child: app)
+                  : app,
             ),
           ),
     ),
@@ -124,11 +113,19 @@ void main() {
     return true;
   });
 
-  runApp(
-    new CheckedModeBanner(
-      child: new Overlay(initialEntries: overlays),
+  DeviceShellWidget<UserPickerDeviceShellModel> deviceShellWidget =
+      new DeviceShellWidget<UserPickerDeviceShellModel>(
+    applicationContext: applicationContext,
+    softKeyboardContainer: softKeyboardContainerImpl,
+    deviceShellModel: model,
+    authenticationContext: new AuthenticationContextImpl(
+      onStartOverlay: authenticationOverlayModel.onStartOverlay,
+      onStopOverlay: authenticationOverlayModel.onStopOverlay,
     ),
+    child: new Overlay(initialEntries: overlays),
   );
+
+  runApp(new CheckedModeBanner(child: deviceShellWidget));
 
   constraintsModel.load(rootBundle);
   deviceShellWidget.advertise();

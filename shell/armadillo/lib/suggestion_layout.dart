@@ -116,9 +116,12 @@ class SuggestionLayout {
     }
     _suggestionWidth = suggestionWidth;
 
-    double textMaxWidth = suggestionWidth -
-        (_suggestion.image == null ? 0.0 : kSuggestionImageWidth) -
-        ((isCircularSuggestionImage ? 1 : 2) * _kHorizontalMargin);
+    double textMaxWidth = math.max(
+      0.0,
+      suggestionWidth -
+          (_suggestion.image == null ? 0.0 : kSuggestionImageWidth) -
+          ((isCircularSuggestionImage ? 1 : 2) * _kHorizontalMargin),
+    );
 
     _headline1TextPainter?.layout(maxWidth: textMaxWidth);
     _headline2TextPainter?.layout(maxWidth: textMaxWidth);
