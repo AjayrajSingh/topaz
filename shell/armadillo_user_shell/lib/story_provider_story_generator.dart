@@ -26,6 +26,8 @@ import 'story_provider_watcher_impl.dart';
 
 const int _kMaxActiveClusters = 6;
 
+const String _kStoryClustersLinkKey = 'story_clusters';
+
 /// Creates a list of stories for the StoryList using
 /// modular's [StoryProvider].
 class StoryProviderStoryGenerator extends StoryGenerator {
@@ -127,13 +129,20 @@ class StoryProviderStoryGenerator extends StoryGenerator {
 
   /// Called when the link changes.
   void onLinkChanged(String json) {
-    if (json == _lastLinkJson) {
+    dynamic decodedJson = JSON.decode(json);
+    if (decodedJson == null ||
+        !(decodedJson is Map) ||
+        !decodedJson.containsKey(_kStoryClustersLinkKey)) {
+      return;
+    }
+    String storyClustersJson = JSON.encode(decodedJson[_kStoryClustersLinkKey]);
+    if (storyClustersJson == _lastLinkJson) {
       return;
     }
 
-    log.fine('Link changed: $json');
+    log.fine('Link changed: $storyClustersJson');
 
-    _lastLinkJson = json;
+    _lastLinkJson = storyClustersJson;
 
     _onLinkUpdate();
   }
@@ -300,12 +309,12 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   }
 
   List<StoryCluster> _getStoryClustersFromJson(String json) {
-    Map<String, dynamic> decodedJson = JSON.decode(json);
+    List<dynamic> decodedJson = JSON.decode(json);
 
     List<StoryCluster> jsonStoryClusters = <StoryCluster>[];
 
     if (decodedJson != null) {
-      decodedJson['story_clusters']?.forEach(
+      decodedJson.forEach(
         (Map<String, dynamic> storyClusterJson) => jsonStoryClusters.add(
               new StoryCluster.fromJson(storyClusterJson),
             ),
@@ -507,30 +516,25 @@ class StoryProviderStoryGenerator extends StoryGenerator {
               storyCluster.stories.any((Story story) => story.isPlaceHolder),
         )) {
       String json = JSON.encode(
-        <String, List<StoryCluster>>{
-          'story_clusters': _storyClusters
-              .where((StoryCluster storyCluster) =>
-                  !storyCluster.isPlaceholder &&
-                  storyCluster.stories
-                      .any((Story story) => story.isPlaceHolder))
-              .toList()
-        },
+        _storyClusters
+            .where((StoryCluster storyCluster) =>
+                !storyCluster.isPlaceholder &&
+                storyCluster.stories.any((Story story) => story.isPlaceHolder))
+            .toList(),
       );
       log.fine('Aborting link write, placeholder story found!\n$json');
       return;
     }
 
     String json = JSON.encode(
-      <String, dynamic>{
-        'story_clusters': _storyClusters
-            .where((StoryCluster storyCluster) => !storyCluster.isPlaceholder)
-            .toList(),
-      },
+      _storyClusters
+          .where((StoryCluster storyCluster) => !storyCluster.isPlaceholder)
+          .toList(),
     );
 
     if (json != _lastLinkJson) {
       log.fine('Writing to link!');
-      _link.set(null, json);
+      _link.set(<String>[_kStoryClustersLinkKey], json);
       _lastLinkJson = json;
     }
   }

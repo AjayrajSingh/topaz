@@ -11,6 +11,7 @@ import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
+import 'package:flutter/widgets.dart';
 import 'package:home_work_agent_lib/home_work_proposer.dart';
 import 'package:lib.widgets/modular.dart';
 
@@ -20,6 +21,7 @@ import 'initial_focus_setter.dart';
 import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
+import 'wallpaper_chooser.dart';
 
 const String _kLocationTopic = '/location/home_work';
 
@@ -64,6 +66,8 @@ class ArmadilloUserShellModel extends UserShellModel {
 
   final ActiveAgentsManager _activeAgentsManager = new ActiveAgentsManager();
 
+  final WallpaperChooser _wallpaperChooser;
+
   /// Called when the [UserShell] stops.
   final _OnStop onUserShellStopped;
 
@@ -78,7 +82,11 @@ class ArmadilloUserShellModel extends UserShellModel {
     this.onUserUpdated,
     this.contextTopics: const <String>[],
     this.onUserShellStopped,
-  });
+    ValueChanged<List<String>> onWallpaperChosen,
+  })
+      : _wallpaperChooser = new WallpaperChooser(
+          onWallpaperChosen: onWallpaperChosen,
+        );
 
   @override
   void onReady(
@@ -139,11 +147,19 @@ class ArmadilloUserShellModel extends UserShellModel {
       storyProvider,
       proposalPublisher,
     );
+
+    _wallpaperChooser.start(
+      focusProvider,
+      storyProvider,
+      proposalPublisher,
+      link,
+    );
   }
 
   @override
   void onStop() {
     _activeAgentsManager.stop();
+    _wallpaperChooser.stop();
     _homeWorkProposer.stop();
     _contextListenerBinding.close();
     _focusRequestWatcherBinding.close();
@@ -156,6 +172,7 @@ class ArmadilloUserShellModel extends UserShellModel {
   @override
   void onNotify(String json) {
     storyProviderStoryGenerator.onLinkChanged(json);
+    _wallpaperChooser.onLinkChanged(json);
   }
 
   /// Called when the user context is tapped.

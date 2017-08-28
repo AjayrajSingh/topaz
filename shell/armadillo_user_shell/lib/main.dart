@@ -176,6 +176,7 @@ Future<Null> main() async {
       powerManagerProxy.ctrl.close();
       powerModel.close();
     },
+    onWallpaperChosen: contextProviderContextModel.onWallpaperChosen,
   );
 
   QuickSettingsProgressModel quickSettingsProgressModel =

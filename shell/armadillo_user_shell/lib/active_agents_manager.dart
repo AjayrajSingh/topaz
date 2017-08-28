@@ -17,7 +17,6 @@ import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.story/story_state.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 
 /// Manages the list of active agents and the proposals for showing them.
@@ -34,7 +33,7 @@ class ActiveAgentsManager {
   final AgentProviderWatcherBinding _agentProviderWatcherBinding =
       new AgentProviderWatcherBinding();
 
-  _CreateStoryCustomAction _createStoryCustomAction;
+  _CustomAction _customAction;
 
   /// Starts listening for active agent changes and begins proposing the agent
   /// module be run.
@@ -49,18 +48,21 @@ class ActiveAgentsManager {
       _agentProviderWatcherBinding.wrap(_agentProviderWatcherImpl),
     );
 
-    _createStoryCustomAction = new _CreateStoryCustomAction(
+    _customAction = new _CustomAction(
       storyProvider: storyProvider,
       agentProviderWatcherImpl: _agentProviderWatcherImpl,
       focusProvider: focusProvider,
     );
 
-    _activeAgentProposer.start(proposalPublisher, _createStoryCustomAction);
+    _activeAgentProposer.start(
+      proposalPublisher: proposalPublisher,
+      customAction: _customAction,
+    );
   }
 
   /// Closes any open handles.
   void stop() {
-    _createStoryCustomAction.stop();
+    _customAction.stop();
     _activeAgentProposer.stop();
     _agentProviderWatcherBinding.close();
     _agentProvider.ctrl.close();
@@ -85,26 +87,32 @@ class _AgentProviderWatcherImpl extends AgentProviderWatcher {
 
 class _ActiveAgentProposer {
   final AskHandlerBinding _askHandlerBinding = new AskHandlerBinding();
-  final CustomActionBinding _customActionBinding = new CustomActionBinding();
+  _AskHandlerImpl _askHandlerImpl;
 
-  void start(ProposalPublisher proposalPublisher, CustomAction customAction) {
+  void start({
+    ProposalPublisher proposalPublisher,
+    CustomAction customAction,
+  }) {
+    _askHandlerImpl = new _AskHandlerImpl(
+      customAction: customAction,
+    );
     proposalPublisher.registerAskHandler(
-      _askHandlerBinding.wrap(new _AskHandlerImpl(
-        customAction: _customActionBinding.wrap(
-          customAction,
-        ),
-      )),
+      _askHandlerBinding.wrap(
+        _askHandlerImpl,
+      ),
     );
   }
 
   void stop() {
+    _askHandlerImpl.stop();
     _askHandlerBinding.close();
-    _customActionBinding.close();
   }
 }
 
 class _AskHandlerImpl extends AskHandler {
-  final InterfaceHandle<CustomAction> customAction;
+  final Set<CustomActionBinding> _bindings = new Set<CustomActionBinding>();
+
+  final CustomAction customAction;
 
   _AskHandlerImpl({this.customAction});
 
@@ -116,6 +124,8 @@ class _AskHandlerImpl extends AskHandler {
         (query.text?.toLowerCase()?.startsWith('age') ?? false) ||
         (query.text?.toLowerCase()?.contains('agent') ?? false) ||
         (query.text?.toLowerCase()?.contains('active') ?? false)) {
+      CustomActionBinding binding = new CustomActionBinding();
+      _bindings.add(binding);
       proposals.add(
         new Proposal()
           ..id = 'View Active Agents'
@@ -128,20 +138,27 @@ class _AskHandlerImpl extends AskHandler {
             ..imageType = SuggestionImageType.other
             ..imageUrl = ''
             ..annoyance = AnnoyanceType.none)
-          ..onSelected = <Action>[new Action()..customAction = customAction],
+          ..onSelected = <Action>[
+            new Action()..customAction = binding.wrap(customAction)
+          ],
       );
     }
+
     callback(proposals);
+  }
+
+  void stop() {
+    _bindings.forEach((CustomActionBinding binding) => binding.close());
   }
 }
 
-class _CreateStoryCustomAction extends CustomAction {
+class _CustomAction extends CustomAction {
   final StoryProvider storyProvider;
   final FocusProvider focusProvider;
   final _AgentProviderWatcherImpl agentProviderWatcherImpl;
   StoryControllerProxy storyControllerProxy;
 
-  _CreateStoryCustomAction({
+  _CustomAction({
     this.storyProvider,
     this.focusProvider,
     this.agentProviderWatcherImpl,
@@ -174,6 +191,7 @@ class _CreateStoryCustomAction extends CustomAction {
           );
           callback(null);
           storyControllerProxy?.ctrl?.close();
+          storyControllerProxy = null;
         });
       },
     );

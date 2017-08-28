@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:armadillo/context_model.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.logging/logging.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
@@ -44,7 +45,12 @@ class ContextProviderContextModel extends ContextModel {
     if (backgroundImageFile == null) {
       return super.backgroundImageProvider;
     }
-    return new FileImage(new File(backgroundImageFile));
+    Uri uri = Uri.parse(backgroundImageFile);
+    if (uri.scheme.startsWith('http')) {
+      return new NetworkImage(backgroundImageFile);
+    } else {
+      return new FileImage(new File(backgroundImageFile));
+    }
   }
 
   /// TODO(apwilson): Remove this.
@@ -88,6 +94,14 @@ class ContextProviderContextModel extends ContextModel {
   void onUserUpdated(String userName, String userImageUrl) {
     _userName = userName;
     _userImageUrl = userImageUrl;
+    notifyListeners();
+  }
+
+  /// Called when the user selected wallpapers change.
+  void onWallpaperChosen(List<String> images) {
+    log.info('Wallpapers chosen: $images');
+    _contextualBackgroundImages['default'] =
+        images.isNotEmpty ? images.first : null;
     notifyListeners();
   }
 

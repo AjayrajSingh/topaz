@@ -69,7 +69,7 @@ class SizeModel extends Model {
   static const double kStoryBarMinimizedHeight = 4.0;
 
   Size _screenSize = Size.zero;
-  double _suggestionListWidth;
+  double _suggestionListWidth = 0.0;
   double _suggestionWidth;
   double _interruptionLeftMargin;
   FormFactor _formFactor = FormFactor.tablet;
