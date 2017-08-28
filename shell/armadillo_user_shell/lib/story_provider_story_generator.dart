@@ -14,6 +14,7 @@ import 'package:apps.mozart.lib.flutter/child_view.dart';
 import 'package:apps.mozart.services.views/view_token.fidl.dart';
 import 'package:armadillo/story.dart';
 import 'package:armadillo/story_cluster.dart';
+import 'package:armadillo/story_cluster_entrance_transition_model.dart';
 import 'package:armadillo/story_cluster_id.dart';
 import 'package:armadillo/story_generator.dart';
 import 'package:flutter/material.dart';
@@ -475,7 +476,7 @@ class StoryProviderStoryGenerator extends StoryGenerator {
   }
 
   void _startStory(StoryInfo storyInfo, int startingIndex) {
-    log.info('Adding story: $storyInfo');
+    log.info('Adding story: $storyInfo $startingIndex');
 
     // Start it!
 
@@ -489,6 +490,8 @@ class StoryProviderStoryGenerator extends StoryGenerator {
         ),
       ],
       onStoryClusterChanged: _onStoryClusterChange,
+      storyClusterEntranceTransitionModel:
+          new StoryClusterEntranceTransitionModel(completed: false),
     );
 
     _storyClusters.add(storyCluster);

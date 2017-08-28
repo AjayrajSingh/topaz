@@ -14,6 +14,7 @@ import 'place_holder_story.dart';
 import 'simulation_builder.dart';
 import 'story.dart';
 import 'story_cluster_drag_feedback.dart';
+import 'story_cluster_entrance_transition_model.dart';
 import 'story_cluster_id.dart';
 import 'story_cluster_panels_model.dart';
 import 'story_cluster_stories_model.dart';
@@ -61,6 +62,9 @@ class StoryCluster {
   /// Called when details about how the stories are clustered changes.
   final VoidCallback onStoryClusterChanged;
 
+  /// The model handling the entrance transtion of the cluster.
+  final StoryClusterEntranceTransitionModel storyClusterEntranceTransitionModel;
+
   /// The title of a cluster is currently generated via
   /// [_getClusterTitle] whenever the list of stories in this cluster changes.
   /// [_getClusterTitle] currently just concatenates the titles of the stories
@@ -88,6 +92,7 @@ class StoryCluster {
     List<Story> stories,
     this.storyLayout,
     this.onStoryClusterChanged,
+    StoryClusterEntranceTransitionModel storyClusterEntranceTransitionModel,
   })
       : this._stories = stories,
         this.title = _getClusterTitle(stories),
@@ -106,13 +111,18 @@ class StoryCluster {
             debugLabel: 'focusSimulationKey'),
         this.inlinePreviewScaleSimulationKey =
             new GlobalKey<SimulationBuilderState>(
-                debugLabel: 'inlinePreviewScaleSimulationKey'),
+          debugLabel: 'inlinePreviewScaleSimulationKey',
+        ),
         this.inlinePreviewHintScaleSimulationKey =
             new GlobalKey<SimulationBuilderState>(
-                debugLabel: 'inlinePreviewHintScaleSimulationKey'),
+          debugLabel: 'inlinePreviewHintScaleSimulationKey',
+        ),
         this._displayMode = DisplayMode.panels,
         this._storyListListeners = new Set<VoidCallback>(),
-        this._focusedStoryId = stories[0].id {
+        this._focusedStoryId = stories[0].id,
+        this.storyClusterEntranceTransitionModel =
+            storyClusterEntranceTransitionModel ??
+                new StoryClusterEntranceTransitionModel() {
     _storiesModel = new StoryClusterStoriesModel(this);
     addStoryListListener(_storiesModel.notifyListeners);
     _panelsModel = new StoryClusterPanelsModel(this);

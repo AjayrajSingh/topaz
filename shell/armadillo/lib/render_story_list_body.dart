@@ -21,6 +21,10 @@ const bool _kSlideUnfocusedAway = true;
 /// [RenderStoryListBody] as the focused child grows.
 const double _kSlideUnfocusedAwayOffsetY = -200.0;
 
+/// The distance in the Y direction to slide entering children of
+/// [RenderStoryListBody].
+const double _kSlideWhenEnteringOffsetY = -400.0;
+
 /// The unfocused children of [RenderStoryListBody] should be fully transparent
 /// when the focused child's focus progress reaches this value and beyond.
 const double _kFocusProgressWhenUnfocusedFullyTransparent = 0.7;
@@ -308,6 +312,28 @@ class RenderStoryListBody extends RenderListBody {
         if (childParentData.focusProgress == 0.0) {
           childParentData.offset = childParentData.offset +
               new Offset(0.0, _kSlideUnfocusedAwayOffsetY * maxFocusProgress);
+        }
+        child = childParentData.nextSibling;
+      }
+    }
+
+    // Shift vertically any stories that are entering.
+    {
+      RenderBox child = firstChild;
+      while (child != null) {
+        final StoryListBodyParentData childParentData = child.parentData;
+        if (childParentData.entranceTransitionProgress != 1.0) {
+          childParentData.offset = childParentData.offset +
+              new Offset(
+                0.0,
+                _kSlideWhenEnteringOffsetY *
+                    (1.0 -
+                        lerpDouble(
+                          childParentData.entranceTransitionProgress,
+                          1.0,
+                          childParentData.focusProgress,
+                        )),
+              );
         }
         child = childParentData.nextSibling;
       }

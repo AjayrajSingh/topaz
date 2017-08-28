@@ -16,6 +16,7 @@ import 'simulation_builder.dart';
 import 'size_model.dart';
 import 'story.dart';
 import 'story_cluster.dart';
+import 'story_cluster_entrance_transition_model.dart';
 import 'story_cluster_widget.dart';
 import 'story_drag_transition_model.dart';
 import 'story_list_body_parent_data.dart';
@@ -164,48 +165,65 @@ class StoryList extends StatelessWidget {
     StoryCluster storyCluster,
     Map<StoryId, Widget> storyWidgets,
   ) =>
-      new SimulationBuilder(
-        key: storyCluster.inlinePreviewHintScaleSimulationKey,
-        springDescription: _kInlinePreviewSimulationDesc,
-        initValue: 0.0,
-        targetValue: 0.0,
-        builder: (
-          BuildContext context,
-          double inlinePreviewHintScaleProgress,
-        ) =>
-            new SimulationBuilder(
-              key: storyCluster.inlinePreviewScaleSimulationKey,
-              springDescription: _kInlinePreviewSimulationDesc,
-              initValue: 0.0,
-              targetValue: 0.0,
-              builder: (BuildContext context,
-                      double inlinePreviewScaleProgress) =>
-                  new SimulationBuilder(
-                    key: storyCluster.focusSimulationKey,
-                    initValue: 0.0,
-                    targetValue: 0.0,
-                    onSimulationChanged: (double focusProgress, bool isDone) {
-                      if (focusProgress == 1.0 && isDone) {
-                        onStoryClusterFocusCompleted?.call(storyCluster);
-                      }
-                    },
-                    builder: (BuildContext context, double focusProgress) =>
-                        new _StoryListChild(
-                          storyLayout: storyCluster.storyLayout,
-                          focusProgress: focusProgress,
-                          inlinePreviewScaleProgress:
-                              inlinePreviewScaleProgress,
-                          inlinePreviewHintScaleProgress:
-                              inlinePreviewHintScaleProgress,
-                          child: _createStoryCluster(
-                            storyClusters,
-                            storyCluster,
-                            focusProgress,
-                            storyWidgets,
+      new ScopedModel<StoryClusterEntranceTransitionModel>(
+        model: storyCluster.storyClusterEntranceTransitionModel,
+        child: new ScopedModelDescendant<StoryClusterEntranceTransitionModel>(
+          builder: (
+            _,
+            __,
+            StoryClusterEntranceTransitionModel
+                storyClusterEntranceTransitionModel,
+          ) =>
+              new SimulationBuilder(
+                key: storyCluster.inlinePreviewHintScaleSimulationKey,
+                springDescription: _kInlinePreviewSimulationDesc,
+                initValue: 0.0,
+                targetValue: 0.0,
+                builder: (
+                  BuildContext context,
+                  double inlinePreviewHintScaleProgress,
+                ) =>
+                    new SimulationBuilder(
+                      key: storyCluster.inlinePreviewScaleSimulationKey,
+                      springDescription: _kInlinePreviewSimulationDesc,
+                      initValue: 0.0,
+                      targetValue: 0.0,
+                      builder: (BuildContext context,
+                              double inlinePreviewScaleProgress) =>
+                          new SimulationBuilder(
+                            key: storyCluster.focusSimulationKey,
+                            initValue: 0.0,
+                            targetValue: 0.0,
+                            onSimulationChanged:
+                                (double focusProgress, bool isDone) {
+                              if (focusProgress == 1.0 && isDone) {
+                                onStoryClusterFocusCompleted
+                                    ?.call(storyCluster);
+                              }
+                            },
+                            builder:
+                                (BuildContext context, double focusProgress) =>
+                                    new _StoryListChild(
+                                      storyLayout: storyCluster.storyLayout,
+                                      focusProgress: focusProgress,
+                                      inlinePreviewScaleProgress:
+                                          inlinePreviewScaleProgress,
+                                      inlinePreviewHintScaleProgress:
+                                          inlinePreviewHintScaleProgress,
+                                      entranceTransitionProgress:
+                                          storyClusterEntranceTransitionModel
+                                              .progress,
+                                      child: _createStoryCluster(
+                                        storyClusters,
+                                        storyCluster,
+                                        focusProgress,
+                                        storyWidgets,
+                                      ),
+                                    ),
                           ),
-                        ),
-                  ),
-            ),
+                    ),
+              ),
+        ),
       );
 
   Widget _createStoryCluster(
@@ -315,6 +333,7 @@ class _StoryListChild extends ParentDataWidget<_StoryListBody> {
   final double _focusProgress;
   final double _inlinePreviewScaleProgress;
   final double _inlinePreviewHintScaleProgress;
+  final double _entranceTransitionProgress;
 
   _StoryListChild({
     Widget child,
@@ -322,11 +341,13 @@ class _StoryListChild extends ParentDataWidget<_StoryListBody> {
     double focusProgress,
     double inlinePreviewScaleProgress,
     double inlinePreviewHintScaleProgress,
+    double entranceTransitionProgress,
   })
       : _storyLayout = storyLayout,
         _focusProgress = focusProgress,
         _inlinePreviewScaleProgress = inlinePreviewScaleProgress,
         _inlinePreviewHintScaleProgress = inlinePreviewHintScaleProgress,
+        _entranceTransitionProgress = entranceTransitionProgress,
         super(child: child);
 
   @override
@@ -337,7 +358,8 @@ class _StoryListChild extends ParentDataWidget<_StoryListBody> {
       ..storyLayout = _storyLayout
       ..focusProgress = _focusProgress
       ..inlinePreviewScaleProgress = _inlinePreviewScaleProgress
-      ..inlinePreviewHintScaleProgress = _inlinePreviewHintScaleProgress;
+      ..inlinePreviewHintScaleProgress = _inlinePreviewHintScaleProgress
+      ..entranceTransitionProgress = _entranceTransitionProgress;
   }
 
   @override
@@ -365,6 +387,12 @@ class _StoryListChild extends ParentDataWidget<_StoryListBody> {
       new DoubleProperty(
         'inlinePreviewHintScaleProgress',
         _inlinePreviewHintScaleProgress,
+      ),
+    );
+    description.add(
+      new DoubleProperty(
+        'entranceTransitionProgress',
+        _entranceTransitionProgress,
       ),
     );
   }

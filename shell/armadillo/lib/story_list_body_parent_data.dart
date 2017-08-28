@@ -18,6 +18,7 @@ class StoryListBodyParentData extends ListBodyParentData {
   double _focusProgress;
   double _inlinePreviewScaleProgress;
   double _inlinePreviewHintScaleProgress;
+  double _entranceTransitionProgress;
 
   /// Constructor.
   StoryListBodyParentData(this.owner);
@@ -61,4 +62,14 @@ class StoryListBodyParentData extends ListBodyParentData {
 
   /// The progress of the inline preview hint transition from 0.0 to 1.0.
   double get inlinePreviewHintScaleProgress => _inlinePreviewHintScaleProgress;
+
+  set entranceTransitionProgress(double entranceTransitionProgress) {
+    if (_entranceTransitionProgress != entranceTransitionProgress) {
+      _entranceTransitionProgress = entranceTransitionProgress;
+      owner.markNeedsLayout();
+    }
+  }
+
+  /// The progress of the entrance transition from 0.0 to 1.0.
+  double get entranceTransitionProgress => _entranceTransitionProgress;
 }

@@ -87,6 +87,29 @@ class StoryModel extends Model {
       listHeight = math.max(listHeight, -storyLayout[i].offset.dy);
     }
     _listHeight = listHeight;
+
+    /// We delay each story a bit more so we have a staggered entrance
+    /// transition.  We also delay all stories by a set amount dependent on the
+    /// number of clusters that haven't loaded in yet.  This should reduce jank
+    /// while those clusters load for the first time.
+    int unenteredClusters = _storyClusters
+        .where(
+          (StoryCluster storyCluster) =>
+              storyCluster.storyClusterEntranceTransitionModel.progress == 0.0,
+        )
+        .length;
+
+    int delayMultiple = 0;
+    _storyClusters.forEach((StoryCluster storyCluster) {
+      if (storyCluster.storyClusterEntranceTransitionModel.progress == 0.0) {
+        storyCluster.storyClusterEntranceTransitionModel.reset(
+          delay:
+              (0.5 * math.min(6, unenteredClusters)) + (0.25 * delayMultiple),
+          completed: false,
+        );
+        delayMultiple++;
+      }
+    });
   }
 
   /// Updates the [Story.lastInteraction] of [storyCluster] to be [DateTime.now].
