@@ -10,6 +10,7 @@ import 'panel.dart';
 import 'panel_resizing_model.dart';
 import 'story.dart';
 import 'story_cluster.dart';
+import 'story_cluster_panels_model.dart';
 import 'story_positioned.dart';
 
 const double _kDragTargetSize = 24.0;
@@ -19,16 +20,12 @@ const Color _kGestureDetectorColor = const Color(0x00800080);
 /// Adds gesture detectors between [storyCluster]'s panels to allow them to be
 /// resized with a horizontal or vertical drag.  These gesture detectors are
 /// overlayed on top of [child].
-/// Once a resizing has occurred [onPanelsChanged] will be called.
 class PanelResizingOverlay extends StatelessWidget {
   /// The cluster whose panels are to be resized.
   final StoryCluster storyCluster;
 
   /// The cluster's widget.
   final Widget child;
-
-  /// Called when a panel is resized.
-  final VoidCallback onPanelsChanged;
 
   /// The current size of the cluster's widget.
   final Size currentSize;
@@ -38,13 +35,25 @@ class PanelResizingOverlay extends StatelessWidget {
     Key key,
     this.storyCluster,
     this.child,
-    this.onPanelsChanged,
     this.currentSize,
   })
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      new ScopedModelDescendant<StoryClusterPanelsModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          StoryClusterPanelsModel storyClusterPanelsModel,
+        ) =>
+            _buildWidget(context, storyClusterPanelsModel),
+      );
+
+  Widget _buildWidget(
+    BuildContext context,
+    StoryClusterPanelsModel storyClusterPanelsModel,
+  ) {
     // For each panel, look at its right and bottom.  If not 1.0, find the
     // panels on the other side of that edge.  If 1:many or many:1
     Set<double> rights = new Set<double>();
@@ -62,7 +71,11 @@ class PanelResizingOverlay extends StatelessWidget {
     List<Widget> stackChildren = <Widget>[child];
 
     // Create draggables for each vertical seam.
-    List<_VerticalSeam> verticalSeams = _getVerticalSeams(context, rights);
+    List<_VerticalSeam> verticalSeams = _getVerticalSeams(
+      context,
+      rights,
+      storyClusterPanelsModel,
+    );
     stackChildren.addAll(
       verticalSeams.map(
         (_VerticalSeam verticalSeam) => new Positioned.fill(
@@ -73,7 +86,7 @@ class PanelResizingOverlay extends StatelessWidget {
 
     // Create draggables for each horizontal seam.
     List<_HorizontalSeam> horizontalSeams =
-        _getHorizontalSeams(context, bottoms);
+        _getHorizontalSeams(context, bottoms, storyClusterPanelsModel);
     stackChildren.addAll(
       horizontalSeams.map(
         (_HorizontalSeam horizontalSeam) => new Positioned.fill(
@@ -93,7 +106,10 @@ class PanelResizingOverlay extends StatelessWidget {
   /// There can be multiple [_VerticalSeam]s for a right if the panels on the
   /// left and right don't overlap contiguously.
   List<_VerticalSeam> _getVerticalSeams(
-      BuildContext context, Set<double> rights) {
+    BuildContext context,
+    Set<double> rights,
+    StoryClusterPanelsModel storyClusterPanelsModel,
+  ) {
     List<_VerticalSeam> verticalSeams = <_VerticalSeam>[];
     rights.forEach((double right) {
       List<Panel> touchingPanels = storyCluster.panels
@@ -121,7 +137,10 @@ class PanelResizingOverlay extends StatelessWidget {
               bottom: bottom,
               panelsToLeft: panelsToLeft,
               panelsToRight: panelsToRight,
-              onPanelsChanged: () => _onPanelsChanged(context),
+              onPanelsChanged: () => _onPanelsChanged(
+                    context,
+                    storyClusterPanelsModel,
+                  ),
               panelResizingModel: PanelResizingModel.of(context),
             ),
           );
@@ -145,7 +164,10 @@ class PanelResizingOverlay extends StatelessWidget {
           bottom: bottom,
           panelsToLeft: panelsToLeft,
           panelsToRight: panelsToRight,
-          onPanelsChanged: () => _onPanelsChanged(context),
+          onPanelsChanged: () => _onPanelsChanged(
+                context,
+                storyClusterPanelsModel,
+              ),
           panelResizingModel: PanelResizingModel.of(context),
         ),
       );
@@ -158,7 +180,10 @@ class PanelResizingOverlay extends StatelessWidget {
   /// There can be multiple [_HorizontalSeam]s for a bottom if the panels on the
   /// top and bottom don't overlap contiguously.
   List<_HorizontalSeam> _getHorizontalSeams(
-      BuildContext context, Set<double> bottoms) {
+    BuildContext context,
+    Set<double> bottoms,
+    StoryClusterPanelsModel storyClusterPanelsModel,
+  ) {
     List<_HorizontalSeam> horizontalSeams = <_HorizontalSeam>[];
     bottoms.forEach((double bottom) {
       List<Panel> touchingPanels = storyCluster.panels
@@ -186,7 +211,10 @@ class PanelResizingOverlay extends StatelessWidget {
               right: right,
               panelsAbove: panelsAbove,
               panelsBelow: panelsBelow,
-              onPanelsChanged: () => _onPanelsChanged(context),
+              onPanelsChanged: () => _onPanelsChanged(
+                    context,
+                    storyClusterPanelsModel,
+                  ),
               panelResizingModel: PanelResizingModel.of(context),
             ),
           );
@@ -210,7 +238,10 @@ class PanelResizingOverlay extends StatelessWidget {
           right: right,
           panelsAbove: panelsAbove,
           panelsBelow: panelsBelow,
-          onPanelsChanged: () => _onPanelsChanged(context),
+          onPanelsChanged: () => _onPanelsChanged(
+                context,
+                storyClusterPanelsModel,
+              ),
           panelResizingModel: PanelResizingModel.of(context),
         ),
       );
@@ -218,7 +249,10 @@ class PanelResizingOverlay extends StatelessWidget {
     return horizontalSeams;
   }
 
-  void _onPanelsChanged(BuildContext context) {
+  void _onPanelsChanged(
+    BuildContext context,
+    StoryClusterPanelsModel storyClusterPanelsModel,
+  ) {
     storyCluster.stories.forEach((Story story) {
       EdgeInsets margins = StoryPositioned.getFractionalMargins(
         story.panel,
@@ -233,7 +267,7 @@ class PanelResizingOverlay extends StatelessWidget {
         fractionalHeight: story.panel.height - (margins.top + margins.bottom),
       );
     });
-    onPanelsChanged();
+    storyClusterPanelsModel.notifyListeners();
   }
 }
 

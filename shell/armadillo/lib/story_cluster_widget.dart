@@ -209,32 +209,23 @@ class StoryClusterWidget extends StatelessWidget {
               storyCluster: storyCluster,
               onAccept: onAccept,
               onVerticalEdgeHover: onVerticalEdgeHover,
-              child: new ScopedModelDescendant<StoryClusterPanelsModel>(
-                builder: (
-                  BuildContext context,
-                  Widget child,
-                  StoryClusterPanelsModel storyClusterPanelsModel,
-                ) =>
-                    new OptionalWrapper(
-                      useWrapper: _isFocused &&
-                          storyCluster.displayMode == DisplayMode.panels,
-                      builder: (BuildContext context, Widget child) =>
-                          new PanelResizingOverlay(
-                            storyCluster: storyCluster,
-                            currentSize: currentSize,
-                            onPanelsChanged: () =>
-                                storyClusterPanelsModel.notifyListeners(),
-                            child: child,
-                          ),
-                      child: new StoryPanels(
-                        key: storyCluster.panelsKey,
-                        storyCluster: storyCluster,
-                        focusProgress: focusProgress,
-                        overlayKey: overlayKey,
-                        storyWidgets: storyWidgets,
-                        currentSize: currentSize,
-                      ),
+              child: new OptionalWrapper(
+                useWrapper: _isFocused &&
+                    storyCluster.displayMode == DisplayMode.panels,
+                builder: (BuildContext context, Widget child) =>
+                    new PanelResizingOverlay(
+                      storyCluster: storyCluster,
+                      currentSize: currentSize,
+                      child: child,
                     ),
+                child: new StoryPanels(
+                  key: storyCluster.panelsKey,
+                  storyCluster: storyCluster,
+                  focusProgress: focusProgress,
+                  overlayKey: overlayKey,
+                  storyWidgets: storyWidgets,
+                  currentSize: currentSize,
+                ),
               ),
             ),
           );
