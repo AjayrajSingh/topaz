@@ -50,7 +50,7 @@
 #include "apps/modular/lib/rapidjson/rapidjson.h"
 #include "apps/modular/services/module/module.fidl.h"
 #include "apps/modular/services/story/link.fidl.h"
-#include "apps/mozart/lib/scene/client/host_image_cycler.h"
+#include "apps/mozart/lib/scenic/client/host_image_cycler.h"
 #include "apps/mozart/lib/view_framework/base_view.h"
 #include "apps/mozart/lib/view_framework/view_provider_app.h"
 #include "apps/web_runner/services/web_view.fidl.h"
@@ -76,7 +76,7 @@ class TouchTracker {
       : start_x_(x), start_y_(y), last_x_(0), last_y_(0), is_drag_(false) {}
 
   void HandleEvent(const mozart::PointerEventPtr& pointer,
-                   const mozart2::Metrics& metrics,
+                   const scenic::Metrics& metrics,
                    WebView& web_view) {
     const auto x = pointer->x * metrics.scale_x;
     const auto y = pointer->y * metrics.scale_y;
@@ -188,9 +188,7 @@ class MozWebView : public mozart::BaseView,
   }
 
   // |WebView|:
-  void ClearCookies() override {
-    web_view_.deleteAllCookies();
-  }
+  void ClearCookies() override { web_view_.deleteAllCookies(); }
 
   void SetWebRequestDelegate(
       ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) final {
@@ -313,15 +311,15 @@ class MozWebView : public mozart::BaseView,
 
   // |BaseView|:
   void OnSceneInvalidated(
-      mozart2::PresentationInfoPtr presentation_info) override {
+      scenic::PresentationInfoPtr presentation_info) override {
     if (!has_physical_size())
       return;
 
     // Update the image.
-    const mozart::client::HostImage* image = image_cycler_.AcquireImage(
+    const scenic_lib::HostImage* image = image_cycler_.AcquireImage(
         physical_size().width, physical_size().height,
-        physical_size().width * 4u, mozart2::ImageInfo::PixelFormat::BGRA_8,
-        mozart2::ImageInfo::ColorSpace::SRGB);
+        physical_size().width * 4u, scenic::ImageInfo::PixelFormat::BGRA_8,
+        scenic::ImageInfo::ColorSpace::SRGB);
     FTL_DCHECK(image);
 
     // Paint the webview.
@@ -347,8 +345,8 @@ class MozWebView : public mozart::BaseView,
     }
 
     if (page_scale_factor_ != metrics().scale_x) {
-        page_scale_factor_ = metrics().scale_x;
-        web_view_.setPageAndTextZoomFactors(page_scale_factor_, 1.0);
+      page_scale_factor_ = metrics().scale_x;
+      web_view_.setPageAndTextZoomFactors(page_scale_factor_, 1.0);
     }
 
     web_view_.iterateEventLoop();
@@ -407,7 +405,7 @@ class MozWebView : public mozart::BaseView,
   std::map<uint32_t, TouchTracker> touch_trackers_;
   float page_scale_factor_ = 0;
 
-  mozart::client::HostImageCycler image_cycler_;
+  scenic_lib::HostImageCycler image_cycler_;
 
   // Link state, used to gather URL updates for the story
   modular::LinkPtr main_link_;
