@@ -22,6 +22,7 @@ template("dart_jit_app") {
       "analysis_options",
       "deps",
       "disable_analysis",
+      "non_dart_deps",
       "source_dir",
     ])
 
@@ -125,6 +126,7 @@ template("dart_aot_app") {
       "analysis_options",
       "deps",
       "disable_analysis",
+      "non_dart_deps",
       "source_dir",
     ])
 
