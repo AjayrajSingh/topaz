@@ -414,7 +414,7 @@ class StoryPanels extends StatelessWidget {
                         focused:
                             (storyCluster.displayMode == DisplayMode.panels) ||
                                 (storyCluster.focusedStoryId == story.id),
-                        elevation: 0.0,
+                        elevation: storyElevationWithTabs,
                         borderRadius: _getStoryBarBorderRadius(story),
                       ),
                     ),
