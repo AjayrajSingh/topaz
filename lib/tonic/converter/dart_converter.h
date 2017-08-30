@@ -227,6 +227,33 @@ struct DartConverter<std::string> {
 };
 
 template <>
+struct DartConverter<std::u16string> {
+  static Dart_Handle ToDart(const std::u16string& val) {
+    return Dart_NewStringFromUTF16(
+        reinterpret_cast<const uint16_t*>(val.data()), val.length());
+  }
+
+  static void SetReturnValue(Dart_NativeArguments args,
+                             const std::u16string& val) {
+    Dart_SetReturnValue(args, ToDart(val));
+  }
+
+  static std::u16string FromDart(Dart_Handle handle) {
+    intptr_t length = 0;
+    Dart_StringLength(handle, &length);
+    std::vector<uint16_t> data(length);
+    Dart_StringToUTF16(handle, data.data(), &length);
+    return std::u16string(reinterpret_cast<char16_t*>(data.data()), length);
+  }
+
+  static std::u16string FromArguments(Dart_NativeArguments args,
+                                      int index,
+                                      Dart_Handle& exception) {
+    return FromDart(Dart_GetNativeArgument(args, index));
+  }
+};
+
+template <>
 struct DartConverter<const char*> {
   static Dart_Handle ToDart(const char* val) {
     return Dart_NewStringFromCString(val);
