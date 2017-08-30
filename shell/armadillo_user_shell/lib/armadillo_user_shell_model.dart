@@ -12,7 +12,7 @@ import 'package:apps.modular.services.story/story_provider.fidl.dart';
 import 'package:apps.modular.services.user/focus.fidl.dart';
 import 'package:apps.modular.services.user/user_shell.fidl.dart';
 import 'package:flutter/widgets.dart';
-import 'package:home_work_agent_lib/home_work_proposer.dart';
+import 'package:home_work_agent/home_work_proposer.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'active_agents_manager.dart';

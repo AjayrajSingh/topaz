@@ -53,7 +53,12 @@ const bool _kShowPerformanceOverlay = false;
 const bool _kDumpAllErrors = false;
 
 Future<Null> main() async {
-  setupLogger(name: 'armadillo');
+  runApp(buildArmadilloUserShell(logName: 'armadillo'));
+}
+
+/// Builds the armadillo user shell.
+Widget buildArmadilloUserShell({String logName}) {
+  setupLogger(name: logName);
 
   if (_kDumpAllErrors) {
     FlutterError.onError =
@@ -299,17 +304,15 @@ Future<Null> main() async {
         _kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app,
   )..advertise();
 
-  runApp(
-    new WindowMediaQuery(
-      onWindowMetricsChanged: () {
-        sizeModel.screenSize =
-            ui.window.physicalSize / ui.window.devicePixelRatio;
-      },
-      child: new CheckedModeBanner(child: userShellWidget),
-    ),
-  );
+  contextProviderContextModel.load();
 
-  await contextProviderContextModel.load();
+  return new WindowMediaQuery(
+    onWindowMetricsChanged: () {
+      sizeModel.screenSize =
+          ui.window.physicalSize / ui.window.devicePixelRatio;
+    },
+    child: new CheckedModeBanner(child: userShellWidget),
+  );
 }
 
 Widget _buildApp({
