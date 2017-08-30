@@ -182,6 +182,7 @@ void RunApplication(
     });
 
     loop.Run();
+    app.SendReturnCode();
   }
 }
 

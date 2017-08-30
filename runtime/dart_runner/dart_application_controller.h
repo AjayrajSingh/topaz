@@ -32,11 +32,13 @@ class DartApplicationController : public app::ApplicationController {
   bool CreateIsolate();
 
   bool Main();
+  void SendReturnCode();
 
  private:
   // |ApplicationController|
   void Kill() override;
   void Detach() override;
+  void Wait(const WaitCallback& callback) override;
 
   mxio_ns_t* SetupNamespace();
 
@@ -51,6 +53,8 @@ class DartApplicationController : public app::ApplicationController {
   app::ServiceProviderBridge service_provider_bridge_;
   fidl::Binding<app::ApplicationController> binding_;
   Dart_Isolate isolate_;
+  int32_t return_code_ = 0;
+  std::vector<WaitCallback> wait_callbacks_;
 
   FTL_DISALLOW_COPY_AND_ASSIGN(DartApplicationController);
 };

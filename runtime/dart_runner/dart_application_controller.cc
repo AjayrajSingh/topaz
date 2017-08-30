@@ -81,6 +81,11 @@ bool DartApplicationController::CreateIsolate() {
 
   state->message_handler().Initialize(
       mtl::MessageLoop::GetCurrent()->task_runner());
+
+  state->SetReturnCodeCallback([this](uint32_t return_code) {
+    return_code_ = return_code;
+  });
+
   return true;
 }
 
@@ -202,6 +207,17 @@ void DartApplicationController::Kill() {
 
 void DartApplicationController::Detach() {
   binding_.set_connection_error_handler(ftl::Closure());
+}
+
+void DartApplicationController::Wait(const WaitCallback& callback) {
+  wait_callbacks_.push_back(callback);
+}
+
+void DartApplicationController::SendReturnCode() {
+  for (const auto& iter : wait_callbacks_) {
+    iter(return_code_);
+  }
+  wait_callbacks_.clear();
 }
 
 }  // namespace dart_content_handler
