@@ -8,6 +8,7 @@ import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.agent/agent.fidl.dart';
 import 'package:apps.modular.services.agent/agent_context.fidl.dart';
+import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
 import 'package:apps.modules.music.services.player/player.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
@@ -15,13 +16,14 @@ import 'package:lib.logging/logging.dart';
 import 'src/player_impl.dart';
 
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
-MusicPlaybackAgent _agent;
+MusicPlaybackAgent _agent = new MusicPlaybackAgent();
 
 /// An [Agent] that provides access fo the music player service
 // TODO(youngseokyoon): use AgentImpl in music_playback_agent.
 // https://fuchsia.atlassian.net/browse/SO-539
-class MusicPlaybackAgent extends Agent {
+class MusicPlaybackAgent implements Agent, Lifecycle {
   final AgentBinding _agentBinding = new AgentBinding();
+  final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
 
   final ServiceProviderImpl _outgoingServicesImpl = new ServiceProviderImpl();
   final List<ServiceProviderBinding> _outgoingServicesBindings =
@@ -31,7 +33,20 @@ class MusicPlaybackAgent extends Agent {
 
   /// Bind an [InterfaceRequest] for an [Agent] interface to this object.
   void bind(InterfaceRequest<Agent> request) {
-    _agentBinding.bind(this, request);
+    if (!_agentBinding.isBound) {
+      _agentBinding.bind(this, request);
+    } else {
+      request.close();
+    }
+  }
+
+  /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
+  void bindLifecycle(InterfaceRequest<Lifecycle> request) {
+    if (!_lifecycleBinding.isBound) {
+      _lifecycleBinding.bind(this, request);
+    } else {
+      request.close();
+    }
   }
 
   @override
@@ -72,13 +87,13 @@ class MusicPlaybackAgent extends Agent {
   @override
   void runTask(String taskId, void callback()) {}
 
-  /// Implements [Agent] interface.
+  /// Implements [Lifecycle] interface.
   @override
-  void stop(void callback()) {
+  void terminate() {
+    _agentBinding.close();
+    _lifecycleBinding.close();
     _outgoingServicesBindings
         .forEach((ServiceProviderBinding binding) => binding.close());
-
-    callback();
   }
 }
 
@@ -86,13 +101,11 @@ class MusicPlaybackAgent extends Agent {
 Future<Null> main(List<String> args) async {
   setupLogger();
 
-  _context.outgoingServices.addServiceForName(
-      (InterfaceRequest<Agent> request) {
-    if (_agent == null) {
-      _agent = new MusicPlaybackAgent()..bind(request);
-    } else {
-      // Can only connect to this interface once.
-      request.close();
-    }
-  }, Agent.serviceName);
+  _context.outgoingServices
+    ..addServiceForName((InterfaceRequest<Agent> request) {
+      _agent.bind(request);
+    }, Agent.serviceName)
+    ..addServiceForName((InterfaceRequest<Lifecycle> request) {
+      _agent.bindLifecycle(request);
+    }, Lifecycle.serviceName);
 }
