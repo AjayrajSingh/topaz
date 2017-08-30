@@ -116,7 +116,7 @@ class StoryClusterWidget extends StatelessWidget {
                 StoryClusterDragStateModel.of(context).removeDragging(
                       storyCluster.id,
                     ),
-            onDismiss: () => StoryModel.of(context).remove(
+            onDismiss: () => StoryModel.of(context).delete(
                   StoryModel.of(context).getStoryCluster(storyCluster.id),
                 ),
             feedbackBuilder: (

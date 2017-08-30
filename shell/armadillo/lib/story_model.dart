@@ -23,12 +23,16 @@ export 'package:lib.widgets/model.dart'
 class StoryModel extends Model {
   /// Called when the currently focused [StoryCluster] changes.
   final OnStoryClusterEvent onFocusChanged;
+
+  /// Called when a [StoryCluster] should be deleted.
+  final ValueChanged<StoryClusterId> onDeleteStoryCluster;
+
   List<StoryCluster> _storyClusters = <StoryCluster>[];
   Size _lastLayoutSize = Size.zero;
   double _listHeight = 0.0;
 
   /// Constructor.
-  StoryModel({this.onFocusChanged});
+  StoryModel({this.onFocusChanged, this.onDeleteStoryCluster});
 
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
@@ -175,6 +179,11 @@ class StoryModel extends Model {
     storyCluster.becomePlaceholder();
     updateLayouts(_lastLayoutSize);
     notifyListeners();
+  }
+
+  /// Called when a [StoryCluster] should be deleted.
+  void delete(StoryCluster storyCluster) {
+    onDeleteStoryCluster(storyCluster.id);
   }
 
   /// Removes [storyToSplit] from [from]'s stories and updates [from]'s stories

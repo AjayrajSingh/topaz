@@ -106,6 +106,7 @@ Widget buildArmadilloUserShell({String logName}) {
 
   StoryModel storyModel = new StoryModel(
     onFocusChanged: suggestionProviderSuggestionModel.storyClusterFocusChanged,
+    onDeleteStoryCluster: storyProviderStoryGenerator.onDeleteStoryCluster,
   );
   storyProviderStoryGenerator.addListener(
     () => storyModel.onStoryClustersChanged(

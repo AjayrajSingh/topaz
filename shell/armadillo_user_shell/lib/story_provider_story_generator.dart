@@ -16,7 +16,6 @@ import 'package:armadillo/story.dart';
 import 'package:armadillo/story_cluster.dart';
 import 'package:armadillo/story_cluster_entrance_transition_model.dart';
 import 'package:armadillo/story_cluster_id.dart';
-import 'package:armadillo/story_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart' as bindings;
 import 'package:lib.logging/logging.dart';
@@ -31,7 +30,7 @@ const String _kStoryClustersLinkKey = 'story_clusters';
 
 /// Creates a list of stories for the StoryList using
 /// modular's [StoryProvider].
-class StoryProviderStoryGenerator extends StoryGenerator {
+class StoryProviderStoryGenerator {
   final Set<VoidCallback> _listeners = new Set<VoidCallback>();
   bool _firstTime = true;
   bool _writeStoryClusterUpdatesToLink = false;
@@ -107,17 +106,17 @@ class StoryProviderStoryGenerator extends StoryGenerator {
     _link = link;
   }
 
-  @override
+  /// [listener] will be called when [storyClusters] changes.
   void addListener(VoidCallback listener) {
     _listeners.add(listener);
   }
 
-  @override
+  /// [listener] will no longer be called when [storyClusters] changes.
   void removeListener(VoidCallback listener) {
     _listeners.remove(listener);
   }
 
-  @override
+  /// The list of [StoryCluster]s.
   List<StoryCluster> get storyClusters => _storyClusters;
 
   /// Called when the drag state of a cluster changes.
@@ -327,12 +326,15 @@ class StoryProviderStoryGenerator extends StoryGenerator {
 
   /// Removes all the stories in the [StoryCluster] with [storyClusterId] from
   /// the [StoryProvider].
-  void removeStoryCluster(StoryClusterId storyClusterId) {
+  void onDeleteStoryCluster(StoryClusterId storyClusterId) {
     StoryCluster storyCluster = _storyClusters
         .where((StoryCluster storyCluster) => storyCluster.id == storyClusterId)
         .single;
     storyCluster.stories.forEach((Story story) {
-      _storyProvider.deleteStory(story.id.value, () {});
+      log.info('Deleting story ${story.id.value}...');
+      _storyProvider.deleteStory(story.id.value, () {
+        log.info('Story ${story.id.value} deleted!');
+      });
       _removeStory(story.id.value, notify: false);
     });
     _storyClusters.remove(storyCluster);
