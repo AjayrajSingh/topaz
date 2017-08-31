@@ -12,6 +12,6 @@ source_set("logging") {
 
   public_deps = [
     "//dart/runtime:dart_api",
-    "//lib/ftl",
+    "//garnet/public/lib/ftl",
   ]
 }
