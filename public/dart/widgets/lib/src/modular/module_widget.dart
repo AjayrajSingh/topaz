@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:application.lib.app.dart/app.dart';
+import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -20,7 +21,8 @@ import 'module_model.dart';
 /// Also for convienence, the [ModuleModel] given to this widget will be
 /// made available to [child] and [child]'s descendants.
 class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
-  final ModuleBinding _binding = new ModuleBinding();
+  final ModuleBinding _moduleBinding = new ModuleBinding();
+  final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
 
   /// The [Module] to [advertise].
   final ModuleImpl _module;
@@ -52,7 +54,8 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
   }
 
   void _onStop() {
-    _binding.close();
+    _moduleBinding.close();
+    _lifecycleBinding.close();
   }
 
   @override
@@ -70,8 +73,15 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
 
   /// Advertises [_module] as a [Module] to the rest of the system via the
   /// [applicationContext].
-  void advertise() => applicationContext.outgoingServices.addServiceForName(
-        (InterfaceRequest<Module> request) => _binding.bind(_module, request),
+  void advertise() {
+    applicationContext.outgoingServices
+    ..addServiceForName(
+        (InterfaceRequest<Module> request) => _moduleBinding.bind(_module, request),
         Module.serviceName,
+      )
+      ..addServiceForName(
+        (InterfaceRequest<Lifecycle> request) => _lifecycleBinding.bind(_module, request),
+        Lifecycle.serviceName,
       );
+  }
 }

@@ -2,7 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:isolate';
+
 import 'package:application.services/service_provider.fidl.dart';
+import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
@@ -17,16 +20,16 @@ typedef void OnModuleReady(
   ServiceProvider incomingServiceProvider,
 );
 
-/// Called at the beginning of [Module.stop].
+/// Called at the beginning of [Lifecycle.terminate].
 typedef void OnModuleStopping();
 
-/// Called at the conclusion of [Module.stop].
+/// Called at the conclusion of [Lifecycle.terminate].
 typedef void OnModuleStop();
 
 /// Implements a Module for receiving the services a [Module] needs to
 /// operate.  When [initialize] is called, the services it receives are routed
 /// by this class to the various classes which need them.
-class ModuleImpl extends Module {
+class ModuleImpl implements Module, Lifecycle {
   final ModuleContextProxy _moduleContextProxy = new ModuleContextProxy();
   final LinkProxy _linkProxy = new LinkProxy();
   final ServiceProviderProxy _incomingServiceProviderProxy =
@@ -43,10 +46,10 @@ class ModuleImpl extends Module {
   /// Called when [Module] is initialied with its services.
   final OnModuleReady onReady;
 
-  /// Called at the beginning of [Module.stop].
+  /// Called at the beginning of [Lifecycle.terminate].
   final OnModuleStopping onStopping;
 
-  /// Called at the conclusion of [Module.stop].
+  /// Called at the conclusion of [Lifecycle.terminate].
   OnModuleStop onStop;
 
   /// Called when [LinkWatcher.notify] is called.
@@ -106,14 +109,14 @@ class ModuleImpl extends Module {
   }
 
   @override
-  void stop(void done()) {
+  void terminate() {
     onStopping?.call();
     _linkWatcherBinding?.close();
     _moduleContextProxy.ctrl.close();
     _linkProxy.ctrl.close();
     _incomingServiceProviderProxy.ctrl.close();
     _outgoingServiceProviderBinding.close();
-    done();
     onStop?.call();
+    Isolate.current.kill();
   }
 }
