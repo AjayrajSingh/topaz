@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sysui_widgets/ticking_state.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'suggestion.dart';
 

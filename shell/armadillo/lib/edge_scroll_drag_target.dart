@@ -5,7 +5,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
-import 'package:sysui_widgets/ticking_state.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'armadillo_drag_target.dart';
 import 'kenichi_edge_scrolling.dart';

@@ -6,7 +6,7 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'elevations.dart';
 import 'selected_suggestion_overlay.dart';

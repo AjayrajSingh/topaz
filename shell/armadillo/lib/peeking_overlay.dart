@@ -7,8 +7,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:sysui_widgets/ticking_double_state.dart';
 
 import 'peek_model.dart';
 import 'size_model.dart';

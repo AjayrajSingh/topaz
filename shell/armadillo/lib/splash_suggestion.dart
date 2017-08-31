@@ -5,7 +5,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'selected_suggestion_overlay.dart';
 import 'splash_painter.dart';

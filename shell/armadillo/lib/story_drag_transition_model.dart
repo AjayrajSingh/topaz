@@ -2,9 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
-
-import 'ticking_model.dart';
+import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/widgets.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;

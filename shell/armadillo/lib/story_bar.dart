@@ -6,9 +6,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:sysui_widgets/three_column_aligned_layout_delegate.dart';
-import 'package:sysui_widgets/ticking_state.dart';
 
 import 'nothing.dart';
 import 'size_model.dart';

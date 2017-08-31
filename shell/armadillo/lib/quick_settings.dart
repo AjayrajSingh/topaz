@@ -8,9 +8,8 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:sysui_widgets/icon_slider.dart';
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
-import 'package:sysui_widgets/ticking_state.dart';
 
 import 'elevations.dart';
 import 'size_model.dart';

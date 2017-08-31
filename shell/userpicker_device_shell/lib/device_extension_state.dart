@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-import 'package:sysui_widgets/ticking_double_state.dart';
+import 'package:lib.widgets/widgets.dart';
 
 /// A [TickingDoubleState] that changes its height to 0% of the child's height
 /// via [hide] and 100% of the child's height via [show].

@@ -31,6 +31,7 @@ import 'package:armadillo/volume_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:sysui_widgets/default_bundle.dart';

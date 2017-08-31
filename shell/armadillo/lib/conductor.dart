@@ -3,12 +3,15 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'armadillo_overlay.dart';
+import 'context_model.dart';
 import 'edge_scroll_drag_target.dart';
 import 'expand_suggestion.dart';
 import 'interruption_overlay.dart';
@@ -128,17 +131,82 @@ class ConductorState extends State<Conductor> {
   Timer _storyFocusTimer;
 
   @override
-  Widget build(BuildContext context) => new Listener(
-        behavior: HitTestBehavior.translucent,
-        onPointerDown: (_) {
-          // TODO: remove this hack when Mozart focus is fixed (MZ-118)
-          // HACK: Due to a mozart focus issue we need to focus when the mozart
-          // window this widget is in is first tapped.
-          if (!_askFocusNode.hasFocus) {
-            _conductorFocusNode.requestFocus(_askFocusNode);
-          }
-        },
-        child: _buildParts(context),
+  Widget build(BuildContext context) => new ScopedModelDescendant<SizeModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          SizeModel sizeModel,
+        ) =>
+            new ScopedModelDescendant<IdleModel>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                IdleModel idleModel,
+              ) =>
+                  new Transform(
+                    transform: new Matrix4.translationValues(
+                      lerpDouble(
+                        0.0,
+                        sizeModel.screenSize.width,
+                        idleModel.progress,
+                      ),
+                      0.0,
+                      0.0,
+                    ),
+                    child: new Stack(
+                      overflow: Overflow.visible,
+                      children: <Widget>[
+                        new Positioned.fill(
+                          child: new Offstage(
+                            offstage: idleModel.progress == 1.0,
+                            child: child,
+                          ),
+                        ),
+                        new Positioned(
+                          top: 0.0,
+                          left: -sizeModel.screenSize.width,
+                          width: sizeModel.screenSize.width,
+                          height: sizeModel.screenSize.height,
+                          child: new Offstage(
+                            offstage: idleModel.progress == 0.0,
+                            child: new Center(
+                              child: new ScopedModelDescendant<ContextModel>(
+                                builder: (
+                                  BuildContext context,
+                                  Widget child,
+                                  ContextModel contextModel,
+                                ) =>
+                                    new Text(
+                                      '${contextModel.timeOnly}',
+                                      style: new TextStyle(
+                                        fontSize: math.min(
+                                          sizeModel.screenSize.width / 6.0,
+                                          sizeModel.screenSize.height / 6.0,
+                                        ),
+                                        fontWeight: FontWeight.w200,
+                                        letterSpacing: 4.0,
+                                      ),
+                                    ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              child: new Listener(
+                behavior: HitTestBehavior.translucent,
+                onPointerDown: (_) {
+                  // TODO: remove this hack when Mozart focus is fixed (MZ-118)
+                  // HACK: Due to a mozart focus issue we need to focus when the mozart
+                  // window this widget is in is first tapped.
+                  if (!_askFocusNode.hasFocus) {
+                    _conductorFocusNode.requestFocus(_askFocusNode);
+                  }
+                },
+                child: _buildParts(context),
+              ),
+            ),
       );
 
   /// Note in particular the magic we're employing here to make the user

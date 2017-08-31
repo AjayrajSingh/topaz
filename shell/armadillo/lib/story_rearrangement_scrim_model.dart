@@ -3,10 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:lib.widgets/model.dart';
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'story_cluster_drag_state_model.dart';
-import 'ticking_model.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;

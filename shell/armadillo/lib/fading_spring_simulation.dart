@@ -6,7 +6,7 @@ import 'dart:async';
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
+import 'package:lib.widgets/widgets.dart';
 
 /// Fade out slowly.
 const RK4SpringDescription _kFadeOutSimulationDesc =

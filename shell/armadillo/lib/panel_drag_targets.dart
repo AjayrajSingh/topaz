@@ -5,8 +5,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
-import 'package:sysui_widgets/ticking_state.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'armadillo_drag_target.dart';
 import 'candidate_info.dart';

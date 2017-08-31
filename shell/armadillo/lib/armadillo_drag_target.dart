@@ -8,9 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
-import 'package:sysui_widgets/ticking_state.dart';
 
 import 'armadillo_overlay.dart';
 

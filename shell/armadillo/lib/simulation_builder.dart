@@ -3,8 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
-import 'package:sysui_widgets/ticking_state.dart';
+import 'package:lib.widgets/widgets.dart';
 
 /// Constants for the simulation.
 const RK4SpringDescription _kSimulationDesc =

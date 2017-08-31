@@ -4,10 +4,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:sysui_widgets/rk4_spring_simulation.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'panel.dart';
-import 'ticking_model.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
