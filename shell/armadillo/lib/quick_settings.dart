@@ -200,6 +200,22 @@ class _QuickSettingsState extends State<QuickSettings> {
   final GlobalKey _kAirplaneModeToggle = new GlobalKey();
   final GlobalKey _kDoNotDisturbModeToggle = new GlobalKey();
   final GlobalKey _kScreenRotationToggle = new GlobalKey();
+  final List<InternetAddress> _addresses = <InternetAddress>[];
+
+  @override
+  void initState() {
+    super.initState();
+    NetworkInterface.list().then((List<NetworkInterface> interfaces) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        interfaces.forEach((NetworkInterface networkInterface) {
+          _addresses.addAll(networkInterface.addresses);
+        });
+      });
+    });
+  }
 
   Widget _divider({double opacity: 1.0}) {
     return new Divider(
@@ -330,6 +346,64 @@ class _QuickSettingsState extends State<QuickSettings> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> children = <Widget>[];
+
+    children.addAll(
+      <Widget>[
+        new Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: new LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) =>
+                new Opacity(
+                  opacity: widget.opacity,
+                  child: (constraints.maxWidth > _kMultiColumnWidthThreshold)
+                      ? _buildForWideScreen(context)
+                      : _buildForNarrowScreen(context),
+                ),
+          ),
+        ),
+        new Opacity(
+          opacity: widget.opacity,
+          child: new Container(
+            padding: const EdgeInsets.all(16.0),
+            child: new Text(
+              '${Platform.localHostname}',
+              textAlign: TextAlign.center,
+              style: new TextStyle(
+                fontFamily: 'RobotoMono',
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
+    children.addAll(
+      _addresses.map(
+        (InternetAddress address) => new Text(
+              '${address.address}',
+              textAlign: TextAlign.center,
+              style: new TextStyle(
+                fontFamily: 'RobotoMono',
+                color: Colors.grey[600],
+              ),
+            ),
+      ),
+    );
+
+    children.addAll(
+      <Widget>[
+        _divider(opacity: widget.opacity),
+        new Opacity(
+          opacity: widget.opacity,
+          child: new _LogoutButton(
+            onLogoutSelected: widget.onLogoutSelected,
+            onClearLedgerSelected: widget.onClearLedgerSelected,
+          ),
+        ),
+      ],
+    );
     return new Material(
       type: MaterialType.canvas,
       color: Colors.transparent,
@@ -337,63 +411,7 @@ class _QuickSettingsState extends State<QuickSettings> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          new Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: new LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) =>
-                  new Opacity(
-                    opacity: widget.opacity,
-                    child: (constraints.maxWidth > _kMultiColumnWidthThreshold)
-                        ? _buildForWideScreen(context)
-                        : _buildForNarrowScreen(context),
-                  ),
-            ),
-          ),
-          new Opacity(
-            opacity: widget.opacity,
-            child: new Container(
-              padding: const EdgeInsets.all(16.0),
-              child: new Text(
-                '${Platform.localHostname}',
-                textAlign: TextAlign.center,
-                style: new TextStyle(
-                  fontFamily: 'RobotoMono',
-                  color: Colors.grey[600],
-                ),
-              ),
-            ),
-          ),
-          _divider(opacity: widget.opacity),
-          new Opacity(
-            opacity: widget.opacity,
-            child: new _LogoutButton(
-              onLogoutSelected: widget.onLogoutSelected,
-              onClearLedgerSelected: widget.onClearLedgerSelected,
-            ),
-          ),
-          _divider(opacity: widget.opacity),
-          new GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              print('Make Inline Quick Settings into Story!');
-            },
-            child: new Container(
-              padding: const EdgeInsets.all(16.0),
-              child: new Opacity(
-                opacity: widget.opacity,
-                child: new Text(
-                  'MORE',
-                  textAlign: TextAlign.center,
-                  style: new TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+        children: children,
       ),
     );
   }
