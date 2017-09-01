@@ -24,18 +24,19 @@ void main() {
 
     int workAddressTaps = 0;
 
-    await tester.pumpWidget(new StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-      return new Material(
-        child: new AddressDetailsGroup(
-          addresses: addresses,
-          onSelectAddress: (Address address) {
-            workAddressTaps++;
-            expect(address, addresses[0]);
-          },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new AddressDetailsGroup(
+            addresses: addresses,
+            onSelectAddress: (Address address) {
+              workAddressTaps++;
+              expect(address, addresses[0]);
+            },
+          ),
         ),
-      );
-    }));
+      ),
+    );
 
     expect(workAddressTaps, 0);
     await tester.tap(find.text(addresses[0].label));

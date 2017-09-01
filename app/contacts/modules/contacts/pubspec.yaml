@@ -10,7 +10,7 @@ dependencies:
   fixtures:
     path: ../../../common/packages/fixtures
   lib.widgets:
-    path: ../../../../../lib/widgets/packages/widgets
+    path: ../../../../../topaz/lib/widgets/packages/widgets
   widgets_meta:
     path: ../../../common/packages/widgets_meta
 dev_dependencies:

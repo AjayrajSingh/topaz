@@ -19,9 +19,9 @@ flutter_app("contacts") {
     "//apps/mozart/services/views:views_dart",
     "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
-    "//topaz/lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/googleapis",
     "//third_party/dart-pkg/pub/googleapis_auth",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 
   analysis_options = "//apps/modules/common/analysis_options.yaml"

@@ -24,18 +24,19 @@ void main() {
 
     int workPhoneTaps = 0;
 
-    await tester.pumpWidget(new StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-      return new Material(
-        child: new PhoneDetailsGroup(
-          phoneNumbers: phoneNumbers,
-          onSelectPhoneNumber: (PhoneNumber phoneNumber) {
-            workPhoneTaps++;
-            expect(phoneNumber, phoneNumbers[0]);
-          },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new PhoneDetailsGroup(
+            phoneNumbers: phoneNumbers,
+            onSelectPhoneNumber: (PhoneNumber phoneNumber) {
+              workPhoneTaps++;
+              expect(phoneNumber, phoneNumbers[0]);
+            },
+          ),
         ),
-      );
-    }));
+      ),
+    );
 
     expect(workPhoneTaps, 0);
     await tester.tap(find.text(phoneNumbers[0].label));

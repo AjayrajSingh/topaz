@@ -24,18 +24,19 @@ void main() {
 
     int workEmailTaps = 0;
 
-    await tester.pumpWidget(new StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-      return new Material(
-        child: new EmailDetailsGroup(
-          emailAddresses: emails,
-          onSelectEmailAddress: (EmailAddress address) {
-            workEmailTaps++;
-            expect(address, emails[0]);
-          },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new EmailDetailsGroup(
+            emailAddresses: emails,
+            onSelectEmailAddress: (EmailAddress address) {
+              workEmailTaps++;
+              expect(address, emails[0]);
+            },
+          ),
         ),
-      );
-    }));
+      ),
+    );
 
     expect(workEmailTaps, 0);
     await tester.tap(find.text(emails[0].label));

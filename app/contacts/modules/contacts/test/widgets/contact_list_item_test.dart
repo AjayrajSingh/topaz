@@ -18,16 +18,20 @@ void main() {
 
     int taps = 0;
 
-    await tester.pumpWidget(new Material(
-      child: new ContactListItem(
-        key: contactListItemKey,
-        contact: contact,
-        onSelect: (Contact c) {
-          expect(c, contact);
-          taps++;
-        },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new ContactListItem(
+            key: contactListItemKey,
+            contact: contact,
+            onSelect: (Contact c) {
+              expect(c, contact);
+              taps++;
+            },
+          ),
+        ),
       ),
-    ));
+    );
 
     expect(taps, 0);
     await tester.tap(find.byKey(contactListItemKey));
