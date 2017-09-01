@@ -18,6 +18,6 @@ dart_app("last_fm_agent") {
     "//apps/modules/music/packages/last_fm_api",
     "//apps/modules/music/packages/last_fm_models",
     "//lib/fidl/dart",
-    "//lib/widgets/packages/logging:lib.logging",
+    "//topaz/lib/widgets/packages/logging:lib.logging",
   ]
 }

@@ -11,7 +11,7 @@ dart_package("last_fm_widgets") {
   deps = [
     "//apps/modules/music/packages/last_fm_models",
     "//lib/flutter/packages/flutter",
-    "//lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 
   analysis_options = "//apps/modules/common/analysis_options.yaml"

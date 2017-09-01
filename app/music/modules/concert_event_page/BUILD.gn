@@ -28,8 +28,8 @@ flutter_app("concert_event_page") {
     "//apps/web_runner/lib/dart:web_view",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
-    "//lib/widgets/packages/logging:lib.logging",
-    "//lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/lib/widgets/packages/logging:lib.logging",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 
   analysis_options = "//apps/modules/common/analysis_options.yaml"
