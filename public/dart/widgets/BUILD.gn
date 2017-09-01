@@ -21,7 +21,7 @@ dart_package("lib.widgets") {
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//lib/flutter/packages/flutter_test",
-    "//lib/widgets/packages/modular:lib.modular",
+    "//topaz/lib/widgets/packages/modular:lib.modular",
     "//third_party/dart-pkg/pub/flutter_image",
   ]
 }
@@ -31,7 +31,7 @@ dart_test("test") {
 
   deps = [
     "//lib/flutter/packages/flutter_test",
-    "//lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/test",
   ]
 }
