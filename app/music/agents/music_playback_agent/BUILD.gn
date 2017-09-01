@@ -13,7 +13,7 @@ dart_app("music_playback_agent") {
     "//apps/media/lib/dart",
     "//apps/modular/services/agent:agent_dart",
     "//apps/modules/music/services/player:player_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
   ]
 

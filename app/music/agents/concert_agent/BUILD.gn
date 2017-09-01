@@ -11,7 +11,7 @@ dart_app("concert_agent") {
     "//application/lib/app/dart",
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/suggestion:suggestion_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
   ]
 }

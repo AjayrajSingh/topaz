@@ -23,7 +23,7 @@ flutter_app("last_fm_artist_bio") {
     "//apps/modules/music/packages/last_fm_models",
     "//apps/modules/music/packages/last_fm_widgets",
     "//apps/mozart/services/views:views_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",

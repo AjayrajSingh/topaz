@@ -26,7 +26,7 @@ flutter_app("concert_event_page") {
     "//apps/modules/music/packages/concert_widgets",
     "//apps/mozart/services/views:views_dart",
     "//apps/web_runner/lib/dart:web_view",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",

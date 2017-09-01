@@ -22,7 +22,7 @@ flutter_app("concert_event_list") {
     "//apps/modules/music/packages/concert_models",
     "//apps/modules/music/packages/concert_widgets",
     "//apps/mozart/services/views:views_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
