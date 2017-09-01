@@ -12,4 +12,4 @@ dependencies:
   widgets_meta:
     path: ../widgets_meta
   lib.logging:
-    path: ../../../../../lib/widgets/packages/logging
+    path: ../../../../../topaz/lib/widgets/packages/logging

@@ -118,7 +118,7 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.34-dev"
+    version: "0.0.34"
   flutter_image:
     description:
       name: flutter_image
@@ -134,7 +134,7 @@ packages:
   flutter_test:
     description: flutter
     source: sdk
-    version: "0.0.12-dev"
+    version: "0.0.12"
   glob:
     description:
       name: glob
@@ -185,13 +185,13 @@ packages:
     version: "0.6.1"
   "lib.logging":
     description:
-      path: "../../../../lib/widgets/packages/logging"
+      path: "../../../../topaz/lib/widgets/packages/logging"
       relative: true
     source: path
     version: "0.0.0"
   "lib.widgets":
     description:
-      path: "../../../../lib/widgets/packages/widgets"
+      path: "../../../../topaz/lib/widgets/packages/widgets"
       relative: true
     source: path
     version: "0.0.0"
