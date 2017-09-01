@@ -15,6 +15,6 @@ dart_package("lib.modular") {
     "//apps/modular/services/device:device_dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/user:user_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
   ]
 }

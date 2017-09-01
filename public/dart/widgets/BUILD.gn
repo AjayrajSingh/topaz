@@ -18,7 +18,7 @@ dart_package("lib.widgets") {
     "//apps/modules/common/packages/widgets_meta",
     "//apps/mozart/lib/flutter",
     "//apps/mozart/services/views:views_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//lib/flutter/packages/flutter_test",
     "//topaz/lib/widgets/packages/modular:lib.modular",
