@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:math' as math;
+
 import 'package:application.lib.app.dart/app.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -125,7 +127,7 @@ void main() {
     child: new Overlay(initialEntries: overlays),
   );
 
-  runApp(new CheckedModeBanner(child: deviceShellWidget));
+  runApp(new _ElevatedCheckedModeBanner(child: deviceShellWidget));
 
   constraintsModel.load(rootBundle);
   deviceShellWidget.advertise();
@@ -163,3 +165,73 @@ Widget _buildPerformanceOverlay({Widget child}) => new Stack(
         ),
       ],
     );
+
+const double _kOffset =
+    40.0; // distance to bottom of banner, at a 45 degree angle inwards
+const double _kHeight = 12.0; // height of banner
+const double _kWidth = 200.0; // width of banner
+const double _kSqrt2Over2 = 0.707;
+const double _kJustUnderMaxElevation = 999.0; // Max visible elevation is 1000.0
+const Color _kColor = const Color(0xA0B71C1C);
+const TextStyle _kTextStyle = const TextStyle(
+  color: const Color(0xFFFFFFFF),
+  fontSize: _kHeight * 0.85,
+  fontWeight: FontWeight.w900,
+  height: 1.0,
+);
+
+class _ElevatedCheckedModeBanner extends StatelessWidget {
+  /// Child to place under the banner.
+  final Widget child;
+
+  /// Constructor.
+  _ElevatedCheckedModeBanner({this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    bool offstage = true;
+    assert(() {
+      offstage = false;
+      return true;
+    });
+    return offstage
+        ? child
+        : new Stack(
+            children: <Widget>[
+              new Align(
+                alignment: FractionalOffset.topRight,
+                child: new Transform(
+                  transform: new Matrix4.translationValues(
+                    -(_kOffset - _kHeight / 2.0) * _kSqrt2Over2 + _kWidth / 2.0,
+                    (_kOffset - _kHeight / 2.0) * _kSqrt2Over2 - _kHeight / 2.0,
+                    0.0,
+                  ),
+                  child: new Transform(
+                    transform: new Matrix4.rotationZ(math.PI / 4.0),
+                    alignment: FractionalOffset.center,
+                    child: new IgnorePointer(
+                      child: new PhysicalModel(
+                        color: _kColor,
+                        elevation: _kJustUnderMaxElevation,
+                        child: new Container(
+                          height: _kHeight,
+                          width: _kWidth,
+                          color: _kColor,
+                          child: new Center(
+                            child: new Text(
+                              'SLOW MODE',
+                              textAlign: TextAlign.center,
+                              style: _kTextStyle,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              child,
+            ],
+          );
+  }
+}
