@@ -19,6 +19,6 @@ flutter_app("example_manual_relationships") {
     "//apps/mozart/services/views:views_dart",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
-    "//lib/widgets/packages/logging:lib.logging",
+    "//topaz/lib/widgets/packages/logging:lib.logging",
   ]
 }
