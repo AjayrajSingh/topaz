@@ -51,6 +51,9 @@ class DartState {
   DartMessageHandler& message_handler() { return *message_handler_; }
   FileLoader& file_loader() { return *file_loader_; }
 
+  void SetReturnCode(uint32_t return_code);
+  void SetReturnCodeCallback(std::function<void(uint32_t)> callback);
+
   virtual void DidSetIsolate();
 
   static Dart_Handle HandleLibraryTag(Dart_LibraryTag tag,
@@ -62,6 +65,7 @@ class DartState {
   std::unique_ptr<DartClassLibrary> class_library_;
   std::unique_ptr<DartMessageHandler> message_handler_;
   std::unique_ptr<FileLoader> file_loader_;
+  std::function<void(uint32_t)> set_return_code_callback_;
 
  protected:
   ftl::WeakPtrFactory<DartState> weak_factory_;

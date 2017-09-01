@@ -44,6 +44,16 @@ ftl::WeakPtr<DartState> DartState::GetWeakPtr() {
   return weak_factory_.GetWeakPtr();
 }
 
+void DartState::SetReturnCode(uint32_t return_code) {
+  if (set_return_code_callback_) {
+    set_return_code_callback_(return_code);
+  }
+}
+
+void DartState::SetReturnCodeCallback(std::function<void(uint32_t)> callback) {
+  set_return_code_callback_ = callback;
+}
+
 void DartState::DidSetIsolate() {}
 
 Dart_Handle DartState::HandleLibraryTag(Dart_LibraryTag tag,
