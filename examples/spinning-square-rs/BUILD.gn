@@ -20,7 +20,7 @@ rust_binary("spinning_square_rs") {
     "//apps/mozart/services/views:view_token_rust_library",
     "//apps/mozart/services/views:views_rust_library",
     "//apps/xi/services:services_rust_library",
-    "//lib/fidl/rust/fidl",
+    "//garnet/public/lib/fidl/rust/fidl",
     "//rust/magenta-rs:magenta",
     "//rust/mxruntime",
     "//third_party/rust-crates:cairo-rs-0.1.3",
