@@ -10,7 +10,7 @@ dart_package("widgets") {
   deps = [
     "//apps/modules/common/packages/models",
     "//lib/flutter/packages/flutter",
-    "//lib/widgets/packages/logging:lib.logging",
+    "//topaz/lib/widgets/packages/logging:lib.logging",
   ]
 
   analysis_options = "//apps/modules/common/analysis_options.yaml"
