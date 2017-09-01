@@ -20,8 +20,8 @@ flutter_app("dashboard_app") {
     "//apps/web_runner/lib/dart:web_view",
     "//lib/fidl/dart",
     "//lib/flutter/packages/flutter",
-    "//lib/widgets/packages/logging:lib.logging",
-    "//lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/lib/widgets/packages/logging:lib.logging",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/html",
     "//third_party/dart-pkg/pub/http",
   ]
