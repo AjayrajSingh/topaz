@@ -17,7 +17,7 @@ flutter_app("xi_app") {
     "//apps/mozart/services/views:views_dart",
     "//apps/xi/packages/widgets:xi_widgets",
     "//apps/xi/services:services_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
   ]
 
