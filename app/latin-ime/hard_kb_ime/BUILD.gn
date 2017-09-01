@@ -11,7 +11,7 @@ dart_app("hard_kb_ime") {
     "//application/lib/app/dart",
     "//apps/mozart/services/input:input_dart",
     "//apps/mozart/services/views:views_dart",
-    "//lib/fidl/dart",
-    "//lib/fidl/examples/interfaces:interfaces_dart",
+    "//garnet/public/lib/fidl/dart",
+    "//garnet/public/lib/fidl/examples/interfaces:interfaces_dart",
   ]
 }
