@@ -26,7 +26,6 @@ import 'package:armadillo/story_model.dart';
 import 'package:armadillo/story_rearrangement_scrim_model.dart';
 import 'package:armadillo/story_time_randomizer.dart';
 import 'package:armadillo/suggestion_model.dart';
-import 'package:armadillo/user_shell_mode_model.dart';
 import 'package:armadillo/volume_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -54,11 +53,12 @@ const bool _kShowPerformanceOverlay = false;
 const bool _kDumpAllErrors = false;
 
 Future<Null> main() async {
-  runApp(buildArmadilloUserShell(logName: 'armadillo'));
+  SizeModel sizeModel = new SizeModel();
+  runApp(buildArmadilloUserShell(logName: 'armadillo', sizeModel: sizeModel));
 }
 
 /// Builds the armadillo user shell.
-Widget buildArmadilloUserShell({String logName}) {
+Widget buildArmadilloUserShell({String logName, SizeModel sizeModel}) {
   setupLogger(name: logName);
 
   if (_kDumpAllErrors) {
@@ -216,9 +216,6 @@ Widget buildArmadilloUserShell({String logName}) {
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();
 
-  UserShellModeModel userShellModeModel = new UserShellModeModel();
-
-  SizeModel sizeModel = new SizeModel(userShellModeModel: userShellModeModel);
   sizeModel.addListener(
     () => storyModel.updateLayouts(
           new Size(
@@ -229,8 +226,6 @@ Widget buildArmadilloUserShell({String logName}) {
   );
   sizeModel.screenSize = ui.window.physicalSize / ui.window.devicePixelRatio;
 
-  userShellModeModel.addListener(sizeModel.notifyListeners);
-
   Widget app = new ScopedModel<StoryDragTransitionModel>(
     model: storyDragTransitionModel,
     child: _buildApp(
@@ -239,10 +234,6 @@ Widget buildArmadilloUserShell({String logName}) {
       debugModel: debugModel,
       armadillo: new Armadillo(
         scopedModelBuilders: <WrapperBuilder>[
-          (_, Widget child) => new ScopedModel<UserShellModeModel>(
-                model: userShellModeModel,
-                child: child,
-              ),
           (_, Widget child) => new ScopedModel<PowerModel>(
                 model: powerModel,
                 child: child,

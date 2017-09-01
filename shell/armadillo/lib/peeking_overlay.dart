@@ -12,7 +12,6 @@ import 'package:meta/meta.dart';
 
 import 'peek_model.dart';
 import 'size_model.dart';
-import 'user_shell_mode_model.dart';
 
 const double _kStartOverlayTransitionHeight = 28.0;
 
@@ -169,9 +168,7 @@ class PeekingOverlayState extends TickingDoubleState<PeekingOverlay> {
                   Widget child,
                   SizeModel sizeModel,
                 ) {
-                  // Set maxHeight appropriately. The overlay will take up
-                  // the entire size of the screen if the user shell is in
-                  // ambient or idle mode.
+                  // Set maxHeight appropriately.
                   double targetMaxHeight = sizeModel.suggestionExpandedHeight;
                   if (maxValue != targetMaxHeight && targetMaxHeight != 0.0) {
                     maxValue = targetMaxHeight;
