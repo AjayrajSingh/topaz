@@ -11,11 +11,15 @@ void main() {
       'Default size should be 48dp and icon size should be half of total size',
       (WidgetTester tester) async {
     Key key = new UniqueKey();
-    await tester.pumpWidget(new Material(
-      child: new Center(
-        child: new TrackArt(key: key),
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new Center(
+            child: new TrackArt(key: key),
+          ),
+        ),
       ),
-    ));
+    );
 
     RenderBox box = tester.renderObject(find.byKey(key));
     expect(box.size, new Size.square(48.0));
@@ -28,14 +32,18 @@ void main() {
   testWidgets('Size argument', (WidgetTester tester) async {
     double size = 100.0;
     Key key = new UniqueKey();
-    await tester.pumpWidget(new Material(
-      child: new Center(
-        child: new TrackArt(
-          key: key,
-          size: size,
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new Center(
+            child: new TrackArt(
+              key: key,
+              size: size,
+            ),
+          ),
         ),
       ),
-    ));
+    );
 
     RenderBox box = tester.renderObject(find.byKey(key));
     expect(box.size, new Size.square(size));

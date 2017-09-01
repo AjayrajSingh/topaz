@@ -16,15 +16,19 @@ void main() {
     Key key = new UniqueKey();
     int taps = 0;
 
-    await tester.pumpWidget(new Material(
-      child: new TrackListItem(
-        key: key,
-        track: track,
-        onTap: () {
-          taps++;
-        },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new TrackListItem(
+            key: key,
+            track: track,
+            onTap: () {
+              taps++;
+            },
+          ),
+        ),
       ),
-    ));
+    );
 
     expect(taps, 0);
     await tester.tap(find.byKey(key));

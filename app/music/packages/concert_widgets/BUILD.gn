@@ -11,8 +11,8 @@ dart_package("concert_widgets") {
   deps = [
     "//apps/modules/music/packages/concert_models",
     "//lib/flutter/packages/flutter",
-    "//topaz/lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/intl",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 
   analysis_options = "//apps/modules/common/analysis_options.yaml"

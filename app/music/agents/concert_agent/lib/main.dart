@@ -27,7 +27,8 @@ final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 /// Concert ContextListenerForTopics listens to hotel reservations and makes a concert
 /// list proposal
 class ContextListenerForTopicsImpl extends ContextListenerForTopics {
-  final ContextListenerForTopicsBinding _binding = new ContextListenerForTopicsBinding();
+  final ContextListenerForTopicsBinding _binding =
+      new ContextListenerForTopicsBinding();
 
   /// Gets the [InterfaceHandle]
   ///
@@ -79,7 +80,7 @@ Future<Null> main(List<dynamic> args) async {
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
   ContextQueryForTopics query = new ContextQueryForTopics()
-      ..topics = <String>[_kHotelTopic];
+    ..topics = <String>[_kHotelTopic];
   _contextListenerImpl = new ContextListenerForTopicsImpl();
   _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
 }

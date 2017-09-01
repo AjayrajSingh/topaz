@@ -37,7 +37,8 @@ final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 /// Concert ContextListenerForTopics that prints if the given artist has an upcoming
 /// concert in the user's metro area.
 class ContextListenerForTopicsImpl extends ContextListenerForTopics {
-  final ContextListenerForTopicsBinding _binding = new ContextListenerForTopicsBinding();
+  final ContextListenerForTopicsBinding _binding =
+      new ContextListenerForTopicsBinding();
 
   final LastFmApi _api;
 
@@ -134,7 +135,7 @@ Future<Null> main(List<dynamic> args) async {
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
   ContextQueryForTopics query = new ContextQueryForTopics()
-      ..topics = <String>[_kMusicArtistTopic];
+    ..topics = <String>[_kMusicArtistTopic];
   _contextListenerImpl = new ContextListenerForTopicsImpl(
     apiKey: config.get('last_fm_api_key'),
   );

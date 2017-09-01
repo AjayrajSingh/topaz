@@ -15,19 +15,23 @@ void main() {
     Track track = fixtures.track();
     int taps = 0;
 
-    await tester.pumpWidget(new SizedBox(
-      // This ensures that the large version of the player will be used
-      width: 800.0,
-      child: new Material(
-        child: new Player(
-          currentTrack: track,
-          playbackPosition: new Duration(seconds: 30),
-          onToggleRepeat: () {
-            taps++;
-          },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new SizedBox(
+          // This ensures that the large version of the player will be used
+          width: 800.0,
+          child: new Material(
+            child: new Player(
+              currentTrack: track,
+              playbackPosition: new Duration(seconds: 30),
+              onToggleRepeat: () {
+                taps++;
+              },
+            ),
+          ),
         ),
       ),
-    ));
+    );
 
     expect(taps, 0);
     await tester.tap(find.byWidgetPredicate(
@@ -41,19 +45,23 @@ void main() {
     Track track = fixtures.track();
     int taps = 0;
 
-    await tester.pumpWidget(new SizedBox(
-      // This ensures that the large version of the player will be used
-      width: 800.0,
-      child: new Material(
-        child: new Player(
-          currentTrack: track,
-          playbackPosition: new Duration(seconds: 30),
-          onToggleShuffle: () {
-            taps++;
-          },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new SizedBox(
+          // This ensures that the large version of the player will be used
+          width: 800.0,
+          child: new Material(
+            child: new Player(
+              currentTrack: track,
+              playbackPosition: new Duration(seconds: 30),
+              onToggleShuffle: () {
+                taps++;
+              },
+            ),
+          ),
         ),
       ),
-    ));
+    );
 
     expect(taps, 0);
     await tester.tap(find.byWidgetPredicate(
@@ -67,15 +75,19 @@ void main() {
     Track track = fixtures.track();
     int taps = 0;
 
-    await tester.pumpWidget(new Material(
-      child: new Player(
-        currentTrack: track,
-        playbackPosition: new Duration(seconds: 30),
-        onSkipPrevious: () {
-          taps++;
-        },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new Player(
+            currentTrack: track,
+            playbackPosition: new Duration(seconds: 30),
+            onSkipPrevious: () {
+              taps++;
+            },
+          ),
+        ),
       ),
-    ));
+    );
 
     expect(taps, 0);
     await tester.tap(find.byWidgetPredicate((Widget widget) =>
@@ -89,15 +101,19 @@ void main() {
     Track track = fixtures.track();
     int taps = 0;
 
-    await tester.pumpWidget(new Material(
-      child: new Player(
-        currentTrack: track,
-        playbackPosition: new Duration(seconds: 30),
-        onSkipNext: () {
-          taps++;
-        },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new Player(
+            currentTrack: track,
+            playbackPosition: new Duration(seconds: 30),
+            onSkipNext: () {
+              taps++;
+            },
+          ),
+        ),
       ),
-    ));
+    );
 
     expect(taps, 0);
     await tester.tap(find.byWidgetPredicate(
@@ -111,15 +127,19 @@ void main() {
     Track track = fixtures.track();
     int taps = 0;
 
-    await tester.pumpWidget(new Material(
-      child: new Player(
-        currentTrack: track,
-        playbackPosition: new Duration(seconds: 30),
-        onTogglePlay: () {
-          taps++;
-        },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new Player(
+            currentTrack: track,
+            playbackPosition: new Duration(seconds: 30),
+            onTogglePlay: () {
+              taps++;
+            },
+          ),
+        ),
       ),
-    ));
+    );
 
     expect(taps, 0);
     await tester.tap(find.byWidgetPredicate((Widget widget) =>
@@ -132,13 +152,17 @@ void main() {
       (WidgetTester tester) async {
     Track track = fixtures.track();
 
-    await tester.pumpWidget(new Material(
-      child: new Player(
-        currentTrack: track,
-        playbackPosition: new Duration(seconds: 30),
-        isPlaying: false,
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new Player(
+            currentTrack: track,
+            playbackPosition: new Duration(seconds: 30),
+            isPlaying: false,
+          ),
+        ),
       ),
-    ));
+    );
 
     expect(
       find.byWidgetPredicate((Widget widget) =>
@@ -146,13 +170,17 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.pumpWidget(new Material(
-      child: new Player(
-        currentTrack: track,
-        playbackPosition: new Duration(seconds: 30),
-        isPlaying: true,
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new Player(
+            currentTrack: track,
+            playbackPosition: new Duration(seconds: 30),
+            isPlaying: true,
+          ),
+        ),
       ),
-    ));
+    );
 
     expect(
       find.byWidgetPredicate((Widget widget) =>
@@ -167,20 +195,24 @@ void main() {
     Track track = fixtures.track();
     Color primaryColor = Colors.blue[500];
 
-    await tester.pumpWidget(new SizedBox(
-      // This ensures that the large version of the player will be used
-      width: 800.0,
-      child: new Material(
-        child: new Theme(
-          data: new ThemeData(primaryColor: primaryColor),
-          child: new Player(
-            currentTrack: track,
-            playbackPosition: new Duration(seconds: 30),
-            isShuffled: true,
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new SizedBox(
+          // This ensures that the large version of the player will be used
+          width: 800.0,
+          child: new Material(
+            child: new Theme(
+              data: new ThemeData(primaryColor: primaryColor),
+              child: new Player(
+                currentTrack: track,
+                playbackPosition: new Duration(seconds: 30),
+                isShuffled: true,
+              ),
+            ),
           ),
         ),
       ),
-    ));
+    );
 
     Icon icon = tester.widget(find.byWidgetPredicate(
         (Widget widget) => widget is Icon && widget.icon == Icons.shuffle));
@@ -193,20 +225,24 @@ void main() {
     Track track = fixtures.track();
     Color primaryColor = Colors.blue[500];
 
-    await tester.pumpWidget(new SizedBox(
-      // This ensures that the large version of the player will be used
-      width: 800.0,
-      child: new Material(
-        child: new Theme(
-          data: new ThemeData(primaryColor: primaryColor),
-          child: new Player(
-            currentTrack: track,
-            playbackPosition: new Duration(seconds: 30),
-            isRepeated: true,
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new SizedBox(
+          // This ensures that the large version of the player will be used
+          width: 800.0,
+          child: new Material(
+            child: new Theme(
+              data: new ThemeData(primaryColor: primaryColor),
+              child: new Player(
+                currentTrack: track,
+                playbackPosition: new Duration(seconds: 30),
+                isRepeated: true,
+              ),
+            ),
           ),
         ),
       ),
-    ));
+    );
 
     Icon icon = tester.widget(find.byWidgetPredicate(
         (Widget widget) => widget is Icon && widget.icon == Icons.repeat));
