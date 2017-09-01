@@ -26,8 +26,8 @@ executable("web_view_bin") {
     "//apps/mozart/services/geometry",
     "//apps/mozart/services/views",
     "//apps/web_runner/services",
-    "//lib/ftl",
-    "//lib/mtl",
+    "//garnet/public/lib/ftl",
+    "//garnet/public/lib/mtl",
     "//third_party/boringssl",
     "//third_party/rapidjson",
   ]
