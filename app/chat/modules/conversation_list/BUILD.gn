@@ -19,9 +19,9 @@ flutter_app("chat_conversation_list") {
     "//apps/mozart/services/views:views_dart",
     "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/pub/meta",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
-    "//third_party/dart-pkg/pub/meta",
   ]
 
   analysis_options = "//apps/modules/common/analysis_options.yaml"

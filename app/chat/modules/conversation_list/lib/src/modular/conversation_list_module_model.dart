@@ -400,10 +400,11 @@ class ChatConversationListModuleModel extends ModuleModel {
         // conversation right away. If not, store the id in a temporary variable
         // and select it later when the conversation is notified via the message
         // queue mechanism.
-        if (conversations.any((Conversation c) => _intListEquality.equals(
-              c.conversationId,
-              conversation.conversationId,
-            ))) {
+        if (conversations != null &&
+            conversations.any((Conversation c) => _intListEquality.equals(
+                  c.conversationId,
+                  conversation.conversationId,
+                ))) {
           setConversationId(conversation.conversationId);
           focusConversation();
         } else {

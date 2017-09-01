@@ -20,13 +20,13 @@ dart_app("chat_content_provider") {
     "//apps/modules/common/packages/fixtures",
     "//apps/modules/common/packages/models",
     "//garnet/public/lib/fidl/dart",
-    "//topaz/lib/widgets/packages/logging:lib.logging",
-    "//topaz/lib/widgets/packages/modular:lib.modular",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/eventsource",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/quiver",
     "//third_party/dart-pkg/pub/uuid",
+    "//topaz/lib/widgets/packages/logging:lib.logging",
+    "//topaz/lib/widgets/packages/modular:lib.modular",
   ]
 
   analysis_options = "//apps/modules/common/analysis_options.yaml"

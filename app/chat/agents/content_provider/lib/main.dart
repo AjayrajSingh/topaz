@@ -28,7 +28,8 @@ class ChatContentProviderAgent extends AgentImpl {
   final ProposalPublisherProxy _proposalPublisher =
       new ProposalPublisherProxy();
   final ContextReaderProxy _contextReader = new ContextReaderProxy();
-  final ContextListenerForTopicsBinding _proposerBinding = new ContextListenerForTopicsBinding();
+  final ContextListenerForTopicsBinding _proposerBinding =
+      new ContextListenerForTopicsBinding();
   ChatContentProviderImpl _contentProviderImpl;
 
   /// Creates a new instance of [ChatContentProviderAgent].

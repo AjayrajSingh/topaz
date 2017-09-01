@@ -423,8 +423,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
         });
 
         callback(ChatStatus.ok, conversations);
-      } catch (e) {
-        log.severe('Decoding error', e);
+      } catch (e, stackTrace) {
+        log.severe('Decoding error', e, stackTrace);
         callback(ChatStatus.decodingError, const <Conversation>[]);
       }
     } catch (e, stackTrace) {

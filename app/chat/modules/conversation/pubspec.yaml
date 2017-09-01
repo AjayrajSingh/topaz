@@ -11,7 +11,7 @@ dependencies:
     sdk: flutter
   intl: ^0.14.0
   lib.widgets:
-    path: ../../../../../lib/widgets/packages/widgets
+    path: ../../../../../topaz/lib/widgets/packages/widgets
   models:
     path: ../../../common/packages/models
   util:

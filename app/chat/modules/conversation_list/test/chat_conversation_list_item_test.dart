@@ -16,18 +16,24 @@ void main() {
 
     int taps = 0;
 
-    await tester.pumpWidget(new Material(
-      child: new ChatConversationListItem(
-        key: chatConversationListItemKey,
-        // TODO(youngseokyoon): add fixtures (SO-333)
-        conversation: new Conversation(
-          participants: <User>[new User(name: 'Coco yang', email: 'Coco@cute')],
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new ChatConversationListItem(
+            key: chatConversationListItemKey,
+            // TODO(youngseokyoon): add fixtures (SO-333)
+            conversation: new Conversation(
+              participants: <User>[
+                new User(name: 'Coco yang', email: 'Coco@cute')
+              ],
+            ),
+            onSelect: () {
+              taps++;
+            },
+          ),
         ),
-        onSelect: () {
-          taps++;
-        },
       ),
-    ));
+    );
 
     expect(taps, 0);
     await tester.tap(find.byKey(chatConversationListItemKey));

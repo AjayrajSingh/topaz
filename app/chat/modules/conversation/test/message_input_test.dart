@@ -11,9 +11,9 @@ void main() {
     'MessageInput.onTapSharePhoto callback test',
     (WidgetTester tester) async {
       await tester.pumpWidget(
-        new Theme(
-          data: new ThemeData(platform: TargetPlatform.fuchsia),
-          child: new Material(
+        new MaterialApp(
+          theme: new ThemeData(platform: TargetPlatform.fuchsia),
+          home: new Material(
             child: new MessageInput(),
           ),
         ),
@@ -29,9 +29,9 @@ void main() {
       int tapSharePhotoCount = 0;
 
       await tester.pumpWidget(
-        new Theme(
-          data: new ThemeData(platform: TargetPlatform.fuchsia),
-          child: new Material(
+        new MaterialApp(
+          theme: new ThemeData(platform: TargetPlatform.fuchsia),
+          home: new Material(
             child: new MessageInput(
               onTapSharePhoto: () => ++tapSharePhotoCount,
             ),

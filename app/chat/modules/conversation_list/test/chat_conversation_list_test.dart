@@ -13,14 +13,18 @@ void main() {
       'Test to see if tapping on the new chat FAB will call the '
       'appropriate callback', (WidgetTester tester) async {
     int taps = 0;
-    await tester.pumpWidget(new Material(
-      child: new ChatConversationList(
-        conversations: new Set<Conversation>(),
-        onNewConversation: () {
-          taps++;
-        },
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new ChatConversationList(
+            conversations: new Set<Conversation>(),
+            onNewConversation: () {
+              taps++;
+            },
+          ),
+        ),
       ),
-    ));
+    );
 
     expect(taps, 0);
     await tester.tap(find.byType(FloatingActionButton));
@@ -32,28 +36,33 @@ void main() {
       'appropriate callback', (WidgetTester tester) async {
     List<int> taps = <int>[0, 0];
 
-    await tester.pumpWidget(new Material(
-      child: new ChatConversationList(
-        conversations: <Conversation>[
-          // TODO(youngseokyoon): add fixtures (SO-333)
-          new Conversation(
-            conversationId: const <int>[0],
-            snippet: 'Snippet #1',
-            participants: <User>[
-              new User(name: 'Coco yang', email: 'Coco@cute')
-            ],
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new ChatConversationList(
+            conversations: <Conversation>[
+              // TODO(youngseokyoon): add fixtures (SO-333)
+              new Conversation(
+                conversationId: const <int>[0],
+                snippet: 'Snippet #1',
+                participants: <User>[
+                  new User(name: 'Coco yang', email: 'Coco@cute')
+                ],
+              ),
+              new Conversation(
+                conversationId: const <int>[1],
+                snippet: 'Snippet #2',
+                participants: <User>[
+                  new User(name: 'Yoyo yang', email: 'Yoyo@cute')
+                ],
+              ),
+            ].toSet(),
+            onSelectConversation: (Conversation c) =>
+                taps[c.conversationId[0]]++,
           ),
-          new Conversation(
-            conversationId: const <int>[1],
-            snippet: 'Snippet #2',
-            participants: <User>[
-              new User(name: 'Yoyo yang', email: 'Yoyo@cute')
-            ],
-          ),
-        ].toSet(),
-        onSelectConversation: (Conversation c) => taps[c.conversationId[0]]++,
+        ),
       ),
-    ));
+    );
 
     expect(taps, orderedEquals(<int>[0, 0]));
     await tester.tap(find.text('Snippet #1'));
