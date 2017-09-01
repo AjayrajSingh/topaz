@@ -20,7 +20,7 @@ flutter_app("chat_conversation") {
     "//apps/modules/common/packages/widgets_meta",
     "//apps/modules/drive/services/gallery:gallery_dart",
     "//apps/mozart/services/views:views_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
