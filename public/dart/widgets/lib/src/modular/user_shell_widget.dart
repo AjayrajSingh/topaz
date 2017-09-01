@@ -7,6 +7,7 @@ import 'package:apps.modular.services.user/user_shell.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.modular/modular.dart';
+import 'package:lib.widgets/model.dart';
 
 import '../widgets/window_media_query.dart';
 import 'user_shell_model.dart';
@@ -16,13 +17,15 @@ import 'user_shell_model.dart';
 /// [UserShell] instances so they aren't garbage collected.
 /// For convenience, [advertise] does the advertising of the app as a
 /// [UserShell] to the rest of the system via the [ApplicationContext].
-/// Also for convienence, the [UserShellModel] given to this widget
-/// will be made available to [child] and [child]'s descendants.
+/// Also for convienence, the [UserShellModel] given to this widget as well as
+/// an [IdleModel] will be made available to [child] and [child]'s descendants.
 class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
   /// The [ApplicationContext] to [advertise] its [UserShell] services to.
   final ApplicationContext applicationContext;
 
   final UserShellBinding _binding = new UserShellBinding();
+
+  final IdleModel _idleModel = new IdleModel();
 
   /// The [UserShell] to [advertise].
   final UserShellImpl _userShell;
@@ -56,12 +59,23 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
   Widget build(BuildContext context) => new Directionality(
         textDirection: TextDirection.ltr,
         child: new WindowMediaQuery(
-          child: _userShellModel == null
-              ? child
-              : new ScopedModel<T>(
-                  model: _userShellModel,
-                  child: child,
-                ),
+          child: new Listener(
+            // TODO: determine idleness in a better way (DNO-147).
+            onPointerDown: (_) => _idleModel.onUserInteraction(),
+            onPointerMove: (_) => _idleModel.onUserInteraction(),
+            onPointerUp: (_) => _idleModel.onUserInteraction(),
+            onPointerCancel: (_) => _idleModel.onUserInteraction(),
+            behavior: HitTestBehavior.translucent,
+            child: new ScopedModel<IdleModel>(
+              model: _idleModel,
+              child: _userShellModel == null
+                  ? child
+                  : new ScopedModel<T>(
+                      model: _userShellModel,
+                      child: child,
+                    ),
+            ),
+          ),
         ),
       );
 

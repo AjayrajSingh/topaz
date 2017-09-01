@@ -10,5 +10,8 @@
 export 'src/widgets/alphatar.dart';
 export 'src/widgets/fuchsia_spinner.dart';
 export 'src/widgets/mondrian_spinner.dart';
+export 'src/widgets/rk4_spring_simulation.dart';
 export 'src/widgets/simulated_positioned.dart';
+export 'src/widgets/ticking_double_state.dart';
+export 'src/widgets/ticking_state.dart';
 export 'src/widgets/window_media_query.dart';
