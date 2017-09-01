@@ -17,6 +17,6 @@ flutter_app("perspective") {
     "//application/lib/app/dart",
     "//apps/media/lib/flutter",
     "//lib/flutter/packages/flutter",
-    "//lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 }

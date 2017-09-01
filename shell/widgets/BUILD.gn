@@ -12,7 +12,7 @@ dart_package("widgets") {
 
   deps = [
     "//lib/flutter/packages/flutter",
-    "//lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 }
 

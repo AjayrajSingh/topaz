@@ -15,7 +15,7 @@ dart_package("armadillo") {
     "//apps/sysui/keyboard",
     "//apps/sysui/widgets",
     "//lib/flutter/packages/flutter",
-    "//lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 }
 
