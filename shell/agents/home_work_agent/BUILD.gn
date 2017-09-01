@@ -17,7 +17,7 @@ dart_app("home_work_agent") {
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/suggestion:suggestion_dart",
     "//apps/maxwell/services/user:user_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//topaz/lib/widgets/packages/modular:lib.modular",
   ]
 }

@@ -29,7 +29,7 @@ flutter_app("armadillo_user_shell") {
     "//apps/sysui/armadillo",
     "//apps/sysui/keyboard",
     "//apps/sysui/widgets",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//lib/flutter/packages/flutter_test",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",

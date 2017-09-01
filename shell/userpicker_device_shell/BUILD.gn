@@ -22,7 +22,7 @@ flutter_app("userpicker_device_shell") {
     "//apps/mozart/services/input:input_dart",
     "//apps/mozart/services/views:views_dart",
     "//apps/sysui/widgets",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
