@@ -48,9 +48,9 @@ template("runner") {
     deps = [
              "//application/lib/app",
              "//application/lib/svc",
-             "//lib/fidl/dart/sdk_ext",
-             "//lib/ftl",
-             "//lib/mtl",
+             "//garnet/public/lib/fidl/dart/sdk_ext",
+             "//garnet/public/lib/ftl",
+             "//garnet/public/lib/mtl",
              "//lib/tonic",
            ] + dart_deps + extra_deps
   }

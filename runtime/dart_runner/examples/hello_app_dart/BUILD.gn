@@ -12,7 +12,7 @@ dart_jit_app("hello_app_dart") {
   deps = [
     "//application/lib/app/dart",
     "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
   ]
 }
 
@@ -24,6 +24,6 @@ dart_aot_app("hello_app_dart_aot") {
   deps = [
     "//application/lib/app/dart",
     "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
-    "//lib/fidl/dart",
+    "//garnet/public/lib/fidl/dart",
   ]
 }

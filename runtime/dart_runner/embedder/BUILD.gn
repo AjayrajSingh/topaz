@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//lib/fidl/dart/sdk_ext/sdk_ext.gni")
+import("//garnet/public/lib/fidl/dart/sdk_ext/sdk_ext.gni")
 
 action("generate_snapshot_bin") {
   if (is_debug) {
