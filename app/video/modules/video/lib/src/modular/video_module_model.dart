@@ -11,7 +11,7 @@ import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.user/device_map.fidl.dart';
-import 'package:apps.netconnector.services/netconnector.fidl.dart';
+import 'package:garnet.public.lib.netconnector.fidl/netconnector.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
