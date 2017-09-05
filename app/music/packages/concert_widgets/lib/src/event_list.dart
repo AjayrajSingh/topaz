@@ -144,6 +144,7 @@ class _EventListGridDelegate extends SliverGridDelegate {
       crossAxisStride: childCrossAxisExtent,
       childMainAxisExtent: childMainAxisExtent,
       childCrossAxisExtent: childCrossAxisExtent,
+      reverseCrossAxis: axisDirectionIsReversed(constraints.crossAxisDirection),
     );
   }
 
