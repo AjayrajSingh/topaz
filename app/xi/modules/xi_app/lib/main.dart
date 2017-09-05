@@ -2,7 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:isolate';
+
 import 'package:application.services/service_provider.fidl.dart';
+import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
@@ -26,18 +29,25 @@ dynamic _handleResponse(String description) {
 }
 
 /// An implementation of the [Module] interface.
-class ModuleImpl extends Module {
+class ModuleImpl implements Module, Lifecycle {
   /// Constructor.
   ModuleImpl(this._ledgerRequest);
 
-  final ModuleBinding _binding = new ModuleBinding();
+  final ModuleBinding _moduleBinding = new ModuleBinding();
+  final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
+
   final ModuleContextProxy _moduleContext = new ModuleContextProxy();
   final ComponentContextProxy _componentContext = new ComponentContextProxy();
   final InterfaceRequest<Ledger> _ledgerRequest;
 
   /// Bind an [InterfaceRequest] for a [Module] interface to this object.
-  void bind(InterfaceRequest<Module> request) {
-    _binding.bind(this, request);
+  void bindModule(InterfaceRequest<Module> request) {
+    _moduleBinding.bind(this, request);
+  }
+
+  /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
+  void bindLifecycle(InterfaceRequest<Lifecycle> request) {
+    _lifecycleBinding.bind(this, request);
   }
 
   @override
@@ -53,16 +63,14 @@ class ModuleImpl extends Module {
   }
 
   @override
-  void stop(void callback()) {
+  void terminate() {
     _log('ModuleImpl::stop call');
 
     // Cleaning up.
     _moduleContext.ctrl.close();
-
-    // Invoke the callback to signal that the clean-up process is done.
-    callback();
-
-    _binding.close();
+    _moduleBinding.close();
+    _lifecycleBinding.close();
+    Isolate.current.kill();
   }
 }
 
@@ -73,12 +81,19 @@ void main() {
   InterfacePair<Ledger> pair = new InterfacePair<Ledger>();
   final ModuleImpl module = new ModuleImpl(pair.passRequest());
 
-  kContext.outgoingServices.addServiceForName(
+  kContext.outgoingServices
+  ..addServiceForName(
     (InterfaceRequest<Module> request) {
       _log('Received binding request for Module');
-      module.bind(request);
+      module.bindModule(request);
     },
     Module.serviceName,
+  )
+  ..addServiceForName(
+    (InterfaceRequest<Lifecycle> request) {
+      module.bindLifecycle(request);
+    },
+    Lifecycle.serviceName,
   );
 
   _log('Starting Flutter app...');
