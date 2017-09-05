@@ -2,10 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:isolate';
 import 'dart:math' as math;
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
+import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
@@ -309,12 +311,18 @@ class MainWidget extends StatelessWidget {
 }
 
 /// Module Service
-class ModuleImpl extends Module {
-  final ModuleBinding _binding = new ModuleBinding();
+class ModuleImpl implements Module, Lifecycle {
+  final ModuleBinding _moduleBinding = new ModuleBinding();
+  final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
 
   /// Bind an [InterfaceRequest] for a [Module] to this
-  void bind(InterfaceRequest<Module> request) {
-    _binding.bind(this, request);
+  void bindModule(InterfaceRequest<Module> request) {
+    _moduleBinding.bind(this, request);
+  }
+
+  /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
+  void bindLifecycle(InterfaceRequest<Lifecycle> request) {
+    _lifecycleBinding.bind(this, request);
   }
 
   @override
@@ -328,14 +336,12 @@ class ModuleImpl extends Module {
   }
 
   @override
-  void stop(void done()) {
-    log.info('ModuleImpl::stop call');
-
+  void terminate() {
+    log.info('ModuleImpl::terminate call');
     _moduleContext.ctrl.close();
-
-    done();
-
-    _binding.close();
+    _moduleBinding.close();
+    _lifecycleBinding.close();
+    Isolate.current.kill();
   }
 }
 
@@ -344,13 +350,20 @@ void main() {
   setupLogger(name: 'exampleManualRelationships');
 
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
-  _appContext.outgoingServices.addServiceForName(
-    (InterfaceRequest<Module> request) {
-      log.info('Received binding request for Module');
-      _module = new ModuleImpl()..bind(request);
-    },
-    Module.serviceName,
-  );
+  _appContext.outgoingServices
+    ..addServiceForName(
+      (InterfaceRequest<Module> request) {
+        log.info('Received binding request for Module');
+        _module.bindModule(request);
+      },
+      Module.serviceName,
+    )
+    ..addServiceForName(
+      (InterfaceRequest<Lifecycle> request) {
+        _module.bindLifecycle(request);
+      },
+      Lifecycle.serviceName,
+    );
 
   Color randomColor =
       new Color(0xFF000000 + new math.Random().nextInt(0xFFFFFF));

@@ -24,10 +24,10 @@ flutter_app("flutter_mondrian") {
     "//apps/mozart/services/views:views_dart",
     "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
-    "//topaz/lib/widgets/packages/logging:lib.logging",
-    "//topaz/lib/widgets/packages/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/quiver",
+    "//topaz/lib/widgets/packages/logging:lib.logging",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 }
 
