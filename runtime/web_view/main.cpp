@@ -47,6 +47,7 @@
 #include "WebView.h"
 
 #include "apps/modular/lib/rapidjson/rapidjson.h"
+#include "apps/modular/services/lifecycle/lifecycle.fidl.h"
 #include "apps/modular/services/module/module.fidl.h"
 #include "apps/modular/services/story/link.fidl.h"
 #include "apps/mozart/lib/scenic/client/host_image_cycler.h"
@@ -128,6 +129,7 @@ class TouchTracker {
 
 class MozWebView : public mozart::BaseView,
                    public modular::Module,
+                   public modular::Lifecycle,
                    public modular::LinkWatcher,
                    public web_view::WebView {
  public:
@@ -144,6 +146,7 @@ class MozWebView : public mozart::BaseView,
         url_(url),
         image_cycler_(session()),
         module_binding_(this),
+        lifecycle_binding_(this),
         main_link_watcher_binding_(this) {
     SetNeedSquareMetrics(true);
     parent_node().AddChild(image_cycler_);
@@ -163,6 +166,10 @@ class MozWebView : public mozart::BaseView,
     application_context->outgoing_services()->AddService<modular::Module>(
         [this](fidl::InterfaceRequest<modular::Module> request) {
           module_binding_.Bind(std::move(request));
+        });
+    application_context->outgoing_services()->AddService<modular::Lifecycle>(
+        [this](fidl::InterfaceRequest<modular::Lifecycle> request) {
+          lifecycle_binding_.Bind(std::move(request));
         });
     mtl::MessageLoop::GetCurrent()->task_runner()->PostTask(
         ([weak = weak_factory_.GetWeakPtr()]() {
@@ -379,7 +386,10 @@ class MozWebView : public mozart::BaseView,
     main_link_->Watch(main_link_watcher_binding_.NewBinding());
   }
 
-  void Stop(const StopCallback& done) final { done(); }
+  // modular::Terminate
+  void Terminate() final {
+    mtl::MessageLoop::GetCurrent()->QuitNow();
+  }
 
   // modular::LinkWatcher
   void Notify(const fidl::String& json) final {
@@ -410,6 +420,7 @@ class MozWebView : public mozart::BaseView,
   // Link state, used to gather URL updates for the story
   modular::LinkPtr main_link_;
   fidl::Binding<modular::Module> module_binding_;
+  fidl::Binding<modular::Lifecycle> lifecycle_binding_;
   fidl::Binding<modular::LinkWatcher> main_link_watcher_binding_;
 
   // Delegate that receives WillSendRequest calls. Can be null.

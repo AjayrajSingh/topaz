@@ -19,6 +19,7 @@ executable("web_view_bin") {
     ":webkit",
     "//application/lib/app",
     "//apps/modular/lib/rapidjson",
+    "//apps/modular/services/lifecycle",
     "//apps/modular/services/module",
     "//apps/modular/services/story",
     "//apps/mozart/lib/view_framework:view_provider",
