@@ -18,7 +18,6 @@ executable("web_view_bin") {
   deps = [
     ":webkit",
     "//application/lib/app",
-    "//apps/icu_data/lib",
     "//apps/modular/lib/rapidjson",
     "//apps/modular/services/module",
     "//apps/modular/services/story",
@@ -27,6 +26,7 @@ executable("web_view_bin") {
     "//apps/mozart/services/views",
     "//apps/web_runner/services",
     "//garnet/public/lib/ftl",
+    "//garnet/public/lib/icu_data/cpp",
     "//garnet/public/lib/mtl",
     "//third_party/boringssl",
     "//third_party/rapidjson",

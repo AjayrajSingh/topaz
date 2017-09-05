@@ -46,7 +46,6 @@
 
 #include "WebView.h"
 
-#include "apps/icu_data/lib/icu_data.h"
 #include "apps/modular/lib/rapidjson/rapidjson.h"
 #include "apps/modular/services/module/module.fidl.h"
 #include "apps/modular/services/story/link.fidl.h"
@@ -58,6 +57,7 @@
 #include "lib/ftl/logging.h"
 #include "lib/ftl/macros.h"
 #include "lib/ftl/memory/weak_ptr.h"
+#include "lib/icu_data/cpp/icu_data.h"
 #include "lib/mtl/tasks/message_loop.h"
 
 using namespace WebCore;
