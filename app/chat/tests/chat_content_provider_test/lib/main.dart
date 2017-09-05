@@ -4,12 +4,14 @@
 
 import 'dart:async';
 import 'dart:convert' show JSON;
+import 'dart:isolate';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.ledger.services.public/ledger.fidl.dart' as ledger_fidl;
 import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.component/message_queue.fidl.dart';
+import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modules.chat.agents.content_provider..chat_content_provider_dart_package/src/chat_content_provider_impl.dart';
@@ -27,12 +29,13 @@ import 'src/mock_chat_message_transporter.dart';
 const Duration _kTimeout = const Duration(seconds: 1);
 
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
-ChatContentProviderTestModule _module;
+ChatContentProviderTestModule _module = new ChatContentProviderTestModule();
 
 /// Implementation of the [Module] interface which tests the functionalities of
 /// [ChatContentProvider].
-class ChatContentProviderTestModule extends Module {
+class ChatContentProviderTestModule implements Module, Lifecycle {
   final ModuleBinding _moduleBinding = new ModuleBinding();
+  final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
 
   final TestRunnerProxy _testRunner = new TestRunnerProxy();
   final ComponentContextProxy _componentContext = new ComponentContextProxy();
@@ -43,8 +46,13 @@ class ChatContentProviderTestModule extends Module {
       new MockChatMessageTransporter();
 
   /// Bind an [InterfaceRequest] for a [Module] interface to this object.
-  void bind(InterfaceRequest<Module> request) {
+  void bindModule(InterfaceRequest<Module> request) {
     _moduleBinding.bind(this, request);
+  }
+
+  /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
+  void bindLifecycle(InterfaceRequest<Lifecycle> request) {
+    _lifecycleBinding.bind(this, request);
   }
 
   /// Implements [Module] interface.
@@ -91,17 +99,16 @@ class ChatContentProviderTestModule extends Module {
     _testRunner.teardown(() {});
   }
 
-  /// Implements [Module] interface.
+  /// Implements [Lifecycle] interface.
   @override
-  void stop(void callback()) {
+  void terminate() {
     _chatContentProvider?.close();
     _ledger.ctrl.close();
     _componentContext.ctrl.close();
     _testRunner.ctrl.close();
-
-    callback();
-
     _moduleBinding.close();
+    _lifecycleBinding.close();
+    Isolate.current.kill();
   }
 
   /// Test adding a new conversation and a few messages, starting from a blank
@@ -716,15 +723,17 @@ class _MessageQueueWrapper {
 Future<Null> main(List<String> args) async {
   setupLogger(name: 'chat/agent_test');
 
-  _context.outgoingServices.addServiceForName(
+  _context.outgoingServices
+  ..addServiceForName(
     (InterfaceRequest<Module> request) {
-      if (_module == null) {
-        _module = new ChatContentProviderTestModule()..bind(request);
-      } else {
-        // Can only connect to this interface once.
-        request.close();
-      }
+      _module.bindModule(request);
     },
     Module.serviceName,
+  )
+  ..addServiceForName(
+    (InterfaceRequest<Lifecycle> request) {
+      _module.bindLifecycle(request);
+    },
+    Lifecycle.serviceName,
   );
 }
