@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:isolate';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:application.services/service_provider.fidl.dart';
@@ -94,6 +95,7 @@ class MusicPlaybackAgent implements Agent, Lifecycle {
     _lifecycleBinding.close();
     _outgoingServicesBindings
         .forEach((ServiceProviderBinding binding) => binding.close());
+    Isolate.current.kill();
   }
 }
 
