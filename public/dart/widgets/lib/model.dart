@@ -9,4 +9,5 @@
 
 export 'src/model/idle_model.dart';
 export 'src/model/model.dart';
+export 'src/model/spring_model.dart';
 export 'src/model/ticking_model.dart';
