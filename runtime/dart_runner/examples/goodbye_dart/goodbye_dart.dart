@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:fidl.internal' as fidl;
+import 'dart:fuchsia' as fuchsia;
 
 Timer timer;
 
@@ -12,6 +12,6 @@ void main(List args) {
 
   timer = new Timer(const Duration(seconds: 1), () {
     print('Goodbye, Dart!');
-    fidl.exit(42);
+    fuchsia.exit(42);
   });
 }

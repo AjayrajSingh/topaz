@@ -9,8 +9,7 @@
 
 #include "dart/runtime/bin/io_natives.h"
 #include "dart/runtime/include/dart_api.h"
-#include "lib/fidl/dart/sdk_ext/src/natives.h"
-#include "lib/fidl/dart/sdk_ext/src/handle.h"
+#include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"
 #include "lib/ftl/arraysize.h"
 #include "lib/ftl/logging.h"
 #include "lib/mtl/tasks/message_loop.h"
@@ -96,26 +95,11 @@ void InitBuiltinLibrariesForIsolate(
     mxio_ns_t* namespc,
     std::unique_ptr<app::ApplicationContext> context,
     fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
-  // dart:fidl.internal --------------------------------------------------------
-
-  Dart_Handle fidl_internal = Dart_LookupLibrary(ToDart("dart:fidl.internal"));
-  DART_CHECK_VALID(Dart_SetNativeResolver(
-      fidl_internal, fidl::dart::NativeLookup, fidl::dart::NativeSymbol));
-  fidl::dart::Initialize();
-
+  // dart:fuchsia --------------------------------------------------------------
   fidl::InterfaceHandle<app::ApplicationEnvironment> environment;
   context->ConnectToEnvironmentService(environment.NewRequest());
-
-  DART_CHECK_VALID(Dart_SetField(fidl_internal, ToDart("_environment"),
-                                 ToDart(fidl::dart::Handle::Create(
-                                     environment.PassHandle().release()))));
-
-  if (outgoing_services) {
-    DART_CHECK_VALID(
-        Dart_SetField(fidl_internal, ToDart("_outgoingServices"),
-                      ToDart(fidl::dart::Handle::Create(
-                          outgoing_services.PassChannel().release()))));
-  }
+  fuchsia::dart::Initialize(std::move(environment),
+                            std::move(outgoing_services));
 
   // dart:fuchsia.builtin ------------------------------------------------------
 

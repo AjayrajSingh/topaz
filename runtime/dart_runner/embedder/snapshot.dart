@@ -10,5 +10,6 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
 import 'dart:fuchsia.builtin';
-import 'dart:fidl.internal';
+import 'dart:zircon';
+import 'dart:fuchsia';
 import 'dart:typed_data';

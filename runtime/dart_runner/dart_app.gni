@@ -3,6 +3,8 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_package.gni")
+import("//garnet/public/dart-pkg/fuchsia/sdk_ext.gni")
+import("//garnet/public/dart-pkg/zircon/sdk_ext.gni")
 
 declare_args() {
   # Controls whether dart_app() targets generate JIT or AOT Dart snapshots.
@@ -61,6 +63,7 @@ template("dart_jit_app") {
       snapshot_path,
     ]
 
+    inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files
 
     rebased_packages_path =
         rebase_path("$target_gen_dir/$dart_package_target_name.packages")
@@ -165,6 +168,8 @@ template("dart_aot_app") {
     outputs = [
       assembly_path,
     ]
+
+    inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files
 
     rebased_packages_path =
         rebase_path("$target_gen_dir/$dart_package_target_name.packages")

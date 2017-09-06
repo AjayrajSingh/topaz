@@ -6,7 +6,7 @@ library fidl_builtin;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:fidl.internal';
+import 'dart:zircon';
 
 // Corelib 'print' implementation.
 void _print(arg) {
