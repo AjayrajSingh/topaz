@@ -30,7 +30,7 @@ void main() {
       ),
       feedbackBuilder: (
         Offset localDragStartPoint,
-        Rect initialBoundsOnDrag,
+        Size initialSize,
       ) {},
       data: 1,
       childWhenDragging: new Container(
@@ -132,7 +132,7 @@ void main() {
       ),
       feedbackBuilder: (
         Offset localDragStartPoint,
-        Rect initialBoundsOnDrag,
+        Size initialSize,
       ) {},
       data: 1,
       childWhenDragging: new Container(
@@ -216,7 +216,7 @@ void main() {
       ),
       feedbackBuilder: (
         Offset localDragStartPoint,
-        Rect initialBoundsOnDrag,
+        Size initialSize,
       ) {},
       data: 1,
     );
@@ -366,7 +366,7 @@ void main() {
       ),
       feedbackBuilder: (
         Offset localDragStartPoint,
-        Rect initialBoundsOnDrag,
+        Size initialSize,
       ) {},
       data: 1,
     );

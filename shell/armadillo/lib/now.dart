@@ -222,12 +222,12 @@ class NowState extends TickingState<Now> {
           StoryDragTransitionModel storyDragTransitionModel,
         ) =>
             new Offstage(
-              offstage: storyDragTransitionModel.progress == 1.0,
+              offstage: storyDragTransitionModel.value == 1.0,
               child: new Opacity(
                 opacity: lerpDouble(
                   1.0,
                   0.0,
-                  storyDragTransitionModel.progress,
+                  storyDragTransitionModel.value,
                 ),
                 child: child,
               ),

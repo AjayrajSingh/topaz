@@ -30,12 +30,16 @@ class PanelResizingOverlay extends StatelessWidget {
   /// The current size of the cluster's widget.
   final Size currentSize;
 
+  /// True if the overlay should respond to resizing events.
+  final bool enabled;
+
   /// Constructor.
   PanelResizingOverlay({
     Key key,
     this.storyCluster,
     this.child,
     this.currentSize,
+    this.enabled,
   })
       : super(key: key);
 
@@ -70,30 +74,32 @@ class PanelResizingOverlay extends StatelessWidget {
 
     List<Widget> stackChildren = <Widget>[child];
 
-    // Create draggables for each vertical seam.
-    List<_VerticalSeam> verticalSeams = _getVerticalSeams(
-      context,
-      rights,
-      storyClusterPanelsModel,
-    );
-    stackChildren.addAll(
-      verticalSeams.map(
-        (_VerticalSeam verticalSeam) => new Positioned.fill(
-              child: verticalSeam.build(context),
-            ),
-      ),
-    );
+    if (enabled) {
+      // Create draggables for each vertical seam.
+      List<_VerticalSeam> verticalSeams = _getVerticalSeams(
+        context,
+        rights,
+        storyClusterPanelsModel,
+      );
+      stackChildren.addAll(
+        verticalSeams.map(
+          (_VerticalSeam verticalSeam) => new Positioned.fill(
+                child: verticalSeam.build(context),
+              ),
+        ),
+      );
 
-    // Create draggables for each horizontal seam.
-    List<_HorizontalSeam> horizontalSeams =
-        _getHorizontalSeams(context, bottoms, storyClusterPanelsModel);
-    stackChildren.addAll(
-      horizontalSeams.map(
-        (_HorizontalSeam horizontalSeam) => new Positioned.fill(
-              child: horizontalSeam.build(context),
-            ),
-      ),
-    );
+      // Create draggables for each horizontal seam.
+      List<_HorizontalSeam> horizontalSeams =
+          _getHorizontalSeams(context, bottoms, storyClusterPanelsModel);
+      stackChildren.addAll(
+        horizontalSeams.map(
+          (_HorizontalSeam horizontalSeam) => new Positioned.fill(
+                child: horizontalSeam.build(context),
+              ),
+        ),
+      );
+    }
 
     return new Stack(
       children: stackChildren,

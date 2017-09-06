@@ -5,13 +5,14 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'armadillo_drag_target.dart';
 import 'display_mode.dart';
 import 'panel.dart';
 import 'panel_drag_targets.dart';
 import 'place_holder_story.dart';
-import 'simulation_builder.dart';
 import 'story.dart';
 import 'story_cluster_drag_feedback.dart';
 import 'story_cluster_entrance_transition_model.dart';
@@ -21,6 +22,9 @@ import 'story_cluster_stories_model.dart';
 import 'story_cluster_widget.dart';
 import 'story_list_layout.dart';
 import 'story_panels.dart';
+
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 /// Called when something related to [storyCluster] happens.
 typedef void OnStoryClusterEvent(StoryCluster storyCluster);
@@ -43,19 +47,17 @@ class StoryCluster {
   /// The key used for the cluster's [StoryClusterDragFeedback].
   final GlobalKey<StoryClusterDragFeedbackState> dragFeedbackKey;
 
-  /// The focus simulation is the scaling that occurs when the
-  /// user has focused on the cluster to bring it to full screen size.
-  final GlobalKey<SimulationBuilderState> focusSimulationKey;
-
   /// The inline preview scale simulation is the scaling that occurs when the
   /// user drags a cluster over this cluster while in the timeline after the
   /// inline preview timeout occurs.
-  final GlobalKey<SimulationBuilderState> inlinePreviewScaleSimulationKey;
+  final InlinePreviewScaleModel inlinePreviewScaleModel =
+      new InlinePreviewScaleModel();
 
   /// The inline preview hint scale simulation is the scaling that occurs when
   /// the user drags a cluster over this cluster while in the timeline before
   /// the inline preview timeout occurs.
-  final GlobalKey<SimulationBuilderState> inlinePreviewHintScaleSimulationKey;
+  final InlinePreviewHintScaleModel inlinePreviewHintScaleModel =
+      new InlinePreviewHintScaleModel();
 
   final Set<VoidCallback> _storyListListeners;
 
@@ -64,6 +66,9 @@ class StoryCluster {
 
   /// The model handling the entrance transtion of the cluster.
   final StoryClusterEntranceTransitionModel storyClusterEntranceTransitionModel;
+
+  /// The focus progress of the cluster.
+  final FocusModel focusModel = new FocusModel();
 
   /// The title of a cluster is currently generated via
   /// [_getClusterTitle] whenever the list of stories in this cluster changes.
@@ -107,16 +112,6 @@ class StoryCluster {
         this.panelsKey = new GlobalKey(debugLabel: 'panelsKey'),
         this.dragFeedbackKey = new GlobalKey<StoryClusterDragFeedbackState>(
             debugLabel: 'dragFeedbackKey'),
-        this.focusSimulationKey = new GlobalKey<SimulationBuilderState>(
-            debugLabel: 'focusSimulationKey'),
-        this.inlinePreviewScaleSimulationKey =
-            new GlobalKey<SimulationBuilderState>(
-          debugLabel: 'inlinePreviewScaleSimulationKey',
-        ),
-        this.inlinePreviewHintScaleSimulationKey =
-            new GlobalKey<SimulationBuilderState>(
-          debugLabel: 'inlinePreviewHintScaleSimulationKey',
-        ),
         this._displayMode = DisplayMode.panels,
         this._storyListListeners = new Set<VoidCallback>(),
         this._focusedStoryId = stories[0].id,
@@ -467,7 +462,7 @@ class StoryCluster {
 
   /// Unfocuses the story cluster.
   void unFocus() {
-    focusSimulationKey.currentState?.target = 0.0;
+    focusModel.target = 0.0;
     minimizeStoryBars();
   }
 
@@ -629,4 +624,33 @@ class StoryCluster {
     });
     return largestDuration;
   }
+}
+
+const RK4SpringDescription _kSimulationDesc =
+    const RK4SpringDescription(tension: 450.0, friction: 50.0);
+
+/// Handles focus progress for a StoryCluster.
+class FocusModel extends SpringModel {
+  /// Constructor.
+  FocusModel() : super(springDescription: _kSimulationDesc);
+}
+
+const RK4SpringDescription _kInlinePreviewSimulationDesc =
+    const RK4SpringDescription(tension: 900.0, friction: 50.0);
+
+/// The inline preview scale simulation is the scaling that occurs when the
+/// user drags a cluster over this cluster while in the timeline after the
+/// inline preview timeout occurs.
+class InlinePreviewScaleModel extends SpringModel {
+  /// Constructor.
+  InlinePreviewScaleModel()
+      : super(springDescription: _kInlinePreviewSimulationDesc);
+}
+
+/// The inline preview hint scale simulation is the scaling that occurs when
+/// the user drags a cluster over this cluster while in the timeline before
+/// the inline preview timeout occurs.
+class InlinePreviewHintScaleModel extends SpringModel {
+  /// Constructor.
+  InlinePreviewHintScaleModel() : super(springDescription: _kSimulationDesc);
 }

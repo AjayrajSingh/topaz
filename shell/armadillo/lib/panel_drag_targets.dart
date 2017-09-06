@@ -444,10 +444,9 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
   /// If [activate] is true, start the inline preview scale simulation.  If
   /// false, reverse the simulation back to its beginning.
   void _updateInlinePreviewScalingSimulation(bool activate) {
-    widget.storyCluster.inlinePreviewScaleSimulationKey.currentState?.target =
-        activate ? 1.0 : 0.0;
-    widget.storyCluster.inlinePreviewHintScaleSimulationKey.currentState
-        ?.target = (activate || _candidateValidityTimer != null) ? 1.0 : 0.0;
+    widget.storyCluster.inlinePreviewScaleModel.target = activate ? 1.0 : 0.0;
+    widget.storyCluster.inlinePreviewHintScaleModel.target =
+        (activate || _candidateValidityTimer != null) ? 1.0 : 0.0;
   }
 
   void _updateClosestTargets(Map<StoryClusterDragData, Offset> candidates) {

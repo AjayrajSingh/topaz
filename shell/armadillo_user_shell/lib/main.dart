@@ -12,12 +12,16 @@ import 'package:armadillo/conductor.dart';
 import 'package:armadillo/context_model.dart';
 import 'package:armadillo/debug_enabler.dart';
 import 'package:armadillo/debug_model.dart';
+import 'package:armadillo/idle_mode_builder.dart';
 import 'package:armadillo/interruption_overlay.dart';
+import 'package:armadillo/now_builder.dart';
 import 'package:armadillo/panel_resizing_model.dart';
 import 'package:armadillo/peek_model.dart';
 import 'package:armadillo/power_model.dart';
 import 'package:armadillo/quick_settings_progress_model.dart';
+import 'package:armadillo/recents_builder.dart';
 import 'package:armadillo/size_model.dart';
+import 'package:armadillo/story_cluster.dart';
 import 'package:armadillo/story_cluster_drag_state_model.dart';
 import 'package:armadillo/story_drag_transition_model.dart';
 import 'package:armadillo/story_model.dart';
@@ -54,11 +58,23 @@ const bool _kDumpAllErrors = false;
 
 Future<Null> main() async {
   SizeModel sizeModel = new SizeModel();
-  runApp(buildArmadilloUserShell(logName: 'armadillo', sizeModel: sizeModel));
+  runApp(buildArmadilloUserShell(
+    logName: 'armadillo',
+    sizeModel: sizeModel,
+    idleModeBuilder: new IdleModeBuilder(),
+    nowBuilder: new NowBuilder(),
+    recentsBuilder: new RecentsBuilder(),
+  ));
 }
 
 /// Builds the armadillo user shell.
-Widget buildArmadilloUserShell({String logName, SizeModel sizeModel}) {
+Widget buildArmadilloUserShell({
+  String logName,
+  SizeModel sizeModel,
+  IdleModeBuilder idleModeBuilder,
+  NowBuilder nowBuilder,
+  RecentsBuilder recentsBuilder,
+}) {
   setupLogger(name: logName);
 
   if (_kDumpAllErrors) {
@@ -211,6 +227,9 @@ Widget buildArmadilloUserShell({String logName, SizeModel sizeModel}) {
     onInterruptionDismissed:
         suggestionProviderSuggestionModel.onInterruptionDismissal,
     onUserContextTapped: armadilloUserShellModel.onUserContextTapped,
+    idleModeBuilder: idleModeBuilder,
+    nowBuilder: nowBuilder,
+    recentsBuilder: recentsBuilder,
   );
 
   DebugModel debugModel = new DebugModel();

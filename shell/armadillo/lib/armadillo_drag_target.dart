@@ -62,12 +62,12 @@ typedef void ArmadilloDragTargetAccept<T>(
 /// local coordinate space.
 typedef Widget FeedbackBuilder(
   Offset localDragStartPoint,
-  Rect initialBoundsOnDrag,
+  Size initialSize,
 );
 
-/// Called when a drag starts.  The returned [Rect] should be the bounds of the
+/// Called when a drag starts.  The returned [Size] should be the size of the
 /// dragged widget.
-typedef Rect OnDragStarted();
+typedef Size OnDragStarted();
 
 /// A widget that can be dragged from to a [ArmadilloDragTarget] starting from long press.
 ///
@@ -208,7 +208,7 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
 
     final RenderBox box = context.findRenderObject();
     final Offset dragStartPoint = box.globalToLocal(position);
-    final Rect initialBoundsOnDrag = widget.onDragStarted?.call();
+    final Size initialSize = widget.onDragStarted?.call();
     final WidgetBuilder builder =
         (BuildContext context) => new _DragAvatarWidget(
               key: _dragAvatarKey,
@@ -216,7 +216,7 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
               overlayKey: widget.overlayKey,
               initialPosition: position,
               dragStartPoint: dragStartPoint,
-              initialBoundsOnDrag: initialBoundsOnDrag,
+              initialSize: initialSize,
               feedbackBuilder: widget.feedbackBuilder,
               onDismiss: widget.onDismiss,
             );
@@ -265,7 +265,7 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
 /// around the overlay.  It encapsulates all the state necessary to animate
 /// the avatar back to the Draggable's original position when dragging first
 /// started.  These include: [initialPosition], [dragStartPoint], and
-/// [initialBoundsOnDrag].
+/// [initialSize].
 /// [overlayKey] is the key to the overlay this widget is a part of.  It's used
 /// to properly position this widget to follow the pointer.
 /// [feedbackBuilder] builds the widget that follows the pointer.
@@ -276,7 +276,7 @@ class _DragAvatarWidget extends StatefulWidget {
   final GlobalKey<ArmadilloOverlayState> overlayKey;
   final Offset initialPosition;
   final Offset dragStartPoint;
-  final Rect initialBoundsOnDrag;
+  final Size initialSize;
   final FeedbackBuilder feedbackBuilder;
   final VoidCallback onDismiss;
 
@@ -286,7 +286,7 @@ class _DragAvatarWidget extends StatefulWidget {
     this.overlayKey,
     this.initialPosition,
     this.dragStartPoint,
-    this.initialBoundsOnDrag,
+    this.initialSize,
     this.feedbackBuilder,
     this.onDismiss,
   })
@@ -342,7 +342,7 @@ class _DragAvatarWidgetState extends TickingState<_DragAvatarWidget> {
           child: new IgnorePointer(
             child: widget.feedbackBuilder(
               widget.dragStartPoint,
-              widget.initialBoundsOnDrag,
+              widget.initialSize,
             ),
           ),
         ),

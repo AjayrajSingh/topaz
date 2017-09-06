@@ -2,20 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.widgets/widgets.dart';
 
+import 'armadillo_drag_target.dart';
 import 'armadillo_overlay.dart';
 import 'render_story_list_body.dart';
-import 'simulation_builder.dart';
 import 'size_model.dart';
 import 'story.dart';
 import 'story_cluster.dart';
+import 'story_cluster_drag_data.dart';
 import 'story_cluster_entrance_transition_model.dart';
 import 'story_cluster_widget.dart';
 import 'story_drag_transition_model.dart';
@@ -25,9 +26,6 @@ import 'story_model.dart';
 import 'story_rearrangement_scrim_model.dart';
 
 const double _kStoryInlineTitleHeight = 20.0;
-
-const RK4SpringDescription _kInlinePreviewSimulationDesc =
-    const RK4SpringDescription(tension: 900.0, friction: 50.0);
 
 /// Displays the [StoryCluster]s of it's ancestor [StoryModel].
 class StoryList extends StatelessWidget {
@@ -81,6 +79,32 @@ class StoryList extends StatelessWidget {
                 fit: StackFit.passthrough,
                 children: <Widget>[
                   _createScrollableList(storyModel, sizeModel),
+                  new Positioned(
+                    left: 0.0,
+                    top: 0.0,
+                    bottom: 0.0,
+                    width: 108.0,
+                    child: _buildDiscardDragTarget(
+                      storyModel: storyModel,
+                      controller: new AnimationController(
+                        vsync: new _TickerProvider(),
+                        duration: const Duration(milliseconds: 200),
+                      ),
+                    ),
+                  ),
+                  new Positioned(
+                    right: 0.0,
+                    top: 0.0,
+                    bottom: 0.0,
+                    width: 108.0,
+                    child: _buildDiscardDragTarget(
+                      storyModel: storyModel,
+                      controller: new AnimationController(
+                        vsync: new _TickerProvider(),
+                        duration: const Duration(milliseconds: 200),
+                      ),
+                    ),
+                  ),
                   new ArmadilloOverlay(key: overlayKey),
                 ],
               );
@@ -146,11 +170,11 @@ class StoryList extends StatelessWidget {
                                           lerpDouble(
                                             0.0,
                                             sizeModel.minimizedNowHeight,
-                                            storyDragTransitionModel.progress,
+                                            storyDragTransitionModel.value,
                                           ),
                                     ),
                                     storyDragTransitionModelProgress:
-                                        storyDragTransitionModel.progress,
+                                        storyDragTransitionModel.value,
                                   ),
                             ),
                       ),
@@ -164,64 +188,58 @@ class StoryList extends StatelessWidget {
     List<StoryCluster> storyClusters,
     StoryCluster storyCluster,
     Map<StoryId, Widget> storyWidgets,
-  ) =>
+  ) {
+    bool wasFocused = (storyCluster.focusModel.value == 1.0 &&
+        storyCluster.focusModel.isDone);
+    return _wrapWithModels(storyCluster, (BuildContext context) {
+      bool isFocused = (storyCluster.focusModel.value == 1.0 &&
+          storyCluster.focusModel.isDone);
+      if (isFocused && !wasFocused) {
+        /// TODO: Investigate if this gets called too much.
+        scheduleMicrotask(
+            () => onStoryClusterFocusCompleted?.call(storyCluster));
+      }
+      wasFocused = isFocused;
+      return new _StoryListChild(
+        storyLayout: storyCluster.storyLayout,
+        focusProgress: storyCluster.focusModel.value,
+        inlinePreviewScaleProgress: storyCluster.inlinePreviewScaleModel.value,
+        inlinePreviewHintScaleProgress:
+            storyCluster.inlinePreviewHintScaleModel.value,
+        entranceTransitionProgress:
+            storyCluster.storyClusterEntranceTransitionModel.value,
+        child: _createStoryCluster(
+          storyClusters,
+          storyCluster,
+          storyCluster.focusModel.value,
+          storyWidgets,
+        ),
+      );
+    });
+  }
+
+  Widget _wrapWithModels(StoryCluster storyCluster, WidgetBuilder builder) =>
       new ScopedModel<StoryClusterEntranceTransitionModel>(
         model: storyCluster.storyClusterEntranceTransitionModel,
         child: new ScopedModelDescendant<StoryClusterEntranceTransitionModel>(
-          builder: (
-            _,
-            __,
-            StoryClusterEntranceTransitionModel
-                storyClusterEntranceTransitionModel,
-          ) =>
-              new SimulationBuilder(
-                key: storyCluster.inlinePreviewHintScaleSimulationKey,
-                springDescription: _kInlinePreviewSimulationDesc,
-                initValue: 0.0,
-                targetValue: 0.0,
-                builder: (
-                  BuildContext context,
-                  double inlinePreviewHintScaleProgress,
-                ) =>
-                    new SimulationBuilder(
-                      key: storyCluster.inlinePreviewScaleSimulationKey,
-                      springDescription: _kInlinePreviewSimulationDesc,
-                      initValue: 0.0,
-                      targetValue: 0.0,
-                      builder: (BuildContext context,
-                              double inlinePreviewScaleProgress) =>
-                          new SimulationBuilder(
-                            key: storyCluster.focusSimulationKey,
-                            initValue: 0.0,
-                            targetValue: 0.0,
-                            onSimulationChanged:
-                                (double focusProgress, bool isDone) {
-                              if (focusProgress == 1.0 && isDone) {
-                                onStoryClusterFocusCompleted
-                                    ?.call(storyCluster);
-                              }
-                            },
-                            builder:
-                                (BuildContext context, double focusProgress) =>
-                                    new _StoryListChild(
-                                      storyLayout: storyCluster.storyLayout,
-                                      focusProgress: focusProgress,
-                                      inlinePreviewScaleProgress:
-                                          inlinePreviewScaleProgress,
-                                      inlinePreviewHintScaleProgress:
-                                          inlinePreviewHintScaleProgress,
-                                      entranceTransitionProgress:
-                                          storyClusterEntranceTransitionModel
-                                              .progress,
-                                      child: _createStoryCluster(
-                                        storyClusters,
-                                        storyCluster,
-                                        focusProgress,
-                                        storyWidgets,
-                                      ),
-                                    ),
-                          ),
-                    ),
+          builder: (_, __, ___) => new ScopedModel<InlinePreviewScaleModel>(
+                model: storyCluster.inlinePreviewScaleModel,
+                child: new ScopedModelDescendant<InlinePreviewScaleModel>(
+                  builder: (_, __, ___) =>
+                      new ScopedModel<InlinePreviewHintScaleModel>(
+                        model: storyCluster.inlinePreviewHintScaleModel,
+                        child: new ScopedModelDescendant<
+                            InlinePreviewHintScaleModel>(
+                          builder: (_, __, ___) => new ScopedModel<FocusModel>(
+                                model: storyCluster.focusModel,
+                                child: new ScopedModelDescendant<FocusModel>(
+                                  builder: (BuildContext context, __, ___) =>
+                                      builder(context),
+                                ),
+                              ),
+                        ),
+                      ),
+                ),
               ),
         ),
       );
@@ -248,8 +266,7 @@ class StoryList extends StatelessWidget {
         ),
       );
 
-  bool _inFocus(StoryCluster s) =>
-      (s.focusSimulationKey.currentState?.progress ?? 0.0) > 0.0;
+  bool _inFocus(StoryCluster s) => s.focusModel.value > 0.0;
 
   void _onGainFocus(
     List<StoryCluster> storyClusters,
@@ -263,12 +280,59 @@ class StoryList extends StatelessWidget {
     });
 
     // Bring tapped story into focus.
-    storyCluster.focusSimulationKey.currentState?.target = 1.0;
+    storyCluster.focusModel.target = 1.0;
 
     storyCluster.maximizeStoryBars();
 
     onStoryClusterFocusStarted?.call();
   }
+
+  Widget _buildDiscardDragTarget({
+    BuildContext context,
+    StoryModel storyModel,
+    AnimationController controller,
+  }) {
+    CurvedAnimation curve = new CurvedAnimation(
+      parent: controller,
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.fastOutSlowIn,
+    );
+    bool wasEmpty = true;
+    return new ArmadilloDragTarget<StoryClusterDragData>(
+      onWillAccept: (_, __) => storyModel.storyClusters.every(
+          (StoryCluster storyCluster) => storyCluster.focusModel.value == 0.0),
+      onAccept: (StoryClusterDragData data, _, __) {
+        storyModel.delete(storyModel.getStoryCluster(data.id));
+        controller.reverse();
+      },
+      builder: (_, Map<StoryClusterDragData, Offset> candidateData, __) {
+        if (candidateData.isEmpty && !wasEmpty) {
+          controller.reverse();
+        } else if (candidateData.isNotEmpty && wasEmpty) {
+          controller.forward();
+        }
+        wasEmpty = candidateData.isEmpty;
+
+        return new IgnorePointer(
+          child: new AnimatedBuilder(
+            animation: curve,
+            builder: (BuildContext context, Widget child) => new Container(
+                  color: Color.lerp(
+                    Colors.transparent,
+                    Colors.black12,
+                    curve.value,
+                  ),
+                ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _TickerProvider extends TickerProvider {
+  @override
+  Ticker createTicker(TickerCallback onTick) => new Ticker(onTick);
 }
 
 class _StoryListBody extends MultiChildRenderObjectWidget {

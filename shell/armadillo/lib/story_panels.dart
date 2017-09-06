@@ -13,6 +13,7 @@ import 'elevations.dart';
 import 'nothing.dart';
 import 'optional_wrapper.dart';
 import 'panel.dart';
+import 'panel_resizing_model.dart';
 import 'place_holder_story.dart';
 import 'simulated_fractionally_sized_box.dart';
 import 'simulated_padding.dart';
@@ -95,10 +96,8 @@ class StoryPanels extends StatelessWidget {
       // This will progressively animate the the elevation of a story cluster
       // when it goes from the inlinePreview hint state to the full blown inline
       // preview state.
-      return (storyCluster
-                  .inlinePreviewScaleSimulationKey.currentState?.progress +
-              storyCluster
-                  .inlinePreviewHintScaleSimulationKey.currentState?.progress) *
+      return (storyCluster.inlinePreviewScaleModel.value +
+              storyCluster.inlinePreviewHintScaleModel.value) *
           Elevations.storyClusterInlinePreview /
           2.0;
     }
@@ -155,7 +154,7 @@ class StoryPanels extends StatelessWidget {
                     fractionalPadding[0],
                     fractionalPadding[1],
                     currentSize,
-                    storyDragTransitionModel.progress,
+                    storyDragTransitionModel.value,
                     focusProgress,
                     (storyCluster.focusedStoryId == story.id),
                   ),
@@ -176,9 +175,9 @@ class StoryPanels extends StatelessWidget {
     BuildContext context,
     Story story,
     Widget child,
+    double fractionalLeftPadding,
   }) {
     final Widget storyWidget = storyWidgets[story.id];
-    double initialDxOnDrag;
     bool onFirstHoverCalled = false;
     Map<StoryId, Panel> storyPanelsOnDrag = <StoryId, Panel>{};
     List<StoryId> storyListOrderOnDrag = <StoryId>[];
@@ -281,24 +280,6 @@ class StoryPanels extends StatelessWidget {
             onDragStarted: () {
               RenderBox box =
                   story.positionedKey.currentContext.findRenderObject();
-              Offset boxTopLeft = box.localToGlobal(Offset.zero);
-              Offset boxBottomRight = box.localToGlobal(
-                new Offset(box.size.width, box.size.height),
-              );
-              Rect initialBoundsOnDrag = new Rect.fromLTRB(
-                boxTopLeft.dx,
-                boxTopLeft.dy,
-                boxBottomRight.dx,
-                boxBottomRight.dy,
-              );
-
-              RenderBox storyBarBox =
-                  story.storyBarKey.currentContext.findRenderObject();
-              Offset storyBarBoxTopLeft =
-                  storyBarBox.localToGlobal(Offset.zero);
-              initialDxOnDrag = (storyCluster.displayMode == DisplayMode.tabs)
-                  ? -storyBarBoxTopLeft.dx
-                  : 0.0;
 
               // Store off panel configuration before splitting.
               storyPanelsOnDrag.clear();
@@ -316,7 +297,8 @@ class StoryPanels extends StatelessWidget {
               StoryClusterDragStateModel.of(context).addDragging(
                     story.clusterId,
                   );
-              return initialBoundsOnDrag;
+
+              return box.size;
             },
             onDragEnded: () =>
                 StoryClusterDragStateModel.of(context).removeDragging(
@@ -326,10 +308,7 @@ class StoryPanels extends StatelessWidget {
                   StoryModel.of(context).getStoryCluster(story.clusterId),
                 ),
             childWhenDragging: Nothing.widget,
-            feedbackBuilder: (
-              Offset localDragStartPoint,
-              Rect initialBoundsOnDrag,
-            ) {
+            feedbackBuilder: (Offset localDragStartPoint, Size initialSize) {
               StoryCluster storyCluster =
                   StoryModel.of(context).getStoryCluster(story.clusterId);
 
@@ -339,8 +318,8 @@ class StoryPanels extends StatelessWidget {
                 storyCluster: storyCluster,
                 storyWidgets: <StoryId, Widget>{story.id: storyWidget},
                 localDragStartPoint: localDragStartPoint,
-                initialBounds: initialBoundsOnDrag,
-                initDx: initialDxOnDrag,
+                initialSize: initialSize,
+                initDx: -fractionalLeftPadding,
               );
             },
             child: child,
@@ -369,6 +348,9 @@ class StoryPanels extends StatelessWidget {
         storyCluster.focusedStoryId == story.id) {
       storyElevationWithTabs += Elevations.focusedStoryTab;
     }
+
+    story.storyBarFocus = (storyCluster.displayMode == DisplayMode.panels) ||
+        (storyCluster.focusedStoryId == story.id);
 
     return story.isPlaceHolder
         ? Nothing.widget
@@ -407,14 +389,13 @@ class StoryPanels extends StatelessWidget {
                     child: _getStoryBarDraggableWrapper(
                       context: context,
                       story: story,
-                      child: new StoryBar(
-                        key: story.storyBarKey,
-                        story: story,
-                        focused:
-                            (storyCluster.displayMode == DisplayMode.panels) ||
-                                (storyCluster.focusedStoryId == story.id),
-                        elevation: storyElevationWithTabs,
-                        borderRadius: _getStoryBarBorderRadius(story),
+                      fractionalLeftPadding: fractionalLeftPadding,
+                      child: story.wrapWithModels(
+                        child: new StoryBar(
+                          story: story,
+                          elevation: storyElevationWithTabs,
+                          borderRadius: _getStoryBarBorderRadius(story),
+                        ),
                       ),
                     ),
                   ),

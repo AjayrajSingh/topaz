@@ -16,6 +16,7 @@ import 'optional_wrapper.dart';
 import 'panel.dart' as panel;
 import 'panel_drag_targets.dart';
 import 'panel_resizing_overlay.dart';
+import 'size_model.dart';
 import 'story.dart';
 import 'story_cluster.dart';
 import 'story_cluster_drag_data.dart';
@@ -97,20 +98,10 @@ class StoryClusterWidget extends StatelessWidget {
             onDragStarted: () {
               RenderBox box =
                   storyCluster.panelsKey.currentContext.findRenderObject();
-              Offset boxTopLeft = box.localToGlobal(Offset.zero);
-              Offset boxBottomRight = box.localToGlobal(
-                new Offset(box.size.width, box.size.height),
-              );
-              Rect initialBoundsOnDrag = new Rect.fromLTRB(
-                boxTopLeft.dx,
-                boxTopLeft.dy,
-                boxBottomRight.dx,
-                boxBottomRight.dy,
-              );
               StoryClusterDragStateModel.of(context).addDragging(
                     storyCluster.id,
                   );
-              return initialBoundsOnDrag;
+              return box.size;
             },
             onDragEnded: () =>
                 StoryClusterDragStateModel.of(context).removeDragging(
@@ -121,7 +112,7 @@ class StoryClusterWidget extends StatelessWidget {
                 ),
             feedbackBuilder: (
               Offset localDragStartPoint,
-              Rect initialBoundsOnDrag,
+              Size initialSize,
             ) =>
                 new StoryClusterDragFeedback(
                   key: storyCluster.dragFeedbackKey,
@@ -129,7 +120,7 @@ class StoryClusterWidget extends StatelessWidget {
                   storyCluster: storyCluster,
                   storyWidgets: storyWidgets,
                   localDragStartPoint: localDragStartPoint,
-                  initialBounds: initialBoundsOnDrag,
+                  initialSize: initialSize,
                 ),
             child: child,
           ),
@@ -208,15 +199,11 @@ class StoryClusterWidget extends StatelessWidget {
               storyCluster: storyCluster,
               onAccept: onAccept,
               onVerticalEdgeHover: onVerticalEdgeHover,
-              child: new OptionalWrapper(
-                useWrapper: _isFocused &&
+              child: new PanelResizingOverlay(
+                storyCluster: storyCluster,
+                currentSize: currentSize,
+                enabled: _isFocused &&
                     storyCluster.displayMode == DisplayMode.panels,
-                builder: (BuildContext context, Widget child) =>
-                    new PanelResizingOverlay(
-                      storyCluster: storyCluster,
-                      currentSize: currentSize,
-                      child: child,
-                    ),
                 child: new StoryPanels(
                   key: storyCluster.panelsKey,
                   storyCluster: storyCluster,
@@ -280,9 +267,9 @@ class InlineStoryTitle extends StatelessWidget {
               ) =>
                   new Opacity(
                     opacity: lerpDouble(
-                      lerpDouble(1.0, 0.5, storyDragTransitionModel.progress),
+                      lerpDouble(1.0, 0.5, storyDragTransitionModel.value),
                       0.0,
-                      storyRearrangementScrimModel.progress,
+                      storyRearrangementScrimModel.value,
                     ),
                     child: child,
                   ),

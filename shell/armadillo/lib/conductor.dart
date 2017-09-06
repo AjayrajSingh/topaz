@@ -3,44 +3,30 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'armadillo_overlay.dart';
 import 'context_model.dart';
 import 'edge_scroll_drag_target.dart';
 import 'expand_suggestion.dart';
+import 'idle_mode_builder.dart';
 import 'interruption_overlay.dart';
 import 'quick_settings.dart';
-import 'now.dart';
+import 'now_builder.dart';
 import 'peek_model.dart';
 import 'peeking_overlay.dart';
-import 'quick_settings_progress_model.dart';
-import 'scroll_locker.dart';
+import 'recents_builder.dart';
 import 'selected_suggestion_overlay.dart';
 import 'size_model.dart';
 import 'splash_suggestion.dart';
 import 'story.dart';
 import 'story_cluster.dart';
-import 'story_cluster_drag_state_model.dart';
-import 'story_drag_transition_model.dart';
-import 'story_list.dart';
 import 'story_model.dart';
 import 'suggestion.dart';
 import 'suggestion_list.dart';
 import 'suggestion_model.dart';
-import 'vertical_shifter.dart';
-
-/// How far [Now] should raise when quick settings is activated inline.
-const double _kQuickSettingsHeightBump = 120.0;
-
-/// If the width of the [Conductor] exceeds this value we will switch to
-/// multicolumn mode for the [StoryList].
-const double _kStoryListMultiColumnWidthThreshold = 500.0;
 
 const double _kSuggestionOverlayPullScrollOffset = 100.0;
 const double _kSuggestionOverlayScrollFactor = 1.2;
@@ -73,6 +59,15 @@ class Conductor extends StatefulWidget {
   /// Called when an interruption is no longer showing.
   final OnInterruptionDismissed onInterruptionDismissed;
 
+  /// Builds the idle mode.
+  final IdleModeBuilder idleModeBuilder;
+
+  /// Builds now.
+  final NowBuilder nowBuilder;
+
+  /// Builds recents.
+  final RecentsBuilder recentsBuilder;
+
   /// Constructor.
   Conductor({
     Key key,
@@ -83,6 +78,9 @@ class Conductor extends StatefulWidget {
     this.onUserContextTapped,
     this.interruptionOverlayKey,
     this.onInterruptionDismissed,
+    this.idleModeBuilder,
+    this.nowBuilder,
+    this.recentsBuilder,
   })
       : super(key: key);
 
@@ -96,32 +94,21 @@ class ConductorState extends State<Conductor> {
       new GlobalKey<SuggestionListState>();
   final ScrollController _suggestionListScrollController =
       new ScrollController();
-  final GlobalKey<NowState> _nowKey = new GlobalKey<NowState>();
   final GlobalKey<QuickSettingsOverlayState> _quickSettingsOverlayKey =
       new GlobalKey<QuickSettingsOverlayState>();
   final GlobalKey<PeekingOverlayState> _suggestionOverlayKey =
       new GlobalKey<PeekingOverlayState>();
-
-  /// The [VerticalShifter] is used to shift the [StoryList] up when [Now]'s
-  /// inline quick settings are activated.
-  final GlobalKey<VerticalShifterState> _verticalShifterKey =
-      new GlobalKey<VerticalShifterState>();
-
-  final ScrollController _scrollController = new ScrollController();
-  final GlobalKey<ScrollLockerState> _scrollLockerKey =
-      new GlobalKey<ScrollLockerState>();
   final GlobalKey<EdgeScrollDragTargetState> _edgeScrollDragTargetKey =
       new GlobalKey<EdgeScrollDragTargetState>();
 
+  final ScrollController _scrollController = new ScrollController();
+
   /// The key for adding [Suggestion]s to the [SelectedSuggestionOverlay].  This
   /// is to allow us to animate from a [Suggestion] in an open [SuggestionList]
-  /// to a [Story] focused in the [StoryList].
+  /// to a [Story] focused in the StoryList.
   final GlobalKey<SelectedSuggestionOverlayState>
       _selectedSuggestionOverlayKey =
       new GlobalKey<SelectedSuggestionOverlayState>();
-
-  final GlobalKey<ArmadilloOverlayState> _overlayKey =
-      new GlobalKey<ArmadilloOverlayState>();
 
   final FocusScopeNode _conductorFocusNode = new FocusScopeNode();
   final FocusNode _askFocusNode = new FocusNode();
@@ -169,26 +156,7 @@ class ConductorState extends State<Conductor> {
                           height: sizeModel.screenSize.height,
                           child: new Offstage(
                             offstage: idleModel.value == 0.0,
-                            child: new Center(
-                              child: new ScopedModelDescendant<ContextModel>(
-                                builder: (
-                                  BuildContext context,
-                                  Widget child,
-                                  ContextModel contextModel,
-                                ) =>
-                                    new Text(
-                                      '${contextModel.timeOnly}',
-                                      style: new TextStyle(
-                                        fontSize: math.min(
-                                          sizeModel.screenSize.width / 6.0,
-                                          sizeModel.screenSize.height / 6.0,
-                                        ),
-                                        fontWeight: FontWeight.w200,
-                                        letterSpacing: 4.0,
-                                      ),
-                                    ),
-                              ),
-                            ),
+                            child: widget.idleModeBuilder.build(context),
                           ),
                         ),
                       ],
@@ -222,35 +190,82 @@ class ConductorState extends State<Conductor> {
           fit: StackFit.passthrough,
           children: <Widget>[
             /// Story List.
-            new ScopedModelDescendant<SizeModel>(
-              builder: (
-                BuildContext context,
-                Widget child,
-                SizeModel sizeModel,
-              ) =>
-                  new ScopedModelDescendant<StoryDragTransitionModel>(
-                    builder: (
-                      BuildContext context,
-                      Widget child,
-                      StoryDragTransitionModel storyDragTransitionModel,
-                    ) =>
-                        new Positioned(
-                          left: 0.0,
-                          right: 0.0,
-                          top: 0.0,
-                          bottom: lerpDouble(
-                            sizeModel.minimizedNowHeight,
-                            0.0,
-                            storyDragTransitionModel.progress,
-                          ),
-                          child: child,
-                        ),
-                    child: _getStoryList(sizeModel),
-                  ),
+            widget.recentsBuilder.build(
+              context,
+              scrollController: _scrollController,
+              onScroll: (double scrollOffset) {
+                if (_ignoreNextScrollOffsetChange) {
+                  _ignoreNextScrollOffsetChange = false;
+                  return;
+                }
+
+                // Ignore top padding of storylist when looking at scroll offset
+                // to determine Now state.
+                widget.nowBuilder.onRecentsScrollOffsetChanged(
+                  scrollOffset + SizeModel.of(context).storyListTopPadding,
+                );
+
+                // Peak suggestion overlay more when overscrolling.
+                if (scrollOffset < -_kSuggestionOverlayPullScrollOffset &&
+                    _suggestionOverlayKey.currentState.hiding) {
+                  _suggestionOverlayKey.currentState.setValue(
+                    SizeModel.of(context).suggestionPeekHeight -
+                        (scrollOffset + _kSuggestionOverlayPullScrollOffset) *
+                            _kSuggestionOverlayScrollFactor,
+                  );
+                }
+              },
+              onStoryClusterFocusStarted: () {
+                // Lock scrolling.
+                widget.recentsBuilder.onStoryFocused();
+                _edgeScrollDragTargetKey.currentState.disable();
+                _minimizeNow();
+              },
+              onStoryClusterFocusCompleted: (StoryCluster storyCluster) {
+                _focusStoryCluster(storyCluster);
+              },
+              onStoryClusterVerticalEdgeHover: () => goToOrigin(),
             ),
 
             // Now.
-            _getNow(),
+            widget.nowBuilder.build(
+              context,
+              onQuickSettingsProgressChange: (double quickSettingsProgress) =>
+                  widget.recentsBuilder
+                      .onQuickSettingsProgressChanged(quickSettingsProgress),
+              onMinimizedTap: () => goToOrigin(),
+              onMinimizedLongPress: () =>
+                  _quickSettingsOverlayKey.currentState.show(),
+              onQuickSettingsMaximized: () {
+                // When quick settings starts being shown, scroll to 0.0.
+                _scrollController.animateTo(
+                  0.0,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.fastOutSlowIn,
+                );
+              },
+              onMinimize: () {
+                PeekModel.of(context).nowMinimized = true;
+                _suggestionOverlayKey.currentState.hide();
+              },
+              onMaximize: () {
+                PeekModel.of(context).nowMinimized = false;
+                _suggestionOverlayKey.currentState.hide();
+              },
+              onBarVerticalDragUpdate: (DragUpdateDetails details) =>
+                  _suggestionOverlayKey.currentState
+                      .onVerticalDragUpdate(details),
+              onBarVerticalDragEnd: (DragEndDetails details) =>
+                  _suggestionOverlayKey.currentState.onVerticalDragEnd(details),
+              onOverscrollThresholdRelease: () =>
+                  _suggestionOverlayKey.currentState.show(),
+              scrollController: _scrollController,
+              onLogoutSelected: widget.onLogoutSelected,
+              onClearLedgerSelected: widget.onClearLedgerSelected,
+              onUserContextTapped: widget.onUserContextTapped,
+              onMinimizedContextTapped: () =>
+                  _suggestionOverlayKey.currentState.show(),
+            ),
 
             // Suggestions Overlay.
             _getSuggestionOverlay(),
@@ -291,92 +306,6 @@ class ConductorState extends State<Conductor> {
               ),
             ),
           ],
-        ),
-      );
-
-  Widget _getStoryList(SizeModel sizeModel) => new VerticalShifter(
-        key: _verticalShifterKey,
-        verticalShift: _kQuickSettingsHeightBump,
-        child: new ScrollLocker(
-          key: _scrollLockerKey,
-          child: new StoryList(
-            scrollController: _scrollController,
-            overlayKey: _overlayKey,
-            onScroll: (double scrollOffset) {
-              if (_ignoreNextScrollOffsetChange) {
-                _ignoreNextScrollOffsetChange = false;
-                return;
-              }
-
-              // Ignore top padding of storylist when looking at scroll offset
-              // to determine Now state.
-              _nowKey.currentState.scrollOffset =
-                  scrollOffset + sizeModel.storyListTopPadding;
-
-              // Peak suggestion overlay more when overscrolling.
-              if (scrollOffset < -_kSuggestionOverlayPullScrollOffset &&
-                  _suggestionOverlayKey.currentState.hiding) {
-                _suggestionOverlayKey.currentState.setValue(
-                  SizeModel.of(context).suggestionPeekHeight -
-                      (scrollOffset + _kSuggestionOverlayPullScrollOffset) *
-                          _kSuggestionOverlayScrollFactor,
-                );
-              }
-            },
-            onStoryClusterFocusStarted: () {
-              // Lock scrolling.
-              _scrollLockerKey.currentState.lock();
-              _edgeScrollDragTargetKey.currentState.disable();
-              _minimizeNow();
-            },
-            onStoryClusterFocusCompleted: (StoryCluster storyCluster) {
-              _focusStoryCluster(storyCluster);
-            },
-            onStoryClusterVerticalEdgeHover: () => goToOrigin(),
-          ),
-        ),
-      );
-
-  // We place Now in a RepaintBoundary as its animations
-  // don't require its parent and siblings to redraw.
-  Widget _getNow() => new RepaintBoundary(
-        child: new Now(
-          key: _nowKey,
-          quickSettingsHeightBump: _kQuickSettingsHeightBump,
-          onQuickSettingsProgressChange: (double quickSettingsProgress) =>
-              _verticalShifterKey.currentState.shiftProgress =
-                  quickSettingsProgress,
-          onMinimizedTap: () => goToOrigin(),
-          onMinimizedLongPress: () =>
-              _quickSettingsOverlayKey.currentState.show(),
-          onQuickSettingsMaximized: () {
-            // When quick settings starts being shown, scroll to 0.0.
-            _scrollController.animateTo(
-              0.0,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.fastOutSlowIn,
-            );
-          },
-          onMinimize: () {
-            PeekModel.of(context).nowMinimized = true;
-            _suggestionOverlayKey.currentState.hide();
-          },
-          onMaximize: () {
-            PeekModel.of(context).nowMinimized = false;
-            _suggestionOverlayKey.currentState.hide();
-          },
-          onBarVerticalDragUpdate: (DragUpdateDetails details) =>
-              _suggestionOverlayKey.currentState.onVerticalDragUpdate(details),
-          onBarVerticalDragEnd: (DragEndDetails details) =>
-              _suggestionOverlayKey.currentState.onVerticalDragEnd(details),
-          onOverscrollThresholdRelease: () =>
-              _suggestionOverlayKey.currentState.show(),
-          scrollController: _scrollController,
-          onLogoutSelected: widget.onLogoutSelected,
-          onClearLedgerSelected: widget.onClearLedgerSelected,
-          onUserContextTapped: widget.onUserContextTapped,
-          onMinimizedContextTapped: () =>
-              _suggestionOverlayKey.currentState.show(),
         ),
       );
 
@@ -447,7 +376,7 @@ class ConductorState extends State<Conductor> {
     );
 
     // Unlock scrolling.
-    _scrollLockerKey.currentState.unlock();
+    widget.recentsBuilder.onStoryUnfocused();
     _edgeScrollDragTargetKey.currentState.enable();
     _scrollController.animateTo(
       0.0,
@@ -483,13 +412,12 @@ class ConductorState extends State<Conductor> {
     _ignoreNextScrollOffsetChange = true;
     _scrollController.jumpTo(0.0);
 
-    _scrollLockerKey.currentState.lock();
+    widget.recentsBuilder.onStoryFocused();
     _edgeScrollDragTargetKey.currentState.disable();
   }
 
   void _minimizeNow() {
-    _nowKey.currentState.minimize();
-    _nowKey.currentState.hideQuickSettings();
+    widget.nowBuilder.onMinimize();
     PeekModel.of(context).nowMinimized = true;
     _suggestionOverlayKey.currentState.hide();
   }
@@ -504,7 +432,7 @@ class ConductorState extends State<Conductor> {
   void goToOrigin() {
     StoryModel storyModel = StoryModel.of(context);
     _defocus(storyModel);
-    _nowKey.currentState.maximize();
+    widget.nowBuilder.onMaximize();
     storyModel.interactionStopped();
     storyModel.clearPlaceHolderStoryClusters();
   }
@@ -514,7 +442,7 @@ class ConductorState extends State<Conductor> {
     StoryId storyId, {
     bool jumpToFinish: true,
   }) {
-    _scrollLockerKey.currentState.lock();
+    widget.recentsBuilder.onStoryFocused();
     _edgeScrollDragTargetKey.currentState.disable();
     _minimizeNow();
     _focusOnStory(storyId, jumpToFinish: jumpToFinish);
@@ -548,33 +476,15 @@ class ConductorState extends State<Conductor> {
         (StoryCluster storyCluster) => storyCluster.unFocus(),
       );
 
-      // The story might have not been initiated when _focusOnStory is called.
-      // This sets a periodic timer to wait for the story to be initiated
-      // before running the animation.
-      int timerCount = 0;
-      _storyFocusTimer =
-          new Timer.periodic(const Duration(milliseconds: 10), (Timer timer) {
-        if (targetStoryClusters[0].focusSimulationKey.currentState != null &&
-            mounted) {
-          // Ensure the focused story is completely expanded.
-          targetStoryClusters[0].focusSimulationKey.currentState.jump(1.0);
+      // Ensure the focused story is completely expanded.
+      targetStoryClusters[0].focusModel.jump(1.0);
+      targetStoryClusters[0].storyClusterEntranceTransitionModel.jump(1.0);
 
-          // Ensure the focused story's story bar is full open.
-          targetStoryClusters[0].maximizeStoryBars(jumpToFinish: jumpToFinish);
+      // Ensure the focused story's story bar is full open.
+      targetStoryClusters[0].maximizeStoryBars(jumpToFinish: jumpToFinish);
 
-          // Focus on the story cluster.
-          _focusStoryCluster(targetStoryClusters[0]);
-
-          timer.cancel();
-        }
-
-        // Give up if story has not been initiated after 1 second
-        if (timerCount > 100) {
-          timer.cancel();
-        }
-
-        timerCount++;
-      });
+      // Focus on the story cluster.
+      _focusStoryCluster(targetStoryClusters[0]);
     }
 
     // Unhide selected suggestion in suggestion list.

@@ -73,7 +73,7 @@ class StoryModel extends Model {
         0.0,
         (double max, StoryCluster storyCluster) => math.max(
               max,
-              storyCluster.focusSimulationKey.currentState?.progress ?? 0.0,
+              storyCluster.focusModel.value,
             ),
       );
 
@@ -108,13 +108,13 @@ class StoryModel extends Model {
     int unenteredClusters = _storyClusters
         .where(
           (StoryCluster storyCluster) =>
-              storyCluster.storyClusterEntranceTransitionModel.progress == 0.0,
+              storyCluster.storyClusterEntranceTransitionModel.value == 0.0,
         )
         .length;
 
     int delayMultiple = 0;
     _storyClusters.forEach((StoryCluster storyCluster) {
-      if (storyCluster.storyClusterEntranceTransitionModel.progress == 0.0) {
+      if (storyCluster.storyClusterEntranceTransitionModel.value == 0.0) {
         storyCluster.storyClusterEntranceTransitionModel.reset(
           delay:
               (0.5 * math.min(6, unenteredClusters)) + (0.25 * delayMultiple),

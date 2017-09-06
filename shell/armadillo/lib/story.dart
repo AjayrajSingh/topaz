@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'panel.dart';
 import 'simulated_fractional.dart';
@@ -44,8 +45,11 @@ class Story {
   /// different cluster.
   final StoryClusterId clusterId;
 
-  /// The key of the [StoryBar] representing this story.
-  final GlobalKey<StoryBarState> storyBarKey;
+  /// Handles the transition when the story bar minimizes and maximizes.
+  final StoryBarHeightModel _storyBarHeightModel = new StoryBarHeightModel();
+
+  /// Handles the transition when the story becomes focused.
+  final StoryBarFocusModel _storyBarFocusModel = new StoryBarFocusModel();
 
   /// The key of the padding being applied to the story's story bar.
   final GlobalKey storyBarPaddingKey;
@@ -100,8 +104,6 @@ class Story {
     this.onClusterIndexChanged,
   })
       : this.clusterId = new StoryClusterId(),
-        this.storyBarKey =
-            new GlobalKey<StoryBarState>(debugLabel: '$id storyBarKey'),
         this.storyBarPaddingKey =
             new GlobalKey(debugLabel: '$id storyBarPaddingKey'),
         this.clusterDraggableKey =
@@ -123,22 +125,41 @@ class Story {
     return story;
   }
 
+  /// Wraps [child] with the [Model]s corresponding to this [Story].
+  Widget wrapWithModels({Widget child}) => new ScopedModel<StoryBarHeightModel>(
+        model: _storyBarHeightModel,
+        child: new ScopedModel<StoryBarFocusModel>(
+          model: _storyBarFocusModel,
+          child: child,
+        ),
+      );
+
   /// Returns true if the [Story] has no content and should just take up empty
   /// space.
   bool get isPlaceHolder => false;
 
-  /// Maximizes the story's story bar.  See [StoryBarState.maximize].
-  void maximizeStoryBar({bool jumpToFinish: false}) =>
-      storyBarKey.currentState?.maximize(jumpToFinish: jumpToFinish);
+  /// Maximizes the story's story bar.
+  void maximizeStoryBar({bool jumpToFinish: false}) {
+    _storyBarHeightModel.maximize(jumpToFinish: jumpToFinish);
+    _storyBarFocusModel.maximize();
+  }
 
-  /// Minimizes the story's story bar.  See [StoryBarState.minimize].
-  void minimizeStoryBar() => storyBarKey.currentState?.minimize();
+  /// Minimizes the story's story bar.
+  void minimizeStoryBar() {
+    _storyBarHeightModel.minimize();
+    _storyBarFocusModel.minimize();
+  }
 
-  /// Hides the story's story bar.  See [StoryBarState.hide].
-  void hideStoryBar() => storyBarKey.currentState?.hide();
+  /// Hides the story's story bar.
+  void hideStoryBar() => _storyBarHeightModel.hide();
 
-  /// Shows the story's story bar.  See [StoryBarState.show].
-  void showStoryBar() => storyBarKey.currentState?.show();
+  /// Shows the story's story bar.
+  void showStoryBar() => _storyBarHeightModel.show();
+
+  /// Sets the story bar into focus mode if true.
+  set storyBarFocus(bool storyBarFocus) {
+    _storyBarFocusModel.focus = storyBarFocus;
+  }
 
   /// Sets the cluster index of this story.
   set clusterIndex(int clusterIndex) {

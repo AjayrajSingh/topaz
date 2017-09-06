@@ -35,8 +35,8 @@ class StoryClusterDragFeedback extends StatefulWidget {
   /// Where the drag began relative to the cluster's widget's coordinate system.
   final Offset localDragStartPoint;
 
-  /// The bounds of the cluster's widget when the drag begin.
-  final Rect initialBounds;
+  /// The size of the cluster's widget when the drag begin.
+  final Size initialSize;
 
   /// The initial X offset of the cluster's widget.
   final double initDx;
@@ -48,7 +48,7 @@ class StoryClusterDragFeedback extends StatefulWidget {
     this.storyCluster,
     this.storyWidgets,
     this.localDragStartPoint,
-    this.initialBounds,
+    this.initialSize,
     this.initDx: 0.0,
   })
       : super(key: key) {
@@ -56,7 +56,7 @@ class StoryClusterDragFeedback extends StatefulWidget {
     assert(storyCluster != null);
     assert(storyWidgets != null);
     assert(localDragStartPoint != null);
-    assert(initialBounds != null);
+    assert(initialSize != null);
   }
 
   @override
@@ -169,11 +169,11 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                   childScale = 1.0;
                 }
                 double targetWidth = (_childKey.currentState == null
-                        ? widget.initialBounds.width
+                        ? widget.initialSize.width
                         : width) *
                     childScale;
                 double targetHeight = (_childKey.currentState == null
-                        ? widget.initialBounds.height
+                        ? widget.initialSize.height
                         : height) *
                     childScale;
 
@@ -268,7 +268,6 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                       children: <Widget>[
                         new Expanded(
                           child: new StoryPanels(
-                            key: widget.storyCluster.panelsKey,
                             storyCluster: widget.storyCluster,
                             focusProgress: 0.0,
                             overlayKey: widget.overlayKey,
