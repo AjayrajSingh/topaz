@@ -2,10 +2,4 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//garnet/public/lib/fidl/fidl.gni")
-
-fidl("services") {
-  sources = [
-    "contacts_content_provider.fidl",
-  ]
-}
+# Dummy for atom Dart analysis.

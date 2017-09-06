@@ -2,26 +2,32 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-module contacts_service;
+module contacts_content_provider;
 
 // This service is implemented by an application that is meant to store contacts
 // for a given user.
-interface Contacts {
+interface ContactsContentProvider {
+  // Returns a list of the user's contacts in alphabetical order.
+  // If a prefix is provided, it will return all contacts with name or email
+  // matching the prefix in alphabetical order.
+  GetContactsList(string? prefix) => (array<Contact> contacts);
 
-  // Adds a contact to the contact collection
-  // This will be called by contact providers (Google People API) to populate
-  // the contact collection
-  put(Contact contact);
+  // Returns the contact information for the contact specified by |email|.
+  // For now, we're matching soley on email.
+  GetContact(string email) => (Contact contact);
 };
 
 // Representation of a contact that is expected by the ContactCollection.
 // For prototyping purposes, we will initially use a subset of contact fields.
 struct Contact {
-  string name;
+  string googleContactID;
+  string displayName;
+  string givenName;
+  string middleName;
+  string familyName;
+  string photoUrl;
   array<EmailAddress> emails;
   array<PhoneNumber> phoneNumbers;
-  string backgroundImageUrl;
-  string photoUrl;
 };
 
 struct EmailAddress {
