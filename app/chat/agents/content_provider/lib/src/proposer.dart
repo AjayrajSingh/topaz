@@ -15,13 +15,12 @@ import 'package:lib.logging/logging.dart';
 const String _kContactsJsonFile = '/system/data/modules/contacts.json';
 
 /// Proposes suggestions when new messages come in based on the current context.
-class Proposer extends ContextListenerForTopics {
+class Proposer extends ContextListener {
   /// Publishes proposals.
   final ProposalPublisher proposalPublisher;
   final List<String> _homeContacts = <String>[];
   final List<String> _workContacts = <String>[];
   String _currentLocation = 'unknown';
-  List<String> _visibleStories = <String>[];
 
   /// Constructor.
   Proposer({this.proposalPublisher});
@@ -67,16 +66,10 @@ class Proposer extends ContextListenerForTopics {
   }
 
   @override
-  void onUpdate(ContextUpdateForTopics result) {
+  void onContextUpdate(ContextUpdate result) {
     log.fine('onUpdate: ${result.values}');
-    _currentLocation = result.values['/location/home_work'] ?? 'unknown';
-    if (result.values.keys.contains('/story/visible_ids')) {
-      _visibleStories = JSON.decode(result.values['/story/visible_ids']);
-    } else {
-      _visibleStories = <String>[];
-    }
+    _currentLocation = result.values['location/home_work'][0]?.content ?? 'unknown';
     log.fine('Current location: $_currentLocation');
-    log.fine('Visible stories: $_visibleStories');
   }
 
   Proposal _createProposal(Message message, bool interruptive) => new Proposal()

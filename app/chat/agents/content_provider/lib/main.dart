@@ -6,6 +6,8 @@ import 'dart:async';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
+import 'package:apps.maxwell.services.context/metadata.fidl.dart';
+import 'package:apps.maxwell.services.context/value_type.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.user/device_map.fidl.dart';
@@ -28,8 +30,8 @@ class ChatContentProviderAgent extends AgentImpl {
   final ProposalPublisherProxy _proposalPublisher =
       new ProposalPublisherProxy();
   final ContextReaderProxy _contextReader = new ContextReaderProxy();
-  final ContextListenerForTopicsBinding _proposerBinding =
-      new ContextListenerForTopicsBinding();
+  final ContextListenerBinding _proposerBinding =
+      new ContextListenerBinding();
   ChatContentProviderImpl _contentProviderImpl;
 
   /// Creates a new instance of [ChatContentProviderAgent].
@@ -68,14 +70,13 @@ class ChatContentProviderAgent extends AgentImpl {
 
     Proposer proposer = new Proposer(proposalPublisher: _proposalPublisher);
 
-    _contextReader.subscribeToTopics(
-      new ContextQueryForTopics()
-        ..topics = <String>[
-          '/location/home_work',
-          '/story/visible_ids',
-        ],
-      _proposerBinding.wrap(proposer),
-    );
+    ContextSelector selector = new ContextSelector()
+      ..type = ContextValueType.entity;
+    selector.meta = new ContextMetadata();
+    selector.meta.entity = new EntityMetadata()..topic = 'location/home_work';
+    ContextQuery query = new ContextQuery();
+    query.selector['location/home_work'] = selector;
+    _contextReader.subscribe(query,_proposerBinding.wrap(proposer));
 
     // Initialize the content provider.
     _contentProviderImpl = new ChatContentProviderImpl(
