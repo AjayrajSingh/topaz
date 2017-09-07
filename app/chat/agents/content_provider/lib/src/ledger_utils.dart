@@ -7,6 +7,7 @@ import 'dart:collection';
 import 'dart:convert' show JSON, UTF8;
 import 'dart:math' show Random;
 import 'dart:typed_data' show Uint8List;
+import 'dart:zircon' show ZX;
 
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
 import 'package:collection/collection.dart';
@@ -25,12 +26,12 @@ List<int> encodeLedgerValue(dynamic value) => UTF8.encode(JSON.encode(value));
 /// This throws an exception when it fails to decode the given data.
 dynamic decodeLedgerValue(Vmo value) {
   GetSizeResult sizeResult = value.getSize();
-  if (sizeResult.status != NO_ERROR) {
+  if (sizeResult.status != ZX.OK) {
     throw new Exception('Unable to retrieve vmo size: ${sizeResult.status}');
   }
 
   ReadResult readResult = value.read(sizeResult.size);
-  if (readResult.status != NO_ERROR) {
+  if (readResult.status != ZX.OK) {
     throw new Exception('Unable to read from vmo: ${readResult.status}');
   }
   if (readResult.bytes.lengthInBytes != sizeResult.size) {
