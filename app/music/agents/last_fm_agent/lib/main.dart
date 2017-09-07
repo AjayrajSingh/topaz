@@ -7,6 +7,8 @@ import 'dart:convert';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
+import 'package:apps.maxwell.services.context/metadata.fidl.dart';
+import 'package:apps.maxwell.services.context/value_type.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
@@ -30,20 +32,20 @@ const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
 
 /// Global scoping to prevent garbage collection
 final ContextReaderProxy _contextReader = new ContextReaderProxy();
-ContextListenerForTopicsImpl _contextListenerImpl;
+ContextListenerImpl _contextListenerImpl;
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 
-/// Concert ContextListenerForTopics that prints if the given artist has an upcoming
+/// Concert ContextListener that prints if the given artist has an upcoming
 /// concert in the user's metro area.
-class ContextListenerForTopicsImpl extends ContextListenerForTopics {
-  final ContextListenerForTopicsBinding _binding =
-      new ContextListenerForTopicsBinding();
+class ContextListenerImpl extends ContextListener {
+  final ContextListenerBinding _binding =
+      new ContextListenerBinding();
 
   final LastFmApi _api;
 
   /// Constructor
-  ContextListenerForTopicsImpl({
+  ContextListenerImpl({
     @required String apiKey,
   })
       : _api = new LastFmApi(apiKey: apiKey) {
@@ -53,15 +55,18 @@ class ContextListenerForTopicsImpl extends ContextListenerForTopics {
   /// Gets the [InterfaceHandle]
   ///
   /// The returned handle should only be used once.
-  InterfaceHandle<ContextListenerForTopics> getHandle() => _binding.wrap(this);
+  InterfaceHandle<ContextListener> getHandle() => _binding.wrap(this);
 
   @override
-  Future<Null> onUpdate(ContextUpdateForTopics result) async {
-    if (!result.values.containsKey(_kMusicArtistTopic)) {
+  Future<Null> onContextUpdate(ContextUpdate result) async {
+    if (result.values[_kMusicArtistTopic].length == 0) {
       return;
     }
 
-    dynamic data = JSON.decode(result.values[_kMusicArtistTopic]);
+    // TODO(thatguy): There can be more than one value. At some point, use the
+    // entity type in the ContextQuery instead of using topics as if they are
+    // types, and handle multiple instances.
+    dynamic data = JSON.decode(result.values[_kMusicArtistTopic][0].content);
 
     if (_isValidArtistContextLink(data)) {
       log.fine('artist update: ${data['name']}');
@@ -134,10 +139,14 @@ Future<Null> main(List<dynamic> args) async {
   config.validate(<String>['last_fm_api_key']);
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextQueryForTopics query = new ContextQueryForTopics()
-    ..topics = <String>[_kMusicArtistTopic];
-  _contextListenerImpl = new ContextListenerForTopicsImpl(
+  ContextSelector selector = new ContextSelector()
+    ..type = ContextValueType.entity;
+  selector.meta = new ContextMetadata();
+  selector.meta.entity = new EntityMetadata()..topic = _kMusicArtistTopic;
+  ContextQuery query = new ContextQuery();
+  query.selector = <String, ContextSelector>{_kMusicArtistTopic: selector};
+  _contextListenerImpl = new ContextListenerImpl(
     apiKey: config.get('last_fm_api_key'),
   );
-  _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
+  _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 }

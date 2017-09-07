@@ -7,6 +7,8 @@ import 'dart:convert';
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
+import 'package:apps.maxwell.services.context/metadata.fidl.dart';
+import 'package:apps.maxwell.services.context/value_type.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
@@ -16,32 +18,35 @@ import 'package:lib.logging/logging.dart';
 /// The Concert Agents subscribes to the hotel topic and makes proposals for
 /// upcoming concerts (concert list module).
 
-const String _kHotelTopic = '/story/focused/link/hotel';
+const String _kHotelTopic = 'link/hotel';
 
 /// Global scoping to prevent garbage collection
 final ContextReaderProxy _contextReader = new ContextReaderProxy();
-ContextListenerForTopicsImpl _contextListenerImpl;
+ContextListenerImpl _contextListenerImpl;
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 
-/// Concert ContextListenerForTopics listens to hotel reservations and makes a concert
+/// Concert ContextListener listens to hotel reservations and makes a concert
 /// list proposal
-class ContextListenerForTopicsImpl extends ContextListenerForTopics {
-  final ContextListenerForTopicsBinding _binding =
-      new ContextListenerForTopicsBinding();
+class ContextListenerImpl extends ContextListener {
+  final ContextListenerBinding _binding =
+      new ContextListenerBinding();
 
   /// Gets the [InterfaceHandle]
   ///
   /// The returned handle should only be used once.
-  InterfaceHandle<ContextListenerForTopics> getHandle() => _binding.wrap(this);
+  InterfaceHandle<ContextListener> getHandle() => _binding.wrap(this);
 
   @override
-  Future<Null> onUpdate(ContextUpdateForTopics result) async {
-    if (!result.values.containsKey(_kHotelTopic)) {
+  Future<Null> onContextUpdate(ContextUpdate result) async {
+    if (result.values[_kHotelTopic].length == 0) {
       return;
     }
 
-    dynamic data = JSON.decode(result.values[_kHotelTopic]);
+    // TODO(thatguy): There can be more than one value. At some point, use the
+    // entity type in the ContextQuery instead of using topics as if they are
+    // types, and handle multiple instances.
+    dynamic data = JSON.decode(result.values[_kHotelTopic][0].content);
     if (data != null && data['name'] is String) {
       _createProposal(data['name']);
     }
@@ -79,8 +84,12 @@ Future<Null> main(List<dynamic> args) async {
 
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextQueryForTopics query = new ContextQueryForTopics()
-    ..topics = <String>[_kHotelTopic];
-  _contextListenerImpl = new ContextListenerForTopicsImpl();
-  _contextReader.subscribeToTopics(query, _contextListenerImpl.getHandle());
+  ContextSelector selector = new ContextSelector()
+    ..type = ContextValueType.entity;
+  selector.meta = new ContextMetadata();
+  selector.meta.entity = new EntityMetadata()..topic = _kHotelTopic;
+  ContextQuery query = new ContextQuery();
+  query.selector = <String, ContextSelector>{_kHotelTopic: selector};
+  _contextListenerImpl = new ContextListenerImpl();
+  _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 }

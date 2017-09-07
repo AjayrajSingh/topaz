@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:application.services/service_provider.fidl.dart';
-import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
+import 'package:apps.maxwell.services.context/context_writer.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
@@ -100,15 +100,18 @@ class EventPageModuleModel extends ModuleModel {
   }
 
   void _publishArtistContext() {
-    ContextPublisherProxy publisher = new ContextPublisherProxy();
+    ContextWriterProxy writer = new ContextWriterProxy();
     IntelligenceServicesProxy intelligenceServices =
         new IntelligenceServicesProxy();
     moduleContext.getIntelligenceServices(intelligenceServices.ctrl.request());
-    intelligenceServices.getContextPublisher(publisher.ctrl.request());
+    intelligenceServices.getContextWriter(writer.ctrl.request());
 
     if (event != null && event.performances.isNotEmpty) {
       if (event.performances.first.artist?.name != null) {
-        publisher.publish(
+        // TODO(thatguy): It would be better to maintain a separate context
+        // value without a topic at all, but this method is easy to use. The
+        // consumer of this context value only looks at the Entity type.
+        writer.writeEntityTopic(
           _kMusicArtistTopic,
           JSON.encode(
             <String, String>{
@@ -119,7 +122,7 @@ class EventPageModuleModel extends ModuleModel {
         );
       }
     }
-    publisher.ctrl.close();
+    writer.ctrl.close();
     intelligenceServices.ctrl.close();
   }
 
