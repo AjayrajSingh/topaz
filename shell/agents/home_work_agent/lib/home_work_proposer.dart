@@ -6,6 +6,8 @@ import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
+import 'package:apps.maxwell.services.context/metadata.fidl.dart';
+import 'package:apps.maxwell.services.context/value_type.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/ask_handler.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
@@ -17,7 +19,7 @@ const String _kConfigFile =
 const String _kDataConfigFile = '/data/contextual_location_proposals.json';
 const String _kAskProposalsFile = '/system/data/sysui/ask_proposals.json';
 
-const String _kLocationHomeWorkTopic = '/location/home_work';
+const String _kLocationHomeWorkTopic = 'location/home_work';
 
 const String _kLaunchEverythingProposalId = 'demo_all';
 
@@ -51,8 +53,8 @@ class HomeWorkProposer {
 }
 
 class _ContextAwareProposer {
-  final ContextListenerForTopicsBinding _contextListenerForTopicsBinding =
-      new ContextListenerForTopicsBinding();
+  final ContextListenerBinding _contextListenerBinding =
+      new ContextListenerBinding();
 
   void start(
     ContextReader contextReader,
@@ -84,10 +86,17 @@ class _ContextAwareProposer {
       });
     }
 
-    contextReader.subscribeToTopics(
-      new ContextQueryForTopics()..topics = <String>[_kLocationHomeWorkTopic],
-      _contextListenerForTopicsBinding.wrap(
-        new _ContextListenerForTopicsImpl(
+    ContextSelector selector = new ContextSelector();
+    selector.type = ContextValueType.entity;
+    selector.meta = new ContextMetadata();
+    selector.meta.entity = new EntityMetadata()..topic = _kLocationHomeWorkTopic;
+    ContextQuery query = new ContextQuery();
+    query.selector = <String, ContextSelector>{_kLocationHomeWorkTopic: selector};
+
+    contextReader.subscribe(
+      query,
+      _contextListenerBinding.wrap(
+        new _ContextListenerImpl(
           proposalPublisher: proposalPublisher,
           onTopicChanged: (String locationJson) {
             final Map<String, String> json = convert.JSON.decode(locationJson);
@@ -133,21 +142,24 @@ class _ContextAwareProposer {
   }
 
   void stop() {
-    _contextListenerForTopicsBinding.close();
+    _contextListenerBinding.close();
   }
 }
 
 typedef void _OnTopicChanged(String topicValue);
 
-class _ContextListenerForTopicsImpl extends ContextListenerForTopics {
+class _ContextListenerImpl extends ContextListener {
   final ProposalPublisher proposalPublisher;
   final _OnTopicChanged onTopicChanged;
 
-  _ContextListenerForTopicsImpl({this.proposalPublisher, this.onTopicChanged});
+  _ContextListenerImpl({this.proposalPublisher, this.onTopicChanged});
 
   @override
-  void onUpdate(ContextUpdateForTopics result) =>
-      onTopicChanged(result.values[_kLocationHomeWorkTopic]);
+  void onContextUpdate(ContextUpdate result) {
+    if (result.values[_kLocationHomeWorkTopic].length > 0) {
+      onTopicChanged(result.values[_kLocationHomeWorkTopic][0].content);
+    }
+  }
 }
 
 class _AskHandlerImpl extends AskHandler {

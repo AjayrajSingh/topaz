@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
+import 'package:apps.maxwell.services.context/context_writer.fidl.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
+import 'package:apps.maxwell.services.context/metadata.fidl.dart';
+import 'package:apps.maxwell.services.context/value_type.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.auth.account/account.fidl.dart';
@@ -23,7 +25,7 @@ import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
 import 'wallpaper_chooser.dart';
 
-const String _kLocationTopic = '/location/home_work';
+const String _kLocationTopic = 'location/home_work';
 
 typedef void _OnContextUpdated(Map<String, String> context);
 typedef void _OnUserUpdated(String userName, String userImageUrl);
@@ -56,8 +58,8 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// The list of context topics to listen for changes to.
   final List<String> contextTopics;
 
-  final ContextListenerForTopicsBinding _contextListenerBinding =
-      new ContextListenerForTopicsBinding();
+  final ContextListenerBinding _contextListenerBinding =
+      new ContextListenerBinding();
 
   final FocusRequestWatcherBinding _focusRequestWatcherBinding =
       new FocusRequestWatcherBinding();
@@ -97,7 +99,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     StoryProvider storyProvider,
     SuggestionProvider suggestionProvider,
     ContextReader contextReader,
-    ContextPublisher contextPublisher,
+    ContextWriter contextWriter,
     ProposalPublisher proposalPublisher,
     Link link,
   ) {
@@ -109,7 +111,7 @@ class ArmadilloUserShellModel extends UserShellModel {
       storyProvider,
       suggestionProvider,
       contextReader,
-      contextPublisher,
+      contextWriter,
       proposalPublisher,
       link,
     );
@@ -125,10 +127,20 @@ class ArmadilloUserShellModel extends UserShellModel {
     suggestionProviderSuggestionModel.focusController = focusController;
     suggestionProviderSuggestionModel.visibleStoriesController =
         visibleStoriesController;
-    contextReader.subscribeToTopics(
-      new ContextQueryForTopics()..topics = contextTopics,
+    ContextQuery query = new ContextQuery();
+    query.selector = <String, ContextSelector>{};
+    contextTopics.forEach((String topic) {
+      ContextSelector selector = new ContextSelector();
+      selector.type = ContextValueType.entity;
+      selector.meta = new ContextMetadata();
+      selector.meta.entity = new EntityMetadata();
+      selector.meta.entity.topic = topic;
+      query.selector[topic] = selector;
+    });
+    contextReader.subscribe(
+      query,
       _contextListenerBinding.wrap(
-        new _ContextListenerForTopicsImpl(onContextUpdated),
+        new _ContextListenerImpl(onContextUpdated),
       ),
     );
     userShellContext.getAccount((Account account) {
@@ -178,7 +190,7 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// Called when the user context is tapped.
   void onUserContextTapped() {
     _currentLocation = _nextLocation;
-    contextPublisher.publish(_kLocationTopic, _currentJsonLocation);
+    contextWriter.writeEntityTopic(_kLocationTopic, _currentJsonLocation);
   }
 
   String get _currentJsonLocation => '{"location":"$_currentLocation"}';
@@ -195,13 +207,22 @@ class ArmadilloUserShellModel extends UserShellModel {
   }
 }
 
-class _ContextListenerForTopicsImpl extends ContextListenerForTopics {
+class _ContextListenerImpl extends ContextListener {
   final _OnContextUpdated onContextUpdated;
 
-  _ContextListenerForTopicsImpl(this.onContextUpdated);
+  _ContextListenerImpl(this.onContextUpdated);
 
   @override
-  void onUpdate(ContextUpdateForTopics result) {
-    onContextUpdated?.call(result.values);
+  void onContextUpdate(ContextUpdate update) {
+    Map<String, String> values = <String, String>{};
+    update.values.keys.forEach((String key) {
+      if (update.values[key].length == 0) return;
+      // TODO(thatguy): The context engine can return multiple entries for a
+      // given selector (in this case topics). The API doesn't make it easy to
+      // get the one "authoritative" value for a topic (since that doesn't
+      // really exist), so we just take the first value for now.
+      values[key] = update.values[key][0].content;
+    });
+    onContextUpdated?.call(values);
   }
 }

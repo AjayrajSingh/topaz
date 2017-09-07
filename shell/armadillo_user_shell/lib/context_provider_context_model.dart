@@ -16,8 +16,8 @@ export 'package:lib.widgets/model.dart'
 
 const String _kBackgroundImage = 'packages/armadillo/res/Background.jpg';
 
-const String _kLocationHomeWorkTopic = '/location/home_work';
-const String _kActivityWalking = '/activity/walking';
+const String _kLocationHomeWorkTopic = 'location/home_work';
+const String _kActivityWalking = 'activity/walking';
 const List<String> _kTopics = const <String>[
   _kLocationHomeWorkTopic,
 ];
