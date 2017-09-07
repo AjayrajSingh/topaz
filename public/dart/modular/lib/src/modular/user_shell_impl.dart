@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
+import 'package:apps.maxwell.services.context/context_writer.fidl.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
@@ -23,7 +23,7 @@ typedef void OnUserShellReady(
   StoryProvider storyProvider,
   SuggestionProvider suggestionProvider,
   ContextReader contextReader,
-  ContextPublisher contextPublisher,
+  ContextWriter contextWriter,
   ProposalPublisher proposalPublisher,
   Link link,
 );
@@ -48,8 +48,8 @@ class UserShellImpl extends UserShell {
   final SuggestionProviderProxy _suggestionProviderProxy =
       new SuggestionProviderProxy();
   final ContextReaderProxy _contextReaderProxy = new ContextReaderProxy();
-  final ContextPublisherProxy _contextPublisherProxy =
-      new ContextPublisherProxy();
+  final ContextWriterProxy _contextWriterProxy =
+      new ContextWriterProxy();
   final ProposalPublisherProxy _proposalPublisherProxy =
       new ProposalPublisherProxy();
   final LinkProxy _linkProxy = new LinkProxy();
@@ -110,8 +110,8 @@ class UserShellImpl extends UserShell {
       _userShellContextProxy.getContextReader(
         _contextReaderProxy.ctrl.request(),
       );
-      _userShellContextProxy.getContextPublisher(
-        _contextPublisherProxy.ctrl.request(),
+      _userShellContextProxy.getContextWriter(
+        _contextWriterProxy.ctrl.request(),
       );
       _userShellContextProxy.getProposalPublisher(
         _proposalPublisherProxy.ctrl.request(),
@@ -127,7 +127,7 @@ class UserShellImpl extends UserShell {
         _storyProviderProxy,
         _suggestionProviderProxy,
         _contextReaderProxy,
-        _contextPublisherProxy,
+        _contextWriterProxy,
         _proposalPublisherProxy,
         _linkProxy,
       );
@@ -157,7 +157,7 @@ class UserShellImpl extends UserShell {
     _focusControllerProxy.ctrl.close();
     _focusProviderProxy.ctrl.close();
     _contextReaderProxy.ctrl.close();
-    _contextPublisherProxy.ctrl.close();
+    _contextWriterProxy.ctrl.close();
     _proposalPublisherProxy.ctrl.close();
     onStop?.call();
   }

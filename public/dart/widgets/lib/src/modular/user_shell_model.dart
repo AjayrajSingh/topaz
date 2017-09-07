@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.maxwell.services.context/context_publisher.fidl.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
+import 'package:apps.maxwell.services.context/context_writer.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
@@ -24,7 +24,7 @@ class UserShellModel extends Model {
   StoryProvider _storyProvider;
   SuggestionProvider _suggestionProvider;
   ContextReader _contextReader;
-  ContextPublisher _contextPublisher;
+  ContextWriter _contextWriter;
   ProposalPublisher _proposalPublisher;
   Link _link;
 
@@ -59,8 +59,8 @@ class UserShellModel extends Model {
   /// The [ContextReader] given to this app's [UserShell].
   ContextReader get contextReader => _contextReader;
 
-  /// The [ContextPublisher] given to this app's [UserShell].
-  ContextPublisher get contextPublisher => _contextPublisher;
+  /// The [ContextWriter] given to this app's [UserShell].
+  ContextWriter get contextWriter => _contextWriter;
 
   /// The [ProposalPublisher] given to this app's [UserShell].
   ProposalPublisher get proposalPublisher => _proposalPublisher;
@@ -78,7 +78,7 @@ class UserShellModel extends Model {
     StoryProvider storyProvider,
     SuggestionProvider suggestionProvider,
     ContextReader contextReader,
-    ContextPublisher contextPublisher,
+    ContextWriter contextWriter,
     ProposalPublisher proposalPublisher,
     Link link,
   ) {
@@ -89,7 +89,7 @@ class UserShellModel extends Model {
     _storyProvider = storyProvider;
     _suggestionProvider = suggestionProvider;
     _contextReader = contextReader;
-    _contextPublisher = contextPublisher;
+    _contextWriter = contextWriter;
     _proposalPublisher = proposalPublisher;
     _link = link;
     notifyListeners();
