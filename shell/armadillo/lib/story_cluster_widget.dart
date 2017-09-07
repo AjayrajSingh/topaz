@@ -130,7 +130,6 @@ class StoryClusterWidget extends StatelessWidget {
                   storyWidgets: storyWidgets,
                   localDragStartPoint: localDragStartPoint,
                   initialBounds: initialBoundsOnDrag,
-                  focusProgress: 0.0,
                 ),
             child: child,
           ),

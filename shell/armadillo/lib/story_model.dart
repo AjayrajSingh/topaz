@@ -68,6 +68,15 @@ class StoryModel extends Model {
     super.notifyListeners();
   }
 
+  /// Gets the max focus progress of all the clusters.
+  double get maxFocusProgress => _storyClusters.fold(
+        0.0,
+        (double max, StoryCluster storyCluster) => math.max(
+              max,
+              storyCluster.focusSimulationKey.currentState?.progress ?? 0.0,
+            ),
+      );
+
   /// Updates the [size] used to layout the stories.
   void updateLayouts(Size size) {
     if (size.width == 0.0 || size.height == 0.0) {

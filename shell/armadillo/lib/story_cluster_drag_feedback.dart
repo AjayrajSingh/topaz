@@ -18,6 +18,7 @@ import 'story_cluster_drag_state_model.dart';
 import 'story_cluster_panels_model.dart';
 import 'story_cluster_widget.dart';
 import 'story_list_layout.dart';
+import 'story_model.dart';
 import 'story_panels.dart';
 
 /// Displays a representation of a StoryCluster while being dragged.
@@ -37,9 +38,6 @@ class StoryClusterDragFeedback extends StatefulWidget {
   /// The bounds of the cluster's widget when the drag begin.
   final Rect initialBounds;
 
-  /// The focus progress of the cluster's widget.
-  final double focusProgress;
-
   /// The initial X offset of the cluster's widget.
   final double initDx;
 
@@ -51,7 +49,6 @@ class StoryClusterDragFeedback extends StatefulWidget {
     this.storyWidgets,
     this.localDragStartPoint,
     this.initialBounds,
-    this.focusProgress,
     this.initDx: 0.0,
   })
       : super(key: key) {
@@ -60,7 +57,6 @@ class StoryClusterDragFeedback extends StatefulWidget {
     assert(storyWidgets != null);
     assert(localDragStartPoint != null);
     assert(initialBounds != null);
-    assert(focusProgress != null);
   }
 
   @override
@@ -147,21 +143,26 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                   StoryClusterDragStateModel storyClusterDragStateModel) {
                 _updateStoryBars();
 
+                double focusProgress = StoryModel.of(context).maxFocusProgress;
                 double width;
                 double height;
                 double childScale;
                 double inlinePreviewScale =
                     StoryListLayout.getInlinePreviewScale(
-                  sizeModel.storySize,
-                );
+                          sizeModel.storySize,
+                        ) *
+                        0.8;
                 bool isAcceptable = storyClusterDragStateModel.isAcceptable;
 
                 if (isAcceptable &&
                     widget.storyCluster.previewStories.isNotEmpty) {
-                  width = sizeModel.storySize.width;
-                  height = sizeModel.storySize.height;
-                  childScale =
-                      lerpDouble(inlinePreviewScale, 0.7, widget.focusProgress);
+                  width = sizeModel.screenSize.width;
+                  height = sizeModel.screenSize.height;
+                  childScale = lerpDouble(
+                    inlinePreviewScale,
+                    0.8,
+                    focusProgress,
+                  );
                 } else {
                   width = widget.storyCluster.storyLayout.size.width;
                   height = widget.storyCluster.storyLayout.size.height;
@@ -249,7 +250,7 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                     : new Size(
                         simulatedSizedBoxCurrentSize.width,
                         simulatedSizedBoxCurrentSize.height -
-                            InlineStoryTitle.getHeight(widget.focusProgress),
+                            InlineStoryTitle.getHeight(focusProgress),
                       );
 
                 return new SimulatedTransform(
@@ -260,7 +261,7 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                     key: _childKey,
                     width: targetWidth,
                     height: targetHeight +
-                        InlineStoryTitle.getHeight(widget.focusProgress),
+                        InlineStoryTitle.getHeight(focusProgress),
                     child: new Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -277,7 +278,7 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                           ),
                         ),
                         new InlineStoryTitle(
-                          focusProgress: widget.focusProgress,
+                          focusProgress: focusProgress,
                           storyCluster: widget.storyCluster,
                         ),
                       ],

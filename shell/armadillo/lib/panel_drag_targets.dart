@@ -313,9 +313,8 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
     _updateStoryBars(hasCandidates);
     _updateClosestTargets(candidates);
 
-    // Scale child to widget.scale if we aren't in the timeline
-    // and we have a candidate being dragged over us.
-    _scale = hasCandidates && !_inTimeline ? widget.scale : 1.0;
+    // Scale child to widget.scale if we have a candidate being dragged over us.
+    _scale = hasCandidates ? widget.scale : 1.0;
 
     List<PanelDragTarget> validTargets = _targets
         .where(

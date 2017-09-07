@@ -39,7 +39,7 @@ const bool _kGrowFocusedTab = false;
 
 /// Displays up to four stories in a grid-like layout.
 class StoryPanels extends StatelessWidget {
-  /// THe cluster whose stories will be displayed.
+  /// The cluster whose stories will be displayed.
   final StoryCluster storyCluster;
 
   /// The progress of the cluster coming into focus.
@@ -340,7 +340,6 @@ class StoryPanels extends StatelessWidget {
                 storyWidgets: <StoryId, Widget>{story.id: storyWidget},
                 localDragStartPoint: localDragStartPoint,
                 initialBounds: initialBoundsOnDrag,
-                focusProgress: focusProgress,
                 initDx: initialDxOnDrag,
               );
             },
