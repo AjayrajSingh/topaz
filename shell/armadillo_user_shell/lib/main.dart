@@ -323,7 +323,7 @@ Widget buildArmadilloUserShell({
       sizeModel.screenSize =
           ui.window.physicalSize / ui.window.devicePixelRatio;
     },
-    child: new CheckedModeBanner(child: userShellWidget),
+    child: userShellWidget,
   );
 }
 
