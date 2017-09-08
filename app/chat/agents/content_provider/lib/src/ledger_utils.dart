@@ -7,11 +7,10 @@ import 'dart:collection';
 import 'dart:convert' show JSON, UTF8;
 import 'dart:math' show Random;
 import 'dart:typed_data' show Uint8List;
-import 'dart:zircon' show ZX;
+import 'dart:zircon' show ZX, Vmo, GetSizeResult, ReadResult;
 
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
 import 'package:collection/collection.dart';
-import 'package:lib.fidl.dart/core.dart';
 import 'package:quiver/core.dart' as quiver;
 
 // This file defines global functions that are useful for directly manipulating
