@@ -5,7 +5,7 @@
 import 'dart:math' as math;
 
 import 'package:apps.modular.services.surface/surface.fidl.dart';
-import 'package:apps.mozart.lib.flutter/child_view.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';

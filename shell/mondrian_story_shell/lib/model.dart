@@ -5,8 +5,8 @@
 import 'dart:math' as math;
 
 import 'package:apps.modular.services.surface/surface.fidl.dart';
-import 'package:apps.mozart.lib.flutter/child_view.dart';
-import 'package:apps.mozart.services.views/view_token.fidl.dart';
+import 'package:lib.ui.flutter/child_view.dart';
+import 'package:lib.ui.views.fidl/view_token.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart';
