@@ -23,7 +23,7 @@ flutter_app("armadillo_user_shell") {
     "//apps/modular/services/user:user_dart",
     "//apps/modules/common/packages/util",
     "//apps/modules/common/packages/widgets",
-    "//apps/mozart/lib/flutter",
+    "//garnet/public/lib/ui/flutter",
     "//apps/sysui/agents/home_work_agent:home_work_agent_dart_package",
     "//apps/sysui/armadillo",
     "//apps/sysui/keyboard",

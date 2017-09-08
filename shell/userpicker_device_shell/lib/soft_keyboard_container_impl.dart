@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.mozart.lib.flutter/child_view.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:application.services/service_provider.fidl.dart';
-import 'package:apps.mozart.services.input/ime_service.fidl.dart';
+import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.fidl.dart/core.dart';

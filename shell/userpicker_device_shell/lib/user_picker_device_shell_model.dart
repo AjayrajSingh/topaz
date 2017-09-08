@@ -8,7 +8,7 @@ import 'package:apps.modular.services.auth.account/account.fidl.dart';
 import 'package:apps.modular.services.config/config.fidl.dart';
 import 'package:apps.modular.services.device/device_shell.fidl.dart';
 import 'package:apps.modular.services.device/user_provider.fidl.dart';
-import 'package:apps.mozart.lib.flutter/child_view.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:lib.fidl.dart/bindings.dart';
