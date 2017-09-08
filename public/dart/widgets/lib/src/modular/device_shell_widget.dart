@@ -4,7 +4,7 @@
 
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.modular.services.device/device_shell.fidl.dart';
-import 'package:apps.mozart.services.input/ime_service.fidl.dart';
+import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.modular/modular.dart';
