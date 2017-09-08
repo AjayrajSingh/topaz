@@ -53,6 +53,7 @@ class FileLoader {
 
   std::string Fetch(const std::string& url,
                     std::string* resolved_url = nullptr);
+  std::pair<uint8_t*, intptr_t> FetchBytes(const std::string& url);
 
  private:
   std::string GetFilePathForURL(std::string url);

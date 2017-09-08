@@ -174,6 +174,23 @@ std::string FileLoader::Fetch(const std::string& url,
   return source;
 }
 
+std::pair<uint8_t*, intptr_t> FileLoader::FetchBytes(const std::string& url) {
+  std::string path = files::SimplifyPath(GetFilePathForURL(url));
+  auto result = files::ReadFileToBytes(files::GetAbsoluteFilePath(path));
+  if (result.first == nullptr) {
+    // TODO(aam): Same as above the file loader should not explicitly log the error
+    // or exit the process. Instead these errors should be reported to the
+    // caller of the FileLoader who can implement the application-specific error
+    // handling policy.
+    std::cerr << "error: Unable to read Dart source '" << url << "'."
+              << std::endl;
+    exit(1);
+  }
+  url_dependencies_.insert(url);
+  dependencies_.insert(path);
+  return result;
+}
+
 Dart_Handle FileLoader::LoadLibrary(const std::string& url) {
   std::string resolved_url;
   Dart_Handle source = ToDart(Fetch(url, &resolved_url));
@@ -197,13 +214,22 @@ Dart_Handle FileLoader::Import(Dart_Handle url) {
   return LoadLibrary(StdStringFromDart(url));
 }
 
+namespace {
+void ReleaseFetchedBytes(uint8_t* buffer) {
+  free(buffer);
+}
+}
+
 Dart_Handle FileLoader::Kernel(Dart_Handle url) {
   std::string url_string = StdStringFromDart(url);
-  std::string resolved_url;
-  std::string binary_file = Fetch(url_string, &resolved_url);
-  const uint8_t* kernel_ir = (const uint8_t*)binary_file.c_str();
-  intptr_t kernel_ir_size = binary_file.size();
-  void* kernel_program = Dart_ReadKernelBinary(kernel_ir, kernel_ir_size);
+  std::pair<uint8_t*, intptr_t> fetched_result = FetchBytes(url_string);
+  // TODO(aam): With dartbug.com/28057 addressed, there should be no need
+  // to pass ownership of fetched program through Dart_ReadKernelBinary.
+  void* kernel_program = Dart_ReadKernelBinary(
+      fetched_result.first,
+      fetched_result.second,
+      ReleaseFetchedBytes
+  );
   if (kernel_program == NULL) {
     return Dart_NewApiError("Failed to read kernel binary");
   }
