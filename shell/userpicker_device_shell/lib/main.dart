@@ -124,10 +124,12 @@ void main() {
       onStartOverlay: authenticationOverlayModel.onStartOverlay,
       onStopOverlay: authenticationOverlayModel.onStopOverlay,
     ),
-    child: new Overlay(initialEntries: overlays),
+    child: new _ElevatedCheckedModeBanner(
+      child: new Overlay(initialEntries: overlays),
+    ),
   );
 
-  runApp(new _ElevatedCheckedModeBanner(child: deviceShellWidget));
+  runApp(deviceShellWidget);
 
   constraintsModel.load(rootBundle);
   deviceShellWidget.advertise();
