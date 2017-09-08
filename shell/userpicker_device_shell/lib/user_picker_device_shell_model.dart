@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
 import 'dart:io';
 
 import 'package:apps.modular.services.auth.account/account.fidl.dart';
@@ -28,7 +27,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     implements TickerProvider {
   bool _showingUserActions = false;
   bool _addingUser = false;
-  bool _loadingChildView = false;
   bool _showingKernelPanic = false;
   UserControllerProxy _userControllerProxy;
   UserWatcherImpl _userWatcherImpl;
@@ -77,7 +75,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Refreshes the list of users.
   void refreshUsers() {
-    _accounts = null;
     _loadUsers();
   }
 
@@ -143,25 +140,14 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       ..userShellConfig = new AppConfig.init(_userShellChooser.appUrl, null);
     userProvider.login(params);
     _userControllerProxy.watch(_userWatcherImpl.getHandle());
-    _loadingChildView = true;
     _childViewConnection = new ChildViewConnection(
       viewOwner.passHandle(),
       onAvailable: (ChildViewConnection connection) {
         log.info('UserPickerDeviceShell: Child view connection available!');
-
-        // The User Shell child view takes about 2 seconds to full render so
-        // we fake the loading by showing a spinner for 2 seconds before
-        // jumping to the child view
-        new Timer(const Duration(seconds: 2), () {
-          _loadingChildView = false;
-          notifyListeners();
-        });
       },
       onUnavailable: (ChildViewConnection connection) {
         log.info('UserPickerDeviceShell: Child view connection unavailable!');
-        _loadingChildView = false;
         onLogout();
-        notifyListeners();
       },
     );
     notifyListeners();
@@ -207,14 +193,10 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   }
 
   /// Show the loading spinner if true
-  bool get showingLoadingSpinner =>
-      _accounts == null || _addingUser || _loadingChildView;
+  bool get showingLoadingSpinner => _accounts == null || _addingUser;
 
   /// Show the system clock if true
-  bool get showingClock =>
-      !showingLoadingSpinner &&
-      _draggedUsers.isEmpty &&
-      _childViewConnection == null;
+  bool get showingClock => !showingLoadingSpinner && _draggedUsers.isEmpty;
 
   /// If true, show advanced user actions
   bool get showingUserActions => _showingUserActions;
@@ -227,9 +209,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Returns true the add user dialog is showing
   bool get addingUser => _addingUser;
-
-  /// Returns true if we are "loading" the child view
-  bool get loadingChildView => _loadingChildView;
 
   /// Returns the authenticated child view connection
   ChildViewConnection get childViewConnection => _childViewConnection;
