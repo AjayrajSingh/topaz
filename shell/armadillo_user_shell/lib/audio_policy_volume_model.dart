@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.media.lib.dart/audio_policy.dart';
+import 'package:lib.media.dart/audio_policy.dart';
 import 'package:armadillo/volume_model.dart';
 
 /// Uses an [AudioPolicy] to set and get volume.
