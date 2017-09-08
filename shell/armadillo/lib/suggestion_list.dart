@@ -157,6 +157,7 @@ class SuggestionListState extends State<SuggestionList>
                 new SliverGrid(
                   gridDelegate: new _SuggestionListSliverGridDelegate(
                     suggestions: suggestions,
+                    textDirection: Directionality.of(context),
                   ),
                   delegate: new SliverChildBuilderDelegate(
                     (BuildContext context, int index) => _createSuggestion(
@@ -337,14 +338,16 @@ class SuggestionListState extends State<SuggestionList>
 
 class _SuggestionListSliverGridDelegate extends SliverGridDelegate {
   final List<Suggestion> suggestions;
+  final TextDirection textDirection;
 
-  _SuggestionListSliverGridDelegate({this.suggestions});
+  _SuggestionListSliverGridDelegate({this.suggestions, this.textDirection});
 
   @override
   SliverGridLayout getLayout(SliverConstraints constraints) =>
       new _SuggestionListSliverGridLayout(
         suggestions: suggestions,
         width: constraints.crossAxisExtent,
+        textDirection: textDirection,
       );
 
   @override
@@ -355,8 +358,13 @@ class _SuggestionListSliverGridDelegate extends SliverGridDelegate {
 class _SuggestionListSliverGridLayout extends SliverGridLayout {
   final List<Suggestion> suggestions;
   final double width;
+  final TextDirection textDirection;
 
-  _SuggestionListSliverGridLayout({this.suggestions, this.width});
+  _SuggestionListSliverGridLayout({
+    this.suggestions,
+    this.width,
+    this.textDirection,
+  });
 
   /// The minimum child index that is visible at (or after) this scroll offset.
   @override
@@ -397,13 +405,13 @@ class _SuggestionListSliverGridLayout extends SliverGridLayout {
                         : leftOffset +
                             _kSuggestionGap * 2 +
                             kSuggestionWidth * 2;
-    suggestions[index].suggestionLayout.layout(width);
+    suggestions[index].suggestionLayout.layout(width, textDirection);
     double mainAxisExtent =
         suggestions[index].suggestionLayout.suggestionHeight;
     double scrollOffset = 0.0;
     for (int i = index - columnCount; i >= 0; i -= columnCount) {
       scrollOffset += _kSuggestionGap;
-      suggestions[i].suggestionLayout.layout(width);
+      suggestions[i].suggestionLayout.layout(width, textDirection);
       scrollOffset += suggestions[i].suggestionLayout.suggestionHeight;
     }
     return new SliverGridGeometry(

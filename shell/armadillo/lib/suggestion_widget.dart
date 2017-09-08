@@ -60,7 +60,10 @@ class SuggestionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints boxConstraints) {
-          suggestion.suggestionLayout.layout(boxConstraints.maxWidth);
+          suggestion.suggestionLayout.layout(
+            boxConstraints.maxWidth,
+            Directionality.of(context),
+          );
           Widget image = _buildImage(
             context,
             suggestion.suggestionLayout.suggestionHeight,

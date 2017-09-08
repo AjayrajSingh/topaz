@@ -132,7 +132,10 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
             _exitingInterruptionWidgets,
           );
           if (_currentInterruption != null) {
-            _currentInterruption.suggestionLayout.layout(_constraints.maxWidth);
+            _currentInterruption.suggestionLayout.layout(
+              _constraints.maxWidth,
+              Directionality.of(context),
+            );
             double suggestionHeight =
                 _currentInterruption.suggestionLayout.suggestionHeight;
             stackChildren.add(
@@ -238,7 +241,10 @@ class InterruptionOverlayState extends State<InterruptionOverlay> {
     SizeModel sizeModel = SizeModel.of(context);
     Suggestion interruptionToRemove = _currentInterruption;
     assert(interruptionToRemove != null);
-    interruptionToRemove.suggestionLayout.layout(_constraints.maxWidth);
+    interruptionToRemove.suggestionLayout.layout(
+      _constraints.maxWidth,
+      Directionality.of(context),
+    );
     double suggestionHeight =
         interruptionToRemove.suggestionLayout.suggestionHeight;
     Widget exitingWidget;
