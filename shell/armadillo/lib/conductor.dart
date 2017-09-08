@@ -148,7 +148,7 @@ class ConductorState extends State<Conductor> {
                       lerpDouble(
                         0.0,
                         sizeModel.screenSize.width,
-                        idleModel.progress,
+                        idleModel.value,
                       ),
                       0.0,
                       0.0,
@@ -158,7 +158,7 @@ class ConductorState extends State<Conductor> {
                       children: <Widget>[
                         new Positioned.fill(
                           child: new Offstage(
-                            offstage: idleModel.progress == 1.0,
+                            offstage: idleModel.value == 1.0,
                             child: child,
                           ),
                         ),
@@ -168,7 +168,7 @@ class ConductorState extends State<Conductor> {
                           width: sizeModel.screenSize.width,
                           height: sizeModel.screenSize.height,
                           child: new Offstage(
-                            offstage: idleModel.progress == 0.0,
+                            offstage: idleModel.value == 0.0,
                             child: new Center(
                               child: new ScopedModelDescendant<ContextModel>(
                                 builder: (
