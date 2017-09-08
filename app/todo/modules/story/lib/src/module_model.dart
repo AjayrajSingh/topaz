@@ -5,7 +5,7 @@
 import 'package:application.services/service_provider.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:apps.mozart.lib.flutter/child_view.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/modular.dart';
 
 /// A [ModuleModel] providing the [ChildViewConnection]s of the child modules.
