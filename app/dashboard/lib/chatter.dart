@@ -14,7 +14,7 @@ import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart'
     as chat;
-import 'package:apps.mozart.lib.flutter/child_view.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:collection/collection.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';

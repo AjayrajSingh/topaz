@@ -11,7 +11,7 @@ import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.user/device_map.fidl.dart';
-import 'package:apps.mozart.lib.flutter/child_view.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
