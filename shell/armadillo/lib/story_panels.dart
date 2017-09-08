@@ -135,7 +135,6 @@ class StoryPanels extends StatelessWidget {
           );
 
           return new StoryPositioned(
-            storyBarMaximizedHeight: SizeModel.kStoryBarMaximizedHeight,
             focusProgress: focusProgress,
             displayMode: storyCluster.displayMode,
             isFocused: (storyCluster.focusedStoryId == story.id),
@@ -382,10 +381,18 @@ class StoryPanels extends StatelessWidget {
                       });
                     }
                   },
-                  child: new ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxHeight: SizeModel.kStoryBarMaximizedHeight,
-                    ),
+                  child: new ScopedModelDescendant<SizeModel>(
+                    builder: (
+                      _,
+                      Widget child,
+                      SizeModel sizeModel,
+                    ) =>
+                        new ConstrainedBox(
+                          constraints: new BoxConstraints(
+                            maxHeight: sizeModel.storyBarHeightMaximized,
+                          ),
+                          child: child,
+                        ),
                     child: _getStoryBarDraggableWrapper(
                       context: context,
                       story: story,
@@ -470,7 +477,6 @@ class StoryPanels extends StatelessWidget {
           displayMode: storyCluster.displayMode,
           panel: story.panel,
           containerKey: story.containerKey,
-          storyBarMaximizedHeight: SizeModel.kStoryBarMaximizedHeight,
           child: storyWidgets[story.id] ?? story.builder(context),
         ),
       );

@@ -7,6 +7,7 @@ import 'package:lib.widgets/model.dart';
 
 import 'panel.dart';
 import 'simulated_fractional.dart';
+import 'size_model.dart';
 import 'story_bar.dart';
 import 'story_cluster_id.dart';
 import 'story_list.dart';
@@ -126,11 +127,21 @@ class Story {
   }
 
   /// Wraps [child] with the [Model]s corresponding to this [Story].
-  Widget wrapWithModels({Widget child}) => new ScopedModel<StoryBarHeightModel>(
+  Widget wrapWithModels({BuildContext context, Widget child}) =>
+      new ScopedModel<StoryBarHeightModel>(
         model: _storyBarHeightModel,
         child: new ScopedModel<StoryBarFocusModel>(
           model: _storyBarFocusModel,
-          child: child,
+          child: new ScopedModelDescendant<SizeModel>(
+            builder: (_, __, SizeModel sizeModel) {
+              _storyBarHeightModel.onStoryBarHeightsChanged(
+                sizeModel.storyBarHeightMinimized,
+                sizeModel.storyBarHeightMaximized,
+              );
+              return child;
+            },
+            child: child,
+          ),
         ),
       );
 

@@ -8,7 +8,6 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import 'size_model.dart';
 import 'story_cluster_widget.dart' show InlineStoryTitle;
 import 'story_list_layout.dart';
 import 'story_list_body_parent_data.dart';
@@ -41,6 +40,7 @@ class RenderStoryListBody extends RenderListBody {
   double _bottomPadding;
   double _listHeight;
   double _liftScale;
+  double _storyBarHeightMinimized;
 
   /// Constructor.
   RenderStoryListBody({
@@ -50,18 +50,29 @@ class RenderStoryListBody extends RenderListBody {
     double bottomPadding,
     double listHeight,
     double liftScale,
+    double storyBarHeightMinimized,
   })
       : _parentSize = parentSize,
         _scrollOffset = scrollOffset,
         _bottomPadding = bottomPadding ?? 0.0,
         _listHeight = listHeight ?? 0.0,
         _liftScale = liftScale ?? 1.0,
+        _storyBarHeightMinimized = storyBarHeightMinimized ?? 0.0,
         super(children: children, mainAxis: Axis.vertical);
 
   /// Sets the size of the parent.  Used to position/size the children.
   set parentSize(Size value) {
     if (_parentSize != value) {
       _parentSize = value;
+      markNeedsLayout();
+    }
+  }
+
+  /// Sets the height of the minimized story bar.
+  /// Used to position/size the children.
+  set storyBarHeightMinimized(double value) {
+    if (_storyBarHeightMinimized != value) {
+      _storyBarHeightMinimized = value;
       markNeedsLayout();
     }
   }
@@ -246,7 +257,7 @@ class RenderStoryListBody extends RenderListBody {
         double childHeight = lerpDouble(
           scaledLayoutHeight +
               InlineStoryTitle.getHeight(childParentData.focusProgress) +
-              SizeModel.kStoryBarMinimizedHeight,
+              _storyBarHeightMinimized,
           _parentSize.height,
           childParentData.focusProgress,
         );

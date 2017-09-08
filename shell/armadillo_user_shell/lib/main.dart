@@ -231,7 +231,7 @@ Widget buildArmadilloUserShell({
     () => storyModel.updateLayouts(
           new Size(
             sizeModel.storySize.width,
-            sizeModel.storySize.height - SizeModel.kStoryBarMaximizedHeight,
+            sizeModel.storySize.height - sizeModel.storyBarHeightMaximized,
           ),
         ),
   );
