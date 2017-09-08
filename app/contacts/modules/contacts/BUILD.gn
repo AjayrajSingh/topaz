@@ -16,7 +16,7 @@ flutter_app("contacts") {
     "//apps/modular/services/story:story_dart",
     "//apps/modules/common/packages/fixtures",
     "//apps/modules/common/packages/widgets_meta",
-    "//apps/mozart/services/views:views_dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/googleapis",
