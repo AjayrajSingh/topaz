@@ -13,7 +13,7 @@ flutter_app("video") {
 
   deps = [
     "//application/lib/app/dart",
-    "//apps/media/lib/flutter",
+    "//garnet/public/lib/media/flutter",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modular/services/user:user_dart",
