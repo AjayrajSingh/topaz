@@ -7,11 +7,11 @@ import 'dart:math';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'package:application.lib.app.dart/app.dart';
-import 'package:apps.mozart.services.input/ime_service.fidl.dart';
-import 'package:apps.mozart.services.input/input_connection.fidl.dart';
-import 'package:apps.mozart.services.input/input_events.fidl.dart';
-import 'package:apps.mozart.services.input/text_editing.fidl.dart';
-import 'package:apps.mozart.services.input/text_input.fidl.dart';
+import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
+import 'package:lib.ui.input.fidl/input_connection.fidl.dart';
+import 'package:lib.ui.input.fidl/input_events.fidl.dart';
+import 'package:lib.ui.input.fidl/text_editing.fidl.dart';
+import 'package:lib.ui.input.fidl/text_input.fidl.dart';
 
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 

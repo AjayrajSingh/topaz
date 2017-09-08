@@ -9,8 +9,8 @@ dart_app("hard_kb_ime") {
 
   deps = [
     "//application/lib/app/dart",
-    "//apps/mozart/services/input:input_dart",
-    "//apps/mozart/services/views:views_dart",
+    "//garnet/public/lib/ui/input/fidl:fidl_dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
     "//garnet/public/lib/fidl/examples/interfaces:interfaces_dart",
   ]

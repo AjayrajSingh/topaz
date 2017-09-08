@@ -14,8 +14,8 @@ flutter_app("latin-ime") {
   deps = [
     "//application/lib/app/dart",
     "//application/services:services_dart",
-    "//apps/mozart/lib/flutter",
-    "//apps/mozart/services/presentation:presentation_dart",
+    "//garnet/public/lib/ui/flutter",
+    "//garnet/public/lib/ui/presentation/fidl:fidl_dart",
     "//apps/sysui/keyboard",
     "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
