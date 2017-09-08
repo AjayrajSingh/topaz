@@ -148,6 +148,7 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(Dart_Invoke(
       async_lib, ToDart("_setScheduleImmediateClosure"), 1, schedule_args));
 
+  // Set up the namespace.
   Dart_Handle namespace_type =
       Dart_GetType(io_lib, ToDart("_Namespace"), 0, nullptr);
   DART_CHECK_VALID(namespace_type);
@@ -156,6 +157,13 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(namespace_args[0]);
   DART_CHECK_VALID(Dart_Invoke(
       namespace_type, ToDart("_setupNamespace"), 1, namespace_args));
+
+  // Disable some dart:io operations.
+  Dart_Handle embedder_config_type =
+      Dart_GetType(io_lib, ToDart("_EmbedderConfig"), 0, nullptr);
+  DART_CHECK_VALID(embedder_config_type);
+  DART_CHECK_VALID(
+      Dart_SetField(embedder_config_type, ToDart("_mayExit"), Dart_False()));
 
   // Set the script location.
   DART_CHECK_VALID(

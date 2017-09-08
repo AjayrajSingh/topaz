@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io' as io;
 
 import 'package:apps.dart_content_handler.examples.hello_app_dart.interfaces/hello.fidl.dart';
 import 'package:application.lib.app.dart/app.dart';
@@ -48,5 +49,9 @@ void main(List<String> args) {
     actl.ctrl.close();
     expect(service.ctrl.error.timeout(new Duration(seconds: 2)),
         throwsA(anything));
+  });
+
+  test("dart:io exit() throws UnsupportedError", () {
+    expect(() => io.exit(-1), throwsUnsupportedError);
   });
 }
