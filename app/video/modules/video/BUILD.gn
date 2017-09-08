@@ -17,7 +17,7 @@ flutter_app("video") {
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modular/services/user:user_dart",
-    "//apps/mozart/services/views:views_dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
     "//garnet/public/lib/netconnector/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",

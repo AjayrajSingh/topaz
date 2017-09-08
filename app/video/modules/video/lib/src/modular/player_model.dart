@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:application.lib.app.dart/app.dart';
 import 'package:apps.media.lib.flutter/media_player_controller.dart';
 import 'package:apps.media.services/problem.fidl.dart';
-import 'package:apps.mozart.lib.flutter/child_view.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
