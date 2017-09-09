@@ -31,8 +31,11 @@ Uri _scriptUri() {
 void _scheduleMicrotask(void callback()) native "ScheduleMicrotask";
 _getScheduleMicrotaskClosure() => _scheduleMicrotask;
 
+int _timerMillisecondClock() =>
+    System.getTime(ZX.CLOCK_MONOTONIC) ~/ (1000 * 1000);
+
 _setupHooks() {
-  VMLibraryHooks.timerMillisecondClock = MxTime.timerMillisecondClock;
+  VMLibraryHooks.timerMillisecondClock = _timerMillisecondClock;
   VMLibraryHooks.platformScript = _scriptUri;
 }
 
