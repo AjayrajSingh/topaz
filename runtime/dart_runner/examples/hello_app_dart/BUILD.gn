@@ -10,7 +10,7 @@ dart_jit_app("hello_app_dart") {
   source_dir = "."
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
     "//garnet/public/lib/fidl/dart",
   ]
@@ -22,7 +22,7 @@ dart_aot_app("hello_app_dart_aot") {
   source_dir = "."
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
     "//garnet/public/lib/fidl/dart",
   ]

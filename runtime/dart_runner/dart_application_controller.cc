@@ -11,7 +11,7 @@
 #include <sys/types.h>
 #include <utility>
 
-#include "application/lib/app/application_context.h"
+#include "lib/app/cpp/application_context.h"
 #include "apps/dart_content_handler/builtin_libraries.h"
 #include "lib/fidl/cpp/bindings/string.h"
 #include "lib/ftl/arraysize.h"

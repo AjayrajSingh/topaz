@@ -46,8 +46,8 @@ template("runner") {
     }
 
     deps = [
-             "//application/lib/app",
-             "//application/lib/svc",
+             "//garnet/public/lib/app/cpp",
+             "//garnet/public/lib/svc/cpp",
              "//garnet/public/dart-pkg/fuchsia",
              "//garnet/public/lib/ftl",
              "//garnet/public/lib/mtl",

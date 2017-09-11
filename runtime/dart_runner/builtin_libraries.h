@@ -10,8 +10,8 @@
 
 #include <mxio/namespace.h>
 
-#include "application/lib/app/application_context.h"
-#include "application/services/service_provider.fidl.h"
+#include "lib/app/cpp/application_context.h"
+#include "lib/app/fidl/service_provider.fidl.h"
 
 namespace dart_content_handler {
 

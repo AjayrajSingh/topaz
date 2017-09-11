@@ -14,7 +14,7 @@ dart_jit_app("integration") {
   source_dir = "."
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
     "//third_party/dart-pkg/pub/test",
   ]
@@ -30,7 +30,7 @@ dart_aot_app("integration_aot") {
   source_dir = "."
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
     "//third_party/dart-pkg/pub/test",
   ]

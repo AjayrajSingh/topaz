@@ -4,7 +4,7 @@
 
 import 'package:lib.fidl.dart/bindings.dart';
 
-import 'package:application.lib.app.dart/app.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:apps.dart_content_handler.examples.hello_app_dart.interfaces/hello.fidl.dart';
 
 class HelloImpl extends Hello {

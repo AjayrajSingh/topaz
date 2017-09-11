@@ -7,8 +7,8 @@
 
 #include <mxio/namespace.h>
 
-#include "application/lib/svc/service_provider_bridge.h"
-#include "application/services/application_runner.fidl.h"
+#include "lib/svc/cpp/service_provider_bridge.h"
+#include "lib/app/fidl/application_runner.fidl.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/fidl/cpp/bindings/binding.h"
 #include "lib/ftl/macros.h"
