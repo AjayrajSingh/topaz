@@ -8,8 +8,8 @@ dart_app("music_playback_agent") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//application/lib/app/dart",
-    "//application/services:services_dart",
+    "//garnet/public/lib/app/dart",
+    "//garnet/public/lib/app/fidl:fidl_dart",
     "//garnet/public/lib/media/dart",
     "//apps/modular/services/agent:agent_dart",
     "//apps/modular/services/lifecycle:lifecycle_dart",

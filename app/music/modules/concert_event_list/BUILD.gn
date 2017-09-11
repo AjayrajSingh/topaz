@@ -14,7 +14,7 @@ flutter_app("concert_event_list") {
   manifest = "pubspec.yaml"
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modules/common/packages/config",

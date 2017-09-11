@@ -13,7 +13,7 @@ flutter_app("music_artist") {
   source_dir = "lib"
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/maxwell/lib/dart",
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/user:user_dart",

@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:application.services/service_provider.fidl.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:apps.maxwell.services.context/context_writer.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';

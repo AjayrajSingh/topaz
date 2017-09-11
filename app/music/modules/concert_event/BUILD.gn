@@ -12,7 +12,7 @@ flutter_app("concert_event") {
   source_dir = "lib"
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modules/common/packages/config",

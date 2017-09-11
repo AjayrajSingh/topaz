@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:application.lib.app.dart/app.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:concert_widgets/concert_widgets.dart';
 import 'package:config/config.dart';
 import 'package:flutter/material.dart';

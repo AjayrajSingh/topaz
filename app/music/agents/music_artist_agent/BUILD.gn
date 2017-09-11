@@ -8,7 +8,7 @@ dart_app("music_artist_agent") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/maxwell/lib/dart",
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/context:context_dart",
