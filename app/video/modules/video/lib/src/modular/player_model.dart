@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 import 'dart:async';
 
-import 'package:application.lib.app.dart/app.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
 import 'package:lib.media.fidl/problem.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
