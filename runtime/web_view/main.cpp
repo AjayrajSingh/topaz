@@ -54,10 +54,10 @@
 #include "lib/ui/view_framework/base_view.h"
 #include "lib/ui/view_framework/view_provider_app.h"
 #include "apps/web_runner/services/web_view.fidl.h"
-#include "lib/ftl/command_line.h"
-#include "lib/ftl/logging.h"
-#include "lib/ftl/macros.h"
-#include "lib/ftl/memory/weak_ptr.h"
+#include "lib/fxl/command_line.h"
+#include "lib/fxl/logging.h"
+#include "lib/fxl/macros.h"
+#include "lib/fxl/memory/weak_ptr.h"
 #include "lib/icu_data/cpp/icu_data.h"
 #include "lib/mtl/tasks/message_loop.h"
 
@@ -327,7 +327,7 @@ class MozWebView : public mozart::BaseView,
         physical_size().width, physical_size().height,
         physical_size().width * 4u, scenic::ImageInfo::PixelFormat::BGRA_8,
         scenic::ImageInfo::ColorSpace::SRGB);
-    FTL_DCHECK(image);
+    FXL_DCHECK(image);
 
     // Paint the webview.
     web_view_.setup(reinterpret_cast<unsigned char*>(image->image_ptr()),
@@ -335,11 +335,11 @@ class MozWebView : public mozart::BaseView,
                     physical_size().height, physical_size().width * 4u);
     if (!url_set_) {
       const char* urlToOpen = url_.c_str();
-      FTL_LOG(INFO) << "Loading " << urlToOpen;
+      FXL_LOG(INFO) << "Loading " << urlToOpen;
       web_view_.setURL(urlToOpen);
       url_set_ = true;
 
-      FTL_DCHECK(metrics().scale_x ==
+      FXL_DCHECK(metrics().scale_x ==
                  metrics().scale_y);  // we asked for square metrics
 
       auto requestCallback = [this](std::string url) {
@@ -401,7 +401,7 @@ class MozWebView : public mozart::BaseView,
       const auto& contract = contract_it->value;
       auto url_it = contract.FindMember("uri");
       if (url_it == contract.MemberEnd() || !url_it->value.IsString()) {
-        FTL_LOG(WARNING) << "/view/uri must be a string in " << json;
+        FXL_LOG(WARNING) << "/view/uri must be a string in " << json;
       } else {
         SetUrl(url_it->value.GetString());
       }
@@ -409,7 +409,7 @@ class MozWebView : public mozart::BaseView,
   }
 
   ::WebView web_view_;
-  ftl::WeakPtrFactory<MozWebView> weak_factory_;
+  fxl::WeakPtrFactory<MozWebView> weak_factory_;
   bool url_set_ = false;
   std::string url_;
   std::map<uint32_t, TouchTracker> touch_trackers_;
@@ -432,11 +432,11 @@ class MozWebView : public mozart::BaseView,
 
   fidl::BindingSet<WebView> web_view_interface_bindings_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(MozWebView);
+  FXL_DISALLOW_COPY_AND_ASSIGN(MozWebView);
 };
 
 int main(int argc, const char** argv) {
-  auto command_line = ftl::CommandLineFromArgcArgv(argc, argv);
+  auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);
   std::vector<std::string> urls = command_line.positional_args();
   std::string url = kDefaultUrl;
   if (!urls.empty()) {
