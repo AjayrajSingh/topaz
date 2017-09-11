@@ -10,7 +10,7 @@ flutter_app("xi_app") {
   source_dir = "lib"
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/modular/services/lifecycle:lifecycle_dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",

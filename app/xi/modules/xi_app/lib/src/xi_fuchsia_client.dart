@@ -6,9 +6,9 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:async';
 
-import 'package:application.lib.app.dart/app.dart';
-import 'package:application.services/application_launcher.fidl.dart';
-import 'package:application.services/service_provider.fidl.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/application_launcher.fidl.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
 import 'package:apps.xi.services/xi.fidl.dart' as service;
 import 'package:lib.fidl.dart/bindings.dart';
