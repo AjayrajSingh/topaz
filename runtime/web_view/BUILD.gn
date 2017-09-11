@@ -17,7 +17,7 @@ executable("web_view_bin") {
 
   deps = [
     ":webkit",
-    "//application/lib/app",
+    "//garnet/public/lib/app/cpp",
     "//apps/modular/lib/rapidjson",
     "//apps/modular/services/lifecycle",
     "//apps/modular/services/module",
