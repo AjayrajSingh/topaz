@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:application.lib.app.dart/app.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.context/metadata.fidl.dart';
 import 'package:apps.maxwell.services.context/value_type.fidl.dart';

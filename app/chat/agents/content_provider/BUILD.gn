@@ -8,8 +8,8 @@ dart_app("chat_content_provider") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//application/lib/app/dart",
-    "//application/services:services_dart",
+    "//garnet/public/lib/app/dart",
+    "//garnet/public/lib/app/fidl:fidl_dart",
     "//apps/ledger/services/public:public_dart",
     "//apps/maxwell/services/suggestion:suggestion_dart",
     "//apps/modular/services/agent:agent_dart",
