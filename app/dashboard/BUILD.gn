@@ -12,7 +12,7 @@ flutter_app("dashboard_app") {
   source_dir = "lib"
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/user:user_dart",
     "//apps/modules/chat/services:services_dart",
