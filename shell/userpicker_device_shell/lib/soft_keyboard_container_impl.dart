@@ -5,7 +5,7 @@
 import 'dart:zircon';
 
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:application.services/service_provider.fidl.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';

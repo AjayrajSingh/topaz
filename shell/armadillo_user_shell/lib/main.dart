@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:application.lib.app.dart/app.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.media.dart/audio_policy.dart';
 import 'package:armadillo/armadillo.dart';
 import 'package:armadillo/conductor.dart';
