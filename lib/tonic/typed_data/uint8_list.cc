@@ -21,7 +21,7 @@ Uint8List::Uint8List(Dart_Handle list)
   Dart_TypedData_Type type;
   Dart_TypedDataAcquireData(list, &type, reinterpret_cast<void**>(&data_),
                             &num_elements_);
-  FTL_DCHECK(!LogIfError(list));
+  FXL_DCHECK(!LogIfError(list));
   if (type != Dart_TypedData_kUint8)
     Dart_ThrowException(ToDart("Non-genuine Uint8List passed to engine."));
 }
@@ -51,7 +51,7 @@ Uint8List DartConverter<Uint8List>::FromArguments(Dart_NativeArguments args,
                                                   int index,
                                                   Dart_Handle& exception) {
   Dart_Handle list = Dart_GetNativeArgument(args, index);
-  FTL_DCHECK(!LogIfError(list));
+  FXL_DCHECK(!LogIfError(list));
   return Uint8List(list);
 }
 
@@ -64,15 +64,15 @@ Dart_Handle DartConverter<Uint8List>::ToDart(const uint8_t* buffer,
                                              unsigned int length) {
   const intptr_t buffer_length = static_cast<intptr_t>(length);
   Dart_Handle array = Dart_NewTypedData(Dart_TypedData_kUint8, buffer_length);
-  FTL_DCHECK(!LogIfError(array));
+  FXL_DCHECK(!LogIfError(array));
   {
     Dart_TypedData_Type type;
     void* data = nullptr;
     intptr_t data_length = 0;
     Dart_TypedDataAcquireData(array, &type, &data, &data_length);
-    FTL_CHECK(type == Dart_TypedData_kUint8);
-    FTL_CHECK(data);
-    FTL_CHECK(data_length == buffer_length);
+    FXL_CHECK(type == Dart_TypedData_kUint8);
+    FXL_CHECK(data);
+    FXL_CHECK(data_length == buffer_length);
     memmove(data, buffer, data_length);
     Dart_TypedDataReleaseData(array);
   }

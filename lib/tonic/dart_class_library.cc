@@ -4,7 +4,7 @@
 
 #include "lib/tonic/dart_class_library.h"
 
-#include "lib/ftl/logging.h"
+#include "lib/fxl/logging.h"
 #include "lib/tonic/dart_wrapper_info.h"
 
 namespace tonic {
@@ -45,7 +45,7 @@ Dart_PersistentHandle DartClassLibrary::GetAndCacheClass(
     const char* interface_name,
     Dart_PersistentHandle* cache_slot) {
   auto it = providers_.find(library_name);
-  FTL_DCHECK(it != providers_.end());
+  FXL_DCHECK(it != providers_.end());
 
   Dart_Handle class_handle = it->second->GetClassByName(interface_name);
   *cache_slot = Dart_NewPersistentHandle(class_handle);

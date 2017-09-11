@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <initializer_list>
 
-#include "lib/ftl/logging.h"
+#include "lib/fxl/logging.h"
 #include "dart/runtime/include/dart_api.h"
 
 namespace tonic {
@@ -37,7 +37,7 @@ class DartLibraryNatives {
   std::unordered_map<std::string, Entry> entries_;
   std::unordered_map<Dart_NativeFunction, const char*> symbols_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(DartLibraryNatives);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartLibraryNatives);
 };
 
 }  // namespace tonic

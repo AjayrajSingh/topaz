@@ -10,6 +10,6 @@ source_set("debugger") {
 
   deps = [
     "//dart/runtime:dart_api",
-    "//garnet/public/lib/ftl",
+    "//garnet/public/lib/fxl",
   ]
 }

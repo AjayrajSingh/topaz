@@ -11,8 +11,8 @@
 #include "dart/runtime/include/dart_api.h"
 #include "dart/runtime/include/dart_native_api.h"
 #include "dart/runtime/include/dart_tools_api.h"
-#include "lib/ftl/synchronization/monitor.h"
-#include "lib/ftl/synchronization/mutex.h"
+#include "lib/fxl/synchronization/monitor.h"
+#include "lib/fxl/synchronization/mutex.h"
 
 namespace tonic {
 
@@ -28,7 +28,7 @@ class DartDebuggerIsolate {
 
  private:
   const Dart_IsolateId id_;
-  ftl::Monitor monitor_;
+  fxl::Monitor monitor_;
 };
 
 class DartDebugger {
@@ -61,7 +61,7 @@ class DartDebugger {
 
   static void RemoveIsolate(Dart_IsolateId id);
 
-  static ftl::Mutex* mutex_;
+  static fxl::Mutex* mutex_;
   static std::vector<std::unique_ptr<DartDebuggerIsolate>>* isolates_;
 
   friend class DartDebuggerIsolate;

@@ -10,7 +10,7 @@ source_set("file_loader") {
 
   deps = [
     "//dart/runtime:dart_api",
-    "//garnet/public/lib/ftl",
+    "//garnet/public/lib/fxl",
     "//lib/tonic/converter",
     "//lib/tonic/parsers",
   ]

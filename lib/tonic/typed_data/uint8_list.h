@@ -23,11 +23,11 @@ class Uint8List {
   ~Uint8List();
 
   uint8_t& at(intptr_t i) {
-    FTL_CHECK(i < num_elements_);
+    FXL_CHECK(i < num_elements_);
     return data_[i];
   }
   const uint8_t& at(intptr_t i) const {
-    FTL_CHECK(i < num_elements_);
+    FXL_CHECK(i < num_elements_);
     return data_[i];
   }
 

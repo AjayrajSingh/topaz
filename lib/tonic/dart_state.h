@@ -8,8 +8,8 @@
 #include <memory>
 
 #include "dart/runtime/include/dart_api.h"
-#include "lib/ftl/logging.h"
-#include "lib/ftl/memory/weak_ptr.h"
+#include "lib/fxl/logging.h"
+#include "lib/fxl/memory/weak_ptr.h"
 #include "lib/tonic/dart_persistent_value.h"
 #include "lib/tonic/scopes/dart_api_scope.h"
 #include "lib/tonic/scopes/dart_isolate_scope.h"
@@ -21,7 +21,7 @@ class FileLoader;
 
 // DartState represents the state associated with a given Dart isolate. The
 // lifetime of this object is controlled by the DartVM. If you want to hold a
-// reference to a DartState instance, please hold a ftl::WeakPtr<DartState>.
+// reference to a DartState instance, please hold a fxl::WeakPtr<DartState>.
 //
 // DartState is analogous to gin::PerIsolateData and JSC::ExecState.
 class DartState {
@@ -42,7 +42,7 @@ class DartState {
   static DartState* From(Dart_Isolate isolate);
   static DartState* Current();
 
-  ftl::WeakPtr<DartState> GetWeakPtr();
+  fxl::WeakPtr<DartState> GetWeakPtr();
 
   Dart_Isolate isolate() { return isolate_; }
   void SetIsolate(Dart_Isolate isolate);
@@ -68,9 +68,9 @@ class DartState {
   std::function<void(uint32_t)> set_return_code_callback_;
 
  protected:
-  ftl::WeakPtrFactory<DartState> weak_factory_;
+  fxl::WeakPtrFactory<DartState> weak_factory_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(DartState);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartState);
 };
 
 }  // namespace tonic

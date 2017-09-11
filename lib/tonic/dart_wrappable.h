@@ -6,8 +6,8 @@
 #define LIB_TONIC_DART_WRAPPABLE_H_
 
 #include "dart/runtime/include/dart_api.h"
-#include "lib/ftl/logging.h"
-#include "lib/ftl/memory/ref_counted.h"
+#include "lib/fxl/logging.h"
+#include "lib/fxl/memory/ref_counted.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/dart_state.h"
@@ -53,7 +53,7 @@ class DartWrappable {
 
   Dart_WeakPersistentHandle dart_wrapper_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(DartWrappable);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartWrappable);
 };
 
 #define DEFINE_WRAPPERTYPEINFO()                                      \
@@ -84,7 +84,7 @@ class DartWrappable {
   };                                                                     \
   const tonic::DartWrapperInfo& ClassName::dart_wrapper_info_ =          \
       kDartWrapperInfo_##LibraryName_##ClassName;                        \
-  static_assert(std::is_base_of<ftl::internal::RefCountedThreadSafeBase, \
+  static_assert(std::is_base_of<fxl::internal::RefCountedThreadSafeBase, \
                                 ClassName>::value,                       \
                 #ClassName " must be thread-safe reference-countable.");
 
@@ -135,25 +135,25 @@ struct DartConverter<
 };
 
 template <typename T>
-struct DartConverter<ftl::RefPtr<T>> {
-  static Dart_Handle ToDart(const ftl::RefPtr<T>& val) {
+struct DartConverter<fxl::RefPtr<T>> {
+  static Dart_Handle ToDart(const fxl::RefPtr<T>& val) {
     return DartConverter<T*>::ToDart(val.get());
   }
 
-  static ftl::RefPtr<T> FromDart(Dart_Handle handle) {
+  static fxl::RefPtr<T> FromDart(Dart_Handle handle) {
     return DartConverter<T*>::FromDart(handle);
   }
 
-  static ftl::RefPtr<T> FromArguments(Dart_NativeArguments args,
+  static fxl::RefPtr<T> FromArguments(Dart_NativeArguments args,
                                       int index,
                                       Dart_Handle& exception,
                                       bool auto_scope = true) {
-    return ftl::RefPtr<T>(
+    return fxl::RefPtr<T>(
         DartConverter<T*>::FromArguments(args, index, exception, auto_scope));
   }
 
   static void SetReturnValue(Dart_NativeArguments args,
-                             const ftl::RefPtr<T>& val,
+                             const fxl::RefPtr<T>& val,
                              bool auto_scope = true) {
     DartConverter<T*>::SetReturnValue(args, val.get());
   }
@@ -163,7 +163,7 @@ template <typename T>
 inline T* GetReceiver(Dart_NativeArguments args) {
   intptr_t receiver;
   Dart_Handle result = Dart_GetNativeReceiver(args, &receiver);
-  FTL_DCHECK(!Dart_IsError(result));
+  FXL_DCHECK(!Dart_IsError(result));
   if (!receiver)
     Dart_ThrowException(ToDart("Object has been disposed."));
   return static_cast<T*>(reinterpret_cast<DartWrappable*>(receiver));

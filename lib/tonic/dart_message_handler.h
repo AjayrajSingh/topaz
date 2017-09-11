@@ -6,9 +6,9 @@
 #define LIB_TONIC_DART_MESSAGE_HANDLER_H_
 
 #include "dart/runtime/include/dart_api.h"
-#include "lib/ftl/memory/ref_ptr.h"
-#include "lib/ftl/memory/weak_ptr.h"
-#include "lib/ftl/tasks/task_runner.h"
+#include "lib/fxl/memory/ref_ptr.h"
+#include "lib/fxl/memory/weak_ptr.h"
+#include "lib/fxl/tasks/task_runner.h"
 #include "lib/tonic/logging/dart_error.h"
 
 namespace tonic {
@@ -20,7 +20,7 @@ class DartMessageHandler {
   ~DartMessageHandler();
 
   // Messages for the current isolate will be scheduled on |runner|.
-  void Initialize(const ftl::RefPtr<ftl::TaskRunner>& runner);
+  void Initialize(const fxl::RefPtr<fxl::TaskRunner>& runner);
 
   // Did the isolate exit?
   bool isolate_exited() const { return isolate_exited_; }
@@ -40,7 +40,7 @@ class DartMessageHandler {
   // By default, called on the task runner's thread for each message.
   void OnHandleMessage(DartState* dart_state);
 
-  const ftl::RefPtr<ftl::TaskRunner>& task_runner() const {
+  const fxl::RefPtr<fxl::TaskRunner>& task_runner() const {
     return task_runner_;
   }
 
@@ -54,7 +54,7 @@ class DartMessageHandler {
   bool isolate_exited_;
   bool isolate_had_uncaught_exception_error_;
   DartErrorHandleType isolate_last_error_;
-  ftl::RefPtr<ftl::TaskRunner> task_runner_;
+  fxl::RefPtr<fxl::TaskRunner> task_runner_;
 
  private:
   static void MessageNotifyCallback(Dart_Isolate dest_isolate);

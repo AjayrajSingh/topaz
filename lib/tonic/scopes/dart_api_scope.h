@@ -5,7 +5,7 @@
 #ifndef LIB_TONIC_SCOPES_DART_API_SCOPE_H_
 #define LIB_TONIC_SCOPES_DART_API_SCOPE_H_
 
-#include "lib/ftl/macros.h"
+#include "lib/fxl/macros.h"
 #include "dart/runtime/include/dart_api.h"
 
 namespace tonic {
@@ -19,7 +19,7 @@ class DartApiScope {
   }
 
  private:
-  FTL_DISALLOW_COPY_AND_ASSIGN(DartApiScope);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartApiScope);
 };
 
 }  // namespace tonic

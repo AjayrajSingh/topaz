@@ -23,11 +23,11 @@ class Float32List {
   ~Float32List();
 
   float& at(intptr_t i) {
-    FTL_CHECK(i < num_elements_);
+    FXL_CHECK(i < num_elements_);
     return data_[i];
   }
   const float& at(intptr_t i) const {
-    FTL_CHECK(i < num_elements_);
+    FXL_CHECK(i < num_elements_);
     return data_[i];
   }
 

@@ -5,8 +5,8 @@
 #ifndef LIB_TONIC_DART_PERSISTENT_VALUE_H_
 #define LIB_TONIC_DART_PERSISTENT_VALUE_H_
 
-#include "lib/ftl/macros.h"
-#include "lib/ftl/memory/weak_ptr.h"
+#include "lib/fxl/macros.h"
+#include "lib/fxl/memory/weak_ptr.h"
 #include "dart/runtime/include/dart_api.h"
 
 namespace tonic {
@@ -30,13 +30,13 @@ class DartPersistentValue {
   void Clear();
   Dart_Handle Release();
 
-  const ftl::WeakPtr<DartState>& dart_state() const { return dart_state_; }
+  const fxl::WeakPtr<DartState>& dart_state() const { return dart_state_; }
 
  private:
-  ftl::WeakPtr<DartState> dart_state_;
+  fxl::WeakPtr<DartState> dart_state_;
   Dart_PersistentHandle value_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(DartPersistentValue);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartPersistentValue);
 };
 
 }  // namespace tonic

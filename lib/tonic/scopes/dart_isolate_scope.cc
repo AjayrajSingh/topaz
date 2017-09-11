@@ -18,7 +18,7 @@ DartIsolateScope::DartIsolateScope(Dart_Isolate isolate) {
 
 DartIsolateScope::~DartIsolateScope() {
   Dart_Isolate current = Dart_CurrentIsolate();
-  FTL_DCHECK(!current || current == isolate_);
+  FXL_DCHECK(!current || current == isolate_);
   if (previous_ == isolate_)
     return;
   if (current)

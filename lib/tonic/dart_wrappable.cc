@@ -12,22 +12,22 @@
 namespace tonic {
 
 DartWrappable::~DartWrappable() {
-  FTL_CHECK(!dart_wrapper_);
+  FXL_CHECK(!dart_wrapper_);
 }
 
 Dart_Handle DartWrappable::CreateDartWrapper(DartState* dart_state) {
-  FTL_DCHECK(!dart_wrapper_);
+  FXL_DCHECK(!dart_wrapper_);
   const DartWrapperInfo& info = GetDartWrapperInfo();
 
   Dart_PersistentHandle type = dart_state->class_library().GetClass(info);
-  FTL_DCHECK(!LogIfError(type));
+  FXL_DCHECK(!LogIfError(type));
 
   intptr_t native_fields[kNumberOfNativeFields];
   native_fields[kPeerIndex] = reinterpret_cast<intptr_t>(this);
   native_fields[kWrapperInfoIndex] = reinterpret_cast<intptr_t>(&info);
   Dart_Handle wrapper =
       Dart_AllocateWithNativeFields(type, kNumberOfNativeFields, native_fields);
-  FTL_DCHECK(!LogIfError(wrapper));
+  FXL_DCHECK(!LogIfError(wrapper));
 
   info.ref_object(this);  // Balanced in FinalizeDartWrapper.
   dart_wrapper_ = Dart_NewWeakPersistentHandle(
@@ -37,21 +37,21 @@ Dart_Handle DartWrappable::CreateDartWrapper(DartState* dart_state) {
 }
 
 void DartWrappable::AssociateWithDartWrapper(Dart_NativeArguments args) {
-  FTL_DCHECK(!dart_wrapper_);
+  FXL_DCHECK(!dart_wrapper_);
 
   Dart_Handle wrapper = Dart_GetNativeArgument(args, 0);
-  FTL_CHECK(!LogIfError(wrapper));
+  FXL_CHECK(!LogIfError(wrapper));
 
   intptr_t native_fields[kNumberOfNativeFields];
-  FTL_CHECK(!LogIfError(Dart_GetNativeFieldsOfArgument(
+  FXL_CHECK(!LogIfError(Dart_GetNativeFieldsOfArgument(
       args, 0, kNumberOfNativeFields, native_fields)));
-  FTL_CHECK(!native_fields[kPeerIndex]);
-  FTL_CHECK(!native_fields[kWrapperInfoIndex]);
+  FXL_CHECK(!native_fields[kPeerIndex]);
+  FXL_CHECK(!native_fields[kWrapperInfoIndex]);
 
   const DartWrapperInfo& info = GetDartWrapperInfo();
-  FTL_CHECK(!LogIfError(Dart_SetNativeInstanceField(
+  FXL_CHECK(!LogIfError(Dart_SetNativeInstanceField(
       wrapper, kPeerIndex, reinterpret_cast<intptr_t>(this))));
-  FTL_CHECK(!LogIfError(Dart_SetNativeInstanceField(
+  FXL_CHECK(!LogIfError(Dart_SetNativeInstanceField(
       wrapper, kWrapperInfoIndex, reinterpret_cast<intptr_t>(&info))));
 
   info.ref_object(this);  // Balanced in FinalizeDartWrapper.
@@ -60,10 +60,10 @@ void DartWrappable::AssociateWithDartWrapper(Dart_NativeArguments args) {
 }
 
 void DartWrappable::ClearDartWrapper() {
-  FTL_DCHECK(dart_wrapper_);
+  FXL_DCHECK(dart_wrapper_);
   Dart_Handle wrapper = Dart_HandleFromWeakPersistent(dart_wrapper_);
-  FTL_CHECK(!LogIfError(Dart_SetNativeInstanceField(wrapper, kPeerIndex, 0)));
-  FTL_CHECK(
+  FXL_CHECK(!LogIfError(Dart_SetNativeInstanceField(wrapper, kPeerIndex, 0)));
+  FXL_CHECK(
       !LogIfError(Dart_SetNativeInstanceField(wrapper, kWrapperInfoIndex, 0)));
   Dart_DeleteWeakPersistentHandle(Dart_CurrentIsolate(), dart_wrapper_);
   dart_wrapper_ = nullptr;

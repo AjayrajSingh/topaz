@@ -23,11 +23,11 @@ class Float64List {
   ~Float64List();
 
   double& at(intptr_t i) {
-    FTL_CHECK(i < num_elements_);
+    FXL_CHECK(i < num_elements_);
     return data_[i];
   }
   const double& at(intptr_t i) const {
-    FTL_CHECK(i < num_elements_);
+    FXL_CHECK(i < num_elements_);
     return data_[i];
   }
 

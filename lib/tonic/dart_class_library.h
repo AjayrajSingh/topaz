@@ -9,7 +9,7 @@
 #include <unordered_map>
 
 #include "dart/runtime/include/dart_api.h"
-#include "lib/ftl/macros.h"
+#include "lib/fxl/macros.h"
 #include "lib/tonic/dart_class_provider.h"
 
 namespace tonic {
@@ -52,7 +52,7 @@ class DartClassLibrary {
                      PairHasher>
       name_cache_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(DartClassLibrary);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartClassLibrary);
 };
 
 }  // namespace tonic

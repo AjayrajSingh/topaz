@@ -9,7 +9,7 @@
 namespace tonic {
 
 DartList::DartList(Dart_Handle dart_handle) : dart_handle_(dart_handle) {
-  FTL_DCHECK(Dart_IsList(dart_handle_));
+  FXL_DCHECK(Dart_IsList(dart_handle_));
 
   intptr_t length;
   is_valid_ = !LogIfError(Dart_ListLength(dart_handle_, &length));

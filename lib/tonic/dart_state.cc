@@ -40,7 +40,7 @@ DartState* DartState::Current() {
   return static_cast<DartState*>(Dart_CurrentIsolateData());
 }
 
-ftl::WeakPtr<DartState> DartState::GetWeakPtr() {
+fxl::WeakPtr<DartState> DartState::GetWeakPtr() {
   return weak_factory_.GetWeakPtr();
 }
 

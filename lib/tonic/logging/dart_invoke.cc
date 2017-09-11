@@ -4,7 +4,7 @@
 
 #include "lib/tonic/logging/dart_invoke.h"
 
-#include "lib/ftl/logging.h"
+#include "lib/fxl/logging.h"
 #include "lib/tonic/logging/dart_error.h"
 
 namespace tonic {

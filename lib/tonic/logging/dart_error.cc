@@ -4,7 +4,7 @@
 
 #include "lib/tonic/logging/dart_error.h"
 
-#include "lib/ftl/logging.h"
+#include "lib/fxl/logging.h"
 
 namespace tonic {
 namespace DartError {
@@ -13,7 +13,7 @@ const char kInvalidArgument[] = "Invalid argument.";
 
 bool LogIfError(Dart_Handle handle) {
   if (Dart_IsError(handle)) {
-    FTL_LOG(ERROR) << Dart_GetError(handle);
+    FXL_LOG(ERROR) << Dart_GetError(handle);
     return true;
   }
   return false;

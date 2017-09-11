@@ -4,7 +4,7 @@
 
 #include "lib/tonic/dart_microtask_queue.h"
 
-#include "lib/ftl/build_config.h"
+#include "lib/fxl/build_config.h"
 #include "lib/tonic/logging/dart_invoke.h"
 #include "lib/tonic/dart_state.h"
 #include "lib/tonic/dart_sticky_error.h"
@@ -73,7 +73,7 @@ void DartMicrotaskQueue::RunMicrotasks() {
     MicrotaskQueue local;
     std::swap(queue_, local);
     for (const auto& callback : local) {
-      ftl::WeakPtr<DartState> dart_state = callback.dart_state();
+      fxl::WeakPtr<DartState> dart_state = callback.dart_state();
       if (!dart_state.get())
         continue;
       DartState::Scope dart_scope(dart_state.get());
@@ -86,7 +86,7 @@ void DartMicrotaskQueue::RunMicrotasks() {
 }
 
 void DartMicrotaskQueue::Destroy() {
-  FTL_DCHECK(this == GetForCurrentThread());
+  FXL_DCHECK(this == GetForCurrentThread());
   SetQueue(nullptr);
   delete this;
 }

@@ -21,7 +21,7 @@ Dart_Handle DartClassProvider::GetClassByName(const char* class_name) {
   Dart_Handle name_handle = ToDart(class_name);
   Dart_Handle class_handle =
       Dart_GetType(library_.value(), name_handle, 0, nullptr);
-  FTL_DCHECK(!Dart_IsError(class_handle)) << class_name << ": "
+  FXL_DCHECK(!Dart_IsError(class_handle)) << class_name << ": "
                                           << Dart_GetError(class_handle);
   return class_handle;
 }

@@ -10,7 +10,7 @@
 #include <string>
 
 #include "dart/runtime/include/dart_api.h"
-#include "lib/ftl/macros.h"
+#include "lib/fxl/macros.h"
 #include "lib/tonic/parsers/packages_map.h"
 
 namespace tonic {
@@ -66,7 +66,7 @@ class FileLoader {
   std::string packages_;
   std::unique_ptr<PackagesMap> packages_map_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(FileLoader);
+  FXL_DISALLOW_COPY_AND_ASSIGN(FileLoader);
 };
 
 }  // namespace tonic

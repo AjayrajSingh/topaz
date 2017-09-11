@@ -41,7 +41,7 @@ class DartArgIterator {
   int index_;
   bool had_exception_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(DartArgIterator);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartArgIterator);
 };
 
 // Classes for generating and storing an argument pack of integer indices

@@ -13,7 +13,7 @@ DartPersistentValue::DartPersistentValue() : value_(nullptr) {}
 
 DartPersistentValue::DartPersistentValue(DartPersistentValue&& other)
     : dart_state_(other.dart_state_), value_(other.value_) {
-  other.dart_state_ = ftl::WeakPtr<DartState>();
+  other.dart_state_ = fxl::WeakPtr<DartState>();
   other.value_ = nullptr;
 }
 
@@ -28,7 +28,7 @@ DartPersistentValue::~DartPersistentValue() {
 }
 
 void DartPersistentValue::Set(DartState* dart_state, Dart_Handle value) {
-  FTL_DCHECK(is_empty());
+  FXL_DCHECK(is_empty());
   dart_state_ = dart_state->GetWeakPtr();
   value_ = Dart_NewPersistentHandle(value);
 }
@@ -39,7 +39,7 @@ void DartPersistentValue::Clear() {
 
   DartIsolateScope scope(dart_state_->isolate());
   Dart_DeletePersistentHandle(value_);
-  dart_state_ = ftl::WeakPtr<DartState>();
+  dart_state_ = fxl::WeakPtr<DartState>();
   value_ = nullptr;
 }
 

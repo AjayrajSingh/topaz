@@ -19,7 +19,7 @@ Float64List::Float64List(Dart_Handle list)
   Dart_TypedData_Type type;
   Dart_TypedDataAcquireData(list, &type, reinterpret_cast<void**>(&data_),
                             &num_elements_);
-  FTL_DCHECK(!LogIfError(list));
+  FXL_DCHECK(!LogIfError(list));
   if (type != Dart_TypedData_kFloat64)
     Dart_ThrowException(ToDart("Non-genuine Float64List passed to engine."));
 }
@@ -49,7 +49,7 @@ Float64List DartConverter<Float64List>::FromArguments(Dart_NativeArguments args,
                                                       int index,
                                                       Dart_Handle& exception) {
   Dart_Handle list = Dart_GetNativeArgument(args, index);
-  FTL_DCHECK(!LogIfError(list));
+  FXL_DCHECK(!LogIfError(list));
   return Float64List(list);
 }
 

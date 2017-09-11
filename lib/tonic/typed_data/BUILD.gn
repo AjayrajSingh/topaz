@@ -18,7 +18,7 @@ source_set("typed_data") {
 
   public_deps = [
     "//dart/runtime:dart_api",
-    "//garnet/public/lib/ftl",
+    "//garnet/public/lib/fxl",
     "//lib/tonic/converter",
     "//lib/tonic/logging",
   ]

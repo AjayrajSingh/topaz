@@ -11,6 +11,6 @@ source_set("scopes") {
 
   public_deps = [
     "//dart/runtime:dart_api",
-    "//garnet/public/lib/ftl",
+    "//garnet/public/lib/fxl",
   ]
 }

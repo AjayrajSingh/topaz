@@ -7,7 +7,7 @@
 #include "dart/runtime/include/dart_api.h"
 #include "dart/runtime/include/dart_native_api.h"
 #include "dart/runtime/include/dart_tools_api.h"
-#include "lib/ftl/logging.h"
+#include "lib/fxl/logging.h"
 #include "lib/tonic/logging/dart_error.h"
 #include "lib/tonic/dart_state.h"
 #include "lib/tonic/dart_sticky_error.h"
@@ -26,11 +26,11 @@ DartMessageHandler::~DartMessageHandler() {
 }
 
 void DartMessageHandler::Initialize(
-    const ftl::RefPtr<ftl::TaskRunner>& runner) {
+    const fxl::RefPtr<fxl::TaskRunner>& runner) {
   // Only can be called once.
-  FTL_CHECK(!task_runner_);
+  FXL_CHECK(!task_runner_);
   task_runner_ = runner;
-  FTL_CHECK(task_runner_);
+  FXL_CHECK(task_runner_);
   Dart_SetMessageNotifyCallback(MessageNotifyCallback);
 }
 
@@ -38,7 +38,7 @@ void DartMessageHandler::OnMessage(DartState* dart_state) {
   auto task_runner = dart_state->message_handler().task_runner();
 
   // Schedule a task to run on the message loop thread.
-  ftl::WeakPtr<DartState> dart_state_ptr = dart_state->GetWeakPtr();
+  fxl::WeakPtr<DartState> dart_state_ptr = dart_state->GetWeakPtr();
   task_runner->PostTask([dart_state_ptr]() {
     if (!dart_state_ptr)
       return;
@@ -115,7 +115,7 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
 
 void DartMessageHandler::MessageNotifyCallback(Dart_Isolate dest_isolate) {
   auto dart_state = DartState::From(dest_isolate);
-  FTL_CHECK(dart_state);
+  FXL_CHECK(dart_state);
   dart_state->message_handler().OnMessage(dart_state);
 }
 

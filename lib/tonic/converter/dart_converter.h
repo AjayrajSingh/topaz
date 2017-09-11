@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "dart/runtime/include/dart_api.h"
-#include "lib/ftl/logging.h"
+#include "lib/fxl/logging.h"
 
 namespace tonic {
 
@@ -112,13 +112,13 @@ struct DartConverter<unsigned long long> {
   // converting values that have the 64th bit set.)
 
   static Dart_Handle ToDart(unsigned long long val) {
-    FTL_DCHECK(val <= 0x7fffffffffffffffLL);
+    FXL_DCHECK(val <= 0x7fffffffffffffffLL);
     return Dart_NewInteger(static_cast<int64_t>(val));
   }
 
   static void SetReturnValue(Dart_NativeArguments args,
                              unsigned long long val) {
-    FTL_DCHECK(val <= 0x7fffffffffffffffLL);
+    FXL_DCHECK(val <= 0x7fffffffffffffffLL);
     Dart_SetIntegerReturnValue(args, val);
   }
 
@@ -319,10 +319,10 @@ struct DartConverter<std::vector<T>> {
     std::vector<Dart_Handle> items(length);
     Dart_Handle items_result =
         Dart_ListGetRange(handle, 0, length, items.data());
-    FTL_DCHECK(!Dart_IsError(items_result));
+    FXL_DCHECK(!Dart_IsError(items_result));
 
     for (intptr_t i = 0; i < length; ++i) {
-      FTL_DCHECK(items[i]);
+      FXL_DCHECK(items[i]);
       result.push_back(DartConverter<ConverterType>::FromDart(items[i]));
     }
     return result;

@@ -18,7 +18,7 @@ DartByteData::DartByteData(Dart_Handle list)
 
   Dart_TypedData_Type type;
   Dart_TypedDataAcquireData(list, &type, &data_, &length_in_bytes_);
-  FTL_DCHECK(!LogIfError(list));
+  FXL_DCHECK(!LogIfError(list));
   if (type != Dart_TypedData_kByteData)
     Dart_ThrowException(ToDart("Non-genuine ByteData passed to engine."));
 }
@@ -52,7 +52,7 @@ DartByteData DartConverter<DartByteData>::FromArguments(
     int index,
     Dart_Handle& exception) {
   Dart_Handle data = Dart_GetNativeArgument(args, index);
-  FTL_DCHECK(!LogIfError(data));
+  FXL_DCHECK(!LogIfError(data));
   return DartByteData(data);
 }
 

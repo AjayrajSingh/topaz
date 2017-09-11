@@ -19,7 +19,7 @@ Int32List::Int32List(Dart_Handle list)
   Dart_TypedData_Type type;
   Dart_TypedDataAcquireData(list, &type, reinterpret_cast<void**>(&data_),
                             &num_elements_);
-  FTL_DCHECK(!LogIfError(list));
+  FXL_DCHECK(!LogIfError(list));
   if (type != Dart_TypedData_kInt32)
     Dart_ThrowException(ToDart("Non-genuine Int32List passed to engine."));
 }
@@ -49,7 +49,7 @@ Int32List DartConverter<Int32List>::FromArguments(Dart_NativeArguments args,
                                                   int index,
                                                   Dart_Handle& exception) {
   Dart_Handle list = Dart_GetNativeArgument(args, index);
-  FTL_DCHECK(!LogIfError(list));
+  FXL_DCHECK(!LogIfError(list));
   return Int32List(list);
 }
 

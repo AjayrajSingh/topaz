@@ -5,7 +5,7 @@
 #ifndef LIB_TONIC_DART_CLASS_PROVIDER_H_
 #define LIB_TONIC_DART_CLASS_PROVIDER_H_
 
-#include "lib/ftl/macros.h"
+#include "lib/fxl/macros.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/tonic/dart_persistent_value.h"
 
@@ -22,7 +22,7 @@ class DartClassProvider {
  private:
   DartPersistentValue library_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(DartClassProvider);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartClassProvider);
 };
 
 }  // namespace tonic

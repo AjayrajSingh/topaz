@@ -8,11 +8,11 @@
 #include <memory>
 #include <utility>
 
-#include "lib/ftl/files/directory.h"
-#include "lib/ftl/files/file.h"
-#include "lib/ftl/files/path.h"
-#include "lib/ftl/files/symlink.h"
-#include "lib/ftl/logging.h"
+#include "lib/fxl/files/directory.h"
+#include "lib/fxl/files/file.h"
+#include "lib/fxl/files/path.h"
+#include "lib/fxl/files/symlink.h"
+#include "lib/fxl/logging.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/parsers/packages_map.h"
 
@@ -77,10 +77,10 @@ bool FileLoader::LoadPackagesMap(const std::string& packages) {
 Dart_Handle FileLoader::HandleLibraryTag(Dart_LibraryTag tag,
                                          Dart_Handle library,
                                          Dart_Handle url) {
-  FTL_DCHECK(Dart_IsNull(library) ||
+  FXL_DCHECK(Dart_IsNull(library) ||
              Dart_IsLibrary(library) ||
              Dart_IsString(library));
-  FTL_DCHECK(Dart_IsString(url));
+  FXL_DCHECK(Dart_IsString(url));
   if (tag == Dart_kCanonicalizeUrl)
     return CanonicalizeURL(library, url);
   if (tag == Dart_kImportTag)
@@ -129,7 +129,7 @@ std::string FileLoader::GetFilePathForURL(std::string url) {
 std::string FileLoader::GetFilePathForPackageURL(std::string url) {
   if (!packages_map_)
     return std::string();
-  FTL_DCHECK(url.find(kPackageScheme) == 0u);
+  FXL_DCHECK(url.find(kPackageScheme) == 0u);
   url = url.substr(kPackageSchemeLength);
   size_t slash = url.find('/');
   if (slash == std::string::npos)
@@ -146,7 +146,7 @@ std::string FileLoader::GetFilePathForPackageURL(std::string url) {
 }
 
 std::string FileLoader::GetFilePathForFileURL(std::string url) {
-  FTL_DCHECK(url.find(kFileURLPrefix) == 0u);
+  FXL_DCHECK(url.find(kFileURLPrefix) == 0u);
   return url.substr(kFileURLPrefixLength);
 }
 

@@ -5,7 +5,7 @@
 #ifndef LIB_TONIC_SCOPES_DART_ISOLATE_SCOPE_H_
 #define LIB_TONIC_SCOPES_DART_ISOLATE_SCOPE_H_
 
-#include "lib/ftl/logging.h"
+#include "lib/fxl/logging.h"
 #include "dart/runtime/include/dart_api.h"
 
 namespace tonic {
@@ -20,7 +20,7 @@ class DartIsolateScope {
   Dart_Isolate isolate_;
   Dart_Isolate previous_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(DartIsolateScope);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartIsolateScope);
 };
 
 }  // namespace tonic
