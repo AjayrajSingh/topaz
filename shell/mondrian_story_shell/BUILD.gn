@@ -17,7 +17,7 @@ flutter_app("flutter_mondrian") {
   package_name = "mondrian"
   main_dart = "lib/main.dart"
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modular/services/surface:surface_dart",
     "//garnet/public/lib/ui/flutter",
