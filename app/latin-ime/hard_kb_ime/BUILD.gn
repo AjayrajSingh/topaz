@@ -8,7 +8,7 @@ dart_app("hard_kb_ime") {
   main_dart = "main.dart"
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//garnet/public/lib/ui/input/fidl:fidl_dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",

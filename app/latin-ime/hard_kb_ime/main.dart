@@ -6,7 +6,7 @@ import 'dart:math';
 
 import 'package:lib.fidl.dart/bindings.dart';
 
-import 'package:application.lib.app.dart/app.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
 import 'package:lib.ui.input.fidl/input_connection.fidl.dart';
 import 'package:lib.ui.input.fidl/input_events.fidl.dart';
