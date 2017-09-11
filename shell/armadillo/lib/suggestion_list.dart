@@ -104,6 +104,12 @@ class SuggestionListState extends State<SuggestionList>
     });
   }
 
+  @override
+  void dispose() {
+    _fadeInAnimation.dispose();
+    super.dispose();
+  }
+
   void _startAsking() {
     SuggestionModel.of(context).asking = true;
     widget.onAskingStarted?.call();

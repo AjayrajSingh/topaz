@@ -8,16 +8,14 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
+import 'conductor_model.dart';
 import 'context_model.dart';
 import 'edge_scroll_drag_target.dart';
 import 'expand_suggestion.dart';
-import 'idle_mode_builder.dart';
 import 'interruption_overlay.dart';
 import 'quick_settings.dart';
-import 'now_builder.dart';
 import 'peek_model.dart';
 import 'peeking_overlay.dart';
-import 'recents_builder.dart';
 import 'selected_suggestion_overlay.dart';
 import 'size_model.dart';
 import 'splash_suggestion.dart';
@@ -59,15 +57,6 @@ class Conductor extends StatefulWidget {
   /// Called when an interruption is no longer showing.
   final OnInterruptionDismissed onInterruptionDismissed;
 
-  /// Builds the idle mode.
-  final IdleModeBuilder idleModeBuilder;
-
-  /// Builds now.
-  final NowBuilder nowBuilder;
-
-  /// Builds recents.
-  final RecentsBuilder recentsBuilder;
-
   /// Constructor.
   Conductor({
     Key key,
@@ -78,9 +67,6 @@ class Conductor extends StatefulWidget {
     this.onUserContextTapped,
     this.interruptionOverlayKey,
     this.onInterruptionDismissed,
-    this.idleModeBuilder,
-    this.nowBuilder,
-    this.recentsBuilder,
   })
       : super(key: key);
 
@@ -118,62 +104,68 @@ class ConductorState extends State<Conductor> {
   Timer _storyFocusTimer;
 
   @override
-  Widget build(BuildContext context) => new ScopedModelDescendant<SizeModel>(
-        builder: (
-          BuildContext context,
-          Widget child,
-          SizeModel sizeModel,
-        ) =>
-            new ScopedModelDescendant<IdleModel>(
+  Widget build(BuildContext context) =>
+      new ScopedModelDescendant<ConductorModel>(
+        builder: (_, __, ConductorModel conductorModel) =>
+            new ScopedModelDescendant<SizeModel>(
               builder: (
                 BuildContext context,
                 Widget child,
-                IdleModel idleModel,
+                SizeModel sizeModel,
               ) =>
-                  new Transform(
-                    transform: new Matrix4.translationValues(
-                      lerpDouble(
-                        0.0,
-                        sizeModel.screenSize.width,
-                        idleModel.value,
-                      ),
-                      0.0,
-                      0.0,
-                    ),
-                    child: new Stack(
-                      overflow: Overflow.visible,
-                      children: <Widget>[
-                        new Positioned.fill(
-                          child: new Offstage(
-                            offstage: idleModel.value == 1.0,
-                            child: child,
+                  new ScopedModelDescendant<IdleModel>(
+                    builder: (
+                      BuildContext context,
+                      Widget child,
+                      IdleModel idleModel,
+                    ) =>
+                        new Transform(
+                          transform: new Matrix4.translationValues(
+                            lerpDouble(
+                              0.0,
+                              sizeModel.screenSize.width,
+                              idleModel.value,
+                            ),
+                            0.0,
+                            0.0,
+                          ),
+                          child: new Stack(
+                            overflow: Overflow.visible,
+                            children: <Widget>[
+                              new Positioned.fill(
+                                child: new Offstage(
+                                  offstage: idleModel.value == 1.0,
+                                  child: child,
+                                ),
+                              ),
+                              new Positioned(
+                                top: 0.0,
+                                left: -sizeModel.screenSize.width,
+                                width: sizeModel.screenSize.width,
+                                height: sizeModel.screenSize.height,
+                                child: new Offstage(
+                                  offstage: idleModel.value == 0.0,
+                                  child: conductorModel.idleModeBuilder.build(
+                                    context,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        new Positioned(
-                          top: 0.0,
-                          left: -sizeModel.screenSize.width,
-                          width: sizeModel.screenSize.width,
-                          height: sizeModel.screenSize.height,
-                          child: new Offstage(
-                            offstage: idleModel.value == 0.0,
-                            child: widget.idleModeBuilder.build(context),
-                          ),
-                        ),
-                      ],
+                    child: new Listener(
+                      behavior: HitTestBehavior.translucent,
+                      onPointerDown: (_) {
+                        // TODO: remove this hack when Mozart focus is fixed (MZ-118)
+                        // HACK: Due to a mozart focus issue we need to focus when the mozart
+                        // window this widget is in is first tapped.
+                        if (!_askFocusNode.hasFocus) {
+                          _conductorFocusNode.requestFocus(_askFocusNode);
+                        }
+                      },
+                      child: _buildParts(context, conductorModel),
                     ),
                   ),
-              child: new Listener(
-                behavior: HitTestBehavior.translucent,
-                onPointerDown: (_) {
-                  // TODO: remove this hack when Mozart focus is fixed (MZ-118)
-                  // HACK: Due to a mozart focus issue we need to focus when the mozart
-                  // window this widget is in is first tapped.
-                  if (!_askFocusNode.hasFocus) {
-                    _conductorFocusNode.requestFocus(_askFocusNode);
-                  }
-                },
-                child: _buildParts(context),
-              ),
             ),
       );
 
@@ -183,14 +175,18 @@ class ConductorState extends State<Conductor> {
   /// size of the final user state bar we have the user state appear to be
   /// a part of the story list and yet prevent the story list from painting
   /// behind it.
-  Widget _buildParts(BuildContext context) => new FocusScope(
+  Widget _buildParts(
+    BuildContext context,
+    ConductorModel conductorModel,
+  ) =>
+      new FocusScope(
         autofocus: true,
         node: _conductorFocusNode,
         child: new Stack(
           fit: StackFit.passthrough,
           children: <Widget>[
             /// Story List.
-            widget.recentsBuilder.build(
+            conductorModel.recentsBuilder.build(
               context,
               scrollController: _scrollController,
               onScroll: (double scrollOffset) {
@@ -201,7 +197,7 @@ class ConductorState extends State<Conductor> {
 
                 // Ignore top padding of storylist when looking at scroll offset
                 // to determine Now state.
-                widget.nowBuilder.onRecentsScrollOffsetChanged(
+                conductorModel.nowBuilder.onRecentsScrollOffsetChanged(
                   scrollOffset + SizeModel.of(context).storyListTopPadding,
                 );
 
@@ -217,7 +213,7 @@ class ConductorState extends State<Conductor> {
               },
               onStoryClusterFocusStarted: () {
                 // Lock scrolling.
-                widget.recentsBuilder.onStoryFocused();
+                conductorModel.recentsBuilder.onStoryFocused();
                 _edgeScrollDragTargetKey.currentState.disable();
                 _minimizeNow();
               },
@@ -228,10 +224,10 @@ class ConductorState extends State<Conductor> {
             ),
 
             // Now.
-            widget.nowBuilder.build(
+            conductorModel.nowBuilder.build(
               context,
               onQuickSettingsProgressChange: (double quickSettingsProgress) =>
-                  widget.recentsBuilder
+                  conductorModel.recentsBuilder
                       .onQuickSettingsProgressChanged(quickSettingsProgress),
               onMinimizedTap: () => goToOrigin(),
               onMinimizedLongPress: () =>
@@ -376,7 +372,7 @@ class ConductorState extends State<Conductor> {
     );
 
     // Unlock scrolling.
-    widget.recentsBuilder.onStoryUnfocused();
+    ConductorModel.of(context).recentsBuilder.onStoryUnfocused();
     _edgeScrollDragTargetKey.currentState.enable();
     _scrollController.animateTo(
       0.0,
@@ -412,12 +408,12 @@ class ConductorState extends State<Conductor> {
     _ignoreNextScrollOffsetChange = true;
     _scrollController.jumpTo(0.0);
 
-    widget.recentsBuilder.onStoryFocused();
+    ConductorModel.of(context).recentsBuilder.onStoryFocused();
     _edgeScrollDragTargetKey.currentState.disable();
   }
 
   void _minimizeNow() {
-    widget.nowBuilder.onMinimize();
+    ConductorModel.of(context).nowBuilder.onMinimize();
     PeekModel.of(context).nowMinimized = true;
     _suggestionOverlayKey.currentState.hide();
   }
@@ -432,26 +428,20 @@ class ConductorState extends State<Conductor> {
   void goToOrigin() {
     StoryModel storyModel = StoryModel.of(context);
     _defocus(storyModel);
-    widget.nowBuilder.onMaximize();
+    ConductorModel.of(context).nowBuilder.onMaximize();
     storyModel.interactionStopped();
     storyModel.clearPlaceHolderStoryClusters();
   }
 
   /// Called to request the conductor focus on the cluster with [storyId].
-  void requestStoryFocus(
-    StoryId storyId, {
-    bool jumpToFinish: true,
-  }) {
-    widget.recentsBuilder.onStoryFocused();
+  void requestStoryFocus(StoryId storyId, {bool jumpToFinish: true}) {
+    ConductorModel.of(context).recentsBuilder.onStoryFocused();
     _edgeScrollDragTargetKey.currentState.disable();
     _minimizeNow();
     _focusOnStory(storyId, jumpToFinish: jumpToFinish);
   }
 
-  void _focusOnStory(
-    StoryId storyId, {
-    bool jumpToFinish: true,
-  }) {
+  void _focusOnStory(StoryId storyId, {bool jumpToFinish: true}) {
     StoryModel storyModel = StoryModel.of(context);
     List<StoryCluster> targetStoryClusters =
         storyModel.storyClusters.where((StoryCluster storyCluster) {

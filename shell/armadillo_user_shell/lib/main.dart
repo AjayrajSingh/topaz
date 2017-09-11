@@ -9,17 +9,15 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.media.dart/audio_policy.dart';
 import 'package:armadillo/armadillo.dart';
 import 'package:armadillo/conductor.dart';
+import 'package:armadillo/conductor_model.dart';
 import 'package:armadillo/context_model.dart';
 import 'package:armadillo/debug_enabler.dart';
 import 'package:armadillo/debug_model.dart';
-import 'package:armadillo/idle_mode_builder.dart';
 import 'package:armadillo/interruption_overlay.dart';
-import 'package:armadillo/now_builder.dart';
 import 'package:armadillo/panel_resizing_model.dart';
 import 'package:armadillo/peek_model.dart';
 import 'package:armadillo/power_model.dart';
 import 'package:armadillo/quick_settings_progress_model.dart';
-import 'package:armadillo/recents_builder.dart';
 import 'package:armadillo/size_model.dart';
 import 'package:armadillo/story_cluster.dart';
 import 'package:armadillo/story_cluster_drag_state_model.dart';
@@ -61,9 +59,7 @@ Future<Null> main() async {
   runApp(buildArmadilloUserShell(
     logName: 'armadillo',
     sizeModel: sizeModel,
-    idleModeBuilder: new IdleModeBuilder(),
-    nowBuilder: new NowBuilder(),
-    recentsBuilder: new RecentsBuilder(),
+    conductorModel: new ConductorModel(),
   ));
 }
 
@@ -71,9 +67,7 @@ Future<Null> main() async {
 Widget buildArmadilloUserShell({
   String logName,
   SizeModel sizeModel,
-  IdleModeBuilder idleModeBuilder,
-  NowBuilder nowBuilder,
-  RecentsBuilder recentsBuilder,
+  ConductorModel conductorModel,
 }) {
   setupLogger(name: logName);
 
@@ -227,9 +221,6 @@ Widget buildArmadilloUserShell({
     onInterruptionDismissed:
         suggestionProviderSuggestionModel.onInterruptionDismissal,
     onUserContextTapped: armadilloUserShellModel.onUserContextTapped,
-    idleModeBuilder: idleModeBuilder,
-    nowBuilder: nowBuilder,
-    recentsBuilder: recentsBuilder,
   );
 
   DebugModel debugModel = new DebugModel();
@@ -253,6 +244,10 @@ Widget buildArmadilloUserShell({
       debugModel: debugModel,
       armadillo: new Armadillo(
         scopedModelBuilders: <WrapperBuilder>[
+          (_, Widget child) => new ScopedModel<ConductorModel>(
+                model: conductorModel,
+                child: child,
+              ),
           (_, Widget child) => new ScopedModel<PowerModel>(
                 model: powerModel,
                 child: child,
