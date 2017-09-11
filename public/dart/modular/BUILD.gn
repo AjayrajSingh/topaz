@@ -10,7 +10,7 @@ dart_package("lib.modular") {
   analysis_options = "analysis_options.yaml"
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/modular/services/agent:agent_dart",
     "//apps/modular/services/device:device_dart",
     "//apps/modular/services/lifecycle:lifecycle_dart",

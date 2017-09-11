@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:application.lib.app.dart/app.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:flutter/widgets.dart';

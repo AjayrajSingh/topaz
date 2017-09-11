@@ -5,8 +5,8 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:application.lib.app.dart/app.dart';
-import 'package:application.services/service_provider.fidl.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:apps.modular.services.agent/agent.fidl.dart';
 import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
 import 'package:apps.modular.services.agent/agent_context.fidl.dart';
@@ -15,7 +15,7 @@ import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:meta/meta.dart';
 
-export 'package:application.lib.app.dart/app.dart';
+export 'package:lib.app.dart/app.dart';
 export 'package:apps.modular.services.agent/agent.fidl.dart';
 export 'package:apps.modular.services.agent/agent_context.fidl.dart';
 export 'package:apps.modular.services.auth/token_provider.fidl.dart';
