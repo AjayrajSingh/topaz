@@ -9,7 +9,7 @@ dart_app("contacts_content_provider") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//application/lib/app/dart",
+    "//garnet/public/lib/app/dart",
     "//apps/modules/contacts/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
   ]
