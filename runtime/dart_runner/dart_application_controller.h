@@ -11,7 +11,7 @@
 #include "lib/app/fidl/application_runner.fidl.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/fidl/cpp/bindings/binding.h"
-#include "lib/ftl/macros.h"
+#include "lib/fxl/macros.h"
 
 namespace dart_content_handler {
 
@@ -56,7 +56,7 @@ class DartApplicationController : public app::ApplicationController {
   int32_t return_code_ = 0;
   std::vector<WaitCallback> wait_callbacks_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(DartApplicationController);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartApplicationController);
 };
 
 }  // namespace dart_content_handler

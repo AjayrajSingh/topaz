@@ -10,15 +10,15 @@
 
 #include "apps/dart_content_handler/embedder/snapshot.h"
 #include "dart/runtime/include/dart_api.h"
-#include "lib/ftl/arraysize.h"
-#include "lib/ftl/command_line.h"
-#include "lib/ftl/files/directory.h"
-#include "lib/ftl/files/eintr_wrapper.h"
-#include "lib/ftl/files/file.h"
-#include "lib/ftl/files/file_descriptor.h"
-#include "lib/ftl/files/symlink.h"
-#include "lib/ftl/files/unique_fd.h"
-#include "lib/ftl/logging.h"
+#include "lib/fxl/arraysize.h"
+#include "lib/fxl/command_line.h"
+#include "lib/fxl/files/directory.h"
+#include "lib/fxl/files/eintr_wrapper.h"
+#include "lib/fxl/files/file.h"
+#include "lib/fxl/files/file_descriptor.h"
+#include "lib/fxl/files/symlink.h"
+#include "lib/fxl/files/unique_fd.h"
+#include "lib/fxl/logging.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/file_loader/file_loader.h"
 
@@ -84,22 +84,22 @@ class DartScope {
 };
 
 void InitDartVM() {
-  FTL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
+  FXL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
   Dart_InitializeParams params = {};
   params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
   params.vm_snapshot_data = dart_content_handler::vm_isolate_snapshot_buffer;
   char* error = Dart_Initialize(&params);
   if (error)
-    FTL_LOG(FATAL) << error;
+    FXL_LOG(FATAL) << error;
 }
 
 Dart_Isolate CreateDartIsolate() {
-  FTL_CHECK(dart_content_handler::isolate_snapshot_buffer);
+  FXL_CHECK(dart_content_handler::isolate_snapshot_buffer);
   char* error = nullptr;
   Dart_Isolate isolate = Dart_CreateIsolate(
       "dart:snapshot", "main", dart_content_handler::isolate_snapshot_buffer,
       nullptr, nullptr, nullptr, &error);
-  FTL_CHECK(isolate) << error;
+  FXL_CHECK(isolate) << error;
   Dart_ExitIsolate();
   return isolate;
 }
@@ -115,8 +115,8 @@ tonic::FileLoader& GetLoader() {
 Dart_Handle HandleLibraryTag(Dart_LibraryTag tag,
                              Dart_Handle library,
                              Dart_Handle url) {
-  FTL_CHECK(Dart_IsLibrary(library));
-  FTL_CHECK(Dart_IsString(url));
+  FXL_CHECK(Dart_IsLibrary(library));
+  FXL_CHECK(Dart_IsString(url));
   tonic::FileLoader& loader = GetLoader();
   if (tag == Dart_kCanonicalizeUrl)
     return loader.CanonicalizeURL(library, url);
@@ -207,7 +207,7 @@ bool WriteDepfile(const std::string& path,
   std::string output = build_output + ":";
   for (const auto& dep : deps) {
     std::string file = dep;
-    FTL_DCHECK(!file.empty());
+    FXL_DCHECK(!file.empty());
     if (file[0] != '/')
       file = current_directory + "/" + file;
 
@@ -225,7 +225,7 @@ int CreateAOTVMSnapshot(std::string snapshot_path) {
   InitDartVM();
 
   Dart_Isolate isolate = CreateDartIsolate();
-  FTL_CHECK(isolate) << "Failed to create isolate.";
+  FXL_CHECK(isolate) << "Failed to create isolate.";
 
   DartScope scope(isolate);
 
@@ -244,7 +244,7 @@ int CreateAOTVMSnapshot(std::string snapshot_path) {
   return 0;
 }
 
-int CreateSnapshot(const ftl::CommandLine& command_line) {
+int CreateSnapshot(const fxl::CommandLine& command_line) {
   if (command_line.HasOption(kHelp, nullptr)) {
     Usage();
     return 0;
@@ -299,7 +299,7 @@ int CreateSnapshot(const ftl::CommandLine& command_line) {
     return 1;
 
   Dart_Isolate isolate = CreateDartIsolate();
-  FTL_CHECK(isolate) << "Failed to create isolate.";
+  FXL_CHECK(isolate) << "Failed to create isolate.";
 
   DartScope scope(isolate);
 
@@ -331,5 +331,5 @@ int CreateSnapshot(const ftl::CommandLine& command_line) {
 
 int main(int argc, const char* argv[]) {
   return dart_snapshotter::CreateSnapshot(
-      ftl::CommandLineFromArgcArgv(argc, argv));
+      fxl::CommandLineFromArgcArgv(argc, argv));
 }

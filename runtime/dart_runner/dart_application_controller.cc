@@ -14,9 +14,9 @@
 #include "lib/app/cpp/application_context.h"
 #include "apps/dart_content_handler/builtin_libraries.h"
 #include "lib/fidl/cpp/bindings/string.h"
-#include "lib/ftl/arraysize.h"
-#include "lib/ftl/logging.h"
-#include "lib/ftl/synchronization/mutex.h"
+#include "lib/fxl/arraysize.h"
+#include "lib/fxl/logging.h"
+#include "lib/fxl/synchronization/mutex.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_message_handler.h"
@@ -73,7 +73,7 @@ bool DartApplicationController::CreateIsolate() {
                                 isolate_snapshot_instructions_, nullptr, state,
                                 &error);
   if (!isolate_) {
-    FTL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
+    FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
     return false;
   }
 
@@ -96,7 +96,7 @@ mxio_ns_t* DartApplicationController::SetupNamespace() {
   const app::FlatNamespacePtr& flat = startup_info_->flat_namespace;
   mx_status_t status = mxio_ns_create(&mxio_namespc);
   if (status != MX_OK) {
-    FTL_LOG(ERROR) << "Failed to create namespace";
+    FXL_LOG(ERROR) << "Failed to create namespace";
     return nullptr;
   }
   for (size_t i = 0; i < flat->paths.size(); ++i) {
@@ -109,7 +109,7 @@ mxio_ns_t* DartApplicationController::SetupNamespace() {
     const char* path = flat->paths[i].data();
     status = mxio_ns_bind(mxio_namespc, path, dir_handle);
     if (status != MX_OK) {
-      FTL_LOG(ERROR) << "Failed to bind " << flat->paths[i] << " to namespace";
+      FXL_LOG(ERROR) << "Failed to bind " << flat->paths[i] << " to namespace";
       mx_handle_close(dir_handle);
       mxio_ns_destroy(mxio_namespc);
       return nullptr;
@@ -164,7 +164,7 @@ bool DartApplicationController::Main() {
 
   Dart_Handle dart_arguments = Dart_NewList(arguments.size());
   if (Dart_IsError(dart_arguments)) {
-    FTL_LOG(ERROR) << "Failed to allocate Dart arguments list";
+    FXL_LOG(ERROR) << "Failed to allocate Dart arguments list";
     Dart_ExitScope();
     return false;
   }
@@ -180,7 +180,7 @@ bool DartApplicationController::Main() {
   Dart_Handle main =
       Dart_Invoke(root_library, ToDart("main"), arraysize(argv), argv);
   if (Dart_IsError(main)) {
-    FTL_LOG(ERROR) << Dart_GetError(main);
+    FXL_LOG(ERROR) << Dart_GetError(main);
     Dart_ExitScope();
     return false;
   }
@@ -206,7 +206,7 @@ void DartApplicationController::Kill() {
 }
 
 void DartApplicationController::Detach() {
-  binding_.set_connection_error_handler(ftl::Closure());
+  binding_.set_connection_error_handler(fxl::Closure());
 }
 
 void DartApplicationController::Wait(const WaitCallback& callback) {

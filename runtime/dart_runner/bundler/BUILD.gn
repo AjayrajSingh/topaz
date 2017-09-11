@@ -12,6 +12,6 @@ executable("bundler") {
   libs = [ "pthread" ]
 
   deps = [
-    "//garnet/public/lib/ftl",
+    "//garnet/public/lib/fxl",
   ]
 }

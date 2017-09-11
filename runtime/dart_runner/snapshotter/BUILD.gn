@@ -23,7 +23,7 @@ executable("snapshotter") {
 
   deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
-    "//garnet/public/lib/ftl",
+    "//garnet/public/lib/fxl",
     "//lib/tonic/converter",
     "//lib/tonic/file_loader",
   ] + dart_deps
@@ -54,7 +54,7 @@ executable("aot_snapshotter") {
 
   deps = [
     "//apps/dart_content_handler/embedder:dart_snapshot_cc",
-    "//garnet/public/lib/ftl",
+    "//garnet/public/lib/fxl",
     "//lib/tonic/converter",
     "//lib/tonic/file_loader",
   ] + dart_deps

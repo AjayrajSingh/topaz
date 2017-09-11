@@ -5,7 +5,7 @@
 #ifndef APPS_DART_CONTENT_HANDLER_APPLICATION_RUNNER_IMPL_H_
 #define APPS_DART_CONTENT_HANDLER_APPLICATION_RUNNER_IMPL_H_
 
-#include "lib/ftl/macros.h"
+#include "lib/fxl/macros.h"
 #include "lib/fidl/cpp/bindings/binding.h"
 #include "lib/app/fidl/application_runner.fidl.h"
 
@@ -26,7 +26,7 @@ class ApplicationRunnerImpl : public app::ApplicationRunner {
 
   fidl::Binding<app::ApplicationRunner> binding_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(ApplicationRunnerImpl);
+  FXL_DISALLOW_COPY_AND_ASSIGN(ApplicationRunnerImpl);
 };
 
 }  // namespace dart_content_handler

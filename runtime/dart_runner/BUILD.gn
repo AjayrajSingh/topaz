@@ -49,7 +49,7 @@ template("runner") {
              "//garnet/public/lib/app/cpp",
              "//garnet/public/lib/svc/cpp",
              "//garnet/public/dart-pkg/fuchsia",
-             "//garnet/public/lib/ftl",
+             "//garnet/public/lib/fxl",
              "//garnet/public/lib/mtl",
              "//lib/tonic",
            ] + dart_deps + extra_deps

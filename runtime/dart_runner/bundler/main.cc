@@ -8,15 +8,15 @@
 #include <set>
 #include <string>
 
-#include "lib/ftl/arraysize.h"
-#include "lib/ftl/command_line.h"
-#include "lib/ftl/files/directory.h"
-#include "lib/ftl/files/eintr_wrapper.h"
-#include "lib/ftl/files/file.h"
-#include "lib/ftl/files/file_descriptor.h"
-#include "lib/ftl/files/symlink.h"
-#include "lib/ftl/files/unique_fd.h"
-#include "lib/ftl/logging.h"
+#include "lib/fxl/arraysize.h"
+#include "lib/fxl/command_line.h"
+#include "lib/fxl/files/directory.h"
+#include "lib/fxl/files/eintr_wrapper.h"
+#include "lib/fxl/files/file.h"
+#include "lib/fxl/files/file_descriptor.h"
+#include "lib/fxl/files/symlink.h"
+#include "lib/fxl/files/unique_fd.h"
+#include "lib/fxl/logging.h"
 
 namespace dart_snapshotter {
 namespace {
@@ -42,23 +42,23 @@ bool WriteBundle(const std::string& path,
                  const std::string& interpreter_line,
                  const char* payload,
                  size_t size) {
-  ftl::UniqueFD fd(HANDLE_EINTR(creat(path.c_str(), 0666)));
+  fxl::UniqueFD fd(HANDLE_EINTR(creat(path.c_str(), 0666)));
   if (!fd.is_valid())
     return false;
-  bool success = ftl::WriteFileDescriptor(fd.get(), interpreter_line.c_str(),
+  bool success = fxl::WriteFileDescriptor(fd.get(), interpreter_line.c_str(),
                                           interpreter_line.length());
   // page align the start of the payload for easy mapping in the content
   // handler.
   const intptr_t pagesize = getpagesize();
   char* padding = new char[pagesize];
   success =
-      success && ftl::WriteFileDescriptor(fd.get(), padding,
+      success && fxl::WriteFileDescriptor(fd.get(), padding,
                                           pagesize - interpreter_line.length());
   delete[] padding;
-  return success && ftl::WriteFileDescriptor(fd.get(), payload, size);
+  return success && fxl::WriteFileDescriptor(fd.get(), payload, size);
 }
 
-int CreateBundle(const ftl::CommandLine& command_line) {
+int CreateBundle(const fxl::CommandLine& command_line) {
   if (command_line.HasOption(kHelp, nullptr)) {
     Usage();
     return 0;
@@ -103,5 +103,5 @@ int CreateBundle(const ftl::CommandLine& command_line) {
 
 int main(int argc, const char* argv[]) {
   return dart_snapshotter::CreateBundle(
-      ftl::CommandLineFromArgcArgv(argc, argv));
+      fxl::CommandLineFromArgcArgv(argc, argv));
 }

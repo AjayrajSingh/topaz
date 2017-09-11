@@ -14,7 +14,7 @@
 #include "apps/dart_content_handler/dart_application_controller.h"
 #include "apps/dart_content_handler/embedder/snapshot.h"
 #include "dart/runtime/bin/embedded_dart_io.h"
-#include "lib/ftl/arraysize.h"
+#include "lib/fxl/arraysize.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "lib/mtl/vmo/vector.h"
 #include "lib/tonic/dart_microtask_queue.h"
@@ -61,7 +61,7 @@ bool ExtractSnapshots(const mx::vmo& bundle,
   uint64_t bundle_size;
   status = bundle.get_size(&bundle_size);
   if (status != MX_OK) {
-    FTL_LOG(ERROR) << "bundle.get_size() failed: "
+    FXL_LOG(ERROR) << "bundle.get_size() failed: "
                    << mx_status_get_string(status);
     return false;
   }
@@ -71,7 +71,7 @@ bool ExtractSnapshots(const mx::vmo& bundle,
   status = bundle.clone(MX_VMO_CLONE_COPY_ON_WRITE | MX_RIGHT_EXECUTE, pagesize,
                         bundle_size - pagesize, &dylib_vmo);
   if (status != MX_OK) {
-    FTL_LOG(ERROR) << "bundle.clone() failed: " << mx_status_get_string(status);
+    FXL_LOG(ERROR) << "bundle.clone() failed: " << mx_status_get_string(status);
     return false;
   }
 
@@ -80,20 +80,20 @@ bool ExtractSnapshots(const mx::vmo& bundle,
   // TODO(rmacnak): It is currently not safe to unload this library when the
   // isolate shuts down because it may be backing part of the vm isolate's heap.
   if (lib == NULL) {
-    FTL_LOG(ERROR) << "dlopen failed: " << dlerror();
+    FXL_LOG(ERROR) << "dlopen failed: " << dlerror();
     return false;
   }
 
   isolate_snapshot_data =
       reinterpret_cast<const uint8_t*>(dlsym(lib, "_kDartIsolateSnapshotData"));
   if (isolate_snapshot_data == NULL) {
-    FTL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotData) failed: " << dlerror();
+    FXL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotData) failed: " << dlerror();
     return false;
   }
   isolate_snapshot_instructions = reinterpret_cast<const uint8_t*>(
       dlsym(lib, "_kDartIsolateSnapshotInstructions"));
   if (isolate_snapshot_instructions == NULL) {
-    FTL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotInstructions) failed: "
+    FXL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotInstructions) failed: "
                    << dlerror();
     return false;
   }
@@ -115,7 +115,7 @@ bool ExtractSnapshots(const mx::vmo& bundle,
   uint64_t bundle_size;
   status = bundle.get_size(&bundle_size);
   if (status != MX_OK) {
-    FTL_LOG(ERROR) << "bundle.get_size() failed: "
+    FXL_LOG(ERROR) << "bundle.get_size() failed: "
                    << mx_status_get_string(status);
     return false;
   }
@@ -125,7 +125,7 @@ bool ExtractSnapshots(const mx::vmo& bundle,
   status = mx::vmar::root_self().map(
       0, bundle, pagesize, bundle_size - pagesize, MX_VM_FLAG_PERM_READ, &addr);
   if (status != MX_OK) {
-    FTL_LOG(ERROR) << "bundle map failed: " << mx_status_get_string(status);
+    FXL_LOG(ERROR) << "bundle map failed: " << mx_status_get_string(status);
     return false;
   }
 
@@ -194,7 +194,7 @@ ApplicationRunnerImpl::ApplicationRunnerImpl(
   dart::bin::BootstrapDartIo();
 
   // TODO(abarth): Make checked mode configurable.
-  FTL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
+  FXL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
 
   Dart_InitializeParams params = {};
   params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
@@ -209,13 +209,13 @@ ApplicationRunnerImpl::ApplicationRunnerImpl(
   params.cleanup = IsolateCleanupCallback;
   char* error = Dart_Initialize(&params);
   if (error)
-    FTL_LOG(FATAL) << "Dart_Initialize failed: " << error;
+    FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
 }
 
 ApplicationRunnerImpl::~ApplicationRunnerImpl() {
   char* error = Dart_Cleanup();
   if (error)
-    FTL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
+    FXL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
 }
 
 void ApplicationRunnerImpl::StartApplication(

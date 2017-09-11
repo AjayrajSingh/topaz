@@ -8,7 +8,7 @@
 #include "lib/app/cpp/connect.h"
 #include "lib/app/fidl/application_runner.fidl.h"
 #include "apps/dart_content_handler/application_runner_impl.h"
-#include "lib/ftl/macros.h"
+#include "lib/fxl/macros.h"
 #include "lib/mtl/tasks/message_loop.h"
 
 namespace dart_content_handler {
@@ -25,7 +25,7 @@ class App {
 
  private:
   std::unique_ptr<app::ApplicationContext> context_;
-  FTL_DISALLOW_COPY_AND_ASSIGN(App);
+  FXL_DISALLOW_COPY_AND_ASSIGN(App);
 };
 
 }  // namespace

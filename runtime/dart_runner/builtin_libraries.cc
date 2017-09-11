@@ -10,8 +10,8 @@
 #include "dart/runtime/bin/io_natives.h"
 #include "dart/runtime/include/dart_api.h"
 #include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"
-#include "lib/ftl/arraysize.h"
-#include "lib/ftl/logging.h"
+#include "lib/fxl/arraysize.h"
+#include "lib/fxl/logging.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_microtask_queue.h"
@@ -43,8 +43,8 @@ Dart_NativeFunction BuiltinNativeLookup(Dart_Handle name,
                                         bool* auto_setup_scope) {
   const char* function_name = nullptr;
   DART_CHECK_VALID(Dart_StringToCString(name, &function_name));
-  FTL_DCHECK(function_name != nullptr);
-  FTL_DCHECK(auto_setup_scope != nullptr);
+  FXL_DCHECK(function_name != nullptr);
+  FXL_DCHECK(auto_setup_scope != nullptr);
   *auto_setup_scope = true;
   size_t num_entries = arraysize(kBuiltinEntries);
   for (size_t i = 0; i < num_entries; i++) {
