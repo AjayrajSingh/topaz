@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -12,6 +14,7 @@ import 'panel_drag_targets.dart';
 
 const double _kDirectionMinSpeed = 100.0;
 const Duration _kMinLockDuration = const Duration(milliseconds: 500);
+const double _kMaxLockVelocityMagnitude = 500.0;
 
 /// Once a drag target is chosen, this is the distance a draggable must travel
 /// before new drag targets are considered.
@@ -39,6 +42,9 @@ class CandidateInfo {
   DateTime _timestamp;
   VelocityTracker _velocityTracker;
   DragDirection _lastDragDirection = DragDirection.none;
+  Completer<bool> _requestCompleter;
+  Timer _requestTimer;
+  PanelDragTarget _requestTarget;
 
   /// Constructor.
   CandidateInfo({
@@ -66,6 +72,9 @@ class CandidateInfo {
     );
   }
 
+  /// Returns the candidate's velocity.
+  Velocity get velocity => _velocityTracker?.getVelocity() ?? Velocity.zero;
+
   /// The candidate can lock to target closest to the candidate if the candidate:
   /// 1) is new, or
   /// 2) is old, and
@@ -76,7 +85,54 @@ class CandidateInfo {
   bool canLock(PanelDragTarget closestTarget, Offset storyClusterPoint) =>
       _hasNewPotentialTarget(closestTarget) &&
       _hasMovedPastThreshold(storyClusterPoint) &&
-      _hasNotChangedRecently();
+      _hasNotChangedRecently() &&
+      _isNotMovingQuickly();
+
+  /// Requests a lock.
+  Future<bool> requestLock(
+    PanelDragTarget closestTarget,
+    Offset storyClusterPoint,
+  ) {
+    // If we're requesting and the target has changed cancel the request.
+    if (_requestCompleter != null && _requestTarget != closestTarget) {
+      dispose();
+    }
+
+    // If we still have an active request for this target, complete previous
+    // request with false but maintain timer.
+    if (_requestCompleter != null) {
+      _requestCompleter.complete(false);
+      _requestCompleter = new Completer<bool>();
+      return _requestCompleter.future;
+    }
+
+    // If we can't lock to this target, complete with false immediately.
+    if (!canLock(closestTarget, storyClusterPoint)) {
+      Completer<bool> completer = new Completer<bool>();
+      completer.complete(false);
+      return completer.future;
+    }
+
+    // We can lock to this target start a timer.
+    _requestCompleter = new Completer<bool>();
+    _requestTarget = closestTarget;
+    _requestTimer = new Timer(const Duration(milliseconds: 200), () {
+      _requestCompleter.complete(canLock(closestTarget, storyClusterPoint));
+      _requestCompleter = null;
+      _requestTimer = null;
+    });
+
+    return _requestCompleter.future;
+  }
+
+  /// Cancels any existing timers.
+  void dispose() {
+    _requestCompleter?.complete(false);
+    _requestCompleter = null;
+    _requestTimer?.cancel();
+    _requestTimer = null;
+    _requestTarget = null;
+  }
 
   /// Locks the candidate to [closestTarget] at the given [lockPoint].
   void lock(Offset lockPoint, PanelDragTarget closestTarget) {
@@ -130,8 +186,12 @@ class CandidateInfo {
       _timestamp == null ||
       timestampEmitter().subtract(minLockDuration).isAfter(_timestamp);
 
+  bool _isNotMovingQuickly() =>
+      velocity.pixelsPerSecond.distance <= _kMaxLockVelocityMagnitude;
+
   /// Turns a [CandidateInfo] into an [Offset] using the candidate's lock point.
-  static Offset toPoint(CandidateInfo candidateInfo) => candidateInfo._lockPoint;
+  static Offset toPoint(CandidateInfo candidateInfo) =>
+      candidateInfo._lockPoint;
 
   static DateTime _defaultTimestampEmitter() => new DateTime.now();
 }

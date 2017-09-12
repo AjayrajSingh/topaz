@@ -454,6 +454,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
     _trackedCandidates.keys.toList().forEach((StoryClusterId storyClusterId) {
       if (candidates.keys
           .every((StoryClusterDragData data) => data.id != storyClusterId)) {
+        _trackedCandidates[storyClusterId].dispose();
         _trackedCandidates.remove(storyClusterId);
 
         panelEventHandler.onCandidateRemoved();
@@ -483,14 +484,18 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
         candidateInfo.closestTarget == null,
       );
 
-      if (candidateInfo.canLock(closestTarget, storyClusterPoint)) {
-        _lockClosestTarget(
-          candidateInfo: candidateInfo,
-          storyCluster: storyCluster,
-          point: storyClusterPoint,
-          closestTarget: closestTarget,
-        );
-      }
+      candidateInfo
+          .requestLock(closestTarget, storyClusterPoint)
+          .then((bool requestGranted) {
+        if (requestGranted) {
+          _lockClosestTarget(
+            candidateInfo: candidateInfo,
+            storyCluster: storyCluster,
+            point: storyClusterPoint,
+            closestTarget: closestTarget,
+          );
+        }
+      });
     });
   }
 
