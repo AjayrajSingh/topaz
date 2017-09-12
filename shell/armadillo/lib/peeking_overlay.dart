@@ -140,69 +140,71 @@ class PeekingOverlayState extends TickingDoubleState<PeekingOverlay> {
   }
 
   @override
-  Widget build(BuildContext context) => new ScopedModelDescendant<PeekModel>(
-        builder: (BuildContext context, Widget child, PeekModel model) {
-          // This triggers the height animation for this overlay if peek has
-          // changed.
-          _setPeeking(model.peek);
-          return child;
-        },
-        child: new Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            new Offstage(
-              offstage: hiding,
-              child: new Listener(
-                onPointerUp: (_) => hide(),
-                behavior: HitTestBehavior.opaque,
-              ),
-            ),
-            new Positioned(
-              left: 0.0,
-              right: 0.0,
-              bottom: 0.0,
-              height: value,
-              child: new ScopedModelDescendant<SizeModel>(
-                builder: (
-                  BuildContext context,
-                  Widget child,
-                  SizeModel sizeModel,
-                ) {
-                  // Set maxHeight appropriately.
-                  double targetMaxHeight = sizeModel.suggestionExpandedHeight;
-                  if (maxValue != targetMaxHeight && targetMaxHeight != 0.0) {
-                    maxValue = targetMaxHeight;
-                    if (!hiding || sizeModel.autoExpandSuggestion) {
-                      show();
-                    }
-                  }
-
-                  return new _HorizontalExpandingBox(
-                    width: sizeModel.suggestionListWidth,
-                    height: math.max(value, maxValue),
-                    child: child,
-                  );
-                },
-                child: new Stack(
-                  fit: StackFit.passthrough,
-                  children: <Widget>[
-                    widget.child,
-                    new Positioned(
-                      top: 0.0,
-                      left: 0.0,
-                      right: 0.0,
-                      height:
-                          hiding ? widget.peekHeight : widget.dragHandleHeight,
-                      child: new GestureDetector(
-                        onVerticalDragUpdate: onVerticalDragUpdate,
-                        onVerticalDragEnd: onVerticalDragEnd,
-                      ),
-                    ),
-                  ],
+  Widget build(BuildContext context) => new Offstage(
+        offstage: value == 0.0,
+        child: new ScopedModelDescendant<PeekModel>(
+          builder: (BuildContext context, Widget child, PeekModel model) {
+            // This triggers the height animation for this overlay if peek has
+            // changed.
+            _setPeeking(model.peek);
+            return child;
+          },
+          child: new Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              new Offstage(
+                offstage: hiding,
+                child: new Listener(
+                  onPointerUp: (_) => hide(),
+                  behavior: HitTestBehavior.opaque,
                 ),
               ),
-            ),
-          ],
+              new Positioned(
+                left: 0.0,
+                right: 0.0,
+                bottom: -widget.peekHeight,
+                height: value +
+                    (math.min(widget.peekHeight, value) / widget.peekHeight) *
+                        widget.peekHeight,
+                child: new ScopedModelDescendant<SizeModel>(
+                  builder: (_, Widget child, SizeModel sizeModel) {
+                    // Set maxHeight appropriately.
+                    double targetMaxHeight = sizeModel.suggestionExpandedHeight;
+                    if (maxValue != targetMaxHeight && targetMaxHeight != 0.0) {
+                      maxValue = targetMaxHeight;
+                      if (!hiding || sizeModel.autoExpandSuggestion) {
+                        show();
+                      }
+                    }
+
+                    return new _HorizontalExpandingBox(
+                      width: sizeModel.suggestionListWidth,
+                      height: math.max(value, maxValue),
+                      child: child,
+                    );
+                  },
+                  child: new Stack(
+                    fit: StackFit.passthrough,
+                    children: <Widget>[
+                      widget.child,
+                      new Positioned(
+                        top: 0.0,
+                        left: 0.0,
+                        right: 0.0,
+                        height: hiding
+                            ? widget.peekHeight
+                            : widget.dragHandleHeight,
+                        child: new GestureDetector(
+                          onVerticalDragUpdate: onVerticalDragUpdate,
+                          onVerticalDragEnd: onVerticalDragEnd,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
 }
