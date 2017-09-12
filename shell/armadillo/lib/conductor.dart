@@ -37,49 +37,51 @@ class ConductorState extends State<Conductor> {
       new ScopedModelDescendant<ConductorModel>(
         builder: (_, __, ConductorModel conductorModel) =>
             new ScopedModelDescendant<SizeModel>(
-              builder: (_, __, SizeModel sizeModel) =>
-                  new ScopedModelDescendant<IdleModel>(
-                    builder: (
-                      BuildContext context,
-                      Widget child,
-                      IdleModel idleModel,
-                    ) =>
-                        new Transform(
-                          transform: new Matrix4.translationValues(
-                            lerpDouble(
-                              0.0,
-                              sizeModel.screenSize.width,
-                              idleModel.value,
-                            ),
+              builder: (_, __, SizeModel sizeModel) {
+                double idleModeOffset = sizeModel.screenSize.width * 1.5;
+                return new ScopedModelDescendant<IdleModel>(
+                  builder: (
+                    BuildContext context,
+                    Widget child,
+                    IdleModel idleModel,
+                  ) =>
+                      new Transform(
+                        transform: new Matrix4.translationValues(
+                          lerpDouble(
                             0.0,
-                            0.0,
+                            idleModeOffset,
+                            idleModel.value,
                           ),
-                          child: new Stack(
-                            overflow: Overflow.visible,
-                            children: <Widget>[
-                              new Positioned.fill(
-                                child: new Offstage(
-                                  offstage: idleModel.value == 1.0,
-                                  child: child,
-                                ),
-                              ),
-                              new Positioned(
-                                top: 0.0,
-                                left: -sizeModel.screenSize.width,
-                                width: sizeModel.screenSize.width,
-                                height: sizeModel.screenSize.height,
-                                child: new Offstage(
-                                  offstage: idleModel.value == 0.0,
-                                  child: conductorModel.idleModeBuilder.build(
-                                    context,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                          0.0,
+                          0.0,
                         ),
-                    child: _buildParts(context, conductorModel),
-                  ),
+                        child: new Stack(
+                          overflow: Overflow.visible,
+                          children: <Widget>[
+                            new Positioned.fill(
+                              child: new Offstage(
+                                offstage: idleModel.value == 1.0,
+                                child: child,
+                              ),
+                            ),
+                            new Positioned(
+                              top: 0.0,
+                              left: -idleModeOffset,
+                              width: sizeModel.screenSize.width,
+                              height: sizeModel.screenSize.height,
+                              child: new Offstage(
+                                offstage: idleModel.value == 0.0,
+                                child: conductorModel.idleModeBuilder.build(
+                                  context,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  child: _buildParts(context, conductorModel),
+                );
+              },
             ),
       );
 
