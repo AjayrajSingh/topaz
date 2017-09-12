@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:isolate';
+import 'dart:fuchsia' as fuchsia;
 
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
@@ -117,6 +117,6 @@ class ModuleImpl implements Module, Lifecycle {
     _incomingServiceProviderProxy.ctrl.close();
     _outgoingServiceProviderBinding.close();
     onStop?.call();
-    Isolate.current.kill();
+    fuchsia.exit(0);
   }
 }
