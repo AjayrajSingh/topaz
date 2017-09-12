@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/widgets.dart';
@@ -10,65 +9,19 @@ import 'package:lib.widgets/model.dart';
 
 import 'conductor_model.dart';
 import 'context_model.dart';
-import 'edge_scroll_drag_target.dart';
-import 'expand_suggestion.dart';
-import 'interruption_overlay.dart';
-import 'quick_settings.dart';
 import 'peek_model.dart';
-import 'peeking_overlay.dart';
-import 'selected_suggestion_overlay.dart';
 import 'size_model.dart';
-import 'splash_suggestion.dart';
 import 'story.dart';
 import 'story_cluster.dart';
 import 'story_model.dart';
-import 'suggestion.dart';
-import 'suggestion_list.dart';
 import 'suggestion_model.dart';
-
-const double _kSuggestionOverlayPullScrollOffset = 100.0;
-const double _kSuggestionOverlayScrollFactor = 1.2;
-
-/// Called when an overlay becomes active or inactive.
-typedef void OnOverlayChanged(bool active);
 
 /// Manages the position, size, and state of the story list, user context,
 /// suggestion overlay, device extensions. interruption overlay, and quick
 /// settings overlay.
 class Conductor extends StatefulWidget {
-  /// Called when the quick settings overlay becomes active or inactive.
-  final OnOverlayChanged onQuickSettingsOverlayChanged;
-
-  /// Called when the suggestions overlay becomes active or inactive.
-  final OnOverlayChanged onSuggestionsOverlayChanged;
-
-  /// Called when the user selects log out.
-  final VoidCallback onLogoutSelected;
-
-  /// Called when the user selects log out and clear the ledger.
-  final VoidCallback onClearLedgerSelected;
-
-  /// Called when the user taps the user context.
-  final VoidCallback onUserContextTapped;
-
-  /// The key of the interruption overlay.
-  final GlobalKey<InterruptionOverlayState> interruptionOverlayKey;
-
-  /// Called when an interruption is no longer showing.
-  final OnInterruptionDismissed onInterruptionDismissed;
-
   /// Constructor.
-  Conductor({
-    Key key,
-    this.onQuickSettingsOverlayChanged,
-    this.onSuggestionsOverlayChanged,
-    this.onLogoutSelected,
-    this.onClearLedgerSelected,
-    this.onUserContextTapped,
-    this.interruptionOverlayKey,
-    this.onInterruptionDismissed,
-  })
-      : super(key: key);
+  Conductor({Key key}) : super(key: key);
 
   @override
   ConductorState createState() => new ConductorState();
@@ -76,43 +29,15 @@ class Conductor extends StatefulWidget {
 
 /// Manages the state for [Conductor].
 class ConductorState extends State<Conductor> {
-  final GlobalKey<SuggestionListState> _suggestionListKey =
-      new GlobalKey<SuggestionListState>();
-  final ScrollController _suggestionListScrollController =
-      new ScrollController();
-  final GlobalKey<QuickSettingsOverlayState> _quickSettingsOverlayKey =
-      new GlobalKey<QuickSettingsOverlayState>();
-  final GlobalKey<PeekingOverlayState> _suggestionOverlayKey =
-      new GlobalKey<PeekingOverlayState>();
-  final GlobalKey<EdgeScrollDragTargetState> _edgeScrollDragTargetKey =
-      new GlobalKey<EdgeScrollDragTargetState>();
-
-  final ScrollController _scrollController = new ScrollController();
-
-  /// The key for adding [Suggestion]s to the [SelectedSuggestionOverlay].  This
-  /// is to allow us to animate from a [Suggestion] in an open [SuggestionList]
-  /// to a [Story] focused in the StoryList.
-  final GlobalKey<SelectedSuggestionOverlayState>
-      _selectedSuggestionOverlayKey =
-      new GlobalKey<SelectedSuggestionOverlayState>();
-
-  final FocusScopeNode _conductorFocusNode = new FocusScopeNode();
-  final FocusNode _askFocusNode = new FocusNode();
-
   bool _ignoreNextScrollOffsetChange = false;
-
-  Timer _storyFocusTimer;
+  double _pointerDownY;
 
   @override
   Widget build(BuildContext context) =>
       new ScopedModelDescendant<ConductorModel>(
         builder: (_, __, ConductorModel conductorModel) =>
             new ScopedModelDescendant<SizeModel>(
-              builder: (
-                BuildContext context,
-                Widget child,
-                SizeModel sizeModel,
-              ) =>
+              builder: (_, __, SizeModel sizeModel) =>
                   new ScopedModelDescendant<IdleModel>(
                     builder: (
                       BuildContext context,
@@ -153,18 +78,7 @@ class ConductorState extends State<Conductor> {
                             ],
                           ),
                         ),
-                    child: new Listener(
-                      behavior: HitTestBehavior.translucent,
-                      onPointerDown: (_) {
-                        // TODO: remove this hack when Mozart focus is fixed (MZ-118)
-                        // HACK: Due to a mozart focus issue we need to focus when the mozart
-                        // window this widget is in is first tapped.
-                        if (!_askFocusNode.hasFocus) {
-                          _conductorFocusNode.requestFocus(_askFocusNode);
-                        }
-                      },
-                      child: _buildParts(context, conductorModel),
-                    ),
+                    child: _buildParts(context, conductorModel),
                   ),
             ),
       );
@@ -179,191 +93,89 @@ class ConductorState extends State<Conductor> {
     BuildContext context,
     ConductorModel conductorModel,
   ) =>
-      new FocusScope(
-        autofocus: true,
-        node: _conductorFocusNode,
-        child: new Stack(
-          fit: StackFit.passthrough,
-          children: <Widget>[
-            /// Story List.
-            conductorModel.recentsBuilder.build(
-              context,
-              scrollController: _scrollController,
-              onScroll: (double scrollOffset) {
-                if (_ignoreNextScrollOffsetChange) {
-                  _ignoreNextScrollOffsetChange = false;
-                  return;
-                }
+      new Stack(
+        fit: StackFit.passthrough,
+        children: <Widget>[
+          /// Story List.
+          conductorModel.recentsBuilder.build(
+            context,
+            onScroll: (double scrollOffset) {
+              // Ignore top padding of storylist when looking at scroll offset
+              // to determine Now state.
+              conductorModel.nowBuilder.onRecentsScrollOffsetChanged(
+                scrollOffset + SizeModel.of(context).storyListTopPadding,
+                _ignoreNextScrollOffsetChange,
+              );
 
-                // Ignore top padding of storylist when looking at scroll offset
-                // to determine Now state.
-                conductorModel.nowBuilder.onRecentsScrollOffsetChanged(
-                  scrollOffset + SizeModel.of(context).storyListTopPadding,
-                );
+              if (_ignoreNextScrollOffsetChange) {
+                _ignoreNextScrollOffsetChange = false;
+                return;
+              }
+              conductorModel.nextBuilder.onRecentsScrollOffsetChanged(
+                context,
+                scrollOffset,
+              );
+            },
+            onStoryClusterFocusStarted: () {
+              // Lock scrolling.
+              conductorModel.recentsBuilder.onStoryFocused();
+              _minimizeNow();
+            },
+            onStoryClusterFocusCompleted: (StoryCluster storyCluster) {
+              _focusStoryCluster(storyCluster);
+            },
+            onStoryClusterVerticalEdgeHover: () => goToOrigin(),
+          ),
 
-                // Peak suggestion overlay more when overscrolling.
-                if (scrollOffset < -_kSuggestionOverlayPullScrollOffset &&
-                    _suggestionOverlayKey.currentState.hiding) {
-                  _suggestionOverlayKey.currentState.setValue(
-                    SizeModel.of(context).suggestionPeekHeight -
-                        (scrollOffset + _kSuggestionOverlayPullScrollOffset) *
-                            _kSuggestionOverlayScrollFactor,
-                  );
-                }
-              },
-              onStoryClusterFocusStarted: () {
-                // Lock scrolling.
-                conductorModel.recentsBuilder.onStoryFocused();
-                _edgeScrollDragTargetKey.currentState.disable();
-                _minimizeNow();
-              },
-              onStoryClusterFocusCompleted: (StoryCluster storyCluster) {
-                _focusStoryCluster(storyCluster);
-              },
-              onStoryClusterVerticalEdgeHover: () => goToOrigin(),
-            ),
+          new Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (PointerDownEvent event) {
+              _pointerDownY = event.position.dy;
+            },
+            onPointerUp: (PointerUpEvent event) {
+              // When the user lifts their finger after overscrolling we may
+              // want to snap suggestions open.
+              // We will do so if the overscroll is significant or if the user
+              // lifted after dragging a certain distance.
+              if (conductorModel.recentsBuilder.isSignificantlyOverscrolled(
+                  _pointerDownY - event.position.dy)) {
+                conductorModel.nextBuilder.show();
+              }
+              conductorModel.nowBuilder.onHideQuickSettings();
+            },
+          ),
+          // Now.
+          conductorModel.nowBuilder.build(
+            context,
+            onQuickSettingsProgressChange: (double quickSettingsProgress) =>
+                conductorModel.recentsBuilder
+                    .onQuickSettingsProgressChanged(quickSettingsProgress),
+            onMinimizedTap: () => goToOrigin(),
+            onQuickSettingsMaximized: () {
+              ConductorModel.of(context).recentsBuilder.resetScroll();
+            },
+            onMinimize: () {
+              PeekModel.of(context).nowMinimized = true;
+              conductorModel.nextBuilder.hide();
+            },
+            onMaximize: () {
+              PeekModel.of(context).nowMinimized = false;
+              conductorModel.nextBuilder.hide();
+            },
+            onBarVerticalDragUpdate: (DragUpdateDetails details) =>
+                conductorModel.nextBuilder.onNowBarVerticalDragUpdate(details),
+            onBarVerticalDragEnd: (DragEndDetails details) =>
+                conductorModel.nextBuilder.onNowBarVerticalDragEnd(details),
+            onMinimizedContextTapped: () => conductorModel.nextBuilder.show(),
+          ),
 
-            // Now.
-            conductorModel.nowBuilder.build(
-              context,
-              onQuickSettingsProgressChange: (double quickSettingsProgress) =>
-                  conductorModel.recentsBuilder
-                      .onQuickSettingsProgressChanged(quickSettingsProgress),
-              onMinimizedTap: () => goToOrigin(),
-              onMinimizedLongPress: () =>
-                  _quickSettingsOverlayKey.currentState.show(),
-              onQuickSettingsMaximized: () {
-                // When quick settings starts being shown, scroll to 0.0.
-                _scrollController.animateTo(
-                  0.0,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.fastOutSlowIn,
-                );
-              },
-              onMinimize: () {
-                PeekModel.of(context).nowMinimized = true;
-                _suggestionOverlayKey.currentState.hide();
-              },
-              onMaximize: () {
-                PeekModel.of(context).nowMinimized = false;
-                _suggestionOverlayKey.currentState.hide();
-              },
-              onBarVerticalDragUpdate: (DragUpdateDetails details) =>
-                  _suggestionOverlayKey.currentState
-                      .onVerticalDragUpdate(details),
-              onBarVerticalDragEnd: (DragEndDetails details) =>
-                  _suggestionOverlayKey.currentState.onVerticalDragEnd(details),
-              onOverscrollThresholdRelease: () =>
-                  _suggestionOverlayKey.currentState.show(),
-              scrollController: _scrollController,
-              onLogoutSelected: widget.onLogoutSelected,
-              onClearLedgerSelected: widget.onClearLedgerSelected,
-              onUserContextTapped: widget.onUserContextTapped,
-              onMinimizedContextTapped: () =>
-                  _suggestionOverlayKey.currentState.show(),
-            ),
-
-            // Suggestions Overlay.
-            _getSuggestionOverlay(),
-
-            // Selected Suggestion Overlay.
-            // This is only visible in transitoning the user from a Suggestion
-            // in an open SuggestionList to a focused Story in the StoryList.
-            new SelectedSuggestionOverlay(
-              key: _selectedSuggestionOverlayKey,
-            ),
-
-            // Interruption Overlay.
-            new InterruptionOverlay(
-              key: widget.interruptionOverlayKey,
-              onSuggestionSelected: _onSuggestionSelected,
-              onInterruptionDismissed: widget.onInterruptionDismissed,
-            ),
-
-            // Quick Settings Overlay.
-            new QuickSettingsOverlay(
-              key: _quickSettingsOverlayKey,
-              onProgressChanged: (double progress) {
-                if (progress == 0.0) {
-                  widget.onQuickSettingsOverlayChanged?.call(false);
-                } else {
-                  widget.onQuickSettingsOverlayChanged?.call(true);
-                }
-              },
-              onLogoutSelected: widget.onLogoutSelected,
-              onClearLedgerSelected: widget.onClearLedgerSelected,
-            ),
-
-            // Top and bottom edge scrolling drag targets.
-            new Positioned.fill(
-              child: new EdgeScrollDragTarget(
-                key: _edgeScrollDragTargetKey,
-                scrollController: _scrollController,
-              ),
-            ),
-          ],
-        ),
+          // Suggestions Overlay.
+          conductorModel.nextBuilder.build(
+            context,
+            onMinimizeNow: _minimizeNow,
+          ),
+        ],
       );
-
-  Widget _getSuggestionOverlay() => new ScopedModelDescendant<SizeModel>(
-        builder: (
-          BuildContext context,
-          Widget child,
-          SizeModel sizeModel,
-        ) =>
-            new PeekingOverlay(
-              key: _suggestionOverlayKey,
-              peekHeight: sizeModel.suggestionPeekHeight,
-              dragHandleHeight: sizeModel.askHeight,
-              onHide: () {
-                widget.onSuggestionsOverlayChanged?.call(false);
-                if (_suggestionListScrollController.hasClients) {
-                  _suggestionListScrollController.animateTo(
-                    0.0,
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.fastOutSlowIn,
-                  );
-                }
-                _suggestionListKey.currentState?.stopAsking();
-              },
-              onShow: () {
-                widget.onSuggestionsOverlayChanged?.call(true);
-              },
-              child: new SuggestionList(
-                key: _suggestionListKey,
-                scrollController: _suggestionListScrollController,
-                onAskingStarted: () {
-                  _suggestionOverlayKey.currentState.show();
-                },
-                onSuggestionSelected: _onSuggestionSelected,
-                askFocusNode: _askFocusNode,
-              ),
-            ),
-      );
-
-  void _onSuggestionSelected(
-    Suggestion suggestion,
-    Rect globalBounds,
-  ) {
-    SuggestionModel.of(context).onSuggestionSelected(suggestion);
-
-    if (suggestion.selectionType == SelectionType.closeSuggestions) {
-      _suggestionOverlayKey.currentState.hide();
-    } else {
-      _selectedSuggestionOverlayKey.currentState.suggestionSelected(
-        expansionBehavior: suggestion.selectionType == SelectionType.launchStory
-            ? new ExpandSuggestion(
-                suggestion: suggestion,
-                suggestionInitialGlobalBounds: globalBounds,
-              )
-            : new SplashSuggestion(
-                suggestion: suggestion,
-                suggestionInitialGlobalBounds: globalBounds,
-              ),
-      );
-      _minimizeNow();
-    }
-  }
 
   void _defocus(StoryModel storyModel) {
     // Unfocus all story clusters.
@@ -373,12 +185,7 @@ class ConductorState extends State<Conductor> {
 
     // Unlock scrolling.
     ConductorModel.of(context).recentsBuilder.onStoryUnfocused();
-    _edgeScrollDragTargetKey.currentState.enable();
-    _scrollController.animateTo(
-      0.0,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.fastOutSlowIn,
-    );
+    ConductorModel.of(context).recentsBuilder.resetScroll();
   }
 
   void _focusStoryCluster(
@@ -406,16 +213,14 @@ class ConductorState extends State<Conductor> {
     // to 0.0 we will inadvertently maximize now and peek the suggestion
     // overlay.
     _ignoreNextScrollOffsetChange = true;
-    _scrollController.jumpTo(0.0);
-
+    ConductorModel.of(context).recentsBuilder.resetScroll(jump: true);
     ConductorModel.of(context).recentsBuilder.onStoryFocused();
-    _edgeScrollDragTargetKey.currentState.disable();
   }
 
   void _minimizeNow() {
     ConductorModel.of(context).nowBuilder.onMinimize();
     PeekModel.of(context).nowMinimized = true;
-    _suggestionOverlayKey.currentState.hide();
+    ConductorModel.of(context).nextBuilder.hide();
   }
 
   /// Returns the state of the children to their initial values.
@@ -436,7 +241,6 @@ class ConductorState extends State<Conductor> {
   /// Called to request the conductor focus on the cluster with [storyId].
   void requestStoryFocus(StoryId storyId, {bool jumpToFinish: true}) {
     ConductorModel.of(context).recentsBuilder.onStoryFocused();
-    _edgeScrollDragTargetKey.currentState.disable();
     _minimizeNow();
     _focusOnStory(storyId, jumpToFinish: jumpToFinish);
   }
@@ -458,7 +262,9 @@ class ConductorState extends State<Conductor> {
     // that's not true, bail out.
     if (targetStoryClusters.length != 1) {
       print(
-          'WARNING: Found ${targetStoryClusters.length} story clusters with a story with id $storyId. Returning to origin.');
+        'WARNING: Found ${targetStoryClusters.length} story clusters with '
+            'a story with id $storyId. Returning to origin.',
+      );
       goToOrigin();
     } else {
       // Unfocus all story clusters.
@@ -477,17 +283,6 @@ class ConductorState extends State<Conductor> {
       _focusStoryCluster(targetStoryClusters[0]);
     }
 
-    // Unhide selected suggestion in suggestion list.
-    _suggestionListKey.currentState.resetSelection();
-  }
-
-  @override
-  void dispose() {
-    _askFocusNode.dispose();
-    _conductorFocusNode.detach();
-    if (_storyFocusTimer != null && _storyFocusTimer.isActive) {
-      _storyFocusTimer.cancel();
-    }
-    super.dispose();
+    ConductorModel.of(context).nextBuilder.resetSelection();
   }
 }

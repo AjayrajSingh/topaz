@@ -13,7 +13,6 @@ import 'package:armadillo/conductor_model.dart';
 import 'package:armadillo/context_model.dart';
 import 'package:armadillo/debug_enabler.dart';
 import 'package:armadillo/debug_model.dart';
-import 'package:armadillo/interruption_overlay.dart';
 import 'package:armadillo/panel_resizing_model.dart';
 import 'package:armadillo/peek_model.dart';
 import 'package:armadillo/power_model.dart';
@@ -107,13 +106,17 @@ Widget buildArmadilloUserShell({
 
   UserLogoutter userLogoutter = new UserLogoutter();
   GlobalKey<ConductorState> conductorKey = new GlobalKey<ConductorState>();
-  GlobalKey<InterruptionOverlayState> interruptionOverlayKey =
-      new GlobalKey<InterruptionOverlayState>();
   SuggestionProviderSuggestionModel suggestionProviderSuggestionModel =
       new SuggestionProviderSuggestionModel(
     hitTestModel: hitTestModel,
-    interruptionOverlayKey: interruptionOverlayKey,
+    onInterruptionAdded: conductorModel.nextBuilder.onInterruptionAdded,
+    onInterruptionRemoved: conductorModel.nextBuilder.onInterruptionRemoved,
+    onInterruptionsRemoved: conductorModel.nextBuilder.onInterruptionsRemoved,
   );
+  conductorModel.nextBuilder.onSuggestionsOverlayChanged =
+      hitTestModel.onSuggestionsOverlayChanged;
+  conductorModel.nextBuilder.onInterruptionDismissed =
+      suggestionProviderSuggestionModel.onInterruptionDismissal;
 
   StoryModel storyModel = new StoryModel(
     onFocusChanged: suggestionProviderSuggestionModel.storyClusterFocusChanged,
@@ -211,17 +214,15 @@ Widget buildArmadilloUserShell({
         ),
   );
 
-  Conductor conductor = new Conductor(
-    key: conductorKey,
-    onQuickSettingsOverlayChanged: hitTestModel.onQuickSettingsOverlayChanged,
-    onSuggestionsOverlayChanged: hitTestModel.onSuggestionsOverlayChanged,
-    onLogoutSelected: userLogoutter.logout,
-    onClearLedgerSelected: userLogoutter.logoutAndResetLedgerState,
-    interruptionOverlayKey: interruptionOverlayKey,
-    onInterruptionDismissed:
-        suggestionProviderSuggestionModel.onInterruptionDismissal,
-    onUserContextTapped: armadilloUserShellModel.onUserContextTapped,
-  );
+  conductorModel.nowBuilder.onLogoutSelected = userLogoutter.logout;
+  conductorModel.nowBuilder.onClearLedgerSelected =
+      userLogoutter.logoutAndResetLedgerState;
+  conductorModel.nowBuilder.onUserContextTapped =
+      armadilloUserShellModel.onUserContextTapped;
+  conductorModel.nowBuilder.onQuickSettingsOverlayChanged =
+      hitTestModel.onQuickSettingsOverlayChanged;
+
+  Conductor conductor = new Conductor(key: conductorKey);
 
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();

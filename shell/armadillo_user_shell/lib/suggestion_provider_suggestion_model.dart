@@ -109,6 +109,9 @@ typedef void OnInterruptionAdded(Suggestion interruption);
 /// Called when an interruption has been removed.
 typedef void OnInterruptionRemoved(String id);
 
+/// Called when all interruptions are removed.
+typedef void OnInterruptionsRemoved();
+
 /// Listens for interruptions from maxwell.
 class _InterruptionListener extends maxwell.SuggestionListener {
   /// Called when an interruption occurs.
@@ -215,9 +218,6 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   _InterruptionListener _interruptionListener;
 
-  /// The key for the interruption overlay.
-  final GlobalKey<InterruptionOverlayState> interruptionOverlayKey;
-
   final List<Suggestion> _currentInterruptions = <Suggestion>[];
 
   /// When the user is asking via text or voice we want to show the maxwell ask
@@ -244,10 +244,21 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   /// Listens for changes to visible stories.
   final HitTestModel hitTestModel;
 
+  /// Called when an interruption is added.
+  final OnInterruptionAdded onInterruptionAdded;
+
+  /// Called when an interruption is removed.
+  final OnInterruptionRemoved onInterruptionRemoved;
+
+  /// Called when all interruptions are removed.
+  final OnInterruptionsRemoved onInterruptionsRemoved;
+
   /// Constructor.
   SuggestionProviderSuggestionModel({
     this.hitTestModel,
-    this.interruptionOverlayKey,
+    this.onInterruptionAdded,
+    this.onInterruptionRemoved,
+    this.onInterruptionsRemoved,
   });
 
   /// Call to close all the handles opened by this model.
@@ -266,14 +277,14 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     _suggestionProviderProxy = suggestionProviderProxy;
     _interruptionListener = new _InterruptionListener(
       onInterruptionAdded: (Suggestion interruption) {
-        interruptionOverlayKey.currentState.onInterruptionAdded(interruption);
+        onInterruptionAdded(interruption);
       },
       onInterruptionRemoved: (String uuid) {
-        interruptionOverlayKey.currentState.onInterruptionRemoved(uuid);
+        onInterruptionRemoved(uuid);
         _onInterruptionRemoved(uuid);
       },
       onInterruptionsRemoved: () {
-        interruptionOverlayKey.currentState.onInterruptionsRemoved();
+        onInterruptionsRemoved();
         _onInterruptionsRemoved();
       },
     );

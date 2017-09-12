@@ -9,6 +9,7 @@ export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
 import 'idle_mode_builder.dart';
+import 'next_builder.dart';
 import 'now_builder.dart';
 import 'recents_builder.dart';
 
@@ -17,6 +18,7 @@ class ConductorModel extends Model {
   final IdleModeBuilder _idleModeBuilder = new IdleModeBuilder();
   final NowBuilder _nowBuilder = new NowBuilder();
   final RecentsBuilder _recentsBuilder = new RecentsBuilder();
+  final NextBuilder _nextBuilder = new NextBuilder();
 
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
@@ -31,4 +33,7 @@ class ConductorModel extends Model {
 
   /// Builds recents.
   RecentsBuilder get recentsBuilder => _recentsBuilder;
+
+  /// Builds next.
+  NextBuilder get nextBuilder => _nextBuilder;
 }
