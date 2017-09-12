@@ -15,8 +15,8 @@
 #include "apps/dart_content_handler/embedder/snapshot.h"
 #include "dart/runtime/bin/embedded_dart_io.h"
 #include "lib/fxl/arraysize.h"
-#include "lib/mtl/tasks/message_loop.h"
-#include "lib/mtl/vmo/vector.h"
+#include "lib/fsl/tasks/message_loop.h"
+#include "lib/fsl/vmo/vector.h"
 #include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/dart_state.h"
 
@@ -34,9 +34,9 @@ const char* kDartVMArgs[] = {
 };
 
 void IsolateShutdownCallback(void* callback_data) {
-  mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
+  fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
   tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
-  mtl::MessageLoop::GetCurrent()->QuitNow();
+  fsl::MessageLoop::GetCurrent()->QuitNow();
 }
 
 void IsolateCleanupCallback(void* callback_data) {
@@ -166,7 +166,7 @@ void RunApplication(
     return;
   }
 
-  mtl::MessageLoop loop;
+  fsl::MessageLoop loop;
 
   DartApplicationController app(
       isolate_snapshot_data, isolate_snapshot_instructions,

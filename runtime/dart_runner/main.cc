@@ -9,7 +9,7 @@
 #include "lib/app/fidl/application_runner.fidl.h"
 #include "apps/dart_content_handler/application_runner_impl.h"
 #include "lib/fxl/macros.h"
-#include "lib/mtl/tasks/message_loop.h"
+#include "lib/fsl/tasks/message_loop.h"
 
 namespace dart_content_handler {
 namespace {
@@ -32,7 +32,7 @@ class App {
 }  // namespace dart_content_handler
 
 int main(int argc, const char** argv) {
-  mtl::MessageLoop loop;
+  fsl::MessageLoop loop;
   dart_content_handler::App app;
   loop.Run();
   return 0;

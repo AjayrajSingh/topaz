@@ -17,7 +17,7 @@
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/synchronization/mutex.h"
-#include "lib/mtl/tasks/message_loop.h"
+#include "lib/fsl/tasks/message_loop.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_message_handler.h"
 #include "lib/tonic/dart_microtask_queue.h"
@@ -80,7 +80,7 @@ bool DartApplicationController::CreateIsolate() {
   state->SetIsolate(isolate_);
 
   state->message_handler().Initialize(
-      mtl::MessageLoop::GetCurrent()->task_runner());
+      fsl::MessageLoop::GetCurrent()->task_runner());
 
   state->SetReturnCodeCallback([this](uint32_t return_code) {
     return_code_ = return_code;
@@ -132,7 +132,7 @@ bool DartApplicationController::Main() {
   // eg. Redirect stdin, stdout, and stderr.
 
   tonic::DartMicrotaskQueue::StartForCurrentThread();
-  mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(AfterTask);
+  fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(AfterTask);
 
   fidl::Array<fidl::String> arguments =
       std::move(startup_info_->launch_info->arguments);
@@ -191,10 +191,10 @@ bool DartApplicationController::Main() {
 
 void DartApplicationController::Kill() {
   if (Dart_CurrentIsolate()) {
-    mtl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
+    fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
     tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
 
-    mtl::MessageLoop::GetCurrent()->QuitNow();
+    fsl::MessageLoop::GetCurrent()->QuitNow();
 
     // TODO(rosswang): The docs warn of threading issues if doing this again,
     // but without this, attempting to shut down the isolate finalizes app

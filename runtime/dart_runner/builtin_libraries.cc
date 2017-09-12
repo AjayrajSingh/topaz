@@ -12,7 +12,7 @@
 #include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
-#include "lib/mtl/tasks/message_loop.h"
+#include "lib/fsl/tasks/message_loop.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/logging/dart_error.h"

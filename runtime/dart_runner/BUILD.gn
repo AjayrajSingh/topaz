@@ -50,7 +50,7 @@ template("runner") {
              "//garnet/public/lib/svc/cpp",
              "//garnet/public/dart-pkg/fuchsia",
              "//garnet/public/lib/fxl",
-             "//garnet/public/lib/mtl",
+             "//garnet/public/lib/fsl",
              "//lib/tonic",
            ] + dart_deps + extra_deps
   }
