@@ -61,24 +61,24 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   ],
   const <List<String>>[
     const <String>[
-      'magenta-qemu-arm64-gcc',
-      'magenta-qemu-arm64-gcc',
-      'magenta'
+      'zircon-qemu-arm64-gcc',
+      'zircon-qemu-arm64-gcc',
+      'zircon'
     ],
     const <String>[
-      'magenta-pc-x86-64-gcc',
-      'magenta-pc-x86-64-gcc',
-      'magenta'
+      'zircon-pc-x86-64-gcc',
+      'zircon-pc-x86-64-gcc',
+      'zircon'
     ],
     const <String>[
-      'magenta-qemu-arm64-clang',
-      'magenta-qemu-arm64-clang',
-      'magenta'
+      'zircon-qemu-arm64-clang',
+      'zircon-qemu-arm64-clang',
+      'zircon'
     ],
     const <String>[
-      'magenta-pc-x86-64-clang',
-      'magenta-pc-x86-64-clang',
-      'magenta'
+      'zircon-pc-x86-64-clang',
+      'zircon-pc-x86-64-clang',
+      'zircon'
     ],
   ],
   const <List<String>>[
