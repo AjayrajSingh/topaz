@@ -12,34 +12,37 @@ const double _kMaxWidth = 400.0;
 
 Future<Null> main() async {
   runApp(
-    new LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        double cardHeight =
-            16.0 + math.min(_kMaxWidth, constraints.maxWidth) / _kGoldenRatio;
-        return new Material(
-          color: Colors.grey[200],
-          child: new Center(
-            child: new ConstrainedBox(
-              constraints: new BoxConstraints(
-                maxWidth: _kMaxWidth,
-                maxHeight: constraints.maxHeight,
-              ),
-              child: new ListView.builder(
-                physics: new _FrictionlessScrollPhysics(),
-                itemExtent: cardHeight,
-                itemBuilder: (BuildContext context, int index) => new Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: new Material(
-                        color: index % 2 == 0 ? Colors.blue : Colors.green,
-                        elevation: 3.0,
-                        borderRadius: new BorderRadius.circular(4.0),
+    new MaterialApp(
+      home: new LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          double cardHeight =
+              16.0 + math.min(_kMaxWidth, constraints.maxWidth) / _kGoldenRatio;
+          return new Material(
+            color: Colors.grey[200],
+            child: new Center(
+              child: new ConstrainedBox(
+                constraints: new BoxConstraints(
+                  maxWidth: _kMaxWidth,
+                  maxHeight: constraints.maxHeight,
+                ),
+                child: new ListView.builder(
+                  physics: new _FrictionlessScrollPhysics(),
+                  itemExtent: cardHeight,
+                  itemBuilder: (BuildContext context, int index) =>
+                      new Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: new Material(
+                          color: index % 2 == 0 ? Colors.blue : Colors.green,
+                          elevation: 3.0,
+                          borderRadius: new BorderRadius.circular(4.0),
+                        ),
                       ),
-                    ),
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     ),
   );
 }
