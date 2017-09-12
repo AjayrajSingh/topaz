@@ -59,7 +59,7 @@
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
 #include "lib/icu_data/cpp/icu_data.h"
-#include "lib/mtl/tasks/message_loop.h"
+#include "lib/fsl/tasks/message_loop.h"
 
 using namespace WebCore;
 
@@ -171,7 +171,7 @@ class MozWebView : public mozart::BaseView,
         [this](fidl::InterfaceRequest<modular::Lifecycle> request) {
           lifecycle_binding_.Bind(std::move(request));
         });
-    mtl::MessageLoop::GetCurrent()->task_runner()->PostTask(
+    fsl::MessageLoop::GetCurrent()->task_runner()->PostTask(
         ([weak = weak_factory_.GetWeakPtr()]() {
           if (weak)
             weak->CallIdle();
@@ -369,7 +369,7 @@ class MozWebView : public mozart::BaseView,
   void CallIdle() {
     web_view_.iterateEventLoop();
     InvalidateScene();
-    mtl::MessageLoop::GetCurrent()->task_runner()->PostTask(
+    fsl::MessageLoop::GetCurrent()->task_runner()->PostTask(
         ([weak = weak_factory_.GetWeakPtr()]() {
           if (weak)
             weak->CallIdle();
@@ -388,7 +388,7 @@ class MozWebView : public mozart::BaseView,
 
   // modular::Terminate
   void Terminate() final {
-    mtl::MessageLoop::GetCurrent()->QuitNow();
+    fsl::MessageLoop::GetCurrent()->QuitNow();
   }
 
   // modular::LinkWatcher
@@ -443,7 +443,7 @@ int main(int argc, const char** argv) {
     url = urls.front();
   }
 
-  mtl::MessageLoop loop;
+  fsl::MessageLoop loop;
 
   mozart::ViewProviderApp app([&url](mozart::ViewContext view_context) {
     return std::make_unique<MozWebView>(
