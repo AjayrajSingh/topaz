@@ -203,7 +203,7 @@ class SimulatedFractionalState extends TickingState<SimulatedFractional> {
   }
 
   @override
-  String toString() =>
+  String toString({DiagnosticLevel minLevel}) =>
       'SimulatedFractionalState(top: $_fractionalTopSimulation, '
       'left: $_fractionalLeftSimulation, '
       'width: $_fractionalWidthSimulation, '
