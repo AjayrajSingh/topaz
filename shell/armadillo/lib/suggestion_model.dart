@@ -18,8 +18,11 @@ abstract class SuggestionModel extends Model {
   static SuggestionModel of(BuildContext context) =>
       new ModelFinder<SuggestionModel>().of(context);
 
-  /// Returns the list of suggestions to be displayed.
-  List<Suggestion> get suggestions;
+  /// Returns the list of suggestions from the current ask query
+  List<Suggestion> get askSuggestions;
+
+  /// Retruns the list of suggestion from the next space
+  List<Suggestion> get nextSuggestions;
 
   /// Sets the ask text to [text].
   set askText(String text);
@@ -30,7 +33,7 @@ abstract class SuggestionModel extends Model {
   /// Gets the asking state.
   bool get asking;
 
-  /// Updates the [suggestions] based on the currently focused storyCluster].  If no
+  /// Updates the suggestions based on the currently focused storyCluster].  If no
   /// story is in focus, [storyCluster] should be null.
   void storyClusterFocusChanged(StoryCluster storyCluster);
 

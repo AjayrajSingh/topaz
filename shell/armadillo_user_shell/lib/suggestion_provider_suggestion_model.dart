@@ -366,10 +366,11 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   }
 
   @override
-  List<Suggestion> get suggestions {
-    if (_asking) {
-      return _askListener?.suggestions ?? <Suggestion>[];
-    }
+  List<Suggestion> get askSuggestions =>
+      _askListener?.suggestions ?? <Suggestion>[];
+
+  @override
+  List<Suggestion> get nextSuggestions {
     List<Suggestion> suggestions = new List<Suggestion>.from(
       _currentInterruptions,
     );

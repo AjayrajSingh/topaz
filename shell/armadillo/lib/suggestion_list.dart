@@ -138,7 +138,9 @@ class SuggestionListState extends State<SuggestionList>
 
   /// Selects the first suggestion in the list as if it had been tapped.
   void selectFirstSuggestions() {
-    List<Suggestion> suggestions = SuggestionModel.of(context).suggestions;
+    List<Suggestion> suggestions = SuggestionModel.of(context).asking
+        ? SuggestionModel.of(context).askSuggestions
+        : SuggestionModel.of(context).nextSuggestions;
     if (suggestions.isNotEmpty) {
       _onSuggestionSelected(suggestions[0]);
     }
@@ -153,7 +155,9 @@ class SuggestionListState extends State<SuggestionList>
           _lastBuildTime = new DateTime.now();
           _fadeInAnimation.value = 0.0;
           _fadeInAnimation.forward();
-          List<Suggestion> suggestions = suggestionModel.suggestions;
+          List<Suggestion> suggestions = suggestionModel.asking
+              ? suggestionModel.askSuggestions
+              : suggestionModel.nextSuggestions;
           return new Container(
             color: const Color(0xFFDBE2E5),
             padding: new EdgeInsets.only(top: 32.0),
@@ -276,11 +280,7 @@ class SuggestionListState extends State<SuggestionList>
                     onSubmitted: (String text) {
                       // Select the first suggestion on text commit (ie.
                       // Pressing enter or tapping 'Go').
-                      List<Suggestion> suggestions =
-                          SuggestionModel.of(context).suggestions;
-                      if (suggestions.isNotEmpty) {
-                        _onSuggestionSelected(suggestions.first);
-                      }
+                      selectFirstSuggestions();
                     },
                   ),
                 ),
