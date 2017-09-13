@@ -4,12 +4,12 @@
 
 import 'dart:isolate';
 
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'src/app.dart';

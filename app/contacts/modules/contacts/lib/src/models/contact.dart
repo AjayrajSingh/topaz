@@ -19,6 +19,9 @@ class Contact {
   /// First name for contact
   final String givenName;
 
+  /// Middle name for contact
+  final String middleName;
+
   /// Last name for contact
   final String familyName;
 
@@ -46,6 +49,7 @@ class Contact {
     this.displayName,
     this.givenName,
     this.familyName,
+    this.middleName,
     this.backgroundImageUrl,
     this.photoUrl,
     List<Address> addresses,

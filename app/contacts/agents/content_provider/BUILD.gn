@@ -9,9 +9,10 @@ dart_app("contacts_content_provider") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//garnet/public/lib/app/dart",
     "//apps/modules/contacts/services:services_dart",
+    "//garnet/public/lib/app/dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
+    "//topaz/lib/widgets/packages/modular:lib.modular",
   ]
 
   analysis_options = "//apps/modules/common/analysis_options.yaml"

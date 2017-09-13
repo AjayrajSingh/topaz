@@ -5,22 +5,20 @@
 import("//build/dart/dart_test.gni")
 import("//flutter/build/flutter_app.gni")
 
-flutter_app("contacts") {
-  package_name = "contacts"
+flutter_app("contact_list") {
+  package_name = "contact_list"
 
-  main_dart = "lib/modular_main.dart"
+  main_dart = "lib/main.dart"
 
   deps = [
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
-    "//apps/modules/common/packages/fixtures",
-    "//apps/modules/common/packages/widgets_meta",
     "//apps/modules/contacts/services:services_dart",
     "//garnet/public/lib/app/dart",
+    "//garnet/public/lib/app/fidl:fidl_dart",
+    "//garnet/public/lib/fidl/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
-    "//third_party/dart-pkg/pub/googleapis",
-    "//third_party/dart-pkg/pub/googleapis_auth",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
@@ -30,8 +28,7 @@ flutter_app("contacts") {
 
 dart_test("test") {
   deps = [
-    "//apps/modules/contacts/modules/contacts:contacts_dart_package",
-    "//lib/flutter/packages/flutter_test",
+    "//apps/modules/contacts/modules/contact_list:contact_list_dart_package",
     "//third_party/dart-pkg/pub/test",
   ]
 

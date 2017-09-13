@@ -1,0 +1,21 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+name: contact_list
+description: Flutter app to run show the list of contacts
+dependencies:
+  flutter:
+    sdk: flutter
+  fixtures:
+    path: ../../../common/packages/fixtures
+  lib.widgets:
+    path: ../../../../../topaz/lib/widgets/packages/widgets
+  widgets_meta:
+    path: ../../../common/packages/widgets_meta
+dev_dependencies:
+  test: any
+  flutter_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true

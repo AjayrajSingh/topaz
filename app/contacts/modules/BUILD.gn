@@ -4,6 +4,7 @@
 
 group("modules") {
   deps = [
+    "contact_list",
     "contacts",
   ]
 }
