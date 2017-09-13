@@ -25,16 +25,18 @@ Future<Null> main() async {
     duration: _kCubeRotationAnimationPeriod,
   );
   runApp(
-    new Container(
-      color: Colors.deepPurple,
-      child: new FractionallySizedBox(
-        alignment: FractionalOffset.center,
-        widthFactor: 0.75,
-        heightFactor: 0.75,
-        child: new Center(
-          child: new SpinningCubeGem(
-            controller: controller,
-            color: Colors.pinkAccent[400],
+    new MaterialApp(
+      home: new Container(
+        color: Colors.deepPurple,
+        child: new FractionallySizedBox(
+          alignment: FractionalOffset.center,
+          widthFactor: 0.75,
+          heightFactor: 0.75,
+          child: new Center(
+            child: new SpinningCubeGem(
+              controller: controller,
+              color: Colors.pinkAccent[400],
+            ),
           ),
         ),
       ),
