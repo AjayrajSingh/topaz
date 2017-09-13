@@ -25,6 +25,9 @@ import 'user_watcher_impl.dart';
 /// logging in and creating new users.
 class UserPickerDeviceShellModel extends DeviceShellModel
     implements TickerProvider {
+  /// Called when the device shell stops.
+  final VoidCallback onDeviceShellStopped;
+
   bool _showingUserActions = false;
   bool _addingUser = false;
   bool _showingKernelPanic = false;
@@ -35,9 +38,10 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   final UserShellChooser _userShellChooser = new UserShellChooser();
   ChildViewConnection _childViewConnection;
   final Set<Account> _draggedUsers = new Set<Account>();
+  final Set<Ticker> _tickers = new Set<Ticker>();
 
   /// Constructor
-  UserPickerDeviceShellModel() : super() {
+  UserPickerDeviceShellModel({this.onDeviceShellStopped}) : super() {
     // Check for last kernel panic
     File lastPanic = new File('/boot/log/last-panic.txt');
     lastPanic.exists().then((bool exists) {
@@ -63,6 +67,15 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     super.onReady(userProvider, deviceShellContext);
     _loadUsers();
     _userPickerScrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void onStop() {
+    _userControllerProxy?.ctrl?.close();
+    _userWatcherImpl?.close();
+    onDeviceShellStopped?.call();
+    _tickers.forEach((Ticker ticker) => ticker.dispose());
+    super.onStop();
   }
 
   // Hide user actions on overscroll
@@ -214,5 +227,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   ChildViewConnection get childViewConnection => _childViewConnection;
 
   @override
-  Ticker createTicker(TickerCallback onTick) => new Ticker(onTick);
+  Ticker createTicker(TickerCallback onTick) {
+    Ticker ticker = new Ticker(onTick);
+    _tickers.add(ticker);
+    return ticker;
+  }
 }

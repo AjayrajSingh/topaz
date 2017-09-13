@@ -8,6 +8,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.netstack.fidl/netstack.fidl.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/modular.dart';
 
@@ -18,6 +19,7 @@ import 'child_constraints_changer.dart';
 import 'constraints_model.dart';
 import 'debug_text.dart';
 import 'memory_indicator.dart';
+import 'netstack_model.dart';
 import 'user_picker_device_shell_screen.dart';
 import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
@@ -32,12 +34,29 @@ void main() {
   setupLogger(name: 'userpicker_device_shell');
   GlobalKey screenManagerKey = new GlobalKey();
   ConstraintsModel constraintsModel = new ConstraintsModel();
-  UserPickerDeviceShellModel model = new UserPickerDeviceShellModel();
   AuthenticationOverlayModel authenticationOverlayModel =
       new AuthenticationOverlayModel();
 
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
+
+  NetstackProxy netstackProxy = new NetstackProxy();
+  connectToService(
+    applicationContext.environmentServices,
+    netstackProxy.ctrl,
+  );
+
+  UserPickerDeviceShellModel userPickerDeviceShellModel =
+      new UserPickerDeviceShellModel(
+    onDeviceShellStopped: () {
+      netstackProxy.ctrl.close();
+    },
+  );
+
+  NetstackModel netstackModel = new NetstackModel(
+    netstack: netstackProxy,
+    tickerProvider: userPickerDeviceShellModel,
+  );
 
   SoftKeyboardContainerImpl softKeyboardContainerImpl = _kAdvertiseImeService
       ? new SoftKeyboardContainerImpl(
@@ -115,17 +134,40 @@ void main() {
     return true;
   });
 
+  overlays.add(
+    new OverlayEntry(
+      builder: (_) => new Align(
+            alignment: FractionalOffset.centerRight,
+            child: new Container(
+              margin: const EdgeInsets.all(8.0),
+              child: new PhysicalModel(
+                color: Colors.grey[900],
+                elevation: 799.0, // Mouse pointer is at 800.0.
+                borderRadius: new BorderRadius.circular(8.0),
+                child: new Container(
+                  padding: const EdgeInsets.all(8.0),
+                  child: new _NetstackInfo(),
+                ),
+              ),
+            ),
+          ),
+    ),
+  );
+
   DeviceShellWidget<UserPickerDeviceShellModel> deviceShellWidget =
       new DeviceShellWidget<UserPickerDeviceShellModel>(
     applicationContext: applicationContext,
     softKeyboardContainer: softKeyboardContainerImpl,
-    deviceShellModel: model,
+    deviceShellModel: userPickerDeviceShellModel,
     authenticationContext: new AuthenticationContextImpl(
       onStartOverlay: authenticationOverlayModel.onStartOverlay,
       onStopOverlay: authenticationOverlayModel.onStopOverlay,
     ),
     child: new _ElevatedCheckedModeBanner(
-      child: new Overlay(initialEntries: overlays),
+      child: new ScopedModel<NetstackModel>(
+        model: netstackModel,
+        child: new Overlay(initialEntries: overlays),
+      ),
     ),
   );
 
@@ -236,4 +278,75 @@ class _ElevatedCheckedModeBanner extends StatelessWidget {
             ],
           );
   }
+}
+
+class _NetstackInfo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) =>
+      new ScopedModelDescendant<NetstackModel>(
+        builder: (_, __, NetstackModel netstackModel) => new Column(
+              mainAxisSize: MainAxisSize.min,
+              children: netstackModel.interfaces
+                  .map(
+                    (InterfaceInfo info) => new Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            new Text(info.name),
+                            new Container(width: 4.0),
+                            new Container(
+                              width: 16.0,
+                              child: _wrapIcon(
+                                info.sendingRevealAnimation,
+                                info.sendingRepeatAnimation,
+                                new Icon(
+                                  Icons.arrow_upward,
+                                  color: Colors.white,
+                                  size: 16.0,
+                                ),
+                              ),
+                            ),
+                            new Container(width: 4.0),
+                            new Container(
+                              width: 16.0,
+                              child: _wrapIcon(
+                                info.receivingRevealAnimation,
+                                info.receivingRepeatAnimation,
+                                new Icon(
+                                  Icons.arrow_downward,
+                                  color: Colors.white,
+                                  size: 16.0,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                  )
+                  .toList(),
+            ),
+      );
+
+  Widget _wrapIcon(
+    Animation<double> reveal,
+    Animation<double> repeat,
+    Icon icon,
+  ) =>
+      new AnimatedBuilder(
+        animation: reveal,
+        builder: (BuildContext context, Widget child) => new Opacity(
+              opacity: reveal.value,
+              child: new AnimatedBuilder(
+                animation: repeat,
+                builder: (BuildContext context, Widget child) => new Transform(
+                      transform: new Matrix4.identity().scaled(
+                          1.1 - (repeat.value - 0.5).abs() / 5,
+                          1.1 - (repeat.value - 0.5).abs() / 5,
+                          0.0),
+                      alignment: FractionalOffset.center,
+                      child: child,
+                    ),
+                child: child,
+              ),
+            ),
+        child: icon,
+      );
 }

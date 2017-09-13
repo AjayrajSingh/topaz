@@ -23,6 +23,7 @@ flutter_app("userpicker_device_shell") {
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//apps/sysui/widgets",
     "//garnet/public/lib/fidl/dart",
+    "//garnet/public/lib/netstack/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
