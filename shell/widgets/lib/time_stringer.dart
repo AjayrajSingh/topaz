@@ -11,6 +11,7 @@ final DateFormat _kTimeOnlyDateFormat = new DateFormat('h:mm', 'en_US');
 final DateFormat _kDateOnlyDateFormat = new DateFormat('EEEE MMM d', 'en_US');
 final DateFormat _kShortStringDateFormat = new DateFormat('h:mm', 'en_US');
 final DateFormat _kLongStringDateFormat = new DateFormat('EEEE h:mm', 'en_US');
+final DateFormat _kMeridiemOnlyFormat = new DateFormat('a', 'en_US');
 
 /// Creates time strings and notifies when they change.
 class TimeStringer extends Listenable {
@@ -60,6 +61,10 @@ class TimeStringer extends Listenable {
   /// Returns a long version of the time including the day (eg. 'Monday 10:34').
   String get longString =>
       _kLongStringDateFormat.format(new DateTime.now().toLocal()).toLowerCase();
+
+  /// Returns the meridiem (eg. 'AM')
+  String get meridiem =>
+      _kMeridiemOnlyFormat.format(new DateTime.now().toLocal()).toUpperCase();
 
   void _scheduleTimer() {
     _timer?.cancel();

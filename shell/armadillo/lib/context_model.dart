@@ -33,6 +33,9 @@ abstract class ContextModel extends Model {
   /// The current date.
   String get dateOnly => _timeStringer.dateOnly;
 
+  /// The current meridiem
+  String get meridiem => _timeStringer.meridiem;
+
   /// The user's name.
   String get userName;
 
