@@ -91,8 +91,8 @@ class ContactListModuleModel extends ModuleModel {
 
     contacts_fidl.Status status = await statusCompleter.future;
     if (status != contacts_fidl.Status.ok) {
-      log.severe(
-          '${contacts_fidl.ContactsContentProvider.serviceName}::GetContactList() threw an error');
+      log.severe('${contacts_fidl.ContactsContentProvider.serviceName}'
+          '::GetContactList() threw an error');
 
       // TODO(meiyili) SO-731, SO-732: throw error to notify UI
       return null;

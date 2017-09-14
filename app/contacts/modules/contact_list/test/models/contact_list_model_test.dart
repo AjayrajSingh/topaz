@@ -22,5 +22,22 @@ void main() {
 
       expect(model.contactList, hasLength(0));
     });
+
+    test('should properly mark the first items in each letter category', () {
+      List<ContactListItem> contactList = <ContactListItem>[
+        new ContactListItem(id: 'id', displayName: 'Danielle Kim'),
+        new ContactListItem(id: 'id', displayName: 'Danielle Stawski'),
+        new ContactListItem(id: 'id', displayName: 'Eric Chowdhury'),
+        new ContactListItem(id: 'id', displayName: 'Eve Mann'),
+        new ContactListItem(id: 'id', displayName: 'E. T. Atkins'),
+      ];
+      ContactListModel model = new ContactListModel(contactList: contactList);
+
+      expect(model.firstItems.contains(contactList[0]), equals(true));
+      expect(model.firstItems.contains(contactList[1]), equals(false));
+      expect(model.firstItems.contains(contactList[2]), equals(true));
+      expect(model.firstItems.contains(contactList[3]), equals(false));
+      expect(model.firstItems.contains(contactList[4]), equals(false));
+    });
   });
 }

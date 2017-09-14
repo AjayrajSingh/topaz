@@ -1,4 +1,4 @@
-// Copyright 2016 The Fuchsia Authors. All rights reserved.
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/modular.dart';
 
-import '../models/contact_list_item.dart';
-import '../models/contact_list_model.dart';
+import '../../models.dart';
+import 'list_item.dart';
 
 /// The UI widget that represents a list of contacts
 class ContactList extends StatefulWidget {
@@ -29,10 +29,11 @@ class _ContactListState extends State<ContactList> {
           Widget child,
           ContactListModel model,
         ) {
-          return new Column(
+          return new ListView(
             children: model.contactList.map((ContactListItem c) {
-              return new Chip(
-                label: new Text(c.displayName, overflow: TextOverflow.ellipsis),
+              return new ListItem(
+                contact: c,
+                isFirstInCategory: model.firstItems.contains(c),
               );
             }).toList(),
           );
