@@ -8,7 +8,7 @@ use view_provider::ViewProviderServer;
 
 use application_services::application_services_service_provider::{ServiceProvider,
                                                                   ServiceProvider_Stub};
-use magenta::Channel;
+use zircon::Channel;
 use std::io::{self, Write};
 
 pub struct ServiceProviderServer {

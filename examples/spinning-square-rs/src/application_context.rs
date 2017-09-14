@@ -9,7 +9,7 @@ use application_services::application_services_service_provider::{ServiceProvide
                                                                   ServiceProvider_Server,
                                                                   ServiceProvider_Client};
 use apps_mozart_services_views::application_services_service_provider::ServiceProvider_Proxy;
-use magenta::{Channel, ChannelOpts, HandleBase};
+use zircon::{Channel, ChannelOpts, HandleBase};
 use mxruntime::{get_service_root, connect_to_environment_service};
 
 use std::sync::{Arc, Mutex};

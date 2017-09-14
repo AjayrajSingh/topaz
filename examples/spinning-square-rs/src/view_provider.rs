@@ -8,7 +8,7 @@ use application_services::application_services_service_provider::{ServiceProvide
 use apps_mozart_services_views::{ViewProvider_Stub, ViewProvider, View_Proxy, ViewManager_Client,
                                  ViewManager_new_Proxy};
 use fidl::Server;
-use magenta::{Channel, ChannelOpts, HandleBase};
+use zircon::{Channel, ChannelOpts, HandleBase};
 
 use base_view::BaseView;
 use base_view::FrameTracker;

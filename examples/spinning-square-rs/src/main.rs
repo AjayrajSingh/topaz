@@ -14,7 +14,7 @@ extern crate apps_mozart_services_views;
 extern crate apps_mozart_services_views_view_token;
 #[macro_use]
 extern crate fidl;
-extern crate magenta;
+extern crate zircon;
 extern crate mxruntime;
 
 mod application;
@@ -27,7 +27,7 @@ mod view_provider;
 
 use application_context::{ApplicationContext, ApplicationContextPtr};
 use fidl::Server;
-use magenta::{Channel, HandleBase};
+use zircon::{Channel, HandleBase};
 use mxruntime::{HandleType, get_startup_handle};
 use service_provider_server::ServiceProviderServer;
 

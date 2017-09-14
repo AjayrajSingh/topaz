@@ -20,7 +20,7 @@ use apps_mozart_services_views::{ViewListener_Stub, ViewInvalidation, ViewListen
 use apps_mozart_services_composition::apps_mozart_services_images::Image;
 
 use fidl::Server;
-use magenta::{Channel, ChannelOpts, ClockId, HandleBase, Vmo, VmoOpts, time_get};
+use zircon::{Channel, ChannelOpts, ClockId, HandleBase, Vmo, VmoOpts, time_get};
 
 use application::Application;
 use application::ApplicationEvent;
