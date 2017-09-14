@@ -49,7 +49,7 @@ You can run on a connected android device with:
 
 Optional: In another terminal you can tail the logs
 
-    ${FUCHSIA_DIR}/out/build-magenta/tools/loglistener
+    ${FUCHSIA_DIR}/out/build-zircon/tools/loglistener
 
 # Firebase DB Setup
 
