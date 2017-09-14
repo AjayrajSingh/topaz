@@ -26,7 +26,7 @@ enum SelectionType {
 }
 
 /// Determines what the suggestion looks like with respect to
-/// [Suggestion.image].
+/// the image.
 enum ImageType {
   /// A [circular] image is expected to be clipped as a circle.
   circular,
@@ -36,7 +36,7 @@ enum ImageType {
 }
 
 /// Determines what the suggestion looks like with respect to
-/// [Suggestion.image].
+/// the image.
 enum ImageSide {
   /// The image should display to the right.
   right,
@@ -71,13 +71,10 @@ class Suggestion {
   /// The story id related to this suggestion.
   final StoryId selectionStoryId;
 
-  /// The icons representing the source for this suggestion.
-  final List<WidgetBuilder> icons;
-
   /// The main image of the suggestion.
-  final WidgetBuilder image;
+  final String imageUrl;
 
-  /// The type of [image].
+  /// The type of image.
   final ImageType imageType;
 
   /// The side the image should appear on.
@@ -95,8 +92,7 @@ class Suggestion {
     this.themeColor,
     this.selectionType,
     this.selectionStoryId,
-    this.icons: const <WidgetBuilder>[],
-    this.image,
+    this.imageUrl,
     this.imageType,
     this.imageSide: ImageSide.right,
   }) {

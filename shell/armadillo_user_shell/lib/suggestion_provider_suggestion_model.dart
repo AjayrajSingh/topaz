@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:io';
-
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart'
     as maxwell;
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart'
@@ -169,20 +167,7 @@ Suggestion _convert(maxwell.Suggestion suggestion) {
     description: suggestion.display.subheadline,
     themeColor: new Color(suggestion.display.color),
     selectionType: SelectionType.launchStory,
-    icons: const <WidgetBuilder>[],
-    image: imageUrl != null
-        ? (_) => imageUrl.startsWith('http')
-            ? new Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                alignment: FractionalOffset.center,
-              )
-            : new Image.file(
-                new File(imageUrl),
-                fit: BoxFit.cover,
-                alignment: FractionalOffset.center,
-              )
-        : null,
+    imageUrl: imageUrl,
     imageType: imageType,
     imageSide: hasImage &&
             suggestion.display.imageType == maxwell.SuggestionImageType.person

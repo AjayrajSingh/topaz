@@ -119,7 +119,7 @@ class SuggestionLayout {
     double textMaxWidth = math.max(
       0.0,
       suggestionWidth -
-          (_suggestion.image == null ? 0.0 : kSuggestionImageWidth) -
+          (_suggestion.imageUrl == null ? 0.0 : kSuggestionImageWidth) -
           ((isCircularSuggestionImage ? 1 : 2) * _kHorizontalMargin),
     );
 

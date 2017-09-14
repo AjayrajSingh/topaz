@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -68,7 +70,7 @@ class SuggestionWidget extends StatelessWidget {
             context,
             suggestion.suggestionLayout.suggestionHeight,
           );
-          Widget textAndIcons = _buildTextAndIcons(
+          Widget textAndIcons = _buildText(
             context,
             suggestion.suggestionLayout.suggestionText,
           );
@@ -99,7 +101,7 @@ class SuggestionWidget extends StatelessWidget {
         },
       );
 
-  Widget _buildTextAndIcons(BuildContext context, Widget suggestionText) =>
+  Widget _buildText(BuildContext context, Widget suggestionText) =>
       new Expanded(
         child: new Align(
           alignment: FractionalOffset.centerLeft,
@@ -108,75 +110,58 @@ class SuggestionWidget extends StatelessWidget {
               left: suggestion.suggestionLayout.leftTextPadding,
               right: suggestion.suggestionLayout.rightTextPadding,
             ),
-            child: new Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                suggestionText,
-                _buildIconBar(context),
-              ],
-            ),
+            child: suggestionText,
           ),
         ),
       );
 
-  Widget _buildIconBar(BuildContext context) => new Offstage(
-        offstage: suggestion.icons.length == 0 || _kIconsDisabled,
-        child: new Container(
-          margin: const EdgeInsets.only(
-            top: _kVerticalSpacing,
-            bottom: _kIconBarBottomMargin,
-          ),
-          height: _kIconSize,
-          child: new Row(
-            children: suggestion.icons
-                .map(
-                  (WidgetBuilder builder) => new Container(
-                        margin: const EdgeInsets.only(right: _kIconSpacing),
-                        width: _kIconSize,
-                        child: builder(context),
-                      ),
-                )
-                .toList(),
-          ),
-        ),
-      );
-
-  Widget _buildImage(BuildContext context, double suggestionHeight) =>
-      suggestion.image == null
-          ? new Container(width: 0.0)
-          : new Container(
-              width: kSuggestionImageWidth,
-              child: suggestion.imageType == ImageType.circular
-                  ? new Padding(
-                      padding: new EdgeInsets.symmetric(
-                        vertical:
-                            (suggestionHeight - _kPersonImageDiameter) / 2.0,
-                        horizontal:
-                            (kSuggestionImageWidth - _kPersonImageDiameter) /
-                                2.0,
-                      ),
-                      child: new SizedBox(
-                        width: _kPersonImageDiameter,
-                        height: _kPersonImageDiameter,
-                        child: suggestion.imageSide == ImageSide.left
-                            ? new ClipOval(
-                                child: suggestion.image.call(context),
-                              )
-                            : suggestion.image.call(context),
-                      ),
-                    )
-                  : new ClipRRect(
-                      borderRadius: new BorderRadius.only(
-                        topRight: new Radius.circular(kSuggestionCornerRadius),
-                        bottomRight: new Radius.circular(
-                          kSuggestionCornerRadius,
-                        ),
-                      ),
-                      child: new Container(
-                        constraints: new BoxConstraints.expand(),
-                        child: suggestion.image.call(context),
-                      ),
-                    ),
+  Widget _buildImage(BuildContext context, double suggestionHeight) {
+    if (suggestion.imageUrl == null) {
+      return new Container(width: 0.0);
+    } else {
+      Widget image = suggestion.imageUrl.startsWith('http')
+          ? new Image.network(
+              suggestion.imageUrl,
+              fit: BoxFit.cover,
+              alignment: FractionalOffset.center,
+            )
+          : new Image.file(
+              new File(suggestion.imageUrl),
+              fit: BoxFit.cover,
+              alignment: FractionalOffset.center,
             );
+      return new Container(
+        width: kSuggestionImageWidth,
+        child: suggestion.imageType == ImageType.circular
+            ? new Padding(
+                padding: new EdgeInsets.symmetric(
+                  vertical: (suggestionHeight - _kPersonImageDiameter) / 2.0,
+                  horizontal:
+                      (kSuggestionImageWidth - _kPersonImageDiameter) / 2.0,
+                ),
+                child: new SizedBox(
+                  width: _kPersonImageDiameter,
+                  height: _kPersonImageDiameter,
+                  child: suggestion.imageSide == ImageSide.left
+                      ? new ClipOval(
+                          child: image,
+                        )
+                      : image,
+                ),
+              )
+            : new ClipRRect(
+                borderRadius: new BorderRadius.only(
+                  topRight: new Radius.circular(kSuggestionCornerRadius),
+                  bottomRight: new Radius.circular(
+                    kSuggestionCornerRadius,
+                  ),
+                ),
+                child: new Container(
+                  constraints: new BoxConstraints.expand(),
+                  child: image,
+                ),
+              ),
+      );
+    }
+  }
 }
