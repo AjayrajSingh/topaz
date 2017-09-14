@@ -36,12 +36,12 @@
 #include <dirent.h>
 #include <hid/hid.h>
 #include <hid/usages.h>
-#include <magenta/device/console.h>
-#include <magenta/device/display.h>
-#include <magenta/pixelformat.h>
-#include <magenta/syscalls.h>
-#include <magenta/types.h>
-#include <mxio/io.h>
+#include <zircon/device/console.h>
+#include <zircon/device/display.h>
+#include <zircon/pixelformat.h>
+#include <zircon/syscalls.h>
+#include <zircon/types.h>
+#include <fdio/io.h>
 #include <stdlib.h>
 
 #include "WebView.h"
@@ -331,7 +331,7 @@ class MozWebView : public mozart::BaseView,
 
     // Paint the webview.
     web_view_.setup(reinterpret_cast<unsigned char*>(image->image_ptr()),
-                    MX_PIXEL_FORMAT_ARGB_8888, physical_size().width,
+                    ZX_PIXEL_FORMAT_ARGB_8888, physical_size().width,
                     physical_size().height, physical_size().width * 4u);
     if (!url_set_) {
       const char* urlToOpen = url_.c_str();

@@ -3,14 +3,14 @@
 #include <iostream>
 #include <vector>
 
-#include <magenta/pixelformat.h>
+#include <zircon/pixelformat.h>
 
 using namespace std;
 
 int main(int argc, const char** argv) {
     size_t kTestWidth = 1024;
     size_t kTestHeight = 728;
-    auto format = MX_PIXEL_FORMAT_RGB_x888;
+    auto format = ZX_PIXEL_FORMAT_RGB_x888;
 
     vector<unsigned char> buffer(kTestWidth * kTestHeight * 4);
 
