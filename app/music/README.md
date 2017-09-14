@@ -53,7 +53,7 @@ You can run on a connected android device with:
 
 Optional: In another terminal you can tail the logs
 
-    ${FUCHSIA_DIR}/out/build-magenta/tools/loglistener
+    ${FUCHSIA_DIR}/out/build-zircon/tools/loglistener
 
 [flutter]: https://flutter.io/
 [fuchsia]: https://fuchsia.googlesource.com/fuchsia/
@@ -64,5 +64,5 @@ Optional: In another terminal you can tail the logs
 [widgets-intro]: https://flutter.io/widgets-intro/
 [fuchsia-setup]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md
 [fuchsia-env]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md#Setup-Build-Environment
-[clang-wrapper]: https://fuchsia.googlesource.com/magenta-rs/+/HEAD/tools
+[clang-wrapper]: https://fuchsia.googlesource.com/zircon-rs/+/HEAD/tools
 [modules-auth]: https://fuchsia.googlesource.com/modules/#Authenticate
