@@ -52,8 +52,9 @@ class PowerManagerPowerModel extends PowerModel {
           _hasBattery = true;
           notifyListeners();
         }
-        if (_percentage != status.level) {
-          _percentage = status.level;
+        int percentage = status.level.round();
+        if (_percentage != percentage) {
+          _percentage = percentage;
           notifyListeners();
         }
         if (_isCharging != status.charging) {
