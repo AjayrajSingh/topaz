@@ -5,8 +5,8 @@
 #include "apps/dart_content_handler/dart_application_controller.h"
 
 #include <fcntl.h>
-#include <magenta/status.h>
-#include <mxio/namespace.h>
+#include <zircon/status.h>
+#include <fdio/namespace.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <utility>
@@ -91,11 +91,11 @@ bool DartApplicationController::CreateIsolate() {
 
 constexpr char kServiceRootPath[] = "/svc";
 
-mxio_ns_t* DartApplicationController::SetupNamespace() {
-  mxio_ns_t* mxio_namespc;
+fdio_ns_t* DartApplicationController::SetupNamespace() {
+  fdio_ns_t* fdio_namespc;
   const app::FlatNamespacePtr& flat = startup_info_->flat_namespace;
-  mx_status_t status = mxio_ns_create(&mxio_namespc);
-  if (status != MX_OK) {
+  zx_status_t status = fdio_ns_create(&fdio_namespc);
+  if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to create namespace";
     return nullptr;
   }
@@ -104,18 +104,18 @@ mxio_ns_t* DartApplicationController::SetupNamespace() {
       // Ownership of /svc goes to the ApplicationContext created below.
       continue;
     }
-    mx::channel dir = std::move(flat->directories[i]);
-    mx_handle_t dir_handle = dir.release();
+    zx::channel dir = std::move(flat->directories[i]);
+    zx_handle_t dir_handle = dir.release();
     const char* path = flat->paths[i].data();
-    status = mxio_ns_bind(mxio_namespc, path, dir_handle);
-    if (status != MX_OK) {
+    status = fdio_ns_bind(fdio_namespc, path, dir_handle);
+    if (status != ZX_OK) {
       FXL_LOG(ERROR) << "Failed to bind " << flat->paths[i] << " to namespace";
-      mx_handle_close(dir_handle);
-      mxio_ns_destroy(mxio_namespc);
+      zx_handle_close(dir_handle);
+      fdio_ns_destroy(fdio_namespc);
       return nullptr;
     }
   }
-  return mxio_namespc;
+  return fdio_namespc;
 }
 
 bool DartApplicationController::Main() {
@@ -153,12 +153,12 @@ bool DartApplicationController::Main() {
   auto outgoing_services = service_provider.NewRequest();
   service_provider_bridge_.set_backend(std::move(service_provider));
 
-  mxio_ns_t* mxio_namespc = SetupNamespace();
-  if (mxio_namespc == nullptr)
+  fdio_ns_t* fdio_namespc = SetupNamespace();
+  if (fdio_namespc == nullptr)
     return false;
 
   InitBuiltinLibrariesForIsolate(
-      url_, mxio_namespc,
+      url_, fdio_namespc,
       app::ApplicationContext::CreateFrom(std::move(startup_info_)),
       std::move(outgoing_services));
 

@@ -4,8 +4,8 @@
 
 #include "apps/dart_content_handler/builtin_libraries.h"
 
-#include <mx/channel.h>
-#include <mxio/namespace.h>
+#include <zx/channel.h>
+#include <fdio/namespace.h>
 
 #include "dart/runtime/bin/io_natives.h"
 #include "dart/runtime/include/dart_api.h"
@@ -92,7 +92,7 @@ void ScheduleMicrotask(Dart_NativeArguments args) {
 
 void InitBuiltinLibrariesForIsolate(
     const std::string& script_uri,
-    mxio_ns_t* namespc,
+    fdio_ns_t* namespc,
     std::unique_ptr<app::ApplicationContext> context,
     fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
   // dart:fuchsia --------------------------------------------------------------
