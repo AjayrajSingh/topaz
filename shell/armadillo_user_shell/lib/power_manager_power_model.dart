@@ -16,7 +16,9 @@ class PowerManagerPowerModel extends PowerModel {
 
   int _percentage;
   bool _isCharging;
+  bool _powerAdapterOnline;
   bool _hasBattery = true;
+  Duration _batteryLifeRemaining;
 
   /// Constructor.
   PowerManagerPowerModel({this.powerManager}) {
@@ -38,7 +40,13 @@ class PowerManagerPowerModel extends PowerModel {
   bool get isCharging => _isCharging;
 
   @override
+  bool get powerAdapterOnline => _powerAdapterOnline;
+
+  @override
   bool get hasBattery => _hasBattery;
+
+  @override
+  Duration get batteryLifeRemaining => _batteryLifeRemaining;
 
   /// Call to close any handles owned by this model.
   void close() {
@@ -52,15 +60,38 @@ class PowerManagerPowerModel extends PowerModel {
           _hasBattery = true;
           notifyListeners();
         }
+
         int percentage = status.level.round();
         if (_percentage != percentage) {
           _percentage = percentage;
           notifyListeners();
         }
+
         if (_isCharging != status.charging) {
           _isCharging = status.charging;
           notifyListeners();
         }
+
+        if (_powerAdapterOnline != status.powerAdapterOnline) {
+          _powerAdapterOnline = status.powerAdapterOnline;
+          notifyListeners();
+        }
+
+        Duration newBatteryLifeRemaining;
+        if (status.remainingBatteryLife >= 0.0) {
+          int hours = status.remainingBatteryLife.floor();
+          int minutes = ((status.remainingBatteryLife - hours) * 60).floor();
+          newBatteryLifeRemaining = new Duration(
+            hours: hours,
+            minutes: minutes,
+          );
+        }
+
+        if (newBatteryLifeRemaining != _batteryLifeRemaining) {
+          _batteryLifeRemaining = newBatteryLifeRemaining;
+          notifyListeners();
+        }
+
         break;
       default:
         if (_hasBattery != false) {

@@ -27,11 +27,25 @@ abstract class PowerModel extends Model {
   /// Returns true if the battery is charging.
   bool get isCharging;
 
+  /// Returns true if the power adapter is online.
+  bool get powerAdapterOnline;
+
   /// Returns true if the device has a battery.
   bool get hasBattery;
 
   /// The text associated with the current battery percentage.
-  String get batteryText => isReady ? '$percentage%' : '';
+  String get batteryText {
+    if (!isReady) {
+      return '';
+    }
+    if (isCharging || powerAdapterOnline || batteryLifeRemaining == null) {
+      return '$percentage%';
+    }
+    String hours = '${batteryLifeRemaining.inHours}';
+    int intMinutes = batteryLifeRemaining.inMinutes % 60;
+    String minutes = intMinutes >= 10 ? '$intMinutes' : '0$intMinutes';
+    return '$hours:$minutes';
+  }
 
   /// The image associated with the current power status.
   String get batteryImageUrl {
@@ -62,7 +76,12 @@ abstract class PowerModel extends Model {
       imageValue = '90';
     }
 
-    return '$_kBatteryUrlPrefix${isCharging ? 'charging_' : ''}'
+    return '$_kBatteryUrlPrefix'
+        '${isCharging || powerAdapterOnline ? 'charging_' : ''}'
         '$imageValue$_kBatteryUrlSuffix';
   }
+
+  /// The remaining battery life.  Null if no battery or battery is not
+  /// discharging.
+  Duration get batteryLifeRemaining;
 }
