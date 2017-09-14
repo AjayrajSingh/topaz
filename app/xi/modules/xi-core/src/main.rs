@@ -7,7 +7,7 @@
 extern crate xi_core_lib;
 extern crate xi_rpc;
 
-extern crate magenta;
+extern crate zircon;
 extern crate mxruntime;
 #[macro_use]
 extern crate fidl;
@@ -24,8 +24,8 @@ use std::thread;
 use std::io::{self, Write, Cursor};
 use std::sync::Arc;
 
-use self::magenta::{Channel, HandleBase, Socket, Status, cprng_draw};
-use self::magenta::{MX_SOCKET_READABLE, MX_SOCKET_PEER_CLOSED, MX_TIME_INFINITE};
+use self::zircon::{Channel, HandleBase, Socket, Status, cprng_draw};
+use self::zircon::{ZX_SOCKET_READABLE, ZX_SOCKET_PEER_CLOSED, ZX_TIME_INFINITE};
 use self::mxruntime::{HandleType, get_startup_handle};
 
 use fidl::Server;
@@ -45,10 +45,10 @@ fn status_to_io_err(_status: Status) -> io::Error {
 
 impl io::Read for MySocket {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        let wait_sigs = MX_SOCKET_READABLE | MX_SOCKET_PEER_CLOSED;
-        match self.0.wait(wait_sigs, MX_TIME_INFINITE) {
+        let wait_sigs = ZX_SOCKET_READABLE | ZX_SOCKET_PEER_CLOSED;
+        match self.0.wait(wait_sigs, ZX_TIME_INFINITE) {
             Ok(signals) => {
-                if signals.contains(MX_SOCKET_PEER_CLOSED) {
+                if signals.contains(ZX_SOCKET_PEER_CLOSED) {
                     return Ok(0)
                 }
             }

@@ -4,7 +4,7 @@ Xi Editor for Fuchsia
 This repository contains the Fuchsia front-end for [xi editor](https://github.com/google/xi-editor).
 
 The back-end, or core (modules/xi-core) is basically the same as for the main
-xi editor, except that it is invoked through fidl and uses Magenta sockets for
+xi editor, except that it is invoked through fidl and uses Zircon sockets for
 communication (still using a json-rpc based protocol, though that may evolve
 in the future). The front-end is written in Flutter.
 
@@ -48,9 +48,9 @@ Don't forget to set up the [Fuchsia environment helpers][fuchsia-env] in `script
 
 **NOTE:** This step is temporary.
 
-A custom `rustc` build is required before Xi core can be built for Fuchsia. Start by building the [clang wrapper][clang-wrapper] in [magenta-rs][https://fuchsia.googlesource.com/magenta-rs/]:
+A custom `rustc` build is required before Xi core can be built for Fuchsia. Start by building the [clang wrapper][clang-wrapper] in [zircon-rs][https://fuchsia.googlesource.com/zircon-rs/]:
 
-    export RUST_TOOLS=${FUCHSIA_DIR}/rust/magenta-rs/tools
+    export RUST_TOOLS=${FUCHSIA_DIR}/rust/zircon-rs/tools
     cd $RUST_TOOLS
     clang++ -O --std=c++11 clang_wrapper.cc -o clang_wrapper
     ln -s clang_wrapper x86-64-unknown-fuchsia-ar
@@ -62,7 +62,7 @@ You can sanity-check the clang wrapper:
     ${RUST_TOOLS}/x86-64-unknown-fuchsia-cc
     clang-4.0: error: no input files
 
-Then clone and build Rust per the [magenta-rs docs][magenta-rs-docs]:
+Then clone and build Rust per the [zircon-rs docs][zircon-rs-docs]:
 
     export RUST_ROOT=${FUCHSIA_DIR}/third_party/rust
     git clone https://github.com/rust-lang/rust.git $RUST_ROOT
@@ -93,9 +93,9 @@ Configure and build rustc (this will take a while):
 
 ## Verify Rust Build
 
-Build the magenta examples:
+Build the zircon examples:
 
-    cd $FUCHSIA_DIR/rust/magenta-rs/
+    cd $FUCHSIA_DIR/rust/zircon-rs/
 
 Configure cargo for the fuchsia target:
 
@@ -105,9 +105,9 @@ Configure cargo for the fuchsia target:
     linker = "${RUST_TOOLS}/x86-64-unknown-fuchsia-cc"
     EOF
 
-Build the magenta-rs example mx_toy:
+Build the zircon-rs example zx_toy:
 
-    RUSTC=${RUST_ROOT}/build/x86_64-apple-darwin/stage1/bin/rustc cargo build --target=x86_64-unknown-fuchsia --example mx_toy
+    RUSTC=${RUST_ROOT}/build/x86_64-apple-darwin/stage1/bin/rustc cargo build --target=x86_64-unknown-fuchsia --example zx_toy
 
 The command above should succeed and generate a rust binary in the target dir.
 
@@ -159,13 +159,13 @@ Assuming you have a working Acer setup and are running `fboot` in a different te
 
 Optional: In another terminal you can tail the logs
 
-    ${FUCHSIA_DIR}/out/build-magenta/tools/loglistener
+    ${FUCHSIA_DIR}/out/build-zircon/tools/loglistener
 
-You can run the mx_toy example from your host with:
+You can run the zx_toy example from your host with:
 
-    netruncmd : "example_mx_toy"
+    netruncmd : "example_zx_toy"
 
-You won't see any output, if you run `example_mx_toy` on the device you should see some log output.
+You won't see any output, if you run `example_zx_toy` on the device you should see some log output.
 
 To run Xi from your host machine:
 
@@ -216,6 +216,6 @@ Run the Flutter app:
 [widgets-intro]: https://flutter.io/widgets-intro/
 [fuchsia-setup]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md
 [fuchsia-env]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md#Setup-Build-Environment
-[clang-wrapper]: https://fuchsia.googlesource.com/magenta-rs/+/HEAD/tools
-[magenta-rs-docs]: https://fuchsia.googlesource.com/magenta-rs/+/HEAD/GETTING_STARTED.md
+[clang-wrapper]: https://fuchsia.googlesource.com/zircon-rs/+/HEAD/tools
+[zircon-rs-docs]: https://fuchsia.googlesource.com/zircon-rs/+/HEAD/GETTING_STARTED.md
 [fuchsia-xi]: https://fuchsia.googlesource.com/xi/
