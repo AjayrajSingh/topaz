@@ -22,7 +22,7 @@ function main() {
 
   echo "=== running ${package}"
 
-  $FUCHSIA_DIR/out/build-magenta/tools/netruncmd : "device_runner \
+  $FUCHSIA_DIR/out/build-zircon/tools/netruncmd : "device_runner \
     --device_shell=dev_device_shell \
     --user_shell=dev_user_shell \
     --user_shell_args='--root_module=${package}'"
