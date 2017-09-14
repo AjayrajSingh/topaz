@@ -298,11 +298,8 @@ class _NetstackInfo extends StatelessWidget {
                               child: _wrapIcon(
                                 info.sendingRevealAnimation,
                                 info.sendingRepeatAnimation,
-                                new Icon(
-                                  Icons.arrow_upward,
-                                  color: Colors.white,
-                                  size: 16.0,
-                                ),
+                                Icons.arrow_upward,
+                                Colors.grey,
                               ),
                             ),
                             new Container(width: 4.0),
@@ -311,11 +308,8 @@ class _NetstackInfo extends StatelessWidget {
                               child: _wrapIcon(
                                 info.receivingRevealAnimation,
                                 info.receivingRepeatAnimation,
-                                new Icon(
-                                  Icons.arrow_downward,
-                                  color: Colors.white,
-                                  size: 16.0,
-                                ),
+                                Icons.arrow_downward,
+                                Colors.grey,
                               ),
                             ),
                           ],
@@ -328,25 +322,22 @@ class _NetstackInfo extends StatelessWidget {
   Widget _wrapIcon(
     Animation<double> reveal,
     Animation<double> repeat,
-    Icon icon,
+    IconData iconData,
+    MaterialColor palette,
   ) =>
       new AnimatedBuilder(
-        animation: reveal,
-        builder: (BuildContext context, Widget child) => new Opacity(
-              opacity: reveal.value,
-              child: new AnimatedBuilder(
-                animation: repeat,
-                builder: (BuildContext context, Widget child) => new Transform(
-                      transform: new Matrix4.identity().scaled(
-                          1.1 - (repeat.value - 0.5).abs() / 5,
-                          1.1 - (repeat.value - 0.5).abs() / 5,
-                          0.0),
-                      alignment: FractionalOffset.center,
-                      child: child,
-                    ),
-                child: child,
-              ),
+        animation: new Listenable.merge(<Listenable>[reveal, repeat]),
+        builder: (_, __) => new Icon(
+              iconData,
+              color: Color.lerp(
+                  Colors.grey[800],
+                  Color.lerp(
+                    palette[100],
+                    palette[300],
+                    ((repeat.value - 0.5) / 0.5).abs(),
+                  ),
+                  reveal.value),
+              size: 16.0,
             ),
-        child: icon,
       );
 }

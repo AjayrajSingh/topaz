@@ -122,10 +122,7 @@ class InterfaceInfo {
   /// Name of the interface.
   String get name => _interface.name;
 
-  void _update(
-    NetInterface interface,
-    NetInterfaceStats stats,
-  ) {
+  void _update(NetInterface interface, NetInterfaceStats stats) {
     _interface = interface;
 
     bool oldReceiving = _receiving;
