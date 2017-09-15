@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui' show lerpDouble;
-
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
@@ -36,53 +34,7 @@ class ConductorState extends State<Conductor> {
   Widget build(BuildContext context) =>
       new ScopedModelDescendant<ConductorModel>(
         builder: (_, __, ConductorModel conductorModel) =>
-            new ScopedModelDescendant<SizeModel>(
-              builder: (_, __, SizeModel sizeModel) {
-                double idleModeOffset = sizeModel.screenSize.width * 1.5;
-                return new ScopedModelDescendant<IdleModel>(
-                  builder: (
-                    BuildContext context,
-                    Widget child,
-                    IdleModel idleModel,
-                  ) =>
-                      new Transform(
-                        transform: new Matrix4.translationValues(
-                          lerpDouble(
-                            0.0,
-                            idleModeOffset,
-                            idleModel.value,
-                          ),
-                          0.0,
-                          0.0,
-                        ),
-                        child: new Stack(
-                          overflow: Overflow.visible,
-                          children: <Widget>[
-                            new Positioned.fill(
-                              child: new Offstage(
-                                offstage: idleModel.value == 1.0,
-                                child: child,
-                              ),
-                            ),
-                            new Positioned(
-                              top: 0.0,
-                              left: -idleModeOffset,
-                              width: sizeModel.screenSize.width,
-                              height: sizeModel.screenSize.height,
-                              child: new Offstage(
-                                offstage: idleModel.value == 0.0,
-                                child: conductorModel.idleModeBuilder.build(
-                                  context,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  child: _buildParts(context, conductorModel),
-                );
-              },
-            ),
+            _buildParts(context, conductorModel),
       );
 
   /// Note in particular the magic we're employing here to make the user
@@ -98,6 +50,9 @@ class ConductorState extends State<Conductor> {
       new Stack(
         fit: StackFit.passthrough,
         children: <Widget>[
+          /// Idle Mode.
+          conductorModel.idleModeBuilder.build(context),
+
           /// Story List.
           conductorModel.recentsBuilder.build(
             context,

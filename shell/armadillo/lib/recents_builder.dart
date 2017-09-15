@@ -5,6 +5,7 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'armadillo_overlay.dart';
 import 'edge_scroll_drag_target.dart';
@@ -44,6 +45,42 @@ class RecentsBuilder {
 
   /// Builds recents.
   Widget build(
+    BuildContext context, {
+    ValueChanged<double> onScroll,
+    VoidCallback onStoryClusterFocusStarted,
+    OnStoryClusterEvent onStoryClusterFocusCompleted,
+    VoidCallback onStoryClusterVerticalEdgeHover,
+  }) =>
+      new ScopedModelDescendant<SizeModel>(
+        builder: (_, Widget child, SizeModel sizeModel) =>
+            new ScopedModelDescendant<IdleModel>(
+              builder: (_, Widget child, IdleModel idleModel) => new Transform(
+                    transform: new Matrix4.translationValues(
+                      0.0,
+                      lerpDouble(
+                        0.0,
+                        -sizeModel.screenSize.height * 1.2,
+                        idleModel.value,
+                      ),
+                      0.0,
+                    ),
+                    child: new Offstage(
+                      offstage: idleModel.value == 1.0,
+                      child: child,
+                    ),
+                  ),
+              child: child,
+            ),
+        child: _buildRecents(
+          context,
+          onScroll: onScroll,
+          onStoryClusterFocusStarted: onStoryClusterFocusStarted,
+          onStoryClusterFocusCompleted: onStoryClusterFocusCompleted,
+          onStoryClusterVerticalEdgeHover: onStoryClusterVerticalEdgeHover,
+        ),
+      );
+
+  Widget _buildRecents(
     BuildContext context, {
     ValueChanged<double> onScroll,
     VoidCallback onStoryClusterFocusStarted,

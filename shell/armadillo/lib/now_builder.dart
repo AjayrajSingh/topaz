@@ -2,10 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'now.dart';
 import 'quick_settings.dart';
+import 'size_model.dart';
 
 /// Builds now.
 class NowBuilder {
@@ -44,6 +48,52 @@ class NowBuilder {
 
   /// Builds now.
   Widget build(
+    BuildContext context, {
+    ValueChanged<double> onQuickSettingsProgressChange,
+    VoidCallback onMinimizedTap,
+    VoidCallback onMinimize,
+    VoidCallback onMaximize,
+    VoidCallback onQuickSettingsMaximized,
+    VoidCallback onOverscrollThresholdRelease,
+    GestureDragUpdateCallback onBarVerticalDragUpdate,
+    GestureDragEndCallback onBarVerticalDragEnd,
+    VoidCallback onMinimizedContextTapped,
+  }) =>
+      new ScopedModelDescendant<SizeModel>(
+        builder: (_, Widget child, SizeModel sizeModel) =>
+            new ScopedModelDescendant<IdleModel>(
+              builder: (_, Widget child, IdleModel idleModel) => new Transform(
+                    transform: new Matrix4.translationValues(
+                      lerpDouble(
+                        0.0,
+                        sizeModel.screenSize.width * 1.2,
+                        idleModel.value,
+                      ),
+                      0.0,
+                      0.0,
+                    ),
+                    child: new Offstage(
+                      offstage: idleModel.value == 1.0,
+                      child: child,
+                    ),
+                  ),
+              child: child,
+            ),
+        child: _buildNow(
+          context,
+          onQuickSettingsProgressChange: onQuickSettingsProgressChange,
+          onMinimizedTap: onMinimizedTap,
+          onMinimize: onMinimize,
+          onMaximize: onMaximize,
+          onQuickSettingsMaximized: onQuickSettingsMaximized,
+          onOverscrollThresholdRelease: onOverscrollThresholdRelease,
+          onBarVerticalDragUpdate: onBarVerticalDragUpdate,
+          onBarVerticalDragEnd: onBarVerticalDragEnd,
+          onMinimizedContextTapped: onMinimizedContextTapped,
+        ),
+      );
+
+  Widget _buildNow(
     BuildContext context, {
     ValueChanged<double> onQuickSettingsProgressChange,
     VoidCallback onMinimizedTap,

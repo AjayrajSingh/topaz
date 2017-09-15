@@ -2,7 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'expand_suggestion.dart';
 import 'interruption_overlay.dart';
@@ -57,6 +60,33 @@ class NextBuilder {
 
   /// Builds now.
   Widget build(
+    BuildContext context, {
+    VoidCallback onMinimizeNow,
+  }) =>
+      new ScopedModelDescendant<SizeModel>(
+        builder: (_, Widget child, SizeModel sizeModel) =>
+            new ScopedModelDescendant<IdleModel>(
+              builder: (_, Widget child, IdleModel idleModel) => new Transform(
+                    transform: new Matrix4.translationValues(
+                      0.0,
+                      lerpDouble(
+                        0.0,
+                        sizeModel.screenSize.height * 1.0,
+                        idleModel.value,
+                      ),
+                      0.0,
+                    ),
+                    child: new Offstage(
+                      offstage: idleModel.value == 1.0,
+                      child: child,
+                    ),
+                  ),
+              child: child,
+            ),
+        child: _buildNow(context, onMinimizeNow: onMinimizeNow),
+      );
+
+  Widget _buildNow(
     BuildContext context, {
     VoidCallback onMinimizeNow,
   }) =>
