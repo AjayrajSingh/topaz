@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.app.dart/app.dart';
 import 'package:apps.maxwell.lib.dart/decomposition.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.context/metadata.fidl.dart';
@@ -15,6 +14,7 @@ import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
 import 'package:config/config.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
@@ -37,8 +37,7 @@ final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 /// Concert ContextListener that prints if the given artist has an upcoming
 /// concert in the user's metro area.
 class ContextListenerImpl extends ContextListener {
-  final ContextListenerBinding _binding =
-      new ContextListenerBinding();
+  final ContextListenerBinding _binding = new ContextListenerBinding();
 
   Api _api;
 

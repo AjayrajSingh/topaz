@@ -14,15 +14,15 @@ flutter_app("concert_event_list") {
   manifest = "pubspec.yaml"
 
   deps = [
-    "//garnet/public/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modules/common/packages/config",
     "//apps/modules/music/packages/concert_api",
     "//apps/modules/music/packages/concert_models",
     "//apps/modules/music/packages/concert_widgets",
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
+    "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",

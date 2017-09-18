@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:apps.maxwell.services.context/context_writer.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
@@ -15,6 +14,7 @@ import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:web_view/web_view.dart' as web_view;
 

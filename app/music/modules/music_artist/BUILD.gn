@@ -13,7 +13,6 @@ flutter_app("music_artist") {
   source_dir = "lib"
 
   deps = [
-    "//garnet/public/lib/app/dart",
     "//apps/maxwell/lib/dart",
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/user:user_dart",
@@ -24,8 +23,9 @@ flutter_app("music_artist") {
     "//apps/modules/music/packages/music_models",
     "//apps/modules/music/packages/music_widgets",
     "//apps/modules/music/services/player:player_dart",
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
+    "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/intl",
     "//topaz/lib/widgets/packages/logging:lib.logging",

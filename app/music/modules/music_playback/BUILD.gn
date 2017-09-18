@@ -13,15 +13,15 @@ flutter_app("music_playback") {
   source_dir = "lib"
 
   deps = [
-    "//garnet/public/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modules/music/packages/music_api",
     "//apps/modules/music/packages/music_models",
     "//apps/modules/music/packages/music_widgets",
     "//apps/modules/music/services/player:player_dart",
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
+    "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/intl",
     "//topaz/lib/widgets/packages/logging:lib.logging",

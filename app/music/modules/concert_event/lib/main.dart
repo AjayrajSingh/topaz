@@ -4,10 +4,10 @@
 
 import 'dart:async';
 
-import 'package:lib.app.dart/app.dart';
 import 'package:concert_widgets/concert_widgets.dart';
 import 'package:config/config.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 

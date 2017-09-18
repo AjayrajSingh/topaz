@@ -4,8 +4,6 @@
 
 import 'dart:async';
 
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:apps.modular.services.agent.agent_controller/agent_controller.fidl.dart';
 import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
@@ -14,6 +12,8 @@ import 'package:apps.modules.music.services.player/player.fidl.dart'
     as player_fidl;
 import 'package:apps.modules.music.services.player/repeat_mode.fidl.dart';
 import 'package:apps.modules.music.services.player/status.fidl.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_models/music_models.dart';
 

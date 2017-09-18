@@ -8,7 +8,6 @@ dart_app("last_fm_agent") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//garnet/public/lib/app/dart",
     "//apps/maxwell/lib/dart",
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/context:context_dart",
@@ -17,6 +16,7 @@ dart_app("last_fm_agent") {
     "//apps/modules/common/packages/config",
     "//apps/modules/music/packages/last_fm_api",
     "//apps/modules/music/packages/last_fm_models",
+    "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
   ]

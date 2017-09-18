@@ -14,7 +14,6 @@ flutter_app("concert_event_page") {
   manifest = "pubspec.yaml"
 
   deps = [
-    "//garnet/public/lib/app/dart",
     "//apps/maxwell/lib/dart",
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/user:user_dart",
@@ -24,9 +23,10 @@ flutter_app("concert_event_page") {
     "//apps/modules/music/packages/concert_api",
     "//apps/modules/music/packages/concert_models",
     "//apps/modules/music/packages/concert_widgets",
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//apps/web_runner/lib/dart:web_view",
+    "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",

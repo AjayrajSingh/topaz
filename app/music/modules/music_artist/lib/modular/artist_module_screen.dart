@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';

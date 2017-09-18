@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.context/metadata.fidl.dart';
 import 'package:apps.maxwell.services.context/value_type.fidl.dart';
@@ -16,6 +15,7 @@ import 'package:apps.modular.services.surface/surface.fidl.dart';
 import 'package:config/config.dart';
 import 'package:last_fm_api/api.dart';
 import 'package:last_fm_models/last_fm_models.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
@@ -25,7 +25,7 @@ import 'package:meta/meta.dart';
 /// Spotify recognizes
 
 /// The context topic for "Music Artist"
-const String _kMusicArtistTopic = '/story/focused/link/music_artist';
+const String _kMusicArtistTopic = 'link/music_artist';
 
 /// The Entity type for a music artist.
 const String _kMusicArtistType = 'http://types.fuchsia.io/music/artist';
@@ -39,8 +39,7 @@ final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 /// Concert ContextListener that prints if the given artist has an upcoming
 /// concert in the user's metro area.
 class ContextListenerImpl extends ContextListener {
-  final ContextListenerBinding _binding =
-      new ContextListenerBinding();
+  final ContextListenerBinding _binding = new ContextListenerBinding();
 
   final LastFmApi _api;
 

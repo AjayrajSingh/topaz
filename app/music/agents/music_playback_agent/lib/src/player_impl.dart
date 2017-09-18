@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.media.dart/audio_player_controller.dart';
 import 'package:apps.modules.music.services.player/player.fidl.dart';
 import 'package:apps.modules.music.services.player/repeat_mode.fidl.dart';
 import 'package:apps.modules.music.services.player/status.fidl.dart';
 import 'package:apps.modules.music.services.player/track.fidl.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.media.dart/audio_player_controller.dart';
 
 /// Function signature for status callback
 typedef void GetStatusCallback(PlayerStatus status);

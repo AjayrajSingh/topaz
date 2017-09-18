@@ -4,9 +4,9 @@
 
 import 'dart:async';
 
-import 'package:lib.app.dart/app.dart';
 import 'package:config/config.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_widgets/music_widgets.dart';

@@ -5,8 +5,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:apps.maxwell.lib.dart/decomposition.dart';
 import 'package:apps.modular.services.agent.agent_controller/agent_controller.fidl.dart';
 import 'package:apps.modular.services.component/component_context.fidl.dart';
@@ -19,9 +17,11 @@ import 'package:apps.modules.music.services.player/player.fidl.dart'
 import 'package:apps.modules.music.services.player/status.fidl.dart';
 import 'package:apps.modules.music.services.player/track.fidl.dart'
     as track_fidl;
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_token.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:music_api/api.dart';
