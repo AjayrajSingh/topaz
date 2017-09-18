@@ -159,10 +159,6 @@ class SizeModel extends Model {
   /// Height of the suggestion list when it is expanded
   double get suggestionExpandedHeight => screenSize.height * 0.8;
 
-  /// Whether the suggestion list should be expanded regardless of user
-  /// interaction.
-  bool get autoExpandSuggestion => false;
-
   /// The top padding of the story list
   double get storyListTopPadding => screenSize.height / 8.0;
 }

@@ -172,7 +172,7 @@ class PeekingOverlayState extends TickingDoubleState<PeekingOverlay> {
                     double targetMaxHeight = sizeModel.suggestionExpandedHeight;
                     if (maxValue != targetMaxHeight && targetMaxHeight != 0.0) {
                       maxValue = targetMaxHeight;
-                      if (!hiding || sizeModel.autoExpandSuggestion) {
+                      if (!hiding) {
                         show();
                       }
                     }
