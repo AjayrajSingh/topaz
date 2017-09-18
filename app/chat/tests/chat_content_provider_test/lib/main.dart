@@ -16,7 +16,7 @@ import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modules.chat.agents.content_provider..chat_content_provider_dart_package/src/chat_content_provider_impl.dart';
 import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
-import 'package:apps.test_runner.services..test_runner/test_runner.fidl.dart';
+import 'package:lib.test_runner.fidl/test_runner.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' hide Message;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.modular/modular.dart';

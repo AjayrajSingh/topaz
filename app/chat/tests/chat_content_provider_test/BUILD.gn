@@ -14,7 +14,7 @@ dart_app("chat_content_provider_test") {
     "//apps/modular/services/story:story_dart",
     "//apps/modules/chat/agents/content_provider:chat_content_provider_dart_package",
     "//apps/modules/chat/services:services_dart",
-    "//apps/test_runner/services:test_runner_dart",
+    "//garnet/public/lib/test_runner/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/matcher",
     "//third_party/dart-pkg/pub/meta",
