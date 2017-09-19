@@ -7,12 +7,14 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
 import 'context_model.dart';
 import 'elevations.dart';
 import 'important_info.dart';
 import 'nothing.dart';
+import 'now_minimization_model.dart';
 import 'opacity_model.dart';
 import 'power_model.dart';
 import 'quick_settings.dart';
@@ -60,12 +62,6 @@ class Now extends StatefulWidget {
   /// Called when [Now]'s center button is long pressed while minimized.
   final VoidCallback onMinimizedLongPress;
 
-  /// Called when [Now] is minimized.
-  final VoidCallback onMinimize;
-
-  /// Called when [Now] is maximized.
-  final VoidCallback onMaximize;
-
   /// Called when [Now]'s quick settings are maximized.
   final VoidCallback onQuickSettingsMaximized;
 
@@ -99,8 +95,6 @@ class Now extends StatefulWidget {
     this.quickSettingsHeightBump,
     this.onMinimizedTap,
     this.onMinimizedLongPress,
-    this.onMinimize,
-    this.onMaximize,
     this.onQuickSettingsMaximized,
     this.onBarVerticalDragUpdate,
     this.onBarVerticalDragEnd,
@@ -116,21 +110,9 @@ class Now extends StatefulWidget {
   NowState createState() => new NowState();
 }
 
-/// Spring description used by the minimization and quick settings reveal
-/// simulations.
-const RK4SpringDescription _kSimulationDesc =
-    const RK4SpringDescription(tension: 600.0, friction: 50.0);
-
-const double _kMinimizationSimulationTarget = 400.0;
-
 /// Controls the animations for maximizing and minimizing, showing and hiding
 /// quick settings, and vertically shifting as the story list is scrolled.
-class NowState extends TickingState<Now> {
-  /// The simulation for the minimization to a bar.
-  final RK4SpringSimulation _minimizationSimulation =
-      new RK4SpringSimulation(initValue: 0.0, desc: _kSimulationDesc);
-
-  final GlobalKey _quickSettingsKey = new GlobalKey();
+class NowState extends State<Now> {
   final GlobalKey _importantInfoMaximizedKey = new GlobalKey();
   final GlobalKey _userContextTextKey = new GlobalKey();
   final GlobalKey _userImageKey = new GlobalKey();
@@ -157,17 +139,17 @@ class NowState extends TickingState<Now> {
     }
     if (scrollOffset > _kNowMinimizationScrollOffsetThreshold &&
         _lastRecentsScrollOffset < scrollOffset) {
-      minimize();
-      hideQuickSettings();
+      NowMinimizationModel.of(context).minimize();
+      QuickSettingsProgressModel.of(context).hide();
     } else if (scrollOffset < _kNowMinimizationScrollOffsetThreshold &&
         _lastRecentsScrollOffset > scrollOffset) {
-      maximize();
+      NowMinimizationModel.of(context).maximize();
     }
     // When we're past the quick settings threshold and are
     // scrolling further, hide quick settings.
     if (scrollOffset > _kNowQuickSettingsHideScrollOffsetThreshold &&
         _lastRecentsScrollOffset < scrollOffset) {
-      hideQuickSettings();
+      QuickSettingsProgressModel.of(context).hide();
     }
     _lastRecentsScrollOffset = scrollOffset;
   }
@@ -197,7 +179,16 @@ class NowState extends TickingState<Now> {
             Widget child,
             QuickSettingsProgressModel quickSettingsProgressModel,
           ) =>
-              _buildNow(context),
+              new ScopedModelDescendant<NowMinimizationModel>(
+                builder: (
+                  BuildContext context,
+                  Widget child,
+                  NowMinimizationModel nowMinimizationModel,
+                ) {
+                  _updateMinimizedInfoOpacity();
+                  return _buildNow(context);
+                },
+              ),
         ),
       );
 
@@ -314,9 +305,9 @@ class NowState extends TickingState<Now> {
         behavior: HitTestBehavior.opaque,
         onTap: () {
           if (!_revealingQuickSettings) {
-            showQuickSettings();
+            _showQuickSettings();
           } else {
-            hideQuickSettings();
+            QuickSettingsProgressModel.of(context).hide();
           }
         },
         child: new PhysicalModel(
@@ -348,7 +339,6 @@ class NowState extends TickingState<Now> {
             sizeModel,
           ),
           child: new Column(
-            key: _quickSettingsKey,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               new Divider(
@@ -600,43 +590,9 @@ class NowState extends TickingState<Now> {
         ),
       );
 
-  @override
-  bool handleTick(double elapsedSeconds) {
-    bool continueTicking = false;
-
-    // Tick the minimization simulation.
-    if (!_minimizationSimulation.isDone) {
-      _minimizationSimulation.elapseTime(elapsedSeconds);
-      if (!_minimizationSimulation.isDone) {
-        continueTicking = true;
-      }
-    }
-
-    _updateMinimizedInfoOpacity();
-    return continueTicking;
-  }
-
-  /// Minimizes [Now] to its bar state.
-  void minimize() {
-    if (!_minimizing) {
-      _minimizationSimulation.target = _kMinimizationSimulationTarget;
-      startTicking();
-      widget.onMinimize?.call();
-    }
-  }
-
-  /// Maximizes [Now] to display the user and context text.
-  void maximize() {
-    if (_minimizing) {
-      _minimizationSimulation.target = 0.0;
-      startTicking();
-      widget.onMaximize?.call();
-    }
-  }
-
   /// Morphs [Now] into its quick settings mode.
   /// This should only be called when [Now] is maximized.
-  void showQuickSettings() {
+  void _showQuickSettings() {
     double heightFromKey(GlobalKey key) {
       RenderBox box = key.currentContext.findRenderObject();
       return box.size.height;
@@ -652,20 +608,10 @@ class NowState extends TickingState<Now> {
     }
   }
 
-  /// Morphs [Now] into its normal mode.
-  /// This should only be called when [Now] is maximized.
-  void hideQuickSettings() {
-    QuickSettingsProgressModel.of(context).target = 0.0;
-  }
-
   double get _quickSettingsProgress =>
       QuickSettingsProgressModel.of(context).value;
 
-  double get _minimizationProgress =>
-      _minimizationSimulation.value / _kMinimizationSimulationTarget;
-
-  bool get _minimizing =>
-      _minimizationSimulation.target == _kMinimizationSimulationTarget;
+  double get _minimizationProgress => NowMinimizationModel.of(context).value;
 
   bool get _revealingQuickSettings =>
       QuickSettingsProgressModel.of(context).target == 1.0;

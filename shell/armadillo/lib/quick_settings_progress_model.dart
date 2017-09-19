@@ -19,6 +19,16 @@ class QuickSettingsProgressModel extends SpringModel {
   /// Constructor.
   QuickSettingsProgressModel() : super(springDescription: _kSimulationDesc);
 
+  /// Shows quick settings.
+  void show() {
+    target = 1.0;
+  }
+
+  /// Hides quick settings.
+  void hide() {
+    target = 0.0;
+  }
+
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
   static QuickSettingsProgressModel of(BuildContext context) =>

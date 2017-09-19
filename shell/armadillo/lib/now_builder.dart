@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'now.dart';
+import 'now_minimization_model.dart';
 import 'quick_settings.dart';
 import 'size_model.dart';
 
@@ -15,6 +16,9 @@ import 'size_model.dart';
 class NowBuilder {
   /// How far Now should raise when quick settings is activated inline.
   static final double kQuickSettingsHeightBump = 120.0;
+
+  /// The simulation for the minimization to a bar.
+  final NowMinimizationModel _nowMinimizationModel = new NowMinimizationModel();
 
   final GlobalKey<NowState> _nowKey = new GlobalKey<NowState>();
   final GlobalKey<QuickSettingsOverlayState> _quickSettingsOverlayKey =
@@ -46,12 +50,20 @@ class NowBuilder {
     _onQuickSettingsOverlayChanged = onQuickSettingsOverlayChanged;
   }
 
+  /// Called when now is minimized.
+  set onMinimize(VoidCallback onMinimize) {
+    _nowMinimizationModel.onMinimize = onMinimize;
+  }
+
+  /// Called when now is maximized.
+  set onMaximize(VoidCallback onMaximize) {
+    _nowMinimizationModel.onMaximize = onMaximize;
+  }
+
   /// Builds now.
   Widget build(
     BuildContext context, {
     VoidCallback onMinimizedTap,
-    VoidCallback onMinimize,
-    VoidCallback onMaximize,
     VoidCallback onQuickSettingsMaximized,
     VoidCallback onOverscrollThresholdRelease,
     GestureDragUpdateCallback onBarVerticalDragUpdate,
@@ -78,24 +90,23 @@ class NowBuilder {
                   ),
               child: child,
             ),
-        child: _buildNow(
-          context,
-          onMinimizedTap: onMinimizedTap,
-          onMinimize: onMinimize,
-          onMaximize: onMaximize,
-          onQuickSettingsMaximized: onQuickSettingsMaximized,
-          onOverscrollThresholdRelease: onOverscrollThresholdRelease,
-          onBarVerticalDragUpdate: onBarVerticalDragUpdate,
-          onBarVerticalDragEnd: onBarVerticalDragEnd,
-          onMinimizedContextTapped: onMinimizedContextTapped,
+        child: new ScopedModel<NowMinimizationModel>(
+          model: _nowMinimizationModel,
+          child: _buildNow(
+            context,
+            onMinimizedTap: onMinimizedTap,
+            onQuickSettingsMaximized: onQuickSettingsMaximized,
+            onOverscrollThresholdRelease: onOverscrollThresholdRelease,
+            onBarVerticalDragUpdate: onBarVerticalDragUpdate,
+            onBarVerticalDragEnd: onBarVerticalDragEnd,
+            onMinimizedContextTapped: onMinimizedContextTapped,
+          ),
         ),
       );
 
   Widget _buildNow(
     BuildContext context, {
     VoidCallback onMinimizedTap,
-    VoidCallback onMinimize,
-    VoidCallback onMaximize,
     VoidCallback onQuickSettingsMaximized,
     VoidCallback onOverscrollThresholdRelease,
     GestureDragUpdateCallback onBarVerticalDragUpdate,
@@ -112,8 +123,6 @@ class NowBuilder {
               onMinimizedLongPress: () =>
                   _quickSettingsOverlayKey.currentState.show(),
               onQuickSettingsMaximized: onQuickSettingsMaximized,
-              onMinimize: onMinimize,
-              onMaximize: onMaximize,
               onBarVerticalDragUpdate: onBarVerticalDragUpdate,
               onBarVerticalDragEnd: onBarVerticalDragEnd,
               onOverscrollThresholdRelease: onOverscrollThresholdRelease,
@@ -148,18 +157,12 @@ class NowBuilder {
   }
 
   /// Call when now should minimize.
-  void onMinimize() {
-    _nowKey.currentState.minimize();
-    _nowKey.currentState.hideQuickSettings();
+  void minimize() {
+    _nowMinimizationModel.minimize();
   }
 
   /// Call when now should maximize.
-  void onMaximize() {
-    _nowKey.currentState.maximize();
-  }
-
-  /// Call when quick settings should be hidden.
-  void onHideQuickSettings() {
-    _nowKey.currentState.hideQuickSettings();
+  void maximize() {
+    _nowMinimizationModel.maximize();
   }
 }

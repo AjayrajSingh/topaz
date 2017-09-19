@@ -8,6 +8,7 @@ import 'package:lib.widgets/model.dart';
 import 'conductor_model.dart';
 import 'context_model.dart';
 import 'peek_model.dart';
+import 'quick_settings_progress_model.dart';
 import 'size_model.dart';
 import 'story.dart';
 import 'story_cluster.dart';
@@ -33,8 +34,18 @@ class ConductorState extends State<Conductor> {
   @override
   Widget build(BuildContext context) =>
       new ScopedModelDescendant<ConductorModel>(
-        builder: (_, __, ConductorModel conductorModel) =>
-            _buildParts(context, conductorModel),
+        builder: (_, __, ConductorModel conductorModel) {
+          conductorModel.nowBuilder.onMinimize = () {
+            PeekModel.of(context).nowMinimized = true;
+            conductorModel.nextBuilder.hide();
+          };
+          conductorModel.nowBuilder.onMaximize = () {
+            PeekModel.of(context).nowMinimized = false;
+            conductorModel.nextBuilder.hide();
+          };
+
+          return _buildParts(context, conductorModel);
+        },
       );
 
   /// Note in particular the magic we're employing here to make the user
@@ -98,7 +109,7 @@ class ConductorState extends State<Conductor> {
                   _pointerDownY - event.position.dy)) {
                 conductorModel.nextBuilder.show();
               }
-              conductorModel.nowBuilder.onHideQuickSettings();
+              QuickSettingsProgressModel.of(context).target = 0.0;
             },
           ),
           // Now.
@@ -107,14 +118,6 @@ class ConductorState extends State<Conductor> {
             onMinimizedTap: () => goToOrigin(),
             onQuickSettingsMaximized: () {
               ConductorModel.of(context).recentsBuilder.resetScroll();
-            },
-            onMinimize: () {
-              PeekModel.of(context).nowMinimized = true;
-              conductorModel.nextBuilder.hide();
-            },
-            onMaximize: () {
-              PeekModel.of(context).nowMinimized = false;
-              conductorModel.nextBuilder.hide();
             },
             onBarVerticalDragUpdate: (DragUpdateDetails details) =>
                 conductorModel.nextBuilder.onNowBarVerticalDragUpdate(details),
@@ -172,7 +175,8 @@ class ConductorState extends State<Conductor> {
   }
 
   void _minimizeNow() {
-    ConductorModel.of(context).nowBuilder.onMinimize();
+    ConductorModel.of(context).nowBuilder.minimize();
+    QuickSettingsProgressModel.of(context).hide();
     PeekModel.of(context).nowMinimized = true;
     ConductorModel.of(context).nextBuilder.hide();
   }
@@ -187,7 +191,7 @@ class ConductorState extends State<Conductor> {
   void goToOrigin() {
     StoryModel storyModel = StoryModel.of(context);
     _defocus(storyModel);
-    ConductorModel.of(context).nowBuilder.onMaximize();
+    ConductorModel.of(context).nowBuilder.maximize();
     storyModel.interactionStopped();
     storyModel.clearPlaceHolderStoryClusters();
   }
