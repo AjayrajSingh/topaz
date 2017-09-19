@@ -26,6 +26,15 @@ int main(int argc, const char** argv) {
         webView.layoutAndPaint();
     }
 
+    // Test that some JS doesn't crash.
+    webView.stringByEvaluatingJavaScriptFromString("");
+    webView.stringByEvaluatingJavaScriptFromString("1+1");
+    webView.stringByEvaluatingJavaScriptFromString("asdfadsfa");
+    webView.stringByEvaluatingJavaScriptFromString("(function(){ return 'hello';})()");
+    webView.stringByEvaluatingJavaScriptFromString("(function(){ return 'hel");
+    webView.stringByEvaluatingJavaScriptFromString("new Exception('asdf')");
+    webView.stringByEvaluatingJavaScriptFromString("throw new Exception('asdf')");
+
     auto err = webView.getMainDocumentError();
     if (err.length() > 0) {
       cerr << "test_webview failed: " << err << endl;

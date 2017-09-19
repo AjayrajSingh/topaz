@@ -12,23 +12,30 @@ executable("web_view_bin") {
   output_name = "web_view"
 
   sources = [
+    "schema_org_context.cpp",
+    "schema_org_context.h",
     "main.cpp",
+    "web_view_impl.cpp",
+    "web_view_impl.h",
+    "web_view_provider.cpp",
+    "web_view_provider.h",
   ]
 
   deps = [
     ":webkit",
-    "//garnet/public/lib/app/cpp",
+    "//apps/maxwell/services/context",
     "//apps/modular/lib/rapidjson",
     "//apps/modular/services/lifecycle",
     "//apps/modular/services/module",
     "//apps/modular/services/story",
-    "//garnet/public/lib/ui/view_framework:view_provider",
-    "//garnet/public/lib/ui/geometry/fidl",
-    "//garnet/public/lib/ui/views/fidl",
     "//apps/web_runner/services",
+    "//garnet/public/lib/app/cpp",
+    "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
     "//garnet/public/lib/icu_data/cpp",
-    "//garnet/public/lib/fsl",
+    "//garnet/public/lib/ui/geometry/fidl",
+    "//garnet/public/lib/ui/view_framework:view_provider",
+    "//garnet/public/lib/ui/views/fidl",
     "//third_party/boringssl",
     "//third_party/rapidjson",
   ]
@@ -76,8 +83,22 @@ if (use_prebuilt_webkit) {
   prebuilt_webkit = "prebuilt/${webkit_arch}/libwebkit.so"
 
   config("prebuilt_webkit_config") {
-    include_dirs = [ "//third_party/webkit/Source/WebKit/fuchsia" ]
+    include_dirs = [
+      "//third_party/webkit/DerivedSources/ForwardingHeaders",
+      "//third_party/webkit/DerivedSources/ForwardingHeaders/JavaScriptCore",
+      "//third_party/webkit/DerivedSources/ForwardingHeaders/WebCore",
+      "//third_party/webkit/DerivedSources/WebCore",
+      "//third_party/webkit/Source",
+      "//third_party/webkit/Source/WTF",
+      "//third_party/webkit/Source/WebCore/ForwardingHeaders/",
+      "//third_party/webkit/Source/WebCore/cssjit",
+      "//third_party/webkit/Source/WebKit/fuchsia",
+    ]
     libs = [ prebuilt_webkit ]
+    cflags = [ "-includeWebKitPrefix.h" ]
+    configs = [
+      "//third_party/icu:icu_config",
+    ]
   }
 
   if (current_toolchain == shlib_toolchain) {
@@ -106,7 +127,8 @@ package("web_view") {
       } ]
 
   resources = [ {
-        path = rebase_path("//garnet/bin/fonts/third_party/roboto/Roboto-Regular.ttf")
+        path = rebase_path(
+                "//garnet/bin/fonts/third_party/roboto/Roboto-Regular.ttf")
         dest = "webkit/Roboto-Regular.ttf"
       } ]
 }
