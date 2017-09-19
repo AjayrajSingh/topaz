@@ -18,7 +18,6 @@ import 'authentication_context_impl.dart';
 import 'child_constraints_changer.dart';
 import 'constraints_model.dart';
 import 'debug_text.dart';
-import 'memory_indicator.dart';
 import 'netstack_model.dart';
 import 'user_picker_device_shell_screen.dart';
 import 'soft_keyboard_container_impl.dart';
@@ -109,30 +108,6 @@ void main() {
           ),
     ),
   ];
-
-  /// As querying free memory is expensive, only do in debug mode.
-  assert(() {
-    overlays.add(
-      new OverlayEntry(
-        builder: (_) => new Align(
-              alignment: FractionalOffset.topLeft,
-              child: new Container(
-                margin: const EdgeInsets.all(8.0),
-                child: new PhysicalModel(
-                  color: Colors.grey[900],
-                  elevation: 799.0, // Mouse pointer is at 800.0.
-                  borderRadius: new BorderRadius.circular(8.0),
-                  child: new Container(
-                    padding: const EdgeInsets.all(8.0),
-                    child: new MemoryIndicator(),
-                  ),
-                ),
-              ),
-            ),
-      ),
-    );
-    return true;
-  });
 
   overlays.add(
     new OverlayEntry(
