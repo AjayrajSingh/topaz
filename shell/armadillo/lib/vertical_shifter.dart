@@ -4,9 +4,11 @@
 
 import 'package:flutter/widgets.dart';
 
-/// Shifts by [verticalShift] as [VerticalShifterState.shiftProgress] goes to
+import 'quick_settings_progress_model.dart';
+
+/// Shifts by [verticalShift] as [QuickSettingsProgressModel.value] goes to
 /// 1.0.
-class VerticalShifter extends StatefulWidget {
+class VerticalShifter extends StatelessWidget {
   /// The amount to shift [child] vertically by.
   final double verticalShift;
 
@@ -17,32 +19,27 @@ class VerticalShifter extends StatefulWidget {
   VerticalShifter({Key key, this.verticalShift, this.child}) : super(key: key);
 
   @override
-  VerticalShifterState createState() => new VerticalShifterState();
-}
-
-/// Tracks the current progress of the shift for [VerticalShifter].
-class VerticalShifterState extends State<VerticalShifter> {
-  double _shiftProgress = 0.0;
-
-  /// The distance to shift up.
-  set shiftProgress(double shiftProgress) => setState(() {
-        _shiftProgress = shiftProgress;
-      });
-
-  @override
-  Widget build(BuildContext context) => new Stack(
-        fit: StackFit.passthrough,
-        children: <Widget>[
-          // Recent List.
-          new Positioned(
-            left: 0.0,
-            right: 0.0,
-            top: -_shiftAmount,
-            bottom: _shiftAmount,
-            child: widget.child,
-          ),
-        ],
+  Widget build(BuildContext context) =>
+      new ScopedModelDescendant<QuickSettingsProgressModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          QuickSettingsProgressModel quickSettingsProgressModel,
+        ) {
+          double shiftAmount = quickSettingsProgressModel.value * verticalShift;
+          return new Stack(
+            fit: StackFit.passthrough,
+            children: <Widget>[
+              new Positioned(
+                left: 0.0,
+                right: 0.0,
+                top: -shiftAmount,
+                bottom: shiftAmount,
+                child: child,
+              ),
+            ],
+          );
+        },
+        child: child,
       );
-
-  double get _shiftAmount => _shiftProgress * widget.verticalShift;
 }

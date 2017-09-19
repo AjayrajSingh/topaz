@@ -104,9 +104,6 @@ class ConductorState extends State<Conductor> {
           // Now.
           conductorModel.nowBuilder.build(
             context,
-            onQuickSettingsProgressChange: (double quickSettingsProgress) =>
-                conductorModel.recentsBuilder
-                    .onQuickSettingsProgressChanged(quickSettingsProgress),
             onMinimizedTap: () => goToOrigin(),
             onQuickSettingsMaximized: () {
               ConductorModel.of(context).recentsBuilder.resetScroll();

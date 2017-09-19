@@ -49,7 +49,6 @@ class NowBuilder {
   /// Builds now.
   Widget build(
     BuildContext context, {
-    ValueChanged<double> onQuickSettingsProgressChange,
     VoidCallback onMinimizedTap,
     VoidCallback onMinimize,
     VoidCallback onMaximize,
@@ -81,7 +80,6 @@ class NowBuilder {
             ),
         child: _buildNow(
           context,
-          onQuickSettingsProgressChange: onQuickSettingsProgressChange,
           onMinimizedTap: onMinimizedTap,
           onMinimize: onMinimize,
           onMaximize: onMaximize,
@@ -95,7 +93,6 @@ class NowBuilder {
 
   Widget _buildNow(
     BuildContext context, {
-    ValueChanged<double> onQuickSettingsProgressChange,
     VoidCallback onMinimizedTap,
     VoidCallback onMinimize,
     VoidCallback onMaximize,
@@ -111,7 +108,6 @@ class NowBuilder {
             child: new Now(
               key: _nowKey,
               quickSettingsHeightBump: kQuickSettingsHeightBump,
-              onQuickSettingsProgressChange: onQuickSettingsProgressChange,
               onMinimizedTap: onMinimizedTap,
               onMinimizedLongPress: () =>
                   _quickSettingsOverlayKey.currentState.show(),

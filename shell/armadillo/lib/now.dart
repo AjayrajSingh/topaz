@@ -55,10 +55,6 @@ class Now extends StatefulWidget {
   /// How much to shift the quick settings vertically when shown.
   final double quickSettingsHeightBump;
 
-  /// Called when the quick settings animation progress changes within the range
-  /// of 0.0 to 1.0.
-  final ValueChanged<double> onQuickSettingsProgressChange;
-
   /// Called when [Now]'s center button is tapped while minimized.
   final VoidCallback onMinimizedTap;
 
@@ -102,7 +98,6 @@ class Now extends StatefulWidget {
   Now({
     Key key,
     this.quickSettingsHeightBump,
-    this.onQuickSettingsProgressChange,
     this.onMinimizedTap,
     this.onMinimizedLongPress,
     this.onMinimize,
@@ -128,7 +123,6 @@ const RK4SpringDescription _kSimulationDesc =
     const RK4SpringDescription(tension: 600.0, friction: 50.0);
 
 const double _kMinimizationSimulationTarget = 400.0;
-const double _kQuickSettingsSimulationTarget = 100.0;
 
 /// Controls the animations for maximizing and minimizing, showing and hiding
 /// quick settings, and vertically shifting as the story list is scrolled.
@@ -136,14 +130,6 @@ class NowState extends TickingState<Now> {
   /// The simulation for the minimization to a bar.
   final RK4SpringSimulation _minimizationSimulation =
       new RK4SpringSimulation(initValue: 0.0, desc: _kSimulationDesc);
-
-  /// The simulation for the inline quick settings reveal.
-  final RK4SpringSimulation _quickSettingsSimulation =
-      new RK4SpringSimulation(initValue: 0.0, desc: _kSimulationDesc);
-
-  /// The simulation for showing minimized info in the minimized bar.
-  final RK4SpringSimulation _minimizedInfoSimulation = new RK4SpringSimulation(
-      initValue: _kMinimizationSimulationTarget, desc: _kSimulationDesc);
 
   final GlobalKey _quickSettingsKey = new GlobalKey();
   final GlobalKey _importantInfoMaximizedKey = new GlobalKey();
@@ -222,7 +208,14 @@ class NowState extends TickingState<Now> {
                 child: child,
               ),
             ),
-        child: _buildNow(context),
+        child: new ScopedModelDescendant<QuickSettingsProgressModel>(
+          builder: (
+            BuildContext context,
+            Widget child,
+            QuickSettingsProgressModel quickSettingsProgressModel,
+          ) =>
+              _buildNow(context),
+        ),
       );
 
   Widget _buildNow(BuildContext context) => new Align(
@@ -553,7 +546,7 @@ class NowState extends TickingState<Now> {
                   lerpDouble(
                     0.0,
                     32.0,
-                    quickSettingsProgressModel.quickSettingsProgress,
+                    quickSettingsProgressModel.value,
                   ),
                   0.0,
                 ),
@@ -561,7 +554,7 @@ class NowState extends TickingState<Now> {
                   textColor: Color.lerp(
                     Colors.white,
                     Colors.grey[600],
-                    quickSettingsProgressModel.quickSettingsProgress,
+                    quickSettingsProgressModel.value,
                   ),
                 ),
               ),
@@ -635,31 +628,12 @@ class NowState extends TickingState<Now> {
   bool handleTick(double elapsedSeconds) {
     bool continueTicking = false;
 
-    // Tick the minimized info simulation.
-    _minimizedInfoSimulation.elapseTime(elapsedSeconds);
-    if (!_minimizedInfoSimulation.isDone) {
-      continueTicking = true;
-    }
-
     // Tick the minimization simulation.
     if (!_minimizationSimulation.isDone) {
       _minimizationSimulation.elapseTime(elapsedSeconds);
       if (!_minimizationSimulation.isDone) {
         continueTicking = true;
       }
-    }
-
-    // Tick the quick settings simulation.
-    if (!_quickSettingsSimulation.isDone) {
-      _quickSettingsSimulation.elapseTime(elapsedSeconds);
-      if (!_quickSettingsSimulation.isDone) {
-        continueTicking = true;
-      }
-      if (widget.onQuickSettingsProgressChange != null) {
-        widget.onQuickSettingsProgressChange(_quickSettingsProgress);
-      }
-      QuickSettingsProgressModel.of(context).quickSettingsProgress =
-          _quickSettingsProgress;
     }
 
     _updateMinimizedInfoOpacity();
@@ -698,7 +672,7 @@ class NowState extends TickingState<Now> {
     _userImageHeight = heightFromKey(_userImageKey);
 
     if (!_revealingQuickSettings) {
-      _quickSettingsSimulation.target = _kQuickSettingsSimulationTarget;
+      QuickSettingsProgressModel.of(context).target = 1.0;
       startTicking();
       widget.onQuickSettingsMaximized?.call();
     }
@@ -708,31 +682,27 @@ class NowState extends TickingState<Now> {
   /// This should only be called when [Now] is maximized.
   void hideQuickSettings() {
     if (_revealingQuickSettings) {
-      _quickSettingsSimulation.target = 0.0;
+      QuickSettingsProgressModel.of(context).target = 0.0;
       startTicking();
     }
   }
 
   void _showMinimizedInfo() {
     _fadingSpringSimulation.fadeIn(force: true);
-    _minimizedInfoSimulation.target = _kMinimizationSimulationTarget;
     startTicking();
   }
 
   double get _quickSettingsProgress =>
-      _quickSettingsSimulation.value / _kQuickSettingsSimulationTarget;
+      QuickSettingsProgressModel.of(context).value;
 
   double get _minimizationProgress =>
       _minimizationSimulation.value / _kMinimizationSimulationTarget;
-
-  double get _minimizedInfoProgress =>
-      _minimizedInfoSimulation.value / _kMinimizationSimulationTarget;
 
   bool get _minimizing =>
       _minimizationSimulation.target == _kMinimizationSimulationTarget;
 
   bool get _revealingQuickSettings =>
-      _quickSettingsSimulation.target == _kQuickSettingsSimulationTarget;
+      QuickSettingsProgressModel.of(context).target == 1.0;
 
   bool get _buttonTapDisabled => _minimizationProgress < 1.0;
 
@@ -819,15 +789,15 @@ class NowState extends TickingState<Now> {
   /// portion of the minimization animation as determined by
   /// [_kFallAwayDurationFraction].
   double get _slideInProgress =>
-      ((((_minimizationProgress - (1.0 - _kFallAwayDurationFraction)) /
-                  _kFallAwayDurationFraction)) *
-              _minimizedInfoProgress)
+      ((_minimizationProgress - (1.0 - _kFallAwayDurationFraction)) /
+              _kFallAwayDurationFraction)
           .clamp(0.0, 1.0);
 
   /// We slide up and fade in the quick settings for the final portion of the
   /// quick settings animation as determined by [_kFallAwayDurationFraction].
   double get _quickSettingsSlideUpProgress => math.max(
-      0.0,
-      ((_quickSettingsProgress - (1.0 - _kFallAwayDurationFraction)) /
-          _kFallAwayDurationFraction));
+        0.0,
+        ((_quickSettingsProgress - (1.0 - _kFallAwayDurationFraction)) /
+            _kFallAwayDurationFraction),
+      );
 }

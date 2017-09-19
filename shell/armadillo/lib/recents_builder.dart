@@ -31,10 +31,6 @@ const double _kOverscrollSnapDragDistanceThreshold = 200.0;
 
 /// Builds recents.
 class RecentsBuilder {
-  /// The [VerticalShifter] is used to shift the [StoryList] up when Now's
-  /// inline quick settings are activated.
-  final GlobalKey<VerticalShifterState> _verticalShifterKey =
-      new GlobalKey<VerticalShifterState>();
   final GlobalKey<ScrollLockerState> _scrollLockerKey =
       new GlobalKey<ScrollLockerState>();
   final GlobalKey<ArmadilloOverlayState> _overlayKey =
@@ -109,7 +105,6 @@ class RecentsBuilder {
                         child: child,
                       ),
                   child: new VerticalShifter(
-                    key: _verticalShifterKey,
                     verticalShift: NowBuilder.kQuickSettingsHeightBump,
                     child: new ScrollLocker(
                       key: _scrollLockerKey,
@@ -148,11 +143,6 @@ class RecentsBuilder {
   void onStoryUnfocused() {
     _scrollLockerKey.currentState.unlock();
     _edgeScrollDragTargetKey.currentState.enable();
-  }
-
-  /// Call when quick settings progress changes.
-  void onQuickSettingsProgressChanged(double quickSettingsProgress) {
-    _verticalShifterKey.currentState.shiftProgress = quickSettingsProgress;
   }
 
   /// Call to reset the recents scrolling to 0.0.

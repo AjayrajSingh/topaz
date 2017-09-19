@@ -210,7 +210,7 @@ Widget buildArmadilloUserShell({
   );
   quickSettingsProgressModel.addListener(
     () => peekModel.onQuickSettingsProgressChanged(
-          quickSettingsProgressModel.quickSettingsProgress,
+          quickSettingsProgressModel.value,
         ),
   );
 
