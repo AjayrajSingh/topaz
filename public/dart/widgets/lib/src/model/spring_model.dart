@@ -43,6 +43,9 @@ class SpringModel extends TickingModel {
     }
   }
 
+  /// The current simulation target.
+  double get target => _simulation.target;
+
   /// The value of spring simulation.
   double get value => _simulation.value;
 
