@@ -15,14 +15,14 @@ rust_binary("spinning_square_rs") {
   deps = [
     "//garnet/public/lib/app/fidl:service_provider_rust_library",
     "//garnet/public/lib/app/fidl:services_rust_library",
+    "//garnet/public/lib/fidl/rust/fidl",
     "//garnet/public/lib/ui/composition/fidl:composition_rust_library",
     "//garnet/public/lib/ui/input/fidl:input_rust_library",
     "//garnet/public/lib/ui/views/fidl:view_token_rust_library",
     "//garnet/public/lib/ui/views/fidl:views_rust_library",
+    "//garnet/public/rust/crates/mxruntime",
     "//apps/xi/services:services_rust_library",
-    "//garnet/public/lib/fidl/rust/fidl",
     "//rust/zircon-rs:zircon",
-    "//rust/mxruntime",
     "//third_party/rust-crates:cairo-rs-0.1.3",
   ]
 }
