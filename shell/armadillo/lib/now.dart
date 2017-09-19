@@ -11,7 +11,6 @@ import 'package:lib.widgets/widgets.dart';
 
 import 'context_model.dart';
 import 'elevations.dart';
-import 'fading_spring_simulation.dart';
 import 'important_info.dart';
 import 'nothing.dart';
 import 'opacity_model.dart';
@@ -138,7 +137,6 @@ class NowState extends TickingState<Now> {
   final OpacityModel _minimizedInfoOpacityModel = new OpacityModel(0.0);
   final ValueNotifier<double> _recentsScrollOffset =
       new ValueNotifier<double>(0.0);
-  FadingSpringSimulation _fadingSpringSimulation;
 
   /// scroll offset affects the bottom padding of the user and text elements
   /// as well as the overall height of [Now] while maximized.
@@ -172,21 +170,6 @@ class NowState extends TickingState<Now> {
       hideQuickSettings();
     }
     _lastRecentsScrollOffset = scrollOffset;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _fadingSpringSimulation = new FadingSpringSimulation(
-      onChange: _updateMinimizedInfoOpacity,
-      tickerProvider: this,
-    );
-  }
-
-  @override
-  void dispose() {
-    _fadingSpringSimulation.reset();
-    super.dispose();
   }
 
   @override
@@ -577,8 +560,7 @@ class NowState extends TickingState<Now> {
   }
 
   void _updateMinimizedInfoOpacity() {
-    _minimizedInfoOpacityModel.opacity =
-        _fadingSpringSimulation.opacity * 0.6 * _slideInProgress;
+    _minimizedInfoOpacityModel.opacity = 0.6 * _slideInProgress;
   }
 
   Widget _buildMinimizedButtonBarGestureDetector(SizeModel sizeModel) =>
@@ -594,9 +576,6 @@ class NowState extends TickingState<Now> {
               new Expanded(
                 child: new GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTapDown: (_) {
-                    _fadingSpringSimulation.fadeIn();
-                  },
                   onTap: () {
                     widget.onMinimizedContextTapped?.call();
                   },
@@ -611,9 +590,6 @@ class NowState extends TickingState<Now> {
               new Expanded(
                 child: new GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTapDown: (_) {
-                    _fadingSpringSimulation.fadeIn();
-                  },
                   onTap: () {
                     widget.onMinimizedContextTapped?.call();
                   },
@@ -644,7 +620,6 @@ class NowState extends TickingState<Now> {
   void minimize() {
     if (!_minimizing) {
       _minimizationSimulation.target = _kMinimizationSimulationTarget;
-      _showMinimizedInfo();
       startTicking();
       widget.onMinimize?.call();
     }
@@ -673,7 +648,6 @@ class NowState extends TickingState<Now> {
 
     if (!_revealingQuickSettings) {
       QuickSettingsProgressModel.of(context).target = 1.0;
-      startTicking();
       widget.onQuickSettingsMaximized?.call();
     }
   }
@@ -681,15 +655,7 @@ class NowState extends TickingState<Now> {
   /// Morphs [Now] into its normal mode.
   /// This should only be called when [Now] is maximized.
   void hideQuickSettings() {
-    if (_revealingQuickSettings) {
-      QuickSettingsProgressModel.of(context).target = 0.0;
-      startTicking();
-    }
-  }
-
-  void _showMinimizedInfo() {
-    _fadingSpringSimulation.fadeIn(force: true);
-    startTicking();
+    QuickSettingsProgressModel.of(context).target = 0.0;
   }
 
   double get _quickSettingsProgress =>
