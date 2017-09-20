@@ -13,9 +13,9 @@ flutter_app("contacts") {
   deps = [
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
-    "//apps/modules/common/packages/fixtures",
-    "//apps/modules/common/packages/widgets_meta",
-    "//apps/modules/contacts/services:services_dart",
+    "//topaz/tools/packages/fixtures",
+    "//topaz/tools/packages/widgets_meta",
+    "//topaz/app/contacts/services:services_dart",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
@@ -25,15 +25,15 @@ flutter_app("contacts") {
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
   deps = [
-    "//apps/modules/contacts/modules/contacts:contacts_dart_package",
+    "//topaz/app/contacts/modules/contacts:contacts_dart_package",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

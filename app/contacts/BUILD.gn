@@ -8,12 +8,12 @@ package("contacts") {
   app = true
 
   deps = [
-    "//apps/modules/contacts/agents",
-    "//apps/modules/contacts/modules/contact_list",
-    "//apps/modules/contacts/modules/contact_list:test",
-    "//apps/modules/contacts/modules/contacts",
-    "//apps/modules/contacts/modules/contacts:test",
-    "//apps/modules/contacts/services",
+    "//topaz/app/contacts/agents",
+    "//topaz/app/contacts/modules/contact_list",
+    "//topaz/app/contacts/modules/contact_list:test",
+    "//topaz/app/contacts/modules/contacts",
+    "//topaz/app/contacts/modules/contacts:test",
+    "//topaz/app/contacts/services",
   ]
 
   binaries = [
@@ -22,11 +22,11 @@ package("contacts") {
       name = "contacts_content_provider"
     },
     {
-      source = "gen/apps/modules/contacts/modules/contacts/contacts.flx"
+      source = "gen/topaz/app/contacts/modules/contacts/contacts.flx"
       name = "contacts"
     },
     {
-      source = "gen/apps/modules/contacts/modules/contact_list/contact_list.flx"
+      source = "gen/topaz/app/contacts/modules/contact_list/contact_list.flx"
       name = "contact_list"
     },
   ]
