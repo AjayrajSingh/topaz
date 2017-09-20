@@ -16,7 +16,7 @@ flutter_app("latin-ime") {
     "//garnet/public/lib/app/fidl:fidl_dart",
     "//garnet/public/lib/ui/flutter",
     "//garnet/public/lib/ui/presentation/fidl:fidl_dart",
-    "//apps/sysui/keyboard",
+    "//topaz/shell/keyboard",
     "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
   ]
