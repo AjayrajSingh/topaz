@@ -37,7 +37,7 @@ package("dashboard") {
   ]
 
   binaries = [ {
-        source = "gen/apps/modules/dashboard/dashboard.flx"
+        source = "gen/topaz/app/dashboard/dashboard.flx"
         name = "dashboard"
       } ]
 }
