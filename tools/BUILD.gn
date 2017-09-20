@@ -26,8 +26,8 @@ package("modules_tests") {
   testonly = true
 
   deps = [
-    "//apps/modules/common/packages/fixtures:test",
-    "//apps/modules/common/packages/models:test",
-    "//apps/modules/common/packages/util:test",
+    "//topaz/tools/packages/fixtures:test",
+    "//topaz/tools/packages/models:test",
+    "//topaz/tools/packages/util:test",
   ]
 }

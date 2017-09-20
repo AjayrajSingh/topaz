@@ -36,7 +36,7 @@ endif
 
 root ?= $(shell git rev-parse --show-toplevel)
 fuchsia_root ?= $(realpath $(root)/../../..)
-common_root ?= $(realpath $(fuchsia_root)/apps/modules/common/tools/common)
+common_root ?= $(realpath $(fuchsia_root)/topaz/tools/tools/common)
 tools_root := $(realpath $(common_root)/..)
 fuchsia_out := $(abspath $(fuchsia_root)/out)
 flutter_root := $(fuchsia_root)/lib/flutter
@@ -180,7 +180,7 @@ lint: copyright-check dart-lint dart-fmt-check gn-fmt-check ## Lint the code.
 
 # Each dart package needs the analysis_options.yaml file so that the IDE can run
 # the live analysis with the correct options.
-$(dart_analysis_options): $(fuchsia_root)/apps/modules/common/analysis_options.yaml
+$(dart_analysis_options): $(fuchsia_root)/topaz/tools/analysis_options.yaml
 	cp $< $@
 
 .PHONY: $(dart_bin)

@@ -9,9 +9,9 @@ dart_package("models") {
   package_name = "models"
 
   deps = [
-    "//apps/modules/common/packages/fixtures",
-    "//apps/modules/common/packages/util",
-    "//apps/modules/common/packages/widgets_meta",
+    "//topaz/tools/packages/fixtures",
+    "//topaz/tools/packages/util",
+    "//topaz/tools/packages/widgets_meta",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/intl",
@@ -19,15 +19,15 @@ dart_package("models") {
     "//third_party/dart-pkg/pub/xml",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
   deps = [
-    "//apps/modules/common/packages/models",
+    "//topaz/tools/packages/models",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

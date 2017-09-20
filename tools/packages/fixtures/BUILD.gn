@@ -9,21 +9,21 @@ dart_package("fixtures") {
   package_name = "fixtures"
 
   deps = [
-    "//apps/modules/common/packages/util",
+    "//topaz/tools/packages/util",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/lorem",
     "//third_party/dart-pkg/pub/uuid",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
   deps = [
-    "//apps/modules/common/packages/fixtures",
+    "//topaz/tools/packages/fixtures",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

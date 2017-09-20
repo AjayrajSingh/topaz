@@ -8,10 +8,10 @@ dart_package("widgets") {
   package_name = "widgets"
 
   deps = [
-    "//apps/modules/common/packages/models",
+    "//topaz/tools/packages/models",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/logging:lib.logging",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

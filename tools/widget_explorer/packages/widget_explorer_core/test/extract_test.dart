@@ -97,7 +97,7 @@ Future<Null> main() async {
       expect(
           widgetMap[key].pathFromFuchsiaRoot,
           equals(
-              'apps/modules/common/testdata/widget_specs/extract_test/mock_package/lib/src/${expected[key]}'));
+              'topaz/tools/testdata/widget_specs/extract_test/mock_package/lib/src/${expected[key]}'));
     });
   });
 

@@ -13,15 +13,15 @@ dart_package("util") {
     "//third_party/dart-pkg/pub/intl",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
   deps = [
-    "//apps/modules/common/packages/util",
+    "//topaz/tools/packages/util",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
