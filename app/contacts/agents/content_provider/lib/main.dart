@@ -10,7 +10,7 @@ import 'package:lib.modular/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart';
 
-import 'src/contacts_content_provider_impl.dart';
+import 'src/modular/contacts_content_provider_impl.dart';
 
 ContactsContentProviderAgent _agent;
 

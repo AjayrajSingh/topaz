@@ -11,11 +11,11 @@ flutter_app("contacts") {
   main_dart = "lib/modular_main.dart"
 
   deps = [
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/story/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/googleapis",
     "//third_party/dart-pkg/pub/googleapis_auth",
     "//topaz/app/contacts/services:services_dart",

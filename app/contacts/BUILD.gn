@@ -9,6 +9,7 @@ package("contacts") {
 
   deps = [
     "//topaz/app/contacts/agents",
+    "//topaz/app/contacts/agents/content_provider:test",
     "//topaz/app/contacts/modules/contact_list",
     "//topaz/app/contacts/modules/contact_list:test",
     "//topaz/app/contacts/modules/contacts",
@@ -22,12 +23,8 @@ package("contacts") {
       name = "contacts_content_provider"
     },
     {
-      source = "gen/topaz/app/contacts/modules/contacts/contacts.flx"
-      name = "contacts"
-    },
-    {
       source = "gen/topaz/app/contacts/modules/contact_list/contact_list.flx"
-      name = "contact_list"
+      name = "contacts/contact_list"
     },
   ]
 }
