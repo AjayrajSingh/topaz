@@ -6,26 +6,15 @@ import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:lib.widgets/widgets.dart';
 
-import 'context_model.dart';
-import 'elevations.dart';
-import 'important_info.dart';
 import 'minimized_now_bar.dart';
 import 'now_minimization_model.dart';
-import 'opacity_model.dart';
-import 'power_model.dart';
+import 'now_user_and_maximized_info.dart';
 import 'quick_settings.dart';
 import 'quick_settings_progress_model.dart';
 import 'size_model.dart';
 import 'story_drag_transition_model.dart';
-import 'user_context_text.dart';
-
-/// Fraction of the minimization animation which should be used for falling away
-/// and sliding in of the user context and battery icon.
-const double _kFallAwayDurationFraction = 0.35;
 
 /// The distance above the lowest point we can scroll down to when
 /// recents scroll offset is 0.0.
@@ -49,6 +38,9 @@ const double _kOverscrollDelayOffset = 0.0;
 
 /// The speed multiple at which now increases in height when overscrolling.
 const double _kScrollFactor = 0.8;
+
+// initialized in showQuickSettings
+final double _kQuickSettingsMaximizedHeight = 200.0;
 
 /// Shows the user, the user's context, and important settings.  When minimized
 /// also shows an affordance for seeing missed interruptions.
@@ -113,21 +105,12 @@ class Now extends StatefulWidget {
 /// Controls the animations for maximizing and minimizing, showing and hiding
 /// quick settings, and vertically shifting as the story list is scrolled.
 class NowState extends State<Now> {
-  final GlobalKey _importantInfoMaximizedKey = new GlobalKey();
-  final GlobalKey _userContextTextKey = new GlobalKey();
-  final GlobalKey _userImageKey = new GlobalKey();
   final ValueNotifier<double> _recentsScrollOffset =
       new ValueNotifier<double>(0.0);
 
   /// scroll offset affects the bottom padding of the user and text elements
   /// as well as the overall height of [Now] while maximized.
   double _lastRecentsScrollOffset = 0.0;
-
-  // initialized in showQuickSettings
-  final double _quickSettingsMaximizedHeight = 200.0;
-  double _importantInfoMaximizedHeight = 0.0;
-  double _userContextTextHeight = 0.0;
-  double _userImageHeight = 0.0;
 
   /// Sets the [scrollOffset] of the story list tracked by [Now].
   void onRecentsScrollOffsetChanged(double scrollOffset, bool ignore) {
@@ -184,12 +167,21 @@ class NowState extends State<Now> {
                   Widget child,
                   NowMinimizationModel nowMinimizationModel,
                 ) =>
-                    _buildNow(context),
+                    _buildNow(
+                      context,
+                      quickSettingsProgressModel,
+                      nowMinimizationModel,
+                    ),
               ),
         ),
       );
 
-  Widget _buildNow(BuildContext context) => new Align(
+  Widget _buildNow(
+    BuildContext context,
+    QuickSettingsProgressModel quickSettingsProgressModel,
+    NowMinimizationModel nowMinimizationModel,
+  ) =>
+      new Align(
         alignment: FractionalOffset.bottomCenter,
         child: new ScopedModelDescendant<SizeModel>(
           builder: (
@@ -201,6 +193,8 @@ class NowState extends State<Now> {
                 animation: _recentsScrollOffset,
                 builder: (BuildContext context, Widget child) => new Container(
                       height: _getNowHeight(
+                        quickSettingsProgressModel,
+                        nowMinimizationModel,
                         sizeModel,
                         _recentsScrollOffset.value,
                       ),
@@ -215,19 +209,25 @@ class NowState extends State<Now> {
                       right: _kQuickSettingsHorizontalPadding,
                       top: _getQuickSettingsBackgroundTopOffset(
                         sizeModel,
+                        quickSettingsProgressModel,
+                        nowMinimizationModel,
                       ),
                       child: new Center(
                         child: new Container(
                           height: _getQuickSettingsBackgroundHeight(
                             sizeModel,
+                            quickSettingsProgressModel,
+                            nowMinimizationModel,
                           ),
                           width: _getQuickSettingsBackgroundWidth(
                             sizeModel,
+                            quickSettingsProgressModel,
+                            nowMinimizationModel,
                           ),
                           decoration: new BoxDecoration(
                             color: Colors.white,
                             borderRadius: new BorderRadius.circular(
-                              _quickSettingsBackgroundBorderRadius,
+                              quickSettingsProgressModel.backgroundBorderRadius,
                             ),
                           ),
                         ),
@@ -237,45 +237,30 @@ class NowState extends State<Now> {
                     new Positioned(
                       left: _kQuickSettingsHorizontalPadding,
                       right: _kQuickSettingsHorizontalPadding,
-                      top: _getUserImageTopOffset(sizeModel),
+                      top: _getUserImageTopOffset(
+                        sizeModel,
+                        quickSettingsProgressModel,
+                        nowMinimizationModel,
+                      ),
                       child: new Center(
                         child: new Column(
                           children: <Widget>[
-                            new Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                // User Context Text when maximized.
-                                new Expanded(
-                                  child: new GestureDetector(
-                                    onTap: widget.onUserContextTapped,
-                                    behavior: HitTestBehavior.opaque,
-                                    child: new Container(
-                                      key: _userContextTextKey,
-                                      height: _userImageSize,
-                                      child: _buildUserContextMaximized(
-                                        opacity: _fallAwayOpacity,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                // User Profile image
-                                _buildUserImage(),
-                                // Important Information when maximized.
-                                new Expanded(
-                                  child: new Container(
-                                    key: _importantInfoMaximizedKey,
-                                    height: _userImageSize,
-                                    child: _buildImportantInfoMaximized(
-                                      opacity: _fallAwayOpacity,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            new NowUserAndMaximizedContext(
+                              onUserContextTapped: widget.onUserContextTapped,
+                              onUserTapped: () {
+                                if (!quickSettingsProgressModel.showing) {
+                                  _showQuickSettings();
+                                } else {
+                                  quickSettingsProgressModel.hide();
+                                }
+                              },
                             ),
+                            new Container(height: 32.0),
                             // Quick Settings
-                            new Container(
-                              padding: const EdgeInsets.only(top: 32.0),
-                              child: _buildQuickSettings(sizeModel),
+                            _buildQuickSettings(
+                              quickSettingsProgressModel,
+                              nowMinimizationModel,
+                              sizeModel,
                             ),
                           ],
                         ),
@@ -283,14 +268,13 @@ class NowState extends State<Now> {
                     ),
 
                     // User Context Text and Important Information when minimized.
-                    new MinimizedNowBar(
-                      fallAwayDurationFraction: _kFallAwayDurationFraction,
-                    ),
+                    new MinimizedNowBar(),
 
                     // Minimized button bar gesture detector. Only enabled when
                     // we're nearly fully minimized.
                     _buildMinimizedButtonBarGestureDetector(
                       sizeModel,
+                      nowMinimizationModel,
                     ),
                   ],
                 ),
@@ -298,42 +282,19 @@ class NowState extends State<Now> {
         ),
       );
 
-  Widget _buildUserImage() => new GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          if (!_revealingQuickSettings) {
-            _showQuickSettings();
-          } else {
-            QuickSettingsProgressModel.of(context).hide();
-          }
-        },
-        child: new PhysicalModel(
-          color: Colors.transparent,
-          shape: BoxShape.circle,
-          elevation:
-              _quickSettingsProgress * Elevations.nowUserQuickSettingsOpen,
-          child: new Container(
-            key: _userImageKey,
-            width: _userImageSize,
-            height: _userImageSize,
-            foregroundDecoration: new BoxDecoration(
-              border: new Border.all(
-                color: new Color(0xFFFFFFFF),
-                width: _userImageBorderWidth,
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: _buildUser(),
-          ),
-        ),
-      );
-
-  Widget _buildQuickSettings(SizeModel sizeModel) => new Padding(
+  Widget _buildQuickSettings(
+    QuickSettingsProgressModel quickSettingsProgressModel,
+    NowMinimizationModel nowMinimizationModel,
+    SizeModel sizeModel,
+  ) =>
+      new Padding(
         padding: const EdgeInsets.symmetric(
             horizontal: _kQuickSettingsInnerHorizontalPadding, vertical: 8.0),
         child: new Container(
           width: _getQuickSettingsBackgroundWidth(
             sizeModel,
+            quickSettingsProgressModel,
+            nowMinimizationModel,
           ),
           child: new Column(
             mainAxisSize: MainAxisSize.min,
@@ -341,12 +302,12 @@ class NowState extends State<Now> {
               new Divider(
                 height: 4.0,
                 color: Colors.grey[300].withOpacity(
-                  _quickSettingsSlideUpProgress,
+                  quickSettingsProgressModel.fadeInProgress,
                 ),
               ),
               new Container(
                 child: new QuickSettings(
-                  opacity: _quickSettingsSlideUpProgress,
+                  opacity: quickSettingsProgressModel.fadeInProgress,
                   onLogoutSelected: widget.onLogoutSelected,
                   onClearLedgerSelected: widget.onClearLedgerSelected,
                 ),
@@ -356,109 +317,12 @@ class NowState extends State<Now> {
         ),
       );
 
-  /// Returns an avatar of the current user.
-  Widget _buildUser() => new ScopedModelDescendant<ContextModel>(
-        builder: (
-          BuildContext context,
-          Widget child,
-          ContextModel contextModel,
-        ) {
-          String avatarUrl = _getImageUrl(contextModel.userImageUrl) ?? '';
-          String name = contextModel.userName ?? '';
-          return avatarUrl.isNotEmpty
-              ? new Alphatar.fromNameAndUrl(
-                  avatarUrl: avatarUrl,
-                  name: name,
-                )
-              : new Alphatar.fromName(
-                  name: name,
-                );
-        },
-      );
-
-  /// Returns a verbose representation of the user's current context.
-  Widget _buildUserContextMaximized({double opacity: 1.0}) => new Opacity(
-        opacity: opacity < 0.8 ? 0.0 : ((opacity - 0.8) / 0.2),
-        child: new ScopedModelDescendant<QuickSettingsProgressModel>(
-          builder: (
-            _,
-            __,
-            QuickSettingsProgressModel quickSettingsProgressModel,
-          ) =>
-              new Transform(
-                transform: new Matrix4.translationValues(
-                  lerpDouble(
-                    -16.0,
-                    0.0,
-                    opacity < 0.8 ? 0.0 : ((opacity - 0.8) / 0.2),
-                  ),
-                  lerpDouble(0.0, 32.0, _quickSettingsProgress),
-                  0.0,
-                ),
-                child: new UserContextText(
-                  textColor: Color.lerp(
-                    Colors.white,
-                    Colors.grey[600],
-                    _quickSettingsProgress,
-                  ),
-                ),
-              ),
-        ),
-      );
-
-  /// Returns a verbose representation of the important information to the user
-  /// with the given [opacity].
-  Widget _buildImportantInfoMaximized({double opacity: 1.0}) => new Opacity(
-        opacity: opacity < 0.8 ? 0.0 : ((opacity - 0.8) / 0.2),
-        child: new ScopedModelDescendant<QuickSettingsProgressModel>(
-          builder: (
-            _,
-            __,
-            QuickSettingsProgressModel quickSettingsProgressModel,
-          ) =>
-              new Transform(
-                transform: new Matrix4.translationValues(
-                  lerpDouble(
-                    16.0,
-                    0.0,
-                    opacity < 0.8 ? 0.0 : ((opacity - 0.8) / 0.2),
-                  ),
-                  lerpDouble(
-                    0.0,
-                    32.0,
-                    quickSettingsProgressModel.value,
-                  ),
-                  0.0,
-                ),
-                child: new ImportantInfo(
-                  textColor: Color.lerp(
-                    Colors.white,
-                    Colors.grey[600],
-                    quickSettingsProgressModel.value,
-                  ),
-                ),
-              ),
-        ),
-      );
-
-  String _getImageUrl(String userImageUrl) {
-    if (userImageUrl == null) {
-      return null;
-    }
-    Uri uri = Uri.parse(userImageUrl);
-    if (uri.queryParameters['sz'] != null) {
-      Map<String, dynamic> queryParameters = new Map<String, dynamic>.from(
-        uri.queryParameters,
-      );
-      queryParameters['sz'] = '112';
-      uri = uri.replace(queryParameters: queryParameters);
-    }
-    return uri.toString();
-  }
-
-  Widget _buildMinimizedButtonBarGestureDetector(SizeModel sizeModel) =>
+  Widget _buildMinimizedButtonBarGestureDetector(
+    SizeModel sizeModel,
+    NowMinimizationModel nowMinimizationModel,
+  ) =>
       new Offstage(
-        offstage: _buttonTapDisabled,
+        offstage: _getButtonTapDisabled(nowMinimizationModel),
         child: new GestureDetector(
           behavior: HitTestBehavior.opaque,
           onVerticalDragUpdate: widget.onBarVerticalDragUpdate,
@@ -496,86 +360,111 @@ class NowState extends State<Now> {
   /// Morphs [Now] into its quick settings mode.
   /// This should only be called when [Now] is maximized.
   void _showQuickSettings() {
-    double heightFromKey(GlobalKey key) {
-      RenderBox box = key.currentContext.findRenderObject();
-      return box.size.height;
-    }
-
-    _importantInfoMaximizedHeight = heightFromKey(_importantInfoMaximizedKey);
-    _userContextTextHeight = heightFromKey(_userContextTextKey);
-    _userImageHeight = heightFromKey(_userImageKey);
-
     if (!_revealingQuickSettings) {
       QuickSettingsProgressModel.of(context).target = 1.0;
       widget.onQuickSettingsMaximized?.call();
     }
   }
 
-  double get _quickSettingsProgress =>
-      QuickSettingsProgressModel.of(context).value;
-
-  double get _minimizationProgress => NowMinimizationModel.of(context).value;
-
   bool get _revealingQuickSettings =>
       QuickSettingsProgressModel.of(context).target == 1.0;
 
-  bool get _buttonTapDisabled => _minimizationProgress < 1.0;
+  bool _getButtonTapDisabled(NowMinimizationModel nowMinimizationModel) =>
+      nowMinimizationModel.value < 1.0;
 
-  double _getNowHeight(SizeModel sizeModel, double scrollOffset) => math.max(
-      sizeModel.minimizedNowHeight,
-      sizeModel.minimizedNowHeight +
-          ((sizeModel.maximizedNowHeight - sizeModel.minimizedNowHeight) *
-              (1.0 - _minimizationProgress)) +
-          _quickSettingsRaiseDistance +
-          _getScrollOffsetHeightDelta(scrollOffset));
+  double _getNowHeight(
+    QuickSettingsProgressModel quickSettingsProgressModel,
+    NowMinimizationModel nowMinimizationModel,
+    SizeModel sizeModel,
+    double scrollOffset,
+  ) =>
+      math.max(
+          sizeModel.minimizedNowHeight,
+          sizeModel.minimizedNowHeight +
+              ((sizeModel.maximizedNowHeight - sizeModel.minimizedNowHeight) *
+                  (1.0 - nowMinimizationModel.value)) +
+              _getQuickSettingsRaiseDistance(quickSettingsProgressModel) +
+              _getScrollOffsetHeightDelta(
+                scrollOffset,
+                quickSettingsProgressModel,
+                nowMinimizationModel,
+              ));
 
-  double get _userImageSize => lerpDouble(56.0, 12.0, _minimizationProgress);
+  double _getUserImageTopOffset(
+    SizeModel sizeModel,
+    QuickSettingsProgressModel quickSettingsProgressModel,
+    NowMinimizationModel nowMinimizationModel,
+  ) =>
+      lerpDouble(
+        lerpDouble(100.0, 20.0, quickSettingsProgressModel.value),
+        ((sizeModel.minimizedNowHeight -
+                nowMinimizationModel.userImageDiameter) /
+            2.0),
+        nowMinimizationModel.value,
+      );
 
-  double get _userImageBorderWidth =>
-      lerpDouble(2.0, 6.0, _minimizationProgress);
-
-  double _getUserImageTopOffset(SizeModel sizeModel) =>
-      lerpDouble(100.0, 20.0, _quickSettingsProgress) *
-          (1.0 - _minimizationProgress) +
-      ((sizeModel.minimizedNowHeight - _userImageSize) / 2.0) *
-          _minimizationProgress;
-
-  double _getQuickSettingsBackgroundTopOffset(SizeModel sizeModel) =>
-      _getUserImageTopOffset(sizeModel) +
-      ((_userImageSize / 2.0) * _quickSettingsProgress);
-
-  double get _quickSettingsBackgroundBorderRadius =>
-      lerpDouble(50.0, 4.0, _quickSettingsProgress);
+  double _getQuickSettingsBackgroundTopOffset(
+    SizeModel sizeModel,
+    QuickSettingsProgressModel quickSettingsProgressModel,
+    NowMinimizationModel nowMinimizationModel,
+  ) =>
+      _getUserImageTopOffset(
+        sizeModel,
+        quickSettingsProgressModel,
+        nowMinimizationModel,
+      ) +
+      ((nowMinimizationModel.userImageDiameter / 2.0) *
+          quickSettingsProgressModel.value);
 
   double _getQuickSettingsBackgroundMaximizedWidth(SizeModel sizeModel) =>
       math.min(_kMaxQuickSettingsBackgroundWidth, sizeModel.screenSize.width) -
       2 * _kQuickSettingsHorizontalPadding;
 
-  double _getQuickSettingsBackgroundWidth(SizeModel sizeModel) => lerpDouble(
-      _userImageSize,
-      _getQuickSettingsBackgroundMaximizedWidth(sizeModel),
-      _quickSettingsProgress * (1.0 - _minimizationProgress));
+  double _getQuickSettingsBackgroundWidth(
+    SizeModel sizeModel,
+    QuickSettingsProgressModel quickSettingsProgressModel,
+    NowMinimizationModel nowMinimizationModel,
+  ) =>
+      lerpDouble(
+        nowMinimizationModel.userImageDiameter,
+        _getQuickSettingsBackgroundMaximizedWidth(sizeModel),
+        quickSettingsProgressModel.value * (1.0 - nowMinimizationModel.value),
+      );
 
-  double _getQuickSettingsBackgroundHeight(SizeModel sizeModel) {
-    return lerpDouble(
-        _userImageSize,
-        -_getUserImageTopOffset(sizeModel) +
-            _userImageHeight +
-            _userContextTextHeight +
-            _importantInfoMaximizedHeight +
-            _quickSettingsHeight,
-        _quickSettingsProgress * (1.0 - _minimizationProgress));
-  }
+  double _getQuickSettingsBackgroundHeight(
+    SizeModel sizeModel,
+    QuickSettingsProgressModel quickSettingsProgressModel,
+    NowMinimizationModel nowMinimizationModel,
+  ) =>
+      lerpDouble(
+        nowMinimizationModel.userImageDiameter,
+        -_getUserImageTopOffset(
+              sizeModel,
+              quickSettingsProgressModel,
+              nowMinimizationModel,
+            ) +
+            nowMinimizationModel.userImageDiameter +
+            nowMinimizationModel.userImageDiameter +
+            nowMinimizationModel.userImageDiameter +
+            _getQuickSettingsHeight(quickSettingsProgressModel),
+        quickSettingsProgressModel.value * (1.0 - nowMinimizationModel.value),
+      );
 
-  double get _quickSettingsHeight =>
-      _quickSettingsProgress * _quickSettingsMaximizedHeight;
+  double _getQuickSettingsHeight(
+    QuickSettingsProgressModel quickSettingsProgressModel,
+  ) =>
+      quickSettingsProgressModel.value * _kQuickSettingsMaximizedHeight;
 
-  double get _fallAwayOpacity => (1.0 - _fallAwayProgress).clamp(0.0, 1.0);
+  double _getQuickSettingsRaiseDistance(
+    QuickSettingsProgressModel quickSettingsProgressModel,
+  ) =>
+      widget.quickSettingsHeightBump * quickSettingsProgressModel.value;
 
-  double get _quickSettingsRaiseDistance =>
-      widget.quickSettingsHeightBump * _quickSettingsProgress;
-
-  double _getScrollOffsetHeightDelta(double scrollOffset) =>
+  double _getScrollOffsetHeightDelta(
+    double scrollOffset,
+    QuickSettingsProgressModel quickSettingsProgressModel,
+    NowMinimizationModel nowMinimizationModel,
+  ) =>
       (math.max(
                   -_kRestingDistanceAboveLowestPoint,
                   (scrollOffset > -_kOverscrollDelayOffset &&
@@ -586,23 +475,9 @@ class NowState extends State<Now> {
                                   ? scrollOffset + _kOverscrollDelayOffset
                                   : scrollOffset) *
                               _kScrollFactor) *
-                          (1.0 - _minimizationProgress) *
-                          (1.0 - _quickSettingsProgress)) *
+                          (1.0 - nowMinimizationModel.value) *
+                          (1.0 - quickSettingsProgressModel.value)) *
               1000.0)
           .truncateToDouble() /
       1000.0;
-
-  /// We fall away the context text and important information for the initial
-  /// portion of the minimization animation as determined by
-  /// [_kFallAwayDurationFraction].
-  double get _fallAwayProgress =>
-      math.min(1.0, (_minimizationProgress / _kFallAwayDurationFraction));
-
-  /// We slide up and fade in the quick settings for the final portion of the
-  /// quick settings animation as determined by [_kFallAwayDurationFraction].
-  double get _quickSettingsSlideUpProgress => math.max(
-        0.0,
-        ((_quickSettingsProgress - (1.0 - _kFallAwayDurationFraction)) /
-            _kFallAwayDurationFraction),
-      );
 }

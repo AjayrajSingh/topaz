@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui' show lerpDouble;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
@@ -18,13 +16,6 @@ import 'size_model.dart';
 
 /// Displays minimized Now bar.
 class MinimizedNowBar extends StatelessWidget {
-  /// Fraction of the minimization animation which should be used for falling away
-  /// and sliding in of the user context and battery icon.
-  final double fallAwayDurationFraction;
-
-  /// Constructor.
-  MinimizedNowBar({this.fallAwayDurationFraction});
-
   @override
   Widget build(BuildContext context) => new ScopedModelDescendant<SizeModel>(
         builder: (
@@ -53,8 +44,7 @@ class MinimizedNowBar extends StatelessWidget {
               new Container(
                 height: sizeModel.minimizedNowHeight,
                 padding: new EdgeInsets.symmetric(
-                  horizontal:
-                      8.0 + _getSlideInDistance(nowMinimizationModel.value),
+                  horizontal: 8.0 + nowMinimizationModel.slideInDistance,
                 ),
                 child: child,
               ),
@@ -81,7 +71,7 @@ class MinimizedNowBar extends StatelessWidget {
             NowMinimizationModel nowMinimizationModel,
           ) =>
               new Opacity(
-                opacity: _getSlideInOpacity(nowMinimizationModel.value),
+                opacity: nowMinimizationModel.slideInOpacity,
                 child: child,
               ),
           child: new ScopedModelDescendant<ContextModel>(
@@ -114,8 +104,7 @@ class MinimizedNowBar extends StatelessWidget {
                             NowMinimizationModel nowMinimizationModel,
                           ) =>
                               new Opacity(
-                                opacity: _getSlideInOpacity(
-                                    nowMinimizationModel.value),
+                                opacity: nowMinimizationModel.slideInOpacity,
                                 child: child,
                               ),
                           child: new Text(powerModel.batteryText),
@@ -130,7 +119,7 @@ class MinimizedNowBar extends StatelessWidget {
                             new Image.asset(
                               powerModel.batteryImageUrl,
                               color: Colors.white.withOpacity(
-                                _getSlideInOpacity(nowMinimizationModel.value),
+                                nowMinimizationModel.slideInOpacity,
                               ),
                               fit: BoxFit.cover,
                               height: 24.0,
@@ -139,18 +128,4 @@ class MinimizedNowBar extends StatelessWidget {
                     ],
                   ),
       );
-
-  double _getSlideInDistance(double nowMinimizationProgress) =>
-      lerpDouble(10.0, 0.0, _getSlideInProgress(nowMinimizationProgress));
-
-  double _getSlideInOpacity(double nowMinimizationProgress) =>
-      0.6 * _getSlideInProgress(nowMinimizationProgress);
-
-  /// We slide in the context text and important information for the final
-  /// portion of the minimization animation as determined by
-  /// [fallAwayDurationFraction].
-  double _getSlideInProgress(double nowMinimizationProgress) =>
-      ((nowMinimizationProgress - (1.0 - fallAwayDurationFraction)) /
-              fallAwayDurationFraction)
-          .clamp(0.0, 1.0);
 }

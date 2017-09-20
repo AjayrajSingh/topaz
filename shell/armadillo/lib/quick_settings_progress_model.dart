@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
@@ -14,10 +16,17 @@ export 'package:lib.widgets/model.dart'
 const RK4SpringDescription _kSimulationDesc =
     const RK4SpringDescription(tension: 600.0, friction: 50.0);
 
+/// Fraction of the quick settings animation which should be used for fading in
+/// the quick settings.
+const double _kFadeInDurationFraction = 0.35;
+
 /// Keeps track of quick settings opening progress.
 class QuickSettingsProgressModel extends SpringModel {
   /// Constructor.
   QuickSettingsProgressModel() : super(springDescription: _kSimulationDesc);
+
+  /// Showing or heading toward showing.
+  bool get showing => target == 1.0;
 
   /// Shows quick settings.
   void show() {
@@ -28,6 +37,15 @@ class QuickSettingsProgressModel extends SpringModel {
   void hide() {
     target = 0.0;
   }
+
+  /// The border radius of quick settings background.
+  double get backgroundBorderRadius => lerpDouble(50.0, 4.0, value);
+
+  /// We fade in the quick settings for the final portion of the
+  /// quick settings animation as determined by [_kFadeInDurationFraction].
+  double get fadeInProgress =>
+      ((value - (1.0 - _kFadeInDurationFraction)) / _kFadeInDurationFraction)
+          .clamp(0.0, 1.0);
 
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
