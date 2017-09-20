@@ -20,5 +20,5 @@ flutter_app("todo_story") {
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
