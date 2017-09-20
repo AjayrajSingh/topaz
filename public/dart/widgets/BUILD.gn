@@ -15,7 +15,7 @@ dart_package("lib.widgets") {
     "//apps/modular/services/device:device_dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/user:user_dart",
-    "//apps/modules/common/packages/widgets_meta",
+    "//topaz/tools/packages/widgets_meta",
     "//garnet/public/lib/ui/flutter",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
