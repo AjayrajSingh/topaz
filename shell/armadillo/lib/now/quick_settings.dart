@@ -11,8 +11,8 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:sysui_widgets/icon_slider.dart';
 
-import 'elevations.dart';
-import 'size_model.dart';
+import '../elevations.dart';
+import '../size_model.dart';
 import 'toggle_icon.dart';
 import 'volume_model.dart';
 

@@ -5,8 +5,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
+import 'now/quick_settings_progress_model.dart';
 import 'peeking_overlay.dart';
-import 'quick_settings_progress_model.dart';
 import 'story_cluster_drag_state_model.dart';
 
 /// Determines if a [PeekingOverlay] should be peeking or not.

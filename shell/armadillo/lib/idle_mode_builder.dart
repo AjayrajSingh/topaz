@@ -8,7 +8,7 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'context_model.dart';
+import 'now/context_model.dart';
 import 'size_model.dart';
 
 /// Builds the idle mode.

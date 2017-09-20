@@ -4,8 +4,8 @@
 
 import 'package:flutter/widgets.dart';
 
+import '../nothing.dart';
 import 'context_model.dart';
-import 'nothing.dart';
 import 'power_model.dart';
 
 const String _kWifiImageGrey600 =

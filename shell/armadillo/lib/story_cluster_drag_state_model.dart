@@ -5,7 +5,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'now.dart';
+import 'now/now.dart';
 import 'peeking_overlay.dart';
 import 'story_cluster_id.dart';
 import 'story_list.dart';

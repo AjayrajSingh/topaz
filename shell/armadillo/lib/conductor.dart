@@ -6,9 +6,9 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'conductor_model.dart';
-import 'context_model.dart';
+import 'now/context_model.dart';
+import 'now/quick_settings_progress_model.dart';
 import 'peek_model.dart';
-import 'quick_settings_progress_model.dart';
 import 'size_model.dart';
 import 'story.dart';
 import 'story_cluster.dart';

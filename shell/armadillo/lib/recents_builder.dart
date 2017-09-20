@@ -9,13 +9,13 @@ import 'package:lib.widgets/model.dart';
 
 import 'armadillo_overlay.dart';
 import 'edge_scroll_drag_target.dart';
-import 'now_builder.dart';
+import 'now/now_builder.dart';
+import 'now/vertical_shifter.dart';
 import 'scroll_locker.dart';
 import 'size_model.dart';
 import 'story_cluster.dart';
 import 'story_drag_transition_model.dart';
 import 'story_list.dart';
-import 'vertical_shifter.dart';
 
 /// If the user releases their finger when overscrolled more than this amount,
 /// we snap suggestions open.

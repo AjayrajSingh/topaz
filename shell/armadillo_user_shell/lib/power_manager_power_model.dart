@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:armadillo/power_model.dart';
+import 'package:armadillo/now/power_model.dart';
 import 'package:lib.power.fidl/power_manager.fidl.dart';
 
 /// Provides battery and charging information.

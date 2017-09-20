@@ -10,8 +10,8 @@ import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
 import 'conductor.dart';
-import 'context_model.dart';
 import 'default_scroll_configuration.dart';
+import 'now/context_model.dart';
 import 'wrapper_builder.dart';
 
 export 'wrapper_builder.dart' show WrapperBuilder;

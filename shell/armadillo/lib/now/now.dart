@@ -8,13 +8,13 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
+import '../size_model.dart';
+import '../story_drag_transition_model.dart';
 import 'minimized_now_bar.dart';
 import 'now_minimization_model.dart';
 import 'now_user_and_maximized_info.dart';
 import 'quick_settings.dart';
 import 'quick_settings_progress_model.dart';
-import 'size_model.dart';
-import 'story_drag_transition_model.dart';
 
 /// The distance above the lowest point we can scroll down to when
 /// recents scroll offset is 0.0.

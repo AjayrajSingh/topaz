@@ -7,10 +7,10 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
+import '../size_model.dart';
 import 'now.dart';
 import 'now_minimization_model.dart';
 import 'quick_settings.dart';
-import 'size_model.dart';
 
 /// Builds now.
 class NowBuilder {

@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert' as convert;
 import 'dart:io';
 
-import 'package:armadillo/context_model.dart';
+import 'package:armadillo/now/context_model.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';

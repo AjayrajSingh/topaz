@@ -5,8 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/widgets.dart';
 
+import '../elevations.dart';
 import 'context_model.dart';
-import 'elevations.dart';
 import 'now_minimization_model.dart';
 import 'quick_settings_progress_model.dart';
 

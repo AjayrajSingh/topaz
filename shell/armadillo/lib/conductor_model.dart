@@ -10,7 +10,7 @@ export 'package:lib.widgets/model.dart'
 
 import 'idle_mode_builder.dart';
 import 'next_builder.dart';
-import 'now_builder.dart';
+import 'now/now_builder.dart';
 import 'recents_builder.dart';
 
 /// Provides builders for Conductor.
