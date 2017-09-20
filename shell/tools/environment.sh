@@ -25,7 +25,7 @@ export PATH="$DART_SDK/bin:$PATH"
 ###################################################
 # Utilities
 
-PRUNE_ARGS="-name third_party -prune -o -name .git -prune -o -name out -prune -o -name .pub -prune -o -name .packages -prune"
+PRUNE_ARGS="-name third_party -prune -o -name .git -prune -o -name out -prune -o -name .pub -prune -o -name .packages -prune -o -name .jiri_root -prune"
 GREP_COMMAND="grep -I -nH --color"
 
 function sfind() {
