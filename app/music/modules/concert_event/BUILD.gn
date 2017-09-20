@@ -14,16 +14,16 @@ flutter_app("concert_event") {
   deps = [
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
-    "//topaz/tools/packages/config",
-    "//topaz/app/music/packages/concert_api",
-    "//topaz/app/music/packages/concert_models",
-    "//topaz/app/music/packages/concert_widgets",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
+    "//topaz/app/music/packages/concert_api",
+    "//topaz/app/music/packages/concert_models",
+    "//topaz/app/music/packages/concert_widgets",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/tools/packages/config",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

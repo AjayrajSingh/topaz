@@ -34,14 +34,18 @@ void main() {
     Key heroBannerKey = new UniqueKey();
     Key bodyKey = new UniqueKey();
     Key heroImageKey = new UniqueKey();
-    await tester.pumpWidget(new Material(
-      child: new HeroBannerScaffold(
-        loadingStatus: LoadingStatus.failed,
-        heroBanner: new Container(key: heroBannerKey),
-        children: <Widget>[new Container(key: bodyKey)],
-        heroImage: new Container(key: heroImageKey),
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new HeroBannerScaffold(
+            loadingStatus: LoadingStatus.failed,
+            heroBanner: new Container(key: heroBannerKey),
+            children: <Widget>[new Container(key: bodyKey)],
+            heroImage: new Container(key: heroImageKey),
+          ),
+        ),
       ),
-    ));
+    );
 
     // Child widgets should not be in the widget tree
     expect(find.byKey(heroBannerKey), findsNothing);

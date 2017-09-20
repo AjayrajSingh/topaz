@@ -13,11 +13,11 @@ dart_app("music_artist_agent") {
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/suggestion:suggestion_dart",
     "//apps/maxwell/services/user:user_dart",
-    "//topaz/tools/packages/config",
-    "//topaz/app/music/packages/music_api",
-    "//topaz/app/music/packages/music_models",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
+    "//topaz/app/music/packages/music_api",
+    "//topaz/app/music/packages/music_models",
     "//topaz/lib/widgets/packages/logging:lib.logging",
+    "//topaz/tools/packages/config",
   ]
 }

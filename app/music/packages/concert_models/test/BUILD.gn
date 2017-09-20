@@ -8,9 +8,9 @@ dart_test("test") {
   source_dir = "."
 
   deps = [
-    "//topaz/app/music/packages/concert_models",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/app/music/packages/concert_models",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

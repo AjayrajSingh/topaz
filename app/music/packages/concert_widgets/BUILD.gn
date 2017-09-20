@@ -9,9 +9,9 @@ dart_package("concert_widgets") {
   package_name = "concert_widgets"
 
   deps = [
-    "//topaz/app/music/packages/concert_models",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/intl",
+    "//topaz/app/music/packages/concert_models",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 

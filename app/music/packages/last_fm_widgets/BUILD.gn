@@ -9,8 +9,8 @@ dart_package("last_fm_widgets") {
   package_name = "last_fm_widgets"
 
   deps = [
-    "//topaz/app/music/packages/last_fm_models",
     "//lib/flutter/packages/flutter",
+    "//topaz/app/music/packages/last_fm_models",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 

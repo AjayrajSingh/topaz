@@ -10,11 +10,11 @@ dart_app("music_playback_agent") {
   deps = [
     "//apps/modular/services/agent:agent_dart",
     "//apps/modular/services/lifecycle:lifecycle_dart",
-    "//topaz/app/music/services/player:player_dart",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/app/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
     "//garnet/public/lib/media/dart",
+    "//topaz/app/music/services/player:player_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
   ]
 
