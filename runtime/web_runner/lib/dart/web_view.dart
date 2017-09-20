@@ -4,4 +4,4 @@
 
 /// The path to web_view.
 /// Keep in sync with web_view_component.json.
-const String kWebViewURL = 'file:///system/apps/web_view';
+const String kWebViewURL = 'file:///system/topaz/runtime/web_view';
