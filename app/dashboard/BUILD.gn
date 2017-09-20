@@ -15,7 +15,7 @@ flutter_app("dashboard_app") {
     "//garnet/public/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/user:user_dart",
-    "//apps/modules/chat/services:services_dart",
+    "//topaz/app/chat/services:services_dart",
     "//garnet/public/lib/ui/flutter",
     "//apps/web_runner/lib/dart:web_view",
     "//garnet/public/lib/fidl/dart",

@@ -12,7 +12,7 @@ import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart'
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
     as chat;
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:collection/collection.dart';
