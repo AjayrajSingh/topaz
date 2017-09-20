@@ -20,7 +20,6 @@ class NowBuilder {
   /// The simulation for the minimization to a bar.
   final NowMinimizationModel _nowMinimizationModel = new NowMinimizationModel();
 
-  final GlobalKey<NowState> _nowKey = new GlobalKey<NowState>();
   final GlobalKey<QuickSettingsOverlayState> _quickSettingsOverlayKey =
       new GlobalKey<QuickSettingsOverlayState>();
 
@@ -65,10 +64,10 @@ class NowBuilder {
     BuildContext context, {
     VoidCallback onMinimizedTap,
     VoidCallback onQuickSettingsMaximized,
-    VoidCallback onOverscrollThresholdRelease,
     GestureDragUpdateCallback onBarVerticalDragUpdate,
     GestureDragEndCallback onBarVerticalDragEnd,
     VoidCallback onMinimizedContextTapped,
+    ValueNotifier<double> recentsScrollOffset,
   }) =>
       new ScopedModelDescendant<SizeModel>(
         builder: (_, Widget child, SizeModel sizeModel) =>
@@ -92,69 +91,41 @@ class NowBuilder {
             ),
         child: new ScopedModel<NowMinimizationModel>(
           model: _nowMinimizationModel,
-          child: _buildNow(
-            context,
-            onMinimizedTap: onMinimizedTap,
-            onQuickSettingsMaximized: onQuickSettingsMaximized,
-            onOverscrollThresholdRelease: onOverscrollThresholdRelease,
-            onBarVerticalDragUpdate: onBarVerticalDragUpdate,
-            onBarVerticalDragEnd: onBarVerticalDragEnd,
-            onMinimizedContextTapped: onMinimizedContextTapped,
+          child: new Stack(
+            children: <Widget>[
+              new RepaintBoundary(
+                child: new Now(
+                  quickSettingsHeightBump: kQuickSettingsHeightBump,
+                  onMinimizedTap: onMinimizedTap,
+                  onMinimizedLongPress: () =>
+                      _quickSettingsOverlayKey.currentState.show(),
+                  onQuickSettingsMaximized: onQuickSettingsMaximized,
+                  onBarVerticalDragUpdate: onBarVerticalDragUpdate,
+                  onBarVerticalDragEnd: onBarVerticalDragEnd,
+                  onLogoutSelected: _onLogoutSelected,
+                  onClearLedgerSelected: _onClearLedgerSelected,
+                  onUserContextTapped: _onUserContextTapped,
+                  onMinimizedContextTapped: onMinimizedContextTapped,
+                  recentsScrollOffset: recentsScrollOffset,
+                ),
+              ),
+              // Quick Settings Overlay.
+              new QuickSettingsOverlay(
+                key: _quickSettingsOverlayKey,
+                onProgressChanged: (double progress) {
+                  if (progress == 0.0) {
+                    _onQuickSettingsOverlayChanged?.call(false);
+                  } else {
+                    _onQuickSettingsOverlayChanged?.call(true);
+                  }
+                },
+                onLogoutSelected: _onLogoutSelected,
+                onClearLedgerSelected: _onClearLedgerSelected,
+              ),
+            ],
           ),
         ),
       );
-
-  Widget _buildNow(
-    BuildContext context, {
-    VoidCallback onMinimizedTap,
-    VoidCallback onQuickSettingsMaximized,
-    VoidCallback onOverscrollThresholdRelease,
-    GestureDragUpdateCallback onBarVerticalDragUpdate,
-    GestureDragEndCallback onBarVerticalDragEnd,
-    VoidCallback onMinimizedContextTapped,
-  }) =>
-      new Stack(
-        children: <Widget>[
-          new RepaintBoundary(
-            child: new Now(
-              key: _nowKey,
-              quickSettingsHeightBump: kQuickSettingsHeightBump,
-              onMinimizedTap: onMinimizedTap,
-              onMinimizedLongPress: () =>
-                  _quickSettingsOverlayKey.currentState.show(),
-              onQuickSettingsMaximized: onQuickSettingsMaximized,
-              onBarVerticalDragUpdate: onBarVerticalDragUpdate,
-              onBarVerticalDragEnd: onBarVerticalDragEnd,
-              onOverscrollThresholdRelease: onOverscrollThresholdRelease,
-              onLogoutSelected: _onLogoutSelected,
-              onClearLedgerSelected: _onClearLedgerSelected,
-              onUserContextTapped: _onUserContextTapped,
-              onMinimizedContextTapped: onMinimizedContextTapped,
-            ),
-          ),
-          // Quick Settings Overlay.
-          new QuickSettingsOverlay(
-            key: _quickSettingsOverlayKey,
-            onProgressChanged: (double progress) {
-              if (progress == 0.0) {
-                _onQuickSettingsOverlayChanged?.call(false);
-              } else {
-                _onQuickSettingsOverlayChanged?.call(true);
-              }
-            },
-            onLogoutSelected: _onLogoutSelected,
-            onClearLedgerSelected: _onClearLedgerSelected,
-          ),
-        ],
-      );
-
-  /// Call when the recents scroll offset changes.
-  void onRecentsScrollOffsetChanged(double recentsScrollOffset, bool ignore) {
-    _nowKey.currentState.onRecentsScrollOffsetChanged(
-      recentsScrollOffset,
-      ignore,
-    );
-  }
 
   /// Call when now should minimize.
   void minimize() {

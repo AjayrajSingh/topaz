@@ -20,13 +20,6 @@ import 'story_drag_transition_model.dart';
 /// recents scroll offset is 0.0.
 const double _kRestingDistanceAboveLowestPoint = 80.0;
 
-/// When the recent list's scrollOffset exceeds this value we minimize [Now].
-const double _kNowMinimizationScrollOffsetThreshold = 120.0;
-
-/// When the recent list's scrollOffset exceeds this value we hide quick
-/// settings [Now].
-const double _kNowQuickSettingsHideScrollOffsetThreshold = 16.0;
-
 const double _kQuickSettingsHorizontalPadding = 16.0;
 
 const double _kQuickSettingsInnerHorizontalPadding = 16.0;
@@ -44,7 +37,7 @@ final double _kQuickSettingsMaximizedHeight = 200.0;
 
 /// Shows the user, the user's context, and important settings.  When minimized
 /// also shows an affordance for seeing missed interruptions.
-class Now extends StatefulWidget {
+class Now extends StatelessWidget {
   /// How much to shift the quick settings vertically when shown.
   final double quickSettingsHeightBump;
 
@@ -56,10 +49,6 @@ class Now extends StatefulWidget {
 
   /// Called when [Now]'s quick settings are maximized.
   final VoidCallback onQuickSettingsMaximized;
-
-  /// Called when the user releases their finger while overscrolled past a
-  /// certain threshold and/or overscrolling with a certain velocity.
-  final VoidCallback onOverscrollThresholdRelease;
 
   /// Called when a vertical drag occurs on [Now] when in its fully minimized
   /// bar state.
@@ -81,6 +70,9 @@ class Now extends StatefulWidget {
   /// Called when minimized context is tapped.
   final VoidCallback onMinimizedContextTapped;
 
+  /// Scroll offset of recents.
+  final ValueNotifier<double> recentsScrollOffset;
+
   /// Constructor.
   Now({
     Key key,
@@ -90,51 +82,13 @@ class Now extends StatefulWidget {
     this.onQuickSettingsMaximized,
     this.onBarVerticalDragUpdate,
     this.onBarVerticalDragEnd,
-    this.onOverscrollThresholdRelease,
     this.onLogoutSelected,
     this.onClearLedgerSelected,
     this.onUserContextTapped,
     this.onMinimizedContextTapped,
+    this.recentsScrollOffset,
   })
       : super(key: key);
-
-  @override
-  NowState createState() => new NowState();
-}
-
-/// Controls the animations for maximizing and minimizing, showing and hiding
-/// quick settings, and vertically shifting as the story list is scrolled.
-class NowState extends State<Now> {
-  final ValueNotifier<double> _recentsScrollOffset =
-      new ValueNotifier<double>(0.0);
-
-  /// scroll offset affects the bottom padding of the user and text elements
-  /// as well as the overall height of [Now] while maximized.
-  double _lastRecentsScrollOffset = 0.0;
-
-  /// Sets the [scrollOffset] of the story list tracked by [Now].
-  void onRecentsScrollOffsetChanged(double scrollOffset, bool ignore) {
-    _recentsScrollOffset.value =
-        scrollOffset - SizeModel.of(context).storyListTopPadding;
-    if (ignore) {
-      return;
-    }
-    if (scrollOffset > _kNowMinimizationScrollOffsetThreshold &&
-        _lastRecentsScrollOffset < scrollOffset) {
-      NowMinimizationModel.of(context).minimize();
-      QuickSettingsProgressModel.of(context).hide();
-    } else if (scrollOffset < _kNowMinimizationScrollOffsetThreshold &&
-        _lastRecentsScrollOffset > scrollOffset) {
-      NowMinimizationModel.of(context).maximize();
-    }
-    // When we're past the quick settings threshold and are
-    // scrolling further, hide quick settings.
-    if (scrollOffset > _kNowQuickSettingsHideScrollOffsetThreshold &&
-        _lastRecentsScrollOffset < scrollOffset) {
-      QuickSettingsProgressModel.of(context).hide();
-    }
-    _lastRecentsScrollOffset = scrollOffset;
-  }
 
   @override
   Widget build(BuildContext context) =>
@@ -190,13 +144,13 @@ class NowState extends State<Now> {
             SizeModel sizeModel,
           ) =>
               new AnimatedBuilder(
-                animation: _recentsScrollOffset,
+                animation: recentsScrollOffset,
                 builder: (BuildContext context, Widget child) => new Container(
                       height: _getNowHeight(
                         quickSettingsProgressModel,
                         nowMinimizationModel,
                         sizeModel,
-                        _recentsScrollOffset.value,
+                        recentsScrollOffset.value,
                       ),
                       child: child,
                     ),
@@ -246,10 +200,11 @@ class NowState extends State<Now> {
                         child: new Column(
                           children: <Widget>[
                             new NowUserAndMaximizedContext(
-                              onUserContextTapped: widget.onUserContextTapped,
+                              onUserContextTapped: onUserContextTapped,
                               onUserTapped: () {
                                 if (!quickSettingsProgressModel.showing) {
-                                  _showQuickSettings();
+                                  quickSettingsProgressModel.show();
+                                  onQuickSettingsMaximized?.call();
                                 } else {
                                   quickSettingsProgressModel.hide();
                                 }
@@ -308,8 +263,8 @@ class NowState extends State<Now> {
               new Container(
                 child: new QuickSettings(
                   opacity: quickSettingsProgressModel.fadeInProgress,
-                  onLogoutSelected: widget.onLogoutSelected,
-                  onClearLedgerSelected: widget.onClearLedgerSelected,
+                  onLogoutSelected: onLogoutSelected,
+                  onClearLedgerSelected: onClearLedgerSelected,
                 ),
               ),
             ],
@@ -325,8 +280,8 @@ class NowState extends State<Now> {
         offstage: _getButtonTapDisabled(nowMinimizationModel),
         child: new GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onVerticalDragUpdate: widget.onBarVerticalDragUpdate,
-          onVerticalDragEnd: widget.onBarVerticalDragEnd,
+          onVerticalDragUpdate: onBarVerticalDragUpdate,
+          onVerticalDragEnd: onBarVerticalDragEnd,
           child: new Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -334,21 +289,21 @@ class NowState extends State<Now> {
                 child: new GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
-                    widget.onMinimizedContextTapped?.call();
+                    onMinimizedContextTapped?.call();
                   },
                 ),
               ),
               new GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: widget.onMinimizedTap,
-                onLongPress: widget.onMinimizedLongPress,
+                onTap: onMinimizedTap,
+                onLongPress: onMinimizedLongPress,
                 child: new Container(width: sizeModel.minimizedNowHeight * 4.0),
               ),
               new Expanded(
                 child: new GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
-                    widget.onMinimizedContextTapped?.call();
+                    onMinimizedContextTapped?.call();
                   },
                 ),
               ),
@@ -356,18 +311,6 @@ class NowState extends State<Now> {
           ),
         ),
       );
-
-  /// Morphs [Now] into its quick settings mode.
-  /// This should only be called when [Now] is maximized.
-  void _showQuickSettings() {
-    if (!_revealingQuickSettings) {
-      QuickSettingsProgressModel.of(context).target = 1.0;
-      widget.onQuickSettingsMaximized?.call();
-    }
-  }
-
-  bool get _revealingQuickSettings =>
-      QuickSettingsProgressModel.of(context).target == 1.0;
 
   bool _getButtonTapDisabled(NowMinimizationModel nowMinimizationModel) =>
       nowMinimizationModel.value < 1.0;
@@ -458,7 +401,7 @@ class NowState extends State<Now> {
   double _getQuickSettingsRaiseDistance(
     QuickSettingsProgressModel quickSettingsProgressModel,
   ) =>
-      widget.quickSettingsHeightBump * quickSettingsProgressModel.value;
+      quickSettingsHeightBump * quickSettingsProgressModel.value;
 
   double _getScrollOffsetHeightDelta(
     double scrollOffset,

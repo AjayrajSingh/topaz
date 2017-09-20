@@ -15,6 +15,13 @@ import 'story_cluster.dart';
 import 'story_model.dart';
 import 'suggestion_model.dart';
 
+/// When the recent list's scrollOffset exceeds this value we minimize Now.
+const double _kNowMinimizationScrollOffsetThreshold = 120.0;
+
+/// When the recent list's scrollOffset exceeds this value we hide quick
+/// settings Now.
+const double _kNowQuickSettingsHideScrollOffsetThreshold = 16.0;
+
 /// Manages the position, size, and state of the story list, user context,
 /// suggestion overlay, device extensions. interruption overlay, and quick
 /// settings overlay.
@@ -28,8 +35,15 @@ class Conductor extends StatefulWidget {
 
 /// Manages the state for [Conductor].
 class ConductorState extends State<Conductor> {
+  final ValueNotifier<double> _recentsScrollOffset =
+      new ValueNotifier<double>(0.0);
+
   bool _ignoreNextScrollOffsetChange = false;
   double _pointerDownY;
+
+  /// Scroll offset affects the bottom padding of the user and text elements
+  /// as well as the overall height of Now while maximized.
+  double _lastRecentsScrollOffset = 0.0;
 
   @override
   Widget build(BuildContext context) =>
@@ -68,17 +82,34 @@ class ConductorState extends State<Conductor> {
           conductorModel.recentsBuilder.build(
             context,
             onScroll: (double scrollOffset) {
-              // Ignore top padding of storylist when looking at scroll offset
-              // to determine Now state.
-              conductorModel.nowBuilder.onRecentsScrollOffsetChanged(
-                scrollOffset + SizeModel.of(context).storyListTopPadding,
-                _ignoreNextScrollOffsetChange,
-              );
+              _recentsScrollOffset.value = scrollOffset;
 
               if (_ignoreNextScrollOffsetChange) {
                 _ignoreNextScrollOffsetChange = false;
                 return;
               }
+
+              double recentsScrollOffset =
+                  scrollOffset + SizeModel.of(context).storyListTopPadding;
+              if (recentsScrollOffset >
+                      _kNowMinimizationScrollOffsetThreshold &&
+                  _lastRecentsScrollOffset < recentsScrollOffset) {
+                conductorModel.nowBuilder.minimize();
+                QuickSettingsProgressModel.of(context).hide();
+              } else if (recentsScrollOffset <
+                      _kNowMinimizationScrollOffsetThreshold &&
+                  _lastRecentsScrollOffset > recentsScrollOffset) {
+                conductorModel.nowBuilder.maximize();
+              }
+              // When we're past the quick settings threshold and are
+              // scrolling further, hide quick settings.
+              if (recentsScrollOffset >
+                      _kNowQuickSettingsHideScrollOffsetThreshold &&
+                  _lastRecentsScrollOffset < recentsScrollOffset) {
+                QuickSettingsProgressModel.of(context).hide();
+              }
+              _lastRecentsScrollOffset = recentsScrollOffset;
+
               conductorModel.nextBuilder.onRecentsScrollOffsetChanged(
                 context,
                 scrollOffset,
@@ -89,10 +120,8 @@ class ConductorState extends State<Conductor> {
               conductorModel.recentsBuilder.onStoryFocused();
               _minimizeNow();
             },
-            onStoryClusterFocusCompleted: (StoryCluster storyCluster) {
-              _focusStoryCluster(storyCluster);
-            },
-            onStoryClusterVerticalEdgeHover: () => goToOrigin(),
+            onStoryClusterFocusCompleted: _focusStoryCluster,
+            onStoryClusterVerticalEdgeHover: goToOrigin,
           ),
 
           new Listener(
@@ -115,15 +144,14 @@ class ConductorState extends State<Conductor> {
           // Now.
           conductorModel.nowBuilder.build(
             context,
-            onMinimizedTap: () => goToOrigin(),
-            onQuickSettingsMaximized: () {
-              ConductorModel.of(context).recentsBuilder.resetScroll();
-            },
-            onBarVerticalDragUpdate: (DragUpdateDetails details) =>
-                conductorModel.nextBuilder.onNowBarVerticalDragUpdate(details),
-            onBarVerticalDragEnd: (DragEndDetails details) =>
-                conductorModel.nextBuilder.onNowBarVerticalDragEnd(details),
-            onMinimizedContextTapped: () => conductorModel.nextBuilder.show(),
+            onMinimizedTap: goToOrigin,
+            onQuickSettingsMaximized: conductorModel.recentsBuilder.resetScroll,
+            onBarVerticalDragUpdate:
+                conductorModel.nextBuilder.onNowBarVerticalDragUpdate,
+            onBarVerticalDragEnd:
+                conductorModel.nextBuilder.onNowBarVerticalDragEnd,
+            onMinimizedContextTapped: conductorModel.nextBuilder.show,
+            recentsScrollOffset: _recentsScrollOffset,
           ),
 
           // Suggestions Overlay.
@@ -134,25 +162,10 @@ class ConductorState extends State<Conductor> {
         ],
       );
 
-  void _defocus(StoryModel storyModel) {
-    // Unfocus all story clusters.
-    storyModel.storyClusters.forEach(
-      (StoryCluster storyCluster) => storyCluster.unFocus(),
-    );
-
-    // Unlock scrolling.
-    ConductorModel.of(context).recentsBuilder.onStoryUnfocused();
-    ConductorModel.of(context).recentsBuilder.resetScroll();
-  }
-
-  void _focusStoryCluster(
-    StoryCluster storyCluster,
-  ) {
-    StoryModel storyModel = StoryModel.of(context);
-
+  void _focusStoryCluster(StoryCluster storyCluster) {
     // Tell the [StoryModel] the story is now in focus.  This will move the
     // [Story] to the front of the [StoryList].
-    storyModel.interactionStarted(storyCluster);
+    StoryModel.of(context).interactionStarted(storyCluster);
 
     // We need to set the scroll offset to 0.0 to ensure the story
     // bars don't become untouchable when fully focused:
@@ -190,7 +203,14 @@ class ConductorState extends State<Conductor> {
   /// 5) Peeking the suggestion list.
   void goToOrigin() {
     StoryModel storyModel = StoryModel.of(context);
-    _defocus(storyModel);
+    // Unfocus all story clusters.
+    storyModel.storyClusters.forEach(
+      (StoryCluster storyCluster) => storyCluster.unFocus(),
+    );
+
+    // Unlock scrolling.
+    ConductorModel.of(context).recentsBuilder.onStoryUnfocused();
+    ConductorModel.of(context).recentsBuilder.resetScroll();
     ConductorModel.of(context).nowBuilder.maximize();
     storyModel.interactionStopped();
     storyModel.clearPlaceHolderStoryClusters();
