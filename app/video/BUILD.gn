@@ -8,11 +8,11 @@ package("video") {
   app = true
 
   deps = [
-    "//apps/modules/video/modules/video",
+    "//topaz/app/video/modules/video",
   ]
 
   binaries = [ {
-        source = "gen/apps/modules/video/modules/video/video.flx"
+        source = "gen/topaz/app/video/modules/video/video.flx"
         name = "video"
       } ]
 }
