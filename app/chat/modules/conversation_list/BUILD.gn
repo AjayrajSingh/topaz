@@ -14,8 +14,8 @@ flutter_app("chat_conversation_list") {
     "//garnet/public/lib/app/dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
-    "//apps/modules/chat/services:services_dart",
-    "//apps/modules/common/packages/models",
+    "//topaz/app/chat/services:services_dart",
+    "//topaz/tools/packages/models",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
@@ -24,15 +24,15 @@ flutter_app("chat_conversation_list") {
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
   deps = [
-    "//apps/modules/chat/modules/conversation_list:chat_conversation_list_dart_package",
+    "//topaz/app/chat/modules/conversation_list:chat_conversation_list_dart_package",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

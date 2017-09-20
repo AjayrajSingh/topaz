@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'package:meta/meta.dart';
 
 /// Called when a new chat message is received from another user.

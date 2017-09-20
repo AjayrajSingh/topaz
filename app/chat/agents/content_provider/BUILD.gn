@@ -15,10 +15,10 @@ dart_app("chat_content_provider") {
     "//apps/modular/services/agent:agent_dart",
     "//apps/modular/services/auth:auth_dart",
     "//apps/modular/services/user:user_dart",
-    "//apps/modules/chat/services:services_dart",
-    "//apps/modules/common/packages/config",
-    "//apps/modules/common/packages/fixtures",
-    "//apps/modules/common/packages/models",
+    "//topaz/app/chat/services:services_dart",
+    "//topaz/tools/packages/config",
+    "//topaz/tools/packages/fixtures",
+    "//topaz/tools/packages/models",
     "//garnet/public/lib/fidl/dart",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/eventsource",
@@ -29,5 +29,5 @@ dart_app("chat_content_provider") {
     "//topaz/lib/widgets/packages/modular:lib.modular",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

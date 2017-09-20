@@ -88,7 +88,7 @@ before running the chat modules correctly.
 
 3. Add the Firebase project information to the configuration file, so that your
    chat module may send messages to other users.
-  * Manually add the following values to `//apps/modules/common/config.json`.
+  * Manually add the following values to `//topaz/tools/config.json`.
     * `"chat_firebase_api_key"`: `<web_api_key>`
     * `"chat_firebase_project_id"`: `<firebase_project_id>`
     * These two value can be found from your Firebase project console.
@@ -117,7 +117,7 @@ Once the fuchsia device is booted, run the following command from the host.
 
 ```bash
 $ $FUCHSIA_DIR/apps/test_runner/src/run_test \
-  --test_file=$FUCHSIA_DIR/apps/modules/chat/tests/chat_tests.json
+  --test_file=$FUCHSIA_DIR/topaz/app/chat/tests/chat_tests.json
 ```
 
 When the test passes, the resulting output should look like this:

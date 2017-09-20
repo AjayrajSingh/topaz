@@ -4,8 +4,8 @@
 
 import 'dart:async';
 
-import 'package:apps.modules.chat.agents.content_provider..chat_content_provider_dart_package/src/chat_message_transporter.dart';
-import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
+import 'package:topaz.app.chat.agents.content_provider..chat_content_provider_dart_package/src/chat_message_transporter.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'package:meta/meta.dart';
 
 /// A mock [ChatMessageTransporter] implementation for testing.

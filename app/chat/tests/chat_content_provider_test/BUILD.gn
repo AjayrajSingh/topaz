@@ -12,8 +12,8 @@ dart_app("chat_content_provider_test") {
   deps = [
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
-    "//apps/modules/chat/agents/content_provider:chat_content_provider_dart_package",
-    "//apps/modules/chat/services:services_dart",
+    "//topaz/app/chat/agents/content_provider:chat_content_provider_dart_package",
+    "//topaz/app/chat/services:services_dart",
     "//garnet/public/lib/test_runner/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/matcher",
@@ -23,5 +23,5 @@ dart_app("chat_content_provider_test") {
     "//topaz/lib/widgets/packages/modular:lib.modular",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

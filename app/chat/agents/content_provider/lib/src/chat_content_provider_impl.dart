@@ -11,7 +11,7 @@ import 'package:apps.ledger.services.public/ledger.fidl.dart';
 import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.component/message_queue.fidl.dart';
 import 'package:apps.modular.services.user/device_map.fidl.dart';
-import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' show InterfaceRequest;
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';

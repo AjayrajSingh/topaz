@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert' show JSON;
 
 import 'package:apps.modular.services.auth/token_provider.fidl.dart';
-import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'package:config/config.dart';
 import 'package:eventsource/eventsource.dart';
 import 'package:http/http.dart' as http;

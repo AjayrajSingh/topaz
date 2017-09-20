@@ -11,7 +11,7 @@ import 'package:apps.maxwell.services.context/value_type.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.user/device_map.fidl.dart';
-import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.modular/modular.dart';

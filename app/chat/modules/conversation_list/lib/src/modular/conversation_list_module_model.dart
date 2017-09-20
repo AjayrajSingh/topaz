@@ -17,7 +17,7 @@ import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.surface/surface.fidl.dart';
-import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart'
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
     as chat_fidl;
 import 'package:collection/collection.dart';
 import 'package:lib.logging/logging.dart';

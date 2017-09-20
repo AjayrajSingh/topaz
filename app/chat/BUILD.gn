@@ -8,9 +8,9 @@ package("chat") {
   app = true
 
   deps = [
-    "//apps/modules/chat/agents",
-    "//apps/modules/chat/modules",
-    "//apps/modules/chat/services",
+    "//topaz/app/chat/agents",
+    "//topaz/app/chat/modules",
+    "//topaz/app/chat/services",
   ]
 
   binaries = [
@@ -22,12 +22,12 @@ package("chat") {
     {
       name = "chat_conversation"
       source =
-          "gen/apps/modules/chat/modules/conversation/chat_conversation.flx"
+          "gen/topaz/app/chat/modules/conversation/chat_conversation.flx"
     },
 
     {
       name = "chat_conversation_list"
-      source = "gen/apps/modules/chat/modules/conversation_list/chat_conversation_list.flx"
+      source = "gen/topaz/app/chat/modules/conversation_list/chat_conversation_list.flx"
     },
   ]
 }
@@ -37,14 +37,14 @@ package("chat_tests") {
   app = true
 
   deps = [
-    "//apps/modules/chat/tests/chat_content_provider_test",
+    "//topaz/app/chat/tests/chat_content_provider_test",
 
     # The following gn targets do not build anything that ends up on the target, but need to be
     # built in order to:
     # 1) run the unit tests on the host side
     # 2) enable dart analyzer support for test code in the IDE
-    "//apps/modules/chat/modules/conversation:test",
-    "//apps/modules/chat/modules/conversation_list:test",
+    "//topaz/app/chat/modules/conversation:test",
+    "//topaz/app/chat/modules/conversation_list:test",
   ]
 
   binaries = [ {

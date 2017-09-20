@@ -9,7 +9,7 @@ import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
-import 'package:apps.modules.chat.services/chat_content_provider.fidl.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
 
 const String _kContactsJsonFile = '/system/data/modules/contacts.json';
