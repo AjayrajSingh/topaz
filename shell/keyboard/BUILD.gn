@@ -8,19 +8,19 @@ import("//build/dart/dart_test.gni")
 dart_package("keyboard") {
   package_name = "keyboard"
 
-  analysis_options = "//apps/sysui/analysis_options.yaml"
+  analysis_options = "//topaz/shell/analysis_options.yaml"
 
   deps = [
-    "//apps/sysui/widgets",
+    "//topaz/shell/widgets",
     "//lib/flutter/packages/flutter",
   ]
 }
 
 dart_test("test") {
-  analysis_options = "//apps/sysui/analysis_options.yaml"
+  analysis_options = "//topaz/shell/analysis_options.yaml"
 
   deps = [
-    "//apps/sysui/keyboard",
+    "//topaz/shell/keyboard",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]
