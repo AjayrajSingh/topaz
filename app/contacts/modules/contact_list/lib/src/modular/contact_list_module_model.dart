@@ -7,12 +7,12 @@ import 'dart:async';
 import 'package:apps.modular.services.agent.agent_controller/agent_controller.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
-    as contacts_fidl;
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
+import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
+    as contacts_fidl;
 
 import '../../models.dart';
 

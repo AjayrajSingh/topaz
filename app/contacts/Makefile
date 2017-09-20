@@ -10,7 +10,7 @@ fuchsia_root := $(realpath $(root)/../../..)
 common_root := $(realpath $(fuchsia_root)/topaz/tools/tools/common)
 common_makefile := $(realpath $(common_root)/Makefile)
 
-PROJECT := contacts
+PROJECT := app/contacts
 FUCHSIA_TARGET := contacts
 
 include $(common_makefile)

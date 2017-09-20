@@ -13,12 +13,12 @@ flutter_app("contact_list") {
   deps = [
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
-    "//topaz/app/contacts/services:services_dart",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/app/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
+    "//topaz/app/contacts/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
@@ -28,8 +28,8 @@ flutter_app("contact_list") {
 
 dart_test("test") {
   deps = [
-    "//topaz/app/contacts/modules/contact_list:contact_list_dart_package",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/app/contacts/modules/contact_list:contact_list_dart_package",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

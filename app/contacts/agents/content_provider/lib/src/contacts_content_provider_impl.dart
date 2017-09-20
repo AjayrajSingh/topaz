@@ -4,8 +4,8 @@
 
 import 'dart:async';
 
-import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart';
 
 /// Initial stub implementation
 class ContactsContentProviderImpl extends ContactsContentProvider {
