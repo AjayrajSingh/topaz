@@ -11,7 +11,7 @@ dart_package("armadillo") {
   analysis_options = "//topaz/shell/analysis_options.yaml"
 
   deps = [
-    "//apps/modules/common/packages/models",
+    "//topaz/tools/packages/models",
     "//topaz/shell/keyboard",
     "//topaz/shell/widgets",
     "//lib/flutter/packages/flutter",

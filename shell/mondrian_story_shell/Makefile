@@ -4,7 +4,7 @@
 
 root := $(shell git rev-parse --show-toplevel)
 fuchsia_root := $(realpath $(root)/../..)
-common_root := $(realpath $(fuchsia_root)/apps/modules/common/tools/common)
+common_root := $(realpath $(fuchsia_root)/topaz/tools/tools/common)
 common_makefile := $(realpath $(common_root)/Makefile)
 
 # Assumes that the project is located three levels deep in the Fuchsia tree,
