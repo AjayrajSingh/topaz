@@ -10,8 +10,8 @@ dart_package("concert_api") {
   source_dir = "lib"
 
   deps = [
-    "//apps/modules/music/packages/concert_models",
+    "//topaz/app/music/packages/concert_models",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

@@ -10,7 +10,7 @@ dart_app("music_playback_agent") {
   deps = [
     "//apps/modular/services/agent:agent_dart",
     "//apps/modular/services/lifecycle:lifecycle_dart",
-    "//apps/modules/music/services/player:player_dart",
+    "//topaz/app/music/services/player:player_dart",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/app/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
@@ -18,5 +18,5 @@ dart_app("music_playback_agent") {
     "//topaz/lib/widgets/packages/logging:lib.logging",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

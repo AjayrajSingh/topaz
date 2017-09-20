@@ -4,8 +4,8 @@
 
 module music;
 
-import "apps/modules/music/services/player/repeat_mode.fidl";
-import "apps/modules/music/services/player/track.fidl";
+import "topaz/app/music/services/player/repeat_mode.fidl";
+import "topaz/app/music/services/player/track.fidl";
 
 // Represents the playback status
 struct PlayerStatus {

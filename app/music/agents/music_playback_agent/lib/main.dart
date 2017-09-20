@@ -8,7 +8,7 @@ import 'dart:isolate';
 import 'package:apps.modular.services.agent/agent.fidl.dart';
 import 'package:apps.modular.services.agent/agent_context.fidl.dart';
 import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
-import 'package:apps.modules.music.services.player/player.fidl.dart';
+import 'package:topaz.app.music.services.player/player.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';

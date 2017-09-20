@@ -12,10 +12,10 @@ import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.surface/surface.fidl.dart';
-import 'package:apps.modules.music.services.player/player.fidl.dart'
+import 'package:topaz.app.music.services.player/player.fidl.dart'
     as player_fidl;
-import 'package:apps.modules.music.services.player/status.fidl.dart';
-import 'package:apps.modules.music.services.player/track.fidl.dart'
+import 'package:topaz.app.music.services.player/status.fidl.dart';
+import 'package:topaz.app.music.services.player/track.fidl.dart'
     as track_fidl;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';

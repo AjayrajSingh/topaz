@@ -18,11 +18,11 @@ flutter_app("music_artist") {
     "//apps/maxwell/services/user:user_dart",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
-    "//apps/modules/common/packages/config",
-    "//apps/modules/music/packages/music_api",
-    "//apps/modules/music/packages/music_models",
-    "//apps/modules/music/packages/music_widgets",
-    "//apps/modules/music/services/player:player_dart",
+    "//topaz/tools/packages/config",
+    "//topaz/app/music/packages/music_api",
+    "//topaz/app/music/packages/music_models",
+    "//topaz/app/music/packages/music_widgets",
+    "//topaz/app/music/services/player:player_dart",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
@@ -32,7 +32,7 @@ flutter_app("music_artist") {
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 fuchsia_component("music_artist_component") {

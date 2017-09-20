@@ -4,9 +4,9 @@
 
 group("music") {
   deps = [
-    "//apps/modules/music/agents",
-    "//apps/modules/music/modules",
-    "//apps/modules/music/services",
+    "//topaz/app/music/agents",
+    "//topaz/app/music/modules",
+    "//topaz/app/music/services",
   ]
 }
 
@@ -14,9 +14,9 @@ group("test") {
   testonly = true
 
   deps = [
-    "//apps/modules/music/packages/concert_models:test",
-    "//apps/modules/music/packages/last_fm_models:test",
-    "//apps/modules/music/packages/music_models:test",
-    "//apps/modules/music/packages/music_widgets:test",
+    "//topaz/app/music/packages/concert_models:test",
+    "//topaz/app/music/packages/last_fm_models:test",
+    "//topaz/app/music/packages/music_models:test",
+    "//topaz/app/music/packages/music_widgets:test",
   ]
 }

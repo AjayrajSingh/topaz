@@ -9,20 +9,20 @@ dart_package("music_models") {
   package_name = "music_models"
 
   deps = [
-    "//apps/modules/common/packages/fixtures",
+    "//topaz/tools/packages/fixtures",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/intl",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
   deps = [
-    "//apps/modules/music/packages/music_models",
+    "//topaz/app/music/packages/music_models",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

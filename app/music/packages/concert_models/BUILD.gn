@@ -11,19 +11,19 @@ dart_package("concert_models") {
   source_dir = "lib"
 
   deps = [
-    "//apps/modules/common/packages/fixtures",
+    "//topaz/tools/packages/fixtures",
     "//lib/flutter/packages/flutter",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
   deps = [
-    "//apps/modules/music/packages/concert_models",
+    "//topaz/app/music/packages/concert_models",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]
 
-  analysis_options = "//apps/modules/common/analysis_options.yaml"
+  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
