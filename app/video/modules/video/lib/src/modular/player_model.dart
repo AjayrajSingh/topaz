@@ -4,10 +4,10 @@
 import 'dart:async';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.media.flutter/media_player_controller.dart';
-import 'package:lib.media.fidl/problem.fidl.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.media.fidl/problem.fidl.dart';
+import 'package:lib.media.flutter/media_player_controller.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';

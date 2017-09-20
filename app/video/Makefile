@@ -10,7 +10,7 @@ fuchsia_root := $(realpath $(root)/../../..)
 common_root := $(realpath $(fuchsia_root)/topaz/tools/tools/common)
 common_makefile := $(realpath $(common_root)/Makefile)
 
-PROJECT := video
+PROJECT := app/video
 FUCHSIA_TARGET := video
 
 include $(common_makefile)

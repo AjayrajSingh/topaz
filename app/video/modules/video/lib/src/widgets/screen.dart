@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 import 'dart:ui' show lerpDouble;
 
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../modular/player_model.dart';

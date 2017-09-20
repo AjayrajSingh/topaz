@@ -12,14 +12,14 @@ flutter_app("video") {
   manifest = "pubspec.yaml"
 
   deps = [
-    "//garnet/public/lib/app/dart",
-    "//garnet/public/lib/media/flutter",
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
     "//apps/modular/services/user:user_dart",
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
+    "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
+    "//garnet/public/lib/media/flutter",
     "//garnet/public/lib/netconnector/fidl:fidl_dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
