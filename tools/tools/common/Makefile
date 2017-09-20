@@ -35,7 +35,7 @@ Before including the common Makefile add "FUCHSIA_TARGET := <target>" to \
 endif
 
 root ?= $(shell git rev-parse --show-toplevel)
-fuchsia_root ?= $(realpath $(root)/../../..)
+fuchsia_root ?= $(realpath $(root)/../..)
 common_root ?= $(realpath $(fuchsia_root)/topaz/tools/tools/common)
 tools_root := $(realpath $(common_root)/..)
 fuchsia_out := $(abspath $(fuchsia_root)/out)
@@ -104,7 +104,7 @@ endif
 # its dependencies.
 MINIMAL ?=
 ifeq ($(MINIMAL),1)
-	FSET_FLAGS += --modules modules
+	FSET_FLAGS += --modules packages/gn/modules
 endif
 
 # Respect the fuchsia build variant if already set by fset command externally.
@@ -209,7 +209,7 @@ dart-lint: build
 	fset $(FUCHSIA_GEN_TARGET) $(FSET_FLAGS) && \
 	$(fuchsia_root)/scripts/run-dart-action.py analyze \
 			--out=$(fuchsia_out)/$(FUCHSIA_VARIANT)-$(FUCHSIA_GEN_TARGET) \
-			--tree=//apps/modules/$(PROJECT)/* \
+			--tree=//topaz/$(PROJECT)/* \
 			--verbose \
 			--lints --fatal-lints --fatal-warnings --fatal-hints
 

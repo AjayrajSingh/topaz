@@ -6,11 +6,11 @@
 # example: $FUCHSIA_DIR/apps/modules/<project>. Change to suit the project
 # location.
 root := $(shell git rev-parse --show-toplevel)
-fuchsia_root := $(realpath $(root)/../../..)
+fuchsia_root := $(realpath $(root)/../..)
 common_root := $(realpath $(fuchsia_root)/topaz/tools/tools/common)
 common_makefile := $(realpath $(common_root)/Makefile)
 
-PROJECT := common
+PROJECT := tools
 FLUTTER_TARGET := fx_widget_explorer
 FUCHSIA_TARGET := color # The common_makefile expects this variable to be set.
 
@@ -30,7 +30,7 @@ build-override: dart-gen-specs $(addsuffix /.packages,$(filter-out $(dart_gn_pac
 # To debug the generation process, pass in "--observe --pause-isolates-on-start"
 # as the DART_FLAGS
 dart_flags ?=
-widget_package_dirs := $(realpath $(addprefix $(root)/, packages/widgets ../calendar/modules/calendar ../chat/modules/conversation ../chat/modules/conversation_list ../contacts/modules/contacts))
+widget_package_dirs := $(realpath $(addprefix $(root)/, packages/widgets ../app/chat/modules/conversation ../app/chat/modules/conversation_list ../app/contacts/modules/contacts))
 widget_dot_packages := $(addsuffix /.packages, $(widget_package_dirs))
 
 .PHONY: dart-gen-specs

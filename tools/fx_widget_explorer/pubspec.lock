@@ -31,12 +31,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
-  calendar:
-    description:
-      path: "../../calendar/modules/calendar"
-      relative: true
-    source: path
-    version: "0.0.0"
   charcode:
     description:
       name: charcode
@@ -45,13 +39,13 @@ packages:
     version: "1.1.1"
   chat_conversation:
     description:
-      path: "../../chat/modules/conversation"
+      path: "../../app/chat/modules/conversation"
       relative: true
     source: path
     version: "0.0.0"
   chat_conversation_list:
     description:
-      path: "../../chat/modules/conversation_list"
+      path: "../../app/chat/modules/conversation_list"
       relative: true
     source: path
     version: "0.0.0"
@@ -81,7 +75,7 @@ packages:
     version: "0.0.1"
   contacts:
     description:
-      path: "../../contacts/modules/contacts"
+      path: "../../app/contacts/modules/contacts"
       relative: true
     source: path
     version: "0.0.0"
@@ -118,7 +112,7 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.34"
+    version: "0.0.36-dev"
   flutter_image:
     description:
       name: flutter_image
@@ -134,7 +128,7 @@ packages:
   flutter_test:
     description: flutter
     source: sdk
-    version: "0.0.12"
+    version: "0.0.14-dev"
   glob:
     description:
       name: glob
@@ -185,13 +179,13 @@ packages:
     version: "0.6.1"
   "lib.logging":
     description:
-      path: "../../../../topaz/lib/widgets/packages/logging"
+      path: "../../lib/widgets/packages/logging"
       relative: true
     source: path
     version: "0.0.0"
   "lib.widgets":
     description:
-      path: "../../../../topaz/lib/widgets/packages/widgets"
+      path: "../../lib/widgets/packages/widgets"
       relative: true
     source: path
     version: "0.0.0"
@@ -329,7 +323,7 @@ packages:
     version: "0.2.1"
   sky_engine:
     description:
-      path: "../../../../lib/flutter/bin/cache/pkg/sky_engine"
+      path: "../../../lib/flutter/bin/cache/pkg/sky_engine"
       relative: true
     source: path
     version: "0.0.99"
@@ -413,7 +407,7 @@ packages:
     version: "0.0.0"
   uuid:
     description:
-      path: "../../../../third_party/dart-pkg/pub/uuid"
+      path: "../../../third_party/dart-pkg/pub/uuid"
       relative: true
     source: path
     version: "0.5.3"

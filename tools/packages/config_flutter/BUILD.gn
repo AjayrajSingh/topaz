@@ -10,8 +10,8 @@ dart_package("config_flutter") {
   source_dir = "lib"
 
   deps = [
-    "//topaz/tools/packages/config",
     "//lib/flutter/packages/flutter",
+    "//topaz/tools/packages/config",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

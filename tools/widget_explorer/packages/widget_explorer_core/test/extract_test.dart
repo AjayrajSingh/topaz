@@ -22,7 +22,6 @@ Future<Null> main() async {
     '..',
     '..',
     '..',
-    '..',
   );
 
   // Run 'flutter packages get'

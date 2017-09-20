@@ -70,11 +70,11 @@ packages:
   flutter:
     description: flutter
     source: sdk
-    version: "0.0.34"
+    version: "0.0.36-dev"
   flutter_test:
     description: flutter
     source: sdk
-    version: "0.0.12"
+    version: "0.0.14-dev"
   front_end:
     description:
       name: front_end
@@ -233,7 +233,7 @@ packages:
     version: "0.2.1"
   sky_engine:
     description:
-      path: "../../../../../lib/flutter/bin/cache/pkg/sky_engine"
+      path: "../../../../lib/flutter/bin/cache/pkg/sky_engine"
       relative: true
     source: path
     version: "0.0.99"

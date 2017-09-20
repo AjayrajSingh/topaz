@@ -18,9 +18,9 @@ dart_package("util") {
 
 dart_test("test") {
   deps = [
-    "//topaz/tools/packages/util",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/tools/packages/util",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"
