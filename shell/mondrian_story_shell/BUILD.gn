@@ -33,7 +33,7 @@ flutter_app("flutter_mondrian") {
 
 dart_test("test") {
   deps = [
-    "//apps/mondrian:flutter_mondrian_dart_package",
+    ":flutter_mondrian_dart_package",
     "//third_party/dart-pkg/pub/test",
   ]
 }
