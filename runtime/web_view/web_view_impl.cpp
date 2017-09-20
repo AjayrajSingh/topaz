@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/web_view/web_view_impl.h"
+#include "topaz/runtime/web_view/web_view_impl.h"
 
 #include <hid/hid.h>
 #include <hid/usages.h>
@@ -13,7 +13,7 @@
 #include <zircon/types.h>
 #include <fdio/io.h>
 
-#include "apps/web_view/schema_org_context.h"
+#include "topaz/runtime/web_view/schema_org_context.h"
 #include "lib/fsl/tasks/message_loop.h"
 
 using namespace WebCore;

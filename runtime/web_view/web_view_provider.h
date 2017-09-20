@@ -7,7 +7,7 @@
 #include "apps/modular/services/lifecycle/lifecycle.fidl.h"
 #include "apps/modular/services/module/module.fidl.h"
 #include "apps/modular/services/story/link.fidl.h"
-#include "apps/web_view/web_view_impl.h"
+#include "topaz/runtime/web_view/web_view_impl.h"
 #include "lib/ui/views/fidl/view_provider.fidl.h"
 #include "lib/app/fidl/service_provider.fidl.h"
 #include "lib/app/cpp/application_context.h"

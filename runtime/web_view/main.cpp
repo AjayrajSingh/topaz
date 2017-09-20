@@ -40,7 +40,7 @@
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/command_line.h"
 #include "lib/fxl/logging.h"
-#include "apps/web_view/web_view_provider.h"
+#include "topaz/runtime/web_view/web_view_provider.h"
 
 using std::cerr;
 using std::cout;

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/web_view/web_view_provider.h"
+#include "topaz/runtime/web_view/web_view_provider.h"
 
 #include "lib/icu_data/cpp/icu_data.h"
 #include "apps/modular/lib/rapidjson/rapidjson.h"

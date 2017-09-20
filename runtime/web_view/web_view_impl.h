@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "apps/web_runner/services/web_view.fidl.h"
+#include "topaz/runtime/web_runner/services/web_view.fidl.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
 #include "lib/ui/scenic/client/host_image_cycler.h"

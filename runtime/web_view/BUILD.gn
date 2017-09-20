@@ -28,7 +28,7 @@ executable("web_view_bin") {
     "//apps/modular/services/lifecycle",
     "//apps/modular/services/module",
     "//apps/modular/services/story",
-    "//apps/web_runner/services",
+    "//topaz/runtime/web_runner/services",
     "//garnet/public/lib/app/cpp",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",

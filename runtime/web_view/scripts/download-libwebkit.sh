@@ -10,7 +10,7 @@ set -e
 readonly WEBKIT_REVISION="6a9d488c49b3bd7d2b062372492de030ebe59344"
 
 readonly SCRIPT_ROOT="$(cd $(dirname ${BASH_SOURCE[0]} ) && pwd)"
-readonly FUCHSIA_ROOT="${SCRIPT_ROOT}/../../.."
+readonly FUCHSIA_ROOT="${SCRIPT_ROOT}/../../../.."
 . "${FUCHSIA_ROOT}/buildtools/download.sh"
 
 readonly URL_BASE="https://storage.googleapis.com/fuchsia"

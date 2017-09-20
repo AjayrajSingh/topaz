@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/web_view/schema_org_context.h"
+#include "topaz/runtime/web_view/schema_org_context.h"
 
 #include "apps/modular/lib/rapidjson/rapidjson.h"
 #include "lib/fxl/logging.h"
