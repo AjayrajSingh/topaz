@@ -13,7 +13,7 @@ import 'package:lib.widgets/widgets.dart';
 import 'context_model.dart';
 import 'elevations.dart';
 import 'important_info.dart';
-import 'nothing.dart';
+import 'minimized_now_bar.dart';
 import 'now_minimization_model.dart';
 import 'opacity_model.dart';
 import 'power_model.dart';
@@ -116,7 +116,6 @@ class NowState extends State<Now> {
   final GlobalKey _importantInfoMaximizedKey = new GlobalKey();
   final GlobalKey _userContextTextKey = new GlobalKey();
   final GlobalKey _userImageKey = new GlobalKey();
-  final OpacityModel _minimizedInfoOpacityModel = new OpacityModel(0.0);
   final ValueNotifier<double> _recentsScrollOffset =
       new ValueNotifier<double>(0.0);
 
@@ -184,10 +183,8 @@ class NowState extends State<Now> {
                   BuildContext context,
                   Widget child,
                   NowMinimizationModel nowMinimizationModel,
-                ) {
-                  _updateMinimizedInfoOpacity();
-                  return _buildNow(context);
-                },
+                ) =>
+                    _buildNow(context),
               ),
         ),
       );
@@ -286,8 +283,8 @@ class NowState extends State<Now> {
                     ),
 
                     // User Context Text and Important Information when minimized.
-                    _buildMinimizedUserContextTextAndImportantInformation(
-                      sizeModel,
+                    new MinimizedNowBar(
+                      fallAwayDurationFraction: _kFallAwayDurationFraction,
                     ),
 
                     // Minimized button bar gesture detector. Only enabled when
@@ -357,96 +354,6 @@ class NowState extends State<Now> {
             ],
           ),
         ),
-      );
-
-  Widget _buildMinimizedUserContextTextAndImportantInformation(
-    SizeModel sizeModel,
-  ) =>
-      new Align(
-        alignment: FractionalOffset.bottomCenter,
-        child: new Container(
-          height: sizeModel.minimizedNowHeight,
-          padding: new EdgeInsets.symmetric(horizontal: 8.0 + _slideInDistance),
-          child: new RepaintBoundary(
-            child: new ScopedModel<OpacityModel>(
-              model: _minimizedInfoOpacityModel,
-              child: new Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  _buildUserContextMinimized(),
-                  _buildImportantInfoMinimized(),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-  /// Returns a succinct representation of the user's current context.
-  Widget _buildUserContextMinimized() => new Padding(
-        padding: const EdgeInsets.only(left: 8.0),
-        child: new ScopedModelDescendant<OpacityModel>(
-          builder: (
-            BuildContext context,
-            Widget child,
-            OpacityModel opacityModel,
-          ) =>
-              new Opacity(
-                opacity: opacityModel.opacity,
-                child: child,
-              ),
-          child: new ScopedModelDescendant<ContextModel>(
-            builder: (BuildContext context, Widget child, ContextModel model) =>
-                new Text('${model.timeOnly}'),
-          ),
-        ),
-      );
-
-  /// Returns a succinct representation of the important information to the
-  /// user.
-  Widget _buildImportantInfoMinimized() =>
-      new ScopedModelDescendant<PowerModel>(
-        builder: (
-          BuildContext context,
-          Widget child,
-          PowerModel powerModel,
-        ) =>
-            !powerModel.hasBattery
-                ? Nothing.widget
-                : new Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      new Padding(
-                        padding: const EdgeInsets.only(top: 4.0, right: 4.0),
-                        child: new ScopedModelDescendant<OpacityModel>(
-                          builder: (
-                            BuildContext context,
-                            Widget child,
-                            OpacityModel opacityModel,
-                          ) =>
-                              new Opacity(
-                                opacity: opacityModel.opacity,
-                                child: child,
-                              ),
-                          child: new Text(powerModel.batteryText),
-                        ),
-                      ),
-                      new ScopedModelDescendant<OpacityModel>(
-                          builder: (
-                        BuildContext context,
-                        Widget child,
-                        OpacityModel opacityModel,
-                      ) =>
-                              new Image.asset(
-                                powerModel.batteryImageUrl,
-                                color: Colors.white
-                                    .withOpacity(opacityModel.opacity),
-                                fit: BoxFit.cover,
-                                height: 24.0,
-                              )),
-                    ],
-                  ),
       );
 
   /// Returns an avatar of the current user.
@@ -547,10 +454,6 @@ class NowState extends State<Now> {
       uri = uri.replace(queryParameters: queryParameters);
     }
     return uri.toString();
-  }
-
-  void _updateMinimizedInfoOpacity() {
-    _minimizedInfoOpacityModel.opacity = 0.6 * _slideInProgress;
   }
 
   Widget _buildMinimizedButtonBarGestureDetector(SizeModel sizeModel) =>
@@ -669,8 +572,6 @@ class NowState extends State<Now> {
 
   double get _fallAwayOpacity => (1.0 - _fallAwayProgress).clamp(0.0, 1.0);
 
-  double get _slideInDistance => lerpDouble(10.0, 0.0, _slideInProgress);
-
   double get _quickSettingsRaiseDistance =>
       widget.quickSettingsHeightBump * _quickSettingsProgress;
 
@@ -696,14 +597,6 @@ class NowState extends State<Now> {
   /// [_kFallAwayDurationFraction].
   double get _fallAwayProgress =>
       math.min(1.0, (_minimizationProgress / _kFallAwayDurationFraction));
-
-  /// We slide in the context text and important information for the final
-  /// portion of the minimization animation as determined by
-  /// [_kFallAwayDurationFraction].
-  double get _slideInProgress =>
-      ((_minimizationProgress - (1.0 - _kFallAwayDurationFraction)) /
-              _kFallAwayDurationFraction)
-          .clamp(0.0, 1.0);
 
   /// We slide up and fade in the quick settings for the final portion of the
   /// quick settings animation as determined by [_kFallAwayDurationFraction].
