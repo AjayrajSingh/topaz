@@ -6,3 +6,4 @@ config.json
 .analysis_options
 analysis_options.yaml
 .packages
+*.snapshot
