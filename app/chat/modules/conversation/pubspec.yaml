@@ -6,20 +6,20 @@ name: chat_conversation
 
 dependencies:
   fixtures:
-    path: ../../../common/packages/fixtures
+    path: ../../../../tools/packages/fixtures
   flutter:
     sdk: flutter
   intl: ^0.14.0
   lib.widgets:
-    path: ../../../../../topaz/lib/widgets/packages/widgets
+    path: ../../../../lib/widgets/packages/widgets
   models:
-    path: ../../../common/packages/models
+    path: ../../../../tools/packages/models
   util:
-    path: ../../../common/packages/util
+    path: ../../../../tools/packages/util
   widgets:
-    path: ../../../common/packages/widgets
+    path: ../../../../tools/packages/widgets
   widgets_meta:
-    path: ../../../common/packages/widgets_meta
+    path: ../../../../tools/packages/widgets_meta
 dev_dependencies:
   test: any
   flutter_test:

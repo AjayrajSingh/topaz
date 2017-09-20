@@ -21,8 +21,7 @@ package("chat") {
 
     {
       name = "chat_conversation"
-      source =
-          "gen/topaz/app/chat/modules/conversation/chat_conversation.flx"
+      source = "gen/topaz/app/chat/modules/conversation/chat_conversation.flx"
     },
 
     {

@@ -4,18 +4,18 @@
 
 import 'dart:async';
 
-import 'package:lib.app.dart/app.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.context/metadata.fidl.dart';
 import 'package:apps.maxwell.services.context/value_type.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
 import 'package:apps.modular.services.user/device_map.fidl.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.modular/modular.dart';
 import 'package:meta/meta.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 
 import 'src/chat_content_provider_impl.dart';
 import 'src/firebase_chat_message_transporter.dart';
@@ -30,8 +30,7 @@ class ChatContentProviderAgent extends AgentImpl {
   final ProposalPublisherProxy _proposalPublisher =
       new ProposalPublisherProxy();
   final ContextReaderProxy _contextReader = new ContextReaderProxy();
-  final ContextListenerBinding _proposerBinding =
-      new ContextListenerBinding();
+  final ContextListenerBinding _proposerBinding = new ContextListenerBinding();
   ChatContentProviderImpl _contentProviderImpl;
 
   /// Creates a new instance of [ChatContentProviderAgent].
@@ -76,7 +75,7 @@ class ChatContentProviderAgent extends AgentImpl {
     selector.meta.entity = new EntityMetadata()..topic = 'location/home_work';
     ContextQuery query = new ContextQuery();
     query.selector['location/home_work'] = selector;
-    _contextReader.subscribe(query,_proposerBinding.wrap(proposer));
+    _contextReader.subscribe(query, _proposerBinding.wrap(proposer));
 
     // Initialize the content provider.
     _contentProviderImpl = new ChatContentProviderImpl(

@@ -8,8 +8,6 @@ import 'dart:convert' show JSON;
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:apps.modular.services.agent.agent_controller/agent_controller.fidl.dart';
 import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.component/message_queue.fidl.dart';
@@ -17,12 +15,14 @@ import 'package:apps.modular.services.module/module_context.fidl.dart';
 import 'package:apps.modular.services.module/module_controller.fidl.dart';
 import 'package:apps.modular.services.story/link.fidl.dart';
 import 'package:apps.modular.services.surface/surface.fidl.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
-    as chat_fidl;
 import 'package:collection/collection.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:models/user.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
+    as chat_fidl;
 
 import '../models.dart';
 

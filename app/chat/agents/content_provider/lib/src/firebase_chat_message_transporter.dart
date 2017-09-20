@@ -6,12 +6,12 @@ import 'dart:async';
 import 'dart:convert' show JSON;
 
 import 'package:apps.modular.services.auth/token_provider.fidl.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'package:config/config.dart';
 import 'package:eventsource/eventsource.dart';
 import 'package:http/http.dart' as http;
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 
 import 'chat_message_transporter.dart';
 

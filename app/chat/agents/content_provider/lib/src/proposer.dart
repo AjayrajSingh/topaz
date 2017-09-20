@@ -9,8 +9,8 @@ import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 
 const String _kContactsJsonFile = '/system/data/modules/contacts.json';
 
@@ -68,7 +68,8 @@ class Proposer extends ContextListener {
   @override
   void onContextUpdate(ContextUpdate result) {
     log.fine('onUpdate: ${result.values}');
-    _currentLocation = result.values['location/home_work'][0]?.content ?? 'unknown';
+    _currentLocation =
+        result.values['location/home_work'][0]?.content ?? 'unknown';
     log.fine('Current location: $_currentLocation');
   }
 

@@ -8,25 +8,25 @@ dart_app("chat_content_provider") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//garnet/public/lib/app/dart",
-    "//garnet/public/lib/app/fidl:fidl_dart",
     "//apps/ledger/services/public:public_dart",
     "//apps/maxwell/services/suggestion:suggestion_dart",
     "//apps/modular/services/agent:agent_dart",
     "//apps/modular/services/auth:auth_dart",
     "//apps/modular/services/user:user_dart",
-    "//topaz/app/chat/services:services_dart",
-    "//topaz/tools/packages/config",
-    "//topaz/tools/packages/fixtures",
-    "//topaz/tools/packages/models",
+    "//garnet/public/lib/app/dart",
+    "//garnet/public/lib/app/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/eventsource",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/quiver",
     "//third_party/dart-pkg/pub/uuid",
+    "//topaz/app/chat/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/modular:lib.modular",
+    "//topaz/tools/packages/config",
+    "//topaz/tools/packages/fixtures",
+    "//topaz/tools/packages/models",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

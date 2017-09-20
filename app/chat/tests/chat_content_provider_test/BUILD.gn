@@ -12,13 +12,13 @@ dart_app("chat_content_provider_test") {
   deps = [
     "//apps/modular/services/module:module_dart",
     "//apps/modular/services/story:story_dart",
-    "//topaz/app/chat/agents/content_provider:chat_content_provider_dart_package",
-    "//topaz/app/chat/services:services_dart",
     "//garnet/public/lib/test_runner/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/matcher",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/app/chat/agents/content_provider:chat_content_provider_dart_package",
+    "//topaz/app/chat/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/modular:lib.modular",
   ]

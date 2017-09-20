@@ -6,22 +6,22 @@ import 'dart:async';
 import 'dart:convert' show JSON;
 import 'dart:isolate';
 
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:apps.ledger.services.public/ledger.fidl.dart' as ledger_fidl;
 import 'package:apps.modular.services.component/component_context.fidl.dart';
 import 'package:apps.modular.services.component/message_queue.fidl.dart';
 import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
 import 'package:apps.modular.services.module/module.fidl.dart';
 import 'package:apps.modular.services.module/module_context.fidl.dart';
-import 'package:topaz.app.chat.agents.content_provider..chat_content_provider_dart_package/src/chat_content_provider_impl.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
-import 'package:lib.test_runner.fidl/test_runner.fidl.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' hide Message;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.modular/modular.dart';
+import 'package:lib.test_runner.fidl/test_runner.fidl.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart' hide expect;
+import 'package:topaz.app.chat.agents.content_provider..chat_content_provider_dart_package/src/chat_content_provider_impl.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 
 import 'src/expect.dart';
 import 'src/mock_chat_message_transporter.dart';
@@ -724,16 +724,16 @@ Future<Null> main(List<String> args) async {
   setupLogger(name: 'chat/agent_test');
 
   _context.outgoingServices
-  ..addServiceForName(
-    (InterfaceRequest<Module> request) {
-      _module.bindModule(request);
-    },
-    Module.serviceName,
-  )
-  ..addServiceForName(
-    (InterfaceRequest<Lifecycle> request) {
-      _module.bindLifecycle(request);
-    },
-    Lifecycle.serviceName,
-  );
+    ..addServiceForName(
+      (InterfaceRequest<Module> request) {
+        _module.bindModule(request);
+      },
+      Module.serviceName,
+    )
+    ..addServiceForName(
+      (InterfaceRequest<Lifecycle> request) {
+        _module.bindLifecycle(request);
+      },
+      Lifecycle.serviceName,
+    );
 }

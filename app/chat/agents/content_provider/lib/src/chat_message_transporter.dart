@@ -4,8 +4,8 @@
 
 import 'dart:async';
 
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'package:meta/meta.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 
 /// Called when a new chat message is received from another user.
 typedef Future<Null> MessageReceivedCallback(
