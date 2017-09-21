@@ -65,5 +65,4 @@ Optional: In another terminal you can tail the logs
 [widgets-intro]: https://flutter.io/widgets-intro/
 [fuchsia-setup]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md
 [fuchsia-env]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md#Setup-Build-Environment
-[clang-wrapper]: https://fuchsia.googlesource.com/zircon-rs/+/HEAD/tools
 [modules-auth]: https://fuchsia.googlesource.com/modules/#Authenticate
