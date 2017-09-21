@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//apps/dart_content_handler/dart_app.gni")
+import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_jit_app("hello_dart") {
   main_dart = "hello_dart.dart"
@@ -10,7 +10,7 @@ dart_jit_app("hello_dart") {
   source_dir = "."
 
   deps = [
-    "//apps/dart_content_handler/examples/hello_dart/greeting",
+    "//topaz/runtime/dart_runner/examples/hello_dart/greeting",
   ]
 }
 
@@ -20,6 +20,6 @@ dart_aot_app("hello_dart_aot") {
   source_dir = "."
 
   deps = [
-    "//apps/dart_content_handler/examples/hello_dart/greeting",
+    "//topaz/runtime/dart_runner/examples/hello_dart/greeting",
   ]
 }

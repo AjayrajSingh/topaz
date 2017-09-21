@@ -22,10 +22,10 @@ executable("snapshotter") {
   }
 
   deps = [
-    "//apps/dart_content_handler/embedder:dart_snapshot_cc",
+    "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc",
     "//garnet/public/lib/fxl",
-    "//lib/tonic/converter",
-    "//lib/tonic/file_loader",
+    "//topaz/lib/tonic/converter",
+    "//topaz/lib/tonic/file_loader",
   ] + dart_deps
 }
 
@@ -53,9 +53,9 @@ executable("aot_snapshotter") {
   }
 
   deps = [
-    "//apps/dart_content_handler/embedder:dart_snapshot_cc",
+    "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc",
     "//garnet/public/lib/fxl",
-    "//lib/tonic/converter",
-    "//lib/tonic/file_loader",
+    "//topaz/lib/tonic/converter",
+    "//topaz/lib/tonic/file_loader",
   ] + dart_deps
 }

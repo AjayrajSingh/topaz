@@ -51,7 +51,7 @@ template("runner") {
              "//garnet/public/dart-pkg/fuchsia",
              "//garnet/public/lib/fxl",
              "//garnet/public/lib/fsl",
-             "//lib/tonic",
+             "//topaz/lib/tonic",
            ] + dart_deps + extra_deps
   }
 }
@@ -59,7 +59,7 @@ template("runner") {
 runner("dart_runner_bin") {
   output_name = "dart_runner"
   extra_defines = []
-  extra_deps = [ "//apps/dart_content_handler/embedder:dart_snapshot_cc" ]
+  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc" ]
   if (is_debug) {
     extra_deps += [ "//dart/runtime:libdart_jit" ]
   } else {
@@ -72,7 +72,7 @@ runner("dart_runner_bin") {
 runner("dart_aot_runner_bin") {
   output_name = "dart_aot_runner"
   extra_defines = [ "AOT_RUNTIME" ]
-  extra_deps = [ "//apps/dart_content_handler/embedder:dart_aot_snapshot_cc" ]
+  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc" ]
   if (is_debug) {
     extra_deps += [ "//dart/runtime:libdart_precompiled_runtime" ]
   } else {

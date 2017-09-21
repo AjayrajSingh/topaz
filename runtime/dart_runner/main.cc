@@ -7,7 +7,7 @@
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
 #include "lib/app/fidl/application_runner.fidl.h"
-#include "apps/dart_content_handler/application_runner_impl.h"
+#include "topaz/runtime/dart_runner/application_runner_impl.h"
 #include "lib/fxl/macros.h"
 #include "lib/fsl/tasks/message_loop.h"
 

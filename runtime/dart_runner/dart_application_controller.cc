@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/dart_content_handler/dart_application_controller.h"
+#include "topaz/runtime/dart_runner/dart_application_controller.h"
 
 #include <fcntl.h>
 #include <zircon/status.h>
@@ -12,7 +12,7 @@
 #include <utility>
 
 #include "lib/app/cpp/application_context.h"
-#include "apps/dart_content_handler/builtin_libraries.h"
+#include "topaz/runtime/dart_runner/builtin_libraries.h"
 #include "lib/fidl/cpp/bindings/string.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"

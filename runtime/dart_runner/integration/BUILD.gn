@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//apps/dart_content_handler/dart_app.gni")
+import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_jit_app("integration") {
   testonly = true
@@ -15,7 +15,7 @@ dart_jit_app("integration") {
 
   deps = [
     "//garnet/public/lib/app/dart",
-    "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces_dart",
     "//third_party/dart-pkg/pub/test",
   ]
 }
@@ -31,7 +31,7 @@ dart_aot_app("integration_aot") {
 
   deps = [
     "//garnet/public/lib/app/dart",
-    "//apps/dart_content_handler/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces_dart",
     "//third_party/dart-pkg/pub/test",
   ]
 }

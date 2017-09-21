@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:io' as io;
 
-import 'package:apps.dart_content_handler.examples.hello_app_dart.interfaces/hello.fidl.dart';
+import 'package:topaz.runtime.dart_runner.examples.hello_app_dart.interfaces/hello.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/application_controller.fidl.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';

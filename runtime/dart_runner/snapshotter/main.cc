@@ -8,7 +8,7 @@
 #include <set>
 #include <string>
 
-#include "apps/dart_content_handler/embedder/snapshot.h"
+#include "topaz/runtime/dart_runner/embedder/snapshot.h"
 #include "dart/runtime/include/dart_api.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/command_line.h"

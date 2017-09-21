@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/dart_content_handler/application_runner_impl.h"
+#include "topaz/runtime/dart_runner/application_runner_impl.h"
 
 #include <dlfcn.h>
 #include <zircon/dlfcn.h>
@@ -11,8 +11,8 @@
 #include <thread>
 #include <utility>
 
-#include "apps/dart_content_handler/dart_application_controller.h"
-#include "apps/dart_content_handler/embedder/snapshot.h"
+#include "topaz/runtime/dart_runner/dart_application_controller.h"
+#include "topaz/runtime/dart_runner/embedder/snapshot.h"
 #include "dart/runtime/bin/embedded_dart_io.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fsl/tasks/message_loop.h"

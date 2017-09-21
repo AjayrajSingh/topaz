@@ -102,7 +102,7 @@ source_set("dart_snapshot_cc") {
 }
 
 action("generate_aot_snapshot_assembly") {
-  aot_snapshotter_label = "//apps/dart_content_handler/snapshotter:aot_snapshotter($host_toolchain)"
+  aot_snapshotter_label = "//topaz/runtime/dart_runner/snapshotter:aot_snapshotter($host_toolchain)"
   aot_snapshotter_dir = get_label_info(aot_snapshotter_label, "root_out_dir")
 
   snapshot_assembly = "$target_gen_dir/aot_vm_snapshot.S"

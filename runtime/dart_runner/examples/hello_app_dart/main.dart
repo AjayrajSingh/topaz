@@ -5,7 +5,7 @@
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:apps.dart_content_handler.examples.hello_app_dart.interfaces/hello.fidl.dart';
+import 'package:topaz.runtime.dart_runner.examples.hello_app_dart.interfaces/hello.fidl.dart';
 
 class HelloImpl extends Hello {
   final HelloBinding _binding = new HelloBinding();

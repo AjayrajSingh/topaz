@@ -46,7 +46,7 @@ template("dart_jit_app") {
   depfile_path = "${snapshot_path}.d"
 
   dart_snapshotter_label =
-      "//apps/dart_content_handler/snapshotter($host_toolchain)"
+      "//topaz/runtime/dart_runner/snapshotter($host_toolchain)"
   dart_snapshotter_dir = get_label_info(dart_snapshotter_label, "root_out_dir")
   dart_snapshotter = "$dart_snapshotter_dir/dart_snapshotter"
 
@@ -89,7 +89,7 @@ template("dart_jit_app") {
   bundle_path = "$root_out_dir/$bundle_name"
 
   dart_bundler_label =
-      "//apps/dart_content_handler/bundler($host_toolchain)"
+      "//topaz/runtime/dart_runner/bundler($host_toolchain)"
   dart_bundler_dir = get_label_info(dart_bundler_label, "root_out_dir")
   dart_bundler = "$dart_bundler_dir/dart_bundler"
 
@@ -152,7 +152,7 @@ template("dart_aot_app") {
   depfile_path = "${assembly_path}.d"
 
   dart_snapshotter_label =
-      "//apps/dart_content_handler/snapshotter:aot_snapshotter($host_toolchain)"
+      "//topaz/runtime/dart_runner/snapshotter:aot_snapshotter($host_toolchain)"
   dart_snapshotter_dir = get_label_info(dart_snapshotter_label, "root_out_dir")
   dart_snapshotter = "$dart_snapshotter_dir/dart_aot_snapshotter"
 
@@ -218,7 +218,7 @@ template("dart_aot_app") {
                      "root_out_dir") + "/lib.unstripped/lib$target_name.so"
 
   dart_bundler_label =
-      "//apps/dart_content_handler/bundler($host_toolchain)"
+      "//topaz/runtime/dart_runner/bundler($host_toolchain)"
   dart_bundler_dir = get_label_info(dart_bundler_label, "root_out_dir")
   dart_bundler = "$dart_bundler_dir/dart_bundler"
 

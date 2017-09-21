@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/dart_content_handler/builtin_libraries.h"
+#include "topaz/runtime/dart_runner/builtin_libraries.h"
 
 #include <zx/channel.h>
 #include <fdio/namespace.h>
