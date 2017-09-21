@@ -14,7 +14,7 @@ extern crate apps_mozart_services_views;
 extern crate apps_mozart_services_views_view_token;
 #[macro_use]
 extern crate fidl;
-extern crate zircon;
+extern crate fuchsia_zircon as zircon;
 extern crate mxruntime;
 
 mod application;

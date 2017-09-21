@@ -22,7 +22,7 @@ rust_binary("spinning_square_rs") {
     "//garnet/public/lib/ui/views/fidl:view_token_rust_library",
     "//garnet/public/lib/ui/views/fidl:views_rust_library",
     "//garnet/public/rust/crates/mxruntime",
-    "//garnet/public/rust/crates/zircon-rs:zircon",
+    "//garnet/public/rust/crates/fuchsia-zircon",
     "//third_party/rust-crates:cairo-rs-0.1.3",
   ]
 }
