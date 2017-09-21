@@ -23,15 +23,19 @@ class StoryClusterDragStateModel extends Model {
       new ModelFinder<StoryClusterDragStateModel>().of(context);
 
   final Set<StoryClusterId> _draggingStoryClusters = new Set<StoryClusterId>();
-  final Set<StoryClusterId> _acceptableStoryClusters =
-      new Set<StoryClusterId>();
+  final Set<StoryClusterId> _acceptingStoryClusters = new Set<StoryClusterId>();
 
   /// Returns true if a story cluster is being dragged.
   bool get isDragging => _draggingStoryClusters.isNotEmpty;
 
-  /// Returns true if a story cluster is being dragged and has been accepted by
-  /// another story cluster.
-  bool get isAcceptable => _acceptableStoryClusters.isNotEmpty;
+  /// Returns true if a story cluster is being dragged and another
+  /// story cluster is accepting it.
+  bool get isAccepting => _acceptingStoryClusters.isNotEmpty;
+
+  /// Returns true if the given story cluster is accepting another
+  /// story cluster.
+  bool isStoryClusterAccepting(StoryClusterId id) =>
+      _acceptingStoryClusters.contains(id);
 
   /// Registers [storyClusterId] as being dragged.
   void addDragging(StoryClusterId storyClusterId) {
@@ -51,21 +55,20 @@ class StoryClusterDragStateModel extends Model {
     }
   }
 
-  /// Registers [storyClusterId] as being accepted by another story cluster.
+  /// Registers [storyClusterId] as accepting another story cluster.
   void addAcceptance(StoryClusterId storyClusterId) {
-    bool isAcceptableBefore = isAcceptable;
-    _acceptableStoryClusters.add(storyClusterId);
-    if (isAcceptable != isAcceptableBefore) {
+    bool isAcceptingBefore = isAccepting;
+    _acceptingStoryClusters.add(storyClusterId);
+    if (isAccepting != isAcceptingBefore) {
       notifyListeners();
     }
   }
 
-  /// Registers [storyClusterId] as no longer being accepted by another story
-  /// cluster.
+  /// Registers [storyClusterId] as no longer accepting another story cluster.
   void removeAcceptance(StoryClusterId storyClusterId) {
-    bool isAcceptableBefore = isAcceptable;
-    _acceptableStoryClusters.remove(storyClusterId);
-    if (isAcceptable != isAcceptableBefore) {
+    bool isAcceptingBefore = isAccepting;
+    _acceptingStoryClusters.remove(storyClusterId);
+    if (isAccepting != isAcceptingBefore) {
       notifyListeners();
     }
   }

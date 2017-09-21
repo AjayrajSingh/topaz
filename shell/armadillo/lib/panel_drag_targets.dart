@@ -163,8 +163,15 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
 
   Widget _buildWidget(BuildContext context) =>
       new ArmadilloDragTarget<StoryClusterDragData>(
-        onWillAccept: (StoryClusterDragData data, _) =>
-            widget.storyCluster.id != data.id,
+        onWillAccept: (StoryClusterDragData data, _) {
+          StoryClusterDragStateModel storyClusterDragStateModel =
+              StoryClusterDragStateModel.of(context);
+          return widget.storyCluster.id != data.id &&
+              (!storyClusterDragStateModel.isAccepting ||
+                  storyClusterDragStateModel.isStoryClusterAccepting(
+                    widget.storyCluster.id,
+                  ));
+        },
         onAccept: (StoryClusterDragData data, _, Velocity velocity) =>
             _onAccept(
               data,

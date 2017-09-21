@@ -91,7 +91,7 @@ Widget buildArmadilloUserShell({
       new StoryRearrangementScrimModel();
   storyClusterDragStateModel.addListener(
     () => storyRearrangementScrimModel
-        .onDragAcceptableStateChanged(storyClusterDragStateModel.isAcceptable),
+        .onDragAcceptableStateChanged(storyClusterDragStateModel.isAccepting),
   );
   storyClusterDragStateModel.addListener(
     () => storyProviderStoryGenerator

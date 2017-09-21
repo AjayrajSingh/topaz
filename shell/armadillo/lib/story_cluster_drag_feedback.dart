@@ -102,15 +102,14 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
       return;
     }
 
-    if (StoryClusterDragStateModel.of(context).isAcceptable &&
+    if (StoryClusterDragStateModel.of(context).isAccepting &&
         widget.storyCluster.previewStories.isNotEmpty) {
       widget.storyCluster.maximizeStoryBars();
     } else {
       widget.storyCluster.minimizeStoryBars();
     }
 
-    if (_wasAcceptable &&
-        !StoryClusterDragStateModel.of(context).isAcceptable) {
+    if (_wasAcceptable && !StoryClusterDragStateModel.of(context).isAccepting) {
       // Revert to initial story locations and display state.
       widget.storyCluster.removePreviews();
       _originalStories.forEach((Story story) {
@@ -121,7 +120,7 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
       });
       widget.storyCluster.displayMode = _originalDisplayMode;
     }
-    _wasAcceptable = StoryClusterDragStateModel.of(context).isAcceptable;
+    _wasAcceptable = StoryClusterDragStateModel.of(context).isAccepting;
   }
 
   @override
@@ -152,9 +151,9 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                           sizeModel.storySize,
                         ) *
                         0.8;
-                bool isAcceptable = storyClusterDragStateModel.isAcceptable;
+                bool isAccepting = storyClusterDragStateModel.isAccepting;
 
-                if (isAcceptable &&
+                if (isAccepting &&
                     widget.storyCluster.previewStories.isNotEmpty) {
                   width = sizeModel.screenSize.width;
                   height = sizeModel.screenSize.height;
@@ -225,15 +224,15 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                 // its translation when isAcceptable is true.
                 // In tab mode we center on the story's story bar.
                 // In panel mode we center on the story itself.
-                double newDx = (isAcceptable ||
-                        widget.localDragStartPoint.dx > targetWidth)
-                    ? (widget.storyCluster.displayMode == DisplayMode.tabs)
-                        ? widget.localDragStartPoint.dx -
-                            targetWidth * tabFractionalXOffset
-                        : widget.localDragStartPoint.dx -
-                            targetWidth * realStoriesFractionalCenterX
-                    : 0.0;
-                double newDy = (isAcceptable ||
+                double newDx =
+                    (isAccepting || widget.localDragStartPoint.dx > targetWidth)
+                        ? (widget.storyCluster.displayMode == DisplayMode.tabs)
+                            ? widget.localDragStartPoint.dx -
+                                targetWidth * tabFractionalXOffset
+                            : widget.localDragStartPoint.dx -
+                                targetWidth * realStoriesFractionalCenterX
+                        : 0.0;
+                double newDy = (isAccepting ||
                         widget.localDragStartPoint.dy > targetHeight)
                     ? (widget.storyCluster.displayMode == DisplayMode.tabs)
                         ? widget.localDragStartPoint.dy -
