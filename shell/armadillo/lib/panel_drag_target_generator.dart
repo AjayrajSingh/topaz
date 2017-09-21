@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import 'cluster_layout.dart';
+import 'display_mode.dart';
 import 'line_segment.dart';
 import 'panel.dart';
 import 'panel_drag_target.dart';
@@ -36,6 +37,11 @@ const double _kStoryEdgeTargetInset = 48.0;
 
 /// The minimum distance inset story edge targets should be from each other.
 const double _kStoryEdgeTargetInsetMinDistance = 0.0;
+
+/// The height of the tab targets when in tabbed mode is increased by half
+/// this amount; all targets directly below the tab targets are moved down by
+/// this amount.
+const double _kNonStoryBarTopTargetShiftWhenTabs = 48.0;
 
 final Color _kDebugTopEdgeTargetColor = Colors.yellow[700];
 final Color _kDebugLeftEdgeTargetColor = Colors.yellow[500];
@@ -104,6 +110,7 @@ class PanelDragTargetGenerator {
   List<PanelDragTarget> createTargets({
     Size size,
     Size currentSize,
+    DisplayMode currentDisplayMode,
     ClusterLayout clusterLayout,
     double scale,
     bool inTimeline,
@@ -124,6 +131,9 @@ class PanelDragTargetGenerator {
     targets.clear();
     double verticalMargin = (1.0 - scale) / 2.0 * size.height;
     double horizontalMargin = (1.0 - scale) / 2.0 * size.width;
+    double verticalShift = currentDisplayMode == DisplayMode.tabs
+        ? _kNonStoryBarTopTargetShiftWhenTabs
+        : 0.0;
 
     List<Panel> panels = clusterLayout.panels;
     int availableRows = maxRows(size) - _getCurrentRows(panels: panels);
@@ -132,7 +142,7 @@ class PanelDragTargetGenerator {
       targets.add(
         new LineSegment.horizontal(
           name: 'Top edge target',
-          y: verticalMargin + _kTopEdgeTargetYOffset,
+          y: verticalMargin + _kTopEdgeTargetYOffset + verticalShift,
           left: horizontalMargin + _kStoryEdgeTargetInsetMinDistance,
           right:
               size.width - horizontalMargin - _kStoryEdgeTargetInsetMinDistance,
@@ -193,7 +203,8 @@ class PanelDragTargetGenerator {
           x: horizontalMargin,
           top: verticalMargin +
               _kTopEdgeTargetYOffset +
-              _kStoryEdgeTargetInsetMinDistance,
+              _kStoryEdgeTargetInsetMinDistance +
+              verticalShift,
           bottom:
               size.height - verticalMargin - _kStoryEdgeTargetInsetMinDistance,
           color: _kDebugLeftEdgeTargetColor,
@@ -222,7 +233,8 @@ class PanelDragTargetGenerator {
           x: size.width - horizontalMargin,
           top: verticalMargin +
               _kTopEdgeTargetYOffset +
-              _kStoryEdgeTargetInsetMinDistance,
+              _kStoryEdgeTargetInsetMinDistance +
+              verticalShift,
           bottom:
               size.height - verticalMargin - _kStoryEdgeTargetInsetMinDistance,
           color: _kDebugRightEdgeTargetColor,
@@ -317,7 +329,8 @@ class PanelDragTargetGenerator {
           right: storyBarTargetLeft + lineWidth,
           color:
               _kDebugStoryBarTargetColor[i % _kDebugStoryBarTargetColor.length],
-          validityDistance: verticalMargin + _kStoryBarTargetYOffset,
+          validityDistance:
+              verticalMargin + _kStoryBarTargetYOffset + verticalShift,
           maxStoriesCanAccept: maxStories,
           onHover: (BuildContext context, StoryCluster storyCluster) =>
               onStoryBarHover(
@@ -349,7 +362,7 @@ class PanelDragTargetGenerator {
         double top = bounds.top +
             _kStoryEdgeTargetInsetMinDistance +
             (storyPanel.top == 0.0
-                ? _kStoryTopEdgeTargetYOffset
+                ? _kStoryTopEdgeTargetYOffset + verticalShift
                 : 2.0 * _kStoryEdgeTargetInset);
         double bottom = bounds.bottom -
             _kStoryEdgeTargetInsetMinDistance -
@@ -417,7 +430,7 @@ class PanelDragTargetGenerator {
       if (horizontalSplits > 0) {
         double top = bounds.top +
             (storyPanel.top == 0.0
-                ? _kStoryTopEdgeTargetYOffset
+                ? _kStoryTopEdgeTargetYOffset + verticalShift
                 : _kStoryEdgeTargetInset);
         double left = bounds.left +
             _kStoryEdgeTargetInsetMinDistance +

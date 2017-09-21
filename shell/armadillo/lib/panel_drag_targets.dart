@@ -547,6 +547,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
       _panelDragTargetGenerator.createTargets(
         size: SizeModel.of(context).storySize,
         currentSize: widget.currentSize,
+        currentDisplayMode: widget.storyCluster.displayMode,
         clusterLayout: _originalClusterLayout,
         scale: widget.scale,
         inTimeline: _inTimeline,
