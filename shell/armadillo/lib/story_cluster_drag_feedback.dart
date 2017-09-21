@@ -238,7 +238,7 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                     ? (widget.storyCluster.displayMode == DisplayMode.tabs)
                         ? widget.localDragStartPoint.dy -
                             targetHeight * realStoriesFractionalTopY -
-                            childScale * sizeModel.storyBarHeightMaximized
+                            childScale * SizeModel.kStoryBarMaximizedHeight
                         : widget.localDragStartPoint.dy -
                             targetHeight * realStoriesFractionalCenterY
                     : 0.0;

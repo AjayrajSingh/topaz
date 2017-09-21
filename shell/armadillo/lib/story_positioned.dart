@@ -10,7 +10,6 @@ import 'display_mode.dart';
 import 'panel.dart';
 import 'panel_resizing_model.dart';
 import 'simulated_fractional.dart';
-import 'size_model.dart';
 import 'story.dart';
 import 'story_panels.dart';
 
@@ -40,11 +39,15 @@ class StoryPositioned extends StatelessWidget {
   /// The [Widget] representation of the [Story].
   final Widget child;
 
+  /// The height of the [Story]'s story bar when maximized.
+  final double storyBarMaximizedHeight;
+
   /// If key to use for the [SimulatedFractional] containing [child].
   final Key childContainerKey;
 
   /// Constructor.
   StoryPositioned({
+    this.storyBarMaximizedHeight,
     this.displayMode,
     this.isFocused,
     this.panel,
@@ -57,59 +60,51 @@ class StoryPositioned extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => new ScopedModelDescendant<SizeModel>(
-        child: child,
-        builder: (
-          BuildContext context,
-          Widget child,
-          SizeModel sizeModel,
-        ) =>
-            new ScopedModelDescendant<PanelResizingModel>(
-                child: child,
-                builder: (
-                  BuildContext context,
-                  Widget child,
-                  PanelResizingModel panelResizingModel,
-                ) {
-                  EdgeInsets margins = getFractionalMargins(
-                    panel,
-                    currentSize,
-                    focusProgress,
-                    panelResizingModel,
+  Widget build(BuildContext context) =>
+      new ScopedModelDescendant<PanelResizingModel>(
+          child: child,
+          builder: (
+            BuildContext context,
+            Widget child,
+            PanelResizingModel panelResizingModel,
+          ) {
+            EdgeInsets margins = getFractionalMargins(
+              panel,
+              currentSize,
+              focusProgress,
+              panelResizingModel,
+            );
+
+            Widget fractionalChild = child;
+
+            return displayMode == DisplayMode.panels
+                ? new SimulatedFractional(
+                    key: childContainerKey,
+                    fractionalTop: panel.top + margins.top,
+                    fractionalLeft: panel.left + margins.left,
+                    fractionalWidth:
+                        panel.width - (margins.left + margins.right),
+                    fractionalHeight:
+                        panel.height - (margins.top + margins.bottom),
+                    size: currentSize,
+                    child: fractionalChild,
+                  )
+                // If we're not in 'panel' displaymode we're in 'tabs' display
+                // mode.  When that's the case, if we're focused we expand to
+                // fit the entire area, otherwise we shrink our height to the height
+                // of our story bar.
+                : new SimulatedFractional(
+                    key: childContainerKey,
+                    fractionalTop: 0.0,
+                    fractionalLeft: 0.0,
+                    fractionalWidth: 1.0,
+                    fractionalHeight: (isFocused)
+                        ? 1.0
+                        : storyBarMaximizedHeight / currentSize.height,
+                    size: currentSize,
+                    child: fractionalChild,
                   );
-
-                  Widget fractionalChild = child;
-
-                  return displayMode == DisplayMode.panels
-                      ? new SimulatedFractional(
-                          key: childContainerKey,
-                          fractionalTop: panel.top + margins.top,
-                          fractionalLeft: panel.left + margins.left,
-                          fractionalWidth:
-                              panel.width - (margins.left + margins.right),
-                          fractionalHeight:
-                              panel.height - (margins.top + margins.bottom),
-                          size: currentSize,
-                          child: fractionalChild,
-                        )
-                      // If we're not in 'panel' displaymode we're in 'tabs' display
-                      // mode.  When that's the case, if we're focused we expand to
-                      // fit the entire area, otherwise we shrink our height to the height
-                      // of our story bar.
-                      : new SimulatedFractional(
-                          key: childContainerKey,
-                          fractionalTop: 0.0,
-                          fractionalLeft: 0.0,
-                          fractionalWidth: 1.0,
-                          fractionalHeight: (isFocused)
-                              ? 1.0
-                              : sizeModel.storyBarHeightMaximized /
-                                  currentSize.height,
-                          size: currentSize,
-                          child: fractionalChild,
-                        );
-                }),
-      );
+          });
 
   /// Returns the margins to use between [panel] and its neighbors within a
   /// cluster in fractions of the parent's [currentSize] and depending on

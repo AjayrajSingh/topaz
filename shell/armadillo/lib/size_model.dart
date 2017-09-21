@@ -54,6 +54,12 @@ const Map<FormFactor, double> _kSuggestionPeekHeight =
 /// The [SizeModel] allows these values to be passed down the widget tree by
 /// using a [ScopedModel] to retrieve the model.
 class SizeModel extends Model {
+  /// The height of the story bar when maximized.
+  static const double kStoryBarMaximizedHeight = 24.0;
+
+  /// The height of the story bar when minimized.
+  static const double kStoryBarMinimizedHeight = 4.0;
+
   Size _screenSize = Size.zero;
   double _suggestionListWidth = 0.0;
   double _suggestionWidth;
@@ -123,12 +129,6 @@ class SizeModel extends Model {
         _screenSize.width,
         _screenSize.height - minimizedNowHeight,
       );
-
-  /// The height of the story bar when maximized.
-  double get storyBarHeightMaximized => 24.0;
-
-  /// The height of the story bar when minimized.
-  double get storyBarHeightMinimized => 4.0;
 
   /// Gets the height of the minimized now bar which is based on the height
   /// of the screen.

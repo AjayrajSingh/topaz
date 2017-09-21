@@ -26,11 +26,15 @@ class StoryFullSizeSimulatedSizedBox extends StatelessWidget {
   /// The panel representing the size and location of this story in its cluster.
   final Panel panel;
 
+  /// The maximum height of the story bar.
+  final double storyBarMaximizedHeight;
+
   /// Constructor.
   StoryFullSizeSimulatedSizedBox({
     this.displayMode,
     this.panel,
     this.containerKey,
+    this.storyBarMaximizedHeight,
     this.child,
   }) {
     assert(child != null);
@@ -43,11 +47,11 @@ class StoryFullSizeSimulatedSizedBox extends StatelessWidget {
               key: containerKey,
               fractionalWidth:
                   displayMode == DisplayMode.panels ? panel.width : 1.0,
-              fractionalHeight:
-                  ((displayMode == DisplayMode.panels ? panel.height : 1.0) -
-                          (sizeModel.storyBarHeightMaximized /
-                              sizeModel.storySize.height))
-                      .clamp(0.0, double.INFINITY),
+              fractionalHeight: ((displayMode == DisplayMode.panels
+                          ? panel.height
+                          : 1.0) -
+                      (storyBarMaximizedHeight / sizeModel.storySize.height))
+                  .clamp(0.0, double.INFINITY),
               size: sizeModel.storySize,
               child: child,
             ),

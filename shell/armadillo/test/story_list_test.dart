@@ -74,7 +74,6 @@ void main() {
       scrollController: scrollController,
     );
     StoryModel storyModel = new _DummyStoryModel(storyKeys: storyKeys);
-    SizeModel sizeModel = new SizeModel();
 
     await tester.pumpWidget(
       _wrapWithModels(
@@ -95,7 +94,7 @@ void main() {
       expect(finder, isNotNull);
       final Size size = tester.getSize(finder);
       expect(size.width, _kWidthMultiColumn);
-      expect(size.height, _kHeight - sizeModel.storyBarHeightMaximized);
+      expect(size.height, _kHeight - SizeModel.kStoryBarMaximizedHeight);
     });
   });
 }

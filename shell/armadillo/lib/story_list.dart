@@ -173,8 +173,6 @@ class StoryList extends StatelessWidget {
                                             storyDragTransitionModel.value,
                                           ),
                                     ),
-                                    storyBarHeightMinimized:
-                                        sizeModel.storyBarHeightMinimized,
                                     storyDragTransitionModelProgress:
                                         storyDragTransitionModel.value,
                                   ),
@@ -343,7 +341,6 @@ class _StoryListBody extends MultiChildRenderObjectWidget {
   final double _listHeight;
   final Size _parentSize;
   final double _storyDragTransitionModelProgress;
-  final double _storyBarHeightMinimized;
 
   /// Constructor.
   _StoryListBody({
@@ -354,21 +351,18 @@ class _StoryListBody extends MultiChildRenderObjectWidget {
     double listHeight,
     Size parentSize,
     double storyDragTransitionModelProgress,
-    double storyBarHeightMinimized,
   })
       : _scrollOffset = scrollOffset,
         _bottomPadding = bottomPadding,
         _listHeight = listHeight,
         _parentSize = parentSize,
         _storyDragTransitionModelProgress = storyDragTransitionModelProgress,
-        _storyBarHeightMinimized = storyBarHeightMinimized,
         super(key: key, children: children);
 
   @override
   RenderStoryListBody createRenderObject(BuildContext context) =>
       new RenderStoryListBody(
         parentSize: _parentSize,
-        storyBarHeightMinimized: _storyBarHeightMinimized,
         scrollOffset: _scrollOffset,
         bottomPadding: _bottomPadding,
         listHeight: _listHeight,
@@ -387,7 +381,6 @@ class _StoryListBody extends MultiChildRenderObjectWidget {
     renderObject
       ..mainAxis = Axis.vertical
       ..parentSize = _parentSize
-      ..storyBarHeightMinimized = _storyBarHeightMinimized
       ..scrollOffset = _scrollOffset
       ..bottomPadding = _bottomPadding
       ..listHeight = _listHeight
