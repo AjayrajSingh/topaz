@@ -7,7 +7,7 @@
 extern crate xi_core_lib;
 extern crate xi_rpc;
 
-extern crate zircon;
+extern crate fuchsia_zircon as zircon;
 extern crate mxruntime;
 #[macro_use]
 extern crate fidl;

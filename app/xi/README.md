@@ -48,9 +48,9 @@ Don't forget to set up the [Fuchsia environment helpers][fuchsia-env] in `script
 
 **NOTE:** This step is temporary.
 
-A custom `rustc` build is required before Xi core can be built for Fuchsia. Start by building the [clang wrapper][clang-wrapper] in [zircon-rs][https://fuchsia.googlesource.com/zircon-rs/]:
+A custom `rustc` build is required before Xi core can be built for Fuchsia. Start by building the [clang wrapper][clang-wrapper] in [fuchsia-zircon][https://fuchsia.googlesource.com/garnet/+/HEAD/public/rust/crates/fuchsia-zircon]:
 
-    export RUST_TOOLS=${FUCHSIA_DIR}/rust/zircon-rs/tools
+    export RUST_TOOLS=${FUCHSIA_DIR}/garnet/public/rust/crates/fuchsia-zircon/tools
     cd $RUST_TOOLS
     clang++ -O --std=c++11 clang_wrapper.cc -o clang_wrapper
     ln -s clang_wrapper x86-64-unknown-fuchsia-ar
@@ -62,7 +62,7 @@ You can sanity-check the clang wrapper:
     ${RUST_TOOLS}/x86-64-unknown-fuchsia-cc
     clang-4.0: error: no input files
 
-Then clone and build Rust per the [zircon-rs docs][zircon-rs-docs]:
+Then clone and build Rust per the [fuchsia-zircon docs][fuchsia-zircon-docs]:
 
     export RUST_ROOT=${FUCHSIA_DIR}/third_party/rust
     git clone https://github.com/rust-lang/rust.git $RUST_ROOT
@@ -95,7 +95,7 @@ Configure and build rustc (this will take a while):
 
 Build the zircon examples:
 
-    cd $FUCHSIA_DIR/rust/zircon-rs/
+    cd $FUCHSIA_DIR/garnet/public/rust/crates/fuchsia-zircon/
 
 Configure cargo for the fuchsia target:
 
@@ -105,7 +105,7 @@ Configure cargo for the fuchsia target:
     linker = "${RUST_TOOLS}/x86-64-unknown-fuchsia-cc"
     EOF
 
-Build the zircon-rs example zx_toy:
+Build the fuchsia-zircon example zx_toy:
 
     RUSTC=${RUST_ROOT}/build/x86_64-apple-darwin/stage1/bin/rustc cargo build --target=x86_64-unknown-fuchsia --example zx_toy
 
@@ -216,6 +216,6 @@ Run the Flutter app:
 [widgets-intro]: https://flutter.io/widgets-intro/
 [fuchsia-setup]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md
 [fuchsia-env]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md#Setup-Build-Environment
-[clang-wrapper]: https://fuchsia.googlesource.com/zircon-rs/+/HEAD/tools
-[zircon-rs-docs]: https://fuchsia.googlesource.com/zircon-rs/+/HEAD/GETTING_STARTED.md
+[clang-wrapper]: https://fuchsia.googlesource.com/garnet/+/HEAD/public/rust/crates/fuchsia-zircon/tools
+[fuchsia-zircon-docs]: https://fuchsia.googlesource.com/garnet/+/HEAD/public/rust/crates/fuchsia-zircon/GETTING_STARTED.md
 [fuchsia-xi]: https://fuchsia.googlesource.com/xi/
