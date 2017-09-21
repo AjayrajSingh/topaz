@@ -30,7 +30,7 @@ Make sure to setup a jiri root according to the Fuchsia getting started doc. Ins
 * Install the latest stable rustc:
 * Setup a (temporary) custom clang_wrapper:
 
-    export RUST_TOOLS=${FUCHSIA_DIR}/rust/zircon-rs/tools
+    export RUST_TOOLS=${FUCHSIA_DIR}/garnet/public/rust/crates/fuchsia-zircon/tools
     cd $RUST_TOOLS
     clang++ -O --std=c++11 clang_wrapper.cc -o clang_wrapper
     ln -s clang_wrapper x86_64-unknown-fuchsia-cc
