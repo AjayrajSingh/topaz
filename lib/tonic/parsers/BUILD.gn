@@ -7,4 +7,8 @@ source_set("parsers") {
     "packages_map.cc",
     "packages_map.h",
   ]
+
+  public_configs = [
+    "//topaz/lib/tonic:config",
+  ]
 }

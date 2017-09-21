@@ -12,4 +12,8 @@ source_set("debugger") {
     "//dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
   ]
+
+  public_configs = [
+    "//topaz/lib/tonic:config",
+  ]
 }

@@ -14,4 +14,8 @@ source_set("logging") {
     "//dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
   ]
+
+  public_configs = [
+    "//topaz/lib/tonic:config",
+  ]
 }

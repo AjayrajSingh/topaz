@@ -11,7 +11,11 @@ source_set("file_loader") {
   deps = [
     "//dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
-    "//lib/tonic/converter",
-    "//lib/tonic/parsers",
+    "//topaz/lib/tonic/converter",
+    "//topaz/lib/tonic/parsers",
+  ]
+
+  public_configs = [
+    "//topaz/lib/tonic:config",
   ]
 }
