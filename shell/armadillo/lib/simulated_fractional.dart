@@ -4,6 +4,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/widgets.dart';
+import 'package:meta/meta.dart';
 
 const RK4SpringDescription _kDefaultSimulationDesc =
     const RK4SpringDescription(tension: 750.0, friction: 50.0);
@@ -38,25 +39,24 @@ class SimulatedFractional extends StatefulWidget {
   final Widget child;
 
   /// Constructor.
-  SimulatedFractional({
+  const SimulatedFractional({
     Key key,
+    @required this.fractionalWidth,
+    @required this.fractionalHeight,
+    @required this.size,
+    @required this.child,
     this.fractionalTop,
     this.fractionalLeft,
-    this.fractionalWidth,
-    this.fractionalHeight,
-    this.size,
     this.springDescription: _kDefaultSimulationDesc,
-    this.child,
   })
-      : super(key: key) {
-    assert(fractionalWidth != null);
-    assert(fractionalHeight != null);
-    assert(size != null);
-    assert(springDescription != null);
-    assert(child != null);
-    assert((fractionalTop == null && fractionalLeft == null) ||
-        (fractionalTop != null && fractionalLeft != null));
-  }
+      : assert(fractionalWidth != null),
+        assert(fractionalHeight != null),
+        assert(size != null),
+        assert(springDescription != null),
+        assert(child != null),
+        assert((fractionalTop == null && fractionalLeft == null) ||
+            (fractionalTop != null && fractionalLeft != null)),
+        super(key: key);
 
   @override
   SimulatedFractionalState createState() => new SimulatedFractionalState();

@@ -11,7 +11,7 @@ class ScrollLocker extends StatefulWidget {
   final Widget child;
 
   /// Constructor.
-  ScrollLocker({Key key, this.child}) : super(key: key);
+  const ScrollLocker({Key key, this.child}) : super(key: key);
 
   @override
   ScrollLockerState createState() => new ScrollLockerState();
@@ -53,9 +53,7 @@ class _LockingScrollBehavior extends ScrollBehavior {
       : const BouncingScrollPhysics();
 
   @override
-  bool shouldNotify(_LockingScrollBehavior old) {
-    return lock != old.lock;
-  }
+  bool shouldNotify(_LockingScrollBehavior old) => lock != old.lock;
 }
 
 class _LockedScrollPhysics extends ScrollPhysics {

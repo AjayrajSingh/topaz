@@ -55,7 +55,7 @@ class InterruptionOverlay extends StatefulWidget {
   final OnInterruptionDismissed onInterruptionDismissed;
 
   /// Constructor.
-  InterruptionOverlay({
+  const InterruptionOverlay({
     Key key,
     this.onSuggestionSelected,
     this.onInterruptionDismissed,
@@ -352,7 +352,7 @@ class _FadeInWidget extends StatefulWidget {
   final double opacity;
   final Widget child;
 
-  _FadeInWidget({Key key, this.opacity, this.child}) : super(key: key);
+  const _FadeInWidget({Key key, this.opacity, this.child}) : super(key: key);
 
   @override
   _FadeInWidgetState createState() => new _FadeInWidgetState();

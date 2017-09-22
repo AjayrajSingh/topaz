@@ -17,7 +17,8 @@ class StoryTitle extends StatelessWidget {
   final Color baseColor;
 
   /// Constructor.
-  StoryTitle({this.title, this.opacity: 1.0, this.baseColor: Colors.white});
+  const StoryTitle(
+      {this.title, this.opacity: 1.0, this.baseColor: Colors.white});
 
   @override
   Widget build(BuildContext context) => new Opacity(

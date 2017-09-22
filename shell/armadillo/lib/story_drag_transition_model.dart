@@ -4,6 +4,7 @@
 
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
+import 'package:meta/meta.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
@@ -22,7 +23,7 @@ class StoryDragTransitionModel extends SpringModel {
 
   /// Sets the dragging state to [isDragging].  This triggers the transition
   /// animation.
-  void onDragStateChanged(bool isDragging) {
+  void onDragStateChanged({@required bool isDragging}) {
     target = isDragging ? 1.0 : 0.0;
   }
 }

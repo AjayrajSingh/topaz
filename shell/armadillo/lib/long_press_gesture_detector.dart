@@ -27,7 +27,7 @@ class LongPressGestureDetector extends StatefulWidget {
   final GestureDragCancelCallback onDragCancel;
 
   /// Constructor.
-  LongPressGestureDetector({
+  const LongPressGestureDetector({
     Key key,
     this.onDragStart,
     this.onDragUpdate,

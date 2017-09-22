@@ -65,15 +65,13 @@ class LineSegment extends PanelDragTarget {
   })
       : this.a = (a.dx < b.dx || a.dy < b.dy) ? a : b,
         this.b = (a.dx < b.dx || a.dy < b.dy) ? b : a,
+        assert(a.dx == b.dx || a.dy == b.dy),
         super(
           onHover: onHover,
           onDrop: onDrop,
           color: color,
           initiallyTargetable: initiallyTargetable,
-        ) {
-    // Ensure the line is either vertical or horizontal.
-    assert(a.dx == b.dx || a.dy == b.dy);
-  }
+        );
 
   /// Creates a vertical [LineSegment] whose [a] and [b] have the same [x].
   factory LineSegment.vertical({

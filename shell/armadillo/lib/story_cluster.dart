@@ -149,11 +149,11 @@ class StoryCluster {
       stories: clusterData['stories']
           .map((Map<String, dynamic> json) => new Story.fromJson(json))
           .toList(),
-    );
-    storyCluster.displayMode = clusterData['display_mode'] == 'tabs'
-        ? DisplayMode.tabs
-        : DisplayMode.panels;
-    storyCluster.focusedStoryId = new StoryId(clusterData['focused_story_id']);
+    )
+      ..displayMode = clusterData['display_mode'] == 'tabs'
+          ? DisplayMode.tabs
+          : DisplayMode.panels
+      ..focusedStoryId = new StoryId(clusterData['focused_story_id']);
     return storyCluster;
   }
 
@@ -214,7 +214,7 @@ class StoryCluster {
   /// Sets the last interaction time for the cluster.  Used for ordering
   /// clusters in the story list.
   set lastInteraction(DateTime lastInteraction) {
-    this._lastInteraction = lastInteraction;
+    _lastInteraction = lastInteraction;
     _stories.forEach((Story story) {
       story.lastInteraction = lastInteraction;
     });
@@ -226,10 +226,10 @@ class StoryCluster {
   /// Sets the cumulative interaction time this cluster has had.  Used for
   /// ordering laying out clusters in the story list.
   set cumulativeInteractionDuration(Duration cumulativeInteractionDuration) {
-    this._cumulativeInteractionDuration = cumulativeInteractionDuration;
-    _stories.forEach((Story story) {
+    _cumulativeInteractionDuration = cumulativeInteractionDuration;
+    for (Story story in _stories) {
       story.cumulativeInteractionDuration = cumulativeInteractionDuration;
-    });
+    }
   }
 
   /// Gets the cumulative interaction time this cluster has had.
@@ -244,16 +244,15 @@ class StoryCluster {
   int get hashCode => id.hashCode;
 
   @override
-  bool operator ==(dynamic other) => (other is StoryCluster && other.id == id);
+  bool operator ==(Object other) => (other is StoryCluster && other.id == id);
 
   @override
   String toString() {
     String string = 'StoryCluster( id: $id, title: $title,\n';
-    _stories.forEach((Story story) {
-      string += '\n   story: $story';
-    });
-    string += ' )';
-    return string;
+    for (Story story in _stories) {
+      string = '$string\n   story: $story';
+    }
+    return '$string )';
   }
 
   /// The current [DisplayMode] of this cluster.
@@ -294,11 +293,11 @@ class StoryCluster {
       currentTopsSet.add(panel.top);
     });
 
-    List<double> currentSortedLefts = new List<double>.from(currentLeftsSet);
-    currentSortedLefts.sort();
+    List<double> currentSortedLefts = new List<double>.from(currentLeftsSet)
+      ..sort();
 
-    List<double> currentSortedTops = new List<double>.from(currentTopsSet);
-    currentSortedTops.sort();
+    List<double> currentSortedTops = new List<double>.from(currentTopsSet)
+      ..sort();
 
     Map<double, double> leftMap = <double, double>{1.0: 1.0};
     double left = 0.0;
@@ -371,22 +370,23 @@ class StoryCluster {
 
   /// Replaces the [Story.panel] of the story with [panel] with [withPanel]/
   void replace({Panel panel, Panel withPanel}) {
-    Story story = _stories.where((Story story) => story.panel == panel).single;
-    story.panel = withPanel;
+    _stories.where((Story story) => story.panel == panel).single
+      ..panel = withPanel;
     _panelsModel.notifyListeners();
   }
 
   /// Replaces the [Story.panel] of the story with [storyId] with [withPanel]/
   void replaceStoryPanel({StoryId storyId, Panel withPanel}) {
-    Story story = _stories.where((Story story) => story.id == storyId).single;
-    story.panel = withPanel;
+    _stories.where((Story story) => story.id == storyId).single
+      ..panel = withPanel;
     _panelsModel.notifyListeners();
   }
 
   /// Replaces the stories in this cluster with [replacementStories].
   void replaceStories(List<Story> replacementStories) {
-    _stories.clear();
-    _stories.addAll(replacementStories);
+    _stories
+      ..clear()
+      ..addAll(replacementStories);
     _notifyStoryListListeners();
   }
 
@@ -396,8 +396,9 @@ class StoryCluster {
   /// Converts this cluster into a placeholder by replacing all its stories
   /// with a single place holder story.
   void becomePlaceholder() {
-    _stories.clear();
-    _stories.add(new PlaceHolderStory());
+    _stories
+      ..clear()
+      ..add(new PlaceHolderStory());
     _notifyStoryListListeners();
   }
 
@@ -409,12 +410,13 @@ class StoryCluster {
     if (stories.length <= 1) {
       return;
     }
-    stories.remove(story);
-    stories.sort(
-      (Story a, Story b) => a.panel.sizeFactor > b.panel.sizeFactor
-          ? 1
-          : a.panel.sizeFactor < b.panel.sizeFactor ? -1 : 0,
-    );
+    stories
+      ..remove(story)
+      ..sort(
+        (Story a, Story b) => a.panel.sizeFactor > b.panel.sizeFactor
+            ? 1
+            : a.panel.sizeFactor < b.panel.sizeFactor ? -1 : 0,
+      );
 
     Panel remainingAreaToAbsorb = story.panel;
     double remainingSize;
@@ -541,16 +543,18 @@ class StoryCluster {
             .where((Story story) =>
                 story.id == placeHolderMirror.associatedStoryId)
             .single;
-        _stories.remove(story);
-        _stories.insert(i, story);
+        _stories
+          ..remove(story)
+          ..insert(i, story);
       } else {
         Story realMirror = storiesToMirror[i];
         Story story = previewStories
             .where((PlaceHolderStory story) =>
                 story.associatedStoryId == realMirror.id)
             .single;
-        _stories.remove(story);
-        _stories.insert(i, story);
+        _stories
+          ..remove(story)
+          ..insert(i, story);
       }
     }
   }
@@ -581,8 +585,9 @@ class StoryCluster {
   /// Updates this story cluster to have the info as [other].
   void update(StoryCluster other) {
     /// 1. Replace stories.
-    _stories.clear();
-    _stories.addAll(other.stories);
+    _stories
+      ..clear()
+      ..addAll(other.stories);
 
     /// 2. Set display mode.
     displayMode = other.displayMode;
@@ -595,12 +600,12 @@ class StoryCluster {
 
   static String _getClusterTitle(List<Story> stories) {
     String title = '';
-    stories.where((Story story) => !story.isPlaceHolder).forEach((Story story) {
+    for (Story story in stories.where((Story story) => !story.isPlaceHolder)) {
       if (title.isNotEmpty) {
-        title += ', ';
+        title = '$title, ';
       }
-      title += story.title;
-    });
+      title = '$title${story.title}';
+    }
     return title;
   }
 

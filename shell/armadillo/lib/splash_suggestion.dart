@@ -47,11 +47,11 @@ class SplashSuggestion extends ExpansionBehavior {
   void start() {
     _notified = false;
     _sweepSimulation =
-        new RK4SpringSimulation(initValue: 0.0, desc: _kSweepSimulationDesc);
-    _sweepSimulation.target = _kSweepSimulationTarget;
+        new RK4SpringSimulation(initValue: 0.0, desc: _kSweepSimulationDesc)
+          ..target = _kSweepSimulationTarget;
     _clearSimulation =
-        new RK4SpringSimulation(initValue: 0.0, desc: _kClearSimulationDesc);
-    _clearSimulation.target = 0.0;
+        new RK4SpringSimulation(initValue: 0.0, desc: _kClearSimulationDesc)
+          ..target = 0.0;
   }
 
   @override
@@ -80,7 +80,7 @@ class SplashSuggestion extends ExpansionBehavior {
   @override
   Widget build(BuildContext context, BoxConstraints constraints) {
     if (_clearIsDone) {
-      return new Offstage(offstage: true);
+      return const Offstage(offstage: true);
     }
 
     RenderBox box = context.findRenderObject();

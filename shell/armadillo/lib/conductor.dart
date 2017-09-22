@@ -27,7 +27,7 @@ const double _kNowQuickSettingsHideScrollOffsetThreshold = 16.0;
 /// settings overlay.
 class Conductor extends StatefulWidget {
   /// Constructor.
-  Conductor({Key key}) : super(key: key);
+  const Conductor({Key key}) : super(key: key);
 
   @override
   ConductorState createState() => new ConductorState();
@@ -49,14 +49,15 @@ class ConductorState extends State<Conductor> {
   Widget build(BuildContext context) =>
       new ScopedModelDescendant<ConductorModel>(
         builder: (_, __, ConductorModel conductorModel) {
-          conductorModel.nowBuilder.onMinimize = () {
-            PeekModel.of(context).nowMinimized = true;
-            conductorModel.nextBuilder.hide();
-          };
-          conductorModel.nowBuilder.onMaximize = () {
-            PeekModel.of(context).nowMinimized = false;
-            conductorModel.nextBuilder.hide();
-          };
+          conductorModel.nowBuilder
+            ..onMinimize = () {
+              PeekModel.of(context).nowMinimized = true;
+              conductorModel.nextBuilder.hide();
+            }
+            ..onMaximize = () {
+              PeekModel.of(context).nowMinimized = false;
+              conductorModel.nextBuilder.hide();
+            };
 
           return _buildParts(context, conductorModel);
         },
@@ -212,8 +213,9 @@ class ConductorState extends State<Conductor> {
     ConductorModel.of(context).recentsBuilder.onStoryUnfocused();
     ConductorModel.of(context).recentsBuilder.resetScroll();
     ConductorModel.of(context).nowBuilder.maximize();
-    storyModel.interactionStopped();
-    storyModel.clearPlaceHolderStoryClusters();
+    storyModel
+      ..interactionStopped()
+      ..clearPlaceHolderStoryClusters();
   }
 
   /// Called to request the conductor focus on the cluster with [storyId].

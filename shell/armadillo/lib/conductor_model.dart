@@ -5,13 +5,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
-export 'package:lib.widgets/model.dart'
-    show ScopedModel, Model, ScopedModelDescendant;
-
 import 'idle_mode_builder.dart';
 import 'next_builder.dart';
 import 'now/now_builder.dart';
 import 'recents_builder.dart';
+
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, Model, ScopedModelDescendant;
 
 /// Provides builders for Conductor.
 class ConductorModel extends Model {

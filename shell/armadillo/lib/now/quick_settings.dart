@@ -62,7 +62,7 @@ class QuickSettingsOverlay extends StatefulWidget {
   final VoidCallback onClearLedgerSelected;
 
   /// Constructor.
-  QuickSettingsOverlay({
+  const QuickSettingsOverlay({
     Key key,
     this.onProgressChanged,
     this.onLogoutSelected,
@@ -184,7 +184,7 @@ class QuickSettings extends StatefulWidget {
   final VoidCallback onClearLedgerSelected;
 
   /// Constructor.
-  QuickSettings({
+  const QuickSettings({
     this.opacity,
     this.onLogoutSelected,
     this.onClearLedgerSelected,
@@ -210,19 +210,17 @@ class _QuickSettingsState extends State<QuickSettings> {
         return;
       }
       setState(() {
-        interfaces.forEach((NetworkInterface networkInterface) {
+        for (NetworkInterface networkInterface in interfaces) {
           _addresses.addAll(networkInterface.addresses);
-        });
+        }
       });
     });
   }
 
-  Widget _divider({double opacity: 1.0}) {
-    return new Divider(
-      height: 4.0,
-      color: Colors.grey[300].withOpacity(opacity),
-    );
-  }
+  Widget _divider({double opacity: 1.0}) => new Divider(
+        height: 4.0,
+        color: Colors.grey[300].withOpacity(opacity),
+      );
 
   Widget _volumeIconSlider() => new ScopedModelDescendant<VolumeModel>(
         builder: (
@@ -235,7 +233,7 @@ class _QuickSettingsState extends State<QuickSettings> {
               min: 0.0,
               max: 1.0,
               activeColor: _kActiveSliderColor,
-              thumbImage: new AssetImage(_kVolumeUpGrey600),
+              thumbImage: const AssetImage(_kVolumeUpGrey600),
               onChanged: (double value) {
                 model.level = value;
               },
@@ -247,7 +245,7 @@ class _QuickSettingsState extends State<QuickSettings> {
         min: 0.0,
         max: 100.0,
         activeColor: _kActiveSliderColor,
-        thumbImage: new AssetImage(_kBrightnessHighGrey600),
+        thumbImage: const AssetImage(_kBrightnessHighGrey600),
         onChanged: (double value) {
           setState(() {
             _brightnessSliderValue = value;
@@ -288,37 +286,35 @@ class _QuickSettingsState extends State<QuickSettings> {
         height: _kIconSize,
       );
 
-  Widget _buildForNarrowScreen(BuildContext context) {
-    return new Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          new Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: _volumeIconSlider()),
-          new Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: _brightnessIconSlider()),
-          new Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: _divider()),
-          new Row(children: <Widget>[
-            new Expanded(
-              flex: 1,
-              child: _airplaneModeToggleIcon(),
-            ),
-            new Expanded(
-              flex: 1,
-              child: _doNotDisturbToggleIcon(),
-            ),
-            new Expanded(
-              flex: 1,
-              child: _screenRotationToggleIcon(),
-            ),
-          ]),
-        ]);
-  }
+  Widget _buildForNarrowScreen(BuildContext context) => new Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            new Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: _volumeIconSlider()),
+            new Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: _brightnessIconSlider()),
+            new Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: _divider()),
+            new Row(children: <Widget>[
+              new Expanded(
+                flex: 1,
+                child: _airplaneModeToggleIcon(),
+              ),
+              new Expanded(
+                flex: 1,
+                child: _doNotDisturbToggleIcon(),
+              ),
+              new Expanded(
+                flex: 1,
+                child: _screenRotationToggleIcon(),
+              ),
+            ]),
+          ]);
 
   Widget _buildForWideScreen(BuildContext context) =>
       new Row(children: <Widget>[
@@ -346,64 +342,61 @@ class _QuickSettingsState extends State<QuickSettings> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = <Widget>[];
-
-    children.addAll(
-      <Widget>[
-        new Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: new LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) =>
-                new Opacity(
-                  opacity: widget.opacity,
-                  child: (constraints.maxWidth > _kMultiColumnWidthThreshold)
-                      ? _buildForWideScreen(context)
-                      : _buildForNarrowScreen(context),
+    List<Widget> children = <Widget>[]
+      ..addAll(
+        <Widget>[
+          new Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: new LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) =>
+                  new Opacity(
+                    opacity: widget.opacity,
+                    child: (constraints.maxWidth > _kMultiColumnWidthThreshold)
+                        ? _buildForWideScreen(context)
+                        : _buildForNarrowScreen(context),
+                  ),
+            ),
+          ),
+          new Opacity(
+            opacity: widget.opacity,
+            child: new Container(
+              padding: const EdgeInsets.all(16.0),
+              child: new Text(
+                '${Platform.localHostname}',
+                textAlign: TextAlign.center,
+                style: new TextStyle(
+                  fontFamily: 'RobotoMono',
+                  color: Colors.grey[600],
                 ),
-          ),
-        ),
-        new Opacity(
-          opacity: widget.opacity,
-          child: new Container(
-            padding: const EdgeInsets.all(16.0),
-            child: new Text(
-              '${Platform.localHostname}',
-              textAlign: TextAlign.center,
-              style: new TextStyle(
-                fontFamily: 'RobotoMono',
-                color: Colors.grey[600],
               ),
             ),
           ),
-        ),
-      ],
-    );
-
-    children.addAll(
-      _addresses.map(
-        (InternetAddress address) => new Text(
-              '${address.address}',
-              textAlign: TextAlign.center,
-              style: new TextStyle(
-                fontFamily: 'RobotoMono',
-                color: Colors.grey[600],
+        ],
+      )
+      ..addAll(
+        _addresses.map(
+          (InternetAddress address) => new Text(
+                '${address.address}',
+                textAlign: TextAlign.center,
+                style: new TextStyle(
+                  fontFamily: 'RobotoMono',
+                  color: Colors.grey[600],
+                ),
               ),
-            ),
-      ),
-    );
-
-    children.addAll(
-      <Widget>[
-        _divider(opacity: widget.opacity),
-        new Opacity(
-          opacity: widget.opacity,
-          child: new _LogoutButton(
-            onLogoutSelected: widget.onLogoutSelected,
-            onClearLedgerSelected: widget.onClearLedgerSelected,
-          ),
         ),
-      ],
-    );
+      )
+      ..addAll(
+        <Widget>[
+          _divider(opacity: widget.opacity),
+          new Opacity(
+            opacity: widget.opacity,
+            child: new _LogoutButton(
+              onLogoutSelected: widget.onLogoutSelected,
+              onClearLedgerSelected: widget.onClearLedgerSelected,
+            ),
+          ),
+        ],
+      );
     return new Material(
       type: MaterialType.canvas,
       color: Colors.transparent,
@@ -435,7 +428,7 @@ class _LogoutButton extends StatefulWidget {
   final VoidCallback onClearLedgerSelected;
 
   /// Constructor.
-  _LogoutButton({this.onLogoutSelected, this.onClearLedgerSelected});
+  const _LogoutButton({this.onLogoutSelected, this.onClearLedgerSelected});
 
   @override
   _LogoutButtonState createState() => new _LogoutButtonState();

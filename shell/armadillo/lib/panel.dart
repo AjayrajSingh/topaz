@@ -93,12 +93,12 @@ class Panel {
           toGridValue(origin.dy),
         ),
         _heightFactor = toGridValue(heightFactor),
-        _widthFactor = toGridValue(widthFactor) {
-    assert(origin.dx >= 0.0 && origin.dx <= 1.0);
-    assert(origin.dy >= 0.0 && origin.dy <= 1.0);
-    assert(origin.dx + widthFactor >= 0.0 && origin.dx + widthFactor <= 1.0);
-    assert(origin.dy + heightFactor >= 0.0 && origin.dx <= 1.0);
-  }
+        _widthFactor = toGridValue(widthFactor),
+        assert(origin.dx >= 0.0 && origin.dx <= 1.0),
+        assert(origin.dy >= 0.0 && origin.dy <= 1.0),
+        assert(
+            origin.dx + widthFactor >= 0.0 && origin.dx + widthFactor <= 1.0),
+        assert(origin.dy + heightFactor >= 0.0 && origin.dx <= 1.0);
 
   /// Creates a panel from the given fractional [left], [top], [right], and
   /// [bottom].
@@ -290,8 +290,8 @@ class Panel {
         ),
       );
     } else if (top == other.top && other.bottom >= bottom) {
-      double absorbedWidthFactor = this._widthFactor + other._widthFactor;
-      double heightFactor = this._heightFactor;
+      double absorbedWidthFactor = _widthFactor + other._widthFactor;
+      double heightFactor = _heightFactor;
       FractionalOffset absorbedOrigin = new FractionalOffset(
         math.min(left, other.left),
         top,
@@ -359,9 +359,8 @@ class Panel {
   double get sizeFactor => _widthFactor * _heightFactor;
 
   @override
-  String toString() {
-    return 'Panel(origin: $_origin, widthFactor: $_widthFactor, heightFactor: $_heightFactor)';
-  }
+  String toString() =>
+      'Panel(origin: $_origin, widthFactor: $_widthFactor, heightFactor: $_heightFactor)';
 
   /// For debug purposes.  Should only be called within an [assert].
   /// This verifies the given panels cover the entire area of the parent with

@@ -7,15 +7,15 @@ import 'package:lib.widgets/model.dart';
 
 import 'panel.dart';
 import 'simulated_fractional.dart';
+import 'simulated_fractionally_sized_box.dart';
 import 'story_bar.dart';
 import 'story_cluster_id.dart';
 import 'story_list.dart';
-import 'simulated_fractionally_sized_box.dart';
 
 /// The ID of a Story as a [ValueKey].
-class StoryId extends ValueKey<dynamic> {
+class StoryId extends ValueKey<String> {
   /// Constructs a StoryId by passing [value] to [ValueKey]'s constructor.
-  StoryId(dynamic value) : super(value);
+  const StoryId(String value) : super(value);
 }
 
 /// A builder that is called for different values of [opacity].
@@ -119,9 +119,9 @@ class Story {
 
   /// Creates a Story from a json object returned by [toJson].
   factory Story.fromJson(Map<String, dynamic> storyData) {
-    Story story = new Story(id: new StoryId(storyData['id']));
-    story.panel = new Panel.fromJson(storyData['panel']);
-    story._clusterIndex = storyData['cluster_index'];
+    Story story = new Story(id: new StoryId(storyData['id']))
+      ..panel = new Panel.fromJson(storyData['panel'])
+      .._clusterIndex = storyData['cluster_index'];
     return story;
   }
 
@@ -173,7 +173,7 @@ class Story {
   int get hashCode => id.hashCode;
 
   @override
-  bool operator ==(dynamic other) => (other is Story && other.id == id);
+  bool operator ==(Object other) => (other is Story && other.id == id);
 
   @override
   String toString() => 'Story( id: $id, title: $title, panel: $panel )';

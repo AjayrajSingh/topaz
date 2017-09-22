@@ -43,23 +43,21 @@ class _ToggleIconState extends State<ToggleIcon> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return new GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        setState(() {
-          _currentImageIndex =
-              (_currentImageIndex + 1) % widget.imageList.length;
-        });
-      },
-      child: new Container(
-        width: widget.width,
-        height: widget.height,
-        child: new Center(
-          child: new Image.asset(widget.imageList[_currentImageIndex],
-              fit: BoxFit.cover),
+  Widget build(BuildContext context) => new GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          setState(() {
+            _currentImageIndex =
+                (_currentImageIndex + 1) % widget.imageList.length;
+          });
+        },
+        child: new Container(
+          width: widget.width,
+          height: widget.height,
+          child: new Center(
+            child: new Image.asset(widget.imageList[_currentImageIndex],
+                fit: BoxFit.cover),
+          ),
         ),
-      ),
-    );
-  }
+      );
 }

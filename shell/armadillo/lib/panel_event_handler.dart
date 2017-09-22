@@ -79,8 +79,9 @@ class PanelEventHandler {
     storyCluster.removePreviews();
     _cleanup(context: context, preview: true);
 
-    targetStoryCluster.displayMode = DisplayMode.tabs;
-    targetStoryCluster.focusedStoryId = storyCluster.focusedStoryId;
+    targetStoryCluster
+      ..displayMode = DisplayMode.tabs
+      ..focusedStoryId = storyCluster.focusedStoryId;
 
     final List<Story> storiesToMove = storyCluster.realStories;
 
@@ -89,9 +90,9 @@ class PanelEventHandler {
           target: targetStoryCluster,
         );
 
-    targetStoryCluster.maximizeStoryBars();
-
-    targetStoryCluster.moveStoriesToIndex(storiesToMove, localTargetIndex);
+    targetStoryCluster
+      ..maximizeStoryBars()
+      ..moveStoriesToIndex(storiesToMove, localTargetIndex);
   }
 
   /// Adds the stories of [storyCluster] to the left, spanning the full height.
@@ -546,11 +547,12 @@ class PanelEventHandler {
           withPanel: placeHolderStory.panel);
     });
 
-    // 4. Update displaymode.
-    draggingStoryCluster.displayMode = displayMode;
+    draggingStoryCluster
+      // 4. Update displaymode.
+      ..displayMode = displayMode
 
-    // 5. Normalize sizes.
-    draggingStoryCluster.normalizeSizes();
+      // 5. Normalize sizes.
+      ..normalizeSizes();
   }
 
   void _normalizeSizes() => targetStoryCluster.normalizeSizes();
@@ -625,30 +627,30 @@ class PanelEventHandler {
   }
 
   static List<Story> _getVerticallySortedStories(StoryCluster storyCluster) {
-    List<Story> sortedStories = new List<Story>.from(storyCluster.stories);
-    sortedStories.sort(
-      (Story a, Story b) => a.panel.top < b.panel.top
-          ? -1
-          : a.panel.top > b.panel.top
-              ? 1
-              : a.panel.left < b.panel.left
-                  ? -1
-                  : a.panel.left > b.panel.left ? 1 : 0,
-    );
+    List<Story> sortedStories = new List<Story>.from(storyCluster.stories)
+      ..sort(
+        (Story a, Story b) => a.panel.top < b.panel.top
+            ? -1
+            : a.panel.top > b.panel.top
+                ? 1
+                : a.panel.left < b.panel.left
+                    ? -1
+                    : a.panel.left > b.panel.left ? 1 : 0,
+      );
     return sortedStories;
   }
 
   static List<Story> _getHorizontallySortedStories(StoryCluster storyCluster) {
-    List<Story> sortedStories = new List<Story>.from(storyCluster.stories);
-    sortedStories.sort(
-      (Story a, Story b) => a.panel.left < b.panel.left
-          ? -1
-          : a.panel.left > b.panel.left
-              ? 1
-              : a.panel.top < b.panel.top
-                  ? -1
-                  : a.panel.top > b.panel.top ? 1 : 0,
-    );
+    List<Story> sortedStories = new List<Story>.from(storyCluster.stories)
+      ..sort(
+        (Story a, Story b) => a.panel.left < b.panel.left
+            ? -1
+            : a.panel.left > b.panel.left
+                ? 1
+                : a.panel.top < b.panel.top
+                    ? -1
+                    : a.panel.top > b.panel.top ? 1 : 0,
+      );
     return sortedStories;
   }
 }

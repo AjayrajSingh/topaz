@@ -5,10 +5,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
+import 'suggestion_list.dart';
+
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
-
-import 'suggestion_list.dart';
 
 /// The various device form factors
 enum FormFactor {

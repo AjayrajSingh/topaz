@@ -51,7 +51,7 @@ class SimulatedTransform extends StatefulWidget {
   final Widget child;
 
   /// Constructor.
-  SimulatedTransform({
+  const SimulatedTransform({
     Key key,
     this.initDx: 0.0,
     this.initDy: 0.0,
@@ -84,23 +84,19 @@ class _SimulatedTranslationTransformState
     _dxSimulation = new RK4SpringSimulation(
       initValue: widget.initDx,
       desc: widget.springDescription,
-    );
-    _dxSimulation.target = widget.targetDx;
+    )..target = widget.targetDx;
     _dySimulation = new RK4SpringSimulation(
       initValue: widget.initDy,
       desc: widget.springDescription,
-    );
-    _dySimulation.target = widget.targetDy;
+    )..target = widget.targetDy;
     _scaleSimulation = new RK4SpringSimulation(
       initValue: widget.initScale,
       desc: widget.springDescription,
-    );
-    _scaleSimulation.target = widget.targetScale;
+    )..target = widget.targetScale;
     _opacitySimulation = new RK4SpringSimulation(
       initValue: widget.initOpacity,
       desc: widget.springDescription,
-    );
-    _opacitySimulation.target = widget.targetOpacity;
+    )..target = widget.targetOpacity;
     startTicking();
   }
 

@@ -128,7 +128,6 @@ class PanelDragTargetGenerator {
     OnPanelsEvent onLeaveCluster,
   }) {
     List<LineSegment> targets = <LineSegment>[];
-    targets.clear();
     double verticalMargin = (1.0 - scale) / 2.0 * size.height;
     double horizontalMargin = (1.0 - scale) / 2.0 * size.width;
     double verticalShift = currentDisplayMode == DisplayMode.tabs
@@ -139,178 +138,187 @@ class PanelDragTargetGenerator {
     int availableRows = maxRows(size) - _getCurrentRows(panels: panels);
     if (availableRows > 0) {
       // Top edge target.
-      targets.add(
-        new LineSegment.horizontal(
-          name: 'Top edge target',
-          y: verticalMargin + _kTopEdgeTargetYOffset + verticalShift,
-          left: horizontalMargin + _kStoryEdgeTargetInsetMinDistance,
-          right:
-              size.width - horizontalMargin - _kStoryEdgeTargetInsetMinDistance,
-          color: _kDebugTopEdgeTargetColor,
-          maxStoriesCanAccept: availableRows,
-          validityDistance: kMinPanelHeight,
-          directionallyTargetable: true,
-          onHover: (BuildContext context, StoryCluster storyCluster) =>
-              onAddClusterAbovePanels(
-                context: context,
-                storyCluster: storyCluster,
-                preview: true,
-              ),
-          onDrop: (BuildContext context, StoryCluster storyCluster) =>
-              onAddClusterAbovePanels(
-                context: context,
-                storyCluster: storyCluster,
-                preview: false,
-              ),
-        ),
-      );
+      targets
+        ..add(
+          new LineSegment.horizontal(
+            name: 'Top edge target',
+            y: verticalMargin + _kTopEdgeTargetYOffset + verticalShift,
+            left: horizontalMargin + _kStoryEdgeTargetInsetMinDistance,
+            right: size.width -
+                horizontalMargin -
+                _kStoryEdgeTargetInsetMinDistance,
+            color: _kDebugTopEdgeTargetColor,
+            maxStoriesCanAccept: availableRows,
+            validityDistance: kMinPanelHeight,
+            directionallyTargetable: true,
+            onHover: (BuildContext context, StoryCluster storyCluster) =>
+                onAddClusterAbovePanels(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: true,
+                ),
+            onDrop: (BuildContext context, StoryCluster storyCluster) =>
+                onAddClusterAbovePanels(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: false,
+                ),
+          ),
+        )
 
-      // Bottom edge target.
-      targets.add(
-        new LineSegment.horizontal(
-          name: 'Bottom edge target',
-          y: size.height - verticalMargin,
-          left: horizontalMargin + _kStoryEdgeTargetInsetMinDistance,
-          right:
-              size.width - horizontalMargin - _kStoryEdgeTargetInsetMinDistance,
-          color: _kDebugBottomEdgeTargetColor,
-          maxStoriesCanAccept: availableRows,
-          validityDistance: kMinPanelHeight,
-          directionallyTargetable: true,
-          onHover: (BuildContext context, StoryCluster storyCluster) =>
-              onAddClusterBelowPanels(
-                context: context,
-                storyCluster: storyCluster,
-                preview: true,
-              ),
-          onDrop: (BuildContext context, StoryCluster storyCluster) =>
-              onAddClusterBelowPanels(
-                context: context,
-                storyCluster: storyCluster,
-                preview: false,
-              ),
-        ),
-      );
+        // Bottom edge target.
+        ..add(
+          new LineSegment.horizontal(
+            name: 'Bottom edge target',
+            y: size.height - verticalMargin,
+            left: horizontalMargin + _kStoryEdgeTargetInsetMinDistance,
+            right: size.width -
+                horizontalMargin -
+                _kStoryEdgeTargetInsetMinDistance,
+            color: _kDebugBottomEdgeTargetColor,
+            maxStoriesCanAccept: availableRows,
+            validityDistance: kMinPanelHeight,
+            directionallyTargetable: true,
+            onHover: (BuildContext context, StoryCluster storyCluster) =>
+                onAddClusterBelowPanels(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: true,
+                ),
+            onDrop: (BuildContext context, StoryCluster storyCluster) =>
+                onAddClusterBelowPanels(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: false,
+                ),
+          ),
+        );
     }
 
     // Left edge target.
     int availableColumns =
         maxColumns(size) - _getCurrentColumns(panels: panels);
     if (availableColumns > 0) {
-      targets.add(
-        new LineSegment.vertical(
-          name: 'Left edge target',
-          x: horizontalMargin,
-          top: verticalMargin +
-              _kTopEdgeTargetYOffset +
-              _kStoryEdgeTargetInsetMinDistance +
-              verticalShift,
-          bottom:
-              size.height - verticalMargin - _kStoryEdgeTargetInsetMinDistance,
-          color: _kDebugLeftEdgeTargetColor,
-          maxStoriesCanAccept: availableColumns,
-          validityDistance: kMinPanelWidth,
-          directionallyTargetable: true,
-          onHover: (BuildContext context, StoryCluster storyCluster) =>
-              onAddClusterToLeftOfPanels(
-                context: context,
-                storyCluster: storyCluster,
-                preview: true,
-              ),
-          onDrop: (BuildContext context, StoryCluster storyCluster) =>
-              onAddClusterToLeftOfPanels(
-                context: context,
-                storyCluster: storyCluster,
-                preview: false,
-              ),
-        ),
-      );
+      targets
+        ..add(
+          new LineSegment.vertical(
+            name: 'Left edge target',
+            x: horizontalMargin,
+            top: verticalMargin +
+                _kTopEdgeTargetYOffset +
+                _kStoryEdgeTargetInsetMinDistance +
+                verticalShift,
+            bottom: size.height -
+                verticalMargin -
+                _kStoryEdgeTargetInsetMinDistance,
+            color: _kDebugLeftEdgeTargetColor,
+            maxStoriesCanAccept: availableColumns,
+            validityDistance: kMinPanelWidth,
+            directionallyTargetable: true,
+            onHover: (BuildContext context, StoryCluster storyCluster) =>
+                onAddClusterToLeftOfPanels(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: true,
+                ),
+            onDrop: (BuildContext context, StoryCluster storyCluster) =>
+                onAddClusterToLeftOfPanels(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: false,
+                ),
+          ),
+        )
 
-      // Right edge target.
-      targets.add(
-        new LineSegment.vertical(
-          name: 'Right edge target',
-          x: size.width - horizontalMargin,
-          top: verticalMargin +
-              _kTopEdgeTargetYOffset +
-              _kStoryEdgeTargetInsetMinDistance +
-              verticalShift,
-          bottom:
-              size.height - verticalMargin - _kStoryEdgeTargetInsetMinDistance,
-          color: _kDebugRightEdgeTargetColor,
-          maxStoriesCanAccept: availableColumns,
-          validityDistance: kMinPanelWidth,
-          directionallyTargetable: true,
-          onHover: (BuildContext context, StoryCluster storyCluster) =>
-              onAddClusterToRightOfPanels(
-                context: context,
-                storyCluster: storyCluster,
-                preview: true,
-              ),
-          onDrop: (BuildContext context, StoryCluster storyCluster) =>
-              onAddClusterToRightOfPanels(
-                context: context,
-                storyCluster: storyCluster,
-                preview: false,
-              ),
-        ),
-      );
+        // Right edge target.
+        ..add(
+          new LineSegment.vertical(
+            name: 'Right edge target',
+            x: size.width - horizontalMargin,
+            top: verticalMargin +
+                _kTopEdgeTargetYOffset +
+                _kStoryEdgeTargetInsetMinDistance +
+                verticalShift,
+            bottom: size.height -
+                verticalMargin -
+                _kStoryEdgeTargetInsetMinDistance,
+            color: _kDebugRightEdgeTargetColor,
+            maxStoriesCanAccept: availableColumns,
+            validityDistance: kMinPanelWidth,
+            directionallyTargetable: true,
+            onHover: (BuildContext context, StoryCluster storyCluster) =>
+                onAddClusterToRightOfPanels(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: true,
+                ),
+            onDrop: (BuildContext context, StoryCluster storyCluster) =>
+                onAddClusterToRightOfPanels(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: false,
+                ),
+          ),
+        );
     }
 
     if (!inTimeline) {
       // Left return-to-timeline target.
-      targets.add(
-        new LineSegment.vertical(
-          name: 'Left return-to-timeline target',
-          initiallyTargetable: false,
-          x: verticalMargin + _kDiscardTargetHorizontalEdgeOffset,
-          top: 0.0,
-          bottom: size.height,
-          color: _kDebugDiscardTargetColor,
-          validityDistance:
-              verticalMargin + _kDiscardTargetHorizontalEdgeOffset,
-          maxStoriesCanAccept: maxStories,
-          onHover: (BuildContext context, StoryCluster storyCluster) =>
-              onLeaveCluster(
-                context: context,
-                storyCluster: storyCluster,
-                preview: true,
-              ),
-          onDrop: (BuildContext context, StoryCluster storyCluster) =>
-              onLeaveCluster(
-                context: context,
-                storyCluster: storyCluster,
-                preview: false,
-              ),
-        ),
-      );
+      targets
+        ..add(
+          new LineSegment.vertical(
+            name: 'Left return-to-timeline target',
+            initiallyTargetable: false,
+            x: verticalMargin + _kDiscardTargetHorizontalEdgeOffset,
+            top: 0.0,
+            bottom: size.height,
+            color: _kDebugDiscardTargetColor,
+            validityDistance:
+                verticalMargin + _kDiscardTargetHorizontalEdgeOffset,
+            maxStoriesCanAccept: maxStories,
+            onHover: (BuildContext context, StoryCluster storyCluster) =>
+                onLeaveCluster(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: true,
+                ),
+            onDrop: (BuildContext context, StoryCluster storyCluster) =>
+                onLeaveCluster(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: false,
+                ),
+          ),
+        )
 
-      // Right return-to-timeline target.
-      targets.add(
-        new LineSegment.vertical(
-          name: 'Right return-to-timeline target',
-          initiallyTargetable: false,
-          x: size.width - verticalMargin - _kDiscardTargetHorizontalEdgeOffset,
-          top: 0.0,
-          bottom: size.height,
-          color: _kDebugBringToFrontTargetColor,
-          validityDistance:
-              verticalMargin + _kDiscardTargetHorizontalEdgeOffset,
-          maxStoriesCanAccept: maxStories,
-          onHover: (BuildContext context, StoryCluster storyCluster) =>
-              onLeaveCluster(
-                context: context,
-                storyCluster: storyCluster,
-                preview: true,
-              ),
-          onDrop: (BuildContext context, StoryCluster storyCluster) =>
-              onLeaveCluster(
-                context: context,
-                storyCluster: storyCluster,
-                preview: false,
-              ),
-        ),
-      );
+        // Right return-to-timeline target.
+        ..add(
+          new LineSegment.vertical(
+            name: 'Right return-to-timeline target',
+            initiallyTargetable: false,
+            x: size.width -
+                verticalMargin -
+                _kDiscardTargetHorizontalEdgeOffset,
+            top: 0.0,
+            bottom: size.height,
+            color: _kDebugBringToFrontTargetColor,
+            validityDistance:
+                verticalMargin + _kDiscardTargetHorizontalEdgeOffset,
+            maxStoriesCanAccept: maxStories,
+            onHover: (BuildContext context, StoryCluster storyCluster) =>
+                onLeaveCluster(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: true,
+                ),
+            onDrop: (BuildContext context, StoryCluster storyCluster) =>
+                onLeaveCluster(
+                  context: context,
+                  storyCluster: storyCluster,
+                  preview: false,
+                ),
+          ),
+        );
     }
 
     // Story Bar targets.
@@ -369,60 +377,61 @@ class PanelDragTargetGenerator {
             _kStoryEdgeTargetInset;
 
         // Add left target.
-        targets.add(
-          new LineSegment.vertical(
-            name: 'Add left target $storyId',
-            x: left,
-            top: top,
-            bottom: bottom,
-            color: _kDebugLeftStoryEdgeTargetColor,
-            maxStoriesCanAccept: verticalSplits,
-            validityDistance: kMinPanelWidth,
-            directionallyTargetable: true,
-            onHover: (BuildContext context, StoryCluster storyCluster) =>
-                onAddClusterToLeftOfPanel(
-                  context: context,
-                  storyCluster: storyCluster,
-                  storyId: storyId,
-                  preview: true,
-                ),
-            onDrop: (BuildContext context, StoryCluster storyCluster) =>
-                onAddClusterToLeftOfPanel(
-                  context: context,
-                  storyCluster: storyCluster,
-                  storyId: storyId,
-                  preview: false,
-                ),
-          ),
-        );
+        targets
+          ..add(
+            new LineSegment.vertical(
+              name: 'Add left target $storyId',
+              x: left,
+              top: top,
+              bottom: bottom,
+              color: _kDebugLeftStoryEdgeTargetColor,
+              maxStoriesCanAccept: verticalSplits,
+              validityDistance: kMinPanelWidth,
+              directionallyTargetable: true,
+              onHover: (BuildContext context, StoryCluster storyCluster) =>
+                  onAddClusterToLeftOfPanel(
+                    context: context,
+                    storyCluster: storyCluster,
+                    storyId: storyId,
+                    preview: true,
+                  ),
+              onDrop: (BuildContext context, StoryCluster storyCluster) =>
+                  onAddClusterToLeftOfPanel(
+                    context: context,
+                    storyCluster: storyCluster,
+                    storyId: storyId,
+                    preview: false,
+                  ),
+            ),
+          )
 
-        // Add right target.
-        targets.add(
-          new LineSegment.vertical(
-            name: 'Add right target $storyId',
-            x: right,
-            top: top,
-            bottom: bottom,
-            color: _kDebugRightStoryEdgeTargetColor,
-            maxStoriesCanAccept: verticalSplits,
-            validityDistance: kMinPanelWidth,
-            directionallyTargetable: true,
-            onHover: (BuildContext context, StoryCluster storyCluster) =>
-                onAddClusterToRightOfPanel(
-                  context: context,
-                  storyCluster: storyCluster,
-                  storyId: storyId,
-                  preview: true,
-                ),
-            onDrop: (BuildContext context, StoryCluster storyCluster) =>
-                onAddClusterToRightOfPanel(
-                  context: context,
-                  storyCluster: storyCluster,
-                  storyId: storyId,
-                  preview: false,
-                ),
-          ),
-        );
+          // Add right target.
+          ..add(
+            new LineSegment.vertical(
+              name: 'Add right target $storyId',
+              x: right,
+              top: top,
+              bottom: bottom,
+              color: _kDebugRightStoryEdgeTargetColor,
+              maxStoriesCanAccept: verticalSplits,
+              validityDistance: kMinPanelWidth,
+              directionallyTargetable: true,
+              onHover: (BuildContext context, StoryCluster storyCluster) =>
+                  onAddClusterToRightOfPanel(
+                    context: context,
+                    storyCluster: storyCluster,
+                    storyId: storyId,
+                    preview: true,
+                  ),
+              onDrop: (BuildContext context, StoryCluster storyCluster) =>
+                  onAddClusterToRightOfPanel(
+                    context: context,
+                    storyCluster: storyCluster,
+                    storyId: storyId,
+                    preview: false,
+                  ),
+            ),
+          );
       }
 
       // If we can split horizontally add horizontal targets on top and bottom.
@@ -441,60 +450,61 @@ class PanelDragTargetGenerator {
         double bottom = bounds.bottom - _kStoryEdgeTargetInset;
 
         // Add top target.
-        targets.add(
-          new LineSegment.horizontal(
-            name: 'Add top target $storyId',
-            y: top,
-            left: left,
-            right: right,
-            color: _kDebugTopStoryEdgeTargetColor,
-            maxStoriesCanAccept: horizontalSplits,
-            validityDistance: kMinPanelHeight,
-            directionallyTargetable: true,
-            onHover: (BuildContext context, StoryCluster storyCluster) =>
-                onAddClusterAbovePanel(
-                  context: context,
-                  storyCluster: storyCluster,
-                  storyId: storyId,
-                  preview: true,
-                ),
-            onDrop: (BuildContext context, StoryCluster storyCluster) =>
-                onAddClusterAbovePanel(
-                  context: context,
-                  storyCluster: storyCluster,
-                  storyId: storyId,
-                  preview: false,
-                ),
-          ),
-        );
+        targets
+          ..add(
+            new LineSegment.horizontal(
+              name: 'Add top target $storyId',
+              y: top,
+              left: left,
+              right: right,
+              color: _kDebugTopStoryEdgeTargetColor,
+              maxStoriesCanAccept: horizontalSplits,
+              validityDistance: kMinPanelHeight,
+              directionallyTargetable: true,
+              onHover: (BuildContext context, StoryCluster storyCluster) =>
+                  onAddClusterAbovePanel(
+                    context: context,
+                    storyCluster: storyCluster,
+                    storyId: storyId,
+                    preview: true,
+                  ),
+              onDrop: (BuildContext context, StoryCluster storyCluster) =>
+                  onAddClusterAbovePanel(
+                    context: context,
+                    storyCluster: storyCluster,
+                    storyId: storyId,
+                    preview: false,
+                  ),
+            ),
+          )
 
-        // Add bottom target.
-        targets.add(
-          new LineSegment.horizontal(
-            name: 'Add bottom target $storyId',
-            y: bottom,
-            left: left,
-            right: right,
-            color: _kDebugBottomStoryEdgeTargetColor,
-            maxStoriesCanAccept: horizontalSplits,
-            validityDistance: kMinPanelHeight,
-            directionallyTargetable: true,
-            onHover: (BuildContext context, StoryCluster storyCluster) =>
-                onAddClusterBelowPanel(
-                  context: context,
-                  storyCluster: storyCluster,
-                  storyId: storyId,
-                  preview: true,
-                ),
-            onDrop: (BuildContext context, StoryCluster storyCluster) =>
-                onAddClusterBelowPanel(
-                  context: context,
-                  storyCluster: storyCluster,
-                  storyId: storyId,
-                  preview: false,
-                ),
-          ),
-        );
+          // Add bottom target.
+          ..add(
+            new LineSegment.horizontal(
+              name: 'Add bottom target $storyId',
+              y: bottom,
+              left: left,
+              right: right,
+              color: _kDebugBottomStoryEdgeTargetColor,
+              maxStoriesCanAccept: horizontalSplits,
+              validityDistance: kMinPanelHeight,
+              directionallyTargetable: true,
+              onHover: (BuildContext context, StoryCluster storyCluster) =>
+                  onAddClusterBelowPanel(
+                    context: context,
+                    storyCluster: storyCluster,
+                    storyId: storyId,
+                    preview: true,
+                  ),
+              onDrop: (BuildContext context, StoryCluster storyCluster) =>
+                  onAddClusterBelowPanel(
+                    context: context,
+                    storyCluster: storyCluster,
+                    storyId: storyId,
+                    preview: false,
+                  ),
+            ),
+          );
       }
     });
 

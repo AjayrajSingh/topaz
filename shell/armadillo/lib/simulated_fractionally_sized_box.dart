@@ -23,7 +23,7 @@ class SimulatedFractionallySizedBox extends StatefulWidget {
   final Widget child;
 
   /// Construuctor.
-  SimulatedFractionallySizedBox({
+  const SimulatedFractionallySizedBox({
     Key key,
     this.alignment,
     this.heightFactor,

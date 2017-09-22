@@ -36,7 +36,7 @@ class StoryBar extends StatefulWidget {
   final BorderRadius borderRadius;
 
   /// Constructor.
-  StoryBar({
+  const StoryBar({
     Key key,
     this.story,
     this.showTitleOnly: _kShowTitleOnly,
@@ -87,7 +87,7 @@ class _StoryBarState extends State<StoryBar> {
       new Container(
         color: widget.story.themeColor,
         height: heightValue - focusValue,
-        padding: new EdgeInsets.symmetric(horizontal: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
         margin: new EdgeInsets.only(bottom: focusValue),
         child: new OverflowBox(
           minHeight: SizeModel.kStoryBarMaximizedHeight,

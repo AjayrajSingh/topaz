@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
 
 import 'armadillo_overlay.dart';
 import 'display_mode.dart';
@@ -42,22 +43,21 @@ class StoryClusterDragFeedback extends StatefulWidget {
   final double initDx;
 
   /// Constructor.
-  StoryClusterDragFeedback({
+  const StoryClusterDragFeedback({
     Key key,
-    this.overlayKey,
-    this.storyCluster,
-    this.storyWidgets,
-    this.localDragStartPoint,
-    this.initialSize,
+    @required this.overlayKey,
+    @required this.storyCluster,
+    @required this.storyWidgets,
+    @required this.localDragStartPoint,
+    @required this.initialSize,
     this.initDx: 0.0,
   })
-      : super(key: key) {
-    assert(overlayKey != null);
-    assert(storyCluster != null);
-    assert(storyWidgets != null);
-    assert(localDragStartPoint != null);
-    assert(initialSize != null);
-  }
+      : assert(overlayKey != null),
+        assert(storyCluster != null),
+        assert(storyWidgets != null),
+        assert(localDragStartPoint != null),
+        assert(initialSize != null),
+        super(key: key);
 
   @override
   StoryClusterDragFeedbackState createState() =>
@@ -78,8 +78,8 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
   @override
   void initState() {
     super.initState();
-    _storyClusterDragStateModel = StoryClusterDragStateModel.of(context);
-    _storyClusterDragStateModel.addListener(_updateStoryBars);
+    _storyClusterDragStateModel = StoryClusterDragStateModel.of(context)
+      ..addListener(_updateStoryBars);
 
     // Store off original stories and display state and on change to
     // isAccepted, revert to initial story locations and

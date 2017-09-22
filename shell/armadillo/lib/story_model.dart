@@ -58,11 +58,9 @@ class StoryModel extends Model {
     // Update indicies
     for (int i = 0; i < _storyClusters.length; i++) {
       StoryCluster storyCluster = _storyClusters[i];
-      storyCluster.stories.forEach(
-        (Story story) {
-          story.clusterIndex = i;
-        },
-      );
+      for (Story story in storyCluster.stories) {
+        story.clusterIndex = i;
+      }
     }
 
     super.notifyListeners();
@@ -113,7 +111,7 @@ class StoryModel extends Model {
         .length;
 
     int delayMultiple = 0;
-    _storyClusters.forEach((StoryCluster storyCluster) {
+    for (StoryCluster storyCluster in _storyClusters) {
       if (storyCluster.storyClusterEntranceTransitionModel.value == 0.0) {
         storyCluster.storyClusterEntranceTransitionModel.reset(
           delay:
@@ -122,7 +120,7 @@ class StoryModel extends Model {
         );
         delayMultiple++;
       }
-    });
+    }
   }
 
   /// Updates the [Story.lastInteraction] of [storyCluster] to be [DateTime.now].
@@ -145,14 +143,15 @@ class StoryModel extends Model {
   void randomizeStoryTimes() {
     math.Random random = new math.Random();
     DateTime storyInteractionTime = new DateTime.now();
-    _storyClusters.forEach((StoryCluster storyCluster) {
+    for (StoryCluster storyCluster in _storyClusters) {
       storyInteractionTime = storyInteractionTime.subtract(
           new Duration(minutes: math.max(0, random.nextInt(100) - 70)));
       Duration interaction = new Duration(minutes: random.nextInt(60));
-      storyCluster.lastInteraction = storyInteractionTime;
-      storyCluster.cumulativeInteractionDuration = interaction;
+      storyCluster
+        ..lastInteraction = storyInteractionTime
+        ..cumulativeInteractionDuration = interaction;
       storyInteractionTime = storyInteractionTime.subtract(interaction);
-    });
+    }
     updateLayouts(_lastLayoutSize);
     notifyListeners();
   }
@@ -165,9 +164,10 @@ class StoryModel extends Model {
       Story sourceStory = source.stories[i];
       Story largestStory = _getLargestStory(target.stories);
       largestStory.panel.split((Panel a, Panel b) {
-        target.replace(panel: largestStory.panel, withPanel: a);
-        target.add(story: sourceStory, withPanel: b);
-        target.normalizeSizes();
+        target
+          ..replace(panel: largestStory.panel, withPanel: a)
+          ..add(story: sourceStory, withPanel: b)
+          ..normalizeSizes();
       });
       if (!largestStory.panel.canBeSplitVertically(_lastLayoutSize.width) &&
           !largestStory.panel.canBeSplitHorizontally(_lastLayoutSize.height)) {
@@ -239,13 +239,13 @@ class StoryModel extends Model {
   Story _getLargestStory(List<Story> stories) {
     double largestSize = -0.0;
     Story largestStory;
-    stories.forEach((Story story) {
+    for (Story story in stories) {
       double storySize = story.panel.sizeFactor;
       if (storySize > largestSize) {
         largestSize = storySize;
         largestStory = story;
       }
-    });
+    }
     return largestStory;
   }
 }

@@ -42,7 +42,7 @@ class PeekingOverlay extends StatefulWidget {
   final VoidCallback onShow;
 
   /// Constructor.
-  PeekingOverlay({
+  const PeekingOverlay({
     Key key,
     this.peekHeight: _kStartOverlayTransitionHeight,
     this.dragHandleHeight,
@@ -221,15 +221,14 @@ class _HorizontalExpandingBox extends StatefulWidget {
   final Widget child;
 
   /// Constructor
-  _HorizontalExpandingBox({
+  const _HorizontalExpandingBox({
     @required this.height,
     @required this.width,
     @required this.child,
-  }) {
-    assert(height != null);
-    assert(width != null);
-    assert(child != null);
-  }
+  })
+      : assert(height != null),
+        assert(width != null),
+        assert(child != null);
 
   @override
   _HorizontalExpandingBoxState createState() =>

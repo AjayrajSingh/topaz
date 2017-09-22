@@ -26,7 +26,7 @@ void main() {
         key: childKey,
         width: 100.0,
         height: 100.0,
-        color: new Color(0xFFFFFF00),
+        color: const Color(0xFFFFFF00),
       ),
       feedbackBuilder: (
         Offset localDragStartPoint,
@@ -37,7 +37,7 @@ void main() {
         key: childWhenDraggingKey,
         width: 100.0,
         height: 100.0,
-        color: new Color(0xFFFFFF00),
+        color: const Color(0xFFFFFF00),
       ),
       onDragStarted: () {
         ongoingDrags++;
@@ -128,7 +128,7 @@ void main() {
       child: new Container(
         width: 100.0,
         height: 100.0,
-        color: new Color(0xFFFFFF00),
+        color: const Color(0xFFFFFF00),
       ),
       feedbackBuilder: (
         Offset localDragStartPoint,
@@ -138,7 +138,7 @@ void main() {
       childWhenDragging: new Container(
         width: 100.0,
         height: 100.0,
-        color: new Color(0xFFFFFF00),
+        color: const Color(0xFFFFFF00),
       ),
       onDragStarted: () {
         ongoingDrags++;
@@ -212,7 +212,7 @@ void main() {
       child: new Container(
         width: 100.0,
         height: 100.0,
-        color: new Color(0xFFFFFF00),
+        color: const Color(0xFFFFFF00),
       ),
       feedbackBuilder: (
         Offset localDragStartPoint,
@@ -243,7 +243,7 @@ void main() {
         return new Container(
           width: 100.0,
           height: 100.0,
-          color: new Color(0xFFFFFF00),
+          color: const Color(0xFFFFFF00),
         );
       },
     );
@@ -271,7 +271,7 @@ void main() {
         return new Container(
           width: 100.0,
           height: 100.0,
-          color: new Color(0xFFFFFF00),
+          color: const Color(0xFFFFFF00),
         );
       },
     );
@@ -362,7 +362,7 @@ void main() {
       child: new Container(
         width: 100.0,
         height: 100.0,
-        color: new Color(0xFFFFFF00),
+        color: const Color(0xFFFFFF00),
       ),
       feedbackBuilder: (
         Offset localDragStartPoint,

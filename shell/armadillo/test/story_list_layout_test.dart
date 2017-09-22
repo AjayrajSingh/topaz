@@ -113,7 +113,7 @@ final List<Story> _kDummyStories = <Story>[
   ),
 ];
 
-final Size _k1280x900Size = new Size(1280.0, 800.0);
+final Size _k1280x900Size = const Size(1280.0, 800.0);
 final List<Rect> _kExpectedRectsFor1280x800 = <Rect>[
   new Rect.fromLTWH(-480.0, -192.0, 240.0, 150.0),
   new Rect.fromLTWH(-192.0, -192.0, 336.0, 210.0),
@@ -141,7 +141,7 @@ final List<Rect> _kExpectedRectsFor1280x800 = <Rect>[
   new Rect.fromLTWH(0.0, -2592.0, 240.0, 150.0),
 ];
 
-final Size _k360x640Size = new Size(360.0, 640.0);
+final Size _k360x640Size = const Size(360.0, 640.0);
 final List<Rect> _kExpectedRectsFor360x640 = <Rect>[
   new Rect.fromLTWH(-172.0, -155.5, 344.0, 107.5),
   new Rect.fromLTWH(-172.0, -311.0, 344.0, 107.5),
@@ -171,7 +171,7 @@ final List<Rect> _kExpectedRectsFor360x640 = <Rect>[
 
 void main() {
   test('Single column, null stories in, no stories out.', () {
-    Size size = new Size(100.0, 100.0);
+    Size size = const Size(100.0, 100.0);
     StoryListLayout layout = new StoryListLayout(size: size);
     List<StoryLayout> stories = layout.layout(
       storyClustersToLayout: null,
@@ -181,7 +181,7 @@ void main() {
   });
 
   test('Multi column, null stories in, no stories out.', () {
-    Size size = new Size(1000.0, 100.0);
+    Size size = const Size(1000.0, 100.0);
     StoryListLayout layout = new StoryListLayout(size: size);
     List<StoryLayout> stories = layout.layout(
       storyClustersToLayout: null,
@@ -191,7 +191,7 @@ void main() {
   });
 
   test('Single column, no stories in, no stories out.', () {
-    Size size = new Size(100.0, 100.0);
+    Size size = const Size(100.0, 100.0);
     StoryListLayout layout = new StoryListLayout(size: size);
     List<StoryLayout> stories = layout.layout(
       storyClustersToLayout: <StoryCluster>[],
@@ -201,7 +201,7 @@ void main() {
   });
 
   test('Multi column, no stories in, no stories out.', () {
-    Size size = new Size(1000.0, 100.0);
+    Size size = const Size(1000.0, 100.0);
     StoryListLayout layout = new StoryListLayout(size: size);
     List<StoryLayout> stories = layout.layout(
       storyClustersToLayout: <StoryCluster>[],
@@ -229,12 +229,12 @@ void main() {
       expect(
         bounds.width,
         equals(_kExpectedRectsFor360x640[i].width),
-        reason: "Story $i has incorrect width!",
+        reason: 'Story $i has incorrect width!',
       );
       expect(
         bounds.height,
         equals(_kExpectedRectsFor360x640[i].height),
-        reason: "Story $i has incorrect height!",
+        reason: 'Story $i has incorrect height!',
       );
     }
     for (int i = 0; i < stories.length; i++) {
@@ -242,12 +242,12 @@ void main() {
       expect(
         bounds.left,
         equals(_kExpectedRectsFor360x640[i].left),
-        reason: "Story $i has incorrect left!",
+        reason: 'Story $i has incorrect left!',
       );
       expect(
         bounds.top,
         equals(_kExpectedRectsFor360x640[i].top),
-        reason: "Story $i has incorrect top!",
+        reason: 'Story $i has incorrect top!',
       );
     }
   });
@@ -271,12 +271,12 @@ void main() {
       expect(
         bounds.width,
         equals(_kExpectedRectsFor1280x800[i].width),
-        reason: "Story $i has incorrect width!",
+        reason: 'Story $i has incorrect width!',
       );
       expect(
         bounds.height,
         equals(_kExpectedRectsFor1280x800[i].height),
-        reason: "Story $i has incorrect height!",
+        reason: 'Story $i has incorrect height!',
       );
     }
     for (int i = 0; i < stories.length; i++) {
@@ -284,12 +284,12 @@ void main() {
       expect(
         bounds.left,
         equals(_kExpectedRectsFor1280x800[i].left),
-        reason: "Story $i has incorrect left!",
+        reason: 'Story $i has incorrect left!',
       );
       expect(
         bounds.top,
         equals(_kExpectedRectsFor1280x800[i].top),
-        reason: "Story $i has incorrect top!",
+        reason: 'Story $i has incorrect top!',
       );
     }
   });

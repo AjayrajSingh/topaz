@@ -43,7 +43,7 @@ class ImportantInfo extends StatelessWidget {
   final Color textColor;
 
   /// Constructor
-  ImportantInfo({
+  const ImportantInfo({
     Key key,
     this.textColor,
   })
@@ -61,10 +61,7 @@ class ImportantInfo extends StatelessWidget {
                       Widget child,
                       PowerModel powerModel,
                     ) {
-                      List<LayoutId> children = <LayoutId>[];
-
-                      children
-                        ..addAll(<LayoutId>[
+                      List<LayoutId> children = <LayoutId>[]..addAll(<LayoutId>[
                           new LayoutId(
                             id: _ImportantInfoLayoutDelegateParts.batteryIcon,
                             child: powerModel.hasBattery
@@ -126,7 +123,7 @@ class _ImportantInfoLayoutDelegate extends MultiChildLayoutDelegate {
       Size wifiIconSize = layoutChild(
         _ImportantInfoLayoutDelegateParts.wifiIcon,
         new BoxConstraints.loose(size).deflate(
-          new EdgeInsets.only(left: _kUserSpacing),
+          const EdgeInsets.only(left: _kUserSpacing),
         ),
       );
 
@@ -209,7 +206,7 @@ class _ImportantInfoLayoutDelegate extends MultiChildLayoutDelegate {
       Size batteryIconSize = layoutChild(
         _ImportantInfoLayoutDelegateParts.batteryIcon,
         new BoxConstraints.loose(size).deflate(
-          new EdgeInsets.only(
+          const EdgeInsets.only(
             left: _kEdgeSpacing + _kUserSpacing / 2.0,
           ),
         ),

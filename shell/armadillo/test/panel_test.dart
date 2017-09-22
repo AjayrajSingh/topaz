@@ -74,18 +74,18 @@ void main() {
     });
   });
   test('maxRows', () {
-    expect(maxRows(new Size(0.0, 0.0)), 1);
-    expect(maxRows(new Size(1600.0, 900.0)), 2);
-    expect(maxRows(new Size(1600.0, 450.0)), 1);
-    expect(maxRows(new Size(1600.0, 9000.0)), 3);
-    expect(maxRows(new Size(16000.0, 9000.0)), 2);
+    expect(maxRows(const Size(0.0, 0.0)), 1);
+    expect(maxRows(const Size(1600.0, 900.0)), 2);
+    expect(maxRows(const Size(1600.0, 450.0)), 1);
+    expect(maxRows(const Size(1600.0, 9000.0)), 3);
+    expect(maxRows(const Size(16000.0, 9000.0)), 2);
   });
   test('maxColumns', () {
-    expect(maxColumns(new Size(0.0, 0.0)), 1);
-    expect(maxColumns(new Size(1600.0, 900.0)), 3);
-    expect(maxColumns(new Size(800.0, 600.0)), 2);
-    expect(maxColumns(new Size(1600.0, 9000.0)), 2);
-    expect(maxColumns(new Size(16000.0, 9000.0)), 3);
+    expect(maxColumns(const Size(0.0, 0.0)), 1);
+    expect(maxColumns(const Size(1600.0, 900.0)), 3);
+    expect(maxColumns(const Size(800.0, 600.0)), 2);
+    expect(maxColumns(const Size(1600.0, 9000.0)), 2);
+    expect(maxColumns(const Size(16000.0, 9000.0)), 3);
   });
   test('toGridValue', () {
     expect(toGridValue(1.0), 1.0);
@@ -95,7 +95,7 @@ void main() {
     expect(toGridValue(0.0), 0.0);
   });
   test('canBeSplitVertically and smallestWidthFactor', () {
-    Size size = new Size(1000.0, 1000.0);
+    Size size = const Size(1000.0, 1000.0);
     double smallest = smallestWidthFactor(size.width);
 
     expect(
@@ -114,7 +114,7 @@ void main() {
     );
   });
   test('canBeSplitHorizontally and smallestHeightFactor', () {
-    Size size = new Size(1000.0, 1000.0);
+    Size size = const Size(1000.0, 1000.0);
     double smallest = smallestHeightFactor(size.width);
 
     expect(

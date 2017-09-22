@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
 
 import 'display_mode.dart';
 import 'panel.dart';
@@ -30,15 +31,14 @@ class StoryFullSizeSimulatedSizedBox extends StatelessWidget {
   final double storyBarMaximizedHeight;
 
   /// Constructor.
-  StoryFullSizeSimulatedSizedBox({
+  const StoryFullSizeSimulatedSizedBox({
+    @required this.child,
     this.displayMode,
     this.panel,
     this.containerKey,
     this.storyBarMaximizedHeight,
-    this.child,
-  }) {
-    assert(child != null);
-  }
+  })
+      : assert(child != null);
 
   @override
   Widget build(BuildContext context) => new ScopedModelDescendant<SizeModel>(

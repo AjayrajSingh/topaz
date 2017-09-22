@@ -110,12 +110,12 @@ class _DummyStoryModel extends StoryModel {
         (int index) => new StoryCluster(
               stories: <Story>[
                 new Story(
-                  id: new StoryId(storyKeys[index]),
+                  id: new StoryId('${storyKeys[index]}'),
                   builder: (_) => new Container(key: storyKeys[index]),
                   title: '',
                   lastInteraction: new DateTime.now(),
                   cumulativeInteractionDuration: const Duration(minutes: 5),
-                  themeColor: new Color(0xFFFFFFFF),
+                  themeColor: const Color(0xFFFFFFFF),
                 ),
               ],
               storyLayout: new _DummyStoryLayout(),
@@ -125,7 +125,7 @@ class _DummyStoryModel extends StoryModel {
 
 class _DummyStoryLayout extends StoryLayout {
   @override
-  Size get size => new Size(200.0, 200.0);
+  Size get size => const Size(200.0, 200.0);
 
   @override
   Offset get offset => Offset.zero;

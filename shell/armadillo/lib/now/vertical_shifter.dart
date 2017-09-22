@@ -16,7 +16,8 @@ class VerticalShifter extends StatelessWidget {
   final Widget child;
 
   /// Constructor.
-  VerticalShifter({Key key, this.verticalShift, this.child}) : super(key: key);
+  const VerticalShifter({Key key, this.verticalShift, this.child})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) =>

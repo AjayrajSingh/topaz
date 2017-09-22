@@ -15,7 +15,7 @@ class DebugEnabler extends StatelessWidget {
   final Widget child;
 
   /// Constructor.
-  DebugEnabler({this.debugModel, this.child});
+  const DebugEnabler({this.debugModel, this.child});
 
   @override
   Widget build(BuildContext context) => new Stack(

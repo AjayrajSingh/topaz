@@ -61,7 +61,7 @@ class SuggestionList extends StatefulWidget {
   final FocusNode askFocusNode;
 
   /// Constructor.
-  SuggestionList({
+  const SuggestionList({
     Key key,
     this.scrollController,
     this.onAskingStarted,
@@ -153,14 +153,15 @@ class SuggestionListState extends State<SuggestionList>
           SuggestionModel suggestionModel,
         ) {
           _lastBuildTime = new DateTime.now();
-          _fadeInAnimation.value = 0.0;
-          _fadeInAnimation.forward();
+          _fadeInAnimation
+            ..value = 0.0
+            ..forward();
           List<Suggestion> suggestions = suggestionModel.asking
               ? suggestionModel.askSuggestions
               : suggestionModel.nextSuggestions;
           return new Container(
             color: const Color(0xFFDBE2E5),
-            padding: new EdgeInsets.only(top: 32.0),
+            padding: const EdgeInsets.only(top: 32.0),
             child: new CustomScrollView(
               controller: widget.scrollController,
               slivers: <Widget>[
@@ -267,7 +268,7 @@ class SuggestionListState extends State<SuggestionList>
                 child: new Material(
                   color: Colors.transparent,
                   child: new TextField(
-                    decoration: new InputDecoration(hideDivider: true),
+                    decoration: const InputDecoration(hideDivider: true),
                     style: new TextStyle(
                       fontSize: 16.0,
                       color: Colors.grey[600],
@@ -366,7 +367,7 @@ class _SuggestionListSliverGridLayout extends SliverGridLayout {
   final double width;
   final TextDirection textDirection;
 
-  _SuggestionListSliverGridLayout({
+  const _SuggestionListSliverGridLayout({
     this.suggestions,
     this.width,
     this.textDirection,
@@ -386,7 +387,7 @@ class _SuggestionListSliverGridLayout extends SliverGridLayout {
   @override
   SliverGridGeometry getGeometryForChildIndex(int index) {
     if (index < 0 || index >= suggestions.length) {
-      return new SliverGridGeometry(
+      return const SliverGridGeometry(
         scrollOffset: 0.0,
         crossAxisOffset: 0.0,
         mainAxisExtent: 0.0,

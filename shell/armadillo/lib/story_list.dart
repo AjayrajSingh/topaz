@@ -51,7 +51,7 @@ class StoryList extends StatelessWidget {
   final VoidCallback onStoryClusterVerticalEdgeHover;
 
   /// Constructor.
-  StoryList({
+  const StoryList({
     Key key,
     this.scrollController,
     this.overlayKey,
@@ -273,11 +273,11 @@ class StoryList extends StatelessWidget {
     StoryCluster storyCluster,
   ) {
     // Defocus any focused stories.
-    storyClusters.forEach((StoryCluster s) {
+    for (StoryCluster s in storyClusters) {
       if (_inFocus(s)) {
         s.unFocus();
       }
-    });
+    }
 
     // Bring tapped story into focus.
     storyCluster.focusModel.target = 1.0;
@@ -399,7 +399,7 @@ class _StoryListChild extends ParentDataWidget<_StoryListBody> {
   final double _inlinePreviewHintScaleProgress;
   final double _entranceTransitionProgress;
 
-  _StoryListChild({
+  const _StoryListChild({
     Widget child,
     StoryLayout storyLayout,
     double focusProgress,
@@ -417,7 +417,10 @@ class _StoryListChild extends ParentDataWidget<_StoryListBody> {
   @override
   void applyParentData(RenderObject renderObject) {
     assert(renderObject.parentData is StoryListBodyParentData);
-    final StoryListBodyParentData parentData = renderObject.parentData;
+    _setParentData(renderObject.parentData);
+  }
+
+  void _setParentData(StoryListBodyParentData parentData) {
     parentData
       ..storyLayout = _storyLayout
       ..focusProgress = _focusProgress
@@ -429,35 +432,36 @@ class _StoryListChild extends ParentDataWidget<_StoryListBody> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(
-      new DiagnosticsProperty<StoryLayout>(
-        'storyLayout',
-        _storyLayout,
-      ),
-    );
-    description.add(
-      new DoubleProperty(
-        'focusProgress',
-        _focusProgress,
-      ),
-    );
-    description.add(
-      new DoubleProperty(
-        'inlinePreviewScaleProgress',
-        _inlinePreviewScaleProgress,
-      ),
-    );
-    description.add(
-      new DoubleProperty(
-        'inlinePreviewHintScaleProgress',
-        _inlinePreviewHintScaleProgress,
-      ),
-    );
-    description.add(
-      new DoubleProperty(
-        'entranceTransitionProgress',
-        _entranceTransitionProgress,
-      ),
-    );
+    description
+      ..add(
+        new DiagnosticsProperty<StoryLayout>(
+          'storyLayout',
+          _storyLayout,
+        ),
+      )
+      ..add(
+        new DoubleProperty(
+          'focusProgress',
+          _focusProgress,
+        ),
+      )
+      ..add(
+        new DoubleProperty(
+          'inlinePreviewScaleProgress',
+          _inlinePreviewScaleProgress,
+        ),
+      )
+      ..add(
+        new DoubleProperty(
+          'inlinePreviewHintScaleProgress',
+          _inlinePreviewHintScaleProgress,
+        ),
+      )
+      ..add(
+        new DoubleProperty(
+          'entranceTransitionProgress',
+          _entranceTransitionProgress,
+        ),
+      );
   }
 }

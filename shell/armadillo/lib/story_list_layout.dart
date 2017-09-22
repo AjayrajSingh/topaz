@@ -108,14 +108,13 @@ class StoryListLayout {
 
     double minImportance = double.INFINITY;
     double maxImportance = -double.INFINITY;
-    storyClustersToLayout
-        .map((StoryCluster storyCluster) => storyCluster.importance)
-        .forEach((double importance) {
+    for (double importance in storyClustersToLayout
+        .map((StoryCluster storyCluster) => storyCluster.importance)) {
       minImportance = math.min(minImportance, importance);
       maxImportance = math.max(maxImportance, importance);
-    });
+    }
     double meanImportance = (maxImportance + minImportance) / 2.0;
-    Function importanceToScaleFactor = (double importance) {
+    double importanceToScaleFactor(double importance) {
       if (importance > meanImportance) {
         return 1.0 +
             math.min(importance - meanImportance, _kStoryRelevanceScaleFactor);
@@ -125,7 +124,7 @@ class StoryListLayout {
       } else {
         return 1.0;
       }
-    };
+    }
 
     List<_StoryMetadata> stories = new List<_StoryMetadata>.generate(
       storyClustersToLayout.length,
@@ -227,8 +226,7 @@ class StoryListLayout {
             (i < stories.length - 1) ? stories[i + 1] : null;
         double maxWidth = _getMaxWidthForTop(-rowTop, jugglingStoryCount);
         story.offset = new Offset(
-            (row.length == 0) ? 0.0 : previousStory.right + _horizontalGap,
-            rowTop);
+            (row.isEmpty) ? 0.0 : previousStory.right + _horizontalGap, rowTop);
         rowWidth += story.size.width;
         row.add(story);
         if (nextStory == null ||
@@ -374,7 +372,7 @@ class StoryListLayout {
         List<_StoryMetadata> row = rows[i];
 
         // For every story in the row...
-        row.forEach((_StoryMetadata story) {
+        for (_StoryMetadata story in row) {
           // Find the bottom Y of the stories above this one (with additional
           // grid margin).
           // Determine what stories are above us by expand the story's
@@ -407,7 +405,7 @@ class StoryListLayout {
               story.dy = maxTop;
             }
           }
-        });
+        }
       }
     }
 

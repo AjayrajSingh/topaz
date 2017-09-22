@@ -46,12 +46,12 @@ class ExpandSuggestion extends ExpansionBehavior {
 
   @override
   void start() {
-    _expansionSimulation = new RK4SpringSimulation(
-        initValue: 0.0, desc: _kExpansionSimulationDesc);
-    _expansionSimulation.target = _kExpansionSimulationTarget;
+    _expansionSimulation =
+        new RK4SpringSimulation(initValue: 0.0, desc: _kExpansionSimulationDesc)
+          ..target = _kExpansionSimulationTarget;
     _opacitySimulation = new RK4SpringSimulation(
-        initValue: _kOpacitySimulationTarget, desc: _kOpacitySimulationDesc);
-    _opacitySimulation.target = _kOpacitySimulationTarget;
+        initValue: _kOpacitySimulationTarget, desc: _kOpacitySimulationDesc)
+      ..target = _kOpacitySimulationTarget;
   }
 
   @override

@@ -10,8 +10,8 @@ import 'package:flutter/widgets.dart';
 
 import 'size_model.dart';
 import 'story_cluster_widget.dart' show InlineStoryTitle;
-import 'story_list_layout.dart';
 import 'story_list_body_parent_data.dart';
+import 'story_list_layout.dart';
 
 /// Set to true to slide the unfocused children of [RenderStoryListBody] as the
 /// focused child grows.
@@ -126,9 +126,9 @@ class RenderStoryListBody extends RenderListBody {
             255)
         .round();
 
-    childrenSortedByFocusProgress.forEach((RenderBox child) {
+    for (RenderBox child in childrenSortedByFocusProgress) {
       _paintChild(context, offset, child, unfocusedAlpha);
-    });
+    }
 
     _paintChild(context, offset, lastChild, unfocusedAlpha);
   }

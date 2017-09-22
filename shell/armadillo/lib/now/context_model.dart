@@ -17,7 +17,7 @@ abstract class ContextModel extends Model {
   final TimeStringer _timeStringer = new TimeStringer();
 
   /// The current background image to use.
-  ImageProvider get backgroundImageProvider => new AssetImage(
+  ImageProvider get backgroundImageProvider => const AssetImage(
         _kBackgroundImage,
       );
 

@@ -31,7 +31,10 @@ class Armadillo extends StatelessWidget {
   final Conductor conductor;
 
   /// Constructor.
-  Armadillo({@required this.scopedModelBuilders, @required this.conductor});
+  const Armadillo({
+    @required this.scopedModelBuilders,
+    @required this.conductor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +46,9 @@ class Armadillo extends StatelessWidget {
               color: Colors.black,
               image: new DecorationImage(
                 image: model.backgroundImageProvider,
-                alignment: new FractionalOffset(0.4, 0.5),
+                alignment: const FractionalOffset(0.4, 0.5),
                 fit: BoxFit.cover,
-                colorFilter: new ui.ColorFilter.mode(
+                colorFilter: const ui.ColorFilter.mode(
                   _kBackgroundOverlayColor,
                   ui.BlendMode.srcATop,
                 ),
@@ -55,10 +58,10 @@ class Armadillo extends StatelessWidget {
           ),
     );
 
-    scopedModelBuilders.forEach((WrapperBuilder scopedModelBuilder) {
+    for (WrapperBuilder scopedModelBuilder in scopedModelBuilders) {
       currentChild = scopedModelBuilder(context, currentChild);
       assert(currentChild is ScopedModel);
-    });
+    }
 
     return currentChild;
   }

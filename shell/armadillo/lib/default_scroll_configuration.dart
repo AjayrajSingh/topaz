@@ -10,7 +10,7 @@ class DefaultScrollConfiguration extends StatelessWidget {
   final Widget child;
 
   /// Constructor.
-  DefaultScrollConfiguration({Key key, this.child}) : super(key: key);
+  const DefaultScrollConfiguration({Key key, this.child}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => new ScrollConfiguration(

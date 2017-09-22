@@ -20,7 +20,7 @@ class SelectedSuggestionOverlay extends StatefulWidget {
   final OnSuggestionExpanded onSuggestionExpanded;
 
   /// Constructor.
-  SelectedSuggestionOverlay({Key key, this.onSuggestionExpanded})
+  const SelectedSuggestionOverlay({Key key, this.onSuggestionExpanded})
       : super(key: key);
 
   @override
@@ -41,8 +41,7 @@ class SelectedSuggestionOverlayState
     if (_expansionBehavior != null) {
       return false;
     }
-    _expansionBehavior = expansionBehavior;
-    _expansionBehavior.start();
+    _expansionBehavior = expansionBehavior..start();
     startTicking();
     return true;
   }
@@ -51,7 +50,7 @@ class SelectedSuggestionOverlayState
   Widget build(BuildContext context) => new LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) =>
           (_expansionBehavior == null)
-              ? new Offstage(offstage: true)
+              ? const Offstage(offstage: true)
               : _expansionBehavior.build(context, constraints));
 
   @override

@@ -27,7 +27,7 @@ class TargetOverlay extends StatelessWidget {
   final bool enabled;
 
   /// Constructor.
-  TargetOverlay({
+  const TargetOverlay({
     this.enabled,
     this.targets,
     this.closestTargetLockPoints,
@@ -42,38 +42,39 @@ class TargetOverlay extends StatelessWidget {
     // When we have a candidate, show the targets.
     if (enabled && candidatePoints.isNotEmpty) {
       // Add all the targets.
-      targets.forEach(
-        (PanelDragTarget target) => stackChildren.add(target.build()),
-      );
+      for (PanelDragTarget target in targets) {
+        stackChildren.add(target.build());
+      }
 
       // Add candidate points
-      stackChildren.addAll(
-        candidatePoints.map(
-          (Offset point) => new Positioned(
-                left: point.dx - 5.0,
-                top: point.dy - 5.0,
-                width: 10.0,
-                height: 10.0,
-                child: new Container(
-                  color: new Color(0xFFFFFF00),
+      stackChildren
+        ..addAll(
+          candidatePoints.map(
+            (Offset point) => new Positioned(
+                  left: point.dx - 5.0,
+                  top: point.dy - 5.0,
+                  width: 10.0,
+                  height: 10.0,
+                  child: new Container(
+                    color: const Color(0xFFFFFF00),
+                  ),
                 ),
-              ),
-        ),
-      );
-      // Add candidate lockpoints
-      stackChildren.addAll(
-        closestTargetLockPoints.map(
-          (Offset point) => new Positioned(
-                left: point.dx - 5.0,
-                top: point.dy - 5.0,
-                width: 10.0,
-                height: 10.0,
-                child: new Container(
-                  color: new Color(0xFFFF00FF),
+          ),
+        )
+        // Add candidate lockpoints
+        ..addAll(
+          closestTargetLockPoints.map(
+            (Offset point) => new Positioned(
+                  left: point.dx - 5.0,
+                  top: point.dy - 5.0,
+                  width: 10.0,
+                  height: 10.0,
+                  child: new Container(
+                    color: const Color(0xFFFF00FF),
+                  ),
                 ),
-              ),
-        ),
-      );
+          ),
+        );
     }
     return new Stack(
       fit: StackFit.passthrough,

@@ -24,7 +24,7 @@ class SimulatedSizedBox extends StatefulWidget {
   final Widget child;
 
   /// Constructor.
-  SimulatedSizedBox({
+  const SimulatedSizedBox({
     Key key,
     this.width,
     this.height,

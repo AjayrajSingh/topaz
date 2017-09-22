@@ -30,7 +30,8 @@ class EdgeScrollDragTarget extends StatefulWidget {
   final ScrollController scrollController;
 
   /// Constructor.
-  EdgeScrollDragTarget({Key key, this.scrollController}) : super(key: key);
+  const EdgeScrollDragTarget({Key key, this.scrollController})
+      : super(key: key);
 
   @override
   EdgeScrollDragTargetState createState() => new EdgeScrollDragTargetState();
@@ -89,9 +90,9 @@ class EdgeScrollDragTargetState extends TickingState<EdgeScrollDragTarget> {
                   RenderBox box = context.findRenderObject();
                   double height = box.size.height;
                   double y = height;
-                  points.forEach((Offset point) {
+                  for (Offset point in points) {
                     y = math.min(y, point.dy);
-                  });
+                  }
                   _kenichiEdgeScrolling.update(y, height);
                   if (!_kenichiEdgeScrolling.isDone) {
                     startTicking();

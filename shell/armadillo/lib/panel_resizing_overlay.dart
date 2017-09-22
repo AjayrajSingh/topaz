@@ -34,7 +34,7 @@ class PanelResizingOverlay extends StatelessWidget {
   final bool enabled;
 
   /// Constructor.
-  PanelResizingOverlay({
+  const PanelResizingOverlay({
     Key key,
     this.storyCluster,
     this.child,
@@ -298,14 +298,12 @@ class _VerticalSeam {
     this.x,
     this.top,
     this.bottom,
-    List<Panel> panelsToLeft,
-    List<Panel> panelsToRight,
+    this.panelsToLeft,
+    this.panelsToRight,
     this.onPanelsChanged,
     PanelResizingModel panelResizingModel,
   })
-      : this.panelsToLeft = panelsToLeft,
-        this.panelsToRight = panelsToRight,
-        resizingState = panelResizingModel.getState(<Side, List<Panel>>{
+      : resizingState = panelResizingModel.getState(<Side, List<Panel>>{
               Side.right: panelsToLeft,
               Side.left: panelsToRight,
             }) ??
@@ -422,14 +420,12 @@ class _HorizontalSeam {
     this.y,
     this.left,
     this.right,
-    List<Panel> panelsAbove,
-    List<Panel> panelsBelow,
+    this.panelsAbove,
+    this.panelsBelow,
     this.onPanelsChanged,
     PanelResizingModel panelResizingModel,
   })
-      : this.panelsAbove = panelsAbove,
-        this.panelsBelow = panelsBelow,
-        resizingState = panelResizingModel.getState(<Side, List<Panel>>{
+      : resizingState = panelResizingModel.getState(<Side, List<Panel>>{
               Side.bottom: panelsAbove,
               Side.top: panelsBelow,
             }) ??
@@ -449,8 +445,9 @@ class _HorizontalSeam {
           color: _kGestureDetectorColor,
           child: new LongPressGestureDetector(
             onDragStart: (DragStartDetails details) {
-              resizingState.valueOnDrag = y;
-              resizingState.dragDelta = 0.0;
+              resizingState
+                ..valueOnDrag = y
+                ..dragDelta = 0.0;
               PanelResizingModel.of(context).resizeBegin(resizingState);
             },
             onDragEnd: (DragEndDetails details) {

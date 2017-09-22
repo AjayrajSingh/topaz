@@ -5,6 +5,7 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
 
 import 'display_mode.dart';
 import 'panel.dart';
@@ -46,7 +47,8 @@ class StoryPositioned extends StatelessWidget {
   final Key childContainerKey;
 
   /// Constructor.
-  StoryPositioned({
+  const StoryPositioned({
+    @required this.child,
     this.storyBarMaximizedHeight,
     this.displayMode,
     this.isFocused,
@@ -54,10 +56,8 @@ class StoryPositioned extends StatelessWidget {
     this.currentSize,
     this.focusProgress,
     this.childContainerKey,
-    this.child,
-  }) {
-    assert(child != null);
-  }
+  })
+      : assert(child != null);
 
   @override
   Widget build(BuildContext context) =>

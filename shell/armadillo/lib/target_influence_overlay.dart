@@ -33,7 +33,7 @@ class TargetInfluenceOverlay extends StatelessWidget {
   final bool enabled;
 
   /// Constructor.
-  TargetInfluenceOverlay({
+  const TargetInfluenceOverlay({
     this.enabled,
     this.targets,
     this.dragDirection,
@@ -90,7 +90,8 @@ class _InfluencePainter extends CustomPainter {
       (int xStep) => new List<PanelDragTarget>.generate(
             ySteps,
             (int yStep) => closestTargetGetter(
-                  new Offset((xStep + 1) * _kStepSize, (yStep + 1) * _kStepSize),
+                  new Offset(
+                      (xStep + 1) * _kStepSize, (yStep + 1) * _kStepSize),
                 ),
           ),
     );
@@ -118,7 +119,7 @@ class _InfluencePainter extends CustomPainter {
             ((j + 1) * _kStepSize) + _kStepSize / 2.0 + bottomShift,
           ),
           new Paint()
-            ..color = (targetMatrix[i][j]?.color ?? new Color(0x00000000))
+            ..color = (targetMatrix[i][j]?.color ?? const Color(0x00000000))
                 .withOpacity(
               0.75,
             ),

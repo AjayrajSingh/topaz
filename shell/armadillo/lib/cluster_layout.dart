@@ -34,9 +34,9 @@ class ClusterLayout {
   factory ClusterLayout.from(StoryCluster storyCluster) {
     Map<StoryId, Panel> storyIdToPanelMap = <StoryId, Panel>{};
 
-    storyCluster.stories.forEach((Story story) {
+    for (Story story in storyCluster.stories) {
       storyIdToPanelMap[story.id] = new Panel.from(story.panel);
-    });
+    }
 
     return new ClusterLayout(
       focusedStoryId: storyCluster.focusedStoryId,
@@ -48,14 +48,15 @@ class ClusterLayout {
   /// Restores [storyCluster]'s panels, display mode, and focused story to that
   /// saved by this [ClusterLayout].
   void restore(StoryCluster storyCluster) {
-    storyIdToPanelMap.keys.forEach((StoryId storyId) {
+    for (StoryId storyId in storyIdToPanelMap.keys) {
       storyCluster.replaceStoryPanel(
         storyId: storyId,
         withPanel: storyIdToPanelMap[storyId],
       );
-    });
-    storyCluster.displayMode = displayMode;
-    storyCluster.focusedStoryId = focusedStoryId;
+    }
+    storyCluster
+      ..displayMode = displayMode
+      ..focusedStoryId = focusedStoryId;
   }
 
   /// Restores [storyCluster]'s focused story to that saved by this
@@ -71,8 +72,9 @@ class ClusterLayout {
   List<Panel> get panels => storyIdToPanelMap.values.toList();
 
   /// Calls [storyCallback] for each story saved off.
-  void visitStories(void storyCallback(StoryId storyId, Panel storyPanel)) =>
-      storyIdToPanelMap.keys.forEach(
-        (StoryId storyId) => storyCallback(storyId, storyIdToPanelMap[storyId]),
-      );
+  void visitStories(void storyCallback(StoryId storyId, Panel storyPanel)) {
+    for (StoryId storyId in storyIdToPanelMap.keys) {
+      storyCallback(storyId, storyIdToPanelMap[storyId]);
+    }
+  }
 }

@@ -67,7 +67,7 @@ class StoryClusterWidget extends StatelessWidget {
   final Map<StoryId, Widget> storyWidgets;
 
   /// Constructor.
-  StoryClusterWidget({
+  const StoryClusterWidget({
     Key key,
     this.storyCluster,
     this.focusProgress,
@@ -86,50 +86,49 @@ class StoryClusterWidget extends StatelessWidget {
             : _getStoryClusterWithInlineStoryTitle(context, true),
       );
 
-  Widget _getUnfocusedDragTargetChild(BuildContext context) {
-    return new OptionalWrapper(
-      useWrapper: _isUnfocused && !storyCluster.isPlaceholder,
-      builder: (BuildContext context, Widget child) =>
-          new ArmadilloLongPressDraggable<StoryClusterDragData>(
-            key: storyCluster.clusterDraggableKey,
-            overlayKey: overlayKey,
-            data: new StoryClusterDragData(id: storyCluster.id),
-            childWhenDragging: Nothing.widget,
-            onDragStarted: () {
-              RenderBox box =
-                  storyCluster.panelsKey.currentContext.findRenderObject();
-              StoryClusterDragStateModel.of(context).addDragging(
-                    storyCluster.id,
-                  );
-              return box.size;
-            },
-            onDragEnded: () =>
-                StoryClusterDragStateModel.of(context).removeDragging(
+  Widget _getUnfocusedDragTargetChild(BuildContext context) =>
+      new OptionalWrapper(
+        useWrapper: _isUnfocused && !storyCluster.isPlaceholder,
+        builder: (BuildContext context, Widget child) =>
+            new ArmadilloLongPressDraggable<StoryClusterDragData>(
+              key: storyCluster.clusterDraggableKey,
+              overlayKey: overlayKey,
+              data: new StoryClusterDragData(id: storyCluster.id),
+              childWhenDragging: Nothing.widget,
+              onDragStarted: () {
+                RenderBox box =
+                    storyCluster.panelsKey.currentContext.findRenderObject();
+                StoryClusterDragStateModel.of(context).addDragging(
                       storyCluster.id,
-                    ),
-            onDismiss: () => StoryModel.of(context).delete(
-                  StoryModel.of(context).getStoryCluster(storyCluster.id),
-                ),
-            feedbackBuilder: (
-              Offset localDragStartPoint,
-              Size initialSize,
-            ) =>
-                new StoryClusterDragFeedback(
-                  key: storyCluster.dragFeedbackKey,
-                  overlayKey: overlayKey,
-                  storyCluster: storyCluster,
-                  storyWidgets: storyWidgets,
-                  localDragStartPoint: localDragStartPoint,
-                  initialSize: initialSize,
-                ),
-            child: child,
-          ),
-      child: _getStoryClusterWithInlineStoryTitle(
-        context,
-        false,
-      ),
-    );
-  }
+                    );
+                return box.size;
+              },
+              onDragEnded: () =>
+                  StoryClusterDragStateModel.of(context).removeDragging(
+                        storyCluster.id,
+                      ),
+              onDismiss: () => StoryModel.of(context).delete(
+                    StoryModel.of(context).getStoryCluster(storyCluster.id),
+                  ),
+              feedbackBuilder: (
+                Offset localDragStartPoint,
+                Size initialSize,
+              ) =>
+                  new StoryClusterDragFeedback(
+                    key: storyCluster.dragFeedbackKey,
+                    overlayKey: overlayKey,
+                    storyCluster: storyCluster,
+                    storyWidgets: storyWidgets,
+                    localDragStartPoint: localDragStartPoint,
+                    initialSize: initialSize,
+                  ),
+              child: child,
+            ),
+        child: _getStoryClusterWithInlineStoryTitle(
+          context,
+          false,
+        ),
+      );
 
   Widget _getStoryClusterWithInlineStoryTitle(
           BuildContext context, bool focused) =>
@@ -245,7 +244,7 @@ class InlineStoryTitle extends StatelessWidget {
   final StoryCluster storyCluster;
 
   /// Constructor.
-  InlineStoryTitle({this.focusProgress, this.storyCluster});
+  const InlineStoryTitle({this.focusProgress, this.storyCluster});
 
   /// THe height the inline story title should be for the given [focusProgress].
   static double getHeight(double focusProgress) =>

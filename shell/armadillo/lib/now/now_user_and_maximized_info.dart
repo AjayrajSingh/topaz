@@ -23,7 +23,8 @@ class NowUserAndMaximizedContext extends StatelessWidget {
   final VoidCallback onUserTapped;
 
   /// Constructor.
-  NowUserAndMaximizedContext({this.onUserContextTapped, this.onUserTapped});
+  const NowUserAndMaximizedContext(
+      {this.onUserContextTapped, this.onUserTapped});
 
   @override
   Widget build(BuildContext context) =>

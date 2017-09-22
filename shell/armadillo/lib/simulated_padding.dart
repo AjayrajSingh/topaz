@@ -28,7 +28,7 @@ class SimulatedPadding extends StatefulWidget {
   final Widget child;
 
   /// Constructor.
-  SimulatedPadding({
+  const SimulatedPadding({
     Key key,
     this.fractionalLeftPadding,
     this.fractionalRightPadding,

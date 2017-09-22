@@ -52,20 +52,17 @@ class CandidateInfo {
     this.timestampEmitter: _defaultTimestampEmitter,
     this.minLockDuration: _kMinLockDuration,
   })
-      : _lockPoint = initialLockPoint {
-    assert(initialLockPoint != null);
-    assert(timestampEmitter != null);
-    assert(minLockDuration != null);
-  }
+      : _lockPoint = initialLockPoint,
+        assert(initialLockPoint != null),
+        assert(timestampEmitter != null),
+        assert(minLockDuration != null);
 
   /// The target the candidate has locked to.
   PanelDragTarget get closestTarget => _closestTarget;
 
   /// Updates the candidate's velocity with [point].
   void updateVelocity(Offset point) {
-    if (_velocityTracker == null) {
-      _velocityTracker = new VelocityTracker();
-    }
+    _velocityTracker ??= new VelocityTracker();
     _velocityTracker.addPosition(
       new Duration(milliseconds: timestampEmitter().millisecondsSinceEpoch),
       point,
@@ -108,9 +105,7 @@ class CandidateInfo {
 
     // If we can't lock to this target, complete with false immediately.
     if (!canLock(closestTarget, storyClusterPoint)) {
-      Completer<bool> completer = new Completer<bool>();
-      completer.complete(false);
-      return completer.future;
+      return new Future<bool>.value(false);
     }
 
     // We can lock to this target start a timer.

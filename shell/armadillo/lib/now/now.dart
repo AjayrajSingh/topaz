@@ -74,7 +74,7 @@ class Now extends StatelessWidget {
   final ValueNotifier<double> recentsScrollOffset;
 
   /// Constructor.
-  Now({
+  const Now({
     Key key,
     this.quickSettingsHeightBump,
     this.onMinimizedTap,

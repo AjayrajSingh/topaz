@@ -50,7 +50,7 @@ class SuggestionWidget extends StatelessWidget {
   final bool shadow;
 
   /// Constructor.
-  SuggestionWidget({
+  const SuggestionWidget({
     Key key,
     this.suggestion,
     this.onSelected,
@@ -151,8 +151,8 @@ class SuggestionWidget extends StatelessWidget {
               )
             : new ClipRRect(
                 borderRadius: new BorderRadius.only(
-                  topRight: new Radius.circular(kSuggestionCornerRadius),
-                  bottomRight: new Radius.circular(
+                  topRight: const Radius.circular(kSuggestionCornerRadius),
+                  bottomRight: const Radius.circular(
                     kSuggestionCornerRadius,
                   ),
                 ),

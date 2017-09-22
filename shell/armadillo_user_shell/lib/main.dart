@@ -91,8 +91,9 @@ Widget buildArmadilloUserShell({
       new StoryRearrangementScrimModel();
   storyClusterDragStateModel
     ..addListener(
-      () => storyRearrangementScrimModel
-          .onDragAcceptableStateChanged(storyClusterDragStateModel.isAccepting),
+      () => storyRearrangementScrimModel.onDragAcceptableStateChanged(
+            isAcceptable: storyClusterDragStateModel.isAccepting,
+          ),
     )
     ..addListener(
       () => storyProviderStoryGenerator.onDraggingChanged(
@@ -102,8 +103,9 @@ Widget buildArmadilloUserShell({
   StoryDragTransitionModel storyDragTransitionModel =
       new StoryDragTransitionModel();
   storyClusterDragStateModel.addListener(
-    () => storyDragTransitionModel
-        .onDragStateChanged(storyClusterDragStateModel.isDragging),
+    () => storyDragTransitionModel.onDragStateChanged(
+          isDragging: storyClusterDragStateModel.isDragging,
+        ),
   );
 
   UserLogoutter userLogoutter = new UserLogoutter();

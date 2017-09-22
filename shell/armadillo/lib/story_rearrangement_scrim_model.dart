@@ -4,6 +4,7 @@
 
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
+import 'package:meta/meta.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
@@ -19,7 +20,7 @@ class StoryRearrangementScrimModel extends SpringModel {
   /// Starts the simulation of this [TickingModel].  If [isAcceptable] is true
   /// the opacity will be animated to non-transparent otherwise it will be
   /// animated to fully transparent.
-  void onDragAcceptableStateChanged(bool isAcceptable) {
+  void onDragAcceptableStateChanged({@required bool isAcceptable}) {
     target = isAcceptable ? 1.0 : 0.0;
     startTicking();
   }

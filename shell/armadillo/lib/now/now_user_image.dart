@@ -16,7 +16,7 @@ class NowUserImage extends StatelessWidget {
   final VoidCallback onTap;
 
   /// Constructor.
-  NowUserImage({this.onTap});
+  const NowUserImage({this.onTap});
 
   @override
   Widget build(BuildContext context) => new GestureDetector(

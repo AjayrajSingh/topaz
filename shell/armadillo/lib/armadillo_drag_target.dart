@@ -84,7 +84,7 @@ class ArmadilloLongPressDraggable<T> extends StatefulWidget {
   /// Creates a widget that can be dragged starting from long press.
   ///
   /// The [child] and [feedbackBuilder] arguments must not be null.
-  ArmadilloLongPressDraggable({
+  const ArmadilloLongPressDraggable({
     Key key,
     @required this.overlayKey,
     @required this.child,
@@ -95,11 +95,10 @@ class ArmadilloLongPressDraggable<T> extends StatefulWidget {
     this.onDragEnded,
     this.onDismiss,
   })
-      : super(key: key) {
-    assert(overlayKey != null);
-    assert(child != null);
-    assert(feedbackBuilder != null);
-  }
+      : assert(overlayKey != null),
+        assert(child != null),
+        assert(feedbackBuilder != null),
+        super(key: key);
 
   /// The data that will be dropped by this draggable.
   final T data;
@@ -170,19 +169,20 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
   }
 
   void _createRecognizers() {
-    _recognizers.add(
-      new HorizontalMultiDragGestureRecognizer()..onStart = _startDrag,
-    );
-    _recognizers.add(
-      new DelayedMultiDragGestureRecognizer(delay: _kLongPressTimeout)
-        ..onStart = _startDrag,
-    );
+    _recognizers
+      ..add(
+        new HorizontalMultiDragGestureRecognizer()..onStart = _startDrag,
+      )
+      ..add(
+        new DelayedMultiDragGestureRecognizer(delay: _kLongPressTimeout)
+          ..onStart = _startDrag,
+      );
   }
 
   void _disposeRecognizers() {
-    _recognizers.forEach(
-      (GestureRecognizer recognizer) => recognizer.dispose(),
-    );
+    for (GestureRecognizer recognizer in _recognizers) {
+      recognizer.dispose();
+    }
   }
 
   bool get _canDrag =>
@@ -191,9 +191,9 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
 
   void _routePointer(PointerEvent event) {
     if (_canDrag) {
-      _recognizers.forEach(
-        (GestureRecognizer recognizer) => recognizer.addPointer(event),
-      );
+      for (GestureRecognizer recognizer in _recognizers) {
+        recognizer.addPointer(event);
+      }
     }
   }
 
@@ -209,17 +209,16 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
     final RenderBox box = context.findRenderObject();
     final Offset dragStartPoint = box.globalToLocal(position);
     final Size initialSize = widget.onDragStarted?.call();
-    final WidgetBuilder builder =
-        (BuildContext context) => new _DragAvatarWidget(
-              key: _dragAvatarKey,
-              returnTargetKey: _nonDraggedChildKey,
-              overlayKey: widget.overlayKey,
-              initialPosition: position,
-              dragStartPoint: dragStartPoint,
-              initialSize: initialSize,
-              feedbackBuilder: widget.feedbackBuilder,
-              onDismiss: widget.onDismiss,
-            );
+    Widget builder(BuildContext context) => new _DragAvatarWidget(
+          key: _dragAvatarKey,
+          returnTargetKey: _nonDraggedChildKey,
+          overlayKey: widget.overlayKey,
+          initialPosition: position,
+          dragStartPoint: dragStartPoint,
+          initialSize: initialSize,
+          feedbackBuilder: widget.feedbackBuilder,
+          onDismiss: widget.onDismiss,
+        );
     widget.overlayKey.currentState.addBuilder(builder);
 
     _DragAvatar<T> dragAvatar = new _DragAvatar<T>(
@@ -253,9 +252,7 @@ class _DraggableState<T> extends State<ArmadilloLongPressDraggable<T>> {
         });
         widget.onDragEnded?.call();
       },
-    );
-
-    dragAvatar.position = position;
+    )..position = position;
 
     return dragAvatar;
   }
@@ -280,7 +277,7 @@ class _DragAvatarWidget extends StatefulWidget {
   final FeedbackBuilder feedbackBuilder;
   final VoidCallback onDismiss;
 
-  _DragAvatarWidget({
+  const _DragAvatarWidget({
     Key key,
     this.returnTargetKey,
     this.overlayKey,
@@ -372,8 +369,7 @@ class _DragAvatarWidgetState extends TickingState<_DragAvatarWidget> {
     _returnSimulation = new RK4SpringSimulation(
       initValue: 0.0,
       desc: _kDefaultSimulationDesc,
-    );
-    _returnSimulation.target = 1.0;
+    )..target = 1.0;
     startTicking();
     _onReturnSimulationDone = onReturnSimulationDone;
   }
@@ -415,23 +411,22 @@ class ArmadilloDragTarget<T> extends StatefulWidget {
   /// Creates a widget that receives drags.
   ///
   /// The [builder] argument must not be null.
-  ArmadilloDragTarget({
-    Key key,
+  const ArmadilloDragTarget({
     @required this.builder,
+    Key key,
     this.onWillAccept,
     this.onAccept,
   })
-      : super(key: key) {
-    assert(builder != null);
-  }
+      : assert(builder != null),
+        super(key: key);
 
   @override
   _DragTargetState<T> createState() => new _DragTargetState<T>();
 }
 
 class _DragTargetState<T> extends State<ArmadilloDragTarget<T>> {
-  final Map<T, Offset> _candidateData = new Map<T, Offset>();
-  final Map<dynamic, Offset> _rejectedData = new Map<dynamic, Offset>();
+  final Map<T, Offset> _candidateData = <T, Offset>{};
+  final Map<dynamic, Offset> _rejectedData = <dynamic, Offset>{};
 
   bool didEnter(dynamic data, Offset localPosition) {
     assert(_candidateData[data] == null);
@@ -541,15 +536,16 @@ class _DragAvatar<T> extends Drag {
       _enteredTargets.addAll(targets);
 
       // Enter new targets.
-      _activeTargets.clear();
-      _activeTargets.addAll(
-        targets.where(
-          (_DragTargetState<T> target) => target.didEnter(
-                data,
-                _globalToLocal(target, globalPosition),
-              ),
-        ),
-      );
+      _activeTargets
+        ..clear()
+        ..addAll(
+          targets.where(
+            (_DragTargetState<T> target) => target.didEnter(
+                  data,
+                  _globalToLocal(target, globalPosition),
+                ),
+          ),
+        );
     }
 
     // Update positions
@@ -601,10 +597,9 @@ class _DragAvatar<T> extends Drag {
   }
 
   void _leaveAllEntered() {
-    _enteredTargets.forEach(
-      (_DragTargetState<T> target) => target.didLeave(data),
-    );
-    _enteredTargets.clear();
+    _enteredTargets
+      ..forEach((_DragTargetState<T> target) => target.didLeave(data))
+      ..clear();
   }
 
   void _finishDrag(_DragEndKind endKind, Velocity velocity) {
@@ -612,10 +607,10 @@ class _DragAvatar<T> extends Drag {
     if (velocity.pixelsPerSecond.dx.abs() <= _kMaxAcceptanceSpeed &&
         velocity.pixelsPerSecond.dy.abs() <= _kMaxAcceptanceSpeed) {
       if (endKind == _DragEndKind.dropped && _activeTargets.isNotEmpty) {
-        _activeTargets.forEach((_DragTargetState<T> activeTarget) {
+        for (_DragTargetState<T> activeTarget in _activeTargets) {
           activeTarget.didDrop(data, velocity);
           _enteredTargets.remove(activeTarget);
-        });
+        }
         wasAccepted = true;
       }
     }

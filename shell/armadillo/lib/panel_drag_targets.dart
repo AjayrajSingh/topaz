@@ -17,7 +17,6 @@ import 'panel_drag_target.dart';
 import 'panel_drag_target_generator.dart';
 import 'panel_event_handler.dart';
 import 'place_holder_story.dart';
-import 'simulated_fractional.dart';
 import 'size_model.dart';
 import 'story.dart';
 import 'story_cluster.dart';
@@ -26,8 +25,8 @@ import 'story_cluster_drag_state_model.dart';
 import 'story_cluster_id.dart';
 import 'story_cluster_stories_model.dart';
 import 'story_model.dart';
-import 'target_overlay.dart';
 import 'target_influence_overlay.dart';
+import 'target_overlay.dart';
 
 const double _kUnfocusedCornerRadius = 4.0;
 const double _kFocusedCornerRadius = 8.0;
@@ -76,7 +75,7 @@ class PanelDragTargets extends StatefulWidget {
   final Size currentSize;
 
   /// Constructor.
-  PanelDragTargets({
+  const PanelDragTargets({
     Key key,
     this.storyCluster,
     this.child,
@@ -201,8 +200,9 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
     if (!_inTimeline &&
         velocity.pixelsPerSecond.dy.abs() >
             _kVerticalFlingToDiscardSpeedThreshold) {
-      storyCluster.removePreviews();
-      storyCluster.minimizeStoryBars();
+      storyCluster
+        ..removePreviews()
+        ..minimizeStoryBars();
       return;
     }
 
@@ -422,8 +422,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
           panelsBox.globalToLocal(storyBottomRight);
       // Jump the Story's SimulatedFractional to its new location to
       // ensure a seamless animation into place.
-      SimulatedFractionalState state = story.positionedKey.currentState;
-      state.jump(
+      story.positionedKey.currentState.jump(
         new Rect.fromLTRB(
           storyInPanelsTopLeft.dx,
           storyInPanelsTopLeft.dy,
@@ -549,32 +548,35 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
   }
 
   void _populateTargets() {
-    _targets.clear();
-    _targets.addAll(
-      _panelDragTargetGenerator.createTargets(
-        size: SizeModel.of(context).storySize,
-        currentSize: widget.currentSize,
-        currentDisplayMode: widget.storyCluster.displayMode,
-        clusterLayout: _originalClusterLayout,
-        scale: widget.scale,
-        inTimeline: _inTimeline,
-        maxStories: _kMaxStoriesPerCluster - widget.storyCluster.stories.length,
-        onAddClusterAbovePanels: panelEventHandler.onAddClusterAbovePanels,
-        onAddClusterBelowPanels: panelEventHandler.onAddClusterBelowPanels,
-        onAddClusterToLeftOfPanels:
-            panelEventHandler.onAddClusterToLeftOfPanels,
-        onAddClusterToRightOfPanels:
-            panelEventHandler.onAddClusterToRightOfPanels,
-        onAddClusterAbovePanel: panelEventHandler.onAddClusterAbovePanel,
-        onAddClusterBelowPanel: panelEventHandler.onAddClusterBelowPanel,
-        onAddClusterToLeftOfPanel: panelEventHandler.onAddClusterToLeftOfPanel,
-        onAddClusterToRightOfPanel:
-            panelEventHandler.onAddClusterToRightOfPanel,
-        onStoryBarHover: panelEventHandler.onStoryBarHover,
-        onStoryBarDrop: panelEventHandler.onStoryBarDrop,
-        onLeaveCluster: _onLeaveCluster,
-      ),
-    );
+    _targets
+      ..clear()
+      ..addAll(
+        _panelDragTargetGenerator.createTargets(
+          size: SizeModel.of(context).storySize,
+          currentSize: widget.currentSize,
+          currentDisplayMode: widget.storyCluster.displayMode,
+          clusterLayout: _originalClusterLayout,
+          scale: widget.scale,
+          inTimeline: _inTimeline,
+          maxStories:
+              _kMaxStoriesPerCluster - widget.storyCluster.stories.length,
+          onAddClusterAbovePanels: panelEventHandler.onAddClusterAbovePanels,
+          onAddClusterBelowPanels: panelEventHandler.onAddClusterBelowPanels,
+          onAddClusterToLeftOfPanels:
+              panelEventHandler.onAddClusterToLeftOfPanels,
+          onAddClusterToRightOfPanels:
+              panelEventHandler.onAddClusterToRightOfPanels,
+          onAddClusterAbovePanel: panelEventHandler.onAddClusterAbovePanel,
+          onAddClusterBelowPanel: panelEventHandler.onAddClusterBelowPanel,
+          onAddClusterToLeftOfPanel:
+              panelEventHandler.onAddClusterToLeftOfPanel,
+          onAddClusterToRightOfPanel:
+              panelEventHandler.onAddClusterToRightOfPanel,
+          onStoryBarHover: panelEventHandler.onStoryBarHover,
+          onStoryBarDrop: panelEventHandler.onStoryBarDrop,
+          onLeaveCluster: _onLeaveCluster,
+        ),
+      );
   }
 
   void _onLeaveCluster({

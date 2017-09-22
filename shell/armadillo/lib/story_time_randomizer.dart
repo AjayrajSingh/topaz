@@ -15,7 +15,7 @@ class StoryTimeRandomizer extends StatelessWidget {
   final Widget child;
 
   /// Constructor.
-  StoryTimeRandomizer({this.storyModel, this.child});
+  const StoryTimeRandomizer({this.storyModel, this.child});
 
   @override
   Widget build(BuildContext context) => new Stack(

@@ -124,16 +124,19 @@ class SuggestionLayout {
     );
 
     if (_headline1TextPainter != null) {
-      _headline1TextPainter.textDirection = textDirection;
-      _headline1TextPainter.layout(maxWidth: textMaxWidth);
+      _headline1TextPainter
+        ..textDirection = textDirection
+        ..layout(maxWidth: textMaxWidth);
     }
     if (_headline2TextPainter != null) {
-      _headline2TextPainter.textDirection = textDirection;
-      _headline2TextPainter.layout(maxWidth: textMaxWidth);
+      _headline2TextPainter
+        ..textDirection = textDirection
+        ..layout(maxWidth: textMaxWidth);
     }
     if (_subHeadlineTextPainter != null) {
-      _subHeadlineTextPainter.textDirection = textDirection;
-      _subHeadlineTextPainter.layout(maxWidth: textMaxWidth);
+      _subHeadlineTextPainter
+        ..textDirection = textDirection
+        ..layout(maxWidth: textMaxWidth);
     }
 
     _suggestionHeight = _kSmallSuggestionHeight;

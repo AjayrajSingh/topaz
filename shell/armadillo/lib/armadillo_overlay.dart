@@ -10,7 +10,7 @@ import 'armadillo_drag_target.dart' show ArmadilloLongPressDraggable;
 /// widgets.
 class ArmadilloOverlay extends StatefulWidget {
   /// Constructor.
-  ArmadilloOverlay({Key key}) : super(key: key);
+  const ArmadilloOverlay({Key key}) : super(key: key);
 
   @override
   ArmadilloOverlayState createState() => new ArmadilloOverlayState();

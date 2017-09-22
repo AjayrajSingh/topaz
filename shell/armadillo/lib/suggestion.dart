@@ -48,7 +48,7 @@ enum ImageSide {
 /// The unique id of a [Suggestion].
 class SuggestionId extends ValueKey<String> {
   /// Constructor.
-  SuggestionId(String value) : super(value);
+  const SuggestionId(String value) : super(value);
 }
 
 /// The model for displaying a suggestion in the suggestion overlay.
@@ -107,7 +107,7 @@ class Suggestion {
   int get hashCode => id.hashCode;
 
   @override
-  bool operator ==(dynamic other) => (other is Suggestion && other.id == id);
+  bool operator ==(Object other) => (other is Suggestion && other.id == id);
 
   @override
   String toString() => 'Suggestion(title: $title)';
