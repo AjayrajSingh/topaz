@@ -12,7 +12,8 @@ class Toggle extends StatefulWidget {
   final ValueChanged<bool> _callback;
 
   /// Constructor.
-  Toggle({Key key, AnimatedContentBuilder builder, ValueChanged<bool> callback})
+  const Toggle(
+      {Key key, AnimatedContentBuilder builder, ValueChanged<bool> callback})
       : _builder = builder,
         _callback = callback,
         super(key: key);

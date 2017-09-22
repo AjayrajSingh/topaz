@@ -15,8 +15,8 @@ class Launcher extends StatelessWidget {
         color: Colors.white,
       ),
       child: new Center(
-        child: new Text(
-          "I provide options",
+        child: const Text(
+          'I provide options',
           style: const TextStyle(
             color: Colors.black,
           ),

@@ -15,8 +15,8 @@ class StatusPanel extends StatelessWidget {
         color: Colors.white,
       ),
       child: new Center(
-        child: new Text(
-          "I host settings",
+        child: const Text(
+          'I host settings',
           style: const TextStyle(
             color: Colors.black,
           ),

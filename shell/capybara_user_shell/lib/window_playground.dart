@@ -18,7 +18,7 @@ class WindowPlaygroundWidget extends StatefulWidget {
 class _PlaygroundState extends State<WindowPlaygroundWidget> {
   final WindowsData _windows = new WindowsData()..add()..add();
   final Map<WindowId, GlobalKey<WindowState>> _windowKeys =
-      new Map<WindowId, GlobalKey<WindowState>>();
+      <WindowId, GlobalKey<WindowState>>{};
   final FocusScopeNode _focusNode = new FocusScopeNode();
 
   /// Currently highlighted window when paging through windows.
@@ -68,21 +68,22 @@ class _PlaygroundState extends State<WindowPlaygroundWidget> {
   List<Widget> _buildWindows(
       WindowsData model, double maxWidth, double maxHeight) {
     // Remove keys that are no longer useful.
-    List<WindowId> obsoleteIds = new List<WindowId>();
-    _windowKeys.keys.forEach((WindowId id) {
+    List<WindowId> obsoleteIds = <WindowId>[];
+    for (WindowId id in _windowKeys.keys) {
       if (!model.windows.any((WindowData window) => window.id == id)) {
         obsoleteIds.add(id);
       }
-    });
-    obsoleteIds.forEach((WindowId id) => _windowKeys.remove(id));
+    }
+    obsoleteIds.forEach(_windowKeys.remove);
 
     // Adjust window order if there's a highlighted window.
     final List<WindowData> windows = new List<WindowData>.from(model.windows);
     if (_highlightedWindow != null) {
       final WindowData window = model.find(_highlightedWindow);
       if (window != null) {
-        windows.remove(window);
-        windows.add(window);
+        windows
+          ..remove(window)
+          ..add(window);
       }
     }
 

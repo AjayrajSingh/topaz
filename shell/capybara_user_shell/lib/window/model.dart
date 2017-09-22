@@ -55,7 +55,7 @@ class WindowData extends Model {
   final ClaimTabCallback claimTab;
 
   /// Constructor.
-  WindowData({this.tabs: const <TabData>[], @required this.claimTab})
+  WindowData({@required this.claimTab, this.tabs: const <TabData>[]})
       : id = new WindowId();
 
   /// Returns true if this window contains the given tab.
@@ -109,7 +109,7 @@ class WindowData extends Model {
 /// A collection of windows.
 class WindowsData extends Model {
   /// The actual windows.
-  final List<WindowData> windows = new List<WindowData>();
+  final List<WindowData> windows = <WindowData>[];
 
   /// Called by a window to claim a tab owned by another window.
   TabData _claimTab(TabId id) {
@@ -152,8 +152,9 @@ class WindowsData extends Model {
         windows.last == window) {
       return;
     }
-    windows.remove(window);
-    windows.add(window);
+    windows
+      ..remove(window)
+      ..add(window);
     notifyListeners();
   }
 

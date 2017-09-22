@@ -24,7 +24,7 @@ class Window extends StatefulWidget {
   final WindowInteractionCallback onWindowInteraction;
 
   /// Constructor.
-  Window(
+  const Window(
       {Key key,
       this.onWindowInteraction,
       this.initialPosition: Offset.zero,
@@ -83,7 +83,7 @@ class WindowState extends State<Window> {
 
   /// Constructs the visual representation of a tab.
   Widget _buildTab({TabData tab, bool selected}) {
-    Widget buildVisual(bool withSelection) => new Container(
+    Widget buildVisual({bool withSelection}) => new Container(
           width: 80.0,
           height: 40.0,
           decoration: new BoxDecoration(
@@ -104,9 +104,9 @@ class WindowState extends State<Window> {
         });
       },
       child: new Draggable<TabId>(
-        child: buildVisual(selected),
+        child: buildVisual(withSelection: selected),
         childWhenDragging: new Container(),
-        feedback: buildVisual(false),
+        feedback: buildVisual(withSelection: false),
         data: tab.id,
         onDragStarted: () => setState(() {
               _draggedTabId = tab.id;

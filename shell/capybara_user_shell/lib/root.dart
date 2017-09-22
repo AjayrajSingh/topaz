@@ -134,13 +134,13 @@ class _RootState extends State<RootWidget> with TickerProviderStateMixin {
 
   /// Hides all overlays except [except] if applicable.
   void _hideOverlays({GlobalKey<SystemOverlayState> except}) {
-    <GlobalKey<SystemOverlayState>>[
+    for (GlobalKey<SystemOverlayState> overlay
+        in <GlobalKey<SystemOverlayState>>[
       _launcherOverlayKey,
       _statusOverlayKey,
-    ]
-        .where((GlobalKey<SystemOverlayState> overlay) => overlay != except)
-        .forEach((GlobalKey<SystemOverlayState> overlay) =>
-            overlay.currentState.visible = false);
+    ].where((GlobalKey<SystemOverlayState> overlay) => overlay != except)) {
+      overlay.currentState.visible = false;
+    }
   }
 
   /// Sets the given [overlay]'s visibility to [visible].
