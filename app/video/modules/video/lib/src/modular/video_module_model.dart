@@ -6,9 +6,9 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert' show JSON;
 
-import 'package:apps.modular.services.module/module_context.fidl.dart';
-import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:apps.modular.services.user/device_map.fidl.dart';
+import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';

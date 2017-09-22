@@ -12,9 +12,9 @@ flutter_app("video") {
   manifest = "pubspec.yaml"
 
   deps = [
-    "//apps/modular/services/module:module_dart",
-    "//apps/modular/services/story:story_dart",
-    "//apps/modular/services/user:user_dart",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//peridot/public/lib/user/fidl:fidl_dart",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
     "//garnet/public/lib/media/flutter",
