@@ -89,14 +89,16 @@ Widget buildArmadilloUserShell({
       new StoryClusterDragStateModel();
   StoryRearrangementScrimModel storyRearrangementScrimModel =
       new StoryRearrangementScrimModel();
-  storyClusterDragStateModel.addListener(
-    () => storyRearrangementScrimModel
-        .onDragAcceptableStateChanged(storyClusterDragStateModel.isAccepting),
-  );
-  storyClusterDragStateModel.addListener(
-    () => storyProviderStoryGenerator
-        .onDraggingChanged(storyClusterDragStateModel.isDragging),
-  );
+  storyClusterDragStateModel
+    ..addListener(
+      () => storyRearrangementScrimModel
+          .onDragAcceptableStateChanged(storyClusterDragStateModel.isAccepting),
+    )
+    ..addListener(
+      () => storyProviderStoryGenerator.onDraggingChanged(
+            dragging: storyClusterDragStateModel.isDragging,
+          ),
+    );
   StoryDragTransitionModel storyDragTransitionModel =
       new StoryDragTransitionModel();
   storyClusterDragStateModel.addListener(
@@ -113,10 +115,11 @@ Widget buildArmadilloUserShell({
     onInterruptionRemoved: conductorModel.nextBuilder.onInterruptionRemoved,
     onInterruptionsRemoved: conductorModel.nextBuilder.onInterruptionsRemoved,
   );
-  conductorModel.nextBuilder.onSuggestionsOverlayChanged =
-      hitTestModel.onSuggestionsOverlayChanged;
-  conductorModel.nextBuilder.onInterruptionDismissed =
-      suggestionProviderSuggestionModel.onInterruptionDismissal;
+  conductorModel.nextBuilder
+    ..onSuggestionsOverlayChanged = ((bool active) =>
+        hitTestModel.onSuggestionsOverlayChanged(active: active))
+    ..onInterruptionDismissed =
+        suggestionProviderSuggestionModel.onInterruptionDismissal;
 
   StoryModel storyModel = new StoryModel(
     onFocusChanged: suggestionProviderSuggestionModel.storyClusterFocusChanged,
@@ -128,19 +131,20 @@ Widget buildArmadilloUserShell({
         ),
   );
 
-  suggestionProviderSuggestionModel.storyModel = storyModel;
-  suggestionProviderSuggestionModel.addOnFocusLossListener(() {
-    conductorKey.currentState.goToOrigin();
-  });
+  suggestionProviderSuggestionModel
+    ..storyModel = storyModel
+    ..addOnFocusLossListener(() {
+      conductorKey.currentState.goToOrigin();
+    });
 
-  StoryFocuser storyFocuser = (String storyId) {
+  void storyFocuser(String storyId) {
     scheduleMicrotask(() {
       conductorKey.currentState.requestStoryFocus(
         new StoryId(storyId),
         jumpToFinish: false,
       );
     });
-  };
+  }
 
   initialFocusSetter.storyFocuser = storyFocuser;
 
@@ -214,28 +218,28 @@ Widget buildArmadilloUserShell({
         ),
   );
 
-  conductorModel.nowBuilder.onLogoutSelected = userLogoutter.logout;
-  conductorModel.nowBuilder.onClearLedgerSelected =
-      userLogoutter.logoutAndResetLedgerState;
-  conductorModel.nowBuilder.onUserContextTapped =
-      armadilloUserShellModel.onUserContextTapped;
-  conductorModel.nowBuilder.onQuickSettingsOverlayChanged =
-      hitTestModel.onQuickSettingsOverlayChanged;
+  conductorModel.nowBuilder
+    ..onLogoutSelected = userLogoutter.logout
+    ..onClearLedgerSelected = userLogoutter.logoutAndResetLedgerState
+    ..onUserContextTapped = armadilloUserShellModel.onUserContextTapped
+    ..onQuickSettingsOverlayChanged = (bool active) =>
+        hitTestModel.onQuickSettingsOverlayChanged(active: active);
 
   Conductor conductor = new Conductor(key: conductorKey);
 
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();
 
-  sizeModel.addListener(
-    () => storyModel.updateLayouts(
-          new Size(
-            sizeModel.storySize.width,
-            sizeModel.storySize.height - SizeModel.kStoryBarMaximizedHeight,
+  sizeModel
+    ..addListener(
+      () => storyModel.updateLayouts(
+            new Size(
+              sizeModel.storySize.width,
+              sizeModel.storySize.height - SizeModel.kStoryBarMaximizedHeight,
+            ),
           ),
-        ),
-  );
-  sizeModel.screenSize = ui.window.physicalSize / ui.window.devicePixelRatio;
+    )
+    ..screenSize = ui.window.physicalSize / ui.window.devicePixelRatio;
 
   Widget app = new ScopedModel<StoryDragTransitionModel>(
     model: storyDragTransitionModel,

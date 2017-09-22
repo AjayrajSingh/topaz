@@ -22,12 +22,13 @@ class PowerManagerPowerModel extends PowerModel {
 
   /// Constructor.
   PowerManagerPowerModel({this.powerManager}) {
-    powerManager.getBatteryStatus(_processStatus);
-    powerManager.watch(
-      _powerManagerWatcherBinding.wrap(
-        new _PowerManagerWatcherImpl(onBatteryStatusChanged: _processStatus),
-      ),
-    );
+    powerManager
+      ..getBatteryStatus(_processStatus)
+      ..watch(
+        _powerManagerWatcherBinding.wrap(
+          new _PowerManagerWatcherImpl(onBatteryStatusChanged: _processStatus),
+        ),
+      );
   }
 
   @override

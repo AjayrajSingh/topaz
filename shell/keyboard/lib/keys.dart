@@ -38,7 +38,7 @@ class TextKey extends StatefulWidget {
   final OnText onText;
 
   /// Constructor.
-  TextKey(
+  const TextKey(
     this.text, {
     GlobalKey key,
     this.onText,
@@ -131,7 +131,7 @@ class ImageKey extends StatefulWidget {
   final double height;
 
   /// Constructor.
-  ImageKey(
+  const ImageKey(
     this.imageUrl,
     this.onKeyPressed,
     this.color,
@@ -169,9 +169,8 @@ class _ImageKeyState extends State<ImageKey> {
             onPressed();
           },
           child: new Container(
-            color: new Color(_down
-                ? _kTurquoiseAccentColorValue
-                : _kUnselectedColorValue),
+            color: new Color(
+                _down ? _kTurquoiseAccentColorValue : _kUnselectedColorValue),
             padding: new EdgeInsets.all(_kPadding),
             height: widget.height,
             child: new Container(

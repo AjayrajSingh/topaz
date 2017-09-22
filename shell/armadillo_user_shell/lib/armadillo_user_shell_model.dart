@@ -121,22 +121,23 @@ class ArmadilloUserShellModel extends UserShellModel {
       _focusRequestWatcherBinding.wrap(focusRequestWatcher),
     );
     initialFocusSetter.focusProvider = focusProvider;
-    storyProviderStoryGenerator.link = link;
-    storyProviderStoryGenerator.storyProvider = storyProvider;
-    suggestionProviderSuggestionModel.suggestionProvider = suggestionProvider;
-    suggestionProviderSuggestionModel.focusController = focusController;
-    suggestionProviderSuggestionModel.visibleStoriesController =
-        visibleStoriesController;
-    ContextQuery query = new ContextQuery();
-    query.selector = <String, ContextSelector>{};
-    contextTopics.forEach((String topic) {
-      ContextSelector selector = new ContextSelector();
-      selector.type = ContextValueType.entity;
-      selector.meta = new ContextMetadata();
+    storyProviderStoryGenerator
+      ..link = link
+      ..storyProvider = storyProvider;
+    suggestionProviderSuggestionModel
+      ..suggestionProvider = suggestionProvider
+      ..focusController = focusController
+      ..visibleStoriesController = visibleStoriesController;
+    ContextQuery query = new ContextQuery()
+      ..selector = <String, ContextSelector>{};
+    for (String topic in contextTopics) {
+      ContextSelector selector = new ContextSelector()
+        ..type = ContextValueType.entity
+        ..meta = new ContextMetadata();
       selector.meta.entity = new EntityMetadata();
       selector.meta.entity.topic = topic;
       query.selector[topic] = selector;
-    });
+    }
     contextReader.subscribe(
       query,
       _contextListenerBinding.wrap(
@@ -215,14 +216,16 @@ class _ContextListenerImpl extends ContextListener {
   @override
   void onContextUpdate(ContextUpdate update) {
     Map<String, String> values = <String, String>{};
-    update.values.keys.forEach((String key) {
-      if (update.values[key].length == 0) return;
+    for (String key in update.values.keys) {
+      if (update.values[key].isEmpty) {
+        return;
+      }
       // TODO(thatguy): The context engine can return multiple entries for a
       // given selector (in this case topics). The API doesn't make it easy to
       // get the one "authoritative" value for a topic (since that doesn't
       // really exist), so we just take the first value for now.
       values[key] = update.values[key][0].content;
-    });
+    }
     onContextUpdated?.call(values);
   }
 }

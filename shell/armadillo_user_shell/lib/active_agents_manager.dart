@@ -78,8 +78,9 @@ class _AgentProviderWatcherImpl extends AgentProviderWatcher {
 
   @override
   void onUpdate(List<String> agentUrls) {
-    agents.clear();
-    agents.addAll(agentUrls);
+    agents
+      ..clear()
+      ..addAll(agentUrls);
     log.fine('agent urls: $agentUrls');
     link.set(null, JSON.encode(agentUrls));
   }
@@ -148,7 +149,9 @@ class _AskHandlerImpl extends AskHandler {
   }
 
   void stop() {
-    _bindings.forEach((CustomActionBinding binding) => binding.close());
+    for (CustomActionBinding binding in _bindings) {
+      binding.close();
+    }
   }
 }
 

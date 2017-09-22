@@ -66,38 +66,38 @@ class StoryProviderStoryGenerator {
   void close() {
     _storyProviderWatcherBinding.close();
     _storyImportanceWatcherBinding.close();
-    _storyControllerMap.values.forEach(
-      (StoryControllerProxy storyControllerProxy) =>
-          storyControllerProxy.ctrl.close(),
-    );
+    for (StoryControllerProxy storyControllerProxy
+        in _storyControllerMap.values) {
+      storyControllerProxy.ctrl.close();
+    }
   }
 
   /// Sets the [StoryProvider] used to get and start stories.
   set storyProvider(StoryProviderProxy storyProvider) {
     _storyProvider = storyProvider;
-    _storyProvider.watch(
-      _storyProviderWatcherBinding.wrap(
-        new StoryProviderWatcherImpl(
-          onStoryChanged: _onStoryChanged,
-          onStoryDeleted: (String storyId) => _removeStory(storyId),
+    _storyProvider
+      ..watch(
+        _storyProviderWatcherBinding.wrap(
+          new StoryProviderWatcherImpl(
+            onStoryChanged: _onStoryChanged,
+            onStoryDeleted: _removeStory,
+          ),
         ),
-      ),
-    );
-
-    _storyProvider.watchImportance(
-      _storyImportanceWatcherBinding.wrap(
-        new StoryImportanceWatcherImpl(
-          onImportanceChanged: () {
-            _storyProvider.getImportance((Map<String, double> importance) {
-              _currentStories.forEach((Story story) {
-                story.importance = importance[story.id.value] ?? 1.0;
+      )
+      ..watchImportance(
+        _storyImportanceWatcherBinding.wrap(
+          new StoryImportanceWatcherImpl(
+            onImportanceChanged: () {
+              _storyProvider.getImportance((Map<String, double> importance) {
+                for (Story story in _currentStories) {
+                  story.importance = importance[story.id.value] ?? 1.0;
+                }
+                _notifyListeners();
               });
-              _notifyListeners();
-            });
-          },
+            },
+          ),
         ),
-      ),
-    );
+      );
     update();
   }
 
@@ -120,7 +120,7 @@ class StoryProviderStoryGenerator {
   List<StoryCluster> get storyClusters => _storyClusters;
 
   /// Called when the drag state of a cluster changes.
-  void onDraggingChanged(bool dragging) {
+  void onDraggingChanged({bool dragging}) {
     if (dragging != _dragging) {
       _dragging = dragging;
       _onLinkUpdate();
@@ -178,9 +178,9 @@ class StoryProviderStoryGenerator {
 
     Map<String, Story> currentStoriesMap = <String, Story>{};
 
-    _currentStories.forEach(
-      (Story story) => currentStoriesMap[story.id.value] = story,
-    );
+    for (Story story in _currentStories) {
+      currentStoriesMap[story.id.value] = story;
+    }
 
     /// Only continue processing if we have the same set of stories.
     if (jsonStories.length != currentStoriesMap.length) {
@@ -209,22 +209,22 @@ class StoryProviderStoryGenerator {
     /// stories.  Before messing with the clusters we replace these incomplete
     /// stories with currently existing ones with some of their data updated
     /// from the incomplete json stories.
-    jsonStoryClusters.forEach((StoryCluster jsonStoryCluster) {
+    for (StoryCluster jsonStoryCluster in jsonStoryClusters) {
       List<Story> jsonStoryClusterStories = jsonStoryCluster.stories;
       List<Story> replacementStories = <Story>[];
-      jsonStoryClusterStories.forEach((Story jsonStory) {
-        Story replacementStory = currentStoriesMap[jsonStory.id.value];
-        replacementStory.update(jsonStory);
+      for (Story jsonStory in jsonStoryClusterStories) {
+        Story replacementStory = currentStoriesMap[jsonStory.id.value]
+          ..update(jsonStory);
         replacementStories.add(replacementStory);
-      });
+      }
       jsonStoryCluster.replaceStories(replacementStories);
-    });
+    }
 
     List<StoryCluster> oldStoryClusters = _storyClusters.toList();
     List<StoryCluster> newStoryClusters = <StoryCluster>[];
 
     /// For each json story cluster...
-    jsonStoryClusters.forEach((StoryCluster jsonStoryCluster) {
+    for (StoryCluster jsonStoryCluster in jsonStoryClusters) {
       List<Story> jsonStoryClusterStories = jsonStoryCluster.stories;
       Iterable<String> jsonStoryClusterStoryIds =
           jsonStoryClusterStories.map((Story story) => story.id.value);
@@ -254,11 +254,12 @@ class StoryProviderStoryGenerator {
       );
       newStoryClusters.add(newStoryCluster);
       newStoryCluster.update(jsonStoryCluster);
-    });
+    }
 
     /// We've merged all the clusters, update everyone with the new list.
-    _storyClusters.clear();
-    _storyClusters.addAll(newStoryClusters);
+    _storyClusters
+      ..clear()
+      ..addAll(newStoryClusters);
     _notifyListeners();
   }
 
@@ -269,18 +270,18 @@ class StoryProviderStoryGenerator {
     List<StoryCluster> storyClusters,
   ) {
     Map<String, Story> storyMap = <String, Story>{};
-    storyClusterToMatch.stories.forEach(
-      (Story story) => storyMap[story.id.value] = story,
-    );
+    for (Story story in storyClusterToMatch.stories) {
+      storyMap[story.id.value] = story;
+    }
 
     /// Find story clusters with same set of stories...
-    Iterable<StoryCluster> exactMatchingStoryClusters =
-        storyClusters.where((StoryCluster storyCluster) {
-      return storyCluster.stories.length == storyMap.length &&
+    Iterable<StoryCluster> exactMatchingStoryClusters = storyClusters.where(
+      (StoryCluster storyCluster) =>
+          storyCluster.stories.length == storyMap.length &&
           storyCluster.stories.every(
             (Story story) => storyMap.containsKey(story.id.value),
-          );
-    });
+          ),
+    );
 
     assert(exactMatchingStoryClusters.length <= 1);
 
@@ -292,18 +293,18 @@ class StoryProviderStoryGenerator {
     int bestMatchingStories = 0;
     StoryCluster bestStoryCluster;
 
-    storyClusters.forEach((StoryCluster storyCluster) {
+    for (StoryCluster storyCluster in storyClusters) {
       int matchingStories = 0;
-      storyCluster.stories.forEach((Story story) {
+      for (Story story in storyCluster.stories) {
         if (storyMap.containsKey(story.id.value)) {
           matchingStories++;
         }
-      });
+      }
       if (matchingStories > bestMatchingStories) {
         bestMatchingStories = matchingStories;
         bestStoryCluster = storyCluster;
       }
-    });
+    }
 
     return bestStoryCluster;
   }
@@ -314,11 +315,9 @@ class StoryProviderStoryGenerator {
     List<StoryCluster> jsonStoryClusters = <StoryCluster>[];
 
     if (decodedJson != null) {
-      decodedJson.forEach(
-        (Map<String, dynamic> storyClusterJson) => jsonStoryClusters.add(
-              new StoryCluster.fromJson(storyClusterJson),
-            ),
-      );
+      for (Map<String, dynamic> storyClusterJson in decodedJson) {
+        jsonStoryClusters.add(new StoryCluster.fromJson(storyClusterJson));
+      }
     }
 
     return jsonStoryClusters;
@@ -330,13 +329,13 @@ class StoryProviderStoryGenerator {
     StoryCluster storyCluster = _storyClusters
         .where((StoryCluster storyCluster) => storyCluster.id == storyClusterId)
         .single;
-    storyCluster.stories.forEach((Story story) {
+    for (Story story in storyCluster.stories) {
       log.info('Deleting story ${story.id.value}...');
       _storyProvider.deleteStory(story.id.value, () {
         log.info('Story ${story.id.value} deleted!');
       });
       _removeStory(story.id.value, notify: false);
-    });
+    }
     _storyClusters.remove(storyCluster);
 
     _notifyListeners();
@@ -354,13 +353,12 @@ class StoryProviderStoryGenerator {
       }
 
       // Remove any stories that aren't in the previous story list.
-      _currentStories
+      for (Story story in _currentStories
           .where((Story story) => !storyIds.contains(story.id.value))
-          .toList()
-          .forEach((Story story) {
+          .toList()) {
         log.info('Story ${story.id.value} has been removed!');
         _removeStoryFromClusters(story);
-      });
+      }
 
       // Add only those stories we don't already know about.
       final List<String> storiesToAdd =
@@ -374,17 +372,19 @@ class StoryProviderStoryGenerator {
       // We have previous stories so lets resume them so they can be
       // displayed in a child view.
       int added = 0;
-      storiesToAdd.forEach((String storyId) {
+      for (String storyId in storiesToAdd) {
         _getController(storyId);
-        _storyControllerMap[storyId]
-            .getInfo((StoryInfo storyInfo, StoryState state) {
+        _storyControllerMap[storyId].getInfo((
+          StoryInfo storyInfo,
+          StoryState state,
+        ) {
           _startStory(storyInfo, _storyClusters.length);
           added++;
           if (added == storiesToAdd.length) {
             _onUpdateComplete(callback);
           }
         });
-      });
+      }
     });
   }
 
@@ -416,7 +416,7 @@ class StoryProviderStoryGenerator {
       _getController(storyInfo.id);
       _startStory(storyInfo, 0);
     } else {
-      storyClusters.forEach((StoryCluster storyCluster) {
+      for (StoryCluster storyCluster in storyClusters) {
         Story story = storyCluster.getStory(storyInfo.id);
         if (story != null) {
           DateTime lastInteraction = new DateTime.fromMicrosecondsSinceEpoch(
@@ -431,7 +431,7 @@ class StoryProviderStoryGenerator {
             _notifyListeners();
           }
         }
-      });
+      }
     }
     _onLinkUpdate();
   }
@@ -454,18 +454,18 @@ class StoryProviderStoryGenerator {
   }
 
   void _removeStoryFromClusters(Story story) {
-    storyClusters
+    for (StoryCluster storyCluster in storyClusters
         .where(
-            (StoryCluster storyCluster) => storyCluster.stories.contains(story))
-        .toList()
-        .forEach((StoryCluster storyCluster) {
+          (StoryCluster storyCluster) => storyCluster.stories.contains(story),
+        )
+        .toList()) {
       if (storyCluster.stories.length == 1) {
         _storyClusters.remove(storyCluster);
         _notifyListeners();
       } else {
         storyCluster.absorb(story);
       }
-    });
+    }
   }
 
   void _getController(String storyId) {
@@ -501,7 +501,9 @@ class StoryProviderStoryGenerator {
   }
 
   void _notifyListeners() {
-    _listeners.toList().forEach((VoidCallback listener) => listener());
+    for (VoidCallback listener in _listeners.toList()) {
+      listener();
+    }
     _onStoryClusterChange();
   }
 
@@ -601,7 +603,7 @@ class _StoryWidget extends StatefulWidget {
   final StoryController storyController;
   final int startingIndex;
 
-  _StoryWidget({
+  const _StoryWidget({
     Key key,
     this.storyInfo,
     this.storyController,
@@ -627,22 +629,20 @@ class _StoryWidgetState extends State<_StoryWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return new ScopedModelDescendant<HitTestModel>(
-      builder: (
-        BuildContext context,
-        Widget child,
-        HitTestModel hitTestModel,
-      ) =>
-          _childViewConnection == null
-              ? new Offstage()
-              : new ChildView(
-                  hitTestable:
-                      hitTestModel.isStoryHitTestable(widget.storyInfo.id),
-                  connection: _childViewConnection,
-                ),
-    );
-  }
+  Widget build(BuildContext context) => new ScopedModelDescendant<HitTestModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          HitTestModel hitTestModel,
+        ) =>
+            _childViewConnection == null
+                ? const Offstage()
+                : new ChildView(
+                    hitTestable:
+                        hitTestModel.isStoryHitTestable(widget.storyInfo.id),
+                    connection: _childViewConnection,
+                  ),
+      );
 
   set index(int index) {
     if (_currentIndex != index) {

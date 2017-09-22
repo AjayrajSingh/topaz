@@ -23,7 +23,7 @@ class KernelPanic extends StatelessWidget {
   final VoidCallback onDismiss;
 
   /// Constructor.
-  KernelPanic({Key key, @required this.kernelPanic, this.onDismiss})
+  const KernelPanic({@required this.kernelPanic, Key key, this.onDismiss})
       : super(key: key);
 
   @override

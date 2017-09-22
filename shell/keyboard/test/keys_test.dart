@@ -23,7 +23,7 @@ void main() {
     expect(onTextText, isNull);
 
     await _tap(tester, _getMiddleOfLeftSide(tester, textKeyKey));
-    expect(onTextText, "A");
+    expect(onTextText, 'A');
   });
 
   testWidgets(

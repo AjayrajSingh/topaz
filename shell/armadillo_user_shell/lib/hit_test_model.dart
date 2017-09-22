@@ -28,7 +28,7 @@ class HitTestModel extends Model {
 
   /// Sets the quick settings overlay's [active] status.
   /// See [isStoryHitTestable] for details.
-  void onQuickSettingsOverlayChanged(bool active) {
+  void onQuickSettingsOverlayChanged({bool active}) {
     if (_storiesObscuredByQuickSettingsOverlay != active) {
       _storiesObscuredByQuickSettingsOverlay = active;
       notifyListeners();
@@ -37,7 +37,7 @@ class HitTestModel extends Model {
 
   /// Sets the suggestion overlay's [active] status.
   /// See [isStoryHitTestable] for details.
-  void onSuggestionsOverlayChanged(bool active) {
+  void onSuggestionsOverlayChanged({bool active}) {
     if (_storiesObscuredBySuggestionOverlay != active) {
       _storiesObscuredBySuggestionOverlay = active;
       notifyListeners();

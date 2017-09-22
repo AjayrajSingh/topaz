@@ -21,7 +21,7 @@ const double _kDefaultRowHeight = 54.0;
 const double _kKeyTextSize = 22.0;
 const TextStyle _kDefaultTextStyle = const TextStyle(
   color: Colors.white,
-  fontFamily: "Roboto-Light",
+  fontFamily: 'Roboto-Light',
   fontSize: _kKeyTextSize,
 );
 
@@ -52,206 +52,206 @@ const int _kKeyboardLayoutIndexUpperCase = 1;
 const int _kKeyboardLayoutIndexSymbolsOne = 2;
 const int _kKeyboardLayoutIndexSymbolsTwo = 3;
 
-const String _kKeyboardLayoutsJson = "["
+const String _kKeyboardLayoutsJson = '['
 // Lower Case Layout
-    "["
-    "["
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},"
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},"
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"q\"},"
-    "{\"$_kKeyText\":\"w\"},"
-    "{\"$_kKeyText\":\"e\"},"
-    "{\"$_kKeyText\":\"r\"},"
-    "{\"$_kKeyText\":\"t\"},"
-    "{\"$_kKeyText\":\"y\"},"
-    "{\"$_kKeyText\":\"u\"},"
-    "{\"$_kKeyText\":\"i\"},"
-    "{\"$_kKeyText\":\"o\"},"
-    "{\"$_kKeyText\":\"p\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"a\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.66666666\"},"
-    "{\"$_kKeyText\":\"s\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"d\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"f\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"g\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"h\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"j\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"k\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"l\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.33333333\"}"
-    "],"
-    "["
-    "{\"$_kKeyImage\":\"packages/keyboard/res/ArrowUp.png\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexUpperCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"},"
-    "{\"$_kKeyText\":\"z\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"x\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"c\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"v\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"b\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"n\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"m\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"5\"},"
-    "{\"$_kKeyImage\":\"packages/keyboard/res/Space.png\", \"$_kKeyAction\":\"$_kKeyActionSpace\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"10\"},"
-    "{\"$_kKeyText\":\".\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"}"
-    "]"
-    "],"
+    '['
+    '['
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},'
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},'
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"q\"},'
+    '{\"$_kKeyText\":\"w\"},'
+    '{\"$_kKeyText\":\"e\"},'
+    '{\"$_kKeyText\":\"r\"},'
+    '{\"$_kKeyText\":\"t\"},'
+    '{\"$_kKeyText\":\"y\"},'
+    '{\"$_kKeyText\":\"u\"},'
+    '{\"$_kKeyText\":\"i\"},'
+    '{\"$_kKeyText\":\"o\"},'
+    '{\"$_kKeyText\":\"p\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"a\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.66666666\"},'
+    '{\"$_kKeyText\":\"s\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"d\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"f\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"g\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"h\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"j\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"k\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"l\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.33333333\"}'
+    '],'
+    '['
+    '{\"$_kKeyImage\":\"packages/keyboard/res/ArrowUp.png\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexUpperCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"},'
+    '{\"$_kKeyText\":\"z\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"x\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"c\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"v\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"b\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"n\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"m\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"5\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/Space.png\", \"$_kKeyAction\":\"$_kKeyActionSpace\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"10\"},'
+    '{\"$_kKeyText\":\".\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"}'
+    ']'
+    '],'
 // Upper Case Layout
-    "["
-    "["
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},"
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},"
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"Q\"},"
-    "{\"$_kKeyText\":\"W\"},"
-    "{\"$_kKeyText\":\"E\"},"
-    "{\"$_kKeyText\":\"R\"},"
-    "{\"$_kKeyText\":\"T\"},"
-    "{\"$_kKeyText\":\"Y\"},"
-    "{\"$_kKeyText\":\"U\"},"
-    "{\"$_kKeyText\":\"I\"},"
-    "{\"$_kKeyText\":\"O\"},"
-    "{\"$_kKeyText\":\"P\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"A\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.66666666\"},"
-    "{\"$_kKeyText\":\"S\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"D\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"F\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"G\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"H\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"J\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"K\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"L\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.33333333\"}"
-    "],"
-    "["
-    "{\"$_kKeyImage\":\"packages/keyboard/res/ArrowDown.png\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexLowerCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"},"
-    "{\"$_kKeyText\":\"Z\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"X\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"C\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"V\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"B\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"N\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"M\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"5\"},"
-    "{\"$_kKeyImage\":\"packages/keyboard/res/Space.png\", \"$_kKeyAction\":\"$_kKeyActionSpace\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"10\"},"
-    "{\"$_kKeyText\":\".\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"}"
-    "]"
-    "],"
+    '['
+    '['
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},'
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},'
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"Q\"},'
+    '{\"$_kKeyText\":\"W\"},'
+    '{\"$_kKeyText\":\"E\"},'
+    '{\"$_kKeyText\":\"R\"},'
+    '{\"$_kKeyText\":\"T\"},'
+    '{\"$_kKeyText\":\"Y\"},'
+    '{\"$_kKeyText\":\"U\"},'
+    '{\"$_kKeyText\":\"I\"},'
+    '{\"$_kKeyText\":\"O\"},'
+    '{\"$_kKeyText\":\"P\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"A\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.66666666\"},'
+    '{\"$_kKeyText\":\"S\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"D\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"F\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"G\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"H\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"J\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"K\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"L\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.33333333\"}'
+    '],'
+    '['
+    '{\"$_kKeyImage\":\"packages/keyboard/res/ArrowDown.png\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexLowerCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"},'
+    '{\"$_kKeyText\":\"Z\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"X\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"C\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"V\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"B\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"N\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"M\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"5\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/Space.png\", \"$_kKeyAction\":\"$_kKeyActionSpace\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"10\"},'
+    '{\"$_kKeyText\":\".\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"}'
+    ']'
+    '],'
 // Symbols One Layout
-    "["
-    "["
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},"
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},"
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"1\"},"
-    "{\"$_kKeyText\":\"2\"},"
-    "{\"$_kKeyText\":\"3\"},"
-    "{\"$_kKeyText\":\"4\"},"
-    "{\"$_kKeyText\":\"5\"},"
-    "{\"$_kKeyText\":\"6\"},"
-    "{\"$_kKeyText\":\"7\"},"
-    "{\"$_kKeyText\":\"8\"},"
-    "{\"$_kKeyText\":\"9\"},"
-    "{\"$_kKeyText\":\"0\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"@\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.66666666\"},"
-    "{\"$_kKeyText\":\"#\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"\$\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"%\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"&\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"-\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"+\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"(\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\")\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.33333333\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"=\\\\<\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsTwo\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"},"
-    "{\"$_kKeyText\":\"*\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"\\\\\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"\'\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\":\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\";\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"!\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"?\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"ABC\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexLowerCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"},"
-    "{\"$_kKeyText\":\",\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"_\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyImage\":\"packages/keyboard/res/Space.png\", \"$_kKeyAction\":\"$_kKeyActionSpace\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"6\"},"
-    "{\"$_kKeyText\":\"/\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\".\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"}"
-    "]"
-    "],"
+    '['
+    '['
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},'
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},'
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"1\"},'
+    '{\"$_kKeyText\":\"2\"},'
+    '{\"$_kKeyText\":\"3\"},'
+    '{\"$_kKeyText\":\"4\"},'
+    '{\"$_kKeyText\":\"5\"},'
+    '{\"$_kKeyText\":\"6\"},'
+    '{\"$_kKeyText\":\"7\"},'
+    '{\"$_kKeyText\":\"8\"},'
+    '{\"$_kKeyText\":\"9\"},'
+    '{\"$_kKeyText\":\"0\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"@\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.66666666\"},'
+    '{\"$_kKeyText\":\"#\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"\$\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"%\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"&\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"-\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"+\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"(\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\")\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.33333333\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"=\\\\<\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsTwo\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"},'
+    '{\"$_kKeyText\":\"*\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"\\\\\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"\'\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\":\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\";\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"!\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"?\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"ABC\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexLowerCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"},'
+    '{\"$_kKeyText\":\",\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"_\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/Space.png\", \"$_kKeyAction\":\"$_kKeyActionSpace\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"6\"},'
+    '{\"$_kKeyText\":\"/\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\".\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"}'
+    ']'
+    '],'
 // Symbols Two Layout
-    "["
-    "["
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},"
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},"
-    "{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"~\"},"
-    "{\"$_kKeyText\":\"`\"},"
-    "{\"$_kKeyText\":\"|\"},"
-    "{\"$_kKeyText\":\"\u{2022}\"},"
-    "{\"$_kKeyText\":\"\u{221A}\"},"
-    "{\"$_kKeyText\":\"\u{03C0}\"},"
-    "{\"$_kKeyText\":\"\u{00F7}\"},"
-    "{\"$_kKeyText\":\"\u{00D7}\"},"
-    "{\"$_kKeyText\":\"\u{00B6}\"},"
-    "{\"$_kKeyText\":\"\u{2206}\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"\u{00A3}\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.66666666\"},"
-    "{\"$_kKeyText\":\"\u{00A2}\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"\u{20AC}\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"\u{00A5}\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"^\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"\u{00B0}\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"=\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"{\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"}\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.33333333\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"},"
-    "{\"$_kKeyText\":\"\\\\\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"\u{00A9}\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"\u{00AE}\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"\u{2122}\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"\u{2105}\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"[\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"]\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"}"
-    "],"
-    "["
-    "{\"$_kKeyText\":\"ABC\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexLowerCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"},"
-    "{\"$_kKeyText\":\",\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"<\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyImage\":\"packages/keyboard/res/Space.png\", \"$_kKeyAction\":\"$_kKeyActionSpace\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"6\"},"
-    "{\"$_kKeyText\":\">\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\".\", \"$_kKeyWidth\":\"2\"},"
-    "{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"}"
-    "]"
-    "]"
-    "]";
+    '['
+    '['
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},'
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},'
+    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"~\"},'
+    '{\"$_kKeyText\":\"`\"},'
+    '{\"$_kKeyText\":\"|\"},'
+    '{\"$_kKeyText\":\"\u{2022}\"},'
+    '{\"$_kKeyText\":\"\u{221A}\"},'
+    '{\"$_kKeyText\":\"\u{03C0}\"},'
+    '{\"$_kKeyText\":\"\u{00F7}\"},'
+    '{\"$_kKeyText\":\"\u{00D7}\"},'
+    '{\"$_kKeyText\":\"\u{00B6}\"},'
+    '{\"$_kKeyText\":\"\u{2206}\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"\u{00A3}\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.66666666\"},'
+    '{\"$_kKeyText\":\"\u{00A2}\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"\u{20AC}\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"\u{00A5}\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"^\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"\u{00B0}\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"=\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"{\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"}\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.33333333\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"},'
+    '{\"$_kKeyText\":\"\\\\\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"\u{00A9}\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"\u{00AE}\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"\u{2122}\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"\u{2105}\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"[\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"]\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"}'
+    '],'
+    '['
+    '{\"$_kKeyText\":\"ABC\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexLowerCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"},'
+    '{\"$_kKeyText\":\",\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"<\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/Space.png\", \"$_kKeyAction\":\"$_kKeyActionSpace\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"6\"},'
+    '{\"$_kKeyText\":\">\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\".\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"}'
+    ']'
+    ']'
+    ']';
 
 final List<List<List<Map<String, String>>>> _kKeyboardLayouts =
     JSON.decode(_kKeyboardLayoutsJson);
@@ -271,7 +271,8 @@ class Keyboard extends StatefulWidget {
   final VoidCallback onGo;
 
   /// Constructor.
-  Keyboard({Key key, this.onText, this.onSuggestion, this.onDelete, this.onGo})
+  const Keyboard(
+      {Key key, this.onText, this.onSuggestion, this.onDelete, this.onGo})
       : super(key: key);
 
   @override
@@ -299,17 +300,15 @@ class KeyboardState extends State<Keyboard> {
   void initState() {
     super.initState();
     _keyboards = <Widget>[];
-    _kKeyboardLayouts.forEach((List<List<Map<String, String>>> keyboard) {
+    for (List<List<Map<String, String>>> keyboard in _kKeyboardLayouts) {
       _keyboards.add(
         new IntrinsicHeight(
           child: new Column(
-            children: keyboard
-                .map((List<Map<String, String>> jsonRow) => _makeRow(jsonRow))
-                .toList(),
+            children: keyboard.map(_makeRow).toList(),
           ),
         ),
       );
-    });
+    }
     _keyboardWidget = _keyboards[0];
   }
 
@@ -349,15 +348,13 @@ class KeyboardState extends State<Keyboard> {
   }
 
   void _clearSuggestions() {
-    _suggestionKeys.forEach((GlobalKey<TextKeyState> suggestionKey) {
+    for (GlobalKey<TextKeyState> suggestionKey in _suggestionKeys) {
       suggestionKey.currentState?.text = '';
-    });
+    }
   }
 
   Row _makeRow(List<Map<String, String>> jsonRow) => new Row(
-      children: jsonRow
-          .map((Map<String, String> jsonKey) => _makeKey(jsonKey))
-          .toList(),
+      children: jsonRow.map(_makeKey).toList(),
       mainAxisAlignment: MainAxisAlignment.center);
 
   Widget _makeKey(Map<String, String> jsonKey) {

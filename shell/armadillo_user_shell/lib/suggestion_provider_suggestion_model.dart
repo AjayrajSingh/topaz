@@ -54,18 +54,16 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
   @override
   void onAdd(List<maxwell.Suggestion> suggestions) {
     log.fine('$prefix onAdd $suggestions');
-    suggestions.forEach(
-      (maxwell.Suggestion suggestion) {
-        if (downgradeInterruptions ||
-            suggestion.display.annoyance == maxwell.AnnoyanceType.none) {
-          _suggestions.add(_convert(suggestion));
-        } else {
-          Suggestion interruption = _convert(suggestion);
-          _interruptions.add(interruption);
-          interruptionListener.onInterruptionAdded(interruption);
-        }
-      },
-    );
+    for (maxwell.Suggestion suggestion in suggestions) {
+      if (downgradeInterruptions ||
+          suggestion.display.annoyance == maxwell.AnnoyanceType.none) {
+        _suggestions.add(_convert(suggestion));
+      } else {
+        Suggestion interruption = _convert(suggestion);
+        _interruptions.add(interruption);
+        interruptionListener.onInterruptionAdded(interruption);
+      }
+    }
     suggestionListener?.call();
   }
 
@@ -91,11 +89,11 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
     log.fine('$prefix onRemoveAll');
     List<Suggestion> interruptionsToRemove = _interruptions.toList();
     _interruptions.clear();
-    interruptionsToRemove.forEach(
-      (Suggestion suggestion) => interruptionListener.onInterruptionRemoved(
-            suggestion.id.value,
-          ),
-    );
+    for (Suggestion suggestion in interruptionsToRemove) {
+      interruptionListener.onInterruptionRemoved(
+        suggestion.id.value,
+      );
+    }
     _suggestions.clear();
     suggestionListener?.call();
   }
@@ -129,10 +127,11 @@ class _InterruptionListener extends maxwell.SuggestionListener {
   });
 
   @override
-  void onAdd(List<maxwell.Suggestion> suggestions) => suggestions.forEach(
-        (maxwell.Suggestion suggestion) =>
-            onInterruptionAdded(_convert(suggestion)),
-      );
+  void onAdd(List<maxwell.Suggestion> suggestions) {
+    for (maxwell.Suggestion suggestion in suggestions) {
+      onInterruptionAdded(_convert(suggestion));
+    }
+  }
 
   @override
   void onRemove(String uuid) {
@@ -261,17 +260,9 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   ) {
     _suggestionProviderProxy = suggestionProviderProxy;
     _interruptionListener = new _InterruptionListener(
-      onInterruptionAdded: (Suggestion interruption) {
-        onInterruptionAdded(interruption);
-      },
-      onInterruptionRemoved: (String uuid) {
-        onInterruptionRemoved(uuid);
-        _onInterruptionRemoved(uuid);
-      },
-      onInterruptionsRemoved: () {
-        onInterruptionsRemoved();
-        _onInterruptionsRemoved();
-      },
+      onInterruptionAdded: onInterruptionAdded,
+      onInterruptionRemoved: _onInterruptionRemoved,
+      onInterruptionsRemoved: _onInterruptionsRemoved,
     );
     _askListener = new _MaxwellSuggestionListenerImpl(
       prefix: 'ask',
@@ -335,6 +326,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   /// Called when an interruption has been removed.
   void _onInterruptionRemoved(String uuid) {
+    onInterruptionRemoved(uuid);
     _currentInterruptions.removeWhere(
       (Suggestion interruption) => interruption.id.value == uuid,
     );
@@ -343,6 +335,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   /// Called when an interruption has been removed.
   void _onInterruptionsRemoved() {
+    onInterruptionsRemoved();
     _currentInterruptions.clear();
     notifyListeners();
   }
@@ -369,8 +362,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   List<Suggestion> get nextSuggestions {
     List<Suggestion> suggestions = new List<Suggestion>.from(
       _currentInterruptions,
-    );
-    suggestions.addAll(_nextListener?.suggestions ?? <Suggestion>[]);
+    )..addAll(_nextListener?.suggestions ?? <Suggestion>[]);
     return suggestions;
   }
 
@@ -418,7 +410,9 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       if (_lastFocusedStoryCluster == null) {
         _lastFocusedStoryClusterId = null;
         _onStoryListChanged();
-        _focusLossListeners.forEach((VoidCallback listener) => listener());
+        for (VoidCallback listener in _focusLossListeners) {
+          listener();
+        }
       }
     }
   }

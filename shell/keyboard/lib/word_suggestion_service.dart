@@ -214,10 +214,10 @@ const List<String> _kWords = const <String>[
 class WordSuggestionService {
   /// Returns a list of words that are similar to [input].
   List<String> suggestWords(String input) {
-    final List<String> suggestedWords = new List<String>.from(_kWords);
-    suggestedWords.removeWhere((String a) => levenshteinDistance(input, a) > 3);
-    suggestedWords.sort((String a, String b) =>
-        levenshteinDistance(input, a) - levenshteinDistance(input, b));
+    final List<String> suggestedWords = new List<String>.from(_kWords)
+      ..removeWhere((String a) => levenshteinDistance(input, a) > 3)
+      ..sort((String a, String b) =>
+          levenshteinDistance(input, a) - levenshteinDistance(input, b));
     return suggestedWords;
   }
 
@@ -227,10 +227,10 @@ class WordSuggestionService {
     if (s == t) {
       return 0;
     }
-    if (s.length == 0) {
+    if (s.isEmpty) {
       return t.length;
     }
-    if (t.length == 0) {
+    if (t.isEmpty) {
       return s.length;
     }
 

@@ -26,7 +26,7 @@ Future<Null> main() async {
                   maxHeight: constraints.maxHeight,
                 ),
                 child: new ListView.builder(
-                  physics: new _FrictionlessScrollPhysics(),
+                  physics: const _FrictionlessScrollPhysics(),
                   itemExtent: cardHeight,
                   itemBuilder: (BuildContext context, int index) =>
                       new Container(
@@ -53,7 +53,7 @@ class _FrictionlessScrollPhysics extends ScrollPhysics {
 
   @override
   ScrollPhysics applyTo(ScrollPhysics ancestor) {
-    return new _FrictionlessScrollPhysics();
+    return const _FrictionlessScrollPhysics();
   }
 
   @override

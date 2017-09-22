@@ -147,7 +147,9 @@ class _AskHandlerImpl extends AskHandler {
   }
 
   void stop() {
-    _bindings.forEach((CustomActionBinding binding) => binding.close());
+    for (CustomActionBinding binding in _bindings) {
+      binding.close();
+    }
   }
 }
 

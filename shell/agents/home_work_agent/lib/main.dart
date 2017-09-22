@@ -37,11 +37,10 @@ class HomeWorkAgent extends AgentImpl {
     IntelligenceServicesProxy intelligenceServices =
         new IntelligenceServicesProxy();
     agentContext.getIntelligenceServices(intelligenceServices.ctrl.request());
-    intelligenceServices.getProposalPublisher(
-      _proposalPublisher.ctrl.request(),
-    );
-    intelligenceServices.getContextReader(_contextReader.ctrl.request());
-    intelligenceServices.ctrl.close();
+    intelligenceServices
+      ..getProposalPublisher(_proposalPublisher.ctrl.request())
+      ..getContextReader(_contextReader.ctrl.request())
+      ..ctrl.close();
 
     _homeWorkProposer.start(_contextReader, _proposalPublisher);
   }
@@ -59,6 +58,5 @@ Future<Null> main(List<dynamic> args) async {
       new ApplicationContext.fromStartupInfo();
   _agent = new HomeWorkAgent(
     applicationContext: applicationContext,
-  );
-  _agent.advertise();
+  )..advertise();
 }

@@ -75,23 +75,24 @@ class _ContextAwareProposer {
             : <String, List<Map<String, String>>>{};
 
     if (proposals.keys.contains('unknown')) {
-      proposals['unknown'].forEach((Map<String, String> proposal) {
+      for (Map<String, String> proposal in proposals['unknown']) {
         proposalPublisher.propose(_createProposal(proposal));
-      });
+      }
     }
 
     if (dataProposals.keys.contains('unknown')) {
-      dataProposals['unknown'].forEach((Map<String, String> proposal) {
+      for (Map<String, String> proposal in dataProposals['unknown']) {
         proposalPublisher.propose(_createProposal(proposal));
-      });
+      }
     }
 
-    ContextSelector selector = new ContextSelector();
-    selector.type = ContextValueType.entity;
-    selector.meta = new ContextMetadata();
-    selector.meta.entity = new EntityMetadata()..topic = _kLocationHomeWorkTopic;
-    ContextQuery query = new ContextQuery();
-    query.selector = <String, ContextSelector>{_kLocationHomeWorkTopic: selector};
+    ContextSelector selector = new ContextSelector()
+      ..type = ContextValueType.entity
+      ..meta = new ContextMetadata();
+    selector.meta.entity = new EntityMetadata()
+      ..topic = _kLocationHomeWorkTopic;
+    ContextQuery query = new ContextQuery()
+      ..selector = <String, ContextSelector>{_kLocationHomeWorkTopic: selector};
 
     contextReader.subscribe(
       query,
@@ -105,35 +106,33 @@ class _ContextAwareProposer {
             }
 
             // Remove all proposals.
-            proposals.values.forEach(
-              (List<Map<String, String>> proposalCategories) =>
-                  proposalCategories.forEach(
-                    (Map<String, String> proposal) =>
-                        proposalPublisher.remove(proposal['id']),
-                  ),
-            );
+            for (List<Map<String, String>> proposalCategories
+                in proposals.values) {
+              for (Map<String, String> proposal in proposalCategories) {
+                proposalPublisher.remove(proposal['id']);
+              }
+            }
 
-            dataProposals.values.forEach(
-              (List<Map<String, String>> proposalCategories) =>
-                  proposalCategories.forEach(
-                    (Map<String, String> proposal) =>
-                        proposalPublisher.remove(proposal['id']),
-                  ),
-            );
+            for (List<Map<String, String>> proposalCategories
+                in dataProposals.values) {
+              for (Map<String, String> proposal in proposalCategories) {
+                proposalPublisher.remove(proposal['id']);
+              }
+            }
 
             // Add proposals for this location.
             if (proposals.keys.contains(json['location'])) {
-              proposals[json['location']]
-                  .forEach((Map<String, String> proposal) {
+              for (Map<String, String> proposal
+                  in proposals[json['location']]) {
                 proposalPublisher.propose(_createProposal(proposal));
-              });
+              }
             }
 
             if (dataProposals.keys.contains(json['location'])) {
-              dataProposals[json['location']]
-                  .forEach((Map<String, String> proposal) {
+              for (Map<String, String> proposal
+                  in dataProposals[json['location']]) {
                 proposalPublisher.propose(_createProposal(proposal));
-              });
+              }
             }
           },
         ),
@@ -156,7 +155,7 @@ class _ContextListenerImpl extends ContextListener {
 
   @override
   void onContextUpdate(ContextUpdate result) {
-    if (result.values[_kLocationHomeWorkTopic].length > 0) {
+    if (result.values[_kLocationHomeWorkTopic].isNotEmpty) {
       onTopicChanged(result.values[_kLocationHomeWorkTopic][0].content);
     }
   }
@@ -172,8 +171,9 @@ class _AskHandlerImpl extends AskHandler {
     List<Proposal> proposals = <Proposal>[];
 
     if (query.text?.toLowerCase()?.startsWith('demo') ?? false) {
-      proposals.addAll(askProposals.map(_createProposal));
-      proposals.add(_launchEverythingProposal);
+      proposals
+        ..addAll(askProposals.map(_createProposal))
+        ..add(_launchEverythingProposal);
     }
 
     if ((query.text?.toLowerCase()?.startsWith('per') ?? false) ||
@@ -192,12 +192,11 @@ class _AskHandlerImpl extends AskHandler {
 
     if ((query.text?.length ?? 0) >= 4) {
       void scanDirectory(Directory directory) {
-        directory
+        for (String path in directory
             .listSync(recursive: true, followLinks: false)
             .map((FileSystemEntity fileSystemEntity) => fileSystemEntity.path)
             .where((String path) => path.contains(query.text))
-            .where((String path) => FileSystemEntity.isFileSync(path))
-            .forEach((String path) {
+            .where(FileSystemEntity.isFileSync)) {
           String name = Uri.parse(path).pathSegments.last;
           String iconUrl =
               'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png';
@@ -241,7 +240,7 @@ class _AskHandlerImpl extends AskHandler {
               color: color,
             ),
           );
-        });
+        }
       }
 
       scanDirectory(new Directory('/system/apps/'));
