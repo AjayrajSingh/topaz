@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:apps.maxwell.lib.dart/decomposition.dart';
+import 'package:lib.decomposition.dart/decomposition.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';

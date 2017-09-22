@@ -8,11 +8,11 @@ dart_app("last_fm_agent") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//apps/maxwell/lib/dart",
-    "//apps/maxwell/services/context:context_dart",
-    "//apps/maxwell/services/context:context_dart",
-    "//apps/maxwell/services/suggestion:suggestion_dart",
-    "//apps/maxwell/services/user:user_dart",
+    "//peridot/public/lib/decomposition/dart",
+    "//peridot/public/lib/context/fidl:fidl_dart",
+    "//peridot/public/lib/context/fidl:fidl_dart",
+    "//peridot/public/lib/suggestion/fidl:fidl_dart",
+    "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
     "//topaz/app/music/packages/last_fm_api",

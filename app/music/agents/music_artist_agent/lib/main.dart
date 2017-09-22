@@ -5,14 +5,14 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:apps.maxwell.lib.dart/decomposition.dart';
-import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
-import 'package:apps.maxwell.services.context/metadata.fidl.dart';
-import 'package:apps.maxwell.services.context/value.fidl.dart';
-import 'package:apps.maxwell.services.context/value_type.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
+import 'package:lib.decomposition.dart/decomposition.dart';
+import 'package:lib.context.fidl/context_reader.fidl.dart';
+import 'package:lib.context.fidl/metadata.fidl.dart';
+import 'package:lib.context.fidl/value.fidl.dart';
+import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:lib.suggestion.fidl/proposal.fidl.dart';
+import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
+import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:config/config.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
