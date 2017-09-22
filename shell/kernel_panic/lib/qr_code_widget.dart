@@ -16,7 +16,7 @@ class QrCodeWidget extends StatefulWidget {
   final QrCode qrCode;
 
   /// Encodes [text] into a QR Code image.
-  QrCodeWidget(String text) : qrCode = QrCode.encodeText(text, EccEnum.low);
+  QrCodeWidget(String text) : qrCode = new QrCode.encodeText(text, EccEnum.low);
 
   @override
   _QrCodeWidgetState createState() => new _QrCodeWidgetState();

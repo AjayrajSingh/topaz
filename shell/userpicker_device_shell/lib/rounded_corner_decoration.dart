@@ -16,7 +16,7 @@ class RoundedCornerDecoration extends Decoration {
   final Color color;
 
   /// Constructor.
-  RoundedCornerDecoration({this.radius, this.color});
+  const RoundedCornerDecoration({this.radius, this.color});
 
   @override
   BoxPainter createBoxPainter([VoidCallback onChanged]) =>
@@ -30,13 +30,13 @@ class RoundedCornerDecoration extends Decoration {
     super.debugFillProperties(description);
     description
       ..defaultDiagnosticsTreeStyle = DiagnosticsTreeStyle.whitespace
-      ..emptyBodyDescription = '<no decorations specified>';
-    description.add(
-      new DiagnosticsProperty<Color>('color', color, defaultValue: null),
-    );
-    description.add(
-      new DiagnosticsProperty<double>('radius', radius, defaultValue: null),
-    );
+      ..emptyBodyDescription = '<no decorations specified>'
+      ..add(
+        new DiagnosticsProperty<Color>('color', color, defaultValue: null),
+      )
+      ..add(
+        new DiagnosticsProperty<double>('radius', radius, defaultValue: null),
+      );
   }
 }
 

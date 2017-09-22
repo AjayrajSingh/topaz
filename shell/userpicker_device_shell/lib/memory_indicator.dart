@@ -47,7 +47,7 @@ class _MemoryIndicatorState extends State<MemoryIndicator> {
   @override
   Widget build(BuildContext context) {
     return _freeMemory == null
-        ? new Offstage()
+        ? const Offstage()
         : new Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
             new Icon(Icons.memory, color: Colors.white, size: 12.0),
             new Container(height: 0.0, width: 4.0),

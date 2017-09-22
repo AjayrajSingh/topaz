@@ -5,7 +5,9 @@
 import 'package:flutter/services.dart';
 
 AssetBundle _initBundle() {
-  if (rootBundle != null) return rootBundle;
+  if (rootBundle != null) {
+    return rootBundle;
+  }
   return new NetworkAssetBundle(Uri.base);
 }
 

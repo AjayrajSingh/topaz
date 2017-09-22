@@ -27,7 +27,7 @@ class ChildConstraintsChanger extends StatefulWidget {
   final Widget child;
 
   /// Constructor.
-  ChildConstraintsChanger({Key key, this.constraintsModel, this.child})
+  const ChildConstraintsChanger({Key key, this.constraintsModel, this.child})
       : super(key: key);
 
   @override

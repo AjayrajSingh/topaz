@@ -84,8 +84,8 @@ final BorderRadius _kAlbumMakerBorderRadius = new BorderRadius.circular(16.0);
 final BorderRadius _kPhotoListBorderRadius = new BorderRadius.circular(16.0);
 final BorderRadius _kSearchBoxBorderRadius = new BorderRadius.circular(8.0);
 final BorderRadius _kVideoPlayerBorderRadius = new BorderRadius.only(
-  bottomLeft: new Radius.circular(16.0),
-  bottomRight: new Radius.circular(16.0),
+  bottomLeft: const Radius.circular(16.0),
+  bottomRight: const Radius.circular(16.0),
 );
 
 const Color _kAutoMagicButtonBackgroundColor = const Color(0xFF4A78C0);
@@ -107,8 +107,7 @@ final ApplicationContext _applicationContext =
 Future<Null> main() async {
   MediaPlayerController controller = new MediaPlayerController(
     _applicationContext.environmentServices,
-  );
-  controller.open(_kVideoUri);
+  )..open(_kVideoUri);
 
   _VideoModel videoModel = new _VideoModel(controller: controller);
 
@@ -162,7 +161,7 @@ Future<Null> main() async {
                       builder: (_, BoxConstraints constraints) =>
                           (constraints.maxWidth == 0.0 ||
                                   constraints.maxHeight == 0.0)
-                              ? new Offstage()
+                              ? const Offstage()
                               : new ScopedModelDescendant<_VideoModel>(
                                   builder: (_, __, _VideoModel videoModel) =>
                                       new _VideoPlayer(videoModel: videoModel),
@@ -224,8 +223,9 @@ class _VideoModel extends Model {
   }
 
   void _resetPlayingState() {
-    controller.pause();
-    controller.seek(Duration.ZERO);
+    controller
+      ..pause()
+      ..seek(Duration.ZERO);
     progress = Duration.ZERO;
     playing = false;
   }
@@ -288,7 +288,7 @@ class _VideoModel extends Model {
 class _VideoPlayer extends StatelessWidget {
   final _VideoModel videoModel;
 
-  _VideoPlayer({this.videoModel});
+  const _VideoPlayer({this.videoModel});
 
   @override
   Widget build(BuildContext context) => new Offstage(
@@ -338,7 +338,7 @@ class _VideoPlayer extends StatelessWidget {
 class _Video extends StatelessWidget {
   final _VideoModel videoModel;
 
-  _Video({this.videoModel});
+  const _Video({this.videoModel});
 
   @override
   Widget build(BuildContext context) => new GestureDetector(
@@ -359,7 +359,7 @@ class _Video extends StatelessWidget {
 class _VideoControls extends StatelessWidget {
   final _VideoModel videoModel;
 
-  _VideoControls({this.videoModel});
+  const _VideoControls({this.videoModel});
 
   @override
   Widget build(BuildContext context) => new Container(
@@ -375,15 +375,15 @@ class _VideoControls extends StatelessWidget {
               ),
             ),
             new _VideoControlButton(
-              onTap: () => videoModel.skipBack(),
+              onTap: videoModel.skipBack,
               icon: Icons.fast_rewind,
             ),
             new _VideoControlButton(
-              onTap: () => videoModel.togglePlayPause(),
+              onTap: videoModel.togglePlayPause,
               icon: videoModel.playing ? Icons.pause : Icons.play_arrow,
             ),
             new _VideoControlButton(
-              onTap: () => videoModel.skipForward(),
+              onTap: videoModel.skipForward,
               icon: Icons.fast_forward,
             ),
             new Expanded(
@@ -400,7 +400,7 @@ class _VideoControls extends StatelessWidget {
 class _VideoTime extends StatelessWidget {
   final Duration time;
 
-  _VideoTime({this.time});
+  const _VideoTime({this.time});
 
   @override
   Widget build(BuildContext context) => new Container(
@@ -429,7 +429,7 @@ class _VideoControlButton extends StatelessWidget {
   final VoidCallback onTap;
   final IconData icon;
 
-  _VideoControlButton({this.onTap, this.icon});
+  const _VideoControlButton({this.onTap, this.icon});
 
   @override
   Widget build(BuildContext context) => new GestureDetector(
@@ -451,7 +451,7 @@ class _VideoControlButton extends StatelessWidget {
 class _VideoProgress extends StatelessWidget {
   final _VideoModel videoModel;
 
-  _VideoProgress({this.videoModel});
+  const _VideoProgress({this.videoModel});
 
   @override
   Widget build(BuildContext context) => new Align(
@@ -541,7 +541,7 @@ class _AlbumMaker extends StatelessWidget {
               bottom: _kSunBottomOffset,
               child: new Align(
                 alignment: FractionalOffset.bottomCenter,
-                child: new _Sun(elevation: _kSunRelativeElevation),
+                child: const _Sun(elevation: _kSunRelativeElevation),
               ),
             ),
           ],
@@ -552,7 +552,7 @@ class _AlbumMaker extends StatelessWidget {
 class _PhotoList extends StatelessWidget {
   final VoidCallback onVideoTapped;
 
-  _PhotoList({this.onVideoTapped});
+  const _PhotoList({this.onVideoTapped});
 
   @override
   Widget build(BuildContext context) => new PhysicalModel(
@@ -830,13 +830,13 @@ class _SearchBox extends StatelessWidget {
 class _SunRay extends StatelessWidget {
   final double elevation;
 
-  _SunRay({this.elevation});
+  const _SunRay({this.elevation});
 
   @override
   Widget build(BuildContext context) => new PhysicalModel(
         color: _kSunColor,
         elevation: elevation,
-        child: new SizedBox(
+        child: const SizedBox(
           width: _kSunRayWidth,
           height: _kSunRayHeight,
         ),
@@ -846,7 +846,7 @@ class _SunRay extends StatelessWidget {
 class _Sun extends StatelessWidget {
   final double elevation;
 
-  _Sun({this.elevation});
+  const _Sun({this.elevation});
 
   @override
   Widget build(BuildContext context) => new SizedBox(
@@ -925,7 +925,7 @@ class _Sun extends StatelessWidget {
                 color: _kSunColor,
                 elevation: elevation,
                 shape: BoxShape.circle,
-                child: new SizedBox(
+                child: const SizedBox(
                   width: _kSunCenterDiameter,
                   height: _kSunCenterDiameter,
                 ),

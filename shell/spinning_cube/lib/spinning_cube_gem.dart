@@ -28,7 +28,7 @@ class SpinningCubeGem extends StatelessWidget {
   final Color color;
 
   /// Constructor.
-  SpinningCubeGem({this.controller, this.color});
+  const SpinningCubeGem({this.controller, this.color});
 
   // The six cube faces are:
   //   1. Placed in a stack and rotated and translated into different positions
@@ -138,10 +138,10 @@ class SpinningCubeGem extends StatelessWidget {
   /// cube rotation as specified by [controller],
   /// [_kCubeAnimationXRotation], and [_kCubeAnimationYRotation].
   Widget _createRoundedCubeFace({
-    Matrix4 faceTranslation,
-    Matrix4 faceRotation,
     @required Matrix4 cubePerspective,
     @required double gemSize,
+    Matrix4 faceTranslation,
+    Matrix4 faceRotation,
   }) =>
       new Transform(
         alignment: FractionalOffset.center,

@@ -50,11 +50,9 @@ class NetstackModel extends Model {
       _interfaces.keys
           .where((int id) => !ids.contains(id))
           .toList()
-          .forEach((int id) {
-        _interfaces.remove(id);
-      });
+          .forEach(_interfaces.remove);
 
-      filteredInterfaces.forEach((NetInterface interface) {
+      for (NetInterface interface in filteredInterfaces) {
         netstack.getStats(
           interface.id,
           (NetInterfaceStats stats) {
@@ -70,7 +68,7 @@ class NetstackModel extends Model {
             notifyListeners();
           },
         );
-      });
+      }
     });
   }
 
@@ -159,7 +157,8 @@ void _updateAnimations(
     reveal.reverse();
   }
   if (newValue && oldValue && !repeat.isAnimating) {
-    repeat.value = 0.0;
-    repeat.forward();
+    repeat
+      ..value = 0.0
+      ..forward();
   }
 }

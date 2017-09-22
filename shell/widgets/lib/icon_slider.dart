@@ -51,10 +51,10 @@ class IconSlider extends StatefulWidget {
   ///
   /// * [value] determines currently selected value for this slider.
   /// * [onChanged] is called when the user selects a new value for the slider.
-  IconSlider({
-    Key key,
+  const IconSlider({
     @required this.value,
     @required this.onChanged,
+    Key key,
     this.min: 0.0,
     this.max: 1.0,
     this.divisions,
@@ -62,13 +62,12 @@ class IconSlider extends StatefulWidget {
     this.activeColor,
     this.thumbImage,
   })
-      : super(key: key) {
-    assert(value != null);
-    assert(min != null);
-    assert(max != null);
-    assert(value >= min && value <= max);
-    assert(divisions == null || divisions > 0);
-  }
+      : assert(value != null),
+        assert(min != null),
+        assert(max != null),
+        assert(value >= min && value <= max),
+        assert(divisions == null || divisions > 0),
+        super(key: key);
 
   /// The currently selected value for this slider.
   ///
@@ -143,7 +142,7 @@ class _IconSliderState extends State<IconSlider> with TickerProviderStateMixin {
 }
 
 class _IconSliderRenderObjectWidget extends LeafRenderObjectWidget {
-  _IconSliderRenderObjectWidget(
+  const _IconSliderRenderObjectWidget(
       {Key key,
       this.value,
       this.divisions,
@@ -239,7 +238,7 @@ BoxConstraints _getAdditionalConstraints(String label) {
 class _RenderIconSlider extends RenderConstrainedBox
     implements SemanticsActionHandler {
   _RenderIconSlider({
-    double value,
+    @required double value,
     int divisions,
     String label,
     Color activeColor,
@@ -255,8 +254,8 @@ class _RenderIconSlider extends RenderConstrainedBox
         _textTheme = textTheme,
         _thumbImage = thumbImage,
         _configuration = configuration,
+        assert(value != null && value >= 0.0 && value <= 1.0),
         super(additionalConstraints: _getAdditionalConstraints(label)) {
-    assert(value != null && value >= 0.0 && value <= 1.0);
     this.label = label;
     _drag = new HorizontalDragGestureRecognizer()
       ..onStart = _handleDragStart
@@ -267,19 +266,20 @@ class _RenderIconSlider extends RenderConstrainedBox
       vsync: vsync,
     );
     _reaction = new CurvedAnimation(
-        parent: _reactionController,
-        curve: Curves.fastOutSlowIn)..addListener(markNeedsPaint);
+        parent: _reactionController, curve: Curves.fastOutSlowIn)
+      ..addListener(markNeedsPaint);
     _position = new AnimationController(
-        value: value,
-        duration: _kDiscreteTransitionDuration,
-        vsync: vsync)..addListener(markNeedsPaint);
+        value: value, duration: _kDiscreteTransitionDuration, vsync: vsync)
+      ..addListener(markNeedsPaint);
   }
 
   double get value => _value;
   double _value;
   set value(double newValue) {
     assert(newValue != null && newValue >= 0.0 && newValue <= 1.0);
-    if (newValue == _value) return;
+    if (newValue == _value) {
+      return;
+    }
     _value = newValue;
     if (divisions != null)
       _position.animateTo(newValue, curve: Curves.fastOutSlowIn);
@@ -290,7 +290,9 @@ class _RenderIconSlider extends RenderConstrainedBox
   int get divisions => _divisions;
   int _divisions;
   set divisions(int newDivisions) {
-    if (newDivisions == _divisions) return;
+    if (newDivisions == _divisions) {
+      return;
+    }
     _divisions = newDivisions;
     markNeedsPaint();
   }
@@ -298,7 +300,9 @@ class _RenderIconSlider extends RenderConstrainedBox
   String get label => _label;
   String _label;
   set label(String newLabel) {
-    if (newLabel == _label) return;
+    if (newLabel == _label) {
+      return;
+    }
     _label = newLabel;
     additionalConstraints = _getAdditionalConstraints(_label);
     if (newLabel != null) {
@@ -317,7 +321,9 @@ class _RenderIconSlider extends RenderConstrainedBox
   TextTheme get textTheme => _textTheme;
   TextTheme _textTheme;
   set textTheme(TextTheme value) {
-    if (value == _textTheme) return;
+    if (value == _textTheme) {
+      return;
+    }
     _textTheme = value;
     markNeedsPaint();
   }
@@ -325,7 +331,9 @@ class _RenderIconSlider extends RenderConstrainedBox
   Color get activeColor => _activeColor;
   Color _activeColor;
   set activeColor(Color value) {
-    if (value == _activeColor) return;
+    if (value == _activeColor) {
+      return;
+    }
     _activeColor = value;
     markNeedsPaint();
   }
@@ -333,7 +341,9 @@ class _RenderIconSlider extends RenderConstrainedBox
   ImageProvider get thumbImage => _thumbImage;
   ImageProvider _thumbImage;
   set thumbImage(ImageProvider value) {
-    if (value == _thumbImage) return;
+    if (value == _thumbImage) {
+      return;
+    }
     _thumbImage = value;
     markNeedsPaint();
   }
@@ -342,7 +352,9 @@ class _RenderIconSlider extends RenderConstrainedBox
   ImageConfiguration _configuration;
   set configuration(ImageConfiguration value) {
     assert(value != null);
-    if (value == _configuration) return;
+    if (value == _configuration) {
+      return;
+    }
     _configuration = value;
     markNeedsPaint();
   }
@@ -411,7 +423,9 @@ class _RenderIconSlider extends RenderConstrainedBox
   @override
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
     assert(debugHandleEvent(event, entry));
-    if (event is PointerDownEvent && isInteractive) _drag.addPointer(event);
+    if (event is PointerDownEvent && isInteractive) {
+      _drag.addPointer(event);
+    }
   }
 
   ImageProvider _cachedThumbImage;
@@ -431,7 +445,9 @@ class _RenderIconSlider extends RenderConstrainedBox
     // during paint. There's no reason to mark ourselves as needing paint if we
     // are already in the middle of painting. (In fact, doing so would trigger
     // an assert).
-    if (!_isPaintingThumb) markNeedsPaint();
+    if (!_isPaintingThumb) {
+      markNeedsPaint();
+    }
   }
 
   @override
@@ -582,8 +598,7 @@ class _RenderIconSlider extends RenderConstrainedBox
         double imageRadius = thumbRadius - thumbStrokeWidth;
         thumbPainter.paint(
             canvas,
-            thumbCenter -
-                new Offset(imageRadius, imageRadius), // + offset
+            thumbCenter - new Offset(imageRadius, imageRadius), // + offset
             configuration.copyWith(size: new Size.fromRadius(imageRadius)));
       } finally {
         _isPaintingThumb = false;
@@ -598,7 +613,9 @@ class _RenderIconSlider extends RenderConstrainedBox
   SemanticsAnnotator get semanticsAnnotator => _annotate;
 
   void _annotate(SemanticsNode semantics) {
-    if (isInteractive) semantics.addAdjustmentActions();
+    if (isInteractive) {
+      semantics.addAdjustmentActions();
+    }
   }
 
   @override

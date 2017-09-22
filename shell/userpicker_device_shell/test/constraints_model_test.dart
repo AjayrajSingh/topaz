@@ -18,7 +18,7 @@ void main() {
     bool caughtError = false;
     try {
       constraintsModel.parseJson('foo');
-    } catch (exception) {
+    } on FormatException {
       caughtError = true;
     }
     expect(caughtError, true);
@@ -27,9 +27,9 @@ void main() {
   });
 
   test('Reading valid json results in proper constraints.', () {
-    ConstraintsModel constraintsModel = new ConstraintsModel();
-    constraintsModel.parseJson(
-        '{ "screen_sizes": [ { "width": "360.0", "height": "640.0" }, { "width": "1280.0", "height": "800.0" } ] }');
+    ConstraintsModel constraintsModel = new ConstraintsModel()
+      ..parseJson(
+          '{ "screen_sizes": [ { "width": "360.0", "height": "640.0" }, { "width": "1280.0", "height": "800.0" } ] }');
     expect(constraintsModel.constraints.length, 3);
     expect(constraintsModel.constraints[0], const BoxConstraints());
     expect(constraintsModel.constraints[1],
@@ -39,8 +39,8 @@ void main() {
   });
 
   test('Reading valid json with empty list results in proper constraints.', () {
-    ConstraintsModel constraintsModel = new ConstraintsModel();
-    constraintsModel.parseJson('{ "screen_sizes": [ ] }');
+    ConstraintsModel constraintsModel = new ConstraintsModel()
+      ..parseJson('{ "screen_sizes": [ ] }');
     expect(constraintsModel.constraints.length, 1);
     expect(constraintsModel.constraints[0], const BoxConstraints());
   });

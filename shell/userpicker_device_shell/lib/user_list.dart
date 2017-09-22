@@ -111,8 +111,9 @@ class UserList extends StatelessWidget {
             ),
           ),
           onTap: () {
-            model.createAndLoginUser();
-            model.hideUserActions();
+            model
+              ..createAndLoginUser()
+              ..hideUserActions();
           },
           isSmall: isSmall,
         ),
@@ -125,8 +126,9 @@ class UserList extends StatelessWidget {
             ),
           ),
           onTap: () {
-            model.login(null);
-            model.hideUserActions();
+            model
+              ..login(null)
+              ..hideUserActions();
           },
           isSmall: isSmall,
         ),
@@ -205,8 +207,9 @@ class UserList extends StatelessWidget {
             (Account account) => _buildUserEntry(
                   account: account,
                   onTap: () {
-                    model.login(account.id);
-                    model.hideUserActions();
+                    model
+                      ..login(account.id)
+                      ..hideUserActions();
                   },
                   isSmall: isSmall,
                   model: model,

@@ -12,16 +12,16 @@ import 'package:lib.netstack.fidl/netstack.fidl.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/modular.dart';
 
+import 'authentication_context_impl.dart';
 import 'authentication_overlay.dart';
 import 'authentication_overlay_model.dart';
-import 'authentication_context_impl.dart';
 import 'child_constraints_changer.dart';
 import 'constraints_model.dart';
 import 'debug_text.dart';
 import 'netstack_model.dart';
-import 'user_picker_device_shell_screen.dart';
 import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
+import 'user_picker_device_shell_screen.dart';
 
 /// Set to true to have this BaseShell provide IME services.
 const bool _kAdvertiseImeService = false;
@@ -107,27 +107,25 @@ void main() {
             child: new DebugText(),
           ),
     ),
-  ];
-
-  overlays.add(
-    new OverlayEntry(
-      builder: (_) => new Align(
-            alignment: FractionalOffset.centerRight,
-            child: new Container(
-              margin: const EdgeInsets.all(8.0),
-              child: new PhysicalModel(
-                color: Colors.grey[900],
-                elevation: 799.0, // Mouse pointer is at 800.0.
-                borderRadius: new BorderRadius.circular(8.0),
-                child: new Container(
-                  padding: const EdgeInsets.all(8.0),
-                  child: new _NetstackInfo(),
+  ]..add(
+      new OverlayEntry(
+        builder: (_) => new Align(
+              alignment: FractionalOffset.centerRight,
+              child: new Container(
+                margin: const EdgeInsets.all(8.0),
+                child: new PhysicalModel(
+                  color: Colors.grey[900],
+                  elevation: 799.0, // Mouse pointer is at 800.0.
+                  borderRadius: new BorderRadius.circular(8.0),
+                  child: new Container(
+                    padding: const EdgeInsets.all(8.0),
+                    child: new _NetstackInfo(),
+                  ),
                 ),
               ),
             ),
-          ),
-    ),
-  );
+      ),
+    );
 
   DeviceShellWidget<UserPickerDeviceShellModel> deviceShellWidget =
       new DeviceShellWidget<UserPickerDeviceShellModel>(
@@ -204,7 +202,7 @@ class _ElevatedCheckedModeBanner extends StatelessWidget {
   final Widget child;
 
   /// Constructor.
-  _ElevatedCheckedModeBanner({this.child});
+  const _ElevatedCheckedModeBanner({this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -237,7 +235,7 @@ class _ElevatedCheckedModeBanner extends StatelessWidget {
                           width: _kWidth,
                           color: _kColor,
                           child: new Center(
-                            child: new Text(
+                            child: const Text(
                               'SLOW MODE',
                               textAlign: TextAlign.center,
                               style: _kTextStyle,

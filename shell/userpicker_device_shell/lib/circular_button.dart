@@ -14,9 +14,8 @@ class CircularButton extends StatelessWidget {
   final IconData icon;
 
   /// Constructor
-  CircularButton({this.onTap, @required this.icon}) {
-    assert(icon != null);
-  }
+  const CircularButton({@required this.icon, this.onTap})
+      : assert(icon != null);
 
   @override
   Widget build(BuildContext context) => new Material(

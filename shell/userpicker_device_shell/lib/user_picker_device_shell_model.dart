@@ -15,11 +15,11 @@ import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
-export 'package:lib.widgets/model.dart'
-    show ScopedModel, ScopedModelDescendant, ModelFinder;
-
 import 'user_shell_chooser.dart';
 import 'user_watcher_impl.dart';
+
+export 'package:lib.widgets/model.dart'
+    show ScopedModel, ScopedModelDescendant, ModelFinder;
 
 /// Contains all the relevant data for displaying the list of users and for
 /// logging in and creating new users.
@@ -74,7 +74,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _userControllerProxy?.ctrl?.close();
     _userWatcherImpl?.close();
     onDeviceShellStopped?.call();
-    _tickers.forEach((Ticker ticker) => ticker.dispose());
+    for (Ticker ticker in _tickers) {
+      ticker.dispose();
+    }
     super.onStop();
   }
 
@@ -101,7 +103,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   /// Permanently removes the user.
   void removeUser(Account account) {
     userProvider.removeUser(account.id, (String errorCode) {
-      if (errorCode != null && errorCode != "") {
+      if (errorCode != null && errorCode != '') {
         log.severe('Error in revoking credentials ${account.id}: $errorCode');
         refreshUsers();
         return;

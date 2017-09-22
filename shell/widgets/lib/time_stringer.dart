@@ -33,7 +33,7 @@ class TimeStringer extends Listenable {
   @override
   void removeListener(VoidCallback listener) {
     _listeners.remove(listener);
-    if (_listeners.length == 0) {
+    if (_listeners.isEmpty) {
       _timer?.cancel();
       _timer = null;
     }
@@ -76,6 +76,8 @@ class TimeStringer extends Listenable {
   }
 
   void _notifyListeners() {
-    _listeners.toList().forEach((VoidCallback listener) => listener());
+    for (VoidCallback listener in _listeners.toList()) {
+      listener();
+    }
   }
 }

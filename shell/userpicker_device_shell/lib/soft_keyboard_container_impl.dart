@@ -96,7 +96,11 @@ class _SoftKeyboardContainerServiceProviderImpl extends ServiceProvider {
 class _KeyboardDeviceExtension extends StatefulWidget {
   final Widget child;
 
-  _KeyboardDeviceExtension({Key key, @required this.child}) : super(key: key);
+  const _KeyboardDeviceExtension({
+    @required this.child,
+    Key key,
+  })
+      : super(key: key);
 
   @override
   _KeyboardDeviceExtensionState createState() =>

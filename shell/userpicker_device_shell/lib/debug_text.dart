@@ -71,9 +71,9 @@ class _DebugTextState extends State<DebugText> {
               return;
             }
             setState(() {
-              interfaces.forEach((NetworkInterface networkInterface) {
+              for (NetworkInterface networkInterface in interfaces) {
                 _addresses.addAll(networkInterface.addresses);
-              });
+              }
             });
           });
         }
@@ -87,15 +87,16 @@ class _DebugTextState extends State<DebugText> {
   Widget build(BuildContext context) {
     List<_DebugEntry> columnChildren = <_DebugEntry>[];
     if (_ready && _showHostInformation) {
-      columnChildren.add(new _DebugEntry(text: Platform.localHostname));
-      columnChildren.addAll(
-        _addresses
-            .map(
-              (InternetAddress address) =>
-                  new _DebugEntry(text: address.address),
-            )
-            .toList(),
-      );
+      columnChildren
+        ..add(new _DebugEntry(text: Platform.localHostname))
+        ..addAll(
+          _addresses
+              .map(
+                (InternetAddress address) =>
+                    new _DebugEntry(text: address.address),
+              )
+              .toList(),
+        );
     }
 
     if (_ready && !_networkingReady) {

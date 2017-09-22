@@ -7,8 +7,8 @@ import 'dart:ui' show lerpDouble;
 import 'package:lib.auth.fidl.account/account.fidl.dart';
 import 'package:flutter/material.dart';
 
-import 'user_picker_device_shell_model.dart';
 import 'user_list.dart';
+import 'user_picker_device_shell_model.dart';
 
 const double _kRemovalTargetSize = 112.0;
 
@@ -107,7 +107,7 @@ class _UserRemovalTarget extends StatefulWidget {
   final bool show;
 
   /// Constructor.
-  _UserRemovalTarget({this.show, this.grow});
+  const _UserRemovalTarget({this.show, this.grow});
 
   @override
   _UserRemovalTargetState createState() => new _UserRemovalTargetState();

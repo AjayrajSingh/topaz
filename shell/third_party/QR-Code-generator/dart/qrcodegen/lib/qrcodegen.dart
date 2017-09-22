@@ -93,26 +93,147 @@ class QrCode {
   List<List<bool>> _modules;
   List<List<bool>> _isFunction;
 
-  /// Constructor.
-  QrCode(dynamic initData, this.mask, this.version, this.errCorLvl) {
+  /// List Constructor.
+  QrCode.withList(List<int> initData, this.mask, this.version, this.errCorLvl) {
+    _checkMask();
+    if (version < 1 || version > 40) {
+      throw new ArgumentError('Version value out of range');
+    }
+
+    _createGrid();
+
+    // Handle grid fields
+    // Draw function patterns, draw all codewords
+    _drawFunctionPatterns();
+    _drawCodewords(_appendErrorCorrection(initData));
+
+    _handleMasking();
+  }
+
+  /// QrCode Constructor.
+  QrCode.withQrCode(QrCode initData, this.mask) {
+    _checkMask();
+    version = initData.version;
+    errCorLvl = initData.errCorLvl;
+
+    _createGrid();
+
+    // Handle grid fields
+    for (int y = 0; y < size; y++) {
+      for (int x = 0; x < size; x++) {
+        _modules[y][x] = initData.getModule(x, y) == 1;
+        _isFunction[y][x] = initData.isFunctionModule(x, y);
+      }
+    }
+    _applyMask(initData.mask); // Undo old mask
+
+    _handleMasking();
+  }
+
+  /// Returns a QR Code symbol representing the given Unicode text string at the given error correction level.
+  /// As a conservative upper bound, this function is guaranteed to succeed for strings that have 738 or fewer Unicode
+  /// code points (not UTF-16 code units). The smallest possible QR Code version is automatically chosen for the output.
+  /// The ECC level of the result may be higher than the ecl argument if it can be done without increasing the version.
+  factory QrCode.encodeText(String text, EccEnum ecl) =>
+      new QrCode._encodeSegments(
+        segs: _QrSegment.makeSegments(text),
+        initialEcl: _kEcc[ecl],
+      );
+
+  /// Returns a QR Code symbol representing the given binary data string at the given error correction level.
+  /// This function always encodes using the binary segment mode, not any text mode. The maximum number of
+  /// bytes allowed is 2953. The smallest possible QR Code version is automatically chosen for the output.
+  /// The ECC level of the result may be higher than the ecl argument if it can be done without increasing the version.
+  factory QrCode.encodeBinary(List<int> data, EccEnum ecl) =>
+      new QrCode._encodeSegments(
+        segs: <_QrSegment>[new _QrSegment.makeBytes(data)],
+        initialEcl: _kEcc[ecl],
+      );
+
+  /// Returns a QR Code symbol representing the given data segments with the given encoding parameters.
+  /// The smallest possible QR Code version within the given range is automatically chosen for the output.
+  /// This function allows the user to create a custom sequence of segments that switches
+  /// between modes (such as alphanumeric and binary) to encode text more efficiently.
+  /// This function is considered to be lower level than simply encoding text or binary data.
+  factory QrCode._encodeSegments(
+      {List<_QrSegment> segs,
+      _Ecc initialEcl,
+      int minVersion: 1,
+      int maxVersion: 40,
+      int mask: -1,
+      bool boostEcl: true}) {
+    if (!(1 <= minVersion && minVersion <= maxVersion && maxVersion <= 40) ||
+        mask < -1 ||
+        mask > 7) {
+      throw new ArgumentError('Invalid value');
+    }
+
+    _Ecc ecl = initialEcl;
+
+    // Find the minimal version number to use
+    int version;
+    int dataUsedBits;
+    for (version = minVersion;; version++) {
+      // Number of data bits available
+      int dataCapacityBits = _getNumDataCodewords(version, ecl) * 8;
+      dataUsedBits = _QrSegment.getTotalBits(segs, version);
+      if (dataUsedBits >= 0 && dataUsedBits <= dataCapacityBits) {
+        break; // This version number is found to be suitable
+      }
+      if (version >= maxVersion) {
+        // All versions in the range could not fit the given data
+        throw new ArgumentError('Data too long');
+      }
+    }
+
+    // Increase the error correction level while the data still fits in the current version number
+    for (_Ecc newEcl in <_Ecc>[
+      _kEcc[EccEnum.medium],
+      _kEcc[EccEnum.quartile],
+      _kEcc[EccEnum.high]
+    ]) {
+      if (boostEcl &&
+          dataUsedBits <= _getNumDataCodewords(version, newEcl) * 8) {
+        ecl = newEcl;
+      }
+    }
+
+    // Create the data bit string by concatenating all segments
+    int dataCapacityBits = _getNumDataCodewords(version, ecl) * 8;
+    _BitBuffer bb = new _BitBuffer();
+    for (_QrSegment seg in segs) {
+      bb
+        ..appendBits(seg.mode.modeBits, 4)
+        ..appendBits(seg.numChars, seg.mode.numCharCountBits(version))
+        ..appendData(seg);
+    }
+
+    // Add terminator and pad up to a byte if applicable
+    bb
+      ..appendBits(0, math.min(4, dataCapacityBits - bb.bitLength))
+      ..appendBits(0, (8 - bb.bitLength % 8) % 8);
+
+    // Pad with alternate bytes until data capacity is reached
+    for (int padByte = 0xEC;
+        bb.bitLength < dataCapacityBits;
+        padByte ^= 0xEC ^ 0x11) {
+      bb.appendBits(padByte, 8);
+    }
+    assert(bb.bitLength % 8 == 0);
+
+    // Create the QR Code symbol
+    return new QrCode.withList(bb.bytes, mask, version, ecl);
+  }
+
+  void _checkMask() {
     // Check arguments and handle simple scalar fields
     if (mask < -1 || mask > 7) {
-      throw new ArgumentError("Mask value out of range");
+      throw new ArgumentError('Mask value out of range');
     }
-    if (initData is List) {
-      if (version < 1 || version > 40) {
-        throw new ArgumentError("Version value out of range");
-      }
-    } else if (initData is QrCode) {
-      if (version != null || errCorLvl != null) {
-        throw new ArgumentError("Values must be undefined");
-      }
-      this.version = initData.version;
-      this.errCorLvl = initData.errCorLvl;
-    } else {
-      throw new ArgumentError("Invalid initial data");
-    }
-    this.size = version * 4 + 17;
+  }
+
+  void _createGrid() {
+    size = version * 4 + 17;
 
     // Initialize both grids to be size*size arrays of Boolean false
     _modules = new List<List<bool>>.generate(
@@ -123,24 +244,9 @@ class QrCode {
       size,
       (_) => new List<bool>.filled(size, false),
     );
+  }
 
-    // Handle grid fields
-    if (initData is List<int>) {
-      // Draw function patterns, draw all codewords
-      _drawFunctionPatterns();
-      _drawCodewords(_appendErrorCorrection(initData));
-    } else if (initData is QrCode) {
-      for (int y = 0; y < size; y++) {
-        for (int x = 0; x < size; x++) {
-          _modules[y][x] = initData.getModule(x, y) == 1;
-          _isFunction[y][x] = initData.isFunctionModule(x, y);
-        }
-      }
-      _applyMask(initData.mask); // Undo old mask
-    } else {
-      throw new ArgumentError("Invalid initial data");
-    }
-
+  void _handleMasking() {
     // Handle masking
     if (mask == -1) {
       // Automatically choose best mask
@@ -254,11 +360,15 @@ class QrCode {
   // Draws two copies of the version bits (with its own error correction code),
   // based on this object's version field (which only has an effect for 7 <= version <= 40).
   void _drawVersion() {
-    if (version < 7) return;
+    if (version < 7) {
+      return;
+    }
 
     // Calculate error correction code and pack bits
     int rem = version; // version is uint6, in the range [7, 40]
-    for (int i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >> 11) * 0x1F25);
+    for (int i = 0; i < 12; i++) {
+      rem = (rem << 1) ^ ((rem >> 11) * 0x1F25);
+    }
     int data = version << 12 | rem; // uint18
     assert(data >> 18 == 0);
 
@@ -322,10 +432,10 @@ class QrCode {
           k, k + shortBlockLen - blockEccLen + (i < numShortBlocks ? 0 : 1));
       k += dat.length;
       List<int> ecc = rs.getRemainder(dat);
-      if (i < numShortBlocks) dat.add(0);
-      ecc.forEach((int b) {
-        dat.add(b);
-      });
+      if (i < numShortBlocks) {
+        dat.add(0);
+      }
+      ecc.forEach(dat.add);
       blocks.add(dat);
     }
 
@@ -346,13 +456,15 @@ class QrCode {
   // data area of this QR Code symbol. Function modules need to be marked off before this is called.
   void _drawCodewords(List<int> data) {
     if (data.length != (_getNumRawDataModules(version) / 8).floor()) {
-      throw new ArgumentError("Invalid argument");
+      throw new ArgumentError('Invalid argument');
     }
     int i = 0; // Bit index into the data
     // Do the funny zigzag scan
     for (int right = size - 1; right >= 1; right -= 2) {
       // Index of right column in each column pair
-      if (right == 6) right = 5;
+      if (right == 6) {
+        right = 5;
+      }
       for (int vert = 0; vert < size; vert++) {
         // Vertical counter
         for (int j = 0; j < 2; j++) {
@@ -377,7 +489,7 @@ class QrCode {
   // well-formed QR Code symbol needs exactly one mask applied (not zero, not two, etc.).
   void _applyMask(int mask) {
     if (mask < 0 || mask > 7) {
-      throw new ArgumentError("Mask value out of range");
+      throw new ArgumentError('Mask value out of range');
     }
     for (int y = 0; y < size; y++) {
       for (int x = 0; x < size; x++) {
@@ -431,7 +543,9 @@ class QrCode {
           runX++;
           if (runX == 5)
             result += _kPenaltyN1;
-          else if (runX > 5) result++;
+          else if (runX > 5) {
+            result++;
+          }
         }
       }
     }
@@ -446,7 +560,9 @@ class QrCode {
           runY++;
           if (runY == 5)
             result += _kPenaltyN1;
-          else if (runY > 5) result++;
+          else if (runY > 5) {
+            result++;
+          }
         }
       }
     }
@@ -457,7 +573,9 @@ class QrCode {
         bool color = _modules[y][x];
         if (color == _modules[y][x + 1] &&
             color == _modules[y + 1][x] &&
-            color == _modules[y + 1][x + 1]) result += _kPenaltyN2;
+            color == _modules[y + 1][x + 1]) {
+          result += _kPenaltyN2;
+        }
       }
     }
 
@@ -471,6 +589,9 @@ class QrCode {
       }
     }
     // Finder-like pattern in columns
+    // TODO: The following x < size is incorrectly being flagged as invariant.
+    //       Remove this ignore once this is fixed in the analyzer.
+    // ignore: invariant_booleans
     for (int x = 0; x < size; x++) {
       for (int y = 0, bits = 0; y < size; y++) {
         bits = ((bits << 1) & 0x7FF) | (_modules[y][x] ? 1 : 0);
@@ -482,13 +603,13 @@ class QrCode {
 
     // Balance of black and white modules
     int black = 0;
-    _modules.forEach((List<bool> row) {
-      row.forEach((bool color) {
+    for (List<bool> row in _modules) {
+      for (bool color in row) {
         if (color) {
           black++;
         }
-      });
-    });
+      }
+    }
     int total = size * size;
     // Find smallest k such that (45-5k)% <= dark/total <= (55+5k)%
     for (int k = 0;
@@ -499,96 +620,6 @@ class QrCode {
     return result;
   }
 
-  /*---- Public static factory functions for QrCode ----*/
-
-  /// Returns a QR Code symbol representing the given Unicode text string at the given error correction level.
-  /// As a conservative upper bound, this function is guaranteed to succeed for strings that have 738 or fewer Unicode
-  /// code points (not UTF-16 code units). The smallest possible QR Code version is automatically chosen for the output.
-  /// The ECC level of the result may be higher than the ecl argument if it can be done without increasing the version.
-  static QrCode encodeText(String text, EccEnum ecl) => _encodeSegments(
-        segs: _QrSegment.makeSegments(text),
-        initialEcl: _kEcc[ecl],
-      );
-
-  /// Returns a QR Code symbol representing the given binary data string at the given error correction level.
-  /// This function always encodes using the binary segment mode, not any text mode. The maximum number of
-  /// bytes allowed is 2953. The smallest possible QR Code version is automatically chosen for the output.
-  /// The ECC level of the result may be higher than the ecl argument if it can be done without increasing the version.
-  static QrCode encodeBinary(List<int> data, EccEnum ecl) => _encodeSegments(
-        segs: <_QrSegment>[new _QrSegment.makeBytes(data)],
-        initialEcl: _kEcc[ecl],
-      );
-
-  /// Returns a QR Code symbol representing the given data segments with the given encoding parameters.
-  /// The smallest possible QR Code version within the given range is automatically chosen for the output.
-  /// This function allows the user to create a custom sequence of segments that switches
-  /// between modes (such as alphanumeric and binary) to encode text more efficiently.
-  /// This function is considered to be lower level than simply encoding text or binary data.
-  static QrCode _encodeSegments(
-      {List<_QrSegment> segs,
-      _Ecc initialEcl,
-      int minVersion: 1,
-      int maxVersion: 40,
-      int mask: -1,
-      bool boostEcl: true}) {
-    if (!(1 <= minVersion && minVersion <= maxVersion && maxVersion <= 40) ||
-        mask < -1 ||
-        mask > 7) {
-      throw new ArgumentError("Invalid value");
-    }
-
-    _Ecc ecl = initialEcl;
-
-    // Find the minimal version number to use
-    int version;
-    int dataUsedBits;
-    for (version = minVersion;; version++) {
-      // Number of data bits available
-      int dataCapacityBits = _getNumDataCodewords(version, ecl) * 8;
-      dataUsedBits = _QrSegment.getTotalBits(segs, version);
-      if (dataUsedBits != null && dataUsedBits <= dataCapacityBits) {
-        break; // This version number is found to be suitable
-      }
-      if (version >= maxVersion) {
-        // All versions in the range could not fit the given data
-        throw new ArgumentError("Data too long");
-      }
-    }
-
-    // Increase the error correction level while the data still fits in the current version number
-    <_Ecc>[_kEcc[EccEnum.medium], _kEcc[EccEnum.quartile], _kEcc[EccEnum.high]]
-        .forEach((_Ecc newEcl) {
-      if (boostEcl &&
-          dataUsedBits <= _getNumDataCodewords(version, newEcl) * 8) {
-        ecl = newEcl;
-      }
-    });
-
-    // Create the data bit string by concatenating all segments
-    int dataCapacityBits = _getNumDataCodewords(version, ecl) * 8;
-    _BitBuffer bb = new _BitBuffer();
-    segs.forEach((_QrSegment seg) {
-      bb.appendBits(seg.mode.modeBits, 4);
-      bb.appendBits(seg.numChars, seg.mode.numCharCountBits(version));
-      bb.appendData(seg);
-    });
-
-    // Add terminator and pad up to a byte if applicable
-    bb.appendBits(0, math.min(4, dataCapacityBits - bb.bitLength));
-    bb.appendBits(0, (8 - bb.bitLength % 8) % 8);
-
-    // Pad with alternate bytes until data capacity is reached
-    for (int padByte = 0xEC;
-        bb.bitLength < dataCapacityBits;
-        padByte ^= 0xEC ^ 0x11) {
-      bb.appendBits(padByte, 8);
-    }
-    assert(bb.bitLength % 8 == 0);
-
-    // Create the QR Code symbol
-    return new QrCode(bb.bytes, mask, version, ecl);
-  }
-
   /*---- Private static helper functions QrCode ----*/
 
   // Returns a sequence of positions of the alignment patterns in ascending order. These positions are
@@ -596,7 +627,7 @@ class QrCode {
   // This stateless pure function could be implemented as table of 40 variable-length lists of integers.
   static List<int> _getAlignmentPatternPositions(int ver) {
     if (ver != null && (ver < 1 || ver > 40))
-      throw new ArgumentError("Version number out of range");
+      throw new ArgumentError('Version number out of range');
     else if (ver == 1)
       return <int>[];
     else {
@@ -621,12 +652,14 @@ class QrCode {
   // The result is in the range [208, 29648]. This could be implemented as a 40-entry lookup table.
   static int _getNumRawDataModules(int ver) {
     if (ver < 1 || ver > 40)
-      throw new ArgumentError("Version number out of range");
+      throw new ArgumentError('Version number out of range');
     int result = (16 * ver + 128) * ver + 64;
     if (ver >= 2) {
       int numAlign = (ver / 7).floor() + 2;
       result -= (25 * numAlign - 10) * numAlign - 55;
-      if (ver >= 7) result -= 18 * 2; // Subtract version information
+      if (ver >= 7) {
+        result -= 18 * 2; // Subtract version information
+      }
     }
     return result;
   }
@@ -636,7 +669,7 @@ class QrCode {
   // This stateless pure function could be implemented as a (40*4)-cell lookup table.
   static int _getNumDataCodewords(int ver, _Ecc ecl) {
     if (ver < 1 || ver > 40)
-      throw new ArgumentError("Version number out of range");
+      throw new ArgumentError('Version number out of range');
     return (_getNumRawDataModules(ver) / 8).floor() -
         _kEccCodewordsPerBlock[ecl.ordinal][ver] *
             QrCode._kNumErrorCorrectionBlocks[ecl.ordinal][ver];
@@ -1058,7 +1091,9 @@ class _QrSegment {
   final List<int> bitData;
 
   _QrSegment(this.mode, this.numChars, this.bitData) {
-    if (numChars < 0) throw new ArgumentError("Invalid argument");
+    if (numChars < 0) {
+      throw new ArgumentError('Invalid argument');
+    }
   }
 
   /*---- Public static factory functions for QrSegment ----*/
@@ -1066,16 +1101,16 @@ class _QrSegment {
   /// Returns a segment representing the given binary data encoded in byte mode.
   factory _QrSegment.makeBytes(List<int> data) {
     _BitBuffer bb = new _BitBuffer();
-    data.forEach((int b) {
+    for (int b in data) {
       bb.appendBits(b, 8);
-    });
+    }
     return new _QrSegment(kMode[_ModeEnum.byte], data.length, bb.bits);
   }
 
   /// Returns a segment representing the given string of decimal digits encoded in numeric mode.
   factory _QrSegment.makeNumeric(String digits) {
     if (!digits.contains(kNumericRegEx))
-      throw new ArgumentError("String contains non-numeric characters");
+      throw new ArgumentError('String contains non-numeric characters');
     _BitBuffer bb = new _BitBuffer();
     int i;
     for (i = 0; i + 3 <= digits.length; i += 3) // Process groups of 3
@@ -1091,7 +1126,7 @@ class _QrSegment {
   factory _QrSegment.makeAlphanumeric(String text) {
     if (!text.contains(kAlphanumericRegex))
       throw new ArgumentError(
-          "String contains unencodable characters in alphanumeric mode");
+          'String contains unencodable characters in alphanumeric mode');
     _BitBuffer bb = new _BitBuffer();
     int i;
     for (i = 0; i + 2 <= text.length; i += 2) {
@@ -1111,13 +1146,11 @@ class _QrSegment {
     if (0 <= assignVal && assignVal < (1 << 7))
       bb.appendBits(assignVal, 8);
     else if ((1 << 7) <= assignVal && assignVal < (1 << 14)) {
-      bb.appendBits(2, 2);
-      bb.appendBits(assignVal, 14);
+      bb..appendBits(2, 2)..appendBits(assignVal, 14);
     } else if ((1 << 14) <= assignVal && assignVal < 999999) {
-      bb.appendBits(6, 3);
-      bb.appendBits(assignVal, 21);
+      bb..appendBits(6, 3)..appendBits(assignVal, 21);
     } else
-      throw new ArgumentError("ECI assignment value out of range");
+      throw new ArgumentError('ECI assignment value out of range');
     return new _QrSegment(kMode[_ModeEnum.eci], 0, bb.bits);
   }
 
@@ -1130,7 +1163,7 @@ class _QrSegment {
 		 */
   static List<_QrSegment> makeSegments(String text) {
     // Select the most efficient segment encoding automatically
-    if (text == "")
+    if (text == '')
       return <_QrSegment>[];
     else if (text.contains(kNumericRegEx))
       return <_QrSegment>[new _QrSegment.makeNumeric(text)];
@@ -1143,13 +1176,15 @@ class _QrSegment {
   // Package-private helper function.
   static int getTotalBits(List<_QrSegment> segs, int version) {
     if (version < 1 || version > 40)
-      throw new ArgumentError("Version number out of range");
+      throw new ArgumentError('Version number out of range');
     int result = 0;
     for (int i = 0; i < segs.length; i++) {
       _QrSegment seg = segs[i];
       int ccbits = seg.mode.numCharCountBits(version);
       // Fail if segment length value doesn't fit in the length field's bit-width
-      if (seg.numChars >= (1 << ccbits)) return null;
+      if (seg.numChars >= (1 << ccbits)) {
+        return -1;
+      }
       result += 4 + ccbits + seg.bits.length;
     }
     return result;
@@ -1210,7 +1245,7 @@ class _Mode {
       else if (27 <= ver && ver <= 40)
         return ccbits[2];
       else
-        throw new ArgumentError("Version number out of range");
+        throw new ArgumentError('Version number out of range');
     };
   }
 }
@@ -1222,7 +1257,7 @@ List<int> _toUtf8ByteArray(String unencodedStr) {
   String str = Uri.encodeComponent(unencodedStr);
   List<int> result = <int>[];
   for (int i = 0; i < str.length; i++) {
-    if (str[i] != "%") {
+    if (str[i] != '%') {
       result.add(str.codeUnitAt(i));
     } else {
       result.add(int.parse('${str[i+1]}${str[i+2]}', radix: 16));
@@ -1253,17 +1288,21 @@ class _ReedSolomonGenerator {
 
   _ReedSolomonGenerator(this.degree) {
     if (degree < 1 || degree > 255)
-      throw new ArgumentError("Degree out of range");
+      throw new ArgumentError('Degree out of range');
 
     // Start with the monomial x^0
-    for (int i = 0; i < degree - 1; i++) coefficients.add(0);
+    for (int i = 0; i < degree - 1; i++) {
+      coefficients.add(0);
+    }
     coefficients.add(1);
 
     for (int i = 0; i < degree; i++) {
       // Multiply the current product by (x - r^i)
       for (int j = 0; j < coefficients.length; j++) {
         coefficients[j] = multiply(coefficients[j], root);
-        if (j + 1 < coefficients.length) coefficients[j] ^= coefficients[j + 1];
+        if (j + 1 < coefficients.length) {
+          coefficients[j] ^= coefficients[j + 1];
+        }
       }
       root = multiply(root, 0x02);
     }
@@ -1276,14 +1315,15 @@ class _ReedSolomonGenerator {
     List<int> result = coefficients.map((_) {
       return 0;
     }).toList();
-    data.forEach((int b) {
+    for (int b in data) {
       int factor = b ^ result[0];
-      result.removeAt(0);
-      result.add(0);
+      result
+        ..removeAt(0)
+        ..add(0);
       for (int i = 0; i < result.length; i++) {
         result[i] ^= multiply(coefficients[i], factor);
       }
-    });
+    }
     return result;
   }
 
@@ -1291,7 +1331,7 @@ class _ReedSolomonGenerator {
 // result are unsigned 8-bit integers. This could be implemented as a lookup table of 256*256 entries of uint8.
   static int multiply(int x, int y) {
     if (x >> 8 != 0 || y >> 8 != 0)
-      throw new ArgumentError("Byte out of range");
+      throw new ArgumentError('Byte out of range');
     // Russian peasant multiplication
     int z = 0;
     for (int i = 7; i >= 0; i--) {
@@ -1323,10 +1363,10 @@ class _BitBuffer {
       result.add(0);
     }
     int i = 0;
-    bitData.forEach((int bit) {
+    for (int bit in bitData) {
       result[i >> 3] |= bit << (7 - (i & 7));
       i++;
-    });
+    }
     return result;
   }
 
@@ -1334,7 +1374,7 @@ class _BitBuffer {
   // If 0 <= len <= 31, then this requires 0 <= val < 2^len.
   void appendBits(int val, int len) {
     if (len < 0 || len > 32 || len < 32 && (val >> len) != 0)
-      throw new ArgumentError("Value out of range");
+      throw new ArgumentError('Value out of range');
     for (int i = len - 1; i >= 0; i--) // Append bit by bit
       bitData.add((val >> i) & 1);
   }

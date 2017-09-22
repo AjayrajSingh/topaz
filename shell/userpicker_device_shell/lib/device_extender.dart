@@ -19,13 +19,13 @@ class DeviceExtender extends StatelessWidget {
   final List<Widget> deviceExtensions;
 
   /// Constructor.
-  DeviceExtender({this.child, this.deviceExtensions: const <Widget>[]});
+  const DeviceExtender({this.child, this.deviceExtensions: const <Widget>[]});
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> columnChildren = <Widget>[];
-    columnChildren.add(new Expanded(child: child));
-    columnChildren.addAll(deviceExtensions);
+    List<Widget> columnChildren = <Widget>[]
+      ..add(new Expanded(child: child))
+      ..addAll(deviceExtensions);
     return new Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: columnChildren,
