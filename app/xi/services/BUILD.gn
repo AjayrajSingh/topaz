@@ -9,6 +9,6 @@ fidl("services") {
     "xi.fidl",
   ]
   deps = [
-    "//apps/ledger/services/public",
+    "//peridot/public/lib/ledger/fidl",
   ]
 }

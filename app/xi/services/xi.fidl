@@ -4,7 +4,7 @@
 
 module xi;
 
-import "apps/ledger/services/public/ledger.fidl";
+import "lib/ledger/fidl/ledger.fidl";
 
 [ServiceName="xi.Json"]
 interface Json {

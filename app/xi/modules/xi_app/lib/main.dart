@@ -8,7 +8,7 @@ import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:apps.ledger.services.public/ledger.fidl.dart';
+import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
