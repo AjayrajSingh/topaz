@@ -4,6 +4,7 @@
 
 #include "topaz/runtime/web_view/web_view_provider.h"
 
+#include "lib/fsl/tasks/message_loop.h"
 #include "lib/icu_data/cpp/icu_data.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
 
