@@ -8,9 +8,9 @@ import 'dart:typed_data';
 import 'dart:zircon' show Vmo;
 
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
-import 'package:apps.modular.services.component/component_context.fidl.dart';
-import 'package:apps.modular.services.component/message_queue.fidl.dart';
-import 'package:apps.modular.services.user/device_map.fidl.dart';
+import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.component.fidl/message_queue.fidl.dart';
+import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' show InterfaceRequest;
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';

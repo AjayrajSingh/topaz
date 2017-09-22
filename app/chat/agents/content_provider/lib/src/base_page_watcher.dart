@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:apps.ledger.services.public/ledger.fidl.dart';
-import 'package:apps.modular.services.component/message_queue.fidl.dart';
+import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';

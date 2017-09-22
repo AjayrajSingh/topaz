@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:convert' show JSON;
 
-import 'package:apps.modular.services.auth/token_provider.fidl.dart';
+import 'package:lib.auth.fidl/token_provider.fidl.dart';
 import 'package:config/config.dart';
 import 'package:eventsource/eventsource.dart';
 import 'package:http/http.dart' as http;

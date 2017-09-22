@@ -7,11 +7,11 @@ import 'dart:convert' show JSON;
 import 'dart:isolate';
 
 import 'package:apps.ledger.services.public/ledger.fidl.dart' as ledger_fidl;
-import 'package:apps.modular.services.component/component_context.fidl.dart';
-import 'package:apps.modular.services.component/message_queue.fidl.dart';
-import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
-import 'package:apps.modular.services.module/module.fidl.dart';
-import 'package:apps.modular.services.module/module_context.fidl.dart';
+import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.component.fidl/message_queue.fidl.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
+import 'package:lib.module.fidl/module.fidl.dart';
+import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' hide Message;
