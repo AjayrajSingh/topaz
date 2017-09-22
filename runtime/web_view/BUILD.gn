@@ -23,7 +23,7 @@ executable("web_view_bin") {
 
   deps = [
     ":webkit",
-    "//apps/maxwell/services/context",
+    "//peridot/public/lib/context/fidl",
     "//garnet/public/lib/app/cpp",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "apps/maxwell/services/context/context_writer.fidl.h"
+#include "lib/context/fidl/context_writer.fidl.h"
 
 class WebView;
 

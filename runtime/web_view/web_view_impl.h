@@ -9,7 +9,7 @@
 #include "lib/fxl/memory/weak_ptr.h"
 #include "lib/ui/scenic/client/host_image_cycler.h"
 #include "lib/ui/view_framework/base_view.h"
-#include "apps/maxwell/services/context/context_writer.fidl.h"
+#include "lib/context/fidl/context_writer.fidl.h"
 #include "lib/fidl/cpp/bindings/binding_set.h"
 #include "lib/app/cpp/service_provider_impl.h"
 
