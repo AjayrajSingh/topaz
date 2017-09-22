@@ -17,8 +17,8 @@ flutter_app("armadillo_user_shell") {
 
   deps = [
     "//garnet/public/lib/app/dart",
-    "//apps/maxwell/services/context:context_dart",
-    "//apps/maxwell/services/suggestion:suggestion_dart",
+    "//peridot/public/lib/context/fidl:fidl_dart",
+    "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//garnet/public/lib/media/dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//topaz/tools/packages/util",

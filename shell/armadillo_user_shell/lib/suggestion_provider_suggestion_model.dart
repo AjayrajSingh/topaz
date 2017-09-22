@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart'
+import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart'
     as maxwell;
-import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart'
+import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart'
     as maxwell;
-import 'package:apps.maxwell.services.suggestion/user_input.fidl.dart'
+import 'package:lib.suggestion.fidl/user_input.fidl.dart'
     as maxwell;
 import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:armadillo/interruption_overlay.dart';

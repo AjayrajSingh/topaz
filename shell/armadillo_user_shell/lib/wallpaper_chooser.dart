@@ -4,11 +4,11 @@
 
 import 'dart:convert';
 
-import 'package:apps.maxwell.services.suggestion/ask_handler.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/user_input.fidl.dart';
+import 'package:lib.suggestion.fidl/ask_handler.fidl.dart';
+import 'package:lib.suggestion.fidl/proposal.fidl.dart';
+import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
+import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
+import 'package:lib.suggestion.fidl/user_input.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.fidl/story_controller.fidl.dart';
 import 'package:lib.story.fidl/story_info.fidl.dart';

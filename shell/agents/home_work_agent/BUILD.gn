@@ -14,9 +14,9 @@ dart_app("home_work_agent") {
 
   deps = [
     "//garnet/public/lib/app/dart",
-    "//apps/maxwell/services/context:context_dart",
-    "//apps/maxwell/services/suggestion:suggestion_dart",
-    "//apps/maxwell/services/user:user_dart",
+    "//peridot/public/lib/context/fidl:fidl_dart",
+    "//peridot/public/lib/suggestion/fidl:fidl_dart",
+    "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
     "//topaz/lib/widgets/packages/modular:lib.modular",
   ]
