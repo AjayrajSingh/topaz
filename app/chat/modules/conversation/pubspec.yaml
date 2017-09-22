@@ -9,7 +9,7 @@ dependencies:
     path: ../../../../tools/packages/fixtures
   flutter:
     sdk: flutter
-  intl: ^0.14.0
+  intl: ^0.15.0
   lib.widgets:
     path: ../../../../lib/widgets/packages/widgets
   models:
