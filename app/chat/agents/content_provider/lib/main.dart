@@ -4,11 +4,11 @@
 
 import 'dart:async';
 
-import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
-import 'package:apps.maxwell.services.context/metadata.fidl.dart';
-import 'package:apps.maxwell.services.context/value_type.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
-import 'package:apps.maxwell.services.user/intelligence_services.fidl.dart';
+import 'package:lib.context.fidl/context_reader.fidl.dart';
+import 'package:lib.context.fidl/metadata.fidl.dart';
+import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
+import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';

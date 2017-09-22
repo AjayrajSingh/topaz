@@ -5,10 +5,10 @@
 import 'dart:convert' show JSON;
 import 'dart:io';
 
-import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
+import 'package:lib.context.fidl/context_reader.fidl.dart';
+import 'package:lib.suggestion.fidl/proposal.fidl.dart';
+import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
+import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 

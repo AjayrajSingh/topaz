@@ -9,7 +9,7 @@ dart_app("chat_content_provider") {
 
   deps = [
     "//apps/ledger/services/public:public_dart",
-    "//apps/maxwell/services/suggestion:suggestion_dart",
+    "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//peridot/public/lib/agent/fidl:fidl_dart",
     "//peridot/public/lib/auth/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
