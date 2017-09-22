@@ -7,12 +7,12 @@ import 'dart:math' as math;
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
-import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
-import 'package:apps.modular.services.module/module.fidl.dart';
-import 'package:apps.modular.services.module/module_context.fidl.dart';
-import 'package:apps.modular.services.module/module_controller.fidl.dart';
-import 'package:apps.modular.services.module/module_state.fidl.dart';
-import 'package:apps.modular.services.surface/surface.fidl.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
+import 'package:lib.module.fidl/module.fidl.dart';
+import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:lib.module.fidl/module_controller.fidl.dart';
+import 'package:lib.module.fidl/module_state.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';

@@ -18,8 +18,8 @@ flutter_app("flutter_mondrian") {
   main_dart = "lib/main.dart"
   deps = [
     "//garnet/public/lib/app/dart",
-    "//apps/modular/services/story:story_dart",
-    "//apps/modular/services/surface:surface_dart",
+    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//peridot/public/lib/surface/fidl:fidl_dart",
     "//garnet/public/lib/ui/flutter",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",

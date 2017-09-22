@@ -5,11 +5,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:apps.modular.services.story/story_controller.fidl.dart';
-import 'package:apps.modular.services.story/story_info.fidl.dart';
-import 'package:apps.modular.services.story/story_state.fidl.dart';
-import 'package:apps.modular.services.story/story_provider.fidl.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.story.fidl/story_controller.fidl.dart';
+import 'package:lib.story.fidl/story_info.fidl.dart';
+import 'package:lib.story.fidl/story_state.fidl.dart';
+import 'package:lib.story.fidl/story_provider.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_token.fidl.dart';
 import 'package:armadillo/story.dart';

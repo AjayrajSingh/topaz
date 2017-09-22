@@ -4,7 +4,7 @@
 
 import 'dart:math' as math;
 
-import 'package:apps.modular.services.surface/surface.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_token.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';

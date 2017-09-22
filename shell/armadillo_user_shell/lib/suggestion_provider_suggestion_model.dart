@@ -8,7 +8,7 @@ import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart'
     as maxwell;
 import 'package:apps.maxwell.services.suggestion/user_input.fidl.dart'
     as maxwell;
-import 'package:apps.modular.services.user/focus.fidl.dart';
+import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:armadillo/interruption_overlay.dart';
 import 'package:armadillo/story.dart';
 import 'package:armadillo/story_cluster.dart';

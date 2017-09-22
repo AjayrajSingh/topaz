@@ -16,8 +16,8 @@ flutter_app("userpicker_device_shell") {
 
   deps = [
     "//garnet/public/lib/app/dart",
-    "//apps/modular/services/auth/account:account_dart",
-    "//apps/modular/services/device:device_dart",
+    "//peridot/public/lib/auth/fidl/account:account_dart",
+    "//peridot/public/lib/device/fidl:fidl_dart",
     "//garnet/public/lib/ui/flutter",
     "//garnet/public/lib/ui/input/fidl:fidl_dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",

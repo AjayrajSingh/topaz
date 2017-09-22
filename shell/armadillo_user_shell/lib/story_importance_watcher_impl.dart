@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.services.story/story_provider.fidl.dart';
+import 'package:lib.story.fidl/story_provider.fidl.dart';
 import 'package:flutter/widgets.dart';
 
 /// Watches for changes to story importance.

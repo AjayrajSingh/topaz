@@ -4,7 +4,7 @@
 
 import 'dart:ui' show lerpDouble;
 
-import 'package:apps.modular.services.auth.account/account.fidl.dart';
+import 'package:lib.auth.fidl.account/account.fidl.dart';
 import 'package:flutter/material.dart';
 
 import 'user_picker_device_shell_model.dart';

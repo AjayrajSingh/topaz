@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.services.device/device_shell.fidl.dart';
+import 'package:lib.device.fidl/device_shell.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_token.fidl.dart';
 import 'package:flutter/widgets.dart';

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.services.user/focus.fidl.dart';
+import 'package:lib.user.fidl/focus.fidl.dart';
 
 /// Calling this causes [storyId] to be focused.
 typedef void StoryFocuser(String storyId);

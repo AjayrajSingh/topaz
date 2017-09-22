@@ -20,7 +20,7 @@ flutter_app("armadillo_user_shell") {
     "//apps/maxwell/services/context:context_dart",
     "//apps/maxwell/services/suggestion:suggestion_dart",
     "//garnet/public/lib/media/dart",
-    "//apps/modular/services/user:user_dart",
+    "//peridot/public/lib/user/fidl:fidl_dart",
     "//topaz/tools/packages/util",
     "//topaz/tools/packages/widgets",
     "//garnet/public/lib/ui/flutter",

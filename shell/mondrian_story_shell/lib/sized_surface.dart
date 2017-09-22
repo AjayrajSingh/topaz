@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.modular.services.surface/surface.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 

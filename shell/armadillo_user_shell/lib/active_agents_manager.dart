@@ -9,14 +9,14 @@ import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/user_input.fidl.dart';
-import 'package:apps.modular.services.agent/agent_provider.fidl.dart';
-import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:apps.modular.services.story/story_controller.fidl.dart';
-import 'package:apps.modular.services.story/story_info.fidl.dart';
-import 'package:apps.modular.services.story/story_provider.fidl.dart';
-import 'package:apps.modular.services.story/story_state.fidl.dart';
-import 'package:apps.modular.services.user/focus.fidl.dart';
-import 'package:apps.modular.services.user/user_shell.fidl.dart';
+import 'package:lib.agent.fidl/agent_provider.fidl.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.story.fidl/story_controller.fidl.dart';
+import 'package:lib.story.fidl/story_info.fidl.dart';
+import 'package:lib.story.fidl/story_provider.fidl.dart';
+import 'package:lib.story.fidl/story_state.fidl.dart';
+import 'package:lib.user.fidl/focus.fidl.dart';
+import 'package:lib.user.fidl/user_shell.fidl.dart';
 import 'package:lib.logging/logging.dart';
 
 /// Manages the list of active agents and the proposals for showing them.
