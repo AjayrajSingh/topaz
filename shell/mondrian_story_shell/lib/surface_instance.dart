@@ -41,12 +41,12 @@ class _SurfaceInstanceState extends State<SurfaceInstance> {
   @override
   void initState() {
     super.initState();
-    positionSim = widget.positionSim;
-    positionSim.value = widget.form.initPosition.center;
-    positionSim.start();
-    sizeSim = widget.sizeSim;
-    sizeSim.value = widget.form.position.size.bottomRight(Offset.zero);
-    sizeSim.start();
+    positionSim = widget.positionSim
+      ..value = widget.form.initPosition.center
+      ..start();
+    sizeSim = widget.sizeSim
+      ..value = widget.form.position.size.bottomRight(Offset.zero)
+      ..start();
   }
 
   @override
@@ -54,12 +54,12 @@ class _SurfaceInstanceState extends State<SurfaceInstance> {
     super.didUpdateWidget(oldWidget);
     Sim2DAnimation oldPositionSim = positionSim;
     Sim2DAnimation oldSizeSim = sizeSim;
-    positionSim = widget.positionSim;
-    positionSim.value = oldPositionSim.value;
-    positionSim.start(initState: oldPositionSim.state);
-    sizeSim = widget.sizeSim;
-    sizeSim.value = oldSizeSim.value;
-    sizeSim.start(initState: oldSizeSim.state);
+    positionSim = widget.positionSim
+      ..value = oldPositionSim.value
+      ..start(initState: oldPositionSim.state);
+    sizeSim = widget.sizeSim
+      ..value = oldSizeSim.value
+      ..start(initState: oldSizeSim.state);
   }
 
   @override
@@ -76,11 +76,12 @@ class _SurfaceInstanceState extends State<SurfaceInstance> {
           widget.form.onDragStarted();
         },
         onPanUpdate: (DragUpdateDetails details) {
-          positionSim.stop();
-          positionSim.value = positionSim.value +
-              widget.form.dragFriction(
-                  positionSim.value - widget.form.position.center,
-                  details.delta);
+          positionSim
+            ..stop()
+            ..value = positionSim.value +
+                widget.form.dragFriction(
+                    positionSim.value - widget.form.position.center,
+                    details.delta);
         },
         onPanEnd: (DragEndDetails details) {
           widget.form.onDragFinished(

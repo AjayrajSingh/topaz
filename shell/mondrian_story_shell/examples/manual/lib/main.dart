@@ -92,7 +92,7 @@ class LaunchModuleButton extends StatelessWidget {
   final String _display;
 
   /// Construct a button [Widget] to add new surface with given relationship
-  LaunchModuleButton(this._relation, this._display);
+  const LaunchModuleButton(this._relation, this._display);
 
   @override
   Widget build(BuildContext context) {
@@ -116,12 +116,12 @@ class Grouping extends StatelessWidget {
   final List<Widget> children;
 
   /// Construct Grouping
-  Grouping({this.children});
+  const Grouping({this.children});
 
   @override
   Widget build(BuildContext context) {
     return new Container(
-      color: new Color(0xFFFFFFFF),
+      color: const Color(0xFFFFFFFF),
       margin: const EdgeInsets.all(10.0),
       padding: const EdgeInsets.all(10.0),
       child: new Column(
@@ -135,7 +135,7 @@ class Grouping extends StatelessWidget {
 /// Specify an emphasis and launch a copresented surface
 class CopresentLauncher extends StatefulWidget {
   /// CopresentLauncher
-  CopresentLauncher({Key key}) : super(key: key);
+  const CopresentLauncher({Key key}) : super(key: key);
 
   @override
   CopresentLauncherState createState() => new CopresentLauncherState();
@@ -182,7 +182,7 @@ class CopresentLauncherState extends State<CopresentLauncher> {
 /// Display controls for a child module
 class ChildController extends StatelessWidget {
   /// Constructor
-  ChildController(this._watcher);
+  const ChildController(this._watcher);
 
   final _ModuleStopperWatcher _watcher;
 
@@ -193,30 +193,30 @@ class ChildController extends StatelessWidget {
         new Text('${_watcher.name} '),
         new Expanded(
           child: new Padding(
-            padding: new EdgeInsets.all(2.0),
+            padding: const EdgeInsets.all(2.0),
             child: new ButtonTheme(
-              padding: new EdgeInsets.all(1.0),
+              padding: const EdgeInsets.all(1.0),
               child: new RaisedButton(
-                child: new Text(
+                child: const Text(
                   'Focus',
-                  style: new TextStyle(fontSize: 10.0),
+                  style: const TextStyle(fontSize: 10.0),
                 ),
-                onPressed: () => _watcher.focus(),
+                onPressed: _watcher.focus,
               ),
             ),
           ),
         ),
         new Expanded(
           child: new Padding(
-            padding: new EdgeInsets.all(2.0),
+            padding: const EdgeInsets.all(2.0),
             child: new ButtonTheme(
-              padding: new EdgeInsets.all(1.0),
+              padding: const EdgeInsets.all(1.0),
               child: new RaisedButton(
-                child: new Text(
+                child: const Text(
                   'Dismiss',
-                  style: new TextStyle(fontSize: 10.0),
+                  style: const TextStyle(fontSize: 10.0),
                 ),
-                onPressed: () => _watcher.defocus(),
+                onPressed: _watcher.defocus,
               ),
             ),
           ),
@@ -229,7 +229,7 @@ class ChildController extends StatelessWidget {
 /// View for currently live child modules
 class ChildModulesView extends StatefulWidget {
   /// ChildModulesView
-  ChildModulesView({Key key}) : super(key: key);
+  const ChildModulesView({Key key}) : super(key: key);
 
   @override
   ChildModulesViewState createState() => new ChildModulesViewState();
@@ -277,7 +277,7 @@ class MainWidget extends StatelessWidget {
                   new Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: new RaisedButton(
-                      child: new Text('Close'),
+                      child: const Text('Close'),
                       onPressed: () {
                         log.info('Module done...');
                         _moduleContext.done();
@@ -288,8 +288,8 @@ class MainWidget extends StatelessWidget {
               ),
               new Grouping(
                 children: <Widget>[
-                  new CopresentLauncher(),
-                  new Divider(),
+                  const CopresentLauncher(),
+                  const Divider(),
                   new LaunchModuleButton(
                       new SurfaceRelation()
                         ..arrangement = SurfaceArrangement.sequential,
@@ -298,7 +298,7 @@ class MainWidget extends StatelessWidget {
               ),
               new Grouping(
                 children: <Widget>[
-                  new Text('Children'),
+                  const Text('Children'),
                   new ChildModulesView(key: kChildModulesKey),
                 ],
               ),

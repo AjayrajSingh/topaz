@@ -109,15 +109,15 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
                     maxHeight: constraints.maxHeight,
                     maxWidth: constraints.maxWidth - 12.0);
                 while (focusStack.isNotEmpty) {
-                  layoutSurfaces(context, adjustedConstraints, focusStack)
-                      .forEach((PositionedSurface ps) {
+                  for (PositionedSurface ps in layoutSurfaces(
+                      context, adjustedConstraints, focusStack)) {
                     if (!placedSurfaces.contains(ps.surface)) {
                       placedSurfaces.add(ps.surface);
                       double oldDepth = _forms[ps.surface]?.depth ?? 0.0;
                       _forms[ps.surface] = _form(
                           ps, oldDepth < 0.0 ? oldDepth : depth, offscreen);
                     }
-                  });
+                  }
                   depth = (depth + 0.1).clamp(0.0, 1.0);
                   while (focusStack.isNotEmpty &&
                       placedSurfaces.contains(focusStack.last)) {
@@ -126,17 +126,17 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
                 }
                 Forest<Surface> dependentSpanningTrees = new Forest<Surface>();
                 // The actual node doesn't matter
-                if (placedSurfaces.length > 0) {
+                if (placedSurfaces.isNotEmpty) {
                   // The actual surface doesn't matter
                   dependentSpanningTrees =
                       placedSurfaces.first.getDependentSpanningTrees();
 
                   /// prune non-visible surfaces
-                  dependentSpanningTrees.flatten().forEach((Tree<Surface> t) {
+                  for (Tree<Surface> t in dependentSpanningTrees.flatten()) {
                     if (!placedSurfaces.contains(t.value)) {
                       dependentSpanningTrees.remove(t);
                     }
-                  });
+                  }
                 }
                 SurfaceSpace space = new SurfaceSpace(
                     forms: dependentSpanningTrees

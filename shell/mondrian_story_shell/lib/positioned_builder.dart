@@ -65,9 +65,7 @@ abstract class SimulatedAnimation<T, S> extends Animation<T>
   /// Start the simulation from its current state
   @mustCallSuper
   void start({S initState}) {
-    if (_ticker == null) {
-      _ticker = vsync.createTicker(tick);
-    }
+    _ticker ??= vsync.createTicker(tick);
     if (_ticker.isActive) {
       return;
     }

@@ -12,10 +12,10 @@ const Curve _scaleCurve = Curves.fastOutSlowIn;
 /// Frame for child views
 class SurfaceFrame extends StatelessWidget {
   /// Constructor
-  SurfaceFrame({Key key, this.child, this.interactable: true, this.depth: 0.0})
-      : super(key: key) {
-    assert(-1.0 <= depth && depth <= 1.0);
-  }
+  const SurfaceFrame(
+      {Key key, this.child, this.interactable: true, this.depth: 0.0})
+      : assert(-1.0 <= depth && depth <= 1.0),
+        super(key: key);
 
   /// The child
   final Widget child;
@@ -46,10 +46,10 @@ class SurfaceFrame extends StatelessWidget {
   Matrix4 _scale(Offset center) {
     double scale =
         _scaleMinScale + (1.0 - depth.clamp(0.0, 1.0)) * (1.0 - _scaleMinScale);
-    Matrix4 matrix = new Matrix4.identity();
-    matrix.translate(center.dx, center.dy);
-    matrix.scale(scale, scale);
-    matrix.translate(-center.dx, -center.dy);
+    Matrix4 matrix = new Matrix4.identity()
+      ..translate(center.dx, center.dy)
+      ..scale(scale, scale)
+      ..translate(-center.dx, -center.dy);
     return matrix;
   }
 }

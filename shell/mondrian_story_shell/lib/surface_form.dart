@@ -96,14 +96,13 @@ class SurfaceForm {
 typedef Offset DragFriction(Offset offset, Offset delta);
 
 /// No friction. Moves exactly with cursor.
-final DragFriction kDragFrictionNone = (Offset offset, Offset delta) => delta;
+Offset kDragFrictionNone(Offset offset, Offset delta) => delta;
 
 /// Infinite friction. Will not move.
-final DragFriction kDragFrictionInfinite =
-    (Offset offset, Offset delta) => Offset.zero;
+Offset kDragFrictionInfinite(Offset offset, Offset delta) => Offset.zero;
 
 /// The position of the form relative to its target position.
 typedef void DragCallback(Offset offset, Velocity velocity);
 
 /// No callback.
-final DragCallback kDragCallbackNone = (Offset offset, Velocity velocity) {};
+void kDragCallbackNone(Offset offset, Velocity velocity) {}

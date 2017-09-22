@@ -28,7 +28,7 @@ class PositionedSurface {
       'surface: $surface, position: $position)';
 
   @override
-  bool operator ==(dynamic o) => o is PositionedSurface && surface == o.surface;
+  bool operator ==(Object o) => o is PositionedSurface && surface == o.surface;
 
   @override
   int get hashCode => surface.hashCode;
@@ -63,68 +63,76 @@ List<PositionedSurface> layoutSurfaces(
       MediaQuery.of(context).size.width * _kMinScreenRatio, _kMinScreenWidth);
   Tree<Surface> copresTree = focused.copresentSpanningTree;
 
-  dynamic focusOrder = (Tree<Surface> l, Tree<Surface> r) =>
+  int focusOrder(Tree<Surface> l, Tree<Surface> r) =>
       _compareByOtherList(l.value, r.value, focusStack);
 
   // Remove dismissed surfaces and collapse tree
-  copresTree.forEach((Tree<Surface> node) {
+  for (Tree<Surface> node in copresTree) {
     if (node.value.dismissed) {
-      node.children.forEach((Tree<Surface> child) {
-        node.parent.add(child);
-      });
+      node.children.forEach(node.parent.add);
       node.detach();
     }
-  });
+  }
 
   // Prune less focused surfaces where their min constraints do not fit
   double totalMinWidth = 0.0;
-  copresTree.flatten(orderChildren: focusOrder).skipWhile((Tree<Surface> node) {
-    double minWidth = node.value.minWidth(min: absoluteMinWidth);
-    if (totalMinWidth + minWidth > totalWidth) {
-      return false;
-    }
-    totalMinWidth += minWidth;
-    return true;
-  }).forEach((Tree<Surface> node) => node.detach());
+  for (Tree<Surface> node
+      in copresTree.flatten(orderChildren: focusOrder).skipWhile(
+    (Tree<Surface> node) {
+      double minWidth = node.value.minWidth(min: absoluteMinWidth);
+      if (totalMinWidth + minWidth > totalWidth) {
+        return false;
+      }
+      totalMinWidth += minWidth;
+      return true;
+    },
+  )) {
+    node.detach();
+  }
 
   // Prune less focused surfaces where emphasis values cannot be respected
   double totalEmphasis = 0.0;
   Surface top = focused;
   Surface tightestFit = focused;
-  copresTree.flatten(orderChildren: focusOrder).skipWhile((Tree<Surface> node) {
-    Surface prevTop = top;
-    double prevTotalEmphasis = totalEmphasis;
+  for (Tree<Surface> node
+      in copresTree.flatten(orderChildren: focusOrder).skipWhile(
+    (Tree<Surface> node) {
+      Surface prevTop = top;
+      double prevTotalEmphasis = totalEmphasis;
 
-    // Update top
-    if (top.ancestors.contains(node.value)) {
-      top = node.value;
-      totalEmphasis *= prevTop.absoluteEmphasis(top);
-    }
-    double emphasis = node.value.absoluteEmphasis(top);
-    totalEmphasis += emphasis;
+      // Update top
+      if (top.ancestors.contains(node.value)) {
+        top = node.value;
+        totalEmphasis *= prevTop.absoluteEmphasis(top);
+      }
+      double emphasis = node.value.absoluteEmphasis(top);
+      totalEmphasis += emphasis;
 
-    // Calculate min width available
-    double tightestFitEmphasis = tightestFit.absoluteEmphasis(top);
-    double extraWidth = emphasis / totalEmphasis * totalWidth -
-        node.value.minWidth(min: absoluteMinWidth);
-    double tightestFitExtraWidth =
-        tightestFitEmphasis / totalEmphasis * totalWidth -
-            tightestFit.minWidth(min: absoluteMinWidth);
+      // Calculate min width available
+      double tightestFitEmphasis = tightestFit.absoluteEmphasis(top);
+      double extraWidth = emphasis / totalEmphasis * totalWidth -
+          node.value.minWidth(min: absoluteMinWidth);
+      double tightestFitExtraWidth =
+          tightestFitEmphasis / totalEmphasis * totalWidth -
+              tightestFit.minWidth(min: absoluteMinWidth);
 
-    // Break if smallest or this doesn't fit
-    if (min(tightestFitExtraWidth, extraWidth) < 0.0) {
-      // Restore previous values
-      top = prevTop;
-      totalEmphasis = prevTotalEmphasis;
-      return false;
-    }
+      // Break if smallest or this doesn't fit
+      if (min(tightestFitExtraWidth, extraWidth) < 0.0) {
+        // Restore previous values
+        top = prevTop;
+        totalEmphasis = prevTotalEmphasis;
+        return false;
+      }
 
-    // Update tightest fit
-    if (extraWidth < tightestFitExtraWidth) {
-      tightestFit = node.value;
-    }
-    return true;
-  }).forEach((Tree<Surface> node) => node.detach());
+      // Update tightest fit
+      if (extraWidth < tightestFitExtraWidth) {
+        tightestFit = node.value;
+      }
+      return true;
+    },
+  )) {
+    node.detach();
+  }
 
   List<Surface> surfacesToDisplay =
       copresTree.map((Tree<Surface> t) => t.value).toList(growable: false);

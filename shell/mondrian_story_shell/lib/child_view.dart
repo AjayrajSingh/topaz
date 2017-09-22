@@ -14,11 +14,10 @@ const Curve _fadeCurve = Curves.fastOutSlowIn;
 /// Frame for child views
 class MondrianChildView extends StatelessWidget {
   /// Constructor
-  MondrianChildView(
+  const MondrianChildView(
       {Key key, this.connection, this.interactable: true, this.fade: 0.0})
-      : super(key: key) {
-    assert(0.0 <= fade && fade <= 1.0);
-  }
+      : assert(0.0 <= fade && fade <= 1.0),
+        super(key: key);
 
   /// The connection for this view
   final ChildViewConnection connection;

@@ -20,7 +20,7 @@ const Color borderColor = const Color(0xFF353535);
 /// Programmatic implementation of Static Mondrian Logo
 class MondrianLogo extends StatelessWidget {
   /// A Programmatic Mondrian Logo
-  MondrianLogo();
+  const MondrianLogo();
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class MondrianLogo extends StatelessWidget {
                                   fontSize: fontPoint),
                             ),
                           ),
-                          decoration: new BoxDecoration(color: yellow),
+                          decoration: const BoxDecoration(color: yellow),
                         ),
                       )
                     ],

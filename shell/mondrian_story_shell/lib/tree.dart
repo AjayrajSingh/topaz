@@ -10,7 +10,7 @@ import 'package:meta/meta.dart';
 class Tree<T> extends Iterable<Tree<T>> {
   /// Construct [Tree]
   Tree({@required this.value, Iterable<Tree<T>> children}) {
-    children?.forEach((Tree<T> child) => add(child));
+    children?.forEach(add);
   }
 
   /// The nodes value
@@ -27,7 +27,7 @@ class Tree<T> extends Iterable<Tree<T>> {
 
   /// Direct descendents of parent, except this
   Iterable<Tree<T>> get siblings => (_parent == null)
-      ? new Iterable<Tree<T>>.empty()
+      ? const Iterable<Tree<T>>.empty()
       : _parent.children.where((Tree<T> node) => node != this);
 
   /// Direct ancestors of this, starting at parent to root
@@ -93,8 +93,8 @@ class Tree<T> extends Iterable<Tree<T>> {
   /// Find the single Tree node with the following value
   ///
   /// Note: Search order not specified (so make sure values are unique)
-  Tree<T> find(T value) => this
-      .firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
+  Tree<T> find(T value) =>
+      firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
 
   /// Generate a new tree with the same structure with transformed values
   Tree<V> mapTree<V>(V f(T value)) => new Tree<V>(
@@ -113,7 +113,7 @@ class Tree<T> extends Iterable<Tree<T>> {
 class Forest<T> extends Iterable<Tree<T>> {
   /// Construct [Forest]
   Forest({Iterable<Tree<T>> roots}) {
-    roots?.forEach((Tree<T> root) => add(root));
+    roots?.forEach(add);
   }
 
   /// Root nodes of this forest
@@ -137,18 +137,14 @@ class Forest<T> extends Iterable<Tree<T>> {
   /// Reparents its children to the nodes parent or as root nodes.
   void remove(Tree<T> node) {
     assert(node != null);
-    if (this.contains(node)) {
+    if (contains(node)) {
       Tree<T> parent = node.parent;
       if (parent == null) {
-        for (Tree<T> child in node.children) {
-          add(child);
-        }
-        this._roots.remove(node);
+        node.children.forEach(add);
+        _roots.remove(node);
       } else {
         node.detach();
-        for (Tree<T> child in node.children) {
-          parent.add(child);
-        }
+        node.children.forEach(parent.add);
       }
     }
   }
@@ -176,8 +172,8 @@ class Forest<T> extends Iterable<Tree<T>> {
   /// Find the single Tree node with the following value
   ///
   /// Note: Search order not specified (so make sure values are unique)
-  Tree<T> find(T value) => this
-      .firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
+  Tree<T> find(T value) =>
+      firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
 
   /// Generate a new forest with the same structure with transformed values
   Forest<V> mapForest<V>(V f(T value)) => new Forest<V>(

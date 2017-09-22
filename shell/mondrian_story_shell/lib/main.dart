@@ -53,15 +53,14 @@ class StoryShellImpl extends StoryShell {
   void connectView(InterfaceHandle<ViewOwner> view, String viewId,
       String parentId, SurfaceRelation surfaceRelation) {
     log.fine('Connecting view $viewId with parent $parentId');
-    _surfaceGraph.addSurface(
-      viewId,
-      new SurfaceProperties(),
-      parentId,
-      surfaceRelation ?? new SurfaceRelation(),
-    );
-
-    // Separated calls in prep for asynchronous availability of view
-    _surfaceGraph.connectView(viewId, view);
+    _surfaceGraph
+      ..addSurface(
+        viewId,
+        new SurfaceProperties(),
+        parentId,
+        surfaceRelation ?? new SurfaceRelation(),
+      )
+      ..connectView(viewId, view);
   }
 
   /// Focus the view with this id
@@ -112,7 +111,7 @@ class StoryShellFactoryImpl extends StoryShellFactory {
 /// High level class for choosing between presentations
 class Mondrian extends StatefulWidget {
   /// Constructor
-  Mondrian({Key key}) : super(key: key);
+  const Mondrian({Key key}) : super(key: key);
 
   @override
   MondrianState createState() => new MondrianState();
@@ -127,7 +126,7 @@ class MondrianState extends State<Mondrian> {
         children: <Widget>[
           new ScopedModel<SurfaceGraph>(
             model: _surfaceGraph,
-            child: _showOverview ? new Overview() : new SurfaceDirector(),
+            child: _showOverview ? const Overview() : new SurfaceDirector(),
           ),
           new Positioned(
             left: 0.0,
@@ -136,7 +135,7 @@ class MondrianState extends State<Mondrian> {
               child: new Container(
                 width: 40.0,
                 height: 40.0,
-                child: _showOverview ? new MondrianLogo() : null,
+                child: _showOverview ? const MondrianLogo() : null,
               ),
               behavior: HitTestBehavior.opaque,
               onTap: () {
@@ -162,7 +161,7 @@ void main() {
     new Directionality(
       textDirection: TextDirection.ltr,
       child: new WindowMediaQuery(
-        child: new Mondrian(),
+        child: const Mondrian(),
       ),
     ),
   );

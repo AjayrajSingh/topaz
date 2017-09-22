@@ -154,7 +154,7 @@ class Surface extends Model {
 
   Iterable<Surface> _surfaces(Iterable<Tree<String>> nodes) => nodes
       .where((Tree<String> node) => (node != null && node.value != null))
-      .map((Tree<String> node) => _surface(node));
+      .map(_surface);
 
   @override
   String toString() {
@@ -166,13 +166,13 @@ class Surface extends Model {
 
   List<Tree<Surface>> _endsOfChain({Tree<Surface> current}) {
     List<Tree<Surface>> ends = <Tree<Surface>>[];
-    current.children.forEach((Tree<Surface> s) {
+    for (Tree<Surface> s in current.children) {
       if (s.value.relation.dependency != SurfaceDependency.dependent) {
         ends.add(s);
       } else {
         ends.addAll(_endsOfChain(current: s));
       }
-    });
+    }
     return ends;
   }
 
@@ -189,9 +189,9 @@ class Surface extends Model {
       Tree<Surface> t = queue.removeAt(0);
       List<Tree<Surface>> ends = _endsOfChain(current: t);
       queue.addAll(ends);
-      ends.forEach((Tree<Surface> s) {
+      for (Tree<Surface> s in ends) {
         t.find(s.value).detach();
-      });
+      }
       forest.add(t);
     }
     return forest;
@@ -201,7 +201,7 @@ class Surface extends Model {
 /// Data structure to manage the relationships and relative focus of surfaces
 class SurfaceGraph extends Model {
   /// Cache of surfaces
-  final Map<String, Surface> _surfaces = new Map<String, Surface>();
+  final Map<String, Surface> _surfaces = <String, Surface>{};
 
   /// Surface relationship tree
   final Tree<String> _tree = new Tree<String>(value: null);
@@ -218,7 +218,7 @@ class SurfaceGraph extends Model {
 
   /// The history of focused [Surface]s
   Iterable<Surface> get focusStack => _focusedSurfaces
-      .where((String id) => _surfaces.containsKey(id))
+      .where(_surfaces.containsKey)
       .map((String id) => _surfaces[id]);
 
   /// Add [Surface] to graph
@@ -247,9 +247,7 @@ class SurfaceGraph extends Model {
       Tree<String> node = _tree.find(id);
       Tree<String> parent = node.parent;
       node.detach();
-      for (Tree<String> child in node.children) {
-        parent.add(child);
-      }
+      node.children.forEach(parent.add);
       _focusedSurfaces.remove(id);
       _dismissedSurfaces.remove(id);
       _surfaces.remove(id);
@@ -308,11 +306,11 @@ class SurfaceGraph extends Model {
     List<Surface> ancestors = dismissed.ancestors.toList();
     List<Surface> dependentTree = dismissed.dependentSpanningTree
         .map((Tree<Surface> t) => t.value)
-        .toList();
-    // TODO(djmurphy) - when codependent comes in this needs to change
-    // this only removes down the tree, codependents would remove their
-    // ancestors
-    dependentTree.removeWhere((Surface s) => ancestors.contains(s));
+        .toList()
+          // TODO(djmurphy) - when codependent comes in this needs to change
+          // this only removes down the tree, codependents would remove their
+          // ancestors
+          ..removeWhere((Surface s) => ancestors.contains(s));
     List<String> depIds =
         dependentTree.map((Surface s) => s._node.value).toList();
     return depIds;
@@ -346,22 +344,23 @@ class SurfaceGraph extends Model {
     final Surface surface = _surfaces[id];
     if (surface != null) {
       log.fine('connectView $surface');
-      surface._connection = new ChildViewConnection(
-        viewOwner,
-        onAvailable: (ChildViewConnection connection) {
-          surface.notifyListeners();
-        },
-        onUnavailable: (ChildViewConnection connection) {
-          surface._connection = null;
-          if (_surfaces.containsValue(surface)) {
-            removeSurface(id);
-            notifyListeners();
-          }
-          // Also any existing listener
-          surface.notifyListeners();
-        },
-      );
-      surface.notifyListeners();
+      surface
+        .._connection = new ChildViewConnection(
+          viewOwner,
+          onAvailable: (ChildViewConnection connection) {
+            surface.notifyListeners();
+          },
+          onUnavailable: (ChildViewConnection connection) {
+            surface._connection = null;
+            if (_surfaces.containsValue(surface)) {
+              removeSurface(id);
+              notifyListeners();
+            }
+            // Also any existing listener
+            surface.notifyListeners();
+          },
+        )
+        ..notifyListeners();
     }
   }
 
@@ -369,17 +368,13 @@ class SurfaceGraph extends Model {
   int get size => _surfaces.length;
 
   @override
-  String toString() =>
-      'Tree:\n' +
-      _tree.children.map((Tree<String> child) => _toString(child)).join('\n');
+  String toString() => 'Tree:\n${_tree.children.map(_toString).join('\n')}';
 
   String _toString(Tree<String> node, {String prefix: ''}) {
     String nodeString = '$prefix${_surfaces[node.value]}';
     if (node.children.isNotEmpty) {
-      nodeString += '\n' +
-          node.children
-              .map((Tree<String> node) => _toString(node, prefix: '$prefix  '))
-              .join('\n');
+      nodeString =
+          '$nodeString\n${node.children.map((Tree<String> node) => _toString(node, prefix: '$prefix  ')).join('\n')}';
     }
     return '$nodeString';
   }

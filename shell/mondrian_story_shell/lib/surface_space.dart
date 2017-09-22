@@ -31,7 +31,7 @@ SimulationBuilder _dimSim() => (double start, double velocity, double end) =>
 /// Spaces determine how things move, and how they can be manipulated
 class SurfaceSpace extends StatefulWidget {
   /// Construct a SurfaceSpace with these forms
-  SurfaceSpace({@required this.forms});
+  const SurfaceSpace({@required this.forms});
 
   /// The forms inside this space
   final Forest<SurfaceForm> forms;
@@ -85,8 +85,9 @@ class _SurfaceSpaceState extends State<SurfaceSpace>
       ),
     );
     List<SurfaceInstance> instances = <SurfaceInstance>[current];
-    formTree.children.forEach((Tree<SurfaceForm> child) =>
-        instances.addAll(_instances(child, parent: current)));
+    for (Tree<SurfaceForm> child in formTree.children) {
+      instances.addAll(_instances(child, parent: current));
+    }
     return instances;
   }
 }

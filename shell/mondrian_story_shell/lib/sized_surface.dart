@@ -28,6 +28,6 @@ class SizedSurface {
 
   @override
   String toString() {
-    return surface.toString() + '| ' + rect.toString();
+    return '${surface.toString()}| ${rect.toString()}';
   }
 }

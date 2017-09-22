@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 /// Convenience function for making trees
 
 Tree<String> t(Tree<String> node, {List<Tree<String>> children}) {
-  children?.forEach((Tree<String> t) => node.add(t));
+  children?.forEach(node.add);
   return node;
 }
 
@@ -72,8 +72,7 @@ void main() {
       children: <Tree<String>>[uncle, aunt],
     );
 
-    forest = new Forest<String>();
-    forest.add(grandparent);
+    forest = new Forest<String>()..add(grandparent);
 
     secondRoot = new Tree<String>(value: 'parent of friend');
     friend = new Tree<String>(value: 'friend');

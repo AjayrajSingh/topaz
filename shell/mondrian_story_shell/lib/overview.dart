@@ -32,7 +32,7 @@ const Map<SurfaceDependency, String> depName =
 /// and their relationships
 class Overview extends StatelessWidget {
   /// Constructor
-  Overview({Key key}) : super(key: key);
+  const Overview({Key key}) : super(key: key);
 
   /// Build the ListView of Surface views in SurfaceGraph
   Widget buildGraphList(BoxConstraints constraints, SurfaceGraph graph) {
@@ -50,8 +50,8 @@ class Overview extends StatelessWidget {
               flex: 1,
               child: new Center(
                 child: index < graph.focusStack.length - 1
-                    ? new Text('Presentation: $arrangement' +
-                        '\nDependency: $dependency' +
+                    ? new Text('Presentation: $arrangement'
+                        '\nDependency: $dependency'
                         '\nEmphasis: ${s.relation.emphasis}')
                     : null,
               ),
