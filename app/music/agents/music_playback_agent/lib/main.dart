@@ -5,9 +5,9 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:apps.modular.services.agent/agent.fidl.dart';
-import 'package:apps.modular.services.agent/agent_context.fidl.dart';
-import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
+import 'package:lib.agent.fidl/agent.fidl.dart';
+import 'package:lib.agent.fidl/agent_context.fidl.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';

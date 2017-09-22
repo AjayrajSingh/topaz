@@ -11,7 +11,7 @@ import 'package:apps.maxwell.services.context/value_type.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_display.fidl.dart';
-import 'package:apps.modular.services.surface/surface.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:config/config.dart';
 import 'package:last_fm_api/api.dart';
 import 'package:last_fm_models/last_fm_models.dart';

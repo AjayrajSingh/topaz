@@ -6,12 +6,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:apps.maxwell.lib.dart/decomposition.dart';
-import 'package:apps.modular.services.agent.agent_controller/agent_controller.fidl.dart';
-import 'package:apps.modular.services.component/component_context.fidl.dart';
-import 'package:apps.modular.services.module/module_context.fidl.dart';
-import 'package:apps.modular.services.module/module_controller.fidl.dart';
-import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:apps.modular.services.surface/surface.fidl.dart';
+import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
+import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:lib.module.fidl/module_controller.fidl.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
