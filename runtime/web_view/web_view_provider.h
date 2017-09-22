@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "apps/modular/services/lifecycle/lifecycle.fidl.h"
-#include "apps/modular/services/module/module.fidl.h"
-#include "apps/modular/services/story/link.fidl.h"
+#include "lib/lifecycle/fidl/lifecycle.fidl.h"
+#include "lib/module/fidl/module.fidl.h"
+#include "lib/story/fidl/link.fidl.h"
 #include "topaz/runtime/web_view/web_view_impl.h"
 #include "lib/ui/views/fidl/view_provider.fidl.h"
 #include "lib/app/fidl/service_provider.fidl.h"

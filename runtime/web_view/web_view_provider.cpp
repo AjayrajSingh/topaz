@@ -5,7 +5,7 @@
 #include "topaz/runtime/web_view/web_view_provider.h"
 
 #include "lib/icu_data/cpp/icu_data.h"
-#include "apps/modular/lib/rapidjson/rapidjson.h"
+#include "peridot/lib/rapidjson/rapidjson.h"
 
 WebViewProvider::WebViewProvider(const std::string url)
     : url_(url),

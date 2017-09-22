@@ -4,7 +4,7 @@
 
 #include "topaz/runtime/web_view/schema_org_context.h"
 
-#include "apps/modular/lib/rapidjson/rapidjson.h"
+#include "peridot/lib/rapidjson/rapidjson.h"
 #include "lib/fxl/logging.h"
 
 #include "WebView.h"

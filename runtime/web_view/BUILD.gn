@@ -24,11 +24,6 @@ executable("web_view_bin") {
   deps = [
     ":webkit",
     "//apps/maxwell/services/context",
-    "//apps/modular/lib/rapidjson",
-    "//apps/modular/services/lifecycle",
-    "//apps/modular/services/module",
-    "//apps/modular/services/story",
-    "//topaz/runtime/web_runner/services",
     "//garnet/public/lib/app/cpp",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
@@ -36,8 +31,13 @@ executable("web_view_bin") {
     "//garnet/public/lib/ui/geometry/fidl",
     "//garnet/public/lib/ui/view_framework:view_provider",
     "//garnet/public/lib/ui/views/fidl",
+    "//peridot/lib/rapidjson",
+    "//peridot/public/lib/lifecycle/fidl",
+    "//peridot/public/lib/module/fidl",
+    "//peridot/public/lib/story/fidl",
     "//third_party/boringssl",
     "//third_party/rapidjson",
+    "//topaz/runtime/web_runner/services",
   ]
 
   ldflags = [ "-Wl,-z,stack-size=1048576" ]
