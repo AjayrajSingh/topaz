@@ -11,11 +11,11 @@ dart_package("lib.modular") {
 
   deps = [
     "//garnet/public/lib/app/dart",
-    "//apps/modular/services/agent:agent_dart",
-    "//apps/modular/services/device:device_dart",
-    "//apps/modular/services/lifecycle:lifecycle_dart",
-    "//apps/modular/services/module:module_dart",
-    "//apps/modular/services/user:user_dart",
+    "//peridot/public/lib/agent/fidl:fidl_dart",
+    "//peridot/public/lib/device/fidl:fidl_dart",
+    "//peridot/public/lib/lifecycle/fidl:fidl_dart",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/user/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
   ]
 }

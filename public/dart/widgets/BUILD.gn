@@ -12,9 +12,9 @@ dart_package("lib.widgets") {
 
   deps = [
     "//garnet/public/lib/app/dart",
-    "//apps/modular/services/device:device_dart",
-    "//apps/modular/services/module:module_dart",
-    "//apps/modular/services/user:user_dart",
+    "//peridot/public/lib/device/fidl:fidl_dart",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/user/fidl:fidl_dart",
     "//topaz/tools/packages/widgets_meta",
     "//garnet/public/lib/ui/flutter",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",

@@ -5,9 +5,9 @@
 import 'dart:async';
 
 import 'package:lib.app.fidl/service_provider.fidl.dart';
-import 'package:apps.modular.services.module/module.fidl.dart';
-import 'package:apps.modular.services.module/module_context.fidl.dart';
-import 'package:apps.modular.services.story/link.fidl.dart';
+import 'package:lib.module.fidl/module.fidl.dart';
+import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 

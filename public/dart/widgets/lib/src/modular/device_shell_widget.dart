@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:apps.modular.services.device/device_shell.fidl.dart';
+import 'package:lib.device.fidl/device_shell.fidl.dart';
 import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';

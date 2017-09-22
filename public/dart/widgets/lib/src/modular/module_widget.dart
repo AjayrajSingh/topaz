@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
-import 'package:apps.modular.services.module/module.fidl.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
+import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.modular/modular.dart';

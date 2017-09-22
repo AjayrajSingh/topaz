@@ -7,19 +7,19 @@ import 'dart:isolate';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
-import 'package:apps.modular.services.agent/agent.fidl.dart';
-import 'package:apps.modular.services.lifecycle/lifecycle.fidl.dart';
-import 'package:apps.modular.services.agent/agent_context.fidl.dart';
-import 'package:apps.modular.services.auth/token_provider.fidl.dart';
-import 'package:apps.modular.services.component/component_context.fidl.dart';
+import 'package:lib.agent.fidl/agent.fidl.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
+import 'package:lib.agent.fidl/agent_context.fidl.dart';
+import 'package:lib.auth.fidl/token_provider.fidl.dart';
+import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:meta/meta.dart';
 
 export 'package:lib.app.dart/app.dart';
-export 'package:apps.modular.services.agent/agent.fidl.dart';
-export 'package:apps.modular.services.agent/agent_context.fidl.dart';
-export 'package:apps.modular.services.auth/token_provider.fidl.dart';
-export 'package:apps.modular.services.component/component_context.fidl.dart';
+export 'package:lib.agent.fidl/agent.fidl.dart';
+export 'package:lib.agent.fidl/agent_context.fidl.dart';
+export 'package:lib.auth.fidl/token_provider.fidl.dart';
+export 'package:lib.component.fidl/component_context.fidl.dart';
 
 /// A base class for implementing an [Agent] which receives common services and
 /// also helps exposing services through an outgoing [ServiceProvider].

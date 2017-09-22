@@ -6,10 +6,10 @@ import 'package:apps.maxwell.services.context/context_writer.fidl.dart';
 import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
 import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
-import 'package:apps.modular.services.story/link.fidl.dart';
-import 'package:apps.modular.services.story/story_provider.fidl.dart';
-import 'package:apps.modular.services.user/focus.fidl.dart';
-import 'package:apps.modular.services.user/user_shell.fidl.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.story.fidl/story_provider.fidl.dart';
+import 'package:lib.user.fidl/focus.fidl.dart';
+import 'package:lib.user.fidl/user_shell.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'link_watcher_impl.dart';
