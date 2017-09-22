@@ -7,7 +7,7 @@ description: APIs for extracting widget specs and generating widget explorer pag
 dependencies:
   analyzer: any # See the dependency override below.
   cli_util: ^0.1.0
-  dart_style: ^0.2.11+1
+  dart_style: ^1.0.8
   glob: ^1.1.3
   mustache: ^0.2.5+1
   path: ^1.3.9

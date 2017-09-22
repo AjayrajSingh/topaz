@@ -8,7 +8,7 @@ dependencies:
   collection: ^1.9.1
   fixtures:
     path: ../fixtures
-  intl: ^0.14.0
+  intl: ^0.15.1
   quiver: ^0.24.0
   util:
     path: ../util
