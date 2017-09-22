@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:apps.maxwell.services.context/context_writer.fidl.dart';
-import 'package:apps.maxwell.services.context/context_reader.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/proposal_publisher.fidl.dart';
-import 'package:apps.maxwell.services.suggestion/suggestion_provider.fidl.dart';
+import 'package:lib.context.fidl/context_writer.fidl.dart';
+import 'package:lib.context.fidl/context_reader.fidl.dart';
+import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
+import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.fidl/story_provider.fidl.dart';
 import 'package:lib.user.fidl/focus.fidl.dart';
