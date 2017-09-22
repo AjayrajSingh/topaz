@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert' show JSON;
 import 'dart:isolate';
 
-import 'package:apps.ledger.services.public/ledger.fidl.dart' as ledger_fidl;
+import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger_fidl;
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';

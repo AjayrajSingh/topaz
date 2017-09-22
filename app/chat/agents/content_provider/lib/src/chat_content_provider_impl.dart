@@ -7,7 +7,7 @@ import 'dart:convert' show UTF8;
 import 'dart:typed_data';
 import 'dart:zircon' show Vmo;
 
-import 'package:apps.ledger.services.public/ledger.fidl.dart';
+import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';

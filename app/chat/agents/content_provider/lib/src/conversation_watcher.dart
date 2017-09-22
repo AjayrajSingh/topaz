@@ -4,7 +4,7 @@
 
 import 'dart:convert' show JSON;
 
-import 'package:apps.ledger.services.public/ledger.fidl.dart';
+import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:meta/meta.dart';
 

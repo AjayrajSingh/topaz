@@ -8,7 +8,7 @@ dart_app("chat_content_provider") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//apps/ledger/services/public:public_dart",
+    "//peridot/public/lib/ledger/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//peridot/public/lib/agent/fidl:fidl_dart",
     "//peridot/public/lib/auth/fidl:fidl_dart",
