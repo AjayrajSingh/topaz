@@ -132,9 +132,9 @@ class StoryCluster {
     Story story,
     VoidCallback onStoryClusterChanged,
   ) {
-    story.panel = new Panel();
-    story.positionedKey =
-        new GlobalKey(debugLabel: '${story.id} positionedKey');
+    story
+      ..panel = new Panel()
+      ..positionedKey = new GlobalKey(debugLabel: '${story.id} positionedKey');
     return new StoryCluster(
       id: story.clusterId,
       clusterDraggableKey: story.clusterDraggableKey,
@@ -185,9 +185,9 @@ class StoryCluster {
   /// Returns [Widget]s for each of the stories in this cluster.
   Map<StoryId, Widget> buildStoryWidgets(BuildContext context) {
     Map<StoryId, Widget> storyWidgets = <StoryId, Widget>{};
-    stories.forEach((Story story) {
+    for (Story story in stories) {
       storyWidgets[story.id] = story.builder(context);
-    });
+    }
     return storyWidgets;
   }
 
@@ -207,7 +207,9 @@ class StoryCluster {
     _cumulativeInteractionDuration = _getClusterCumulativeInteractionDuration(
       stories,
     );
-    _storyListListeners.forEach((VoidCallback listener) => listener());
+    for (VoidCallback listener in _storyListListeners) {
+      listener();
+    }
     _panelsModel.notifyListeners();
   }
 
@@ -215,9 +217,9 @@ class StoryCluster {
   /// clusters in the story list.
   set lastInteraction(DateTime lastInteraction) {
     _lastInteraction = lastInteraction;
-    _stories.forEach((Story story) {
+    for (Story story in _stories) {
       story.lastInteraction = lastInteraction;
-    });
+    }
   }
 
   /// Gets the last interaction time for the cluster.
@@ -272,12 +274,12 @@ class StoryCluster {
   Map<StoryId, PlaceHolderStory> removePreviews() {
     Map<StoryId, PlaceHolderStory> storiesRemoved =
         <StoryId, PlaceHolderStory>{};
-    _stories.toList().forEach((Story story) {
+    for (Story story in _stories.toList()) {
       if (story is PlaceHolderStory) {
         absorb(story);
         storiesRemoved[story.associatedStoryId] = story;
       }
-    });
+    }
 
     return storiesRemoved;
   }
@@ -290,10 +292,10 @@ class StoryCluster {
   void normalizeSizes() {
     Set<double> currentLeftsSet = new Set<double>();
     Set<double> currentTopsSet = new Set<double>();
-    panels.forEach((Panel panel) {
+    for (Panel panel in panels) {
       currentLeftsSet.add(panel.left);
       currentTopsSet.add(panel.top);
-    });
+    }
 
     List<double> currentSortedLefts = new List<double>.from(currentLeftsSet)
       ..sort();
@@ -315,47 +317,44 @@ class StoryCluster {
       top += getSpanSpan(1.0, i, currentSortedTops.length);
     }
 
-    panels.toList().forEach(
-      (Panel panel) {
-        assert(() {
-          bool hadErrors = false;
-          if (leftMap[panel.left] == null) {
-            print(
-                'leftMap doesn\'t contain left ${panel.left}: ${leftMap.keys}');
-            hadErrors = true;
+    for (Panel panel in panels.toList()) {
+      assert(() {
+        bool hadErrors = false;
+        if (leftMap[panel.left] == null) {
+          print('leftMap doesn\'t contain left ${panel.left}: ${leftMap.keys}');
+          hadErrors = true;
+        }
+        if (topMap[panel.top] == null) {
+          print('topMap doesn\'t contain top ${panel.top}: ${topMap.keys}');
+          hadErrors = true;
+        }
+        if (leftMap[panel.right] == null) {
+          print(
+              'leftMap doesn\'t contain right ${panel.right}: ${leftMap.keys}');
+          hadErrors = true;
+        }
+        if (topMap[panel.bottom] == null) {
+          print(
+              'topMap doesn\'t contain bottom ${panel.bottom}: ${topMap.keys}');
+          hadErrors = true;
+        }
+        if (hadErrors) {
+          for (Panel panel in panels) {
+            print(' |--> $panel');
           }
-          if (topMap[panel.top] == null) {
-            print('topMap doesn\'t contain top ${panel.top}: ${topMap.keys}');
-            hadErrors = true;
-          }
-          if (leftMap[panel.right] == null) {
-            print(
-                'leftMap doesn\'t contain right ${panel.right}: ${leftMap.keys}');
-            hadErrors = true;
-          }
-          if (topMap[panel.bottom] == null) {
-            print(
-                'topMap doesn\'t contain bottom ${panel.bottom}: ${topMap.keys}');
-            hadErrors = true;
-          }
-          if (hadErrors) {
-            panels.forEach((Panel panel) {
-              print(' |--> $panel');
-            });
-          }
-          return !hadErrors;
-        });
-        replace(
-          panel: panel,
-          withPanel: new Panel.fromLTRB(
-            leftMap[panel.left],
-            topMap[panel.top],
-            leftMap[panel.right],
-            topMap[panel.bottom],
-          ),
-        );
-      },
-    );
+        }
+        return !hadErrors;
+      });
+      replace(
+        panel: panel,
+        withPanel: new Panel.fromLTRB(
+          leftMap[panel.left],
+          topMap[panel.top],
+          leftMap[panel.right],
+          topMap[panel.bottom],
+        ),
+      );
+    }
     _panelsModel.notifyListeners();
   }
 
@@ -472,41 +471,49 @@ class StoryCluster {
 
   /// Maximizes the story bars for all the stories within the cluster.
   /// See [Story.maximizeStoryBar].
-  void maximizeStoryBars({
-    bool jumpToFinish: false,
-  }) =>
-      stories.forEach(
-        (Story story) => story.maximizeStoryBar(jumpToFinish: jumpToFinish),
-      );
+  void maximizeStoryBars({bool jumpToFinish: false}) {
+    for (Story story in stories) {
+      story.maximizeStoryBar(jumpToFinish: jumpToFinish);
+    }
+  }
 
   /// Minimizes the story bars for all the stories within the cluster.
   /// See [Story.minimizeStoryBar].
-  void minimizeStoryBars() =>
-      stories.forEach((Story story) => story.minimizeStoryBar());
+  void minimizeStoryBars() {
+    for (Story story in stories) {
+      story.minimizeStoryBar();
+    }
+  }
 
   /// Hides the story bars for all the stories within the cluster.
   /// See [Story.hideStoryBar].
-  void hideStoryBars() =>
-      stories.forEach((Story story) => story.hideStoryBar());
+  void hideStoryBars() {
+    for (Story story in stories) {
+      story.hideStoryBar();
+    }
+  }
 
   /// Shows the story bars for all the stories within the cluster.
   /// See [Story.showStoryBar].
-  void showStoryBars() =>
-      stories.forEach((Story story) => story.showStoryBar());
+  void showStoryBars() {
+    for (Story story in stories) {
+      story.showStoryBar();
+    }
+  }
 
   /// Moves the [storiesToMove] from their current location in the story list
   /// to [targetIndex].
   void moveStoriesToIndex(List<Story> storiesToMove, int targetIndex) {
     List<Story> removedStories = <Story>[];
-    storiesToMove.forEach((Story storyToMove) {
+    for (Story storyToMove in storiesToMove) {
       Story story =
           stories.where((Story story) => story.id == storyToMove.id).single;
       _stories.remove(story);
       removedStories.add(story);
-    });
-    removedStories.reversed.forEach(
-      (Story removedStory) => _stories.insert(targetIndex, removedStory),
-    );
+    }
+    for (Story removedStory in removedStories.reversed) {
+      _stories.insert(targetIndex, removedStory);
+    }
     _notifyStoryListListeners();
   }
 
@@ -518,17 +525,17 @@ class StoryCluster {
     int targetIndex,
   ) {
     List<Story> removedStories = <Story>[];
-    storiesToMove.forEach((Story storyToMove) {
+    for (Story storyToMove in storiesToMove) {
       Story story = previewStories
           .where((PlaceHolderStory story) =>
               story.associatedStoryId == storyToMove.id)
           .single;
       _stories.remove(story);
       removedStories.add(story);
-    });
-    removedStories.reversed.forEach(
-      (Story removedStory) => _stories.insert(targetIndex, removedStory),
-    );
+    }
+    for (Story removedStory in removedStories.reversed) {
+      _stories.insert(targetIndex, removedStory);
+    }
     _notifyStoryListListeners();
   }
 
@@ -613,22 +620,22 @@ class StoryCluster {
 
   static DateTime _getClusterLastInteraction(List<Story> stories) {
     DateTime latestTime = new DateTime(1970);
-    stories.where((Story story) => !story.isPlaceHolder).forEach((Story story) {
+    for (Story story in stories.where((Story story) => !story.isPlaceHolder)) {
       if (latestTime.isBefore(story.lastInteraction)) {
         latestTime = story.lastInteraction;
       }
-    });
+    }
     return latestTime;
   }
 
   static Duration _getClusterCumulativeInteractionDuration(
       List<Story> stories) {
     Duration largestDuration = new Duration();
-    stories.where((Story story) => !story.isPlaceHolder).forEach((Story story) {
+    for (Story story in stories.where((Story story) => !story.isPlaceHolder)) {
       if (largestDuration < story.cumulativeInteractionDuration) {
         largestDuration = story.cumulativeInteractionDuration;
       }
-    });
+    }
     return largestDuration;
   }
 }

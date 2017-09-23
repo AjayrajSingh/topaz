@@ -138,7 +138,7 @@ class PanelResizingModel extends TickingModel {
   @override
   bool handleTick(double elapsedSeconds) {
     bool done = true;
-    _states.toList().forEach((ResizingState state) {
+    for (ResizingState state in _states.toList()) {
       if (!state.simulation.isDone) {
         state.simulation.elapseTime(elapsedSeconds);
       }
@@ -147,7 +147,7 @@ class PanelResizingModel extends TickingModel {
       } else if (state.simulation.target == 0.0) {
         _states.remove(state);
       }
-    });
+    }
     return !done;
   }
 }

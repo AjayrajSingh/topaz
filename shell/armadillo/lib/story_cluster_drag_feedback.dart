@@ -112,12 +112,12 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
     if (_wasAcceptable && !StoryClusterDragStateModel.of(context).isAccepting) {
       // Revert to initial story locations and display state.
       widget.storyCluster.removePreviews();
-      _originalStories.forEach((Story story) {
+      for (Story story in _originalStories) {
         widget.storyCluster.replaceStoryPanel(
           storyId: story.id,
           withPanel: story.panel,
         );
-      });
+      }
       widget.storyCluster.displayMode = _originalDisplayMode;
     }
     _wasAcceptable = StoryClusterDragStateModel.of(context).isAccepting;
@@ -184,7 +184,7 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                 double realStoriesFractionalTop = 1.0;
                 double realStoriesFractionalBottom = 0.0;
 
-                widget.storyCluster.realStories.forEach((Story story) {
+                for (Story story in widget.storyCluster.realStories) {
                   realStoriesFractionalLeft =
                       math.min(realStoriesFractionalLeft, story.panel.left);
                   realStoriesFractionalRight =
@@ -193,7 +193,7 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                       math.min(realStoriesFractionalTop, story.panel.top);
                   realStoriesFractionalBottom =
                       math.max(realStoriesFractionalBottom, story.panel.bottom);
-                });
+                }
 
                 double realStoriesFractionalCenterX =
                     realStoriesFractionalLeft +

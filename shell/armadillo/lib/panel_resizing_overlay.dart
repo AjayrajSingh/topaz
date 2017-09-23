@@ -62,7 +62,7 @@ class PanelResizingOverlay extends StatelessWidget {
     // panels on the other side of that edge.  If 1:many or many:1
     Set<double> rights = new Set<double>();
     Set<double> bottoms = new Set<double>();
-    storyCluster.panels.forEach((Panel panel) {
+    for (Panel panel in storyCluster.panels) {
       if (panel.right != 1.0) {
         rights.add(panel.right);
       }
@@ -70,7 +70,7 @@ class PanelResizingOverlay extends StatelessWidget {
       if (panel.bottom != 1.0) {
         bottoms.add(panel.bottom);
       }
-    });
+    }
 
     List<Widget> stackChildren = <Widget>[child];
 
@@ -117,19 +117,19 @@ class PanelResizingOverlay extends StatelessWidget {
     StoryClusterPanelsModel storyClusterPanelsModel,
   ) {
     List<_VerticalSeam> verticalSeams = <_VerticalSeam>[];
-    rights.forEach((double right) {
+    for (double right in rights) {
       List<Panel> touchingPanels = storyCluster.panels
           .where((Panel panel) => panel.left == right || panel.right == right)
-          .toList();
-      touchingPanels.sort(
-        (Panel a, Panel b) => a.top < b.top ? -1 : a.top > b.top ? 1 : 0,
-      );
+          .toList()
+            ..sort(
+              (Panel a, Panel b) => a.top < b.top ? -1 : a.top > b.top ? 1 : 0,
+            );
       // Start first span.
       double top = touchingPanels.first.top;
       double bottom = touchingPanels.first.bottom;
       List<Panel> panelsToLeft = <Panel>[];
       List<Panel> panelsToRight = <Panel>[];
-      touchingPanels.forEach((Panel panel) {
+      for (Panel panel in touchingPanels) {
         if (panel.top < bottom) {
           if (panel.bottom > bottom) {
             bottom = panel.bottom;
@@ -161,7 +161,7 @@ class PanelResizingOverlay extends StatelessWidget {
         } else {
           panelsToLeft.add(panel);
         }
-      });
+      }
       // Store last span.
       verticalSeams.add(
         new _VerticalSeam(
@@ -177,7 +177,7 @@ class PanelResizingOverlay extends StatelessWidget {
           panelResizingModel: PanelResizingModel.of(context),
         ),
       );
-    });
+    }
     return verticalSeams;
   }
 
@@ -191,19 +191,20 @@ class PanelResizingOverlay extends StatelessWidget {
     StoryClusterPanelsModel storyClusterPanelsModel,
   ) {
     List<_HorizontalSeam> horizontalSeams = <_HorizontalSeam>[];
-    bottoms.forEach((double bottom) {
+    for (double bottom in bottoms) {
       List<Panel> touchingPanels = storyCluster.panels
           .where((Panel panel) => panel.top == bottom || panel.bottom == bottom)
-          .toList();
-      touchingPanels.sort(
-        (Panel a, Panel b) => a.left < b.left ? -1 : a.left > b.left ? 1 : 0,
-      );
+          .toList()
+            ..sort(
+              (Panel a, Panel b) =>
+                  a.left < b.left ? -1 : a.left > b.left ? 1 : 0,
+            );
       // Start first span.
       double left = touchingPanels.first.left;
       double right = touchingPanels.first.right;
       List<Panel> panelsAbove = <Panel>[];
       List<Panel> panelsBelow = <Panel>[];
-      touchingPanels.forEach((Panel panel) {
+      for (Panel panel in touchingPanels) {
         if (panel.left < right) {
           if (panel.right > right) {
             right = panel.right;
@@ -235,7 +236,7 @@ class PanelResizingOverlay extends StatelessWidget {
         } else {
           panelsAbove.add(panel);
         }
-      });
+      }
       // Store last span.
       horizontalSeams.add(
         new _HorizontalSeam(
@@ -251,7 +252,7 @@ class PanelResizingOverlay extends StatelessWidget {
           panelResizingModel: PanelResizingModel.of(context),
         ),
       );
-    });
+    }
     return horizontalSeams;
   }
 
@@ -259,7 +260,7 @@ class PanelResizingOverlay extends StatelessWidget {
     BuildContext context,
     StoryClusterPanelsModel storyClusterPanelsModel,
   ) {
-    storyCluster.stories.forEach((Story story) {
+    for (Story story in storyCluster.stories) {
       EdgeInsets margins = StoryPositioned.getFractionalMargins(
         story.panel,
         currentSize,
@@ -272,7 +273,7 @@ class PanelResizingOverlay extends StatelessWidget {
         fractionalWidth: story.panel.width - (margins.left + margins.right),
         fractionalHeight: story.panel.height - (margins.top + margins.bottom),
       );
-    });
+    }
     storyClusterPanelsModel.notifyListeners();
   }
 }
@@ -323,8 +324,9 @@ class _VerticalSeam {
           color: _kGestureDetectorColor,
           child: new LongPressGestureDetector(
             onDragStart: (DragStartDetails details) {
-              resizingState.valueOnDrag = x;
-              resizingState.dragDelta = 0.0;
+              resizingState
+                ..valueOnDrag = x
+                ..dragDelta = 0.0;
               PanelResizingModel.of(context).resizeBegin(resizingState);
             },
             onDragEnd: (DragEndDetails details) {
@@ -356,8 +358,12 @@ class _VerticalSeam {
                           box.size.width,
                         ),
                   )) {
-                panelsToLeft.forEach((Panel panel) => panel.adjustRight(newX));
-                panelsToRight.forEach((Panel panel) => panel.adjustLeft(newX));
+                for (Panel panel in panelsToLeft) {
+                  panel.adjustRight(newX);
+                }
+                for (Panel panel in panelsToRight) {
+                  panel.adjustLeft(newX);
+                }
                 onPanelsChanged();
               }
             },
@@ -478,8 +484,12 @@ class _HorizontalSeam {
                           box.size.height,
                         ),
                   )) {
-                panelsAbove.forEach((Panel panel) => panel.adjustBottom(newY));
-                panelsBelow.forEach((Panel panel) => panel.adjustTop(newY));
+                for (Panel panel in panelsAbove) {
+                  panel.adjustBottom(newY);
+                }
+                for (Panel panel in panelsBelow) {
+                  panel.adjustTop(newY);
+                }
                 onPanelsChanged();
               }
             },

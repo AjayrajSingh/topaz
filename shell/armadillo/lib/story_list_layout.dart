@@ -165,7 +165,8 @@ class StoryListLayout {
     // Calculate base size.
     double minW = _getMinWidth();
     int storyIndex = 0;
-    stories.forEach((_StoryMetadata story) {
+
+    for (_StoryMetadata story in stories) {
       double baseJugglingScaling = 0.1 +
           _smoothstep(
                 0.0,
@@ -196,22 +197,20 @@ class StoryListLayout {
       );
 
       storyIndex++;
-    });
+    }
 
     // Roughly layout stories.
     if (!_multiColumn) {
       _StoryMetadata previousStory;
-      stories.forEach(
-        (_StoryMetadata story) {
-          story.offset = new Offset(
-            -story.size.width / 2,
-            ((previousStory == null) ? 0.0 : previousStory.offset.dy) -
-                story.size.height -
-                _baseVerticalGrid * 4.0,
-          );
-          previousStory = story;
-        },
-      );
+      for (_StoryMetadata story in stories) {
+        story.offset = new Offset(
+          -story.size.width / 2,
+          ((previousStory == null) ? 0.0 : previousStory.offset.dy) -
+              story.size.height -
+              _baseVerticalGrid * 4.0,
+        );
+        previousStory = story;
+      }
     } else {
       // Split stories into rows.
       double rowTop = -stories[0].size.height;
@@ -240,39 +239,39 @@ class StoryListLayout {
       }
 
       // Exaggerate the time difference within a row.
-      rows.where((List<_StoryMetadata> row) {
+      for (List<_StoryMetadata> row in rows.where((List<_StoryMetadata> row) {
         bool isJuggling = false;
-        row.forEach((_StoryMetadata story) {
+        for (_StoryMetadata story in row) {
           if (story.jugglingMinutes > 0) {
             isJuggling = true;
           }
-        });
+        }
         return isJuggling;
-      }).forEach((List<_StoryMetadata> row) {
+      })) {
         int storyInteractionMinutesForRow = 0;
-        row.forEach((_StoryMetadata story) {
+        for (_StoryMetadata story in row) {
           storyInteractionMinutesForRow += story.interactionMinutes;
-        });
+        }
         double averageStoryInteractionMinutes =
             storyInteractionMinutesForRow / row.length;
-        row.forEach((_StoryMetadata story) {
+        for (_StoryMetadata story in row) {
           double scale = 1.0 +
               (story.interactionMinutes - averageStoryInteractionMinutes) /
                   averageStoryInteractionMinutes *
                   _intraStoryInteractionScaling;
           story.size *= scale;
-        });
-      });
+        }
+      }
 
       double previousRowLastStoryTop = 0.0;
       int storyIndex = 0;
       // For every row...
       List<_StoryMetadata> previousRow;
-      rows.forEach((List<_StoryMetadata> row) {
+      for (List<_StoryMetadata> row in rows) {
         double originalRowWidth = 0.0;
-        row.forEach((_StoryMetadata story) {
+        for (_StoryMetadata story in row) {
           originalRowWidth += story.size.width;
-        });
+        }
 
         // For every story in the row, scale it so the row's total width
         // becomes or comes closer to our target width.
@@ -286,22 +285,22 @@ class StoryListLayout {
               : originalRowWidth + (maxRowWidth - originalRowWidth) * 0.4;
           double scale = (targetRowWidth / originalRowWidth).clamp(0.7, 1.3);
 
-          row.forEach((_StoryMetadata story) {
+          for (_StoryMetadata story in row) {
             story.size = _alignSizeToGrid(story.size * scale);
-          });
+          }
         }
 
         // For every story in the row, assign its left relative to the row's
         // left.
         double rowWidth = 0.0;
         _StoryMetadata previousStory;
-        row.forEach((_StoryMetadata story) {
+        for (_StoryMetadata story in row) {
           story.dx = (previousStory == null)
               ? 0.0
               : previousStory.right + _horizontalGap;
           rowWidth += story.size.width;
           previousStory = story;
-        });
+        }
 
         // Shift all stories in the row to the left to account for horizontal
         // margins between the stories.
@@ -310,7 +309,7 @@ class StoryListLayout {
             : rowWidth + _horizontalGap * 0.5;
 
         previousStory = null;
-        row.forEach((_StoryMetadata story) {
+        for (_StoryMetadata story in row) {
           story.offset = story.offset.translate(-storyLeftShift, 0.0);
 
           if (previousRow != null) {
@@ -325,21 +324,17 @@ class StoryListLayout {
             // Set our y offset such that we're above the previous row.
             // TODO(apwilson): This doesn't take into account multiple
             // intersections correctly.
-            previousRow
-                .where(
+            for (_StoryMetadata intersectingStory in previousRow.where(
               (_StoryMetadata storyBelow) => _intersect(
                     expandedStoryRect,
                     storyBelow.bounds,
                   ),
-            )
-                .forEach(
-              (_StoryMetadata intersectingStory) {
-                // TODO(apwilson): Should be vertical grid not horizontal.
-                story.dy = intersectingStory.offset.dy -
-                    story.size.height -
-                    _baseVerticalGrid * 2.0;
-              },
-            );
+            )) {
+              // TODO(apwilson): Should be vertical grid not horizontal.
+              story.dy = intersectingStory.offset.dy -
+                  story.size.height -
+                  _baseVerticalGrid * 2.0;
+            }
 
             // Stagger our y offset from the previous story.
             if (previousStory != null) {
@@ -359,13 +354,13 @@ class StoryListLayout {
           story.offset = _alignOffsetToGrid(story.offset);
           storyIndex++;
           previousStory = story;
-        });
+        }
 
         // TODO(apwilson): Should probably be based on the highest story in this
         // row?
         previousRowLastStoryTop = row[row.length - 1].offset.dy;
         previousRow = row;
-      });
+      }
 
       // For every row but the last one...
       for (int i = 0; i < rows.length - 1; i++) {
@@ -391,14 +386,13 @@ class StoryListLayout {
           // If we've found a story above us...
           if (intersectingStories.isNotEmpty) {
             double maxTop = double.NEGATIVE_INFINITY;
-            intersectingStories
-                .forEach((_StoryMetadata intersectingStoryAbove) {
+            for (_StoryMetadata intersectingStoryAbove in intersectingStories) {
               // TODO(apwilson): Should be vertical grid not horizontal.
               maxTop = math.max(
                 maxTop,
                 intersectingStoryAbove.bottom + _baseVerticalGrid * 4.0,
               );
-            });
+            }
 
             // ...if we're too far away, get closer.
             if (story.offset.dy > maxTop) {

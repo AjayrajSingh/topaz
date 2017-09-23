@@ -51,12 +51,12 @@ void main() {
     );
     expect(find.byKey(storyListKey), isNotNull);
     expect(tester.getSize(find.byKey(storyListKey)).width, _kWidthSingleColumn);
-    storyKeys.forEach((GlobalKey key) {
+    for (GlobalKey key in storyKeys) {
       final Finder finder = find.byKey(key);
       expect(finder, isNotNull);
       final Size size = tester.getSize(finder);
       expect(size.width, _kWidthSingleColumn);
-    });
+    }
   });
 
   testWidgets(
@@ -89,13 +89,13 @@ void main() {
     );
     expect(find.byKey(storyListKey), isNotNull);
     expect(tester.getSize(find.byKey(storyListKey)).width, _kWidthMultiColumn);
-    storyKeys.forEach((GlobalKey key) {
+    for (GlobalKey key in storyKeys) {
       final Finder finder = find.byKey(key);
       expect(finder, isNotNull);
       final Size size = tester.getSize(finder);
       expect(size.width, _kWidthMultiColumn);
       expect(size.height, _kHeight - SizeModel.kStoryBarMaximizedHeight);
-    });
+    }
   });
 }
 

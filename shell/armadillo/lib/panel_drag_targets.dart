@@ -289,7 +289,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
   Widget _buildWithConfirmedCandidates(
     Map<StoryClusterDragData, Offset> candidates,
   ) {
-    candidates.keys.forEach((StoryClusterDragData data) {
+    for (StoryClusterDragData data in candidates.keys) {
       if (_trackedCandidates[data.id] == null) {
         _trackedCandidates[data.id] = new CandidateInfo(
           initialLockPoint: candidates[data],
@@ -297,7 +297,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
       }
       // Update velocity trackers.
       _trackedCandidates[data.id].updateVelocity(candidates[data]);
-    });
+    }
 
     bool hasCandidates = candidates.isNotEmpty;
     if (hasCandidates && !_hadCandidates) {

@@ -205,9 +205,9 @@ class ConductorState extends State<Conductor> {
   void goToOrigin() {
     StoryModel storyModel = StoryModel.of(context);
     // Unfocus all story clusters.
-    storyModel.storyClusters.forEach(
-      (StoryCluster storyCluster) => storyCluster.unFocus(),
-    );
+    for (StoryCluster storyCluster in storyModel.storyClusters) {
+      storyCluster.unFocus();
+    }
 
     // Unlock scrolling.
     ConductorModel.of(context).recentsBuilder.onStoryUnfocused();
@@ -230,11 +230,11 @@ class ConductorState extends State<Conductor> {
     List<StoryCluster> targetStoryClusters =
         storyModel.storyClusters.where((StoryCluster storyCluster) {
       bool result = false;
-      storyCluster.stories.forEach((Story story) {
+      for (Story story in storyCluster.stories) {
         if (story.id == storyId) {
           result = true;
         }
-      });
+      }
       return result;
     }).toList();
 
@@ -248,9 +248,9 @@ class ConductorState extends State<Conductor> {
       goToOrigin();
     } else {
       // Unfocus all story clusters.
-      storyModel.storyClusters.forEach(
-        (StoryCluster storyCluster) => storyCluster.unFocus(),
-      );
+      for (StoryCluster storyCluster in storyModel.storyClusters) {
+        storyCluster.unFocus();
+      }
 
       // Ensure the focused story is completely expanded.
       targetStoryClusters[0].focusModel.jump(1.0);

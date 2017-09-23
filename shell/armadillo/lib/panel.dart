@@ -371,24 +371,24 @@ class Panel {
       for (int j = i + 1; j < panels.length; j++) {
         if (panels[i]._overlaps(panels[j])) {
           print('Overlap detected between ${panels[i]} and ${panels[j]}');
-          panels.forEach((Panel panel) {
+          for (Panel panel in panels) {
             print('   $panel');
-          });
+          }
           assert(false);
         }
       }
     }
     // Next sum their areas - they should equal 1.0.
     int areaSum = 0;
-    panels.forEach((Panel panel) {
+    for (Panel panel in panels) {
       areaSum += (panel.sizeFactor * _kGridLines * _kGridLines).round();
-    });
+    }
     if (areaSum != (_kGridLines.round() * _kGridLines.round())) {
       print('Area covered was not 1.0! $areaSum');
       print('----------------------------------');
-      panels.forEach((Panel panel) {
+      for (Panel panel in panels) {
         print('$panel');
-      });
+      }
       print('----------------------------------');
     }
     assert(areaSum == (_kGridLines.round() * _kGridLines.round()));

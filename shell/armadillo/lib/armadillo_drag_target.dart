@@ -426,9 +426,9 @@ class ArmadilloDragTarget<T> extends StatefulWidget {
 
 class _DragTargetState<T> extends State<ArmadilloDragTarget<T>> {
   final Map<T, Offset> _candidateData = <T, Offset>{};
-  final Map<dynamic, Offset> _rejectedData = <dynamic, Offset>{};
+  final Map<dynamic, Offset> _rejectedData = <Object, Offset>{};
 
-  bool didEnter(dynamic data, Offset localPosition) {
+  bool didEnter(Object data, Offset localPosition) {
     assert(_candidateData[data] == null);
     assert(_rejectedData[data] == null);
     if (data is T && (widget.onWillAccept?.call(data, localPosition) ?? true)) {
@@ -443,7 +443,7 @@ class _DragTargetState<T> extends State<ArmadilloDragTarget<T>> {
     return false;
   }
 
-  void updatePosition(dynamic data, Offset localPosition) {
+  void updatePosition(Object data, Offset localPosition) {
     setState(() {
       if (_candidateData[data] != null) {
         _candidateData[data] = localPosition;
@@ -454,7 +454,7 @@ class _DragTargetState<T> extends State<ArmadilloDragTarget<T>> {
     });
   }
 
-  void didLeave(dynamic data) {
+  void didLeave(Object data) {
     assert(_candidateData[data] != null || _rejectedData[data] != null);
     if (!mounted) {
       return;
@@ -465,7 +465,7 @@ class _DragTargetState<T> extends State<ArmadilloDragTarget<T>> {
     });
   }
 
-  void didDrop(dynamic data, Velocity velocity) {
+  void didDrop(Object data, Velocity velocity) {
     assert(_candidateData[data] != null);
     if (mounted) {
       Offset point = _candidateData[data];
@@ -549,9 +549,9 @@ class _DragAvatar<T> extends Drag {
     }
 
     // Update positions
-    _enteredTargets.forEach(
-      (_DragTargetState<T> target) => _updatePosition(target, globalPosition),
-    );
+    for (_DragTargetState<T> target in _enteredTargets) {
+      _updatePosition(target, globalPosition);
+    }
   }
 
   Offset _globalToLocal(_DragTargetState<T> target, Offset globalPosition) {
