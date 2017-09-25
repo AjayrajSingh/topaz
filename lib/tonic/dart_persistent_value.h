@@ -28,6 +28,7 @@ class DartPersistentValue {
 
   void Set(DartState* dart_state, Dart_Handle value);
   void Clear();
+  Dart_Handle Get();
   Dart_Handle Release();
 
   const fxl::WeakPtr<DartState>& dart_state() const { return dart_state_; }

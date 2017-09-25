@@ -43,10 +43,14 @@ void DartPersistentValue::Clear() {
   value_ = nullptr;
 }
 
-Dart_Handle DartPersistentValue::Release() {
+Dart_Handle DartPersistentValue::Get() {
   if (!value_)
     return nullptr;
-  Dart_Handle local = Dart_HandleFromPersistent(value_);
+  return Dart_HandleFromPersistent(value_);
+}
+
+Dart_Handle DartPersistentValue::Release() {
+  Dart_Handle local = Get();
   Clear();
   return local;
 }
