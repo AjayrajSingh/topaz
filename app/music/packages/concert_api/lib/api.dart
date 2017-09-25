@@ -58,7 +58,7 @@ class Api {
     if (name != null) {
       query['artist_name'] = name;
     }
-    query['location'] = 'clientip';
+    query['location'] = 'sk:26330';
     query['apikey'] = apiKey;
     Uri uri = new Uri.https(
       _kApiBaseUrl,
