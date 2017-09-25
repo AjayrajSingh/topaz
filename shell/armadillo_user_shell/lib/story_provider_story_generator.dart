@@ -551,16 +551,7 @@ class StoryProviderStoryGenerator {
     StoryController storyController,
     int startingIndex,
   }) {
-    String storyTitle = Uri
-        .parse(storyInfo.url)
-        .pathSegments[Uri.parse(storyInfo.url).pathSegments.length - 1]
-        ?.toUpperCase();
-
-    // Add story ID to title only when we're in debug mode.
-    assert(() {
-      storyTitle = '[$storyTitle // ${storyInfo.id}]';
-      return true;
-    });
+    String storyTitle = _getStoryTitle(storyInfo);
     int initialIndex = startingIndex;
 
     return new Story(
@@ -595,6 +586,23 @@ class StoryProviderStoryGenerator {
             initialIndex = clusterIndex;
           }
         });
+  }
+
+  String _getStoryTitle(StoryInfo storyInfo) {
+    if (storyInfo.extra['story_title'] != null) {
+      return storyInfo.extra['story_title'];
+    }
+    String storyTitle = Uri
+        .parse(storyInfo.url)
+        .pathSegments[Uri.parse(storyInfo.url).pathSegments.length - 1]
+        ?.toUpperCase();
+
+    // Add story ID to title only when we're in debug mode.
+    assert(() {
+      storyTitle = '[$storyTitle // ${storyInfo.id}]';
+      return true;
+    });
+    return storyTitle;
   }
 }
 

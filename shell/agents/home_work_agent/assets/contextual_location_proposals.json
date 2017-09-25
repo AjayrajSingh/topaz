@@ -2,6 +2,7 @@
   "home": [
     {
       "id": "home_01",
+      "story_title": "Cinefilm Showtimes",
       "headline": "See movies playing near me",
       "color": "0xFFA52714",
       "icon_url": "/system/data/sysui/cinefilm_96.png",
@@ -10,6 +11,7 @@
     },
     {
       "id": "home_02",
+      "story_title": "Three Peaks Episode 6",
       "headline": "New Episode for Three Peaks available",
       "color": "0xFF827717",
       "image_url": "/system/data/sysui/threepeaks.png",
@@ -18,6 +20,7 @@
     },
     {
       "id": "home_03",
+      "story_title": "Good Foods",
       "headline": "Complete your order from Good Foods",
       "color": "0xFFEF5B26",
       "icon_url": "/system/data/sysui/truefood.png",
@@ -26,6 +29,7 @@
     },
     {
       "id": "home_04",
+      "story_title": "OverThrough Magazine",
       "headline": "Continue reading OverThrough Magazine",
       "subheadline": "Finding peace in drawing. 10 easy lessons to start meditating with a pen in your hands.",
       "color": "0xFFFF8A65",
@@ -37,6 +41,7 @@
   "work": [
     {
       "id": "work_01",
+      "story_title": "Expense Report",
       "headline": "View Expenses",
       "subheadline": "Your June report has been approved",
       "color": "0xFF0887A5",
@@ -46,6 +51,7 @@
     },
     {
       "id": "work_02",
+      "story_title": "Toe The Line Analytics",
       "headline": "Simon shared 'Toe the Line Analytics' with you",
       "color": "0xFFF6B500",
       "image_url": "/system/data/sysui/simon_96.jpg",
@@ -55,6 +61,7 @@
     },
     {
       "id": "work_03",
+      "story_title": "Calendar",
       "headline": "Flux Weekly Sync starts in 25 minutes",
       "color": "0xFF4285F4",
       "icon_url": "/system/data/sysui/calendar.png",
@@ -63,6 +70,7 @@
     },
     {
       "id": "work_04",
+      "story_title": "Q4'17 Marketing Plan",
       "headline": "Q4'17 Marketing Plan",
       "subheadline": "Continue working on this document",
       "color": "0xFF4285F4",
