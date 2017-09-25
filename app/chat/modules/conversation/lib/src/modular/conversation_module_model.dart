@@ -13,7 +13,6 @@ import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
-import 'package:apps.modules.drive.services.gallery/gallery.fidl.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/app.dart';
@@ -52,7 +51,7 @@ class ChatConversationModuleModel extends ModuleModel {
   MessageReceiverImpl _mqSelectedImagesReceiver;
   final Completer<String> _mqSelectedImagesToken = new Completer<String>();
 
-  GalleryServiceProxy _galleryService;
+  // GalleryServiceProxy _galleryService;
 
   final LinkProxy _childLink = new LinkProxy();
   final LinkWatcherBinding _childLinkWatcherBinding = new LinkWatcherBinding();
@@ -420,11 +419,11 @@ class ChatConversationModuleModel extends ModuleModel {
     }
 
     if (_mqSelectedImagesToken.isCompleted) {
-      String messageQueueToken = await _mqSelectedImagesToken.future;
-      _galleryService?.unsubscribe(messageQueueToken);
+      // String messageQueueToken = await _mqSelectedImagesToken.future;
+      // _galleryService?.unsubscribe(messageQueueToken);
     }
 
-    _galleryService?.ctrl?.close();
+    // _galleryService?.ctrl?.close();
     _childModuleController?.ctrl?.close();
     _mqConversationEvents.ctrl.close();
     _mqConversationReceiver.close();
@@ -454,11 +453,11 @@ class ChatConversationModuleModel extends ModuleModel {
         _kGalleryModuleUrl,
         incomingServices.ctrl.request(),
       );
-      _galleryService = new GalleryServiceProxy();
-      connectToService(incomingServices, _galleryService.ctrl);
+      // _galleryService = new GalleryServiceProxy();
+      // connectToService(incomingServices, _galleryService.ctrl);
       incomingServices.ctrl.close();
 
-      _galleryService.subscribe(await _mqSelectedImagesToken.future);
+      // _galleryService.subscribe(await _mqSelectedImagesToken.future);
     }
   }
 
@@ -503,10 +502,10 @@ class ChatConversationModuleModel extends ModuleModel {
       _childLink.set(<String>[], JSON.encode(null));
     }
 
-    if (_galleryService != null) {
-      _galleryService.ctrl.close();
-      _galleryService = null;
-    }
+    // if (_galleryService != null) {
+    //   _galleryService.ctrl.close();
+    //   _galleryService = null;
+    // }
   }
 
   Future<Null> _onNotifyChild(String json) async {
@@ -531,13 +530,13 @@ class ChatConversationModuleModel extends ModuleModel {
             );
 
             // TODO(youngseokyoon): handle this in a more generalized way.
-            if (name == 'gallery') {
-              _galleryService?.ctrl?.close();
-              _galleryService = new GalleryServiceProxy();
-              connectToService(incomingServices, _galleryService.ctrl);
-
-              _galleryService.subscribe(await _mqSelectedImagesToken.future);
-            }
+            // if (name == 'gallery') {
+            //   _galleryService?.ctrl?.close();
+            //   _galleryService = new GalleryServiceProxy();
+            //   connectToService(incomingServices, _galleryService.ctrl);
+            //
+            //   _galleryService.subscribe(await _mqSelectedImagesToken.future);
+            // }
 
             incomingServices.ctrl.close();
           }
