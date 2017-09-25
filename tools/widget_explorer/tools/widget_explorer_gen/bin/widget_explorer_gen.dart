@@ -90,7 +90,7 @@ String checkArgs(List<String> args, String fuchsiaRoot) {
     // Try creating the directory.
     try {
       new Directory(outputDir).createSync(recursive: true);
-    } catch (e) {
+    } on Exception {
       return 'Could not create the output directory "$outputDir".';
     }
   }
@@ -287,10 +287,10 @@ Future<Null> writeWidgetSpecs(String outputDir, WidgetSpecs specs) async {
       orElse: () => null);
 
   if (constructor != null) {
-    params = new List<ParameterElement>.from(constructor.parameters);
-    params.removeWhere((ParameterElement param) => param.type.name == 'Key');
-    params.forEach((ParameterElement param) =>
-        _addImportForType(additionalImports, importIdMap, param.type));
+    params = new List<ParameterElement>.from(constructor.parameters)
+      ..removeWhere((ParameterElement param) => param.type.name == 'Key')
+      ..forEach((ParameterElement param) =>
+          _addImportForType(additionalImports, importIdMap, param.type));
   }
 
   // The parameter controllers / initial values should be generated here first
@@ -667,8 +667,7 @@ ElementAnnotation _getGenerator(ParameterElement param) {
   }
 
   // Also see if the parameter type (class) has an @Generator annotation.
-  annotation = getAnnotationWithName(param?.type?.element, 'Generator');
-  return annotation;
+  return annotation = getAnnotationWithName(param?.type?.element, 'Generator');
 }
 
 /// Gets the code for invoking the generator.
@@ -752,7 +751,7 @@ String _getQualifiedTypeName(
   String typeName = _getTypeName(type);
   String prefix =
       typeName == 'dynamic' ? '' : _getImportIdPrefixForType(importIdMap, type);
-  return prefix + typeName;
+  return '$prefix$typeName';
 }
 
 String _doubleValueToCode(double value) {

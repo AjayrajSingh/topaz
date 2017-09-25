@@ -69,15 +69,15 @@ Future<Null> main() async {
   });
 
   test('extractWidgetSpecs() should correctly extract the package name.', () {
-    widgetMap.keys.forEach((String key) {
+    for (String key in widgetMap.keys) {
       expect(widgetMap[key].packageName, equals('mock_package'));
-    });
+    }
   });
 
   test('extractWidgetSpecs() should correctly extract the path.', () {
-    widgetMap.keys.forEach((String key) {
+    for (String key in widgetMap.keys) {
       expect(widgetMap[key].path, equals('exported.dart'));
-    });
+    }
   });
 
   test(
@@ -92,12 +92,12 @@ Future<Null> main() async {
       'SizeParamWidget': 'size_param_widget.dart',
     };
 
-    widgetMap.keys.forEach((String key) {
+    for (String key in widgetMap.keys) {
       expect(
           widgetMap[key].pathFromFuchsiaRoot,
           equals(
               'topaz/tools/testdata/widget_specs/extract_test/mock_package/lib/src/${expected[key]}'));
-    });
+    }
   });
 
   test('The extracted ClassElement should have annotation information.', () {
@@ -111,7 +111,7 @@ Future<Null> main() async {
       'stringParam': 'example string value!',
     };
 
-    specs.constructor.parameters.forEach((ParameterElement param) {
+    for (ParameterElement param in specs.constructor.parameters) {
       // Find the @ExampleValue annotation.
       ElementAnnotation exampleValueAnnotation =
           specs.getExampleValueAnnotation(param);
@@ -123,7 +123,7 @@ Future<Null> main() async {
       } else {
         expect(param.name, isNot(isIn(expectedExampleValues.keys)));
       }
-    });
+    }
   });
 
   test('The example size should be correctly extracted.', () {
@@ -133,20 +133,22 @@ Future<Null> main() async {
     expect(widget01.exampleWidth, closeTo(200.0, delta));
     expect(widget01.exampleHeight, closeTo(300.0, delta));
 
-    widgetMap.values
-        .where((WidgetSpecs ws) => ws != widget01)
-        .forEach((WidgetSpecs ws) {
+    Iterable<WidgetSpecs> widgetSpecs =
+        widgetMap.values.where((WidgetSpecs ws) => ws != widget01);
+    for (WidgetSpecs ws in widgetSpecs) {
       expect(ws.exampleWidth, isNull);
       expect(ws.exampleHeight, isNull);
-    });
+    }
   });
 
   test('The hasSizeParam value should be correctly extracted.', () {
     WidgetSpecs sizeParamWidget = widgetMap['SizeParamWidget'];
     expect(sizeParamWidget.hasSizeParam, isTrue);
 
-    widgetMap.values
-        .where((WidgetSpecs ws) => ws != sizeParamWidget)
-        .forEach((WidgetSpecs ws) => expect(ws.hasSizeParam, isFalse));
+    Iterable<WidgetSpecs> widgetSpecs =
+        widgetMap.values.where((WidgetSpecs ws) => ws != sizeParamWidget);
+    for (WidgetSpecs ws in widgetSpecs) {
+      expect(ws.hasSizeParam, isFalse);
+    }
   });
 }

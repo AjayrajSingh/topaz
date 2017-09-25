@@ -8,7 +8,7 @@ import 'package:flutter/rendering.dart';
 /// Navigation drawer for the FX Gallery.
 class GalleryDrawer extends StatefulWidget {
   /// Create a [GalleryDrawer] instance, which is a material navigation drawer.
-  GalleryDrawer({
+  const GalleryDrawer({
     Key key,
     bool showPerformanceOverlay,
     this.onShowPerformanceOverlayChanged,
@@ -32,9 +32,9 @@ class _GalleryDrawerState extends State<GalleryDrawer> {
   Widget build(BuildContext context) {
     final double systemTopPadding = MediaQuery.of(context).padding.top;
 
-    List<Widget> drawerItems = <Widget>[];
-
-    drawerItems.add(new Container(height: systemTopPadding));
+    List<Widget> drawerItems = <Widget>[
+      new Container(height: systemTopPadding),
+    ];
 
     // 'Debug Menu' subheader
     TextStyle subheaderStyle = Theme.of(context).textTheme.body2;
@@ -62,55 +62,53 @@ class _GalleryDrawerState extends State<GalleryDrawer> {
     }
 
     // Other debug paint menus
-    drawerItems.add(createCheckboxItem(
-      text: 'Debug Paint Size',
-      value: debugPaintSizeEnabled,
-      onChanged: (bool value) {
-        setState(() {
-          debugPaintSizeEnabled = value;
-        });
-      },
-    ));
-
-    drawerItems.add(createCheckboxItem(
-      text: 'Debug Paint Baselines',
-      value: debugPaintBaselinesEnabled,
-      onChanged: (bool value) {
-        setState(() {
-          debugPaintBaselinesEnabled = value;
-        });
-      },
-    ));
-
-    drawerItems.add(createCheckboxItem(
-      text: 'Debug Paint Pointers',
-      value: debugPaintPointersEnabled,
-      onChanged: (bool value) {
-        setState(() {
-          debugPaintPointersEnabled = value;
-        });
-      },
-    ));
-
-    drawerItems.add(createCheckboxItem(
-      text: 'Debug Paint Layer Borders',
-      value: debugPaintLayerBordersEnabled,
-      onChanged: (bool value) {
-        setState(() {
-          debugPaintLayerBordersEnabled = value;
-        });
-      },
-    ));
-
-    drawerItems.add(createCheckboxItem(
-      text: 'Debug Repaint Rainbow',
-      value: debugRepaintRainbowEnabled,
-      onChanged: (bool value) {
-        setState(() {
-          debugRepaintRainbowEnabled = value;
-        });
-      },
-    ));
+    drawerItems.addAll(<Widget>[
+      createCheckboxItem(
+        text: 'Debug Paint Size',
+        value: debugPaintSizeEnabled,
+        onChanged: (bool value) {
+          setState(() {
+            debugPaintSizeEnabled = value;
+          });
+        },
+      ),
+      createCheckboxItem(
+        text: 'Debug Paint Baselines',
+        value: debugPaintBaselinesEnabled,
+        onChanged: (bool value) {
+          setState(() {
+            debugPaintBaselinesEnabled = value;
+          });
+        },
+      ),
+      createCheckboxItem(
+        text: 'Debug Paint Pointers',
+        value: debugPaintPointersEnabled,
+        onChanged: (bool value) {
+          setState(() {
+            debugPaintPointersEnabled = value;
+          });
+        },
+      ),
+      createCheckboxItem(
+        text: 'Debug Paint Layer Borders',
+        value: debugPaintLayerBordersEnabled,
+        onChanged: (bool value) {
+          setState(() {
+            debugPaintLayerBordersEnabled = value;
+          });
+        },
+      ),
+      createCheckboxItem(
+        text: 'Debug Repaint Rainbow',
+        value: debugRepaintRainbowEnabled,
+        onChanged: (bool value) {
+          setState(() {
+            debugRepaintRainbowEnabled = value;
+          });
+        },
+      ),
+    ]);
 
     return new Drawer(child: new ListView(children: drawerItems));
   }

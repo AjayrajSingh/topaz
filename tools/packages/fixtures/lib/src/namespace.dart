@@ -11,8 +11,11 @@ final Set<String> _namespaces = new Set<String>();
 String namespace(String value) {
   String ns = '$_basename/$value';
 
-  ok(_namespaces.add(ns),
-      'Namespaces must be unique, the namespace \'$ns\' has already been created.');
+  ok(
+    value: _namespaces.add(ns),
+    message: 'Namespaces must be unique, '
+        'the namespace \'$ns\' has already been created.',
+  );
 
   return ns;
 }

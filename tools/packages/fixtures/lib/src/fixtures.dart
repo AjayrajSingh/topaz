@@ -31,7 +31,7 @@ class FixturesError extends StateError {
 /// are actual instances of their return types.
 class Fixtures {
   final Set<String> _names = new Set<String>();
-  final Map<String, Sequence> _sequences = new Map<String, Sequence>();
+  final Map<String, Sequence> _sequences = <String, Sequence>{};
 
   /// Random number generator to be used by [Fixtures] and other subclasses.
   final Random rng = new Random();
@@ -97,7 +97,7 @@ class Fixtures {
   ///     String name = fixtures.name();
   ///
   /// [Fixtures] instances track subsequent calls to [name] to guarantee
-  /// unique random [Name] values, even against ones that have an explicitly
+  /// unique random name values, even against ones that have an explicitly
   /// set value. Additional calls for explicit names will not be counted
   /// against the [nameThreshold] after the first time.
   ///
@@ -122,17 +122,18 @@ class Fixtures {
       throw new FixturesError(message);
     }
 
-    if (value != null) {
-      _names.add(value);
+    String result = value;
+    if (result != null) {
+      _names.add(result);
     } else {
-      value = Name.generate();
+      result = generateName();
 
-      while (!_names.add(value)) {
-        value = Name.generate();
+      while (!_names.add(result)) {
+        result = generateName();
       }
     }
 
-    return value;
+    return result;
   }
 
   /// Generate a random email address.

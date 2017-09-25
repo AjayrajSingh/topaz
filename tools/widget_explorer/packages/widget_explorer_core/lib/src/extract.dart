@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// ignore_for_file: implementation_imports
+
 import 'dart:collection';
 import 'dart:io' as io;
 
@@ -42,9 +44,9 @@ List<WidgetSpecs> extractWidgetSpecs(String packagePath, {String fuchsiaRoot}) {
   String libDir = path.join(packagePath, 'lib');
   String libSrcDir = path.join(libDir, 'src');
 
-  pattern.listSync().forEach((io.FileSystemEntity file) {
+  for (io.FileSystemEntity file in pattern.listSync()) {
     if (file.path.startsWith(libSrcDir)) {
-      return;
+      continue;
     }
 
     File sourceFile = resourceProvider.getFile(file.absolute.path);
@@ -55,7 +57,7 @@ List<WidgetSpecs> extractWidgetSpecs(String packagePath, {String fuchsiaRoot}) {
     }
     sources.add(source);
     cs.addedSource(source);
-  });
+  }
 
   // Add all the source files to the analysis context.
   context.applyChanges(cs);
@@ -140,7 +142,7 @@ AnalysisContext _initContext(String packagePath) {
       }
     }
   } else {
-    sdkDir = cli_util.getSdkDir()?.path;
+    sdkDir = cli_util.getSdkPath();
   }
 
   // Try locating an Embedder SDK.

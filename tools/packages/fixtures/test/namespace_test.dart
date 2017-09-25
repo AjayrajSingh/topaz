@@ -11,7 +11,7 @@ void main() {
       String ns = namespace('foo');
 
       expect(ns, contains('foo'));
-      expect(() => namespace('foo'), throwsA(new isInstanceOf<StateError>()));
+      expect(() => namespace('foo'), throwsA(const isInstanceOf<StateError>()));
     });
   });
 }
