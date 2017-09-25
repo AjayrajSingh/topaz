@@ -522,7 +522,7 @@ class PanelEventHandler {
     // 2. Create and Add PlaceHolders for dragging story cluster for each story
     //    in this story cluster.
     if (targetStoryCluster.previewStories.isNotEmpty) {
-      targetStoryCluster.realStories.forEach((Story story) {
+      for (Story story in targetStoryCluster.realStories) {
         draggingStoryCluster.add(
           story: previews[story.id] ??
               new PlaceHolderStory(
@@ -531,12 +531,12 @@ class PanelEventHandler {
           withPanel: story.panel,
           atIndex: 0,
         );
-      });
+      }
     }
 
     // 3. Resize all panels in the dragging story cluster with the placeholders
     //    in this story cluster.
-    targetStoryCluster.previewStories.forEach((Story story) {
+    for (Story story in targetStoryCluster.previewStories) {
       PlaceHolderStory placeHolderStory = story;
       draggingStoryCluster.replace(
           panel: draggingStoryCluster.stories
@@ -545,7 +545,7 @@ class PanelEventHandler {
               .single
               .panel,
           withPanel: placeHolderStory.panel);
-    });
+    }
 
     draggingStoryCluster
       // 4. Update displaymode.
@@ -565,7 +565,7 @@ class PanelEventHandler {
     double widthFactorDelta: 0.0,
     double heightFactorDelta: 0.0,
   }) {
-    panels.forEach((Panel panel) {
+    for (Panel panel in panels) {
       targetStoryCluster.replace(
         panel: panel,
         withPanel: new Panel(
@@ -577,7 +577,7 @@ class PanelEventHandler {
           heightFactor: panel.height + heightFactorDelta,
         ),
       );
-    });
+    }
   }
 
   /// Adds stories horizontally starting from [x] with vertical bounds of
@@ -589,7 +589,7 @@ class PanelEventHandler {
     double bottom,
   }) {
     double dx = x;
-    stories.forEach((Story story) {
+    for (Story story in stories) {
       targetStoryCluster.add(
         story: story,
         withPanel: new Panel(
@@ -600,7 +600,7 @@ class PanelEventHandler {
       );
       dx += _kAddedStorySpan;
       story.maximizeStoryBar();
-    });
+    }
   }
 
   /// Adds stories vertically starting from [y] with horizontal bounds of
@@ -612,7 +612,7 @@ class PanelEventHandler {
     double right,
   }) {
     double dy = y;
-    stories.forEach((Story story) {
+    for (Story story in stories) {
       targetStoryCluster.add(
         story: story,
         withPanel: new Panel(
@@ -623,7 +623,7 @@ class PanelEventHandler {
       );
       dy += _kAddedStorySpan;
       story.maximizeStoryBar();
-    });
+    }
   }
 
   static List<Story> _getVerticallySortedStories(StoryCluster storyCluster) {

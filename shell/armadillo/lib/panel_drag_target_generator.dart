@@ -560,25 +560,25 @@ class PanelDragTargetGenerator {
 
   int _getRows({double left, double right, List<Panel> panels}) {
     Set<double> tops = new Set<double>();
-    panels
-        .where((Panel panel) =>
-            (left <= panel.left && right > panel.left) ||
-            (panel.left < left && panel.right > left))
-        .forEach((Panel panel) {
+    for (Panel panel in panels.where(
+      (Panel panel) =>
+          (left <= panel.left && right > panel.left) ||
+          (panel.left < left && panel.right > left),
+    )) {
       tops.add(panel.top);
-    });
+    }
     return tops.length;
   }
 
   int _getColumns({double top, double bottom, List<Panel> panels}) {
     Set<double> lefts = new Set<double>();
-    panels
-        .where((Panel panel) =>
-            (top <= panel.top && bottom > panel.top) ||
-            (top < panel.top && panel.bottom > top))
-        .forEach((Panel panel) {
+    for (Panel panel in panels.where(
+      (Panel panel) =>
+          (top <= panel.top && bottom > panel.top) ||
+          (top < panel.top && panel.bottom > top),
+    )) {
       lefts.add(panel.left);
-    });
+    }
     return lefts.length;
   }
 

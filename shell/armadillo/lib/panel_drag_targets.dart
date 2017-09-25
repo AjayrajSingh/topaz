@@ -305,9 +305,9 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
       _populateTargets();
 
       // Invoke onFirstHover callbacks if they exist.
-      candidates.keys.forEach(
-        (StoryClusterDragData data) => data.onFirstHover?.call(),
-      );
+      for (StoryClusterDragData data in candidates.keys) {
+        data.onFirstHover?.call();
+      }
     }
     _hadCandidates = hasCandidates;
 
@@ -397,7 +397,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
   /// Moves the [stories] corrdinates from whatever space they're in to the
   /// coordinate space of our [PanelDragTargets.child].
   void _transposeToChildCoordinates(List<Story> stories) {
-    stories.forEach((Story story) {
+    for (Story story in stories) {
       // Get the Story's current global bounds...
       RenderBox storyBox =
           story.positionedKey.currentContext?.findRenderObject();
@@ -431,19 +431,19 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
         ),
         panelsBox.size,
       );
-    });
+    }
   }
 
   Map<StoryCluster, Offset> _getStoryClusterMap(
     Map<StoryClusterDragData, Offset> candidates,
   ) {
     Map<StoryCluster, Offset> storyClusterMap = <StoryCluster, Offset>{};
-    candidates.keys.forEach((StoryClusterDragData data) {
+    for (StoryClusterDragData data in candidates.keys) {
       Offset storyClusterPoint = candidates[data];
       StoryCluster storyCluster =
           StoryModel.of(context).getStoryCluster(data.id);
       storyClusterMap[storyCluster] = storyClusterPoint;
-    });
+    }
     return storyClusterMap;
   }
 
@@ -457,7 +457,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
 
   void _updateClosestTargets(Map<StoryClusterDragData, Offset> candidates) {
     // Remove any candidates that no longer exist.
-    _trackedCandidates.keys.toList().forEach((StoryClusterId storyClusterId) {
+    for (StoryClusterId storyClusterId in _trackedCandidates.keys.toList()) {
       if (candidates.keys
           .every((StoryClusterDragData data) => data.id != storyClusterId)) {
         _trackedCandidates[storyClusterId].dispose();
@@ -472,10 +472,10 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
           _originalClusterLayout.restore(widget.storyCluster);
         }
       }
-    });
+    }
 
     // For each candidate...
-    candidates.keys.forEach((StoryClusterDragData data) {
+    for (StoryClusterDragData data in candidates.keys) {
       Offset storyClusterPoint = candidates[data];
 
       CandidateInfo candidateInfo = _trackedCandidates[data.id];
@@ -502,7 +502,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
           );
         }
       });
-    });
+    }
   }
 
   void _lockClosestTarget({
@@ -526,16 +526,17 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
   ) {
     double minScore = double.INFINITY;
     PanelDragTarget closestTarget;
-    _targets
+    for (PanelDragTarget target in _targets
         .where((PanelDragTarget target) => storyCluster == null
             ? true
             : target.canAccept(storyCluster.realStories.length))
         .where((PanelDragTarget target) =>
             target.isValidInDirection(dragDirection))
         .where((PanelDragTarget target) => target.withinRange(point))
-        .where((PanelDragTarget target) =>
-            (!initialTarget || target.initiallyTargetable))
-        .forEach((PanelDragTarget target) {
+        .where(
+          (PanelDragTarget target) =>
+              (!initialTarget || target.initiallyTargetable),
+        )) {
       double targetScore = target.distanceFrom(point);
       targetScore *=
           target.isInDirectionFromPoint(dragDirection, point) ? 1.0 : 2.0;
@@ -543,7 +544,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
         minScore = targetScore;
         closestTarget = target;
       }
-    });
+    }
     return closestTarget;
   }
 

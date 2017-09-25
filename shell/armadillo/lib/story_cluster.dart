@@ -248,11 +248,13 @@ class StoryCluster {
 
   @override
   String toString() {
-    String string = 'StoryCluster( id: $id, title: $title,\n';
+    StringBuffer string =
+        new StringBuffer('StoryCluster( id: $id, title: $title,\n');
     for (Story story in _stories) {
-      string = '$string\n   story: $story';
+      string.write('\n   story: $story');
     }
-    return '$string )';
+    string.write(' )');
+    return string.toString();
   }
 
   /// The current [DisplayMode] of this cluster.
@@ -599,14 +601,14 @@ class StoryCluster {
   }
 
   static String _getClusterTitle(List<Story> stories) {
-    String title = '';
+    StringBuffer title = new StringBuffer('');
     for (Story story in stories.where((Story story) => !story.isPlaceHolder)) {
       if (title.isNotEmpty) {
-        title = '$title, ';
+        title.write(', ');
       }
-      title = '$title${story.title}';
+      title.write(story.title);
     }
-    return title;
+    return title.toString();
   }
 
   static DateTime _getClusterLastInteraction(List<Story> stories) {

@@ -42,7 +42,7 @@ class UserContextText extends StatelessWidget {
   final Color textColor;
 
   /// Constructor.
-  UserContextText({
+  const UserContextText({
     Key key,
     this.textColor,
   })
