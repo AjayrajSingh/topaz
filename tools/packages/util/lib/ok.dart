@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:meta/meta.dart';
+
 /// Run an [assert] against the passed in value with an optional message.
-void ok(bool value, [String message]) {
+void ok({@required bool value, String message}) {
   if (message == null) {
     assert(value);
   } else {

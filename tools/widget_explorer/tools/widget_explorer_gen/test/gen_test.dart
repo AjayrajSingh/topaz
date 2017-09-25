@@ -74,11 +74,11 @@ void main() {
       'widget03.dart',
     ];
 
-    filesToVerify.forEach((String filename) {
+    for (String filename in filesToVerify) {
       expect(
         new File(path.join(outputPath, filename)).readAsStringSync(),
         new File(path.join(getTestDataPath(), filename)).readAsStringSync(),
       );
-    });
+    }
   });
 }

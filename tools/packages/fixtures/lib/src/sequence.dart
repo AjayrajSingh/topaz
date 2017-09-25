@@ -13,8 +13,5 @@ class Sequence {
   ///
   /// The [int] value returned will be sequentially increased by one every
   /// time it is retrieved.
-  int get value {
-    ++_value;
-    return _value;
-  }
+  int get value => ++_value;
 }

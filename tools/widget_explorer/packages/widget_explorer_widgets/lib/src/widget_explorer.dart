@@ -33,16 +33,15 @@ class WidgetExplorer extends StatefulWidget {
   final Map<String, GeneratedStateBuilder> stateBuilders;
 
   /// Creates a new instance of [WidgetExplorer].
-  WidgetExplorer({
+  const WidgetExplorer({
     Key key,
     this.config,
     @required this.widgetSpecs,
     @required this.stateBuilders,
   })
-      : super(key: key) {
-    assert(widgetSpecs != null);
-    assert(stateBuilders != null);
-  }
+      : assert(widgetSpecs != null),
+        assert(stateBuilders != null),
+        super(key: key);
 
   @override
   _WidgetExplorerState createState() => new _WidgetExplorerState();
@@ -56,7 +55,7 @@ class _WidgetExplorerState extends State<WidgetExplorer> {
 
   _WidgetExplorerState() {
     contentKey = new UniqueKey();
-    size = new Size(_kDefaultWidth, _kDefaultHeight);
+    size = const Size(_kDefaultWidth, _kDefaultHeight);
     widgetSizes = <String, Size>{};
   }
 
@@ -91,7 +90,7 @@ class _WidgetExplorerState extends State<WidgetExplorer> {
     WidgetSpecs specs = widget.widgetSpecs[selectedWidget];
     if (specs == null) {
       return new Center(
-        child: new Text('Please select a widget from the left pane.'),
+        child: const Text('Please select a widget from the left pane.'),
       );
     }
 
@@ -137,7 +136,7 @@ ${specs.pathFromFuchsiaRoot != null ? '**Defined In**: `FUCHSIA_ROOT/${specs.pat
     return new Container(
       decoration: new BoxDecoration(
         border: new Border.all(color: Colors.grey[500]),
-        borderRadius: new BorderRadius.all(new Radius.circular(4.0)),
+        borderRadius: const BorderRadius.all(const Radius.circular(4.0)),
       ),
       margin: const EdgeInsets.all(16.0),
       child: new Container(

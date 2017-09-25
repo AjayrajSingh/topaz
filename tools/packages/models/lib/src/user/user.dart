@@ -41,10 +41,9 @@ class User {
     this.familyName,
     this.picture,
     this.locale,
-  }) {
-    assert(name != null);
-    assert(email != null);
-
+  })
+      : assert(name != null),
+        assert(email != null) {
     List<String> names = name.split(' ');
     givenName ??= names.first;
     familyName ??= names.last;
@@ -63,7 +62,7 @@ class User {
         name: json['name'],
         picture: json['picture'],
       );
-    } catch (err) {
+    } on Exception catch (err) {
       throw new FormatException('Unable to cast User properties: $err');
     }
 
@@ -72,7 +71,7 @@ class User {
 
   /// Helper function for JSON.encode() creates JSON-encoded User object.
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = new Map<String, dynamic>();
+    Map<String, dynamic> json = <String, dynamic>{};
 
     json['id'] = id;
     json['email'] = email;

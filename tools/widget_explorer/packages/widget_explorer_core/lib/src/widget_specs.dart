@@ -106,7 +106,7 @@ class WidgetSpecs implements Comparable<WidgetSpecs> {
 
   @override
   int compareTo(WidgetSpecs other) {
-    return this.name.compareTo(other.name);
+    return name.compareTo(other.name);
   }
 
   @override
