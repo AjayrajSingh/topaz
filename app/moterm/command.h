@@ -5,51 +5,56 @@
 #ifndef APPS_MOTERM_COMMAND_H_
 #define APPS_MOTERM_COMMAND_H_
 
+#include <fdio/util.h>
 #include <launchpad/launchpad.h>
-#include <mx/process.h>
-#include <mx/socket.h>
-#include <mxio/util.h>
+#include <zx/process.h>
+#include <zx/socket.h>
 
 #include <functional>
 #include <vector>
 
-#include "lib/ftl/files/unique_fd.h"
-#include "lib/ftl/functional/closure.h"
-#include "lib/mtl/io/redirection.h"
-#include "lib/mtl/tasks/message_loop.h"
-#include "lib/mtl/tasks/message_loop_handler.h"
+#include <async/auto_wait.h>
+#include "lib/fsl/io/redirection.h"
+#include "lib/fxl/files/unique_fd.h"
+#include "lib/fxl/functional/closure.h"
 
 namespace moterm {
 
-class Command : mtl::MessageLoopHandler {
+class Command {
  public:
   using ReceiveCallback =
       std::function<void(const void* bytes, size_t num_bytes)>;
 
   Command();
-  ~Command();
 
   bool Start(std::vector<std::string> command,
-             std::vector<mtl::StartupHandle> startup_handles,
+             std::vector<fsl::StartupHandle> startup_handles,
              ReceiveCallback receive_callback,
-             ftl::Closure termination_callback);
+             fxl::Closure termination_callback);
 
   void SendData(const void* bytes, size_t num_bytes);
 
  private:
-  // |mtl::MessageLoopHandler|:
-  void OnHandleReady(mx_handle_t handle, mx_signals_t pending, uint64_t count);
+  async_wait_result_t OnProcessTerminated(zx_handle_t process_handle,
+                                          async_t*,
+                                          zx_status_t status,
+                                          const zx_packet_signal* signal);
+  // |socket| might be either |stdout_| or |stderr_|.
+  async_wait_result_t OnSocketReadable(zx::socket* socket,
+                                       async_t*,
+                                       zx_status_t status,
+                                       const zx_packet_signal* signal);
 
-  ftl::Closure termination_callback_;
+  fxl::Closure termination_callback_;
   ReceiveCallback receive_callback_;
-  mx::socket stdin_;
-  mx::socket stdout_;
-  mx::socket stderr_;
+  zx::socket stdin_;
+  zx::socket stdout_;
+  zx::socket stderr_;
 
-  mtl::MessageLoop::HandlerKey termination_key_ = 0;
-  mtl::MessageLoop::HandlerKey out_key_ = 0;
-  mtl::MessageLoop::HandlerKey err_key_ = 0;
-  mx::process process_;
+  std::unique_ptr<async::AutoWait> termination_waiter_ = 0;
+  std::unique_ptr<async::AutoWait> stdout_waiter_ = 0;
+  std::unique_ptr<async::AutoWait> stderr_waiter_ = 0;
+  zx::process process_;
 };
 
 }  // namespace moterm

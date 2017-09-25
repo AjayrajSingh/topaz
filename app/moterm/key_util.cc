@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/moterm/key_util.h"
+#include "topaz/app/moterm/key_util.h"
 
 #include <hid/usages.h>
 
-#include "apps/mozart/services/input/input_events.fidl.h"
-#include "lib/ftl/logging.h"
+#include "lib/ui/input/fidl/input_events.fidl.h"
+#include "lib/fxl/logging.h"
 
 // TODO(vtl): Handle more stuff and verify that we're consistent about the
 // sequences we generate.
@@ -18,12 +18,12 @@ std::string GetInputSequenceForKeyPressedEvent(
     bool keypad_application_mode) {
   if (key_event.is_keyboard()) {
     const mozart::KeyboardEventPtr& keyboard = key_event.get_keyboard();
-    FTL_DCHECK(keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED ||
+    FXL_DCHECK(keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED ||
                keyboard->phase == mozart::KeyboardEvent::Phase::REPEAT);
 
     if (keyboard->code_point) {
       if (keyboard->code_point > 128) {
-        FTL_NOTIMPLEMENTED();
+        FXL_NOTIMPLEMENTED();
         return std::string();
       }
 
@@ -75,7 +75,7 @@ std::string GetInputSequenceForKeyPressedEvent(
       case HID_USAGE_KEY_TAB:
         return std::string("\t");
       default:
-        FTL_NOTIMPLEMENTED() << " hid_usage = " << keyboard->hid_usage;
+        FXL_NOTIMPLEMENTED() << " hid_usage = " << keyboard->hid_usage;
     }
   }
   return std::string();

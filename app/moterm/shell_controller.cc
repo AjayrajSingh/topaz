@@ -2,19 +2,19 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/moterm/shell_controller.h"
+#include "topaz/app/moterm/shell_controller.h"
 
 #include <string.h>
 
 #include <sstream>
 
-#include <magenta/processargs.h>
+#include <zircon/processargs.h>
 
-#include "lib/ftl/files/directory.h"
-#include "lib/ftl/files/file.h"
-#include "lib/ftl/files/path.h"
-#include "lib/ftl/logging.h"
-#include "lib/ftl/strings/split_string.h"
+#include "lib/fxl/files/directory.h"
+#include "lib/fxl/files/file.h"
+#include "lib/fxl/files/path.h"
+#include "lib/fxl/logging.h"
+#include "lib/fxl/strings/split_string.h"
 
 namespace moterm {
 
@@ -47,17 +47,17 @@ std::vector<std::string> ShellController::GetShellCommand() {
   return {std::string(kShell)};
 }
 
-std::vector<mtl::StartupHandle> ShellController::GetStartupHandles() {
-  std::vector<mtl::StartupHandle> ret;
+std::vector<fsl::StartupHandle> ShellController::GetStartupHandles() {
+  std::vector<fsl::StartupHandle> ret;
 
-  mx::channel shell_handle;
-  mx_status_t status = mx::channel::create(0, &channel_, &shell_handle);
-  if (status != MX_OK) {
-    FTL_LOG(ERROR) << "Failed to create an mx::channel for the shell, status: "
+  zx::channel shell_handle;
+  zx_status_t status = zx::channel::create(0, &channel_, &shell_handle);
+  if (status != ZX_OK) {
+    FXL_LOG(ERROR) << "Failed to create an zx::channel for the shell, status: "
                    << status;
     return {};
   }
-  mtl::StartupHandle startup_handle;
+  fsl::StartupHandle startup_handle;
   startup_handle.id = PA_USER1;
   startup_handle.handle = std::move(shell_handle);
   ret.push_back(std::move(startup_handle));
@@ -83,10 +83,10 @@ void ShellController::OnRemoteEntry(const std::string& entry) {
     return;
   }
   std::string command = kAddRemoteEntryCommand + entry;
-  mx_status_t status =
+  zx_status_t status =
       channel_.write(0, command.data(), command.size(), nullptr, 0);
-  if (status != MX_OK && status != MX_ERR_NO_MEMORY) {
-    FTL_LOG(ERROR) << "Failed to write a " << kAddRemoteEntryCommand
+  if (status != ZX_OK && status != ZX_ERR_NO_MEMORY) {
+    FXL_LOG(ERROR) << "Failed to write a " << kAddRemoteEntryCommand
                    << " command, status: " << status;
   }
 }
@@ -94,20 +94,20 @@ void ShellController::OnRemoteEntry(const std::string& entry) {
 bool ShellController::SendBackHistory(std::vector<std::string> entries) {
   const std::string history_str = SerializeHistory(entries);
 
-  mx::vmo data;
-  if (!mtl::VmoFromString(history_str, &data)) {
-    FTL_LOG(ERROR) << "Failed to write terminal history to a vmo.";
+  zx::vmo data;
+  if (!fsl::VmoFromString(history_str, &data)) {
+    FXL_LOG(ERROR) << "Failed to write terminal history to a vmo.";
     return false;
   }
 
-  const mx_handle_t handles[] = {data.release()};
+  const zx_handle_t handles[] = {data.release()};
   const std::string command = "";
-  mx_status_t status =
+  zx_status_t status =
       channel_.write(0, command.data(), command.size(), handles, 1);
-  if (status != MX_OK) {
-    FTL_LOG(ERROR)
+  if (status != ZX_OK) {
+    FXL_LOG(ERROR)
         << "Failed to write the terminal history response to channel.";
-    mx_handle_close(handles[0]);
+    zx_handle_close(handles[0]);
     return false;
   }
   return true;
@@ -122,10 +122,10 @@ void ShellController::ReadCommand() {
   // of a history entry.
   char buffer[kMaxHistoryEntrySize + 100];
   uint32_t num_bytes = 0;
-  mx_status_t rv =
-      channel_.read(MX_CHANNEL_READ_MAY_DISCARD, buffer, sizeof(buffer),
+  zx_status_t rv =
+      channel_.read(ZX_CHANNEL_READ_MAY_DISCARD, buffer, sizeof(buffer),
                     &num_bytes, nullptr, 0, nullptr);
-  if (rv == MX_OK) {
+  if (rv == ZX_OK) {
     const std::string command = std::string(buffer, num_bytes);
     if (command == kGetHistoryCommand) {
       history_->ReadInitialEntries([this](std::vector<std::string> entries) {
@@ -135,34 +135,34 @@ void ShellController::ReadCommand() {
                kAddLocalEntryCommand) {
       HandleAddToHistory(command.substr(strlen(kAddLocalEntryCommand)));
     } else {
-      FTL_LOG(ERROR) << "Unrecognized shell command: " << command;
+      FXL_LOG(ERROR) << "Unrecognized shell command: " << command;
       return;
     }
 
     WaitForShell();
-  } else if (rv == MX_ERR_SHOULD_WAIT) {
+  } else if (rv == ZX_ERR_SHOULD_WAIT) {
     WaitForShell();
-  } else if (rv == MX_ERR_BUFFER_TOO_SMALL) {
+  } else if (rv == ZX_ERR_BUFFER_TOO_SMALL) {
     // Ignore the command.
-    FTL_LOG(WARNING) << "The command sent by shell didn't fit in the buffer.";
-  } else if (rv == MX_ERR_PEER_CLOSED) {
+    FXL_LOG(WARNING) << "The command sent by shell didn't fit in the buffer.";
+  } else if (rv == ZX_ERR_PEER_CLOSED) {
     channel_.reset();
     return;
   } else {
-    FTL_DCHECK(false) << "Unhandled mx_status_t: " << rv;
+    FXL_DCHECK(false) << "Unhandled zx_status_t: " << rv;
   }
 }
 
 void ShellController::WaitForShell() {
-  FTL_DCHECK(!wait_id_);
+  FXL_DCHECK(!wait_id_);
   wait_id_ = waiter_->AsyncWait(channel_.get(),
-                                MX_CHANNEL_READABLE | MX_CHANNEL_PEER_CLOSED,
-                                MX_TIME_INFINITE, &WaitComplete, this);
+                                ZX_CHANNEL_READABLE | ZX_CHANNEL_PEER_CLOSED,
+                                ZX_TIME_INFINITE, &WaitComplete, this);
 }
 
 // static.
-void ShellController::WaitComplete(mx_status_t result,
-                                   mx_signals_t pending,
+void ShellController::WaitComplete(zx_status_t result,
+                                   zx_signals_t pending,
                                    uint64_t count,
                                    void* context) {
   ShellController* controller = static_cast<ShellController*>(context);

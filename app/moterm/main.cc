@@ -2,24 +2,26 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/modular/services/component/component_context.fidl.h"
-#include "apps/modular/services/module/module.fidl.h"
-#include "apps/modular/services/story/story_marker.fidl.h"
-#include "apps/moterm/history.h"
-#include "apps/moterm/ledger_helpers.h"
-#include "apps/moterm/moterm_params.h"
-#include "apps/moterm/moterm_view.h"
-#include "apps/mozart/lib/skia/skia_font_loader.h"
-#include "apps/mozart/lib/view_framework/view_provider_service.h"
-#include "apps/tracing/lib/trace/provider.h"
-#include "lib/ftl/functional/make_copyable.h"
-#include "lib/ftl/log_settings_command_line.h"
-#include "lib/ftl/logging.h"
-#include "lib/mtl/tasks/message_loop.h"
+#include <trace-provider/provider.h>
+
+#include "lib/component/fidl/component_context.fidl.h"
+#include "lib/lifecycle/fidl/lifecycle.fidl.h"
+#include "lib/module/fidl/module.fidl.h"
+#include "lib/story/fidl/story_marker.fidl.h"
+#include "lib/ui/skia/skia_font_loader.h"
+#include "lib/ui/view_framework/view_provider_service.h"
+#include "topaz/app/moterm/history.h"
+#include "topaz/app/moterm/ledger_helpers.h"
+#include "topaz/app/moterm/moterm_params.h"
+#include "topaz/app/moterm/moterm_view.h"
+#include "lib/fxl/functional/make_copyable.h"
+#include "lib/fxl/log_settings_command_line.h"
+#include "lib/fxl/logging.h"
+#include "lib/fsl/tasks/message_loop.h"
 
 namespace moterm {
 
-class App : public modular::Module {
+class App : modular::Module, modular::Lifecycle {
  public:
   App(MotermParams params)
       : params_(std::move(params)),
@@ -28,14 +30,18 @@ class App : public modular::Module {
                                [this](mozart::ViewContext view_context) {
                                  return MakeView(std::move(view_context));
                                }),
-        module_binding_(this) {
-    tracing::InitializeTracer(application_context_.get(), {});
-
+        module_binding_(this),
+        lifecycle_binding_(this) {
     application_context_->outgoing_services()->AddService<modular::Module>(
         [this](fidl::InterfaceRequest<modular::Module> request) {
-          FTL_DCHECK(!module_binding_.is_bound());
+          FXL_DCHECK(!module_binding_.is_bound());
           module_binding_.Bind(std::move(request));
         });
+    application_context_->outgoing_services()->AddService<modular::Lifecycle>(
+      [this](fidl::InterfaceRequest<modular::Lifecycle> request) {
+        FXL_DCHECK(!lifecycle_binding_.is_bound());
+        lifecycle_binding_.Bind(std::move(request));
+      });
 
     // TODO(ppi): drop this once FW-97 is fixed or moterm no longer supports
     // view provider service.
@@ -49,7 +55,7 @@ class App : public modular::Module {
 
   ~App() {}
 
-  // modular::Module:
+  // |modular::Module|
   void Initialize(
       fidl::InterfaceHandle<modular::ModuleContext> module_context_handle,
       fidl::InterfaceHandle<app::ServiceProvider> incoming_services,
@@ -65,14 +71,14 @@ class App : public modular::Module {
     ledger::LedgerPtr ledger;
     component_context_ptr->GetLedger(
         ledger.NewRequest(),
-        ftl::MakeCopyable([module_context = std::move(module_context)](
+        fxl::MakeCopyable([module_context = std::move(module_context)](
             ledger::Status status) { LogLedgerError(status, "GetLedger"); }));
 
     ledger::PagePtr history_page;
     ledger::Ledger* ledger_ptr = ledger.get();
     ledger_ptr->GetRootPage(
         history_page.NewRequest(),
-        ftl::MakeCopyable([ledger = std::move(ledger)](ledger::Status status) {
+        fxl::MakeCopyable([ledger = std::move(ledger)](ledger::Status status) {
           LogLedgerError(status, "GetRootPage");
         }));
 
@@ -80,7 +86,10 @@ class App : public modular::Module {
     history_.Initialize(std::move(history_page));
   }
 
-  void Stop(const StopCallback& done) override { done(); }
+  // |modular::Lifecycle|
+  void Terminate() override {
+    fsl::MessageLoop::GetCurrent()->QuitNow();
+  }
 
  private:
   std::unique_ptr<moterm::MotermView> MakeView(
@@ -96,26 +105,29 @@ class App : public modular::Module {
   modular::StoryMarkerPtr story_marker_;
   mozart::ViewProviderService view_provider_service_;
   fidl::Binding<modular::Module> module_binding_;
+  fidl::Binding<modular::Lifecycle> lifecycle_binding_;
   // Ledger-backed store for terminal history.
   History history_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(App);
+  FXL_DISALLOW_COPY_AND_ASSIGN(App);
 };
 
 }  // namespace moterm
 
 int main(int argc, const char** argv) {
-  srand(mx_time_get(MX_CLOCK_UTC));
+  srand(zx_time_get(ZX_CLOCK_UTC));
 
-  auto command_line = ftl::CommandLineFromArgcArgv(argc, argv);
+  auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);
   moterm::MotermParams params;
-  if (!ftl::SetLogSettingsFromCommandLine(command_line) ||
+  if (!fxl::SetLogSettingsFromCommandLine(command_line) ||
       !params.Parse(command_line)) {
-    FTL_LOG(ERROR) << "Missing or invalid parameters. See README.";
+    FXL_LOG(ERROR) << "Missing or invalid parameters. See README.";
     return 1;
   }
 
-  mtl::MessageLoop loop;
+  fsl::MessageLoop loop;
+  trace::TraceProvider trace_provider(loop.async());
+
   moterm::App app(std::move(params));
   loop.Run();
   return 0;

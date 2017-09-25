@@ -5,20 +5,20 @@
 #ifndef APPS_MOTERM_MOTERM_VIEW_H_
 #define APPS_MOTERM_MOTERM_VIEW_H_
 
-#include "application/lib/app/application_context.h"
-#include "application/services/application_environment.fidl.h"
-#include "apps/moterm/command.h"
-#include "apps/moterm/history.h"
-#include "apps/moterm/moterm_model.h"
-#include "apps/moterm/moterm_params.h"
-#include "apps/moterm/shell_controller.h"
-#include "apps/mozart/lib/skia/skia_font_loader.h"
-#include "apps/mozart/lib/view_framework/skia_view.h"
-#include "lib/ftl/macros.h"
-#include "lib/ftl/memory/ref_ptr.h"
-#include "lib/ftl/memory/weak_ptr.h"
-#include "lib/ftl/tasks/task_runner.h"
-#include "lib/ftl/time/time_point.h"
+#include "lib/app/cpp/application_context.h"
+#include "lib/app/fidl/application_environment.fidl.h"
+#include "lib/ui/skia/skia_font_loader.h"
+#include "lib/ui/view_framework/skia_view.h"
+#include "topaz/app/moterm/command.h"
+#include "topaz/app/moterm/history.h"
+#include "topaz/app/moterm/moterm_model.h"
+#include "topaz/app/moterm/moterm_params.h"
+#include "topaz/app/moterm/shell_controller.h"
+#include "lib/fxl/macros.h"
+#include "lib/fxl/memory/ref_ptr.h"
+#include "lib/fxl/memory/weak_ptr.h"
+#include "lib/fxl/tasks/task_runner.h"
+#include "lib/fxl/time/time_point.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 
@@ -78,8 +78,8 @@ class MotermView : public mozart::SkiaView, public MotermModel::Delegate {
   // Keyboard state.
   bool keypad_application_mode_;
 
-  ftl::RefPtr<ftl::TaskRunner> task_runner_;
-  ftl::TimePoint last_key_;
+  fxl::RefPtr<fxl::TaskRunner> task_runner_;
+  fxl::TimePoint last_key_;
   bool blink_on_ = true;
   uint64_t blink_timer_id_ = 0;
   bool focused_ = false;
@@ -89,9 +89,9 @@ class MotermView : public mozart::SkiaView, public MotermModel::Delegate {
   MotermParams params_;
   std::unique_ptr<Command> command_;
 
-  ftl::WeakPtrFactory<MotermView> weak_ptr_factory_;
+  fxl::WeakPtrFactory<MotermView> weak_ptr_factory_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(MotermView);
+  FXL_DISALLOW_COPY_AND_ASSIGN(MotermView);
 };
 }  // namespace moterm
 

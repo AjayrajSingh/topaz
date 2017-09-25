@@ -10,23 +10,23 @@
 #include <string>
 #include <vector>
 
-#include <mx/channel.h>
-#include <mx/vmo.h>
+#include <zx/channel.h>
+#include <zx/vmo.h>
 
-#include "apps/moterm/history.h"
+#include "topaz/app/moterm/history.h"
 #include "lib/fidl/c/waiter/async_waiter.h"
 #include "lib/fidl/cpp/waiter/default.h"
-#include "lib/ftl/macros.h"
-#include "lib/mtl/io/redirection.h"
-#include "lib/mtl/vmo/strings.h"
+#include "lib/fxl/macros.h"
+#include "lib/fsl/io/redirection.h"
+#include "lib/fsl/vmo/strings.h"
 
 namespace moterm {
 
 // Implements the controller protocol of the default shell. The controller
-// exchanges control messages with the shell over an mx::channel.
+// exchanges control messages with the shell over an zx::channel.
 //
 // For the protocol description, see
-// magenta/third_party/uapp/dash/src/controller.h.
+// zircon/third_party/uapp/dash/src/controller.h.
 class ShellController : public History::Client {
  public:
   ShellController(History* history);
@@ -36,7 +36,7 @@ class ShellController : public History::Client {
   std::vector<std::string> GetShellCommand();
 
   // Returns the startup handles needed for initializing the default shell.
-  std::vector<mtl::StartupHandle> GetStartupHandles();
+  std::vector<fsl::StartupHandle> GetStartupHandles();
 
   // Starts the communication with shell.
   void Start();
@@ -53,8 +53,8 @@ class ShellController : public History::Client {
 
   void ReadCommand();
   void WaitForShell();
-  static void WaitComplete(mx_status_t result,
-                           mx_signals_t pending,
+  static void WaitComplete(zx_status_t result,
+                           zx_signals_t pending,
                            uint64_t count,
                            void* context);
 
@@ -64,9 +64,9 @@ class ShellController : public History::Client {
   const FidlAsyncWaiter* waiter_ = fidl::GetDefaultAsyncWaiter();
   FidlAsyncWaitID wait_id_ = 0;
 
-  mx::channel channel_;
+  zx::channel channel_;
 
-  FTL_DISALLOW_COPY_AND_ASSIGN(ShellController);
+  FXL_DISALLOW_COPY_AND_ASSIGN(ShellController);
 };
 
 }  // namespace moterm

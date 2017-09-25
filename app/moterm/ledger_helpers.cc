@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/moterm/ledger_helpers.h"
+#include "topaz/app/moterm/ledger_helpers.h"
 
-#include "lib/ftl/logging.h"
+#include "lib/fxl/logging.h"
 
 namespace moterm {
 
 void LogLedgerError(ledger::Status status, const std::string& description) {
   if (status != ledger::Status::OK) {
-    FTL_LOG(ERROR) << description << " failed, status: " << status;
+    FXL_LOG(ERROR) << description << " failed, status: " << status;
   }
 }
 

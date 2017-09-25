@@ -2,26 +2,26 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "apps/moterm/moterm_view.h"
+#include "topaz/app/moterm/moterm_view.h"
 
 #include <unistd.h>
 
-#include "apps/moterm/command.h"
-#include "apps/moterm/key_util.h"
-#include "apps/moterm/moterm_model.h"
-#include "apps/mozart/services/input/cpp/formatting.h"
+#include "lib/ui/input/cpp/formatting.h"
+#include "topaz/app/moterm/command.h"
+#include "topaz/app/moterm/key_util.h"
+#include "topaz/app/moterm/moterm_model.h"
 #include "lib/fonts/fidl/font_provider.fidl.h"
-#include "lib/ftl/logging.h"
-#include "lib/ftl/strings/string_printf.h"
-#include "lib/ftl/time/time_delta.h"
-#include "lib/mtl/io/redirection.h"
-#include "lib/mtl/tasks/message_loop.h"
+#include "lib/fxl/logging.h"
+#include "lib/fxl/strings/string_printf.h"
+#include "lib/fxl/time/time_delta.h"
+#include "lib/fsl/io/redirection.h"
+#include "lib/fsl/tasks/message_loop.h"
 #include "third_party/skia/include/core/SkPaint.h"
 
 namespace moterm {
 
 namespace {
-constexpr ftl::TimeDelta kBlinkInterval = ftl::TimeDelta::FromMilliseconds(500);
+constexpr fxl::TimeDelta kBlinkInterval = fxl::TimeDelta::FromMilliseconds(500);
 }  // namespace
 
 MotermView::MotermView(
@@ -37,18 +37,18 @@ MotermView::MotermView(
       context_(context),
       font_loader_(
           context_->ConnectToEnvironmentService<fonts::FontProvider>()),
-      task_runner_(mtl::MessageLoop::GetCurrent()->task_runner()),
+      task_runner_(fsl::MessageLoop::GetCurrent()->task_runner()),
       history_(history),
       params_(moterm_params),
       weak_ptr_factory_(this) {
-  FTL_DCHECK(context_);
-  FTL_DCHECK(history_);
+  FXL_DCHECK(context_);
+  FXL_DCHECK(history_);
 
   auto font_request = fonts::FontRequest::New();
   font_request->family = "RobotoMono";
   font_loader_.LoadFont(
       std::move(font_request), [this](sk_sp<SkTypeface> typeface) {
-        FTL_CHECK(typeface);  // TODO(jpoichet): Fail gracefully.
+        FXL_CHECK(typeface);  // TODO(jpoichet): Fail gracefully.
         regular_typeface_ = std::move(typeface);
         ComputeMetrics();
         StartCommand();
@@ -70,18 +70,18 @@ void MotermView::ComputeMetrics() {
   fg_paint.getFontMetrics(&fm);
   ascent_ = static_cast<int>(ceilf(-fm.fAscent));
   line_height_ = ascent_ + static_cast<int>(ceilf(fm.fDescent + fm.fLeading));
-  FTL_DCHECK(line_height_ > 0);
+  FXL_DCHECK(line_height_ > 0);
   // To figure out the advance width, measure an X. Better hope the font
   // is monospace.
   advance_width_ = static_cast<int>(ceilf(fg_paint.measureText("X", 1)));
-  FTL_DCHECK(advance_width_ > 0);
+  FXL_DCHECK(advance_width_ > 0);
 }
 
 void MotermView::StartCommand() {
   command_.reset(new Command());
 
   std::vector<std::string> command_to_run = params_.command;
-  std::vector<mtl::StartupHandle> startup_handles;
+  std::vector<fsl::StartupHandle> startup_handles;
 
   if (command_to_run.empty()) {
     shell_controller_ = std::make_unique<ShellController>(history_);
@@ -96,7 +96,7 @@ void MotermView::StartCommand() {
                                  },
                                  [this] { OnCommandTerminated(); });
   if (!success) {
-    FTL_LOG(ERROR) << "Error starting command.";
+    FXL_LOG(ERROR) << "Error starting command.";
     exit(1);
   }
 
@@ -109,7 +109,7 @@ void MotermView::Blink(uint64_t blink_timer_id) {
     return;
 
   if (focused_) {
-    ftl::TimeDelta delta = ftl::TimePoint::Now() - last_key_;
+    fxl::TimeDelta delta = fxl::TimePoint::Now() - last_key_;
     if (delta > kBlinkInterval) {
       blink_on_ = !blink_on_;
       InvalidateScene();
@@ -275,7 +275,7 @@ bool MotermView::OnInputEvent(mozart::InputEventPtr event) {
 }
 
 void MotermView::OnKeyPressed(mozart::InputEventPtr key_event) {
-  last_key_ = ftl::TimePoint::Now();
+  last_key_ = fxl::TimePoint::Now();
   blink_on_ = true;
 
   std::string input_sequence =
@@ -298,11 +298,11 @@ void MotermView::OnDataReceived(const void* bytes, size_t num_bytes) {
 }
 
 void MotermView::OnCommandTerminated() {
-  FTL_LOG(INFO) << "Command terminated.";
+  FXL_LOG(INFO) << "Command terminated.";
   if (shell_controller_) {
     shell_controller_->Terminate();
   }
-  mtl::MessageLoop::GetCurrent()->PostQuitTask();
+  fsl::MessageLoop::GetCurrent()->PostQuitTask();
 }
 
 }  // namespace moterm
