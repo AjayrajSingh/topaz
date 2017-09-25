@@ -5,8 +5,8 @@
 import 'dart:async';
 import 'dart:convert' show JSON;
 
-import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
+import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 
@@ -25,9 +25,8 @@ class ConversationListWatcher extends BasePageWatcher {
   ConversationListWatcher({
     @required PageSnapshotProxy initialSnapshot,
   })
-      : super(initialSnapshot: initialSnapshot) {
-    assert(initialSnapshot != null);
-  }
+      : assert(initialSnapshot != null),
+        super(initialSnapshot: initialSnapshot);
 
   @override
   void onPageChange(

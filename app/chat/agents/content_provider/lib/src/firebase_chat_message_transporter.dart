@@ -5,10 +5,10 @@
 import 'dart:async';
 import 'dart:convert' show JSON;
 
-import 'package:lib.auth.fidl/token_provider.fidl.dart';
 import 'package:config/config.dart';
 import 'package:eventsource/eventsource.dart';
 import 'package:http/http.dart' as http;
+import 'package:lib.auth.fidl/token_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
@@ -141,7 +141,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
       _startProcessingEventStream();
 
       _ready.complete();
-    } catch (e) {
+    } on Exception catch (e) {
       ChatAuthenticationException cae = new ChatAuthenticationException(
         'Firebase authentication failed.',
         e,
@@ -260,8 +260,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
 
         // Don't spam with the keep-alive event.
         if (eventType != 'keep-alive') {
-          log.fine('Event Received: $eventType');
-          log.fine('Data: ${event.data}');
+          log..fine('Event Received: $eventType')..fine('Data: ${event.data}');
         }
 
         switch (eventType) {
@@ -289,9 +288,10 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
                 '$eventType');
         }
       },
-      onError: (dynamic e, StackTrace stackTrace) {
-        log.severe('Error while processing the event stream', e, stackTrace);
-        log.severe('Continuing to receive events.');
+      onError: (Object e, StackTrace stackTrace) {
+        log
+          ..severe('Error while processing the event stream', e, stackTrace)
+          ..severe('Continuing to receive events.');
       },
       onDone: () {
         log.fine('Event stream is closed. Renewing the credential.');
@@ -323,11 +323,11 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     if (path == '/') {
       if (data != null) {
         // Sort the messages by their server timestamps assigned by Firebase.
-        List<String> messageKeys = new List<String>.from(data.keys);
-        messageKeys.sort(
-          (String k1, String k2) => data[k1]['server_timestamp']
-              .compareTo(data[k2]['server_timestamp']),
-        );
+        List<String> messageKeys = new List<String>.from(data.keys)
+          ..sort(
+            (String k1, String k2) => data[k1]['server_timestamp']
+                .compareTo(data[k2]['server_timestamp']),
+          );
 
         for (String messageKey in messageKeys) {
           await _handleNewMessage(messageKey, data[messageKey]);
@@ -360,10 +360,11 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
         _cachedMessageKeys.remove(messageKey);
       }
     } else {
-      log.warning("'put' event received from the event stream, but could not "
-          'recognize the path.');
-      log.warning('path: $path');
-      log.warning('data: $data');
+      log
+        ..warning("'put' event received from the event stream, but could not "
+            'recognize the path.')
+        ..warning('path: $path')
+        ..warning('data: $data');
     }
   }
 
@@ -432,7 +433,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
   }
 
   /// Make a PUT request to the firebase DB.
-  Future<http.Response> _firebaseDBPut(String path, dynamic data) async {
+  Future<http.Response> _firebaseDBPut(String path, Object data) async {
     Uri url = _getFirebaseUrl(path);
     try {
       return await _client.put(
@@ -442,7 +443,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
         },
         body: JSON.encode(data),
       );
-    } catch (e) {
+    } on Exception catch (e) {
       throw new ChatNetworkException('Network Error', e);
     }
   }
@@ -452,7 +453,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     Uri url = _getFirebaseUrl(path);
     try {
       return await _client.delete(url);
-    } catch (e) {
+    } on Exception catch (e) {
       throw new ChatNetworkException('Network Error', e);
     }
   }
@@ -502,13 +503,13 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     ];
 
     String result = original;
-    toEncode.forEach((String ch) {
+    for (String ch in toEncode) {
       String radixString = ch.codeUnitAt(0).toRadixString(16).toUpperCase();
       if (radixString.length < 2) {
         radixString = '0$radixString';
       }
       result = result.replaceAll(ch, '&$radixString');
-    });
+    }
 
     return result;
   }

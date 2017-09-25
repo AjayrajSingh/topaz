@@ -13,8 +13,8 @@ void main() {
       await tester.pumpWidget(
         new MaterialApp(
           theme: new ThemeData(platform: TargetPlatform.fuchsia),
-          home: new Material(
-            child: new MessageInput(),
+          home: const Material(
+            child: const MessageInput(),
           ),
         ),
       );

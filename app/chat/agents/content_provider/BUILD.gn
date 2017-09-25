@@ -8,14 +8,14 @@ dart_app("chat_content_provider") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//peridot/public/lib/ledger/fidl:fidl_dart",
-    "//peridot/public/lib/suggestion/fidl:fidl_dart",
-    "//peridot/public/lib/agent/fidl:fidl_dart",
-    "//peridot/public/lib/auth/fidl:fidl_dart",
-    "//peridot/public/lib/user/fidl:fidl_dart",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/app/fidl:fidl_dart",
     "//garnet/public/lib/fidl/dart",
+    "//peridot/public/lib/agent/fidl:fidl_dart",
+    "//peridot/public/lib/auth/fidl:fidl_dart",
+    "//peridot/public/lib/ledger/fidl:fidl_dart",
+    "//peridot/public/lib/suggestion/fidl:fidl_dart",
+    "//peridot/public/lib/user/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/eventsource",
     "//third_party/dart-pkg/pub/meta",

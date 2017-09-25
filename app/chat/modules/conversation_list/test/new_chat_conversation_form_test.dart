@@ -7,12 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final List<String> _participants = new List<String>();
+  final List<String> _participants = <String>[];
 
   /// Clears [_participants] and adds the contents of [participants] param to it
   void _mockSubmitFunction(List<String> participants) {
-    _participants.clear();
-    _participants.addAll(participants);
+    _participants
+      ..clear()
+      ..addAll(participants);
   }
 
   /// Create a NewChatConversationForm for testing; it is wrapped in a
