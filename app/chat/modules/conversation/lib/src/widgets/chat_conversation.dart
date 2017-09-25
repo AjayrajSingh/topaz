@@ -34,7 +34,7 @@ class ChatConversation extends StatefulWidget {
   final ScrollController scrollController;
 
   /// Constructor
-  ChatConversation({
+  const ChatConversation({
     Key key,
     this.enabled: true,
     @required this.sections,
@@ -43,10 +43,9 @@ class ChatConversation extends StatefulWidget {
     this.onTapSharePhoto,
     this.scrollController,
   })
-      : super(key: key) {
-    assert(this.enabled != null);
-    assert(this.sections != null);
-  }
+      : assert(enabled != null),
+        assert(sections != null),
+        super(key: key);
 
   @override
   _ChatConversationState createState() => new _ChatConversationState();

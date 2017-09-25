@@ -4,16 +4,16 @@
 
 import 'dart:async';
 
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
-import 'package:lib.user.fidl/device_map.fidl.dart';
-import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.modular/modular.dart';
+import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
+import 'package:lib.user.fidl/device_map.fidl.dart';
+import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 
@@ -59,20 +59,17 @@ class ChatContentProviderAgent extends AgentImpl {
     IntelligenceServicesProxy intelligenceServices =
         new IntelligenceServicesProxy();
     agentContext.getIntelligenceServices(intelligenceServices.ctrl.request());
-    intelligenceServices.getProposalPublisher(
-      _proposalPublisher.ctrl.request(),
-    );
-    intelligenceServices.getContextReader(
-      _contextReader.ctrl.request(),
-    );
-    intelligenceServices.ctrl.close();
+    intelligenceServices
+      ..getProposalPublisher(_proposalPublisher.ctrl.request())
+      ..getContextReader(_contextReader.ctrl.request())
+      ..ctrl.close();
 
     Proposer proposer = new Proposer(proposalPublisher: _proposalPublisher);
 
     ContextSelector selector = new ContextSelector()
-      ..type = ContextValueType.entity;
-    selector.meta = new ContextMetadata();
-    selector.meta.entity = new EntityMetadata()..topic = 'location/home_work';
+      ..type = ContextValueType.entity
+      ..meta = new ContextMetadata()
+      ..meta.entity = (new EntityMetadata()..topic = 'location/home_work');
     ContextQuery query = new ContextQuery();
     query.selector['location/home_work'] = selector;
     _contextReader.subscribe(query, _proposerBinding.wrap(proposer));
@@ -116,6 +113,5 @@ Future<Null> main(List<String> args) async {
 
   _agent = new ChatContentProviderAgent(
     applicationContext: new ApplicationContext.fromStartupInfo(),
-  );
-  _agent.advertise();
+  )..advertise();
 }

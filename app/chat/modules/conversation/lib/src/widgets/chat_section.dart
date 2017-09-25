@@ -27,13 +27,12 @@ class ChatSection extends StatelessWidget {
   static final DateFormat _kDateHeaderFormat = new DateFormat.yMMMMd();
 
   /// Constructor
-  ChatSection({
+  const ChatSection({
     Key key,
     @required this.section,
   })
-      : super(key: key) {
-    assert(section != null);
-  }
+      : assert(section != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +78,7 @@ class ChatSection extends StatelessWidget {
                 ? const EdgeInsets.only(bottom: 16.0)
                 : const EdgeInsets.only(left: 50.0, bottom: 16.0),
             child: new Text(
-              TimeUtil.relativeDisplayDate(
+              relativeDisplayDate(
                 date: section.lastMessageTime,
                 alwaysIncludeTime: true,
               ),

@@ -2,21 +2,23 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// ignore_for_file: implementation_imports
+
 import 'dart:async';
 import 'dart:convert' show JSON;
 import 'dart:isolate';
 
-import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger_fidl;
-import 'package:lib.component.fidl/component_context.fidl.dart';
-import 'package:lib.component.fidl/message_queue.fidl.dart';
-import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
-import 'package:lib.module.fidl/module.fidl.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' hide Message;
+import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger_fidl;
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.modular/modular.dart';
+import 'package:lib.module.fidl/module.fidl.dart';
+import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.test_runner.fidl/test_runner.fidl.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart' hide expect;
@@ -91,7 +93,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
       await _testFromBlankSlate();
       await _testMessageQueues();
       log.info('Test passed.');
-    } catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       _testRunner.fail('Test Error. See the console logs for more details.');
       log.severe('Test Error', e, stackTrace);
     }
@@ -690,9 +692,9 @@ class _MessageQueueWrapper {
   _MessageQueueWrapper({
     @required this.queue,
     @required this.token,
-  }) {
-    assert(queue != null);
-    assert(token != null);
+  })
+      : assert(queue != null),
+        assert(token != null) {
     _queueReceiver = new MessageReceiverImpl(
       messageQueue: queue,
       onReceiveMessage: handleMessage,

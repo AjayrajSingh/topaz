@@ -44,7 +44,7 @@ class ChatBubble extends StatelessWidget {
   final GestureLongPressCallback onLongPress;
 
   /// Constructor
-  ChatBubble({
+  const ChatBubble({
     Key key,
     ChatBubbleOrientation orientation,
     this.backgroundColor,
@@ -53,11 +53,10 @@ class ChatBubble extends StatelessWidget {
     this.onLongPress,
     @required @Generator(WidgetFixtures, 'sentenceText') this.child,
   })
-      : orientation = orientation ?? ChatBubbleOrientation.left,
+      : assert(child != null),
+        orientation = orientation ?? ChatBubbleOrientation.left,
         fillBubble = fillBubble ?? false,
-        super(key: key) {
-    assert(child != null);
-  }
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -6,10 +6,10 @@ import 'dart:convert' show JSON;
 import 'dart:io';
 
 import 'package:lib.context.fidl/context_reader.fidl.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 
 const String _kContactsJsonFile = '/system/data/modules/contacts.json';
@@ -33,7 +33,7 @@ class Proposer extends ContextListener {
     }
     String json = contactsJsonFile.readAsStringSync();
     final List<Map<String, dynamic>> decodedJson = JSON.decode(json);
-    decodedJson.forEach((Map<String, dynamic> contact) {
+    for (Map<String, dynamic> contact in decodedJson) {
       List<String> context = contact['context'] ?? <String>[];
       String email = contact['email'];
       if (email == null) {
@@ -45,7 +45,7 @@ class Proposer extends ContextListener {
       if (context.contains('home')) {
         _homeContacts.add(email);
       }
-    });
+    }
   }
 
   /// Called when a message is received.

@@ -28,11 +28,11 @@ abstract class ChatException implements Exception {
   String toString() {
     String result = 'FirebaseException';
     if (message != null) {
-      result += ': $message';
+      result = '$result: $message';
     }
     if (innerException != null) {
-      result +=
-          (message != null ? ', ' : ': ') + 'innerException: $innerException';
+      result = '$result${(message != null ? ',' : ':')}'
+          ' innerException: $innerException';
     }
 
     return result;
@@ -42,14 +42,14 @@ abstract class ChatException implements Exception {
 /// An [Exception] thrown when the authentication process has failed.
 class ChatAuthenticationException extends ChatException {
   /// Creates a new instance of [ChatAuthenticationException].
-  ChatAuthenticationException([dynamic message, dynamic innerException])
+  ChatAuthenticationException([Object message, Object innerException])
       : super(message, innerException);
 }
 
 /// An [Exception] thrown when an operation has failed due to permission issues.
 class ChatAuthorizationException extends ChatException {
   /// Creates a new instance of [ChatAuthorizationException].
-  ChatAuthorizationException([dynamic message, dynamic innerException])
+  ChatAuthorizationException([Object message, Object innerException])
       : super(message, innerException);
 }
 
@@ -57,7 +57,7 @@ class ChatAuthorizationException extends ChatException {
 /// message to another user.
 class ChatNetworkException extends ChatException {
   /// Creates a new instance of [ChatNetworkException].
-  ChatNetworkException([dynamic message, dynamic innerException])
+  ChatNetworkException([Object message, Object innerException])
       : super(message, innerException);
 }
 

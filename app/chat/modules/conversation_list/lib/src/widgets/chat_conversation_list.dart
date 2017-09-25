@@ -35,7 +35,7 @@ class ChatConversationList extends StatelessWidget {
   final bool shouldDisplaySpinner;
 
   /// Constructor
-  ChatConversationList({
+  const ChatConversationList({
     Key key,
     @required this.conversations,
     this.onNewConversation,
@@ -43,10 +43,9 @@ class ChatConversationList extends StatelessWidget {
     this.selectedId,
     bool shouldDisplaySpinner,
   })
-      : shouldDisplaySpinner = shouldDisplaySpinner ?? false,
-        super(key: key) {
-    assert(this.conversations != null);
-  }
+      : assert(conversations != null),
+        shouldDisplaySpinner = shouldDisplaySpinner ?? false,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {

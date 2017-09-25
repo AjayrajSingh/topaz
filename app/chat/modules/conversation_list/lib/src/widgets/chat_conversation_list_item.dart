@@ -30,11 +30,10 @@ class ChatConversationListItem extends StatelessWidget {
     this.onSelect,
     bool selected,
   })
-      : selected = selected ?? false,
-        super(key: key) {
-    assert(conversation != null);
-    assert(conversation.participants != null);
-  }
+      : assert(conversation != null),
+        assert(conversation.participants != null),
+        selected = selected ?? false,
+        super(key: key);
 
   String get _participantNames => conversation.participants
       .map((User user) => user.name ?? user.email)
@@ -62,7 +61,7 @@ class ChatConversationListItem extends StatelessWidget {
         ),
         trailing: new Text(
           conversation.timestamp != null
-              ? TimeUtil.relativeDisplayDate(date: conversation.timestamp)
+              ? relativeDisplayDate(date: conversation.timestamp)
               : '',
           style: new TextStyle(
             color: Colors.grey[500],

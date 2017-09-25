@@ -6,19 +6,19 @@ import 'dart:async';
 import 'dart:convert' show JSON;
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
+import 'package:flutter/widgets.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
+import 'package:lib.fidl.dart/bindings.dart' hide Message;
+import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
-import 'package:collection/collection.dart';
-import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart' hide Message;
-import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
     as chat_fidl;
@@ -114,7 +114,7 @@ class ChatConversationModuleModel extends ModuleModel {
       _sections = createSectionsFromMessages(
         sortedMessages.map(_createMessageFromFidl).toList(),
       );
-    } catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       log.severe('Error occurred while setting _messages', e, stackTrace);
     } finally {
       notifyListeners();
@@ -163,8 +163,7 @@ class ChatConversationModuleModel extends ModuleModel {
       _mqConversationEvents.ctrl.request(),
     );
     // Save the message queue token for later use.
-    _mqConversationEvents
-        .getToken((String token) => _mqConversationToken.complete(token));
+    _mqConversationEvents.getToken(_mqConversationToken.complete);
     _mqConversationReceiver = new MessageReceiverImpl(
       messageQueue: _mqConversationEvents,
       onReceiveMessage: _handleConversationEvent,
@@ -177,8 +176,7 @@ class ChatConversationModuleModel extends ModuleModel {
       _mqSelectedImages.ctrl.request(),
     );
     // Save the message queue token for later use.
-    _mqSelectedImages
-        .getToken((String token) => _mqSelectedImagesToken.complete(token));
+    _mqSelectedImages.getToken(_mqSelectedImagesToken.complete);
     // Start receiving stuff.
     _mqSelectedImagesReceiver = new MessageReceiverImpl(
       messageQueue: _mqSelectedImages,
@@ -255,6 +253,7 @@ class ChatConversationModuleModel extends ModuleModel {
 
     // TODO(youngseokyoon): properly communicate the error status to the user.
     // https://fuchsia.atlassian.net/browse/SO-365
+    status = await statusCompleter.future;
     if (status != chat_fidl.ChatStatus.ok) {
       log.severe('ChatContentProvider::GetMessages() returned an error '
           'status: $status');
@@ -328,7 +327,7 @@ class ChatConversationModuleModel extends ModuleModel {
           log.severe('Not a valid conversation event: $event');
           break;
       }
-    } catch (e) {
+    } on Exception catch (e) {
       log.severe('Error occurred while processing the message received via the '
           'message queue: $e');
     }
@@ -356,7 +355,7 @@ class ChatConversationModuleModel extends ModuleModel {
     Map<String, dynamic> decoded = JSON.decode(message);
     if (decoded['selected_images'] != null) {
       List<String> imageUrls = decoded['selected_images'];
-      imageUrls.forEach((String imageUrl) {
+      for (String imageUrl in imageUrls) {
         log.fine('sending image url message: $imageUrl');
         _chatContentProvider.sendMessage(
           conversationId,
@@ -364,7 +363,7 @@ class ChatConversationModuleModel extends ModuleModel {
           imageUrl,
           (_, __) => null,
         );
-      });
+      }
     }
 
     // After adding the images, close the gallery module.
@@ -406,8 +405,12 @@ class ChatConversationModuleModel extends ModuleModel {
   }
 
   static int _compareMessages(chat_fidl.Message m1, chat_fidl.Message m2) {
-    if (m1.timestamp < m2.timestamp) return -1;
-    if (m1.timestamp > m2.timestamp) return 1;
+    if (m1.timestamp < m2.timestamp) {
+      return -1;
+    }
+    if (m1.timestamp > m2.timestamp) {
+      return 1;
+    }
     return 0;
   }
 
@@ -546,7 +549,7 @@ class ChatConversationModuleModel extends ModuleModel {
       if (shouldCloseChildModule) {
         _closeChildModule();
       }
-    } catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       log.severe('Could not parse the child Link data: $json', e, stackTrace);
     }
   }

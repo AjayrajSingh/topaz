@@ -37,12 +37,12 @@ class Section {
     bool shouldDisplayDateHeader,
     bool shouldDisplayLastMessageTime,
   })
-      : _messages = new List<Message>.from(messages),
+      : assert(messages != null && messages.isNotEmpty),
+        assert(
+            messages.every((Message m) => m.sender == messages.first.sender)),
+        _messages = new List<Message>.from(messages),
         shouldDisplayDateHeader = shouldDisplayDateHeader ?? false,
-        shouldDisplayLastMessageTime = shouldDisplayLastMessageTime ?? false {
-    assert(messages != null && messages.isNotEmpty);
-    assert(messages.every((Message m) => m.sender == sender));
-  }
+        shouldDisplayLastMessageTime = shouldDisplayLastMessageTime ?? false;
 
   /// Gets the [Message]s contained in this [Section].
   List<Message> get messages => new UnmodifiableListView<Message>(_messages);
@@ -64,8 +64,12 @@ class Section {
 /// assumed that the given list is already sorted by their time in ascending
 /// order.
 List<Section> createSectionsFromMessages(List<Message> messages) {
-  if (messages == null) return null;
-  if (messages.isEmpty) return const <Section>[];
+  if (messages == null) {
+    return null;
+  }
+  if (messages.isEmpty) {
+    return const <Section>[];
+  }
 
   List<List<Message>> sectionCandidates = <List<Message>>[];
 
@@ -105,5 +109,4 @@ bool _shouldBeSeparated(Message m1, Message m2) =>
 bool _diffGreaterThanThreshold(Message m1, Message m2) =>
     m1.time.difference(m2.time).abs() > const Duration(hours: 1);
 
-bool _onDifferentDate(Message m1, Message m2) =>
-    !TimeUtil.isSameDay(m1.time, m2.time);
+bool _onDifferentDate(Message m1, Message m2) => !isSameDay(m1.time, m2.time);

@@ -52,20 +52,19 @@ void main() {
       ));
     }
 
-    messages.add(fixtures.message(
-      time: DateTime.parse('2017-05-04 09:01:00'),
-      sender: alice,
-    ));
-
-    messages.add(fixtures.message(
-      time: DateTime.parse('2017-05-04 11:00:00'),
-      sender: alice,
-    ));
-
-    messages.add(fixtures.message(
-      time: DateTime.parse('2017-05-05 09:00:00'),
-      sender: 'me',
-    ));
+    messages
+      ..add(fixtures.message(
+        time: DateTime.parse('2017-05-04 09:01:00'),
+        sender: alice,
+      ))
+      ..add(fixtures.message(
+        time: DateTime.parse('2017-05-04 11:00:00'),
+        sender: alice,
+      ))
+      ..add(fixtures.message(
+        time: DateTime.parse('2017-05-05 09:00:00'),
+        sender: 'me',
+      ));
 
     List<Section> sections = createSectionsFromMessages(messages);
 

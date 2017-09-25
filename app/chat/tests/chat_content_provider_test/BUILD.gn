@@ -10,9 +10,9 @@ dart_app("chat_content_provider_test") {
   main_dart = "lib/main.dart"
 
   deps = [
+    "//garnet/public/lib/test_runner/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/story/fidl:fidl_dart",
-    "//garnet/public/lib/test_runner/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/matcher",
     "//third_party/dart-pkg/pub/meta",

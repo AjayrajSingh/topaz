@@ -20,14 +20,13 @@ class ImageUrlMessage extends Message {
     VoidCallback onDelete,
     @required this.url,
   })
-      : super(
+      : assert(url != null),
+        super(
           messageId: messageId,
           time: time,
           sender: sender,
           onDelete: onDelete,
-        ) {
-    assert(url != null);
-  }
+        );
 
   @override
   String get type => 'image-url';

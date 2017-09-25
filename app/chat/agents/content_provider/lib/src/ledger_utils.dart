@@ -9,15 +9,15 @@ import 'dart:math' show Random;
 import 'dart:typed_data' show Uint8List;
 import 'dart:zircon' show ZX, Vmo, GetSizeResult, ReadResult;
 
-import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:collection/collection.dart';
+import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:quiver/core.dart' as quiver;
 
 // This file defines global functions that are useful for directly manipulating
 // Ledger data.
 
 /// Encodes the given value first into a JSON string and then encode in UTF8.
-List<int> encodeLedgerValue(dynamic value) => UTF8.encode(JSON.encode(value));
+List<int> encodeLedgerValue(Object value) => UTF8.encode(JSON.encode(value));
 
 /// Decodes the given [Vmo] into a Dart Object. This assumes that the data held
 /// in the given [Vmo] is encoded in JSON and UTF8.
@@ -104,6 +104,6 @@ List<int> generateRandomId(int lengthInBytes) {
 /// Creates a new [Map] where the key is a Ledger ID.
 Map<List<int>, T> createLedgerIdMap<T>() => new HashMap<List<int>, T>(
       equals: const ListEquality<int>().equals,
-      hashCode: (List<int> key) => quiver.hashObjects(key),
-      isValidKey: (dynamic key) => key is List<int>,
+      hashCode: quiver.hashObjects,
+      isValidKey: (Object key) => key is List<int>,
     );

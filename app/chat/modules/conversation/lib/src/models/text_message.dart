@@ -20,14 +20,13 @@ class TextMessage extends Message {
     VoidCallback onDelete,
     @required this.text,
   })
-      : super(
+      : assert(text != null),
+        super(
           messageId: messageId,
           time: time,
           sender: sender,
           onDelete: onDelete,
-        ) {
-    assert(text != null);
-  }
+        );
 
   @override
   String get type => 'text';

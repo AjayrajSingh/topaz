@@ -26,10 +26,9 @@ abstract class Message {
     @required this.time,
     @required this.sender,
     this.onDelete,
-  }) {
-    assert(time != null);
-    assert(sender != null);
-  }
+  })
+      : assert(time != null),
+        assert(sender != null);
 
   /// The type of the message. (e.g. 'text')
   String get type;
