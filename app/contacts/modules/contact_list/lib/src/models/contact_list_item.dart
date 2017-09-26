@@ -22,10 +22,9 @@ class ContactListItem {
     @required this.id,
     @required this.displayName,
     this.photoUrl: '',
-  }) {
-    assert(id != null && id.isNotEmpty);
-    assert(displayName != null && displayName.isNotEmpty);
-  }
+  })
+      : assert(id != null && id.isNotEmpty),
+        assert(displayName != null && displayName.isNotEmpty);
 
   /// The first letter of the display name
   String get firstLetter => displayName[0];

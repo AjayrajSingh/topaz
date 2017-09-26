@@ -39,13 +39,12 @@ class ContactAPI {
     @required DateTime expiry,
     @required String refreshToken,
     @required this.scopes,
-  }) {
-    assert(id != null);
-    assert(secret != null);
-    assert(token != null);
-    assert(expiry != null);
-    assert(refreshToken != null);
-
+  })
+      : assert(id != null),
+        assert(secret != null),
+        assert(token != null),
+        assert(expiry != null),
+        assert(refreshToken != null) {
     ClientId clientId = new ClientId(id, secret);
     AccessToken accessToken = new AccessToken('Bearer', token, expiry);
     AccessCredentials credentials =

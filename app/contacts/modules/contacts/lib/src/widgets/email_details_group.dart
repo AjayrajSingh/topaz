@@ -19,14 +19,13 @@ class EmailDetailsGroup extends StatelessWidget {
   final EmailAddressActionCallback onSelectEmailAddress;
 
   /// Constructor
-  EmailDetailsGroup({
+  const EmailDetailsGroup({
     Key key,
     @required this.emailAddresses,
     this.onSelectEmailAddress,
   })
-      : super(key: key) {
-    assert(emailAddresses != null);
-  }
+      : assert(emailAddresses != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,7 @@ class EmailDetailsGroup extends StatelessWidget {
               emailAddress.value,
               softWrap: false,
               overflow: TextOverflow.ellipsis,
-              style: new TextStyle(
+              style: const TextStyle(
                 fontSize: 16.0,
               ),
             ),

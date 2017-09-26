@@ -12,7 +12,7 @@ import 'list_item.dart';
 /// The UI widget that represents a list of contacts
 class ContactList extends StatefulWidget {
   /// Creates a new instance of [ContactList]
-  ContactList({Key key}) : super(key: key);
+  const ContactList({Key key}) : super(key: key);
 
   @override
   _ContactListState createState() => new _ContactListState();

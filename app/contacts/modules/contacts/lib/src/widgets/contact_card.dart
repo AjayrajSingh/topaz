@@ -16,13 +16,12 @@ class ContactCard extends StatelessWidget {
   final Contact contact;
 
   /// Constructor
-  ContactCard({
+  const ContactCard({
     Key key,
     @required this.contact,
   })
-      : super(key: key) {
-    assert(contact != null);
-  }
+      : assert(contact != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,8 +49,8 @@ class ContactCard extends StatelessWidget {
             labelColor: theme.primaryColor,
             unselectedLabelColor: Colors.grey[700],
             tabs: <Widget>[
-              new Tab(text: 'DETAILS'),
-              new Tab(text: 'ACTIVITY'),
+              const Tab(text: 'DETAILS'),
+              const Tab(text: 'ACTIVITY'),
             ],
           ),
         ),
@@ -80,7 +79,7 @@ class ContactCard extends StatelessWidget {
             ),
             new Container(
               height: 800.0,
-              child: new Text(
+              child: const Text(
                 'ACTIVITY',
               ),
             ),

@@ -15,15 +15,14 @@ class ContactDetailsGroup extends StatelessWidget {
   final IconData icon;
 
   /// Constructor
-  ContactDetailsGroup({
+  const ContactDetailsGroup({
     Key key,
     @required this.child,
     @required this.icon,
   })
-      : super(key: key) {
-    assert(child != null);
-    assert(icon != null);
-  }
+      : assert(child != null),
+        assert(icon != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -19,14 +19,13 @@ class PhoneDetailsGroup extends StatelessWidget {
   final PhoneNumberActionCallback onSelectPhoneNumber;
 
   /// Constructor
-  PhoneDetailsGroup({
+  const PhoneDetailsGroup({
     Key key,
     @required this.phoneNumbers,
     this.onSelectPhoneNumber,
   })
-      : super(key: key) {
-    assert(phoneNumbers != null);
-  }
+      : assert(phoneNumbers != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,7 @@ class PhoneDetailsGroup extends StatelessWidget {
               phoneNumber.number,
               softWrap: false,
               overflow: TextOverflow.ellipsis,
-              style: new TextStyle(
+              style: const TextStyle(
                 fontSize: 16.0,
               ),
             ),

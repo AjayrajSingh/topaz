@@ -19,21 +19,20 @@ class AddressDetailsGroup extends StatelessWidget {
   final AddressActionCallback onSelectAddress;
 
   /// Constructor
-  AddressDetailsGroup({
+  const AddressDetailsGroup({
     Key key,
     @required this.addresses,
     this.onSelectAddress,
   })
-      : super(key: key) {
-    assert(addresses != null);
-  }
+      : assert(addresses != null),
+        super(key: key);
 
   Widget _buildAddressLine(String line) {
     return new Text(
       line,
       softWrap: false,
       overflow: TextOverflow.ellipsis,
-      style: new TextStyle(
+      style: const TextStyle(
         fontSize: 16.0,
       ),
     );
@@ -49,17 +48,17 @@ class AddressDetailsGroup extends StatelessWidget {
     if (address.city != null ||
         address.region != null ||
         address.postalCode != null) {
-      String line = '';
+      StringBuffer lineBuffer = new StringBuffer();
       if (address.city != null) {
-        line += '${address.city}, ';
+        lineBuffer.write(address.city);
       }
       if (address.region != null) {
-        line += '${address.region} ';
+        lineBuffer.write(address.region);
       }
       if (address.postalCode != null) {
-        line += '${address.postalCode}';
+        lineBuffer.write(address.postalCode);
       }
-      addressLines.add(_buildAddressLine(line));
+      addressLines.add(_buildAddressLine(lineBuffer.toString()));
     }
 
     if (address.country != null) {

@@ -19,15 +19,14 @@ class ContactDetailsRow extends StatelessWidget {
   final String label;
 
   /// Constructor
-  ContactDetailsRow({
+  const ContactDetailsRow({
     Key key,
     @required this.child,
     this.label,
     this.onSelect,
   })
-      : super(key: key) {
-    assert(child != null);
-  }
+      : assert(child != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {

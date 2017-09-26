@@ -26,13 +26,12 @@ class ContactHeader extends StatelessWidget {
   final Contact contact;
 
   /// Constructor
-  ContactHeader({
+  const ContactHeader({
     Key key,
     @required this.contact,
   })
-      : super(key: key) {
-    assert(contact != null);
-  }
+      : assert(contact != null),
+        super(key: key);
 
   /// Build background image
   Widget _buildBackgroundImage(Color primaryColor) {
@@ -83,7 +82,7 @@ class ContactHeader extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 4.0),
         child: new Text(
           contact.displayName,
-          style: new TextStyle(
+          style: const TextStyle(
             fontSize: 18.0,
           ),
         ),

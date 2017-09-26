@@ -21,14 +21,13 @@ class ListItem extends StatelessWidget {
   final bool isFirstInCategory;
 
   /// Constructor
-  ListItem({
+  const ListItem({
     Key key,
     @required this.contact,
     this.isFirstInCategory = false,
   })
-      : super(key: key) {
-    assert(contact != null);
-  }
+      : assert(contact != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {

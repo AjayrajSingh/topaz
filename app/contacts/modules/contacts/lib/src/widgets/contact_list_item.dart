@@ -20,14 +20,13 @@ class ContactListItem extends StatelessWidget {
   final ContactActionCallback onSelect;
 
   /// Constructor
-  ContactListItem({
+  const ContactListItem({
     Key key,
     @required this.contact,
     this.onSelect,
   })
-      : super(key: key) {
-    assert(contact != null);
-  }
+      : assert(contact != null),
+        super(key: key);
 
   void _handleSelect() {
     onSelect?.call(contact);

@@ -58,6 +58,5 @@ Future<Null> main(List<String> args) async {
 
   _agent = new ContactsContentProviderAgent(
     applicationContext: new ApplicationContext.fromStartupInfo(),
-  );
-  _agent.advertise();
+  )..advertise();
 }

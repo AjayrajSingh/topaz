@@ -38,7 +38,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
         _contacts = contacts;
         _loading = false;
       });
-    } catch (exception, stackTrace) {
+    } on Exception catch (exception, stackTrace) {
       print(exception);
       print(stackTrace);
     }

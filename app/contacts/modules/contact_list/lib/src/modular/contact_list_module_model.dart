@@ -35,9 +35,7 @@ class ContactListModuleModel extends ModuleModel {
 
   /// Creates an instance of a [ContactListModuleModel] and takes a
   /// [ContactListModel] that it will keep updated.
-  ContactListModuleModel({@required this.model}) {
-    assert(model != null);
-  }
+  ContactListModuleModel({@required this.model}) : assert(model != null);
 
   @override
   Future<Null> onReady(
@@ -84,8 +82,7 @@ class ContactListModuleModel extends ModuleModel {
         new Completer<contacts_fidl.Status>();
     _contactsContentProvider.getContactList(prefix,
         (contacts_fidl.Status status, List<contacts_fidl.Contact> contacts) {
-      contacts.forEach(
-          (contacts_fidl.Contact c) => contactList.add(_transformContact(c)));
+      contactList.addAll(contacts.map(_transformContact));
       statusCompleter.complete(status);
     });
 

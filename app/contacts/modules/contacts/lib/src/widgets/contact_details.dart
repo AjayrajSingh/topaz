@@ -27,16 +27,15 @@ class ContactDetails extends StatelessWidget {
   final PhoneNumberActionCallback onSelectPhoneNumber;
 
   /// Constructor
-  ContactDetails({
+  const ContactDetails({
     Key key,
     @required this.contact,
     this.onSelectAddress,
     this.onSelectEmailAddress,
     this.onSelectPhoneNumber,
   })
-      : super(key: key) {
-    assert(contact != null);
-  }
+      : assert(contact != null),
+        super(key: key);
 
   void _handleSelectEmailAddress(EmailAddress emailAddress) {
     onSelectEmailAddress?.call(emailAddress);

@@ -16,7 +16,7 @@ class ContactCardScreen extends StatefulWidget {
   final String contactId;
 
   /// Constructor
-  ContactCardScreen({this.contactId});
+  const ContactCardScreen({this.contactId});
 
   @override
   _ContactCardScreenState createState() => new _ContactCardScreenState();
@@ -41,7 +41,7 @@ class _ContactCardScreenState extends State<ContactCardScreen> {
         _contact = contact;
         _loading = false;
       });
-    } catch (exception, stackTrace) {
+    } on Exception catch (exception, stackTrace) {
       print(exception);
       print(stackTrace);
     }

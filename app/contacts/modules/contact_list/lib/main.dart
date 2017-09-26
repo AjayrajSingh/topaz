@@ -22,12 +22,13 @@ void main() {
 
   ModuleWidget<ContactListModuleModel> moduleWidget =
       new ModuleWidget<ContactListModuleModel>(
-          moduleModel: moduleModel,
-          applicationContext: new ApplicationContext.fromStartupInfo(),
-          child: new ScopedModel<ContactListModel>(
-            model: model,
-            child: new ContactList(),
-          ));
-  moduleWidget.advertise();
+    moduleModel: moduleModel,
+    applicationContext: new ApplicationContext.fromStartupInfo(),
+    child: new ScopedModel<ContactListModel>(
+      model: model,
+      child: const ContactList(),
+    ),
+  )..advertise();
+
   runApp(moduleWidget);
 }

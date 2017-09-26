@@ -47,9 +47,9 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
 
   /// Close all the bindings.
   void close() {
-    _bindings.forEach(
-      (ContactsContentProviderBinding binding) => binding.close(),
-    );
+    for (ContactsContentProviderBinding binding in _bindings) {
+      binding.close();
+    }
     _bindings.clear();
   }
 
