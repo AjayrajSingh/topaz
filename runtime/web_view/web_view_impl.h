@@ -83,6 +83,7 @@ class WebViewImpl : public mozart::BaseView,
   scenic_lib::HostImageCycler image_cycler_;
 
   maxwell::ContextWriterPtr context_writer_;
+  std::vector<maxwell::ContextValueWriterPtr> context_values_;
 
   // Delegate that receives WillSendRequest calls. Can be null.
   web_view::WebRequestDelegatePtr webRequestDelegate_;

@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "lib/context/fidl/context_writer.fidl.h"
+#include <vector>
+#include <string>
 
 class WebView;
 
-std::vector<maxwell::ContextValuePtr> ExtractSchemaOrgContext(
-    WebView& web_view);
+std::vector<std::string> ExtractSchemaOrgContext(WebView& web_view);

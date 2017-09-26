@@ -4,6 +4,7 @@
 
 #include "topaz/runtime/web_view/web_view_impl.h"
 
+#include <fdio/io.h>
 #include <hid/hid.h>
 #include <hid/usages.h>
 #include <zircon/device/console.h>
@@ -11,10 +12,10 @@
 #include <zircon/pixelformat.h>
 #include <zircon/syscalls.h>
 #include <zircon/types.h>
-#include <fdio/io.h>
 
-#include "topaz/runtime/web_view/schema_org_context.h"
 #include "lib/fsl/tasks/message_loop.h"
+#include "peridot/public/lib/context/fidl/value_type.fidl.h"
+#include "topaz/runtime/web_view/schema_org_context.h"
 
 using namespace WebCore;
 
@@ -297,14 +298,17 @@ void WebViewImpl::CallIdle() {
 
 void WebViewImpl::DidFinishLoad() {
   if (context_writer_) {
-    std::vector<maxwell::ContextValuePtr> context_values =
+    std::vector<std::string> context_values =
         ExtractSchemaOrgContext(web_view_);
     FXL_LOG(INFO) << "Extracted " << context_values.size() << " context values";
 
-    for (auto& value : context_values) {
-      context_writer_->AddValue(std::move(value), [](auto x) {
-        FXL_LOG(INFO) << "added a context value, got id: " << x;
-      });
+    // Remove any existing values.
+    context_values_.clear();
+    for (auto& content : context_values) {
+      maxwell::ContextValueWriterPtr value;
+      context_writer_->CreateValue(value.NewRequest(),
+                                   maxwell::ContextValueType::ENTITY);
+      value->Set(content, nullptr /* metadata */);
     }
   }
 }

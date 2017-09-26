@@ -4,8 +4,8 @@
 
 #include "topaz/runtime/web_view/schema_org_context.h"
 
-#include "peridot/lib/rapidjson/rapidjson.h"
 #include "lib/fxl/logging.h"
+#include "peridot/lib/rapidjson/rapidjson.h"
 
 #include "WebView.h"
 
@@ -46,9 +46,8 @@ constexpr char script[] = R"(
 
 }  // namespace
 
-std::vector<maxwell::ContextValuePtr> ExtractSchemaOrgContext(
-    WebView& web_view) {
-  std::vector<maxwell::ContextValuePtr> values;
+std::vector<std::string> ExtractSchemaOrgContext(WebView& web_view) {
+  std::vector<std::string> values;
 
   std::string json = web_view.stringByEvaluatingJavaScriptFromString(script);
   modular::JsonDoc parsed;
@@ -59,11 +58,7 @@ std::vector<maxwell::ContextValuePtr> ExtractSchemaOrgContext(
   }
 
   for (auto i = parsed.Begin(); i != parsed.End(); ++i) {
-    maxwell::ContextValuePtr value = maxwell::ContextValue::New();
-    value->type = maxwell::ContextValueType::ENTITY;
-    value->content = modular::JsonValueToPrettyString(*i);
-    value->meta = maxwell::ContextMetadata::New();
-    values.push_back(std::move(value));
+    values.push_back(modular::JsonValueToPrettyString(*i));
   }
 
   return values;
