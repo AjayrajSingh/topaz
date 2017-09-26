@@ -1,0 +1,15 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "imports": [
+        "topaz/packages/chat",
+        "topaz/packages/contacts",
+        "topaz/packages/music",
+        "topaz/packages/video"
+    ],
+    "packages": {
+        "modules_tests": "//topaz/tools:modules_tests",
+        "modules": "//topaz/tools:modules"
+    }
+}
