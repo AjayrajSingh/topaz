@@ -29,6 +29,8 @@ const char* kDartVMArgs[] = {
     "--precompilation",
 #else
     "--enable_mirrors=false",
+    "--await_is_keyword",
+    "--assert_initializer",
 #endif
     // clang-format on
 };
