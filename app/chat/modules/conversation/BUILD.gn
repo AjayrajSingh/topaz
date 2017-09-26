@@ -11,12 +11,12 @@ flutter_app("chat_conversation") {
   main_dart = "lib/main.dart"
 
   deps = [
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/story/fidl:fidl_dart",
     "//garnet/public/lib/app/dart",
     "//garnet/public/lib/fidl/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/intl",
     "//topaz/app/chat/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",

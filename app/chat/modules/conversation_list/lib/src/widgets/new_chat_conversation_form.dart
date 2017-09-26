@@ -20,14 +20,15 @@ class NewChatConversationForm extends StatefulWidget {
   final NewConversationFormSubmitCallback onFormSubmit;
 
   /// Constructor
-  const NewChatConversationForm({
+  NewChatConversationForm({
     Key key,
     @required this.onFormCancel,
     @required this.onFormSubmit,
   })
-      : assert(onFormCancel != null),
-        assert(onFormSubmit != null),
-        super(key: key);
+      : super(key: key) {
+    assert(this.onFormCancel != null);
+    assert(this.onFormSubmit != null);
+  }
 
   @override
   _NewChatConversationFormState createState() =>
@@ -35,7 +36,7 @@ class NewChatConversationForm extends StatefulWidget {
 }
 
 class _NewChatConversationFormState extends State<NewChatConversationForm> {
-  final List<String> _participants = <String>[];
+  final List<String> _participants = new List<String>();
   final TextEditingController _textController = new TextEditingController();
   final FocusNode _textFieldFocusNode = new FocusNode();
 

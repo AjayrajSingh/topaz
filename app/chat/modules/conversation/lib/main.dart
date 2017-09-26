@@ -17,8 +17,10 @@ void main() {
       new ModuleWidget<ChatConversationModuleModel>(
     applicationContext: new ApplicationContext.fromStartupInfo(),
     moduleModel: new ChatConversationModuleModel(),
-    child: const ChatConversationScreen(),
-  )..advertise();
+    child: new ChatConversationScreen(),
+  );
+
+  moduleWidget.advertise();
 
   runApp(moduleWidget);
 }

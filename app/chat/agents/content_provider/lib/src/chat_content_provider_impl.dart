@@ -7,12 +7,12 @@ import 'dart:convert' show UTF8;
 import 'dart:typed_data';
 import 'dart:zircon' show Vmo;
 
+import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart' show InterfaceRequest;
-import 'package:lib.ledger.fidl/ledger.fidl.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
+import 'package:lib.fidl.dart/bindings.dart' show InterfaceRequest;
+import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 
@@ -133,11 +133,12 @@ class ChatContentProviderImpl extends ChatContentProvider {
     this.deviceId,
     this.onMessageReceived,
   })
-      : assert(componentContext != null),
-        assert(chatMessageTransporter != null),
-        deviceIdBytes = deviceId != null
+      : deviceIdBytes = deviceId != null
             ? new Uint8List.fromList(UTF8.encode(deviceId))
             : new Uint8List(0) {
+    assert(componentContext != null);
+    assert(chatMessageTransporter != null);
+
     chatMessageTransporter.onReceived = _handleMessage;
   }
 
@@ -152,7 +153,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         _initializeLedger(),
         chatMessageTransporter.initialize(),
       ]);
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       log.severe('Failed to initialize', e, stackTrace);
       return;
     }
@@ -178,9 +179,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         );
       }
 
-      for (PageProxy page in _reservedPages.values) {
-        page?.ctrl?.close();
-      }
+      _reservedPages.values.forEach((PageProxy page) => page?.ctrl?.close());
       _reservedPages.clear();
 
       await Future.forEach(_kReservedPages, (_ReservedPage pageInfo) {
@@ -231,7 +230,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
       _ledgerReady.complete();
       log.fine('Ledger Initialized');
-    } on Exception catch (e) {
+    } catch (e) {
       _ledgerReady.completeError(e);
       log.fine('Failed to initialize Ledger');
       rethrow;
@@ -253,23 +252,17 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
   /// Close all the bindings.
   void close() {
-    for (PageProxy page in _reservedPages.values) {
-      page?.ctrl?.close();
-    }
-    for (PageProxy page in _pageProxies) {
-      page?.ctrl?.close();
-    }
-    for (PageSnapshotProxy snapshot in _snapshotProxies) {
-      snapshot?.ctrl?.close();
-    }
-    for (ChatContentProviderBinding binding in _bindings) {
-      binding.close();
-    }
+    _reservedPages.values.forEach((PageProxy page) => page?.ctrl?.close());
+    _pageProxies.forEach((PageProxy page) => page?.ctrl?.close());
+    _snapshotProxies
+        .forEach((PageSnapshotProxy snapshot) => snapshot?.ctrl?.close());
+    _bindings.forEach(
+      (ChatContentProviderBinding binding) => binding.close(),
+    );
 
     _conversationListWatcher.close();
-    for (ConversationWatcher watcher in _conversationWatchers.values) {
-      watcher.close();
-    }
+    _conversationWatchers.values
+        .forEach((ConversationWatcher watcher) => watcher.close());
   }
 
   @override
@@ -283,7 +276,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
     try {
       try {
         await _ledgerReady.future;
-      } on Exception {
+      } catch (e) {
         callback(ChatStatus.ledgerNotInitialized, null);
         return;
       }
@@ -349,7 +342,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         newConversationPage.ctrl.close();
         _pageProxies.remove(newConversationPage);
       }
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError, null);
     }
@@ -364,7 +357,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
     try {
       try {
         await _ledgerReady.future;
-      } on Exception {
+      } catch (e) {
         callback(ChatStatus.ledgerNotInitialized, null);
         return;
       }
@@ -375,11 +368,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
           wait: wait,
         );
         callback(ChatStatus.ok, conversation);
-      } on Exception {
+      } catch (e) {
         log.warning('Specified conversation is not found.');
         callback(ChatStatus.idNotFound, null);
       }
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError, null);
     }
@@ -393,7 +386,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
     try {
       try {
         await _ledgerReady.future;
-      } on Exception {
+      } catch (e) {
         callback(ChatStatus.ledgerNotInitialized, const <Conversation>[]);
         return;
       }
@@ -414,7 +407,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       List<Entry> entries;
       try {
         entries = await getFullEntries(_conversationListWatcher.pageSnapshot);
-      } on Exception catch (e, stackTrace) {
+      } catch (e, stackTrace) {
         log.severe('Failed to get entries', e, stackTrace);
         callback(ChatStatus.ledgerOperationError, const <Conversation>[]);
         return;
@@ -423,18 +416,18 @@ class ChatContentProviderImpl extends ChatContentProvider {
       try {
         List<Conversation> conversations = <Conversation>[];
 
-        for (Entry entry in entries) {
+        entries.forEach((Entry entry) {
           Conversation conversation = _createConversationFromLedgerEntry(entry);
           conversations.add(conversation);
           _conversationCache[entry.key] = conversation;
-        }
+        });
 
         callback(ChatStatus.ok, conversations);
-      } on Exception catch (e, stackTrace) {
+      } catch (e, stackTrace) {
         log.severe('Decoding error', e, stackTrace);
         callback(ChatStatus.decodingError, const <Conversation>[]);
       }
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError, const <Conversation>[]);
     }
@@ -449,7 +442,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
     try {
       try {
         await _ledgerReady.future;
-      } on Exception {
+      } catch (e) {
         callback(ChatStatus.ledgerNotInitialized, const <Message>[]);
         return;
       }
@@ -472,7 +465,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       List<Entry> entries;
       try {
         entries = await getFullEntries(watcher.pageSnapshot);
-      } on Exception catch (e, stackTrace) {
+      } catch (e, stackTrace) {
         log.severe('Failed to get entries', e, stackTrace);
         callback(ChatStatus.ledgerOperationError, const <Message>[]);
         return;
@@ -483,11 +476,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
             entries.map(_createMessageFromLedgerEntry).toList();
 
         callback(ChatStatus.ok, messages);
-      } on Exception catch (e, stackTrace) {
+      } catch (e, stackTrace) {
         log.severe('Decoding error', e, stackTrace);
         callback(ChatStatus.decodingError, const <Message>[]);
       }
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError, const <Message>[]);
     }
@@ -502,7 +495,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
     try {
       try {
         await _ledgerReady.future;
-      } on Exception {
+      } catch (e) {
         callback(ChatStatus.ledgerNotInitialized, null);
         return;
       }
@@ -534,11 +527,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
       try {
         Message message = _createMessageFromLedgerKeyValue(messageId, value);
         callback(ChatStatus.ok, message);
-      } on Exception catch (e, stackTrace) {
+      } catch (e, stackTrace) {
         log.severe('Decoding error', e, stackTrace);
         callback(ChatStatus.decodingError, null);
       }
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError, null);
     }
@@ -573,7 +566,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
     try {
       try {
         await _ledgerReady.future;
-      } on Exception {
+      } catch (e) {
         callback(ChatStatus.ledgerNotInitialized, const <int>[]);
         return;
       }
@@ -657,7 +650,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       }
 
       callback(ChatStatus.ok, messageId);
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError caused by', e, stackTrace);
       callback(ChatStatus.unknownError, const <int>[]);
     }
@@ -672,7 +665,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
     try {
       try {
         await _ledgerReady.future;
-      } on Exception {
+      } catch (e) {
         callback(ChatStatus.ledgerNotInitialized);
         return;
       }
@@ -715,7 +708,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       }
 
       callback(ChatStatus.ok);
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError caused by', e, stackTrace);
       callback(ChatStatus.unknownError);
     }
@@ -783,9 +776,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
     // If we don't have a conversation watcher for this conversation, create a
     // new one and put it in the cache.
     ConversationWatcher watcher = _conversationWatchers[conversationId];
-    if (watcher != null) {
-      return watcher;
-    }
+    if (watcher != null) return watcher;
 
     PageProxy conversationPage = new PageProxy();
     _pageProxies.add(conversationPage);
@@ -903,7 +894,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         conversationPage.ctrl.close();
         _pageProxies.remove(conversationPage);
       }
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       log.severe('Error while processing an incoming message', e, stackTrace);
     }
   }

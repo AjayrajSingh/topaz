@@ -8,17 +8,17 @@ import 'dart:convert' show JSON;
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:collection/collection.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:models/user.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
@@ -107,20 +107,12 @@ class ChatConversationListModuleModel extends ModuleModel {
     int minLength =
         math.min(c1.conversationId.length, c2.conversationId.length);
     for (int i = 0; i < minLength; ++i) {
-      if (c1.conversationId[i] < c2.conversationId[i]) {
-        return -1;
-      }
-      if (c1.conversationId[i] > c2.conversationId[i]) {
-        return 1;
-      }
+      if (c1.conversationId[i] < c2.conversationId[i]) return -1;
+      if (c1.conversationId[i] > c2.conversationId[i]) return 1;
     }
 
-    if (c2.conversationId.length > minLength) {
-      return -1;
-    }
-    if (c1.conversationId.length < minLength) {
-      return 1;
-    }
+    if (c2.conversationId.length > minLength) return -1;
+    if (c1.conversationId.length < minLength) return 1;
     return 0;
   }
 
@@ -171,7 +163,7 @@ class ChatConversationListModuleModel extends ModuleModel {
       _messageQueue.ctrl.request(),
     );
     // Save the message queue token for later use.
-    _messageQueue.getToken(_mqTokenCompleter.complete);
+    _messageQueue.getToken((String token) => _mqTokenCompleter.complete(token));
     _messageQueueReceiver = new MessageReceiverImpl(
       messageQueue: _messageQueue,
       onReceiveMessage: _handleConversationListEvent,
@@ -318,7 +310,7 @@ class ChatConversationListModuleModel extends ModuleModel {
           log.severe('Not a valid conversation list event: $event');
           break;
       }
-    } on Exception catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       log.severe('Decoding error while processing the message', e, stackTrace);
     }
   }

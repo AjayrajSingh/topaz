@@ -12,7 +12,7 @@ import 'conversation_list_module_model.dart';
 /// Top-level widget for the chat_conversation_list module.
 class ChatConversationListScreen extends StatefulWidget {
   /// Creates a new instance of [ChatConversationListScreen].
-  const ChatConversationListScreen({Key key}) : super(key: key);
+  ChatConversationListScreen({Key key}) : super(key: key);
 
   @override
   _ChatConversationListScreenState createState() =>

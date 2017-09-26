@@ -33,15 +33,16 @@ class ChatGroupAvatar extends StatelessWidget {
     this.size: 40.0,
     bool selected,
   })
-      : assert(users != null),
-        assert(users.isNotEmpty),
-        selected = selected ?? false,
-        super(key: key);
+      : selected = selected ?? false,
+        super(key: key) {
+    assert(users != null);
+    assert(users.isNotEmpty);
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (users.isEmpty) {
-      return const Offstage();
+    if (users.length <= 0) {
+      return new Offstage();
     } else if (users.length == 1) {
       return new Alphatar.fromNameAndUrl(
         name: users[0].name,

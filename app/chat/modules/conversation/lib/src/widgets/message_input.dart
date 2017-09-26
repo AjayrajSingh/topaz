@@ -18,14 +18,15 @@ class MessageInput extends StatefulWidget {
   final VoidCallback onTapSharePhoto;
 
   /// Constructor
-  const MessageInput({
+  MessageInput({
     Key key,
     this.enabled: true,
     this.onSubmitMessage,
     this.onTapSharePhoto,
   })
-      : assert(enabled != null),
-        super(key: key);
+      : super(key: key) {
+    assert(this.enabled != null);
+  }
 
   @override
   _MessageInputState createState() => new _MessageInputState();

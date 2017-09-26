@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: implementation_imports
-
 import 'dart:async';
 
 import 'package:meta/meta.dart';
@@ -29,7 +27,7 @@ class MockChatMessageTransporter extends ChatMessageTransporter {
     Conversation conversation,
     Message message,
   ) async {
-    if (onReceived != null) {
+    if (this.onReceived != null) {
       await onReceived(conversation, message);
     }
   }

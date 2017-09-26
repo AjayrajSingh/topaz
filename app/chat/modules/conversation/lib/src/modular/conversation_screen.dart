@@ -11,7 +11,7 @@ import 'conversation_module_model.dart';
 /// Top-level widget for the chat_conversation module.
 class ChatConversationScreen extends StatelessWidget {
   /// Creates a new instance of [ChatConversationScreen].
-  const ChatConversationScreen({Key key}) : super(key: key);
+  ChatConversationScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

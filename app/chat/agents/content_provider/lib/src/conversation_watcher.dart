@@ -4,8 +4,8 @@
 
 import 'dart:convert' show JSON;
 
-import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
+import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:meta/meta.dart';
 
 import 'base_page_watcher.dart';
@@ -22,9 +22,10 @@ class ConversationWatcher extends BasePageWatcher {
     @required PageSnapshotProxy initialSnapshot,
     @required this.conversationId,
   })
-      : assert(initialSnapshot != null),
-        assert(conversationId != null),
-        super(initialSnapshot: initialSnapshot);
+      : super(initialSnapshot: initialSnapshot) {
+    assert(initialSnapshot != null);
+    assert(this.conversationId != null);
+  }
 
   @override
   void onPageChange(
