@@ -28,11 +28,11 @@ enum SelectionType {
 /// Determines what the suggestion looks like with respect to
 /// the image.
 enum ImageType {
-  /// A [circular] image is expected to be clipped as a circle.
-  circular,
+  /// An image of a person that is expected to be clipped as a circle.
+  person,
 
-  /// A [rectangular] image is not clipped.
-  rectangular
+  /// A non-person image
+  other,
 }
 
 /// Determines what the suggestion looks like with respect to
@@ -74,11 +74,11 @@ class Suggestion {
   /// The main image of the suggestion.
   final String imageUrl;
 
+  /// List of icons URLs
+  final List<String> iconUrls;
+
   /// The type of image.
   final ImageType imageType;
-
-  /// The side the image should appear on.
-  final ImageSide imageSide;
 
   SuggestionLayout _suggestionLayout;
 
@@ -94,7 +94,7 @@ class Suggestion {
     this.selectionStoryId,
     this.imageUrl,
     this.imageType,
-    this.imageSide: ImageSide.right,
+    this.iconUrls,
   }) {
     _suggestionLayout = new SuggestionLayout(suggestion: this);
     _suggestionKey = new GlobalObjectKey(this);

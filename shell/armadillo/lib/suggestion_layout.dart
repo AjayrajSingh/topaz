@@ -200,6 +200,11 @@ class SuggestionLayout {
     }
   }
 
+  ImageSide get _imageSide =>
+      _suggestion.imageUrl != null && _suggestion.imageType == ImageType.person
+          ? ImageSide.left
+          : ImageSide.right;
+
   /// The height the suggestion should be for the last [layout] call.
   double get suggestionHeight => _suggestionHeight;
 
@@ -211,19 +216,21 @@ class SuggestionLayout {
 
   /// Returns true if the image should be circular.
   bool get isCircularSuggestionImage =>
-      _suggestion.imageType == ImageType.circular;
+      (_suggestion.imageUrl != null &&
+          _suggestion.imageType == ImageType.person) ||
+      (_suggestion.imageUrl == null && _suggestion.iconUrls.isNotEmpty);
 
   /// Returns the left text padding.
   double get leftTextPadding =>
-      _suggestion.imageSide == ImageSide.left && isCircularSuggestionImage
+      _imageSide == ImageSide.left && isCircularSuggestionImage
           ? 0.0
           : _kHorizontalMargin;
 
   /// Returns the right text padding.
-  double get rightTextPadding => _suggestion.imageSide == ImageSide.right &&
-          isCircularSuggestionImage
-      ? 0.0
-      : _suggestion.imageSide == ImageSide.right && !isCircularSuggestionImage
-          ? 16.0
-          : _kHorizontalMargin;
+  double get rightTextPadding =>
+      _imageSide == ImageSide.right && isCircularSuggestionImage
+          ? 0.0
+          : _imageSide == ImageSide.right && !isCircularSuggestionImage
+              ? 16.0
+              : _kHorizontalMargin;
 }

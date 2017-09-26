@@ -2,12 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart'
-    as maxwell;
-import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart'
-    as maxwell;
-import 'package:lib.suggestion.fidl/user_input.fidl.dart'
-    as maxwell;
+import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart' as maxwell;
+import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
+import 'package:lib.suggestion.fidl/user_input.fidl.dart' as maxwell;
 import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:armadillo/interruption_overlay.dart';
 import 'package:armadillo/story.dart';
@@ -24,12 +21,6 @@ import 'package:meta/meta.dart';
 import 'hit_test_model.dart';
 
 const int _kMaxSuggestions = 100;
-
-final Map<maxwell.SuggestionImageType, ImageType> _kImageTypeMap =
-    <maxwell.SuggestionImageType, ImageType>{
-  maxwell.SuggestionImageType.person: ImageType.circular,
-  maxwell.SuggestionImageType.other: ImageType.rectangular,
-};
 
 /// Listens to a maxwell suggestion list.  As suggestions change it
 /// notifies its [suggestionListener].
@@ -147,31 +138,18 @@ class _InterruptionListener extends maxwell.SuggestionListener {
 }
 
 Suggestion _convert(maxwell.Suggestion suggestion) {
-  bool hasImage = suggestion.display.imageUrl?.isNotEmpty ?? false;
-  bool hasIcon = suggestion.display.iconUrls?.isNotEmpty ?? false
-      ? suggestion.display.iconUrls[0]?.isNotEmpty ?? false
-      : false;
-  ImageType imageType = (hasImage &&
-              suggestion.display.imageType ==
-                  maxwell.SuggestionImageType.person) ||
-          (!hasImage && hasIcon)
-      ? ImageType.circular
-      : ImageType.rectangular;
-  String imageUrl = hasImage
-      ? suggestion.display.imageUrl
-      : hasIcon ? suggestion.display.iconUrls[0] : null;
   return new Suggestion(
     id: new SuggestionId(suggestion.uuid),
     title: suggestion.display.headline,
     description: suggestion.display.subheadline,
     themeColor: new Color(suggestion.display.color),
     selectionType: SelectionType.launchStory,
-    imageUrl: imageUrl,
-    imageType: imageType,
-    imageSide: hasImage &&
-            suggestion.display.imageType == maxwell.SuggestionImageType.person
-        ? ImageSide.left
-        : ImageSide.right,
+    imageUrl: suggestion.display.imageUrl,
+    imageType:
+        suggestion.display.imageType == maxwell.SuggestionImageType.person
+            ? ImageType.person
+            : ImageType.other,
+    iconUrls: suggestion.display.iconUrls,
   );
 }
 

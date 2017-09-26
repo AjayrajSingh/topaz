@@ -59,6 +59,20 @@ class SuggestionWidget extends StatelessWidget {
   })
       : super(key: key);
 
+  bool get _hasImage =>
+      (suggestion.imageUrl != null && suggestion.imageUrl.isNotEmpty) ||
+      suggestion.iconUrls.isNotEmpty;
+
+  bool get _isCircular =>
+      (suggestion.imageUrl != null &&
+          suggestion.imageType == ImageType.person) ||
+      (suggestion.imageUrl == null && suggestion.iconUrls.isNotEmpty);
+
+  ImageSide get _imageSide =>
+      suggestion.imageUrl != null && suggestion.imageType == ImageType.person
+          ? ImageSide.left
+          : ImageSide.right;
+
   @override
   Widget build(BuildContext context) => new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints boxConstraints) {
@@ -75,7 +89,7 @@ class SuggestionWidget extends StatelessWidget {
             suggestion.suggestionLayout.suggestionText,
           );
 
-          List<Widget> rowChildren = suggestion.imageSide == ImageSide.left
+          List<Widget> rowChildren = _imageSide == ImageSide.left
               ? <Widget>[image, textAndIcons]
               : <Widget>[textAndIcons, image];
 
@@ -116,23 +130,28 @@ class SuggestionWidget extends StatelessWidget {
       );
 
   Widget _buildImage(BuildContext context, double suggestionHeight) {
-    if (suggestion.imageUrl == null) {
+    if (!_hasImage) {
       return new Container(width: 0.0);
     } else {
-      Widget image = suggestion.imageUrl.startsWith('http')
+      String imageUrl =
+          suggestion.imageUrl != null && suggestion.imageUrl.isNotEmpty
+              ? suggestion.imageUrl
+              : suggestion.iconUrls[0];
+      Widget image = imageUrl.startsWith('http')
           ? new Image.network(
-              suggestion.imageUrl,
+              imageUrl,
               fit: BoxFit.cover,
               alignment: FractionalOffset.center,
             )
           : new Image.file(
-              new File(suggestion.imageUrl),
+              new File(imageUrl),
               fit: BoxFit.cover,
               alignment: FractionalOffset.center,
             );
+
       return new Container(
         width: kSuggestionImageWidth,
-        child: suggestion.imageType == ImageType.circular
+        child: _isCircular
             ? new Padding(
                 padding: new EdgeInsets.symmetric(
                   vertical: (suggestionHeight - _kPersonImageDiameter) / 2.0,
@@ -142,7 +161,7 @@ class SuggestionWidget extends StatelessWidget {
                 child: new SizedBox(
                   width: _kPersonImageDiameter,
                   height: _kPersonImageDiameter,
-                  child: suggestion.imageSide == ImageSide.left
+                  child: _imageSide == ImageSide.left
                       ? new ClipOval(
                           child: image,
                         )
