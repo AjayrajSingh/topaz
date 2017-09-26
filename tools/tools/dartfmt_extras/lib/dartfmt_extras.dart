@@ -48,10 +48,10 @@ Future<bool> processDoubleQuotes(
 /// Report double quote issues.
 void reportDoubleQuotes(
     SourceFile src, List<SingleStringLiteral> invalidNodes) {
-  for (SingleStringLiteral node in invalidNodes) {
+  invalidNodes.forEach((SingleStringLiteral node) {
     print('${src.url}:${src.getLine(node.offset)}: '
         'Prefer single quotes over double quotes: $node');
-  }
+  });
 }
 
 /// Fix double quote issues.
@@ -64,7 +64,7 @@ Future<Null> fixDoubleQuotes(
   String code = src.getText(0);
 
   // Replace the double quotes into single quotes.
-  for (SingleStringLiteral node in invalidNodes) {
+  invalidNodes.forEach((SingleStringLiteral node) {
     int openingOffset = node.offset + (node.isRaw ? 1 : 0);
     code = code.replaceRange(
       openingOffset,
@@ -81,7 +81,7 @@ Future<Null> fixDoubleQuotes(
       closingOffset + (node.isMultiline ? 3 : 1),
       node.isMultiline ? "'''" : "'",
     );
-  }
+  });
 
   // Overwrite the source file.
   await file.writeAsString(code);

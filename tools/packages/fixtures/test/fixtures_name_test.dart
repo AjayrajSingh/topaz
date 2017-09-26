@@ -47,20 +47,11 @@ void main() {
       Fixtures fixtures = new Fixtures(nameThreshold: 1);
       String name = fixtures.name();
 
-      expect(
-        () => fixtures.name(),
-        throwsA(const isInstanceOf<FixturesError>()),
-      );
-      expect(
-        () => fixtures.name(),
-        throwsA(const isInstanceOf<FixturesError>()),
-        reason: 'should fail on subsequent calls',
-      );
-      expect(
-        fixtures.name(name),
-        name,
-        reason: 'allows generating a previously defined name',
-      );
+      expect(() => fixtures.name(), throwsA(new isInstanceOf<FixturesError>()));
+      expect(() => fixtures.name(), throwsA(new isInstanceOf<FixturesError>()),
+          reason: 'should fail on subsequent calls');
+      expect(fixtures.name(name), name,
+          reason: 'allows generating a previously defined name');
     });
   });
 }

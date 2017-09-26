@@ -4,7 +4,7 @@
 
 /// Parses a value to an integer
 /// Handles cases when the value is already an integer
-int parseInt(Object value, {int onError(String source)}) {
+int parseInt(dynamic value, {int onError(String source)}) {
   if (value is int) {
     return value;
   } else {

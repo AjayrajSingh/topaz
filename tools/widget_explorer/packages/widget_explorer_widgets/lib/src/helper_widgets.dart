@@ -68,7 +68,7 @@ class WidgetExplorerWrapper extends StatefulWidget {
   final GeneratedStateBuilder stateBuilder;
 
   /// Creates a new instance of [WidgetExplorerWrapper].
-  const WidgetExplorerWrapper({
+  WidgetExplorerWrapper({
     Key key,
     @required this.config,
     @required this.width,
@@ -100,8 +100,9 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
         fn?.call();
         _updateKey();
       });
-    })
-      ..initState(widget.config);
+    });
+
+    genState.initState(widget.config);
   }
 
   @override
@@ -114,7 +115,7 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
         widget.width,
         widget.height,
       );
-    } on Exception catch (e) {
+    } catch (e) {
       targetWidget = new Text('Failed to build the widget.\n'
           'See the error message below:\n\n'
           '$e');
@@ -126,7 +127,7 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
           decoration: new BoxDecoration(
             border: new Border.all(color: Colors.grey[500]),
             borderRadius:
-                const BorderRadius.all(const Radius.circular(_kBoxRadius)),
+                new BorderRadius.all(new Radius.circular(_kBoxRadius)),
           ),
           margin: const EdgeInsets.all(_kMargin),
           child: new Container(
@@ -158,7 +159,7 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
           decoration: new BoxDecoration(
             border: new Border.all(color: Colors.grey[500]),
             borderRadius:
-                const BorderRadius.all(const Radius.circular(_kBoxRadius)),
+                new BorderRadius.all(new Radius.circular(_kBoxRadius)),
           ),
           margin: const EdgeInsets.all(_kMargin),
           child: new Container(
@@ -186,7 +187,7 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
 
 /// Wrapper widget which gives some top margin to a given child.
 class _TopMargined extends StatelessWidget {
-  const _TopMargined({
+  _TopMargined({
     Key key,
     @required this.child,
   })
@@ -240,7 +241,7 @@ class RegenerateButton extends StatelessWidget {
   final String codeToDisplay;
 
   /// Creates a new instance of [RegenerateButton].
-  const RegenerateButton({
+  RegenerateButton({
     Key key,
     @required this.onPressed,
     this.codeToDisplay,
@@ -269,7 +270,7 @@ class InfoText extends StatelessWidget {
   final String text;
 
   /// Creates a new instance of [InfoText].
-  const InfoText(this.text, {Key key}) : super(key: key);
+  InfoText(this.text, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => new Text(
@@ -288,13 +289,14 @@ class ConfigKeyText extends StatelessWidget {
   final String configValue;
 
   /// Creates a new instance of [ConfigKeyText].
-  const ConfigKeyText({
+  ConfigKeyText({
     Key key,
     @required this.configKey,
     @required this.configValue,
   })
-      : assert(configKey != null),
-        super(key: key);
+      : super(key: key) {
+    assert(configKey != null);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +328,7 @@ class TextFieldWithInitialValue extends StatefulWidget {
   final ValueChanged<String> onSubmitted;
 
   /// Creates a new instance of [TextFieldWithInitialValue].
-  const TextFieldWithInitialValue({
+  TextFieldWithInitialValue({
     Key key,
     this.initialValue,
     this.keyboardType,

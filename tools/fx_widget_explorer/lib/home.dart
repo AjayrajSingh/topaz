@@ -12,7 +12,7 @@ import 'src/generated/index.dart';
 /// This [Widget] displays the homepage of the gallery.
 class Home extends StatefulWidget {
   /// Creates an instance of [Home].
-  const Home({
+  Home({
     Key key,
     bool showPerformanceOverlay,
     this.onShowPerformanceOverlayChanged,
@@ -37,7 +37,7 @@ class _HomeState extends State<Home> {
     App app = context.ancestorWidgetOfExactType(App);
 
     return new Scaffold(
-      appBar: new AppBar(title: const Text('FX Live Widget Gallery')),
+      appBar: new AppBar(title: new Text('FX Live Widget Gallery')),
       body: new WidgetExplorer(
         config: app?.config?.toJSON(),
         widgetSpecs: kWidgetSpecs,

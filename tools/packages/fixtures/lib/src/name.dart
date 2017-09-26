@@ -6,25 +6,29 @@ import 'dart:math';
 
 import 'names.dart';
 
-final Random _rng = new Random();
-
 /// Used by Fixtures for generating names.
 ///
-/// A [String] name can be randomly generated with calls to [generateName].
-///
-///     String name = generateName();
+/// A [String] name can be randomly generated with calls to [generate].
 ///
 /// When a name is 'generated' it is derived from a random first name
 /// [kFirstNames], and random last name [kSurnames].
-String generateName() {
-  String first;
-  int firstIndex;
+class Name {
+  static final Random _rng = new Random();
 
-  firstIndex = _rng.nextInt(kFirstNames.length);
-  first = kFirstNames[firstIndex];
+  /// Generate a random String name.
+  ///
+  ///     String name = Name.generate();
+  ///
+  static String generate() {
+    String first;
+    int firstIndex;
 
-  int lastIndex = _rng.nextInt(kSurnames.length);
-  String last = kSurnames[lastIndex];
+    firstIndex = _rng.nextInt(kFirstNames.length);
+    first = kFirstNames[firstIndex];
 
-  return '$first $last';
+    int lastIndex = _rng.nextInt(kSurnames.length);
+    String last = kSurnames[lastIndex];
+
+    return '$first $last';
+  }
 }

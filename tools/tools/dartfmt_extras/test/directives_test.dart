@@ -29,7 +29,7 @@ void main() {
     await beforeFile.copy(targetPath);
 
     File targetFile = new File(targetPath);
-    SourceFile src = new SourceFile.fromString(await targetFile.readAsString());
+    SourceFile src = new SourceFile(await targetFile.readAsString());
     CompilationUnit cu = parseCompilationUnit(src.getText(0));
 
     // Run the process function and compare the results.

@@ -28,22 +28,19 @@ class Config {
 
     try {
       data = await file.readAsString();
-    } on Exception {
+    } catch (err) {
       String message = 'unable to read file "$src"';
       throw new StateError(message);
     }
 
     try {
       json = JSON.decode(data);
-    } on Exception {
+    } catch (err) {
       String message = 'unable to decode JSON \n$data';
       throw new StateError(message);
     }
 
-    for (String key in json.keys) {
-      String value = json[key];
-      put(key, value);
-    }
+    json.forEach((String key, String value) => this.put(key, value));
   }
 
   /// Check is the configuration has a value for [key].
@@ -70,12 +67,12 @@ class Config {
       '',
     ];
 
-    for (String key in keys) {
+    keys.forEach((String key) {
       if (!has(key) || get(key) == null) {
         isValid = false;
         message.add('* $key');
       }
-    }
+    });
 
     message.add('');
 

@@ -12,7 +12,7 @@ import 'home.dart';
 /// The top-level widget for the gallery.
 class App extends StatefulWidget {
   /// Creates an App.
-  const App({Key key, this.config}) : super(key: key);
+  App({Key key, this.config}) : super(key: key);
 
   /// Config object to be used throughout the gallery app.
   final Config config;

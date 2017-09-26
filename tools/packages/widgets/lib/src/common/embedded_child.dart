@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 /// A widget build function that returns a child of the specific type.
-typedef EmbeddedChild EmbeddedChildBuilder(Object args);
+typedef EmbeddedChild EmbeddedChildBuilder(dynamic args);
 
 /// Dispose method for an embedded child view.
 typedef void EmbeddedChildDisposer();
@@ -19,7 +19,7 @@ typedef void EmbeddedChildAdder(EmbeddedChild child);
 /// to childAdder.
 typedef void GeneralEmbeddedChildBuilder({
   String contract,
-  Object initialData,
+  dynamic initialData,
   EmbeddedChildAdder childAdder,
 });
 
@@ -75,9 +75,10 @@ class EmbeddedChild {
     EmbeddedChildDisposer disposer,
     this.additionalData,
   })
-      : assert(widgetBuilder != null),
-        _widgetBuilder = widgetBuilder,
-        _disposer = disposer;
+      : _widgetBuilder = widgetBuilder,
+        _disposer = disposer {
+    assert(widgetBuilder != null);
+  }
 
   /// [WidgetBuilder] which the embedding module should use to create the actual
   /// widget.
@@ -133,7 +134,7 @@ class EmbeddedChildProvider {
   /// the child is no longer in use.
   EmbeddedChild buildEmbeddedChild(
     String type,
-    Object args,
+    dynamic args,
   ) {
     assert(type != null);
 
@@ -148,7 +149,7 @@ class EmbeddedChildProvider {
   /// Sets the [GeneralEmbeddedChildBuilder].
   ///
   /// [builder] will be called by [buildGeneralEmbeddedChild].
-  set generalBuilder(GeneralEmbeddedChildBuilder builder) {
+  void setGeneralEmbeddedChildBuilder(GeneralEmbeddedChildBuilder builder) {
     _generalBuilder = builder;
   }
 
@@ -158,7 +159,7 @@ class EmbeddedChildProvider {
   /// the child is no longer in use.
   void buildGeneralEmbeddedChild({
     String contract,
-    Object initialData,
+    dynamic initialData,
     EmbeddedChildAdder childAdder,
   }) {
     _generalBuilder(
