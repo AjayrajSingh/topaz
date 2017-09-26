@@ -104,7 +104,7 @@ endif
 # its dependencies.
 MINIMAL ?=
 ifeq ($(MINIMAL),1)
-	FSET_FLAGS += --modules packages/gn/modules
+	FSET_FLAGS += --modules topaz/packages/modules
 endif
 
 # Respect the fuchsia build variant if already set by fset command externally.
