@@ -1,0 +1,10 @@
+{
+    "imports": [
+        "topaz/packages/dashboard",
+        "topaz/packages/latin-ime",
+        "topaz/packages/modules",
+        "topaz/packages/mondrian",
+        "topaz/packages/moterm",
+        "topaz/packages/sysui"
+    ]
+}
