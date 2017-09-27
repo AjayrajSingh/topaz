@@ -3,8 +3,8 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_package.gni")
-import("//garnet/public/dart-pkg/fuchsia/sdk_ext.gni")
-import("//garnet/public/dart-pkg/zircon/sdk_ext.gni")
+import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
+import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
 
 declare_args() {
   # Controls whether dart_app() targets generate JIT or AOT Dart snapshots.

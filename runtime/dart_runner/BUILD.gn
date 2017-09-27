@@ -47,11 +47,11 @@ template("runner") {
 
     deps = [
              "//garnet/public/lib/app/cpp",
-             "//garnet/public/lib/svc/cpp",
-             "//garnet/public/dart-pkg/fuchsia",
-             "//garnet/public/lib/fxl",
              "//garnet/public/lib/fsl",
+             "//garnet/public/lib/fxl",
+             "//garnet/public/lib/svc/cpp",
              "//topaz/lib/tonic",
+             "//topaz/public/dart-pkg/fuchsia",
            ] + dart_deps + extra_deps
   }
 }

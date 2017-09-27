@@ -10,9 +10,9 @@ dart_jit_app("hello_app_dart") {
   source_dir = "."
 
   deps = [
-    "//garnet/public/lib/app/dart",
+    "//topaz/public/lib/app/dart",
     "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces_dart",
-    "//garnet/public/lib/fidl/dart",
+    "//topaz/public/lib/fidl/dart",
   ]
 }
 
@@ -22,8 +22,8 @@ dart_aot_app("hello_app_dart_aot") {
   source_dir = "."
 
   deps = [
-    "//garnet/public/lib/app/dart",
+    "//topaz/public/lib/app/dart",
     "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces_dart",
-    "//garnet/public/lib/fidl/dart",
+    "//topaz/public/lib/fidl/dart",
   ]
 }

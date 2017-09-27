@@ -9,7 +9,7 @@ dart_jit_app("goodbye_dart") {
 
   source_dir = "."
   deps = [
-    "//garnet/public/lib/fidl/dart",
+    "//topaz/public/lib/fidl/dart",
   ]
 }
 
@@ -18,6 +18,6 @@ dart_aot_app("goodbye_dart_aot") {
 
   source_dir = "."
   deps = [
-    "//garnet/public/lib/fidl/dart",
+    "//topaz/public/lib/fidl/dart",
   ]
 }

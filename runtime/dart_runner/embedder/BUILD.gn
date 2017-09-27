@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//garnet/public/dart-pkg/fuchsia/sdk_ext.gni")
-import("//garnet/public/dart-pkg/zircon/sdk_ext.gni")
+import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
+import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
 
 action("generate_snapshot_bin") {
   if (is_debug) {
