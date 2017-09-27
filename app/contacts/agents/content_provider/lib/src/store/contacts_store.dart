@@ -58,9 +58,7 @@ class ContactsStore<T> {
     // Add all searchable values to the prefix tree
     for (String value in searchableValues) {
       _prefixTree[value] ??= new Set<T>();
-
-      // TODO(meiyili): remove null check after prefix tree is implemented
-      _prefixTree[value]?.add(contact);
+      _prefixTree[value].add(contact);
     }
   }
 

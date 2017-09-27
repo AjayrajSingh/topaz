@@ -182,7 +182,38 @@ void main() {
     });
 
     group('search', () {
-      // TODO(meiyili) SO-712
+      test('should return contacts with displayName and email matching prefix',
+          () {
+        List<_MockContact> contacts = _createContactList();
+        ContactsStore<_MockContact> store = new ContactsStore<_MockContact>();
+        for (_MockContact c in contacts) {
+          List<String> searchableValues = <String>[c.displayName, c.email];
+          store.addContact(c.id, c.displayName, searchableValues, c);
+        }
+
+        Map<String, Set<_MockContact>> result = store.search('la');
+        expect(result, hasLength(3));
+        expect(result, contains('latte lover'));
+        expect(result, contains('largest_rodent@example.com'));
+        expect(result, contains('lady_of_the_sea@example.com'));
+      });
+
+      test('should return all searchable values if prefix is an empty string',
+          () {
+        List<_MockContact> contacts = _createContactList();
+        ContactsStore<_MockContact> store = new ContactsStore<_MockContact>();
+        for (_MockContact c in contacts) {
+          List<String> searchableValues = <String>[c.displayName, c.email];
+          store.addContact(c.id, c.displayName, searchableValues, c);
+        }
+
+        Map<String, Set<_MockContact>> result = store.search('');
+        expect(result, hasLength(10));
+        for (_MockContact c in contacts) {
+          expect(result, contains(c.displayName));
+          expect(result, contains(c.email));
+        }
+      });
     });
   });
 }
@@ -206,9 +237,13 @@ List<_MockContact> _createContactList() {
     ),
     new _MockContact(
       id: 'contact4',
-      displayName: 'Dugong',
+      displayName: 'Dewey',
       email: 'lady_of_the_sea@example.com',
     ),
+    new _MockContact(
+        id: 'contact5',
+        displayName: 'latte lover',
+        email: 'LatteLover99@example.com')
   ];
 }
 

@@ -19,7 +19,7 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
     List<Contact> stubList = <Contact>[
       _createStubContact('Arnold', 'Armadillo'),
       _createStubContact('Christina', 'Capybara'),
-      _createStubContact('Daniel', 'Dugong'),
+      _createStubContact('Daniel', 'Dewey'),
     ];
 
     callback(Status.ok, stubList);
