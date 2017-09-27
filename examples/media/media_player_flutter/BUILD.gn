@@ -1,0 +1,40 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//flutter/build/flutter_app.gni")
+import("//packages/package.gni")
+
+flutter_app("media_player_flutter") {
+  main_dart = "lib/main.dart"
+
+  deps = [
+    "//garnet/public/lib/app/dart",
+    "//garnet/public/lib/media/flutter",
+    "//peridot/public/lib/lifecycle/fidl:fidl_dart",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//garnet/public/lib/ui/flutter",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
+    "//garnet/public/lib/fidl/dart",
+    "//lib/flutter/packages/flutter",
+  ]
+
+  analysis_options = "//topaz/tools/analysis_options.yaml"
+}
+
+package("package") {
+  package_name = "media_player_flutter"
+  app = true
+
+  deps = [ ":media_player_flutter" ]
+
+  binaries = [ {
+        name = "media_player_flutter"
+        source = "gen/topaz/examples/media/media_player_flutter/media_player_flutter.flx"
+      } ]
+  resources = [ {
+        path = rebase_path("media_player_flutter.config")
+        dest = "media_player_flutter/media_player_flutter.config"
+      } ]
+}
