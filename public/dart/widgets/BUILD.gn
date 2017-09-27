@@ -11,14 +11,14 @@ dart_package("lib.widgets") {
   analysis_options = "analysis_options.yaml"
 
   deps = [
-    "//garnet/public/lib/app/dart",
+    "//topaz/public/lib/app/dart",
     "//peridot/public/lib/device/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//topaz/tools/packages/widgets_meta",
-    "//garnet/public/lib/ui/flutter",
+    "//topaz/public/lib/ui/flutter",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//garnet/public/lib/fidl/dart",
+    "//topaz/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//lib/flutter/packages/flutter_test",
     "//topaz/lib/widgets/packages/modular:lib.modular",
