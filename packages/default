@@ -1,6 +1,7 @@
 {
     "imports": [
         "topaz/packages/dashboard",
+        "topaz/packages/examples",
         "topaz/packages/latin-ime",
         "topaz/packages/modules",
         "topaz/packages/mondrian",

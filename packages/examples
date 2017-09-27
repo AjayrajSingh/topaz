@@ -1,0 +1,12 @@
+{
+    "languages": [
+        "cpp",
+        "dart"
+    ],
+    "packages": {
+        "basic_wm": "//topaz/examples/ui/basic_wm:package",
+        "bluetooth_examples": "//topaz/examples/bluetooth:bluetooth_examples",
+        "hello_material": "//topaz/examples/ui/hello_material:package",
+        "media_player_flutter": "//topaz/examples/media/media_player_flutter:package"
+    }
+}
