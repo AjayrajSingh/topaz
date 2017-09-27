@@ -38,38 +38,62 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
     ],
   ],
   const <List<String>>[
+    const <String>['topaz-x86_64-linux-debug', 'x86_64-linux-debug', 'topaz'],
+    const <String>['topaz-aarch64-linux-debug', 'aarch64-linux-debug', 'topaz'],
     const <String>[
-      'drivers-x86_64-linux-debug',
-      'x86_64-linux-debug',
-      'drivers'
-    ],
-    const <String>[
-      'drivers-aarch64-linux-debug',
-      'aarch64-linux-debug',
-      'drivers'
-    ],
-    const <String>[
-      'drivers-x86_64-linux-release',
+      'topaz-x86_64-linux-release',
       'x86_64-linux-release',
-      'drivers'
+      'topaz'
     ],
     const <String>[
-      'drivers-aarch64-linux-release',
+      'topaz-aarch64-linux-release',
       'aarch64-linux-release',
-      'drivers'
+      'topaz'
     ],
   ],
   const <List<String>>[
     const <String>[
-      'zircon-qemu-arm64-gcc',
-      'zircon-qemu-arm64-gcc',
-      'zircon'
+      'peridot-x86_64-linux-debug',
+      'x86_64-linux-debug',
+      'peridot'
     ],
     const <String>[
-      'zircon-pc-x86-64-gcc',
-      'zircon-pc-x86-64-gcc',
-      'zircon'
+      'peridot-aarch64-linux-debug',
+      'aarch64-linux-debug',
+      'peridot'
     ],
+    const <String>[
+      'peridot-x86_64-linux-release',
+      'x86_64-linux-release',
+      'peridot'
+    ],
+    const <String>[
+      'peridot-aarch64-linux-release',
+      'aarch64-linux-release',
+      'peridot'
+    ],
+  ],
+  const <List<String>>[
+    const <String>['garnet-x86_64-linux-debug', 'x86_64-linux-debug', 'garnet'],
+    const <String>[
+      'garnet-aarch64-linux-debug',
+      'aarch64-linux-debug',
+      'garnet'
+    ],
+    const <String>[
+      'garnet-x86_64-linux-release',
+      'x86_64-linux-release',
+      'garnet'
+    ],
+    const <String>[
+      'garnet-aarch64-linux-release',
+      'aarch64-linux-release',
+      'garnet'
+    ],
+  ],
+  const <List<String>>[
+    const <String>['zircon-qemu-arm64-gcc', 'zircon-qemu-arm64-gcc', 'zircon'],
+    const <String>['zircon-pc-x86-64-gcc', 'zircon-pc-x86-64-gcc', 'zircon'],
     const <String>[
       'zircon-qemu-arm64-clang',
       'zircon-qemu-arm64-clang',
