@@ -8,10 +8,10 @@ dart_app("hard_kb_ime") {
   main_dart = "main.dart"
 
   deps = [
-    "//garnet/public/lib/app/dart",
+    "//topaz/public/lib/app/dart",
     "//garnet/public/lib/ui/input/fidl:fidl_dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//garnet/public/lib/fidl/dart",
+    "//topaz/public/lib/fidl/dart",
     "//garnet/public/lib/fidl/examples/interfaces:interfaces_dart",
   ]
 }
