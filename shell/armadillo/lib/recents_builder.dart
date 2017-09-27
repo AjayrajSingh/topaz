@@ -16,6 +16,7 @@ import 'size_model.dart';
 import 'story_cluster.dart';
 import 'story_drag_transition_model.dart';
 import 'story_list.dart';
+import 'story_model.dart';
 
 /// If the user releases their finger when overscrolled more than this amount,
 /// we snap suggestions open.
@@ -47,33 +48,12 @@ class RecentsBuilder {
     OnStoryClusterEvent onStoryClusterFocusCompleted,
     VoidCallback onStoryClusterVerticalEdgeHover,
   }) =>
-      new ScopedModelDescendant<SizeModel>(
-        builder: (_, Widget child, SizeModel sizeModel) =>
-            new ScopedModelDescendant<IdleModel>(
-              builder: (_, Widget child, IdleModel idleModel) => new Transform(
-                    transform: new Matrix4.translationValues(
-                      0.0,
-                      lerpDouble(
-                        0.0,
-                        -sizeModel.screenSize.height * 1.2,
-                        idleModel.value,
-                      ),
-                      0.0,
-                    ),
-                    child: new Offstage(
-                      offstage: idleModel.value == 1.0,
-                      child: child,
-                    ),
-                  ),
-              child: child,
-            ),
-        child: _buildRecents(
-          context,
-          onScroll: onScroll,
-          onStoryClusterFocusStarted: onStoryClusterFocusStarted,
-          onStoryClusterFocusCompleted: onStoryClusterFocusCompleted,
-          onStoryClusterVerticalEdgeHover: onStoryClusterVerticalEdgeHover,
-        ),
+      _buildRecents(
+        context,
+        onScroll: onScroll,
+        onStoryClusterFocusStarted: onStoryClusterFocusStarted,
+        onStoryClusterFocusCompleted: onStoryClusterFocusCompleted,
+        onStoryClusterVerticalEdgeHover: onStoryClusterVerticalEdgeHover,
       );
 
   Widget _buildRecents(

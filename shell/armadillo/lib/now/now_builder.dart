@@ -2,12 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui' show lerpDouble;
-
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../size_model.dart';
+import '../story_model.dart';
 import 'now.dart';
 import 'now_minimization_model.dart';
 import 'quick_settings.dart';
@@ -69,61 +68,40 @@ class NowBuilder {
     VoidCallback onMinimizedContextTapped,
     ValueNotifier<double> recentsScrollOffset,
   }) =>
-      new ScopedModelDescendant<SizeModel>(
-        builder: (_, Widget child, SizeModel sizeModel) =>
-            new ScopedModelDescendant<IdleModel>(
-              builder: (_, Widget child, IdleModel idleModel) => new Transform(
-                    transform: new Matrix4.translationValues(
-                      lerpDouble(
-                        0.0,
-                        sizeModel.screenSize.width * 1.2,
-                        idleModel.value,
-                      ),
-                      0.0,
-                      0.0,
-                    ),
-                    child: new Offstage(
-                      offstage: idleModel.value == 1.0,
-                      child: child,
-                    ),
-                  ),
-              child: child,
-            ),
-        child: new ScopedModel<NowMinimizationModel>(
-          model: _nowMinimizationModel,
-          child: new Stack(
-            children: <Widget>[
-              new RepaintBoundary(
-                child: new Now(
-                  quickSettingsHeightBump: kQuickSettingsHeightBump,
-                  onMinimizedTap: onMinimizedTap,
-                  onMinimizedLongPress: () =>
-                      _quickSettingsOverlayKey.currentState.show(),
-                  onQuickSettingsMaximized: onQuickSettingsMaximized,
-                  onBarVerticalDragUpdate: onBarVerticalDragUpdate,
-                  onBarVerticalDragEnd: onBarVerticalDragEnd,
-                  onLogoutSelected: _onLogoutSelected,
-                  onClearLedgerSelected: _onClearLedgerSelected,
-                  onUserContextTapped: _onUserContextTapped,
-                  onMinimizedContextTapped: onMinimizedContextTapped,
-                  recentsScrollOffset: recentsScrollOffset,
-                ),
-              ),
-              // Quick Settings Overlay.
-              new QuickSettingsOverlay(
-                key: _quickSettingsOverlayKey,
-                onProgressChanged: (double progress) {
-                  if (progress == 0.0) {
-                    _onQuickSettingsOverlayChanged?.call(false);
-                  } else {
-                    _onQuickSettingsOverlayChanged?.call(true);
-                  }
-                },
+      new ScopedModel<NowMinimizationModel>(
+        model: _nowMinimizationModel,
+        child: new Stack(
+          children: <Widget>[
+            new RepaintBoundary(
+              child: new Now(
+                quickSettingsHeightBump: kQuickSettingsHeightBump,
+                onMinimizedTap: onMinimizedTap,
+                onMinimizedLongPress: () =>
+                    _quickSettingsOverlayKey.currentState.show(),
+                onQuickSettingsMaximized: onQuickSettingsMaximized,
+                onBarVerticalDragUpdate: onBarVerticalDragUpdate,
+                onBarVerticalDragEnd: onBarVerticalDragEnd,
                 onLogoutSelected: _onLogoutSelected,
                 onClearLedgerSelected: _onClearLedgerSelected,
+                onUserContextTapped: _onUserContextTapped,
+                onMinimizedContextTapped: onMinimizedContextTapped,
+                recentsScrollOffset: recentsScrollOffset,
               ),
-            ],
-          ),
+            ),
+            // Quick Settings Overlay.
+            new QuickSettingsOverlay(
+              key: _quickSettingsOverlayKey,
+              onProgressChanged: (double progress) {
+                if (progress == 0.0) {
+                  _onQuickSettingsOverlayChanged?.call(false);
+                } else {
+                  _onQuickSettingsOverlayChanged?.call(true);
+                }
+              },
+              onLogoutSelected: _onLogoutSelected,
+              onClearLedgerSelected: _onClearLedgerSelected,
+            ),
+          ],
         ),
       );
 

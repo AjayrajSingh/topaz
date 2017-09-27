@@ -3,39 +3,19 @@
 // found in the LICENSE file.
 
 import 'dart:math' as math;
-import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'now/context_model.dart';
 import 'size_model.dart';
+import 'story_model.dart';
 
 /// Builds the idle mode.
 class IdleModeBuilder {
   /// Builds the idle mode.
-  Widget build(BuildContext context) => new ScopedModelDescendant<SizeModel>(
-        builder: (_, Widget child, SizeModel sizeModel) =>
-            new ScopedModelDescendant<IdleModel>(
-              builder: (_, Widget child, IdleModel idleModel) => new Transform(
-                    transform: new Matrix4.translationValues(
-                      lerpDouble(
-                        -sizeModel.screenSize.width * 1.2,
-                        0.0,
-                        idleModel.value,
-                      ),
-                      0.0,
-                      0.0,
-                    ),
-                    child: new Offstage(
-                      offstage: idleModel.value == 0.0,
-                      child: child,
-                    ),
-                  ),
-              child: child,
-            ),
-        child: _buildIdle(context),
-      );
+  Widget build(BuildContext context) =>
+      new Offstage(child: _buildIdle(context));
 
   Widget _buildIdle(BuildContext context) => new Center(
         child: new ScopedModelDescendant<ContextModel>(
