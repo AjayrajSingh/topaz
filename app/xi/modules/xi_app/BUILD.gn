@@ -10,15 +10,15 @@ flutter_app("xi_app") {
   source_dir = "lib"
 
   deps = [
-    "//garnet/public/lib/app/dart",
+    "//topaz/public/lib/app/dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/story/fidl:fidl_dart",
-    "//garnet/public/lib/ui/flutter",
+    "//topaz/public/lib/ui/flutter",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//apps/xi/packages/widgets:xi_widgets",
     "//apps/xi/services:services_dart",
-    "//garnet/public/lib/fidl/dart",
+    "//topaz/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
   ]
 
