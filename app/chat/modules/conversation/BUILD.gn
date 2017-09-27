@@ -11,8 +11,8 @@ flutter_app("chat_conversation") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//garnet/public/lib/app/dart",
-    "//garnet/public/lib/fidl/dart",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
     "//peridot/public/lib/module/fidl:fidl_dart",
