@@ -17,12 +17,12 @@ flutter_app("flutter_mondrian") {
   package_name = "mondrian"
   main_dart = "lib/main.dart"
   deps = [
-    "//garnet/public/lib/app/dart",
+    "//topaz/public/lib/app/dart",
     "//peridot/public/lib/story/fidl:fidl_dart",
     "//peridot/public/lib/surface/fidl:fidl_dart",
-    "//garnet/public/lib/ui/flutter",
+    "//topaz/public/lib/ui/flutter",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//garnet/public/lib/fidl/dart",
+    "//topaz/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/quiver",
