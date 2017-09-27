@@ -266,7 +266,7 @@ class _AskHandlerImpl extends AskHandler {
           (Map<String, String> proposal) => new Action()
             ..createStory = (new CreateStory()
               ..moduleId = proposal['module_url'] ?? ''
-              ..initialData = proposal['module_data'] ?? ''),
+              ..initialData = proposal['module_data']),
         )
         .toList();
 }
@@ -292,7 +292,7 @@ Proposal _createProposal(Map<String, String> proposal) => new Proposal()
     new Action()
       ..createStory = (new CreateStory()
         ..moduleId = proposal['module_url'] ?? ''
-        ..initialData = proposal['module_data'] ?? '')
+        ..initialData = proposal['module_data'])
   ];
 
 Proposal _createAppProposal({
@@ -301,7 +301,6 @@ Proposal _createAppProposal({
   String headline,
   String subheadline,
   String imageUrl: '',
-  String initialData,
   SuggestionImageType imageType: SuggestionImageType.other,
   List<String> iconUrls = const <String>[],
   int color,
@@ -319,8 +318,5 @@ Proposal _createAppProposal({
         ..imageUrl = imageUrl
         ..annoyance = annoyanceType)
       ..onSelected = <Action>[
-        new Action()
-          ..createStory = (new CreateStory()
-            ..moduleId = appUrl
-            ..initialData = initialData)
+        new Action()..createStory = (new CreateStory()..moduleId = appUrl)
       ];
