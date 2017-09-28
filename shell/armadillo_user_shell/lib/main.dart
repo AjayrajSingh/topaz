@@ -54,19 +54,21 @@ const bool _kShowPerformanceOverlay = false;
 const bool _kDumpAllErrors = false;
 
 Future<Null> main() async {
-  SizeModel sizeModel = new SizeModel();
-  runApp(buildArmadilloUserShell(
-    logName: 'armadillo',
-    sizeModel: sizeModel,
-    conductorModel: new ConductorModel(),
-  ));
+  runApp(
+    buildArmadilloUserShell(
+      sizeModel: new SizeModel(),
+      conductorModel: new ConductorModel(),
+      applicationContext: new ApplicationContext.fromStartupInfo(),
+    ),
+  );
 }
 
 /// Builds the armadillo user shell.
 Widget buildArmadilloUserShell({
-  String logName,
-  SizeModel sizeModel,
-  ConductorModel conductorModel,
+  String logName: 'armadillo',
+  @required SizeModel sizeModel,
+  @required ConductorModel conductorModel,
+  @required ApplicationContext applicationContext,
 }) {
   setupLogger(name: logName);
 
@@ -167,9 +169,6 @@ Widget buildArmadilloUserShell({
 
   ContextProviderContextModel contextProviderContextModel =
       new ContextProviderContextModel();
-
-  ApplicationContext applicationContext =
-      new ApplicationContext.fromStartupInfo();
 
   AudioPolicy audioPolicy = new AudioPolicy(
     applicationContext.environmentServices,
