@@ -19,7 +19,7 @@ class TrackArt extends StatelessWidget {
   final String artworkUrl;
 
   /// Constructor
-  TrackArt({
+  const TrackArt({
     Key key,
     this.artworkUrl,
     this.size: 48.0,

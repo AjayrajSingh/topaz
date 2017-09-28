@@ -29,17 +29,16 @@ class EventListItem extends StatelessWidget {
   final bool showGridLayout;
 
   /// Constructor
-  EventListItem(
+  const EventListItem(
       {Key key,
       bool isSelected,
       @required this.event,
       this.onSelect,
       this.showGridLayout: false})
-      : isSelected = isSelected ?? false,
-        super(key: key) {
-    assert(event != null);
-    assert(showGridLayout != null);
-  }
+      : assert(event != null),
+        assert(showGridLayout != null),
+        isSelected = isSelected ?? false,
+        super(key: key);
 
   String get _eventImage => event.performances.isNotEmpty
       ? event.performances.first.artist?.imageUrl

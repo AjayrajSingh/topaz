@@ -12,7 +12,7 @@ import 'artist_bio_module_model.dart';
 /// Top-level widget for the Artist Bio Module
 class ArtistBioModuleScreen extends StatelessWidget {
   /// Constructor
-  ArtistBioModuleScreen({Key key}) : super(key: key);
+  const ArtistBioModuleScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

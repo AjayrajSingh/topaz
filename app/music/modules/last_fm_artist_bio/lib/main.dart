@@ -15,8 +15,8 @@ import 'modular/artist_bio_module_screen.dart';
 
 /// Retrieves the Songkick API Key
 Future<String> _readAPIKey() async {
-  Config config = await Config.read('/system/data/modules/config.json');
-  config.validate(<String>['last_fm_api_key']);
+  Config config = await Config.read('/system/data/modules/config.json')
+    ..validate(<String>['last_fm_api_key']);
   return config.get('last_fm_api_key');
 }
 
@@ -36,7 +36,7 @@ Future<Null> main() async {
       new ModuleWidget<ArtistBioModuleModel>(
     applicationContext: applicationContext,
     moduleModel: artistBioModuleModel,
-    child: new ArtistBioModuleScreen(),
+    child: const ArtistBioModuleScreen(),
   );
 
   runApp(moduleWidget);

@@ -69,7 +69,7 @@ class Player extends StatelessWidget {
   final VoidCallback onTapPlayQueue;
 
   /// Constructor
-  Player({
+  const Player({
     Key key,
     this.currentTrack,
     this.playbackPosition,
@@ -122,27 +122,28 @@ class Player extends StatelessWidget {
     ];
 
     if (!isMinimized) {
-      children.insert(
-        0,
-        new CupertinoButton(
+      children
+        ..insert(
+          0,
+          new CupertinoButton(
+            child: new Icon(
+              Icons.shuffle,
+              color: isShuffled ? primaryColor : _kButtonColor,
+              size: _kSecondaryIconSize,
+            ),
+            onPressed: () => onToggleShuffle?.call(),
+            padding: _kButtonPadding,
+          ),
+        )
+        ..add(new CupertinoButton(
           child: new Icon(
-            Icons.shuffle,
-            color: isShuffled ? primaryColor : _kButtonColor,
+            Icons.repeat,
+            color: isRepeated ? primaryColor : _kButtonColor,
             size: _kSecondaryIconSize,
           ),
-          onPressed: () => onToggleShuffle?.call(),
+          onPressed: () => onToggleRepeat?.call(),
           padding: _kButtonPadding,
-        ),
-      );
-      children.add(new CupertinoButton(
-        child: new Icon(
-          Icons.repeat,
-          color: isRepeated ? primaryColor : _kButtonColor,
-          size: _kSecondaryIconSize,
-        ),
-        onPressed: () => onToggleRepeat?.call(),
-        padding: _kButtonPadding,
-      ));
+        ));
     }
 
     return new Row(
@@ -157,8 +158,8 @@ class Player extends StatelessWidget {
       child: new Column(
         children: <Widget>[
           new PlaybackSlider(
-            duration: currentTrack?.duration ?? const Duration(),
-            playbackPosition: playbackPosition ?? new Duration(milliseconds: 0),
+            duration: currentTrack?.duration ?? Duration.ZERO,
+            playbackPosition: playbackPosition ?? Duration.ZERO,
             showTimeText: false,
           ),
           new Expanded(
@@ -183,7 +184,7 @@ class Player extends StatelessWidget {
                               style: _kTrackTitleStyle,
                             ),
                             // Spacing between the title and user text
-                            new TextSpan(text: '  '),
+                            const TextSpan(text: '  '),
                             new TextSpan(
                               text: currentTrack?.artists?.first?.name ?? '',
                               style: _kTrackUserStyle,
@@ -252,9 +253,8 @@ class Player extends StatelessWidget {
             // offset white space from buttons for even visual spacing
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: new PlaybackSlider(
-              duration: currentTrack?.duration ?? const Duration(),
-              playbackPosition:
-                  playbackPosition ?? new Duration(milliseconds: 0),
+              duration: currentTrack?.duration ?? Duration.ZERO,
+              playbackPosition: playbackPosition ?? Duration.ZERO,
             ),
           ),
         ),

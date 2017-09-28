@@ -41,11 +41,10 @@ class PlaybackSlider extends StatelessWidget {
     @required this.playbackPosition,
     this.showTimeText: true,
   })
-      : super(key: key) {
-    assert(this.duration != null);
-    assert(this.playbackPosition != null);
-    assert(duration.compareTo(this.playbackPosition) >= 0);
-  }
+      : assert(duration != null),
+        assert(playbackPosition != null),
+        assert(duration.compareTo(playbackPosition) >= 0),
+        super(key: key);
 
   double get _playbackRatio {
     if (duration.inMilliseconds == 0) {
@@ -107,10 +106,9 @@ class _PlaybackBarPainter extends CustomPainter {
 
   _PlaybackBarPainter({
     @required this.playbackRatio,
-  }) {
-    assert(playbackRatio != null);
-    assert(playbackRatio >= 0.0 && playbackRatio <= 1.0);
-  }
+  })
+      : assert(playbackRatio != null),
+        assert(playbackRatio >= 0.0 && playbackRatio <= 1.0);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -120,14 +118,16 @@ class _PlaybackBarPainter extends CustomPainter {
     final Paint foregroundPaint = new Paint()
       ..color = _kBarColor
       ..style = PaintingStyle.fill;
-    canvas.drawRect(
-      new Rect.fromLTWH(0.0, 0.0, size.width, size.height),
-      backgroundPaint,
-    );
-    canvas.drawRect(
-      new Rect.fromLTWH(0.0, 0.0, size.width * playbackRatio, size.height),
-      foregroundPaint,
-    );
+
+    canvas
+      ..drawRect(
+        new Rect.fromLTWH(0.0, 0.0, size.width, size.height),
+        backgroundPaint,
+      )
+      ..drawRect(
+        new Rect.fromLTWH(0.0, 0.0, size.width * playbackRatio, size.height),
+        foregroundPaint,
+      );
   }
 
   @override

@@ -38,7 +38,7 @@ class EventModuleModel extends ModuleModel {
       } else {
         _loadingStatus = LoadingStatus.failed;
       }
-    } catch (_) {
+    } on Exception {
       _loadingStatus = LoadingStatus.failed;
     }
     notifyListeners();

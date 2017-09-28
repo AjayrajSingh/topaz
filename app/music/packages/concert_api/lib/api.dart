@@ -19,7 +19,7 @@ class Api {
   ) async {
     assert(name != null);
     assert(apiKey != null);
-    Map<String, String> query = new Map<String, String>();
+    Map<String, String> query = <String, String>{};
     query['query'] = name;
     query['apikey'] = apiKey;
     Uri uri = new Uri.https(
@@ -54,7 +54,7 @@ class Api {
     String apiKey,
   ) async {
     assert(apiKey != null);
-    Map<String, String> query = new Map<String, String>();
+    Map<String, String> query = <String, String>{};
     if (name != null) {
       query['artist_name'] = name;
     }
@@ -88,7 +88,7 @@ class Api {
   static Future<Event> getEvent(int id, String apiKey) async {
     assert(id != null);
     assert(apiKey != null);
-    Map<String, String> query = new Map<String, String>();
+    Map<String, String> query = <String, String>{};
     query['apikey'] = apiKey;
     Uri uri = new Uri.https(
       _kApiBaseUrl,

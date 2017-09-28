@@ -53,37 +53,43 @@ class Album {
   });
 
   /// Create album model from json data
-  factory Album.fromJson(dynamic json) {
-    DateTime releaseDate;
-    if (json['release_date'] != null) {
-      try {
-        releaseDate = DateTime.parse(json['release_date']);
-      } catch (_) {
-        // Sometimes release dates are given only as a year
+  factory Album.fromJson(Object json) {
+    if (json is Map) {
+      DateTime releaseDate;
+      if (json['release_date'] != null) {
         try {
-          releaseDate = _yearFormat.parse(json['release_date']);
-        } catch (_) {}
+          releaseDate = DateTime.parse(json['release_date']);
+        } on Exception {
+          // Sometimes release dates are given only as a year
+          try {
+            releaseDate = _yearFormat.parse(json['release_date']);
+          } on Exception {
+            // ignore.
+          }
+        }
       }
-    }
 
-    return new Album(
-      name: json['name'],
-      artists: json['artists'] is List<dynamic>
-          ? json['artists']
-              .map((dynamic artistJson) => new Artist.fromJson(artistJson))
-              .toList()
-          : <Artist>[],
-      images: MusicImage.listFromJson(json['images']),
-      tracks: json['tracks'] != null && json['tracks']['items'] is List<dynamic>
-          ? json['tracks']['items']
-              .map((dynamic trackJson) => new Track.fromJson(trackJson))
-              .toList()
-          : <Track>[],
-      releaseDate: releaseDate,
-      albumType: json['album_type'],
-      genres: json['genres'] is List<String> ? json['genres'] : null,
-      id: json['id'],
-    );
+      return new Album(
+        name: json['name'],
+        artists: json['artists'] is List
+            ? json['artists']
+                .map((Object artistJson) => new Artist.fromJson(artistJson))
+                .toList()
+            : <Artist>[],
+        images: MusicImage.listFromJson(json['images']),
+        tracks: json['tracks'] != null && json['tracks']['items'] is List
+            ? json['tracks']['items']
+                .map((Object trackJson) => new Track.fromJson(trackJson))
+                .toList()
+            : <Track>[],
+        releaseDate: releaseDate,
+        albumType: json['album_type'],
+        genres: json['genres'] is List<String> ? json['genres'] : null,
+        id: json['id'],
+      );
+    } else {
+      throw new Exception('The provided json object must be a Map.');
+    }
   }
 
   /// Gets the default artwork for this album.

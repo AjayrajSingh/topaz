@@ -5,15 +5,15 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.fidl.dart/bindings.dart';
-import 'package:lib.logging/logging.dart';
 
 /// The Concert Agents subscribes to the hotel topic and makes proposals for
 /// upcoming concerts (concert list module).
@@ -38,7 +38,7 @@ class ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onContextUpdate(ContextUpdate result) async {
-    if (result.values[_kHotelTopic].length == 0) {
+    if (result.values[_kHotelTopic].isEmpty) {
       return;
     }
 
@@ -84,11 +84,11 @@ Future<Null> main(List<dynamic> args) async {
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
   ContextSelector selector = new ContextSelector()
-    ..type = ContextValueType.entity;
-  selector.meta = new ContextMetadata();
+    ..type = ContextValueType.entity
+    ..meta = new ContextMetadata();
   selector.meta.entity = new EntityMetadata()..topic = _kHotelTopic;
-  ContextQuery query = new ContextQuery();
-  query.selector = <String, ContextSelector>{_kHotelTopic: selector};
+  ContextQuery query = new ContextQuery()
+    ..selector = <String, ContextSelector>{_kHotelTopic: selector};
   _contextListenerImpl = new ContextListenerImpl();
   _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 }

@@ -15,8 +15,8 @@ import 'modular/event_list_module_model.dart';
 
 /// Retrieves the Songkick API Key
 Future<String> _readAPIKey() async {
-  Config config = await Config.read('/system/data/modules/config.json');
-  config.validate(<String>['songkick_api_key']);
+  Config config = await Config.read('/system/data/modules/config.json')
+    ..validate(<String>['songkick_api_key']);
   return config.get('songkick_api_key');
 }
 

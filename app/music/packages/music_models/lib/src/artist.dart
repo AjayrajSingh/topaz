@@ -33,17 +33,21 @@ class Artist {
   });
 
   /// Create a full artist object from json data
-  factory Artist.fromJson(dynamic json) {
-    return new Artist(
-      name: json['name'],
-      images: MusicImage.listFromJson(json['images']),
-      genres: json['genres'] is List<String> ? json['genres'] : null,
-      followersCount:
-          json['followers'] != null && json['followers']['total'] is int
-              ? json['followers']['total']
-              : null,
-      id: json['id'],
-    );
+  factory Artist.fromJson(Object json) {
+    if (json is Map) {
+      return new Artist(
+        name: json['name'],
+        images: MusicImage.listFromJson(json['images']),
+        genres: json['genres'] is List<String> ? json['genres'] : null,
+        followersCount:
+            json['followers'] != null && json['followers']['total'] is int
+                ? json['followers']['total']
+                : null,
+        id: json['id'],
+      );
+    } else {
+      throw new Exception('The provided json must be a Map.');
+    }
   }
 
   /// Gets the default artwork for this artist.

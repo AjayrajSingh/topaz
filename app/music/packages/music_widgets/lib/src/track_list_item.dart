@@ -35,7 +35,7 @@ class TrackListItem extends StatelessWidget {
   final Color highlightColor;
 
   /// Constructor
-  TrackListItem({
+  const TrackListItem({
     Key key,
     @required this.track,
     this.isPlaying: false,
@@ -43,9 +43,8 @@ class TrackListItem extends StatelessWidget {
     this.onTap,
     this.highlightColor,
   })
-      : super(key: key) {
-    assert(track != null);
-  }
+      : assert(track != null),
+        super(key: key);
 
   TextStyle _getTextStyle(Color primaryColor) {
     return new TextStyle(

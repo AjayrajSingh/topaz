@@ -33,15 +33,16 @@ class PlayerImpl extends Player {
   /// Constructor
   PlayerImpl(ApplicationContext context) {
     _audioPlayerController =
-        new AudioPlayerController(context.environmentServices);
-    _audioPlayerController.updateCallback = _onAudioControllerUpdate;
+        new AudioPlayerController(context.environmentServices)
+          ..updateCallback = _onAudioControllerUpdate;
   }
 
   @override
   void play(Track track) {
     _currentTrack = track;
-    _audioPlayerController.open(Uri.parse(track.playbackUrl));
-    _audioPlayerController.play();
+    _audioPlayerController
+      ..open(Uri.parse(track.playbackUrl))
+      ..play();
     log.fine('Playing: ${_currentTrack.title}');
   }
 
@@ -114,9 +115,12 @@ class PlayerImpl extends Player {
 
   /// Close all the bindings.
   void close() {
-    _bindings.forEach((PlayerBinding binding) => binding.close());
-    _listeners
-        .forEach((PlayerStatusListenerProxy listener) => listener.ctrl.close());
+    for (PlayerBinding binding in _bindings) {
+      binding.close();
+    }
+    for (PlayerStatusListenerProxy listener in _listeners) {
+      listener.ctrl.close();
+    }
   }
 
   void _onAudioControllerUpdate() {
@@ -129,8 +133,9 @@ class PlayerImpl extends Player {
   }
 
   void _updateListeners() {
-    _listeners.forEach((PlayerStatusListenerProxy listener) =>
-        listener.onUpdate(_playerStatus));
+    for (PlayerStatusListenerProxy listener in _listeners) {
+      listener.onUpdate(_playerStatus);
+    }
   }
 
   PlayerStatus get _playerStatus => new PlayerStatus()

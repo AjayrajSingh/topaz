@@ -13,7 +13,7 @@ const double _kHeroImageHeight = 240.0;
 const double _kLogoSize = 32.0;
 const double _kLineupAvatarSize = 48.0;
 
-final TextStyle _kVenueFontStyle = new TextStyle(
+final TextStyle _kVenueFontStyle = const TextStyle(
   fontSize: 16.0,
   height: 1.5,
 );
@@ -31,20 +31,19 @@ class EventPage extends StatelessWidget {
   static final DateFormat _timeFormat = new DateFormat('h:mm aaa');
 
   /// Constructor
-  EventPage({
+  const EventPage({
     Key key,
     this.onTapBuy,
     @required this.event,
   })
-      : super(key: key) {
-    assert(event != null);
-  }
+      : assert(event != null),
+        super(key: key);
 
   String get _readableDate {
     String date = _dateFormat.format(event.date);
     // Some events do not include the start time
     if (event.startTime != null) {
-      date += ' ${_timeFormat.format(event.startTime)}';
+      date = '$date ${_timeFormat.format(event.startTime)}';
     }
     return date;
   }
@@ -71,8 +70,10 @@ class EventPage extends StatelessWidget {
     if (event.venue.city?.name != null ||
         event.venue.city?.country != null ||
         event.venue.zip != null) {
+      String city =
+          event.venue.city?.name != null ? '${event.venue.city.name}, ' : '';
       children.add(new Text(
-        '${event.venue.city?.name + ', ' ?? ''}${event.venue.city?.country ?? ''} ${ event.venue.zip ?? ''}',
+        '$city${event.venue.city?.country ?? ''} ${ event.venue.zip ?? ''}',
         style: _kVenueFontStyle,
       ));
     }
@@ -187,7 +188,7 @@ class EventPage extends StatelessWidget {
         decoration: new BoxDecoration(
           color: Colors.grey[200],
           borderRadius: new BorderRadius.vertical(
-            bottom: new Radius.circular(8.0),
+            bottom: const Radius.circular(8.0),
           ),
         ),
         child: new Row(
@@ -216,7 +217,7 @@ class EventPage extends StatelessWidget {
     ];
 
     return DefaultTextStyle.merge(
-      style: new TextStyle(fontFamily: 'RobotoSlab'),
+      style: const TextStyle(fontFamily: 'RobotoSlab'),
       child: new Container(
         padding: const EdgeInsets.all(32.0),
         child: new Column(

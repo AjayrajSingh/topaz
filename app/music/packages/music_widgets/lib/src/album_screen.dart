@@ -41,7 +41,7 @@ class AlbumScreen extends StatelessWidget {
   final LoadingStatus loadingStatus;
 
   /// Constructor
-  AlbumScreen({
+  const AlbumScreen({
     Key key,
     this.album,
     this.highlightColor,
@@ -50,7 +50,8 @@ class AlbumScreen extends StatelessWidget {
     this.currentTrack,
     this.onTapTrack,
     this.loadingStatus: LoadingStatus.completed,
-  });
+  })
+      : super(key: key);
 
   String get _totalDurationText {
     Duration totalDuration = album.tracks.fold(

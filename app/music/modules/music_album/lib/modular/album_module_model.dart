@@ -28,10 +28,9 @@ class AlbumModuleModel extends ModuleModel {
   AlbumModuleModel({
     @required this.clientId,
     @required this.clientSecret,
-  }) {
-    assert(clientId != null);
-    assert(clientSecret != null);
-  }
+  })
+      : assert(clientId != null),
+        assert(clientSecret != null);
 
   /// Get the current loading status
   LoadingStatus get loadingStatus => _loadingStatus;
@@ -49,7 +48,7 @@ class AlbumModuleModel extends ModuleModel {
       } else {
         _loadingStatus = LoadingStatus.failed;
       }
-    } catch (error) {
+    } on Exception {
       _loadingStatus = LoadingStatus.failed;
     }
     notifyListeners();
@@ -70,7 +69,7 @@ class AlbumModuleModel extends ModuleModel {
       } else {
         return;
       }
-    } catch (_) {
+    } on Exception {
       return;
     }
 

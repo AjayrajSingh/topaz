@@ -22,7 +22,7 @@ void main() {
     );
 
     RenderBox box = tester.renderObject(find.byKey(key));
-    expect(box.size, new Size.square(48.0));
+    expect(box.size, const Size.square(48.0));
 
     Icon icon = tester.widget(find.byWidgetPredicate(
         (Widget widget) => widget is Icon && widget.icon == Icons.music_note));

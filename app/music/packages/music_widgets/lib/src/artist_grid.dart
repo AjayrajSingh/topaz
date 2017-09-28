@@ -24,14 +24,13 @@ class ArtistGrid extends StatelessWidget {
   final ArtistActionCallback onTapArtist;
 
   /// Constructor
-  ArtistGrid({
+  const ArtistGrid({
     Key key,
     @required this.artists,
     this.onTapArtist,
   })
-      : super(key: key) {
-    assert(artists != null);
-  }
+      : assert(artists != null),
+        super(key: key);
 
   Widget _buildArtistGridItem({
     Artist artist,

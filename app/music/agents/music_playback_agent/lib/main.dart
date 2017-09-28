@@ -7,10 +7,10 @@ import 'dart:isolate';
 
 import 'package:lib.agent.fidl/agent.fidl.dart';
 import 'package:lib.agent.fidl/agent_context.fidl.dart';
-import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:topaz.app.music.services.player/player.fidl.dart';
 
@@ -93,8 +93,9 @@ class MusicPlaybackAgent implements Agent, Lifecycle {
   void terminate() {
     _agentBinding.close();
     _lifecycleBinding.close();
-    _outgoingServicesBindings
-        .forEach((ServiceProviderBinding binding) => binding.close());
+    for (ServiceProviderBinding binding in _outgoingServicesBindings) {
+      binding.close();
+    }
     Isolate.current.kill();
   }
 }

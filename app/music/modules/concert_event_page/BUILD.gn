@@ -14,20 +14,20 @@ flutter_app("concert_event_page") {
   manifest = "pubspec.yaml"
 
   deps = [
-    "//peridot/public/lib/decomposition/dart",
-    "//peridot/public/lib/context/fidl:fidl_dart",
-    "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
+    "//peridot/public/lib/context/fidl:fidl_dart",
+    "//peridot/public/lib/decomposition/dart",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
     "//topaz/app/music/packages/concert_api",
     "//topaz/app/music/packages/concert_models",
     "//topaz/app/music/packages/concert_widgets",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
     "//topaz/runtime/web_runner/lib/dart:web_view",
     "//topaz/tools/packages/config",
   ]

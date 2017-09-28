@@ -21,15 +21,14 @@ class Loader extends StatelessWidget {
   final WidgetBuilder builder;
 
   /// Constructor
-  Loader({
+  const Loader({
     Key key,
     @required this.loadingStatus,
     @required this.builder,
   })
-      : super(key: key) {
-    assert(loadingStatus != null);
-    assert(builder != null);
-  }
+      : assert(loadingStatus != null),
+        assert(builder != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {

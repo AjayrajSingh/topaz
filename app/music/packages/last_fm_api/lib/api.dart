@@ -17,9 +17,7 @@ class LastFmApi {
   final String apiKey;
 
   /// Constructor
-  LastFmApi({@required this.apiKey}) {
-    assert(apiKey != null);
-  }
+  LastFmApi({@required this.apiKey}) : assert(apiKey != null);
 
   /// Retrieves an artist given the name
   Future<Artist> getArtist(String name) async {

@@ -5,18 +5,18 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.decomposition.dart/decomposition.dart';
+import 'package:config/config.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:lib.decomposition.dart/decomposition.dart';
+import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
-import 'package:config/config.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.fidl.dart/bindings.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
@@ -39,20 +39,19 @@ final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 class ContextListenerImpl extends ContextListener {
   final ContextListenerBinding _binding = new ContextListenerBinding();
 
-  Api _api;
+  final Api _api;
 
   /// Constructor
   ContextListenerImpl({
     @required String clientId,
     @required String clientSecret,
-  }) {
-    assert(clientId != null);
-    assert(clientSecret != null);
-    _api = new Api(
-      clientId: clientId,
-      clientSecret: clientSecret,
-    );
-  }
+  })
+      : assert(clientId != null),
+        assert(clientSecret != null),
+        _api = new Api(
+          clientId: clientId,
+          clientSecret: clientSecret,
+        );
 
   /// Gets the [InterfaceHandle]
   ///
@@ -68,13 +67,15 @@ class ContextListenerImpl extends ContextListener {
         List<Artist> artists = await _api.searchArtists(
           entity['name'],
         );
-        if (artists != null && artists.length > 0) {
+        if (artists != null && artists.isNotEmpty) {
           log.fine('found artist for: ${entity['name']}');
           _createProposal(artists.first);
         } else {
           log.fine('no artist found for: ${entity['name']}');
         }
-      } catch (_) {}
+      } on Exception {
+        return;
+      }
     }
   }
 
@@ -115,21 +116,21 @@ class ContextListenerImpl extends ContextListener {
 Future<Null> main(List<dynamic> args) async {
   setupLogger();
 
-  Config config = await Config.read('/system/data/modules/config.json');
-  config.validate(<String>['spotify_client_id', 'spotify_client_secret']);
+  Config config = await Config.read('/system/data/modules/config.json')
+    ..validate(<String>['spotify_client_id', 'spotify_client_secret']);
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextSelector selector = new ContextSelector();
-  selector.type = ContextValueType.entity;
-  selector.meta = new ContextMetadata();
+  ContextSelector selector = new ContextSelector()
+    ..type = ContextValueType.entity
+    ..meta = new ContextMetadata();
   selector.meta.story = new StoryMetadata();
   selector.meta.story.focused = new FocusedState();
   selector.meta.story.focused.state = FocusedStateState.focused;
   selector.meta.entity = new EntityMetadata();
   selector.meta.entity.type = <String>[_kMusicArtistType];
 
-  ContextQuery query = new ContextQuery();
-  query.selector = <String, ContextSelector>{_kMusicArtistType: selector};
+  ContextQuery query = new ContextQuery()
+    ..selector = <String, ContextSelector>{_kMusicArtistType: selector};
   _contextListenerImpl = new ContextListenerImpl(
     clientId: config.get('spotify_client_id'),
     clientSecret: config.get('spotify_client_secret'),

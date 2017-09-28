@@ -8,14 +8,14 @@ dart_app("music_playback_agent") {
   main_dart = "lib/main.dart"
 
   deps = [
+    "//garnet/public/lib/app/fidl:fidl_dart",
     "//peridot/public/lib/agent/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",
-    "//topaz/public/lib/app/dart",
-    "//garnet/public/lib/app/fidl:fidl_dart",
-    "//topaz/public/lib/fidl/dart",
-    "//topaz/public/lib/media/dart",
     "//topaz/app/music/services/player:player_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/media/dart",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

@@ -18,7 +18,7 @@ enum _View {
 /// MyHomePage widget.
 class MyHomePage extends StatefulWidget {
   /// MyHomePage constructor.
-  MyHomePage({Key key, this.title}) : super(key: key);
+  const MyHomePage({Key key, this.title}) : super(key: key);
 
   /// MyHomePage title.
   final String title;

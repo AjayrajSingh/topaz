@@ -8,16 +8,16 @@ dart_app("last_fm_agent") {
   main_dart = "lib/main.dart"
 
   deps = [
+    "//peridot/public/lib/context/fidl:fidl_dart",
+    "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/decomposition/dart",
-    "//peridot/public/lib/context/fidl:fidl_dart",
-    "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
     "//topaz/app/music/packages/last_fm_api",
     "//topaz/app/music/packages/last_fm_models",
     "//topaz/lib/widgets/packages/logging:lib.logging",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
     "//topaz/tools/packages/config",
   ]
 }

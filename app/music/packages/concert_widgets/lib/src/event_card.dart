@@ -45,7 +45,7 @@ class EventCard extends StatelessWidget {
   static final DateFormat _timeFormat = new DateFormat('h:mm aaa');
 
   /// Constructor
-  EventCard({
+  const EventCard({
     Key key,
     @required this.event,
     this.loadingStatus: LoadingStatus.completed,
@@ -61,7 +61,7 @@ class EventCard extends StatelessWidget {
 
   Widget _buildInfoSection() {
     return new Container(
-      margin: new EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(16.0),
       child: new Row(
         children: <Widget>[
           new Container(
@@ -124,7 +124,7 @@ class EventCard extends StatelessWidget {
             margin: const EdgeInsets.only(top: 4.0),
             child: new Text(
               performance.artist?.name ?? '',
-              style: new TextStyle(fontSize: 12.0),
+              style: const TextStyle(fontSize: 12.0),
             ),
           ),
         ],
@@ -134,7 +134,7 @@ class EventCard extends StatelessWidget {
 
   Widget _buildLineupSection() {
     return new Container(
-      margin: new EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(16.0),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -153,7 +153,7 @@ class EventCard extends StatelessWidget {
 
   Widget _buildVenueSection() {
     return new Container(
-      margin: new EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(16.0),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -243,9 +243,9 @@ class EventCard extends StatelessWidget {
               ),
             ),
             _buildInfoSection(),
-            new Divider(),
+            const Divider(),
             _buildLineupSection(),
-            new Divider(),
+            const Divider(),
             _buildVenueSection(),
           ],
         );

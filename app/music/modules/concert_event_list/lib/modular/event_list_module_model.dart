@@ -6,15 +6,15 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.module.fidl/module_controller.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:lib.module.fidl/module_controller.fidl.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 
 /// [ModuleModel] that manages the state of the Event Module.
@@ -71,7 +71,7 @@ class EventListModuleModel extends ModuleModel {
       } else {
         _loadingStatus = LoadingStatus.failed;
       }
-    } catch (exception) {
+    } on Exception catch (exception) {
       log.severe('Failed to Retrieve Concert Events', exception);
       _loadingStatus = LoadingStatus.failed;
     }

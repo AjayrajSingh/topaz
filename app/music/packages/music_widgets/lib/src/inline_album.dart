@@ -37,7 +37,7 @@ class InlineAlbum extends StatelessWidget {
   final AlbumActionCallback onTapAlbum;
 
   /// Constructor
-  InlineAlbum({
+  const InlineAlbum({
     Key key,
     @required this.album,
     this.currentTrack,
@@ -45,9 +45,8 @@ class InlineAlbum extends StatelessWidget {
     this.onTapTrack,
     this.onTapAlbum,
   })
-      : super(key: key) {
-    assert(album != null);
-  }
+      : assert(album != null),
+        super(key: key);
 
   Widget _buildListSection(Color highlightColor) {
     List<Widget> children = <Widget>[
@@ -80,7 +79,7 @@ class InlineAlbum extends StatelessWidget {
                       ),
                     ),
                     // Spacing between the title and album type
-                    new TextSpan(text: '  '),
+                    const TextSpan(text: '  '),
                     new TextSpan(
                       text: album.albumType.toUpperCase(),
                       style: _kSubtitleStyle,
@@ -97,9 +96,7 @@ class InlineAlbum extends StatelessWidget {
           ],
         ),
       ),
-    ];
-
-    children.addAll(album.tracks.map((Track track) => new TrackListItem(
+    ]..addAll(album.tracks.map((Track track) => new TrackListItem(
           track: track,
           isPlaying: track == currentTrack,
           highlightColor: highlightColor,

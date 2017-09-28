@@ -19,7 +19,7 @@ class FollowButton extends StatelessWidget {
   final Color highlightColor;
 
   /// Constructor
-  FollowButton({
+  const FollowButton({
     Key key,
     this.onTap,
     this.isFollowing: false,

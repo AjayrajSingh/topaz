@@ -17,9 +17,8 @@ class ArtistBioModuleModel extends ModuleModel {
   ArtistBioModuleModel({
     @required this.apiKey,
   })
-      : _api = new LastFmApi(apiKey: apiKey) {
-    assert(apiKey != null);
-  }
+      : assert(apiKey != null),
+        _api = new LastFmApi(apiKey: apiKey);
 
   /// The artist for this given module
   Artist artist;
@@ -42,7 +41,7 @@ class ArtistBioModuleModel extends ModuleModel {
       } else {
         _loadingStatus = LoadingStatus.failed;
       }
-    } catch (error) {
+    } on Exception {
       _loadingStatus = LoadingStatus.failed;
     }
     notifyListeners();

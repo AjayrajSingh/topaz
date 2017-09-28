@@ -5,16 +5,16 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.decomposition.dart/decomposition.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.decomposition.dart/decomposition.dart';
+import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_token.fidl.dart';
 import 'package:lib.widgets/modular.dart';
@@ -45,10 +45,9 @@ class ArtistModuleModel extends ModuleModel {
   ArtistModuleModel({
     @required this.clientId,
     @required this.clientSecret,
-  }) {
-    assert(clientId != null);
-    assert(clientSecret != null);
-  }
+  })
+      : assert(clientId != null),
+        assert(clientSecret != null);
 
   /// The artist for this given module
   Artist artist;
@@ -103,7 +102,7 @@ class ArtistModuleModel extends ModuleModel {
       } else {
         _loadingStatus = LoadingStatus.failed;
       }
-    } catch (_) {
+    } on Exception {
       _loadingStatus = LoadingStatus.failed;
     }
 
@@ -176,7 +175,7 @@ class ArtistModuleModel extends ModuleModel {
       } else {
         return;
       }
-    } catch (_) {
+    } on Exception {
       return;
     }
 

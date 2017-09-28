@@ -13,18 +13,18 @@ flutter_app("music_album") {
   source_dir = "lib"
 
   deps = [
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/story/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/intl",
     "//topaz/app/music/packages/music_api",
     "//topaz/app/music/packages/music_models",
     "//topaz/app/music/packages/music_widgets",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
     "//topaz/tools/packages/config",
   ]
 

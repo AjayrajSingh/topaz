@@ -13,13 +13,12 @@ class ArtistBio extends StatelessWidget {
   final Artist artist;
 
   /// Constructor
-  ArtistBio({
+  const ArtistBio({
     Key key,
     @required this.artist,
   })
-      : super(key: key) {
-    assert(artist != null);
-  }
+      : assert(artist != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +31,7 @@ class ArtistBio extends StatelessWidget {
           decoration: new BoxDecoration(
             color: Colors.black,
             image: new DecorationImage(
-              image: new AssetImage(
+              image: const AssetImage(
                 'packages/last_fm_widgets/res/background.jpg',
               ),
               fit: BoxFit.cover,
@@ -80,7 +79,7 @@ class ArtistBio extends StatelessWidget {
               new Text(
                 artist.bio,
                 softWrap: true,
-                style: new TextStyle(
+                style: const TextStyle(
                   height: 1.7,
                 ),
               ),

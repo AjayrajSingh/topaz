@@ -68,7 +68,7 @@ class HeroBannerScaffold extends StatelessWidget {
   final LoadingStatus loadingStatus;
 
   /// Constructor
-  HeroBannerScaffold({
+  const HeroBannerScaffold({
     Key key,
     this.heroBannerBackgroundColor,
     this.backgroundColor,

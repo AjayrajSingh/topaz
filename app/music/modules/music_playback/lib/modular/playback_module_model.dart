@@ -5,11 +5,11 @@
 import 'dart:async';
 
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_models/music_models.dart';
 import 'package:topaz.app.music.services.player/player.fidl.dart'
@@ -98,17 +98,19 @@ class PlaybackModuleModel extends ModuleModel {
         notifyListeners();
       },
     );
-    _player.addPlayerListener(_statusListener.getHandle());
 
-    // Get status at initialization
-    _player.getStatus((PlayerStatus status) {
-      _updatePlaybackStatus(status);
-      if (status.isPlaying) {
-        _ensureProgressTimer();
-      } else {
-        _ensureNoProgressTimer();
-      }
-    });
+    _player
+      ..addPlayerListener(_statusListener.getHandle())
+
+      // Get status at initialization
+      ..getStatus((PlayerStatus status) {
+        _updatePlaybackStatus(status);
+        if (status.isPlaying) {
+          _ensureProgressTimer();
+        } else {
+          _ensureNoProgressTimer();
+        }
+      });
 
     // Close all the unnecessary bindings.
     playerServices.ctrl.close();

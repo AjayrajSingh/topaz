@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// ignore: implementation_imports
 import 'package:music_widgets/src/utils.dart';
 import 'package:test/test.dart';
 

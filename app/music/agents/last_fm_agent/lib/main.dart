@@ -5,19 +5,19 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.context.fidl/metadata.fidl.dart';
-import 'package:lib.context.fidl/value_type.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
-import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:config/config.dart';
 import 'package:last_fm_api/api.dart';
 import 'package:last_fm_models/last_fm_models.dart';
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.context.fidl/context_reader.fidl.dart';
+import 'package:lib.context.fidl/metadata.fidl.dart';
+import 'package:lib.context.fidl/value_type.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.suggestion.fidl/proposal.fidl.dart';
+import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
+import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:meta/meta.dart';
 
 /// The Music Artist Agent subscribes to the 'focal_entities' topic and will
@@ -47,9 +47,8 @@ class ContextListenerImpl extends ContextListener {
   ContextListenerImpl({
     @required String apiKey,
   })
-      : _api = new LastFmApi(apiKey: apiKey) {
-    assert(apiKey != null);
-  }
+      : assert(apiKey != null),
+        _api = new LastFmApi(apiKey: apiKey);
 
   /// Gets the [InterfaceHandle]
   ///
@@ -58,7 +57,7 @@ class ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onContextUpdate(ContextUpdate result) async {
-    if (result.values[_kMusicArtistTopic].length == 0) {
+    if (result.values[_kMusicArtistTopic].isEmpty) {
       return;
     }
 
@@ -77,7 +76,9 @@ class ContextListenerImpl extends ContextListener {
         } else {
           log.fine('no artist found for: ${data['name']}');
         }
-      } catch (_) {}
+      } on Exception {
+        return;
+      }
     }
   }
 
@@ -134,16 +135,16 @@ class ContextListenerImpl extends ContextListener {
 Future<Null> main(List<dynamic> args) async {
   setupLogger();
 
-  Config config = await Config.read('/system/data/modules/config.json');
-  config.validate(<String>['last_fm_api_key']);
+  Config config = await Config.read('/system/data/modules/config.json')
+    ..validate(<String>['last_fm_api_key']);
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
   ContextSelector selector = new ContextSelector()
-    ..type = ContextValueType.entity;
-  selector.meta = new ContextMetadata();
+    ..type = ContextValueType.entity
+    ..meta = new ContextMetadata();
   selector.meta.entity = new EntityMetadata()..topic = _kMusicArtistTopic;
-  ContextQuery query = new ContextQuery();
-  query.selector = <String, ContextSelector>{_kMusicArtistTopic: selector};
+  ContextQuery query = new ContextQuery()
+    ..selector = <String, ContextSelector>{_kMusicArtistTopic: selector};
   _contextListenerImpl = new ContextListenerImpl(
     apiKey: config.get('last_fm_api_key'),
   );

@@ -42,21 +42,25 @@ class Track {
   });
 
   /// Create a new track from JSON data
-  factory Track.fromJson(dynamic json) {
-    return new Track(
-      name: json['name'],
-      artists: json['artists'] is List<dynamic>
-          ? json['artists']
-              .map((dynamic artistJson) => new Artist.fromJson(artistJson))
-              .toList()
-          : <Artist>[],
-      // Tracks accessed within an album will have this as null
-      album: json['album'] != null ? new Album.fromJson(json['album']) : null,
-      duration: new Duration(milliseconds: json['duration_ms']),
-      trackNumber: json['track_number'],
-      id: json['id'],
-      playbackUrl: json['preview_url'],
-    );
+  factory Track.fromJson(Object json) {
+    if (json is Map) {
+      return new Track(
+        name: json['name'],
+        artists: json['artists'] is List
+            ? json['artists']
+                .map((Object artistJson) => new Artist.fromJson(artistJson))
+                .toList()
+            : <Artist>[],
+        // Tracks accessed within an album will have this as null
+        album: json['album'] != null ? new Album.fromJson(json['album']) : null,
+        duration: new Duration(milliseconds: json['duration_ms']),
+        trackNumber: json['track_number'],
+        id: json['id'],
+        playbackUrl: json['preview_url'],
+      );
+    } else {
+      throw new Exception('The provided json must be a Map.');
+    }
   }
 
   /// Gets the default artwork for this track.

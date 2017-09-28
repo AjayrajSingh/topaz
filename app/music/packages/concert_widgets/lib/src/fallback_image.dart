@@ -27,7 +27,7 @@ class FallbackImage extends StatelessWidget {
   final IconData icon;
 
   /// Constructor
-  FallbackImage({
+  const FallbackImage({
     Key key,
     this.url,
     this.width,

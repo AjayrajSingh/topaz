@@ -13,7 +13,7 @@ import 'artist_module_model.dart';
 /// Top-level widget for the Artist Module
 class ArtistModuleScreen extends StatelessWidget {
   /// Constructor
-  ArtistModuleScreen({Key key}) : super(key: key);
+  const ArtistModuleScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

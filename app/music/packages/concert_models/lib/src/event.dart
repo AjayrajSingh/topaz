@@ -65,8 +65,8 @@ class Event {
           : null,
       performances: json['performance'] is List<dynamic>
           ? json['performance']
-              .map((dynamic performance) =>
-                  new Performance.fromJson(performance))
+              .map(
+                  (Object performance) => new Performance.fromJson(performance))
               .toList()
           : <Performance>[],
       id: json['id'],

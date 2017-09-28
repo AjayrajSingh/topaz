@@ -7,6 +7,7 @@ import 'dart:convert' show BASE64, JSON, UTF8;
 
 import 'package:http/http.dart' as http;
 import 'package:lib.logging/logging.dart';
+import 'package:meta/meta.dart';
 import 'package:music_models/music_models.dart';
 
 const String _kApiBaseUrl = 'api.spotify.com';
@@ -25,15 +26,14 @@ class Api {
 
   /// Constructor
   Api({
-    this.clientId,
-    this.clientSecret,
-  }) {
-    assert(clientId != null);
-    assert(clientSecret != null);
-  }
+    @required this.clientId,
+    @required this.clientSecret,
+  })
+      : assert(clientId != null),
+        assert(clientSecret != null);
 
   Future<Map<String, String>> _getAuthHeader() async {
-    Map<String, String> authHeader = new Map<String, String>();
+    Map<String, String> authHeader = <String, String>{};
     if (_accessToken != null &&
         _expirationTime != null &&
         _expirationTime.isBefore(new DateTime.now())) {
@@ -41,11 +41,11 @@ class Api {
       return authHeader;
     } else {
       Uri uri = new Uri.https(_kAuthBaseUrl, '/api/token');
-      Map<String, String> headers = new Map<String, String>();
+      Map<String, String> headers = <String, String>{};
       String encodedAuthorization =
           BASE64.encode(UTF8.encode('$clientId:$clientSecret'));
       headers['Authorization'] = 'Basic $encodedAuthorization';
-      Map<String, String> body = new Map<String, String>();
+      Map<String, String> body = <String, String>{};
       body['grant_type'] = 'client_credentials';
       http.Response response =
           await http.post(uri, body: body, headers: headers);
@@ -92,8 +92,8 @@ class Api {
     }
     dynamic jsonData = JSON.decode(response.body);
     List<Artist> artists = <Artist>[];
-    if (jsonData['artists'] is List<dynamic>) {
-      jsonData['artists'].forEach((dynamic artistJson) {
+    if (jsonData['artists'] is List) {
+      jsonData['artists'].forEach((Object artistJson) {
         artists.add(new Artist.fromJson(artistJson));
       });
     }
@@ -121,7 +121,7 @@ class Api {
       return null;
     }
     // Only retrieve albums for US market to avoid duplicates
-    Map<String, String> query = new Map<String, String>();
+    Map<String, String> query = <String, String>{};
     query['market'] = 'us';
     Uri uri = new Uri.https(_kApiBaseUrl, '/v1/artists/$id/albums', query);
     http.Response response = await http.get(uri, headers: authHeader);
@@ -130,8 +130,8 @@ class Api {
     }
     dynamic jsonData = JSON.decode(response.body);
     List<Album> simplifiedAlbums = <Album>[];
-    if (jsonData['items'] is List<dynamic>) {
-      jsonData['items'].forEach((dynamic albumJson) {
+    if (jsonData['items'] is List) {
+      jsonData['items'].forEach((Object albumJson) {
         simplifiedAlbums.add(new Album.fromJson(albumJson));
       });
     }
@@ -148,7 +148,7 @@ class Api {
     if (authHeader == null) {
       return null;
     }
-    Map<String, String> query = new Map<String, String>();
+    Map<String, String> query = <String, String>{};
     query['ids'] = ids.join(',');
     Uri uri = new Uri.https(_kApiBaseUrl, '/v1/albums', query);
     http.Response response = await http.get(uri, headers: authHeader);
@@ -157,8 +157,8 @@ class Api {
     }
     dynamic jsonData = JSON.decode(response.body);
     List<Album> albums = <Album>[];
-    if (jsonData['albums'] is List<dynamic>) {
-      jsonData['albums'].forEach((dynamic albumJson) {
+    if (jsonData['albums'] is List) {
+      jsonData['albums'].forEach((Object albumJson) {
         albums.add(new Album.fromJson(albumJson));
       });
     }
@@ -171,7 +171,7 @@ class Api {
     if (authHeader == null) {
       return null;
     }
-    Map<String, String> query = new Map<String, String>();
+    Map<String, String> query = <String, String>{};
     query['type'] = 'artist';
     query['q'] = name;
     Uri uri = new Uri.https(_kApiBaseUrl, '/v1/search', query);
@@ -183,8 +183,8 @@ class Api {
     }
     dynamic jsonData = JSON.decode(response.body);
     List<Artist> artists = <Artist>[];
-    if (jsonData['artists']['items'] is List<dynamic>) {
-      jsonData['artists']['items'].forEach((dynamic artistJson) {
+    if (jsonData['artists']['items'] is List) {
+      jsonData['artists']['items'].forEach((Object artistJson) {
         artists.add(new Artist.fromJson(artistJson));
       });
     }

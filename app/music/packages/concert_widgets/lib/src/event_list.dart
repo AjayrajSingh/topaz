@@ -36,15 +36,14 @@ class EventList extends StatelessWidget {
       new _EventListGridDelegate();
 
   /// Constructor
-  EventList({
+  const EventList({
     Key key,
     @required this.events,
     this.selectedEvent,
     this.onSelect,
   })
-      : super(key: key) {
-    assert(events != null);
-  }
+      : assert(events != null),
+        super(key: key);
 
   String get _listTitle =>
       'Concert Guide  -  ${_kMonthFormat.format(new DateTime.now())}';
@@ -59,7 +58,7 @@ class EventList extends StatelessWidget {
         child: new Container(
           decoration: new BoxDecoration(
             image: new DecorationImage(
-              image: new AssetImage(
+              image: const AssetImage(
                 'packages/concert_widgets/res/concert_bg.jpg',
               ),
               fit: BoxFit.cover,

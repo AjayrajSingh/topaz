@@ -53,7 +53,7 @@ class ArtistScreen extends StatelessWidget {
   final LoadingStatus loadingStatus;
 
   /// Constructor
-  ArtistScreen({
+  const ArtistScreen({
     Key key,
     this.artist,
     this.albums,
@@ -160,9 +160,9 @@ class ArtistScreen extends StatelessWidget {
             left: 32.0,
             top: 16.0,
           ),
-          child: new Text(
+          child: const Text(
             'RELATED ARTISTS',
-            style: new TextStyle(
+            style: const TextStyle(
               fontSize: 16.0,
             ),
           ),

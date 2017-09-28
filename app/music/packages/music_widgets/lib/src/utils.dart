@@ -9,8 +9,7 @@ class DurationFormat {
   int _seconds;
 
   /// Constructor
-  DurationFormat(Duration duration) {
-    assert(duration != null);
+  DurationFormat(Duration duration) : assert(duration != null) {
     _hours = (duration.inSeconds / Duration.SECONDS_PER_HOUR).floor();
     _minutes = ((duration.inSeconds - (_hours * Duration.SECONDS_PER_HOUR)) /
             Duration.SECONDS_PER_MINUTE)
@@ -25,25 +24,25 @@ class DurationFormat {
   ///
   /// This only needs to be precise to the second
   String get playbackText {
-    String output = '';
+    StringBuffer buffer = new StringBuffer();
 
     if (_hours > 0) {
-      output += '$_hours:';
+      buffer.write('$_hours:');
     }
 
     if (_minutes < 10 && _hours > 0) {
-      output += '0$_minutes:';
+      buffer.write('0$_minutes:');
     } else {
-      output += '$_minutes:';
+      buffer.write('$_minutes:');
     }
 
     if (_seconds < 10) {
-      output += '0$_seconds';
+      buffer.write('0$_seconds');
     } else {
-      output += '$_seconds';
+      buffer.write('$_seconds');
     }
 
-    return output;
+    return buffer.toString();
   }
 
   /// Returns the human-readable form of a given duration that is usually used for
@@ -51,23 +50,23 @@ class DurationFormat {
   ///
   /// Only show seconds if the duration is below a minute
   String get totalText {
-    String output = '';
+    StringBuffer buffer = new StringBuffer();
 
     if (_hours > 0) {
-      output += '${_hours}hr';
+      buffer.write('${_hours}hr');
       if (_minutes > 0) {
-        output += ' ';
+        buffer.write(' ');
       }
     }
 
     if (_minutes > 0) {
-      output += '${_minutes}m';
+      buffer.write('${_minutes}m');
     }
 
     if (_hours == 0 && _minutes == 0) {
-      output += '${_seconds}s';
+      buffer.write('${_seconds}s');
     }
 
-    return output;
+    return buffer.toString();
   }
 }

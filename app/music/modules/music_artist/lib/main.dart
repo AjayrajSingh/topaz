@@ -16,8 +16,8 @@ import 'modular/artist_module_screen.dart';
 Future<Null> main() async {
   setupLogger();
 
-  Config config = await Config.read('/system/data/modules/config.json');
-  config.validate(<String>['spotify_client_id', 'spotify_client_secret']);
+  Config config = await Config.read('/system/data/modules/config.json')
+    ..validate(<String>['spotify_client_id', 'spotify_client_secret']);
 
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
@@ -31,7 +31,7 @@ Future<Null> main() async {
       new ModuleWidget<ArtistModuleModel>(
     applicationContext: applicationContext,
     moduleModel: artistModuleModel,
-    child: new ArtistModuleScreen(),
+    child: const ArtistModuleScreen(),
   );
 
   runApp(moduleWidget);

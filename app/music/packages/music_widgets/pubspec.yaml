@@ -11,7 +11,7 @@ dependencies:
     path: ../../../../lib/widgets/packages/widgets
   music_models:
     path: ../music_models
-  intl: ^0.14.0
+  intl: ^0.15.1
 dev_dependencies:
   test: any
   flutter_test:

@@ -29,16 +29,21 @@ class Artist {
   });
 
   /// Create an artist object from json data
-  factory Artist.fromJson(dynamic json) {
-    return new Artist(
-      name: json['name'],
-      mbid: json['mbid'],
-      bio: json['bio'] is Map<String, dynamic> ? json['bio']['content'] : null,
-      imageUrl: json['image'] is List<dynamic> &&
-              json['image'].isNotEmpty &&
-              json['image'].last is Map<String, String>
-          ? json['image'].last['#text']
-          : null,
-    );
+  factory Artist.fromJson(Object json) {
+    if (json is Map) {
+      return new Artist(
+        name: json['name'],
+        mbid: json['mbid'],
+        bio:
+            json['bio'] is Map<String, dynamic> ? json['bio']['content'] : null,
+        imageUrl: json['image'] is List<dynamic> &&
+                json['image'].isNotEmpty &&
+                json['image'].last is Map<String, String>
+            ? json['image'].last['#text']
+            : null,
+      );
+    } else {
+      throw new Exception('The provided json object must be a Map.');
+    }
   }
 }
