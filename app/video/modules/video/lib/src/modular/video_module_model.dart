@@ -6,13 +6,13 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert' show JSON;
 
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.netconnector.fidl/netconnector.fidl.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 
 import '../widgets.dart';
@@ -24,8 +24,9 @@ const String _kCastingDeviceName = 'castingDeviceName';
 class VideoModuleModel extends ModuleModel {
   String _remoteDeviceName = 'Remote Device';
   String _castingDeviceName;
-  DeviceMapEntry _currentDevice =
-      new DeviceMapEntry.init('Current Device', null, null, 'Current Device');
+  DeviceMapEntry _currentDevice = new DeviceMapEntry()
+    ..name = 'Current Device'
+    ..hostname = 'Current Device';
   final NetConnectorProxy _netConnector = new NetConnectorProxy();
   final DeviceMapProxy _deviceMap = new DeviceMapProxy();
 
