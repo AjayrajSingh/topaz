@@ -1,0 +1,41 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/rust/rust_binary.gni")
+import("//packages/package.gni")
+
+group("rust_sample_module") {
+  deps = [
+    ":spinning_square_rs",
+  ]
+}
+
+rust_binary("spinning_square_rs") {
+  deps = [
+    "//apps/xi/services:services_rust_library",
+    "//garnet/public/lib/app/fidl:service_provider_rust_library",
+    "//garnet/public/lib/app/fidl:services_rust_library",
+    "//garnet/public/lib/fidl/rust/fidl",
+    "//garnet/public/lib/ui/composition/fidl:composition_rust_library",
+    "//garnet/public/lib/ui/input/fidl:input_rust_library",
+    "//garnet/public/lib/ui/views/fidl:view_token_rust_library",
+    "//garnet/public/lib/ui/views/fidl:views_rust_library",
+    "//garnet/public/rust/crates/mxruntime",
+    "//garnet/public/rust/crates/fuchsia-zircon",
+    "//third_party/rust-crates:cairo-rs-0.1.3",
+  ]
+}
+
+package("package") {
+  package_name = "rust_sample_module"
+  app = true
+
+  deps = [
+    ":spinning_square_rs",
+  ]
+
+  binaries = [ {
+        name = "spinning_square_rs"
+      } ]
+}
