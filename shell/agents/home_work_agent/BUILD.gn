@@ -5,7 +5,6 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_app("home_work_agent") {
-
   main_dart = "lib/main.dart"
 
   package_name = "home_work_agent"
@@ -13,12 +12,11 @@ dart_app("home_work_agent") {
   analysis_options = "//topaz/shell/analysis_options.yaml"
 
   deps = [
-    "//topaz/public/lib/app/dart",
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
-    "//topaz/public/lib/fidl/dart",
     "//topaz/lib/widgets/packages/modular:lib.modular",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
   ]
 }
-

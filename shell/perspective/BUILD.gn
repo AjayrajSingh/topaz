@@ -14,9 +14,9 @@ flutter_app("perspective") {
   analysis_options = "//topaz/shell/analysis_options.yaml"
 
   deps = [
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/media/flutter",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/media/flutter",
   ]
 }

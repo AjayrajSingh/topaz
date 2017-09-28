@@ -10,7 +10,8 @@ declare_args() {
   # a "//" in which case it will be considered relative to the Fuchsia source
   # directory. If the path starts with a single slash it will be treated as an
   # absolute path
-  armadillo_path_context_config = "armadillo_user_shell/assets/contextual_config.json"
+  armadillo_path_context_config =
+      "armadillo_user_shell/assets/contextual_config.json"
 }
 
 assert(armadillo_path_context_config != "")
@@ -327,7 +328,6 @@ package("sysui") {
       path = rebase_path(armadillo_path_context_config)
       dest = "sysui/contextual_config.json"
     },
-
   ]
 }
 

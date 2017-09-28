@@ -11,11 +11,11 @@ dart_package("armadillo") {
   analysis_options = "//topaz/shell/analysis_options.yaml"
 
   deps = [
-    "//topaz/tools/packages/models",
-    "//topaz/shell/keyboard",
-    "//topaz/shell/widgets",
     "//lib/flutter/packages/flutter",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/shell/keyboard",
+    "//topaz/shell/widgets",
+    "//topaz/tools/packages/models",
   ]
 }
 
@@ -23,8 +23,8 @@ dart_test("test") {
   analysis_options = "//topaz/shell/analysis_options.yaml"
 
   deps = [
-    "//topaz/shell/armadillo",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/shell/armadillo",
   ]
 }

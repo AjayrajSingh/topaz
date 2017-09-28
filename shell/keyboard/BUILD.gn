@@ -11,8 +11,8 @@ dart_package("keyboard") {
   analysis_options = "//topaz/shell/analysis_options.yaml"
 
   deps = [
-    "//topaz/shell/widgets",
     "//lib/flutter/packages/flutter",
+    "//topaz/shell/widgets",
   ]
 }
 
@@ -20,8 +20,8 @@ dart_test("test") {
   analysis_options = "//topaz/shell/analysis_options.yaml"
 
   deps = [
-    "//topaz/shell/keyboard",
     "//lib/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/shell/keyboard",
   ]
 }
