@@ -19,13 +19,12 @@ class DeviceChooser extends StatelessWidget {
   final DeviceCallback playRemote;
 
   /// Constructor for the device chooser in the video player
-  DeviceChooser({
+  const DeviceChooser({
     Key key,
     @required this.playRemote,
   })
-      : super(key: key) {
-    assert(this.playRemote != null);
-  }
+      : assert(playRemote != null),
+        super(key: key);
 
   Widget _createDropTarget(
     String dropTargetName,
@@ -62,7 +61,7 @@ class DeviceChooser extends StatelessWidget {
           child: new Column(
             children: <Widget>[
               new Padding(
-                padding: new EdgeInsets.only(top: 40.0, bottom: 10.0),
+                padding: const EdgeInsets.only(top: 40.0, bottom: 10.0),
                 child: new Icon(
                   Icons.error,
                   size: 64.0,

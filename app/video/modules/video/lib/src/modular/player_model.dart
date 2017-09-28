@@ -86,15 +86,15 @@ class PlayerModel extends Model {
     @required this.setDisplayMode,
     @required this.onPlayRemote,
     @required this.onPlayLocal,
-  }) {
-    assert(requestFocus != null);
-    assert(getDisplayMode != null);
-    assert(setDisplayMode != null);
-    assert(onPlayRemote != null);
-    assert(onPlayLocal != null);
-    _controller = new MediaPlayerController(appContext.environmentServices);
-    _controller.addListener(_handleControllerChanged);
-    _controller.open(_asset.uri, serviceName: _kServiceName);
+  })
+      : assert(requestFocus != null),
+        assert(getDisplayMode != null),
+        assert(setDisplayMode != null),
+        assert(onPlayRemote != null),
+        assert(onPlayLocal != null) {
+    _controller = new MediaPlayerController(appContext.environmentServices)
+      ..addListener(_handleControllerChanged)
+      ..open(_asset.uri, serviceName: _kServiceName);
 
     notifyListeners();
   }
@@ -166,7 +166,7 @@ class PlayerModel extends Model {
       );
 
       if (_replayRemotely) {
-        lastLocalTime = new Duration(seconds: 0);
+        lastLocalTime = Duration.ZERO;
         _replayRemotely = false;
       }
       _controller.seek(lastLocalTime);
@@ -187,7 +187,7 @@ class PlayerModel extends Model {
   void playRemote(String deviceName) {
     if (_asset.device == null) {
       pause();
-      log.fine('Starting remote play on ' + deviceName);
+      log.fine('Starting remote play on $deviceName');
       _asset = new Asset.remote(
           service: _kServiceName,
           device: deviceName,
@@ -212,8 +212,9 @@ class PlayerModel extends Model {
       _asset = _defaultAsset;
       setDisplayMode(kDefaultDisplayMode);
       log.fine('Starting local play');
-      _controller.open(_asset.uri, serviceName: _kServiceName);
-      _controller.seek(progress);
+      _controller
+        ..open(_asset.uri, serviceName: _kServiceName)
+        ..seek(progress);
 
       brieflyShowControlOverlay();
       onPlayLocal();

@@ -24,7 +24,7 @@ class PlayControls extends StatelessWidget {
   final double padding;
 
   /// Constructor for the play controls in the video player
-  PlayControls({
+  const PlayControls({
     Key key,
     @required this.primaryIconSize,
     @required this.secondaryIconSize,
@@ -55,17 +55,17 @@ class PlayControls extends StatelessWidget {
   }
 
   void _forward(PlayerModel model) {
-    model.pause();
-    model.normalizedSeek(
-        min(model.normalizedProgress + _getZoomTime(model), 1.0));
-    model.play();
+    model
+      ..pause()
+      ..normalizedSeek(min(model.normalizedProgress + _getZoomTime(model), 1.0))
+      ..play();
   }
 
   void _rewind(PlayerModel model) {
-    model.pause();
-    model.normalizedSeek(
-        max(model.normalizedProgress - _getZoomTime(model), 0.0));
-    model.play();
+    model
+      ..pause()
+      ..normalizedSeek(max(model.normalizedProgress - _getZoomTime(model), 0.0))
+      ..play();
   }
 
   void _togglePlayPause(PlayerModel model) {

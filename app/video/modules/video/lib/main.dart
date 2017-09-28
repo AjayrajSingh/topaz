@@ -32,10 +32,9 @@ void main() {
     applicationContext: appContext,
     child: new ScopedModel<PlayerModel>(
       model: playerModel,
-      child: new VideoApp(),
+      child: const VideoApp(),
     ),
-  );
-  moduleWidget.advertise();
+  )..advertise();
 
   runApp(moduleWidget);
 }

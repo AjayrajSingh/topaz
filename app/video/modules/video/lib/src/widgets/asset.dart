@@ -68,19 +68,18 @@ class Asset {
     @required this.thumbnail,
     @required this.background,
   })
-      : type = AssetType.movie,
+      : assert(uri != null),
+        assert(title != null),
+        assert(description != null),
+        assert(thumbnail != null),
+        assert(background != null),
+        type = AssetType.movie,
         artist = null,
         album = null,
         children = null,
         device = null,
         service = null,
-        position = null {
-    assert(uri != null);
-    assert(title != null);
-    assert(description != null);
-    assert(thumbnail != null);
-    assert(background != null);
-  }
+        position = null;
 
   /// Constructs an asset describing a song.
   Asset.song({
@@ -103,7 +102,10 @@ class Asset {
     @required this.children,
     this.title,
   })
-      : type = AssetType.playlist,
+      : assert(children.isNotEmpty),
+        assert(children.every((Asset c) =>
+            c.type == AssetType.movie || c.type == AssetType.song)),
+        type = AssetType.playlist,
         uri = null,
         description = null,
         thumbnail = null,
@@ -112,11 +114,7 @@ class Asset {
         album = null,
         device = null,
         service = null,
-        position = null {
-    assert(children.isNotEmpty);
-    assert(children.every(
-        (Asset c) => c.type == AssetType.movie || c.type == AssetType.song));
-  }
+        position = null;
 
   /// Constructs an asset describing a remote player.
   Asset.remote({
@@ -129,17 +127,16 @@ class Asset {
     @required this.background,
     @required this.uri,
   })
-      : type = AssetType.remote,
+      : assert(device != null),
+        assert(service != null),
+        assert(position != null),
+        assert(title != null),
+        assert(description != null),
+        assert(thumbnail != null),
+        assert(background != null),
+        assert(uri != null),
+        type = AssetType.remote,
         artist = null,
         album = null,
-        children = null {
-    assert(device != null);
-    assert(service != null);
-    assert(position != null);
-    assert(title != null);
-    assert(description != null);
-    assert(thumbnail != null);
-    assert(background != null);
-    assert(uri != null);
-  }
+        children = null;
 }

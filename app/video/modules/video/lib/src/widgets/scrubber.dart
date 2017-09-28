@@ -13,10 +13,7 @@ const double _kZoomTimeInMicroseconds = 3000000.0;
 /// The time slider/scrubber for the video player
 class Scrubber extends StatelessWidget {
   /// Constructor for the time slider/scrubber for the video player
-  Scrubber({
-    Key key,
-  })
-      : super(key: key);
+  const Scrubber({Key key}) : super(key: key);
 
   /// Converts a duration to a string indicating seconds, such as '1:15:00' or
   /// '2:40'
@@ -51,7 +48,7 @@ class Scrubber extends StatelessWidget {
   Widget _buildTimestamp(Duration timestamp, DisplayMode displayMode) {
     return new Center(
       child: new Container(
-        padding: new EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: new Text(
           _convertDurationToString(timestamp),
           style: new TextStyle(
@@ -85,10 +82,10 @@ class Scrubber extends StatelessWidget {
     switch (model.getDisplayMode()) {
       case DisplayMode.remoteControl:
         return new Container(
-          padding: new EdgeInsets.only(top: 40.0),
+          padding: const EdgeInsets.only(top: 40.0),
           child: new Stack(
             children: <Widget>[
-              new PlayControls(
+              const PlayControls(
                 primaryIconSize: 48.0,
                 secondaryIconSize: 48.0,
                 padding: 36.0,
@@ -129,7 +126,7 @@ class Scrubber extends StatelessWidget {
             children: <Widget>[
               _buildProgress(model),
               _buildDuration(model),
-              new PlayControls(
+              const PlayControls(
                 primaryIconSize: 36.0,
                 secondaryIconSize: 36.0,
                 padding: 20.0,

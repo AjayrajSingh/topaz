@@ -16,21 +16,20 @@ class Standby extends StatelessWidget {
   final Asset asset;
 
   /// Constructor for standby mode
-  Standby({
+  const Standby({
     Key key,
     @required this.castingDeviceName,
     @required this.asset,
   })
-      : super(key: key) {
-    assert(asset != null);
-  }
+      : assert(asset != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Widget thumbnail = new Align(
       alignment: FractionalOffset.bottomCenter,
       child: new Container(
-        margin: new EdgeInsets.all(24.0),
+        margin: const EdgeInsets.all(24.0),
         width: 400.0,
         child: new Image.asset(asset.thumbnail),
       ),
@@ -66,7 +65,7 @@ class Standby extends StatelessWidget {
                 color: Colors.grey[50],
               ),
               new Padding(
-                padding: new EdgeInsets.only(left: 8.0),
+                padding: const EdgeInsets.only(left: 8.0),
                 child: new Text(
                   castingDeviceName ?? 'Acer',
                   style: new TextStyle(
@@ -86,7 +85,7 @@ class Standby extends StatelessWidget {
       child: new Column(
         children: <Widget>[
           new Padding(
-            padding: new EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: new Text(
               asset.title,
               style: new TextStyle(
@@ -98,7 +97,7 @@ class Standby extends StatelessWidget {
           ),
           new Container(
             width: 550.0,
-            padding: new EdgeInsets.only(bottom: 4.0),
+            padding: const EdgeInsets.only(bottom: 4.0),
             child: new Text(
               asset.description,
               textAlign: TextAlign.center,

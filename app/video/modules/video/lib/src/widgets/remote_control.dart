@@ -22,26 +22,25 @@ class RemoteControl extends StatelessWidget {
   final bool smallScreen;
 
   /// Constructor for remote control mode for the video player
-  RemoteControl({
+  const RemoteControl({
     Key key,
     @required this.playLocal,
     @required this.remoteDeviceName,
     @required this.asset,
     @required this.smallScreen,
   })
-      : super(key: key) {
-    assert(playLocal != null);
-    assert(remoteDeviceName != null);
-    assert(asset != null);
-    assert(smallScreen != null);
-  }
+      : assert(playLocal != null),
+        assert(remoteDeviceName != null),
+        assert(asset != null),
+        assert(smallScreen != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Widget thumbnail = new Align(
       alignment: FractionalOffset.bottomCenter,
       child: new Container(
-        margin: new EdgeInsets.all(20.0),
+        margin: const EdgeInsets.all(20.0),
         width: 360.0,
         child: new Image.asset(asset.thumbnail),
       ),
@@ -64,7 +63,7 @@ class RemoteControl extends StatelessWidget {
           ),
           new Container(
             width: 400.0,
-            padding: new EdgeInsets.only(bottom: 4.0),
+            padding: const EdgeInsets.only(bottom: 4.0),
             child: new Text(
               smallScreen ? '' : asset.description,
               textAlign: TextAlign.center,
@@ -89,7 +88,7 @@ class RemoteControl extends StatelessWidget {
             borderRadius: new BorderRadius.circular(16.0),
             color: Colors.grey[800],
           ),
-          padding: new EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: new Row(
             children: <Widget>[
               new Icon(
@@ -98,7 +97,7 @@ class RemoteControl extends StatelessWidget {
                 color: Colors.grey[50],
               ),
               new Padding(
-                padding: new EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: new Text(
                   remoteDeviceName,
                   style: new TextStyle(
@@ -138,7 +137,7 @@ class RemoteControl extends StatelessWidget {
         ),
         new Expanded(
           flex: smallScreen ? 5 : 2,
-          child: new Scrubber(),
+          child: const Scrubber(),
         ),
       ],
     );

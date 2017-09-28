@@ -13,16 +13,15 @@ final Color _kFocusedColor = Colors.white;
 /// Device Drop Target Icon that animates based on if it is focused
 class DeviceTargetIcon extends StatefulWidget {
   /// Constructor
-  DeviceTargetIcon({
+  const DeviceTargetIcon({
     Key key,
     @required this.icon,
     @required this.deviceName,
     this.focused: false,
   })
-      : super(key: key) {
-    assert(icon != null);
-    assert(deviceName != null);
-  }
+      : assert(icon != null),
+        assert(deviceName != null),
+        super(key: key);
 
   /// Icon that represents the device
   final IconData icon;
@@ -92,7 +91,7 @@ class _DeviceTargetIconState extends State<DeviceTargetIcon>
               child: new Column(
                 children: <Widget>[
                   new Padding(
-                    padding: new EdgeInsets.only(top: 40.0, bottom: 10.0),
+                    padding: const EdgeInsets.only(top: 40.0, bottom: 10.0),
                     child: new Icon(
                       widget.icon,
                       size: _kDefaultIconSize,

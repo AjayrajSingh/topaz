@@ -15,7 +15,7 @@ import 'loading.dart';
 /// The video screen for the video player
 class Screen extends StatefulWidget {
   /// Constructor for the video screen for the video player
-  Screen({Key key}) : super(key: key);
+  const Screen({Key key}) : super(key: key);
 
   @override
   _ScreenState createState() => new _ScreenState();

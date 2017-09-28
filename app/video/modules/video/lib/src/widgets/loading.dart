@@ -11,13 +11,12 @@ class Loading extends StatelessWidget {
   final String remoteDeviceName;
 
   /// Constructor for the loading screen
-  Loading({
+  const Loading({
     Key key,
     @required this.remoteDeviceName,
   })
-      : super(key: key) {
-    assert(remoteDeviceName != null);
-  }
+      : assert(remoteDeviceName != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,7 @@ class Loading extends StatelessWidget {
         child: new Column(
           children: <Widget>[
             new Padding(
-              padding: new EdgeInsets.only(top: 40.0, bottom: 10.0),
+              padding: const EdgeInsets.only(top: 40.0, bottom: 10.0),
               child: new Container(
                 height: 64.0,
                 width: 64.0,

@@ -12,14 +12,14 @@ import '../widgets.dart';
 /// Video player layout
 class Player extends StatelessWidget {
   /// Constructor for the video player layout
-  Player({
+  const Player({
     Key key,
   })
       : super(key: key);
 
-  final Widget _screen = new Screen();
+  final Widget _screen = const Screen();
 
-  final Widget _playControls = new PlayControls(
+  final Widget _playControls = const PlayControls(
     primaryIconSize: 80.0,
     secondaryIconSize: 64.0,
     padding: 0.0,
@@ -34,7 +34,7 @@ class Player extends StatelessWidget {
             borderRadius: new BorderRadius.circular(3.0),
             color: Colors.black,
           ),
-          padding: new EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: new Row(
             children: <Widget>[
               new Text(
@@ -49,7 +49,7 @@ class Player extends StatelessWidget {
                 onTap: () =>
                     playerModel.playRemote(moduleModel.remoteDeviceName),
                 child: new Padding(
-                  padding: new EdgeInsets.only(left: 32.0),
+                  padding: const EdgeInsets.only(left: 32.0),
                   child: new Text(
                     'RETRY',
                     style: new TextStyle(
@@ -111,7 +111,7 @@ class Player extends StatelessWidget {
                     ],
                   ),
                 ),
-                new Scrubber(),
+                const Scrubber(),
               ],
             ),
             // TODO(maryxia) SO-609: transparency with PhysicalModel
@@ -145,9 +145,9 @@ class Player extends StatelessWidget {
                 ),
                 new AnimatedCrossFade(
                     duration: kPlayControlsAnimationTime,
-                    firstChild: new Padding(
+                    firstChild: const Padding(
                       // height of play controls + Slider._kReactionRadius
-                      padding: new EdgeInsets.only(bottom: 86.0),
+                      padding: const EdgeInsets.only(bottom: 86.0),
                     ),
                     secondChild: new Container(),
                     crossFadeState: playerModel.showControlOverlay
@@ -156,11 +156,11 @@ class Player extends StatelessWidget {
               ],
             ),
             // Scrubber for this Mode includes PlayControls
-            new Positioned(
+            const Positioned(
               bottom: 0.0,
               left: 0.0,
               right: 0.0,
-              child: new Scrubber(),
+              child: const Scrubber(),
             ),
             // TODO(maryxia) SO-609: transparency with PhysicalModel
             new Positioned(

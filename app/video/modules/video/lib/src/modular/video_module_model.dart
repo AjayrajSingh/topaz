@@ -135,7 +135,7 @@ class VideoModuleModel extends ModuleModel {
   /// NetConnector callback to set names of currently active remote devices
   void setActiveRemoteDevices(int version, List<String> deviceNames) {
     this.deviceNames = deviceNames;
-    this.lastVersion = version;
+    lastVersion = version;
   }
 
   /// DeviceMap callback to set names/hostnames of all remote devices
@@ -148,7 +148,7 @@ class VideoModuleModel extends ModuleModel {
   /// Refresh list of remote devices using deviceMap/netConnector
   void refreshRemoteDevices() {
     _deviceMap.query(setRemoteDeviceNames);
-    _netConnector.getKnownDeviceNames(this.lastVersion, setActiveRemoteDevices);
+    _netConnector.getKnownDeviceNames(lastVersion, setActiveRemoteDevices);
   }
 
   /// Device side play remotely
@@ -177,7 +177,7 @@ class VideoModuleModel extends ModuleModel {
   }
 
   void _handleRemoteDeviceChange(String remoteInfoJson) {
-    log.fine('Remote device UI change: ' + remoteInfoJson);
+    log.fine('Remote device UI change: $remoteInfoJson');
     Map<String, dynamic> remoteInfo = JSON.decode(remoteInfoJson);
     if (remoteInfo != null) {
       bool shouldNotifyListeners = false;
