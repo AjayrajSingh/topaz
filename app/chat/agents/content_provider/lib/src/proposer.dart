@@ -68,8 +68,15 @@ class Proposer extends ContextListener {
   @override
   void onContextUpdate(ContextUpdate result) {
     log.fine('onUpdate: ${result.values}');
-    _currentLocation =
-        result.values['location/home_work'][0]?.content ?? 'unknown';
+    if (!(result?.values?.containsKey('location/home_work') ?? false)) {
+      return;
+    }
+    if (result.values['location/home_work'].isEmpty) {
+      _currentLocation = 'unknown';
+    } else {
+      _currentLocation =
+          result.values['location/home_work'][0]?.content ?? 'unknown';
+    }
     log.fine('Current location: $_currentLocation');
   }
 

@@ -122,7 +122,9 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
       );
 
       FirebaseToken firebaseToken = await tokenCompleter.future;
-      if (firebaseToken == null) {
+      if (firebaseToken == null ||
+          firebaseToken.idToken == null ||
+          firebaseToken.idToken.isEmpty) {
         throw new Exception('Could not obtain the Firebase token.');
       }
 
