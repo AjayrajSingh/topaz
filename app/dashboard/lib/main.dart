@@ -17,18 +17,8 @@ const String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/fuchsia/';
 const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   const <List<String>>[
     const <String>[
-      'fuchsia-x86_64-linux-debug',
-      'x86_64-linux-debug',
-      'fuchsia'
-    ],
-    const <String>[
       'fuchsia-aarch64-linux-debug',
       'aarch64-linux-debug',
-      'fuchsia'
-    ],
-    const <String>[
-      'fuchsia-x86_64-linux-release',
-      'x86_64-linux-release',
       'fuchsia'
     ],
     const <String>[
@@ -36,35 +26,35 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
       'aarch64-linux-release',
       'fuchsia'
     ],
+    const <String>[
+      'fuchsia-x86_64-linux-debug',
+      'x86_64-linux-debug',
+      'fuchsia'
+    ],
+    const <String>[
+      'fuchsia-x86_64-linux-release',
+      'x86_64-linux-release',
+      'fuchsia'
+    ],
   ],
   const <List<String>>[
-    const <String>['topaz-x86_64-linux-debug', 'x86_64-linux-debug', 'topaz'],
     const <String>['topaz-aarch64-linux-debug', 'aarch64-linux-debug', 'topaz'],
-    const <String>[
-      'topaz-x86_64-linux-release',
-      'x86_64-linux-release',
-      'topaz'
-    ],
     const <String>[
       'topaz-aarch64-linux-release',
       'aarch64-linux-release',
       'topaz'
     ],
+    const <String>['topaz-x86_64-linux-debug', 'x86_64-linux-debug', 'topaz'],
+    const <String>[
+      'topaz-x86_64-linux-release',
+      'x86_64-linux-release',
+      'topaz'
+    ],
   ],
   const <List<String>>[
     const <String>[
-      'peridot-x86_64-linux-debug',
-      'x86_64-linux-debug',
-      'peridot'
-    ],
-    const <String>[
       'peridot-aarch64-linux-debug',
       'aarch64-linux-debug',
-      'peridot'
-    ],
-    const <String>[
-      'peridot-x86_64-linux-release',
-      'x86_64-linux-release',
       'peridot'
     ],
     const <String>[
@@ -72,17 +62,21 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
       'aarch64-linux-release',
       'peridot'
     ],
+    const <String>[
+      'peridot-x86_64-linux-debug',
+      'x86_64-linux-debug',
+      'peridot'
+    ],
+    const <String>[
+      'peridot-x86_64-linux-release',
+      'x86_64-linux-release',
+      'peridot'
+    ],
   ],
   const <List<String>>[
-    const <String>['garnet-x86_64-linux-debug', 'x86_64-linux-debug', 'garnet'],
     const <String>[
       'garnet-aarch64-linux-debug',
       'aarch64-linux-debug',
-      'garnet'
-    ],
-    const <String>[
-      'garnet-x86_64-linux-release',
-      'x86_64-linux-release',
       'garnet'
     ],
     const <String>[
@@ -90,20 +84,26 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
       'aarch64-linux-release',
       'garnet'
     ],
+    const <String>['garnet-x86_64-linux-debug', 'x86_64-linux-debug', 'garnet'],
+    const <String>[
+      'garnet-x86_64-linux-release',
+      'x86_64-linux-release',
+      'garnet'
+    ],
   ],
   const <List<String>>[
-    const <String>['zircon-qemu-arm64-gcc', 'zircon-qemu-arm64-gcc', 'zircon'],
+    const <String>[
+      'zircon-pc-x86-64-clang',
+      'zircon-pc-x86-64-clang',
+      'zircon'
+    ],
     const <String>['zircon-pc-x86-64-gcc', 'zircon-pc-x86-64-gcc', 'zircon'],
     const <String>[
       'zircon-qemu-arm64-clang',
       'zircon-qemu-arm64-clang',
       'zircon'
     ],
-    const <String>[
-      'zircon-pc-x86-64-clang',
-      'zircon-pc-x86-64-clang',
-      'zircon'
-    ],
+    const <String>['zircon-qemu-arm64-gcc', 'zircon-qemu-arm64-gcc', 'zircon'],
   ],
   const <List<String>>[
     const <String>['web_view-x86_64-linux', 'x86_64-linux', 'web_view'],
