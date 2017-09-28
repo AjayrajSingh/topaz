@@ -8,9 +8,7 @@ dart_app("chat_content_provider") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//topaz/public/lib/app/dart",
     "//garnet/public/lib/app/fidl:fidl_dart",
-    "//topaz/public/lib/fidl/dart",
     "//peridot/public/lib/agent/fidl:fidl_dart",
     "//peridot/public/lib/auth/fidl:fidl_dart",
     "//peridot/public/lib/ledger/fidl:fidl_dart",
@@ -24,6 +22,8 @@ dart_app("chat_content_provider") {
     "//topaz/app/chat/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/modular:lib.modular",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
     "//topaz/tools/packages/config",
     "//topaz/tools/packages/fixtures",
     "//topaz/tools/packages/models",

@@ -11,8 +11,6 @@ flutter_app("chat_conversation_list") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
     "//peridot/public/lib/module/fidl:fidl_dart",
@@ -21,6 +19,8 @@ flutter_app("chat_conversation_list") {
     "//topaz/app/chat/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
     "//topaz/tools/packages/models",
   ]
 

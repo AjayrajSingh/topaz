@@ -71,7 +71,7 @@ class ChatContentProviderAgent extends AgentImpl {
       ..meta = new ContextMetadata()
       ..meta.entity = (new EntityMetadata()..topic = 'location/home_work');
     ContextQuery query = new ContextQuery();
-    query.selector['location/home_work'] = selector;
+    query.selector = <String, ContextSelector>{'location/home_work': selector};
     _contextReader.subscribe(query, _proposerBinding.wrap(proposer));
 
     // Initialize the content provider.
