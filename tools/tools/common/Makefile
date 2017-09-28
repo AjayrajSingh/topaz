@@ -77,6 +77,9 @@ PATH := $(flutter_bin):$(dart_bin):$(fuchsia_root)/buildtools:$(PATH)
 ################################################################################
 ## Fuchsia build / LUCI bot related flags
 
+DEFAULT_MODULE ?= packages/gn/default
+MINIMAL_MODULE ?= topaz/packages/modules
+
 # Specify GOMA=1 to force use goma, GOMA=0 to force not use goma.
 # Auto-detect if not specified.
 FSET_FLAGS :=
@@ -104,7 +107,9 @@ endif
 # its dependencies.
 MINIMAL ?=
 ifeq ($(MINIMAL),1)
-	FSET_FLAGS += --modules topaz/packages/modules
+	FSET_FLAGS += --modules $(MINIMAL_MODULE)
+else
+	FSET_FLAGS += --modules $(DEFAULT_MODULE)
 endif
 
 # Respect the fuchsia build variant if already set by fset command externally.
