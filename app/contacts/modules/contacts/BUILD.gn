@@ -11,7 +11,6 @@ flutter_app("contacts") {
   main_dart = "lib/modular_main.dart"
 
   deps = [
-    "//topaz/public/lib/app/dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
     "//peridot/public/lib/module/fidl:fidl_dart",
@@ -21,6 +20,7 @@ flutter_app("contacts") {
     "//topaz/app/contacts/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
     "//topaz/tools/packages/fixtures",
     "//topaz/tools/packages/widgets_meta",
   ]

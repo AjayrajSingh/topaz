@@ -10,10 +10,10 @@ dart_app("contacts_content_provider") {
   package_name = "contacts_content_provider"
 
   deps = [
-    "//topaz/public/lib/app/dart",
     "//topaz/app/contacts/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/modular:lib.modular",
+    "//topaz/public/lib/app/dart",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

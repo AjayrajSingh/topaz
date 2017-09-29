@@ -56,12 +56,12 @@ class ContactsStore<T> {
     _displayNameIndex[displayName].add(contact);
 
     // Add all searchable values to the prefix tree
-    searchableValues.forEach((String value) {
+    for (String value in searchableValues) {
       _prefixTree[value] ??= new Set<T>();
 
       // TODO(meiyili): remove null check after prefix tree is implemented
       _prefixTree[value]?.add(contact);
-    });
+    }
   }
 
   /// Return the list of all contacts sorted by displayName

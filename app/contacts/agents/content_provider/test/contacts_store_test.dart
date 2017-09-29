@@ -22,43 +22,43 @@ void main() {
         test('should throw if id is null', () {
           expect(() {
             store.addContact(null, 'displayName', <String>['email'], 'contact');
-          }, throwsA(new isInstanceOf<ArgumentError>()));
+          }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if id is empty string', () {
           expect(() {
             store.addContact('', 'displayName', <String>['email'], 'contact');
-          }, throwsA(new isInstanceOf<ArgumentError>()));
+          }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if displayName is null', () {
           expect(() {
             store.addContact('id', null, <String>['email'], 'contact');
-          }, throwsA(new isInstanceOf<ArgumentError>()));
+          }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if displayName is empty string', () {
           expect(() {
             store.addContact('id', '', <String>['email'], 'contact');
-          }, throwsA(new isInstanceOf<ArgumentError>()));
+          }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if searchableValues is null', () {
           expect(() {
             store.addContact('id', 'displayName', null, 'contact');
-          }, throwsA(new isInstanceOf<ArgumentError>()));
+          }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if searchableValues is empty', () {
           expect(() {
             store.addContact('id', 'displayName', <String>[], 'contact');
-          }, throwsA(new isInstanceOf<ArgumentError>()));
+          }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if contact is null', () {
           expect(() {
             store.addContact('id', 'displayName', <String>['email'], null);
-          }, throwsA(new isInstanceOf<ArgumentError>()));
+          }, throwsA(const isInstanceOf<ArgumentError>()));
         });
       });
 
@@ -92,18 +92,20 @@ void main() {
           displayName: displayName,
           email: 'the_other_armadillo@example.com',
         );
-        store.addContact(
-          contact1.id,
-          contact1.displayName,
-          <String>[contact1.email],
-          contact1,
-        );
-        store.addContact(
-          contact2.id,
-          contact2.displayName,
-          <String>[contact2.email],
-          contact2,
-        );
+
+        store
+          ..addContact(
+            contact1.id,
+            contact1.displayName,
+            <String>[contact1.email],
+            contact1,
+          )
+          ..addContact(
+            contact2.id,
+            contact2.displayName,
+            <String>[contact2.email],
+            contact2,
+          );
 
         expect(store.getContact(contact1.id), equals(contact1));
         expect(store.getContact(contact2.id), equals(contact2));
@@ -114,10 +116,10 @@ void main() {
           'if adding contact with duplicate id', () {
         expect(() {
           String id = 'contact1';
-          ContactsStore<String> store = new ContactsStore<String>();
-          store.addContact(id, null, <String>['email'], 'contact1');
-          store.addContact(id, null, <String>['firstname'], 'contact2');
-        }, throwsA(new isInstanceOf<ArgumentError>()));
+          new ContactsStore<String>()
+            ..addContact(id, null, <String>['email'], 'contact1')
+            ..addContact(id, null, <String>['firstname'], 'contact2');
+        }, throwsA(const isInstanceOf<ArgumentError>()));
       });
     });
 
@@ -125,15 +127,15 @@ void main() {
       test('should return a list of all contacts', () {
         List<_MockContact> contacts = _createContactList();
         ContactsStore<_MockContact> store = new ContactsStore<_MockContact>();
-        contacts.forEach((_MockContact c) {
+        for (_MockContact c in contacts) {
           store.addContact(c.id, c.displayName, <String>[c.email], c);
-        });
+        }
 
         List<_MockContact> result = store.getAllContacts();
         expect(result, hasLength(contacts.length));
-        contacts.forEach((_MockContact c) {
+        for (_MockContact c in contacts) {
           expect(result, contains(c));
-        });
+        }
       });
 
       test('should return an empty list if there aren\'t any contacts', () {
@@ -147,9 +149,9 @@ void main() {
 
       setUp(() async {
         store = new ContactsStore<_MockContact>();
-        _createContactList().forEach((_MockContact c) {
+        for (_MockContact c in _createContactList()) {
           store.addContact(c.id, c.displayName, <String>[c.email], c);
-        });
+        }
       });
 
       tearDown(() async {
