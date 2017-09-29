@@ -4,9 +4,8 @@
 
 import 'dart:convert';
 
-import 'package:lib.suggestion.fidl/ask_handler.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
+import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:lib.suggestion.fidl/user_input.fidl.dart';
 import 'package:lib.agent.fidl/agent_provider.fidl.dart';
@@ -17,6 +16,7 @@ import 'package:lib.story.fidl/story_provider.fidl.dart';
 import 'package:lib.story.fidl/story_state.fidl.dart';
 import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:lib.user.fidl/user_shell.fidl.dart';
+import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.logging/logging.dart';
 
 /// Manages the list of active agents and the proposals for showing them.
@@ -41,7 +41,7 @@ class ActiveAgentsManager {
     UserShellContext userShellContext,
     FocusProvider focusProvider,
     StoryProvider storyProvider,
-    ProposalPublisher proposalPublisher,
+    IntelligenceServices intelligenceServices,
   ) {
     userShellContext.getAgentProvider(_agentProvider.ctrl.request());
     _agentProvider.watch(
@@ -55,7 +55,7 @@ class ActiveAgentsManager {
     );
 
     _activeAgentProposer.start(
-      proposalPublisher: proposalPublisher,
+      intelligenceServices: intelligenceServices,
       customAction: _customAction,
     );
   }
@@ -87,38 +87,38 @@ class _AgentProviderWatcherImpl extends AgentProviderWatcher {
 }
 
 class _ActiveAgentProposer {
-  final AskHandlerBinding _askHandlerBinding = new AskHandlerBinding();
-  _AskHandlerImpl _askHandlerImpl;
+  final QueryHandlerBinding _queryHandlerBinding = new QueryHandlerBinding();
+  _QueryHandlerImpl _queryHandlerImpl;
 
   void start({
-    ProposalPublisher proposalPublisher,
+    IntelligenceServices intelligenceServices,
     CustomAction customAction,
   }) {
-    _askHandlerImpl = new _AskHandlerImpl(
+    _queryHandlerImpl = new _QueryHandlerImpl(
       customAction: customAction,
     );
-    proposalPublisher.registerAskHandler(
-      _askHandlerBinding.wrap(
-        _askHandlerImpl,
+    intelligenceServices.registerQueryHandler(
+      _queryHandlerBinding.wrap(
+        _queryHandlerImpl,
       ),
     );
   }
 
   void stop() {
-    _askHandlerImpl.stop();
-    _askHandlerBinding.close();
+    _queryHandlerImpl.stop();
+    _queryHandlerBinding.close();
   }
 }
 
-class _AskHandlerImpl extends AskHandler {
+class _QueryHandlerImpl extends QueryHandler {
   final Set<CustomActionBinding> _bindings = new Set<CustomActionBinding>();
 
   final CustomAction customAction;
 
-  _AskHandlerImpl({this.customAction});
+  _QueryHandlerImpl({this.customAction});
 
   @override
-  void ask(UserInput query, void callback(AskResponse response)) {
+  void onQuery(UserInput query, void callback(AskResponse response)) {
     List<Proposal> proposals = <Proposal>[];
 
     if ((query.text?.toLowerCase()?.startsWith('act') ?? false) ||

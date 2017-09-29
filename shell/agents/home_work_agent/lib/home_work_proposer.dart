@@ -8,11 +8,12 @@ import 'dart:io';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
-import 'package:lib.suggestion.fidl/ask_handler.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
+import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:lib.suggestion.fidl/user_input.fidl.dart';
+import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 
 const String _kConfigFile =
     '/system/data/sysui/contextual_location_proposals.json';
@@ -25,30 +26,37 @@ const String _kLaunchEverythingProposalId = 'demo_all';
 
 /// Proposes suggestions for home and work locations.
 class HomeWorkProposer {
-  final AskHandlerBinding _askHandlerBinding = new AskHandlerBinding();
+  final ProposalPublisherProxy _proposalPublisherProxy =
+      new ProposalPublisherProxy();
+  final QueryHandlerBinding _queryHandlerBinding = new QueryHandlerBinding();
   final _ContextAwareProposer _contextAwareProposer =
       new _ContextAwareProposer();
 
   /// Starts the proposal process.
   void start(
     ContextReader contextReader,
-    ProposalPublisher proposalPublisher,
+    IntelligenceServices intelligenceServices,
   ) {
-    _contextAwareProposer.start(contextReader, proposalPublisher);
+    intelligenceServices.getProposalPublisher(
+        _proposalPublisherProxy.ctrl.request());
+    _contextAwareProposer.start(contextReader, _proposalPublisherProxy);
 
     final List<Map<String, String>> askProposals = convert.JSON.decode(
       new File(_kAskProposalsFile).readAsStringSync(),
     );
 
-    proposalPublisher.registerAskHandler(
-      _askHandlerBinding.wrap(new _AskHandlerImpl(askProposals: askProposals)),
+    intelligenceServices.registerQueryHandler(
+      _queryHandlerBinding.wrap(
+        new _QueryHandlerImpl(askProposals: askProposals)
+      ),
     );
   }
 
   /// Cleans up any handles opened by [start].
   void stop() {
     _contextAwareProposer.stop();
-    _askHandlerBinding.close();
+    _proposalPublisherProxy.ctrl.close();
+    _queryHandlerBinding.close();
   }
 }
 
@@ -161,13 +169,13 @@ class _ContextListenerImpl extends ContextListener {
   }
 }
 
-class _AskHandlerImpl extends AskHandler {
+class _QueryHandlerImpl extends QueryHandler {
   final List<Map<String, String>> askProposals;
 
-  _AskHandlerImpl({this.askProposals});
+  _QueryHandlerImpl({this.askProposals});
 
   @override
-  void ask(UserInput query, void callback(AskResponse response)) {
+  void onQuery(UserInput query, void callback(AskResponse response)) {
     List<Proposal> proposals = <Proposal>[];
 
     if (query.text?.toLowerCase()?.startsWith('demo') ?? false) {

@@ -6,7 +6,6 @@ import 'dart:async';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.modular/modular.dart';
 import 'package:meta/meta.dart';
@@ -17,8 +16,8 @@ HomeWorkAgent _agent;
 
 /// An implementation of the [Agent] interface.
 class HomeWorkAgent extends AgentImpl {
-  final ProposalPublisherProxy _proposalPublisher =
-      new ProposalPublisherProxy();
+  final IntelligenceServicesProxy _intelligenceServices =
+      new IntelligenceServicesProxy();
   final ContextReaderProxy _contextReader = new ContextReaderProxy();
   final HomeWorkProposer _homeWorkProposer = new HomeWorkProposer();
 
@@ -34,22 +33,21 @@ class HomeWorkAgent extends AgentImpl {
     TokenProvider tokenProvider,
     ServiceProviderImpl outgoingServices,
   ) async {
-    IntelligenceServicesProxy intelligenceServices =
-        new IntelligenceServicesProxy();
-    agentContext.getIntelligenceServices(intelligenceServices.ctrl.request());
-    intelligenceServices
-      ..getProposalPublisher(_proposalPublisher.ctrl.request())
-      ..getContextReader(_contextReader.ctrl.request())
-      ..ctrl.close();
+    agentContext.getIntelligenceServices(_intelligenceServices.ctrl.request());
+    _intelligenceServices
+      ..getContextReader(_contextReader.ctrl.request());
 
-    _homeWorkProposer.start(_contextReader, _proposalPublisher);
+    _homeWorkProposer.start(
+      _contextReader,
+      _intelligenceServices,
+    );
   }
 
   @override
   Future<Null> onStop() async {
     _homeWorkProposer.stop();
     _contextReader.ctrl.close();
-    _proposalPublisher.ctrl.close();
+    _intelligenceServices.ctrl.close();
   }
 }
 
