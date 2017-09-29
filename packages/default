@@ -1,5 +1,6 @@
 {
     "imports": [
+        "topaz/packages/curl",
         "topaz/packages/dashboard",
         "topaz/packages/examples",
         "topaz/packages/latin-ime",
