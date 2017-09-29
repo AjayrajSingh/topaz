@@ -12,11 +12,10 @@ import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
     as chat;
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:collection/collection.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 
 const String _kChatContentProviderUrl =
@@ -37,54 +36,61 @@ class Chatter {
       new AgentControllerProxy();
   final chat.ChatContentProviderProxy _chatContentProvider =
       new chat.ChatContentProviderProxy();
-  final ModuleControllerProxy _chatModuleController =
-      new ModuleControllerProxy();
+  ModuleControllerProxy _chatModuleControllerProxy;
 
   /// Constructor.
   Chatter(this.moduleContext);
+
+  /// Launches the chat module.
+  void launchChat() {
+    if (_chatModuleControllerProxy != null) {
+      _chatModuleControllerProxy.focus();
+      return;
+    }
+    _chatModuleControllerProxy = new ModuleControllerProxy();
+
+    LinkProxy linkProxy = new LinkProxy();
+    const String chatLinkName = 'chatLink';
+    moduleContext.getLink(chatLinkName, linkProxy.ctrl.request());
+    moduleContext.startModuleInShell(
+      'module:chat',
+      _kChatConversationModuleUrl,
+      chatLinkName,
+      null, // outgoingServices,
+      null, // incomingServices,
+      _chatModuleControllerProxy.ctrl.request(),
+      new SurfaceRelation()
+        ..arrangement = SurfaceArrangement.copresent
+        ..emphasis = 0.5,
+      true,
+    );
+
+    _getConversationId().then((List<int> conversationId) {
+      if (conversationId == null) {
+        log.severe('Failed to get conversation id.');
+        _chatModuleControllerProxy?.ctrl?.close();
+        _chatModuleControllerProxy = null;
+        return;
+      }
+      log.fine('Creating convo with id: $conversationId');
+
+      linkProxy
+        ..set(<String>[], JSON.encode(conversationId))
+        ..ctrl.close();
+    });
+  }
+
+  /// Closes the chat module.
+  void closeChat() {
+    _chatModuleControllerProxy?.defocus();
+  }
 
   /// Closes any open handles.
   void onStop() {
     _chatContentProviderController.ctrl.close();
     _chatContentProvider.ctrl.close();
-    _chatModuleController.ctrl.close();
-  }
-
-  /// Creates a child view connection for embedding the chat module.  Returns
-  /// null if somethign went wrong.
-  Future<ChildViewConnection> load() async {
-    List<int> conversationId = await _getConversationId();
-    if (conversationId == null) {
-      log.severe('Failed to get conversation id.');
-      return null;
-    }
-    log.fine('Creating convo with id: $conversationId');
-
-    LinkProxy linkProxy = new LinkProxy();
-    const String chatLinkName = 'chatLink';
-    moduleContext.getLink(chatLinkName, linkProxy.ctrl.request());
-    linkProxy
-      ..set(<String>[], JSON.encode(conversationId))
-      ..ctrl.close();
-
-    final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
-
-    moduleContext.startModule(
-      'chat',
-      _kChatConversationModuleUrl,
-      chatLinkName,
-      null,
-      null,
-      _chatModuleController.ctrl.request(),
-      viewOwner.passRequest(),
-    );
-
-    ChildViewConnection connection = new ChildViewConnection(
-      viewOwner.passHandle(),
-      onAvailable: (ChildViewConnection connection) {},
-      onUnavailable: (ChildViewConnection connection) {},
-    );
-    return connection;
+    _chatModuleControllerProxy?.ctrl?.close();
+    _chatModuleControllerProxy = null;
   }
 
   /// Finds or creates the chat id for the dashboard.

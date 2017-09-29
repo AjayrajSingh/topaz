@@ -153,10 +153,6 @@ void main() {
         buildStatusModels
             .expand((List<BuildStatusModel> models) => models)
             .forEach((BuildStatusModel model) => model.refresh());
-
-        // TODO(apwilson): Remove this hack once we have a proper story shell to
-        // remove the added web view.
-        dashboardModuleModel.closeWebView();
       },
       onLaunchUrl: dashboardModuleModel.launchWebView,
     ),

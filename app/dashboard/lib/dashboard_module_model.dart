@@ -9,12 +9,14 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
+import 'package:lib.module.fidl/module_state.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
@@ -34,13 +36,11 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   DateTime _startTime = new DateTime.now();
   DateTime _lastRefreshed;
   List<String> _devices;
-  ModuleControllerProxy _moduleControllerProxy;
+  ModuleWatcherBinding _webviewModuleWatcherBinding;
+  ModuleControllerProxy _webviewModuleControllerProxy;
+  LinkProxy _webviewLinkProxy;
   Timer _deviceMapTimer;
-  bool _showChat = false;
-  ChildViewConnection _chatChildViewConnection;
   Chatter _chatter;
-  AnimationController _transitionAnimation;
-  CurvedAnimation _curvedTransitionAnimation;
 
   /// Constructor.
   DashboardModuleModel({this.applicationContext, this.buildStatusModels}) {
@@ -48,16 +48,6 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
           (BuildStatusModel buildStatusModel) =>
               buildStatusModel.addListener(_updatePassFailTime),
         );
-    _transitionAnimation = new AnimationController(
-      value: 0.0,
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-    _curvedTransitionAnimation = new CurvedAnimation(
-      parent: _transitionAnimation,
-      curve: Curves.fastOutSlowIn,
-      reverseCurve: Curves.fastOutSlowIn,
-    );
   }
 
   @override
@@ -68,17 +58,12 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   ) {
     super.onReady(moduleContext, link, incomingServiceProvider);
     _chatter = new Chatter(moduleContext);
-    _chatter.load().then((ChildViewConnection childViewConnection) {
-      _chatChildViewConnection = childViewConnection;
-      notifyListeners();
-    });
   }
 
   @override
   void onStop() {
+    closeWebView();
     _chatter.onStop();
-    _moduleControllerProxy?.ctrl?.close();
-    _moduleControllerProxy = null;
     _deviceMapProxy.ctrl.close();
     _deviceMapTimer?.cancel();
     _deviceMapTimer = null;
@@ -97,14 +82,15 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   /// The devices for the current user.
   List<String> get devices => _devices;
 
-  /// Indicates the chat module should be shown.
-  bool get showChat => _showChat;
+  /// Launches the chat module.
+  void launchChat() {
+    _chatter.launchChat();
+  }
 
-  /// The connection to use for showing the chat module.
-  ChildViewConnection get chatChildViewConnection => _chatChildViewConnection;
-
-  /// THe animation for showing and hiding the chat module.
-  CurvedAnimation get animation => _curvedTransitionAnimation;
+  /// Closes the chat module.
+  void closeChat() {
+    _chatter.closeChat();
+  }
 
   /// Starts loading the device map from the environment.
   void loadDeviceMap() {
@@ -130,52 +116,83 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
 
   /// Starts a web view module pointing to the given [url].
   void launchWebView(String url) {
-    LinkProxy linkProxy = new LinkProxy();
     const String webViewLinkName = 'web_view';
-    moduleContext.getLink(webViewLinkName, linkProxy.ctrl.request());
-    linkProxy
+
+    if (_webviewLinkProxy != null) {
+      _webviewLinkProxy
+        ..set(
+          <String>[],
+          JSON.encode(<String, Map<String, String>>{
+            'view': <String, String>{'uri': url}
+          }),
+        );
+      _webviewModuleControllerProxy.focus();
+      return;
+    }
+    _webviewLinkProxy?.ctrl?.close();
+    _webviewLinkProxy = new LinkProxy();
+
+    moduleContext.getLink(webViewLinkName, _webviewLinkProxy.ctrl.request());
+    _webviewLinkProxy
       ..set(
         <String>[],
         JSON.encode(<String, Map<String, String>>{
           'view': <String, String>{'uri': url}
         }),
-      )
-      ..ctrl.close();
+      );
 
-    _moduleControllerProxy?.ctrl?.close();
-    _moduleControllerProxy = new ModuleControllerProxy();
+    _webviewModuleControllerProxy?.ctrl?.close();
+    _webviewModuleControllerProxy = new ModuleControllerProxy();
 
     moduleContext.startModuleInShell(
-      '',
+      'module:web_view',
       web_view.kWebViewURL,
       webViewLinkName,
-      null,
-      null,
-      _moduleControllerProxy.ctrl.request(),
-      null,
+      null, // outgoingServices,
+      null, // incomingServices,
+      _webviewModuleControllerProxy.ctrl.request(),
+      new SurfaceRelation()..arrangement = SurfaceArrangement.copresent,
       true,
+    );
+    _webviewModuleWatcherBinding = new ModuleWatcherBinding();
+    _webviewModuleControllerProxy.watch(
+      _webviewModuleWatcherBinding.wrap(
+        new _ModuleWatcherImpl(onStop: closeWebView),
+      ),
     );
   }
 
   /// Closes a previously launched web view.
   void closeWebView() {
-    _moduleControllerProxy?.ctrl?.close();
-    _moduleControllerProxy = null;
-  }
-
-  /// Toggles the showing of the chat module.
-  void toggleChat() {
-    _showChat = !_showChat;
-    if (_showChat) {
-      _transitionAnimation.forward();
-    } else {
-      _transitionAnimation.reverse();
-    }
-    notifyListeners();
+    _webviewModuleControllerProxy?.ctrl?.close();
+    _webviewModuleControllerProxy = null;
+    _webviewLinkProxy?.ctrl?.close();
+    _webviewLinkProxy = null;
+    _webviewModuleWatcherBinding?.close();
+    _webviewModuleWatcherBinding = null;
   }
 
   void _updatePassFailTime() {
     _lastRefreshed = new DateTime.now();
     notifyListeners();
+  }
+
+  /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
+  /// details.
+  static DashboardModuleModel of(BuildContext context) =>
+      new ModelFinder<DashboardModuleModel>().of(context);
+}
+
+class _ModuleWatcherImpl extends ModuleWatcher {
+  final VoidCallback onStop;
+
+  _ModuleWatcherImpl({this.onStop});
+
+  @override
+  void onStateChange(ModuleState newState) {
+    /// If our module was stopped by the framework, notify this.
+    if (newState == ModuleState.stopped || newState == ModuleState.done) {
+      onStop();
+    }
   }
 }

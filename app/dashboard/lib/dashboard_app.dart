@@ -2,9 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui' show lerpDouble;
-
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
@@ -99,81 +96,42 @@ class DashboardApp extends StatelessWidget {
       theme: new ThemeData(primaryColor: _kFuchsiaColor),
       home: new Container(
         color: Colors.grey[200],
-        child: new LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            double chatWidth = constraints.maxWidth / 5.0;
-            return new ScopedModelDescendant<DashboardModuleModel>(
-              builder: (
-                _,
-                Widget child,
-                DashboardModuleModel model,
-              ) =>
-                  new AnimatedBuilder(
-                    animation: model.animation,
-                    builder: (_, __) => new Stack(
-                          children: <Widget>[
-                            new Positioned.fill(
-                              right: lerpDouble(
-                                0.0,
-                                chatWidth,
-                                model.animation.value,
-                              ),
-                              child: new Stack(children: <Widget>[
-                                child,
-                                new Align(
-                                  alignment: FractionalOffset.bottomRight,
-                                  child: new Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      new Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 16.0,
-                                          right: 16.0,
-                                        ),
-                                        child: new FloatingActionButton(
-                                          backgroundColor: _kFuchsiaColor,
-                                          onPressed: () => model.toggleChat(),
-                                          tooltip: 'Chat',
-                                          child: new Icon(Icons.chat),
-                                        ),
-                                      ),
-                                      new Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 16.0,
-                                          right: 16.0,
-                                        ),
-                                        child: new FloatingActionButton(
-                                          backgroundColor: _kFuchsiaColor,
-                                          onPressed: () => onRefresh?.call(),
-                                          tooltip: 'Refresh',
-                                          child: new Icon(Icons.refresh),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ]),
-                            ),
-                            new Positioned(
-                              top: 0.0,
-                              bottom: 0.0,
-                              right: lerpDouble(
-                                -chatWidth,
-                                0.0,
-                                model.animation.value,
-                              ),
-                              width: chatWidth,
-                              child: new ChildView(
-                                connection: model.chatChildViewConnection,
-                              ),
-                            ),
-                          ],
-                        ),
+        child: new Stack(children: <Widget>[
+          new Column(children: rows),
+          new Align(
+            alignment: FractionalOffset.bottomRight,
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 16.0,
+                    right: 16.0,
                   ),
-              child: new Column(children: rows),
-            );
-          },
-        ),
+                  child: new FloatingActionButton(
+                    backgroundColor: _kFuchsiaColor,
+                    onPressed: () =>
+                        DashboardModuleModel.of(context).launchChat(),
+                    tooltip: 'Chat',
+                    child: new Icon(Icons.chat),
+                  ),
+                ),
+                new Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 16.0,
+                    right: 16.0,
+                  ),
+                  child: new FloatingActionButton(
+                    backgroundColor: _kFuchsiaColor,
+                    onPressed: () => onRefresh?.call(),
+                    tooltip: 'Refresh',
+                    child: new Icon(Icons.refresh),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ]),
       ),
     );
   }
