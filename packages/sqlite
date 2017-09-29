@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "cpp"
+    ],
+    "packages": {
+        "sqlite": "//third_party/sqlite:package"
+    }
+}

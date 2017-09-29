@@ -6,6 +6,7 @@
         "topaz/packages/modules",
         "topaz/packages/mondrian",
         "topaz/packages/moterm",
-        "topaz/packages/sysui"
+        "topaz/packages/sysui",
+        "topaz/packages/web_view"
     ]
 }
