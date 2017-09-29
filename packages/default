@@ -1,9 +1,11 @@
 {
     "imports": [
         "topaz/packages/curl",
+        "topaz/packages/dart",
         "topaz/packages/dart_runner",
         "topaz/packages/dashboard",
         "topaz/packages/examples",
+        "topaz/packages/flutter",
         "topaz/packages/latin-ime",
         "topaz/packages/lua",
         "topaz/packages/modules",
