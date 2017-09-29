@@ -2,17 +2,16 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Assumes that the project is located three levels deep in the Fuchsia tree, for
-# example: $FUCHSIA_DIR/apps/modules/<project>. Change to suit the project
-# location.
 root := $(shell git rev-parse --show-toplevel)
+
+# Change to suit the project location.
 fuchsia_root := $(realpath $(root)/../..)
+
 common_root := $(realpath $(fuchsia_root)/topaz/tools/tools/common)
 common_makefile := $(realpath $(common_root)/Makefile)
 
+# The project variable is the path of this project, relative to //topaz.
 PROJECT := tools
-FLUTTER_TARGET := fx_widget_explorer
-FUCHSIA_TARGET := color # The common_makefile expects this variable to be set.
 
 include $(common_makefile)
 

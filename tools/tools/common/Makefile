@@ -11,26 +11,18 @@ SHELL := /bin/bash
 .SUFFIXES:
 
 # This Makefile is expected to be included in a parent Makefile for a given
-# project. In order for the conventions used by the tasks defined in this file
-# PROJECT and FUCHSIA_TARGET variables must be set. Optionally, you may define
-# FLUTTER_TARGET variable if your project has a regular flutter app that runs on
-# Android / iOS. For example:
+# project. The parent Makefile must set the PROJECT variable, which should be
+# the path to the project (i.e., where the parent Makefile belongs to), relative
+# to //topaz.
 #
-#     PROJECT := email
-#     FLUTTER_TARGET := modules/story
-#     FUCHSIA_TARGET := email_story
+#     # This means the project is located at //topaz/app/chat.
+#     PROJECT := app/chat
 #
 #     include <path to this Makefile>
 #
 ifndef PROJECT
 $(error PROJECT is not set. \
 Before including the common Makefile add "PROJECT := <project>" to \
-"$(firstword $(realpath $(MAKEFILE_LIST)))")
-endif
-
-ifndef FUCHSIA_TARGET
-$(error PROJECT is not set. \
-Before including the common Makefile add "FUCHSIA_TARGET := <target>" to \
 "$(firstword $(realpath $(MAKEFILE_LIST)))")
 endif
 
@@ -144,23 +136,6 @@ clean: dart-clean ## Clean build artifacts from this project.
 .PHONY: reboot
 reboot: ## Reboot connected Fuchsia device.
 	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/reboot.sh
-
-.PHONY: run
-run: ## Run project on Fuchsia.
-	@echo "=== Don't forget to reboot between builds! ==="
-	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/run.sh $(FUCHSIA_TARGET)
-
-.PHONY: flutter-run
-flutter-run: ## Run UI application in modules/<project> via `flutter run`.
-ifndef FLUTTER_TARGET
-	$(error FLUTTER_TARGET is not set. \
-	Before including the common Makefile add "FLUTTER_TARGET := <target>" variable to \
-	"$(firstword $(realpath $(MAKEFILE_LIST)))")
-endif
-	cd $(FLUTTER_TARGET) && \
-		$(flutter) packages upgrade && \
-		$(flutter) build clean && \
-		$(flutter) run --hot
 
 .PHONY: fmt
 fmt: dart-fmt gn-fmt ## Format the code in this project.

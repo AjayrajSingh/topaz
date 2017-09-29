@@ -209,6 +209,7 @@ String _getOrderedDirectives(
     new _Condition<ImportDirective>('dart:').func,
     new _Condition<ImportDirective>('package:').func,
     new _Condition<ImportDirective>('').func,
+    new _Condition<ExportDirective>('package:').func,
     new _Condition<ExportDirective>('src/').func,
     new _Condition<ExportDirective>('').func,
   ];
