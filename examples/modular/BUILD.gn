@@ -1,0 +1,14 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("modular") {
+  deps = [
+    "counter_flutter",
+    "hello_world_flutter",
+    "photos_flutter",
+    "story_shell_flutter",
+    "suggest_shell",
+    "todo_story",
+  ]
+}
