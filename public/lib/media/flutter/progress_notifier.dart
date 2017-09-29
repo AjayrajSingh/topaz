@@ -24,9 +24,7 @@ class ProgressNotifier extends ChangeNotifier {
   bool _disposed = false;
 
   /// Constructs a |ProgressNotifier|.
-  ProgressNotifier(this._controller) {
-    assert(_controller != null);
-  }
+  ProgressNotifier(this._controller) : assert(_controller != null);
 
   @override
   void dispose() {
@@ -65,6 +63,7 @@ class ProgressNotifier extends ChangeNotifier {
   /// Sets the resolution and returns this |ProgressNotifier|. This method
   /// should be called in a builder that runs when the controller notifies of
   /// a state change.
+  // ignore: avoid_returning_this
   ProgressNotifier withResolution(Duration resolution) {
     if (_disposed) {
       return this;
@@ -85,9 +84,10 @@ class ProgressNotifier extends ChangeNotifier {
   /// the distance the slider moves. Use |LayoutBuilder| to get the width of
   /// the slider.
   ProgressNotifier withExcursion(double excursion, BuildContext context) {
-    excursion *= MediaQuery.of(context).devicePixelRatio;
+    double effectiveExcursion =
+        excursion * MediaQuery.of(context).devicePixelRatio;
     return withResolution(new Duration(
         microseconds:
-            (_controller.duration.inMicroseconds / excursion).ceil()));
+            (_controller.duration.inMicroseconds / effectiveExcursion).ceil()));
   }
 }

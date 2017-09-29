@@ -51,13 +51,13 @@ class AudioPolicy {
   /// implicitly set to true. When gain is changed from -160db to a higher
   /// value, |systemAudioMuted| is implicitly set to false.
   set systemAudioGainDb(double value) {
-    value = value.clamp(AudioRenderer.kMutedGain, _unityGain);
-    if (_systemAudioGainDb == value) {
+    double clampedValue = value.clamp(AudioRenderer.kMutedGain, _unityGain);
+    if (_systemAudioGainDb == clampedValue) {
       return;
     }
 
-    _systemAudioGainDb = value;
-    _systemAudioPerceivedLevel = gainToLevel(value);
+    _systemAudioGainDb = clampedValue;
+    _systemAudioPerceivedLevel = gainToLevel(clampedValue);
 
     if (_systemAudioGainDb == AudioRenderer.kMutedGain) {
       _systemAudioMuted = true;
@@ -73,12 +73,12 @@ class AudioPolicy {
   /// Sets system-wide audio muted state. Setting this value to false when
   /// |systemAudioGainDb| is -160db has no effect.
   set systemAudioMuted(bool value) {
-    value = value || _systemAudioGainDb == AudioRenderer.kMutedGain;
-    if (_systemAudioMuted == value) {
+    bool muted = value || _systemAudioGainDb == AudioRenderer.kMutedGain;
+    if (_systemAudioMuted == muted) {
       return;
     }
 
-    _systemAudioMuted = value;
+    _systemAudioMuted = muted;
     _audioPolicyService.setSystemAudioMute(_systemAudioMuted);
   }
 

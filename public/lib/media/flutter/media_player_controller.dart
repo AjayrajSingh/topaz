@@ -21,7 +21,7 @@ class MediaPlayerController extends AudioPlayerController
     implements Listenable {
   final MediaServiceProxy _mediaService = new MediaServiceProxy();
 
-  final List<VoidCallback> _listeners = new List<VoidCallback>();
+  final List<VoidCallback> _listeners = <VoidCallback>[];
 
   Timer _hideTimer;
 
@@ -102,7 +102,9 @@ class MediaPlayerController extends AudioPlayerController
   }
 
   void _notifyListeners() {
-    _listeners.forEach((VoidCallback l) => l());
+    for (VoidCallback listener in _listeners) {
+      listener();
+    }
   }
 
   /// Discards any resources used by the object. After this is called, the
@@ -178,9 +180,7 @@ class MediaPlayerController extends AudioPlayerController
           status.videoSize.width.toDouble() * pixelAspectRatio,
           status.videoSize.height.toDouble());
 
-      scheduleMicrotask(() {
-        _notifyListeners();
-      });
+      scheduleMicrotask(_notifyListeners);
     }
 
     _videoRenderer.getStatus(version, _handleVideoRendererStatusUpdates);

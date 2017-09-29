@@ -15,7 +15,7 @@ class MediaPlayer extends StatefulWidget {
   final MediaPlayerController controller;
 
   /// Constructs a [MediaPlayer] from an existing controller.
-  MediaPlayer(this.controller, {Key key}) : super(key: key);
+  const MediaPlayer(this.controller, {Key key}) : super(key: key);
 
   @override
   _MediaPlayerState createState() => new _MediaPlayerState();
@@ -141,13 +141,13 @@ class _MediaPlayerState extends State<MediaPlayer> {
               animation:
                   _secondsNotifier.withResolution(const Duration(seconds: 1)),
               builder: (BuildContext context, Widget child) => new Container(
-                width: 65.0,
-                child: new Text(
-                    _durationToString(widget.controller.progress),
-                    style: new TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
+                    width: 65.0,
+                    child: new Text(
+                      _durationToString(widget.controller.progress),
+                      style: new TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
             ),
           ),
         ),
