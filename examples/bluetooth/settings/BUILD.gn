@@ -19,5 +19,5 @@ flutter_app("settings") {
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
   ]
 
-  analysis_options = "//topaz/examples/bluetooth/.analysis_options"
+  analysis_options = "//topaz/examples/bluetooth/analysis_options.yaml"
 }

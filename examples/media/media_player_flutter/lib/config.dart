@@ -19,27 +19,29 @@ Future<List<Asset>> readConfig(String fileName) async {
   return _convertAssetList(JSON.decode(await file.readAsString()));
 }
 
-String _convertString(dynamic json) {
+String _convertString(Object json) {
   if (json is! String) {
-    throw new FormatException('Config file is malformed: string expected');
+    throw const FormatException('Config file is malformed: string expected');
   }
 
   return json;
 }
 
-bool _convertBool(dynamic json) {
+bool _convertBool(Object json) {
   if (json is! String || (json != 'true' && json != 'false')) {
-    throw new FormatException(
+    throw const FormatException(
         'Config file is malformed: "true" or "false" expected');
   }
 
   return json == 'true';
 }
 
-Asset _convertAsset(dynamic json) {
+Asset _convertAsset(Object json) {
   if (json is! Map) {
-    throw new FormatException('Config file is malformed: object expected');
+    throw const FormatException('Config file is malformed: object expected');
   }
+
+  Map<String, Object> jsonMap = json;
 
   Uri uri;
   AssetType type;
@@ -51,7 +53,7 @@ Asset _convertAsset(dynamic json) {
   String device;
   String service;
 
-  json.forEach((String key, dynamic value) {
+  jsonMap.forEach((String key, Object value) {
     switch (key) {
       case 'uri':
       case 'url':
@@ -120,17 +122,17 @@ Asset _convertAsset(dynamic json) {
   }
 
   if (type == null) {
-    throw new FormatException(
+    throw const FormatException(
         'Config file is malformed: asset type was not specified and cannot be'
         ' inferred');
   }
 
   switch (type) {
     case AssetType.movie:
-      _checkNotNull(type, uri, "a URI");
-      _checkNull(type, children, "children");
-      _checkNull(type, device, "device name");
-      _checkNull(type, service, "service name");
+      _checkNotNull(type, uri, 'a URI');
+      _checkNull(type, children, 'children');
+      _checkNull(type, device, 'device name');
+      _checkNull(type, service, 'service name');
       return new Asset.movie(
         uri: uri,
         title: title,
@@ -140,10 +142,10 @@ Asset _convertAsset(dynamic json) {
       );
 
     case AssetType.song:
-      _checkNotNull(type, uri, "a URI");
-      _checkNull(type, children, "children");
-      _checkNull(type, device, "device name");
-      _checkNull(type, service, "service name");
+      _checkNotNull(type, uri, 'a URI');
+      _checkNull(type, children, 'children');
+      _checkNull(type, device, 'device name');
+      _checkNull(type, service, 'service name');
       return new Asset.song(
         uri: uri,
         title: title,
@@ -153,19 +155,19 @@ Asset _convertAsset(dynamic json) {
       );
 
     case AssetType.playlist:
-      _checkNull(type, uri, "a URI");
-      _checkNotNull(type, children, "children");
-      _checkNull(type, artist, "artist name");
-      _checkNull(type, album, "album name");
-      _checkNull(type, device, "device name");
-      _checkNull(type, service, "service name");
+      _checkNull(type, uri, 'a URI');
+      _checkNotNull(type, children, 'children');
+      _checkNull(type, artist, 'artist name');
+      _checkNull(type, album, 'album name');
+      _checkNull(type, device, 'device name');
+      _checkNull(type, service, 'service name');
       if (children.isEmpty) {
-        throw new FormatException(
+        throw const FormatException(
             'Config file is malformed: a playlist must have at least one child');
       }
       if (!children.every(
           (Asset c) => c.type == AssetType.movie || c.type == AssetType.song)) {
-        throw new FormatException(
+        throw const FormatException(
             'Config file is malformed: playlist children must be songs or movies');
       }
       return new Asset.playlist(
@@ -175,12 +177,12 @@ Asset _convertAsset(dynamic json) {
       );
 
     case AssetType.remote:
-      _checkNull(type, uri, "a URI");
-      _checkNull(type, children, "children");
-      _checkNull(type, artist, "artist name");
-      _checkNull(type, album, "album name");
-      _checkNotNull(type, device, "device name");
-      _checkNotNull(type, service, "service name");
+      _checkNull(type, uri, 'a URI');
+      _checkNull(type, children, 'children');
+      _checkNull(type, artist, 'artist name');
+      _checkNull(type, album, 'album name');
+      _checkNotNull(type, device, 'device name');
+      _checkNotNull(type, service, 'service name');
       return new Asset.remote(
         title: title,
         device: device,
@@ -206,19 +208,21 @@ void _checkNull(AssetType type, Object value, String name) {
   }
 }
 
-List<Asset> _convertAssetList(dynamic json) {
+List<Asset> _convertAssetList(Object json) {
   if (json is! List) {
-    throw new FormatException('Config file is malformed: array expected');
+    throw const FormatException('Config file is malformed: array expected');
   }
 
-  List<Asset> list = new List<Asset>();
+  List<Object> jsonList = json;
 
-  json.forEach((dynamic item) {
+  List<Asset> list = <Asset>[];
+
+  for (Object item in jsonList) {
     Asset asset = _convertAsset(item);
     if (asset != null) {
       list.add(asset);
     }
-  });
+  }
 
   return list;
 }

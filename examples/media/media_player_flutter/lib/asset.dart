@@ -83,13 +83,13 @@ class Asset {
     this.title,
     this.loop,
   })
-      : type = AssetType.playlist,
+      : assert(children.isNotEmpty),
+        type = AssetType.playlist,
         uri = null,
         artist = null,
         album = null,
         device = null,
         service = null {
-    assert(children.isNotEmpty);
     assert(children.every(
         (Asset c) => c.type == AssetType.movie || c.type == AssetType.song));
   }

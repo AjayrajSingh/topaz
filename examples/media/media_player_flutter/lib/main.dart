@@ -81,6 +81,7 @@ Future<Null> _readConfig() async {
     try {
       _assets = await readConfig(fileName);
       return;
+      // ignore: avoid_catching_errors
     } on ArgumentError {
       // File doesn't exist. Continue.
     } on FormatException catch (e) {
@@ -153,14 +154,15 @@ void _playLeafAsset(Asset asset) {
       service: _leafAssetToPlay.service,
     );
   } else {
-    _controller.open(_leafAssetToPlay.uri);
-    _controller.play();
+    _controller
+      ..open(_leafAssetToPlay.uri)
+      ..play();
   }
 }
 
 /// Screen for asset playback.
 class _PlaybackScreen extends StatefulWidget {
-  _PlaybackScreen({Key key}) : super(key: key);
+  const _PlaybackScreen({Key key}) : super(key: key);
 
   @override
   _PlaybackScreenState createState() => new _PlaybackScreenState();
@@ -241,9 +243,9 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> columnChildren = new List<Widget>();
-
-    columnChildren.add(new MediaPlayer(_controller));
+    List<Widget> columnChildren = <Widget>[
+      new MediaPlayer(_controller),
+    ];
 
     MediaMetadata metadata = _controller.metadata;
     if (metadata != null) {
@@ -305,7 +307,7 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
 
 /// Screen for asset selection
 class _ChooserScreen extends StatefulWidget {
-  _ChooserScreen({Key key}) : super(key: key);
+  const _ChooserScreen({Key key}) : super(key: key);
 
   @override
   _ChooserScreenState createState() => new _ChooserScreenState();
@@ -403,22 +405,23 @@ Future<Null> main() async {
 
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices
-  ..addServiceForName(
-    (InterfaceRequest<Module> request) {
-      _log('Received binding request for Module');
-      _module.bindModule(request);
-    },
-    Module.serviceName,
-  )..addServiceForName(
-    (InterfaceRequest<Lifecycle> request) {
-      _module.bindLifecycle(request);
-    },
-    Lifecycle.serviceName,
-  );
+    ..addServiceForName(
+      (InterfaceRequest<Module> request) {
+        _log('Received binding request for Module');
+        _module.bindModule(request);
+      },
+      Module.serviceName,
+    )
+    ..addServiceForName(
+      (InterfaceRequest<Lifecycle> request) {
+        _module.bindLifecycle(request);
+      },
+      Lifecycle.serviceName,
+    );
 
   await _readConfig();
 
-  if (_assets.length == 0) {
+  if (_assets.isEmpty) {
     print('no assets configured');
     return;
   }
@@ -429,9 +432,10 @@ Future<Null> main() async {
 
   runApp(new MaterialApp(
     title: 'Media Player',
-    home: _assets.length == 1 ? new _PlaybackScreen() : new _ChooserScreen(),
+    home:
+        _assets.length == 1 ? const _PlaybackScreen() : const _ChooserScreen(),
     routes: <String, WidgetBuilder>{
-      '/play': (BuildContext context) => new _PlaybackScreen()
+      '/play': (BuildContext context) => const _PlaybackScreen()
     },
     theme: new ThemeData(primarySwatch: Colors.blue),
     debugShowCheckedModeBanner: false,
