@@ -3,6 +3,9 @@
         "cpp",
         "dart"
     ],
+    "imports": [
+        "topaz/packages/modular_examples"
+    ],
     "packages": {
         "basic_wm": "//topaz/examples/ui/basic_wm:package",
         "bluetooth_examples": "//topaz/examples/bluetooth:bluetooth_examples",
