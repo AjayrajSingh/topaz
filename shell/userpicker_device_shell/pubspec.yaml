@@ -10,4 +10,13 @@ flutter:
     - packages/userpicker_device_shell/res/CapybaraSilhouette.png
     - packages/userpicker_device_shell/res/Fuchsia_Logo_40dp_Accent.png
     - packages/userpicker_device_shell/res/fuchsia.png
+    - packages/userpicker_device_shell/res/ic_signal_wifi_0_bar_white_48dp.png
+    - packages/userpicker_device_shell/res/ic_signal_wifi_1_bar_lock_white_48dp.png
+    - packages/userpicker_device_shell/res/ic_signal_wifi_1_bar_white_48dp.png
+    - packages/userpicker_device_shell/res/ic_signal_wifi_2_bar_lock_white_48dp.png
+    - packages/userpicker_device_shell/res/ic_signal_wifi_2_bar_white_48dp.png
+    - packages/userpicker_device_shell/res/ic_signal_wifi_3_bar_lock_white_48dp.png
+    - packages/userpicker_device_shell/res/ic_signal_wifi_3_bar_white_48dp.png
+    - packages/userpicker_device_shell/res/ic_signal_wifi_4_bar_lock_white_48dp.png
+    - packages/userpicker_device_shell/res/ic_signal_wifi_4_bar_white_48dp.png
     - packages/userpicker_device_shell/res/screen_config.json

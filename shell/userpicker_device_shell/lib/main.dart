@@ -11,6 +11,7 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.netstack.fidl/netstack.fidl.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/modular.dart';
+import 'package:lib.wlan.fidl/wlan_service.fidl.dart';
 
 import 'authentication_context_impl.dart';
 import 'authentication_overlay.dart';
@@ -22,12 +23,16 @@ import 'netstack_model.dart';
 import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
 import 'user_picker_device_shell_screen.dart';
+import 'wlan_model.dart';
 
 /// Set to true to have this BaseShell provide IME services.
 const bool _kAdvertiseImeService = false;
 
 /// Set to true to enable the performance overlay.
 const bool _kShowPerformanceOverlay = false;
+
+const double _kMousePointerElevation = 800.0;
+const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
 
 void main() {
   setupLogger(name: 'userpicker_device_shell');
@@ -55,6 +60,16 @@ void main() {
   NetstackModel netstackModel = new NetstackModel(
     netstack: netstackProxy,
     tickerProvider: userPickerDeviceShellModel,
+  );
+
+  WlanProxy wlanProxy = new WlanProxy();
+  connectToService(
+    applicationContext.environmentServices,
+    wlanProxy.ctrl,
+  );
+
+  WlanModel wlanModel = new WlanModel(
+    wlan: wlanProxy,
   );
 
   SoftKeyboardContainerImpl softKeyboardContainerImpl = _kAdvertiseImeService
@@ -102,30 +117,35 @@ void main() {
           ),
     ),
     new OverlayEntry(
-      builder: (_) => new Align(
+      builder: (BuildContext context) => new Align(
             alignment: FractionalOffset.topCenter,
             child: new DebugText(),
           ),
     ),
-  ]..add(
-      new OverlayEntry(
-        builder: (_) => new Align(
-              alignment: FractionalOffset.centerRight,
-              child: new Container(
-                margin: const EdgeInsets.all(8.0),
-                child: new PhysicalModel(
-                  color: Colors.grey[900],
-                  elevation: 799.0, // Mouse pointer is at 800.0.
-                  borderRadius: new BorderRadius.circular(8.0),
-                  child: new Container(
-                    padding: const EdgeInsets.all(8.0),
-                    child: new _NetstackInfo(),
-                  ),
+    new OverlayEntry(
+      builder: (BuildContext context) => new Align(
+            alignment: FractionalOffset.centerRight,
+            child: new Container(
+              margin: const EdgeInsets.all(8.0),
+              child: new PhysicalModel(
+                color: Colors.grey[900],
+                elevation: _kIndicatorElevation,
+                borderRadius: new BorderRadius.circular(8.0),
+                child: new Container(
+                  padding: const EdgeInsets.all(8.0),
+                  child: new _NetstackInfo(),
                 ),
               ),
             ),
-      ),
-    );
+          ),
+    ),
+    new OverlayEntry(
+      builder: (BuildContext context) => new Align(
+            alignment: FractionalOffset.centerLeft,
+            child: new _WlanInfo(),
+          ),
+    ),
+  ];
 
   DeviceShellWidget<UserPickerDeviceShellModel> deviceShellWidget =
       new DeviceShellWidget<UserPickerDeviceShellModel>(
@@ -139,7 +159,10 @@ void main() {
     child: new _ElevatedCheckedModeBanner(
       child: new ScopedModel<NetstackModel>(
         model: netstackModel,
-        child: new Overlay(initialEntries: overlays),
+        child: new ScopedModel<WlanModel>(
+          model: wlanModel,
+          child: new Overlay(initialEntries: overlays),
+        ),
       ),
     ),
   );
@@ -257,39 +280,41 @@ class _NetstackInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       new ScopedModelDescendant<NetstackModel>(
-        builder: (_, __, NetstackModel netstackModel) => new Column(
-              mainAxisSize: MainAxisSize.min,
-              children: netstackModel.interfaces
-                  .map(
-                    (InterfaceInfo info) => new Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            new Text(info.name),
-                            new Container(width: 4.0),
-                            new Container(
-                              width: 16.0,
-                              child: _wrapIcon(
-                                info.sendingRevealAnimation,
-                                info.sendingRepeatAnimation,
-                                Icons.arrow_upward,
-                                Colors.grey,
-                              ),
+        builder:
+            (BuildContext context, Widget child, NetstackModel netstackModel) =>
+                new Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: netstackModel.interfaces
+                      .map(
+                        (InterfaceInfo info) => new Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                new Text(info.name),
+                                new Container(width: 4.0),
+                                new Container(
+                                  width: 16.0,
+                                  child: _wrapIcon(
+                                    info.sendingRevealAnimation,
+                                    info.sendingRepeatAnimation,
+                                    Icons.arrow_upward,
+                                    Colors.grey,
+                                  ),
+                                ),
+                                new Container(width: 4.0),
+                                new Container(
+                                  width: 16.0,
+                                  child: _wrapIcon(
+                                    info.receivingRevealAnimation,
+                                    info.receivingRepeatAnimation,
+                                    Icons.arrow_downward,
+                                    Colors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
-                            new Container(width: 4.0),
-                            new Container(
-                              width: 16.0,
-                              child: _wrapIcon(
-                                info.receivingRevealAnimation,
-                                info.receivingRepeatAnimation,
-                                Icons.arrow_downward,
-                                Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                  )
-                  .toList(),
-            ),
+                      )
+                      .toList(),
+                ),
       );
 
   Widget _wrapIcon(
@@ -300,7 +325,7 @@ class _NetstackInfo extends StatelessWidget {
   ) =>
       new AnimatedBuilder(
         animation: new Listenable.merge(<Listenable>[reveal, repeat]),
-        builder: (_, __) => new Icon(
+        builder: (BuildContext context, Widget child) => new Icon(
               iconData,
               color: Color.lerp(
                   Colors.grey[800],
@@ -312,5 +337,55 @@ class _NetstackInfo extends StatelessWidget {
                   reveal.value),
               size: 16.0,
             ),
+      );
+}
+
+class _WlanInfo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => new ScopedModelDescendant<WlanModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          WlanModel wlanModel,
+        ) =>
+            wlanModel.accessPoints.isEmpty
+                ? const Offstage()
+                : new Container(
+                    margin: const EdgeInsets.all(8.0),
+                    child: new PhysicalModel(
+                      color: Colors.grey[900],
+                      elevation: _kIndicatorElevation,
+                      borderRadius: new BorderRadius.circular(8.0),
+                      child: new Container(
+                        padding: const EdgeInsets.all(8.0),
+                        child: new Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: wlanModel.accessPoints
+                              .map(
+                                (AccessPoint accessPoint) => new Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        new Container(
+                                          width: 150.0,
+                                          child: new Text(
+                                            accessPoint.name,
+                                            overflow: TextOverflow.fade,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        new Container(width: 8.0),
+                                        new Image.asset(
+                                          accessPoint.url,
+                                          height: 20.0,
+                                          width: 20.0,
+                                        ),
+                                      ],
+                                    ),
+                              )
+                              .toList(),
+                        ),
+                      ),
+                    ),
+                  ),
       );
 }
