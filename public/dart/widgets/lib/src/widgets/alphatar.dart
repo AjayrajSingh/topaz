@@ -76,7 +76,7 @@ class Alphatar extends StatelessWidget {
     assert(avatarUrl != null || letter != null);
     return new Alphatar(
       key: key,
-      avatarImage: avatarUrl != null
+      avatarImage: avatarUrl != null && avatarUrl.isNotEmpty
           ? new Image(
               image: new NetworkImageWithRetry(avatarUrl),
               width: size,
