@@ -18,9 +18,8 @@ interface ContactsContentProvider {
   // matching the prefix in alphabetical order.
   GetContactList(string? prefix) => (Status status, array<Contact> contacts);
 
-  // Returns the contact information for the contact specified by |email|.
-  // For now, we're matching soley on email.
-  GetContact(string email) => (Status status, Contact contact);
+  // Returns the contact information for the contact specified by contact id.
+  GetContact(string id) => (Status status, Contact contact);
 };
 
 // Representation of a contact that is expected by the ContactCollection.

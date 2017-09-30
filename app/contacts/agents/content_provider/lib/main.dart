@@ -34,7 +34,7 @@ class ContactsContentProviderAgent extends AgentImpl {
   ) async {
     log.fine('onReady start');
 
-    _contentProviderImpl = new ContactsContentProviderImpl();
+    _contentProviderImpl = new ContactsContentProviderImpl()..initialize();
 
     // Register the content provider to the outgoing services provider
     outgoingServices.addServiceForName(

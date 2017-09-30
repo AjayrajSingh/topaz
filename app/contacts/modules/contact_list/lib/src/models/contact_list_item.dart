@@ -21,7 +21,7 @@ class ContactListItem {
   ContactListItem({
     @required this.id,
     @required this.displayName,
-    this.photoUrl: '',
+    this.photoUrl,
   })
       : assert(id != null && id.isNotEmpty),
         assert(displayName != null && displayName.isNotEmpty);
