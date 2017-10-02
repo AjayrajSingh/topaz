@@ -22,7 +22,7 @@ const String _kModuleUrl = 'file:///system/apps/example_manual_relationships';
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
 /// This is used for keeping the reference around.
-ModuleImpl _module;
+ModuleImpl _module = new ModuleImpl();
 ModuleContextProxy _moduleContext = new ModuleContextProxy();
 List<_ModuleStopperWatcher> _watchers = <_ModuleStopperWatcher>[];
 int _childId = 0;
