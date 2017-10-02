@@ -4,12 +4,12 @@
 
 import 'package:lib.context.fidl/context_writer.fidl.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.fidl/story_provider.fidl.dart';
 import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:lib.user.fidl/user_shell.fidl.dart';
+import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'link_watcher_impl.dart';
@@ -24,7 +24,7 @@ typedef void OnUserShellReady(
   SuggestionProvider suggestionProvider,
   ContextReader contextReader,
   ContextWriter contextWriter,
-  ProposalPublisher proposalPublisher,
+  IntelligenceServices intelligenceServices,
   Link link,
 );
 
@@ -50,8 +50,8 @@ class UserShellImpl extends UserShell {
   final ContextReaderProxy _contextReaderProxy = new ContextReaderProxy();
   final ContextWriterProxy _contextWriterProxy =
       new ContextWriterProxy();
-  final ProposalPublisherProxy _proposalPublisherProxy =
-      new ProposalPublisherProxy();
+  final IntelligenceServicesProxy _intelligenceServicesProxy =
+      new IntelligenceServicesProxy();
   final LinkProxy _linkProxy = new LinkProxy();
 
   /// Called when [initialize] occurs.
@@ -113,8 +113,8 @@ class UserShellImpl extends UserShell {
       _userShellContextProxy.getContextWriter(
         _contextWriterProxy.ctrl.request(),
       );
-      _userShellContextProxy.getProposalPublisher(
-        _proposalPublisherProxy.ctrl.request(),
+      _userShellContextProxy.getIntelligenceServices(
+        _intelligenceServicesProxy.ctrl.request(),
       );
 
       _userShellContextProxy.getLink(_linkProxy.ctrl.request());
@@ -128,7 +128,7 @@ class UserShellImpl extends UserShell {
         _suggestionProviderProxy,
         _contextReaderProxy,
         _contextWriterProxy,
-        _proposalPublisherProxy,
+        _intelligenceServicesProxy,
         _linkProxy,
       );
     }
@@ -158,7 +158,7 @@ class UserShellImpl extends UserShell {
     _focusProviderProxy.ctrl.close();
     _contextReaderProxy.ctrl.close();
     _contextWriterProxy.ctrl.close();
-    _proposalPublisherProxy.ctrl.close();
+    _intelligenceServicesProxy.ctrl.close();
     onStop?.call();
   }
 }
