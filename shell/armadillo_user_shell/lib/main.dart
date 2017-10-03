@@ -111,7 +111,6 @@ Widget buildArmadilloUserShell({
   );
 
   UserLogoutter userLogoutter = new UserLogoutter();
-  GlobalKey<ConductorState> conductorKey = new GlobalKey<ConductorState>();
   SuggestionProviderSuggestionModel suggestionProviderSuggestionModel =
       new SuggestionProviderSuggestionModel(
     hitTestModel: hitTestModel,
@@ -137,20 +136,9 @@ Widget buildArmadilloUserShell({
 
   suggestionProviderSuggestionModel
     ..storyModel = storyModel
-    ..addOnFocusLossListener(() {
-      conductorKey.currentState.goToOrigin();
-    });
+    ..addOnFocusLossListener(conductorModel.goToOrigin);
 
-  void storyFocuser(String storyId) {
-    scheduleMicrotask(() {
-      conductorKey.currentState.requestStoryFocus(
-        new StoryId(storyId),
-        jumpToFinish: false,
-      );
-    });
-  }
-
-  initialFocusSetter.storyFocuser = storyFocuser;
+  initialFocusSetter.storyFocuser = conductorModel.focusStory;
 
   FocusRequestWatcherImpl focusRequestWatcher = new FocusRequestWatcherImpl(
     onFocusRequest: (String storyId) {
@@ -160,9 +148,11 @@ Widget buildArmadilloUserShell({
         log.info(
           'Story $storyId isn\'t in the list, querying story provider...',
         );
-        storyProviderStoryGenerator.update(() => storyFocuser(storyId));
+        storyProviderStoryGenerator.update(
+          () => conductorModel.focusStory(storyId),
+        );
       } else {
-        storyFocuser(storyId);
+        conductorModel.focusStory(storyId);
       }
     },
   );
@@ -226,7 +216,7 @@ Widget buildArmadilloUserShell({
     ..onQuickSettingsOverlayChanged = (bool active) =>
         hitTestModel.onQuickSettingsOverlayChanged(active: active);
 
-  Conductor conductor = new Conductor(key: conductorKey);
+  Conductor conductor = conductorModel.build();
 
   DebugModel debugModel = new DebugModel();
   PanelResizingModel panelResizingModel = new PanelResizingModel();

@@ -222,10 +222,6 @@ class ConductorState extends State<Conductor> {
   void requestStoryFocus(StoryId storyId, {bool jumpToFinish: true}) {
     ConductorModel.of(context).recentsBuilder.onStoryFocused();
     _minimizeNow();
-    _focusOnStory(storyId, jumpToFinish: jumpToFinish);
-  }
-
-  void _focusOnStory(StoryId storyId, {bool jumpToFinish: true}) {
     StoryModel storyModel = StoryModel.of(context);
     List<StoryCluster> targetStoryClusters =
         storyModel.storyClusters.where((StoryCluster storyCluster) {
@@ -253,8 +249,13 @@ class ConductorState extends State<Conductor> {
       }
 
       // Ensure the focused story is completely expanded.
-      targetStoryClusters[0].focusModel.jump(1.0);
-      targetStoryClusters[0].storyClusterEntranceTransitionModel.jump(1.0);
+      if (jumpToFinish) {
+        targetStoryClusters[0].focusModel.jump(1.0);
+        targetStoryClusters[0].storyClusterEntranceTransitionModel.jump(1.0);
+      } else {
+        targetStoryClusters[0].focusModel.target = 1.0;
+        targetStoryClusters[0].storyClusterEntranceTransitionModel.target = 1.0;
+      }
 
       // Ensure the focused story's story bar is full open.
       targetStoryClusters[0].maximizeStoryBars(jumpToFinish: jumpToFinish);
