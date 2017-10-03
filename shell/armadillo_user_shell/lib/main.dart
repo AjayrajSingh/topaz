@@ -25,7 +25,6 @@ import 'package:armadillo/story_drag_transition_model.dart';
 import 'package:armadillo/story_model.dart';
 import 'package:armadillo/story_rearrangement_scrim_model.dart';
 import 'package:armadillo/story_time_randomizer.dart';
-import 'package:armadillo/story.dart';
 import 'package:armadillo/suggestion_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
