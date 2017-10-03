@@ -6,13 +6,13 @@ import 'package:lib.context.fidl/context_writer.fidl.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart';
 import 'package:lib.auth.fidl.account/account.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.fidl/story_provider.fidl.dart';
 import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:lib.user.fidl/user_shell.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:home_work_agent/home_work_proposer.dart';
 import 'package:lib.widgets/modular.dart';
@@ -100,7 +100,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     SuggestionProvider suggestionProvider,
     ContextReader contextReader,
     ContextWriter contextWriter,
-    IntelligenceServices intelligenceServices,
+    ProposalPublisher proposalPublisher,
     Link link,
   ) {
     super.onReady(
@@ -112,7 +112,7 @@ class ArmadilloUserShellModel extends UserShellModel {
       suggestionProvider,
       contextReader,
       contextWriter,
-      intelligenceServices,
+      proposalPublisher,
       link,
     );
 
@@ -152,19 +152,19 @@ class ArmadilloUserShellModel extends UserShellModel {
       }
     });
 
-    _homeWorkProposer.start(contextReader, intelligenceServices);
+    _homeWorkProposer.start(contextReader, proposalPublisher);
 
     _activeAgentsManager.start(
       userShellContext,
       focusProvider,
       storyProvider,
-      intelligenceServices,
+      proposalPublisher,
     );
 
     _wallpaperChooser.start(
       focusProvider,
       storyProvider,
-      intelligenceServices,
+      proposalPublisher,
       link,
     );
   }
