@@ -33,6 +33,9 @@ abstract class SuggestionModel extends Model {
   /// Gets the asking state.
   bool get asking;
 
+  /// Starts speech input.
+  void beginSpeechCapture();
+
   /// Updates the suggestions based on the currently focused storyCluster].  If no
   /// story is in focus, [storyCluster] should be null.
   void storyClusterFocusChanged(StoryCluster storyCluster);

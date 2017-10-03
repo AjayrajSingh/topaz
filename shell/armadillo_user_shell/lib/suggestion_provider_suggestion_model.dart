@@ -90,6 +90,24 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
   }
 }
 
+// TODO(rosswang => dayang): make this do what you want it to
+class _MaxwellSpeechListenerImpl extends maxwell.SpeechListener {
+  @override
+  void onStatusChanged(maxwell.SpeechStatus status) {
+    print(status);
+  }
+
+  @override
+  void onTextRecognized(String recognizedText) {
+    print('recoginized text: $recognizedText');
+  }
+
+  @override
+  void onTextResponse(String responseText) {
+    print('response text: $responseText');
+  }
+}
+
 /// Called when an interruption occurs.
 typedef void OnInterruptionAdded(Suggestion interruption);
 
@@ -182,6 +200,12 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   final List<Suggestion> _currentInterruptions = <Suggestion>[];
 
+  final maxwell.SpeechListenerBinding _speechListenerBinding =
+      new maxwell.SpeechListenerBinding();
+
+  // Listens for changes in conversational state.
+  _MaxwellSpeechListenerImpl _speechListener;
+
   /// When the user is asking via text or voice we want to show the maxwell ask
   /// suggestions rather than the normal maxwell suggestion list.
   String _askText;
@@ -229,6 +253,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     _askListenerBinding.close();
     _nextControllerProxy.ctrl.close();
     _nextListenerBinding.close();
+    _speechListenerBinding.close();
   }
 
   /// Setting [suggestionProvider] triggers the loading on suggestions.
@@ -253,6 +278,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       suggestionListener: _onNextSuggestionsChanged,
       interruptionListener: _interruptionListener,
     );
+    _speechListener = new _MaxwellSpeechListenerImpl();
     _load();
   }
 
@@ -330,6 +356,9 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       _nextControllerProxy.ctrl.request(),
     );
     _nextControllerProxy.setResultCount(_kMaxSuggestions);
+
+    _suggestionProviderProxy
+        .registerSpeechListener(_speechListenerBinding.wrap(_speechListener));
   }
 
   @override
@@ -374,6 +403,11 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   @override
   bool get asking => _asking;
+
+  @override
+  void beginSpeechCapture() {
+    _askControllerProxy.beginSpeechCapture();
+  }
 
   @override
   void storyClusterFocusChanged(StoryCluster storyCluster) {

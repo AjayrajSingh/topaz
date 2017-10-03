@@ -287,10 +287,15 @@ class SuggestionListState extends State<SuggestionList>
                 ),
               ),
             ),
-            new Image.asset(
-              _kMicImage,
-              height: 24.0,
-              fit: BoxFit.fitHeight,
+            new GestureDetector(
+              onTap: () {
+                SuggestionModel.of(context).beginSpeechCapture();
+              },
+              child: new Image.asset(
+                _kMicImage,
+                height: 24.0,
+                fit: BoxFit.fitHeight,
+              ),
             ),
           ],
         ),
