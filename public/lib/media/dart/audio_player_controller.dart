@@ -81,7 +81,11 @@ class AudioPlayerController {
       _handlePlayerStatusUpdates(NetMediaPlayer.kInitialStatus, null);
     }
 
-    updateCallback?.call();
+    if (updateCallback != null) {
+      scheduleMicrotask(() {
+        updateCallback();
+      });
+    }
   }
 
   /// Connects to a remote media player.
@@ -103,14 +107,24 @@ class AudioPlayerController {
     _netMediaPlayer.ctrl.onConnectionError = _handleConnectionError;
 
     _handlePlayerStatusUpdates(NetMediaPlayer.kInitialStatus, null);
-    updateCallback?.call();
+
+    if (updateCallback != null) {
+      scheduleMicrotask(() {
+        updateCallback();
+      });
+    }
   }
 
   /// Closes this controller, undoing a previous |open| or |connectToRemote|
   /// call. Does nothing if the controller is already closed.
   void close() {
     _close();
-    updateCallback?.call();
+
+    if (updateCallback != null) {
+      scheduleMicrotask(() {
+        updateCallback();
+      });
+    }
   }
 
   /// Internal version of |close|.
