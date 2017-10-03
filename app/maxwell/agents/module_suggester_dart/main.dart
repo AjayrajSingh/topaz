@@ -5,26 +5,26 @@
 import 'dart:convert' show JSON;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.decomposition.dart/decomposition.dart';
-import 'package:lib.suggestion.fidl/ask_handler.fidl.dart';
+import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:lib.suggestion.fidl/user_input.fidl.dart';
+import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
-final _proposalPublisher = new ProposalPublisherProxy();
-final _askHandlerBinding = new AskHandlerBinding();
+final _intelligenceServices = new IntelligenceServicesProxy();
+final _queryHandlerBinding = new QueryHandlerBinding();
 
 void main(List args) {
   final context = new ApplicationContext.fromStartupInfo();
-  connectToService(context.environmentServices, _proposalPublisher.ctrl);
-  _proposalPublisher.registerAskHandler(
-    _askHandlerBinding.wrap(new _AskHandlerImpl()),
+  connectToService(context.environmentServices, _intelligenceServices.ctrl);
+  _intelligenceServices.registerQueryHandler(
+    _queryHandlerBinding.wrap(new _QueryHandlerImpl()),
   );
   context.close();
 }
 
-class _AskHandlerImpl extends AskHandler {
+class _QueryHandlerImpl extends QueryHandler {
   static final _urlSubPattern =
       new RegExp(r"\.[a-z]{2}|(?:\d{1,3}\.){3}\d{1,3}|localhost");
   static final _dashboardSubPattern = new RegExp(r"^das|^fuc|^bui|^sta");
@@ -36,7 +36,7 @@ class _AskHandlerImpl extends AskHandler {
   static final _musicPatternPortugal = new RegExp(r"portugal|the man");
 
   @override
-  void ask(UserInput query, void callback(AskResponse response)) {
+  void onQuery(UserInput query, void callback(AskResponse response)) {
     List<Proposal> proposals = new List();
     if (query.text?.contains(_urlSubPattern) ?? false) {
       final String url = query.text.startsWith("http")
