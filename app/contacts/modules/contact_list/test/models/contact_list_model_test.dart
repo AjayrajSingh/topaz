@@ -13,14 +13,14 @@ void main() {
       ];
       ContactListModel model = new ContactListModel(contactList: contactList);
 
-      expect(model.contactList, equals(contactList));
+      expect(model.contacts, equals(contactList));
     });
 
     test('should set contact list to empty list if contactList param is null',
         () {
       ContactListModel model = new ContactListModel();
 
-      expect(model.contactList, hasLength(0));
+      expect(model.contacts, hasLength(0));
     });
 
     test('should properly mark the first items in each letter category', () {

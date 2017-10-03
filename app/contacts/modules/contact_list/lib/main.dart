@@ -26,9 +26,17 @@ void main() {
     applicationContext: new ApplicationContext.fromStartupInfo(),
     child: new ScopedModel<ContactListModel>(
       model: model,
-      child: const ContactList(),
+      child: new ContactList(
+        onQueryChanged: moduleModel.searchContacts,
+        onQueryCleared: moduleModel.clearSearchResults,
+      ),
     ),
   )..advertise();
 
-  runApp(moduleWidget);
+  runApp(
+    new MaterialApp(
+      theme: new ThemeData(primarySwatch: Colors.blue),
+      home: moduleWidget,
+    ),
+  );
 }

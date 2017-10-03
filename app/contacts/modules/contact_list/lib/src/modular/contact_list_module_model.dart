@@ -64,7 +64,7 @@ class ContactListModuleModel extends ModuleModel {
     componentContext.ctrl.close();
 
     // Fetch the contacts list
-    model.contactList = await getContactList();
+    model.contacts = await _getContactList();
   }
 
   @override
@@ -76,8 +76,14 @@ class ContactListModuleModel extends ModuleModel {
     super.onStop();
   }
 
+  /// Search the contacts store with the given prefix and then update the model
+  Future<Null> searchContacts(String prefix) async {
+    // TODO(meiyili) SO-731, SO-732: handle errors
+    model.searchResults = await _getContactList(prefix);
+  }
+
   /// Call the content provider to retrieve the list of contacts
-  Future<List<ContactListItem>> getContactList({String prefix = ''}) async {
+  Future<List<ContactListItem>> _getContactList([String prefix = '']) async {
     List<ContactListItem> contactList = <ContactListItem>[];
     Completer<contacts_fidl.Status> statusCompleter =
         new Completer<contacts_fidl.Status>();
@@ -101,6 +107,11 @@ class ContactListModuleModel extends ModuleModel {
     }
 
     return contactList;
+  }
+
+  /// Clears the search results from the model
+  void clearSearchResults() {
+    model.searchResults = <ContactListItem>[];
   }
 
   /// Transform a FIDL Contact object into a ContactListItem
