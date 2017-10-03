@@ -54,22 +54,25 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
         return new ScopedModelDescendant<BuildStatusModel>(
           builder:
               (BuildContext context, Widget child, BuildStatusModel model) {
+            Color backgroundColor = _colorFromBuildStatus(model);
             bool hasError = model.errorMessage?.isNotEmpty ?? false;
             List<Widget> columnChildren = <Widget>[
               new Text(
                 model.type,
                 textAlign: TextAlign.center,
                 style: hasError
-                    ? _unimportantStyle.copyWith(fontSize: _errorFontSize)
-                    : _unimportantStyle,
+                    ? _getUnimportantStyle(backgroundColor)
+                        .copyWith(fontSize: _errorFontSize)
+                    : _getUnimportantStyle(backgroundColor),
               ),
               new Container(height: 4.0),
               new Text(
                 model.name,
                 textAlign: TextAlign.center,
                 style: hasError
-                    ? _importantStyle.copyWith(fontSize: _errorFontSize)
-                    : _importantStyle,
+                    ? _getImportantStyle(backgroundColor)
+                        .copyWith(fontSize: _errorFontSize)
+                    : _getImportantStyle(backgroundColor),
               ),
             ];
             if (hasError) {
@@ -116,7 +119,7 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
                     margin: const EdgeInsets.only(top: 8.0),
                     child: new Text(
                       toConciseString(lastFailureTime),
-                      style: _timerStyle,
+                      style: _getTimerStyle(backgroundColor),
                     ),
                   ),
                 ),
@@ -132,7 +135,7 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
                     margin: const EdgeInsets.only(top: 8.0),
                     child: new Text(
                       toConciseString(lastPassTime),
-                      style: _timerStyle,
+                      style: _getTimerStyle(backgroundColor),
                     ),
                   ),
                 ),
@@ -141,7 +144,7 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
 
             return new Material(
               elevation: 2.0,
-              color: _colorFromBuildStatus(model.buildStatus),
+              color: backgroundColor,
               borderRadius: new BorderRadius.circular(8.0),
               child: new InkWell(
                 onTap: () => widget.onTap?.call(),
@@ -158,12 +161,12 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
         );
       });
 
-  Color _colorFromBuildStatus(BuildStatus status) {
-    switch (status) {
+  Color _colorFromBuildStatus(BuildStatusModel model) {
+    switch (model.buildStatus) {
       case BuildStatus.success:
-        return Colors.green[300];
+        return model.successColor;
       case BuildStatus.failure:
-        return Colors.red[400];
+        return model.failColor;
       case BuildStatus.networkError:
         return Colors.purple[100];
       default:
@@ -171,20 +174,34 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
     }
   }
 
+  Color _getTextColor(Color backgroundColor) {
+    // See http://www.w3.org/TR/AERT#color-contrast for the details of this
+    // algorithm.
+    int brightness = (((backgroundColor.red * 299) +
+                (backgroundColor.green * 587) +
+                (backgroundColor.blue * 114)) /
+            1000)
+        .round();
+
+    return (brightness > 125) ? Colors.black : Colors.white;
+  }
+
   double get _fontSize => _size.height / 6.0;
   double get _timerFontSize => _size.height / 10.0;
   double get _errorFontSize => _size.height / 10.0;
-  TextStyle get _importantStyle => new TextStyle(
-        color: Colors.black,
+  TextStyle _getImportantStyle(Color backgroundColor) => new TextStyle(
+        color: _getTextColor(backgroundColor),
         fontSize: _fontSize,
         fontWeight: FontWeight.w500,
       );
 
-  TextStyle get _unimportantStyle => _importantStyle.copyWith(
+  TextStyle _getUnimportantStyle(Color backgroundColor) =>
+      _getImportantStyle(backgroundColor).copyWith(
         fontWeight: FontWeight.w300,
       );
 
-  TextStyle get _timerStyle => _importantStyle.copyWith(
+  TextStyle _getTimerStyle(Color backgroundColor) =>
+      _getImportantStyle(backgroundColor).copyWith(
         fontSize: _timerFontSize,
       );
 

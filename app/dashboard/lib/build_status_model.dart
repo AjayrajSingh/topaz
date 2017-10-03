@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
@@ -26,6 +27,13 @@ enum BuildStatus {
   /// The build failed.
   failure,
 }
+
+final DateTime _kHalloween = new DateTime.utc(
+  2017,
+  10,
+  31,
+  12,
+);
 
 /// Manages a build status and associated metadata.
 class BuildStatusModel extends ModuleModel {
@@ -73,6 +81,24 @@ class BuildStatusModel extends ModuleModel {
   /// If the build status isn't [BuildStatus.success] this will indicate any
   /// additional information about why not.
   String get errorMessage => _errorMessage;
+
+  /// The color to use as the background of a successful build.
+  Color get successColor {
+    Duration difference = new DateTime.now().difference(_kHalloween).abs();
+    if (difference < const Duration(days: 1)) {
+      return Colors.orange[700];
+    }
+    return Colors.green[300];
+  }
+
+  /// The color to use as the background of a failed build.
+  Color get failColor {
+    Duration difference = new DateTime.now().difference(_kHalloween).abs();
+    if (difference < const Duration(days: 1)) {
+      return Colors.black;
+    }
+    return Colors.red[400];
+  }
 
   /// Starts the model refreshing periodically.
   void start() {
