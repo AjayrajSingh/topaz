@@ -57,7 +57,7 @@ class MediaPlayerController extends AudioPlayerController
       _handleVideoRendererStatusUpdates(VideoRenderer.kInitialStatus, null);
     }
 
-    _notifyListeners();
+    scheduleMicrotask(_notifyListeners);
   }
 
   @override
@@ -70,7 +70,7 @@ class MediaPlayerController extends AudioPlayerController
   void close() {
     _close();
     super.close();
-    _notifyListeners();
+    scheduleMicrotask(_notifyListeners);
   }
 
   void _close() {
