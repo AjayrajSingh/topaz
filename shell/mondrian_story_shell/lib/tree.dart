@@ -10,7 +10,7 @@ import 'package:meta/meta.dart';
 class Tree<T> extends Iterable<Tree<T>> {
   /// Construct [Tree]
   Tree({@required this.value, Iterable<Tree<T>> children}) {
-    children?.forEach(add);
+    children?.forEach((Tree<T> child) => add(child));
   }
 
   /// The nodes value
@@ -27,7 +27,7 @@ class Tree<T> extends Iterable<Tree<T>> {
 
   /// Direct descendents of parent, except this
   Iterable<Tree<T>> get siblings => (_parent == null)
-      ? const Iterable<Tree<T>>.empty()
+      ? new Iterable<Tree<T>>.empty()
       : _parent.children.where((Tree<T> node) => node != this);
 
   /// Direct ancestors of this, starting at parent to root
@@ -93,14 +93,18 @@ class Tree<T> extends Iterable<Tree<T>> {
   /// Find the single Tree node with the following value
   ///
   /// Note: Search order not specified (so make sure values are unique)
-  Tree<T> find(T value) =>
-      firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
+  Tree<T> find(T value) => this
+      .firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
 
   /// Generate a new tree with the same structure with transformed values
   Tree<V> mapTree<V>(V f(T value)) => new Tree<V>(
         value: f(value),
         children: _children.map((Tree<T> n) => n.mapTree(f)),
       );
+
+  /// Reduces a tree to some other object using passed in function.
+  V reduceTree<V>(V f(T value, Iterable<V> children)) =>
+      f(value, children.map((Tree<T> child) => child.reduceTree(f)));
 
   /// Get a flattened iterable of all of the values in the tree
   Iterable<T> get values => flatten().map((Tree<T> t) => t.value);
@@ -113,7 +117,7 @@ class Tree<T> extends Iterable<Tree<T>> {
 class Forest<T> extends Iterable<Tree<T>> {
   /// Construct [Forest]
   Forest({Iterable<Tree<T>> roots}) {
-    roots?.forEach(add);
+    roots?.forEach((Tree<T> root) => add(root));
   }
 
   /// Root nodes of this forest
@@ -137,14 +141,18 @@ class Forest<T> extends Iterable<Tree<T>> {
   /// Reparents its children to the nodes parent or as root nodes.
   void remove(Tree<T> node) {
     assert(node != null);
-    if (contains(node)) {
+    if (this.contains(node)) {
       Tree<T> parent = node.parent;
       if (parent == null) {
-        node.children.forEach(add);
-        _roots.remove(node);
+        for (Tree<T> child in node.children) {
+          add(child);
+        }
+        this._roots.remove(node);
       } else {
         node.detach();
-        node.children.forEach(parent.add);
+        for (Tree<T> child in node.children) {
+          parent.add(child);
+        }
       }
     }
   }
@@ -172,13 +180,17 @@ class Forest<T> extends Iterable<Tree<T>> {
   /// Find the single Tree node with the following value
   ///
   /// Note: Search order not specified (so make sure values are unique)
-  Tree<T> find(T value) =>
-      firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
+  Tree<T> find(T value) => this
+      .firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
 
   /// Generate a new forest with the same structure with transformed values
   Forest<V> mapForest<V>(V f(T value)) => new Forest<V>(
         roots: _roots.map((Tree<T> n) => n.mapTree(f)),
       );
+
+  /// Reduces a Forest to a list of objects.
+  Iterable<V> reduceForest<V>(V f(T value, Iterable<V> children)) =>
+      roots.map((Tree<T> t) => t.reduceTree(f));
 
   /// Get a flattened iterable of all of the values in the forest
   Iterable<T> get values => flatten().map((Tree<T> t) => t.value);
