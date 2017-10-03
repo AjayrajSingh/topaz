@@ -4,12 +4,12 @@
 
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/context_writer.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.fidl/story_provider.fidl.dart';
 import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:lib.user.fidl/user_shell.fidl.dart';
+import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
@@ -25,7 +25,7 @@ class UserShellModel extends Model {
   SuggestionProvider _suggestionProvider;
   ContextReader _contextReader;
   ContextWriter _contextWriter;
-  ProposalPublisher _proposalPublisher;
+  IntelligenceServices _intelligenceServices;
   Link _link;
 
   /// Indicates whether the [LinkWatcher] should watch for all changes including
@@ -62,8 +62,8 @@ class UserShellModel extends Model {
   /// The [ContextWriter] given to this app's [UserShell].
   ContextWriter get contextWriter => _contextWriter;
 
-  /// The [ProposalPublisher] given to this app's [UserShell].
-  ProposalPublisher get proposalPublisher => _proposalPublisher;
+  /// The [IntelligenceServices] given to this app's [UserShell].
+  IntelligenceServices get intelligenceServices => _intelligenceServices;
 
   /// The [Link] given to this [UserShell].
   Link get link => _link;
@@ -79,7 +79,7 @@ class UserShellModel extends Model {
     SuggestionProvider suggestionProvider,
     ContextReader contextReader,
     ContextWriter contextWriter,
-    ProposalPublisher proposalPublisher,
+    IntelligenceServices intelligenceServices,
     Link link,
   ) {
     _userShellContext = userShellContext;
@@ -90,7 +90,7 @@ class UserShellModel extends Model {
     _suggestionProvider = suggestionProvider;
     _contextReader = contextReader;
     _contextWriter = contextWriter;
-    _proposalPublisher = proposalPublisher;
+    _intelligenceServices = intelligenceServices;
     _link = link;
     notifyListeners();
   }
