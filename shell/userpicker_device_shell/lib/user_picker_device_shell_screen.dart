@@ -67,9 +67,13 @@ class UserPickerDeviceShellScreen extends StatelessWidget {
         }
 
         if (model.childViewConnection != null) {
-          stackChildren.add(
-            new ChildView(connection: model.childViewConnection),
-          );
+          stackChildren.add(new Offstage(
+            child: new Container(
+              color: Colors.black,
+              child: new ChildView(connection: model.childViewConnection),
+            ),
+            offstage: model.loadingChildView,
+          ));
         }
 
         return new Stack(fit: StackFit.expand, children: stackChildren);

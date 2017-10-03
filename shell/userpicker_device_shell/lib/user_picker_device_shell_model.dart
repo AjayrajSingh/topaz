@@ -30,6 +30,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   bool _showingUserActions = false;
   bool _addingUser = false;
+  bool _loadingChildView = false;
   bool _showingKernelPanic = false;
   UserControllerProxy _userControllerProxy;
   UserWatcherImpl _userWatcherImpl;
@@ -90,6 +91,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Refreshes the list of users.
   void refreshUsers() {
+    _accounts = null;
     _loadUsers();
   }
 
@@ -155,14 +157,19 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       ..userShellConfig = new AppConfig.init(_userShellChooser.appUrl, null);
     userProvider.login(params);
     _userControllerProxy.watch(_userWatcherImpl.getHandle());
+    _loadingChildView = true;
     _childViewConnection = new ChildViewConnection(
       viewOwner.passHandle(),
       onAvailable: (ChildViewConnection connection) {
         log.info('UserPickerDeviceShell: Child view connection available!');
+        _loadingChildView = false;
+        notifyListeners();
       },
       onUnavailable: (ChildViewConnection connection) {
         log.info('UserPickerDeviceShell: Child view connection unavailable!');
+        _loadingChildView = false;
         onLogout();
+        notifyListeners();
       },
     );
     notifyListeners();
@@ -208,10 +215,14 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   }
 
   /// Show the loading spinner if true
-  bool get showingLoadingSpinner => _accounts == null || _addingUser;
+  bool get showingLoadingSpinner =>
+      _accounts == null || _addingUser || _loadingChildView;
 
   /// Show the system clock if true
-  bool get showingClock => !showingLoadingSpinner && _draggedUsers.isEmpty;
+  bool get showingClock =>
+      !showingLoadingSpinner &&
+      _draggedUsers.isEmpty &&
+      _childViewConnection == null;
 
   /// If true, show advanced user actions
   bool get showingUserActions => _showingUserActions;
@@ -224,6 +235,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Returns true the add user dialog is showing
   bool get addingUser => _addingUser;
+
+  /// Returns true if we are "loading" the child view
+  bool get loadingChildView => _loadingChildView;
 
   /// Returns the authenticated child view connection
   ChildViewConnection get childViewConnection => _childViewConnection;
