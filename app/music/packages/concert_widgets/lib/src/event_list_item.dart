@@ -99,8 +99,8 @@ class EventListItem extends StatelessWidget {
       ),
     );
 
-    return new AnimatedCrossFade(
-      firstChild: new Column(
+    if (showGridLayout) {
+      return new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Expanded(child: image),
@@ -109,8 +109,9 @@ class EventListItem extends StatelessWidget {
             child: _buildTextSection(),
           ),
         ],
-      ),
-      secondChild: new Row(
+      );
+    } else {
+      return new Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           new Container(
@@ -125,11 +126,8 @@ class EventListItem extends StatelessWidget {
             child: _buildTextSection(),
           ),
         ],
-      ),
-      crossFadeState:
-          showGridLayout ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-      duration: const Duration(microseconds: 200),
-    );
+      );
+    }
   }
 
   @override
