@@ -11,6 +11,8 @@ import 'clock.dart';
 import 'user_picker_device_shell_model.dart';
 import 'user_picker_screen.dart';
 
+const double _kKernelPanicElevation = 799.9;
+
 /// The root widget which displays all the other windows of this app.
 class UserPickerDeviceShellScreen extends StatelessWidget {
   /// Launcher to launch the kernel panic module if needed.
@@ -50,11 +52,15 @@ class UserPickerDeviceShellScreen extends StatelessWidget {
             /// hittestable when DNO-86 is fixed.
             new GestureDetector(
               onTap: model.hideKernelPanic,
-              child: new ApplicationWidget(
-                url: 'kernel_panic',
-                launcher: launcher,
-                onDone: model.hideKernelPanic,
-                hitTestable: false,
+              child: new PhysicalModel(
+                color: Colors.black,
+                elevation: _kKernelPanicElevation,
+                child: new ApplicationWidget(
+                  url: 'kernel_panic',
+                  launcher: launcher,
+                  onDone: model.hideKernelPanic,
+                  hitTestable: false,
+                ),
               ),
             ),
           );
