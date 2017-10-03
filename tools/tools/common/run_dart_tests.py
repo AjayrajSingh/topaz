@@ -71,6 +71,8 @@ Extra flags will be passed to the flutter test command.
         if os.path.basename(dart_package) == 'test':
             continue
         elif os.path.isdir(dart_package + '/test'):
+            print "** NOTE: Running tests found in '%s'." % os.path.relpath(
+                dart_package, WORKING_DIR)
             target_packages.append(dart_package)
         else:
             print "** WARNING: No tests found in '%s'." % os.path.relpath(

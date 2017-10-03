@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:widgets_meta/widgets_meta.dart';
+import 'package:widget_explorer_meta/widgets_meta.dart';
 
 import 'extras/mock_models.dart';
 import 'mock_generator.dart';

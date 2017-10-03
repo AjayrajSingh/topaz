@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:widgets_meta/widgets_meta.dart';
+import 'package:widget_explorer_meta/widgets_meta.dart';
 
 /// Sample widget for demonstrating the use of @ConfigKey annotation.
 class ConfigKeyWidget extends StatelessWidget {

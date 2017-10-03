@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-import 'package:widgets_meta/widgets_meta.dart';
+import 'package:widget_explorer_meta/widgets_meta.dart';
 
 /// This is a public [StatefulWidget].
 @ExampleSize(200.0, 300.0)
