@@ -36,7 +36,7 @@ class _QueryHandlerImpl extends QueryHandler {
   static final _musicPatternPortugal = new RegExp(r"portugal|the man");
 
   @override
-  void onQuery(UserInput query, void callback(AskResponse response)) {
+  void onQuery(UserInput query, void callback(QueryResponse response)) {
     List<Proposal> proposals = new List();
     if (query.text?.contains(_urlSubPattern) ?? false) {
       final String url = query.text.startsWith("http")
@@ -153,7 +153,7 @@ class _QueryHandlerImpl extends QueryHandler {
       proposals.addAll(_kDummyInterruptions);
     }
 
-    callback(new AskResponse()..proposals = proposals);
+    callback(new QueryResponse()..proposals = proposals);
   }
 }
 
