@@ -4,12 +4,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:models/user.dart';
-import 'package:util/time_util.dart';
 
-import '../models/conversation.dart';
+import '../models.dart';
 import 'chat_group_avatar.dart';
 import 'constants.dart';
+import 'time_util.dart';
 
 /// UI Widget that represents a single chat conversation when viewing many chat
 /// conversations in a list.

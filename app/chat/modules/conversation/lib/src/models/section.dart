@@ -5,8 +5,8 @@
 import 'dart:collection';
 
 import 'package:meta/meta.dart';
-import 'package:util/time_util.dart';
 
+import '../widgets/time_util.dart';
 import 'message.dart';
 
 /// A model class representing a [Section] of consecutive chat [Message]s.

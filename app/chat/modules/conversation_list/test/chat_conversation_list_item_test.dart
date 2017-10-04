@@ -6,7 +6,6 @@ import 'package:chat_conversation_list/models.dart';
 import 'package:chat_conversation_list/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:models/user.dart';
 
 void main() {
   testWidgets(
@@ -24,7 +23,7 @@ void main() {
             // TODO(youngseokyoon): add fixtures (SO-333)
             conversation: new Conversation(
               participants: <User>[
-                new User(name: 'Coco yang', email: 'Coco@cute')
+                new User.fixture(),
               ],
             ),
             onSelect: () {

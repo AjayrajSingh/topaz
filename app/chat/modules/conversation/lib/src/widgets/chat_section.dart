@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:util/time_util.dart';
 
 import '../models.dart';
 import 'chat_bubble.dart';
+import 'time_util.dart';
 
 /// UI Widget that represents a consecutive sequence of [ChatBubble]s by the
 /// same user.

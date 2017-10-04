@@ -5,8 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:models/user.dart';
 
+import '../models.dart';
 import 'constants.dart';
 
 const double _kSizeRatio = 0.80;

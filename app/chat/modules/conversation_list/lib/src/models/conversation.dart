@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:models/user.dart';
+import 'user.dart';
 
 /// A data model class representing a conversation.
 ///

@@ -6,7 +6,6 @@ import 'package:chat_conversation_list/models.dart';
 import 'package:chat_conversation_list/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:models/user.dart';
 
 void main() {
   testWidgets(
@@ -46,14 +45,14 @@ void main() {
                 conversationId: const <int>[0],
                 snippet: 'Snippet #1',
                 participants: <User>[
-                  new User(name: 'Coco yang', email: 'Coco@cute')
+                  new User.fixture(),
                 ],
               ),
               new Conversation(
                 conversationId: const <int>[1],
                 snippet: 'Snippet #2',
                 participants: <User>[
-                  new User(name: 'Yoyo yang', email: 'Yoyo@cute')
+                  new User.fixture(),
                 ],
               ),
             ].toSet(),

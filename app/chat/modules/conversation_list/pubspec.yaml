@@ -9,12 +9,10 @@ dependencies:
     sdk: flutter
   lib.widgets:
     path: ../../../../lib/widgets/packages/widgets
-  models:
-    path: ../../../../tools/packages/models
-  util:
-    path: ../../../../tools/packages/util
-  widgets_meta:
-    path: ../../../../tools/packages/widgets_meta
+  fixtures:
+    path: ../../../../public/dart/fixtures
+  widget_explorer_meta:
+    path: ../../../../tools/widget_explorer/packages/widget_explorer_meta
 dev_dependencies:
   test: any
   flutter_test:

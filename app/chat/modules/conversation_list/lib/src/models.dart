@@ -3,3 +3,4 @@
 // found in the LICENSE file.
 
 export 'models/conversation.dart';
+export 'models/user.dart';

@@ -20,7 +20,6 @@ import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:models/user.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
     as chat_fidl;
 
@@ -351,11 +350,14 @@ class ChatConversationListModuleModel extends ModuleModel {
         participants: c.participants.map(_getUserFromEmail).toList(),
       );
 
-  User _getUserFromEmail(String email) => new User(
-        email: email,
-        name: email,
-        picture: null,
-      );
+  User _getUserFromEmail(String email) {
+    Map<String, String> json = <String, String>{
+      'name': email,
+      'email': email,
+    };
+
+    return new User.fromJson(json);
+  }
 
   @override
   void onStop() {

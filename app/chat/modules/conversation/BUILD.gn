@@ -19,11 +19,10 @@ flutter_app("chat_conversation") {
     "//topaz/app/chat/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/dart/fixtures",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//topaz/tools/packages/fixtures",
-    "//topaz/tools/packages/widgets",
-    "//topaz/tools/packages/widgets_meta",
+    "//topaz/tools/widget_explorer/packages/widget_explorer_meta",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

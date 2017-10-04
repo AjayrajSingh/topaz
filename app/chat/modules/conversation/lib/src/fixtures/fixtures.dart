@@ -5,6 +5,7 @@
 import 'dart:typed_data';
 
 import 'package:fixtures/fixtures.dart';
+import 'package:flutter/widgets.dart';
 
 import '../models.dart';
 
@@ -48,4 +49,9 @@ class ChatConversationFixtures extends Fixtures {
 
   String _sender() =>
       rng.nextBool() ? 'me' : name().replaceAll(' ', '.').toLowerCase();
+
+  /// Returns a [Text] widget with a randomly generated sentence in it.
+  Text sentenceText() {
+    return new Text(lorem.createSentence());
+  }
 }

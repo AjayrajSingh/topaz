@@ -22,11 +22,10 @@ dart_app("chat_content_provider") {
     "//topaz/app/chat/services:services_dart",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/modular:lib.modular",
+    "//topaz/public/dart/config",
+    "//topaz/public/dart/fixtures",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//topaz/tools/packages/config",
-    "//topaz/tools/packages/fixtures",
-    "//topaz/tools/packages/models",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

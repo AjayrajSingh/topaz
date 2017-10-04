@@ -4,8 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:widgets/fixtures.dart';
-import 'package:widgets_meta/widgets_meta.dart';
+import 'package:widget_explorer_meta/widgets_meta.dart';
+
+import '../../fixtures.dart';
 
 const Radius _kBubbleBorderRadius = const Radius.circular(24.0);
 const Radius _kBubbleBorderSmallRadius = const Radius.circular(4.0);
@@ -51,7 +52,7 @@ class ChatBubble extends StatelessWidget {
     bool fillBubble,
     this.onTap,
     this.onLongPress,
-    @required @Generator(WidgetFixtures, 'sentenceText') this.child,
+    @required @Generator(ChatConversationFixtures, 'sentenceText') this.child,
   })
       : assert(child != null),
         orientation = orientation ?? ChatBubbleOrientation.left,
