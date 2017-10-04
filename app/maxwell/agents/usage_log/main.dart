@@ -46,7 +46,7 @@ var _topicDedupSet = new LinkedHashSet<String>();
 // ContextListener callback
 void onContextUpdate(ContextUpdate update) {
   update.values["modules"].forEach((ContextValue value) {
-    String dedupKey = value.meta.story.id + value.meta.mod.url;
+    String dedupKey = "${value.meta.story?.id}${value.meta.mod.url}";
     // To record module launches, we only process each topic once
     if (_topicDedupSet.contains(dedupKey)) {
       return;
