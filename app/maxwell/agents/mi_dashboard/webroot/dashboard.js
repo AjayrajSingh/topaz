@@ -228,6 +228,11 @@ function handleContextUpdate(context) {
 
     if (value.parentIds.length > 0) {
       $.each(value.parentIds, function(idx, parentId) {
+        if (contextTree[parentId] == null) {
+          console.log(
+              'Value ID ' + value.id + ' has invalid parent: ' + parentId);
+          return;
+        }
         contextTree[parentId].children.push(value.id);
       });
     } else {
@@ -239,7 +244,7 @@ function handleContextUpdate(context) {
   var buildValueDomRecursive = function(id) {
     var entry = contextTree[id];
     var div = $("<div/>");
-    div.append($("<b/>").text(contextTypeToString(entry.value.type)));
+    div.append($("<b/>").text(contextTypeToString(entry.value.type) + ' - ' + id));
     $.each(contextValueMetadataToList(entry.value.meta), function(idx, pair) {
       div.append("<br/>");
       div.append($("<span/>").html(pair[0] + "." + pair[1] + " = " + pair[2]));
