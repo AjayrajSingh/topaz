@@ -48,6 +48,7 @@ void DartState::SetReturnCode(uint32_t return_code) {
   if (set_return_code_callback_) {
     set_return_code_callback_(return_code);
   }
+  has_set_return_code_ = true;
 }
 
 void DartState::SetReturnCodeCallback(std::function<void(uint32_t)> callback) {

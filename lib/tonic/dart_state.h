@@ -53,6 +53,7 @@ class DartState {
 
   void SetReturnCode(uint32_t return_code);
   void SetReturnCodeCallback(std::function<void(uint32_t)> callback);
+  bool has_set_return_code() const { return has_set_return_code_; }
 
   virtual void DidSetIsolate();
 
@@ -66,6 +67,7 @@ class DartState {
   std::unique_ptr<DartMessageHandler> message_handler_;
   std::unique_ptr<FileLoader> file_loader_;
   std::function<void(uint32_t)> set_return_code_callback_;
+  bool has_set_return_code_;
 
  protected:
   fxl::WeakPtrFactory<DartState> weak_factory_;

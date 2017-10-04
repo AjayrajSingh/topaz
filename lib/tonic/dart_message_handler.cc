@@ -87,7 +87,15 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
   } else {
     // We are processing messages normally.
     result = Dart_HandleMessages();
-    error = LogIfError(result);
+    // If the Dart program has set a return code, then it is intending to shut
+    // down by way of a fatal error, and so there is no need to emit a log
+    // message.
+    if (dart_state->has_set_return_code() && Dart_IsError(result) &&
+        Dart_IsFatalError(result)) {
+      error = true;
+    } else {
+      error = LogIfError(result);
+    }
   }
 
   if (error) {
