@@ -201,6 +201,9 @@ class Now extends StatelessWidget {
                           children: <Widget>[
                             new NowUserAndMaximizedContext(
                               onUserContextTapped: onUserContextTapped,
+                              onUserTimeTapped: () {
+                                print('time tapped');
+                              },
                               onUserTapped: () {
                                 if (!quickSettingsProgressModel.showing) {
                                   quickSettingsProgressModel.show();

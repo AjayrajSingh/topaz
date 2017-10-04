@@ -41,11 +41,18 @@ class UserContextText extends StatelessWidget {
   /// The color the text in this widget will have.
   final Color textColor;
 
+  /// Callback when user taps context
+  final VoidCallback onUserContextTapped;
+
+  /// Callback when user taps time.
+  final VoidCallback onUserTimeTapped;
+
   /// Constructor.
-  const UserContextText({
-    Key key,
-    this.textColor,
-  })
+  const UserContextText(
+      {Key key,
+      this.textColor,
+      this.onUserContextTapped,
+      this.onUserTimeTapped})
       : super(key: key);
 
   @override
@@ -57,51 +64,59 @@ class UserContextText extends StatelessWidget {
               List<LayoutId> children = <LayoutId>[
                 new LayoutId(
                   id: _UserContextLayoutDelegateParts.location,
-                  child: new Text(
-                    model.contextualLocation.toUpperCase(),
-                    softWrap: false,
-                    overflow: TextOverflow.fade,
-                    style: _kLocationTextStyle.copyWith(
-                      color: textColor,
-                      fontSize: tight ? 10.0 : 12.0,
-                    ),
-                  ),
+                  child: _getGestureDetector(
+                      new Text(
+                        model.contextualLocation.toUpperCase(),
+                        softWrap: false,
+                        overflow: TextOverflow.fade,
+                        style: _kLocationTextStyle.copyWith(
+                          color: textColor,
+                          fontSize: tight ? 10.0 : 12.0,
+                        ),
+                      ),
+                      onUserContextTapped),
                 ),
               ];
               if (tight) {
                 children.add(
                   new LayoutId(
                     id: _UserContextLayoutDelegateParts.time,
-                    child: new Text(
-                      model.timeOnly,
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      style: _kDateTextStyle.copyWith(
-                        color: textColor,
-                        fontSize: 10.0,
-                      ),
-                    ),
+                    child: _getGestureDetector(
+                        new Text(
+                          model.timeOnly,
+                          softWrap: false,
+                          overflow: TextOverflow.fade,
+                          style: _kDateTextStyle.copyWith(
+                            color: textColor,
+                            fontSize: 10.0,
+                          ),
+                        ),
+                        onUserTimeTapped),
                   ),
                 );
               } else {
                 children.addAll(<LayoutId>[
                   new LayoutId(
                     id: _UserContextLayoutDelegateParts.time,
-                    child: new Text(
-                      model.timeOnly,
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      style: _kTimeTextStyle.copyWith(color: textColor),
-                    ),
+                    child: _getGestureDetector(
+                        new Text(
+                          model.timeOnly,
+                          softWrap: false,
+                          overflow: TextOverflow.fade,
+                          style: _kTimeTextStyle.copyWith(color: textColor),
+                        ),
+                        onUserTimeTapped),
                   ),
                   new LayoutId(
                     id: _UserContextLayoutDelegateParts.date,
-                    child: new Text(
-                      model.dateOnly,
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      style: _kDateTextStyle.copyWith(color: textColor),
-                    ),
+                    child: _getGestureDetector(
+                        new Text(
+                          model.dateOnly,
+                          softWrap: false,
+                          overflow: TextOverflow.fade,
+                          style: _kDateTextStyle.copyWith(color: textColor),
+                        ),
+                        onUserContextTapped),
                   ),
                 ]);
               }
@@ -117,6 +132,14 @@ class UserContextText extends StatelessWidget {
               );
             }),
       );
+}
+
+Widget _getGestureDetector(Widget widget, VoidCallback tapCallback) {
+  return new GestureDetector(
+    child: widget,
+    onTap: tapCallback,
+    behavior: HitTestBehavior.opaque,
+  );
 }
 
 enum _UserContextLayoutDelegateParts {

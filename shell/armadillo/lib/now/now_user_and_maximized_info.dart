@@ -19,12 +19,15 @@ class NowUserAndMaximizedContext extends StatelessWidget {
   /// Called when the user's context text is tapped.
   final VoidCallback onUserContextTapped;
 
+  /// Called when user's time text is tapped.
+  final VoidCallback onUserTimeTapped;
+
   /// Called when the user image is tapped.
   final VoidCallback onUserTapped;
 
   /// Constructor.
   const NowUserAndMaximizedContext(
-      {this.onUserContextTapped, this.onUserTapped});
+      {this.onUserContextTapped, this.onUserTimeTapped, this.onUserTapped});
 
   @override
   Widget build(BuildContext context) =>
@@ -41,16 +44,15 @@ class NowUserAndMaximizedContext extends StatelessWidget {
                 children: <Widget>[
                   // User Context Text when maximized.
                   new Expanded(
-                    child: new GestureDetector(
-                      onTap: onUserContextTapped,
-                      behavior: HitTestBehavior.opaque,
-                      child: _buildQuickSettingsText(
-                        startingXOffset: -16.0,
-                        slideInProgress:
-                            nowMinimizationModel.maximizedTextSlideInProgress,
-                        builder: (Color color) =>
-                            new UserContextText(textColor: color),
-                      ),
+                    child: _buildQuickSettingsText(
+                      startingXOffset: -16.0,
+                      slideInProgress:
+                          nowMinimizationModel.maximizedTextSlideInProgress,
+                      builder: (Color color) => new UserContextText(
+                            textColor: color,
+                            onUserContextTapped: onUserContextTapped,
+                            onUserTimeTapped: onUserTimeTapped,
+                          ),
                     ),
                   ),
                   // User Profile image
