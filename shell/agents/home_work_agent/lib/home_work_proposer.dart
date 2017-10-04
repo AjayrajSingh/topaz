@@ -37,8 +37,8 @@ class HomeWorkProposer {
     ContextReader contextReader,
     IntelligenceServices intelligenceServices,
   ) {
-    intelligenceServices.getProposalPublisher(
-        _proposalPublisherProxy.ctrl.request());
+    intelligenceServices
+        .getProposalPublisher(_proposalPublisherProxy.ctrl.request());
     _contextAwareProposer.start(contextReader, _proposalPublisherProxy);
 
     final List<Map<String, String>> askProposals = convert.JSON.decode(
@@ -46,9 +46,8 @@ class HomeWorkProposer {
     );
 
     intelligenceServices.registerQueryHandler(
-      _queryHandlerBinding.wrap(
-        new _QueryHandlerImpl(askProposals: askProposals)
-      ),
+      _queryHandlerBinding
+          .wrap(new _QueryHandlerImpl(askProposals: askProposals)),
     );
   }
 
@@ -175,7 +174,7 @@ class _QueryHandlerImpl extends QueryHandler {
   _QueryHandlerImpl({this.askProposals});
 
   @override
-  void onQuery(UserInput query, void callback(AskResponse response)) {
+  void onQuery(UserInput query, void callback(QueryResponse response)) {
     List<Proposal> proposals = <Proposal>[];
 
     if (query.text?.toLowerCase()?.startsWith('demo') ?? false) {
@@ -255,7 +254,7 @@ class _QueryHandlerImpl extends QueryHandler {
       scanDirectory(new Directory('/system/pkgs/'));
     }
 
-    callback(new AskResponse()..proposals = proposals);
+    callback(new QueryResponse()..proposals = proposals);
   }
 
   Proposal get _launchEverythingProposal => new Proposal()

@@ -118,7 +118,7 @@ class _QueryHandlerImpl extends QueryHandler {
   _QueryHandlerImpl({this.customAction});
 
   @override
-  void onQuery(UserInput query, void callback(AskResponse response)) {
+  void onQuery(UserInput query, void callback(QueryResponse response)) {
     List<Proposal> proposals = <Proposal>[];
 
     if ((query.text?.toLowerCase()?.startsWith('act') ?? false) ||
@@ -144,7 +144,7 @@ class _QueryHandlerImpl extends QueryHandler {
           ],
       );
     }
-    callback(new AskResponse()..proposals = proposals);
+    callback(new QueryResponse()..proposals = proposals);
   }
 
   void stop() {
