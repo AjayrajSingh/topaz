@@ -8,5 +8,5 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_image: ^0.0.1
-  widgets_meta:
-    path: ../../../../../topaz/tools/packages/widgets_meta
+  widget_explorer_meta:
+    path: ../../../../../topaz/tools/widget_explorer/packages/widget_explorer_meta

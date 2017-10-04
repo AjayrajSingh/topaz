@@ -7,7 +7,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_image/network.dart';
 import 'package:meta/meta.dart';
-import 'package:widgets_meta/widgets_meta.dart';
+import 'package:widget_explorer_meta/widgets_meta.dart';
 
 /// Holds all the allowed background colors for an [Alphatar].
 ///
