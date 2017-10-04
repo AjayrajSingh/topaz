@@ -56,27 +56,19 @@ HandleWaiter::HandleWaiter(Handle* handle,
 }
 
 HandleWaiter::~HandleWaiter() {
-  // Destructor shouldn't be called until it has been released from its
-  // Handle.
-  FXL_DCHECK(!handle_);
-  // Destructor shouldn't be called until the wait has completed or been
-  // cancelled.
-  FXL_DCHECK(!wait_.is_pending());
+  Cancel();
 }
 
 void HandleWaiter::Cancel() {
-  if (wait_.is_pending() && handle_) {
-    // Hold a reference to this object.
-    fxl::RefPtr<HandleWaiter> ref(this);
-
-    // Cancel the wait and clear wait_id_.
+  FXL_DCHECK(wait_.is_pending() == !!handle_);
+  if (handle_) {
+    // Cancel the wait.
     wait_.Cancel();
 
     // Release this object from the handle and clear handle_.
     handle_->ReleaseWaiter(this);
     handle_ = nullptr;
   }
-  FXL_DCHECK(handle_ == nullptr);
   FXL_DCHECK(!wait_.is_pending());
 }
 
