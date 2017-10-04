@@ -15,7 +15,6 @@ dart_package("armadillo") {
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
     "//topaz/shell/keyboard",
     "//topaz/shell/widgets",
-    "//topaz/tools/packages/models",
   ]
 }
 

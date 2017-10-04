@@ -24,6 +24,7 @@ flutter_app("armadillo_user_shell") {
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/intl",
+    "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
@@ -33,7 +34,5 @@ flutter_app("armadillo_user_shell") {
     "//topaz/shell/armadillo",
     "//topaz/shell/keyboard",
     "//topaz/shell/widgets",
-    "//topaz/tools/packages/util",
-    "//topaz/tools/packages/widgets",
   ]
 }
