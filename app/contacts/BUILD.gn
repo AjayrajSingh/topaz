@@ -14,6 +14,7 @@ package("contacts") {
     "//topaz/app/contacts/modules/contact_list:test",
     "//topaz/app/contacts/modules/contacts",
     "//topaz/app/contacts/modules/contacts:test",
+    "//topaz/app/contacts/modules/contacts_picker",
     "//topaz/app/contacts/services",
   ]
 
@@ -25,6 +26,11 @@ package("contacts") {
     {
       source = "gen/topaz/app/contacts/modules/contact_list/contact_list.flx"
       name = "contacts/contact_list"
+    },
+    {
+      source =
+          "gen/topaz/app/contacts/modules/contacts_picker/contacts_picker.flx"
+      name = "contacts/contacts_picker"
     },
   ]
 }

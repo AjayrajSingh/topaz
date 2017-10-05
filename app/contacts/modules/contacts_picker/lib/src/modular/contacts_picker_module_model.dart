@@ -10,32 +10,23 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:meta/meta.dart';
 import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
     as contacts_fidl;
 
-import '../../models.dart';
+import '../../stores.dart';
 
 const String _kContactsContentProviderUrl =
     'file:///system/apps/contacts_content_provider';
 
-/// Call back definition for [ContactListModuleModel]'s subscribe method.
-typedef void OnSubscribeCallback(List<ContactListItem> newContactList);
-
-/// The [ModuleModel] for the contacts module set.
-class ContactListModuleModel extends ModuleModel {
+/// The module model
+class ContactsPickerModuleModel extends ModuleModel {
   final contacts_fidl.ContactsContentProviderProxy _contactsContentProvider =
       new contacts_fidl.ContactsContentProviderProxy();
   final AgentControllerProxy _contactsContentProviderController =
       new AgentControllerProxy();
 
-  /// The [ContactListModel] that serves as the data store for the UI and
-  /// contains the behaviors that users can use to mutate the data
-  final ContactListModel model;
-
-  /// Creates an instance of a [ContactListModuleModel] and takes a
-  /// [ContactListModel] that it will keep updated.
-  ContactListModuleModel({@required this.model}) : assert(model != null);
+  /// Creates an instance of a [ContactsPickerModuleModel]
+  ContactsPickerModuleModel();
 
   @override
   Future<Null> onReady(
@@ -63,8 +54,14 @@ class ContactListModuleModel extends ModuleModel {
     contentProviderServices.ctrl.close();
     componentContext.ctrl.close();
 
-    // Fetch the contacts list
-    model.contactList = await getContactList();
+    // Stub link data
+    // TODO(meiyili): integrate with Link
+    LinkData linkData = const LinkData(
+      prefix: 'a',
+      detailType: DetailType.email,
+    );
+    List<ContactListItem> contacts = await getContactList(linkData);
+    await updateContactsListAction(contacts);
   }
 
   @override
@@ -77,15 +74,19 @@ class ContactListModuleModel extends ModuleModel {
   }
 
   /// Call the content provider to retrieve the list of contacts
-  Future<List<ContactListItem>> getContactList({String prefix = ''}) async {
+  Future<List<ContactListItem>> getContactList(LinkData linkData) async {
     List<ContactListItem> contactList = <ContactListItem>[];
     Completer<contacts_fidl.Status> statusCompleter =
         new Completer<contacts_fidl.Status>();
     _contactsContentProvider.getContactList(
-      prefix,
+      linkData.prefix,
       (contacts_fidl.Status status, List<contacts_fidl.Contact> contacts) {
         contactList.addAll(
-          contacts.map(_transformContact),
+          contacts.map(
+            (contacts_fidl.Contact c) {
+              return _transformContact(c, linkData.detailType);
+            },
+          ),
         );
         statusCompleter.complete(status);
       },
@@ -104,10 +105,24 @@ class ContactListModuleModel extends ModuleModel {
   }
 
   /// Transform a FIDL Contact object into a ContactListItem
-  ContactListItem _transformContact(contacts_fidl.Contact c) =>
-      new ContactListItem(
-        id: c.googleContactId,
-        displayName: c.displayName,
-        photoUrl: c.photoUrl,
-      );
+  ContactListItem _transformContact(
+    contacts_fidl.Contact c,
+    DetailType detailType,
+  ) {
+    // TODO(meiyili): change how emails and phone numbers are stored and update
+    // to handle the "custom" detail type as well
+    String detail = '';
+    if (detailType == DetailType.email && c.emails.isNotEmpty) {
+      detail = c.emails[0].value;
+    } else if (detailType == DetailType.phoneNumber &&
+        c.phoneNumbers.isNotEmpty) {
+      detail = c.phoneNumbers[0].value;
+    }
+    return new ContactListItem(
+      id: c.googleContactId,
+      displayName: c.displayName,
+      detail: detail,
+      photoUrl: c.photoUrl,
+    );
+  }
 }
