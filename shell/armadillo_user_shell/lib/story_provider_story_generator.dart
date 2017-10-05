@@ -416,13 +416,17 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
           DateTime lastInteraction = new DateTime.fromMicrosecondsSinceEpoch(
             (storyInfo.lastFocusTime / 1000).round(),
           );
-          bool lastInteractionChanged =
-              (lastInteraction != story.lastInteraction ||
-                  lastInteraction != storyCluster.lastInteraction);
-          story.lastInteraction = lastInteraction;
-          storyCluster.lastInteraction = lastInteraction;
-          if (lastInteractionChanged) {
-            notifyListeners();
+
+          // Ignore if we're going back in time.
+          if (lastInteraction.isAfter(story.lastInteraction)) {
+            bool lastInteractionChanged =
+                (lastInteraction != story.lastInteraction ||
+                    lastInteraction != storyCluster.lastInteraction);
+            story.lastInteraction = lastInteraction;
+            storyCluster.lastInteraction = lastInteraction;
+            if (lastInteractionChanged) {
+              notifyListeners();
+            }
           }
         }
       }
