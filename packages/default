@@ -9,7 +9,7 @@
         "topaz/packages/latin-ime",
         "topaz/packages/lua",
         "topaz/packages/maxwell",
-        "topaz/packages/modules",
+        "topaz/packages/mods",
         "topaz/packages/mondrian",
         "topaz/packages/moterm",
         "topaz/packages/oauth_token_manager",
