@@ -8,11 +8,11 @@ dependencies:
   flutter:
     sdk: flutter
   fixtures:
-    path: ../../../../tools/packages/fixtures
+    path: ../../../../public/dart/fixtures
   lib.widgets:
     path: ../../../../lib/widgets/packages/widgets
-  widgets_meta:
-    path: ../../../../tools/packages/widgets_meta
+  widget_explorer_meta:
+    path: ../../../../tools/widget_explorer/packages/widget_explorer_meta
 dev_dependencies:
   test: any
   flutter_test:
