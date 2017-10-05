@@ -1,0 +1,14 @@
+{
+    "languages": [
+        "cpp"
+    ],
+    "labels": [
+        "//topaz/examples/oauth_token_manager"
+    ],
+    "binaries": [
+        {
+            "binary": "oauth_token_manager",
+            "bootfs_path": "apps/oauth_token_manager"
+        }
+    ]
+}
