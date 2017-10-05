@@ -208,7 +208,7 @@ class ChildViewConnection {
 
   void _removeChildFromViewHostIfNeeded() {
     assert(_attachments >= 0);
-    if (_attachments == 0) _removeChildFromViewHost();
+    if (_attachments == 0 && _viewKey != null) _removeChildFromViewHost();
   }
 
   ViewProperties _createViewProperties(
