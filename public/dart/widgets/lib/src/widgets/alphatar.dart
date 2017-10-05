@@ -77,12 +77,19 @@ class Alphatar extends StatelessWidget {
     return new Alphatar(
       key: key,
       avatarImage: avatarUrl != null && avatarUrl.isNotEmpty
-          ? new Image(
-              image: new NetworkImageWithRetry(avatarUrl),
-              width: size,
-              height: size,
-              fit: BoxFit.cover,
-            )
+          ? avatarUrl.startsWith('http')
+              ? new Image(
+                  image: new NetworkImageWithRetry(avatarUrl),
+                  width: size,
+                  height: size,
+                  fit: BoxFit.cover,
+                )
+              : new Image.asset(
+                  avatarUrl,
+                  width: size,
+                  height: size,
+                  fit: BoxFit.cover,
+                )
           : null,
       letter: letter,
       size: size,
