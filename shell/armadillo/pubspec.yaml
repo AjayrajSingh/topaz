@@ -25,6 +25,7 @@ flutter:
     - packages/armadillo/res/Background.jpg
     - packages/armadillo/res/googlelogo_color_62x24dp.png
     - packages/armadillo/res/googlemic_color_24dp.png
+    - packages/armadillo/res/guest_user_image.png
     - packages/armadillo/res/ic_airplanemode_active_black.png
     - packages/armadillo/res/ic_airplanemode_inactive_grey600.png
     - packages/armadillo/res/ic_battery_20_white_48dp.png

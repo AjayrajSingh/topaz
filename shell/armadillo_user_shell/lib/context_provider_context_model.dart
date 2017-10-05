@@ -93,7 +93,9 @@ class ContextProviderContextModel extends ContextModel {
   /// Called when the user information changes.
   void onUserUpdated(String userName, String userImageUrl) {
     _userName = userName;
-    _userImageUrl = userImageUrl;
+    _userImageUrl = userImageUrl != null && userImageUrl.isNotEmpty
+        ? userImageUrl
+        : 'packages/armadillo/res/guest_user_image.png';
     notifyListeners();
   }
 

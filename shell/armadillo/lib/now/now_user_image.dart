@@ -79,6 +79,9 @@ class NowUserImage extends StatelessWidget {
         ) {
           String avatarUrl = _getImageUrl(contextModel.userImageUrl) ?? '';
           String name = contextModel.userName ?? '';
+          if (avatarUrl.isEmpty && name.isEmpty) {
+            return const Offstage();
+          }
           return avatarUrl.isNotEmpty
               ? new Alphatar.fromNameAndUrl(
                   avatarUrl: avatarUrl,
