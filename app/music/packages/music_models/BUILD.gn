@@ -11,7 +11,7 @@ dart_package("music_models") {
   deps = [
     "//lib/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/intl",
-    "//topaz/tools/packages/fixtures",
+    "//topaz/public/dart/fixtures",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

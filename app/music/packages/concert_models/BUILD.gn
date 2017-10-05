@@ -12,7 +12,7 @@ dart_package("concert_models") {
 
   deps = [
     "//lib/flutter/packages/flutter",
-    "//topaz/tools/packages/fixtures",
+    "//topaz/public/dart/fixtures",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

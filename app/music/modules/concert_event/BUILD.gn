@@ -21,9 +21,9 @@ flutter_app("concert_event") {
     "//topaz/app/music/packages/concert_widgets",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/dart/config",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//topaz/tools/packages/config",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

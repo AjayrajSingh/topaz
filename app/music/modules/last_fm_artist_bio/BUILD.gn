@@ -24,9 +24,9 @@ flutter_app("last_fm_artist_bio") {
     "//topaz/app/music/packages/last_fm_widgets",
     "//topaz/lib/widgets/packages/logging:lib.logging",
     "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/dart/config",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//topaz/tools/packages/config",
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"

@@ -16,8 +16,8 @@ dart_app("music_artist_agent") {
     "//topaz/app/music/packages/music_api",
     "//topaz/app/music/packages/music_models",
     "//topaz/lib/widgets/packages/logging:lib.logging",
+    "//topaz/public/dart/config",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//topaz/tools/packages/config",
   ]
 }
