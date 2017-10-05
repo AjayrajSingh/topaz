@@ -24,7 +24,7 @@ void _log(String msg) {
   print('[Counter Child] $msg');
 }
 
-typedef void _ValueCallback(int);
+typedef void _ValueCallback(int value);
 typedef void _UpdateCallback();
 
 class _ChildCounterModule implements Module, Lifecycle, LinkWatcher {

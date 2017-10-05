@@ -38,7 +38,7 @@ void _log(String msg) {
   print('[Counter Parent] $msg');
 }
 
-typedef void _ValueCallback(int);
+typedef void _ValueCallback(int value);
 typedef void _UpdateCallback();
 typedef void _ChildViewCallback(ChildViewConnection connection);
 
