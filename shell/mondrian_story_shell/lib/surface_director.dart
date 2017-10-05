@@ -31,10 +31,11 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
   SurfaceForm _form(PositionedSurface ps, double depth, Offset offscreen) =>
       new SurfaceForm.single(
         key: new GlobalObjectKey(ps.surface),
-        child: new MondrianChildView(
-          connection: ps.surface.connection,
-          interactable: depth <= 0.0,
-          fade: (depth * _kFadeToDepthRatio).clamp(0.0, 1.0),
+        child: new ScopedModel<Surface>(
+          model: ps.surface,
+          child: new MondrianChildView(
+            interactable: depth <= 0.0,
+          ),
         ),
         position: ps.position,
         initPosition: ps.position.shift(offscreen),
@@ -68,10 +69,11 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           Surface surface, SurfaceForm form, Offset offscreen) =>
       new SurfaceForm.single(
         key: form.key,
-        child: new MondrianChildView(
-          connection: surface.connection,
-          interactable: false,
-          fade: (form.depth * _kFadeToDepthRatio).clamp(0.0, 1.0),
+        child: new ScopedModel<Surface>(
+          model: surface,
+          child: const MondrianChildView(
+            interactable: false,
+          ),
         ),
         position: form.position.shift(offscreen),
         initPosition: form.initPosition,

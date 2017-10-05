@@ -5,6 +5,9 @@
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
+
+import 'model.dart';
 
 const Duration _fadeAnimationDuration = const Duration(seconds: 1);
 const double _fadeToScaleRatio = 0.2;
@@ -14,30 +17,19 @@ const Curve _fadeCurve = Curves.fastOutSlowIn;
 /// Frame for child views
 class MondrianChildView extends StatelessWidget {
   /// Constructor
-  const MondrianChildView(
-      {Key key, this.connection, this.interactable: true, this.fade: 0.0})
-      : assert(0.0 <= fade && fade <= 1.0),
-        super(key: key);
-
-  /// The connection for this view
-  final ChildViewConnection connection;
+  const MondrianChildView({Key key, this.interactable: true}) : super(key: key);
 
   /// If true then ChildView hit tests will go through
   final bool interactable;
 
-  /// How much to fade this surface [0.0, 1.0]
-  final double fade;
-
   @override
-  Widget build(BuildContext context) => new AnimatedOpacity(
-        duration: _fadeAnimationDuration,
-        opacity: 1.0 - fade,
-        curve: _fadeCurve,
-        child: connection == null
-            ? null
-            : new ChildView(
-                connection: connection,
-                hitTestable: interactable,
-              ),
+  Widget build(BuildContext context) => new ScopedModelDescendant<Surface>(
+        builder: (BuildContext context, Widget child, Surface surface) =>
+            surface.connection == null
+                ? new Container(color: Colors.grey[300])
+                : new ChildView(
+                    connection: surface.connection,
+                    hitTestable: interactable,
+                  ),
       );
 }
