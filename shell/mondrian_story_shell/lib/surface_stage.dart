@@ -12,6 +12,7 @@ import 'flux.dart';
 import 'sim.dart';
 import 'surface_form.dart';
 import 'surface_frame.dart';
+import 'tree.dart';
 
 const SpringDescription _kSimSpringDescription = const SpringDescription(
   mass: 1.0,
@@ -19,12 +20,30 @@ const SpringDescription _kSimSpringDescription = const SpringDescription(
   damping: 29.0,
 );
 
-/// Instantiation of a Surface in SurfaceSpace
-class SurfaceInstance extends StatefulWidget {
+/// Stages determine how things move, and how they can be manipulated
+class SurfaceStage extends StatelessWidget {
+  /// Construct a SurfaceStage with these forms
+  const SurfaceStage({@required this.forms});
+
+  /// The forms inside this stage
+  final Forest<SurfaceForm> forms;
+
+  @override
+  Widget build(BuildContext context) => new Stack(
+      fit: StackFit.expand,
+      // TODO(alangardner): figure out elevation layering
+      children: forms
+          .reduceForest((SurfaceForm f, Iterable<_SurfaceInstance> children) =>
+              new _SurfaceInstance(form: f, dependents: children.toList()))
+          .toList());
+}
+
+/// Instantiation of a Surface in SurfaceStage
+class _SurfaceInstance extends StatefulWidget {
   /// SurfaceLayout
-  SurfaceInstance({
+  _SurfaceInstance({
     @required this.form,
-    this.dependents: const <SurfaceInstance>[],
+    this.dependents: const <_SurfaceInstance>[],
   })
       : super(key: form.key);
 
@@ -32,13 +51,13 @@ class SurfaceInstance extends StatefulWidget {
   final SurfaceForm form;
 
   /// Dependent surfaces
-  final List<SurfaceInstance> dependents;
+  final List<_SurfaceInstance> dependents;
 
   @override
   _SurfaceInstanceState createState() => new _SurfaceInstanceState();
 }
 
-class _SurfaceInstanceState extends State<SurfaceInstance>
+class _SurfaceInstanceState extends State<_SurfaceInstance>
     with TickerProviderStateMixin {
   FluxAnimation<Rect> get animation => _animation;
   ManualAnimation<Rect> _animation;
@@ -61,7 +80,7 @@ class _SurfaceInstanceState extends State<SurfaceInstance>
   }
 
   @override
-  void didUpdateWidget(SurfaceInstance oldWidget) {
+  void didUpdateWidget(_SurfaceInstance oldWidget) {
     super.didUpdateWidget(oldWidget);
     _animation
       ..update(value: _animation.value, velocity: _animation.velocity)

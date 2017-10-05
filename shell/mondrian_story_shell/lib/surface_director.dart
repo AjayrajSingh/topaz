@@ -12,7 +12,7 @@ import 'child_view.dart';
 import 'copresent_layout.dart';
 import 'model.dart';
 import 'surface_form.dart';
-import 'surface_space.dart';
+import 'surface_stage.dart';
 import 'tree.dart';
 
 const double _kFadeToDepthRatio = 3.0;
@@ -157,7 +157,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
                   formForest.add(new Tree<SurfaceForm>(value: orphan));
                 }
 
-                return new SurfaceSpace(forms: formForest);
+                return new SurfaceStage(forms: formForest);
               },
             ),
           );
