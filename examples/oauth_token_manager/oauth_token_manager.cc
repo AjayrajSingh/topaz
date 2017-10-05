@@ -34,7 +34,7 @@
 #include "lib/network/fidl/network_service.fidl.h"
 #include "lib/ui/views/fidl/view_provider.fidl.h"
 #include "lib/ui/views/fidl/view_token.fidl.h"
-#include "peridot/bin/oauth_token_manager/credentials_generated.h"
+#include "topaz/examples/oauth_token_manager/credentials_generated.h"
 #include "lib/async/cpp/operation.h"
 #include "third_party/rapidjson/rapidjson/document.h"
 #include "third_party/rapidjson/rapidjson/error/en.h"
