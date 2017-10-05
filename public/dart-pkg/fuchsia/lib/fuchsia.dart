@@ -28,7 +28,7 @@ class MxStartupInfo {
 
 void _setReturnCode(int returnCode) native "SetReturnCode";
 
-Error exit(int returnCode) {
+void exit(int returnCode) {
   _setReturnCode(returnCode);
   Isolate.current.kill(priority: Isolate.IMMEDIATE);
 }
