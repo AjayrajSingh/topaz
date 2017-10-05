@@ -24,65 +24,64 @@ class SurfaceDirector extends StatefulWidget {
 }
 
 class _SurfaceDirectorState extends State<SurfaceDirector> {
-  final Map<Surface, SurfaceForm> _forms = <Surface, SurfaceForm>{};
+  final Map<Surface, SurfaceForm> _prevForms = <Surface, SurfaceForm>{};
+  final List<Surface> _draggedSurfaces = <Surface>[];
+  final List<SurfaceForm> _orphanedForms = <SurfaceForm>[];
 
   SurfaceForm _form(PositionedSurface ps, double depth, Offset offscreen) =>
       new SurfaceForm.single(
         key: new GlobalObjectKey(ps.surface),
         child: new MondrianChildView(
           connection: ps.surface.connection,
-          interactable: depth <= 0.0 ? true : false,
+          interactable: depth <= 0.0,
           fade: (depth * _kFadeToDepthRatio).clamp(0.0, 1.0),
         ),
         position: ps.position,
         initPosition: ps.position.shift(offscreen),
-        depth: depth,
+        depth: _draggedSurfaces.contains(ps.surface) ? -0.1 : depth,
         friction: depth > 0.0
             ? kDragFrictionInfinite
             : ps.surface.canDismiss()
                 ? kDragFrictionNone
                 : (Offset offset, Offset delta) =>
                     delta / math.max(1.0, offset.distanceSquared / 100.0),
-        onPositioned: () {
-          if (ps.surface.dismissed) {
-            setState(() {
-              _forms.remove(ps.surface);
-              // TODO(alangardner): Callback to notify framework
-            });
-          }
-        },
         onDragStarted: () {
-          // Bring dragged items above
           setState(() {
-            _forms[ps.surface] = _form(
-                new PositionedSurface(
-                    surface: ps.surface, position: ps.position),
-                -0.1,
-                offscreen);
+            _draggedSurfaces.add(ps.surface);
           });
         },
         onDragFinished: (Offset offset, Velocity velocity) {
-          // HACK(alangardner): Harcoded distances for swipe
-          // gesture to avoid complicated layout work for this
-          // throwaway version.
           Offset expectedOffset = offset + (velocity.pixelsPerSecond / 5.0);
           // Only remove if greater than threshold
           if (expectedOffset.distance > 200.0) {
-            setState(() {
-              _forms[ps.surface] = _form(
-                  new PositionedSurface(
-                      surface: ps.surface,
-                      position: ps.position.shift(offscreen)),
-                  -0.1,
-                  Offset.zero);
-            });
+            // HACK(alangardner): Hardcoded distances for swipe gesture to
+            // avoid complicated layout work.
             ps.surface.dismiss();
-          } else {
-            // HACK: Force relayout to reset position and depth
-            setState(() {
-              _forms.remove(ps.surface);
-            });
           }
+          setState(() {
+            _draggedSurfaces.remove(ps.surface);
+          });
+        },
+      );
+
+  SurfaceForm _orphanedForm(
+          Surface surface, SurfaceForm form, Offset offscreen) =>
+      new SurfaceForm.single(
+        key: form.key,
+        child: new MondrianChildView(
+          connection: surface.connection,
+          interactable: false,
+          fade: (form.depth * _kFadeToDepthRatio).clamp(0.0, 1.0),
+        ),
+        position: form.position.shift(offscreen),
+        initPosition: form.initPosition,
+        depth: form.depth,
+        friction: kDragFrictionInfinite,
+        onPositioned: () {
+          // TODO(alangardner): Callback to notify framework
+          setState(() {
+            _orphanedForms.removeWhere((SurfaceForm f) => (f.key == form.key));
+          });
         },
       );
 
@@ -99,8 +98,9 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
             child: new ScopedModelDescendant<SurfaceGraph>(
               builder:
                   (BuildContext context, Widget child, SurfaceGraph graph) {
+                Map<Surface, SurfaceForm> placedSurfaces =
+                    <Surface, SurfaceForm>{};
                 List<Surface> focusStack = graph.focusStack.toList();
-                List<Surface> placedSurfaces = <Surface>[];
                 double depth = 0.0;
                 // HACK(alangardner): Used to create illusion of symmetry
                 BoxConstraints adjustedConstraints = new BoxConstraints(
@@ -111,16 +111,14 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
                 while (focusStack.isNotEmpty) {
                   for (PositionedSurface ps in layoutSurfaces(
                       context, adjustedConstraints, focusStack)) {
-                    if (!placedSurfaces.contains(ps.surface)) {
-                      placedSurfaces.add(ps.surface);
-                      double oldDepth = _forms[ps.surface]?.depth ?? 0.0;
-                      _forms[ps.surface] = _form(
-                          ps, oldDepth < 0.0 ? oldDepth : depth, offscreen);
+                    if (!placedSurfaces.keys.contains(ps.surface)) {
+                      _prevForms.remove(ps.surface);
+                      placedSurfaces[ps.surface] = _form(ps, depth, offscreen);
                     }
                   }
                   depth = (depth + 0.1).clamp(0.0, 1.0);
                   while (focusStack.isNotEmpty &&
-                      placedSurfaces.contains(focusStack.last)) {
+                      placedSurfaces.keys.contains(focusStack.last)) {
                     focusStack.removeLast();
                   }
                 }
@@ -129,21 +127,37 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
                 if (placedSurfaces.isNotEmpty) {
                   // The actual surface doesn't matter
                   dependentSpanningTrees =
-                      placedSurfaces.first.getDependentSpanningTrees();
+                      placedSurfaces.keys.first.getDependentSpanningTrees();
 
                   /// prune non-visible surfaces
                   for (Tree<Surface> t in dependentSpanningTrees.flatten()) {
-                    if (!placedSurfaces.contains(t.value)) {
+                    if (!placedSurfaces.keys.contains(t.value)) {
                       dependentSpanningTrees.remove(t);
                     }
                   }
                 }
-                SurfaceSpace space = new SurfaceSpace(
-                    forms: dependentSpanningTrees
-                        .mapForest((Surface s) => _forms[s]));
 
-                _forms.clear(); // need to get rid of removed surfaces
-                return space;
+                // Convert orphaned forms, to animate them out
+                Iterable<Key> placedKeys =
+                    placedSurfaces.values.map((SurfaceForm f) => f.key);
+                _orphanedForms
+                    .removeWhere((SurfaceForm f) => placedKeys.contains(f.key));
+                for (Surface s in _prevForms.keys) {
+                  _orphanedForms
+                      .add(_orphanedForm(s, _prevForms[s], offscreen));
+                }
+                _prevForms
+                  ..clear()
+                  ..addAll(placedSurfaces);
+
+                /// Create form forest
+                final Forest<SurfaceForm> formForest = dependentSpanningTrees
+                    .mapForest((Surface s) => placedSurfaces[s]);
+                for (SurfaceForm orphan in _orphanedForms) {
+                  formForest.add(new Tree<SurfaceForm>(value: orphan));
+                }
+
+                return new SurfaceSpace(forms: formForest);
               },
             ),
           );
