@@ -63,17 +63,7 @@ void onAddObservationStatus(Status status) {
   // If adding an observation fails, we simply drop it and do not retry.
   // TODO(jwnichols): Perhaps we should do something smarter if we fail
   if (status != Status.ok) {
-    print("[USAGE LOG] Failed to add Cobalt observation.");
-  } else {
-    _encoder.sendObservations(onSendObservationStatus);
-  }
-}
-
-void onSendObservationStatus(Status status) {
-  // If sending observations fails, we simply drop them and do not retry.
-  // TODO(jwnichols): Perhaps we should do something smarter if we fail
-  if (status != Status.ok) {
-    print("[USAGE LOG] Failed to send Cobalt observations.");
+    print("[USAGE LOG] Failed to add Cobalt observation: " + status.toString());
   }
 }
 
