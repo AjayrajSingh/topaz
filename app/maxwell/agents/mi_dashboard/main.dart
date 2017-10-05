@@ -177,7 +177,7 @@ void send404(HttpResponse response) {
   response.close();
 }
 
-void handleWebsocketRequest(String event) {
+void handleWebsocketRequest(dynamic event) {
   print("[INFO] websocket event was received!");
 }
 
