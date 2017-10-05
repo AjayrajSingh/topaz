@@ -27,11 +27,17 @@ abstract class SuggestionModel extends Model {
   /// Sets the ask text to [text].
   set askText(String text);
 
+  /// Gets the ask text.
+  String get askText;
+
   /// Sets the asking state to [asking].
   set asking(bool asking);
 
   /// Gets the asking state.
   bool get asking;
+
+  /// Returns true if an ask is being processed.
+  bool get processingAsk;
 
   /// Starts speech input.
   void beginSpeechCapture();

@@ -90,21 +90,33 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
   }
 }
 
-// TODO(rosswang => dayang): make this do what you want it to
 class _MaxwellSpeechListenerImpl extends maxwell.SpeechListener {
+  final ValueChanged<String> onSpeechTextRecognized;
+  final ValueChanged<String> onSpeechTextResponse;
+  final ValueChanged<maxwell.SpeechStatus> onSpeechStatusChanged;
+
+  _MaxwellSpeechListenerImpl({
+    this.onSpeechTextRecognized,
+    this.onSpeechTextResponse,
+    this.onSpeechStatusChanged,
+  });
+
   @override
   void onStatusChanged(maxwell.SpeechStatus status) {
-    print(status);
+    log.info('Status changed: $status');
+    onSpeechStatusChanged?.call(status);
   }
 
   @override
   void onTextRecognized(String recognizedText) {
-    print('recoginized text: $recognizedText');
+    log.fine('recognizedText $recognizedText');
+    onSpeechTextRecognized?.call(recognizedText);
   }
 
   @override
   void onTextResponse(String responseText) {
-    print('response text: $responseText');
+    log.fine('responseText $responseText');
+    onSpeechTextResponse?.call(responseText);
   }
 }
 
@@ -210,6 +222,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   /// suggestions rather than the normal maxwell suggestion list.
   String _askText;
   bool _asking = false;
+  bool _processingAsk = false;
 
   /// Set from an external source - typically the UserShell.
   maxwell.SuggestionProviderProxy _suggestionProviderProxy;
@@ -278,7 +291,31 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       suggestionListener: _onNextSuggestionsChanged,
       interruptionListener: _interruptionListener,
     );
-    _speechListener = new _MaxwellSpeechListenerImpl();
+    _speechListener = new _MaxwellSpeechListenerImpl(
+      onSpeechTextRecognized: (String text) {
+        askText = text;
+      },
+      onSpeechTextResponse: (String text) {},
+      onSpeechStatusChanged: (maxwell.SpeechStatus speechStatus) {
+        switch (speechStatus) {
+          case maxwell.SpeechStatus.processing:
+            if (!_processingAsk) {
+              _processingAsk = true;
+              notifyListeners();
+            }
+            break;
+          case maxwell.SpeechStatus.idle:
+          case maxwell.SpeechStatus.listening:
+          case maxwell.SpeechStatus.responding:
+          default:
+            if (_processingAsk) {
+              _processingAsk = false;
+              notifyListeners();
+            }
+            break;
+        }
+      },
+    );
     _load();
   }
 
@@ -391,6 +428,9 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   }
 
   @override
+  String get askText => _askText ?? '';
+
+  @override
   set asking(bool asking) {
     if (_asking != asking) {
       _asking = asking;
@@ -405,8 +445,13 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   bool get asking => _asking;
 
   @override
+  bool get processingAsk => _processingAsk;
+
+  @override
   void beginSpeechCapture() {
+    log.info('Begin speech capture!');
     _askControllerProxy.beginSpeechCapture();
+    asking = true;
   }
 
   @override
