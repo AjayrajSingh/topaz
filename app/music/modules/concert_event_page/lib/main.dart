@@ -35,9 +35,9 @@ Future<Null> main() async {
       new ModuleWidget<EventPageModuleModel>(
     applicationContext: applicationContext,
     moduleModel: eventPageModuleModel,
-    child: new Scaffold(
-      backgroundColor: Colors.white,
-      body: new ScopedModelDescendant<EventPageModuleModel>(builder: (
+    child: new Material(
+      elevation: 1.0,
+      child: new ScopedModelDescendant<EventPageModuleModel>(builder: (
         BuildContext context,
         Widget child,
         EventPageModuleModel model,
