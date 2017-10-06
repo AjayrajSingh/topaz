@@ -29,7 +29,7 @@ Simple Flutter module to display the Fuchsia build status. This can be built bot
 
 1. ```cp $SRC/third_party/fuchsia_build_status/misc_build_files/boot_dashboard $SRC/packages/gn/```
 
-2. packages/gn/gen.py -m boot_dashboard
+2. packages/gn/gen.py -p boot_dashboard
 
 
 ## How to build for iOS, Android
