@@ -57,8 +57,8 @@ class PowerManagerPowerModel extends PowerModel {
   void _processStatus(BatteryStatus status) {
     switch (status.status) {
       case Status.ok:
-        if (_hasBattery != true) {
-          _hasBattery = true;
+        if (_hasBattery != status.batteryPresent) {
+          _hasBattery = status.batteryPresent;
           notifyListeners();
         }
 
