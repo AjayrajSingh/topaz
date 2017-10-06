@@ -144,19 +144,7 @@ class StoryList extends StatelessWidget {
                               animation: scrollController,
                               builder: (BuildContext context, Widget child) =>
                                   new _StoryListBody(
-                                    children: new List<Widget>.generate(
-                                      storyModel.storyClusters.length,
-                                      (int index) =>
-                                          _createFocusableStoryCluster(
-                                            context,
-                                            storyModel.storyClusters,
-                                            storyModel.storyClusters[index],
-                                            storyModel.storyClusters[index]
-                                                .buildStoryWidgets(
-                                              context,
-                                            ),
-                                          ),
-                                    ),
+                                    children: _toWidgets(context, storyModel),
                                     listHeight: storyModel.listHeight,
                                     scrollOffset:
                                         scrollController?.offset ?? 0.0,
@@ -183,9 +171,19 @@ class StoryList extends StatelessWidget {
         ),
       );
 
+  List<Widget> _toWidgets(BuildContext context, StoryModel storyModel) =>
+      storyModel.toWidgets((StoryCluster storyCluster) {
+        return _createFocusableStoryCluster(
+          context,
+          storyModel,
+          storyCluster,
+          storyCluster.buildStoryWidgets(context),
+        );
+      });
+
   Widget _createFocusableStoryCluster(
     BuildContext context,
-    List<StoryCluster> storyClusters,
+    StoryModel storyModel,
     StoryCluster storyCluster,
     Map<StoryId, Widget> storyWidgets,
   ) {
@@ -209,7 +207,7 @@ class StoryList extends StatelessWidget {
         entranceTransitionProgress:
             storyCluster.storyClusterEntranceTransitionModel.value,
         child: _createStoryCluster(
-          storyClusters,
+          storyModel,
           storyCluster,
           storyCluster.focusModel.value,
           storyWidgets,
@@ -245,7 +243,7 @@ class StoryList extends StatelessWidget {
       );
 
   Widget _createStoryCluster(
-    List<StoryCluster> storyClusters,
+    StoryModel storyModel,
     StoryCluster storyCluster,
     double progress,
     Map<StoryId, Widget> storyWidgets,
@@ -257,10 +255,10 @@ class StoryList extends StatelessWidget {
           storyCluster: storyCluster,
           onAccept: () {
             if (!_inFocus(storyCluster)) {
-              _onGainFocus(storyClusters, storyCluster);
+              _onGainFocus(storyModel, storyCluster);
             }
           },
-          onTap: () => _onGainFocus(storyClusters, storyCluster),
+          onTap: () => _onGainFocus(storyModel, storyCluster),
           onVerticalEdgeHover: onStoryClusterVerticalEdgeHover,
           storyWidgets: storyWidgets,
         ),
@@ -269,15 +267,11 @@ class StoryList extends StatelessWidget {
   bool _inFocus(StoryCluster s) => s.focusModel.value > 0.0;
 
   void _onGainFocus(
-    List<StoryCluster> storyClusters,
+    StoryModel storyModel,
     StoryCluster storyCluster,
   ) {
     // Defocus any focused stories.
-    for (StoryCluster s in storyClusters) {
-      if (_inFocus(s)) {
-        s.unFocus();
-      }
-    }
+    storyModel.unfocusAll();
 
     // Bring tapped story into focus.
     storyCluster.focusModel.target = 1.0;
@@ -299,8 +293,7 @@ class StoryList extends StatelessWidget {
     );
     bool wasEmpty = true;
     return new ArmadilloDragTarget<StoryClusterDragData>(
-      onWillAccept: (_, __) => storyModel.storyClusters.every(
-          (StoryCluster storyCluster) => storyCluster.focusModel.value == 0.0),
+      onWillAccept: (_, __) => storyModel.allUnfocused,
       onAccept: (StoryClusterDragData data, _, __) {
         storyModel.delete(storyModel.getStoryCluster(data.id));
         controller.reverse();

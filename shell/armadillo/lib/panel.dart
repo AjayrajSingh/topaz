@@ -384,7 +384,9 @@ class Panel {
       areaSum += (panel.sizeFactor * _kGridLines * _kGridLines).round();
     }
     if (areaSum != (_kGridLines.round() * _kGridLines.round())) {
-      print('Area covered was not 1.0! $areaSum');
+      print(
+          'Area covered was not ${_kGridLines.round() * _kGridLines.round()}! '
+          '$areaSum');
       print('----------------------------------');
       for (Panel panel in panels) {
         print('$panel');

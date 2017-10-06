@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:lib.story.fidl/link.fidl.dart';
@@ -30,8 +31,7 @@ const String _kStoryClustersLinkKey = 'story_clusters';
 
 /// Creates a list of stories for the StoryList using
 /// modular's [StoryProvider].
-class StoryProviderStoryGenerator {
-  final Set<VoidCallback> _listeners = new Set<VoidCallback>();
+class StoryProviderStoryGenerator extends ChangeNotifier {
   bool _firstTime = true;
   bool _writeStoryClusterUpdatesToLink = false;
   bool _reactToLinkUpdates = false;
@@ -92,7 +92,7 @@ class StoryProviderStoryGenerator {
                 for (Story story in _currentStories) {
                   story.importance = importance[story.id.value] ?? 1.0;
                 }
-                _notifyListeners();
+                notifyListeners();
               });
             },
           ),
@@ -106,18 +106,11 @@ class StoryProviderStoryGenerator {
     _link = link;
   }
 
-  /// [listener] will be called when [storyClusters] changes.
-  void addListener(VoidCallback listener) {
-    _listeners.add(listener);
-  }
-
-  /// [listener] will no longer be called when [storyClusters] changes.
-  void removeListener(VoidCallback listener) {
-    _listeners.remove(listener);
-  }
-
   /// The list of [StoryCluster]s.
-  List<StoryCluster> get storyClusters => _storyClusters;
+  List<StoryCluster> get storyClusters =>
+      new UnmodifiableListView<StoryCluster>(
+        _storyClusters,
+      );
 
   /// Called when the drag state of a cluster changes.
   void onDraggingChanged({bool dragging}) {
@@ -167,7 +160,7 @@ class StoryProviderStoryGenerator {
     );
 
     log.fine(
-      'Current cluster count: ${storyClusters.length}, '
+      'Current cluster count: ${_storyClusters.length}, '
           'decoded cluster count: ${jsonStoryClusters.length}',
     );
 
@@ -214,7 +207,7 @@ class StoryProviderStoryGenerator {
       List<Story> replacementStories = <Story>[];
       for (Story jsonStory in jsonStoryClusterStories) {
         Story replacementStory = currentStoriesMap[jsonStory.id.value]
-          ..update(jsonStory);
+            .copyWithPanelAndClusterIndex(jsonStory);
         replacementStories.add(replacementStory);
       }
       jsonStoryCluster.replaceStories(replacementStories);
@@ -242,7 +235,7 @@ class StoryProviderStoryGenerator {
         oldStoryClusters.remove(bestMatchingStoryCluster);
         newStoryClusters.add(bestMatchingStoryCluster);
         bestMatchingStoryCluster.update(jsonStoryCluster);
-        return;
+        continue;
       }
 
       /// If no clusters exist with the stories, create a new cluster.
@@ -260,7 +253,8 @@ class StoryProviderStoryGenerator {
     _storyClusters
       ..clear()
       ..addAll(newStoryClusters);
-    _notifyListeners();
+
+    notifyListeners();
   }
 
   /// Finds the story cluster in [storyClusters] that best matches the stories
@@ -338,7 +332,7 @@ class StoryProviderStoryGenerator {
     }
     _storyClusters.remove(storyCluster);
 
-    _notifyListeners();
+    notifyListeners();
   }
 
   /// Loads the list of previous stories from the [StoryProvider].
@@ -347,7 +341,7 @@ class StoryProviderStoryGenerator {
   /// If set, [callback] will be called when the stories have been updated.
   void update([VoidCallback callback]) {
     _storyProvider.previousStories((List<String> storyIds) {
-      if (storyIds.isEmpty && storyClusters.isEmpty) {
+      if (storyIds.isEmpty && _storyClusters.isEmpty) {
         _onUpdateComplete(callback);
         return;
       }
@@ -400,7 +394,7 @@ class StoryProviderStoryGenerator {
   }
 
   /// TODO: Determine if this should be expanding cluster.realStories instead
-  Iterable<Story> get _currentStories => storyClusters.expand(
+  Iterable<Story> get _currentStories => _storyClusters.expand(
         (StoryCluster cluster) => cluster.stories,
       );
 
@@ -416,7 +410,7 @@ class StoryProviderStoryGenerator {
       _getController(storyInfo.id);
       _startStory(storyInfo, 0);
     } else {
-      for (StoryCluster storyCluster in storyClusters) {
+      for (StoryCluster storyCluster in _storyClusters) {
         Story story = storyCluster.getStory(storyInfo.id);
         if (story != null) {
           DateTime lastInteraction = new DateTime.fromMicrosecondsSinceEpoch(
@@ -428,7 +422,7 @@ class StoryProviderStoryGenerator {
           story.lastInteraction = lastInteraction;
           storyCluster.lastInteraction = lastInteraction;
           if (lastInteractionChanged) {
-            _notifyListeners();
+            notifyListeners();
           }
         }
       }
@@ -448,20 +442,20 @@ class StoryProviderStoryGenerator {
         _removeStoryFromClusters(stories.first);
       }
       if (notify) {
-        _notifyListeners();
+        notifyListeners();
       }
     }
   }
 
   void _removeStoryFromClusters(Story story) {
-    for (StoryCluster storyCluster in storyClusters
+    for (StoryCluster storyCluster in _storyClusters
         .where(
           (StoryCluster storyCluster) => storyCluster.stories.contains(story),
         )
         .toList()) {
       if (storyCluster.stories.length == 1) {
         _storyClusters.remove(storyCluster);
-        _notifyListeners();
+        notifyListeners();
       } else {
         storyCluster.absorb(story);
       }
@@ -493,17 +487,18 @@ class StoryProviderStoryGenerator {
       ],
       onStoryClusterChanged: _onStoryClusterChange,
       storyClusterEntranceTransitionModel:
-          new StoryClusterEntranceTransitionModel(completed: false),
+          new StoryClusterEntranceTransitionModel(
+        completed: false,
+      ),
     );
 
     _storyClusters.add(storyCluster);
-    _notifyListeners();
+    notifyListeners();
   }
 
-  void _notifyListeners() {
-    for (VoidCallback listener in _listeners.toList()) {
-      listener();
-    }
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
     _onStoryClusterChange();
   }
 

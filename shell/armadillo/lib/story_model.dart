@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:collection';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -40,15 +41,12 @@ class StoryModel extends Model {
       new ModelFinder<StoryModel>()
           .of(context, rebuildOnChange: rebuildOnChange);
 
-  /// Returns the current list of [StoryCluster]s.
-  List<StoryCluster> get storyClusters => _storyClusters;
-
   /// The current height of the story list.
   double get listHeight => _listHeight;
 
   /// Called to set a new list of [storyClusters].
   void onStoryClustersChanged(List<StoryCluster> storyClusters) {
-    _storyClusters = storyClusters;
+    _storyClusters = storyClusters.toList();
     updateLayouts(_lastLayoutSize);
     notifyListeners();
   }
@@ -64,6 +62,70 @@ class StoryModel extends Model {
     }
 
     super.notifyListeners();
+  }
+
+  /// An unmodifiable list of all storyClusters.
+  List<StoryCluster> get storyClusters =>
+      new UnmodifiableListView<StoryCluster>(_storyClusters);
+
+  /// An unmodifiable list of all stories.
+  List<Story> get stories => new UnmodifiableListView<Story>(
+        _storyClusters.expand(
+          (StoryCluster storyCluster) => storyCluster.stories,
+        ),
+      );
+
+  /// Returns true if all story clusters are unfocused.
+  bool get allUnfocused => _storyClusters.every(
+      (StoryCluster storyCluster) => storyCluster.focusModel.value == 0.0);
+
+  /// Unfocuses all the story clusters.
+  void unfocusAll() {
+    for (StoryCluster storyCluster in _storyClusters) {
+      storyCluster.unFocus();
+    }
+  }
+
+  /// Iterates through the story clusters creating widgets with the given
+  /// builder.
+  List<Widget> toWidgets(Widget toWidget(StoryCluster storyCluster)) {
+    return new List<Widget>.generate(
+      _storyClusters.length,
+      (int index) => toWidget(_storyClusters[index]),
+    );
+  }
+
+  /// Returns the story cluster with the given id or null if no clusters
+  /// have the id.
+  StoryCluster storyClusterWithId(StoryClusterId id) {
+    Iterable<StoryCluster> storyClustersWithId = _storyClusters.where(
+      (StoryCluster storyCluster) => storyCluster.id == id,
+    );
+    if (storyClustersWithId.isEmpty) {
+      return null;
+    }
+    assert(storyClustersWithId.length == 1);
+    return storyClustersWithId.first;
+  }
+
+  /// Returns the story cluster with the given story or null if no clusters
+  /// contain the story.
+  StoryCluster storyClusterWithStory(StoryId storyId) {
+    Iterable<StoryCluster> storyClustersWithStory =
+        _storyClusters.where((StoryCluster storyCluster) {
+      bool result = false;
+      for (Story story in storyCluster.stories) {
+        if (story.id == storyId) {
+          result = true;
+        }
+      }
+      return result;
+    });
+    if (storyClustersWithStory.isEmpty) {
+      return null;
+    }
+    assert(storyClustersWithStory.length == 1);
+    return storyClustersWithStory.first;
   }
 
   /// Gets the max focus progress of all the clusters.
@@ -88,7 +150,9 @@ class StoryModel extends Model {
         a.lastInteraction.millisecondsSinceEpoch);
 
     List<StoryLayout> storyLayout = new StoryListLayout(size: size).layout(
-      storyClustersToLayout: _storyClusters,
+      storyClustersToLayout: new UnmodifiableListView<StoryCluster>(
+        _storyClusters,
+      ),
       currentTime: new DateTime.now(),
     );
 

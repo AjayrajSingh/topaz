@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:collection';
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
@@ -99,23 +100,23 @@ class StoryCluster {
     this.onStoryClusterChanged,
     StoryClusterEntranceTransitionModel storyClusterEntranceTransitionModel,
   })
-      : this._stories = stories,
-        this.title = _getClusterTitle(stories),
-        this._lastInteraction = _getClusterLastInteraction(stories),
-        this._cumulativeInteractionDuration =
+      : _stories = stories,
+        title = _getClusterTitle(stories),
+        _lastInteraction = _getClusterLastInteraction(stories),
+        _cumulativeInteractionDuration =
             _getClusterCumulativeInteractionDuration(stories),
-        this.id = id ?? new StoryClusterId(),
-        this.clusterDraggableKey = clusterDraggableKey ??
+        id = id ?? new StoryClusterId(),
+        clusterDraggableKey = clusterDraggableKey ??
             new GlobalKey(debugLabel: 'clusterDraggableKey'),
-        this.clusterDragTargetsKey =
+        clusterDragTargetsKey =
             new GlobalKey(debugLabel: 'clusterDragTargetsKey'),
-        this.panelsKey = new GlobalKey(debugLabel: 'panelsKey'),
-        this.dragFeedbackKey = new GlobalKey<StoryClusterDragFeedbackState>(
+        panelsKey = new GlobalKey(debugLabel: 'panelsKey'),
+        dragFeedbackKey = new GlobalKey<StoryClusterDragFeedbackState>(
             debugLabel: 'dragFeedbackKey'),
-        this._displayMode = DisplayMode.panels,
-        this._storyListListeners = new Set<VoidCallback>(),
-        this._focusedStoryId = stories[0].id,
-        this.storyClusterEntranceTransitionModel =
+        _displayMode = DisplayMode.panels,
+        _storyListListeners = new Set<VoidCallback>(),
+        _focusedStoryId = stories[0].id,
+        storyClusterEntranceTransitionModel =
             storyClusterEntranceTransitionModel ??
                 new StoryClusterEntranceTransitionModel() {
     _storiesModel = new StoryClusterStoriesModel(this);
@@ -169,16 +170,16 @@ class StoryCluster {
 
   /// The list of stories in this cluster including both 'real' stories and
   /// place holder stories.
-  List<Story> get stories => new List<Story>.unmodifiable(_stories);
+  List<Story> get stories => new UnmodifiableListView<Story>(_stories);
 
   /// The list of 'real' stories in this cluster.
-  List<Story> get realStories => new List<Story>.unmodifiable(
+  List<Story> get realStories => new UnmodifiableListView<Story>(
         _stories.where((Story story) => !story.isPlaceHolder),
       );
 
   /// The list of place holder stories in this cluster.
   List<PlaceHolderStory> get previewStories =>
-      new List<PlaceHolderStory>.unmodifiable(
+      new UnmodifiableListView<PlaceHolderStory>(
         _stories.where((Story story) => story.isPlaceHolder),
       );
 

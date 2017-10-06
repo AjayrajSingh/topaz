@@ -102,20 +102,33 @@ class Story {
     this.themeColor: Colors.black,
     this.importance: 1.0,
     this.onClusterIndexChanged,
+    StoryClusterId clusterId,
+    GlobalKey storyBarPaddingKey,
+    GlobalKey clusterDraggableKey,
+    GlobalKey positionedKey,
+    GlobalKey shadowPositionedKey,
+    GlobalKey containerKey,
+    GlobalKey<SimulatedFractionallySizedBoxState> tabSizerKey,
+    Panel panel,
+    int clusterIndex,
   })
-      : this.clusterId = new StoryClusterId(),
-        this.storyBarPaddingKey =
+      : clusterId = clusterId ?? new StoryClusterId(),
+        storyBarPaddingKey = storyBarPaddingKey ??
             new GlobalKey(debugLabel: '$id storyBarPaddingKey'),
-        this.clusterDraggableKey =
+        clusterDraggableKey = clusterDraggableKey ??
             new GlobalKey(debugLabel: '$id clusterDraggableKey'),
-        this.positionedKey = new GlobalKey(debugLabel: '$id positionedKey'),
-        this.shadowPositionedKey =
+        positionedKey =
+            positionedKey ?? new GlobalKey(debugLabel: '$id positionedKey'),
+        shadowPositionedKey = shadowPositionedKey ??
             new GlobalKey(debugLabel: '$id shadowPositionedKey'),
-        this.containerKey = new GlobalKey(debugLabel: '$id containerKey'),
-        this.tabSizerKey = new GlobalKey<SimulatedFractionallySizedBoxState>(
-            debugLabel: '$id tabSizerKey'),
-        this.panel = new Panel(),
-        this.lastInteraction = lastInteraction ?? new DateTime.now();
+        containerKey =
+            containerKey ?? new GlobalKey(debugLabel: '$id containerKey'),
+        tabSizerKey = tabSizerKey ??
+            new GlobalKey<SimulatedFractionallySizedBoxState>(
+                debugLabel: '$id tabSizerKey'),
+        panel = panel ?? new Panel(),
+        lastInteraction = lastInteraction ?? new DateTime.now(),
+        _clusterIndex = clusterIndex;
 
   /// Creates a Story from a json object returned by [toJson].
   factory Story.fromJson(Map<String, dynamic> storyData) {
@@ -178,11 +191,28 @@ class Story {
   @override
   String toString() => 'Story( id: $id, title: $title, panel: $panel )';
 
-  /// Updates this story to have the info as [other].
-  void update(Story other) {
-    panel = other.panel;
-    _clusterIndex = other._clusterIndex;
-  }
+  /// Creates a new story with this story's values and [other]'s panel and
+  /// cluster index.
+  Story copyWithPanelAndClusterIndex(Story other) => new Story(
+        id: id,
+        builder: builder,
+        title: title,
+        icons: icons,
+        lastInteraction: lastInteraction,
+        cumulativeInteractionDuration: cumulativeInteractionDuration,
+        themeColor: themeColor,
+        importance: importance,
+        onClusterIndexChanged: onClusterIndexChanged,
+        clusterId: clusterId,
+        storyBarPaddingKey: storyBarPaddingKey,
+        clusterDraggableKey: clusterDraggableKey,
+        positionedKey: positionedKey,
+        shadowPositionedKey: shadowPositionedKey,
+        containerKey: containerKey,
+        tabSizerKey: tabSizerKey,
+        panel: other.panel,
+        clusterIndex: other._clusterIndex,
+      );
 
   /// Returns an object represeting the [Story] suitable for conversion
   /// into JSON.

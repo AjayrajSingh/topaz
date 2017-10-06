@@ -440,20 +440,10 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     _visibleStoriesController.set(visibleStoryIds);
   }
 
-  StoryCluster get _lastFocusedStoryCluster {
-    if (_lastFocusedStoryClusterId == null) {
-      return null;
-    }
-    Iterable<StoryCluster> storyClusters = _storyModel.storyClusters.where(
-      (StoryCluster storyCluster) =>
-          storyCluster.id == _lastFocusedStoryClusterId,
-    );
-    if (storyClusters.isEmpty) {
-      return null;
-    }
-    assert(storyClusters.length == 1);
-    return storyClusters.first;
-  }
+  StoryCluster get _lastFocusedStoryCluster =>
+      _lastFocusedStoryClusterId == null
+          ? null
+          : _storyModel.storyClusterWithId(_lastFocusedStoryClusterId);
 
   void _onAskSuggestionsChanged() {
     if (_asking) {

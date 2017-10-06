@@ -203,11 +203,8 @@ class ConductorState extends State<Conductor> {
   /// 4) Scrolling to the beginning of the story list.
   /// 5) Peeking the suggestion list.
   void goToOrigin() {
-    StoryModel storyModel = StoryModel.of(context);
     // Unfocus all story clusters.
-    for (StoryCluster storyCluster in storyModel.storyClusters) {
-      storyCluster.unFocus();
-    }
+    StoryModel storyModel = StoryModel.of(context)..unfocusAll();
 
     // Unlock scrolling.
     ConductorModel.of(context).recentsBuilder.onStoryUnfocused();
@@ -223,45 +220,30 @@ class ConductorState extends State<Conductor> {
     ConductorModel.of(context).recentsBuilder.onStoryFocused();
     _minimizeNow();
     StoryModel storyModel = StoryModel.of(context);
-    List<StoryCluster> targetStoryClusters =
-        storyModel.storyClusters.where((StoryCluster storyCluster) {
-      bool result = false;
-      for (Story story in storyCluster.stories) {
-        if (story.id == storyId) {
-          result = true;
-        }
-      }
-      return result;
-    }).toList();
+    StoryCluster storyCluster = storyModel.storyClusterWithStory(storyId);
 
-    // There should be only one story cluster with a story with this id.  If
+    // There should be one story cluster with a story with this id.  If
     // that's not true, bail out.
-    if (targetStoryClusters.length != 1) {
-      print(
-        'WARNING: Found ${targetStoryClusters.length} story clusters with '
-            'a story with id $storyId. Returning to origin.',
-      );
+    if (storyCluster == null) {
       goToOrigin();
     } else {
       // Unfocus all story clusters.
-      for (StoryCluster storyCluster in storyModel.storyClusters) {
-        storyCluster.unFocus();
-      }
+      storyModel.unfocusAll();
 
       // Ensure the focused story is completely expanded.
       if (jumpToFinish) {
-        targetStoryClusters[0].focusModel.jump(1.0);
-        targetStoryClusters[0].storyClusterEntranceTransitionModel.jump(1.0);
+        storyCluster.focusModel.jump(1.0);
+        storyCluster.storyClusterEntranceTransitionModel.jump(1.0);
       } else {
-        targetStoryClusters[0].focusModel.target = 1.0;
-        targetStoryClusters[0].storyClusterEntranceTransitionModel.target = 1.0;
+        storyCluster.focusModel.target = 1.0;
+        storyCluster.storyClusterEntranceTransitionModel.target = 1.0;
       }
 
       // Ensure the focused story's story bar is full open.
-      targetStoryClusters[0].maximizeStoryBars(jumpToFinish: jumpToFinish);
+      storyCluster.maximizeStoryBars(jumpToFinish: jumpToFinish);
 
       // Focus on the story cluster.
-      _focusStoryCluster(targetStoryClusters[0]);
+      _focusStoryCluster(storyCluster);
     }
 
     ConductorModel.of(context).nextBuilder.resetSelection();
