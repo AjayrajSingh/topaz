@@ -29,7 +29,7 @@ class Config {
     try {
       data = await file.readAsString();
     } on Exception {
-      data = "{}";
+      data = '{}';
     }
 
     try {
