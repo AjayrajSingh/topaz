@@ -57,9 +57,6 @@ class Story {
   /// The key of draggable portion of the widget represeting this story.
   final GlobalKey clusterDraggableKey;
 
-  /// The key of shadow being applied behind this story's widget.
-  final GlobalKey<SimulatedFractionalState> shadowPositionedKey;
-
   /// The key of container in which this story's widget resides.
   final GlobalKey containerKey;
 
@@ -74,7 +71,7 @@ class Story {
   /// widget in the story list.
   DateTime lastInteraction;
 
-  /// The culmultaive interaction duration the user has had with is story.  This
+  /// The culmulative interaction duration the user has had with is story.  This
   /// is used for determining the size of the story's widget in the story list.
   Duration cumulativeInteractionDuration;
 
@@ -106,7 +103,6 @@ class Story {
     GlobalKey storyBarPaddingKey,
     GlobalKey clusterDraggableKey,
     GlobalKey positionedKey,
-    GlobalKey shadowPositionedKey,
     GlobalKey containerKey,
     GlobalKey<SimulatedFractionallySizedBoxState> tabSizerKey,
     Panel panel,
@@ -119,8 +115,6 @@ class Story {
             new GlobalKey(debugLabel: '$id clusterDraggableKey'),
         positionedKey =
             positionedKey ?? new GlobalKey(debugLabel: '$id positionedKey'),
-        shadowPositionedKey = shadowPositionedKey ??
-            new GlobalKey(debugLabel: '$id shadowPositionedKey'),
         containerKey =
             containerKey ?? new GlobalKey(debugLabel: '$id containerKey'),
         tabSizerKey = tabSizerKey ??
@@ -207,7 +201,6 @@ class Story {
         storyBarPaddingKey: storyBarPaddingKey,
         clusterDraggableKey: clusterDraggableKey,
         positionedKey: positionedKey,
-        shadowPositionedKey: shadowPositionedKey,
         containerKey: containerKey,
         tabSizerKey: tabSizerKey,
         panel: other.panel,
