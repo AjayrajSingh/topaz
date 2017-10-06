@@ -1,0 +1,407 @@
+[submodule "build"]
+	branch = master
+	path = build
+	url = https://fuchsia.googlesource.com/build
+[submodule "buildtools"]
+	branch = master
+	path = buildtools
+	url = https://fuchsia.googlesource.com/buildtools
+[submodule "dart"]
+	branch = 90587a6837c5ad4a64d571397a8ba65a7cc3f44f
+	path = dart
+	url = https://dart.googlesource.com/sdk
+[submodule "docs"]
+	branch = master
+	path = docs
+	url = https://fuchsia.googlesource.com/docs
+[submodule "drivers/audio"]
+	branch = master
+	path = drivers/audio
+	url = https://fuchsia.googlesource.com/drivers/audio
+[submodule "garnet"]
+	branch = master
+	path = garnet
+	url = https://fuchsia.googlesource.com/garnet
+[submodule "lib/flutter"]
+	branch = 21b81d902df4ca37bcb4804bf9407267052b0015
+	path = lib/flutter
+	url = https://chromium.googlesource.com/external/github.com/flutter/flutter
+[submodule "manifest"]
+	branch = master
+	path = manifest
+	url = https://fuchsia.googlesource.com/manifest
+[submodule "packages"]
+	branch = master
+	path = packages
+	url = https://fuchsia.googlesource.com/packages
+[submodule "peridot"]
+	branch = master
+	path = peridot
+	url = https://fuchsia.googlesource.com/peridot
+[submodule "scripts"]
+	branch = master
+	path = scripts
+	url = https://fuchsia.googlesource.com/scripts
+[submodule "third_party/asio"]
+	branch = master
+	path = third_party/asio
+	url = https://fuchsia.googlesource.com/third_party/asio
+[submodule "third_party/benchmark"]
+	branch = master
+	path = third_party/benchmark
+	url = https://fuchsia.googlesource.com/third_party/benchmark
+[submodule "third_party/binutils-gdb"]
+	branch = 6dd1c25a5a34a7e3d270f1817aee7e4003c88ade
+	path = third_party/binutils-gdb
+	url = https://fuchsia.googlesource.com/third_party/binutils-gdb
+[submodule "third_party/boringssl"]
+	branch = 03458bb801b93b91017f73a0b3ea1b3a00442b9a
+	path = third_party/boringssl
+	url = https://fuchsia.googlesource.com/third_party/boringssl
+[submodule "third_party/cairo"]
+	branch = master
+	shallow = true
+	path = third_party/cairo
+	url = https://fuchsia.googlesource.com/third_party/cairo
+[submodule "third_party/cares"]
+	branch = master
+	path = third_party/cares
+	url = https://fuchsia.googlesource.com/third_party/c-ares
+[submodule "third_party/catapult"]
+	branch = 99ec8187805e3ab807dac86c1ef0a1b07be9d1a6
+	path = third_party/catapult
+	url = https://chromium.googlesource.com/external/github.com/catapult-project/catapult
+[submodule "third_party/cobalt"]
+	branch = 7ecbb96053dfae59da62f49fa40b0328e1c8141d
+	path = third_party/cobalt
+	url = https://fuchsia.googlesource.com/cobalt
+[submodule "third_party/curl"]
+	branch = master
+	path = third_party/curl
+	url = https://fuchsia.googlesource.com/third_party/curl
+[submodule "third_party/dart-pkg"]
+	branch = master
+	path = third_party/dart-pkg
+	url = https://fuchsia.googlesource.com/third_party/dart-pkg
+[submodule "third_party/expat"]
+	branch = master
+	path = third_party/expat
+	url = https://fuchsia.googlesource.com/third_party/expat
+[submodule "third_party/ffmpeg"]
+	branch = master
+	path = third_party/ffmpeg
+	url = https://fuchsia.googlesource.com/third_party/ffmpeg
+[submodule "third_party/flatbuffers"]
+	branch = master
+	path = third_party/flatbuffers
+	url = https://fuchsia.googlesource.com/third_party/flatbuffers
+[submodule "third_party/freetype2"]
+	branch = master
+	path = third_party/freetype2
+	url = https://fuchsia.googlesource.com/third_party/freetype2
+[submodule "third_party/gflags"]
+	branch = master
+	path = third_party/gflags
+	url = https://fuchsia.googlesource.com/third_party/gflags
+[submodule "third_party/git"]
+	branch = master
+	path = third_party/git
+	url = https://fuchsia.googlesource.com/third_party/git
+[submodule "third_party/glm"]
+	branch = 5dcc56489e1b66dfd5bca751fa9b8dc68059e008
+	path = third_party/glm
+	url = https://chromium.googlesource.com/external/github.com/g-truc/glm
+[submodule "third_party/glog"]
+	branch = master
+	path = third_party/glog
+	url = https://fuchsia.googlesource.com/third_party/glog
+[submodule "third_party/go"]
+	branch = master
+	path = third_party/go
+	url = https://fuchsia.googlesource.com/third_party/go
+[submodule "third_party/golang/crypto"]
+	branch = master
+	path = third_party/golang/crypto
+	url = https://fuchsia.googlesource.com/third_party/golang/crypto
+[submodule "third_party/golibs/github.com/google/subcommands"]
+	branch = master
+	path = third_party/golibs/github.com/google/subcommands
+	url = https://fuchsia.googlesource.com/third_party/github.com/google/subcommands
+[submodule "third_party/golibs/github.com/kr/fs"]
+	branch = master
+	path = third_party/golibs/github.com/kr/fs
+	url = https://fuchsia.googlesource.com/third_party/github.com/kr/fs
+[submodule "third_party/golibs/github.com/pkg/errors"]
+	branch = master
+	path = third_party/golibs/github.com/pkg/errors
+	url = https://fuchsia.googlesource.com/third_party/github.com/pkg/errors
+[submodule "third_party/golibs/github.com/pkg/sftp"]
+	branch = master
+	path = third_party/golibs/github.com/pkg/sftp
+	url = https://fuchsia.googlesource.com/third_party/github.com/pkg/sftp
+[submodule "third_party/grpc"]
+	branch = 60160de187af72f65a20b1539ab305c1d8a6f591
+	path = third_party/grpc
+	url = https://fuchsia.googlesource.com/third_party/grpc
+[submodule "third_party/gtest"]
+	branch = master
+	path = third_party/gtest
+	url = https://fuchsia.googlesource.com/third_party/gtest
+[submodule "third_party/harfbuzz"]
+	branch = master
+	path = third_party/harfbuzz
+	url = https://fuchsia.googlesource.com/third_party/harfbuzz
+[submodule "third_party/icu"]
+	branch = master
+	path = third_party/icu
+	url = https://fuchsia.googlesource.com/third_party/icu
+[submodule "third_party/iperf"]
+	branch = master
+	path = third_party/iperf
+	url = https://fuchsia.googlesource.com/third_party/iperf
+[submodule "third_party/jinja2"]
+	branch = master
+	path = third_party/jinja2
+	url = https://fuchsia.googlesource.com/third_party/jinja2
+[submodule "third_party/leveldb"]
+	branch = master
+	path = third_party/leveldb
+	url = https://fuchsia.googlesource.com/third_party/leveldb
+[submodule "third_party/libc-tests"]
+	branch = master
+	path = third_party/libc-tests
+	url = https://fuchsia.googlesource.com/libc-tests
+[submodule "third_party/libjpeg-turbo"]
+	branch = master
+	path = third_party/libjpeg-turbo
+	url = https://fuchsia.googlesource.com/third_party/libjpeg-turbo
+[submodule "third_party/libpng"]
+	branch = master
+	path = third_party/libpng
+	url = https://fuchsia.googlesource.com/third_party/libpng
+[submodule "third_party/libteken"]
+	branch = master
+	path = third_party/libteken
+	url = https://fuchsia.googlesource.com/third_party/libteken
+[submodule "third_party/libxml2"]
+	branch = master
+	path = third_party/libxml2
+	url = https://fuchsia.googlesource.com/third_party/libxml2
+[submodule "third_party/llvm"]
+	branch = bb46295e2f8860860f7eb83cff702e89037436ed
+	path = third_party/llvm
+	url = https://fuchsia.googlesource.com/third_party/llvm
+[submodule "third_party/lua"]
+	branch = master
+	path = third_party/lua
+	url = https://fuchsia.googlesource.com/third_party/lua
+[submodule "third_party/mako"]
+	branch = master
+	path = third_party/mako
+	url = https://fuchsia.googlesource.com/third_party/mako
+[submodule "third_party/markupsafe"]
+	branch = master
+	path = third_party/markupsafe
+	url = https://fuchsia.googlesource.com/third_party/markupsafe
+[submodule "third_party/mesa"]
+	branch = master
+	path = third_party/mesa
+	url = https://fuchsia.googlesource.com/third_party/mesa
+[submodule "third_party/murmurhash"]
+	branch = master
+	path = third_party/murmurhash
+	url = https://fuchsia.googlesource.com/third_party/murmurhash.c
+[submodule "third_party/netstack"]
+	branch = master
+	path = third_party/netstack
+	url = https://fuchsia.googlesource.com/third_party/netstack
+[submodule "third_party/openssh-portable"]
+	branch = master
+	path = third_party/openssh-portable
+	url = https://fuchsia.googlesource.com/third_party/openssh-portable
+[submodule "third_party/pixman"]
+	branch = master
+	shallow = true
+	path = third_party/pixman
+	url = https://fuchsia.googlesource.com/third_party/pixman
+[submodule "third_party/processor-trace"]
+	branch = master
+	path = third_party/processor-trace
+	url = https://fuchsia.googlesource.com/third_party/processor-trace
+[submodule "third_party/protobuf"]
+	branch = 60d83472b81e28379cce600bde19d7530a69681b
+	path = third_party/protobuf
+	url = https://fuchsia.googlesource.com/third_party/protobuf
+[submodule "third_party/pytoml"]
+	branch = master
+	path = third_party/pytoml
+	url = https://fuchsia.googlesource.com/third_party/pytoml
+[submodule "third_party/rapidjson"]
+	branch = master
+	path = third_party/rapidjson
+	url = https://fuchsia.googlesource.com/third_party/rapidjson
+[submodule "third_party/re2"]
+	branch = master
+	path = third_party/re2
+	url = https://fuchsia.googlesource.com/third_party/re2
+[submodule "third_party/root_certificates"]
+	branch = a4c7c6f23a664a37bc1b6f15a819e3f2a292791a
+	path = third_party/root_certificates
+	url = https://dart.googlesource.com/root_certificates
+[submodule "third_party/roughtime"]
+	branch = master
+	path = third_party/roughtime
+	url = https://fuchsia.googlesource.com/third_party/roughtime
+[submodule "third_party/rust-crates"]
+	branch = master
+	path = third_party/rust-crates
+	url = https://fuchsia.googlesource.com/third_party/rust-crates
+[submodule "third_party/rust-mirrors/cargo-vendor"]
+	branch = master
+	path = third_party/rust-mirrors/cargo-vendor
+	url = https://fuchsia.googlesource.com/third_party/cargo-vendor
+[submodule "third_party/rust-mirrors/mio"]
+	branch = master
+	path = third_party/rust-mirrors/mio
+	url = https://fuchsia.googlesource.com/third_party/mio
+[submodule "third_party/rust-mirrors/tokio-core"]
+	branch = master
+	path = third_party/rust-mirrors/tokio-core
+	url = https://fuchsia.googlesource.com/third_party/tokio-core
+[submodule "third_party/sbase"]
+	branch = master
+	path = third_party/sbase
+	url = https://fuchsia.googlesource.com/third_party/sbase
+[submodule "third_party/shaderc"]
+	branch = master
+	path = third_party/shaderc
+	url = https://fuchsia.googlesource.com/third_party/shaderc
+[submodule "third_party/skia"]
+	branch = df071d78850d6cfcb6fb891316757e33574ee512
+	path = third_party/skia
+	url = https://skia.googlesource.com/skia
+[submodule "third_party/snappy"]
+	branch = master
+	path = third_party/snappy
+	url = https://fuchsia.googlesource.com/third_party/snappy
+[submodule "third_party/speccpu2000"]
+	branch = master
+	path = third_party/speccpu2000
+	url = https://fuchsia.googlesource.com/third_party/speccpu2000
+[submodule "third_party/sqlite"]
+	branch = master
+	path = third_party/sqlite
+	url = https://fuchsia.googlesource.com/third_party/sqlite
+[submodule "third_party/vim"]
+	branch = master
+	path = third_party/vim
+	url = https://fuchsia.googlesource.com/third_party/vim
+[submodule "third_party/vulkan-cts"]
+	branch = master
+	path = third_party/vulkan-cts
+	url = https://fuchsia.googlesource.com/third_party/vulkan-cts
+[submodule "third_party/vulkan_loader_and_validation_layers"]
+	branch = master
+	path = third_party/vulkan_loader_and_validation_layers
+	url = https://fuchsia.googlesource.com/third_party/vulkan_loader_and_validation_layers
+[submodule "third_party/webkit"]
+	branch = master
+	shallow = true
+	path = third_party/webkit
+	url = https://fuchsia.googlesource.com/third_party/webkit
+[submodule "third_party/xi-editor"]
+	branch = 25fd559f81ca07e18c80a5fc5ecfbc96834c0a12
+	path = third_party/xi-editor
+	url = https://fuchsia.googlesource.com/third_party/xi-editor
+[submodule "third_party/yasm"]
+	branch = master
+	path = third_party/yasm
+	url = https://fuchsia.googlesource.com/third_party/yasm
+[submodule "third_party/zlib"]
+	branch = master
+	path = third_party/zlib
+	url = https://fuchsia.googlesource.com/third_party/zlib
+[submodule "topaz/app/chat"]
+	branch = master
+	path = topaz/app/chat
+	url = https://fuchsia.googlesource.com/modules/chat
+[submodule "topaz/app/contacts"]
+	branch = master
+	path = topaz/app/contacts
+	url = https://fuchsia.googlesource.com/modules/contacts
+[submodule "topaz/app/dashboard"]
+	branch = master
+	path = topaz/app/dashboard
+	url = https://fuchsia.googlesource.com/modules/dashboard
+[submodule "topaz/app/latin-ime"]
+	branch = master
+	path = topaz/app/latin-ime
+	url = https://fuchsia.googlesource.com/latin-ime
+[submodule "topaz/app/maxwell"]
+	branch = master
+	path = topaz/app/maxwell
+	url = https://fuchsia.googlesource.com/maxwell
+[submodule "topaz/app/moterm"]
+	branch = master
+	path = topaz/app/moterm
+	url = https://fuchsia.googlesource.com/moterm
+[submodule "topaz/app/music"]
+	branch = master
+	path = topaz/app/music
+	url = https://fuchsia.googlesource.com/modules/music
+[submodule "topaz/app/todo"]
+	branch = master
+	path = topaz/app/todo
+	url = https://fuchsia.googlesource.com/modules/todo
+[submodule "topaz/app/video"]
+	branch = master
+	path = topaz/app/video
+	url = https://fuchsia.googlesource.com/modules/video
+[submodule "topaz/app/xi"]
+	branch = master
+	path = topaz/app/xi
+	url = https://fuchsia.googlesource.com/xi
+[submodule "topaz/examples"]
+	branch = master
+	path = topaz/examples
+	url = https://fuchsia.googlesource.com/topaz/examples
+[submodule "topaz/lib/tonic"]
+	branch = master
+	path = topaz/lib/tonic
+	url = https://fuchsia.googlesource.com/tonic
+[submodule "topaz/lib/widgets"]
+	branch = master
+	path = topaz/lib/widgets
+	url = https://fuchsia.googlesource.com/widgets
+[submodule "topaz/packages"]
+	branch = master
+	path = topaz/packages
+	url = https://fuchsia.googlesource.com/topaz/packages
+[submodule "topaz/public"]
+	branch = master
+	path = topaz/public
+	url = https://fuchsia.googlesource.com/topaz/public
+[submodule "topaz/runtime/dart_runner"]
+	branch = master
+	path = topaz/runtime/dart_runner
+	url = https://fuchsia.googlesource.com/dart_content_handler
+[submodule "topaz/runtime/web_runner"]
+	branch = master
+	path = topaz/runtime/web_runner
+	url = https://fuchsia.googlesource.com/web_runner
+[submodule "topaz/runtime/web_view"]
+	branch = master
+	path = topaz/runtime/web_view
+	url = https://fuchsia.googlesource.com/web_view
+[submodule "topaz/shell"]
+	branch = master
+	path = topaz/shell
+	url = https://fuchsia.googlesource.com/sysui
+[submodule "topaz/tools"]
+	branch = master
+	path = topaz/tools
+	url = https://fuchsia.googlesource.com/modules/common
+[submodule "zircon"]
+	branch = master
+	path = zircon
+	url = https://fuchsia.googlesource.com/zircon
