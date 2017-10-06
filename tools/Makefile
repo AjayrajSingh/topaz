@@ -19,24 +19,5 @@ include $(common_makefile)
 ################################################################################
 ## Project specific build
 .PHONY: build-override
-build-override: dart-gen-specs $(addsuffix /.packages,$(filter-out $(dart_gn_packages),$(dart_all_packages)))
+build-override:
 	@true
-
-
-################################################################################
-## Widget Explorer related targets
-
-# To debug the generation process, pass in "--observe --pause-isolates-on-start"
-# as the DART_FLAGS
-dart_flags ?=
-widget_package_dirs := $(realpath $(addprefix $(root)/, packages/widgets ../app/chat/modules/conversation ../app/chat/modules/conversation_list ../app/contacts/modules/contacts))
-widget_dot_packages := $(addsuffix /.packages, $(widget_package_dirs))
-
-.PHONY: dart-gen-specs
-dart-gen-specs: $(dart_bin) widget_explorer/tools/widget_explorer_gen/.packages $(widget_dot_packages)
-	@rm -rf fx_widget_explorer/lib/src/generated/*.dart
-	@cd widget_explorer/tools/widget_explorer_gen && \
-	FLUTTER_ROOT=$(flutter_root) $(dart) $(dart_flags) bin/widget_explorer_gen.dart \
-		$(root)/fx_widget_explorer/lib/src/generated \
-		$(widget_package_dirs)
-	@rm -f $(widget_dot_packages)

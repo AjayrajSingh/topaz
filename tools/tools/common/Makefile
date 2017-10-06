@@ -70,7 +70,7 @@ PATH := $(flutter_bin):$(dart_bin):$(fuchsia_root)/buildtools:$(PATH)
 ## Fuchsia build / LUCI bot related flags
 
 DEFAULT_MODULE ?= packages/gn/default
-MINIMAL_MODULE ?= topaz/packages/modules
+MINIMAL_MODULE ?= topaz/packages/mods
 
 # Specify GOMA=1 to force use goma, GOMA=0 to force not use goma.
 # Auto-detect if not specified.
