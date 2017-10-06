@@ -79,6 +79,15 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
   @override
   void onRemoveAll() {
     log.fine('$prefix onRemoveAll');
+    clearSuggestions();
+  }
+
+  @override
+  void onProcessingChange(bool processing) {
+    // TODO(jwnichols): Incorporate this into the user interface somehow
+  }
+
+  void clearSuggestions() {
     List<Suggestion> interruptionsToRemove = _interruptions.toList();
     _interruptions.clear();
     for (Suggestion suggestion in interruptionsToRemove) {
@@ -188,6 +197,12 @@ class _InterruptionListener extends maxwell.SuggestionListener {
     // TODO(apwilson): decide what to do with a removed interruption.
     onInterruptionsRemoved();
   }
+
+  @override
+  void onProcessingChange(bool processing) {
+    // TODO(jwnichols): This method doesn't make sense for interruptions and
+    // will go away once we create a specialized listener for interruptions
+  }
 }
 
 Suggestion _convert(maxwell.Suggestion suggestion) {
@@ -209,21 +224,11 @@ Suggestion _convert(maxwell.Suggestion suggestion) {
 /// Creates a list of suggestions for the SuggestionList using the
 /// [maxwell.SuggestionProvider].
 class SuggestionProviderSuggestionModel extends SuggestionModel {
-  // Controls how many suggestions we receive from maxwell's Ask suggestion
-  // stream as well as indicates what the user is asking.
-  final maxwell.AskControllerProxy _askControllerProxy =
-      new maxwell.AskControllerProxy();
-
   final maxwell.SuggestionListenerBinding _askListenerBinding =
       new maxwell.SuggestionListenerBinding();
 
   // Listens for changes to maxwell's ask suggestion list.
   _MaxwellSuggestionListenerImpl _askListener;
-
-  // Controls how many suggestions we receive from maxwell's Next suggestion
-  // stream.
-  final maxwell.NextControllerProxy _nextControllerProxy =
-      new maxwell.NextControllerProxy();
 
   final maxwell.SuggestionListenerBinding _nextListenerBinding =
       new maxwell.SuggestionListenerBinding();
@@ -289,9 +294,8 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   /// Call to close all the handles opened by this model.
   void close() {
-    _askControllerProxy.ctrl.close();
-    _askListenerBinding.close();
-    _nextControllerProxy.ctrl.close();
+    if (_askListenerBinding.isBound)
+      _askListenerBinding.close();
     _nextListenerBinding.close();
     _feedbackListenerBinding.close();
     _transcriptionListenerBinding.close();
@@ -407,20 +411,13 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   }
 
   void _load() {
-    _suggestionProviderProxy.initiateAsk(
-      _askListenerBinding.wrap(_askListener),
-      _askControllerProxy.ctrl.request(),
-    );
-    _askControllerProxy.setResultCount(_kMaxSuggestions);
-
-    _suggestionProviderProxy.subscribeToNext(
-      _nextListenerBinding.wrap(_nextListener),
-      _nextControllerProxy.ctrl.request(),
-    );
-    _nextControllerProxy.setResultCount(_kMaxSuggestions);
-
-    _suggestionProviderProxy.registerFeedbackListener(
-        _feedbackListenerBinding.wrap(_feedbackListener));
+    _suggestionProviderProxy
+      ..subscribeToNext(
+        _nextListenerBinding.wrap(_nextListener),
+        _kMaxSuggestions,
+      )
+      ..registerFeedbackListener(
+          _feedbackListenerBinding.wrap(_feedbackListener));
   }
 
   @override
@@ -447,8 +444,20 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   set askText(String text) {
     if (_askText != text) {
       _askText = text;
-      _askControllerProxy
-          .setUserInput(new maxwell.UserInput()..text = text ?? '');
+
+      // If our existing binding is bound, close it.
+      if (_askListenerBinding.isBound)
+        _askListenerBinding.close();
+
+      // Also clear any suggestions that the ask listener may have cached
+      _askListener.clearSuggestions();
+
+      // Make a query and rewrap the binding
+      _suggestionProviderProxy.query(
+        _askListenerBinding.wrap(_askListener),
+        new maxwell.UserInput()..text = text ?? '',
+        _kMaxSuggestions,
+      );
     }
   }
 
@@ -459,8 +468,8 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   set asking(bool asking) {
     if (_asking != asking) {
       _asking = asking;
-      if (!_asking) {
-        _askControllerProxy.setUserInput(new maxwell.UserInput()..text = '');
+      if (!_asking && _askListenerBinding.isBound) {
+        _askListenerBinding.close();
       }
       notifyListeners();
     }
@@ -477,7 +486,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     _transcriptionListenerBinding.close();
 
     log.info('Begin speech capture!');
-    _askControllerProxy.beginSpeechCapture(_transcriptionListenerBinding
+    _suggestionProviderProxy.beginSpeechCapture(_transcriptionListenerBinding
         .wrap(new _MaxwellTranscriptionListenerImpl(
             onReadyImpl: () {
               // TODO(rosswang => anwilson): UI feedback once we start listening
