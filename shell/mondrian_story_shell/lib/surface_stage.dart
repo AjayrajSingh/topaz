@@ -124,9 +124,6 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
                     velocity: Rect.zero);
               },
               onPanEnd: (DragEndDetails details) {
-                form.onDragFinished(
-                    animation.value.center - form.position.center,
-                    details.velocity);
                 _animation
                   ..update(
                       value: animation.value,
@@ -134,6 +131,9 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
                           animation.value.center - form.position.center,
                           details.velocity.pixelsPerSecond)))
                   ..done();
+                form.onDragFinished(
+                    animation.value.center - form.position.center,
+                    details.velocity);
               },
               child: new SurfaceFrame(
                 child: form.parts.keys.first,
