@@ -30,7 +30,6 @@ const char* kDartVMArgs[] = {
 #else
     "--enable_mirrors=false",
     "--await_is_keyword",
-    "--assert_initializer",
 #endif
     // clang-format on
 };
