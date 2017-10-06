@@ -32,8 +32,27 @@ class WlanModel extends Model {
   void _update() {
     wlan.scan(new ScanRequest()..timeout = 15, (ScanResult scanResult) {
       if (scanResult.error.code == ErrCode.ok) {
+        // First sort APs by signal strength so when we de-dupe we drop the
+        // weakest ones
+        scanResult.aps.sort((Ap a, Ap b) {
+          if (b.lastRssi == a.lastRssi) {
+            return 0;
+          }
+          if (a.lastRssi > b.lastRssi) {
+            return -1;
+          }
+          return 1;
+        });
+
+        Set<String> seenNames = new Set<String>();
         List<AccessPoint> accessPoints = <AccessPoint>[];
         for (Ap ap in scanResult.aps) {
+          // Dedupe: if we've seen this ssid before, skip it.
+          if (seenNames.contains(ap.ssid)) {
+            continue;
+          }
+          seenNames.add(ap.ssid);
+
           accessPoints.add(
             new AccessPoint(
               name: ap.ssid,
@@ -42,15 +61,6 @@ class WlanModel extends Model {
             ),
           );
         }
-        accessPoints.sort((AccessPoint a, AccessPoint b) {
-          if (b.signalStrength == a.signalStrength) {
-            return 0;
-          }
-          if (a.signalStrength > b.signalStrength) {
-            return -1;
-          }
-          return 1;
-        });
         _accessPoints = accessPoints;
         notifyListeners();
       } else {
