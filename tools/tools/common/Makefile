@@ -99,9 +99,9 @@ endif
 # its dependencies.
 MINIMAL ?=
 ifeq ($(MINIMAL),1)
-	FSET_FLAGS += --modules $(MINIMAL_MODULE)
+	FSET_FLAGS += --packages $(MINIMAL_MODULE)
 else
-	FSET_FLAGS += --modules $(DEFAULT_MODULE)
+	FSET_FLAGS += --packages $(DEFAULT_MODULE)
 endif
 
 # Respect the fuchsia build variant if already set by fset command externally.

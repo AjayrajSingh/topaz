@@ -9,8 +9,8 @@ import 'module_model.dart';
 
 /// The home page of this mod.
 class HomePage extends StatelessWidget {
-  /// Creates a new instance of [Home] widget.
-  HomePage({Key key}) : super(key: key);
+  /// Creates a new instance of [HomePage] widget.
+  const HomePage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
