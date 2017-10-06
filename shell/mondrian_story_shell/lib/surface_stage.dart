@@ -31,11 +31,12 @@ class SurfaceStage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => new Stack(
       fit: StackFit.expand,
-      // TODO(alangardner): figure out elevation layering
       children: forms
           .reduceForest((SurfaceForm f, Iterable<_SurfaceInstance> children) =>
               new _SurfaceInstance(form: f, dependents: children.toList()))
-          .toList());
+          .toList()
+            ..sort((_SurfaceInstance a, _SurfaceInstance b) =>
+                b.form.depth.compareTo(a.form.depth)));
 }
 
 /// Instantiation of a Surface in SurfaceStage
@@ -137,6 +138,8 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
               child: new SurfaceFrame(
                 child: form.parts.keys.first,
                 depth: form.depth,
+                // HACK(alangardner): May need explicit interactable parameter
+                interactable: form.dragFriction != kDragFrictionInfinite,
               ),
             ),
           ),
