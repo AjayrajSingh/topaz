@@ -56,7 +56,7 @@ class RenderStoryListBody extends RenderListBody {
         _bottomPadding = bottomPadding ?? 0.0,
         _listHeight = listHeight ?? 0.0,
         _liftScale = liftScale ?? 1.0,
-        super(children: children, mainAxis: Axis.vertical);
+        super(children: children, axisDirection: AxisDirection.down);
 
   /// Sets the size of the parent.  Used to position/size the children.
   set parentSize(Size value) {

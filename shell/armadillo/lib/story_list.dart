@@ -372,7 +372,7 @@ class _StoryListBody extends MultiChildRenderObjectWidget {
     RenderStoryListBody renderObject,
   ) {
     renderObject
-      ..mainAxis = Axis.vertical
+      ..axisDirection = AxisDirection.down
       ..parentSize = _parentSize
       ..scrollOffset = _scrollOffset
       ..bottomPadding = _bottomPadding
