@@ -10,7 +10,7 @@ dart_app("music_artist_agent") {
   deps = [
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/context/fidl:fidl_dart",
-    "//peridot/public/lib/decomposition/dart",
+    "//topaz/public/lib/decomposition/dart",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
     "//topaz/app/music/packages/music_api",
