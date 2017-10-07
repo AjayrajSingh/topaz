@@ -15,7 +15,7 @@ dart_app("mi_dashboard_dart") {
   deps = [
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//peridot/public/lib/context/dart",
+    "//topaz/public/lib/context/dart",
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:debug_dart",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
