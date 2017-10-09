@@ -21,8 +21,8 @@ import 'module_model.dart';
 /// Also for convienence, the [ModuleModel] given to this widget will be
 /// made available to [child] and [child]'s descendants.
 class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
-  final ModuleBinding _moduleBinding = new ModuleBinding();
-  final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
+  final ModuleBinding _moduleBinding;
+  final LifecycleBinding _lifecycleBinding;
 
   /// The [Module] to [advertise].
   final ModuleImpl _module;
@@ -37,26 +37,42 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
   final Widget child;
 
   /// Constructor.
-  ModuleWidget({
+  factory ModuleWidget({
+    @required ApplicationContext applicationContext,
+    @required T moduleModel,
+    @required Widget child,
+  }) =>
+      new ModuleWidget<T>._create(
+        applicationContext: applicationContext,
+        moduleModel: moduleModel,
+        child: child,
+        moduleBinding: new ModuleBinding(),
+        lifecycleBinding: new LifecycleBinding(),
+      );
+
+  ModuleWidget._create({
     @required this.applicationContext,
     @required T moduleModel,
     @required this.child,
+    @required ModuleBinding moduleBinding,
+    @required LifecycleBinding lifecycleBinding,
   })
       : _moduleModel = moduleModel,
+        _moduleBinding = moduleBinding,
+        _lifecycleBinding = lifecycleBinding,
         _module = new ModuleImpl(
+          applicationContext: applicationContext,
           onReady: moduleModel?.onReady,
           onStopping: moduleModel?.onStop,
+          onStop: () {
+            moduleBinding.close();
+            lifecycleBinding.close();
+          },
           onNotify: moduleModel?.onNotify,
+          onDeviceMapChange: moduleModel?.onDeviceMapChange,
           watchAll: moduleModel?.watchAll,
           outgoingServiceProvider: moduleModel?.outgoingServiceProvider,
-        ) {
-    _module.onStop = _onStop;
-  }
-
-  void _onStop() {
-    _moduleBinding.close();
-    _lifecycleBinding.close();
-  }
+        );
 
   @override
   Widget build(BuildContext context) => new Directionality(
@@ -75,12 +91,14 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
   /// [applicationContext].
   void advertise() {
     applicationContext.outgoingServices
-    ..addServiceForName(
-        (InterfaceRequest<Module> request) => _moduleBinding.bind(_module, request),
+      ..addServiceForName(
+        (InterfaceRequest<Module> request) =>
+            _moduleBinding.bind(_module, request),
         Module.serviceName,
       )
       ..addServiceForName(
-        (InterfaceRequest<Lifecycle> request) => _lifecycleBinding.bind(_module, request),
+        (InterfaceRequest<Lifecycle> request) =>
+            _lifecycleBinding.bind(_module, request),
         Lifecycle.serviceName,
       );
   }

@@ -8,6 +8,7 @@ import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
@@ -73,4 +74,7 @@ class ModuleModel extends Model {
 
   /// Called when [LinkWatcher.notify] is called.
   void onNotify(String json) => null;
+
+  /// Called when the device map entry for the current device changes.
+  void onDeviceMapChange(DeviceMapEntry entry) => null;
 }

@@ -18,12 +18,12 @@ import 'user_shell_model.dart';
 /// For convenience, [advertise] does the advertising of the app as a
 /// [UserShell] to the rest of the system via the [ApplicationContext].
 /// Also for convienence, the [UserShellModel] given to this widget as well as
-/// an [IdleModel] will be made available to [child] and [child]'s descendants.
+/// an [IdleModel] will be made available to [_child] and [_child]'s descendants.
 class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
   /// The [ApplicationContext] to [advertise] its [UserShell] services to.
-  final ApplicationContext applicationContext;
+  final ApplicationContext _applicationContext;
 
-  final UserShellBinding _binding = new UserShellBinding();
+  final UserShellBinding _binding;
 
   final IdleModel _idleModel = new IdleModel();
 
@@ -31,29 +31,40 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
   final UserShellImpl _userShell;
 
   /// The rest of the application.
-  final Widget child;
+  final Widget _child;
 
   final T _userShellModel;
 
   /// Constructor.
-  UserShellWidget({
-    this.applicationContext,
+  factory UserShellWidget({
+    ApplicationContext applicationContext,
     T userShellModel,
-    this.child,
+    Widget child,
+  }) =>
+      new UserShellWidget<T>._create(
+        applicationContext: applicationContext,
+        userShellModel: userShellModel,
+        child: child,
+        userShellBinding: new UserShellBinding(),
+      );
+
+  UserShellWidget._create({
+    ApplicationContext applicationContext,
+    T userShellModel,
+    Widget child,
+    UserShellBinding userShellBinding,
   })
-      : _userShellModel = userShellModel,
+      : _applicationContext = applicationContext,
+        _userShellModel = userShellModel,
+        _child = child,
+        _binding = userShellBinding,
         _userShell = new UserShellImpl(
           onReady: userShellModel?.onReady,
           onStopping: userShellModel?.onStop,
           onNotify: userShellModel?.onNotify,
           watchAll: userShellModel?.watchAll,
-        ) {
-    _userShell.onStop = _onStop;
-  }
-
-  void _onStop() {
-    _binding.close();
-  }
+          onStop: userShellBinding.close,
+        );
 
   @override
   Widget build(BuildContext context) => new Directionality(
@@ -69,10 +80,10 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
             child: new ScopedModel<IdleModel>(
               model: _idleModel,
               child: _userShellModel == null
-                  ? child
+                  ? _child
                   : new ScopedModel<T>(
                       model: _userShellModel,
-                      child: child,
+                      child: _child,
                     ),
             ),
           ),
@@ -81,7 +92,7 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
 
   /// Advertises [_userShell] as a [UserShell] to the rest of the system via
   /// the [ApplicationContext].
-  void advertise() => applicationContext.outgoingServices.addServiceForName(
+  void advertise() => _applicationContext.outgoingServices.addServiceForName(
         (InterfaceRequest<UserShell> request) =>
             _binding.bind(_userShell, request),
         UserShell.serviceName,

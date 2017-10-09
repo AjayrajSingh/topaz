@@ -48,8 +48,7 @@ class UserShellImpl extends UserShell {
   final SuggestionProviderProxy _suggestionProviderProxy =
       new SuggestionProviderProxy();
   final ContextReaderProxy _contextReaderProxy = new ContextReaderProxy();
-  final ContextWriterProxy _contextWriterProxy =
-      new ContextWriterProxy();
+  final ContextWriterProxy _contextWriterProxy = new ContextWriterProxy();
   final IntelligenceServicesProxy _intelligenceServicesProxy =
       new IntelligenceServicesProxy();
   final LinkProxy _linkProxy = new LinkProxy();
@@ -61,7 +60,7 @@ class UserShellImpl extends UserShell {
   final OnUserShellStop onStopping;
 
   /// Called at the conclusion of [UserShell.terminate].
-  OnUserShellStop onStop;
+  final OnUserShellStop onStop;
 
   /// Called when [LinkWatcher.notify] is called.
   final OnNotify onNotify;
