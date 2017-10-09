@@ -121,6 +121,13 @@ class SuggestionListState extends State<SuggestionList>
     SuggestionModel.of(context).askText = null;
   }
 
+  void _onTranscriptUpdate(String spokenText) {
+    _askTextController
+      ..text = spokenText
+      ..selection = new TextSelection.collapsed(offset: spokenText.length);
+    SuggestionModel.of(context).askText = spokenText;
+  }
+
   /// Clears the last selected suggestion.  The selected suggestion isn't drawn
   /// in favor of a splash transition drawing it.
   void resetSelection() {
@@ -289,7 +296,9 @@ class SuggestionListState extends State<SuggestionList>
             ),
             new GestureDetector(
               onTap: () {
-                SuggestionModel.of(context).beginSpeechCapture();
+                SuggestionModel
+                    .of(context)
+                    .beginSpeechCapture(_onTranscriptUpdate);
               },
               child: new Image.asset(
                 _kMicImage,

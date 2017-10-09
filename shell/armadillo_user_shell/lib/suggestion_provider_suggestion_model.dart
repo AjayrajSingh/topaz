@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.suggestion.fidl/speech_to_text.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/user_input.fidl.dart' as maxwell;
@@ -90,33 +92,47 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
   }
 }
 
-class _MaxwellSpeechListenerImpl extends maxwell.SpeechListener {
-  final ValueChanged<String> onSpeechTextRecognized;
-  final ValueChanged<String> onSpeechTextResponse;
-  final ValueChanged<maxwell.SpeechStatus> onSpeechStatusChanged;
+class _MaxwellTranscriptionListenerImpl extends maxwell.TranscriptionListener {
+  final ValueChanged<String> onTranscriptUpdateImpl;
+  final VoidCallback onErrorImpl;
 
-  _MaxwellSpeechListenerImpl({
-    this.onSpeechTextRecognized,
-    this.onSpeechTextResponse,
-    this.onSpeechStatusChanged,
+  _MaxwellTranscriptionListenerImpl({
+    this.onTranscriptUpdateImpl,
+    this.onErrorImpl,
+  });
+
+  @override
+  void onTranscriptUpdate(String spokenText) {
+    log.fine('spokenText $spokenText');
+    onTranscriptUpdateImpl?.call(spokenText);
+  }
+
+  @override
+  void onError() {
+    log.fine('onError');
+    onErrorImpl?.call();
+  }
+}
+
+class _MaxwellFeedbackListenerImpl extends maxwell.FeedbackListener {
+  final ValueChanged<String> onTextResponseImpl;
+  final ValueChanged<maxwell.SpeechStatus> onStatusChangedImpl;
+
+  _MaxwellFeedbackListenerImpl({
+    this.onTextResponseImpl,
+    this.onStatusChangedImpl,
   });
 
   @override
   void onStatusChanged(maxwell.SpeechStatus status) {
     log.info('Status changed: $status');
-    onSpeechStatusChanged?.call(status);
-  }
-
-  @override
-  void onTextRecognized(String recognizedText) {
-    log.fine('recognizedText $recognizedText');
-    onSpeechTextRecognized?.call(recognizedText);
+    onStatusChangedImpl?.call(status);
   }
 
   @override
   void onTextResponse(String responseText) {
     log.fine('responseText $responseText');
-    onSpeechTextResponse?.call(responseText);
+    onTextResponseImpl?.call(responseText);
   }
 }
 
@@ -212,11 +228,18 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   final List<Suggestion> _currentInterruptions = <Suggestion>[];
 
-  final maxwell.SpeechListenerBinding _speechListenerBinding =
-      new maxwell.SpeechListenerBinding();
+  final maxwell.FeedbackListenerBinding _feedbackListenerBinding =
+      new maxwell.FeedbackListenerBinding();
 
-  // Listens for changes in conversational state.
-  _MaxwellSpeechListenerImpl _speechListener;
+  // Listens for changes in conversational state. This is temporary; see
+  // comments in suggestion_provider.fidl.
+  _MaxwellFeedbackListenerImpl _feedbackListener;
+
+  final maxwell.TranscriptionListenerBinding _transcriptionListenerBinding =
+      new maxwell.TranscriptionListenerBinding();
+
+  // Listens for
+  _MaxwellTranscriptionListenerImpl _transcriptionListener;
 
   /// When the user is asking via text or voice we want to show the maxwell ask
   /// suggestions rather than the normal maxwell suggestion list.
@@ -266,7 +289,8 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     _askListenerBinding.close();
     _nextControllerProxy.ctrl.close();
     _nextListenerBinding.close();
-    _speechListenerBinding.close();
+    _feedbackListenerBinding.close();
+    _transcriptionListenerBinding.close();
   }
 
   /// Setting [suggestionProvider] triggers the loading on suggestions.
@@ -291,12 +315,9 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       suggestionListener: _onNextSuggestionsChanged,
       interruptionListener: _interruptionListener,
     );
-    _speechListener = new _MaxwellSpeechListenerImpl(
-      onSpeechTextRecognized: (String text) {
-        askText = text;
-      },
-      onSpeechTextResponse: (String text) {},
-      onSpeechStatusChanged: (maxwell.SpeechStatus speechStatus) {
+    _feedbackListener = new _MaxwellFeedbackListenerImpl(
+      onTextResponseImpl: (String text) {},
+      onStatusChangedImpl: (maxwell.SpeechStatus speechStatus) {
         switch (speechStatus) {
           case maxwell.SpeechStatus.processing:
             if (!_processingAsk) {
@@ -305,7 +326,6 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
             }
             break;
           case maxwell.SpeechStatus.idle:
-          case maxwell.SpeechStatus.listening:
           case maxwell.SpeechStatus.responding:
           default:
             if (_processingAsk) {
@@ -394,8 +414,8 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     );
     _nextControllerProxy.setResultCount(_kMaxSuggestions);
 
-    _suggestionProviderProxy
-        .registerSpeechListener(_speechListenerBinding.wrap(_speechListener));
+    _suggestionProviderProxy.registerFeedbackListener(
+        _feedbackListenerBinding.wrap(_feedbackListener));
   }
 
   @override
@@ -448,9 +468,26 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   bool get processingAsk => _processingAsk;
 
   @override
-  void beginSpeechCapture() {
+  void beginSpeechCapture(OnTranscriptUpdate onTranscriptUpdate) {
+    _transcriptionListenerBinding.close();
+
     log.info('Begin speech capture!');
-    _askControllerProxy.beginSpeechCapture();
+    _askControllerProxy.beginSpeechCapture(
+        (InterfaceRequest<maxwell.TranscriptionListener> listener) {
+      // TODO(rosswang => anwilson): UI feedback once we start listening (mic
+      // icon, blank text?)
+      _transcriptionListener = new _MaxwellTranscriptionListenerImpl(
+          onTranscriptUpdateImpl: onTranscriptUpdate,
+          onErrorImpl: () {
+            // TODO(rosswang => anwilson): change UI state to indicate a speech
+            // input error
+          });
+      _transcriptionListenerBinding
+        ..bind(_transcriptionListener, listener)
+        // TODO(rosswang=>anwilson): UI feedback that we stopped listening
+        // (likely show processing/speaking/idle state instead)
+        ..onConnectionError = _transcriptionListenerBinding.close;
+    });
     asking = true;
   }
 
