@@ -3,8 +3,14 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
+import 'package:lib.logging/logging.dart';
+import 'package:lib.modular/ledger.dart';
+import 'package:meta/meta.dart';
 import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart';
 
 import '../store/contacts_store.dart';
@@ -15,27 +21,50 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
   final List<ContactsContentProviderBinding> _bindings =
       <ContactsContentProviderBinding>[];
 
-  /// Runs necessary methods to initialize the contacts content provider
-  void initialize() {
-    // Make call to retrieve the list of contacts
-    // TODO(meiyili) replace with a call to the necessary service agents and
-    // ledger and create a fixture with the stub contact generation code
-    List<Contact> contacts = <Contact>[
-      _createStubContact('1', 'Ahonui', 'Armadillo'),
-      _createStubContact('2', 'Badia', 'Blue-Whale'),
-      _createStubContact('3', 'Candida', 'Capybara'),
-      _createStubContact('4', 'Daniel', 'Dewey'),
-      _createStubContact('5', 'Ada', 'Lovelace'),
-      _createStubContact('6', 'Alan', 'Turing'),
-      _createStubContact('7', 'Barbara', 'McClintock'),
-      _createStubContact('8', 'Benjamin', 'Banneker'),
-      _createStubContact('9', 'Clara', 'Schumann'),
-      _createStubContact('10', 'Claude', 'Debussy'),
-      _createStubContact('11', 'Daphne', 'du Maurier'),
-      _createStubContact('12', 'Dmitri', 'Mendeleev'),
-    ];
+  /// [ComponentContext] used for interfacing with Ledger
+  final ComponentContext componentContext;
 
-    // Add all of the contacts to the contacts store
+  /// [Ledger] instance
+  ledger.LedgerProxy _ledger;
+
+  /// Ledger [Page] instance containing contacts
+  ledger.PageProxy _page;
+
+  /// Constructor
+  ContactsContentProviderImpl({@required this.componentContext})
+      : assert(componentContext != null);
+
+  /// Runs necessary methods to initialize the contacts content provider
+  Future<Null> initialize() async {
+    // Connect to ledger
+    try {
+      await _initializeLedgerConnection();
+    } on Exception catch (e, stackTrace) {
+      log.severe('Failed to initialize', e, stackTrace);
+      return;
+    }
+
+    // Grab user's contacts
+    bool errorReadingLedgerContacts = false;
+    List<Contact> ledgerContacts;
+    try {
+      ledgerContacts = await _getLedgerContacts();
+    } on Exception catch (e, stackTrace) {
+      errorReadingLedgerContacts = true;
+      log.severe('Failed to read ledger contacts', e, stackTrace);
+    }
+    List<Contact> contacts;
+    if (!errorReadingLedgerContacts && ledgerContacts.isNotEmpty) {
+      contacts = ledgerContacts;
+    } else {
+      // Grab contacts from the contacts providers and save to ledger
+      // TODO(meiyili) replace with a call to the necessary service agents and
+      // ledger and create a fixture with the stub contact generation code
+      contacts = _getStubContactList();
+      await _saveContactsToLedger(contacts);
+    }
+
+    // Create the searchable contacts store
     for (Contact contact in contacts) {
       List<String> searchableValues = <String>[
         contact.displayName.trim().toLowerCase(),
@@ -49,9 +78,9 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
         contact,
       );
     }
+    log.fine('Contacts store successfully created');
   }
 
-  /// Stub implementation of getContactList
   @override
   Future<Null> getContactList(String prefix,
       void callback(Status status, List<Contact> contacts)) async {
@@ -61,7 +90,7 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
     } else {
       Map<String, Set<Contact>> contacts = _contactsStore.search(prefix);
 
-      // Merge into set first to avoid duplicates
+      // Merge into a set first to avoid duplicates
       contactsList =
           contacts.values.expand((Set<Contact> s) => s).toSet().toList();
     }
@@ -69,7 +98,6 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
     return;
   }
 
-  /// Stub implementation of getContact
   @override
   Future<Null> getContact(
       String id, void callback(Status status, Contact contact)) async {
@@ -88,6 +116,10 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
       binding.close();
     }
     _bindings.clear();
+
+    // Close Ledger bindings
+    _page.ctrl.close();
+    _ledger.ctrl.close();
   }
 
   /// Temporary for stub implementations
@@ -110,5 +142,151 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
           ..value = '12345678910'
       ]
       ..photoUrl = '';
+  }
+
+  List<Contact> _getStubContactList() {
+    return <Contact>[
+      _createStubContact('1', 'Ahonui', 'Armadillo'),
+      _createStubContact('2', 'Badia', 'Blue-Whale'),
+      _createStubContact('3', 'Candida', 'Capybara'),
+      _createStubContact('4', 'Daniel', 'Dewey'),
+      _createStubContact('5', 'Ada', 'Lovelace'),
+      _createStubContact('6', 'Alan', 'Turing'),
+      _createStubContact('7', 'Barbara', 'McClintock'),
+      _createStubContact('8', 'Benjamin', 'Banneker'),
+      _createStubContact('9', 'Clara', 'Schumann'),
+      _createStubContact('10', 'Claude', 'Debussy'),
+      _createStubContact('11', 'Daphne', 'du Maurier'),
+      _createStubContact('12', 'Dmitri', 'Mendeleev'),
+    ];
+  }
+
+  /// Initialize connection to ledger and get the page of contacts data
+  Future<Null> _initializeLedgerConnection() async {
+    // Connect to ledger
+    _ledger?.ctrl?.close();
+    _ledger = new ledger.LedgerProxy();
+    Completer<ledger.Status> statusCompleter = new Completer<ledger.Status>();
+    componentContext.getLedger(
+      _ledger.ctrl.request(),
+      statusCompleter.complete,
+    );
+    ledger.Status status = await statusCompleter.future;
+    _handleLedgerResponseStatus(
+      status: status,
+      ledgerCall: 'componentContext.getLedger()',
+    );
+
+    // Grab the page of contacts
+    _page?.ctrl?.close();
+    _page = new ledger.PageProxy();
+    statusCompleter = new Completer<ledger.Status>();
+    _ledger.getRootPage(
+      _page.ctrl.request(),
+      statusCompleter.complete,
+    );
+    ledger.Status pageStatus = await statusCompleter.future;
+    _handleLedgerResponseStatus(
+      status: pageStatus,
+      ledgerCall: 'ledger.getRootPage()',
+    );
+  }
+
+  Future<List<Contact>> _getLedgerContacts() async {
+    if (_page == null) {
+      // TODO(meiyili): handle ledger errors gracefully SO-810
+      log.warning('getLedgerContacts was called on a null page');
+      return <Contact>[];
+    }
+
+    // TODO(meiyili): add page watcher SO-713
+    Completer<ledger.Status> statusCompleter = new Completer<ledger.Status>();
+    ledger.PageSnapshotProxy snapshot = new ledger.PageSnapshotProxy();
+    _page.getSnapshot(
+      snapshot.ctrl.request(),
+      null,
+      null,
+      statusCompleter.complete,
+    );
+
+    ledger.Status status = await statusCompleter.future;
+    _handleLedgerResponseStatus(
+      status: status,
+      ledgerCall: 'page.getSnapshot()',
+    );
+
+    List<Contact> contacts = <Contact>[];
+    List<ledger.Entry> entries = await getFullEntries(snapshot);
+    if (entries.isNotEmpty) {
+      contacts = entries.map(_getContactFromEntry);
+    }
+    return contacts;
+  }
+
+  Future<Null> _saveContactsToLedger(List<Contact> contacts) async {
+    if (_page == null) {
+      // TODO(meiyili): handle ledger errors gracefully SO-810
+      log.warning('saveContactsToLedger was called on a null page');
+      return;
+    }
+    for (Contact contact in contacts) {
+      List<int> contactId = UTF8.encode(contact.googleContactId);
+      List<int> ledgerValue = encodeLedgerValue(contact);
+      _page.put(
+        contactId,
+        ledgerValue,
+        (ledger.Status status) {
+          // TODO(meiyili): retry put calls that returned with an error SO-810
+          if (status != ledger.Status.ok) {
+            log.severe('page.put returned an error');
+          } else {
+            log.fine('page.put succeeded');
+          }
+        },
+      );
+    }
+  }
+
+  Contact _getContactFromEntry(ledger.Entry entry) {
+    String contactId = UTF8.decode(entry.key);
+    Map<String, dynamic> decodedValue = decodeLedgerValue(entry.value);
+
+    List<EmailAddress> emails = <EmailAddress>[];
+    for (Map<String, String> email in decodedValue['emails']) {
+      emails.add(new EmailAddress()
+        ..label = email['label']
+        ..value = email['value']);
+    }
+
+    List<PhoneNumber> phoneNumbers = <PhoneNumber>[];
+    for (Map<String, String> number in decodedValue['phoneNumbers']) {
+      phoneNumbers.add(new PhoneNumber()
+        ..label = number['label']
+        ..value = number['value']);
+    }
+    return new Contact()
+      ..googleContactId = contactId
+      ..displayName = decodedValue['displayName']
+      ..givenName = decodedValue['givenName']
+      ..middleName = decodedValue['middleName']
+      ..familyName = decodedValue['familyName']
+      ..photoUrl = decodedValue['photoUrl']
+      ..emails = emails
+      ..phoneNumbers = phoneNumbers;
+  }
+
+  /// Handles response status, throws an exception if the status is not ok
+  void _handleLedgerResponseStatus({ledger.Status status, String ledgerCall}) {
+    // TODO(meiyili): handle ledger errors and try to reconnect if there were
+    // status errors SO-810
+    if (status != ledger.Status.ok) {
+      log.severe('Ledger error: $ledgerCall');
+      throw new Exception(
+        'Contacts Content Provider Ledger call error: '
+            'status = $status, message = "$ledgerCall returned an error"',
+      );
+    } else {
+      log.fine('$ledgerCall succeeded');
+    }
   }
 }
