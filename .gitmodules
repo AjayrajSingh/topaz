@@ -123,6 +123,22 @@
 	branch = master
 	path = third_party/golang/crypto
 	url = https://fuchsia.googlesource.com/third_party/golang/crypto
+[submodule "third_party/golibs/github.com/dustin/go-humanize"]
+	branch = master
+	path = third_party/golibs/github.com/dustin/go-humanize
+	url = https://fuchsia.googlesource.com/third_party/go-humanize
+[submodule "third_party/golibs/github.com/flynn/go-docopt"]
+	branch = master
+	path = third_party/golibs/github.com/flynn/go-docopt
+	url = https://fuchsia.googlesource.com/third_party/go-docopt
+[submodule "third_party/golibs/github.com/flynn/go-tuf"]
+	branch = master
+	path = third_party/golibs/github.com/flynn/go-tuf
+	url = https://fuchsia.googlesource.com/third_party/go-tuf
+[submodule "third_party/golibs/github.com/golang/snappy"]
+	branch = master
+	path = third_party/golibs/github.com/golang/snappy
+	url = https://fuchsia.googlesource.com/third_party/golang/snappy
 [submodule "third_party/golibs/github.com/google/subcommands"]
 	branch = master
 	path = third_party/golibs/github.com/google/subcommands
@@ -139,6 +155,14 @@
 	branch = master
 	path = third_party/golibs/github.com/pkg/sftp
 	url = https://fuchsia.googlesource.com/third_party/github.com/pkg/sftp
+[submodule "third_party/golibs/github.com/syndtr/goleveldb"]
+	branch = master
+	path = third_party/golibs/github.com/syndtr/goleveldb
+	url = https://fuchsia.googlesource.com/third_party/goleveldb
+[submodule "third_party/golibs/github.com/tent/canonical-json-go"]
+	branch = master
+	path = third_party/golibs/github.com/tent/canonical-json-go
+	url = https://fuchsia.googlesource.com/third_party/canonical-json-go
 [submodule "third_party/grpc"]
 	branch = 60160de187af72f65a20b1539ab305c1d8a6f591
 	path = third_party/grpc
