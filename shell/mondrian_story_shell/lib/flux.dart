@@ -315,6 +315,10 @@ class MovingTargetAnimation<T> extends FluxAnimation<T>
 
   /// Like this animation except stays in lockstep with target once reached.
   FluxAnimation<T> get stickyAnimation => target.value == _value
+      // HACK(alangardner): Using '==' is fragile. We should instead use
+      // simulate(value, target.value, velocityOrigin).isDone(0.0)
+      // where velocityOrigin is the 'zero' velocity. However, this introduces
+      // a zeroVelocity parameter complexity to the API and may be confusing.
       ? target
       : new ChainedAnimation<T>(this, then: target);
 
