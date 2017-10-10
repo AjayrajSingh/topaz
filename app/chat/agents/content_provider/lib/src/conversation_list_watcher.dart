@@ -8,10 +8,10 @@ import 'dart:convert' show JSON;
 import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.modular/ledger.dart';
 import 'package:meta/meta.dart';
 
 import 'base_page_watcher.dart';
-import 'ledger_utils.dart';
 
 /// A [PageWatcher] implementation that watches for changes in the
 /// `conversations` [Page] which stores the list of all conversations. Whenever

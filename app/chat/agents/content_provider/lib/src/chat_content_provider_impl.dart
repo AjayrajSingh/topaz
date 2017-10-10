@@ -12,6 +12,7 @@ import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' show InterfaceRequest;
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.modular/ledger.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
@@ -19,7 +20,6 @@ import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'chat_message_transporter.dart';
 import 'conversation_list_watcher.dart';
 import 'conversation_watcher.dart';
-import 'ledger_utils.dart';
 
 const int _kKeyLengthInBytes = 16;
 
