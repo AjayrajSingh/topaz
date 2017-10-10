@@ -7,7 +7,7 @@
 	path = buildtools
 	url = https://fuchsia.googlesource.com/buildtools
 [submodule "dart"]
-	branch = 90587a6837c5ad4a64d571397a8ba65a7cc3f44f
+	branch = dfced8c1d3df70a9e4e6a252b2680ba7d8ea3127
 	path = dart
 	url = https://dart.googlesource.com/sdk
 [submodule "docs"]
