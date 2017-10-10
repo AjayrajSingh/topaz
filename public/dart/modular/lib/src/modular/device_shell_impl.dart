@@ -5,12 +5,14 @@
 import 'package:lib.device.fidl/device_shell.fidl.dart';
 import 'package:lib.device.fidl/user_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
 import 'package:meta/meta.dart';
 
 /// Called when [DeviceShell.initialize] occurs.
 typedef void OnDeviceShellReady(
   UserProvider userProvider,
   DeviceShellContext deviceShellContext,
+  Presentation presentation,
 );
 
 /// Called when [DeviceShell.terminate] occurs.
@@ -22,6 +24,7 @@ class DeviceShellImpl extends DeviceShell {
   final DeviceShellContextProxy _deviceShellContextProxy =
       new DeviceShellContextProxy();
   final UserProviderProxy _userProviderProxy = new UserProviderProxy();
+  final PresentationProxy _presentationProxy = new PresentationProxy();
   final Set<AuthenticationContextBinding> _bindingSet =
       new Set<AuthenticationContextBinding>();
 
@@ -44,12 +47,16 @@ class DeviceShellImpl extends DeviceShell {
   @override
   void initialize(
     InterfaceHandle<DeviceShellContext> deviceShellContextHandle,
+    DeviceShellParams deviceShellParams,
   ) {
     if (onReady != null) {
       _deviceShellContextProxy.ctrl.bind(deviceShellContextHandle);
       _deviceShellContextProxy
           .getUserProvider(_userProviderProxy.ctrl.request());
-      onReady(_userProviderProxy, _deviceShellContextProxy);
+      if (deviceShellParams.presentation.channel != null) {
+        _presentationProxy.ctrl.bind(deviceShellParams.presentation);
+      }
+      onReady(_userProviderProxy, _deviceShellContextProxy, _presentationProxy);
     }
   }
 
