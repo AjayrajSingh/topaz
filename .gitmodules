@@ -277,7 +277,7 @@
 	path = third_party/shaderc
 	url = https://fuchsia.googlesource.com/third_party/shaderc
 [submodule "third_party/skia"]
-	branch = f6143ffa3a8b52f02684d7913b7d9c502e3459f4
+	branch = e0240455a84d530e5f5a5c1525e31341938c9207
 	path = third_party/skia
 	url = https://skia.googlesource.com/skia
 [submodule "third_party/snappy"]
