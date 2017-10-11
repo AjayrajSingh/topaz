@@ -324,13 +324,14 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       onStatusChangedImpl: (maxwell.SpeechStatus speechStatus) {
         switch (speechStatus) {
           case maxwell.SpeechStatus.processing:
+            break;
+          case maxwell.SpeechStatus.responding:
             if (!_processingAsk) {
               _processingAsk = true;
               notifyListeners();
             }
             break;
           case maxwell.SpeechStatus.idle:
-          case maxwell.SpeechStatus.responding:
           default:
             if (_processingAsk) {
               _processingAsk = false;
@@ -492,6 +493,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     _transcriptionListenerBinding.onConnectionError =
         _transcriptionListenerBinding.close;
     asking = true;
+    askText = '';
   }
 
   @override
