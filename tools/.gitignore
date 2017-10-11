@@ -3,7 +3,5 @@ node_modules
 third_party
 coverage
 config.json
-.analysis_options
-analysis_options.yaml
 .packages
 *.snapshot

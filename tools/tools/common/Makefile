@@ -50,7 +50,6 @@ dart_tools_packages := $(realpath $(shell find $(tools_root) $(ignore_flags) -na
 # find all dart packages defined in BUILD.gn
 dart_gn_packages := $(realpath $(shell grep -Rwl . --include="*.gn" -e "^\(flutter_app\|dart_package\|dart_app\)" | xargs -n1 dirname | sort -u))
 dart_all_packages := $(sort $(dart_packages) $(dart_tools_packages) $(dart_gn_packages))
-dart_analysis_options := $(addsuffix /analysis_options.yaml, $(dart_all_packages))
 
 gn_sources := $(shell $(sfind) -name "*.gn")
 
@@ -126,7 +125,7 @@ init: ## Set path to pick up deps with: eval $(make init)
 	@echo "export PATH=${PATH}"
 
 .PHONY: build
-build: $(dart_analysis_options) build-override ## Build Fuchsia with project.
+build: build-override ## Build Fuchsia with project.
 	@FUCHSIA_DIR=$(fuchsia_root) \
 		MAKEFLAGS="$(filter-out --warn-undefined-variables,$(MAKEFLAGS))" \
 		$(common_root)/build.sh $(BUILD_FLAGS)
@@ -159,11 +158,6 @@ lint: copyright-check dart-lint dart-fmt-check gn-fmt-check ## Lint the code.
 %/.packages: %/pubspec.yaml
 	@cd $* && flutter packages get
 
-# Each dart package needs the analysis_options.yaml file so that the IDE can run
-# the live analysis with the correct options.
-$(dart_analysis_options): $(fuchsia_root)/topaz/tools/analysis_options.yaml
-	cp $< $@
-
 .PHONY: $(dart_bin)
 $(dart_bin):
 	@$(flutter) precache
@@ -175,7 +169,7 @@ dart-clean:
 	@# it as well.
 	@for pkg in $(dart_all_packages); do \
 		pushd $${pkg} > /dev/null; \
-		rm -rf .packages packages .pub build coverage .analysis_options analysis_options.yaml; \
+		rm -rf .packages packages .pub build coverage; \
 		git ls-files pubspec.lock --error-unmatch &> /dev/null; \
 		if [ $$? -ne 0 ]; then \
 			rm -f pubspec.lock; \
