@@ -23,7 +23,7 @@
 	path = garnet
 	url = https://fuchsia.googlesource.com/garnet
 [submodule "lib/flutter"]
-	branch = 21b81d902df4ca37bcb4804bf9407267052b0015
+	branch = 51e4e9f9a58fefa196ed174993aeae46e1c17d8c
 	path = lib/flutter
 	url = https://chromium.googlesource.com/external/github.com/flutter/flutter
 [submodule "manifest"]
