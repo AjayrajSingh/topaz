@@ -335,6 +335,18 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Called when a story cluster is added due to user interaction.
+  void onStoryClusterAdded(StoryCluster storyCluster) {
+    _storyClusters.add(storyCluster);
+    notifyListeners();
+  }
+
+  /// Called when a story cluster is removed due to user interaction.
+  void onStoryClusterRemoved(StoryCluster storyCluster) {
+    _storyClusters.remove(storyCluster);
+    notifyListeners();
+  }
+
   /// Loads the list of previous stories from the [StoryProvider].
   /// If no stories exist, we create some.
   /// If stories do exist, we resume them.

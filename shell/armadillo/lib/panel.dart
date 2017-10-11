@@ -163,7 +163,7 @@ class Panel {
     double rightBefore = right;
     _origin = new FractionalOffset(
       toGridValue(newLeft),
-      _origin.dy,
+      toGridValue(_origin.dy),
     );
     _widthFactor = toGridValue(rightBefore - newLeft);
     assert(rightBefore == right);
@@ -173,7 +173,7 @@ class Panel {
   void adjustTop(double newTop) {
     double bottomBefore = bottom;
     _origin = new FractionalOffset(
-      _origin.dx,
+      toGridValue(_origin.dx),
       toGridValue(newTop),
     );
     _heightFactor = toGridValue(bottomBefore - newTop);
@@ -181,13 +181,13 @@ class Panel {
   }
 
   /// The fractional left of the panel.
-  double get left => _origin.dx;
+  double get left => toGridValue(_origin.dx);
 
   /// The fractional right of the panel.
   double get right => toGridValue(_origin.dx + _widthFactor);
 
   /// The fractional top of the panel.
-  double get top => _origin.dy;
+  double get top => toGridValue(_origin.dy);
 
   /// The fractional bottom of the panel.
   double get bottom => toGridValue(_origin.dy + _heightFactor);

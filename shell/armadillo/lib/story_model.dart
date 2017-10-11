@@ -28,12 +28,28 @@ class StoryModel extends Model {
   /// Called when a [StoryCluster] should be deleted.
   final ValueChanged<StoryClusterId> onDeleteStoryCluster;
 
+  /// Called when a [StoryCluster] was added to the model's list.
+  final ValueChanged<StoryCluster> onStoryClusterAdded;
+
+  /// Called when a [StoryCluster] was removed from the model's list.
+  final ValueChanged<StoryCluster> onStoryClusterRemoved;
+
+  /// The most recent list of story clusters received from
+  /// [onStoryClustersChanged].
+  /// NOTE: While we may sort this list we should not add to or remove from it.
+  /// Call [onStoryClusterAdded] and [onStoryClusterRemoved] to do so.
+  /// This list is *NOT* the source of truth of the list of story clusters.
   List<StoryCluster> _storyClusters = <StoryCluster>[];
   Size _lastLayoutSize = Size.zero;
   double _listHeight = 0.0;
 
   /// Constructor.
-  StoryModel({this.onFocusChanged, this.onDeleteStoryCluster});
+  StoryModel({
+    this.onFocusChanged,
+    this.onDeleteStoryCluster,
+    this.onStoryClusterAdded,
+    this.onStoryClusterRemoved,
+  });
 
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
@@ -268,12 +284,12 @@ class StoryModel extends Model {
     from.absorb(storyToSplit);
 
     clearPlaceHolderStoryClusters();
-    _storyClusters.add(
-      new StoryCluster.fromStory(
-        storyToSplit,
-        from.onStoryClusterChanged,
-      ),
+    StoryCluster newStoryCluster = new StoryCluster.fromStory(
+      storyToSplit,
+      from.onStoryClusterChanged,
     );
+    onStoryClusterAdded?.call(newStoryCluster);
+
     updateLayouts(_lastLayoutSize);
     notifyListeners();
   }
@@ -293,9 +309,10 @@ class StoryModel extends Model {
 
   /// Removes any [StoryCluster]s that consist of entirely place holder stories.
   void clearPlaceHolderStoryClusters() {
-    _storyClusters.removeWhere(
-      (StoryCluster storyCluster) => storyCluster.realStories.isEmpty,
-    );
+    _storyClusters
+        .where((StoryCluster storyCluster) => storyCluster.realStories.isEmpty)
+        .forEach(onStoryClusterRemoved?.call);
+
     updateLayouts(_lastLayoutSize);
     notifyListeners();
   }

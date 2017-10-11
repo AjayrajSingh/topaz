@@ -179,7 +179,7 @@ class StoryCluster {
 
   /// The list of place holder stories in this cluster.
   List<PlaceHolderStory> get previewStories =>
-      new UnmodifiableListView<PlaceHolderStory>(
+      new List<PlaceHolderStory>.unmodifiable(
         _stories.where((Story story) => story.isPlaceHolder),
       );
 
@@ -308,14 +308,14 @@ class StoryCluster {
     double left = 0.0;
     for (int i = 0; i < currentSortedLefts.length; i++) {
       leftMap[currentSortedLefts[i]] = left;
-      left += getSpanSpan(1.0, i, currentSortedLefts.length);
+      left = toGridValue(left + getSpanSpan(1.0, i, currentSortedLefts.length));
     }
 
     Map<double, double> topMap = <double, double>{1.0: 1.0};
     double top = 0.0;
     for (int i = 0; i < currentSortedTops.length; i++) {
       topMap[currentSortedTops[i]] = top;
-      top += getSpanSpan(1.0, i, currentSortedTops.length);
+      top = toGridValue(top + getSpanSpan(1.0, i, currentSortedTops.length));
     }
 
     for (Panel panel in panels.toList()) {
