@@ -107,6 +107,8 @@ class Story {
     GlobalKey<SimulatedFractionallySizedBoxState> tabSizerKey,
     Panel panel,
     int clusterIndex,
+    StoryBarHeightModel storyBarHeightModel,
+    StoryBarFocusModel storyBarFocusModel,
   })
       : clusterId = clusterId ?? new StoryClusterId(),
         storyBarPaddingKey = storyBarPaddingKey ??
@@ -122,7 +124,14 @@ class Story {
                 debugLabel: '$id tabSizerKey'),
         panel = panel ?? new Panel(),
         lastInteraction = lastInteraction ?? new DateTime.now(),
-        _clusterIndex = clusterIndex;
+        _clusterIndex = clusterIndex {
+    if (storyBarHeightModel != null) {
+      _storyBarHeightModel.jump(storyBarHeightModel.value);
+    }
+    if (storyBarFocusModel != null) {
+      _storyBarFocusModel.jump(storyBarFocusModel.value);
+    }
+  }
 
   /// Creates a Story from a json object returned by [toJson].
   factory Story.fromJson(Map<String, dynamic> storyData) {
@@ -205,6 +214,8 @@ class Story {
         tabSizerKey: tabSizerKey,
         panel: other.panel,
         clusterIndex: other._clusterIndex,
+        storyBarFocusModel: _storyBarFocusModel,
+        storyBarHeightModel: _storyBarHeightModel,
       );
 
   /// Returns an object represeting the [Story] suitable for conversion
