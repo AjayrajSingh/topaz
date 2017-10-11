@@ -23,7 +23,7 @@ check() {
   local filetype=$(basename ${1##*.})
   local prefix
   case "${filetype}" in
-    dart|fidl|js)
+    dart|fidl|go|js)
       prefix="// "
       ;;
     gn|py|sh|yaml)

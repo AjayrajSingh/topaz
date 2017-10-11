@@ -59,6 +59,7 @@ sources := $(shell $(sfind) \
 	-o -name "*.py" \
 	-o -name "*.fidl" \
 	-o -name "*.gn" \
+	-o -name "*.go" \
 	-o -name "*.sh" \
 	-o -name "*.yaml" \))
 
