@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.suggestion.fidl/speech_to_text.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
@@ -93,13 +92,21 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
 }
 
 class _MaxwellTranscriptionListenerImpl extends maxwell.TranscriptionListener {
+  final VoidCallback onReadyImpl;
   final ValueChanged<String> onTranscriptUpdateImpl;
   final VoidCallback onErrorImpl;
 
   _MaxwellTranscriptionListenerImpl({
+    this.onReadyImpl,
     this.onTranscriptUpdateImpl,
     this.onErrorImpl,
   });
+
+  @override
+  void onReady() {
+    log.fine('onReady');
+    onReadyImpl?.call();
+  }
 
   @override
   void onTranscriptUpdate(String spokenText) {
@@ -237,9 +244,6 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   final maxwell.TranscriptionListenerBinding _transcriptionListenerBinding =
       new maxwell.TranscriptionListenerBinding();
-
-  // Listens for
-  _MaxwellTranscriptionListenerImpl _transcriptionListener;
 
   /// When the user is asking via text or voice we want to show the maxwell ask
   /// suggestions rather than the normal maxwell suggestion list.
@@ -472,22 +476,21 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     _transcriptionListenerBinding.close();
 
     log.info('Begin speech capture!');
-    _askControllerProxy.beginSpeechCapture(
-        (InterfaceRequest<maxwell.TranscriptionListener> listener) {
-      // TODO(rosswang => anwilson): UI feedback once we start listening (mic
-      // icon, blank text?)
-      _transcriptionListener = new _MaxwellTranscriptionListenerImpl(
-          onTranscriptUpdateImpl: onTranscriptUpdate,
-          onErrorImpl: () {
-            // TODO(rosswang => anwilson): change UI state to indicate a speech
-            // input error
-          });
-      _transcriptionListenerBinding
-        ..bind(_transcriptionListener, listener)
-        // TODO(rosswang=>anwilson): UI feedback that we stopped listening
-        // (likely show processing/speaking/idle state instead)
-        ..onConnectionError = _transcriptionListenerBinding.close;
-    });
+    _askControllerProxy.beginSpeechCapture(_transcriptionListenerBinding
+        .wrap(new _MaxwellTranscriptionListenerImpl(
+            onReadyImpl: () {
+              // TODO(rosswang => anwilson): UI feedback once we start listening
+              // (mic icon, blank text?)
+            },
+            onTranscriptUpdateImpl: onTranscriptUpdate,
+            onErrorImpl: () {
+              // TODO(rosswang => anwilson): change UI state to indicate a speech
+              // input error
+            })));
+    // TODO(rosswang=>anwilson): UI feedback that we stopped listening (likely
+    // show processing/speaking/idle state instead)
+    _transcriptionListenerBinding.onConnectionError =
+        _transcriptionListenerBinding.close;
     asking = true;
   }
 
