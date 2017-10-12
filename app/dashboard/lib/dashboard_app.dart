@@ -32,7 +32,14 @@ class DashboardApp extends StatelessWidget {
   DashboardApp({this.buildStatusModels, this.onRefresh, this.onLaunchUrl});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => new LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) =>
+            constraints.maxHeight == 0.0 || constraints.maxWidth == 0.0
+                ? const Offstage()
+                : _buildWidget(context),
+      );
+
+  Widget _buildWidget(BuildContext context) {
     List<Widget> rows = <Widget>[];
 
     // Get the max number of children a row can have.
