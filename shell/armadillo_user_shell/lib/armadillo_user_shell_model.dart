@@ -10,6 +10,7 @@ import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart';
 import 'package:lib.auth.fidl.account/account.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.fidl/story_provider.fidl.dart';
+import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
 import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:lib.user.fidl/user_shell.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
@@ -73,6 +74,9 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// Called when the [UserShell] stops.
   final _OnStop onUserShellStopped;
 
+  /// Allows control over various presentation parameters, such as lighting.
+  final PresentationProxy _presentation = new PresentationProxy();
+
   /// Constructor.
   ArmadilloUserShellModel({
     this.storyProviderStoryGenerator,
@@ -115,6 +119,8 @@ class ArmadilloUserShellModel extends UserShellModel {
       intelligenceServices,
       link,
     );
+
+    userShellContext.getPresentation(_presentation.ctrl.request());
 
     userLogoutter.userShellContext = userShellContext;
     focusController.watchRequest(
@@ -176,6 +182,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     _homeWorkProposer.stop();
     _contextListenerBinding.close();
     _focusRequestWatcherBinding.close();
+    _presentation.ctrl.close();
     suggestionProviderSuggestionModel.close();
     storyProviderStoryGenerator.close();
     onUserShellStopped?.call();

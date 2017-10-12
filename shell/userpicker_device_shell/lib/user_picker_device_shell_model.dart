@@ -3,12 +3,15 @@
 // found in the LICENSE file.
 
 import 'dart:io';
+import 'dart:zircon' show Channel;
 
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.auth.fidl.account/account.fidl.dart';
 import 'package:lib.config.fidl/config.fidl.dart';
 import 'package:lib.device.fidl/device_shell.fidl.dart';
 import 'package:lib.device.fidl/user_provider.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
+import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -24,7 +27,7 @@ export 'package:lib.widgets/model.dart'
 /// Contains all the relevant data for displaying the list of users and for
 /// logging in and creating new users.
 class UserPickerDeviceShellModel extends DeviceShellModel
-    implements TickerProvider {
+    implements Presentation, ServiceProvider, TickerProvider {
   /// Called when the device shell stops.
   final VoidCallback onDeviceShellStopped;
 
@@ -40,6 +43,12 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   ChildViewConnection _childViewConnection;
   final Set<Account> _draggedUsers = new Set<Account>();
   final Set<Ticker> _tickers = new Set<Ticker>();
+
+  // Because this device shell only supports a single user logged in at a time,
+  // we don't need to maintain separate ServiceProvider and Presentation
+  // bindings for each logged-in user.
+  final PresentationBinding _presentationBinding = new PresentationBinding();
+  final ServiceProviderBinding _serviceProviderBinding = new ServiceProviderBinding();
 
   /// Constructor
   UserPickerDeviceShellModel({this.onDeviceShellStopped}) : super() {
@@ -64,8 +73,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   void onReady(
     UserProvider userProvider,
     DeviceShellContext deviceShellContext,
+    Presentation presentation,
   ) {
-    super.onReady(userProvider, deviceShellContext);
+    super.onReady(userProvider, deviceShellContext, presentation);
     _loadUsers();
     _userPickerScrollController.addListener(_scrollListener);
   }
@@ -149,13 +159,19 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       onLogout();
     });
 
+    final InterfacePair<ServiceProvider> serviceProvider
+        = new InterfacePair<ServiceProvider>();
+    _serviceProviderBinding.bind(this, serviceProvider.passRequest());
+
     final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
     final UserLoginParams params = new UserLoginParams()
       ..accountId = accountId
       ..viewOwner = viewOwner.passRequest()
+      ..services = serviceProvider.passHandle()
       ..userController = _userControllerProxy.ctrl.request()
       ..userShellConfig = new AppConfig.init(_userShellChooser.appUrl, null);
     userProvider.login(params);
+
     _userControllerProxy.watch(_userWatcherImpl.getHandle());
     _loadingChildView = true;
     _childViewConnection = new ChildViewConnection(
@@ -179,6 +195,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   void onLogout() {
     refreshUsers();
     _childViewConnection = null;
+    _presentationBinding.close();
+    _serviceProviderBinding.close();
     notifyListeners();
   }
 
@@ -247,5 +265,42 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     Ticker ticker = new Ticker(onTick);
     _tickers.add(ticker);
     return ticker;
+  }
+
+  // |Presentation|.
+  // Delegate to the Presentation received by DeviceShell.Initialize().
+  @override
+  // ignore: avoid_positional_boolean_parameters
+  void enableClipping(bool enabled) {
+    presentation.enableClipping(enabled);
+  }
+
+  // |Presentation|.
+  // Delegate to the Presentation received by DeviceShell.Initialize().
+  @override
+  void useOrthographicView() {
+    presentation.useOrthographicView();
+  }
+
+  // |Presentation|.
+  // Delegate to the Presentation received by DeviceShell.Initialize().
+  @override
+  void usePerspectiveView() {
+    presentation.usePerspectiveView();
+  }
+
+  // |ServiceProvider|.
+  @override
+  void connectToService(String serviceName, Channel channel) {
+    if (serviceName == 'mozart.Presentation') {
+      if (_presentationBinding.isBound) {
+        log.warning('UserPickerDeviceShell: Presentation service is already bound !');
+      } else {
+        _presentationBinding.bind(this, new InterfaceRequest<Presentation>(channel));
+      }
+    } else {
+      log.warning('UserPickerDeviceShell: received request for unknown service: $serviceName !');
+      channel.close();
+    }
   }
 }
