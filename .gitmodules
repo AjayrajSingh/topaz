@@ -288,6 +288,10 @@
 	branch = master
 	path = third_party/rust-mirrors/mio
 	url = https://fuchsia.googlesource.com/third_party/mio
+[submodule "third_party/rust-mirrors/rand"]
+	branch = master
+	path = third_party/rust-mirrors/rand
+	url = https://fuchsia.googlesource.com/third_party/rust-mirrors/rand
 [submodule "third_party/rust-mirrors/tokio-core"]
 	branch = master
 	path = third_party/rust-mirrors/tokio-core
