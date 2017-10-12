@@ -11,7 +11,7 @@
         "garnet/packages/zlib"
     ],
     "labels": [
-        "//flutter",
+        "//third_party/flutter",
         "//lib/flutter/examples/flutter_gallery"
     ],
     "binaries": [
@@ -24,11 +24,11 @@
             "bootfs_path": "apps/flutter_aot_runner"
         },
         {
-            "binary": "gen/flutter/examples/hello_flutter/hello_flutter.flx",
+            "binary": "gen/third_party/flutter/examples/hello_flutter/hello_flutter.flx",
             "bootfs_path": "apps/hello_flutter"
         },
         {
-            "binary": "gen/flutter/examples/hello_flutter/hello_flutter_aot.flx",
+            "binary": "gen/third_party/flutter/examples/hello_flutter/hello_flutter_aot.flx",
             "bootfs_path": "apps/hello_flutter_aot"
         },
         {
@@ -36,7 +36,7 @@
             "bootfs_path": "apps/flutter_gallery"
         },
         {
-            "binary": "gen/flutter/examples/spinning_square/spinning_square.flx",
+            "binary": "gen/third_party/flutter/examples/spinning_square/spinning_square.flx",
             "bootfs_path": "apps/spinning_square"
         }
     ]
