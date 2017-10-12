@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 import("//packages/package.gni")
-import("//flutter/build/flutter_app.gni")
+import("//third_party/flutter/build/flutter_app.gni")
 
 flutter_app("dashboard_app") {
   output_name = "dashboard.flx"
