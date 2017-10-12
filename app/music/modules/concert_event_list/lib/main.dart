@@ -45,11 +45,19 @@ Future<Null> main() async {
           child: new Loader(
             loadingStatus: model.loadingStatus,
             builder: (BuildContext context) {
-              return new EventList(
-                events: model.events,
-                onSelect: model.selectEvent,
-                selectedEvent: model.selectedEvent,
-              );
+              if (model.deviceMode == 'edgeToEdge') {
+                return new PageableEventList(
+                  events: model.events,
+                  onSelect: model.selectEvent,
+                  selectedEvent: model.selectedEvent,
+                );
+              } else {
+                return new EventList(
+                  events: model.events,
+                  onSelect: model.selectEvent,
+                  selectedEvent: model.selectedEvent,
+                );
+              }
             },
           ),
         );

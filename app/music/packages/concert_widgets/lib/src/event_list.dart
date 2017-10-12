@@ -7,9 +7,9 @@ import 'dart:math';
 import 'package:concert_models/concert_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
+import 'concert_guide_header.dart';
 import 'event_list_item.dart';
 import 'typedefs.dart';
 
@@ -30,8 +30,6 @@ class EventList extends StatelessWidget {
   /// Callback for when an event is selected
   final EventActionCallback onSelect;
 
-  static final DateFormat _kMonthFormat = new DateFormat('MMMM y');
-
   static final _EventListGridDelegate _eventListGridDelegate =
       new _EventListGridDelegate();
 
@@ -45,9 +43,6 @@ class EventList extends StatelessWidget {
       : assert(events != null),
         super(key: key);
 
-  String get _listTitle =>
-      'Concert Guide  -  ${_kMonthFormat.format(new DateTime.now())}';
-
   Widget _buildHeader() {
     return new Container(
       constraints: new BoxConstraints(
@@ -55,38 +50,7 @@ class EventList extends StatelessWidget {
       ),
       child: new AspectRatio(
         aspectRatio: 4.5,
-        child: new Container(
-          decoration: new BoxDecoration(
-            image: new DecorationImage(
-              image: const AssetImage(
-                'packages/concert_widgets/res/concert_bg.jpg',
-              ),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: new Center(
-            child: new Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                new Container(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: new Image.asset(
-                    'packages/concert_widgets/res/plat_logo.png',
-                    height: _kLogoSize,
-                    width: _kLogoSize,
-                  ),
-                ),
-                new Text(
-                  _listTitle,
-                  style: new TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        child: new ConcertGuideHeader(),
       ),
     );
   }

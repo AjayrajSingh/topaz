@@ -8,3 +8,4 @@ export 'src/event_list_item.dart';
 export 'src/event_page.dart';
 export 'src/loader.dart';
 export 'src/loading_status.dart';
+export 'src/pageable_event_list.dart';

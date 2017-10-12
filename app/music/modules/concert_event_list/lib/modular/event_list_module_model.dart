@@ -15,18 +15,18 @@ import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 
 /// [ModuleModel] that manages the state of the Event Module.
 class EventListModuleModel extends ModuleModel {
+  /// Constructor
+  EventListModuleModel({this.apiKey}) : super() {
+    _fetchEvents();
+  }
+
   /// API key for Songkick APIs
   final String apiKey;
-
-  List<Event> _events = <Event>[];
-
-  int _selectedEventId;
-
-  LoadingStatus _loadingStatus = LoadingStatus.inProgress;
 
   final ModuleControllerProxy _eventPageModuleController =
       new ModuleControllerProxy();
@@ -38,17 +38,18 @@ class EventListModuleModel extends ModuleModel {
 
   bool _startedEventModule = false;
 
-  /// Constructor
-  EventListModuleModel({this.apiKey}) : super() {
-    _fetchEvents();
-  }
+  /// The current device mode
+  String get deviceMode => _deviceMode;
+  String _deviceMode;
 
   /// List of upcoming nearby events
   List<Event> get events =>
       _events != null ? new UnmodifiableListView<Event>(_events) : null;
+  List<Event> _events = <Event>[];
 
   /// Get the current loading status
   LoadingStatus get loadingStatus => _loadingStatus;
+  LoadingStatus _loadingStatus = LoadingStatus.inProgress;
 
   /// Get the currently selected event
   Event get selectedEvent {
@@ -61,6 +62,8 @@ class EventListModuleModel extends ModuleModel {
       );
     }
   }
+
+  int _selectedEventId;
 
   /// Retrieves the events
   Future<Null> _fetchEvents() async {
@@ -132,5 +135,14 @@ class EventListModuleModel extends ModuleModel {
   void onStop() {
     _eventPageModuleController.ctrl.close();
     _eventLink?.ctrl?.close();
+  }
+
+  @override
+  void onDeviceMapChange(DeviceMapEntry entry) {
+    Map<String, dynamic> profileMap = JSON.decode(entry.profile);
+    if (_deviceMode != profileMap['mode']) {
+      _deviceMode = profileMap['mode'];
+      notifyListeners();
+    }
   }
 }
