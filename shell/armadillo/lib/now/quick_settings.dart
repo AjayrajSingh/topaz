@@ -8,11 +8,13 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:sysui_widgets/icon_slider.dart';
 
 import '../elevations.dart';
 import '../size_model.dart';
+import 'context_model.dart';
 import 'toggle_icon.dart';
 import 'volume_model.dart';
 
@@ -375,14 +377,42 @@ class _QuickSettingsState extends State<QuickSettings> {
       )
       ..addAll(
         _addresses.map(
-          (InternetAddress address) => new Text(
-                '${address.address}',
-                textAlign: TextAlign.center,
-                style: new TextStyle(
-                  fontFamily: 'RobotoMono',
-                  color: Colors.grey[600],
+          (InternetAddress address) => new Opacity(
+                opacity: widget.opacity,
+                child: new Text(
+                  '${address.address}',
+                  textAlign: TextAlign.center,
+                  style: new TextStyle(
+                    fontFamily: 'RobotoMono',
+                    color: Colors.grey[600],
+                  ),
                 ),
               ),
+        ),
+      )
+      ..add(
+        new Opacity(
+          opacity: widget.opacity,
+          child: new Container(
+            padding: const EdgeInsets.all(16.0),
+            child: new ScopedModelDescendant<ContextModel>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                ContextModel contextModel,
+              ) =>
+                  contextModel.buildTimestamp != null
+                      ? new Text(
+                          'Built at ${new DateFormat('h:mmaaa', 'en_US').format(contextModel.buildTimestamp).toLowerCase()} on ${new DateFormat('MMM dd, yyyy', 'en_US').format(contextModel.buildTimestamp)}',
+                          textAlign: TextAlign.center,
+                          style: new TextStyle(
+                            fontFamily: 'RobotoMono',
+                            color: Colors.grey[600],
+                          ),
+                        )
+                      : const Offstage(),
+            ),
+          ),
         ),
       )
       ..addAll(

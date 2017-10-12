@@ -42,6 +42,9 @@ abstract class ContextModel extends Model {
   /// The user's image url.
   String get userImageUrl;
 
+  /// The timestamp of the build.
+  DateTime get buildTimestamp;
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);

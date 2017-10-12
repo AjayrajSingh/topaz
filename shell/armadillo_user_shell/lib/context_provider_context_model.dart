@@ -24,6 +24,8 @@ const List<String> _kTopics = const <String>[
 
 const String _kContextConfig = '/system/data/sysui/contextual_config.json';
 
+const String _kLastUpdate = '/system/data/build/last-update';
+
 /// Provides assets and text based on context.
 class ContextProviderContextModel extends ContextModel {
   Map<String, String> _contextualWifiNetworks = <String, String>{};
@@ -35,6 +37,7 @@ class ContextProviderContextModel extends ContextModel {
   String _activity = 'unknown';
   String _userName;
   String _userImageUrl;
+  DateTime _buildTimestamp;
 
   /// The current background image to use.
   @override
@@ -90,6 +93,9 @@ class ContextProviderContextModel extends ContextModel {
   @override
   String get userImageUrl => _userImageUrl;
 
+  @override
+  DateTime get buildTimestamp => _buildTimestamp;
+
   /// Called when the user information changes.
   void onUserUpdated(String userName, String userImageUrl) {
     _userName = userName;
@@ -135,6 +141,15 @@ class ContextProviderContextModel extends ContextModel {
     _contextualTimeOnly = decodedJson['time_only'];
     _contextualDateOnly = decodedJson['date_only'];
     _contextualBackgroundImages = decodedJson['background_image'];
+
+    String lastUpdate = new File(_kLastUpdate).readAsStringSync();
+    print('lastUpdate $lastUpdate');
+    try {
+      _buildTimestamp = DateTime.parse(lastUpdate.trim());
+    } on FormatException {
+      log.warning('Could not parse build timestamp! ${lastUpdate.trim()}');
+    }
+
     notifyListeners();
   }
 
