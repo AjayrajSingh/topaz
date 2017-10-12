@@ -196,45 +196,47 @@ class SuggestionListState extends State<SuggestionList>
           new OverlayEntry(
             builder: (BuildContext context) => new LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) =>
-                      new ScopedModelDescendant<SizeModel>(
-                        builder: (
-                          BuildContext context,
-                          Widget child,
-                          SizeModel sizeModel,
-                        ) =>
-                            new PhysicalModel(
-                              elevation: Elevations.suggestionList,
-                              color: Colors.white,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: const Radius.circular(8.0),
-                                topRight: const Radius.circular(8.0),
-                              ),
-                              child: new Stack(
-                                children: <Widget>[
-                                  // We overlap a little to avoid aliasing issues.
-                                  new Positioned.fill(
-                                    top: sizeModel.askHeight - 8.0,
-                                    child: _buildSuggestionGrid(),
-                                  ),
-                                  new Positioned(
-                                    left: 0.0,
-                                    right: 0.0,
-                                    top: 0.0,
-                                    height: sizeModel.askHeight,
-                                    child: new Container(
-                                      color: Colors.white,
-                                      padding: new EdgeInsets.symmetric(
-                                        horizontal: _getLeftOffset(
-                                          constraints.maxWidth,
+                      constraints.maxWidth == 0.0
+                          ? const Offstage()
+                          : new ScopedModelDescendant<SizeModel>(
+                              builder: (
+                                BuildContext context,
+                                Widget child,
+                                SizeModel sizeModel,
+                              ) =>
+                                  new PhysicalModel(
+                                    elevation: Elevations.suggestionList,
+                                    color: Colors.white,
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: const Radius.circular(8.0),
+                                      topRight: const Radius.circular(8.0),
+                                    ),
+                                    child: new Stack(
+                                      children: <Widget>[
+                                        // We overlap a little to avoid aliasing issues.
+                                        new Positioned.fill(
+                                          top: sizeModel.askHeight - 8.0,
+                                          child: _buildSuggestionGrid(),
                                         ),
-                                      ),
-                                      child: _buildAsk(context),
+                                        new Positioned(
+                                          left: 0.0,
+                                          right: 0.0,
+                                          top: 0.0,
+                                          height: sizeModel.askHeight,
+                                          child: new Container(
+                                            color: Colors.white,
+                                            padding: new EdgeInsets.symmetric(
+                                              horizontal: _getLeftOffset(
+                                                constraints.maxWidth,
+                                              ),
+                                            ),
+                                            child: _buildAsk(context),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
                             ),
-                      ),
                 ),
           ),
         ],
