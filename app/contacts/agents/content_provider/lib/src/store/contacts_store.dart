@@ -34,6 +34,9 @@ class ContactsStore<T> {
   /// we want to be able to do a prefix search against, this list cannot be
   /// empty.
   ///
+  /// [updateIfExists] allows the caller to update the value instead of adding
+  /// it if it already exists in the contacts store.
+  ///
   /// Note: ideally this would directly take a Contact class defined by the
   /// FIDL interface however if we have a dependency on the FIDL defined
   /// classes then it cannot be easily unit tested at this time
@@ -44,9 +47,16 @@ class ContactsStore<T> {
     String id,
     String displayName,
     List<String> searchableValues,
-    T contact,
-  ) {
-    _validateAddContactArgs(id, displayName, searchableValues, contact);
+    T contact, {
+    bool updateIfExists: false,
+  }) {
+    _validateAddContactArgs(
+      id,
+      displayName,
+      searchableValues,
+      contact,
+      updateIfExists,
+    );
 
     // Store the entire contact information in the map against its id
     _contactMap[id] = contact;
@@ -82,10 +92,11 @@ class ContactsStore<T> {
     String displayName,
     List<String> searchableValues,
     T contact,
+    bool isValidIfExists,
   ) {
     if (id == null || id.isEmpty) {
       throw new ArgumentError('id cannot be null or empty');
-    } else if (_contactMap.containsKey(id)) {
+    } else if (_contactMap.containsKey(id) && !isValidIfExists) {
       throw new ArgumentError('$id already exists in ContactsStore');
     }
     if (displayName == null || displayName.isEmpty) {

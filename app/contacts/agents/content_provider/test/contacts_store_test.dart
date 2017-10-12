@@ -117,9 +117,25 @@ void main() {
         expect(() {
           String id = 'contact1';
           new ContactsStore<String>()
-            ..addContact(id, null, <String>['email'], 'contact1')
-            ..addContact(id, null, <String>['firstname'], 'contact2');
+            ..addContact(id, 'contact1', <String>['contact1'], 'contact1')
+            ..addContact(id, 'contact2', <String>['contact2'], 'contact2');
         }, throwsA(const isInstanceOf<ArgumentError>()));
+      });
+
+      test('should update the contact if updateIfExists is true', () {
+        String id = 'contact1';
+        ContactsStore<String> store = new ContactsStore<String>()
+          ..addContact(id, 'contact1', <String>['contact1'], 'contact1');
+        expect(store.getContact(id), equals('contact1'));
+
+        store.addContact(
+          id,
+          'contact2',
+          <String>['contact2'],
+          'contact2',
+          updateIfExists: true,
+        );
+        expect(store.getContact(id), equals('contact2'));
       });
     });
 
