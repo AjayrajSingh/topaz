@@ -11,7 +11,7 @@ flutter_app("__project_name__") {
 
   deps = [
     "//lib/flutter/packages/flutter",
-    "//topaz/lib/widgets/packages/logging:lib.logging",
-    "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/dart/widgets:lib.widgets",
   ]
 }
