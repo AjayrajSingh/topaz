@@ -156,14 +156,19 @@ void main() {
       onStartOverlay: authenticationOverlayModel.onStartOverlay,
       onStopOverlay: authenticationOverlayModel.onStopOverlay,
     ),
-    child: new _ElevatedCheckedModeBanner(
-      child: new ScopedModel<NetstackModel>(
-        model: netstackModel,
-        child: new ScopedModel<WlanModel>(
-          model: wlanModel,
-          child: new Overlay(initialEntries: overlays),
-        ),
-      ),
+    child: new LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) =>
+          (constraints.biggest == Size.zero)
+              ? const Offstage()
+              : new _ElevatedCheckedModeBanner(
+                  child: new ScopedModel<NetstackModel>(
+                    model: netstackModel,
+                    child: new ScopedModel<WlanModel>(
+                      model: wlanModel,
+                      child: new Overlay(initialEntries: overlays),
+                    ),
+                  ),
+                ),
     ),
   );
 
