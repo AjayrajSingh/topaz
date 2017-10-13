@@ -11,7 +11,7 @@ dart_package("music_widgets") {
   deps = [
     "//third_party/dart-pkg/pub/intl",
     "//topaz/app/music/packages/music_models",
-    "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/dart/fixtures",
   ]
 
