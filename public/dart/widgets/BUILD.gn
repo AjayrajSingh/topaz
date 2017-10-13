@@ -1,0 +1,39 @@
+# Copyright 2017 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_package.gni")
+import("//build/dart/dart_test.gni")
+
+dart_package("lib.widgets") {
+  package_name = "lib.widgets"
+
+  analysis_options = "analysis_options.yaml"
+
+  deps = [
+    "//topaz/public/lib/app/dart",
+    "//peridot/public/lib/device/fidl:fidl_dart",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/user/fidl:fidl_dart",
+    "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
+    "//topaz/tools/widget_explorer/packages/widget_explorer_meta",
+    "//topaz/public/lib/ui/flutter",
+    "//garnet/public/lib/ui/presentation/fidl:fidl_dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
+    "//topaz/public/lib/fidl/dart",
+    "//lib/flutter/packages/flutter",
+    "//lib/flutter/packages/flutter_test",
+    "//topaz/lib/widgets/packages/modular:lib.modular",
+    "//third_party/dart-pkg/pub/flutter_image",
+  ]
+}
+
+dart_test("test") {
+  analysis_options = "analysis_options.yaml"
+
+  deps = [
+    "//lib/flutter/packages/flutter_test",
+    "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}
