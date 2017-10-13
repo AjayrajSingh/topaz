@@ -16,7 +16,7 @@ dart_app("eddystone_agent_dart") {
     "//garnet/public/lib/bluetooth/fidl:fidl_dart",
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
-    "//topaz/lib/widgets/packages/logging:lib.logging",
+    "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/decomposition/dart",
     "//topaz/public/lib/fidl/dart",

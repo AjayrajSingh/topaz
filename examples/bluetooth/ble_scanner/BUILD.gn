@@ -15,8 +15,8 @@ flutter_app("ble_scanner") {
     "//topaz/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
     "//peridot/public/lib/module/fidl:fidl_dart",
-    "//topaz/lib/widgets/packages/logging:lib.logging",
-    "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/dart/widgets:lib.widgets",
   ]
 
   analysis_options = "//topaz/examples/bluetooth/analysis_options.yaml"
