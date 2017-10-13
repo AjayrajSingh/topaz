@@ -12,7 +12,7 @@ dart_package("armadillo") {
 
   deps = [
     "//lib/flutter/packages/flutter",
-    "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/shell/keyboard",
     "//topaz/shell/widgets",
   ]

@@ -15,7 +15,7 @@ flutter_app("perspective") {
 
   deps = [
     "//lib/flutter/packages/flutter",
-    "//topaz/lib/widgets/packages/widgets:lib.widgets",
+    "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/media/flutter",
   ]
