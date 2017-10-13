@@ -298,9 +298,9 @@ class SuggestionListState extends State<SuggestionList>
             ),
             new GestureDetector(
               onTap: () {
-                SuggestionModel
-                    .of(context)
-                    .beginSpeechCapture(_onTranscriptUpdate);
+                SuggestionModel.of(context).beginSpeechCapture(
+                      onTranscriptUpdate: _onTranscriptUpdate,
+                    );
               },
               child: new Image.asset(
                 _kMicImage,

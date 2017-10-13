@@ -56,6 +56,9 @@ class Suggestion {
   /// The unique id of this suggestion.
   final SuggestionId id;
 
+  /// Confidence of suggestion
+  final double confidence;
+
   /// The suggestion's title.
   final String title;
 
@@ -87,6 +90,7 @@ class Suggestion {
   /// Constructor.
   Suggestion({
     @required this.id,
+    this.confidence,
     this.title,
     this.description,
     this.themeColor,

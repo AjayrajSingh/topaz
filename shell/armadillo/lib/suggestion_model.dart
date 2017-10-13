@@ -43,7 +43,12 @@ abstract class SuggestionModel extends Model {
   bool get processingAsk;
 
   /// Starts speech input.
-  void beginSpeechCapture(OnTranscriptUpdate onTranscriptUpdate);
+  void beginSpeechCapture({
+    VoidCallback onReady,
+    OnTranscriptUpdate onTranscriptUpdate,
+    VoidCallback onError,
+    VoidCallback onCompleted,
+  });
 
   /// Updates the suggestions based on the currently focused storyCluster].  If no
   /// story is in focus, [storyCluster] should be null.

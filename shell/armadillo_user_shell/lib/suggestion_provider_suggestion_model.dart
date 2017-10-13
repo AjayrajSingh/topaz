@@ -25,22 +25,34 @@ const int _kMaxSuggestions = 100;
 
 /// Listens to a maxwell suggestion list.  As suggestions change it
 /// notifies its [suggestionListener].
-class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
+class MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
+  /// String prefix
   final String prefix;
+
+  /// Listener that is called when list of suggestions update
   final VoidCallback suggestionListener;
+
+  /// Listener that is called when list of interruptions update
   final _InterruptionListener interruptionListener;
+
+  /// If true, downgrade interruptions
   final bool downgradeInterruptions;
+
   final List<Suggestion> _suggestions = <Suggestion>[];
   final List<Suggestion> _interruptions = <Suggestion>[];
 
-  _MaxwellSuggestionListenerImpl({
+  /// Constructor
+  MaxwellSuggestionListenerImpl({
     this.prefix,
     this.suggestionListener,
     this.interruptionListener,
     this.downgradeInterruptions: false,
   });
 
+  /// List of suggestions
   List<Suggestion> get suggestions => _suggestions.toList();
+
+  /// List of interruptions
   List<Suggestion> get interruptions => _interruptions.toList();
 
   @override
@@ -87,6 +99,7 @@ class _MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
     // TODO(jwnichols): Incorporate this into the user interface somehow
   }
 
+  /// Clear all suggestions
   void clearSuggestions() {
     List<Suggestion> interruptionsToRemove = _interruptions.toList();
     _interruptions.clear();
@@ -228,13 +241,13 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       new maxwell.SuggestionListenerBinding();
 
   // Listens for changes to maxwell's ask suggestion list.
-  _MaxwellSuggestionListenerImpl _askListener;
+  MaxwellSuggestionListenerImpl _askListener;
 
   final maxwell.SuggestionListenerBinding _nextListenerBinding =
       new maxwell.SuggestionListenerBinding();
 
   // Listens for changes to maxwell's next suggestion list.
-  _MaxwellSuggestionListenerImpl _nextListener;
+  MaxwellSuggestionListenerImpl _nextListener;
 
   _InterruptionListener _interruptionListener;
 
@@ -284,6 +297,9 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   /// Called when all interruptions are removed.
   final OnInterruptionsRemoved onInterruptionsRemoved;
 
+  final Set<maxwell.SuggestionListenerBinding> _askListenerBindings =
+      new Set<maxwell.SuggestionListenerBinding>();
+
   /// Constructor.
   SuggestionProviderSuggestionModel({
     this.hitTestModel,
@@ -294,11 +310,16 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   /// Call to close all the handles opened by this model.
   void close() {
-    if (_askListenerBinding.isBound)
+    if (_askListenerBinding.isBound) {
       _askListenerBinding.close();
+    }
     _nextListenerBinding.close();
     _feedbackListenerBinding.close();
     _transcriptionListenerBinding.close();
+    for (maxwell.SuggestionListenerBinding askListener
+        in _askListenerBindings) {
+      askListener.close();
+    }
   }
 
   /// Setting [suggestionProvider] triggers the loading on suggestions.
@@ -312,13 +333,13 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       onInterruptionRemoved: _onInterruptionRemoved,
       onInterruptionsRemoved: _onInterruptionsRemoved,
     );
-    _askListener = new _MaxwellSuggestionListenerImpl(
+    _askListener = new MaxwellSuggestionListenerImpl(
       prefix: 'ask',
       suggestionListener: _onAskSuggestionsChanged,
       interruptionListener: _interruptionListener,
       downgradeInterruptions: true,
     );
-    _nextListener = new _MaxwellSuggestionListenerImpl(
+    _nextListener = new MaxwellSuggestionListenerImpl(
       prefix: 'next',
       suggestionListener: _onNextSuggestionsChanged,
       interruptionListener: _interruptionListener,
@@ -446,8 +467,9 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       _askText = text;
 
       // If our existing binding is bound, close it.
-      if (_askListenerBinding.isBound)
+      if (_askListenerBinding.isBound) {
         _askListenerBinding.close();
+      }
 
       // Also clear any suggestions that the ask listener may have cached
       _askListener.clearSuggestions();
@@ -475,6 +497,27 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     }
   }
 
+  /// Performs an ask query.
+  void performAskQuery({
+    String text,
+    maxwell.SuggestionListener askListener,
+  }) {
+    final maxwell.SuggestionListenerBinding askListenerBinding =
+        new maxwell.SuggestionListenerBinding();
+    _askListenerBindings.add(askListenerBinding);
+
+    // Make a query and rewrap the binding
+    _suggestionProviderProxy.query(
+      askListenerBinding.wrap(askListener),
+      new maxwell.UserInput()..text = text ?? '',
+      _kMaxSuggestions,
+    );
+    askListenerBinding.onConnectionError = () {
+      askListenerBinding.close();
+      _askListenerBindings.remove(askListenerBinding);
+    };
+  }
+
   @override
   bool get asking => _asking;
 
@@ -482,27 +525,28 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   bool get processingAsk => _processingAsk;
 
   @override
-  void beginSpeechCapture(OnTranscriptUpdate onTranscriptUpdate) {
+  void beginSpeechCapture({
+    OnTranscriptUpdate onTranscriptUpdate,
+    VoidCallback onReady,
+    VoidCallback onError,
+    VoidCallback onCompleted,
+  }) {
     _transcriptionListenerBinding.close();
 
     log.info('Begin speech capture!');
-    _suggestionProviderProxy.beginSpeechCapture(_transcriptionListenerBinding
-        .wrap(new _MaxwellTranscriptionListenerImpl(
-            onReadyImpl: () {
-              // TODO(rosswang => anwilson): UI feedback once we start listening
-              // (mic icon, blank text?)
-            },
-            onTranscriptUpdateImpl: onTranscriptUpdate,
-            onErrorImpl: () {
-              // TODO(rosswang => anwilson): change UI state to indicate a speech
-              // input error
-            })));
-    // TODO(rosswang=>anwilson): UI feedback that we stopped listening (likely
-    // show processing/speaking/idle state instead)
-    _transcriptionListenerBinding.onConnectionError =
-        _transcriptionListenerBinding.close;
-    asking = true;
-    askText = '';
+    _suggestionProviderProxy.beginSpeechCapture(
+      _transcriptionListenerBinding.wrap(new _MaxwellTranscriptionListenerImpl(
+        onReadyImpl: onReady,
+        onTranscriptUpdateImpl: onTranscriptUpdate,
+        onErrorImpl: onError,
+      )),
+    );
+
+    // The voice input is completed when the transcriptListener is closed
+    _transcriptionListenerBinding.onConnectionError = () {
+      onCompleted?.call();
+      _transcriptionListenerBinding.close;
+    };
   }
 
   @override

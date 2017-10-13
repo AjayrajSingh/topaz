@@ -191,6 +191,7 @@ Widget buildArmadilloUserShell({
       audioPolicy.dispose();
       powerManagerProxy.ctrl.close();
       powerModel.close();
+      suggestionProviderSuggestionModel.close();
     },
     onWallpaperChosen: contextProviderContextModel.onWallpaperChosen,
   );
