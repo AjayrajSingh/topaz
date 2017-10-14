@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
 import '../../stores.dart';
+import 'contact_item.dart';
 
 /// The UI widget that represents a list of contacts
 class ContactsPicker extends StoreWatcher {
@@ -23,12 +24,10 @@ class ContactsPicker extends StoreWatcher {
 
     return new Material(
       child: new ListView(
-        children: pickerStore.contacts.map((ContactListItem contact) {
-          return new Row(
-            children: <Widget>[
-              new Text(contact.displayName),
-              new Text(' - ${contact.detail}'),
-            ],
+        children: pickerStore.contacts.map((ContactItemStore contact) {
+          return new ContactItem(
+            matchedPrefix: pickerStore.prefix,
+            contact: contact,
           );
         }).toList(),
       ),

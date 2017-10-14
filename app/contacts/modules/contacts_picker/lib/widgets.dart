@@ -2,6 +2,5 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-export 'src/stores/contact_item_store.dart';
-export 'src/stores/contacts_picker_store.dart';
-export 'src/stores/link_data.dart';
+export 'src/widgets/contact_item.dart';
+export 'src/widgets/contacts_picker.dart';

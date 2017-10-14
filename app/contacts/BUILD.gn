@@ -15,6 +15,7 @@ package("contacts") {
     "//topaz/app/contacts/modules/contacts",
     "//topaz/app/contacts/modules/contacts:test",
     "//topaz/app/contacts/modules/contacts_picker",
+    "//topaz/app/contacts/modules/contacts_picker:test",
     "//topaz/app/contacts/services",
   ]
 

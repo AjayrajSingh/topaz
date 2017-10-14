@@ -60,8 +60,9 @@ class ContactsPickerModuleModel extends ModuleModel {
       prefix: 'a',
       detailType: DetailType.email,
     );
-    List<ContactListItem> contacts = await getContactList(linkData);
+    List<ContactItemStore> contacts = await getContactList(linkData);
     await updateContactsListAction(contacts);
+    await updatePrefixAction(linkData.prefix);
   }
 
   @override
@@ -74,8 +75,8 @@ class ContactsPickerModuleModel extends ModuleModel {
   }
 
   /// Call the content provider to retrieve the list of contacts
-  Future<List<ContactListItem>> getContactList(LinkData linkData) async {
-    List<ContactListItem> contactList = <ContactListItem>[];
+  Future<List<ContactItemStore>> getContactList(LinkData linkData) async {
+    List<ContactItemStore> contactList = <ContactItemStore>[];
     Completer<contacts_fidl.Status> statusCompleter =
         new Completer<contacts_fidl.Status>();
     _contactsContentProvider.getContactList(
@@ -84,7 +85,7 @@ class ContactsPickerModuleModel extends ModuleModel {
         contactList.addAll(
           contacts.map(
             (contacts_fidl.Contact c) {
-              return _transformContact(c, linkData.detailType);
+              return _transformContact(c, linkData.detailType, linkData.prefix);
             },
           ),
         );
@@ -104,10 +105,11 @@ class ContactsPickerModuleModel extends ModuleModel {
     return contactList;
   }
 
-  /// Transform a FIDL Contact object into a ContactListItem
-  ContactListItem _transformContact(
+  /// Transform a FIDL Contact object into a ContactItemStore
+  ContactItemStore _transformContact(
     contacts_fidl.Contact c,
     DetailType detailType,
+    String prefix,
   ) {
     // TODO(meiyili): change how emails and phone numbers are stored and update
     // to handle the "custom" detail type as well
@@ -118,11 +120,27 @@ class ContactsPickerModuleModel extends ModuleModel {
         c.phoneNumbers.isNotEmpty) {
       detail = c.phoneNumbers[0].value;
     }
-    return new ContactListItem(
+
+    // Determine which part of the name matched the prefix
+    List<String> nameComponents = <String>[c.givenName, c.familyName];
+    bool isMatchedOnName = false;
+    int matchedNameIndex = -1;
+
+    // Prioritize highlighting left-most name component,
+    // will clearly need to be changed after internationalization :P
+    for (int i = nameComponents.length - 1; i >= 0; i--) {
+      if (nameComponents[i].toLowerCase().startsWith(prefix)) {
+        isMatchedOnName = true;
+        matchedNameIndex = i;
+      }
+    }
+    return new ContactItemStore(
       id: c.googleContactId,
-      displayName: c.displayName,
+      names: <String>[c.givenName, c.familyName],
       detail: detail,
       photoUrl: c.photoUrl,
+      isMatchedOnName: isMatchedOnName,
+      matchedNameIndex: matchedNameIndex,
     );
   }
 }

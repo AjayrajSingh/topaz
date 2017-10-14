@@ -9,9 +9,13 @@ dependencies:
     sdk: flutter
   lib.widgets:
     path: ../../../../lib/widgets/packages/widgets
+  lib.logging:
+    path: ../../../../lib/widgets/packages/logging
 dev_dependencies:
   test: any
   flutter_test:
     sdk: flutter
+  flutter_flux:
+    path: ../../../../../third_party/dart-pkg/pub/flutter_flux
 flutter:
   uses-material-design: true
