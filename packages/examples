@@ -4,13 +4,12 @@
         "dart"
     ],
     "imports": [
-        "topaz/packages/modular_examples"
+        "topaz/packages/modular_examples",
+        "topaz/packages/ui_examples"
     ],
     "packages": {
-        "basic_wm": "//topaz/examples/ui/basic_wm:package",
         "bluetooth_examples": "//topaz/examples/bluetooth:bluetooth_examples",
         "eddystone_agent": "//topaz/examples/eddystone_agent:eddystone_agent",
-        "hello_material": "//topaz/examples/ui/hello_material:package",
         "media_player_flutter": "//topaz/examples/media/media_player_flutter:package"
     }
 }
