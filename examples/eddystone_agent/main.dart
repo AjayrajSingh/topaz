@@ -103,14 +103,21 @@ String decodeEddystoneURL(Iterable<int> encoded) {
 }
 
 class EddystoneScanner implements ble.CentralDelegate {
+  int _delayMinutes = 1;
+
   void start(ble.Central central) {
     ble.ScanFilter filter = new ble.ScanFilter()
       ..serviceUuids = [kEddystoneUuid];
     log.info('BLE starting scan for Eddystone beacons');
     central.startScan(filter, (bt.Status status) {
       if (status.error != null) {
-        log.warning('BLE scan start failed: ${status.error.description}');
-        new Timer(new Duration(minutes: 1), () => start(_central));
+        log.warning(
+            'BLE scan start failed: ${status.error.description}, retry in $_delayMinutes mins');
+        new Timer(new Duration(minutes: _delayMinutes), () => start(_central));
+        _delayMinutes *= 2;
+        if (_delayMinutes > 60) {
+          _delayMinutes = 60;
+        }
       }
     });
   }
@@ -121,6 +128,7 @@ class EddystoneScanner implements ble.CentralDelegate {
   void onScanStateChanged(bool scanning) {
     log.info('BLE adapter scan state changed: $scanning');
     if (!scanning) {
+      _delayMinutes = 1;
       start(_central);
     }
   }
@@ -138,7 +146,6 @@ class EddystoneScanner implements ble.CentralDelegate {
         return;
       }
       if (data[0] == 0x10) {
-        log.info('Decoding Eddystone-URL: ${toHexString(data)}');
         // Eddystone-URL
         String url = decodeEddystoneURL(data.getRange(2, data.length));
         if (url != null && !proposed.contains(url)) {
