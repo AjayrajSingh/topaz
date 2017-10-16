@@ -2,7 +2,6 @@ analyzer:
   strong-mode: true
   language:
     enableSuperMixins: true
-    enableAssertInitializer: true
 linter:
   # Full list available at http://dart-lang.github.io/linter/lints/options/options.html.
   rules:
@@ -47,7 +46,7 @@ linter:
     - type_annotate_public_apis
     - type_init_formals
     - unawaited_futures
-    - unnecessary_brace_in_string_interp
+    - unnecessary_brace_in_string_interps
     - unnecessary_getters_setters
     - unrelated_type_equality_checks
     - valid_regexps
