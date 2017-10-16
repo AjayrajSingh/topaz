@@ -1,0 +1,26 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//packages/package.gni")
+
+package("documents") {
+  app = true
+
+  deps = [
+    "//topaz/app/documents/agents",
+    "//topaz/app/documents/modules/browser",
+    "//topaz/app/documents/services",
+  ]
+
+  binaries = [ {
+        source = "gen/topaz/app/documents/modules/browser/browser.flx"
+        name = "documents/browser"
+      } ]
+}
+
+package("documents_tests") {
+  testonly = true
+
+  deps = []
+}
