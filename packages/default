@@ -4,6 +4,7 @@
         "topaz/packages/dart",
         "topaz/packages/dart_runner",
         "topaz/packages/dashboard",
+        "topaz/packages/documents",
         "topaz/packages/examples",
         "topaz/packages/flutter",
         "topaz/packages/latin-ime",

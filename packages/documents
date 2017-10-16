@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "packages": {
+        "documents": "//topaz/app/documents"
+    }
+}
