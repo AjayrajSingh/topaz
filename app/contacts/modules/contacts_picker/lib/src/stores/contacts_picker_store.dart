@@ -14,6 +14,7 @@ class ContactsPickerStore extends Store {
 
   /// Constructor
   ContactsPickerStore() {
+    // ignore: uses_dynamic_as_bottom
     triggerOnAction(updateContactsListAction, (List<ContactListItem> contacts) {
       _contacts = contacts;
     });
