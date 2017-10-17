@@ -5,21 +5,21 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_jit_app("hello_dart") {
-  main_dart = "hello_dart.dart"
+  main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
 
   deps = [
-    "//topaz/runtime/dart_runner/examples/hello_dart/greeting",
+    "//topaz/runtime/dart_runner/examples/greeting",
   ]
 }
 
 dart_aot_app("hello_dart_aot") {
-  main_dart = "hello_dart.dart"
+  main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
 
   deps = [
-    "//topaz/runtime/dart_runner/examples/hello_dart/greeting",
+    "//topaz/runtime/dart_runner/examples/greeting",
   ]
 }
