@@ -231,6 +231,7 @@ Suggestion _convert(maxwell.Suggestion suggestion) {
             ? ImageType.person
             : ImageType.other,
     iconUrls: suggestion.display.iconUrls,
+    confidence: suggestion.confidence,
   );
 }
 
