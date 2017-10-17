@@ -49,8 +49,16 @@ Conversation _createConversationFromLedgerKeyValue(List<int> key, Vmo value) {
   Map<String, dynamic> decodedValue = decodeLedgerValue(value);
   return new Conversation()
     ..conversationId = key
-    ..participants = decodedValue['participants'];
+    ..participants =
+        decodedValue['participants'].map(_createParticipantFromMap).toList();
 }
+
+/// Creates a [Participant] object from the given map.
+Participant _createParticipantFromMap(Map<String, String> participantMap) =>
+    new Participant()
+      ..email = participantMap['email']
+      ..displayName = participantMap['displayName']
+      ..photoUrl = participantMap['photoUrl'];
 
 /// Creates a [Message] object from the given ledger [Entry].
 Message _createMessageFromLedgerEntry(Entry entry) =>
@@ -274,7 +282,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
   @override
   Future<Null> newConversation(
-    List<String> participants,
+    List<Participant> participants,
     void callback(
       ChatStatus chatStatus,
       Conversation conversation,
@@ -289,7 +297,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
       }
 
       // Validate the email addresses first.
-      if (participants == null || participants.any(_isEmailNotValid)) {
+      if (participants == null ||
+          participants.map((Participant p) => p.email).any(_isEmailNotValid)) {
         callback(ChatStatus.invalidEmailAddress, null);
         return;
       }
@@ -325,7 +334,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
         _conversationsPage.put(
           conversationId,
           encodeLedgerValue(<String, dynamic>{
-            'participants': participants,
+            'participants':
+                participants.map((Participant p) => p.toJson()).toList(),
           }),
           statusCompleter.complete,
         );

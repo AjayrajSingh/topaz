@@ -4,6 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
+    as chat_fidl;
 
 import '../widgets.dart';
 import 'conversation_module_model.dart';
@@ -29,7 +31,11 @@ class ChatConversationScreen extends StatelessWidget {
               sections: model.sections,
               title: model.fetchingConversation
                   ? ''
-                  : model.participants?.join(', '),
+                  : model.participants
+                      ?.map(
+                        (chat_fidl.Participant p) => p.displayName ?? p.email,
+                      )
+                      ?.join(', '),
               onSubmitMessage: model.sendMessage,
               onTapSharePhoto: model.startGalleryModule,
               scrollController: model.scrollController,

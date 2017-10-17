@@ -137,9 +137,9 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     expect(conversations, isEmpty);
 
     // Test NewConversation() method.
-    List<String> participants = <String>[
-      'alice@example.com',
-      'bob@example.com',
+    List<Participant> participants = <Participant>[
+      new Participant()..email = 'alice@example.com',
+      new Participant()..email = 'bob@example.com',
     ];
     await _chatContentProvider.newConversation(
       participants,
@@ -153,7 +153,10 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     expect(conversation, isNotNull);
     expect(conversation.conversationId, isNotNull);
     expect(conversation.conversationId, isNotEmpty);
-    expect(conversation.participants, unorderedEquals(participants));
+    expect(
+      conversation.participants.map((Participant p) => p.email),
+      unorderedEquals(participants.map((Participant p) => p.email)),
+    );
 
     // Test GetConversation() method.
     await _chatContentProvider.getConversation(
@@ -389,9 +392,9 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     completer1 = new Completer<Null>();
     mqConversation1.completer = completer1;
 
-    List<String> participants1 = <String>[
-      'foo@example.com',
-      'bar@example.com',
+    List<Participant> participants1 = <Participant>[
+      new Participant()..email = 'foo@example.com',
+      new Participant()..email = 'bar@example.com',
     ];
 
     await _chatContentProvider.newConversation(
@@ -402,7 +405,10 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
       },
     ).timeout(_kTimeout);
     expect(status, equals(ChatStatus.ok));
-    expect(conversation1.participants, unorderedEquals(participants1));
+    expect(
+      conversation1.participants.map((Participant p) => p.email),
+      unorderedEquals(participants1.map((Participant p) => p.email)),
+    );
 
     // Wait for the message queue notification.
     await completer1.future.timeout(_kTimeout);
@@ -416,7 +422,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
       orderedEquals(conversation1.conversationId),
     );
     expect(
-      decoded['participants'],
+      decoded['participants'].map((Map<String, String> p) => p['email']),
       unorderedEquals(participants1),
     );
 
@@ -437,9 +443,9 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     mqConversation1.completer = completer1;
     mqConversation2.completer = completer2;
 
-    List<String> participants2 = <String>[
-      'qux@example.com',
-      'baz@example.com',
+    List<Participant> participants2 = <Participant>[
+      new Participant()..email = 'qux@example.com',
+      new Participant()..email = 'baz@example.com',
     ];
 
     await _chatContentProvider.newConversation(
@@ -450,7 +456,10 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
       },
     ).timeout(_kTimeout);
     expect(status, equals(ChatStatus.ok));
-    expect(conversation2.participants, unorderedEquals(participants2));
+    expect(
+      conversation2.participants.map((Participant p) => p.email),
+      unorderedEquals(participants2.map((Participant p) => p.email)),
+    );
 
     // Wait for the message queue notifications.
     await completer1.future.timeout(_kTimeout);
@@ -464,7 +473,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
       orderedEquals(conversation2.conversationId),
     );
     expect(
-      decoded['participants'],
+      decoded['participants'].map((Map<String, String> p) => p['email']),
       unorderedEquals(participants2),
     );
 
@@ -479,7 +488,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
       orderedEquals(conversation2.conversationId),
     );
     expect(
-      decoded['participants'],
+      decoded['participants'].map((Map<String, String> p) => p['email']),
       unorderedEquals(participants2),
     );
 

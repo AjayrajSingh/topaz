@@ -27,7 +27,7 @@ import '../models.dart';
 import '../widgets.dart';
 
 const String _kChatContentProviderUrl =
-    'file:///system/apps/chat_content_provider';
+    'file:///system/apps/hangouts/content_provider';
 const String _kGalleryModuleUrl = 'file:///system/apps/gallery';
 
 const Duration _kScrollAnimationDuration = const Duration(milliseconds: 300);
@@ -69,8 +69,10 @@ class ChatConversationModuleModel extends ModuleModel {
   Uint8List get conversationId => _conversationId;
 
   /// Gets the list of participants in this conversation.
-  List<String> get participants => _conversation != null
-      ? new UnmodifiableListView<String>(_conversation.participants)
+  List<chat_fidl.Participant> get participants => _conversation != null
+      ? new UnmodifiableListView<chat_fidl.Participant>(
+          _conversation.participants,
+        )
       : null;
 
   /// Indicates whether the fetching is in progress or not.

@@ -18,6 +18,18 @@ enum ChatStatus {
   UNKNOWN_ERROR = -1,
 };
 
+// Metadata of a chat participant.
+struct Participant {
+  // The |email| address of this participant. Must not be null.
+  string email;
+
+  // The |display_name| of this participant to be displayed in the chat UI.
+  string? display_name;
+
+  // The |photo_url| to be used for displaying this participant's alphatar.
+  string? photo_url;
+};
+
 // Contains metadata of a chat conversation (i.e. chat room).
 // This struct does not contain the actual message history, and the messages
 // must be retrieved from the |ChatContentProvider| interface using
@@ -26,9 +38,8 @@ struct Conversation {
   // Unique id of this conversation.
   array<uint8> conversation_id;
 
-  // List of the email addresses of the users participating in this conversation
-  // excluding the current user.
-  array<string> participants;
+  // List of users participating in this conversation excluding the current user.
+  array<Participant> participants;
 };
 
 // Represents a chat message.
@@ -55,8 +66,8 @@ struct Message {
 [ServiceName="chat_content_provider.ChatContentProvider"]
 interface ChatContentProvider {
   // Creates a new conversation with the given |participants|, which is a list
-  // of email addresses of all participants in the group.
-  NewConversation(array<string> participants)
+  // of all participants (including the current user) in the group.
+  NewConversation(array<Participant> participants)
       => (ChatStatus status, Conversation? conversation);
 
   // Returns the metadata of the specified conversation.
@@ -84,7 +95,14 @@ interface ChatContentProvider {
   //     {
   //       "event":           "new_conversation",
   //       "conversation_id": <conversation_id>,
-  //       "participants":    <list of participant emails>
+  //       "participants":    [
+  //         {
+  //           "email": <participant_email>,
+  //           "displayName": <display name>,
+  //           "photoUrl": <photo url>
+  //         },
+  //         <...>
+  //       ]
   //     }
   //
   // OR

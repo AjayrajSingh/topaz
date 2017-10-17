@@ -26,7 +26,7 @@ import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
 import '../models.dart';
 
 const String _kChatContentProviderUrl =
-    'file:///system/apps/chat_content_provider';
+    'file:///system/apps/hangouts/content_provider';
 const String _kChatConversationModuleUrl =
     'file:///system/apps/chat_conversation';
 
@@ -274,11 +274,11 @@ class ChatConversationListModuleModel extends ModuleModel {
       switch (event) {
         case 'new_conversation':
           List<int> conversationId = decoded['conversation_id'];
-          List<String> participants = decoded['participants'];
+          List<Map<String, String>> participants = decoded['participants'];
 
           Conversation newConversation = new Conversation(
             conversationId: conversationId,
-            participants: participants.map(_getUserFromEmail).toList(),
+            participants: participants.map(_getUserFromParticipantMap).toList(),
           );
 
           if (_conversations != null) {
@@ -347,17 +347,26 @@ class ChatConversationListModuleModel extends ModuleModel {
   Conversation _getConversationFromFidl(chat_fidl.Conversation c) =>
       new Conversation(
         conversationId: c.conversationId,
-        participants: c.participants.map(_getUserFromEmail).toList(),
+        participants: c.participants.map(_getUserFromParticipant).toList(),
       );
 
-  User _getUserFromEmail(String email) {
+  User _getUserFromParticipant(chat_fidl.Participant participant) {
     Map<String, String> json = <String, String>{
-      'name': email,
-      'email': email,
+      'email': participant.email,
+      'name': participant.displayName,
+      'picture': participant.photoUrl,
     };
 
     return new User.fromJson(json);
   }
+
+  User _getUserFromParticipantMap(Map<String, String> participantMap) =>
+      _getUserFromParticipant(
+        new chat_fidl.Participant()
+          ..email = participantMap['email']
+          ..displayName = participantMap['displayName']
+          ..photoUrl = participantMap['photoUrl'],
+      );
 
   @override
   void onStop() {
@@ -388,7 +397,7 @@ class ChatConversationListModuleModel extends ModuleModel {
   }
 
   /// Create a new conversation with the specified participant emails.
-  void newConversation(List<String> participants) {
+  void newConversation(List<chat_fidl.Participant> participants) {
     _chatContentProvider.newConversation(
       participants,
       (chat_fidl.ChatStatus status, chat_fidl.Conversation conversation) {
@@ -427,8 +436,13 @@ class ChatConversationListModuleModel extends ModuleModel {
   }
 
   /// Callback that handles the user submitting a new conversation form
-  void handleNewConversationFormSubmit(List<String> participants) {
+  void handleNewConversationFormSubmit(List<String> emails) {
     hideNewConversationForm();
+
+    List<chat_fidl.Participant> participants = emails.map((String email) {
+      return new chat_fidl.Participant()..email = email;
+    }).toList();
+
     newConversation(participants);
   }
 }

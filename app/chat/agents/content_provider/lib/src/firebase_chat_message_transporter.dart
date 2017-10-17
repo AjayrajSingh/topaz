@@ -186,7 +186,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
 
     await Future.wait(
       conversation.participants.map(
-        (String recipient) => _sendMessageTo(recipient, key, value),
+        (Participant recipient) => _sendMessageTo(recipient.email, key, value),
       ),
     );
   }
