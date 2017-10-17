@@ -282,10 +282,6 @@ class AudioPlayerController {
     int positionNanoseconds = (position.inMicroseconds * 1000).round();
 
     _netMediaPlayer.seek(positionNanoseconds);
-
-    if (!_playing) {
-      play();
-    }
   }
 
   /// Seeks to a position expressed as a normalized value in the range 0.0 to
