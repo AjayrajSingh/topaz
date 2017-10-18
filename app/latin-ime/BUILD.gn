@@ -2,10 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//packages/package.gni")
 import("//third_party/flutter/build/flutter_app.gni")
 
-flutter_app("latin-ime") {
+flutter_app("app") {
   main_dart = "main.dart"
+  output_name = "latin-ime"
 
   manifest = "pubspec.yaml"
 
@@ -20,4 +22,16 @@ flutter_app("latin-ime") {
     "//topaz/public/lib/fidl/dart",
     "//lib/flutter/packages/flutter",
   ]
+}
+
+package("latin-ime") {
+  app = true
+
+  deps = [
+    ":app",
+  ]
+
+  binaries = [ {
+        name = "latin-ime"
+      } ]
 }
