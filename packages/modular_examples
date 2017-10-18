@@ -2,37 +2,7 @@
     "languages": [
         "dart"
     ],
-    "labels": [
-        "//topaz/examples/modular"
-    ],
-    "binaries": [
-        {
-            "binary": "gen/topaz/examples/modular/counter_flutter/child/example_flutter_counter_child.flx",
-            "bootfs_path": "apps/example_flutter_counter_child"
-        },
-        {
-            "binary": "gen/topaz/examples/modular/counter_flutter/parent/example_flutter_counter_parent.flx",
-            "bootfs_path": "apps/example_flutter_counter_parent"
-        },
-        {
-            "binary": "gen/topaz/examples/modular/hello_world_flutter/example_flutter_hello_world.flx",
-            "bootfs_path": "apps/example_flutter_hello_world"
-        },
-        {
-            "binary": "gen/topaz/examples/modular/story_shell_flutter/example_flutter_story_shell.flx",
-            "bootfs_path": "apps/example_flutter_story_shell"
-        },
-        {
-            "binary": "gen/topaz/examples/modular/todo_story/example_todo_story.flx",
-            "bootfs_path": "apps/example_todo_story"
-        },
-        {
-            "binary": "suggest_shell_controller",
-            "bootfs_path": "apps/suggest_shell_controller"
-        },
-        {
-            "binary": "gen/topaz/examples/modular/suggest_shell/view/suggest_shell_view.flx",
-            "bootfs_path": "apps/suggest_shell_view"
-        }
-    ]
+    "packages": {
+        "more_modular_examples": "//topaz/examples/modular"
+    }
 }
