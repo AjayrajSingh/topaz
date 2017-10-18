@@ -6,7 +6,7 @@ import("//packages/package.gni")
 import("//third_party/flutter/build/flutter_app.gni")
 
 flutter_app("dashboard_app") {
-  output_name = "dashboard.flx"
+  output_name = "dashboard"
   main_dart = "lib/main.dart"
 
   source_dir = "lib"
@@ -37,7 +37,6 @@ package("dashboard") {
   ]
 
   binaries = [ {
-        source = "gen/topaz/app/dashboard/dashboard.flx"
         name = "dashboard"
       } ]
 }
