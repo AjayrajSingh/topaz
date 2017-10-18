@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//packages/package.gni")
 import("//third_party/flatbuffers/flatbuffer.gni")
 
 flatbuffer("credentials") {
@@ -10,7 +11,9 @@ flatbuffer("credentials") {
   ]
 }
 
-executable("oauth_token_manager") {
+executable("bin") {
+  output_name = "oauth_token_manager"
+
   sources = [
     "oauth_token_manager.cc",
   ]
@@ -28,4 +31,14 @@ executable("oauth_token_manager") {
     "//topaz/runtime/web_runner/services",
     "//zircon/system/ulib/trace-provider",
   ]
+}
+
+package("oauth_token_manager") {
+  app = true
+
+  deps = [ ":bin" ]
+
+  binaries = [ {
+        name = "oauth_token_manager"
+      } ]
 }
