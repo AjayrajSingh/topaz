@@ -11,27 +11,36 @@ void main() {
       'https://raw.githubusercontent.com/dvdwasibi/DogsOfFuchsia/master/coco.jpg';
 
   testWidgets(
-      'Alphatar should display the image when given, whether or not the'
-      'fall-back letter is given, but also display fallback letter in'
+      'Alphatar should display the image when given, whether or not the '
+      'fall-back letter is given, but also display fallback letter in '
       'the background', (WidgetTester tester) async {
     // First, try without providing a letter.
-    await tester.pumpWidget(new StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-      return new Material(
-        child: new Alphatar.withUrl(avatarUrl: profileUrl),
-      );
-    }));
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new Alphatar.withUrl(
+            avatarUrl: profileUrl,
+            retry: false,
+          ),
+        ),
+      ),
+    );
 
     expect(find.byType(Image), findsOneWidget);
-    expect(find.byType(Text), findsOneWidget);
+    expect(find.byType(Icon), findsOneWidget);
 
     // Try again with a letter provided.
-    await tester.pumpWidget(new StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-      return new Material(
-        child: new Alphatar.withUrl(avatarUrl: profileUrl, letter: 'L'),
-      );
-    }));
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new Alphatar.withUrl(
+            avatarUrl: profileUrl,
+            letter: 'L',
+            retry: false,
+          ),
+        ),
+      ),
+    );
 
     expect(find.byType(Image), findsOneWidget);
     expect(find.byType(Text), findsOneWidget);
@@ -40,12 +49,13 @@ void main() {
   testWidgets(
       'Alphatar should display the fall-back letter, '
       'when the image is not provided', (WidgetTester tester) async {
-    await tester.pumpWidget(new StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-      return new Material(
-        child: new Alphatar(letter: 'L'),
-      );
-    }));
+    await tester.pumpWidget(
+      new MaterialApp(
+        home: new Material(
+          child: new Alphatar(letter: 'L'),
+        ),
+      ),
+    );
 
     expect(find.byType(Image), findsNothing);
     expect(find.text('L'), findsOneWidget);

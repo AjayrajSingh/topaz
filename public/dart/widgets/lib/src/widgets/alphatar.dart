@@ -72,14 +72,18 @@ class Alphatar extends StatelessWidget {
     String letter,
     double size: 40.0,
     Color backgroundColor,
+    bool retry: true,
   }) {
     assert(avatarUrl != null || letter != null);
+    assert(retry != null);
     return new Alphatar(
       key: key,
       avatarImage: avatarUrl != null && avatarUrl.isNotEmpty
           ? avatarUrl.startsWith('http')
               ? new Image(
-                  image: new NetworkImageWithRetry(avatarUrl),
+                  image: retry
+                      ? new NetworkImageWithRetry(avatarUrl)
+                      : new NetworkImage(avatarUrl),
                   width: size,
                   height: size,
                   fit: BoxFit.cover,
@@ -122,6 +126,7 @@ class Alphatar extends StatelessWidget {
     @required String avatarUrl,
     double size: 40.0,
     Color backgroundColor,
+    bool retry: true,
   }) {
     assert(name != null);
     return new Alphatar.withUrl(
@@ -130,6 +135,7 @@ class Alphatar extends StatelessWidget {
       letter: name.isNotEmpty ? name[0] : '',
       size: size,
       backgroundColor: backgroundColor ?? _pickColorForString(name),
+      retry: retry,
     );
   }
 
