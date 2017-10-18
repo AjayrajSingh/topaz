@@ -27,5 +27,6 @@ package("dart_package_tests") {
 
   deps = [
     "//topaz/public/dart/fixtures:test",
+    "//topaz/public/dart/widgets:test",
   ]
 }
