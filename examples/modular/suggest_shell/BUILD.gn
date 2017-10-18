@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 group("suggest_shell") {
-  deps = [
+  public_deps = [
     "controller",
     "view",
   ]

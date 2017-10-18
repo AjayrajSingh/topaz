@@ -5,7 +5,7 @@
 import("//third_party/flutter/build/flutter_app.gni")
 
 group("hello_world_flutter") {
-  deps = [
+  public_deps = [
     ":example_flutter_hello_world",
   ]
 }

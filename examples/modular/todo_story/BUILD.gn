@@ -5,7 +5,7 @@
 import("//third_party/flutter/build/flutter_app.gni")
 
 group("todo_story") {
-  deps = [
+  public_deps = [
     ":example_todo_story",
   ]
 }

@@ -5,7 +5,7 @@
 import("//garnet/public/lib/fidl/fidl.gni")
 
 group("controller") {
-  deps = [
+  public_deps = [
     ":suggest_shell_controller",
   ]
 }

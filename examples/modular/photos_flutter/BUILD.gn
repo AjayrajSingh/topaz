@@ -5,7 +5,7 @@
 import("//third_party/flutter/build/flutter_app.gni")
 
 group("photos_flutter") {
-  deps = [
+  public_deps = [
     ":example_flutter_photos",
   ]
 }
