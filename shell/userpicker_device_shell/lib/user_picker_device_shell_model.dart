@@ -12,6 +12,7 @@ import 'package:lib.device.fidl/device_shell.fidl.dart';
 import 'package:lib.device.fidl/user_provider.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
+import 'package:lib.ui.scenic.fidl/renderer.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -269,6 +270,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   // |Presentation|.
   // Delegate to the Presentation received by DeviceShell.Initialize().
+  // TODO: revert to default state when client logs out.
   @override
   // ignore: avoid_positional_boolean_parameters
   void enableClipping(bool enabled) {
@@ -277,6 +279,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   // |Presentation|.
   // Delegate to the Presentation received by DeviceShell.Initialize().
+  // TODO: revert to default state when client logs out.
   @override
   void useOrthographicView() {
     presentation.useOrthographicView();
@@ -284,9 +287,18 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   // |Presentation|.
   // Delegate to the Presentation received by DeviceShell.Initialize().
+  // TODO: revert to default state when client logs out.
   @override
   void usePerspectiveView() {
     presentation.usePerspectiveView();
+  }
+
+  // |Presentation|.
+  // Delegate to the Presentation received by DeviceShell.Initialize().
+  // TODO: revert to default state when client logs out.
+  @override
+  void setRendererParams(List<RendererParam> params) {
+    presentation.setRendererParams(params);
   }
 
   // |ServiceProvider|.
