@@ -2,7 +2,11 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-executable("moterm") {
+import("//packages/package.gni")
+
+executable("bin") {
+  output_name = "moterm"
+
   sources = [
     "command.cc",
     "command.h",
@@ -49,4 +53,14 @@ executable("moterm") {
   ]
 
   libs = [ "launchpad" ]
+}
+
+package("moterm") {
+  app = true
+
+  deps = [ ":bin" ]
+
+  binaries = [ {
+        name = "moterm"
+      } ]
 }
