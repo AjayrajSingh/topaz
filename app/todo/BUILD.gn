@@ -2,10 +2,24 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("todo") {
+import("//packages/package.gni")
+
+package("todo") {
+  app = true
+
   deps = [
     "//apps/modules/todo/agents/content_provider:todo_content_provider",
     "//apps/modules/todo/modules/story:todo_story",
     "//apps/modules/todo/services",
+  ]
+
+  binaries = [
+    {
+      name = "gen/topaz/app/todo/modules/story/todo_story.flx"
+      dest = "todo_story"
+    },
+    {
+      name = "todo_content_provider"
+    },
   ]
 }
