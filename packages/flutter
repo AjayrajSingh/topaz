@@ -10,19 +10,13 @@
         "garnet/packages/icu_data",
         "garnet/packages/zlib"
     ],
+    "packages": {
+        "flutter": "//third_party/flutter:package"
+    },
     "labels": [
-        "//third_party/flutter",
         "//lib/flutter/examples/flutter_gallery"
     ],
     "binaries": [
-        {
-            "binary": "flutter_runner",
-            "bootfs_path": "apps/flutter_runner"
-        },
-        {
-            "binary": "flutter_aot_runner",
-            "bootfs_path": "apps/flutter_aot_runner"
-        },
         {
             "binary": "gen/third_party/flutter/examples/hello_flutter/hello_flutter.flx",
             "bootfs_path": "apps/hello_flutter"
