@@ -13,12 +13,11 @@ group("hello_world_flutter") {
 flutter_app("example_flutter_hello_world") {
   main_dart = "lib/main.dart"
   deps = [
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//lib/flutter/packages/flutter",
-    "//peridot/public/lib/lifecycle/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/fidl/dart",
   ]
+
+    analysis_options = "//topaz/tools/analysis_options.yaml"
 }
