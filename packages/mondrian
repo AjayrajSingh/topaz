@@ -2,18 +2,8 @@
     "languages": [
         "dart"
     ],
-    "labels": [
-        "//topaz/shell/mondrian_story_shell:mondrian",
-        "//topaz/shell/mondrian_story_shell:test"
-    ],
-    "binaries": [
-        {
-            "binary": "gen/topaz/shell/mondrian_story_shell/flutter_mondrian.flx",
-            "bootfs_path": "apps/mondrian"
-        },
-        {
-            "binary": "gen/topaz/shell/mondrian_story_shell/examples/manual/example_manual_relationships.flx",
-            "bootfs_path": "apps/example_manual_relationships"
-        }
-    ]
+    "packages": {
+        "mondrian": "//topaz/shell/mondrian_story_shell:mondrian",
+        "mondrian_examples": "//topaz/shell/mondrian_story_shell/examples:mondrian_examples"
+    }
 }

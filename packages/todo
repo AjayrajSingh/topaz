@@ -3,17 +3,7 @@
         "cpp",
         "dart"
     ],
-    "labels": [
-        "//topaz/app/todo"
-    ],
-    "binaries": [
-        {
-            "binary": "gen/topaz/app/todo/modules/story/todo_story.flx",
-            "bootfs_path": "apps/todo_story"
-        },
-        {
-            "binary": "todo_content_provider",
-            "bootfs_path": "apps/todo_content_provider"
-        }
-    ]
+    "packages": {
+        "todo": "//topaz/app/todo"
+    }
 }
