@@ -2,11 +2,61 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("music") {
+import("//packages/package.gni")
+
+package("music") {
+  app = true
+
   deps = [
     "//topaz/app/music/agents",
     "//topaz/app/music/modules",
-    "//topaz/app/music/services",
+  ]
+
+  binaries = [
+    {
+      name = "concert_agent.dartx"
+      dest = "concert_agent"
+    },
+    {
+      name = "gen/topaz/app/music/modules/concert_event/concert_event.flx"
+      dest = "concert_event"
+    },
+    {
+      name = "gen/topaz/app/music/modules/concert_event_list/concert_event_list.flx"
+      dest = "concert_event_list"
+    },
+    {
+      name = "gen/topaz/app/music/modules/concert_event_page/concert_event_page.flx"
+      dest = "concert_event_page"
+    },
+    {
+      name = "last_fm_agent.dartx"
+      dest = "last_fm_agent"
+    },
+    {
+      name = "gen/topaz/app/music/modules/last_fm_artist_bio/last_fm_artist_bio.flx"
+      dest = "last_fm_artist_bio"
+    },
+    {
+      name = "gen/topaz/app/music/modules/music_album/music_album.flx"
+      dest = "music_album"
+    },
+    {
+      name = "gen/topaz/app/music/modules/music_artist/music_artist.flx"
+      dest = "music_artist"
+    },
+    {
+      name = "music_artist_agent.dartx"
+      dest = "music_artist_agent"
+    },
+    {
+      name = "gen/topaz/app/music/modules/music_playback/music_playback.flx"
+      dest = "music_playback"
+    },
+    {
+      name = "music_playback_agent.dartx"
+      dest = "music_playback_agent"
+    },
   ]
 }
 

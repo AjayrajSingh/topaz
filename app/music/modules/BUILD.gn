@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 group("modules") {
-  deps = [
+  public_deps = [
     "concert_event",
     "concert_event_list",
     "concert_event_page",
