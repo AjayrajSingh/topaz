@@ -23,7 +23,7 @@ class RoundedCornerDecoration extends Decoration {
       new _RoundedCornerBoxPainter(radius: radius, color: color);
 
   @override
-  bool hitTest(Size size, Offset position) => false;
+  bool hitTest(Size size, Offset position, { TextDirection textDirection }) => false;
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
