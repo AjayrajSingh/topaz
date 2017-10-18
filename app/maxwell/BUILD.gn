@@ -4,7 +4,6 @@
 
 group("maxwell") {
   deps = [
-    "agents",
     "modules",
   ]
 }
