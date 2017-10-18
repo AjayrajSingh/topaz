@@ -5,7 +5,7 @@
 import("//third_party/flutter/build/flutter_app.gni")
 
 group("manual") {
-  deps = [
+  public_deps = [
     ":example_manual_relationships",
   ]
 }

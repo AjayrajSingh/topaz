@@ -2,8 +2,17 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("examples") {
+import("//packages/package.gni")
+
+package("mondrian_examples") {
+  app = true
+
   deps = [
     "manual",
   ]
+
+  binaries = [ {
+        name = "gen/topaz/shell/mondrian_story_shell/examples/manual/example_manual_relationships.flx"
+        dest = "example_manual_relationships"
+      } ]
 }
