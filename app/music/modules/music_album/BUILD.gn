@@ -17,7 +17,7 @@ flutter_app("music_album") {
     "//lib/flutter/packages/flutter",
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/story/fidl:fidl_dart",
-    "//third_party/dart-pkg/pub/intl",
+    "//third_party/dart/third_party/pkg/intl",
     "//topaz/app/music/packages/music_api",
     "//topaz/app/music/packages/music_models",
     "//topaz/app/music/packages/music_widgets",
