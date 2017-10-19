@@ -235,8 +235,7 @@ BoxConstraints _getAdditionalConstraints(String label) {
       height: 2 * _kReactionRadius + _getAdditionalHeightForLabel(label));
 }
 
-class _RenderIconSlider extends RenderConstrainedBox
-    implements SemanticsActionHandler {
+class _RenderIconSlider extends RenderConstrainedBox {
   _RenderIconSlider({
     @required double value,
     int divisions,
@@ -607,31 +606,25 @@ class _RenderIconSlider extends RenderConstrainedBox
   }
 
   @override
-  bool get isSemanticBoundary => isInteractive;
+  void describeSemanticsConfiguration(SemanticsConfiguration config) {
+    super.describeSemanticsConfiguration(config);
 
-  @override
-  SemanticsAnnotator get semanticsAnnotator => _annotate;
-
-  void _annotate(SemanticsNode semantics) {
+    config.isSemanticBoundary = isInteractive;
     if (isInteractive) {
-      semantics.addAdjustmentActions();
+      config..addAction(SemanticsAction.increase, _increaseAction)
+          ..addAction(SemanticsAction.decrease, _decreaseAction);
     }
   }
 
-  @override
-  void performAction(SemanticsAction action) {
-    switch (action) {
-      case SemanticsAction.increase:
-        if (isInteractive)
-          onChanged((value + _kAdjustmentUnit).clamp(0.0, 1.0));
-        break;
-      case SemanticsAction.decrease:
-        if (isInteractive)
-          onChanged((value - _kAdjustmentUnit).clamp(0.0, 1.0));
-        break;
-      default:
-        assert(false);
-        break;
-    }
+  double get _semanticActionUnit => divisions != null ? 1.0 / divisions : _kAdjustmentUnit;
+
+  void _increaseAction() {
+    if (isInteractive)
+      onChanged((value + _semanticActionUnit).clamp(0.0, 1.0));
+  }
+
+  void _decreaseAction() {
+    if (isInteractive)
+      onChanged((value - _semanticActionUnit).clamp(0.0, 1.0));
   }
 }
