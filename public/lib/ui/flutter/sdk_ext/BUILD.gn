@@ -9,7 +9,7 @@ source_set("sdk_ext") {
   ]
 
   deps = [
-    "//dart/runtime:dart_api",
+    "//third_party/dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
     "//garnet/public/lib/ui/views/fidl",
     "//topaz/lib/tonic",

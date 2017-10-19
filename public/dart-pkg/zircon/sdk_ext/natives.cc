@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "dart-pkg/zircon/sdk_ext/handle.h"
 #include "dart-pkg/zircon/sdk_ext/handle_waiter.h"
 #include "dart-pkg/zircon/sdk_ext/system.h"

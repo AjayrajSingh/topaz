@@ -30,7 +30,7 @@ source_set("sdk_ext") {
   ]
 
   deps = [
-    "//dart/runtime:dart_api",
+    "//third_party/dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
     "//zircon/system/ulib/async:default",
     "//zircon/system/ulib/zx",

@@ -22,7 +22,7 @@ source_set("sdk_ext") {
   ]
 
   deps = [
-    "//dart/runtime:dart_api",
+    "//third_party/dart/runtime:dart_api",
     "//garnet/public/lib/fidl/cpp/bindings",
     "//garnet/public/lib/fxl",
     "//zircon/system/ulib/zx",

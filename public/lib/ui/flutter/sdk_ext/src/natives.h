@@ -5,7 +5,7 @@
 #ifndef LIB_UI_FLUTTER_SDK_EXT_SRC_NATIVES_H_
 #define LIB_UI_FLUTTER_SDK_EXT_SRC_NATIVES_H_
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 
 namespace mozart {
 class View;

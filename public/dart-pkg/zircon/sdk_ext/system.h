@@ -7,7 +7,7 @@
 
 #include <zircon/syscalls.h>
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "dart-pkg/zircon/sdk_ext/handle.h"
 #include "lib/tonic/dart_library_natives.h"
 #include "lib/tonic/dart_wrappable.h"
