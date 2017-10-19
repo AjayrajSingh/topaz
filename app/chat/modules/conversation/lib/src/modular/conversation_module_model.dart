@@ -27,7 +27,7 @@ import '../models.dart';
 import '../widgets.dart';
 
 const String _kChatContentProviderUrl =
-    'file:///system/apps/hangouts/content_provider';
+    'file:///system/apps/chat_content_provider';
 const String _kGalleryModuleUrl = 'file:///system/apps/gallery';
 
 const Duration _kScrollAnimationDuration = const Duration(milliseconds: 300);

@@ -26,7 +26,7 @@ import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
 import '../models.dart';
 
 const String _kChatContentProviderUrl =
-    'file:///system/apps/hangouts/content_provider';
+    'file:///system/apps/chat_content_provider';
 const String _kChatConversationModuleUrl =
     'file:///system/apps/chat_conversation';
 
