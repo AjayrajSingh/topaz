@@ -33,8 +33,8 @@ class ApplicationContext {
 
     final Handle outgoingServicesHandle = MxStartupInfo.takeOutgoingServices();
     if (outgoingServicesHandle != null) {
-      context.outgoingServices.bind(
-          new InterfaceRequest<ServiceProvider>(new Channel(outgoingServicesHandle)));
+      context.outgoingServices.bind(new InterfaceRequest<ServiceProvider>(
+          new Channel(outgoingServicesHandle)));
     }
 
     return context;
@@ -51,7 +51,8 @@ class ApplicationContext {
 void connectToService(
     ServiceProvider serviceProvider, ProxyController controller) {
   final String serviceName = controller.serviceName;
-  if (serviceName == null) return;
+  assert(serviceName != null,
+      'controller.serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
   serviceProvider.connectToService(
       serviceName, controller.request().passChannel());
 }
