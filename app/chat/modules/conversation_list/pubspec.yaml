@@ -8,7 +8,7 @@ dependencies:
   flutter:
     sdk: flutter
   lib.widgets:
-    path: ../../../../lib/widgets/packages/widgets
+    path: ../../../../public/dart/widgets
   fixtures:
     path: ../../../../public/dart/fixtures
   widget_explorer_meta:
