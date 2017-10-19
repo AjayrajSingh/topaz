@@ -23,7 +23,7 @@ flutter_app("armadillo_user_shell") {
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
-    "//third_party/dart-pkg/pub/intl",
+    "//third_party/dart/third_party/pkg/intl",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
