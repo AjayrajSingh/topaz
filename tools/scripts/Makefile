@@ -150,7 +150,7 @@ coverage: dart-coverage ## Show coverage for this project.
 presubmit: build lint test ## Run the presubmit tests for this project.
 
 .PHONY: presubmit-cq
-presubmit-cq: build lint
+presubmit-cq: presubmit
 
 .PHONY: lint
 lint: copyright-check dart-lint dart-fmt-check gn-fmt-check ## Lint the code.
@@ -209,10 +209,13 @@ dart-fmt-check: $(dart_bin) $(tools_root)/dartfmt_extras/.packages
 	fi
 
 .PHONY: dart-test
-dart-test: $(dart_bin)
-	@$(scripts_dir)/run_dart_tests.py
-	@## Remove the .packages files to sanitize the Atom dart analysis.
-	@rm -f $(addsuffix "/.packages",$(dart_gn_packages))
+dart-test: build
+	@set +u; source $(fuchsia_root)/scripts/env.sh && \
+	fset $(FUCHSIA_GEN_TARGET) $(FSET_FLAGS) && \
+	$(fuchsia_root)/scripts/run-dart-action.py test \
+			--out=$(fuchsia_out)/$(FUCHSIA_VARIANT)-$(FUCHSIA_GEN_TARGET) \
+			--tree=//topaz/$(PROJECT)/* \
+			--verbose
 
 .PHONY: dart-coverage
 dart-coverage: $(dart_bin)
