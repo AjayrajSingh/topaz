@@ -7,11 +7,11 @@
         "garnet/packages/zlib"
     ],
     "labels": [
-        "//dart/runtime/bin:dart",
-        "//dart/runtime/bin:dart_precompiled_runtime",
-        "//dart/runtime/bin:hello_fuchsia",
-        "//dart/runtime/bin:hello_fuchsia_dylib",
-        "//dart:create_sdk"
+        "//third_party/dart/runtime/bin:dart",
+        "//third_party/dart/runtime/bin:dart_precompiled_runtime",
+        "//third_party/dart/runtime/bin:hello_fuchsia",
+        "//third_party/dart/runtime/bin:hello_fuchsia_dylib",
+        "//third_party/dart:create_sdk"
     ],
     "binaries": [
         {
