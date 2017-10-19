@@ -13,7 +13,7 @@ action("generate_snapshot_bin") {
   }
 
   deps = [
-    "//dart/runtime/bin:$gen_snapshot_exe($host_toolchain)",
+    "//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)",
   ]
 
   inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files + [
@@ -30,9 +30,9 @@ action("generate_snapshot_bin") {
   ]
 
   gen_snapshot_dir =
-      get_label_info("//dart/runtime/bin:$gen_snapshot_exe($host_toolchain)",
+      get_label_info("//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)",
                      "root_out_dir")
-  script = "//dart/runtime/tools/create_snapshot_bin.py"
+  script = "//third_party/dart/runtime/tools/create_snapshot_bin.py"
 
   fuchsia_builtin_path = rebase_path("builtin.dart")
   zircon_path = rebase_path(zircon_sdk_ext_lib)
@@ -77,7 +77,7 @@ action("generate_snapshot_file") {
     snapshot_file,
   ]
 
-  script = "//dart/runtime/tools/create_snapshot_file.py"
+  script = "//third_party/dart/runtime/tools/create_snapshot_file.py"
   args = [
     "--vm_input_bin",
     rebase_path(vm_input_bin),

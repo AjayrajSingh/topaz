@@ -11,13 +11,13 @@ executable("snapshotter") {
 
   if (is_debug) {
     dart_deps = [
-      "//dart/runtime:libdart_jit",
-      "//dart/runtime/platform:libdart_platform",
+      "//third_party/dart/runtime:libdart_jit",
+      "//third_party/dart/runtime/platform:libdart_platform",
     ]
   } else {
     dart_deps = [
-      "//dart/runtime:libdart_jit_product",
-      "//dart/runtime/platform:libdart_platform_product",
+      "//third_party/dart/runtime:libdart_jit_product",
+      "//third_party/dart/runtime/platform:libdart_platform_product",
     ]
   }
 
@@ -42,13 +42,13 @@ executable("aot_snapshotter") {
 
   if (is_debug) {
     dart_deps = [
-      "//dart/runtime:libdart_with_precompiler",
-      "//dart/runtime/platform:libdart_platform",
+      "//third_party/dart/runtime:libdart_with_precompiler",
+      "//third_party/dart/runtime/platform:libdart_platform",
     ]
   } else {
     dart_deps = [
-      "//dart/runtime:libdart_with_precompiler_product",
-      "//dart/runtime/platform:libdart_platform_product",
+      "//third_party/dart/runtime:libdart_with_precompiler_product",
+      "//third_party/dart/runtime/platform:libdart_platform_product",
     ]
   }
 

@@ -7,8 +7,8 @@
 #include <zx/channel.h>
 #include <fdio/namespace.h>
 
-#include "dart/runtime/bin/io_natives.h"
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/bin/io_natives.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"

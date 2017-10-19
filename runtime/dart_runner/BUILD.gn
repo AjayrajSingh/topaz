@@ -30,18 +30,18 @@ template("runner") {
     # those features.
     if (is_debug) {
       dart_deps = [
-        "//dart/runtime/bin:embedded_dart_io",
+        "//third_party/dart/runtime/bin:embedded_dart_io",
 
         # TODO(abarth): We shouldn't need to depend on libdart_builtin but we
         # fail to link otherwise.
-        "//dart/runtime/bin:libdart_builtin",
-        "//dart/runtime/platform:libdart_platform",
+        "//third_party/dart/runtime/bin:libdart_builtin",
+        "//third_party/dart/runtime/platform:libdart_platform",
       ]
     } else {
       dart_deps = [
-        "//dart/runtime/bin:embedded_dart_io_product",
-        "//dart/runtime/bin:libdart_builtin_product",
-        "//dart/runtime/platform:libdart_platform_product",
+        "//third_party/dart/runtime/bin:embedded_dart_io_product",
+        "//third_party/dart/runtime/bin:libdart_builtin_product",
+        "//third_party/dart/runtime/platform:libdart_platform_product",
       ]
     }
 
@@ -61,11 +61,11 @@ runner("dart_runner_bin") {
   extra_defines = []
   extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc" ]
   if (is_debug) {
-    extra_deps += [ "//dart/runtime:libdart_jit" ]
+    extra_deps += [ "//third_party/dart/runtime:libdart_jit" ]
   } else {
     # Since the Dart content handlers don't have a vmservice, it is safe to
     # link against the PRODUCT mode libraries in a Fuchsia release build.
-    extra_deps += [ "//dart/runtime:libdart_jit_product" ]
+    extra_deps += [ "//third_party/dart/runtime:libdart_jit_product" ]
   }
 }
 
@@ -74,9 +74,9 @@ runner("dart_aot_runner_bin") {
   extra_defines = [ "AOT_RUNTIME" ]
   extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc" ]
   if (is_debug) {
-    extra_deps += [ "//dart/runtime:libdart_precompiled_runtime" ]
+    extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime" ]
   } else {
-    extra_deps += [ "//dart/runtime:libdart_precompiled_runtime_product" ]
+    extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime_product" ]
   }
 }
 

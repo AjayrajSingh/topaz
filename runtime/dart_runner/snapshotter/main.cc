@@ -9,7 +9,7 @@
 #include <string>
 
 #include "topaz/runtime/dart_runner/embedder/snapshot.h"
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/command_line.h"
 #include "lib/fxl/files/directory.h"

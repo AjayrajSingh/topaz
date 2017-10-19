@@ -9,7 +9,7 @@
 
 #include "lib/svc/cpp/service_provider_bridge.h"
 #include "lib/app/fidl/application_runner.fidl.h"
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/fidl/cpp/bindings/binding.h"
 #include "lib/fxl/macros.h"
 
