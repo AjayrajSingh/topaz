@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 root := $(shell git rev-parse --show-toplevel)
-fuchsia_root := $(shell jiri -show-root)
+fuchsia_root ?= $(shell jiri -show-root)
 
 scripts_dir := $(realpath $(fuchsia_root)/topaz/tools/scripts)
 common_makefile := $(realpath $(scripts_dir)/Makefile)
