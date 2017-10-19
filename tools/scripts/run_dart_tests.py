@@ -20,7 +20,7 @@ import subprocess
 import sys
 import threading
 
-REPO_ROOT = os.path.dirname(os.path.dirname(sys.path[0]))
+REPO_ROOT = os.path.dirname(sys.path[0])
 FUCHSIA_ROOT = os.path.dirname(os.path.dirname(REPO_ROOT))
 WORKING_DIR = os.getcwd()
 

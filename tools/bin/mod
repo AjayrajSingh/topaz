@@ -4,7 +4,7 @@
 # found in the LICENSE file.
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-MOD_TOOL_DIR=${DIR}/../tools/mod
+MOD_TOOL_DIR=${DIR}/../mod
 SNAPSHOT_PATH=${MOD_TOOL_DIR}/bin/mod.dart.snapshot
 
 # Find the dart executable.

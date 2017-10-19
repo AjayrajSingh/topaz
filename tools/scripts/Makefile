@@ -27,9 +27,9 @@ Before including the common Makefile add "PROJECT := <project>" to \
 endif
 
 root ?= $(shell git rev-parse --show-toplevel)
-fuchsia_root ?= $(realpath $(root)/../..)
-common_root ?= $(realpath $(fuchsia_root)/topaz/tools/tools/common)
-tools_root := $(realpath $(common_root)/..)
+fuchsia_root ?= $(shell jiri -show-root)
+scripts_dir ?= $(realpath $(fuchsia_root)/topaz/tools/scripts)
+tools_root := $(realpath $(scripts_dir)/..)
 fuchsia_out := $(abspath $(fuchsia_root)/out)
 flutter_root := $(fuchsia_root)/lib/flutter
 flutter_bin := $(flutter_root)/bin
@@ -128,14 +128,14 @@ init: ## Set path to pick up deps with: eval $(make init)
 build: build-override ## Build Fuchsia with project.
 	@FUCHSIA_DIR=$(fuchsia_root) \
 		MAKEFLAGS="$(filter-out --warn-undefined-variables,$(MAKEFLAGS))" \
-		$(common_root)/build.sh $(BUILD_FLAGS)
+		$(scripts_dir)/build.sh $(BUILD_FLAGS)
 
 .PHONY: clean
 clean: dart-clean ## Clean build artifacts from this project.
 
 .PHONY: reboot
 reboot: ## Reboot connected Fuchsia device.
-	@FUCHSIA_DIR=$(fuchsia_root) $(common_root)/reboot.sh
+	@FUCHSIA_DIR=$(fuchsia_root) $(scripts_dir)/reboot.sh
 
 .PHONY: fmt
 fmt: dart-fmt gn-fmt ## Format the code in this project.
@@ -210,21 +210,21 @@ dart-fmt-check: $(dart_bin) $(tools_root)/dartfmt_extras/.packages
 
 .PHONY: dart-test
 dart-test: $(dart_bin)
-	@$(common_root)/run_dart_tests.py
+	@$(scripts_dir)/run_dart_tests.py
 	@## Remove the .packages files to sanitize the Atom dart analysis.
 	@rm -f $(addsuffix "/.packages",$(dart_gn_packages))
 
 .PHONY: dart-coverage
 dart-coverage: $(dart_bin)
-	@$(common_root)/run_dart_tests.py --coverage
-	@$(common_root)/merge_coverage.sh
-	@$(dart) $(common_root)/report_coverage.dart coverage/lcov.info
+	@$(scripts_dir)/run_dart_tests.py --coverage
+	@$(scripts_dir)/merge_coverage.sh
+	@$(dart) $(scripts_dir)/report_coverage.dart coverage/lcov.info
 	@## Remove the .packages files to sanitize the Atom dart analysis.
 	@rm -f $(addsuffix "/.packages",$(dart_gn_packages))
 
 .PHONY: copyright-check
 copyright-check: ## Check source files for missing copyright.
-	@$(common_root)/copyright-check.sh $(sources)
+	@$(scripts_dir)/copyright-check.sh $(sources)
 
 .PHONY: gn-fmt
 gn-fmt:

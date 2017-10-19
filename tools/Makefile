@@ -3,12 +3,10 @@
 # found in the LICENSE file.
 
 root := $(shell git rev-parse --show-toplevel)
+fuchsia_root := $(shell jiri -show-root)
 
-# Change to suit the project location.
-fuchsia_root := $(realpath $(root)/../..)
-
-common_root := $(realpath $(fuchsia_root)/topaz/tools/tools/common)
-common_makefile := $(realpath $(common_root)/Makefile)
+scripts_dir := $(realpath $(fuchsia_root)/topaz/tools/scripts)
+common_makefile := $(realpath $(scripts_dir)/Makefile)
 
 # The project variable is the path of this project, relative to //topaz.
 PROJECT := tools

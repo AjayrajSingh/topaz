@@ -2,6 +2,9 @@ _book
 node_modules
 third_party
 coverage
-config.json
 .packages
 *.snapshot
+.DS_Store
+.atom/
+.idea
+.pub/
