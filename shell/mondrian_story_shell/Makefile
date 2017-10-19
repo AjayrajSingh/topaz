@@ -3,14 +3,13 @@
 # found in the LICENSE file.
 
 root := $(shell git rev-parse --show-toplevel)
-fuchsia_root := $(realpath $(root)/../..)
-common_root := $(realpath $(fuchsia_root)/topaz/tools/tools/common)
-common_makefile := $(realpath $(common_root)/Makefile)
+fuchsia_root := $(shell jiri -show-root)
 
-# Assumes that the project is located three levels deep in the Fuchsia tree,
-# specifically: $FUCHSIA_DIR/apps/modules/<project>.
-PROJECT := ../mondrian
-FUCHSIA_TARGET := mondrian
+scripts_dir := $(realpath $(fuchsia_root)/topaz/tools/scripts)
+common_makefile := $(realpath $(scripts_dir)/Makefile)
+
+# The project variable is the path of this project, relative to //topaz.
+PROJECT := shell/mondrian_story_shell
 
 include $(common_makefile)
 
