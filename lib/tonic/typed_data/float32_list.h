@@ -5,7 +5,7 @@
 #ifndef LIB_TONIC_TYPED_DATA_FLOAT32_LIST_H_
 #define LIB_TONIC_TYPED_DATA_FLOAT32_LIST_H_
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/tonic/converter/dart_converter.h"
 
 namespace tonic {

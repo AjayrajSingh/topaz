@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/fxl/logging.h"
 
 namespace tonic {

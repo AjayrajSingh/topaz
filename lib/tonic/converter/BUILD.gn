@@ -9,7 +9,7 @@ source_set("converter") {
   ]
 
   public_deps = [
-    "//dart/runtime:dart_api",
+    "//third_party/dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
   ]
 

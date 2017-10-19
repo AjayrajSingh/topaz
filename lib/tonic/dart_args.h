@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_wrappable.h"
 

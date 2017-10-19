@@ -6,7 +6,7 @@
 #define LIB_TONIC_SCOPES_DART_ISOLATE_SCOPE_H_
 
 #include "lib/fxl/logging.h"
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 
 namespace tonic {
 

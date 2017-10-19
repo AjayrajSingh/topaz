@@ -6,7 +6,7 @@
 #define LIB_TONIC_DART_CLASS_PROVIDER_H_
 
 #include "lib/fxl/macros.h"
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/tonic/dart_persistent_value.h"
 
 namespace tonic {

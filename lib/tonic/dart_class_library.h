@@ -8,7 +8,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/fxl/macros.h"
 #include "lib/tonic/dart_class_provider.h"
 

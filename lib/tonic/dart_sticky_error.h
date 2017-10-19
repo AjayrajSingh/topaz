@@ -5,7 +5,7 @@
 #ifndef LIB_TONIC_DART_STICKY_ERROR_H_
 #define LIB_TONIC_DART_STICKY_ERROR_H_
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 
 namespace tonic {
 

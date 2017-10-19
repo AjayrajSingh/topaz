@@ -9,7 +9,7 @@
 #include <set>
 #include <string>
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/fxl/macros.h"
 #include "lib/tonic/parsers/packages_map.h"
 

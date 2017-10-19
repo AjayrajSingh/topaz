@@ -5,7 +5,7 @@
 #ifndef LIB_TONIC_DART_MESSAGE_HANDLER_H_
 #define LIB_TONIC_DART_MESSAGE_HANDLER_H_
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/fxl/memory/ref_ptr.h"
 #include "lib/fxl/memory/weak_ptr.h"
 #include "lib/fxl/tasks/task_runner.h"

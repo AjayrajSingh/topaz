@@ -5,7 +5,7 @@
 #ifndef LIB_TONIC_DART_WRAPPABLE_H_
 #define LIB_TONIC_DART_WRAPPABLE_H_
 
-#include "dart/runtime/include/dart_api.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/memory/ref_counted.h"
 #include "lib/tonic/converter/dart_converter.h"

@@ -36,7 +36,7 @@ source_set("tonic") {
   ]
 
   public_deps = [
-    "//dart/runtime:dart_api",
+    "//third_party/dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
     "//topaz/lib/tonic/converter",
     "//topaz/lib/tonic/file_loader",
