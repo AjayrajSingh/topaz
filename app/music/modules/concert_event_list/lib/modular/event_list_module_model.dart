@@ -18,8 +18,12 @@ import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 
+import 'event_selector.dart';
+
 /// [ModuleModel] that manages the state of the Event Module.
 class EventListModuleModel extends ModuleModel {
+  final EventSelector _eventSelector = new EventSelector();
+
   /// Constructor
   EventListModuleModel({this.apiKey}) : super() {
     _fetchEvents();
@@ -126,15 +130,19 @@ class EventListModuleModel extends ModuleModel {
   ) {
     super.onReady(moduleContext, link, incomingServices);
     moduleContext.getLink('event_link', _eventLink.ctrl.request());
-    _eventLink.watchAll(_eventLinkWatcherBinding.wrap(new LinkWatcherImpl(
-      onNotify: _onNotifyChild,
-    )));
+    _eventLink.watchAll(
+      _eventLinkWatcherBinding.wrap(
+        new LinkWatcherImpl(onNotify: _onNotifyChild),
+      ),
+    );
+    _eventSelector.start(moduleContext);
   }
 
   @override
   void onStop() {
     _eventPageModuleController.ctrl.close();
     _eventLink?.ctrl?.close();
+    _eventSelector.stop();
   }
 
   @override
@@ -144,5 +152,25 @@ class EventListModuleModel extends ModuleModel {
       _deviceMode = profileMap['mode'];
       notifyListeners();
     }
+  }
+
+  @override
+  void notifyListeners() {
+    // Deregister all old artists as selectable w.r.t. hotwords.
+    _eventSelector.deregisterAllEvents();
+
+    // Register all new artists as selectable w.r.t. hotwords.
+    for (Event event in events) {
+      String artistName = event.performances.first.artist?.name;
+      if (artistName != null) {
+        _eventSelector.registerEvent(
+          event.id.toString(),
+          artistName,
+          () => selectEvent(event),
+        );
+      }
+    }
+
+    super.notifyListeners();
   }
 }
