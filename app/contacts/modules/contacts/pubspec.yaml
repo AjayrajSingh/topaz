@@ -10,7 +10,7 @@ dependencies:
   fixtures:
     path: ../../../../public/dart/fixtures
   lib.widgets:
-    path: ../../../../lib/widgets/packages/widgets
+    path: ../../../../public/dart/widgets
   widget_explorer_meta:
     path: ../../../../tools/widget_explorer/packages/widget_explorer_meta
 dev_dependencies:

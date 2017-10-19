@@ -8,9 +8,9 @@ dependencies:
   flutter:
     sdk: flutter
   lib.widgets:
-    path: ../../../../lib/widgets/packages/widgets
+    path: ../../../../public/dart/widgets
   lib.logging:
-    path: ../../../../lib/widgets/packages/logging
+    path: ../../../../public/dart/logging
 dev_dependencies:
   test: any
   flutter_test:
