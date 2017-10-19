@@ -3,10 +3,7 @@
 # found in the LICENSE file.
 
 import("//packages/package.gni")
-
-declare_args() {
-  use_prebuilt_webkit = true
-}
+import("//topaz/runtime/web_view/config.gni")
 
 executable("web_view_bin") {
   output_name = "web_view"
@@ -44,7 +41,7 @@ executable("web_view_bin") {
 }
 
 group("webkit") {
-  visibility = [ ":*" ]
+  visibility = [ "//topaz/*" ]
 
   if (use_prebuilt_webkit) {
     public_configs = [ ":prebuilt_webkit_config" ]
