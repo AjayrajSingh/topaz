@@ -125,7 +125,9 @@ class Chatter {
               .where(
                 (chat.Conversation conversation) =>
                     const ListEquality<String>().equals(
-                      conversation.participants,
+                      conversation.participants
+                          .map((chat.Participant p) => p.email)
+                          .toList(),
                       _kDashboardParticipants,
                     ),
               )
@@ -137,7 +139,9 @@ class Chatter {
           } else {
             log.fine('No existing chat, create a new one!');
             _chatContentProvider.newConversation(
-              _kDashboardParticipants,
+              _kDashboardParticipants
+                  .map((String email) => new chat.Participant()..email = email)
+                  .toList(),
               (chat.ChatStatus status, chat.Conversation conversation) {
                 if (status != chat.ChatStatus.ok) {
                   log.severe('Couldn\'t create new chat!');
