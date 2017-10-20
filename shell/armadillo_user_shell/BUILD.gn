@@ -17,8 +17,8 @@ flutter_app("armadillo_user_shell") {
 
   deps = [
     "//garnet/public/lib/power/fidl:fidl_dart",
-    "//lib/flutter/packages/flutter",
-    "//lib/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",

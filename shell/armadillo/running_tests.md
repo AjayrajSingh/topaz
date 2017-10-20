@@ -6,8 +6,8 @@ between the two:
 
 To run flutter tests:
 1. ``cd <fuchsia_root>/<flutter app directory>``
-1. ``<fuchsia_root>/lib/flutter/bin/flutter upgrade``
-1. ``<fuchsia_root>/lib/flutter/bin/flutter test``
+1. ``<fuchsia_root>/third_party/dart-pkg/git/flutter/bin/flutter upgrade``
+1. ``<fuchsia_root>/third_party/dart-pkg/git/flutter/bin/flutter test``
 
 To build Fuchsia:
 1. ``rm -Rf <fuchsia_root>/out/debug-x86-64/gen/``

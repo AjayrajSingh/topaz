@@ -19,7 +19,7 @@ flutter_app("userpicker_device_shell") {
     "//garnet/public/lib/ui/input/fidl:fidl_dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//garnet/public/lib/wlan/fidl:fidl_dart",
-    "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//peridot/public/lib/auth/fidl/account:account_dart",
     "//peridot/public/lib/device/fidl:fidl_dart",
     "//topaz/public/dart/logging:lib.logging",
@@ -36,7 +36,7 @@ dart_test("test") {
 
   deps = [
     ":userpicker_device_shell_dart_package",
-    "//lib/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]
 }
