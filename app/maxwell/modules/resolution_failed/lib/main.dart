@@ -12,8 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
-final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
-
 class ModuleDataScreen extends StoreWatcher {
   ModuleDataScreen({Key key}) : super(key: key);
 
