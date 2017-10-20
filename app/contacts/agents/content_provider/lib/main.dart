@@ -12,6 +12,7 @@ import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
 
 import 'src/modular/contacts_content_provider_impl.dart';
 
+// ignore: unused_element
 ContactsContentProviderAgent _agent;
 
 /// Contacts content provider implementation of the [Agent] interface.

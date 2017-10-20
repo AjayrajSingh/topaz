@@ -9,8 +9,6 @@ import 'package:meta/meta.dart';
 import '../models.dart';
 import 'type_defs.dart';
 
-const double _kAvatarSize = 40.0;
-
 /// UI widget representing a [Contact] in list view
 class ContactListItem extends StatelessWidget {
   /// [Contact] for this list item
