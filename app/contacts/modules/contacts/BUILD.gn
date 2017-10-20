@@ -12,7 +12,7 @@ flutter_app("contacts") {
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/story/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/googleapis",
@@ -30,7 +30,7 @@ flutter_app("contacts") {
 
 dart_test("test") {
   deps = [
-    "//lib/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
     "//topaz/app/contacts/modules/contacts:contacts_dart_package",
   ]
