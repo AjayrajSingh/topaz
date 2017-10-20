@@ -9,11 +9,6 @@ import 'package:lib.widgets/model.dart';
 
 import 'model.dart';
 
-const Duration _fadeAnimationDuration = const Duration(seconds: 1);
-const double _fadeToScaleRatio = 0.2;
-const double _fadeMinScale = 0.6;
-const Curve _fadeCurve = Curves.fastOutSlowIn;
-
 /// Frame for child views
 class MondrianChildView extends StatelessWidget {
   /// Constructor

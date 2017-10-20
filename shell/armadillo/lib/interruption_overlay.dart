@@ -15,9 +15,6 @@ import 'suggestion_widget.dart';
 const Duration _kInterruptionShowingTimeout =
     const Duration(milliseconds: 3500);
 
-const Duration _kInterruptionExitingTimeout =
-    const Duration(milliseconds: 3500);
-
 double _kBottomSpacing = 24.0;
 
 enum _RemoveDirection {

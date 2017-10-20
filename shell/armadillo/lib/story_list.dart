@@ -25,8 +25,6 @@ import 'story_list_layout.dart';
 import 'story_model.dart';
 import 'story_rearrangement_scrim_model.dart';
 
-const double _kStoryInlineTitleHeight = 20.0;
-
 /// Displays the [StoryCluster]s of it's ancestor [StoryModel].
 class StoryList extends StatelessWidget {
   /// Called when the story list scrolls.

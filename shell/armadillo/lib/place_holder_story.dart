@@ -2,15 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/widgets.dart';
-
 import 'nothing.dart';
 import 'panel_drag_targets.dart';
 import 'story.dart';
 import 'story_cluster.dart';
 import 'story_panels.dart';
-
-const Color _kBackgroundColor = const Color(0x40E6E6E6);
 
 /// A [Story] with no content.  This is used in place of a real story within a
 /// [StoryCluster] to take up empty visual space in [StoryPanels] when

@@ -11,22 +11,6 @@ import 'elevations.dart';
 import 'suggestion.dart';
 import 'suggestion_layout.dart';
 
-const bool _kIconsDisabled = true;
-
-/// Spacing between lines of text and between the text and icon bar.
-const double _kVerticalSpacing = 8.0;
-
-/// A fudgefactor to add to the bottom of the icon bar to make the text with
-/// icon bar appear centered.  This compensates for the ascender height of the
-/// suggestion text font.
-const double _kIconBarBottomMargin = 4.0;
-
-/// Height of the icon bar and the size of its square icons.
-const double _kIconSize = 16.0;
-
-/// Spacing between icons in the icon bar.
-const double _kIconSpacing = 8.0;
-
 /// Gives each suggestion a slight rounded edge.
 /// TODO(apwilson): We may want to animate this to zero when expanding the card
 /// to fill the screen.

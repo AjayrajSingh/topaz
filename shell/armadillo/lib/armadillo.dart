@@ -17,7 +17,6 @@ import 'wrapper_builder.dart';
 export 'wrapper_builder.dart' show WrapperBuilder;
 
 const Color _kBackgroundOverlayColor = const Color(0xB0000000);
-const double _kDeviceScreenInnerBezelRadius = 8.0;
 
 /// [Armadillo] is the main Widget.  Its purpose is to set up [Model]s the rest
 /// of the Widgets depend upon. It uses the [Conductor] to display the actual UI

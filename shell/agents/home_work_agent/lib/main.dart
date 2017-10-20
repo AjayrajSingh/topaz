@@ -12,6 +12,7 @@ import 'package:meta/meta.dart';
 
 import 'home_work_proposer.dart';
 
+// ignore: unused_element
 HomeWorkAgent _agent;
 
 /// An implementation of the [Agent] interface.

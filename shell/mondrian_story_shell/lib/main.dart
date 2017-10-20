@@ -23,6 +23,7 @@ import 'surface_director.dart';
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
 /// This is used for keeping the reference around.
+// ignore: unused_element
 StoryShellFactoryImpl _storyShellFactory;
 
 SurfaceGraph _surfaceGraph;

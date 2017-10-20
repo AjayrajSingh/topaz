@@ -19,7 +19,6 @@ final BorderRadius _kButtonBorderRadiusPhone =
     new BorderRadius.circular(_kUserAvatarSizeSmall / 2.0);
 final BorderRadius _kButtonBorderRadiusLarge =
     new BorderRadius.circular(_kUserAvatarSizeLarge / 2.0);
-final Color _kButtonBackgroundColor = Colors.white.withAlpha(100);
 
 /// Shows the list of users and allows the user to add new users
 class UserList extends StatelessWidget {

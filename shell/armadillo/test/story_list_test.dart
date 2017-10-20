@@ -16,9 +16,7 @@ import 'package:armadillo/story_rearrangement_scrim_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/widgets.dart';
 
-const int _kStoryCount = 4;
 const double _kWidthSingleColumn = 500.0;
-const double _kHorizontalMarginsSingleColumn = 16.0;
 const double _kWidthMultiColumn = 700.0;
 const double _kHeight = 600.0;
 

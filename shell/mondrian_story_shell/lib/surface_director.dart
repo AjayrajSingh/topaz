@@ -15,8 +15,6 @@ import 'surface_form.dart';
 import 'surface_stage.dart';
 import 'tree.dart';
 
-const double _kFadeToDepthRatio = 3.0;
-
 /// Directs the layout of the SurfaceSpace
 class SurfaceDirector extends StatefulWidget {
   @override

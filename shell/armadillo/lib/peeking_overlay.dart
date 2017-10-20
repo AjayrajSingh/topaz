@@ -15,11 +15,6 @@ import 'size_model.dart';
 
 const double _kStartOverlayTransitionHeight = 28.0;
 
-/// The distance the top right corner is inset when peeking.  When hiding, the
-/// top left corner will inset the same distance as the overlay becomes
-/// fully hidden.
-const double _kAngleOffsetY = 0.0;
-
 /// Builds the child which floats vertically above this overlay.
 typedef Widget ChildAboveBuilder(BuildContext context, double overlayHeight);
 

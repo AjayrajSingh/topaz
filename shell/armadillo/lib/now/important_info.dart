@@ -10,8 +10,6 @@ import 'power_model.dart';
 
 const String _kWifiImageGrey600 =
     'packages/armadillo/res/ic_signal_wifi_3_bar_grey600_24dp.png';
-const String _kNetworkSignalImageGrey600 = 'packages/armadillo/res/'
-    'ic_signal_cellular_connected_no_internet_0_bar_grey600_24dp.png';
 
 enum _ImportantInfoLayoutDelegateParts {
   batteryIcon,

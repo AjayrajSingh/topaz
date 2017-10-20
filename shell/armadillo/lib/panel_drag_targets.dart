@@ -28,8 +28,6 @@ import 'story_model.dart';
 import 'target_influence_overlay.dart';
 import 'target_overlay.dart';
 
-const double _kUnfocusedCornerRadius = 4.0;
-const double _kFocusedCornerRadius = 8.0;
 const int _kMaxStoriesPerCluster = 100;
 
 const RK4SpringDescription _kScaleSimulationDesc =

@@ -12,11 +12,6 @@ import 'suggestion.dart';
 /// The suggestion text and icons are horizontally inset by this amount.
 const double _kHorizontalMargin = 24.0;
 
-/// Gives each suggestion a slight rounded edge.
-/// TODO(apwilson): We may want to animate this to zero when expanding the card
-/// to fill the screen.
-const double _kSuggestionCornerRadius = 8.0;
-
 /// The height of a small suggestion.
 const double _kSmallSuggestionHeight = 80.0;
 

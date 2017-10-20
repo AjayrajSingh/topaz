@@ -14,8 +14,6 @@ import 'package:lib.logging/logging.dart';
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
-const String _kBackgroundImage = 'packages/armadillo/res/Background.jpg';
-
 const String _kLocationHomeWorkTopic = 'location/home_work';
 const String _kActivityWalking = 'activity/walking';
 const List<String> _kTopics = const <String>[

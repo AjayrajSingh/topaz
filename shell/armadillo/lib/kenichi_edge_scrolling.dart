@@ -10,7 +10,6 @@ const double _kA = 1.0;
 const double _kB = 0.5;
 const double _kC = 1.5;
 const double _kD = 0.02;
-const double _kE = 2.0;
 const double _kTh1Multiplier = 120.0 / 900.0;
 const double _kTh2Multiplier = 40.0 / 900.0;
 

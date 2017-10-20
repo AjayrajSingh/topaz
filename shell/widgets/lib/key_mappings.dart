@@ -7,7 +7,9 @@ import 'dart:io' show Platform;
 const int _kAndroidMetaStateNormal = 0;
 const int _kAndroidMetaStateLeftShiftDown = 65;
 const int _kAndroidMetaStateRightShiftDown = 129;
+// ignore: unused_element
 const int _kAndroidMetaStateAltDown = 18;
+// ignore: unused_element
 const int _kAndroidMetaStateCtrlDown = 12288;
 
 const Map<int, String> _kAndroidKeyCodeMap = const <int, String>{
@@ -110,7 +112,9 @@ const int _kAndroidKeyCodeBackspace = 67;
 const int _kLinuxMetaStateNormal = 0;
 const int _kLinuxMetaStateLeftShiftDown = 1;
 const int _kLinuxMetaStateRightShiftDown = 1;
+// ignore: unused_element
 const int _kLinuxMetaStateAltDown = 2;
+// ignore: unused_element
 const int _kLinuxMetaStateCtrlDown = 4096;
 
 const Map<int, String> _kLinuxKeyCodeMap = const <int, String>{
