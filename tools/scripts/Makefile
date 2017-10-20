@@ -31,7 +31,7 @@ fuchsia_root ?= $(shell jiri -show-root)
 scripts_dir ?= $(realpath $(fuchsia_root)/topaz/tools/scripts)
 tools_root := $(realpath $(scripts_dir)/..)
 fuchsia_out := $(abspath $(fuchsia_root)/out)
-flutter_root := $(fuchsia_root)/lib/flutter
+flutter_root := $(fuchsia_root)/third_party/dart-pkg/git/flutter
 flutter_bin := $(flutter_root)/bin
 dart_bin := $(flutter_bin)/cache/dart-sdk/bin
 
