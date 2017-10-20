@@ -20,7 +20,7 @@ dart_package("music_widgets") {
 
 dart_test("test") {
   deps = [
-    "//lib/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
     "//topaz/app/music/packages/music_models",
     "//topaz/app/music/packages/music_widgets",
