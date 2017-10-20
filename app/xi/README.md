@@ -205,7 +205,7 @@ Run the Flutter app:
     fgen -m=default,rust
     fbuild
     ${FUCHSIA_DIR}/scripts/symlink-dot-packages.py --tree=//apps/xi/*
-    ${FUCHSIA_DIR}/lib/flutter/bin/flutter run
+    ${FUCHSIA_DIR}/third_party/dart-pkg/git/flutter/bin/flutter run
 
 [flutter]: https://flutter.io/
 [fuchsia]: https://fuchsia.googlesource.com/fuchsia/

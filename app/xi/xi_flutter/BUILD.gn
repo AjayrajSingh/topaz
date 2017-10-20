@@ -13,7 +13,7 @@ dart_package("xi_flutter") {
   deps = [
     "//apps/xi/packages/widgets:xi_widgets",
     "//apps/xi/packages/xi_client",
-    "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/path",
     "//third_party/dart-pkg/pub/path_provider",
   ]

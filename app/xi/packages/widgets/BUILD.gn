@@ -9,7 +9,7 @@ dart_package("xi_widgets") {
 
   deps = [
     "//apps/xi/packages/xi_client",
-    "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
 
   analysis_options = "//apps/xi/.analysis_options"
