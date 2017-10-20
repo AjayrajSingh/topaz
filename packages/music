@@ -7,9 +7,5 @@
     ],
     "packages": {
         "music": "//topaz/app/music"
-    },
-    "components": [
-        "topaz/app/music/modules/music_album/music_album_component.json",
-        "topaz/app/music/modules/music_artist/music_artist_component.json"
-    ]
+    }
 }
