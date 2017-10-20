@@ -16,6 +16,7 @@ final GlobalKey<SurfaceLayoutState> _surfaceLayoutKey =
     new GlobalKey<SurfaceLayoutState>();
 
 /// This is used for keeping the reference around.
+// ignore: unused_element
 StoryShellFactoryImpl _storyShellFactory;
 
 void _log(String msg) {
