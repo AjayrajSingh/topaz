@@ -21,8 +21,6 @@ import 'chat_message_transporter.dart';
 import 'conversation_list_watcher.dart';
 import 'conversation_watcher.dart';
 
-const int _kKeyLengthInBytes = 16;
-
 /// Defines a reserved [Page] for the Ledger instance.
 class _ReservedPage {
   final String name;

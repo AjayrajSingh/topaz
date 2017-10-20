@@ -23,6 +23,7 @@ import 'src/proposer.dart';
 
 const Duration _kTimeout = const Duration(seconds: 3);
 
+// ignore: unused_element
 ChatContentProviderAgent _agent;
 
 /// An implementation of the [Agent] interface.
