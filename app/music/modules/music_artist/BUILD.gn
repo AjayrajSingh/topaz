@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/component/component.gni")
 import("//third_party/flutter/build/flutter_app.gni")
 
 flutter_app("music_artist") {
@@ -33,9 +32,4 @@ flutter_app("music_artist") {
   ]
 
   analysis_options = "//topaz/tools/analysis_options.yaml"
-}
-
-fuchsia_component("music_artist_component") {
-  manifest = "music_artist_component.json"
-  flutter_program = ":music_artist"
 }

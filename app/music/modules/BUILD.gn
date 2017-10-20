@@ -9,9 +9,7 @@ group("modules") {
     "concert_event_page",
     "last_fm_artist_bio",
     "music_album",
-    "music_album:music_album_component",
     "music_artist",
-    "music_artist:music_artist_component",
     "music_playback",
   ]
 }
