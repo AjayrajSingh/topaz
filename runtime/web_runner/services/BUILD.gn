@@ -5,5 +5,7 @@
 import("//garnet/public/lib/fidl/fidl.gni")
 
 fidl("services") {
-  sources = ["web_view.fidl"]
+  sources = [
+    "web_view.fidl",
+  ]
 }
