@@ -9,7 +9,7 @@ dart_package("fixtures") {
   package_name = "fixtures"
 
   deps = [
-    "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/lorem",
     "//third_party/dart-pkg/pub/uuid",
   ]
@@ -19,7 +19,7 @@ dart_package("fixtures") {
 
 dart_test("test") {
   deps = [
-    "//lib/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
     "//topaz/public/dart/fixtures",
   ]
