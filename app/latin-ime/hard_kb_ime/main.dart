@@ -13,8 +13,6 @@ import 'package:lib.ui.input.fidl/input_events.fidl.dart';
 import 'package:lib.ui.input.fidl/text_editing.fidl.dart';
 import 'package:lib.ui.input.fidl/text_input.fidl.dart';
 
-final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
-
 /// The current editor is a global, corresponding to the most recent one
 /// connected.
 _EditSession _currentSession;
@@ -22,7 +20,7 @@ _EditSession _currentSession;
 /// A class representing an editing session.
 class _EditSession {
   final InputMethodEditorClientProxy _client =
-    new InputMethodEditorClientProxy();
+      new InputMethodEditorClientProxy();
   TextInputState _state;
   int _maxRev = 0;
 
@@ -37,10 +35,11 @@ class _EditSession {
   }
 
   void updateState(String text, TextSelection selection, TextRange composing,
-    InputEvent event) {
+      InputEvent event) {
     // increment to next odd revision
     int newRev = _maxRev + (_maxRev & 1) + 1;
-    TextInputState newState = new TextInputState.init(newRev, text, selection, composing);
+    TextInputState newState =
+        new TextInputState.init(newRev, text, selection, composing);
     _maxRev = newRev;
     _state = newState;
     _client.didUpdateState(newState, event);
@@ -55,15 +54,16 @@ class _EditSession {
   bool onEvent(InputEvent event) {
     if (event.tag == InputEventTag.keyboard) {
       final kbEvent = event.keyboard;
-      if (kbEvent.phase == KeyboardEventPhase.pressed && kbEvent.codePoint != 0) {
+      if (kbEvent.phase == KeyboardEventPhase.pressed &&
+          kbEvent.codePoint != 0) {
         // TODO: handle combining characters
         String newChar = new String.fromCharCode(kbEvent.codePoint);
         int start = min(_state.selection.base, _state.selection.extent);
         int end = max(_state.selection.base, _state.selection.extent);
         String newText = _state.text.replaceRange(start, end, newChar);
         int cursor = start + newChar.length;
-        TextSelection newSelection = new TextSelection.init(
-          cursor, cursor, TextAffinity.downstream);
+        TextSelection newSelection =
+            new TextSelection.init(cursor, cursor, TextAffinity.downstream);
         updateState(newText, newSelection, new TextRange(), event);
         return true;
       }
@@ -77,7 +77,7 @@ class _EditSession {
 class InputListenerImpl extends InputListener {
   final InputListenerBinding _binding = new InputListenerBinding();
 
-  void bind(InterfaceRequest<InputListener > request) {
+  void bind(InterfaceRequest<InputListener> request) {
     _binding.bind(this, request);
   }
 
@@ -128,12 +128,11 @@ class ImeServiceImpl extends ImeService {
 
   @override
   void getInputMethodEditor(
-    KeyboardType keyboardType,
-    InputMethodAction action,
-    TextInputState initialState,
-    InterfaceHandle<InputMethodEditorClient> client,
-    InterfaceRequest<InputMethodEditor> editor
-  ) {
+      KeyboardType keyboardType,
+      InputMethodAction action,
+      TextInputState initialState,
+      InterfaceHandle<InputMethodEditorClient> client,
+      InterfaceRequest<InputMethodEditor> editor) {
     // Shut down the old session; we only have one active at a time.
     _currentSession?.close();
 
