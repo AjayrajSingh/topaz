@@ -11,10 +11,6 @@ import 'package:lib.widgets/widgets.dart';
 import 'build_status_model.dart';
 import 'info_text.dart' show toConciseString;
 
-const double _kSpaceBetween = 4.0;
-
-const Color _kFuchsiaColor = const Color(0xFFFF0080);
-
 /// Displays a build status using its ancestor [BuildStatusModel].
 class BuildStatusWidget extends StatefulWidget {
   /// Called then the widget is tapped.
