@@ -28,10 +28,6 @@ final TextStyle _kSubtitleStyle = new TextStyle(
 /// Color for default failure message
 final Color _kFailureTextColor = Colors.grey[500];
 
-/// Mininum height for the [EventCard]
-/// Primarily used so that the loading/error state views look decent
-const double _kMinCardHeight = 200.0;
-
 /// UI Widget that represents a card for an [Event]
 class EventCard extends StatelessWidget {
   /// [Event] that this card represents

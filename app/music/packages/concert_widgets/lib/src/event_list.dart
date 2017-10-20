@@ -14,7 +14,6 @@ import 'event_list_item.dart';
 import 'typedefs.dart';
 
 const double _kMinHeaderHeight = 160.0;
-const double _kLogoSize = 48.0;
 const double _kEventGridMinWidth = 300.0;
 const double _kEventGridAspectRatio = 1.2;
 const double _kEventListHeight = 96.0;

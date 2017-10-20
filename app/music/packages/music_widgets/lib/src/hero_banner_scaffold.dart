@@ -30,10 +30,6 @@ const double _kHeroBannerHorizontalPadding = 52.0;
 /// The maximum width of the main content section below the header.
 const double _kBodyMaxWidth = 1000.0;
 
-/// The mininum height of the body section, primarily used to reduce "flow jank"
-/// during the transition from loading to completed states.
-const double _kMinBodyHeight = 200.0;
-
 /// Default background color used behind the body
 final Color _kDefaultBackgroundColor = Colors.grey[300];
 
