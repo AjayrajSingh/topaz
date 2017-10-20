@@ -11,7 +11,7 @@ flutter_app("hello_material") {
   source_dir = "."
 
   deps = [
-    "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
 }
 

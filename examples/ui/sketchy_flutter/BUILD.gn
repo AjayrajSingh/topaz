@@ -11,7 +11,7 @@ flutter_app("sketchy_flutter") {
   deps = [
     "//garnet/public/lib/ui/scenic/fidl:fidl_dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//lib/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/lib/ui/flutter",
   ]
 }
