@@ -8,8 +8,6 @@ import 'package:lib.widgets/model.dart';
 import '../modular/player_model.dart';
 import '../widgets.dart';
 
-const double _kZoomTimeInMicroseconds = 3000000.0;
-
 /// The time slider/scrubber for the video player
 class Scrubber extends StatelessWidget {
   /// Constructor for the time slider/scrubber for the video player
