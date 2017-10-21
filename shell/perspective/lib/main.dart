@@ -112,68 +112,77 @@ Future<Null> main() async {
   _VideoModel videoModel = new _VideoModel(controller: controller);
 
   runApp(
-    new Directionality(
-      textDirection: TextDirection.ltr,
-      child: new WindowMediaQuery(
-        child: new GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => videoModel.hideVideo(),
-          child: new Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              // Album Maker.
-              new Positioned(
-                left: 0.0,
-                top: 0.0,
-                bottom: 0.0,
-                width: _kAlbumMakerWidth,
-                child: new _AlbumMaker(),
-              ),
+    new LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) => constraints
+                      .biggest.width ==
+                  0.0 ||
+              constraints.biggest.height == 0.0
+          ? const Offstage()
+          : new Directionality(
+              textDirection: TextDirection.ltr,
+              child: new WindowMediaQuery(
+                child: new GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => videoModel.hideVideo(),
+                  child: new Stack(
+                    fit: StackFit.expand,
+                    children: <Widget>[
+                      // Album Maker.
+                      new Positioned(
+                        left: 0.0,
+                        top: 0.0,
+                        bottom: 0.0,
+                        width: _kAlbumMakerWidth,
+                        child: new _AlbumMaker(),
+                      ),
 
-              // Photo list.
-              new Positioned(
-                right: 0.0,
-                bottom: 0.0,
-                width: _kPhotoListWidth,
-                height: _kPhotoListHeight,
-                child: new _PhotoList(
-                  onVideoTapped: () => videoModel.toggleVideo(),
-                ),
-              ),
+                      // Photo list.
+                      new Positioned(
+                        right: 0.0,
+                        bottom: 0.0,
+                        width: _kPhotoListWidth,
+                        height: _kPhotoListHeight,
+                        child: new _PhotoList(
+                          onVideoTapped: () => videoModel.toggleVideo(),
+                        ),
+                      ),
 
-              // Auto Magic Button.
-              new Positioned(
-                right: _kPhotoListWidth - _kAutoMagicHorizontalOverlap,
-                bottom: _kAutoMagicBottomOffset,
-                width: _kAutoMagicSize,
-                height: _kAutoMagicSize,
-                child: new _AutoMagicButton(),
-              ),
+                      // Auto Magic Button.
+                      new Positioned(
+                        right: _kPhotoListWidth - _kAutoMagicHorizontalOverlap,
+                        bottom: _kAutoMagicBottomOffset,
+                        width: _kAutoMagicSize,
+                        height: _kAutoMagicSize,
+                        child: new _AutoMagicButton(),
+                      ),
 
-              // Video Player.
-              new Center(
-                child: new SizedBox(
-                  width: _kVideoPlayerWidth,
-                  height: _kVideoPlayerHeight,
-                  child: new ScopedModel<_VideoModel>(
-                    model: videoModel,
-                    child: new LayoutBuilder(
-                      builder: (_, BoxConstraints constraints) =>
-                          (constraints.maxWidth == 0.0 ||
-                                  constraints.maxHeight == 0.0)
-                              ? const Offstage()
-                              : new ScopedModelDescendant<_VideoModel>(
-                                  builder: (_, __, _VideoModel videoModel) =>
-                                      new _VideoPlayer(videoModel: videoModel),
-                                ),
-                    ),
+                      // Video Player.
+                      new Center(
+                        child: new SizedBox(
+                          width: _kVideoPlayerWidth,
+                          height: _kVideoPlayerHeight,
+                          child: new ScopedModel<_VideoModel>(
+                            model: videoModel,
+                            child: new LayoutBuilder(
+                              builder: (_, BoxConstraints constraints) =>
+                                  (constraints.maxWidth == 0.0 ||
+                                          constraints.maxHeight == 0.0)
+                                      ? const Offstage()
+                                      : new ScopedModelDescendant<_VideoModel>(
+                                          builder:
+                                              (_, __, _VideoModel videoModel) =>
+                                                  new _VideoPlayer(
+                                                      videoModel: videoModel),
+                                        ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     ),
   );
 }
