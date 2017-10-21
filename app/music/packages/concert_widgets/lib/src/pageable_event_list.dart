@@ -21,6 +21,7 @@ class PageableEventList extends StatelessWidget {
     @required this.events,
     this.selectedEvent,
     this.onSelect,
+    this.onPageChanged,
   })
       : assert(events != null),
         super(key: key);
@@ -33,6 +34,9 @@ class PageableEventList extends StatelessWidget {
 
   /// Callback for when an event is selected
   final EventActionCallback onSelect;
+
+  /// Called when the page changes.
+  final ValueChanged<int> onPageChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +110,7 @@ class PageableEventList extends StatelessWidget {
         return new PageView.builder(
           scrollDirection: axis,
           itemCount: pageCount,
+          onPageChanged: onPageChanged,
           itemBuilder: (BuildContext context, int index) => _buildPage(
                 pageIndex: index,
                 itemsPerPage: 3,

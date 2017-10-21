@@ -55,6 +55,8 @@ class EventListModuleModel extends ModuleModel {
   LoadingStatus get loadingStatus => _loadingStatus;
   LoadingStatus _loadingStatus = LoadingStatus.inProgress;
 
+  int _currentPageIndex = 0;
+
   /// Get the currently selected event
   Event get selectedEvent {
     if (events == null) {
@@ -91,6 +93,12 @@ class EventListModuleModel extends ModuleModel {
       'songkick:eventId': event.id,
     };
     _eventLink.set(null, JSON.encode(data));
+  }
+
+  /// Call when the current event page changes.
+  void onPageChanged(int currentPageIndex) {
+    _currentPageIndex = currentPageIndex;
+    _registerEventsWithEventSelector();
   }
 
   Future<Null> _onNotifyChild(String json) async {
@@ -156,11 +164,17 @@ class EventListModuleModel extends ModuleModel {
 
   @override
   void notifyListeners() {
+    _registerEventsWithEventSelector();
+    super.notifyListeners();
+  }
+
+  void _registerEventsWithEventSelector() {
     // Deregister all old artists as selectable w.r.t. hotwords.
     _eventSelector.deregisterAllEvents();
 
     // Register all new artists as selectable w.r.t. hotwords.
-    for (Event event in events) {
+    for (int i = 0; i < events.length; i++) {
+      Event event = events[i];
       String artistName = event.performances.first.artist?.name;
       if (artistName != null) {
         _eventSelector.registerEvent(
@@ -169,8 +183,48 @@ class EventListModuleModel extends ModuleModel {
           () => selectEvent(event),
         );
       }
-    }
 
-    super.notifyListeners();
+      // For the events that are currently on screen, register events.
+      // We assume three events per page.
+      if (_currentPageIndex != null && _currentPageIndex == (i / 3).floor()) {
+        if (i % 3 == 0) {
+          _eventSelector
+            ..registerEvent(
+              'left',
+              'left',
+              () => selectEvent(event),
+            )
+            ..registerEvent(
+              'first',
+              'first',
+              () => selectEvent(event),
+            );
+        } else if (i % 3 == 1) {
+          _eventSelector
+            ..registerEvent(
+              'middle',
+              'middle',
+              () => selectEvent(event),
+            )
+            ..registerEvent(
+              'second',
+              'second',
+              () => selectEvent(event),
+            );
+        } else if (i % 3 == 2) {
+          _eventSelector
+            ..registerEvent(
+              'right',
+              'right',
+              () => selectEvent(event),
+            )
+            ..registerEvent(
+              'third',
+              'third',
+              () => selectEvent(event),
+            );
+        }
+      }
+    }
   }
 }

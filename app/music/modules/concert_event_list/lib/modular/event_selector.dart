@@ -84,7 +84,11 @@ class EventSelector implements QueryHandler {
 
     if (queryText != null) {
       for (_EventData eventData in _registeredEvents.values) {
-        if (queryText.contains(eventData.hotWordPhrase)) {
+        if ((queryText.contains('choose') ||
+                queryText.contains('show') ||
+                queryText.contains('select') ||
+                queryText.contains('more')) &&
+            queryText.contains(eventData.hotWordPhrase)) {
           _SelectEventCustomAction selectEventCustomAction =
               new _SelectEventCustomAction(eventData);
           CustomActionBinding binding = new CustomActionBinding();

@@ -50,6 +50,7 @@ Future<Null> main() async {
                   events: model.events,
                   onSelect: model.selectEvent,
                   selectedEvent: model.selectedEvent,
+                  onPageChanged: model.onPageChanged,
                 );
               } else {
                 return new EventList(
