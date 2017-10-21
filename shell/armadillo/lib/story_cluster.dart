@@ -642,7 +642,7 @@ class StoryCluster {
 }
 
 const RK4SpringDescription _kSimulationDesc =
-    const RK4SpringDescription(tension: 450.0, friction: 50.0);
+    const RK4SpringDescription(tension: 750.0, friction: 50.0);
 
 /// Handles focus progress for a StoryCluster.
 class FocusModel extends SpringModel {
