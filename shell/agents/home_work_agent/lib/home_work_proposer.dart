@@ -177,14 +177,28 @@ class _QueryHandlerImpl extends QueryHandler {
   void onQuery(UserInput query, void callback(QueryResponse response)) {
     List<Proposal> proposals = <Proposal>[];
 
-    if (query.text?.toLowerCase()?.startsWith('demo') ?? false) {
+    String queryText = query.text?.toLowerCase() ?? '';
+
+    if (queryText.startsWith('demo') ?? false) {
       proposals
         ..addAll(askProposals.map(_createProposal))
         ..add(_launchEverythingProposal);
     }
 
-    if ((query.text?.toLowerCase()?.startsWith('per') ?? false) ||
-        (query.text?.toLowerCase()?.contains('3d') ?? false)) {
+    if (queryText.contains('perspective') && queryText.contains('launch')) {
+      proposals.add(
+        _createAppProposal(
+          id: 'Launch Perspective 3D demo',
+          appUrl: 'perspective',
+          headline: 'Launch Perspective 3D demo',
+          imageType: SuggestionImageType.other,
+          imageUrl: 'https://goo.gl/bi9jBa',
+          color: 0xFF4A78C0,
+          confidence: 1.0,
+        ),
+      );
+    } else if ((queryText.startsWith('per') ?? false) ||
+        (queryText.contains('3d') ?? false)) {
       proposals.add(
         _createAppProposal(
           id: 'Launch Perspective 3D demo',
@@ -311,10 +325,12 @@ Proposal _createAppProposal({
   SuggestionImageType imageType: SuggestionImageType.other,
   List<String> iconUrls = const <String>[],
   int color,
+  double confidence: 0.0,
   AnnoyanceType annoyanceType: AnnoyanceType.none,
 }) =>
     new Proposal()
       ..id = id
+      ..confidence = confidence
       ..display = (new SuggestionDisplay()
         ..headline = headline
         ..subheadline = subheadline ?? ''
