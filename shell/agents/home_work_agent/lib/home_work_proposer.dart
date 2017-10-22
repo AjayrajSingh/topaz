@@ -185,19 +185,102 @@ class _QueryHandlerImpl extends QueryHandler {
         ..add(_launchEverythingProposal);
     }
 
-    if (queryText.contains('perspective') && queryText.contains('launch')) {
-      proposals.add(
-        _createAppProposal(
-          id: 'Launch Perspective 3D demo',
-          appUrl: 'perspective',
-          headline: 'Launch Perspective 3D demo',
-          imageType: SuggestionImageType.other,
-          imageUrl: 'https://goo.gl/bi9jBa',
-          color: 0xFF4A78C0,
-          confidence: 1.0,
-        ),
-      );
-    } else if ((queryText.startsWith('per') ?? false) ||
+    if (queryText.contains('launch') ||
+        queryText.contains('show me') ||
+        queryText.contains('bring up')) {
+      if (queryText.contains('shader')) {
+        proposals.add(
+          _createAppProposal(
+            id: 'Launch Shader Toy',
+            appUrl: 'shadertoy_client',
+            headline: 'Launch Shader Toy',
+            imageType: SuggestionImageType.other,
+            imageUrl:
+                'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png',
+            color: 0xFF4A78C0,
+            confidence: 1.0,
+          ),
+        );
+      } else if (queryText.contains('perspective')) {
+        proposals.add(
+          _createAppProposal(
+            id: 'Launch Perspective 3D demo',
+            appUrl: 'perspective',
+            headline: 'Launch Perspective 3D demo',
+            imageType: SuggestionImageType.other,
+            imageUrl: 'https://goo.gl/bi9jBa',
+            color: 0xFF4A78C0,
+            confidence: 1.0,
+          ),
+        );
+      } else if (queryText.contains('infinite')) {
+        proposals.add(
+          _createAppProposal(
+            id: 'Launch Infinite Scroller',
+            appUrl: 'infinite_scroller',
+            headline: 'Launch Infinite Scroller',
+            imageType: SuggestionImageType.other,
+            imageUrl:
+                'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png',
+            color: 0xFF4A78C0,
+            confidence: 1.0,
+          ),
+        );
+      } else if (queryText.contains('spinning')) {
+        proposals.add(
+          _createAppProposal(
+            id: 'Launch Spinning Cube',
+            appUrl: 'spinning_cube',
+            headline: 'Launch Spinning Cube',
+            imageType: SuggestionImageType.other,
+            imageUrl:
+                'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png',
+            color: 0xFF4A78C0,
+            confidence: 1.0,
+          ),
+        );
+      } else if (queryText.contains('video')) {
+        proposals.add(
+          _createAppProposal(
+            id: 'Launch Video',
+            appUrl: 'video',
+            headline: 'Launch Video',
+            imageType: SuggestionImageType.other,
+            imageUrl:
+                'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png',
+            color: 0xFF4A78C0,
+            confidence: 1.0,
+          ),
+        );
+      } else if (queryText.contains('hotel')) {
+        proposals.add(
+          _createAppProposal(
+            id: 'Launch Hotel Confirmation',
+            appUrl: 'hotel_confirmation',
+            headline: 'Launch Hotel Confirmation',
+            imageType: SuggestionImageType.other,
+            imageUrl:
+                'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png',
+            color: 0xFF4A78C0,
+            confidence: 1.0,
+          ),
+        );
+      } else if (queryText.contains('concert')) {
+        proposals.add(
+          _createAppProposal(
+            id: 'Launch Concert List',
+            appUrl: 'concert_event_list',
+            headline: 'Launch Concert List',
+            imageType: SuggestionImageType.other,
+            imageUrl:
+                'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png',
+            color: 0xFF4A78C0,
+            confidence: 1.0,
+          ),
+        );
+      }
+    }
+    if ((queryText.startsWith('per') ?? false) ||
         (queryText.contains('3d') ?? false)) {
       proposals.add(
         _createAppProposal(
