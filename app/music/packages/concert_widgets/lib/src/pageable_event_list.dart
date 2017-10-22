@@ -97,9 +97,8 @@ class PageableEventList extends StatelessWidget {
   Widget _buildPageableList() {
     return new LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        Axis axis = constraints.maxHeight > constraints.maxWidth
-            ? Axis.vertical
-            : Axis.horizontal;
+        Axis axis =
+            constraints.maxWidth < 500.0 ? Axis.vertical : Axis.horizontal;
         int itemsPerPage = axis == Axis.vertical ? 4 : 3;
         int pageCount = (events.length / itemsPerPage).ceil();
         double minBoundsSize = min(constraints.maxHeight, constraints.maxWidth);
@@ -109,9 +108,9 @@ class PageableEventList extends StatelessWidget {
           itemCount: pageCount,
           itemBuilder: (BuildContext context, int index) => _buildPage(
                 pageIndex: index,
-                itemsPerPage: itemsPerPage,
+                itemsPerPage: 3,
                 axis: axis,
-                padding: minBoundsSize / 24.0,
+                padding: axis == Axis.horizontal ? minBoundsSize / 30.0 : 8.0,
               ),
         );
       },

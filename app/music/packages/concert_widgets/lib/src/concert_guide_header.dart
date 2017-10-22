@@ -37,15 +37,15 @@ class ConcertGuideHeader extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: new Image.asset(
                     'packages/concert_widgets/res/plat_logo.png',
-                    height: minBoundsSize / 4,
-                    width: minBoundsSize / 4,
+                    height: minBoundsSize / 6,
+                    width: minBoundsSize / 6,
                   ),
                 ),
                 new Text(
                   _listTitle,
                   style: new TextStyle(
                     color: Colors.white,
-                    fontSize: minBoundsSize / 8,
+                    fontSize: minBoundsSize / 12,
                   ),
                 ),
               ],
