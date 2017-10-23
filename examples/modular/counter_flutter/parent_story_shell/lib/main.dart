@@ -10,12 +10,12 @@ import 'home.dart';
 import 'module_model.dart';
 
 void main() {
-  setupLogger(name: 'counter_child');
+  setupLogger(name: 'counter_parent_story_shell');
 
-  ModuleWidget<CounterChildModuleModel> moduleWidget =
-      new ModuleWidget<CounterChildModuleModel>(
+  ModuleWidget<CounterParentModuleModel> moduleWidget =
+      new ModuleWidget<CounterParentModuleModel>(
     applicationContext: new ApplicationContext.fromStartupInfo(),
-    moduleModel: new CounterChildModuleModel(),
+    moduleModel: new CounterParentModuleModel(),
     child: new MaterialApp(
       home: new Home(),
     ),

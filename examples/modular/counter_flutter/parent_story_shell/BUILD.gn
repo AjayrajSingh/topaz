@@ -1,16 +1,16 @@
-# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
 import("//third_party/flutter/build/flutter_app.gni")
 
-group("child") {
+group("parent_story_shell") {
   public_deps = [
-    ":example_flutter_counter_child",
+    ":example_flutter_counter_parent_story_shell",
   ]
 }
 
-flutter_app("example_flutter_counter_child") {
+flutter_app("example_flutter_counter_parent_story_shell") {
   main_dart = "lib/main.dart"
 
   deps = [

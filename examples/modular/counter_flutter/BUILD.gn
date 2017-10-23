@@ -5,6 +5,7 @@
 group("counter_flutter") {
   public_deps = [
     "child",
-    "parent",
+    "parent_embed",
+    "parent_story_shell",
   ]
 }

@@ -1,0 +1,129 @@
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'dart:convert' show JSON;
+
+import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
+import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:lib.module.fidl/module_controller.fidl.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.ui.flutter/child_view.dart';
+import 'package:lib.ui.views.fidl/view_token.fidl.dart';
+import 'package:lib.widgets/modular.dart';
+
+const String _kChildModuleUrl = 'example_flutter_counter_child';
+const String _kCounterKey = 'counter';
+const String _kJsonSchema = '''
+{
+  "\$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+     "$_kCounterKey": {
+        "type": "integer"
+     }
+   },
+   "additionalProperties" : false,
+   "required": [
+      "$_kCounterKey"
+   ]
+}
+''';
+
+/// The [ModuleModel] class for this counter child module, which encapsulates
+/// how this module interacts with Fuchsia's modular framework.
+///
+/// This parent example uses direct embedding to layout the child view into the
+/// screen manually.
+class CounterParentModuleModel extends ModuleModel {
+  /// Creates a new instance.
+  ///
+  /// Setting the [watchAll] value to [true] makes sure that you get notified
+  /// by [Link] service, even with the changes are made by this model.
+  CounterParentModuleModel() : super(watchAll: true);
+
+  /// In-memory counter value.
+  int _counter = 0;
+
+  /// Gets the counter value.
+  int get counter => _counter;
+
+  /// Sets the counter value and call [notifyListeners()] to redraw the
+  /// [ScopedModelDescendant]s of this model.
+  set counter(int value) {
+    _counter = value;
+    notifyListeners();
+  }
+
+  /// The [ChildViewConnection] that holds the [ViewOwner] of the child module.
+  ChildViewConnection _connection;
+  ChildViewConnection get connection => _connection;
+
+  final ModuleControllerProxy _childController = new ModuleControllerProxy();
+
+  @override
+  void onReady(
+    ModuleContext moduleContext,
+    Link link,
+    ServiceProvider incomingServiceProvider,
+  ) {
+    super.onReady(moduleContext, link, incomingServiceProvider);
+
+    // Set a JSON schema to the main link of this module. If an update violates
+    // the schema, this only creates debug log output.
+    link.setSchema(_kJsonSchema);
+
+    // Start the child module and obtain the ViewOwner.
+    InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
+    moduleContext.startModule(
+      'counter_child',
+      _kChildModuleUrl,
+      null, // null means that the child gets the same link as the parent.
+      null,
+      null,
+      _childController.ctrl.request(),
+      viewOwnerPair.passRequest(),
+    );
+
+    // Create a child view connection, so that it can be laid out in the screen.
+    _connection = new ChildViewConnection(viewOwnerPair.passHandle());
+    notifyListeners();
+  }
+
+  @override
+  void onStop() {
+    _childController.ctrl.close();
+    super.onStop();
+  }
+
+  /// Called when the [Link] data changes.
+  @override
+  void onNotify(String json) {
+    dynamic decodedJson = JSON.decode(json);
+    if (decodedJson is Map<String, dynamic> &&
+        decodedJson[_kCounterKey] is int) {
+      counter = decodedJson[_kCounterKey];
+    }
+  }
+
+  /// Increments the counter value by writing the new value to the [Link].
+  ///
+  /// Note that this method does not increment the [_counter] value directly.
+  /// Instead, we update the [_counter] value upon [onNotify()] callback, which
+  /// will be caused by writing this new value to the [Link].
+  ///
+  /// This creates a unidirectional data-flow similar to flux, and makes sure
+  /// that the [_counter] value and the [Link] value are always in sync.
+  void increment() {
+    log.info('increment');
+    link.set(<String>[_kCounterKey], JSON.encode(counter + 1));
+  }
+
+  /// Decrements the counter value by writing the new value to the [Link].
+  void decrement() {
+    log.info('decrement');
+    link.set(<String>[_kCounterKey], JSON.encode(counter - 1));
+  }
+}
