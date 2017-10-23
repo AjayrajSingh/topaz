@@ -17,6 +17,7 @@ import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_token.fidl.dart';
+import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:music_api/api.dart';
@@ -81,6 +82,10 @@ class ArtistModuleModel extends ModuleModel {
   final player_fidl.PlayerProxy _player = new player_fidl.PlayerProxy();
 
   final LinkProxy _contextLink = new LinkProxy();
+
+  /// The current device mode
+  String get deviceMode => _deviceMode;
+  String _deviceMode;
 
   /// Retrieves all the data necessary to render the artist module
   Future<Null> fetchArtist(String artistId) async {
@@ -192,6 +197,15 @@ class ArtistModuleModel extends ModuleModel {
         'spotifyId': artist.id,
       };
       _contextLink.set(null, JSON.encode(contextLinkData));
+    }
+  }
+
+  @override
+  void onDeviceMapChange(DeviceMapEntry entry) {
+    Map<String, dynamic> profileMap = JSON.decode(entry.profile);
+    if (_deviceMode != profileMap['mode']) {
+      _deviceMode = profileMap['mode'];
+      notifyListeners();
     }
   }
 

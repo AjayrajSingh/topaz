@@ -7,14 +7,9 @@ import 'package:meta/meta.dart';
 
 import 'utils.dart';
 
-const double _kSliderHeight = 4.0;
 final Color _kBackgroundColor = Colors.grey[300];
 final Color _kBarColor = Colors.grey[600];
-final TextStyle _kTimeTextStyle = new TextStyle(
-  fontSize: 12.0,
-  color: Colors.grey[500],
-);
-const double _kTimeTextHeight = 24.0;
+final Color _kTextColor = Colors.grey[500];
 
 /// Track Playback Slider
 ///
@@ -34,12 +29,20 @@ class PlaybackSlider extends StatelessWidget {
   /// Defaults to true.
   final bool showTimeText;
 
+  /// Font size for playback time text
+  final double fontSize;
+
+  /// Height of playback slider
+  final double sliderHeight;
+
   /// Constructor
   PlaybackSlider({
     Key key,
     @required this.duration,
     @required this.playbackPosition,
     this.showTimeText: true,
+    this.fontSize: 12.0,
+    this.sliderHeight: 4.0,
   })
       : assert(duration != null),
         assert(playbackPosition != null),
@@ -61,7 +64,7 @@ class PlaybackSlider extends StatelessWidget {
     return new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
       final Widget progressBar = new CustomPaint(
-        size: new Size(constraints.maxWidth, _kSliderHeight),
+        size: new Size(constraints.maxWidth, sliderHeight),
         painter: new _PlaybackBarPainter(playbackRatio: _playbackRatio),
       );
       if (showTimeText) {
@@ -71,21 +74,27 @@ class PlaybackSlider extends StatelessWidget {
             // This empty container is used to offset the time text to make
             // sure that the playback bar is visually centered.
             new Container(
-              height: _kTimeTextHeight,
+              height: fontSize * 2.0,
             ),
             progressBar,
             new Container(
-              height: _kTimeTextHeight,
+              height: fontSize * 2.0,
               child: new Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   new Text(
                     new DurationFormat(playbackPosition).playbackText,
-                    style: _kTimeTextStyle,
+                    style: new TextStyle(
+                      color: _kTextColor,
+                      fontSize: fontSize,
+                    ),
                   ),
                   new Text(
                     new DurationFormat(duration).playbackText,
-                    style: _kTimeTextStyle,
+                    style: new TextStyle(
+                      color: _kTextColor,
+                      fontSize: fontSize,
+                    ),
                   ),
                 ],
               ),

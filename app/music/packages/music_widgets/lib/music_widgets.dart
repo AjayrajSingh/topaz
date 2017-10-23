@@ -4,6 +4,7 @@
 
 export 'src/album_screen.dart';
 export 'src/artist_screen.dart';
+export 'src/edge_to_edge_player.dart';
 export 'src/hero_banner_scaffold.dart';
 export 'src/home_page.dart';
 export 'src/inline_album.dart';

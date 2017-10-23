@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -10,6 +11,7 @@ import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:music_models/music_models.dart';
 import 'package:topaz.app.music.services.player/player.fidl.dart'
@@ -64,6 +66,10 @@ class PlaybackModuleModel extends ModuleModel {
   void previous() => _player.previous();
 
   Timer _progressTimer;
+
+  /// The current device mode
+  String get deviceMode => _deviceMode;
+  String _deviceMode;
 
   @override
   void onReady(
@@ -123,6 +129,15 @@ class PlaybackModuleModel extends ModuleModel {
     _player.ctrl.close();
     _playbackAgentController.ctrl.close();
     super.onStop();
+  }
+
+  @override
+  void onDeviceMapChange(DeviceMapEntry entry) {
+    Map<String, dynamic> profileMap = JSON.decode(entry.profile);
+    if (_deviceMode != profileMap['mode']) {
+      _deviceMode = profileMap['mode'];
+      notifyListeners();
+    }
   }
 
   /// Ensure that the progress timer is running.

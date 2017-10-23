@@ -30,16 +30,27 @@ void main() {
           __,
           PlaybackModuleModel model,
         ) {
-          return new Player(
-            currentTrack: playbackModuleModel.currentTrack,
-            playbackPosition: playbackModuleModel.playbackPosition,
-            isPlaying: playbackModuleModel.isPlaying,
-            onTogglePlay: playbackModuleModel.togglePlayPause,
-            onSkipNext: playbackModuleModel.next,
-            onSkipPrevious: playbackModuleModel.previous,
-            onToggleRepeat: playbackModuleModel.toggleRepeat,
-            isRepeated: playbackModuleModel.isRepeated,
-          );
+          if (model.deviceMode == 'edgeToEdge') {
+            return new EdgeToEdgePlayer(
+              currentTrack: playbackModuleModel.currentTrack,
+              playbackPosition: playbackModuleModel.playbackPosition,
+              isPlaying: playbackModuleModel.isPlaying,
+              onTogglePlay: playbackModuleModel.togglePlayPause,
+              onSkipNext: playbackModuleModel.next,
+              onSkipPrevious: playbackModuleModel.previous,
+            );
+          } else {
+            return new Player(
+              currentTrack: playbackModuleModel.currentTrack,
+              playbackPosition: playbackModuleModel.playbackPosition,
+              isPlaying: playbackModuleModel.isPlaying,
+              onTogglePlay: playbackModuleModel.togglePlayPause,
+              onSkipNext: playbackModuleModel.next,
+              onSkipPrevious: playbackModuleModel.previous,
+              onToggleRepeat: playbackModuleModel.toggleRepeat,
+              isRepeated: playbackModuleModel.isRepeated,
+            );
+          }
         },
       ),
     ),

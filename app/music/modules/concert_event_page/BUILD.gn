@@ -15,11 +15,11 @@ flutter_app("concert_event_page") {
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/story/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/music/packages/concert_api",
     "//topaz/app/music/packages/concert_models",
     "//topaz/app/music/packages/concert_widgets",
