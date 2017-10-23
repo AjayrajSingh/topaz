@@ -325,6 +325,16 @@ package("sysui") {
     },
 
     {
+      path = rebase_path("agents/home_work_agent/assets/cc0_calafia.jpg")
+      dest = "sysui/cc0_calafia.jpg"
+    },
+
+    {
+      path = rebase_path("agents/home_work_agent/assets/cc0_music.jpg")
+      dest = "sysui/cc0_music.jpg"
+    },
+
+    {
       path = rebase_path(armadillo_path_context_config)
       dest = "sysui/contextual_config.json"
     },

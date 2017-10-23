@@ -82,21 +82,30 @@
   "unknown": [
     {
       "id": "unknown_01",
-      "headline": "You've walked 11,302 steps today",
+      "headline": "It's Danielle's Birthday",
       "color": "0xFFFF8F00",
-      "icon_url": "/system/data/sysui/logo_fitness_color_2x_web_96.png",
-      "module_url": "image",
-      "module_data": "{\"image_url\":\"/system/data/sysui/story_steps.png\"}"
-    },
-    {
-      "id": "unknown_02",
-      "headline": "Call Danielle back",
-      "subheadline": "1 missed call 32 minutes ago",
-      "color": "0xFF4054B2",
       "image_url": "/system/data/sysui/danielle_cc0.jpg",
       "type": "person",
       "module_url": "image",
       "module_data": "{\"image_url\":\"/system/data/sysui/story_phonecall.png\"}"
+    },
+    {
+      "id": "unknown_02",
+      "headline": "17 min drive to Calafia",
+      "color": "0xFF4054B2",
+      "image_url": "/system/data/sysui/cc0_calafia.jpg",
+      "type": "other",
+      "module_url": "image",
+      "module_data": "{\"image_url\":\"/system/data/sysui/cc0_calafia.jpg\"}"
+    },
+    {
+      "id": "unknown_03",
+      "headline": "Play Weekly Playlist",
+      "color": "0xFF4054B2",
+      "image_url": "/system/data/sysui/cc0_music.jpg",
+      "type": "other",
+      "module_url": "image",
+      "module_data": "{\"image_url\":\"/system/data/sysui/cc0_music.jpg\"}"
     }
   ]
 }
