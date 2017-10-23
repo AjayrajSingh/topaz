@@ -10,8 +10,8 @@ dart_package("lib.logging") {
   analysis_options = "analysis_options.yaml"
 
   deps = [
-    "//topaz/public/lib/fidl/dart",
     "//third_party/dart-pkg/pub/logging",
     "//third_party/dart-pkg/pub/stack_trace",
+    "//topaz/public/lib/fidl/dart",
   ]
 }

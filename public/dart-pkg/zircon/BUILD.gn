@@ -12,8 +12,8 @@ group("zircon") {
     ":sdk_ext",
   ]
   deps = [
-    ":package_for_analysis",
     ":dart_zircon_test",
+    ":package_for_analysis",
   ]
 }
 
@@ -30,15 +30,15 @@ source_set("sdk_ext") {
   ]
 
   deps = [
-    "//third_party/dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
+    "//third_party/dart/runtime:dart_api",
     "//zircon/system/ulib/async:default",
     "//zircon/system/ulib/zx",
   ]
 
   public_deps = [
-    "//zircon/system/ulib/async",
     "//topaz/lib/tonic",
+    "//zircon/system/ulib/async",
   ]
 }
 

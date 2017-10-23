@@ -11,20 +11,20 @@ dart_package("lib.widgets") {
   analysis_options = "analysis_options.yaml"
 
   deps = [
-    "//topaz/public/lib/app/dart",
+    "//garnet/public/lib/ui/presentation/fidl:fidl_dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/device/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
-    "//topaz/tools/widget_explorer/packages/widget_explorer_meta",
-    "//topaz/public/lib/ui/flutter",
-    "//garnet/public/lib/ui/presentation/fidl:fidl_dart",
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//topaz/public/lib/fidl/dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
-    "//topaz/public/dart/modular:lib.modular",
     "//third_party/dart-pkg/pub/flutter_image",
+    "//topaz/public/dart/modular:lib.modular",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/ui/flutter",
+    "//topaz/tools/widget_explorer/packages/widget_explorer_meta",
   ]
 }
 
@@ -33,7 +33,7 @@ dart_test("test") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
-    "//topaz/public/dart/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/public/dart/widgets:lib.widgets",
   ]
 }
