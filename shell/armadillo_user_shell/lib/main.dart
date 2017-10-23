@@ -3,10 +3,12 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui' as ui;
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.media.dart/audio_policy.dart';
+import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:armadillo/armadillo.dart';
 import 'package:armadillo/conductor.dart';
 import 'package:armadillo/conductor_model.dart';
@@ -161,6 +163,19 @@ Widget buildArmadilloUserShell({
   ContextProviderContextModel contextProviderContextModel =
       new ContextProviderContextModel();
 
+  DeviceMapProxy deviceMapProxy = new DeviceMapProxy();
+  DeviceMapWatcherBinding deviceMapWatcher = new DeviceMapWatcherBinding();
+
+  connectToService(applicationContext.environmentServices, deviceMapProxy.ctrl);
+
+  deviceMapProxy.watchDeviceMap(
+    deviceMapWatcher.wrap(
+      new _DeviceMapWatcherImpl(
+        onProfileChanged: contextProviderContextModel.onDeviceProfileChanged,
+      ),
+    ),
+  );
+
   AudioPolicy audioPolicy = new AudioPolicy(
     applicationContext.environmentServices,
   );
@@ -192,6 +207,8 @@ Widget buildArmadilloUserShell({
       powerManagerProxy.ctrl.close();
       powerModel.close();
       suggestionProviderSuggestionModel.close();
+      deviceMapProxy.ctrl.close();
+      deviceMapWatcher.close();
     },
     onWallpaperChosen: contextProviderContextModel.onWallpaperChosen,
   );
@@ -360,3 +377,21 @@ Widget _buildPerformanceOverlay({Widget child}) => new Stack(
         ),
       ],
     );
+
+class _DeviceMapWatcherImpl extends DeviceMapWatcher {
+  ValueChanged<Map<String, String>> onProfileChanged;
+
+  _DeviceMapWatcherImpl({this.onProfileChanged});
+  @override
+  void onDeviceMapChange(DeviceMapEntry entry) {
+    Object decodedJson = JSON.decode(entry.profile);
+    if (decodedJson is Map<String, String>) {
+      onProfileChanged(decodedJson);
+    } else {
+      log.severe(
+        'Device profile expected to be a map of strings!'
+            ' ${entry.profile}',
+      );
+    }
+  }
+}

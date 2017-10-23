@@ -12,6 +12,15 @@ export 'package:lib.widgets/model.dart'
 
 const String _kBackgroundImage = 'packages/armadillo/res/Background.jpg';
 
+/// The Device's mode.
+enum DeviceMode {
+  /// Normal mode.
+  normal,
+
+  /// Edge to edge mode.
+  edgeToEdge,
+}
+
 /// Provides assets and text based on context.
 abstract class ContextModel extends Model {
   final TimeStringer _timeStringer = new TimeStringer();
@@ -44,6 +53,9 @@ abstract class ContextModel extends Model {
 
   /// The timestamp of the build.
   DateTime get buildTimestamp;
+
+  /// The mode of the device.
+  DeviceMode get deviceMode;
 
   @override
   void addListener(VoidCallback listener) {

@@ -24,6 +24,10 @@ const String _kContextConfig = '/system/data/sysui/contextual_config.json';
 
 const String _kLastUpdate = '/system/data/build/last-update';
 
+const String _kMode = 'mode';
+const String _kModeNormal = 'normal';
+const String _kModeEdgeToEdge = 'edgeToEdge';
+
 /// Provides assets and text based on context.
 class ContextProviderContextModel extends ContextModel {
   Map<String, String> _contextualWifiNetworks = <String, String>{};
@@ -36,6 +40,7 @@ class ContextProviderContextModel extends ContextModel {
   String _userName;
   String _userImageUrl;
   DateTime _buildTimestamp;
+  DeviceMode _deviceMode = DeviceMode.normal;
 
   /// The current background image to use.
   @override
@@ -93,6 +98,30 @@ class ContextProviderContextModel extends ContextModel {
 
   @override
   DateTime get buildTimestamp => _buildTimestamp;
+
+  @override
+  DeviceMode get deviceMode => _deviceMode;
+
+  /// Called when the device profile changes.
+  void onDeviceProfileChanged(Map<String, String> deviceProfile) {
+    switch (deviceProfile[_kMode]) {
+      case _kModeNormal:
+        if (_deviceMode != DeviceMode.normal) {
+          _deviceMode = DeviceMode.normal;
+          notifyListeners();
+        }
+        break;
+      case _kModeEdgeToEdge:
+        if (_deviceMode != DeviceMode.edgeToEdge) {
+          _deviceMode = DeviceMode.edgeToEdge;
+          notifyListeners();
+        }
+        break;
+      default:
+        // Unknown mode.
+        break;
+    }
+  }
 
   /// Called when the user information changes.
   void onUserUpdated(String userName, String userImageUrl) {
