@@ -6,11 +6,9 @@ import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 
+import 'layout_model.dart';
 import 'model.dart';
 import 'tree.dart';
-
-const double _kMinScreenWidth = 200.0;
-const double _kMinScreenRatio = 1.0 / 5.0;
 
 /// A pair of Surface and a Rect position.
 class PositionedSurface {
@@ -52,6 +50,7 @@ List<PositionedSurface> layoutSurfaces(
   BuildContext context,
   BoxConstraints constraints,
   List<Surface> focusStack,
+  LayoutModel layoutModel,
 ) {
   if (focusStack.isEmpty) {
     return <PositionedSurface>[];
@@ -60,7 +59,9 @@ List<PositionedSurface> layoutSurfaces(
 
   final double totalWidth = constraints.biggest.width;
   final double absoluteMinWidth = max(
-      MediaQuery.of(context).size.width * _kMinScreenRatio, _kMinScreenWidth);
+    MediaQuery.of(context).size.width * layoutModel.minScreenRatio,
+    layoutModel.minScreenWidth,
+  );
   Tree<Surface> copresTree = focused.copresentSpanningTree;
 
   int focusOrder(Tree<Surface> l, Tree<Surface> r) =>

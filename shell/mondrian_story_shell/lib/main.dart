@@ -2,18 +2,22 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.story.fidl/story_shell.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_token.fidl.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
+import 'layout_model.dart';
 import 'logo.dart';
 import 'model.dart';
 import 'overview.dart';
@@ -21,6 +25,7 @@ import 'surface_details.dart';
 import 'surface_director.dart';
 
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
+final DeviceMapWatcherBinding _deviceMapWatcher = new DeviceMapWatcherBinding();
 
 /// This is used for keeping the reference around.
 // ignore: unused_element
@@ -155,6 +160,8 @@ void main() {
   setupLogger(name: 'Mondrian');
   log.info('Started');
 
+  LayoutModel layoutModel = new LayoutModel();
+
   _surfaceGraph = new SurfaceGraph();
   // Note: This implementation only supports one StoryShell at a time.
   // Initialize the one Flutter application we support
@@ -162,7 +169,22 @@ void main() {
     new Directionality(
       textDirection: TextDirection.ltr,
       child: new WindowMediaQuery(
-        child: const Mondrian(),
+        child: new ScopedModel<LayoutModel>(
+          model: layoutModel,
+          child: const Mondrian(),
+        ),
+      ),
+    ),
+  );
+
+  DeviceMapProxy deviceMapProxy = new DeviceMapProxy();
+
+  connectToService(_appContext.environmentServices, deviceMapProxy.ctrl);
+
+  deviceMapProxy.watchDeviceMap(
+    _deviceMapWatcher.wrap(
+      new _DeviceMapWatcherImpl(
+        onProfileChanged: layoutModel.onDeviceProfileChanged,
       ),
     ),
   );
@@ -174,4 +196,22 @@ void main() {
     },
     StoryShellFactory.serviceName,
   );
+}
+
+class _DeviceMapWatcherImpl extends DeviceMapWatcher {
+  ValueChanged<Map<String, String>> onProfileChanged;
+
+  _DeviceMapWatcherImpl({this.onProfileChanged});
+  @override
+  void onDeviceMapChange(DeviceMapEntry entry) {
+    Object decodedJson = JSON.decode(entry.profile);
+    if (decodedJson is Map<String, String>) {
+      onProfileChanged(decodedJson);
+    } else {
+      log.severe(
+        'Device profile expected to be a map of strings!'
+            ' ${entry.profile}',
+      );
+    }
+  }
 }

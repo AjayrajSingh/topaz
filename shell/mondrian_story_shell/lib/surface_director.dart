@@ -10,6 +10,7 @@ import 'package:lib.widgets/model.dart';
 
 import 'child_view.dart';
 import 'copresent_layout.dart';
+import 'layout_model.dart';
 import 'model.dart';
 import 'surface_form.dart';
 import 'surface_stage.dart';
@@ -95,69 +96,88 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           return new SizedBox(
             width: constraints.maxWidth,
             height: constraints.maxHeight,
-            child: new ScopedModelDescendant<SurfaceGraph>(
-              builder:
-                  (BuildContext context, Widget child, SurfaceGraph graph) {
-                Map<Surface, SurfaceForm> placedSurfaces =
-                    <Surface, SurfaceForm>{};
-                List<Surface> focusStack = graph.focusStack.toList();
-                double depth = 0.0;
-                // HACK(alangardner): Used to create illusion of symmetry
-                BoxConstraints adjustedConstraints = new BoxConstraints(
-                    minWidth: constraints.minWidth,
-                    minHeight: constraints.minHeight,
-                    maxHeight: constraints.maxHeight,
-                    maxWidth: constraints.maxWidth - 12.0);
-                while (focusStack.isNotEmpty) {
-                  for (PositionedSurface ps in layoutSurfaces(
-                      context, adjustedConstraints, focusStack)) {
-                    if (!placedSurfaces.keys.contains(ps.surface)) {
-                      _prevForms.remove(ps.surface);
-                      placedSurfaces[ps.surface] = _form(ps, depth, offscreen);
+            child: new ScopedModelDescendant<LayoutModel>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                LayoutModel layoutModel,
+              ) {
+                return new ScopedModelDescendant<SurfaceGraph>(
+                  builder: (
+                    BuildContext context,
+                    Widget child,
+                    SurfaceGraph graph,
+                  ) {
+                    Map<Surface, SurfaceForm> placedSurfaces =
+                        <Surface, SurfaceForm>{};
+                    List<Surface> focusStack = graph.focusStack.toList();
+                    double depth = 0.0;
+                    // HACK(alangardner): Used to create illusion of symmetry
+                    BoxConstraints adjustedConstraints = new BoxConstraints(
+                        minWidth: constraints.minWidth,
+                        minHeight: constraints.minHeight,
+                        maxHeight: constraints.maxHeight,
+                        maxWidth: constraints.maxWidth - 12.0);
+                    while (focusStack.isNotEmpty) {
+                      for (PositionedSurface ps in layoutSurfaces(
+                        context,
+                        adjustedConstraints,
+                        focusStack,
+                        layoutModel,
+                      )) {
+                        if (!placedSurfaces.keys.contains(ps.surface)) {
+                          _prevForms.remove(ps.surface);
+                          placedSurfaces[ps.surface] =
+                              _form(ps, depth, offscreen);
+                        }
+                      }
+                      depth = (depth + 0.1).clamp(0.0, 1.0);
+                      while (focusStack.isNotEmpty &&
+                          placedSurfaces.keys.contains(focusStack.last)) {
+                        focusStack.removeLast();
+                      }
                     }
-                  }
-                  depth = (depth + 0.1).clamp(0.0, 1.0);
-                  while (focusStack.isNotEmpty &&
-                      placedSurfaces.keys.contains(focusStack.last)) {
-                    focusStack.removeLast();
-                  }
-                }
-                Forest<Surface> dependentSpanningTrees = new Forest<Surface>();
-                // The actual node doesn't matter
-                if (placedSurfaces.isNotEmpty) {
-                  // The actual surface doesn't matter
-                  dependentSpanningTrees =
-                      placedSurfaces.keys.first.getDependentSpanningTrees();
+                    Forest<Surface> dependentSpanningTrees =
+                        new Forest<Surface>();
+                    // The actual node doesn't matter
+                    if (placedSurfaces.isNotEmpty) {
+                      // The actual surface doesn't matter
+                      dependentSpanningTrees =
+                          placedSurfaces.keys.first.getDependentSpanningTrees();
 
-                  /// prune non-visible surfaces
-                  for (Tree<Surface> t in dependentSpanningTrees.flatten()) {
-                    if (!placedSurfaces.keys.contains(t.value)) {
-                      dependentSpanningTrees.remove(t);
+                      /// prune non-visible surfaces
+                      for (Tree<Surface> t
+                          in dependentSpanningTrees.flatten()) {
+                        if (!placedSurfaces.keys.contains(t.value)) {
+                          dependentSpanningTrees.remove(t);
+                        }
+                      }
                     }
-                  }
-                }
 
-                // Convert orphaned forms, to animate them out
-                Iterable<Key> placedKeys =
-                    placedSurfaces.values.map((SurfaceForm f) => f.key);
-                _orphanedForms
-                    .removeWhere((SurfaceForm f) => placedKeys.contains(f.key));
-                for (Surface s in _prevForms.keys) {
-                  _orphanedForms
-                      .add(_orphanedForm(s, _prevForms[s], offscreen));
-                }
-                _prevForms
-                  ..clear()
-                  ..addAll(placedSurfaces);
+                    // Convert orphaned forms, to animate them out
+                    Iterable<Key> placedKeys =
+                        placedSurfaces.values.map((SurfaceForm f) => f.key);
+                    _orphanedForms.removeWhere(
+                        (SurfaceForm f) => placedKeys.contains(f.key));
+                    for (Surface s in _prevForms.keys) {
+                      _orphanedForms
+                          .add(_orphanedForm(s, _prevForms[s], offscreen));
+                    }
+                    _prevForms
+                      ..clear()
+                      ..addAll(placedSurfaces);
 
-                /// Create form forest
-                final Forest<SurfaceForm> formForest = dependentSpanningTrees
-                    .mapForest((Surface s) => placedSurfaces[s]);
-                for (SurfaceForm orphan in _orphanedForms) {
-                  formForest.add(new Tree<SurfaceForm>(value: orphan));
-                }
+                    /// Create form forest
+                    final Forest<SurfaceForm> formForest =
+                        dependentSpanningTrees
+                            .mapForest((Surface s) => placedSurfaces[s]);
+                    for (SurfaceForm orphan in _orphanedForms) {
+                      formForest.add(new Tree<SurfaceForm>(value: orphan));
+                    }
 
-                return new SurfaceStage(forms: formForest);
+                    return new SurfaceStage(forms: formForest);
+                  },
+                );
               },
             ),
           );
