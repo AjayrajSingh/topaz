@@ -13,6 +13,8 @@ import 'concert_guide_header.dart';
 import 'event_list_item.dart';
 import 'typedefs.dart';
 
+const double _kMinHeaderHeight = 160.0;
+
 /// UI Widget that represents a pageable list of [Event]s
 class PageableEventList extends StatelessWidget {
   /// Constructor
@@ -43,12 +45,16 @@ class PageableEventList extends StatelessWidget {
     return new Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        new Expanded(
-          flex: 2,
-          child: new ConcertGuideHeader(),
+        new Container(
+          constraints: new BoxConstraints(
+            minHeight: _kMinHeaderHeight,
+          ),
+          child: new AspectRatio(
+            aspectRatio: 4.5,
+            child: new ConcertGuideHeader(),
+          ),
         ),
         new Expanded(
-          flex: 3,
           child: _buildPageableList(),
         ),
       ],
