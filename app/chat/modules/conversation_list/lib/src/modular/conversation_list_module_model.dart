@@ -9,6 +9,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:config/config.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -140,16 +141,21 @@ class ChatConversationListModuleModel extends ModuleModel {
   Uint8List _lastCreatedConversationId;
 
   @override
-  void onReady(
+  Future<Null> onReady(
     ModuleContext moduleContext,
     Link link,
     ServiceProvider incomingServices,
-  ) {
+  ) async {
     super.onReady(moduleContext, link, incomingServices);
 
     log.fine('ModuleModel::onReady call.');
     // Start the chat conversation module.
     _startConversationModule();
+
+    // Obtain the chat content provider url from the config.
+    Config config = await Config.read('/system/data/modules/config.json');
+    String contentProviderUrl =
+        config.get('chat_content_provider_url') ?? _kChatContentProviderUrl;
 
     // Obtain the component context.
     ComponentContextProxy componentContext = new ComponentContextProxy();
@@ -158,7 +164,7 @@ class ChatConversationListModuleModel extends ModuleModel {
     // Obtain the ChatContentProvider service.
     ServiceProviderProxy contentProviderServices = new ServiceProviderProxy();
     componentContext.connectToAgent(
-      _kChatContentProviderUrl,
+      contentProviderUrl,
       contentProviderServices.ctrl.request(),
       _chatContentProviderController.ctrl.request(),
     );
@@ -180,6 +186,7 @@ class ChatConversationListModuleModel extends ModuleModel {
     contentProviderServices.ctrl.close();
     componentContext.ctrl.close();
 
+    // ignore: unawaited_futures
     _fetchConversations();
   }
 

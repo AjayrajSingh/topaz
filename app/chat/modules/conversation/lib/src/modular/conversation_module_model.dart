@@ -7,6 +7,7 @@ import 'dart:convert' show JSON;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:config/config.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -137,14 +138,19 @@ class ChatConversationModuleModel extends ModuleModel {
   ScrollController get scrollController => _scrollController;
 
   @override
-  void onReady(
+  Future<Null> onReady(
     ModuleContext moduleContext,
     Link link,
     ServiceProvider incomingServices,
-  ) {
+  ) async {
     super.onReady(moduleContext, link, incomingServices);
 
     log.fine('ModuleModel::onReady call.');
+
+    // Obtain the chat content provider url from the config.
+    Config config = await Config.read('/system/data/modules/config.json');
+    String contentProviderUrl =
+        config.get('chat_content_provider_url') ?? _kChatContentProviderUrl;
 
     // Obtain the component context.
     ComponentContextProxy componentContext = new ComponentContextProxy();
@@ -153,7 +159,7 @@ class ChatConversationModuleModel extends ModuleModel {
     // Obtain the ChatContentProvider service.
     ServiceProviderProxy contentProviderServices = new ServiceProviderProxy();
     componentContext.connectToAgent(
-      _kChatContentProviderUrl,
+      contentProviderUrl,
       contentProviderServices.ctrl.request(),
       _chatContentProviderController.ctrl.request(),
     );
