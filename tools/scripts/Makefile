@@ -75,7 +75,6 @@ MINIMAL_MODULE ?= topaz/packages/mods
 # Specify GOMA=1 to force use goma, GOMA=0 to force not use goma.
 # Auto-detect if not specified.
 FSET_FLAGS :=
-FGEN_FLAGS :=
 GOMA ?=
 ifeq ($(GOMA),1)
 	FSET_FLAGS += --goma
@@ -111,7 +110,7 @@ ifeq ($(FUCHSIA_VARIANT),release)
 	FSET_FLAGS += --release
 endif
 
-BUILD_FLAGS := $(addprefix --gen-arg ,$(FGEN_FLAGS)) $(FSET_FLAGS)
+BUILD_FLAGS := $(FSET_FLAGS)
 FUCHSIA_GEN_TARGET ?= x86-64
 
 ################################################################################

@@ -10,37 +10,6 @@ set -e
 # to be set.
 source "${FUCHSIA_DIR}/scripts/env.sh"
 
-function main() {
-  echo "=== buidling Fuchsia"
-
-  local gen_args=""
-
-  while [[ $# -ne 0 ]]; do
-    local exit_loop=""
-    case $1 in
-      --gen-arg)
-        gen_args="${gen_args} $2"
-        shift
-        ;;
-      *)
-        exit_loop=true
-        break
-        ;;
-    esac
-    if [ "${exit_loop}" = true ]; then
-      break
-    fi
-    shift
-  done
-
-  fset x86-64 "$@"
-  if [[ -z "${gen_args}" ]]; then
-    fgen
-  else
-    fgen "${gen_args:1}"
-  fi
-
-  fbuild
-}
-
-main "$@"
+echo "=== buidling Fuchsia"
+fset x86-64 "$@"
+fbuild
