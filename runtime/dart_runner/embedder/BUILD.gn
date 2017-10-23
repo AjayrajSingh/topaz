@@ -29,9 +29,9 @@ action("generate_snapshot_bin") {
     isolate_snapshot,
   ]
 
-  gen_snapshot_dir =
-      get_label_info("//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)",
-                     "root_out_dir")
+  gen_snapshot_dir = get_label_info(
+          "//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)",
+          "root_out_dir")
   script = "//third_party/dart/runtime/tools/create_snapshot_bin.py"
 
   fuchsia_builtin_path = rebase_path("builtin.dart")
@@ -102,13 +102,14 @@ source_set("dart_snapshot_cc") {
 }
 
 action("generate_aot_snapshot_assembly") {
-  aot_snapshotter_label = "//topaz/runtime/dart_runner/snapshotter:aot_snapshotter($host_toolchain)"
+  aot_snapshotter_label =
+      "//topaz/runtime/dart_runner/snapshotter:aot_snapshotter($host_toolchain)"
   aot_snapshotter_dir = get_label_info(aot_snapshotter_label, "root_out_dir")
 
   snapshot_assembly = "$target_gen_dir/aot_vm_snapshot.S"
 
   deps = [
-    aot_snapshotter_label
+    aot_snapshotter_label,
   ]
 
   outputs = [
@@ -116,9 +117,7 @@ action("generate_aot_snapshot_assembly") {
   ]
 
   script = rebase_path("$aot_snapshotter_dir/dart_aot_snapshotter")
-  args = [
-    "--aot-vm-snapshot=" + rebase_path(snapshot_assembly),
-  ]
+  args = [ "--aot-vm-snapshot=" + rebase_path(snapshot_assembly) ]
 }
 
 source_set("dart_aot_snapshot_cc") {

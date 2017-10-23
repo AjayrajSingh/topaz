@@ -76,7 +76,8 @@ runner("dart_aot_runner_bin") {
   if (is_debug) {
     extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime" ]
   } else {
-    extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime_product" ]
+    extra_deps +=
+        [ "//third_party/dart/runtime:libdart_precompiled_runtime_product" ]
   }
 }
 

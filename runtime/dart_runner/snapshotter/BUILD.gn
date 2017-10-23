@@ -22,11 +22,11 @@ executable("snapshotter") {
   }
 
   deps = [
-    "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc",
-    "//garnet/public/lib/fxl",
-    "//topaz/lib/tonic/converter",
-    "//topaz/lib/tonic/file_loader",
-  ] + dart_deps
+           "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc",
+           "//garnet/public/lib/fxl",
+           "//topaz/lib/tonic/converter",
+           "//topaz/lib/tonic/file_loader",
+         ] + dart_deps
 }
 
 executable("aot_snapshotter") {
@@ -36,9 +36,7 @@ executable("aot_snapshotter") {
     "main.cc",
   ]
 
-  defines = [
-    "AOT_COMPILER"
-  ]
+  defines = [ "AOT_COMPILER" ]
 
   if (is_debug) {
     dart_deps = [
@@ -53,9 +51,9 @@ executable("aot_snapshotter") {
   }
 
   deps = [
-    "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc",
-    "//garnet/public/lib/fxl",
-    "//topaz/lib/tonic/converter",
-    "//topaz/lib/tonic/file_loader",
-  ] + dart_deps
+           "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc",
+           "//garnet/public/lib/fxl",
+           "//topaz/lib/tonic/converter",
+           "//topaz/lib/tonic/file_loader",
+         ] + dart_deps
 }
