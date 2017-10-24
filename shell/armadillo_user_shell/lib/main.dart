@@ -181,7 +181,7 @@ Widget buildArmadilloUserShell({
   );
   VolumeModel volumeModel = new AudioPolicyVolumeModel(
     audioPolicy: audioPolicy,
-  );
+  )..level = 1.0;
 
   PowerManagerProxy powerManagerProxy = new PowerManagerProxy();
   connectToService(
