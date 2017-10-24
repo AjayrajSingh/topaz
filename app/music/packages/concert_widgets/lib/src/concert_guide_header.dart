@@ -19,7 +19,6 @@ class ConcertGuideHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return new LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        double minBoundsSize = min(constraints.maxHeight, constraints.maxWidth);
         return new Container(
           decoration: new BoxDecoration(
             image: new DecorationImage(
@@ -37,15 +36,15 @@ class ConcertGuideHeader extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: new Image.asset(
                     'packages/concert_widgets/res/plat_logo.png',
-                    height: minBoundsSize / 6,
-                    width: minBoundsSize / 6,
+                    height: constraints.maxHeight * 0.3,
+                    width: constraints.maxHeight * 0.3,
                   ),
                 ),
                 new Text(
                   _listTitle,
                   style: new TextStyle(
                     color: Colors.white,
-                    fontSize: minBoundsSize / 12,
+                    fontSize: min(constraints.maxWidth * 0.06, 48.0),
                   ),
                 ),
               ],
