@@ -31,6 +31,9 @@ const bool _kAdvertiseImeService = false;
 /// Set to true to enable the performance overlay.
 const bool _kShowPerformanceOverlay = false;
 
+/// Set to true to enable network activity overlay.
+const bool _kEnableNetworkingIndicators = false;
+
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
 
@@ -124,28 +127,33 @@ void main() {
     ),
     new OverlayEntry(
       builder: (BuildContext context) => new Align(
-            alignment: FractionalOffset.centerRight,
-            child: new Container(
-              margin: const EdgeInsets.all(8.0),
-              child: new PhysicalModel(
-                color: Colors.grey[900],
-                elevation: _kIndicatorElevation,
-                borderRadius: new BorderRadius.circular(8.0),
-                child: new Container(
-                  padding: const EdgeInsets.all(8.0),
-                  child: new _NetstackInfo(),
-                ),
-              ),
-            ),
-          ),
-    ),
-    new OverlayEntry(
-      builder: (BuildContext context) => new Align(
             alignment: FractionalOffset.centerLeft,
             child: new _WlanInfo(),
           ),
     ),
   ];
+
+  if (_kEnableNetworkingIndicators) {
+    overlays.add(
+      new OverlayEntry(
+        builder: (BuildContext context) => new Align(
+              alignment: FractionalOffset.centerRight,
+              child: new Container(
+                margin: const EdgeInsets.all(8.0),
+                child: new PhysicalModel(
+                  color: Colors.grey[900],
+                  elevation: _kIndicatorElevation,
+                  borderRadius: new BorderRadius.circular(8.0),
+                  child: new Container(
+                    padding: const EdgeInsets.all(8.0),
+                    child: new _NetstackInfo(),
+                  ),
+                ),
+              ),
+            ),
+      ),
+    );
+  }
 
   DeviceShellWidget<UserPickerDeviceShellModel> deviceShellWidget =
       new DeviceShellWidget<UserPickerDeviceShellModel>(
