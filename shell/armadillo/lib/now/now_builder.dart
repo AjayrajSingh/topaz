@@ -23,18 +23,12 @@ class NowBuilder {
       new GlobalKey<QuickSettingsOverlayState>();
 
   VoidCallback _onLogoutSelected;
-  VoidCallback _onClearLedgerSelected;
   VoidCallback _onUserContextTapped;
   ValueChanged<bool> _onQuickSettingsOverlayChanged;
 
   /// Called when user requests to log out.
   set onLogoutSelected(VoidCallback onLogoutSelected) {
     _onLogoutSelected = onLogoutSelected;
-  }
-
-  /// Called when user requests to log out and clear user data.
-  set onClearLedgerSelected(VoidCallback onClearLedgerSelected) {
-    _onClearLedgerSelected = onClearLedgerSelected;
   }
 
   /// Called when the user taps the user context.
@@ -82,7 +76,6 @@ class NowBuilder {
                 onBarVerticalDragUpdate: onBarVerticalDragUpdate,
                 onBarVerticalDragEnd: onBarVerticalDragEnd,
                 onLogoutSelected: _onLogoutSelected,
-                onClearLedgerSelected: _onClearLedgerSelected,
                 onUserContextTapped: _onUserContextTapped,
                 onMinimizedContextTapped: onMinimizedContextTapped,
                 recentsScrollOffset: recentsScrollOffset,
@@ -99,7 +92,6 @@ class NowBuilder {
                 }
               },
               onLogoutSelected: _onLogoutSelected,
-              onClearLedgerSelected: _onClearLedgerSelected,
             ),
           ],
         ),

@@ -17,9 +17,4 @@ class UserLogoutter {
   void logout() {
     _userShellContext?.logout();
   }
-
-  /// Logs out the user and resets the user's ledger state at the same time.
-  void logoutAndResetLedgerState() {
-    _userShellContext?.logoutAndResetLedgerState();
-  }
 }

@@ -230,7 +230,6 @@ Widget buildArmadilloUserShell({
 
   conductorModel.nowBuilder
     ..onLogoutSelected = userLogoutter.logout
-    ..onClearLedgerSelected = userLogoutter.logoutAndResetLedgerState
     ..onUserContextTapped = armadilloUserShellModel.onUserContextTapped
     ..onQuickSettingsOverlayChanged = (bool active) =>
         hitTestModel.onQuickSettingsOverlayChanged(active: active);
