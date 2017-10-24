@@ -116,7 +116,7 @@ $ frun <options> # when using QEMU.
 Once the fuchsia device is booted, run the following command from the host.
 
 ```bash
-$ $FUCHSIA_DIR/apps/test_runner/src/run_test \
+$ $FUCHSIA_DIR/garnet/bin/test_runner/run_test \
   --test_file=$FUCHSIA_DIR/topaz/app/chat/tests/chat_tests.json
 ```
 
@@ -172,7 +172,7 @@ Among the returned values, some useful ones include:
 * `"localId"`: The Firebase User ID (UID) associated with this user.
 * `"email"`  : Primary email address for this user.
 * `"idToken"`: Auth token to be used in any subsequent REST API calls to the
-  Firebase DB.  
+  Firebase DB.
   (Not to be confused with `oauthIdToken` value.)
 
 Note that this new `idToken` is different from the original `GOOGLE_ID_TOKEN` we
