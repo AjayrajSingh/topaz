@@ -34,6 +34,12 @@ const bool _kShowPerformanceOverlay = false;
 /// Set to true to enable network activity overlay.
 const bool _kEnableNetworkingIndicators = false;
 
+/// Set to true to enable debug info overlay.
+const bool _kEnableDebugInfo = false;
+
+/// Set to true to enable wifi overlay.
+const bool _kEnableWifiOverlay = false;
+
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
 
@@ -48,31 +54,17 @@ void main() {
       new ApplicationContext.fromStartupInfo();
 
   NetstackProxy netstackProxy = new NetstackProxy();
-  connectToService(
-    applicationContext.environmentServices,
-    netstackProxy.ctrl,
-  );
+  connectToService(applicationContext.environmentServices, netstackProxy.ctrl);
+
+  WlanProxy wlanProxy = new WlanProxy();
+  connectToService(applicationContext.environmentServices, wlanProxy.ctrl);
 
   UserPickerDeviceShellModel userPickerDeviceShellModel =
       new UserPickerDeviceShellModel(
     onDeviceShellStopped: () {
       netstackProxy.ctrl.close();
+      wlanProxy.ctrl.close();
     },
-  );
-
-  NetstackModel netstackModel = new NetstackModel(
-    netstack: netstackProxy,
-    tickerProvider: userPickerDeviceShellModel,
-  );
-
-  WlanProxy wlanProxy = new WlanProxy();
-  connectToService(
-    applicationContext.environmentServices,
-    wlanProxy.ctrl,
-  );
-
-  WlanModel wlanModel = new WlanModel(
-    wlan: wlanProxy,
   );
 
   SoftKeyboardContainerImpl softKeyboardContainerImpl = _kAdvertiseImeService
@@ -119,19 +111,32 @@ void main() {
             ),
           ),
     ),
-    new OverlayEntry(
-      builder: (BuildContext context) => new Align(
-            alignment: FractionalOffset.topCenter,
-            child: new DebugText(),
-          ),
-    ),
-    new OverlayEntry(
-      builder: (BuildContext context) => new Align(
-            alignment: FractionalOffset.centerLeft,
-            child: new _WlanInfo(),
-          ),
-    ),
   ];
+
+  if (_kEnableWifiOverlay) {
+    overlays.add(
+      new OverlayEntry(
+        builder: (BuildContext context) => new Align(
+              alignment: FractionalOffset.centerLeft,
+              child: new ScopedModel<WlanModel>(
+                model: new WlanModel(wlan: wlanProxy),
+                child: new _WlanInfo(),
+              ),
+            ),
+      ),
+    );
+  }
+
+  if (_kEnableDebugInfo) {
+    overlays.add(
+      new OverlayEntry(
+        builder: (BuildContext context) => new Align(
+              alignment: FractionalOffset.topCenter,
+              child: new DebugText(),
+            ),
+      ),
+    );
+  }
 
   if (_kEnableNetworkingIndicators) {
     overlays.add(
@@ -146,7 +151,13 @@ void main() {
                   borderRadius: new BorderRadius.circular(8.0),
                   child: new Container(
                     padding: const EdgeInsets.all(8.0),
-                    child: new _NetstackInfo(),
+                    child: new ScopedModel<NetstackModel>(
+                      model: new NetstackModel(
+                        netstack: netstackProxy,
+                        tickerProvider: userPickerDeviceShellModel,
+                      ),
+                      child: new _NetstackInfo(),
+                    ),
                   ),
                 ),
               ),
@@ -169,13 +180,7 @@ void main() {
           (constraints.biggest == Size.zero)
               ? const Offstage()
               : new _ElevatedCheckedModeBanner(
-                  child: new ScopedModel<NetstackModel>(
-                    model: netstackModel,
-                    child: new ScopedModel<WlanModel>(
-                      model: wlanModel,
-                      child: new Overlay(initialEntries: overlays),
-                    ),
-                  ),
+                  child: new Overlay(initialEntries: overlays),
                 ),
     ),
   );
