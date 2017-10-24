@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_package.gni")
+import("//build/dart/toolchain.gni")
 import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
 import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
 
@@ -65,8 +66,9 @@ template("dart_jit_app") {
 
     inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files
 
+    dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
     rebased_packages_path =
-        rebase_path("$target_gen_dir/$dart_package_target_name.packages")
+        rebase_path("$dart_target_gen_dir/$dart_package_target_name.packages")
     rebased_snapshot_path = rebase_path(snapshot_path)
     rebased_depfile_path = rebase_path(depfile_path)
     rebased_build_output_path = rebase_path(snapshot_path, root_build_dir)
@@ -171,8 +173,9 @@ template("dart_aot_app") {
 
     inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files
 
+    dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
     rebased_packages_path =
-        rebase_path("$target_gen_dir/$dart_package_target_name.packages")
+        rebase_path("$dart_target_gen_dir/$dart_package_target_name.packages")
     rebased_assembly_path = rebase_path(assembly_path)
     rebased_depfile_path = rebase_path(depfile_path)
     rebased_build_output_path = rebase_path(assembly_path, root_build_dir)
