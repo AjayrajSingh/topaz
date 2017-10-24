@@ -116,10 +116,16 @@ class ArtistModuleModel extends ModuleModel {
     _player.getStatus((PlayerStatus playerStatus) {
       if (playerStatus.track == null) {
         if (albums.isNotEmpty && albums.first.tracks.isNotEmpty) {
-          _player.setTrack(_convertTrackToFidl(
+          track_fidl.Track firstTrack = _convertTrackToFidl(
             albums.first.tracks.first,
             albums.first,
-          ));
+          );
+          // play first track if in edgeToEdge mode
+          if (deviceMode == 'edgeToEdge') {
+            _player.play(firstTrack);
+          } else {
+            _player.setTrack(firstTrack);
+          }
         }
       }
     });
