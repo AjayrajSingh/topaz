@@ -382,6 +382,18 @@ class ChatConversationModuleModel extends ModuleModel {
     DateTime time = new DateTime.fromMillisecondsSinceEpoch(m.timestamp);
 
     switch (m.type) {
+      case 'command':
+        return new CommandMessage(
+          messageId: m.messageId,
+          time: time,
+          sender: m.sender,
+          onDelete: () {
+            log.fine('CommandMessage::onDelete');
+            deleteMessage(m.messageId);
+          },
+          payload: m.jsonPayload,
+        );
+
       case 'text':
         return new TextMessage(
           messageId: m.messageId,
@@ -566,9 +578,11 @@ class ChatConversationModuleModel extends ModuleModel {
   /// Internally, it invokes the [chat_fidl.ChatContentProvider.sendMessage]
   /// method.
   void sendMessage(String message) {
+    String type = CommandMessage.isCommand(message) ? 'command' : 'text';
+
     _chatContentProvider.sendMessage(
       conversationId,
-      'text',
+      type,
       message,
       (_, __) => null,
     );

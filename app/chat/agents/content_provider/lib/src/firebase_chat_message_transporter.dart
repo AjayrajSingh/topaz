@@ -166,9 +166,10 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     // Construct the message.
     String key = _encodeFirebaseKey(JSON.encode(messageId));
 
-    List<String> participants = new List<String>.from(conversation.participants)
-      ..add(_email)
-      ..sort();
+    List<String> participants =
+        conversation.participants.map((Participant p) => p.email).toList()
+          ..add(_email)
+          ..sort();
 
     // Every message contains the conversation id as well as the list of all
     // participants in the conversation, which is apparently ineffieicnt. The

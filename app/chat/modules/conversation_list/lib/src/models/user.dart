@@ -14,7 +14,6 @@ class User {
 
   final List<String> _requiredKeys = <String>[
     'email',
-    'name',
   ];
 
   final Map<String, String> _json = <String, String>{
@@ -82,7 +81,7 @@ class User {
   String get email => _json['email'];
 
   /// Full name for user, Ex: John Doe
-  String get name => _json['name'];
+  String get name => _json['name'] ?? _json['email'];
 
   /// URL for user avatar
   String get picture => _json['picture'];
