@@ -185,9 +185,7 @@ class _QueryHandlerImpl extends QueryHandler {
         ..add(_launchEverythingProposal);
     }
 
-    if (queryText.contains('launch') ||
-        queryText.contains('show me') ||
-        queryText.contains('bring up')) {
+    if (queryText.contains('launch') || queryText.contains('bring up')) {
       if (queryText.contains('shader')) {
         proposals.add(
           _createAppProposal(
