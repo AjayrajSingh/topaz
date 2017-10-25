@@ -11,6 +11,4 @@ dart_package("xi_widgets") {
     "//apps/xi/packages/xi_client",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
-
-  analysis_options = "//apps/xi/.analysis_options"
 }

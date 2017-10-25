@@ -10,6 +10,4 @@ dart_package("xi_client") {
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
-
-  analysis_options = "//apps/xi/.analysis_options"
 }

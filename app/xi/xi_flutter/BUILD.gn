@@ -17,6 +17,4 @@ dart_package("xi_flutter") {
     "//third_party/dart-pkg/pub/path",
     "//third_party/dart-pkg/pub/path_provider",
   ]
-
-  analysis_options = "//apps/xi/.analysis_options"
 }
