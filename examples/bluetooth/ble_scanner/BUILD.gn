@@ -18,6 +18,4 @@ flutter_app("ble_scanner") {
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
   ]
-
-  analysis_options = "//topaz/examples/bluetooth/analysis_options.yaml"
 }

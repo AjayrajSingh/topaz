@@ -18,6 +18,4 @@ flutter_app("example_flutter_hello_world") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/fidl/dart",
   ]
-
-    analysis_options = "//topaz/tools/analysis_options.yaml"
 }
