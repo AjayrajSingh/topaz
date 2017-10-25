@@ -22,7 +22,6 @@ template("dart_jit_app") {
 
   dart_package(dart_package_target_name) {
     forward_variables_from(invoker, [
-      "analysis_options",
       "deps",
       "disable_analysis",
       "extra_analyzer_sources",
@@ -129,7 +128,6 @@ template("dart_aot_app") {
 
   dart_package(dart_package_target_name) {
     forward_variables_from(invoker, [
-      "analysis_options",
       "deps",
       "disable_analysis",
       "extra_analyzer_sources",
@@ -268,13 +266,8 @@ template("dart_aot_app") {
 #   output_name (optional)
 #     Name of the output file to generate. Defaults to ${target_name}.dartx
 #
-#   analysis_options (optional)
-#     By default, a script to run the analyzer on the contents of the package is
-#     generated in the output directory. This parameter contains the path to an
-#     analysis options file for this target.
-#
 #   disable_analysis (optional)
-#     Prevents the analysis script from being generated.
+#     Prevents analysis from being run on this target.
 template("dart_app") {
   if (dart_app_default_is_jit) {
     dart_jit_app(target_name) {
@@ -284,7 +277,6 @@ template("dart_app") {
             "main_dart",
             "deps",
             "output_name",
-            "analysis_options",
             "disable_analysis",
             "testonly",
             "source_dir",
@@ -298,7 +290,6 @@ template("dart_app") {
             "main_dart",
             "deps",
             "output_name",
-            "analysis_options",
             "disable_analysis",
             "testonly",
             "source_dir",
