@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.suggestion.fidl..debug/debug.fidl.dart';
+import 'package:lib.suggestion.fidl._debug/debug.fidl.dart';
 
 import 'data_handler.dart';
 
