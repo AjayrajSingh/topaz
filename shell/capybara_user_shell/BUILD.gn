@@ -12,8 +12,6 @@ flutter_app("capybara_user_shell") {
 
   manifest = "pubspec.yaml"
 
-  analysis_options = "//topaz/shell/analysis_options.yaml"
-
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",
@@ -22,8 +20,6 @@ flutter_app("capybara_user_shell") {
 }
 
 dart_test("test") {
-  analysis_options = "//topaz/shell/analysis_options.yaml"
-
   deps = [
     ":capybara_user_shell_dart_package",
     "//third_party/dart-pkg/pub/test",

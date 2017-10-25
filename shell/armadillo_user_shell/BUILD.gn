@@ -11,10 +11,6 @@ flutter_app("armadillo_user_shell") {
 
   manifest = "pubspec.yaml"
 
-  source_dir = "lib"
-
-  analysis_options = "//topaz/shell/analysis_options.yaml"
-
   deps = [
     "//garnet/public/lib/power/fidl:fidl_dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",

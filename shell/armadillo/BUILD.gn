@@ -8,8 +8,6 @@ import("//build/dart/dart_test.gni")
 dart_package("armadillo") {
   package_name = "armadillo"
 
-  analysis_options = "//topaz/shell/analysis_options.yaml"
-
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/widgets:lib.widgets",
@@ -19,8 +17,6 @@ dart_package("armadillo") {
 }
 
 dart_test("test") {
-  analysis_options = "//topaz/shell/analysis_options.yaml"
-
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",

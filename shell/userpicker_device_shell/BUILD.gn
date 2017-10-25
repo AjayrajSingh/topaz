@@ -12,8 +12,6 @@ flutter_app("userpicker_device_shell") {
 
   manifest = "pubspec.yaml"
 
-  analysis_options = "//topaz/shell/analysis_options.yaml"
-
   deps = [
     "//garnet/public/lib/netstack/fidl:fidl_dart",
     "//garnet/public/lib/ui/input/fidl:fidl_dart",
@@ -32,8 +30,6 @@ flutter_app("userpicker_device_shell") {
 }
 
 dart_test("test") {
-  analysis_options = "//topaz/shell/analysis_options.yaml"
-
   deps = [
     ":userpicker_device_shell_dart_package",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

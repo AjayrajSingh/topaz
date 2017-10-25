@@ -11,8 +11,6 @@ flutter_app("spinning_cube") {
 
   manifest = "pubspec.yaml"
 
-  analysis_options = "//topaz/shell/analysis_options.yaml"
-
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]

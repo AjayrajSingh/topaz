@@ -7,6 +7,4 @@ import("//build/dart/dart_test.gni")
 
 dart_package("qrcodegen") {
   package_name = "qrcodegen"
-
-  analysis_options = "//topaz/shell/analysis_options.yaml"
 }
