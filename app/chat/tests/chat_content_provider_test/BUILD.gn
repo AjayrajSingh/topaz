@@ -22,6 +22,4 @@ dart_app("chat_content_provider_test") {
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/modular:lib.modular",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

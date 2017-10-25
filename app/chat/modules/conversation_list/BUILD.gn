@@ -24,8 +24,6 @@ flutter_app("chat_conversation_list") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
@@ -34,6 +32,4 @@ dart_test("test") {
     "//third_party/dart-pkg/pub/test",
     "//topaz/app/chat/modules/conversation_list:chat_conversation_list_dart_package",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

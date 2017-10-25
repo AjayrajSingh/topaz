@@ -25,6 +25,4 @@ dart_app("chat_content_provider") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
