@@ -18,8 +18,6 @@ flutter_app("contacts_picker") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/fidl/dart",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
@@ -28,6 +26,4 @@ dart_test("test") {
     "//third_party/dart-pkg/pub/test",
     "//topaz/app/contacts/modules/contacts_picker:contacts_picker_dart_package",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

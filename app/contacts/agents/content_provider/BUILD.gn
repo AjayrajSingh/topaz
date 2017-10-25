@@ -15,8 +15,6 @@ dart_app("contacts_content_provider") {
     "//topaz/public/dart/modular:lib.modular",
     "//topaz/public/lib/app/dart",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
@@ -24,6 +22,4 @@ dart_test("test") {
     "//third_party/dart-pkg/pub/test",
     "//topaz/app/contacts/agents/content_provider:contacts_content_provider_dart_package",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
