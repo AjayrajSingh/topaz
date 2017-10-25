@@ -13,6 +13,8 @@ import 'package:lib.widgets/modular.dart';
 
 import 'stores.dart';
 
+// ignore_for_file: public_member_api_docs
+
 class ModuleDataModuleModel extends ModuleModel {
   /// Creates an instance of a [ModuleDataModuleModel]
   ModuleDataModuleModel();

@@ -4,6 +4,8 @@
 
 import 'package:flutter_flux/flutter_flux.dart';
 
+// ignore_for_file: public_member_api_docs
+
 class ModuleDataStore extends Store {
   ModuleDataStore() {
     // ignore: uses_dynamic_as_bottom

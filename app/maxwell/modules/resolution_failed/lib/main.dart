@@ -11,6 +11,8 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'src/module_data_module_model.dart';
 import 'src/stores.dart';
 
+// ignore_for_file: public_member_api_docs
+
 class ModuleDataScreen extends StoreWatcher {
   ModuleDataScreen({Key key}) : super(key: key);
 
