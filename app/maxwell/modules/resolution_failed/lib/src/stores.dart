@@ -13,7 +13,7 @@ class ModuleDataStore extends Store {
     });
   }
 
-  String _linkValue = "(not set)";
+  String _linkValue = '(not set)';
 
   String get linkValue => _linkValue;
 }
