@@ -29,7 +29,7 @@ class SpringModel extends TickingModel {
   void jump(double value) {
     _simulation = new RK4SpringSimulation(
       initValue: value,
-      desc: _kSimulationDesc,
+      desc: springDescription,
     );
     startTicking();
     notifyListeners();
