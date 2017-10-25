@@ -37,41 +37,27 @@ class Armadillo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget currentChild = new ScopedModelDescendant<IdleModel>(
+    Widget currentChild = new ScopedModelDescendant<ContextModel>(
       child: new DefaultScrollConfiguration(child: conductor),
       builder: (
         BuildContext context,
         Widget child,
-        IdleModel idleModel,
+        ContextModel contextModel,
       ) =>
-          new ScopedModelDescendant<ContextModel>(
-            child: child,
-            builder: (
-              BuildContext context,
-              Widget child,
-              ContextModel contextModel,
-            ) =>
-                new Container(
-                  decoration: new BoxDecoration(
-                    color: Colors.black,
-                    image: new DecorationImage(
-                      image: contextModel.backgroundImageProvider,
-                      alignment: const FractionalOffset(0.4, 0.5),
-                      fit: BoxFit.cover,
-                      colorFilter: new ui.ColorFilter.mode(
-                        Color.lerp(
-                          _kBackgroundOverlayColor,
-                          Colors.transparent,
-                          contextModel.deviceMode == DeviceMode.normal
-                              ? 0.0
-                              : idleModel.value,
-                        ),
-                        ui.BlendMode.srcATop,
-                      ),
-                    ),
-                  ),
-                  child: child,
+          new Container(
+            decoration: new BoxDecoration(
+              color: Colors.black,
+              image: new DecorationImage(
+                image: contextModel.backgroundImageProvider,
+                alignment: const FractionalOffset(0.4, 0.5),
+                fit: BoxFit.cover,
+                colorFilter: const ui.ColorFilter.mode(
+                  _kBackgroundOverlayColor,
+                  ui.BlendMode.srcATop,
                 ),
+              ),
+            ),
+            child: child,
           ),
     );
 

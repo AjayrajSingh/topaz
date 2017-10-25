@@ -170,7 +170,7 @@ class ContextProviderContextModel extends ContextModel {
     _contextualBackgroundImages = decodedJson['background_image'];
 
     String lastUpdate = new File(_kLastUpdate).readAsStringSync();
-    print('lastUpdate $lastUpdate');
+    log.info('Build timestamp: ${lastUpdate.trim()}');
     try {
       _buildTimestamp = DateTime.parse(lastUpdate.trim());
     } on FormatException {
