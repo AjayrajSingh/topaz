@@ -13,6 +13,4 @@ dart_package("last_fm_widgets") {
     "//topaz/app/music/packages/last_fm_models",
     "//topaz/public/dart/widgets:lib.widgets",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

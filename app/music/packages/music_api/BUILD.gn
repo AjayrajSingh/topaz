@@ -13,6 +13,4 @@ dart_package("music_api") {
     "//topaz/app/music/packages/music_models",
     "//topaz/public/dart/logging:lib.logging",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

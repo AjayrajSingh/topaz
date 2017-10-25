@@ -26,6 +26,4 @@ flutter_app("music_album") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

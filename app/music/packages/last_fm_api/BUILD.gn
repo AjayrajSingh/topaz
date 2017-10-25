@@ -12,6 +12,4 @@ dart_package("last_fm_api") {
   deps = [
     "//topaz/app/music/packages/last_fm_models",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

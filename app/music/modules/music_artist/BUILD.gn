@@ -30,6 +30,4 @@ flutter_app("music_artist") {
     "//topaz/public/lib/decomposition/dart",
     "//topaz/public/lib/fidl/dart",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

@@ -14,8 +14,6 @@ dart_package("concert_models") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fixtures",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
@@ -24,6 +22,4 @@ dart_test("test") {
     "//third_party/dart-pkg/pub/test",
     "//topaz/app/music/packages/concert_models",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

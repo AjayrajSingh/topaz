@@ -31,6 +31,4 @@ flutter_app("concert_event_page") {
     "//topaz/public/lib/fidl/dart",
     "//topaz/runtime/web_runner/lib/dart:web_view",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

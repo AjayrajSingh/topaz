@@ -12,6 +12,4 @@ dart_package("concert_api") {
   deps = [
     "//topaz/app/music/packages/concert_models",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

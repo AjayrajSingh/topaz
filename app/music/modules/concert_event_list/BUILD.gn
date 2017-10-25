@@ -27,6 +27,4 @@ flutter_app("concert_event_list") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

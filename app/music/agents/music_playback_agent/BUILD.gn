@@ -17,6 +17,4 @@ dart_app("music_playback_agent") {
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/media/dart",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
