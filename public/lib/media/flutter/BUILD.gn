@@ -18,6 +18,4 @@ dart_package("flutter") {
     "//topaz/public/lib/media/dart",
     "//topaz/public/lib/ui/flutter",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }

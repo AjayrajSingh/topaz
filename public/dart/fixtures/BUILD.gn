@@ -13,8 +13,6 @@ dart_package("fixtures") {
     "//third_party/dart-pkg/pub/lorem",
     "//third_party/dart-pkg/pub/uuid",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
 
 dart_test("test") {
@@ -23,6 +21,4 @@ dart_test("test") {
     "//third_party/dart-pkg/pub/test",
     "//topaz/public/dart/fixtures",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
