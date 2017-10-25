@@ -24,6 +24,4 @@ flutter_app("video") {
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/media/flutter",
   ]
-
-  analysis_options = "//topaz/tools/analysis_options.yaml"
 }
