@@ -42,6 +42,9 @@ abstract class SuggestionModel extends Model {
   /// Returns true if an ask is being processed.
   bool get processingAsk;
 
+  /// Returns true if voice response is playing.
+  bool get speaking;
+
   /// Starts speech input.
   void beginSpeechCapture({
     VoidCallback onReady,

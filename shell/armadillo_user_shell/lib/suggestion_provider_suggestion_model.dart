@@ -269,6 +269,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   String _askText;
   bool _asking = false;
   bool _processingAsk = false;
+  bool _speaking = false;
 
   /// Set from an external source - typically the UserShell.
   maxwell.SuggestionProviderProxy _suggestionProviderProxy;
@@ -323,6 +324,10 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     }
   }
 
+  /// Dataflow spaghetti.
+  maxwell.SuggestionProviderProxy get suggestionProviderProxy =>
+      _suggestionProviderProxy;
+
   /// Setting [suggestionProvider] triggers the loading on suggestions.
   /// This is typically set by the UserShell.
   set suggestionProvider(
@@ -352,12 +357,17 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
           case maxwell.SpeechStatus.processing:
             break;
           case maxwell.SpeechStatus.responding:
+            _speaking = true;
             if (!_processingAsk) {
               _processingAsk = true;
-              notifyListeners();
             }
+            notifyListeners();
             break;
           case maxwell.SpeechStatus.idle:
+            _speaking = false;
+            _processingAsk = false;
+            notifyListeners();
+            break;
           default:
             if (_processingAsk) {
               _processingAsk = false;
@@ -524,6 +534,9 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   @override
   bool get processingAsk => _processingAsk;
+
+  @override
+  bool get speaking => _speaking;
 
   @override
   void beginSpeechCapture({
