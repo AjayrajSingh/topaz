@@ -346,6 +346,7 @@ class _QueryHandlerImpl extends QueryHandler {
       }
 
       scanDirectory(new Directory('/system/apps/'));
+      scanDirectory(new Directory('/system/bin/'));
       scanDirectory(new Directory('/system/pkgs/'));
     }
 
