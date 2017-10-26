@@ -343,13 +343,13 @@ class Panel {
     return (intersection.width > 0.0 && intersection.height > 0.0);
   }
 
-  /// Returns true if [other] is above [this] [Panel].
+  /// Returns true if [other] is above `this` [Panel].
   bool isBelow(Panel other) =>
       (other.bottom == top) &&
       ((other.left >= left && other.left < right) ||
           (other.left < left && other.right > left));
 
-  /// Returns true if [other] is to the left of [this] [Panel].
+  /// Returns true if [other] is to the left of `this` [Panel].
   bool isRightOf(Panel other) =>
       (other.right == left) &&
       ((other.top >= top && other.top < bottom) ||

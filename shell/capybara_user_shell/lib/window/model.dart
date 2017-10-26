@@ -62,7 +62,7 @@ class WindowData extends Model {
   bool has(TabId id) => tabs.any((TabData tab) => tab.id == id);
 
   /// Returns the data for the [id] tab, or the result of calling [orElse], or
-  /// [null].
+  /// `null`.
   TabData find(TabId id, {TabData orElse()}) => tabs.firstWhere(
         (TabData tab) => tab.id == id,
         orElse: orElse ?? () => null,
@@ -159,7 +159,7 @@ class WindowsData extends Model {
   }
 
   /// Returns the data for the [id] window, or the result of calling [orElse],
-  /// or [null].
+  /// or `null`.
   WindowData find(WindowId id, {WindowData orElse()}) => windows.firstWhere(
         (WindowData window) => window.id == id,
         orElse: orElse ?? () => null,
