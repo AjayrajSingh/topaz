@@ -101,7 +101,7 @@ void showStackTrace() {
 }
 
 /// From the given [Trace], finds the first [Frame] after the `logging` package
-/// and returns that frame. If no such [Frame] is found, returns [null].
+/// and returns that frame. If no such [Frame] is found, returns `null`.
 ///
 /// SEE: https://github.com/dart-lang/logging/issues/32
 Frame _findCallerFrame(Trace trace) {

@@ -27,9 +27,9 @@ class ModuleModel extends Model {
   final Completer<Null> _readyCompleter = new Completer<Null>();
 
   /// Indicates whether the [LinkWatcher] should watch for all changes including
-  /// the changes made by this [Module]. If [true], it calls [Link.watchAll] to
+  /// the changes made by this [Module]. If `true`, it calls [Link.watchAll] to
   /// register the [LinkWatcher], and [Link.watch] otherwise. Only takes effect
-  /// when the [onNotify] callback is also provided. Defaults to false.
+  /// when the [onNotify] callback is also provided. Defaults to `false`.
   final bool watchAll;
 
   /// Creates a new instance of [ModuleModel].

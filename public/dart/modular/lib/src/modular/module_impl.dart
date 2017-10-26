@@ -70,9 +70,9 @@ class ModuleImpl implements Module, Lifecycle {
   final OnDeviceMapChange onDeviceMapChange;
 
   /// Indicates whether the [LinkWatcher] should watch for all changes including
-  /// the changes made by this [Module]. If [true], it calls [Link.watchAll] to
+  /// the changes made by this [Module]. If `true`, it calls [Link.watchAll] to
   /// register the [LinkWatcher], and [Link.watch] otherwise. Only takes effect
-  /// when the [onNotify] callback is also provided. Defaults to false.
+  /// when the [onNotify] callback is also provided. Defaults to `false`.
   final bool watchAll;
 
   /// Constuctor.
