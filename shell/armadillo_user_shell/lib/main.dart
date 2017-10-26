@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:ui' as ui;
 
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.device_settings.fidl/device_settings.fidl.dart';
 import 'package:lib.media.dart/audio_policy.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:armadillo/armadillo.dart';
@@ -160,8 +161,17 @@ Widget buildArmadilloUserShell({
     },
   );
 
+  DeviceSettingsManagerProxy deviceSettingsManagerProxy =
+      new DeviceSettingsManagerProxy();
+  connectToService(
+    applicationContext.environmentServices,
+    deviceSettingsManagerProxy.ctrl,
+  );
+
   ContextProviderContextModel contextProviderContextModel =
-      new ContextProviderContextModel();
+      new ContextProviderContextModel(
+    deviceSettingsManager: deviceSettingsManagerProxy,
+  );
 
   DeviceMapProxy deviceMapProxy = new DeviceMapProxy();
   DeviceMapWatcherBinding deviceMapWatcher = new DeviceMapWatcherBinding();
@@ -209,6 +219,7 @@ Widget buildArmadilloUserShell({
       suggestionProviderSuggestionModel.close();
       deviceMapProxy.ctrl.close();
       deviceMapWatcher.close();
+      deviceSettingsManagerProxy.ctrl.close();
     },
     onWallpaperChosen: contextProviderContextModel.onWallpaperChosen,
   );

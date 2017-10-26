@@ -12,6 +12,7 @@ flutter_app("armadillo_user_shell") {
   manifest = "pubspec.yaml"
 
   deps = [
+    "//garnet/public/lib/device_settings/fidl:fidl_dart",
     "//garnet/public/lib/power/fidl:fidl_dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

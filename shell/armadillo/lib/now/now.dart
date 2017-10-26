@@ -10,11 +10,13 @@ import 'package:lib.widgets/model.dart';
 
 import '../size_model.dart';
 import '../story_drag_transition_model.dart';
+import 'context_model.dart';
 import 'minimized_now_bar.dart';
 import 'now_minimization_model.dart';
 import 'now_user_and_maximized_info.dart';
 import 'quick_settings.dart';
 import 'quick_settings_progress_model.dart';
+import 'timezone_picker.dart';
 
 /// The distance above the lowest point we can scroll down to when
 /// recents scroll offset is 0.0.
@@ -135,109 +137,129 @@ class Now extends StatelessWidget {
     QuickSettingsProgressModel quickSettingsProgressModel,
     NowMinimizationModel nowMinimizationModel,
   ) =>
-      new Align(
-        alignment: FractionalOffset.bottomCenter,
-        child: new ScopedModelDescendant<SizeModel>(
-          builder: (
-            BuildContext context,
-            Widget child,
-            SizeModel sizeModel,
-          ) =>
-              new AnimatedBuilder(
-                animation: recentsScrollOffset,
-                builder: (BuildContext context, Widget child) => new Container(
-                      height: _getNowHeight(
-                        quickSettingsProgressModel,
-                        nowMinimizationModel,
-                        sizeModel,
-                        recentsScrollOffset.value,
-                      ),
-                      child: child,
-                    ),
-                child: new Stack(
-                  fit: StackFit.passthrough,
-                  children: <Widget>[
-                    // Quick Settings Background.
-                    new Positioned(
-                      left: _kQuickSettingsHorizontalPadding,
-                      right: _kQuickSettingsHorizontalPadding,
-                      top: _getQuickSettingsBackgroundTopOffset(
-                        sizeModel,
-                        quickSettingsProgressModel,
-                        nowMinimizationModel,
-                      ),
-                      child: new Center(
-                        child: new Container(
-                          height: _getQuickSettingsBackgroundHeight(
+      new Stack(
+        children: <Widget>[
+          new Align(
+            alignment: FractionalOffset.bottomCenter,
+            child: new ScopedModelDescendant<SizeModel>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                SizeModel sizeModel,
+              ) =>
+                  new AnimatedBuilder(
+                    animation: recentsScrollOffset,
+                    builder: (BuildContext context, Widget child) =>
+                        new Container(
+                          height: _getNowHeight(
+                            quickSettingsProgressModel,
+                            nowMinimizationModel,
+                            sizeModel,
+                            recentsScrollOffset.value,
+                          ),
+                          child: child,
+                        ),
+                    child: new Stack(
+                      fit: StackFit.passthrough,
+                      children: <Widget>[
+                        // Quick Settings Background.
+                        new Positioned(
+                          left: _kQuickSettingsHorizontalPadding,
+                          right: _kQuickSettingsHorizontalPadding,
+                          top: _getQuickSettingsBackgroundTopOffset(
                             sizeModel,
                             quickSettingsProgressModel,
                             nowMinimizationModel,
                           ),
-                          width: _getQuickSettingsBackgroundWidth(
+                          child: new Center(
+                            child: new Container(
+                              height: _getQuickSettingsBackgroundHeight(
+                                sizeModel,
+                                quickSettingsProgressModel,
+                                nowMinimizationModel,
+                              ),
+                              width: _getQuickSettingsBackgroundWidth(
+                                sizeModel,
+                                quickSettingsProgressModel,
+                                nowMinimizationModel,
+                              ),
+                              decoration: new BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: new BorderRadius.circular(
+                                  quickSettingsProgressModel
+                                      .backgroundBorderRadius,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        // User Image, User Context Text, and Important Information when maximized.
+                        new Positioned(
+                          left: _kQuickSettingsHorizontalPadding,
+                          right: _kQuickSettingsHorizontalPadding,
+                          top: _getUserImageTopOffset(
                             sizeModel,
                             quickSettingsProgressModel,
                             nowMinimizationModel,
                           ),
-                          decoration: new BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: new BorderRadius.circular(
-                              quickSettingsProgressModel.backgroundBorderRadius,
+                          child: new Center(
+                            child: new Column(
+                              children: <Widget>[
+                                new NowUserAndMaximizedContext(
+                                  onUserContextTapped: onUserContextTapped,
+                                  onUserTimeTapped: () {
+                                    ContextModel
+                                        .of(context)
+                                        .isTimezonePickerShowing = true;
+                                  },
+                                  onUserTapped: () {
+                                    if (!quickSettingsProgressModel.showing) {
+                                      quickSettingsProgressModel.show();
+                                      onQuickSettingsMaximized?.call();
+                                    } else {
+                                      quickSettingsProgressModel.hide();
+                                    }
+                                  },
+                                ),
+                                new Container(height: 32.0),
+                                // Quick Settings
+                                _buildQuickSettings(
+                                  quickSettingsProgressModel,
+                                  nowMinimizationModel,
+                                  sizeModel,
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    // User Image, User Context Text, and Important Information when maximized.
-                    new Positioned(
-                      left: _kQuickSettingsHorizontalPadding,
-                      right: _kQuickSettingsHorizontalPadding,
-                      top: _getUserImageTopOffset(
-                        sizeModel,
-                        quickSettingsProgressModel,
-                        nowMinimizationModel,
-                      ),
-                      child: new Center(
-                        child: new Column(
-                          children: <Widget>[
-                            new NowUserAndMaximizedContext(
-                              onUserContextTapped: onUserContextTapped,
-                              onUserTimeTapped: () {
-                                print('time tapped');
-                              },
-                              onUserTapped: () {
-                                if (!quickSettingsProgressModel.showing) {
-                                  quickSettingsProgressModel.show();
-                                  onQuickSettingsMaximized?.call();
-                                } else {
-                                  quickSettingsProgressModel.hide();
-                                }
-                              },
-                            ),
-                            new Container(height: 32.0),
-                            // Quick Settings
-                            _buildQuickSettings(
-                              quickSettingsProgressModel,
-                              nowMinimizationModel,
-                              sizeModel,
-                            ),
-                          ],
+
+                        // User Context Text and Important Information when minimized.
+                        new MinimizedNowBar(),
+
+                        // Minimized button bar gesture detector. Only enabled when
+                        // we're nearly fully minimized.
+                        _buildMinimizedButtonBarGestureDetector(
+                          sizeModel,
+                          nowMinimizationModel,
                         ),
-                      ),
+                      ],
                     ),
-
-                    // User Context Text and Important Information when minimized.
-                    new MinimizedNowBar(),
-
-                    // Minimized button bar gesture detector. Only enabled when
-                    // we're nearly fully minimized.
-                    _buildMinimizedButtonBarGestureDetector(
-                      sizeModel,
-                      nowMinimizationModel,
-                    ),
-                  ],
+                  ),
+            ),
+          ),
+          new ScopedModelDescendant<ContextModel>(
+            builder: (
+              BuildContext context,
+              Widget child,
+              ContextModel contextModel,
+            ) =>
+                new Offstage(
+                  offstage: !contextModel.isTimezonePickerShowing,
+                  child: child,
                 ),
-              ),
-        ),
+            child: new TimezonePicker(),
+          ),
+        ],
       );
 
   Widget _buildQuickSettings(

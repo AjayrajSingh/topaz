@@ -17,6 +17,7 @@ final DateFormat _kMeridiemOnlyFormat = new DateFormat('a', 'en_US');
 class TimeStringer extends Listenable {
   final Set<VoidCallback> _listeners = new Set<VoidCallback>();
   Timer _timer;
+  int _offsetMinutes = 0;
 
   /// [listener] will be called whenever [shortString] or [longString] have
   /// changed.
@@ -42,29 +43,42 @@ class TimeStringer extends Listenable {
   /// Returns the time only (eg. '10:34').
   String get timeOnly => _kTimeOnlyDateFormat
       .format(
-        new DateTime.now().toLocal(),
+        _getNowWithOffset(),
       )
       .toUpperCase();
 
   /// Returns the date only (eg. 'MONDAY AUG 3').
   String get dateOnly => _kDateOnlyDateFormat
       .format(
-        new DateTime.now().toLocal(),
+        _getNowWithOffset(),
       )
       .toUpperCase();
 
   /// Returns a short version of the time (eg. '10:34').
-  String get shortString => _kShortStringDateFormat
-      .format(new DateTime.now().toLocal())
-      .toLowerCase();
+  String get shortString =>
+      _kShortStringDateFormat.format(_getNowWithOffset()).toLowerCase();
 
   /// Returns a long version of the time including the day (eg. 'Monday 10:34').
   String get longString =>
-      _kLongStringDateFormat.format(new DateTime.now().toLocal()).toLowerCase();
+      _kLongStringDateFormat.format(_getNowWithOffset()).toLowerCase();
 
   /// Returns the meridiem (eg. 'AM')
   String get meridiem =>
-      _kMeridiemOnlyFormat.format(new DateTime.now().toLocal()).toUpperCase();
+      _kMeridiemOnlyFormat.format(_getNowWithOffset()).toUpperCase();
+
+  /// Returns the offset, in minutes.
+  int get offsetMinutes => _offsetMinutes;
+
+  set offsetMinutes(int offsetMinutes) {
+    if (_offsetMinutes != offsetMinutes) {
+      _offsetMinutes = offsetMinutes;
+      _notifyListeners();
+    }
+  }
+
+  DateTime _getNowWithOffset() {
+    return new DateTime.now().add(new Duration(minutes: _offsetMinutes));
+  }
 
   void _scheduleTimer() {
     _timer?.cancel();
