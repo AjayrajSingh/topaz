@@ -26,7 +26,7 @@ bool isSameDay(DateTime time1, DateTime time2) {
 /// 2. Show month abbreviation + day for timestamps not in the same day.
 ///    Ex: Aug 15
 ///
-/// If [alwaysIncludeTime] is set to [true], the time information is also
+/// If [alwaysIncludeTime] is set to `true`, the time information is also
 /// shown even when the timestamps are not in the same day.
 ///    Ex: Aut 15, 10:44pm
 String relativeDisplayDate({
