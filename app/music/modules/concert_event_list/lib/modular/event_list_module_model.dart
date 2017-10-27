@@ -37,9 +37,7 @@ class EventListModuleModel extends ModuleModel {
       new IntelligenceServicesProxy();
 
   /// Constructor
-  EventListModuleModel({this.apiKey}) : super() {
-    _fetchEvents();
-  }
+  EventListModuleModel({this.apiKey}) : super();
 
   /// API key for Songkick APIs
   final String apiKey;
@@ -84,9 +82,12 @@ class EventListModuleModel extends ModuleModel {
   int _selectedEventId;
 
   /// Retrieves the events
-  Future<Null> _fetchEvents() async {
+  Future<Null> _fetchEvents(String metroId) async {
     try {
-      _events = await Api.searchEventsByArtist(null, apiKey);
+      _events = await Api.searchEventsByArtist(
+        apiKey: apiKey,
+        metroId: metroId,
+      );
       if (_events != null) {
         _loadingStatus = LoadingStatus.completed;
       } else {
@@ -187,6 +188,23 @@ class EventListModuleModel extends ModuleModel {
       ),
     );
     _eventSelector.start(moduleContext);
+  }
+
+  @override
+  Future<Null> onNotify(String json) async {
+    try {
+      dynamic doc = JSON.decode(json);
+      dynamic uri = doc['view'];
+      if (uri['host'] == 'www.songkick.com' &&
+          uri['path segments'][0] == 'metro_areas') {
+        // Songkick metro areas area specified as: id-name in the URL
+        // We only want the ID before the first dash
+        List<String> split = uri['path segments'][1].split('-');
+        await _fetchEvents(split[0]);
+      }
+    } on Exception {
+      return;
+    }
   }
 
   @override

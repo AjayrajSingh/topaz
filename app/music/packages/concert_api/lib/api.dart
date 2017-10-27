@@ -7,6 +7,7 @@ import 'dart:convert' show JSON;
 
 import 'package:concert_models/concert_models.dart';
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 
 const String _kApiBaseUrl = 'api.songkick.com';
 
@@ -49,16 +50,18 @@ class Api {
   /// List upcoming Songkick events for the given artist name.
   /// If no artist name is given, then all nearby events will be retrieved.
   /// Only nearby (based on client IP address) events will shown.
-  static Future<List<Event>> searchEventsByArtist(
+  static Future<List<Event>> searchEventsByArtist({
     String name,
-    String apiKey,
-  ) async {
+    @required String apiKey,
+    @required String metroId,
+  }) async {
     assert(apiKey != null);
+    assert(metroId != null);
     Map<String, String> query = <String, String>{};
     if (name != null) {
       query['artist_name'] = name;
     }
-    query['location'] = 'sk:26330';
+    query['location'] = 'sk:$metroId';
     query['apikey'] = apiKey;
     Uri uri = new Uri.https(
       _kApiBaseUrl,

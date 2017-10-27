@@ -9,6 +9,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:lib.decomposition.dart/decomposition.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
@@ -55,6 +56,11 @@ class ContextListenerImpl extends ContextListener {
   void _createProposal(String hotelName) {
     String headline = 'Upcoming concerts near $hotelName this week';
 
+    final Uri arg = new Uri(
+      host: 'www.songkick.com',
+      pathSegments: <String>['metro_areas', '26330-us-sf-bay-area'],
+    );
+
     Proposal proposal = new Proposal()
       ..id = 'Concerts Near Hotel'
       ..display = (new SuggestionDisplay()
@@ -70,7 +76,9 @@ class ContextListenerImpl extends ContextListener {
       ..onSelected = <Action>[
         new Action()
           ..createStory = (new CreateStory()
-            ..moduleId = 'file:///system/apps/concert_event_list')
+            ..moduleId = 'file:///system/apps/concert_event_list'
+            ..initialData =
+                JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}))
       ];
 
     log.fine('proposing concert suggestion');
