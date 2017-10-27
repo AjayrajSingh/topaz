@@ -27,6 +27,7 @@ class EventSelector implements QueryHandler {
   final QueryHandlerBinding _queryHandlerBinding = new QueryHandlerBinding();
   final Map<String, _EventData> _registeredEvents = <String, _EventData>{};
   final Set<CustomActionBinding> _bindings = new Set<CustomActionBinding>();
+  bool _storyInFocus = false;
 
   /// Registers [hotWordPhrase] that when asked for will trigger [onSelected].
   /// [id] should be used to call [deregisterEvent] when this event is no longer
@@ -40,6 +41,11 @@ class EventSelector implements QueryHandler {
       hotWordPhrase: hotWordPhrase.toLowerCase(),
       onSelected: onSelected,
     );
+  }
+
+  /// Sets the story id this module is running within.
+  set storyInFocus(bool storyInFocus) {
+    _storyInFocus = storyInFocus;
   }
 
   /// Deregisters the event registered with [id].
@@ -80,39 +86,41 @@ class EventSelector implements QueryHandler {
   void onQuery(UserInput query, void callback(QueryResponse response)) {
     List<Proposal> proposals = <Proposal>[];
 
-    String queryText = query.text?.toLowerCase();
+    if (_storyInFocus) {
+      String queryText = query.text?.toLowerCase();
 
-    if (queryText != null) {
-      for (_EventData eventData in _registeredEvents.values) {
-        if ((queryText.contains('choose') ||
-                queryText.contains('show') ||
-                queryText.contains('select') ||
-                queryText.contains('more')) &&
-            queryText.contains(eventData.hotWordPhrase)) {
-          _SelectEventCustomAction selectEventCustomAction =
-              new _SelectEventCustomAction(eventData);
-          CustomActionBinding binding = new CustomActionBinding();
-          _bindings.add(binding);
-          proposals.add(
-            new Proposal()
-              ..id = 'Select ${eventData.hotWordPhrase}'
-              ..confidence = 1.0
-              ..display = (new SuggestionDisplay()
-                ..headline = 'Select ${eventData.hotWordPhrase}'
-                ..subheadline = ''
-                ..details = ''
-                ..color = 0xFFA5A700
-                ..iconUrls = <String>[]
-                ..imageType = SuggestionImageType.other
-                ..imageUrl = ''
-                ..annoyance = AnnoyanceType.none)
-              ..onSelected = <Action>[
-                new Action()
-                  ..customAction = binding.wrap(
-                    selectEventCustomAction,
-                  )
-              ],
-          );
+      if (queryText != null) {
+        for (_EventData eventData in _registeredEvents.values) {
+          if ((queryText.contains('choose') ||
+                  queryText.contains('show') ||
+                  queryText.contains('select') ||
+                  queryText.contains('more')) &&
+              queryText.contains(eventData.hotWordPhrase)) {
+            _SelectEventCustomAction selectEventCustomAction =
+                new _SelectEventCustomAction(eventData);
+            CustomActionBinding binding = new CustomActionBinding();
+            _bindings.add(binding);
+            proposals.add(
+              new Proposal()
+                ..id = 'Select ${eventData.hotWordPhrase}'
+                ..confidence = 1.0
+                ..display = (new SuggestionDisplay()
+                  ..headline = 'Select ${eventData.hotWordPhrase}'
+                  ..subheadline = ''
+                  ..details = ''
+                  ..color = 0xFFA5A700
+                  ..iconUrls = <String>[]
+                  ..imageType = SuggestionImageType.other
+                  ..imageUrl = ''
+                  ..annoyance = AnnoyanceType.none)
+                ..onSelected = <Action>[
+                  new Action()
+                    ..customAction = binding.wrap(
+                      selectEventCustomAction,
+                    )
+                ],
+            );
+          }
         }
       }
     }

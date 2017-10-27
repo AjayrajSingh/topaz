@@ -9,20 +9,32 @@ import 'dart:convert';
 import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
+import 'package:flutter/widgets.dart' show ValueChanged;
 import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.context.fidl/context_reader.fidl.dart';
+import 'package:lib.context.fidl/metadata.fidl.dart';
+import 'package:lib.context.fidl/value_type.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
+import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'event_selector.dart';
 
+const String _kSelectorLabel = 'focused_stories_with_my_story_id';
+
 /// [ModuleModel] that manages the state of the Event Module.
 class EventListModuleModel extends ModuleModel {
   final EventSelector _eventSelector = new EventSelector();
+  final ContextReaderProxy _contextReaderProxy = new ContextReaderProxy();
+  final ContextListenerBinding _contextListenerBinding =
+      new ContextListenerBinding();
+  final IntelligenceServicesProxy _intelligenceServicesProxy =
+      new IntelligenceServicesProxy();
 
   /// Constructor
   EventListModuleModel({this.apiKey}) : super() {
@@ -137,7 +149,38 @@ class EventListModuleModel extends ModuleModel {
     ServiceProvider incomingServices,
   ) {
     super.onReady(moduleContext, link, incomingServices);
-    moduleContext.getLink('event_link', _eventLink.ctrl.request());
+
+    moduleContext.getIntelligenceServices(
+      _intelligenceServicesProxy.ctrl.request(),
+    );
+
+    _intelligenceServicesProxy.getContextReader(
+      _contextReaderProxy.ctrl.request(),
+    );
+
+    moduleContext
+      ..getStoryId((String storyId) {
+        _contextReaderProxy.subscribe(
+          new ContextQuery()
+            ..selector = <String, ContextSelector>{
+              _kSelectorLabel: new ContextSelector()
+                ..type = ContextValueType.story
+                ..meta = (new ContextMetadata()
+                  ..story = (new StoryMetadata()
+                    ..id = storyId
+                    ..focused = (new FocusedState()
+                      ..state = FocusedStateState.focused))),
+            },
+          _contextListenerBinding.wrap(
+            new _ContextListenerImpl(
+              onStoryInFocusChanged: (bool storyInFocus) {
+                _eventSelector.storyInFocus = storyInFocus;
+              },
+            ),
+          ),
+        );
+      })
+      ..getLink('event_link', _eventLink.ctrl.request());
     _eventLink.watchAll(
       _eventLinkWatcherBinding.wrap(
         new LinkWatcherImpl(onNotify: _onNotifyChild),
@@ -151,6 +194,9 @@ class EventListModuleModel extends ModuleModel {
     _eventPageModuleController.ctrl.close();
     _eventLink?.ctrl?.close();
     _eventSelector.stop();
+    _contextReaderProxy.ctrl.close();
+    _contextListenerBinding.close();
+    _intelligenceServicesProxy.ctrl.close();
   }
 
   @override
@@ -225,6 +271,21 @@ class EventListModuleModel extends ModuleModel {
             );
         }
       }
+    }
+  }
+}
+
+class _ContextListenerImpl extends ContextListener {
+  final ValueChanged<bool> onStoryInFocusChanged;
+
+  _ContextListenerImpl({this.onStoryInFocusChanged});
+
+  @override
+  Future<Null> onContextUpdate(ContextUpdate result) async {
+    if (result.values[_kSelectorLabel].isEmpty) {
+      onStoryInFocusChanged?.call(false);
+    } else {
+      onStoryInFocusChanged?.call(true);
     }
   }
 }
