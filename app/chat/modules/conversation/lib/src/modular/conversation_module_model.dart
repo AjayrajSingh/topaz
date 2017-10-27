@@ -26,6 +26,7 @@ import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
 
 import '../models.dart';
 import '../widgets.dart';
+import 'embedder.dart';
 
 const String _kChatContentProviderUrl =
     'file:///system/apps/chat_content_provider';
@@ -37,6 +38,9 @@ const Duration _kScrollAnimationDuration = const Duration(milliseconds: 300);
 /// widgets.
 class ChatConversationModuleModel extends ModuleModel {
   static final ListEquality<int> _intListEquality = const ListEquality<int>();
+
+  /// Keep track of all the [Embedder] instances.
+  final List<Embedder> embedders = <Embedder>[];
 
   final AgentControllerProxy _chatContentProviderController =
       new AgentControllerProxy();
@@ -82,6 +86,7 @@ class ChatConversationModuleModel extends ModuleModel {
   /// Sets the current conversation id value.
   void _setConversationId(List<int> id) {
     Uint8List newId = id == null ? null : new Uint8List.fromList(id);
+
     if (!_intListEquality.equals(_conversationId, newId)) {
       _conversationId = newId;
 
@@ -210,8 +215,6 @@ class ChatConversationModuleModel extends ModuleModel {
   /// The returned conversation will be stored in [_conversation], and the
   /// messages in the [_messages] list.
   Future<Null> _fetchConversation() async {
-    log.fine('fetchConversation call.');
-
     if (conversationId == null) {
       return;
     }
@@ -228,14 +231,29 @@ class ChatConversationModuleModel extends ModuleModel {
       conversationId,
       true, // Wait until the conversation info is ready
       (chat_fidl.ChatStatus status, chat_fidl.Conversation conversation) {
+        log.fine('got conversation from content provider');
+
         statusCompleter.complete(status);
         conversationCompleter.complete(conversation);
       },
     );
 
+    // TODO(SO-888): there is some wierd race condition in the setup here or in the
+    // content provider's initialization. The first time the agent runs the code
+    // below will hang, the timeout retires the effort after 5 secs.
+    Duration duration = const Duration(seconds: 5);
+    Timer timer = new Timer(duration, () {
+      if (!statusCompleter.isCompleted) {
+        log.info('waited $duration, retrying...');
+        _fetchConversation();
+      }
+    });
+
     // TODO(youngseokyoon): properly communicate the error status to the user.
     // https://fuchsia.atlassian.net/browse/SO-365
     chat_fidl.ChatStatus status = await statusCompleter.future;
+    timer.cancel();
+
     if (status != chat_fidl.ChatStatus.ok) {
       log.severe('ChatContentProvider::GetConversation() returned an error '
           'status: $status');
@@ -383,7 +401,18 @@ class ChatConversationModuleModel extends ModuleModel {
 
     switch (m.type) {
       case 'command':
+        Embedder embedder = new Embedder(
+          height: 200.0,
+          moduleContext: moduleContext,
+        );
+
+        embedders.add(embedder);
+
         return new CommandMessage(
+          members: participants.map((chat_fidl.Participant p) {
+            return p.displayName ?? p.email;
+          }).toList(),
+          embedder: embedder,
           messageId: m.messageId,
           time: time,
           sender: m.sender,
@@ -456,6 +485,10 @@ class ChatConversationModuleModel extends ModuleModel {
     _childLink.ctrl.close();
     _chatContentProvider.ctrl.close();
     _chatContentProviderController.ctrl.close();
+
+    for (Embedder e in embedders) {
+      e.close();
+    }
 
     super.onStop();
   }

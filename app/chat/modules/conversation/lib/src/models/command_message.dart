@@ -3,8 +3,10 @@
 // found in the LICENSE file.
 
 import 'dart:collection';
+import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
 import 'message.dart';
@@ -17,18 +19,31 @@ enum CommandType {
 
 /// A [Message] model representing a slash command.
 class CommandMessage extends Message {
+  /// Called whenever the [Model] changes.
+  // CommandMessageParentBuilder parentBuilder;
+  final EmbedderModel embedder;
+
+  /// String paylod of the message contents.
+  final String payload;
+
+  /// String list of members in the chat convo.
+  final List<String> members;
+
   CommandType _command;
   List<String> _arguments;
 
   /// Creates a new instance of [CommandMessage].
   CommandMessage({
+    @required this.members,
+    @required this.embedder,
     @required List<int> messageId,
     @required DateTime time,
     @required String sender,
     VoidCallback onDelete,
-    @required String payload,
+    @required this.payload,
   })
-      : assert(payload != null),
+      : assert(embedder != null),
+        assert(payload != null),
         assert(payload.isNotEmpty),
         assert(CommandMessage.isCommand(payload)),
         super(
@@ -44,11 +59,28 @@ class CommandMessage extends Message {
       case '/mod':
         _command = CommandType.mod;
         break;
-      default:
-        throw new Exception('The "$first" command is not supported.');
     }
 
     _arguments = chunks;
+
+    // Supports "/mod <bin> <message>".
+    if (_arguments.isNotEmpty) {
+      String id = messageId.join();
+      String bin = _arguments.first;
+      String message = _arguments.sublist(1).join(' ');
+
+      // Setup link data.
+      Map<String, dynamic> json = <String, dynamic>{
+        'message': message,
+        'members': members,
+      };
+
+      embedder.startModule(
+        uri: 'file:///system/apps/codelab/$bin',
+        name: 'chat-command-$id',
+        data: JSON.encode(json),
+      );
+    }
   }
 
   /// Check if a string is a slash command.
@@ -60,7 +92,7 @@ class CommandMessage extends Message {
   String get type => 'command';
 
   @override
-  bool get fillBubble => true;
+  bool get fillBubble => _command == null ? false : true;
 
   /// The [CommandType] for this [CommandMessage].
   CommandType get command => _command;
@@ -69,5 +101,33 @@ class CommandMessage extends Message {
   List<String> get arguments => new UnmodifiableListView<String>(_arguments);
 
   @override
-  Widget buildWidget() => new Text('$command');
+  Widget buildWidget() {
+    /// Connect the [EmbedderModel] parent to the nodes built in
+    /// [buildEmbeddedModule].
+    return new ScopedModel<EmbedderModel>(
+      model: embedder,
+      child: new ScopedModelDescendant<EmbedderModel>(
+          builder: buildEmbeddedModule),
+    );
+  }
+
+  /// Command specific rendering, delelgates to the embedder for the mod
+  /// command.
+  Widget buildEmbeddedModule(
+    BuildContext context,
+    Widget child,
+    EmbedderModel model,
+  ) {
+    if (_command == null) {
+      return new Text(
+        payload,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.grey,
+        ),
+      );
+    } else {
+      return model.build(context);
+    }
+  }
 }

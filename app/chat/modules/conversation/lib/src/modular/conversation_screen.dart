@@ -20,29 +20,36 @@ class ChatConversationScreen extends StatelessWidget {
     return new MaterialApp(
       theme: new ThemeData(primarySwatch: Colors.purple),
       home: new Material(
-        child: new ScopedModelDescendant<ChatConversationModuleModel>(
-          builder: (
-            BuildContext context,
-            Widget child,
-            ChatConversationModuleModel model,
-          ) {
-            return new ChatConversation(
-              enabled: model.conversationId != null,
-              sections: model.sections,
-              title: model.fetchingConversation
-                  ? ''
-                  : model.participants
-                      ?.map(
-                        (chat_fidl.Participant p) => p.displayName ?? p.email,
-                      )
-                      ?.join(', '),
-              onSubmitMessage: model.sendMessage,
-              onTapSharePhoto: model.startGalleryModule,
-              scrollController: model.scrollController,
-            );
-          },
+        // Scaffold is used to show snack bar messages.
+        child: new Scaffold(
+          body: new ScopedModelDescendant<ChatConversationModuleModel>(
+            builder: buildChatConversation,
+          ),
         ),
       ),
+    );
+  }
+
+  /// Builder used to generate the widget tree for a [ScopedModelDescendant]
+  /// requireing a [ChatConversationModuleModel] parent.
+  Widget buildChatConversation(
+    BuildContext context,
+    Widget child,
+    ChatConversationModuleModel model,
+  ) {
+    return new ChatConversation(
+      enabled: model.conversationId != null,
+      sections: model.sections,
+      title: model.fetchingConversation
+          ? ''
+          : model.participants
+              ?.map(
+                (chat_fidl.Participant p) => p.displayName ?? p.email,
+              )
+              ?.join(', '),
+      onSubmitMessage: model.sendMessage,
+      onTapSharePhoto: model.startGalleryModule,
+      scrollController: model.scrollController,
     );
   }
 }

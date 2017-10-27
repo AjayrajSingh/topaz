@@ -3,11 +3,15 @@
 // found in the LICENSE file.
 
 import 'package:chat_conversation/models.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lib.widgets/model.dart';
 
 void main() {
   test('Conversation JSON', () {
     CommandMessage message = new CommandMessage(
+      members: <String>[],
+      embedder: new TestEmbedder(),
       messageId: <int>[1, 2, 3],
       time: new DateTime.now(),
       sender: 'me',
@@ -17,4 +21,12 @@ void main() {
     expect(message.command, equals(CommandType.mod));
     expect(message.arguments, equals(<String>['hello', 'world']));
   });
+}
+
+///
+class TestEmbedder extends EmbedderModel {
+  @override
+  Widget build(BuildContext context) {
+    return const Text('testing');
+  }
 }
