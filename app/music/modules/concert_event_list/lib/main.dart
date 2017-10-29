@@ -36,31 +36,27 @@ Future<Null> main() async {
     applicationContext: applicationContext,
     moduleModel: eventListModel,
     child: new Scaffold(
+      backgroundColor: Colors.white,
       body: new ScopedModelDescendant<EventListModuleModel>(builder: (
         BuildContext context,
         Widget child,
         EventListModuleModel model,
       ) {
         return new Material(
-          child: new Loader(
-            loadingStatus: model.loadingStatus,
-            builder: (BuildContext context) {
-              if (model.deviceMode == 'edgeToEdge') {
-                return new PageableEventList(
+          child: model.deviceMode == 'edgeToEdge'
+              ? new PageableEventList(
                   events: model.events,
                   onSelect: model.selectEvent,
                   selectedEvent: model.selectedEvent,
                   onPageChanged: model.onPageChanged,
-                );
-              } else {
-                return new EventList(
+                  loadingStatus: model.loadingStatus,
+                )
+              : new EventList(
                   events: model.events,
                   onSelect: model.selectEvent,
                   selectedEvent: model.selectedEvent,
-                );
-              }
-            },
-          ),
+                  loadingStatus: model.loadingStatus,
+                ),
         );
       }),
     ),

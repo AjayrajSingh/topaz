@@ -42,14 +42,12 @@ Future<Null> main() async {
         Widget child,
         EventPageModuleModel model,
       ) {
-        return new Loader(
-          loadingStatus: model.loadingStatus,
-          builder: (BuildContext context) => new SingleChildScrollView(
-                child: new EventPage(
-                  event: model.event,
-                  onTapBuy: model.purchaseTicket,
-                ),
-              ),
+        return new SingleChildScrollView(
+          child: new EventPage(
+            event: model.event,
+            onTapBuy: model.purchaseTicket,
+            loadingStatus: model.loadingStatus,
+          ),
         );
       }),
     ),

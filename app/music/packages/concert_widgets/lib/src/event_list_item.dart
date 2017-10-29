@@ -5,12 +5,35 @@
 import 'package:concert_models/concert_models.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:meta/meta.dart';
 
 import 'fallback_image.dart';
+import 'text_placeholder.dart';
 import 'typedefs.dart';
 
 const double _kListHeight = 64.0;
+
+final TextStyle _kDateStyle = new TextStyle(
+  color: Colors.grey[600],
+  fontWeight: FontWeight.w400,
+  fontSize: 12.0,
+  height: 1.25,
+);
+
+final TextStyle _kEventTitleStyle = new TextStyle(
+  fontSize: 18.0,
+  fontWeight: FontWeight.w600,
+  color: Colors.black,
+  height: 1.25,
+);
+
+final TextStyle _kEventSubtitleStyle = new TextStyle(
+  fontSize: 14.0,
+  fontWeight: FontWeight.w500,
+  color: Colors.black,
+  height: 1.25,
+);
+
+final Color _kPlaceholderColor = Colors.grey[300];
 
 /// UI Widget that represents a list item for an [Event]
 class EventListItem extends StatelessWidget {
@@ -29,14 +52,14 @@ class EventListItem extends StatelessWidget {
   final bool showGridLayout;
 
   /// Constructor
-  const EventListItem(
-      {Key key,
-      bool isSelected,
-      @required this.event,
-      this.onSelect,
-      this.showGridLayout: false})
-      : assert(event != null),
-        assert(showGridLayout != null),
+  const EventListItem({
+    Key key,
+    bool isSelected,
+    this.event,
+    this.onSelect,
+    this.showGridLayout: false,
+  })
+      : assert(showGridLayout != null),
         isSelected = isSelected ?? false,
         super(key: key);
 
@@ -58,35 +81,32 @@ class EventListItem extends StatelessWidget {
       children: <Widget>[
         new Container(
           margin: const EdgeInsets.only(bottom: 4.0),
-          child: new Text(
-            _readableDate.toUpperCase(),
-            style: new TextStyle(
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w400,
-              fontSize: 12.0,
-            ),
-          ),
+          child: event != null
+              ? new Text(
+                  _readableDate.toUpperCase(),
+                  style: _kDateStyle,
+                )
+              : new TextPlaceholder(style: _kDateStyle, width: 48.0),
         ),
         new Container(
           margin: const EdgeInsets.only(bottom: 4.0),
-          child: new Text(
-            _eventTitle,
-            overflow: TextOverflow.ellipsis,
-            softWrap: false,
-            style: new TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          child: event != null
+              ? new Text(
+                  _eventTitle,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: _kEventTitleStyle,
+                )
+              : new TextPlaceholder(style: _kEventTitleStyle, width: 96.0),
         ),
-        new Text(
-          event.venue?.name ?? '',
-          overflow: TextOverflow.ellipsis,
-          softWrap: false,
-          style: new TextStyle(
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        event != null
+            ? new Text(
+                event.venue?.name ?? '',
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: _kEventSubtitleStyle,
+              )
+            : new TextPlaceholder(style: _kEventSubtitleStyle, width: 60.0),
       ],
     );
   }
@@ -95,7 +115,7 @@ class EventListItem extends StatelessWidget {
     Widget image = new ClipRRect(
       borderRadius: new BorderRadius.circular(8.0),
       child: new FallbackImage(
-        url: _eventImage,
+        url: event != null ? _eventImage : null,
       ),
     );
 
@@ -133,7 +153,7 @@ class EventListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Material(
-      color: isSelected ? Colors.grey[200] : Colors.white,
+      color: event != null && isSelected ? Colors.grey[200] : Colors.white,
       child: new InkWell(
         onTap: () => onSelect?.call(event),
         child: new Container(

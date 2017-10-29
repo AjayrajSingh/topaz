@@ -7,10 +7,10 @@ import 'dart:math';
 import 'package:concert_models/concert_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:meta/meta.dart';
 
 import 'concert_guide_header.dart';
 import 'event_list_item.dart';
+import 'loading_status.dart';
 import 'typedefs.dart';
 
 const double _kMinHeaderHeight = 160.0;
@@ -29,18 +29,21 @@ class EventList extends StatelessWidget {
   /// Callback for when an event is selected
   final EventActionCallback onSelect;
 
+  /// Loading status of concert list
+  final LoadingStatus loadingStatus;
+
   static final _EventListGridDelegate _eventListGridDelegate =
       new _EventListGridDelegate();
 
   /// Constructor
   const EventList({
     Key key,
-    @required this.events,
+    this.events,
     this.selectedEvent,
     this.onSelect,
+    this.loadingStatus: LoadingStatus.inProgress,
   })
-      : assert(events != null),
-        super(key: key);
+      : super(key: key);
 
   Widget _buildHeader() {
     return new Container(
@@ -56,6 +59,17 @@ class EventList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Event> eventList =
+        events != null && loadingStatus == LoadingStatus.completed
+            ? events
+            : <Event>[
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+              ];
     return new LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         bool showGridLayout = constraints.maxWidth >= _kEventGridMinWidth * 2;
@@ -71,7 +85,7 @@ class EventList extends StatelessWidget {
               sliver: new SliverGrid(
                 gridDelegate: _eventListGridDelegate,
                 delegate: new SliverChildListDelegate(
-                  events
+                  eventList
                       .map((Event event) => new EventListItem(
                             event: event,
                             onSelect: onSelect,

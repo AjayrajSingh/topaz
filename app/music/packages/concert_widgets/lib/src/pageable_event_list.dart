@@ -7,26 +7,27 @@ import 'dart:math';
 import 'package:concert_models/concert_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:meta/meta.dart';
 
 import 'concert_guide_header.dart';
 import 'event_list_item.dart';
+import 'loading_status.dart';
 import 'typedefs.dart';
 
 const double _kMinHeaderHeight = 160.0;
+const int _kItemsPerPage = 3;
 
 /// UI Widget that represents a pageable list of [Event]s
 class PageableEventList extends StatelessWidget {
   /// Constructor
   const PageableEventList({
     Key key,
-    @required this.events,
+    this.events,
     this.selectedEvent,
     this.onSelect,
     this.onPageChanged,
+    this.loadingStatus: LoadingStatus.inProgress,
   })
-      : assert(events != null),
-        super(key: key);
+      : super(key: key);
 
   /// [Event]s to list out
   final List<Event> events;
@@ -39,6 +40,17 @@ class PageableEventList extends StatelessWidget {
 
   /// Called when the page changes.
   final ValueChanged<int> onPageChanged;
+
+  /// Loading status of pageable concert list
+  final LoadingStatus loadingStatus;
+
+  List<Event> get _events {
+    if (events != null && loadingStatus == LoadingStatus.completed) {
+      return events;
+    } else {
+      return <Event>[null, null, null];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,8 +80,8 @@ class PageableEventList extends StatelessWidget {
     double padding,
   }) {
     int startIndex = pageIndex * itemsPerPage;
-    int endIndex = min(pageIndex * itemsPerPage + itemsPerPage, events.length);
-    List<Widget> children = events
+    int endIndex = min(pageIndex * itemsPerPage + itemsPerPage, _events.length);
+    List<Widget> children = _events
         .sublist(startIndex, endIndex)
         .map((Event event) => new Expanded(
               child: new Container(
@@ -91,6 +103,7 @@ class PageableEventList extends StatelessWidget {
       ));
     }
     return new Container(
+      color: Colors.white,
       padding: new EdgeInsets.all(padding),
       child: axis == Axis.horizontal
           ? new Row(
@@ -109,8 +122,7 @@ class PageableEventList extends StatelessWidget {
       builder: (BuildContext context, BoxConstraints constraints) {
         Axis axis =
             constraints.maxWidth < 500.0 ? Axis.vertical : Axis.horizontal;
-        int itemsPerPage = axis == Axis.vertical ? 4 : 3;
-        int pageCount = (events.length / itemsPerPage).ceil();
+        int pageCount = (_events.length / _kItemsPerPage).ceil();
         double minBoundsSize = min(constraints.maxHeight, constraints.maxWidth);
 
         return new PageView.builder(
@@ -119,7 +131,7 @@ class PageableEventList extends StatelessWidget {
           onPageChanged: onPageChanged,
           itemBuilder: (BuildContext context, int index) => _buildPage(
                 pageIndex: index,
-                itemsPerPage: 3,
+                itemsPerPage: _kItemsPerPage,
                 axis: axis,
                 padding: axis == Axis.horizontal ? minBoundsSize / 30.0 : 8.0,
               ),

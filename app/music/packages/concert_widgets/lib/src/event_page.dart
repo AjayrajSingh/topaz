@@ -5,17 +5,30 @@
 import 'package:concert_models/concert_models.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:meta/meta.dart';
 
 import 'fallback_image.dart';
+import 'loading_status.dart';
+import 'text_placeholder.dart';
 
 const double _kHeroImageHeight = 240.0;
 const double _kLogoSize = 32.0;
 const double _kLineupAvatarSize = 48.0;
 
-final TextStyle _kVenueFontStyle = const TextStyle(
+final TextStyle _kVenueTextStyle = const TextStyle(
   fontSize: 16.0,
   height: 1.5,
+);
+
+final TextStyle _kEventTextStyle = const TextStyle(
+  fontSize: 34.0,
+  fontWeight: FontWeight.w500,
+  height: 1.2,
+);
+
+final TextStyle _kDateTextStyle = const TextStyle(
+  fontSize: 20.0,
+  fontWeight: FontWeight.w600,
+  height: 1.2,
 );
 
 /// UI widget that represents an entire concert page
@@ -26,6 +39,9 @@ class EventPage extends StatelessWidget {
   /// Callback for when the user taps the buy button
   final VoidCallback onTapBuy;
 
+  /// Loading status of event page
+  final LoadingStatus loadingStatus;
+
   static final DateFormat _dateFormat = new DateFormat('EEEE, d LLLL y');
 
   static final DateFormat _timeFormat = new DateFormat('h:mm aaa');
@@ -34,10 +50,10 @@ class EventPage extends StatelessWidget {
   const EventPage({
     Key key,
     this.onTapBuy,
-    @required this.event,
+    this.event,
+    this.loadingStatus: LoadingStatus.inProgress,
   })
-      : assert(event != null),
-        super(key: key);
+      : super(key: key);
 
   String get _readableDate {
     String date = _dateFormat.format(event.date);
@@ -48,24 +64,28 @@ class EventPage extends StatelessWidget {
     return date;
   }
 
+  bool get _showPlaceholder =>
+      event == null || loadingStatus != LoadingStatus.completed;
+
   Widget _buildVenueSection() {
     List<Widget> children = <Widget>[
       new Container(
         margin: const EdgeInsets.only(bottom: 8.0),
-        child: new Text(
+        child: const Text(
           'Venue',
-          style: new TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 18.0,
           ),
         ),
       ),
     ];
+
     if (event.venue.name != null) {
-      children.add(new Text(event.venue.name, style: _kVenueFontStyle));
+      children.add(new Text(event.venue.name, style: _kVenueTextStyle));
     }
     if (event.venue.street != null) {
-      children.add(new Text(event.venue.street, style: _kVenueFontStyle));
+      children.add(new Text(event.venue.street, style: _kVenueTextStyle));
     }
     if (event.venue.city?.name != null ||
         event.venue.city?.country != null ||
@@ -74,12 +94,13 @@ class EventPage extends StatelessWidget {
           event.venue.city?.name != null ? '${event.venue.city.name}, ' : '';
       children.add(new Text(
         '$city${event.venue.city?.country ?? ''} ${ event.venue.zip ?? ''}',
-        style: _kVenueFontStyle,
+        style: _kVenueTextStyle,
       ));
     }
     if (event.venue.phoneNumber != null) {
-      children.add(new Text(event.venue.phoneNumber, style: _kVenueFontStyle));
+      children.add(new Text(event.venue.phoneNumber, style: _kVenueTextStyle));
     }
+
     return new Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,9 +130,9 @@ class EventPage extends StatelessWidget {
       children: <Widget>[
         new Container(
           margin: const EdgeInsets.only(bottom: 8.0),
-          child: new Text(
+          child: const Text(
             'Lineup',
-            style: new TextStyle(
+            style: const TextStyle(
               fontSize: 18.0,
               fontWeight: FontWeight.w600,
             ),
@@ -128,13 +149,13 @@ class EventPage extends StatelessWidget {
   Widget _buildDetailsSection() {
     List<Widget> children = <Widget>[];
 
-    if (event.venue != null) {
+    if (!_showPlaceholder && event.venue != null) {
       children.add(new Expanded(
         child: _buildVenueSection(),
       ));
     }
 
-    if (event.performances.length > 1) {
+    if (!_showPlaceholder && event.performances.length > 1) {
       children.add(new Expanded(
         child: _buildOtherPerformers(),
       ));
@@ -158,15 +179,19 @@ class EventPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             new Expanded(
-              child: new Text(
-                event.performances.isNotEmpty
-                    ? event.performances.first.artist?.name ?? ''
-                    : '',
-                style: new TextStyle(
-                  fontSize: 34.0,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              child: _showPlaceholder
+                  ? new Container(
+                      padding: const EdgeInsets.only(right: 100.0),
+                      child: new TextPlaceholder(
+                        style: _kEventTextStyle,
+                      ),
+                    )
+                  : new Text(
+                      event.performances.isNotEmpty
+                          ? event.performances.first.artist?.name ?? ''
+                          : '',
+                      style: _kEventTextStyle,
+                    ),
             ),
             new Image.asset(
               'packages/concert_widgets/res/myseat.png',
@@ -177,7 +202,7 @@ class EventPage extends StatelessWidget {
         ),
       ),
       new FallbackImage(
-        url: event.performances.isNotEmpty
+        url: !_showPlaceholder && event.performances.isNotEmpty
             ? event.performances.first.artist?.imageUrl
             : null,
         height: _kHeroImageHeight,
@@ -194,13 +219,15 @@ class EventPage extends StatelessWidget {
         child: new Row(
           children: <Widget>[
             new Expanded(
-              child: new Text(
-                _readableDate,
-                style: new TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: _showPlaceholder
+                  ? new Container(
+                      padding: const EdgeInsets.only(right: 100.0),
+                      child: new TextPlaceholder(style: _kDateTextStyle),
+                    )
+                  : new Text(
+                      _readableDate,
+                      style: _kDateTextStyle,
+                    ),
             ),
             new RaisedButton(
               child: new Icon(
