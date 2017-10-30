@@ -6,9 +6,11 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
+import '../modular/embedder.dart';
 import 'message.dart';
 
 /// Enum for supported command types.
@@ -21,7 +23,7 @@ enum CommandType {
 class CommandMessage extends Message {
   /// Called whenever the [Model] changes.
   // CommandMessageParentBuilder parentBuilder;
-  final EmbedderModel embedder;
+  final Embedder embedder;
 
   /// String paylod of the message contents.
   final String payload;
@@ -69,16 +71,15 @@ class CommandMessage extends Message {
       String bin = _arguments.first;
       String message = _arguments.sublist(1).join(' ');
 
-      // Setup link data.
-      Map<String, dynamic> json = <String, dynamic>{
-        'message': message,
-        'members': members,
-      };
+      // Setup Daisy.
+      Daisy daisy = new Daisy()..verb = 'com.google.fuchsia.codelab.$bin'
+                               ..nouns = <String, Noun>{};
+      daisy.nouns['message'] = new Noun()..json = message;
+      daisy.nouns['members'] = new Noun()..json = JSON.encode(members);
 
-      embedder.startModule(
-        uri: 'file:///system/apps/codelab/$bin',
+      embedder.startDaisy(
+        daisy: daisy,
         name: 'chat-command-$id',
-        data: JSON.encode(json),
       );
     }
   }

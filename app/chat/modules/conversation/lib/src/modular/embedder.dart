@@ -12,6 +12,7 @@ import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.module.fidl/module_state.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_token.fidl.dart';
 import 'package:lib.widgets/model.dart';
@@ -109,9 +110,9 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
       ..info('=> data: $data');
 
     moduleContext.startModule(
-      name,
+      name,  // module name
       uri,
-      name,
+      name,  // link name
       null, // outgoingServices
       null, // incomingServices
       moduleControllerProxy.ctrl.request(),
@@ -121,6 +122,33 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
     connection = new ChildViewConnection(viewOwnerPair.passHandle());
 
     // ModuleWatcherImpl watcher = new ModuleWatcherImpl();
+    moduleControllerProxy.watch(watcherBinding.wrap(this));
+  }
+
+  /// Starts a Daisy.
+  Future<Null> startDaisy({
+    @required Daisy daisy,
+    @required String name
+  }) async {
+    status = EmbedderModelStatus.resolving;
+    notifyListeners();
+
+    log
+      ..info('Starting Daisy: $daisy')
+      ..info('=> name: $name');
+
+    moduleContext.startDaisy(
+      name,  // module name
+      daisy,
+      name,  // link name
+      null, // outgoingServices
+      null, // incomingServices
+      moduleControllerProxy.ctrl.request(),
+      viewOwnerPair.passRequest(),
+    );
+
+    connection = new ChildViewConnection(viewOwnerPair.passHandle());
+
     moduleControllerProxy.watch(watcherBinding.wrap(this));
   }
 
