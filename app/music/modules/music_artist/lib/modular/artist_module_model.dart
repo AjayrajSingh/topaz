@@ -114,18 +114,16 @@ class ArtistModuleModel extends ModuleModel {
     // Set the first track of the first album for playback if there is no track
     // in the playback queue.
     _player.getStatus((PlayerStatus playerStatus) {
-      if (playerStatus.track == null) {
-        if (albums.isNotEmpty && albums.first.tracks.isNotEmpty) {
-          track_fidl.Track firstTrack = _convertTrackToFidl(
-            albums.first.tracks.first,
-            albums.first,
-          );
-          // play first track if in edgeToEdge mode
-          if (deviceMode == 'edgeToEdge') {
-            _player.play(firstTrack);
-          } else {
-            _player.setTrack(firstTrack);
-          }
+      if (albums.isNotEmpty && albums.first.tracks.isNotEmpty) {
+        track_fidl.Track firstTrack = _convertTrackToFidl(
+          albums.first.tracks.first,
+          albums.first,
+        );
+        // play first track if in edgeToEdge mode
+        if (deviceMode == 'edgeToEdge') {
+          _player.play(firstTrack);
+        } else if (playerStatus.track == null) {
+          _player.setTrack(firstTrack);
         }
       }
     });
