@@ -30,7 +30,9 @@ void main() {
           __,
           PlaybackModuleModel model,
         ) {
-          if (model.deviceMode == 'edgeToEdge') {
+          if (model.deviceMode == 'null') {
+            return new Container(color: Colors.black);
+          } else if (model.deviceMode == 'edgeToEdge') {
             return new EdgeToEdgePlayer(
               currentTrack: playbackModuleModel.currentTrack,
               playbackPosition: playbackModuleModel.playbackPosition,
@@ -39,7 +41,7 @@ void main() {
               onSkipNext: playbackModuleModel.next,
               onSkipPrevious: playbackModuleModel.previous,
             );
-          } else {
+          } else if (model.deviceMode == 'normal') {
             return new Player(
               currentTrack: playbackModuleModel.currentTrack,
               playbackPosition: playbackModuleModel.playbackPosition,

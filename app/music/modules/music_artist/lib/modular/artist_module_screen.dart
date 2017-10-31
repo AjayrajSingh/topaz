@@ -25,7 +25,9 @@ class ArtistModuleScreen extends StatelessWidget {
         __,
         ArtistModuleModel model,
       ) {
-        if (model.deviceMode == 'edgeToEdge') {
+        if (model.deviceMode == null) {
+          return new Container(color: Colors.black);
+        } else if (model.deviceMode == 'edgeToEdge') {
           switch (model.loadingStatus) {
             case LoadingStatus.completed:
               return new Container(
@@ -45,7 +47,7 @@ class ArtistModuleScreen extends StatelessWidget {
             case LoadingStatus.failed:
               return const Text('failed to load');
           }
-        } else {
+        } else if (model.deviceMode == 'normal') {
           return new Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
