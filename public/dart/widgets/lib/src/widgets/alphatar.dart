@@ -59,9 +59,8 @@ class Alphatar extends StatelessWidget {
     Color backgroundColor,
   })
       : backgroundColor = backgroundColor ?? _pickRandomColor(),
-        super(key: key) {
-    assert(avatarImage != null || letter != null);
-  }
+        assert(avatarImage != null || letter != null),
+        super(key: key);
 
   /// Creates a new [Alphatar] with the given URL.
   ///

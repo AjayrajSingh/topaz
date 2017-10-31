@@ -40,7 +40,9 @@ abstract class Model extends Listenable {
       scheduleMicrotask(() {
         _version++;
         _microtaskVersion = _version;
-        _listeners.toList().forEach((VoidCallback listener) => listener());
+        for (VoidCallback listener in _listeners) {
+          listener();
+        }
       });
     }
   }
@@ -54,7 +56,7 @@ class ModelFinder<T extends Model> {
   /// [Widget]s who call [of] with a [rebuildOnChange] of true will be rebuilt
   /// whenever there's a change to the returned model.
   T of(BuildContext context, {bool rebuildOnChange: false}) {
-    final Type type = new _InheritedModel<T>.forRuntimeType().runtimeType;
+    final Type type = const _InheritedModel<T>.forRuntimeType().runtimeType;
     Widget widget = rebuildOnChange
         ? context.inheritFromWidgetOfExactType(type)
         : context.ancestorWidgetOfExactType(type);
@@ -72,7 +74,7 @@ class ScopedModel<T extends Model> extends StatelessWidget {
   final Widget child;
 
   /// Constructor.
-  ScopedModel({this.model, this.child});
+  const ScopedModel({this.model, this.child});
 
   @override
   Widget build(BuildContext context) => new _ModelListener(
@@ -89,7 +91,7 @@ class _ModelListener extends StatefulWidget {
   final Model model;
   final WidgetBuilder builder;
 
-  _ModelListener({this.model, this.builder});
+  const _ModelListener({this.model, this.builder});
 
   @override
   _ModelListenerState createState() => new _ModelListenerState();
@@ -130,13 +132,12 @@ class _ModelListenerState extends State<_ModelListener> {
 class _InheritedModel<T extends Model> extends InheritedWidget {
   final T model;
   final int version;
-  _InheritedModel({Key key, Widget child, T model})
-      : this.model = model,
-        this.version = model._version,
+  _InheritedModel({Key key, Widget child, this.model})
+      : this.version = model._version,
         super(key: key, child: child);
 
   /// Used to return the runtime type.
-  _InheritedModel.forRuntimeType()
+  const _InheritedModel.forRuntimeType()
       : this.model = null,
         this.version = 0;
 
@@ -163,7 +164,7 @@ class ScopedModelDescendant<T extends Model> extends StatelessWidget {
   final Widget child;
 
   /// Constructor.
-  ScopedModelDescendant({this.builder, this.child});
+  const ScopedModelDescendant({this.builder, this.child});
 
   @override
   Widget build(BuildContext context) => builder(

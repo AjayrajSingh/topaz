@@ -38,9 +38,8 @@ abstract class AgentImpl implements Agent, Lifecycle {
 
   /// Creates a new instance of [AgentImpl].
   AgentImpl({@required ApplicationContext applicationContext})
-      : _applicationContext = applicationContext {
-    assert(applicationContext != null);
-  }
+      : _applicationContext = applicationContext,
+        assert(applicationContext != null);
 
   @override
   void connect(
@@ -58,8 +57,9 @@ abstract class AgentImpl implements Agent, Lifecycle {
     void callback(),
   ) {
     _agentContext.ctrl.bind(agentContext);
-    _agentContext.getComponentContext(_componentContext.ctrl.request());
-    _agentContext.getTokenProvider(_tokenProvider.ctrl.request());
+    _agentContext
+      ..getComponentContext(_componentContext.ctrl.request())
+      ..getTokenProvider(_tokenProvider.ctrl.request());
 
     onReady(
       _applicationContext,
@@ -95,8 +95,9 @@ abstract class AgentImpl implements Agent, Lifecycle {
       _agentContext.ctrl.close();
       _lifecycleBinding.close();
 
-      _outgoingServicesBindings
-          .forEach((ServiceProviderBinding binding) => binding.close());
+      for (ServiceProviderBinding binding in _outgoingServicesBindings) {
+        binding.close();
+      }
 
       // Doing 'dart.io.kill()' will exit other isolates shared with this
       // ApplicationEnvironment's dart runner, so we only exit this isolate.

@@ -32,9 +32,9 @@ void main() {
 
   test('more friction takes longer to complete', () {
     final RK4SpringSimulation x1 = new RK4SpringSimulation(
-        desc: new RK4SpringDescription(tension: 100.0, friction: 10.0));
+        desc: const RK4SpringDescription(tension: 100.0, friction: 10.0));
     final RK4SpringSimulation x2 = new RK4SpringSimulation(
-        desc: new RK4SpringDescription(tension: 100.0, friction: 50.0));
+        desc: const RK4SpringDescription(tension: 100.0, friction: 50.0));
     x1.target = 100.0;
     x2.target = 100.0;
     x1.elapseTime(1.0);
@@ -44,9 +44,9 @@ void main() {
 
   test('less tension takes longer to complete', () {
     final RK4SpringSimulation x1 = new RK4SpringSimulation(
-        desc: new RK4SpringDescription(tension: 1000.0, friction: 50.0));
+        desc: const RK4SpringDescription(tension: 1000.0, friction: 50.0));
     final RK4SpringSimulation x2 = new RK4SpringSimulation(
-        desc: new RK4SpringDescription(tension: 500.0, friction: 50.0));
+        desc: const RK4SpringDescription(tension: 500.0, friction: 50.0));
     x1.target = 100.0;
     x2.target = 100.0;
     x1.elapseTime(0.1);

@@ -65,9 +65,9 @@ class DeviceShellImpl extends DeviceShell {
     onStop?.call();
     _userProviderProxy.ctrl.close();
     _deviceShellContextProxy.ctrl.close();
-    _bindingSet.forEach(
-      (AuthenticationContextBinding binding) => binding.close(),
-    );
+    for (AuthenticationContextBinding binding in _bindingSet) {
+      binding.close();
+    }
   }
 
   @override
@@ -75,8 +75,8 @@ class DeviceShellImpl extends DeviceShell {
     String username,
     InterfaceRequest<AuthenticationContext> request,
   ) {
-    AuthenticationContextBinding binding = new AuthenticationContextBinding();
-    binding.bind(authenticationContext, request);
+    AuthenticationContextBinding binding = new AuthenticationContextBinding()
+      ..bind(authenticationContext, request);
     _bindingSet.add(binding);
   }
 }

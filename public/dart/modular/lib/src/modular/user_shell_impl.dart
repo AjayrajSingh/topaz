@@ -90,33 +90,32 @@ class UserShellImpl extends UserShell {
   ) {
     if (onReady != null) {
       _userShellContextProxy.ctrl.bind(userShellContextHandle);
-      _userShellContextProxy.getStoryProvider(
-        _storyProviderProxy.ctrl.request(),
-      );
-      _userShellContextProxy.getSuggestionProvider(
-        _suggestionProviderProxy.ctrl.request(),
-      );
-      _userShellContextProxy.getVisibleStoriesController(
-        _visibleStoriesControllerProxy.ctrl.request(),
-      );
-      _userShellContextProxy.getFocusController(
-        _focusControllerProxy.ctrl.request(),
-      );
-      _userShellContextProxy.getFocusProvider(
-        _focusProviderProxy.ctrl.request(),
-      );
-
-      _userShellContextProxy.getContextReader(
-        _contextReaderProxy.ctrl.request(),
-      );
-      _userShellContextProxy.getContextWriter(
-        _contextWriterProxy.ctrl.request(),
-      );
-      _userShellContextProxy.getIntelligenceServices(
-        _intelligenceServicesProxy.ctrl.request(),
-      );
-
-      _userShellContextProxy.getLink(_linkProxy.ctrl.request());
+      _userShellContextProxy
+        ..getStoryProvider(
+          _storyProviderProxy.ctrl.request(),
+        )
+        ..getSuggestionProvider(
+          _suggestionProviderProxy.ctrl.request(),
+        )
+        ..getVisibleStoriesController(
+          _visibleStoriesControllerProxy.ctrl.request(),
+        )
+        ..getFocusController(
+          _focusControllerProxy.ctrl.request(),
+        )
+        ..getFocusProvider(
+          _focusProviderProxy.ctrl.request(),
+        )
+        ..getContextReader(
+          _contextReaderProxy.ctrl.request(),
+        )
+        ..getContextWriter(
+          _contextWriterProxy.ctrl.request(),
+        )
+        ..getIntelligenceServices(
+          _intelligenceServicesProxy.ctrl.request(),
+        )
+        ..getLink(_linkProxy.ctrl.request());
 
       onReady(
         _userShellContextProxy,

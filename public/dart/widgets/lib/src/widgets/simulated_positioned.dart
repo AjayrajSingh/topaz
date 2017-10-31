@@ -60,7 +60,7 @@ class SimulatedPositioned extends StatefulWidget {
   /// modified directly by gesture, or animated by repositioning.
   /// TODO(apwilson): Rename rect to target, initRect to init, and onRectReached
   /// to onTargetReached.  Or maybe use a tween?
-  SimulatedPositioned({
+  const SimulatedPositioned({
     Key key,
     @required this.rect,
     Rect initRect,
@@ -75,9 +75,8 @@ class SimulatedPositioned extends StatefulWidget {
       : this.initRect = initRect ?? rect,
         this.dragOffsetTransform =
             dragOffsetTransform ?? _kDirectDragOffsetTransform,
-        super(key: key) {
-    assert(hitTestBehavior != null);
-  }
+        assert(hitTestBehavior != null),
+        super(key: key);
 
   /// The widget below this widget in the tree.
   final Widget child;
@@ -112,9 +111,10 @@ class SimulatedPositioned extends StatefulWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(new DiagnosticsProperty<Widget>('child', child));
-    description.add(new DiagnosticsProperty<Rect>('rect', rect));
-    description.add(new DiagnosticsProperty<Rect>('initRect', initRect));
+    description
+      ..add(new DiagnosticsProperty<Widget>('child', child))
+      ..add(new DiagnosticsProperty<Rect>('rect', rect))
+      ..add(new DiagnosticsProperty<Rect>('initRect', initRect));
   }
 }
 
@@ -251,10 +251,10 @@ class _SimAnimationController extends Animation<Offset>
     Offset velocity: Offset.zero,
     @required TickerProvider vsync,
   })
-      : _status = AnimationStatus.dismissed {
-    assert(vsync != null);
-    assert(position != null);
-    assert(velocity != null);
+      : _status = AnimationStatus.dismissed,
+        assert(vsync != null),
+        assert(position != null),
+        assert(velocity != null) {
     _ticker = vsync.createTicker(_tick);
     reset(position, velocity);
     if (target != null) {

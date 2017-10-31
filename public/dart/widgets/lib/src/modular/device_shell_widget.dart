@@ -68,8 +68,8 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
   void advertise() {
     applicationContext.outgoingServices.addServiceForName(
       (InterfaceRequest<DeviceShell> request) {
-        DeviceShellBinding binding = new DeviceShellBinding();
-        binding.bind(_deviceShell, request);
+        DeviceShellBinding binding = new DeviceShellBinding()
+          ..bind(_deviceShell, request);
         _deviceShellBindingSet.add(binding);
       },
       DeviceShell.serviceName,
@@ -78,8 +78,8 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
       applicationContext.outgoingServices.addServiceForName(
         (InterfaceRequest<SoftKeyboardContainer> request) {
           SoftKeyboardContainerBinding binding =
-              new SoftKeyboardContainerBinding();
-          binding.bind(softKeyboardContainer, request);
+              new SoftKeyboardContainerBinding()
+                ..bind(softKeyboardContainer, request);
           _softKeyboardContainerBindingSet.add(binding);
         },
         SoftKeyboardContainer.serviceName,
@@ -92,10 +92,12 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
     AuthenticationContext authenticationContext,
   ) {
     DeviceShellImpl deviceShell;
-    VoidCallback onStop = () {
+    void onStop() {
       deviceShellModel?.onStop?.call();
       deviceShell.onStop();
-    };
+    }
+
+    // ignore: join_return_with_assignment
     deviceShell = new DeviceShellImpl(
       authenticationContext: authenticationContext,
       onReady: deviceShellModel?.onReady,

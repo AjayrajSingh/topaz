@@ -27,7 +27,7 @@ class ApplicationWidget extends StatefulWidget {
   final bool hitTestable;
 
   /// Constructor.
-  ApplicationWidget({
+  const ApplicationWidget({
     Key key,
     @required this.url,
     @required this.launcher,

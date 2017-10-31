@@ -15,7 +15,7 @@ class WindowMediaQuery extends StatefulWidget {
   final Widget child;
 
   /// Constructor.
-  WindowMediaQuery({this.onWindowMetricsChanged, this.child});
+  const WindowMediaQuery({this.onWindowMetricsChanged, this.child});
 
   @override
   _WindowMediaQueryState createState() => new _WindowMediaQueryState();

@@ -21,7 +21,7 @@ class FuchsiaSpinner extends StatefulWidget {
   final Color color;
 
   /// Constructor.
-  FuchsiaSpinner({
+  const FuchsiaSpinner({
     this.color: _kDefaultColor,
   });
 
@@ -54,8 +54,7 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
     _controller = new AnimationController(
       vsync: this,
       duration: _kAnimationDuration,
-    );
-    _controller.repeat(period: _kAnimationDuration);
+    )..repeat(period: _kAnimationDuration);
   }
 
   @override
