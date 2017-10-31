@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
+import 'package:uuid/uuid.dart';
 
 import '../modular/embedder.dart';
 import 'message.dart';
@@ -21,6 +22,9 @@ enum CommandType {
 
 /// A [Message] model representing a slash command.
 class CommandMessage extends Message {
+  /// [Uuid] generator.
+  static final Uuid uuid = new Uuid();
+
   /// Called whenever the [Model] changes.
   // CommandMessageParentBuilder parentBuilder;
   final Embedder embedder;
@@ -67,19 +71,20 @@ class CommandMessage extends Message {
 
     // Supports "/mod <bin> <message>".
     if (_arguments.isNotEmpty) {
-      String id = messageId.join();
+      String id = uuid.unparse(messageId);
       String bin = _arguments.first;
       String message = _arguments.sublist(1).join(' ');
 
       // Setup Daisy.
-      Daisy daisy = new Daisy()..verb = 'com.google.fuchsia.codelab.$bin'
-                               ..nouns = <String, Noun>{};
-      daisy.nouns['message'] = new Noun()..json = message;
+      Daisy daisy = new Daisy()
+        ..verb = 'com.google.fuchsia.codelab.$bin'
+        ..nouns = <String, Noun>{};
+      daisy.nouns['message'] = new Noun()..json = JSON.encode(message);
       daisy.nouns['members'] = new Noun()..json = JSON.encode(members);
 
       embedder.startDaisy(
         daisy: daisy,
-        name: 'chat-command-$id',
+        name: id,
       );
     }
   }

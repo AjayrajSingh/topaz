@@ -27,14 +27,13 @@ class ChatGroupAvatar extends StatelessWidget {
   final bool selected;
 
   /// Constructor
-  ChatGroupAvatar({
+  const ChatGroupAvatar({
     Key key,
     @required this.users,
     this.size: 40.0,
     bool selected,
   })
       : assert(users != null),
-        assert(users.isNotEmpty),
         selected = selected ?? false,
         super(key: key);
 

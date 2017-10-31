@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:meta/meta.dart';
+
 import 'user.dart';
 
 /// A data model class representing a conversation.
@@ -24,8 +26,9 @@ class Conversation {
   /// Creates a new instance of [Conversation].
   Conversation({
     this.conversationId,
-    this.participants,
+    @required this.participants,
     this.snippet,
     this.timestamp,
-  });
+  })
+      : assert(participants != null);
 }

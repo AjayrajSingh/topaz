@@ -47,8 +47,11 @@ Conversation _createConversationFromLedgerKeyValue(List<int> key, Vmo value) {
   Map<String, dynamic> decodedValue = decodeLedgerValue(value);
   return new Conversation()
     ..conversationId = key
-    ..participants =
-        decodedValue['participants'].map(_createParticipantFromMap).toList();
+    ..participants = decodedValue['participants']
+        // TODO(SO-906): remove when the bug passing non-map types is fixed.
+        .where((Map<String, String> el) => el != null && el is Map)
+        .map(_createParticipantFromMap)
+        .toList();
 }
 
 /// Creates a [Participant] object from the given map.

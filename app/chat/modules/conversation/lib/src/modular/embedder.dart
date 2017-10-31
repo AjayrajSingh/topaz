@@ -11,8 +11,8 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.module.fidl/module_state.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_token.fidl.dart';
 import 'package:lib.widgets/model.dart';
@@ -90,57 +90,20 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
     watcherBinding.close();
   }
 
-  @override
-  Future<Null> startModule({
-    @required String uri,
-    @required String name,
-    @required String data,
-  }) async {
-    // NOTE: this should get moved into the resolution method.
-    status = EmbedderModelStatus.resolving;
-    notifyListeners();
-
-    moduleContext.getLink(name, link.ctrl.request());
-    link.set(<String>[], data);
-    link.ctrl.close();
-
-    log
-      ..info('Starting module: $uri')
-      ..info('=> name: $name')
-      ..info('=> data: $data');
-
-    moduleContext.startModule(
-      name,  // module name
-      uri,
-      name,  // link name
-      null, // outgoingServices
-      null, // incomingServices
-      moduleControllerProxy.ctrl.request(),
-      viewOwnerPair.passRequest(),
-    );
-
-    connection = new ChildViewConnection(viewOwnerPair.passHandle());
-
-    // ModuleWatcherImpl watcher = new ModuleWatcherImpl();
-    moduleControllerProxy.watch(watcherBinding.wrap(this));
-  }
-
   /// Starts a Daisy.
   Future<Null> startDaisy({
     @required Daisy daisy,
-    @required String name
+    @required String name,
   }) async {
     status = EmbedderModelStatus.resolving;
     notifyListeners();
 
-    log
-      ..info('Starting Daisy: $daisy')
-      ..info('=> name: $name');
+    log..info('Starting Daisy: $daisy')..info('=> name: $name');
 
     moduleContext.startDaisy(
-      name,  // module name
+      name, // module name
       daisy,
-      name,  // link name
+      name, // link name
       null, // outgoingServices
       null, // incomingServices
       moduleControllerProxy.ctrl.request(),

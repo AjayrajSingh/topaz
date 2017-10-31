@@ -78,6 +78,7 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   /// Sets the current conversation id value.
   void setConversationId(List<int> id, {bool updateLink: true}) {
+    log.info('setting conversation id to: $id');
     Uint8List newId = id == null ? null : new Uint8List.fromList(id);
     if (!_intListEquality.equals(_conversationId, newId)) {
       _conversationId = newId;
