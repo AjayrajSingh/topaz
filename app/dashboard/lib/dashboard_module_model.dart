@@ -33,7 +33,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   /// The models that get the various build statuses.
   final List<List<BuildStatusModel>> buildStatusModels;
 
-  DateTime _startTime = new DateTime.now();
+  final DateTime _startTime = new DateTime.now();
   DateTime _lastRefreshed;
   List<String> _devices;
   ModuleWatcherBinding _webviewModuleWatcherBinding;
@@ -44,6 +44,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
 
   /// Constructor.
   DashboardModuleModel({this.applicationContext, this.buildStatusModels}) {
+    // ignore: avoid_function_literals_in_foreach_calls
     buildStatusModels.expand((List<BuildStatusModel> models) => models).forEach(
           (BuildStatusModel buildStatusModel) =>
               buildStatusModel.addListener(_updatePassFailTime),

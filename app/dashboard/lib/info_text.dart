@@ -54,7 +54,7 @@ class _InfoTextState extends State<InfoText> {
                 ? DateTime.parse(timestamp.trim())
                 : 0;
           });
-        } catch (_, __) {
+        } on FormatException catch (_) {
           log.severe(
               'Error: Could not parse ${timestamp.trim()} as a DateTime!');
         }

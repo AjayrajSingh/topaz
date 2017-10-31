@@ -144,7 +144,7 @@ class BuildStatusModel extends ModuleModel {
         errorMessage =
             'Status ${response.statusCode}\n${response.reasonPhrase}';
       }
-    } catch (error) {
+    } on http.ClientException catch (error) {
       status = BuildStatus.networkError;
       errorMessage = 'Error receiving response:\n$error';
     } finally {
@@ -157,10 +157,10 @@ class BuildStatusModel extends ModuleModel {
         dom.Document domTree = parse(html);
         List<dom.Element> trs = domTree.querySelectorAll('tr');
         for (dom.Element tr in trs) {
-          if (tr.className == "danger") {
+          if (tr.className == 'danger') {
             status = BuildStatus.failure;
             break;
-          } else if (tr.className == "success") {
+          } else if (tr.className == 'success') {
             status = BuildStatus.success;
             break;
           }

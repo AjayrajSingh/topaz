@@ -29,7 +29,8 @@ class DashboardApp extends StatelessWidget {
   final OnLaunchUrl onLaunchUrl;
 
   /// Constructor.
-  DashboardApp({this.buildStatusModels, this.onRefresh, this.onLaunchUrl});
+  const DashboardApp(
+      {this.buildStatusModels, this.onRefresh, this.onLaunchUrl});
 
   @override
   Widget build(BuildContext context) => new LayoutBuilder(
@@ -44,13 +45,13 @@ class DashboardApp extends StatelessWidget {
 
     // Get the max number of children a row can have.
     int maxRowChildren = 0;
-    buildStatusModels.forEach((List<BuildStatusModel> models) {
+    for (List<BuildStatusModel> models in buildStatusModels) {
       if (models.length > maxRowChildren) {
         maxRowChildren = models.length;
       }
-    });
+    }
 
-    buildStatusModels.forEach((List<BuildStatusModel> models) {
+    for (List<BuildStatusModel> models in buildStatusModels) {
       List<Widget> rowChildren = models
           .map(
             (BuildStatusModel model) => new Expanded(
@@ -94,7 +95,7 @@ class DashboardApp extends StatelessWidget {
           ),
         ),
       );
-    });
+    }
 
     rows.add(new InfoText());
 

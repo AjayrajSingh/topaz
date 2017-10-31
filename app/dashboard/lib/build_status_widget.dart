@@ -17,7 +17,7 @@ class BuildStatusWidget extends StatefulWidget {
   final VoidCallback onTap;
 
   /// Constructor.
-  BuildStatusWidget({this.onTap});
+  const BuildStatusWidget({this.onTap});
 
   @override
   _BuildStatusWidgetState createState() => new _BuildStatusWidgetState();

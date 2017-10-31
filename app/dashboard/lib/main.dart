@@ -117,19 +117,18 @@ void main() {
   final List<List<BuildStatusModel>> buildStatusModels =
       <List<BuildStatusModel>>[];
 
-  _kTargetsMap.forEach((List<List<String>> buildConfigs) {
+  for (List<List<String>> buildConfigs in _kTargetsMap) {
     List<BuildStatusModel> categoryModels = <BuildStatusModel>[];
-    buildConfigs.forEach((List<String> config) {
+    for (List<String> config in buildConfigs) {
       BuildStatusModel buildStatusModel = new BuildStatusModel(
         type: config[2],
         name: config[1],
-        url: _kBaseURL + config[0],
-      );
-      buildStatusModel.start();
+        url: '$_kBaseURL${config[0]}',
+      )..start();
       categoryModels.add(buildStatusModel);
-    });
+    }
     buildStatusModels.add(categoryModels);
-  });
+  }
 
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
@@ -148,6 +147,7 @@ void main() {
       onRefresh: () {
         buildStatusModels
             .expand((List<BuildStatusModel> models) => models)
+            // ignore: avoid_function_literals_in_foreach_calls
             .forEach((BuildStatusModel model) => model.refresh());
       },
       onLaunchUrl: dashboardModuleModel.launchWebView,

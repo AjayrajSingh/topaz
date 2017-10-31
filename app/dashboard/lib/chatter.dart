@@ -51,19 +51,20 @@ class Chatter {
 
     LinkProxy linkProxy = new LinkProxy();
     const String chatLinkName = 'chatLink';
-    moduleContext.getLink(chatLinkName, linkProxy.ctrl.request());
-    moduleContext.startModuleInShell(
-      'module:chat',
-      _kChatConversationModuleUrl,
-      chatLinkName,
-      null, // outgoingServices,
-      null, // incomingServices,
-      _chatModuleControllerProxy.ctrl.request(),
-      new SurfaceRelation()
-        ..arrangement = SurfaceArrangement.copresent
-        ..emphasis = 0.5,
-      true,
-    );
+    moduleContext
+      ..getLink(chatLinkName, linkProxy.ctrl.request())
+      ..startModuleInShell(
+        'module:chat',
+        _kChatConversationModuleUrl,
+        chatLinkName,
+        null, // outgoingServices,
+        null, // incomingServices,
+        _chatModuleControllerProxy.ctrl.request(),
+        new SurfaceRelation()
+          ..arrangement = SurfaceArrangement.copresent
+          ..emphasis = 0.5,
+        true,
+      );
 
     _getConversationId().then((List<int> conversationId) {
       if (conversationId == null) {
