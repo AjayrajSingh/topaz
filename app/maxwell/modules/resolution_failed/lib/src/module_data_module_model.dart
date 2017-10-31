@@ -33,6 +33,9 @@ class ModuleDataModuleModel extends ModuleModel {
     moduleContext.getComponentContext(componentContext.ctrl.request());
     // ... do something with componentContext ...
     componentContext.ctrl.close();
+
+    // Signal module watchers this module is ready to be rendered.
+    moduleContext.ready();
   }
 
   @override
