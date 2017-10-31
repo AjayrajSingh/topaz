@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
@@ -47,7 +48,7 @@ class BuildStatusModel extends ModuleModel {
   final String url;
 
   /// The client to perform get requests with.
-  final http.Client client;
+  http.Client _client;
 
   DateTime _lastRefreshed;
   DateTime _lastRefreshStarted;
@@ -58,7 +59,8 @@ class BuildStatusModel extends ModuleModel {
   String _errorMessage;
 
   /// Constructor.
-  BuildStatusModel({this.type, this.name, this.url, this.client});
+  BuildStatusModel({this.type, this.name, this.url})
+      : _client = createHttpClient();
 
   /// Returns the time when the status was refreshed.
   DateTime get lastRefreshed => _lastRefreshed;
@@ -81,6 +83,8 @@ class BuildStatusModel extends ModuleModel {
   /// If the build status isn't [BuildStatus.success] this will indicate any
   /// additional information about why not.
   String get errorMessage => _errorMessage;
+
+  bool _outstandingGet = false;
 
   /// The color to use as the background of a successful build.
   Color get successColor {
@@ -111,9 +115,13 @@ class BuildStatusModel extends ModuleModel {
 
   /// Initiates a refresh of the build status.
   void refresh() {
-    _lastRefreshed = new DateTime.now().toLocal();
-    _fetchConfigStatus();
-    notifyListeners();
+    DateTime now = new DateTime.now().toLocal();
+    if (_lastRefreshed == null ||
+        now.difference(_lastRefreshed) > const Duration(seconds: 5)) {
+      _lastRefreshed = now;
+      _fetchConfigStatus();
+      notifyListeners();
+    }
   }
 
   Future<Null> _fetchConfigStatus() async {
@@ -123,8 +131,14 @@ class BuildStatusModel extends ModuleModel {
     _lastRefreshStarted = new DateTime.now();
     _lastRefreshEnded = null;
 
+    if (_outstandingGet) {
+      _client.close();
+      _client = createHttpClient();
+    }
+
     try {
-      http.Response response = await client.get(url);
+      _outstandingGet = true;
+      http.Response response = await _client.get(url);
       html = response.body;
       if (html == null) {
         errorMessage =
@@ -133,39 +147,41 @@ class BuildStatusModel extends ModuleModel {
     } catch (error) {
       status = BuildStatus.networkError;
       errorMessage = 'Error receiving response:\n$error';
-    }
-    _lastRefreshEnded = new DateTime.now();
+    } finally {
+      _outstandingGet = false;
+      _lastRefreshEnded = new DateTime.now();
 
-    if (html == null) {
-      status = BuildStatus.networkError;
-    } else {
-      dom.Document domTree = parse(html);
-      List<dom.Element> trs = domTree.querySelectorAll('tr');
-      for (dom.Element tr in trs) {
-        if (tr.className == "danger") {
-          status = BuildStatus.failure;
-          break;
-        } else if (tr.className == "success") {
-          status = BuildStatus.success;
-          break;
+      if (html == null) {
+        status = BuildStatus.networkError;
+      } else {
+        dom.Document domTree = parse(html);
+        List<dom.Element> trs = domTree.querySelectorAll('tr');
+        for (dom.Element tr in trs) {
+          if (tr.className == "danger") {
+            status = BuildStatus.failure;
+            break;
+          } else if (tr.className == "success") {
+            status = BuildStatus.success;
+            break;
+          }
         }
       }
-    }
 
-    _buildStatus = status;
-    _errorMessage = errorMessage;
+      _buildStatus = status;
+      _errorMessage = errorMessage;
 
-    if (_buildStatus == BuildStatus.success) {
-      if (_lastPassTime == null) {
-        _lastPassTime = new DateTime.now();
-        _lastFailTime = null;
+      if (_buildStatus == BuildStatus.success) {
+        if (_lastPassTime == null) {
+          _lastPassTime = new DateTime.now();
+          _lastFailTime = null;
+        }
+      } else {
+        if (_lastFailTime == null) {
+          _lastFailTime = new DateTime.now();
+          _lastPassTime = null;
+        }
       }
-    } else {
-      if (_lastFailTime == null) {
-        _lastFailTime = new DateTime.now();
-        _lastPassTime = null;
-      }
+      notifyListeners();
     }
-    notifyListeners();
   }
 }

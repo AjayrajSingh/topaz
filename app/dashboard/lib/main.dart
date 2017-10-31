@@ -3,9 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' as http;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
@@ -116,7 +114,6 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
 void main() {
   setupLogger();
 
-  http.Client client = createHttpClient();
   final List<List<BuildStatusModel>> buildStatusModels =
       <List<BuildStatusModel>>[];
 
@@ -127,7 +124,6 @@ void main() {
         type: config[2],
         name: config[1],
         url: _kBaseURL + config[0],
-        client: client,
       );
       buildStatusModel.start();
       categoryModels.add(buildStatusModel);
