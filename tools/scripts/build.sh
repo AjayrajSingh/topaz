@@ -6,10 +6,6 @@
 # Exit this script if one command fails.
 set -e
 
-# TODO(jasoncampbell): Do something a little better than requiring an env var
-# to be set.
-source "${FUCHSIA_DIR}/scripts/env.sh"
-
 echo "=== buidling Fuchsia"
-fset x86-64 "$@"
-fbuild
+fx set x86-64 "$@"
+fx full-build

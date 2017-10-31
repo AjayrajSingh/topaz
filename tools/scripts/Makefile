@@ -74,43 +74,43 @@ MINIMAL_MODULE ?= topaz/packages/mods
 
 # Specify GOMA=1 to force use goma, GOMA=0 to force not use goma.
 # Auto-detect if not specified.
-FSET_FLAGS :=
+FX_SET_FLAGS :=
 GOMA ?=
 ifeq ($(GOMA),1)
-	FSET_FLAGS += --goma
+	FX_SET_FLAGS += --goma
 endif
 ifeq ($(GOMA),0)
-	FSET_FLAGS += --no-goma
+	FX_SET_FLAGS += --no-goma
 endif
 
 GOMA_DIR ?=
 ifneq ($(strip $(GOMA_DIR)),)
-	FSET_FLAGS += --goma-dir $(GOMA_DIR)
+	FX_SET_FLAGS += --goma-dir $(GOMA_DIR)
 endif
 
-# If NO_ENSURE_GOMA=1 then we tell fbuild not to run the goma script directly.
+# If NO_ENSURE_GOMA=1 then we tell fx not to run the goma script directly.
 NO_ENSURE_GOMA ?=
 ifeq ($(NO_ENSURE_GOMA),1)
-	FSET_FLAGS += --no-ensure-goma
+	FX_SET_FLAGS += --no-ensure-goma
 endif
 
 # If MINIMAL=1 then we perform a minimal build of only the "modules" package and
 # its dependencies.
 MINIMAL ?=
 ifeq ($(MINIMAL),1)
-	FSET_FLAGS += --packages $(MINIMAL_MODULE)
+	FX_SET_FLAGS += --packages $(MINIMAL_MODULE)
 else
-	FSET_FLAGS += --packages $(DEFAULT_MODULE)
+	FX_SET_FLAGS += --packages $(DEFAULT_MODULE)
 endif
 
 # Respect the fuchsia build variant if already set by fset command externally.
 # Otherwise, default to debug build.
 FUCHSIA_VARIANT ?= debug
 ifeq ($(FUCHSIA_VARIANT),release)
-	FSET_FLAGS += --release
+	FX_SET_FLAGS += --release
 endif
 
-BUILD_FLAGS := $(FSET_FLAGS)
+BUILD_FLAGS := $(FX_SET_FLAGS)
 FUCHSIA_GEN_TARGET ?= x86-64
 
 ################################################################################
