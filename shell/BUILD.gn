@@ -29,6 +29,7 @@ package("sysui") {
     "//topaz/shell/perspective",
     "//topaz/shell/spinning_cube",
     "//topaz/shell/userpicker_device_shell",
+    "//topaz/shell/wifi_settings",
   ]
 
   binaries = [
@@ -66,6 +67,11 @@ package("sysui") {
     {
       source = "gen/topaz/shell/perspective/perspective.flx"
       name = "perspective"
+    },
+
+    {
+      source = "gen/topaz/shell/wifi_settings/wifi_settings.flx"
+      name = "wifi_settings"
     },
 
     {

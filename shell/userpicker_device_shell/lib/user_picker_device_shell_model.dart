@@ -32,6 +32,12 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   /// Called when the device shell stops.
   final VoidCallback onDeviceShellStopped;
 
+  /// Called when wifi is tapped.
+  final VoidCallback onWifiTapped;
+
+  /// Called when a user is logging in.
+  final VoidCallback onLogin;
+
   bool _showingUserActions = false;
   bool _addingUser = false;
   bool _loadingChildView = false;
@@ -49,10 +55,16 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   // we don't need to maintain separate ServiceProvider and Presentation
   // bindings for each logged-in user.
   final PresentationBinding _presentationBinding = new PresentationBinding();
-  final ServiceProviderBinding _serviceProviderBinding = new ServiceProviderBinding();
+  final ServiceProviderBinding _serviceProviderBinding =
+      new ServiceProviderBinding();
 
   /// Constructor
-  UserPickerDeviceShellModel({this.onDeviceShellStopped}) : super() {
+  UserPickerDeviceShellModel({
+    this.onDeviceShellStopped,
+    this.onWifiTapped,
+    this.onLogin,
+  })
+      : super() {
     // Check for last kernel panic
     File lastPanic = new File('/boot/log/last-panic.txt');
     lastPanic.exists().then((bool exists) {
@@ -113,6 +125,11 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     });
   }
 
+  /// Call when wifi is tapped.
+  void wifiTapped() {
+    onWifiTapped?.call();
+  }
+
   /// Permanently removes the user.
   void removeUser(Account account) {
     userProvider.removeUser(account.id, (String errorCode) {
@@ -152,6 +169,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Login with given user
   void login(String accountId) {
+    onLogin?.call();
     _userControllerProxy?.ctrl?.close();
     _userControllerProxy = new UserControllerProxy();
     _userWatcherImpl?.close();
@@ -160,8 +178,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       onLogout();
     });
 
-    final InterfacePair<ServiceProvider> serviceProvider
-        = new InterfacePair<ServiceProvider>();
+    final InterfacePair<ServiceProvider> serviceProvider =
+        new InterfacePair<ServiceProvider>();
     _serviceProviderBinding.bind(this, serviceProvider.passRequest());
 
     final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
@@ -306,12 +324,15 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   void connectToService(String serviceName, Channel channel) {
     if (serviceName == 'mozart.Presentation') {
       if (_presentationBinding.isBound) {
-        log.warning('UserPickerDeviceShell: Presentation service is already bound !');
+        log.warning(
+            'UserPickerDeviceShell: Presentation service is already bound !');
       } else {
-        _presentationBinding.bind(this, new InterfaceRequest<Presentation>(channel));
+        _presentationBinding.bind(
+            this, new InterfaceRequest<Presentation>(channel));
       }
     } else {
-      log.warning('UserPickerDeviceShell: received request for unknown service: $serviceName !');
+      log.warning(
+          'UserPickerDeviceShell: received request for unknown service: $serviceName !');
       channel.close();
     }
   }

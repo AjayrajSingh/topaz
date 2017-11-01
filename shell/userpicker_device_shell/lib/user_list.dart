@@ -103,6 +103,17 @@ class UserList extends StatelessWidget {
         ),
         _buildUserActionButton(
           child: new Text(
+            'WIFI',
+            style: new TextStyle(
+              fontSize: fontSize,
+              color: Colors.white,
+            ),
+          ),
+          onTap: model.wifiTapped,
+          isSmall: isSmall,
+        ),
+        _buildUserActionButton(
+          child: new Text(
             'LOGIN',
             style: new TextStyle(
               fontSize: fontSize,

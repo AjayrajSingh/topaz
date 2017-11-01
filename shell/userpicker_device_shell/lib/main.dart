@@ -4,14 +4,15 @@
 
 import 'dart:math' as math;
 
-import 'package:lib.app.dart/app.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.netstack.fidl/netstack.fidl.dart';
 import 'package:lib.widgets/application.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:lib.wlan.fidl/wlan_service.fidl.dart';
+import 'package:meta/meta.dart';
 
 import 'authentication_context_impl.dart';
 import 'authentication_overlay.dart';
@@ -23,7 +24,6 @@ import 'netstack_model.dart';
 import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
 import 'user_picker_device_shell_screen.dart';
-import 'wlan_model.dart';
 
 /// Set to true to have this BaseShell provide IME services.
 const bool _kAdvertiseImeService = false;
@@ -36,9 +36,6 @@ const bool _kEnableNetworkingIndicators = false;
 
 /// Set to true to enable debug info overlay.
 const bool _kEnableDebugInfo = false;
-
-/// Set to true to enable wifi overlay.
-const bool _kEnableWifiOverlay = false;
 
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
@@ -56,14 +53,18 @@ void main() {
   NetstackProxy netstackProxy = new NetstackProxy();
   connectToService(applicationContext.environmentServices, netstackProxy.ctrl);
 
-  WlanProxy wlanProxy = new WlanProxy();
-  connectToService(applicationContext.environmentServices, wlanProxy.ctrl);
+  _OverlayModel wifiInfoOverlayModel = new _OverlayModel();
 
   UserPickerDeviceShellModel userPickerDeviceShellModel =
       new UserPickerDeviceShellModel(
     onDeviceShellStopped: () {
       netstackProxy.ctrl.close();
-      wlanProxy.ctrl.close();
+    },
+    onLogin: () {
+      wifiInfoOverlayModel.showing = false;
+    },
+    onWifiTapped: () {
+      wifiInfoOverlayModel.showing = !wifiInfoOverlayModel.showing;
     },
   );
 
@@ -111,21 +112,18 @@ void main() {
             ),
           ),
     ),
-  ];
-
-  if (_kEnableWifiOverlay) {
-    overlays.add(
-      new OverlayEntry(
-        builder: (BuildContext context) => new Align(
-              alignment: FractionalOffset.centerLeft,
-              child: new ScopedModel<WlanModel>(
-                model: new WlanModel(wlan: wlanProxy),
-                child: new _WlanInfo(),
+    new OverlayEntry(
+      builder: (BuildContext context) => new ScopedModel<_OverlayModel>(
+            model: wifiInfoOverlayModel,
+            child: new _WifiInfo(
+              wifiApplicationWidget: new ApplicationWidget(
+                url: 'wifi_settings',
+                launcher: applicationContext.launcher,
               ),
             ),
-      ),
-    );
-  }
+          ),
+    ),
+  ];
 
   if (_kEnableDebugInfo) {
     overlays.add(
@@ -358,52 +356,60 @@ class _NetstackInfo extends StatelessWidget {
       );
 }
 
-class _WlanInfo extends StatelessWidget {
+class _WifiInfo extends StatelessWidget {
+  final ApplicationWidget wifiApplicationWidget;
+
+  const _WifiInfo({@required this.wifiApplicationWidget})
+      : assert(wifiApplicationWidget != null);
+
   @override
-  Widget build(BuildContext context) => new ScopedModelDescendant<WlanModel>(
+  Widget build(BuildContext context) =>
+      new ScopedModelDescendant<_OverlayModel>(
         builder: (
           BuildContext context,
           Widget child,
-          WlanModel wlanModel,
+          _OverlayModel model,
         ) =>
-            wlanModel.accessPoints.isEmpty
-                ? const Offstage()
-                : new Container(
-                    margin: const EdgeInsets.all(8.0),
-                    child: new PhysicalModel(
-                      color: Colors.grey[900],
-                      elevation: _kIndicatorElevation,
-                      borderRadius: new BorderRadius.circular(8.0),
+            new Offstage(
+              offstage: !model.showing,
+              child: new Stack(
+                children: <Widget>[
+                  new Listener(
+                    behavior: HitTestBehavior.opaque,
+                    onPointerDown: (PointerDownEvent event) {
+                      model.showing = false;
+                    },
+                  ),
+                  new Center(
+                    child: new FractionallySizedBox(
+                      widthFactor: 0.75,
+                      heightFactor: 0.75,
                       child: new Container(
-                        padding: const EdgeInsets.all(8.0),
-                        child: new Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: wlanModel.accessPoints
-                              .map(
-                                (AccessPoint accessPoint) => new Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        new Container(
-                                          width: 150.0,
-                                          child: new Text(
-                                            accessPoint.name,
-                                            overflow: TextOverflow.fade,
-                                            maxLines: 1,
-                                          ),
-                                        ),
-                                        new Container(width: 8.0),
-                                        new Image.asset(
-                                          accessPoint.url,
-                                          height: 20.0,
-                                          width: 20.0,
-                                        ),
-                                      ],
-                                    ),
-                              )
-                              .toList(),
+                        margin: const EdgeInsets.all(8.0),
+                        child: new PhysicalModel(
+                          color: Colors.grey[900],
+                          elevation: _kIndicatorElevation,
+                          borderRadius: new BorderRadius.circular(8.0),
+                          child: wifiApplicationWidget,
                         ),
                       ),
                     ),
                   ),
+                ],
+              ),
+            ),
       );
+}
+
+class _OverlayModel extends Model {
+  bool _showing = false;
+
+  set showing(bool showing) {
+    if (_showing != showing) {
+      _showing = showing;
+      notifyListeners();
+    }
+  }
+
+  bool get showing => _showing;
 }
