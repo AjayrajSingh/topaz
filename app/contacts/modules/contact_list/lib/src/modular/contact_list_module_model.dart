@@ -117,7 +117,7 @@ class ContactListModuleModel extends ModuleModel {
   /// Transform a FIDL Contact object into a ContactListItem
   ContactListItem _transformContact(contacts_fidl.Contact c) =>
       new ContactListItem(
-        id: c.googleContactId,
+        id: c.contactId,
         displayName: c.displayName,
         photoUrl: c.photoUrl,
       );

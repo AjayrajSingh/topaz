@@ -135,7 +135,7 @@ class ContactsPickerModuleModel extends ModuleModel {
       }
     }
     return new ContactItemStore(
-      id: c.googleContactId,
+      id: c.contactId,
       names: <String>[c.givenName, c.familyName],
       detail: detail,
       photoUrl: c.photoUrl,

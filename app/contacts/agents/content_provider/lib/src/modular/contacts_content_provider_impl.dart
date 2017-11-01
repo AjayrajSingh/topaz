@@ -11,16 +11,18 @@ import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.modular/ledger.dart';
 import 'package:meta/meta.dart';
-import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart';
+import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
+    as fidl;
 
 import '../store/contacts_store.dart';
 import 'contacts_watcher.dart';
 
 /// Initial stub implementation
-class ContactsContentProviderImpl extends ContactsContentProvider {
-  final ContactsStore<Contact> _contactsStore = new ContactsStore<Contact>();
-  final List<ContactsContentProviderBinding> _bindings =
-      <ContactsContentProviderBinding>[];
+class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
+  final ContactsStore<fidl.Contact> _contactsStore =
+      new ContactsStore<fidl.Contact>();
+  final List<fidl.ContactsContentProviderBinding> _bindings =
+      <fidl.ContactsContentProviderBinding>[];
 
   /// [ComponentContext] used for interfacing with Ledger
   final ComponentContext componentContext;
@@ -50,7 +52,7 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
 
     // Grab user's contacts
     bool errorReadingLedgerContacts = false;
-    List<Contact> ledgerContacts;
+    List<fidl.Contact> ledgerContacts;
     try {
       ledgerContacts = await _getLedgerContacts(_page);
     } on Exception catch (e, stackTrace) {
@@ -68,7 +70,7 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
       // TODO(meiyili) handle errors gracefully SO-810, i.e. couldn't save
       // TODO(meiyili) replace with a call to the necessary service agents and
       // ledger and create a fixture with the stub contact generation code
-      List<Contact> contacts = _getStubContactList();
+      List<fidl.Contact> contacts = _getStubContactList();
       await _saveContactsToLedger(contacts);
       log.fine('Ledger empty, initialized contacts store from service');
     }
@@ -77,36 +79,37 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
 
   @override
   Future<Null> getContactList(String prefix,
-      void callback(Status status, List<Contact> contacts)) async {
-    List<Contact> contactsList;
+      void callback(fidl.Status status, List<fidl.Contact> contacts)) async {
+    List<fidl.Contact> contactsList;
     if (prefix == null || prefix == '') {
       contactsList = _contactsStore.getAllContacts();
     } else {
-      Map<String, Set<Contact>> contacts = _contactsStore.search(prefix);
+      Map<String, Set<fidl.Contact>> contacts = _contactsStore.search(prefix);
 
       // Merge into a set first to avoid duplicates
       contactsList =
-          contacts.values.expand((Set<Contact> s) => s).toSet().toList();
+          contacts.values.expand((Set<fidl.Contact> s) => s).toSet().toList();
     }
-    callback(Status.ok, contactsList);
+    callback(fidl.Status.ok, contactsList);
     return;
   }
 
   @override
-  Future<Null> getContact(
-      String id, void callback(Status status, Contact contact)) async {
-    callback(Status.ok, _contactsStore.getContact(id));
+  Future<Null> getContact(String id,
+      void callback(fidl.Status status, fidl.Contact contact)) async {
+    callback(fidl.Status.ok, _contactsStore.getContact(id));
     return;
   }
 
   /// Add request to the list of binding objects.
-  void addBinding(InterfaceRequest<ContactsContentProvider> request) {
-    _bindings.add(new ContactsContentProviderBinding()..bind(this, request));
+  void addBinding(InterfaceRequest<fidl.ContactsContentProvider> request) {
+    _bindings
+        .add(new fidl.ContactsContentProviderBinding()..bind(this, request));
   }
 
   /// Close all the bindings.
   void close() {
-    for (ContactsContentProviderBinding binding in _bindings) {
+    for (fidl.ContactsContentProviderBinding binding in _bindings) {
       binding.close();
     }
     _bindings.clear();
@@ -117,47 +120,68 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
     _ledger?.ctrl?.close();
   }
 
-  void _addContactsToStore(List<Contact> contacts) {
-    for (Contact contact in contacts) {
-      List<String> searchableValues = <String>[
-        contact.displayName.trim().toLowerCase(),
-        contact.familyName.trim().toLowerCase(),
-        contact.emails[0].value.trim().toLowerCase(),
-      ];
-      _contactsStore.addContact(
-        contact.googleContactId,
-        contact.displayName,
-        searchableValues,
-        contact,
-        updateIfExists: true,
-      );
+  void _addContactsToStore(List<fidl.Contact> contacts) {
+    for (fidl.Contact contact in contacts) {
+      if (contact.displayName.trim().isNotEmpty) {
+        // Will only add the contact if it has a displayName that can be shown
+        // to the user
+        List<String> searchableValues = <String>[
+          contact.displayName.trim().toLowerCase()
+        ];
+
+        if (contact.familyName != null &&
+            contact.familyName.trim().isNotEmpty) {
+          searchableValues.add(contact.familyName.trim());
+        }
+
+        // Allow contact to be searchable on all of their email addresses
+        for (fidl.EmailAddress e in contact.emails) {
+          if (e != null && e.value.trim().isNotEmpty) {
+            searchableValues.add(e.value.trim());
+          }
+        }
+
+        _contactsStore.addContact(
+          contact.contactId,
+          contact.displayName,
+          searchableValues,
+          contact,
+          updateIfExists: true,
+        );
+      }
     }
   }
 
   /// Temporary for stub implementations
   /// TODO(meiyili) remove when implementing the actual methods
-  Contact _createStubContact(String id, String givenName, String familyName) {
-    return new Contact()
-      ..googleContactId = id
+  fidl.Contact _createStubContact(
+    String id,
+    String givenName,
+    String familyName,
+  ) {
+    return new fidl.Contact()
+      ..contactId = id
+      ..sourceContactId = id
+      ..sourceId = 'stub'
       ..displayName = '$givenName $familyName'
       ..givenName = givenName
       ..middleName = givenName.substring(0, 1)
       ..familyName = familyName
-      ..emails = <EmailAddress>[
-        new EmailAddress()
+      ..emails = <fidl.EmailAddress>[
+        new fidl.EmailAddress()
           ..label = 'primary'
           ..value = '$familyName$givenName@example.com'.toLowerCase()
       ]
-      ..phoneNumbers = <PhoneNumber>[
-        new PhoneNumber()
+      ..phoneNumbers = <fidl.PhoneNumber>[
+        new fidl.PhoneNumber()
           ..label = 'mobile'
           ..value = '12345678910'
       ]
       ..photoUrl = '';
   }
 
-  List<Contact> _getStubContactList() {
-    return <Contact>[
+  List<fidl.Contact> _getStubContactList() {
+    return <fidl.Contact>[
       _createStubContact('1', 'Ahonui', 'Armadillo'),
       _createStubContact('2', 'Badia', 'Blue-Whale'),
       _createStubContact('3', 'Candida', 'Capybara'),
@@ -204,11 +228,11 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
     );
   }
 
-  Future<List<Contact>> _getLedgerContacts(ledger.PageProxy page) async {
+  Future<List<fidl.Contact>> _getLedgerContacts(ledger.PageProxy page) async {
     if (page == null) {
       // TODO(meiyili): handle ledger errors gracefully SO-810
       log.warning('getLedgerContacts was called on a null page');
-      return <Contact>[];
+      return <fidl.Contact>[];
     }
     ledger.PageSnapshotProxy snapshot = new ledger.PageSnapshotProxy();
 
@@ -236,33 +260,35 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
     return _getContactsFromEntries(await getFullEntries(snapshot));
   }
 
-  List<Contact> _getContactsFromEntries(List<ledger.Entry> entries) {
-    List<Contact> contacts = <Contact>[];
+  List<fidl.Contact> _getContactsFromEntries(List<ledger.Entry> entries) {
+    List<fidl.Contact> contacts = <fidl.Contact>[];
     if (entries.isNotEmpty) {
       contacts = entries.map(_getContactFromEntry);
     }
     return contacts;
   }
 
-  Contact _getContactFromEntry(ledger.Entry entry) {
+  fidl.Contact _getContactFromEntry(ledger.Entry entry) {
     String contactId = UTF8.decode(entry.key);
     Map<String, dynamic> decodedValue = decodeLedgerValue(entry.value);
 
-    List<EmailAddress> emails = <EmailAddress>[];
+    List<fidl.EmailAddress> emails = <fidl.EmailAddress>[];
     for (Map<String, String> email in decodedValue['emails']) {
-      emails.add(new EmailAddress()
+      emails.add(new fidl.EmailAddress()
         ..label = email['label']
         ..value = email['value']);
     }
 
-    List<PhoneNumber> phoneNumbers = <PhoneNumber>[];
+    List<fidl.PhoneNumber> phoneNumbers = <fidl.PhoneNumber>[];
     for (Map<String, String> number in decodedValue['phoneNumbers']) {
-      phoneNumbers.add(new PhoneNumber()
+      phoneNumbers.add(new fidl.PhoneNumber()
         ..label = number['label']
         ..value = number['value']);
     }
-    return new Contact()
-      ..googleContactId = contactId
+    return new fidl.Contact()
+      ..contactId = contactId
+      ..sourceContactId = decodedValue['sourceContactId']
+      ..sourceId = decodedValue['sourceId']
       ..displayName = decodedValue['displayName']
       ..givenName = decodedValue['givenName']
       ..middleName = decodedValue['middleName']
@@ -272,14 +298,14 @@ class ContactsContentProviderImpl extends ContactsContentProvider {
       ..phoneNumbers = phoneNumbers;
   }
 
-  Future<Null> _saveContactsToLedger(List<Contact> contacts) async {
+  Future<Null> _saveContactsToLedger(List<fidl.Contact> contacts) async {
     if (_page == null) {
       // TODO(meiyili): handle ledger errors gracefully SO-810
       log.warning('saveContactsToLedger was called on a null page');
       return;
     }
-    for (Contact contact in contacts) {
-      List<int> contactId = UTF8.encode(contact.googleContactId);
+    for (fidl.Contact contact in contacts) {
+      List<int> contactId = UTF8.encode(contact.contactId);
       List<int> ledgerValue = encodeLedgerValue(contact);
       _page.put(
         contactId,

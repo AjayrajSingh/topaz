@@ -22,25 +22,28 @@ interface ContactsContentProvider {
   GetContact(string id) => (Status status, Contact contact);
 };
 
-// Representation of a contact that is expected by the ContactCollection.
+// Representation of a contact that is expected by the ContactsContentProvider
+// and the modules that consume the contact information.
 // For prototyping purposes, we will initially use a subset of contact fields.
 struct Contact {
-  string googleContactID;
+  string contactId;
+  string sourceContactId;
+  string sourceId;
   string displayName;
-  string givenName;
-  string middleName;
-  string familyName;
-  string photoUrl;
+  string? givenName;
+  string? middleName;
+  string? familyName;
+  string? photoUrl;
   array<EmailAddress> emails;
   array<PhoneNumber> phoneNumbers;
 };
 
 struct EmailAddress {
   string value;
-  string label;
+  string? label;
 };
 
 struct PhoneNumber {
   string value;
-  string label;
+  string? label;
 };

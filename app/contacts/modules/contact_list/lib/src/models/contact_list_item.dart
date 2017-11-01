@@ -8,11 +8,10 @@ import 'package:meta/meta.dart';
 /// It contains only the data needed for displaying a list item and retrieving
 /// more information about the given contact later on.
 class ContactListItem {
+  final String _displayName;
+
   /// Unique identifier for the contact.
   final String id;
-
-  /// List display name for the contact.
-  final String displayName;
 
   /// Avatar photoUrl for the contact.
   final String photoUrl;
@@ -20,12 +19,16 @@ class ContactListItem {
   /// Creates an instance of a [ContactListItem]
   ContactListItem({
     @required this.id,
-    @required this.displayName,
+    @required String displayName,
     this.photoUrl,
   })
       : assert(id != null && id.isNotEmpty),
-        assert(displayName != null && displayName.isNotEmpty);
+        assert(displayName != null && displayName.trim().isNotEmpty),
+        _displayName = displayName.trim();
 
   /// The first letter of the display name
-  String get firstLetter => displayName[0];
+  String get firstLetter => _displayName[0];
+
+  /// List display name for the contact.
+  String get displayName => _displayName;
 }
