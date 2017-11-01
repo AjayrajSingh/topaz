@@ -355,21 +355,29 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       onStatusChangedImpl: (maxwell.SpeechStatus speechStatus) {
         switch (speechStatus) {
           case maxwell.SpeechStatus.processing:
+            if (_speaking || !_processingAsk) {
+              _speaking = false;
+              _processingAsk = true;
+              notifyListeners();
+            }
             break;
           case maxwell.SpeechStatus.responding:
-            _speaking = true;
-            if (!_processingAsk) {
+            if (!_speaking || !_processingAsk) {
+              _speaking = true;
               _processingAsk = true;
+              notifyListeners();
             }
-            notifyListeners();
             break;
           case maxwell.SpeechStatus.idle:
-            _speaking = false;
-            _processingAsk = false;
-            notifyListeners();
+            if (_speaking || _processingAsk) {
+              _speaking = false;
+              _processingAsk = false;
+              notifyListeners();
+            }
             break;
           default:
-            if (_processingAsk) {
+            if (_speaking || _processingAsk) {
+              _speaking = false;
               _processingAsk = false;
               notifyListeners();
             }
