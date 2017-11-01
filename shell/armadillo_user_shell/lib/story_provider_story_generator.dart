@@ -325,10 +325,15 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
         .single;
     for (Story story in storyCluster.stories) {
       log.info('Deleting story ${story.id.value}...');
+
       _storyProvider.deleteStory(story.id.value, () {
         log.info('Story ${story.id.value} deleted!');
       });
-      _removeStory(story.id.value, notify: false);
+
+      if (_storyControllerMap.containsKey(story.id.value)) {
+        _storyControllerMap[story.id.value].ctrl.close();
+        _storyControllerMap.remove(story.id.value);
+      }
     }
     _storyClusters.remove(storyCluster);
 
