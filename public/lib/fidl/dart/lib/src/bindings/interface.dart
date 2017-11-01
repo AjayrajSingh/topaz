@@ -279,7 +279,7 @@ abstract class Binding<T> {
     // ZX.ERR_BAD_STATE is only used to indicate that the other end of
     // the pipe has been closed. We can ignore the close here and wait for
     // the PeerClosed signal on the event stream.
-    assert((status == ZX.OK) || (status == ZX.ERR_BAD_STATE));
+    assert((status == ZX.OK) || (status == ZX.ERR_BAD_STATE), 'Channel write: bad status $status');
   }
 
   final ChannelReader _reader = new ChannelReader();
