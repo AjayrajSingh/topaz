@@ -73,14 +73,22 @@ class CommandMessage extends Message {
     if (_arguments.isNotEmpty) {
       String id = uuid.unparse(messageId);
       String bin = _arguments.first;
-      String message = _arguments.sublist(1).join(' ');
+
+      Map<String, String> messageEntity = <String, String>{
+        '@type': 'com.google.fuchsia.string',
+        'content': _arguments.sublist(1).join(' '),
+      };
+      Map<String, dynamic> membersEntity = <String, dynamic>{
+        '@type': 'com.google.fuchsia.chat.members',
+        'members': members,
+      };
 
       // Setup Daisy.
       Daisy daisy = new Daisy()
         ..verb = 'com.google.fuchsia.codelab.$bin'
         ..nouns = <String, Noun>{};
-      daisy.nouns['message'] = new Noun()..json = JSON.encode(message);
-      daisy.nouns['members'] = new Noun()..json = JSON.encode(members);
+      daisy.nouns['message'] = new Noun()..json = JSON.encode(messageEntity);
+      daisy.nouns['members'] = new Noun()..json = JSON.encode(membersEntity);
 
       embedder.startDaisy(
         daisy: daisy,
