@@ -1,0 +1,299 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_package.gni")
+import("//build/dart/toolchain.gni")
+import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
+import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
+
+declare_args() {
+  # Controls whether dart_app() targets generate JIT or AOT Dart snapshots.
+  # In a debug build, the default is JIT so that attaching a debugger is
+  # possible. In a release build the default is AOT to save compilation time
+  # and memory footprint.
+  dart_app_default_is_jit = is_debug
+}
+
+template("dart_jit_app") {
+  assert(defined(invoker.main_dart), "Must specify main_dart file")
+
+  dart_package_target_name = target_name + "_dart_package"
+
+  dart_package(dart_package_target_name) {
+    forward_variables_from(invoker, [
+      "deps",
+      "disable_analysis",
+      "extra_analyzer_sources",
+      "non_dart_deps",
+      "source_dir",
+    ])
+
+    if (defined(invoker.package_name)) {
+      package_name = invoker.package_name
+    } else {
+      infer_package_name = true
+    }
+  }
+
+  if (defined(invoker.output_name)) {
+    bundle_name = invoker.output_name
+  } else {
+    bundle_name = "${target_name}.dartx"
+  }
+
+  snapshot_path = "$target_gen_dir/${target_name}_snapshot.bin"
+  depfile_path = "${snapshot_path}.d"
+
+  dart_snapshotter_label =
+      "//topaz/runtime/dart_runner/snapshotter($host_toolchain)"
+  dart_snapshotter_dir = get_label_info(dart_snapshotter_label, "root_out_dir")
+  dart_snapshotter = "$dart_snapshotter_dir/dart_snapshotter"
+
+  snapshot_target_name = target_name + "_snapshot"
+
+  action(snapshot_target_name) {
+    if (defined(invoker.testonly)) {
+      testonly = invoker.testonly
+    }
+
+    depfile = depfile_path
+
+    outputs = [
+      snapshot_path,
+    ]
+
+    inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files
+
+    dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+    rebased_packages_path =
+        rebase_path("$dart_target_gen_dir/$dart_package_target_name.packages")
+    rebased_snapshot_path = rebase_path(snapshot_path)
+    rebased_depfile_path = rebase_path(depfile_path)
+    rebased_build_output_path = rebase_path(snapshot_path, root_build_dir)
+
+    script = dart_snapshotter
+    args = [
+      "--packages=$rebased_packages_path",
+      "--snapshot=$rebased_snapshot_path",
+      "--depfile=$rebased_depfile_path",
+      "--build-output=$rebased_build_output_path",
+      rebase_path(invoker.main_dart),
+    ]
+
+    deps = [
+      ":$dart_package_target_name",
+      dart_snapshotter_label,
+    ]
+  }
+
+  bundle_path = "$root_out_dir/$bundle_name"
+
+  dart_bundler_label =
+      "//topaz/runtime/dart_runner/bundler($host_toolchain)"
+  dart_bundler_dir = get_label_info(dart_bundler_label, "root_out_dir")
+  dart_bundler = "$dart_bundler_dir/dart_bundler"
+
+  action(target_name) {
+    if (defined(invoker.testonly)) {
+      testonly = invoker.testonly
+    }
+
+    outputs = [
+      bundle_path,
+    ]
+
+    rebased_snapshot_path = rebase_path(snapshot_path)
+    rebased_bundle_path = rebase_path(bundle_path)
+
+    script = dart_bundler
+    args = [
+      "--interpreter=dart_runner",
+      "--snapshot-key=snapshot_blob.bin",
+      "--snapshot=$rebased_snapshot_path",
+      "--bundle=$rebased_bundle_path",
+    ]
+
+    deps = [
+      ":" + snapshot_target_name,
+       dart_bundler_label,
+    ]
+  }
+}
+
+template("dart_aot_app") {
+  assert(defined(invoker.main_dart), "Must specify main_dart file")
+
+  dart_package_target_name = target_name + "_dart_package"
+
+  dart_package(dart_package_target_name) {
+    forward_variables_from(invoker, [
+      "deps",
+      "disable_analysis",
+      "extra_analyzer_sources",
+      "non_dart_deps",
+      "source_dir",
+    ])
+
+    if (defined(invoker.package_name)) {
+      package_name = invoker.package_name
+    } else {
+      infer_package_name = true
+    }
+  }
+
+  if (defined(invoker.output_name)) {
+    bundle_name = invoker.output_name
+  } else {
+    bundle_name = "${target_name}.dartx"
+  }
+
+  assembly_path = "$target_gen_dir/${target_name}.S"
+  depfile_path = "${assembly_path}.d"
+
+  dart_snapshotter_label =
+      "//topaz/runtime/dart_runner/snapshotter:aot_snapshotter($host_toolchain)"
+  dart_snapshotter_dir = get_label_info(dart_snapshotter_label, "root_out_dir")
+  dart_snapshotter = "$dart_snapshotter_dir/dart_aot_snapshotter"
+
+  assembly_target_name = target_name + "_assembly"
+
+  action(assembly_target_name) {
+    if (defined(invoker.testonly)) {
+      testonly = invoker.testonly
+    }
+
+    depfile = depfile_path
+
+    outputs = [
+      assembly_path,
+    ]
+
+    inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files
+
+    dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+    rebased_packages_path =
+        rebase_path("$dart_target_gen_dir/$dart_package_target_name.packages")
+    rebased_assembly_path = rebase_path(assembly_path)
+    rebased_depfile_path = rebase_path(depfile_path)
+    rebased_build_output_path = rebase_path(assembly_path, root_build_dir)
+
+    script = dart_snapshotter
+    args = [
+      "--packages=$rebased_packages_path",
+      "--snapshot=$rebased_assembly_path",
+      "--depfile=$rebased_depfile_path",
+      "--build-output=$rebased_build_output_path",
+      rebase_path(invoker.main_dart),
+    ]
+
+    deps = [
+      ":$dart_package_target_name",
+      dart_snapshotter_label,
+    ]
+  }
+
+  dylib_target_name = target_name + "_dylib"
+  outer_target_name = target_name
+  shared_library(dylib_target_name) {
+    if (defined(invoker.testonly)) {
+      testonly = invoker.testonly
+    }
+
+    deps = [
+      ":$assembly_target_name",
+    ]
+    sources = [
+      assembly_path,
+    ]
+    cflags = [
+      "-nostdlib",
+      "-nostartfiles",
+    ]
+    output_name = outer_target_name
+  }
+
+  bundle_path = "$root_out_dir/$bundle_name"
+  dylib_path =
+      get_label_info(":$dylib_target_name($shlib_toolchain)",
+                     "root_out_dir") + "/lib.unstripped/lib$target_name.so"
+
+  dart_bundler_label =
+      "//topaz/runtime/dart_runner/bundler($host_toolchain)"
+  dart_bundler_dir = get_label_info(dart_bundler_label, "root_out_dir")
+  dart_bundler = "$dart_bundler_dir/dart_bundler"
+
+  action(target_name) {
+    if (defined(invoker.testonly)) {
+      testonly = invoker.testonly
+    }
+
+    outputs = [
+      bundle_path,
+    ]
+
+    rebased_dylib_path = rebase_path(dylib_path)
+    rebased_bundle_path = rebase_path(bundle_path)
+
+    script = dart_bundler
+    args = [
+      "--interpreter=dart_aot_runner",
+      "--snapshot-key=libapp.so",
+      "--snapshot=$rebased_dylib_path",
+      "--bundle=$rebased_bundle_path",
+    ]
+
+    deps = [
+      ":$dylib_target_name",
+       dart_bundler_label,
+    ]
+  }
+}
+
+# Defines a Dart application that can be run in the Dart content handler
+#
+# Parameters
+#
+#   package_name (optional)
+#     Name of the dart package.
+#
+#   main_dart (required)
+#     File containing the main function of the application.
+#
+#   deps (optional)
+#     Dependencies of this application
+#
+#   output_name (optional)
+#     Name of the output file to generate. Defaults to ${target_name}.dartx
+#
+#   disable_analysis (optional)
+#     Prevents analysis from being run on this target.
+template("dart_app") {
+  if (dart_app_default_is_jit) {
+    dart_jit_app(target_name) {
+      forward_variables_from(invoker,
+          [
+            "package_name",
+            "main_dart",
+            "deps",
+            "output_name",
+            "disable_analysis",
+            "testonly",
+            "source_dir",
+          ])
+    }
+  } else {
+    dart_aot_app(target_name) {
+      forward_variables_from(invoker,
+          [
+            "package_name",
+            "main_dart",
+            "deps",
+            "output_name",
+            "disable_analysis",
+            "testonly",
+            "source_dir",
+          ])
+    }
+  }
+}

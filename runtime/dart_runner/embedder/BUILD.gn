@@ -1,0 +1,132 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
+import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
+
+action("generate_snapshot_bin") {
+  if (is_debug) {
+    gen_snapshot_exe = "gen_snapshot"
+  } else {
+    gen_snapshot_exe = "gen_snapshot_product"
+  }
+
+  deps = [
+    "//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)",
+  ]
+
+  inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files + [
+             "builtin.dart",
+             "snapshot.dart",
+           ]
+
+  vm_isolate_snapshot = "$target_gen_dir/vm_isolate_snapshot.bin"
+  isolate_snapshot = "$target_gen_dir/isolate_snapshot.bin"
+
+  outputs = [
+    vm_isolate_snapshot,
+    isolate_snapshot,
+  ]
+
+  gen_snapshot_dir = get_label_info(
+          "//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)",
+          "root_out_dir")
+  script = "//third_party/dart/runtime/tools/create_snapshot_bin.py"
+
+  fuchsia_builtin_path = rebase_path("builtin.dart")
+  zircon_path = rebase_path(zircon_sdk_ext_lib)
+  fuchsia_path = rebase_path(fuchsia_sdk_ext_lib)
+
+  args = [
+    "--executable",
+    rebase_path("$gen_snapshot_dir/$gen_snapshot_exe"),
+    "--package_root",
+    rebase_path("$root_gen_dir/dart-gen"),
+    "--script",
+    rebase_path("snapshot.dart"),
+    "--snapshot_kind",
+    "core",
+    "--vm_output_bin",
+    rebase_path(vm_isolate_snapshot, root_build_dir),
+    "--isolate_output_bin",
+    rebase_path(isolate_snapshot, root_build_dir),
+    "--url_mapping=dart:fuchsia.builtin,$fuchsia_builtin_path",
+    "--url_mapping=dart:zircon,$zircon_path",
+    "--url_mapping=dart:fuchsia,$fuchsia_path",
+  ]
+}
+
+action("generate_snapshot_file") {
+  deps = [
+    ":generate_snapshot_bin",
+  ]
+
+  vm_input_bin = "$target_gen_dir/vm_isolate_snapshot.bin"
+  input_bin = "$target_gen_dir/isolate_snapshot.bin"
+  snapshot_template = "snapshot.cc.tmpl"
+  snapshot_file = "$target_gen_dir/dart_snapshot.cc"
+
+  inputs = [
+    snapshot_template,
+    vm_input_bin,
+    input_bin,
+  ]
+
+  outputs = [
+    snapshot_file,
+  ]
+
+  script = "//third_party/dart/runtime/tools/create_snapshot_file.py"
+  args = [
+    "--vm_input_bin",
+    rebase_path(vm_input_bin),
+    "--input_bin",
+    rebase_path(input_bin),
+    "--input_cc",
+    rebase_path(snapshot_template),
+    "--output",
+    rebase_path(snapshot_file),
+  ]
+}
+
+source_set("dart_snapshot_cc") {
+  deps = [
+    ":generate_snapshot_file",
+  ]
+
+  sources = [
+    "$target_gen_dir/dart_snapshot.cc",
+    "snapshot.h",
+  ]
+}
+
+action("generate_aot_snapshot_assembly") {
+  aot_snapshotter_label =
+      "//topaz/runtime/dart_runner/snapshotter:aot_snapshotter($host_toolchain)"
+  aot_snapshotter_dir = get_label_info(aot_snapshotter_label, "root_out_dir")
+
+  snapshot_assembly = "$target_gen_dir/aot_vm_snapshot.S"
+
+  deps = [
+    aot_snapshotter_label,
+  ]
+
+  outputs = [
+    snapshot_assembly,
+  ]
+
+  script = rebase_path("$aot_snapshotter_dir/dart_aot_snapshotter")
+  args = [ "--aot-vm-snapshot=" + rebase_path(snapshot_assembly) ]
+}
+
+source_set("dart_aot_snapshot_cc") {
+  deps = [
+    ":generate_aot_snapshot_assembly",
+  ]
+
+  sources = [
+    "$target_gen_dir/aot_vm_snapshot.S",
+    "snapshot.h",
+  ]
+}

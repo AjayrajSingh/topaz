@@ -1,0 +1,129 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//packages/package.gni")
+
+template("runner") {
+  invoker_output_name = invoker.output_name
+  extra_defines = invoker.extra_defines
+  extra_deps = invoker.extra_deps
+
+  executable(target_name) {
+    output_name = invoker_output_name
+
+    sources = [
+      "application_runner_impl.cc",
+      "application_runner_impl.h",
+      "builtin_libraries.cc",
+      "builtin_libraries.h",
+      "dart_application_controller.cc",
+      "dart_application_controller.h",
+      "main.cc",
+    ]
+
+    defines = extra_defines
+
+    # In a debug build, we use a build of Dart in which it is possible to
+    # spawn a vmservice isolate, use the Observatory, attach the debugger, etc.
+    # In a release build, we use a stripped-down build of Dart that leaves out
+    # those features.
+    if (is_debug) {
+      dart_deps = [
+        "//third_party/dart/runtime/bin:embedded_dart_io",
+
+        # TODO(abarth): We shouldn't need to depend on libdart_builtin but we
+        # fail to link otherwise.
+        "//third_party/dart/runtime/bin:libdart_builtin",
+        "//third_party/dart/runtime/platform:libdart_platform",
+      ]
+    } else {
+      dart_deps = [
+        "//third_party/dart/runtime/bin:embedded_dart_io_product",
+        "//third_party/dart/runtime/bin:libdart_builtin_product",
+        "//third_party/dart/runtime/platform:libdart_platform_product",
+      ]
+    }
+
+    deps = [
+             "//garnet/public/lib/app/cpp",
+             "//garnet/public/lib/fsl",
+             "//garnet/public/lib/fxl",
+             "//garnet/public/lib/svc/cpp",
+             "//topaz/lib/tonic",
+             "//topaz/public/dart-pkg/fuchsia",
+           ] + dart_deps + extra_deps
+  }
+}
+
+runner("dart_runner_bin") {
+  output_name = "dart_runner"
+  extra_defines = []
+  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc" ]
+  if (is_debug) {
+    extra_deps += [ "//third_party/dart/runtime:libdart_jit" ]
+  } else {
+    # Since the Dart content handlers don't have a vmservice, it is safe to
+    # link against the PRODUCT mode libraries in a Fuchsia release build.
+    extra_deps += [ "//third_party/dart/runtime:libdart_jit_product" ]
+  }
+}
+
+runner("dart_aot_runner_bin") {
+  output_name = "dart_aot_runner"
+  extra_defines = [ "AOT_RUNTIME" ]
+  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc" ]
+  if (is_debug) {
+    extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime" ]
+  } else {
+    extra_deps +=
+        [ "//third_party/dart/runtime:libdart_precompiled_runtime_product" ]
+  }
+}
+
+package("dart_runner") {
+  testonly = true
+  app = true
+  system_image = true
+
+  deps = [
+    ":dart_aot_runner_bin",
+    ":dart_runner_bin",
+    "examples",
+    "integration",
+    "integration:integration_aot",
+  ]
+
+  binaries = [
+    {
+      name = "dart_runner"
+    },
+    {
+      name = "dart_runner_test.dartx"
+    },
+    {
+      name = "goodbye_dart.dartx"
+    },
+    {
+      name = "hello_app_dart.dartx"
+    },
+    {
+      name = "hello_dart.dartx"
+    },
+    {
+      name = "dart_aot_runner"
+    },
+    {
+      name = "dart_aot_runner_test.dartx"
+    },
+    {
+      name = "goodbye_dart_aot.dartx"
+    },
+    {
+      name = "hello_app_dart_aot.dartx"
+    },
+    {
+      name = "hello_dart_aot.dartx"
+    },
+  ]
+}

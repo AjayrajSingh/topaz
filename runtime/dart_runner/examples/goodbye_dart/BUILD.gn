@@ -1,0 +1,23 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/dart_runner/dart_app.gni")
+
+dart_jit_app("goodbye_dart") {
+  main_dart = "goodbye_dart.dart"
+
+  source_dir = "."
+  deps = [
+    "//topaz/public/lib/fidl/dart",
+  ]
+}
+
+dart_aot_app("goodbye_dart_aot") {
+  main_dart = "goodbye_dart.dart"
+
+  source_dir = "."
+  deps = [
+    "//topaz/public/lib/fidl/dart",
+  ]
+}
