@@ -6,6 +6,7 @@ import("//packages/package.gni")
 
 package("xi") {
   app = true
+  system_image = true
 
   deps = [
     # NOTE: comment out the `//apps/xi/modules` line below to build only the
