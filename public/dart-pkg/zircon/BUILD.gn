@@ -1,0 +1,55 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_package.gni")
+import("//build/dart/dart_fuchsia_test.gni")
+
+# NOTE: You must add any Dart files to sdk_ext.gni.
+
+group("zircon") {
+  public_deps = [
+    ":sdk_ext",
+  ]
+  deps = [
+    ":dart_zircon_test",
+    ":package_for_analysis",
+  ]
+}
+
+source_set("sdk_ext") {
+  sources = [
+    "sdk_ext/handle.cc",
+    "sdk_ext/handle.h",
+    "sdk_ext/handle_waiter.cc",
+    "sdk_ext/handle_waiter.h",
+    "sdk_ext/natives.cc",
+    "sdk_ext/natives.h",
+    "sdk_ext/system.cc",
+    "sdk_ext/system.h",
+  ]
+
+  deps = [
+    "//garnet/public/lib/fxl",
+    "//third_party/dart/runtime:dart_api",
+    "//zircon/system/ulib/async:default",
+    "//zircon/system/ulib/zx",
+  ]
+
+  public_deps = [
+    "//topaz/lib/tonic",
+    "//zircon/system/ulib/async",
+  ]
+}
+
+# This is just so that we can run dart analysis on these files.
+dart_package("package_for_analysis") {
+  infer_package_name = true
+  source_dir = "lib"
+}
+
+dart_fuchsia_test("dart_zircon_test") {
+  deps = [
+    "//topaz/public/lib/fidl/dart",
+  ]
+}

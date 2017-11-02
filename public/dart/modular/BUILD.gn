@@ -1,0 +1,23 @@
+# Copyright 2017 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_package.gni")
+
+dart_package("lib.modular") {
+  package_name = "lib.modular"
+
+  deps = [
+    "//peridot/public/lib/agent/fidl:fidl_dart",
+    "//peridot/public/lib/device/fidl:fidl_dart",
+    "//peridot/public/lib/ledger/fidl:fidl_dart",
+    "//peridot/public/lib/lifecycle/fidl:fidl_dart",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/user/fidl:fidl_dart",
+    "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
+    "//third_party/dart-pkg/pub/collection",
+    "//third_party/dart-pkg/pub/quiver",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
+  ]
+}
