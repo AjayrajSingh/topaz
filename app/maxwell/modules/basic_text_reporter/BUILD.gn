@@ -24,6 +24,7 @@ flutter_app("maxwell_btr") {
 
 package("basic_text_reporter") {
   app = true
+  system_image = true
 
   deps = [
     ":maxwell_btr",

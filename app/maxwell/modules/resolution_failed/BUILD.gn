@@ -22,6 +22,8 @@ flutter_app("app") {
 }
 
 package("resolution_failed") {
+  system_image = true
+
   deps = [
     ":app",
   ]

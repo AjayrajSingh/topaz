@@ -23,6 +23,7 @@ dart_app("app") {
 
 package("module_suggester") {
   app = true
+  system_image = true
 
   deps = [
     ":app",
