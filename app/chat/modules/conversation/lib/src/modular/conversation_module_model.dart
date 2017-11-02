@@ -67,6 +67,7 @@ class ChatConversationModuleModel extends ModuleModel {
   List<chat_fidl.Message> _messages;
   List<Section> _sections;
   bool _fetchingConversation = false;
+  final Completer<Null> _readyCompleter = new Completer<Null>();
 
   Uint8List _conversationId;
 
@@ -205,6 +206,8 @@ class ChatConversationModuleModel extends ModuleModel {
     // Close all the unnecessary bindings.
     contentProviderServices.ctrl.close();
     componentContext.ctrl.close();
+
+    _readyCompleter.complete();
   }
 
   /// Fetches the conversation metadata and the message history from the content
@@ -238,21 +241,9 @@ class ChatConversationModuleModel extends ModuleModel {
       },
     );
 
-    // TODO(SO-888): there is some wierd race condition in the setup here or in the
-    // content provider's initialization. The first time the agent runs the code
-    // below will hang, the timeout retires the effort after 5 secs.
-    Duration duration = const Duration(seconds: 5);
-    Timer timer = new Timer(duration, () {
-      if (!statusCompleter.isCompleted) {
-        log.info('waited $duration, retrying...');
-        _fetchConversation();
-      }
-    });
-
     // TODO(youngseokyoon): properly communicate the error status to the user.
     // https://fuchsia.atlassian.net/browse/SO-365
     chat_fidl.ChatStatus status = await statusCompleter.future;
-    timer.cancel();
 
     if (status != chat_fidl.ChatStatus.ok) {
       log.severe('ChatContentProvider::GetConversation() returned an error '
@@ -494,7 +485,11 @@ class ChatConversationModuleModel extends ModuleModel {
   }
 
   @override
-  void onNotify(String json) {
+  Future<Null> onNotify(String json) async {
+    // The conversation ID must be set after the module model initialization is
+    // finished.
+    await _readyCompleter.future;
+
     _setConversationId(JSON.decode(json));
   }
 
