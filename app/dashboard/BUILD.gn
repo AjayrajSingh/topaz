@@ -29,6 +29,7 @@ flutter_app("dashboard_app") {
 
 package("dashboard") {
   app = true
+  system_image = true
 
   deps = [
     ":dashboard_app",
