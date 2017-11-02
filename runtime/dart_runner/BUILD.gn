@@ -84,6 +84,7 @@ runner("dart_aot_runner_bin") {
 package("dart_runner") {
   testonly = true
   app = true
+  system_image = true
 
   deps = [
     ":dart_aot_runner_bin",
