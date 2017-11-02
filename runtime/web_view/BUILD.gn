@@ -41,7 +41,10 @@ executable("web_view_bin") {
 }
 
 group("webkit") {
-  visibility = [ "//topaz/*" ]
+  visibility = [
+    "//topaz/*",
+    "//vendor/google/*",
+  ]
 
   if (use_prebuilt_webkit) {
     public_configs = [ ":prebuilt_webkit_config" ]
