@@ -1,0 +1,49 @@
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+module contacts_content_provider;
+
+enum Status {
+  OK = 0,
+  UNKNOWN_ERROR,
+};
+
+// This service is implemented by an application that is meant to store contacts
+// for a given user.
+[ServiceName="contacts_content_provider.ContactsContentProvider"]
+interface ContactsContentProvider {
+  // Returns a list of the user's contacts in alphabetical order.
+  // If a prefix is provided, it will return all contacts with name or email
+  // matching the prefix in alphabetical order.
+  GetContactList(string? prefix) => (Status status, array<Contact> contacts);
+
+  // Returns the contact information for the contact specified by contact id.
+  GetContact(string id) => (Status status, Contact contact);
+};
+
+// Representation of a contact that is expected by the ContactsContentProvider
+// and the modules that consume the contact information.
+// For prototyping purposes, we will initially use a subset of contact fields.
+struct Contact {
+  string contactId;
+  string sourceContactId;
+  string sourceId;
+  string displayName;
+  string? givenName;
+  string? middleName;
+  string? familyName;
+  string? photoUrl;
+  array<EmailAddress> emails;
+  array<PhoneNumber> phoneNumbers;
+};
+
+struct EmailAddress {
+  string value;
+  string? label;
+};
+
+struct PhoneNumber {
+  string value;
+  string? label;
+};

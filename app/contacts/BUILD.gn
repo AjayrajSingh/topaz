@@ -1,0 +1,38 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//packages/package.gni")
+
+package("contacts") {
+  app = true
+  system_image = true
+
+  deps = [
+    "//topaz/app/contacts/agents",
+    "//topaz/app/contacts/agents/content_provider:test",
+    "//topaz/app/contacts/modules/contact_list",
+    "//topaz/app/contacts/modules/contact_list:test",
+    "//topaz/app/contacts/modules/contacts",
+    "//topaz/app/contacts/modules/contacts:test",
+    "//topaz/app/contacts/modules/contacts_picker",
+    "//topaz/app/contacts/modules/contacts_picker:test",
+    "//topaz/app/contacts/services",
+  ]
+
+  binaries = [
+    {
+      source = "contacts_content_provider.dartx"
+      name = "contacts_content_provider"
+    },
+    {
+      source = "gen/topaz/app/contacts/modules/contact_list/contact_list.flx"
+      name = "contacts/contact_list"
+    },
+    {
+      source =
+          "gen/topaz/app/contacts/modules/contacts_picker/contacts_picker.flx"
+      name = "contacts/contacts_picker"
+    },
+  ]
+}
