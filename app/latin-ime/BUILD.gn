@@ -1,0 +1,38 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//packages/package.gni")
+import("//third_party/flutter/build/flutter_app.gni")
+
+flutter_app("app") {
+  main_dart = "main.dart"
+  output_name = "latin-ime"
+
+  manifest = "pubspec.yaml"
+
+  source_dir = "."
+
+  deps = [
+    "//topaz/public/lib/app/dart",
+    "//garnet/public/lib/app/fidl:fidl_dart",
+    "//topaz/public/lib/ui/flutter",
+    "//garnet/public/lib/ui/presentation/fidl:fidl_dart",
+    "//topaz/shell/keyboard",
+    "//topaz/public/lib/fidl/dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+  ]
+}
+
+package("latin-ime") {
+  app = true
+  system_image = true
+
+  deps = [
+    ":app",
+  ]
+
+  binaries = [ {
+        name = "latin-ime"
+      } ]
+}
