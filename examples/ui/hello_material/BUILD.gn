@@ -17,6 +17,8 @@ flutter_app("hello_material") {
 
 package("package") {
   app = true
+  system_image = true
+
   package_name = "hello_material"
 
   deps = [

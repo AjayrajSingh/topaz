@@ -5,8 +5,10 @@
 import("//packages/package.gni")
 
 package("modular") {
-  package_name = "more_modular_examples"
   app = true
+  system_image = true
+
+  package_name = "more_modular_examples"
 
   deps = [
     "counter_flutter",

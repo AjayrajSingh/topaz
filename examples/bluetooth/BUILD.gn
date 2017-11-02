@@ -6,6 +6,7 @@ import("//packages/package.gni")
 
 package("bluetooth_examples") {
   app = true
+  system_image = true
 
   deps = [
     "ble_scanner",

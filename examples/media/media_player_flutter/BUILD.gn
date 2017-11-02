@@ -22,8 +22,10 @@ flutter_app("media_player_flutter") {
 }
 
 package("package") {
-  package_name = "media_player_flutter"
   app = true
+  system_image = true
+
+  package_name = "media_player_flutter"
 
   deps = [ ":media_player_flutter" ]
 

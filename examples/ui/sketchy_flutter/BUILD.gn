@@ -18,6 +18,8 @@ flutter_app("sketchy_flutter") {
 
 package("package") {
   app = true
+  system_image = true
+
   package_name = "sketchy_flutter"
 
   deps = [

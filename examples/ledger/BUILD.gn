@@ -5,6 +5,8 @@
 import("//packages/package.gni")
 
 package("ledger") {
+  system_image = true
+
   package_name = "more_ledger_examples"
 
   deps = [

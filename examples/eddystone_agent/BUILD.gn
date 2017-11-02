@@ -26,9 +26,7 @@ dart_app("eddystone_agent_dart") {
 
 package("eddystone_agent") {
   app = true
-
-  # this should be set to true once dart packages can be archives
-  archive = false
+  system_image = true
 
   deps = [
     ":eddystone_agent_dart",

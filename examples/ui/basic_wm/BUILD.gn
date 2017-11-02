@@ -22,6 +22,8 @@ flutter_app("basic_wm") {
 
 package("package") {
   app = true
+  system_image = true
+
   package_name = "basic_wm"
 
   deps = [
