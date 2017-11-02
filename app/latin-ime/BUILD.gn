@@ -26,6 +26,7 @@ flutter_app("app") {
 
 package("latin-ime") {
   app = true
+  system_image = true
 
   deps = [
     ":app",
