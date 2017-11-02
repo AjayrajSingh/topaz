@@ -6,6 +6,7 @@ import("//packages/package.gni")
 
 package("todo") {
   app = true
+  system_image = true
 
   deps = [
     "//apps/modules/todo/agents/content_provider:todo_content_provider",
