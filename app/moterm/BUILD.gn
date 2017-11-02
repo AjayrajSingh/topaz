@@ -57,6 +57,7 @@ executable("bin") {
 
 package("moterm") {
   app = true
+  system_image = true
 
   deps = [ ":bin" ]
 
