@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "packages": {
+        "more_modular_examples": "//topaz/examples/modular"
+    }
+}

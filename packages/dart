@@ -1,0 +1,16 @@
+{
+    "languages": [
+        "cpp",
+        "dart"
+    ],
+    "imports": [
+        "garnet/packages/zlib"
+    ],
+    "labels": [
+        "//third_party/dart:create_sdk"
+    ],
+    "packages": {
+        "dart": "//third_party/dart/runtime/bin:package",
+        "dart_tests": "//third_party/dart/runtime/bin:dart_tests"
+    }
+}

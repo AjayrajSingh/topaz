@@ -1,0 +1,20 @@
+{
+    "imports": [
+        "topaz/packages/curl",
+        "topaz/packages/dart",
+        "topaz/packages/dart_runner",
+        "topaz/packages/dashboard",
+        "topaz/packages/documents",
+        "topaz/packages/examples",
+        "topaz/packages/flutter",
+        "topaz/packages/latin-ime",
+        "topaz/packages/lua",
+        "topaz/packages/maxwell",
+        "topaz/packages/mods",
+        "topaz/packages/mondrian",
+        "topaz/packages/moterm",
+        "topaz/packages/oauth_token_manager",
+        "topaz/packages/sysui",
+        "topaz/packages/web_view"
+    ]
+}

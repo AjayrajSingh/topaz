@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "cpp"
+    ],
+    "packages": {
+        "oauth_token_manager": "//topaz/examples/oauth_token_manager"
+    }
+}

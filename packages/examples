@@ -1,0 +1,16 @@
+{
+    "languages": [
+        "cpp",
+        "dart"
+    ],
+    "imports": [
+        "topaz/packages/modular_examples",
+        "topaz/packages/ui_examples"
+    ],
+    "packages": {
+        "bluetooth_examples": "//topaz/examples/bluetooth:bluetooth_examples",
+        "eddystone_agent": "//topaz/examples/eddystone_agent:eddystone_agent",
+        "more_ledger_examples": "//topaz/examples/ledger",
+        "media_player_flutter": "//topaz/examples/media/media_player_flutter:package"
+    }
+}

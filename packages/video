@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "packages": {
+        "video": "//topaz/app/video"
+    }
+}

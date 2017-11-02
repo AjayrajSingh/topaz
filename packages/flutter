@@ -1,0 +1,16 @@
+{
+    "languages": [
+        "cpp",
+        "dart"
+    ],
+    "imports": [
+        "garnet/packages/fonts",
+        "garnet/packages/icu",
+        "garnet/packages/mozart",
+        "garnet/packages/icu_data",
+        "garnet/packages/zlib"
+    ],
+    "packages": {
+        "flutter": "//third_party/flutter:package"
+    }
+}
