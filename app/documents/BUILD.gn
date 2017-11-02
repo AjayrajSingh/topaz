@@ -6,6 +6,7 @@ import("//packages/package.gni")
 
 package("documents") {
   app = true
+  system_image = true
 
   deps = [
     "//topaz/app/documents/agents",
@@ -21,6 +22,7 @@ package("documents") {
 
 package("documents_tests") {
   testonly = true
+  system_image = true
 
   deps = []
 }
