@@ -6,6 +6,7 @@ import("//packages/package.gni")
 
 package("chat") {
   app = true
+  system_image = true
 
   deps = [
     "//topaz/app/chat/agents",
@@ -34,6 +35,7 @@ package("chat") {
 package("chat_tests") {
   testonly = true
   app = true
+  system_image = true
 
   deps = [
     "//topaz/app/chat/tests/chat_content_provider_test",
