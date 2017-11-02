@@ -16,6 +16,8 @@ declare_args() {
 assert(modules_override_config != "")
 
 package("config") {
+  system_image = true
+
   resources = [ {
         path = rebase_path(modules_override_config)
         dest = "modules/config.json"
@@ -24,6 +26,7 @@ package("config") {
 
 package("dart_package_tests") {
   testonly = true
+  system_image = true
 
   deps = [
     "//topaz/public/dart/fixtures:test",
