@@ -388,6 +388,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
         ..conversationId = messageValue['conversation_id']
         ..participants = messageValue['participants']
             .where((String email) => email != _email)
+            .map((String email) => new Participant()..email = email)
             .toList();
 
       Message message = new Message()
