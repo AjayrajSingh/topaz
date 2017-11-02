@@ -1,0 +1,25 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//third_party/flutter/build/flutter_app.gni")
+
+group("manual") {
+  public_deps = [
+    ":example_manual_relationships",
+  ]
+}
+
+flutter_app("example_manual_relationships") {
+  main_dart = "lib/main.dart"
+  deps = [
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//peridot/public/lib/lifecycle/fidl:fidl_dart",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
+  ]
+}

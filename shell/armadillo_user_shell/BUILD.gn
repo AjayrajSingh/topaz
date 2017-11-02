@@ -1,0 +1,35 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//third_party/flutter/build/flutter_app.gni")
+
+flutter_app("armadillo_user_shell") {
+  main_dart = "lib/main.dart"
+
+  package_name = "armadillo_user_shell"
+
+  manifest = "pubspec.yaml"
+
+  deps = [
+    "//garnet/public/lib/device_settings/fidl:fidl_dart",
+    "//garnet/public/lib/power/fidl:fidl_dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+    "//peridot/public/lib/context/fidl:fidl_dart",
+    "//peridot/public/lib/suggestion/fidl:fidl_dart",
+    "//peridot/public/lib/user/fidl:fidl_dart",
+    "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
+    "//third_party/dart/third_party/pkg/intl",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/media/dart",
+    "//topaz/public/lib/ui/flutter",
+    "//topaz/shell/agents/home_work_agent:home_work_agent_dart_package",
+    "//topaz/shell/armadillo",
+    "//topaz/shell/keyboard",
+    "//topaz/shell/widgets",
+  ]
+}
