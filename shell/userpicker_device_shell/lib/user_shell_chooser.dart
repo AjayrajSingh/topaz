@@ -11,13 +11,15 @@ class UserShellChooser {
   /// Constructor.
   UserShellChooser() {
     File file = new File('/system/data/sysui/user_shell_to_launch');
-    file.exists().then(
-          (bool exists) => file.readAsString().then(
-                (String userShellAppUrl) {
-                  _userShellAppUrl = userShellAppUrl;
-                },
-              ),
+    file.exists().then((bool exists) {
+      if (exists) {
+        file.readAsString().then(
+          (String userShellAppUrl) {
+            _userShellAppUrl = userShellAppUrl;
+          },
         );
+      }
+    });
   }
 
   /// Gets the current user shell's app url.
