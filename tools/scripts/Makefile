@@ -1,0 +1,256 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+MAKEFLAGS += --warn-undefined-variables --no-print-directory
+SHELL := /bin/bash
+
+.SHELLFLAGS := -eu -o pipefail -c
+.DEFAULT_GOAL := all
+.DELETE_ON_ERROR:
+.SUFFIXES:
+
+# This Makefile is expected to be included in a parent Makefile for a given
+# project. The parent Makefile must set the PROJECT variable, which should be
+# the path to the project (i.e., where the parent Makefile belongs to), relative
+# to //topaz.
+#
+#     # This means the project is located at //topaz/app/chat.
+#     PROJECT := app/chat
+#
+#     include <path to this Makefile>
+#
+ifndef PROJECT
+$(error PROJECT is not set. \
+Before including the common Makefile add "PROJECT := <project>" to \
+"$(firstword $(realpath $(MAKEFILE_LIST)))")
+endif
+
+root ?= $(shell git rev-parse --show-toplevel)
+fuchsia_root ?= $(shell jiri -show-root)
+scripts_dir ?= $(realpath $(fuchsia_root)/topaz/tools/scripts)
+tools_root := $(realpath $(scripts_dir)/..)
+fuchsia_out := $(abspath $(fuchsia_root)/out)
+flutter_root := $(fuchsia_root)/third_party/dart-pkg/git/flutter
+flutter_bin := $(flutter_root)/bin
+dart_bin := $(flutter_bin)/cache/dart-sdk/bin
+
+flutter := $(flutter_bin)/flutter
+dart := $(dart_bin)/dart
+pub := $(dart_bin)/pub
+
+ignored_dirs := _book generated infra node_modules testdata ios .pub
+ignore_flags := $(shell echo $(addprefix '! -wholename "*/',$(addsuffix '/*"',$(ignored_dirs))))
+sfind := find $(root) $(ignore_flags)
+
+dart_sources := $(shell $(sfind) -name "*.dart")
+
+dart_packages := $(realpath $(shell $(sfind) -name "pubspec.yaml" -exec dirname {} \;))
+dart_tools_packages := $(realpath $(shell find $(tools_root) $(ignore_flags) -name "pubspec.yaml" -exec dirname {} \;))
+# find all dart packages defined in BUILD.gn
+dart_gn_packages := $(realpath $(shell grep -Rwl . --include="*.gn" -e "^\(flutter_app\|dart_package\|dart_app\)" | xargs -n1 dirname | sort -u))
+dart_all_packages := $(sort $(dart_packages) $(dart_tools_packages) $(dart_gn_packages))
+
+gn_sources := $(shell $(sfind) -name "*.gn")
+
+sources := $(shell $(sfind) \
+	\( -name "*.dart" \
+	-o -name "*.py" \
+	-o -name "*.fidl" \
+	-o -name "*.gn" \
+	-o -name "*.go" \
+	-o -name "*.sh" \
+	-o -name "*.yaml" \))
+
+makefiles := $(foreach file, $(MAKEFILE_LIST), $(realpath $(file)))
+
+PATH := $(flutter_bin):$(dart_bin):$(fuchsia_root)/buildtools:$(PATH)
+
+################################################################################
+## Fuchsia build / LUCI bot related flags
+
+DEFAULT_MODULE ?= packages/gn/default
+MINIMAL_MODULE ?= topaz/packages/mods
+
+# Specify GOMA=1 to force use goma, GOMA=0 to force not use goma.
+# Auto-detect if not specified.
+FX_SET_FLAGS :=
+GOMA ?=
+ifeq ($(GOMA),1)
+	FX_SET_FLAGS += --goma
+endif
+ifeq ($(GOMA),0)
+	FX_SET_FLAGS += --no-goma
+endif
+
+GOMA_DIR ?=
+ifneq ($(strip $(GOMA_DIR)),)
+	FX_SET_FLAGS += --goma-dir $(GOMA_DIR)
+endif
+
+# If NO_ENSURE_GOMA=1 then we tell fx not to run the goma script directly.
+NO_ENSURE_GOMA ?=
+ifeq ($(NO_ENSURE_GOMA),1)
+	FX_SET_FLAGS += --no-ensure-goma
+endif
+
+# If MINIMAL=1 then we perform a minimal build of only the "modules" package and
+# its dependencies.
+MINIMAL ?=
+ifeq ($(MINIMAL),1)
+	FX_SET_FLAGS += --packages $(MINIMAL_MODULE)
+else
+	FX_SET_FLAGS += --packages $(DEFAULT_MODULE)
+endif
+
+# Respect the fuchsia build variant if already set by fset command externally.
+# Otherwise, default to debug build.
+FUCHSIA_VARIANT ?= debug
+ifeq ($(FUCHSIA_VARIANT),release)
+	FX_SET_FLAGS += --release
+endif
+
+BUILD_FLAGS := $(FX_SET_FLAGS)
+FUCHSIA_GEN_TARGET ?= x86-64
+
+################################################################################
+
+
+.PHONY: all
+all: build
+
+.PHONY: init
+init: ## Set path to pick up deps with: eval $(make init)
+	@echo "export PATH=${PATH}"
+
+.PHONY: build
+build: build-override ## Build Fuchsia with project.
+	@FUCHSIA_DIR=$(fuchsia_root) \
+		MAKEFLAGS="$(filter-out --warn-undefined-variables,$(MAKEFLAGS))" \
+		$(scripts_dir)/build.sh $(BUILD_FLAGS)
+
+.PHONY: clean
+clean: dart-clean ## Clean build artifacts from this project.
+
+.PHONY: reboot
+reboot: ## Reboot connected Fuchsia device.
+	@FUCHSIA_DIR=$(fuchsia_root) $(scripts_dir)/reboot.sh
+
+.PHONY: fmt
+fmt: dart-fmt gn-fmt ## Format the code in this project.
+
+.PHONY: test
+test: dart-test ## Run the tests in this project.
+
+.PHONY: coverage
+coverage: dart-coverage ## Show coverage for this project.
+
+.PHONY: presubmit
+presubmit: build lint test ## Run the presubmit tests for this project.
+
+.PHONY: presubmit-cq
+presubmit-cq: presubmit
+
+.PHONY: lint
+lint: copyright-check dart-lint dart-fmt-check gn-fmt-check ## Lint the code.
+
+%/.packages: %/pubspec.yaml
+	@cd $* && flutter packages get
+
+.PHONY: $(dart_bin)
+$(dart_bin):
+	@$(flutter) precache
+
+.PHONY: dart-clean
+dart-clean:
+	@# Remove all build artifacts, including the coverage information.
+	@# Also, if there is a pubspec.lock file that is not tracked by git, remove
+	@# it as well.
+	@for pkg in $(dart_all_packages); do \
+		pushd $${pkg} > /dev/null; \
+		rm -rf .packages packages .pub build coverage; \
+		git ls-files pubspec.lock --error-unmatch &> /dev/null; \
+		if [ $$? -ne 0 ]; then \
+			rm -f pubspec.lock; \
+		fi; \
+		popd > /dev/null; \
+	done
+	@rm -rf coverage
+
+.PHONY: dart-lint
+dart-lint: build
+	@set +u; source $(fuchsia_root)/scripts/env.sh && \
+	fset $(FUCHSIA_GEN_TARGET) $(FSET_FLAGS) && \
+	$(fuchsia_root)/scripts/run-dart-action.py analyze \
+			--out=$(fuchsia_out)/$(FUCHSIA_VARIANT)-$(FUCHSIA_GEN_TARGET) \
+			--tree=//topaz/$(PROJECT)/* \
+			--verbose \
+			--lints --fatal-lints --fatal-warnings --fatal-hints
+
+.PHONY: dart-fmt
+dart-fmt: $(dart_bin) $(tools_root)/dartfmt_extras/.packages
+	@dartfmt -w $(dart_sources)
+	@cd $(tools_root)/dartfmt_extras; \
+	FLUTTER_ROOT=$(flutter_root) $(pub) run bin/main.dart fix / $(dart_sources)
+
+.PHONY: dart-fmt-check
+dart-fmt-check: $(dart_bin) $(tools_root)/dartfmt_extras/.packages
+	@dartfmt --dry-run --set-exit-if-changed $(dart_sources); \
+	error=$$?; \
+	cd $(tools_root)/dartfmt_extras; \
+	FLUTTER_ROOT=$(flutter_root) $(pub) run bin/main.dart check / $(dart_sources); \
+	if [ $$? -ne 0 -o $$error -ne 0 ] ; then \
+		echo; \
+		echo "The above dart files have formatting issues."; \
+		echo "Run \"make fmt\" to fix the formatting."; \
+		echo; \
+		exit 1; \
+	fi
+
+.PHONY: dart-test
+dart-test: build
+	@set +u; source $(fuchsia_root)/scripts/env.sh && \
+	fset $(FUCHSIA_GEN_TARGET) $(FSET_FLAGS) && \
+	$(fuchsia_root)/scripts/run-dart-action.py test \
+			--out=$(fuchsia_out)/$(FUCHSIA_VARIANT)-$(FUCHSIA_GEN_TARGET) \
+			--tree=//topaz/$(PROJECT)/* \
+			--verbose
+
+.PHONY: dart-coverage
+dart-coverage: $(dart_bin)
+	@$(scripts_dir)/run_dart_tests.py --coverage
+	@$(scripts_dir)/merge_coverage.sh
+	@$(dart) $(scripts_dir)/report_coverage.dart coverage/lcov.info
+	@## Remove the .packages files to sanitize the Atom dart analysis.
+	@rm -f $(addsuffix "/.packages",$(dart_gn_packages))
+
+.PHONY: copyright-check
+copyright-check: ## Check source files for missing copyright.
+	@$(scripts_dir)/copyright-check.sh $(sources)
+
+.PHONY: gn-fmt
+gn-fmt:
+	@for src in $(gn_sources); do \
+		gn format $$src; \
+	done
+
+.PHONY: gn-fmt-check
+gn-fmt-check:
+	@export GN_FORMAT_ERROR=false; \
+	for src in $(gn_sources); do \
+		if ! $$(gn format --dry-run $$src); then \
+			export GN_FORMAT_ERROR=true; \
+			echo "Formatting issues found in: '$${src}'"; \
+		fi; \
+	done; \
+	if [ "$${GN_FORMAT_ERROR}" = true ]; then \
+		echo; \
+		echo "Run \"make fmt\" to fix the formatting."; \
+		exit 1; \
+	fi
+
+.PHONY: help
+help: ## Displays this help message.
+	@for file in $(makefiles); do \
+		grep -E '^[a-zA-Z_-]+:.*?## .*$$' $${file} | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "%-20s %s\n", $$1, $$2}'; \
+	done
