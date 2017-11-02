@@ -8,6 +8,7 @@ import("//third_party/flutter/build/flutter_app.gni")
 
 package("mondrian") {
   app = true
+  system_image = true
 
   deps = [
     ":flutter_mondrian",

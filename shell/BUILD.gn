@@ -18,6 +18,7 @@ assert(armadillo_path_context_config != "")
 
 package("sysui") {
   app = true
+  system_image = true
 
   deps = [
     "//topaz/shell/agents/home_work_agent",
@@ -343,6 +344,7 @@ package("sysui") {
 
 package("sysui_tests") {
   testonly = true
+  system_image = true
 
   deps = [
     "//topaz/shell/armadillo:test",
