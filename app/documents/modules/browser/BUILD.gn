@@ -17,6 +17,7 @@ flutter_app("browser") {
     "//peridot/public/lib/story/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/app/documents/services:services_dart",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

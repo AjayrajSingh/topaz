@@ -3,5 +3,7 @@
 # found in the LICENSE file.
 
 group("agents") {
-  public_deps = []
+  public_deps = [
+    "content_provider:documents_content_provider",
+  ]
 }

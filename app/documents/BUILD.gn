@@ -14,15 +14,18 @@ package("documents") {
     "//topaz/app/documents/services",
   ]
 
-  binaries = [ {
-        source = "gen/topaz/app/documents/modules/browser/browser.flx"
-        name = "documents/browser"
-      } ]
-}
-
-package("documents_tests") {
-  testonly = true
-  system_image = true
-
-  deps = []
+  binaries = [
+    {
+      name = "documents/browser"
+      source = "gen/topaz/app/documents/modules/browser/browser.flx"
+    },
+    {
+      # This is what shows up in file:///system/apps/documents/content_provider
+      # and points to the documents_content_provider.dartx, which is defined at
+      # agents/BUILD.gn
+      # When running connectToAgent() we should pass in this name
+      name = "documents/content_provider"
+      source = "documents_content_provider.dartx"
+    },
+  ]
 }

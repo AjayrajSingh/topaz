@@ -6,6 +6,6 @@ import("//garnet/public/lib/fidl/fidl.gni")
 
 fidl("services") {
   sources = [
-    "document_content_provider.fidl",
+    "document.fidl",
   ]
 }
