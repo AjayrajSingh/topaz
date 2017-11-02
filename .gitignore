@@ -5,7 +5,6 @@
 /app/maxwell
 /app/music
 /examples
-/runtime/dart_runner
 /runtime/web_runner
 /runtime/web_view
 /shell
