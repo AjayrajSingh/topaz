@@ -1,0 +1,18 @@
+{
+  "fuchsia:component": {
+    "name": "web_view",
+    "url": "file:///system/bin/web_view"
+  },
+  "fuchsia:program": {
+    "resource": "main"
+  },
+  "fuchsia:resources": {
+    "main": "web_view"
+  },
+  "fuchsia:module": {
+    "contract": "view",
+    "data_preconditions": {
+      "scheme": [ "http", "https" ]
+    }
+  }
+}
