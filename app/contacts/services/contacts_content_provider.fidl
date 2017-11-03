@@ -6,6 +6,7 @@ module contacts_content_provider;
 
 enum Status {
   OK = 0,
+  ERROR,
   UNKNOWN_ERROR,
 };
 
@@ -20,6 +21,20 @@ interface ContactsContentProvider {
 
   // Returns the contact information for the contact specified by contact id.
   GetContact(string id) => (Status status, Contact contact);
+};
+
+// Service interface to be implemented by third-party contacts data providers
+// that wish to feed contacts data into the contacts content provider.
+// It should provide capabilities to request contacts data as well as sync
+// data to the ContactsContentProvider.
+[ServiceName="contacts_content_provider.ContactsDataProvider"]
+interface ContactsDataProvider {
+  // Returns a list of the user's contacts.
+  GetContactList() => (Status status, array<Contact> contacts);
+
+  // TODO(meiyili): implement calls required for syncing data, should also
+  // modify signature of GetContactList to include a last sync token and time
+  // stamp
 };
 
 // Representation of a contact that is expected by the ContactsContentProvider

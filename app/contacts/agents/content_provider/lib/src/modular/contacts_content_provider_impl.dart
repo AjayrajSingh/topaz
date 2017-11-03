@@ -4,7 +4,11 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
@@ -17,15 +21,44 @@ import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
 import '../store/contacts_store.dart';
 import 'contacts_watcher.dart';
 
+const String _kDataProvidersConfig =
+    '/system/data/contacts/data_providers.json';
+
+/// Private class to store information about a [fidl.ContactsDataProvider] agent
+class _DataProvider {
+  final String sourceId;
+  final String agentUrl;
+  final fidl.ContactsDataProviderProxy dataProviderProxy;
+  final AgentControllerProxy agentControllerProxy;
+
+  _DataProvider({
+    @required this.sourceId,
+    @required this.agentUrl,
+    @required this.dataProviderProxy,
+    @required this.agentControllerProxy,
+  })
+      : assert(sourceId != null && sourceId.isNotEmpty),
+        assert(agentUrl != null && agentUrl.isNotEmpty),
+        assert(dataProviderProxy != null),
+        assert(agentControllerProxy != null);
+}
+
 /// Initial stub implementation
 class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
+  /// Map of [fidl.ContactsDataProvider] sourceIds to the [_DataProvider]
+  /// information
+  final Map<String, _DataProvider> _dataProviders = <String, _DataProvider>{};
+
+  /// Store for the consolidated contacts information
   final ContactsStore<fidl.Contact> _contactsStore =
       new ContactsStore<fidl.Contact>();
+
+  /// Store of the request bindings to this impl
   final List<fidl.ContactsContentProviderBinding> _bindings =
       <fidl.ContactsContentProviderBinding>[];
 
   /// [ComponentContext] used for interfacing with Ledger
-  final ComponentContext componentContext;
+  final ComponentContext _componentContext;
 
   /// [Ledger] instance
   ledger.LedgerProxy _ledger;
@@ -37,20 +70,23 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
   ContactsWatcher _contactsWatcher;
 
   /// Constructor
-  ContactsContentProviderImpl({@required this.componentContext})
-      : assert(componentContext != null);
+  ContactsContentProviderImpl({@required ComponentContext componentContext})
+      : assert(componentContext != null),
+        _componentContext = componentContext;
 
   /// Runs necessary methods to initialize the contacts content provider
+  // TODO: remove async/error prone code SO-931
   Future<Null> initialize() async {
     // Connect to ledger
     try {
       await _initializeLedgerConnection();
     } on Exception catch (e, stackTrace) {
-      log.severe('Failed to initialize', e, stackTrace);
+      log.severe('Failed to initialize ledger connection', e, stackTrace);
       return;
     }
 
-    // Grab user's contacts
+    // Connect to data providers and ledger to grab contacts information
+    _connectToDataProviders();
     bool errorReadingLedgerContacts = false;
     List<fidl.Contact> ledgerContacts;
     try {
@@ -63,18 +99,9 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
       _addContactsToStore(ledgerContacts);
       log.fine('Initialized contacts store from ledger');
     } else {
-      // Grab contacts from the contacts providers and save to ledger, rather
-      // than adding them to the store immediately we will wait until the
-      // changes propagate back from Ledger via the page watcher to add them
-      // the store.
-      // TODO(meiyili) handle errors gracefully SO-810, i.e. couldn't save
-      // TODO(meiyili) replace with a call to the necessary service agents and
-      // ledger and create a fixture with the stub contact generation code
-      List<fidl.Contact> contacts = _getStubContactList();
-      await _saveContactsToLedger(contacts);
+      await _getContactsFromDataProviders();
       log.fine('Ledger empty, initialized contacts store from service');
     }
-    log.fine('Initialization completed');
   }
 
   @override
@@ -107,12 +134,20 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
         .add(new fidl.ContactsContentProviderBinding()..bind(this, request));
   }
 
-  /// Close all the bindings.
+  /// Close all the bindings and connections
   void close() {
+    // Close bindings
     for (fidl.ContactsContentProviderBinding binding in _bindings) {
       binding.close();
     }
     _bindings.clear();
+
+    // Close all data provider agent connections
+    for (_DataProvider dataProvider in _dataProviders.values) {
+      dataProvider.dataProviderProxy.ctrl.close();
+      dataProvider.agentControllerProxy.ctrl.close();
+    }
+    _dataProviders.clear();
 
     // Close Ledger bindings
     _contactsWatcher?.close();
@@ -152,65 +187,20 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
     }
   }
 
-  /// Temporary for stub implementations
-  /// TODO(meiyili) remove when implementing the actual methods
-  fidl.Contact _createStubContact(
-    String id,
-    String givenName,
-    String familyName,
-  ) {
-    return new fidl.Contact()
-      ..contactId = id
-      ..sourceContactId = id
-      ..sourceId = 'stub'
-      ..displayName = '$givenName $familyName'
-      ..givenName = givenName
-      ..middleName = givenName.substring(0, 1)
-      ..familyName = familyName
-      ..emails = <fidl.EmailAddress>[
-        new fidl.EmailAddress()
-          ..label = 'primary'
-          ..value = '$familyName$givenName@example.com'.toLowerCase()
-      ]
-      ..phoneNumbers = <fidl.PhoneNumber>[
-        new fidl.PhoneNumber()
-          ..label = 'mobile'
-          ..value = '12345678910'
-      ]
-      ..photoUrl = '';
-  }
-
-  List<fidl.Contact> _getStubContactList() {
-    return <fidl.Contact>[
-      _createStubContact('1', 'Ahonui', 'Armadillo'),
-      _createStubContact('2', 'Badia', 'Blue-Whale'),
-      _createStubContact('3', 'Candida', 'Capybara'),
-      _createStubContact('4', 'Daniel', 'Dewey'),
-      _createStubContact('5', 'Ada', 'Lovelace'),
-      _createStubContact('6', 'Alan', 'Turing'),
-      _createStubContact('7', 'Barbara', 'McClintock'),
-      _createStubContact('8', 'Benjamin', 'Banneker'),
-      _createStubContact('9', 'Clara', 'Schumann'),
-      _createStubContact('10', 'Claude', 'Debussy'),
-      _createStubContact('11', 'Daphne', 'du Maurier'),
-      _createStubContact('12', 'Dmitri', 'Mendeleev'),
-    ];
-  }
-
   /// Initialize connection to ledger and get the page of contacts data
   Future<Null> _initializeLedgerConnection() async {
     // Connect to ledger
     _ledger?.ctrl?.close();
     _ledger = new ledger.LedgerProxy();
     Completer<ledger.Status> statusCompleter = new Completer<ledger.Status>();
-    componentContext.getLedger(
+    _componentContext.getLedger(
       _ledger.ctrl.request(),
       statusCompleter.complete,
     );
     ledger.Status status = await statusCompleter.future;
     _handleLedgerResponseStatus(
       status: status,
-      ledgerCall: 'componentContext.getLedger()',
+      ledgerCall: '_componentContext.getLedger()',
     );
 
     // Grab the page of contacts
@@ -304,6 +294,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
       log.warning('saveContactsToLedger was called on a null page');
       return;
     }
+
     for (fidl.Contact contact in contacts) {
       List<int> contactId = UTF8.encode(contact.contactId);
       List<int> ledgerValue = encodeLedgerValue(contact);
@@ -334,6 +325,105 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
       );
     } else {
       log.fine('$ledgerCall succeeded');
+    }
+  }
+
+  /// Looks for the contacts data providers json file that contains the list
+  /// of data providers.
+  ///
+  /// The content of the config file has the format:
+  /// {
+  ///   "data_providers": [
+  ///     {
+  ///       "source_id": "provider_source_id",
+  ///       "agent_url": "file:///system/apps/path_to_some_provider"
+  ///     }
+  ///   ]
+  /// }
+  ///
+  /// If it exists, it will parse out the providers' information and attempt
+  /// to connect to the agent. If it is successful, it will save the data
+  /// provider's information and connection.
+  void _connectToDataProviders() {
+    log.fine('Looking for config file at $_kDataProvidersConfig');
+    File configFile = new File(_kDataProvidersConfig);
+    if (!configFile.existsSync()) {
+      log.fine('Config file does not exist');
+      return;
+    }
+
+    try {
+      Map<String, Object> config = JSON.decode(configFile.readAsStringSync());
+      Object dataProviders = config['data_providers'];
+      if (dataProviders is List) {
+        for (Map<String, String> info in dataProviders) {
+          String sourceId = info['source_id'] ?? '';
+          String agentUrl = info['agent_url'] ?? '';
+          _DataProvider provider = _connectToDataProvider(sourceId, agentUrl);
+          if (provider != null) {
+            _dataProviders[provider.sourceId] = provider;
+          }
+        }
+      }
+    } on Exception catch (e) {
+      log.warning('Error reading contacts data provider config file: $e');
+    }
+  }
+
+  /// Connects to the data provider specified by the url and returns the
+  /// [_DataProvider] information. If the sourceId or url are empty it will
+  /// return null.
+  _DataProvider _connectToDataProvider(String sourceId, String agentUrl) {
+    if (sourceId.isEmpty || agentUrl.isEmpty) {
+      return null;
+    }
+
+    // Connect to the agent
+    fidl.ContactsDataProviderProxy contactsDataProviderProxy =
+        new fidl.ContactsDataProviderProxy();
+    AgentControllerProxy contactsDataProviderController =
+        new AgentControllerProxy();
+    ServiceProviderProxy dataProviderService = new ServiceProviderProxy();
+    _componentContext.connectToAgent(
+      agentUrl,
+      dataProviderService.ctrl.request(),
+      contactsDataProviderController.ctrl.request(),
+    );
+    connectToService(dataProviderService, contactsDataProviderProxy.ctrl);
+
+    // Close all unnecessary bindings
+    dataProviderService.ctrl.close();
+
+    // Save the proxies and data provider info
+    return new _DataProvider(
+      sourceId: sourceId,
+      agentUrl: agentUrl,
+      dataProviderProxy: contactsDataProviderProxy,
+      agentControllerProxy: contactsDataProviderController,
+    );
+  }
+
+  /// Grab contacts from the contacts providers and save to ledger, rather
+  /// than adding them to the store immediately we will wait until the
+  /// changes propagate back from Ledger via the page watcher to add them
+  /// the store.
+  Future<Null> _getContactsFromDataProviders() async {
+    // TODO(meiyili) grab last sync tokens and save those as well
+    Completer<List<fidl.Contact>> completer;
+    for (_DataProvider provider in _dataProviders.values) {
+      log.fine('Connecting to data provider = $provider');
+      completer = new Completer<List<fidl.Contact>>();
+      provider.dataProviderProxy.getContactList(
+        (fidl.Status status, List<fidl.Contact> contacts) {
+          if (status == fidl.Status.ok) {
+            completer.complete(contacts);
+          } else {
+            completer.complete(<fidl.Contact>[]);
+          }
+        },
+      );
+      List<fidl.Contact> contacts = await completer.future;
+      await _saveContactsToLedger(contacts);
     }
   }
 }
