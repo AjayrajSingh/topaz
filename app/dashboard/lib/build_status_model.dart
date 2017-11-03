@@ -47,6 +47,7 @@ class BuildStatusModel extends ModuleModel {
 
   /// The service used to fetch [BuildInfo].
   final BuildService _buildService;
+  StreamSubscription<BuildInfo> _pendingRequest;
 
   DateTime _lastRefreshed;
   DateTime _lastRefreshStarted;
@@ -81,8 +82,6 @@ class BuildStatusModel extends ModuleModel {
   /// If the build status isn't [BuildStatus.success] this will indicate any
   /// additional information about why not.
   String get errorMessage => _errorMessage;
-
-  bool _outstandingGet = false;
 
   /// The color to use as the background of a successful build.
   Color get successColor {
@@ -123,41 +122,40 @@ class BuildStatusModel extends ModuleModel {
   }
 
   Future<Null> _fetchConfigStatus() async {
-    if (_outstandingGet) {
-      return;
-    }
-    _outstandingGet = true;
-
-    String errorMessage;
+    await _pendingRequest?.cancel();
     _lastRefreshStarted = new DateTime.now();
     _lastRefreshEnded = null;
 
-    BuildInfo info;
+    runZoned(() {
+      _pendingRequest =
+          _buildService.getBuildByName(url).listen((BuildInfo response) {
+        _pendingRequest.cancel();
+        _buildStatus = response?.result == 'SUCCESS'
+            ? BuildStatus.success
+            : BuildStatus.failure;
+        _errorMessage = null;
+        _handleFetchComplete();
+      });
+    }, onError: (Object error) {
+      _buildStatus = null;
+      _errorMessage = 'Error receiving response:\n$error';
+      _handleFetchComplete();
+    });
+  }
 
-    try {
-      info = await _buildService.getBuildByName(url).first;
-    } on BuildServiceException catch (error) {
-      _buildStatus = BuildStatus.networkError;
-      errorMessage = 'Error receiving response:\n$error';
-    } finally {
-      _outstandingGet = false;
-      _lastRefreshEnded = new DateTime.now();
-      _buildStatus =
-          info?.result == 'SUCCESS' ? BuildStatus.success : BuildStatus.failure;
-      _errorMessage = errorMessage;
-
-      if (_buildStatus == BuildStatus.success) {
-        if (_lastPassTime == null) {
-          _lastPassTime = new DateTime.now();
-          _lastFailTime = null;
-        }
-      } else {
-        if (_lastFailTime == null) {
-          _lastFailTime = new DateTime.now();
-          _lastPassTime = null;
-        }
+  void _handleFetchComplete() {
+    _lastRefreshEnded = new DateTime.now();
+    if (_buildStatus == BuildStatus.success) {
+      if (_lastPassTime == null) {
+        _lastPassTime = new DateTime.now();
+        _lastFailTime = null;
       }
-      notifyListeners();
+    } else {
+      if (_lastFailTime == null) {
+        _lastFailTime = new DateTime.now();
+        _lastPassTime = null;
+      }
     }
+    notifyListeners();
   }
 }
