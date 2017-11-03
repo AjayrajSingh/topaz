@@ -15,7 +15,7 @@ const String _kCounterKey = 'counter';
 class CounterChildModuleModel extends ModuleModel {
   /// Creates a new instance.
   ///
-  /// Setting the [watchAll] value to [true] makes sure that you get notified
+  /// Setting the [watchAll] value to `true` makes sure that you get notified
   /// by [Link] service, even with the changes are made by this model.
   CounterChildModuleModel() : super(watchAll: true);
 

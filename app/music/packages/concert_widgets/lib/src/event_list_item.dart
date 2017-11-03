@@ -33,8 +33,6 @@ final TextStyle _kEventSubtitleStyle = new TextStyle(
   height: 1.25,
 );
 
-final Color _kPlaceholderColor = Colors.grey[300];
-
 /// UI Widget that represents a list item for an [Event]
 class EventListItem extends StatelessWidget {
   /// [Event] to represent

@@ -38,7 +38,7 @@ const String _kJsonSchema = '''
 class CounterParentModuleModel extends ModuleModel {
   /// Creates a new instance.
   ///
-  /// Setting the [watchAll] value to [true] makes sure that you get notified
+  /// Setting the [watchAll] value to `true` makes sure that you get notified
   /// by [Link] service, even with the changes are made by this model.
   CounterParentModuleModel() : super(watchAll: true);
 
