@@ -160,8 +160,8 @@ class ScopedModelDescendant<T extends Model> extends StatelessWidget {
   /// Called whenever the [Model] changes.
   final ScopedModelDescendantBuilder<T> builder;
 
-  /// An optional constant child that depends on the model.  This will be passed
-  /// as the child of [builder].
+  /// An optional constant child that does not depend on the model.  This will
+  /// be passed as the child of [builder].
   final Widget child;
 
   /// Constructor.
