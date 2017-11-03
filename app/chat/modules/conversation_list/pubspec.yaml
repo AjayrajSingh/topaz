@@ -5,12 +5,13 @@
 name: chat_conversation_list
 
 dependencies:
-  flutter:
-    sdk: flutter
-  lib.widgets:
-    path: ../../../../public/dart/widgets
   fixtures:
     path: ../../../../public/dart/fixtures
+  flutter:
+    sdk: flutter
+  intl: ^0.15.0
+  lib.widgets:
+    path: ../../../../public/dart/widgets
   widget_explorer_meta:
     path: ../../../../tools/widget_explorer/packages/widget_explorer_meta
 dev_dependencies:

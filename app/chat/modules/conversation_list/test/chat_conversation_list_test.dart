@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:chat_conversation_list/fixtures.dart';
 import 'package:chat_conversation_list/models.dart';
 import 'package:chat_conversation_list/widgets.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ void main() {
   testWidgets(
       'Test to see if tapping on a conversation in the list calls the '
       'appropriate callback', (WidgetTester tester) async {
+    ChatConversationFixtures fixtures = new ChatConversationFixtures();
     List<int> taps = <int>[0, 0];
 
     await tester.pumpWidget(
@@ -40,21 +42,8 @@ void main() {
         home: new Material(
           child: new ChatConversationList(
             conversations: <Conversation>[
-              // TODO(youngseokyoon): add fixtures (SO-333)
-              new Conversation(
-                conversationId: const <int>[0],
-                snippet: 'Snippet #1',
-                participants: <User>[
-                  new User.fixture(),
-                ],
-              ),
-              new Conversation(
-                conversationId: const <int>[1],
-                snippet: 'Snippet #2',
-                participants: <User>[
-                  new User.fixture(),
-                ],
-              ),
+              fixtures.conversation(id: <int>[0], snippet: 'Snippet #1'),
+              fixtures.conversation(id: <int>[1], snippet: 'Snippet #2'),
             ].toSet(),
             onSelectConversation: (Conversation c) =>
                 taps[c.conversationId[0]]++,
