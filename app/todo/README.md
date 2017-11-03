@@ -20,9 +20,7 @@ UI.
 
 # Development
 
-Make sure to setup a jiri root according to the Fuchsia getting started doc. Instruction here assume env.sh usage:
-
-    source $FUCHSIA_DIR/scrips/env.sh
+Make sure to setup a jiri root according to the Fuchsia getting started doc.
 
 ## Rust
 
@@ -37,20 +35,19 @@ Make sure to setup a jiri root according to the Fuchsia getting started doc. Ins
 
 ## Build
 
-An optional build target for "todo" lives in `//packages/gn/todo`. It can be used via `fset`
+An optional build target for "todo" lives in `//packages/gn/todo`. It can be used via `fx set`
 
-    fset x86-64 --modules default,todo --release
+    fx set x86-64 --packages topaz/packages/default,topaz/packages/todo --release
 
 To build the system run:
 
     # Or use the default `make` task.
-    fgen
-    fbuild
+    fx full-build
 
 ## Run
 
     # Or use `make run`.
-    netruncmd : "device_runner \
+    fx shell "device_runner \
       --device_shell=dev_device_shell \
       --user_shell=dev_user_shell \
       --user_shell_args='--root_module=todo_story'"

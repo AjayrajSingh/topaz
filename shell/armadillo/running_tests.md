@@ -11,6 +11,6 @@ To run flutter tests:
 
 To build Fuchsia:
 1. ``rm -Rf <fuchsia_root>/out/debug-x86-64/gen/``
-1. ``fbuild``
+1. ``fx full-build``
 
-This assumes you have the fbuild (which builds a debug version of Fuchsia) script function installed.
+This assumes you have the fx tool (which builds a debug version of Fuchsia) configured.

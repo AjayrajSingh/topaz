@@ -30,7 +30,6 @@ root ?= $(shell git rev-parse --show-toplevel)
 fuchsia_root ?= $(shell jiri -show-root)
 scripts_dir ?= $(realpath $(fuchsia_root)/topaz/tools/scripts)
 tools_root := $(realpath $(scripts_dir)/..)
-fuchsia_out := $(abspath $(fuchsia_root)/out)
 flutter_root := $(fuchsia_root)/third_party/dart-pkg/git/flutter
 flutter_bin := $(flutter_root)/bin
 dart_bin := $(flutter_bin)/cache/dart-sdk/bin
@@ -179,10 +178,8 @@ dart-clean:
 
 .PHONY: dart-lint
 dart-lint: build
-	@set +u; source $(fuchsia_root)/scripts/env.sh && \
-	fset $(FUCHSIA_GEN_TARGET) $(FSET_FLAGS) && \
 	$(fuchsia_root)/scripts/run-dart-action.py analyze \
-			--out=$(fuchsia_out)/$(FUCHSIA_VARIANT)-$(FUCHSIA_GEN_TARGET) \
+			--out=$(fx get-build-dir) \
 			--tree=//topaz/$(PROJECT)/* \
 			--verbose \
 			--lints --fatal-lints --fatal-warnings --fatal-hints
@@ -209,10 +206,8 @@ dart-fmt-check: $(dart_bin) $(tools_root)/dartfmt_extras/.packages
 
 .PHONY: dart-test
 dart-test: build
-	@set +u; source $(fuchsia_root)/scripts/env.sh && \
-	fset $(FUCHSIA_GEN_TARGET) $(FSET_FLAGS) && \
 	$(fuchsia_root)/scripts/run-dart-action.py test \
-			--out=$(fuchsia_out)/$(FUCHSIA_VARIANT)-$(FUCHSIA_GEN_TARGET) \
+			--out=$(fx get-build-dir) \
 			--tree=//topaz/$(PROJECT)/* \
 			--verbose
 

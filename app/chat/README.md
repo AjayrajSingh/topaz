@@ -22,10 +22,6 @@ This repo is already part of the default jiri manifest.
 
 Follow the instructions for setting up a fresh Fuchsia checkout.  Once you have the `jiri` tool installed and have imported the default manifest and updated return to these instructions.
 
-It is recommended you set up the [Fuchsia environment helpers][fuchsia-env] in `scripts/env.sh`:
-
-    source scripts/env.sh
-
 ## Workflow
 
 There are Makefile tasks setup to help simplify common development tasks. Use `make help` to see what they are.
@@ -35,9 +31,10 @@ When you have changes you are ready to see in action you can build with:
     make build
 
 Once the system has been built you will need to run a bootserver to get it
-over to a connected Acer. You can use the `env.sh` helper to move the build from your host to the target device with:
+over to a connected Acer. You can use the `fx` tool to move the build from your
+host to the target device with:
 
-    freboot
+    fx reboot
 
 Once that is done (it takes a while) you can run the application with:
 
@@ -49,7 +46,7 @@ You can run on a connected android device with:
 
 Optional: In another terminal you can tail the logs
 
-    ${FUCHSIA_DIR}/out/build-zircon/tools/loglistener
+    fx log
 
 # Firebase DB Setup
 
@@ -104,20 +101,21 @@ before running the chat modules correctly.
 
 ## Chat Agent Tests
 
-To run the chat agent tests, build fuchsia with `--modules boot_test_modular`
-option and boot into fuchsia using a target device or a QEMU instance.
+To run the chat agent tests, build fuchsia with
+`--packages packages/gn/boot_test_modular` option and boot into fuchsia using a
+target device or a QEMU instance.
 
 ```bash
-$ fset --modules boot_test_modular
-$ fbuild
-$ frun <options> # when using QEMU.
+$ fx set x86-64 --packages packages/gn/boot_test_modular
+$ fx full-build
+$ fx run <options> # when using QEMU.
 ```
 
 Once the fuchsia device is booted, run the following command from the host.
 
 ```bash
-$ $FUCHSIA_DIR/garnet/bin/test_runner/run_test \
-  --test_file=$FUCHSIA_DIR/topaz/app/chat/tests/chat_tests.json
+$ fx exec garnet/bin/test_runner/run_test \
+  --test_file=topaz/app/chat/tests/chat_tests.json
 ```
 
 When the test passes, the resulting output should look like this:
@@ -246,10 +244,10 @@ curl -Li \
 
 [flutter]: https://flutter.io/
 [fuchsia]: https://fuchsia.googlesource.com/fuchsia/
-[modular]: https://fuchsia.googlesource.com/modular/
+[modular]: https://fuchsia.googlesource.com/peridot/+/master/docs/modular
 [pub]: https://www.dartlang.org/tools/pub/get-started
 [dart]: https://www.dartlang.org/
-[fidl]: https://fuchsia.googlesource.com/fidl/
+[fidl]: https://fuchsia.googlesource.com/garnet/+/master/public/lib/fidl
 [widgets-intro]: https://flutter.io/widgets-intro/
 [fuchsia-setup]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md
 [fuchsia-env]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md#Setup-Build-Environment

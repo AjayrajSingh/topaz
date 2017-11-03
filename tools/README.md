@@ -21,11 +21,7 @@ The dialog will now only appear the first time the command is run, at least unti
 
 On new or newly provisioned devices it is possible to trigger an SSL error caused by the system clock being set in the future. To prevent this you must set the device clock:
 
-    # On Darwin
-    (fgo && DATE=`date +%Y-%m-%dT%T`; ./out/build-zircon/tools/netruncmd : "clock --set $DATE")
-
-    # On Linux
-    (fgo && DATE=`date -Iseconds`; ./out/build-zircon/tools/netruncmd : "clock --set $DATE")
+    fx set-clock
 
 This only needs to be done once.
 
@@ -33,7 +29,7 @@ This only needs to be done once.
 
 Listen to device logs:
 
-    $FUCHSIA_DIR/out/build-zircon/tools/loglistener
+    fx log
 
 # Configuration
 
@@ -77,15 +73,15 @@ This will clean and create a release build. To do this manually you can use:
 
 # Run
 
-Assuming you have an Acer properly networked and running `fboot` in another
+Assuming you have an Acer properly networked and running `fx boot` in another
 terminal session you can run email two different ways.
 
 Running with the full sysui
 
-    netruncmd : "device_runner"
+    fx shell device_runner
 
 Running the email story directly
 
-    netruncmd : "device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=<target>"
+    fx shell "device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=<target>"
 
 [get-started]: https://fuchsia.googlesource.com/docs/+/master/getting_started.md

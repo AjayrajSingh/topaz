@@ -40,10 +40,6 @@ Then add/update the Rust projects to your Fuchsia tree with:
 
     jiri update
 
-Don't forget to set up the [Fuchsia environment helpers][fuchsia-env] in `scripts/env.sh`:
-
-    source scripts/env.sh
-
 ## Rust Toolchain
 
 **NOTE:** This step is temporary.
@@ -114,12 +110,11 @@ The command above should succeed and generate a rust binary in the target dir.
 # Xi
 
 Before the xi-core module can be built the fidl service should be built, this
-can be done by commenting out `"//apps/xi/modules",` in the apps/xi/BUILD.gn.
-and then running:
+can be done by commenting out `"//topaz/app/xi/modules",` in the
+`topaz/app/xi/BUILD.gn` and then running:
 
-    fset x86-64 --modules default,rust
-    fgen -m=default,rust
-    fbuild
+    fx set x86-64 --packages topaz/packages/default,topaz/packages/xi
+    fx full-build
 
 This will error but it will generate the artifacts needed to continue.
 
@@ -145,31 +140,31 @@ The command above will generate the binary in `target/x86_64-unknown-fuchsia/deb
 
 First configure your build:
 
-    fset x86-64 --modules default,rust
+    fx set x86-64 --packages topaz/packages/default,topaz/packages/xi
 
 Generate and build:
 
-    fgen -m=default,rust
-    fbuild
-    ${FUCHSIA_DIR}/scripts/symlink-dot-packages.py --tree=//apps/xi/*
+    fx full-build
+    scripts/symlink-dot-packages.py --tree=//topaz/app/xi/*
 
-Assuming you have a working Acer setup and are running `fboot` in a different terminal session, you can reboot the Acer with the new build using:
+Assuming you have a working Acer setup and are running `fx boot` in a different
+terminal session, you can reboot the Acer with the new build using:
 
-    freboot
+    fx reboot
 
 Optional: In another terminal you can tail the logs
 
-    ${FUCHSIA_DIR}/out/build-zircon/tools/loglistener
+    fx log
 
 You can run the zx_toy example from your host with:
 
-    netruncmd : "example_zx_toy"
+    fx shell "example_zx_toy"
 
 You won't see any output, if you run `example_zx_toy` on the device you should see some log output.
 
 To run Xi from your host machine:
 
-    netruncmd : "@ bootstrap device_runner --user-shell=dev_user_shell --user-shell-args=--root-module=xi_app"
+    fx shell "bootstrap device_runner --user-shell=dev_user_shell --user-shell-args=--root-module=xi_app"
 
 ## Android & Flutter
 
@@ -202,8 +197,7 @@ Finally, build the binary and push it to a connected Android device:
 Run the Flutter app:
 
     cd ${FUCHSIA_DIR}/apps/xi/xi_flutter
-    fgen -m=default,rust
-    fbuild
+    fx full-build
     ${FUCHSIA_DIR}/scripts/symlink-dot-packages.py --tree=//apps/xi/*
     ${FUCHSIA_DIR}/third_party/dart-pkg/git/flutter/bin/flutter run
 

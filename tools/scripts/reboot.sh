@@ -9,7 +9,7 @@ set -e
 function main() {
   echo "=== rebooting Fuchsia"
 
-  $FUCHSIA_DIR/out/build-zircon/tools/netruncmd : "dm reboot"
+  fx reboot
 }
 
 main "$@"
