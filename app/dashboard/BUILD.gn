@@ -1,0 +1,41 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//packages/package.gni")
+import("//third_party/flutter/build/flutter_app.gni")
+
+flutter_app("dashboard_app") {
+  output_name = "dashboard"
+  main_dart = "lib/main.dart"
+
+  source_dir = "lib"
+
+  deps = [
+    "//topaz/public/lib/app/dart",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/user/fidl:fidl_dart",
+    "//topaz/app/chat/services:services_dart",
+    "//topaz/public/lib/ui/flutter",
+    "//topaz/runtime/web_runner/lib/dart:web_view",
+    "//topaz/public/lib/fidl/dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//third_party/dart-pkg/pub/html",
+    "//third_party/dart-pkg/pub/http",
+  ]
+}
+
+package("dashboard") {
+  app = true
+  system_image = true
+
+  deps = [
+    ":dashboard_app",
+  ]
+
+  binaries = [ {
+        name = "dashboard"
+      } ]
+}
