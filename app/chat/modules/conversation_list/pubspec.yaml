@@ -1,0 +1,21 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+name: chat_conversation_list
+
+dependencies:
+  flutter:
+    sdk: flutter
+  lib.widgets:
+    path: ../../../../public/dart/widgets
+  fixtures:
+    path: ../../../../public/dart/fixtures
+  widget_explorer_meta:
+    path: ../../../../tools/widget_explorer/packages/widget_explorer_meta
+dev_dependencies:
+  test: any
+  flutter_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true

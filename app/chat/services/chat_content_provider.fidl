@@ -1,0 +1,179 @@
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+module chat_content_provider;
+
+// Status codes for all |ChatContentProvider| operations.
+enum ChatStatus {
+  OK = 0,
+  AUTHENTICATION_ERROR,
+  DECODING_ERROR,
+  ID_NOT_FOUND,
+  INVALID_EMAIL_ADDRESS,
+  LEDGER_NOT_INITIALIZED,
+  LEDGER_OPERATION_ERROR,
+  NETWORK_ERROR,
+  PERMISSION_ERROR,
+  UNSUPPORTED,
+  UNKNOWN_ERROR = -1,
+};
+
+// Metadata of a chat participant.
+struct Participant {
+  // The |email| address of this participant. Must not be null.
+  string email;
+
+  // The |display_name| of this participant to be displayed in the chat UI.
+  string? display_name;
+
+  // The |photo_url| to be used for displaying this participant's alphatar.
+  string? photo_url;
+};
+
+// Contains metadata of a chat conversation (i.e. chat room).
+// This struct does not contain the actual message history, and the messages
+// must be retrieved from the |ChatContentProvider| interface using
+// |GetMessages| method.
+struct Conversation {
+  // Unique id of this conversation.
+  array<uint8> conversation_id;
+
+  // List of users participating in this conversation excluding the current user.
+  array<Participant> participants;
+};
+
+// Represents a chat message.
+struct Message {
+  // Unique id of this message.
+  array<uint8> message_id;
+
+  // Timestamp at which this message was created.
+  // Ideally, this value will be the same as the timestamp value automatically
+  // created by the Firebase DB.
+  int64 timestamp;
+
+  // The email address of the sender.
+  // A special value "me" indicates that this message is from the current user.
+  string sender;
+
+  // Message type (text, image, module).
+  string type;
+
+  // JSON string containing the message content.
+  string json_payload;
+};
+
+[ServiceName="chat_content_provider.ChatContentProvider"]
+interface ChatContentProvider {
+  // Creates a new conversation with the given |participants|, which is a list
+  // of all participants (including the current user) in the group.
+  NewConversation(array<Participant> participants)
+      => (ChatStatus status, Conversation? conversation);
+
+  // Returns the metadata of the specified conversation.
+  // To obtain the conversation history, use the |GetMessages| method with the
+  // same conversation id.
+  //
+  // If |wait| parameter is set to true, this method waits until the specified
+  // conversation appears in the list of conversations, if the conversation
+  // cannot be found. If set to false, this method returns |ID_NOT_FOUND| status
+  // in such cases.
+  GetConversation(array<uint8> conversation_id, bool wait)
+      => (ChatStatus status, Conversation? conversation);
+
+  // Returns the list of metadata of all existing conversations.
+  // To obtain the conversation history, use the |GetMessages| method with
+  // the obtained conversation id.
+  //
+  // When the |message_queue_token| value is provided, the client will be
+  // notified with any new conversations added after the initial list of
+  // conversations is sent, or when the ledger download status is changed.
+  //
+  // The message sent from the content provider will be a JSON string formatted
+  // as following:
+  //
+  //     {
+  //       "event":           "new_conversation",
+  //       "conversation_id": <conversation_id>,
+  //       "participants":    [
+  //         {
+  //           "email": <participant_email>,
+  //           "displayName": <display name>,
+  //           "photoUrl": <photo url>
+  //         },
+  //         <...>
+  //       ]
+  //     }
+  //
+  // OR
+  //
+  //     {
+  //       "event":  "download_status",
+  //       "status": "idle|pending|in_progress|error"
+  //     }
+  //
+  GetConversations(string? message_queue_token)
+      => (ChatStatus status, array<Conversation> conversations);
+
+  // Gets the list of all |Message|s in the specified conversation.
+  // When the |message_queue_token| value is provided, the client will be
+  // notified with any new messages added and messages deleted after the initial
+  // snapshot is sent.
+  //
+  // The message sent from the content provider will be a JSON string formatted
+  // as following:
+  //
+  //     {
+  //       "event":           "add|delete",
+  //       "conversation_id": <conversation_id>,
+  //       "message_id":      <message_id>
+  //     }
+  //
+  // The client should then make a subsequent |GetMessage| call to retrieve the
+  // actual message content.
+  GetMessages(array<uint8> conversation_id, string? message_queue_token)
+      => (ChatStatus status, array<Message> messages);
+
+  // Gets the specified |Message|.
+  GetMessage(array<uint8> conversation_id, array<uint8> message_id)
+      => (ChatStatus status, Message? message);
+
+  // Gets the last message of the specified conversation.
+  // The returned message can be null if the specified conversation does not
+  // exist or the conversation is empty.
+  // Intended to be used by the chat_conversation_list module.
+  GetLastMessage(array<uint8> conversation_id)
+      => (ChatStatus status, Message? message);
+
+  // Sends a new message to the specified conversation.
+  // Returns the |message_id| created by the content provider.
+  //
+  // The returned |message_id| is constructed by concatenating three values:
+  //
+  // 1. Local timestamp since epoch
+  //  - Putting the timestamp at the beginning guarantees the sort order.
+  //
+  // 2. Incremental message index
+  //  - This prevents id collision when adding a batch of messages at once.
+  //
+  // 3. Device id
+  //  - This prevents accidental id collision when between multiple devices of
+  //    the same user.
+  SendMessage(array<uint8> conversation_id, string type, string json_payload)
+      => (ChatStatus status, array<uint8> message_id);
+
+  // Deletes the specified |Message| from the chat history.
+  //
+  // This only deletes the message from the current user's |Ledger|, which means
+  // that the message will still be shown in the other users' chat history.
+  DeleteMessage(array<uint8> conversation_id, array<uint8> message_id)
+      => (ChatStatus status);
+
+  // Notifies the agent that the specified message queue should no longer be
+  // used to send more notifications.
+  //
+  // Clients who passed a |message_queue_token| in a prior |GetMessages| call
+  // should call |Unsubscribe| when it no longer needs to be notified.
+  Unsubscribe(string message_queue_token);
+};

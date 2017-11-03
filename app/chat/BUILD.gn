@@ -1,0 +1,60 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//packages/package.gni")
+
+package("chat") {
+  app = true
+  system_image = true
+
+  deps = [
+    "//topaz/app/chat/agents",
+    "//topaz/app/chat/modules",
+    "//topaz/app/chat/services",
+  ]
+
+  binaries = [
+    {
+      name = "chat_content_provider"
+      source = "chat_content_provider.dartx"
+    },
+
+    {
+      name = "chat_conversation"
+      source = "gen/topaz/app/chat/modules/conversation/chat_conversation.flx"
+    },
+
+    {
+      name = "chat_conversation_list"
+      source = "gen/topaz/app/chat/modules/conversation_list/chat_conversation_list.flx"
+    },
+  ]
+}
+
+package("chat_tests") {
+  testonly = true
+  app = true
+  system_image = true
+
+  deps = [
+    "//topaz/app/chat/tests/chat_content_provider_test",
+
+    # The following gn targets do not build anything that ends up on the target, but need to be
+    # built in order to:
+    # 1) run the unit tests on the host side
+    # 2) enable dart analyzer support for test code in the IDE
+    "//topaz/app/chat/modules/conversation:test",
+    "//topaz/app/chat/modules/conversation_list:test",
+  ]
+
+  binaries = [ {
+        name = "chat_content_provider_test.dartx"
+        source = "chat_content_provider_test.dartx"
+      } ]
+
+  resources = [ {
+        path = rebase_path("tests/chat_tests.json")
+        dest = "apps/chat_tests/chat_tests.json"
+      } ]
+}
