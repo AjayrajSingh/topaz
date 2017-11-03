@@ -1,0 +1,56 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//packages/package.gni")
+
+package("modular") {
+  app = true
+  system_image = true
+
+  package_name = "more_modular_examples"
+
+  deps = [
+    "counter_flutter",
+    "hello_world_flutter",
+    "photos_flutter",
+    "story_shell_flutter",
+    "suggest_shell",
+    "todo_story",
+  ]
+
+  binaries = [
+    {
+      name = "gen/topaz/examples/modular/counter_flutter/child/example_flutter_counter_child.flx"
+      dest = "example_flutter_counter_child"
+    },
+    {
+      name = "gen/topaz/examples/modular/counter_flutter/parent_embed/example_flutter_counter_parent_embed.flx"
+      dest = "example_flutter_counter_parent_embed"
+    },
+    {
+      name = "gen/topaz/examples/modular/counter_flutter/parent_story_shell/example_flutter_counter_parent_story_shell.flx"
+      dest = "example_flutter_counter_parent_story_shell"
+    },
+    {
+      name = "gen/topaz/examples/modular/hello_world_flutter/example_flutter_hello_world.flx"
+      dest = "example_flutter_hello_world"
+    },
+    {
+      name = "gen/topaz/examples/modular/story_shell_flutter/example_flutter_story_shell.flx"
+      dest = "example_flutter_story_shell"
+    },
+    {
+      name = "gen/topaz/examples/modular/todo_story/example_todo_story.flx"
+      dest = "example_todo_story"
+    },
+    {
+      name = "suggest_shell_controller"
+    },
+    {
+      name =
+          "gen/topaz/examples/modular/suggest_shell/view/suggest_shell_view.flx"
+      dest = "suggest_shell_view"
+    },
+  ]
+}

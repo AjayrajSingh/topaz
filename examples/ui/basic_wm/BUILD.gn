@@ -1,0 +1,37 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//third_party/flutter/build/flutter_app.gni")
+import("//packages/package.gni")
+
+flutter_app("basic_wm") {
+  main_dart = "main.dart"
+
+  source_dir = "."
+
+  deps = [
+    "//topaz/public/lib/app/dart",
+    "//garnet/public/lib/app/fidl:fidl_dart",
+    "//topaz/public/lib/ui/flutter",
+    "//garnet/public/lib/ui/presentation/fidl:fidl_dart",
+    "//topaz/public/lib/fidl/dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+  ]
+}
+
+package("package") {
+  app = true
+  system_image = true
+
+  package_name = "basic_wm"
+
+  deps = [
+    ":basic_wm",
+  ]
+
+  binaries = [ {
+        name = "basic_wm"
+        source = "gen/topaz/examples/ui/basic_wm/basic_wm.flx"
+      } ]
+}

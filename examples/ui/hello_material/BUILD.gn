@@ -1,0 +1,33 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//third_party/flutter/build/flutter_app.gni")
+import("//packages/package.gni")
+
+flutter_app("hello_material") {
+  main_dart = "main.dart"
+
+  source_dir = "."
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+  ]
+}
+
+package("package") {
+  app = true
+  system_image = true
+
+  package_name = "hello_material"
+
+  deps = [
+    ":hello_material",
+  ]
+
+  binaries = [ {
+        name = "hello_material"
+        source = "gen/topaz/examples/ui/hello_material/hello_material.flx"
+      } ]
+}
+

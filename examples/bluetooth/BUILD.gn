@@ -1,0 +1,31 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//packages/package.gni")
+
+package("bluetooth_examples") {
+  app = true
+  system_image = true
+
+  deps = [
+    "ble_scanner",
+    "eddystone_advertiser",
+    "settings",
+  ]
+
+  binaries = [
+    {
+        source = "gen/topaz/examples/bluetooth/ble_scanner/ble_scanner.flx"
+        name = "bluetooth_le_scanner"
+    },
+    {
+        source = "gen/topaz/examples/bluetooth/eddystone_advertiser/eddystone_advertiser.flx"
+        name = "eddystone_advertiser"
+    },
+    {
+        source = "gen/topaz/examples/bluetooth/settings/settings.flx"
+        name = "bluetooth_settings_example"
+    }
+  ]
+}
