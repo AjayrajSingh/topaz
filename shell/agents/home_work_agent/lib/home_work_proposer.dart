@@ -292,7 +292,7 @@ class _QueryHandlerImpl extends QueryHandler {
       );
     }
 
-    if ((query.text?.length ?? 0) >= 4) {
+    if ((query.text?.length ?? 0) >= 2) {
       void scanDirectory(Directory directory) {
         for (String path in directory
             .listSync(recursive: true, followLinks: false)
