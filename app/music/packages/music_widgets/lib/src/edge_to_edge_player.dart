@@ -49,8 +49,20 @@ class EdgeToEdgePlayer extends StatelessWidget {
       fit: StackFit.expand,
       children: <Widget>[
         new Container(
-          color: Colors.black,
-          padding: const EdgeInsets.all(80.0),
+          child: new Image.asset(
+            'packages/music_widgets/res/music_wallpaper.jpg',
+            fit: BoxFit.cover,
+            color: Colors.black.withOpacity(0.7),
+            colorBlendMode: BlendMode.srcATop,
+          ),
+        ),
+        new Container(
+          padding: const EdgeInsets.only(
+            top: 80.0,
+            left: 80.0,
+            right: 80.0,
+            bottom: 50.0,
+          ),
           child: new Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -75,12 +87,15 @@ class EdgeToEdgePlayer extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              new Text(
-                currentTrack?.name ?? '',
-                maxLines: 2,
-                style: new TextStyle(
-                  color: Colors.white,
-                  fontSize: 40.0,
+              new Container(
+                margin: const EdgeInsets.only(top: 32.0),
+                child: new Text(
+                  currentTrack?.name ?? '',
+                  maxLines: 2,
+                  style: new TextStyle(
+                    color: Colors.white,
+                    fontSize: 40.0,
+                  ),
                 ),
               ),
               new Container(
@@ -99,11 +114,15 @@ class EdgeToEdgePlayer extends StatelessWidget {
         ),
         new Container(
           margin: const EdgeInsets.only(left: 32.0),
-          child: new AspectRatio(
-            aspectRatio: 1.0,
-            child: new TrackArt(
-              size: 300.0,
-              artworkUrl: currentTrack?.defaultArtworkUrl,
+          child: new PhysicalModel(
+            elevation: 8.0,
+            color: Colors.transparent,
+            child: new AspectRatio(
+              aspectRatio: 1.0,
+              child: new TrackArt(
+                size: 300.0,
+                artworkUrl: currentTrack?.defaultArtworkUrl,
+              ),
             ),
           ),
         ),

@@ -20,3 +20,5 @@ dev_dependencies:
     sdk: flutter
 flutter:
   uses-material-design: true
+  assets:
+    - packages/music_widgets/res/music_wallpaper.jpg
