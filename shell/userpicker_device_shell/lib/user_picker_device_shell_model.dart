@@ -114,7 +114,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Refreshes the list of users.
   void refreshUsers() {
-    _accounts = null;
     _loadUsers();
   }
 
