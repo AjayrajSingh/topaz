@@ -115,9 +115,11 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
     });
   }
 
-  /// Starts a web view module pointing to the given [url].
-  void launchWebView(String url) {
+  /// Starts a web view module pointing to the given [buildName].
+  void launchWebView(String buildName) {
     const String webViewLinkName = 'web_view';
+    final String url =
+        'https://luci-scheduler.appspot.com/jobs/fuchsia/$buildName';
 
     if (_webviewLinkProxy != null) {
       _webviewLinkProxy

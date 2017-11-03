@@ -5,11 +5,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart' show parse;
-import 'package:http/http.dart' as http;
 import 'package:lib.widgets/modular.dart';
+import 'service/build_info.dart';
+import 'service/build_service.dart';
 
 /// Indicates the last known status of a particular build.
 enum BuildStatus {
@@ -47,8 +45,8 @@ class BuildStatusModel extends ModuleModel {
   /// The url of the page used to determine the build status.
   final String url;
 
-  /// The client to perform get requests with.
-  http.Client _client;
+  /// The service used to fetch [BuildInfo].
+  final BuildService _buildService;
 
   DateTime _lastRefreshed;
   DateTime _lastRefreshStarted;
@@ -59,8 +57,8 @@ class BuildStatusModel extends ModuleModel {
   String _errorMessage;
 
   /// Constructor.
-  BuildStatusModel({this.type, this.name, this.url})
-      : _client = createHttpClient();
+  BuildStatusModel({this.type, this.name, this.url, BuildService buildService})
+      : _buildService = buildService;
 
   /// Returns the time when the status was refreshed.
   DateTime get lastRefreshed => _lastRefreshed;
@@ -117,7 +115,7 @@ class BuildStatusModel extends ModuleModel {
   void refresh() {
     DateTime now = new DateTime.now().toLocal();
     if (_lastRefreshed == null ||
-        now.difference(_lastRefreshed) > const Duration(seconds: 5)) {
+        now.difference(_lastRefreshed) > const Duration(seconds: 60)) {
       _lastRefreshed = now;
       _fetchConfigStatus();
       notifyListeners();
@@ -125,49 +123,27 @@ class BuildStatusModel extends ModuleModel {
   }
 
   Future<Null> _fetchConfigStatus() async {
-    BuildStatus status = BuildStatus.parseError;
-    String html;
+    if (_outstandingGet) {
+      return;
+    }
+    _outstandingGet = true;
+
     String errorMessage;
     _lastRefreshStarted = new DateTime.now();
     _lastRefreshEnded = null;
 
-    if (_outstandingGet) {
-      _client.close();
-      _client = createHttpClient();
-    }
+    BuildInfo info;
 
     try {
-      _outstandingGet = true;
-      http.Response response = await _client.get(url);
-      html = response.body;
-      if (html == null) {
-        errorMessage =
-            'Status ${response.statusCode}\n${response.reasonPhrase}';
-      }
-    } on http.ClientException catch (error) {
-      status = BuildStatus.networkError;
+      info = await _buildService.getBuildByName(url).first;
+    } on BuildServiceException catch (error) {
+      _buildStatus = BuildStatus.networkError;
       errorMessage = 'Error receiving response:\n$error';
     } finally {
       _outstandingGet = false;
       _lastRefreshEnded = new DateTime.now();
-
-      if (html == null) {
-        status = BuildStatus.networkError;
-      } else {
-        dom.Document domTree = parse(html);
-        List<dom.Element> trs = domTree.querySelectorAll('tr');
-        for (dom.Element tr in trs) {
-          if (tr.className == 'danger') {
-            status = BuildStatus.failure;
-            break;
-          } else if (tr.className == 'success') {
-            status = BuildStatus.success;
-            break;
-          }
-        }
-      }
-
-      _buildStatus = status;
+      _buildStatus =
+          info?.result == 'SUCCESS' ? BuildStatus.success : BuildStatus.failure;
       _errorMessage = errorMessage;
 
       if (_buildStatus == BuildStatus.success) {

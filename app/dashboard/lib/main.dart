@@ -10,8 +10,8 @@ import 'package:lib.widgets/modular.dart';
 import 'build_status_model.dart';
 import 'dashboard_app.dart';
 import 'dashboard_module_model.dart';
+import 'service/build_service.dart';
 
-const String _kBaseURL = 'https://luci-scheduler.appspot.com/jobs/fuchsia/';
 const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   const <List<String>>[
     const <String>[
@@ -36,13 +36,21 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
     ],
   ],
   const <List<String>>[
-    const <String>['topaz-aarch64-linux-debug', 'aarch64-linux-debug', 'topaz'],
+    const <String>[
+      'topaz-aarch64-linux-debug',
+      'aarch64-linux-debug',
+      'topaz',
+    ],
     const <String>[
       'topaz-aarch64-linux-release',
       'aarch64-linux-release',
       'topaz'
     ],
-    const <String>['topaz-x86_64-linux-debug', 'x86_64-linux-debug', 'topaz'],
+    const <String>[
+      'topaz-x86_64-linux-debug',
+      'x86_64-linux-debug',
+      'topaz',
+    ],
     const <String>[
       'topaz-x86_64-linux-release',
       'x86_64-linux-release',
@@ -82,7 +90,11 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
       'aarch64-linux-release',
       'garnet'
     ],
-    const <String>['garnet-x86_64-linux-debug', 'x86_64-linux-debug', 'garnet'],
+    const <String>[
+      'garnet-x86_64-linux-debug',
+      'x86_64-linux-debug',
+      'garnet',
+    ],
     const <String>[
       'garnet-x86_64-linux-release',
       'x86_64-linux-release',
@@ -95,24 +107,50 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
       'zircon-pc-x86-64-clang',
       'zircon'
     ],
-    const <String>['zircon-pc-x86-64-gcc', 'zircon-pc-x86-64-gcc', 'zircon'],
+    const <String>[
+      'zircon-pc-x86-64-gcc',
+      'zircon-pc-x86-64-gcc',
+      'zircon',
+    ],
     const <String>[
       'zircon-qemu-arm64-clang',
       'zircon-qemu-arm64-clang',
       'zircon'
     ],
-    const <String>['zircon-qemu-arm64-gcc', 'zircon-qemu-arm64-gcc', 'zircon'],
+    const <String>[
+      'zircon-qemu-arm64-gcc',
+      'zircon-qemu-arm64-gcc',
+      'zircon',
+    ],
   ],
   const <List<String>>[
-    const <String>['web_view-x86_64-linux', 'x86_64-linux', 'web_view'],
-    const <String>['web_view-aarch64-linux', 'aarch64-linux', 'web_view'],
-    const <String>['jiri-x86_64-linux', 'x86_64-linux', 'jiri'],
-    const <String>['jiri-x86_64-mac', 'x86_64-mac', 'jiri'],
+    const <String>[
+      'web_view-x86_64-linux',
+      'x86_64-linux',
+      'web_view',
+    ],
+    const <String>[
+      'web_view-aarch64-linux',
+      'aarch64-linux',
+      'web_view',
+    ],
+    const <String>[
+      'jiri-x86_64-linux',
+      'x86_64-linux',
+      'jiri',
+    ],
+    const <String>[
+      'jiri-x86_64-mac',
+      'x86_64-mac',
+      'jiri',
+    ],
   ]
 ];
 
 void main() {
   setupLogger();
+
+  final BuildService buildService = new BuildService();
 
   final List<List<BuildStatusModel>> buildStatusModels =
       <List<BuildStatusModel>>[];
@@ -123,7 +161,8 @@ void main() {
       BuildStatusModel buildStatusModel = new BuildStatusModel(
         type: config[2],
         name: config[1],
-        url: '$_kBaseURL${config[0]}',
+        url: config[0],
+        buildService: buildService,
       )..start();
       categoryModels.add(buildStatusModel);
     }

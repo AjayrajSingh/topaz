@@ -24,6 +24,7 @@ flutter_app("dashboard_app") {
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/ui/flutter",
     "//topaz/runtime/web_runner/lib/dart:web_view",
+    "//third_party/dart-pkg/pub/buildbucket",
   ]
 }
 

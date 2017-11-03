@@ -10,6 +10,7 @@ dependencies:
   http: any
   flutter:
     sdk: flutter
+  buildbucket: ^0.1.0-dev
 
 # The following section is specific to Flutter.
 flutter:
@@ -41,3 +42,6 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
+dev_dependencies:
+  test: any
+  mockito: any
