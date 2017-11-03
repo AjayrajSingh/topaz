@@ -1,0 +1,26 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_package.gni")
+import("//build/dart/dart_test.gni")
+
+dart_package("music_widgets") {
+  package_name = "music_widgets"
+
+  deps = [
+    "//third_party/dart/third_party/pkg/intl",
+    "//topaz/app/music/packages/music_models",
+    "//topaz/public/dart/fixtures",
+    "//topaz/public/dart/widgets:lib.widgets",
+  ]
+}
+
+dart_test("test") {
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/pub/test",
+    "//topaz/app/music/packages/music_models",
+    "//topaz/app/music/packages/music_widgets",
+  ]
+}

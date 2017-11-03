@@ -1,0 +1,334 @@
+{
+  "album_type" : "album",
+  "artists" : [ {
+    "external_urls" : {
+      "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+    },
+    "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+    "id" : "6E1rccfBuIsyLUBH81PYoG",
+    "name" : "Nonch Harpin'",
+    "type" : "artist",
+    "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+  } ],
+  "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+  "copyrights" : [ {
+    "text" : "2015 Nonch Harpin' Records",
+    "type" : "C"
+  }, {
+    "text" : "2015 Nonch Harpin' Records",
+    "type" : "P"
+  } ],
+  "external_ids" : {
+    "upc" : "859716043210"
+  },
+  "external_urls" : {
+    "spotify" : "https://open.spotify.com/album/3e3AbSasv8baYuhNRWylG5"
+  },
+  "genres" : ["Post Modern Jazz"],
+  "href" : "https://api.spotify.com/v1/albums/3e3AbSasv8baYuhNRWylG5",
+  "id" : "3e3AbSasv8baYuhNRWylG5",
+  "images" : [ {
+    "height" : 640,
+    "url" : "https://i.scdn.co/image/36fa6374df504e39033932377494a5c3c260ba9e",
+    "width" : 640
+  }, {
+    "height" : 300,
+    "url" : "https://i.scdn.co/image/47026847db3f7666b87bdb180ebd6746c9c676ef",
+    "width" : 300
+  }, {
+    "height" : 64,
+    "url" : "https://i.scdn.co/image/48df42ae766fa772003a1db5435f9fc9a0042fe9",
+    "width" : 64
+  } ],
+  "label" : "Nonch Harpin' Records",
+  "name" : "Native Sons",
+  "popularity" : 0,
+  "release_date" : "2015-11-18",
+  "release_date_precision" : "day",
+  "tracks" : {
+    "href" : "https://api.spotify.com/v1/albums/3e3AbSasv8baYuhNRWylG5/tracks?offset=0&limit=50",
+    "items" : [ {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 251306,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/3x0QU63tatBxxSZef5107i"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/3x0QU63tatBxxSZef5107i",
+      "id" : "3x0QU63tatBxxSZef5107i",
+      "name" : "Mr. Rocket Boots Celery Man",
+      "preview_url" : "https://p.scdn.co/mp3-preview/b9f1e5d68e307ee48f2e30d283b5023fe5c8fdbf?cid=null",
+      "track_number" : 1,
+      "type" : "track",
+      "uri" : "spotify:track:3x0QU63tatBxxSZef5107i"
+    }, {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 380213,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/0ITpi7kFeFuObhwZeOHV6W"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/0ITpi7kFeFuObhwZeOHV6W",
+      "id" : "0ITpi7kFeFuObhwZeOHV6W",
+      "name" : "Melody for a Woodland Cabana",
+      "preview_url" : "https://p.scdn.co/mp3-preview/c9f6fa7f90e7934d2946ab62e81bce9ec7b7efa6?cid=null",
+      "track_number" : 2,
+      "type" : "track",
+      "uri" : "spotify:track:0ITpi7kFeFuObhwZeOHV6W"
+    }, {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 605813,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/1UMM5qTnlvyqCRb9CjFdTe"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/1UMM5qTnlvyqCRb9CjFdTe",
+      "id" : "1UMM5qTnlvyqCRb9CjFdTe",
+      "name" : "The Sheltering Sky",
+      "preview_url" : "https://p.scdn.co/mp3-preview/3d14a2bed27a0c2909239ea87e60964cda4970ed?cid=null",
+      "track_number" : 3,
+      "type" : "track",
+      "uri" : "spotify:track:1UMM5qTnlvyqCRb9CjFdTe"
+    }, {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 328653,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/5SD67ch4MUUQciIjOaUvro"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/5SD67ch4MUUQciIjOaUvro",
+      "id" : "5SD67ch4MUUQciIjOaUvro",
+      "name" : "Li'l Antonin Scalia",
+      "preview_url" : "https://p.scdn.co/mp3-preview/10756c0f8d39b5642bc98da776933c7c8ded371c?cid=null",
+      "track_number" : 4,
+      "type" : "track",
+      "uri" : "spotify:track:5SD67ch4MUUQciIjOaUvro"
+    }, {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 307906,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/1jsoiqZRDA8KWCcrjLZM6l"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/1jsoiqZRDA8KWCcrjLZM6l",
+      "id" : "1jsoiqZRDA8KWCcrjLZM6l",
+      "name" : "By the Way, Frances",
+      "preview_url" : "https://p.scdn.co/mp3-preview/0fc50894912b6d65d0908d7c3e9895acc49be118?cid=null",
+      "track_number" : 5,
+      "type" : "track",
+      "uri" : "spotify:track:1jsoiqZRDA8KWCcrjLZM6l"
+    }, {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 267826,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/6ybQfcNfeAkTEh1Ke2qyTZ"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/6ybQfcNfeAkTEh1Ke2qyTZ",
+      "id" : "6ybQfcNfeAkTEh1Ke2qyTZ",
+      "name" : "Souphounds and Strays",
+      "preview_url" : "https://p.scdn.co/mp3-preview/f642ec8739fb2a853321a650f60c71c9087ac451?cid=null",
+      "track_number" : 6,
+      "type" : "track",
+      "uri" : "spotify:track:6ybQfcNfeAkTEh1Ke2qyTZ"
+    }, {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 419586,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/6VsJ85sL5yokSXeSlJV9v2"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/6VsJ85sL5yokSXeSlJV9v2",
+      "id" : "6VsJ85sL5yokSXeSlJV9v2",
+      "name" : "The Street Joke",
+      "preview_url" : "https://p.scdn.co/mp3-preview/62638971fa9db6e5e97d75bbde0d6892d2a3b73d?cid=null",
+      "track_number" : 7,
+      "type" : "track",
+      "uri" : "spotify:track:6VsJ85sL5yokSXeSlJV9v2"
+    }, {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 262706,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/2lAjtUYfVdQWFJkF4hqUZP"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/2lAjtUYfVdQWFJkF4hqUZP",
+      "id" : "2lAjtUYfVdQWFJkF4hqUZP",
+      "name" : "Brown Rice Is a Bummer",
+      "preview_url" : "https://p.scdn.co/mp3-preview/084c126271fcf7bded45dd2111d7fe5c2d54039d?cid=null",
+      "track_number" : 8,
+      "type" : "track",
+      "uri" : "spotify:track:2lAjtUYfVdQWFJkF4hqUZP"
+    }, {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 569333,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/6Uo33HRRUgrshzUNoGaQcS"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/6Uo33HRRUgrshzUNoGaQcS",
+      "id" : "6Uo33HRRUgrshzUNoGaQcS",
+      "name" : "A Forgotten Guitar",
+      "preview_url" : "https://p.scdn.co/mp3-preview/662d6466dd9bc9ca4ff5bb8d3d42259bbd6a368e?cid=null",
+      "track_number" : 9,
+      "type" : "track",
+      "uri" : "spotify:track:6Uo33HRRUgrshzUNoGaQcS"
+    }, {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 274733,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/5nKgCzhjTscze1Sf4LHh1a"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/5nKgCzhjTscze1Sf4LHh1a",
+      "id" : "5nKgCzhjTscze1Sf4LHh1a",
+      "name" : "Derring-Do",
+      "preview_url" : "https://p.scdn.co/mp3-preview/aa5c114df9737114464432b8f7ab05808c87a380?cid=null",
+      "track_number" : 10,
+      "type" : "track",
+      "uri" : "spotify:track:5nKgCzhjTscze1Sf4LHh1a"
+    }, {
+      "artists" : [ {
+        "external_urls" : {
+          "spotify" : "https://open.spotify.com/artist/6E1rccfBuIsyLUBH81PYoG"
+        },
+        "href" : "https://api.spotify.com/v1/artists/6E1rccfBuIsyLUBH81PYoG",
+        "id" : "6E1rccfBuIsyLUBH81PYoG",
+        "name" : "Nonch Harpin'",
+        "type" : "artist",
+        "uri" : "spotify:artist:6E1rccfBuIsyLUBH81PYoG"
+      } ],
+      "available_markets" : [ "AD", "AR", "AT", "AU", "BE", "BG", "BO", "BR", "CA", "CH", "CL", "CO", "CR", "CY", "CZ", "DE", "DK", "DO", "EC", "EE", "ES", "FI", "FR", "GB", "GR", "GT", "HK", "HN", "HU", "ID", "IE", "IS", "IT", "JP", "LI", "LT", "LU", "LV", "MC", "MT", "MX", "MY", "NI", "NL", "NO", "NZ", "PA", "PE", "PH", "PL", "PT", "PY", "SE", "SG", "SK", "SV", "TR", "TW", "US", "UY" ],
+      "disc_number" : 1,
+      "duration_ms" : 300080,
+      "explicit" : false,
+      "external_urls" : {
+        "spotify" : "https://open.spotify.com/track/6CmEK52UEfhGyB1tx0EzEd"
+      },
+      "href" : "https://api.spotify.com/v1/tracks/6CmEK52UEfhGyB1tx0EzEd",
+      "id" : "6CmEK52UEfhGyB1tx0EzEd",
+      "name" : "The Fat Samaritan",
+      "preview_url" : "https://p.scdn.co/mp3-preview/83a5e78806c8e6ceb9e37d85655d6cd3bd2326b1?cid=null",
+      "track_number" : 11,
+      "type" : "track",
+      "uri" : "spotify:track:6CmEK52UEfhGyB1tx0EzEd"
+    } ],
+    "limit" : 50,
+    "next" : null,
+    "offset" : 0,
+    "previous" : null,
+    "total" : 11
+  },
+  "type" : "album",
+  "uri" : "spotify:album:3e3AbSasv8baYuhNRWylG5"
+}

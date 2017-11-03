@@ -1,0 +1,33 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//third_party/flutter/build/flutter_app.gni")
+
+flutter_app("music_artist") {
+  package_name = "music_artist"
+
+  main_dart = "lib/main.dart"
+
+  source_dir = "lib"
+
+  deps = [
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
+    "//peridot/public/lib/context/fidl:fidl_dart",
+    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//third_party/dart/third_party/pkg/intl",
+    "//topaz/app/music/packages/music_api",
+    "//topaz/app/music/packages/music_models",
+    "//topaz/app/music/packages/music_widgets",
+    "//topaz/app/music/services/player:player_dart",
+    "//topaz/public/dart/config",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/decomposition/dart",
+    "//topaz/public/lib/fidl/dart",
+  ]
+}

@@ -1,0 +1,11 @@
+{
+    "uri": "http://www.songkick.com/artists/288696-vampire-weekend?utm_source=PARTNER_ID&utm_medium=partner",
+    "displayName": "Vampire Weekend",
+    "id": 288696,
+    "identifier": [
+        {
+            "href": "http://api.songkick.com/api/3.0/artists/mbid:af37c51c-0790-4a29-b995-456f98a6b8c9.json",
+            "mbid": "af37c51c-0790-4a29-b995-456f98a6b8c9"
+        }
+    ]
+}

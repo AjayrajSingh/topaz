@@ -1,0 +1,22 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+name: music_playback
+description: Music Playback Module
+
+dependencies:
+  flutter:
+    sdk: flutter
+  music_api:
+    path: ../../packages/music_api
+  music_models:
+    path: ../../packages/music_models
+  music_widgets:
+    path: ../../packages/music_widgets
+dev_dependencies:
+  test: any
+  flutter_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true

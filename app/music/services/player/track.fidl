@@ -1,0 +1,30 @@
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+module music;
+
+// Represents a musical track.
+struct Track {
+
+  // Title of the track.
+  string title;
+
+  // ID of track.
+  string id;
+
+  // Name of artist of this track.
+  string artist;
+
+  // Name of Album that this track belongs to.
+  string album;
+
+  // URL for the artwork for this track.
+  string cover;
+
+  /// URL for playback streaming
+  string playbackUrl;
+
+  // Duration of this track in seconds.
+  int64 durationInSeconds;
+};

@@ -1,0 +1,23 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+name: last_fm_artist_bio
+description: Last FM Artist Bio
+dependencies:
+  flutter:
+    sdk: flutter
+  concert_api:
+    path: ../../packages/last_fm_api
+  last_fm_models:
+    path: ../../packages/last_fm_models
+  last_fm_widgets:
+    path: ../../packages/last_fm_widgets
+dev_dependencies:
+  test: any
+  flutter_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true
+  assets:
+    - packages/last_fm_widgets/res/background.jpg
