@@ -16,16 +16,16 @@ package("bluetooth_examples") {
 
   binaries = [
     {
-        source = "gen/topaz/examples/bluetooth/ble_scanner/ble_scanner.flx"
-        name = "bluetooth_le_scanner"
+      source = "gen/topaz/examples/bluetooth/ble_scanner/ble_scanner.flx"
+      name = "bluetooth_le_scanner"
     },
     {
-        source = "gen/topaz/examples/bluetooth/eddystone_advertiser/eddystone_advertiser.flx"
-        name = "eddystone_advertiser"
+      source = "gen/topaz/examples/bluetooth/eddystone_advertiser/eddystone_advertiser.flx"
+      name = "eddystone_advertiser"
     },
     {
-        source = "gen/topaz/examples/bluetooth/settings/settings.flx"
-        name = "bluetooth_settings_example"
-    }
+      source = "gen/topaz/examples/bluetooth/settings/settings.flx"
+      name = "bluetooth_settings_example"
+    },
   ]
 }

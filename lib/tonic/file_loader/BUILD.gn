@@ -9,13 +9,11 @@ source_set("file_loader") {
   ]
 
   deps = [
-    "//third_party/dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
+    "//third_party/dart/runtime:dart_api",
     "//topaz/lib/tonic/converter",
     "//topaz/lib/tonic/parsers",
   ]
 
-  public_configs = [
-    "//topaz/lib/tonic:config",
-  ]
+  public_configs = [ "//topaz/lib/tonic:config" ]
 }

@@ -10,13 +10,13 @@ flutter_app("todo_story") {
   source_dir = "lib"
 
   deps = [
-    "//topaz/public/lib/app/dart",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/story/fidl:fidl_dart",
-    "//topaz/public/lib/ui/flutter",
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//topaz/public/lib/fidl/dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/ui/flutter",
   ]
 }

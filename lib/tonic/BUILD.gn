@@ -3,9 +3,7 @@
 # found in the LICENSE file.
 
 config("config") {
-  include_dirs = [
-    "//topaz",
-  ]
+  include_dirs = [ "//topaz" ]
 }
 
 source_set("tonic") {
@@ -36,8 +34,8 @@ source_set("tonic") {
   ]
 
   public_deps = [
-    "//third_party/dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
+    "//third_party/dart/runtime:dart_api",
     "//topaz/lib/tonic/converter",
     "//topaz/lib/tonic/file_loader",
     "//topaz/lib/tonic/logging",
@@ -45,7 +43,5 @@ source_set("tonic") {
     "//topaz/lib/tonic/typed_data",
   ]
 
-  public_configs = [
-    ":config",
-  ]
+  public_configs = [ ":config" ]
 }

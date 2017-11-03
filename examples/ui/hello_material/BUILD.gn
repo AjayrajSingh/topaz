@@ -30,4 +30,3 @@ package("package") {
         source = "gen/topaz/examples/ui/hello_material/hello_material.flx"
       } ]
 }
-

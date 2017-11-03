@@ -26,9 +26,9 @@ flutter_app("flutter_mondrian") {
   main_dart = "lib/main.dart"
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//peridot/public/lib/story/fidl:fidl_dart",
     "//peridot/public/lib/surface/fidl:fidl_dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/quiver",
     "//topaz/public/dart/logging:lib.logging",

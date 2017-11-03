@@ -37,7 +37,9 @@ package("oauth_token_manager") {
   app = true
   system_image = true
 
-  deps = [ ":bin" ]
+  deps = [
+    ":bin",
+  ]
 
   binaries = [ {
         name = "oauth_token_manager"

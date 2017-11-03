@@ -6,12 +6,12 @@ import("//build/rust/rust_binary.gni")
 
 rust_binary("xi-core") {
   deps = [
-    "//peridot/public/lib/ledger/fidl:fidl_rust_library",
     "//apps/xi/services:services_rust_library",
     "//garnet/public/lib/app/fidl:service_provider_rust_library",
     "//garnet/public/lib/fidl/rust/fidl",
-    "//garnet/public/rust/crates/mxruntime",
     "//garnet/public/rust/crates/fuchsia-zircon",
+    "//garnet/public/rust/crates/mxruntime",
+    "//peridot/public/lib/ledger/fidl:fidl_rust_library",
     "//third_party/xi-editor/rust/core-lib:xi_core_lib",
     "//third_party/xi-editor/rust/rpc:xi_rpc",
   ]

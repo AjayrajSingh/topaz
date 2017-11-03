@@ -17,13 +17,11 @@ source_set("typed_data") {
   ]
 
   public_deps = [
-    "//third_party/dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
+    "//third_party/dart/runtime:dart_api",
     "//topaz/lib/tonic/converter",
     "//topaz/lib/tonic/logging",
   ]
 
-  public_configs = [
-    "//topaz/lib/tonic:config",
-  ]
+  public_configs = [ "//topaz/lib/tonic:config" ]
 }

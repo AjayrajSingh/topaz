@@ -9,11 +9,9 @@ source_set("converter") {
   ]
 
   public_deps = [
-    "//third_party/dart/runtime:dart_api",
     "//garnet/public/lib/fxl",
+    "//third_party/dart/runtime:dart_api",
   ]
 
-  public_configs = [
-    "//topaz/lib/tonic:config",
-  ]
+  public_configs = [ "//topaz/lib/tonic:config" ]
 }

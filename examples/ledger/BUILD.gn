@@ -13,10 +13,8 @@ package("ledger") {
     "todo_list",
   ]
 
-  binaries = [
-    {
-      name = "gen/topaz/examples/ledger/todo_list/todo_list.flx"
-      dest = "todo_list"
-    }
-  ]
+  binaries = [ {
+        name = "gen/topaz/examples/ledger/todo_list/todo_list.flx"
+        dest = "todo_list"
+      } ]
 }

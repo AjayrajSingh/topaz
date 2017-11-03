@@ -9,9 +9,9 @@ executable("web_view_bin") {
   output_name = "web_view"
 
   sources = [
+    "main.cpp",
     "schema_org_context.cpp",
     "schema_org_context.h",
-    "main.cpp",
     "web_view_impl.cpp",
     "web_view_impl.h",
     "web_view_provider.cpp",
@@ -20,7 +20,6 @@ executable("web_view_bin") {
 
   deps = [
     ":webkit",
-    "//peridot/public/lib/context/fidl",
     "//garnet/public/lib/app/cpp",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
@@ -29,6 +28,7 @@ executable("web_view_bin") {
     "//garnet/public/lib/ui/view_framework:view_provider",
     "//garnet/public/lib/ui/views/fidl",
     "//peridot/lib/rapidjson",
+    "//peridot/public/lib/context/fidl",
     "//peridot/public/lib/lifecycle/fidl",
     "//peridot/public/lib/module/fidl",
     "//peridot/public/lib/story/fidl",
@@ -96,9 +96,7 @@ if (use_prebuilt_webkit) {
     ]
     libs = [ prebuilt_webkit ]
     cflags = [ "-includeWebKitPrefix.h" ]
-    configs = [
-      "//third_party/icu:icu_config",
-    ]
+    configs = [ "//third_party/icu:icu_config" ]
   }
 
   if (current_toolchain == shlib_toolchain) {

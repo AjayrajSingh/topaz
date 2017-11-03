@@ -10,8 +10,8 @@ flutter_app("todo_list") {
   source_dir = "lib"
 
   deps = [
-    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//peridot/public/lib/ledger/fidl:fidl_dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

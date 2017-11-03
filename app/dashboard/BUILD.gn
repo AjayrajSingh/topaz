@@ -12,18 +12,18 @@ flutter_app("dashboard_app") {
   source_dir = "lib"
 
   deps = [
-    "//topaz/public/lib/app/dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
-    "//topaz/app/chat/services:services_dart",
-    "//topaz/public/lib/ui/flutter",
-    "//topaz/runtime/web_runner/lib/dart:web_view",
-    "//topaz/public/lib/fidl/dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/dart/logging:lib.logging",
-    "//topaz/public/dart/widgets:lib.widgets",
     "//third_party/dart-pkg/pub/html",
     "//third_party/dart-pkg/pub/http",
+    "//topaz/app/chat/services:services_dart",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/ui/flutter",
+    "//topaz/runtime/web_runner/lib/dart:web_view",
   ]
 }
 

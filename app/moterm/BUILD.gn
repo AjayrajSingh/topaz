@@ -28,22 +28,22 @@ executable("bin") {
   ]
 
   deps = [
-    "//peridot/public/lib/ledger/fidl",
     "//garnet/public/lib/app/cpp",
+    "//garnet/public/lib/fidl/cpp/bindings",
+    "//garnet/public/lib/fonts/fidl",
+    "//garnet/public/lib/fsl",
+    "//garnet/public/lib/fxl",
+    "//garnet/public/lib/ui/geometry/fidl",
+    "//garnet/public/lib/ui/input/cpp",
+    "//garnet/public/lib/ui/input/fidl",
     "//garnet/public/lib/ui/scenic:client",
+    "//garnet/public/lib/ui/scenic/fidl",
     "//garnet/public/lib/ui/skia:fonts",
     "//garnet/public/lib/ui/view_framework:skia",
     "//garnet/public/lib/ui/view_framework:view_provider",
-    "//garnet/public/lib/ui/geometry/fidl",
-    "//garnet/public/lib/ui/input/fidl",
-    "//garnet/public/lib/ui/input/cpp",
-    "//garnet/public/lib/ui/scenic/fidl",
     "//garnet/public/lib/ui/views/fidl",
-    "//garnet/public/lib/fidl/cpp/bindings",
-    "//garnet/public/lib/fonts/fidl",
-    "//garnet/public/lib/fxl",
-    "//garnet/public/lib/fsl",
     "//peridot/public/lib/component/fidl",
+    "//peridot/public/lib/ledger/fidl",
     "//peridot/public/lib/lifecycle/fidl",
     "//peridot/public/lib/module/fidl",
     "//peridot/public/lib/story/fidl",
@@ -59,7 +59,9 @@ package("moterm") {
   app = true
   system_image = true
 
-  deps = [ ":bin" ]
+  deps = [
+    ":bin",
+  ]
 
   binaries = [ {
         name = "moterm"

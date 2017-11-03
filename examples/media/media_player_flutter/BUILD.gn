@@ -9,15 +9,15 @@ flutter_app("media_player_flutter") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/media/flutter",
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/story/fidl:fidl_dart",
-    "//topaz/public/lib/ui/flutter",
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//topaz/public/lib/fidl/dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/media/flutter",
+    "//topaz/public/lib/ui/flutter",
   ]
 }
 
@@ -27,7 +27,9 @@ package("package") {
 
   package_name = "media_player_flutter"
 
-  deps = [ ":media_player_flutter" ]
+  deps = [
+    ":media_player_flutter",
+  ]
 
   binaries = [ {
         name = "media_player_flutter"
