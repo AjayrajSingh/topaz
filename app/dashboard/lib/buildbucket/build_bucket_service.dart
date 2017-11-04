@@ -7,8 +7,8 @@ import 'dart:async';
 import 'package:buildbucket/buildbucket.dart';
 import 'package:http/http.dart' as http;
 
-import '../service/build_info.dart';
-import '../service/build_service.dart';
+import 'package:dashboard/service/build_info.dart';
+import 'package:dashboard/service/build_service.dart';
 
 /// A [BuildService] implementation that fetches info from the build_bucket api.
 class BuildBucketService implements BuildService {

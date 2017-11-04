@@ -6,6 +6,7 @@ import("//packages/package.gni")
 import("//third_party/flutter/build/flutter_app.gni")
 
 flutter_app("dashboard_app") {
+  package_name = "dashboard"
   output_name = "dashboard"
   main_dart = "lib/main.dart"
 

@@ -15,7 +15,7 @@ void main() {
 
     ApiCommonBuildMessage buildInfoResponse =
         new ApiCommonBuildMessage.fromJson(<String, Object>{
-      'bucket': 'luci.fuchsia.try',
+      'bucket': 'luci.fuchsia.continuous',
       'status': 'COMPLETE',
       'result': 'SUCCESS',
       'tags': const <String>[
@@ -32,7 +32,7 @@ void main() {
     test('getBucketByName should fetch build info based on the given name',
         () async {
       when(mockApi.search(
-        bucket: const <String>['luci.fuchsia.continuous', 'luci.fuchsia.try'],
+        bucket: const <String>['luci.fuchsia.continuous'],
         status: 'COMPLETED',
         tag: <String>['builder:$buildName'],
       )).thenReturn(new Future<ApiSearchResponseMessage>.value(
@@ -41,7 +41,7 @@ void main() {
 
       final BuildInfo info = await service.getBuildByName(buildName).first;
 
-      expect(info.bucket, 'luci.fuchsia.try');
+      expect(info.bucket, 'luci.fuchsia.continuous');
       expect(info.status, 'COMPLETE');
       expect(info.result, 'SUCCESS');
       expect(info.name, 'fuchsia-x86_64-linux-release');
@@ -52,7 +52,7 @@ void main() {
     test('getBuildsByname should fetch build info based on the given names',
         () async {
       when(mockApi.search(
-        bucket: const <String>['luci.fuchsia.continuous', 'luci.fuchsia.try'],
+        bucket: const <String>['luci.fuchsia.continuous'],
         status: 'COMPLETED',
         tag: <String>['builder:$buildName'],
       )).thenReturn(new Future<ApiSearchResponseMessage>.value(
@@ -63,7 +63,7 @@ void main() {
           await service.getBuildsByName(<String>[buildName]).first;
       final BuildInfo info = results.single;
 
-      expect(info.bucket, 'luci.fuchsia.try');
+      expect(info.bucket, 'luci.fuchsia.continuous');
       expect(info.status, 'COMPLETE');
       expect(info.result, 'SUCCESS');
       expect(info.name, 'fuchsia-x86_64-linux-release');

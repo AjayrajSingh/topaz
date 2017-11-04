@@ -20,8 +20,8 @@ import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
-import 'build_status_model.dart';
-import 'chatter.dart';
+import 'package:dashboard/build_status_model.dart';
+import 'package:dashboard/chatter.dart';
 
 /// Manages the framework FIDL services for this module.
 class DashboardModuleModel extends ModuleModel implements TickerProvider {

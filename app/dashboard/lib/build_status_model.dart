@@ -6,8 +6,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/modular.dart';
-import 'service/build_info.dart';
-import 'service/build_service.dart';
+import 'package:dashboard/service/build_info.dart';
+import 'package:dashboard/service/build_service.dart';
 
 /// Indicates the last known status of a particular build.
 enum BuildStatus {

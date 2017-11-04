@@ -10,7 +10,7 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:intl/intl.dart';
 
-import 'dashboard_module_model.dart';
+import 'package:dashboard/dashboard_module_model.dart';
 
 const double _kFontSize = 20.0;
 

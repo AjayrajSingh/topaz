@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
-import 'build_status_model.dart';
-import 'info_text.dart' show toConciseString;
+import 'package:dashboard/build_status_model.dart';
+import 'package:dashboard/info_text.dart' show toConciseString;
 
 /// Displays a build status using its ancestor [BuildStatusModel].
 class BuildStatusWidget extends StatefulWidget {

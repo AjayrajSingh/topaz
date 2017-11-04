@@ -7,10 +7,10 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
-import 'build_status_model.dart';
-import 'dashboard_app.dart';
-import 'dashboard_module_model.dart';
-import 'service/build_service.dart';
+import 'package:dashboard/build_status_model.dart';
+import 'package:dashboard/dashboard_app.dart';
+import 'package:dashboard/dashboard_module_model.dart';
+import 'package:dashboard/service/build_service.dart';
 
 const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   const <List<String>>[

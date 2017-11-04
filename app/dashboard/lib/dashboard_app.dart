@@ -5,10 +5,10 @@
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'build_status_model.dart';
-import 'build_status_widget.dart';
-import 'dashboard_module_model.dart';
-import 'info_text.dart';
+import 'package:dashboard/build_status_model.dart';
+import 'package:dashboard/build_status_widget.dart';
+import 'package:dashboard/dashboard_module_model.dart';
+import 'package:dashboard/info_text.dart';
 
 const double _kSpaceBetween = 4.0;
 
