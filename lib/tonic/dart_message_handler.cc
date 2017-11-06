@@ -70,8 +70,8 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
         return;
       }
       Dart_SetPausedOnStart(false);
-      // We've resumed, handle *all* normal messages that are in the queue.
-      result = Dart_HandleMessages();
+      // We've resumed, handle normal messages that are in the queue.
+      result = Dart_HandleMessage();
       error = LogIfError(result);
     }
   } else if (Dart_IsPausedOnExit()) {
@@ -86,7 +86,7 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
     }
   } else {
     // We are processing messages normally.
-    result = Dart_HandleMessages();
+    result = Dart_HandleMessage();
     // If the Dart program has set a return code, then it is intending to shut
     // down by way of a fatal error, and so there is no need to emit a log
     // message.
