@@ -5,6 +5,8 @@
 import 'dart:fuchsia';
 import 'dart:zircon';
 
+// ignore_for_file: public_member_api_docs
+
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.app.fidl/application_environment.fidl.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
@@ -48,8 +50,8 @@ class ApplicationContext {
   }
 }
 
-void connectToService(
-    ServiceProvider serviceProvider, ProxyController controller) {
+void connectToService<T>(
+    ServiceProvider serviceProvider, ProxyController<T> controller) {
   final String serviceName = controller.serviceName;
   assert(serviceName != null,
       'controller.serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
@@ -57,16 +59,16 @@ void connectToService(
       serviceName, controller.request().passChannel());
 }
 
-InterfaceHandle connectToServiceByName(
+InterfaceHandle<T> connectToServiceByName<T>(
     ServiceProvider serviceProvider, String serviceName) {
   final ChannelPair pair = new ChannelPair();
   serviceProvider.connectToService(serviceName, pair.first);
-  return new InterfaceHandle(pair.second, 0);
+  return new InterfaceHandle<T>(pair.second, 0);
 }
 
 typedef void ServiceConnector<T>(InterfaceRequest<T> request);
-typedef void DefaultServiceConnector(
-    String serviceName, InterfaceRequest request);
+typedef void DefaultServiceConnector<T>(
+    String serviceName, InterfaceRequest<T> request);
 
 class ServiceProviderImpl extends ServiceProvider {
   final ServiceProviderBinding _binding = new ServiceProviderBinding();
@@ -79,10 +81,10 @@ class ServiceProviderImpl extends ServiceProvider {
     _binding.close();
   }
 
-  DefaultServiceConnector defaultConnector;
+  DefaultServiceConnector<dynamic> defaultConnector;
 
-  final Map<String, ServiceConnector> _connectors =
-      new Map<String, ServiceConnector>();
+  final Map<String, ServiceConnector<dynamic>> _connectors =
+      <String, ServiceConnector<dynamic>>{};
 
   void addServiceForName<T>(ServiceConnector<T> connector, String serviceName) {
     _connectors[serviceName] = connector;
@@ -90,11 +92,11 @@ class ServiceProviderImpl extends ServiceProvider {
 
   @override
   void connectToService(String serviceName, Channel channel) {
-    final ServiceConnector connector = _connectors[serviceName];
+    final ServiceConnector<dynamic> connector = _connectors[serviceName];
     if (connector != null) {
-      connector(new InterfaceRequest(channel));
+      connector(new InterfaceRequest<dynamic>(channel));
     } else if (defaultConnector != null) {
-      defaultConnector(serviceName, new InterfaceRequest(channel));
+      defaultConnector(serviceName, new InterfaceRequest<dynamic>(channel));
     } else {
       channel.close();
     }

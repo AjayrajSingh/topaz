@@ -23,6 +23,8 @@ import 'package:lib.fidl.dart/bindings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+// ignore_for_file: public_member_api_docs
+
 /// The context topic for "focal entities".
 const String _kFocalEntitiesTopic = 'inferred/focal_entities';
 
@@ -50,17 +52,17 @@ class ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onContextUpdate(ContextUpdate result) async {
-    if (result.values[_kFocalEntitiesTopic].length == 0) {
+    if (result.values[_kFocalEntitiesTopic].isEmpty) {
       return;
     }
 
-    String outputText = "";
+    String outputText = '';
     int lastEnd = 0;
     final String allControllerText = _controller.text;
     // Without this, selection might be overwritten.
     final TextSelection oldSelection = _controller.selection;
     for (ContextValue value in result.values[_kFocalEntitiesTopic]) {
-      final content = JSON.decode(value.content);
+      final dynamic content = JSON.decode(value.content);
       // TODO(thatguy): Give the Entity a type instead of this ad-hoc schema
       // checking. Then use that type in the ContextQuery below.
       if (!(content is Map<String, dynamic>) &&
@@ -68,13 +70,14 @@ class ContextListenerImpl extends ContextListener {
           content.containsKey('end')) {
         final int start = content['start'];
         final int end = content['end'];
-        outputText += allControllerText.substring(lastEnd, start).toLowerCase();
-        outputText += allControllerText.substring(start, end).toUpperCase();
+        outputText = '$outputText'
+            '${allControllerText.substring(lastEnd, start).toLowerCase()}'
+            '${allControllerText.substring(start, end).toUpperCase()}';
         lastEnd = end;
       }
     }
-    outputText +=
-        allControllerText.substring(lastEnd, allControllerText.length);
+    outputText = '$outputText'
+        '${allControllerText.substring(lastEnd, allControllerText.length)}';
     if (outputText.length != allControllerText.length) {
       _log('LENGTH MISMATCH');
     } else {
@@ -122,25 +125,26 @@ class ModuleImpl implements Module, Lifecycle {
     // collected before the pipe is properly closed or unbound, the app will
     // crash due to the leaked handle.
     _moduleContext.ctrl.bind(moduleContextHandle);
-    _moduleContext.getLink(null, _link.ctrl.request());
-
-    // Do something with the story and link services.
     _moduleContext
-        .getIntelligenceServices(_intelligenceServices.ctrl.request());
-    _intelligenceServices.getContextWriter(_writer.ctrl.request());
+      ..getLink(null, _link.ctrl.request())
 
-    // Listen to updates from the context service.
-    _intelligenceServices.getContextReader(_contextReader.ctrl.request());
+      // Do something with the story and link services.
+      ..getIntelligenceServices(_intelligenceServices.ctrl.request());
+    _intelligenceServices
+      ..getContextWriter(_writer.ctrl.request())
+
+      // Listen to updates from the context service.
+      ..getContextReader(_contextReader.ctrl.request());
     _contextListenerImpl = new ContextListenerImpl();
 
-    ContextSelector selector = new ContextSelector();
-    selector.type = ContextValueType.entity;
-    selector.meta = new ContextMetadata();
-    selector.meta.story = new StoryMetadata();
-    selector.meta.story.focused = new FocusedState();
-    selector.meta.story.focused.state = FocusedStateState.focused;
-    selector.meta.entity = new EntityMetadata();
-    selector.meta.entity.topic = _kFocalEntitiesTopic;
+    ContextSelector selector = new ContextSelector()
+      ..type = ContextValueType.entity
+      ..meta = new ContextMetadata()
+      ..meta.story = new StoryMetadata()
+      ..meta.story.focused = new FocusedState()
+      ..meta.story.focused.state = FocusedStateState.focused
+      ..meta.entity = new EntityMetadata()
+      ..meta.entity.topic = _kFocalEntitiesTopic;
     ContextQuery query = new ContextQuery();
     query.selector[_kFocalEntitiesTopic] = selector;
 
@@ -195,14 +199,14 @@ void main() {
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices
     ..addServiceForName(
-      (request) {
+      (InterfaceRequest<Module> request) {
         _log('Received binding request for Module');
         _module.bindModule(request);
       },
       Module.serviceName,
     )
     ..addServiceForName(
-      (request) {
+      (InterfaceRequest<Lifecycle> request) {
         _module.bindLifecycle(request);
       },
       Lifecycle.serviceName,
@@ -212,21 +216,22 @@ void main() {
     String currentText = _controller.text;
     int selectionStart = _controller.selection.start;
     int selectionEnd = _controller.selection.end;
-    _module.publishText(currentText);
-    _module.publishSelection(selectionStart, selectionEnd);
+    _module
+      ..publishText(currentText)
+      ..publishSelection(selectionStart, selectionEnd);
   });
 
   runApp(new MaterialApp(
-    title: "Basic Text Reporter",
+    title: 'Basic Text Reporter',
     home: new Scaffold(
       appBar: new AppBar(
-        title: new Text("Basic Text Reporter"),
+        title: const Text('Basic Text Reporter'),
       ),
       body: new Container(
         child: new TextField(
           controller: _controller,
-          decoration: new InputDecoration(
-              hintText: 'Type something, selectable entities will become' +
+          decoration: const InputDecoration(
+              hintText: 'Type something, selectable entities will become'
                   ' ALL CAPS'),
         ),
       ),

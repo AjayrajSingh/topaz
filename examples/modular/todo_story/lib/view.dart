@@ -5,12 +5,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import "./data.dart";
-import "./generator.dart";
+import 'data.dart';
+import 'generator.dart';
+
+// ignore_for_file: public_member_api_docs
 
 /// Widget representing a list of [TodoItem]s.
 class TodoListView extends StatefulWidget {
-  TodoListView(this._linkConnector);
+  const TodoListView(this._linkConnector);
 
   final LinkConnector _linkConnector;
 
@@ -21,14 +23,15 @@ class TodoListView extends StatefulWidget {
 class TodoListViewState extends State<TodoListView> {
   final LinkConnector _linkConnector;
   final Generator _generator = new Generator();
-  final List<TodoItem> _items = new List<TodoItem>();
+  final List<TodoItem> _items = <TodoItem>[];
   final TextEditingController _newTodoController = new TextEditingController();
 
   TodoListViewState(this._linkConnector) {
     _linkConnector.setCallback((List<TodoItem> items) {
       setState(() {
-        _items.clear();
-        _items.addAll(items);
+        _items
+          ..clear()
+          ..addAll(items);
       });
     });
   }
@@ -63,7 +66,7 @@ class TodoListViewState extends State<TodoListView> {
                 ),
                 onSubmitted: _handleTodoCreated)),
         new Container(
-            margin: new EdgeInsets.symmetric(horizontal: 4.0),
+            margin: const EdgeInsets.symmetric(horizontal: 4.0),
             child: new AnimatedBuilder(
                 animation: _newTodoController,
                 builder: (BuildContext context, Widget child) {
@@ -79,32 +82,37 @@ class TodoListViewState extends State<TodoListView> {
       ]),
       new RaisedButton(
           onPressed: _handleGenerateRandomTodo,
-          child: new Text("Generate random TODO"))
+          child: const Text('Generate random TODO'))
     ]);
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: new AppBar(title: new Text('Todo Example (story)')),
+        appBar: new AppBar(title: const Text('Todo Example (story)')),
         body: new Container(
             child: new Column(children: <Widget>[
           new Flexible(
               child: new ListView(
                   shrinkWrap: true,
-                  children: _items.map((TodoItem item) {
-                    return new LongPressDraggable(
-                        child: new TodoItemView(
-                            item: item,
-                            onItemDeleted: _handleItemRemoved,
-                            onDrop: _linkConnector.reorderItems),
-                        data: item,
-                        feedback: new Card(
-                            child: new SizedBox(
-                                height: 32.0,
-                                width: 512.0,
-                                child: new TodoItemView(item: item))));
-                  }).toList())),
+                  children: _items
+                      .map(
+                        (TodoItem item) => new LongPressDraggable<TodoItem>(
+                              child: new TodoItemView(
+                                  item: item,
+                                  onItemDeleted: _handleItemRemoved,
+                                  onDrop: _linkConnector.reorderItems),
+                              data: item,
+                              feedback: new Card(
+                                child: new SizedBox(
+                                  height: 32.0,
+                                  width: 512.0,
+                                  child: new TodoItemView(item: item),
+                                ),
+                              ),
+                            ),
+                      )
+                      .toList())),
           _buildTextComposer()
         ])));
   }
@@ -129,9 +137,9 @@ class TodoItemView extends StatelessWidget {
         onAccept: _onAcceptDrop,
         builder: (BuildContext context, List<TodoItem> data,
             List<dynamic> rejectedData) {
-          List<ListTile> itemWidgets = new List.from(
-              data.map((TodoItem item) => _itemToWidget(context, item)));
-          itemWidgets.add(_itemToWidget(context, _item));
+          List<ListTile> itemWidgets = new List<ListTile>.from(
+              data.map((TodoItem item) => _itemToWidget(context, item)))
+            ..add(_itemToWidget(context, _item));
           return new Column(children: itemWidgets);
         });
   }

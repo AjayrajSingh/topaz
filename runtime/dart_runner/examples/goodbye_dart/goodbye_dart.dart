@@ -5,12 +5,12 @@
 import 'dart:async';
 import 'dart:fuchsia' as fuchsia;
 
-Timer timer;
+Timer _timer;
 
-void main(List args) {
+void main(List<String> args) {
   print('Hello, Dart!');
 
-  timer = new Timer(const Duration(seconds: 1), () {
+  _timer = new Timer(const Duration(seconds: 1), () {
     print('Goodbye, Dart!');
     fuchsia.exit(42);
   });

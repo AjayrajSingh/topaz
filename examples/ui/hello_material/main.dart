@@ -5,21 +5,21 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(new MyApp());
+  runApp(new _MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class _MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
       title: 'Hello Material',
-      home: new MyHomePage(title: 'Home Page'),
+      home: const _MyHomePage(title: 'Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class _MyHomePage extends StatefulWidget {
+  const _MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -27,7 +27,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<_MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() {

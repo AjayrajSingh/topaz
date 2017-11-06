@@ -5,7 +5,7 @@
 /// Decomposes a URI into base components for evaluation by Resolver and
 /// modules.
 Map<String, dynamic> decomposeUri(final Uri uri) {
-  return {
+  return <String, dynamic>{
     'uri': uri.toString(),
     'scheme': uri.scheme,
     'host': uri.host,

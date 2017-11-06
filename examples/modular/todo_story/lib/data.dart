@@ -8,6 +8,8 @@ import 'dart:convert';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
+// ignore_for_file: public_member_api_docs
+
 void _log(String msg) {
   print('[Todo Story Example] $msg');
 }
@@ -49,41 +51,39 @@ class LinkConnector extends LinkWatcher {
   /// [callback] will be immediately called with the current state of the todo
   /// list.
   void setCallback(LinkConnectorCallback callback) {
-    this._callback = callback;
-    Timer.run(() {
-      _callCallback();
-    });
+    _callback = callback;
+    Timer.run(_callCallback);
   }
 
-  Future _setup() async {
+  Future<Null> _setup() async {
     LinkProxy link = await _link;
     // ignore: unawaited_futures
     link.ctrl.error.then((ProxyError error) {
-      _log("Error on link " + error.toString());
+      _log('Error on link: $error');
     });
     link.watchAll(_binding.wrap(this));
   }
 
   @override
   void notify(String json) {
-    _log("Received " + json);
+    _log('Received $json');
     _parse(json);
   }
 
-  Future _parse(String json) async {
+  Future<Null> _parse(String json) async {
     final dynamic decoded = JSON.decode(json);
     if (decoded == null) {
       _items = <TodoItem>[];
       _callCallback();
       return;
     }
-    if (decoded is! Map || decoded["items"] is! List) {
-      _log("decoded is not of the right type");
+    if (decoded is! Map || decoded['items'] is! List) {
+      _log('decoded is not of the right type');
       return;
     }
     _items = <TodoItem>[];
-    for (int i = 0; i < decoded["items"].length; i++) {
-      _items.add(new TodoItem(text: decoded["items"][i], position: i));
+    for (int i = 0; i < decoded['items'].length; i++) {
+      _items.add(new TodoItem(text: decoded['items'][i], position: i));
     }
     _callCallback();
   }
@@ -96,7 +96,7 @@ class LinkConnector extends LinkWatcher {
 
   /// Adds a new todo item with the provided text at the end of the current
   /// list.
-  Future addItem(String text) async {
+  Future<Null> addItem(String text) async {
     int position = _items.length;
     TodoItem item = new TodoItem(text: text, position: position);
     _items.add(item);
@@ -104,24 +104,25 @@ class LinkConnector extends LinkWatcher {
   }
 
   /// Removes the provided [TodoItem] from the current list.
-  Future removeItem(TodoItem item) async {
-    _log("Deleting item " + item.text);
+  Future<Null> removeItem(TodoItem item) async {
+    _log('Deleting item ${item.text}');
     _items.removeAt(item.position);
     return _setLink();
   }
 
   /// Places [item] at the [position] index within the todo list.
-  Future reorderItems(TodoItem item, int position) async {
-    _log("Insert " + item.text + " at position " + position.toString());
-    _items.removeAt(item.position);
-    _items.insert(position, new TodoItem(text: item.text, position: position));
+  Future<Null> reorderItems(TodoItem item, int position) async {
+    _log('Insert ${item.text} at position $position');
+    _items
+      ..removeAt(item.position)
+      ..insert(position, new TodoItem(text: item.text, position: position));
     return _setLink();
   }
 
-  Future _setLink() async {
+  Future<Null> _setLink() async {
     // This implementation can lose data because the Link needs an interface to
     // reconcile conflicts.
-    (await _link).set(["items"],
+    (await _link).set(<String>['items'],
         JSON.encode(_items.map((TodoItem item) => item.text).toList()));
   }
 }

@@ -15,8 +15,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
-import "./data.dart";
-import "./view.dart";
+import 'data.dart';
+import 'view.dart';
+
+// ignore_for_file: public_member_api_docs
 
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
@@ -54,9 +56,9 @@ class TodoModule implements Module, Lifecycle {
     _log('TodoModule::initialize()');
 
     LinkProxy link = new LinkProxy();
-    ModuleContextProxy moduleContext = new ModuleContextProxy()
-      ..ctrl.bind(moduleContextHandle);
-    moduleContext.getLink(null, link.ctrl.request());
+    new ModuleContextProxy()
+      ..ctrl.bind(moduleContextHandle)
+      ..getLink(null, link.ctrl.request());
     _linkCompleter.complete(link);
   }
 
@@ -73,20 +75,18 @@ class TodoModule implements Module, Lifecycle {
 void main() {
   _log('Module started with ApplicationContext: $_appContext');
 
-  final module = new TodoModule();
+  final TodoModule module = new TodoModule();
 
   _appContext.outgoingServices
     ..addServiceForName(
-      (request) {
+      (InterfaceRequest<Module> request) {
         _log('Received binding request for Module');
         module.bindModule(request);
       },
       Module.serviceName,
     )
     ..addServiceForName(
-      (request) {
-        module.bindLifecycle(request);
-      },
+      module.bindLifecycle,
       Lifecycle.serviceName,
     );
 

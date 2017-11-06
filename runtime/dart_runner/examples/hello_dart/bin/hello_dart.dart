@@ -4,6 +4,6 @@
 
 import 'package:topaz.runtime.dart_runner.examples.greeting/greeting.dart';
 
-void main(List args) {
-  print(greeting() + ', Dart!');
+void main(List<String> args) {
+  print('${greeting()}, Dart!');
 }
