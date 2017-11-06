@@ -1,0 +1,62 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//packages/package.gni")
+import("//topaz/runtime/dart_runner/dart_app.gni")
+
+dart_app("ledger_dashboard_dart") {
+  output_name = "ledger_dashboard.dartx"
+
+  main_dart = "main.dart"
+
+  source_dir = "."
+
+  deps = [
+    "//peridot/public/lib/lifecycle/fidl:fidl_dart",
+    "//third_party/dart-pkg/pub/http",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/context/dart",
+    "//topaz/public/lib/fidl/dart",
+  ]
+}
+
+package("ledger_dashboard") {
+  app = true
+  system_image = true
+
+  deps = [
+    ":ledger_dashboard_dart",
+  ]
+
+  binaries = [ {
+        name = "ledger_dashboard.dartx"
+        dest = "ledger_dashboard.dartx"
+      } ]
+
+  resources = [
+    {
+      path =
+          rebase_path("//topaz/app/ledger/ledger_dashboard/webroot/index.html")
+      dest = "ledger_dashboard/webroot/index.html"
+    },
+    {
+      path = rebase_path(
+              "//topaz/app/ledger/ledger_dashboard/webroot/dashboard.js")
+      dest = "ledger_dashboard/webroot/dashboard.js"
+    },
+    {
+      path = rebase_path(
+              "//topaz/app/ledger/ledger_dashboard/webroot/dashboard.css")
+      dest = "ledger_dashboard/webroot/dashboard.css"
+    },
+    {
+      path = rebase_path("//topaz/app/ledger/ledger_dashboard/webroot/logo.png")
+      dest = "ledger_dashboard/webroot/logo.png"
+    },
+    {
+      path = rebase_path("//topaz/app/ledger/ledger_dashboard/dashboard.config")
+      dest = "ledger_dashboard/dashboard.config"
+    },
+  ]
+}

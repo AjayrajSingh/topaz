@@ -1,0 +1,30 @@
+:root {
+  --mdc-theme-primary: #00AAC0;
+}
+
+body {
+  background-color: #EEEEEE;
+  display: block;
+  margin: 0px;
+}
+
+.mdc-card {
+  background-color: white;
+}
+
+.mdc-tab-bar {
+  padding-left: 24px;
+}
+
+.overview-header-card {
+  grid-column-end: span 12;
+}
+
+.panel {
+  display: none;
+  padding: 24px;
+}
+
+.panel.active {
+  display: block;
+}

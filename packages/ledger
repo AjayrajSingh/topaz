@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "packages": {
+        "ledger_dashboard": "//topaz/app/ledger/ledger_dashboard"
+    }
+}
