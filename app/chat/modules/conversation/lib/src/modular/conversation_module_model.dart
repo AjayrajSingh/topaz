@@ -7,7 +7,6 @@ import 'dart:convert' show BASE64, JSON;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:config/config.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -145,6 +144,11 @@ class ChatConversationModuleModel extends ModuleModel {
   /// scroll position when a new message is added.
   ScrollController get scrollController => _scrollController;
 
+  /// Completer for the content provider url provided by the Link. This must be
+  /// completed when onNotify() is called for the first time.
+  final Completer<String> _contentProviderUrlCompleter =
+      new Completer<String>();
+
   @override
   Future<Null> onReady(
     ModuleContext moduleContext,
@@ -155,10 +159,11 @@ class ChatConversationModuleModel extends ModuleModel {
 
     log.fine('ModuleModel::onReady call.');
 
-    // Obtain the chat content provider url from the config.
-    Config config = await Config.read('/system/data/modules/config.json');
-    String contentProviderUrl =
-        config.get('chat_content_provider_url') ?? _kChatContentProviderUrl;
+    // Obtain the chat content provider url by reading the url from the Link. If
+    // the initial onNotify() call doesn't contain the url, use the default chat
+    // content provider.
+    String contentProviderUrl = await _contentProviderUrlCompleter.future;
+    contentProviderUrl ??= _kChatContentProviderUrl;
 
     // Obtain the component context.
     ComponentContextProxy componentContext = new ComponentContextProxy();
@@ -492,11 +497,28 @@ class ChatConversationModuleModel extends ModuleModel {
 
   @override
   Future<Null> onNotify(String json) async {
+    Object decodedJson = JSON.decode(json);
+
+    // See if the content provider url is provided. This must be done only once,
+    // when the Link notification is provided for the first time.
+    if (!_contentProviderUrlCompleter.isCompleted) {
+      String contentProviderUrl;
+      if (decodedJson is Map) {
+        contentProviderUrl = decodedJson['content_provider_url'];
+      }
+      _contentProviderUrlCompleter.complete(contentProviderUrl);
+    }
+
+    List<int> conversationId;
+    if (decodedJson is Map && decodedJson['conversation_id'] is List<int>) {
+      conversationId = decodedJson['conversation_id'];
+    }
+
     // The conversation ID must be set after the module model initialization is
     // finished.
     await _readyCompleter.future;
 
-    _setConversationId(JSON.decode(json));
+    _setConversationId(conversationId);
   }
 
   /// Start or focus the gallery module on the right side.

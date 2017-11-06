@@ -9,7 +9,6 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:config/config.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -85,7 +84,7 @@ class ChatConversationListModuleModel extends ModuleModel {
 
       // Set the value to Link.
       if (updateLink) {
-        link.set(null, JSON.encode(id));
+        link.set(const <String>['conversation_id'], JSON.encode(id));
       }
 
       notifyListeners();
@@ -141,6 +140,11 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   Uint8List _lastCreatedConversationId;
 
+  /// Completer for the content provider url provided by the Link. This must be
+  /// completed when onNotify() is called for the first time.
+  final Completer<String> _contentProviderUrlCompleter =
+      new Completer<String>();
+
   @override
   Future<Null> onReady(
     ModuleContext moduleContext,
@@ -153,10 +157,11 @@ class ChatConversationListModuleModel extends ModuleModel {
     // Start the chat conversation module.
     _startConversationModule();
 
-    // Obtain the chat content provider url from the config.
-    Config config = await Config.read('/system/data/modules/config.json');
-    String contentProviderUrl =
-        config.get('chat_content_provider_url') ?? _kChatContentProviderUrl;
+    // Obtain the chat content provider url by reading the url from the Link. If
+    // the initial onNotify() call doesn't contain the url, use the default chat
+    // content provider.
+    String contentProviderUrl = await _contentProviderUrlCompleter.future;
+    contentProviderUrl ??= _kChatContentProviderUrl;
 
     // Obtain the component context.
     ComponentContextProxy componentContext = new ComponentContextProxy();
@@ -389,7 +394,24 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   @override
   void onNotify(String json) {
-    setConversationId(JSON.decode(json), updateLink: false);
+    Object decodedJson = JSON.decode(json);
+
+    // See if the content provider url is provided. This must be done only once,
+    // when the Link notification is provided for the first time.
+    if (!_contentProviderUrlCompleter.isCompleted) {
+      String contentProviderUrl;
+      if (decodedJson is Map) {
+        contentProviderUrl = decodedJson['content_provider_url'];
+      }
+      _contentProviderUrlCompleter.complete(contentProviderUrl);
+    }
+
+    List<int> conversationId;
+    if (decodedJson is Map && decodedJson['conversation_id'] is List<int>) {
+      conversationId = decodedJson['conversation_id'];
+    }
+
+    setConversationId(conversationId, updateLink: false);
   }
 
   /// Shows the new conversation form.

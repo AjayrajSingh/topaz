@@ -18,7 +18,6 @@ flutter_app("chat_conversation") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart/third_party/pkg/intl",
     "//topaz/app/chat/services:services_dart",
-    "//topaz/public/dart/config",
     "//topaz/public/dart/fixtures",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
