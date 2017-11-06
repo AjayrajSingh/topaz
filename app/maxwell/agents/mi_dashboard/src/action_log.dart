@@ -11,12 +11,14 @@ import 'package:lib.action_log.fidl/user.fidl.dart';
 
 import 'data_handler.dart';
 
+// ignore_for_file: public_member_api_docs
+
 class ActionLogDataHandler extends ActionLogListener with DataHandler {
   @override
-  String get name => "action_log";
+  String get name => 'action_log';
 
   // cache for current context state
-  final _actionLogCache = new List<UserAction>();
+  final List<UserAction> _actionLogCache = <UserAction>[];
 
   // connection to ActionLog
   UserActionLogProxy _actionLog;
@@ -26,7 +28,7 @@ class ActionLogDataHandler extends ActionLogListener with DataHandler {
 
   @override
   void init(ApplicationContext appContext, SendWebSocketMessage sender) {
-    this._sendMessage = sender;
+    _sendMessage = sender;
 
     // Connect to the ActionLog
     _actionLog = new UserActionLogProxy();
@@ -41,7 +43,7 @@ class ActionLogDataHandler extends ActionLogListener with DataHandler {
   @override
   bool handleRequest(String requestString, HttpRequest request) {
     // /data/action_log/all returns all of the actions in the log
-    if (requestString == "/all") {
+    if (requestString == '/all') {
       request.response.write(JSON.encode(_actionLogCache));
       request.response.close();
       return true;
@@ -52,13 +54,15 @@ class ActionLogDataHandler extends ActionLogListener with DataHandler {
   @override
   void handleNewWebSocket(WebSocket socket) {
     // send all cached data to the socket
-    String message = JSON.encode({"action_log.all": _actionLogCache});
+    String message =
+        JSON.encode(<String, dynamic>{'action_log.all': _actionLogCache});
     socket.add(message);
   }
 
   @override
   void onAction(UserAction action) {
     _actionLogCache.add(action);
-    this._sendMessage(JSON.encode({"action_log.new_action": action.toJson()}));
+    _sendMessage(JSON
+        .encode(<String, dynamic>{'action_log.new_action': action.toJson()}));
   }
 }

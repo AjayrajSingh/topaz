@@ -13,6 +13,8 @@ import 'package:lib.ui.input.fidl/input_events.fidl.dart';
 import 'package:lib.ui.input.fidl/text_editing.fidl.dart';
 import 'package:lib.ui.input.fidl/text_input.fidl.dart';
 
+// ignore_for_file: public_member_api_docs
+
 /// The current editor is a global, corresponding to the most recent one
 /// connected.
 _EditSession _currentSession;
@@ -53,7 +55,7 @@ class _EditSession {
 
   bool onEvent(InputEvent event) {
     if (event.tag == InputEventTag.keyboard) {
-      final kbEvent = event.keyboard;
+      final KeyboardEvent kbEvent = event.keyboard;
       if (kbEvent.phase == KeyboardEventPhase.pressed &&
           kbEvent.codePoint != 0) {
         // TODO: handle combining characters
@@ -136,18 +138,18 @@ class ImeServiceImpl extends ImeService {
     // Shut down the old session; we only have one active at a time.
     _currentSession?.close();
 
-    _EditSession session = new _EditSession(initialState);
-    session.init(client);
+    _EditSession session = new _EditSession(initialState)..init(client);
     // ignore: unused_local_variable
     InputMethodEditorImpl imeImpl = new InputMethodEditorImpl(session);
     _currentSession = session;
   }
 }
 
-void main(List args) {
+void main(List<String> args) {
   ApplicationContext context = new ApplicationContext.fromStartupInfo();
 
-  context.outgoingServices.addServiceForName((request) {
-    new ImeServiceImpl().bind(request);
-  }, ImeService.serviceName);
+  context.outgoingServices.addServiceForName(
+    new ImeServiceImpl().bind,
+    ImeService.serviceName,
+  );
 }

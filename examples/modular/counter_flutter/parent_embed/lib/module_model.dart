@@ -57,8 +57,9 @@ class CounterParentModuleModel extends ModuleModel {
     notifyListeners();
   }
 
-  /// The [ChildViewConnection] that holds the [ViewOwner] of the child module.
   ChildViewConnection _connection;
+
+  /// The [ChildViewConnection] that holds the [ViewOwner] of the child module.
   ChildViewConnection get connection => _connection;
 
   final ModuleControllerProxy _childController = new ModuleControllerProxy();

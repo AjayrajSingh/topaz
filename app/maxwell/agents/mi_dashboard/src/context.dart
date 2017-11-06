@@ -11,25 +11,31 @@ import 'package:lib.user_intelligence.fidl/scope.fidl.dart';
 
 import 'data_handler.dart';
 
+// ignore_for_file: public_member_api_docs
+
 class ContextDataHandler extends ContextDebugListener with DataHandler {
   @override
-  String get name => "context";
+  String get name => 'context';
 
+  // ignore: avoid_annotating_with_dynamic
   final JsonCodec json = new JsonCodec(toEncodable: (dynamic object) {
     if (object is ComponentScope) {
       switch (object.tag) {
         case ComponentScopeTag.globalScope:
-          return {"type": "global"};
+          return <String, dynamic>{'type': 'global'};
         case ComponentScopeTag.moduleScope:
-          return {
-            "type": "module",
-            "url": object.moduleScope.url,
-            "storyId": object.moduleScope.storyId
+          return <String, dynamic>{
+            'type': 'module',
+            'url': object.moduleScope.url,
+            'storyId': object.moduleScope.storyId
           };
         case ComponentScopeTag.agentScope:
-          return {"type": "agent", "url": object.agentScope.url};
+          return <String, dynamic>{
+            'type': 'agent',
+            'url': object.agentScope.url
+          };
         default:
-          return {"type": "unknown"};
+          return <String, dynamic>{'type': 'unknown'};
       }
     } else {
       return object.toJson();
@@ -37,8 +43,10 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
   });
 
   // cache for current state
-  final Map<String, ContextDebugSubscription> _subscriptionsCache = {};
-  final Map<String, ContextDebugValue> _valuesCache = {};
+  final Map<String, ContextDebugSubscription> _subscriptionsCache =
+      <String, ContextDebugSubscription>{};
+  final Map<String, ContextDebugValue> _valuesCache =
+      <String, ContextDebugValue>{};
 
   // connection to context debug
   ContextDebugListenerBinding _contextDebugListenerBinding;
@@ -47,9 +55,9 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
 
   @override
   void init(ApplicationContext appContext, SendWebSocketMessage sender) {
-    this._sendMessage = sender;
+    _sendMessage = sender;
 
-    final contextDebug = new ContextDebugProxy();
+    final ContextDebugProxy contextDebug = new ContextDebugProxy();
     connectToService(appContext.environmentServices, contextDebug.ctrl);
     assert(contextDebug.ctrl.isBound);
 
@@ -67,35 +75,35 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
   @override
   void handleNewWebSocket(WebSocket socket) {
     // Send all cached context data to the new socket.
-    socket.add(this._encode());
+    socket.add(_encode());
   }
 
   @override
   void onValuesChanged(List<ContextDebugValue> values) {
-    values.forEach((ContextDebugValue update) {
+    for (ContextDebugValue update in values) {
       if (update.value != null) {
         // This is a new value or an update.
-        this._valuesCache[update.id] = update;
+        _valuesCache[update.id] = update;
       } else {
         // This is a removal.
-        this._valuesCache.remove(update.id);
+        _valuesCache.remove(update.id);
       }
-    });
-    this._send();
+    }
+    _send();
   }
 
   @override
   void onSubscriptionsChanged(List<ContextDebugSubscription> subscriptions) {
-    subscriptions.forEach((ContextDebugSubscription update) {
+    for (ContextDebugSubscription update in subscriptions) {
       if (update.query != null) {
         // This is a new subscription.
-        this._subscriptionsCache[update.id] = update;
+        _subscriptionsCache[update.id] = update;
       } else {
         // This is a removal.
-        this._subscriptionsCache.remove(update.id);
+        _subscriptionsCache.remove(update.id);
       }
-    });
-    this._send();
+    }
+    _send();
   }
 
   String _encode() {
@@ -104,14 +112,15 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
     // we'd have to have each new web-socket get its own listener, so that
     // it is sent a complete state snapshot from the ContextEngine when it is
     // initialized in handleNewWebSocket().
-    final String message = json.encode({
-      "context.values": new List.from(_valuesCache.values),
-      "context.subscriptions": new List.from(_subscriptionsCache.values)
+    final String message = json.encode(<String, dynamic>{
+      'context.values': new List<ContextDebugValue>.from(_valuesCache.values),
+      'context.subscriptions':
+          new List<ContextDebugSubscription>.from(_subscriptionsCache.values)
     });
     return message;
   }
 
   void _send() {
-    this._sendMessage(this._encode());
+    _sendMessage(_encode());
   }
 }

@@ -7,40 +7,43 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:lib.app.dart/app.dart';
-
 import 'package:path/path.dart' as path;
 
-import 'src/data_handler.dart';
 import 'src/action_log.dart';
 import 'src/context.dart';
+import 'src/data_handler.dart';
 import 'src/proposal_subscribers.dart';
 
-const _configDir = "/system/data/mi_dashboard";
-const _configFilename = "dashboard.config";
-const _defaultWebrootPath = "webroot";
-const _defaultPort = 4000;
+// ignore_for_file: public_member_api_docs
 
-const _portPropertyName = "port";
-const _webrootPropertyName = "webroot";
+const String _configDir = '/system/data/mi_dashboard';
+const String _configFilename = 'dashboard.config';
+const String _defaultWebrootPath = 'webroot';
+const int _defaultPort = 4000;
+
+const String _portPropertyName = 'port';
+const String _webrootPropertyName = 'webroot';
 
 int _port = _defaultPort;
-var _webrootPath = _defaultWebrootPath;
+String _webrootPath = _defaultWebrootPath;
 Directory _webrootDirectory;
 
-var _activeWebsockets = new List<WebSocket>();
+final List<WebSocket> _activeWebsockets = <WebSocket>[];
 
-final SendWebSocketMessage _sendMessage = (String message) {
+// SendWebSocketMessage type.
+void _sendMessage(String message) {
   if (_activeWebsockets.isNotEmpty) {
-    for (final socket in _activeWebsockets) {
+    for (final WebSocket socket in _activeWebsockets) {
       socket.add(message);
     }
   }
-};
+}
 
-final _dataHandlerMap = new Map<String, DataHandler>();
+final Map<String, DataHandler> _dataHandlerMap = <String, DataHandler>{};
 
-void main(List args) {
-  final appContext = new ApplicationContext.fromStartupInfo();
+void main(List<String> args) {
+  final ApplicationContext appContext =
+      new ApplicationContext.fromStartupInfo();
 
   // Assemble the list of DataHandlers
   addDataHandler(new ActionLogDataHandler());
@@ -48,14 +51,14 @@ void main(List args) {
   addDataHandler(new ProposalSubscribersDataHandler());
 
   // Initialize the DataHandlers
-  _dataHandlerMap.forEach((name, handler) {
+  _dataHandlerMap.forEach((String name, DataHandler handler) {
     handler.init(appContext, _sendMessage);
   });
 
   appContext.close();
 
   // Read the config file from disk
-  var configFile = new File(path.join(_configDir, _configFilename));
+  final File configFile = new File(path.join(_configDir, _configFilename));
   configFile.readAsString(encoding: ASCII).then(parseConfigAndStart);
 }
 
@@ -65,7 +68,7 @@ void addDataHandler(DataHandler handler) {
 
 void parseConfigAndStart(String configString) {
   // parse config file as JSON
-  Map configMap = JSON.decode(configString);
+  Map<String, dynamic> configMap = JSON.decode(configString);
 
   // port property
   if (configMap.containsKey(_portPropertyName))
@@ -77,43 +80,47 @@ void parseConfigAndStart(String configString) {
   _webrootDirectory = new Directory(path.join(_configDir, _webrootPath));
 
   // Start the web server
-  print("[INFO] Starting MI Dashboard web server on port $_port...");
-  HttpServer.bind(InternetAddress.ANY_IP_V6, _port).then((server) {
+  print('[INFO] Starting MI Dashboard web server on port $_port...');
+  HttpServer.bind(InternetAddress.ANY_IP_V6, _port).then((HttpServer server) {
     server.listen(handleRequest);
-  }).catchError((error) {
-    print("[WARN] MI Dashboard bind failed...${error.toString()}");
+  }).catchError((Object error) {
+    print('[WARN] MI Dashboard bind failed...${error.toString()}');
   });
 }
 
 void handleRequest(HttpRequest request) {
   // Identify websocket requests
-  if (request.requestedUri.path.startsWith("/ws")) {
-    WebSocketTransformer.upgrade(request).then((socket) {
+  if (request.requestedUri.path.startsWith('/ws')) {
+    WebSocketTransformer.upgrade(request).then((WebSocket socket) {
       _activeWebsockets.add(socket);
       socket.listen(handleWebsocketRequest, onDone: () {
         handleWebsocketClose(socket);
       });
       // Alert all DataHandlers
-      _dataHandlerMap.forEach((name, handler) {
+      _dataHandlerMap.forEach((String name, DataHandler handler) {
         handler.handleNewWebSocket(socket);
       });
     });
   } else {
     // Identify requests requiring return of context data
     // Such requests will begin with /data/<service>/...
-    var dataRequestPattern = new RegExp("/data/([^/]+)(/.*)");
-    var match = dataRequestPattern.firstMatch(request.requestedUri.path);
+    final RegExp dataRequestPattern = new RegExp('/data/([^/]+)(/.*)');
+    final Match match =
+        dataRequestPattern.firstMatch(request.requestedUri.path);
     if (match != null) {
-      var serviceName = match.group(1); // first match group is the service name
-      // print("Returning data for service ${serviceName}");
+      final String serviceName =
+          match.group(1); // first match group is the service name
+      // print('Returning data for service ${serviceName}');
 
       // we are returning JSON
       request.response.headers.contentType =
-          new ContentType("application", "json", charset: "utf-8");
+          new ContentType('application', 'json', charset: 'utf-8');
 
       // If an appropriate handler can be found, ask it to respond
-      var handler = _dataHandlerMap[serviceName];
-      if (handler?.handleRequest(match.group(2), request) ?? false) return;
+      final DataHandler handler = _dataHandlerMap[serviceName];
+      if (handler?.handleRequest(match.group(2), request) ?? false) {
+        return;
+      }
 
       // Nothing handled the request, so respond with a 404
       send404(request.response);
@@ -121,11 +128,13 @@ void handleRequest(HttpRequest request) {
       // Find the referenced file
       // path.join does not work in this case, possibly because the request path
       // may start with a /, so using a simple string concatenation instead
-      var requestPath =
-          "${_webrootDirectory.path}/${request.requestedUri.path}";
-      if (requestPath.endsWith("/")) requestPath += "index.html";
-      var requestFile = new File(requestPath);
-      requestFile.exists().then((exists) {
+      String requestPath =
+          '${_webrootDirectory.path}/${request.requestedUri.path}';
+      if (requestPath.endsWith('/')) {
+        requestPath = '${requestPath}index.html';
+      }
+      final File requestFile = new File(requestPath);
+      requestFile.exists().then((bool exists) {
         if (exists) {
           // Make sure the referenced file is within the webroot
           if (requestFile.uri.path.startsWith(_webrootDirectory.path)) {
@@ -140,29 +149,29 @@ void handleRequest(HttpRequest request) {
   }
 }
 
-Future sendFile(File requestFile, HttpResponse response) async {
+Future<Null> sendFile(File requestFile, HttpResponse response) async {
   // Set the content type correctly based on the file name suffix
   // The content type is text/plain if the suffix isn't identified
-  if (requestFile.path.endsWith("html")) {
+  if (requestFile.path.endsWith('html')) {
     response.headers.contentType =
-        new ContentType("text", "html", charset: "utf-8");
-  } else if (requestFile.path.endsWith("json")) {
+        new ContentType('text', 'html', charset: 'utf-8');
+  } else if (requestFile.path.endsWith('json')) {
     response.headers.contentType =
-        new ContentType("application", "json", charset: "utf-8");
-  } else if (requestFile.path.endsWith("js")) {
+        new ContentType('application', 'json', charset: 'utf-8');
+  } else if (requestFile.path.endsWith('js')) {
     response.headers.contentType =
-        new ContentType("application", "javascript", charset: "utf-8");
-  } else if (requestFile.path.endsWith("css")) {
+        new ContentType('application', 'javascript', charset: 'utf-8');
+  } else if (requestFile.path.endsWith('css')) {
     response.headers.contentType =
-        new ContentType("text", "css", charset: "utf-8");
-  } else if (requestFile.path.endsWith("jpg") ||
-      requestFile.path.endsWith("jpeg")) {
-    response.headers.contentType = new ContentType("image", "jpeg");
-  } else if (requestFile.path.endsWith("png")) {
-    response.headers.contentType = new ContentType("image", "png");
+        new ContentType('text', 'css', charset: 'utf-8');
+  } else if (requestFile.path.endsWith('jpg') ||
+      requestFile.path.endsWith('jpeg')) {
+    response.headers.contentType = new ContentType('image', 'jpeg');
+  } else if (requestFile.path.endsWith('png')) {
+    response.headers.contentType = new ContentType('image', 'png');
   } else {
     response.headers.contentType =
-        new ContentType("text", "plain", charset: "utf-8");
+        new ContentType('text', 'plain', charset: 'utf-8');
   }
 
   // Send the contents of the file
@@ -172,16 +181,18 @@ Future sendFile(File requestFile, HttpResponse response) async {
 }
 
 void send404(HttpResponse response) {
-  response.statusCode = 404;
-  response.reasonPhrase = "File not found.";
-  response.close();
+  response
+    ..statusCode = 404
+    ..reasonPhrase = 'File not found.'
+    ..close();
 }
 
+// ignore: avoid_annotating_with_dynamic
 void handleWebsocketRequest(dynamic event) {
-  print("[INFO] websocket event was received!");
+  print('[INFO] websocket event was received!');
 }
 
 void handleWebsocketClose(WebSocket socket) {
-  print("[INFO] Websocket closed (${_activeWebsockets.indexOf(socket)})");
+  print('[INFO] Websocket closed (${_activeWebsockets.indexOf(socket)})');
   _activeWebsockets.remove(socket);
 }

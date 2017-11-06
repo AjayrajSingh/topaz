@@ -36,7 +36,7 @@ class Home extends StatelessWidget {
                     height: 2.0,
                   ),
                 ),
-                new Text('Current Value:'),
+                const Text('Current Value:'),
                 new Text(model.counter.toString()),
                 new Row(
                   mainAxisSize: MainAxisSize.min,

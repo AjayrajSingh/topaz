@@ -5,16 +5,16 @@
 import 'package:flutter/material.dart';
 import 'package:keyboard/keyboard.dart';
 
-class App extends StatelessWidget {
+class _App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Theme(
       data: new ThemeData.light(),
-      child: new Keyboard(),
+      child: const Keyboard(),
     );
   }
 }
 
 void main() {
-  runApp(new App());
+  runApp(new _App());
 }

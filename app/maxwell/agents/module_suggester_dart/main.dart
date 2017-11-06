@@ -12,11 +12,12 @@ import 'package:lib.suggestion.fidl/user_input.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
-final _intelligenceServices = new IntelligenceServicesProxy();
-final _queryHandlerBinding = new QueryHandlerBinding();
+final IntelligenceServicesProxy _intelligenceServices =
+    new IntelligenceServicesProxy();
+final QueryHandlerBinding _queryHandlerBinding = new QueryHandlerBinding();
 
-void main(List args) {
-  final context = new ApplicationContext.fromStartupInfo();
+void main(List<String> args) {
+  final ApplicationContext context = new ApplicationContext.fromStartupInfo();
   connectToService(context.environmentServices, _intelligenceServices.ctrl);
   _intelligenceServices.registerQueryHandler(
     _queryHandlerBinding.wrap(new _QueryHandlerImpl()),
@@ -25,34 +26,34 @@ void main(List args) {
 }
 
 class _QueryHandlerImpl extends QueryHandler {
-  static final _urlSubPattern =
-      new RegExp(r"\.[a-z]{2}|(?:\d{1,3}\.){3}\d{1,3}|localhost");
-  static final _dashboardSubPattern = new RegExp(r"^das|^fuc|^bui|^sta");
-  static final _chatHeadline = "Open Chat";
-  static final _emailHeadline = "Open Email";
-  static final _youtubeHeadline = "Open YouTube";
-  static final _terminalHeadline = "Open Terminal";
-  static final _musicPatternKanye = new RegExp(r"kanye|yeezus");
-  static final _musicPatternPortugal = new RegExp(r"portugal|the man");
+  static final RegExp _urlSubPattern =
+      new RegExp(r'\.[a-z]{2}|(?:\d{1,3}\.){3}\d{1,3}|localhost');
+  static final RegExp _dashboardSubPattern = new RegExp(r'^das|^fuc|^bui|^sta');
+  static final String _chatHeadline = 'Open Chat';
+  static final String _emailHeadline = 'Open Email';
+  static final String _youtubeHeadline = 'Open YouTube';
+  static final String _terminalHeadline = 'Open Terminal';
+  static final RegExp _musicPatternKanye = new RegExp(r'kanye|yeezus');
+  static final RegExp _musicPatternPortugal = new RegExp(r'portugal|the man');
 
   @override
   void onQuery(UserInput query, void callback(QueryResponse response)) {
-    List<Proposal> proposals = new List();
+    List<Proposal> proposals = <Proposal>[];
     if (query.text?.contains(_urlSubPattern) ?? false) {
-      final String url = query.text.startsWith("http")
+      final String url = query.text.startsWith('http')
           ? query.text
-          : query.text.startsWith("localhost")
-              ? "http://" + query.text
-              : "https://" + query.text;
+          : query.text.startsWith('localhost')
+              ? 'http://${query.text}'
+              : 'https://${query.text}';
 
       proposals.add(
         _createProposal(
           id: 'launch web_view',
           appUrl: web_view.kWebViewURL,
-          headline: 'Go to ' + query.text,
+          headline: 'Go to ${query.text}',
           color: 0xff8080ff,
-          initialData: JSON.encode({
-            "view": {"uri": url}
+          initialData: JSON.encode(<String, dynamic>{
+            'view': <String, dynamic>{'uri': url}
           }),
         ),
       );
@@ -121,7 +122,7 @@ class _QueryHandlerImpl extends QueryHandler {
           appUrl: 'music_artist',
           headline: 'Listen to Kanye',
           color: 0xFF9C27B0, // Material Purple 500,
-          initialData: JSON.encode({
+          initialData: JSON.encode(<String, dynamic>{
             'view': decomposeUri(new Uri(
                 scheme: 'spotify',
                 host: 'artist',
@@ -138,7 +139,7 @@ class _QueryHandlerImpl extends QueryHandler {
           appUrl: 'music_artist',
           headline: 'Listen to Portugal. The Man',
           color: 0xFF9C27B0, // Material Purple 500,
-          initialData: JSON.encode({
+          initialData: JSON.encode(<String, dynamic>{
             'view': decomposeUri(new Uri(
                 scheme: 'spotify',
                 host: 'artist',
@@ -149,8 +150,7 @@ class _QueryHandlerImpl extends QueryHandler {
     }
 
     if (query.text?.startsWith('test s') ?? false) {
-      proposals.addAll(_kDummyProposals);
-      proposals.addAll(_kDummyInterruptions);
+      proposals..addAll(_kDummyProposals)..addAll(_kDummyInterruptions);
     }
 
     callback(new QueryResponse()..proposals = proposals);

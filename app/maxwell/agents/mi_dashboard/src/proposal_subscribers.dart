@@ -11,42 +11,44 @@ import 'package:lib.suggestion.fidl._debug/debug.fidl.dart';
 
 import 'data_handler.dart';
 
-Function listEqual = const ListEquality().equals;
+// ignore_for_file: public_member_api_docs
+
+Function listEqual = const ListEquality<ProposalSummary>().equals;
 
 class ProposalSubscribersDataHandler extends AskProposalListener
     with NextProposalListener, InterruptionProposalListener, DataHandler {
   @override
-  String get name => "proposal_subscribers";
+  String get name => 'proposal_subscribers';
 
   AskProposalListenerBinding _askListenerBinding;
   NextProposalListenerBinding _nextListenerBinding;
   InterruptionProposalListenerBinding _interruptionListenerBinding;
 
-  List<ProposalSummary> _currentNextProposals = [];
-  List<ProposalSummary> _lastAskProposals = [];
-  String _lastQuery = "";
+  List<ProposalSummary> _currentNextProposals = <ProposalSummary>[];
+  List<ProposalSummary> _lastAskProposals = <ProposalSummary>[];
+  String _lastQuery = '';
   ProposalSummary _lastSelectedProposal;
   ProposalSummary _lastInterruptionProposal;
 
   SendWebSocketMessage _sendMessage;
 
   String makeJsonMessage() {
-    return JSON.encode({
-      "suggestions": {
-        "ask_query": _lastQuery,
-        "ask_proposals": _lastAskProposals,
-        "selection": _lastSelectedProposal,
-        "next_proposals": _currentNextProposals,
-        "interruption": _lastInterruptionProposal,
+    return JSON.encode(<String, dynamic>{
+      'suggestions': <String, dynamic>{
+        'ask_query': _lastQuery,
+        'ask_proposals': _lastAskProposals,
+        'selection': _lastSelectedProposal,
+        'next_proposals': _currentNextProposals,
+        'interruption': _lastInterruptionProposal,
       }
     });
   }
 
   @override
   void init(ApplicationContext appContext, SendWebSocketMessage sender) {
-    this._sendMessage = sender;
+    _sendMessage = sender;
 
-    final suggestionDebug = new SuggestionDebugProxy();
+    final SuggestionDebugProxy suggestionDebug = new SuggestionDebugProxy();
     _askListenerBinding = new AskProposalListenerBinding();
     _nextListenerBinding = new NextProposalListenerBinding();
     _interruptionListenerBinding = new InterruptionProposalListenerBinding();
@@ -54,11 +56,11 @@ class ProposalSubscribersDataHandler extends AskProposalListener
     assert(suggestionDebug.ctrl.isBound);
 
     // Watch for Ask, Next, and Interruption proposal changes.
-    suggestionDebug.watchAskProposals(_askListenerBinding.wrap(this));
-    suggestionDebug.watchNextProposals(_nextListenerBinding.wrap(this));
     suggestionDebug
-        .watchInterruptionProposals(_interruptionListenerBinding.wrap(this));
-    suggestionDebug.ctrl.close();
+      ..watchAskProposals(_askListenerBinding.wrap(this))
+      ..watchNextProposals(_nextListenerBinding.wrap(this))
+      ..watchInterruptionProposals(_interruptionListenerBinding.wrap(this))
+      ..ctrl.close();
   }
 
   @override
@@ -68,7 +70,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
 
   @override
   void handleNewWebSocket(WebSocket socket) {
-    socket.add(this.makeJsonMessage());
+    socket.add(makeJsonMessage());
   }
 
   @override
@@ -76,7 +78,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
     if (!listEqual(_lastAskProposals, proposals) || (_lastQuery != query)) {
       _lastAskProposals = proposals;
       _lastQuery = query;
-      this._sendMessage(this.makeJsonMessage());
+      _sendMessage(makeJsonMessage());
     }
   }
 
@@ -84,7 +86,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
   void onProposalSelected(ProposalSummary selectedProposal) {
     if (_lastSelectedProposal != selectedProposal) {
       _lastSelectedProposal = selectedProposal;
-      this._sendMessage(this.makeJsonMessage());
+      _sendMessage(makeJsonMessage());
     }
   }
 
@@ -92,7 +94,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
   void onNextUpdate(List<ProposalSummary> proposals) {
     if (!listEqual(_currentNextProposals, proposals)) {
       _currentNextProposals = proposals;
-      this._sendMessage(this.makeJsonMessage());
+      _sendMessage(makeJsonMessage());
     }
   }
 
@@ -100,7 +102,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
   void onInterrupt(ProposalSummary interruptionProposal) {
     if (_lastInterruptionProposal != interruptionProposal) {
       _lastInterruptionProposal = interruptionProposal;
-      this._sendMessage(this.makeJsonMessage());
+      _sendMessage(makeJsonMessage());
     }
   }
 }
