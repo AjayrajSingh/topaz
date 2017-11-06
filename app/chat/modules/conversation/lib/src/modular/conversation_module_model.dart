@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show BASE64, JSON;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
@@ -34,13 +34,15 @@ const String _kGalleryModuleUrl = 'file:///system/apps/gallery';
 
 const Duration _kScrollAnimationDuration = const Duration(milliseconds: 300);
 
+const double _kEmbeddedModHeight = 200.0;
+
 /// A [ModuleModel] providing chat conversation specific data to the descendant
 /// widgets.
 class ChatConversationModuleModel extends ModuleModel {
   static final ListEquality<int> _intListEquality = const ListEquality<int>();
 
   /// Keep track of all the [Embedder] instances.
-  final List<Embedder> embedders = <Embedder>[];
+  final Map<String, Embedder> embedders = <String, Embedder>{};
 
   final AgentControllerProxy _chatContentProviderController =
       new AgentControllerProxy();
@@ -392,12 +394,16 @@ class ChatConversationModuleModel extends ModuleModel {
 
     switch (m.type) {
       case 'command':
-        Embedder embedder = new Embedder(
-          height: 200.0,
-          moduleContext: moduleContext,
-        );
-
-        embedders.add(embedder);
+        // Create a new embedder if is hasn't been created yet.
+        String encodedId = BASE64.encode(m.messageId);
+        Embedder embedder = embedders[encodedId];
+        if (embedder == null) {
+          embedder = new Embedder(
+            height: _kEmbeddedModHeight,
+            moduleContext: moduleContext,
+          );
+          embedders[encodedId] = embedder;
+        }
 
         return new CommandMessage(
           members: participants.map((chat_fidl.Participant p) {
@@ -477,7 +483,7 @@ class ChatConversationModuleModel extends ModuleModel {
     _chatContentProvider.ctrl.close();
     _chatContentProviderController.ctrl.close();
 
-    for (Embedder e in embedders) {
+    for (Embedder e in embedders.values) {
       e.close();
     }
 

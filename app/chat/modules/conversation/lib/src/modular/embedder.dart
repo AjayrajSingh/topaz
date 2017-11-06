@@ -53,6 +53,10 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
       : assert(height != null),
         super();
 
+  @override
+  bool get daisyStarted => _daisyStarted;
+  bool _daisyStarted = false;
+
   /// Implementation for [ModuleWatcher].
   @override
   void onStateChange(ModuleState state) {
@@ -85,6 +89,9 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
 
   /// Close down everything used to embed the module.
   void close() {
+    // Stop the embedded module.
+    moduleControllerProxy.stop(() {});
+
     link.ctrl.close();
     moduleControllerProxy.ctrl.close();
     watcherBinding.close();
@@ -95,6 +102,11 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
     @required Daisy daisy,
     @required String name,
   }) async {
+    if (daisyStarted) {
+      return;
+    }
+    _daisyStarted = true;
+
     status = EmbedderModelStatus.resolving;
     notifyListeners();
 

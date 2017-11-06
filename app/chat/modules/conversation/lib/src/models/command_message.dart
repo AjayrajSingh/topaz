@@ -70,7 +70,7 @@ class CommandMessage extends Message {
     _arguments = chunks;
 
     // Supports "/mod <bin> <message>".
-    if (_arguments.isNotEmpty) {
+    if (_arguments.isNotEmpty && !embedder.daisyStarted) {
       String id = uuid.unparse(messageId);
       String bin = _arguments.first;
 
