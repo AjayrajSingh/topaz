@@ -14,7 +14,6 @@ import '../service/build_service.dart';
 class BuildBucketService implements BuildService {
   static const List<String> _allBuckets = const <String>[
     'luci.fuchsia.continuous',
-    'luci.fuchsia.try',
   ];
 
   final BuildbucketApi _api;
