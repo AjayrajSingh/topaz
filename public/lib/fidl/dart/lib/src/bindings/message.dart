@@ -4,6 +4,8 @@
 
 part of bindings;
 
+// ignore_for_file: public_member_api_docs
+
 class MessageHeader {
   static const int kSimpleMessageSize = 16;
   static const int kSimpleMessageVersion = 0;
@@ -22,16 +24,16 @@ class MessageHeader {
 
   MessageHeader(this.type)
       : _header =
-            new StructDataHeader(kSimpleMessageSize, kSimpleMessageVersion),
+            const StructDataHeader(kSimpleMessageSize, kSimpleMessageVersion),
         flags = 0,
         requestId = 0;
 
   MessageHeader.withRequestId(this.type, this.flags, this.requestId)
-      : _header = new StructDataHeader(
+      : _header = const StructDataHeader(
             kMessageWithRequestIdSize, kMessageWithRequestIdVersion);
 
   MessageHeader.fromMessage(Message message) {
-    var decoder = new Decoder(message);
+    final Decoder decoder = new Decoder(message);
     _header = decoder.decodeStructDataHeader();
     if (_header.size < kSimpleMessageSize) {
       throw new FidlCodecError('Incorrect message size. Got: ${_header.size} '
@@ -57,16 +59,17 @@ class MessageHeader {
   bool get hasRequestId => mustHaveRequestId(flags);
 
   void encode(Encoder encoder) {
-    encoder.encodeStructDataHeader(_header);
-    encoder.encodeUint32(type, kMessageTypeOffset);
-    encoder.encodeUint32(flags, kMessageFlagsOffset);
+    encoder
+      ..encodeStructDataHeader(_header)
+      ..encodeUint32(type, kMessageTypeOffset)
+      ..encodeUint32(flags, kMessageFlagsOffset);
     if (hasRequestId) {
       encoder.encodeUint64(requestId, kMessageRequestIdOffset);
     }
   }
 
   @override
-  String toString() => "MessageHeader($_header, $type, $flags, $requestId)";
+  String toString() => 'MessageHeader($_header, $type, $flags, $requestId)';
 
   bool validateHeaderFlags(int expectedFlags) =>
       (flags & (kMessageExpectsResponse | kMessageIsResponse)) == expectedFlags;
@@ -81,9 +84,8 @@ class Message {
       : buffer = result.bytes,
         handles = result.handles,
         dataLength = result.bytes.lengthInBytes,
-        handlesLength = result.handles.length {
-    assert(result.status == ZX.OK);
-  }
+        handlesLength = result.handles.length,
+        assert(result.status == ZX.OK);
 
   final ByteData buffer;
   final List<Handle> handles;
@@ -92,13 +94,15 @@ class Message {
 
   void closeAllHandles() {
     if (handles != null) {
-      for (int i = 0; i < handles.length; ++i) handles[i].close();
+      for (int i = 0; i < handles.length; ++i) {
+        handles[i].close();
+      }
     }
   }
 
   @override
   String toString() =>
-      "Message(numBytes=$dataLength, numHandles=$handlesLength)";
+      'Message(numBytes=$dataLength, numHandles=$handlesLength)';
 }
 
 class ServiceMessage extends Message {
@@ -114,7 +118,7 @@ class ServiceMessage extends Message {
 
   Message get payload {
     if (_payload == null) {
-      var truncatedBuffer = new ByteData.view(
+      final ByteData truncatedBuffer = new ByteData.view(
           buffer.buffer, header.size, dataLength - header.size);
       _payload = new Message(
           truncatedBuffer, handles, dataLength - header.size, handlesLength);
@@ -123,7 +127,7 @@ class ServiceMessage extends Message {
   }
 
   @override
-  String toString() => "ServiceMessage($header, $_payload)";
+  String toString() => 'ServiceMessage($header, $_payload)';
 }
 
 typedef void MessageSink(ServiceMessage message);

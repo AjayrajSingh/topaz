@@ -4,7 +4,10 @@
 
 part of bindings;
 
-abstract class Union { // ignore: one_member_abstracts
+// ignore_for_file: public_member_api_docs
+
+// ignore: one_member_abstracts
+abstract class Union {
   void encode(Encoder encoder, int offset);
 }
 
@@ -17,7 +20,6 @@ class UnsetUnionTagError extends UnionError {
   UnsetUnionTagError(this.curTag, this.requestedTag);
 
   @override
-  String toString() =>
-    "Tried to read unset union member: $requestedTag "
-        "current member: $curTag.";
+  String toString() => 'Tried to read unset union member: $requestedTag '
+      'current member: $curTag.';
 }

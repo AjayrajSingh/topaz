@@ -4,6 +4,8 @@
 
 part of bindings;
 
+// ignore_for_file: public_member_api_docs
+
 typedef void _VoidCallback();
 
 /// A channel over which messages from interface T can be sent.
@@ -170,8 +172,9 @@ abstract class Binding<T> {
   /// a `TBinding` object, which are subclasses of [Binding<T>] created by the
   /// FIDL compiler for a specific interface.
   Binding() {
-    _reader.onReadable = _handleReadable;
-    _reader.onError = _handleError;
+    _reader
+      ..onReadable = _handleReadable
+      ..onError = _handleError;
   }
 
   /// Returns an interface handle whose peer is bound to the given object.
@@ -184,7 +187,9 @@ abstract class Binding<T> {
   InterfaceHandle<T> wrap(T impl) {
     assert(!isBound);
     ChannelPair pair = new ChannelPair();
-    if (pair.status != ZX.OK) return null;
+    if (pair.status != ZX.OK) {
+      return null;
+    }
     _impl = impl;
     _reader.bind(pair.first);
     return new InterfaceHandle<T>(pair.second, version);
@@ -270,16 +275,21 @@ abstract class Binding<T> {
   /// Always called when the channel underneath closes. If [onConnectionError]
   /// is set, it is called.
   void _handleError(ChannelReaderError error) {
-    if (onConnectionError != null) onConnectionError();
+    if (onConnectionError != null) {
+      onConnectionError();
+    }
   }
 
   void _sendResponse(Message response) {
-    if (!_reader.isBound) return;
+    if (!_reader.isBound) {
+      return;
+    }
     final int status = _reader.channel.write(response.buffer, response.handles);
     // ZX.ERR_BAD_STATE is only used to indicate that the other end of
     // the pipe has been closed. We can ignore the close here and wait for
     // the PeerClosed signal on the event stream.
-    assert((status == ZX.OK) || (status == ZX.ERR_BAD_STATE), 'Channel write: bad status $status');
+    assert((status == ZX.OK) || (status == ZX.ERR_BAD_STATE),
+        'Channel write: bad status $status');
   }
 
   final ChannelReader _reader = new ChannelReader();
@@ -322,8 +332,9 @@ class ProxyController<T> {
   /// typically obtain a [ProxyController<T>] object as the [Proxy<T>.ctrl]
   /// property of a `TProxy` object.
   ProxyController({this.serviceName}) {
-    _reader.onReadable = _handleReadable;
-    _reader.onError = _handleError;
+    _reader
+      ..onReadable = _handleReadable
+      ..onError = _handleError;
   }
 
   /// The service name associated with [T], if any.
@@ -379,7 +390,9 @@ class ProxyController<T> {
   /// The proxy must have previously been bound (e.g., using [bind]).
   InterfaceHandle<T> unbind() {
     assert(isBound);
-    if (!_reader.isBound) return null;
+    if (!_reader.isBound) {
+      return null;
+    }
     return new InterfaceHandle<T>(_reader.unbind(), _version);
   }
 
@@ -393,7 +406,9 @@ class ProxyController<T> {
   /// The proxy must have previously been bound (e.g., using [bind]).
   void close() {
     if (isBound) {
-      if (_pendingResponsesCount > 0) proxyError('The proxy is closed.');
+      if (_pendingResponsesCount > 0) {
+        proxyError('The proxy is closed.');
+      }
       _reset();
       _reader.close();
     }
@@ -441,9 +456,13 @@ class ProxyController<T> {
         final Message message = new Message.fromReadResult(result);
         onResponse(new ServiceMessage.fromMessage(message));
       }
+      // ignore: avoid_catching_errors
     } on FidlCodecError catch (e) {
-      if (result.handles != null)
-        result.handles.forEach((handle) => handle.close());
+      if (result.handles != null) {
+        for (Handle handle in result.handles) {
+          handle.close();
+        }
+      }
       proxyError(e.toString());
       close();
     }
@@ -452,7 +471,9 @@ class ProxyController<T> {
   /// Always called when the channel underneath closes. If [onConnectionError]
   /// is set, it is called.
   void _handleError(ChannelReaderError error) {
-    if (onConnectionError != null) onConnectionError();
+    if (onConnectionError != null) {
+      onConnectionError();
+    }
   }
 
   /// Sends the given messages over the bound channel.
@@ -524,7 +545,7 @@ class ProxyController<T> {
   void proxyError(String message) {
     if (!_errorCompleter.isCompleted) {
       error.whenComplete(() {
-        _errorCompleter = new Completer();
+        _errorCompleter = new Completer<ProxyError>();
       });
       _errorCompleter.complete(new ProxyError(message));
     }

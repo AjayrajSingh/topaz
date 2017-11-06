@@ -4,6 +4,10 @@
 
 part of bindings;
 
+// ignore_for_file: public_member_api_docs
+// ignore_for_file: avoid_positional_boolean_parameters
+// ignore_for_file: always_specify_types
+
 int _align(int size) =>
     size + ((kAlignment - (size & kAlignmentMask)) & kAlignmentMask);
 
@@ -34,7 +38,7 @@ class StructDataHeader {
   const StructDataHeader(this.size, this.version);
 
   @override
-  String toString() => "StructDataHeader($size, $version)";
+  String toString() => 'StructDataHeader($size, $version)';
 }
 
 class ArrayDataHeader {
@@ -47,7 +51,7 @@ class ArrayDataHeader {
   const ArrayDataHeader(this.size, this.numElements);
 
   @override
-  String toString() => "ArrayDataHeader($size, $numElements)";
+  String toString() => 'ArrayDataHeader($size, $numElements)';
 }
 
 class FidlCodecError extends Error {
@@ -67,7 +71,7 @@ class _EncoderBuffer {
 
   _EncoderBuffer([int size = -1])
       : buffer = new ByteData(size > 0 ? size : kInitialBufferSize),
-        handles = [],
+        handles = <Handle>[],
         extent = 0;
 
   void _grow(int newSize) {
@@ -104,17 +108,11 @@ class Encoder {
       : _buffer = buffer,
         _base = buffer.extent;
 
-  Encoder getStructEncoderAtOffset(StructDataHeader dataHeader) {
-    var result = new Encoder._fromBuffer(_buffer);
-    result.encodeStructDataHeader(dataHeader);
-    return result;
-  }
+  Encoder getStructEncoderAtOffset(StructDataHeader dataHeader) =>
+      new Encoder._fromBuffer(_buffer)..encodeStructDataHeader(dataHeader);
 
-  Encoder getArrayEncoderAtOffset(ArrayDataHeader dataHeader) {
-    var result = new Encoder._fromBuffer(_buffer);
-    result.encodeArrayDataHeader(dataHeader);
-    return result;
-  }
+  Encoder getArrayEncoderAtOffset(ArrayDataHeader dataHeader) =>
+      new Encoder._fromBuffer(_buffer)..encodeArrayDataHeader(dataHeader);
 
   Message get message => new Message(
       _buffer.trimmed, _buffer.handles, _buffer.extent, _buffer.handles.length);
@@ -198,7 +196,7 @@ class Encoder {
   }
 
   void encodeChannel(Channel value, int offset, bool nullable) =>
-    encodeHandle(value != null ? value.handle : null, offset, nullable);
+      encodeHandle(value != null ? value.handle : null, offset, nullable);
 
   void encodeInterfaceHandle(
       InterfaceHandle interfaceHandle, int offset, bool nullable) {
@@ -272,7 +270,7 @@ class Encoder {
 
   void encodeNestedUnion(Union value, int offset, bool nullable) {
     encodePointerToNextUnclaimed(offset);
-    var encoder = new Encoder._fromBuffer(_buffer);
+    final Encoder encoder = new Encoder._fromBuffer(_buffer);
     _buffer.claimMemory(_align(kUnionSize));
     encoder.encodeUnion(value, 0, nullable);
   }
@@ -313,7 +311,8 @@ class Encoder {
       throw new FidlCodecError(
           'Cannot encode a fixed array of incorrect size.');
     }
-    var bytes = new Uint8List((value.length + 7) >> kAlignmentShift);
+    final Uint8List bytes =
+        new Uint8List((value.length + 7) >> kAlignmentShift);
     for (int i = 0; i < bytes.length; ++i) {
       for (int j = 0; j < kAlignment; ++j) {
         int boolIndex = kAlignment * i + j;
@@ -322,9 +321,8 @@ class Encoder {
         }
       }
     }
-    var encoder =
-        encoderForArrayByTotalSize(bytes.length, value.length, offset);
-    encoder.appendUint8Array(bytes);
+    encoderForArrayByTotalSize(bytes.length, value.length, offset)
+      ..appendUint8Array(bytes);
   }
 
   void encodeArray(Function arrayAppend, int elementBytes, List value,
@@ -333,60 +331,120 @@ class Encoder {
       encodeNullPointer(offset, isArrayNullable(nullability));
       return;
     }
-    var encoder =
+    final Encoder encoder =
         encoderForArray(elementBytes, value.length, offset, expectedLength);
     arrayAppend(encoder, value);
   }
 
   void encodeInt8Array(
           List<int> value, int offset, int nullability, int expectedLength) =>
-      encodeArray((e, v) => e.appendInt8Array(v), 1, value, offset, nullability,
-          expectedLength);
+      encodeArray(
+        (Encoder e, Object v) => e.appendInt8Array(v),
+        1,
+        value,
+        offset,
+        nullability,
+        expectedLength,
+      );
 
   void encodeUint8Array(
           List<int> value, int offset, int nullability, int expectedLength) =>
-      encodeArray((e, v) => e.appendUint8Array(v), 1, value, offset,
-          nullability, expectedLength);
+      encodeArray(
+        (Encoder e, Object v) => e.appendUint8Array(v),
+        1,
+        value,
+        offset,
+        nullability,
+        expectedLength,
+      );
 
   void encodeInt16Array(
           List<int> value, int offset, int nullability, int expectedLength) =>
-      encodeArray((e, v) => e.appendInt16Array(v), 2, value, offset,
-          nullability, expectedLength);
+      encodeArray(
+        (Encoder e, Object v) => e.appendInt16Array(v),
+        2,
+        value,
+        offset,
+        nullability,
+        expectedLength,
+      );
 
   void encodeUint16Array(
           List<int> value, int offset, int nullability, int expectedLength) =>
-      encodeArray((e, v) => e.appendUint16Array(v), 2, value, offset,
-          nullability, expectedLength);
+      encodeArray(
+        (Encoder e, Object v) => e.appendUint16Array(v),
+        2,
+        value,
+        offset,
+        nullability,
+        expectedLength,
+      );
 
   void encodeInt32Array(
           List<int> value, int offset, int nullability, int expectedLength) =>
-      encodeArray((e, v) => e.appendInt32Array(v), 4, value, offset,
-          nullability, expectedLength);
+      encodeArray(
+        (Encoder e, Object v) => e.appendInt32Array(v),
+        4,
+        value,
+        offset,
+        nullability,
+        expectedLength,
+      );
 
   void encodeUint32Array(
           List<int> value, int offset, int nullability, int expectedLength) =>
-      encodeArray((e, v) => e.appendUint32Array(v), 4, value, offset,
-          nullability, expectedLength);
+      encodeArray(
+        (Encoder e, Object v) => e.appendUint32Array(v),
+        4,
+        value,
+        offset,
+        nullability,
+        expectedLength,
+      );
 
   void encodeInt64Array(
           List<int> value, int offset, int nullability, int expectedLength) =>
-      encodeArray((e, v) => e.appendInt64Array(v), 8, value, offset,
-          nullability, expectedLength);
+      encodeArray(
+        (Encoder e, Object v) => e.appendInt64Array(v),
+        8,
+        value,
+        offset,
+        nullability,
+        expectedLength,
+      );
 
   void encodeUint64Array(
           List<int> value, int offset, int nullability, int expectedLength) =>
-      encodeArray((e, v) => e.appendUint64Array(v), 8, value, offset,
-          nullability, expectedLength);
+      encodeArray(
+        (Encoder e, Object v) => e.appendUint64Array(v),
+        8,
+        value,
+        offset,
+        nullability,
+        expectedLength,
+      );
 
   void encodeFloatArray(List<double> value, int offset, int nullability,
           int expectedLength) =>
-      encodeArray((e, v) => e.appendFloatArray(v), 4, value, offset,
-          nullability, expectedLength);
+      encodeArray(
+        (Encoder e, Object v) => e.appendFloatArray(v),
+        4,
+        value,
+        offset,
+        nullability,
+        expectedLength,
+      );
 
   void encodeDoubleArray(List<double> value, int offset, int nullability,
           int expectedLength) =>
-      encodeArray((e, v) => e.appendDoubleArray(v), 8, value, offset,
-          nullability, expectedLength);
+      encodeArray(
+        (Encoder e, Object v) => e.appendDoubleArray(v),
+        8,
+        value,
+        offset,
+        nullability,
+        expectedLength,
+      );
 
   void _handleArrayEncodeHelper(Function elementEncoder, List value, int offset,
       int elementSize, int nullability, int expectedLength) {
@@ -394,7 +452,7 @@ class Encoder {
       encodeNullPointer(offset, isArrayNullable(nullability));
       return;
     }
-    var encoder =
+    final Encoder encoder =
         encoderForArray(elementSize, value.length, offset, expectedLength);
     for (int i = 0; i < value.length; ++i) {
       int elementOffset = ArrayDataHeader.kHeaderSize + elementSize * i;
@@ -405,33 +463,60 @@ class Encoder {
 
   void encodeHandleArray(List<Handle> value, int offset, int nullability,
           int expectedLength) =>
-      _handleArrayEncodeHelper((e, v, o, n) => e.encodeHandle(v, o, n), value,
-          offset, kSerializedHandleSize, nullability, expectedLength);
+      _handleArrayEncodeHelper(
+        (Encoder e, Object v, int o, bool n) => e.encodeHandle(v, o, n),
+        value,
+        offset,
+        kSerializedHandleSize,
+        nullability,
+        expectedLength,
+      );
 
   void encodeChannelArray(List<Channel> value, int offset, int nullability,
           int expectedLength) =>
-      _handleArrayEncodeHelper((e, v, o, n) => e.encodeChannel(v, o, n), value,
-          offset, kSerializedHandleSize, nullability, expectedLength);
+      _handleArrayEncodeHelper(
+        (Encoder e, Object v, int o, bool n) => e.encodeChannel(v, o, n),
+        value,
+        offset,
+        kSerializedHandleSize,
+        nullability,
+        expectedLength,
+      );
 
   void encodeInterfaceRequestArray(List<InterfaceRequest> value, int offset,
           int nullability, int expectedLength) =>
       _handleArrayEncodeHelper(
-          (e, v, o, n) => e.encodeInterfaceRequest(v, o, n),
-          value,
-          offset,
-          kSerializedHandleSize,
-          nullability,
-          expectedLength);
+        (Encoder e, Object v, int o, bool n) =>
+            e.encodeInterfaceRequest(v, o, n),
+        value,
+        offset,
+        kSerializedHandleSize,
+        nullability,
+        expectedLength,
+      );
 
   void encodeInterfaceHandleArray(List<InterfaceHandle> value, int offset,
           int nullability, int expectedLength) =>
-      _handleArrayEncodeHelper((e, v, o, n) => e.encodeInterfaceHandle(v, o, n),
-          value, offset, kSerializedInterfaceSize, nullability, expectedLength);
+      _handleArrayEncodeHelper(
+        (Encoder e, Object v, int o, bool n) =>
+            e.encodeInterfaceHandle(v, o, n),
+        value,
+        offset,
+        kSerializedInterfaceSize,
+        nullability,
+        expectedLength,
+      );
 
   void encodeSocketArray(List<Socket> value, int offset, int nullability,
           int expectedLength) =>
-      _handleArrayEncodeHelper((e, v, o, n) => e.encodeSocket(v, o, n), value,
-          offset, kSerializedHandleSize, nullability, expectedLength);
+      _handleArrayEncodeHelper(
+        (Encoder e, Object v, int o, bool n) => e.encodeSocket(v, o, n),
+        value,
+        offset,
+        kSerializedHandleSize,
+        nullability,
+        expectedLength,
+      );
 
   static const Utf8Encoder _utf8Encoder = const Utf8Encoder();
 
@@ -559,7 +644,7 @@ class _Validator {
   final int _numberOfHandles;
   int _minNextClaimedHandle = 0;
   int _minNextMemory = 0;
-  final List<int> _skippedIndices = [];
+  final List<int> _skippedIndices = <int>[];
 
   _Validator(this._maxMemory, this._numberOfHandles);
 
@@ -613,8 +698,10 @@ class Decoder {
   ByteData get _buffer => _message.buffer;
   List<Handle> get _handles => _message.handles;
   List<Handle> get excessHandles {
-    if (_message.handlesLength == 0) return null;
-    List<Handle> handles = new List();
+    if (_message.handlesLength == 0) {
+      return null;
+    }
+    List<Handle> handles = <Handle>[];
     for (int i = _validator._minNextClaimedHandle;
         i < _message.handlesLength;
         i++) {
@@ -675,7 +762,9 @@ class Decoder {
 
   InterfaceRequest decodeInterfaceRequest(int offset, bool nullable) {
     final Channel channel = decodeChannel(offset, nullable);
-    if (!channel.handle.isValid) return null;
+    if (!channel.handle.isValid) {
+      return null;
+    }
     return new InterfaceRequest(channel);
   }
 
@@ -729,8 +818,8 @@ class Decoder {
 
   // Decode arrays.
   ArrayDataHeader decodeDataHeaderForBoolArray(int expectedLength) {
-    var header = decodeArrayDataHeader();
-    var arrayByteCount = ArrayDataHeader.kHeaderSize +
+    final ArrayDataHeader header = decodeArrayDataHeader();
+    final int arrayByteCount = ArrayDataHeader.kHeaderSize +
         ((header.numElements + 7) >> kAlignmentShift);
     if (header.size < arrayByteCount) {
       throw new FidlCodecError('Array header is incorrect');
@@ -749,12 +838,13 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForBoolArray(expectedLength);
-    var bytes = new Uint8List.view(
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForBoolArray(expectedLength);
+    final Uint8List bytes = new Uint8List.view(
         d._buffer.buffer,
         d._buffer.offsetInBytes + d._base + ArrayDataHeader.kHeaderSize,
         ((header.numElements + 7) >> kAlignmentShift));
-    var result = new List<bool>(header.numElements);
+    final List<bool> result = new List<bool>(header.numElements);
     for (int i = 0; i < bytes.lengthInBytes; ++i) {
       for (int j = 0; j < kAlignment; ++j) {
         int boolIndex = i * kAlignment + j;
@@ -768,8 +858,8 @@ class Decoder {
 
   ArrayDataHeader decodeDataHeaderForArray(
       int elementSize, int expectedLength) {
-    var header = decodeArrayDataHeader();
-    var arrayByteCount =
+    final ArrayDataHeader header = decodeArrayDataHeader();
+    final int arrayByteCount =
         ArrayDataHeader.kHeaderSize + header.numElements * elementSize;
     if (header.size < arrayByteCount) {
       throw new FidlCodecError(
@@ -798,7 +888,8 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(1, expectedLength);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(1, expectedLength);
     int startByte = d._base + ArrayDataHeader.kHeaderSize;
     int endByte = startByte + header.numElements;
     Int8List result = new Int8List(header.numElements);
@@ -815,7 +906,8 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(1, expectedLength);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(1, expectedLength);
     int startByte = d._base + ArrayDataHeader.kHeaderSize;
     int endByte = startByte + header.numElements;
     Uint8List result = new Uint8List(header.numElements);
@@ -832,7 +924,8 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(2, expectedLength);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(2, expectedLength);
     int startByte = d._base + ArrayDataHeader.kHeaderSize;
     int endByte = startByte + (header.numElements << 1);
     Int16List result = new Int16List(header.numElements);
@@ -850,7 +943,8 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(2, expectedLength);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(2, expectedLength);
     int startByte = d._base + ArrayDataHeader.kHeaderSize;
     int endByte = startByte + (header.numElements << 1);
     Uint16List result = new Uint16List(header.numElements);
@@ -867,7 +961,8 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(4, expectedLength);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(4, expectedLength);
     int startByte = d._base + ArrayDataHeader.kHeaderSize;
     int endByte = startByte + (header.numElements << 2);
     Int32List result = new Int32List(header.numElements);
@@ -885,7 +980,8 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(4, expectedLength);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(4, expectedLength);
     int startByte = d._base + ArrayDataHeader.kHeaderSize;
     int endByte = startByte + (header.numElements << 2);
     Uint32List result = new Uint32List(header.numElements);
@@ -902,7 +998,8 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(8, expectedLength);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(8, expectedLength);
     int startByte = d._base + ArrayDataHeader.kHeaderSize;
     int endByte = startByte + (header.numElements << 3);
     Int64List result = new Int64List(header.numElements);
@@ -920,7 +1017,8 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(8, expectedLength);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(8, expectedLength);
     int startByte = d._base + ArrayDataHeader.kHeaderSize;
     int endByte = startByte + (header.numElements << 3);
     Uint64List result = new Uint64List(header.numElements);
@@ -938,7 +1036,8 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(4, expectedLength);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(4, expectedLength);
     int startByte = d._base + ArrayDataHeader.kHeaderSize;
     int endByte = startByte + (header.numElements << 2);
     Float32List result = new Float32List(header.numElements);
@@ -956,7 +1055,8 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(8, expectedLength);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(8, expectedLength);
     int startByte = d._base + ArrayDataHeader.kHeaderSize;
     int endByte = startByte + (header.numElements << 3);
     Float64List result = new Float64List(header.numElements);
@@ -974,8 +1074,9 @@ class Decoder {
     if (d == null) {
       return null;
     }
-    var header = d.decodeDataHeaderForArray(elementSize, expectedLength);
-    var result = new List(header.numElements);
+    final ArrayDataHeader header =
+        d.decodeDataHeaderForArray(elementSize, expectedLength);
+    final List<dynamic> result = new List<dynamic>(header.numElements);
     for (int i = 0; i < result.length; ++i) {
       result[i] = elementDecoder(
           d,
@@ -987,36 +1088,62 @@ class Decoder {
 
   List<Handle> decodeHandleArray(
           int offset, int nullability, int expectedLength) =>
-      _handleArrayDecodeHelper((d, o, n) => d.decodeHandle(o, n), offset,
-          kSerializedHandleSize, nullability, expectedLength);
+      _handleArrayDecodeHelper(
+        (Decoder d, int o, bool n) => d.decodeHandle(o, n),
+        offset,
+        kSerializedHandleSize,
+        nullability,
+        expectedLength,
+      );
 
   List<Channel> decodeChannelArray(
           int offset, int nullability, int expectedLength) =>
-      _handleArrayDecodeHelper((d, o, n) => d.decodeChannel(o, n), offset,
-          kSerializedHandleSize, nullability, expectedLength);
+      _handleArrayDecodeHelper(
+        (Decoder d, int o, bool n) => d.decodeChannel(o, n),
+        offset,
+        kSerializedHandleSize,
+        nullability,
+        expectedLength,
+      );
 
   List<InterfaceRequest> decodeInterfaceRequestArray(
       int offset, int nullability, int expectedLength) {
-    return _handleArrayDecodeHelper((d, o, n) => d.decodeInterfaceRequest(o, n),
-        offset, kSerializedHandleSize, nullability, expectedLength);
+    return _handleArrayDecodeHelper(
+      (Decoder d, int o, bool n) => d.decodeInterfaceRequest(o, n),
+      offset,
+      kSerializedHandleSize,
+      nullability,
+      expectedLength,
+    );
   }
 
   List<InterfaceHandle> decodeInterfaceHandleArray(
       int offset, int nullability, int expectedLength) {
-    return _handleArrayDecodeHelper((d, o, n) => d.decodeInterfaceHandle(o, n),
-        offset, kSerializedInterfaceSize, nullability, expectedLength);
+    return _handleArrayDecodeHelper(
+      (Decoder d, int o, bool n) => d.decodeInterfaceHandle(o, n),
+      offset,
+      kSerializedInterfaceSize,
+      nullability,
+      expectedLength,
+    );
   }
 
   List<Socket> decodeSocketArray(
           int offset, int nullability, int expectedLength) =>
-      _handleArrayDecodeHelper((d, o, n) => d.decodeSocket(o, n), offset,
-          kSerializedHandleSize, nullability, expectedLength);
+      _handleArrayDecodeHelper(
+        (Decoder d, int o, bool n) => d.decodeSocket(o, n),
+        offset,
+        kSerializedHandleSize,
+        nullability,
+        expectedLength,
+      );
 
-  static const _utf8Decoder = const Utf8Decoder();
+  static const Utf8Decoder _utf8Decoder = const Utf8Decoder();
 
   String decodeString(int offset, bool nullable) {
     int nullability = nullable ? kArrayNullable : 0;
-    var bytes = decodeUint8Array(offset, nullability, kUnspecifiedArrayLength);
+    final Uint8List bytes =
+        decodeUint8Array(offset, nullability, kUnspecifiedArrayLength);
     if (bytes == null) {
       return null;
     }
@@ -1024,7 +1151,7 @@ class Decoder {
   }
 
   StructDataHeader decodeDataHeaderForMap() {
-    var header = decodeStructDataHeader();
+    final StructDataHeader header = decodeStructDataHeader();
     if (header.size != kMapStructHeader.size) {
       throw new FidlCodecError(
           'Incorrect header for map. The size is incorrect.');
