@@ -95,13 +95,8 @@ class BuildStatusModel extends ModuleModel {
 
   /// Initiates a refresh of the build status.
   void refresh() {
-    DateTime now = new DateTime.now().toLocal();
-    if (_lastRefreshed == null ||
-        now.difference(_lastRefreshed) > const Duration(seconds: 60)) {
-      _lastRefreshed = now;
-      _fetchConfigStatus();
-      notifyListeners();
-    }
+    _fetchConfigStatus();
+    notifyListeners();
   }
 
   Future<Null> _fetchConfigStatus() async {
@@ -124,6 +119,11 @@ class BuildStatusModel extends ModuleModel {
       _buildResult = null;
       _errorMessage = 'Error: $error';
       _handleFetchComplete();
+
+      if (error is TimeoutException) {
+        _errorMessage = '$_errorMessage  Retrying...';
+        refresh();
+      }
     });
   }
 

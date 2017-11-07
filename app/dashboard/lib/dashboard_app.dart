@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:dashboard/service/build_service.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
@@ -28,9 +29,16 @@ class DashboardApp extends StatelessWidget {
   /// Called when a build status widget is pressed.
   final OnLaunchUrl onLaunchUrl;
 
+  /// The service used to fetch build information.
+  final BuildService buildService;
+
   /// Constructor.
-  const DashboardApp(
-      {this.buildStatusModels, this.onRefresh, this.onLaunchUrl});
+  const DashboardApp({
+    this.buildService,
+    this.buildStatusModels,
+    this.onRefresh,
+    this.onLaunchUrl,
+  });
 
   @override
   Widget build(BuildContext context) => new LayoutBuilder(
@@ -97,7 +105,7 @@ class DashboardApp extends StatelessWidget {
       );
     }
 
-    rows.add(new InfoText());
+    rows.add(new InfoText(timeoutRate: () => buildService.timeoutRate));
 
     return new MaterialApp(
       title: 'Fuchsia Build Status',

@@ -12,6 +12,9 @@ abstract class BuildService {
   /// Default constructor.
   factory BuildService() => new BuildBucketService();
 
+  /// The percentage of requests made by this service that have timed out.
+  double get timeoutRate;
+
   /// Returns a single event stream of the latest [BuildInfo] for [buildName].
   ///
   /// The stream interface is used so that the client may cancel requests.

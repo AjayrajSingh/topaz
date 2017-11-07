@@ -20,23 +20,33 @@ class BuildBucketService implements BuildService {
 
   final BuildbucketApi _api;
 
+  int _requestCount = 0;
+  int _timeoutCount = 0;
+
   /// Initializing constructor.
   BuildBucketService([BuildbucketApi api])
       : _api = api ?? new BuildbucketApi(new http.Client());
 
   @override
+  double get timeoutRate =>
+      100 * (_requestCount > 0 ? _timeoutCount / _requestCount : 0.0);
+
+  @override
   Stream<BuildInfo> getBuildByName(String buildName) async* {
     final Timer timeout = new Timer(_timeoutDuration, () {
+      _timeoutCount++;
       throw new TimeoutException(
           '$buildName exceeded ${_timeoutDuration.inSeconds} seconds');
     });
 
-    final ApiSearchResponseMessage response = await _api.search(
+    final Future<ApiSearchResponseMessage> request = _api.search(
       bucket: _allBuckets,
       tag: <String>['builder:$buildName'],
       status: BuildStatusEnum.completed.value,
     );
+    _requestCount++;
 
+    final ApiSearchResponseMessage response = await request;
     timeout.cancel();
 
     if (response.error != null) {

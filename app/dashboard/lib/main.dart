@@ -182,6 +182,7 @@ void main() {
     applicationContext: applicationContext,
     moduleModel: dashboardModuleModel,
     child: new DashboardApp(
+      buildService: buildService,
       buildStatusModels: buildStatusModels,
       onRefresh: () {
         buildStatusModels

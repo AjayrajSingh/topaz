@@ -24,15 +24,29 @@ final TextStyle _kUnimportantStyle = _kImportantStyle.copyWith(
   fontWeight: FontWeight.w300,
 );
 
+/// A callback that returns a percentage of the build info requests that have
+/// timed out.
+typedef _GetTimeoutRate = double Function();
+
 /// Displays important info about the builds.
 class InfoText extends StatefulWidget {
+  /// A percentage representing no. timed out requests / no. total requests.
+  final _GetTimeoutRate timeoutRate;
+
+  /// Initializing constructor.
+  const InfoText({this.timeoutRate});
+
   @override
-  _InfoTextState createState() => new _InfoTextState();
+  _InfoTextState createState() => new _InfoTextState(timeoutRate: timeoutRate);
 }
 
 class _InfoTextState extends State<InfoText> {
   Timer _timer;
   DateTime _targetTime;
+
+  final _GetTimeoutRate timeoutRate;
+
+  _InfoTextState({this.timeoutRate});
 
   @override
   void initState() {
@@ -91,6 +105,19 @@ class _InfoTextState extends State<InfoText> {
                         ),
                   style: _kImportantStyle,
                 ),
+              ],
+            ),
+          ),
+          new RichText(
+            textAlign: TextAlign.right,
+            text: new TextSpan(
+              text: 'Timeout Rate ',
+              style: _kUnimportantStyle,
+              children: <TextSpan>[
+                new TextSpan(
+                  text: '${timeoutRate().ceil()}%',
+                  style: _kImportantStyle,
+                )
               ],
             ),
           ),
