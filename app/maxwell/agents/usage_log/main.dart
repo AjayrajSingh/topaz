@@ -26,64 +26,66 @@ import 'package:lib.context.fidl/value.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
 
 // The project ID of the usage_log registered in Cobalt.
-const _cobaltProjectID = 101;
+const int _cobaltProjectID = 101;
 
 // The IDs of the Cobalt metric and encoding we are using.
 // These specify objects within our Cobalt project configuration.
-const _cobaltMetricID = 1;
-const _cobaltEncodingID = 1;
+const int _cobaltMetricID = 1;
+const int _cobaltEncodingID = 1;
 
 // connection to context reader
-final _contextReader = new ContextReaderProxy();
+final ContextReaderProxy _contextReader = new ContextReaderProxy();
 ContextListenerImpl _contextListener;
 
 // connection to Cobalt
-final _encoder = new CobaltEncoderProxy();
+final CobaltEncoderProxy _encoder = new CobaltEncoderProxy();
 
 // Deduplication Map
-var _topicDedupSet = new LinkedHashSet<String>();
+final LinkedHashSet<String> _topicDedupSet = new LinkedHashSet<String>();
 
 // ContextListener callback
-void onContextUpdate(ContextUpdate update) {
-  update.values["modules"].forEach((ContextValue value) {
-    String dedupKey = "${value.meta.story?.id}${value.meta.mod.url}";
+void _onContextUpdate(ContextUpdate update) {
+  for (ContextValue value in update.values['modules']) {
+    String dedupKey = '${value.meta.story?.id}${value.meta.mod.url}';
     // To record module launches, we only process each topic once
     if (_topicDedupSet.contains(dedupKey)) {
       return;
     }
     _topicDedupSet.add(dedupKey);
 
-    // print("[USAGE LOG] Recording module url $url");
+    // print('[USAGE LOG] Recording module url $url');
     _encoder.addStringObservation(_cobaltMetricID, _cobaltEncodingID,
-        value.meta.mod.url, onAddObservationStatus);
-  });
-}
-
-void onAddObservationStatus(Status status) {
-  // If adding an observation fails, we simply drop it and do not retry.
-  // TODO(jwnichols): Perhaps we should do something smarter if we fail
-  if (status != Status.ok) {
-    print("[USAGE LOG] Failed to add Cobalt observation: " + status.toString());
+        value.meta.mod.url, _onAddObservationStatus);
   }
 }
 
-void main(List args) {
-  final appContext = new ApplicationContext.fromStartupInfo();
+void _onAddObservationStatus(Status status) {
+  // If adding an observation fails, we simply drop it and do not retry.
+  // TODO(jwnichols): Perhaps we should do something smarter if we fail
+  if (status != Status.ok) {
+    print('[USAGE LOG] Failed to add Cobalt observation: $status');
+  }
+}
+
+void main(List<String> args) {
+  final ApplicationContext appContext =
+      new ApplicationContext.fromStartupInfo();
 
   // Connect to the ContextReader
-  _contextListener = new ContextListenerImpl(onContextUpdate);
+  _contextListener = new ContextListenerImpl(_onContextUpdate);
   connectToService(appContext.environmentServices, _contextReader.ctrl);
   assert(_contextReader.ctrl.isBound);
 
   // Subscribe to all topics
-  ContextSelector selector = new ContextSelector();
-  selector.type = ContextValueType.module;
-  ContextQuery query = new ContextQuery();
-  query.selector = <String, ContextSelector>{"modules": selector};
+  ContextSelector selector = new ContextSelector()
+    ..type = ContextValueType.module;
+  ContextQuery query = new ContextQuery()
+    ..selector = <String, ContextSelector>{'modules': selector};
   _contextReader.subscribe(query, _contextListener.getHandle());
 
   // Connect to Cobalt
-  var encoderFactory = new CobaltEncoderFactoryProxy();
+  final CobaltEncoderFactoryProxy encoderFactory =
+      new CobaltEncoderFactoryProxy();
   connectToService(appContext.environmentServices, encoderFactory.ctrl);
   assert(encoderFactory.ctrl.isBound);
 

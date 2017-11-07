@@ -6,6 +6,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+// ignore_for_file: public_member_api_docs
+
 const Color _kCloseColor = const Color(0xFFEF9A9A);
 const Color _kTitleBarColor = const Color(0xFF90CAF9);
 const Color _kResizerColor = const Color(0xFF00E676);
@@ -29,7 +31,7 @@ class Window {
 }
 
 class WindowTitleBar extends StatelessWidget {
-  WindowTitleBar({
+  const WindowTitleBar({
     Key key,
     this.title,
     this.onClosed,
@@ -85,7 +87,8 @@ class WindowTitleBar extends StatelessWidget {
 }
 
 class WindowResizer extends StatelessWidget {
-  WindowResizer({Key key, this.onResized, this.elevation}) : super(key: key);
+  const WindowResizer({Key key, this.onResized, this.elevation})
+      : super(key: key);
 
   final GestureDragUpdateCallback onResized;
   final double elevation;
@@ -111,7 +114,8 @@ class WindowResizer extends StatelessWidget {
 }
 
 class WindowZoomer extends StatelessWidget {
-  WindowZoomer({Key key, this.onZoomed, this.elevation}) : super(key: key);
+  const WindowZoomer({Key key, this.onZoomed, this.elevation})
+      : super(key: key);
 
   final GestureDragUpdateCallback onZoomed;
   final double elevation;
@@ -263,7 +267,7 @@ class _WindowFrameState extends State<WindowFrame> {
 }
 
 class WindowManager extends StatefulWidget {
-  WindowManager({
+  const WindowManager({
     Key key,
     this.wallpaper,
     this.decorations,
@@ -289,14 +293,16 @@ class WindowManagerState extends State<WindowManager> {
   void dispose() {
     super.dispose();
     for (VoidCallback callback in _closeCallbacks.values.toList()) {
-      if (callback != null) callback();
+      callback?.call();
     }
   }
 
   void addWindow(Window window, {VoidCallback onClose}) {
     setState(() {
       _windows.add(window);
-      if (onClose != null) _closeCallbacks[window] = onClose;
+      if (onClose != null) {
+        _closeCallbacks[window] = onClose;
+      }
     });
   }
 
@@ -305,19 +311,25 @@ class WindowManagerState extends State<WindowManager> {
       _windows.remove(window);
     });
     VoidCallback callback = _closeCallbacks.remove(window);
-    if (callback != null) callback();
+    if (callback != null) {
+      callback();
+    }
   }
 
   void activateWindow(Window window) {
     setState(() {
-      if (_windows.remove(window)) _windows.add(window);
+      if (_windows.remove(window)) {
+        _windows.add(window);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     List<Widget> children = <Widget>[];
-    if (widget.wallpaper != null) children.add(widget.wallpaper);
+    if (widget.wallpaper != null) {
+      children.add(widget.wallpaper);
+    }
     children.addAll(widget.decorations);
 
     double elevation = _kBaseWindowElevation;

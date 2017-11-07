@@ -16,6 +16,8 @@ import 'package:lib.ui.presentation.fidl/presenter.fidl.dart';
 
 import 'window_manager.dart';
 
+// ignore_for_file: public_member_api_docs
+
 final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
 
 final ApplicationEnvironmentProxy _childEnvironment = _initChildEnvironment();
@@ -106,10 +108,9 @@ class ApplicationEnvironmentHostImpl extends ApplicationEnvironmentHost {
       InterfaceRequest<ServiceProvider> services) {
     ServiceProviderImpl impl = new ServiceProviderImpl()
       ..bind(services)
-      ..addServiceForName((request) {
-        new PresenterImpl().bind(request);
-      }, Presenter.serviceName)
-      ..defaultConnector = (String serviceName, InterfaceRequest request) {
+      ..addServiceForName(new PresenterImpl().bind, Presenter.serviceName)
+      ..defaultConnector =
+          (String serviceName, InterfaceRequest<dynamic> request) {
         _context.environmentServices
             .connectToService(serviceName, request.passChannel());
       };
