@@ -23,7 +23,7 @@ void _log(String msg) {
 dynamic _handleResponse(String description) {
   return (Status status) {
     if (status != Status.ok) {
-      _log("$description: $status");
+      _log('$description: $status');
     }
   };
 }
@@ -59,7 +59,7 @@ class ModuleImpl implements Module, Lifecycle {
 
     _moduleContext.ctrl.bind(moduleContextHandle);
     _moduleContext.getComponentContext(_componentContext.ctrl.request());
-    _componentContext.getLedger(_ledgerRequest, _handleResponse("getLedger"));
+    _componentContext.getLedger(_ledgerRequest, _handleResponse('getLedger'));
   }
 
   @override
@@ -82,19 +82,17 @@ void main() {
   final ModuleImpl module = new ModuleImpl(pair.passRequest());
 
   kContext.outgoingServices
-  ..addServiceForName(
-    (InterfaceRequest<Module> request) {
-      _log('Received binding request for Module');
-      module.bindModule(request);
-    },
-    Module.serviceName,
-  )
-  ..addServiceForName(
-    (InterfaceRequest<Lifecycle> request) {
-      module.bindLifecycle(request);
-    },
-    Lifecycle.serviceName,
-  );
+    ..addServiceForName(
+      (InterfaceRequest<Module> request) {
+        _log('Received binding request for Module');
+        module.bindModule(request);
+      },
+      Module.serviceName,
+    )
+    ..addServiceForName(
+      module.bindLifecycle,
+      Lifecycle.serviceName,
+    );
 
   _log('Starting Flutter app...');
 

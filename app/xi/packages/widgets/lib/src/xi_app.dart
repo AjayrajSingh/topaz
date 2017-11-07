@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:xi_client/client.dart';
 
-import 'home_page.dart';
 import 'editor.dart';
+import 'home_page.dart';
+
+// ignore_for_file: avoid_annotating_with_dynamic
 
 /// Top-level Widget.
 class XiApp extends StatefulWidget {
@@ -15,13 +17,12 @@ class XiApp extends StatefulWidget {
   final XiClient xi;
 
   /// [XiApp] constructor.
-  XiApp({
+  const XiApp({
     Key key,
     @required this.xi,
   })
-      : super(key: key) {
-    assert(xi != null);
-  }
+      : assert(xi != null),
+        super(key: key);
 
   @override
   XiAppState createState() => new XiAppState();
@@ -87,7 +88,11 @@ class XiAppState extends State<XiApp> {
       _pendingReqs ??= <_PendingNotification>[];
       _pendingReqs.add(new _PendingNotification(method, params));
     } else {
-      Map<String, dynamic> innerParams = <String, dynamic>{'method': method, 'params': params, 'view_id': _tabId};
+      Map<String, dynamic> innerParams = <String, dynamic>{
+        'method': method,
+        'params': params,
+        'view_id': _tabId
+      };
       widget.xi.sendNotification('edit', innerParams);
     }
   }
@@ -95,7 +100,7 @@ class XiAppState extends State<XiApp> {
   /// Connect editor state, so that notifications from the core are routed to
   /// the editor. Called by [Editor] widget.
   void connectEditor(EditorState editorState) {
-    widget.xi.registerHandler(new XiAppHandler(editorState));
+    widget.xi.handler = new XiAppHandler(editorState);
   }
 
   @override
@@ -103,20 +108,21 @@ class XiAppState extends State<XiApp> {
     super.initState();
     widget.xi.onMessage(handleMessage);
     widget.xi.init().then((Null _) =>
-      // Arguably the new_tab should be sent by the editor (and the editor should plumb
-      // the tab id through to the connectEditor call). However, that would require holding
-      // a pending queue of new_tab requests, waiting for init to complete. This is easier.
-      widget.xi.sendRpc('new_view', <String, dynamic>{'file_path': '/data/test_xi_sync'}, (String id) {
-        _tabId = id;
-        print('id = $id');
-        if (_pendingReqs != null) {
-          for (_PendingNotification pending in _pendingReqs) {
-            sendNotification(pending.method, pending.params);
+        // Arguably the new_tab should be sent by the editor (and the editor should plumb
+        // the tab id through to the connectEditor call). However, that would require holding
+        // a pending queue of new_tab requests, waiting for init to complete. This is easier.
+        widget.xi.sendRpc(
+            'new_view', <String, dynamic>{'file_path': '/data/test_xi_sync'},
+            (dynamic id) {
+          _tabId = id;
+          print('id = $id');
+          if (_pendingReqs != null) {
+            for (_PendingNotification pending in _pendingReqs) {
+              sendNotification(pending.method, pending.params);
+            }
+            _pendingReqs = null;
           }
-          _pendingReqs = null;
-        }
-      })
-    );
+        }));
   }
 
   /// Handle messages from xi-core.

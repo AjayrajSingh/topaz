@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
+
+// ignore_for_file: avoid_annotating_with_dynamic
 
 /// A callback for data sent by xi-core.
 ///
@@ -29,7 +31,7 @@ abstract class XiClient {
   /// Flag marking wether the client has been initialized or not.
   bool initialized = false;
   int _id = 0;
-  Map<int, XiRpcCallback> _pending = <int, XiRpcCallback>{};
+  final Map<int, XiRpcCallback> _pending = <int, XiRpcCallback>{};
   XiRpcHandler _handler;
 
   /// Callbacks fired whenever a message from xi-core is received. Add with
@@ -72,7 +74,7 @@ abstract class XiClient {
 
   /// Register a handler. This causes incoming json-rpc requests to be
   /// routed to that handler.
-  void registerHandler(XiRpcHandler h) {
+  set handler(XiRpcHandler h) {
     _handler = h;
   }
 
@@ -101,15 +103,19 @@ abstract class XiClient {
       String method = json['method'];
       dynamic params = json['params'];
       if (json.containsKey('id')) {
-        Map<String, dynamic> response =
-          <String, dynamic>{'result': _handler.handleRpc(method, params), 'id': json['id']};
+        Map<String, dynamic> response = <String, dynamic>{
+          'result': _handler.handleRpc(method, params),
+          'id': json['id']
+        };
         _sendJson(response);
       } else {
         _handler.handleNotification(method, params);
       }
     }
-    if (listeners.length > 0) {
-      listeners.forEach((XiClientListener callback) => callback(json));
+    if (listeners.isNotEmpty) {
+      for (XiClientListener callback in listeners) {
+        callback(json);
+      }
     }
   }
 
@@ -119,7 +125,10 @@ abstract class XiClient {
 
   /// Send an asynchronous notification to the core.
   void sendNotification(String method, dynamic params) {
-    Map<String, dynamic> json = <String, dynamic>{'method': method, 'params': params};
+    Map<String, dynamic> json = <String, dynamic>{
+      'method': method,
+      'params': params
+    };
     _sendJson(json);
   }
 
@@ -127,7 +136,11 @@ abstract class XiClient {
   /// is a response.
   void sendRpc(String method, dynamic params, XiRpcCallback callback) {
     _pending[_id] = callback;
-    Map<String, dynamic> json = <String, dynamic>{'method': method, 'params': params, 'id': _id};
+    Map<String, dynamic> json = <String, dynamic>{
+      'method': method,
+      'params': params,
+      'id': _id
+    };
     _sendJson(json);
     _id++;
   }

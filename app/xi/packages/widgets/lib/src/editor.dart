@@ -2,21 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import 'xi_app.dart';
-import 'line_cache.dart';
-import 'text_line.dart';
-
 import 'dart:async';
 import 'dart:ui' as ui
     show Paragraph, ParagraphBuilder, ParagraphConstraints, ParagraphStyle;
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'line_cache.dart';
+import 'text_line.dart';
+import 'xi_app.dart';
+
 /// Widget for one editor tab
 class Editor extends StatefulWidget {
   /// Standard widget constructor
-  Editor({Key key}) : super(key: key);
+  const Editor({Key key}) : super(key: key);
 
   @override
   EditorState createState() => new EditorState();
@@ -171,6 +171,7 @@ const int _modifierCtrlRight = 0x10;
 const int _modifierCtrlMask = 0x18;
 const int _modifierAltLeft = 0x20;
 const int _modifierAltRight = 0x40;
+// ignore: unused_element
 const int _modifierAltMask = 0x60;
 const int _modifierAltCtrlMask = 0x78;
 
@@ -191,7 +192,7 @@ final String _zeroWidthSpace = '\u{200b}';
 /// State for editor tab
 class EditorState extends State<Editor> {
   LineCache _lines;
-  ScrollController _controller = new ScrollController();
+  final ScrollController _controller = new ScrollController();
   // Height of lines (currently fixed, all lines have the same height)
   double _lineHeight;
   // location of last tap (used to expand selection on long press)
@@ -208,22 +209,20 @@ class EditorState extends State<Editor> {
   }
 
   XiAppState get _xiAppState =>
-      context.ancestorStateOfType(new TypeMatcher<XiAppState>());
+      context.ancestorStateOfType(const TypeMatcher<XiAppState>());
 
   @override
   void initState() {
     super.initState();
     _xiAppState.connectEditor(this);
-    scheduleMicrotask(() {
-      _sendScrollViewport();
-    });
+    scheduleMicrotask(_sendScrollViewport);
   }
 
   double _lineHeightForStyle(TextStyle style) {
     ui.ParagraphBuilder builder =
-        new ui.ParagraphBuilder(new ui.ParagraphStyle());
-    builder.pushStyle(style.getTextStyle());
-    builder.addText(_zeroWidthSpace);
+        new ui.ParagraphBuilder(new ui.ParagraphStyle())
+          ..pushStyle(style.getTextStyle())
+          ..addText(_zeroWidthSpace);
     ui.Paragraph layout = builder.build()
       ..layout(new ui.ParagraphConstraints(width: double.INFINITY));
     return layout.height;
@@ -250,6 +249,7 @@ class EditorState extends State<Editor> {
 
   // Send a notification to the core. If params are not given,
   // an empty array will be sent.
+  // ignore: avoid_annotating_with_dynamic
   void _sendNotification(String method, [dynamic params]) {
     _xiAppState.sendNotification(method, params ?? <dynamic>[]);
   }

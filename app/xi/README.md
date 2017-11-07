@@ -198,7 +198,7 @@ Run the Flutter app:
 
     cd ${FUCHSIA_DIR}/apps/xi/xi_flutter
     fx full-build
-    ${FUCHSIA_DIR}/scripts/symlink-dot-packages.py --tree=//apps/xi/*
+    ${FUCHSIA_DIR}/scripts/symlink-dot-packages.py --tree=//topaz/app/xi/*
     ${FUCHSIA_DIR}/third_party/dart-pkg/git/flutter/bin/flutter run
 
 [flutter]: https://flutter.io/

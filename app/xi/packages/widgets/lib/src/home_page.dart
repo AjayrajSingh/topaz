@@ -14,15 +14,14 @@ typedef void HomePageFabPressed();
 /// [message]. [HomePage] is the
 class HomePage extends StatefulWidget {
   /// [HomePage] constructor.
-  HomePage({
+  const HomePage({
     Key key,
     this.title: 'Home Page',
     this.message: '',
     @required this.onFabPressed,
   })
-      : super(key: key) {
-    assert(onFabPressed != null);
-  }
+      : assert(onFabPressed != null),
+        super(key: key);
 
   /// Callback for when the [FloatingActionButton] child [Widget] is pressed.
   final HomePageFabPressed onFabPressed;
@@ -52,7 +51,7 @@ class _HomePageState extends State<HomePage> {
       appBar: new AppBar(
         title: new Text(widget.title),
       ),
-      body: new Editor(),
+      body: const Editor(),
       floatingActionButton: new FloatingActionButton(
         onPressed: handleFabPressed,
         tooltip: 'Ping xi-core',

@@ -5,10 +5,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:xi_widgets/widgets.dart';
-
-import 'src/xi_flutter_client.dart';
-
 // ignore: unused_import
 import 'package:flutter/rendering.dart'
     show
@@ -17,6 +13,9 @@ import 'package:flutter/rendering.dart'
         debugPaintLayerBordersEnabled,
         debugPaintPointersEnabled,
         debugRepaintRainbowEnabled;
+import 'package:xi_widgets/widgets.dart';
+
+import 'src/xi_flutter_client.dart';
 
 Future<Null> main() async {
   //debugRepaintRainbowEnabled = true;

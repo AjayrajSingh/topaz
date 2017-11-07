@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'dart:ui';
+
+import 'package:flutter/material.dart';
 
 /// A simple utility function to test equality (==) for all elements of a list.
 bool listEq<T>(List<T> l1, List<T> l2) {
@@ -34,7 +35,7 @@ final double _nominalWidth = 200.0;
 class TextLine extends LeafRenderObjectWidget {
   /// Creates a widget for displaying one line of text, with optional
   /// cursor decoration (when it's done).
-  TextLine(this.text, this.cursor, this.styles, this.height, {Key key})
+  const TextLine(this.text, this.cursor, this.styles, this.height, {Key key})
       : super(key: key);
 
   /// The text displayed in the widget.

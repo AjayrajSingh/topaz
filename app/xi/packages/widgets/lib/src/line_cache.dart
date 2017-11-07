@@ -5,15 +5,17 @@
 // A data structure for holding a cache of lines, and receiving incremental updates
 // based on deltas from xi-core.
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 /// One line in the editor view, with cursor and style information.
 class Line {
   /// The text of the line
   final TextSpan text;
+
   /// A list of cursor locations (at utf-16 offset)
   final List<int> cursor;
+
   /// The style info, in triple format (start, end, styleId), where
   /// start and end are utf-16 offsets. Note that this is similar to
   /// the xi protocol triple format, but with absolute rather than
@@ -25,25 +27,23 @@ class Line {
 
   /// Constructor, from json data (xi-core update protocol format)
   Line.fromJson(Map<String, dynamic> json, TextStyle style)
-    : text = new TextSpan(text: json['text'], style: style),
-      cursor = _transformCursor(json['text'], json) ?? <int>[],
-      styles = _transformStyles(json['text'], json) ?? <int>[];
+      : text = new TextSpan(text: json['text'], style: style),
+        cursor = _transformCursor(json['text'], json) ?? <int>[],
+        styles = _transformStyles(json['text'], json) ?? <int>[];
 
   /// Update cursor and styles for a line, retaining text, using json
   /// from the xi-core "update" op
-  Line updateFromJson(Map<String, dynamic> json) =>
-    new Line(
-      text,
-      _transformCursor(text.text, json) ?? cursor,
-      _transformStyles(text.text, json) ?? styles,
-    );
+  Line updateFromJson(Map<String, dynamic> json) => new Line(
+        text,
+        _transformCursor(text.text, json) ?? cursor,
+        _transformStyles(text.text, json) ?? styles,
+      );
 
   /// Return the utf-16 offset closest to the given horizontal position.
   // TODO: should conversion to utf-8 offset happen here or be caller's
   // responsibility?
   int getIndexForHorizontal(double horizontal) {
-    TextPainter textPainter = new TextPainter(text: text);
-    textPainter.layout();
+    TextPainter textPainter = new TextPainter(text: text)..layout();
     Offset offset = new Offset(horizontal, 0.0);
     TextPosition pos = textPainter.getPositionForOffset(offset);
     return pos.offset;
@@ -141,7 +141,9 @@ int _utf8ToUtf16Offset(String s, int utf8Offset) {
 
 // Transform a list of utf-8 offsets to utf-16 offsets
 List<int> _transformCursor(String s, Map<String, dynamic> json) {
-  return json['cursor']?.map((int offset) =>_utf8ToUtf16Offset(s, offset))?.toList();
+  return json['cursor']
+      ?.map((int offset) => _utf8ToUtf16Offset(s, offset))
+      ?.toList();
 }
 
 // Convert style triples from utf-8 to utf-16 and relative to absolute offsets.
@@ -156,9 +158,10 @@ List<int> _transformStyles(String s, Map<String, dynamic> json) {
     int start = ix + styles[i];
     int end = start + styles[i + 1];
     int styleId = styles[i + 2];
-    result.add(_utf8ToUtf16Offset(s, start));
-    result.add(_utf8ToUtf16Offset(s, end));
-    result.add(styleId);
+    result
+      ..add(_utf8ToUtf16Offset(s, start))
+      ..add(_utf8ToUtf16Offset(s, end))
+      ..add(styleId);
     ix = end;
   }
   return result;

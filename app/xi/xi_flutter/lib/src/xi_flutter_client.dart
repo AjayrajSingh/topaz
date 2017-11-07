@@ -37,7 +37,7 @@ class XiFlutterClient extends XiClient {
     String filename = path.join(tmp.uri.path, 'xi-core');
     try {
       await new File('/data/local/tmp/xi-core').copy(filename);
-    } catch (e) {
+    } on FileSystemException catch (e) {
       // Note: we'll get a "text file busy" error when doing a reload from
       // "flutter run", so best to log the error and go on. Might want to
       // make error catching more fine-grained here.

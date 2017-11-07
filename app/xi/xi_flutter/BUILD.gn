@@ -11,10 +11,10 @@ dart_package("xi_flutter") {
   source_dir = "lib"
 
   deps = [
-    "//apps/xi/packages/widgets:xi_widgets",
-    "//apps/xi/packages/xi_client",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/path",
     "//third_party/dart-pkg/pub/path_provider",
+    "//topaz/app/xi/packages/widgets:xi_widgets",
+    "//topaz/app/xi/packages/xi_client",
   ]
 }
