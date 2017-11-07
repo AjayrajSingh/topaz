@@ -16,6 +16,7 @@
         "topaz/packages/moterm",
         "topaz/packages/oauth_token_manager",
         "topaz/packages/sysui",
+        "topaz/packages/tools",
         "topaz/packages/web_view"
     ]
 }

@@ -9,4 +9,5 @@ dependencies:
   googleapis_auth: ^0.2.3
   googleapis: ^0.46.0
   lorem: ^0.1.0
+  strings: ^0.0.6
   uuid: ^0.5.3

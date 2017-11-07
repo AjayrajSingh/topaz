@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "labels": [
+        "//topaz/tools/mod:all(//build/toolchain:host_x64)"
+    ]
+}
