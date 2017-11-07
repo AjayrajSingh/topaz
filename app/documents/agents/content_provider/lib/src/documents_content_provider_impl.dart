@@ -5,7 +5,6 @@ import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
@@ -16,10 +15,8 @@ import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 /// documents
 // TODO SO-880(maryxia) retrieve document providers from a list
 class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
-  final List<doc_fidl.DocumentInterfaceBinding> _bindings =
-      <doc_fidl.DocumentInterfaceBinding>[];
-  final AgentControllerProxy _documentsAgentController =
-      new AgentControllerProxy();
+  final AgentControllerProxy _agentControllerProxy = new AgentControllerProxy();
+
   // We use this interface proxy to talk to the doc_fidl
   final doc_fidl.DocumentInterfaceProxy _docInterfaceProxy =
       new doc_fidl.DocumentInterfaceProxy();
@@ -72,30 +69,20 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
       // Also, we need to check that the file location exists before calling this
       'file:///system/apps/reconciler/documents',
       serviceProviderProxy.ctrl.request(),
-      _documentsAgentController.ctrl.request(),
+      _agentControllerProxy.ctrl.request(),
     );
     // Connect the DocumentInterfaceProxy to a service that the agent manages.
     // Otherwise, you've only connected to the Agent, and can't do anything.
     // This is just a global function located in app.dart
     connectToService(serviceProviderProxy, _docInterfaceProxy.ctrl);
     serviceProviderProxy.ctrl.close();
+
     log.fine('Initialized DocumentsContentProviderImpl');
   }
 
-  /// Binds this implementation to the incoming [InterfaceRequest].
-  /// This should only be called once. In other words, a new
-  /// [DocumentsContentProviderImpl] object needs to be created per interface
-  /// request.
-  void addBinding(InterfaceRequest<doc_fidl.DocumentInterface> request) {
-    _bindings.add(new doc_fidl.DocumentInterfaceBinding()..bind(this, request));
-  }
-
-  /// Close all our bindings; called by our owner during termination.
+  /// Closes proxies
   void close() {
-    for (doc_fidl.DocumentInterfaceBinding binding in _bindings) {
-      binding.close();
-    }
     _docInterfaceProxy.ctrl.close();
-    _documentsAgentController.ctrl.close();
+    _agentControllerProxy.ctrl.close();
   }
 }
