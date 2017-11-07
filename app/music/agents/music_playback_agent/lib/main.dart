@@ -24,6 +24,7 @@ MusicPlaybackAgent _agent = new MusicPlaybackAgent();
 // https://fuchsia.atlassian.net/browse/SO-539
 class MusicPlaybackAgent implements Agent, Lifecycle {
   final AgentBinding _agentBinding = new AgentBinding();
+  final AgentContextProxy _agentContextProxy = new AgentContextProxy();
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
 
   final ServiceProviderImpl _outgoingServicesImpl = new ServiceProviderImpl();
@@ -55,8 +56,10 @@ class MusicPlaybackAgent implements Agent, Lifecycle {
       InterfaceHandle<AgentContext> agentContextHandle, void callback()) async {
     log.fine('Agent::initialize start.');
 
+    _agentContextProxy.ctrl.bind(agentContextHandle);
+
     // Initialize the player service
-    _playerImpl = new PlayerImpl(_context);
+    _playerImpl = new PlayerImpl(_context, _agentContextProxy);
 
     // Register the player service to the outgoingServices service provider
     _outgoingServicesImpl.addServiceForName(
@@ -91,6 +94,7 @@ class MusicPlaybackAgent implements Agent, Lifecycle {
   /// Implements [Lifecycle] interface.
   @override
   void terminate() {
+    _agentContextProxy.ctrl.close();
     _agentBinding.close();
     _lifecycleBinding.close();
     for (ServiceProviderBinding binding in _outgoingServicesBindings) {

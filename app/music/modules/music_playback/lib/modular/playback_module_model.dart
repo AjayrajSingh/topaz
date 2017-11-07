@@ -18,9 +18,7 @@ import 'package:topaz.app.music.services.player/player.fidl.dart'
     as player_fidl;
 import 'package:topaz.app.music.services.player/repeat_mode.fidl.dart';
 import 'package:topaz.app.music.services.player/status.fidl.dart';
-import 'package:topaz.app.music.services.player/track.fidl.dart' as track_fidl;
 
-import 'command_handler.dart';
 import 'player_status_listener.dart';
 
 const String _kPlayerUrl = 'file:///system/apps/music_playback_agent';
@@ -36,8 +34,6 @@ class PlaybackModuleModel extends ModuleModel {
   PlayerStatusListenerImpl _statusListener;
 
   Track _currentTrack;
-
-  track_fidl.Track _currentFidlTrack;
 
   Duration _playbackPosition;
 
@@ -74,8 +70,6 @@ class PlaybackModuleModel extends ModuleModel {
   /// The current device mode
   String get deviceMode => _deviceMode;
   String _deviceMode;
-
-  CommandHandler _commandHandler;
 
   @override
   void onReady(
@@ -124,19 +118,6 @@ class PlaybackModuleModel extends ModuleModel {
         }
       });
 
-    _commandHandler = new CommandHandler(
-      onPause: () {
-        if (isPlaying) {
-          _player.togglePlayPause();
-        }
-      },
-      onPlay: () {
-        if (!isPlaying && _currentFidlTrack != null) {
-          _player.play(_currentFidlTrack);
-        }
-      },
-    )..start(moduleContext);
-
     // Close all the unnecessary bindings.
     playerServices.ctrl.close();
     componentContext.ctrl.close();
@@ -147,7 +128,6 @@ class PlaybackModuleModel extends ModuleModel {
     _ensureNoProgressTimer();
     _player.ctrl.close();
     _playbackAgentController.ctrl.close();
-    _commandHandler.stop();
     super.onStop();
   }
 
@@ -190,7 +170,6 @@ class PlaybackModuleModel extends ModuleModel {
     _playbackPosition =
         new Duration(milliseconds: status.playbackPositionInMilliseconds);
     if (status.track != null) {
-      _currentFidlTrack = status.track;
       _currentTrack = new Track(
         name: status.track.title,
         id: status.track.title,

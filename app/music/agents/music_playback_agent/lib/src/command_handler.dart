@@ -2,15 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:ui' show VoidCallback;
-
-import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:lib.agent.fidl/agent_context.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:lib.suggestion.fidl/user_input.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
+
+/// Typedef for VoidCallback
+typedef void VoidCallback();
 
 /// Proposes high confidence suggestions for playback commands (play, pause)
 class CommandHandler implements QueryHandler {
@@ -34,10 +35,9 @@ class CommandHandler implements QueryHandler {
   });
 
   /// Starts the proposal process.
-  void start(ModuleContext moduleContext) {
-    moduleContext.getIntelligenceServices(
-      _intelligenceServicesProxy.ctrl.request(),
-    );
+  void start(AgentContextProxy agentContextProxy) {
+    agentContextProxy
+        .getIntelligenceServices(_intelligenceServicesProxy.ctrl.request());
     _intelligenceServicesProxy
       ..getProposalPublisher(
         _proposalPublisherProxy.ctrl.request(),

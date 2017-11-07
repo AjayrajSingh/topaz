@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:lib.agent.fidl/agent_context.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
@@ -10,6 +11,8 @@ import 'package:topaz.app.music.services.player/player.fidl.dart';
 import 'package:topaz.app.music.services.player/repeat_mode.fidl.dart';
 import 'package:topaz.app.music.services.player/status.fidl.dart';
 import 'package:topaz.app.music.services.player/track.fidl.dart';
+
+import 'command_handler.dart';
 
 /// Function signature for status callback
 typedef void GetStatusCallback(PlayerStatus status);
@@ -30,11 +33,25 @@ class PlayerImpl extends Player {
 
   RepeatMode _repeatMode = RepeatMode.one;
 
+  CommandHandler _commandHandler;
+
   /// Constructor
-  PlayerImpl(ApplicationContext context) {
+  PlayerImpl(ApplicationContext context, AgentContextProxy agentContextProxy) {
     _audioPlayerController =
         new AudioPlayerController(context.environmentServices)
           ..updateCallback = _onAudioControllerUpdate;
+    _commandHandler = new CommandHandler(
+      onPause: () {
+        if (_audioPlayerController.playing) {
+          _audioPlayerController.pause();
+        }
+      },
+      onPlay: () {
+        if (!_audioPlayerController.playing && _currentTrack != null) {
+          _audioPlayerController.play();
+        }
+      },
+    )..start(agentContextProxy);
   }
 
   @override
@@ -121,6 +138,7 @@ class PlayerImpl extends Player {
     for (PlayerStatusListenerProxy listener in _listeners) {
       listener.ctrl.close();
     }
+    _commandHandler.stop();
   }
 
   void _onAudioControllerUpdate() {
