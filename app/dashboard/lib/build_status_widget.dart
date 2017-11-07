@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:dashboard/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
@@ -158,15 +159,12 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
       });
 
   Color _colorFromBuildStatus(BuildStatusModel model) {
-    switch (model.buildStatus) {
-      case BuildStatus.success:
-        return model.successColor;
-      case BuildStatus.failure:
-        return model.failColor;
-      case BuildStatus.networkError:
-        return Colors.purple[100];
-      default:
-        return Colors.grey[300];
+    if (model.buildResult == BuildResultEnum.success) {
+      return model.successColor;
+    } else if (model.buildResult == BuildResultEnum.failure) {
+      return model.failColor;
+    } else {
+      return Colors.grey[300];
     }
   }
 

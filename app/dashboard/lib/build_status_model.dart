@@ -4,28 +4,11 @@
 
 import 'dart:async';
 
+import 'package:dashboard/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:dashboard/service/build_info.dart';
 import 'package:dashboard/service/build_service.dart';
-
-/// Indicates the last known status of a particular build.
-enum BuildStatus {
-  /// The build status hasn't been determined yet.
-  unknown,
-
-  /// A network error occurred getting the build status.
-  networkError,
-
-  /// A parse error occurred while determining the build status.
-  parseError,
-
-  /// The build was successful.
-  success,
-
-  /// The build failed.
-  failure,
-}
 
 final DateTime _kHalloween = new DateTime.utc(
   2017,
@@ -54,7 +37,7 @@ class BuildStatusModel extends ModuleModel {
   DateTime _lastRefreshEnded;
   DateTime _lastFailTime;
   DateTime _lastPassTime;
-  BuildStatus _buildStatus = BuildStatus.unknown;
+  BuildResultEnum _buildResult;
   String _errorMessage;
 
   /// Constructor.
@@ -71,7 +54,7 @@ class BuildStatusModel extends ModuleModel {
   DateTime get lastRefreshEnded => _lastRefreshEnded;
 
   /// Returns the current build status.
-  BuildStatus get buildStatus => _buildStatus;
+  BuildResultEnum get buildResult => _buildResult;
 
   /// The time the build started failing.
   DateTime get lastFailTime => _lastFailTime;
@@ -79,8 +62,8 @@ class BuildStatusModel extends ModuleModel {
   /// The time the build started passing.
   DateTime get lastPassTime => _lastPassTime;
 
-  /// If the build status isn't [BuildStatus.success] this will indicate any
-  /// additional information about why not.
+  /// If the build status isn't [BuildResultEnum.success.value] this will
+  /// indicate any additional information about why not.
   String get errorMessage => _errorMessage;
 
   /// The color to use as the background of a successful build.
@@ -130,22 +113,20 @@ class BuildStatusModel extends ModuleModel {
       _pendingRequest =
           _buildService.getBuildByName(url).listen((BuildInfo response) {
         _pendingRequest.cancel();
-        _buildStatus = response?.result == 'SUCCESS'
-            ? BuildStatus.success
-            : BuildStatus.failure;
+        _buildResult = response.result;
         _errorMessage = null;
         _handleFetchComplete();
       });
     }, onError: (Object error) {
-      _buildStatus = null;
-      _errorMessage = 'Error receiving response:\n$error';
+      _buildResult = null;
+      _errorMessage = 'Error: $error';
       _handleFetchComplete();
     });
   }
 
   void _handleFetchComplete() {
     _lastRefreshEnded = new DateTime.now();
-    if (_buildStatus == BuildStatus.success) {
+    if (_buildResult == BuildResultEnum.success) {
       if (_lastPassTime == null) {
         _lastPassTime = new DateTime.now();
         _lastFailTime = null;

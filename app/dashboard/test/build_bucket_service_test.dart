@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dashboard/buildbucket/build_bucket_service.dart';
+import 'package:dashboard/enums.dart';
 import 'package:dashboard/service/build_info.dart';
 import 'package:test/test.dart';
 import 'package:mockito/mockito.dart';
@@ -16,8 +17,8 @@ void main() {
     ApiCommonBuildMessage buildInfoResponse =
         new ApiCommonBuildMessage.fromJson(<String, Object>{
       'bucket': 'luci.fuchsia.continuous',
-      'status': 'COMPLETE',
-      'result': 'SUCCESS',
+      'status': BuildStatusEnum.completed.value,
+      'result': BuildResultEnum.success.value,
       'tags': const <String>[
         'builder:fuchsia-x86_64-linux-release:1509636609227930',
       ],
@@ -33,7 +34,7 @@ void main() {
         () async {
       when(mockApi.search(
         bucket: const <String>['luci.fuchsia.continuous'],
-        status: 'COMPLETED',
+        status: BuildStatusEnum.completed.value,
         tag: <String>['builder:$buildName'],
       )).thenReturn(new Future<ApiSearchResponseMessage>.value(
           new ApiSearchResponseMessage()
@@ -42,8 +43,8 @@ void main() {
       final BuildInfo info = await service.getBuildByName(buildName).first;
 
       expect(info.bucket, 'luci.fuchsia.continuous');
-      expect(info.status, 'COMPLETE');
-      expect(info.result, 'SUCCESS');
+      expect(info.status, BuildStatusEnum.completed);
+      expect(info.result, BuildResultEnum.success);
       expect(info.name, 'fuchsia-x86_64-linux-release');
       expect(info.url, '#2');
       expect(info.type, 'fuchsia');
@@ -53,7 +54,7 @@ void main() {
         () async {
       when(mockApi.search(
         bucket: const <String>['luci.fuchsia.continuous'],
-        status: 'COMPLETED',
+        status: BuildStatusEnum.completed.value,
         tag: <String>['builder:$buildName'],
       )).thenReturn(new Future<ApiSearchResponseMessage>.value(
           new ApiSearchResponseMessage()
@@ -64,8 +65,8 @@ void main() {
       final BuildInfo info = results.single;
 
       expect(info.bucket, 'luci.fuchsia.continuous');
-      expect(info.status, 'COMPLETE');
-      expect(info.result, 'SUCCESS');
+      expect(info.status, BuildStatusEnum.completed);
+      expect(info.result, BuildResultEnum.success);
       expect(info.name, 'fuchsia-x86_64-linux-release');
       expect(info.url, '#2');
       expect(info.type, 'fuchsia');

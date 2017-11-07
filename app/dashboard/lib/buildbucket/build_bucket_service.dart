@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:buildbucket/buildbucket.dart';
+import 'package:dashboard/enums.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:dashboard/service/build_info.dart';
@@ -27,7 +28,7 @@ class BuildBucketService implements BuildService {
     final ApiSearchResponseMessage response = await _api.search(
       bucket: _allBuckets,
       tag: <String>['builder:$buildName'],
-      status: 'COMPLETED',
+      status: BuildStatusEnum.completed.value,
     );
 
     if (response.error != null) {
@@ -61,8 +62,8 @@ class BuildBucketService implements BuildService {
   BuildInfo _createBuildInfo(ApiCommonBuildMessage build) => new BuildInfo(
         bucket: build.bucket,
         name: _getBuildName(build),
-        result: build.result,
-        status: build.status,
+        result: BuildResultEnum.from(build.result),
+        status: BuildStatusEnum.from(build.status),
         type: _getBuildType(build),
         url: build.url,
       );

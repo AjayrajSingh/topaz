@@ -2,16 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:dashboard/enums.dart';
+
 /// Describes a build result.
 class BuildInfo {
   /// The bucket this build belongs to.
   final String bucket;
 
   /// The status of the build.
-  final String status;
+  final BuildStatusEnum status;
 
   /// The result of the build.
-  final String result;
+  final BuildResultEnum result;
 
   /// The display name for the build.
   ///
