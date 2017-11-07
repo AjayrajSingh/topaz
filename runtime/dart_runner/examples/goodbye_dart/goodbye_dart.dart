@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:fuchsia' as fuchsia;
 
+// ignore: unused_element
 Timer _timer;
 
 void main(List<String> args) {
