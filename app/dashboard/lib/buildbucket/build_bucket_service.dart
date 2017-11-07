@@ -13,6 +13,7 @@ import 'package:dashboard/service/build_service.dart';
 
 /// A [BuildService] implementation that fetches info from the build_bucket api.
 class BuildBucketService implements BuildService {
+  static const Duration _timeoutDuration = const Duration(seconds: 10);
   static const List<String> _allBuckets = const <String>[
     'luci.fuchsia.continuous',
   ];
@@ -25,11 +26,18 @@ class BuildBucketService implements BuildService {
 
   @override
   Stream<BuildInfo> getBuildByName(String buildName) async* {
+    final Timer timeout = new Timer(_timeoutDuration, () {
+      throw new TimeoutException(
+          '$buildName exceeded ${_timeoutDuration.inSeconds} seconds');
+    });
+
     final ApiSearchResponseMessage response = await _api.search(
       bucket: _allBuckets,
       tag: <String>['builder:$buildName'],
       status: BuildStatusEnum.completed.value,
     );
+
+    timeout.cancel();
 
     if (response.error != null) {
       throw new BuildServiceException(response.error.toJson().toString());
