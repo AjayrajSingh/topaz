@@ -3,6 +3,8 @@
         "dart"
     ],
     "labels": [
-        "//topaz/tools/mod:all(//build/toolchain:host_x64)"
+        "//topaz/tools/dartfmt_extras:all(//build/toolchain:host_x64)",
+        "//topaz/tools/mod:all(//build/toolchain:host_x64)",
+        "//topaz/tools/widget_explorer(//build/toolchain:host_x64)"
     ]
 }

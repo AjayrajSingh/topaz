@@ -73,7 +73,6 @@ CompilationUnit _parseCompilationUnit(String contents, String name) {
   Scanner scanner = new Scanner(source, reader, errorCollector);
   Token token = scanner.tokenize();
   Parser parser = new Parser(source, errorCollector)
-    ..enableAssertInitializer = true
     ..parseFunctionBodies = true;
   CompilationUnit unit = parser.parseCompilationUnit(token)
     ..lineInfo = new LineInfo(scanner.lineStarts);

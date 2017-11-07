@@ -13,11 +13,9 @@ import 'package:dart_style/dart_style.dart';
 import 'package:mustache/mustache.dart';
 import 'package:path/path.dart' as path;
 import 'package:strings/strings.dart' as strings;
+// ignore: implementation_imports
 import 'package:widget_explorer_core/src/utils.dart';
 import 'package:widget_explorer_core/widget_specs.dart';
-
-const double _kBoxRadius = 4.0;
-const double _kMargin = 16.0;
 
 final DartFormatter _formatter = new DartFormatter();
 
