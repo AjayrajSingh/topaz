@@ -18,9 +18,4 @@ class StoryModuleModel extends ModuleModel {
   ) {
     super.onReady(moduleContext, link, incomingServices);
   }
-
-  @override
-  void onStop() {
-    super.onStop();
-  }
 }

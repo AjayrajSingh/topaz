@@ -8,6 +8,7 @@ import 'dart:isolate';
 import 'dart:zircon';
 
 // ignore_for_file: native_function_body_in_non_sdk_code
+// ignore_for_file: public_member_api_docs
 
 Handle _environment;
 Handle _outgoingServices;
@@ -26,7 +27,7 @@ class MxStartupInfo {
   }
 }
 
-void _setReturnCode(int returnCode) native "SetReturnCode";
+void _setReturnCode(int returnCode) native 'SetReturnCode';
 
 void exit(int returnCode) {
   _setReturnCode(returnCode);

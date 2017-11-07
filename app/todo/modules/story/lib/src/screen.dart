@@ -10,7 +10,7 @@ import 'module_model.dart';
 /// Top-level widget for the chat_story module.
 class StoryScreen extends StatelessWidget {
   /// Creates a new instance of [StoryScreen].
-  StoryScreen({Key key}) : super(key: key);
+  const StoryScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class StoryScreen extends StatelessWidget {
 /// A temporary homepage.
 class HomePage extends StatelessWidget {
   /// Constructor
-  HomePage({
+  const HomePage({
     Key key,
     this.title,
   })
@@ -54,7 +54,7 @@ class HomePage extends StatelessWidget {
         title: new Text(title),
       ),
       body: new Center(
-        child: new Text('TODO: Make some UI.'),
+        child: const Text('TODO: Make some UI.'),
       ),
     );
   }

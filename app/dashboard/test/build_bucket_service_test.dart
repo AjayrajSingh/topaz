@@ -1,11 +1,15 @@
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'dart:async';
 
+import 'package:buildbucket/buildbucket.dart';
 import 'package:dashboard/buildbucket/build_bucket_service.dart';
 import 'package:dashboard/enums.dart';
 import 'package:dashboard/service/build_info.dart';
-import 'package:test/test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:buildbucket/buildbucket.dart';
+import 'package:test/test.dart';
 
 void main() {
   group(BuildBucketService, () {

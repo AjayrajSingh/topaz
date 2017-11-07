@@ -9,9 +9,9 @@ package("todo") {
   system_image = true
 
   deps = [
-    "//apps/modules/todo/agents/content_provider:todo_content_provider",
-    "//apps/modules/todo/modules/story:todo_story",
-    "//apps/modules/todo/services",
+    "agents/content_provider:todo_content_provider",
+    "modules/story:todo_story",
+    "services",
   ]
 
   binaries = [

@@ -14,10 +14,8 @@ void main() {
       new ModuleWidget<StoryModuleModel>(
     applicationContext: new ApplicationContext.fromStartupInfo(),
     moduleModel: new StoryModuleModel(),
-    child: new StoryScreen(),
-  );
-
-  moduleWidget.advertise();
+    child: const StoryScreen(),
+  )..advertise();
 
   runApp(moduleWidget);
 }

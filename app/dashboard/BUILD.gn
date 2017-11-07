@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/dart/dart_test.gni")
 import("//packages/package.gni")
 import("//third_party/flutter/build/flutter_app.gni")
 
@@ -16,6 +17,7 @@ flutter_app("dashboard_app") {
     "//peridot/public/lib/module/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//third_party/dart-pkg/pub/buildbucket",
     "//third_party/dart-pkg/pub/html",
     "//third_party/dart-pkg/pub/http",
     "//topaz/app/chat/services:services_dart",
@@ -25,7 +27,15 @@ flutter_app("dashboard_app") {
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/ui/flutter",
     "//topaz/runtime/web_runner/lib/dart:web_view",
+  ]
+}
+
+dart_test("dashboard_test") {
+  deps = [
+    ":dashboard_app_dart_package",
     "//third_party/dart-pkg/pub/buildbucket",
+    "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
   ]
 }
 
@@ -35,6 +45,8 @@ package("dashboard") {
 
   deps = [
     ":dashboard_app",
+    # TODO(pylaligand): add target for "all Dart tests".
+    ":dashboard_test",
   ]
 
   binaries = [ {

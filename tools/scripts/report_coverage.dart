@@ -58,29 +58,29 @@ Future<Null> main(List<String> args) async {
   }).asFuture();
 
   // Report to console.
-  TableWriter writer = new TableWriter(stdout);
-  writer.setHeaders(<Object>['Filepath', 'Covered', 'Total', 'Percentage']);
-  writer.setRightAlignment(<bool>[false, true, true, true]);
-  files.forEach((String file) {
+  TableWriter writer = new TableWriter(stdout)
+    ..setHeaders(<Object>['Filepath', 'Covered', 'Total', 'Percentage'])
+    ..setRightAlignment(<bool>[false, true, true, true]);
+  for (String file in files) {
     writer.addRow(<Object>[
       file,
       coveredLines[file],
       totalLines[file],
       '${_getPercentage(coveredLines[file], totalLines[file])}%',
     ]);
-  });
+  }
 
   // Last line for total.
   int totalCoveredLines = coveredLines.values.fold(0, (int a, int b) => a + b);
   int totalTotalLines = totalLines.values.fold(0, (int a, int b) => a + b);
-  writer.setFooters(<Object>[
-    'Total',
-    totalCoveredLines,
-    totalTotalLines,
-    '${_getPercentage(totalCoveredLines, totalTotalLines)}%',
-  ]);
-
-  writer.render();
+  writer
+    ..setFooters(<Object>[
+      'Total',
+      totalCoveredLines,
+      totalTotalLines,
+      '${_getPercentage(totalCoveredLines, totalTotalLines)}%',
+    ])
+    ..render();
 }
 
 double _getPercentage(int covered, int total) {
@@ -111,6 +111,7 @@ class TableWriter {
     _footers = _processRow(footers);
   }
 
+  // ignore: use_setters_to_change_properties
   /// Sets whether each column needs to be right aligned.
   void setRightAlignment(List<bool> rightAlignments) {
     _rightAlignments = rightAlignments;
@@ -156,11 +157,9 @@ class TableWriter {
       }
 
       if (_shouldBeRightAligned(i)) {
-        _out.write(' ' * (_colLen[i] - row[i].length));
-        _out.write(row[i]);
+        _out..write(' ' * (_colLen[i] - row[i].length))..write(row[i]);
       } else {
-        _out.write(row[i]);
-        _out.write(' ' * (_colLen[i] - row[i].length));
+        _out..write(row[i])..write(' ' * (_colLen[i] - row[i].length));
       }
     }
     _out.writeln();

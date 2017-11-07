@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-
 import 'dart:io';
 
 import 'package:lib.app.dart/app.dart';
@@ -11,12 +10,10 @@ import 'data_handler.dart';
 
 class LedgerDebugDataHandler extends DataHandler {
   @override
-  String get name => "ledger_debug";
+  String get name => 'ledger_debug';
 
   @override
-  void init(ApplicationContext appContext, SendWebSocketMessage sender) {
-
-  }
+  void init(ApplicationContext appContext, SendWebSocketMessage sender) {}
 
   @override
   bool handleRequest(String requestString, HttpRequest request) {
@@ -24,8 +21,5 @@ class LedgerDebugDataHandler extends DataHandler {
   }
 
   @override
-  void handleNewWebSocket(WebSocket socket) {
-
-  }
-
+  void handleNewWebSocket(WebSocket socket) {}
 }
