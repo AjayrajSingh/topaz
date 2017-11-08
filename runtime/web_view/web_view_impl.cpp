@@ -77,6 +77,7 @@ WebViewImpl::WebViewImpl(
       url_(url),
       image_cycler_(session()) {
   FXL_LOG(INFO) << "WebViewImpl constructor";
+  web_view_.setup_once();
   SetNeedSquareMetrics(true);
   parent_node().AddChild(image_cycler_);
 
