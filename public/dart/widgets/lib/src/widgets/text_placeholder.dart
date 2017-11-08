@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 
 final Color _kPlaceholderColor = Colors.grey[300];
 
-/// Renders a loading text placeholder for a given text style
+/// Renders a text placeholder meant for loading/scaffolding
 class TextPlaceholder extends StatelessWidget {
   /// Constructor
   const TextPlaceholder({

@@ -5,9 +5,9 @@
 import 'package:concert_models/concert_models.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lib.widgets/widgets.dart' show TextPlaceholder;
 
 import 'fallback_image.dart';
-import 'text_placeholder.dart';
 import 'typedefs.dart';
 
 const double _kListHeight = 64.0;

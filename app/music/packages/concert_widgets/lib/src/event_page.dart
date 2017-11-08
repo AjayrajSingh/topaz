@@ -5,10 +5,10 @@
 import 'package:concert_models/concert_models.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lib.widgets/widgets.dart' show TextPlaceholder;
 
 import 'fallback_image.dart';
 import 'loading_status.dart';
-import 'text_placeholder.dart';
 
 const double _kHeroImageHeight = 240.0;
 const double _kLogoSize = 32.0;
