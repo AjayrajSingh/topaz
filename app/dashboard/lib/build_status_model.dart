@@ -107,14 +107,14 @@ class BuildStatusModel extends ModuleModel {
     runZoned(() {
       _pendingRequest =
           _buildService.getBuildByName(url).listen((BuildInfo response) {
-        _pendingRequest.cancel();
+        _pendingRequest?.cancel();
         _pendingRequest = null;
         _errorMessage = null;
         _buildResult = response.result;
         _handleFetchComplete();
       });
     }, onError: (Object error) {
-      _pendingRequest.cancel();
+      _pendingRequest?.cancel();
       _pendingRequest = null;
       _buildResult = null;
       _errorMessage = 'Error: $error';

@@ -11,6 +11,9 @@ import 'package:http/http.dart' as http;
 import 'package:dashboard/service/build_info.dart';
 import 'package:dashboard/service/build_service.dart';
 
+/// Provides a [BuildbucketApi].
+typedef _ApiProvider = BuildbucketApi Function(http.Client client);
+
 /// A [BuildService] implementation that fetches info from the build_bucket api.
 class BuildBucketService implements BuildService {
   static const Duration _timeoutDuration = const Duration(seconds: 10);
@@ -18,14 +21,14 @@ class BuildBucketService implements BuildService {
     'luci.fuchsia.continuous',
   ];
 
-  final BuildbucketApi _api;
-
   int _requestCount = 0;
   int _timeoutCount = 0;
 
+  _ApiProvider _createApi;
+
   /// Initializing constructor.
-  BuildBucketService([BuildbucketApi api])
-      : _api = api ?? new BuildbucketApi(new http.Client());
+  BuildBucketService({_ApiProvider apiProvider})
+      : _createApi = apiProvider ?? _defaultApiFactory;
 
   @override
   double get timeoutRate =>
@@ -33,13 +36,17 @@ class BuildBucketService implements BuildService {
 
   @override
   Stream<BuildInfo> getBuildByName(String buildName) async* {
+    // Create a new HTTP client per request to prevent opening infinite sockets.
+    final http.Client httpClient = new http.Client();
     final Timer timeout = new Timer(_timeoutDuration, () {
       _timeoutCount++;
+      httpClient.close();
       throw new TimeoutException(
           '$buildName exceeded ${_timeoutDuration.inSeconds} seconds');
     });
 
-    final Future<ApiSearchResponseMessage> request = _api.search(
+    final Future<ApiSearchResponseMessage> request =
+        _createApi(httpClient).search(
       bucket: _allBuckets,
       tag: <String>['builder:$buildName'],
       status: BuildStatusEnum.completed.value,
@@ -47,6 +54,7 @@ class BuildBucketService implements BuildService {
     _requestCount++;
 
     final ApiSearchResponseMessage response = await request;
+    httpClient.close();
     timeout.cancel();
 
     if (response.error != null) {
@@ -58,13 +66,17 @@ class BuildBucketService implements BuildService {
 
   /// Fetch builds with names from [buildNames].
   ///
-  /// On buildbucket, this given build name corresponds to the name of the
+  /// On build bucket, this given build name corresponds to the name of the
   /// builder which is derived from the build response's tags.
   @override
   Stream<List<BuildInfo>> getBuildsByName(List<String> buildNames) async* {
     yield await Future
         .wait(buildNames.map((String name) => getBuildByName(name).first));
   }
+
+  /// Creates a new [BuildbucketApi] given [httpClient].
+  static BuildbucketApi _defaultApiFactory(http.Client httpClient) =>
+      new BuildbucketApi(httpClient);
 
   /// Returns the "name" of the build if it is present. Otherwise, null.
   String _getBuildName(ApiCommonBuildMessage build) {

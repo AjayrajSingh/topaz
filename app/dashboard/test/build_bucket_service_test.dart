@@ -31,7 +31,7 @@ void main() {
 
     setUp(() {
       mockApi = new MockBuildBucketApi();
-      service = new BuildBucketService(mockApi);
+      service = new BuildBucketService(apiProvider: (_) => mockApi);
     });
 
     test('getBucketByName should fetch build info based on the given name',
