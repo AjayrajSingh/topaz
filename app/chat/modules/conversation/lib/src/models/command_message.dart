@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
-import 'package:uuid/uuid.dart';
 
 import '../modular/embedder.dart';
 import 'message.dart';
@@ -22,9 +21,6 @@ enum CommandType {
 
 /// A [Message] model representing a slash command.
 class CommandMessage extends Message {
-  /// [Uuid] generator.
-  static final Uuid uuid = new Uuid();
-
   /// Called whenever the [Model] changes.
   // CommandMessageParentBuilder parentBuilder;
   final Embedder embedder;
@@ -69,14 +65,14 @@ class CommandMessage extends Message {
 
     _arguments = chunks;
 
-    // Supports "/mod <bin> <message>".
+    // Supports "/mod <bin>".
     if (_arguments.isNotEmpty && !embedder.daisyStarted) {
-      String id = uuid.unparse(messageId);
+      String id = BASE64.encode(messageId);
       String bin = _arguments.first;
 
       Map<String, String> messageEntity = <String, String>{
         '@type': 'com.google.fuchsia.string',
-        'content': _arguments.sublist(1).join(' '),
+        'content': null, // start with a null message content.
       };
       Map<String, dynamic> membersEntity = <String, dynamic>{
         '@type': 'com.google.fuchsia.chat.members',
@@ -118,10 +114,9 @@ class CommandMessage extends Message {
   Widget buildWidget() {
     /// Connect the [EmbedderModel] parent to the nodes built in
     /// [buildEmbeddedModule].
-    return new ScopedModel<EmbedderModel>(
-      model: embedder,
-      child: new ScopedModelDescendant<EmbedderModel>(
-          builder: buildEmbeddedModule),
+    return new AnimatedBuilder(
+      animation: embedder,
+      builder: buildEmbeddedModule,
     );
   }
 
@@ -130,10 +125,10 @@ class CommandMessage extends Message {
   Widget buildEmbeddedModule(
     BuildContext context,
     Widget child,
-    EmbedderModel model,
   ) {
+    Widget content;
     if (_command == null) {
-      return new Text(
+      content = new Text(
         payload,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
@@ -141,7 +136,26 @@ class CommandMessage extends Message {
         ),
       );
     } else {
-      return model.build(context);
+      content = embedder.build(context);
     }
+
+    return new Stack(
+      fit: StackFit.passthrough,
+      children: <Widget>[
+        content,
+        new Positioned(
+          top: 0.0,
+          right: 0.0,
+          child: new PhysicalModel(
+            elevation: 8.0,
+            color: Colors.transparent,
+            child: new IconButton(
+              icon: new Icon(Icons.clear, color: Colors.grey[400]),
+              onPressed: onDelete,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

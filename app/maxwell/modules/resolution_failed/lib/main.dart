@@ -24,16 +24,26 @@ class ModuleDataScreen extends StoreWatcher {
   @override
   Widget build(BuildContext context, Map<StoreToken, Store> stores) {
     final ModuleDataStore moduleDataStore = stores[moduleDataStoreToken];
-    return new DefaultTextStyle(
+    return new Container(
+      color: Colors.black,
+      child: new DefaultTextStyle(
         style: Theme
             .of(context)
             .textTheme
             .subhead
             .copyWith(color: Colors.red[400]),
         child: new Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: new Text(
-                'Resolution Failed\n\nLink value: ${moduleDataStore.linkValue}')));
+          padding: const EdgeInsets.all(16.0),
+          child: new ListView(
+            children: <Widget>[
+              new Text(
+                'Resolution Failed\n\nLink value: ${moduleDataStore.linkValue}',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

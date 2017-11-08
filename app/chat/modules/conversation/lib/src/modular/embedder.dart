@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -30,19 +28,20 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
 
   /// The [InterfacePair] for the [ViewOwner] used for the
   /// [ChildViewConnection].
-  InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
+  final InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
 
   /// The client for the link used by the embedded module.
-  LinkProxy link = new LinkProxy();
+  final LinkProxy link = new LinkProxy();
 
   /// The [ChildViewConnection] of the embedded module.
   ChildViewConnection connection;
 
   /// A [ModuleControllerProxy].
-  ModuleControllerProxy moduleControllerProxy = new ModuleControllerProxy();
+  final ModuleControllerProxy moduleControllerProxy =
+      new ModuleControllerProxy();
 
   /// A [ModuleWatcherBinding] used to watch for [ModuleState] changes.
-  ModuleWatcherBinding watcherBinding = new ModuleWatcherBinding();
+  final ModuleWatcherBinding watcherBinding = new ModuleWatcherBinding();
 
   /// The [Embedder] constructor.
   Embedder({
@@ -98,10 +97,10 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
   }
 
   /// Starts a Daisy.
-  Future<Null> startDaisy({
+  void startDaisy({
     @required Daisy daisy,
     @required String name,
-  }) async {
+  }) {
     if (daisyStarted) {
       return;
     }
@@ -123,6 +122,8 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
     );
 
     connection = new ChildViewConnection(viewOwnerPair.passHandle());
+
+    moduleContext.getLink(name, link.ctrl.request());
 
     moduleControllerProxy.watch(watcherBinding.wrap(this));
   }

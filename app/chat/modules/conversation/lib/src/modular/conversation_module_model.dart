@@ -43,6 +43,11 @@ class ChatConversationModuleModel extends ModuleModel {
   /// Keep track of all the [Embedder] instances.
   final Map<String, Embedder> embedders = <String, Embedder>{};
 
+  /// Mapping from BASE64-encoded conversation ID to all the embedders in that
+  /// specific conversation.
+  final Map<String, List<Embedder>> embeddersForConversation =
+      <String, List<Embedder>>{};
+
   final AgentControllerProxy _chatContentProviderController =
       new AgentControllerProxy();
 
@@ -118,12 +123,31 @@ class ChatConversationModuleModel extends ModuleModel {
         return;
       }
 
-      List<chat_fidl.Message> sortedMessages =
+      List<chat_fidl.Message> sortedFidlMessages =
           new List<chat_fidl.Message>.from(_messages)..sort(_compareMessages);
 
-      _sections = createSectionsFromMessages(
-        sortedMessages.map(_createMessageFromFidl).toList(),
-      );
+      List<Message> sortedMessages =
+          sortedFidlMessages.map(_createMessageFromFidl).toList();
+      _sections = createSectionsFromMessages(sortedMessages);
+
+      // Update the last message in the embedded mod links.
+      // Only consider the last TextMessage available in the conversation.
+      TextMessage lastTextMessage = sortedMessages
+          .lastWhere((Message m) => m is TextMessage, orElse: () => null);
+
+      if (lastTextMessage != null) {
+        String convId = BASE64.encode(conversationId);
+        List<Embedder> embedders = embeddersForConversation[convId];
+        if (embedders != null) {
+          for (Embedder embedder in embedders) {
+            // Set the link value.
+            embedder.link.updateObject(
+              const <String>['message'],
+              JSON.encode(<String, String>{'content': lastTextMessage.text}),
+            );
+          }
+        }
+      }
     } on Exception catch (e, stackTrace) {
       log.severe('Error occurred while setting _messages', e, stackTrace);
     } finally {
@@ -400,14 +424,19 @@ class ChatConversationModuleModel extends ModuleModel {
     switch (m.type) {
       case 'command':
         // Create a new embedder if is hasn't been created yet.
-        String encodedId = BASE64.encode(m.messageId);
-        Embedder embedder = embedders[encodedId];
+        String cid = BASE64.encode(conversationId);
+        String mid = BASE64.encode(m.messageId);
+        Embedder embedder = embedders[mid];
         if (embedder == null) {
           embedder = new Embedder(
             height: _kEmbeddedModHeight,
             moduleContext: moduleContext,
           );
-          embedders[encodedId] = embedder;
+          embedders[mid] = embedder;
+
+          // Update the embedder mapping for the current conversation.
+          embeddersForConversation.putIfAbsent(cid, () => <Embedder>[]);
+          embeddersForConversation[cid].add(embedder);
         }
 
         return new CommandMessage(
