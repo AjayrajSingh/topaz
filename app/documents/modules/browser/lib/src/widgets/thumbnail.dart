@@ -7,23 +7,47 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
+import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
+
 const double _kThumbnailSize = 100.0;
+
+/// Typedef of function to call for onDocumentTapped
+typedef void OnDocumentTapped(doc_fidl.Document doc);
+
+List<String> _kValidMimeTypes = <String>['image/', 'video/', 'application/pdf'];
 
 /// Representation of Document objects in the Document Browser
 class Thumbnail extends StatelessWidget {
-  /// Name of the document
-  final String name;
+  /// Document attached to this thumbnail
+  final doc_fidl.Document doc;
+
+  /// True if this document is currently selected
+  final bool selected;
+
+  /// Function to show the info/details view for the Document
+  final OnDocumentTapped onDocumentTapped;
 
   /// Constructor
   const Thumbnail({
     Key key,
-    @required this.name,
+    @required this.doc,
+    @required this.selected,
+    @required this.onDocumentTapped,
   })
-      : assert(name != null),
+      : assert(doc != null),
+        assert(selected != null),
+        assert(onDocumentTapped != null),
         super(key: key);
 
-  void _navigateToDocument(BuildContext context) {
-    // TODO(maryxia) SO-781 build Document Details view
+  bool _showThumbnailLink() {
+    if (doc.thumbnailLink != '') {
+      for (String type in _kValidMimeTypes) {
+        if (doc.mimeType.startsWith(type)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @override
@@ -34,21 +58,26 @@ class Thumbnail extends StatelessWidget {
       margin: const EdgeInsets.all(4.0),
       child: new Material(
         child: new RaisedButton(
-          color: Colors.pink[50],
-          onPressed: () => _navigateToDocument(context),
+          color: selected ? Colors.pink[50] : Colors.teal[50],
+          onPressed: () => onDocumentTapped(doc),
           child: new Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              new Icon(
-                Icons.insert_drive_file,
-                size: 50.0,
-              ),
+              _showThumbnailLink()
+                  ? new Image.network(
+                      doc.thumbnailLink,
+                      height: 70.0,
+                    )
+                  : new Icon(
+                      doc.isFolder ? Icons.folder : Icons.insert_drive_file,
+                      size: 40.0,
+                    ),
               new Text(
-                name,
+                doc.name,
                 textAlign: TextAlign.center,
                 style: new TextStyle(
                   color: Colors.brown,
-                  fontSize: 30.0,
+                  fontSize: 12.0,
                   fontWeight: FontWeight.w700,
                 ),
               ),

@@ -18,11 +18,13 @@ class BrowserModuleModel extends ModuleModel {
   final doc_fidl.DocumentInterfaceProxy _docsInterfaceProxy =
       new doc_fidl.DocumentInterfaceProxy();
 
-  final AgentControllerProxy _documentsAgentController =
-      new AgentControllerProxy();
+  final AgentControllerProxy _agentControllerProxy = new AgentControllerProxy();
 
   /// List of all documents for this Document Provider
   List<doc_fidl.Document> documents = <doc_fidl.Document>[];
+
+  /// Currently selected Document
+  doc_fidl.Document _currentDoc;
 
   /// Constructor
   BrowserModuleModel();
@@ -37,6 +39,15 @@ class BrowserModuleModel extends ModuleModel {
       log.fine('Retrieved list of documents for BrowserModuleModel');
     });
   }
+
+  /// Updates the currently-selected doc
+  void updateCurrentDoc(doc_fidl.Document doc) {
+    _currentDoc = doc;
+    notifyListeners();
+  }
+
+  /// Gets the currently-selected doc
+  doc_fidl.Document get currentDoc => _currentDoc;
 
   @override
   Future<Null> onReady(
@@ -59,7 +70,7 @@ class BrowserModuleModel extends ModuleModel {
       // launches the application at this location, as if it were an agent
       'file:///system/apps/documents/content_provider',
       serviceProviderProxy.ctrl.request(),
-      _documentsAgentController.ctrl.request(),
+      _agentControllerProxy.ctrl.request(),
     );
     // Connect the DocumentsInterfaceProxy to a service that the agent manages.
     // Otherwise, you've only connected to the Agent, and can't perform actions.
@@ -68,5 +79,11 @@ class BrowserModuleModel extends ModuleModel {
     componentContext.ctrl.close();
     notifyListeners();
     log.fine('BrowserModuleModel onReady complete');
+  }
+
+  @override
+  void onStop() {
+    _docsInterfaceProxy.ctrl.close();
+    _agentControllerProxy.ctrl.close();
   }
 }

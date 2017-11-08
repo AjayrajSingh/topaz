@@ -32,7 +32,10 @@ class _BrowserAppState extends State<BrowserApp> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _tabController = new TabController(vsync: this, length: widget.tabs.length);
+    _tabController = new TabController(
+      vsync: this,
+      length: widget.tabs.length,
+    );
     super.initState();
   }
 
@@ -53,7 +56,9 @@ class _BrowserAppState extends State<BrowserApp> with TickerProviderStateMixin {
         return new Scaffold(
           body: new Browser(
             documents: model.documents,
+            currentDoc: model.currentDoc,
             onListPressed: model.list,
+            onDocumentTapped: model.updateCurrentDoc,
           ),
           appBar: new AppBar(
             bottom: new TabBar(
