@@ -1,5 +1,6 @@
 {
     "imports": [
+        "peridot/packages/default",
         "topaz/packages/curl",
         "topaz/packages/dart",
         "topaz/packages/dart_runner",
