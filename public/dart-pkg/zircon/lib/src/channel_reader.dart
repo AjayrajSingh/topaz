@@ -4,6 +4,8 @@
 
 part of zircon;
 
+// ignore_for_file: public_member_api_docs
+
 class ChannelReaderError {
   final Object error;
   final StackTrace stacktrace;
@@ -29,13 +31,17 @@ class ChannelReader {
   ChannelReaderErrorHandler onError;
 
   void bind(Channel channel) {
-    if (isBound) throw new ZirconApiError('ChannelReader is already bound.');
+    if (isBound) {
+      throw new ZirconApiError('ChannelReader is already bound.');
+    }
     _channel = channel;
     _asyncWait();
   }
 
   Channel unbind() {
-    if (!isBound) throw new ZirconApiError("ChannelReader is not bound");
+    if (!isBound) {
+      throw new ZirconApiError('ChannelReader is not bound');
+    }
     _waiter?.cancel();
     final Channel result = _channel;
     _channel = null;
@@ -43,23 +49,29 @@ class ChannelReader {
   }
 
   void close() {
-    if (!isBound) return;
+    if (!isBound) {
+      return;
+    }
     _waiter.cancel();
     _channel.close();
     _channel = null;
   }
 
   void _asyncWait() {
-    _waiter = _channel.handle.asyncWait(
-        Channel.READABLE | Channel.PEER_CLOSED, _handleWaitComplete);
+    _waiter = _channel.handle
+        .asyncWait(Channel.READABLE | Channel.PEER_CLOSED, _handleWaitComplete);
   }
 
   void _errorSoon(ChannelReaderError error) {
-    if (onError == null) return;
+    if (onError == null) {
+      return;
+    }
     scheduleMicrotask(() {
       // We need to re-check onError because it might have changed during the
       // asynchronous gap.
-      if (onError != null) onError(error);
+      if (onError != null) {
+        onError(error);
+      }
     });
   }
 
@@ -79,17 +91,23 @@ class ChannelReader {
     // RawReceivePort any more.
     try {
       if ((pending & Channel.READABLE) != 0) {
-        if (onReadable != null) onReadable();
-        if (isBound) _asyncWait();
+        if (onReadable != null) {
+          onReadable();
+        }
+        if (isBound) {
+          _asyncWait();
+        }
       } else if ((pending & Channel.PEER_CLOSED) != 0) {
         close();
         _errorSoon(null);
       }
+      // ignore: avoid_catching_errors
     } on Error catch (_) {
       // An Error exception from the core libraries is probably a programming
       // error that can't be handled. We rethrow the error so that
       // FidlEventHandlers can't swallow it by mistake.
       rethrow;
+      // ignore: avoid_catches_without_on_clauses
     } catch (e, s) {
       close();
       _errorSoon(new ChannelReaderError(e, s));

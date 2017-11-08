@@ -11,6 +11,8 @@ import 'package:lib.fidl.dart/bindings.dart';
 
 import 'package:flutter/widgets.dart';
 
+// ignore_for_file: public_member_api_docs
+
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 final GlobalKey<SurfaceLayoutState> _surfaceLayoutKey =
     new GlobalKey<SurfaceLayoutState>();
@@ -25,7 +27,7 @@ void _log(String msg) {
 
 /// Main layout widget for displaying Surfaces.
 class SurfaceLayout extends StatefulWidget {
-  SurfaceLayout({Key key}) : super(key: key);
+  const SurfaceLayout({Key key}) : super(key: key);
 
   @override
   SurfaceLayoutState createState() => new SurfaceLayoutState();
@@ -129,7 +131,7 @@ void main() {
 
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices.addServiceForName(
-    (request) {
+    (InterfaceRequest<StoryShellFactory> request) {
       _log('Received binding request for StoryShellFactory');
       _storyShellFactory = new StoryShellFactoryImpl()..bind(request);
     },

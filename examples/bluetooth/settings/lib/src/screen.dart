@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.bluetooth.fidl/control.fidl.dart'
-    as bluetooth;
+import 'package:lib.bluetooth.fidl/control.fidl.dart' as bluetooth;
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'modular/module_model.dart';
@@ -59,7 +58,7 @@ class _SettingsScaffold extends StatelessWidget {
               'Bluetooth Settings (${moduleModel.activeAdapterDescription})'),
           bottom: moduleModel.isDiscovering
               ? new PreferredSize(
-                  child: new LinearProgressIndicator(),
+                  child: const LinearProgressIndicator(),
                   preferredSize: Size.zero)
               : null,
           actions: <Widget>[
@@ -82,7 +81,7 @@ class _SettingsScaffold extends StatelessWidget {
 /// Root Widget of the Settings example module.
 class SettingsScreen extends StatelessWidget {
   /// Constructor
-  SettingsScreen({Key key}) : super(key: key);
+  const SettingsScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

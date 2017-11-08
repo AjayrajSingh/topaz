@@ -8,11 +8,14 @@ import 'package:meta/meta.dart';
 
 import 'modular/module_model.dart';
 
+// ignore_for_file: public_member_api_docs
+
 /// Root Widget of the Eddystone Advertiser module.
 class EddystoneScreen extends StatefulWidget {
   final EddystoneModuleModel moduleModel;
 
-  EddystoneScreen({Key key, @required this.moduleModel}) : super(key: key);
+  const EddystoneScreen({Key key, @required this.moduleModel})
+      : super(key: key);
 
   @override
   _EddystoneState createState() => new _EddystoneState();
@@ -21,9 +24,8 @@ class EddystoneScreen extends StatefulWidget {
 typedef void RemoveCallback();
 
 class AdvertisedListItem extends StatelessWidget {
-  AdvertisedListItem({String url, this.onRemove})
-      : url = url,
-        super(key: new ObjectKey(url));
+  AdvertisedListItem({this.url, this.onRemove})
+      : super(key: new ObjectKey(url));
 
   final String url;
   final RemoveCallback onRemove;
@@ -33,7 +35,7 @@ class AdvertisedListItem extends StatelessWidget {
     return new ListTile(
         title: new Text(url),
         trailing:
-            new RaisedButton(child: new Text('STOP'), onPressed: onRemove));
+            new RaisedButton(child: const Text('STOP'), onPressed: onRemove));
   }
 }
 
@@ -72,8 +74,9 @@ class _EddystoneState extends State<EddystoneScreen> {
                                 return;
                               }
                               moduleModel.startAdvertising(newValue).catchError(
-                                  (error) => Scaffold.of(context).showSnackBar(
-                                      new SnackBar(
+                                  (Object error) => Scaffold
+                                      .of(context)
+                                      .showSnackBar(new SnackBar(
                                           content: new Text(error),
                                           backgroundColor:
                                               const Color(0xFFFFC0EB),
@@ -81,26 +84,28 @@ class _EddystoneState extends State<EddystoneScreen> {
                                               const Duration(seconds: 15))));
                             })),
                     new RaisedButton(
-                        child: new Text('Advertise'),
+                        child: const Text('Advertise'),
                         onPressed: () {
                           _formKey.currentState.save();
                           _formKey.currentState.reset();
                         }),
                   ]),
                 ])));
-        List<Widget> widgets = [advertisingForm, new Text("Advertised URLs")];
-        widgets.addAll(moduleModel.advertisedUrls.map((String url) {
-          return new AdvertisedListItem(
-              url: url,
-              onRemove: () {
-                moduleModel.stopAdvertising(url);
-              });
-        }));
+        List<Widget> widgets = <Widget>[
+          advertisingForm,
+          const Text('Advertised URLs')
+        ]..addAll(moduleModel.advertisedUrls.map((String url) {
+            return new AdvertisedListItem(
+                url: url,
+                onRemove: () {
+                  moduleModel.stopAdvertising(url);
+                });
+          }));
         return new Column(children: widgets);
       });
       return new Scaffold(
           appBar: new AppBar(
-            title: new Text('Eddystone Beacon'),
+            title: const Text('Eddystone Beacon'),
           ),
           body: b);
     });

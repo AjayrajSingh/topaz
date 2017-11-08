@@ -7,9 +7,11 @@ import 'dart:ui';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+// ignore_for_file: public_member_api_docs
+
 // Hosts a Scenic scene graph, in a very naive way.
 class ScenicWidget extends LeafRenderObjectWidget {
-  ScenicWidget(this.sceneHost);
+  const ScenicWidget(this.sceneHost);
 
   final SceneHost sceneHost;
 

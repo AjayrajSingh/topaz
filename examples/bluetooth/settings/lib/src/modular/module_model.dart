@@ -5,8 +5,7 @@
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.bluetooth.fidl/common.fidl.dart' as common;
-import 'package:lib.bluetooth.fidl/control.fidl.dart'
-    as bluetooth;
+import 'package:lib.bluetooth.fidl/control.fidl.dart' as bluetooth;
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.logging/logging.dart';
@@ -102,10 +101,10 @@ class SettingsModuleModel extends ModuleModel
     assert(!_isDiscoveryRequestPending);
 
     _isDiscoveryRequestPending = true;
-    var cb = (common.Status status) {
+    void cb(common.Status status) {
       _isDiscoveryRequestPending = false;
       notifyListeners();
-    };
+    }
 
     if (isDiscovering) {
       log.info('Stop discovery');
@@ -178,7 +177,9 @@ class SettingsModuleModel extends ModuleModel
   void onAdapterRemoved(String identifier) {
     log.info('onAdapterRemoved: $identifier');
     _adapters.remove(identifier);
-    if (_adapters.isEmpty) _activeAdapterId = null;
+    if (_adapters.isEmpty) {
+      _activeAdapterId = null;
+    }
     notifyListeners();
   }
 
@@ -187,7 +188,9 @@ class SettingsModuleModel extends ModuleModel
   @override
   void onAdapterStateChanged(bluetooth.AdapterState state) {
     log.info('onAdapterStateChanged');
-    if (state.discovering == null) return;
+    if (state.discovering == null) {
+      return;
+    }
 
     _isDiscovering = state.discovering.value;
     log.info(

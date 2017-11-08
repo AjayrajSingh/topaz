@@ -9,6 +9,8 @@ import 'photo.dart';
 import 'photo_storage.dart';
 import 'photo_view.dart';
 
+// ignore_for_file: public_member_api_docs
+
 void _log(String msg) {
   print('[Photos Flutter Example] $msg');
 }
@@ -17,7 +19,7 @@ void _log(String msg) {
 class Home extends StatefulWidget {
   final PhotoStorage _storage;
 
-  Home({Key key, PhotoStorage storage})
+  const Home({Key key, PhotoStorage storage})
       : _storage = storage,
         super(key: key);
 
@@ -26,7 +28,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final String _imageUrl = "http://lorempixel.com/400/200/cats/";
+  final String _imageUrl = 'http://lorempixel.com/400/200/cats/';
   PhotoStorage _storage;
 
   _HomeState(this._storage);
@@ -34,7 +36,7 @@ class _HomeState extends State<Home> {
   Widget _buildGrid() {
     final List<Photo> photos = _storage.photos;
     if (photos.isEmpty) {
-      return new Text("Click on \"+\" to add photos.");
+      return const Text('Click on "+" to add photos.');
     }
     return new GridView.count(
         crossAxisCount: 3,
@@ -52,16 +54,16 @@ class _HomeState extends State<Home> {
   }
 
   void _showPhoto(BuildContext context, Photo photo) {
-    _log("clicked on photo: " + photo.description);
+    _log('clicked on photo ${photo.description}');
     Navigator.of(context).push(new MaterialPageRoute<Null>(
         builder: (BuildContext context) => new PhotoView(photo: photo)));
   }
 
   void _onPlusPressed() {
     setState(() {
-      _log("clicked on \"+\"");
+      _log('clicked on "+"');
       int id = _storage.photos.length;
-      _storage.add(new Photo(_storage, "$_imageUrl/?$id", "cat #$id",
+      _storage.add(new Photo(_storage, '$_imageUrl/?$id', 'cat #$id',
           new DateTime.now().millisecondsSinceEpoch));
     });
   }
@@ -74,7 +76,7 @@ class _HomeState extends State<Home> {
             child: _buildGrid()));
 
     return new Scaffold(
-      appBar: new AppBar(title: new Text('Photos Example')),
+      appBar: new AppBar(title: const Text('Photos Example')),
       body: child,
       floatingActionButton: new FloatingActionButton(
           child: new Icon(Icons.add), onPressed: _onPlusPressed),

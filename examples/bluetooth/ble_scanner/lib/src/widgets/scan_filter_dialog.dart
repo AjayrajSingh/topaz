@@ -12,6 +12,8 @@ import 'package:meta/meta.dart';
 import '../manufacturer_names.dart';
 import '../modular/module_model.dart';
 
+// ignore_for_file: public_member_api_docs
+
 /// Enum values to pass to Navigator.push()
 enum DismissDialogAction {
   /// Cancel the scan filter
@@ -25,7 +27,8 @@ enum DismissDialogAction {
 class ScanFilterDialog extends StatefulWidget {
   final BLEScannerModuleModel moduleModel;
 
-  ScanFilterDialog({Key key, @required this.moduleModel}) : super(key: key);
+  const ScanFilterDialog({Key key, @required this.moduleModel})
+      : super(key: key);
 
   @override
   _ScanFilterDialogState createState() => new _ScanFilterDialogState();
@@ -41,7 +44,9 @@ class _ScanFilterDialogState extends State<ScanFilterDialog> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
   Future<bool> _onWillPop() async {
-    if (!_saveNeeded) return true;
+    if (!_saveNeeded) {
+      return true;
+    }
 
     final ThemeData theme = Theme.of(context);
     final TextStyle dialogTextStyle =

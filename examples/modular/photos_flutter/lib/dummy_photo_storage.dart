@@ -7,12 +7,12 @@ import 'package:flutter/services.dart';
 import 'photo.dart';
 import 'photo_storage.dart';
 
-// An in memory cache for photos.
+/// An in memory cache for photos.
 class DummyPhotoStorage extends PhotoStorage {
   final List<Photo> _photos = <Photo>[];
 
   @override
-  List<Photo> get photos => new List.unmodifiable(_photos);
+  List<Photo> get photos => new List<Photo>.unmodifiable(_photos);
 
   @override
   void add(Photo photo) {

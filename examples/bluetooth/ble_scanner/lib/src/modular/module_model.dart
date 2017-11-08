@@ -11,6 +11,8 @@ import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
+// ignore_for_file: public_member_api_docs
+
 enum ConnectionState { notConnected, connecting, connected }
 
 /// The [ModuleModel] for the BLE Scanner example.
@@ -55,7 +57,9 @@ class BLEScannerModuleModel extends ModuleModel implements ble.CentralDelegate {
   set scanFilter(ble.ScanFilter filter) {
     _scanFilter = filter;
     _discoveredDevices.clear();
-    if (isScanning) _restartScan();
+    if (isScanning) {
+      _restartScan();
+    }
     notifyListeners();
   }
 
@@ -139,14 +143,10 @@ class BLEScannerModuleModel extends ModuleModel implements ble.CentralDelegate {
     _central.setDelegate(_delegateBinding.wrap(this));
   }
 
-  @override
-  void onStop() {
-    super.onStop();
-  }
-
   // ble.CentralDelegate overrides:
 
   @override
+  // ignore: avoid_positional_boolean_parameters
   void onScanStateChanged(bool scanning) {
     _isScanning = scanning;
     notifyListeners();

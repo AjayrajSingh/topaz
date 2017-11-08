@@ -7,10 +7,12 @@ import 'package:flutter/widgets.dart';
 
 import 'photo.dart';
 
+// ignore_for_file: public_member_api_docs
+
 class PhotoView extends StatelessWidget {
   final Photo _photo;
 
-  PhotoView({Key key, Photo photo})
+  const PhotoView({Key key, Photo photo})
       : this._photo = photo,
         super(key: key);
 

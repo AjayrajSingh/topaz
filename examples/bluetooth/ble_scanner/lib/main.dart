@@ -19,9 +19,8 @@ void main() {
       new ModuleWidget<BLEScannerModuleModel>(
           moduleModel: new BLEScannerModuleModel(appContext),
           applicationContext: appContext,
-          child: new BLEScannerScreen());
-
-  moduleWidget.advertise();
+          child: new BLEScannerScreen())
+        ..advertise();
 
   runApp(new MaterialApp(home: moduleWidget));
 }

@@ -5,6 +5,7 @@
 part of zircon;
 
 // ignore_for_file: native_function_body_in_non_sdk_code
+// ignore_for_file: public_member_api_docs
 
 class Handle extends NativeFieldWrapperClass2 {
   // No public constructor - this can only be created from native code.
@@ -14,23 +15,23 @@ class Handle extends NativeFieldWrapperClass2 {
   factory Handle.invalid() {
     return _createInvalid();
   }
-  static Handle _createInvalid() native "Handle_CreateInvalid";
+  static Handle _createInvalid() native 'Handle_CreateInvalid';
 
-  int get _handle native "Handle_handle";
+  int get _handle native 'Handle_handle';
 
   @override
   String toString() => 'Handle($_handle)';
 
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
       (other is Handle) && (_handle == other._handle);
 
   @override
   int get hashCode => _handle.hashCode;
 
   // Common handle operations.
-  bool get isValid native "Handle_is_valid";
-  int close() native "Handle_Close";
+  bool get isValid native 'Handle_is_valid';
+  int close() native 'Handle_Close';
   HandleWaiter asyncWait(int signals, AsyncWaitCallback callback)
-      native "Handle_AsyncWait";
+      native 'Handle_AsyncWait';
 }

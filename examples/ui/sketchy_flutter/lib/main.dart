@@ -11,6 +11,8 @@ import 'package:lib.app.dart/app.dart';
 import 'scenic.dart' as scenic;
 import 'scenic_widget.dart';
 
+// ignore_for_file: public_member_api_docs
+
 void main() {
   runApp(new SketchyExampleApp());
 }
@@ -28,7 +30,7 @@ class SketchyExampleApp extends StatelessWidget {
 }
 
 class SketchyExample extends StatefulWidget {
-  SketchyExample({Key key, this.title, this.applicationContext})
+  const SketchyExample({Key key, this.title, this.applicationContext})
       : super(key: key);
 
   final String title;
@@ -69,10 +71,10 @@ class _SketchyExampleState extends State<SketchyExample> {
   final scenic.RoundedRectangle rect;
   final scenic.Material material;
   final scenic.ImportNode rootNode;
-  final List shapeNodes = <scenic.ShapeNode>[];
+  final List<scenic.ShapeNode> shapeNodes = <scenic.ShapeNode>[];
 
   void _addShapeNode() {
-    final shapeNode = new scenic.ShapeNode(session)
+    final scenic.ShapeNode shapeNode = new scenic.ShapeNode(session)
       ..setShape(rect)
       ..setMaterial(material)
       ..setTranslation(100.0 + shapeNodes.length * 30,

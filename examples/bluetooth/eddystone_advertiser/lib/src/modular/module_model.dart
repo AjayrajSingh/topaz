@@ -12,13 +12,15 @@ import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
+// ignore_for_file: public_member_api_docs
+
 /// The [ModuleModel] for the Eddystone advertiser example.
 class EddystoneModuleModel extends ModuleModel {
   // Members that maintain the FIDL service connections.
   final ble.PeripheralProxy _peripheral = new ble.PeripheralProxy();
 
   // The set of advertisements that we're adveertising. Maps url => id
-  final Map<String, String> _activeAdvertisements = {};
+  final Map<String, String> _activeAdvertisements = <String, String>{};
 
   static const String kEddystoneUuid = '0000feaa-0000-1000-8000-00805f9b34fb';
 
@@ -36,11 +38,11 @@ class EddystoneModuleModel extends ModuleModel {
 
   /// Advertises a URL, if possible.
   Future<String> startAdvertising(String url) {
-    Completer completer = new Completer();
-    ble.AdvertisingData data = new ble.AdvertisingData();
+    Completer<String> completer = new Completer<String>();
     log.info('Advertising url: $url');
-    data.serviceUuids = [kEddystoneUuid];
-    data.serviceData = new Map<String, List<int>>();
+    ble.AdvertisingData data = new ble.AdvertisingData()
+      ..serviceUuids = <String>[kEddystoneUuid]
+      ..serviceData = <String, List<int>>{};
     data.serviceData[kEddystoneUuid] = _eddystoneDataForUrl(url);
     _peripheral.startAdvertising(data, null, null, 1000, false,
         (bt.Status status, String advertisementId) {
@@ -84,13 +86,11 @@ class EddystoneModuleModel extends ModuleModel {
 
   @override
   void onStop() {
-    for (final url in _activeAdvertisements.values) {
-      stopAdvertising(url);
-    }
+    _activeAdvertisements.values.forEach(stopAdvertising);
     super.onStop();
   }
 
-  final Map<String, int> _schemes = const {
+  final Map<String, int> _schemes = const <String, int>{
     'http://www.': 0,
     'https://www.': 1,
     'http://': 2,
@@ -99,7 +99,7 @@ class EddystoneModuleModel extends ModuleModel {
 
   String validateEddystoneUrl(final String proposed) {
     bool prefixFound = false;
-    for (final prefix in _schemes.keys) {
+    for (final String prefix in _schemes.keys) {
       if (proposed.startsWith(prefix)) {
         prefixFound = true;
       }
@@ -118,15 +118,14 @@ class EddystoneModuleModel extends ModuleModel {
   }
 
   List<int> _eddystoneDataForUrl(final String url) {
-    List<int> result = [];
-
-    // Eddystone header
-    result.add(0x10); // Frame type (Eddystone-URL)
-    result.add(0x12); // Faked tx-power (18dBm)
+    List<int> result = <int>[]
+      // Eddystone header
+      ..add(0x10) // Frame type (Eddystone-URL)
+      ..add(0x12); // Faked tx-power (18dBm)
     String left = url;
     // Scheme
 
-    final Map<String, int> expansions = const {
+    final Map<String, int> expansions = const <String, int>{
       '.com/': 0,
       '.org/': 1,
       '.edu/': 2,
@@ -143,16 +142,16 @@ class EddystoneModuleModel extends ModuleModel {
       '.gov': 13,
     };
 
-    for (final prefix in _schemes.keys) {
+    for (final String prefix in _schemes.keys) {
       if (left.startsWith(prefix)) {
         left = left.substring(prefix.length);
         result.add(_schemes[prefix]);
       }
     }
 
-    while (left.length > 0) {
+    while (left.isNotEmpty) {
       bool compacted = false;
-      for (final str in expansions.keys) {
+      for (final String str in expansions.keys) {
         if (left.startsWith(str)) {
           result.add(expansions[str]);
           left = left.substring(str.length);
@@ -160,7 +159,9 @@ class EddystoneModuleModel extends ModuleModel {
           break;
         }
       }
-      if (compacted) continue;
+      if (compacted) {
+        continue;
+      }
       result.add(left.codeUnitAt(0));
       left = left.substring(1);
     }

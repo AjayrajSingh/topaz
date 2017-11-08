@@ -21,10 +21,10 @@ class BLEScannerScreen extends StatelessWidget {
     ) {
       return new Scaffold(
           appBar: new AppBar(
-              title: new Text('BLE Scanner'),
+              title: const Text('BLE Scanner'),
               bottom: moduleModel.isScanning
                   ? new PreferredSize(
-                      child: new LinearProgressIndicator(),
+                      child: const LinearProgressIndicator(),
                       preferredSize: Size.zero)
                   : null,
               actions: <Widget>[

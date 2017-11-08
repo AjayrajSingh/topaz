@@ -2,14 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import "session.dart";
-
 import 'dart:zircon';
+
 import 'package:lib.ui.scenic.fidl/nodes.fidl.dart' as scenic;
 import 'package:lib.ui.scenic.fidl/ops.fidl.dart' as scenic;
 import 'package:lib.ui.scenic.fidl/resources.fidl.dart' as scenic;
 import 'package:lib.ui.scenic.fidl/shapes.fidl.dart' as scenic;
 import 'package:lib.ui.scenic.fidl/types.fidl.dart' as scenic;
+
+import 'session.dart';
+
+// ignore_for_file: public_member_api_docs
 
 class Resource {
   final int id;
@@ -31,17 +34,13 @@ class Resource {
   }
 
   scenic.Op _enqueue() {
-    final op = new scenic.Op();
+    final scenic.Op op = new scenic.Op();
     session.enqueue(op);
     return op;
   }
 }
 
-scenic.Value vector1(double val) {
-  final v = new scenic.Value();
-  v.vector1 = val;
-  return v;
-}
+scenic.Value vector1(double val) => new scenic.Value()..vector1 = val;
 
 class Node extends Resource {
   Node._create(Session session, scenic.Resource resource)
@@ -51,7 +50,7 @@ class Node extends Resource {
       : super._import(session, token, spec);
 
   void setRotation(double x, double y, double z, double w) {
-    final quaternion = new scenic.Quaternion()
+    final scenic.Quaternion quaternion = new scenic.Quaternion()
       ..x = x
       ..y = y
       ..z = z
@@ -68,7 +67,7 @@ class Node extends Resource {
   }
 
   void setTranslation(double x, double y, double z) {
-    final vec3 = new scenic.Vec3()
+    final scenic.Vec3 vec3 = new scenic.Vec3()
       ..x = x
       ..y = y
       ..z = z;
@@ -133,7 +132,7 @@ class Material extends Resource {
             session, new scenic.Resource()..material = new scenic.Material());
 
   void setColor(double red, double green, double blue, double alpha) {
-    final color = new scenic.ColorRgba()
+    final scenic.ColorRgba color = new scenic.ColorRgba()
       ..red = (red * 255).round()
       ..green = (green * 255).round()
       ..blue = (blue * 255).round()
@@ -181,13 +180,13 @@ class RoundedRectangle extends Shape {
       scenic.Value topRightRadius,
       scenic.Value bottomLeftRadius,
       scenic.Value bottomRightRadius) {
-    final rect = new scenic.RoundedRectangle();
-    rect.width = width;
-    rect.height = height;
-    rect.topLeftRadius = topLeftRadius;
-    rect.topRightRadius = topRightRadius;
-    rect.bottomLeftRadius = bottomLeftRadius;
-    rect.bottomRightRadius = bottomRightRadius;
+    final scenic.RoundedRectangle rect = new scenic.RoundedRectangle()
+      ..width = width
+      ..height = height
+      ..topLeftRadius = topLeftRadius
+      ..topRightRadius = topRightRadius
+      ..bottomLeftRadius = bottomLeftRadius
+      ..bottomRightRadius = bottomRightRadius;
 
     return new RoundedRectangle._create(
         session, new scenic.Resource()..roundedRectangle = rect);

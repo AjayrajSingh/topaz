@@ -59,7 +59,8 @@ class ScanResultsState extends State<ScanResultsWidget> {
       Widget child,
       model.BLEScannerModuleModel moduleModel,
     ) {
-      var connState = moduleModel.getPeripheralState(device.identifier);
+      final model.ConnectionState connState =
+          moduleModel.getPeripheralState(device.identifier);
       return new Row(children: <Widget>[
         new Expanded(
             flex: 2,
@@ -84,7 +85,7 @@ class ScanResultsState extends State<ScanResultsWidget> {
     });
   }
 
-  String toHexString(final List<int> data) {
+  String _toHexString(final List<int> data) {
     return data
         .map((int byte) => byte.toRadixString(16).padLeft(2, '0'))
         .join(' ');
@@ -128,7 +129,7 @@ class ScanResultsState extends State<ScanResultsWidget> {
       entries.add(new _AdvertisingDataEntry(
           title,
           (BuildContext context) =>
-              new Text(toHexString(data), style: textStyle)));
+              new Text(_toHexString(data), style: textStyle)));
     });
 
     device.advertisingData.manufacturerSpecificData
@@ -139,15 +140,15 @@ class ScanResultsState extends State<ScanResultsWidget> {
       entries.add(new _AdvertisingDataEntry(
           title,
           (BuildContext context) =>
-              new Text(toHexString(data), style: textStyle)));
+              new Text(_toHexString(data), style: textStyle)));
     });
 
-    device.advertisingData.uris?.forEach((var uri) {
+    for (String uri in device.advertisingData.uris ?? const <String>[]) {
       const String title = 'URI';
       currentMaxTitleLength = max(currentMaxTitleLength, title.length);
       entries.add(new _AdvertisingDataEntry(
           title, (BuildContext context) => new Text(uri)));
-    });
+    }
 
     if (entries.isEmpty) {
       return new Text('No data', style: textStyle);
@@ -184,7 +185,8 @@ class ScanResultsState extends State<ScanResultsWidget> {
         return const Text('Not connectable');
       }
 
-      var connState = moduleModel.getPeripheralState(device.identifier);
+      final model.ConnectionState connState =
+          moduleModel.getPeripheralState(device.identifier);
 
       if (connState == model.ConnectionState.connecting) {
         return const Text('Connecting...');

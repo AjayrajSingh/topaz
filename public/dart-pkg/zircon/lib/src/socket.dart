@@ -5,6 +5,7 @@
 part of zircon;
 
 // ignore_for_file: constant_identifier_names
+// ignore_for_file: public_member_api_docs
 
 class Socket extends _HandleWrapper<Socket> {
   Socket(Handle handle) : super(handle);
@@ -31,13 +32,17 @@ class Socket extends _HandleWrapper<Socket> {
   static const int SHUTDOWN_WRITE = ZX.SOCKET_SHUTDOWN_WRITE;
 
   WriteResult write(ByteData data, [int options = 0]) {
-    if (handle == null) return const WriteResult(ZX.ERR_INVALID_ARGS);
+    if (handle == null) {
+      return const WriteResult(ZX.ERR_INVALID_ARGS);
+    }
 
     return System.socketWrite(handle, data, options);
   }
 
   ReadResult read(int numBytes) {
-    if (handle == null) return const ReadResult(ZX.ERR_INVALID_ARGS);
+    if (handle == null) {
+      return const ReadResult(ZX.ERR_INVALID_ARGS);
+    }
 
     return System.socketRead(handle, numBytes);
   }

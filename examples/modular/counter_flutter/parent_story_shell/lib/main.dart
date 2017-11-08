@@ -19,8 +19,6 @@ void main() {
     child: new MaterialApp(
       home: new Home(),
     ),
-  );
-
-  moduleWidget.advertise();
+  )..advertise();
   runApp(moduleWidget);
 }

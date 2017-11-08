@@ -5,6 +5,7 @@
 part of zircon;
 
 // ignore_for_file: constant_identifier_names
+// ignore_for_file: public_member_api_docs
 
 class Channel extends _HandleWrapper<Channel> {
   Channel(Handle handle) : super(handle);
@@ -22,7 +23,9 @@ class Channel extends _HandleWrapper<Channel> {
   static const int MAX_MSG_HANDLES = ZX.CHANNEL_MAX_MSG_HANDLES;
 
   int write(ByteData data, [List<Handle> handles]) {
-    if (handle == null) return ZX.ERR_INVALID_ARGS;
+    if (handle == null) {
+      return ZX.ERR_INVALID_ARGS;
+    }
 
     return System.channelWrite(handle, data, handles);
   }

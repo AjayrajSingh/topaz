@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 
 import 'photo_storage.dart';
 
+// ignore_for_file: public_member_api_docs
+
 /// The representation of a photo.
 class Photo {
   final PhotoStorage _storage;

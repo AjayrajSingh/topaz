@@ -22,9 +22,8 @@ void main() {
       new ModuleWidget<EddystoneModuleModel>(
           moduleModel: model,
           applicationContext: appContext,
-          child: new EddystoneScreen(moduleModel: model));
-
-  moduleWidget.advertise();
+          child: new EddystoneScreen(moduleModel: model))
+        ..advertise();
 
   runApp(new MaterialApp(home: moduleWidget));
 }

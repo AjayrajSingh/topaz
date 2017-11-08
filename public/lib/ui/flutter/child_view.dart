@@ -26,7 +26,9 @@ export 'package:lib.ui.views.fidl/view_token.fidl.dart' show ViewOwner;
 
 ViewContainerProxy _initViewContainer() {
   final Handle handle = MozartStartupInfo.takeViewContainer();
-  if (handle == null) return null;
+  if (handle == null) {
+    return null;
+  }
   final ViewContainerProxy proxy = new ViewContainerProxy()
     ..ctrl.bind(new InterfaceHandle<ViewContainer>(new Channel(handle), 0))
     ..setListener(_ViewContainerListenerImpl.instance.createInterfaceHandle());
@@ -73,8 +75,7 @@ class _ViewContainerListenerImpl extends ViewContainerListener {
 }
 
 typedef void ChildViewConnectionCallback(ChildViewConnection connection);
-final ChildViewConnectionCallback _emptyConnectionCallback =
-    (ChildViewConnection c) {};
+void _emptyConnectionCallback(ChildViewConnection c) {}
 
 /// A connection with a child view.
 ///
@@ -84,9 +85,8 @@ class ChildViewConnection {
       {ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable})
       : _onAvailableCallback = onAvailable ?? _emptyConnectionCallback,
-        _onUnavailableCallback = onUnavailable ?? _emptyConnectionCallback {
-    assert(_viewOwner != null);
-  }
+        _onUnavailableCallback = onUnavailable ?? _emptyConnectionCallback,
+        assert(_viewOwner != null);
 
   factory ChildViewConnection.launch(String url, ApplicationLauncher launcher,
       {InterfaceRequest<ApplicationController> controller,
@@ -140,7 +140,9 @@ class ChildViewConnection {
   void _onAttachedToContainer(ViewInfo viewInfo) {
     assert(_viewInfo == null);
     _viewInfo = viewInfo;
-    if (_onViewInfoAvailable != null) _onViewInfoAvailable();
+    if (_onViewInfoAvailable != null) {
+      _onViewInfoAvailable();
+    }
     _onAvailableCallback(this);
   }
 
@@ -150,7 +152,9 @@ class ChildViewConnection {
   }
 
   void _addChildToViewHost() {
-    if (_viewContainer == null) return;
+    if (_viewContainer == null) {
+      return;
+    }
     assert(_attached);
     assert(_viewOwner != null);
     assert(_viewKey == null);
@@ -168,7 +172,9 @@ class ChildViewConnection {
   }
 
   void _removeChildFromViewHost() {
-    if (_viewContainer == null) return;
+    if (_viewContainer == null) {
+      return;
+    }
     assert(!_attached);
     assert(_viewOwner == null);
     assert(_viewKey != null);
@@ -197,7 +203,9 @@ class ChildViewConnection {
   void _attach() {
     assert(_attachments >= 0);
     ++_attachments;
-    if (_viewKey == null) _addChildToViewHost();
+    if (_viewKey == null) {
+      _addChildToViewHost();
+    }
   }
 
   void _detach() {
@@ -208,7 +216,9 @@ class ChildViewConnection {
 
   void _removeChildFromViewHostIfNeeded() {
     assert(_attachments >= 0);
-    if (_attachments == 0 && _viewKey != null) _removeChildFromViewHost();
+    if (_attachments == 0 && _viewKey != null) {
+      _removeChildFromViewHost();
+    }
   }
 
   ViewProperties _createViewProperties(
@@ -227,7 +237,9 @@ class ChildViewConnection {
         _currentViewProperties.viewLayout.inset.top == insetTop &&
         _currentViewProperties.viewLayout.inset.right == insetRight &&
         _currentViewProperties.viewLayout.inset.bottom == insetBottom &&
-        _currentViewProperties.viewLayout.inset.left == insetLeft) return null;
+        _currentViewProperties.viewLayout.inset.left == insetLeft) {
+      return null;
+    }
 
     DisplayMetrics displayMetrics = new DisplayMetrics()
       ..devicePixelRatio = devicePixelRatio;
@@ -242,10 +254,9 @@ class ChildViewConnection {
     ViewLayout viewLayout = new ViewLayout()
       ..size = size
       ..inset = inset;
-    _currentViewProperties = new ViewProperties()
+    return _currentViewProperties = new ViewProperties()
       ..displayMetrics = displayMetrics
       ..viewLayout = viewLayout;
-    return _currentViewProperties;
   }
 
   void _setChildProperties(
@@ -259,10 +270,14 @@ class ChildViewConnection {
     assert(_attached);
     assert(_attachments == 1);
     assert(_viewKey != null);
-    if (_viewContainer == null) return;
+    if (_viewContainer == null) {
+      return;
+    }
     ViewProperties viewProperties = _createViewProperties(width, height,
         devicePixelRatio, insetTop, insetRight, insetBottom, insetLeft);
-    if (viewProperties == null) return;
+    if (viewProperties == null) {
+      return;
+    }
     _viewContainer.setChildProperties(_viewKey, viewProperties);
   }
 }
@@ -273,21 +288,22 @@ class _RenderChildView extends RenderBox {
   /// The [scale] argument must not be null.
   _RenderChildView({
     ChildViewConnection connection,
-    double scale,
+    @required double scale,
     bool hitTestable: true,
   })
-      : _scale = scale,
-        _hitTestable = hitTestable {
-    assert(scale != null);
-    assert(hitTestable != null);
-    this.connection = connection;
-  }
+      : _connection = connection,
+        _scale = scale,
+        _hitTestable = hitTestable,
+        assert(scale != null),
+        assert(hitTestable != null);
 
   /// The child to display.
   ChildViewConnection get connection => _connection;
   ChildViewConnection _connection;
   set connection(ChildViewConnection value) {
-    if (value == _connection) return;
+    if (value == _connection) {
+      return;
+    }
     if (attached && _connection != null) {
       _connection._detach();
       assert(_connection._onViewInfoAvailable != null);
@@ -311,9 +327,13 @@ class _RenderChildView extends RenderBox {
   double _scale;
   set scale(double value) {
     assert(value != null);
-    if (value == _scale) return;
+    if (value == _scale) {
+      return;
+    }
     _scale = value;
-    if (_connection != null) markNeedsLayout();
+    if (_connection != null) {
+      markNeedsLayout();
+    }
   }
 
   /// Whether this child should be included during hit testing.
@@ -321,9 +341,13 @@ class _RenderChildView extends RenderBox {
   bool _hitTestable;
   set hitTestable(bool value) {
     assert(value != null);
-    if (value == _hitTestable) return;
+    if (value == _hitTestable) {
+      return;
+    }
     _hitTestable = value;
-    if (_connection != null) markNeedsPaint();
+    if (_connection != null) {
+      markNeedsPaint();
+    }
   }
 
   @override
@@ -365,7 +389,7 @@ class _RenderChildView extends RenderBox {
       assert(() {
         if (_viewContainer == null) {
           _debugErrorMessage ??= new TextPainter(
-              text: new TextSpan(
+              text: const TextSpan(
                   text:
                       'Child views are supported only when running in Mozart.'));
           _debugErrorMessage.layout(minWidth: size.width, maxWidth: size.width);
@@ -403,13 +427,14 @@ class _RenderChildView extends RenderBox {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(
-      new DiagnosticsProperty<ChildViewConnection>(
-        'connection',
-        connection,
-      ),
-    );
-    description.add(new DoubleProperty('scale', scale));
+    description
+      ..add(
+        new DiagnosticsProperty<ChildViewConnection>(
+          'connection',
+          connection,
+        ),
+      )
+      ..add(new DoubleProperty('scale', scale));
   }
 }
 
@@ -457,11 +482,12 @@ class ChildSceneLayer extends Layer {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(new DiagnosticsProperty<Offset>('offset', offset));
-    description.add(new DoubleProperty('width', width));
-    description.add(new DoubleProperty('height', height));
-    description.add(new DiagnosticsProperty<ui.SceneHost>('sceneHost', sceneHost));
-    description.add(new DiagnosticsProperty<bool>('hitTestable', hitTestable));
+    description
+      ..add(new DiagnosticsProperty<Offset>('offset', offset))
+      ..add(new DoubleProperty('width', width))
+      ..add(new DoubleProperty('height', height))
+      ..add(new DiagnosticsProperty<ui.SceneHost>('sceneHost', sceneHost))
+      ..add(new DiagnosticsProperty<bool>('hitTestable', hitTestable));
   }
 }
 
@@ -472,9 +498,8 @@ class ChildSceneLayer extends Layer {
 @immutable
 class ChildView extends LeafRenderObjectWidget {
   /// Creates a widget that is replaced by content from another process.
-  ChildView({ChildViewConnection connection, this.hitTestable: true})
-      : connection = connection,
-        super(key: new GlobalObjectKey(connection));
+  ChildView({this.connection, this.hitTestable: true})
+      : super(key: new GlobalObjectKey(connection));
 
   /// A connection to the child whose content will replace this widget.
   final ChildViewConnection connection;

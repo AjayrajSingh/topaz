@@ -5,6 +5,7 @@
 part of zircon;
 
 // ignore_for_file: native_function_body_in_non_sdk_code
+// ignore_for_file: public_member_api_docs
 
 /// An exception representing an error returned as an zx_status_t.
 class ZxStatusException extends Error {
@@ -37,7 +38,8 @@ class HandlePairResult extends _Result {
   const HandlePairResult(final int status, [this.first, this.second])
       : super(status);
   @override
-  String toString() => 'HandlePairResult(status=$status, first=$first, second=$second)';
+  String toString() =>
+      'HandlePairResult(status=$status, first=$first, second=$second)';
 }
 
 class ReadResult extends _Result {
@@ -50,7 +52,8 @@ class ReadResult extends _Result {
       bytes.buffer.asUint8List(bytes.offsetInBytes, numBytes);
   String bytesAsUTF8String() => UTF8.decode(bytesAsUint8List());
   @override
-  String toString() => 'ReadResult(status=$status, bytes=$bytes, numBytes=$numBytes, handles=$handles)';
+  String toString() =>
+      'ReadResult(status=$status, bytes=$bytes, numBytes=$numBytes, handles=$handles)';
 }
 
 class WriteResult extends _Result {
@@ -73,34 +76,34 @@ class System extends NativeFieldWrapperClass2 {
 
   // Channel operations.
   static HandlePairResult channelCreate([int options = 0])
-      native "System_ChannelCreate";
+      native 'System_ChannelCreate';
   static int channelWrite(Handle channel, ByteData data, List<Handle> handles)
-      native "System_ChannelWrite";
+      native 'System_ChannelWrite';
   static ReadResult channelQueryAndRead(Handle channel)
-      native "System_ChannelQueryAndRead";
+      native 'System_ChannelQueryAndRead';
 
   // Eventpair operations.
   static HandlePairResult eventpairCreate([int options = 0])
-      native "System_EventpairCreate";
+      native 'System_EventpairCreate';
 
   // Socket operations.
   static HandlePairResult socketCreate([int options = ZX.SOCKET_STREAM])
-      native "System_SocketCreate";
+      native 'System_SocketCreate';
   static WriteResult socketWrite(Handle socket, ByteData data, int options)
-      native "System_SocketWrite";
+      native 'System_SocketWrite';
   static ReadResult socketRead(Handle socket, int size)
-      native "System_SocketRead";
+      native 'System_SocketRead';
 
   // Vmo operations.
   static HandleResult vmoCreate(int size, [int options = 0])
-      native "System_VmoCreate";
-  static GetSizeResult vmoGetSize(Handle vmo) native "System_VmoGetSize";
-  static int vmoSetSize(Handle vmo, int size) native "System_VmoSetSize";
+      native 'System_VmoCreate';
+  static GetSizeResult vmoGetSize(Handle vmo) native 'System_VmoGetSize';
+  static int vmoSetSize(Handle vmo, int size) native 'System_VmoSetSize';
   static WriteResult vmoWrite(Handle vmo, int offset, ByteData bytes)
-      native "System_VmoWrite";
+      native 'System_VmoWrite';
   static ReadResult vmoRead(Handle vmo, int offset, int size)
-      native "System_VmoRead";
+      native 'System_VmoRead';
 
   // Time operations.
-  static int timeGet(int clockId) native "System_TimeGet";
+  static int timeGet(int clockId) native 'System_TimeGet';
 }

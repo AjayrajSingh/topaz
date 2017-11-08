@@ -19,9 +19,8 @@ void main() {
       new ModuleWidget<SettingsModuleModel>(
           moduleModel: new SettingsModuleModel(appContext),
           applicationContext: appContext,
-          child: new SettingsScreen());
-
-  moduleWidget.advertise();
+          child: const SettingsScreen())
+        ..advertise();
 
   runApp(new MaterialApp(home: moduleWidget));
 }

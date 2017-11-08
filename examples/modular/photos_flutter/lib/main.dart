@@ -66,19 +66,17 @@ void main() {
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices
     ..addServiceForName(
-      (request) {
+      (InterfaceRequest<Module> request) {
         _log('Received binding request for Module');
         _moduleImpl.bindModule(request);
       },
       Module.serviceName,
     )
     ..addServiceForName(
-      (request) {
-        _moduleImpl.bindLifecycle(request);
-      },
+      _moduleImpl.bindLifecycle,
       Lifecycle.serviceName,
     );
-  final storage = new DummyPhotoStorage();
+  final DummyPhotoStorage storage = new DummyPhotoStorage();
   runApp(new MaterialApp(
     title: 'Photos Example',
     home: new Home(storage: storage),

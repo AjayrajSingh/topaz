@@ -7,8 +7,10 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
+// ignore_for_file: public_member_api_docs
+
 class ModuleDataScreen extends StatelessWidget {
-  ModuleDataScreen({Key key}) : super(key: key);
+  const ModuleDataScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +20,9 @@ class ModuleDataScreen extends StatelessWidget {
             .textTheme
             .subhead
             .copyWith(color: Colors.red[400]),
-        child: new Padding(
+        child: const Padding(
             padding: const EdgeInsets.all(16.0),
-            child: new Text("Hello, World!")));
+            child: const Text('Hello, World!')));
   }
 }
 
@@ -35,7 +37,7 @@ void main() {
       title: 'Example Hello World Flutter',
       theme: new ThemeData(
           primarySwatch: Colors.purple, accentColor: Colors.orangeAccent[400]),
-      home: new ModuleDataScreen(),
+      home: const ModuleDataScreen(),
     ),
   )..advertise();
 

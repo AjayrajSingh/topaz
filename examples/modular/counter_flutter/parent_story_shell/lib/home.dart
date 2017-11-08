@@ -35,7 +35,7 @@ class Home extends StatelessWidget {
                     height: 2.0,
                   ),
                 ),
-                new Text('Current Value:'),
+                const Text('Current Value:'),
                 new Text(model.counter.toString()),
                 new Row(
                   mainAxisSize: MainAxisSize.min,
@@ -54,7 +54,7 @@ class Home extends StatelessWidget {
                 // module to the front, when it has lost focus or has been
                 // dismissed by the user.
                 new RaisedButton(
-                  child: new Text('Focus Child'),
+                  child: const Text('Focus Child'),
                   onPressed: model.focusChild,
                 ),
               ],

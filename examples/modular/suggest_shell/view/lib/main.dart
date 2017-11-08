@@ -16,7 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
-final String _kValue = "http://schema.domokit.org/suggestion";
+final String _kValue = 'http://schema.domokit.org/suggestion';
 
 void _log(String msg) {
   print('[SuggestShell View] $msg');
@@ -109,7 +109,7 @@ class _AppState {
   // stored in the Link of the Module. Everything else in this class
   // orchestrates sources for updates of this state or ways to access
   // this state.
-  String _value = "";
+  String _value = '';
 
   // Watchers to be notified of state changes.
   final List<_UpdateCallback> _watch = <_UpdateCallback>[];
@@ -124,7 +124,9 @@ class _AppState {
   // all watchers about it.
   void _notify(Function change) {
     change();
-    _watch.forEach((f) => f());
+    for (_UpdateCallback f in _watch) {
+      f();
+    }
   }
 
   // API below is exposed to the view state. It exposes the current
@@ -161,8 +163,8 @@ class _HomeScreenState extends State<_HomeScreen> {
         onKey: _onKey,
         child: new Material(
             color: Colors.blue[200],
-            child: new Column(children: [
-              new Text('[type and terminate input with <<]'),
+            child: new Column(children: <Widget>[
+              const Text('[type and terminate input with <<]'),
               new Text('Active input: ${_state.value}'),
               new Text('Next input: $_value')
             ])));
@@ -192,7 +194,7 @@ class _HomeScreenState extends State<_HomeScreen> {
 // here it doesn't), but the app state instance stays the same for the
 // whole life of the app instance.
 class _HomeScreen extends StatefulWidget {
-  _HomeScreen({Key key, _AppState state})
+  const _HomeScreen({Key key, _AppState state})
       : _state = state,
         super(key: key);
 
