@@ -115,23 +115,6 @@ class CommandMessage extends Message {
       content = embedder.build(context);
     }
 
-    return new Stack(
-      fit: StackFit.passthrough,
-      children: <Widget>[
-        content,
-        new Positioned(
-          top: 0.0,
-          right: 0.0,
-          child: new PhysicalModel(
-            elevation: 8.0,
-            color: Colors.transparent,
-            child: new IconButton(
-              icon: new Icon(Icons.clear, color: Colors.grey[400]),
-              onPressed: onDelete,
-            ),
-          ),
-        ),
-      ],
-    );
+    return content;
   }
 }

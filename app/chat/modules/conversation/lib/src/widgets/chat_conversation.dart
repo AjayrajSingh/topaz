@@ -19,6 +19,9 @@ class ChatConversation extends StatefulWidget {
   /// List of [Section]s to render
   final List<Section> sections;
 
+  /// List of [CommandMessage]s to stack at the bottom of the conversation.
+  final List<CommandMessage> commandMessages;
+
   /// Title of thread
   final String title;
 
@@ -38,6 +41,7 @@ class ChatConversation extends StatefulWidget {
     Key key,
     this.enabled: true,
     @required this.sections,
+    @required this.commandMessages,
     this.title,
     this.onSubmitMessage,
     this.onTapSharePhoto,
@@ -60,51 +64,87 @@ class _ChatConversationState extends State<ChatConversation> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+
+    List<Widget> children = <Widget>[
+      new Container(
+        height: 56.0,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        alignment: FractionalOffset.centerLeft,
+        decoration: new BoxDecoration(
+          border: new Border(bottom: new BorderSide(color: Colors.grey[300])),
+        ),
+        child: new Text(
+          widget.title ?? '(No Conversation Selected)',
+          style: widget.enabled
+              ? theme.textTheme.title
+              : theme.textTheme.title.copyWith(color: Colors.grey[500]),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+      new Expanded(
+        child: new Column(
+          children: <Widget>[
+            new Flexible(
+              child: new Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: new ListView(
+                  controller: effectiveScrollController,
+                  reverse: true,
+                  shrinkWrap: true,
+                  children: widget.sections.reversed
+                      .map((Section section) =>
+                          new ChatSection(section: section))
+                      .toList(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ];
+
+    // Stack the command messages, if any. Note that this could cause vertical
+    // renderflex overflow, in case there are too many command messages to
+    // display.
+    if (widget.commandMessages?.isNotEmpty ?? false) {
+      children.addAll(
+        widget.commandMessages.map(
+          (CommandMessage cm) => new Container(
+                child: new Column(
+                  children: <Widget>[
+                    new Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: new GestureDetector(
+                        child: new Icon(
+                          Icons.clear,
+                          color: Colors.grey[700],
+                        ),
+                        onTap: cm.onDelete,
+                      ),
+                    ),
+                    cm.buildWidget(),
+                  ],
+                ),
+                color: Colors.grey[300],
+                padding: const EdgeInsets.all(8.0),
+              ),
+        ),
+      );
+    }
+
+    children.add(
+      new MessageInput(
+        enabled: widget.enabled,
+        onSubmitMessage: widget.onSubmitMessage,
+        onTapSharePhoto: widget.onTapSharePhoto,
+      ),
+    );
+
     return new Column(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        new Container(
-          height: 56.0,
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          alignment: FractionalOffset.centerLeft,
-          decoration: new BoxDecoration(
-            border: new Border(bottom: new BorderSide(color: Colors.grey[300])),
-          ),
-          child: new Text(
-            widget.title ?? '(No Conversation Selected)',
-            style: widget.enabled
-                ? theme.textTheme.title
-                : theme.textTheme.title.copyWith(color: Colors.grey[500]),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        new Expanded(
-          child: new Column(
-            children: <Widget>[
-              new Flexible(
-                child: new Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: new ListView(
-                    controller: effectiveScrollController,
-                    reverse: true,
-                    shrinkWrap: true,
-                    children: widget.sections.reversed
-                        .map((Section section) =>
-                            new ChatSection(section: section))
-                        .toList(),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        new MessageInput(
-          enabled: widget.enabled,
-          onSubmitMessage: widget.onSubmitMessage,
-          onTapSharePhoto: widget.onTapSharePhoto,
-        ),
-      ],
+      children: children,
     );
   }
 }
