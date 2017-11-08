@@ -13,6 +13,7 @@ dart_app("ledger_dashboard_dart") {
   source_dir = "."
 
   deps = [
+    "//peridot/bin/ledger/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/http",
     "//topaz/public/lib/app/dart",

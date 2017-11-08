@@ -22,9 +22,21 @@ $(function() {
       var newPanelSelector = _tabBar.activeTab.root_.hash;
       updateTabPanel(newPanelSelector);
     });
-
   _tabBar.layout();
 
+  $(document).ready(function(){
+    $.get("http://" + window.location.host + "/data/ledger_debug/",
+           function(data, status){
+             var methodElem = $("<span/>")
+              .addClass('mdc-list-item__text')
+              .text(data);
+             methodElem.append(' ');
+
+             $("#ledger-panel")
+              .prepend($('<li/>').addClass('mdc-list-item').append(methodElem))
+              .prepend($('<li/>').addClass('mdc-list-divider').attr('role','divider'));
+           });
+  });
 })
 
 function updateTabPanel(newPanelSelector) {
