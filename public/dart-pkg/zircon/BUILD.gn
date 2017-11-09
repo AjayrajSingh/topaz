@@ -46,9 +46,6 @@ source_set("sdk_ext") {
 dart_package("package_for_analysis") {
   infer_package_name = true
   source_dir = "lib"
-
-  # Temporarily disabled to figure out where native wrappers went in Dart 2.0.
-  disable_analysis = true
 }
 
 dart_fuchsia_test("dart_zircon_test") {
