@@ -17,6 +17,7 @@ import 'package:lib.fidl.dart/bindings.dart' hide Message;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
+import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.widgets/modular.dart';
@@ -439,10 +440,12 @@ class ChatConversationModuleModel extends ModuleModel {
           embeddersForConversation[cid].add(embedder);
         }
 
+        List<String> members = participants.map((chat_fidl.Participant p) {
+          return p.displayName ?? p.email;
+        }).toList();
+
         return new CommandMessage(
-          members: participants.map((chat_fidl.Participant p) {
-            return p.displayName ?? p.email;
-          }).toList(),
+          members: members,
           embedder: embedder,
           messageId: m.messageId,
           time: time,
@@ -452,6 +455,36 @@ class ChatConversationModuleModel extends ModuleModel {
             deleteMessage(m.messageId);
           },
           payload: m.jsonPayload,
+          initializer: (List<String> args) {
+            // Supports "/mod <bin>".
+            if (args.isNotEmpty && !embedder.daisyStarted) {
+              String id = BASE64.encode(m.messageId);
+              String bin = args.first;
+
+              Map<String, String> messageEntity = <String, String>{
+                '@type': 'com.google.fuchsia.string',
+                'content': null, // start with a null message content.
+              };
+              Map<String, dynamic> membersEntity = <String, dynamic>{
+                '@type': 'com.google.fuchsia.chat.members',
+                'members': members,
+              };
+
+              // Setup Daisy.
+              Daisy daisy = new Daisy()
+                ..verb = 'com.google.fuchsia.codelab.$bin'
+                ..nouns = <String, Noun>{};
+              daisy.nouns['message'] = new Noun()
+                ..json = JSON.encode(messageEntity);
+              daisy.nouns['members'] = new Noun()
+                ..json = JSON.encode(membersEntity);
+
+              embedder.startDaisy(
+                daisy: daisy,
+                name: id,
+              );
+            }
+          },
         );
 
       case 'text':

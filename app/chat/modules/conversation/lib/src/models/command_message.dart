@@ -3,15 +3,15 @@
 // found in the LICENSE file.
 
 import 'dart:collection';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
-import '../modular/embedder.dart';
 import 'message.dart';
+
+/// Function signature for an additional command initialization.
+typedef void CommandInitializer(List<String> args);
 
 /// Enum for supported command types.
 enum CommandType {
@@ -21,9 +21,8 @@ enum CommandType {
 
 /// A [Message] model representing a slash command.
 class CommandMessage extends Message {
-  /// Called whenever the [Model] changes.
-  // CommandMessageParentBuilder parentBuilder;
-  final Embedder embedder;
+  /// The embedder associated with this command message.
+  final EmbedderModel embedder;
 
   /// String paylod of the message contents.
   final String payload;
@@ -43,6 +42,7 @@ class CommandMessage extends Message {
     @required String sender,
     VoidCallback onDelete,
     @required this.payload,
+    CommandInitializer initializer,
   })
       : assert(embedder != null),
         assert(payload != null),
@@ -65,32 +65,8 @@ class CommandMessage extends Message {
 
     _arguments = chunks;
 
-    // Supports "/mod <bin>".
-    if (_arguments.isNotEmpty && !embedder.daisyStarted) {
-      String id = BASE64.encode(messageId);
-      String bin = _arguments.first;
-
-      Map<String, String> messageEntity = <String, String>{
-        '@type': 'com.google.fuchsia.string',
-        'content': null, // start with a null message content.
-      };
-      Map<String, dynamic> membersEntity = <String, dynamic>{
-        '@type': 'com.google.fuchsia.chat.members',
-        'members': members,
-      };
-
-      // Setup Daisy.
-      Daisy daisy = new Daisy()
-        ..verb = 'com.google.fuchsia.codelab.$bin'
-        ..nouns = <String, Noun>{};
-      daisy.nouns['message'] = new Noun()..json = JSON.encode(messageEntity);
-      daisy.nouns['members'] = new Noun()..json = JSON.encode(membersEntity);
-
-      embedder.startDaisy(
-        daisy: daisy,
-        name: id,
-      );
-    }
+    // Perform additional initialization if necessary.
+    initializer?.call(_arguments);
   }
 
   /// Check if a string is a slash command.
