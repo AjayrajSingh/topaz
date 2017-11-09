@@ -1076,9 +1076,10 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
     flatbuffers::FlatBufferBuilder builder;
     std::vector<flatbuffers::Offset<::auth::UserCredential>> creds;
 
-    // Reserialize existing users.
-    if (app_->creds_ && app_->creds_->creds()) {
-      for (const auto* cred : *app_->creds_->creds()) {
+    const ::auth::CredentialStore* file_creds = ParseCredsFile();
+    if (file_creds != nullptr) {
+      // Reserialize existing users.
+      for (const auto* cred : *file_creds->creds()) {
         if (cred->account_id()->str() == account_->id) {
           // Update existing credentials
           continue;
