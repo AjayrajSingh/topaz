@@ -16,6 +16,7 @@ dart_package("lib.modular") {
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/collection",
+    "//third_party/dart-pkg/pub/json_schema",
     "//third_party/dart-pkg/pub/quiver",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
