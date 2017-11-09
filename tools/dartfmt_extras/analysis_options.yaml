@@ -2,4 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-include: ../analysis_options.yaml
+# TODO(youngseokyoon): re-enable the include.
+# https://fuchsia.atlassian.net/browse/SO-947
+# include: ../analysis_options.yaml
+analyzer:
+  exclude:
+    - 'testdata/directives_test/after.dart'
+    - 'testdata/directives_test/before.dart'
+    - 'testdata/double_quotes_test/after.dart'
+    - 'testdata/double_quotes_test/before.dart'

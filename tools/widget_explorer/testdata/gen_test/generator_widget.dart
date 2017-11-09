@@ -22,7 +22,7 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
   name: 'GeneratorWidget',
   path: 'exported.dart',
   pathFromFuchsiaRoot:
-      'topaz/tools/testdata/widget_specs/extract_test/mock_package/lib/src/generator_widget.dart',
+      'topaz/tools/widget_explorer/testdata/extract_test/mock_package/lib/src/generator_widget.dart',
   doc: '''
 Sample widget for demonstrating the use of model classes annotated with
 @Generator annotation.''',

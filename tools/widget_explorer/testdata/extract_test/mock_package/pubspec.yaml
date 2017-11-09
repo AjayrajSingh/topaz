@@ -3,5 +3,5 @@ description: mock package
 dependencies:
   flutter:
     sdk: flutter
-  widgets_meta:
-    path: ../../../../packages/widgets_meta
+  widget_explorer_meta:
+    path: ../../../packages/widget_explorer_meta

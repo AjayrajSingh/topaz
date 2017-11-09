@@ -15,7 +15,7 @@ import 'util.dart';
 void main() {
   test('Import / Export directives should be re-ordered correctly.', () async {
     // Get the paths of the test data.
-    String testDataPath = getTestDataPath();
+    String testDataPath = getTestDataPath('directives_test');
 
     String beforePath = path.join(testDataPath, 'before.dart');
     File beforeFile = new File(beforePath);

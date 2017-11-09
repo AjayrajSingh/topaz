@@ -15,7 +15,7 @@ import 'util.dart';
 void main() {
   test('Double quotes should be fixed correctly.', () async {
     // Get the paths of the test data.
-    String testDataPath = getTestDataPath();
+    String testDataPath = getTestDataPath('double_quotes_test');
 
     String beforePath = path.join(testDataPath, 'before.dart');
     File beforeFile = new File(beforePath);

@@ -13,18 +13,29 @@ void main() {
   test('widget_explorer_gen tool should correctly generate the expected files.',
       () async {
     String mockPackagePath =
-        path.join(getTestDataPath(basename: 'extract_test'), 'mock_package');
+        path.join(getTestDataPath('extract_test'), 'mock_package');
+    String fuchsiaRoot = path.normalize(path.joinAll(<String>[
+      mockPackagePath,
+      '..',
+      '..',
+      '..',
+      '..',
+      '..',
+      '..',
+    ]));
+
+    String flutterRoot = path.normalize(
+        path.join(fuchsiaRoot, 'third_party', 'dart-pkg', 'git', 'flutter'));
 
     // Run 'flutter packages get'
     await Process.run(
-      'flutter',
+      path.join(flutterRoot, 'bin', 'flutter'),
       <String>['packages', 'get'],
       workingDirectory: mockPackagePath,
     );
 
     String packagePath = path.normalize(path.join(
-      getTestScriptPath(),
-      '..',
+      Directory.current.path,
       '..',
     ));
 
@@ -33,11 +44,38 @@ void main() {
     String outputPath = tempDir.path;
     print('Temp dir: $outputPath');
 
-    // Run the gen script.
-    ProcessResult result = await Process.run(
+    String pubPath = path.normalize(path.joinAll(<String>[
+      fuchsiaRoot,
+      'third_party',
+      'dart',
+      'tools',
+      'sdks',
+      Platform.isMacOS ? 'mac' : 'linux',
+      'dart-sdk',
+      'bin',
       'pub',
+    ]));
+
+    // Run pub get.
+    ProcessResult result = await Process.run(
+      pubPath,
+      <String>['get'],
+      workingDirectory: packagePath,
+      environment: <String, String>{'FLUTTER_ROOT': flutterRoot},
+    );
+
+    // Print out the error messages before the assert fails.
+    if (result.exitCode != 0) {
+      print(result.stdout);
+      print(result.stderr);
+    }
+
+    // Run the gen script.
+    result = await Process.run(
+      pubPath,
       <String>['run', 'widget_explorer_gen.dart', outputPath, mockPackagePath],
       workingDirectory: packagePath,
+      environment: <String, String>{'FLUTTER_ROOT': flutterRoot},
     );
 
     // Print out the error messages before the assert fails.
@@ -77,7 +115,8 @@ void main() {
     for (String filename in filesToVerify) {
       expect(
         new File(path.join(outputPath, filename)).readAsStringSync(),
-        new File(path.join(getTestDataPath(), filename)).readAsStringSync(),
+        new File(path.join(getTestDataPath('gen_test'), filename))
+            .readAsStringSync(),
       );
     }
   });

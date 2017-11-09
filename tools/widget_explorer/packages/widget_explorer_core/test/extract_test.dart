@@ -13,8 +13,11 @@ import 'package:widget_explorer_core/widget_specs.dart';
 import 'util.dart';
 
 Future<Null> main() async {
-  String mockPackagePath = path.join(getTestDataPath(), 'mock_package');
-  String fuchsiaRoot = path.join(
+  String mockPackagePath = path.join(
+    getTestDataPath('extract_test'),
+    'mock_package',
+  );
+  String fuchsiaRoot = path.normalize(path.joinAll(<String>[
     mockPackagePath,
     '..',
     '..',
@@ -22,11 +25,12 @@ Future<Null> main() async {
     '..',
     '..',
     '..',
-  );
+  ]));
 
   // Run 'flutter packages get'
   await Process.run(
-    'flutter',
+    path.normalize(path.join(fuchsiaRoot, 'third_party', 'dart-pkg', 'git',
+        'flutter', 'bin', 'flutter')),
     <String>['packages', 'get'],
     workingDirectory: mockPackagePath,
   );
@@ -98,7 +102,7 @@ Future<Null> main() async {
       expect(
           widgetMap[key].pathFromFuchsiaRoot,
           equals(
-              'topaz/tools/testdata/widget_specs/extract_test/mock_package/lib/src/${expected[key]}'));
+              'topaz/tools/widget_explorer/testdata/extract_test/mock_package/lib/src/${expected[key]}'));
     }
   });
 

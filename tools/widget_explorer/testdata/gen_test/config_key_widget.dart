@@ -10,31 +10,31 @@ import 'package:widget_explorer_widgets/widget_explorer_widgets.dart';
 import 'package:mock_package/exported.dart';
 
 /// Name of the widget.
-const String kName = 'SizeParamWidget';
+const String kName = 'ConfigKeyWidget';
 
 /// [WidgetSpecs] of this widget.
 final WidgetSpecs kSpecs = new WidgetSpecs(
   packageName: 'mock_package',
-  name: 'SizeParamWidget',
+  name: 'ConfigKeyWidget',
   path: 'exported.dart',
   pathFromFuchsiaRoot:
-      'topaz/tools/testdata/widget_specs/extract_test/mock_package/lib/src/size_param_widget.dart',
+      'topaz/tools/widget_explorer/testdata/extract_test/mock_package/lib/src/config_key_widget.dart',
   doc: '''
-Sample widget for demonstrating the use of @sizeParam annotation.''',
+Sample widget for demonstrating the use of @ConfigKey annotation.''',
   exampleWidth: null,
   exampleHeight: null,
-  hasSizeParam: true,
+  hasSizeParam: false,
 );
 
 /// Generated state object for this widget.
-class _GeneratedSizeParamWidgetState extends GeneratedState {
-  double size;
+class _GeneratedConfigKeyWidgetState extends GeneratedState {
+  String apiKey;
 
-  _GeneratedSizeParamWidgetState(SetStateFunc setState) : super(setState);
+  _GeneratedConfigKeyWidgetState(SetStateFunc setState) : super(setState);
 
   @override
   void initState(Map<String, dynamic> config) {
-    size = 0.0;
+    apiKey = config['api_key'];
   }
 
   @override
@@ -44,9 +44,9 @@ class _GeneratedSizeParamWidgetState extends GeneratedState {
     double width,
     double height,
   ) {
-    return new SizeParamWidget(
+    return new ConfigKeyWidget(
       key: key,
-      size: width,
+      apiKey: this.apiKey,
     );
   }
 
@@ -56,9 +56,12 @@ class _GeneratedSizeParamWidgetState extends GeneratedState {
       buildTableRow(
         context,
         <Widget>[
-          new Text('double'),
-          new Text('size'),
-          new InfoText('size value is used'),
+          new Text('String'),
+          new Text('apiKey'),
+          new ConfigKeyText(
+            configKey: 'api_key',
+            configValue: apiKey,
+          ),
         ],
       ),
     ];
@@ -67,4 +70,4 @@ class _GeneratedSizeParamWidgetState extends GeneratedState {
 
 /// State builder for this widget.
 final GeneratedStateBuilder kBuilder =
-    (SetStateFunc setState) => new _GeneratedSizeParamWidgetState(setState);
+    (SetStateFunc setState) => new _GeneratedConfigKeyWidgetState(setState);

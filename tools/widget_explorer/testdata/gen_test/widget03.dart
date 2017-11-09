@@ -20,7 +20,7 @@ final WidgetSpecs kSpecs = new WidgetSpecs(
   name: 'Widget03',
   path: 'exported.dart',
   pathFromFuchsiaRoot:
-      'topaz/tools/testdata/widget_specs/extract_test/mock_package/lib/src/sample_widgets.dart',
+      'topaz/tools/widget_explorer/testdata/extract_test/mock_package/lib/src/sample_widgets.dart',
   doc: '''
 This is a public [StatelessWidget].''',
   exampleWidth: null,
