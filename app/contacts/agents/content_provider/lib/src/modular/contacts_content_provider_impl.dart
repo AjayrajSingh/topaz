@@ -408,11 +408,14 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
   /// changes propagate back from Ledger via the page watcher to add them
   /// the store.
   Future<Null> _getContactsFromDataProviders() async {
-    // TODO(meiyili) grab last sync tokens and save those as well
-    Completer<List<fidl.Contact>> completer;
+    // TODO(meiyili) grab last sync tokens and save those as well so the shape
+    // of the content in the future will change and be less ugly
+    List<Future<List<fidl.Contact>>> completers =
+        <Future<List<fidl.Contact>>>[];
     for (_DataProvider provider in _dataProviders.values) {
       log.fine('Connecting to data provider = $provider');
-      completer = new Completer<List<fidl.Contact>>();
+      Completer<List<fidl.Contact>> completer =
+          new Completer<List<fidl.Contact>>();
       provider.dataProviderProxy.getContactList(
         (fidl.Status status, List<fidl.Contact> contacts) {
           if (status == fidl.Status.ok) {
@@ -422,8 +425,11 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
           }
         },
       );
-      List<fidl.Contact> contacts = await completer.future;
-      await _saveContactsToLedger(contacts);
+      completers.add(completer.future);
     }
+    List<fidl.Contact> contacts = (await Future.wait(completers))
+        .expand((List<fidl.Contact> c) => c)
+        .toList();
+    await _saveContactsToLedger(contacts);
   }
 }
