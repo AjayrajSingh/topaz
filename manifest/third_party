@@ -68,9 +68,4 @@
              gerrithost="https://fuchsia-review.googlesource.com"
              historydepth="1"/>
   </projects>
-  <hooks>
-    <hook name="download-libwebkit"
-          project="topaz"
-          action="runtime/web_view/scripts/download-libwebkit.sh"/>
-  </hooks>
 </manifest>
