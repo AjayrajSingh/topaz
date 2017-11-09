@@ -6,12 +6,7 @@ import 'package:lib.suggestion.fidl/speech_to_text.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/user_input.fidl.dart' as maxwell;
-import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:armadillo/interruption_overlay.dart';
-import 'package:armadillo/story.dart';
-import 'package:armadillo/story_cluster.dart';
-import 'package:armadillo/story_cluster_id.dart';
-import 'package:armadillo/story_model.dart';
 import 'package:armadillo/suggestion.dart';
 import 'package:armadillo/suggestion_model.dart';
 import 'package:flutter/material.dart';
@@ -274,19 +269,6 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   /// Set from an external source - typically the UserShell.
   maxwell.SuggestionProviderProxy _suggestionProviderProxy;
 
-  /// Set from an external source - typically the UserShell.
-  FocusControllerProxy _focusController;
-
-  /// Set from an external source - typically the UserShell.
-  VisibleStoriesControllerProxy _visibleStoriesController;
-
-  // Set from an external source - typically the UserShell.
-  StoryModel _storyModel;
-
-  StoryClusterId _lastFocusedStoryClusterId;
-
-  final Set<VoidCallback> _focusLossListeners = new Set<VoidCallback>();
-
   /// Listens for changes to visible stories.
   final HitTestModel hitTestModel;
 
@@ -386,31 +368,6 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       },
     );
     _load();
-  }
-
-  /// Sets the [FocusController] called when focus changes.
-  set focusController(FocusControllerProxy focusController) {
-    _focusController = focusController;
-  }
-
-  /// Sets the [VisibleStoriesController] called when the list of visible
-  /// stories changes.
-  set visibleStoriesController(
-    VisibleStoriesControllerProxy visibleStoriesController,
-  ) {
-    _visibleStoriesController = visibleStoriesController;
-  }
-
-  /// Sets the [StoryModel] used to get the currently focused and visible
-  /// stories.
-  set storyModel(StoryModel storyModel) {
-    _storyModel = storyModel;
-    storyModel.addListener(_onStoryClusterListChanged);
-  }
-
-  /// [listener] will be called when no stories are in focus.
-  void addOnFocusLossListener(VoidCallback listener) {
-    _focusLossListeners.add(listener);
   }
 
   /// Called when an interruption is no longer showing.
@@ -570,42 +527,6 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       _transcriptionListenerBinding.close;
     };
   }
-
-  @override
-  void storyClusterFocusChanged(StoryCluster storyCluster) {
-    _lastFocusedStoryCluster?.removeStoryListListener(_onStoryListChanged);
-    storyCluster?.addStoryListListener(_onStoryListChanged);
-    _lastFocusedStoryClusterId = storyCluster?.id;
-    _onStoryListChanged();
-  }
-
-  void _onStoryClusterListChanged() {
-    if (_lastFocusedStoryClusterId != null) {
-      if (_lastFocusedStoryCluster == null) {
-        _lastFocusedStoryClusterId = null;
-        _onStoryListChanged();
-        for (VoidCallback listener in _focusLossListeners) {
-          listener();
-        }
-      }
-    }
-  }
-
-  void _onStoryListChanged() {
-    _focusController.set(_lastFocusedStoryCluster?.focusedStoryId?.value);
-
-    List<String> visibleStoryIds = _lastFocusedStoryCluster?.stories
-            ?.map<String>((Story story) => story.id.value)
-            ?.toList() ??
-        <String>[];
-    hitTestModel.onVisibleStoriesChanged(visibleStoryIds);
-    _visibleStoriesController.set(visibleStoryIds);
-  }
-
-  StoryCluster get _lastFocusedStoryCluster =>
-      _lastFocusedStoryClusterId == null
-          ? null
-          : _storyModel.storyClusterWithId(_lastFocusedStoryClusterId);
 
   void _onAskSuggestionsChanged() {
     if (_asking) {

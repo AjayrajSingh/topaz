@@ -130,10 +130,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     storyProviderStoryGenerator
       ..link = link
       ..storyProvider = storyProvider;
-    suggestionProviderSuggestionModel
-      ..suggestionProvider = suggestionProvider
-      ..focusController = focusController
-      ..visibleStoriesController = visibleStoriesController;
+    suggestionProviderSuggestionModel.suggestionProvider = suggestionProvider;
     ContextQuery query = new ContextQuery()
       ..selector = <String, ContextSelector>{};
     for (String topic in contextTopics) {

@@ -44,23 +44,17 @@ class RecentsBuilder {
   Widget build(
     BuildContext context, {
     ValueChanged<double> onScroll,
-    VoidCallback onStoryClusterFocusStarted,
-    OnStoryClusterEvent onStoryClusterFocusCompleted,
     VoidCallback onStoryClusterVerticalEdgeHover,
   }) =>
       _buildRecents(
         context,
         onScroll: onScroll,
-        onStoryClusterFocusStarted: onStoryClusterFocusStarted,
-        onStoryClusterFocusCompleted: onStoryClusterFocusCompleted,
         onStoryClusterVerticalEdgeHover: onStoryClusterVerticalEdgeHover,
       );
 
   Widget _buildRecents(
     BuildContext context, {
     ValueChanged<double> onScroll,
-    VoidCallback onStoryClusterFocusStarted,
-    OnStoryClusterEvent onStoryClusterFocusCompleted,
     VoidCallback onStoryClusterVerticalEdgeHover,
   }) =>
       new Stack(
@@ -92,9 +86,6 @@ class RecentsBuilder {
                         scrollController: _scrollController,
                         overlayKey: _overlayKey,
                         onScroll: onScroll,
-                        onStoryClusterFocusStarted: onStoryClusterFocusStarted,
-                        onStoryClusterFocusCompleted:
-                            onStoryClusterFocusCompleted,
                         onStoryClusterVerticalEdgeHover:
                             onStoryClusterVerticalEdgeHover,
                       ),

@@ -13,6 +13,7 @@ import 'next_builder.dart';
 import 'now/now_builder.dart';
 import 'recents_builder.dart';
 import 'story.dart';
+import 'story_cluster.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
@@ -46,6 +47,16 @@ class ConductorModel extends Model {
   /// Moves the conductor to its original layout.
   void goToOrigin() {
     _conductorKey.currentState.goToOrigin();
+  }
+
+  /// Call when a story cluster begins focusing.
+  void onStoryClusterFocusStarted() {
+    _conductorKey.currentState.onStoryClusterFocusStarted();
+  }
+
+  /// Call when a story cluster finishes focusing.
+  void onStoryClusterFocusCompleted(StoryCluster storyCluster) {
+    _conductorKey.currentState.onStoryClusterFocusCompleted(storyCluster);
   }
 
   /// Focuses the given story.

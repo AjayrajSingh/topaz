@@ -59,8 +59,18 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
   /// Called the first time the [StoryProvider] returns stories.
   final VoidCallback onStoriesFirstAvailable;
 
+  /// Call when a story cluster begins focusing.
+  final VoidCallback onStoryClusterFocusStarted;
+
+  /// Call when a story cluster finishes focusing.
+  final ValueChanged<StoryCluster> onStoryClusterFocusCompleted;
+
   /// Constructor.
-  StoryProviderStoryGenerator({this.onStoriesFirstAvailable});
+  StoryProviderStoryGenerator({
+    this.onStoriesFirstAvailable,
+    this.onStoryClusterFocusStarted,
+    this.onStoryClusterFocusCompleted,
+  });
 
   /// Call to close all the handles opened by this story generator.
   void close() {
@@ -245,6 +255,11 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
             .toList(),
         onStoryClusterChanged: _onStoryClusterChange,
       );
+      newStoryCluster.focusModel
+        ..onStoryClusterFocusStarted = onStoryClusterFocusStarted
+        ..onStoryClusterFocusCompleted = () => onStoryClusterFocusCompleted(
+              newStoryCluster,
+            );
       newStoryClusters.add(newStoryCluster);
       newStoryCluster.update(jsonStoryCluster);
     }
@@ -512,7 +527,11 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
         completed: false,
       ),
     );
-
+    storyCluster.focusModel
+      ..onStoryClusterFocusStarted = onStoryClusterFocusStarted
+      ..onStoryClusterFocusCompleted = () => onStoryClusterFocusCompleted(
+            storyCluster,
+          );
     _storyClusters.add(storyCluster);
     notifyListeners();
   }

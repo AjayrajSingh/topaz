@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
@@ -12,6 +11,7 @@ import 'package:flutter/widgets.dart';
 
 import 'armadillo_drag_target.dart';
 import 'armadillo_overlay.dart';
+import 'focus_model.dart';
 import 'render_story_list_body.dart';
 import 'size_model.dart';
 import 'story.dart';
@@ -30,14 +30,6 @@ class StoryList extends StatelessWidget {
   /// Called when the story list scrolls.
   final ValueChanged<double> onScroll;
 
-  /// Called when a story cluster begins to take focus.  This is when its
-  /// focus animation begins.
-  final VoidCallback onStoryClusterFocusStarted;
-
-  /// Called when a story cluster has taken focus. This is when its
-  /// focus animation finishes.
-  final OnStoryClusterEvent onStoryClusterFocusCompleted;
-
   /// Controls the scrolling of this list.
   final ScrollController scrollController;
 
@@ -54,8 +46,6 @@ class StoryList extends StatelessWidget {
     this.scrollController,
     this.overlayKey,
     this.onScroll,
-    this.onStoryClusterFocusStarted,
-    this.onStoryClusterFocusCompleted,
     this.onStoryClusterVerticalEdgeHover,
   })
       : super(key: key);
@@ -184,35 +174,26 @@ class StoryList extends StatelessWidget {
     StoryModel storyModel,
     StoryCluster storyCluster,
     Map<StoryId, Widget> storyWidgets,
-  ) {
-    bool wasFocused = (storyCluster.focusModel.value == 1.0 &&
-        storyCluster.focusModel.isDone);
-    return _wrapWithModels(storyCluster, (BuildContext context) {
-      bool isFocused = (storyCluster.focusModel.value == 1.0 &&
-          storyCluster.focusModel.isDone);
-      if (isFocused && !wasFocused) {
-        /// TODO: Investigate if this gets called too much.
-        scheduleMicrotask(
-            () => onStoryClusterFocusCompleted?.call(storyCluster));
-      }
-      wasFocused = isFocused;
-      return new _StoryListChild(
-        storyLayout: storyCluster.storyLayout,
-        focusProgress: storyCluster.focusModel.value,
-        inlinePreviewScaleProgress: storyCluster.inlinePreviewScaleModel.value,
-        inlinePreviewHintScaleProgress:
-            storyCluster.inlinePreviewHintScaleModel.value,
-        entranceTransitionProgress:
-            storyCluster.storyClusterEntranceTransitionModel.value,
-        child: _createStoryCluster(
-          storyModel,
-          storyCluster,
-          storyCluster.focusModel.value,
-          storyWidgets,
-        ),
+  ) =>
+      _wrapWithModels(
+        storyCluster,
+        (BuildContext context) => new _StoryListChild(
+              storyLayout: storyCluster.storyLayout,
+              focusProgress: storyCluster.focusModel.value,
+              inlinePreviewScaleProgress:
+                  storyCluster.inlinePreviewScaleModel.value,
+              inlinePreviewHintScaleProgress:
+                  storyCluster.inlinePreviewHintScaleModel.value,
+              entranceTransitionProgress:
+                  storyCluster.storyClusterEntranceTransitionModel.value,
+              child: _createStoryCluster(
+                storyModel,
+                storyCluster,
+                storyCluster.focusModel.value,
+                storyWidgets,
+              ),
+            ),
       );
-    });
-  }
 
   Widget _wrapWithModels(StoryCluster storyCluster, WidgetBuilder builder) =>
       new ScopedModel<StoryClusterEntranceTransitionModel>(
@@ -275,8 +256,6 @@ class StoryList extends StatelessWidget {
     storyCluster.focusModel.target = 1.0;
 
     storyCluster.maximizeStoryBars();
-
-    onStoryClusterFocusStarted?.call();
   }
 
   Widget _buildDiscardDragTarget({

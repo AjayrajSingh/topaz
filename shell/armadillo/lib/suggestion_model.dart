@@ -53,10 +53,6 @@ abstract class SuggestionModel extends Model {
     VoidCallback onCompleted,
   });
 
-  /// Updates the suggestions based on the currently focused storyCluster].  If no
-  /// story is in focus, [storyCluster] should be null.
-  void storyClusterFocusChanged(StoryCluster storyCluster);
-
   /// Called when a suggestion is selected by the user.
   void onSuggestionSelected(Suggestion suggestion);
 }

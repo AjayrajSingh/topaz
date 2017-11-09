@@ -116,12 +116,6 @@ class ConductorState extends State<Conductor> {
                 scrollOffset,
               );
             },
-            onStoryClusterFocusStarted: () {
-              // Lock scrolling.
-              conductorModel.recentsBuilder.onStoryFocused();
-              _minimizeNow();
-            },
-            onStoryClusterFocusCompleted: _focusStoryCluster,
             onStoryClusterVerticalEdgeHover: goToOrigin,
           ),
 
@@ -163,7 +157,15 @@ class ConductorState extends State<Conductor> {
         ],
       );
 
-  void _focusStoryCluster(StoryCluster storyCluster) {
+  /// Call when a story cluster begins focusing.
+  void onStoryClusterFocusStarted() {
+    // Lock scrolling.
+    ConductorModel.of(context).recentsBuilder.onStoryFocused();
+    _minimizeNow();
+  }
+
+  /// Call when a story cluster finishes focusing.
+  void onStoryClusterFocusCompleted(StoryCluster storyCluster) {
     // Tell the [StoryModel] the story is now in focus.  This will move the
     // [Story] to the front of the [StoryList].
     StoryModel.of(context).interactionStarted(storyCluster);
@@ -217,8 +219,7 @@ class ConductorState extends State<Conductor> {
 
   /// Called to request the conductor focus on the cluster with [storyId].
   void requestStoryFocus(StoryId storyId, {bool jumpToFinish: true}) {
-    ConductorModel.of(context).recentsBuilder.onStoryFocused();
-    _minimizeNow();
+    onStoryClusterFocusStarted();
     StoryModel storyModel = StoryModel.of(context);
     StoryCluster storyCluster = storyModel.storyClusterWithStory(storyId);
 
@@ -243,7 +244,7 @@ class ConductorState extends State<Conductor> {
       storyCluster.maximizeStoryBars(jumpToFinish: jumpToFinish);
 
       // Focus on the story cluster.
-      _focusStoryCluster(storyCluster);
+      onStoryClusterFocusCompleted(storyCluster);
     }
 
     ConductorModel.of(context).nextBuilder.resetSelection();

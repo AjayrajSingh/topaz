@@ -11,6 +11,7 @@ import 'package:lib.widgets/widgets.dart';
 
 import 'armadillo_drag_target.dart';
 import 'display_mode.dart';
+import 'focus_model.dart';
 import 'panel.dart';
 import 'panel_drag_targets.dart';
 import 'place_holder_story.dart';
@@ -641,15 +642,6 @@ class StoryCluster {
   }
 }
 
-const RK4SpringDescription _kSimulationDesc =
-    const RK4SpringDescription(tension: 750.0, friction: 50.0);
-
-/// Handles focus progress for a StoryCluster.
-class FocusModel extends SpringModel {
-  /// Constructor.
-  FocusModel() : super(springDescription: _kSimulationDesc);
-}
-
 const RK4SpringDescription _kInlinePreviewSimulationDesc =
     const RK4SpringDescription(tension: 900.0, friction: 50.0);
 
@@ -661,6 +653,9 @@ class InlinePreviewScaleModel extends SpringModel {
   InlinePreviewScaleModel()
       : super(springDescription: _kInlinePreviewSimulationDesc);
 }
+
+const RK4SpringDescription _kSimulationDesc =
+    const RK4SpringDescription(tension: 750.0, friction: 50.0);
 
 /// The inline preview hint scale simulation is the scaling that occurs when
 /// the user drags a cluster over this cluster while in the timeline before

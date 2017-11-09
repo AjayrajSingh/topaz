@@ -42,6 +42,7 @@ import 'armadillo_user_shell_model.dart';
 import 'audio_policy_volume_model.dart';
 import 'context_provider_context_model.dart';
 import 'focus_request_watcher_impl.dart';
+import 'focused_stories_tracker.dart';
 import 'hit_test_model.dart';
 import 'initial_focus_setter.dart';
 import 'power_manager_power_model.dart';
@@ -88,6 +89,8 @@ Widget buildArmadilloUserShell({
   StoryProviderStoryGenerator storyProviderStoryGenerator =
       new StoryProviderStoryGenerator(
     onStoriesFirstAvailable: initialFocusSetter.onStoriesFirstAvailable,
+    onStoryClusterFocusStarted: conductorModel.onStoryClusterFocusStarted,
+    onStoryClusterFocusCompleted: conductorModel.onStoryClusterFocusCompleted,
   );
   StoryClusterDragStateModel storyClusterDragStateModel =
       new StoryClusterDragStateModel();
@@ -126,21 +129,23 @@ Widget buildArmadilloUserShell({
     ..onInterruptionDismissed =
         suggestionProviderSuggestionModel.onInterruptionDismissal;
 
+  FocusedStoriesTracker focusedStoriesTracker = new FocusedStoriesTracker();
+
   StoryModel storyModel = new StoryModel(
-    onFocusChanged: suggestionProviderSuggestionModel.storyClusterFocusChanged,
+    onFocusChanged: focusedStoriesTracker.onStoryClusterFocusChanged,
     onDeleteStoryCluster: storyProviderStoryGenerator.onDeleteStoryCluster,
     onStoryClusterAdded: storyProviderStoryGenerator.onStoryClusterAdded,
     onStoryClusterRemoved: storyProviderStoryGenerator.onStoryClusterRemoved,
   );
+
+  storyModel.addListener(() => focusedStoriesTracker
+      .onStoryClusterListChanged(storyModel.storyClusters));
+
   storyProviderStoryGenerator.addListener(
     () => storyModel.onStoryClustersChanged(
           storyProviderStoryGenerator.storyClusters,
         ),
   );
-
-  suggestionProviderSuggestionModel
-    ..storyModel = storyModel
-    ..addOnFocusLossListener(conductorModel.goToOrigin);
 
   initialFocusSetter.storyFocuser = conductorModel.focusStory;
 
@@ -223,6 +228,22 @@ Widget buildArmadilloUserShell({
     },
     onWallpaperChosen: contextProviderContextModel.onWallpaperChosen,
   );
+
+  focusedStoriesTracker.addListener(() {
+    armadilloUserShellModel
+      ..focusController.set(
+        focusedStoriesTracker.focusedStoryId,
+      )
+      ..visibleStoriesController.set(
+        focusedStoriesTracker.focusedStoryIds,
+      );
+    hitTestModel.onVisibleStoriesChanged(
+      focusedStoriesTracker.focusedStoryIds,
+    );
+    if (focusedStoriesTracker.focusedStoryId == null) {
+      conductorModel.goToOrigin();
+    }
+  });
 
   QuickSettingsProgressModel quickSettingsProgressModel =
       new QuickSettingsProgressModel();
