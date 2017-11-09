@@ -193,6 +193,13 @@ class ChildViewConnection {
     _sceneHost = null;
   }
 
+  /// Only call when the connection is available.
+  void requestFocus() {
+    if (_viewKey != null) {
+      _viewContainer.requestFocus(_viewKey);
+    }
+  }
+
   // The number of render objects attached to this view. In between frames, we
   // might have more than one connected if we get added to a new render object
   // before we get removed from the old render object. By the time we get around
