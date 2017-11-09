@@ -5,13 +5,6 @@
 import("//build/dart/dart_test.gni")
 import("//build/dart/dart_tool.gni")
 
-group("all") {
-  deps = [
-    ":dartfmt_extras",
-    ":dartfmt_extras_test",
-  ]
-}
-
 dart_tool("dartfmt_extras") {
   package_name = "dartfmt_extras"
 
@@ -24,7 +17,7 @@ dart_tool("dartfmt_extras") {
   ]
 }
 
-dart_test("dartfmt_extras_test") {
+dart_test("test") {
   deps = [
     ":dartfmt_extras_dart_package",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

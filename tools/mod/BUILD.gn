@@ -5,13 +5,6 @@
 import("//build/dart/dart_test.gni")
 import("//build/dart/dart_tool.gni")
 
-group("all") {
-  deps = [
-    ":mod",
-    ":mod_test",
-  ]
-}
-
 dart_tool("mod") {
   package_name = "mod"
 
@@ -24,7 +17,7 @@ dart_tool("mod") {
   ]
 }
 
-dart_test("mod_test") {
+dart_test("test") {
   deps = [
     ":mod_dart_package",
     "//third_party/dart-pkg/pub/test",

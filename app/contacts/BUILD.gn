@@ -9,15 +9,11 @@ package("contacts") {
   system_image = true
 
   deps = [
-    "//topaz/app/contacts/agents",
-    "//topaz/app/contacts/agents/content_provider:test",
-    "//topaz/app/contacts/modules/contact_list",
-    "//topaz/app/contacts/modules/contact_list:test",
-    "//topaz/app/contacts/modules/contacts",
-    "//topaz/app/contacts/modules/contacts:test",
-    "//topaz/app/contacts/modules/contacts_picker",
-    "//topaz/app/contacts/modules/contacts_picker:test",
-    "//topaz/app/contacts/services",
+    "agents",
+    "modules/contact_list",
+    "modules/contacts",
+    "modules/contacts_picker",
+    "services",
   ]
 
   binaries = [
@@ -34,5 +30,16 @@ package("contacts") {
           "gen/topaz/app/contacts/modules/contacts_picker/contacts_picker.flx"
       name = "contacts/contacts_picker"
     },
+  ]
+}
+
+group("tests") {
+  testonly = true
+
+  deps = [
+    "agents/content_provider:test",
+    "modules/contact_list:test",
+    "modules/contacts:test",
+    "modules/contacts_picker:test",
   ]
 }

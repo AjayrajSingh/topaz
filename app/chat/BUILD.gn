@@ -9,9 +9,9 @@ package("chat") {
   system_image = true
 
   deps = [
-    "//topaz/app/chat/agents",
-    "//topaz/app/chat/modules",
-    "//topaz/app/chat/services",
+    "agents",
+    "modules",
+    "services",
   ]
 
   binaries = [
@@ -38,14 +38,7 @@ package("chat_tests") {
   system_image = true
 
   deps = [
-    "//topaz/app/chat/tests/chat_content_provider_test",
-
-    # The following gn targets do not build anything that ends up on the target, but need to be
-    # built in order to:
-    # 1) run the unit tests on the host side
-    # 2) enable dart analyzer support for test code in the IDE
-    "//topaz/app/chat/modules/conversation:test",
-    "//topaz/app/chat/modules/conversation_list:test",
+    "tests/chat_content_provider_test",
   ]
 
   binaries = [ {
@@ -57,4 +50,13 @@ package("chat_tests") {
         path = rebase_path("tests/chat_tests.json")
         dest = "apps/chat_tests/chat_tests.json"
       } ]
+}
+
+group("tests") {
+  testonly = true
+
+  deps = [
+    "modules/conversation:test",
+    "modules/conversation_list:test",
+  ]
 }

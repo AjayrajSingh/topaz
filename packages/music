@@ -2,9 +2,6 @@
     "languages": [
         "dart"
     ],
-    "labels": [
-        "//topaz/app/music:test"
-    ],
     "packages": {
         "music": "//topaz/app/music"
     }

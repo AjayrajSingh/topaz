@@ -21,15 +21,15 @@ package("sysui") {
   system_image = true
 
   deps = [
-    "//topaz/shell/agents/home_work_agent",
-    "//topaz/shell/armadillo_user_shell",
-    "//topaz/shell/capybara_user_shell",
-    "//topaz/shell/infinite_scroller",
-    "//topaz/shell/kernel_panic",
-    "//topaz/shell/perspective",
-    "//topaz/shell/spinning_cube",
-    "//topaz/shell/userpicker_device_shell",
-    "//topaz/shell/wifi_settings",
+    "agents/home_work_agent",
+    "armadillo_user_shell",
+    "capybara_user_shell",
+    "infinite_scroller",
+    "kernel_panic",
+    "perspective",
+    "spinning_cube",
+    "userpicker_device_shell",
+    "wifi_settings",
   ]
 
   binaries = [
@@ -348,14 +348,14 @@ package("sysui") {
   ]
 }
 
-package("sysui_tests") {
+group("tests") {
   testonly = true
-  system_image = true
 
   deps = [
-    "//topaz/shell/armadillo:test",
-    "//topaz/shell/capybara_user_shell:test",
-    "//topaz/shell/keyboard:test",
-    "//topaz/shell/userpicker_device_shell:test",
+    "armadillo:test",
+    "capybara_user_shell:test",
+    "keyboard:test",
+    "mondrian_story_shell:test",
+    "userpicker_device_shell:test",
   ]
 }

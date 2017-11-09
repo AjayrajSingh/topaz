@@ -9,8 +9,8 @@ package("music") {
   system_image = true
 
   deps = [
-    "//topaz/app/music/agents",
-    "//topaz/app/music/modules",
+    "agents",
+    "modules",
   ]
 
   binaries = [
@@ -61,13 +61,13 @@ package("music") {
   ]
 }
 
-group("test") {
+group("tests") {
   testonly = true
 
   deps = [
-    "//topaz/app/music/packages/concert_models:test",
-    "//topaz/app/music/packages/last_fm_models:test",
-    "//topaz/app/music/packages/music_models:test",
-    "//topaz/app/music/packages/music_widgets:test",
+    "packages/concert_models:test",
+    "packages/last_fm_models:test",
+    "packages/music_models:test",
+    "packages/music_widgets:test",
   ]
 }

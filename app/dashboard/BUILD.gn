@@ -39,14 +39,20 @@ dart_test("dashboard_test") {
   ]
 }
 
+group("tests") {
+  testonly = true
+
+  deps = [
+    ":dashboard_test",
+  ]
+}
+
 package("dashboard") {
   app = true
   system_image = true
 
   deps = [
     ":dashboard_app",
-    # TODO(pylaligand): add target for "all Dart tests".
-    ":dashboard_test",
   ]
 
   binaries = [ {

@@ -12,7 +12,6 @@ package("mondrian") {
 
   deps = [
     ":flutter_mondrian",
-    ":test",
   ]
 
   binaries = [ {

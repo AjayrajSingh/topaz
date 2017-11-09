@@ -13,11 +13,3 @@ dart_package("widgets") {
     "//topaz/public/dart/widgets:lib.widgets",
   ]
 }
-
-dart_test("test") {
-  deps = [
-    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
-    "//third_party/dart-pkg/pub/test",
-    "//topaz/shell/widgets",
-  ]
-}

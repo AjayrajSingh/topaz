@@ -23,13 +23,3 @@ package("config") {
         dest = "modules/config.json"
       } ]
 }
-
-package("dart_package_tests") {
-  testonly = true
-  system_image = true
-
-  deps = [
-    "//topaz/public/dart/fixtures:test",
-    "//topaz/public/dart/widgets:test",
-  ]
-}

@@ -9,7 +9,6 @@
         "topaz/packages/video"
     ],
     "packages": {
-        "config": "//topaz/packages:config",
-        "dart_package_tests": "//topaz/packages:dart_package_tests"
+        "config": "//topaz/packages:config"
     }
 }
