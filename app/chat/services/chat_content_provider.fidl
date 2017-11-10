@@ -36,6 +36,9 @@ struct Participant {
 // must be retrieved from the |ChatContentProvider| interface using
 // |GetMessages| method.
 struct Conversation {
+  // An optional conversation title set by the user.
+  string? title;
+
   // Unique id of this conversation.
   array<uint8> conversation_id;
 
@@ -90,8 +93,9 @@ interface ChatContentProvider {
   // the obtained conversation id.
   //
   // When the |message_queue_token| value is provided, the client will be
-  // notified with any new conversations added after the initial list of
-  // conversations is sent, or when the ledger download status is changed.
+  // notified (1) with any new conversations added after the initial list of
+  // conversations is sent, or (2) when the ledger download status is changed,
+  // or (3) when a conversation title is changed.
   //
   // The message sent from the content provider will be a JSON string formatted
   // as following:
@@ -101,9 +105,9 @@ interface ChatContentProvider {
   //       "conversation_id": <conversation_id>,
   //       "participants":    [
   //         {
-  //           "email": <participant_email>,
+  //           "email":       <participant_email>,
   //           "displayName": <display name>,
-  //           "photoUrl": <photo url>
+  //           "photoUrl":    <photo url>
   //         },
   //         <...>
   //       ]
@@ -116,13 +120,25 @@ interface ChatContentProvider {
   //       "status": "idle|pending|in_progress|error"
   //     }
   //
+  // OR
+  //
+  //     {
+  //       "event":           "conversation_title",
+  //       "conversation_id": <conversation_id>,
+  //       "title":           <title>
+  //     }
+  //
   GetConversations(string? message_queue_token)
       => (ChatStatus status, array<Conversation> conversations);
+
+  // Sets the |title| of the specified conversation.
+  SetConversationTitle(array<uint8> conversation_id, string title)
+      => (ChatStatus status);
 
   // Gets the list of all |Message|s in the specified conversation.
   // When the |message_queue_token| value is provided, the client will be
   // notified with any new messages added and messages deleted after the initial
-  // snapshot is sent.
+  // snapshot is sent, or when the conversation title is changed.
   //
   // The message sent from the content provider will be a JSON string formatted
   // as following:
@@ -133,6 +149,12 @@ interface ChatContentProvider {
   //       "message_id":      <message_id>
   //     }
   //
+  // OR
+  //
+  //     {
+  //       "event": "title",
+  //       "title": <title>
+  //     }
   // The client should then make a subsequent |GetMessage| call to retrieve the
   // actual message content.
   GetMessages(array<uint8> conversation_id, string? message_queue_token)

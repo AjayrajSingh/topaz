@@ -18,6 +18,7 @@ import 'base_page_watcher.dart';
 /// a new [Entry] is added to this page, this [ConversationListWatcher] sends
 /// notifications to the subscriber through the [MessageQueue].
 class ConversationListWatcher extends BasePageWatcher {
+  final Set<List<int>> _seenConversations = createLedgerIdSet();
   final Map<List<int>, Completer<Entry>> _conversationCompleters =
       createLedgerIdMap<Completer<Entry>>();
 
@@ -33,11 +34,7 @@ class ConversationListWatcher extends BasePageWatcher {
     PageChange pageChange,
     ResultState resultState,
   ) {
-    // The underlying assumption is that there will be no changes to an existing
-    // conversation, and only new conversations will be added to the list of all
-    // conversations. Therefore, we can safely ignore whether this onChange
-    // notification is partial or complete, and just process the changes
-    // independently.
+    // Process the changes independently.
     pageChange.changes.forEach(_processEntry);
   }
 
@@ -93,16 +90,26 @@ class ConversationListWatcher extends BasePageWatcher {
   /// Process the provided [Entry] and sends notification to the subscriber.
   /// Refer to the `chat_content_provider.fidl` file for the message format.
   void _processEntry(Entry entry) {
-    Map<String, dynamic> decoded = decodeLedgerValue(entry.value);
+    Map<String, Object> decoded = decodeLedgerValue(entry.value);
 
-    Map<String, dynamic> newConversationNotification = <String, dynamic>{
-      'event': 'new_conversation',
-      'conversation_id': entry.key,
-      'participants': decoded['participants'],
-    };
+    Map<String, Object> notification = _seenConversations.contains(entry.key)
+        ? <String, Object>{
+            'event': 'conversation_title',
+            'conversation_id': entry.key,
+            'title': decoded['title'],
+          }
+        : <String, Object>{
+            'event': 'new_conversation',
+            'conversation_id': entry.key,
+            'participants': decoded['participants'],
+          };
+    _seenConversations.add(entry.key);
 
-    sendMessage(JSON.encode(newConversationNotification));
+    sendMessage(JSON.encode(notification));
 
-    _conversationCompleters[entry.key]?.complete(entry);
+    Completer<Entry> completer = _conversationCompleters[entry.key];
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(entry);
+    }
   }
 }

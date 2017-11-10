@@ -174,6 +174,8 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     expect(conversation.conversationId, isNotEmpty);
     expect(conversation.participants, unorderedEquals(participants));
 
+    await new Future<Null>.delayed(const Duration(milliseconds: 100));
+
     // Test GetConversations() method again.
     await _chatContentProvider.getConversations(
       null,
@@ -190,7 +192,10 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
       conversations[0].conversationId,
       orderedEquals(conversation.conversationId),
     );
-    expect(conversations[0].participants, unorderedEquals(participants));
+    expect(
+      conversations[0].participants.map((Participant p) => p.email),
+      unorderedEquals(participants.map((Participant p) => p.email)),
+    );
 
     // Test GetMessages() method.
     await _chatContentProvider.getMessages(
@@ -354,7 +359,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     Conversation conversation0, conversation1, conversation2;
     List<Message> messages;
     List<int> messageId1, messageId2;
-    Completer<Null> completer1, completer2;
+    Completer<Null> completer1, completer2, completer3, completer4;
     dynamic decoded;
 
     _MessageQueueWrapper mqConversation1 = await _getMessageQueue('conv1');
@@ -423,7 +428,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     );
     expect(
       decoded['participants'].map((Map<String, String> p) => p['email']),
-      unorderedEquals(participants1),
+      unorderedEquals(participants1.map((Participant p) => p.email)),
     );
 
     // Register another message queue for conversation.
@@ -474,7 +479,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     );
     expect(
       decoded['participants'].map((Map<String, String> p) => p['email']),
-      unorderedEquals(participants2),
+      unorderedEquals(participants2.map((Participant p) => p.email)),
     );
 
     await completer2.future.timeout(_kTimeout);
@@ -489,7 +494,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     );
     expect(
       decoded['participants'].map((Map<String, String> p) => p['email']),
-      unorderedEquals(participants2),
+      unorderedEquals(participants2.map((Participant p) => p.email)),
     );
 
     // Now send a few messages to the initial conversation and see if that
@@ -623,8 +628,8 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
       orderedEquals(messageId1),
     );
 
-    // Lastly, simulate the situation where a new message arrives from some
-    // other user. Both message queues should be notified.
+    // Simulate the situation where a new message arrives from some other user.
+    // Both message queues should be notified.
     completer1 = new Completer<Null>();
     completer2 = new Completer<Null>();
     mqMessage1.completer = completer1;
@@ -667,6 +672,65 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
       decoded['message_id'],
       orderedEquals(messageId1),
     );
+
+    // Try setting the title of a conversation and see if correct notifications
+    // are sent.
+    completer1 = new Completer<Null>();
+    completer2 = new Completer<Null>();
+    completer3 = new Completer<Null>();
+    completer4 = new Completer<Null>();
+    mqConversation1.completer = completer1;
+    mqConversation2.completer = completer2;
+    mqMessage1.completer = completer3;
+    mqMessage2.completer = completer4;
+
+    String conversationTitle = 'Sample Conversation Title 01';
+    await _chatContentProvider.setConversationTitle(
+      conversation0.conversationId,
+      conversationTitle,
+      (ChatStatus s) {
+        status = s;
+      },
+    ).timeout(_kTimeout);
+
+    // Check if the 4 notifications are correctly sent.
+    await completer1.future.timeout(_kTimeout);
+    expect(mqConversation1.messagesOfType('conversation_title'), hasLength(1));
+    decoded =
+        JSON.decode(mqConversation1.messagesOfType('conversation_title').last);
+    expect(decoded, isMap);
+    expect(decoded['event'], equals('conversation_title'));
+    expect(
+      decoded['conversation_id'],
+      orderedEquals(conversation0.conversationId),
+    );
+    expect(decoded['title'], conversationTitle);
+
+    await completer2.future.timeout(_kTimeout);
+    expect(mqConversation2.messagesOfType('conversation_title'), hasLength(1));
+    decoded =
+        JSON.decode(mqConversation2.messagesOfType('conversation_title').last);
+    expect(decoded, isMap);
+    expect(decoded['event'], equals('conversation_title'));
+    expect(
+      decoded['conversation_id'],
+      orderedEquals(conversation0.conversationId),
+    );
+    expect(decoded['title'], conversationTitle);
+
+    await completer3.future.timeout(_kTimeout);
+    expect(mqMessage1.messagesOfType('title'), hasLength(1));
+    decoded = JSON.decode(mqMessage1.messagesOfType('title').last);
+    expect(decoded, isMap);
+    expect(decoded['event'], equals('title'));
+    expect(decoded['title'], conversationTitle);
+
+    await completer4.future.timeout(_kTimeout);
+    expect(mqMessage2.messagesOfType('title'), hasLength(1));
+    decoded = JSON.decode(mqMessage2.messagesOfType('title').last);
+    expect(decoded, isMap);
+    expect(decoded['event'], equals('title'));
+    expect(decoded['title'], conversationTitle);
 
     mqConversation1.close();
     mqConversation2.close();

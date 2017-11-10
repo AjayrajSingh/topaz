@@ -101,6 +101,13 @@ List<int> generateRandomId(int lengthInBytes) {
   return id;
 }
 
+/// Creates a new [Set] of Ledger IDs.
+Set<List<int>> createLedgerIdSet() => new HashSet<List<int>>(
+      equals: const ListEquality<int>().equals,
+      hashCode: quiver.hashObjects,
+      isValidKey: (Object key) => key is List<int>,
+    );
+
 /// Creates a new [Map] where the key is a Ledger ID.
 Map<List<int>, T> createLedgerIdMap<T>() => new HashMap<List<int>, T>(
       equals: const ListEquality<int>().equals,

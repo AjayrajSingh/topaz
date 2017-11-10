@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show UTF8;
+import 'dart:convert' show JSON, UTF8;
 import 'dart:typed_data';
 import 'dart:zircon' show Vmo;
 
@@ -74,6 +74,13 @@ Message _createMessageFromLedgerKeyValue(List<int> key, Vmo value) {
     ..timestamp = decodedValue['timestamp'] ?? 0
     ..type = decodedValue['type']
     ..jsonPayload = decodedValue['json_payload'];
+}
+
+class _KeyNotFoundException implements Exception {
+  final String message;
+  _KeyNotFoundException([this.message]);
+  @override
+  String toString() => 'KeyNotFound: $message';
 }
 
 /// Called when a new message is received.
@@ -391,7 +398,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
           wait: wait,
         );
         callback(ChatStatus.ok, conversation);
-      } on Exception {
+      } on _KeyNotFoundException {
         log.warning('Specified conversation is not found.');
         callback(ChatStatus.idNotFound, null);
       }
@@ -453,6 +460,98 @@ class ChatContentProviderImpl extends ChatContentProvider {
     } on Exception catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError, const <Conversation>[]);
+    }
+  }
+
+  @override
+  Future<Null> setConversationTitle(
+    List<int> conversationId,
+    String title,
+    void callback(ChatStatus chatStatus),
+  ) async {
+    try {
+      try {
+        await _ledgerReady.future;
+      } on Exception {
+        callback(ChatStatus.ledgerNotInitialized);
+        return;
+      }
+
+      // Write the updated title in Ledger in two places.
+      // (1) In the conversation entry of the main conversations page.
+      Conversation conversation;
+      try {
+        conversation = await _getConversation(conversationId);
+      } on _KeyNotFoundException {
+        log.severe('The conversation ID is not found');
+        callback(ChatStatus.idNotFound);
+        return;
+      }
+
+      // Update the conversation entry with the new title in Ledger.
+      Completer<Status> statusCompleter = new Completer<Status>();
+      _conversationsPage.put(
+        conversationId,
+        encodeLedgerValue(<String, dynamic>{
+          'title': title,
+          'participants': conversation.participants
+              .map((Participant p) => p.toJson())
+              .toList(),
+        }),
+        statusCompleter.complete,
+      );
+
+      Status status = await statusCompleter.future;
+      if (status != Status.ok) {
+        log.severe('Page::Put() returned an error status: $status');
+        callback(ChatStatus.ledgerOperationError);
+        return;
+      }
+
+      // Update the conversation cache.
+      _conversationCache[conversationId] = conversation..title = title;
+
+      // (2) In the specific conversation page, with the zero-array key.
+      PageProxy conversationPage = new PageProxy();
+      _pageProxies.add(conversationPage);
+
+      try {
+        // Request a new page from Ledger.
+        statusCompleter = new Completer<Status>();
+        _ledger.getPage(
+          conversation.conversationId,
+          conversationPage.ctrl.request(),
+          statusCompleter.complete,
+        );
+
+        status = await statusCompleter.future;
+        if (status != Status.ok) {
+          log.severe('Ledger::GetPage() returned an error status: $status');
+          callback(ChatStatus.ledgerOperationError);
+          return;
+        }
+
+        // Put the title in the conversation page.
+        statusCompleter = new Completer<Status>();
+        conversationPage.put(
+          new Uint8List(1),
+          UTF8.encode(JSON.encode(title)),
+          statusCompleter.complete,
+        );
+
+        status = await statusCompleter.future;
+        if (status != Status.ok) {
+          log.severe('Page::Put() returned an error status: $status');
+          callback(ChatStatus.ledgerOperationError);
+          return;
+        }
+      } finally {
+        conversationPage.ctrl.close();
+        _pageProxies.remove(conversationPage);
+      }
+    } on Exception catch (e, stackTrace) {
+      log.severe('Sending ChatStatus.unknownError', e, stackTrace);
+      callback(ChatStatus.unknownError);
     }
   }
 
@@ -780,7 +879,10 @@ class ChatContentProviderImpl extends ChatContentProvider {
       return conversation;
     }
 
-    if (status != Status.ok) {
+    // Distinguish keyNotFound status and others.
+    if (status == Status.keyNotFound) {
+      throw new _KeyNotFoundException('The conversation ID is not found');
+    } else if (status != Status.ok) {
       throw new Exception(
         'PageSnapshot::Get() returned an error status: $status',
       );

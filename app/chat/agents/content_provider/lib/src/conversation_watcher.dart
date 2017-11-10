@@ -6,6 +6,7 @@ import 'dart:convert' show JSON;
 
 import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
+import 'package:lib.modular/ledger.dart';
 import 'package:meta/meta.dart';
 
 import 'base_page_watcher.dart';
@@ -31,11 +32,15 @@ class ConversationWatcher extends BasePageWatcher {
     PageChange pageChange,
     ResultState resultState,
   ) {
-    // The underlying assumption is that there will be no changes to an existing
-    // message. Therefore, we can safely ignore whether this onChange
-    // notification is partial or complete, and just process the messages
-    // independently.
-    pageChange.changes.forEach(_processNewEntry);
+    for (Entry entry in pageChange.changes) {
+      // If the entry key is zero, it contains the title.
+      if (entry.key.length == 1 && entry.key[0] == 0) {
+        _processTitle(entry);
+      } else {
+        _processNewEntry(entry);
+      }
+    }
+
     pageChange.deletedKeys.forEach(_processDeletedKey);
   }
 
@@ -52,17 +57,30 @@ class ConversationWatcher extends BasePageWatcher {
   /// Processes the provided [Entry] and sends notification to the subscriber.
   /// Refer to the `chat_content_provider.fidl` file for the message format.
   void _processNewEntry(Entry entry) {
-    _notifySubscribers('add', entry.key);
+    _notifyMessage('add', entry.key);
   }
 
   /// Processes the deleted key and sends notification to the subscriber.
   /// Refer to the `chat_content_provider.fidl` file for the message format.
   void _processDeletedKey(List<int> key) {
-    _notifySubscribers('delete', key);
+    _notifyMessage('delete', key);
   }
 
-  void _notifySubscribers(String event, List<int> messageId) {
-    Map<String, dynamic> notification = <String, dynamic>{
+  /// Processes the provided [Entry] and sends title change notification to the
+  /// subscriber.
+  void _processTitle(Entry entry) {
+    String title = decodeLedgerValue(entry.value);
+
+    Map<String, Object> notification = <String, Object>{
+      'event': 'title',
+      'title': title,
+    };
+
+    sendMessage(JSON.encode(notification));
+  }
+
+  void _notifyMessage(String event, List<int> messageId) {
+    Map<String, Object> notification = <String, Object>{
       'event': event,
       'conversation_id': conversationId,
       'message_id': messageId,
