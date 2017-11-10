@@ -4,8 +4,8 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:fuchsia' as fuchsia;
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -61,7 +61,7 @@ class LifecycleImpl implements Lifecycle {
   void terminate() {
     _log('LifecycleImpl.terminate()');
     _lifecycleBinding.close();
-    Isolate.current.kill();
+    fuchsia.exit(0);
   }
 }
 

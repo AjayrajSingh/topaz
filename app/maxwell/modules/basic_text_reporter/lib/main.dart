@@ -4,7 +4,7 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
+import 'dart:fuchsia';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -165,7 +165,7 @@ class ModuleImpl implements Module, Lifecycle {
     _moduleBinding.close();
     _lifecycleBinding.close();
 
-    Isolate.current.kill();
+    exit(0);
   }
 
   void publishText(String text) {

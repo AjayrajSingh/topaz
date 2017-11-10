@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:isolate';
+import 'dart:fuchsia';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -53,7 +53,7 @@ class ModuleImpl implements Module, Lifecycle {
     _log('ModuleImpl.terminate()');
     _moduleBinding.close();
     _lifecycleBinding.close();
-    Isolate.current.kill();
+    exit(0);
   }
 }
 

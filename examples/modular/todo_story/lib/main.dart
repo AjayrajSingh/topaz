@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:isolate';
+import 'dart:fuchsia';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -68,7 +68,7 @@ class TodoModule implements Module, Lifecycle {
     _log('TodoModule.terminate()');
     _moduleBinding.close();
     _lifecycleBinding.close();
-    Isolate.current.kill();
+    exit(0);
   }
 }
 

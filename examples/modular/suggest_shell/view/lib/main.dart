@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:convert';
-import 'dart:isolate';
+import 'dart:fuchsia';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -67,7 +67,7 @@ class _Module implements Module, Lifecycle, LinkWatcher {
     _link.ctrl.close();
     _moduleBinding.close();
     _lifecycleBinding.close();
-    Isolate.current.kill();
+    exit(0);
   }
 
   /// |LinkWatcher|

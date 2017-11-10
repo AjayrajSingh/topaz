@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:isolate';
+import 'dart:fuchsia';
 import 'dart:math' as math;
 
 import 'package:lib.app.dart/app.dart';
@@ -341,7 +341,7 @@ class ModuleImpl implements Module, Lifecycle {
     _moduleContext.ctrl.close();
     _moduleBinding.close();
     _lifecycleBinding.close();
-    Isolate.current.kill();
+    exit(0);
   }
 }
 

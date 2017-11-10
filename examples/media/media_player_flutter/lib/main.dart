@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:fuchsia';
 import 'dart:io' as io;
-import 'dart:isolate';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -62,7 +62,7 @@ class ModuleImpl implements Module, Lifecycle {
     _log('ModuleImpl::Terminate call');
     _moduleBinding.close();
     _lifecycleBinding.close();
-    Isolate.current.kill();
+    exit(0);
   }
 }
 

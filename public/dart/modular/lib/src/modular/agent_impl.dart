@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:isolate';
+import 'dart:fuchsia';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -101,7 +101,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
 
       // Doing 'dart.io.kill()' will exit other isolates shared with this
       // ApplicationEnvironment's dart runner, so we only exit this isolate.
-      Isolate.current.kill();
+      exit(0);
     });
   }
 

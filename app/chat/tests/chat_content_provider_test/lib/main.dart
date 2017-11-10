@@ -6,7 +6,7 @@
 
 import 'dart:async';
 import 'dart:convert' show JSON;
-import 'dart:isolate';
+import 'dart:fuchsia';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -110,7 +110,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     _testRunner.ctrl.close();
     _moduleBinding.close();
     _lifecycleBinding.close();
-    Isolate.current.kill();
+    exit(0);
   }
 
   /// Test adding a new conversation and a few messages, starting from a blank
