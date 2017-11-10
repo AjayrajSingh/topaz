@@ -19,6 +19,9 @@ typedef void ConversationActionCallback(Conversation message);
 class ChatConversationList extends StatelessWidget {
   static final ListEquality<int> _intListEquality = const ListEquality<int>();
 
+  /// The title to be displayed at the top.
+  final String title;
+
   /// Set of [Conversation]s to render.
   final Set<Conversation> conversations;
 
@@ -37,6 +40,7 @@ class ChatConversationList extends StatelessWidget {
   /// Constructor
   const ChatConversationList({
     Key key,
+    this.title,
     @required this.conversations,
     this.onNewConversation,
     this.onSelectConversation,
@@ -67,7 +71,7 @@ class ChatConversationList extends StatelessWidget {
                 ),
               ),
               child: new Text(
-                'Chat',
+                title ?? '',
                 style: theme.textTheme.title,
               ),
             ),

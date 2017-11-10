@@ -34,6 +34,7 @@ class _ChatConversationListScreenState
           ) {
             List<Widget> stackChildren = <Widget>[
               new ChatConversationList(
+                title: model.title,
                 conversations: model.conversations == null
                     ? new Set<Conversation>()
                     : model.conversations,

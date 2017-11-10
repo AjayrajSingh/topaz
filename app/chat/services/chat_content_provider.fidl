@@ -66,6 +66,9 @@ struct Message {
 
 [ServiceName="chat_content_provider.ChatContentProvider"]
 interface ChatContentProvider {
+  // Returns the title of the content provider (e.g. "Chat").
+  GetTitle() => (string title);
+
   // Creates a new conversation with the given |participants|, which is a list
   // of all participants (including the current user) in the group.
   NewConversation(array<Participant> participants)

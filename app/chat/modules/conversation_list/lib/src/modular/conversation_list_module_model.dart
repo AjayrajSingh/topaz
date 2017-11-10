@@ -59,6 +59,10 @@ class ChatConversationListModuleModel extends ModuleModel {
   /// the initial list of conversations are fetched.
   final Queue<Conversation> _newConversationQueue = new Queue<Conversation>();
 
+  /// The title value to be displayed at the top of the conversation list.
+  String get title => _title;
+  String _title;
+
   /// Indicates whether the spinner UI should be shown.
   bool get shouldDisplaySpinner => _isDownloading || _isFetching;
 
@@ -175,6 +179,12 @@ class ChatConversationListModuleModel extends ModuleModel {
       _chatContentProviderController.ctrl.request(),
     );
     connectToService(contentProviderServices, _chatContentProvider.ctrl);
+
+    // Get the conversation title.
+    _chatContentProvider.getTitle((String title) {
+      _title = title;
+      notifyListeners();
+    });
 
     // Obtain a message queue.
     componentContext.obtainMessageQueue(

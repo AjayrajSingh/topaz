@@ -282,6 +282,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
   }
 
   @override
+  void getTitle(void callback(String title)) {
+    callback('Chat');
+  }
+
+  @override
   Future<Null> newConversation(
     List<Participant> participants,
     void callback(
