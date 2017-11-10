@@ -197,6 +197,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       onAvailable: (ChildViewConnection connection) {
         log.info('UserPickerDeviceShell: Child view connection available!');
         _loadingChildView = false;
+        connection.requestFocus();
         notifyListeners();
       },
       onUnavailable: (ChildViewConnection connection) {
