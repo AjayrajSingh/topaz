@@ -10,9 +10,7 @@ package("contacts") {
 
   deps = [
     "agents",
-    "modules/contact_list",
-    "modules/contacts",
-    "modules/contacts_picker",
+    "modules",
     "services",
   ]
 
@@ -20,6 +18,11 @@ package("contacts") {
     {
       source = "contacts_content_provider.dartx"
       name = "contacts_content_provider"
+    },
+    {
+      source =
+          "gen/topaz/app/contacts/modules/contact_card/contact_card.flx"
+      name = "contacts/contact_card"
     },
     {
       source = "gen/topaz/app/contacts/modules/contact_list/contact_list.flx"
