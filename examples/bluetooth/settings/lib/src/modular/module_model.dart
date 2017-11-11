@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.bluetooth.fidl/common.fidl.dart' as common;
 import 'package:lib.bluetooth.fidl/control.fidl.dart' as bluetooth;
 import 'package:lib.module.fidl/module_context.fidl.dart';
@@ -121,9 +120,8 @@ class SettingsModuleModel extends ModuleModel
   void onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServices,
   ) {
-    super.onReady(moduleContext, link, incomingServices);
+    super.onReady(moduleContext, link);
 
     connectToService(
         applicationContext.environmentServices, _adapterManager.ctrl);

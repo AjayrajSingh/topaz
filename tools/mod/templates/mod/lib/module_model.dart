@@ -85,9 +85,8 @@ class __ProjectName__ModuleModel extends ModuleModel {
   void onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServiceProvider,
   ) {
-    super.onReady(moduleContext, link, incomingServiceProvider);
+    super.onReady(moduleContext, link);
 
     // Do more initialization here.
   }

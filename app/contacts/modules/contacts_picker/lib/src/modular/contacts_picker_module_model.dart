@@ -32,9 +32,8 @@ class ContactsPickerModuleModel extends ModuleModel {
   Future<Null> onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServices,
   ) async {
-    super.onReady(moduleContext, link, incomingServices);
+    super.onReady(moduleContext, link);
     log.fine('ModuleModel::onReady call');
 
     // Obtain the component context

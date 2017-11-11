@@ -29,7 +29,6 @@ class WebViewProvider : mozart::ViewProvider,
   // modular::Module
   void Initialize(
       fidl::InterfaceHandle<modular::ModuleContext> context,
-      fidl::InterfaceHandle<app::ServiceProvider> incoming_services,
       fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) final;
 
   // modular::Terminate

@@ -58,7 +58,6 @@ class App : modular::Module, modular::Lifecycle {
   // |modular::Module|
   void Initialize(
       fidl::InterfaceHandle<modular::ModuleContext> module_context_handle,
-      fidl::InterfaceHandle<app::ServiceProvider> incoming_services,
       fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) override {
     fidl::InterfacePtr<modular::ModuleContext> module_context;
     module_context.Bind(std::move(module_context_handle));

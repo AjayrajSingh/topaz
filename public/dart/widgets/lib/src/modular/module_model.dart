@@ -22,7 +22,6 @@ export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
 class ModuleModel extends Model {
   ModuleContext _moduleContext;
   Link _link;
-  ServiceProvider _incomingServiceProvider;
 
   final Completer<Null> _readyCompleter = new Completer<Null>();
 
@@ -41,9 +40,6 @@ class ModuleModel extends Model {
   /// The [Link] given to this [Module].
   Link get link => _link;
 
-  /// The [ServiceProvider] given to this [Module] as incoming services.
-  ServiceProvider get incomingServiceProvider => _incomingServiceProvider;
-
   /// The [ServiceProvider] exposed to the parent module. Modules should
   /// override this to provide an actual instance, if they wish to expose
   /// outgoing services to their parents.
@@ -58,11 +54,9 @@ class ModuleModel extends Model {
   void onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServiceProvider,
   ) {
     _moduleContext = moduleContext;
     _link = link;
-    _incomingServiceProvider = incomingServiceProvider;
 
     _readyCompleter.complete();
 

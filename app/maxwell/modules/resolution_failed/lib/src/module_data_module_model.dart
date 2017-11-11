@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
@@ -23,9 +22,8 @@ class ModuleDataModuleModel extends ModuleModel {
   Future<Null> onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServices,
   ) async {
-    super.onReady(moduleContext, link, incomingServices);
+    super.onReady(moduleContext, link);
     log.fine('ModuleModel::onReady call');
 
     // Obtain the component context

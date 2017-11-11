@@ -5,7 +5,6 @@
 import 'dart:convert';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.module.fidl/module.fidl.dart';
@@ -41,7 +40,6 @@ class SimpleModule {
   ModuleImpl _module;
   ModuleContext _moduleContext;
   Link _link;
-  ServiceProvider _incomingServiceProvider;
 
   /// The [ApplicationContext] encapsulates how the module exchanges services with
   /// the Fuchsia system. E.g. the Module service is exposed via this
@@ -73,19 +71,14 @@ class SimpleModule {
   /// The [Link] returned from the [ModuleImpl]'s startup.
   Link get link => _link;
 
-  /// The [incomingServiceProvider] returned from the [ModuleImpl]'s startup.
-  ServiceProvider get incomingServiceProvider => _incomingServiceProvider;
-
   /// The handler for [ModuleImpl#onReady].
   void handleReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServiceProvider,
   ) {
     /// TODO(SO-920): Move these to public getters on the ModuleImpl.
     _moduleContext = moduleContext;
     _link = link;
-    _incomingServiceProvider = incomingServiceProvider;
 
     // Signal module watchers it's go time.
     moduleContext.ready();

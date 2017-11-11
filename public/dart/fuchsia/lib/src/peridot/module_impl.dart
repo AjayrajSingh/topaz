@@ -19,7 +19,6 @@ import 'link_watcher_impl.dart';
 typedef void OnModuleReady(
   ModuleContext moduleContext,
   Link link,
-  ServiceProvider incomingServiceProvider,
 );
 
 /// Called at the beginning of [Lifecycle.terminate].
@@ -37,8 +36,6 @@ typedef void OnDeviceMapChange(DeviceMapEntry deviceMapEntry);
 class ModuleImpl implements Module, Lifecycle {
   final ModuleContextProxy _moduleContextProxy = new ModuleContextProxy();
   final LinkProxy _linkProxy = new LinkProxy();
-  final ServiceProviderProxy _incomingServiceProviderProxy =
-      new ServiceProviderProxy();
   final ServiceProviderBinding _outgoingServiceProviderBinding =
       new ServiceProviderBinding();
   final DeviceMapProxy _deviceMapProxy = new DeviceMapProxy();
@@ -91,7 +88,6 @@ class ModuleImpl implements Module, Lifecycle {
   @override
   void initialize(
     InterfaceHandle<ModuleContext> moduleContext,
-    InterfaceHandle<ServiceProvider> incomingServices,
     InterfaceRequest<ServiceProvider> outgoingServices,
   ) {
     print('===> module_impl initializing...');
@@ -100,11 +96,7 @@ class ModuleImpl implements Module, Lifecycle {
       _moduleContextProxy.ctrl.bind(moduleContext);
       _moduleContextProxy.getLink(null, _linkProxy.ctrl.request());
 
-      if (incomingServices != null) {
-        _incomingServiceProviderProxy.ctrl.bind(incomingServices);
-      }
-
-      onReady(_moduleContextProxy, _linkProxy, _incomingServiceProviderProxy);
+      onReady(_moduleContextProxy, _linkProxy);
     }
 
     if (outgoingServices != null && outgoingServiceProvider != null) {
@@ -148,7 +140,6 @@ class ModuleImpl implements Module, Lifecycle {
     _linkWatcherBinding?.close();
     _moduleContextProxy.ctrl.close();
     _linkProxy.ctrl.close();
-    _incomingServiceProviderProxy.ctrl.close();
     _outgoingServiceProviderBinding.close();
     _deviceMapProxy.ctrl.close();
     _deviceMapWatcherBinding.close();

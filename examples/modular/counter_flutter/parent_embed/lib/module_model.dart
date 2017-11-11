@@ -4,7 +4,6 @@
 
 import 'dart:convert' show JSON;
 
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
@@ -68,9 +67,8 @@ class CounterParentModuleModel extends ModuleModel {
   void onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServiceProvider,
   ) {
-    super.onReady(moduleContext, link, incomingServiceProvider);
+    super.onReady(moduleContext, link);
 
     // Set a JSON schema to the main link of this module. If an update violates
     // the schema, this only creates debug log output.

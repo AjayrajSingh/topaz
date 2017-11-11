@@ -7,7 +7,6 @@ import 'dart:collection';
 import 'dart:convert' show JSON;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.netconnector.fidl/netconnector.fidl.dart';
@@ -62,9 +61,8 @@ class VideoModuleModel extends ModuleModel {
   Future<Null> onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServices,
   ) async {
-    super.onReady(moduleContext, link, incomingServices);
+    super.onReady(moduleContext, link);
     Completer<DeviceMapEntry> currentDeviceCompleter =
         new Completer<DeviceMapEntry>();
     _deviceMap.getCurrentDevice(currentDeviceCompleter.complete);

@@ -8,7 +8,6 @@ import 'dart:convert';
 import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.context.fidl/context_writer.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
@@ -82,9 +81,8 @@ class EventPageModuleModel extends ModuleModel {
   void onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServices,
   ) {
-    super.onReady(moduleContext, link, incomingServices);
+    super.onReady(moduleContext, link);
 
     // Setup the Context Link
     moduleContext.getLink(_kContextLinkName, _contextLink.ctrl.request());

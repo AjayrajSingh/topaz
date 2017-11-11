@@ -135,9 +135,8 @@ class ArtistModuleModel extends ModuleModel {
   void onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServices,
   ) {
-    super.onReady(moduleContext, link, incomingServices);
+    super.onReady(moduleContext, link);
 
     // Obtain the component context.
     ComponentContextProxy componentContext = new ComponentContextProxy();

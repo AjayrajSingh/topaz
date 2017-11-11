@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.module.fidl/module_state.fidl.dart';
@@ -55,9 +54,8 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   void onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServiceProvider,
   ) {
-    super.onReady(moduleContext, link, incomingServiceProvider);
+    super.onReady(moduleContext, link);
     _chatter = new Chatter(moduleContext);
   }
 

@@ -5,7 +5,6 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
 import 'package:lib.module.fidl/module_context.fidl.dart';
@@ -36,8 +35,7 @@ class TodoListModuleModel extends ModuleModel implements ledger.PageWatcher {
 
   /// Implementation of ModuleModel.onReady():
   @override
-  void onReady(ModuleContext moduleContext, Link link,
-      ServiceProvider incomingServiceProvider) {
+  void onReady(ModuleContext moduleContext, Link link) {
     moduleContext.getComponentContext(_componentContext.ctrl.request());
     _componentContext.getLedger(
       _ledger.ctrl.request(),
@@ -57,7 +55,7 @@ class TodoListModuleModel extends ModuleModel implements ledger.PageWatcher {
     );
 
     _readItems(snapshot);
-    super.onReady(moduleContext, link, incomingServiceProvider);
+    super.onReady(moduleContext, link);
   }
 
   /// Implementation of ModuleModel.onStop():

@@ -10,7 +10,6 @@ import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
 import 'package:flutter/widgets.dart' show ValueChanged;
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
@@ -147,9 +146,8 @@ class EventListModuleModel extends ModuleModel {
   void onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServices,
   ) {
-    super.onReady(moduleContext, link, incomingServices);
+    super.onReady(moduleContext, link);
 
     moduleContext.getIntelligenceServices(
       _intelligenceServicesProxy.ctrl.request(),

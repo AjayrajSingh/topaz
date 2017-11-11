@@ -51,7 +51,6 @@ class TodoModule implements Module, Lifecycle {
   @override
   void initialize(
       InterfaceHandle<ModuleContext> moduleContextHandle,
-      InterfaceHandle<ServiceProvider> incomingServices,
       InterfaceRequest<ServiceProvider> outgoingServices) {
     _log('TodoModule::initialize()');
 

@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.bluetooth.fidl/common.fidl.dart' as bt;
 import 'package:lib.bluetooth.fidl/low_energy.fidl.dart' as ble;
 import 'package:lib.module.fidl/module_context.fidl.dart';
@@ -135,9 +134,8 @@ class BLEScannerModuleModel extends ModuleModel implements ble.CentralDelegate {
   void onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServices,
   ) {
-    super.onReady(moduleContext, link, incomingServices);
+    super.onReady(moduleContext, link);
 
     connectToService(applicationContext.environmentServices, _central.ctrl);
     _central.setDelegate(_delegateBinding.wrap(this));

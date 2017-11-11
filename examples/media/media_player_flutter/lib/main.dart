@@ -51,7 +51,6 @@ class ModuleImpl implements Module, Lifecycle {
   @override
   void initialize(
       InterfaceHandle<ModuleContext> moduleContextHandle,
-      InterfaceHandle<ServiceProvider> incomingServices,
       InterfaceRequest<ServiceProvider> outgoingServices) {
     _log('ModuleImpl::initialize call');
   }

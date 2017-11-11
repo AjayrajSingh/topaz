@@ -61,7 +61,6 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
   @override
   Future<Null> initialize(
     InterfaceHandle<ModuleContext> moduleContext,
-    InterfaceHandle<ServiceProvider> incomingServices,
     InterfaceRequest<ServiceProvider> outgoingServices,
   ) async {
     // Obtain TestRunner interface.

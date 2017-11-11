@@ -4,7 +4,6 @@
 
 import 'dart:async';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.bluetooth.fidl/common.fidl.dart' as bt;
 import 'package:lib.bluetooth.fidl/low_energy.fidl.dart' as ble;
 import 'package:lib.module.fidl/module_context.fidl.dart';
@@ -77,9 +76,8 @@ class EddystoneModuleModel extends ModuleModel {
   void onReady(
     ModuleContext moduleContext,
     Link link,
-    ServiceProvider incomingServices,
   ) {
-    super.onReady(moduleContext, link, incomingServices);
+    super.onReady(moduleContext, link);
 
     connectToService(applicationContext.environmentServices, _peripheral.ctrl);
   }
