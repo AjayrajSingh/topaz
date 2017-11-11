@@ -40,6 +40,9 @@ const bool _kEnableDebugInfo = false;
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
 
+/// The main device shell widget.
+DeviceShellWidget<UserPickerDeviceShellModel> _deviceShellWidget;
+
 void main() {
   setupLogger(name: 'userpicker_device_shell');
   GlobalKey screenManagerKey = new GlobalKey();
@@ -86,7 +89,7 @@ void main() {
       ),
       new ScopedModel<AuthenticationOverlayModel>(
         model: authenticationOverlayModel,
-        child: new AuthenticationOverlay(),
+        child: const AuthenticationOverlay(onCancel: _cancelAuthenticationFlow),
       ),
     ],
   );
@@ -164,15 +167,13 @@ void main() {
     );
   }
 
-  DeviceShellWidget<UserPickerDeviceShellModel> deviceShellWidget =
-      new DeviceShellWidget<UserPickerDeviceShellModel>(
+  _deviceShellWidget = new DeviceShellWidget<UserPickerDeviceShellModel>(
     applicationContext: applicationContext,
     softKeyboardContainer: softKeyboardContainerImpl,
     deviceShellModel: userPickerDeviceShellModel,
     authenticationContext: new AuthenticationContextImpl(
-      onStartOverlay: authenticationOverlayModel.onStartOverlay,
-      onStopOverlay: authenticationOverlayModel.onStopOverlay,
-    ),
+        onStartOverlay: authenticationOverlayModel.onStartOverlay,
+        onStopOverlay: authenticationOverlayModel.onStopOverlay),
     child: new LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) =>
           (constraints.biggest == Size.zero)
@@ -183,10 +184,10 @@ void main() {
     ),
   );
 
-  runApp(deviceShellWidget);
+  runApp(_deviceShellWidget);
 
   constraintsModel.load(rootBundle);
-  deviceShellWidget.advertise();
+  _deviceShellWidget.advertise();
   softKeyboardContainerImpl?.advertise();
   RawKeyboard.instance.addListener((RawKeyEvent event) {
     final bool isDown = event is RawKeyDownEvent;
@@ -200,6 +201,11 @@ void main() {
       childConstraintsChangerKey.currentState.toggleConstraints();
     }
   });
+}
+
+/// Cancels any ongoing authorization flows in the device shell.
+void _cancelAuthenticationFlow() {
+  _deviceShellWidget.cancelAuthenticationFlow();
 }
 
 Widget _buildPerformanceOverlay({Widget child}) => new Stack(

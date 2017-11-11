@@ -105,4 +105,9 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
     );
     return deviceShell;
   }
+
+  /// Cancels any authentication flow currently in progress.
+  void cancelAuthenticationFlow() {
+    _deviceShell.closeAuthenticationContextBindings();
+  }
 }

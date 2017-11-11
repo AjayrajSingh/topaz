@@ -8,8 +8,21 @@ import 'package:lib.widgets/model.dart';
 
 import 'authentication_overlay_model.dart';
 
+/// Signature for callback used to indicate that the user cancelled the authorization
+/// flow.
+typedef void AuthenticationCancelCallback();
+
 /// Displays the authentication window.
 class AuthenticationOverlay extends StatelessWidget {
+  /// Constructs an authentication overlay that calls the provided callback if the
+  /// user cancels the login flow.
+  const AuthenticationOverlay({AuthenticationCancelCallback onCancel})
+      : _onCancel = onCancel;
+
+  /// The callback that is triggered when the user taps outside of the child view,
+  /// cancelling the authorization flow.
+  final AuthenticationCancelCallback _onCancel;
+
   @override
   Widget build(BuildContext context) =>
       new ScopedModelDescendant<AuthenticationOverlayModel>(
@@ -27,12 +40,20 @@ class AuthenticationOverlay extends StatelessWidget {
                       child: child,
                     ),
                   ),
-              child: new FractionallySizedBox(
-                widthFactor: 0.75,
-                heightFactor: 0.75,
-                child: new ChildView(
-                  connection: model.childViewConnection,
-                ),
+              child: new Stack(
+                fit: StackFit.passthrough,
+                children: <Widget>[
+                  new GestureDetector(
+                    onTap: _onCancel,
+                  ),
+                  new FractionallySizedBox(
+                    widthFactor: 0.75,
+                    heightFactor: 0.75,
+                    child: new ChildView(
+                      connection: model.childViewConnection,
+                    ),
+                  ),
+                ],
               ),
             ),
       );

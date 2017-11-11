@@ -79,4 +79,13 @@ class DeviceShellImpl extends DeviceShell {
       ..bind(authenticationContext, request);
     _bindingSet.add(binding);
   }
+
+  /// Closes all bindings to authentication contexts, effectively cancelling any ongoing
+  /// authorization flows.
+  void closeAuthenticationContextBindings() {
+    for (AuthenticationContextBinding binding in _bindingSet) {
+      binding.close();
+    }
+    _bindingSet.clear();
+  }
 }
