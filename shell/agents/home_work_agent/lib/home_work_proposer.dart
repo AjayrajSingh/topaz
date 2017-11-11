@@ -24,6 +24,9 @@ const String _kLocationHomeWorkTopic = 'location/home_work';
 
 const String _kLaunchEverythingProposalId = 'demo_all';
 
+/// Ensure we don't exceed the max message size.
+const int _kMaxProposals = 42;
+
 /// Proposes suggestions for home and work locations.
 class HomeWorkProposer {
   final ProposalPublisherProxy _proposalPublisherProxy =
@@ -342,6 +345,9 @@ class _QueryHandlerImpl extends QueryHandler {
               color: color,
             ),
           );
+          if (proposals.length > _kMaxProposals) {
+            break;
+          }
         }
       }
 
@@ -409,19 +415,20 @@ Proposal _createAppProposal({
   int color,
   double confidence: 0.0,
   AnnoyanceType annoyanceType: AnnoyanceType.none,
-}) =>
-    new Proposal()
-      ..id = id
-      ..confidence = confidence
-      ..display = (new SuggestionDisplay()
-        ..headline = headline
-        ..subheadline = subheadline ?? ''
-        ..details = ''
-        ..color = color
-        ..iconUrls = iconUrls
-        ..imageType = imageType
-        ..imageUrl = imageUrl
-        ..annoyance = annoyanceType)
-      ..onSelected = <Action>[
-        new Action()..createStory = (new CreateStory()..moduleId = appUrl)
-      ];
+}) {
+  return new Proposal()
+    ..id = id
+    ..confidence = confidence
+    ..display = (new SuggestionDisplay()
+      ..headline = headline
+      ..subheadline = subheadline ?? ''
+      ..details = ''
+      ..color = color
+      ..iconUrls = iconUrls
+      ..imageType = imageType
+      ..imageUrl = imageUrl
+      ..annoyance = annoyanceType)
+    ..onSelected = <Action>[
+      new Action()..createStory = (new CreateStory()..moduleId = appUrl)
+    ];
+}
