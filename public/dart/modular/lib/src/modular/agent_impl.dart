@@ -36,16 +36,19 @@ abstract class AgentImpl implements Agent, Lifecycle {
   final List<ServiceProviderBinding> _outgoingServicesBindings =
       <ServiceProviderBinding>[];
 
+  final Completer<Null> _readyCompleter = new Completer<Null>();
+
   /// Creates a new instance of [AgentImpl].
   AgentImpl({@required ApplicationContext applicationContext})
       : _applicationContext = applicationContext,
         assert(applicationContext != null);
 
   @override
-  void connect(
+  Future<Null> connect(
     String requestorUrl,
     InterfaceRequest<ServiceProvider> services,
-  ) {
+  ) async {
+    await _readyCompleter.future;
     _outgoingServicesBindings.add(
       new ServiceProviderBinding()..bind(_outgoingServicesImpl, services),
     );
@@ -56,6 +59,8 @@ abstract class AgentImpl implements Agent, Lifecycle {
     InterfaceHandle<AgentContext> agentContext,
     void callback(),
   ) {
+    callback();
+
     _agentContext.ctrl.bind(agentContext);
     _agentContext
       ..getComponentContext(_componentContext.ctrl.request())
@@ -69,9 +74,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
       _outgoingServicesImpl,
     ).catchError((Exception e) {
       throw e;
-    }).whenComplete(() {
-      callback();
-    });
+    }).whenComplete(_readyCompleter.complete);
   }
 
   @override

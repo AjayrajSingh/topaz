@@ -35,8 +35,8 @@ class CommandHandler implements QueryHandler {
   });
 
   /// Starts the proposal process.
-  void start(AgentContextProxy agentContextProxy) {
-    agentContextProxy
+  void start(AgentContext agentContext) {
+    agentContext
         .getIntelligenceServices(_intelligenceServicesProxy.ctrl.request());
     _intelligenceServicesProxy
       ..getProposalPublisher(

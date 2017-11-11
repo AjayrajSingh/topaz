@@ -36,7 +36,7 @@ class PlayerImpl extends Player {
   CommandHandler _commandHandler;
 
   /// Constructor
-  PlayerImpl(ApplicationContext context, AgentContextProxy agentContextProxy) {
+  PlayerImpl(ApplicationContext context, AgentContext agentContext) {
     _audioPlayerController =
         new AudioPlayerController(context.environmentServices)
           ..updateCallback = _onAudioControllerUpdate;
@@ -51,7 +51,7 @@ class PlayerImpl extends Player {
           _audioPlayerController.play();
         }
       },
-    )..start(agentContextProxy);
+    )..start(agentContext);
   }
 
   @override
