@@ -73,7 +73,6 @@ class ChatConversationModuleModel extends ModuleModel {
   chat_fidl.Conversation _conversation;
   List<chat_fidl.Message> _messages;
   List<Section> _sections;
-  List<CommandMessage> _commandMessages;
   bool _fetchingConversation = false;
   final Completer<Null> _readyCompleter = new Completer<Null>();
 
@@ -122,7 +121,6 @@ class ChatConversationModuleModel extends ModuleModel {
       _messages = messages;
       if (_messages == null) {
         _sections = null;
-        _commandMessages = null;
         return;
       }
 
@@ -132,19 +130,11 @@ class ChatConversationModuleModel extends ModuleModel {
       List<Message> sortedMessages =
           sortedFidlMessages.map(_createMessageFromFidl).toList();
 
-      // Separate out command messages and treat them specially. The command
-      // messages should be stacked right above the message input field.
-      List<Message> bubbledMessages =
-          sortedMessages.where((Message m) => m is! CommandMessage).toList();
-      List<CommandMessage> commandMessages =
-          sortedMessages.where((Message m) => m is CommandMessage).toList();
-
-      _sections = createSectionsFromMessages(bubbledMessages);
-      _commandMessages = commandMessages;
+      _sections = createSectionsFromMessages(sortedMessages);
 
       // Update the last message in the embedded mod links.
       // Only consider the last TextMessage available in the conversation.
-      TextMessage lastTextMessage = bubbledMessages
+      TextMessage lastTextMessage = sortedMessages
           .lastWhere((Message m) => m is TextMessage, orElse: () => null);
 
       if (lastTextMessage != null) {
@@ -171,11 +161,6 @@ class ChatConversationModuleModel extends ModuleModel {
   List<Section> get sections => _sections == null
       ? const <Section>[]
       : new UnmodifiableListView<Section>(_sections);
-
-  /// Gets the list of sorted [CommandMessage]s in this conversation.
-  List<CommandMessage> get commandMessages => _commandMessages == null
-      ? const <CommandMessage>[]
-      : new UnmodifiableListView<CommandMessage>(_commandMessages);
 
   ScrollController _scrollController;
 

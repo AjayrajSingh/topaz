@@ -40,7 +40,6 @@ class ChatConversationScreen extends StatelessWidget {
     return new ChatConversation(
       enabled: model.conversationId != null,
       sections: model.sections,
-      commandMessages: model.commandMessages,
       title: model.fetchingConversation
           ? ''
           : model.participants
