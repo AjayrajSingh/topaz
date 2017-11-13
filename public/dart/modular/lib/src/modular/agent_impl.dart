@@ -57,10 +57,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
   @override
   void initialize(
     InterfaceHandle<AgentContext> agentContext,
-    void callback(),
   ) {
-    callback();
-
     _agentContext.ctrl.bind(agentContext);
     _agentContext
       ..getComponentContext(_componentContext.ctrl.request())
