@@ -212,6 +212,9 @@ class SurfaceGraph extends Model {
   /// The stack of previous focusedSurfaces, most focused at end
   final Set<String> _dismissedSurfaces = new Set<String>();
 
+  /// The last focused surface.
+  Surface _lastFocusedSurface;
+
   /// The currently most focused [Surface]
   Surface get focused =>
       _focusedSurfaces.isEmpty ? null : _surfaces[_focusedSurfaces.last];
@@ -296,6 +299,11 @@ class SurfaceGraph extends Model {
         _focusedSurfaces.insert(index, id);
       }
     }
+
+    // Also request the input focus through the child view connection.
+    _surfaces[id].connection.requestFocus();
+    _lastFocusedSurface = _surfaces[id];
+
     notifyListeners();
   }
 
@@ -348,6 +356,11 @@ class SurfaceGraph extends Model {
         .._connection = new ChildViewConnection(
           viewOwner,
           onAvailable: (ChildViewConnection connection) {
+            // If this surface is the last focused one, also request input focus
+            if (_lastFocusedSurface == surface) {
+              connection.requestFocus();
+            }
+
             surface.notifyListeners();
           },
           onUnavailable: (ChildViewConnection connection) {
