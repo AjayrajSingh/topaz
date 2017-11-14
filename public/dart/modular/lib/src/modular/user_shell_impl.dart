@@ -4,6 +4,7 @@
 
 import 'package:lib.context.fidl/context_writer.fidl.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.fidl/story_provider.fidl.dart';
@@ -28,15 +29,15 @@ typedef void OnUserShellReady(
   Link link,
 );
 
-/// Called at the beginning of [UserShell.terminate].
+/// Called at the beginning of [Lifecycle.terminate].
 typedef void OnUserShellStopping();
 
-/// Called at the conclusion of [UserShell.terminate].
+/// Called at the conclusion of [Lifecycle.terminate].
 typedef void OnUserShellStop();
 
 /// Implements a UserShell for receiving the services a [UserShell] needs to
 /// operate.
-class UserShellImpl extends UserShell {
+class UserShellImpl implements UserShell, Lifecycle {
   /// Binding for the actual UserShell interface object.
   final UserShellContextProxy _userShellContextProxy =
       new UserShellContextProxy();
@@ -56,10 +57,10 @@ class UserShellImpl extends UserShell {
   /// Called when [initialize] occurs.
   final OnUserShellReady onReady;
 
-  /// Called at the beginning of [UserShell.terminate].
+  /// Called at the beginning of [Lifecycle.terminate].
   final OnUserShellStop onStopping;
 
-  /// Called at the conclusion of [UserShell.terminate].
+  /// Called at the conclusion of [Lifecycle.terminate].
   final OnUserShellStop onStop;
 
   /// Called when [LinkWatcher.notify] is called.

@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.user.fidl/user_shell.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -23,11 +24,15 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
   /// The [ApplicationContext] to [advertise] its [UserShell] services to.
   final ApplicationContext _applicationContext;
 
-  final UserShellBinding _binding;
+  /// The binding for the [UserShell] service implemented by [UserShellImpl].
+  final UserShellBinding _userShellBinding;
+
+  /// The binding for the [Lifecycle] service implemented by [UserShellImpl].
+  final LifecycleBinding _lifecycleBinding;
 
   final IdleModel _idleModel = new IdleModel();
 
-  /// The [UserShell] to [advertise].
+  /// The [UserShellImpl] whose services to [advertise].
   final UserShellImpl _userShell;
 
   /// The rest of the application.
@@ -46,6 +51,7 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
         userShellModel: userShellModel,
         child: child,
         userShellBinding: new UserShellBinding(),
+        lifecycleBinding: new LifecycleBinding(),
       );
 
   UserShellWidget._create({
@@ -53,17 +59,22 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
     T userShellModel,
     Widget child,
     UserShellBinding userShellBinding,
+    LifecycleBinding lifecycleBinding,
   })
       : _applicationContext = applicationContext,
         _userShellModel = userShellModel,
         _child = child,
-        _binding = userShellBinding,
+        _userShellBinding = userShellBinding,
+        _lifecycleBinding = lifecycleBinding,
         _userShell = new UserShellImpl(
           onReady: userShellModel?.onReady,
           onStopping: userShellModel?.onStop,
           onNotify: userShellModel?.onNotify,
           watchAll: userShellModel?.watchAll,
-          onStop: userShellBinding.close,
+          onStop: () {
+            userShellBinding.close();
+            lifecycleBinding.close();
+          },
         );
 
   @override
@@ -92,9 +103,17 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
 
   /// Advertises [_userShell] as a [UserShell] to the rest of the system via
   /// the [ApplicationContext].
-  void advertise() => _applicationContext.outgoingServices.addServiceForName(
+  void advertise() {
+    _applicationContext.outgoingServices
+      ..addServiceForName(
         (InterfaceRequest<UserShell> request) =>
-            _binding.bind(_userShell, request),
+            _userShellBinding.bind(_userShell, request),
         UserShell.serviceName,
+      )
+      ..addServiceForName(
+        (InterfaceRequest<Lifecycle> request) =>
+            _lifecycleBinding.bind(_userShell, request),
+        Lifecycle.serviceName,
       );
+  }
 }

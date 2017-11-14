@@ -21,10 +21,13 @@ import 'module_model.dart';
 /// Also for convienence, the [ModuleModel] given to this widget will be
 /// made available to [child] and [child]'s descendants.
 class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
+  /// The binding for the [Module] service implemented by [ModuleImpl].
   final ModuleBinding _moduleBinding;
+
+  /// The binding for the [Lifecycle] service implemented by [ModuleImpl].
   final LifecycleBinding _lifecycleBinding;
 
-  /// The [Module] to [advertise].
+  /// The [ModuleImpl] whose services to [advertise].
   final ModuleImpl _module;
 
   /// The [ApplicationContext] to [advertise] its [Module] services to.
