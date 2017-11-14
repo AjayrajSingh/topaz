@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.story.fidl/story_shell.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
@@ -29,24 +30,30 @@ final DeviceMapWatcherBinding _deviceMapWatcher = new DeviceMapWatcherBinding();
 
 /// This is used for keeping the reference around.
 // ignore: unused_element
-StoryShellFactoryImpl _storyShellFactory;
+StoryShellImpl _storyShellImpl;
 
 SurfaceGraph _surfaceGraph;
 
 /// An implementation of the [StoryShell] interface.
-class StoryShellImpl extends StoryShell {
+class StoryShellImpl implements StoryShell, Lifecycle {
   final StoryShellBinding _storyShellBinding = new StoryShellBinding();
+  final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
   final StoryContextProxy _storyContext = new StoryContextProxy();
 
-  /// StoryShellImpl
-  /// @params contextHandle: The [InterfaceHandle] to [StoryContext]
-  StoryShellImpl(InterfaceHandle<StoryContext> contextHandle) {
+  /// StoryShell
+  @override
+  void initialize(InterfaceHandle<StoryContext> contextHandle) {
     _storyContext.ctrl.bind(contextHandle);
   }
 
   /// Bind an [InterfaceRequest] for a [StoryShell] interface to this object.
-  void bind(InterfaceRequest<StoryShell> request) {
+  void bindStoryShell(InterfaceRequest<StoryShell> request) {
     _storyShellBinding.bind(this, request);
+  }
+
+  /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
+  void bindLifecycle(InterfaceRequest<Lifecycle> request) {
+    _lifecycleBinding.bind(this, request);
   }
 
   /// Introduce a new [ViewOwner] to the current Story, with relationship
@@ -84,33 +91,13 @@ class StoryShellImpl extends StoryShell {
     callback();
   }
 
-  /// Terminate the StoryShell
+  /// Terminate the StoryShell. TODO(mesch): Really terminate, i.e. exit.
   @override
   void terminate() {
     log.info('StoryShellImpl::terminate call');
     _storyContext.ctrl.close();
     _storyShellBinding.close();
-  }
-}
-
-/// An implemenation of the [StoryShellFactory] interface.
-class StoryShellFactoryImpl extends StoryShellFactory {
-  final StoryShellFactoryBinding _binding = new StoryShellFactoryBinding();
-
-  /// Implementation of StoryShell service
-  // ignore: unused_field
-  StoryShellImpl _storyShell;
-
-  /// Bind an [InterfaceRequest] for a [StoryShellFactory] interface to this.
-  void bind(InterfaceRequest<StoryShellFactory> request) {
-    _binding.bind(this, request);
-  }
-
-  @override
-  void create(InterfaceHandle<StoryContext> context,
-      InterfaceRequest<StoryShell> request) {
-    _storyShell = new StoryShellImpl(context)..bind(request);
-    // TODO(alangardner): Figure out what to do if a second call is made
+    _lifecycleBinding.close();
   }
 }
 
@@ -189,13 +176,19 @@ void main() {
     ),
   );
 
-  _appContext.outgoingServices.addServiceForName(
-    (InterfaceRequest<StoryShellFactory> request) {
-      log.fine('Received binding request for StoryShellFactory');
-      _storyShellFactory = new StoryShellFactoryImpl()..bind(request);
-    },
-    StoryShellFactory.serviceName,
-  );
+  _storyShellImpl = new StoryShellImpl();
+
+  _appContext.outgoingServices
+    ..addServiceForName(
+        (InterfaceRequest<StoryShell> request) {
+      log.fine('Received binding request for StoryShell');
+      _storyShellImpl.bindStoryShell(request);
+    }, StoryShell.serviceName)
+    ..addServiceForName(
+        (InterfaceRequest<Lifecycle> request) {
+      log.fine('Received binding request for Lifecycle');
+      _storyShellImpl.bindLifecycle(request);
+    }, Lifecycle.serviceName);
 }
 
 class _DeviceMapWatcherImpl extends DeviceMapWatcher {

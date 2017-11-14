@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.story.fidl/story_shell.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
@@ -19,7 +20,7 @@ final GlobalKey<SurfaceLayoutState> _surfaceLayoutKey =
 
 /// This is used for keeping the reference around.
 // ignore: unused_element
-StoryShellFactoryImpl _storyShellFactory;
+StoryShellImpl _storyShellImpl;
 
 void _log(String msg) {
   print('[FlutterStoryShell] $msg');
@@ -62,17 +63,25 @@ class SurfaceLayoutState extends State<SurfaceLayout> {
 }
 
 /// An implementation of the [StoryShell] interface.
-class StoryShellImpl extends StoryShell {
+class StoryShellImpl implements StoryShell, Lifecycle {
   final StoryShellBinding _storyShellBinding = new StoryShellBinding();
+  final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
   final StoryContextProxy _storyContext = new StoryContextProxy();
 
-  StoryShellImpl(InterfaceHandle<StoryContext> contextHandle) {
+  /// StoryShell
+  @override
+  void initialize(InterfaceHandle<StoryContext> contextHandle) {
     _storyContext.ctrl.bind(contextHandle);
   }
 
   /// Bind an [InterfaceRequest] for a [StoryShell] interface to this object.
-  void bind(InterfaceRequest<StoryShell> request) {
+  void bindStoryShell(InterfaceRequest<StoryShell> request) {
     _storyShellBinding.bind(this, request);
+  }
+
+  /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
+  void bindLifecycle(InterfaceRequest<Lifecycle> request) {
+    _lifecycleBinding.bind(this, request);
   }
 
   /// StoryShell
@@ -97,27 +106,10 @@ class StoryShellImpl extends StoryShell {
   /// StoryShell
   @override
   void terminate() {
+    // TODO(mesch): Really terminate, i.e. exit.
     _log('StoryShellImpl::terminate call');
     _storyShellBinding.close();
-  }
-}
-
-/// An implemenation of the [StoryShellFactory] interface.
-class StoryShellFactoryImpl extends StoryShellFactory {
-  final StoryShellFactoryBinding _binding = new StoryShellFactoryBinding();
-  // ignore: unused_field
-  StoryShellImpl _storyShell;
-
-  /// Bind an [InterfaceRequest] for a [StoryShellFactory] interface to this.
-  void bind(InterfaceRequest<StoryShellFactory> request) {
-    _binding.bind(this, request);
-  }
-
-  @override
-  void create(InterfaceHandle<StoryContext> context,
-      InterfaceRequest<StoryShell> request) {
-    _storyShell = new StoryShellImpl(context)..bind(request);
-    // TODO(alangardner): Figure out what to do if a second call is made
+    _lifecycleBinding.close();
   }
 }
 
@@ -129,12 +121,19 @@ void main() {
   // Initialize the one Flutter application we support
   runApp(new SurfaceLayout(key: _surfaceLayoutKey));
 
-  /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
-  _appContext.outgoingServices.addServiceForName(
-    (InterfaceRequest<StoryShellFactory> request) {
-      _log('Received binding request for StoryShellFactory');
-      _storyShellFactory = new StoryShellFactoryImpl()..bind(request);
-    },
-    StoryShellFactory.serviceName,
-  );
+  _storyShellImpl = new StoryShellImpl();
+
+  /// Add [StoryShellImpl]'s services to this application's outgoing
+  /// ServiceProvider.
+  _appContext.outgoingServices
+    ..addServiceForName(
+        (InterfaceRequest<StoryShell> request) {
+      _log('Received binding request for StoryShell');
+      _storyShellImpl.bindStoryShell(request);
+    }, StoryShell.serviceName)
+    ..addServiceForName(
+        (InterfaceRequest<Lifecycle> request) {
+      _log('Received binding request for Lifecycle');
+      _storyShellImpl.bindLifecycle(request);
+    }, Lifecycle.serviceName);
 }
