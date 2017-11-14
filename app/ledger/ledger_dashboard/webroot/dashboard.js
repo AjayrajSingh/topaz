@@ -1,12 +1,3 @@
-const RECONNECT_INTERVAL = 500;
-const MAX_RECONNECT_INTERVAL = 2000;
-
-var _activeAskQueryFlag = false;
-var _entities = {};
-var _focusedStoryId = null;
-var _modules = {};
-var _reconnectInterval = RECONNECT_INTERVAL;
-var _stories = {};
 var _toolbar = null;
 var _tabBar = null;
 var _webSocket = null;
@@ -25,17 +16,7 @@ $(function() {
   _tabBar.layout();
 
   $(document).ready(function(){
-    $.get("http://" + window.location.host + "/data/ledger_debug/",
-           function(data, status){
-             var methodElem = $("<span/>")
-              .addClass('mdc-list-item__text')
-              .text(data);
-             methodElem.append(' ');
-
-             $("#ledger-panel")
-              .prepend($('<li/>').addClass('mdc-list-item').append(methodElem))
-              .prepend($('<li/>').addClass('mdc-list-divider').attr('role','divider'));
-           });
+    getInstancesList();
   });
 })
 
@@ -48,4 +29,19 @@ function updateTabPanel(newPanelSelector) {
   if (newActivePanel) {
     newActivePanel.classList.add('active');
   }
+}
+
+function getInstancesList() {
+  $.get("http://" + window.location.host + "/data/ledger_debug/instances_list",
+        function(data, status){
+          var instancesList = JSON.parse(JSON.stringify(data));
+          $("#number-of-ledger-instances").append(instancesList.length);
+          for(var i = 0; i < instancesList.length; i++) {
+            var methodElem = $("<li></li>")
+            .addClass('mdc-list-item')
+            .text(instancesList[i]);
+
+            $("#ledger-instances-list").append(methodElem);
+          }
+        });
 }

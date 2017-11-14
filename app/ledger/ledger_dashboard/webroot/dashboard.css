@@ -28,3 +28,7 @@ body {
 .panel.active {
   display: block;
 }
+
+.ledger-instances-card {
+  grid-column-end: span 8;
+}

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:lib.app.dart/app.dart';
@@ -26,15 +27,20 @@ class LedgerDebugDataHandler extends DataHandler {
 
   @override
   bool handleRequest(String requestString, HttpRequest request) {
-    _ledgerRepositoryDebug.getInt((int value) => callbackFunc(request, value));
-    return true;
+    if(requestString == '/instances_list') {
+      _ledgerRepositoryDebug.getInstancesList((List<String> listOfInstances) =>
+                                sendInstancesList(request, listOfInstances));
+      return true;
+    }
+
+    return false;
   }
 
   @override
   void handleNewWebSocket(WebSocket socket) {}
 
-  void callbackFunc(HttpRequest request, int value) {
-    request.response.write(value);
+  void sendInstancesList(HttpRequest request, List<String> listOfInstances) {
+    request.response.write(JSON.encode(listOfInstances));
     request.response.close();
   }
 }

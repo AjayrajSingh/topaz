@@ -45,19 +45,24 @@
   <main>
     <section class="panels">
       <div id="overview-panel" class="panel active" role="tabpanel">
-        <div class="mdc-layout-grid__inner">
-          <div class="cell mdc-layout-grid__cell overview-header-card" style="display:none">
-            <div class="mdc-card">
-              <section class="mdc-card__primary">
-                <h1 class="mdc-card__title mdc-card__title--large">Header</h1>
-              </section>
-            </div> <!-- card -->
-          </div> <!-- grid__cell -->
-        </div> <!-- grid__inner -->
       </div> <!-- overview-panel -->
+
       <div id="ledger-panel" class="panel grid mdc-layout-grid" role="tabpanel">
         <div class="mdc-layout-grid__inner">
-        </div> <!-- grid__inner -->
+          <div class="cell mdc-layout-grid__cell ledger-instances-card">
+            <div class="mdc-card">
+              <section class="mdc-card__primary">
+                <h1 class="mdc-card__title mdc-card__title--large">Ledger Instances</h1>
+              </section>
+              <section id="number-of-ledger-instances" class="mdc-card__supporting-text">
+                Number of Ledger Instances:
+              </section>
+              <section class="mdc-card__supporting-text">
+                <ul id="ledger-instances-list" class="mdc-list">
+                </ul>
+              </section>
+            </div> <!-- mdc_card -->
+          </div> <!-- cell -->
       </div> <!-- ledger-panel -->
 
     </section>
