@@ -20,6 +20,7 @@
         "topaz/packages/sysui",
         "topaz/packages/todo",
         "topaz/packages/tools",
-        "topaz/packages/web_view"
+        "topaz/packages/web_view",
+        "topaz/packages/xi"
     ]
 }
