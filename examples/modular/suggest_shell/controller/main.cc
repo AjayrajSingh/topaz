@@ -4,7 +4,9 @@
 
 #include <memory>
 
+#include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
+#include "lib/app_driver/cpp/app_driver.h"
 #include "lib/fidl/cpp/bindings/binding_set.h"
 #include "lib/fidl/cpp/bindings/interface_request.h"
 #include "lib/fsl/tasks/message_loop.h"
@@ -29,7 +31,10 @@ constexpr char kProposalId[] =
 class ControllerApp : public modular::SingleServiceApp<modular::Module>,
                       modular::LinkWatcher {
  public:
-  ControllerApp() : link_watcher_binding_(this) {}
+  ControllerApp(app::ApplicationContext* const application_context)
+      : SingleServiceApp(application_context),
+        link_watcher_binding_(this) {}
+
   ~ControllerApp() override = default;
 
  private:
@@ -79,9 +84,6 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
     application_context()->ConnectToEnvironmentService(
         proposal_publisher_.NewRequest());
   }
-
-  // |Terminate|
-  void Terminate() override { fsl::MessageLoop::GetCurrent()->QuitNow(); }
 
   // |LinkWatcher|
   void Notify(const fidl::String& json) override {
@@ -148,7 +150,13 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
 
 int main(int /*argc*/, const char** /*argv*/) {
   fsl::MessageLoop loop;
-  ControllerApp app;
+
+  auto app_context = app::ApplicationContext::CreateFromStartupInfo();
+  modular::AppDriver<ControllerApp> driver(
+      app_context->outgoing_services(),
+      std::make_unique<ControllerApp>(app_context.get()),
+      [&loop] { loop.QuitNow(); });
+
   loop.Run();
   return 0;
 }

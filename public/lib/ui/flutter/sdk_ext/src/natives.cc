@@ -133,7 +133,7 @@ void Mozart_offerServiceProvider(Dart_NativeArguments args) {
   NativesDelegate* delegate = reinterpret_cast<NativesDelegate*>(context);
   fidl::InterfaceHandle<app::ServiceProvider> provider =
       fidl::InterfaceHandle<app::ServiceProvider>(
-          zx::channel(handle->ReleaseHandle()), 0);
+          zx::channel(handle->ReleaseHandle()));
 
   View* view = delegate->GetMozartView();
   view->OfferServiceProvider(std::move(provider), std::move(services));
