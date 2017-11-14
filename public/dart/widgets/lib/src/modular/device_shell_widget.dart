@@ -4,6 +4,7 @@
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.device.fidl/device_shell.fidl.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -23,10 +24,17 @@ import 'device_shell_model.dart';
 class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
   /// The [ApplicationContext] to [advertise] its [DeviceShell] services to.
   final ApplicationContext applicationContext;
+
+  /// The bindings for the [DeviceShell] service implemented by [DeviceShellImpl].
   final Set<DeviceShellBinding> _deviceShellBindingSet =
       new Set<DeviceShellBinding>();
+
   final Set<SoftKeyboardContainerBinding> _softKeyboardContainerBindingSet =
       new Set<SoftKeyboardContainerBinding>();
+
+  /// The bindings for the [Lifecycle] service implemented by [DeviceShellImpl].
+  final Set<LifecycleBinding> _lifecycleBindingSet =
+      new Set<LifecycleBinding>();
 
   /// The [DeviceShell] to [advertise].
   final DeviceShellImpl _deviceShell;
@@ -66,14 +74,18 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
   /// Advertises [_deviceShell] as a [DeviceShell] to the rest of the system via
   /// the [ApplicationContext].
   void advertise() {
-    applicationContext.outgoingServices.addServiceForName(
-      (InterfaceRequest<DeviceShell> request) {
+    applicationContext.outgoingServices
+      ..addServiceForName((InterfaceRequest<DeviceShell> request) {
         DeviceShellBinding binding = new DeviceShellBinding()
           ..bind(_deviceShell, request);
         _deviceShellBindingSet.add(binding);
-      },
-      DeviceShell.serviceName,
-    );
+      }, DeviceShell.serviceName)
+      ..addServiceForName((InterfaceRequest<Lifecycle> request) {
+        LifecycleBinding binding = new LifecycleBinding()
+          ..bind(_deviceShell, request);
+        _lifecycleBindingSet.add(binding);
+      }, Lifecycle.serviceName);
+
     if (softKeyboardContainer != null) {
       applicationContext.outgoingServices.addServiceForName(
         (InterfaceRequest<SoftKeyboardContainer> request) {

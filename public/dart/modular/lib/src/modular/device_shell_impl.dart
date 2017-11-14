@@ -5,6 +5,7 @@
 import 'package:lib.device.fidl/device_shell.fidl.dart';
 import 'package:lib.device.fidl/user_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
 import 'package:meta/meta.dart';
 
@@ -15,12 +16,12 @@ typedef void OnDeviceShellReady(
   Presentation presentation,
 );
 
-/// Called when [DeviceShell.terminate] occurs.
+/// Called when [Lifecycle.terminate] occurs.
 typedef void OnDeviceShellStop();
 
 /// Implements a DeviceShell for receiving the services a [DeviceShell] needs to
 /// operate.
-class DeviceShellImpl extends DeviceShell {
+class DeviceShellImpl implements DeviceShell, Lifecycle {
   final DeviceShellContextProxy _deviceShellContextProxy =
       new DeviceShellContextProxy();
   final UserProviderProxy _userProviderProxy = new UserProviderProxy();
