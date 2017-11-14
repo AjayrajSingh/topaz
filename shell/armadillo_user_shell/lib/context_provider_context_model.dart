@@ -8,8 +8,8 @@ import 'dart:io';
 
 import 'package:armadillo/now.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.device_settings.fidl/device_settings.fidl.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.time_service.fidl/time_service.fidl.dart';
 import 'package:meta/meta.dart';
 
 export 'package:lib.widgets/model.dart'
@@ -29,12 +29,10 @@ const String _kMode = 'mode';
 const String _kModeNormal = 'normal';
 const String _kModeEdgeToEdge = 'edgeToEdge';
 
-const String _kTimezoneDeviceSettingsKey = 'Timezone';
-
 /// Provides assets and text based on context.
 class ContextProviderContextModel extends ContextModel {
-  /// Provides device settings like timezone.
-  final DeviceSettingsManager deviceSettingsManager;
+  /// Provides time zone information.
+  final TimeService timeService;
 
   Map<String, String> _contextualWifiNetworks = <String, String>{};
   Map<String, String> _contextualLocations = <String, String>{};
@@ -49,26 +47,28 @@ class ContextProviderContextModel extends ContextModel {
   DeviceMode _deviceMode = DeviceMode.normal;
 
   /// Constructor.
-  ContextProviderContextModel({@required this.deviceSettingsManager})
-      : assert(deviceSettingsManager != null) {
-    deviceSettingsManager.getInteger(
-      _kTimezoneDeviceSettingsKey,
-      (int value, Status status) {
-        if (status == Status.ok) {
-          super.timezoneOffsetMinutes = value;
-        }
-      },
-    );
+  ContextProviderContextModel({@required this.timeService})
+      : assert(timeService != null) {
+    // Gets the current timezone ID so that the correct zone can be
+    // highlighted in the timezone picker when timezoneId is retrieved
+    // through the 'get' function.  This must be called as the timezone persists
+    // in non-volatile storage.
+    timeService.getTimezoneId((String zoneId) {
+      super.timezoneId = zoneId;
+    });
   }
 
   @override
-  set timezoneOffsetMinutes(int newTimezoneOffsetMinutes) {
-    if (timezoneOffsetMinutes != newTimezoneOffsetMinutes) {
-      super.timezoneOffsetMinutes = newTimezoneOffsetMinutes;
-      deviceSettingsManager.setInteger(
-        _kTimezoneDeviceSettingsKey,
-        newTimezoneOffsetMinutes,
-        (bool result) {},
+  set timezoneId(String newTimezoneId) {
+    if (super.timezoneId != newTimezoneId) {
+      timeService.setTimezone(
+        newTimezoneId,
+        (bool status) {
+          if (status) {
+            super.timezoneId = newTimezoneId;
+            notifyListeners();
+          }
+        },
       );
     }
   }

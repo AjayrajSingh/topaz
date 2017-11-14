@@ -7,8 +7,8 @@ import 'dart:convert';
 import 'dart:ui' as ui;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.device_settings.fidl/device_settings.fidl.dart';
 import 'package:lib.media.dart/audio_policy.dart';
+import 'package:lib.time_service.fidl/time_service.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:armadillo/common.dart';
 import 'package:armadillo/overview.dart';
@@ -153,16 +153,13 @@ Widget buildArmadilloUserShell({
     },
   );
 
-  DeviceSettingsManagerProxy deviceSettingsManagerProxy =
-      new DeviceSettingsManagerProxy();
+  TimeServiceProxy timeServiceProxy = new TimeServiceProxy();
   connectToService(
-    applicationContext.environmentServices,
-    deviceSettingsManagerProxy.ctrl,
-  );
+      applicationContext.environmentServices, timeServiceProxy.ctrl);
 
   ContextProviderContextModel contextProviderContextModel =
       new ContextProviderContextModel(
-    deviceSettingsManager: deviceSettingsManagerProxy,
+    timeService: timeServiceProxy,
   );
 
   DeviceMapProxy deviceMapProxy = new DeviceMapProxy();
@@ -213,7 +210,7 @@ Widget buildArmadilloUserShell({
       powerModel.close();
       deviceMapProxy.ctrl.close();
       deviceMapWatcher.close();
-      deviceSettingsManagerProxy.ctrl.close();
+      timeServiceProxy.ctrl.close();
     },
     onWallpaperChosen: contextProviderContextModel.onWallpaperChosen,
   );

@@ -43,28 +43,28 @@ class TimeStringer extends Listenable {
   /// Returns the time only (eg. '10:34').
   String get timeOnly => _kTimeOnlyDateFormat
       .format(
-        _getNowWithOffset(),
+        new DateTime.now(),
       )
       .toUpperCase();
 
   /// Returns the date only (eg. 'MONDAY AUG 3').
   String get dateOnly => _kDateOnlyDateFormat
       .format(
-        _getNowWithOffset(),
+        new DateTime.now(),
       )
       .toUpperCase();
 
   /// Returns a short version of the time (eg. '10:34').
   String get shortString =>
-      _kShortStringDateFormat.format(_getNowWithOffset()).toLowerCase();
+      _kShortStringDateFormat.format(new DateTime.now()).toLowerCase();
 
   /// Returns a long version of the time including the day (eg. 'Monday 10:34').
   String get longString =>
-      _kLongStringDateFormat.format(_getNowWithOffset()).toLowerCase();
+      _kLongStringDateFormat.format(new DateTime.now()).toLowerCase();
 
   /// Returns the meridiem (eg. 'AM')
   String get meridiem =>
-      _kMeridiemOnlyFormat.format(_getNowWithOffset()).toUpperCase();
+      _kMeridiemOnlyFormat.format(new DateTime.now()).toUpperCase();
 
   /// Returns the offset, in minutes.
   int get offsetMinutes => _offsetMinutes;
@@ -74,10 +74,6 @@ class TimeStringer extends Listenable {
       _offsetMinutes = offsetMinutes;
       _notifyListeners();
     }
-  }
-
-  DateTime _getNowWithOffset() {
-    return new DateTime.now().add(new Duration(minutes: _offsetMinutes));
   }
 
   void _scheduleTimer() {

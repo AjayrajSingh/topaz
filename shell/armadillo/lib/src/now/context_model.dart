@@ -37,6 +37,9 @@ abstract class ContextModel extends Model {
   /// Whether the time zone picker is showing.
   bool _isTimezonePickerShowing = false;
 
+  /// The current timezone ID.
+  String timezoneId = 'UTC';
+
   /// The current wifi network.
   String get wifiNetwork => 'GoogleGuest';
 
@@ -51,14 +54,6 @@ abstract class ContextModel extends Model {
 
   /// The current meridiem
   String get meridiem => _timeStringer.meridiem;
-
-  /// The current time zone offset in minutes.
-  int get timezoneOffsetMinutes => _timeStringer.offsetMinutes;
-
-  /// Sets the offset minutes.
-  set timezoneOffsetMinutes(int offsetMinutes) {
-    _timeStringer.offsetMinutes = offsetMinutes;
-  }
 
   /// If this is showing.
   bool get isTimezonePickerShowing => _isTimezonePickerShowing;

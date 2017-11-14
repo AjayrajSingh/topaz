@@ -12,8 +12,8 @@ flutter_app("armadillo_user_shell") {
   manifest = "pubspec.yaml"
 
   deps = [
-    "//garnet/public/lib/device_settings/fidl:fidl_dart",
     "//garnet/public/lib/power/fidl:fidl_dart",
+    "//garnet/public/lib/time_service/fidl:fidl_dart",
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/speech/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
