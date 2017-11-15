@@ -4,9 +4,7 @@
 
 import 'dart:math' as math;
 
-import 'package:armadillo/candidate_info.dart';
-import 'package:armadillo/drag_direction.dart';
-import 'package:armadillo/line_segment.dart';
+import 'package:armadillo/recent.dart';
 import 'package:flutter/widgets.dart';
 import 'package:test/test.dart';
 

@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:armadillo/story.dart';
-import 'package:armadillo/story_cluster.dart';
-import 'package:armadillo/story_list_layout.dart';
+import 'package:armadillo/recent.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/widgets.dart';
 

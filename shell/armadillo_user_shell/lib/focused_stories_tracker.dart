@@ -4,11 +4,9 @@
 
 import 'dart:collection';
 
-import 'package:flutter/widgets.dart' show ChangeNotifier;
-
-import 'package:armadillo/story_cluster.dart';
-import 'package:armadillo/story.dart';
+import 'package:armadillo/recent.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/widgets.dart' show ChangeNotifier;
 
 const ListEquality<String> _kStringListEquality = const ListEquality<String>();
 

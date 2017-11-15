@@ -2,17 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:armadillo/debug_model.dart';
-import 'package:armadillo/panel_resizing_model.dart';
-import 'package:armadillo/size_model.dart';
-import 'package:armadillo/story.dart';
-import 'package:armadillo/story_cluster.dart';
-import 'package:armadillo/story_cluster_drag_state_model.dart';
-import 'package:armadillo/story_drag_transition_model.dart';
-import 'package:armadillo/story_list.dart';
-import 'package:armadillo/story_list_layout.dart';
-import 'package:armadillo/story_model.dart';
-import 'package:armadillo/story_rearrangement_scrim_model.dart';
+import 'package:armadillo/common.dart';
+import 'package:armadillo/overview.dart';
+import 'package:armadillo/recent.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/widgets.dart';
 

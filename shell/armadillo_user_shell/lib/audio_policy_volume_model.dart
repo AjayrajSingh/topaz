@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:armadillo/now.dart';
 import 'package:lib.media.dart/audio_policy.dart';
-import 'package:armadillo/now/volume_model.dart';
 
 /// Uses an [AudioPolicy] to set and get volume.
 class AudioPolicyVolumeModel extends VolumeModel {

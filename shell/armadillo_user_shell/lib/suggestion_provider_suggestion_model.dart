@@ -2,16 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:armadillo/next.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.suggestion.fidl/speech_to_text.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/user_input.fidl.dart' as maxwell;
-import 'package:armadillo/interruption_overlay.dart';
-import 'package:armadillo/suggestion.dart';
-import 'package:armadillo/suggestion_model.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 
 import 'hit_test_model.dart';
