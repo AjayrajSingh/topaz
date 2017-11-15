@@ -26,13 +26,30 @@ class BrowserModuleModel extends ModuleModel {
   /// Currently selected Document
   doc_fidl.Document _currentDoc;
 
+  /// True if we are in image preview mode
+  bool _previewMode = false;
+
   /// Constructor
   BrowserModuleModel();
+
+  /// Sets the document location to preview
+  // TODO(maryxia) SO-967 - no need to do a get() to download to a
+  // document location if the file is publicly accessible
+  void setPreviewDocLocation() {
+    _docsInterfaceProxy.get(_currentDoc.id, (doc_fidl.Document doc) {
+      // Check that user has not navigated away to another doc
+      if (_currentDoc.id == doc.id) {
+        _currentDoc.location = doc.location;
+        notifyListeners();
+        log.fine('Downloaded file to local /tmp');
+      }
+    });
+  }
 
   /// Implements the Document interface to List documents
   /// Saves the updated list of documents to the model
   // TODO(maryxia) SO-913 add error modes to doc_fidl
-  void list() {
+  void listDocs() {
     _docsInterfaceProxy.list((List<doc_fidl.Document> docs) {
       documents = docs;
       notifyListeners();
@@ -41,13 +58,22 @@ class BrowserModuleModel extends ModuleModel {
   }
 
   /// Updates the currently-selected doc
-  void updateCurrentDoc(doc_fidl.Document doc) {
+  set currentDoc(doc_fidl.Document doc) {
     _currentDoc = doc;
     notifyListeners();
   }
 
   /// Gets the currently-selected doc
   doc_fidl.Document get currentDoc => _currentDoc;
+
+  /// Gets whether we should be showing the image preview mode
+  bool get previewMode => _previewMode;
+
+  /// Sets whether we should be showing the image preview mode
+  set previewMode(bool show) {
+    _previewMode = show;
+    notifyListeners();
+  }
 
   @override
   Future<Null> onReady(

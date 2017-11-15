@@ -8,9 +8,9 @@ struct Document {
   string id;
   string name;
   string mimeType;
-  string location;
-  string thumbnailLink;
-  string size;
+  string location; // URL or path to the document
+  string? thumbnailLocation;
+  uint64 size;
   bool isFolder;
 };
 

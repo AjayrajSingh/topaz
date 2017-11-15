@@ -46,17 +46,11 @@ class Info extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          new RaisedButton(
-            // TODO(maryxia) SO-662 open the file with correct module
-            onPressed: null,
-            color: Colors.green[300],
-            child: const Text('Open Document'),
-          ),
           _createText('Name: ${doc.name}'),
           _createText('MIME Type: ${doc.mimeType}'),
           _createText('Location: ${doc.location}'),
           _createText('Size (Bytes): ${doc.size}'),
-          _createText('Thumbnail Link: ${doc.thumbnailLink}'),
+          _createText('Thumbnail Location: ${doc.thumbnailLocation}'),
         ],
       ),
     );

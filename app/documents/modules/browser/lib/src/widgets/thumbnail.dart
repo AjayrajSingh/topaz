@@ -6,15 +6,14 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-
 import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 
 const double _kThumbnailSize = 100.0;
-
-/// Typedef of function to call for onDocumentTapped
-typedef void OnDocumentTapped(doc_fidl.Document doc);
-
-List<String> _kValidMimeTypes = <String>['image/', 'video/', 'application/pdf'];
+const List<String> _kValidMimeTypes = const <String>[
+  'image/',
+  'video/',
+  'application/pdf',
+];
 
 /// Representation of Document objects in the Document Browser
 class Thumbnail extends StatelessWidget {
@@ -24,23 +23,22 @@ class Thumbnail extends StatelessWidget {
   /// True if this document is currently selected
   final bool selected;
 
-  /// Function to show the info/details view for the Document
-  final OnDocumentTapped onDocumentTapped;
+  /// Function to call when thumbnail is pressed
+  final VoidCallback onPressed;
 
   /// Constructor
   const Thumbnail({
     Key key,
     @required this.doc,
     @required this.selected,
-    @required this.onDocumentTapped,
+    this.onPressed,
   })
       : assert(doc != null),
         assert(selected != null),
-        assert(onDocumentTapped != null),
         super(key: key);
 
-  bool _showThumbnailLink() {
-    if (doc.thumbnailLink != '') {
+  bool _showThumbnail() {
+    if (doc.thumbnailLocation.isNotEmpty) {
       for (String type in _kValidMimeTypes) {
         if (doc.mimeType.startsWith(type)) {
           return true;
@@ -57,15 +55,16 @@ class Thumbnail extends StatelessWidget {
       width: _kThumbnailSize,
       margin: const EdgeInsets.all(4.0),
       child: new Material(
-        child: new RaisedButton(
+        child: new FlatButton(
           color: selected ? Colors.pink[50] : Colors.teal[50],
-          onPressed: () => onDocumentTapped(doc),
+          onPressed: onPressed,
           child: new Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              _showThumbnailLink()
+              _showThumbnail()
+                  // TODO(maryxia) SO-969 check if image is .network or .file
                   ? new Image.network(
-                      doc.thumbnailLink,
+                      doc.thumbnailLocation,
                       height: 70.0,
                     )
                   : new Icon(
@@ -76,7 +75,7 @@ class Thumbnail extends StatelessWidget {
                 doc.name,
                 textAlign: TextAlign.center,
                 style: new TextStyle(
-                  color: Colors.brown,
+                  color: Colors.purple,
                   fontSize: 12.0,
                   fontWeight: FontWeight.w700,
                 ),
