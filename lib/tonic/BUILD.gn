@@ -39,6 +39,7 @@ source_set("tonic") {
     "//topaz/lib/tonic/converter",
     "//topaz/lib/tonic/file_loader",
     "//topaz/lib/tonic/logging",
+    "//topaz/lib/tonic/platform",
     "//topaz/lib/tonic/scopes",
     "//topaz/lib/tonic/typed_data",
   ]

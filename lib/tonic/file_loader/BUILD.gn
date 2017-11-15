@@ -3,9 +3,17 @@
 # found in the LICENSE file.
 
 source_set("file_loader") {
+  if (is_win) {
+    set_sources_assignment_filter([ "*_posix.cc" ])
+  } else {
+    set_sources_assignment_filter([ "*_win.cc" ])
+  }
+
   sources = [
     "file_loader.cc",
     "file_loader.h",
+    "file_loader_posix.cc",
+    "file_loader_win.cc",
   ]
 
   deps = [
@@ -13,6 +21,7 @@ source_set("file_loader") {
     "//third_party/dart/runtime:dart_api",
     "//topaz/lib/tonic/converter",
     "//topaz/lib/tonic/parsers",
+    "//topaz/lib/tonic/platform",
   ]
 
   public_configs = [ "//topaz/lib/tonic:config" ]

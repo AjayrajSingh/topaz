@@ -15,20 +15,18 @@
 #include "lib/fxl/logging.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/parsers/packages_map.h"
+#include "lib/tonic/platform/platform_utils.h"
 
 namespace tonic {
 namespace {
 
-constexpr char kPackageScheme[] = "package:";
-constexpr size_t kPackageSchemeLength = sizeof(kPackageScheme) - 1;
+constexpr char kDartScheme[] = "dart:";
 
 constexpr char kFileScheme[] = "file:";
 constexpr size_t kFileSchemeLength = sizeof(kFileScheme) - 1;
 
-constexpr char kFileURLPrefix[] = "file://";
-constexpr size_t kFileURLPrefixLength = sizeof(kFileURLPrefix) - 1;
-
-constexpr char kDartScheme[] = "dart:";
+constexpr char kPackageScheme[] = "package:";
+constexpr size_t kPackageSchemeLength = sizeof(kPackageScheme) - 1;
 
 // Extract the scheme prefix ('package:' or 'file:' from )
 std::string ExtractSchemePrefix(std::string url) {
@@ -74,6 +72,27 @@ bool FileLoader::LoadPackagesMap(const std::string& packages) {
   return true;
 }
 
+std::string FileLoader::GetFilePathForPackageURL(std::string url) {
+  if (!packages_map_)
+    return std::string();
+  FXL_DCHECK(url.find(kPackageScheme) == 0u);
+  url = url.substr(kPackageSchemeLength);
+
+  size_t slash = url.find(FileLoader::kPathSeparator);
+  if (slash == std::string::npos)
+    return std::string();
+  std::string package = url.substr(0, slash);
+  std::string library_path = url.substr(slash + 1);
+  std::string package_path = packages_map_->Resolve(package);
+  if (package_path.empty())
+    return std::string();
+  if (package_path.find(FileLoader::kFileURLPrefix) == 0u)
+    return package_path.substr(FileLoader::kFileURLPrefixLength) + library_path;
+  return files::GetDirectoryName(files::AbsolutePath(packages_)) +
+    FileLoader::kPathSeparator + package_path + FileLoader::kPathSeparator +
+    library_path;
+}
+
 Dart_Handle FileLoader::HandleLibraryTag(Dart_LibraryTag tag,
                                          Dart_Handle library,
                                          Dart_Handle url) {
@@ -106,16 +125,17 @@ Dart_Handle FileLoader::CanonicalizeURL(Dart_Handle library, Dart_Handle url) {
   if (string.find(kDartScheme) == 0u)
     return url;
   if (string.find(kPackageScheme) == 0u)
-    return url;
+    return StdStringToDart(SanitizePath(string));
   if (string.find(kFileScheme) == 0u)
-    return StdStringToDart(string.substr(kFileSchemeLength));
+    return StdStringToDart(CanonicalizeFileURL(string));
 
   std::string library_url = StdStringFromDart(Dart_LibraryUrl(library));
   std::string prefix = ExtractSchemePrefix(library_url);
   std::string base_path = ExtractPath(library_url);
   std::string simplified_path =
-      files::SimplifyPath(files::GetDirectoryName(base_path) + "/" + string);
-  return StdStringToDart(prefix + simplified_path);
+      files::SimplifyPath(files::GetDirectoryName(base_path) +
+          FileLoader::kPathSeparator + string);
+  return StdStringToDart(SanitizePath(prefix + simplified_path));
 }
 
 std::string FileLoader::GetFilePathForURL(std::string url) {
@@ -124,34 +144,6 @@ std::string FileLoader::GetFilePathForURL(std::string url) {
   if (url.find(kFileScheme) == 0u)
     return GetFilePathForFileURL(std::move(url));
   return url;
-}
-
-std::string FileLoader::GetFilePathForPackageURL(std::string url) {
-  if (!packages_map_)
-    return std::string();
-  FXL_DCHECK(url.find(kPackageScheme) == 0u);
-  url = url.substr(kPackageSchemeLength);
-  size_t slash = url.find('/');
-  if (slash == std::string::npos)
-    return std::string();
-  std::string package = url.substr(0, slash);
-  std::string library_path = url.substr(slash + 1);
-  std::string package_path = packages_map_->Resolve(package);
-  if (package_path.empty())
-    return std::string();
-  if (package_path.find(kFileURLPrefix) == 0u)
-    return package_path.substr(kFileURLPrefixLength) + library_path;
-  return files::GetDirectoryName(files::AbsolutePath(packages_)) + "/" +
-         package_path + "/" + library_path;
-}
-
-std::string FileLoader::GetFilePathForFileURL(std::string url) {
-  FXL_DCHECK(url.find(kFileURLPrefix) == 0u);
-  return url.substr(kFileURLPrefixLength);
-}
-
-std::string FileLoader::GetFileURLForPath(const std::string& path) {
-  return std::string(kFileURLPrefix) + path;
 }
 
 std::string FileLoader::Fetch(const std::string& url,
@@ -167,7 +159,7 @@ std::string FileLoader::Fetch(const std::string& url,
     // handling policy.
     std::cerr << "error: Unable to read Dart source '" << url << "'."
               << std::endl;
-    exit(1);
+    PlatformExit(1);
   }
   url_dependencies_.insert(url);
   dependencies_.insert(path);
@@ -184,7 +176,7 @@ std::pair<uint8_t*, intptr_t> FileLoader::FetchBytes(const std::string& url) {
     // handling policy.
     std::cerr << "error: Unable to read Dart source '" << url << "'."
               << std::endl;
-    exit(1);
+    PlatformExit(1);
   }
   url_dependencies_.insert(url);
   dependencies_.insert(path);
@@ -255,6 +247,15 @@ void FileLoader::SetPackagesUrl(Dart_Handle url) {
   }
   const std::string& packages_url = StdStringFromDart(url);
   LoadPackagesMap(packages_url);
+}
+
+std::string FileLoader::GetFilePathForFileURL(std::string url) {
+  FXL_DCHECK(url.find(FileLoader::kFileURLPrefix) == 0u);
+  return url.substr(FileLoader::kFileURLPrefixLength);
+}
+
+std::string FileLoader::GetFileURLForPath(const std::string& path) {
+  return std::string(FileLoader::kFileURLPrefix) + path;
 }
 
 }  // namespace tonic

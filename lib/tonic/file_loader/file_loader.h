@@ -55,7 +55,14 @@ class FileLoader {
                     std::string* resolved_url = nullptr);
   std::pair<uint8_t*, intptr_t> FetchBytes(const std::string& url);
 
+  static const char kFileURLPrefix[];
+  static const size_t kFileURLPrefixLength;
+  static const std::string kPathSeparator;
+
  private:
+  static std::string SanitizePath(const std::string& path);
+  static std::string CanonicalizeFileURL(const std::string& url);
+
   std::string GetFilePathForURL(std::string url);
   std::string GetFilePathForPackageURL(std::string url);
   std::string GetFilePathForFileURL(std::string url);
