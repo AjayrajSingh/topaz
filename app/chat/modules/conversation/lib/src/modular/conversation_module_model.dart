@@ -151,7 +151,7 @@ class ChatConversationModuleModel extends ModuleModel {
           for (Embedder embedder in embedders) {
             // Set the link value.
             embedder.link.updateObject(
-              const <String>['message'],
+              const <String>['lastMessage'],
               JSON.encode(<String, String>{'content': lastTextMessage.text}),
             );
           }
@@ -463,14 +463,15 @@ class ChatConversationModuleModel extends ModuleModel {
           },
           payload: m.jsonPayload,
           initializer: (List<String> args) {
-            // Supports "/mod <bin>".
+            // Supports "/mod <verb> <message>".
             if (args.isNotEmpty && !embedder.daisyStarted) {
               String id = BASE64.encode(m.messageId);
-              String bin = args.first;
+              String verb = args.first;
 
               Map<String, String> messageEntity = <String, String>{
                 '@type': 'com.google.fuchsia.string',
-                'content': null, // start with a null message content.
+                // Content is anything following the <verb>.
+                'content': args.sublist(1).join(' '),
               };
               Map<String, dynamic> membersEntity = <String, dynamic>{
                 '@type': 'com.google.fuchsia.chat.members',
@@ -479,9 +480,9 @@ class ChatConversationModuleModel extends ModuleModel {
 
               // Setup Daisy.
               Daisy daisy = new Daisy()
-                ..verb = 'com.google.fuchsia.codelab.$bin'
+                ..verb = 'com.google.fuchsia.codelab.$verb'
                 ..nouns = <String, Noun>{};
-              daisy.nouns['message'] = new Noun()
+              daisy.nouns['originalMessage'] = new Noun()
                 ..json = JSON.encode(messageEntity);
               daisy.nouns['members'] = new Noun()
                 ..json = JSON.encode(membersEntity);
