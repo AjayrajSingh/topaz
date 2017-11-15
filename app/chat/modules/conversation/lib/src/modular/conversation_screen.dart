@@ -19,13 +19,8 @@ class ChatConversationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       theme: new ThemeData(primarySwatch: Colors.purple),
-      home: new Material(
-        // Scaffold is used to show snack bar messages.
-        child: new Scaffold(
-          body: new ScopedModelDescendant<ChatConversationModuleModel>(
-            builder: buildChatConversation,
-          ),
-        ),
+      home: new ScopedModelDescendant<ChatConversationModuleModel>(
+        builder: buildChatConversation,
       ),
     );
   }
@@ -37,19 +32,25 @@ class ChatConversationScreen extends StatelessWidget {
     Widget child,
     ChatConversationModuleModel model,
   ) {
-    return new ChatConversation(
-      enabled: model.conversationId != null,
-      sections: model.sections,
-      title: model.fetchingConversation
-          ? ''
-          : model.participants
-              ?.map(
-                (chat_fidl.Participant p) => p.displayName ?? p.email,
-              )
-              ?.join(', '),
-      onSubmitMessage: model.sendMessage,
-      onTapSharePhoto: model.startGalleryModule,
-      scrollController: model.scrollController,
+    // Scaffold is used to show snack bar messages.
+    return new Scaffold(
+      key: model.scaffoldKey,
+      body: new Material(
+        child: new ChatConversation(
+          enabled: model.conversationId != null,
+          sections: model.sections,
+          title: model.fetchingConversation
+              ? ''
+              : model.participants
+                  ?.map(
+                    (chat_fidl.Participant p) => p.displayName ?? p.email,
+                  )
+                  ?.join(', '),
+          onSubmitMessage: model.sendMessage,
+          onTapSharePhoto: model.startGalleryModule,
+          scrollController: model.scrollController,
+        ),
+      ),
     );
   }
 }

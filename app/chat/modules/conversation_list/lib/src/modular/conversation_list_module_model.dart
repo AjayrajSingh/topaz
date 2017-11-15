@@ -9,6 +9,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -29,6 +30,8 @@ const String _kChatContentProviderUrl =
     'file:///system/apps/chat_content_provider';
 const String _kChatConversationModuleUrl =
     'file:///system/apps/chat_conversation';
+
+const Duration _kErrorDuration = const Duration(seconds: 10);
 
 /// A [ModuleModel] providing chat conversation list specific data to the
 /// descendant widgets.
@@ -72,6 +75,10 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   /// Indicates whether the data is being fetched from the local Ledger.
   bool _isFetching = true;
+
+  /// The key to be used for scaffold.
+  GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   /// Gets the [ChatContentProvider] service provided by the agent.
   chat_fidl.ChatContentProvider get chatContentProvider => _chatContentProvider;
@@ -251,13 +258,13 @@ class ChatConversationListModuleModel extends ModuleModel {
 
       chat_fidl.ChatStatus status = await statusCompleter.future;
 
-      // TODO(youngseokyoon): properly communicate the error status to the
-      // user. (https://fuchsia.atlassian.net/browse/SO-365)
       if (status != chat_fidl.ChatStatus.ok) {
         log.severe('ChatContentProvider::GetConversations() returned an error '
             'status: $status');
         _conversations = null;
         notifyListeners();
+
+        showError('Error: $status');
         return;
       }
 
@@ -440,11 +447,11 @@ class ChatConversationListModuleModel extends ModuleModel {
     _chatContentProvider.newConversation(
       participants,
       (chat_fidl.ChatStatus status, chat_fidl.Conversation conversation) {
-        // TODO(youngseokyoon): properly communicate the error status to the
-        // user. (https://fuchsia.atlassian.net/browse/SO-365)
         if (status != chat_fidl.ChatStatus.ok) {
           log.severe('ChatContentProvider::NewConversation() returned an error '
               'status: $status');
+
+          showError('Error: $status');
           return;
         }
 
@@ -483,5 +490,13 @@ class ChatConversationListModuleModel extends ModuleModel {
     }).toList();
 
     newConversation(participants);
+  }
+
+  /// Shows the given error message using snack bar.
+  void showError(String message) {
+    scaffoldKey.currentState?.showSnackBar(new SnackBar(
+      content: new Text(message),
+      duration: _kErrorDuration,
+    ));
   }
 }

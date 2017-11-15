@@ -25,46 +25,49 @@ class _ChatConversationListScreenState
   Widget build(BuildContext context) {
     return new MaterialApp(
       theme: new ThemeData(primarySwatch: Colors.purple),
-      home: new Material(
-        child: new ScopedModelDescendant<ChatConversationListModuleModel>(
-          builder: (
-            BuildContext context,
-            Widget child,
-            ChatConversationListModuleModel model,
-          ) {
-            List<Widget> stackChildren = <Widget>[
-              new ChatConversationList(
-                title: model.title,
-                conversations: model.conversations == null
-                    ? new Set<Conversation>()
-                    : model.conversations,
-                onNewConversation: model.showNewConversationForm,
-                onSelectConversation: (Conversation c) => model
-                  ..setConversationId(c.conversationId)
-                  ..focusConversation(),
-                selectedId: model.conversationId,
-                shouldDisplaySpinner: model.shouldDisplaySpinner,
-              ),
-            ];
+      home: new ScopedModelDescendant<ChatConversationListModuleModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          ChatConversationListModuleModel model,
+        ) {
+          List<Widget> stackChildren = <Widget>[
+            new ChatConversationList(
+              title: model.title,
+              conversations: model.conversations == null
+                  ? new Set<Conversation>()
+                  : model.conversations,
+              onNewConversation: model.showNewConversationForm,
+              onSelectConversation: (Conversation c) => model
+                ..setConversationId(c.conversationId)
+                ..focusConversation(),
+              selectedId: model.conversationId,
+              shouldDisplaySpinner: model.shouldDisplaySpinner,
+            ),
+          ];
 
-            if (model.shouldShowNewConversationForm) {
-              stackChildren.addAll(<Widget>[
-                new GestureDetector(
-                  onTapUp: (_) => model.hideNewConversationForm(),
-                  child: new Container(
-                    color: Colors.black.withAlpha(180),
-                  ),
+          if (model.shouldShowNewConversationForm) {
+            stackChildren.addAll(<Widget>[
+              new GestureDetector(
+                onTapUp: (_) => model.hideNewConversationForm(),
+                child: new Container(
+                  color: Colors.black.withAlpha(180),
                 ),
-                _buildNewConversationForm(context, model),
-              ]);
-            }
+              ),
+              _buildNewConversationForm(context, model),
+            ]);
+          }
 
-            return new Stack(
-              fit: StackFit.passthrough,
-              children: stackChildren,
-            );
-          },
-        ),
+          return new Scaffold(
+            key: model.scaffoldKey,
+            body: new Material(
+              child: new Stack(
+                fit: StackFit.passthrough,
+                children: stackChildren,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -7,6 +7,7 @@ import 'dart:convert' show BASE64, JSON;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -33,6 +34,8 @@ const String _kChatContentProviderUrl =
 const String _kGalleryModuleUrl = 'file:///system/apps/gallery';
 
 const Duration _kScrollAnimationDuration = const Duration(milliseconds: 300);
+
+const Duration _kErrorDuration = const Duration(seconds: 10);
 
 const double _kEmbeddedModHeight = 200.0;
 
@@ -75,6 +78,10 @@ class ChatConversationModuleModel extends ModuleModel {
   List<Section> _sections;
   bool _fetchingConversation = false;
   final Completer<Null> _readyCompleter = new Completer<Null>();
+
+  /// The key to be used for scaffold.
+  GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   Uint8List _conversationId;
 
@@ -273,8 +280,6 @@ class ChatConversationModuleModel extends ModuleModel {
       },
     );
 
-    // TODO(youngseokyoon): properly communicate the error status to the user.
-    // https://fuchsia.atlassian.net/browse/SO-365
     chat_fidl.ChatStatus status = await statusCompleter.future;
 
     if (status != chat_fidl.ChatStatus.ok) {
@@ -283,6 +288,8 @@ class ChatConversationModuleModel extends ModuleModel {
       _fetchingConversation = false;
       _conversation = null;
       _setMessages(null);
+
+      showError('Error: $status');
       return;
     }
 
@@ -300,8 +307,6 @@ class ChatConversationModuleModel extends ModuleModel {
       },
     );
 
-    // TODO(youngseokyoon): properly communicate the error status to the user.
-    // https://fuchsia.atlassian.net/browse/SO-365
     status = await statusCompleter.future;
     if (status != chat_fidl.ChatStatus.ok) {
       log.severe('ChatContentProvider::GetMessages() returned an error '
@@ -309,6 +314,8 @@ class ChatConversationModuleModel extends ModuleModel {
       _fetchingConversation = false;
       _conversation = null;
       _setMessages(null);
+
+      showError('Error: $status');
       return;
     }
 
@@ -342,12 +349,12 @@ class ChatConversationModuleModel extends ModuleModel {
             (chat_fidl.ChatStatus status, chat_fidl.Message message) {
               log.fine('getMessage() callback');
 
-              // TODO(youngseokyoon): properly communicate the error status to
-              // the user. (https://fuchsia.atlassian.net/browse/SO-365)
               if (status != chat_fidl.ChatStatus.ok) {
                 log.severe(
                     'ChatContentProvider::GetMessage() returned an error '
                     'status: $status');
+
+                showError('Error: $status');
                 return;
               }
 
@@ -709,5 +716,13 @@ class ChatConversationModuleModel extends ModuleModel {
   /// Asks the content provider to delete the specified message.
   void deleteMessage(List<int> messageId) {
     _chatContentProvider.deleteMessage(conversationId, messageId, (_) => null);
+  }
+
+  /// Shows the given error message using snack bar.
+  void showError(String message) {
+    scaffoldKey.currentState?.showSnackBar(new SnackBar(
+      content: new Text(message),
+      duration: _kErrorDuration,
+    ));
   }
 }
