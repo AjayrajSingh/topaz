@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "packages": {
+        "link_viewer": "//topaz/app/link_viewer"
+    }
+}

@@ -3,15 +3,28 @@
 # found in the LICENSE file.
 
 import("//third_party/flutter/build/flutter_app.gni")
+import("//packages/package.gni")
 
-flutter_app("spinning_cube") {
+flutter_app("infinite_scroller_app") {
   main_dart = "lib/main.dart"
-
-  package_name = "spinning_cube"
+  output_name = "infinite_scroller"
 
   manifest = "pubspec.yaml"
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
+}
+
+package("infinite_scroller") {
+  app = true
+  system_image = true
+
+  deps = [
+    ":infinite_scroller_app",
+  ]
+
+  binaries = [ {
+        name = "infinite_scroller"
+      } ]
 }

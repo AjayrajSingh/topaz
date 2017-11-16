@@ -24,10 +24,7 @@ package("sysui") {
     "agents/home_work_agent",
     "armadillo_user_shell",
     "capybara_user_shell",
-    "infinite_scroller",
     "kernel_panic",
-    "perspective",
-    "spinning_cube",
     "userpicker_device_shell",
     "wifi_settings",
   ]
@@ -52,21 +49,6 @@ package("sysui") {
       source =
           "gen/topaz/shell/userpicker_device_shell/userpicker_device_shell.flx"
       name = "userpicker_device_shell"
-    },
-
-    {
-      source = "gen/topaz/shell/spinning_cube/spinning_cube.flx"
-      name = "spinning_cube"
-    },
-
-    {
-      source = "gen/topaz/shell/infinite_scroller/infinite_scroller.flx"
-      name = "infinite_scroller"
-    },
-
-    {
-      source = "gen/topaz/shell/perspective/perspective.flx"
-      name = "perspective"
     },
 
     {

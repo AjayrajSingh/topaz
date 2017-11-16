@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "packages": {
+        "file_explorer": "//topaz/app/file_explorer"
+    }
+}

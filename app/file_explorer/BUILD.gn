@@ -3,15 +3,28 @@
 # found in the LICENSE file.
 
 import("//third_party/flutter/build/flutter_app.gni")
+import("//packages/package.gni")
 
-flutter_app("infinite_scroller") {
+flutter_app("file_explorer_app") {
   main_dart = "lib/main.dart"
-
-  package_name = "infinite_scroller"
+  output_name = "file_explorer"
 
   manifest = "pubspec.yaml"
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
+}
+
+package("file_explorer") {
+  app = true
+  system_image = true
+
+  deps = [
+    ":file_explorer_app",
+  ]
+
+  binaries = [ {
+        name = "file_explorer"
+      } ]
 }

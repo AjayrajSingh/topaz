@@ -3,10 +3,11 @@
 # found in the LICENSE file.
 
 import("//third_party/flutter/build/flutter_app.gni")
+import("//packages/package.gni")
 
-flutter_app("perspective") {
+flutter_app("perspective_app") {
   main_dart = "lib/main.dart"
-
+  output_name = "perspective"
   package_name = "perspective"
 
   manifest = "pubspec.yaml"
@@ -17,4 +18,17 @@ flutter_app("perspective") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/media/flutter",
   ]
+}
+
+package("perspective") {
+  app = true
+  system_image = true
+
+  deps = [
+    ":perspective_app",
+  ]
+
+  binaries = [ {
+        name = "perspective"
+      } ]
 }
