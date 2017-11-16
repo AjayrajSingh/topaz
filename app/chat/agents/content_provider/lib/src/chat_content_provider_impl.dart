@@ -161,13 +161,19 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
   /// Runs the startup logic for the chat content provider.
   Future<Null> initialize() async {
+    // Don't wait for the message transporter logic to be finished. It may take
+    // significantly longer than the ledger setup, and there are many operations
+    // that only require the ledger setup.
+    //
+    // ignore: unawaited_futures
+    chatMessageTransporter.initialize().catchError((Object err) {
+      // TODO: store this state and retry when the agent starts up again
+      // https://fuchsia.atlassian.net/browse/SO-340
+      log.severe('Failed to initialize transport', err);
+    });
+
     try {
-      /// These two operations don't depend on each other, so just run them in
-      /// parallel.
-      await Future.wait(<Future<Null>>[
-        _initializeLedger(),
-        chatMessageTransporter.initialize(),
-      ]);
+      await _initializeLedger();
     } on Exception catch (e, stackTrace) {
       log.severe('Failed to initialize', e, stackTrace);
       return;
@@ -765,10 +771,13 @@ class ChatContentProviderImpl extends ChatContentProvider {
         );
       } on ChatAuthenticationException {
         callback(ChatStatus.authenticationError, const <int>[]);
+        return;
       } on ChatAuthorizationException {
         callback(ChatStatus.permissionError, const <int>[]);
+        return;
       } on ChatNetworkException {
         callback(ChatStatus.networkError, const <int>[]);
+        return;
       }
 
       callback(ChatStatus.ok, messageId);

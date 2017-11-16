@@ -417,7 +417,11 @@ class ChatConversationModuleModel extends ModuleModel {
           conversationId,
           'image-url',
           imageUrl,
-          (_, __) => null,
+          (chat_fidl.ChatStatus status, _) {
+            if (status != chat_fidl.ChatStatus.ok) {
+              showError('Error while sending image: $status');
+            }
+          },
         );
       }
     }
@@ -710,7 +714,11 @@ class ChatConversationModuleModel extends ModuleModel {
       conversationId,
       type,
       message,
-      (_, __) => null,
+      (chat_fidl.ChatStatus status, _) {
+        if (status != chat_fidl.ChatStatus.ok) {
+          showError('Error while sending message: $status');
+        }
+      },
     );
   }
 

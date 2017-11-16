@@ -26,7 +26,7 @@ abstract class ChatException implements Exception {
 
   @override
   String toString() {
-    String result = 'FirebaseException';
+    String result = 'ChatException';
     if (message != null) {
       result = '$result: $message';
     }
