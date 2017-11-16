@@ -4,16 +4,11 @@
     ],
     "imports": [
         "garnet/packages/fonts",
-        "garnet/packages/icu",
         "garnet/packages/mozart",
-        "garnet/packages/zlib",
-        "topaz/packages/cairo",
         "topaz/packages/curl",
-        "topaz/packages/libxml2",
         "topaz/packages/sqlite"
     ],
     "packages": {
-        "libwebkit": "//topaz/runtime/web_view:libwebkit",
         "web_view": "//topaz/runtime/web_view",
         "web_view_test_package": "//topaz/runtime/web_view:web_view_test_package"
     }

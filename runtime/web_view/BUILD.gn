@@ -49,6 +49,7 @@ group("webkit") {
   if (use_prebuilt_webkit) {
     public_configs = [ ":prebuilt_webkit_config" ]
     deps = [
+      ":copy_prebuilt_webkit($shlib_toolchain)",
       "//third_party/boringssl:ssl",
       "//third_party/cairo",
       "//third_party/curl:libcurl",
@@ -129,21 +130,6 @@ package("web_view") {
         path = rebase_path(
                 "//garnet/bin/fonts/third_party/roboto/Roboto-Regular.ttf")
         dest = "webkit/Roboto-Regular.ttf"
-      } ]
-}
-
-package("libwebkit") {
-  system_image = true
-
-  deps = [
-    ":webkit",
-  ]
-  if (use_prebuilt_webkit) {
-    deps += [ ":copy_prebuilt_webkit($shlib_toolchain)" ]
-  }
-
-  libraries = [ {
-        name = "libwebkit.so"
       } ]
 }
 

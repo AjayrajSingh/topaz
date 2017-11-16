@@ -3,9 +3,6 @@
         "cpp",
         "dart"
     ],
-    "imports": [
-        "garnet/packages/zlib"
-    ],
     "labels": [
         "//third_party/dart:create_sdk"
     ],
