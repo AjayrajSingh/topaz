@@ -11,9 +11,6 @@ import 'suggestion.dart';
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
-/// Callback allowing the UI to display updated speech-to-text transcriptions.
-typedef void OnTranscriptUpdate(String spokenText);
-
 /// The base class for suggestion models.
 abstract class SuggestionModel extends Model {
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
@@ -41,17 +38,6 @@ abstract class SuggestionModel extends Model {
 
   /// Returns true if an ask is being processed.
   bool get processingAsk;
-
-  /// Returns true if voice response is playing.
-  bool get speaking;
-
-  /// Starts speech input.
-  void beginSpeechCapture({
-    VoidCallback onReady,
-    OnTranscriptUpdate onTranscriptUpdate,
-    VoidCallback onError,
-    VoidCallback onCompleted,
-  });
 
   /// Called when a suggestion is selected by the user.
   void onSuggestionSelected(Suggestion suggestion);

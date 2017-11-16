@@ -6,7 +6,6 @@ import 'package:armadillo/next.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.suggestion.fidl/speech_to_text.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/user_input.fidl.dart' as maxwell;
@@ -28,6 +27,9 @@ class MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
   /// Listener that is called when list of interruptions update
   final _InterruptionListener interruptionListener;
 
+  /// Listener that is called when the processing status has changed
+  final ValueChanged<bool> processingChangeListener;
+
   /// If true, downgrade interruptions
   final bool downgradeInterruptions;
 
@@ -39,6 +41,7 @@ class MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
     this.prefix,
     this.suggestionListener,
     this.interruptionListener,
+    this.processingChangeListener,
     this.downgradeInterruptions: false,
   });
 
@@ -89,7 +92,7 @@ class MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
 
   @override
   void onProcessingChange(bool processing) {
-    // TODO(jwnichols): Incorporate this into the user interface somehow
+    processingChangeListener?.call(processing);
   }
 
   /// Clear all suggestions
@@ -103,58 +106,6 @@ class MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
     }
     _suggestions.clear();
     suggestionListener?.call();
-  }
-}
-
-class _MaxwellTranscriptionListenerImpl extends maxwell.TranscriptionListener {
-  final VoidCallback onReadyImpl;
-  final ValueChanged<String> onTranscriptUpdateImpl;
-  final VoidCallback onErrorImpl;
-
-  _MaxwellTranscriptionListenerImpl({
-    this.onReadyImpl,
-    this.onTranscriptUpdateImpl,
-    this.onErrorImpl,
-  });
-
-  @override
-  void onReady() {
-    log.fine('onReady');
-    onReadyImpl?.call();
-  }
-
-  @override
-  void onTranscriptUpdate(String spokenText) {
-    log.fine('spokenText $spokenText');
-    onTranscriptUpdateImpl?.call(spokenText);
-  }
-
-  @override
-  void onError() {
-    log.fine('onError');
-    onErrorImpl?.call();
-  }
-}
-
-class _MaxwellFeedbackListenerImpl extends maxwell.FeedbackListener {
-  final ValueChanged<String> onTextResponseImpl;
-  final ValueChanged<maxwell.SpeechStatus> onStatusChangedImpl;
-
-  _MaxwellFeedbackListenerImpl({
-    this.onTextResponseImpl,
-    this.onStatusChangedImpl,
-  });
-
-  @override
-  void onStatusChanged(maxwell.SpeechStatus status) {
-    log.info('Status changed: $status');
-    onStatusChangedImpl?.call(status);
-  }
-
-  @override
-  void onTextResponse(String responseText) {
-    log.fine('responseText $responseText');
-    onTextResponseImpl?.call(responseText);
   }
 }
 
@@ -247,22 +198,10 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   final List<Suggestion> _currentInterruptions = <Suggestion>[];
 
-  final maxwell.FeedbackListenerBinding _feedbackListenerBinding =
-      new maxwell.FeedbackListenerBinding();
-
-  // Listens for changes in conversational state. This is temporary; see
-  // comments in suggestion_provider.fidl.
-  _MaxwellFeedbackListenerImpl _feedbackListener;
-
-  final maxwell.TranscriptionListenerBinding _transcriptionListenerBinding =
-      new maxwell.TranscriptionListenerBinding();
-
   /// When the user is asking via text or voice we want to show the maxwell ask
   /// suggestions rather than the normal maxwell suggestion list.
   String _askText;
   bool _asking = false;
-  bool _processingAsk = false;
-  bool _speaking = false;
 
   /// Set from an external source - typically the UserShell.
   maxwell.SuggestionProviderProxy _suggestionProviderProxy;
@@ -279,9 +218,6 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   /// Called when all interruptions are removed.
   final OnInterruptionsRemoved onInterruptionsRemoved;
 
-  final Set<maxwell.SuggestionListenerBinding> _askListenerBindings =
-      new Set<maxwell.SuggestionListenerBinding>();
-
   /// Constructor.
   SuggestionProviderSuggestionModel({
     this.hitTestModel,
@@ -296,17 +232,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       _askListenerBinding.close();
     }
     _nextListenerBinding.close();
-    _feedbackListenerBinding.close();
-    _transcriptionListenerBinding.close();
-    for (maxwell.SuggestionListenerBinding askListener
-        in _askListenerBindings) {
-      askListener.close();
-    }
   }
-
-  /// Dataflow spaghetti.
-  maxwell.SuggestionProviderProxy get suggestionProviderProxy =>
-      _suggestionProviderProxy;
 
   /// Setting [suggestionProvider] triggers the loading on suggestions.
   /// This is typically set by the UserShell.
@@ -323,47 +249,14 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       prefix: 'ask',
       suggestionListener: _onAskSuggestionsChanged,
       interruptionListener: _interruptionListener,
+      processingChangeListener: (bool processing) =>
+          _processingAsk = processing,
       downgradeInterruptions: true,
     );
     _nextListener = new MaxwellSuggestionListenerImpl(
       prefix: 'next',
       suggestionListener: _onNextSuggestionsChanged,
       interruptionListener: _interruptionListener,
-    );
-    _feedbackListener = new _MaxwellFeedbackListenerImpl(
-      onTextResponseImpl: (String text) {},
-      onStatusChangedImpl: (maxwell.SpeechStatus speechStatus) {
-        switch (speechStatus) {
-          case maxwell.SpeechStatus.processing:
-            if (_speaking || !_processingAsk) {
-              _speaking = false;
-              _processingAsk = true;
-              notifyListeners();
-            }
-            break;
-          case maxwell.SpeechStatus.responding:
-            if (!_speaking || !_processingAsk) {
-              _speaking = true;
-              _processingAsk = true;
-              notifyListeners();
-            }
-            break;
-          case maxwell.SpeechStatus.idle:
-            if (_speaking || _processingAsk) {
-              _speaking = false;
-              _processingAsk = false;
-              notifyListeners();
-            }
-            break;
-          default:
-            if (_speaking || _processingAsk) {
-              _speaking = false;
-              _processingAsk = false;
-              notifyListeners();
-            }
-            break;
-        }
-      },
     );
     _load();
   }
@@ -410,9 +303,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       ..subscribeToNext(
         _nextListenerBinding.wrap(_nextListener),
         _kMaxSuggestions,
-      )
-      ..registerFeedbackListener(
-          _feedbackListenerBinding.wrap(_feedbackListener));
+      );
   }
 
   @override
@@ -471,60 +362,13 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     }
   }
 
-  /// Performs an ask query.
-  void performAskQuery({
-    String text,
-    maxwell.SuggestionListener askListener,
-  }) {
-    final maxwell.SuggestionListenerBinding askListenerBinding =
-        new maxwell.SuggestionListenerBinding();
-    _askListenerBindings.add(askListenerBinding);
-
-    // Make a query and rewrap the binding
-    _suggestionProviderProxy.query(
-      askListenerBinding.wrap(askListener),
-      new maxwell.UserInput()..text = text ?? '',
-      _kMaxSuggestions,
-    );
-    askListenerBinding.onConnectionError = () {
-      askListenerBinding.close();
-      _askListenerBindings.remove(askListenerBinding);
-    };
-  }
-
   @override
   bool get asking => _asking;
 
+  bool _processingAsk;
+
   @override
   bool get processingAsk => _processingAsk;
-
-  @override
-  bool get speaking => _speaking;
-
-  @override
-  void beginSpeechCapture({
-    OnTranscriptUpdate onTranscriptUpdate,
-    VoidCallback onReady,
-    VoidCallback onError,
-    VoidCallback onCompleted,
-  }) {
-    _transcriptionListenerBinding.close();
-
-    log.info('Begin speech capture!');
-    _suggestionProviderProxy.beginSpeechCapture(
-      _transcriptionListenerBinding.wrap(new _MaxwellTranscriptionListenerImpl(
-        onReadyImpl: onReady,
-        onTranscriptUpdateImpl: onTranscriptUpdate,
-        onErrorImpl: onError,
-      )),
-    );
-
-    // The voice input is completed when the transcriptListener is closed
-    _transcriptionListenerBinding.onConnectionError = () {
-      onCompleted?.call();
-      _transcriptionListenerBinding.close;
-    };
-  }
 
   void _onAskSuggestionsChanged() {
     if (_asking) {

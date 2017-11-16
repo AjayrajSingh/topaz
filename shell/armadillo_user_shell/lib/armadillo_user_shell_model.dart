@@ -21,6 +21,8 @@ import 'package:lib.widgets/modular.dart';
 import 'active_agents_manager.dart';
 import 'focus_request_watcher_impl.dart';
 import 'initial_focus_setter.dart';
+import 'maxwell_hotword.dart';
+import 'maxwell_voice_model.dart';
 import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
@@ -40,6 +42,12 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// Receives the [SuggestionProvider], [FocusController], and
   /// [VisibleStoriesController].
   final SuggestionProviderSuggestionModel suggestionProviderSuggestionModel;
+
+  /// Listens for hotwords.
+  final MaxwellHotword maxwellHotword;
+
+  /// Tracks speech UI state.
+  final MaxwellVoiceModel maxwellVoiceModel;
 
   /// Watches the [FocusController].
   final FocusRequestWatcherImpl focusRequestWatcher;
@@ -81,6 +89,8 @@ class ArmadilloUserShellModel extends UserShellModel {
   ArmadilloUserShellModel({
     this.storyProviderStoryGenerator,
     this.suggestionProviderSuggestionModel,
+    this.maxwellHotword,
+    this.maxwellVoiceModel,
     this.focusRequestWatcher,
     this.initialFocusSetter,
     this.userLogoutter,
@@ -130,7 +140,11 @@ class ArmadilloUserShellModel extends UserShellModel {
     storyProviderStoryGenerator
       ..link = link
       ..storyProvider = storyProvider;
+
     suggestionProviderSuggestionModel.suggestionProvider = suggestionProvider;
+    maxwellHotword.suggestionProvider = suggestionProvider;
+    maxwellVoiceModel.suggestionProvider = suggestionProvider;
+
     ContextQuery query = new ContextQuery()
       ..selector = <String, ContextSelector>{};
     for (String topic in contextTopics) {
@@ -180,6 +194,8 @@ class ArmadilloUserShellModel extends UserShellModel {
     _contextListenerBinding.close();
     _focusRequestWatcherBinding.close();
     _presentation.ctrl.close();
+    maxwellVoiceModel.close();
+    maxwellHotword.stop();
     suggestionProviderSuggestionModel.close();
     storyProviderStoryGenerator.close();
     onUserShellStopped?.call();

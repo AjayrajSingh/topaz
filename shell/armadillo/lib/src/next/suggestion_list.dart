@@ -5,6 +5,7 @@
 import 'dart:math' as math;
 
 import 'package:armadillo/common.dart';
+import 'package:armadillo/next.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +83,8 @@ class SuggestionListState extends State<SuggestionList>
   DateTime _lastBuildTime;
   AnimationController _fadeInAnimation;
   CurvedAnimation _curvedFadeInAnimation;
+  VoiceModel _voiceModel;
+  bool _useSpeechInput = false;
 
   @override
   void initState() {
@@ -101,10 +104,13 @@ class SuggestionListState extends State<SuggestionList>
         _startAsking();
       }
     });
+
+    _voiceModel = VoiceModel.of(context)..addListener(_updateTranscript);
   }
 
   @override
   void dispose() {
+    _voiceModel.removeListener(_updateTranscript);
     _fadeInAnimation.dispose();
     super.dispose();
   }
@@ -120,11 +126,25 @@ class SuggestionListState extends State<SuggestionList>
     SuggestionModel.of(context).askText = null;
   }
 
-  void _onTranscriptUpdate(String spokenText) {
-    _askTextController
-      ..text = spokenText
-      ..selection = new TextSelection.collapsed(offset: spokenText.length);
-    SuggestionModel.of(context).askText = spokenText;
+  void _updateTranscript() {
+    if (_voiceModel.isInput) {
+      _useSpeechInput = true;
+    }
+
+    if (_useSpeechInput) {
+      _askTextController
+        ..text = _voiceModel.transcription
+        ..selection = new TextSelection.collapsed(
+            offset: _voiceModel.transcription.length);
+      SuggestionModel.of(context).askText = _voiceModel.transcription;
+    }
+
+    // There may (or may not) be a case where voice state transitions from input
+    // to passive while transcription settles, so have the _useSpeechinput off
+    // switch after the transcription sync.
+    if (_voiceModel.state == VoiceState.passive) {
+      _useSpeechInput = false;
+    }
   }
 
   /// Clears the last selected suggestion.  The selected suggestion isn't drawn
@@ -296,11 +316,7 @@ class SuggestionListState extends State<SuggestionList>
               ),
             ),
             new GestureDetector(
-              onTap: () {
-                SuggestionModel.of(context).beginSpeechCapture(
-                      onTranscriptUpdate: _onTranscriptUpdate,
-                    );
-              },
+              onTap: VoiceModel.of(context).beginSpeechCapture,
               child: new Image.asset(
                 _kMicImage,
                 height: 24.0,
