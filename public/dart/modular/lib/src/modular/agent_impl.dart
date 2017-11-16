@@ -41,21 +41,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
   /// Creates a new instance of [AgentImpl].
   AgentImpl({@required ApplicationContext applicationContext})
       : _applicationContext = applicationContext,
-        assert(applicationContext != null);
-
-  @override
-  Future<Null> connect(
-    String requestorUrl,
-    InterfaceRequest<ServiceProvider> services,
-  ) async {
-    await _readyCompleter.future;
-    _outgoingServicesBindings.add(
-      new ServiceProviderBinding()..bind(_outgoingServicesImpl, services),
-    );
-  }
-
-  @override
-  void initialize() {
+        assert(applicationContext != null) {
     connectToService(_applicationContext.environmentServices,
         _agentContext.ctrl);
     _agentContext
@@ -71,6 +57,17 @@ abstract class AgentImpl implements Agent, Lifecycle {
     ).catchError((Exception e) {
       throw e;
     }).whenComplete(_readyCompleter.complete);
+  }
+
+  @override
+  Future<Null> connect(
+    String requestorUrl,
+    InterfaceRequest<ServiceProvider> services,
+  ) async {
+    await _readyCompleter.future;
+    _outgoingServicesBindings.add(
+      new ServiceProviderBinding()..bind(_outgoingServicesImpl, services),
+    );
   }
 
   @override
@@ -118,7 +115,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
       }, Lifecycle.serviceName);
   }
 
-  /// Performs additional initialization after [Agent.initialize] is called.
+  /// Performs additional initializations.
   /// Subclasses must override this if additional work should be done at the
   /// initialization phase.
   /// Note: Completing the future with an error will raise an unhandled
