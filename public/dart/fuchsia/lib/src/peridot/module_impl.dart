@@ -90,9 +90,7 @@ class ModuleImpl implements Module, Lifecycle {
     InterfaceHandle<ModuleContext> moduleContext,
     InterfaceRequest<ServiceProvider> outgoingServices,
   ) {
-    print('===> module_impl initializing...');
     if (onReady != null) {
-      print('===> registering on ready callback');
       _moduleContextProxy.ctrl.bind(moduleContext);
       _moduleContextProxy.getLink(null, _linkProxy.ctrl.request());
 
@@ -107,15 +105,12 @@ class ModuleImpl implements Module, Lifecycle {
     }
 
     if (onNotify != null) {
-      print('===> registering onNotify callback');
-
       _linkWatcherImpl = new LinkWatcherImpl(onNotify: onNotify);
       _linkWatcherBinding = new LinkWatcherBinding();
 
       if (watchAll) {
         _linkProxy.watchAll(_linkWatcherBinding.wrap(_linkWatcherImpl));
       } else {
-        print('===> watching link');
         _linkProxy.watch(_linkWatcherBinding.wrap(_linkWatcherImpl));
       }
     }
@@ -135,7 +130,6 @@ class ModuleImpl implements Module, Lifecycle {
 
   @override
   void terminate() {
-    print('===> terminating');
     onStopping?.call();
     _linkWatcherBinding?.close();
     _moduleContextProxy.ctrl.close();
