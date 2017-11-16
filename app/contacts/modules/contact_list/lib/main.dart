@@ -35,7 +35,6 @@ void main() {
 
   runApp(
     new MaterialApp(
-      theme: new ThemeData(primarySwatch: Colors.blue),
       home: moduleWidget,
     ),
   );

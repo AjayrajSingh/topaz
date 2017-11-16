@@ -20,7 +20,9 @@ void main() {
     moduleModel: moduleModel,
     applicationContext: new ApplicationContext.fromStartupInfo(),
     child: new MaterialApp(
-      home: new ContactCard(),
+      home: new Scaffold(
+        body: new ContactCard(),
+      ),
     ),
   )..advertise();
 
