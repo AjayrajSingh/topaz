@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:peridot.bin.ledger.fidl/debug.fidl.dart';
+import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger_fidl;
 
 import 'data_handler.dart';
 
@@ -27,9 +28,27 @@ class LedgerDebugDataHandler extends DataHandler {
 
   @override
   bool handleRequest(String requestString, HttpRequest request) {
-    if(requestString == '/instances_list') {
+    List<String> requestArr = requestString.split('/');
+    Map<String, String> queryParam = request.requestedUri.queryParameters;
+    if (requestArr[1] == 'instances_list') {
       _ledgerRepositoryDebug.getInstancesList((List<String> listOfInstances) =>
-                                sendInstancesList(request, listOfInstances));
+          sendInstancesList(request, listOfInstances));
+      return true;
+    } else if (requestArr[1] == 'pages_list') {
+      LedgerDebugProxy ledgerDebug = new LedgerDebugProxy();
+      ledgerDebug.ctrl.onConnectionError = () {
+        print('Connection Error on Ledger Debug: ${ledgerDebug.hashCode}');
+      };
+
+      _ledgerRepositoryDebug.getLedgerDebug(
+          UTF8.encode(queryParam['instance']), ledgerDebug.ctrl.request(),
+          (ledger_fidl.Status s) {
+        if (s != ledger_fidl.Status.ok) {
+          print('[ERROR] LEDGER name failed to bind.');
+        }
+      });
+      ledgerDebug.getPagesList(
+          (List<List<int>> listOfPages) => sendList(request, listOfPages));
       return true;
     }
 
@@ -41,6 +60,11 @@ class LedgerDebugDataHandler extends DataHandler {
 
   void sendInstancesList(HttpRequest request, List<String> listOfInstances) {
     request.response.write(JSON.encode(listOfInstances));
+    request.response.close();
+  }
+
+  void sendList(HttpRequest request, List<List<int>> listOfEncod) {
+    request.response.write(JSON.encode(listOfEncod));
     request.response.close();
   }
 }
