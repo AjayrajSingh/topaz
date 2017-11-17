@@ -21,6 +21,9 @@ interface ContactsContentProvider {
 
   // Returns the contact information for the contact specified by contact id.
   GetContact(string id) => (Status status, Contact contact);
+
+  // Returns the entity reference for the contact specified by the contact id.
+  GetEntityReference(string id) => (Status status, string entityReference);
 };
 
 // Service interface to be implemented by third-party contacts data providers

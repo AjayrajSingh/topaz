@@ -6,10 +6,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:lib.agent.fidl/agent_context.fidl.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.entity.fidl/entity_reference_factory.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
 import 'package:lib.logging/logging.dart';
@@ -60,6 +62,9 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
   /// [ComponentContext] used for interfacing with Ledger
   final ComponentContext _componentContext;
 
+  /// [AgentContext] used for creating entity references
+  final AgentContext _agentContext;
+
   /// [Ledger] instance
   ledger.LedgerProxy _ledger;
 
@@ -70,9 +75,14 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
   ContactsWatcher _contactsWatcher;
 
   /// Constructor
-  ContactsContentProviderImpl({@required ComponentContext componentContext})
+  ContactsContentProviderImpl({
+    @required ComponentContext componentContext,
+    @required AgentContext agentContext,
+  })
       : assert(componentContext != null),
-        _componentContext = componentContext;
+        assert(agentContext != null),
+        _componentContext = componentContext,
+        _agentContext = agentContext;
 
   /// Runs necessary methods to initialize the contacts content provider
   // TODO: remove async/error prone code SO-931
@@ -105,8 +115,10 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
   }
 
   @override
-  Future<Null> getContactList(String prefix,
-      void callback(fidl.Status status, List<fidl.Contact> contacts)) async {
+  Future<Null> getContactList(
+    String prefix,
+    void callback(fidl.Status status, List<fidl.Contact> contacts),
+  ) async {
     List<fidl.Contact> contactsList;
     if (prefix == null || prefix == '') {
       contactsList = _contactsStore.getAllContacts();
@@ -122,10 +134,53 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
   }
 
   @override
-  Future<Null> getContact(String id,
-      void callback(fidl.Status status, fidl.Contact contact)) async {
+  Future<Null> getContact(
+    String id,
+    void callback(fidl.Status status, fidl.Contact contact),
+  ) async {
     callback(fidl.Status.ok, _contactsStore.getContact(id));
     return;
+  }
+
+  @override
+  Future<Null> getEntityReference(
+    String id,
+    void callback(fidl.Status status, String entityReference),
+  ) async {
+    // Create a proxy to the EntityReferenceFactory that will create the
+    // entity reference
+    EntityReferenceFactoryProxy entityReferenceProxy =
+        new EntityReferenceFactoryProxy();
+    Completer<String> entityReferenceCompleter = new Completer<String>();
+    _agentContext.getEntityReferenceFactory(
+      entityReferenceProxy.ctrl.request(),
+    );
+    entityReferenceProxy.createReference(
+      id,
+      (String entityReference) {
+        if (entityReference.isNotEmpty) {
+          entityReferenceCompleter.complete(entityReference);
+        } else {
+          // TODO(meiyili): better error handling
+          String errorMsg =
+              'Entity reference factory returned empty entity reference';
+          log.warning(errorMsg);
+          entityReferenceCompleter.completeError(errorMsg);
+        }
+      },
+    );
+
+    // Await the result and check the status before passing back to the caller
+    fidl.Status status = fidl.Status.ok;
+    String entityReference = await entityReferenceCompleter.future.catchError(
+      (Object error) {
+        status = fidl.Status.error;
+        log.warning('Entity factory completed with error: $error');
+      },
+    );
+    entityReference ??= '';
+    entityReferenceProxy.ctrl.close();
+    callback(status, entityReference);
   }
 
   /// Add request to the list of binding objects.
