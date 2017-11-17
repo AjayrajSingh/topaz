@@ -3,13 +3,16 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:entity_schemas/entities.dart' as entities;
+import 'package:lib.widgets/modular.dart';
 
+import '../models/contact_card_model.dart';
 import 'contact_activity.dart';
 import 'contact_details.dart';
 import 'header.dart';
 
 const double _kListPortraitWidth = 0.4;
+const String _kEmptyContactMsg =
+    'Sorry, the contact does not exist or was never specified. :(';
 
 /// The UI widget that shows the details of a contact
 class ContactCard extends StatefulWidget {
@@ -19,23 +22,6 @@ class ContactCard extends StatefulWidget {
 
 class _ContactCardState extends State<ContactCard>
     with SingleTickerProviderStateMixin {
-  // TODO(meiyili): will be removed in subsequent cl
-  final entities.Contact _contact = new entities.Contact(
-    displayName: 'Aparna Neilsen',
-    id: '123',
-    photoUrl: 'http://www.galaxycorgipuppies.com/img/products/coobee.jpg',
-    emailAddresses: <entities.EmailAddress>[
-      new entities.EmailAddress(
-        value: 'aparna_nielsen@example.com',
-        label: 'personal',
-      ),
-      new entities.EmailAddress(value: 'aparna_n@example.com', label: 'work')
-    ],
-    phoneNumbers: <entities.PhoneNumber>[
-      new entities.PhoneNumber(number: '(312) 800-2342', label: 'mobile')
-    ],
-  );
-
   TabController _controller;
 
   @override
@@ -46,37 +32,47 @@ class _ContactCardState extends State<ContactCard>
 
   @override
   Widget build(BuildContext context) {
-    return new LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        bool isPortrait = (constraints.maxWidth < constraints.maxHeight);
-        double listWidth = isPortrait
-            ? constraints.maxWidth
-            : (constraints.maxWidth * _kListPortraitWidth).round().toDouble();
+    return new ScopedModelDescendant<ContactCardModel>(
+      builder: (
+        BuildContext context,
+        Widget child,
+        ContactCardModel model,
+      ) {
+        return model.contact == null
+            ? new Center(child: const Text(_kEmptyContactMsg))
+            : new LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  bool isPortrait =
+                      (constraints.maxWidth < constraints.maxHeight);
+                  double listWidth = isPortrait
+                      ? constraints.maxWidth
+                      : constraints.maxWidth * _kListPortraitWidth;
+                  Header header = new Header(
+                    displayName: model.contact.displayName,
+                    photoUrl: model.contact.photoUrl,
+                  );
+                  ContactDetails details = new ContactDetails(
+                    contact: model.contact,
+                  );
+                  ContactActivity activity = new ContactActivity(
+                    showHeader: !isPortrait,
+                  );
 
-        Header header = new Header(
-          displayName: _contact.displayName,
-          photoUrl: _contact.photoUrl,
-        );
-        ContactDetails details = new ContactDetails(
-          contact: _contact,
-        );
-        ContactActivity activity = new ContactActivity(
-          showHeader: !isPortrait,
-        );
-
-        return isPortrait
-            ? _buildPortraitView(header, details, activity)
-            : new Row(
-                children: <Widget>[
-                  new Container(
-                    width: listWidth,
-                    child: new Column(children: <Widget>[
-                      header,
-                      new Expanded(child: details),
-                    ]),
-                  ),
-                  new Expanded(child: activity),
-                ],
+                  return isPortrait
+                      ? _buildPortraitView(header, details, activity)
+                      : new Row(
+                          children: <Widget>[
+                            new Container(
+                              width: listWidth,
+                              child: new Column(children: <Widget>[
+                                header,
+                                new Expanded(child: details),
+                              ]),
+                            ),
+                            new Expanded(child: activity),
+                          ],
+                        );
+                },
               );
       },
     );
