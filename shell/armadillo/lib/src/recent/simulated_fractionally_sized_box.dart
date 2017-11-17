@@ -3,80 +3,51 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
+import 'package:meta/meta.dart';
 
 const RK4SpringDescription _kDefaultSimulationDesc =
     const RK4SpringDescription(tension: 450.0, friction: 50.0);
 
-/// Animates a [FractionallySizedBox]'s [heightFactor] with a spring simulation.
-class SimulatedFractionallySizedBox extends StatefulWidget {
-  /// See [FractionallySizedBox.heightFactor].
-  final double heightFactor;
+/// Animates a [FractionallySizedBox]'s height factor with a spring simulation.
+class SimulatedFractionallySizedBox extends StatelessWidget {
+  /// The state of the [SimulatedFractionallySizedBox].
+  final SimulatedFractionallySizedBoxModel model;
 
   /// See [FractionallySizedBox.alignment].
   final FractionalOffset alignment;
-
-  /// The description of the spring used to transition the box's size.
-  final RK4SpringDescription springDescription;
 
   /// The widget to be sized by this box.
   final Widget child;
 
   /// Construuctor.
   const SimulatedFractionallySizedBox({
-    Key key,
+    @required this.model,
     this.alignment,
-    this.heightFactor,
-    this.springDescription: _kDefaultSimulationDesc,
     this.child,
   })
-      : super(key: key);
+      : assert(model != null);
 
   @override
-  SimulatedFractionallySizedBoxState createState() =>
-      new SimulatedFractionallySizedBoxState();
+  Widget build(BuildContext context) => new AnimatedBuilder(
+        animation: model,
+        builder: (BuildContext context, Widget child) =>
+            new FractionallySizedBox(
+              alignment: alignment,
+              heightFactor: model.value,
+              widthFactor: 1.0,
+              child: child,
+            ),
+        child: child,
+      );
 }
 
 /// Tracks the simulation of the [SimulatedFractionallySizedBox]'s size.
-class SimulatedFractionallySizedBoxState
-    extends TickingState<SimulatedFractionallySizedBox> {
-  RK4SpringSimulation _heightFactorSimulation;
-
-  @override
-  void initState() {
-    super.initState();
-    _heightFactorSimulation = new RK4SpringSimulation(
-      initValue: widget.heightFactor,
-      desc: widget.springDescription,
-    );
-  }
-
-  @override
-  void didUpdateWidget(SimulatedFractionallySizedBox oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _heightFactorSimulation.target = widget.heightFactor;
-    startTicking();
-  }
-
-  @override
-  Widget build(BuildContext context) => new FractionallySizedBox(
-        alignment: widget.alignment,
-        heightFactor: _heightFactorSimulation.value,
-        widthFactor: 1.0,
-        child: widget.child,
-      );
-
-  @override
-  bool handleTick(double elapsedSeconds) {
-    _heightFactorSimulation.elapseTime(elapsedSeconds);
-    return !_heightFactorSimulation.isDone;
-  }
-
-  /// Jumps the height of the box relative to its parent to [heightFactor].
-  void jump({double heightFactor}) {
-    _heightFactorSimulation = new RK4SpringSimulation(
-      initValue: heightFactor,
-      desc: widget.springDescription,
-    );
+class SimulatedFractionallySizedBoxModel extends SpringModel {
+  /// Constructor.
+  SimulatedFractionallySizedBoxModel()
+      : super(springDescription: _kDefaultSimulationDesc) {
+    jump(1.0);
   }
 }

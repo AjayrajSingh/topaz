@@ -584,16 +584,15 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
     int startingIndex,
   }) {
     String storyTitle = _getStoryTitle(storyInfo);
-    int initialIndex = startingIndex;
+    _StoryWidgetModel storyWidgetState = new _StoryWidgetModel(
+      storyInfo: storyInfo,
+      storyController: storyController,
+      startingIndex: startingIndex,
+    );
 
     return new Story(
         id: new StoryId(storyInfo.id),
-        builder: (BuildContext context) => new _StoryWidget(
-              key: new GlobalObjectKey<_StoryWidgetState>(storyController),
-              storyInfo: storyInfo,
-              storyController: storyController,
-              startingIndex: initialIndex,
-            ),
+        widget: new _StoryWidget(model: storyWidgetState),
         // TODO(apwilson): Improve title.
         title: storyTitle,
         icons: <OpacityBuilder>[],
@@ -609,14 +608,7 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
                 ? Colors.grey[500]
                 : new Color(int.parse(storyInfo.extra['color'])),
         onClusterIndexChanged: (int clusterIndex) {
-          _StoryWidgetState state =
-              new GlobalObjectKey<_StoryWidgetState>(storyController)
-                  .currentState;
-          if (state != null) {
-            state.index = clusterIndex;
-          } else {
-            initialIndex = clusterIndex;
-          }
+          storyWidgetState.index = clusterIndex;
         });
   }
 
@@ -638,51 +630,21 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
   }
 }
 
-class _StoryWidget extends StatefulWidget {
+class _StoryWidgetModel extends Model {
   final StoryInfo storyInfo;
   final StoryController storyController;
-  final int startingIndex;
 
-  const _StoryWidget({
-    Key key,
-    this.storyInfo,
-    this.storyController,
-    this.startingIndex,
-  })
-      : super(key: key);
+  _StoryWidgetModel({this.storyInfo, this.storyController, int startingIndex}) {
+    _currentIndex = startingIndex;
+    _toggleStartOrStop();
+  }
 
-  @override
-  _StoryWidgetState createState() => new _StoryWidgetState();
-}
-
-class _StoryWidgetState extends State<_StoryWidget> {
   Completer<Null> _stoppingCompleter;
   ChildViewConnection _childViewConnection;
   int _currentIndex;
   bool _shouldBeStopped = true;
 
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.startingIndex;
-    _toggleStartOrStop();
-  }
-
-  @override
-  Widget build(BuildContext context) => new ScopedModelDescendant<HitTestModel>(
-        builder: (
-          BuildContext context,
-          Widget child,
-          HitTestModel hitTestModel,
-        ) =>
-            _childViewConnection == null
-                ? const Offstage()
-                : new ChildView(
-                    hitTestable:
-                        hitTestModel.isStoryHitTestable(widget.storyInfo.id),
-                    connection: _childViewConnection,
-                  ),
-      );
+  ChildViewConnection get childViewConnection => _childViewConnection;
 
   set index(int index) {
     if (_currentIndex != index) {
@@ -714,15 +676,14 @@ class _StoryWidgetState extends State<_StoryWidget> {
     if (_shouldBeStopped) {
       return;
     }
-    log.info('Starting story: ${widget.storyInfo.id}');
+    log.info('Starting story: ${storyInfo.id}');
     bindings.InterfacePair<ViewOwner> viewOwner =
         new bindings.InterfacePair<ViewOwner>();
-    widget.storyController.start(viewOwner.passRequest());
-    setState(() {
-      _childViewConnection = new ChildViewConnection(
-        viewOwner.passHandle(),
-      );
-    });
+    storyController.start(viewOwner.passRequest());
+    _childViewConnection = new ChildViewConnection(
+      viewOwner.passHandle(),
+    );
+    notifyListeners();
   }
 
   void _stop() {
@@ -732,14 +693,39 @@ class _StoryWidgetState extends State<_StoryWidget> {
         return;
       }
       _stoppingCompleter = new Completer<Null>();
-      log.info('Stopping story: ${widget.storyInfo.id}');
-      setState(() {
-        _childViewConnection = null;
-      });
-      widget.storyController.stop(() {
+      log.info('Stopping story: ${storyInfo.id}');
+      _childViewConnection = null;
+      notifyListeners();
+      storyController.stop(() {
         _stoppingCompleter.complete();
         _stoppingCompleter = null;
       });
     }
   }
+}
+
+class _StoryWidget extends StatelessWidget {
+  final _StoryWidgetModel model;
+
+  const _StoryWidget({this.model});
+
+  @override
+  Widget build(BuildContext context) => new AnimatedBuilder(
+        animation: model,
+        builder: (BuildContext context, Widget child) =>
+            new ScopedModelDescendant<HitTestModel>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                HitTestModel hitTestModel,
+              ) =>
+                  model.childViewConnection == null
+                      ? const Offstage()
+                      : new ChildView(
+                          hitTestable: hitTestModel
+                              .isStoryHitTestable(model.storyInfo.id),
+                          connection: model.childViewConnection,
+                        ),
+            ),
+      );
 }

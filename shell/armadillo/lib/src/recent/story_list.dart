@@ -14,7 +14,6 @@ import 'armadillo_drag_target.dart';
 import 'armadillo_overlay.dart';
 import 'focus_model.dart';
 import 'render_story_list_body.dart';
-import 'story.dart';
 import 'story_cluster.dart';
 import 'story_cluster_drag_data.dart';
 import 'story_cluster_entrance_transition_model.dart';
@@ -165,7 +164,6 @@ class StoryList extends StatelessWidget {
           context,
           storyModel,
           storyCluster,
-          storyCluster.buildStoryWidgets(context),
         );
       });
 
@@ -173,7 +171,6 @@ class StoryList extends StatelessWidget {
     BuildContext context,
     StoryModel storyModel,
     StoryCluster storyCluster,
-    Map<StoryId, Widget> storyWidgets,
   ) =>
       _wrapWithModels(
         storyCluster,
@@ -189,8 +186,6 @@ class StoryList extends StatelessWidget {
               child: _createStoryCluster(
                 storyModel,
                 storyCluster,
-                storyCluster.focusModel.value,
-                storyWidgets,
               ),
             ),
       );
@@ -224,13 +219,10 @@ class StoryList extends StatelessWidget {
   Widget _createStoryCluster(
     StoryModel storyModel,
     StoryCluster storyCluster,
-    double progress,
-    Map<StoryId, Widget> storyWidgets,
   ) =>
       new RepaintBoundary(
         child: new StoryClusterWidget(
           overlayKey: overlayKey,
-          focusProgress: progress,
           storyCluster: storyCluster,
           onAccept: () {
             if (!_inFocus(storyCluster)) {
@@ -239,7 +231,6 @@ class StoryList extends StatelessWidget {
           },
           onTap: () => _onGainFocus(storyModel, storyCluster),
           onVerticalEdgeHover: onStoryClusterVerticalEdgeHover,
-          storyWidgets: storyWidgets,
         ),
       );
 

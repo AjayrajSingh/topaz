@@ -22,7 +22,7 @@ const double _kPartMargin = 8.0;
 const bool _kShowTitleOnly = true;
 
 /// The bar to be shown at the top of a story.
-class StoryBar extends StatefulWidget {
+class StoryBar extends StatelessWidget {
   /// The [Story] this bar represents.
   final Story story;
 
@@ -37,29 +37,21 @@ class StoryBar extends StatefulWidget {
 
   /// Constructor.
   const StoryBar({
-    Key key,
     this.story,
     this.showTitleOnly: _kShowTitleOnly,
     this.elevation,
     this.borderRadius,
-  })
-      : super(key: key);
+  });
 
-  @override
-  _StoryBarState createState() => new _StoryBarState();
-}
-
-/// Holds the simulations for focus and height transitions.
-class _StoryBarState extends State<StoryBar> {
   @override
   Widget build(BuildContext context) =>
       SizeModel.kStoryBarMinimizedHeight == 0.0 &&
               SizeModel.kStoryBarMaximizedHeight == 0.0
           ? Nothing.widget
           : new PhysicalModel(
-              color: widget.story.themeColor,
-              elevation: widget.elevation,
-              borderRadius: widget.borderRadius,
+              color: story.themeColor,
+              elevation: elevation,
+              borderRadius: borderRadius,
               child: new ScopedModelDescendant<StoryBarHeightModel>(
                 builder: (
                   _,
@@ -73,6 +65,7 @@ class _StoryBarState extends State<StoryBar> {
                         StoryBarFocusModel storyBarFocusModel,
                       ) =>
                           _buildStoryBar(
+                            context,
                             storyBarHeightModel.value,
                             storyBarFocusModel.value,
                           ),
@@ -81,11 +74,12 @@ class _StoryBarState extends State<StoryBar> {
             );
 
   Widget _buildStoryBar(
+    BuildContext context,
     double heightValue,
     double focusValue,
   ) =>
       new Container(
-        color: widget.story.themeColor,
+        color: story.themeColor,
         height: heightValue - focusValue,
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         margin: new EdgeInsets.only(bottom: focusValue),
@@ -93,10 +87,10 @@ class _StoryBarState extends State<StoryBar> {
           minHeight: SizeModel.kStoryBarMaximizedHeight,
           maxHeight: SizeModel.kStoryBarMaximizedHeight,
           alignment: FractionalOffset.topCenter,
-          child: widget.showTitleOnly
+          child: showTitleOnly
               ? new Center(
                   child: new StoryTitle(
-                    title: widget.story.title,
+                    title: story.title,
                     opacity: _opacity(heightValue),
                     baseColor: _textColor,
                   ),
@@ -118,7 +112,7 @@ class _StoryBarState extends State<StoryBar> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
-                          children: widget.story.icons
+                          children: story.icons
                               .map(
                                 (OpacityBuilder builder) => builder(
                                       context,
@@ -133,7 +127,7 @@ class _StoryBarState extends State<StoryBar> {
                       new LayoutId(
                         id: ThreeColumnAlignedLayoutDelegateParts.center,
                         child: new StoryTitle(
-                          title: widget.story.title,
+                          title: story.title,
                           opacity: _opacity(heightValue),
                           baseColor: _textColor,
                         ),
@@ -153,9 +147,9 @@ class _StoryBarState extends State<StoryBar> {
   Color get _textColor {
     // See http://www.w3.org/TR/AERT#color-contrast for the details of this
     // algorithm.
-    int brightness = (((widget.story.themeColor.red * 299) +
-                (widget.story.themeColor.green * 587) +
-                (widget.story.themeColor.blue * 114)) /
+    int brightness = (((story.themeColor.red * 299) +
+                (story.themeColor.green * 587) +
+                (story.themeColor.blue * 114)) /
             1000)
         .round();
 

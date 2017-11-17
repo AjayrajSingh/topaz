@@ -21,7 +21,7 @@ class PlaceHolderStory extends Story {
   PlaceHolderStory({this.associatedStoryId})
       : super(
           id: new StoryId('PlaceHolder $associatedStoryId'),
-          builder: (_) => Nothing.widget,
+          widget: Nothing.widget,
         );
 
   @override

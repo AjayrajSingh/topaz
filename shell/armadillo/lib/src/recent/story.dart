@@ -8,6 +8,7 @@ import 'package:lib.widgets/model.dart';
 import 'panel.dart';
 import 'simulated_fractional.dart';
 import 'simulated_fractionally_sized_box.dart';
+import 'simulated_padding.dart';
 import 'story_bar.dart';
 import 'story_cluster_id.dart';
 import 'story_list.dart';
@@ -22,14 +23,14 @@ class StoryId extends ValueKey<String> {
 typedef Widget OpacityBuilder(BuildContext context, double opacity);
 
 /// The representation of a Story.  A Story's contents are display as a [Widget]
-/// provided by [builder] while the size of a story in the [StoryList] is
+/// provided by [widget] while the size of a story in the [StoryList] is
 /// determined by [lastInteraction] and [cumulativeInteractionDuration].
 class Story {
   /// The Story's ID.
   final StoryId id;
 
-  /// Builds the [Widget] representation of the story.
-  final WidgetBuilder builder;
+  /// The [Widget] representation of the story.
+  final Widget widget;
 
   /// The icons indicating the source of the story.
   final List<OpacityBuilder> icons;
@@ -51,8 +52,8 @@ class Story {
   /// Handles the transition when the story becomes focused.
   final StoryBarFocusModel _storyBarFocusModel = new StoryBarFocusModel();
 
-  /// The key of the padding being applied to the story's story bar.
-  final GlobalKey storyBarPaddingKey;
+  /// The state of the padding being applied to the story's story bar.
+  final SimulatedPaddingModel simulatedPaddingModel;
 
   /// The key of draggable portion of the widget represeting this story.
   final GlobalKey clusterDraggableKey;
@@ -60,8 +61,8 @@ class Story {
   /// The key of container in which this story's widget resides.
   final GlobalKey containerKey;
 
-  /// The key of the container that sizes the story's widget in tab mode.
-  final GlobalKey<SimulatedFractionallySizedBoxState> tabSizerKey;
+  /// The state of the container that sizes the story's widget in tab mode.
+  final SimulatedFractionallySizedBoxModel simulatedFractionallySizedBoxModel;
 
   /// Called when the cluster index of this story changes.
   final ValueChanged<int> onClusterIndexChanged;
@@ -91,7 +92,7 @@ class Story {
   /// Constructor.
   Story({
     this.id,
-    this.builder,
+    this.widget,
     this.title: '',
     this.icons: const <OpacityBuilder>[],
     DateTime lastInteraction,
@@ -100,28 +101,28 @@ class Story {
     this.importance: 1.0,
     this.onClusterIndexChanged,
     StoryClusterId clusterId,
-    GlobalKey storyBarPaddingKey,
+    SimulatedPaddingModel simulatedPaddingState,
     GlobalKey clusterDraggableKey,
     GlobalKey positionedKey,
     GlobalKey containerKey,
-    GlobalKey<SimulatedFractionallySizedBoxState> tabSizerKey,
+    SimulatedFractionallySizedBoxModel simulatedFractionallySizedBoxState,
     Panel panel,
     int clusterIndex,
     StoryBarHeightModel storyBarHeightModel,
     StoryBarFocusModel storyBarFocusModel,
   })
       : clusterId = clusterId ?? new StoryClusterId(),
-        storyBarPaddingKey = storyBarPaddingKey ??
-            new GlobalKey(debugLabel: '$id storyBarPaddingKey'),
+        simulatedPaddingModel =
+            simulatedPaddingState ?? new SimulatedPaddingModel(),
         clusterDraggableKey = clusterDraggableKey ??
             new GlobalKey(debugLabel: '$id clusterDraggableKey'),
         positionedKey =
             positionedKey ?? new GlobalKey(debugLabel: '$id positionedKey'),
         containerKey =
             containerKey ?? new GlobalKey(debugLabel: '$id containerKey'),
-        tabSizerKey = tabSizerKey ??
-            new GlobalKey<SimulatedFractionallySizedBoxState>(
-                debugLabel: '$id tabSizerKey'),
+        simulatedFractionallySizedBoxModel =
+            simulatedFractionallySizedBoxState ??
+                new SimulatedFractionallySizedBoxModel(),
         panel = panel ?? new Panel(),
         lastInteraction = lastInteraction ?? new DateTime.now(),
         _clusterIndex = clusterIndex {
@@ -198,7 +199,7 @@ class Story {
   /// cluster index.
   Story copyWithPanelAndClusterIndex(Story other) => new Story(
         id: id,
-        builder: builder,
+        widget: widget,
         title: title,
         icons: icons,
         lastInteraction: lastInteraction,
@@ -207,11 +208,11 @@ class Story {
         importance: importance,
         onClusterIndexChanged: onClusterIndexChanged,
         clusterId: clusterId,
-        storyBarPaddingKey: storyBarPaddingKey,
+        simulatedPaddingState: simulatedPaddingModel,
         clusterDraggableKey: clusterDraggableKey,
         positionedKey: positionedKey,
         containerKey: containerKey,
-        tabSizerKey: tabSizerKey,
+        simulatedFractionallySizedBoxState: simulatedFractionallySizedBoxModel,
         panel: other.panel,
         clusterIndex: other._clusterIndex,
         storyBarFocusModel: _storyBarFocusModel,

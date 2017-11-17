@@ -47,9 +47,6 @@ class StoryPanels extends StatelessWidget {
   /// The overlay to use for this cluster's draggable.
   final GlobalKey<ArmadilloOverlayState> overlayKey;
 
-  /// The widgets for this cluster's stories.
-  final Map<StoryId, Widget> storyWidgets;
-
   /// The size the cluster's widget should be.
   final Size currentSize;
 
@@ -62,7 +59,6 @@ class StoryPanels extends StatelessWidget {
     this.storyCluster,
     this.focusProgress,
     this.overlayKey,
-    this.storyWidgets,
     this.currentSize,
     this.isBeingDragged: false,
   })
@@ -124,7 +120,7 @@ class StoryPanels extends StatelessWidget {
     List<Widget> stackChildren = <Widget>[]..addAll(
         sortedStories.map(
           (Story story) {
-            List<double> fractionalPadding = _getStoryBarPadding(
+            _setStoryBarPadding(
               story: story,
               width: currentSize.width,
             );
@@ -146,8 +142,6 @@ class StoryPanels extends StatelessWidget {
                     _getStory(
                       context,
                       story,
-                      fractionalPadding[0],
-                      fractionalPadding[1],
                       currentSize,
                       storyDragTransitionModel.value,
                       focusProgress,
@@ -170,9 +164,7 @@ class StoryPanels extends StatelessWidget {
     BuildContext context,
     Story story,
     Widget child,
-    double fractionalLeftPadding,
   }) {
-    final Widget storyWidget = storyWidgets[story.id];
     bool onFirstHoverCalled = false;
     Map<StoryId, Panel> storyPanelsOnDrag = <StoryId, Panel>{};
     List<StoryId> storyListOrderOnDrag = <StoryId>[];
@@ -312,10 +304,9 @@ class StoryPanels extends StatelessWidget {
                 key: storyCluster.dragFeedbackKey,
                 overlayKey: overlayKey,
                 storyCluster: storyCluster,
-                storyWidgets: <StoryId, Widget>{story.id: storyWidget},
                 localDragStartPoint: localDragStartPoint,
                 initialSize: initialSize,
-                initDx: -fractionalLeftPadding,
+                initDx: -story.simulatedPaddingModel.left,
               );
             },
             child: child,
@@ -327,8 +318,6 @@ class StoryPanels extends StatelessWidget {
   Widget _getStory(
     BuildContext context,
     Story story,
-    double fractionalLeftPadding,
-    double fractionalRightPadding,
     Size currentSize,
     double dragProgress,
     double focusProgress,
@@ -348,6 +337,15 @@ class StoryPanels extends StatelessWidget {
     story.storyBarFocus = (storyCluster.displayMode == DisplayMode.panels) ||
         (storyCluster.focusedStoryId == story.id);
 
+    // TODO(SY-291): Remove the lerpDouble from 1.03 to 1.0 and
+    // just use 1.0.  This was added to zoom the story in slightly
+    // to hide Mondrain's drag bars.
+    story.simulatedFractionallySizedBoxModel.target =
+        (storyCluster.focusedStoryId == story.id ||
+                storyCluster.displayMode == DisplayMode.panels)
+            ? lerpDouble(1.03, 1.0, focusProgress)
+            : 0.0;
+
     return story.isPlaceHolder
         ? Nothing.widget
         : new Column(
@@ -355,9 +353,7 @@ class StoryPanels extends StatelessWidget {
             children: <Widget>[
               // The story bar that pushes down the story.
               new SimulatedPadding(
-                key: story.storyBarPaddingKey,
-                fractionalLeftPadding: fractionalLeftPadding,
-                fractionalRightPadding: fractionalRightPadding,
+                model: story.simulatedPaddingModel,
                 width: currentSize.width,
                 child: new GestureDetector(
                   onTap: () {
@@ -369,8 +365,8 @@ class StoryPanels extends StatelessWidget {
                       for (Story story in storyCluster.stories) {
                         bool storyFocused =
                             (storyCluster.focusedStoryId == story.id);
-                        story.tabSizerKey.currentState
-                            .jump(heightFactor: storyFocused ? 1.0 : 0.0);
+                        story.simulatedFractionallySizedBoxModel
+                            .jump(storyFocused ? 1.0 : 0.0);
                         if (storyFocused) {
                           story.positionedKey.currentState
                               .jumpFractionalHeight(1.0);
@@ -385,7 +381,6 @@ class StoryPanels extends StatelessWidget {
                     child: _getStoryBarDraggableWrapper(
                       context: context,
                       story: story,
-                      fractionalLeftPadding: fractionalLeftPadding,
                       child: story.wrapWithModels(
                         child: new StoryBar(
                           story: story,
@@ -400,15 +395,8 @@ class StoryPanels extends StatelessWidget {
               // The story itself.
               new Expanded(
                 child: new SimulatedFractionallySizedBox(
-                  key: story.tabSizerKey,
+                  model: story.simulatedFractionallySizedBoxModel,
                   alignment: FractionalOffset.topCenter,
-                  // TODO(SY-291): Remove the lerpDouble from 1.03 to 1.0 and
-                  // just use 1.0.  This was added to zoom the story in slightly
-                  // to hide Mondrain's drag bars.
-                  heightFactor: (storyCluster.focusedStoryId == story.id ||
-                          storyCluster.displayMode == DisplayMode.panels)
-                      ? lerpDouble(1.03, 1.0, focusProgress)
-                      : 0.0,
                   child: new PhysicalModel(
                     color: _kStoryBackgroundColor,
                     elevation: storyElevationWithTabs,
@@ -467,20 +455,24 @@ class StoryPanels extends StatelessWidget {
           panel: story.panel,
           containerKey: story.containerKey,
           storyBarMaximizedHeight: SizeModel.kStoryBarMaximizedHeight,
-          child: storyWidgets[story.id] ?? story.builder(context),
+          child: story.widget,
         ),
       );
 
-  /// Returns the fractionalLeftPadding [0] and fractionalRightPadding [1] for
+  /// Sets the fractionalLeftPadding [0] and fractionalRightPadding [1] for
   /// the [story].  If [growFocused] is true, the focused story is given double
   /// the width of the other stories.
-  List<double> _getStoryBarPadding({
+  void _setStoryBarPadding({
     Story story,
     double width,
     bool growFocused: _kGrowFocusedTab,
   }) {
     if (storyCluster.displayMode == DisplayMode.panels) {
-      return <double>[0.0, 0.0];
+      story.simulatedPaddingModel.update(
+        fractionalLeftPadding: 0.0,
+        fractionalRightPadding: 0.0,
+      );
+      return;
     }
     int storyBarGaps = storyCluster.stories.length - 1;
     int spaces = _kGrowFocusedTab
@@ -507,6 +499,10 @@ class StoryPanels extends StatelessWidget {
             ? 2.0 * fractionalWidthPerSpace
             : fractionalWidthPerSpace;
     double right = 1.0 - left - fractionalWidth;
-    return <double>[left, right];
+
+    story.simulatedPaddingModel.update(
+      fractionalLeftPadding: left,
+      fractionalRightPadding: right,
+    );
   }
 }

@@ -184,15 +184,6 @@ class StoryCluster {
         _stories.where((Story story) => story.isPlaceHolder),
       );
 
-  /// Returns [Widget]s for each of the stories in this cluster.
-  Map<StoryId, Widget> buildStoryWidgets(BuildContext context) {
-    Map<StoryId, Widget> storyWidgets = <StoryId, Widget>{};
-    for (Story story in stories) {
-      storyWidgets[story.id] = story.builder(context);
-    }
-    return storyWidgets;
-  }
-
   /// [listener] will be called whenever the list of stories changes.
   void addStoryListListener(VoidCallback listener) {
     _storyListListeners.add(listener);

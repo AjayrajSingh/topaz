@@ -46,9 +46,6 @@ class StoryClusterWidget extends StatelessWidget {
   /// The cluster this [Widget] displays.
   final StoryCluster storyCluster;
 
-  /// The progress of the focus animation for this cluster.
-  final double focusProgress;
-
   /// Called when this cluster has another cluster dropped upon it.
   final VoidCallback onAccept;
 
@@ -62,19 +59,14 @@ class StoryClusterWidget extends StatelessWidget {
   /// The key this [Widget]'s [ArmadilloLongPressDraggable] puts its avatar in.
   final GlobalKey<ArmadilloOverlayState> overlayKey;
 
-  /// The [Widget]s for the stories in this cluster.
-  final Map<StoryId, Widget> storyWidgets;
-
   /// Constructor.
   const StoryClusterWidget({
     Key key,
     this.storyCluster,
-    this.focusProgress,
     this.onAccept,
     this.onTap,
     this.onVerticalEdgeHover,
     this.overlayKey,
-    this.storyWidgets,
   })
       : super(key: key);
 
@@ -117,7 +109,6 @@ class StoryClusterWidget extends StatelessWidget {
                     key: storyCluster.dragFeedbackKey,
                     overlayKey: overlayKey,
                     storyCluster: storyCluster,
-                    storyWidgets: storyWidgets,
                     localDragStartPoint: localDragStartPoint,
                     initialSize: initialSize,
                   ),
@@ -142,7 +133,7 @@ class StoryClusterWidget extends StatelessWidget {
                 child: _getStoryCluster(context),
               ),
               new InlineStoryTitle(
-                focusProgress: focusProgress,
+                focusProgress: storyCluster.focusModel.value,
                 storyCluster: storyCluster,
               ),
             ],
@@ -192,7 +183,7 @@ class StoryClusterWidget extends StatelessWidget {
             child: new PanelDragTargets(
               key: storyCluster.clusterDragTargetsKey,
               scale: _kDragScale,
-              focusProgress: focusProgress,
+              focusProgress: storyCluster.focusModel.value,
               currentSize: currentSize,
               storyCluster: storyCluster,
               onAccept: onAccept,
@@ -205,9 +196,8 @@ class StoryClusterWidget extends StatelessWidget {
                 child: new StoryPanels(
                   key: storyCluster.panelsKey,
                   storyCluster: storyCluster,
-                  focusProgress: focusProgress,
+                  focusProgress: storyCluster.focusModel.value,
                   overlayKey: overlayKey,
-                  storyWidgets: storyWidgets,
                   currentSize: currentSize,
                 ),
               ),
@@ -230,8 +220,8 @@ class StoryClusterWidget extends StatelessWidget {
         ),
       );
 
-  bool get _isUnfocused => focusProgress == 0.0;
-  bool get _isFocused => focusProgress == 1.0;
+  bool get _isUnfocused => storyCluster.focusModel.value == 0.0;
+  bool get _isFocused => storyCluster.focusModel.value == 1.0;
 }
 
 /// The Story Title that hovers below the story itself.

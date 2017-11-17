@@ -101,7 +101,7 @@ class _DummyStoryModel extends StoryModel {
               stories: <Story>[
                 new Story(
                   id: new StoryId('${storyKeys[index]}'),
-                  builder: (_) => new Container(key: storyKeys[index]),
+                  widget: new Container(key: storyKeys[index]),
                   title: '',
                   lastInteraction: new DateTime.now(),
                   cumulativeInteractionDuration: const Duration(minutes: 5),

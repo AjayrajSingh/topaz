@@ -3,23 +3,17 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
 const RK4SpringDescription _kDefaultSimulationDesc =
     const RK4SpringDescription(tension: 750.0, friction: 50.0);
 
-/// Animates a [Padding]'s [fractionalLeftPadding] and [fractionalRightPadding]
+/// Animates a [Padding]'s fractional left padding and fractional right padding
 /// with a spring simulation.
-class SimulatedPadding extends StatefulWidget {
-  /// The description of the spring to use for simulating transitions.
-  final RK4SpringDescription springDescription;
-
-  /// The amount of left padding to apply to [child] given the parent's [width].
-  final double fractionalLeftPadding;
-
-  /// The amount of right padding to apply to [child] given the parent's
-  /// [width].
-  final double fractionalRightPadding;
+class SimulatedPadding extends StatelessWidget {
+  /// The SimulatedPadding's state.
+  final SimulatedPaddingModel model;
 
   /// The parent's width.
   final double width;
@@ -28,55 +22,60 @@ class SimulatedPadding extends StatefulWidget {
   final Widget child;
 
   /// Constructor.
-  const SimulatedPadding({
-    Key key,
-    this.fractionalLeftPadding,
-    this.fractionalRightPadding,
-    this.width,
-    this.springDescription: _kDefaultSimulationDesc,
-    this.child,
-  })
-      : super(key: key);
+  const SimulatedPadding({this.model, this.width, this.child});
 
   @override
-  _SimulatedPaddingState createState() => new _SimulatedPaddingState();
+  Widget build(BuildContext context) => new AnimatedBuilder(
+        animation: model,
+        builder: (BuildContext context, Widget child) => new Padding(
+              padding: new EdgeInsets.only(
+                left: width * model.left.clamp(0.0, double.INFINITY),
+                right: width * model.right.clamp(0.0, double.INFINITY),
+              ),
+              child: child,
+            ),
+        child: child,
+      );
 }
 
-class _SimulatedPaddingState extends TickingState<SimulatedPadding> {
-  RK4SpringSimulation _leftSimulation;
-  RK4SpringSimulation _rightSimulation;
+/// The state of the simulated padding.
+class SimulatedPaddingModel extends TickingModel {
+  /// The description of the spring to use for simulating transitions.
+  final RK4SpringDescription springDescription;
 
-  @override
-  void initState() {
-    super.initState();
-    _leftSimulation = new RK4SpringSimulation(
-      initValue: widget.fractionalLeftPadding,
-      desc: widget.springDescription,
-    );
-    _rightSimulation = new RK4SpringSimulation(
-      initValue: widget.fractionalRightPadding,
-      desc: widget.springDescription,
-    );
-  }
+  final RK4SpringSimulation _leftSimulation;
+  final RK4SpringSimulation _rightSimulation;
 
-  @override
-  void didUpdateWidget(SimulatedPadding oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _leftSimulation.target = widget.fractionalLeftPadding;
-    _rightSimulation.target = widget.fractionalRightPadding;
+  /// Constructor.
+  SimulatedPaddingModel({
+    this.springDescription: _kDefaultSimulationDesc,
+    double fractionalLeftPadding: 0.0,
+    double fractionalRightPadding: 0.0,
+  })
+      : _leftSimulation = new RK4SpringSimulation(
+          initValue: fractionalLeftPadding,
+          desc: springDescription,
+        ),
+        _rightSimulation = new RK4SpringSimulation(
+          initValue: fractionalRightPadding,
+          desc: springDescription,
+        );
+
+  /// Gives new padding targets.
+  void update({
+    double fractionalLeftPadding,
+    double fractionalRightPadding,
+  }) {
+    _leftSimulation.target = fractionalLeftPadding;
+    _rightSimulation.target = fractionalRightPadding;
     startTicking();
   }
 
-  @override
-  Widget build(BuildContext context) => new Padding(
-        padding: new EdgeInsets.only(
-          left:
-              widget.width * _leftSimulation.value.clamp(0.0, double.INFINITY),
-          right:
-              widget.width * _rightSimulation.value.clamp(0.0, double.INFINITY),
-        ),
-        child: widget.child,
-      );
+  /// The left fractional padding.
+  double get left => _leftSimulation.value;
+
+  /// The right fractional padding.
+  double get right => _rightSimulation.value;
 
   @override
   bool handleTick(double elapsedSeconds) {

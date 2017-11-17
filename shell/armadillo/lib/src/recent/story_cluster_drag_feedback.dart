@@ -31,9 +31,6 @@ class StoryClusterDragFeedback extends StatefulWidget {
   /// The key of the overlay this feedback has been added to.
   final GlobalKey<ArmadilloOverlayState> overlayKey;
 
-  /// The widgets for the stories in the cluster being dragged.
-  final Map<StoryId, Widget> storyWidgets;
-
   /// Where the drag began relative to the cluster's widget's coordinate system.
   final Offset localDragStartPoint;
 
@@ -48,14 +45,12 @@ class StoryClusterDragFeedback extends StatefulWidget {
     Key key,
     @required this.overlayKey,
     @required this.storyCluster,
-    @required this.storyWidgets,
     @required this.localDragStartPoint,
     @required this.initialSize,
     this.initDx: 0.0,
   })
       : assert(overlayKey != null),
         assert(storyCluster != null),
-        assert(storyWidgets != null),
         assert(localDragStartPoint != null),
         assert(initialSize != null),
         super(key: key);
@@ -271,7 +266,6 @@ class StoryClusterDragFeedbackState extends State<StoryClusterDragFeedback> {
                             storyCluster: widget.storyCluster,
                             focusProgress: 0.0,
                             overlayKey: widget.overlayKey,
-                            storyWidgets: widget.storyWidgets,
                             currentSize: panelsCurrentSize,
                             isBeingDragged: true,
                           ),
