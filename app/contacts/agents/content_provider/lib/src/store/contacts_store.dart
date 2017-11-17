@@ -82,6 +82,9 @@ class ContactsStore<T> {
   /// Return the contact that matches the given [id] otherwise return null
   T getContact(String id) => _contactMap[id];
 
+  /// Return whether or not the store contains a contact with the given [id]
+  bool containsContact(String id) => _contactMap.containsKey(id);
+
   /// Searches through all searchable values that start with the given [prefix]
   /// Returns a map with the matching strings as keys and the contacts
   /// associated with each matched string as its value.

@@ -141,4 +141,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
   /// Note: Completing the future with an error will raise an unhandled
   /// exception. Subclasses should handle recoverable errors internally.
   Future<Null> onRunTask(String taskId) async => null;
+
+  /// The Application Context
+  ApplicationContext get applicationContext => _applicationContext;
 }

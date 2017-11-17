@@ -11,17 +11,19 @@ import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.entity.fidl/entity_provider.fidl.dart';
 import 'package:lib.entity.fidl/entity_reference_factory.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.modular/ledger.dart';
+import 'package:entity_schemas/entities.dart' as entities;
 import 'package:meta/meta.dart';
 import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
     as fidl;
 
 import '../store/contacts_store.dart';
 import 'contacts_watcher.dart';
+import 'entity_helpers.dart';
 
 const String _kDataProvidersConfig =
     '/system/data/contacts/data_providers.json';
@@ -46,7 +48,8 @@ class _DataProvider {
 }
 
 /// Initial stub implementation
-class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
+class ContactsContentProviderImpl extends fidl.ContactsContentProvider
+    implements EntityProvider {
   /// Map of [fidl.ContactsDataProvider] sourceIds to the [_DataProvider]
   /// information
   final Map<String, _DataProvider> _dataProviders = <String, _DataProvider>{};
@@ -54,10 +57,6 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
   /// Store for the consolidated contacts information
   final ContactsStore<fidl.Contact> _contactsStore =
       new ContactsStore<fidl.Contact>();
-
-  /// Store of the request bindings to this impl
-  final List<fidl.ContactsContentProviderBinding> _bindings =
-      <fidl.ContactsContentProviderBinding>[];
 
   /// [ComponentContext] used for interfacing with Ledger
   final ComponentContext _componentContext;
@@ -183,20 +182,32 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider {
     callback(status, entityReference);
   }
 
-  /// Add request to the list of binding objects.
-  void addBinding(InterfaceRequest<fidl.ContactsContentProvider> request) {
-    _bindings
-        .add(new fidl.ContactsContentProviderBinding()..bind(this, request));
+  // Entity Provider methods
+  /// Get the types that the contacts content provider supports.
+  /// For contacts, [cookie] maps to a contact's contactId
+  @override
+  void getTypes(String cookie, void callback(List<String> types)) {
+    List<String> types = <String>[];
+    if (_contactsStore.containsContact(cookie)) {
+      types.add(entities.Contact.getType());
+    }
+    callback(types);
   }
 
-  /// Close all the bindings and connections
-  void close() {
-    // Close bindings
-    for (fidl.ContactsContentProviderBinding binding in _bindings) {
-      binding.close();
+  /// Get the data for the entity specified by [type].
+  /// For contacts, [cookie] maps to a contact's contactId
+  @override
+  void getData(String cookie, String type, void callback(String data)) {
+    String data;
+    fidl.Contact contact = _contactsStore.getContact(cookie);
+    if (contact != null && type == entities.Contact.getType()) {
+      data = getEntityFromContact(contact).toJson();
     }
-    _bindings.clear();
+    callback(data);
+  }
 
+  /// Close all connections
+  void close() {
     // Close all data provider agent connections
     for (_DataProvider dataProvider in _dataProviders.values) {
       dataProvider.dataProviderProxy.ctrl.close();

@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:lib.entity.fidl/entity_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.modular/modular.dart';
@@ -17,13 +18,38 @@ ContactsContentProviderAgent _agent;
 
 /// Contacts content provider implementation of the [Agent] interface.
 class ContactsContentProviderAgent extends AgentImpl {
+  /// Implementation of the contacts content provider and entity provider
+  /// interfaces
   ContactsContentProviderImpl _contentProviderImpl;
+
+  /// Store of the request bindings to the impl
+  final List<Binding<Object>> _bindings = <Binding<Object>>[];
 
   /// Create a new instance of [ContactsContentProviderAgent].
   ContactsContentProviderAgent({
     @required ApplicationContext applicationContext,
   })
       : super(applicationContext: applicationContext);
+
+  @override
+  void advertise() {
+    super.advertise();
+
+    // Add impl for processing Entity Provider service requests to the
+    // application context outgoing services which differs from the
+    // ServiceProviderImpl's outgoing services
+    applicationContext.outgoingServices.addServiceForName(
+      (InterfaceRequest<EntityProvider> request) {
+        log.fine('Received an EntityProvider request');
+        _bindings.add(
+          new EntityProviderBinding()..bind(_contentProviderImpl, request),
+        );
+      },
+      EntityProvider.serviceName,
+    );
+
+    log.fine('Added entity provider implementation to outgoing services');
+  }
 
   @override
   Future<Null> onReady(
@@ -45,7 +71,10 @@ class ContactsContentProviderAgent extends AgentImpl {
     outgoingServices.addServiceForName(
       (InterfaceRequest<ContactsContentProvider> request) {
         log.fine('Received a ContactsContentProvider request');
-        _contentProviderImpl.addBinding(request);
+        _bindings.add(
+          new ContactsContentProviderBinding()
+            ..bind(_contentProviderImpl, request),
+        );
       },
       ContactsContentProvider.serviceName,
     );
@@ -54,6 +83,10 @@ class ContactsContentProviderAgent extends AgentImpl {
 
   @override
   Future<Null> onStop() async {
+    for (Binding<Object> binding in _bindings) {
+      binding.close();
+    }
+    _bindings.clear();
     _contentProviderImpl?.close();
   }
 }

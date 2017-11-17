@@ -231,6 +231,29 @@ void main() {
         }
       });
     });
+
+    group('containsContact', () {
+      ContactsStore<_MockContact> store;
+      _MockContact c;
+
+      setUp(() {
+        store = new ContactsStore<_MockContact>();
+        c = new _MockContact(id: 'id123', displayName: 'name', email: 'email');
+        store.addContact(c.id, c.displayName, <String>[c.email], c);
+      });
+
+      tearDown(() {
+        store = null;
+      });
+
+      test('should return true if contact is in store', () {
+        expect(store.containsContact(c.id), isTrue);
+      });
+
+      test('should return false if contact is not in store', () {
+        expect(store.containsContact('does not exist'), isFalse);
+      });
+    });
   });
 }
 
