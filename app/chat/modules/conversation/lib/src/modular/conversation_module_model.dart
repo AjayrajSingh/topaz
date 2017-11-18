@@ -18,7 +18,7 @@ import 'package:lib.fidl.dart/bindings.dart' hide Message;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
-import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
+import 'package:lib.module_resolver.dart/daisy_builder.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.widgets/modular.dart';
@@ -491,17 +491,14 @@ class ChatConversationModuleModel extends ModuleModel {
                 'members': members,
               };
 
-              // Setup Daisy.
-              Daisy daisy = new Daisy()
-                ..verb = 'com.google.fuchsia.codelab.$verb'
-                ..nouns = <String, Noun>{};
-              daisy.nouns['originalMessage'] = new Noun()
-                ..json = JSON.encode(messageEntity);
-              daisy.nouns['members'] = new Noun()
-                ..json = JSON.encode(membersEntity);
+              // Create a Daisy.
+              DaisyBuilder daisyBuilder = new DaisyBuilder.verb(
+                  'com.google.fuchsia.codelab.$verb')
+                ..addNoun('originalMessage', messageEntity)
+                ..addNoun('members', membersEntity);
 
               embedder.startDaisy(
-                daisy: daisy,
+                daisy: daisyBuilder.daisy,
                 name: id,
               );
             }
