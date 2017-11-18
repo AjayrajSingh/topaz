@@ -50,12 +50,18 @@ class FocusedStoriesTracker extends ChangeNotifier {
   String get focusedStoryId => _focusedStoryId;
 
   void _onStoryListChanged() {
-    List<String> newFocusedStoryIds = (_lastFocusedStoryCluster?.stories
+    /// Only real stories are valid for story focus/visibility purposes.
+    List<String> newFocusedStoryIds = (_lastFocusedStoryCluster?.realStories
             ?.map<String>((Story story) => story.id.value)
             ?.toList() ??
         <String>[])
       ..sort();
     String newFocusedStoryId = _lastFocusedStoryCluster?.focusedStoryId?.value;
+
+    /// Ensure we're not focused on a place holder story.
+    if (!newFocusedStoryIds.contains(newFocusedStoryId)) {
+      newFocusedStoryId = null;
+    }
     if (!_kStringListEquality.equals(_focusedStoryIds, newFocusedStoryIds) ||
         newFocusedStoryId != _focusedStoryId) {
       _focusedStoryIds = newFocusedStoryIds;
