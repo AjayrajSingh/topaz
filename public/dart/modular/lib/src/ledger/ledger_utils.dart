@@ -7,9 +7,10 @@ import 'dart:collection';
 import 'dart:convert' show JSON, UTF8;
 import 'dart:math' show Random;
 import 'dart:typed_data' show Uint8List;
-import 'dart:zircon' show ZX, Vmo, GetSizeResult, ReadResult;
+import 'dart:zircon' show ZX, ReadResult;
 
 import 'package:collection/collection.dart';
+import 'package:lib.fsl.fidl/sized_vmo_transport.fidl.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:quiver/core.dart' as quiver;
 
@@ -19,21 +20,16 @@ import 'package:quiver/core.dart' as quiver;
 /// Encodes the given value first into a JSON string and then encode in UTF8.
 List<int> encodeLedgerValue(Object value) => UTF8.encode(JSON.encode(value));
 
-/// Decodes the given [Vmo] into a Dart Object. This assumes that the data held
-/// in the given [Vmo] is encoded in JSON and UTF8.
+/// Decodes the given [SizedVmoTransport] into a Dart Object. This assumes that
+/// the data held in the given [SizedVmoTransport] is encoded in JSON and UTF8.
 ///
 /// This throws an exception when it fails to decode the given data.
-dynamic decodeLedgerValue(Vmo value) {
-  GetSizeResult sizeResult = value.getSize();
-  if (sizeResult.status != ZX.OK) {
-    throw new Exception('Unable to retrieve vmo size: ${sizeResult.status}');
-  }
-
-  ReadResult readResult = value.read(sizeResult.size);
+dynamic decodeLedgerValue(SizedVmoTransport value) {
+  ReadResult readResult = value.vmo.read(value.size);
   if (readResult.status != ZX.OK) {
     throw new Exception('Unable to read from vmo: ${readResult.status}');
   }
-  if (readResult.bytes.lengthInBytes != sizeResult.size) {
+  if (readResult.bytes.lengthInBytes != value.size) {
     throw new Exception('Unexpected count of bytes read.');
   }
 

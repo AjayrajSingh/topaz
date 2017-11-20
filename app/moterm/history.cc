@@ -30,9 +30,13 @@ std::string ToString(fidl::Array<uint8_t>& data) {
   return ret;
 }
 
-std::string ToString(const zx::vmo& value) {
+std::string ToString(fsl::SizedVmoTransportPtr value) {
+  fsl::SizedVmo vmo;
+  if (!fsl::SizedVmo::FromTransport(std::move(value), &vmo)) {
+    FXL_DCHECK(false);
+  }
   std::string ret;
-  if (!fsl::StringFromVmo(value, &ret)) {
+  if (!fsl::StringFromVmo(vmo, &ret)) {
     FXL_DCHECK(false);
   }
   return ret;
@@ -140,7 +144,7 @@ void History::DoReadEntries(
 
     std::vector<std::string> results;
     for (auto& entry : entries) {
-      results.push_back(ToString(entry->value));
+      results.push_back(ToString(std::move(entry->value)));
     }
     callback(std::move(results));
   });
@@ -173,7 +177,7 @@ void History::OnChange(ledger::PageChangePtr page_change,
     if (local_entry_keys_.count(ToString(entry->key)) == 0) {
       // Notify clients about the remote entry.
       for (Client* client : clients_) {
-        client->OnRemoteEntry(ToString(entry->value));
+        client->OnRemoteEntry(ToString(std::move(entry->value)));
       }
     } else {
       local_entry_keys_.erase(ToString(entry->key));
