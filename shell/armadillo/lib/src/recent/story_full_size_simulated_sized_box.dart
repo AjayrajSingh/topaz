@@ -18,9 +18,6 @@ class StoryFullSizeSimulatedSizedBox extends StatelessWidget {
   /// The widget whose size should be simulated.
   final Widget child;
 
-  /// The key to use for the [SimulatedFractional].
-  final GlobalKey containerKey;
-
   /// The current display mode of the cluster this story is in.
   final DisplayMode displayMode;
 
@@ -35,7 +32,6 @@ class StoryFullSizeSimulatedSizedBox extends StatelessWidget {
     @required this.child,
     this.displayMode,
     this.panel,
-    this.containerKey,
     this.storyBarMaximizedHeight,
   })
       : assert(child != null);
@@ -44,7 +40,6 @@ class StoryFullSizeSimulatedSizedBox extends StatelessWidget {
   Widget build(BuildContext context) => new ScopedModelDescendant<SizeModel>(
         builder: (BuildContext context, Widget child, SizeModel sizeModel) =>
             new SimulatedFractional(
-              key: containerKey,
               fractionalWidth:
                   displayMode == DisplayMode.panels ? panel.width : 1.0,
               fractionalHeight: ((displayMode == DisplayMode.panels

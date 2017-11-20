@@ -453,7 +453,6 @@ class StoryPanels extends StatelessWidget {
         child: new StoryFullSizeSimulatedSizedBox(
           displayMode: storyCluster.displayMode,
           panel: story.panel,
-          containerKey: story.containerKey,
           storyBarMaximizedHeight: SizeModel.kStoryBarMaximizedHeight,
           child: story.widget,
         ),

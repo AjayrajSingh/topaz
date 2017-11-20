@@ -32,13 +32,26 @@ const double _kOverscrollSnapDragDistanceThreshold = 200.0;
 
 /// Builds recents.
 class RecentsBuilder {
-  final GlobalKey<ScrollLockerState> _scrollLockerKey =
-      new GlobalKey<ScrollLockerState>();
+  final ScrollLockerModel _scrollLockerModel = new ScrollLockerModel();
   final GlobalKey<ArmadilloOverlayState> _overlayKey =
       new GlobalKey<ArmadilloOverlayState>();
-  final GlobalKey<EdgeScrollDragTargetState> _edgeScrollDragTargetKey =
-      new GlobalKey<EdgeScrollDragTargetState>();
-  final ScrollController _scrollController = new ScrollController();
+  final EdgeScrollDragTargetModel _edgeScrollDragTargetModel;
+  final ScrollController _scrollController;
+
+  /// Constructor.
+  factory RecentsBuilder() {
+    ScrollController scrollController = new ScrollController();
+    return new RecentsBuilder._create(
+        scrollController,
+        new EdgeScrollDragTargetModel(
+          scrollController: scrollController,
+        ));
+  }
+
+  RecentsBuilder._create(
+    this._scrollController,
+    this._edgeScrollDragTargetModel,
+  );
 
   /// Builds recents.
   Widget build(
@@ -81,7 +94,7 @@ class RecentsBuilder {
                   child: new VerticalShifter(
                     verticalShift: NowBuilder.kQuickSettingsHeightBump,
                     child: new ScrollLocker(
-                      key: _scrollLockerKey,
+                      model: _scrollLockerModel,
                       child: new StoryList(
                         scrollController: _scrollController,
                         overlayKey: _overlayKey,
@@ -96,24 +109,21 @@ class RecentsBuilder {
 
           // Top and bottom edge scrolling drag targets.
           new Positioned.fill(
-            child: new EdgeScrollDragTarget(
-              key: _edgeScrollDragTargetKey,
-              scrollController: _scrollController,
-            ),
+            child: new EdgeScrollDragTarget(model: _edgeScrollDragTargetModel),
           ),
         ],
       );
 
   /// Call when a story cluster comes into focus.
   void onStoryFocused() {
-    _scrollLockerKey.currentState.lock();
-    _edgeScrollDragTargetKey.currentState.disable();
+    _scrollLockerModel.lock();
+    _edgeScrollDragTargetModel.disable();
   }
 
   /// Call when a story cluster leaves focus.
   void onStoryUnfocused() {
-    _scrollLockerKey.currentState.unlock();
-    _edgeScrollDragTargetKey.currentState.enable();
+    _scrollLockerModel.unlock();
+    _edgeScrollDragTargetModel.enable();
   }
 
   /// Call to reset the recents scrolling to 0.0.

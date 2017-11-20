@@ -101,10 +101,7 @@ class StoryClusterWidget extends StatelessWidget {
               onDismiss: () => StoryModel.of(context).delete(
                     StoryModel.of(context).getStoryCluster(storyCluster.id),
                   ),
-              feedbackBuilder: (
-                Offset localDragStartPoint,
-                Size initialSize,
-              ) =>
+              feedbackBuilder: (Offset localDragStartPoint, Size initialSize) =>
                   new StoryClusterDragFeedback(
                     key: storyCluster.dragFeedbackKey,
                     overlayKey: overlayKey,

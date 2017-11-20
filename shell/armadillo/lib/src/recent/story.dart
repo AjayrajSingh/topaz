@@ -58,9 +58,6 @@ class Story {
   /// The key of draggable portion of the widget represeting this story.
   final GlobalKey clusterDraggableKey;
 
-  /// The key of container in which this story's widget resides.
-  final GlobalKey containerKey;
-
   /// The state of the container that sizes the story's widget in tab mode.
   final SimulatedFractionallySizedBoxModel simulatedFractionallySizedBoxModel;
 
@@ -104,7 +101,6 @@ class Story {
     SimulatedPaddingModel simulatedPaddingState,
     GlobalKey clusterDraggableKey,
     GlobalKey positionedKey,
-    GlobalKey containerKey,
     SimulatedFractionallySizedBoxModel simulatedFractionallySizedBoxState,
     Panel panel,
     int clusterIndex,
@@ -118,8 +114,6 @@ class Story {
             new GlobalKey(debugLabel: '$id clusterDraggableKey'),
         positionedKey =
             positionedKey ?? new GlobalKey(debugLabel: '$id positionedKey'),
-        containerKey =
-            containerKey ?? new GlobalKey(debugLabel: '$id containerKey'),
         simulatedFractionallySizedBoxModel =
             simulatedFractionallySizedBoxState ??
                 new SimulatedFractionallySizedBoxModel(),
@@ -211,7 +205,6 @@ class Story {
         simulatedPaddingState: simulatedPaddingModel,
         clusterDraggableKey: clusterDraggableKey,
         positionedKey: positionedKey,
-        containerKey: containerKey,
         simulatedFractionallySizedBoxState: simulatedFractionallySizedBoxModel,
         panel: other.panel,
         clusterIndex: other._clusterIndex,

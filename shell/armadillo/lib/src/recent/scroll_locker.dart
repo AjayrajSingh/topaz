@@ -4,43 +4,56 @@
 
 import 'package:flutter/physics.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.widgets/model.dart';
 
 /// Locks and unlocks scrolling in its [child] and its descendants.
-class ScrollLocker extends StatefulWidget {
+class ScrollLocker extends StatelessWidget {
+  /// Holds the state for the ScrollLocker.
+  final ScrollLockerModel model;
+
   /// The Widget whose scrolling will be locked.
   final Widget child;
 
   /// Constructor.
-  const ScrollLocker({Key key, this.child}) : super(key: key);
+  const ScrollLocker({this.model, this.child});
 
   @override
-  ScrollLockerState createState() => new ScrollLockerState();
+  Widget build(BuildContext context) => new AnimatedBuilder(
+        animation: model,
+        builder: (BuildContext context, Widget child) =>
+            new ScrollConfiguration(
+              behavior: model.scrollBehavior,
+              child: child,
+            ),
+        child: child,
+      );
 }
 
 /// The [State] of [ScrollLocker].
-class ScrollLockerState extends State<ScrollLocker> {
+class ScrollLockerModel extends Model {
   /// When true, list scrolling is disabled.
   bool _lockScrolling = false;
 
-  @override
-  Widget build(BuildContext context) => new ScrollConfiguration(
-        behavior: new _LockingScrollBehavior(lock: _lockScrolling),
-        child: widget.child,
-      );
-
   /// Locks the scrolling of [ScrollLocker.child].
   void lock() {
-    setState(() {
+    if (!_lockScrolling) {
       _lockScrolling = true;
-    });
+      notifyListeners();
+    }
   }
 
   /// Unlocks the scrolling of [ScrollLocker.child].
   void unlock() {
-    setState(() {
+    if (_lockScrolling) {
       _lockScrolling = false;
-    });
+      notifyListeners();
+    }
   }
+
+  /// The current scroll behavior.
+  ScrollBehavior get scrollBehavior => new _LockingScrollBehavior(
+        lock: _lockScrolling,
+      );
 }
 
 class _LockingScrollBehavior extends ScrollBehavior {
