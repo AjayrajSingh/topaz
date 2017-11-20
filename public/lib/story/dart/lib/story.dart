@@ -2,5 +2,4 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-export 'src/peridot/link_watcher_impl.dart';
-export 'src/peridot/module_impl.dart';
+export 'src/link_watcher_impl.dart';

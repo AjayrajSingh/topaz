@@ -5,19 +5,19 @@
 import 'package:lib.story.fidl/link.fidl.dart';
 
 /// Called when [LinkWatcher.notify] is called.
-typedef void OnNotify(String json);
+typedef void LinkWatcherNotifyCallback(String data);
 
 /// Implements a [LinkWatcher] for receiving notifications from a [Link]
 /// instance.
 class LinkWatcherImpl extends LinkWatcher {
   /// Called when [LinkWatcher.notify] is called.
-  final OnNotify onNotify;
+  final LinkWatcherNotifyCallback onNotify;
 
   /// Creates a new instance of [LinkWatcherImpl].
   LinkWatcherImpl({this.onNotify});
 
   @override
-  void notify(String json) {
-    onNotify?.call(json);
+  void notify(String data) {
+    onNotify?.call(data);
   }
 }

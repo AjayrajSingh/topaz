@@ -10,10 +10,9 @@ import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:lib.story.dart/story.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
-
-import 'link_watcher_impl.dart';
 
 /// Called when [Module.initialize] occurs.
 typedef void OnModuleReady(
@@ -61,7 +60,7 @@ class ModuleImpl implements Module, Lifecycle {
   final OnModuleStop onStop;
 
   /// Called when [LinkWatcher.notify] is called.
-  final OnNotify onNotify;
+  final LinkWatcherNotifyCallback onNotify;
 
   /// Called when the device map entry for the current device changes.
   final OnDeviceMapChange onDeviceMapChange;
