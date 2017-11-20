@@ -3,12 +3,15 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert' show JSON;
 
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
@@ -18,16 +21,23 @@ import '../../models.dart';
 
 const String _kContactsContentProviderUrl =
     'file:///system/apps/contacts_content_provider';
+const String _kContactCardModuleUrl =
+    'file:///system/apps/contacts/contact_card';
 
 /// Call back definition for [ContactListModuleModel]'s subscribe method.
 typedef void OnSubscribeCallback(List<ContactListItem> newContactList);
 
 /// The [ModuleModel] for the contacts module set.
 class ContactListModuleModel extends ModuleModel {
+  // Proxies for the Contacts Content Provier Agent
   final contacts_fidl.ContactsContentProviderProxy _contactsContentProvider =
       new contacts_fidl.ContactsContentProviderProxy();
   final AgentControllerProxy _contactsContentProviderController =
       new AgentControllerProxy();
+
+  // Proxies for the Contact Card Module
+  final ModuleControllerProxy _contactCardModuleController =
+      new ModuleControllerProxy();
 
   /// The [ContactListModel] that serves as the data store for the UI and
   /// contains the behaviors that users can use to mutate the data
@@ -49,6 +59,9 @@ class ContactListModuleModel extends ModuleModel {
     ComponentContextProxy componentContext = new ComponentContextProxy();
     moduleContext.getComponentContext(componentContext.ctrl.request());
 
+    // Start the contact card module
+    _startContactCardModule();
+
     // Connect to ContactsContentProvider service
     ServiceProviderProxy contentProviderServices = new ServiceProviderProxy();
     componentContext.connectToAgent(
@@ -64,6 +77,28 @@ class ContactListModuleModel extends ModuleModel {
 
     // Fetch the contacts list
     model.contacts = await _getContactList();
+  }
+
+  void _startContactCardModule() {
+    moduleContext.startModuleInShell(
+      'contact_card',
+      _kContactCardModuleUrl,
+      null, // Passes default link to the child
+      null,
+      _contactCardModuleController.ctrl.request(),
+      new SurfaceRelation()
+        ..arrangement = SurfaceArrangement.copresent
+        ..dependency = SurfaceDependency.dependent
+        ..emphasis = 2.0,
+      false,
+    );
+  }
+
+  @override
+  void onNotify(String json) {
+    // TODO (meiyili): read previously selected contact id from link and
+    // highlight it SO-996
+    log.fine('onNotify called');
   }
 
   @override
@@ -111,6 +146,35 @@ class ContactListModuleModel extends ModuleModel {
   /// Clears the search results from the model
   void clearSearchResults() {
     model.searchResults = <ContactListItem>[];
+  }
+
+  /// Handle when a contact is tapped
+  void onContactTapped(ContactListItem contact) {
+    // Make a request to get the entity reference
+    _contactsContentProvider.getEntityReference(
+      contact.id,
+      (contacts_fidl.Status status, String entityReference) {
+        if (status == contacts_fidl.Status.ok) {
+          // Pass the entity reference to the contact card module via link and
+          // save off the contact id for next time the module starts
+          log.fine('Link set: contact_entity_reference to $entityReference, '
+              'contact id to ${contact.id}');
+          link
+            ..set(
+              const <String>['selected_contact_id'],
+              JSON.encode(contact.id),
+            )
+            ..set(
+              const <String>['contact_entity_reference'],
+              JSON.encode(entityReference),
+            );
+        } else {
+          // TODO(meiyili): better error handling
+          String errorMsg = 'Error retrieving entity reference';
+          log.warning(errorMsg);
+        }
+      },
+    );
   }
 
   /// Transform a FIDL Contact object into a ContactListItem

@@ -29,6 +29,7 @@ void main() {
       child: new ContactList(
         onQueryChanged: moduleModel.searchContacts,
         onQueryCleared: moduleModel.clearSearchResults,
+        onContactTapped: moduleModel.onContactTapped,
       ),
     ),
   )..advertise();

@@ -36,13 +36,15 @@ class ContactDetails extends StatelessWidget {
       );
     }
 
-    contactDetails.add(divider);
     for (entities.EmailAddress email in _contact.emailAddresses) {
+      Icon icon = const Icon(null);
+      if (email == _contact.emailAddresses.first) {
+        contactDetails.add(divider);
+        icon = const Icon(Icons.email, size: _kIconSize);
+      }
       contactDetails.add(
         new ListTile(
-          leading: email == _contact.emailAddresses.first
-              ? const Icon(Icons.email, size: _kIconSize)
-              : const Icon(null),
+          leading: icon,
           title: new Text(email.value, style: _kDetail),
           subtitle: new Text(email.label, style: _kLabel),
         ),

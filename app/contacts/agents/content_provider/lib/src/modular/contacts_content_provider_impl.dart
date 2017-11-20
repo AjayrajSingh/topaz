@@ -187,8 +187,11 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   /// For contacts, [cookie] maps to a contact's contactId
   @override
   void getTypes(String cookie, void callback(List<String> types)) {
+    log.fine('getTypes called with cookie = $cookie');
+
     List<String> types = <String>[];
     if (_contactsStore.containsContact(cookie)) {
+      log.fine('contacts store has the contact');
       types.add(entities.Contact.getType());
     }
     callback(types);
@@ -198,11 +201,15 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   /// For contacts, [cookie] maps to a contact's contactId
   @override
   void getData(String cookie, String type, void callback(String data)) {
+    log.fine('getData called with cookie = $cookie and type = $type');
+
     String data;
     fidl.Contact contact = _contactsStore.getContact(cookie);
     if (contact != null && type == entities.Contact.getType()) {
-      data = getEntityFromContact(contact).toJson();
+      data = getEntityFromContact(contact).toData();
     }
+
+    log.fine('Retrieved contact = $contact');
     callback(data);
   }
 

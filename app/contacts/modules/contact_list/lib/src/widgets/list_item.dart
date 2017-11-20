@@ -9,6 +9,9 @@ import 'package:meta/meta.dart';
 
 import '../models/contact_list_item.dart';
 
+/// The function that will be called when a contact is tapped
+typedef void ContactTappedAction(ContactListItem contact);
+
 /// A UI widget representing the list item in the contact list
 ///
 /// Shows a letter if it is the first item starting with that character,
@@ -17,6 +20,9 @@ class ListItem extends StatelessWidget {
   /// The contact information to display
   final ContactListItem contact;
 
+  /// Handle user tap on the list item
+  final ContactTappedAction onContactTapped;
+
   /// Boolean representing if this is the first list item
   final bool isFirstInCategory;
 
@@ -24,6 +30,7 @@ class ListItem extends StatelessWidget {
   const ListItem({
     Key key,
     @required this.contact,
+    @required this.onContactTapped,
     this.isFirstInCategory = false,
   })
       : assert(contact != null),
@@ -31,30 +38,35 @@ class ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Row(
-      children: <Widget>[
-        new Container(
-          margin: const EdgeInsets.only(left: 10.0),
-          width: 40.0,
-          child: new Center(
-            child: new Text(isFirstInCategory ? contact.firstLetter : ''),
+    return new GestureDetector(
+      child: new Row(
+        children: <Widget>[
+          new Container(
+            margin: const EdgeInsets.only(left: 10.0),
+            width: 40.0,
+            child: new Center(
+              child: new Text(isFirstInCategory ? contact.firstLetter : ''),
+            ),
           ),
-        ),
-        new Container(
-          margin: const EdgeInsets.all(10.0),
-          width: 40.0,
-          child: new Alphatar.fromNameAndUrl(
-            name: contact.displayName,
-            avatarUrl: contact.photoUrl,
+          new Container(
+            margin: const EdgeInsets.all(10.0),
+            width: 40.0,
+            child: new Alphatar.fromNameAndUrl(
+              name: contact.displayName,
+              avatarUrl: contact.photoUrl,
+            ),
           ),
-        ),
-        new Flexible(
-          child: new Text(
-            contact.displayName,
-            overflow: TextOverflow.ellipsis,
+          new Flexible(
+            child: new Text(
+              contact.displayName,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        )
-      ],
+        ],
+      ),
+      onTap: () {
+        onContactTapped(contact);
+      },
     );
   }
 }

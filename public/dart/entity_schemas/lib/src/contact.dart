@@ -86,6 +86,12 @@ class Contact {
     }
   }
 
+  /// Instantiate a contact from the data string provided by the entity
+  /// framework
+  factory Contact.fromData(String data) {
+    return new Contact.fromJson(data);
+  }
+
   /// Get the type of this entity
   static String getType() => _kType;
 
@@ -128,5 +134,11 @@ class Contact {
         phoneNumbers.map((PhoneNumber n) => n.toJson()).toList();
 
     return JSON.encode(json);
+  }
+
+  /// Encode the entity into the data string to be passed around by the entity
+  /// framework
+  String toData() {
+    return toJson();
   }
 }

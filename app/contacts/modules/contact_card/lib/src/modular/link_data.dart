@@ -18,8 +18,9 @@ class LinkData {
   /// malformed it will return null
   factory LinkData.fromJson(String json) {
     Object decodedJson = JSON.decode(json);
-    if (decodedJson is Map && decodedJson['entityReference'] != null) {
-      return new LinkData(entityReference: decodedJson['entityReference']);
+    if (decodedJson is Map && decodedJson['contact_entity_reference'] != null) {
+      return new LinkData(
+          entityReference: decodedJson['contact_entity_reference']);
     } else {
       return null;
     }

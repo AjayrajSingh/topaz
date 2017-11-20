@@ -28,14 +28,19 @@ class ContactList extends StatefulWidget {
   /// Method to call to clear the search results list
   final ClearSearchResultsAction onQueryCleared;
 
+  /// Method to call when the user taps on a contact item
+  final ContactTappedAction onContactTapped;
+
   /// Creates a new instance of [ContactList]
   const ContactList({
     Key key,
     @required this.onQueryChanged,
     @required this.onQueryCleared,
+    @required this.onContactTapped,
   })
       : assert(onQueryChanged != null),
         assert(onQueryCleared != null),
+        assert(onContactTapped != null),
         super(key: key);
 
   @override
@@ -211,6 +216,7 @@ class _ContactListState extends State<ContactList>
       children: model.contacts.map((ContactListItem c) {
         return new ListItem(
           contact: c,
+          onContactTapped: widget.onContactTapped,
           isFirstInCategory: model.firstItems.contains(c),
         );
       }).toList(),
@@ -222,6 +228,7 @@ class _ContactListState extends State<ContactList>
       children: model.searchResults.map((ContactListItem c) {
         return new ListItem(
           contact: c,
+          onContactTapped: widget.onContactTapped,
           isFirstInCategory: model.firstItems.contains(c),
         );
       }).toList(),
