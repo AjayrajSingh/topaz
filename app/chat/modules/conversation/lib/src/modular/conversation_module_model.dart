@@ -79,6 +79,9 @@ class ChatConversationModuleModel extends ModuleModel {
   bool _fetchingConversation = false;
   final Completer<Null> _readyCompleter = new Completer<Null>();
 
+  /// Gets the conversation title.
+  String get title => _conversation?.title;
+
   /// The key to be used for scaffold.
   GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -339,6 +342,7 @@ class ChatConversationModuleModel extends ModuleModel {
       String event = decoded['event'];
       List<int> conversationId = decoded['conversation_id'];
       List<int> messageId = decoded['message_id'];
+      String title = decoded['title'];
 
       switch (event) {
         case 'add':
@@ -377,6 +381,11 @@ class ChatConversationModuleModel extends ModuleModel {
               ..removeWhere((chat_fidl.Message m) =>
                   _intListEquality.equals(m.messageId, messageId)));
           }
+          break;
+
+        case 'title':
+          _conversation?.title = title;
+          notifyListeners();
           break;
 
         default:
@@ -702,6 +711,19 @@ class ChatConversationModuleModel extends ModuleModel {
     } on Exception catch (e, stackTrace) {
       log.severe('Could not parse the child Link data: $json', e, stackTrace);
     }
+  }
+
+  /// Sets the current conversation title to the specified one.
+  void setConversationTitle(String title) {
+    _chatContentProvider.setConversationTitle(
+      conversationId,
+      title,
+      (chat_fidl.ChatStatus status) {
+        if (status != chat_fidl.ChatStatus.ok) {
+          showError('Error while setting conversation title: $status');
+        }
+      },
+    );
   }
 
   /// Sends a new message to the current conversation.

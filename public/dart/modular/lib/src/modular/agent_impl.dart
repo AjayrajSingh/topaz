@@ -42,8 +42,8 @@ abstract class AgentImpl implements Agent, Lifecycle {
   AgentImpl({@required ApplicationContext applicationContext})
       : _applicationContext = applicationContext,
         assert(applicationContext != null) {
-    connectToService(_applicationContext.environmentServices,
-        _agentContext.ctrl);
+    connectToService(
+        _applicationContext.environmentServices, _agentContext.ctrl);
     _agentContext
       ..getComponentContext(_componentContext.ctrl.request())
       ..getTokenProvider(_tokenProvider.ctrl.request());

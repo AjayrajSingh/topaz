@@ -25,6 +25,9 @@ class ChatConversation extends StatefulWidget {
   /// Callback for when a new message is submitted
   final ValueChanged<String> onSubmitMessage;
 
+  /// Callback for when a new title is submitted
+  final ValueChanged<String> onSubmitTitle;
+
   /// Callback for when the share photo button is tapped
   final VoidCallback onTapSharePhoto;
 
@@ -40,6 +43,7 @@ class ChatConversation extends StatefulWidget {
     @required this.sections,
     this.title,
     this.onSubmitMessage,
+    this.onSubmitTitle,
     this.onTapSharePhoto,
     this.scrollController,
   })
@@ -57,11 +61,34 @@ class _ChatConversationState extends State<ChatConversation> {
   ScrollController get effectiveScrollController =>
       widget.scrollController ?? _scrollController;
 
-  @override
-  Widget build(BuildContext context) {
+  bool _editingTitle = false;
+  TextEditingController _titleEditingController;
+
+  Widget _buildTitle(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
+    if (widget.enabled && _editingTitle) {
+      return new TextField(
+        controller: _titleEditingController,
+        decoration: const InputDecoration.collapsed(hintText: ''),
+        style: theme.textTheme.title,
+        onSubmitted: _submitTitle,
+      );
+    } else {
+      return new Text(
+        widget.title ?? '(No Conversation Selected)',
+        style: widget.enabled
+            ? theme.textTheme.title
+            : theme.textTheme.title.copyWith(color: Colors.grey[500]),
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     List<Widget> children = <Widget>[
+      // The header section.
       new Container(
         height: 56.0,
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -69,12 +96,17 @@ class _ChatConversationState extends State<ChatConversation> {
         decoration: new BoxDecoration(
           border: new Border(bottom: new BorderSide(color: Colors.grey[300])),
         ),
-        child: new Text(
-          widget.title ?? '(No Conversation Selected)',
-          style: widget.enabled
-              ? theme.textTheme.title
-              : theme.textTheme.title.copyWith(color: Colors.grey[500]),
-          overflow: TextOverflow.ellipsis,
+        child: new Row(
+          children: <Widget>[
+            new Expanded(child: _buildTitle(context)),
+            new Offstage(
+              offstage: !widget.enabled || _editingTitle,
+              child: new IconButton(
+                icon: new Icon(Icons.edit),
+                onPressed: _startEditingTitle,
+              ),
+            ),
+          ],
         ),
       ),
       new Expanded(
@@ -109,5 +141,22 @@ class _ChatConversationState extends State<ChatConversation> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: children,
     );
+  }
+
+  void _startEditingTitle() {
+    setState(() {
+      _editingTitle = true;
+      _titleEditingController = new TextEditingController(
+        text: widget.title,
+      );
+    });
+  }
+
+  void _submitTitle(String title) {
+    widget.onSubmitTitle?.call(title);
+    setState(() {
+      _editingTitle = false;
+      _titleEditingController = null;
+    });
   }
 }

@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert' show BASE64;
+
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
@@ -37,16 +39,21 @@ class ChatConversationScreen extends StatelessWidget {
       key: model.scaffoldKey,
       body: new Material(
         child: new ChatConversation(
+          key: model.conversationId != null
+              ? new ValueKey<String>(BASE64.encode(model.conversationId))
+              : null,
           enabled: model.conversationId != null,
           sections: model.sections,
           title: model.fetchingConversation
               ? ''
-              : model.participants
-                  ?.map(
-                    (chat_fidl.Participant p) => p.displayName ?? p.email,
-                  )
-                  ?.join(', '),
+              : model.title ??
+                  model.participants
+                      ?.map(
+                        (chat_fidl.Participant p) => p.displayName ?? p.email,
+                      )
+                      ?.join(', '),
           onSubmitMessage: model.sendMessage,
+          onSubmitTitle: model.setConversationTitle,
           onTapSharePhoto: model.startGalleryModule,
           scrollController: model.scrollController,
         ),

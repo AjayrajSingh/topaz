@@ -43,10 +43,12 @@ Conversation _createConversationFromLedgerEntry(Entry entry) =>
     _createConversationFromLedgerKeyValue(entry.key, entry.value);
 
 /// Creates a [Conversation] object from the given ledger entry's key-value.
-Conversation _createConversationFromLedgerKeyValue(List<int> key, SizedVmoTransport value) {
+Conversation _createConversationFromLedgerKeyValue(
+    List<int> key, SizedVmoTransport value) {
   Map<String, dynamic> decodedValue = decodeLedgerValue(value);
   return new Conversation()
     ..conversationId = key
+    ..title = decodedValue['title']
     ..participants = decodedValue['participants']
         // TODO(SO-906): remove when the bug passing non-map types is fixed.
         .where((Map<String, String> el) => el != null && el is Map)
@@ -66,7 +68,8 @@ Message _createMessageFromLedgerEntry(Entry entry) =>
     _createMessageFromLedgerKeyValue(entry.key, entry.value);
 
 /// Creates a [Message] object from the given ledger entry's key-value.
-Message _createMessageFromLedgerKeyValue(List<int> key, SizedVmoTransport value) {
+Message _createMessageFromLedgerKeyValue(
+    List<int> key, SizedVmoTransport value) {
   Map<String, dynamic> decodedValue = decodeLedgerValue(value);
   return new Message()
     ..messageId = key
@@ -600,8 +603,12 @@ class ChatContentProviderImpl extends ChatContentProvider {
       }
 
       try {
-        List<Message> messages =
-            entries.map(_createMessageFromLedgerEntry).toList();
+        // Exclude the title entry. The title entry key will always be one-byte
+        // zero value.
+        List<Message> messages = entries
+            .where((Entry entry) => entry.key.length != 1 || entry.key[0] != 0)
+            .map(_createMessageFromLedgerEntry)
+            .toList();
 
         callback(ChatStatus.ok, messages);
       } on Exception catch (e, stackTrace) {
@@ -632,8 +639,10 @@ class ChatContentProviderImpl extends ChatContentProvider {
           await _getConversationWatcher(conversationId);
 
       Completer<Status> statusCompleter = new Completer<Status>();
-      Completer<SizedVmoTransport> valueCompleter = new Completer<SizedVmoTransport>();
-      watcher.pageSnapshot.get(messageId, (Status status, SizedVmoTransport value) {
+      Completer<SizedVmoTransport> valueCompleter =
+          new Completer<SizedVmoTransport>();
+      watcher.pageSnapshot.get(messageId,
+          (Status status, SizedVmoTransport value) {
         statusCompleter.complete(status);
         valueCompleter.complete(value);
       });
@@ -867,7 +876,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
     }
 
     Completer<Status> statusCompleter = new Completer<Status>();
-    Completer<SizedVmoTransport> valueCompleter = new Completer<SizedVmoTransport>();
+    Completer<SizedVmoTransport> valueCompleter =
+        new Completer<SizedVmoTransport>();
     _conversationListWatcher.pageSnapshot.get(conversationId,
         (Status status, SizedVmoTransport value) {
       statusCompleter.complete(status);

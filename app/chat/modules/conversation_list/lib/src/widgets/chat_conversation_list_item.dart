@@ -51,7 +51,7 @@ class ChatConversationListItem extends StatelessWidget {
           selected: selected,
         ),
         title: new Text(
-          _participantNames,
+          conversation.title ?? _participantNames,
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: new Text(

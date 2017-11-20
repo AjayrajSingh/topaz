@@ -53,7 +53,7 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   Uint8List _conversationId;
 
-  Set<Conversation> _conversations;
+  Map<List<int>, Conversation> _conversations;
 
   /// A temporary [Queue] for holding the new conversation notified via
   /// [MessageQueue], while the conversation list is being fetched.
@@ -115,21 +115,25 @@ class ChatConversationListModuleModel extends ModuleModel {
   /// conversation at the top.
   int _compareConversation(Conversation c1, Conversation c2) {
     // Compare the ids lexicographically.
-    int minLength =
-        math.min(c1.conversationId.length, c2.conversationId.length);
+    return _compareConversationId(c1.conversationId, c2.conversationId);
+  }
+
+  int _compareConversationId(List<int> id1, List<int> id2) {
+    // Compare the ids lexicographically.
+    int minLength = math.min(id1.length, id2.length);
     for (int i = 0; i < minLength; ++i) {
-      if (c1.conversationId[i] < c2.conversationId[i]) {
+      if (id1[i] < id2[i]) {
         return -1;
       }
-      if (c1.conversationId[i] > c2.conversationId[i]) {
+      if (id1[i] > id2[i]) {
         return 1;
       }
     }
 
-    if (c2.conversationId.length > minLength) {
+    if (id2.length > minLength) {
       return -1;
     }
-    if (c1.conversationId.length < minLength) {
+    if (id1.length < minLength) {
       return 1;
     }
     return 0;
@@ -141,7 +145,7 @@ class ChatConversationListModuleModel extends ModuleModel {
   /// The returned [Set] is sorted by the [_compareConversation] method above.
   Set<Conversation> get conversations => _conversations == null
       ? null
-      : new UnmodifiableSetView<Conversation>(_conversations);
+      : new UnmodifiableSetView<Conversation>(_conversations.values.toSet());
 
   bool _shouldShowNewConversationForm = false;
 
@@ -268,15 +272,15 @@ class ChatConversationListModuleModel extends ModuleModel {
         return;
       }
 
-      // Use a SplayTreeSet to keep the list of conversations ordered.
-      _conversations = conversations == null
-          ? null
-          : new SplayTreeSet<Conversation>.from(
-              conversations.map(_getConversationFromFidl),
-              _compareConversation,
-            );
+      // Use a SplayTreeMap to keep the list of conversations ordered.
+      _conversations = null;
+      if (conversations != null) {
+        _conversations =
+            new SplayTreeMap<List<int>, Conversation>(_compareConversationId);
+        for (Conversation c in conversations.map(_getConversationFromFidl)) {
+          _conversations[c.conversationId] = c;
+        }
 
-      if (_conversations != null) {
         while (_newConversationQueue.isNotEmpty) {
           _addConversation(_newConversationQueue.removeFirst());
         }
@@ -342,6 +346,15 @@ class ChatConversationListModuleModel extends ModuleModel {
           notifyListeners();
           break;
 
+        case 'conversation_title':
+          List<int> conversationId = decoded['conversation_id'];
+          String title = decoded['title'];
+          log.info('conversation_title event with title: $title');
+          _conversations[conversationId] =
+              _conversations[conversationId].copyWith(title: title);
+          notifyListeners();
+          break;
+
         default:
           log.severe('Not a valid conversation list event: $event');
           break;
@@ -354,8 +367,8 @@ class ChatConversationListModuleModel extends ModuleModel {
   void _addConversation(Conversation conversation) {
     assert(_conversations != null);
 
-    // Because we are using a [Set], duplicate conversation will not be added.
-    _conversations.add(conversation);
+    // Because we are using a [Map], duplicate conversation will not be added.
+    _conversations[conversation.conversationId] = conversation;
 
     List<int> id = conversation.conversationId;
 
@@ -376,6 +389,7 @@ class ChatConversationListModuleModel extends ModuleModel {
   Conversation _getConversationFromFidl(chat_fidl.Conversation c) =>
       new Conversation(
         conversationId: c.conversationId,
+        title: c.title,
         participants: c.participants.map(_getUserFromParticipant).toList(),
       );
 

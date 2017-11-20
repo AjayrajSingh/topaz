@@ -21,13 +21,20 @@ class ConversationListWatcher extends BasePageWatcher {
   final Set<List<int>> _seenConversations = createLedgerIdSet();
   final Map<List<int>, Completer<Entry>> _conversationCompleters =
       createLedgerIdMap<Completer<Entry>>();
+  final Completer<Null> _ready = new Completer<Null>();
 
   /// Creates a [ConversationListWatcher] instance.
   ConversationListWatcher({
     @required PageSnapshotProxy initialSnapshot,
   })
       : assert(initialSnapshot != null),
-        super(initialSnapshot: initialSnapshot);
+        super(initialSnapshot: initialSnapshot) {
+    getFullEntries(initialSnapshot).then((List<Entry> entries) {
+      for (Entry entry in entries) {
+        _seenConversations.add(entry.key);
+      }
+    }).whenComplete(_ready.complete);
+  }
 
   @override
   void onPageChange(
@@ -89,7 +96,9 @@ class ConversationListWatcher extends BasePageWatcher {
 
   /// Process the provided [Entry] and sends notification to the subscriber.
   /// Refer to the `chat_content_provider.fidl` file for the message format.
-  void _processEntry(Entry entry) {
+  Future<Null> _processEntry(Entry entry) async {
+    await _ready.future;
+
     Map<String, Object> decoded = decodeLedgerValue(entry.value);
 
     Map<String, Object> notification = _seenConversations.contains(entry.key)

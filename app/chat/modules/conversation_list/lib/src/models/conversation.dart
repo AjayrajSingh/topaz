@@ -14,6 +14,9 @@ class Conversation {
   /// Conversation id to be used in Ledger.
   final List<int> conversationId;
 
+  /// Conversation title.
+  final String title;
+
   /// List of participants in this conversation.
   final List<User> participants;
 
@@ -26,9 +29,27 @@ class Conversation {
   /// Creates a new instance of [Conversation].
   Conversation({
     this.conversationId,
+    this.title,
     @required this.participants,
     this.snippet,
     this.timestamp,
   })
       : assert(participants != null);
+
+  /// Returns a copy of this conversation with the specified override values.
+  Conversation copyWith({
+    List<int> conversationId,
+    String title,
+    List<User> participants,
+    String snippet,
+    DateTime timestamp,
+  }) {
+    return new Conversation(
+      conversationId: conversationId ?? this.conversationId,
+      title: title ?? this.title,
+      participants: participants ?? this.participants,
+      snippet: snippet ?? this.snippet,
+      timestamp: timestamp ?? this.timestamp,
+    );
+  }
 }
