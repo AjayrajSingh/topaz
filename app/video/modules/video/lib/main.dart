@@ -18,6 +18,7 @@ void main() {
   VideoModuleModel videoModuleModel = new VideoModuleModel(
     appContext: appContext,
   );
+
   PlayerModel playerModel = new PlayerModel(
     appContext: appContext,
     requestFocus: videoModuleModel.requestFocus,
@@ -26,6 +27,11 @@ void main() {
     onPlayRemote: videoModuleModel.onPlayRemote,
     onPlayLocal: videoModuleModel.onPlayLocal,
   );
+
+  // Add listener in the case that the asset changes, from a Daisy
+  videoModuleModel.addListener(
+      () => playerModel.handleAssetChanged(videoModuleModel.asset));
+
   ModuleWidget<VideoModuleModel> moduleWidget =
       new ModuleWidget<VideoModuleModel>(
     moduleModel: videoModuleModel,

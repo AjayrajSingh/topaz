@@ -18,16 +18,6 @@ const Duration _kLoadingDuration = const Duration(seconds: 2);
 const Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
 const String _kServiceName = 'fling';
 
-final Asset _defaultAsset = new Asset.movie(
-  uri: Uri.parse(
-      'https://storage.googleapis.com/fuchsia/assets/video/656a7250025525ae5a44b43d23c51e38b466d146'),
-  title: 'Discover Tahiti',
-  description:
-      'Take a trip and experience the ultimate island fantasy, Vahine Island in Tahiti.',
-  thumbnail: 'assets/video-thumbnail.png',
-  background: 'assets/video-background.png',
-);
-
 /// Typedef for function to request focus for module
 typedef void RequestFocus();
 
@@ -38,7 +28,8 @@ typedef DisplayMode DisplayModeGetter();
 typedef void DisplayModeSetter(DisplayMode mode);
 
 /// Typedef for updating device info when playing remotely
-typedef void PlayRemoteCallback(String deviceName);
+typedef void PlayRemoteCallback(
+    String deviceName, String serviceName, Duration progress);
 
 /// Typedef for updating device info when playing locally
 typedef void PlayLocalCallback();
@@ -53,7 +44,6 @@ class PlayerModel extends Model {
   bool _locallyControlled = false;
   bool _showControlOverlay = true;
   bool _failedCast = false;
-  Asset _asset = _defaultAsset;
   // The video has ended but the user has not uncast.
   // Replaying the video should still happen on remote device.
   bool _replayRemotely = false;
@@ -77,6 +67,9 @@ class PlayerModel extends Model {
   /// Callback that updates device-specific info for local play
   PlayLocalCallback onPlayLocal;
 
+  /// Video asset for the player to currently play
+  Asset _asset;
+
   /// Create a Player model
   PlayerModel({
     this.appContext,
@@ -92,9 +85,7 @@ class PlayerModel extends Model {
         assert(onPlayRemote != null),
         assert(onPlayLocal != null) {
     _controller = new MediaPlayerController(appContext.environmentServices)
-      ..addListener(_handleControllerChanged)
-      ..open(_asset.uri, serviceName: _kServiceName);
-
+      ..addListener(_handleControllerChanged);
     notifyListeners();
   }
 
@@ -142,8 +133,19 @@ class PlayerModel extends Model {
   ChildViewConnection get videoViewConnection =>
       _controller.videoViewConnection;
 
-  /// Currently playing asset
-  Asset get asset => _asset;
+  /// When the VideoModuleModel.onReady() has finished running, the
+  /// Link with the video asset has been updated to the one the user
+  /// had selected from the Daisy.
+  void handleAssetChanged(Asset asset) {
+    if (asset != null && (_asset == null || (_asset.uri != asset.uri))) {
+      log.fine('Updating video asset in the Player');
+      _asset = asset;
+      _controller
+        ..close()
+        ..open(_asset.uri, serviceName: _kServiceName);
+      notifyListeners();
+    }
+  }
 
   /// Seeks to a duration in the video
   void seek(Duration duration) {
@@ -187,16 +189,8 @@ class PlayerModel extends Model {
     if (_asset.device == null) {
       pause();
       log.fine('Starting remote play on $deviceName');
-      _asset = new Asset.remote(
-          service: _kServiceName,
-          device: deviceName,
-          uri: _asset.uri,
-          title: _asset.title,
-          description: _asset.description,
-          thumbnail: _asset.thumbnail,
-          background: _asset.background,
-          position: _controller.progress);
-      onPlayRemote(deviceName);
+
+      onPlayRemote(deviceName, _kServiceName, _controller.progress);
       play();
     }
   }
@@ -208,15 +202,13 @@ class PlayerModel extends Model {
       pause();
       Duration progress = _controller.progress;
       _controller.close();
-      _asset = _defaultAsset;
       setDisplayMode(kDefaultDisplayMode);
       log.fine('Starting local play');
+      onPlayLocal();
       _controller
         ..open(_asset.uri, serviceName: _kServiceName)
         ..seek(progress);
-
       brieflyShowControlOverlay();
-      onPlayLocal();
       play();
     }
   }

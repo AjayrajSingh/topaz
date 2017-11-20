@@ -41,9 +41,10 @@ class DocumentsAgent extends AgentImpl {
   ) async {
     log.fine('onReady fired');
 
-    _documentsContentProviderImpl =
-        new DocumentsContentProviderImpl(componentContext: componentContext)
-          ..init();
+    _documentsContentProviderImpl = new DocumentsContentProviderImpl(
+      componentContext: componentContext,
+      agentContext: agentContext,
+    )..init();
 
     // This adds this agent's service to the outgoingServices so that the
     // ModuleModel can use it. Inside the ModuleModel, you would first connect

@@ -22,5 +22,6 @@ flutter_app("browser") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/module_resolver/dart",
   ]
 }

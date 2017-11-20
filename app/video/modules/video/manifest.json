@@ -1,0 +1,13 @@
+{
+    "binary": "/system/apps/video",
+    "local_name": "video",
+    "verb": "com.google.fuchsia.play",
+    "noun_constraints": [
+        {
+            "name": "asset",
+            "types": [
+                "com.google.fuchsia.string"
+            ]
+        }
+    ]
+}

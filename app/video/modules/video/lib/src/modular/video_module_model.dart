@@ -20,6 +20,16 @@ import '../widgets.dart';
 const String _kRemoteDisplayMode = 'remoteDisplayMode';
 const String _kCastingDeviceName = 'castingDeviceName';
 
+final Asset _kDefaultAsset = new Asset.movie(
+  uri: Uri.parse(
+      'https://storage.googleapis.com/fuchsia/assets/video/656a7250025525ae5a44b43d23c51e38b466d146'),
+  title: 'Discover Tahiti',
+  description:
+      'Take a trip and experience the ultimate island fantasy, Vahine Island in Tahiti.',
+  thumbnail: 'assets/video-thumbnail.png',
+  background: 'assets/video-background.png',
+);
+
 /// The [ModuleModel] for the video player.
 class VideoModuleModel extends ModuleModel {
   String _remoteDeviceName = 'Remote Device';
@@ -29,6 +39,7 @@ class VideoModuleModel extends ModuleModel {
     ..hostname = 'Current Device';
   final NetConnectorProxy _netConnector = new NetConnectorProxy();
   final DeviceMapProxy _deviceMap = new DeviceMapProxy();
+  Asset _asset = _kDefaultAsset;
 
   bool _hideDeviceChooser = true;
   DisplayMode _displayMode = kDefaultDisplayMode;
@@ -68,6 +79,8 @@ class VideoModuleModel extends ModuleModel {
         new Completer<DeviceMapEntry>();
     _deviceMap.getCurrentDevice(currentDeviceCompleter.complete);
     _currentDevice = await currentDeviceCompleter.future;
+
+    // Add and watch remote device [Link]
     moduleContext.getLink(
       _kRemoteDisplayMode,
       _remoteDeviceLink.ctrl.request(),
@@ -83,6 +96,15 @@ class VideoModuleModel extends ModuleModel {
     notifyListeners();
   }
 
+  /// Gets asset
+  Asset get asset => _asset;
+
+  /// Sets the currently-playing asset. The Asset should be of type movie.
+  set asset(Asset asset) {
+    _asset = asset;
+    notifyListeners();
+  }
+
   /// Requests focus for module, using moduleContext
   void requestFocus() {
     moduleContext.requestFocus();
@@ -95,7 +117,7 @@ class VideoModuleModel extends ModuleModel {
 
   /// Sets this device's media player's display mode
   ///
-  /// Notifies listeners when this value is changed.
+  /// Notifies listeners when this value is handleasset.
   void setDisplayMode(DisplayMode mode) {
     assert(mode != null);
     if (_displayMode != mode) {
@@ -116,7 +138,7 @@ class VideoModuleModel extends ModuleModel {
 
   /// Gets and sets whether or not the Device Chooser should be hidden.
   ///
-  /// Notifies listeners when this value is changed.
+  /// Notifies listeners when this value is handleasset.
   bool get hideDeviceChooser => _hideDeviceChooser;
   set hideDeviceChooser(bool hide) {
     assert(hide != null);
@@ -151,7 +173,16 @@ class VideoModuleModel extends ModuleModel {
   }
 
   /// Device side play remotely
-  void onPlayRemote(String deviceName) {
+  void onPlayRemote(String deviceName, String serviceName, Duration progress) {
+    asset = new Asset.remote(
+        service: serviceName,
+        device: deviceName,
+        uri: _asset.uri,
+        title: _asset.title,
+        description: _asset.description,
+        thumbnail: _asset.thumbnail,
+        background: _asset.background,
+        position: progress);
     hideDeviceChooser = true;
     _remoteDeviceName = deviceName;
     setDisplayMode(DisplayMode.remoteControl);
@@ -161,6 +192,14 @@ class VideoModuleModel extends ModuleModel {
 
   /// Device side play locally
   void onPlayLocal() {
+    // Convert Asset.remote back to Asset.movie
+    asset = new Asset.movie(
+      uri: asset.uri,
+      title: asset.title,
+      description: asset.description,
+      thumbnail: asset.thumbnail,
+      background: asset.background,
+    );
     hideDeviceChooser = true;
     // TODO(maryxia): make separate set calls.
     // https://fuchsia.atlassian.net/browse/SO-578
@@ -201,6 +240,26 @@ class VideoModuleModel extends ModuleModel {
       if (shouldNotifyListeners) {
         notifyListeners();
       }
+    }
+  }
+
+  /// Get [link] for module resolution, and update the video asset URI.
+  /// This overrides the onNotify function for the [link] param in the
+  /// onReady(), which points to the root link.
+  @override
+  void onNotify(String json) {
+    Map<String, String> linkContents = JSON.decode(json);
+    log.fine('Updating video asset according to Daisy Link data');
+    // TODO(maryxia) SO-1014 fill these in using Entities
+    String uri = linkContents['asset'];
+    if (uri != null) {
+      asset = new Asset.movie(
+        uri: Uri.parse(uri),
+        title: 'Super cool video',
+        description: 'What a great video!',
+        thumbnail: 'assets/video-thumbnail.png',
+        background: 'assets/video-background.png',
+      );
     }
   }
 

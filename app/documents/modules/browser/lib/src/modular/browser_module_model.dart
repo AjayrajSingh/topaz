@@ -4,12 +4,14 @@
 
 import 'dart:async';
 
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:lib.module.fidl/module_controller.fidl.dart';
+import 'package:lib.module_resolver.dart/daisy_builder.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
@@ -56,6 +58,33 @@ class BrowserModuleModel extends ModuleModel {
       documents = docs;
       notifyListeners();
       log.fine('Retrieved list of documents for BrowserModuleModel');
+    });
+  }
+
+  /// Creates an Entity Reference for the currently-selected doc
+  /// The Resolver can use this Entity to figure out what relevant module to open
+  void createDocEntityRef() {
+    // Make Entity Ref for this doc
+    _docsInterfaceProxy.createEntityReference(_currentDoc, (String entityRef) {
+      log.fine('Retrieved an Entity Ref at $entityRef');
+      // TODO(maryxia) SO-788 actually do something with the entity
+
+      // Use DaisyBuilder to create a Daisy that stores an entityRef
+      // for this Document
+      // TODO(maryxia) SO-1014 pass in an entity for the Noun
+      DaisyBuilder daisyBuilder = new DaisyBuilder.verb(
+          'com.google.fuchsia.play')
+        ..addNoun('asset',
+            'http://ia800201.us.archive.org/12/items/BigBuckBunny_328/BigBuckBunny.ogv');
+      log.fine('Created Daisy for $_currentDoc.id');
+
+      // Open a new module using Module Resolution
+      ModuleControllerProxy moduleController = new ModuleControllerProxy();
+      moduleContext.startDaisyInShell('video', daisyBuilder.daisy, null, null,
+          moduleController.ctrl.request(), null);
+      moduleController.ctrl.close();
+      log.fine('Opened a new module');
+      notifyListeners();
     });
   }
 

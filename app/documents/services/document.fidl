@@ -18,5 +18,6 @@ struct Document {
 
 interface DocumentInterface {
   Get(string documentId) => (Document? document);
+  CreateEntityReference(Document document) => (string entityReference);
   List() => (array<Document>? documents);
 };
