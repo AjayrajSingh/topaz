@@ -11,7 +11,6 @@
 #include "lib/tonic/dart_args.h"
 #include "lib/tonic/dart_binding_macros.h"
 #include "lib/tonic/dart_library_natives.h"
-#include "lib/tonic/dart_message_handler.h"
 #include "lib/tonic/logging/dart_invoke.h"
 
 using tonic::DartInvokeField;
@@ -88,17 +87,12 @@ void HandleWaiter::OnWaitComplete(zx_status_t status, zx_signals_t pending) {
   // Clear handle_.
   handle_ = nullptr;
 
-  DartState* state = callback_.dart_state().get();
-  DartState::Scope scope(state);
+  DartState::Scope scope(callback_.dart_state().get());
 
   std::vector<Dart_Handle> args{ToDart(status), ToDart(pending)};
   FXL_DCHECK(!callback_.is_empty());
-  Dart_Handle result =
-      Dart_InvokeClosure(callback_.Release(), args.size(), args.data());
-  // If there was an uncaught error from the callback propagate it out.
-  if (tonic::LogIfError(result)) {
-    state->message_handler().UnhandledError(result);
-  }
+  tonic::LogIfError(
+      Dart_InvokeClosure(callback_.Release(), args.size(), args.data()));
 }
 
 }  // namespace dart

@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:convert';
-import 'dart:fuchsia' show exit;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -92,14 +91,13 @@ class StoryShellImpl implements StoryShell, Lifecycle {
     callback();
   }
 
-  /// Terminate the StoryShell.
+  /// Terminate the StoryShell. TODO(mesch): Really terminate, i.e. exit.
   @override
   void terminate() {
     log.info('StoryShellImpl::terminate call');
     _storyContext.ctrl.close();
     _storyShellBinding.close();
     _lifecycleBinding.close();
-    exit(0);
   }
 }
 

@@ -46,27 +46,7 @@ void DartMessageHandler::OnMessage(DartState* dart_state) {
   });
 }
 
-void DartMessageHandler::UnhandledError(Dart_Handle error) {
-  FXL_DCHECK(Dart_CurrentIsolate());
-  FXL_DCHECK(Dart_IsError(error));
-
-  isolate_last_error_ = GetErrorHandleType(error);
-  // Remember that we had an uncaught exception error.
-  isolate_had_uncaught_exception_error_ = true;
-  if (Dart_IsFatalError(error)) {
-    // Stop handling messages.
-    Dart_SetMessageNotifyCallback(nullptr);
-    // Shut down the isolate.
-    Dart_ShutdownIsolate();
-  }
-}
-
 void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
-  if (isolate_had_uncaught_exception_error_) {
-    // Don't handle any more messages.
-    return;
-  }
-
   DartIsolateScope scope(dart_state->isolate());
   DartApiScope dart_api_scope;
   Dart_Handle result = Dart_Null();
@@ -119,7 +99,17 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
   }
 
   if (error) {
-    UnhandledError(result);
+    isolate_last_error_ = GetErrorHandleType(result);
+    if (Dart_IsError(result)) {
+      // Remember that we had an uncaught exception error.
+      isolate_had_uncaught_exception_error_ = true;
+      if (Dart_IsFatalError(result)) {
+        // Stop handling messages.
+        Dart_SetMessageNotifyCallback(nullptr);
+        // Shut down the isolate.
+        Dart_ShutdownIsolate();
+      }
+    }
   } else if (!Dart_HasLivePorts()) {
     // The isolate has no live ports and would like to exit.
     if (!Dart_IsPausedOnExit() && Dart_ShouldPauseOnExit()) {
