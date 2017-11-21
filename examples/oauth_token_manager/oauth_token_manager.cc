@@ -85,7 +85,8 @@ constexpr auto kScopes = {"openid",
                           "https://www.googleapis.com/auth/youtube.readonly",
                           "https://www.googleapis.com/auth/contacts",
                           "https://www.googleapis.com/auth/drive",
-                          "https://www.googleapis.com/auth/plus.login"};
+                          "https://www.googleapis.com/auth/plus.login",
+                          "https://www.googleapis.com/auth/calendar.readonly"};
 
 // Type of token requested.
 enum TokenType {
