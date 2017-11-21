@@ -71,7 +71,6 @@ void startModuleInShell(SurfaceRelation relation) {
     name,
     _kModuleUrl,
     null, // link
-    null, // outgoingServices,
     null, // incomingServices,
     moduleController.ctrl.request(),
     relation,

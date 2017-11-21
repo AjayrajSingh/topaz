@@ -73,7 +73,6 @@ class CounterParentModuleModel extends ModuleModel {
       _kChildModuleUrl,
       null, // null means that the child gets the same link as the parent.
       null,
-      null,
       _childController.ctrl.request(),
       // Here, we define the surface relationship between the current module and
       // the child module being launched.

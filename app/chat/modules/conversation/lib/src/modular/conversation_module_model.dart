@@ -633,7 +633,6 @@ class ChatConversationModuleModel extends ModuleModel {
       name,
       url,
       name,
-      null,
       incomingServices,
       _childModuleController.ctrl.request(),
       new SurfaceRelation()

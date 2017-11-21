@@ -153,7 +153,6 @@ class EventPageModuleModel extends ModuleModel {
           'Purchase Web View',
           web_view.kWebViewURL,
           _kWebViewLinkName,
-          null, // outgoingServices,
           null, // incomingServices,
           _webViewModuleController.ctrl.request(),
           new SurfaceRelation()..arrangement = SurfaceArrangement.sequential,

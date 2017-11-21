@@ -124,7 +124,6 @@ class EventListModuleModel extends ModuleModel {
           'event_module',
           'file:///system/apps/concert_event_page',
           'event_link',
-          null, // outgoingServices,
           null, // incomingServices,
           _eventPageModuleController.ctrl.request(),
           new SurfaceRelation()

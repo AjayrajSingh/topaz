@@ -81,7 +81,6 @@ class CounterParentModuleModel extends ModuleModel {
       _kChildModuleUrl,
       null, // null means that the child gets the same link as the parent.
       null,
-      null,
       _childController.ctrl.request(),
       viewOwnerPair.passRequest(),
     );

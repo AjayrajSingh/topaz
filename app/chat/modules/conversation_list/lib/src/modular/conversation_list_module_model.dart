@@ -231,7 +231,6 @@ class ChatConversationListModuleModel extends ModuleModel {
       _kChatConversationModuleUrl,
       null, // Pass on our default link to the child.
       null,
-      null,
       _conversationModuleController.ctrl.request(),
       new SurfaceRelation()
         ..arrangement = SurfaceArrangement.copresent

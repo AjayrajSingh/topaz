@@ -57,7 +57,6 @@ class Chatter {
         'module:chat',
         _kChatConversationModuleUrl,
         chatLinkName,
-        null, // outgoingServices,
         null, // incomingServices,
         _chatModuleControllerProxy.ctrl.request(),
         new SurfaceRelation()

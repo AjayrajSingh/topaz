@@ -115,7 +115,6 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
       name, // module name
       daisy,
       name, // link name
-      null, // outgoingServices
       null, // incomingServices
       moduleControllerProxy.ctrl.request(),
       viewOwnerPair.passRequest(),

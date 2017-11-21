@@ -149,7 +149,6 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
       'module:web_view',
       web_view.kWebViewURL,
       webViewLinkName,
-      null, // outgoingServices,
       null, // incomingServices,
       _webviewModuleControllerProxy.ctrl.request(),
       new SurfaceRelation()..arrangement = SurfaceArrangement.copresent,
