@@ -98,6 +98,11 @@ class ChatConversationListModuleModel extends ModuleModel {
         link.set(const <String>['conversation_id'], JSON.encode(id));
       }
 
+      // Start the child conversation, if it hasn't been started yet.
+      if (!_conversationModuleStarted) {
+        _startConversationModule();
+      }
+
       notifyListeners();
     }
   }
@@ -147,11 +152,16 @@ class ChatConversationListModuleModel extends ModuleModel {
       ? null
       : new UnmodifiableSetView<Conversation>(_conversations.values.toSet());
 
-  bool _shouldShowNewConversationForm = false;
-
   /// Indicates whether the conversation list screen should show the new
   /// conversation form.
   bool get shouldShowNewConversationForm => _shouldShowNewConversationForm;
+  bool _shouldShowNewConversationForm = false;
+
+  /// Indicates whether we should automatically select a conversation.
+  bool _shouldAutoSelectConversation = false;
+
+  /// Indicates whether the child conversation module has been started.
+  bool _conversationModuleStarted = false;
 
   Uint8List _lastCreatedConversationId;
 
@@ -168,8 +178,6 @@ class ChatConversationListModuleModel extends ModuleModel {
     super.onReady(moduleContext, link);
 
     log.fine('ModuleModel::onReady call.');
-    // Start the chat conversation module.
-    _startConversationModule();
 
     // Obtain the chat content provider url by reading the url from the Link. If
     // the initial onNotify() call doesn't contain the url, use the default chat
@@ -231,6 +239,7 @@ class ChatConversationListModuleModel extends ModuleModel {
         ..emphasis = 2.0,
       false,
     );
+    _conversationModuleStarted = true;
   }
 
   /// Fetches the conversation list from the content provider. Also provide our
@@ -284,6 +293,11 @@ class ChatConversationListModuleModel extends ModuleModel {
         while (_newConversationQueue.isNotEmpty) {
           _addConversation(_newConversationQueue.removeFirst());
         }
+
+        if (_shouldAutoSelectConversation && _conversations.isNotEmpty) {
+          setConversationId(_conversations.values.first.conversationId);
+          _shouldAutoSelectConversation = false;
+        }
       }
 
       notifyListeners();
@@ -316,6 +330,10 @@ class ChatConversationListModuleModel extends ModuleModel {
 
           if (_conversations != null) {
             _addConversation(newConversation);
+            if (_shouldAutoSelectConversation) {
+              setConversationId(newConversation.conversationId);
+              _shouldAutoSelectConversation = false;
+            }
           } else {
             _newConversationQueue.add(newConversation);
           }
@@ -442,6 +460,9 @@ class ChatConversationListModuleModel extends ModuleModel {
     }
 
     setConversationId(conversationId, updateLink: false);
+    if (conversationId == null) {
+      _shouldAutoSelectConversation = true;
+    }
   }
 
   /// Shows the new conversation form.

@@ -141,7 +141,7 @@ class ChatConversationList extends StatelessWidget {
                   ),
                 ),
                 new Text(
-                  'Start a chat and it will show up here',
+                  'Touch the plus button to start a chat',
                   style: new TextStyle(
                     fontSize: 16.0,
                     color: Colors.grey[500],
