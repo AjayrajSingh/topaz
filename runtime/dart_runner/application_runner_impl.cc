@@ -47,7 +47,7 @@ void IsolateCleanupCallback(void* callback_data) {
 
 #if defined(AOT_RUNTIME)
 
-bool ExtractSnapshots(const zx::vmo& bundle,
+bool ExtractSnapshots(const fsl::SizedVmoTransportPtr& bundle,
                       const uint8_t*& isolate_snapshot_data,
                       const uint8_t*& isolate_snapshot_instructions,
                       const uint8_t*& script_snapshot,
@@ -58,18 +58,15 @@ bool ExtractSnapshots(const zx::vmo& bundle,
   //   3. The dylib containing the AOT compiled Dart snapshot.
   // To make a vmo that we can pass to dlopen_vmo(), we clone the bundle vmo
   // at an offset of one page.
-  zx_status_t status;
-  uint64_t bundle_size;
-  status = bundle.get_size(&bundle_size);
-  if (status != ZX_OK) {
-    FXL_LOG(ERROR) << "bundle.get_size() failed: "
-                   << zx_status_get_string(status);
+  if (!fsl::SizedVmo::IsSizeValid(bundle->vmo, bundle->size)) {
+    FXL_LOG(ERROR) << "bundle size is not valid.";
     return false;
   }
-
+  uint64_t bundle_size = bundle->size;
   zx::vmo dylib_vmo;
   const int pagesize = getpagesize();
-  status = bundle.clone(ZX_VMO_CLONE_COPY_ON_WRITE | ZX_RIGHT_EXECUTE, pagesize,
+  zx_status_t status =
+      bundle->vmo.clone(ZX_VMO_CLONE_COPY_ON_WRITE | ZX_RIGHT_EXECUTE, pagesize,
                         bundle_size - pagesize, &dylib_vmo);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "bundle.clone() failed: " << zx_status_get_string(status);
@@ -104,27 +101,23 @@ bool ExtractSnapshots(const zx::vmo& bundle,
 
 #else  // !defined(AOT_RUNTIME)
 
-bool ExtractSnapshots(const zx::vmo& bundle,
+bool ExtractSnapshots(const fsl::SizedVmoTransportPtr& bundle,
                       const uint8_t*& isolate_snapshot_data,
                       const uint8_t*& isolate_snapshot_instructions,
                       const uint8_t*& script_snapshot,
                       intptr_t* script_snapshot_len) {
+  if (!fsl::SizedVmo::IsSizeValid(bundle->vmo, bundle->size)) {
+    FXL_LOG(ERROR) << "bundle size is not valid.";
+    return false;
+  }
+  uint64_t bundle_size = bundle->size;
   isolate_snapshot_data = dart_content_handler::isolate_snapshot_buffer;
   isolate_snapshot_instructions = NULL;
 
-  zx_status_t status;
-  uint64_t bundle_size;
-  status = bundle.get_size(&bundle_size);
-  if (status != ZX_OK) {
-    FXL_LOG(ERROR) << "bundle.get_size() failed: "
-                   << zx_status_get_string(status);
-    return false;
-  }
-
   const int pagesize = getpagesize();
   uintptr_t addr;
-  status = zx::vmar::root_self().map(
-      0, bundle, pagesize, bundle_size - pagesize, ZX_VM_FLAG_PERM_READ, &addr);
+  zx_status_t status = zx::vmar::root_self().map(
+      0, bundle->vmo, pagesize, bundle_size - pagesize, ZX_VM_FLAG_PERM_READ, &addr);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "bundle map failed: " << zx_status_get_string(status);
     return false;
@@ -155,7 +148,7 @@ void RunApplication(
   // the mappings.
   std::string label = "dart:" + GetLabelFromURL(url);
   zx::process::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
-  application->data.set_property(ZX_PROP_NAME, label.c_str(), label.size());
+  application->data->vmo.set_property(ZX_PROP_NAME, label.c_str(), label.size());
 
   const uint8_t* isolate_snapshot_data = NULL;
   const uint8_t* isolate_snapshot_instructions = NULL;

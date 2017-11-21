@@ -94,13 +94,13 @@ void ShellController::OnRemoteEntry(const std::string& entry) {
 bool ShellController::SendBackHistory(std::vector<std::string> entries) {
   const std::string history_str = SerializeHistory(entries);
 
-  zx::vmo data;
+  fsl::SizedVmo data;
   if (!fsl::VmoFromString(history_str, &data)) {
     FXL_LOG(ERROR) << "Failed to write terminal history to a vmo.";
     return false;
   }
 
-  const zx_handle_t handles[] = {data.release()};
+  const zx_handle_t handles[] = {data.vmo().release()};
   const std::string command = "";
   zx_status_t status =
       channel_.write(0, command.data(), command.size(), handles, 1);

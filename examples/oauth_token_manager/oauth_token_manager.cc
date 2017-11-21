@@ -224,7 +224,7 @@ void Post(const std::string& request_body,
     encoded_request_body = UrlEncode(request_body);
   }
 
-  zx::vmo data;
+  fsl::SizedVmo data;
   auto result = fsl::VmoFromString(encoded_request_body, &data);
   FXL_VLOG(1) << "Post Data:" << encoded_request_body;
   FXL_DCHECK(result);
@@ -259,7 +259,7 @@ void Post(const std::string& request_body,
   request->headers.push_back(std::move(content_type_header));
 
   request->body = network::URLBody::New();
-  request->body->set_buffer(std::move(data));
+  request->body->set_sized_buffer(std::move(data).ToTransport());
 
   url_loader->Start(std::move(request), [success_callback, failure_callback,
                                          set_token_callback](
