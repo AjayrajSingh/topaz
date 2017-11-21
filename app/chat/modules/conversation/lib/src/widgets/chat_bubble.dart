@@ -38,6 +38,9 @@ class ChatBubble extends StatelessWidget {
   /// Indicates whether the message should fill the entire bubble area or not.
   final bool fillBubble;
 
+  /// Indicates whether the message should have a background.
+  final bool transparent;
+
   /// Called when the bubble is tapped.
   final GestureTapCallback onTap;
 
@@ -50,6 +53,7 @@ class ChatBubble extends StatelessWidget {
     ChatBubbleOrientation orientation,
     this.backgroundColor,
     bool fillBubble,
+    bool transparent,
     this.onTap,
     this.onLongPress,
     @required @Generator(ChatConversationFixtures, 'sentenceText') this.child,
@@ -57,6 +61,7 @@ class ChatBubble extends StatelessWidget {
       : assert(child != null),
         orientation = orientation ?? ChatBubbleOrientation.left,
         fillBubble = fillBubble ?? false,
+        transparent = transparent ?? false,
         super(key: key);
 
   @override
@@ -101,19 +106,20 @@ class ChatBubble extends StatelessWidget {
       wrappedChild = child;
     }
 
-    return new ClipRRect(
-      borderRadius: borderRadius,
-      child: new GestureDetector(
-        onTap: onTap,
-        onLongPress: onLongPress,
-        child: new Container(
-          padding: padding,
-          margin: const EdgeInsets.only(bottom: 2.0),
-          decoration: new BoxDecoration(
-            color: backgroundColor ?? theme.primaryColor,
-            borderRadius: borderRadius,
+    return new Container(
+      margin: const EdgeInsets.only(bottom: 2.0),
+      child: new PhysicalModel(
+        color: transparent
+            ? Colors.transparent
+            : backgroundColor ?? theme.primaryColor,
+        borderRadius: borderRadius,
+        child: new GestureDetector(
+          onTap: onTap,
+          onLongPress: onLongPress,
+          child: new Container(
+            padding: padding,
+            child: wrappedChild,
           ),
-          child: wrappedChild,
         ),
       ),
     );

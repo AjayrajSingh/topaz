@@ -42,6 +42,9 @@ abstract class Message {
   /// Indicates whether this section contains [Message]s from the current user.
   bool get isMyMessage => sender == 'me';
 
+  /// Use transparent background.
+  bool get transparent => false;
+
   /// Returns the [Widget] representation of this model.
   Widget buildWidget();
 }

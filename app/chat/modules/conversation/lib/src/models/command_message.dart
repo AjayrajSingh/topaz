@@ -125,6 +125,9 @@ class CommandMessage extends Message {
     );
   }
 
+  @override
+  bool get transparent => true;
+
   /// Command specific rendering, delelgates to the embedder for the mod
   /// command.
   Widget _buildEmbeddedModule(
