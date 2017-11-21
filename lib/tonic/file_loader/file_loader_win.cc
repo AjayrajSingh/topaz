@@ -22,26 +22,10 @@ const char FileLoader::kFileURLPrefix[] = "file:///";
 const size_t FileLoader::kFileURLPrefixLength = sizeof(FileLoader::kFileURLPrefix) - 1;
 const std::string FileLoader::kPathSeparator = "\\";
 
-namespace {
-
-void FindAndReplaceInPlace(std::string& str,
-    const std::string& findStr, const std::string& replaceStr) {
-  size_t pos = 0;
-  while ((pos = str.find(findStr, pos)) != std::string::npos) {
-    str.replace(pos, findStr.length(), replaceStr);
-    pos += replaceStr.length();
-  }
-}
-
-}  // namespace
-
-
 std::string FileLoader::SanitizePath(const std::string& url) {
   std::string sanitized = url;
   FindAndReplaceInPlace(sanitized, "/", FileLoader::kPathSeparator);
-  // TODO(bkonyi): URIs may contain other escaped characters that need to be
-  // replaced. We may want to add replacements for those here at some point.
-  FindAndReplaceInPlace(sanitized, "%20", " ");
+  SanitizeURIEscapedCharactersInPlace(sanitized);
   return sanitized;
 }
 

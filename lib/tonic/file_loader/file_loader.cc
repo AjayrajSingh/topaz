@@ -52,6 +52,21 @@ FileLoader::FileLoader() {}
 
 FileLoader::~FileLoader() {}
 
+void FileLoader::FindAndReplaceInPlace(std::string& str,
+    const std::string& findStr, const std::string& replaceStr) {
+  size_t pos = 0;
+  while ((pos = str.find(findStr, pos)) != std::string::npos) {
+    str.replace(pos, findStr.length(), replaceStr);
+    pos += replaceStr.length();
+  }
+}
+
+void FileLoader::SanitizeURIEscapedCharactersInPlace(std::string& str) {
+  // TODO(bkonyi): URIs may contain other escaped characters that need to be
+  // replaced. We may want to add replacements for those here at some point.
+  FindAndReplaceInPlace(str, "%20", " ");
+}
+
 bool FileLoader::LoadPackagesMap(const std::string& packages) {
   packages_ = packages;
   dependencies_.insert(packages_);
