@@ -21,7 +21,6 @@ import 'package:lib.widgets/modular.dart';
 import 'active_agents_manager.dart';
 import 'focus_request_watcher_impl.dart';
 import 'initial_focus_setter.dart';
-import 'maxwell_hotword.dart';
 import 'maxwell_voice_model.dart';
 import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
@@ -42,9 +41,6 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// Receives the [SuggestionProvider], [FocusController], and
   /// [VisibleStoriesController].
   final SuggestionProviderSuggestionModel suggestionProviderSuggestionModel;
-
-  /// Listens for hotwords.
-  final MaxwellHotword maxwellHotword;
 
   /// Tracks speech UI state.
   final MaxwellVoiceModel maxwellVoiceModel;
@@ -89,7 +85,6 @@ class ArmadilloUserShellModel extends UserShellModel {
   ArmadilloUserShellModel({
     this.storyProviderStoryGenerator,
     this.suggestionProviderSuggestionModel,
-    this.maxwellHotword,
     this.maxwellVoiceModel,
     this.focusRequestWatcher,
     this.initialFocusSetter,
@@ -142,7 +137,6 @@ class ArmadilloUserShellModel extends UserShellModel {
       ..storyProvider = storyProvider;
 
     suggestionProviderSuggestionModel.suggestionProvider = suggestionProvider;
-    maxwellHotword.suggestionProvider = suggestionProvider;
     maxwellVoiceModel.suggestionProvider = suggestionProvider;
 
     ContextQuery query = new ContextQuery()
@@ -195,7 +189,6 @@ class ArmadilloUserShellModel extends UserShellModel {
     _focusRequestWatcherBinding.close();
     _presentation.ctrl.close();
     maxwellVoiceModel.close();
-    maxwellHotword.stop();
     suggestionProviderSuggestionModel.close();
     storyProviderStoryGenerator.close();
     onUserShellStopped?.call();

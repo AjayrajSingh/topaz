@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-export 'src/next/hotword.dart';
 export 'src/next/interruption_overlay.dart';
 export 'src/next/next_builder.dart';
 export 'src/next/peek_model.dart';

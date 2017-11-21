@@ -2,13 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:armadillo/next.dart';
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/speech_to_text.fidl.dart' as maxwell;
 import 'package:lib.logging/logging.dart';
 
 /// Listens for a hotword from Maxwell.
-class MaxwellHotword extends Hotword with maxwell.HotwordListener {
+abstract class MaxwellHotword extends maxwell.HotwordListener {
   static final Duration _kCriticalFailurePeriod = new Duration(seconds: 1);
   static const int _kCriticalFailureCount = 5;
 
@@ -33,7 +32,6 @@ class MaxwellHotword extends Hotword with maxwell.HotwordListener {
   }
 
   /// Starts listening for a hotword.
-  @override
   void start() {
     if (_suggestionProviderProxy == null) {
       _startPending = true;
@@ -42,6 +40,7 @@ class MaxwellHotword extends Hotword with maxwell.HotwordListener {
       _suggestionProviderProxy
           .listenForHotword(_hotwordListenerBinding.wrap(this));
       _hotwordListenerBinding.onConnectionError = () {
+        onError();
         _hotwordListenerBinding.close();
 
         final DateTime now = new DateTime.now();
@@ -55,6 +54,7 @@ class MaxwellHotword extends Hotword with maxwell.HotwordListener {
           log.warning('Speech capture failed more than '
               '$_kCriticalFailureCount times in $_kCriticalFailurePeriod; '
               'disabling hotword detection');
+          onFatal();
           return;
         }
         start();
@@ -64,7 +64,6 @@ class MaxwellHotword extends Hotword with maxwell.HotwordListener {
   }
 
   /// Stops listening for a hortword.
-  @override
   void stop() {
     if (_hotwordListenerBinding.isBound) {
       log.info('Stopped listening for hotword');
@@ -72,4 +71,10 @@ class MaxwellHotword extends Hotword with maxwell.HotwordListener {
     }
     _startPending = false;
   }
+
+  /// Called when hotword detection encounters a recoverable error.
+  void onError();
+
+  /// Called when hotword detection encounters a fatal error.
+  void onFatal();
 }

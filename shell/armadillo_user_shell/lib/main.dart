@@ -31,7 +31,6 @@ import 'focus_request_watcher_impl.dart';
 import 'focused_stories_tracker.dart';
 import 'hit_test_model.dart';
 import 'initial_focus_setter.dart';
-import 'maxwell_hotword.dart';
 import 'maxwell_voice_model.dart';
 import 'power_manager_power_model.dart';
 import 'story_provider_story_generator.dart';
@@ -196,34 +195,12 @@ Widget buildArmadilloUserShell({
     powerManager: powerManagerProxy,
   );
 
-  MaxwellHotword hotword = new MaxwellHotword();
   MaxwellVoiceModel voiceModel = new MaxwellVoiceModel();
-
-  voiceModel.addListener(() {
-    if (voiceModel.isInput) {
-      // There's the potential for a race condition here. If we don't call stop
-      // here, we can't tell the difference between hotword stopping expectedly
-      // due to speech capture or erroneously due to a system error, and the
-      // retry handler for hotword may kick us back out of speech capture.
-      // voiceModel listener and FIDL are both dispatched asynchronously, and it
-      // is reasonable to assume that for now this listener executes
-      // deterministically first. Also though, this race will probably go away
-      // after the audio refactor.
-      hotword.stop();
-    } else {
-      hotword.start();
-    }
-  });
-
-  hotword
-    ..addListener(voiceModel.beginSpeechCapture)
-    ..start();
 
   ArmadilloUserShellModel armadilloUserShellModel = new ArmadilloUserShellModel(
     storyProviderStoryGenerator: storyProviderStoryGenerator,
     suggestionProviderSuggestionModel: suggestionProviderSuggestionModel,
     maxwellVoiceModel: voiceModel,
-    maxwellHotword: hotword,
     focusRequestWatcher: focusRequestWatcher,
     initialFocusSetter: initialFocusSetter,
     userLogoutter: userLogoutter,

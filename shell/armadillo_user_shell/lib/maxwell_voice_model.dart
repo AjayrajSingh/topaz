@@ -8,20 +8,20 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.suggestion.fidl/speech_to_text.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
 
+import 'maxwell_hotword.dart';
+
 class _MaxwellTranscriptionListenerImpl extends maxwell.TranscriptionListener {
   final MaxwellVoiceModel model;
 
   _MaxwellTranscriptionListenerImpl(this.model);
 
   @override
-  void onReady() {
-    model.state = VoiceState.listening;
-  }
+  void onReady() => model._speechToText = VoiceState.listening;
 
   @override
   void onTranscriptUpdate(String spokenText) {
     if (spokenText != null && spokenText.isNotEmpty) {
-      model.state = VoiceState.userSpeaking;
+      model._speechToText = VoiceState.userSpeaking;
     }
     if (model._transcription != spokenText) {
       model
@@ -31,9 +31,7 @@ class _MaxwellTranscriptionListenerImpl extends maxwell.TranscriptionListener {
   }
 
   @override
-  void onError() {
-    model.state = VoiceState.error;
-  }
+  void onError() => model._error = true;
 }
 
 class _MaxwellFeedbackListenerImpl extends maxwell.FeedbackListener {
@@ -45,29 +43,62 @@ class _MaxwellFeedbackListenerImpl extends maxwell.FeedbackListener {
   void onStatusChanged(maxwell.SpeechStatus status) {
     switch (status) {
       case maxwell.SpeechStatus.processing:
-        model._processing = true;
+        model
+          .._loading = true
+          .._replying = false;
         break;
       case maxwell.SpeechStatus.responding:
+        // (loading status indeterminate/moot)
+        model._replying = true;
         // HACK(rosswang): Right now, it's possible Maxwell may attempt to start
         // replying while speech capture is still active. For now, close speech
         // capture if that happens. Eventually we'll want to wait until we've
         // stopped capturing first.
         model._transcriptionListenerBinding.close();
-        model.state = VoiceState.replying;
         break;
       case maxwell.SpeechStatus.idle:
-        model._processing = false;
+        model
+          .._loading = false
+          .._replying = false;
         break;
       default:
         log.warning('Unknown speech status $status');
-        model._processing = false;
+        model
+          .._loading = false
+          .._replying = false;
         break;
     }
   }
 
   @override
-  void onTextResponse(String responseText) {
-    log.fine('responseText $responseText');
+  void onTextResponse(String responseText) =>
+      log.fine('responseText $responseText');
+}
+
+class _MaxwellVoiceModelHotword extends MaxwellHotword {
+  final MaxwellVoiceModel model;
+
+  _MaxwellVoiceModelHotword(this.model);
+
+  @override
+  void onReady() {
+    model._hotwordReady = true;
+  }
+
+  @override
+  void onHotword() => model.beginSpeechCapture();
+
+  @override
+  void onError() {
+    model._hotwordReady = false;
+    // don't raise the error flag just yet; this may be recoverable
+  }
+
+  @override
+  void onFatal() {
+    model
+      .._error = true
+      .._hotwordReady = false;
   }
 }
 
@@ -80,7 +111,8 @@ class _MaxwellFeedbackListenerImpl extends maxwell.FeedbackListener {
 ///   [VoiceState.userSpeaking] / [VoiceState.listening]?
 ///   [VoiceState.loading]?
 ///   [VoiceState.error]? (cleared on next request)
-/// otherwise, [VoiceState.passive].
+///   [VoiceState.passive]? (hotword ready?)
+/// otherwise, [VoiceState.initializing].
 class MaxwellVoiceModel extends VoiceModel {
   /// Set from an external source - typically the UserShell.
   maxwell.SuggestionProviderProxy _suggestionProviderProxy;
@@ -93,31 +125,81 @@ class MaxwellVoiceModel extends VoiceModel {
   final maxwell.TranscriptionListenerBinding _transcriptionListenerBinding =
       new maxwell.TranscriptionListenerBinding();
 
+  _MaxwellVoiceModelHotword _hotword;
+
   String _transcription = '';
-  // The loading state is !isInput && _processing.
-  bool _processingValue = false;
+
+  // state stack (see class docs)
+  bool _isReplying = false;
+  VoiceState _speechToTextState;
+  bool _isLoading = false;
+  bool _isError = false;
+  bool _isHotwordReady = false;
 
   /// Default constructor.
   MaxwellVoiceModel() {
     _feedbackListener = new _MaxwellFeedbackListenerImpl(this);
     _transcriptionListener = new _MaxwellTranscriptionListenerImpl(this);
+    (_hotword = new _MaxwellVoiceModelHotword(this)).start();
   }
 
-  bool get _processing => _processingValue;
+  set _replying(bool value) {
+    _isReplying = value;
+    _updateState();
+  }
 
-  set _processing(bool value) {
-    _processingValue = value;
-    // Processing state transitions that happen while capture is active are
-    // handled by _transcriptionListenerBinding.onConnectionError, so only
-    // update if capture is inactive.
-    if (!isInput) {
-      if (value) {
-        state = VoiceState.loading;
-      } else if (state != VoiceState.error) {
-        // error supercedes passive
-        state = VoiceState.passive;
+  set _speechToText(VoiceState value) {
+    _speechToTextState = value;
+    _updateState();
+  }
+
+  set _loading(bool value) {
+    _isLoading = value;
+    _updateState();
+  }
+
+  set _error(bool value) {
+    _isError = value;
+    _updateState();
+  }
+
+  set _hotwordReady(bool value) {
+    _isHotwordReady = value;
+    _updateState();
+  }
+
+  void _updateState() {
+    bool wasInput = isInput;
+
+    if (_isReplying) {
+      super.state = VoiceState.replying;
+    } else if (_speechToTextState != null) {
+      super.state = _speechToTextState;
+    } else if (_isLoading) {
+      super.state = VoiceState.loading;
+    } else if (_isError) {
+      super.state = VoiceState.error;
+    } else if (_isHotwordReady) {
+      super.state = VoiceState.passive;
+    } else {
+      super.state = VoiceState.initializing;
+    }
+
+    if (wasInput != isInput) {
+      if (isInput) {
+        _hotword.stop();
+        _hotwordReady = false;
+      } else {
+        _hotwordReady = false;
+        _hotword.start();
       }
     }
+  }
+
+  @override
+  @deprecated
+  set state(VoiceState state) {
+    throw new UnsupportedError('state is not writeable.');
   }
 
   @override
@@ -131,18 +213,21 @@ class MaxwellVoiceModel extends VoiceModel {
     _suggestionProviderProxy = suggestionProviderProxy;
     suggestionProviderProxy.registerFeedbackListener(
         _feedbackListenerBinding.wrap(_feedbackListener));
+    _hotword.suggestionProvider = suggestionProviderProxy;
   }
 
   /// Call to close all the handles opened by this model.
   void close() {
     _feedbackListenerBinding.close();
     _transcriptionListenerBinding.close();
+    _hotword.stop();
   }
 
   /// Initiates speech capture.
   @override
   void beginSpeechCapture() {
-    state = VoiceState.preparing;
+    _speechToText = VoiceState.preparing;
+    _error = false;
     _transcriptionListenerBinding.close();
     _transcription = '';
 
@@ -152,11 +237,7 @@ class MaxwellVoiceModel extends VoiceModel {
     // The voice input is completed when the transcriptionListener is closed
     _transcriptionListenerBinding.onConnectionError = () {
       _transcriptionListenerBinding.close();
-      if (_processing) {
-        state = VoiceState.loading;
-      } else if (state != VoiceState.replying && state != VoiceState.error) {
-        state = VoiceState.passive;
-      }
+      _speechToText = null;
     };
   }
 }

@@ -12,6 +12,9 @@ export 'package:lib.widgets/model.dart'
 /// Most of the states are from:
 /// https://knowledge-ux-prototyping.teams.x20web.corp.google.com/motion/tts_spec/index.html
 enum VoiceState {
+  /// The system is not yet ready to listen for a hotword.
+  initializing,
+
   /// User has not said the hotword
   passive,
 
@@ -44,7 +47,7 @@ abstract class VoiceModel extends Model {
   static VoiceModel of(BuildContext context) =>
       new ModelFinder<VoiceModel>().of(context);
 
-  VoiceState _state = VoiceState.passive;
+  VoiceState _state = VoiceState.initializing;
 
   /// The current voice state.
   VoiceState get state => _state;
