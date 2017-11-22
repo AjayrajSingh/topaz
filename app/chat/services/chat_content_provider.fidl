@@ -107,7 +107,8 @@ interface ChatContentProvider {
   //         {
   //           "email":       <participant_email>,
   //           "displayName": <display name>,
-  //           "photoUrl":    <photo url>
+  //           "photoUrl":    <photo url>,
+  //           "title":       <title (can be null)>
   //         },
   //         <...>
   //       ]

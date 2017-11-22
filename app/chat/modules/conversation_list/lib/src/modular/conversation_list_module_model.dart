@@ -321,10 +321,12 @@ class ChatConversationListModuleModel extends ModuleModel {
         case 'new_conversation':
           List<int> conversationId = decoded['conversation_id'];
           List<Map<String, String>> participants = decoded['participants'];
+          String title = decoded['title'];
 
           Conversation newConversation = new Conversation(
             conversationId: conversationId,
             participants: participants.map(_getUserFromParticipantMap).toList(),
+            title: title,
           );
 
           if (_conversations != null) {

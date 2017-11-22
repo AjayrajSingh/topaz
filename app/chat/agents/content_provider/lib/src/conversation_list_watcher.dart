@@ -111,6 +111,7 @@ class ConversationListWatcher extends BasePageWatcher {
             'event': 'new_conversation',
             'conversation_id': entry.key,
             'participants': decoded['participants'],
+            'title': decoded['title'],
           };
     _seenConversations.add(entry.key);
 
