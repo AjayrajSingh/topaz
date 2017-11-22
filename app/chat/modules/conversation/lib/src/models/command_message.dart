@@ -30,6 +30,9 @@ class CommandMessage extends Message {
   /// String list of members in the chat convo.
   final List<String> members;
 
+  /// Called when the refresh button is tapped.
+  final VoidCallback onRefresh;
+
   CommandType _command;
   List<String> _arguments;
 
@@ -41,6 +44,7 @@ class CommandMessage extends Message {
     @required DateTime time,
     @required String sender,
     VoidCallback onDelete,
+    this.onRefresh,
     @required this.payload,
     CommandInitializer initializer,
   })
@@ -80,6 +84,9 @@ class CommandMessage extends Message {
   @override
   bool get fillBubble => _command == null ? false : true;
 
+  @override
+  bool get longPressDeleteEnabled => false;
+
   /// The [CommandType] for this [CommandMessage].
   CommandType get command => _command;
 
@@ -88,17 +95,39 @@ class CommandMessage extends Message {
 
   @override
   Widget buildWidget() {
-    /// Connect the [EmbedderModel] parent to the nodes built in
-    /// [buildEmbeddedModule].
-    return new AnimatedBuilder(
-      animation: embedder,
-      builder: buildEmbeddedModule,
+    List<Widget> children = <Widget>[
+      /// Connect the [EmbedderModel] parent to the nodes built in
+      /// [buildEmbeddedModule].
+      new Expanded(
+        child: new AnimatedBuilder(
+          animation: embedder,
+          builder: _buildEmbeddedModule,
+        ),
+      ),
+    ]..insert(isMyMessage ? 0 : 1, _buildToolbar());
+
+    return new Row(children: children);
+  }
+
+  /// Builds a toolbar for refresh, delete buttons.
+  Widget _buildToolbar() {
+    return new Column(
+      children: <Widget>[
+        new IconButton(
+          icon: new Icon(Icons.refresh),
+          onPressed: onRefresh,
+        ),
+        new IconButton(
+          icon: new Icon(Icons.delete),
+          onPressed: onDelete,
+        ),
+      ],
     );
   }
 
   /// Command specific rendering, delelgates to the embedder for the mod
   /// command.
-  Widget buildEmbeddedModule(
+  Widget _buildEmbeddedModule(
     BuildContext context,
     Widget child,
   ) {

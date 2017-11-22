@@ -36,6 +36,12 @@ abstract class Message {
   /// Indicates whether the message should fill the chat bubble area or not.
   bool get fillBubble => false;
 
+  /// Indicates whether the long press delete is enabled for this message.
+  bool get longPressDeleteEnabled => true;
+
+  /// Indicates whether this section contains [Message]s from the current user.
+  bool get isMyMessage => sender == 'me';
+
   /// Returns the [Widget] representation of this model.
   Widget buildWidget();
 }

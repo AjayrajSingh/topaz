@@ -150,7 +150,9 @@ class ChatSection extends StatelessWidget {
                     orientation: orientation,
                     backgroundColor: backgroundColor,
                     fillBubble: message.fillBubble,
-                    onLongPress: message.onDelete,
+                    onLongPress: message.longPressDeleteEnabled
+                        ? message.onDelete
+                        : null,
                   ))
               .toList(),
         ),

@@ -474,11 +474,11 @@ class ChatConversationModuleModel extends ModuleModel {
             log.fine('CommandMessage::onDelete');
             deleteMessage(m.messageId);
           },
+          onRefresh: embedder.restartDaisy,
           payload: m.jsonPayload,
           initializer: (List<String> args) {
             // Supports "/mod <verb> <message>".
             if (args.isNotEmpty && !embedder.daisyStarted) {
-              String id = BASE64.encode(m.messageId);
               String verb = args.first;
 
               Map<String, String> messageEntity = <String, String>{
@@ -492,14 +492,14 @@ class ChatConversationModuleModel extends ModuleModel {
               };
 
               // Create a Daisy.
-              DaisyBuilder daisyBuilder = new DaisyBuilder.verb(
-                  'com.google.fuchsia.codelab.$verb')
-                ..addNoun('originalMessage', messageEntity)
-                ..addNoun('members', membersEntity);
+              DaisyBuilder daisyBuilder =
+                  new DaisyBuilder.verb('com.google.fuchsia.codelab.$verb')
+                    ..addNoun('originalMessage', messageEntity)
+                    ..addNoun('members', membersEntity);
 
               embedder.startDaisy(
                 daisy: daisyBuilder.daisy,
-                name: id,
+                name: mid,
               );
             }
           },

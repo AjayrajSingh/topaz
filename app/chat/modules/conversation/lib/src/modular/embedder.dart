@@ -26,22 +26,23 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
   /// The [ModuleContext] used to grab links etc.
   final ModuleContext moduleContext;
 
-  /// The [InterfacePair] for the [ViewOwner] used for the
-  /// [ChildViewConnection].
-  final InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
+  /// The [Daisy] to use when restarting the Daisy.
+  Daisy daisy;
+
+  /// The name of the embedded mod for restarting Daisy.
+  String name;
 
   /// The client for the link used by the embedded module.
-  final LinkProxy link = new LinkProxy();
+  LinkProxy link;
 
   /// The [ChildViewConnection] of the embedded module.
   ChildViewConnection connection;
 
   /// A [ModuleControllerProxy].
-  final ModuleControllerProxy moduleControllerProxy =
-      new ModuleControllerProxy();
+  ModuleControllerProxy moduleController;
 
   /// A [ModuleWatcherBinding] used to watch for [ModuleState] changes.
-  final ModuleWatcherBinding watcherBinding = new ModuleWatcherBinding();
+  ModuleWatcherBinding watcherBinding;
 
   /// The [Embedder] constructor.
   Embedder({
@@ -89,11 +90,26 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
   /// Close down everything used to embed the module.
   void close() {
     // Stop the embedded module.
-    moduleControllerProxy.stop(() {});
+    moduleController?.stop(() {});
 
-    link.ctrl.close();
-    moduleControllerProxy.ctrl.close();
-    watcherBinding.close();
+    link?.ctrl?.close();
+    link = null;
+
+    moduleController?.ctrl?.close();
+    moduleController = null;
+
+    watcherBinding?.close();
+    watcherBinding = null;
+
+    _daisyStarted = false;
+  }
+
+  /// Restarts the Daisy from the previous startDaisy call.
+  void restartDaisy() {
+    assert(daisyStarted);
+
+    close();
+    startDaisy(daisy: daisy, name: name);
   }
 
   /// Starts a Daisy.
@@ -104,6 +120,11 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
     if (daisyStarted) {
       return;
     }
+
+    // Remember the values for refreshing later.
+    this.daisy = daisy;
+    this.name = name;
+
     _daisyStarted = true;
 
     status = EmbedderModelStatus.resolving;
@@ -111,20 +132,25 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
 
     log..info('Starting Daisy: $daisy')..info('=> name: $name');
 
+    moduleController = new ModuleControllerProxy();
+    InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
+
     moduleContext.startDaisy(
       name, // module name
       daisy,
       name, // link name
       null, // incomingServices
-      moduleControllerProxy.ctrl.request(),
+      moduleController.ctrl.request(),
       viewOwnerPair.passRequest(),
     );
 
     connection = new ChildViewConnection(viewOwnerPair.passHandle());
 
+    link = new LinkProxy();
     moduleContext.getLink(name, link.ctrl.request());
 
-    moduleControllerProxy.watch(watcherBinding.wrap(this));
+    watcherBinding = new ModuleWatcherBinding();
+    moduleController.watch(watcherBinding.wrap(this));
   }
 
   @override
