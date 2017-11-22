@@ -53,7 +53,7 @@ PATH := $(FLUTTER_BIN):$(DART_BIN):$(FUCHSIA_DIR)/buildtools:$(FUCHSIA_DIR)/scri
 ################################################################################
 ## Fuchsia build / LUCI bot related flags
 
-DEFAULT_MODULE ?= packages/gn/default
+DEFAULT_MODULE ?= build/gn/default
 MINIMAL_MODULE ?= topaz/packages/mods
 
 # Specify GOMA=1 to force use goma, GOMA=0 to force not use goma.

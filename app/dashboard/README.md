@@ -6,8 +6,8 @@ Simple Flutter module to display the Fuchsia build status. This can be built bot
 
 1. ```cd $SRC/third_party```
 2. ```git clone git@github.com:gregsimon/fuchsia_build_status.git ```
-3. ```cp $SRC/third_party/fuchsia_build_status/misc_build_files/fuchsia_build_status $SRC/packages/gn/```
-4. Modify ```$SRC/packages/gn/default``` adding ```"fuchsia_build_status"``` to the "imports" section:
+3. ```cp $SRC/third_party/fuchsia_build_status/misc_build_files/fuchsia_build_status $SRC/build/gn/```
+4. Modify ```$SRC/build/gn/default``` adding ```"fuchsia_build_status"``` to the "imports" section:
 
 ```
 
@@ -27,9 +27,9 @@ Simple Flutter module to display the Fuchsia build status. This can be built bot
 
 ## How to self-boot into the dashboard
 
-1. ```cp $SRC/third_party/fuchsia_build_status/misc_build_files/boot_dashboard $SRC/packages/gn/```
+1. ```cp $SRC/third_party/fuchsia_build_status/misc_build_files/boot_dashboard $SRC/build/gn/```
 
-2. packages/gn/gen.py -p boot_dashboard
+2. build/gn/gen.py -p boot_dashboard
 
 
 ## How to build for iOS, Android

@@ -35,7 +35,7 @@ Make sure to setup a jiri root according to the Fuchsia getting started doc.
 
 ## Build
 
-An optional build target for "todo" lives in `//packages/gn/todo`. It can be used via `fx set`
+An optional build target for "todo" lives in `//build/gn/todo`. It can be used via `fx set`
 
     fx set x86-64 --packages topaz/packages/default,topaz/packages/todo --release
 

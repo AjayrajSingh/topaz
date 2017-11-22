@@ -102,11 +102,11 @@ before running the chat modules correctly.
 ## Chat Agent Tests
 
 To run the chat agent tests, build fuchsia with
-`--packages packages/gn/boot_test_modular` option and boot into fuchsia using a
+`--packages build/gn/boot_test_modular` option and boot into fuchsia using a
 target device or a QEMU instance.
 
 ```bash
-$ fx set x86-64 --packages packages/gn/boot_test_modular
+$ fx set x86-64 --packages build/gn/boot_test_modular
 $ fx full-build
 $ fx run <options> # when using QEMU.
 ```
