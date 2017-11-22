@@ -9,12 +9,14 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
+import 'package:lib.context.fidl/context_writer.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' hide Message;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
@@ -23,6 +25,7 @@ import 'package:lib.module_resolver.dart/daisy_builder.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.dart/story.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
     as chat_fidl;
@@ -40,6 +43,13 @@ const Duration _kScrollAnimationDuration = const Duration(milliseconds: 300);
 const Duration _kErrorDuration = const Duration(seconds: 10);
 
 const double _kEmbeddedModHeight = 200.0;
+
+/// The context topic for a chat conversation
+const String _kConversationContextTopic = 'chat_conversation';
+
+/// The Entity type for a chat conversation.
+const String _kConversationContextType =
+    'http://types.fuchsia.io/chat/conversation';
 
 /// A [ModuleModel] providing chat conversation specific data to the descendant
 /// widgets.
@@ -74,6 +84,8 @@ class ChatConversationModuleModel extends ModuleModel {
   final LinkWatcherBinding _childLinkWatcherBinding = new LinkWatcherBinding();
   ModuleControllerProxy _childModuleController;
   String _currentChildModuleName;
+
+  final ContextWriterProxy _contextWriter = new ContextWriterProxy();
 
   chat_fidl.Conversation _conversation;
   List<chat_fidl.Message> _messages;
@@ -252,6 +264,13 @@ class ChatConversationModuleModel extends ModuleModel {
       onNotify: _onNotifyChild,
     )));
 
+    // Set up context writer
+    IntelligenceServicesProxy intelligenceServices =
+        new IntelligenceServicesProxy();
+    moduleContext.getIntelligenceServices(intelligenceServices.ctrl.request());
+    intelligenceServices.getContextWriter(_contextWriter.ctrl.request());
+    intelligenceServices.ctrl.close();
+
     // Close all the unnecessary bindings.
     contentProviderServices.ctrl.close();
     componentContext.ctrl.close();
@@ -374,6 +393,11 @@ class ChatConversationModuleModel extends ModuleModel {
                       this.conversationId, conversationId)) {
                 log.fine('adding the new message.');
                 _setMessages(_messages..add(message));
+                Message convertedMessage = _createMessageFromFidl(message);
+                if (convertedMessage is TextMessage) {
+                  TextMessage textMessage = convertedMessage;
+                  _publishMessageAsContext(textMessage.text);
+                }
                 _scrollToEnd();
               }
             },
@@ -581,6 +605,7 @@ class ChatConversationModuleModel extends ModuleModel {
     _childLink.ctrl.close();
     _chatContentProvider.ctrl.close();
     _chatContentProviderController.ctrl.close();
+    _contextWriter.ctrl.close();
 
     for (Embedder e in embedders.values) {
       e.close();
@@ -765,5 +790,17 @@ class ChatConversationModuleModel extends ModuleModel {
       content: new Text(message),
       duration: _kErrorDuration,
     ));
+  }
+
+  void _publishMessageAsContext(String message) {
+    _contextWriter.writeEntityTopic(
+      _kConversationContextTopic,
+      JSON.encode(
+        <String, String>{
+          '@type': _kConversationContextType,
+          'message': message,
+        },
+      ),
+    );
   }
 }
