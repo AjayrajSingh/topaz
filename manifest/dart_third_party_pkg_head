@@ -111,7 +111,7 @@
     <project name="third_party/dart/third_party/pkg/intl"
              path="third_party/dart/third_party/pkg/intl"
              remote="https://chromium.googlesource.com/external/github.com/dart-lang/intl.git"
-             revision="0.15.1"/>
+             revision="0.15.2"/>
 
     <project name="third_party/dart/third_party/pkg/isolate"
              path="third_party/dart/third_party/pkg/isolate"
