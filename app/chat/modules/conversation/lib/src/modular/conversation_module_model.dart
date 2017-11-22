@@ -106,6 +106,11 @@ class ChatConversationModuleModel extends ModuleModel {
     Uint8List newId = id == null ? null : new Uint8List.fromList(id);
 
     if (!_intListEquality.equals(_conversationId, newId)) {
+      // Unsubscribe to get no further notification on the old conversation.
+      if (_mqConversationToken.isCompleted) {
+        _mqConversationToken.future.then(_chatContentProvider.unsubscribe);
+      }
+
       _conversationId = newId;
 
       // We don't want to reuse the existing scroll controller, so create a new
@@ -380,6 +385,13 @@ class ChatConversationModuleModel extends ModuleModel {
             _setMessages(_messages
               ..removeWhere((chat_fidl.Message m) =>
                   _intListEquality.equals(m.messageId, messageId)));
+          }
+          break;
+
+        case 'delete_conversation':
+          // Reset the current conversation.
+          if (_intListEquality.equals(this.conversationId, conversationId)) {
+            _setConversationId(null);
           }
           break;
 

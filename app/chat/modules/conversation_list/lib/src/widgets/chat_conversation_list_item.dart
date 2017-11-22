@@ -19,6 +19,9 @@ class ChatConversationListItem extends StatelessWidget {
   /// Callback fired when this item is selected.
   final VoidCallback onSelect;
 
+  /// Callback fired when this item is long pressed.
+  final VoidCallback onLongPress;
+
   /// Indicates whether this conversation is currently selected or not.
   final bool selected;
 
@@ -27,6 +30,7 @@ class ChatConversationListItem extends StatelessWidget {
     Key key,
     @required this.conversation,
     this.onSelect,
+    this.onLongPress,
     bool selected,
   })
       : assert(conversation != null),
@@ -67,7 +71,8 @@ class ChatConversationListItem extends StatelessWidget {
             fontSize: 12.0,
           ),
         ),
-        onTap: () => onSelect?.call(),
+        onTap: onSelect,
+        onLongPress: onLongPress,
       ),
     );
   }

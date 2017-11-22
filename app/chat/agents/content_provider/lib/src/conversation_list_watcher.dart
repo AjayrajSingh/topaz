@@ -43,6 +43,9 @@ class ConversationListWatcher extends BasePageWatcher {
   ) {
     // Process the changes independently.
     pageChange.changes.forEach(_processEntry);
+
+    // Process the deleted conversations.
+    pageChange.deletedKeys.forEach(_processDeletedKey);
   }
 
   @override
@@ -121,5 +124,15 @@ class ConversationListWatcher extends BasePageWatcher {
     if (completer != null && !completer.isCompleted) {
       completer.complete(entry);
     }
+  }
+
+  /// Process the deleted key and send notification to the clients.
+  void _processDeletedKey(List<int> conversationId) {
+    Map<String, Object> notification = <String, Object>{
+      'event': 'delete_conversation',
+      'conversation_id': conversationId,
+    };
+
+    sendMessage(JSON.encode(notification));
   }
 }

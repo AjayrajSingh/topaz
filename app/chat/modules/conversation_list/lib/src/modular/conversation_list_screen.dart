@@ -41,6 +41,8 @@ class _ChatConversationListScreenState
               onSelectConversation: (Conversation c) => model
                 ..setConversationId(c.conversationId)
                 ..focusConversation(),
+              onLongPressConversation: (Conversation c) =>
+                  model.deleteConversation(c.conversationId),
               selectedId: model.conversationId,
               shouldDisplaySpinner: model.shouldDisplaySpinner,
             ),

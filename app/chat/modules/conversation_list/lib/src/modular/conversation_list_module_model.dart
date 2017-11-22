@@ -340,6 +340,25 @@ class ChatConversationListModuleModel extends ModuleModel {
           }
           break;
 
+        case 'delete_conversation':
+          List<int> conversationId = decoded['conversation_id'];
+          _conversations.remove(conversationId);
+
+          // If the given conversation is the currently selected one, attempt to
+          // auto-select another conversation.
+          if (_intListEquality.equals(_conversationId, conversationId)) {
+            if (_conversations.isNotEmpty) {
+              setConversationId(_conversations.keys.first);
+            } else {
+              setConversationId(null);
+              _conversationModuleController?.defocus();
+              _shouldAutoSelectConversation = true;
+            }
+          } else {
+            notifyListeners();
+          }
+          break;
+
         case 'download_status':
           String downloadStatus = decoded['status'];
           log.fine('Download status: $downloadStatus');
@@ -493,8 +512,8 @@ class ChatConversationListModuleModel extends ModuleModel {
 
         // The intended behavior is to auto-select the newly created
         // conversation when it is successfully created. However, we don't know
-        // whether the `_handleNewConversation()` notification or this callback
-        // of `newConversation()` call will come first.
+        // whether the `_handleConversationListEvent()` notification or this
+        // callback of `newConversation()` call will come first.
         //
         // In order to account for both scenarios, if the created conversation
         // id is already in our list of conversation ids, just select that
@@ -526,6 +545,18 @@ class ChatConversationListModuleModel extends ModuleModel {
     }).toList();
 
     newConversation(participants);
+  }
+
+  /// Delete the specified conversation.
+  void deleteConversation(List<int> conversationId) {
+    _chatContentProvider.deleteConversation(
+      conversationId,
+      (chat_fidl.ChatStatus status) {
+        if (status != chat_fidl.ChatStatus.ok) {
+          showError('Error: $status');
+        }
+      },
+    );
   }
 
   /// Shows the given error message using snack bar.

@@ -77,6 +77,10 @@ interface ChatContentProvider {
   NewConversation(array<Participant> participants)
       => (ChatStatus status, Conversation? conversation);
 
+  // Deletes the conversation specified by the |conversation_id|.
+  // Returns |ID_NOT_FOUND| in case the given |conversation_id| was not found.
+  DeleteConversation(array<uint8> conversation_id) => (ChatStatus status);
+
   // Returns the metadata of the specified conversation.
   // To obtain the conversation history, use the |GetMessages| method with the
   // same conversation id.
@@ -95,7 +99,8 @@ interface ChatContentProvider {
   // When the |message_queue_token| value is provided, the client will be
   // notified (1) with any new conversations added after the initial list of
   // conversations is sent, or (2) when the ledger download status is changed,
-  // or (3) when a conversation title is changed.
+  // or (3) when a conversation is deleted, or (4) when a conversation title is
+  // changed.
   //
   // The message sent from the content provider will be a JSON string formatted
   // as following:
@@ -114,6 +119,10 @@ interface ChatContentProvider {
   //       ]
   //     }
   //
+  //     {
+  //       "event":           "delete_conversation",
+  //       "conversation_id": <conversation_id>
+  //     }
   // OR
   //
   //     {
@@ -139,7 +148,8 @@ interface ChatContentProvider {
   // Gets the list of all |Message|s in the specified conversation.
   // When the |message_queue_token| value is provided, the client will be
   // notified with any new messages added and messages deleted after the initial
-  // snapshot is sent, or when the conversation title is changed.
+  // snapshot is sent, when the conversation is deleted, or when its title is
+  // changed.
   //
   // The message sent from the content provider will be a JSON string formatted
   // as following:
@@ -153,9 +163,17 @@ interface ChatContentProvider {
   // OR
   //
   //     {
+  //       "event":           "delete_conversation",
+  //       "conversation_id": <conversation_id>
+  //     }
+  //
+  // OR
+  //
+  //     {
   //       "event": "title",
   //       "title": <title>
   //     }
+  //
   // The client should then make a subsequent |GetMessage| call to retrieve the
   // actual message content.
   GetMessages(array<uint8> conversation_id, string? message_queue_token)

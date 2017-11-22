@@ -388,6 +388,39 @@ class ChatContentProviderImpl extends ChatContentProvider {
   }
 
   @override
+  Future<Null> deleteConversation(
+    List<int> conversationId,
+    void callback(ChatStatus chatStatus),
+  ) async {
+    try {
+      try {
+        await _ledgerReady.future;
+      } on Exception {
+        callback(ChatStatus.ledgerNotInitialized);
+        return;
+      }
+
+      Completer<Status> statusCompleter = new Completer<Status>();
+      _conversationsPage.delete(conversationId, statusCompleter.complete);
+
+      Status status = await statusCompleter.future;
+      if (status == Status.keyNotFound) {
+        callback(ChatStatus.idNotFound);
+      } else if (status != Status.ok) {
+        callback(ChatStatus.ledgerOperationError);
+      }
+
+      // Notify the conversation watchers.
+      _conversationWatchers[conversationId]?.onConversationDeleted();
+
+      callback(ChatStatus.ok);
+    } on Exception catch (e, stackTrace) {
+      log.severe('Sending ChatStatus.unknownError', e, stackTrace);
+      callback(ChatStatus.unknownError);
+    }
+  }
+
+  @override
   Future<Null> getConversation(
     List<int> conversationId,
     bool wait,

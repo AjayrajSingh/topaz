@@ -44,6 +44,16 @@ class ConversationWatcher extends BasePageWatcher {
     pageChange.deletedKeys.forEach(_processDeletedKey);
   }
 
+  /// Handle the conversation deleted event and send notification.
+  void onConversationDeleted() {
+    Map<String, Object> notification = <String, Object>{
+      'event': 'delete_conversation',
+      'conversation_id': conversationId,
+    };
+
+    sendMessage(JSON.encode(notification));
+  }
+
   @override
   void syncStateChanged(
     SyncState downloadStatus,
