@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//packages/package.gni")
+import("//build/package.gni")
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_app("usage_log_dart") {
