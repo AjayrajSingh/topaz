@@ -9,6 +9,7 @@ package("bluetooth_examples") {
   system_image = true
 
   deps = [
+    "ble_rect",
     "ble_scanner",
     "eddystone_advertiser",
     "settings",
@@ -17,7 +18,11 @@ package("bluetooth_examples") {
   binaries = [
     {
       source = "gen/topaz/examples/bluetooth/ble_scanner/ble_scanner.flx"
-      name = "bluetooth_le_scanner"
+      name = "ble_scanner"
+    },
+    {
+      source = "gen/topaz/examples/bluetooth/ble_rect/ble_rect.flx"
+      name = "ble_rect"
     },
     {
       source = "gen/topaz/examples/bluetooth/eddystone_advertiser/eddystone_advertiser.flx"
