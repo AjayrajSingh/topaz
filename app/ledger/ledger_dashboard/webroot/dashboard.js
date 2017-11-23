@@ -17,6 +17,7 @@ $(function() {
   _tabBar.layout();
 
   $(document).ready(function(){
+    instancesObjects = new Array();
     getInstancesList();
   });
 });
@@ -32,65 +33,71 @@ function updateTabPanel(newPanelSelector) {
   }
 }
 
-function getInstancesList() {
-  $.get( _ReqUrl + "/instances_list",
-        function(data, status){
-          var instancesList = JSON.parse(JSON.stringify(data));
-          $("#number-of-ledger-instances").append(instancesList.length);
-          for(var i = 0; i < instancesList.length; i++) {
+class Instance {
+    constructor(encodedString) {
+      this.encodedName = encodedString;
+      this.decodedName = "";
+    }
+    addInList(listId) {
+      this.decodedName = bytesToString(this.encodedName);
+      var methodElem = $("<li></li>")
+      .addClass('mdc-list-item')
+      .text(this.decodedName)
+      .attr('id', this.decodedName)
+      .click($.proxy(this.getPagesList, this));
+
+      $(listId).append(methodElem);
+    }
+    getPagesList() {
+      var clickedName = this.decodedName;
+      $.get( _ReqUrl + "/pages_list",
+        { instance: JSON.stringify(this.encodedName) },
+        function(pagesList, status) {
+          var stringsList = new Array();
+          for(var i = 0; i < pagesList.length; i++)
+            stringsList.push(bytesToString(pagesList[i]));
+
+          $("#number-of-ledger-pages").text("Number of "+
+                                            clickedName + " pages: " +
+                                            (stringsList.length).toString());
+          $("#ledger-pages-list").empty();
+          for(var i = 0; i < stringsList.length; i++) {
             var methodElem = $("<li></li>")
             .addClass('mdc-list-item')
-            .text(instancesList[i])
-            .attr('id', instancesList[i])
-            .click(getPagesList);
+            .text(stringsList[i]);
 
-            $("#ledger-instances-list").append(methodElem);
+            $("#ledger-pages-list").append(methodElem);
           }
-
-        });
-}
-
-function getPagesList() {
-  var elemName = $(event.target).text();
-  $.get( _ReqUrl + "/pages_list",
-    { instance: elemName },
-    function(data, status){
-      var pagesList = data;
-      stringsList = bytesToStrings(pagesList);
-
-      $("#number-of-ledger-pages").text("Number of "+ elemName + " pages: " +
-                                        (stringsList.length).toString());
-      $("#ledger-pages-list").empty();
-      for(i = 0; i< stringsList.length; i++) {
-        var methodElem = $("<li></li>")
-        .addClass('mdc-list-item')
-        .text(stringsList[i]);
-
-        $("#ledger-pages-list").append(methodElem);
-      }
-      return;
-    }).fail( function() { console.log("The GET request didn't work! You need to\
-    check that the server is working properly."); } );
-  return false;
-}
-
-function bytesToStrings(bytesList) {
-  var stringsList = new Array();
-  for(var i = 0; i < bytesList.length; i++) {
-    var str = "";
-    for(var j = 0; j < bytesList[i].length; j++) {
-      if((bytesList[i][j] >= 0 && bytesList[i][j] <= 31)
-          || bytesList[i][j] >= 127) {
-        str = bytesToHex(bytesList[i]);
-        break;
-      }
-      str += String.fromCharCode(bytesList[i][j]);
+          return;
+        }).fail( function() { console.log("The GET request didn't work! You \
+        need to check that the server is working properly."); } );
+      return false;
     }
-    stringsList.push(str);
-  }
-  return stringsList;
 }
 
+function getInstancesList() {
+  $.get( _ReqUrl + "/instances_list", function(instancesList, status){
+        for(var i = 0; i < instancesList.length; i++) {
+          newInstance = new Instance(instancesList[i]);
+          newInstance.addInList("#ledger-instances-list");
+          instancesObjects.push(newInstance);
+        }
+        $("#number-of-ledger-instances").append(instancesObjects.length);
+      });
+}
+
+function bytesToString(bytesList) {
+  var str = "";
+  for(var i = 0; i < bytesList.length; i++) {
+    if((bytesList[i] >= 0 && bytesList[i] <= 31)
+        || bytesList[i] >= 127) {
+      str = bytesToHex(bytesList);
+      break;
+    }
+    str += String.fromCharCode(bytesList[i]);
+  }
+  return str;
+}
 
 function bytesToHex(bytes) {
   var hexString = '0x';
