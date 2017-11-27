@@ -51,8 +51,7 @@ class _Module implements Module, Lifecycle, LinkWatcher {
 
   /// |Module|
   @override
-  void initialize(
-      InterfaceHandle<ModuleContext> moduleContextHandle,
+  void initialize(InterfaceHandle<ModuleContext> moduleContextHandle,
       InterfaceRequest<ServiceProvider> outgoingServices) {
     _moduleContext.ctrl.bind(moduleContextHandle);
     _moduleContext.getLink(null, _link.ctrl.request());

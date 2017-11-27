@@ -22,6 +22,7 @@ flutter_app("chat_conversation_list") {
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/component/dart",
     "//topaz/public/lib/fidl/dart",
   ]
 }

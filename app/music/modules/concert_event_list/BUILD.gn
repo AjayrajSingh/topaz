@@ -26,5 +26,6 @@ flutter_app("concert_event_list") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/story/dart",
   ]
 }

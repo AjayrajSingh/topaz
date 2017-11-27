@@ -13,8 +13,9 @@ dart_app("contacts_content_provider") {
     "//topaz/app/contacts/services:services_dart",
     "//topaz/public/dart/entity_schemas:entity_schemas",
     "//topaz/public/dart/logging:lib.logging",
-    "//topaz/public/dart/modular:lib.modular",
+    "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/ledger/dart",
   ]
 }
 

@@ -126,13 +126,11 @@ void main() {
   /// Add [StoryShellImpl]'s services to this application's outgoing
   /// ServiceProvider.
   _appContext.outgoingServices
-    ..addServiceForName(
-        (InterfaceRequest<StoryShell> request) {
+    ..addServiceForName((InterfaceRequest<StoryShell> request) {
       _log('Received binding request for StoryShell');
       _storyShellImpl.bindStoryShell(request);
     }, StoryShell.serviceName)
-    ..addServiceForName(
-        (InterfaceRequest<Lifecycle> request) {
+    ..addServiceForName((InterfaceRequest<Lifecycle> request) {
       _log('Received binding request for Lifecycle');
       _storyShellImpl.bindLifecycle(request);
     }, Lifecycle.serviceName);

@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
-import 'package:lib.modular/modular.dart';
+import 'package:lib.agent.dart/agent.dart';
 import 'package:meta/meta.dart';
 
 import 'home_work_proposer.dart';
@@ -35,8 +35,7 @@ class HomeWorkAgent extends AgentImpl {
     ServiceProviderImpl outgoingServices,
   ) async {
     agentContext.getIntelligenceServices(_intelligenceServices.ctrl.request());
-    _intelligenceServices
-      ..getContextReader(_contextReader.ctrl.request());
+    _intelligenceServices..getContextReader(_contextReader.ctrl.request());
 
     _homeWorkProposer.start(
       _contextReader,

@@ -15,7 +15,6 @@ import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:meta/meta.dart';
 
-export 'package:lib.app.dart/app.dart';
 export 'package:lib.agent.fidl/agent.fidl.dart';
 export 'package:lib.agent.fidl/agent_context.fidl.dart';
 export 'package:lib.auth.fidl/token_provider.fidl.dart';

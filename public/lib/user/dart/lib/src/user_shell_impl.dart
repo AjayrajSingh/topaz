@@ -12,8 +12,7 @@ import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:lib.user.fidl/user_shell.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
-
-import 'link_watcher_impl.dart';
+import 'package:lib.story.dart/story.dart';
 
 /// Called when [UserShell.initialize] occurs.
 typedef void OnUserShellReady(
@@ -64,7 +63,7 @@ class UserShellImpl implements UserShell, Lifecycle {
   final OnUserShellStop onStop;
 
   /// Called when [LinkWatcher.notify] is called.
-  final OnNotify onNotify;
+  final LinkWatcherNotifyCallback onNotify;
 
   /// Indicates whether the [LinkWatcher] should watch for all changes including
   /// the changes made by this [UserShell]. If `true`, it calls [Link.watchAll]

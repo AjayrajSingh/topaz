@@ -611,20 +611,24 @@ class _RenderIconSlider extends RenderConstrainedBox {
 
     config.isSemanticBoundary = isInteractive;
     if (isInteractive) {
-      config..addAction(SemanticsAction.increase, _increaseAction)
-          ..addAction(SemanticsAction.decrease, _decreaseAction);
+      config
+        ..addAction(SemanticsAction.increase, _increaseAction)
+        ..addAction(SemanticsAction.decrease, _decreaseAction);
     }
   }
 
-  double get _semanticActionUnit => divisions != null ? 1.0 / divisions : _kAdjustmentUnit;
+  double get _semanticActionUnit =>
+      divisions != null ? 1.0 / divisions : _kAdjustmentUnit;
 
   void _increaseAction() {
-    if (isInteractive)
+    if (isInteractive) {
       onChanged((value + _semanticActionUnit).clamp(0.0, 1.0));
+    }
   }
 
   void _decreaseAction() {
-    if (isInteractive)
+    if (isInteractive) {
       onChanged((value - _semanticActionUnit).clamp(0.0, 1.0));
+    }
   }
 }

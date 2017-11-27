@@ -8,7 +8,8 @@ import 'package:lib.agent.fidl/agent_context.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.modular/modular.dart';
+import 'package:lib.agent.dart/agent.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 

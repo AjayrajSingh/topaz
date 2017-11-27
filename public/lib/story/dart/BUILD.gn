@@ -4,8 +4,8 @@
 
 import("//build/dart/dart_package.gni")
 
-dart_package("lib.story.dart") {
-  package_name = "lib.story.dart"
+dart_package("dart") {
+  infer_package_name = true
 
   deps = [
     "//peridot/public/lib/story/fidl:fidl_dart",

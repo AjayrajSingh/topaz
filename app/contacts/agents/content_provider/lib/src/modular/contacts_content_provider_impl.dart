@@ -15,7 +15,7 @@ import 'package:lib.entity.fidl/entity_provider.fidl.dart';
 import 'package:lib.entity.fidl/entity_reference_factory.fidl.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
 import 'package:lib.logging/logging.dart';
-import 'package:lib.modular/ledger.dart';
+import 'package:lib.ledger.dart/ledger.dart';
 import 'package:entity_schemas/entities.dart' as entities;
 import 'package:meta/meta.dart';
 import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'

@@ -7,7 +7,7 @@ import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
-import 'package:lib.modular/modular.dart';
+import 'package:lib.module.dart/module.dart';
 import 'package:meta/meta.dart';
 
 import '../widgets/window_media_query.dart';

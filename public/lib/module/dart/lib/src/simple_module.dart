@@ -7,10 +7,10 @@ import 'dart:convert';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
+import 'package:lib.module.dart/src/module_impl.dart';
 import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.module.dart/src/module_impl.dart';
 
 /// A callback used by [SimpleModule] to communicate [Exception] events to
 /// clients.

@@ -18,10 +18,12 @@ dart_package("lib.widgets") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/flutter_image",
-    "//topaz/public/dart/modular:lib.modular",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/device/dart",
     "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/module/dart",
     "//topaz/public/lib/ui/flutter",
+    "//topaz/public/lib/user/dart",
     "//topaz/tools/widget_explorer/packages/widget_explorer_meta",
   ]
 }

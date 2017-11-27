@@ -6,5 +6,4 @@ import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/modular.dart';
 
 /// A [ModuleModel] providing the [ChildViewConnection]s of the child modules.
-class StoryModuleModel extends ModuleModel {
-}
+class StoryModuleModel extends ModuleModel {}

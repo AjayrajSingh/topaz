@@ -20,8 +20,7 @@ class DaisyBuilder {
     // We can accept various types of objects here (eventually Entity
     // handles, or Entity references or an EntityClient wrapper).
     // For now, assume everything should just be converted into JSON.
-    _daisy.nouns[name] = new Noun()
-      ..json = JSON.encode(value);
+    _daisy.nouns[name] = new Noun()..json = JSON.encode(value);
   }
 
   Daisy get daisy => _daisy;

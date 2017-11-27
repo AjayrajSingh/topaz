@@ -41,8 +41,7 @@ class ModuleImpl implements Module, Lifecycle {
 
   /// Implementation of the Initialize(Story story, Link link) method.
   @override
-  void initialize(
-      InterfaceHandle<ModuleContext> moduleContextHandle,
+  void initialize(InterfaceHandle<ModuleContext> moduleContextHandle,
       InterfaceRequest<ServiceProvider> outgoingServices) {
     _log('ModuleImpl::initialize call');
   }

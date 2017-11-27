@@ -4,6 +4,8 @@
 
 import 'dart:async';
 
+import 'package:entity_schemas/entities.dart' as entities;
+import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.entity.fidl/entity.fidl.dart';
 import 'package:lib.entity.fidl/entity_resolver.fidl.dart';
 import 'package:lib.logging/logging.dart';
@@ -11,7 +13,6 @@ import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
-import 'package:entity_schemas/entities.dart' as entities;
 
 import '../models/contact_card_model.dart';
 import 'link_data.dart';

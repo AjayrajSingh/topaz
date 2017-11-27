@@ -4,17 +4,17 @@
 
 import("//build/dart/dart_package.gni")
 
-dart_package("lib.module.dart") {
-  package_name = "lib.module.dart"
+dart_package("dart") {
+  infer_package_name = true
 
   deps = [
     "//peridot/public/lib/device/fidl:fidl_dart",
-    "//peridot/public/lib/user/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/user/fidl:fidl_dart",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//topaz/public/lib/story/dart:lib.story.dart",
+    "//topaz/public/lib/story/dart",
   ]
 }

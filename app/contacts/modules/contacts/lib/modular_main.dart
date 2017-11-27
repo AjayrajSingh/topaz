@@ -34,8 +34,7 @@ class ModuleImpl implements Module, Lifecycle {
   }
 
   @override
-  void initialize(
-      InterfaceHandle<ModuleContext> moduleContextHandle,
+  void initialize(InterfaceHandle<ModuleContext> moduleContextHandle,
       InterfaceRequest<ServiceProvider> outgoingServices) {}
 
   @override

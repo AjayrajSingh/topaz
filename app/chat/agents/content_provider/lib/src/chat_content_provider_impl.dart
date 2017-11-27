@@ -12,7 +12,7 @@ import 'package:lib.fidl.dart/bindings.dart' show InterfaceRequest;
 import 'package:lib.fsl.fidl/sized_vmo_transport.fidl.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.modular/ledger.dart';
+import 'package:lib.ledger.dart/ledger.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';

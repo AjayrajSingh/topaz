@@ -12,6 +12,7 @@ import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.netconnector.fidl/netconnector.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
+import 'package:lib.story.dart/story.dart';
 import 'package:lib.widgets/modular.dart';
 
 import '../widgets.dart';

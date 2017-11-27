@@ -21,8 +21,9 @@ dart_app("chat_content_provider") {
     "//topaz/public/dart/config",
     "//topaz/public/dart/fixtures",
     "//topaz/public/dart/logging:lib.logging",
-    "//topaz/public/dart/modular:lib.modular",
+    "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/ledger/dart",
   ]
 }

@@ -10,12 +10,13 @@ import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.modular/modular.dart';
+import 'package:lib.agent.dart/agent.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
+import 'package:lib.auth.fidl/token_provider.fidl.dart';
 
 import 'src/chat_content_provider_impl.dart';
 import 'src/firebase_chat_message_transporter.dart';

@@ -6,7 +6,7 @@ group("modules") {
   public_deps = [
     "contact_card",
     "contact_list",
-    "contacts_picker",
     "contacts",
+    "contacts_picker",
   ]
 }

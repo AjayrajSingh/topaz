@@ -8,7 +8,7 @@ import 'dart:convert' show JSON;
 import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.modular/ledger.dart';
+import 'package:lib.ledger.dart/ledger.dart';
 import 'package:meta/meta.dart';
 
 import 'base_page_watcher.dart';

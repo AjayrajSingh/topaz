@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.component.dart/component.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.logging/logging.dart';

@@ -181,13 +181,11 @@ void main() {
   _storyShellImpl = new StoryShellImpl();
 
   _appContext.outgoingServices
-    ..addServiceForName(
-        (InterfaceRequest<StoryShell> request) {
+    ..addServiceForName((InterfaceRequest<StoryShell> request) {
       log.fine('Received binding request for StoryShell');
       _storyShellImpl.bindStoryShell(request);
     }, StoryShell.serviceName)
-    ..addServiceForName(
-        (InterfaceRequest<Lifecycle> request) {
+    ..addServiceForName((InterfaceRequest<Lifecycle> request) {
       log.fine('Received binding request for Lifecycle');
       _storyShellImpl.bindLifecycle(request);
     }, Lifecycle.serviceName);

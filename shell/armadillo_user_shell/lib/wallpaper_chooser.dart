@@ -17,7 +17,7 @@ import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:lib.suggestion.fidl/user_input.fidl.dart';
 import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.story.dart/story.dart';
 
 const String _kWallpapersLinkKey = 'wallpapers';
 const String _kImageSelectorModulePath = 'gallery';

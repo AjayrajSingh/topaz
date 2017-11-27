@@ -8,7 +8,7 @@ import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
-import 'package:lib.modular/modular.dart';
+import 'package:lib.device.dart/device.dart';
 import 'package:meta/meta.dart';
 
 import '../widgets/window_media_query.dart';
