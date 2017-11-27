@@ -59,16 +59,17 @@ class ContactsStore<T> {
     );
 
     // Store the entire contact information in the map against its id
-    _contactMap[id] = contact;
+    T contactToAdd = _contactMap[id] ?? contact;
+    _contactMap[id] = contactToAdd;
 
     // Add to the displayName index
     _displayNameIndex[displayName] ??= new Set<T>();
-    _displayNameIndex[displayName].add(contact);
+    _displayNameIndex[displayName].add(contactToAdd);
 
     // Add all searchable values to the prefix tree
     for (String value in searchableValues) {
       _prefixTree[value] ??= new Set<T>();
-      _prefixTree[value].add(contact);
+      _prefixTree[value].add(contactToAdd);
     }
   }
 

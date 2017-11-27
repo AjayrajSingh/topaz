@@ -7,18 +7,16 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 
-import '../models/contact_list_item.dart';
-
-/// The function that will be called when a contact is tapped
-typedef void ContactTappedAction(ContactListItem contact);
+import '../models/actions.dart';
+import '../models/contact_item.dart';
 
 /// A UI widget representing the list item in the contact list
 ///
 /// Shows a letter if it is the first item starting with that character,
 /// an avatar, and the contact display name
-class ListItem extends StatelessWidget {
+class ContactListItem extends StatelessWidget {
   /// The contact information to display
-  final ContactListItem contact;
+  final ContactItem contact;
 
   /// Handle user tap on the list item
   final ContactTappedAction onContactTapped;
@@ -27,7 +25,7 @@ class ListItem extends StatelessWidget {
   final bool isFirstInCategory;
 
   /// Constructor
-  const ListItem({
+  const ContactListItem({
     Key key,
     @required this.contact,
     @required this.onContactTapped,

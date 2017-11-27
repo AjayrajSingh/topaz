@@ -182,6 +182,15 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     callback(status, entityReference);
   }
 
+  @override
+  Future<Null> refreshContacts(
+    void callback(fidl.Status status, List<fidl.Contact> contacts),
+  ) async {
+    List<fidl.Contact> contacts = await _getContactsFromDataProviders();
+    _addContactsToStore(contacts);
+    callback(fidl.Status.ok, _contactsStore.getAllContacts());
+  }
+
   // Entity Provider methods
   /// Get the types that the contacts content provider supports.
   /// For contacts, [cookie] maps to a contact's contactId
@@ -480,7 +489,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   /// than adding them to the store immediately we will wait until the
   /// changes propagate back from Ledger via the page watcher to add them
   /// the store.
-  Future<Null> _getContactsFromDataProviders() async {
+  Future<List<fidl.Contact>> _getContactsFromDataProviders() async {
     // TODO(meiyili) grab last sync tokens and save those as well so the shape
     // of the content in the future will change and be less ugly
     List<Future<List<fidl.Contact>>> completers =
@@ -504,5 +513,8 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
         .expand((List<fidl.Contact> c) => c)
         .toList();
     await _saveContactsToLedger(contacts);
+
+    // TODO (meiyili): this is temporary until I finish SO-891
+    return contacts;
   }
 }

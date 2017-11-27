@@ -27,7 +27,20 @@ const String _kContactCardModuleUrl =
     'file:///system/apps/contacts/contact_card';
 
 /// Call back definition for [ContactListModuleModel]'s subscribe method.
-typedef void OnSubscribeCallback(List<ContactListItem> newContactList);
+typedef void OnSubscribeCallback(List<ContactItem> newContactList);
+
+class _ContactListResponse {
+  final contacts_fidl.Status status;
+  final List<contacts_fidl.Contact> contacts;
+
+  /// Constructor
+  _ContactListResponse({
+    @required this.status,
+    @required this.contacts,
+  })
+      : assert(status != null),
+        assert(contacts != null);
+}
 
 /// The [ModuleModel] for the contacts module set.
 class ContactListModuleModel extends ModuleModel {
@@ -115,43 +128,65 @@ class ContactListModuleModel extends ModuleModel {
   /// Search the contacts store with the given prefix and then update the model
   Future<Null> searchContacts(String prefix) async {
     // TODO(meiyili) SO-731, SO-732: handle errors
-    model.searchResults = await _getContactList(prefix);
+    model.searchResults = await _getContactList(prefix: prefix);
+  }
+
+  /// Handle refreshing the user's contact list
+  Future<Null> refreshContacts() async {
+    model.contacts = await _getContactList(refresh: true);
   }
 
   /// Call the content provider to retrieve the list of contacts
-  Future<List<ContactListItem>> _getContactList([String prefix = '']) async {
-    List<ContactListItem> contactList = <ContactListItem>[];
-    Completer<contacts_fidl.Status> statusCompleter =
-        new Completer<contacts_fidl.Status>();
-    _contactsContentProvider.getContactList(
-      prefix,
-      (contacts_fidl.Status status, List<contacts_fidl.Contact> contacts) {
-        contactList.addAll(
-          contacts.map(_transformContact),
-        );
-        statusCompleter.complete(status);
-      },
-    );
+  Future<List<ContactItem>> _getContactList({
+    String prefix: '',
+    bool refresh: false,
+  }) async {
+    List<ContactItem> contactList = <ContactItem>[];
+    Completer<_ContactListResponse> responseCompleter =
+        new Completer<_ContactListResponse>();
 
-    contacts_fidl.Status status = await statusCompleter.future;
-    if (status != contacts_fidl.Status.ok) {
+    if (refresh) {
+      _contactsContentProvider.refreshContacts((
+        contacts_fidl.Status status,
+        List<contacts_fidl.Contact> contacts,
+      ) {
+        responseCompleter.complete(
+            new _ContactListResponse(status: status, contacts: contacts));
+      });
+    } else {
+      _contactsContentProvider.getContactList(prefix, (
+        contacts_fidl.Status status,
+        List<contacts_fidl.Contact> contacts,
+      ) {
+        responseCompleter.complete(new _ContactListResponse(
+          status: status,
+          contacts: contacts,
+        ));
+      });
+    }
+
+    _ContactListResponse response = await responseCompleter.future;
+    if (response.status != contacts_fidl.Status.ok) {
       log.severe('${contacts_fidl.ContactsContentProvider.serviceName}'
-          '::GetContactList() threw an error');
+          '::threw an error');
 
       // TODO(meiyili) SO-731, SO-732: throw error to notify UI
       return null;
+    } else {
+      contactList.addAll(
+        response.contacts.map(_transformContact),
+      );
+      return contactList;
     }
-
-    return contactList;
   }
 
   /// Clears the search results from the model
   void clearSearchResults() {
-    model.searchResults = <ContactListItem>[];
+    model.searchResults = <ContactItem>[];
   }
 
   /// Handle when a contact is tapped
-  void onContactTapped(ContactListItem contact) {
+  void onContactTapped(ContactItem contact) {
     // Make a request to get the entity reference
     _contactsContentProvider.getEntityReference(
       contact.id,
@@ -179,9 +214,8 @@ class ContactListModuleModel extends ModuleModel {
     );
   }
 
-  /// Transform a FIDL Contact object into a ContactListItem
-  ContactListItem _transformContact(contacts_fidl.Contact c) =>
-      new ContactListItem(
+  /// Transform a FIDL Contact object into a ContactItem
+  ContactItem _transformContact(contacts_fidl.Contact c) => new ContactItem(
         id: c.contactId,
         displayName: c.displayName,
         photoUrl: c.photoUrl,

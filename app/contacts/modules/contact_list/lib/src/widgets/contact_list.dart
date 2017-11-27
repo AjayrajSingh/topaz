@@ -8,7 +8,7 @@ import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 
 import '../../models.dart';
-import 'list_item.dart';
+import 'contact_list_item.dart';
 
 // Strings
 const String _kContacts = 'Contact';
@@ -31,16 +31,21 @@ class ContactList extends StatefulWidget {
   /// Method to call when the user taps on a contact item
   final ContactTappedAction onContactTapped;
 
+  /// Method to call to refresh the list of contacts
+  final RefreshContactsAction onRefreshContacts;
+
   /// Creates a new instance of [ContactList]
   const ContactList({
     Key key,
     @required this.onQueryChanged,
     @required this.onQueryCleared,
     @required this.onContactTapped,
+    @required this.onRefreshContacts,
   })
       : assert(onQueryChanged != null),
         assert(onQueryCleared != null),
         assert(onContactTapped != null),
+        assert(onRefreshContacts != null),
         super(key: key);
 
   @override
@@ -80,23 +85,30 @@ class _ContactListState extends State<ContactList>
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    return new Material(
-      child: new ScopedModelDescendant<ContactListModel>(
+    return new Scaffold(
+      body: new ScopedModelDescendant<ContactListModel>(
         builder: (
           BuildContext context,
           Widget child,
           ContactListModel model,
         ) {
-          return new Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _buildHeader(theme),
-              new Expanded(
-                child: _buildList(model),
-              ),
-            ],
+          return new Center(
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _buildHeader(theme),
+                new Expanded(
+                  child: _buildList(model),
+                ),
+              ],
+            ),
           );
         },
+      ),
+      floatingActionButton: new FloatingActionButton(
+        onPressed: widget.onRefreshContacts,
+        tooltip: 'Refresh contact list',
+        child: new Icon(Icons.refresh),
       ),
     );
   }
@@ -213,8 +225,8 @@ class _ContactListState extends State<ContactList>
 
   Widget _buildContactsList(ContactListModel model) {
     return new ListView(
-      children: model.contacts.map((ContactListItem c) {
-        return new ListItem(
+      children: model.contacts.map((ContactItem c) {
+        return new ContactListItem(
           contact: c,
           onContactTapped: widget.onContactTapped,
           isFirstInCategory: model.firstItems.contains(c),
@@ -225,8 +237,8 @@ class _ContactListState extends State<ContactList>
 
   Widget _buildSearchResultsList(ContactListModel model) {
     return new ListView(
-      children: model.searchResults.map((ContactListItem c) {
-        return new ListItem(
+      children: model.searchResults.map((ContactItem c) {
+        return new ContactListItem(
           contact: c,
           onContactTapped: widget.onContactTapped,
           isFirstInCategory: model.firstItems.contains(c),

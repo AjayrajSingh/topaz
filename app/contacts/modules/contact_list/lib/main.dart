@@ -30,6 +30,7 @@ void main() {
         onQueryChanged: moduleModel.searchContacts,
         onQueryCleared: moduleModel.clearSearchResults,
         onContactTapped: moduleModel.onContactTapped,
+        onRefreshContacts: moduleModel.refreshContacts,
       ),
     ),
   )..advertise();

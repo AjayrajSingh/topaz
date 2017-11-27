@@ -8,8 +8,8 @@ import 'package:test/test.dart';
 void main() {
   group('ContactListModel', () {
     test('should set contact list if contactList param is not null', () {
-      List<ContactListItem> contactList = <ContactListItem>[
-        new ContactListItem(id: 'id', displayName: 'displayName'),
+      List<ContactItem> contactList = <ContactItem>[
+        new ContactItem(id: 'id', displayName: 'displayName'),
       ];
       ContactListModel model = new ContactListModel(contactList: contactList);
 
@@ -24,12 +24,12 @@ void main() {
     });
 
     test('should properly mark the first items in each letter category', () {
-      List<ContactListItem> contactList = <ContactListItem>[
-        new ContactListItem(id: 'id', displayName: 'Danielle Kim'),
-        new ContactListItem(id: 'id', displayName: 'Danielle Stawski'),
-        new ContactListItem(id: 'id', displayName: 'Eric Chowdhury'),
-        new ContactListItem(id: 'id', displayName: 'Eve Mann'),
-        new ContactListItem(id: 'id', displayName: 'E. T. Atkins'),
+      List<ContactItem> contactList = <ContactItem>[
+        new ContactItem(id: 'id', displayName: 'Danielle Kim'),
+        new ContactItem(id: 'id', displayName: 'Danielle Stawski'),
+        new ContactItem(id: 'id', displayName: 'Eric Chowdhury'),
+        new ContactItem(id: 'id', displayName: 'Eve Mann'),
+        new ContactItem(id: 'id', displayName: 'E. T. Atkins'),
       ];
       ContactListModel model = new ContactListModel(contactList: contactList);
 

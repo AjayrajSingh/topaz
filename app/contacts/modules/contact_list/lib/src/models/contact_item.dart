@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 /// A data model class that represents a contact list item.
 /// It contains only the data needed for displaying a list item and retrieving
 /// more information about the given contact later on.
-class ContactListItem {
+class ContactItem {
   final String _displayName;
 
   /// Unique identifier for the contact.
@@ -16,8 +16,8 @@ class ContactListItem {
   /// Avatar photoUrl for the contact.
   final String photoUrl;
 
-  /// Creates an instance of a [ContactListItem]
-  ContactListItem({
+  /// Creates an instance of a [ContactItem]
+  ContactItem({
     @required this.id,
     @required String displayName,
     this.photoUrl,

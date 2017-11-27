@@ -6,16 +6,16 @@ import 'package:contact_list/models.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('ContactListItem', () {
+  group('ContactItem', () {
     test('should throw if display name is empty', () {
       expect(() {
-        new ContactListItem(id: 'id', displayName: '');
+        new ContactItem(id: 'id', displayName: '');
       }, throwsA(const isInstanceOf<AssertionError>()));
     });
 
     test('should throw if id is empty', () {
       expect(() {
-        new ContactListItem(id: '', displayName: 'displayName');
+        new ContactItem(id: '', displayName: 'displayName');
       }, throwsA(const isInstanceOf<AssertionError>()));
     });
   });
