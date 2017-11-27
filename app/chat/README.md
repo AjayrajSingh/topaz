@@ -102,7 +102,7 @@ before running the chat modules correctly.
 ## Chat Agent Tests
 
 To run the chat agent tests, build fuchsia with
-`--packages build/gn/boot_test_modular` option and boot into fuchsia using a
+`--packages peridot/packages/boot_test_modular,topaz/packages/default` option and boot into fuchsia using a
 target device or a QEMU instance.
 
 ```bash
