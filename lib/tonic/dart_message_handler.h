@@ -22,6 +22,10 @@ class DartMessageHandler {
   // Messages for the current isolate will be scheduled on |runner|.
   void Initialize(const fxl::RefPtr<fxl::TaskRunner>& runner);
 
+  // Handle an unhandled error. If the error is fatal then shut down the
+  // isolate. The message handler's isolate must be the current isolate.
+  void UnhandledError(Dart_Handle error);
+
   // Did the isolate exit?
   bool isolate_exited() const { return isolate_exited_; }
 
