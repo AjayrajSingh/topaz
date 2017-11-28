@@ -10,13 +10,13 @@ import 'dart:fuchsia';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.component.dart/component.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart' hide Message;
 import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger_fidl;
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.component.dart/component.dart';
 import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.test_runner.fidl/test_runner.fidl.dart';

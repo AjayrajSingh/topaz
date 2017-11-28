@@ -238,5 +238,30 @@ void main() {
         },
       );
     });
+
+    group('tap callback', () {
+      testWidgets('should be correctly called on tap',
+          (WidgetTester tester) async {
+        ContactItemStore contact = new ContactItemStore(
+          id: '1',
+          names: <String>['Alpha'],
+          detail: 'alpha@example.com',
+          isMatchedOnName: false,
+        );
+
+        int tap = 0;
+        ContactItem testItem = new ContactItem(
+          matchedPrefix: 'alpha',
+          contact: contact,
+          onTap: (ContactItemStore contact) => tap++,
+        );
+
+        await tester.pumpWidget(_buildTestWidget(testItem));
+
+        expect(tap, equals(0));
+        await tester.tap(find.byType(ContactItem));
+        expect(tap, equals(1));
+      });
+    });
   });
 }

@@ -13,6 +13,9 @@ const String _kDividerChar = ' - ';
 const TextStyle _kDetailStyle = const TextStyle(color: Colors.grey);
 const TextStyle _kBoldStyle = const TextStyle(fontWeight: FontWeight.bold);
 
+/// Callback type that passes in a contact item.
+typedef void ContactItemCallback(ContactItemStore contact);
+
 /// A UI widget representing the list item in the contact list
 ///
 /// Shows an avatar, the contact's full name, and the detail
@@ -26,11 +29,15 @@ class ContactItem extends StatelessWidget {
   /// The contact information to display
   final ContactItemStore contact;
 
+  /// Called when this item is tapped
+  final ContactItemCallback onTap;
+
   /// Constructor
   const ContactItem({
     Key key,
     @required this.matchedPrefix,
     @required this.contact,
+    this.onTap,
   })
       : assert(contact != null),
         assert(matchedPrefix != null),
@@ -49,6 +56,7 @@ class ContactItem extends StatelessWidget {
           children: _getDisplayText(),
         ),
       ),
+      onTap: () => onTap(contact),
     );
   }
 

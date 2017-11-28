@@ -3,11 +3,12 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert' show JSON;
 
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
@@ -54,16 +55,6 @@ class ContactsPickerModuleModel extends ModuleModel {
     // Close all unnecessary bindings
     contentProviderServices.ctrl.close();
     componentContext.ctrl.close();
-
-    // Stub link data
-    // TODO(meiyili): integrate with Link
-    LinkData linkData = const LinkData(
-      prefix: 'a',
-      detailType: DetailType.email,
-    );
-    List<ContactItemStore> contacts = await getContactList(linkData);
-    await updateContactsListAction(contacts);
-    await updatePrefixAction(linkData.prefix);
   }
 
   @override
@@ -73,6 +64,23 @@ class ContactsPickerModuleModel extends ModuleModel {
     _contactsContentProviderController.ctrl.close();
     _contactsContentProvider.ctrl.close();
     super.onStop();
+  }
+
+  @override
+  Future<Null> onNotify(String json) async {
+    LinkData linkData;
+    try {
+      linkData = new LinkData.fromJson(json);
+    } on Exception catch (e, stackTrace) {
+      log.severe('Failed to create LinkData.', e, stackTrace);
+      return;
+    }
+
+    // TODO(youngseokyoon): only update the contacts when the link data is
+    // different from the previously known one.
+    List<ContactItemStore> contacts = await getContactList(linkData);
+    await updateContactsListAction(contacts);
+    await updatePrefixAction(linkData.prefix);
   }
 
   /// Call the content provider to retrieve the list of contacts
@@ -122,26 +130,44 @@ class ContactsPickerModuleModel extends ModuleModel {
       detail = c.phoneNumbers[0].value;
     }
 
-    // Determine which part of the name matched the prefix
-    List<String> nameComponents = <String>[c.givenName, c.familyName];
+    List<String> nameComponents = <String>[c.displayName];
     bool isMatchedOnName = false;
     int matchedNameIndex = -1;
-
-    // Prioritize highlighting left-most name component,
-    // will clearly need to be changed after internationalization :P
-    for (int i = nameComponents.length - 1; i >= 0; i--) {
+    for (int i = 0; i < nameComponents.length; i++) {
       if (nameComponents[i].toLowerCase().startsWith(prefix)) {
         isMatchedOnName = true;
         matchedNameIndex = i;
       }
     }
+
     return new ContactItemStore(
       id: c.contactId,
-      names: <String>[c.givenName, c.familyName],
+      names: nameComponents,
       detail: detail,
       photoUrl: c.photoUrl,
       isMatchedOnName: isMatchedOnName,
       matchedNameIndex: matchedNameIndex,
+    );
+  }
+
+  /// Handle the contact tap event and write the selected contact in the Link.
+  void handleContactTapped(ContactItemStore contact) {
+    _contactsContentProvider.getEntityReference(
+      contact.id,
+      (contacts_fidl.Status status, String entityReference) {
+        if (status != contacts_fidl.Status.ok) {
+          log.severe('Failed to get entity reference for contact ${contact.id}:'
+              ' (status: $status)');
+          return;
+        }
+
+        // Set the result in the Link.
+        // TODO: Use an output noun instead.
+        link.set(
+          const <String>['selectedContact'],
+          JSON.encode(entityReference),
+        );
+      },
     );
   }
 }

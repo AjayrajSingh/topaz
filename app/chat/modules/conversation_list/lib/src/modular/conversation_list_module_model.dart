@@ -9,6 +9,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:entity_schemas/entities.dart' as entities;
 import 'package:flutter/material.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -16,12 +17,19 @@ import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.component.fidl/message_queue.fidl.dart';
+import 'package:lib.entity.fidl/entity.fidl.dart';
+import 'package:lib.entity.fidl/entity_resolver.fidl.dart';
+import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
+import 'package:lib.module_resolver.dart/daisy_builder.dart';
+import 'package:lib.story.dart/story.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/modular.dart';
+import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
     as chat_fidl;
 
@@ -39,6 +47,14 @@ const Duration _kErrorDuration = const Duration(seconds: 10);
 class ChatConversationListModuleModel extends ModuleModel {
   static final ListEquality<int> _intListEquality = const ListEquality<int>();
 
+  /// Creates a new instance of [ChatConversationListModuleModel].
+  ChatConversationListModuleModel({@required this.formModel})
+      : assert(formModel != null) {
+    formModel.textController.addListener(() {
+      handleNewConversationFormChanged(formModel.textController.text);
+    });
+  }
+
   final AgentControllerProxy _chatContentProviderController =
       new AgentControllerProxy();
 
@@ -47,6 +63,15 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   final ModuleControllerProxy _conversationModuleController =
       new ModuleControllerProxy();
+
+  final ModuleControllerProxy _pickerModuleController =
+      new ModuleControllerProxy();
+
+  final EntityResolverProxy _entityResolver = new EntityResolverProxy();
+
+  final LinkWatcherBinding _pickerWatcherBinding = new LinkWatcherBinding();
+
+  final LinkProxy _pickerLink = new LinkProxy();
 
   final MessageQueueProxy _messageQueue = new MessageQueueProxy();
   MessageReceiverImpl _messageQueueReceiver;
@@ -77,12 +102,19 @@ class ChatConversationListModuleModel extends ModuleModel {
   /// Indicates whether the data is being fetched from the local Ledger.
   bool _isFetching = true;
 
+  /// The form model.
+  final FormModel formModel;
+
   /// The key to be used for scaffold.
   GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   /// Gets the [ChatContentProvider] service provided by the agent.
   chat_fidl.ChatContentProvider get chatContentProvider => _chatContentProvider;
+
+  /// Gets the [ChildViewConnection] to the contacts picker mod.
+  ChildViewConnection get pickerConnection => _pickerConnection;
+  ChildViewConnection _pickerConnection;
 
   /// Gets and sets the current conversation id value.
   Uint8List get conversationId => _conversationId;
@@ -171,6 +203,10 @@ class ChatConversationListModuleModel extends ModuleModel {
   final Completer<String> _contentProviderUrlCompleter =
       new Completer<String>();
 
+  /// Indicates whether the contacts picker should be shown on screen.
+  bool get shouldShowContactsPicker =>
+      shouldShowNewConversationForm && formModel.textController.text.isNotEmpty;
+
   @override
   Future<Null> onReady(
     ModuleContext moduleContext,
@@ -217,9 +253,16 @@ class ChatConversationListModuleModel extends ModuleModel {
       onReceiveMessage: _handleConversationListEvent,
     );
 
+    // Obtain the entity resolver.
+    componentContext.getEntityResolver(_entityResolver.ctrl.request());
+
     // Close all the unnecessary bindings.
     contentProviderServices.ctrl.close();
     componentContext.ctrl.close();
+
+    // Start the contacts picker. We'll start it early and reuse it, instead of
+    // launching it every time when it's needed.
+    _startContactsPicker();
 
     // ignore: unawaited_futures
     _fetchConversations();
@@ -240,6 +283,86 @@ class ChatConversationListModuleModel extends ModuleModel {
       false,
     );
     _conversationModuleStarted = true;
+  }
+
+  /// Starts the contacts picker using Daisy.
+  void _startContactsPicker() {
+    String name = 'contacts_picker';
+
+    Map<String, String> prefixEntity = <String, String>{
+      '@type': 'com.google.fuchsia.string',
+      'content': '',
+    };
+    Map<String, String> detailTypeEntity = <String, String>{
+      '@type': 'com.google.fuchsia.string',
+      'content': 'email',
+    };
+
+    DaisyBuilder daisyBuilder =
+        new DaisyBuilder.verb('com.google.fuchsia.pick-contacts')
+          ..addNoun('prefix', prefixEntity)
+          ..addNoun('detailType', detailTypeEntity);
+
+    InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
+    moduleContext
+      ..startDaisy(
+        name, // mod name
+        daisyBuilder.daisy,
+        name, // link name
+        null,
+        _pickerModuleController.ctrl.request(),
+        viewOwner.passRequest(),
+      )
+      ..getLink(name, _pickerLink.ctrl.request());
+
+    // Register a LinkWatcher, which would read the selected contact.
+    LinkWatcherImpl watcher = new LinkWatcherImpl(onNotify: (String json) {
+      Object jsonObject = JSON.decode(json);
+      if (jsonObject is Map<String, Object> &&
+          jsonObject['selectedContact'] is String) {
+        String entityReference = jsonObject['selectedContact'];
+        _handleSelectedContact(entityReference);
+      }
+    });
+
+    _pickerLink.watch(_pickerWatcherBinding.wrap(watcher));
+
+    _pickerConnection = new ChildViewConnection(viewOwner.passHandle());
+    notifyListeners();
+  }
+
+  /// Handles the selected contact from the contacts picker.
+  Future<Null> _handleSelectedContact(String entityReference) async {
+    EntityProxy entity = new EntityProxy();
+    _entityResolver.resolveEntity(entityReference, entity.ctrl.request());
+
+    // Assume that the returned entity would have 'Contact' type.
+    Completer<List<String>> typesCompleter = new Completer<List<String>>();
+    entity.getTypes(typesCompleter.complete);
+    List<String> types = await typesCompleter.future;
+
+    if (!types.contains('Contact')) {
+      log.warning('The selected entity does not provide the "Contact" type.');
+      return;
+    }
+
+    Completer<String> dataCompleter = new Completer<String>();
+    entity.getData('Contact', dataCompleter.complete);
+    String data = await dataCompleter.future;
+
+    try {
+      entities.Contact contact = new entities.Contact.fromData(data);
+      String email = contact.primaryEmail?.value;
+      if (email != null) {
+        formModel.addNewParticipants(null, email, refocus: false);
+      }
+    } on Exception catch (e, stackTrace) {
+      log.warning('Failed to decode contact data: $data', e, stackTrace);
+    }
+
+    _pickerLink.erase(const <String>['selectedContact']);
+
+    moduleContext.requestFocus();
   }
 
   /// Fetches the conversation list from the content provider. Also provide our
@@ -455,8 +578,12 @@ class ChatConversationListModuleModel extends ModuleModel {
     _messageQueue.ctrl.close();
     _messageQueueReceiver.close();
     _conversationModuleController.ctrl.close();
+    _pickerWatcherBinding.close();
+    _pickerLink.ctrl.close();
+    _pickerModuleController.ctrl.close();
     _chatContentProvider.ctrl.close();
     _chatContentProviderController.ctrl.close();
+    _entityResolver.ctrl.close();
 
     super.onStop();
   }
@@ -535,6 +662,19 @@ class ChatConversationListModuleModel extends ModuleModel {
         }
       },
     );
+  }
+
+  /// Callback that handles the text change event in the new conversation form.
+  void handleNewConversationFormChanged(String text) {
+    // Update the link data for contacts picker.
+    _pickerLink.updateObject(
+      const <String>['prefix'],
+      JSON.encode(<String, String>{'content': text}),
+    );
+
+    // Notify listeners so that the contacts picker can be shown or hidden
+    // depending on the text (should be hidden when the text is empty).
+    notifyListeners();
   }
 
   /// Callback that handles the user submitting a new conversation form

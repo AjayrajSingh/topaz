@@ -9,7 +9,6 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -22,8 +21,8 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.module_resolver.dart/daisy_builder.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.dart/story.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.widgets/modular.dart';

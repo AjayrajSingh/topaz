@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'package:entity_schemas/entities.dart' as entities;
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 const double _kIconSize = 14.0;

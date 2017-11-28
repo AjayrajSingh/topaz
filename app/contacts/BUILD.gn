@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/package.gni")
+import("//peridot/build/module_repository/manifest_package.gni")
 
 package("contacts") {
   app = true
@@ -43,5 +44,11 @@ group("tests") {
     "modules/contact_list:test",
     "modules/contacts:test",
     "modules/contacts_picker:test",
+  ]
+}
+
+module_manifest_package("contacts_picker_manifest") {
+  sources = [
+    "modules/contacts_picker/manifest.json",
   ]
 }

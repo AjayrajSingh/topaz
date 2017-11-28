@@ -10,8 +10,11 @@ import 'contact_item.dart';
 
 /// The UI widget that represents a list of contacts
 class ContactsPicker extends StoreWatcher {
+  /// Called when a contact is tapped
+  final ContactItemCallback onContactTapped;
+
   /// Creates a new instance of [ContactsPicker]
-  ContactsPicker({Key key}) : super(key: key);
+  ContactsPicker({Key key, this.onContactTapped}) : super(key: key);
 
   @override
   void initStores(ListenToStore listenToStore) {
@@ -28,6 +31,7 @@ class ContactsPicker extends StoreWatcher {
           return new ContactItem(
             matchedPrefix: pickerStore.prefix,
             contact: contact,
+            onTap: onContactTapped,
           );
         }).toList(),
       ),

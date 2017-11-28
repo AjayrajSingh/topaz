@@ -1,0 +1,15 @@
+{
+  "binary": "/system/apps/contacts/contacts_picker",
+  "local_name": "contacts_picker",
+  "verb": "com.google.fuchsia.pick-contacts",
+  "noun_constraints": [
+    {
+      "name": "prefix",
+      "types": [ "com.google.fuchsia.string" ]
+    },
+    {
+      "name": "detailType",
+      "types": [ "com.google.fuchsia.string" ]
+    }
+  ]
+}

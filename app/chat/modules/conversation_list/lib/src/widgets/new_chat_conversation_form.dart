@@ -3,16 +3,14 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
+import '../models.dart';
 import 'constants.dart';
 
-/// Callback function signature for the action to submit the new conversation
-/// form
-typedef void NewConversationFormSubmitCallback(List<String> participants);
-
 /// UI Widget that represents the form to create a new chat
-class NewChatConversationForm extends StatefulWidget {
+class NewChatConversationForm extends StatelessWidget {
   /// Callback to handle the form cancel action
   final VoidCallback onFormCancel;
 
@@ -30,32 +28,28 @@ class NewChatConversationForm extends StatefulWidget {
         super(key: key);
 
   @override
-  _NewChatConversationFormState createState() =>
-      new _NewChatConversationFormState();
-}
-
-class _NewChatConversationFormState extends State<NewChatConversationForm> {
-  final List<String> _participants = <String>[];
-  final TextEditingController _textController = new TextEditingController();
-  final FocusNode _textFieldFocusNode = new FocusNode();
-
-  @override
   Widget build(BuildContext context) {
-    return new AnimatedBuilder(
-      animation: _textController,
-      builder: (BuildContext context, Widget child) {
+    return new ScopedModelDescendant<FormModel>(
+      builder: (BuildContext context, Widget child, FormModel model) {
         return new AlertDialog(
           title: new Text(kNewChatFormTitle),
-          content: _buildParticipantInputField(),
+          content: _buildParticipantInputField(context, model),
           actions: <Widget>[
             new FlatButton(
               child: new Text(kNewChatFormCancel),
-              onPressed: widget.onFormCancel,
+              onPressed: () {
+                model.clear();
+                onFormCancel?.call();
+              },
             ),
             new FlatButton(
               child: new Text(kNewChatFormSubmit),
-              onPressed: _shouldEnableSubmitButton(_textController.text)
-                  ? () => _handleConversationFormSubmit(_textController.text)
+              onPressed: model.shouldEnableSubmitButton()
+                  ? () => model.handleConversationFormSubmit(
+                        context,
+                        model.textController.text,
+                        onFormSubmit,
+                      )
                   : null,
             ),
           ],
@@ -66,7 +60,7 @@ class _NewChatConversationFormState extends State<NewChatConversationForm> {
 
   /// Build the participant input field that converts the comma separated values
   /// into chips upon submit
-  Widget _buildParticipantInputField() {
+  Widget _buildParticipantInputField(BuildContext context, FormModel model) {
     return new Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -78,14 +72,10 @@ class _NewChatConversationFormState extends State<NewChatConversationForm> {
             child: new Wrap(
               spacing: 8.0,
               runSpacing: 4.0,
-              children: _participants.map((String email) {
+              children: model.participants.map((String email) {
                 return new Chip(
                   label: new Text(email, overflow: TextOverflow.ellipsis),
-                  onDeleted: () {
-                    setState(() {
-                      _participants.remove(email);
-                    });
-                  },
+                  onDeleted: () => model.removeParticipant(email),
                 );
               }).toList(),
             ),
@@ -93,64 +83,16 @@ class _NewChatConversationFormState extends State<NewChatConversationForm> {
         ),
         new TextField(
           autofocus: true,
-          focusNode: _textFieldFocusNode,
+          focusNode: model.textFieldFocusNode,
           decoration: const InputDecoration(hintText: kNewChatFormHintText),
-          controller: _textController,
-          onSubmitted: _handleInputSubmit,
+          controller: model.textController,
+          onSubmitted: (String text) => model.handleInputSubmit(
+                context,
+                text,
+                onFormSubmit,
+              ),
         ),
       ],
     );
-  }
-
-  /// Convert a comma separated string into a set of distinct values that
-  /// maintains the insertion order;
-  /// empty strings are not added to the resulting set
-  Set<String> _getDistinctValuesFromCSV(String text) {
-    return text
-        .split(',')
-        .map((String s) => s.trim())
-        .where((String s) => s.isNotEmpty)
-        .toSet();
-  }
-
-  /// Determines whether we should submit the list of participants
-  bool _shouldSubmitForm(String text) =>
-      text.trim().isEmpty && _participants.isNotEmpty;
-
-  /// Add the new text in the input field to the list of participants;
-  /// if there are multiple values delimited by commas, it will add multiple
-  /// values. By default [refocus] is true which will refocus back on the
-  /// text field.
-  void _addNewParticipants(String text, {bool refocus = true}) {
-    _participants.addAll(_getDistinctValuesFromCSV(text)
-        .where((String s) => !_participants.contains(s)));
-    _textController.clear();
-
-    // refocus back into the text field so that multiple values can be typed
-    if (refocus) {
-      FocusScope.of(context).requestFocus(_textFieldFocusNode);
-    }
-  }
-
-  /// Determines whether the submit button should be enabled or not.
-  bool _shouldEnableSubmitButton(String text) {
-    return _getDistinctValuesFromCSV(text).isNotEmpty ||
-        _participants.isNotEmpty;
-  }
-
-  /// Creates a new conversation with the given participants.
-  void _handleConversationFormSubmit(String text) {
-    _addNewParticipants(text, refocus: false);
-    widget.onFormSubmit(_participants);
-  }
-
-  /// Handles the text field submit action and determines whether to add the
-  /// new text to the participant list or submit the form
-  void _handleInputSubmit(String text) {
-    if (_shouldSubmitForm(text)) {
-      _handleConversationFormSubmit(text);
-    } else {
-      _addNewParticipants(text);
-    }
   }
 }

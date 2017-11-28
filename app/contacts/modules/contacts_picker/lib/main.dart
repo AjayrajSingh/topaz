@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/app.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
@@ -26,7 +26,9 @@ void main() {
     child: new MaterialApp(
       title: 'Contacts Picker',
       theme: new ThemeData(primarySwatch: Colors.blue),
-      home: new ContactsPicker(),
+      home: new ContactsPicker(
+        onContactTapped: moduleModel.handleContactTapped,
+      ),
     ),
   )..advertise();
 

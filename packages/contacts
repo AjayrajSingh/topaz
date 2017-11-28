@@ -3,6 +3,7 @@
         "dart"
     ],
     "packages": {
-        "contacts": "//topaz/app/contacts"
+        "contacts": "//topaz/app/contacts",
+        "contacts_picker_manifest": "//topaz/app/contacts:contacts_picker_manifest"
     }
 }

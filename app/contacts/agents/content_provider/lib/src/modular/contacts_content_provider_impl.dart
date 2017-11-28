@@ -6,17 +6,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:lib.agent.fidl/agent_context.fidl.dart';
+import 'package:entity_schemas/entities.dart' as entities;
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
+import 'package:lib.agent.fidl/agent_context.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.entity.fidl/entity_provider.fidl.dart';
 import 'package:lib.entity.fidl/entity_reference_factory.fidl.dart';
+import 'package:lib.ledger.dart/ledger.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
 import 'package:lib.logging/logging.dart';
-import 'package:lib.ledger.dart/ledger.dart';
-import 'package:entity_schemas/entities.dart' as entities;
 import 'package:meta/meta.dart';
 import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
     as fidl;
@@ -245,11 +245,6 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
         List<String> searchableValues = <String>[
           contact.displayName.trim().toLowerCase()
         ];
-
-        if (contact.familyName != null &&
-            contact.familyName.trim().isNotEmpty) {
-          searchableValues.add(contact.familyName.trim());
-        }
 
         // Allow contact to be searchable on all of their email addresses
         for (fidl.EmailAddress e in contact.emails) {

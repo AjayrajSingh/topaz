@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert' show JSON;
+
 /// The type of detail to show with the contact's display name
 enum DetailType {
   /// Primary email of the contact
@@ -32,4 +34,40 @@ class LinkData {
     this.prefix,
     this.detailType: DetailType.email,
   });
+
+  /// Create a new [LinkData] from the given json.
+  ///
+  /// Typically, the json data will come from the root Link of this module.
+  factory LinkData.fromJson(String json) {
+    String prefix = '';
+    DetailType detailType = DetailType.values[0];
+
+    Object jsonObject = JSON.decode(json);
+    if (jsonObject is Map<String, dynamic>) {
+      if (jsonObject['prefix'] is Map<String, Object>) {
+        prefix = jsonObject['prefix']['content'];
+      }
+
+      if (jsonObject['detailType'] is Map<String, Object>) {
+        switch (jsonObject['detailType']['content']) {
+          case 'email':
+            detailType = DetailType.email;
+            break;
+
+          case 'phoneNumber':
+            detailType = DetailType.phoneNumber;
+            break;
+
+          case 'custom':
+            detailType = DetailType.custom;
+            break;
+        }
+      }
+    }
+
+    return new LinkData(
+      prefix: prefix,
+      detailType: detailType,
+    );
+  }
 }

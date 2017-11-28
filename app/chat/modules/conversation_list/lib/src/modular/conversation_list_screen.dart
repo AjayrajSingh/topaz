@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../models.dart';
@@ -10,17 +11,10 @@ import '../widgets.dart';
 import 'conversation_list_module_model.dart';
 
 /// Top-level widget for the chat_conversation_list module.
-class ChatConversationListScreen extends StatefulWidget {
+class ChatConversationListScreen extends StatelessWidget {
   /// Creates a new instance of [ChatConversationListScreen].
   const ChatConversationListScreen({Key key}) : super(key: key);
 
-  @override
-  _ChatConversationListScreenState createState() =>
-      new _ChatConversationListScreenState();
-}
-
-class _ChatConversationListScreenState
-    extends State<ChatConversationListScreen> {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -57,6 +51,7 @@ class _ChatConversationListScreenState
                 ),
               ),
               _buildNewConversationForm(context, model),
+              _buildPicker(model),
             ]);
           }
 
@@ -83,6 +78,30 @@ class _ChatConversationListScreenState
       child: new NewChatConversationForm(
         onFormCancel: model.hideNewConversationForm,
         onFormSubmit: model.handleNewConversationFormSubmit,
+      ),
+    );
+  }
+
+  Widget _buildPicker(
+    ChatConversationListModuleModel model,
+  ) {
+    // TODO(youngseokyoon): Figure out how to layout correctly.
+    // https://fuchsia.atlassian.net/browse/SO-1010
+    return new Positioned(
+      left: 8.0,
+      right: 8.0,
+      bottom: 8.0,
+      height: 200.0,
+      child: new Offstage(
+        offstage: !model.shouldShowContactsPicker,
+        child: new PhysicalModel(
+          color: Colors.transparent,
+          // The AlertDialog's elevation is 24.0, so we need a bigger value.
+          elevation: 36.0,
+          child: new ChildView(
+            connection: model.pickerConnection,
+          ),
+        ),
       ),
     );
   }
