@@ -42,6 +42,8 @@ executable("web_view_bin") {
 
 group("webkit") {
   visibility = [
+    # Allow the webkit library to be built as a standalone.
+    "//build/gn/*",
     "//topaz/*",
     "//vendor/google/*",
   ]

@@ -1,0 +1,13 @@
+{
+    "languages": [
+        "cpp"
+    ],
+    "imports": [
+        "topaz/packages/curl",
+        "topaz/packages/sqlite"
+    ],
+    "labels": [
+        "//topaz/runtime/web_view:webkit"
+    ]
+}
+
