@@ -12,6 +12,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- jQuery CDN -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <!-- AngularJS CDN -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
   <!-- Material Components CDN -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
@@ -43,7 +45,7 @@
   </header>
 
   <main>
-    <section class="panels">
+    <section class="panels" ng-app="ledgerDashboard" ng-controller="debugCtrl">
       <div id="overview-panel" class="panel active" role="tabpanel">
       </div> <!-- overview-panel -->
 
@@ -55,24 +57,30 @@
                 <h1 class="mdc-card__title mdc-card__title--large">Ledger Instances</h1>
               </section>
               <section id="number-of-ledger-instances" class="mdc-card__supporting-text">
-                Number of Ledger Instances:
+                Number of Ledger Instances: {{ instancesList.length }}
               </section>
               <section class="mdc-card__supporting-text">
                 <ul id="ledger-instances-list" class="mdc-list">
+                  <li ng-repeat="x in instancesList" ng-click="getPagesList($index, $instanceName)">
+                    {{  bytesToString(x) }}
+                  </li>
                 </ul>
               </section>
             </div> <!-- mdc_card -->
           </div> <!-- cell -->
-
-          <div class="cell mdc-layout-grid__cell ledger-pages-card">
+          <div class="cell mdc-layout-grid__cell ledger-pages-card" ng-show="showPages">
             <div class="mdc-card">
               <section class="mdc-card__primary">
                 <h1 class="mdc-card__title mdc-card__title--large">Ledger Pages</h1>
               </section>
               <section id="number-of-ledger-pages" class="mdc-card__supporting-text">
+                Number of {{ selectedInstance }} Pages: {{ pagesList.length }}
               </section>
               <section class="mdc-card__supporting-text">
                 <ul id="ledger-pages-list" class="mdc-list">
+                  <li ng-repeat="x in pagesList">
+                    {{ bytesToString(x) }}
+                  </li>
                 </ul>
               </section>
             </div> <!-- mdc_card -->

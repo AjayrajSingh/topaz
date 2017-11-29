@@ -15,11 +15,6 @@ $(function() {
       updateTabPanel(newPanelSelector);
     });
   _tabBar.layout();
-
-  $(document).ready(function(){
-    instancesObjects = new Array();
-    getInstancesList();
-  });
 });
 
 function updateTabPanel(newPanelSelector) {
@@ -33,76 +28,51 @@ function updateTabPanel(newPanelSelector) {
   }
 }
 
-class Instance {
-    constructor(encodedString) {
-      this.encodedName = encodedString;
-      this.decodedName = "";
+
+var app = angular.module('ledgerDashboard', []);
+app.controller('debugCtrl', function($scope, $http) {
+  $scope.instancesList = [];
+  $scope.pagesList = [];
+  $scope.showPages = false;
+  $scope.selectedInstance = '';
+  $scope.bytesToString = function(bytesList) {
+    var str = "";
+    for(var i = 0; i < bytesList.length; i++) {
+      if((bytesList[i] >= 0 && bytesList[i] <= 31)
+          || bytesList[i] >= 127) {
+        str = bytesToHex(bytesList);
+        break;
+      }
+      str += String.fromCharCode(bytesList[i]);
     }
-    addInList(listId) {
-      this.decodedName = bytesToString(this.encodedName);
-      var methodElem = $("<li></li>")
-      .addClass('mdc-list-item')
-      .text(this.decodedName)
-      .attr('id', this.decodedName)
-      .click($.proxy(this.getPagesList, this));
+    return str;
+  };
 
-      $(listId).append(methodElem);
+  function bytesToHex (bytes) {
+    var hexString = '0x';
+    for(var i = 0; i < bytes.length; i++) {
+      var temp = bytes[i].toString(16);
+      if(temp.length < 2)
+        temp = "0" + temp;
+      hexString += temp;
     }
-    getPagesList() {
-      var clickedName = this.decodedName;
-      $.get( _ReqUrl + "/pages_list",
-        { instance: JSON.stringify(this.encodedName) },
-        function(pagesList, status) {
-          var stringsList = new Array();
-          for(var i = 0; i < pagesList.length; i++)
-            stringsList.push(bytesToString(pagesList[i]));
+    return hexString;
+  };
 
-          $("#number-of-ledger-pages").text("Number of "+
-                                            clickedName + " pages: " +
-                                            (stringsList.length).toString());
-          $("#ledger-pages-list").empty();
-          for(var i = 0; i < stringsList.length; i++) {
-            var methodElem = $("<li></li>")
-            .addClass('mdc-list-item')
-            .text(stringsList[i]);
-
-            $("#ledger-pages-list").append(methodElem);
-          }
-          return;
-        }).fail( function() { console.log("The GET request didn't work! You \
-        need to check that the server is working properly."); } );
-      return false;
-    }
-}
-
-function getInstancesList() {
-  $.get( _ReqUrl + "/instances_list", function(instancesList, status){
-        for(var i = 0; i < instancesList.length; i++) {
-          newInstance = new Instance(instancesList[i]);
-          newInstance.addInList("#ledger-instances-list");
-          instancesObjects.push(newInstance);
-        }
-        $("#number-of-ledger-instances").append(instancesObjects.length);
+  $scope.getPagesList = function(index) {
+    $scope.selectedInstance = $scope.bytesToString($scope.instancesList[index]);
+    $scope.showPages = true;
+    $http.get( _ReqUrl + "/pages_list",{
+      params: { instance: JSON.stringify($scope.instancesList[index]) }
+    })
+      .then(function(response) {
+        $scope.pagesList = response.data;
       });
-}
+  };
 
-function bytesToString(bytesList) {
-  var str = "";
-  for(var i = 0; i < bytesList.length; i++) {
-    if((bytesList[i] >= 0 && bytesList[i] <= 31)
-        || bytesList[i] >= 127) {
-      str = bytesToHex(bytesList);
-      break;
-    }
-    str += String.fromCharCode(bytesList[i]);
-  }
-  return str;
-}
-
-function bytesToHex(bytes) {
-  var hexString = '0x';
-  for(var i = 0; i < bytes.length; i++) {
-    hexString += bytes[i].toString(16);
-  }
-  return hexString;
-}
+  $(document).ready(function(){
+    $http.get( _ReqUrl + "/instances_list").then(function(response){
+      $scope.instancesList = response.data;
+    });
+  });
+});
