@@ -78,6 +78,7 @@ constexpr char kWebViewUrl[] = "web_view";
 
 constexpr auto kScopes = {"openid",
                           "email",
+                          "https://www.googleapis.com/auth/admin.directory.user.readonly",
                           "https://www.googleapis.com/auth/assistant",
                           "https://www.googleapis.com/auth/gmail.modify",
                           "https://www.googleapis.com/auth/userinfo.email",
