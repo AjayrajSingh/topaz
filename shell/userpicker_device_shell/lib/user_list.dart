@@ -15,6 +15,13 @@ const double _kButtonWidthSmall = 116.0;
 const double _kButtonFontSizeLarge = 16.0;
 const double _kButtonFontSizeSmall = 14.0;
 
+const TextStyle _kTextStyle = const TextStyle(
+  color: Colors.white,
+  fontSize: 10.0,
+  letterSpacing: 1.0,
+  fontWeight: FontWeight.w300,
+);
+
 final BorderRadius _kButtonBorderRadiusPhone =
     new BorderRadius.circular(_kUserAvatarSizeSmall / 2.0);
 final BorderRadius _kButtonBorderRadiusLarge =
@@ -33,7 +40,6 @@ class UserList extends StatelessWidget {
       child: new Container(
         height: size,
         width: size,
-        margin: const EdgeInsets.only(left: 16.0),
         child: new Alphatar.fromNameAndUrl(
           name: account.displayName,
           avatarUrl: _getImageUrl(account),
@@ -178,7 +184,7 @@ class UserList extends StatelessWidget {
       return userCard;
     }
 
-    return new LongPressDraggable<Account>(
+    Widget userImage = new LongPressDraggable<Account>(
       child: userCard,
       feedback: userCard,
       data: account,
@@ -189,6 +195,32 @@ class UserList extends StatelessWidget {
       onDragStarted: () => model.addDraggedUser(account),
       onDraggableCanceled: (_, __) => model.removeDraggedUser(account),
     );
+
+    if (model.showingUserActions) {
+      return new Padding(
+        padding: const EdgeInsets.only(left: 16.0),
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            new Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: new Text(
+                account.displayName,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                style: _kTextStyle,
+              ),
+            ),
+            userImage,
+          ],
+        ),
+      );
+    } else {
+      return new Padding(
+        padding: const EdgeInsets.only(left: 16.0),
+        child: userImage,
+      );
+    }
   }
 
   Widget _buildUserList(UserPickerDeviceShellModel model) {
@@ -200,36 +232,50 @@ class UserList extends StatelessWidget {
             constraints.maxWidth < 600.0 || constraints.maxHeight < 600.0;
 
         if (model.showingUserActions) {
-          children.add(_buildExpandedUserActions(
-            model: model,
-            isSmall: isSmall,
-          ));
+          children.add(
+            new Align(
+              alignment: FractionalOffset.bottomCenter,
+              child: _buildExpandedUserActions(
+                model: model,
+                isSmall: isSmall,
+              ),
+            ),
+          );
         } else {
-          children.add(_buildIconButton(
-            onTap: model.showUserActions,
-            isSmall: isSmall,
-            icon: Icons.add,
-          ));
+          children.add(
+            new Align(
+              alignment: FractionalOffset.bottomCenter,
+              child: _buildIconButton(
+                onTap: model.showUserActions,
+                isSmall: isSmall,
+                icon: Icons.add,
+              ),
+            ),
+          );
         }
 
         children.addAll(
           model.accounts.map(
-            (Account account) => _buildUserEntry(
-                  account: account,
-                  onTap: () {
-                    model
-                      ..login(account.id)
-                      ..hideUserActions();
-                  },
-                  isSmall: isSmall,
-                  model: model,
+            (Account account) => new Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  child: _buildUserEntry(
+                    account: account,
+                    onTap: () {
+                      model
+                        ..login(account.id)
+                        ..hideUserActions();
+                    },
+                    isSmall: isSmall,
+                    model: model,
+                  ),
                 ),
           ),
         );
 
         return new Container(
-          height:
-              (isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge) + 24.0,
+          height: (isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge) +
+              24.0 +
+              (model.showingUserActions ? 24.0 : 0.0),
           child: new AnimatedOpacity(
             duration: new Duration(milliseconds: 250),
             opacity: model.showingRemoveUserTarget ? 0.0 : 1.0,

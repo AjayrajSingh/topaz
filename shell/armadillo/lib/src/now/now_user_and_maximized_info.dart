@@ -6,11 +6,18 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 
+import 'context_model.dart';
 import 'important_info.dart';
 import 'now_minimization_model.dart';
 import 'now_user_image.dart';
 import 'quick_settings_progress_model.dart';
 import 'user_context_text.dart';
+
+const TextStyle _kTextStyle = const TextStyle(
+  fontSize: 10.0,
+  letterSpacing: 1.0,
+  fontWeight: FontWeight.w300,
+);
 
 typedef Widget _QuickSettingsTextBuilder(Color color);
 
@@ -61,12 +68,17 @@ class NowUserAndMaximizedContext extends StatelessWidget {
                   ),
                   // Important Information when maximized.
                   new Expanded(
-                    child: _buildQuickSettingsText(
-                      startingXOffset: 16.0,
-                      slideInProgress:
-                          nowMinimizationModel.maximizedTextSlideInProgress,
-                      builder: (Color color) =>
-                          new ImportantInfo(textColor: color),
+                    child: new Stack(
+                      children: <Widget>[
+                        _buildUserDisplayName(),
+                        _buildQuickSettingsText(
+                          startingXOffset: 16.0,
+                          slideInProgress:
+                              nowMinimizationModel.maximizedTextSlideInProgress,
+                          builder: (Color color) =>
+                              new ImportantInfo(textColor: color),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -102,5 +114,40 @@ class NowUserAndMaximizedContext extends StatelessWidget {
                 ),
               ),
         ),
+      );
+
+  Widget _buildUserDisplayName() => new ScopedModelDescendant<ContextModel>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          ContextModel contextModel,
+        ) =>
+            new ScopedModelDescendant<QuickSettingsProgressModel>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                QuickSettingsProgressModel quickSettingsProgressModel,
+              ) =>
+                  new Opacity(
+                    // Fade in as quick settings opens.
+                    opacity: quickSettingsProgressModel.value,
+                    child: new Transform(
+                      // Slide to the left slightly as we fade in.
+                      transform: new Matrix4.translationValues(
+                        lerpDouble(
+                          24.0,
+                          8.0,
+                          quickSettingsProgressModel.value,
+                        ),
+                        4.0,
+                        0.0,
+                      ),
+                      child: new Text(
+                        contextModel.userName ?? '',
+                        style: _kTextStyle,
+                      ),
+                    ),
+                  ),
+            ),
       );
 }
