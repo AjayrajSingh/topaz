@@ -5,6 +5,7 @@
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.user.fidl/user_shell.fidl.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.user.dart/user.dart';
@@ -78,24 +79,28 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
         );
 
   @override
-  Widget build(BuildContext context) => new Directionality(
-        textDirection: TextDirection.ltr,
-        child: new WindowMediaQuery(
-          child: new Listener(
-            // TODO: determine idleness in a better way (DNO-147).
-            onPointerDown: (_) => _idleModel.onUserInteraction(),
-            onPointerMove: (_) => _idleModel.onUserInteraction(),
-            onPointerUp: (_) => _idleModel.onUserInteraction(),
-            onPointerCancel: (_) => _idleModel.onUserInteraction(),
-            behavior: HitTestBehavior.translucent,
-            child: new ScopedModel<IdleModel>(
-              model: _idleModel,
-              child: _userShellModel == null
-                  ? _child
-                  : new ScopedModel<T>(
-                      model: _userShellModel,
-                      child: _child,
-                    ),
+  Widget build(BuildContext context) => new MaterialApp(
+        home: new Material(
+          child: new Directionality(
+            textDirection: TextDirection.ltr,
+            child: new WindowMediaQuery(
+              child: new Listener(
+                // TODO: determine idleness in a better way (DNO-147).
+                onPointerDown: (_) => _idleModel.onUserInteraction(),
+                onPointerMove: (_) => _idleModel.onUserInteraction(),
+                onPointerUp: (_) => _idleModel.onUserInteraction(),
+                onPointerCancel: (_) => _idleModel.onUserInteraction(),
+                behavior: HitTestBehavior.translucent,
+                child: new ScopedModel<IdleModel>(
+                  model: _idleModel,
+                  child: _userShellModel == null
+                      ? _child
+                      : new ScopedModel<T>(
+                          model: _userShellModel,
+                          child: _child,
+                        ),
+                ),
+              ),
             ),
           ),
         ),

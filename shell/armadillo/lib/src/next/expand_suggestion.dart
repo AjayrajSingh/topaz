@@ -89,8 +89,6 @@ class ExpandSuggestion extends ExpansionBehavior {
 
   @override
   Widget build(BuildContext context, BoxConstraints constraints) {
-    RenderBox box = context.findRenderObject();
-    Offset topLeft = box.localToGlobal(Offset.zero);
     return new ScopedModelDescendant<SizeModel>(
       builder: (BuildContext context, Widget child, SizeModel sizeModel) =>
           new Stack(
@@ -98,12 +96,12 @@ class ExpandSuggestion extends ExpansionBehavior {
             children: <Widget>[
               new Positioned(
                 left: lerpDouble(
-                  suggestionInitialGlobalBounds.left - topLeft.dx,
+                  suggestionInitialGlobalBounds.left,
                   0.0,
                   _expansionProgress,
                 ),
                 top: lerpDouble(
-                  suggestionInitialGlobalBounds.top - topLeft.dy,
+                  suggestionInitialGlobalBounds.top,
                   0.0,
                   _expansionProgress,
                 ),

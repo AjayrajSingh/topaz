@@ -5,6 +5,7 @@
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.module.fidl/module.fidl.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.module.dart/module.dart';
@@ -78,15 +79,19 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
         );
 
   @override
-  Widget build(BuildContext context) => new Directionality(
-        textDirection: TextDirection.ltr,
-        child: new WindowMediaQuery(
-          child: _moduleModel == null
-              ? child
-              : new ScopedModel<T>(
-                  model: _moduleModel,
-                  child: child,
-                ),
+  Widget build(BuildContext context) => new MaterialApp(
+        home: new Material(
+          child: new Directionality(
+            textDirection: TextDirection.ltr,
+            child: new WindowMediaQuery(
+              child: _moduleModel == null
+                  ? child
+                  : new ScopedModel<T>(
+                      model: _moduleModel,
+                      child: child,
+                    ),
+            ),
+          ),
         ),
       );
 

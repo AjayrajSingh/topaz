@@ -6,6 +6,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.device.fidl/device_shell.fidl.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.device.dart/device.dart';
@@ -62,12 +63,16 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
         );
 
   @override
-  Widget build(BuildContext context) => new Directionality(
-        textDirection: TextDirection.ltr,
-        child: new WindowMediaQuery(
-          child: _deviceShellModel == null
-              ? child
-              : new ScopedModel<T>(model: _deviceShellModel, child: child),
+  Widget build(BuildContext context) => new MaterialApp(
+        home: new Material(
+          child: new Directionality(
+            textDirection: TextDirection.ltr,
+            child: new WindowMediaQuery(
+              child: _deviceShellModel == null
+                  ? child
+                  : new ScopedModel<T>(model: _deviceShellModel, child: child),
+            ),
+          ),
         ),
       );
 

@@ -22,6 +22,7 @@ class Clock extends StatelessWidget {
               child: new Text(
                 _time.timeOnly,
                 style: new TextStyle(
+                  color: Colors.white,
                   fontSize: min(
                     constraints.maxWidth / 6.0,
                     constraints.maxHeight / 6.0,
