@@ -109,8 +109,8 @@ void parseConfigAndStart(String configString) {
 
 void handleRequest(HttpRequest request) {
   // Identify websocket requests
-  // Such requests will end with /ws/<service>/...
-  final RegExp websocketRequestPattern = new RegExp('/ws/([^/]+)(/.*)');
+  // Such requests will end with /ws/<service>/
+  final RegExp websocketRequestPattern = new RegExp('/ws/([^/]+)/');
   final Match match =
       websocketRequestPattern.firstMatch(request.requestedUri.path);
   if (match != null) {

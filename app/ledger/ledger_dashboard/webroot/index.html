@@ -56,12 +56,9 @@
               <section class="mdc-card__primary">
                 <h1 class="mdc-card__title mdc-card__title--large">Ledger Instances</h1>
               </section>
-              <section id="number-of-ledger-instances" class="mdc-card__supporting-text">
-                Number of Ledger Instances: {{ instancesList.length }}
-              </section>
               <section class="mdc-card__supporting-text">
                 <ul id="ledger-instances-list" class="mdc-list">
-                  <li ng-repeat="x in instancesList" ng-click="getPagesList($index)">
+                  <li class="mdc-list-item" ng-class="{ 'selected-class-name': $index == selectedInstIndex }" ng-repeat="x in instancesList" ng-click="getPagesList($index)">
                     {{  bytesToString(x) }}
                   </li>
                 </ul>
@@ -73,19 +70,29 @@
               <section class="mdc-card__primary">
                 <h1 class="mdc-card__title mdc-card__title--large">Ledger Pages</h1>
               </section>
-              <section id="number-of-ledger-pages" class="mdc-card__supporting-text">
-                Number of {{ selectedInstance }} Pages: {{ pagesList.length }}
-              </section>
               <section class="mdc-card__supporting-text">
                 <ul id="ledger-pages-list" class="mdc-list">
-                  <li ng-repeat="x in pagesList">
+                  <li class="mdc-list-item" ng-class="{ 'selected-class-name': $index == selectedPageIndex }" ng-repeat="x in pagesList" ng-click="getCommitsList($index)">
                     {{ bytesToString(x) }}
                   </li>
                 </ul>
               </section>
             </div> <!-- mdc_card -->
           </div> <!-- cell -->
-
+          <div class="cell mdc-layout-grid__cell head-commits-card" ng-show="showCommits">
+            <div class="mdc-card">
+              <section class="mdc-card__primary">
+                <h1 class="mdc-card__title mdc-card__title--large">Head Commits</h1>
+              </section>
+              <section class="mdc-card__supporting-text">
+                <ul id="head-commits-list" class="mdc-list">
+                  <li class="mdc-list-item" ng-repeat="x in commitsList">
+                    {{ bytesToBase64(x) }}
+                  </li>
+                </ul>
+              </section>
+            </div> <!-- mdc_card -->
+          </div> <!-- cell -->
         </div> <!-- grid_inner -->
       </div> <!-- ledger-panel -->
 

@@ -16,6 +16,10 @@ body {
   grid-column-end: span 3;
 }
 
+.head-commits-card {
+  grid-column-end: span 3;
+}
+
 .mdc-card {
   background-color: white;
 }
@@ -35,4 +39,9 @@ body {
 
 .panel.active {
   display: block;
+}
+
+.selected-class-name {
+  padding-left:8px;
+  background-color: #D3D3D3;
 }
