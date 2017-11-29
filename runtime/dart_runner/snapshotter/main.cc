@@ -146,6 +146,7 @@ std::vector<char> CreateSnapshot() {
 
   Dart_QualifiedFunctionName content_handler_entry_points[] = {
       {"::", "::", "main"},
+      {"dart:_internal", "::", "_printClosure"},
       {"dart:async", "::", "_setScheduleImmediateClosure"},
       {"dart:core", "::", "_uriBaseClosure"},
       {"dart:fuchsia", "::", "_environment"},
