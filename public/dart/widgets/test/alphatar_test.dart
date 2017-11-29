@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lib.testing.flutter/testing.dart';
 import 'package:lib.widgets/widgets.dart';
 
 void main() {
@@ -14,6 +16,7 @@ void main() {
       'Alphatar should display the image when given, whether or not the '
       'fall-back letter is given, but also display fallback letter in '
       'the background', (WidgetTester tester) async {
+    createHttpClient = createMockImageHttpClient;
     // First, try without providing a letter.
     await tester.pumpWidget(
       new MaterialApp(

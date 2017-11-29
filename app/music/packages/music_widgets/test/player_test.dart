@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lib.testing.flutter/testing.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
 
@@ -12,6 +14,7 @@ void main() {
   testWidgets(
       'Test to see if tapping on the repeat button calls the appropriate '
       'callback', (WidgetTester tester) async {
+    createHttpClient = createMockImageHttpClient;
     Track track = fixtures.track();
     int taps = 0;
 
@@ -37,11 +40,14 @@ void main() {
     await tester.tap(find.byWidgetPredicate(
         (Widget widget) => widget is Icon && widget.icon == Icons.repeat));
     expect(taps, 1);
+
+    await tester.pumpAndSettle();
   });
 
   testWidgets(
       'Test to see if tapping on the shuffle button calls the appropriate '
       'callback', (WidgetTester tester) async {
+    createHttpClient = createMockImageHttpClient;
     Track track = fixtures.track();
     int taps = 0;
 
@@ -72,6 +78,7 @@ void main() {
   testWidgets(
       'Test to see if tapping on the "skip previous" button calls the '
       'appropriate callback', (WidgetTester tester) async {
+    createHttpClient = createMockImageHttpClient;
     Track track = fixtures.track();
     int taps = 0;
 
@@ -98,6 +105,7 @@ void main() {
   testWidgets(
       'Test to see if tapping on the "skip next" button calls the '
       'appropriate callback', (WidgetTester tester) async {
+    createHttpClient = createMockImageHttpClient;
     Track track = fixtures.track();
     int taps = 0;
 
@@ -124,6 +132,7 @@ void main() {
   testWidgets(
       'Test to see if tapping on the play/pause button calls the appropriate '
       'callback', (WidgetTester tester) async {
+    createHttpClient = createMockImageHttpClient;
     Track track = fixtures.track();
     int taps = 0;
 
@@ -150,6 +159,7 @@ void main() {
   testWidgets(
       'Play/Pause button should be set to Pause if isPlaying is set to true',
       (WidgetTester tester) async {
+    createHttpClient = createMockImageHttpClient;
     Track track = fixtures.track();
 
     await tester.pumpWidget(
@@ -192,6 +202,7 @@ void main() {
   testWidgets(
       'Shuffle icon should be the theme primaryColor when isShuffled is true',
       (WidgetTester tester) async {
+    createHttpClient = createMockImageHttpClient;
     Track track = fixtures.track();
     Color primaryColor = Colors.blue[500];
 
@@ -222,6 +233,7 @@ void main() {
   testWidgets(
       'Repeat icon should be the theme primaryColor when isRepeated is true',
       (WidgetTester tester) async {
+    createHttpClient = createMockImageHttpClient;
     Track track = fixtures.track();
     Color primaryColor = Colors.blue[500];
 
