@@ -15,28 +15,6 @@ import 'package:dashboard/service/build_service.dart';
 const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   const <List<String>>[
     const <String>[
-      'fuchsia-aarch64-linux-debug',
-      'aarch64-linux-debug',
-      'fuchsia'
-    ],
-    const <String>[
-      'fuchsia-aarch64-linux-release',
-      'aarch64-linux-release',
-      'fuchsia'
-    ],
-    const <String>[
-      'fuchsia-x86_64-linux-debug',
-      'x86_64-linux-debug',
-      'fuchsia'
-    ],
-    const <String>[
-      'fuchsia-x86_64-linux-release',
-      'x86_64-linux-release',
-      'fuchsia'
-    ],
-  ],
-  const <List<String>>[
-    const <String>[
       'topaz-aarch64-linux-debug',
       'aarch64-linux-debug',
       'topaz',

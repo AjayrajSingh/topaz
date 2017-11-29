@@ -18,7 +18,7 @@ typedef _ApiProvider = BuildbucketApi Function(http.Client client);
 class BuildBucketService implements BuildService {
   static const Duration _timeoutDuration = const Duration(seconds: 10);
   static const List<String> _allBuckets = const <String>[
-    'luci.fuchsia.continuous',
+    'luci.fuchsia.ci',
   ];
 
   int _requestCount = 0;
