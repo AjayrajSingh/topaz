@@ -5,14 +5,71 @@
 import 'package:contacts_content_provider/store.dart';
 import 'package:test/test.dart';
 
+class _MockContact {
+  final String id;
+  final String displayName;
+  final List<String> tags;
+
+  _MockContact({
+    this.id,
+    this.displayName,
+    this.tags,
+  });
+}
+
+String getId(_MockContact c) => c?.id;
+
+String getDisplayName(_MockContact c) => c?.displayName;
+
+List<String> getSearchableValues(_MockContact c) =>
+    (<String>[c.displayName]..addAll(c.tags));
+
+ContactsStore<_MockContact> _createStore() {
+  return new ContactsStore<_MockContact>(
+    getId: getId,
+    getDisplayName: getDisplayName,
+    getSearchableValues: getSearchableValues,
+  );
+}
+
+List<_MockContact> _createContactList() {
+  return <_MockContact>[
+    new _MockContact(
+      id: 'contact1',
+      displayName: 'Armadillo',
+      tags: <String>['mr_armadillo@example.com'],
+    ),
+    new _MockContact(
+      id: 'contact2',
+      displayName: 'Blue Whale',
+      tags: <String>['the_true_blue@example.com'],
+    ),
+    new _MockContact(
+      id: 'contact3',
+      displayName: 'Capybara',
+      tags: <String>['largest_rodent@example.com'],
+    ),
+    new _MockContact(
+      id: 'contact4',
+      displayName: 'Dewey',
+      tags: <String>['lady_of_the_sea@example.com'],
+    ),
+    new _MockContact(
+      id: 'contact5',
+      displayName: 'latte lover',
+      tags: <String>['LatteLover99@example.com'],
+    ),
+  ];
+}
+
 void main() {
   group('ContactsStore', () {
     group('addContact', () {
       group('validation', () {
-        ContactsStore<String> store;
+        ContactsStore<_MockContact> store;
 
         setUp(() {
-          store = new ContactsStore<String>();
+          store = _createStore();
         });
 
         tearDown(() {
@@ -21,91 +78,96 @@ void main() {
 
         test('should throw if id is null', () {
           expect(() {
-            store.addContact(null, 'displayName', <String>['email'], 'contact');
+            store.addContact(new _MockContact(
+              displayName: 'displayName',
+              tags: <String>['tag'],
+            ));
           }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if id is empty string', () {
           expect(() {
-            store.addContact('', 'displayName', <String>['email'], 'contact');
+            store.addContact(new _MockContact(
+              id: '',
+              displayName: 'displayName',
+              tags: <String>['tag'],
+            ));
           }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if displayName is null', () {
           expect(() {
-            store.addContact('id', null, <String>['email'], 'contact');
+            store.addContact(new _MockContact(
+              id: 'id',
+              tags: <String>['tag'],
+            ));
           }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if displayName is empty string', () {
           expect(() {
-            store.addContact('id', '', <String>['email'], 'contact');
+            store.addContact(new _MockContact(
+              id: 'id',
+              displayName: '',
+              tags: <String>['tag'],
+            ));
           }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if searchableValues is null', () {
           expect(() {
-            store.addContact('id', 'displayName', null, 'contact');
+            new ContactsStore<_MockContact>(
+              getId: getId,
+              getDisplayName: getDisplayName,
+              getSearchableValues: (_) => null,
+            )..addContact(new _MockContact(id: 'id', displayName: 'd'));
           }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if searchableValues is empty', () {
           expect(() {
-            store.addContact('id', 'displayName', <String>[], 'contact');
+            new ContactsStore<_MockContact>(
+              getId: getId,
+              getDisplayName: getDisplayName,
+              getSearchableValues: (_) => <String>[],
+            )..addContact(new _MockContact(id: 'id', displayName: 'd'));
           }, throwsA(const isInstanceOf<ArgumentError>()));
         });
 
         test('should throw if contact is null', () {
           expect(() {
-            store.addContact('id', 'displayName', <String>['email'], null);
+            store.addContact(null);
           }, throwsA(const isInstanceOf<ArgumentError>()));
         });
       });
 
       test('should be able to add a contact', () {
-        ContactsStore<_MockContact> store = new ContactsStore<_MockContact>();
+        ContactsStore<_MockContact> store = _createStore();
         _MockContact contact = new _MockContact(
           id: 'contact1',
           displayName: 'Armadillo',
-          email: 'mr_armadillo@example.com',
+          tags: <String>['mr_armadillo@example.com'],
         );
-        store.addContact(
-          contact.id,
-          contact.displayName,
-          <String>[contact.email],
-          contact,
-        );
+        store.addContact(contact);
 
         expect(store.getContact(contact.id), equals(contact));
       });
 
       test('should be able to add contacts with the same displayName', () {
-        ContactsStore<_MockContact> store = new ContactsStore<_MockContact>();
+        ContactsStore<_MockContact> store = _createStore();
         String displayName = 'Armadillo';
         _MockContact contact1 = new _MockContact(
           id: 'contact1',
           displayName: displayName,
-          email: 'mr_armadillo@example.com',
+          tags: <String>['mr_armadillo@example.com'],
         );
         _MockContact contact2 = new _MockContact(
           id: 'contact2',
           displayName: displayName,
-          email: 'the_other_armadillo@example.com',
+          tags: <String>['the_other_armadillo@example.com'],
         );
 
-        store
-          ..addContact(
-            contact1.id,
-            contact1.displayName,
-            <String>[contact1.email],
-            contact1,
-          )
-          ..addContact(
-            contact2.id,
-            contact2.displayName,
-            <String>[contact2.email],
-            contact2,
-          );
+        store..addContact(contact1)..addContact(contact2);
 
         expect(store.getContact(contact1.id), equals(contact1));
         expect(store.getContact(contact2.id), equals(contact2));
@@ -116,35 +178,195 @@ void main() {
           'if adding contact with duplicate id', () {
         expect(() {
           String id = 'contact1';
-          new ContactsStore<String>()
-            ..addContact(id, 'contact1', <String>['contact1'], 'contact1')
-            ..addContact(id, 'contact2', <String>['contact2'], 'contact2');
+          _MockContact contact1 = new _MockContact(
+            id: id,
+            displayName: 'Mr. Armadillo',
+            tags: <String>['mr_armadillo@example.com'],
+          );
+          _MockContact contact2 = new _MockContact(
+            id: id,
+            displayName: 'Mr. Other Armadillo',
+            tags: <String>['the_other_armadillo@example.com'],
+          );
+
+          _createStore()..addContact(contact1)..addContact(contact2);
         }, throwsA(const isInstanceOf<ArgumentError>()));
       });
 
       test('should update the contact if updateIfExists is true', () {
-        String id = 'contact1';
-        ContactsStore<String> store = new ContactsStore<String>()
-          ..addContact(id, 'contact1', <String>['contact1'], 'contact1');
-        expect(store.getContact(id), equals('contact1'));
-
-        store.addContact(
-          id,
-          'contact2',
-          <String>['contact2'],
-          'contact2',
-          updateIfExists: true,
+        String id = '1';
+        _MockContact contact = new _MockContact(
+          id: id,
+          displayName: 'Mr. Armadillo',
+          tags: <String>['mr_armadillo@example.com'],
         );
-        expect(store.getContact(id), equals('contact2'));
+        _MockContact updatedContact = new _MockContact(
+          id: id,
+          displayName: 'Mr. Other Armadillo',
+          tags: <String>['the_other_armadillo@example.com'],
+        );
+        ContactsStore<_MockContact> store = _createStore()..addContact(contact);
+        expect(store.getContact(id), equals(contact));
+
+        store.addContact(updatedContact, updateIfExists: true);
+        expect(store.getContact(id), equals(updatedContact));
       });
-    }, skip: 'Temporarily disabled due to a bug in Contacts Store.');
+    });
+
+    group('removeContact', () {
+      test('should remove the contact from the contact map', () {
+        _MockContact contact1 = new _MockContact(
+          id: 'contact1',
+          displayName: 'Armadillo',
+          tags: <String>['armadillo@example.com'],
+        );
+        _MockContact contact2 = new _MockContact(
+          id: 'contact2',
+          displayName: 'Capybara',
+          tags: <String>['capybara@example.com'],
+        );
+        ContactsStore<_MockContact> store = _createStore()
+          ..addContact(contact1)
+          ..addContact(contact2);
+        expect(store.containsContact(contact1.id), equals(true));
+        expect(store.containsContact(contact2.id), equals(true));
+
+        store.removeContact(contact1.id);
+
+        expect(store.containsContact(contact1.id), equals(false));
+        expect(store.containsContact(contact2.id), equals(true));
+      });
+
+      test('should remove the contact\'s display name', () {
+        _MockContact contact1 = new _MockContact(
+          id: 'contact1',
+          displayName: 'Armadillo',
+          tags: <String>['armadillo@example.com'],
+        );
+        _MockContact contact2 = new _MockContact(
+          id: 'contact2',
+          displayName: 'Capybara',
+          tags: <String>['capybara@example.com'],
+        );
+        ContactsStore<_MockContact> store = _createStore()
+          ..addContact(contact1)
+          ..addContact(contact2);
+        expect(
+          store.search(contact1.displayName),
+          contains(contact1.displayName),
+        );
+        expect(
+          store.search(contact2.displayName),
+          contains(contact2.displayName),
+        );
+
+        store.removeContact(contact1.id);
+
+        expect(
+          store.search(contact1.displayName),
+          isEmpty,
+        );
+        expect(
+          store.search(contact2.displayName),
+          contains(contact2.displayName),
+        );
+      });
+
+      test('should remove the contact\'s searchable values', () {
+        _MockContact contact1 = new _MockContact(
+          id: 'contact1',
+          displayName: 'Armadillo',
+          tags: <String>['armadillo@example.com'],
+        );
+        _MockContact contact2 = new _MockContact(
+          id: 'contact2',
+          displayName: 'Capybara',
+          tags: <String>['capybara@example.com'],
+        );
+        ContactsStore<_MockContact> store = _createStore()
+          ..addContact(contact1)
+          ..addContact(contact2);
+
+        List<String> c1Values = getSearchableValues(contact1);
+        List<String> c2Values = getSearchableValues(contact2);
+        for (String s in <String>[]..addAll(c1Values)..addAll(c2Values)) {
+          expect(store.search(s), contains(s));
+        }
+
+        store.removeContact(contact1.id);
+
+        for (String s in c1Values) {
+          expect(store.search(s), isEmpty);
+        }
+        for (String s in c2Values) {
+          expect(store.search(s), contains(s));
+        }
+      });
+
+      test('should not remove other contacts with the same display name', () {
+        _MockContact contact1 = new _MockContact(
+          id: 'contact1',
+          displayName: 'Armadillo',
+          tags: <String>['armadillo@example.com'],
+        );
+        _MockContact contact2 = new _MockContact(
+          id: 'contact2',
+          displayName: 'Armadillo',
+          tags: <String>['other_armadillo@example.com'],
+        );
+        ContactsStore<_MockContact> store = _createStore()
+          ..addContact(contact1)
+          ..addContact(contact2);
+
+        Map<String, Set<_MockContact>> searchResult = store.search('Armadillo');
+        expect(searchResult['Armadillo'], hasLength(2));
+        expect(searchResult['Armadillo'], contains(contact1));
+        expect(searchResult['Armadillo'], contains(contact2));
+
+        store.removeContact(contact1.id);
+
+        searchResult = store.search('Armadillo');
+        expect(searchResult['Armadillo'], hasLength(1));
+        expect(searchResult['Armadillo'], contains(contact2));
+      });
+
+      test('should not remove other contacts with the same searchable value',
+          () {
+        _MockContact contact1 = new _MockContact(
+          id: 'contact1',
+          displayName: 'Armadillo',
+          tags: <String>['armadillo@example.com', 'test'],
+        );
+        _MockContact contact2 = new _MockContact(
+          id: 'contact2',
+          displayName: 'Capybara',
+          tags: <String>['capybara@example.com', 'test'],
+        );
+        ContactsStore<_MockContact> store = _createStore()
+          ..addContact(contact1)
+          ..addContact(contact2);
+
+        Map<String, Set<_MockContact>> searchResult = store.search('test');
+        expect(searchResult['test'], hasLength(2));
+        expect(searchResult['test'], contains(contact1));
+        expect(searchResult['test'], contains(contact2));
+
+        store.removeContact(contact1.id);
+
+        searchResult = store.search('test');
+        expect(searchResult['test'], hasLength(1));
+        expect(searchResult['test'], contains(contact2));
+      });
+    });
 
     group('getAllContacts', () {
       test('should return a list of all contacts', () {
         List<_MockContact> contacts = _createContactList();
-        ContactsStore<_MockContact> store = new ContactsStore<_MockContact>();
+        ContactsStore<_MockContact> store = _createStore();
+
+        // ignore: prefer_foreach
         for (_MockContact c in contacts) {
-          store.addContact(c.id, c.displayName, <String>[c.email], c);
+          store.addContact(c);
         }
 
         List<_MockContact> result = store.getAllContacts();
@@ -155,7 +377,7 @@ void main() {
       });
 
       test('should return an empty list if there aren\'t any contacts', () {
-        ContactsStore<_MockContact> store = new ContactsStore<_MockContact>();
+        ContactsStore<_MockContact> store = _createStore();
         expect(store.getAllContacts(), isEmpty);
       });
     });
@@ -164,9 +386,11 @@ void main() {
       ContactsStore<_MockContact> store;
 
       setUp(() async {
-        store = new ContactsStore<_MockContact>();
+        store = _createStore();
+
+        // ignore: prefer_foreach
         for (_MockContact c in _createContactList()) {
-          store.addContact(c.id, c.displayName, <String>[c.email], c);
+          store.addContact(c);
         }
       });
 
@@ -178,17 +402,16 @@ void main() {
         _MockContact orca = new _MockContact(
           id: 'contact123',
           displayName: 'orca',
-          email: 'not_actually_a_whale@example.com',
+          tags: <String>['not_actually_a_whale@example.com'],
         );
-        store.addContact(orca.id, orca.displayName, <String>[orca.email], orca);
+        store.addContact(orca);
 
         _MockContact result = store.getContact(orca.id);
         expect(result, equals(orca));
       });
 
       test('should return null if there aren\'t any contacts', () {
-        ContactsStore<_MockContact> emptyStore =
-            new ContactsStore<_MockContact>();
+        ContactsStore<_MockContact> emptyStore = _createStore();
         expect(emptyStore.getContact('someId'), isNull);
       });
 
@@ -198,13 +421,14 @@ void main() {
     });
 
     group('search', () {
-      test('should return contacts with displayName and email matching prefix',
+      test('should return contacts with displayName and tag matching prefix',
           () {
         List<_MockContact> contacts = _createContactList();
-        ContactsStore<_MockContact> store = new ContactsStore<_MockContact>();
+        ContactsStore<_MockContact> store = _createStore();
+
+        // ignore: prefer_foreach
         for (_MockContact c in contacts) {
-          List<String> searchableValues = <String>[c.displayName, c.email];
-          store.addContact(c.id, c.displayName, searchableValues, c);
+          store.addContact(c);
         }
 
         Map<String, Set<_MockContact>> result = store.search('la');
@@ -217,18 +441,28 @@ void main() {
       test('should return all searchable values if prefix is an empty string',
           () {
         List<_MockContact> contacts = _createContactList();
-        ContactsStore<_MockContact> store = new ContactsStore<_MockContact>();
+        ContactsStore<_MockContact> store = _createStore();
+
+        // ignore: prefer_foreach
         for (_MockContact c in contacts) {
-          List<String> searchableValues = <String>[c.displayName, c.email];
-          store.addContact(c.id, c.displayName, searchableValues, c);
+          store.addContact(c);
         }
 
         Map<String, Set<_MockContact>> result = store.search('');
         expect(result, hasLength(10));
         for (_MockContact c in contacts) {
           expect(result, contains(c.displayName));
-          expect(result, contains(c.email));
+
+          List<String> searchableValues = getSearchableValues(c);
+          for (String s in searchableValues) {
+            expect(result, contains(s));
+          }
         }
+      });
+
+      test('should return empty map if store is empty', () {
+        ContactsStore<_MockContact> emptyStore = _createStore();
+        expect(emptyStore.search('something'), isEmpty);
       });
     });
 
@@ -237,9 +471,13 @@ void main() {
       _MockContact c;
 
       setUp(() {
-        store = new ContactsStore<_MockContact>();
-        c = new _MockContact(id: 'id123', displayName: 'name', email: 'email');
-        store.addContact(c.id, c.displayName, <String>[c.email], c);
+        store = _createStore();
+        c = new _MockContact(
+          id: 'id123',
+          displayName: 'name',
+          tags: <String>['email'],
+        );
+        store.addContact(c);
       });
 
       tearDown(() {
@@ -254,46 +492,5 @@ void main() {
         expect(store.containsContact('does not exist'), isFalse);
       });
     });
-  });
-}
-
-List<_MockContact> _createContactList() {
-  return <_MockContact>[
-    new _MockContact(
-      id: 'contact1',
-      displayName: 'Armadillo',
-      email: 'mr_armadillo@example.com',
-    ),
-    new _MockContact(
-      id: 'contact2',
-      displayName: 'Blue Whale',
-      email: 'the_true_blue@example.com',
-    ),
-    new _MockContact(
-      id: 'contact3',
-      displayName: 'Capybara',
-      email: 'largest_rodent@example.com',
-    ),
-    new _MockContact(
-      id: 'contact4',
-      displayName: 'Dewey',
-      email: 'lady_of_the_sea@example.com',
-    ),
-    new _MockContact(
-        id: 'contact5',
-        displayName: 'latte lover',
-        email: 'LatteLover99@example.com')
-  ];
-}
-
-class _MockContact {
-  final String id;
-  final String displayName;
-  final String email;
-
-  _MockContact({
-    this.id,
-    this.displayName,
-    this.email,
   });
 }
