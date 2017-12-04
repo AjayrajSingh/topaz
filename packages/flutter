@@ -9,6 +9,7 @@
         "garnet/packages/icu_data"
     ],
     "packages": {
-        "flutter": "//third_party/flutter:package"
+        "flutter_aot_runner": "//third_party/flutter:flutter_aot_runner",
+        "flutter_jit_runner": "//third_party/flutter:flutter_jit_runner"
     }
 }
