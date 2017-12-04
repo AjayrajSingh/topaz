@@ -56,14 +56,14 @@ executable("bin") {
 }
 
 package("moterm") {
-  app = true
-  system_image = true
-
   deps = [
     ":bin",
   ]
 
-  binaries = [ {
-        name = "moterm"
+  binary = "moterm"
+
+  meta = [ {
+        path = rebase_path("meta/sandbox")
+        dest = "sandbox"
       } ]
 }
