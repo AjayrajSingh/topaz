@@ -73,6 +73,9 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
       : _tokenProvider = tokenProvider,
         super(onReceived: onReceived);
 
+  @override
+  String get currentUserEmail => _email;
+
   /// Sign in to the firebase DB using the given google auth credentials.
   @override
   Future<Null> initialize() async {

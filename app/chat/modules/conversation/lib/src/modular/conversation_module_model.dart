@@ -55,6 +55,9 @@ const String _kConversationContextType =
 class ChatConversationModuleModel extends ModuleModel {
   static final ListEquality<int> _intListEquality = const ListEquality<int>();
 
+  /// The currently logged in user.
+  String currentUser = '';
+
   /// Keep track of all the [Embedder] instances.
   final Map<String, Embedder> embedders = <String, Embedder>{};
 
@@ -230,6 +233,10 @@ class ChatConversationModuleModel extends ModuleModel {
       _chatContentProviderController.ctrl.request(),
     );
     connectToService(contentProviderServices, _chatContentProvider.ctrl);
+
+    _chatContentProvider.currentUserEmail((String email) {
+      currentUser = email;
+    });
 
     // Obtain a message queue for new messages.
     componentContext.obtainMessageQueue(
@@ -500,6 +507,8 @@ class ChatConversationModuleModel extends ModuleModel {
         List<String> members = participants.map((chat_fidl.Participant p) {
           return p.displayName ?? p.email;
         }).toList();
+
+        members.add(currentUser);
 
         return new CommandMessage(
           members: members,

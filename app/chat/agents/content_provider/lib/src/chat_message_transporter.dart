@@ -70,6 +70,9 @@ abstract class ChatMessageTransporter {
   /// Creates a new [ChatMessageTransporter] instance.
   ChatMessageTransporter({this.onReceived});
 
+  /// The email of the currently logged in user.
+  String get currentUserEmail;
+
   /// Initializes the [ChatMessageTransporter].
   Future<Null> initialize();
 

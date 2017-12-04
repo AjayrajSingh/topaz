@@ -69,6 +69,9 @@ struct Message {
 
 [ServiceName="chat_content_provider.ChatContentProvider"]
 interface ChatContentProvider {
+  // Reutruns the email of the currently logged in user.
+  CurrentUserEmail()  => (string email);
+
   // Returns the title of the content provider (e.g. "Chat").
   GetTitle() => (string title);
 

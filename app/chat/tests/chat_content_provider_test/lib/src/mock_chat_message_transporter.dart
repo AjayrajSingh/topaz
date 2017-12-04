@@ -13,6 +13,9 @@ import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 /// A mock [ChatMessageTransporter] implementation for testing.
 class MockChatMessageTransporter extends ChatMessageTransporter {
   @override
+  String get currentUserEmail => '';
+
+  @override
   Future<Null> initialize() async {}
 
   @override
