@@ -31,8 +31,8 @@ class ChatConversationList extends StatelessWidget {
   /// Callback for when a conversation in the list is tapped.
   final ConversationActionCallback onSelectConversation;
 
-  /// Callback for when a conversation in the list is long pressed.
-  final ConversationActionCallback onLongPressConversation;
+  /// Callback for when a conversation in the list is dismissed.
+  final ConversationActionCallback onDismiss;
 
   /// Indicates the conversation id of the selected conversation. Can be null.
   final List<int> selectedId;
@@ -47,7 +47,7 @@ class ChatConversationList extends StatelessWidget {
     @required this.conversations,
     this.onNewConversation,
     this.onSelectConversation,
-    this.onLongPressConversation,
+    this.onDismiss,
     this.selectedId,
     bool shouldDisplaySpinner,
   })
@@ -108,7 +108,7 @@ class ChatConversationList extends StatelessWidget {
             (Conversation c) => new ChatConversationListItem(
                 conversation: c,
                 onSelect: () => onSelectConversation?.call(c),
-                onLongPress: () => onLongPressConversation?.call(c),
+                onDismiss: () => onDismiss?.call(c),
                 selected: _intListEquality.equals(
                   selectedId,
                   c.conversationId,

@@ -35,7 +35,7 @@ class ChatConversationListScreen extends StatelessWidget {
               onSelectConversation: (Conversation c) => model
                 ..setConversationId(c.conversationId)
                 ..focusConversation(),
-              onLongPressConversation: (Conversation c) =>
+              onDismiss: (Conversation c) =>
                   model.deleteConversation(c.conversationId),
               selectedId: model.conversationId,
               shouldDisplaySpinner: model.shouldDisplaySpinner,

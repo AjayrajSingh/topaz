@@ -10,6 +10,14 @@ import 'chat_group_avatar.dart';
 import 'constants.dart';
 import 'time_util.dart';
 
+const Widget _kDismissIcon = const Icon(
+  Icons.delete,
+  color: Colors.white,
+  size: 24.0,
+);
+
+const Color _kDismissColor = Colors.red;
+
 /// UI Widget that represents a single chat conversation when viewing many chat
 /// conversations in a list.
 class ChatConversationListItem extends StatelessWidget {
@@ -19,8 +27,8 @@ class ChatConversationListItem extends StatelessWidget {
   /// Callback fired when this item is selected.
   final VoidCallback onSelect;
 
-  /// Callback fired when this item is long pressed.
-  final VoidCallback onLongPress;
+  /// Callback fired when this item is dismissed.
+  final VoidCallback onDismiss;
 
   /// Indicates whether this conversation is currently selected or not.
   final bool selected;
@@ -30,7 +38,7 @@ class ChatConversationListItem extends StatelessWidget {
     Key key,
     @required this.conversation,
     this.onSelect,
-    this.onLongPress,
+    this.onDismiss,
     bool selected,
   })
       : assert(conversation != null),
@@ -49,30 +57,47 @@ class ChatConversationListItem extends StatelessWidget {
 
     return new Material(
       color: selected ? kSelectedBgColor : theme.canvasColor,
-      child: new ListTile(
-        leading: new ChatGroupAvatar(
-          users: conversation.participants,
-          selected: selected,
-        ),
-        title: new Text(
-          conversation.title ?? _participantNames,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: new Text(
-          conversation.snippet ?? '',
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: new Text(
-          conversation.timestamp != null
-              ? relativeDisplayDate(date: conversation.timestamp)
-              : '',
-          style: new TextStyle(
-            color: Colors.grey[500],
-            fontSize: 12.0,
+      child: new Dismissible(
+        key: new ObjectKey(conversation),
+        onDismissed: (DismissDirection direction) {
+          onDismiss?.call();
+        },
+        background: new Container(
+          color: _kDismissColor,
+          child: const ListTile(
+            leading: _kDismissIcon,
           ),
         ),
-        onTap: onSelect,
-        onLongPress: onLongPress,
+        secondaryBackground: new Container(
+          color: _kDismissColor,
+          child: const ListTile(
+            trailing: _kDismissIcon,
+          ),
+        ),
+        child: new ListTile(
+          leading: new ChatGroupAvatar(
+            users: conversation.participants,
+            selected: selected,
+          ),
+          title: new Text(
+            conversation.title ?? _participantNames,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: new Text(
+            conversation.snippet ?? '',
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: new Text(
+            conversation.timestamp != null
+                ? relativeDisplayDate(date: conversation.timestamp)
+                : '',
+            style: new TextStyle(
+              color: Colors.grey[500],
+              fontSize: 12.0,
+            ),
+          ),
+          onTap: onSelect,
+        ),
       ),
     );
   }
