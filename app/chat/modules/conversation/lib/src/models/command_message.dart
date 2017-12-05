@@ -111,18 +111,20 @@ class CommandMessage extends Message {
 
   /// Builds a toolbar for refresh, delete buttons.
   Widget _buildToolbar() {
-    return new Column(
-      children: <Widget>[
-        new IconButton(
-          icon: new Icon(Icons.refresh),
-          onPressed: onRefresh,
-        ),
-        new IconButton(
-          icon: new Icon(Icons.delete),
-          onPressed: onDelete,
-        ),
-      ],
-    );
+    return new Container(
+        color: Colors.grey,
+        child: new Column(
+          children: <Widget>[
+            new IconButton(
+              icon: new Icon(Icons.refresh),
+              onPressed: onRefresh,
+            ),
+            new IconButton(
+              icon: new Icon(Icons.delete),
+              onPressed: onDelete,
+            ),
+          ],
+        ));
   }
 
   @override
