@@ -5,7 +5,6 @@
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/application_controller.fidl.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_provider.fidl.dart';
 import 'package:flutter/widgets.dart';
@@ -81,31 +80,30 @@ class _ApplicationWidgetState extends State<ApplicationWidget> {
   void _launchApp() {
     _applicationController = new ApplicationControllerProxy();
 
-    ServiceProviderProxy incomingServices = new ServiceProviderProxy();
+    Services incomingServices = new Services();
     widget.launcher.createApplication(
       new ApplicationLaunchInfo()
         ..url = widget.url
-        ..services = incomingServices.ctrl.request(),
+        ..serviceRequest = incomingServices.request(),
       _applicationController.ctrl.request(),
     );
 
     _connection = new ChildViewConnection(
       _consumeViewProvider(
-        _consumeServiceProvider(incomingServices),
+        _consumeServices(incomingServices),
       ),
       onAvailable: (_) {},
       onUnavailable: (_) => widget.onDone?.call(),
     );
   }
 
-  /// Creates a [ViewProviderProxy] from a [ServiceProviderProxy], closing it in
-  /// the process.
-  ViewProviderProxy _consumeServiceProvider(
-    ServiceProviderProxy serviceProvider,
-  ) {
+  /// Creates a [ViewProviderProxy] from a [Services], closing it in the
+  /// process.
+  ViewProviderProxy _consumeServices(Services services) {
     ViewProviderProxy viewProvider = new ViewProviderProxy();
-    connectToService(serviceProvider, viewProvider.ctrl);
-    serviceProvider.ctrl.close();
+    services
+      ..connectToService(viewProvider.ctrl)
+      ..close();
     return viewProvider;
   }
 

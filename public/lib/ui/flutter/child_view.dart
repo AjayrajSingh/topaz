@@ -93,10 +93,10 @@ class ChildViewConnection {
       InterfaceRequest<ServiceProvider> childServices,
       ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable}) {
-    final ServiceProviderProxy services = new ServiceProviderProxy();
+    final Services services = new Services();
     final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo()
       ..url = url
-      ..services = services.ctrl.request();
+      ..serviceRequest = services.request();
     try {
       launcher.createApplication(launchInfo, controller);
       return new ChildViewConnection.connect(services,
@@ -104,16 +104,16 @@ class ChildViewConnection {
           onAvailable: onAvailable,
           onUnavailable: onUnavailable);
     } finally {
-      services.ctrl.close();
+      services.close();
     }
   }
 
-  factory ChildViewConnection.connect(ServiceProvider services,
+  factory ChildViewConnection.connect(Services services,
       {InterfaceRequest<ServiceProvider> childServices,
       ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable}) {
     final ViewProviderProxy viewProvider = new ViewProviderProxy();
-    connectToService(services, viewProvider.ctrl);
+    services.connectToService(viewProvider.ctrl);
     try {
       final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
       viewProvider.createView(viewOwner.passRequest(), childServices);

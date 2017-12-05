@@ -9,7 +9,6 @@ import 'dart:zircon';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:topaz.app.xi.services/xi.fidl.dart' as service;
@@ -22,7 +21,7 @@ final ApplicationContext kContext = new ApplicationContext.fromStartupInfo();
 class XiFuchsiaClient extends XiClient {
   /// Constructor.
   XiFuchsiaClient(this._ledgerHandle);
-  final ServiceProviderProxy _serviceProvider = new ServiceProviderProxy();
+  final Services _services = new Services();
   final ApplicationLaunchInfo _launchInfo = new ApplicationLaunchInfo();
   final service.JsonProxy _jsonProxy = new service.JsonProxy();
   final InterfaceHandle<Ledger> _ledgerHandle;
@@ -37,13 +36,12 @@ class XiFuchsiaClient extends XiClient {
 
     _launchInfo
       ..url = 'file:///system/apps/xi-core'
-      ..services = _serviceProvider.ctrl.request();
+      ..serviceRequest = _services.request();
     kContext.launcher.createApplication(_launchInfo, null);
     // TODO(jasoncampbell): File a bug for how to get rid of the Dart warning
     // "Unsafe implicit cast from InterfaceHandle<dynamic>"?
     // ignore: STRONG_MODE_DOWN_CAST_COMPOSITE
-    InterfaceHandle<service.Json> handle = connectToServiceByName(
-      _serviceProvider,
+    InterfaceHandle<service.Json> handle = _services.connectToServiceByName(
       service.Json.serviceName,
     );
     _jsonProxy.ctrl.bind(handle);

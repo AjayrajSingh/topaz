@@ -9,7 +9,6 @@ import 'package:topaz.runtime.dart_runner.examples.hello_app_dart.interfaces/hel
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/application_controller.fidl.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:test/test.dart';
 
 void main(List<String> args) {
@@ -28,17 +27,18 @@ void main(List<String> args) {
   });
 
   test('communicate with a fidl service (hello_app_dart)', () async {
-    final ServiceProviderProxy services = new ServiceProviderProxy();
+    final Services services = new Services();
     final HelloProxy service = new HelloProxy();
 
     final ApplicationControllerProxy actl = new ApplicationControllerProxy();
 
     final ApplicationLaunchInfo info = new ApplicationLaunchInfo()
       ..url = 'hello_app_dart_jit.dartx'
-      ..services = services.ctrl.request();
+      ..serviceRequest = services.request();
     context.launcher.createApplication(info, actl.ctrl.request());
-    connectToService(services, service.ctrl);
-    services.ctrl.close();
+    services
+      ..connectToService(service.ctrl)
+      ..close();
 
     // TODO(rosswang): let's see if we can generate a future-based fidl dart
     final Completer<String> hello = new Completer<String>();

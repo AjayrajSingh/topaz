@@ -32,6 +32,7 @@
 #include "lib/fxl/strings/join_strings.h"
 #include "lib/fxl/strings/string_number_conversions.h"
 #include "lib/network/fidl/network_service.fidl.h"
+#include "lib/svc/cpp/services.h"
 #include "lib/ui/views/fidl/view_provider.fidl.h"
 #include "lib/ui/views/fidl/view_token.fidl.h"
 #include "topaz/examples/oauth_token_manager/credentials_generated.h"
@@ -1140,10 +1141,10 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
   }
 
   mozart::ViewOwnerPtr SetupWebView() {
-    app::ServiceProviderPtr web_view_services;
+    app::Services web_view_services;
     auto web_view_launch_info = app::ApplicationLaunchInfo::New();
     web_view_launch_info->url = kWebViewUrl;
-    web_view_launch_info->services = web_view_services.NewRequest();
+    web_view_launch_info->service_request = web_view_services.NewRequest();
     app_->application_context_->launcher()->CreateApplication(
         std::move(web_view_launch_info), web_view_controller_.NewRequest());
     web_view_controller_.set_connection_error_handler([this] {
@@ -1152,7 +1153,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
 
     mozart::ViewOwnerPtr view_owner;
     mozart::ViewProviderPtr view_provider;
-    ConnectToService(web_view_services.get(), view_provider.NewRequest());
+    web_view_services.ConnectToService(view_provider.NewRequest());
     app::ServiceProviderPtr web_view_moz_services;
     view_provider->CreateView(view_owner.NewRequest(),
                               web_view_moz_services.NewRequest());
