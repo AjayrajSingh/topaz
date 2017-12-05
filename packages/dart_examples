@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "packages": {
+        "dart_examples": "//topaz/runtime/dart_runner:dart_examples"
+    }
+}

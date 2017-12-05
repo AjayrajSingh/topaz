@@ -7,7 +7,7 @@ import("//topaz/runtime/dart_runner/dart_app.gni")
 dart_jit_app("integration") {
   testonly = true
 
-  output_name = "dart_runner_test.dartx"
+  output_name = "dart_jit_runner_test.dartx"
 
   main_dart = "main.dart"
 

@@ -108,7 +108,7 @@ template("dart_jit_app") {
 
     script = dart_bundler
     args = [
-      "--interpreter=dart_runner",
+      "--interpreter=dart_jit_runner",
       "--snapshot-key=snapshot_blob.bin",
       "--snapshot=$rebased_snapshot_path",
       "--bundle=$rebased_bundle_path",

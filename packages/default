@@ -4,6 +4,7 @@
         "topaz/packages/color",
         "topaz/packages/curl",
         "topaz/packages/dart",
+        "topaz/packages/dart_examples",
         "topaz/packages/dart_runner",
         "topaz/packages/dart_unittests",
         "topaz/packages/dashboard",

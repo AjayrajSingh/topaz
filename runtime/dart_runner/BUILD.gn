@@ -56,8 +56,8 @@ template("runner") {
   }
 }
 
-runner("dart_runner_bin") {
-  output_name = "dart_runner"
+runner("dart_jit_runner_bin") {
+  output_name = "dart_jit_runner"
   extra_defines = []
   extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc" ]
   if (is_debug) {
@@ -81,14 +81,38 @@ runner("dart_aot_runner_bin") {
   }
 }
 
-package("dart_runner") {
+package("dart_aot_runner") {
+  deps = [
+    ":dart_aot_runner_bin",
+  ]
+
+  binary = "dart_aot_runner"
+
+  meta = [ {
+        path = rebase_path("meta/sandbox")
+        dest = "sandbox"
+      } ]
+}
+
+package("dart_jit_runner") {
+  deps = [
+    ":dart_jit_runner_bin",
+  ]
+
+  binary = "dart_jit_runner"
+
+  meta = [ {
+        path = rebase_path("meta/sandbox")
+        dest = "sandbox"
+      } ]
+}
+
+package("dart_examples") {
   testonly = true
   app = true
   system_image = true
 
   deps = [
-    ":dart_aot_runner_bin",
-    ":dart_runner_bin",
     "examples",
     "integration",
     "integration:integration_aot",
@@ -96,10 +120,7 @@ package("dart_runner") {
 
   binaries = [
     {
-      name = "dart_runner"
-    },
-    {
-      name = "dart_runner_test.dartx"
+      name = "dart_jit_runner_test.dartx"
     },
     {
       name = "goodbye_dart.dartx"
@@ -109,9 +130,6 @@ package("dart_runner") {
     },
     {
       name = "hello_dart.dartx"
-    },
-    {
-      name = "dart_aot_runner"
     },
     {
       name = "dart_aot_runner_test.dartx"
