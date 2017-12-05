@@ -61,7 +61,7 @@
               </section>
               <section class="mdc-card__supporting-text">
                 <ul id="ledger-instances-list" class="mdc-list">
-                  <li ng-repeat="x in instancesList" ng-click="getPagesList($index, $instanceName)">
+                  <li ng-repeat="x in instancesList" ng-click="getPagesList($index)">
                     {{  bytesToString(x) }}
                   </li>
                 </ul>

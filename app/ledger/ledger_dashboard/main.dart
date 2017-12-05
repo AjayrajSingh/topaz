@@ -28,17 +28,6 @@ int _port = _defaultPort;
 String _webrootPath = _defaultWebrootPath;
 Directory _webrootDirectory;
 
-List<WebSocket> _activeWebsockets = <WebSocket>[];
-
-// SendWebSocketMessage
-void _sendMessage(String message) {
-  if (_activeWebsockets.isNotEmpty) {
-    for (final WebSocket socket in _activeWebsockets) {
-      socket.add(message);
-    }
-  }
-}
-
 final Map<String, DataHandler> _dataHandlerMap = <String, DataHandler>{};
 
 void _log(String msg) {
@@ -74,7 +63,7 @@ void main(List<String> args) {
 
   // Initialize the DataHandlers
   _dataHandlerMap.forEach((String name, DataHandler handler) {
-    handler.init(appContext, _sendMessage);
+    handler.init(appContext);
   });
 
   final LifecycleImpl lifeCycleImpl = new LifecycleImpl();
@@ -120,17 +109,22 @@ void parseConfigAndStart(String configString) {
 
 void handleRequest(HttpRequest request) {
   // Identify websocket requests
-  if (request.requestedUri.path.startsWith('/ws')) {
+  // Such requests will end with /ws/<service>/...
+  final RegExp websocketRequestPattern = new RegExp('/ws/([^/]+)(/.*)');
+  final Match match =
+      websocketRequestPattern.firstMatch(request.requestedUri.path);
+  if (match != null) {
     WebSocketTransformer.upgrade(request).then((WebSocket socket) {
-      _activeWebsockets.add(socket);
-      socket.listen(handleWebsocketRequest, onDone: () {
-        handleWebsocketClose(socket);
-      });
-      // Alert all DataHandlers
-      _dataHandlerMap.forEach((String name, DataHandler handler) {
+      final String serviceName = match.group(1);
+      final DataHandler handler = _dataHandlerMap[serviceName];
+      if (handler != null) {
         handler.handleNewWebSocket(socket);
-      });
+      } else {
+        send404(request.response);
+      }
     });
+  } else if (request.requestedUri.path.startsWith('/ws')) {
+    send404(request.response);
   } else {
     // Identify requests requiring return of context data
     // Such requests will begin with /data/<service>/...
@@ -215,14 +209,4 @@ void send404(HttpResponse response) {
     ..statusCode = 404
     ..reasonPhrase = 'File not found.'
     ..close();
-}
-
-// ignore: avoid_annotating_with_dynamic
-void handleWebsocketRequest(dynamic event) {
-  print('[INFO] websocket event was received!');
-}
-
-void handleWebsocketClose(WebSocket socket) {
-  print('[INFO] Websocket closed (${_activeWebsockets.indexOf(socket)})');
-  _activeWebsockets.remove(socket);
 }

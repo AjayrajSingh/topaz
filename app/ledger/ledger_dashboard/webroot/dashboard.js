@@ -1,7 +1,11 @@
+const RECONNECT_INTERVAL = 500;
+const MAX_RECONNECT_INTERVAL = 2000;
+
 var _toolbar = null;
 var _tabBar = null;
 var _webSocket = null;
 var _ReqUrl = "http://" + window.location.host + "/data/ledger_debug";
+var _reconnectInterval = RECONNECT_INTERVAL;
 
 $(function() {
   mdc.autoInit();
@@ -60,19 +64,63 @@ app.controller('debugCtrl', function($scope, $http) {
   };
 
   $scope.getPagesList = function(index) {
-    $scope.selectedInstance = $scope.bytesToString($scope.instancesList[index]);
-    $scope.showPages = true;
-    $http.get( _ReqUrl + "/pages_list",{
-      params: { instance: JSON.stringify($scope.instancesList[index]) }
-    })
-      .then(function(response) {
-        $scope.pagesList = response.data;
-      });
+    _webSocket.send(JSON.stringify({"instance_name": $scope.instancesList[index]}));
   };
 
+  function connectWebSocket() {
+    $scope.showPages = false;
+    _webSocket = new WebSocket("ws://" + window.location.host + "/ws/ledger_debug/");
+    _webSocket.onopen = handleWebSocketOpen;
+    _webSocket.onerror = handleWebSocketError;
+    _webSocket.onclose = handleWebSocketClose;
+    _webSocket.onmessage = handleWebSocketMessage;
+  }
+
+  function handleWebSocketOpen(evt) {
+    $("#connectedLabel").text("Connected");
+    // reset reconnect
+    _reconnectInterval = RECONNECT_INTERVAL;
+  }
+
+  function handleWebSocketError(evt) {
+    console.log("WebSocket Error: " + evt.toString());
+  }
+
+  function handleWebSocketClose(evt) {
+    $("#connectedLabel").text("Disconnected");
+    // attempt to reconnect
+    attemptReconnect();
+  }
+
+  function attemptReconnect() {
+    console.log("Attempting to reconnect after " + _reconnectInterval);
+
+    // reconnect after the timeout
+    setTimeout(connectWebSocket, _reconnectInterval);
+    // exponential reconnect timeout
+    var nextInterval = _reconnectInterval * 2;
+    if (nextInterval < MAX_RECONNECT_INTERVAL) {
+      _reconnectInterval = nextInterval;
+    } else {
+      _reconnectInterval = MAX_RECONNECT_INTERVAL;
+    }
+  }
+
+  function handleWebSocketMessage(evt) {
+    // parse the JSON message
+    var message = JSON.parse(evt.data);
+    if ("instances_list" in message) {
+      $scope.instancesList = message["instances_list"];
+    }
+    if ("pages_list" in message) {
+      $scope.showPages = true;
+      $scope.pagesList = message["pages_list"];
+    }
+    $scope.$apply();
+  }
+
   $(document).ready(function(){
-    $http.get( _ReqUrl + "/instances_list").then(function(response){
-      $scope.instancesList = response.data;
-    });
+    connectWebSocket();
   });
+
 });
