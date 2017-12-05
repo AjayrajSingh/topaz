@@ -16,7 +16,7 @@ enum ChatStatus {
   NETWORK_ERROR,
   PERMISSION_ERROR,
   UNSUPPORTED,
-  UNKNOWN_ERROR = -1,
+  UNKNOWN_ERROR,
 };
 
 // Metadata of a chat participant.
