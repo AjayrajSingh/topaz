@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:armadillo/next.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -14,6 +16,9 @@ import 'package:meta/meta.dart';
 import 'hit_test_model.dart';
 
 const int _kMaxSuggestions = 100;
+
+/// Timeout to wait after typing to perform an ask query
+const Duration _kAskQueryTimeout = const Duration(milliseconds: 500);
 
 /// Listens to a maxwell suggestion list.  As suggestions change it
 /// notifies its [suggestionListener].
@@ -218,6 +223,10 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   /// Called when all interruptions are removed.
   final OnInterruptionsRemoved onInterruptionsRemoved;
 
+  /// Timer that tracks the delay between ask text input and making the actual
+  /// query.
+  Timer _askTextTimer;
+
   /// Constructor.
   SuggestionProviderSuggestionModel({
     this.hitTestModel,
@@ -331,20 +340,25 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     if (_askText != text) {
       _askText = text;
 
-      // If our existing binding is bound, close it.
-      if (_askListenerBinding.isBound) {
-        _askListenerBinding.close();
-      }
+      /// A timer ensures that we don't make unneeded ask queries while the
+      /// user is still typing/talking
+      _askTextTimer?.cancel();
+      _askTextTimer = new Timer(_kAskQueryTimeout, () {
+        // If our existing binding is bound, close it.
+        if (_askListenerBinding.isBound) {
+          _askListenerBinding.close();
+        }
 
-      // Also clear any suggestions that the ask listener may have cached
-      _askListener.clearSuggestions();
+        // Also clear any suggestions that the ask listener may have cached
+        _askListener.clearSuggestions();
 
-      // Make a query and rewrap the binding
-      _suggestionProviderProxy.query(
-        _askListenerBinding.wrap(_askListener),
-        new maxwell.UserInput()..text = text ?? '',
-        _kMaxSuggestions,
-      );
+        // Make a query and rewrap the binding
+        _suggestionProviderProxy.query(
+          _askListenerBinding.wrap(_askListener),
+          new maxwell.UserInput()..text = text ?? '',
+          _kMaxSuggestions,
+        );
+      });
     }
   }
 
