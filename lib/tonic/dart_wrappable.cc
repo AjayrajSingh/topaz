@@ -83,18 +83,27 @@ size_t DartWrappable::GetAllocationSize() {
   return GetDartWrapperInfo().size_in_bytes;
 }
 
-DartWrappable* DartConverterWrappable::FromDart(Dart_Handle handle) {
+DartWrappable* DartConverterWrappable::FromDart(Dart_Handle handle, const DartWrapperInfo& wrapper_info) {
   intptr_t peer = 0;
   Dart_Handle result =
       Dart_GetNativeInstanceField(handle, DartWrappable::kPeerIndex, &peer);
   if (Dart_IsError(result))
     return nullptr;
+  intptr_t handle_wrapper_info;
+  result =
+      Dart_GetNativeInstanceField(handle, DartWrappable::kWrapperInfoIndex, &handle_wrapper_info);
+  if (Dart_IsError(result))
+    return nullptr;
+
+  intptr_t expected_wrapper_info = reinterpret_cast<intptr_t>(&wrapper_info);
+  FXL_CHECK(handle_wrapper_info == expected_wrapper_info);
+
   return reinterpret_cast<DartWrappable*>(peer);
 }
 
 DartWrappable* DartConverterWrappable::FromArguments(Dart_NativeArguments args,
                                                      int index,
-                                                     Dart_Handle& exception) {
+                                                     Dart_Handle& exception, const DartWrapperInfo& wrapper_info) {
   intptr_t native_fields[DartWrappable::kNumberOfNativeFields];
   Dart_Handle result = Dart_GetNativeFieldsOfArgument(
       args, index, DartWrappable::kNumberOfNativeFields, native_fields);
@@ -104,6 +113,9 @@ DartWrappable* DartConverterWrappable::FromArguments(Dart_NativeArguments args,
   }
   if (!native_fields[DartWrappable::kPeerIndex])
     return nullptr;
+  intptr_t handle_wrapper_info = native_fields[DartWrappable::kWrapperInfoIndex];
+  intptr_t expected_wrapper_info = reinterpret_cast<intptr_t>(&wrapper_info);
+  FXL_CHECK(handle_wrapper_info == expected_wrapper_info);
   return reinterpret_cast<DartWrappable*>(
       native_fields[DartWrappable::kPeerIndex]);
 }
