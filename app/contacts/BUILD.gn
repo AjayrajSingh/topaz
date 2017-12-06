@@ -17,10 +17,6 @@ package("contacts") {
 
   binaries = [
     {
-      source = "contacts_content_provider.dartx"
-      name = "contacts_content_provider"
-    },
-    {
       source = "gen/topaz/app/contacts/modules/contact_card/contact_card.flx"
       name = "contacts/contact_card"
     },

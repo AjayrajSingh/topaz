@@ -3,6 +3,7 @@
         "dart"
     ],
     "packages": {
+        "documents_content_provider": "//topaz/app/documents/agents/content_provider:documents_content_provider",
         "documents": "//topaz/app/documents"
     }
 }

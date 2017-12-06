@@ -28,9 +28,9 @@ import 'package:topaz.app.music.services.player/player.fidl.dart'
 import 'package:topaz.app.music.services.player/status.fidl.dart';
 import 'package:topaz.app.music.services.player/track.fidl.dart' as track_fidl;
 
-const String _kPlayerUrl = 'file:///system/apps/music_playback_agent';
+const String _kPlayerUrl = 'music_playback_agent';
 
-const String _kPlaybackModuleUrl = 'file:///system/apps/music_playback';
+const String _kPlaybackModuleUrl = 'music_playback';
 
 /// The context topic for "Music Artist"
 const String _kMusicArtistTopic = 'music_artist';
@@ -220,7 +220,7 @@ class ArtistModuleModel extends ModuleModel {
       pathSegments: <String>[artistId],
     );
     _startModule(
-      url: 'file:///system/apps/music_artist',
+      url: 'music_artist',
       initialData: JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}),
     );
   }
@@ -233,7 +233,7 @@ class ArtistModuleModel extends ModuleModel {
       pathSegments: <String>[albumId],
     );
     _startModule(
-      url: 'file:///system/apps/music_album',
+      url: 'music_album',
       initialData: JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}),
     );
   }

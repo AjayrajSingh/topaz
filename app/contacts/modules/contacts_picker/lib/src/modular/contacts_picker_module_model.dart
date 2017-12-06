@@ -18,8 +18,7 @@ import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
 
 import '../../stores.dart';
 
-const String _kContactsContentProviderUrl =
-    'file:///system/apps/contacts_content_provider';
+const String _kContactsContentProviderUrl = 'contacts_content_provider';
 
 /// The module model
 class ContactsPickerModuleModel extends ModuleModel {

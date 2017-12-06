@@ -4,6 +4,7 @@
 
 import("//build/dart/dart_package.gni")
 import("//build/dart/toolchain.gni")
+import("//build/package.gni")
 import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
 import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
 
@@ -34,12 +35,6 @@ template("dart_jit_app") {
     } else {
       infer_package_name = true
     }
-  }
-
-  if (defined(invoker.output_name)) {
-    bundle_name = invoker.output_name
-  } else {
-    bundle_name = "${target_name}.dartx"
   }
 
   snapshot_path = "$target_gen_dir/${target_name}_snapshot.bin"
@@ -87,36 +82,31 @@ template("dart_jit_app") {
     ]
   }
 
-  bundle_path = "$root_out_dir/$bundle_name"
+  package(target_name) {
+    forward_variables_from(invoker, [
+      "testonly",
+    ])
 
-  dart_bundler_label =
-      "//topaz/runtime/dart_runner/bundler($host_toolchain)"
-  dart_bundler_dir = get_label_info(dart_bundler_label, "root_out_dir")
-  dart_bundler = "$dart_bundler_dir/dart_bundler"
-
-  action(target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
+    if (defined(invoker.fuchsia_package_name)) {
+      package_name = invoker.fuchsia_package_name
     }
 
-    outputs = [
-      bundle_path,
-    ]
-
-    rebased_snapshot_path = rebase_path(snapshot_path)
-    rebased_bundle_path = rebase_path(bundle_path)
-
-    script = dart_bundler
-    args = [
-      "--interpreter=dart_jit_runner",
-      "--snapshot-key=snapshot_blob.bin",
-      "--snapshot=$rebased_snapshot_path",
-      "--bundle=$rebased_bundle_path",
-    ]
-
     deps = [
-      ":" + snapshot_target_name,
-       dart_bundler_label,
+      ":$snapshot_target_name",
+    ]
+
+    resources = [
+      {
+        path = rebase_path(snapshot_path)
+        dest = "snapshot_blob.bin"
+      }
+    ]
+
+    meta = [
+      {
+        path = rebase_path("//topaz/runtime/dart_runner/meta/jit_runtime")
+        dest = "runtime"
+      }
     ]
   }
 }
@@ -140,12 +130,6 @@ template("dart_aot_app") {
     } else {
       infer_package_name = true
     }
-  }
-
-  if (defined(invoker.output_name)) {
-    bundle_name = invoker.output_name
-  } else {
-    bundle_name = "${target_name}.dartx"
   }
 
   assembly_path = "$target_gen_dir/${target_name}.S"
@@ -213,39 +197,35 @@ template("dart_aot_app") {
     output_name = outer_target_name
   }
 
-  bundle_path = "$root_out_dir/$bundle_name"
   dylib_path =
       get_label_info(":$dylib_target_name($shlib_toolchain)",
                      "root_out_dir") + "/lib.unstripped/lib$target_name.so"
 
-  dart_bundler_label =
-      "//topaz/runtime/dart_runner/bundler($host_toolchain)"
-  dart_bundler_dir = get_label_info(dart_bundler_label, "root_out_dir")
-  dart_bundler = "$dart_bundler_dir/dart_bundler"
+  package(target_name) {
+    forward_variables_from(invoker, [
+      "testonly",
+    ])
 
-  action(target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
+    if (defined(invoker.fuchsia_package_name)) {
+      package_name = invoker.fuchsia_package_name
     }
-
-    outputs = [
-      bundle_path,
-    ]
-
-    rebased_dylib_path = rebase_path(dylib_path)
-    rebased_bundle_path = rebase_path(bundle_path)
-
-    script = dart_bundler
-    args = [
-      "--interpreter=dart_aot_runner",
-      "--snapshot-key=libapp.so",
-      "--snapshot=$rebased_dylib_path",
-      "--bundle=$rebased_bundle_path",
-    ]
 
     deps = [
       ":$dylib_target_name",
-       dart_bundler_label,
+    ]
+
+    resources = [
+      {
+        path = rebase_path(dylib_path)
+        dest = "libapp.so"
+      }
+    ]
+
+    meta = [
+      {
+        path = rebase_path("//topaz/runtime/dart_runner/meta/aot_runtime")
+        dest = "runtime"
+      }
     ]
   }
 }
@@ -263,8 +243,8 @@ template("dart_aot_app") {
 #   deps (optional)
 #     Dependencies of this application
 #
-#   output_name (optional)
-#     Name of the output file to generate. Defaults to ${target_name}.dartx
+#   fuchsia_package_name (optional)
+#     Name of the output Fuchsia package to generate. Defaults to ${target_name}
 #
 #   disable_analysis (optional)
 #     Prevents analysis from being run on this target.
@@ -273,26 +253,28 @@ template("dart_app") {
     dart_jit_app(target_name) {
       forward_variables_from(invoker,
           [
-            "package_name",
-            "main_dart",
             "deps",
-            "output_name",
             "disable_analysis",
-            "testonly",
+            "fuchsia_package_name",
+            "main_dart",
+            "output_name",
+            "package_name",
             "source_dir",
+            "testonly",
           ])
     }
   } else {
     dart_aot_app(target_name) {
       forward_variables_from(invoker,
           [
-            "package_name",
-            "main_dart",
             "deps",
-            "output_name",
             "disable_analysis",
-            "testonly",
+            "fuchsia_package_name",
+            "main_dart",
+            "output_name",
+            "package_name",
             "source_dir",
+            "testonly",
           ])
     }
   }

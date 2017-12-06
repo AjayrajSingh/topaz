@@ -48,7 +48,7 @@ class InfoModuleModel extends ModuleModel {
       // TODO(maryxia) SO-880 get this from file manifest and add a check for
       // whether it can be found in the system
       // launches the application at this location, as if it were an agent
-      'file:///system/apps/documents/content_provider',
+      'documents_content_provider',
       serviceProviderProxy.ctrl.request(),
       _agentControllerProxy.ctrl.request(),
     );

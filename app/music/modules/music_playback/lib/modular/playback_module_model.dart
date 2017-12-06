@@ -21,7 +21,7 @@ import 'package:topaz.app.music.services.player/status.fidl.dart';
 
 import 'player_status_listener.dart';
 
-const String _kPlayerUrl = 'file:///system/apps/music_playback_agent';
+const String _kPlayerUrl = 'music_playback_agent';
 final Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
 
 /// [ModuleModel] that manages the state of the Playback Module.

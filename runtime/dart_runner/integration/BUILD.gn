@@ -4,10 +4,10 @@
 
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
-dart_jit_app("integration") {
+dart_jit_app("jit") {
   testonly = true
 
-  output_name = "dart_jit_runner_test.dartx"
+  fuchsia_package_name = "dart_jit_runner_test"
 
   main_dart = "main.dart"
 
@@ -20,10 +20,10 @@ dart_jit_app("integration") {
   ]
 }
 
-dart_aot_app("integration_aot") {
+dart_aot_app("aot") {
   testonly = true
 
-  output_name = "dart_aot_runner_test.dartx"
+  fuchsia_package_name = "dart_aot_runner_test"
 
   main_dart = "main.dart"
 

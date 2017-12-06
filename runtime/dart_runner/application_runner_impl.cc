@@ -5,9 +5,11 @@
 #include "topaz/runtime/dart_runner/application_runner_impl.h"
 
 #include <dlfcn.h>
+#include <fcntl.h>
 #include <zircon/dlfcn.h>
 #include <zircon/status.h>
 #include <zx/process.h>
+
 #include <thread>
 #include <utility>
 
@@ -16,6 +18,8 @@
 #include "third_party/dart/runtime/bin/embedded_dart_io.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fsl/tasks/message_loop.h"
+#include "lib/fsl/vmo/file.h"
+#include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fsl/vmo/vector.h"
 #include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/dart_state.h"
@@ -74,37 +78,27 @@ fdio_ns_t* SetupNamespace(app::FlatNamespacePtr* flat_namespace) {
   return fdio_namespc;
 }
 
-
 #if defined(AOT_RUNTIME)
 
-bool ExtractSnapshots(const fsl::SizedVmoTransportPtr& bundle,
+bool ExtractSnapshots(fdio_ns_t* namespc,
                       const uint8_t*& isolate_snapshot_data,
                       const uint8_t*& isolate_snapshot_instructions,
                       const uint8_t*& script_snapshot,
                       intptr_t* script_snapshot_len) {
-  // The AOT bundle consists of:
-  //   1. The Fuchsia shebang: #!fuchsia dart_aot_runner\n
-  //   2. Padding up to the page size
-  //   3. The dylib containing the AOT compiled Dart snapshot.
-  // To make a vmo that we can pass to dlopen_vmo(), we clone the bundle vmo
-  // at an offset of one page.
-  if (!fsl::SizedVmo::IsSizeValid(bundle->vmo, bundle->size)) {
-    FXL_LOG(ERROR) << "bundle size is not valid.";
+  fxl::UniqueFD root_dir(fdio_ns_opendir(namespc));
+  if (!root_dir.is_valid())
     return false;
-  }
-  uint64_t bundle_size = bundle->size;
-  zx::vmo dylib_vmo;
-  const int pagesize = getpagesize();
-  zx_status_t status =
-      bundle->vmo.clone(ZX_VMO_CLONE_COPY_ON_WRITE | ZX_RIGHT_EXECUTE, pagesize,
-                        bundle_size - pagesize, &dylib_vmo);
-  if (status != ZX_OK) {
-    FXL_LOG(ERROR) << "bundle.clone() failed: " << zx_status_get_string(status);
+
+  fxl::UniqueFD dylib_file(openat(root_dir.get(), "pkg/data/libapp.so", O_RDONLY));
+  if (!dylib_file.is_valid())
     return false;
-  }
+
+  fsl::SizedVmo dylib;
+  if (!fsl::VmoFromFd(std::move(dylib_file), &dylib))
+    return false;
 
   dlerror();
-  void* lib = dlopen_vmo(dylib_vmo.get(), RTLD_LAZY);
+  void* lib = dlopen_vmo(dylib.vmo().get(), RTLD_LAZY);
   // TODO(rmacnak): It is currently not safe to unload this library when the
   // isolate shuts down because it may be backing part of the vm isolate's heap.
   if (lib == NULL) {
@@ -131,30 +125,36 @@ bool ExtractSnapshots(const fsl::SizedVmoTransportPtr& bundle,
 
 #else  // !defined(AOT_RUNTIME)
 
-bool ExtractSnapshots(const fsl::SizedVmoTransportPtr& bundle,
+bool ExtractSnapshots(fdio_ns_t* namespc,
                       const uint8_t*& isolate_snapshot_data,
                       const uint8_t*& isolate_snapshot_instructions,
                       const uint8_t*& script_snapshot,
                       intptr_t* script_snapshot_len) {
-  if (!fsl::SizedVmo::IsSizeValid(bundle->vmo, bundle->size)) {
-    FXL_LOG(ERROR) << "bundle size is not valid.";
+  fxl::UniqueFD root_dir(fdio_ns_opendir(namespc));
+  if (!root_dir.is_valid())
     return false;
-  }
-  uint64_t bundle_size = bundle->size;
+
+  fxl::UniqueFD snapshot_file(openat(root_dir.get(), "pkg/data/snapshot_blob.bin", O_RDONLY));
+  if (!snapshot_file.is_valid())
+    return false;
+
+  fsl::SizedVmo snapshot;
+  if (!fsl::VmoFromFd(std::move(snapshot_file), &snapshot))
+    return false;
+
   isolate_snapshot_data = dart_content_handler::isolate_snapshot_buffer;
   isolate_snapshot_instructions = NULL;
 
-  const int pagesize = getpagesize();
   uintptr_t addr;
   zx_status_t status = zx::vmar::root_self().map(
-      0, bundle->vmo, pagesize, bundle_size - pagesize, ZX_VM_FLAG_PERM_READ, &addr);
+      0, snapshot.vmo(), 0, snapshot.size(), ZX_VM_FLAG_PERM_READ, &addr);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "bundle map failed: " << zx_status_get_string(status);
     return false;
   }
 
   script_snapshot = reinterpret_cast<uint8_t*>(addr);
-  *script_snapshot_len = bundle_size - pagesize;
+  *script_snapshot_len = snapshot.size();
   return true;
 }
 
@@ -178,7 +178,8 @@ void RunApplication(
   // the mappings.
   std::string label = "dart:" + GetLabelFromURL(url);
   zx::process::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
-  application->data->vmo.set_property(ZX_PROP_NAME, label.c_str(), label.size());
+  if (application->data)
+    application->data->vmo.set_property(ZX_PROP_NAME, label.c_str(), label.size());
 
   fdio_ns_t* namespc = SetupNamespace(&startup_info->flat_namespace);
   if (!namespc)
@@ -188,7 +189,7 @@ void RunApplication(
   const uint8_t* isolate_snapshot_instructions = NULL;
   const uint8_t* script_snapshot = NULL;
   intptr_t script_snapshot_len = 0;
-  if (!ExtractSnapshots(application->data, isolate_snapshot_data,
+  if (!ExtractSnapshots(namespc, isolate_snapshot_data,
                         isolate_snapshot_instructions, script_snapshot,
                         &script_snapshot_len)) {
     return;

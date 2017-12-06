@@ -33,9 +33,8 @@ import '../models.dart';
 import '../widgets.dart';
 import 'embedder.dart';
 
-const String _kChatContentProviderUrl =
-    'file:///system/apps/chat_content_provider';
-const String _kGalleryModuleUrl = 'file:///system/apps/gallery';
+const String _kChatContentProviderUrl = 'chat_content_provider';
+const String _kGalleryModuleUrl = 'gallery';
 
 const Duration _kScrollAnimationDuration = const Duration(milliseconds: 300);
 

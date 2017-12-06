@@ -76,7 +76,7 @@ class DocumentsAgent extends AgentImpl {
 
 /// Main entry point.
 Future<Null> main(List<String> args) async {
-  setupLogger(name: 'documents/content_provider');
+  setupLogger(name: 'documents_content_provider');
 
   _agent = new DocumentsAgent(
     applicationContext: new ApplicationContext.fromStartupInfo(),

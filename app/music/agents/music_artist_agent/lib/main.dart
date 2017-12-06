@@ -103,7 +103,7 @@ class ContextListenerImpl extends ContextListener {
             annoyance: AnnoyanceType.none),
         onSelected: <Action>[
           new Action.withCreateStory(new CreateStory(
-              moduleId: 'file:///system/apps/music_artist',
+              moduleId: 'music_artist',
               initialData:
                   JSON.encode(<String, dynamic>{'view': decomposeUri(arg)})))
         ]);

@@ -5,9 +5,7 @@
 import("//build/package.gni")
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
-dart_app("app") {
-  output_name = "agents/module_suggester.dartx"
-
+dart_app("module_suggester") {
   main_dart = "main.dart"
 
   source_dir = "."
@@ -19,17 +17,4 @@ dart_app("app") {
     "//topaz/public/lib/decomposition/dart",
     "//topaz/runtime/web_runner/lib/dart:web_view",
   ]
-}
-
-package("module_suggester") {
-  app = true
-  system_image = true
-
-  deps = [
-    ":app",
-  ]
-
-  binaries = [ {
-        name = "agents/module_suggester.dartx"
-      } ]
 }

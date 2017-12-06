@@ -469,7 +469,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   ///   "data_providers": [
   ///     {
   ///       "source_id": "provider_source_id",
-  ///       "agent_url": "file:///system/apps/path_to_some_provider"
+  ///       "agent_url": "some_provider"
   ///     }
   ///   ]
   /// }

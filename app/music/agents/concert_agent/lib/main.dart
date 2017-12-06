@@ -75,7 +75,7 @@ class ContextListenerImpl extends ContextListener {
             annoyance: AnnoyanceType.none),
         onSelected: <Action>[
           new Action.withCreateStory(new CreateStory(
-              moduleId: 'file:///system/apps/concert_event_list',
+              moduleId: 'concert_event_list',
               initialData:
                   JSON.encode(<String, dynamic>{'view': decomposeUri(arg)})))
         ]);

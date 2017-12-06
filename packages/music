@@ -3,6 +3,10 @@
         "dart"
     ],
     "packages": {
+        "concert_agent": "//topaz/app/music/agents/concert_agent",
+        "last_fm_agent": "//topaz/app/music/agents/last_fm_agent",
+        "music_artist_agent": "//topaz/app/music/agents/music_artist_agent",
+        "music_playback_agent": "//topaz/app/music/agents/music_playback_agent",
         "music": "//topaz/app/music"
     }
 }

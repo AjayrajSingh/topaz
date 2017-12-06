@@ -103,7 +103,7 @@ class ContextListenerImpl extends ContextListener {
               storyId: data['@source']['story_id'],
               moduleName: 'Last FM: ${data['name']}',
               modulePath: data['@source']['module_path'],
-              moduleUrl: 'file:///system/apps/last_fm_artist_bio',
+              moduleUrl: 'last_fm_artist_bio',
               surfaceRelation: new SurfaceRelation(
                   arrangement: SurfaceArrangement.copresent,
                   emphasis: 0.5,

@@ -35,10 +35,8 @@ import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
 
 import '../models.dart';
 
-const String _kChatContentProviderUrl =
-    'file:///system/apps/chat_content_provider';
-const String _kChatConversationModuleUrl =
-    'file:///system/apps/chat_conversation';
+const String _kChatContentProviderUrl = 'chat_content_provider';
+const String _kChatConversationModuleUrl = 'chat_conversation';
 
 const Duration _kErrorDuration = const Duration(seconds: 10);
 

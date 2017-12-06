@@ -34,7 +34,7 @@ class XiFuchsiaClient extends XiClient {
     }
 
     final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo(
-        url: 'file:///system/apps/xi-core',
+        url: 'xi-core',
         serviceRequest: _services.request());
     kContext.launcher.createApplication(launchInfo, null);
     // TODO(jasoncampbell): File a bug for how to get rid of the Dart warning

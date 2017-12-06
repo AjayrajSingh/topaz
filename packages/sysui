@@ -3,6 +3,7 @@
         "dart"
     ],
     "packages": {
+        "home_work_agent": "//topaz/shell/agents/home_work_agent",
         "sysui": "//topaz/shell:sysui"
     }
 }

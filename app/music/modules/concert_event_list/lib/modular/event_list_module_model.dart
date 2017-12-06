@@ -123,7 +123,7 @@ class EventListModuleModel extends ModuleModel {
       if (!_startedEventModule) {
         moduleContext.startModuleInShell(
           'event_module',
-          'file:///system/apps/concert_event_page',
+          'concert_event_page',
           'event_link',
           null, // incomingServices,
           _eventPageModuleController.ctrl.request(),

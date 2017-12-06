@@ -18,10 +18,8 @@ import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
 import 'package:collection/collection.dart';
 import 'package:lib.logging/logging.dart';
 
-const String _kChatContentProviderUrl =
-    'file:///system/apps/chat_content_provider';
-const String _kChatConversationModuleUrl =
-    'file:///system/apps/chat_conversation';
+const String _kChatContentProviderUrl = 'chat_content_provider';
+const String _kChatConversationModuleUrl = 'chat_conversation';
 
 const List<String> _kDashboardParticipants = const <String>[
   'fuchsia_dashboard@google.com'

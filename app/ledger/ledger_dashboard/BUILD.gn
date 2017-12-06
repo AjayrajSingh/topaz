@@ -5,9 +5,7 @@
 import("//build/package.gni")
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
-dart_app("ledger_dashboard_dart") {
-  output_name = "ledger_dashboard.dartx"
-
+dart_app("ledger_dashboard") {
   main_dart = "main.dart"
 
   source_dir = "."
@@ -22,18 +20,8 @@ dart_app("ledger_dashboard_dart") {
   ]
 }
 
-package("ledger_dashboard") {
-  app = true
+package("ledger_dashboard_resources") {
   system_image = true
-
-  deps = [
-    ":ledger_dashboard_dart",
-  ]
-
-  binaries = [ {
-        name = "ledger_dashboard.dartx"
-        dest = "ledger_dashboard.dartx"
-      } ]
 
   resources = [
     {

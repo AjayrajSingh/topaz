@@ -16,11 +16,6 @@ package("chat") {
 
   binaries = [
     {
-      name = "chat_content_provider"
-      source = "chat_content_provider.dartx"
-    },
-
-    {
       name = "chat_conversation"
       source = "gen/topaz/app/chat/modules/conversation/chat_conversation.flx"
     },
@@ -28,11 +23,6 @@ package("chat") {
     {
       name = "chat_conversation_list"
       source = "gen/topaz/app/chat/modules/conversation_list/chat_conversation_list.flx"
-    },
-
-    {
-      name = "firebase_db_client"
-      source = "firebase_db_client.dartx"
     },
   ]
 }
@@ -45,11 +35,6 @@ package("chat_tests") {
   deps = [
     "tests/chat_content_provider_test",
   ]
-
-  binaries = [ {
-        name = "chat_content_provider_test.dartx"
-        source = "chat_content_provider_test.dartx"
-      } ]
 
   resources = [ {
         path = rebase_path("tests/chat_tests.json")

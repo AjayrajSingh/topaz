@@ -1,5 +1,5 @@
 {
-    "binary": "/system/apps/video",
+    "binary": "video",
     "local_name": "video",
     "verb": "com.google.fuchsia.play",
     "noun_constraints": [

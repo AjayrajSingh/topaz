@@ -24,13 +24,5 @@ package("documents") {
       name = "documents/info"
       source = "gen/topaz/app/documents/modules/info/info.flx"
     },
-    {
-      # This is what shows up in file:///system/apps/documents/content_provider
-      # and points to the documents_content_provider.dartx, which is defined at
-      # agents/BUILD.gn
-      # When running connectToAgent() we should pass in this name
-      name = "documents/content_provider"
-      source = "documents_content_provider.dartx"
-    },
   ]
 }

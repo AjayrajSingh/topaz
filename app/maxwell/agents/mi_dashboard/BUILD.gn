@@ -5,9 +5,7 @@
 import("//build/package.gni")
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
-dart_app("mi_dashboard_dart") {
-  output_name = "mi_dashboard.dartx"
-
+dart_app("mi_dashboard") {
   main_dart = "main.dart"
 
   source_dir = "."
@@ -24,18 +22,8 @@ dart_app("mi_dashboard_dart") {
   ]
 }
 
-package("mi_dashboard") {
-  app = true
+package("mi_dashboard_resources") {
   system_image = true
-
-  deps = [
-    ":mi_dashboard_dart",
-  ]
-
-  binaries = [ {
-        name = "mi_dashboard.dartx"
-        dest = "agents/mi_dashboard.dartx"
-      } ]
 
   resources = [
     {

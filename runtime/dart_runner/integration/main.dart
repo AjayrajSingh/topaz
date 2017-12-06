@@ -22,7 +22,7 @@ void main(List<String> args) {
 
   test('start hello_dart', () {
     final ApplicationLaunchInfo info =
-        const ApplicationLaunchInfo(url: 'hello_dart_jit.dartx');
+        const ApplicationLaunchInfo(url: 'hello_dart_jit');
     context.launcher.createApplication(info, null);
   });
 
@@ -33,7 +33,7 @@ void main(List<String> args) {
     final ApplicationControllerProxy actl = new ApplicationControllerProxy();
 
     final ApplicationLaunchInfo info = new ApplicationLaunchInfo(
-        url: 'hello_app_dart_jit.dartx', serviceRequest: services.request());
+        url: 'hello_app_dart_jit', serviceRequest: services.request());
     context.launcher.createApplication(info, actl.ctrl.request());
     services
       ..connectToService(service.ctrl)
