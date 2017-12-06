@@ -299,7 +299,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
   @override
   void currentUserEmail(void callback(String email)) {
-    callback(chatMessageTransporter.currentUserEmail);
+    callback(chatMessageTransporter.currentUserEmail ?? '');
   }
 
   @override

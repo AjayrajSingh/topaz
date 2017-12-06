@@ -94,6 +94,8 @@ class VideoModuleModel extends ModuleModel {
     );
 
     notifyListeners();
+
+    moduleContext.ready();
   }
 
   /// Gets asset

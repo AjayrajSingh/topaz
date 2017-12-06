@@ -11,12 +11,15 @@ import 'package:meta/meta.dart';
 import 'message.dart';
 
 /// Function signature for an additional command initialization.
-typedef void CommandInitializer(List<String> args);
+typedef void CommandInitializer(CommandType commandType, List<String> args);
 
 /// Enum for supported command types.
 enum CommandType {
   /// Command to embed a mod.
   mod,
+
+  /// Command to embed a video.
+  video,
 }
 
 /// A [Message] model representing a slash command.
@@ -65,12 +68,16 @@ class CommandMessage extends Message {
       case '/mod':
         _command = CommandType.mod;
         break;
+
+      case '/video':
+        _command = CommandType.video;
+        break;
     }
 
     _arguments = chunks;
 
     // Perform additional initialization if necessary.
-    initializer?.call(_arguments);
+    initializer?.call(command, arguments);
   }
 
   /// Check if a string is a slash command.

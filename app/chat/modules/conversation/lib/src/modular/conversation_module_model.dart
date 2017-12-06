@@ -174,7 +174,7 @@ class ChatConversationModuleModel extends ModuleModel {
         if (embedders != null) {
           for (Embedder embedder in embedders) {
             // Set the link value.
-            embedder.link.updateObject(
+            embedder.link?.updateObject(
               const <String>['lastMessage'],
               JSON.encode(<String, String>{'content': lastTextMessage.text}),
             );
@@ -522,31 +522,51 @@ class ChatConversationModuleModel extends ModuleModel {
           },
           onRefresh: embedder.restartDaisy,
           payload: m.jsonPayload,
-          initializer: (List<String> args) {
+          initializer: (CommandType commandType, List<String> args) {
             // Supports "/mod <verb> <message>".
             if (args.isNotEmpty && !embedder.daisyStarted) {
-              String verb = args.first;
+              switch (commandType) {
+                case CommandType.mod:
+                  String verb = args.first;
 
-              Map<String, String> messageEntity = <String, String>{
-                '@type': 'com.google.fuchsia.string',
-                // Content is anything following the <verb>.
-                'content': args.sublist(1).join(' '),
-              };
-              Map<String, dynamic> membersEntity = <String, dynamic>{
-                '@type': 'com.google.fuchsia.chat.members',
-                'members': members,
-              };
+                  Map<String, String> messageEntity = <String, String>{
+                    '@type': 'com.google.fuchsia.string',
+                    // Content is anything following the <verb>.
+                    'content': args.sublist(1).join(' '),
+                  };
+                  Map<String, dynamic> membersEntity = <String, dynamic>{
+                    '@type': 'com.google.fuchsia.chat.members',
+                    'members': members,
+                  };
 
-              // Create a Daisy.
-              DaisyBuilder daisyBuilder =
-                  new DaisyBuilder.verb('com.google.fuchsia.codelab.$verb')
-                    ..addNoun('originalMessage', messageEntity)
-                    ..addNoun('members', membersEntity);
+                  // Create a Daisy.
+                  DaisyBuilder daisyBuilder =
+                      new DaisyBuilder.verb('com.google.fuchsia.codelab.$verb')
+                        ..addNoun('originalMessage', messageEntity)
+                        ..addNoun('members', membersEntity);
 
-              embedder.startDaisy(
-                daisy: daisyBuilder.daisy,
-                name: mid,
-              );
+                  embedder.startDaisy(
+                    daisy: daisyBuilder.daisy,
+                    name: mid,
+                  );
+                  break;
+
+                case CommandType.video:
+                  if (args.length != 1) {
+                    log.warning('Usage: /video <video_url>');
+                    break;
+                  }
+
+                  DaisyBuilder daisyBuilder =
+                      new DaisyBuilder.verb('com.google.fuchsia.play')
+                        ..addNoun('asset', args[0]);
+
+                  embedder.startDaisy(
+                    daisy: daisyBuilder.daisy,
+                    name: mid,
+                  );
+                  break;
+              }
             }
           },
         );
