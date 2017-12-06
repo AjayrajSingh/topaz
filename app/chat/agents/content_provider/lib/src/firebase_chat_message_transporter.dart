@@ -73,8 +73,11 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
       : _tokenProvider = tokenProvider,
         super(onReceived: onReceived);
 
+  // HACK(jimbe) The fidl declaration won't accept null, so the workaround is
+  // to return an empty string. Returning null is probably better, but I don't
+  // have time to chase it down.
   @override
-  String get currentUserEmail => _email;
+  String get currentUserEmail => _email ?? '';
 
   /// Sign in to the firebase DB using the given google auth credentials.
   @override
