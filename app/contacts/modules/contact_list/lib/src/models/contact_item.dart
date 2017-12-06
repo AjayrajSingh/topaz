@@ -26,8 +26,11 @@ class ContactItem {
         assert(displayName != null && displayName.trim().isNotEmpty),
         _displayName = displayName.trim();
 
-  /// The first letter of the display name
-  String get firstLetter => _displayName[0];
+  /// The first letter of the display name, or '#' if display name begins with a number.
+  String get firstLetter {
+    bool isNumber = '0123456789'.contains(_displayName[0]);
+    return isNumber ? '#' : _displayName[0].toUpperCase();
+  }
 
   /// List display name for the contact.
   String get displayName => _displayName;

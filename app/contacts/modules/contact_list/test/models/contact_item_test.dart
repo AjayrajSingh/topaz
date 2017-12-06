@@ -18,5 +18,13 @@ void main() {
         new ContactItem(id: '', displayName: 'displayName');
       }, throwsA(const isInstanceOf<AssertionError>()));
     });
+
+    test(
+        'should return # as first letter when display name begins with a number',
+        () {
+      ContactItem item =
+          new ContactItem(id: 'id', displayName: '931 Gilman Street');
+      expect(item.firstLetter, equals('#'));
+    });
   });
 }
