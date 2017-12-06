@@ -95,6 +95,7 @@ class VideoModuleModel extends ModuleModel {
 
     notifyListeners();
 
+    link.set(const <String>['preferredHeight'], JSON.encode(300.0));
     moduleContext.ready();
   }
 

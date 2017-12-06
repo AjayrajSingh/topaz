@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert' show JSON;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -17,11 +19,14 @@ import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 
+const double _kMinHeight = 200.0;
+const double _kMaxHeight = 500.0;
+
 /// The actual [Embedder] class that interacts with Fuchsia APIs to resolve,
 /// start, and embed a module.
-class Embedder extends EmbedderModel implements ModuleWatcher {
+class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
   /// Height of the box the module will be rendered in.
-  final double height;
+  double _height;
 
   /// The [ModuleContext] used to grab links etc.
   final ModuleContext moduleContext;
@@ -35,6 +40,9 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
   /// The client for the link used by the embedded module.
   LinkProxy link;
 
+  /// A [LinkWatcherBinding] used to watch for [Link] changes.
+  LinkWatcherBinding linkWatcherBinding;
+
   /// The [ChildViewConnection] of the embedded module.
   ChildViewConnection connection;
 
@@ -47,15 +55,19 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
   /// The [Embedder] constructor.
   Embedder({
     String uri,
-    @required this.height,
+    @required double height,
     @required this.moduleContext,
   })
       : assert(height != null),
+        _height = height,
         super();
 
   @override
   bool get daisyStarted => _daisyStarted;
   bool _daisyStarted = false;
+
+  /// Gets the desired height of this embedded mod.
+  double get height => _height;
 
   /// Implementation for [ModuleWatcher].
   @override
@@ -87,10 +99,24 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
     notifyListeners();
   }
 
+  @override
+  void notify(String json) {
+    Object jsonObject = JSON.decode(json);
+    if (jsonObject is Map<String, Object> &&
+        jsonObject['preferredHeight'] != null) {
+      num h = jsonObject['preferredHeight'];
+      _height = h.toDouble().clamp(_kMinHeight, _kMaxHeight);
+      notifyListeners();
+    }
+  }
+
   /// Close down everything used to embed the module.
   void close() {
     // Stop the embedded module.
     moduleController?.stop(() {});
+
+    linkWatcherBinding?.close();
+    linkWatcherBinding = null;
 
     link?.ctrl?.close();
     link = null;
@@ -148,6 +174,8 @@ class Embedder extends EmbedderModel implements ModuleWatcher {
 
     link = new LinkProxy();
     moduleContext.getLink(name, link.ctrl.request());
+    linkWatcherBinding = new LinkWatcherBinding();
+    link.watch(linkWatcherBinding.wrap(this));
 
     watcherBinding = new ModuleWatcherBinding();
     moduleController.watch(watcherBinding.wrap(this));
