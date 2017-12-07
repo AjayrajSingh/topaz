@@ -18,6 +18,7 @@ namespace dart_content_handler {
 class DartApplicationController : public app::ApplicationController {
  public:
   DartApplicationController(
+      fdio_ns_t* namespc,
       const uint8_t* isolate_snapshot_data,
       const uint8_t* isolate_snapshot_instructions,
 #if !defined(AOT_RUNTIME)
@@ -40,8 +41,7 @@ class DartApplicationController : public app::ApplicationController {
   void Detach() override;
   void Wait(const WaitCallback& callback) override;
 
-  fdio_ns_t* SetupNamespace();
-
+  fdio_ns_t* namespace_;
   const uint8_t* isolate_snapshot_data_;
   const uint8_t* isolate_snapshot_instructions_;
 #if !defined(AOT_RUNTIME)

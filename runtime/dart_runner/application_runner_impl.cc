@@ -34,6 +34,8 @@ const char* kDartVMArgs[] = {
     // clang-format on
 };
 
+constexpr char kServiceRootPath[] = "/svc";
+
 void IsolateShutdownCallback(void* callback_data) {
   fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
   tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
@@ -44,6 +46,34 @@ void IsolateCleanupCallback(void* callback_data) {
   tonic::DartState* dart_state = static_cast<tonic::DartState*>(callback_data);
   delete dart_state;
 }
+
+fdio_ns_t* SetupNamespace(app::FlatNamespacePtr* flat_namespace) {
+  app::FlatNamespacePtr& flat = *flat_namespace;
+  fdio_ns_t* fdio_namespc = nullptr;
+  zx_status_t status = fdio_ns_create(&fdio_namespc);
+  if (status != ZX_OK) {
+    FXL_LOG(ERROR) << "Failed to create namespace";
+    return nullptr;
+  }
+  for (size_t i = 0; i < flat->paths.size(); ++i) {
+    if (flat->paths[i] == kServiceRootPath) {
+      // Ownership of /svc goes to the ApplicationContext created below.
+      continue;
+    }
+    zx::channel dir = std::move(flat->directories[i]);
+    zx_handle_t dir_handle = dir.release();
+    const char* path = flat->paths[i].data();
+    status = fdio_ns_bind(fdio_namespc, path, dir_handle);
+    if (status != ZX_OK) {
+      FXL_LOG(ERROR) << "Failed to bind " << flat->paths[i] << " to namespace";
+      zx_handle_close(dir_handle);
+      fdio_ns_destroy(fdio_namespc);
+      return nullptr;
+    }
+  }
+  return fdio_namespc;
+}
+
 
 #if defined(AOT_RUNTIME)
 
@@ -150,6 +180,10 @@ void RunApplication(
   zx::process::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
   application->data->vmo.set_property(ZX_PROP_NAME, label.c_str(), label.size());
 
+  fdio_ns_t* namespc = SetupNamespace(&startup_info->flat_namespace);
+  if (!namespc)
+      return;
+
   const uint8_t* isolate_snapshot_data = NULL;
   const uint8_t* isolate_snapshot_instructions = NULL;
   const uint8_t* script_snapshot = NULL;
@@ -163,7 +197,7 @@ void RunApplication(
   fsl::MessageLoop loop;
 
   DartApplicationController app(
-      isolate_snapshot_data, isolate_snapshot_instructions,
+      namespc, isolate_snapshot_data, isolate_snapshot_instructions,
 #if !defined(AOT_RUNTIME)
       script_snapshot, script_snapshot_len,
 #endif  // !defined(AOT_RUNTIME)

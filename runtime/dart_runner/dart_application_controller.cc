@@ -38,6 +38,7 @@ void AfterTask() {
 }  // namespace
 
 DartApplicationController::DartApplicationController(
+    fdio_ns_t* namespc,
     const uint8_t* isolate_snapshot_data,
     const uint8_t* isolate_snapshot_instructions,
 #if !defined(AOT_RUNTIME)
@@ -47,7 +48,8 @@ DartApplicationController::DartApplicationController(
     app::ApplicationStartupInfoPtr startup_info,
     std::string url,
     fidl::InterfaceRequest<app::ApplicationController> controller)
-    : isolate_snapshot_data_(isolate_snapshot_data),
+    : namespace_(namespc),
+      isolate_snapshot_data_(isolate_snapshot_data),
       isolate_snapshot_instructions_(isolate_snapshot_instructions),
 #if !defined(AOT_RUNTIME)
       script_snapshot_(script_snapshot),
@@ -62,7 +64,12 @@ DartApplicationController::DartApplicationController(
   }
 }
 
-DartApplicationController::~DartApplicationController() {}
+DartApplicationController::~DartApplicationController() {
+  if (namespace_) {
+    fdio_ns_destroy(namespace_);
+    namespace_ = nullptr;
+  }
+}
 
 bool DartApplicationController::CreateIsolate() {
   // Create the isolate from the snapshot.
@@ -87,35 +94,6 @@ bool DartApplicationController::CreateIsolate() {
   });
 
   return true;
-}
-
-constexpr char kServiceRootPath[] = "/svc";
-
-fdio_ns_t* DartApplicationController::SetupNamespace() {
-  fdio_ns_t* fdio_namespc;
-  const app::FlatNamespacePtr& flat = startup_info_->flat_namespace;
-  zx_status_t status = fdio_ns_create(&fdio_namespc);
-  if (status != ZX_OK) {
-    FXL_LOG(ERROR) << "Failed to create namespace";
-    return nullptr;
-  }
-  for (size_t i = 0; i < flat->paths.size(); ++i) {
-    if (flat->paths[i] == kServiceRootPath) {
-      // Ownership of /svc goes to the ApplicationContext created below.
-      continue;
-    }
-    zx::channel dir = std::move(flat->directories[i]);
-    zx_handle_t dir_handle = dir.release();
-    const char* path = flat->paths[i].data();
-    status = fdio_ns_bind(fdio_namespc, path, dir_handle);
-    if (status != ZX_OK) {
-      FXL_LOG(ERROR) << "Failed to bind " << flat->paths[i] << " to namespace";
-      zx_handle_close(dir_handle);
-      fdio_ns_destroy(fdio_namespc);
-      return nullptr;
-    }
-  }
-  return fdio_namespc;
 }
 
 bool DartApplicationController::Main() {
@@ -153,14 +131,11 @@ bool DartApplicationController::Main() {
   auto outgoing_services = service_provider.NewRequest();
   service_provider_bridge_.set_backend(std::move(service_provider));
 
-  fdio_ns_t* fdio_namespc = SetupNamespace();
-  if (fdio_namespc == nullptr)
-    return false;
-
   InitBuiltinLibrariesForIsolate(
-      url_, fdio_namespc,
+      url_, namespace_,
       app::ApplicationContext::CreateFrom(std::move(startup_info_)),
       std::move(outgoing_services));
+  namespace_ = nullptr;
 
   Dart_Handle dart_arguments = Dart_NewList(arguments.size());
   if (Dart_IsError(dart_arguments)) {
