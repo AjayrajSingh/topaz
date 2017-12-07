@@ -41,6 +41,9 @@ abstract class EmbedderModel extends Model {
   /// Indicates whether the daisy has been started.
   bool get daisyStarted;
 
+  /// Gets the desired height of this embedded module.
+  double get height;
+
   /// The build method to be used by builders of any
   /// ScopedModelDescendant<EmbedderModel>.
   Widget build(BuildContext context);

@@ -113,7 +113,13 @@ class CommandMessage extends Message {
       ),
     ]..insert(isMyMessage ? 0 : 1, _buildToolbar());
 
-    return new Row(children: children);
+    return new SizedBox(
+      height: embedder.height,
+      child: new Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: children,
+      ),
+    );
   }
 
   /// Builds a toolbar for refresh, delete buttons.
@@ -121,6 +127,7 @@ class CommandMessage extends Message {
     return new Container(
         color: Colors.grey,
         child: new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             new IconButton(
               icon: new Icon(Icons.refresh),

@@ -67,6 +67,7 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
   bool _daisyStarted = false;
 
   /// Gets the desired height of this embedded mod.
+  @override
   double get height => _height;
 
   /// Implementation for [ModuleWatcher].
@@ -196,11 +197,8 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
       child = new ChildView(connection: connection);
     }
 
-    return new SizedBox(
-      height: height,
-      child: new Center(
-        child: child,
-      ),
+    return new Center(
+      child: child,
     );
   }
 }
