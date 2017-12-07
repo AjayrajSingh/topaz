@@ -2,6 +2,10 @@
   --mdc-theme-primary: #00AAC0;
 }
 
+html {
+    overflow-y:scroll;
+}
+
 body {
   background-color: #EEEEEE;
   display: block;
@@ -18,6 +22,10 @@ body {
 
 .head-commits-card {
   grid-column-end: span 3;
+}
+
+.keys-values-card {
+  grid-column-end: span 12;
 }
 
 .mdc-card {
@@ -44,4 +52,9 @@ body {
 .selected-class-name {
   padding-left:8px;
   background-color: #D3D3D3;
+}
+
+#keys-entries-list li {
+  border-bottom: 1px solid #D3D3D3;
+  margin:0 0 10px 0;
 }

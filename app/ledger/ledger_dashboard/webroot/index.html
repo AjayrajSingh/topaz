@@ -61,6 +61,9 @@
                   <li class="mdc-list-item" ng-class="{ 'selected-class-name': $index == selectedInstIndex }" ng-repeat="x in instancesList" ng-click="getPagesList($index)">
                     {{  bytesToString(x) }}
                   </li>
+                  <li ng-hide="instancesList.length > 0">
+                    There's no instances for the current user.
+                  </li>
                 </ul>
               </section>
             </div> <!-- mdc_card -->
@@ -75,6 +78,9 @@
                   <li class="mdc-list-item" ng-class="{ 'selected-class-name': $index == selectedPageIndex }" ng-repeat="x in pagesList" ng-click="getCommitsList($index)">
                     {{ bytesToString(x) }}
                   </li>
+                  <li ng-hide="pagesList.length > 0">
+                    There's no pages for this instance.
+                  </li>
                 </ul>
               </section>
             </div> <!-- mdc_card -->
@@ -82,12 +88,35 @@
           <div class="cell mdc-layout-grid__cell head-commits-card" ng-show="showCommits">
             <div class="mdc-card">
               <section class="mdc-card__primary">
-                <h1 class="mdc-card__title mdc-card__title--large">Head Commits</h1>
+                <h1 class="mdc-card__title mdc-card__title--large">Head Commits (Base64)</h1>
               </section>
               <section class="mdc-card__supporting-text">
                 <ul id="head-commits-list" class="mdc-list">
-                  <li class="mdc-list-item" ng-repeat="x in commitsList">
+                  <li class="mdc-list-item" ng-class="{ 'selected-class-name': $index == selectedCommitIndex }" ng-repeat="x in commitsList" ng-click="getEntriesList($index)">
                     {{ bytesToBase64(x) }}
+                  </li>
+                  <li ng-hide="commitsList.length > 0">
+                    There's no commits for this page.
+                  </li>
+                </ul>
+              </section>
+            </div> <!-- mdc_card -->
+          </div> <!-- cell -->
+          <div class="cell mdc-layout-grid__cell keys-values-card" ng-show="showEntries">
+            <div class="mdc-card">
+              <section class="mdc-card__primary">
+                <h1 class="mdc-card__title mdc-card__title--large">Ledger Entries</h1>
+              </section>
+              <section class="mdc-card__supporting-text">
+                <ul id="keys-entries-list" class="mdc-list">
+                  <li ng-repeat="x in entriesList">
+                      <i>Key:</i> {{ bytesToString(x[0]) }} <br>
+                      <i>Value:</i> {{ bytesToString(x[1]) }} <br>
+                      <span ng-if="x[2]">The value has been truncated, can't display more than 500 bytes.<span>
+                      <i>Priority:</i> {{ x[3] }}
+                  </li>
+                  <li ng-hide="entriesList.length > 0">
+                    There's no entries for this commit.
                   </li>
                 </ul>
               </section>

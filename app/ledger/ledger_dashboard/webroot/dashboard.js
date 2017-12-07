@@ -37,10 +37,13 @@ app.controller('debugCtrl', function($scope, $http) {
   $scope.instancesList = [];
   $scope.pagesList = [];
   $scope.commitsList = [];
+  $scope.entriesList = [];
   $scope.showPages = false;
   $scope.showCommits = false;
+  $scope.showEntries = false;
   $scope.selectedInstIndex = -1;
   $scope.selectedPageIndex = -1;
+  $scope.selectedCommitIndex = -1;
 
   $scope.bytesToBase64 = function(bytes) {
     var str = '';
@@ -73,7 +76,6 @@ app.controller('debugCtrl', function($scope, $http) {
 
   $scope.getPagesList = function(index) {
     $scope.selectedInstIndex = index;
-    $scope.showCommits = false;
     _webSocket.send(
         JSON.stringify({'instance_name': $scope.instancesList[index]}));
   };
@@ -81,6 +83,12 @@ app.controller('debugCtrl', function($scope, $http) {
   $scope.getCommitsList = function(index) {
     $scope.selectedPageIndex = index;
     _webSocket.send(JSON.stringify({'page_name': $scope.pagesList[index]}));
+  };
+
+  $scope.getEntriesList = function(index) {
+    $scope.selectedCommitIndex = index;
+    _webSocket.send(JSON.stringify({'commit_id': $scope.commitsList[index]}));
+    $scope.entriesList = [];
   };
 
   function connectWebSocket() {
@@ -127,20 +135,42 @@ app.controller('debugCtrl', function($scope, $http) {
     // parse the JSON message
     var message = JSON.parse(evt.data);
     if ('instances_list' in message) {
-      $scope.selectedInstIndex = -1;
+      showInstancesCard();
       $scope.instancesList = message['instances_list'];
     }
     if ('pages_list' in message) {
-      $scope.showPages = true;
-      $scope.showCommits = false;
-      $scope.selectedPageIndex = -1;
+      showPagesCard();
       $scope.pagesList = message['pages_list'];
     }
     if ('commits_list' in message) {
-      $scope.showCommits = true;
+      showCommitsCard();
       $scope.commitsList = message['commits_list'];
     }
+    if ('entries_list' in message) {
+      $scope.showEntries = true;
+      $scope.entriesList = $scope.entriesList.concat(message['entries_list']);
+    }
     $scope.$apply();
+  }
+
+  function showInstancesCard() {
+    $scope.showPages = false;
+    $scope.showCommits = false;
+    $scope.showEntries = false;
+    $scope.selectedInstIndex = -1;
+  }
+
+  function showPagesCard() {
+    $scope.showPages = true;
+    $scope.showCommits = false;
+    $scope.showEntries = false;
+    $scope.selectedPageIndex = -1;
+  }
+
+  function showCommitsCard() {
+    $scope.showCommits = true;
+    $scope.showEntries = false;
+    $scope.selectedCommitIndex = -1;
   }
 
   $(document).ready(function() {

@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:peridot.bin.ledger.fidl/debug.fidl.dart';
@@ -18,22 +19,66 @@ class WebSocketHolder {
   WebSocket _webSocket;
 
   /// Provides a proxy for ledgerDebug attached to this socket connection.
-  LedgerDebugProxy ledgerDebug;
+  LedgerDebugProxy _ledgerDebug;
 
   /// Provides a proxy for pageDebug attached to this socket connection.
-  PageDebugProxy pageDebug;
+  PageDebugProxy _pageDebug;
+
+  /// Provides a proxy for pageSnapshot attached to this socket connection.
+  ledger_fidl.PageSnapshotProxy _pageSnapshot;
 
   /// The class constructor initializes _webSocket.
   WebSocketHolder(this._webSocket);
+
+  LedgerDebugProxy get ledgerDebug => _ledgerDebug;
+
+  set ledgerDebug(LedgerDebugProxy proxy) {
+    closeLedgerDebug();
+    closePageDebug();
+    closePageSnapshot();
+    _ledgerDebug = proxy;
+  }
+
+  PageDebugProxy get pageDebug => _pageDebug;
+
+  set pageDebug(PageDebugProxy proxy) {
+    closePageDebug();
+    closePageSnapshot();
+    _pageDebug = proxy;
+  }
+
+  ledger_fidl.PageSnapshotProxy get pageSnapshot => _pageSnapshot;
+
+  set pageSnapshot(ledger_fidl.PageSnapshotProxy proxy) {
+    closePageSnapshot();
+    _pageSnapshot = proxy;
+  }
 
   /// Sends messages over _webSocket.
   void add(String msg) {
     _webSocket.add(msg);
   }
 
+  void closeLedgerDebug() {
+    _ledgerDebug?.ctrl?.close();
+    _ledgerDebug = null;
+  }
+
+  void closePageDebug() {
+    _pageDebug?.ctrl?.close();
+    _pageDebug = null;
+  }
+
+  void closePageSnapshot() {
+    _pageSnapshot?.ctrl?.close();
+    _pageSnapshot = null;
+  }
+
   /// Handles the termination of _webSocket.
   void close() {
-    ledgerDebug = null;
+    closeLedgerDebug();
+    closePageDebug();
+    closePageSnapshot();
   }
 }
 
@@ -82,58 +127,96 @@ class LedgerDebugDataHandler extends DataHandler {
       // ignore: avoid_annotating_with_dynamic
       dynamic event) {
     dynamic request = JSON.decode(event);
-    if (request['instance_name'] != null)
+    if (request['instance_name'] != null && isValidId(request['instance_name']))
       handlePagesRequest(socketHolder, request);
-    else if (request['page_name'] != null)
+    else if (request['page_name'] != null && isValidId(request['page_name']))
       handleCommitsRequest(socketHolder, request);
+    else if (request['commit_id'] != null && isValidId(request['commit_id']))
+      handleEntriesRequest(socketHolder, request);
+  }
+
+  bool isValidId(List<int> request) {
+    for (int i = 0; i < request.length; i++) {
+      if (request[i] is! int) {
+        return false;
+      }
+    }
+    return true;
   }
 
   void handlePagesRequest(
       WebSocketHolder socketHolder, Map<String, List<int>> request) {
-    if (request['instance_name'] is List<int>) {
-      LedgerDebugProxy ledgerDebug = new LedgerDebugProxy();
-      ledgerDebug.ctrl.onConnectionError = () {
-        print('Connection Error on Ledger Debug: ${ledgerDebug.hashCode}');
-      };
-      _ledgerRepositoryDebug
-          .getLedgerDebug(request['instance_name'], ledgerDebug.ctrl.request(),
-              (ledger_fidl.Status s) {
-        if (s != ledger_fidl.Status.ok) {
-          print('[ERROR] LEDGER name failed to bind.');
-        }
-      });
-      ledgerDebug.getPagesList((List<List<int>> listOfPages) =>
-          sendList(socketHolder, 'pages_list', listOfPages));
-      socketHolder.ledgerDebug = ledgerDebug;
-    } else {
-      print('[ERROR] LEDGER instance name type is wrong.');
-    }
+    LedgerDebugProxy ledgerDebug = new LedgerDebugProxy();
+    ledgerDebug.ctrl.onConnectionError = () {
+      print('Connection Error on Ledger Debug: ${ledgerDebug.hashCode}');
+    };
+    _ledgerRepositoryDebug
+        .getLedgerDebug(request['instance_name'], ledgerDebug.ctrl.request(),
+            (ledger_fidl.Status s) {
+      if (s != ledger_fidl.Status.ok) {
+        print('[ERROR] LEDGER name failed to bind.');
+      }
+    });
+    ledgerDebug.getPagesList((List<List<int>> listOfPages) =>
+        sendList(socketHolder, 'pages_list', listOfPages));
+    socketHolder.ledgerDebug = ledgerDebug;
   }
 
   void handleCommitsRequest(
       WebSocketHolder socketHolder, Map<String, List<int>> request) {
-    if (request['page_name'] is List<int>) {
-      if (socketHolder.ledgerDebug != null) {
-        PageDebugProxy pageDebug = new PageDebugProxy();
-        pageDebug.ctrl.onConnectionError = () {
-          print('Connection Error on Page Debug: ${pageDebug.hashCode}');
-        };
-        socketHolder.ledgerDebug
-            .getPageDebug(request['page_name'], pageDebug.ctrl.request(),
-                (ledger_fidl.Status s) {
-          if (s != ledger_fidl.Status.ok) {
-            print('[ERROR] PageDebug failed to bind.');
-          }
-        });
-        pageDebug.getHeadCommitsIds(
-            (ledger_fidl.Status s, List<List<int>> listOfCommits) =>
-                sendList(socketHolder, 'commits_list', listOfCommits, s));
-        socketHolder.pageDebug = pageDebug;
-      }
+    if (socketHolder.ledgerDebug != null) {
+      PageDebugProxy pageDebug = new PageDebugProxy();
+      pageDebug.ctrl.onConnectionError = () {
+        print('Connection Error on Page Debug: ${pageDebug.hashCode}');
+      };
+      socketHolder.ledgerDebug
+          .getPageDebug(request['page_name'], pageDebug.ctrl.request(),
+              (ledger_fidl.Status s) {
+        if (s != ledger_fidl.Status.ok) {
+          print('[ERROR] PageDebug failed to bind.');
+        }
+      });
+      pageDebug.getHeadCommitsIds(
+          (ledger_fidl.Status s, List<List<int>> listOfCommits) =>
+              sendList(socketHolder, 'commits_list', listOfCommits, s));
+      socketHolder.pageDebug = pageDebug;
     } else {
-      print('[ERROR] LEDGER page name type is wrong.');
-      return;
+      print(
+          '[ERROR] The corresponding Ledger instance isn\'\t bound properly.');
     }
+  }
+
+  void handleEntriesRequest(
+      WebSocketHolder socketHolder, Map<String, List<int>> request) {
+    if (socketHolder.ledgerDebug != null && socketHolder.pageDebug != null) {
+      ledger_fidl.PageSnapshotProxy pageSnapshot =
+          new ledger_fidl.PageSnapshotProxy();
+      pageSnapshot.ctrl.onConnectionError = () {
+        print('Connection Error on Page Snapshot: ${pageSnapshot.hashCode}');
+      };
+      socketHolder.pageDebug
+          .getSnapshot(request['commit_id'], pageSnapshot.ctrl.request(),
+              (ledger_fidl.Status s) {
+        if (s != ledger_fidl.Status.ok) {
+          print('[ERROR] PageSnapshot failed to bind.');
+        }
+      });
+      socketHolder.pageSnapshot = pageSnapshot;
+      recursiveGetEntries(socketHolder, null);
+    } else {
+      print(
+          '[ERROR] The corresponding Ledger instance and page aren\'\t bound properly');
+    }
+  }
+
+  void recursiveGetEntries(WebSocketHolder socketHolder, List<int> nextToken) {
+    socketHolder.pageSnapshot?.getEntries(
+        null,
+        nextToken,
+        (ledger_fidl.Status s, List<ledger_fidl.Entry> listOfEntries,
+                List<int> nextToken) =>
+            sendEntries(
+                socketHolder, 'entries_list', listOfEntries, s, nextToken));
   }
 
   void sendList(WebSocketHolder socketHolder, String listName,
@@ -142,6 +225,36 @@ class LedgerDebugDataHandler extends DataHandler {
     if (s == ledger_fidl.Status.ok) {
       String message = JSON.encode(<String, dynamic>{listName: listOfEncod});
       socketHolder.add(message);
+    }
+  }
+
+  void sendEntries(
+      WebSocketHolder socketHolder,
+      String listName,
+      List<ledger_fidl.Entry> listOfEncod,
+      ledger_fidl.Status s,
+      List<int> nextToken) {
+    if ((s == ledger_fidl.Status.ok) ||
+        (s == ledger_fidl.Status.partialResult)) {
+      List<List<Object>> entriesList = <List<Object>>[];
+      for (int i = 0; i < (listOfEncod?.length ?? 0); i++) {
+        bool isTruncated = listOfEncod[i].value.size > 500 ? true : false;
+        List<Object> singleEntry = <Object>[]
+          ..add(listOfEncod[i].key)
+          ..add(listOfEncod[i]
+              .value
+              .vmo
+              .read(min(500, listOfEncod[i].value.size))
+              .bytesAsUint8List())
+          ..add(isTruncated)
+          ..add(listOfEncod[i].priority);
+        entriesList.add(singleEntry);
+      }
+      String message = JSON.encode(<String, dynamic>{listName: entriesList});
+      socketHolder.add(message);
+      if (s == ledger_fidl.Status.partialResult) {
+        recursiveGetEntries(socketHolder, nextToken);
+      }
     }
   }
 
