@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 
@@ -49,9 +50,18 @@ class ChatSection extends StatelessWidget {
     if (section.isMyMessage) {
       rowChildren = <Widget>[paddingColumn, chatColumn];
     } else {
-      Widget alphatar = new Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: new Alphatar.fromName(name: section.sender),
+      Widget alphatar = new ScopedModelDescendant<UserModel>(
+        builder: (BuildContext context, Widget child, UserModel userModel) {
+          Participant participant = userModel.getParticipant(section.sender);
+
+          return new Container(
+            margin: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: new Alphatar.fromNameAndUrl(
+              name: participant?.displayName ?? section.sender,
+              avatarUrl: participant?.photoUrl,
+            ),
+          );
+        },
       );
       rowChildren = <Widget>[alphatar, chatColumn, paddingColumn];
     }

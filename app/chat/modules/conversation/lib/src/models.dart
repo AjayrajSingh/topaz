@@ -7,3 +7,4 @@ export 'models/image_url_message.dart';
 export 'models/message.dart';
 export 'models/section.dart';
 export 'models/text_message.dart';
+export 'models/user_model.dart';

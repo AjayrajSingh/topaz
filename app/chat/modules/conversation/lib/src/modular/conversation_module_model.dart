@@ -55,6 +55,9 @@ const String _kConversationContextType =
 class ChatConversationModuleModel extends ModuleModel {
   static final ListEquality<int> _intListEquality = const ListEquality<int>();
 
+  /// Creates a new instance of [ChatConversationModuleModel].
+  ChatConversationModuleModel({this.userModel});
+
   /// The currently logged in user.
   String currentUser = '';
 
@@ -206,6 +209,9 @@ class ChatConversationModuleModel extends ModuleModel {
   final Completer<String> _contentProviderUrlCompleter =
       new Completer<String>();
 
+  /// User model that holds the profile urls of each participant.
+  final UserModel userModel;
+
   @override
   Future<Null> onReady(
     ModuleContext moduleContext,
@@ -329,6 +335,19 @@ class ChatConversationModuleModel extends ModuleModel {
     }
 
     _conversation = await conversationCompleter.future;
+
+    // Update the user model.
+    if (userModel != null) {
+      Map<String, Participant> participants = <String, Participant>{};
+      for (chat_fidl.Participant participant in _conversation.participants) {
+        participants[participant.email] = new Participant(
+          email: participant.email,
+          displayName: participant.displayName,
+          photoUrl: participant.photoUrl,
+        );
+      }
+      userModel.updateModel(participants);
+    }
 
     // Get the message history.
     String messageQueueToken = await _mqConversationToken.future;

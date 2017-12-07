@@ -7,17 +7,23 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
+import 'models.dart';
 import 'src/modular/conversation_module_model.dart';
 import 'src/modular/conversation_screen.dart';
 
 void main() {
   setupLogger(name: 'chat/conversation');
 
+  UserModel userModel = new UserModel();
+
   ModuleWidget<ChatConversationModuleModel> moduleWidget =
       new ModuleWidget<ChatConversationModuleModel>(
     applicationContext: new ApplicationContext.fromStartupInfo(),
-    moduleModel: new ChatConversationModuleModel(),
-    child: const ChatConversationScreen(),
+    moduleModel: new ChatConversationModuleModel(userModel: userModel),
+    child: new ScopedModel<UserModel>(
+      model: userModel,
+      child: const ChatConversationScreen(),
+    ),
   )..advertise();
 
   runApp(moduleWidget);
