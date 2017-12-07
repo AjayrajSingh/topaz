@@ -44,6 +44,7 @@ class PlayerModel extends Model {
   bool _locallyControlled = false;
   bool _showControlOverlay = true;
   bool _failedCast = false;
+  String _errorMessage = 'UNABLE TO CAST';
   // The video has ended but the user has not uncast.
   // Replaying the video should still happen on remote device.
   bool _replayRemotely = false;
@@ -92,6 +93,21 @@ class PlayerModel extends Model {
   /// Returns whether casting failed
   bool get failedCast => _failedCast;
 
+  /// Sets whether casting failed
+  set failedCast(bool cast) {
+    _failedCast = cast;
+    notifyListeners();
+  }
+
+  /// Gets the error message
+  String get errorMessage => _errorMessage;
+
+  /// Sets the error message
+  set errorMessage(String message) {
+    _errorMessage = message;
+    notifyListeners();
+  }
+
   /// Returns whether media player controller is playing
   bool get playing => _controller.playing;
 
@@ -133,6 +149,19 @@ class PlayerModel extends Model {
   ChildViewConnection get videoViewConnection =>
       _controller.videoViewConnection;
 
+  bool _controllerHasProblem() {
+    if (_controller.problem != null) {
+      failedCast = true;
+      if (_controller.problem.type == Problem.kProblemContainerNotSupported) {
+        errorMessage = 'UNSUPPORTED VIDEO LINK';
+      } else {
+        errorMessage = 'ERROR LOADING/PLAYING VIDEO';
+      }
+      return true;
+    }
+    return false;
+  }
+
   /// When the VideoModuleModel.onReady() has finished running, the
   /// Link with the video asset has been updated to the one the user
   /// had selected from the Daisy.
@@ -143,6 +172,7 @@ class PlayerModel extends Model {
       _controller
         ..close()
         ..open(_asset.uri, serviceName: _kServiceName);
+      _controllerHasProblem();
       notifyListeners();
     }
   }
@@ -156,6 +186,9 @@ class PlayerModel extends Model {
 
   /// Plays video
   void play() {
+    if (_controllerHasProblem()) {
+      return;
+    }
     _progressTimer = new Timer.periodic(
         _kProgressBarUpdateInterval, (Timer timer) => _notifyTimerListeners());
     _locallyControlled = true;
@@ -208,8 +241,6 @@ class PlayerModel extends Model {
       _controller
         ..open(_asset.uri, serviceName: _kServiceName)
         ..seek(progress);
-      brieflyShowControlOverlay();
-      play();
     }
   }
 
@@ -225,16 +256,13 @@ class PlayerModel extends Model {
         _errorTimer = new Timer(_kOverlayAutoHideDuration, () {
           _errorTimer?.cancel();
           _errorTimer = null;
-          _failedCast = false;
-          notifyListeners();
+          failedCast = false;
         });
-        _failedCast = true;
-        notifyListeners();
+        failedCast = true;
         playLocal();
       });
     } else if (_errorTimer == null && _failedCast) {
-      _failedCast = false;
-      notifyListeners();
+      failedCast = false;
     }
     if (_controller.playing &&
         !_locallyControlled &&

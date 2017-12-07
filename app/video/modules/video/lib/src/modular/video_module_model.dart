@@ -121,7 +121,7 @@ class VideoModuleModel extends ModuleModel {
 
   /// Sets this device's media player's display mode
   ///
-  /// Notifies listeners when this value is handleasset.
+  /// Notifies listeners when this value is changed.
   void setDisplayMode(DisplayMode mode) {
     assert(mode != null);
     if (_displayMode != mode) {
@@ -142,7 +142,7 @@ class VideoModuleModel extends ModuleModel {
 
   /// Gets and sets whether or not the Device Chooser should be hidden.
   ///
-  /// Notifies listeners when this value is handleasset.
+  /// Notifies listeners when this value is changed.
   bool get hideDeviceChooser => _hideDeviceChooser;
   set hideDeviceChooser(bool hide) {
     assert(hide != null);
@@ -255,15 +255,17 @@ class VideoModuleModel extends ModuleModel {
     Map<String, String> linkContents = JSON.decode(json);
     log.fine('Updating video asset according to Daisy Link data');
     // TODO(maryxia) SO-1014 fill these in using Entities
-    String uri = linkContents['asset'];
-    if (uri != null) {
-      asset = new Asset.movie(
-        uri: Uri.parse(uri),
-        title: 'Super cool video',
-        description: 'What a great video!',
-        thumbnail: 'assets/video-thumbnail.png',
-        background: 'assets/video-background.png',
-      );
+    if (linkContents != null) {
+      String uri = linkContents['asset'];
+      if (uri != null) {
+        asset = new Asset.movie(
+          uri: Uri.parse(uri),
+          title: 'Super cool video',
+          description: 'What a great video!',
+          thumbnail: 'assets/video-thumbnail.png',
+          background: 'assets/video-background.png',
+        );
+      }
     }
   }
 

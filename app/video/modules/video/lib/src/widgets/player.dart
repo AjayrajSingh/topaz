@@ -38,7 +38,7 @@ class Player extends StatelessWidget {
           child: new Row(
             children: <Widget>[
               new Text(
-                'UNABLE TO CAST',
+                playerModel.errorMessage,
                 style: new TextStyle(
                   fontSize: 14.0,
                   color: Colors.grey[50],
@@ -71,7 +71,7 @@ class Player extends StatelessWidget {
     );
   }
 
-  Widget _buildInfo(VideoModuleModel moduleModel, PlayerModel playerModel) {
+  Widget _buildInfo(VideoModuleModel moduleModel) {
     return new Center(
       child: new Container(
         decoration: new BoxDecoration(
@@ -110,6 +110,7 @@ class Player extends StatelessWidget {
     Widget _deviceChooser = new DeviceChooser(
       playRemote: playerModel.playRemote,
     );
+
     switch (moduleModel.getDisplayMode()) {
       case DisplayMode.remoteControl:
         return new RemoteControl(
@@ -148,7 +149,6 @@ class Player extends StatelessWidget {
                 const Scrubber(),
               ],
             ),
-            // TODO(maryxia) SO-609: transparency with PhysicalModel
             new Positioned(
               bottom: 40.0,
               right: 48.0,
@@ -196,26 +196,26 @@ class Player extends StatelessWidget {
               right: 0.0,
               child: const Scrubber(),
             ),
-            // TODO(maryxia) SO-609: transparency with PhysicalModel
-            new Positioned(
-              bottom: 100.0,
-              right: 48.0,
-              child: new PhysicalModel(
-                elevation: 2.0,
-                color: Colors.black,
-                child: new Offstage(
-                  offstage: !playerModel.failedCast,
-                  child: _buildRetry(moduleModel, playerModel),
-                ),
-              ),
-            ),
             new Positioned(
               top: 10.0,
               right: 10.0,
               child: new PhysicalModel(
                 elevation: 2.0,
                 color: Colors.black,
-                child: _buildInfo(moduleModel, playerModel),
+                child: _buildInfo(moduleModel),
+              ),
+            ),
+            // TODO(maryxia) SO-609: transparency with PhysicalModel
+            new Positioned(
+              bottom: 100.0,
+              right: 48.0,
+              child: new PhysicalModel(
+                elevation: 3.0,
+                color: Colors.black,
+                child: new Offstage(
+                  offstage: !playerModel.failedCast,
+                  child: _buildRetry(moduleModel, playerModel),
+                ),
               ),
             ),
           ],
