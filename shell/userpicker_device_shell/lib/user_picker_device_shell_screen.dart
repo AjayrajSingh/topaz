@@ -32,10 +32,11 @@ class UserPickerDeviceShellScreen extends StatelessWidget {
         Widget child,
         UserPickerDeviceShellModel model,
       ) {
-        List<Widget> stackChildren = <Widget>[
-          new UserPickerScreen(),
-        ]..add(
-            // Add System Clock
+        List<Widget> stackChildren = <Widget>[];
+
+        if (model.childViewConnection == null || model.loadingChildView) {
+          stackChildren.addAll(<Widget>[
+            new UserPickerScreen(),
             new Align(
               alignment: FractionalOffset.center,
               child: new Offstage(
@@ -43,7 +44,8 @@ class UserPickerDeviceShellScreen extends StatelessWidget {
                 child: new Clock(),
               ),
             ),
-          );
+          ]);
+        }
 
         // Add kernel panic screen
         if (model.showingKernelPanic) {
