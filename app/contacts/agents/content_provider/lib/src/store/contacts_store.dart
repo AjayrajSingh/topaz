@@ -34,7 +34,7 @@ class ContactsStore<T> {
   /// Takes the displayName as the key and a set of contact ids as the value
   /// in case there are multiple contacts with the same display name
   final SplayTreeMap<String, Set<T>> _displayNameIndex =
-      new SplayTreeMap<String, Set<T>>();
+      new SplayTreeMap<String, Set<T>>(_compareDisplayNames);
 
   /// The prefix tree that allows prefix searching through all searchable fields
   final PrefixTree<Set<T>> _prefixTree = new PrefixTree<Set<T>>();
@@ -146,6 +146,11 @@ class ContactsStore<T> {
 
   /// Return whether or not the store contains a contact with the given [id]
   bool containsContact(String id) => _contactMap.containsKey(id);
+
+  /// Return the result of the case-insensitive alphabetical comparison of two contacts' display names
+  static int _compareDisplayNames(String lhs, String rhs) {
+    return lhs.toLowerCase().compareTo(rhs.toLowerCase());
+  }
 
   /// Searches through all searchable values that start with the given [prefix]
   /// Returns a map with the matching strings as keys and the contacts

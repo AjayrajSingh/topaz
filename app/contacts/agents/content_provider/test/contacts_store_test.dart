@@ -380,6 +380,30 @@ void main() {
         ContactsStore<_MockContact> store = _createStore();
         expect(store.getAllContacts(), isEmpty);
       });
+
+      test('should return contacts in case-insensitive alphabetical order', () {
+        List<_MockContact> contacts = <_MockContact>[
+          new _MockContact(
+              id: 'index-1', displayName: 'Bobby Bonilla', tags: <String>[]),
+          new _MockContact(
+              id: 'index-0', displayName: 'aaron aalderks', tags: <String>[]),
+          new _MockContact(
+              id: 'index-3', displayName: 'Zeke zephyr', tags: <String>[]),
+          new _MockContact(
+              id: 'index-2', displayName: 'calvin coolidge', tags: <String>[]),
+        ];
+        ContactsStore<_MockContact> store = _createStore();
+
+        // ignore: prefer_foreach
+        for (_MockContact c in contacts) {
+          store.addContact(c);
+        }
+
+        List<_MockContact> result = store.getAllContacts();
+        for (int index = 0; index < result.length; index++) {
+          expect(result[index].id, equals('index-$index'));
+        }
+      });
     });
 
     group('getContact', () {
