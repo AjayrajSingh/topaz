@@ -7,7 +7,6 @@ import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:armadillo/now.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.device_settings.fidl/device_settings.fidl.dart';
 import 'package:lib.logging/logging.dart';
