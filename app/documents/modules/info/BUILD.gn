@@ -4,25 +4,17 @@
 
 import("//third_party/flutter/build/flutter_app.gni")
 
-flutter_app("browser") {
-  package_name = "browser"
+flutter_app("info") {
+  package_name = "info"
 
   main_dart = "lib/main.dart"
 
   manifest = "pubspec.yaml"
 
   deps = [
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
-    "//peridot/public/lib/user/fidl:fidl_dart",
-    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/documents/services:services_dart",
     "//topaz/public/dart/entity_schemas:entity_schemas",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
-    "//topaz/public/lib/module_resolver/dart",
   ]
 }

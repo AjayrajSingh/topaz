@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -13,8 +14,11 @@ import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.module_resolver.dart/daisy_builder.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
+
+const String _kInfoModuleUrl = 'file:///system/apps/documents/info';
 
 /// The ModuleModel for the document browser
 class BrowserModuleModel extends ModuleModel {
@@ -22,7 +26,11 @@ class BrowserModuleModel extends ModuleModel {
   final doc_fidl.DocumentInterfaceProxy _docsInterfaceProxy =
       new doc_fidl.DocumentInterfaceProxy();
 
+  /// Used to talk to agents
   final AgentControllerProxy _agentControllerProxy = new AgentControllerProxy();
+
+  /// Used to start and stop modules from within the Browser module
+  final ModuleControllerProxy _moduleController = new ModuleControllerProxy();
 
   /// List of all documents for this Document Provider
   List<doc_fidl.Document> documents = <doc_fidl.Document>[];
@@ -36,11 +44,17 @@ class BrowserModuleModel extends ModuleModel {
   /// True if loading docs.
   bool _loading = true;
 
+  /// True if the Info Module is opened for a document
+  bool _infoModuleOpen = false;
+
   /// Constructor
   BrowserModuleModel();
 
   /// True if loading docs.
   bool get loading => _loading;
+
+  /// True if the Info Module is opened for a document
+  bool get infoModuleOpen => _infoModuleOpen;
 
   /// Sets the document location to preview
   // TODO(maryxia) SO-967 - no need to do a get() to download to a
@@ -49,15 +63,8 @@ class BrowserModuleModel extends ModuleModel {
     _docsInterfaceProxy.get(_currentDoc.id, (doc_fidl.Document doc) {
       // Check that user has not navigated away to another doc
       if (_currentDoc.id == doc.id) {
-        currentDoc = new doc_fidl.Document(
-          location: doc.location,
-          id: _currentDoc.id,
-          isFolder: _currentDoc.isFolder,
-          mimeType: _currentDoc.mimeType,
-          name: _currentDoc.mimeType,
-          size: _currentDoc.size,
-          thumbnailLocation: _currentDoc.thumbnailLocation,
-        );
+        _currentDoc = doc;
+        notifyListeners();
         log.fine('Downloaded file to local /tmp');
       }
     });
@@ -75,6 +82,32 @@ class BrowserModuleModel extends ModuleModel {
       notifyListeners();
       log.fine('Retrieved list of documents for BrowserModuleModel');
     });
+  }
+
+  /// Toggles the Info Module view for a [doc_fidl.Document]
+  void toggleInfo() {
+    if (_infoModuleOpen) {
+      _moduleController.stop(() {
+        _infoModuleOpen = false;
+        notifyListeners();
+      });
+    } else {
+      moduleContext.startModuleInShell(
+        'info',
+        _kInfoModuleUrl,
+        null, // default link
+        null,
+        _moduleController.ctrl.request(),
+        new SurfaceRelation(
+          arrangement: SurfaceArrangement.copresent,
+          dependency: SurfaceDependency.dependent,
+          emphasis: 0.5,
+        ),
+        false,
+      );
+      _infoModuleOpen = true;
+      notifyListeners();
+    }
   }
 
   /// Creates an Entity Reference for the currently-selected doc
@@ -95,18 +128,18 @@ class BrowserModuleModel extends ModuleModel {
       log.fine('Created Daisy for $_currentDoc.id');
 
       // Open a new module using Module Resolution
-      ModuleControllerProxy moduleController = new ModuleControllerProxy();
       moduleContext.startDaisyInShell('video', daisyBuilder.daisy, null, null,
-          moduleController.ctrl.request(), null);
-      moduleController.ctrl.close();
+          _moduleController.ctrl.request(), null);
       log.fine('Opened a new module');
       notifyListeners();
     });
   }
 
   /// Updates the currently-selected doc
+  /// Also sets the currentDocId in the Link
   set currentDoc(doc_fidl.Document doc) {
     _currentDoc = doc;
+    link.set(const <String>['currentDocId'], JSON.encode(doc.id));
     notifyListeners();
   }
 
@@ -158,5 +191,6 @@ class BrowserModuleModel extends ModuleModel {
   void onStop() {
     _docsInterfaceProxy.ctrl.close();
     _agentControllerProxy.ctrl.close();
+    _moduleController.ctrl.close();
   }
 }

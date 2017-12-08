@@ -45,7 +45,8 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
         _componentContext = componentContext,
         _agentContext = agentContext;
 
-  /// Implements the Document interface to get a document based on id
+  /// Implements the Document interface to get a [Document] based on id
+  /// This downloads and returns the local file location for the Document.
   // TODO(maryxia) SO-820 search by name as well as id
   @override
   void get(
@@ -55,6 +56,23 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
     log.fine('Retrieving a document in DocumentsContentProviderImpl');
     _docInterfaceProxy.get(documentId, (doc_fidl.Document doc) {
       log.fine('Retrieved a document');
+      callback(doc);
+    });
+  }
+
+  /// Implements the Document interface to get a [Document]'s metadata using id
+  /// This returns all the metadata (e.g. last modified, permissions)
+  /// for the Document, and also returns the webContentLink for it. However,
+  /// it does not download/return a copy of the actual Document.
+  // TODO(maryxia) SO-820 search by name as well as id
+  @override
+  void getMetadata(
+    String documentId,
+    void callback(doc_fidl.Document doc),
+  ) {
+    log.fine('Retrieving a document in DocumentsContentProviderImpl');
+    _docInterfaceProxy.getMetadata(documentId, (doc_fidl.Document doc) {
+      log.fine('Retrieved a Document metadata');
       callback(doc);
     });
   }
@@ -86,7 +104,6 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
     _entityReferenceProxy.createReference(
       doc.id,
       (String createdEntityReference) {
-        print(createdEntityReference);
         completer.complete(createdEntityReference);
       },
     );

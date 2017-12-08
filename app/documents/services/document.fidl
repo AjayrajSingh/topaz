@@ -12,12 +12,19 @@ struct Document {
   string? thumbnailLocation;
   uint64 size;
   bool isFolder;
+  array<string>? owners;
+  uint64 modified;
+  uint64 opened;
+  uint64 created;
+  array<string>? permissions;
+  string? description;
 };
 
 [ServiceName="documents.DocumentInterface"]
 
 interface DocumentInterface {
   Get@0(string documentId) => (Document? document);
-  CreateEntityReference@1(Document document) => (string entityReference);
-  List@2() => (array<Document>? documents);
+  GetMetadata@1(string documentId) => (Document? document);
+  CreateEntityReference@2(Document document) => (string entityReference);
+  List@3() => (array<Document>? documents);
 };

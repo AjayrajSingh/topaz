@@ -8,7 +8,6 @@ import 'package:lib.widgets/model.dart';
 
 import '../modular/browser_module_model.dart';
 import './image_viewer.dart';
-import './info.dart';
 import './thumbnail.dart';
 
 /// Function to call when we toggle on the Image Preview
@@ -47,7 +46,6 @@ class Browser extends StatelessWidget {
       } else {
         mainDocView = new Expanded(
           child: new Container(
-            color: Colors.green[100],
             child: new GridView.count(
               children: model.documents.map((doc_fidl.Document doc) {
                 return new Thumbnail(
@@ -62,34 +60,56 @@ class Browser extends StatelessWidget {
           ),
         );
       }
+
+      // TODO(maryxia) get this name dynamically
+      Widget headerNavigation = new Container(
+        padding: const EdgeInsets.all(8.0),
+        child: const Text('Documents'),
+      );
+
+      Widget headerActions = new Row(children: <Widget>[
+        new IconButton(
+          icon: new Icon(Icons.refresh),
+          tooltip: 'Refresh list of documents',
+          onPressed: model.listDocs,
+        ),
+        new IconButton(
+          icon: new Icon(Icons.open_in_new),
+          tooltip: 'Preview document',
+          // TODO(maryxia) SO-662 open the file with correct module
+          onPressed: _canBePreviewed(model.currentDoc)
+              ? () => _previewImage(model, true)
+              : (model.currentDoc == null ? null : model.createDocEntityRef),
+        ),
+        new IconButton(
+          icon: new Icon(
+            Icons.info,
+            color: model.infoModuleOpen ? Colors.teal[400] : Colors.black,
+          ),
+          tooltip: 'Document info',
+          onPressed: model.currentDoc != null ? model.toggleInfo : null,
+        ),
+        new IconButton(
+          icon: new Icon(Icons.create_new_folder),
+          tooltip: 'Create new...',
+          onPressed: null,
+        ),
+      ]);
+
+      Widget header = new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          headerNavigation,
+          headerActions,
+        ],
+      );
+
       Widget browser = new Column(
         children: <Widget>[
-          new Container(
-            height: 50.0,
-            width: 200.0,
-            child: new FlatButton(
-              onPressed: model.listDocs,
-              color: Colors.green,
-              child: const Text('List Documents'),
-            ),
-          ),
-          new FlatButton(
-            // TODO(maryxia) SO-662 open the file with correct module
-            onPressed: _canBePreviewed(model.currentDoc)
-                ? () => _previewImage(model, true)
-                : (model.currentDoc == null ? null : model.createDocEntityRef),
-            color: Colors.green[300],
-            child: _canBePreviewed(model.currentDoc)
-                ? const Text('Preview Image')
-                : const Text('Open Document'),
-          ),
+          header,
           mainDocView,
         ],
       );
-      Widget info = new Container();
-      if (model.currentDoc != null) {
-        info = new Info(doc: model.currentDoc);
-      }
 
       // Generic image viewer
       Widget imageViewer = new Container();
@@ -106,14 +126,7 @@ class Browser extends StatelessWidget {
       return new Material(
         child: new Stack(
           children: <Widget>[
-            new Row(
-              children: <Widget>[
-                new Expanded(
-                  child: browser,
-                ),
-                info,
-              ],
-            ),
+            browser,
             imageViewer,
           ],
         ),

@@ -11,6 +11,7 @@ package("documents") {
   deps = [
     "//topaz/app/documents/agents",
     "//topaz/app/documents/modules/browser",
+    "//topaz/app/documents/modules/info",
     "//topaz/app/documents/services",
   ]
 
@@ -18,6 +19,10 @@ package("documents") {
     {
       name = "documents/browser"
       source = "gen/topaz/app/documents/modules/browser/browser.flx"
+    },
+    {
+      name = "documents/info"
+      source = "gen/topaz/app/documents/modules/info/info.flx"
     },
     {
       # This is what shows up in file:///system/apps/documents/content_provider

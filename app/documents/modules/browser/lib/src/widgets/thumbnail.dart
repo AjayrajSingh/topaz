@@ -55,32 +55,42 @@ class Thumbnail extends StatelessWidget {
       width: _kThumbnailSize,
       margin: const EdgeInsets.all(4.0),
       child: new Material(
-        child: new FlatButton(
-          color: selected ? Colors.pink[50] : Colors.teal[50],
-          onPressed: onPressed,
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              _showThumbnail()
-                  // TODO(maryxia) SO-969 check if image is .network or .file
-                  ? new Image.network(
-                      doc.thumbnailLocation,
-                      height: 70.0,
-                    )
-                  : new Icon(
-                      doc.isFolder ? Icons.folder : Icons.insert_drive_file,
-                      size: 40.0,
-                    ),
-              new Text(
-                doc.name,
-                textAlign: TextAlign.center,
-                style: new TextStyle(
-                  color: Colors.purple,
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.w700,
+        child: new Container(
+          decoration: new BoxDecoration(
+            borderRadius: new BorderRadius.circular(2.0),
+            border: new Border.all(
+              width: 1.0,
+              color: selected ? Colors.teal[400] : Colors.grey[400],
+            ),
+          ),
+          child: new FlatButton(
+            color: selected ? Colors.teal[50] : Colors.grey[50],
+            onPressed: onPressed,
+            child: new Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                _showThumbnail()
+                    // TODO(maryxia) SO-969 check if image is .network or .file
+                    ? new Image.network(
+                        doc.thumbnailLocation,
+                        height: 70.0,
+                      )
+                    : new Icon(
+                        doc.isFolder ? Icons.folder : Icons.insert_drive_file,
+                        size: 40.0,
+                        color: selected ? Colors.teal[400] : Colors.grey[800],
+                      ),
+                new Text(
+                  doc.name,
+                  textAlign: TextAlign.center,
+                  style: new TextStyle(
+                    color: selected ? Colors.teal[400] : Colors.grey[800],
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
