@@ -145,6 +145,9 @@ class ChatContentProviderImpl extends ChatContentProvider {
   /// Called when a new message is received.
   final OnMessageReceived onMessageReceived;
 
+  /// Indicates whether the agent returned an unrecoverable error.
+  bool _unrecoverable = false;
+
   /// Creates a new [ChatContentProviderImpl] instance.
   ChatContentProviderImpl({
     @required this.componentContext,
@@ -173,6 +176,9 @@ class ChatContentProviderImpl extends ChatContentProvider {
       // TODO: store this state and retry when the agent starts up again
       // https://fuchsia.atlassian.net/browse/SO-340
       log.severe('Failed to initialize transport', err);
+      if (err is ChatUnrecoverableException) {
+        _unrecoverable = true;
+      }
     });
 
     try {
@@ -315,6 +321,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
       Conversation conversation,
     ),
   ) async {
+    if (_unrecoverable) {
+      callback(ChatStatus.unrecoverableError, null);
+      return;
+    }
+
     try {
       try {
         await _ledgerReady.future;
@@ -397,6 +408,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
     List<int> conversationId,
     void callback(ChatStatus chatStatus),
   ) async {
+    if (_unrecoverable) {
+      callback(ChatStatus.unrecoverableError);
+      return;
+    }
+
     try {
       try {
         await _ledgerReady.future;
@@ -431,6 +447,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
     bool wait,
     void callback(ChatStatus chatStatus, Conversation conversation),
   ) async {
+    if (_unrecoverable) {
+      callback(ChatStatus.unrecoverableError, null);
+      return;
+    }
+
     try {
       try {
         await _ledgerReady.future;
@@ -460,6 +481,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
     String messageQueueToken,
     void callback(ChatStatus chatStatus, List<Conversation> conversations),
   ) async {
+    if (_unrecoverable) {
+      callback(ChatStatus.unrecoverableError, const <Conversation>[]);
+      return;
+    }
+
     try {
       try {
         await _ledgerReady.future;
@@ -516,6 +542,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
     String title,
     void callback(ChatStatus chatStatus),
   ) async {
+    if (_unrecoverable) {
+      callback(ChatStatus.unrecoverableError);
+      return;
+    }
+
     try {
       try {
         await _ledgerReady.future;
@@ -608,6 +639,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
     String messageQueueToken,
     void callback(ChatStatus chatStatus, List<Message> messages),
   ) async {
+    if (_unrecoverable) {
+      callback(ChatStatus.unrecoverableError, const <Message>[]);
+      return;
+    }
+
     try {
       try {
         await _ledgerReady.future;
@@ -665,6 +701,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
     List<int> messageId,
     void callback(ChatStatus chatStatus, Message message),
   ) async {
+    if (_unrecoverable) {
+      callback(ChatStatus.unrecoverableError, null);
+      return;
+    }
+
     try {
       try {
         await _ledgerReady.future;
@@ -738,6 +779,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
     String jsonPayload,
     void callback(ChatStatus chatStatus, List<int> messageId),
   ) async {
+    if (_unrecoverable) {
+      callback(ChatStatus.unrecoverableError, const <int>[]);
+      return;
+    }
+
     try {
       try {
         await _ledgerReady.future;
@@ -840,6 +886,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
     List<int> messageId,
     void callback(ChatStatus chatStatus),
   ) async {
+    if (_unrecoverable) {
+      callback(ChatStatus.unrecoverableError);
+      return;
+    }
+
     try {
       try {
         await _ledgerReady.future;

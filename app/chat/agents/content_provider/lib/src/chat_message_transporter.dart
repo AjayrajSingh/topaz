@@ -39,6 +39,14 @@ abstract class ChatException implements Exception {
   }
 }
 
+/// An [Exception] thrown when an unrecoverable exception is detected while
+/// initializing the transport.
+class ChatUnrecoverableException extends ChatException {
+  /// Creates a new instance of [ChatUnrecoverableException].
+  ChatUnrecoverableException([Object message, Object innerException])
+      : super(message, innerException);
+}
+
 /// An [Exception] thrown when the authentication process has failed.
 class ChatAuthenticationException extends ChatException {
   /// Creates a new instance of [ChatAuthenticationException].

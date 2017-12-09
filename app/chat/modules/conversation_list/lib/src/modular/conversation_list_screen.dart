@@ -25,6 +25,10 @@ class ChatConversationListScreen extends StatelessWidget {
           Widget child,
           ChatConversationListModuleModel model,
         ) {
+          if (model.unrecoverable) {
+            return const ErrorScreen();
+          }
+
           List<Widget> stackChildren = <Widget>[
             new ChatConversationList(
               title: model.title,

@@ -102,6 +102,20 @@ class ChatConversationListModuleModel extends ModuleModel {
   /// Indicates whether the data is being fetched from the local Ledger.
   bool _isFetching = true;
 
+  /// Indicates whether the agent sent an unrecoverable error.
+  bool get unrecoverable => _unrecoverable;
+  set unrecoverable(bool value) {
+    if (_unrecoverable != value) {
+      _unrecoverable = value;
+      if (value) {
+        _conversationModuleController?.defocus();
+      }
+      notifyListeners();
+    }
+  }
+
+  bool _unrecoverable = false;
+
   /// The form model.
   final FormModel formModel;
 
@@ -398,6 +412,11 @@ class ChatConversationListModuleModel extends ModuleModel {
         log.severe('ChatContentProvider::GetConversations() returned an error '
             'status: $status');
         _conversations = null;
+
+        if (status == chat_fidl.ChatStatus.unrecoverableError) {
+          unrecoverable = true;
+        }
+
         notifyListeners();
 
         showError('Error: $status');
@@ -634,7 +653,12 @@ class ChatConversationListModuleModel extends ModuleModel {
           log.severe('ChatContentProvider::NewConversation() returned an error '
               'status: $status');
 
-          showError('Error: $status');
+          if (status == chat_fidl.ChatStatus.unrecoverableError) {
+            unrecoverable = true;
+          } else {
+            showError('Error: $status');
+          }
+
           return;
         }
 
@@ -694,7 +718,11 @@ class ChatConversationListModuleModel extends ModuleModel {
       conversationId,
       (chat_fidl.ChatStatus status) {
         if (status != chat_fidl.ChatStatus.ok) {
-          showError('Error: $status');
+          if (status == chat_fidl.ChatStatus.unrecoverableError) {
+            unrecoverable = true;
+          } else {
+            showError('Error: $status');
+          }
         }
       },
     );

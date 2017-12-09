@@ -107,35 +107,42 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
         throw new Exception('TokenProvider is not provided.');
       }
 
-      // See if the required config values are all provided.
-      Config config = await Config.read('/system/data/modules/config.json');
-      List<String> keys = <String>[
-        'chat_firebase_api_key',
-        'chat_firebase_project_id',
-      ];
+      FirebaseToken firebaseToken;
+      try {
+        // See if the required config values are all provided.
+        Config config = await Config.read('/system/data/modules/config.json');
+        List<String> keys = <String>[
+          'chat_firebase_api_key',
+          'chat_firebase_project_id',
+        ];
 
-      config.validate(keys);
-      _config = config;
+        config.validate(keys);
+        _config = config;
 
-      Completer<FirebaseToken> tokenCompleter = new Completer<FirebaseToken>();
-      AuthErr authErr;
-      _tokenProvider.getFirebaseAuthToken(
-        _config.get('chat_firebase_api_key'),
-        (FirebaseToken token, AuthErr err) {
-          tokenCompleter.complete(token);
-          authErr = err;
-        },
-      );
+        Completer<FirebaseToken> tokenCompleter =
+            new Completer<FirebaseToken>();
+        AuthErr authErr;
+        _tokenProvider.getFirebaseAuthToken(
+          _config.get('chat_firebase_api_key'),
+          (FirebaseToken token, AuthErr err) {
+            tokenCompleter.complete(token);
+            authErr = err;
+          },
+        );
 
-      FirebaseToken firebaseToken = await tokenCompleter.future;
-      if (firebaseToken == null ||
-          firebaseToken.idToken == null ||
-          firebaseToken.idToken.isEmpty) {
-        throw new Exception('Could not obtain the Firebase token.');
-      }
+        firebaseToken = await tokenCompleter.future;
+        if (firebaseToken == null ||
+            firebaseToken.idToken == null ||
+            firebaseToken.idToken.isEmpty) {
+          throw new Exception('Could not obtain the Firebase token.');
+        }
 
-      if (authErr.status != Status.ok) {
-        throw new Exception('Error fetching firebase token:${authErr.message}');
+        if (authErr.status != Status.ok) {
+          throw new Exception(
+              'Error fetching firebase token:${authErr.message}');
+        }
+      } on Object catch (e) {
+        throw new ChatUnrecoverableException('Initialization failed', e);
       }
 
       _email = _normalizeEmail(firebaseToken.email);
@@ -149,6 +156,8 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
       _startProcessingEventStream();
 
       _ready.complete();
+    } on ChatException {
+      rethrow;
     } on Exception catch (e) {
       ChatAuthenticationException cae = new ChatAuthenticationException(
         'Firebase authentication failed.',
