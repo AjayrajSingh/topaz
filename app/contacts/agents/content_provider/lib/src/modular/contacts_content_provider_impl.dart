@@ -12,6 +12,7 @@ import 'package:lib.agent.fidl/agent_context.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.entity.fidl/entity_provider.fidl.dart';
 import 'package:lib.entity.fidl/entity_reference_factory.fidl.dart';
 import 'package:lib.ledger.dart/ledger.dart';
@@ -47,6 +48,7 @@ class _DataProvider {
         assert(agentControllerProxy != null);
 }
 
+// TODO: Handle cases where payloads exceeds fidl message size limit SO-1038
 /// Initial stub implementation
 class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     implements EntityProvider {
@@ -71,6 +73,11 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
 
   /// Watcher to keep track of updates to the Ledger [Page]
   ContactsWatcher _contactsWatcher;
+
+  /// Keep track of subscribers via a map of message queue tokens to the
+  /// message sender proxies
+  final Map<String, MessageSenderProxy> _messageSenders =
+      <String, MessageSenderProxy>{};
 
   /// Constructor
   ContactsContentProviderImpl({
@@ -121,8 +128,13 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   @override
   Future<Null> getContactList(
     String prefix,
+    String messageQueueToken,
     void callback(fidl.Status status, List<fidl.Contact> contacts),
   ) async {
+    if (messageQueueToken != null) {
+      _subscribe(messageQueueToken);
+    }
+
     List<fidl.Contact> contactsList;
     if (prefix == null || prefix == '') {
       contactsList = _contactsStore.getAllContacts();
@@ -185,6 +197,31 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     entityReference ??= '';
     entityReferenceProxy.ctrl.close();
     callback(status, entityReference);
+  }
+
+  void _subscribe(String messageQueueToken) {
+    log.fine('Subscribe called');
+    if (!_messageSenders.containsKey(messageQueueToken)) {
+      // TODO: handle getMessageSender failures and somehow propagate that back
+      // to the callers SO-1040
+      MessageSenderProxy messageSender = new MessageSenderProxy();
+      _componentContext.getMessageSender(
+        messageQueueToken,
+        messageSender.ctrl.request(),
+      );
+      _messageSenders[messageQueueToken] = messageSender;
+      log.info('Added subscription for token $messageQueueToken');
+    }
+  }
+
+  @override
+  void unsubscribe(String messageQueueToken) {
+    log.fine('Unsubscribe called');
+    MessageSenderProxy messageSender = _messageSenders[messageQueueToken];
+    if (messageSender != null) {
+      messageSender.ctrl.close();
+      _messageSenders.remove(messageSender);
+    }
   }
 
   @override
@@ -318,6 +355,16 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
       initialSnapshot: snapshot,
       processEntriesCallback: (List<ledger.Entry> entries) {
         _addContactsToStore(_getContactsFromEntries(entries));
+
+        // Notify all subscribers that the list of contacts has changed
+        Map<String, dynamic> message = <String, dynamic>{
+          'contact_list': _contactsStore.getAllContacts()
+        };
+        String json = JSON.encode(message);
+        log.info('Sending update to ${_messageSenders.length} subscribers');
+        for (MessageSenderProxy ms in _messageSenders.values) {
+          ms.send(json);
+        }
       },
     );
 

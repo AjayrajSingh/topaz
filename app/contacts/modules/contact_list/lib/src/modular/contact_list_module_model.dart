@@ -8,7 +8,9 @@ import 'dart:convert' show JSON;
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.component.dart/component.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
@@ -25,6 +27,7 @@ const String _kContactsContentProviderUrl =
     'file:///system/apps/contacts_content_provider';
 const String _kContactCardModuleUrl =
     'file:///system/apps/contacts/contact_card';
+const String _kContactsUpdateQueue = 'contacts_update_queue';
 
 /// Call back definition for [ContactListModuleModel]'s subscribe method.
 typedef void OnSubscribeCallback(List<ContactItem> newContactList);
@@ -53,6 +56,11 @@ class ContactListModuleModel extends ModuleModel {
   // Proxies for the Contact Card Module
   final ModuleControllerProxy _contactCardModuleController =
       new ModuleControllerProxy();
+
+  // Message queue proxies for receiving updates from the content provider
+  final MessageQueueProxy _messageQueue = new MessageQueueProxy();
+  MessageReceiverImpl _messageQueueReceiver;
+  final Completer<String> _messageQueueToken = new Completer<String>();
 
   /// The [ContactListModel] that serves as the data store for the UI and
   /// contains the behaviors that users can use to mutate the data
@@ -86,12 +94,27 @@ class ContactListModuleModel extends ModuleModel {
     );
     connectToService(contentProviderServices, _contactsContentProvider.ctrl);
 
+    // Create a message queue to pass to the content provider agent for updates
+    componentContext.obtainMessageQueue(
+      _kContactsUpdateQueue,
+      _messageQueue.ctrl.request(),
+    );
+
+    // Save token to be passed to subscribe call
+    _messageQueue.getToken(_messageQueueToken.complete);
+    _messageQueueReceiver = new MessageReceiverImpl(
+      messageQueue: _messageQueue,
+      onReceiveMessage: _onReceiveMessage,
+    );
+
     // Close all unnecessary bindings
     contentProviderServices.ctrl.close();
     componentContext.ctrl.close();
 
-    // Fetch the contacts list
+    // Fetch the contacts list and subscribe to updates only after we have
+    // gotten the initial results
     model.contacts = await _getContactList();
+    moduleContext.ready();
   }
 
   void _startContactCardModule() {
@@ -117,7 +140,13 @@ class ContactListModuleModel extends ModuleModel {
   }
 
   @override
-  void onStop() {
+  Future<Null> onStop() async {
+    log.fine('onStop called');
+    String token = await _messageQueueToken.future;
+    _contactsContentProvider.unsubscribe(token);
+    _messageQueueReceiver.close();
+    _messageQueue.ctrl.close();
+
     // Close the connection so that the agent knows that this module is no
     // longer using it
     _contactsContentProviderController.ctrl.close();
@@ -154,7 +183,8 @@ class ContactListModuleModel extends ModuleModel {
             new _ContactListResponse(status: status, contacts: contacts));
       });
     } else {
-      _contactsContentProvider.getContactList(prefix, (
+      String token = await _messageQueueToken.future;
+      _contactsContentProvider.getContactList(prefix, token, (
         contacts_fidl.Status status,
         List<contacts_fidl.Contact> contacts,
       ) {
@@ -220,4 +250,34 @@ class ContactListModuleModel extends ModuleModel {
         displayName: c.displayName,
         photoUrl: c.photoUrl,
       );
+
+  /// Handle messages received on the message queue
+  void _onReceiveMessage(String data, void ack()) {
+    ack();
+
+    Map<String, dynamic> updates = JSON.decode(data);
+    log.info('Decoded contact updates = $updates');
+
+    if (updates.containsKey('contact_list')) {
+      List<ContactItem> updatedContacts = updates['contact_list']
+          .map(_getContactFromJson)
+          .where((ContactItem c) => c != null)
+          .toList();
+
+      // TODO(meiyili): update search results if we are on the search results
+      // view
+      model.contacts = updatedContacts;
+    }
+  }
+
+  ContactItem _getContactFromJson(Map<String, dynamic> json) {
+    if (json is Map) {
+      return new ContactItem(
+          id: json['contactId'],
+          displayName: json['displayName'],
+          photoUrl: json['photoUrl']);
+    } else {
+      return null;
+    }
+  }
 }

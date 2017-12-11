@@ -90,6 +90,7 @@ class ContactsPickerModuleModel extends ModuleModel {
         new Completer<contacts_fidl.Status>();
     _contactsContentProvider.getContactList(
       linkData.prefix,
+      null,
       (contacts_fidl.Status status, List<contacts_fidl.Contact> contacts) {
         contactList.addAll(
           contacts.map(
