@@ -40,8 +40,11 @@ class _EditSession {
       InputEvent event) {
     // increment to next odd revision
     int newRev = _maxRev + (_maxRev & 1) + 1;
-    TextInputState newState =
-        new TextInputState.init(newRev, text, selection, composing);
+    TextInputState newState = new TextInputState.init(
+        revision: newRev,
+        text: text,
+        selection: selection,
+        composing: composing);
     _maxRev = newRev;
     _state = newState;
     _client.didUpdateState(newState, event);
@@ -64,8 +67,8 @@ class _EditSession {
         int end = max(_state.selection.base, _state.selection.extent);
         String newText = _state.text.replaceRange(start, end, newChar);
         int cursor = start + newChar.length;
-        TextSelection newSelection =
-            new TextSelection.init(cursor, cursor, TextAffinity.downstream);
+        TextSelection newSelection = new TextSelection.init(
+            base: cursor, extent: cursor, affinity: TextAffinity.downstream);
         updateState(newText, newSelection, new TextRange(), event);
         return true;
       }
