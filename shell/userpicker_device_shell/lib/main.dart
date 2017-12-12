@@ -139,6 +139,11 @@ void main() {
     );
   }
 
+  NetstackModel netstackModel = new NetstackModel(
+    netstack: netstackProxy,
+    tickerProvider: userPickerDeviceShellModel,
+  )..start();
+
   if (_kEnableNetworkingIndicators) {
     overlays.add(
       new OverlayEntry(
@@ -152,13 +157,7 @@ void main() {
                   borderRadius: new BorderRadius.circular(8.0),
                   child: new Container(
                     padding: const EdgeInsets.all(8.0),
-                    child: new ScopedModel<NetstackModel>(
-                      model: new NetstackModel(
-                        netstack: netstackProxy,
-                        tickerProvider: userPickerDeviceShellModel,
-                      ),
-                      child: new _NetstackInfo(),
-                    ),
+                    child: new _NetstackInfo(),
                   ),
                 ),
               ),
@@ -179,7 +178,10 @@ void main() {
           (constraints.biggest == Size.zero)
               ? const Offstage()
               : new _ElevatedCheckedModeBanner(
-                  child: new Overlay(initialEntries: overlays),
+                  child: new ScopedModel<NetstackModel>(
+                    model: netstackModel,
+                    child: new Overlay(initialEntries: overlays),
+                  ),
                 ),
     ),
   );

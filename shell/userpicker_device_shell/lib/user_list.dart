@@ -4,8 +4,10 @@
 
 import 'package:lib.auth.fidl.account/account.fidl.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
+import 'netstack_model.dart';
 import 'user_picker_device_shell_model.dart';
 
 const double _kUserAvatarSizeLarge = 56.0;
@@ -74,9 +76,10 @@ class UserList extends StatelessWidget {
     VoidCallback onTap,
     bool isSmall,
     double width,
+    bool isDisabled: false,
   }) {
     return new GestureDetector(
-      onTap: () => onTap?.call(),
+      onTap: isDisabled ? null : () => onTap?.call(),
       child: new Container(
         height: (isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge),
         width: width ?? (isSmall ? _kButtonWidthSmall : _kButtonWidthLarge),
@@ -86,7 +89,7 @@ class UserList extends StatelessWidget {
           borderRadius:
               isSmall ? _kButtonBorderRadiusPhone : _kButtonBorderRadiusLarge,
           border: new Border.all(
-            color: Colors.white,
+            color: isDisabled ? Colors.grey : Colors.white,
             width: 1.0,
           ),
         ),
@@ -118,20 +121,28 @@ class UserList extends StatelessWidget {
           onTap: model.wifiTapped,
           isSmall: isSmall,
         ),
-        _buildUserActionButton(
-          child: new Text(
-            'LOGIN',
-            style: new TextStyle(
-              fontSize: fontSize,
-              color: Colors.white,
-            ),
-          ),
-          onTap: () {
-            model
-              ..createAndLoginUser()
-              ..hideUserActions();
-          },
-          isSmall: isSmall,
+        new ScopedModelDescendant<NetstackModel>(
+          builder: (
+            BuildContext context,
+            Widget child,
+            NetstackModel netstackModel,
+          ) =>
+              _buildUserActionButton(
+                isDisabled: !netstackModel.hasIp,
+                child: new Text(
+                  'LOGIN',
+                  style: new TextStyle(
+                    fontSize: fontSize,
+                    color: netstackModel.hasIp ? Colors.white : Colors.grey,
+                  ),
+                ),
+                onTap: () {
+                  model
+                    ..createAndLoginUser()
+                    ..hideUserActions();
+                },
+                isSmall: isSmall,
+              ),
         ),
         _buildUserActionButton(
           child: new Text(

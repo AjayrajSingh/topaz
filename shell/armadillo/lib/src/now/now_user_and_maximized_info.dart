@@ -144,7 +144,7 @@ class NowUserAndMaximizedContext extends StatelessWidget {
                       ),
                       child: new Text(
                         contextModel.userName ?? '',
-                        style: _kTextStyle,
+                        style: _kTextStyle.copyWith(color: Colors.white),
                       ),
                     ),
                   ),

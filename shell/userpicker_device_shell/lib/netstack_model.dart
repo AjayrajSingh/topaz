@@ -2,78 +2,86 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
-
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.netstack.fidl/netstack.fidl.dart';
+import 'package:lib.netstack.fidl/netstack.fidl.dart' as net;
 import 'package:lib.widgets/model.dart';
 
 const String _kLoopbackInterfaceName = 'en1';
 
 /// Provides netstack information.
-class NetstackModel extends Model {
+class NetstackModel extends Model implements net.NotificationListener {
   /// The netstack containing networking information for the device.
-  final Netstack netstack;
+  final net.Netstack netstack;
 
   final Map<int, InterfaceInfo> _interfaces = <int, InterfaceInfo>{};
-
-  /// How often to poll the netstack for interface and stats information.
-  final Duration updatePeriod;
 
   /// Ticker provider for animations.
   final TickerProvider tickerProvider;
 
+  net.NotificationListenerBinding _binding;
+
   /// Constructor.
   NetstackModel({
     this.netstack,
-    this.updatePeriod: const Duration(seconds: 1),
     this.tickerProvider,
-  }) {
-    _update();
-    new Timer.periodic(updatePeriod, (_) {
-      _update();
-    });
+  });
+
+  /// Starts listening for netstack interfaces.
+  void start() {
+    _binding?.close();
+    _binding = new net.NotificationListenerBinding();
+    netstack
+      ..registerListener(_binding.wrap(this))
+      ..getInterfaces(onInterfacesChanged);
   }
 
-  void _update() {
-    netstack.getInterfaces((List<NetInterface> interfaces) {
-      List<NetInterface> filteredInterfaces = interfaces
-          .where((NetInterface interface) =>
-              interface.name != _kLoopbackInterfaceName)
-          .toList();
+  /// Stops listening for netstack interfaces.
+  void stop() {
+    _binding?.close();
+  }
 
-      List<int> ids = filteredInterfaces
-          .map((NetInterface interface) => interface.id)
-          .toList();
+  @override
+  void onInterfacesChanged(List<net.NetInterface> interfaces) {
+    List<net.NetInterface> filteredInterfaces = interfaces
+        .where((net.NetInterface interface) =>
+            interface.name != _kLoopbackInterfaceName)
+        .toList();
 
-      _interfaces.keys
-          .where((int id) => !ids.contains(id))
-          .toList()
-          .forEach(_interfaces.remove);
+    List<int> ids = filteredInterfaces
+        .map((net.NetInterface interface) => interface.id)
+        .toList();
 
-      for (NetInterface interface in filteredInterfaces) {
-        netstack.getStats(
-          interface.id,
-          (NetInterfaceStats stats) {
-            if (_interfaces[interface.id] == null) {
-              _interfaces[interface.id] = new InterfaceInfo(
-                interface,
-                stats,
-                tickerProvider,
-              );
-            } else {
-              _interfaces[interface.id]._update(interface, stats);
-            }
-            notifyListeners();
-          },
-        );
-      }
-    });
+    _interfaces.keys
+        .where((int id) => !ids.contains(id))
+        .toList()
+        .forEach(_interfaces.remove);
+
+    for (net.NetInterface interface in filteredInterfaces) {
+      netstack.getStats(
+        interface.id,
+        (net.NetInterfaceStats stats) {
+          if (_interfaces[interface.id] == null) {
+            _interfaces[interface.id] = new InterfaceInfo(
+              interface,
+              stats,
+              tickerProvider,
+            );
+          } else {
+            _interfaces[interface.id]._update(interface, stats);
+          }
+          notifyListeners();
+        },
+      );
+    }
   }
 
   /// The current interfaces on the device.
   List<InterfaceInfo> get interfaces => _interfaces.values.toList();
+
+  /// Returns true if the netstack has an ip.
+  bool get hasIp =>
+      interfaces.any((InterfaceInfo interfaceInfo) => interfaceInfo.hasIp);
 }
 
 const Duration _kRevealAnimationDuration = const Duration(milliseconds: 200);
@@ -92,8 +100,8 @@ class InterfaceInfo {
 
   /// The animation to use when repeating sending information.
   AnimationController sendingRepeatAnimation;
-  NetInterface _interface;
-  NetInterfaceStats _stats;
+  net.NetInterface _interface;
+  net.NetInterfaceStats _stats;
   bool _receiving = false;
   bool _sending = false;
 
@@ -120,7 +128,15 @@ class InterfaceInfo {
   /// Name of the interface.
   String get name => _interface.name;
 
-  void _update(NetInterface interface, NetInterfaceStats stats) {
+  /// Returns true if we have an ip.
+  bool get hasIp =>
+      ((_interface.addr.ipv4?.length ?? 0) == 4 &&
+          _interface.addr.ipv4[0] != 0) ||
+      ((_interface.addr.ipv6?.length ?? 0) == 6 &&
+          _interface.addr.ipv6[0] != 0 &&
+          (_interface.addr.ipv6[0] << 8 | _interface.addr.ipv6[1]) != 0xfe80);
+
+  void _update(net.NetInterface interface, net.NetInterfaceStats stats) {
     _interface = interface;
 
     bool oldReceiving = _receiving;
