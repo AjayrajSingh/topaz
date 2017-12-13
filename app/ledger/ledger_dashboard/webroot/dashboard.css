@@ -21,7 +21,7 @@ body {
 }
 
 .head-commits-card {
-  grid-column-end: span 3;
+  grid-column-end: span 12;
 }
 
 .keys-values-card {
@@ -57,4 +57,18 @@ body {
 #keys-entries-list li {
   border-bottom: 1px solid #D3D3D3;
   margin:0 0 10px 0;
+}
+
+.text {
+  font: 10px sans-serif;
+}
+
+.line {
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
 }

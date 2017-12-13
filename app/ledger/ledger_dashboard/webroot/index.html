@@ -14,6 +14,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <!-- AngularJS CDN -->
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  <script src="http://d3js.org/d3.v4.min.js"></script>
   <!-- Material Components CDN -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
@@ -75,7 +76,7 @@
               </section>
               <section class="mdc-card__supporting-text">
                 <ul id="ledger-pages-list" class="mdc-list">
-                  <li class="mdc-list-item" ng-class="{ 'selected-class-name': $index == selectedPageIndex }" ng-repeat="x in pagesList" ng-click="getCommitsList($index)">
+                  <li class="mdc-list-item" ng-class="{ 'selected-class-name': $index == selectedPageIndex }" ng-repeat="x in pagesList" ng-click="getHeadCommitsList($index)">
                     {{ bytesToString(x) }}
                   </li>
                   <li ng-hide="pagesList.length > 0">
@@ -88,17 +89,13 @@
           <div class="cell mdc-layout-grid__cell head-commits-card" ng-show="showCommits">
             <div class="mdc-card">
               <section class="mdc-card__primary">
-                <h1 class="mdc-card__title mdc-card__title--large">Head Commits (Base64)</h1>
+                <h1 class="mdc-card__title mdc-card__title--large">Commits Graph</h1>
               </section>
               <section class="mdc-card__supporting-text">
-                <ul id="head-commits-list" class="mdc-list">
-                  <li class="mdc-list-item" ng-class="{ 'selected-class-name': $index == selectedCommitIndex }" ng-repeat="x in commitsList" ng-click="getEntriesList($index)">
-                    {{ bytesToBase64(x) }}
-                  </li>
-                  <li ng-hide="commitsList.length > 0">
-                    There's no commits for this page.
-                  </li>
-                </ul>
+                <span ng-hide="headCommitsList.length > 0">There's no commits for this page.</span>
+                <div id="svg-container">
+                  <svg id="commits-graph"></svg>
+                </div>
               </section>
             </div> <!-- mdc_card -->
           </div> <!-- cell -->
@@ -108,6 +105,9 @@
                 <h1 class="mdc-card__title mdc-card__title--large">Ledger Entries</h1>
               </section>
               <section class="mdc-card__supporting-text">
+                <span ng-hide="commitsObjDict[selectedCommitId]['generation'] > 0"> <i>This is the Root Commit</i> <br> </span>
+                <i>Timestamp:</i> {{ commitsObjDict[selectedCommitId]['timestamp'] }} <br>
+                <i>Generation:</i> {{ commitsObjDict[selectedCommitId]['generation'] }} <br>
                 <ul id="keys-entries-list" class="mdc-list">
                   <li ng-repeat="x in entriesList">
                       <i>Key:</i> {{ bytesToString(x[0]) }} <br>

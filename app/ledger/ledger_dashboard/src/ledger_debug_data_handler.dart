@@ -130,9 +130,13 @@ class LedgerDebugDataHandler extends DataHandler {
     if (request['instance_name'] != null && isValidId(request['instance_name']))
       handlePagesRequest(socketHolder, request);
     else if (request['page_name'] != null && isValidId(request['page_name']))
-      handleCommitsRequest(socketHolder, request);
-    else if (request['commit_id'] != null && isValidId(request['commit_id']))
+      handleHeadCommitsRequest(socketHolder, request);
+    else if (request['commit_id'] != null &&
+        isValidId(request['commit_id']))
       handleEntriesRequest(socketHolder, request);
+    else if (request['commit_obj_id'] != null &&
+        isValidId(request['commit_obj_id']))
+      handleCommitObjRequest(socketHolder, request);
   }
 
   bool isValidId(List<int> request) {
@@ -162,7 +166,7 @@ class LedgerDebugDataHandler extends DataHandler {
     socketHolder.ledgerDebug = ledgerDebug;
   }
 
-  void handleCommitsRequest(
+  void handleHeadCommitsRequest(
       WebSocketHolder socketHolder, Map<String, List<int>> request) {
     if (socketHolder.ledgerDebug != null) {
       PageDebugProxy pageDebug = new PageDebugProxy();
@@ -170,7 +174,7 @@ class LedgerDebugDataHandler extends DataHandler {
         print('Connection Error on Page Debug: ${pageDebug.hashCode}');
       };
       socketHolder.ledgerDebug
-          .getPageDebug(request['page_name'], pageDebug.ctrl.request(),
+          ?.getPageDebug(request['page_name'], pageDebug.ctrl.request(),
               (ledger_fidl.Status s) {
         if (s != ledger_fidl.Status.ok) {
           print('[ERROR] PageDebug failed to bind.');
@@ -195,7 +199,7 @@ class LedgerDebugDataHandler extends DataHandler {
         print('Connection Error on Page Snapshot: ${pageSnapshot.hashCode}');
       };
       socketHolder.pageDebug
-          .getSnapshot(request['commit_id'], pageSnapshot.ctrl.request(),
+          ?.getSnapshot(request['commit_id'], pageSnapshot.ctrl.request(),
               (ledger_fidl.Status s) {
         if (s != ledger_fidl.Status.ok) {
           print('[ERROR] PageSnapshot failed to bind.');
@@ -217,6 +221,17 @@ class LedgerDebugDataHandler extends DataHandler {
                 List<int> nextToken) =>
             sendEntries(
                 socketHolder, 'entries_list', listOfEntries, s, nextToken));
+  }
+
+  void handleCommitObjRequest(
+      WebSocketHolder socketHolder, Map<String, List<int>> request) {
+    if (socketHolder.ledgerDebug != null && socketHolder.pageDebug != null) {
+      socketHolder.pageDebug?.getCommit(request['commit_obj_id'],
+          (ledger_fidl.Status s, Commit commit) => sendCommit(socketHolder, s, commit));
+    } else {
+      print(
+          '[ERROR] The corresponding Ledger instance and page aren\'\t bound properly');
+    }
   }
 
   void sendList(WebSocketHolder socketHolder, String listName,
@@ -255,6 +270,18 @@ class LedgerDebugDataHandler extends DataHandler {
       if (s == ledger_fidl.Status.partialResult) {
         recursiveGetEntries(socketHolder, nextToken);
       }
+    }
+  }
+
+  void sendCommit(WebSocketHolder socketHolder, ledger_fidl.Status s, Commit commit) {
+    if(s == ledger_fidl.Status.ok) {
+      List<Object> commitObj = <Object>[]
+      ..add(commit.commitId)
+      ..add(commit.parentsIds)
+      ..add(commit.timestamp)
+      ..add(commit.generation);
+      String message = JSON.encode(<String, dynamic>{'commit_obj': commitObj});
+      socketHolder.add(message);
     }
   }
 
