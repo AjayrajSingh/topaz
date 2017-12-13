@@ -611,8 +611,8 @@ class _RenderIconSlider extends RenderConstrainedBox {
     config.isSemanticBoundary = isInteractive;
     if (isInteractive) {
       config
-        ..addAction(SemanticsAction.increase, _increaseAction)
-        ..addAction(SemanticsAction.decrease, _decreaseAction);
+        ..onIncrease = _increaseAction
+        ..onDecrease = _decreaseAction;
     }
   }
 
