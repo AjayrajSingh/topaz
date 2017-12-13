@@ -32,24 +32,25 @@ void proposeUrl(String url) {
   // TODO(jamuraa): resolve this URL for a title or more info?
   // TODO(jamuraa): add icon for eddystone / physicalweb
   String headline = 'Open nearby webpage';
-  Proposal proposal = new Proposal()
-    ..id = 'Eddystone-URL: $url'
-    ..display = (new SuggestionDisplay()
-      ..headline = headline
-      ..subheadline = '$url'
-      ..details = 'Eddystone nearby webpage detected'
-      ..iconUrls = const <String>[]
-      ..imageUrl = ''
-      ..imageType = SuggestionImageType.other
-      ..annoyance = AnnoyanceType.none)
-    ..onSelected = <Action>[
-      new Action()
-        ..createStory = (new CreateStory()
-          ..moduleId = web_view.kWebViewURL
-          ..initialData = JSON.encode({
-            'view': {'uri': url}
-          }))
-    ];
+  Proposal proposal = new Proposal(
+      id: 'Eddystone-URL: $url',
+      confidence: 0.0,
+      display: new SuggestionDisplay(
+          headline: headline,
+          subheadline: '$url',
+          details: 'Eddystone nearby webpage detected',
+          color: 0xFF0000FF,
+          iconUrls: const <String>[],
+          imageUrl: '',
+          imageType: SuggestionImageType.other,
+          annoyance: AnnoyanceType.none),
+      onSelected: <Action>[
+        new Action.withCreateStory(new CreateStory(
+            moduleId: web_view.kWebViewURL,
+            initialData: JSON.encode({
+              'view': {'uri': url}
+            })))
+      ]);
   log.info('Proposing URL: $url');
   _proposalPublisher.propose(proposal);
 }

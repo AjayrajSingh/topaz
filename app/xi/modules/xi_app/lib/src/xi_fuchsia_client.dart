@@ -22,7 +22,6 @@ class XiFuchsiaClient extends XiClient {
   /// Constructor.
   XiFuchsiaClient(this._ledgerHandle);
   final Services _services = new Services();
-  final ApplicationLaunchInfo _launchInfo = new ApplicationLaunchInfo();
   final service.JsonProxy _jsonProxy = new service.JsonProxy();
   final InterfaceHandle<Ledger> _ledgerHandle;
   final SocketReader _reader = new SocketReader();
@@ -34,10 +33,10 @@ class XiFuchsiaClient extends XiClient {
       return;
     }
 
-    _launchInfo
-      ..url = 'file:///system/apps/xi-core'
-      ..serviceRequest = _services.request();
-    kContext.launcher.createApplication(_launchInfo, null);
+    final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo(
+        url: 'file:///system/apps/xi-core',
+        serviceRequest: _services.request());
+    kContext.launcher.createApplication(launchInfo, null);
     // TODO(jasoncampbell): File a bug for how to get rid of the Dart warning
     // "Unsafe implicit cast from InterfaceHandle<dynamic>"?
     // ignore: STRONG_MODE_DOWN_CAST_COMPOSITE

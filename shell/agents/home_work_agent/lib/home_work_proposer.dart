@@ -96,13 +96,12 @@ class _ContextAwareProposer {
       }
     }
 
-    ContextSelector selector = new ContextSelector()
-      ..type = ContextValueType.entity
-      ..meta = new ContextMetadata();
-    selector.meta.entity = new EntityMetadata()
-      ..topic = _kLocationHomeWorkTopic;
-    ContextQuery query = new ContextQuery()
-      ..selector = <String, ContextSelector>{_kLocationHomeWorkTopic: selector};
+    ContextSelector selector = new ContextSelector(
+        type: ContextValueType.entity,
+        meta: new ContextMetadata(
+            entity: new EntityMetadata(topic: _kLocationHomeWorkTopic)));
+    ContextQuery query = new ContextQuery(
+        selector: <String, ContextSelector>{_kLocationHomeWorkTopic: selector});
 
     contextReader.subscribe(
       query,
@@ -356,53 +355,52 @@ class _QueryHandlerImpl extends QueryHandler {
       scanDirectory(new Directory('/system/pkgs/'));
     }
 
-    callback(new QueryResponse()..proposals = proposals);
+    callback(new QueryResponse(proposals: proposals));
   }
 
-  Proposal get _launchEverythingProposal => new Proposal()
-    ..id = _kLaunchEverythingProposalId
-    ..display = (new SuggestionDisplay()
-      ..headline = 'Launch everything'
-      ..subheadline = ''
-      ..details = ''
-      ..color = 0xFFFF0080
-      ..iconUrls = const <String>[]
-      ..imageType = SuggestionImageType.other
-      ..imageUrl = ''
-      ..annoyance = AnnoyanceType.none)
-    ..onSelected = askProposals
-        .map(
-          (Map<String, String> proposal) => new Action()
-            ..createStory = (new CreateStory()
-              ..moduleId = proposal['module_url'] ?? ''
-              ..initialData = proposal['module_data']),
-        )
-        .toList();
+  Proposal get _launchEverythingProposal => new Proposal(
+      id: _kLaunchEverythingProposalId,
+      display: new SuggestionDisplay(
+          headline: 'Launch everything',
+          subheadline: '',
+          details: '',
+          color: 0xFFFF0080,
+          iconUrls: const <String>[],
+          imageType: SuggestionImageType.other,
+          imageUrl: '',
+          annoyance: AnnoyanceType.none),
+      onSelected: askProposals
+          .map(
+            (Map<String, String> proposal) => new Action.withCreateStory(
+                new CreateStory(
+                    moduleId: proposal['module_url'] ?? '',
+                    initialData: proposal['module_data'])),
+          )
+          .toList());
 }
 
-Proposal _createProposal(Map<String, String> proposal) => new Proposal()
-  ..id = proposal['id']
-  ..display = (new SuggestionDisplay()
-    ..headline = proposal['headline'] ?? ''
-    ..subheadline = proposal['subheadline'] ?? ''
-    ..details = ''
-    ..color = (proposal['color'] != null && proposal['color'].isNotEmpty)
-        ? int.parse(proposal['color'], onError: (_) => 0xFFFF0080)
-        : 0xFFFF0080
-    ..iconUrls = proposal['icon_url'] != null
-        ? <String>[proposal['icon_url']]
-        : const <String>[]
-    ..imageType = 'person' == proposal['type']
-        ? SuggestionImageType.person
-        : SuggestionImageType.other
-    ..imageUrl = proposal['image_url'] ?? ''
-    ..annoyance = AnnoyanceType.none)
-  ..onSelected = <Action>[
-    new Action()
-      ..createStory = (new CreateStory()
-        ..moduleId = proposal['module_url'] ?? ''
-        ..initialData = proposal['module_data'])
-  ];
+Proposal _createProposal(Map<String, String> proposal) => new Proposal(
+        id: proposal['id'],
+        display: new SuggestionDisplay(
+            headline: proposal['headline'] ?? '',
+            subheadline: proposal['subheadline'] ?? '',
+            details: '',
+            color: (proposal['color'] != null && proposal['color'].isNotEmpty)
+                ? int.parse(proposal['color'], onError: (_) => 0xFFFF0080)
+                : 0xFFFF0080,
+            iconUrls: proposal['icon_url'] != null
+                ? <String>[proposal['icon_url']]
+                : const <String>[],
+            imageType: 'person' == proposal['type']
+                ? SuggestionImageType.person
+                : SuggestionImageType.other,
+            imageUrl: proposal['image_url'] ?? '',
+            annoyance: AnnoyanceType.none),
+        onSelected: <Action>[
+          new Action.withCreateStory(new CreateStory(
+              moduleId: proposal['module_url'] ?? '',
+              initialData: proposal['module_data']))
+        ]);
 
 Proposal _createAppProposal({
   String id,
@@ -416,19 +414,19 @@ Proposal _createAppProposal({
   double confidence: 0.0,
   AnnoyanceType annoyanceType: AnnoyanceType.none,
 }) {
-  return new Proposal()
-    ..id = id
-    ..confidence = confidence
-    ..display = (new SuggestionDisplay()
-      ..headline = headline
-      ..subheadline = subheadline ?? ''
-      ..details = ''
-      ..color = color
-      ..iconUrls = iconUrls
-      ..imageType = imageType
-      ..imageUrl = imageUrl
-      ..annoyance = annoyanceType)
-    ..onSelected = <Action>[
-      new Action()..createStory = (new CreateStory()..moduleId = appUrl)
-    ];
+  return new Proposal(
+      id: id,
+      confidence: confidence,
+      display: new SuggestionDisplay(
+          headline: headline,
+          subheadline: subheadline ?? '',
+          details: '',
+          color: color,
+          iconUrls: iconUrls,
+          imageType: imageType,
+          imageUrl: imageUrl,
+          annoyance: annoyanceType),
+      onSelected: <Action>[
+        new Action.withCreateStory(new CreateStory(moduleId: appUrl))
+      ]);
 }

@@ -77,10 +77,9 @@ void main(List<String> args) {
   assert(_contextReader.ctrl.isBound);
 
   // Subscribe to all topics
-  ContextSelector selector = new ContextSelector()
-    ..type = ContextValueType.module;
-  ContextQuery query = new ContextQuery()
-    ..selector = <String, ContextSelector>{'modules': selector};
+  ContextSelector selector = new ContextSelector(type: ContextValueType.module);
+  ContextQuery query = new ContextQuery(
+      selector: <String, ContextSelector>{'modules': selector});
   _contextReader.subscribe(query, _contextListener.getHandle());
 
   // Connect to Cobalt

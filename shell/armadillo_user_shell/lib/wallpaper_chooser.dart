@@ -126,24 +126,24 @@ class _QueryHandlerImpl extends QueryHandler {
       CustomActionBinding binding = new CustomActionBinding();
       _bindings.add(binding);
       proposals.add(
-        new Proposal()
-          ..id = _kChooseWallpaperSuggestionHeadline
-          ..display = (new SuggestionDisplay()
-            ..headline = _kChooseWallpaperSuggestionHeadline
-            ..subheadline = ''
-            ..details = ''
-            ..color = _kChooseWallpaperSuggestionColor
-            ..iconUrls = <String>[]
-            ..imageType = SuggestionImageType.other
-            ..imageUrl = _kChooseWallpaperSuggestionImageUrl
-            ..annoyance = AnnoyanceType.none)
-          ..onSelected = <Action>[
-            new Action()..customAction = binding.wrap(customAction)
-          ],
+        new Proposal(
+            id: _kChooseWallpaperSuggestionHeadline,
+            display: new SuggestionDisplay(
+                headline: _kChooseWallpaperSuggestionHeadline,
+                subheadline: '',
+                details: '',
+                color: _kChooseWallpaperSuggestionColor,
+                iconUrls: <String>[],
+                imageType: SuggestionImageType.other,
+                imageUrl: _kChooseWallpaperSuggestionImageUrl,
+                annoyance: AnnoyanceType.none),
+            onSelected: <Action>[
+              new Action.withCustomAction(binding.wrap(customAction))
+            ]),
       );
     }
 
-    callback(new QueryResponse()..proposals = proposals);
+    callback(new QueryResponse(proposals: proposals));
   }
 
   void stop() {

@@ -399,19 +399,19 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     }
 
     if (onReceived != null) {
-      Conversation conversation = new Conversation()
-        ..conversationId = messageValue['conversation_id']
-        ..participants = messageValue['participants']
-            .where((String email) => email != _email)
-            .map((String email) => new Participant()..email = email)
-            .toList();
+      Conversation conversation = new Conversation(
+          conversationId: messageValue['conversation_id'],
+          participants: messageValue['participants']
+              .where((String email) => email != _email)
+              .map((String email) => new Participant(email: email))
+              .toList());
 
-      Message message = new Message()
-        ..messageId = messageValue['message_id']
-        ..sender = messageValue['sender']
-        ..timestamp = new DateTime.now().millisecondsSinceEpoch
-        ..type = messageValue['type']
-        ..jsonPayload = messageValue['json_payload'];
+      Message message = new Message(
+          messageId: messageValue['message_id'],
+          sender: messageValue['sender'],
+          timestamp: new DateTime.now().millisecondsSinceEpoch,
+          type: messageValue['type'],
+          jsonPayload: messageValue['json_payload']);
 
       await onReceived(conversation, message);
     }

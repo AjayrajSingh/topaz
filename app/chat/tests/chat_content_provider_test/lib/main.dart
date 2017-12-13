@@ -137,8 +137,8 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
 
     // Test NewConversation() method.
     List<Participant> participants = <Participant>[
-      new Participant()..email = 'alice@example.com',
-      new Participant()..email = 'bob@example.com',
+      new Participant(email: 'alice@example.com'),
+      new Participant(email: 'bob@example.com'),
     ];
     await _chatContentProvider.newConversation(
       participants,
@@ -397,8 +397,8 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     mqConversation1.completer = completer1;
 
     List<Participant> participants1 = <Participant>[
-      new Participant()..email = 'foo@example.com',
-      new Participant()..email = 'bar@example.com',
+      new Participant(email: 'foo@example.com'),
+      new Participant(email: 'bar@example.com'),
     ];
 
     await _chatContentProvider.newConversation(
@@ -448,8 +448,8 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     mqConversation2.completer = completer2;
 
     List<Participant> participants2 = <Participant>[
-      new Participant()..email = 'qux@example.com',
-      new Participant()..email = 'baz@example.com',
+      new Participant(email: 'qux@example.com'),
+      new Participant(email: 'baz@example.com'),
     ];
 
     await _chatContentProvider.newConversation(
@@ -638,11 +638,12 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     await _mockChatMessageTransporter
         .mockReceiveMessage(
           conversation0,
-          new Message()
-            ..messageId = messageId1
-            ..sender = 'alice@example.com'
-            ..timestamp = new DateTime.now().millisecondsSinceEpoch
-            ..jsonPayload = JSON.encode('A message from Alice!'),
+          new Message(
+              type: 'text',
+              messageId: messageId1,
+              sender: 'alice@example.com',
+              timestamp: new DateTime.now().millisecondsSinceEpoch,
+              jsonPayload: JSON.encode('A message from Alice!')),
         )
         .timeout(_kTimeout);
 

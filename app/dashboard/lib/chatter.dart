@@ -140,7 +140,7 @@ class Chatter {
             log.fine('No existing chat, create a new one!');
             _chatContentProvider.newConversation(
               _kDashboardParticipants
-                  .map((String email) => new chat.Participant()..email = email)
+                  .map((String email) => new chat.Participant(email: email))
                   .toList(),
               (chat.ChatStatus status, chat.Conversation conversation) {
                 if (status != chat.ChatStatus.ok) {

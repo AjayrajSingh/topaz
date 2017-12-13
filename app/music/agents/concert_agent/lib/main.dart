@@ -61,25 +61,24 @@ class ContextListenerImpl extends ContextListener {
       pathSegments: <String>['metro_areas', '26330-us-sf-bay-area'],
     );
 
-    Proposal proposal = new Proposal()
-      ..id = 'Concerts Near Hotel'
-      ..display = (new SuggestionDisplay()
-        ..headline = headline
-        ..subheadline = 'powered by Songkick'
-        ..details = ''
-        ..color = 0xFF467187
-        ..iconUrls = const <String>[]
-        ..imageType = SuggestionImageType.other
-        ..imageUrl =
-            'https://images.unsplash.com/photo-1486591978090-58e619d37fe7?dpr=1&auto=format&fit=crop&w=300&h=300&q=80&cs=tinysrgb&crop=&bg='
-        ..annoyance = AnnoyanceType.none)
-      ..onSelected = <Action>[
-        new Action()
-          ..createStory = (new CreateStory()
-            ..moduleId = 'file:///system/apps/concert_event_list'
-            ..initialData =
-                JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}))
-      ];
+    Proposal proposal = new Proposal(
+        id: 'Concerts Near Hotel',
+        display: new SuggestionDisplay(
+            headline: headline,
+            subheadline: 'powered by Songkick',
+            details: '',
+            color: 0xFF467187,
+            iconUrls: const <String>[],
+            imageType: SuggestionImageType.other,
+            imageUrl:
+                'https://images.unsplash.com/photo-1486591978090-58e619d37fe7?dpr=1&auto=format&fit=crop&w=300&h=300&q=80&cs=tinysrgb&crop=&bg=',
+            annoyance: AnnoyanceType.none),
+        onSelected: <Action>[
+          new Action.withCreateStory(new CreateStory(
+              moduleId: 'file:///system/apps/concert_event_list',
+              initialData:
+                  JSON.encode(<String, dynamic>{'view': decomposeUri(arg)})))
+        ]);
 
     log.fine('proposing concert suggestion');
     _proposalPublisher.propose(proposal);
@@ -91,12 +90,12 @@ Future<Null> main(List<dynamic> args) async {
 
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextSelector selector = new ContextSelector()
-    ..type = ContextValueType.entity
-    ..meta = new ContextMetadata();
-  selector.meta.entity = new EntityMetadata()..topic = _kHotelTopic;
-  ContextQuery query = new ContextQuery()
-    ..selector = <String, ContextSelector>{_kHotelTopic: selector};
+  ContextSelector selector = new ContextSelector(
+      type: ContextValueType.entity,
+      meta:
+          new ContextMetadata(entity: new EntityMetadata(topic: _kHotelTopic)));
+  ContextQuery query = new ContextQuery(
+      selector: <String, ContextSelector>{_kHotelTopic: selector});
   _contextListenerImpl = new ContextListenerImpl();
   _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 }

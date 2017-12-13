@@ -46,22 +46,22 @@ Conversation _createConversationFromLedgerEntry(Entry entry) =>
 Conversation _createConversationFromLedgerKeyValue(
     List<int> key, SizedVmoTransport value) {
   Map<String, dynamic> decodedValue = decodeLedgerValue(value);
-  return new Conversation()
-    ..conversationId = key
-    ..title = decodedValue['title']
-    ..participants = decodedValue['participants']
-        // TODO(SO-906): remove when the bug passing non-map types is fixed.
-        .where((Map<String, String> el) => el != null && el is Map)
-        .map(_createParticipantFromMap)
-        .toList();
+  return new Conversation(
+      conversationId: key,
+      title: decodedValue['title'],
+      participants: decodedValue['participants']
+          // TODO(SO-906): remove when the bug passing non-map types is fixed.
+          .where((Map<String, String> el) => el != null && el is Map)
+          .map(_createParticipantFromMap)
+          .toList());
 }
 
 /// Creates a [Participant] object from the given map.
 Participant _createParticipantFromMap(Map<String, String> participantMap) =>
-    new Participant()
-      ..email = participantMap['email']
-      ..displayName = participantMap['displayName']
-      ..photoUrl = participantMap['photoUrl'];
+    new Participant(
+        email: participantMap['email'],
+        displayName: participantMap['displayName'],
+        photoUrl: participantMap['photoUrl']);
 
 /// Creates a [Message] object from the given ledger [Entry].
 Message _createMessageFromLedgerEntry(Entry entry) =>
@@ -71,12 +71,12 @@ Message _createMessageFromLedgerEntry(Entry entry) =>
 Message _createMessageFromLedgerKeyValue(
     List<int> key, SizedVmoTransport value) {
   Map<String, dynamic> decodedValue = decodeLedgerValue(value);
-  return new Message()
-    ..messageId = key
-    ..sender = decodedValue['sender']
-    ..timestamp = decodedValue['timestamp'] ?? 0
-    ..type = decodedValue['type']
-    ..jsonPayload = decodedValue['json_payload'];
+  return new Message(
+      messageId: key,
+      sender: decodedValue['sender'],
+      timestamp: decodedValue['timestamp'] ?? 0,
+      type: decodedValue['type'],
+      jsonPayload: decodedValue['json_payload']);
 }
 
 class _KeyNotFoundException implements Exception {
@@ -386,9 +386,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
         }
 
         // Return the created conversation.
-        Conversation conversation = new Conversation()
-          ..conversationId = conversationId
-          ..participants = participants;
+        Conversation conversation = new Conversation(
+            conversationId: conversationId, participants: participants);
 
         _conversationCache[conversationId] = conversation;
 

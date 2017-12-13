@@ -135,16 +135,14 @@ class ModuleImpl implements Module, Lifecycle {
       ..getContextReader(_contextReader.ctrl.request());
     _contextListenerImpl = new ContextListenerImpl();
 
-    ContextSelector selector = new ContextSelector()
-      ..type = ContextValueType.entity
-      ..meta = new ContextMetadata()
-      ..meta.story = new StoryMetadata()
-      ..meta.story.focused = new FocusedState()
-      ..meta.story.focused.state = FocusedStateState.focused
-      ..meta.entity = new EntityMetadata()
-      ..meta.entity.topic = _kFocalEntitiesTopic;
-    ContextQuery query = new ContextQuery();
-    query.selector[_kFocalEntitiesTopic] = selector;
+    ContextSelector selector = new ContextSelector(
+        type: ContextValueType.entity,
+        meta: new ContextMetadata(
+            story: new StoryMetadata(
+                focused: new FocusedState(state: FocusedStateState.focused)),
+            entity: new EntityMetadata(topic: _kFocalEntitiesTopic)));
+    ContextQuery query = new ContextQuery(
+        selector: <String, ContextSelector>{_kFocalEntitiesTopic: selector});
 
     _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 

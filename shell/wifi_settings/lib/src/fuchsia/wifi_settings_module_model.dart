@@ -53,7 +53,7 @@ class WifiSettingsModuleModel extends ModuleModel {
     if (_selectedAccessPoint != null) {
       return;
     }
-    wlanProxy.scan(new wlan.ScanRequest()..timeout = 15,
+    wlanProxy.scan(new wlan.ScanRequest(timeout: 15),
         (wlan.ScanResult scanResult) {
       if (_selectedAccessPoint != null) {
         return;
@@ -126,10 +126,10 @@ class WifiSettingsModuleModel extends ModuleModel {
 
   void _connect(AccessPoint accessPoint, [String password]) {
     wlanProxy.connect(
-      new wlan.ConnectConfig()
-        ..ssid = accessPoint.name
-        ..passPhrase = password ?? ''
-        ..scanInterval = _kConnectionScanInterval,
+      new wlan.ConnectConfig(
+          ssid: accessPoint.name,
+          passPhrase: password ?? '',
+          scanInterval: _kConnectionScanInterval),
       (wlan.Error error) {
         _selectedAccessPoint = null;
         _password = null;

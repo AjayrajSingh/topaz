@@ -40,7 +40,7 @@ class _EditSession {
       InputEvent event) {
     // increment to next odd revision
     int newRev = _maxRev + (_maxRev & 1) + 1;
-    TextInputState newState = new TextInputState.init(
+    TextInputState newState = new TextInputState(
         revision: newRev,
         text: text,
         selection: selection,
@@ -67,7 +67,7 @@ class _EditSession {
         int end = max(_state.selection.base, _state.selection.extent);
         String newText = _state.text.replaceRange(start, end, newChar);
         int cursor = start + newChar.length;
-        TextSelection newSelection = new TextSelection.init(
+        TextSelection newSelection = new TextSelection(
             base: cursor, extent: cursor, affinity: TextAffinity.downstream);
         updateState(newText, newSelection, new TextRange(), event);
         return true;

@@ -80,18 +80,16 @@ class Proposer extends ContextListener {
     log.fine('Current location: $_currentLocation');
   }
 
-  Proposal _createProposal(Message message, bool interruptive) => new Proposal()
-    ..id = 'Message from ${message.sender}'
-    ..display = (new SuggestionDisplay()
-      ..headline = 'Message from ${message.sender}'
-      ..subheadline = ''
-      ..details = ''
-      ..color = 0xFFFF0080
-      ..iconUrls = const <String>[]
-      ..imageType = SuggestionImageType.other
-      ..imageUrl = ''
-      ..annoyance = AnnoyanceType.none)
-    ..onSelected = <Action>[
-      new Action()..focusStory = (new FocusStory()..storyId = '')
-    ];
+  Proposal _createProposal(Message message, bool interruptive) => new Proposal(
+      id: 'Message from ${message.sender}',
+      display: new SuggestionDisplay(
+          headline: 'Message from ${message.sender}',
+          subheadline: '',
+          details: '',
+          color: 0xFFFF0080,
+          iconUrls: const <String>[],
+          imageType: SuggestionImageType.other,
+          imageUrl: '',
+          annoyance: AnnoyanceType.none),
+      onSelected: <Action>[new Action.withFocusStory(new FocusStory(storyId: ''))]);
 }

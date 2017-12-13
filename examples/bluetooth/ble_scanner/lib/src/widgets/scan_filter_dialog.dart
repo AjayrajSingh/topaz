@@ -94,8 +94,8 @@ class _ScanFilterDialogState extends State<ScanFilterDialog> {
                 ble.ScanFilter filter = new ble.ScanFilter();
 
                 if (_manufacturerId != null) {
-                  filter.manufacturerIdentifier = new UInt16()
-                    ..value = _manufacturerId;
+                  filter.manufacturerIdentifier =
+                      new UInt16(value: _manufacturerId);
                 }
 
                 if (_nameSubstring?.isNotEmpty ?? false) {
@@ -103,7 +103,7 @@ class _ScanFilterDialogState extends State<ScanFilterDialog> {
                 }
 
                 if (_connectable != null) {
-                  filter.connectable = new Bool()..value = _connectable;
+                  filter.connectable = new Bool(value: _connectable);
                 }
 
                 widget.moduleModel.scanFilter = filter;

@@ -74,30 +74,24 @@ class CommandHandler implements QueryHandler {
       if (action != null) {
         CustomActionBinding binding = new CustomActionBinding();
         _bindings.add(binding);
-        proposals.add(
-          new Proposal()
-            ..id = 'Music Command'
-            ..confidence = 1.0
-            ..display = (new SuggestionDisplay()
-              ..headline = 'Music Command'
-              ..subheadline = ''
-              ..details = ''
-              ..color = 0xFFA5A700
-              ..iconUrls = <String>[]
-              ..imageType = SuggestionImageType.other
-              ..imageUrl = ''
-              ..annoyance = AnnoyanceType.none)
-            ..onSelected = <Action>[
-              new Action()
-                ..customAction = binding.wrap(
-                  action,
-                )
-            ],
-        );
+        proposals.add(new Proposal(
+          id: 'Music Command',
+          confidence: 1.0,
+          display: new SuggestionDisplay(
+              headline: 'Music Command',
+              subheadline: '',
+              details: '',
+              color: 0xFFA5A700,
+              iconUrls: <String>[],
+              imageType: SuggestionImageType.other,
+              imageUrl: '',
+              annoyance: AnnoyanceType.none),
+          onSelected: <Action>[new Action.withCustomAction(binding.wrap(action))],
+        ));
       }
     }
 
-    callback(new QueryResponse()..proposals = proposals);
+    callback(new QueryResponse(proposals: proposals));
   }
 }
 

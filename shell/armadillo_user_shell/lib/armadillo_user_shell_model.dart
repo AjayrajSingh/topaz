@@ -139,14 +139,12 @@ class ArmadilloUserShellModel extends UserShellModel {
     suggestionProviderSuggestionModel.suggestionProvider = suggestionProvider;
     maxwellVoiceModel.suggestionProvider = suggestionProvider;
 
-    ContextQuery query = new ContextQuery()
-      ..selector = <String, ContextSelector>{};
+    ContextQuery query =
+        new ContextQuery(selector: <String, ContextSelector>{});
     for (String topic in contextTopics) {
-      ContextSelector selector = new ContextSelector()
-        ..type = ContextValueType.entity
-        ..meta = new ContextMetadata();
-      selector.meta.entity = new EntityMetadata();
-      selector.meta.entity.topic = topic;
+      ContextSelector selector = new ContextSelector(
+          type: ContextValueType.entity,
+          meta: new ContextMetadata(entity: new EntityMetadata(topic: topic)));
       query.selector[topic] = selector;
     }
     contextReader.subscribe(

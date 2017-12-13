@@ -128,23 +128,23 @@ class _QueryHandlerImpl extends QueryHandler {
       CustomActionBinding binding = new CustomActionBinding();
       _bindings.add(binding);
       proposals.add(
-        new Proposal()
-          ..id = 'View Active Agents'
-          ..display = (new SuggestionDisplay()
-            ..headline = 'View Active Agents'
-            ..subheadline = ''
-            ..details = ''
-            ..color = 0xFFA5A700
-            ..iconUrls = <String>['/system/data/sysui/AgentIcon.png']
-            ..imageType = SuggestionImageType.other
-            ..imageUrl = ''
-            ..annoyance = AnnoyanceType.none)
-          ..onSelected = <Action>[
-            new Action()..customAction = binding.wrap(customAction)
-          ],
+        new Proposal(
+            id: 'View Active Agents',
+            display: new SuggestionDisplay(
+                headline: 'View Active Agents',
+                subheadline: '',
+                details: '',
+                color: 0xFFA5A700,
+                iconUrls: <String>['/system/data/sysui/AgentIcon.png'],
+                imageType: SuggestionImageType.other,
+                imageUrl: '',
+                annoyance: AnnoyanceType.none),
+            onSelected: <Action>[
+              new Action.withCustomAction(binding.wrap(customAction))
+            ]),
       );
     }
-    callback(new QueryResponse()..proposals = proposals);
+    callback(new QueryResponse(proposals: proposals));
   }
 
   void stop() {

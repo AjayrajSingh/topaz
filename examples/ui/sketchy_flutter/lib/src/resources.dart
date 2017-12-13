@@ -20,27 +20,18 @@ class Resource {
 
   Resource._create(this.session, scenic.Resource resource)
       : id = session.nextResourceId() {
-    _enqueue().createResource = new scenic.CreateResourceOp()
-      ..id = id
-      ..resource = resource;
+    session.enqueue(new scenic.Op.withCreateResource(
+        new scenic.CreateResourceOp(id: id, resource: resource)));
   }
 
   Resource._import(this.session, Handle token, scenic.ImportSpec spec)
       : id = session.nextResourceId() {
-    _enqueue().importResource = new scenic.ImportResourceOp()
-      ..id = id
-      ..token = token
-      ..spec = spec;
-  }
-
-  scenic.Op _enqueue() {
-    final scenic.Op op = new scenic.Op();
-    session.enqueue(op);
-    return op;
+    session.enqueue(new scenic.Op.withImportResource(
+        new scenic.ImportResourceOp(id: id, token: token, spec: spec)));
   }
 }
 
-scenic.Value vector1(double val) => new scenic.Value()..vector1 = val;
+scenic.Value vector1(double val) => new scenic.Value.withVector1(val);
 
 class Node extends Resource {
   Node._create(Session session, scenic.Resource resource)
@@ -50,36 +41,25 @@ class Node extends Resource {
       : super._import(session, token, spec);
 
   void setRotation(double x, double y, double z, double w) {
-    final scenic.Quaternion quaternion = new scenic.Quaternion()
-      ..x = x
-      ..y = y
-      ..z = z
-      ..w = w;
-    setRotationValue(new scenic.QuaternionValue()
-      ..value = quaternion
-      ..variableId = 0);
+    final scenic.Quaternion quaternion =
+        new scenic.Quaternion(x: x, y: y, z: z, w: w);
+    setRotationValue(
+        new scenic.QuaternionValue(value: quaternion, variableId: 0));
   }
 
   void setRotationValue(scenic.QuaternionValue rotation) {
-    _enqueue().setRotation = new scenic.SetRotationOp()
-      ..id = id
-      ..value = rotation;
+    session.enqueue(new scenic.Op.withSetRotation(
+        new scenic.SetRotationOp(id: id, value: rotation)));
   }
 
   void setTranslation(double x, double y, double z) {
-    final scenic.Vec3 vec3 = new scenic.Vec3()
-      ..x = x
-      ..y = y
-      ..z = z;
-    setTranslationValue(new scenic.Vector3Value()
-      ..value = vec3
-      ..variableId = 0);
+    final scenic.Vec3 vec3 = new scenic.Vec3(x: x, y: y, z: z);
+    setTranslationValue(new scenic.Vector3Value(value: vec3, variableId: 0));
   }
 
   void setTranslationValue(scenic.Vector3Value vec3) {
-    _enqueue().setTranslation = new scenic.SetTranslationOp()
-      ..id = id
-      ..value = vec3;
+    session.enqueue(new scenic.Op.withSetTranslation(
+        new scenic.SetTranslationOp(id: id, value: vec3)));
   }
 }
 
@@ -91,15 +71,13 @@ class ContainerNode extends Node {
       : super._import(session, token, spec);
 
   void addChild(Node child) {
-    _enqueue().addChild = new scenic.AddChildOp()
-      ..nodeId = id
-      ..childId = child.id;
+    session.enqueue(new scenic.Op.withAddChild(
+        new scenic.AddChildOp(nodeId: id, childId: child.id)));
   }
 
   void addPart(Node part) {
-    _enqueue().addPart = new scenic.AddPartOp()
-      ..nodeId = id
-      ..partId = part.id;
+    session.enqueue(new scenic.Op.withAddPart(
+        new scenic.AddPartOp(nodeId: id, partId: part.id)));
   }
 }
 
@@ -111,41 +89,36 @@ class ImportNode extends ContainerNode {
 class ShapeNode extends Node {
   ShapeNode(Session session)
       : super._create(
-            session, new scenic.Resource()..shapeNode = new scenic.ShapeNode());
+            session, new scenic.Resource.withShapeNode(new scenic.ShapeNode()));
 
   void setMaterial(Material material) {
-    _enqueue().setMaterial = new scenic.SetMaterialOp()
-      ..nodeId = id
-      ..materialId = material.id;
+    session.enqueue(new scenic.Op.withSetMaterial(
+        new scenic.SetMaterialOp(nodeId: id, materialId: material.id)));
   }
 
   void setShape(Shape shape) {
-    _enqueue().setShape = new scenic.SetShapeOp()
-      ..nodeId = id
-      ..shapeId = shape.id;
+    session.enqueue(new scenic.Op.withSetShape(
+        new scenic.SetShapeOp(nodeId: id, shapeId: shape.id)));
   }
 }
 
 class Material extends Resource {
   Material(Session session)
       : super._create(
-            session, new scenic.Resource()..material = new scenic.Material());
+            session, new scenic.Resource.withMaterial(new scenic.Material()));
 
   void setColor(double red, double green, double blue, double alpha) {
-    final scenic.ColorRgba color = new scenic.ColorRgba()
-      ..red = (red * 255).round()
-      ..green = (green * 255).round()
-      ..blue = (blue * 255).round()
-      ..alpha = (alpha * 255).round();
-    setColorValue(new scenic.ColorRgbaValue()
-      ..value = color
-      ..variableId = 0);
+    final scenic.ColorRgba color = new scenic.ColorRgba(
+        red: (red * 255).round(),
+        green: (green * 255).round(),
+        blue: (blue * 255).round(),
+        alpha: (alpha * 255).round());
+    setColorValue(new scenic.ColorRgbaValue(value: color, variableId: 0));
   }
 
   void setColorValue(scenic.ColorRgbaValue color) {
-    _enqueue().setColor = new scenic.SetColorOp()
-      ..materialId = id
-      ..color = color;
+    session.enqueue(new scenic.Op.withSetColor(
+        new scenic.SetColorOp(materialId: id, color: color)));
   }
 }
 
@@ -180,16 +153,16 @@ class RoundedRectangle extends Shape {
       scenic.Value topRightRadius,
       scenic.Value bottomLeftRadius,
       scenic.Value bottomRightRadius) {
-    final scenic.RoundedRectangle rect = new scenic.RoundedRectangle()
-      ..width = width
-      ..height = height
-      ..topLeftRadius = topLeftRadius
-      ..topRightRadius = topRightRadius
-      ..bottomLeftRadius = bottomLeftRadius
-      ..bottomRightRadius = bottomRightRadius;
+    final scenic.RoundedRectangle rect = new scenic.RoundedRectangle(
+        width: width,
+        height: height,
+        topLeftRadius: topLeftRadius,
+        topRightRadius: topRightRadius,
+        bottomLeftRadius: bottomLeftRadius,
+        bottomRightRadius: bottomRightRadius);
 
     return new RoundedRectangle._create(
-        session, new scenic.Resource()..roundedRectangle = rect);
+        session, new scenic.Resource.withRoundedRectangle(rect));
   }
 
   RoundedRectangle._create(Session session, scenic.Resource resource)

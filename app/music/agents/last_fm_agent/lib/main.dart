@@ -86,30 +86,29 @@ class ContextListenerImpl extends ContextListener {
   void _createProposal(Artist artist, Map<String, dynamic> data) {
     String headline = 'Learn more about ${artist.name}';
 
-    Proposal proposal = new Proposal()
-      ..id = 'Last FM Artist bio: ${artist.mbid}'
-      ..display = (new SuggestionDisplay()
-        ..headline = headline
-        ..subheadline = 'powered by Last.fm'
-        ..details = ''
-        ..color = 0xFFFF0080
-        ..iconUrls = const <String>[]
-        ..imageType = SuggestionImageType.other
-        ..imageUrl = artist.imageUrl
-        ..annoyance = AnnoyanceType.none)
-      ..onSelected = <Action>[
-        new Action()
-          ..addModuleToStory = (new AddModuleToStory()
-            ..linkName = data['@source']['link_name']
-            ..storyId = data['@source']['story_id']
-            ..moduleName = 'Last FM: ${data['name']}'
-            ..modulePath = data['@source']['module_path']
-            ..moduleUrl = 'file:///system/apps/last_fm_artist_bio'
-            ..surfaceRelation = (new SurfaceRelation()
-              ..arrangement = SurfaceArrangement.copresent
-              ..emphasis = 0.5
-              ..dependency = SurfaceDependency.dependent))
-      ];
+    Proposal proposal = new Proposal(
+        id: 'Last FM Artist bio: ${artist.mbid}',
+        display: new SuggestionDisplay(
+            headline: headline,
+            subheadline: 'powered by Last.fm',
+            details: '',
+            color: 0xFFFF0080,
+            iconUrls: const <String>[],
+            imageType: SuggestionImageType.other,
+            imageUrl: artist.imageUrl,
+            annoyance: AnnoyanceType.none),
+        onSelected: <Action>[
+          new Action.withAddModuleToStory(new AddModuleToStory(
+              linkName: data['@source']['link_name'],
+              storyId: data['@source']['story_id'],
+              moduleName: 'Last FM: ${data['name']}',
+              modulePath: data['@source']['module_path'],
+              moduleUrl: 'file:///system/apps/last_fm_artist_bio',
+              surfaceRelation: new SurfaceRelation(
+                  arrangement: SurfaceArrangement.copresent,
+                  emphasis: 0.5,
+                  dependency: SurfaceDependency.dependent)))
+        ]);
 
     log.fine('proposing artist bio suggestion');
     _proposalPublisher.propose(proposal);
@@ -139,12 +138,12 @@ Future<Null> main(List<dynamic> args) async {
     ..validate(<String>['last_fm_api_key']);
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextSelector selector = new ContextSelector()
-    ..type = ContextValueType.entity
-    ..meta = new ContextMetadata();
-  selector.meta.entity = new EntityMetadata()..topic = _kMusicArtistTopic;
-  ContextQuery query = new ContextQuery()
-    ..selector = <String, ContextSelector>{_kMusicArtistTopic: selector};
+  ContextSelector selector = new ContextSelector(
+      type: ContextValueType.entity,
+      meta: new ContextMetadata(
+          entity: new EntityMetadata(topic: _kMusicArtistTopic)));
+  ContextQuery query = new ContextQuery(
+      selector: <String, ContextSelector>{_kMusicArtistTopic: selector});
   _contextListenerImpl = new ContextListenerImpl(
     apiKey: config.get('last_fm_api_key'),
   );

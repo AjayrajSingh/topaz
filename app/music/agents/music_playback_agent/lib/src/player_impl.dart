@@ -156,11 +156,11 @@ class PlayerImpl extends Player {
     }
   }
 
-  PlayerStatus get _playerStatus => new PlayerStatus()
-    ..isPlaying = _audioPlayerController.playing
-    ..track = _currentTrack
-    ..repeatMode = _repeatMode
-    ..playbackPositionInMilliseconds = _currentTrack != null
-        ? _audioPlayerController.progress.inMilliseconds
-        : 0;
+  PlayerStatus get _playerStatus => new PlayerStatus(
+      isPlaying: _audioPlayerController.playing,
+      track: _currentTrack,
+      repeatMode: _repeatMode,
+      playbackPositionInMilliseconds: _currentTrack != null
+          ? _audioPlayerController.progress.inMilliseconds
+          : 0);
 }

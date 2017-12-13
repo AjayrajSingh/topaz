@@ -160,16 +160,15 @@ class EventListModuleModel extends ModuleModel {
     moduleContext
       ..getStoryId((String storyId) {
         _contextReaderProxy.subscribe(
-          new ContextQuery()
-            ..selector = <String, ContextSelector>{
-              _kSelectorLabel: new ContextSelector()
-                ..type = ContextValueType.story
-                ..meta = (new ContextMetadata()
-                  ..story = (new StoryMetadata()
-                    ..id = storyId
-                    ..focused = (new FocusedState()
-                      ..state = FocusedStateState.focused))),
-            },
+          new ContextQuery(selector: <String, ContextSelector>{
+            _kSelectorLabel: new ContextSelector(
+                type: ContextValueType.story,
+                meta: new ContextMetadata(
+                    story: new StoryMetadata(
+                        id: storyId,
+                        focused: new FocusedState(
+                            state: FocusedStateState.focused)))),
+          }),
           _contextListenerBinding.wrap(
             new _ContextListenerImpl(
               onStoryInFocusChanged: (bool storyInFocus) {

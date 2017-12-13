@@ -362,7 +362,7 @@ class AudioPlayerController {
 
   /// Called when the connection to the NetMediaPlayer fails.
   void _handleConnectionError() {
-    _problem = new Problem()..type = Problem.kProblemConnectionFailed;
+    _problem = new Problem(type: Problem.kProblemConnectionFailed);
 
     if (updateCallback != null) {
       scheduleMicrotask(() {

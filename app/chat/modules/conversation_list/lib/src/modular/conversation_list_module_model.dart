@@ -586,10 +586,10 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   User _getUserFromParticipantMap(Map<String, String> participantMap) =>
       _getUserFromParticipant(
-        new chat_fidl.Participant()
-          ..email = participantMap['email']
-          ..displayName = participantMap['displayName']
-          ..photoUrl = participantMap['photoUrl'],
+        new chat_fidl.Participant(
+          email: participantMap['email'],
+          displayName: participantMap['displayName'],
+          photoUrl: participantMap['photoUrl']),
       );
 
   @override
@@ -706,7 +706,7 @@ class ChatConversationListModuleModel extends ModuleModel {
     hideNewConversationForm();
 
     List<chat_fidl.Participant> participants = emails.map((String email) {
-      return new chat_fidl.Participant()..email = email;
+      return new chat_fidl.Participant(email: email);
     }).toList();
 
     newConversation(participants);

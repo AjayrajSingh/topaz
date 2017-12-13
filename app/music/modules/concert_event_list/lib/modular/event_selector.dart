@@ -100,32 +100,28 @@ class EventSelector implements QueryHandler {
                 new _SelectEventCustomAction(eventData);
             CustomActionBinding binding = new CustomActionBinding();
             _bindings.add(binding);
-            proposals.add(
-              new Proposal()
-                ..id = 'Select ${eventData.hotWordPhrase}'
-                ..confidence = 1.0
-                ..display = (new SuggestionDisplay()
-                  ..headline = 'Select ${eventData.hotWordPhrase}'
-                  ..subheadline = ''
-                  ..details = ''
-                  ..color = 0xFFA5A700
-                  ..iconUrls = <String>[]
-                  ..imageType = SuggestionImageType.other
-                  ..imageUrl = ''
-                  ..annoyance = AnnoyanceType.none)
-                ..onSelected = <Action>[
-                  new Action()
-                    ..customAction = binding.wrap(
-                      selectEventCustomAction,
-                    )
-                ],
-            );
+            proposals.add(new Proposal(
+              id: 'Select ${eventData.hotWordPhrase}',
+              confidence: 1.0,
+              display: new SuggestionDisplay(
+                  headline: 'Select ${eventData.hotWordPhrase}',
+                  subheadline: '',
+                  details: '',
+                  color: 0xFFA5A700,
+                  iconUrls: <String>[],
+                  imageType: SuggestionImageType.other,
+                  imageUrl: '',
+                  annoyance: AnnoyanceType.none),
+              onSelected: <Action>[
+                new Action.withCustomAction(binding.wrap(selectEventCustomAction))
+              ],
+            ));
           }
         }
       }
     }
 
-    callback(new QueryResponse()..proposals = proposals);
+    callback(new QueryResponse(proposals: proposals));
   }
 }
 

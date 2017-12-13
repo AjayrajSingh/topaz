@@ -398,28 +398,27 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
 
     List<fidl.EmailAddress> emails = <fidl.EmailAddress>[];
     for (Map<String, String> email in decodedValue['emails']) {
-      emails.add(new fidl.EmailAddress()
-        ..label = email['label']
-        ..value = email['value']);
+      emails.add(new fidl.EmailAddress(label: email['label'],
+        value: email['value']));
     }
 
     List<fidl.PhoneNumber> phoneNumbers = <fidl.PhoneNumber>[];
     for (Map<String, String> number in decodedValue['phoneNumbers']) {
-      phoneNumbers.add(new fidl.PhoneNumber()
-        ..label = number['label']
-        ..value = number['value']);
+      phoneNumbers.add(new fidl.PhoneNumber(
+        label: number['label'],
+        value: number['value']));
     }
-    return new fidl.Contact()
-      ..contactId = contactId
-      ..sourceContactId = decodedValue['sourceContactId']
-      ..sourceId = decodedValue['sourceId']
-      ..displayName = decodedValue['displayName']
-      ..givenName = decodedValue['givenName']
-      ..middleName = decodedValue['middleName']
-      ..familyName = decodedValue['familyName']
-      ..photoUrl = decodedValue['photoUrl']
-      ..emails = emails
-      ..phoneNumbers = phoneNumbers;
+    return new fidl.Contact(
+      contactId: contactId,
+      sourceContactId: decodedValue['sourceContactId'],
+      sourceId: decodedValue['sourceId'],
+      displayName: decodedValue['displayName'],
+      givenName: decodedValue['givenName'],
+      middleName: decodedValue['middleName'],
+      familyName: decodedValue['familyName'],
+      photoUrl: decodedValue['photoUrl'],
+      emails: emails,
+      phoneNumbers: phoneNumbers);
   }
 
   Future<Null> _saveContactsToLedger(List<fidl.Contact> contacts) async {

@@ -331,7 +331,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   void onSuggestionSelected(Suggestion suggestion) {
     _suggestionProviderProxy.notifyInteraction(
       suggestion.id.value,
-      new maxwell.Interaction()..type = maxwell.InteractionType.selected,
+      new maxwell.Interaction(type: maxwell.InteractionType.selected),
     );
   }
 
@@ -355,7 +355,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
         // Make a query and rewrap the binding
         _suggestionProviderProxy.query(
           _askListenerBinding.wrap(_askListener),
-          new maxwell.UserInput()..text = text ?? '',
+          new maxwell.UserInput(text: text ?? ''),
           _kMaxSuggestions,
         );
       });

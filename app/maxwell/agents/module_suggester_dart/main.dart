@@ -153,7 +153,7 @@ class _QueryHandlerImpl extends QueryHandler {
       proposals..addAll(_kDummyProposals)..addAll(_kDummyInterruptions);
     }
 
-    callback(new QueryResponse()..proposals = proposals);
+    callback(new QueryResponse(proposals: proposals));
   }
 }
 
@@ -697,20 +697,18 @@ Proposal _createProposal({
   int color,
   AnnoyanceType annoyanceType: AnnoyanceType.none,
 }) =>
-    new Proposal()
-      ..id = id
-      ..display = (new SuggestionDisplay()
-        ..headline = headline
-        ..subheadline = subheadline ?? ''
-        ..details = ''
-        ..color = color
-        ..iconUrls = iconUrls
-        ..imageType = imageType
-        ..imageUrl = imageUrl
-        ..annoyance = annoyanceType)
-      ..onSelected = <Action>[
-        new Action()
-          ..createStory = (new CreateStory()
-            ..moduleId = appUrl
-            ..initialData = initialData)
-      ];
+    new Proposal(
+        id: id,
+        display: new SuggestionDisplay(
+            headline: headline,
+            subheadline: subheadline ?? '',
+            details: '',
+            color: color,
+            iconUrls: iconUrls,
+            imageType: imageType,
+            imageUrl: imageUrl,
+            annoyance: annoyanceType),
+        onSelected: <Action>[
+          new Action.withCreateStory(
+              new CreateStory(moduleId: appUrl, initialData: initialData))
+        ]);

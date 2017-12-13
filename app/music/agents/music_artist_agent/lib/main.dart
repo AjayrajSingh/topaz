@@ -89,24 +89,24 @@ class ContextListenerImpl extends ContextListener {
       pathSegments: <String>[artist.id],
     );
 
-    Proposal proposal = new Proposal()
-      ..id = 'Spotify Artist: ${artist.id}'
-      ..display = (new SuggestionDisplay()
-        ..headline = headline
-        ..subheadline = 'powered by Spotify'
-        ..details = ''
-        ..color = 0xFFFF0080
-        ..iconUrls = const <String>[]
-        ..imageType = SuggestionImageType.other
-        ..imageUrl = artist.defaultArtworkUrl ?? ''
-        ..annoyance = AnnoyanceType.none)
-      ..onSelected = <Action>[
-        new Action()
-          ..createStory = (new CreateStory()
-            ..moduleId = 'file:///system/apps/music_artist'
-            ..initialData =
-                JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}))
-      ];
+    Proposal proposal = new Proposal(
+        id: 'Spotify Artist: ${artist.id}',
+        confidence: 0.0,
+        display: new SuggestionDisplay(
+            headline: headline,
+            subheadline: 'powered by Spotify',
+            details: '',
+            color: 0xFFFF0080,
+            iconUrls: const <String>[],
+            imageType: SuggestionImageType.other,
+            imageUrl: artist.defaultArtworkUrl ?? '',
+            annoyance: AnnoyanceType.none),
+        onSelected: <Action>[
+          new Action.withCreateStory(new CreateStory(
+              moduleId: 'file:///system/apps/music_artist',
+              initialData:
+                  JSON.encode(<String, dynamic>{'view': decomposeUri(arg)})))
+        ]);
 
     log.fine('proposing artist suggestion');
     _proposalPublisher.propose(proposal);
@@ -120,17 +120,15 @@ Future<Null> main(List<dynamic> args) async {
     ..validate(<String>['spotify_client_id', 'spotify_client_secret']);
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextSelector selector = new ContextSelector()
-    ..type = ContextValueType.entity
-    ..meta = new ContextMetadata();
-  selector.meta.story = new StoryMetadata();
-  selector.meta.story.focused = new FocusedState();
-  selector.meta.story.focused.state = FocusedStateState.focused;
-  selector.meta.entity = new EntityMetadata();
-  selector.meta.entity.type = <String>[_kMusicArtistType];
+  ContextSelector selector = new ContextSelector(
+      type: ContextValueType.entity,
+      meta: new ContextMetadata(
+          story: new StoryMetadata(
+              focused: new FocusedState(state: FocusedStateState.focused)),
+          entity: new EntityMetadata(type: <String>[_kMusicArtistType])));
 
-  ContextQuery query = new ContextQuery()
-    ..selector = <String, ContextSelector>{_kMusicArtistType: selector};
+  ContextQuery query = new ContextQuery(
+      selector: <String, ContextSelector>{_kMusicArtistType: selector});
   _contextListenerImpl = new ContextListenerImpl(
     clientId: config.get('spotify_client_id'),
     clientSecret: config.get('spotify_client_secret'),

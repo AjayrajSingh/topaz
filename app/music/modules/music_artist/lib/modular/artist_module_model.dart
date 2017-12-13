@@ -247,14 +247,14 @@ class ArtistModuleModel extends ModuleModel {
   }
 
   track_fidl.Track _convertTrackToFidl(Track track, Album album) {
-    return new track_fidl.Track()
-      ..title = track.name
-      ..id = track.id
-      ..artist = track.artists.first?.name
-      ..album = album.name
-      ..cover = album.defaultArtworkUrl
-      ..playbackUrl = track.playbackUrl
-      ..durationInSeconds = track.duration.inSeconds;
+    return new track_fidl.Track(
+        title: track.name,
+        id: track.id,
+        artist: track.artists.first?.name,
+        album: album.name,
+        cover: album.defaultArtworkUrl,
+        playbackUrl: track.playbackUrl,
+        durationInSeconds: track.duration.inSeconds);
   }
 
   /// Starts a module in the story shell

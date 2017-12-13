@@ -94,9 +94,8 @@ class ChildViewConnection {
       ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable}) {
     final Services services = new Services();
-    final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo()
-      ..url = url
-      ..serviceRequest = services.request();
+    final ApplicationLaunchInfo launchInfo =
+        new ApplicationLaunchInfo(url: url, serviceRequest: services.request());
     try {
       launcher.createApplication(launchInfo, controller);
       return new ChildViewConnection.connect(services,
@@ -250,17 +249,10 @@ class ChildViewConnection {
 
     DisplayMetrics displayMetrics = new DisplayMetrics()
       ..devicePixelRatio = devicePixelRatio;
-    fidl.SizeF size = new fidl.SizeF()
-      ..width = width
-      ..height = height;
-    fidl.InsetF inset = new fidl.InsetF()
-      ..top = insetTop
-      ..right = insetRight
-      ..bottom = insetBottom
-      ..left = insetLeft;
-    ViewLayout viewLayout = new ViewLayout()
-      ..size = size
-      ..inset = inset;
+    fidl.SizeF size = new fidl.SizeF(width: width, height: height);
+    fidl.InsetF inset = new fidl.InsetF(
+        top: insetTop, right: insetRight, bottom: insetBottom, left: insetLeft);
+    ViewLayout viewLayout = new ViewLayout(size: size, inset: inset);
     return _currentViewProperties = new ViewProperties()
       ..displayMetrics = displayMetrics
       ..viewLayout = viewLayout;

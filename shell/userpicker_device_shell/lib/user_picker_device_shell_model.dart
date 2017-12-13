@@ -182,12 +182,12 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _serviceProviderBinding.bind(this, serviceProvider.passRequest());
 
     final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
-    final UserLoginParams params = new UserLoginParams()
-      ..accountId = accountId
-      ..viewOwner = viewOwner.passRequest()
-      ..services = serviceProvider.passHandle()
-      ..userController = _userControllerProxy.ctrl.request()
-      ..userShellConfig = new AppConfig.init(url: _userShellChooser.appUrl);
+    final UserLoginParams params = new UserLoginParams(
+        accountId: accountId,
+        viewOwner: viewOwner.passRequest(),
+        services: serviceProvider.passHandle(),
+        userController: _userControllerProxy.ctrl.request(),
+        userShellConfig: new AppConfig(url: _userShellChooser.appUrl));
     userProvider.login(params);
 
     _userControllerProxy.watch(_userWatcherImpl.getHandle());
