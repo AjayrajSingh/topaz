@@ -16,40 +16,40 @@ interface Player {
   const uint64 kInitialStatus = 0;
 
   // Play the given track
-  Play(Track track);
+  Play@0(Track track);
 
   // Sets the given track as the current track without playing it
-  SetTrack(Track track);
+  SetTrack@1(Track track);
 
   // Toggles between pause and play for the given track.
   // This will not do anything if no track is set.
-  TogglePlayPause();
+  TogglePlayPause@2();
 
   // Jumps to the next track in the play queue and plays the track
-  Next();
+  Next@3();
 
   // Jumps to the previous track in the play queue and plays the track
-  Previous();
+  Previous@4();
 
   // Adds the given track(s) to the end of the play queue
-  Enqueue(array<string> trackIds);
+  Enqueue@5(array<string> trackIds);
 
   // Removes the given track(s) from the play queue
-  Dequeue(array<string> trackIds);
+  Dequeue@6(array<string> trackIds);
 
   // Gets the playback status
-  GetStatus() => (PlayerStatus status);
+  GetStatus@7() => (PlayerStatus status);
 
   // Register the PlayerStatusListener to receive Status and Track updates.
   // The subscription will continue to stay open as long as the listener handle
   // is not closed.
-  AddPlayerListener(PlayerStatusListener listener);
+  AddPlayerListener@8(PlayerStatusListener listener);
 
   // Sets the repeat mode
-  SetRepeatMode(RepeatMode repeatMode);
+  SetRepeatMode@9(RepeatMode repeatMode);
 };
 
 interface PlayerStatusListener {
   // Receives an update for the track and playback status
-  OnUpdate(PlayerStatus status);
+  OnUpdate@0(PlayerStatus status);
 };

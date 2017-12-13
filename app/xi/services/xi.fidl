@@ -9,5 +9,5 @@ import "lib/ledger/fidl/ledger.fidl";
 [ServiceName="xi.Json"]
 interface Json {
 	// connect a socket, which then has the same behavior as stdin/stdout in Unix/Windows
-	ConnectSocket(handle<socket> sock, ledger.Ledger sync_ledger);
+	ConnectSocket@0(handle<socket> sock, ledger.Ledger sync_ledger);
 };

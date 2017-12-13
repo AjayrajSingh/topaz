@@ -11,8 +11,8 @@ struct Todo {
 
 [ServiceName="todo.Resource"]
 interface Resource {
-  Get(string id);
-  Put(string id, string content);
-  Delete(string id);
-  All(array<Todo> todos);
+  Get@0(string id);
+  Put@1(string id, string content);
+  Delete@2(string id);
+  All@3(array<Todo> todos);
 };

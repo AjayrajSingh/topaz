@@ -71,19 +71,19 @@ struct Message {
 [ServiceName="chat_content_provider.ChatContentProvider"]
 interface ChatContentProvider {
   // Reutruns the email of the currently logged in user.
-  CurrentUserEmail()  => (string email);
+  CurrentUserEmail@0()  => (string email);
 
   // Returns the title of the content provider (e.g. "Chat").
-  GetTitle() => (string title);
+  GetTitle@1() => (string title);
 
   // Creates a new conversation with the given |participants|, which is a list
   // of all participants (including the current user) in the group.
-  NewConversation(array<Participant> participants)
+  NewConversation@2(array<Participant> participants)
       => (ChatStatus status, Conversation? conversation);
 
   // Deletes the conversation specified by the |conversation_id|.
   // Returns |ID_NOT_FOUND| in case the given |conversation_id| was not found.
-  DeleteConversation(array<uint8> conversation_id) => (ChatStatus status);
+  DeleteConversation@3(array<uint8> conversation_id) => (ChatStatus status);
 
   // Returns the metadata of the specified conversation.
   // To obtain the conversation history, use the |GetMessages| method with the
@@ -93,7 +93,7 @@ interface ChatContentProvider {
   // conversation appears in the list of conversations, if the conversation
   // cannot be found. If set to false, this method returns |ID_NOT_FOUND| status
   // in such cases.
-  GetConversation(array<uint8> conversation_id, bool wait)
+  GetConversation@4(array<uint8> conversation_id, bool wait)
       => (ChatStatus status, Conversation? conversation);
 
   // Returns the list of metadata of all existing conversations.
@@ -142,11 +142,11 @@ interface ChatContentProvider {
   //       "title":           <title>
   //     }
   //
-  GetConversations(string? message_queue_token)
+  GetConversations@5(string? message_queue_token)
       => (ChatStatus status, array<Conversation> conversations);
 
   // Sets the |title| of the specified conversation.
-  SetConversationTitle(array<uint8> conversation_id, string title)
+  SetConversationTitle@6(array<uint8> conversation_id, string title)
       => (ChatStatus status);
 
   // Gets the list of all |Message|s in the specified conversation.
@@ -180,18 +180,18 @@ interface ChatContentProvider {
   //
   // The client should then make a subsequent |GetMessage| call to retrieve the
   // actual message content.
-  GetMessages(array<uint8> conversation_id, string? message_queue_token)
+  GetMessages@7(array<uint8> conversation_id, string? message_queue_token)
       => (ChatStatus status, array<Message> messages);
 
   // Gets the specified |Message|.
-  GetMessage(array<uint8> conversation_id, array<uint8> message_id)
+  GetMessage@8(array<uint8> conversation_id, array<uint8> message_id)
       => (ChatStatus status, Message? message);
 
   // Gets the last message of the specified conversation.
   // The returned message can be null if the specified conversation does not
   // exist or the conversation is empty.
   // Intended to be used by the chat_conversation_list module.
-  GetLastMessage(array<uint8> conversation_id)
+  GetLastMessage@9(array<uint8> conversation_id)
       => (ChatStatus status, Message? message);
 
   // Sends a new message to the specified conversation.
@@ -208,14 +208,14 @@ interface ChatContentProvider {
   // 3. Device id
   //  - This prevents accidental id collision when between multiple devices of
   //    the same user.
-  SendMessage(array<uint8> conversation_id, string type, string json_payload)
+  SendMessage@10(array<uint8> conversation_id, string type, string json_payload)
       => (ChatStatus status, array<uint8> message_id);
 
   // Deletes the specified |Message| from the chat history.
   //
   // This only deletes the message from the current user's |Ledger|, which means
   // that the message will still be shown in the other users' chat history.
-  DeleteMessage(array<uint8> conversation_id, array<uint8> message_id)
+  DeleteMessage@11(array<uint8> conversation_id, array<uint8> message_id)
       => (ChatStatus status);
 
   // Notifies the agent that the specified message queue should no longer be
@@ -223,5 +223,5 @@ interface ChatContentProvider {
   //
   // Clients who passed a |message_queue_token| in a prior |GetMessages| call
   // should call |Unsubscribe| when it no longer needs to be notified.
-  Unsubscribe(string message_queue_token);
+  Unsubscribe@12(string message_queue_token);
 };

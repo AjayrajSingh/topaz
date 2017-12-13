@@ -17,7 +17,7 @@ struct Document {
 [ServiceName="documents.DocumentInterface"]
 
 interface DocumentInterface {
-  Get(string documentId) => (Document? document);
-  CreateEntityReference(Document document) => (string entityReference);
-  List() => (array<Document>? documents);
+  Get@0(string documentId) => (Document? document);
+  CreateEntityReference@1(Document document) => (string entityReference);
+  List@2() => (array<Document>? documents);
 };
