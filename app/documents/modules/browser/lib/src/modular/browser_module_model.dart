@@ -33,8 +33,14 @@ class BrowserModuleModel extends ModuleModel {
   /// True if we are in image preview mode
   bool _previewMode = false;
 
+  /// True if loading docs.
+  bool _loading = true;
+
   /// Constructor
   BrowserModuleModel();
+
+  /// True if loading docs.
+  bool get loading => _loading;
 
   /// Sets the document location to preview
   // TODO(maryxia) SO-967 - no need to do a get() to download to a
@@ -54,8 +60,11 @@ class BrowserModuleModel extends ModuleModel {
   /// Saves the updated list of documents to the model
   // TODO(maryxia) SO-913 add error modes to doc_fidl
   void listDocs() {
+    _loading = true;
+    notifyListeners();
     _docsInterfaceProxy.list((List<doc_fidl.Document> docs) {
       documents = docs;
+      _loading = false;
       notifyListeners();
       log.fine('Retrieved list of documents for BrowserModuleModel');
     });
@@ -133,6 +142,7 @@ class BrowserModuleModel extends ModuleModel {
     connectToService(serviceProviderProxy, _docsInterfaceProxy.ctrl);
     serviceProviderProxy.ctrl.close();
     componentContext.ctrl.close();
+    listDocs();
     notifyListeners();
     log.fine('BrowserModuleModel onReady complete');
   }

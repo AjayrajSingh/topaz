@@ -40,6 +40,28 @@ class Browser extends StatelessWidget {
       Widget child,
       BrowserModuleModel model,
     ) {
+      // Handles whether to display that loading is happening.
+      Widget mainDocView;
+      if (model.loading) {
+        mainDocView = new Center(child: const CircularProgressIndicator());
+      } else {
+        mainDocView = new Expanded(
+          child: new Container(
+            color: Colors.green[100],
+            child: new GridView.count(
+              children: model.documents.map((doc_fidl.Document doc) {
+                return new Thumbnail(
+                  doc: doc,
+                  selected:
+                      model.currentDoc != null && doc.id == model.currentDoc.id,
+                  onPressed: () => model.currentDoc = doc,
+                );
+              }).toList(),
+              crossAxisCount: 5,
+            ),
+          ),
+        );
+      }
       Widget browser = new Column(
         children: <Widget>[
           new Container(
@@ -61,25 +83,9 @@ class Browser extends StatelessWidget {
                 ? const Text('Preview Image')
                 : const Text('Open Document'),
           ),
-          new Expanded(
-            child: new Container(
-              color: Colors.green[100],
-              child: new GridView.count(
-                children: model.documents.map((doc_fidl.Document doc) {
-                  return new Thumbnail(
-                    doc: doc,
-                    selected: model.currentDoc != null &&
-                        doc.id == model.currentDoc.id,
-                    onPressed: () => model.currentDoc = doc,
-                  );
-                }).toList(),
-                crossAxisCount: 5,
-              ),
-            ),
-          ),
+          mainDocView,
         ],
       );
-
       Widget info = new Container();
       if (model.currentDoc != null) {
         info = new Info(doc: model.currentDoc);
