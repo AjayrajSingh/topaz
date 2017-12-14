@@ -2,62 +2,63 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
-import 'package:lib.suggestion.fidl/speech_to_text.fidl.dart' as maxwell;
+import 'package:lib.speech.fidl/speech_to_text.fidl.dart' as speech;
 import 'package:lib.logging/logging.dart';
 
+import 'rate_limited_retry.dart';
+
 /// Listens for a hotword from Maxwell.
-abstract class MaxwellHotword extends maxwell.HotwordListener {
-  static final Duration _kCriticalFailurePeriod = new Duration(seconds: 1);
-  static const int _kCriticalFailureCount = 5;
+abstract class MaxwellHotword extends speech.HotwordListener {
+  /// Retry limit for hotword detector failures.
+  static final RateThreshold kMaxRetry =
+      new RateThreshold(5, new Duration(seconds: 1));
 
   bool _startPending = false;
-  maxwell.SuggestionProviderProxy _suggestionProviderProxy;
+  speech.SpeechToTextProxy _speechToText;
 
-  final maxwell.HotwordListenerBinding _hotwordListenerBinding =
-      new maxwell.HotwordListenerBinding();
+  final speech.HotwordListenerBinding _hotwordListenerBinding =
+      new speech.HotwordListenerBinding();
 
-  DateTime _lastFailure;
-  int _failureCount;
+  final RateLimitedRetry _retry = new RateLimitedRetry(kMaxRetry);
 
-  /// Sets the suggestion provider proxy. If speech capture had previously been
-  /// requested but unable to start due to lack of a suggestion provider, it is
-  /// initated.
-  set suggestionProvider(
-      maxwell.SuggestionProviderProxy suggestionProviderProxy) {
-    _suggestionProviderProxy = suggestionProviderProxy;
-    if (_startPending) {
+  /// Sets the speech-to-text proxy. If speech capture had previously been
+  /// requested but unable to start due to lack of a provider, it is initated.
+  ///
+  /// Even if the given proxy is the one already set, hotword listening is
+  /// restarted if needed in case the proxy controller has been rebound.
+  // TODO(rosswang): Is this really the best way to handle this?
+  set speechToText(speech.SpeechToTextProxy speechToText) {
+    _speechToText = speechToText;
+
+    bool started = _hotwordListenerBinding.isBound;
+    if (started) {
+      _hotwordListenerBinding.close();
+    }
+
+    if (_startPending || started) {
       start();
     }
   }
 
   /// Starts listening for a hotword.
   void start() {
-    if (_suggestionProviderProxy == null) {
+    if (_speechToText == null) {
       _startPending = true;
     } else if (!_hotwordListenerBinding.isBound) {
       log.info('Listening for hotword');
-      _suggestionProviderProxy
-          .listenForHotword(_hotwordListenerBinding.wrap(this));
+      _speechToText.listenForHotword(_hotwordListenerBinding.wrap(this));
       _hotwordListenerBinding.onConnectionError = () {
         onError();
         _hotwordListenerBinding.close();
 
-        final DateTime now = new DateTime.now();
-        if (_lastFailure == null ||
-            now.difference(_lastFailure) >= _kCriticalFailurePeriod) {
-          _lastFailure = now;
-          _failureCount = 1;
-        } else if (_failureCount <= _kCriticalFailureCount) {
-          _failureCount++;
+        if (_retry.shouldRetry) {
+          start();
         } else {
-          log.warning('Speech capture failed more than '
-              '$_kCriticalFailureCount times in $_kCriticalFailurePeriod; '
-              'disabling hotword detection');
+          log.warning(_retry.formatMessage(
+              component: 'hotword listener', feature: 'hotword detection'));
+
           onFatal();
-          return;
         }
-        start();
       };
       _startPending = false;
     }

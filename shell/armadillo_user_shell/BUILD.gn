@@ -15,6 +15,7 @@ flutter_app("armadillo_user_shell") {
     "//garnet/public/lib/device_settings/fidl:fidl_dart",
     "//garnet/public/lib/power/fidl:fidl_dart",
     "//peridot/public/lib/context/fidl:fidl_dart",
+    "//peridot/public/lib/speech/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",

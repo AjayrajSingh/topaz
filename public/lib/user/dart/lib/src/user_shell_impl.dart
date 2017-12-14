@@ -106,16 +106,13 @@ class UserShellImpl implements UserShell, Lifecycle {
         ..getFocusProvider(
           _focusProviderProxy.ctrl.request(),
         )
-        ..getContextReader(
-          _contextReaderProxy.ctrl.request(),
-        )
-        ..getContextWriter(
-          _contextWriterProxy.ctrl.request(),
-        )
         ..getIntelligenceServices(
           _intelligenceServicesProxy.ctrl.request(),
         )
         ..getLink(_linkProxy.ctrl.request());
+      _intelligenceServicesProxy
+        ..getContextReader(_contextReaderProxy.ctrl.request())
+        ..getContextWriter(_contextWriterProxy.ctrl.request());
 
       onReady(
         _userShellContextProxy,

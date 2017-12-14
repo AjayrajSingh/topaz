@@ -5,12 +5,12 @@
 import 'package:armadillo/next.dart';
 
 import 'package:lib.logging/logging.dart';
-import 'package:lib.suggestion.fidl/speech_to_text.fidl.dart' as maxwell;
+import 'package:lib.speech.fidl/speech_to_text.fidl.dart' as speech;
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
 
 import 'maxwell_hotword.dart';
 
-class _MaxwellTranscriptionListenerImpl extends maxwell.TranscriptionListener {
+class _MaxwellTranscriptionListenerImpl extends speech.TranscriptionListener {
   final MaxwellVoiceModel model;
 
   _MaxwellTranscriptionListenerImpl(this.model);
@@ -115,15 +115,15 @@ class _MaxwellVoiceModelHotword extends MaxwellHotword {
 /// otherwise, [VoiceState.initializing].
 class MaxwellVoiceModel extends VoiceModel {
   /// Set from an external source - typically the UserShell.
-  maxwell.SuggestionProviderProxy _suggestionProviderProxy;
+  speech.SpeechToTextProxy _speechToTextProxy;
 
   _MaxwellFeedbackListenerImpl _feedbackListener;
   final maxwell.FeedbackListenerBinding _feedbackListenerBinding =
       new maxwell.FeedbackListenerBinding();
 
   _MaxwellTranscriptionListenerImpl _transcriptionListener;
-  final maxwell.TranscriptionListenerBinding _transcriptionListenerBinding =
-      new maxwell.TranscriptionListenerBinding();
+  final speech.TranscriptionListenerBinding _transcriptionListenerBinding =
+      new speech.TranscriptionListenerBinding();
 
   _MaxwellVoiceModelHotword _hotword;
 
@@ -169,8 +169,6 @@ class MaxwellVoiceModel extends VoiceModel {
   }
 
   void _updateState() {
-    bool wasInput = isInput;
-
     if (_isReplying) {
       super.state = VoiceState.replying;
     } else if (_speechToTextState != null) {
@@ -185,14 +183,11 @@ class MaxwellVoiceModel extends VoiceModel {
       super.state = VoiceState.initializing;
     }
 
-    if (wasInput != isInput) {
-      if (isInput) {
-        _hotword.stop();
-        _hotwordReady = false;
-      } else {
-        _hotwordReady = false;
-        _hotword.start();
-      }
+    if (isInput) {
+      _hotword.stop();
+      _isHotwordReady = false;
+    } else {
+      _hotword.start();
     }
   }
 
@@ -205,15 +200,21 @@ class MaxwellVoiceModel extends VoiceModel {
   @override
   String get transcription => _transcription;
 
-  /// Sets the [suggestionProvider] to use for speech services.
+  /// Sets the [suggestionProvider] to use for state feedback.
   /// This is typically set by the UserShell.
   set suggestionProvider(
     maxwell.SuggestionProviderProxy suggestionProviderProxy,
   ) {
-    _suggestionProviderProxy = suggestionProviderProxy;
     suggestionProviderProxy.registerFeedbackListener(
         _feedbackListenerBinding.wrap(_feedbackListener));
-    _hotword.suggestionProvider = suggestionProviderProxy;
+  }
+
+  /// Sets the [speechToText] to use for speech services.
+  /// This is typically set by the UserShell.
+  set speechToText(
+    speech.SpeechToTextProxy speechToTextProxy,
+  ) {
+    _hotword.speechToText = _speechToTextProxy = speechToTextProxy;
   }
 
   /// Call to close all the handles opened by this model.
@@ -231,7 +232,7 @@ class MaxwellVoiceModel extends VoiceModel {
     _transcriptionListenerBinding.close();
     _transcription = '';
 
-    _suggestionProviderProxy.beginSpeechCapture(
+    _speechToTextProxy.beginCapture(
         _transcriptionListenerBinding.wrap(_transcriptionListener));
 
     // The voice input is completed when the transcriptionListener is closed

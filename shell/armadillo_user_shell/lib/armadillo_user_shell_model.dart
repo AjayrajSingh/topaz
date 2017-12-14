@@ -9,6 +9,8 @@ import 'package:lib.context.fidl/context_writer.fidl.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:lib.logging/logging.dart';
+import 'package:lib.speech.fidl/speech_to_text.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.fidl/story_provider.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart';
@@ -21,7 +23,9 @@ import 'package:lib.widgets/modular.dart';
 import 'active_agents_manager.dart';
 import 'focus_request_watcher_impl.dart';
 import 'initial_focus_setter.dart';
+import 'maxwell_hotword.dart';
 import 'maxwell_voice_model.dart';
+import 'rate_limited_retry.dart';
 import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
@@ -138,6 +142,7 @@ class ArmadilloUserShellModel extends UserShellModel {
 
     suggestionProviderSuggestionModel.suggestionProvider = suggestionProvider;
     maxwellVoiceModel.suggestionProvider = suggestionProvider;
+    _attachSpeechToText();
 
     ContextQuery query =
         new ContextQuery(selector: <String, ContextSelector>{});
@@ -187,6 +192,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     _focusRequestWatcherBinding.close();
     _presentation.ctrl.close();
     maxwellVoiceModel.close();
+    _speechToText.ctrl.close();
     suggestionProviderSuggestionModel.close();
     storyProviderStoryGenerator.close();
     onUserShellStopped?.call();
@@ -216,6 +222,23 @@ class ArmadilloUserShellModel extends UserShellModel {
       default:
         return 'work';
     }
+  }
+
+  final SpeechToTextProxy _speechToText = new SpeechToTextProxy();
+  final RateLimitedRetry _retry =
+      new RateLimitedRetry(MaxwellHotword.kMaxRetry);
+
+  void _attachSpeechToText() {
+    userShellContext.getSpeechToText(_speechToText.ctrl.request());
+    maxwellVoiceModel.speechToText = _speechToText;
+    _speechToText.ctrl.onConnectionError = () {
+      if (_retry.shouldRetry) {
+        _attachSpeechToText();
+      } else {
+        log.warning(_retry.formatMessage(
+            component: 'speech to text', feature: 'voice input'));
+      }
+    };
   }
 }
 
