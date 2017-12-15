@@ -59,9 +59,10 @@ class Chatter {
         chatLinkName,
         null, // incomingServices,
         _chatModuleControllerProxy.ctrl.request(),
-        new SurfaceRelation()
-          ..arrangement = SurfaceArrangement.copresent
-          ..emphasis = 0.5,
+        const SurfaceRelation(
+          arrangement: SurfaceArrangement.copresent,
+          emphasis: 0.5,
+        ),
         true,
       );
 

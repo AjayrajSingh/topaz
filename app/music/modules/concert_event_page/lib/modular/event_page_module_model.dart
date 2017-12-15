@@ -155,7 +155,7 @@ class EventPageModuleModel extends ModuleModel {
           _kWebViewLinkName,
           null, // incomingServices,
           _webViewModuleController.ctrl.request(),
-          new SurfaceRelation()..arrangement = SurfaceArrangement.sequential,
+          const SurfaceRelation(arrangement: SurfaceArrangement.sequential),
           true,
         );
       } else {

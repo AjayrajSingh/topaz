@@ -88,8 +88,8 @@ class ImportNode extends ContainerNode {
 
 class ShapeNode extends Node {
   ShapeNode(Session session)
-      : super._create(
-            session, new scenic.Resource.withShapeNode(new scenic.ShapeNode()));
+      : super._create(session,
+            const scenic.Resource.withShapeNode(const scenic.ShapeNode()));
 
   void setMaterial(Material material) {
     session.enqueue(new scenic.Op.withSetMaterial(
@@ -104,8 +104,8 @@ class ShapeNode extends Node {
 
 class Material extends Resource {
   Material(Session session)
-      : super._create(
-            session, new scenic.Resource.withMaterial(new scenic.Material()));
+      : super._create(session,
+            const scenic.Resource.withMaterial(const scenic.Material()));
 
   void setColor(double red, double green, double blue, double alpha) {
     final scenic.ColorRgba color = new scenic.ColorRgba(

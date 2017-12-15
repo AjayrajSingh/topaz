@@ -124,10 +124,11 @@ class ContactListModuleModel extends ModuleModel {
       null, // Passes default link to the child
       null,
       _contactCardModuleController.ctrl.request(),
-      new SurfaceRelation()
-        ..arrangement = SurfaceArrangement.copresent
-        ..dependency = SurfaceDependency.dependent
-        ..emphasis = 2.0,
+      const SurfaceRelation(
+        arrangement: SurfaceArrangement.copresent,
+        dependency: SurfaceDependency.dependent,
+        emphasis: 2.0,
+      ),
       false,
     );
   }

@@ -140,7 +140,7 @@ class ModuleImpl implements Module, Lifecycle {
         meta: new ContextMetadata(
             story: new StoryMetadata(
                 focused: new FocusedState(state: FocusedStateState.focused)),
-            entity: new EntityMetadata(topic: _kFocalEntitiesTopic)));
+            entity: const EntityMetadata(topic: _kFocalEntitiesTopic)));
     ContextQuery query = new ContextQuery(
         selector: <String, ContextSelector>{_kFocalEntitiesTopic: selector});
 

@@ -69,7 +69,7 @@ class _EditSession {
         int cursor = start + newChar.length;
         TextSelection newSelection = new TextSelection(
             base: cursor, extent: cursor, affinity: TextAffinity.downstream);
-        updateState(newText, newSelection, new TextRange(), event);
+        updateState(newText, newSelection, const TextRange(), event);
         return true;
       }
       // TODO: handle editing commands other than inserting keys (backspace etc)

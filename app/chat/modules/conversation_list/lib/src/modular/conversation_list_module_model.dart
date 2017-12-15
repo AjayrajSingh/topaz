@@ -290,10 +290,11 @@ class ChatConversationListModuleModel extends ModuleModel {
       null, // Pass on our default link to the child.
       null,
       _conversationModuleController.ctrl.request(),
-      new SurfaceRelation()
-        ..arrangement = SurfaceArrangement.copresent
-        ..dependency = SurfaceDependency.dependent
-        ..emphasis = 2.0,
+      const SurfaceRelation(
+        arrangement: SurfaceArrangement.copresent,
+        dependency: SurfaceDependency.dependent,
+        emphasis: 2.0,
+      ),
       false,
     );
     _conversationModuleStarted = true;
@@ -587,9 +588,9 @@ class ChatConversationListModuleModel extends ModuleModel {
   User _getUserFromParticipantMap(Map<String, String> participantMap) =>
       _getUserFromParticipant(
         new chat_fidl.Participant(
-          email: participantMap['email'],
-          displayName: participantMap['displayName'],
-          photoUrl: participantMap['photoUrl']),
+            email: participantMap['email'],
+            displayName: participantMap['displayName'],
+            photoUrl: participantMap['photoUrl']),
       );
 
   @override

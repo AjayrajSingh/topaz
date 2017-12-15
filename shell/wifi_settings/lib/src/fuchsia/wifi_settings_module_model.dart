@@ -53,7 +53,7 @@ class WifiSettingsModuleModel extends ModuleModel {
     if (_selectedAccessPoint != null) {
       return;
     }
-    wlanProxy.scan(new wlan.ScanRequest(timeout: 15),
+    wlanProxy.scan(const wlan.ScanRequest(timeout: 15),
         (wlan.ScanResult scanResult) {
       if (_selectedAccessPoint != null) {
         return;

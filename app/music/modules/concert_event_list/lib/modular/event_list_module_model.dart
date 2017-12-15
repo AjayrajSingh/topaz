@@ -127,10 +127,11 @@ class EventListModuleModel extends ModuleModel {
           'event_link',
           null, // incomingServices,
           _eventPageModuleController.ctrl.request(),
-          new SurfaceRelation()
-            ..arrangement = SurfaceArrangement.copresent
-            ..emphasis = 1.5
-            ..dependency = SurfaceDependency.dependent,
+          const SurfaceRelation(
+            arrangement: SurfaceArrangement.copresent,
+            emphasis: 1.5,
+            dependency: SurfaceDependency.dependent,
+          ),
           true,
         );
 

@@ -586,7 +586,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
       }
 
       // Update the conversation cache.
-      _conversationCache[conversationId] = conversation..title = title;
+      _conversationCache[conversationId] = new Conversation(
+        title: title,
+        conversationId: conversation.conversationId,
+        participants: conversation.participants,
+      );
 
       // (2) In the specific conversation page, with the zero-array key.
       PageProxy conversationPage = new PageProxy();

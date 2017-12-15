@@ -34,7 +34,7 @@ final Asset _kDefaultAsset = new Asset.movie(
 class VideoModuleModel extends ModuleModel {
   String _remoteDeviceName = 'Remote Device';
   String _castingDeviceName;
-  DeviceMapEntry _currentDevice = new DeviceMapEntry(
+  DeviceMapEntry _currentDevice = const DeviceMapEntry(
       name: 'Current Device',
       hostname: 'Current Device',
       lastChangeTimestamp: 0);

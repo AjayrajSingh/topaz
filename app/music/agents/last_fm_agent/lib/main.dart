@@ -138,12 +138,13 @@ Future<Null> main(List<dynamic> args) async {
     ..validate(<String>['last_fm_api_key']);
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextSelector selector = new ContextSelector(
-      type: ContextValueType.entity,
-      meta: new ContextMetadata(
-          entity: new EntityMetadata(topic: _kMusicArtistTopic)));
-  ContextQuery query = new ContextQuery(
-      selector: <String, ContextSelector>{_kMusicArtistTopic: selector});
+  ContextQuery query =
+      const ContextQuery(selector: const <String, ContextSelector>{
+    _kMusicArtistTopic: const ContextSelector(
+        type: ContextValueType.entity,
+        meta: const ContextMetadata(
+            entity: const EntityMetadata(topic: _kMusicArtistTopic)))
+  });
   _contextListenerImpl = new ContextListenerImpl(
     apiKey: config.get('last_fm_api_key'),
   );

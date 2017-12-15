@@ -22,7 +22,7 @@ void main(List<String> args) {
 
   test('start hello_dart', () {
     final ApplicationLaunchInfo info =
-        new ApplicationLaunchInfo(url: 'hello_dart_jit.dartx');
+        const ApplicationLaunchInfo(url: 'hello_dart_jit.dartx');
     context.launcher.createApplication(info, null);
   });
 

@@ -90,12 +90,13 @@ Future<Null> main(List<dynamic> args) async {
 
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
-  ContextSelector selector = new ContextSelector(
-      type: ContextValueType.entity,
-      meta:
-          new ContextMetadata(entity: new EntityMetadata(topic: _kHotelTopic)));
-  ContextQuery query = new ContextQuery(
-      selector: <String, ContextSelector>{_kHotelTopic: selector});
+  ContextQuery query =
+      const ContextQuery(selector: const <String, ContextSelector>{
+    _kHotelTopic: const ContextSelector(
+        type: ContextValueType.entity,
+        meta: const ContextMetadata(
+            entity: const EntityMetadata(topic: _kHotelTopic)))
+  });
   _contextListenerImpl = new ContextListenerImpl();
   _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 }

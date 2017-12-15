@@ -91,20 +91,17 @@ class _ScanFilterDialogState extends State<ScanFilterDialog> {
               onPressed: () {
                 _formKey.currentState.save();
 
-                ble.ScanFilter filter = new ble.ScanFilter();
-
-                if (_manufacturerId != null) {
-                  filter.manufacturerIdentifier =
-                      new UInt16(value: _manufacturerId);
-                }
-
-                if (_nameSubstring?.isNotEmpty ?? false) {
-                  filter.nameSubstring = _nameSubstring;
-                }
-
-                if (_connectable != null) {
-                  filter.connectable = new Bool(value: _connectable);
-                }
+                ble.ScanFilter filter = new ble.ScanFilter(
+                  manufacturerIdentifier: _manufacturerId != null
+                      ? new UInt16(value: _manufacturerId)
+                      : null,
+                  nameSubstring: _nameSubstring?.isNotEmpty ?? false
+                      ? _nameSubstring
+                      : null,
+                  connectable: _connectable != null
+                      ? new Bool(value: _connectable)
+                      : null,
+                );
 
                 widget.moduleModel.scanFilter = filter;
                 Navigator.pop(context, DismissDialogAction.save);

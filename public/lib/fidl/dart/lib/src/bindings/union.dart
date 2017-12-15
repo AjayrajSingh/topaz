@@ -8,6 +8,7 @@ part of bindings;
 
 // ignore: one_member_abstracts
 abstract class Union {
+  const Union();
   void encode(Encoder encoder, int offset);
 }
 

@@ -247,15 +247,16 @@ class ChildViewConnection {
       return null;
     }
 
-    DisplayMetrics displayMetrics = new DisplayMetrics()
-      ..devicePixelRatio = devicePixelRatio;
+    DisplayMetrics displayMetrics =
+        new DisplayMetrics(devicePixelRatio: devicePixelRatio);
     fidl.SizeF size = new fidl.SizeF(width: width, height: height);
     fidl.InsetF inset = new fidl.InsetF(
         top: insetTop, right: insetRight, bottom: insetBottom, left: insetLeft);
     ViewLayout viewLayout = new ViewLayout(size: size, inset: inset);
-    return _currentViewProperties = new ViewProperties()
-      ..displayMetrics = displayMetrics
-      ..viewLayout = viewLayout;
+    return _currentViewProperties = new ViewProperties(
+      displayMetrics: displayMetrics,
+      viewLayout: viewLayout,
+    );
   }
 
   void _setChildProperties(

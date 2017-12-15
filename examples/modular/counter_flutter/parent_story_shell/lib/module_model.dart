@@ -76,10 +76,11 @@ class CounterParentModuleModel extends ModuleModel {
       _childController.ctrl.request(),
       // Here, we define the surface relationship between the current module and
       // the child module being launched.
-      new SurfaceRelation()
-        ..arrangement = SurfaceArrangement.copresent
-        ..dependency = SurfaceDependency.dependent
-        ..emphasis = 1.0,
+      const SurfaceRelation(
+        arrangement: SurfaceArrangement.copresent,
+        dependency: SurfaceDependency.dependent,
+        emphasis: 1.0,
+      ),
       true, // The child module is initially focused.
     );
   }

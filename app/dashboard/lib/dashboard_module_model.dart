@@ -151,7 +151,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
       webViewLinkName,
       null, // incomingServices,
       _webviewModuleControllerProxy.ctrl.request(),
-      new SurfaceRelation()..arrangement = SurfaceArrangement.copresent,
+      const SurfaceRelation(arrangement: SurfaceArrangement.copresent),
       true,
     );
     _webviewModuleWatcherBinding = new ModuleWatcherBinding();

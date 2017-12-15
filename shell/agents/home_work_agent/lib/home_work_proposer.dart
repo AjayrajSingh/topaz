@@ -96,12 +96,13 @@ class _ContextAwareProposer {
       }
     }
 
-    ContextSelector selector = new ContextSelector(
-        type: ContextValueType.entity,
-        meta: new ContextMetadata(
-            entity: new EntityMetadata(topic: _kLocationHomeWorkTopic)));
-    ContextQuery query = new ContextQuery(
-        selector: <String, ContextSelector>{_kLocationHomeWorkTopic: selector});
+    ContextQuery query =
+        const ContextQuery(selector: const <String, ContextSelector>{
+      _kLocationHomeWorkTopic: const ContextSelector(
+          type: ContextValueType.entity,
+          meta: const ContextMetadata(
+              entity: const EntityMetadata(topic: _kLocationHomeWorkTopic)))
+    });
 
     contextReader.subscribe(
       query,
@@ -360,7 +361,7 @@ class _QueryHandlerImpl extends QueryHandler {
 
   Proposal get _launchEverythingProposal => new Proposal(
       id: _kLaunchEverythingProposalId,
-      display: new SuggestionDisplay(
+      display: const SuggestionDisplay(
           headline: 'Launch everything',
           subheadline: '',
           details: '',

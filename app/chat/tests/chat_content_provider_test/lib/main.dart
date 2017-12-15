@@ -136,9 +136,9 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     expect(conversations, isEmpty);
 
     // Test NewConversation() method.
-    List<Participant> participants = <Participant>[
-      new Participant(email: 'alice@example.com'),
-      new Participant(email: 'bob@example.com'),
+    List<Participant> participants = const <Participant>[
+      const Participant(email: 'alice@example.com'),
+      const Participant(email: 'bob@example.com'),
     ];
     await _chatContentProvider.newConversation(
       participants,
@@ -396,9 +396,9 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     completer1 = new Completer<Null>();
     mqConversation1.completer = completer1;
 
-    List<Participant> participants1 = <Participant>[
-      new Participant(email: 'foo@example.com'),
-      new Participant(email: 'bar@example.com'),
+    List<Participant> participants1 = const <Participant>[
+      const Participant(email: 'foo@example.com'),
+      const Participant(email: 'bar@example.com'),
     ];
 
     await _chatContentProvider.newConversation(
@@ -447,9 +447,9 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     mqConversation1.completer = completer1;
     mqConversation2.completer = completer2;
 
-    List<Participant> participants2 = <Participant>[
-      new Participant(email: 'qux@example.com'),
-      new Participant(email: 'baz@example.com'),
+    List<Participant> participants2 = const <Participant>[
+      const Participant(email: 'qux@example.com'),
+      const Participant(email: 'baz@example.com'),
     ];
 
     await _chatContentProvider.newConversation(

@@ -107,8 +107,8 @@ class EddystoneScanner implements ble.CentralDelegate {
   int _delayMinutes = 1;
 
   void start(ble.Central central) {
-    ble.ScanFilter filter = new ble.ScanFilter()
-      ..serviceUuids = [kEddystoneUuid];
+    ble.ScanFilter filter =
+        const ble.ScanFilter(serviceUuids: const [kEddystoneUuid]);
     log.info('BLE starting scan for Eddystone beacons');
     central.startScan(filter, (bt.Status status) {
       if (status.error != null) {

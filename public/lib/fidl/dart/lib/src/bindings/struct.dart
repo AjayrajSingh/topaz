@@ -9,7 +9,7 @@ part of bindings;
 abstract class Struct {
   final int encodedSize;
 
-  Struct(this.encodedSize);
+  const Struct(this.encodedSize);
 
   static StructDataHeader checkVersion(
       Decoder decoder, List<StructDataHeader> knownVersions) {

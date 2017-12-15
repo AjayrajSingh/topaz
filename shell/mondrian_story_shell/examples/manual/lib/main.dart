@@ -163,15 +163,17 @@ class CopresentLauncherState extends State<CopresentLauncher> {
                   setState(() => _copresentEmphasisExp = value),
             ),
             new LaunchModuleButton(
-                new SurfaceRelation()
-                  ..emphasis = _emphasis
-                  ..arrangement = SurfaceArrangement.copresent,
+                new SurfaceRelation(
+                  emphasis: _emphasis,
+                  arrangement: SurfaceArrangement.copresent,
+                ),
                 'Copresent'),
             new LaunchModuleButton(
-                new SurfaceRelation()
-                  ..emphasis = _emphasis
-                  ..arrangement = SurfaceArrangement.copresent
-                  ..dependency = SurfaceDependency.dependent,
+                new SurfaceRelation(
+                  emphasis: _emphasis,
+                  arrangement: SurfaceArrangement.copresent,
+                  dependency: SurfaceDependency.dependent,
+                ),
                 'Dependent\nCopresent'),
           ],
         ),
@@ -290,8 +292,8 @@ class MainWidget extends StatelessWidget {
                   const CopresentLauncher(),
                   const Divider(),
                   new LaunchModuleButton(
-                      new SurfaceRelation()
-                        ..arrangement = SurfaceArrangement.sequential,
+                      new SurfaceRelation(
+                          arrangement: SurfaceArrangement.sequential),
                       'Sequential'),
                 ],
               ),

@@ -49,8 +49,15 @@ class BrowserModuleModel extends ModuleModel {
     _docsInterfaceProxy.get(_currentDoc.id, (doc_fidl.Document doc) {
       // Check that user has not navigated away to another doc
       if (_currentDoc.id == doc.id) {
-        _currentDoc.location = doc.location;
-        notifyListeners();
+        currentDoc = new doc_fidl.Document(
+          location: doc.location,
+          id: _currentDoc.id,
+          isFolder: _currentDoc.isFolder,
+          mimeType: _currentDoc.mimeType,
+          name: _currentDoc.mimeType,
+          size: _currentDoc.size,
+          thumbnailLocation: _currentDoc.thumbnailLocation,
+        );
         log.fine('Downloaded file to local /tmp');
       }
     });

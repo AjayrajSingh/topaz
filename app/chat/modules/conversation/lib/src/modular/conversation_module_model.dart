@@ -447,7 +447,13 @@ class ChatConversationModuleModel extends ModuleModel {
           break;
 
         case 'title':
-          _conversation?.title = title;
+          if (_conversation != null) {
+            _conversation = new chat_fidl.Conversation(
+              title: title,
+              conversationId: _conversation.conversationId,
+              participants: _conversation.participants,
+            );
+          }
           notifyListeners();
           break;
 
@@ -733,10 +739,10 @@ class ChatConversationModuleModel extends ModuleModel {
       name,
       incomingServices,
       _childModuleController.ctrl.request(),
-      new SurfaceRelation()
-        ..arrangement = SurfaceArrangement.copresent
-        ..dependency = SurfaceDependency.dependent
-        ..emphasis = 0.5,
+      const SurfaceRelation(
+          arrangement: SurfaceArrangement.copresent,
+          dependency: SurfaceDependency.dependent,
+          emphasis: 0.5),
       true,
     );
 
