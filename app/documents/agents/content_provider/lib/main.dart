@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:lib.agent.fidl/agent_context.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.entity.fidl/entity_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.agent.dart/agent.dart';
@@ -22,8 +23,7 @@ DocumentsAgent _agent;
 /// Implementation of the [Agent] interface for the Documents Agent
 class DocumentsAgent extends AgentImpl {
   DocumentsContentProviderImpl _documentsContentProviderImpl;
-  final List<doc_fidl.DocumentInterfaceBinding> _bindings =
-      <doc_fidl.DocumentInterfaceBinding>[];
+  final List<Binding<Object>> _bindings = <doc_fidl.DocumentInterfaceBinding>[];
 
   /// Creates a new instance of [DocumentsAgent].
   DocumentsAgent({
@@ -71,6 +71,20 @@ class DocumentsAgent extends AgentImpl {
     for (doc_fidl.DocumentInterfaceBinding binding in _bindings) {
       binding.close();
     }
+  }
+
+  @override
+  void advertise() {
+    super.advertise();
+    applicationContext.outgoingServices.addServiceForName(
+      (InterfaceRequest<EntityProvider> request) {
+        _bindings.add(
+          new EntityProviderBinding()
+            ..bind(_documentsContentProviderImpl, request),
+        );
+      },
+      EntityProvider.serviceName,
+    );
   }
 }
 

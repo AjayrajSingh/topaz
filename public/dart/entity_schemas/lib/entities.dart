@@ -5,3 +5,4 @@
 export 'src/contact.dart';
 export 'src/email.dart';
 export 'src/phone_number.dart';
+export 'src/video.dart';

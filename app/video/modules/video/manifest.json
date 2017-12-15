@@ -1,10 +1,10 @@
 {
     "binary": "video",
     "local_name": "video",
-    "verb": "com.google.fuchsia.play",
+    "verb": "com.google.fuchsia.preview",
     "noun_constraints": [
         {
-            "name": "asset",
+            "name": "entityRef",
             "types": [
                 "com.google.fuchsia.string"
             ]

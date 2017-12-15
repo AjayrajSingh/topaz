@@ -79,7 +79,7 @@ class Browser extends StatelessWidget {
           // TODO(maryxia) SO-662 open the file with correct module
           onPressed: _canBePreviewed(model.currentDoc)
               ? () => _previewImage(model, true)
-              : (model.currentDoc == null ? null : model.createDocEntityRef),
+              : (model.currentDoc == null ? null : model.resolveDocument),
         ),
         new IconButton(
           icon: new Icon(

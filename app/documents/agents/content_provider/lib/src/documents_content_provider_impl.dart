@@ -9,8 +9,10 @@ import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.entity.fidl/entity_provider.fidl.dart';
 import 'package:lib.entity.fidl/entity_reference_factory.fidl.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:entity_schemas/entities.dart' as entities;
 import 'package:meta/meta.dart';
 import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 
@@ -18,8 +20,11 @@ import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 /// Currently, it can only take in one hardcoded Document Provider.
 /// In the future, it would return back a list of Document Providers and their
 /// documents
+/// This also implements the EntityProvider because each document can be
+/// made into an Entity, which we can then pass in a Daisy.
 // TODO SO-880(maryxia) retrieve document providers from a list
-class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
+class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface
+    implements EntityProvider {
   final AgentControllerProxy _agentControllerProxy = new AgentControllerProxy();
 
   // We use this interface proxy to talk to the doc_fidl
@@ -45,7 +50,7 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
         _componentContext = componentContext,
         _agentContext = agentContext;
 
-  /// Implements the Document interface to get a [Document] based on id
+  /// Extends the Document interface to get a [Document] based on id
   /// This downloads and returns the local file location for the Document.
   // TODO(maryxia) SO-820 search by name as well as id
   @override
@@ -60,7 +65,7 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
     });
   }
 
-  /// Implements the Document interface to get a [Document]'s metadata using id
+  /// Extends the Document interface to get a [Document]'s metadata using id
   /// This returns all the metadata (e.g. last modified, permissions)
   /// for the Document, and also returns the webContentLink for it. However,
   /// it does not download/return a copy of the actual Document.
@@ -77,7 +82,7 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
     });
   }
 
-  /// Implements the [Document] interface to List files
+  /// Extends the [Document] interface list() to List files
   @override
   void list(
     void callback(List<doc_fidl.Document> docs),
@@ -89,6 +94,7 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
     });
   }
 
+  /// Extends the [Document] interface createEntityReference()
   /// Uses the EntityReferenceFactoryProxy (an implementation of the
   /// EntityReferenceProxy) to create an Entity Reference for a given
   /// Document type
@@ -110,6 +116,40 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
 
     String entityRef = await completer.future;
     callback(entityRef);
+  }
+
+  /// Implements [EntityProvider] getTypes(). Currently we only support Video.
+  @override
+  void getTypes(String cookie, void callback(List<String> types)) {
+    getMetadata(cookie, (doc_fidl.Document doc) {
+      // TODO(maryxia) SO-913: a Doc_fidl.Error object would be returned here
+      // if the doc isn't valid or doesn't exist. Use that instead of null check
+      if (doc == null) {
+        callback(<String>[]);
+      }
+      callback(<String>['Video']);
+    });
+  }
+
+  /// Implements [EntityProvider] getData(). This is the data needed to create
+  /// an Asset object for Videos.
+  @override
+  void getData(String cookie, String type, void callback(String data)) {
+    String data;
+    getMetadata(cookie, (doc_fidl.Document doc) {
+      // TODO(maryxia) SO-913: a Doc_fidl.Error object would be returned here
+      // if the doc isn't valid or doesn't exist. Use that instead of null check
+      if (doc == null) {
+        callback(null);
+      }
+      doc_fidl.Document entityDoc = doc;
+      data = new entities.Video(
+        location: entityDoc.location,
+        mimeType: entityDoc.mimeType,
+      )
+          .toJson();
+      callback(data);
+    });
   }
 
   // TODO(maryxia) SO-796 preload the results for documents

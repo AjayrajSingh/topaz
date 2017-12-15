@@ -7,6 +7,7 @@ import 'dart:collection';
 import 'dart:convert' show JSON;
 
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.netconnector.fidl/netconnector.fidl.dart';
@@ -14,6 +15,9 @@ import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.story.dart/story.dart';
 import 'package:lib.widgets/modular.dart';
+import 'package:lib.entity.fidl/entity.fidl.dart';
+import 'package:lib.entity.fidl/entity_resolver.fidl.dart';
+import 'package:entity_schemas/entities.dart' as entities;
 
 import '../widgets.dart';
 
@@ -32,6 +36,9 @@ final Asset _kDefaultAsset = new Asset.movie(
 
 /// The [ModuleModel] for the video player.
 class VideoModuleModel extends ModuleModel {
+  final ComponentContextProxy _componentContextProxy =
+      new ComponentContextProxy();
+  final EntityResolverProxy _entityResolverProxy = new EntityResolverProxy();
   String _remoteDeviceName = 'Remote Device';
   String _castingDeviceName;
   DeviceMapEntry _currentDevice = const DeviceMapEntry(
@@ -76,6 +83,11 @@ class VideoModuleModel extends ModuleModel {
     Link link,
   ) async {
     super.onReady(moduleContext, link);
+
+    moduleContext.getComponentContext(_componentContextProxy.ctrl.request());
+    _componentContextProxy
+        .getEntityResolver(_entityResolverProxy.ctrl.request());
+
     Completer<DeviceMapEntry> currentDeviceCompleter =
         new Completer<DeviceMapEntry>();
     _deviceMap.getCurrentDevice(currentDeviceCompleter.complete);
@@ -150,6 +162,53 @@ class VideoModuleModel extends ModuleModel {
       _hideDeviceChooser = hide;
       notifyListeners();
     }
+  }
+
+  // Creates a Video asset from an EntityRef
+  //
+  // First we resolve the EntityRef into an entities.Video object.
+  // Then we map the entities.Video into an Asset.movie object.
+  // The Video Player module takes in the Asset.movie for playing.
+  Future<Null> _createAssetFromEntityRef(String entityRef) async {
+    // Resolve entityRef
+    entities.Video video;
+    EntityProxy entityProxy = new EntityProxy();
+    _entityResolverProxy.resolveEntity(
+      entityRef,
+      entityProxy.ctrl.request(),
+    );
+    String type = entities.Video.getType();
+    Completer<String> completer = new Completer<String>();
+    entityProxy.ctrl.onConnectionError = () {
+      log.warning('Error connecting to the EntityProxy');
+      return;
+    };
+    entityProxy.getData(type, completer.complete);
+    String data = await completer.future;
+
+    // Convert data into entities.Video
+    try {
+      // SO-1060 When our video links work, use those instead of this one
+      //video = new entities.Video.fromJson(data);
+      video = new entities.Video(
+          location:
+              'http://ia800201.us.archive.org/12/items/BigBuckBunny_328/BigBuckBunny.ogv',
+          mimeType: 'video/ogv');
+      log.fine('Successfully resolved Video entity');
+    } on Exception catch (e) {
+      log.warning('Error decoding Video entity from data = $data, error = $e');
+    }
+    entityProxy.ctrl.close();
+
+    // Map the entities.Video into an Asset.movie
+    _asset = new Asset.movie(
+      uri: Uri.parse(video.location),
+      title: 'Super cool video',
+      description: 'What a great video!',
+      thumbnail: 'assets/video-thumbnail.png',
+      background: 'assets/video-background.png',
+    );
+    notifyListeners();
   }
 
   /// Returns display name for a given device
@@ -254,8 +313,11 @@ class VideoModuleModel extends ModuleModel {
   void onNotify(String json) {
     Map<String, String> linkContents = JSON.decode(json);
     log.fine('Updating video asset according to Daisy Link data');
-    // TODO(maryxia) SO-1014 fill these in using Entities
-    if (linkContents != null) {
+    if (linkContents['entityRef'] == null) {
+      String entityRef = linkContents['entityRef'];
+      _createAssetFromEntityRef(entityRef);
+    } else {
+      // TODO(maryxia) SO-1069: remove this once we have on-the-fly entities
       String uri = linkContents['asset'];
       if (uri != null) {
         asset = new Asset.movie(
@@ -280,6 +342,8 @@ class VideoModuleModel extends ModuleModel {
     _remoteDeviceLink.ctrl.close();
     _netConnector.ctrl.close();
     _deviceMap.ctrl.close();
+    _componentContextProxy.ctrl.close();
+    _entityResolverProxy.ctrl.close();
     super.onStop();
   }
 }

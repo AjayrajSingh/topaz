@@ -20,6 +20,12 @@ import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 
 const String _kInfoModuleUrl = 'file:///system/apps/documents/info';
 
+const SurfaceRelation _kSurfaceRelation = const SurfaceRelation(
+  arrangement: SurfaceArrangement.copresent,
+  dependency: SurfaceDependency.dependent,
+  emphasis: 0.5,
+);
+
 /// The ModuleModel for the document browser
 class BrowserModuleModel extends ModuleModel {
   // Interface Proxy. This is how we talk to the Doc FIDL
@@ -98,11 +104,7 @@ class BrowserModuleModel extends ModuleModel {
         null, // default link
         null,
         _moduleController.ctrl.request(),
-        new SurfaceRelation(
-          arrangement: SurfaceArrangement.copresent,
-          dependency: SurfaceDependency.dependent,
-          emphasis: 0.5,
-        ),
+        _kSurfaceRelation,
         false,
       );
       _infoModuleOpen = true;
@@ -110,26 +112,31 @@ class BrowserModuleModel extends ModuleModel {
     }
   }
 
-  /// Creates an Entity Reference for the currently-selected doc
-  /// The Resolver can use this Entity to figure out what relevant module to open
-  void createDocEntityRef() {
+  /// Resolves the [Document] into a new module.
+  ///
+  /// Creates an Entity Reference for the currently-selected doc.
+  /// Create a Daisy, passing in the Entity Reference.
+  /// The Resolver then figures out what relevant module to open.
+  void resolveDocument() {
     // Make Entity Ref for this doc
     _docsInterfaceProxy.createEntityReference(_currentDoc, (String entityRef) {
       log.fine('Retrieved an Entity Ref at $entityRef');
-      // TODO(maryxia) SO-788 actually do something with the entity
-
       // Use DaisyBuilder to create a Daisy that stores an entityRef
       // for this Document
-      // TODO(maryxia) SO-1014 pass in an entity for the Noun
-      DaisyBuilder daisyBuilder = new DaisyBuilder.verb(
-          'com.google.fuchsia.play')
-        ..addNoun('asset',
-            'http://ia800201.us.archive.org/12/items/BigBuckBunny_328/BigBuckBunny.ogv');
+      DaisyBuilder daisyBuilder =
+          new DaisyBuilder.verb('com.google.fuchsia.preview')
+            ..addNoun('entityRef', entityRef);
       log.fine('Created Daisy for $_currentDoc.id');
 
       // Open a new module using Module Resolution
-      moduleContext.startDaisyInShell('video', daisyBuilder.daisy, null, null,
-          _moduleController.ctrl.request(), null);
+      moduleContext.startDaisyInShell(
+        'video',
+        daisyBuilder.daisy,
+        null,
+        null,
+        _moduleController.ctrl.request(),
+        _kSurfaceRelation,
+      );
       log.fine('Opened a new module');
       notifyListeners();
     });
