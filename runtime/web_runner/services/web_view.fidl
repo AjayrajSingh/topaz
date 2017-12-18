@@ -5,7 +5,7 @@
 module web_view;
 
 interface WebRequestDelegate {
-   WillSendRequest(string url);
+   WillSendRequest@0(string url);
 };
 
 [ServiceName="web_view::WebView"]
