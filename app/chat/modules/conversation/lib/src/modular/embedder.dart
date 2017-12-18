@@ -143,6 +143,7 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
   void startDaisy({
     @required Daisy daisy,
     @required String name,
+    Object additionalLinkData,
   }) {
     if (daisyStarted) {
       return;
@@ -175,6 +176,19 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
 
     link = new LinkProxy();
     moduleContext.getLink(name, link.ctrl.request());
+
+    try {
+      if (additionalLinkData != null) {
+        link.updateObject(null, JSON.encode(additionalLinkData));
+      }
+    } on Exception catch (e, stackTrace) {
+      log.warning(
+        'Failed to encode the additional link data: $additionalLinkData',
+        e,
+        stackTrace,
+      );
+    }
+
     linkWatcherBinding = new LinkWatcherBinding();
     link.watch(linkWatcherBinding.wrap(this));
 

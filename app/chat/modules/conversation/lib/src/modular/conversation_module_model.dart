@@ -558,6 +558,17 @@ class ChatConversationModuleModel extends ModuleModel {
                     'members': members,
                   };
 
+                  Map<String, dynamic> additionalLinkData = <String, dynamic>{
+                    'conversationId': <String, String>{
+                      '@type': 'com.google.fuchsia.string',
+                      'content': cid,
+                    },
+                    'messageId': <String, String>{
+                      '@type': 'com.google.fuchsia.string',
+                      'content': mid,
+                    },
+                  };
+
                   // Create a Daisy.
                   DaisyBuilder daisyBuilder =
                       new DaisyBuilder.verb('com.google.fuchsia.codelab.$verb')
@@ -567,6 +578,7 @@ class ChatConversationModuleModel extends ModuleModel {
                   embedder.startDaisy(
                     daisy: daisyBuilder.daisy,
                     name: mid,
+                    additionalLinkData: additionalLinkData,
                   );
                   break;
 
