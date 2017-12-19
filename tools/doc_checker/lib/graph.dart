@@ -29,10 +29,29 @@ class Graph {
   void addEdge({Node from, Node to}) =>
       _edges.putIfAbsent(from, () => new Set<Node>()).add(to);
 
+  /// Removes and returns all singletons from the graph.
+  List<Node> removeSingletons() {
+    final List<Node> singletons = _nodes.values
+        .where((Node node) =>
+            !_edges.containsKey(node) &&
+            _edges.values.every((Set<Node> nodes) => !nodes.contains(node)))
+        .toList();
+    for (Node node in singletons) {
+      _nodes.remove(node.label);
+    }
+    return singletons;
+  }
+
+  /// Returns the nodes which do not have a parent.
+  List<Node> get orphans => _nodes.values
+      .where((Node node) =>
+          node != _root &&
+          _edges.values.every((Set<Node> nodes) => !nodes.contains(node)))
+      .toList();
+
   /// Creates a string representation of this graph in the DOT format.
   void export(String name, StringSink out) {
     out.writeln('digraph $name {');
-    out.writeln('rankdir  = TB');
     for (Node node in _nodes.values) {
       out.writeln('${node.id} [label="${node.label}"];');
     }

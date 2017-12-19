@@ -11,6 +11,7 @@ dart_tool("doc_checker") {
 
   deps = [
     "//third_party/dart-pkg/pub/args",
+    "//third_party/dart-pkg/pub/http",
     "//third_party/dart-pkg/pub/markdown",
     "//third_party/dart-pkg/pub/path",
   ]
