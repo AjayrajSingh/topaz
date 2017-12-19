@@ -7,5 +7,6 @@ import("//garnet/public/lib/fidl/fidl.gni")
 fidl("services") {
   sources = [
     "chat_content_provider.fidl",
+    "firebase_db_client.fidl",
   ]
 }

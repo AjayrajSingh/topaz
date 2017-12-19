@@ -5,7 +5,9 @@
 import 'dart:async';
 
 import 'package:lib.agent.dart/agent.dart';
+import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.auth.fidl/token_provider.fidl.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
@@ -17,12 +19,14 @@ import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
+import 'package:topaz.app.chat.services/firebase_db_client.fidl.dart';
 
 import 'src/chat_content_provider_impl.dart';
 import 'src/firebase_chat_message_transporter.dart';
 import 'src/proposer.dart';
 
 const Duration _kTimeout = const Duration(seconds: 3);
+const String _kFirebaseDbAgentUrl = 'firebase_db_client';
 
 // ignore: unused_element
 ChatContentProviderAgent _agent;
@@ -34,6 +38,11 @@ class ChatContentProviderAgent extends AgentImpl {
   final ContextReaderProxy _contextReader = new ContextReaderProxy();
   final ContextListenerBinding _proposerBinding = new ContextListenerBinding();
   ChatContentProviderImpl _contentProviderImpl;
+
+  final FirebaseDbConnectorProxy _firebaseDbConnector =
+      new FirebaseDbConnectorProxy();
+  final AgentControllerProxy _firebaseDbAgentController =
+      new AgentControllerProxy();
 
   /// Creates a new instance of [ChatContentProviderAgent].
   ChatContentProviderAgent({@required ApplicationContext applicationContext})
@@ -76,11 +85,21 @@ class ChatContentProviderAgent extends AgentImpl {
         selector: <String, ContextSelector>{'location/home_work': selector});
     _contextReader.subscribe(query, _proposerBinding.wrap(proposer));
 
+    // Connect to the firebase db client agent and obtain the connector service.
+    ServiceProviderProxy firebaseServices = new ServiceProviderProxy();
+    componentContext.connectToAgent(
+      _kFirebaseDbAgentUrl,
+      firebaseServices.ctrl.request(),
+      _firebaseDbAgentController.ctrl.request(),
+    );
+    connectToService(firebaseServices, _firebaseDbConnector.ctrl);
+    firebaseServices.ctrl.close();
+
     // Initialize the content provider.
     _contentProviderImpl = new ChatContentProviderImpl(
       componentContext: componentContext,
       chatMessageTransporter: new FirebaseChatMessageTransporter(
-        tokenProvider: tokenProvider,
+        firebaseDbConnector: _firebaseDbConnector,
       ),
       deviceId: deviceId,
       onMessageReceived: proposer.onMessageReceived,
@@ -106,6 +125,8 @@ class ChatContentProviderAgent extends AgentImpl {
     _proposalPublisher.ctrl.close();
     _contextReader.ctrl.close();
     _proposerBinding.close();
+    _firebaseDbConnector.ctrl.close();
+    _firebaseDbAgentController.ctrl.close();
   }
 }
 

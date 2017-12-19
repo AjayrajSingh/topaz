@@ -5,61 +5,23 @@
 import 'dart:async';
 import 'dart:convert' show JSON;
 
-import 'package:config/config.dart';
-import 'package:eventsource/eventsource.dart';
-import 'package:http/http.dart' as http;
-import 'package:lib.auth.fidl/token_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
+
 import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
+import 'package:topaz.app.chat.services/firebase_db_client.fidl.dart';
 
 import 'chat_message_transporter.dart';
 
 const int _kMaxRetryCount = 3;
-const Duration _kInitDebounceWindow = const Duration(seconds: 5);
-const Duration _kHealthCheckPeriod = const Duration(minutes: 3);
 
 /// A [ChatMessageTransporter] implementation that uses a Firebase Realtime
 /// Database as its message transportation channel.
-class FirebaseChatMessageTransporter extends ChatMessageTransporter {
-  /// Config object obtained from the `/system/data/modules/config.json` file.
-  Config _config;
-
-  /// The primary email address of this user.
-  String _email;
-
-  /// Firebase auth token obtained from the identity toolkit api.
-  String _firebaseAuthToken;
-
-  /// [EventSource] connection for wathcing the incoming messages from Firebase.
-  EventSource _eventSource;
-
-  /// [StreamSubscription] for canceling the subscription when needed.
-  StreamSubscription<Event> _eventSourceSubscription;
-
-  /// The [TokenProvider] instance from which the id_token can be obtained.
-  final TokenProvider _tokenProvider;
-
-  /// An http client for making requests to the Firebase DB server. This same
-  /// client should be used for all https calls, so that data such as the DNS
-  /// lookup results can be cached and reused.
-  final http.Client _client = new http.Client();
-
-  /// A [Completer] which completes when the Firebase initialization is done. In
-  /// case of an error, this also completes with an error.
-  Completer<Null> _ready = new Completer<Null>();
-
-  /// Stores the last time [initialize()] is called, used for debouncing the
-  /// [initialize()] call.
-  DateTime _lastInitializeStartTime;
-
-  /// [Timer] for periodic health check. Normally, the Firebase event stream
-  /// sends the 'keep-alive' event every 30 seconds to notify that the stream
-  /// connection is still alive. Therefore, this timer is reset every time when
-  /// a new event is sent from the Firebase event stream. When this timer
-  /// triggers, it will try to re-establish the connection to the event stream.
-  /// This way, the agent can be more resilient to any potential network errors.
-  Timer _healthCheckTimer;
+class FirebaseChatMessageTransporter extends ChatMessageTransporter
+    implements FirebaseDbWatcher {
+  final FirebaseDbClientProxy _firebaseClient = new FirebaseDbClientProxy();
+  final FirebaseDbWatcherBinding _watcherBinding =
+      new FirebaseDbWatcherBinding();
 
   /// Keep the last received message keys so that we don't process the same
   /// message more than once.
@@ -68,103 +30,38 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
   /// Creates a new [FirebaseChatMessageTransporter] instance.
   FirebaseChatMessageTransporter({
     MessageReceivedCallback onReceived,
-    @required TokenProvider tokenProvider,
+    @required FirebaseDbConnector firebaseDbConnector,
   })
-      : _tokenProvider = tokenProvider,
-        super(onReceived: onReceived);
+      : super(onReceived: onReceived) {
+    firebaseDbConnector.getClient(
+      _watcherBinding.wrap(this),
+      _firebaseClient.ctrl.request(),
+    );
+  }
 
-  // HACK(jimbe) The fidl declaration won't accept null, so the workaround is
-  // to return an empty string. Returning null is probably better, but I don't
-  // have time to chase it down.
   @override
-  String get currentUserEmail => _email ?? '';
+  Future<String> get currentUserEmail {
+    Completer<String> completer = new Completer<String>();
+    _firebaseClient.getCurrentUserEmail(completer.complete);
+    return completer.future;
+  }
 
-  /// Sign in to the firebase DB using the given google auth credentials.
   @override
   Future<Null> initialize() async {
-    log.fine('initialize() start');
-    try {
-      // The initialize() method can be called by multiple reasons; the
-      // 'auth_revoked' event from the event source, and any 401 unauthorized
-      // status code returned from a DB update operation.
-      // To prevent parallel running initialize() method, only allow running the
-      // initialization logic once within the debounce window.
-      DateTime now = new DateTime.now();
-      if (_lastInitializeStartTime != null &&
-          now.difference(_lastInitializeStartTime) < _kInitDebounceWindow) {
-        log.fine('debouncing initialize() call');
-        return _ready.future;
-      }
-      _lastInitializeStartTime = now;
+    Completer<FirebaseStatus> statusCompleter = new Completer<FirebaseStatus>();
+    _firebaseClient.initialize(statusCompleter.complete);
 
-      _resetHealthCheckTimer();
-
-      if (_ready.isCompleted) {
-        _ready = new Completer<Null>();
-      }
-
-      if (_tokenProvider == null) {
-        throw new Exception('TokenProvider is not provided.');
-      }
-
-      FirebaseToken firebaseToken;
-      try {
-        // See if the required config values are all provided.
-        Config config = await Config.read('/system/data/modules/config.json');
-        List<String> keys = <String>[
-          'chat_firebase_api_key',
-          'chat_firebase_project_id',
-        ];
-
-        config.validate(keys);
-        _config = config;
-
-        Completer<FirebaseToken> tokenCompleter =
-            new Completer<FirebaseToken>();
-        AuthErr authErr;
-        _tokenProvider.getFirebaseAuthToken(
-          _config.get('chat_firebase_api_key'),
-          (FirebaseToken token, AuthErr err) {
-            tokenCompleter.complete(token);
-            authErr = err;
-          },
+    FirebaseStatus status = await statusCompleter.future;
+    if (status != FirebaseStatus.ok) {
+      if (status == FirebaseStatus.unrecoverableError) {
+        throw new ChatUnrecoverableException(
+          'Unrecoverable error from Firebase transport',
         );
-
-        firebaseToken = await tokenCompleter.future;
-        if (firebaseToken == null ||
-            firebaseToken.idToken == null ||
-            firebaseToken.idToken.isEmpty) {
-          throw new Exception('Could not obtain the Firebase token.');
-        }
-
-        if (authErr.status != Status.ok) {
-          throw new Exception(
-              'Error fetching firebase token:${authErr.message}');
-        }
-      } on Object catch (e) {
-        throw new ChatUnrecoverableException('Initialization failed', e);
+      } else if (status == FirebaseStatus.authenticationError) {
+        throw new ChatAuthenticationException('Failed to authenticate');
+      } else {
+        throw new ChatNetworkException('Unknown error');
       }
-
-      _email = _normalizeEmail(firebaseToken.email);
-      _firebaseAuthToken = firebaseToken.idToken;
-
-      await _connectToEventStream();
-
-      // We would like to start listeneing to the events but not necessarily
-      // await for the stream to be completed. Just ignore the lint rule here.
-      // ignore: unawaited_futures
-      _startProcessingEventStream();
-
-      _ready.complete();
-    } on ChatException {
-      rethrow;
-    } on Exception catch (e) {
-      ChatAuthenticationException cae = new ChatAuthenticationException(
-        'Firebase authentication failed.',
-        e,
-      );
-      _ready.completeError(cae);
-      throw cae;
     }
   }
 
@@ -176,14 +73,13 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     @required String type,
     @required String jsonPayload,
   }) async {
-    await _ready.future;
-
     // Construct the message.
-    String key = _encodeFirebaseKey(JSON.encode(messageId));
+    String key = await _encodeKey(JSON.encode(messageId));
+    String email = await currentUserEmail;
 
     List<String> participants =
         conversation.participants.map((Participant p) => p.email).toList()
-          ..add(_email)
+          ..add(email)
           ..sort();
 
     // Every message contains the conversation id as well as the list of all
@@ -195,7 +91,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
       'participants': participants,
       'message_id': messageId,
       'server_timestamp': <String, String>{'.sv': 'timestamp'},
-      'sender': _email,
+      'sender': email,
       'type': type,
       'json_payload': jsonPayload,
     };
@@ -213,10 +109,22 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     Map<String, dynamic> value, [
     int retryCount = 0,
   ]) async {
-    http.Response response = await _firebaseDBPut(
-      'emails/${_encodeFirebaseKey(recipient)}/$key',
-      value,
+    Completer<FirebaseStatus> statusCompleter = new Completer<FirebaseStatus>();
+    HttpResponse response;
+
+    _firebaseClient.put(
+      'emails/${await _encodeKey(recipient)}/$key',
+      JSON.encode(value),
+      (FirebaseStatus status, HttpResponse resp) {
+        response = resp;
+        statusCompleter.complete(status);
+      },
     );
+
+    FirebaseStatus status = await statusCompleter.future;
+    if (status != FirebaseStatus.ok) {
+      throw new ChatNetworkException('Firebase error returned: $status');
+    }
 
     if (response.statusCode != 200) {
       log.severe('Failed to send message to $recipient. '
@@ -243,146 +151,79 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     }
   }
 
-  Future<Null> _connectToEventStream() async {
-    if (_eventSource != null) {
-      _eventSource.client.close();
+  // |FirebaseDBWatcher|
+  /// Handles the 'put' event from the Firebase event stream, which usually
+  /// indicates that there's a new incoming message.
+  @override
+  Future<Null> dataChanged(
+    NotificationType type,
+    String path,
+    String data,
+    void callback(),
+  ) async {
+    if (type != NotificationType.put) {
+      log.severe('Expected to get only "put" events, but got: $type');
+      callback();
+      return;
     }
 
     try {
-      _eventSource = await EventSource.connect(
-        _getFirebaseUrl('emails/${_encodeFirebaseKey(_email)}'),
-      );
-    } on EventSourceSubscriptionException catch (e) {
-      log.severe('Event Source Subscription Exception: ${e.data}');
-    }
-  }
+      dynamic decoded = JSON.decode(data);
 
-  Future<Null> _reconnectToEventStream() async {
-    await _eventSourceSubscription?.cancel();
-    _eventSourceSubscription = null;
+      // If the path is given as '/', the data may contain multiple messages.
+      // Otherwise, the path would be the message key, and the data should be
+      // the encoded message.
+      if (path == '/') {
+        if (decoded != null) {
+          // Sort the messages by their server timestamps assigned by Firebase.
+          List<String> messageKeys = new List<String>.from(decoded.keys)
+            ..sort(
+              (String k1, String k2) => decoded[k1]['server_timestamp']
+                  .compareTo(decoded[k2]['server_timestamp']),
+            );
 
-    _eventSource?.client?.close();
-    _eventSource = null;
+          for (String messageKey in messageKeys) {
+            await _handleNewMessage(messageKey, decoded[messageKey]);
+          }
 
-    await initialize();
-  }
-
-  Future<Null> _startProcessingEventStream() async {
-    assert(_eventSource != null);
-
-    _eventSourceSubscription = _eventSource.listen(
-      (Event event) async {
-        _resetHealthCheckTimer();
-
-        String eventType = event.event?.toLowerCase();
-
-        // Don't spam with the keep-alive event.
-        if (eventType != 'keep-alive') {
-          log..fine('Event Received: $eventType')..fine('Data: ${event.data}');
+          // In case the path is '/' and the data is not null, we received the
+          // entire snapshot of the incoming messages. Store all the keys so
+          // that we can correctly ignore the subsequent events about these
+          // messages.
+          _cachedMessageKeys
+            ..clear()
+            ..addAll(decoded.keys);
+        } else {
+          // In case the path is '/' and the data is null, that means we fetched
+          // all the incoming messages already. Clear the message key cache.
+          _cachedMessageKeys.clear();
         }
+      } else if (new RegExp(r'^/[^/]+$').hasMatch(path)) {
+        // In this case, the path is constructed by concatenating '/' and the
+        // actual message key. Remove the leading '/' to obtain the message key.
+        String messageKey = path.substring(1);
 
-        switch (eventType) {
-          case 'put':
-            await _handlePutEvent(event);
-            break;
-
-          case 'keep-alive':
-            // We can safely ignore this event.
-            break;
-
-          case 'cancel':
-            log.fine('"cancel" event received.');
-            await _reconnectToEventStream();
-            break;
-
-          case 'auth_revoked':
-            log.fine('"auth_revoked" event received. The auth credential is no '
-                'longer valid and should be renewed. Renewing the credential.');
-            await _reconnectToEventStream();
-            break;
-
-          default:
-            log.warning('WARNING: Unknown event type from Firebase: '
-                '$eventType');
+        if (decoded != null) {
+          // If data is not null, we received a new incoming message. Handle
+          // this message and add it to the cached keys.
+          await _handleNewMessage(messageKey, decoded);
+          _cachedMessageKeys.add(messageKey);
+        } else {
+          // If data is null, that means that this message is removed from the
+          // Firebase DB. Just remove this key from the cache.
+          _cachedMessageKeys.remove(messageKey);
         }
-      },
-      onError: (Object e, StackTrace stackTrace) {
+      } else {
         log
-          ..severe('Error while processing the event stream', e, stackTrace)
-          ..severe('Continuing to receive events.');
-      },
-      onDone: () {
-        log.fine('Event stream is closed. Renewing the credential.');
-        _reconnectToEventStream();
-      },
-      cancelOnError: false,
-    );
-  }
-
-  void _resetHealthCheckTimer() {
-    _healthCheckTimer?.cancel();
-    _healthCheckTimer = new Timer(_kHealthCheckPeriod, () {
-      log.fine('Reinitializing: triggered by the health check timer.');
-      initialize();
-    });
-  }
-
-  /// Handles the 'put' event from the Firebase event stream, which usually
-  /// indicates that there's a new incoming message.
-  Future<Null> _handlePutEvent(Event event) async {
-    Map<String, dynamic> decodedData = JSON.decode(event.data);
-
-    String path = decodedData['path'];
-    Map<String, dynamic> data = decodedData['data'];
-
-    // If the path is given as '/', the data may contain multiple messages.
-    // Otherwise, the path would be the message key, and the data should be the
-    // encoded message.
-    if (path == '/') {
-      if (data != null) {
-        // Sort the messages by their server timestamps assigned by Firebase.
-        List<String> messageKeys = new List<String>.from(data.keys)
-          ..sort(
-            (String k1, String k2) => data[k1]['server_timestamp']
-                .compareTo(data[k2]['server_timestamp']),
-          );
-
-        for (String messageKey in messageKeys) {
-          await _handleNewMessage(messageKey, data[messageKey]);
-        }
-
-        // In case the path is '/' and the data is not null, we received the
-        // entire snapshot of the incoming messages. Store all the keys so that
-        // we can correctly ignore the subsequent events about these messages.
-        _cachedMessageKeys
-          ..clear()
-          ..addAll(data.keys);
-      } else {
-        // In case the path is '/' and the data is null, that means we fetched
-        // all the incoming messages already. Clear the message key cache.
-        _cachedMessageKeys.clear();
+          ..warning("'put' event received from the event stream, but could not "
+              'recognize the path.')
+          ..warning('path: $path')
+          ..warning('data: $data');
       }
-    } else if (new RegExp(r'^/[^/]+$').hasMatch(path)) {
-      // In this case, the path is constructed by concatenating '/' and the
-      // actual message key. Remove the leading '/' to obtain the message key.
-      String messageKey = path.substring(1);
-
-      if (data != null) {
-        // If data is not null, we received a new incoming message. Handle this
-        // message and add it to the cached keys.
-        await _handleNewMessage(messageKey, data);
-        _cachedMessageKeys.add(messageKey);
-      } else {
-        // If data is null, that means that this message is removed from the
-        // Firebase DB. Just remove this key from the cache.
-        _cachedMessageKeys.remove(messageKey);
-      }
-    } else {
-      log
-        ..warning("'put' event received from the event stream, but could not "
-            'recognize the path.')
-        ..warning('path: $path')
-        ..warning('data: $data');
+    } on Exception catch (e, stackTrace) {
+      log.severe('Decoding error', e, stackTrace);
+    } finally {
+      callback();
     }
   }
 
@@ -398,11 +239,13 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
       return;
     }
 
+    String currentUser = await currentUserEmail;
+
     if (onReceived != null) {
       Conversation conversation = new Conversation(
           conversationId: messageValue['conversation_id'],
           participants: messageValue['participants']
-              .where((String email) => email != _email)
+              .where((String email) => email != currentUser)
               .map((String email) => new Participant(email: email))
               .toList());
 
@@ -425,9 +268,21 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     int retryCount = 0,
   ]) async {
     // Delete that message from Firebase DB.
-    http.Response response = await _firebaseDBDelete(
-      'emails/${_encodeFirebaseKey(_email)}/$messageKey',
+    Completer<FirebaseStatus> statusCompleter = new Completer<FirebaseStatus>();
+    HttpResponse response;
+
+    _firebaseClient.delete(
+      'emails/${await _encodeKey(await currentUserEmail)}/$messageKey',
+      (FirebaseStatus status, HttpResponse resp) {
+        response = resp;
+        statusCompleter.complete(status);
+      },
     );
+
+    FirebaseStatus status = await statusCompleter.future;
+    if (status != FirebaseStatus.ok) {
+      throw new ChatNetworkException('Firebase error returned: $status');
+    }
 
     if (response.statusCode != 200) {
       log.severe(
@@ -451,85 +306,15 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter {
     }
   }
 
-  /// Make a PUT request to the firebase DB.
-  Future<http.Response> _firebaseDBPut(String path, Object data) async {
-    Uri url = _getFirebaseUrl(path);
-    try {
-      return await _client.put(
-        url,
-        headers: <String, String>{
-          'content-type': 'application/json',
-        },
-        body: JSON.encode(data),
-      );
-    } on Exception catch (e) {
-      throw new ChatNetworkException('Network Error', e);
-    }
+  // |FirebaseDBWatcher|
+  @override
+  Future<Null> getListenPath(void callback(String path)) async {
+    callback('emails/${await _encodeKey(await currentUserEmail)}');
   }
 
-  /// Make a DELETE request to the firebase DB.
-  Future<http.Response> _firebaseDBDelete(String path) async {
-    Uri url = _getFirebaseUrl(path);
-    try {
-      return await _client.delete(url);
-    } on Exception catch (e) {
-      throw new ChatNetworkException('Network Error', e);
-    }
-  }
-
-  /// Returns the firebase DB url with the given data path.
-  Uri _getFirebaseUrl(String path) {
-    return new Uri.https(
-      '${_config.get('chat_firebase_project_id')}.firebaseio.com',
-      '$path.json',
-      <String, String>{
-        'auth': _firebaseAuthToken,
-      },
-    );
-  }
-
-  /// Normalize the email address.
-  String _normalizeEmail(String email) {
-    int atSignIndex = email?.indexOf('@') ?? -1;
-    if (atSignIndex == -1) {
-      return email;
-    }
-
-    return email.toLowerCase();
-  }
-
-  /// Returns the encoded version of the given string that can be used in
-  /// Firebase DB keys.
-  ///
-  /// Since there are certain characters that are not allowed in Firebase keys,
-  /// encode each unallowed character to be '&' followed by the two digit upper
-  /// case hex value of that character, similar to URI encoding.
-  ///
-  /// (e.g. `john.doe@example.com` becomes `john&2Edoe@example&2Ecom`).
-  ///
-  /// NOTE: Originally, we were using `%` instead of `&`, but Firebase API
-  /// started to reject any `%` characters in a database path when using their
-  /// REST API, so we now have to use a different character.
-  String _encodeFirebaseKey(String original) {
-    const List<String> toEncode = const <String>[
-      '.',
-      '\$',
-      '[',
-      ']',
-      '#',
-      '/',
-      '%',
-    ];
-
-    String result = original;
-    for (String ch in toEncode) {
-      String radixString = ch.codeUnitAt(0).toRadixString(16).toUpperCase();
-      if (radixString.length < 2) {
-        radixString = '0$radixString';
-      }
-      result = result.replaceAll(ch, '&$radixString');
-    }
-
-    return result;
+  Future<String> _encodeKey(String key) {
+    Completer<String> completer = new Completer<String>();
+    _firebaseClient.encodeKey(key, completer.complete);
+    return completer.future;
   }
 }

@@ -304,8 +304,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
   }
 
   @override
-  void currentUserEmail(void callback(String email)) {
-    callback(chatMessageTransporter.currentUserEmail ?? '');
+  Future<Null> currentUserEmail(void callback(String email)) async {
+    callback(await chatMessageTransporter.currentUserEmail);
   }
 
   @override

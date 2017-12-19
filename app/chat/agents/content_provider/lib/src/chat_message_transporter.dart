@@ -79,7 +79,7 @@ abstract class ChatMessageTransporter {
   ChatMessageTransporter({this.onReceived});
 
   /// The email of the currently logged in user.
-  String get currentUserEmail;
+  Future<String> get currentUserEmail;
 
   /// Initializes the [ChatMessageTransporter].
   Future<Null> initialize();
