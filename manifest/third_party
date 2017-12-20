@@ -4,6 +4,7 @@
     <localimport file="dart"/>
     <localimport file="flutter"/>
     <localimport file="minimal"/>
+    <localimport file="skia"/>
   </imports>
   <projects>
     <project name="third_party/cairo"
