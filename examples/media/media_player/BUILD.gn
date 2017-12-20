@@ -1,0 +1,37 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/package.gni")
+
+executable("media_player") {
+  sources = [
+    "main.cc",
+    "media_player_params.cc",
+    "media_player_params.h",
+    "media_player_view.cc",
+    "media_player_view.h",
+  ]
+
+  deps = [
+    "//garnet/public/lib/fsl",
+    "//garnet/public/lib/media/fidl",
+    "//garnet/public/lib/media/timeline",
+    "//garnet/public/lib/ui/view_framework:skia",
+    "//garnet/public/lib/ui/view_framework:view_provider",
+    "//third_party/skia",
+  ]
+}
+
+package("package") {
+  system_image = true
+  package_name = "media_player"
+
+  deps = [
+    ":media_player",
+  ]
+
+  binaries = [ {
+        name = "media_player"
+      } ]
+}
