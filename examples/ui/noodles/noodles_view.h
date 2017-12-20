@@ -5,7 +5,7 @@
 #ifndef GARNET_EXAMPLES_UI_NOODLES_NOODLES_VIEW_H_
 #define GARNET_EXAMPLES_UI_NOODLES_NOODLES_VIEW_H_
 
-#include "lib/ui/view_framework/skia_view.h"
+#include "examples/ui/lib/skia_view.h"
 #include "lib/fxl/macros.h"
 
 class SkCanvas;

@@ -5,15 +5,10 @@
 #ifndef APPS_MOTERM_MOTERM_VIEW_H_
 #define APPS_MOTERM_MOTERM_VIEW_H_
 
+#include "examples/ui/lib/skia_font_loader.h"
+#include "examples/ui/lib/skia_view.h"
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/fidl/application_environment.fidl.h"
-#include "lib/ui/skia/skia_font_loader.h"
-#include "lib/ui/view_framework/skia_view.h"
-#include "topaz/app/moterm/command.h"
-#include "topaz/app/moterm/history.h"
-#include "topaz/app/moterm/moterm_model.h"
-#include "topaz/app/moterm/moterm_params.h"
-#include "topaz/app/moterm/shell_controller.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/ref_ptr.h"
 #include "lib/fxl/memory/weak_ptr.h"
@@ -21,6 +16,11 @@
 #include "lib/fxl/time/time_point.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkTypeface.h"
+#include "topaz/app/moterm/command.h"
+#include "topaz/app/moterm/history.h"
+#include "topaz/app/moterm/moterm_model.h"
+#include "topaz/app/moterm/moterm_params.h"
+#include "topaz/app/moterm/shell_controller.h"
 
 namespace moterm {
 class MotermView : public mozart::SkiaView, public MotermModel::Delegate {

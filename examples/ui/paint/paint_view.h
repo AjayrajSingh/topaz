@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 
-#include "lib/ui/view_framework/skia_view.h"
+#include "examples/ui/lib/skia_view.h"
 #include "lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkPath.h"

@@ -18,11 +18,11 @@ executable("jank") {
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
     "//garnet/public/lib/ui/scenic/fidl",
-    "//garnet/public/lib/ui/skia:fonts",
-    "//garnet/public/lib/ui/view_framework:skia",
     "//garnet/public/lib/ui/view_framework:view_provider",
     "//garnet/public/lib/ui/views/fidl",
     "//third_party/skia",
+    "//topaz/examples/ui/lib:skia_fonts",
+    "//topaz/examples/ui/lib:skia_view",
     "//zircon/system/ulib/trace-provider",
   ]
 }

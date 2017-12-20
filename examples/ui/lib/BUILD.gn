@@ -1,0 +1,102 @@
+# Copyright 2017 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//garnet/public/lib/ui/config.gni")
+
+config("config") {
+  include_dirs = [ "//topaz" ]
+}
+
+source_set("scenic_skia") {
+  sources = [
+    "host_canvas_cycler.cc",
+    "host_canvas_cycler.h",
+    "host_surfaces.cc",
+    "host_surfaces.h",
+    "image_info.cc",
+    "image_info.h",
+  ]
+
+  public_deps = [
+    "//garnet/public/lib/fxl",
+    "//garnet/public/lib/ui/scenic:client",
+    "//third_party/skia",
+  ]
+
+  public_configs = [ ":config" ]
+}
+
+group("skia") {
+  public_deps = [
+    ":skia_fonts",
+    ":skia_type_converters",
+    ":skia_vmo",
+  ]
+}
+
+source_set("skia_fonts") {
+  sources = [
+    "skia_font_loader.cc",
+    "skia_font_loader.h",
+  ]
+
+  deps = [
+    ":skia_type_converters",
+    ":skia_vmo",
+    "//garnet/public/lib/fonts/fidl",
+    "//garnet/public/lib/fxl",
+    "//third_party/skia",
+  ]
+
+  public_configs = [ ":config" ]
+}
+
+source_set("skia_type_converters") {
+  sources = [
+    "type_converters.cc",
+    "type_converters.h",
+  ]
+
+  public_deps = [
+    "//garnet/public/lib/ui/geometry/fidl",
+    "//third_party/skia",
+  ]
+
+  public_configs = [ ":config" ]
+}
+
+source_set("skia_vmo") {
+  sources = [
+    "skia_vmo_data.cc",
+    "skia_vmo_data.h",
+  ]
+
+  public_deps = [
+    "//garnet/public/lib/fsl",
+    "//garnet/public/lib/fxl",
+    "//third_party/skia",
+    "//zircon/system/ulib/zx",
+  ]
+
+  deps = [
+    "//zircon/system/ulib/trace",
+  ]
+
+  public_configs = [ ":config" ]
+}
+
+source_set("skia_view") {
+  sources = [
+    "skia_view.cc",
+    "skia_view.h",
+  ]
+
+  public_deps = [
+    ":scenic_skia",
+    "//garnet/public/lib/ui/view_framework",
+    "//third_party/skia",
+  ]
+
+  public_configs = [ ":config" ]
+}

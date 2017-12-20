@@ -38,8 +38,6 @@ executable("bin") {
     "//garnet/public/lib/ui/input/fidl",
     "//garnet/public/lib/ui/scenic:client",
     "//garnet/public/lib/ui/scenic/fidl",
-    "//garnet/public/lib/ui/skia:fonts",
-    "//garnet/public/lib/ui/view_framework:skia",
     "//garnet/public/lib/ui/view_framework:view_provider",
     "//garnet/public/lib/ui/views/fidl",
     "//peridot/public/lib/component/fidl",
@@ -49,6 +47,8 @@ executable("bin") {
     "//peridot/public/lib/story/fidl",
     "//third_party/libteken",
     "//third_party/skia",
+    "//topaz/examples/ui/lib:skia_fonts",
+    "//topaz/examples/ui/lib:skia_view",
     "//zircon/system/ulib/trace-provider",
   ]
 

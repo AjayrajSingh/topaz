@@ -5,8 +5,8 @@
 #ifndef GARNET_EXAMPLES_UI_JANK_JANK_VIEW_H_
 #define GARNET_EXAMPLES_UI_JANK_JANK_VIEW_H_
 
-#include "lib/ui/skia/skia_font_loader.h"
-#include "lib/ui/view_framework/skia_view.h"
+#include "examples/ui/lib/skia_font_loader.h"
+#include "examples/ui/lib/skia_view.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/time/time_point.h"
 #include "third_party/skia/include/core/SkCanvas.h"

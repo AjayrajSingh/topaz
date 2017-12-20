@@ -4,20 +4,20 @@
 
 #include <trace-provider/provider.h>
 
+#include "examples/ui/lib/skia_font_loader.h"
 #include "lib/component/fidl/component_context.fidl.h"
+#include "lib/fsl/tasks/message_loop.h"
+#include "lib/fxl/functional/make_copyable.h"
+#include "lib/fxl/log_settings_command_line.h"
+#include "lib/fxl/logging.h"
 #include "lib/lifecycle/fidl/lifecycle.fidl.h"
 #include "lib/module/fidl/module.fidl.h"
 #include "lib/story/fidl/story_marker.fidl.h"
-#include "lib/ui/skia/skia_font_loader.h"
 #include "lib/ui/view_framework/view_provider_service.h"
 #include "topaz/app/moterm/history.h"
 #include "topaz/app/moterm/ledger_helpers.h"
 #include "topaz/app/moterm/moterm_params.h"
 #include "topaz/app/moterm/moterm_view.h"
-#include "lib/fxl/functional/make_copyable.h"
-#include "lib/fxl/log_settings_command_line.h"
-#include "lib/fxl/logging.h"
-#include "lib/fsl/tasks/message_loop.h"
 
 namespace moterm {
 
