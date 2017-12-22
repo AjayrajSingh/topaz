@@ -174,6 +174,7 @@ class FirebaseDbClientImpl implements FirebaseDbClient {
     } on FirebaseUnrecoverableException catch (e) {
       log.warning('Sending unrecoverable error', e);
       status = FirebaseStatus.unrecoverableError;
+      _readyCompleter.completeError(e);
     } on Exception catch (e) {
       log.warning('Sending authentication error', e);
       status = FirebaseStatus.authenticationError;
@@ -395,8 +396,19 @@ class FirebaseDbClientImpl implements FirebaseDbClient {
   }
 
   @override
-  void getCurrentUserEmail(void callback(String email)) {
-    callback(currentUserEmail);
+  Future<Null> getCurrentUserEmail(void callback(String email)) async {
+    String result = _email;
+
+    if (_email == null) {
+      try {
+        await ready;
+        result = _email;
+      } on Object {
+        result = '';
+      }
+    }
+
+    callback(result);
   }
 
   @override

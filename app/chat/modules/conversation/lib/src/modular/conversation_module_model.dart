@@ -573,6 +573,14 @@ class ChatConversationModuleModel extends ModuleModel {
                       '@type': 'com.google.fuchsia.string',
                       'content': mid,
                     },
+                    'sender': <String, String>{
+                      '@type': 'com.google.fuchsia.string',
+                      'content': m.sender == 'me' ? currentUser : m.sender,
+                    },
+                    'currentUser': <String, String>{
+                      '@type': 'com.google.fuchsia.string',
+                      'content': currentUser,
+                    },
                   };
 
                   // Create a Daisy.
