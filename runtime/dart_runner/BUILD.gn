@@ -59,7 +59,7 @@ template("runner") {
 runner("dart_jit_runner_bin") {
   output_name = "dart_jit_runner"
   extra_defines = []
-  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc" ]
+  extra_deps = [ "//topaz/runtime/dart_runner/embedder:snapshot" ]
   if (is_debug) {
     extra_deps += [ "//third_party/dart/runtime:libdart_jit" ]
   } else {
@@ -78,6 +78,21 @@ runner("dart_aot_runner_bin") {
   } else {
     extra_deps +=
         [ "//third_party/dart/runtime:libdart_precompiled_runtime_product" ]
+  }
+}
+
+runner("dart_script_runner_bin") {
+  output_name = "dart_script_runner"
+  extra_defines = [ "SCRIPT_RUNTIME" ]
+  extra_deps = [
+      "//topaz/runtime/dart_runner/embedder:script_runner_snapshot",
+  ]
+  if (is_debug) {
+    extra_deps += [ "//third_party/dart/runtime:libdart_jit" ]
+  } else {
+    # Since the Dart content handlers don't have a vmservice, it is safe to
+    # link against the PRODUCT mode libraries in a Fuchsia release build.
+    extra_deps += [ "//third_party/dart/runtime:libdart_jit_product" ]
   }
 }
 
@@ -105,4 +120,17 @@ package("dart_jit_runner") {
         path = rebase_path("meta/sandbox")
         dest = "sandbox"
       } ]
+}
+
+package("dart_script_runner") {
+  deps = [
+    ":dart_script_runner_bin",
+  ]
+
+  binary = "dart_script_runner"
+
+  meta = [{
+    path = rebase_path("meta/sandbox")
+    dest = "sandbox"
+  }]
 }

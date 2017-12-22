@@ -81,21 +81,28 @@ fdio_ns_t* SetupNamespace(app::FlatNamespacePtr* flat_namespace) {
 #if defined(AOT_RUNTIME)
 
 bool ExtractSnapshots(fdio_ns_t* namespc,
+                      const fsl::SizedVmoTransportPtr& bundle,
                       const uint8_t*& isolate_snapshot_data,
                       const uint8_t*& isolate_snapshot_instructions,
                       const uint8_t*& script_snapshot,
                       intptr_t* script_snapshot_len) {
   fxl::UniqueFD root_dir(fdio_ns_opendir(namespc));
-  if (!root_dir.is_valid())
+  if (!root_dir.is_valid()) {
+    FXL_LOG(ERROR) << "Failed to open namespace";
     return false;
+  }
 
   fxl::UniqueFD dylib_file(openat(root_dir.get(), "pkg/data/libapp.so", O_RDONLY));
-  if (!dylib_file.is_valid())
+  if (!dylib_file.is_valid()) {
+    FXL_LOG(ERROR) << "Failed to open dylib at pkg/data/libapp.so";
     return false;
+  }
 
   fsl::SizedVmo dylib;
-  if (!fsl::VmoFromFd(std::move(dylib_file), &dylib))
+  if (!fsl::VmoFromFd(std::move(dylib_file), &dylib)) {
+    FXL_LOG(ERROR) << "Failed to map dylib from pkg/data/libapp.so";
     return false;
+  }
 
   dlerror();
   void* lib = dlopen_vmo(dylib.vmo().get(), RTLD_LAZY);
@@ -123,24 +130,60 @@ bool ExtractSnapshots(fdio_ns_t* namespc,
   return true;
 }
 
+#elif defined(SCRIPT_RUNTIME)
+
+bool ExtractSnapshots(fdio_ns_t* namespc,
+                      const fsl::SizedVmoTransportPtr& bundle,
+                      const uint8_t*& isolate_snapshot_data,
+                      const uint8_t*& isolate_snapshot_instructions,
+                      const uint8_t*& script_snapshot,
+                      intptr_t* script_snapshot_len) {
+  if (!fsl::SizedVmo::IsSizeValid(bundle->vmo, bundle->size)) {
+    FXL_LOG(ERROR) << "bundle size is not valid.";
+    return false;
+  }
+
+  isolate_snapshot_data = dart_content_handler::isolate_snapshot_buffer;
+  isolate_snapshot_instructions = NULL;
+
+  uintptr_t addr;
+  zx_status_t status = zx::vmar::root_self().map(
+      0, bundle->vmo, 0, bundle->size, ZX_VM_FLAG_PERM_READ, &addr);
+  if (status != ZX_OK) {
+    FXL_LOG(ERROR) << "bundle map failed: " << zx_status_get_string(status);
+    return false;
+  }
+
+  script_snapshot = reinterpret_cast<uint8_t*>(addr);
+  *script_snapshot_len = bundle->size;
+  return true;
+}
+
 #else  // !defined(AOT_RUNTIME)
 
 bool ExtractSnapshots(fdio_ns_t* namespc,
+                      const fsl::SizedVmoTransportPtr& bundle,
                       const uint8_t*& isolate_snapshot_data,
                       const uint8_t*& isolate_snapshot_instructions,
                       const uint8_t*& script_snapshot,
                       intptr_t* script_snapshot_len) {
   fxl::UniqueFD root_dir(fdio_ns_opendir(namespc));
-  if (!root_dir.is_valid())
+  if (!root_dir.is_valid()) {
+    FXL_LOG(ERROR) << "Failed to open namespace";
     return false;
+  }
 
   fxl::UniqueFD snapshot_file(openat(root_dir.get(), "pkg/data/snapshot_blob.bin", O_RDONLY));
-  if (!snapshot_file.is_valid())
+  if (!snapshot_file.is_valid()) {
+    FXL_LOG(ERROR) << "Failed to open snapshot at pkg/data/snapshot_blob.bin";
     return false;
+  }
 
   fsl::SizedVmo snapshot;
-  if (!fsl::VmoFromFd(std::move(snapshot_file), &snapshot))
+  if (!fsl::VmoFromFd(std::move(snapshot_file), &snapshot)) {
+    FXL_LOG(ERROR) << "Failed to map snapshot from pkg/data/snapshot_blob.bin";
     return false;
+  }
 
   isolate_snapshot_data = dart_content_handler::isolate_snapshot_buffer;
   isolate_snapshot_instructions = NULL;
@@ -189,8 +232,11 @@ void RunApplication(
   const uint8_t* isolate_snapshot_instructions = NULL;
   const uint8_t* script_snapshot = NULL;
   intptr_t script_snapshot_len = 0;
-  if (!ExtractSnapshots(namespc, isolate_snapshot_data,
-                        isolate_snapshot_instructions, script_snapshot,
+  if (!ExtractSnapshots(namespc,
+                        application->data,
+                        isolate_snapshot_data,
+                        isolate_snapshot_instructions,
+                        script_snapshot,
                         &script_snapshot_len)) {
     return;
   }

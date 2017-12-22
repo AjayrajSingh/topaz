@@ -22,7 +22,7 @@ executable("snapshotter") {
   }
 
   deps = [
-           "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc",
+           "//topaz/runtime/dart_runner/embedder:snapshot",
            "//garnet/public/lib/fxl",
            "//topaz/lib/tonic/converter",
            "//topaz/lib/tonic/file_loader",
@@ -51,7 +51,7 @@ executable("aot_snapshotter") {
   }
 
   deps = [
-           "//topaz/runtime/dart_runner/embedder:dart_snapshot_cc",
+           "//topaz/runtime/dart_runner/embedder:snapshot",
            "//garnet/public/lib/fxl",
            "//topaz/lib/tonic/converter",
            "//topaz/lib/tonic/file_loader",

@@ -84,6 +84,15 @@ bool DartApplicationController::CreateIsolate() {
     return false;
   }
 
+#if defined(SCRIPT_RUNTIME)
+  Dart_Handle status =
+      Dart_SetLibraryTagHandler(tonic::DartState::HandleLibraryTag);
+  if (Dart_IsError(status)) {
+    FXL_LOG(ERROR) << "Dart_SetLibraryTagHandler failed";
+    return false;
+  }
+#endif
+
   state->SetIsolate(isolate_);
 
   state->message_handler().Initialize(
@@ -101,6 +110,29 @@ bool DartApplicationController::Main() {
 
 #if defined(AOT_RUNTIME)
   Dart_Handle root_library = Dart_RootLibrary();
+#elif defined(SCRIPT_RUNTIME)
+  Dart_Handle url = Dart_NewStringFromUTF8(
+      reinterpret_cast<const uint8_t*>(url_.data()), url_.length());
+  if (Dart_IsError(url)) {
+    FXL_LOG(ERROR) << "Failed to make string for url: " << url_;
+    Dart_ExitScope();
+    return false;
+  }
+  // The script_snapshot_ field holds the text of the script when we are
+  // in the script runner.
+  Dart_Handle script =
+      Dart_NewStringFromUTF8(script_snapshot_, script_snapshot_len_);
+  if (Dart_IsError(script)) {
+    FXL_LOG(ERROR) << "Failed to make string for script";
+    Dart_ExitScope();
+    return false;
+  }
+  Dart_Handle root_library = Dart_LoadScript(url, url, script, 0, 0);
+  if (Dart_IsError(root_library)) {
+    FXL_LOG(ERROR) << "Failed to load script: " << url_;
+    Dart_ExitScope();
+    return false;
+  }
 #else
   Dart_Handle root_library =
       Dart_LoadScriptFromSnapshot(script_snapshot_, script_snapshot_len_);
