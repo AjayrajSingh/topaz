@@ -2,8 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//third_party/flutter/build/flutter_app.gni")
 import("//build/package.gni")
+import("//peridot/build/module_repository/manifest_package.gni")
+import("//third_party/flutter/build/flutter_app.gni")
 
 flutter_app("image_app") {
   main_dart = "lib/main.dart"
@@ -30,4 +31,10 @@ package("image") {
   binaries = [ {
         name = "image"
       } ]
+}
+
+module_manifest_package("image_manifest") {
+  sources = [
+    "manifest.json",
+  ]
 }

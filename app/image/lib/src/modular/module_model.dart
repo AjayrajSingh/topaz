@@ -13,16 +13,30 @@ class ImageModuleModel extends ModuleModel {
   Uri get imageUri => _imageUri;
   Uri _imageUri;
 
+  // TODO(vardhan): Deprecate 'image_url' in favour proper typing (eg.,
+  // http://schema.org/image).
   @override
   void onNotify(String json) {
     log.fine('JSON: $json');
     // Expects Link to look something like this:
     // { "image_url" : "http:///www.example.com/image.gif" } or
-    // { "image_url" : "/system/data/modules/image.gif" }
+    // { "image_url" : "/system/data/modules/image.gif" } or
+    // { "asset": "http:///www.example.com/image.gif" } or
+    // { "asset": { "contentUrl": "http:///www.example.com/image.gif" } }
     final dynamic doc = JSON.decode(json);
-    if (doc is Map && doc['image_url'] is String) {
-      _imageUri = Uri.parse(doc['image_url']);
-      notifyListeners();
+    if (doc is Map) {
+      if (doc['image_url'] is String) {
+        _imageUri = Uri.parse(doc['image_url']);
+        notifyListeners();
+      } else if (doc['asset'] is String) {
+        // schema.org/image: URL to a image
+        _imageUri = Uri.parse(doc['asset']);
+        notifyListeners();
+      } else if (doc['asset'] is Map && doc['contentUrl'] is String) {
+        // schema.org/image: ImageObject
+        _imageUri = Uri.parse(doc['asset']['contentUrl']);
+        notifyListeners();
+      }
     }
   }
 }
