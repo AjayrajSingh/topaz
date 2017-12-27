@@ -4,6 +4,7 @@
 
 #include "topaz/runtime/web_view/schema_org_context.h"
 
+#include "lib/fxl/files/file.h"
 #include "lib/fxl/logging.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
 
@@ -11,43 +12,22 @@
 
 namespace {
 
-constexpr char script[] = R"(
-(function() {
-  var entities = [];
-  function addJsonLd(item) {
-    // prefix @type with @context for context engine compatibility
-    if (!item["@type"]) {
-      return;
-    }
-    if (!item["@context"]) {
-      return;
-    }
-    item["@type"] = item["@context"] + "/" + item["@type"];
-    entities.push(item);
-  }
-  for (var script of document.querySelectorAll("script[type='application/ld+json']")) {
-    var value;
-    try {
-      value = JSON.parse(script.textContent);
-    } catch(e) {
-      continue;
-    }
-    if (value instanceof Array) {
-      for (item of value) {
-        addJsonLd(item);
-      }
-    } else {
-      addJsonLd(value);
-    }
-  }
-  return JSON.stringify(entities);
-})()
-)";
+constexpr char script_path[] = "/system/data/js/extract_schema_org.js";
+std::string script = "";
+bool script_loaded = false;
 
 }  // namespace
 
 std::vector<std::string> ExtractSchemaOrgContext(WebView& web_view) {
   std::vector<std::string> values;
+
+  if (!script_loaded) {
+    script_loaded = files::ReadFileToString(script_path, &script);
+    if (!script_loaded) {
+      FXL_LOG(WARNING) << "Failed to load script: " << script_path;
+      return values;
+    }
+  }
 
   std::string json = web_view.stringByEvaluatingJavaScriptFromString(script);
   modular::JsonDoc parsed;

@@ -128,11 +128,17 @@ package("web_view") {
         name = "web_view"
       } ]
 
-  resources = [ {
-        path = rebase_path(
-                "//garnet/bin/fonts/third_party/roboto/Roboto-Regular.ttf")
-        dest = "webkit/Roboto-Regular.ttf"
-      } ]
+  resources = [
+    {
+      path = rebase_path(
+              "//garnet/bin/fonts/third_party/roboto/Roboto-Regular.ttf")
+      dest = "webkit/Roboto-Regular.ttf"
+    },
+    {
+      path = rebase_path("extract_schema_org.js")
+      dest = "js/extract_schema_org.js"
+    },
+  ]
 }
 
 executable("web_view_test") {
