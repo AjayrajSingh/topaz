@@ -44,9 +44,15 @@ void WebViewProvider::CreateView(
   view_ = std::make_unique<WebViewImpl>(
       context_->ConnectToEnvironmentService<mozart::ViewManager>(),
       std::move(view_owner_request), std::move(view_services), url_);
+#ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   if (context_writer_) {
     view_->set_context_writer(std::move(context_writer_));
   }
+  if (component_context_) {
+    view_->set_component_context(std::move(component_context_));
+  }
+#endif
+
   view_->SetReleaseHandler([this] {
     FXL_LOG(INFO) << "release handler";
     view_ = nullptr;
@@ -60,13 +66,17 @@ void WebViewProvider::Initialize(
   context_ptr->GetLink(nullptr, main_link_.NewRequest());
   main_link_->Watch(main_link_watcher_binding_.NewBinding());
 
+#ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   maxwell::IntelligenceServicesPtr intelligence_services;
   context_ptr->GetIntelligenceServices(intelligence_services.NewRequest());
   intelligence_services->GetContextWriter(context_writer_.NewRequest());
+  context_ptr->GetComponentContext(component_context_.NewRequest());
 
   if (view_) {
     view_->set_context_writer(std::move(context_writer_));
+    view_->set_component_context(std::move(component_context_));
   }
+#endif
 
   FXL_LOG(INFO) << "Initialize()";
 }

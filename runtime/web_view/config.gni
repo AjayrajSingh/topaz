@@ -4,4 +4,5 @@
 
 declare_args() {
   use_prebuilt_webkit = true
+  experimental_web_entity_extraction = false
 }

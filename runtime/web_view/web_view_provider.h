@@ -4,13 +4,14 @@
 
 #pragma once
 
+#include "lib/app/cpp/application_context.h"
+#include "lib/app/fidl/service_provider.fidl.h"
+#include "lib/component/fidl/component_context.fidl.h"
 #include "lib/lifecycle/fidl/lifecycle.fidl.h"
 #include "lib/module/fidl/module.fidl.h"
 #include "lib/story/fidl/link.fidl.h"
-#include "topaz/runtime/web_view/web_view_impl.h"
 #include "lib/ui/views/fidl/view_provider.fidl.h"
-#include "lib/app/fidl/service_provider.fidl.h"
-#include "lib/app/cpp/application_context.h"
+#include "topaz/runtime/web_view/web_view_impl.h"
 
 class WebViewProvider : mozart::ViewProvider,
                         modular::Module,
@@ -47,7 +48,10 @@ class WebViewProvider : mozart::ViewProvider,
   f1dl::Binding<modular::Lifecycle> lifecycle_binding_;
   f1dl::Binding<modular::LinkWatcher> main_link_watcher_binding_;
 
+#ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   maxwell::ContextWriterPtr context_writer_;
+  modular::ComponentContextPtr component_context_;
+#endif
 };
 
 

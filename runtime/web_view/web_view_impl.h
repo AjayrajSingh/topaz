@@ -5,13 +5,17 @@
 #pragma once
 
 #include "topaz/runtime/web_runner/services/web_view.fidl.h"
+
+#include "lib/app/cpp/service_provider_impl.h"
+#include "lib/fidl/cpp/bindings/binding_set.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
 #include "lib/ui/scenic/client/host_image_cycler.h"
 #include "lib/ui/view_framework/base_view.h"
-#include "lib/context/fidl/context_writer.fidl.h"
-#include "lib/fidl/cpp/bindings/binding_set.h"
-#include "lib/app/cpp/service_provider_impl.h"
+
+#ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
+#include "topaz/runtime/web_view/schema_org_context.h"
+#endif
 
 #include "WebView.h"
 
@@ -42,7 +46,15 @@ class WebViewImpl : public mozart::BaseView,
 
   ~WebViewImpl();
 
-  void set_context_writer(maxwell::ContextWriterPtr context_writer);
+#ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
+  void set_context_writer(maxwell::ContextWriterPtr context_writer) {
+    schema_org_.set_context_writer(std::move(context_writer));
+  }
+
+  void set_component_context(modular::ComponentContextPtr component_context) {
+    schema_org_.set_component_context(std::move(component_context));
+  }
+#endif
 
   // |WebView|:
   void SetUrl(const ::f1dl::String& url) override;
@@ -80,10 +92,11 @@ class WebViewImpl : public mozart::BaseView,
   std::map<uint32_t, TouchTracker> touch_trackers_;
   float page_scale_factor_ = 0;
 
-  scenic_lib::HostImageCycler image_cycler_;
+#ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
+  SchemaOrgContext schema_org_;
+#endif
 
-  maxwell::ContextWriterPtr context_writer_;
-  std::vector<maxwell::ContextValueWriterPtr> context_values_;
+  scenic_lib::HostImageCycler image_cycler_;
 
   // Delegate that receives WillSendRequest calls. Can be null.
   web_view::WebRequestDelegatePtr webRequestDelegate_;

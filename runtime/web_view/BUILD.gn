@@ -10,8 +10,6 @@ executable("web_view_bin") {
 
   sources = [
     "main.cpp",
-    "schema_org_context.cpp",
-    "schema_org_context.h",
     "web_view_impl.cpp",
     "web_view_impl.h",
     "web_view_provider.cpp",
@@ -27,6 +25,7 @@ executable("web_view_bin") {
     "//garnet/public/lib/ui/geometry/fidl",
     "//garnet/public/lib/ui/view_framework:view_provider",
     "//garnet/public/lib/ui/views/fidl",
+    "//garnet/public/lib/url",
     "//peridot/lib/rapidjson",
     "//peridot/public/lib/context/fidl",
     "//peridot/public/lib/lifecycle/fidl",
@@ -37,6 +36,14 @@ executable("web_view_bin") {
     "//topaz/runtime/web_runner/services",
     "//zircon/public/lib/hid",
   ]
+
+  if (experimental_web_entity_extraction) {
+    sources += [
+      "schema_org_context.cpp",
+      "schema_org_context.h",
+    ]
+    defines = [ "EXPERIMENTAL_WEB_ENTITY_EXTRACTION" ]
+  }
 
   ldflags = [ "-Wl,-z,stack-size=1048576" ]
 }
@@ -124,9 +131,11 @@ package("web_view") {
     ":web_view_bin",
   ]
 
-  binaries = [ {
-        name = "web_view"
-      } ]
+  binaries = [
+    {
+      name = "web_view"
+    },
+  ]
 
   resources = [
     {
@@ -134,11 +143,16 @@ package("web_view") {
               "//garnet/bin/fonts/third_party/roboto/Roboto-Regular.ttf")
       dest = "webkit/Roboto-Regular.ttf"
     },
-    {
-      path = rebase_path("extract_schema_org.js")
-      dest = "js/extract_schema_org.js"
-    },
   ]
+
+  if (experimental_web_entity_extraction) {
+    resources += [
+      {
+        path = rebase_path("js/dist/bundle.js")
+        dest = "js/extract_schema_org.js"
+      },
+    ]
+  }
 }
 
 executable("web_view_test") {
@@ -158,9 +172,11 @@ package("web_view_test_package") {
     ":web_view_test",
   ]
 
-  binaries = [ {
-        name = "web_view_test"
-      } ]
+  binaries = [
+    {
+      name = "web_view_test"
+    },
+  ]
 }
 
 executable("web_view_link_test") {

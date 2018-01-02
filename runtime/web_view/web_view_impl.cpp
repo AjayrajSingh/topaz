@@ -74,6 +74,9 @@ WebViewImpl::WebViewImpl(
                "WebView"),
       weak_factory_(this),
       url_(url),
+#ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
+      schema_org_(web_view_),
+#endif
       image_cycler_(session()) {
   FXL_LOG(INFO) << "WebViewImpl constructor";
   web_view_.setup_once();
@@ -95,15 +98,9 @@ WebViewImpl::WebViewImpl(
         if (weak)
           weak->CallIdle();
       }));
-
-  web_view_.setDidFinishLoadDelegate([this]() { this->DidFinishLoad(); });
 }
 
 WebViewImpl::~WebViewImpl() {}
-
-void WebViewImpl::set_context_writer(maxwell::ContextWriterPtr context_writer) {
-  context_writer_ = std::move(context_writer);
-}
 
 // |WebView|:
 void WebViewImpl::SetUrl(const ::f1dl::String& url) {
@@ -293,21 +290,4 @@ void WebViewImpl::CallIdle() {
         if (weak)
           weak->CallIdle();
       }));
-}
-
-void WebViewImpl::DidFinishLoad() {
-  if (context_writer_) {
-    std::vector<std::string> context_values =
-        ExtractSchemaOrgContext(web_view_);
-    FXL_LOG(INFO) << "Extracted " << context_values.size() << " context values";
-
-    // Remove any existing values.
-    context_values_.clear();
-    for (auto& content : context_values) {
-      maxwell::ContextValueWriterPtr value;
-      context_writer_->CreateValue(value.NewRequest(),
-                                   maxwell::ContextValueType::ENTITY);
-      value->Set(content, nullptr /* metadata */);
-    }
-  }
 }

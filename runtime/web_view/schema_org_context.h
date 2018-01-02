@@ -4,9 +4,33 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
+
+#include "lib/component/fidl/component_context.fidl.h"
+#include "lib/context/fidl/context_writer.fidl.h"
 
 class WebView;
 
-std::vector<std::string> ExtractSchemaOrgContext(WebView& web_view);
+class SchemaOrgContext {
+ public:
+  SchemaOrgContext(WebView& web_view);
+
+  void set_context_writer(maxwell::ContextWriterPtr context_writer) {
+    context_writer_ = std::move(context_writer);
+  }
+  void set_component_context(modular::ComponentContextPtr component_context) {
+    component_context_ = std::move(component_context);
+  }
+
+ private:
+  void PageLoaded();
+  void EntitiesChanged();
+
+  WebView& web_view_;
+  std::string script_ = "";
+
+  modular::ComponentContextPtr component_context_;
+  maxwell::ContextWriterPtr context_writer_;
+  std::vector<maxwell::ContextValueWriterPtr> context_values_;
+};
