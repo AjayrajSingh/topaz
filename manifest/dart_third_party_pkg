@@ -103,6 +103,11 @@
              remote="https://chromium.googlesource.com/external/github.com/dart-lang/http_parser.git"
              revision="3.1.1"/>
 
+    <project name="third_party/dart/third_party/pkg/http_retry"
+             path="third_party/dart/third_party/pkg/http_retry"
+             remote="https://chromium.googlesource.com/external/github.com/dart-lang/http_retry.git"
+             revision="0.1.0"/>
+
     <project name="third_party/dart/third_party/pkg/http_throttle"
              path="third_party/dart/third_party/pkg/http_throttle"
              remote="https://chromium.googlesource.com/external/github.com/dart-lang/http_throttle.git"
@@ -126,7 +131,7 @@
     <project name="third_party/dart/third_party/pkg/linter"
              path="third_party/dart/third_party/pkg/linter"
              remote="https://chromium.googlesource.com/external/github.com/dart-lang/linter.git"
-             revision="0.1.40"/>
+             revision="0.1.41"/>
 
     <project name="third_party/dart/third_party/pkg/logging"
              path="third_party/dart/third_party/pkg/logging"
@@ -186,7 +191,7 @@
     <project name="third_party/dart/third_party/pkg/pub"
              path="third_party/dart/third_party/pkg/pub"
              remote="https://chromium.googlesource.com/external/github.com/dart-lang/pub.git"
-             revision="cde958f157d3662bf968bcbed05580d5c0355e89"/>
+             revision="667281eef93b4be648cceca400e954e000edba38"/>
 
     <project name="third_party/dart/third_party/pkg/pub_semver"
              path="third_party/dart/third_party/pkg/pub_semver"
@@ -221,7 +226,7 @@
     <project name="third_party/dart/third_party/pkg/shelf_static"
              path="third_party/dart/third_party/pkg/shelf_static"
              remote="https://chromium.googlesource.com/external/github.com/dart-lang/shelf_static.git"
-             revision="0.2.5"/>
+             revision="3558aa35a0d2f0f35868c3fd64b258e140db0122"/>
 
     <project name="third_party/dart/third_party/pkg/shelf_web_socket"
              path="third_party/dart/third_party/pkg/shelf_web_socket"
