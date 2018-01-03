@@ -39,11 +39,12 @@ class EddystoneModuleModel extends ModuleModel {
   Future<String> startAdvertising(String url) {
     Completer<String> completer = new Completer<String>();
     log.info('Advertising url: $url');
-    ble.AdvertisingData data = const ble.AdvertisingData(
+    ble.AdvertisingData data = new ble.AdvertisingData(
       serviceUuids: const <String>[kEddystoneUuid],
-      serviceData: const <String, List<int>>{},
+      serviceData: <String, List<int>>{
+        kEddystoneUuid: _eddystoneDataForUrl(url)
+      },
     );
-    data.serviceData[kEddystoneUuid] = _eddystoneDataForUrl(url);
     _peripheral.startAdvertising(data, null, null, 1000, false,
         (bt.Status status, String advertisementId) {
       log.info('StartAdvertising result: $status with $advertisementId');
