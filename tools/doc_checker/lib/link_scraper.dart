@@ -14,10 +14,6 @@ class LinkScraper {
         new Document().parseLines(new File(file).readAsLinesSync());
     final _Visitor visitor = new _Visitor();
     for (Node node in nodes) {
-      // Work around a bug in the markdown package.
-      if (node is Element && node.isEmpty) {
-        continue;
-      }
       node.accept(visitor);
     }
     return visitor.links;

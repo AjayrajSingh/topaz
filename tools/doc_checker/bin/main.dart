@@ -17,11 +17,49 @@ const String _optionRootDir = 'root-dir';
 const String _optionDotFile = 'dot-file';
 const String _optionGitProject = 'git-project';
 
-void reportError(String type, String value) {
-  print('${type.padRight(25)}: $value');
+void reportError(Error error) {
+  String errorToString(ErrorType type) {
+    switch (type) {
+      case ErrorType.convertPathToHttp:
+        return 'Convert path to http';
+      case ErrorType.unknownLocalFile:
+        return 'Linking to unknown file';
+      case ErrorType.convertHttpToPath:
+        return 'Convert http to path';
+      case ErrorType.brokenLink:
+        return 'Http link is broken';
+      case ErrorType.unreachablePage:
+        return 'Page should be reachable';
+      default:
+        throw new UnsupportedError('Unknown error type $type');
+    }
+  }
+
+  final String location = error.hasLocation ? ' (${error.location})' : '';
+  print('${errorToString(error.type).padRight(25)}: ${error.content}$location');
 }
 
-void main(List<String> args) {
+enum ErrorType {
+  convertPathToHttp,
+  unknownLocalFile,
+  convertHttpToPath,
+  brokenLink,
+  unreachablePage,
+}
+
+class Error {
+  final ErrorType type;
+  final String location;
+  final String content;
+
+  Error(this.type, this.location, this.content);
+
+  Error.forProject(this.type, this.content) : location = null;
+
+  bool get hasLocation => location != null;
+}
+
+Future<Null> main(List<String> args) async {
   final ArgParser parser = new ArgParser()
     ..addFlag(
       _optionHelp,
@@ -59,9 +97,8 @@ void main(List<String> args) {
 
   final String readme = path.join(docsDir, 'README.md');
   final Graph graph = new Graph();
-  final List<Uri> httpLinks = <Uri>[];
-  final List<String> relativeExternalLinks = <String>[];
-  final List<String> missingLocal = <String>[];
+  final List<Error> errors = <Error>[];
+  final List<Future<Error>> pendingErrors = <Future<Error>>[];
 
   for (String doc in docs) {
     final String label = path.relative(doc, from: docsDir);
@@ -74,7 +111,19 @@ void main(List<String> args) {
       final Uri uri = Uri.parse(link);
       if (uri.hasScheme) {
         if (uri.scheme == 'http' || uri.scheme == 'https') {
-          httpLinks.add(uri);
+          if (uri.authority == 'fuchsia.googlesource.com' &&
+              uri.pathSegments.isNotEmpty &&
+              uri.pathSegments[0] == options[_optionGitProject]) {
+            errors.add(
+                new Error(ErrorType.convertHttpToPath, label, uri.toString()));
+          } else {
+            pendingErrors.add(() async {
+              if ((await http.get(uri)).statusCode != 200) {
+                return new Error(ErrorType.brokenLink, label, uri.toString());
+              }
+              return null;
+            }());
+          }
         }
         continue;
       }
@@ -92,62 +141,35 @@ void main(List<String> args) {
         if (docs.contains(absoluteLocation)) {
           graph.addEdge(from: node, to: graph.getNode(relativeLocation));
         } else {
-          missingLocal.add(relativeLocation);
+          errors.add(
+              new Error(ErrorType.unknownLocalFile, label, relativeLocation));
         }
       } else {
-        relativeExternalLinks.add(location);
+        errors.add(new Error(ErrorType.convertPathToHttp, label, location));
       }
     }
   }
 
-  bool hasStructureError = false;
-
-  // Verify that relative paths are within the directory.
-  hasStructureError = hasStructureError || relativeExternalLinks.isNotEmpty;
-  for (String location in relativeExternalLinks) {
-    reportError('Convert path to http', location);
-  }
-
-  // Verify that all local links work.
-  hasStructureError = hasStructureError || missingLocal.isNotEmpty;
-  for (String location in missingLocal) {
-    reportError('Linking to unknown file', location);
-  }
-
-  // Verify that HTTP links do not point to the same project.
-  final List<Uri> localLinks = httpLinks
-      .where((Uri uri) =>
-          uri.authority == 'fuchsia.googlesource.com' &&
-          uri.pathSegments.isNotEmpty &&
-          uri.pathSegments[0] == options[_optionGitProject])
-      .toList();
-  hasStructureError = hasStructureError || localLinks.isNotEmpty;
-  for (Uri uri in localLinks) {
-    reportError('Convert http to path', uri.toString());
-  }
-
-  // Verify that HTTP links point to valid locations.
-  Future
-      .wait(httpLinks.map((Uri uri) async =>
-          (await http.get(uri)).statusCode == 200 ? null : uri))
-      .then((List<Uri> uris) {
-    final List<Uri> errors = uris.where((Uri uri) => uri != null);
-    hasStructureError = hasStructureError || errors.isNotEmpty;
-    for (Uri uri in errors) {
-      reportError('Http link is broken', uri.toString());
-    }
-  });
+  // Resolve all pending errors.
+  errors.addAll(
+      (await Future.wait(pendingErrors)).where((Error error) => error != null));
 
   // Verify singletons and orphans.
   final List<Node> unreachable = graph.removeSingletons()
     ..addAll(
         graph.orphans..removeWhere((Node node) => node.label == 'navbar.md'));
-  hasStructureError = hasStructureError || unreachable.isNotEmpty;
   for (Node node in unreachable) {
-    reportError('Page should be reachable', node.label);
+    errors.add(new Error.forProject(ErrorType.unreachablePage, node.label));
   }
+
+  errors
+    ..sort((Error a, Error b) => a.type.index - b.type.index)
+    ..forEach(reportError);
 
   graph.export('fuchsia_docs', new File(options[_optionDotFile]).openWrite());
 
-  exitCode = hasStructureError ? 1 : 0;
+  if (errors.isNotEmpty) {
+    print('Found ${errors.length} error(s).');
+    exitCode = 1;
+  }
 }
