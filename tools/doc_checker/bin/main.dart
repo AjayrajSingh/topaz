@@ -11,6 +11,7 @@ import 'package:path/path.dart' as path;
 
 import 'package:doc_checker/graph.dart';
 import 'package:doc_checker/link_scraper.dart';
+import 'package:doc_checker/projects.dart';
 
 const String _optionHelp = 'help';
 const String _optionRootDir = 'root-dir';
@@ -30,6 +31,8 @@ void reportError(Error error) {
         return 'Http link is broken';
       case ErrorType.unreachablePage:
         return 'Page should be reachable';
+      case ErrorType.obsoleteProject:
+        return 'Project is obsolete';
       default:
         throw new UnsupportedError('Unknown error type $type');
     }
@@ -45,6 +48,7 @@ enum ErrorType {
   convertHttpToPath,
   brokenLink,
   unreachablePage,
+  obsoleteProject,
 }
 
 class Error {
@@ -57,6 +61,14 @@ class Error {
   Error.forProject(this.type, this.content) : location = null;
 
   bool get hasLocation => location != null;
+}
+
+Future<bool> isLinkValid(Uri link) async {
+  try {
+    return (await http.get(link)).statusCode == 200;
+  } on IOException {
+    return false;
+  }
 }
 
 Future<Null> main(List<String> args) async {
@@ -111,14 +123,22 @@ Future<Null> main(List<String> args) async {
       final Uri uri = Uri.parse(link);
       if (uri.hasScheme) {
         if (uri.scheme == 'http' || uri.scheme == 'https') {
+          bool shouldTestLink = true;
           if (uri.authority == 'fuchsia.googlesource.com' &&
-              uri.pathSegments.isNotEmpty &&
-              uri.pathSegments[0] == options[_optionGitProject]) {
-            errors.add(
-                new Error(ErrorType.convertHttpToPath, label, uri.toString()));
-          } else {
+              uri.pathSegments.isNotEmpty) {
+            if (uri.pathSegments[0] == options[_optionGitProject]) {
+              shouldTestLink = false;
+              errors.add(new Error(
+                  ErrorType.convertHttpToPath, label, uri.toString()));
+            } else if (!validProjects.contains(uri.pathSegments[0])) {
+              shouldTestLink = false;
+              errors.add(
+                  new Error(ErrorType.obsoleteProject, label, uri.toString()));
+            }
+          }
+          if (shouldTestLink) {
             pendingErrors.add(() async {
-              if ((await http.get(uri)).statusCode != 200) {
+              if (!(await isLinkValid(uri))) {
                 return new Error(ErrorType.brokenLink, label, uri.toString());
               }
               return null;
