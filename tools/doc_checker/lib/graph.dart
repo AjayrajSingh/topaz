@@ -49,18 +49,58 @@ class Graph {
           _edges.values.every((Set<Node> nodes) => !nodes.contains(node)))
       .toList();
 
+  /// Computes the depth of each node starting on the root.
+  Map<Node, int> _computeDepths() {
+    final Map<Node, int> levels = <Node, int>{};
+    void addLevel(int level, List<Node> nodes) {
+      if (nodes.isEmpty) {
+        return;
+      }
+      final List<Node> next = <Node>[];
+      for (Node node in nodes) {
+        if (levels.containsKey(node)) {
+          continue;
+        }
+        levels[node] = level;
+        if (_edges.containsKey(node)) {
+          next.addAll(_edges[node]);
+        }
+      }
+      addLevel(level + 1, next);
+    }
+
+    addLevel(0, <Node>[_root]);
+    return levels;
+  }
+
   /// Creates a string representation of this graph in the DOT format.
   void export(String name, StringSink out) {
-    out.writeln('digraph $name {');
-    for (Node node in _nodes.values) {
-      out.writeln('${node.id} [label="${node.label}"];');
+    const List<String> colors = const <String>[
+      '#4285f4',
+      '#f4b400',
+      '#0f9d58',
+      '#db4437',
+    ];
+    final Map<Node, int> levels = _computeDepths();
+    out
+      ..writeln('digraph $name {')
+      ..writeln('edge [arrowhead="none", arrowtail="none"];');
+    for (Node n in _nodes.values) {
+      final String color =
+          levels.containsKey(n) ? colors[levels[n] % colors.length] : '#ffffff';
+      out.writeln(
+          '${n.id} [label="${n.label}", style="filled", fillcolor="$color"];');
     }
     if (_root != null) {
       out.writeln('root=${_root.id};');
     }
     for (Node from in _edges.keys) {
       for (Node to in _edges[from]) {
-        out.writeln('${from.id} -> ${to.id};');
+        if (!levels.containsKey(from) ||
+            !levels.containsKey(to) ||
+            levels[from] < levels[to]) {
+          out.writeln('${from.id} -> ${to.id};');
+        }
       }
     }
     out.writeln('}');
