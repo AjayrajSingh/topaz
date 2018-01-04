@@ -108,6 +108,15 @@ template("dart_jit_app") {
         dest = "runtime"
       }
     ]
+
+    if (defined(invoker.sandbox)) {
+      meta += [
+        {
+          path = rebase_path(invoker.sandbox)
+          dest = "sandbox"
+        }
+      ]
+    }
   }
 }
 
@@ -227,6 +236,15 @@ template("dart_aot_app") {
         dest = "runtime"
       }
     ]
+
+    if (defined(invoker.sandbox)) {
+      meta += [
+        {
+          path = rebase_path(invoker.sandbox)
+          dest = "sandbox"
+        }
+      ]
+    }
   }
 }
 
@@ -259,6 +277,7 @@ template("dart_app") {
             "main_dart",
             "output_name",
             "package_name",
+            "sandbox",
             "source_dir",
             "testonly",
           ])
@@ -273,6 +292,7 @@ template("dart_app") {
             "main_dart",
             "output_name",
             "package_name",
+            "sandbox",
             "source_dir",
             "testonly",
           ])

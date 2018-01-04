@@ -7,6 +7,8 @@ import("//topaz/runtime/dart_runner/dart_app.gni")
 dart_app("firebase_db_client") {
   main_dart = "lib/main.dart"
 
+  sandbox = "meta/sandbox"
+
   deps = [
     "//peridot/public/lib/auth/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/eventsource",

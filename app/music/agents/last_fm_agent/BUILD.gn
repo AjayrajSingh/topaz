@@ -7,6 +7,8 @@ import("//topaz/runtime/dart_runner/dart_app.gni")
 dart_app("last_fm_agent") {
   main_dart = "lib/main.dart"
 
+  sandbox = "meta/sandbox"
+
   deps = [
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/context/fidl:fidl_dart",
