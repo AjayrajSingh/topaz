@@ -1,0 +1,33 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/package.gni")
+
+package("tests") {
+  testonly = true
+  system_image = true
+
+  package_name = "auth_provider_tests"
+
+  deps = [
+    ":auth_provider_unittests",
+  ]
+
+  tests = [
+    {
+      name = "auth_provider_unittests"
+    },
+  ]
+}
+
+executable("auth_provider_unittests") {
+  testonly = true
+
+  deps = [
+    "//garnet/public/lib/fxl:fxl_printers",
+    "//garnet/public/lib/test_runner/cpp:gtest_main",
+    "//topaz/auth_providers/oauth:unittests",
+    "//topaz/auth_providers/google:unittests",
+  ]
+}

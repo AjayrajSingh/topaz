@@ -25,6 +25,7 @@
         "topaz/packages/mondrian",
         "topaz/packages/term",
         "topaz/packages/echidna_user_shell",
+        "topaz/packages/google_auth_provider",
         "topaz/packages/oauth_token_manager",
         "topaz/packages/perspective",
         "topaz/packages/spinning_cube",

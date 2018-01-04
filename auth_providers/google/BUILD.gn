@@ -1,0 +1,78 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/package.gni")
+
+executable("bin") {
+  output_name = "google_auth_provider"
+
+  sources = [
+    "main.cc",
+  ]
+
+  deps = [
+    ":lib",
+    "//garnet/lib/network_wrapper",
+    "//garnet/public/lib/app/cpp",
+    "//garnet/public/lib/auth/fidl",
+    "//garnet/public/lib/fidl/cpp/bindings",
+    "//garnet/public/lib/fsl",
+    "//garnet/public/lib/fxl",
+    "//zircon/public/lib/trace-provider",
+  ]
+}
+
+source_set("lib") {
+
+  sources = [
+    "constants.h",
+    "factory_impl.h",
+    "factory_impl.cc",
+    "google_auth_provider_impl.h",
+    "google_auth_provider_impl.cc",
+  ]
+
+  deps = [
+    "//garnet/lib/network_wrapper",
+    "//garnet/public/lib/auth/fidl",
+    "//garnet/public/lib/fidl/cpp/bindings",
+    "//garnet/public/lib/fxl",
+    "//garnet/lib/callback",
+    "//peridot/lib/rapidjson",
+    "//topaz/auth_providers/oauth",
+    "//topaz/runtime/web_runner/services",
+  ]
+}
+
+source_set("unittests") {
+  testonly = true
+
+  sources = [
+    "google_auth_provider_impl_unittest.cc",
+  ]
+
+  deps = [
+    ":lib",
+    "//garnet/lib/network_wrapper:fake",
+    "//garnet/public/lib/auth/fidl",
+    "//garnet/public/lib/fidl/cpp/bindings",
+    "//garnet/public/lib/fxl:fxl_printers",
+    "//garnet/public/lib/test_runner/cpp:gtest_main",
+    "//garnet/lib/gtest:gtest",
+  ]
+}
+
+package("google_auth_provider") {
+  app = true
+  system_image = true
+
+  deps = [
+    ":bin",
+  ]
+
+  binaries = [ {
+        name = "google_auth_provider"
+  } ]
+}
+
