@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//third_party/flutter/build/flutter_app.gni")
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
 import("//build/package.gni")
 
 flutter_app("basic_wm") {
