@@ -7,7 +7,10 @@ import("//build/dart/dart_test.gni")
 
 dart_app("contacts_content_provider") {
   main_dart = "lib/main.dart"
+
   package_name = "contacts_content_provider"
+
+  sandbox = "meta/sandbox"
 
   deps = [
     "//topaz/app/contacts/services:services_dart",
