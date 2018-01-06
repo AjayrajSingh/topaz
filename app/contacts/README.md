@@ -2,15 +2,16 @@
 
 > Status: Experimental
 
-What exists here mostly boilerplate for the tooling and infrastructure needed
-to build out the UI as a set of Flutter Widgets that can be run on Fuchsia and have the UI developed on Android.
+This project contains code for the [Fuchsia][fuchsia] Contacts [modules][modular].
 
 # Structure
 
-This repo contains code for running a vanilla [Flutter][flutter] application (iOS & Android) and a [Fuchsia][fuchsia] specific set of [modules][modular].
-
+* **agents**: The Fuchsia agent (background services) that is the central consolidator of contacts information. It supplies searching capabilities and information about contacts.
 * **modules**: Fuchsia application code using Modular APIs.
-  * **contacts**: Is a Flutter app with two entry points, one for Fuchsia and one for Vanilla Flutter.
+  * **contact_card**: UI module for displaying information about a single contact Entity. Can be composed into any other module that can supply it a contact Entity through link.
+  * **contact_list**: UI module for listing out all contacts, searching through contacts, and displaying information about selected contacts.
+  * **contacts**: Deprecated
+  * **contacts_picker**: UI module that will display a list of contacts that match any prefix that is supplied to it via link.
 * **services**: [FIDL][fidl] service definitions.
 
 # Development
@@ -20,12 +21,6 @@ This repo contains code for running a vanilla [Flutter][flutter] application (iO
 This repo is already part of the default jiri manifest.
 
 Follow the instructions for setting up a fresh Fuchsia checkout.  Once you have the `jiri` tool installed and have imported the default manifest and updated return to these instructions.
-
-## Authenticate
-
-
-Follow authentication instructions for [Modules][modules-auth]:
-
 
 ## Workflow
 
@@ -63,3 +58,20 @@ Optional: In another terminal you can tail the logs
 [fuchsia-setup]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md
 [fuchsia-env]: https://fuchsia.googlesource.com/fuchsia/+/HEAD/README.md#Setup-Build-Environment
 [modules-auth]: https://fuchsia.googlesource.com/modules/#Authenticate
+
+# Adding Contact Data Providers
+
+On it's own, the contacts content provider agent does not request any contacts data from an external source.
+
+To supply contact information to the contacts content provider, a separate agent should be created that will feed contact data into the contacts content provider.
+
+1. Create a new contacta data provider agent that connects to some contacts source
+
+2. Configure the agent to run on start up
+
+3. Upon initialization, connect the new agent to the contacts content provider agent and call addAll, updateAll, removeAll to push in contacts data
+
+4. If needed, add a task to the new data provider agent to poll its contact service at an interval in order to keep the contacts information up to date
+
+## Current limitations
+At the moment, the contacts content provider will not dedupe data provider agent source ids. If two data provider agents specify the same source id, it will treat them as from the same source.
