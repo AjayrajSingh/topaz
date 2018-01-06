@@ -41,26 +41,31 @@ interface ContactsContentProvider {
 
   // Unsubscribe to changes in the contact list
   Unsubscribe@4(string message_queue_token);
+
+  // Add the array of contacts to the contact store
+  AddAll@5(array<Contact> contacts) => (Status status);
 };
 
 // Service interface to be implemented by third-party contacts data providers
 // that wish to feed contacts data into the contacts content provider.
-// It should provide capabilities to request contacts data as well as sync
-// data to the ContactsContentProvider.
+// It provides capabilities to allow the ContactsContentProvider to pull
+// contacts from it.
 [ServiceName="contacts_content_provider.ContactsDataProvider"]
 interface ContactsDataProvider {
   // Returns a list of the user's contacts.
   GetContactList@1() => (Status status, array<Contact> contacts);
-
-  // TODO(meiyili): implement calls required for syncing data, should also
-  // modify signature of GetContactList to include a last sync token and time
-  // stamp
 };
 
 // Representation of a contact that is expected by the ContactsContentProvider
 // and the modules that consume the contact information.
 // For prototyping purposes, we will initially use a subset of contact fields.
 struct Contact {
+  // A unique identifier across all contacts sources, current temporary
+  // implementation uses sourceId+sourceContactId from the respective data
+  // provider, but this should really be ignored by the the data provider and
+  // set by the contacts content provider
+  // TODO(meiyili): update to be optional and set via the contacts content
+  // provider
   string contactId;
   string sourceContactId;
   string sourceId;

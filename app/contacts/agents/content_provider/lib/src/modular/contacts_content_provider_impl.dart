@@ -120,8 +120,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
       _addContactsToStore(ledgerContacts);
       log.fine('Initialized contacts store from ledger');
     } else {
-      await _getContactsFromDataProviders();
-      log.fine('Ledger empty, initialized contacts store from service');
+      log.fine('Ledger empty');
     }
   }
 
@@ -231,6 +230,18 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     List<fidl.Contact> contacts = await _getContactsFromDataProviders();
     _addContactsToStore(contacts);
     callback(fidl.Status.ok, _contactsStore.getAllContacts());
+  }
+
+  @override
+  void addAll(
+    List<fidl.Contact> contacts,
+    void callback(fidl.Status status),
+  ) {
+    log.info('addAll called');
+    _saveContactsToLedger(contacts).then((bool saved) {
+      log.info('addAll completed');
+      callback(saved ? fidl.Status.ok : fidl.Status.error);
+    });
   }
 
   // Entity Provider methods
@@ -398,52 +409,86 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
 
     List<fidl.EmailAddress> emails = <fidl.EmailAddress>[];
     for (Map<String, String> email in decodedValue['emails']) {
-      emails.add(new fidl.EmailAddress(label: email['label'],
-        value: email['value']));
+      emails.add(
+        new fidl.EmailAddress(label: email['label'], value: email['value']),
+      );
     }
 
     List<fidl.PhoneNumber> phoneNumbers = <fidl.PhoneNumber>[];
     for (Map<String, String> number in decodedValue['phoneNumbers']) {
-      phoneNumbers.add(new fidl.PhoneNumber(
-        label: number['label'],
-        value: number['value']));
+      phoneNumbers.add(
+        new fidl.PhoneNumber(label: number['label'], value: number['value']),
+      );
     }
     return new fidl.Contact(
-      contactId: contactId,
-      sourceContactId: decodedValue['sourceContactId'],
-      sourceId: decodedValue['sourceId'],
-      displayName: decodedValue['displayName'],
-      givenName: decodedValue['givenName'],
-      middleName: decodedValue['middleName'],
-      familyName: decodedValue['familyName'],
-      photoUrl: decodedValue['photoUrl'],
-      emails: emails,
-      phoneNumbers: phoneNumbers);
+        contactId: contactId,
+        sourceContactId: decodedValue['sourceContactId'],
+        sourceId: decodedValue['sourceId'],
+        displayName: decodedValue['displayName'],
+        givenName: decodedValue['givenName'],
+        middleName: decodedValue['middleName'],
+        familyName: decodedValue['familyName'],
+        photoUrl: decodedValue['photoUrl'],
+        emails: emails,
+        phoneNumbers: phoneNumbers);
   }
 
-  Future<Null> _saveContactsToLedger(List<fidl.Contact> contacts) async {
+  /// Saves the list of contacts to ledger and returns true if it was successful
+  Future<bool> _saveContactsToLedger(List<fidl.Contact> contacts) async {
+    bool updated = false;
     if (_page == null) {
       // TODO(meiyili): handle ledger errors gracefully SO-810
       log.warning('saveContactsToLedger was called on a null page');
-      return;
+      return updated;
     }
 
-    for (fidl.Contact contact in contacts) {
-      List<int> contactId = UTF8.encode(contact.contactId);
-      List<int> ledgerValue = encodeLedgerValue(contact);
-      _page.put(
-        contactId,
-        ledgerValue,
-        (ledger.Status status) {
-          // TODO(meiyili): retry put calls that returned with an error SO-810
-          if (status != ledger.Status.ok) {
-            log.severe('page.put returned an error');
-          } else {
-            log.fine('page.put succeeded');
-          }
-        },
+    // TODO(meiyili): retry transactions that returned with an error SO-810
+    Completer<ledger.Status> completer = new Completer<ledger.Status>();
+
+    // Start transaction will error if called again before the previous
+    // transation completed
+    // TODO: queue up save contacts requests SO-1051
+    _page.startTransaction(completer.complete);
+    bool startTransactionOk = (await completer.future) == ledger.Status.ok;
+    if (startTransactionOk) {
+      log.info('Started ledger transaction');
+      List<Future<ledger.Status>> putStatuses = <Future<ledger.Status>>[];
+      for (fidl.Contact contact in (contacts ?? <fidl.Contact>[])) {
+        Completer<ledger.Status> statusCompleter =
+            new Completer<ledger.Status>();
+        putStatuses.add(statusCompleter.future);
+        List<int> contactId = UTF8.encode(contact.contactId);
+        List<int> ledgerValue = encodeLedgerValue(contact);
+        _page.put(
+          contactId,
+          ledgerValue,
+          (ledger.Status status) => statusCompleter.complete(status),
+        );
+      }
+
+      List<ledger.Status> statuses = await Future.wait(putStatuses);
+      bool allSucceeded = statuses.every(
+        (ledger.Status s) => s == ledger.Status.ok,
       );
+
+      // TODO: determine what to do if the commit or rollback fails SO-1041
+      if (allSucceeded) {
+        log.info('Ledger operations succeeded');
+        completer = new Completer<ledger.Status>();
+        _page.commit((ledger.Status status) => completer.complete(status));
+        bool commitOk = (await completer.future) == ledger.Status.ok;
+        if (commitOk) {
+          updated = true;
+        }
+      } else {
+        completer = new Completer<ledger.Status>();
+        _page.rollback((ledger.Status status) => completer.complete(status));
+        await completer.future;
+        updated = false;
+        log.info('Ledger operations failed, rolled back');
+      }
     }
+    return updated;
   }
 
   /// Handles response status, throws an exception if the status is not ok
