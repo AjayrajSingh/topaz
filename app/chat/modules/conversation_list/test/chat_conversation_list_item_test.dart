@@ -20,12 +20,14 @@ void main() {
     await tester.pumpWidget(
       new MaterialApp(
         home: new Material(
-          child: new ChatConversationListItem(
-            key: chatConversationListItemKey,
-            conversation: fixtures.conversation(),
-            onSelect: () {
-              taps++;
-            },
+          child: new Center(
+            child: new ChatConversationListItem(
+              key: chatConversationListItemKey,
+              conversation: fixtures.conversation(),
+              onSelect: () {
+                taps++;
+              },
+            ),
           ),
         ),
       ),
