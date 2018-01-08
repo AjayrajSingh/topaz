@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/runtime/dart_runner/application_runner_impl.h"
+#include "topaz/runtime/dart_runner/dart_application_runner.h"
 
 #include <dlfcn.h>
 #include <fcntl.h>
@@ -217,7 +217,7 @@ void RunApplication(
 
 }  // namespace
 
-ApplicationRunnerImpl::ApplicationRunnerImpl(
+DartApplicationRunner::DartApplicationRunner(
     fidl::InterfaceRequest<app::ApplicationRunner> app_runner)
     : binding_(this, std::move(app_runner)) {
   dart::bin::BootstrapDartIo();
@@ -241,13 +241,13 @@ ApplicationRunnerImpl::ApplicationRunnerImpl(
     FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
 }
 
-ApplicationRunnerImpl::~ApplicationRunnerImpl() {
+DartApplicationRunner::~DartApplicationRunner() {
   char* error = Dart_Cleanup();
   if (error)
     FXL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
 }
 
-void ApplicationRunnerImpl::StartApplication(
+void DartApplicationRunner::StartApplication(
     app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
     ::fidl::InterfaceRequest<app::ApplicationController> controller) {

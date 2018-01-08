@@ -7,7 +7,7 @@
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
 #include "lib/app/fidl/application_runner.fidl.h"
-#include "topaz/runtime/dart_runner/application_runner_impl.h"
+#include "topaz/runtime/dart_runner/dart_application_runner.h"
 #include "lib/fxl/macros.h"
 #include "lib/fsl/tasks/message_loop.h"
 
@@ -19,7 +19,7 @@ class App {
   App() : context_(app::ApplicationContext::CreateFromStartupInfo()) {
     context_->outgoing_services()->AddService<app::ApplicationRunner>(
         [this](fidl::InterfaceRequest<app::ApplicationRunner> app_runner) {
-          new ApplicationRunnerImpl(std::move(app_runner));
+          new DartApplicationRunner(std::move(app_runner));
         });
   }
 

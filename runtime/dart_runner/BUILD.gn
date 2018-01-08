@@ -13,12 +13,12 @@ template("runner") {
     output_name = invoker_output_name
 
     sources = [
-      "application_runner_impl.cc",
-      "application_runner_impl.h",
       "builtin_libraries.cc",
       "builtin_libraries.h",
       "dart_application_controller.cc",
       "dart_application_controller.h",
+      "dart_application_runner.cc",
+      "dart_application_runner.h",
       "main.cc",
     ]
 
