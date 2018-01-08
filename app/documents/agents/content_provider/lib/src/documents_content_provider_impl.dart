@@ -123,7 +123,7 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface {
       // TODO(maryxia) SO-880 this should be read in from a file
       // launches the application at this location, as if it were an agent
       // Also, we need to check that the file location exists before calling this
-      'file:///system/apps/reconciler/documents',
+      'reconciler_documents',
       serviceProviderProxy.ctrl.request(),
       _agentControllerProxy.ctrl.request(),
     );
