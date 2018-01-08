@@ -2,10 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_package.gni")
+import("//build/dart/dart_library.gni")
 import("//build/dart/dart_test.gni")
 
-dart_package("concert_models") {
+dart_library("concert_models") {
   package_name = "concert_models"
 
   source_dir = "lib"

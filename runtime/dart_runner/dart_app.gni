@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_package.gni")
+import("//build/dart/dart_library.gni")
 import("//build/dart/toolchain.gni")
 import("//build/package.gni")
 import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
@@ -19,9 +19,9 @@ declare_args() {
 template("dart_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
-  dart_package_target_name = target_name + "_dart_package"
+  dart_library_target_name = target_name + "_dart_library"
 
-  dart_package(dart_package_target_name) {
+  dart_library(dart_library_target_name) {
     forward_variables_from(invoker, [
       "deps",
       "disable_analysis",
@@ -62,7 +62,7 @@ template("dart_jit_app") {
 
     dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
     rebased_packages_path =
-        rebase_path("$dart_target_gen_dir/$dart_package_target_name.packages")
+        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
     rebased_snapshot_path = rebase_path(snapshot_path)
     rebased_depfile_path = rebase_path(depfile_path)
     rebased_build_output_path = rebase_path(snapshot_path, root_build_dir)
@@ -77,7 +77,7 @@ template("dart_jit_app") {
     ]
 
     deps = [
-      ":$dart_package_target_name",
+      ":$dart_library_target_name",
       dart_snapshotter_label,
     ]
   }
@@ -123,9 +123,9 @@ template("dart_jit_app") {
 template("dart_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
-  dart_package_target_name = target_name + "_dart_package"
+  dart_library_target_name = target_name + "_dart_library"
 
-  dart_package(dart_package_target_name) {
+  dart_library(dart_library_target_name) {
     forward_variables_from(invoker, [
       "deps",
       "disable_analysis",
@@ -166,7 +166,7 @@ template("dart_aot_app") {
 
     dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
     rebased_packages_path =
-        rebase_path("$dart_target_gen_dir/$dart_package_target_name.packages")
+        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
     rebased_assembly_path = rebase_path(assembly_path)
     rebased_depfile_path = rebase_path(depfile_path)
     rebased_build_output_path = rebase_path(assembly_path, root_build_dir)
@@ -181,7 +181,7 @@ template("dart_aot_app") {
     ]
 
     deps = [
-      ":$dart_package_target_name",
+      ":$dart_library_target_name",
       dart_snapshotter_label,
     ]
   }

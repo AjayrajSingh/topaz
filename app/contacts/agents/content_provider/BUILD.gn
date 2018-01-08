@@ -25,6 +25,6 @@ dart_app("contacts_content_provider") {
 dart_test("test") {
   deps = [
     "//third_party/dart-pkg/pub/test",
-    "//topaz/app/contacts/agents/content_provider:contacts_content_provider_dart_package",
+    "//topaz/app/contacts/agents/content_provider:contacts_content_provider_dart_library",
   ]
 }

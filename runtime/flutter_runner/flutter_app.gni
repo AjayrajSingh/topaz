@@ -4,7 +4,7 @@
 
 assert(is_fuchsia || is_fuchsia_host)
 
-import("//build/dart/dart_package.gni")
+import("//build/dart/dart_library.gni")
 import("//build/dart/toolchain.gni")
 import("//third_party/flutter/lib/ui/dart_ui.gni")
 import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
@@ -28,9 +28,9 @@ flutter_tools_bin = "$flutter_tools_out_dir/dart-tools/fuchsia_builder"
 template("flutter_jit_app") {
   assert(defined(invoker.main_dart), "Must define main_dart")
 
-  dart_package_name = target_name + "_dart_package"
+  dart_library_name = target_name + "_dart_library"
 
-  dart_package(dart_package_name) {
+  dart_library(dart_library_name) {
     forward_variables_from(invoker,
                            [
                              "deps",
@@ -63,7 +63,7 @@ template("flutter_jit_app") {
       "$flutter_core_snapshot_gen_dir/isolate_snapshot_instructions.bin"
 
   dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-  dot_packages = "$dart_target_gen_dir/$dart_package_name.packages"
+  dot_packages = "$dart_target_gen_dir/$dart_library_name.packages"
   bundle_depfile = "$bundle_path.d"
   snapshot_path = "$target_gen_dir/${target_name}_snapshot.bin"
   snapshot_depfile = "${snapshot_path}.d"
@@ -120,7 +120,7 @@ template("flutter_jit_app") {
     }
 
     deps = [
-      ":$dart_package_name",
+      ":$dart_library_name",
       flutter_core_snapshot_label,
       gen_snapshot_label,
     ]
@@ -185,9 +185,9 @@ template("flutter_jit_app") {
 template("flutter_aot_app") {
   assert(defined(invoker.main_dart), "Must define main_dart")
 
-  dart_package_name = target_name + "_dart_package"
+  dart_library_name = target_name + "_dart_library"
 
-  dart_package(dart_package_name) {
+  dart_library(dart_library_name) {
     forward_variables_from(invoker,
                            [
                              "deps",
@@ -208,7 +208,7 @@ template("flutter_aot_app") {
   }
 
   dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-  dot_packages = "$dart_target_gen_dir/$dart_package_name.packages"
+  dot_packages = "$dart_target_gen_dir/$dart_library_name.packages"
   bundle_depfile = "$bundle_path.d"
   assembly_path = "$target_gen_dir/$target_name.S"
   assembly_depfile = "${assembly_path}.d"
@@ -277,7 +277,7 @@ template("flutter_aot_app") {
     }
 
     deps = [
-      ":$dart_package_name",
+      ":$dart_library_name",
       "//third_party/flutter/lib/snapshot:generate_dart_ui",
       gen_snapshot_label,
     ]

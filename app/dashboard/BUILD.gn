@@ -32,7 +32,7 @@ flutter_app("dashboard_app") {
 
 dart_test("dashboard_test") {
   deps = [
-    ":dashboard_app_dart_package",
+    ":dashboard_app_dart_library",
     "//third_party/dart-pkg/pub/buildbucket",
     "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",

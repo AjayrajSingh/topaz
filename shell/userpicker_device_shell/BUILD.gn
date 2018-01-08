@@ -30,7 +30,7 @@ flutter_app("userpicker_device_shell") {
 
 dart_test("test") {
   deps = [
-    ":userpicker_device_shell_dart_package",
+    ":userpicker_device_shell_dart_library",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]

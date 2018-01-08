@@ -22,7 +22,7 @@ import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.test_runner.fidl/test_runner.fidl.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart' hide expect;
-import 'package:topaz.app.chat.agents.content_provider._chat_content_provider_dart_package/src/chat_content_provider_impl.dart';
+import 'package:topaz.app.chat.agents.content_provider._chat_content_provider_dart_library/src/chat_content_provider_impl.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 
 import 'src/expect.dart';

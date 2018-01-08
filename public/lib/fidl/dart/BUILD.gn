@@ -2,9 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_package.gni")
+import("//build/dart/dart_library.gni")
 
-dart_package("dart") {
+dart_library("dart") {
   package_name = "lib.fidl.dart"
 
   source_dir = "lib"

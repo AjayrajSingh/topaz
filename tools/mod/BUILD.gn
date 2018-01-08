@@ -19,7 +19,7 @@ dart_tool("mod") {
 
 dart_test("test") {
   deps = [
-    ":mod_dart_package",
+    ":mod_dart_library",
     "//third_party/dart-pkg/pub/test",
   ]
 }

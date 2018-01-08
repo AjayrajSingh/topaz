@@ -29,6 +29,6 @@ flutter_app("contact_list") {
 dart_test("test") {
   deps = [
     "//third_party/dart-pkg/pub/test",
-    "//topaz/app/contacts/modules/contact_list:contact_list_dart_package",
+    "//topaz/app/contacts/modules/contact_list:contact_list_dart_library",
   ]
 }

@@ -21,7 +21,7 @@ flutter_app("capybara_user_shell") {
 
 dart_test("test") {
   deps = [
-    ":capybara_user_shell_dart_package",
+    ":capybara_user_shell_dart_library",
     "//third_party/dart-pkg/pub/test",
   ]
 }

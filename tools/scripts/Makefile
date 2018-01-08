@@ -32,7 +32,7 @@ DART_SOURCES := $(shell $(SFIND) -name "*.dart")
 DART_PACKAGES := $(realpath $(shell $(SFIND) -name "pubspec.yaml" -exec dirname {} \;))
 DART_TOOLS_PACKAGES := $(realpath $(shell find $(TOOLS_ROOT) $(IGNORE_FLAGS) -name "pubspec.yaml" -exec dirname {} \;))
 # find all dart packages defined in BUILD.gn
-DART_GN_PACKAGES := $(realpath $(shell grep -Rwl . --include="*.gn" -e "^\(flutter_app\|dart_package\|dart_app\)" | xargs -n1 dirname | sort -u))
+DART_GN_PACKAGES := $(realpath $(shell grep -Rwl . --include="*.gn" -e "^\(flutter_app\|dart_library\|dart_app\)" | xargs -n1 dirname | sort -u))
 DART_ALL_PACKAGES := $(sort $(DART_PACKAGES) $(DART_TOOLS_PACKAGES) $(DART_GN_PACKAGES))
 
 GN_SOURCES := $(shell $(SFIND) -name "*.gn")
