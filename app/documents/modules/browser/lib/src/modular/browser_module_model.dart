@@ -53,11 +53,16 @@ class BrowserModuleModel extends ModuleModel {
   /// True if the Info Module is opened for a document
   bool _infoModuleOpen = false;
 
+  bool _gridView = true;
+
   /// Constructor
   BrowserModuleModel();
 
   /// True if loading docs.
   bool get loading => _loading;
+
+  /// True if the Documents are laid out in Grid View
+  bool get gridView => _gridView;
 
   /// True if the Info Module is opened for a document
   bool get infoModuleOpen => _infoModuleOpen;
@@ -88,6 +93,12 @@ class BrowserModuleModel extends ModuleModel {
       notifyListeners();
       log.fine('Retrieved list of documents for BrowserModuleModel');
     });
+  }
+
+  /// Toggles between List and Grid view
+  void toggleGridView() {
+    _gridView = !_gridView;
+    notifyListeners();
   }
 
   /// Toggles the Info Module view for a [doc_fidl.Document]

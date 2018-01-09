@@ -7,13 +7,9 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
+import 'package:utils/utils.dart' as utils;
 
 const double _kThumbnailSize = 100.0;
-const List<String> _kValidMimeTypes = const <String>[
-  'image/',
-  'video/',
-  'application/pdf',
-];
 
 /// Representation of Document objects in the Document Browser
 class Thumbnail extends StatelessWidget {
@@ -37,17 +33,6 @@ class Thumbnail extends StatelessWidget {
         assert(selected != null),
         super(key: key);
 
-  bool _showThumbnail() {
-    if (doc.thumbnailLocation.isNotEmpty) {
-      for (String type in _kValidMimeTypes) {
-        if (doc.mimeType.startsWith(type)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   @override
   Widget build(BuildContext context) {
     return new Container(
@@ -69,11 +54,11 @@ class Thumbnail extends StatelessWidget {
             child: new Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                _showThumbnail()
+                utils.showThumbnailImage(doc.thumbnailLocation, doc.mimeType)
                     // TODO(maryxia) SO-969 check if image is .network or .file
                     ? new Image.network(
                         doc.thumbnailLocation,
-                        height: 70.0,
+                        height: 50.0,
                       )
                     : new Icon(
                         doc.isFolder ? Icons.folder : Icons.insert_drive_file,

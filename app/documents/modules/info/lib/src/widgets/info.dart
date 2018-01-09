@@ -5,19 +5,10 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
+import 'package:utils/utils.dart' as utils;
 
 import '../modular/info_module_model.dart';
-
-const List<String> _kValidMimeTypes = const <String>[
-  'image/',
-  'video/',
-  'application/pdf',
-];
-
-final DateFormat _kDateFormat = new DateFormat.yMMMMEEEEd();
 
 /// Document Info view
 class Info extends StatelessWidget {
@@ -26,23 +17,6 @@ class Info extends StatelessWidget {
     Key key,
   })
       : super(key: key);
-
-  bool _showThumbnail(doc_fidl.Document doc) {
-    if (doc != null && doc.thumbnailLocation.isNotEmpty) {
-      for (String type in _kValidMimeTypes) {
-        if (doc.mimeType.startsWith(type)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  // Formats the date into a word format, i.e. Day, Month Day, Year
-  String _prettifyDate(int millisDate) {
-    return _kDateFormat
-        .format(new DateTime.fromMillisecondsSinceEpoch(millisDate));
-  }
 
   Widget _createLabel(String label, String text) {
     return new Expanded(
@@ -54,18 +28,7 @@ class Info extends StatelessWidget {
         child: new Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              new Container(
-                width: 100.0,
-                child: new Text(
-                  label.toUpperCase() ?? '',
-                  textAlign: TextAlign.left,
-                  style: new TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 10.0,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
+              new utils.LabelText(text: label),
               new Expanded(
                 child: new Text(
                   text ?? '',
@@ -153,7 +116,8 @@ class Info extends StatelessWidget {
             new Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: new Center(
-                child: _showThumbnail(model.doc)
+                child: utils.showThumbnailImage(
+                        model.doc.thumbnailLocation, model.doc.mimeType)
                     // TODO(maryxia) SO-969 check if image is .network or .file
                     ? new Image.network(
                         model.doc.thumbnailLocation,
@@ -173,9 +137,9 @@ class Info extends StatelessWidget {
                 : _createLabel('Size', '${model.doc.size} bytes'),
             _createLabel('Location', model.doc.location),
             _createLabel('Owner', model.doc.owners.join(', ')),
-            _createLabel('Modified', _prettifyDate(model.doc.modified)),
-            _createLabel('Opened', _prettifyDate(model.doc.opened)),
-            _createLabel('Created', _prettifyDate(model.doc.created)),
+            _createLabel('Modified', utils.prettifyDate(model.doc.modified)),
+            _createLabel('Opened', utils.prettifyDate(model.doc.opened)),
+            _createLabel('Created', utils.prettifyDate(model.doc.created)),
             _createLabel('Permissions', model.doc.permissions.join(', ')),
             _createLabel('Description', model.doc.description),
           ],
