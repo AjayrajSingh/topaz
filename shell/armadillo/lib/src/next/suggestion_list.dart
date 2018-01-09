@@ -296,7 +296,7 @@ class SuggestionListState extends State<SuggestionList>
                 child: new Material(
                   color: Colors.transparent,
                   child: new TextField(
-                    decoration: const InputDecoration(hideDivider: true),
+                    decoration: const InputDecoration(border: null),
                     style: new TextStyle(
                       fontSize: 16.0,
                       color: Colors.grey[600],
