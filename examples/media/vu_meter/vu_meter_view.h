@@ -6,13 +6,12 @@
 
 #include <memory>
 #include <queue>
+#include <fbl/vmo_mapper.h>
 
 #include "examples/ui/lib/skia_view.h"
 #include "lib/app/cpp/application_context.h"
 #include "lib/fxl/macros.h"
-#include "lib/media/fidl/media_capturer.fidl.h"
-#include "lib/media/fidl/media_transport.fidl.h"
-#include "lib/media/transport/media_packet_consumer_base.h"
+#include "lib/media/fidl/audio_capturer.fidl.h"
 #include "topaz/examples/media/vu_meter/vu_meter_params.h"
 
 namespace examples {
@@ -27,22 +26,9 @@ class VuMeterView : public mozart::SkiaView {
   ~VuMeterView() override;
 
  private:
-  static constexpr uint32_t kBytesPerSample = 2;
   static constexpr float kVuFullWidth = 35000.0f;
   static constexpr float kFastDecay = 0.0001f;
   static constexpr float kSlowDecay = 0.00003f;
-
-  class PacketConsumer : public media::MediaPacketConsumerBase {
-   public:
-    PacketConsumer(VuMeterView* owner);
-
-   protected:
-    void OnPacketSupplied(
-        std::unique_ptr<SuppliedPacket> supplied_packet) override;
-
-   private:
-    VuMeterView* owner_;
-  };
 
   class PeakFilter {
    public:
@@ -72,23 +58,26 @@ class VuMeterView : public mozart::SkiaView {
   // Draws the UI.
   void DrawContent(SkCanvas* canvas);
 
+  // Send a capture request to our capturer.
+  void SendCaptureRequest();
+
   // Toggles between start and stop.
-  void ToggleStartStop();
+  void ToggleStartStop() {
+    started_ = !started_;
+    SendCaptureRequest();
+  }
 
-  // Selects the media type to capture.
-  void OnGotSupportedMediaTypes(
-      fidl::Array<media::MediaTypeSetPtr> media_types);
+  // Shutdown the app
+  void Shutdown();
 
-  void OnPacketSupplied(
-      std::unique_ptr<media::MediaPacketConsumerBase::SuppliedPacket>
-          supplied_packet);
+  void OnDefaultFormatFetched(media::MediaTypePtr default_type);
+  void OnPacketCaptured(media::MediaPacketPtr packet);
 
-  media::MediaCapturerPtr media_capturer_;
-  media::MediaPacketProducerPtr packet_producer_;
-  PacketConsumer packet_consumer_;
+  media::AudioCapturerPtr capturer_;
+  fbl::VmoMapper payload_buffer_;
   bool started_ = false;
-  uint32_t channels_ = 0;
-  uint32_t frames_per_second_ = 0;
+  bool request_in_flight_ = false;
+
   PeakFilter fast_left_;
   PeakFilter fast_right_;
   PeakFilter slow_left_;

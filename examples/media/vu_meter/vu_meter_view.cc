@@ -12,9 +12,13 @@
 #include "lib/app/cpp/connect.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
-#include "lib/media/fidl/media_service.fidl.h"
+#include "lib/media/audio/types.h"
+#include "lib/media/fidl/audio_server.fidl.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
+
+constexpr zx_duration_t kCaptureDuration = ZX_MSEC(20);
+constexpr uint64_t kBytesPerFrame = 4;
 
 namespace examples {
 
@@ -26,44 +30,24 @@ VuMeterView::VuMeterView(
     : mozart::SkiaView(std::move(view_manager),
                        std::move(view_owner_request),
                        "VU Meter"),
-      packet_consumer_(this),
       fast_left_(kFastDecay),
       fast_right_(kFastDecay),
       slow_left_(kSlowDecay),
       slow_right_(kSlowDecay) {
   FXL_DCHECK(params.is_valid());
 
-  auto media_service =
-      application_context->ConnectToEnvironmentService<media::MediaService>();
-  media_service->CreateAudioCapturer(media_capturer_.NewRequest());
+  auto audio_server =
+      application_context->ConnectToEnvironmentService<media::AudioServer>();
+  audio_server->CreateCapturer(capturer_.NewRequest(), false);
 
-  media_capturer_.set_connection_error_handler([this]() {
+  capturer_.set_connection_error_handler([this]() {
     FXL_LOG(ERROR) << "Connection error occurred. Quitting.";
-    media_capturer_.reset();
-    fsl::MessageLoop::GetCurrent()->PostQuitTask();
+    Shutdown();
   });
 
-  media_capturer_->GetPacketProducer(packet_producer_.NewRequest());
-
-  fidl::InterfaceHandle<media::MediaPacketConsumer> packet_consumer_handle;
-  packet_consumer_.Bind(&packet_consumer_handle);
-
-  packet_producer_->Connect(std::move(packet_consumer_handle), []() {});
-
-  // Set demand on the consumer to 2 packets. This obligates the producer to
-  // try to keep two packets in flight at any given time. We could set this to
-  // 1, but that would effectively serialize the production of packets with
-  // OnPacketSupplied. Using a value of 2, when we're done with one packet
-  // (OnPacketSupplied returns), there's already another packet queued at the
-  // consumer, so we don't have to wait. While we're consuming that new packet,
-  // the producer is preparing another one.
-  packet_consumer_.SetDemand(2);
-
-  // Fetch the list of supported media types
-  media_capturer_->GetSupportedMediaTypes(
-      [this](fidl::Array<media::MediaTypeSetPtr> supported_media_types) {
-        OnGotSupportedMediaTypes(std::move(supported_media_types));
-      });
+  capturer_->GetMediaType([this](media::MediaTypePtr type) {
+    OnDefaultFormatFetched(std::move(type));
+  });
 }
 
 VuMeterView::~VuMeterView() {}
@@ -86,7 +70,7 @@ bool VuMeterView::OnInputEvent(mozart::InputEventPtr event) {
           handled = true;
           break;
         case HID_USAGE_KEY_Q:
-          fsl::MessageLoop::GetCurrent()->PostQuitTask();
+          Shutdown();
           handled = true;
           break;
         default:
@@ -131,96 +115,83 @@ void VuMeterView::DrawContent(SkCanvas* canvas) {
       (slow_right_.current() * logical_size().width / 2) / kVuFullWidth, paint);
 }
 
-void VuMeterView::ToggleStartStop() {
-  if ((started_) || !channels_) {
-    media_capturer_->Stop();
-    started_ = false;
-  } else {
-    media_capturer_->Start();
-    started_ = true;
-  }
-
-  InvalidateScene();
-}
-
-void VuMeterView::OnGotSupportedMediaTypes(
-    fidl::Array<media::MediaTypeSetPtr> media_types) {
-  // Look for a media type we like.
-  for (const auto& type : media_types) {
-    if (type->medium != media::MediaTypeMedium::AUDIO) {
-      continue;
-    }
-
-    FXL_DCHECK(!type->details.is_null());
-    FXL_DCHECK(type->details->is_audio());
-    const auto& audio_details = *(type->details->get_audio());
-    if (audio_details.sample_format != media::AudioSampleFormat::SIGNED_16)
-      continue;
-
-    channels_ = std::max(std::min(2u, audio_details.max_channels),
-                         audio_details.min_channels);
-    frames_per_second_ =
-        std::max(std::min(2u, audio_details.max_frames_per_second),
-                 audio_details.min_frames_per_second);
-
-    auto tmp = media::AudioMediaTypeDetails::New();
-    tmp->sample_format = media::AudioSampleFormat::SIGNED_16;
-    tmp->channels = channels_;
-    tmp->frames_per_second = frames_per_second_;
-
-    auto cfg = media::MediaType::New();
-    cfg->medium = media::MediaTypeMedium::AUDIO;
-    cfg->encoding = media::MediaType::kAudioEncodingLpcm;
-    cfg->details = media::MediaTypeDetails::New();
-    cfg->details->set_audio(std::move(tmp));
-
-    FXL_LOG(INFO) << "Configured capture for " << channels_ << " channel"
-                  << ((channels_ == 1) ? " " : "s ") << frames_per_second_
-                  << " Hz 16-bit LPCM";
-
-    media_capturer_->SetMediaType(std::move(cfg));
-    ToggleStartStop();
+void VuMeterView::SendCaptureRequest() {
+  if (!started_ || request_in_flight_) {
     return;
   }
 
-  FXL_LOG(WARNING) << "No compatible media types detect among the "
-                   << media_types.size() << " supplied.";
+  // clang-format off
+  capturer_->CaptureAt(
+      0, payload_buffer_.size() / kBytesPerFrame,
+      [this](media::MediaPacketPtr packet) {
+        OnPacketCaptured(std::move(packet));
+      });
+  // clang-format on
+
+  request_in_flight_ = true;
 }
 
-void VuMeterView::OnPacketSupplied(
-    std::unique_ptr<media::MediaPacketConsumerBase::SuppliedPacket>
-        supplied_packet) {
+void VuMeterView::OnDefaultFormatFetched(media::MediaTypePtr default_type) {
+  // Set the media type, keep the default sample rate but make sure that we
+  // normalize to stereo 16-bit LPCM.
+  FXL_DCHECK(!default_type->details.is_null());
+  FXL_DCHECK(default_type->details->is_audio());
+  const auto& audio_details = *(default_type->details->get_audio());
+  capturer_->SetMediaType(media::CreateLpcmMediaType(
+        media::AudioSampleFormat::SIGNED_16, 2, audio_details.frames_per_second));
+
+  uint64_t payload_buffer_size =
+    kBytesPerFrame * ((kCaptureDuration * audio_details.frames_per_second) / ZX_SEC(1));
+
+  constexpr zx_rights_t rights = ZX_RIGHT_TRANSFER | ZX_RIGHT_READ | ZX_RIGHT_WRITE | ZX_RIGHT_MAP;
+  zx_status_t zx_res;
+  zx::vmo vmo;
+  zx_res = payload_buffer_.CreateAndMap(payload_buffer_size,
+                                        ZX_VM_FLAG_PERM_READ,
+                                        nullptr,
+                                        &vmo,
+                                        rights);
+  if (zx_res != ZX_OK) {
+    FXL_LOG(ERROR) << "Failed to create payload buffer (res " << zx_res << ")";
+    Shutdown();
+    return;
+  }
+
+  capturer_->SetPayloadBuffer(std::move(vmo));
+
+  // Start capturing.
+  ToggleStartStop();
+}
+
+void VuMeterView::OnPacketCaptured(media::MediaPacketPtr packet) {
+  request_in_flight_ = false;
+  if (!started_) {
+    return;
+  }
+
   // TODO(dalesat): Synchronize display and captured audio.
-  FXL_DCHECK(supplied_packet->payload_size() % (kBytesPerSample * channels_) ==
-             0);
-  int16_t* sample = static_cast<int16_t*>(supplied_packet->payload());
-  uint32_t frame_count =
-      supplied_packet->payload_size() / (kBytesPerSample * channels_);
+  uint32_t frame_count = static_cast<uint32_t>(payload_buffer_.size() / kBytesPerFrame);
+  int16_t* samples = reinterpret_cast<int16_t*>(payload_buffer_.start());
 
-  uint32_t right_channel_ndx = (channels_ == 1) ? 0 : 1;
-  for (uint32_t frame_index = 0; frame_index < frame_count; ++frame_index) {
-    int16_t abs_sample = std::abs(sample[0]);
-    fast_left_.Process(abs_sample);
-    slow_left_.Process(abs_sample);
+  for (uint32_t i = 0; i < frame_count; ++i) {
+      int16_t abs_sample = std::abs(samples[0]);
+      fast_left_.Process(abs_sample);
+      slow_left_.Process(abs_sample);
 
-    abs_sample = std::abs(sample[right_channel_ndx]);
-    fast_right_.Process(abs_sample);
-    slow_right_.Process(abs_sample);
+      abs_sample = std::abs(samples[1]);
+      fast_right_.Process(abs_sample);
+      slow_right_.Process(abs_sample);
 
-    sample += channels_;
+      samples += 2;
   }
 
   InvalidateScene();
+  SendCaptureRequest();
 }
 
-VuMeterView::PacketConsumer::PacketConsumer(VuMeterView* owner)
-    : owner_(owner) {
-  FXL_DCHECK(owner_);
-}
-
-void VuMeterView::PacketConsumer::OnPacketSupplied(
-    std::unique_ptr<SuppliedPacket> supplied_packet) {
-  owner_->OnPacketSupplied(std::move(supplied_packet));
+void VuMeterView::Shutdown() {
+    capturer_.reset();
+    fsl::MessageLoop::GetCurrent()->PostQuitTask();
 }
 
 }  // namespace examples
