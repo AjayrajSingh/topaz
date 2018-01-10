@@ -30,8 +30,13 @@ const int _cobaltProjectID = 101;
 
 // The IDs of the Cobalt metric and encoding we are using.
 // These specify objects within our Cobalt project configuration.
-const int _cobaltMetricID = 1;
+enum Metric {
+  moduleLaunched,
+  modulePairsInStory,
+}
 const int _cobaltEncodingID = 1;
+const String _existingModuleKey = 'existing_module';
+const String _addedModuleKey = 'added_module';
 
 // connection to context reader
 final ContextReaderProxy _contextReader = new ContextReaderProxy();
@@ -41,29 +46,65 @@ ContextListenerImpl _contextListener;
 final CobaltEncoderProxy _encoder = new CobaltEncoderProxy();
 
 // Deduplication Map
-final LinkedHashSet<String> _topicDedupSet = new LinkedHashSet<String>();
+final Map<String, LinkedHashSet<String>> _storyModules =
+    <String, LinkedHashSet<String>>{};
+
+// Transform Metric enum index to Cobalt Metric ID.
+int _getCobaltMetricID(Metric metric) {
+  return metric.index + 1;
+}
 
 // ContextListener callback
 void _onContextUpdate(ContextUpdate update) {
   for (ContextValue value in update.values['modules']) {
-    String dedupKey = '${value.meta.story?.id}${value.meta.mod.url}';
-    // To record module launches, we only process each topic once
-    if (_topicDedupSet.contains(dedupKey)) {
+    String modUrl = '${value.meta.mod.url}';
+    String storyId = '${value.meta.story?.id}';
+
+    if (storyId == null) {
       return;
     }
-    _topicDedupSet.add(dedupKey);
 
-    // print('[USAGE LOG] Recording module url $url');
-    _encoder.addStringObservation(_cobaltMetricID, _cobaltEncodingID,
-        value.meta.mod.url, _onAddObservationStatus);
+    // To record module launches, we only process each topic once
+    _storyModules.putIfAbsent(storyId, () => new LinkedHashSet<String>());
+    if (_storyModules[storyId].contains(modUrl)) {
+      return;
+    }
+    _addStringObservation(Metric.moduleLaunched, value.meta.mod.url);
+    for (String existingMod in _storyModules[storyId]) {
+      _addModulePairObservation(existingMod, modUrl);
+    }
+    _storyModules[storyId].add(modUrl);
   }
 }
 
-void _onAddObservationStatus(Status status) {
+void _addStringObservation(Metric metric, String metricString) {
+  int metricId = _getCobaltMetricID(metric);
+  _encoder.addStringObservation(
+      metricId, _cobaltEncodingID, metricString,
+      (Status s) => _onAddObservationStatus(metricId, s));
+}
+
+void _addModulePairObservation(String existingMod, String newMod) {
+  int metricId = _getCobaltMetricID(Metric.modulePairsInStory);
+  _encoder.addMultipartObservation(metricId, <ObservationValue>[
+    _getStringObservationValue(_existingModuleKey, existingMod),
+    _getStringObservationValue(_addedModuleKey, newMod)
+  ], (Status s) => _onAddObservationStatus(metricId, s));
+}
+
+ObservationValue _getStringObservationValue(String name, String value) {
+  return new ObservationValue(
+      name: name,
+      value: new Value.withStringValue(value),
+      encodingId: _cobaltEncodingID);
+}
+
+void _onAddObservationStatus(int metricId, Status status) {
   // If adding an observation fails, we simply drop it and do not retry.
   // TODO(jwnichols): Perhaps we should do something smarter if we fail
   if (status != Status.ok) {
-    print('[USAGE LOG] Failed to add Cobalt observation: $status');
+    print('[USAGE LOG] Failed to add Cobalt observation: $status. '
+        'Metric ID: $metricId');
   }
 }
 
