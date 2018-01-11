@@ -148,6 +148,8 @@ class BrowserModuleModel extends ModuleModel {
   /// Create a Daisy, passing in the Entity Reference.
   /// The Resolver then figures out what relevant module to open.
   void resolveDocument() {
+    // Download the Document we want to resolve (currently, only video)
+    // See SO-1084 for why we have to download the doc
     // Make Entity Ref for this doc
     _docsInterfaceProxy.createEntityReference(_currentDoc, (String entityRef) {
       log.fine('Retrieved an Entity Ref at $entityRef');

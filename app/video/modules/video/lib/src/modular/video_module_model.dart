@@ -185,30 +185,23 @@ class VideoModuleModel extends ModuleModel {
     };
     entityProxy.getData(type, completer.complete);
     String data = await completer.future;
-
     // Convert data into entities.Video
     try {
-      // SO-1060 When our video links work, use those instead of this one
-      //video = new entities.Video.fromJson(data);
-      video = new entities.Video(
-          location:
-              'http://ia800201.us.archive.org/12/items/BigBuckBunny_328/BigBuckBunny.ogv',
-          mimeType: 'video/ogv');
+      video = new entities.Video.fromJson(data);
       log.fine('Successfully resolved Video entity');
+      // Map the entities.Video into an Asset.movie
+      _asset = new Asset.movie(
+        uri: Uri.parse('file://${video.location}'),
+        title: video.name,
+        description: video.description,
+        thumbnail: video.thumbnailLocation,
+        background: video.thumbnailLocation,
+      );
+      notifyListeners();
     } on Exception catch (e) {
       log.warning('Error decoding Video entity from data = $data, error = $e');
     }
     entityProxy.ctrl.close();
-
-    // Map the entities.Video into an Asset.movie
-    _asset = new Asset.movie(
-      uri: Uri.parse(video.location),
-      title: 'Super cool video',
-      description: 'What a great video!',
-      thumbnail: 'assets/video-thumbnail.png',
-      background: 'assets/video-background.png',
-    );
-    notifyListeners();
   }
 
   /// Returns display name for a given device
@@ -313,21 +306,18 @@ class VideoModuleModel extends ModuleModel {
   void onNotify(String json) {
     Map<String, String> linkContents = JSON.decode(json);
     log.fine('Updating video asset according to Daisy Link data');
-    if (linkContents['entityRef'] == null) {
+    if (linkContents['entityRef'] != null) {
       String entityRef = linkContents['entityRef'];
       _createAssetFromEntityRef(entityRef);
-    } else {
-      // TODO(maryxia) SO-1069: remove this once we have on-the-fly entities
-      String uri = linkContents['asset'];
-      if (uri != null) {
-        asset = new Asset.movie(
-          uri: Uri.parse(uri),
-          title: 'Super cool video',
-          description: 'What a great video!',
-          thumbnail: 'assets/video-thumbnail.png',
-          background: 'assets/video-background.png',
-        );
-      }
+    } else if (linkContents['asset'] != null) {
+      // TODO(maryxia) SO-1069: remove else-if once we have on-the-fly entities
+      asset = new Asset.movie(
+        uri: Uri.parse(linkContents['asset']),
+        title: 'Super cool video',
+        description: 'What a great video!',
+        thumbnail: 'assets/video-thumbnail.png',
+        background: 'assets/video-background.png',
+      );
     }
   }
 

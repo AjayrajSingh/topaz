@@ -1,4 +1,4 @@
-// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Copyright 2017 Th%e Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -14,16 +14,26 @@ class Video {
   /// Video location: URL or file path if local
   final String location;
 
-  /// Video mimeType
-  final String mimeType;
+  /// Video name (i.e. Document name)
+  final String name;
+
+  /// Video description
+  final String description;
+
+  /// Video thumbnail image's location
+  final String thumbnailLocation;
 
   /// Constructor
   Video({
     @required this.location,
-    @required this.mimeType,
+    @required this.name,
+    @required this.description,
+    @required this.thumbnailLocation,
   })
       : assert(location != null),
-        assert(mimeType != null);
+        assert(name != null),
+        assert(description != null),
+        assert(thumbnailLocation != null);
 
   /// Instantiate a Video from a JSON string
   factory Video.fromJson(String json) {
@@ -31,7 +41,9 @@ class Video {
       Map<String, String> decodedJson = JSON.decode(json);
       return new Video(
         location: decodedJson['location'],
-        mimeType: decodedJson['mimeType'] ?? '',
+        name: decodedJson['name'] ?? '',
+        description: decodedJson['description'] ?? '',
+        thumbnailLocation: decodedJson['thumbnailLocation'] ?? '',
       );
     } on Exception catch (e) {
       // TODO errors
@@ -51,7 +63,9 @@ class Video {
   String toJson() {
     return JSON.encode(<String, String>{
       'location': location,
-      'mimeType': mimeType,
+      'name': name,
+      'description': description,
+      'thumbnailLocation': thumbnailLocation,
     });
   }
 }

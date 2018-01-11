@@ -151,6 +151,7 @@ class PlayerModel extends Model {
 
   bool _controllerHasProblem() {
     if (_controller.problem != null) {
+      log.fine(_controller.problem);
       failedCast = true;
       if (_controller.problem.type == Problem.kProblemContainerNotSupported) {
         errorMessage = 'UNSUPPORTED VIDEO LINK';

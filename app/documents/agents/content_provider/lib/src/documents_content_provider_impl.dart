@@ -123,7 +123,7 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface
   @override
   void getTypes(String cookie, void callback(List<String> types)) {
     getMetadata(cookie, (doc_fidl.Document doc) {
-      // TODO(maryxia) SO-913: a Doc_fidl.Error object would be returned here
+      // TODO(maryxia) SO-913: a doc_fidl.Error object would be returned here
       // if the doc isn't valid or doesn't exist. Use that instead of null check
       if (doc == null) {
         callback(<String>[]);
@@ -133,12 +133,14 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface
   }
 
   /// Implements [EntityProvider] getData(). This is the data needed to create
-  /// an Asset object for Videos.
+  /// an Asset object for Videos. Currently, we download the entire video
+  /// because we can't play the video from the source URL. See SO-1084
+  /// TODO(maryxia) SO-1088 determine why this cannot play long videos
   @override
   void getData(String cookie, String type, void callback(String data)) {
     String data;
-    getMetadata(cookie, (doc_fidl.Document doc) {
-      // TODO(maryxia) SO-913: a Doc_fidl.Error object would be returned here
+    get(cookie, (doc_fidl.Document doc) {
+      // TODO(maryxia) SO-913: a doc_fidl.Error object would be returned here
       // if the doc isn't valid or doesn't exist. Use that instead of null check
       if (doc == null) {
         callback(null);
@@ -146,7 +148,9 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface
       doc_fidl.Document entityDoc = doc;
       data = new entities.Video(
         location: entityDoc.location,
-        mimeType: entityDoc.mimeType,
+        name: entityDoc.name,
+        description: entityDoc.description,
+        thumbnailLocation: entityDoc.thumbnailLocation,
       )
           .toJson();
       callback(data);
