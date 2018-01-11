@@ -35,6 +35,7 @@ import 'embedder.dart';
 
 const String _kChatContentProviderUrl = 'chat_content_provider';
 const String _kGalleryModuleUrl = 'gallery';
+const String _kInfoModuleUrl = 'chat_conversation_info';
 
 const Duration _kScrollAnimationDuration = const Duration(milliseconds: 300);
 
@@ -719,9 +720,10 @@ class ChatConversationModuleModel extends ModuleModel {
     } else {
       ServiceProviderProxy incomingServices = new ServiceProviderProxy();
       _startChildModule(
-        'gallery',
-        _kGalleryModuleUrl,
-        incomingServices.ctrl.request(),
+        name: 'gallery',
+        url: _kGalleryModuleUrl,
+        linkName: 'gallery',
+        incomingServices: incomingServices.ctrl.request(),
       );
       // _galleryService = new GalleryServiceProxy();
       // connectToService(incomingServices, _galleryService.ctrl);
@@ -731,19 +733,32 @@ class ChatConversationModuleModel extends ModuleModel {
     }
   }
 
+  /// Start or focus the info module on the right side.
+  Future<Null> startInfoModule() async {
+    if (_currentChildModuleName == 'info') {
+      _childModuleController.focus();
+    } else {
+      _startChildModule(
+        name: 'info',
+        url: _kInfoModuleUrl,
+      );
+    }
+  }
+
   /// Start a sub-module, which will be added as a hierarchical child.
-  void _startChildModule(
+  void _startChildModule({
     String name,
     String url,
+    String linkName,
     InterfaceRequest<ServiceProvider> incomingServices,
-  ) {
+  }) {
     _closeChildModule();
     _childModuleController = new ModuleControllerProxy();
 
     moduleContext.startModuleInShell(
       name,
       url,
-      name,
+      linkName,
       incomingServices,
       _childModuleController.ctrl.request(),
       const SurfaceRelation(
@@ -757,7 +772,11 @@ class ChatConversationModuleModel extends ModuleModel {
     _currentChildModuleName = name;
     _childLink.set(
       const <String>[],
-      JSON.encode(<String, String>{'name': name, 'url': url}),
+      JSON.encode(<String, String>{
+        'name': name,
+        'url': url,
+        'linkName': linkName,
+      }),
     );
   }
 
@@ -786,6 +805,7 @@ class ChatConversationModuleModel extends ModuleModel {
         if (decoded is Map<String, String>) {
           String name = decoded['name'];
           String url = decoded['url'];
+          String linkName = decoded['linkName'];
 
           if (name != null && url != null) {
             shouldCloseChildModule = false;
@@ -793,9 +813,10 @@ class ChatConversationModuleModel extends ModuleModel {
             ServiceProviderProxy incomingServices = new ServiceProviderProxy();
 
             _startChildModule(
-              name,
-              url,
-              incomingServices.ctrl.request(),
+              name: name,
+              url: url,
+              linkName: linkName,
+              incomingServices: incomingServices.ctrl.request(),
             );
 
             // TODO(youngseokyoon): handle this in a more generalized way.
@@ -818,19 +839,6 @@ class ChatConversationModuleModel extends ModuleModel {
     } on Exception catch (e, stackTrace) {
       log.severe('Could not parse the child Link data: $json', e, stackTrace);
     }
-  }
-
-  /// Sets the current conversation title to the specified one.
-  void setConversationTitle(String title) {
-    _chatContentProvider.setConversationTitle(
-      conversationId,
-      title,
-      (chat_fidl.ChatStatus status) {
-        if (status != chat_fidl.ChatStatus.ok) {
-          showError('Error while setting conversation title: $status');
-        }
-      },
-    );
   }
 
   /// Sends a new message to the current conversation.

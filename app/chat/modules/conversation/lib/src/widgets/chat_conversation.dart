@@ -25,11 +25,11 @@ class ChatConversation extends StatefulWidget {
   /// Callback for when a new message is submitted
   final ValueChanged<String> onSubmitMessage;
 
-  /// Callback for when a new title is submitted
-  final ValueChanged<String> onSubmitTitle;
-
   /// Callback for when the share photo button is tapped
   final VoidCallback onTapSharePhoto;
+
+  /// Callback for when the info icon is tapped
+  final VoidCallback onTapInfo;
 
   /// Optional [ScrollController] to be used in the [ListView]. The [ListView]
   /// is a reverse list, so the `0.0` scroll offset indicates the bottom end of
@@ -43,8 +43,8 @@ class ChatConversation extends StatefulWidget {
     @required this.sections,
     this.title,
     this.onSubmitMessage,
-    this.onSubmitTitle,
     this.onTapSharePhoto,
+    this.onTapInfo,
     this.scrollController,
   })
       : assert(enabled != null),
@@ -61,28 +61,16 @@ class _ChatConversationState extends State<ChatConversation> {
   ScrollController get effectiveScrollController =>
       widget.scrollController ?? _scrollController;
 
-  bool _editingTitle = false;
-  TextEditingController _titleEditingController;
-
   Widget _buildTitle(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
-    if (widget.enabled && _editingTitle) {
-      return new TextField(
-        controller: _titleEditingController,
-        decoration: const InputDecoration.collapsed(hintText: ''),
-        style: theme.textTheme.title,
-        onSubmitted: _submitTitle,
-      );
-    } else {
-      return new Text(
-        widget.title ?? '(No Conversation Selected)',
-        style: widget.enabled
-            ? theme.textTheme.title
-            : theme.textTheme.title.copyWith(color: Colors.grey[500]),
-        overflow: TextOverflow.ellipsis,
-      );
-    }
+    return new Text(
+      widget.title ?? '(No Conversation Selected)',
+      style: widget.enabled
+          ? theme.textTheme.title
+          : theme.textTheme.title.copyWith(color: Colors.grey[500]),
+      overflow: TextOverflow.ellipsis,
+    );
   }
 
   @override
@@ -100,10 +88,10 @@ class _ChatConversationState extends State<ChatConversation> {
           children: <Widget>[
             new Expanded(child: _buildTitle(context)),
             new Offstage(
-              offstage: !widget.enabled || _editingTitle,
+              offstage: !widget.enabled,
               child: new IconButton(
-                icon: new Icon(Icons.edit),
-                onPressed: _startEditingTitle,
+                icon: new Icon(Icons.info_outline),
+                onPressed: widget.onTapInfo,
               ),
             ),
           ],
@@ -141,22 +129,5 @@ class _ChatConversationState extends State<ChatConversation> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: children,
     );
-  }
-
-  void _startEditingTitle() {
-    setState(() {
-      _editingTitle = true;
-      _titleEditingController = new TextEditingController(
-        text: widget.title,
-      );
-    });
-  }
-
-  void _submitTitle(String title) {
-    widget.onSubmitTitle?.call(title);
-    setState(() {
-      _editingTitle = false;
-      _titleEditingController = null;
-    });
   }
 }

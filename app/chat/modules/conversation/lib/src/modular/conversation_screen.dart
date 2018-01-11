@@ -53,8 +53,8 @@ class ChatConversationScreen extends StatelessWidget {
                       )
                       ?.join(', '),
           onSubmitMessage: model.sendMessage,
-          onSubmitTitle: model.setConversationTitle,
           onTapSharePhoto: model.startGalleryModule,
+          onTapInfo: model.startInfoModule,
           scrollController: model.scrollController,
         ),
       ),

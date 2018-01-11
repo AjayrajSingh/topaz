@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
+import '../widgets.dart';
 import 'conversation_info_module_model.dart';
 
 /// Top-level widget for the chat_conversation_info mod.
@@ -22,8 +23,14 @@ class ConversationInfoScreen extends StatelessWidget {
           ConversationInfoModuleModel model,
         ) {
           return new Scaffold(
-            body: new Center(
-              child: const Text('chat_conversation_info mod'),
+            key: model.scaffoldKey,
+            body: new Column(
+              children: <Widget>[
+                new TitleSection(
+                  initialTitle: model.title,
+                  onTitleSubmitted: model.setConversationTitle,
+                ),
+              ],
             ),
           );
         },

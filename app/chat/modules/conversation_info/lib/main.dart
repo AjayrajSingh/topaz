@@ -4,12 +4,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'src/modular/conversation_info_module_model.dart';
 import 'src/modular/conversation_info_screen.dart';
 
 void main() {
+  setupLogger(name: 'chat_conversation_info');
+
   ModuleWidget<ConversationInfoModuleModel> moduleWidget =
       new ModuleWidget<ConversationInfoModuleModel>(
     applicationContext: new ApplicationContext.fromStartupInfo(),
