@@ -10,6 +10,7 @@ import 'package:lib.config.fidl/config.fidl.dart';
 import 'package:lib.device.fidl/device_shell.fidl.dart';
 import 'package:lib.device.fidl/user_provider.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
+import 'package:lib.ui.presentation.fidl/display_usage.fidl.dart';
 import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
 import 'package:lib.ui.scenic.fidl/renderer.fidl.dart';
 import 'package:flutter/material.dart';
@@ -317,6 +318,11 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   @override
   void setRendererParams(List<RendererParam> params) {
     presentation.setRendererParams(params);
+  }
+
+  @override
+  void setDisplayUsage(DisplayUsage usage) {
+    presentation.setDisplayUsage(usage);
   }
 
   // |ServiceProvider|.
