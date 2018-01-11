@@ -21,6 +21,11 @@ package("chat") {
     },
 
     {
+      name = "chat_conversation_info"
+      source = "gen/topaz/app/chat/modules/conversation_info/chat_conversation_info.flx"
+    },
+
+    {
       name = "chat_conversation_list"
       source = "gen/topaz/app/chat/modules/conversation_list/chat_conversation_list.flx"
     },

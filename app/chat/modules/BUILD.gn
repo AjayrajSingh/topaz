@@ -5,6 +5,7 @@
 group("modules") {
   public_deps = [
     "conversation:chat_conversation",
+    "conversation_info:chat_conversation_info",
     "conversation_list:chat_conversation_list",
   ]
 }
