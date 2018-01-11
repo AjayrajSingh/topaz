@@ -4,7 +4,7 @@
 # found in the LICENSE file.
 
 # Update this year as needed.
-readonly YEAR="201[6-7]"
+readonly YEAR="201[6-8]"
 
 usage() {
   echo "Usage: `basename $0` <files>"

@@ -1,10 +1,9 @@
-// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'dart:convert' show JSON;
 
-import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
@@ -50,7 +49,7 @@ import 'package:lib.widgets/modular.dart';
 class __ProjectName__ModuleModel extends ModuleModel {
   /// Creates a new instance.
   ///
-  /// Setting the [watchAll] value to [true] makes sure that you get notified
+  /// Setting the [watchAll] value to `true` makes sure that you get notified
   /// by [Link] service, even with the changes are made by this model.
   __ProjectName__ModuleModel() : super(watchAll: true);
 

@@ -1,4 +1,4 @@
-// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -36,7 +36,7 @@ class HomePage extends StatelessWidget {
               child: new Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  new Text(
+                  const Text(
                     'You have pushed the button this many times:',
                   ),
                   new Text(

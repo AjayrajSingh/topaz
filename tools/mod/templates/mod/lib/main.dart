@@ -1,8 +1,9 @@
-// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'home_page.dart';
@@ -22,13 +23,14 @@ void main() {
     applicationContext: new ApplicationContext.fromStartupInfo(),
     moduleModel: new __ProjectName__ModuleModel(),
     child: new MaterialApp(
-      home: new HomePage(),
+      home: const HomePage(),
     ),
   );
 
   // The advertise() call exposes the Module service interface to the underlying
   // Fuchsia framework. This call is mandatory, and this application will not
   // function properly as a module if advertise() is not called.
+  // ignore: cascade_invocations
   moduleWidget.advertise();
 
   runApp(moduleWidget);
