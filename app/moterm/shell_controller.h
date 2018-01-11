@@ -5,17 +5,16 @@
 #ifndef APPS_MOTERM_SHELL_CONTROLLER_H_
 #define APPS_MOTERM_SHELL_CONTROLLER_H_
 
+#include <async/auto_wait.h>
+#include <zx/channel.h>
+#include <zx/vmo.h>
+
 #include <deque>
 #include <map>
 #include <string>
 #include <vector>
 
-#include <zx/channel.h>
-#include <zx/vmo.h>
-
 #include "topaz/app/moterm/history.h"
-#include "lib/fidl/c/waiter/async_waiter.h"
-#include "lib/fidl/cpp/waiter/default.h"
 #include "lib/fxl/macros.h"
 #include "lib/fsl/io/redirection.h"
 #include "lib/fsl/vmo/strings.h"
@@ -51,18 +50,12 @@ class ShellController : public History::Client {
   bool SendBackHistory(std::vector<std::string> entries);
   void HandleAddToHistory(const std::string& entry);
 
-  void ReadCommand();
-  void WaitForShell();
-  static void WaitComplete(zx_status_t result,
-                           zx_signals_t pending,
-                           uint64_t count,
-                           void* context);
+  async_wait_result_t ReadCommand();
 
   // Ledger-backed store for terminal history.
   History* history_;
 
-  const FidlAsyncWaiter* waiter_ = fidl::GetDefaultAsyncWaiter();
-  FidlAsyncWaitID wait_id_ = 0;
+  async::AutoWait wait_;
 
   zx::channel channel_;
 

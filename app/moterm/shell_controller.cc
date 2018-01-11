@@ -4,11 +4,12 @@
 
 #include "topaz/app/moterm/shell_controller.h"
 
+#include <async/auto_wait.h>
+#include <async/default.h>
 #include <string.h>
+#include <zircon/processargs.h>
 
 #include <sstream>
-
-#include <zircon/processargs.h>
 
 #include "lib/fxl/files/directory.h"
 #include "lib/fxl/files/file.h"
@@ -37,8 +38,16 @@ std::string SerializeHistory(const std::vector<std::string>& history) {
 
 }  // namespace
 
-ShellController::ShellController(History* history) : history_(history) {
+ShellController::ShellController(History* history)
+  : history_(history),
+    wait_(async_get_default()) {
   history_->RegisterClient(this);
+  wait_.set_trigger(ZX_CHANNEL_READABLE | ZX_CHANNEL_PEER_CLOSED);
+  wait_.set_handler([this](async_t* async,
+                           zx_status_t status,
+                           const zx_packet_signal_t* signal) {
+    return ReadCommand();
+  });
 }
 
 ShellController::~ShellController() {}
@@ -66,14 +75,14 @@ std::vector<fsl::StartupHandle> ShellController::GetStartupHandles() {
 }
 
 void ShellController::Start() {
-  WaitForShell();
+  wait_.Cancel();
+  wait_.set_object(channel_.get());
+  wait_.Begin();
 }
 
 // Stops communication with the shell.
 void ShellController::Terminate() {
-  if (wait_id_) {
-    waiter_->CancelWait(wait_id_);
-  }
+  wait_.Cancel();
   history_->UnregisterClient(this);
 }
 
@@ -117,7 +126,7 @@ void ShellController::HandleAddToHistory(const std::string& entry) {
   history_->AddEntry(entry);
 }
 
-void ShellController::ReadCommand() {
+async_wait_result_t ShellController::ReadCommand() {
   // The commands should not be bigger than the name of the command + max size
   // of a history entry.
   char buffer[kMaxHistoryEntrySize + 100];
@@ -136,38 +145,23 @@ void ShellController::ReadCommand() {
       HandleAddToHistory(command.substr(strlen(kAddLocalEntryCommand)));
     } else {
       FXL_LOG(ERROR) << "Unrecognized shell command: " << command;
-      return;
+      return ASYNC_WAIT_FINISHED;
     }
 
-    WaitForShell();
+    return ASYNC_WAIT_AGAIN;
   } else if (rv == ZX_ERR_SHOULD_WAIT) {
-    WaitForShell();
+    return ASYNC_WAIT_AGAIN;
   } else if (rv == ZX_ERR_BUFFER_TOO_SMALL) {
     // Ignore the command.
     FXL_LOG(WARNING) << "The command sent by shell didn't fit in the buffer.";
+    return ASYNC_WAIT_AGAIN;
   } else if (rv == ZX_ERR_PEER_CLOSED) {
     channel_.reset();
-    return;
+    return ASYNC_WAIT_FINISHED;
   } else {
     FXL_DCHECK(false) << "Unhandled zx_status_t: " << rv;
+    return ASYNC_WAIT_FINISHED;
   }
-}
-
-void ShellController::WaitForShell() {
-  FXL_DCHECK(!wait_id_);
-  wait_id_ = waiter_->AsyncWait(channel_.get(),
-                                ZX_CHANNEL_READABLE | ZX_CHANNEL_PEER_CLOSED,
-                                ZX_TIME_INFINITE, &WaitComplete, this);
-}
-
-// static.
-void ShellController::WaitComplete(zx_status_t result,
-                                   zx_signals_t pending,
-                                   uint64_t count,
-                                   void* context) {
-  ShellController* controller = static_cast<ShellController*>(context);
-  controller->wait_id_ = 0;
-  controller->ReadCommand();
 }
 
 }  // namespace moterm
