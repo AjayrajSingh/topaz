@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:convert' show BASE64, JSON;
 import 'dart:typed_data';
 
+import 'package:chat_models/chat_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

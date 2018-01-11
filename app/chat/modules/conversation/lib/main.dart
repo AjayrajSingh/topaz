@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:chat_models/chat_models.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
-import 'models.dart';
 import 'src/modular/conversation_module_model.dart';
 import 'src/modular/conversation_screen.dart';
 
