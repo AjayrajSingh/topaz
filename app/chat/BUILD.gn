@@ -52,6 +52,7 @@ group("tests") {
 
   deps = [
     "modules/conversation:test",
+    "modules/conversation_info:test",
     "modules/conversation_list:test",
   ]
 }
