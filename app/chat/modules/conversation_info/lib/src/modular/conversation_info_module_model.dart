@@ -46,6 +46,7 @@ class ConversationInfoModuleModel extends ModuleModel {
 
   fidl.Conversation _conversation;
   bool _fetchingConversation = false;
+  bool _supportsMembershipEditing = false;
   final Completer<Null> _readyCompleter = new Completer<Null>();
 
   /// Gets the conversation title.
@@ -69,6 +70,9 @@ class ConversationInfoModuleModel extends ModuleModel {
 
   /// Indicates whether the fetching is in progress or not.
   bool get fetchingConversation => _fetchingConversation;
+
+  /// Indicates whether the agent allows editing group membership.
+  bool get supportsMembershipEditing => _supportsMembershipEditing;
 
   /// Sets the current conversation id value.
   void _setConversationId(List<int> id) {
@@ -142,6 +146,12 @@ class ConversationInfoModuleModel extends ModuleModel {
     // Close all the unnecessary bindings.
     contentProviderServices.ctrl.close();
     componentContext.ctrl.close();
+
+    // See if editing membership is supported with the connected agent.
+    _chatContentProvider.supportsMembershipEditing((bool supported) {
+      _supportsMembershipEditing = supported;
+      notifyListeners();
+    });
 
     _readyCompleter.complete();
   }

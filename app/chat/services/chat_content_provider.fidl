@@ -149,6 +149,20 @@ interface ChatContentProvider {
   SetConversationTitle@6(array<uint8> conversation_id, string title)
       => (ChatStatus status);
 
+  // Gets whether this content provider supports membership editing.
+  // If this returns true, clients can also call |AddParticipants()| and
+  // |RemoveParticipants()|. Otherwise, these two methods will return the
+  // |UNSUPPORTED| status code.
+  SupportsMembershipEditing@13() => (bool supported);
+
+  // Adds |participants| to the conversation specified by |conversation_id|.
+  AddParticipants@14(array<uint8> conversation_id, array<Participant> participants)
+      => (ChatStatus status);
+
+  // Removes |participants| from the conversation specified by |conversation_id|.
+  RemoveParticipants@15(array<uint8> conversation_id, array<Participant> participants)
+      => (ChatStatus status);
+
   // Gets the list of all |Message|s in the specified conversation.
   // When the |message_queue_token| value is provided, the client will be
   // notified with any new messages added and messages deleted after the initial

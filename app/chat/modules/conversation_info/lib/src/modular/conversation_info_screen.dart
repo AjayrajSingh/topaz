@@ -30,7 +30,9 @@ class ConversationInfoScreen extends StatelessWidget {
                   initialTitle: model.title,
                   onTitleSubmitted: model.setConversationTitle,
                 ),
-                const ParticipantsSection(),
+                new ParticipantsSection(
+                  editingEnabled: model.supportsMembershipEditing,
+                ),
               ],
             ),
           );

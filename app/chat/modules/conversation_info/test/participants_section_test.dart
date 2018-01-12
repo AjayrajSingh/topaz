@@ -52,12 +52,26 @@ void main() {
   testWidgets(
     'The add button callback should be correctly called.',
     (WidgetTester tester) async {
+      // When the editing is disabled, the add button should not be shown.
+      await tester.pumpWidget(
+        new MaterialApp(
+          home: const Material(
+            child: const ParticipantsSection(),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.add), findsNothing);
+      expect(find.text('Add people'), findsNothing);
+
+      // When the editing is disabled, the add button should not be shown.
       int tapAddCount = 0;
 
       await tester.pumpWidget(
         new MaterialApp(
           home: new Material(
             child: new ParticipantsSection(
+              editingEnabled: true,
               onAddTapped: () => tapAddCount++,
             ),
           ),
@@ -105,6 +119,20 @@ void main() {
     (WidgetTester tester) async {
       UserModel userModel = new UserModel()..updateModel(_kTestParticipantMap);
 
+      // When the editing is disabled, the remove buttons should not be shown.
+      await tester.pumpWidget(
+        new MaterialApp(
+          home: new Material(
+            child: new ScopedModel<UserModel>(
+              model: userModel,
+              child: const ParticipantsSection(),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.clear), findsNothing);
+
       // Key: participant email.
       // Value: remove button tap count for the participant.
       Map<String, int> tapCount = <String, int>{};
@@ -115,6 +143,7 @@ void main() {
             child: new ScopedModel<UserModel>(
               model: userModel,
               child: new ParticipantsSection(
+                editingEnabled: true,
                 onRemoveTapped: (Participant p) {
                   tapCount.putIfAbsent(p.email, () => 0);
                   tapCount[p.email]++;

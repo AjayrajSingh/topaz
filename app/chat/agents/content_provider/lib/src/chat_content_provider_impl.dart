@@ -637,6 +637,29 @@ class ChatContentProviderImpl extends ChatContentProvider {
   }
 
   @override
+  void supportsMembershipEditing(void callback(bool supported)) {
+    callback(false);
+  }
+
+  @override
+  void addParticipants(
+    List<int> conversationId,
+    List<Participant> participants,
+    void callback(ChatStatus chatStatus),
+  ) {
+    callback(ChatStatus.unsupported);
+  }
+
+  @override
+  void removeParticipants(
+    List<int> conversationId,
+    List<Participant> participants,
+    void callback(ChatStatus chatStatus),
+  ) {
+    callback(ChatStatus.unsupported);
+  }
+
+  @override
   Future<Null> getMessages(
     List<int> conversationId,
     String messageQueueToken,
