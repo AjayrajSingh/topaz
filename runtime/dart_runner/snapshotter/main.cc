@@ -192,7 +192,7 @@ std::vector<char> CreateSnapshot() {
       {"dart:zircon", "WriteResult", "WriteResult."},
       {NULL, NULL, NULL}  // Must be terminated with NULL entries.
   };
-  DART_CHECK_VALID(Dart_Precompile(content_handler_entry_points, NULL, 0));
+  DART_CHECK_VALID(Dart_Precompile(content_handler_entry_points));
 
   uint8_t* buffer = nullptr;
   intptr_t size = 0;

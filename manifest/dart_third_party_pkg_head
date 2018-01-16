@@ -16,7 +16,7 @@
     <project name="third_party/dart/third_party/pkg/barback"
              path="third_party/dart/third_party/pkg/barback"
              remote="https://dart.googlesource.com/barback.git"
-             revision="0.15.2+13"/>
+             revision="0.15.2+14"/>
 
     <project name="third_party/dart/third_party/pkg/bazel_worker"
              path="third_party/dart/third_party/pkg/bazel_worker"
@@ -86,7 +86,7 @@
     <project name="third_party/dart/third_party/pkg/html"
              path="third_party/dart/third_party/pkg/html"
              remote="https://dart.googlesource.com/html.git"
-             revision="0.13.2+1"/>
+             revision="0.13.2+2"/>
 
     <project name="third_party/dart/third_party/pkg/http"
              path="third_party/dart/third_party/pkg/http"
@@ -186,7 +186,7 @@
     <project name="third_party/dart/third_party/pkg/protobuf"
              path="third_party/dart/third_party/pkg/protobuf"
              remote="https://dart.googlesource.com/protobuf.git"
-             revision="0.5.4"/>
+             revision="0.6.0"/>
 
     <project name="third_party/dart/third_party/pkg/pub"
              path="third_party/dart/third_party/pkg/pub"
@@ -207,11 +207,6 @@
              path="third_party/dart/third_party/pkg/resource"
              remote="https://dart.googlesource.com/resource.git"
              revision="af5a5bf65511943398146cf146e466e5f0b95cb9"/>
-
-    <project name="third_party/dart/third_party/pkg/scheduled_test"
-             path="third_party/dart/third_party/pkg/scheduled_test"
-             remote="https://dart.googlesource.com/scheduled_test.git"
-             revision="0.12.11+1"/>
 
     <project name="third_party/dart/third_party/pkg/shelf"
              path="third_party/dart/third_party/pkg/shelf"
@@ -251,7 +246,7 @@
     <project name="third_party/dart/third_party/pkg/stack_trace"
              path="third_party/dart/third_party/pkg/stack_trace"
              remote="https://dart.googlesource.com/stack_trace.git"
-             revision="1.8.2"/>
+             revision="1.9.0"/>
 
     <project name="third_party/dart/third_party/pkg/stream_channel"
              path="third_party/dart/third_party/pkg/stream_channel"
@@ -271,7 +266,17 @@
     <project name="third_party/dart/third_party/pkg/test"
              path="third_party/dart/third_party/pkg/test"
              remote="https://dart.googlesource.com/test.git"
-             revision="0.12.24+6"/>
+             revision="0.12.29+1"/>
+
+    <project name="third_party/dart/third_party/pkg/test_descriptor"
+             path="third_party/dart/third_party/pkg/test_descriptor"
+             remote="https://dart.googlesource.com/test_descriptor.git"
+             revision="1.0.3"/>
+
+    <project name="third_party/dart/third_party/pkg/test_process"
+             path="third_party/dart/third_party/pkg/test_process"
+             remote="https://dart.googlesource.com/test_process.git"
+             revision="1.0.1"/>
 
     <project name="third_party/dart/third_party/pkg/test_reflective_loader"
              path="third_party/dart/third_party/pkg/test_reflective_loader"
@@ -316,7 +321,7 @@
     <project name="third_party/dart/third_party/pkg_tested/dart_style"
              path="third_party/dart/third_party/pkg_tested/dart_style"
              remote="https://dart.googlesource.com/dart_style.git"
-             revision="1.0.7"/>
+             revision="1.0.9"/>
 
     <project name="third_party/dart/third_party/pkg_tested/package_config"
              path="third_party/dart/third_party/pkg_tested/package_config"
