@@ -15,3 +15,11 @@ flutter_app("hello_material") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
 }
+
+flutter_source_app("hello_material_source") {
+  source_dir = "."
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+  ]
+}
