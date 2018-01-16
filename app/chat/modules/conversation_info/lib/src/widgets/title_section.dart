@@ -27,11 +27,16 @@ class TitleSection extends StatefulWidget {
 class _TitleSectionState extends State<TitleSection> {
   final TextEditingController _controller = new TextEditingController();
 
+  bool get _canUpdateTitle =>
+      _effectiveText.isNotEmpty && _effectiveText != widget.initialTitle;
+
+  String get _effectiveText => _controller.text.trim();
+
   @override
   void initState() {
     super.initState();
 
-    _controller.text = widget.initialTitle ?? '';
+    _controller.text = widget.initialTitle?.trim() ?? '';
   }
 
   @override
@@ -39,7 +44,7 @@ class _TitleSectionState extends State<TitleSection> {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.initialTitle != widget.initialTitle) {
-      _controller.text = widget.initialTitle ?? '';
+      _controller.text = widget.initialTitle?.trim() ?? '';
     }
   }
 
@@ -53,7 +58,11 @@ class _TitleSectionState extends State<TitleSection> {
           new TextField(
             decoration: const InputDecoration(labelText: 'Title'),
             controller: _controller,
-            onSubmitted: widget.onTitleSubmitted,
+            onSubmitted: (String text) {
+              if (_canUpdateTitle) {
+                widget.onTitleSubmitted?.call(_effectiveText);
+              }
+            },
           ),
           new ButtonTheme.bar(
             child: new ButtonBar(
@@ -62,10 +71,8 @@ class _TitleSectionState extends State<TitleSection> {
                   animation: _controller,
                   builder: (BuildContext context, Widget child) {
                     return new FlatButton(
-                      onPressed: _controller.text.isNotEmpty &&
-                              _controller.text != widget.initialTitle
-                          ? () =>
-                              widget.onTitleSubmitted?.call(_controller.text)
+                      onPressed: _canUpdateTitle
+                          ? () => widget.onTitleSubmitted?.call(_effectiveText)
                           : null,
                       child: const Text('UPDATE'),
                     );
