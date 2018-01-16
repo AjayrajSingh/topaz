@@ -13,6 +13,7 @@
 #include "lib/fxl/files/path.h"
 #include "lib/fxl/files/symlink.h"
 #include "lib/fxl/logging.h"
+#include "lib/fxl/portable_unistd.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/parsers/packages_map.h"
 #include "lib/tonic/platform/platform_utils.h"
@@ -48,9 +49,12 @@ std::string ExtractPath(std::string url) {
 
 }  // namespace
 
-FileLoader::FileLoader() {}
+FileLoader::FileLoader(int dirfd) : dirfd_(dirfd) {}
 
-FileLoader::~FileLoader() {}
+FileLoader::~FileLoader() {
+  if (dirfd_ >= 0)
+    close(dirfd_);
+}
 
 void FileLoader::FindAndReplaceInPlace(std::string& str,
     const std::string& findStr, const std::string& replaceStr) {
@@ -71,7 +75,7 @@ bool FileLoader::LoadPackagesMap(const std::string& packages) {
   packages_ = packages;
   dependencies_.insert(packages_);
   std::string packages_source;
-  if (!files::ReadFileToString(packages_, &packages_source)) {
+  if (!ReadFileToString(packages_, &packages_source)) {
     std::cerr << "error: Unable to load .packages file '" << packages_ << "'."
               << std::endl;
     return false;
@@ -167,7 +171,7 @@ std::string FileLoader::Fetch(const std::string& url,
   if (resolved_url)
     *resolved_url = GetFileURLForPath(path);
   std::string source;
-  if (!files::ReadFileToString(files::GetAbsoluteFilePath(path), &source)) {
+  if (!ReadFileToString(files::GetAbsoluteFilePath(path), &source)) {
     // TODO(johnmccutchan): The file loader should not explicitly log the error
     // or exit the process. Instead these errors should be reported to the
     // caller of the FileLoader who can implement the application-specific error

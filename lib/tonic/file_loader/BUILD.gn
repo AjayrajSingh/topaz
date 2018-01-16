@@ -3,18 +3,18 @@
 # found in the LICENSE file.
 
 source_set("file_loader") {
-  if (is_win) {
-    set_sources_assignment_filter([ "*_posix.cc" ])
-  } else {
-    set_sources_assignment_filter([ "*_win.cc" ])
-  }
-
   sources = [
     "file_loader.cc",
     "file_loader.h",
-    "file_loader_posix.cc",
-    "file_loader_win.cc",
   ]
+
+  if (is_win) {
+    sources += [ "file_loader_win.cc" ]
+  } else if (is_fuchsia) {
+    sources += [ "file_loader_fuchsia.cc" ]
+  } else {
+    sources += [ "file_loader_posix.cc" ]
+  }
 
   deps = [
     "//garnet/public/lib/fxl",

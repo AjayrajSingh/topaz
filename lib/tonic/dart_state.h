@@ -36,7 +36,7 @@ class DartState {
     DartApiScope api_scope_;
   };
 
-  DartState();
+  DartState(int dirfd = -1);
   virtual ~DartState();
 
   static DartState* From(Dart_Isolate isolate);

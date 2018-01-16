@@ -38,4 +38,15 @@ std::string FileLoader::CanonicalizeFileURL(const std::string& url) {
   return url.substr(kFileSchemeLength);
 }
 
+bool FileLoader::ReadFileToString(const std::string& path,
+                                  std::string* result) {
+  FXL_DCHECK(dirfd_ == -1);
+  return files::ReadFileToString(path, result);
+}
+
+std::pair<uint8_t*, intptr_t> FileLoader::ReadFileToBytes(const std::string& path) {
+  FXL_DCHECK(dirfd_ == -1);
+  return files::ReadFileToBytes(path);
+}
+
 }  // namespace tonic

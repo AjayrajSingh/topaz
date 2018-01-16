@@ -17,7 +17,7 @@ namespace tonic {
 
 class FileLoader {
  public:
-  FileLoader();
+  FileLoader(int dirfd = -1);
   ~FileLoader();
 
   bool LoadPackagesMap(const std::string& packages);
@@ -72,6 +72,10 @@ class FileLoader {
 
   std::string GetFileURLForPath(const std::string& path);
 
+  bool ReadFileToString(const std::string& path, std::string* result);
+  std::pair<uint8_t*, intptr_t> ReadFileToBytes(const std::string& path);
+
+  int dirfd_;
   std::set<std::string> dependencies_;
   std::set<std::string> url_dependencies_;
   std::string packages_;

@@ -16,11 +16,11 @@ DartState::Scope::Scope(DartState* dart_state)
 
 DartState::Scope::~Scope() {}
 
-DartState::DartState()
+DartState::DartState(int dirfd)
     : isolate_(nullptr),
       class_library_(new DartClassLibrary),
       message_handler_(new DartMessageHandler()),
-      file_loader_(new FileLoader()),
+      file_loader_(new FileLoader(dirfd)),
       weak_factory_(this) {}
 
 DartState::~DartState() {}
