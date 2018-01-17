@@ -21,150 +21,102 @@ const int _kMaxSuggestions = 100;
 /// Timeout to wait after typing to perform an ask query
 const Duration _kAskQueryTimeout = const Duration(milliseconds: 500);
 
-/// Listens to a maxwell suggestion list.  As suggestions change it
+/// Listens to a maxwell next suggestion list.  As suggestions change it
 /// notifies its [suggestionListener].
-class MaxwellSuggestionListenerImpl extends maxwell.SuggestionListener {
+class MaxwellNextListenerImpl extends maxwell.NextListener {
   /// String prefix
   final String prefix;
 
   /// Listener that is called when list of suggestions update
   final VoidCallback suggestionListener;
 
-  /// Listener that is called when list of interruptions update
-  final _InterruptionListener interruptionListener;
-
   /// Listener that is called when the processing status has changed
   final ValueChanged<bool> processingChangeListener;
 
-  /// If true, downgrade interruptions
-  final bool downgradeInterruptions;
-
   final List<Suggestion> _suggestions = <Suggestion>[];
-  final List<Suggestion> _interruptions = <Suggestion>[];
 
   /// Constructor
-  MaxwellSuggestionListenerImpl({
+  MaxwellNextListenerImpl({
     this.prefix,
     this.suggestionListener,
-    this.interruptionListener,
     this.processingChangeListener,
-    this.downgradeInterruptions: false,
   });
 
   /// List of suggestions
   List<Suggestion> get suggestions => _suggestions.toList();
 
-  /// List of interruptions
-  List<Suggestion> get interruptions => _interruptions.toList();
-
   @override
-  void onAdd(List<maxwell.Suggestion> suggestions) {
-    log.fine('$prefix onAdd $suggestions');
+  void onNextResults(List<maxwell.Suggestion> suggestions) {
+    _suggestions.clear();
+    log.fine('$prefix onQueryResults $suggestions');
     for (maxwell.Suggestion suggestion in suggestions) {
-      if (downgradeInterruptions ||
-          suggestion.display.annoyance == maxwell.AnnoyanceType.none) {
-        _suggestions.add(_convert(suggestion));
-      } else {
-        Suggestion interruption = _convert(suggestion);
-        _interruptions.add(interruption);
-        interruptionListener.onInterruptionAdded(interruption);
-      }
+      _suggestions.add(_convert(suggestion));
     }
     suggestionListener?.call();
-  }
-
-  @override
-  void onRemove(String uuid) {
-    log.fine('$prefix onRemove $uuid');
-    _suggestions.removeWhere(
-      (Suggestion suggestion) => suggestion.id.value == uuid,
-    );
-    if (_interruptions
-        .where((Suggestion suggestion) => suggestion.id.value == uuid)
-        .isNotEmpty) {
-      _interruptions.removeWhere(
-        (Suggestion suggestion) => suggestion.id.value == uuid,
-      );
-      interruptionListener.onInterruptionRemoved(uuid);
-    }
-    suggestionListener?.call();
-  }
-
-  @override
-  void onRemoveAll() {
-    log.fine('$prefix onRemoveAll');
-    clearSuggestions();
   }
 
   @override
   void onProcessingChange(bool processing) {
     processingChangeListener?.call(processing);
   }
+}
 
-  /// Clear all suggestions
-  void clearSuggestions() {
-    List<Suggestion> interruptionsToRemove = _interruptions.toList();
-    _interruptions.clear();
-    for (Suggestion suggestion in interruptionsToRemove) {
-      interruptionListener.onInterruptionRemoved(
-        suggestion.id.value,
-      );
-    }
+/// Listens to a maxwell query suggestion list.  As suggestions change it
+/// notifies its [suggestionListener].
+class MaxwellQueryListenerImpl extends maxwell.QueryListener {
+  /// String prefix
+  final String prefix;
+
+  /// Listener that is called when list of suggestions update
+  final VoidCallback suggestionListener;
+
+  /// Listener that is called when the processing status has changed
+  final VoidCallback queryCompleteListener;
+
+  final List<Suggestion> _suggestions = <Suggestion>[];
+
+  /// Constructor
+  MaxwellQueryListenerImpl({
+    this.prefix,
+    this.suggestionListener,
+    this.queryCompleteListener,
+  });
+
+  /// List of suggestions
+  List<Suggestion> get suggestions => _suggestions.toList();
+
+  @override
+  void onQueryResults(List<maxwell.Suggestion> suggestions) {
     _suggestions.clear();
+    log.fine('$prefix onQueryResults $suggestions');
+    for (maxwell.Suggestion suggestion in suggestions) {
+      _suggestions.add(_convert(suggestion));
+    }
     suggestionListener?.call();
+  }
+
+  @override
+  void onQueryComplete() {
+    queryCompleteListener?.call();
   }
 }
 
 /// Called when an interruption occurs.
-typedef void OnInterruptionAdded(Suggestion interruption);
-
-/// Called when an interruption has been removed.
-typedef void OnInterruptionRemoved(String id);
-
-/// Called when all interruptions are removed.
-typedef void OnInterruptionsRemoved();
+typedef void OnInterruption(Suggestion interruption);
 
 /// Listens for interruptions from maxwell.
-class _InterruptionListener extends maxwell.SuggestionListener {
+class MaxwellInterruptionListenerImpl extends maxwell.InterruptionListener {
   /// Called when an interruption occurs.
-  final OnInterruptionAdded onInterruptionAdded;
-
-  /// Called when an interruption is finished.
-  final OnInterruptionRemoved onInterruptionRemoved;
-
-  /// Called when all interruptions are finished.
-  final VoidCallback onInterruptionsRemoved;
+  final OnInterruption onInterruption;
 
   /// Constructor.
-  _InterruptionListener({
-    @required this.onInterruptionAdded,
-    @required this.onInterruptionRemoved,
-    @required this.onInterruptionsRemoved,
+  MaxwellInterruptionListenerImpl({
+    @required this.onInterruption,
   });
 
   @override
-  void onAdd(List<maxwell.Suggestion> suggestions) {
-    for (maxwell.Suggestion suggestion in suggestions) {
-      onInterruptionAdded(_convert(suggestion));
-    }
-  }
-
-  @override
-  void onRemove(String uuid) {
-    // TODO(apwilson): decide what to do with a removed interruption.
-    onInterruptionRemoved(uuid);
-  }
-
-  @override
-  void onRemoveAll() {
-    // TODO(apwilson): decide what to do with a removed interruption.
-    onInterruptionsRemoved();
-  }
-
-  @override
-  void onProcessingChange(bool processing) {
-    // TODO(jwnichols): This method doesn't make sense for interruptions and
-    // will go away once we create a specialized listener for interruptions
+  void onInterrupt(maxwell.Suggestion suggestion) {
+    onInterruption(_convert(suggestion));
   }
 }
 
@@ -196,20 +148,24 @@ Suggestion _convert(maxwell.Suggestion suggestion) {
 /// Creates a list of suggestions for the SuggestionList using the
 /// [maxwell.SuggestionProvider].
 class SuggestionProviderSuggestionModel extends SuggestionModel {
-  final maxwell.SuggestionListenerBinding _askListenerBinding =
-      new maxwell.SuggestionListenerBinding();
+  final maxwell.QueryListenerBinding _askListenerBinding =
+      new maxwell.QueryListenerBinding();
 
   // Listens for changes to maxwell's ask suggestion list.
-  MaxwellSuggestionListenerImpl _askListener;
+  MaxwellQueryListenerImpl _askListener;
 
-  final maxwell.SuggestionListenerBinding _nextListenerBinding =
-      new maxwell.SuggestionListenerBinding();
+  final maxwell.NextListenerBinding _nextListenerBinding =
+      new maxwell.NextListenerBinding();
 
   // Listens for changes to maxwell's next suggestion list.
-  MaxwellSuggestionListenerImpl _nextListener;
+  MaxwellNextListenerImpl _nextListener;
 
-  _InterruptionListener _interruptionListener;
+  final maxwell.InterruptionListenerBinding _interruptionListenerBinding =
+      new maxwell.InterruptionListenerBinding();
 
+  MaxwellInterruptionListenerImpl _interruptionListener;
+
+  // TODO(jwnichols): Is this still needed?
   final List<Suggestion> _currentInterruptions = <Suggestion>[];
 
   /// When the user is asking via text or voice we want to show the maxwell ask
@@ -223,14 +179,8 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   /// Listens for changes to visible stories.
   final HitTestModel hitTestModel;
 
-  /// Called when an interruption is added.
-  final OnInterruptionAdded onInterruptionAdded;
-
-  /// Called when an interruption is removed.
-  final OnInterruptionRemoved onInterruptionRemoved;
-
-  /// Called when all interruptions are removed.
-  final OnInterruptionsRemoved onInterruptionsRemoved;
+  /// Called when an interruption occurs.
+  final OnInterruption onInterruption;
 
   /// Timer that tracks the delay between ask text input and making the actual
   /// query.
@@ -239,9 +189,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   /// Constructor.
   SuggestionProviderSuggestionModel({
     this.hitTestModel,
-    this.onInterruptionAdded,
-    this.onInterruptionRemoved,
-    this.onInterruptionsRemoved,
+    this.onInterruption,
   });
 
   /// Call to close all the handles opened by this model.
@@ -250,6 +198,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       _askListenerBinding.close();
     }
     _nextListenerBinding.close();
+    _interruptionListenerBinding.close();
   }
 
   /// Setting [suggestionProvider] triggers the loading on suggestions.
@@ -258,23 +207,19 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     maxwell.SuggestionProviderProxy suggestionProviderProxy,
   ) {
     _suggestionProviderProxy = suggestionProviderProxy;
-    _interruptionListener = new _InterruptionListener(
-      onInterruptionAdded: onInterruptionAdded,
-      onInterruptionRemoved: _onInterruptionRemoved,
-      onInterruptionsRemoved: _onInterruptionsRemoved,
+    _interruptionListener = new MaxwellInterruptionListenerImpl(
+      onInterruption: onInterruption,
     );
-    _askListener = new MaxwellSuggestionListenerImpl(
+    _askListener = new MaxwellQueryListenerImpl(
       prefix: 'ask',
       suggestionListener: _onAskSuggestionsChanged,
-      interruptionListener: _interruptionListener,
-      processingChangeListener: (bool processing) =>
-          _processingAsk = processing,
-      downgradeInterruptions: true,
+      queryCompleteListener: () => _processingAsk = false,
     );
-    _nextListener = new MaxwellSuggestionListenerImpl(
+    _nextListener = new MaxwellNextListenerImpl(
       prefix: 'next',
       suggestionListener: _onNextSuggestionsChanged,
-      interruptionListener: _interruptionListener,
+      processingChangeListener: (bool processing) =>
+          _processingNext = processing,
     );
     _load();
   }
@@ -288,10 +233,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     switch (reason) {
       case DismissalReason.snoozed:
       case DismissalReason.timedOut:
-        if (!_askListener.interruptions.contains(interruption) &&
-            !_nextListener.interruptions.contains(interruption)) {
-          return;
-        }
+        // TODO(jwnichols): Not sure we should persist interruptions
         _currentInterruptions.insert(0, interruption);
         notifyListeners();
         break;
@@ -300,27 +242,14 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     }
   }
 
-  /// Called when an interruption has been removed.
-  void _onInterruptionRemoved(String uuid) {
-    onInterruptionRemoved(uuid);
-    _currentInterruptions.removeWhere(
-      (Suggestion interruption) => interruption.id.value == uuid,
-    );
-    notifyListeners();
-  }
-
-  /// Called when an interruption has been removed.
-  void _onInterruptionsRemoved() {
-    onInterruptionsRemoved();
-    _currentInterruptions.clear();
-    notifyListeners();
-  }
-
   void _load() {
     _suggestionProviderProxy
       ..subscribeToNext(
         _nextListenerBinding.wrap(_nextListener),
         _kMaxSuggestions,
+      )
+      ..subscribeToInterruptions(
+        _interruptionListenerBinding.wrap(_interruptionListener),
       );
   }
 
@@ -330,6 +259,8 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
 
   @override
   List<Suggestion> get nextSuggestions {
+    // TODO(jwnichols): I'm not sure the user shell should be explicitly
+    // displaying interruptions that timed out.
     List<Suggestion> suggestions = new List<Suggestion>.from(
       _currentInterruptions,
     )..addAll(_nextListener?.suggestions ?? <Suggestion>[]);
@@ -357,9 +288,6 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
         if (_askListenerBinding.isBound) {
           _askListenerBinding.close();
         }
-
-        // Also clear any suggestions that the ask listener may have cached
-        _askListener.clearSuggestions();
 
         // Make a query and rewrap the binding
         _suggestionProviderProxy.query(
@@ -398,6 +326,11 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       notifyListeners();
     }
   }
+
+  bool _processingNext;
+
+  @override
+  bool get processingNext => _processingNext;
 
   void _onNextSuggestionsChanged() {
     if (!_asking) {

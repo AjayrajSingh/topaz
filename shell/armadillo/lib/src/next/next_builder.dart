@@ -185,19 +185,9 @@ class NextBuilder {
   void onNowBarVerticalDragEnd(DragEndDetails details) =>
       _suggestionOverlayKey.currentState.onVerticalDragEnd(details);
 
-  /// Call when an interruption is added.
-  void onInterruptionAdded(Suggestion interruption) {
+  /// Call when an interruption occurs.
+  void onInterruption(Suggestion interruption) {
     _interruptionOverlayKey.currentState.onInterruptionAdded(interruption);
-  }
-
-  /// Call when an interruption is removed.
-  void onInterruptionRemoved(String uuid) {
-    _interruptionOverlayKey.currentState.onInterruptionRemoved(uuid);
-  }
-
-  /// Call when all interruptions are removed.
-  void onInterruptionsRemoved() {
-    _interruptionOverlayKey.currentState.onInterruptionsRemoved();
   }
 
   void _onSuggestionSelected(

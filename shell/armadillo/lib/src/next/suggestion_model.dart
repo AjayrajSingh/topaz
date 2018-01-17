@@ -39,6 +39,9 @@ abstract class SuggestionModel extends Model {
   /// Returns true if an ask is being processed.
   bool get processingAsk;
 
+  /// Returns true if a next is being processed.
+  bool get processingNext;
+
   /// Called when a suggestion is selected by the user.
   void onSuggestionSelected(Suggestion suggestion);
 }

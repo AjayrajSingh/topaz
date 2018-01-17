@@ -106,9 +106,7 @@ Widget buildArmadilloUserShell({
   SuggestionProviderSuggestionModel suggestionProviderSuggestionModel =
       new SuggestionProviderSuggestionModel(
     hitTestModel: hitTestModel,
-    onInterruptionAdded: conductorModel.nextBuilder.onInterruptionAdded,
-    onInterruptionRemoved: conductorModel.nextBuilder.onInterruptionRemoved,
-    onInterruptionsRemoved: conductorModel.nextBuilder.onInterruptionsRemoved,
+    onInterruption: conductorModel.nextBuilder.onInterruption,
   );
   conductorModel.nextBuilder
     ..onSuggestionsOverlayChanged = ((bool active) =>
