@@ -26,6 +26,9 @@ const SurfaceRelation _kSurfaceRelation = const SurfaceRelation(
   emphasis: 0.5,
 );
 
+const String _kDefaultNavName = 'Documents';
+const String _kDefaultRootDir = 'root';
+
 /// The ModuleModel for the document browser
 class BrowserModuleModel extends ModuleModel {
   // Interface Proxy. This is how we talk to the Doc FIDL
@@ -53,7 +56,14 @@ class BrowserModuleModel extends ModuleModel {
   /// True if the Info Module is opened for a document
   bool _infoModuleOpen = false;
 
+  /// True if we are in Grid View. False if we are in List View
   bool _gridView = true;
+
+  // Name of where we are in the navigation path (i.e. what folder we're in)
+  String _navName = _kDefaultNavName;
+
+  // Id of the folder we're currently in, in the navigation path
+  String _navId = _kDefaultRootDir;
 
   /// Constructor
   BrowserModuleModel();
@@ -66,6 +76,12 @@ class BrowserModuleModel extends ModuleModel {
 
   /// True if the Info Module is opened for a document
   bool get infoModuleOpen => _infoModuleOpen;
+
+  /// Gets the name of the current folder we're in
+  String get navName => _navName;
+
+  /// Gets the ID of the current folder we're in
+  String get navId => _navId;
 
   /// Sets the document location to preview
   // TODO(maryxia) SO-967 - no need to do a get() to download to a
@@ -84,11 +100,14 @@ class BrowserModuleModel extends ModuleModel {
   /// Implements the Document interface to List documents
   /// Saves the updated list of documents to the model
   // TODO(maryxia) SO-913 add error modes to doc_fidl
-  void listDocs() {
+  void listDocs(String currentDirectoryId, String currentDirectoryName) {
     _loading = true;
     notifyListeners();
-    _docsInterfaceProxy.list((List<doc_fidl.Document> docs) {
+    _docsInterfaceProxy.list(currentDirectoryId,
+        (List<doc_fidl.Document> docs) {
       documents = docs;
+      _navName = currentDirectoryName;
+      _navId = currentDirectoryId;
       _loading = false;
       notifyListeners();
       log.fine('Retrieved list of documents for BrowserModuleModel');
@@ -154,10 +173,19 @@ class BrowserModuleModel extends ModuleModel {
   }
 
   /// Updates the currently-selected doc
-  /// Also sets the currentDocId in the Link
-  set currentDoc(doc_fidl.Document doc) {
-    _currentDoc = doc;
-    link.set(const <String>['currentDocId'], JSON.encode(doc.id));
+  /// If the doc had not been selected, it now becomes selected
+  /// If the user had already selected this doc, selecting it again will
+  /// "unselect" it
+  /// A user can have no currently-selected doc
+  /// Also updates the currentDocId in the Link accordingly
+  void updateCurrentlySelectedDoc(doc_fidl.Document doc) {
+    if (_currentDoc == doc) {
+      _currentDoc = null;
+      link.set(const <String>['currentDocId'], JSON.encode(null));
+    } else {
+      _currentDoc = doc;
+      link.set(const <String>['currentDocId'], JSON.encode(doc.id));
+    }
     notifyListeners();
   }
 
@@ -200,7 +228,9 @@ class BrowserModuleModel extends ModuleModel {
     connectToService(serviceProviderProxy, _docsInterfaceProxy.ctrl);
     serviceProviderProxy.ctrl.close();
     componentContext.ctrl.close();
-    listDocs();
+    _docsInterfaceProxy.getContentProviderName((String name) {
+      listDocs(_kDefaultRootDir, name);
+    });
     notifyListeners();
     log.fine('BrowserModuleModel onReady complete');
   }

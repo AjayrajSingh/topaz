@@ -69,7 +69,13 @@ class Browser extends StatelessWidget {
                 doc: doc,
                 selected:
                     model.currentDoc != null && doc.id == model.currentDoc.id,
-                onPressed: () => model.currentDoc = doc,
+                onPressed: () => model.updateCurrentlySelectedDoc(doc),
+                onDoubleTap: () {
+                  model.updateCurrentlySelectedDoc(doc);
+                  if (model.currentDoc.isFolder) {
+                    model.listDocs(model.currentDoc.id, model.currentDoc.name);
+                  }
+                },
               );
             }).toList(),
             crossAxisCount: 6,
@@ -101,7 +107,7 @@ class Browser extends StatelessWidget {
                 doc: doc,
                 selected:
                     model.currentDoc != null && doc.id == model.currentDoc.id,
-                onPressed: () => model.currentDoc = doc,
+                onPressed: () => model.updateCurrentlySelectedDoc(doc),
               );
             },
           ),
@@ -130,17 +136,16 @@ class Browser extends StatelessWidget {
         );
       }
 
-      // TODO(maryxia) get this name dynamically
       Widget headerNavigation = new Container(
         padding: const EdgeInsets.all(4.0),
-        child: const Text('Documents'),
+        child: new Text(model.navName),
       );
 
       Widget headerActions = new Row(children: <Widget>[
         new IconButton(
           icon: new Icon(Icons.refresh),
           tooltip: 'Refresh list of documents',
-          onPressed: model.listDocs,
+          onPressed: () => model.listDocs(model.navId, model.navName),
         ),
         new IconButton(
           icon: new Icon(Icons.open_in_new),

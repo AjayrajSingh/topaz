@@ -85,10 +85,11 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface
   /// Extends the [Document] interface list() to List files
   @override
   void list(
+    String currentDirectoryId,
     void callback(List<doc_fidl.Document> docs),
   ) {
     log.fine('Retrieving a list of documents in DocumentsContentProviderImpl');
-    _docInterfaceProxy.list((List<doc_fidl.Document> docs) {
+    _docInterfaceProxy.list(currentDirectoryId, (List<doc_fidl.Document> docs) {
       log.fine('Retrieved a list of documents');
       callback(docs);
     });
@@ -150,6 +151,14 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface
           .toJson();
       callback(data);
     });
+  }
+
+  /// Gets the name of the Content Provider
+  @override
+  void getContentProviderName(void callback(String contentProviderName)) {
+    log.fine(
+        'Retrieving the Content Provider Name from DocumentsContentProviderImpl');
+    _docInterfaceProxy.getContentProviderName(callback);
   }
 
   // TODO(maryxia) SO-796 preload the results for documents

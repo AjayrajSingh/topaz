@@ -18,6 +18,7 @@ struct Document {
   uint64 created;
   array<string>? permissions;
   string? description;
+  string? currentDirectoryId;
 };
 
 [ServiceName="documents.DocumentInterface"]
@@ -26,5 +27,6 @@ interface DocumentInterface {
   Get@0(string documentId) => (Document? document);
   GetMetadata@1(string documentId) => (Document? document);
   CreateEntityReference@2(Document document) => (string entityReference);
-  List@3() => (array<Document>? documents);
+  List@3(string currentDirectoryId) => (array<Document>? documents);
+  GetContentProviderName@4() => (string contentProviderName);
 };
