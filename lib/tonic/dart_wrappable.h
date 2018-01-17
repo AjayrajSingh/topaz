@@ -61,9 +61,6 @@ class DartWrappable {
   const tonic::DartWrapperInfo& GetDartWrapperInfo() const override { \
     return dart_wrapper_info_;                                        \
   }                                                                   \
-  static const tonic::DartWrapperInfo& GetClassDartWrapperInfo()    { \
-    return dart_wrapper_info_;                                        \
-  }                                                                   \
                                                                       \
  private:                                                             \
   static const tonic::DartWrapperInfo& dart_wrapper_info_
@@ -92,10 +89,10 @@ class DartWrappable {
                 #ClassName " must be thread-safe reference-countable.");
 
 struct DartConverterWrappable {
-  static DartWrappable* FromDart(Dart_Handle handle, const DartWrapperInfo& wrapper_info);
+  static DartWrappable* FromDart(Dart_Handle handle);
   static DartWrappable* FromArguments(Dart_NativeArguments args,
                                       int index,
-                                      Dart_Handle& exception, const DartWrapperInfo& wrapper_info);
+                                      Dart_Handle& exception);
 };
 
 template <typename T>
@@ -123,15 +120,17 @@ struct DartConverter<
   }
 
   static T* FromDart(Dart_Handle handle) {
-    return static_cast<T*>(DartConverterWrappable::FromDart(handle, T::GetClassDartWrapperInfo()));
+    // TODO(abarth): We're missing a type check.
+    return static_cast<T*>(DartConverterWrappable::FromDart(handle));
   }
 
   static T* FromArguments(Dart_NativeArguments args,
                           int index,
                           Dart_Handle& exception,
                           bool auto_scope = true) {
+    // TODO(abarth): We're missing a type check.
     return static_cast<T*>(
-        DartConverterWrappable::FromArguments(args, index, exception, T::GetClassDartWrapperInfo()));
+        DartConverterWrappable::FromArguments(args, index, exception));
   }
 };
 
