@@ -5,7 +5,6 @@
 import 'dart:convert' show JSON;
 
 import 'package:lib.component.fidl/message_queue.fidl.dart';
-import 'package:lib.ledger.dart/ledger.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:meta/meta.dart';
 
@@ -35,23 +34,15 @@ class ConversationWatcher extends BasePageWatcher {
     for (Entry entry in pageChange.changes) {
       // If the entry key is zero, it contains the title.
       if (entry.key.length == 1 && entry.key[0] == 0) {
-        _processTitle(entry);
+        // Skip processing the title entry. This is now better handled by the
+        // conversation list watcher. Keeping this if statement for backward
+        // compatibility reasons.
       } else {
         _processNewEntry(entry);
       }
     }
 
     pageChange.deletedKeys.forEach(_processDeletedKey);
-  }
-
-  /// Handle the conversation deleted event and send notification.
-  void onConversationDeleted() {
-    Map<String, Object> notification = <String, Object>{
-      'event': 'delete_conversation',
-      'conversation_id': conversationId,
-    };
-
-    sendMessage(JSON.encode(notification));
   }
 
   @override
@@ -74,19 +65,6 @@ class ConversationWatcher extends BasePageWatcher {
   /// Refer to the `chat_content_provider.fidl` file for the message format.
   void _processDeletedKey(List<int> key) {
     _notifyMessage('delete', key);
-  }
-
-  /// Processes the provided [Entry] and sends title change notification to the
-  /// subscriber.
-  void _processTitle(Entry entry) {
-    String title = decodeLedgerValue(entry.value);
-
-    Map<String, Object> notification = <String, Object>{
-      'event': 'title',
-      'title': title,
-    };
-
-    sendMessage(JSON.encode(notification));
   }
 
   void _notifyMessage(String event, List<int> messageId) {

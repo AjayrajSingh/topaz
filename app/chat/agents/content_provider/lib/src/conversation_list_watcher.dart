@@ -23,6 +23,9 @@ class ConversationListWatcher extends BasePageWatcher {
       createLedgerIdMap<Completer<Entry>>();
   final Completer<Null> _ready = new Completer<Null>();
 
+  final Map<List<int>, Map<String, MessageSender>> _conversationMessageSenders =
+      createLedgerIdMap();
+
   /// Creates a [ConversationListWatcher] instance.
   ConversationListWatcher({
     @required PageSnapshotProxy initialSnapshot,
@@ -34,6 +37,25 @@ class ConversationListWatcher extends BasePageWatcher {
         _seenConversations.add(entry.key);
       }
     }).whenComplete(_ready.complete);
+  }
+
+  /// Add a message sender listening to conversation metadata changes.
+  void addConversationMessageSender(
+    List<int> conversationId,
+    String token,
+    MessageSender messageSender,
+  ) {
+    _conversationMessageSenders.putIfAbsent(
+      conversationId,
+      () => <String, MessageSender>{},
+    )[token] = messageSender;
+  }
+
+  /// Remove a conversation message sender associated with the given token.
+  void removeConversationMessageSender(String token) {
+    for (Map<String, MessageSender> m in _conversationMessageSenders.values) {
+      m.remove(token);
+    }
   }
 
   @override
@@ -104,11 +126,12 @@ class ConversationListWatcher extends BasePageWatcher {
 
     Map<String, Object> decoded = decodeLedgerValue(entry.value);
 
-    Map<String, Object> notification = _seenConversations.contains(entry.key)
+    bool seen = _seenConversations.contains(entry.key);
+
+    Map<String, Object> notification = seen
         ? <String, Object>{
-            'event': 'conversation_title',
+            'event': 'conversation_meta',
             'conversation_id': entry.key,
-            'title': decoded['title'],
           }
         : <String, Object>{
             'event': 'new_conversation',
@@ -116,6 +139,12 @@ class ConversationListWatcher extends BasePageWatcher {
             'participants': decoded['participants'],
             'title': decoded['title'],
           };
+
+    // Send the conversation_meta message to the conversation listeners as well.
+    if (seen) {
+      _sendConversationMessage(entry.key, JSON.encode(notification));
+    }
+
     _seenConversations.add(entry.key);
 
     sendMessage(JSON.encode(notification));
@@ -133,6 +162,18 @@ class ConversationListWatcher extends BasePageWatcher {
       'conversation_id': conversationId,
     };
 
-    sendMessage(JSON.encode(notification));
+    String message = JSON.encode(notification);
+
+    sendMessage(message);
+    _sendConversationMessage(conversationId, message);
+  }
+
+  void _sendConversationMessage(List<int> conversationId, String message) {
+    if (_conversationMessageSenders.containsKey(conversationId)) {
+      for (MessageSender messageSender
+          in _conversationMessageSenders[conversationId].values) {
+        messageSender.send(message);
+      }
+    }
   }
 }

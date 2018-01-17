@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON, UTF8;
+import 'dart:convert' show UTF8;
 import 'dart:typed_data';
 
 import 'package:lib.component.fidl/component_context.fidl.dart';
@@ -430,9 +430,6 @@ class ChatContentProviderImpl extends ChatContentProvider {
         callback(ChatStatus.ledgerOperationError);
       }
 
-      // Notify the conversation watchers.
-      _conversationWatchers[conversationId]?.onConversationDeleted();
-
       callback(ChatStatus.ok);
     } on Exception catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
@@ -554,8 +551,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
         return;
       }
 
-      // Write the updated title in Ledger in two places.
-      // (1) In the conversation entry of the main conversations page.
+      // Write the updated title in the conversation entry of the main
+      // conversations page.
       Conversation conversation;
       try {
         conversation = await _getConversation(conversationId);
@@ -591,45 +588,6 @@ class ChatContentProviderImpl extends ChatContentProvider {
         conversationId: conversation.conversationId,
         participants: conversation.participants,
       );
-
-      // (2) In the specific conversation page, with the zero-array key.
-      PageProxy conversationPage = new PageProxy();
-      _pageProxies.add(conversationPage);
-
-      try {
-        // Request a new page from Ledger.
-        statusCompleter = new Completer<Status>();
-        _ledger.getPage(
-          conversation.conversationId,
-          conversationPage.ctrl.request(),
-          statusCompleter.complete,
-        );
-
-        status = await statusCompleter.future;
-        if (status != Status.ok) {
-          log.severe('Ledger::GetPage() returned an error status: $status');
-          callback(ChatStatus.ledgerOperationError);
-          return;
-        }
-
-        // Put the title in the conversation page.
-        statusCompleter = new Completer<Status>();
-        conversationPage.put(
-          new Uint8List(1),
-          UTF8.encode(JSON.encode(title)),
-          statusCompleter.complete,
-        );
-
-        status = await statusCompleter.future;
-        if (status != Status.ok) {
-          log.severe('Page::Put() returned an error status: $status');
-          callback(ChatStatus.ledgerOperationError);
-          return;
-        }
-      } finally {
-        conversationPage.ctrl.close();
-        _pageProxies.remove(conversationPage);
-      }
     } on Exception catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError', e, stackTrace);
       callback(ChatStatus.unknownError);
@@ -691,6 +649,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
         );
 
         watcher.addMessageSender(messageQueueToken, messageSender);
+        _conversationListWatcher.addConversationMessageSender(
+          conversationId,
+          messageQueueToken,
+          messageSender,
+        );
       }
 
       List<Entry> entries;
@@ -820,9 +783,17 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
       // First, store the message in the current user's Ledger.
 
-      // The message id is constructed by concatenating three values: the local
-      // timestamp, incremental message index, and device id.
-      // Refer to the `chat_content_provider.fidl` file for the full rationale.
+      // The message_id is constructed by concatenating three values:
+      //
+      // 1. Local timestamp since epoch
+      //  - Putting the timestamp at the beginning guarantees the sort order.
+      //
+      // 2. Incremental message index
+      //  - This prevents id collision when adding a batch of messages at once.
+      //
+      // 3. Device id
+      //  - This prevents accidental id collision when between multiple devices
+      //    of the same user.
       int localTimestamp = new DateTime.now().millisecondsSinceEpoch;
       Uint8List messageId = new Uint8List(12 + deviceIdBytes.lengthInBytes);
       new ByteData.view(messageId.buffer)
@@ -971,7 +942,10 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
   @override
   void unsubscribe(String messageQueueToken) {
-    _conversationListWatcher.removeMessageSender(messageQueueToken);
+    _conversationListWatcher
+      ..removeMessageSender(messageQueueToken)
+      ..removeConversationMessageSender(messageQueueToken);
+
     for (ConversationWatcher watcher in _conversationWatchers.values) {
       watcher.removeMessageSender(messageQueueToken);
     }

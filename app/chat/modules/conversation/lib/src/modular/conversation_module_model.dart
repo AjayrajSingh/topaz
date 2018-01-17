@@ -298,7 +298,7 @@ class ChatConversationModuleModel extends ModuleModel {
   ///
   /// The returned conversation will be stored in [_conversation], and the
   /// messages in the [_messages] list.
-  Future<Null> _fetchConversation() async {
+  Future<Null> _fetchConversation({bool fetchMessages: true}) async {
     if (conversationId == null) {
       return;
     }
@@ -351,33 +351,37 @@ class ChatConversationModuleModel extends ModuleModel {
     }
 
     // Get the message history.
-    String messageQueueToken = await _mqConversationToken.future;
-    statusCompleter = new Completer<chat_fidl.ChatStatus>();
-    _chatContentProvider.getMessages(
-      conversationId,
-      messageQueueToken,
-      (chat_fidl.ChatStatus status, List<chat_fidl.Message> messages) {
-        statusCompleter.complete(status);
-        messagesCompleter.complete(messages);
-      },
-    );
+    if (fetchMessages) {
+      String messageQueueToken = await _mqConversationToken.future;
+      statusCompleter = new Completer<chat_fidl.ChatStatus>();
+      _chatContentProvider.getMessages(
+        conversationId,
+        messageQueueToken,
+        (chat_fidl.ChatStatus status, List<chat_fidl.Message> messages) {
+          statusCompleter.complete(status);
+          messagesCompleter.complete(messages);
+        },
+      );
 
-    status = await statusCompleter.future;
-    if (status != chat_fidl.ChatStatus.ok) {
-      log.severe('ChatContentProvider::GetMessages() returned an error '
-          'status: $status');
-      _fetchingConversation = false;
-      _conversation = null;
-      _setMessages(null);
+      status = await statusCompleter.future;
+      if (status != chat_fidl.ChatStatus.ok) {
+        log.severe('ChatContentProvider::GetMessages() returned an error '
+            'status: $status');
+        _fetchingConversation = false;
+        _conversation = null;
+        _setMessages(null);
 
-      showError('Error: $status');
-      return;
+        showError('Error: $status');
+        return;
+      }
+
+      _setMessages(
+        new List<chat_fidl.Message>.from(await messagesCompleter.future),
+      );
     }
 
     _fetchingConversation = false;
-    _setMessages(
-      new List<chat_fidl.Message>.from(await messagesCompleter.future),
-    );
+    notifyListeners();
   }
 
   /// Handle the message added / deleted event passed via the [MessageQueue].
@@ -394,7 +398,6 @@ class ChatConversationModuleModel extends ModuleModel {
       String event = decoded['event'];
       List<int> conversationId = decoded['conversation_id'];
       List<int> messageId = decoded['message_id'];
-      String title = decoded['title'];
 
       switch (event) {
         case 'add':
@@ -447,13 +450,9 @@ class ChatConversationModuleModel extends ModuleModel {
           }
           break;
 
-        case 'title':
-          if (_conversation != null) {
-            _conversation = new chat_fidl.Conversation(
-              title: title,
-              conversationId: _conversation.conversationId,
-              participants: _conversation.participants,
-            );
+        case 'conversation_meta':
+          if (_intListEquality.equals(this.conversationId, conversationId)) {
+            _fetchConversation(fetchMessages: false);
           }
           notifyListeners();
           break;

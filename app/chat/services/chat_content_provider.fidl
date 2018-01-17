@@ -101,14 +101,16 @@ interface ChatContentProvider {
   // the obtained conversation id.
   //
   // When the |message_queue_token| value is provided, the client will be
-  // notified (1) with any new conversations added after the initial list of
-  // conversations is sent, or (2) when the ledger download status is changed,
-  // or (3) when a conversation is deleted, or (4) when a conversation title is
-  // changed.
+  // notified when:
+  // (1) a new conversation is added after the initial list is sent.
+  // (2) a conversation is deleted.
+  // (3) the ledger download status is changed.
+  // (4) a conversation metadata is changed (e.g. title, participants).
   //
   // The message sent from the content provider will be a JSON string formatted
   // as following:
   //
+  // (1)
   //     {
   //       "event":           "new_conversation",
   //       "conversation_id": <conversation_id>,
@@ -123,24 +125,26 @@ interface ChatContentProvider {
   //       ]
   //     }
   //
+  // (2)
   //     {
   //       "event":           "delete_conversation",
   //       "conversation_id": <conversation_id>
   //     }
-  // OR
   //
+  // (3)
   //     {
   //       "event":  "download_status",
   //       "status": "idle|pending|in_progress|error"
   //     }
   //
-  // OR
-  //
+  // (4)
   //     {
-  //       "event":           "conversation_title",
-  //       "conversation_id": <conversation_id>,
-  //       "title":           <title>
+  //       "event":           "conversation_meta",
+  //       "conversation_id": <conversation_id>
   //     }
+  //
+  // NOTE: The clients should make subsequent |GetConversation| call to retrieve
+  // the changed metadata.
   //
   GetConversations@5(string? message_queue_token)
       => (ChatStatus status, array<Conversation> conversations);
@@ -165,35 +169,36 @@ interface ChatContentProvider {
 
   // Gets the list of all |Message|s in the specified conversation.
   // When the |message_queue_token| value is provided, the client will be
-  // notified with any new messages added and messages deleted after the initial
-  // snapshot is sent, when the conversation is deleted, or when its title is
-  // changed.
+  // notified when:
+  // (1) a message is added or deleted after the initial snapshot is sent.
+  // (2) the current conversation is deleted.
+  // (3) the conversation metadata is changed (e.g. title, participants).
   //
   // The message sent from the content provider will be a JSON string formatted
   // as following:
   //
+  // (1)
   //     {
   //       "event":           "add|delete",
   //       "conversation_id": <conversation_id>,
   //       "message_id":      <message_id>
   //     }
   //
-  // OR
+  // NOTE: The client should then make a subsequent |GetMessage| call to
+  // retrieve the actual message content.
   //
+  // (2)
   //     {
   //       "event":           "delete_conversation",
   //       "conversation_id": <conversation_id>
   //     }
   //
-  // OR
-  //
+  // (3)
   //     {
-  //       "event": "title",
-  //       "title": <title>
+  //       "event":           "conversation_meta",
+  //       "conversation_id": <conversation_id>
   //     }
   //
-  // The client should then make a subsequent |GetMessage| call to retrieve the
-  // actual message content.
   GetMessages@7(array<uint8> conversation_id, string? message_queue_token)
       => (ChatStatus status, array<Message> messages);
 
@@ -210,18 +215,6 @@ interface ChatContentProvider {
 
   // Sends a new message to the specified conversation.
   // Returns the |message_id| created by the content provider.
-  //
-  // The returned |message_id| is constructed by concatenating three values:
-  //
-  // 1. Local timestamp since epoch
-  //  - Putting the timestamp at the beginning guarantees the sort order.
-  //
-  // 2. Incremental message index
-  //  - This prevents id collision when adding a batch of messages at once.
-  //
-  // 3. Device id
-  //  - This prevents accidental id collision when between multiple devices of
-  //    the same user.
   SendMessage@10(array<uint8> conversation_id, string type, string json_payload)
       => (ChatStatus status, array<uint8> message_id);
 

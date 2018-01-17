@@ -526,13 +526,25 @@ class ChatConversationListModuleModel extends ModuleModel {
           notifyListeners();
           break;
 
-        case 'conversation_title':
+        case 'conversation_meta':
           List<int> conversationId = decoded['conversation_id'];
-          String title = decoded['title'];
-          log.info('conversation_title event with title: $title');
-          _conversations[conversationId] =
-              _conversations[conversationId].copyWith(title: title);
-          notifyListeners();
+          log.fine('conversation_meta event with id: $conversationId');
+
+          // Fetch the full conversation metadata.
+          _chatContentProvider.getConversation(
+            conversationId,
+            false,
+            (chat_fidl.ChatStatus status, chat_fidl.Conversation conversation) {
+              if (status != chat_fidl.ChatStatus.ok) {
+                log.warning('GetConversation() call failed', status);
+                return;
+              }
+
+              _conversations[conversationId] =
+                  _getConversationFromFidl(conversation);
+              notifyListeners();
+            },
+          );
           break;
 
         default:

@@ -162,7 +162,7 @@ class ConversationInfoModuleModel extends ModuleModel {
   /// conversation.
   ///
   /// The returned conversation will be stored in [_conversation].
-  Future<Null> _fetchConversation() async {
+  Future<Null> _fetchConversation({bool fetchMessages: true}) async {
     if (conversationId == null) {
       return;
     }
@@ -215,27 +215,29 @@ class ConversationInfoModuleModel extends ModuleModel {
     }
 
     // Get the message history.
-    String messageQueueToken = await _mqConversationToken.future;
-    statusCompleter = new Completer<fidl.ChatStatus>();
-    _chatContentProvider.getMessages(
-      conversationId,
-      messageQueueToken,
-      (fidl.ChatStatus status, List<fidl.Message> messages) {
-        statusCompleter.complete(status);
-        messagesCompleter.complete(messages);
-      },
-    );
+    if (fetchMessages) {
+      String messageQueueToken = await _mqConversationToken.future;
+      statusCompleter = new Completer<fidl.ChatStatus>();
+      _chatContentProvider.getMessages(
+        conversationId,
+        messageQueueToken,
+        (fidl.ChatStatus status, List<fidl.Message> messages) {
+          statusCompleter.complete(status);
+          messagesCompleter.complete(messages);
+        },
+      );
 
-    status = await statusCompleter.future;
-    if (status != fidl.ChatStatus.ok) {
-      log.severe('ChatContentProvider::GetMessages() returned an error '
-          'status: $status');
-      _fetchingConversation = false;
-      _conversation = null;
-      notifyListeners();
+      status = await statusCompleter.future;
+      if (status != fidl.ChatStatus.ok) {
+        log.severe('ChatContentProvider::GetMessages() returned an error '
+            'status: $status');
+        _fetchingConversation = false;
+        _conversation = null;
+        notifyListeners();
 
-      showError('Error: $status');
-      return;
+        showError('Error: $status');
+        return;
+      }
     }
 
     _fetchingConversation = false;
@@ -254,22 +256,24 @@ class ConversationInfoModuleModel extends ModuleModel {
 
       Map<String, dynamic> decoded = JSON.decode(message);
       String event = decoded['event'];
-      String title = decoded['title'];
+      List<int> conversationId = decoded['conversation_id'];
 
       switch (event) {
         // Ignore these events.
         case 'add':
         case 'delete':
-        case 'delete_conversation':
           break;
 
-        case 'title':
-          if (_conversation != null) {
-            _conversation = new fidl.Conversation(
-              title: title,
-              conversationId: _conversation.conversationId,
-              participants: _conversation.participants,
-            );
+        case 'delete_conversation':
+          // Reset the current conversation.
+          if (_intListEquality.equals(this.conversationId, conversationId)) {
+            _setConversationId(null);
+          }
+          break;
+
+        case 'conversation_meta':
+          if (_intListEquality.equals(this.conversationId, conversationId)) {
+            _fetchConversation(fetchMessages: false);
           }
           notifyListeners();
           break;

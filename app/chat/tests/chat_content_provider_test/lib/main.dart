@@ -695,28 +695,26 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
 
     // Check if the 4 notifications are correctly sent.
     await completer1.future.timeout(_kTimeout);
-    expect(mqConversation1.messagesOfType('conversation_title'), hasLength(1));
+    expect(mqConversation1.messagesOfType('conversation_meta'), hasLength(1));
     decoded =
-        JSON.decode(mqConversation1.messagesOfType('conversation_title').last);
+        JSON.decode(mqConversation1.messagesOfType('conversation_meta').last);
     expect(decoded, isMap);
-    expect(decoded['event'], equals('conversation_title'));
+    expect(decoded['event'], equals('conversation_meta'));
     expect(
       decoded['conversation_id'],
       orderedEquals(conversation0.conversationId),
     );
-    expect(decoded['title'], conversationTitle);
 
     await completer2.future.timeout(_kTimeout);
-    expect(mqConversation2.messagesOfType('conversation_title'), hasLength(1));
+    expect(mqConversation2.messagesOfType('conversation_meta'), hasLength(1));
     decoded =
-        JSON.decode(mqConversation2.messagesOfType('conversation_title').last);
+        JSON.decode(mqConversation2.messagesOfType('conversation_meta').last);
     expect(decoded, isMap);
-    expect(decoded['event'], equals('conversation_title'));
+    expect(decoded['event'], equals('conversation_meta'));
     expect(
       decoded['conversation_id'],
       orderedEquals(conversation0.conversationId),
     );
-    expect(decoded['title'], conversationTitle);
 
     await completer3.future.timeout(_kTimeout);
     expect(mqMessage1.messagesOfType('title'), hasLength(1));
