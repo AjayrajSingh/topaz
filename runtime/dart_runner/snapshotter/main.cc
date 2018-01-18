@@ -138,12 +138,6 @@ std::vector<char> CreateSnapshot() {
 #else
   DART_CHECK_VALID(Dart_FinalizeLoading(false));
 
-  // Import dart:_internal into dart:fuchsia.builtin for setting up hooks.
-  Dart_Handle builtin_lib = Dart_LookupLibrary(ToDart("dart:fuchsia.builtin"));
-  Dart_Handle internal_lib = Dart_LookupLibrary(ToDart("dart:_internal"));
-  DART_CHECK_VALID(
-      Dart_LibraryImportLibrary(builtin_lib, internal_lib, Dart_Null()));
-
   Dart_QualifiedFunctionName content_handler_entry_points[] = {
       {"::", "::", "main"},
       {"dart:_internal", "::", "_printClosure"},

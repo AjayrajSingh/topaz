@@ -2,11 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-library fidl_builtin;
+library fuchsia_builtin;
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:zircon';
+import 'dart:_internal' show VMLibraryHooks;
 
 // Corelib 'print' implementation.
 void _print(arg) {
@@ -31,18 +30,8 @@ Uri _scriptUri() {
 void _scheduleMicrotask(void callback()) native "ScheduleMicrotask";
 _getScheduleMicrotaskClosure() => _scheduleMicrotask;
 
-int _timerMillisecondClock() =>
-    System.getTime(ZX.CLOCK_MONOTONIC) ~/ (1000 * 1000);
-
 _setupHooks() {
-  VMLibraryHooks.timerMillisecondClock = _timerMillisecondClock;
   VMLibraryHooks.platformScript = _scriptUri;
 }
 
 _getPrintClosure() => _print;
-
-// import 'root_library'; happens here from C Code
-// The root library (aka the script) is imported into this library. The
-// embedder uses this to lookup the main entrypoint in the root library's
-// namespace.
-Function _getMainClosure() => main;
