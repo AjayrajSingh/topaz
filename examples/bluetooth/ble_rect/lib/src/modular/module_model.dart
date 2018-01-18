@@ -112,15 +112,13 @@ class BLERectModuleModel extends ModuleModel
     final gatt.AttributePermissions writeOnlyPermissions =
         new gatt.AttributePermissions(write: sec);
 
-    // All of our characteristics have this property.
-    final List<gatt.CharacteristicProperty> props =
-        <gatt.CharacteristicProperty>[gatt.CharacteristicProperty.write];
-
     // Color
     final gatt.Characteristic color = new gatt.Characteristic(
         id: _colorId,
         type: _colorUuid,
-        properties: props,
+        properties: <gatt.CharacteristicProperty>[
+          gatt.CharacteristicProperty.write,
+          gatt.CharacteristicProperty.reliableWrite],
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
           new gatt.Descriptor(
@@ -133,7 +131,8 @@ class BLERectModuleModel extends ModuleModel
     final gatt.Characteristic scale = new gatt.Characteristic(
         id: _scaleId,
         type: _scaleUuid,
-        properties: props,
+        properties: <gatt.CharacteristicProperty>[
+          gatt.CharacteristicProperty.write],
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
           new gatt.Descriptor(
@@ -146,7 +145,8 @@ class BLERectModuleModel extends ModuleModel
     final gatt.Characteristic rotate = new gatt.Characteristic(
         id: _rotateId,
         type: _rotateUuid,
-        properties: props,
+        properties: <gatt.CharacteristicProperty>[
+          gatt.CharacteristicProperty.writeWithoutResponse],
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
           new gatt.Descriptor(
@@ -325,8 +325,6 @@ class BLERectModuleModel extends ModuleModel
       func = _writeColor;
     } else if (id == _scaleId) {
       func = _writeScale;
-    } else if (id == _rotateId) {
-      func = _writeRotate;
     }
 
     if (!func(value)) {
@@ -339,5 +337,15 @@ class BLERectModuleModel extends ModuleModel
   }
 
   @override
-  void onWriteWithoutResponse(int id, int offset, List<int> value) {}
+  void onWriteWithoutResponse(int id, int offset, List<int> value) {
+    if (offset != 0) {
+      return;
+    }
+
+    if (!_writeRotate(value)) {
+      return;
+    }
+
+    notifyListeners();
+  }
 }
