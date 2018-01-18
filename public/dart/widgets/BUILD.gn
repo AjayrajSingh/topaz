@@ -16,7 +16,6 @@ dart_library("lib.widgets") {
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/flutter_image",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/device/dart",
