@@ -92,7 +92,7 @@ void ScheduleMicrotask(Dart_NativeArguments args) {
 
 void InitBuiltinLibrariesForIsolate(
     const std::string& script_uri,
-    fdio_ns_t* namespc,
+    fdio_ns_t* namespc, int stdoutfd, int stderrfd,
     std::unique_ptr<app::ApplicationContext> context,
     fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
   // dart:fuchsia --------------------------------------------------------------
@@ -153,6 +153,16 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(namespace_args[0]);
   DART_CHECK_VALID(Dart_Invoke(
       namespace_type, ToDart("_setupNamespace"), 1, namespace_args));
+
+  // Set up stdout and stderr.
+  Dart_Handle stdio_args[3];
+  stdio_args[0] = Dart_NewInteger(0);
+  DART_CHECK_VALID(stdio_args[0]);
+  stdio_args[1] = Dart_NewInteger(stdoutfd);
+  DART_CHECK_VALID(stdio_args[1]);
+  stdio_args[2] = Dart_NewInteger(stderrfd);
+  DART_CHECK_VALID(stdio_args[2]);
+  DART_CHECK_VALID(Dart_Invoke(io_lib, ToDart("_setStdioFDs"), 3, stdio_args));
 
   // Disable some dart:io operations.
   Dart_Handle embedder_config_type =

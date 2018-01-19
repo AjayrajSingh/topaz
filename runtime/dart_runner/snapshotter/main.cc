@@ -153,6 +153,7 @@ std::vector<char> CreateSnapshot() {
       {"dart:io", "::", "_getWatchSignalInternal"},
       {"dart:io", "::", "_makeDatagram"},
       {"dart:io", "::", "_makeUint8ListView"},
+      {"dart:io", "::", "_setStdioFDs"},
       {"dart:io", "::", "_setupHooks"},
       {"dart:io", "_EmbedderConfig", "_mayExit"},
       {"dart:io", "_ExternalBuffer", "get:end"},

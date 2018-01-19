@@ -7,6 +7,7 @@
 #include <dlfcn.h>
 #include <fcntl.h>
 #include <fdio/namespace.h>
+#include <fdio/util.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <zircon/dlfcn.h>
@@ -69,11 +70,12 @@ DartApplicationController::~DartApplicationController() {
     fdio_ns_destroy(namespace_);
     namespace_ = nullptr;
   }
-
   if (shared_library_) {
     dlclose(shared_library_);
     shared_library_ = nullptr;
   }
+  close(stdoutfd_);
+  close(stderrfd_);
 }
 
 bool DartApplicationController::Setup() {
@@ -278,6 +280,39 @@ bool DartApplicationController::SetupFromSharedLibrary() {
 #endif  // defined(AOT_RUNTIME)
 }
 
+int DartApplicationController::SetupFileDescriptor(app::FileDescriptorPtr fd) {
+  if (!fd) {
+    return -1;
+  }
+  zx_handle_t handles[3] = {
+    fd->handle0.release(),
+    fd->handle1.release(),
+    fd->handle2.release(),
+  };
+  uint32_t htypes[3] = {
+    static_cast<uint32_t>(fd->type0),
+    static_cast<uint32_t>(fd->type1),
+    static_cast<uint32_t>(fd->type2),
+  };
+  int valid_handle_count = 0;
+  for (int i = 0; i < 3; i++) {
+    valid_handle_count += (handles[i] == ZX_HANDLE_INVALID) ? 0 : 1;
+  }
+  if (valid_handle_count == 0) {
+    return -1;
+  }
+
+  int outfd;
+  zx_status_t status = fdio_create_fd(handles, htypes, valid_handle_count,
+                                      &outfd);
+  if (status != ZX_OK) {
+    FXL_LOG(ERROR) << "Failed to extract output fd: "
+                   << zx_status_get_string(status);
+    return -1;
+  }
+  return outfd;
+}
+
 bool DartApplicationController::CreateIsolate(
     void* isolate_snapshot_data,
     void* isolate_snapshot_instructions) {
@@ -336,8 +371,11 @@ bool DartApplicationController::Main() {
   auto outgoing_services = service_provider.NewRequest();
   service_provider_bridge_.set_backend(std::move(service_provider));
 
+  stdoutfd_ = SetupFileDescriptor(std::move(startup_info_->launch_info->out));
+  stderrfd_ = SetupFileDescriptor(std::move(startup_info_->launch_info->err));
+
   InitBuiltinLibrariesForIsolate(
-      url_, namespace_,
+      url_, namespace_, stdoutfd_, stderrfd_,
       app::ApplicationContext::CreateFrom(std::move(startup_info_)),
       std::move(outgoing_services));
   namespace_ = nullptr;
