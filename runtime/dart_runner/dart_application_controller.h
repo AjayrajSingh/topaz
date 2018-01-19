@@ -26,19 +26,22 @@ class DartApplicationController : public app::ApplicationController {
   ~DartApplicationController() override;
 
   bool Setup();
-
   bool Main();
   void SendReturnCode();
 
  private:
   bool SetupNamespace();
+
   bool SetupFromScriptSnapshot();
   bool SetupFromSource();
   bool SetupFromKernel();
   bool SetupFromSharedLibrary();
-  int SetupFileDescriptor(app::FileDescriptorPtr fd);
+
   bool CreateIsolate(void* isolate_snapshot_data,
                      void* isolate_snapshot_instructions);
+  bool CreateIsolateFromKernel();
+
+  int SetupFileDescriptor(app::FileDescriptorPtr fd);
 
   // |ApplicationController|
   void Kill() override;
@@ -56,7 +59,8 @@ class DartApplicationController : public app::ApplicationController {
   int stderrfd_ = -1;
   MappedResource isolate_snapshot_data_;
   MappedResource isolate_snapshot_instructions_;
-  MappedResource script_;  // Snapshot or source.
+  MappedResource platform_dill_;
+  MappedResource script_;  // Snapshot, source or DIL file.
   void* shared_library_ = nullptr;
 
   Dart_Isolate isolate_;

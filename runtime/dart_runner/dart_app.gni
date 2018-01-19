@@ -13,7 +13,11 @@ declare_args() {
   # In a debug build, the default is JIT so that attaching a debugger is
   # possible. In a release build the default is AOT to save compilation time
   # and memory footprint.
-  dart_app_default_is_jit = is_debug
+  if (is_debug) {
+    dart_default_app = "dart_jit_app"
+  } else {
+    dart_default_app = "dart_aot_app"
+  }
 }
 
 template("dart_jit_app") {
@@ -99,6 +103,110 @@ template("dart_jit_app") {
       {
         path = rebase_path(snapshot_path)
         dest = "snapshot_blob.bin"
+      },
+    ]
+
+    meta = [
+      {
+        path = rebase_path("//topaz/runtime/dart_runner/meta/jit_runtime")
+        dest = "runtime"
+      }
+    ]
+
+    if (defined(invoker.sandbox)) {
+      meta += [
+        {
+          path = rebase_path(invoker.sandbox)
+          dest = "sandbox"
+        }
+      ]
+    }
+  }
+}
+
+template("dart_jit_kernel_app") {
+  assert(defined(invoker.main_dart), "Must specify main_dart file")
+
+  dart_library_target_name = target_name + "_dart_library"
+
+  dart_library(dart_library_target_name) {
+    forward_variables_from(invoker, [
+      "deps",
+      "disable_analysis",
+      "extra_analyzer_sources",
+      "non_dart_deps",
+      "source_dir",
+    ])
+
+    if (defined(invoker.package_name)) {
+      package_name = invoker.package_name
+    } else {
+      infer_package_name = true
+    }
+  }
+
+  kernel_path = "$target_gen_dir/${target_name}_kernel.dil"
+  kernel_compiler_label =
+      "//topaz/runtime/dart_runner/kernel:kernel_compiler($host_toolchain)"
+  kernel_compiler_out_dir = get_label_info(kernel_compiler_label, "root_out_dir")
+  kernel_compiler_bin = "$kernel_compiler_out_dir/dart-tools/kernel_compiler"
+
+  kernel_target_name = target_name + "_kernel"
+
+  action(kernel_target_name) {
+    if (defined(invoker.testonly)) {
+      testonly = invoker.testonly
+    }
+
+    # TODO(rmacnak): Produce a depfile.
+    # depfile = ...
+
+    outputs = [
+      kernel_path,
+    ]
+
+    inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files
+
+    dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+    rebased_packages_path =
+        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
+    rebased_kernel_path = rebase_path(kernel_path)
+
+    script = kernel_compiler_bin
+    args = [
+      "--sdk-root",
+      rebase_path("$root_out_dir/runner_patched_sdk"),
+      "--packages",
+      rebased_packages_path,
+      "--output",
+      rebased_kernel_path,
+      rebase_path(invoker.main_dart),
+    ]
+
+    deps = [
+      ":$dart_library_target_name",
+      kernel_compiler_label,
+      "//topaz/runtime/dart_runner/kernel:kernel_platform_files",
+    ]
+  }
+
+  package(target_name) {
+    forward_variables_from(invoker, [
+      "testonly",
+    ])
+
+    if (defined(invoker.fuchsia_package_name)) {
+      package_name = invoker.fuchsia_package_name
+    }
+
+    deps = [
+      ":$kernel_target_name",
+    ]
+
+    resources = [
+      {
+        path = rebase_path(kernel_path)
+        dest = "kernel_blob.dill"
       }
     ]
 
@@ -267,35 +375,7 @@ template("dart_aot_app") {
 #   disable_analysis (optional)
 #     Prevents analysis from being run on this target.
 template("dart_app") {
-  if (dart_app_default_is_jit) {
-    dart_jit_app(target_name) {
-      forward_variables_from(invoker,
-          [
-            "deps",
-            "disable_analysis",
-            "fuchsia_package_name",
-            "main_dart",
-            "output_name",
-            "package_name",
-            "sandbox",
-            "source_dir",
-            "testonly",
-          ])
-    }
-  } else {
-    dart_aot_app(target_name) {
-      forward_variables_from(invoker,
-          [
-            "deps",
-            "disable_analysis",
-            "fuchsia_package_name",
-            "main_dart",
-            "output_name",
-            "package_name",
-            "sandbox",
-            "source_dir",
-            "testonly",
-          ])
-    }
+  target(dart_default_app, target_name) {
+    forward_variables_from(invoker, "*")
   }
 }

@@ -49,6 +49,10 @@ std::string GetLabelFromURL(const std::string& url) {
   return url.substr(last_slash + 1);
 }
 
+void NopReleaseDill(uint8_t* dill) {
+  // Released by ~MappedResource.
+}
+
 }  // namespace
 
 DartApplicationController::DartApplicationController(
@@ -226,8 +230,32 @@ bool DartApplicationController::SetupFromSource() {
 }
 
 bool DartApplicationController::SetupFromKernel() {
-  // TODO(rmacnak): Load platform and application kernel files.
-  return false;
+  if (!MappedResource::LoadFromNamespace(
+          namespace_, "pkg/data/kernel_blob.dill", script_)) {
+    return false;
+  }
+
+  if (!MappedResource::LoadFromNamespace(nullptr, "pkg/data/platform.dill",
+                                         platform_dill_)) {
+    return false;
+  }
+
+  if (!CreateIsolateFromKernel()) {
+    return false;
+  }
+
+  Dart_EnterScope();
+  Dart_Handle root_library = Dart_LoadKernel(
+      Dart_ReadKernelBinary(reinterpret_cast<const uint8_t*>(script_.address()),
+                            script_.size(), NopReleaseDill));
+  if (Dart_IsError(root_library)) {
+    FXL_LOG(ERROR) << "Failed to load script kernel: "
+                   << Dart_GetError(root_library);
+    Dart_ExitScope();
+    return false;
+  }
+
+  return true;
 }
 
 bool DartApplicationController::SetupFromSharedLibrary() {
@@ -325,6 +353,33 @@ bool DartApplicationController::CreateIsolate(
       reinterpret_cast<const uint8_t*>(isolate_snapshot_data),
       reinterpret_cast<const uint8_t*>(isolate_snapshot_instructions), nullptr,
       state, &error);
+  if (!isolate_) {
+    FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
+    return false;
+  }
+
+  state->SetIsolate(isolate_);
+
+  state->message_handler().Initialize(
+      fsl::MessageLoop::GetCurrent()->task_runner());
+
+  state->SetReturnCodeCallback(
+      [this](uint32_t return_code) { return_code_ = return_code; });
+
+  return true;
+}
+
+bool DartApplicationController::CreateIsolateFromKernel() {
+  void* platform_kernel = Dart_ReadKernelBinary(
+      reinterpret_cast<const uint8_t*>(platform_dill_.address()),
+      platform_dill_.size(), NopReleaseDill);
+
+  // Create the isolate from the snapshot.
+  char* error = nullptr;
+
+  auto state = new tonic::DartState();  // Freed in IsolateShutdownCallback.
+  isolate_ = Dart_CreateIsolateFromKernel(url_.c_str(), "main", platform_kernel,
+                                          nullptr, state, &error);
   if (!isolate_) {
     FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
     return false;
