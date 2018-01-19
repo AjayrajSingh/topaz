@@ -34,7 +34,7 @@ const char* kDartVMArgs[] = {
     "--systrace_timeline",
     "--timeline_streams=VM,Isolate,Compiler,Dart,GC,Embedder",
 #endif
-// clang-format on
+    // clang-format on
 };
 
 void IsolateShutdownCallback(void* callback_data) {

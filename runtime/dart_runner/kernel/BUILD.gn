@@ -211,6 +211,61 @@ group("kernel_platform_files") {
   ]
 }
 
+action("kernel_core_snapshot") {
+  if (is_debug) {
+    gen_snapshot_exe = "gen_snapshot"
+  } else {
+    gen_snapshot_exe = "gen_snapshot_product"
+  }
+
+  gen_snapshot_label = "//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)"
+  gen_snapshot_dir = get_label_info(gen_snapshot_label, "root_out_dir")
+
+  deps = [
+    gen_snapshot_label,
+    ":kernel_platform_files",
+  ]
+
+  platform_dill = "$root_out_dir/runner_patched_sdk/platform.dill"
+  inputs = [
+    platform_dill
+  ]
+
+  vm_snapshot_data = "$target_gen_dir/vm_isolate_snapshot.bin"
+  vm_snapshot_instructions = "$target_gen_dir/vm_snapshot_instructions.bin"
+  isolate_snapshot_data = "$target_gen_dir/isolate_snapshot.bin"
+  isolate_snapshot_instructions =
+      "$target_gen_dir/isolate_snapshot_instructions.bin"
+  outputs = [
+    vm_snapshot_data,
+    vm_snapshot_instructions,
+    isolate_snapshot_data,
+    isolate_snapshot_instructions,
+  ]
+
+  script = "//third_party/dart/runtime/tools/create_snapshot_bin.py"
+  args = [
+    "--executable",
+    rebase_path("$gen_snapshot_dir/$gen_snapshot_exe"),
+    "--script",
+    rebase_path(platform_dill),
+    "--snapshot_kind",
+    "core",
+    "--vm_flag",
+    "--await_is_keyword",
+    "--vm_flag",
+    "--enable_mirrors=false",
+    "--vm_output_bin",
+    rebase_path(vm_snapshot_data, root_build_dir),
+    "--vm_instructions_output_bin",
+    rebase_path(vm_snapshot_instructions, root_build_dir),
+    "--isolate_output_bin",
+    rebase_path(isolate_snapshot_data, root_build_dir),
+    "--isolate_instructions_output_bin",
+    rebase_path(isolate_snapshot_instructions, root_build_dir),
+  ]
+}
+
 dart_tool("kernel_compiler") {
   main_dart = "compiler.dart"
   source_dir = "."

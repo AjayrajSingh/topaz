@@ -29,7 +29,7 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
       defaultsTo: false)
   ..addFlag('embed-sources',
       help: 'Embed sources in the output dill file',
-      defaultsTo: false)
+      defaultsTo: true)  // TODO(dartbug.com/32007): Default to false.
   ..addOption('packages',
       help: 'Path to .packages file')
   ..addOption('output',

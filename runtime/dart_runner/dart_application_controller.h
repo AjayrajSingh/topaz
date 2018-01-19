@@ -39,7 +39,6 @@ class DartApplicationController : public app::ApplicationController {
 
   bool CreateIsolate(void* isolate_snapshot_data,
                      void* isolate_snapshot_instructions);
-  bool CreateIsolateFromKernel();
 
   int SetupFileDescriptor(app::FileDescriptorPtr fd);
 
@@ -59,7 +58,6 @@ class DartApplicationController : public app::ApplicationController {
   int stderrfd_ = -1;
   MappedResource isolate_snapshot_data_;
   MappedResource isolate_snapshot_instructions_;
-  MappedResource platform_dill_;
   MappedResource script_;  // Snapshot, source or DIL file.
   void* shared_library_ = nullptr;
 

@@ -235,12 +235,12 @@ bool DartApplicationController::SetupFromKernel() {
     return false;
   }
 
-  if (!MappedResource::LoadFromNamespace(nullptr, "pkg/data/platform.dill",
-                                         platform_dill_)) {
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/snapshot_isolate.bin", isolate_snapshot_data_)) {
     return false;
   }
 
-  if (!CreateIsolateFromKernel()) {
+  if (!CreateIsolate(isolate_snapshot_data_.address(), nullptr)) {
     return false;
   }
 
@@ -313,14 +313,14 @@ int DartApplicationController::SetupFileDescriptor(app::FileDescriptorPtr fd) {
     return -1;
   }
   zx_handle_t handles[3] = {
-    fd->handle0.release(),
-    fd->handle1.release(),
-    fd->handle2.release(),
+      fd->handle0.release(),
+      fd->handle1.release(),
+      fd->handle2.release(),
   };
   uint32_t htypes[3] = {
-    static_cast<uint32_t>(fd->type0),
-    static_cast<uint32_t>(fd->type1),
-    static_cast<uint32_t>(fd->type2),
+      static_cast<uint32_t>(fd->type0),
+      static_cast<uint32_t>(fd->type1),
+      static_cast<uint32_t>(fd->type2),
   };
   int valid_handle_count = 0;
   for (int i = 0; i < 3; i++) {
@@ -331,8 +331,8 @@ int DartApplicationController::SetupFileDescriptor(app::FileDescriptorPtr fd) {
   }
 
   int outfd;
-  zx_status_t status = fdio_create_fd(handles, htypes, valid_handle_count,
-                                      &outfd);
+  zx_status_t status =
+      fdio_create_fd(handles, htypes, valid_handle_count, &outfd);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to extract output fd: "
                    << zx_status_get_string(status);
@@ -369,40 +369,8 @@ bool DartApplicationController::CreateIsolate(
   return true;
 }
 
-bool DartApplicationController::CreateIsolateFromKernel() {
-  void* platform_kernel = Dart_ReadKernelBinary(
-      reinterpret_cast<const uint8_t*>(platform_dill_.address()),
-      platform_dill_.size(), NopReleaseDill);
-
-  // Create the isolate from the snapshot.
-  char* error = nullptr;
-
-  auto state = new tonic::DartState();  // Freed in IsolateShutdownCallback.
-  isolate_ = Dart_CreateIsolateFromKernel(url_.c_str(), "main", platform_kernel,
-                                          nullptr, state, &error);
-  if (!isolate_) {
-    FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
-    return false;
-  }
-
-  state->SetIsolate(isolate_);
-
-  state->message_handler().Initialize(
-      fsl::MessageLoop::GetCurrent()->task_runner());
-
-  state->SetReturnCodeCallback(
-      [this](uint32_t return_code) { return_code_ = return_code; });
-
-  return true;
-}
-
 bool DartApplicationController::Main() {
   Dart_EnterScope();
-
-  Dart_Handle root_library = Dart_RootLibrary();
-
-  // TODO(jeffbrown): Decide what we should do with any startup handles.
-  // eg. Redirect stdin, stdout, and stderr.
 
   tonic::DartMicrotaskQueue::StartForCurrentThread();
   fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(AfterTask);
@@ -452,7 +420,7 @@ bool DartApplicationController::Main() {
   };
 
   Dart_Handle main =
-      Dart_Invoke(root_library, ToDart("main"), arraysize(argv), argv);
+      Dart_Invoke(Dart_RootLibrary(), ToDart("main"), arraysize(argv), argv);
   if (Dart_IsError(main)) {
     FXL_LOG(ERROR) << Dart_GetError(main);
     Dart_ExitScope();

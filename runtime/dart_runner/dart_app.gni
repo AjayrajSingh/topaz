@@ -212,7 +212,7 @@ template("dart_jit_kernel_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/jit_runtime")
+        path = rebase_path("//topaz/runtime/dart_runner/meta/jit_kernel_runtime")
         dest = "runtime"
       }
     ]
