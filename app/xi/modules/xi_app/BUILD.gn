@@ -17,6 +17,7 @@ flutter_app("xi_app") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/xi/packages/widgets:xi_widgets",
     "//topaz/app/xi/services:services_dart",
+    "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/ui/flutter",

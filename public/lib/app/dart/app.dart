@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:fuchsia';
 import 'dart:typed_data';
-import 'dart:zircon';
 
 // ignore_for_file: public_member_api_docs
 
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.fidl/application_environment.fidl.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.fidl.dart/bindings.dart';
+import 'package:zircon/zircon.dart';
 
 class ApplicationContext {
   ApplicationContext();

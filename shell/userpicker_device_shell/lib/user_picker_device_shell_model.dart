@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:io';
-import 'dart:zircon' show Channel;
 
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.auth.fidl.account/account.fidl.dart';
@@ -18,6 +17,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
+import 'package:zircon/zircon.dart' show Channel;
 
 import 'user_shell_chooser.dart';
 import 'user_watcher_impl.dart';

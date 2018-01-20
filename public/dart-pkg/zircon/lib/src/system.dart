@@ -19,7 +19,7 @@ class _Result {
 
   /// Throw an |ZxStatusException| if the |status| is not |ZX_OK|.
   void checkStatus() {
-    if (status != ZX.OK) {
+    if (status != 0) {
       throw new ZxStatusException(status);
     }
   }
@@ -87,7 +87,7 @@ class System extends NativeFieldWrapperClass2 {
       native 'System_EventpairCreate';
 
   // Socket operations.
-  static HandlePairResult socketCreate([int options = ZX.SOCKET_STREAM])
+  static HandlePairResult socketCreate([int options = 0])
       native 'System_SocketCreate';
   static WriteResult socketWrite(Handle socket, ByteData data, int options)
       native 'System_SocketWrite';
