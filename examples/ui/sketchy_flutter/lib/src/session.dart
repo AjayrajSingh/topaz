@@ -2,14 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:zircon' as zircon;
-
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.ui.scenic.fidl/ops.fidl.dart';
 import 'package:lib.ui.scenic.fidl/presentation_info.fidl.dart';
 import 'package:lib.ui.scenic.fidl/scene_manager.fidl.dart';
 import 'package:lib.ui.scenic.fidl/session.fidl.dart';
+import 'package:zircon/zircon.dart' as zircon;
 
 export 'package:lib.ui.scenic.fidl/presentation_info.fidl.dart'
     show PresentationInfo;

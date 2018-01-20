@@ -4,7 +4,7 @@
 
 library dart_mozart;
 
-import 'dart:zircon' show Handle;
+import 'package:zircon/zircon.dart' show Handle;
 
 // Should be set to a |mozart::NativesDelegate*| by the embedder.
 int _context;

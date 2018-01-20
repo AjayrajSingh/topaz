@@ -44,6 +44,8 @@ template("flutter_jit_app") {
     } else {
       infer_package_name = true
     }
+    # dart:mozart.internal imports package:zircon.
+    deps += [ "//topaz/public/dart/zircon" ]
   }
 
   flutter_core_snapshot_label = "//third_party/flutter/lib/snapshot:generate_snapshot_bin"
@@ -238,6 +240,8 @@ template("flutter_aot_app") {
     } else {
       infer_package_name = true
     }
+    # dart:mozart.internal imports package:zircon.
+    deps += [ "//topaz/public/dart/zircon" ]
   }
 
   dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")

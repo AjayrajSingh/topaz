@@ -39,6 +39,7 @@ dart_library("package_for_analysis") {
   infer_package_name = true
   source_dir = "."
   deps = [
+    "//topaz/public/dart/zircon",
     "//topaz/public/lib/fidl/dart",
   ]
 }

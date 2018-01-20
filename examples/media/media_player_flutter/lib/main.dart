@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:fuchsia';
 import 'dart:io' as io;
 
 import 'package:lib.app.dart/app.dart';
@@ -17,6 +16,7 @@ import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'asset.dart';

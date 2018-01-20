@@ -3,17 +3,17 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:fuchsia';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.story.fidl/link.fidl.dart';
 
 import 'data.dart';
 import 'view.dart';

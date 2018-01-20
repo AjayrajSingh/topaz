@@ -4,8 +4,8 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:fuchsia';
 
+import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.context.fidl/context_writer.fidl.dart';

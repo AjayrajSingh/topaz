@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:mozart.internal';
 import 'dart:ui' as ui;
-import 'dart:zircon';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/application_controller.fidl.dart';
@@ -21,6 +20,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:meta/meta.dart';
+import 'package:zircon/zircon.dart';
 
 export 'package:lib.ui.views.fidl/view_token.fidl.dart' show ViewOwner;
 
