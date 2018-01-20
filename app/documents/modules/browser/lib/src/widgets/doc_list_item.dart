@@ -9,29 +9,33 @@ import 'package:meta/meta.dart';
 import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 import 'package:utils/utils.dart' as utils;
 
+import './selectable_item.dart';
+
 const double _kRowHeight = 44.0;
 
 /// Representation of Document objects in the Document Browser
-class ListItem extends StatelessWidget {
-  /// Document attached to this thumbnail
-  final doc_fidl.Document doc;
-
-  /// True if this document is currently selected
-  final bool selected;
-
-  /// Function to call when thumbnail is pressed
-  final VoidCallback onPressed;
-
+class DocListItem extends SelectableItem {
   /// Constructor
-  const ListItem({
+  const DocListItem({
     Key key,
-    @required this.doc,
-    @required this.selected,
-    this.onPressed,
+    @required doc_fidl.Document doc,
+    @required bool selected,
+    VoidCallback onPressed,
+    VoidCallback onDoubleTap,
+    VoidCallback onLongPress,
+    bool hideCheckbox,
   })
       : assert(doc != null),
         assert(selected != null),
-        super(key: key);
+        super(
+          key: key,
+          doc: doc,
+          selected: selected,
+          onPressed: onPressed,
+          onDoubleTap: onDoubleTap,
+          onLongPress: onLongPress,
+          hideCheckbox: hideCheckbox,
+        );
 
   Widget _customizeFont(String text) {
     return new Align(
@@ -54,36 +58,48 @@ class ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget name = new Row(children: <Widget>[
-      utils.showThumbnailImage(doc.thumbnailLocation, doc.mimeType)
-          // TODO(maryxia) SO-969 check if image is .network or .file
-          ? new Image.network(
-              doc.thumbnailLocation,
-              height: _kRowHeight - 8.0,
-              width: _kRowHeight - 8.0,
-              fit: BoxFit.cover,
-            )
-          : new Icon(
-              doc.isFolder ? Icons.folder : Icons.insert_drive_file,
-              size: _kRowHeight - 8.0,
-              color: selected ? Colors.teal[400] : Colors.grey[800],
-            ),
-      new Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: new Text(
-          doc.name,
-          overflow: TextOverflow.ellipsis,
-          style: new TextStyle(
-            color: selected ? Colors.teal[400] : Colors.grey[800],
-            fontSize: 12.0,
-            fontWeight: FontWeight.w700,
+    Widget name = new Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        new Offstage(
+          offstage: hideCheckbox,
+          child: new Checkbox(
+            value: selected,
+            onChanged: null,
           ),
         ),
-      ),
-    ]);
+        utils.showThumbnailImage(doc.thumbnailLocation, doc.mimeType)
+            // TODO(maryxia) SO-969 check if image is .network or .file
+            ? new Image.network(
+                doc.thumbnailLocation,
+                height: _kRowHeight - 8.0,
+                width: _kRowHeight - 8.0,
+                fit: BoxFit.cover,
+              )
+            : new Icon(
+                doc.isFolder ? Icons.folder : Icons.insert_drive_file,
+                size: _kRowHeight - 8.0,
+                color: selected ? Colors.teal[400] : Colors.grey[800],
+              ),
+        new Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: new Text(
+            doc.name,
+            overflow: TextOverflow.ellipsis,
+            style: new TextStyle(
+              color: selected ? Colors.teal[400] : Colors.grey[800],
+              fontSize: 12.0,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
 
     return new GestureDetector(
       onTap: onPressed,
+      onDoubleTap: onDoubleTap,
+      onLongPress: onLongPress,
       child: new Container(
         height: _kRowHeight,
         padding: const EdgeInsets.all(4.0),

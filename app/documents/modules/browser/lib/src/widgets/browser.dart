@@ -3,13 +3,15 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 import 'package:lib.widgets/model.dart';
+import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 import 'package:utils/utils.dart' as utils;
 
 import '../modular/browser_module_model.dart';
+import './doc_list_item.dart';
+import './header.dart';
 import './image_viewer.dart';
-import './list_item.dart';
+import './multi_select_header.dart';
 import './thumbnail.dart';
 
 /// Function to call when we toggle on the Image Preview
@@ -23,18 +25,7 @@ class Browser extends StatelessWidget {
   })
       : super(key: key);
 
-  void _previewImage(BrowserModuleModel model, bool show) {
-    model
-      ..setPreviewDocLocation()
-      ..previewMode = show;
-  }
-
-  /// Whether a Document can be previewed by the image viewer
-  bool _canBePreviewed(doc_fidl.Document doc) {
-    return doc != null && doc.mimeType.startsWith('image/');
-  }
-
-  Widget _buildHeader(String text, bool ascending) {
+  Widget _buildListViewHeader(String text, bool ascending) {
     return new Expanded(
       flex: 1,
       child: new Container(
@@ -67,15 +58,18 @@ class Browser extends StatelessWidget {
             children: model.documents.map((doc_fidl.Document doc) {
               return new Thumbnail(
                 doc: doc,
-                selected:
-                    model.currentDoc != null && doc.id == model.currentDoc.id,
-                onPressed: () => model.updateCurrentlySelectedDoc(doc),
-                onDoubleTap: () {
-                  model.updateCurrentlySelectedDoc(doc);
-                  if (model.currentDoc.isFolder) {
-                    model.listDocs(model.currentDoc.id, model.currentDoc.name);
+                selected: (model.currentDoc != null &&
+                        doc.id == model.currentDoc.id) ||
+                    model.selectedDocs.contains(doc),
+                onPressed: () {
+                  if (model.selectedDocs.isEmpty) {
+                    model.updateCurrentlySelectedDoc(doc);
+                  } else {
+                    model.updateSelectedDocs(doc);
                   }
                 },
+                onLongPress: () => model.updateSelectedDocs(doc),
+                hideCheckbox: model.selectedDocs.isEmpty,
               );
             }).toList(),
             crossAxisCount: 6,
@@ -92,9 +86,9 @@ class Browser extends StatelessWidget {
           height: 32.0,
           child: new Row(
             children: <Widget>[
-              _buildHeader('Name', null),
-              _buildHeader('Owner', null),
-              _buildHeader('Last Modified', true),
+              _buildListViewHeader('Name', null),
+              _buildListViewHeader('Owner', null),
+              _buildListViewHeader('Last Modified', true),
             ],
           ),
         ),
@@ -103,11 +97,20 @@ class Browser extends StatelessWidget {
             itemCount: model.documents.length,
             itemBuilder: (BuildContext context, int index) {
               doc_fidl.Document doc = model.documents[index];
-              return new ListItem(
+              return new DocListItem(
                 doc: doc,
-                selected:
-                    model.currentDoc != null && doc.id == model.currentDoc.id,
-                onPressed: () => model.updateCurrentlySelectedDoc(doc),
+                selected: (model.currentDoc != null &&
+                        doc.id == model.currentDoc.id) ||
+                    model.selectedDocs.contains(doc),
+                onPressed: () {
+                  if (model.selectedDocs.isEmpty) {
+                    model.updateCurrentlySelectedDoc(doc);
+                  } else {
+                    model.updateSelectedDocs(doc);
+                  }
+                },
+                onLongPress: () => model.updateSelectedDocs(doc),
+                hideCheckbox: model.selectedDocs.isEmpty,
               );
             },
           ),
@@ -130,86 +133,42 @@ class Browser extends StatelessWidget {
       } else {
         mainDocView = new Expanded(
           child: new Container(
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                bottom: 20.0,
+                top: 8.0,
+              ),
               child: model.gridView
                   ? _buildGridView(model)
                   : _buildListView(model)),
         );
       }
 
-      Widget headerNavigation = new Container(
-        padding: const EdgeInsets.all(4.0),
-        child: new Text(model.navName),
-      );
-
-      Widget headerActions = new Row(children: <Widget>[
-        new IconButton(
-          icon: new Icon(Icons.refresh),
-          tooltip: 'Refresh list of documents',
-          onPressed: () => model.listDocs(model.navId, model.navName),
-        ),
-        new IconButton(
-          icon: new Icon(Icons.open_in_new),
-          tooltip: 'Preview document',
-          // TODO(maryxia) SO-662 open the file with correct module
-          onPressed: _canBePreviewed(model.currentDoc)
-              ? () => _previewImage(model, true)
-              : (model.currentDoc == null ? null : model.resolveDocument),
-        ),
-        new IconButton(
-          icon: new Icon(
-            model.gridView ? Icons.view_list : Icons.view_module,
-            color: Colors.black,
-          ),
-          tooltip: model.gridView ? 'Toggle Grid View' : 'Toggle List View',
-          onPressed: model.toggleGridView,
-        ),
-        new IconButton(
-          icon: new Icon(
-            Icons.info,
-            color: model.infoModuleOpen ? Colors.teal[400] : Colors.black,
-          ),
-          tooltip: 'Document info',
-          onPressed: model.currentDoc != null ? model.toggleInfo : null,
-        ),
-        new IconButton(
-          icon: new Icon(Icons.create_new_folder),
-          tooltip: 'Create new...',
-          onPressed: null,
-        ),
-      ]);
-
-      Widget header = new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      Widget browser = new Column(
         children: <Widget>[
-          headerNavigation,
-          headerActions,
+          model.selectedDocs.isEmpty
+              ? new Header(model: model)
+              : new MultiSelectHeader(
+                  onClosePressed: () =>
+                      model.selectedDocs = <doc_fidl.Document>[],
+                  documents: model.selectedDocs,
+                ),
+          mainDocView,
         ],
-      );
-
-      Widget browser = new Padding(
-        padding: const EdgeInsets.only(
-          left: 20.0,
-          bottom: 20.0,
-          right: 20.0,
-          top: 8.0,
-        ),
-        child: new Column(
-          children: <Widget>[
-            header,
-            mainDocView,
-          ],
-        ),
       );
 
       // Generic image viewer
       Widget imageViewer = new Container();
       if (model.currentDoc != null && model.currentDoc.location != null) {
         imageViewer = new Offstage(
-          offstage: !(model.previewMode && _canBePreviewed(model.currentDoc)),
+          offstage:
+              !(model.previewMode && model.canBePreviewed(model.currentDoc)),
           child: new ImageViewer(
-            location: model.currentDoc.location,
-            onClosePressed: (bool show) => _previewImage(model, show),
-          ),
+              location: model.currentDoc.location,
+              onClosePressed: () {
+                model.previewMode = false;
+              }),
         );
       }
 

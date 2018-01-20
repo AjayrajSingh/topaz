@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
@@ -44,8 +45,11 @@ class BrowserModuleModel extends ModuleModel {
   /// List of all documents for this Document Provider
   List<doc_fidl.Document> documents = <doc_fidl.Document>[];
 
-  /// Currently selected Document
+  /// Currently selected Document in single-select mode
   doc_fidl.Document _currentDoc;
+
+  /// List of docs toggled on in multi-select mode
+  List<doc_fidl.Document> _selectedDocs = <doc_fidl.Document>[];
 
   /// True if we are in image preview mode
   bool _previewMode = false;
@@ -83,6 +87,10 @@ class BrowserModuleModel extends ModuleModel {
   /// Gets the ID of the current folder we're in
   String get navId => _navId;
 
+  /// List of selected documents in multi-select mode
+  List<doc_fidl.Document> get selectedDocs =>
+      new UnmodifiableListView<doc_fidl.Document>(_selectedDocs);
+
   /// Sets the document location to preview
   // TODO(maryxia) SO-967 - no need to do a get() to download to a
   // document location if the file is publicly accessible
@@ -112,6 +120,11 @@ class BrowserModuleModel extends ModuleModel {
       notifyListeners();
       log.fine('Retrieved list of documents for BrowserModuleModel');
     });
+  }
+
+  /// Whether a Document can be previewed by the image viewer
+  bool canBePreviewed(doc_fidl.Document doc) {
+    return doc != null && doc.mimeType.startsWith('image/');
   }
 
   /// Toggles between List and Grid view
@@ -182,7 +195,11 @@ class BrowserModuleModel extends ModuleModel {
   /// If the doc had not been selected, it now becomes selected
   /// If the user had already selected this doc, selecting it again will
   /// "unselect" it
-  /// A user can have no currently-selected doc
+  /// We are allowed to set the currently-selected doc to null. For example,
+  /// when the list of documents initially loads, no doc has been selected.
+  /// When a user selects, and then immediately unselects the same doc, the
+  /// _currentDoc becomes null.
+  ///
   /// Also updates the currentDocId in the Link accordingly
   void updateCurrentlySelectedDoc(doc_fidl.Document doc) {
     if (_currentDoc == doc) {
@@ -191,6 +208,27 @@ class BrowserModuleModel extends ModuleModel {
     } else {
       _currentDoc = doc;
       link.set(const <String>['currentDocId'], JSON.encode(doc.id));
+    }
+    notifyListeners();
+  }
+
+  /// Sets the entire list of _selectedDocs
+  /// This is mostly used to clear the list of selected docs
+  set selectedDocs(List<doc_fidl.Document> docs) {
+    _selectedDocs = docs;
+    notifyListeners();
+  }
+
+  /// Updates the selected docs (for multi-select)
+  /// _currentDoc is purposely ignored for multi-select
+  /// If the doc is not in the list, it is added
+  /// If you had previously selected a doc, updating it will "unselect" it
+  void updateSelectedDocs(doc_fidl.Document doc) {
+    _currentDoc = null;
+    if (_selectedDocs.contains(doc)) {
+      _selectedDocs.remove(doc);
+    } else {
+      _selectedDocs.add(doc);
     }
     notifyListeners();
   }
