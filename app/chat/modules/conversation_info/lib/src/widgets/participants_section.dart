@@ -55,9 +55,12 @@ class ParticipantsSection extends StatelessWidget {
           children.addAll(model.currentParticipants.map(_buildParticipantTile));
         }
 
-        return new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: children,
+        return new Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          ),
         );
       },
     );

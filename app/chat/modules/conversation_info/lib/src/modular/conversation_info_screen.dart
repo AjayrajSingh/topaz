@@ -4,6 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
+    as fidl;
 
 import '../widgets.dart';
 import 'conversation_info_module_model.dart';
@@ -27,7 +29,12 @@ class ConversationInfoScreen extends StatelessWidget {
             body: new Column(
               children: <Widget>[
                 new TitleSection(
-                  initialTitle: model.title,
+                  initialTitle: model.title ??
+                      model.participants
+                          ?.map(
+                            (fidl.Participant p) => p.displayName ?? p.email,
+                          )
+                          ?.join(', '),
                   onTitleSubmitted: model.setConversationTitle,
                 ),
                 new ParticipantsSection(
