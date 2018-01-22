@@ -19,7 +19,6 @@ dart_app("chat_content_provider_test") {
     "//third_party/dart-pkg/pub/test",
     "//topaz/app/chat/agents/content_provider:chat_content_provider_dart_library",
     "//topaz/app/chat/services:services_dart",
-    "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/component/dart",
   ]

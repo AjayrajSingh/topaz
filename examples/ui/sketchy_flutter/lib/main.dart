@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 import 'dart:ui';
+import 'dart:zircon';
 
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:zircon/zircon.dart';
 
 import 'scenic.dart' as scenic;
 import 'scenic_widget.dart';

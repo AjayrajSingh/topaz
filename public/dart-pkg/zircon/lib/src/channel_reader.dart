@@ -1,4 +1,4 @@
-// Copyright 2018 The Fuchsia Authors. All rights reserved.
+// Copyright 2016 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -6,45 +6,45 @@ part of zircon;
 
 // ignore_for_file: public_member_api_docs
 
-class SocketReaderError extends Error {
+class ChannelReaderError {
   final Object error;
   final StackTrace stacktrace;
 
-  SocketReaderError(this.error, this.stacktrace);
+  ChannelReaderError(this.error, this.stacktrace);
 
   @override
   String toString() => error.toString();
 }
 
-typedef void SocketReaderReadableHandler();
-typedef void SocketReaderErrorHandler(SocketReaderError error);
+typedef void ChannelReaderReadableHandler();
+typedef void ChannelReaderErrorHandler(ChannelReaderError error);
 
-class SocketReader {
-  Socket get socket => _socket;
-  Socket _socket;
+class ChannelReader {
+  Channel get channel => _channel;
+  Channel _channel;
 
-  bool get isBound => _socket != null;
+  bool get isBound => _channel != null;
 
   HandleWaiter _waiter;
 
-  SocketReaderReadableHandler onReadable;
-  SocketReaderErrorHandler onError;
+  ChannelReaderReadableHandler onReadable;
+  ChannelReaderErrorHandler onError;
 
-  void bind(Socket socket) {
+  void bind(Channel channel) {
     if (isBound) {
-      throw new ZirconApiError('SocketReader is already bound.');
+      throw new ZirconApiError('ChannelReader is already bound.');
     }
-    _socket = socket;
+    _channel = channel;
     _asyncWait();
   }
 
-  Socket unbind() {
+  Channel unbind() {
     if (!isBound) {
-      throw new ZirconApiError('SocketReader is not bound');
+      throw new ZirconApiError('ChannelReader is not bound');
     }
-    _waiter.cancel();
-    final Socket result = _socket;
-    _socket = null;
+    _waiter?.cancel();
+    final Channel result = _channel;
+    _channel = null;
     return result;
   }
 
@@ -53,16 +53,16 @@ class SocketReader {
       return;
     }
     _waiter.cancel();
-    _socket.close();
-    _socket = null;
+    _channel.close();
+    _channel = null;
   }
 
   void _asyncWait() {
-    _waiter = _socket.handle
-        .asyncWait(Socket.READABLE | Socket.PEER_CLOSED, _handleWaitComplete);
+    _waiter = _channel.handle
+        .asyncWait(Channel.READABLE | Channel.PEER_CLOSED, _handleWaitComplete);
   }
 
-  void _errorSoon(SocketReaderError error) {
+  void _errorSoon(ChannelReaderError error) {
     if (onError == null) {
       return;
     }
@@ -76,13 +76,13 @@ class SocketReader {
   }
 
   @override
-  String toString() => 'SocketReader($_socket)';
+  String toString() => 'ChannelReader($_channel)';
 
   void _handleWaitComplete(int status, int pending) {
     assert(isBound);
     if (status != ZX.OK) {
       close();
-      _errorSoon(new SocketReaderError(
+      _errorSoon(new ChannelReaderError(
           'Wait completed with status ${getStringForStatus(status)} ($status)',
           null));
       return;
@@ -90,14 +90,14 @@ class SocketReader {
     // TODO(abarth): Change this try/catch pattern now that we don't use
     // RawReceivePort any more.
     try {
-      if ((pending & Socket.READABLE) != 0) {
+      if ((pending & Channel.READABLE) != 0) {
         if (onReadable != null) {
           onReadable();
         }
         if (isBound) {
           _asyncWait();
         }
-      } else if ((pending & Socket.PEER_CLOSED) != 0) {
+      } else if ((pending & Channel.PEER_CLOSED) != 0) {
         close();
         _errorSoon(null);
       }
@@ -110,7 +110,7 @@ class SocketReader {
       // ignore: avoid_catches_without_on_clauses
     } catch (e, s) {
       close();
-      _errorSoon(new SocketReaderError(e, s));
+      _errorSoon(new ChannelReaderError(e, s));
     }
   }
 }

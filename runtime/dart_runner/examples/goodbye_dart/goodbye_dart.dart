@@ -3,8 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-
-import 'package:fuchsia/fuchsia.dart' as fuchsia;
+import 'dart:fuchsia' as fuchsia;
 
 // ignore: unused_element
 Timer _timer;

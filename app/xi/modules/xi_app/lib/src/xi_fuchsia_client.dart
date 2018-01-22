@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:zircon';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
@@ -12,7 +13,6 @@ import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:topaz.app.xi.services/xi.fidl.dart' as service;
 import 'package:xi_client/client.dart';
-import 'package:zircon/zircon.dart';
 
 /// [ApplicationContext] exported here so it can be used in `main.dart`.
 final ApplicationContext kContext = new ApplicationContext.fromStartupInfo();

@@ -10,7 +10,6 @@ dart_library("dart") {
   source_dir = "lib"
 
   deps = [
-    "//topaz/public/dart/zircon",
     "//third_party/dart-pkg/pub/meta",
   ]
 }

@@ -20,9 +20,6 @@ import 'dart:typed_data';
 // gen_snapshot_cc("script_runner_snapshot") in the BUILD.gn file in this
 // directory is updated with any new dependencies.
 
-import 'package:fuchsia/fuchsia.dart';
-import 'package:zircon/zircon.dart';
-
 // FIDL bindings and application libraries.
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';

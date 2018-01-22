@@ -4,9 +4,9 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:fuchsia' as fuchsia;
 import 'dart:io';
 
-import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';

@@ -11,7 +11,5 @@ dart_library("dart") {
 
   deps = [
     "//garnet/public/lib/app/fidl:fidl_dart",
-    "//topaz/public/dart/fuchsia",
-    "//topaz/public/dart/zircon",
   ]
 }

@@ -173,8 +173,6 @@ gen_snapshot_cc("script_runner_snapshot") {
     "//peridot/public/lib/story/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
-    "//topaz/public/dart/fuchsia",
-    "//topaz/public/dart/zircon",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
   ]

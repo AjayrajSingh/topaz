@@ -14,7 +14,6 @@ dart_app("ledger_dashboard") {
     "//peridot/bin/ledger/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/http",
-    "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/context/dart",
     "//topaz/public/lib/fidl/dart",

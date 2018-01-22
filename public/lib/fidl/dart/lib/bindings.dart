@@ -8,9 +8,9 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:zircon';
 
 import 'package:meta/meta.dart';
-import 'package:zircon/zircon.dart';
 
 part 'src/bindings/codec.dart';
 part 'src/bindings/enum.dart';

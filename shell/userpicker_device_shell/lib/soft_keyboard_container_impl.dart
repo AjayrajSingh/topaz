@@ -2,13 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:zircon';
+
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:meta/meta.dart';
-import 'package:zircon/zircon.dart';
 
 import 'device_extender.dart';
 import 'device_extension_state.dart';

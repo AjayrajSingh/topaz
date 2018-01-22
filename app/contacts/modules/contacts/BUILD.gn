@@ -19,7 +19,6 @@ flutter_app("contacts") {
     "//third_party/dart-pkg/pub/googleapis_auth",
     "//topaz/app/contacts/services:services_dart",
     "//topaz/public/dart/fixtures",
-    "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

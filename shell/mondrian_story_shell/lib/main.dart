@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 import 'dart:convert';
+import 'dart:fuchsia' show exit;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fuchsia/fuchsia.dart' show exit;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.story.fidl/story_shell.fidl.dart';
