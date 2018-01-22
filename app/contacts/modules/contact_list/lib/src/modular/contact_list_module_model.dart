@@ -24,8 +24,7 @@ import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
 import '../../models.dart';
 
 const String _kContactsContentProviderUrl = 'contacts_content_provider';
-const String _kContactCardModuleUrl =
-    'file:///system/apps/contacts/contact_card';
+const String _kContactCardModuleUrl = 'contact_card';
 const String _kContactsUpdateQueue = 'contacts_update_queue';
 
 /// Call back definition for [ContactListModuleModel]'s subscribe method.

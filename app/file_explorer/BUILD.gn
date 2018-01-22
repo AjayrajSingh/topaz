@@ -5,26 +5,13 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 import("//build/package.gni")
 
-flutter_app("file_explorer_app") {
+flutter_app("file_explorer") {
   main_dart = "lib/main.dart"
-  output_name = "file_explorer"
+  flx = false
 
-  manifest = "pubspec.yaml"
+  sandbox = "meta/sandbox"
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
-}
-
-package("file_explorer") {
-  app = true
-  system_image = true
-
-  deps = [
-    ":file_explorer_app",
-  ]
-
-  binaries = [ {
-        name = "file_explorer"
-      } ]
 }

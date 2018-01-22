@@ -5,33 +5,6 @@
 import("//build/package.gni")
 import("//peridot/build/module_repository/manifest_package.gni")
 
-package("contacts") {
-  app = true
-  system_image = true
-
-  deps = [
-    "agents",
-    "modules",
-    "services",
-  ]
-
-  binaries = [
-    {
-      source = "gen/topaz/app/contacts/modules/contact_card/contact_card.flx"
-      name = "contacts/contact_card"
-    },
-    {
-      source = "gen/topaz/app/contacts/modules/contact_list/contact_list.flx"
-      name = "contacts/contact_list"
-    },
-    {
-      source =
-          "gen/topaz/app/contacts/modules/contacts_picker/contacts_picker.flx"
-      name = "contacts/contacts_picker"
-    },
-  ]
-}
-
 group("tests") {
   testonly = true
 

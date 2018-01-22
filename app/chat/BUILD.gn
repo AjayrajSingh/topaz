@@ -4,34 +4,6 @@
 
 import("//build/package.gni")
 
-package("chat") {
-  app = true
-  system_image = true
-
-  deps = [
-    "agents",
-    "modules",
-    "services",
-  ]
-
-  binaries = [
-    {
-      name = "chat_conversation"
-      source = "gen/topaz/app/chat/modules/conversation/chat_conversation.flx"
-    },
-
-    {
-      name = "chat_conversation_info"
-      source = "gen/topaz/app/chat/modules/conversation_info/chat_conversation_info.flx"
-    },
-
-    {
-      name = "chat_conversation_list"
-      source = "gen/topaz/app/chat/modules/conversation_list/chat_conversation_list.flx"
-    },
-  ]
-}
-
 package("chat_tests") {
   testonly = true
   app = true

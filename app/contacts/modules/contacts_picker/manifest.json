@@ -1,5 +1,5 @@
 {
-  "binary": "/system/apps/contacts/contacts_picker",
+  "binary": "contacts_picker",
   "local_name": "contacts_picker",
   "verb": "com.google.fuchsia.pick-contacts",
   "noun_constraints": [

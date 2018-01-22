@@ -5,9 +5,10 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 import("//build/package.gni")
 
-flutter_app("color_app") {
+flutter_app("color") {
+  flx = false
+
   main_dart = "lib/main.dart"
-  output_name = "color"
   source_dir = "lib"
 
   deps = [
@@ -16,18 +17,4 @@ flutter_app("color_app") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
   ]
-}
-
-
-package("color") {
-  app = true
-  system_image = true
-
-  deps = [
-    ":color_app",
-  ]
-
-  binaries = [ {
-        name = "color"
-      } ]
 }

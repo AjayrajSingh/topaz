@@ -4,12 +4,11 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_app("info") {
+flutter_app("documents_info") {
   package_name = "info"
+  flx = false
 
   main_dart = "lib/main.dart"
-
-  manifest = "pubspec.yaml"
 
   deps = [
     "//topaz/app/documents/packages/utils:utils",

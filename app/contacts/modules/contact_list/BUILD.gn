@@ -7,6 +7,7 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("contact_list") {
   package_name = "contact_list"
+  flx = false
 
   main_dart = "lib/main.dart"
 

@@ -5,26 +5,11 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 import("//build/package.gni")
 
-flutter_app("infinite_scroller_app") {
+flutter_app("infinite_scroller") {
   main_dart = "lib/main.dart"
-  output_name = "infinite_scroller"
-
-  manifest = "pubspec.yaml"
+  flx = false
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
-}
-
-package("infinite_scroller") {
-  app = true
-  system_image = true
-
-  deps = [
-    ":infinite_scroller_app",
-  ]
-
-  binaries = [ {
-        name = "infinite_scroller"
-      } ]
 }

@@ -3,7 +3,8 @@
         "dart"
     ],
     "packages": {
+        "documents_browser": "//topaz/app/documents/modules/browser:documents_browser",
         "documents_content_provider": "//topaz/app/documents/agents/content_provider:documents_content_provider",
-        "documents": "//topaz/app/documents"
+        "documents_info": "//topaz/app/documents/modules/info:documents_info"
     }
 }

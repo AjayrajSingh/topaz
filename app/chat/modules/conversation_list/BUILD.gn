@@ -7,6 +7,7 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("chat_conversation_list") {
   package_name = "chat_conversation_list"
+  flx = false
 
   main_dart = "lib/main.dart"
 

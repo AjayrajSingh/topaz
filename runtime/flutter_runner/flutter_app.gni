@@ -219,6 +219,15 @@ template("flutter_jit_app") {
           dest = "runtime"
         }
       ]
+
+      if (defined(invoker.sandbox)) {
+        meta += [
+          {
+            path = rebase_path(invoker.sandbox)
+            dest = "sandbox"
+          }
+        ]
+      }
     }
   }
 }
@@ -437,6 +446,15 @@ template("flutter_aot_app") {
           dest = "runtime"
         }
       ]
+
+      if (defined(invoker.sandbox)) {
+        meta += [
+          {
+            path = rebase_path(invoker.sandbox)
+            dest = "sandbox"
+          }
+        ]
+      }
     }
   }
 }
@@ -475,6 +493,7 @@ template("flutter_app") {
                                "deps",
                                "manifest",
                                "disable_analysis",
+                               "sandbox",
                                "source_dir",
                                "resources",
                              ])
@@ -491,6 +510,7 @@ template("flutter_app") {
                                "deps",
                                "manifest",
                                "disable_analysis",
+                               "sandbox",
                                "source_dir",
                                "resources",
                              ])
