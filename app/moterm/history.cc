@@ -51,7 +51,7 @@ fidl::Array<uint8_t> ToArray(const std::string& val) {
 using Key = fidl::Array<uint8_t>;
 
 std::string MakeKey() {
-  return fxl::StringPrintf("%120lu-%u", zx_time_get(ZX_CLOCK_UTC), rand());
+  return fxl::StringPrintf("%120lu-%u", zx_clock_get(ZX_CLOCK_UTC), rand());
 }
 
 void GetMoreEntries(

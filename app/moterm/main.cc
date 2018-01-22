@@ -114,7 +114,7 @@ class App : modular::Module, modular::Lifecycle {
 }  // namespace moterm
 
 int main(int argc, const char** argv) {
-  srand(zx_time_get(ZX_CLOCK_UTC));
+  srand(zx_clock_get(ZX_CLOCK_UTC));
 
   auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);
   moterm::MotermParams params;

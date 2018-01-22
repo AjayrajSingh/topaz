@@ -48,7 +48,7 @@ class System : public fxl::RefCountedThreadSafe<System>,
                              uint64_t offset,
                              size_t size);
 
-  static uint64_t TimeGet(uint32_t clock_id);
+  static uint64_t ClockGet(uint32_t clock_id);
 
   static void RegisterNatives(tonic::DartLibraryNatives* natives);
 };

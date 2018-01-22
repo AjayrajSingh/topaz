@@ -316,8 +316,8 @@ Dart_Handle System::VmoRead(fxl::RefPtr<Handle> vmo,
   }
 }
 
-uint64_t System::TimeGet(uint32_t clock_id) {
-  return zx_time_get(clock_id);
+uint64_t System::ClockGet(uint32_t clock_id) {
+  return zx_clock_get(clock_id);
 }
 
   // clang-format: off
@@ -335,7 +335,7 @@ uint64_t System::TimeGet(uint32_t clock_id) {
   V(System, VmoSetSize)            \
   V(System, VmoRead)               \
   V(System, VmoWrite)              \
-  V(System, TimeGet)
+  V(System, ClockGet)
 
 // clang-format: on
 

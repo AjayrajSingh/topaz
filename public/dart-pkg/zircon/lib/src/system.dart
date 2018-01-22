@@ -105,5 +105,5 @@ class System extends NativeFieldWrapperClass2 {
       native 'System_VmoRead';
 
   // Time operations.
-  static int timeGet(int clockId) native 'System_TimeGet';
+  static int clockGet(int clockId) native 'System_ClockGet';
 }
