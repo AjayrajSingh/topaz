@@ -325,6 +325,10 @@ class ChatConversationListModuleModel extends ModuleModel {
         null,
         _pickerModuleController.ctrl.request(),
         viewOwner.passRequest(),
+        (StartDaisyStatus status) {
+          // Handle daisy resolution here
+          log.info('Start daisy status = $status');
+        },
       )
       ..getLink(name, _pickerLink.ctrl.request());
 

@@ -168,6 +168,10 @@ class BrowserModuleModel extends ModuleModel {
         null,
         _moduleController.ctrl.request(),
         _kSurfaceRelation,
+        (StartDaisyStatus status) {
+          // Handle daisy resolution here
+          log.info('Start daisy status = $status');
+        },
       );
       log.fine('Opened a new module');
       notifyListeners();
