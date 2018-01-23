@@ -4,25 +4,29 @@
 
 #include "topaz/runtime/dart_runner/dart_application_controller.h"
 
+#include <dlfcn.h>
 #include <fcntl.h>
-#include <zircon/status.h>
 #include <fdio/namespace.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <zircon/dlfcn.h>
+#include <zircon/status.h>
+#include <zx/process.h>
 #include <utility>
 
 #include "lib/app/cpp/application_context.h"
-#include "topaz/runtime/dart_runner/builtin_libraries.h"
 #include "lib/fidl/cpp/bindings/string.h"
+#include "lib/fsl/tasks/message_loop.h"
+#include "lib/fsl/vmo/file.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/synchronization/mutex.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_message_handler.h"
 #include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/dart_state.h"
 #include "lib/tonic/logging/dart_error.h"
+#include "topaz/runtime/dart_runner/builtin_libraries.h"
 
 using tonic::ToDart;
 
@@ -35,28 +39,22 @@ void AfterTask() {
   queue->RunMicrotasks();
 }
 
+std::string GetLabelFromURL(const std::string& url) {
+  size_t last_slash = url.rfind('/');
+  if (last_slash == std::string::npos || last_slash + 1 == url.length())
+    return url;
+  return url.substr(last_slash + 1);
+}
+
 }  // namespace
 
 DartApplicationController::DartApplicationController(
-    fdio_ns_t* namespc,
-    const uint8_t* isolate_snapshot_data,
-    const uint8_t* isolate_snapshot_instructions,
-#if !defined(AOT_RUNTIME)
-    const uint8_t* script_snapshot,
-    intptr_t script_snapshot_len,
-#endif  // !defined(AOT_RUNTIE)
+    app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
-    std::string url,
     fidl::InterfaceRequest<app::ApplicationController> controller)
-    : namespace_(namespc),
-      isolate_snapshot_data_(isolate_snapshot_data),
-      isolate_snapshot_instructions_(isolate_snapshot_instructions),
-#if !defined(AOT_RUNTIME)
-      script_snapshot_(script_snapshot),
-      script_snapshot_len_(script_snapshot_len),
-#endif  // !defined(AOT_RUNTIE)
+    : url_(std::move(application->resolved_url)),
+      application_(std::move(application)),
       startup_info_(std::move(startup_info)),
-      url_(std::move(url)),
       binding_(this) {
   if (controller.is_pending()) {
     binding_.Bind(std::move(controller));
@@ -69,38 +67,236 @@ DartApplicationController::~DartApplicationController() {
     fdio_ns_destroy(namespace_);
     namespace_ = nullptr;
   }
+
+  if (shared_library_) {
+    dlclose(shared_library_);
+    shared_library_ = nullptr;
+  }
 }
 
-bool DartApplicationController::CreateIsolate() {
+bool DartApplicationController::Setup() {
+  // Name the process after the url of the application being launched.
+  std::string label = "dart:" + GetLabelFromURL(url_);
+  zx::process::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
+
+  if (!SetupNamespace()) {
+    return false;
+  }
+
+  if (SetupFromScriptSnapshot()) {
+    FXL_LOG(INFO) << url_ << " is running from a script snapshot";
+  } else if (SetupFromSource()) {
+    FXL_LOG(INFO) << url_ << " is running from source";
+  } else if (SetupFromSharedLibrary()) {
+    FXL_LOG(INFO) << url_ << " is running from a shared library";
+  } else if (SetupFromKernel()) {
+    FXL_LOG(INFO) << url_ << " is running from kernel";
+  } else {
+    FXL_LOG(ERROR) << "Could not find a program in " << url_;
+    return false;
+  }
+
+  return true;
+}
+
+constexpr char kServiceRootPath[] = "/svc";
+
+bool DartApplicationController::SetupNamespace() {
+  app::FlatNamespacePtr& flat = *(&startup_info_->flat_namespace);
+  zx_status_t status = fdio_ns_create(&namespace_);
+  if (status != ZX_OK) {
+    FXL_LOG(ERROR) << "Failed to create namespace";
+    return false;
+  }
+
+  for (size_t i = 0; i < flat->paths.size(); ++i) {
+    if (flat->paths[i] == kServiceRootPath) {
+      // Ownership of /svc goes to the ApplicationContext created below.
+      continue;
+    }
+    zx::channel dir = std::move(flat->directories[i]);
+    zx_handle_t dir_handle = dir.release();
+    const char* path = flat->paths[i].data();
+    status = fdio_ns_bind(namespace_, path, dir_handle);
+    if (status != ZX_OK) {
+      FXL_LOG(ERROR) << "Failed to bind " << flat->paths[i] << " to namespace";
+      zx_handle_close(dir_handle);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool DartApplicationController::SetupFromScriptSnapshot() {
+#if defined(AOT_RUNTIME)
+  return false;
+#else
+  if (!MappedResource::LoadFromNamespace(
+          namespace_, "pkg/data/snapshot_blob.bin", script_)) {
+    return false;
+  }
+
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/snapshot_isolate.bin", isolate_snapshot_data_)) {
+    return false;
+  }
+
+  if (!CreateIsolate(isolate_snapshot_data_.address(), nullptr)) {
+    return false;
+  }
+
+  Dart_EnterScope();
+  Dart_Handle root_library = Dart_LoadScriptFromSnapshot(
+      reinterpret_cast<const uint8_t*>(script_.address()), script_.size());
+  if (Dart_IsError(root_library)) {
+    FXL_LOG(ERROR) << "Failed to load script snapshot: "
+                   << Dart_GetError(root_library);
+    Dart_ExitScope();
+    return false;
+  }
+
+  return true;
+#endif  // !defined(AOT_RUNTIME)
+}
+
+bool DartApplicationController::SetupFromSource() {
+#if defined(AOT_RUNTIME)
+  return false;
+#else
+  if (!application_->data ||
+      !MappedResource::LoadFromVmo(
+          url_,
+          fsl::SizedVmo(std::move(application_->data->vmo),
+                        application_->data->size),
+          script_)) {
+    return false;
+  }
+
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/snapshot_isolate.bin", isolate_snapshot_data_)) {
+    return false;
+  }
+
+  if (!CreateIsolate(isolate_snapshot_data_.address(), nullptr)) {
+    return false;
+  }
+
+  Dart_Handle status =
+      Dart_SetLibraryTagHandler(tonic::DartState::HandleLibraryTag);
+  if (Dart_IsError(status)) {
+    FXL_LOG(ERROR) << "Dart_SetLibraryTagHandler failed: "
+                   << Dart_GetError(status);
+    return false;
+  }
+
+  Dart_EnterScope();
+  Dart_Handle url = Dart_NewStringFromUTF8(
+      reinterpret_cast<const uint8_t*>(url_.data()), url_.length());
+  if (Dart_IsError(url)) {
+    FXL_LOG(ERROR) << "Failed to make string for url: " << Dart_GetError(url);
+    Dart_ExitScope();
+    return false;
+  }
+
+  Dart_Handle script = Dart_NewStringFromUTF8(
+      reinterpret_cast<const uint8_t*>(script_.address()), script_.size());
+  if (Dart_IsError(script)) {
+    FXL_LOG(ERROR) << "Failed to make string for script: "
+                   << Dart_GetError(script);
+    Dart_ExitScope();
+    return false;
+  }
+  Dart_Handle root_library = Dart_LoadScript(url, url, script, 0, 0);
+  if (Dart_IsError(root_library)) {
+    FXL_LOG(ERROR) << "Failed to load script: " << Dart_GetError(root_library);
+    Dart_ExitScope();
+    return false;
+  }
+
+  return true;
+#endif  // !defined(AOT_RUNTIME)
+}
+
+bool DartApplicationController::SetupFromKernel() {
+  // TODO(rmacnak): Load platform and application kernel files.
+  return false;
+}
+
+bool DartApplicationController::SetupFromSharedLibrary() {
+#if !defined(AOT_RUNTIME)
+  // If we start generating app-jit snapshots, the code below should be able
+  // handle that case without modification.
+  return false;
+#else
+  const std::string& path = "pkg/data/libapp.so";
+
+  fxl::UniqueFD root_dir(fdio_ns_opendir(namespace_));
+  if (!root_dir.is_valid()) {
+    FXL_LOG(ERROR) << "Failed to open namespace";
+    return false;
+  }
+
+  fsl::SizedVmo dylib;
+  if (!fsl::VmoFromFilenameAt(root_dir.get(), path, &dylib)) {
+    FXL_LOG(ERROR) << "Failed to read " << path;
+    return false;
+  }
+
+  dlerror();
+  shared_library_ = dlopen_vmo(dylib.vmo().get(), RTLD_LAZY);
+  if (shared_library_ == nullptr) {
+    FXL_LOG(ERROR) << "dlopen failed: " << dlerror();
+    return false;
+  }
+
+  void* isolate_snapshot_data =
+      dlsym(shared_library_, "_kDartIsolateSnapshotData");
+  if (isolate_snapshot_data == nullptr) {
+    FXL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotData) failed: " << dlerror();
+    return false;
+  }
+
+  void* isolate_snapshot_instructions =
+      dlsym(shared_library_, "_kDartIsolateSnapshotInstructions");
+  if (isolate_snapshot_instructions == nullptr) {
+    FXL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotInstructions) failed: "
+                   << dlerror();
+    return false;
+  }
+
+  if (!CreateIsolate(isolate_snapshot_data, isolate_snapshot_instructions)) {
+    return false;
+  }
+
+  return true;
+#endif  // defined(AOT_RUNTIME)
+}
+
+bool DartApplicationController::CreateIsolate(
+    void* isolate_snapshot_data,
+    void* isolate_snapshot_instructions) {
   // Create the isolate from the snapshot.
   char* error = nullptr;
 
   auto state = new tonic::DartState();  // Freed in IsolateShutdownCallback.
-  isolate_ = Dart_CreateIsolate(url_.c_str(), "main", isolate_snapshot_data_,
-                                isolate_snapshot_instructions_, nullptr, state,
-                                &error);
+  isolate_ = Dart_CreateIsolate(
+      url_.c_str(), "main",
+      reinterpret_cast<const uint8_t*>(isolate_snapshot_data),
+      reinterpret_cast<const uint8_t*>(isolate_snapshot_instructions), nullptr,
+      state, &error);
   if (!isolate_) {
     FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
     return false;
   }
-
-#if defined(SCRIPT_RUNTIME)
-  Dart_Handle status =
-      Dart_SetLibraryTagHandler(tonic::DartState::HandleLibraryTag);
-  if (Dart_IsError(status)) {
-    FXL_LOG(ERROR) << "Dart_SetLibraryTagHandler failed";
-    return false;
-  }
-#endif
 
   state->SetIsolate(isolate_);
 
   state->message_handler().Initialize(
       fsl::MessageLoop::GetCurrent()->task_runner());
 
-  state->SetReturnCodeCallback([this](uint32_t return_code) {
-    return_code_ = return_code;
-  });
+  state->SetReturnCodeCallback(
+      [this](uint32_t return_code) { return_code_ = return_code; });
 
   return true;
 }
@@ -108,35 +304,7 @@ bool DartApplicationController::CreateIsolate() {
 bool DartApplicationController::Main() {
   Dart_EnterScope();
 
-#if defined(AOT_RUNTIME)
   Dart_Handle root_library = Dart_RootLibrary();
-#elif defined(SCRIPT_RUNTIME)
-  Dart_Handle url = Dart_NewStringFromUTF8(
-      reinterpret_cast<const uint8_t*>(url_.data()), url_.length());
-  if (Dart_IsError(url)) {
-    FXL_LOG(ERROR) << "Failed to make string for url: " << url_;
-    Dart_ExitScope();
-    return false;
-  }
-  // The script_snapshot_ field holds the text of the script when we are
-  // in the script runner.
-  Dart_Handle script =
-      Dart_NewStringFromUTF8(script_snapshot_, script_snapshot_len_);
-  if (Dart_IsError(script)) {
-    FXL_LOG(ERROR) << "Failed to make string for script";
-    Dart_ExitScope();
-    return false;
-  }
-  Dart_Handle root_library = Dart_LoadScript(url, url, script, 0, 0);
-  if (Dart_IsError(root_library)) {
-    FXL_LOG(ERROR) << "Failed to load script: " << url_;
-    Dart_ExitScope();
-    return false;
-  }
-#else
-  Dart_Handle root_library =
-      Dart_LoadScriptFromSnapshot(script_snapshot_, script_snapshot_len_);
-#endif
 
   // TODO(jeffbrown): Decide what we should do with any startup handles.
   // eg. Redirect stdin, stdout, and stderr.
@@ -171,7 +339,8 @@ bool DartApplicationController::Main() {
 
   Dart_Handle dart_arguments = Dart_NewList(arguments.size());
   if (Dart_IsError(dart_arguments)) {
-    FXL_LOG(ERROR) << "Failed to allocate Dart arguments list";
+    FXL_LOG(ERROR) << "Failed to allocate Dart arguments list: "
+                   << Dart_GetError(dart_arguments);
     Dart_ExitScope();
     return false;
   }

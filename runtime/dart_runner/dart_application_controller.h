@@ -7,51 +7,55 @@
 
 #include <fdio/namespace.h>
 
-#include "lib/svc/cpp/service_provider_bridge.h"
 #include "lib/app/fidl/application_runner.fidl.h"
-#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/fidl/cpp/bindings/binding.h"
+#include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fxl/macros.h"
+#include "lib/svc/cpp/service_provider_bridge.h"
+#include "third_party/dart/runtime/include/dart_api.h"
+#include "topaz/runtime/dart_runner/mapped_resource.h"
 
 namespace dart_content_handler {
 
 class DartApplicationController : public app::ApplicationController {
  public:
   DartApplicationController(
-      fdio_ns_t* namespc,
-      const uint8_t* isolate_snapshot_data,
-      const uint8_t* isolate_snapshot_instructions,
-#if !defined(AOT_RUNTIME)
-      const uint8_t* snapshot,
-      intptr_t snapshot_len,
-#endif  // !defined(AOT_RUNTIME)
+      app::ApplicationPackagePtr application,
       app::ApplicationStartupInfoPtr startup_info,
-      std::string url,
       fidl::InterfaceRequest<app::ApplicationController> controller);
   ~DartApplicationController() override;
 
-  bool CreateIsolate();
+  bool Setup();
 
   bool Main();
   void SendReturnCode();
 
  private:
+  bool SetupNamespace();
+  bool SetupFromScriptSnapshot();
+  bool SetupFromSource();
+  bool SetupFromKernel();
+  bool SetupFromSharedLibrary();
+  bool CreateIsolate(void* isolate_snapshot_data,
+                     void* isolate_snapshot_instructions);
+
   // |ApplicationController|
   void Kill() override;
   void Detach() override;
   void Wait(const WaitCallback& callback) override;
 
-  fdio_ns_t* namespace_;
-  const uint8_t* isolate_snapshot_data_;
-  const uint8_t* isolate_snapshot_instructions_;
-#if !defined(AOT_RUNTIME)
-  const uint8_t* script_snapshot_;
-  intptr_t script_snapshot_len_;
-#endif  // !defined(AOT_RUNTIME)
-  app::ApplicationStartupInfoPtr startup_info_;
   std::string url_;
+  app::ApplicationPackagePtr application_;
+  app::ApplicationStartupInfoPtr startup_info_;
   app::ServiceProviderBridge service_provider_bridge_;
   fidl::Binding<app::ApplicationController> binding_;
+
+  fdio_ns_t* namespace_ = nullptr;
+  MappedResource isolate_snapshot_data_;
+  MappedResource isolate_snapshot_instructions_;
+  MappedResource script_;  // Snapshot or source.
+  void* shared_library_ = nullptr;
+
   Dart_Isolate isolate_;
   int32_t return_code_ = 0;
   std::vector<WaitCallback> wait_callbacks_;
