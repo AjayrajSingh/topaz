@@ -134,7 +134,7 @@ class Info extends StatelessWidget {
             _createLabel('Type', model.doc.mimeType),
             model.doc.isFolder
                 ? new Container()
-                : _createLabel('Size', '${model.doc.size} bytes'),
+                : _createLabel('Size', utils.prettifyFileSize(model.doc.size)),
             _createLabel('Location', model.doc.location),
             _createLabel('Owner', model.doc.owners.join(', ')),
             _createLabel('Modified', utils.prettifyDate(model.doc.modified)),

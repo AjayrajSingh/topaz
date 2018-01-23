@@ -14,11 +14,41 @@ const List<String> _kValidMimeTypes = const <String>[
   'video/',
   'application/pdf',
 ];
+const int _kOneKilobyte = 1024;
+const int _kOneMegabyte = _kOneKilobyte * 1024;
+const int _kOneGigabyte = _kOneMegabyte * 1024;
+const int _kOneTerabyte = _kOneGigabyte * 1024;
 
 /// Formats the date into a word format, i.e. Day, Month Day, Year
 String prettifyDate(int millisDate) {
   return _kDateFormat
       .format(new DateTime.fromMillisecondsSinceEpoch(millisDate));
+}
+
+/// Formats a file size in byte, KB, MB, GB, TB as appropriate
+String prettifyFileSize(int bytes) {
+  String suffix = 'bytes';
+  double value = bytes.toDouble();
+  if (bytes == 1) {
+    return '1 byte';
+  }
+  if (bytes < _kOneKilobyte) {
+    return '${bytes.toString()} bytes';
+  }
+  if (bytes < _kOneMegabyte) {
+    suffix = 'KB';
+    value = value / _kOneKilobyte;
+  } else if (bytes < _kOneGigabyte) {
+    suffix = 'MB';
+    value = value / _kOneMegabyte;
+  } else if (bytes < _kOneTerabyte) {
+    suffix = 'GB';
+    value = value / _kOneGigabyte;
+  } else {
+    suffix = 'TB';
+    value = value / _kOneTerabyte;
+  }
+  return '${value.toStringAsFixed(value > 2.0 ? 0 : 1)} $suffix';
 }
 
 /// Returns true if we have a thumbnail image location, and the file type is

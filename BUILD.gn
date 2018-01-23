@@ -9,6 +9,7 @@ group("dart_unittests") {
     "app/chat:tests",
     "app/contacts:tests",
     "app/dashboard:tests",
+    "app/documents/packages/utils:test",
     "app/music:tests",
     "public/dart/fixtures:test",
     "public/dart/widgets:test",

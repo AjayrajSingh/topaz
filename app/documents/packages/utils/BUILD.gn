@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_library.gni")
+import("//build/dart/dart_test.gni")
 
 dart_library("utils") {
   package_name = "utils"
@@ -10,4 +11,12 @@ dart_library("utils") {
   deps = [
       "//third_party/dart-pkg/git/flutter/packages/flutter",
     ]
+}
+
+dart_test("test") {
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/pub/test",
+    "//topaz/app/documents/packages/utils",
+  ]
 }
