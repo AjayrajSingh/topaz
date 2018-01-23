@@ -7,31 +7,30 @@
 
 #include <vector>
 
-#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/tonic/dart_persistent_value.h"
 #include "lib/tonic/logging/dart_error.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 
 namespace tonic {
 
 class DartMicrotaskQueue {
  public:
+  DartMicrotaskQueue();
+  ~DartMicrotaskQueue();
+
   static void StartForCurrentThread();
+
   static DartMicrotaskQueue* GetForCurrentThread();
 
   void ScheduleMicrotask(Dart_Handle callback);
   void RunMicrotasks();
   void Destroy();
 
-  bool HasMicrotasks() const {
-    return !queue_.empty();
-  }
+  bool HasMicrotasks() const { return !queue_.empty(); }
 
   DartErrorHandleType GetLastError();
 
  private:
-  DartMicrotaskQueue();
-  ~DartMicrotaskQueue();
-
   typedef std::vector<DartPersistentValue> MicrotaskQueue;
 
   DartErrorHandleType last_error_;
