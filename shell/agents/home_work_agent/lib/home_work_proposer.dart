@@ -296,12 +296,18 @@ class _QueryHandlerImpl extends QueryHandler {
     }
 
     if ((query.text?.length ?? 0) >= 2) {
-      void scanDirectory(Directory directory) {
-        for (String path in directory
-            .listSync(recursive: true, followLinks: false)
+      void scanDirectory(Directory directory, {bool recursive: true}) {
+        if (!directory.existsSync()) {
+          return;
+        }
+        List<String> list = directory
+            .listSync(recursive: recursive, followLinks: false)
             .map((FileSystemEntity fileSystemEntity) => fileSystemEntity.path)
-            .where((String path) => path.contains(query.text))
-            .where(FileSystemEntity.isFileSync)) {
+            .where((String path) => path.contains(query.text));
+        if (recursive) {
+            list = list.where(FileSystemEntity.isFileSync);
+        }
+        for (String path in list) {
           String name = Uri.parse(path).pathSegments.last;
           String iconUrl =
               'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png';
@@ -351,6 +357,7 @@ class _QueryHandlerImpl extends QueryHandler {
         }
       }
 
+      scanDirectory(new Directory('/pkgfs/packages/'), recursive: false);
       scanDirectory(new Directory('/system/apps/'));
       scanDirectory(new Directory('/system/bin/'));
       scanDirectory(new Directory('/system/pkgs/'));
