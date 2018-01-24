@@ -19,7 +19,7 @@ class ContactsPickerStore extends Store {
     triggerOnAction(
       updateContactsListAction,
 
-      // ignore: uses_dynamic_as_bottom
+      // ignore: strong_mode_uses_dynamic_as_bottom
       (List<ContactItemStore> contacts) {
         _contacts = contacts;
         log.fine('ContactsPickerStore: contacts updated');
@@ -29,7 +29,7 @@ class ContactsPickerStore extends Store {
     triggerOnAction(
       updatePrefixAction,
 
-      // ignore: uses_dynamic_as_bottom
+      // ignore: strong_mode_uses_dynamic_as_bottom
       (String prefix) {
         _prefix = prefix;
         log.fine('ContactsPickerStore: prefix updated to $prefix');

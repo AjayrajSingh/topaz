@@ -8,7 +8,7 @@ import 'package:flutter_flux/flutter_flux.dart';
 
 class ModuleDataStore extends Store {
   ModuleDataStore() {
-    // ignore: uses_dynamic_as_bottom
+    // ignore: strong_mode_uses_dynamic_as_bottom
     triggerOnAction(setLinkValueAction, (String value) {
       _linkValue = value;
       return null;

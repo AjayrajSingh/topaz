@@ -26,9 +26,9 @@ final Map<String, Participant> _kTestParticipantMap =
     new Map<String, Participant>.unmodifiable(
   new Map<String, Participant>.fromIterable(
     _kTestParticipants,
-    // ignore: uses_dynamic_as_bottom
+    // ignore: strong_mode_uses_dynamic_as_bottom
     key: (Participant p) => p.email,
-    // ignore: uses_dynamic_as_bottom
+    // ignore: strong_mode_uses_dynamic_as_bottom
     value: (Participant p) => p,
   ),
 );

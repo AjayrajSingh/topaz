@@ -21,7 +21,7 @@
     <project name="third_party/dart/third_party/pkg/bazel_worker"
              path="third_party/dart/third_party/pkg/bazel_worker"
              remote="https://dart.googlesource.com/bazel_worker.git"
-             revision="v0.1.4"/>
+             revision="v0.1.9"/>
 
     <project name="third_party/dart/third_party/pkg/boolean_selector"
              path="third_party/dart/third_party/pkg/boolean_selector"
@@ -66,7 +66,7 @@
     <project name="third_party/dart/third_party/pkg/dartdoc"
              path="third_party/dart/third_party/pkg/dartdoc"
              remote="https://dart.googlesource.com/dartdoc.git"
-             revision="v0.15.0+1"/>
+             revision="v0.15.1"/>
 
     <project name="third_party/dart/third_party/pkg/fixnum"
              path="third_party/dart/third_party/pkg/fixnum"
@@ -126,12 +126,12 @@
     <project name="third_party/dart/third_party/pkg/json_rpc_2"
              path="third_party/dart/third_party/pkg/json_rpc_2"
              remote="https://dart.googlesource.com/json_rpc_2.git"
-             revision="2.0.4"/>
+             revision="2.0.6"/>
 
     <project name="third_party/dart/third_party/pkg/linter"
              path="third_party/dart/third_party/pkg/linter"
              remote="https://dart.googlesource.com/linter.git"
-             revision="0.1.41"/>
+             revision="0.1.42"/>
 
     <project name="third_party/dart/third_party/pkg/logging"
              path="third_party/dart/third_party/pkg/logging"
@@ -171,7 +171,7 @@
     <project name="third_party/dart/third_party/pkg/path"
              path="third_party/dart/third_party/pkg/path"
              remote="https://dart.googlesource.com/path.git"
-             revision="1.4.2"/>
+             revision="1.5.1"/>
 
     <project name="third_party/dart/third_party/pkg/plugin"
              path="third_party/dart/third_party/pkg/plugin"
@@ -186,12 +186,12 @@
     <project name="third_party/dart/third_party/pkg/protobuf"
              path="third_party/dart/third_party/pkg/protobuf"
              remote="https://dart.googlesource.com/protobuf.git"
-             revision="0.6.0"/>
+             revision="0.7.0"/>
 
     <project name="third_party/dart/third_party/pkg/pub"
              path="third_party/dart/third_party/pkg/pub"
              remote="https://dart.googlesource.com/pub.git"
-             revision="667281eef93b4be648cceca400e954e000edba38"/>
+             revision="64c5f40adf6828da1b63320dd39bcedbef1354c6"/>
 
     <project name="third_party/dart/third_party/pkg/pub_semver"
              path="third_party/dart/third_party/pkg/pub_semver"
@@ -201,7 +201,7 @@
     <project name="third_party/dart/third_party/pkg/quiver"
              path="third_party/dart/third_party/pkg/quiver"
              remote="https://chromium.googlesource.com/external/github.com/google/quiver-dart.git"
-             revision="0.27.0"/>
+             revision="0.28.0"/>
 
     <project name="third_party/dart/third_party/pkg/resource"
              path="third_party/dart/third_party/pkg/resource"

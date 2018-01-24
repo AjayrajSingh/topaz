@@ -43,9 +43,9 @@ Future<Null> main() async {
   Map<String, WidgetSpecs> widgetMap =
       new Map<String, WidgetSpecs>.fromIterable(
     widgetSpecs,
-    // ignore: uses_dynamic_as_bottom
+    // ignore: strong_mode_uses_dynamic_as_bottom
     key: (WidgetSpecs ws) => ws.name,
-    // ignore: uses_dynamic_as_bottom
+    // ignore: strong_mode_uses_dynamic_as_bottom
     value: (WidgetSpecs ws) => ws,
   );
 
