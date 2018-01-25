@@ -4,9 +4,9 @@
 
 #include "topaz/runtime/dart_runner/dart_application_runner.h"
 
+#include <sys/stat.h>
 #include <thread>
 #include <utility>
-#include <sys/stat.h>
 
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/arraysize.h"
@@ -14,6 +14,7 @@
 #include "lib/tonic/dart_state.h"
 #include "third_party/dart/runtime/bin/embedded_dart_io.h"
 #include "topaz/runtime/dart_runner/dart_application_controller.h"
+#include "topaz/runtime/dart_runner/service_isolate.h"
 
 #if defined(AOT_RUNTIME)
 extern "C" uint8_t _kDartVmSnapshotData[];
@@ -55,10 +56,43 @@ void PushBackAll(std::vector<const char*>* args,
   }
 }
 
+Dart_Isolate IsolateCreateCallback(const char* uri,
+                                   const char* main,
+                                   const char* package_root,
+                                   const char* package_config,
+                                   Dart_IsolateFlags* flags,
+                                   void* callback_data,
+                                   char** error) {
+  if (std::string(uri) == DART_VM_SERVICE_ISOLATE_NAME) {
+#if defined(AOT_RUNTIME)
+    *error = strdup("The service isolate is not implemented in AOT mode");
+    return NULL;
+#elif defined(NDEBUG)
+    *error = strdup("The service isolate is not implemented in release mode");
+    return NULL;
+#else
+    return CreateServiceIsolate(uri, flags, error);
+#endif
+  }
+
+  if (std::string(uri) == DART_KERNEL_ISOLATE_NAME) {
+    *error = strdup("The kernel isolate is not implemented in dart_runner");
+    return NULL;
+  }
+
+  *error = strdup("Isolate spawning is not implemented in dart_runner");
+  return NULL;
+}
+
 void IsolateShutdownCallback(void* callback_data) {
-  fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
-  tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
-  fsl::MessageLoop::GetCurrent()->QuitNow();
+  // The service isolate (and maybe later the kernel isolate) doesn't have an
+  // fsl::MessageLoop.
+  fsl::MessageLoop* loop = fsl::MessageLoop::GetCurrent();
+  if (loop) {
+    loop->SetAfterTaskCallback(nullptr);
+    tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
+    loop->QuitNow();
+  }
 }
 
 void IsolateCleanupCallback(void* callback_data) {
@@ -123,8 +157,12 @@ DartApplicationRunner::DartApplicationRunner(
       reinterpret_cast<const uint8_t*>(vm_snapshot_data_.address());
   params.vm_snapshot_instructions = NULL;
 #endif
+  params.create = IsolateCreateCallback;
   params.shutdown = IsolateShutdownCallback;
   params.cleanup = IsolateCleanupCallback;
+#if !defined(NDEBUG) && !defined(AOT_RUNTIME)
+  params.get_service_assets = GetVMServiceAssetsArchiveCallback;
+#endif
   char* error = Dart_Initialize(&params);
   if (error)
     FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;

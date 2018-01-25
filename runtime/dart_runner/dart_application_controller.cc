@@ -406,8 +406,20 @@ bool DartApplicationController::Main() {
   InitBuiltinLibrariesForIsolate(
       url_, namespace_, stdoutfd_, stderrfd_,
       app::ApplicationContext::CreateFrom(std::move(startup_info_)),
-      std::move(outgoing_services));
+      std::move(outgoing_services), false /* service_isolate */);
   namespace_ = nullptr;
+
+  Dart_ExitScope();
+  Dart_ExitIsolate();
+  bool retval = Dart_IsolateMakeRunnable(isolate_);
+  if (!retval) {
+    Dart_EnterIsolate(isolate_);
+    Dart_ShutdownIsolate();
+    FXL_LOG(ERROR) << "Unable to make isolate runnable";
+    return false;
+  }
+  Dart_EnterIsolate(isolate_);
+  Dart_EnterScope();
 
   Dart_Handle dart_arguments = Dart_NewList(arguments.size());
   if (Dart_IsError(dart_arguments)) {

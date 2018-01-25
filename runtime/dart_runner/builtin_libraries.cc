@@ -96,12 +96,15 @@ void InitBuiltinLibrariesForIsolate(
     int stdoutfd,
     int stderrfd,
     std::unique_ptr<app::ApplicationContext> context,
-    f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
+    f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services,
+    bool service_isolate) {
   // dart:fuchsia --------------------------------------------------------------
-  f1dl::InterfaceHandle<app::ApplicationEnvironment> environment;
-  context->ConnectToEnvironmentService(environment.NewRequest());
-  fuchsia::dart::Initialize(std::move(environment),
-                            std::move(outgoing_services));
+  if (!service_isolate) {
+    f1dl::InterfaceHandle<app::ApplicationEnvironment> environment;
+    context->ConnectToEnvironmentService(environment.NewRequest());
+    fuchsia::dart::Initialize(std::move(environment),
+                              std::move(outgoing_services));
+  }
 
   // dart:fuchsia.builtin ------------------------------------------------------
 
@@ -143,8 +146,16 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(Dart_SetField(internal_lib, ToDart("_printClosure"), print));
 
   // Set up the 'scheduleImmediate' closure.
-  Dart_Handle schedule_immediate_closure = Dart_Invoke(
-      builtin_lib, ToDart("_getScheduleMicrotaskClosure"), 0, nullptr);
+  Dart_Handle schedule_immediate_closure;
+  if (service_isolate) {
+    // Running on dart::ThreadPool.
+    schedule_immediate_closure = Dart_Invoke(
+        isolate_lib, ToDart("_getIsolateScheduleImmediateClosure"), 0, nullptr);
+  } else {
+    // Running on fsl::MessageLoop.
+    schedule_immediate_closure = Dart_Invoke(
+        builtin_lib, ToDart("_getScheduleMicrotaskClosure"), 0, nullptr);
+  }
   DART_CHECK_VALID(schedule_immediate_closure);
 
   Dart_Handle schedule_args[1];

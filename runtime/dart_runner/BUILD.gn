@@ -22,6 +22,8 @@ template("runner") {
       "main.cc",
       "mapped_resource.cc",
       "mapped_resource.h",
+      "service_isolate.cc",
+      "service_isolate.h",
     ]
 
     defines = extra_defines
@@ -168,6 +170,11 @@ package("dart2_jit_runner") {
     ":dart_jit_runner_bin",
     "kernel:kernel_core_snapshot",
   ]
+  if (is_debug) {
+    deps += [
+      "//third_party/dart/runtime/observatory:embedded_observatory_archive",
+    ]
+  }
 
   binary = "dart_jit_runner"
 
@@ -192,6 +199,15 @@ package("dart2_jit_runner") {
       dest = "snapshot_isolate.bin"
     },
   ]
+  if (is_debug) {
+    resources += [
+      {
+        path = rebase_path(
+                "$root_gen_dir/observatory/embedded_archive_observatory.tar")
+        dest = "observatory.tar"
+      },
+    ]
+  }
 }
 
 package("dart_script_runner") {
