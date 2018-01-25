@@ -12,6 +12,7 @@
 #include <zircon/dlfcn.h>
 #include <zircon/status.h>
 #include <zx/process.h>
+#include <zx/thread.h>
 #include <utility>
 
 #include "lib/app/cpp/application_context.h"
@@ -26,6 +27,7 @@
 #include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/dart_state.h"
 #include "lib/tonic/logging/dart_error.h"
+#include "third_party/dart/runtime/include/dart_tools_api.h"
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 
 using tonic::ToDart;
@@ -75,9 +77,12 @@ DartApplicationController::~DartApplicationController() {
 }
 
 bool DartApplicationController::Setup() {
-  // Name the process after the url of the application being launched.
+  // Name the process and thread after the url of the application being
+  // launched.
   std::string label = "dart:" + GetLabelFromURL(url_);
   zx::process::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
+  zx::thread::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
+  Dart_SetThreadName(label.c_str());
 
   if (!SetupNamespace()) {
     return false;

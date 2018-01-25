@@ -30,7 +30,11 @@ const char* kDartVMArgs[] = {
     "--enable_mirrors=false",
     "--await_is_keyword",
 #endif
-    // clang-format on
+#if !defined(NDEBUG)
+    "--systrace_timeline",
+    "--timeline_streams=VM,Isolate,Compiler,Dart,GC,Embedder",
+#endif
+// clang-format on
 };
 
 void IsolateShutdownCallback(void* callback_data) {
@@ -48,10 +52,15 @@ void RunApplication(
     app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
     ::fidl::InterfaceRequest<app::ApplicationController> controller) {
+  int64_t start = Dart_TimelineGetMicros();
   fsl::MessageLoop loop;
   DartApplicationController app(std::move(application), std::move(startup_info),
                                 std::move(controller));
-  if (app.Setup()) {
+  bool success = app.Setup();
+  int64_t end = Dart_TimelineGetMicros();
+  Dart_TimelineEvent("DartApplicationController::Setup", start, end,
+                     Dart_Timeline_Event_Duration, 0, NULL, NULL);
+  if (success) {
     loop.task_runner()->PostTask([&loop, &app] {
       if (!app.Main())
         loop.PostQuitTask();

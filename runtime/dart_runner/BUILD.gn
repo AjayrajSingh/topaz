@@ -54,6 +54,7 @@ template("runner") {
              "//garnet/public/lib/svc/cpp",
              "//topaz/lib/tonic",
              "//topaz/public/dart-pkg/fuchsia",
+             "//zircon/system/ulib/trace-provider",
            ] + dart_deps + extra_deps
   }
 }
