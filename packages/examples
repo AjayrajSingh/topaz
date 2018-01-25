@@ -13,6 +13,7 @@
         "media_player": "//topaz/examples/media/media_player:package",
         "media_player_flutter": "//topaz/examples/media/media_player_flutter:package",
         "more_ledger_examples": "//topaz/examples/ledger",
+        "mine_digger": "//topaz/examples/mine_digger",
         "vu_meter": "//topaz/examples/media/vu_meter:package"
     }
 }
