@@ -14,6 +14,9 @@ import 'package:lib.widgets/model.dart';
 import '../widgets/window_media_query.dart';
 import 'user_shell_model.dart';
 
+export 'package:lib.app.dart/app.dart' show ApplicationContext;
+export 'user_shell_model.dart' show UserShellModel;
+
 /// A wrapper widget intended to be the root of the application that is
 /// a [UserShell].  Its main purpose is to hold the [ApplicationContext] and
 /// [UserShell] instances so they aren't garbage collected.

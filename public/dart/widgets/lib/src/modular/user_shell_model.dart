@@ -13,6 +13,17 @@ import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
+export 'package:lib.context.fidl/context_reader.fidl.dart' show ContextReader;
+export 'package:lib.context.fidl/context_writer.fidl.dart' show ContextWriter;
+export 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart'
+    show SuggestionProvider;
+export 'package:lib.story.fidl/link.fidl.dart' show Link;
+export 'package:lib.story.fidl/story_provider.fidl.dart' show StoryProvider;
+export 'package:lib.user.fidl/focus.fidl.dart'
+    show FocusProvider, FocusController, VisibleStoriesController;
+export 'package:lib.user.fidl/user_shell.fidl.dart' show UserShellContext;
+export 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart'
+    show IntelligenceServices;
 export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
 
 /// The [Model] that provides services provided to this app's [UserShell].
