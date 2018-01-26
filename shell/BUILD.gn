@@ -21,7 +21,6 @@ package("sysui") {
   system_image = true
 
   deps = [
-    "armadillo_user_shell",
     "capybara_user_shell",
     "kernel_panic",
     "userpicker_device_shell",
@@ -29,11 +28,6 @@ package("sysui") {
   ]
 
   binaries = [
-    {
-      source = "gen/topaz/shell/armadillo_user_shell/armadillo_user_shell.flx"
-      name = "armadillo_user_shell"
-    },
-
     {
       source = "gen/topaz/shell/capybara_user_shell/capybara_user_shell.flx"
       name = "capybara_user_shell"

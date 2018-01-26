@@ -4,6 +4,7 @@
     ],
     "packages": {
         "home_work_agent": "//topaz/shell/agents/home_work_agent",
-        "sysui": "//topaz/shell:sysui"
+        "sysui": "//topaz/shell:sysui",
+        "armadillo_user_shell": "//topaz/shell/armadillo_user_shell"
     }
 }

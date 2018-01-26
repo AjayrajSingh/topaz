@@ -3,11 +3,16 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
+import("//build/package.gni")
 
 flutter_app("armadillo_user_shell") {
   main_dart = "lib/main.dart"
 
   package_name = "armadillo_user_shell"
+
+  flx = false
+
+  sandbox = "meta/sandbox"
 
   manifest = "pubspec.yaml"
 
