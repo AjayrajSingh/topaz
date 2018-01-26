@@ -170,10 +170,6 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
       null, // incomingServices
       moduleController.ctrl.request(),
       viewOwnerPair.passRequest(),
-      (StartDaisyStatus status) {
-        // Handle daisy resolution here
-        log.info('Start daisy status = $status');
-      },
     );
 
     connection = new ChildViewConnection(viewOwnerPair.passHandle());
