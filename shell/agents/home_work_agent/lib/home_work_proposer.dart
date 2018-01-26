@@ -300,14 +300,16 @@ class _QueryHandlerImpl extends QueryHandler {
         if (!directory.existsSync()) {
           return;
         }
-        List<String> list = directory
+        Iterable<String> fsPaths = directory
             .listSync(recursive: recursive, followLinks: false)
             .map((FileSystemEntity fileSystemEntity) => fileSystemEntity.path)
             .where((String path) => path.contains(query.text));
+
         if (recursive) {
-            list = list.where(FileSystemEntity.isFileSync);
+          fsPaths = fsPaths.where(FileSystemEntity.isFileSync);
         }
-        for (String path in list) {
+
+        for (String path in fsPaths) {
           String name = Uri.parse(path).pathSegments.last;
           String iconUrl =
               'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png';
