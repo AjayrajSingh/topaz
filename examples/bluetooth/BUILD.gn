@@ -12,7 +12,6 @@ package("bluetooth_examples") {
     "ble_rect",
     "ble_scanner",
     "eddystone_advertiser",
-    "settings",
   ]
 
   binaries = [
@@ -27,10 +26,6 @@ package("bluetooth_examples") {
     {
       source = "gen/topaz/examples/bluetooth/eddystone_advertiser/eddystone_advertiser.flx"
       name = "eddystone_advertiser"
-    },
-    {
-      source = "gen/topaz/examples/bluetooth/settings/settings.flx"
-      name = "bluetooth_settings_example"
     },
   ]
 }

@@ -1,6 +1,7 @@
 {
     "imports": [
         "peridot/packages/default",
+        "topaz/packages/bluetooth_settings",
         "topaz/packages/color",
         "topaz/packages/curl",
         "topaz/packages/dart",

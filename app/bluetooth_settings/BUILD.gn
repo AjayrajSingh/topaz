@@ -2,12 +2,13 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/package.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_app("settings") {
-  package_name = "settings"
-
+flutter_app("app") {
   main_dart = "lib/main.dart"
+  manifest = "pubspec.yaml"
+  source_dir = "lib"
 
   deps = [
     "//garnet/public/lib/bluetooth/fidl:fidl_dart",
@@ -17,5 +18,21 @@ flutter_app("settings") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
+  ]
+}
+
+package("bluetooth_settings") {
+  app = true
+  system_image = true
+
+  deps = [
+    ":app",
+  ]
+
+  binaries = [
+    {
+      source = "gen/topaz/app/bluetooth_settings/app.flx"
+      name = "bluetooth_settings"
+    },
   ]
 }
