@@ -311,6 +311,7 @@ class _QueryHandlerImpl extends QueryHandler {
 
         for (String path in fsPaths) {
           String name = Uri.parse(path).pathSegments.last;
+          String binName = Uri.parse(path).pathSegments.last;
           String iconUrl =
               'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png';
           int color = 0xFF000000 + (name.hashCode % 0xFFFFFF);
@@ -343,7 +344,7 @@ class _QueryHandlerImpl extends QueryHandler {
           proposals.add(
             _createAppProposal(
               id: 'open $name',
-              appUrl: 'file://$path',
+              appUrl: binName,
               headline: 'Launch $name',
               // TODO(design): Find a better way to add indicators to the
               // suggestions about their provenance, lack of safety, etc. that
