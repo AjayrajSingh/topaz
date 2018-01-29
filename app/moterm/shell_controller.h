@@ -5,7 +5,7 @@
 #ifndef APPS_MOTERM_SHELL_CONTROLLER_H_
 #define APPS_MOTERM_SHELL_CONTROLLER_H_
 
-#include <async/auto_wait.h>
+#include <async/cpp/auto_wait.h>
 #include <zx/channel.h>
 #include <zx/vmo.h>
 

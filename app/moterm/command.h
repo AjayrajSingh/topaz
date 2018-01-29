@@ -5,6 +5,7 @@
 #ifndef APPS_MOTERM_COMMAND_H_
 #define APPS_MOTERM_COMMAND_H_
 
+#include <async/cpp/auto_wait.h>
 #include <fdio/util.h>
 #include <launchpad/launchpad.h>
 #include <zx/process.h>
@@ -13,7 +14,6 @@
 #include <functional>
 #include <vector>
 
-#include <async/auto_wait.h>
 #include "lib/fsl/io/redirection.h"
 #include "lib/fxl/files/unique_fd.h"
 #include "lib/fxl/functional/closure.h"

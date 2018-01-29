@@ -4,7 +4,7 @@
 
 #include "topaz/app/moterm/shell_controller.h"
 
-#include <async/auto_wait.h>
+#include <async/cpp/auto_wait.h>
 #include <async/default.h>
 #include <string.h>
 #include <zircon/processargs.h>
