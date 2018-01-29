@@ -177,6 +177,15 @@ abstract class Binding<T> {
       ..onError = _handleError;
   }
 
+  /// Event for binding.
+  _VoidCallback onBind;
+
+  /// Event for unbinding.
+  _VoidCallback onUnbind;
+
+  /// Event for when the binding is closed.
+  _VoidCallback onClose;
+
   /// Returns an interface handle whose peer is bound to the given object.
   ///
   /// Creates a channel pair, binds one of the channels to this object, and
@@ -192,6 +201,11 @@ abstract class Binding<T> {
     }
     _impl = impl;
     _reader.bind(pair.first);
+
+    if (onBind != null) {
+      onBind();
+    }
+
     return new InterfaceHandle<T>(pair.second, version);
   }
 
@@ -212,6 +226,10 @@ abstract class Binding<T> {
     assert(channel != null);
     _impl = impl;
     _reader.bind(channel);
+
+    if (onBind != null) {
+      onBind();
+    }
   }
 
   /// Unbinds [impl] and returns the unbound channel as an interface request.
@@ -226,6 +244,11 @@ abstract class Binding<T> {
     final InterfaceRequest<T> result =
         new InterfaceRequest<T>(_reader.unbind());
     _impl = null;
+
+    if (onUnbind != null) {
+      onUnbind();
+    }
+
     return result;
   }
 
@@ -236,6 +259,10 @@ abstract class Binding<T> {
     if (isBound) {
       _reader.close();
       _impl = null;
+
+      if (onClose != null) {
+        onClose();
+      }
     }
   }
 
@@ -337,6 +364,15 @@ class ProxyController<T> {
       ..onError = _handleError;
   }
 
+  /// Event for binding.
+  _VoidCallback onBind;
+
+  /// Event for unbinding.
+  _VoidCallback onUnbind;
+
+  /// Event for when the binding is closed.
+  _VoidCallback onClose;
+
   /// The service name associated with [T], if any.
   ///
   /// Corresponds to the `[ServiceName]` attribute in the FIDL interface
@@ -362,6 +398,11 @@ class ProxyController<T> {
     assert(pair.status == ZX.OK);
     _version = version;
     _reader.bind(pair.first);
+
+    if (onBind != null) {
+      onBind();
+    }
+
     return new InterfaceRequest<T>(pair.second);
   }
 
@@ -380,6 +421,10 @@ class ProxyController<T> {
     assert(interfaceHandle.channel != null);
     _version = interfaceHandle.version;
     _reader.bind(interfaceHandle.passChannel());
+
+    if (onBind != null) {
+      onBind();
+    }
   }
 
   /// Unbinds the proxy and returns the unbound channel as an interface handle.
@@ -393,6 +438,11 @@ class ProxyController<T> {
     if (!_reader.isBound) {
       return null;
     }
+
+    if (onUnbind != null) {
+      onUnbind();
+    }
+
     return new InterfaceHandle<T>(_reader.unbind(), _version);
   }
 
@@ -411,6 +461,10 @@ class ProxyController<T> {
       }
       _reset();
       _reader.close();
+
+      if (onClose != null) {
+        onClose();
+      }
     }
   }
 

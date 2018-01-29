@@ -6,6 +6,7 @@ part of zircon;
 
 // ignore_for_file: public_member_api_docs
 
+// TODO: ZirconApiError should be an exception.
 class ZirconApiError extends Error {
   final String message;
   ZirconApiError(this.message) : super();

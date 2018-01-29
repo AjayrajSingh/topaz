@@ -14,6 +14,8 @@ import 'package:lib.fidl.dart/bindings.dart';
 import 'package:zircon/zircon.dart';
 
 class ApplicationContext {
+  static ApplicationContext _context;
+
   ApplicationContext();
 
   final ApplicationEnvironmentProxy environment =
@@ -23,6 +25,11 @@ class ApplicationContext {
   final ServiceProviderImpl outgoingServices = new ServiceProviderImpl();
 
   factory ApplicationContext.fromStartupInfo() {
+    if (_context != null) {
+      return _context;
+    }
+
+
     final ApplicationContext context = new ApplicationContext();
 
     final Handle environmentHandle = MxStartupInfo.takeEnvironment();
@@ -39,6 +46,8 @@ class ApplicationContext {
       context.outgoingServices.bind(new InterfaceRequest<ServiceProvider>(
           new Channel(outgoingServicesHandle)));
     }
+
+    _context = context;
 
     return context;
   }

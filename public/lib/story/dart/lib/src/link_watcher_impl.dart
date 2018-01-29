@@ -1,23 +1,26 @@
-// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:meta/meta.dart';
 
-/// Called when [LinkWatcher.notify] is called.
+/// Handler for when [LinkWatcher#notify] is called by the framework.
 typedef void LinkWatcherNotifyCallback(String data);
 
-/// Implements a [LinkWatcher] for receiving notifications from a [Link]
-/// instance.
+/// Implements [LinkWatcher] for receiving update notifications from a [Link].
 class LinkWatcherImpl extends LinkWatcher {
   /// Called when [LinkWatcher.notify] is called.
   final LinkWatcherNotifyCallback onNotify;
 
   /// Creates a new instance of [LinkWatcherImpl].
-  LinkWatcherImpl({this.onNotify});
+  LinkWatcherImpl({
+    @required this.onNotify,
+  })
+      : assert(onNotify != null);
 
   @override
   void notify(String data) {
-    onNotify?.call(data);
+    onNotify(data);
   }
 }

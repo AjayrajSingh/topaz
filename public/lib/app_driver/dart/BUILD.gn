@@ -1,4 +1,4 @@
-# Copyright 2016 The Chromium Authors. All rights reserved.
+# Copyright 2018 The Chromium Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
@@ -7,12 +7,11 @@ import("//build/dart/dart_library.gni")
 dart_library("dart") {
   infer_package_name = true
 
-  source_dir = "."
-
   deps = [
-    "//garnet/public/lib/app/fidl:fidl_dart",
-    "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/logging:lib.logging",
-    "//topaz/public/dart/zircon",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/lifecycle/dart",
+    "//topaz/public/lib/module/dart",
+    "//topaz/public/lib/story/dart",
   ]
 }
