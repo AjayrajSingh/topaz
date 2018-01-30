@@ -53,7 +53,7 @@ void setupLogger({
     assert(() {
       inCheckedMode = true;
       return true;
-    });
+    }());
 
     final bool showCodeLocation =
         (forceShowCodeLocation ?? false) || inCheckedMode;
