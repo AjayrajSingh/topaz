@@ -266,7 +266,7 @@
     <project name="third_party/dart/third_party/pkg/test"
              path="third_party/dart/third_party/pkg/test"
              remote="https://dart.googlesource.com/test.git"
-             revision="0.12.29+1"/>
+             revision="0.12.30+1"/>
 
     <project name="third_party/dart/third_party/pkg/test_descriptor"
              path="third_party/dart/third_party/pkg/test_descriptor"
@@ -322,6 +322,11 @@
              path="third_party/dart/third_party/pkg_tested/dart_style"
              remote="https://dart.googlesource.com/dart_style.git"
              revision="1.0.9"/>
+
+    <project name="third_party/dart/third_party/pkg_tested/http_io"
+             path="third_party/dart/third_party/pkg_tested/http_io"
+             remote="https://dart.googlesource.com/http_io.git"
+             revision="bea7f236fbd62f6e1b47d4806a889f628c58d114"/>
 
     <project name="third_party/dart/third_party/pkg_tested/package_config"
              path="third_party/dart/third_party/pkg_tested/package_config"
