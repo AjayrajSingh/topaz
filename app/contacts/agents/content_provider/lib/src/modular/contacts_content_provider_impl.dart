@@ -57,7 +57,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   final Map<String, _DataProvider> _dataProviders = <String, _DataProvider>{};
 
   /// Store for the consolidated contacts information
-  ContactsStore<fidl.Contact> _contactsStore;
+  ContactsStore _contactsStore;
 
   /// [ComponentContext] used for interfacing with Ledger
   final ComponentContext _componentContext;
@@ -88,11 +88,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
         assert(agentContext != null),
         _componentContext = componentContext,
         _agentContext = agentContext {
-    _contactsStore = new ContactsStore<fidl.Contact>(
-      getId: _getIdFromContact,
-      getDisplayName: _getDisplayNameFromContact,
-      getSearchableValues: _getSearchableValuesFromContact,
-    );
+    _contactsStore = new ContactsStore();
   }
 
   /// Runs necessary methods to initialize the contacts content provider
@@ -298,28 +294,6 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
         _contactsStore.addContact(contact, updateIfExists: true);
       }
     }
-  }
-
-  String _getIdFromContact(fidl.Contact contact) => contact?.contactId;
-
-  String _getDisplayNameFromContact(fidl.Contact contact) =>
-      contact?.displayName;
-
-  List<String> _getSearchableValuesFromContact(fidl.Contact contact) {
-    List<String> searchableValues = <String>[];
-    if (contact != null) {
-      // TODO: add back ability to search on parts of the users names SO-1018
-      searchableValues = <String>[contact.displayName.trim().toLowerCase()];
-
-      // Allow contact to be searchable on all of their email addresses
-      for (fidl.EmailAddress e in contact.emails) {
-        if (e != null && e.value.trim().isNotEmpty) {
-          searchableValues.add(e.value.trim());
-        }
-      }
-    }
-
-    return searchableValues;
   }
 
   /// Initialize connection to ledger and get the page of contacts data

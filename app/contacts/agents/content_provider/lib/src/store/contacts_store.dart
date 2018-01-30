@@ -4,66 +4,47 @@
 
 import 'dart:collection';
 
-import 'package:meta/meta.dart';
+import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
+    as fidl;
 
 import 'prefix_tree.dart';
-
-/// Returns the id of the contact
-typedef String GetId<T>(T contact);
-
-/// Returns the display name of the contact
-typedef String GetDisplayName<T>(T contact);
-
-/// Returns all the searchable values for the contact
-typedef List<String> GetSearchableValues<T>(T contact);
 
 /// A [ContactsStore] that holds contacts objects.
 /// It allows prefix search of the searchable fields, listing contacts
 /// alphabetically based on display name, and retrieving specific contacts.
-///
-/// Note: ideally this would directly take a Contact class defined by the
-/// FIDL interface however if we have a dependency on the FIDL defined
-/// classes then it cannot be easily unit tested at this time.
-///
-/// TODO(meiyili): remove generic once using FIDL defined structs no longer
-/// prevents local host unit tests (SO-746).
-class ContactsStore<T> {
+class ContactsStore {
   /// Map that stores the contact object given its ID
-  final Map<String, T> _contactMap = new HashMap<String, T>();
+  final Map<String, fidl.Contact> _contactMap =
+      new HashMap<String, fidl.Contact>();
 
   /// Takes the displayName as the key and a set of contact ids as the value
   /// in case there are multiple contacts with the same display name
-  final SplayTreeMap<String, Set<T>> _displayNameIndex =
-      new SplayTreeMap<String, Set<T>>(_compareDisplayNames);
+  final SplayTreeMap<String, Set<fidl.Contact>> _displayNameIndex =
+      new SplayTreeMap<String, Set<fidl.Contact>>(_compareDisplayNames);
 
   /// The prefix tree that allows prefix searching through all searchable fields
-  final PrefixTree<Set<T>> _prefixTree = new PrefixTree<Set<T>>();
+  final PrefixTree<Set<fidl.Contact>> _prefixTree =
+      new PrefixTree<Set<fidl.Contact>>();
 
-  // Methods to retrieve the key values of the contact
-  final GetId<T> _getId;
-  final GetDisplayName<T> _getDisplayName;
-  final GetSearchableValues<T> _getSearchableValues;
+  List<String> _getSearchableValues(fidl.Contact contact) {
+    List<String> searchableValues = <String>[];
+    if (contact != null) {
+      // TODO: add back ability to search on parts of the users names SO-1018
+      searchableValues = <String>[
+        contact.displayName.trim(),
+        contact.displayName.trim().toLowerCase()
+      ];
 
-  /// Create a contact store instance that takes methods to derive the necessary
-  /// contact data from type [T] to index on.
-  ///
-  /// Note: ideally this would directly take a Contact class defined by the
-  /// FIDL interface however if we have a dependency on the FIDL defined
-  /// classes then it cannot be easily unit tested at this time
-  ///
-  /// TODO(meiyili): once using FIDL defined structs no long prevents local
-  /// unit tests change this to addContact(Contact contact) (SO-746).
-  ContactsStore({
-    @required GetId<T> getId,
-    @required GetDisplayName<T> getDisplayName,
-    @required GetSearchableValues<T> getSearchableValues,
-  })
-      : assert(getId != null),
-        assert(getDisplayName != null),
-        assert(getSearchableValues != null),
-        _getId = getId,
-        _getDisplayName = getDisplayName,
-        _getSearchableValues = getSearchableValues;
+      // Allow contact to be searchable on all of their email addresses
+      for (fidl.EmailAddress e in contact.emails) {
+        if (e != null && e.value.trim().isNotEmpty) {
+          searchableValues.add(e.value.trim());
+        }
+      }
+    }
+
+    return searchableValues;
+  }
 
   /// Add contact data to the store.
   ///
@@ -75,11 +56,11 @@ class ContactsStore<T> {
   ///
   /// [updateIfExists] allows the caller to update the value instead of adding
   /// it if it already exists in the contacts store.
-  void addContact(T contact, {bool updateIfExists: false}) {
+  void addContact(fidl.Contact contact, {bool updateIfExists: false}) {
     _validateContact(contact, updateIfExists);
 
-    String id = _getId(contact);
-    String displayName = _getDisplayName(contact);
+    String id = contact.contactId;
+    String displayName = contact.displayName;
     List<String> searchableValues = _getSearchableValues(contact);
 
     // Since store doesn't know the specifics of the contact object, rather
@@ -91,19 +72,19 @@ class ContactsStore<T> {
     _contactMap[id] = contact;
 
     // Add to the displayName index
-    _displayNameIndex[displayName] ??= new Set<T>();
+    _displayNameIndex[displayName] ??= new Set<fidl.Contact>();
     _displayNameIndex[displayName].add(contact);
 
     // Add all searchable values to the prefix tree
     for (String value in searchableValues) {
-      _prefixTree[value] ??= new Set<T>();
+      _prefixTree[value] ??= new Set<fidl.Contact>();
       _prefixTree[value].add(contact);
     }
   }
 
   /// Remove the contact with the given [id] from the store
   void removeContact(String id) {
-    T contact = _contactMap[id];
+    fidl.Contact contact = _contactMap[id];
     if (contact == null) {
       return;
     }
@@ -113,15 +94,16 @@ class ContactsStore<T> {
     // values and removing them as well as the old contact object from the store
     _contactMap.remove(id);
 
-    String displayName = _getDisplayName(contact);
-    Set<T> displayNameSet = _displayNameIndex[displayName]..remove(contact);
+    String displayName = contact.displayName;
+    Set<fidl.Contact> displayNameSet = _displayNameIndex[displayName]
+      ..remove(contact);
     if (displayNameSet.isEmpty) {
       _displayNameIndex.remove(displayName);
     }
 
     List<String> searchableValues = _getSearchableValues(contact);
     for (String value in searchableValues) {
-      Set<T> prefixContacts = _prefixTree[value];
+      Set<fidl.Contact> prefixContacts = _prefixTree[value];
 
       // A contact may have duplicate emails, the set may have already been
       // removed
@@ -135,14 +117,14 @@ class ContactsStore<T> {
   }
 
   /// Return the list of all contacts sorted by displayName
-  List<T> getAllContacts() {
+  List<fidl.Contact> getAllContacts() {
     return _displayNameIndex.values
-        .expand((Set<T> contacts) => contacts)
+        .expand((Set<fidl.Contact> contacts) => contacts)
         .toList();
   }
 
   /// Return the contact that matches the given [id] otherwise return null
-  T getContact(String id) => _contactMap[id];
+  fidl.Contact getContact(String id) => _contactMap[id];
 
   /// Return whether or not the store contains a contact with the given [id]
   bool containsContact(String id) => _contactMap.containsKey(id);
@@ -155,31 +137,31 @@ class ContactsStore<T> {
   /// Searches through all searchable values that start with the given [prefix]
   /// Returns a map with the matching strings as keys and the contacts
   /// associated with each matched string as its value.
-  Map<String, Set<T>> search(String prefix) => _prefixTree.search(prefix);
+  Map<String, Set<fidl.Contact>> search(String prefix) =>
+      _prefixTree.search(prefix);
 
-  void _validateContact(T contact, bool isValidIfExists) {
+  void _validateContact(fidl.Contact contact, bool isValidIfExists) {
     if (contact == null) {
       throw new ArgumentError.notNull('contact');
     }
 
-    String id;
-    String displayName;
-    List<String> searchableValues;
-    try {
-      id = _getId(contact);
-      displayName = _getDisplayName(contact);
-      searchableValues = _getSearchableValues(contact);
-    } on Exception catch (e) {
-      throw new ArgumentError('Error extracting contact details. error = $e');
-    }
-
+    String id = contact.contactId;
     if (id == null || id.isEmpty) {
       throw new ArgumentError('id cannot be null or empty');
     } else if (_contactMap.containsKey(id) && !isValidIfExists) {
       throw new ArgumentError('$id already exists in ContactsStore');
     }
+
+    String displayName = contact.displayName;
     if (displayName == null || displayName.isEmpty) {
       throw new ArgumentError('displayName cannot be null or empty');
+    }
+
+    List<String> searchableValues;
+    try {
+      searchableValues = _getSearchableValues(contact);
+    } on Exception catch (e) {
+      throw new ArgumentError('Error extracting searchable values. error = $e');
     }
     if (searchableValues == null || searchableValues.isEmpty) {
       throw new ArgumentError('searchableValues cannot be null or empty');
