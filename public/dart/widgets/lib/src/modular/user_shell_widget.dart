@@ -44,15 +44,19 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
 
   final T _userShellModel;
 
+  final VoidCallback _onWindowMetricsChanged;
+
   /// Constructor.
   factory UserShellWidget({
     ApplicationContext applicationContext,
     T userShellModel,
+    VoidCallback onWindowMetricsChanged,
     Widget child,
   }) =>
       new UserShellWidget<T>._create(
         applicationContext: applicationContext,
         userShellModel: userShellModel,
+        onWindowMetricsChanged: onWindowMetricsChanged,
         child: child,
         userShellBinding: new UserShellBinding(),
         lifecycleBinding: new LifecycleBinding(),
@@ -61,12 +65,14 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
   UserShellWidget._create({
     ApplicationContext applicationContext,
     T userShellModel,
+    VoidCallback onWindowMetricsChanged,
     Widget child,
     UserShellBinding userShellBinding,
     LifecycleBinding lifecycleBinding,
   })
       : _applicationContext = applicationContext,
         _userShellModel = userShellModel,
+        _onWindowMetricsChanged = onWindowMetricsChanged,
         _child = child,
         _userShellBinding = userShellBinding,
         _lifecycleBinding = lifecycleBinding,
@@ -87,6 +93,7 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
           child: new Directionality(
             textDirection: TextDirection.ltr,
             child: new WindowMediaQuery(
+              onWindowMetricsChanged: _onWindowMetricsChanged,
               child: new Listener(
                 // TODO: determine idleness in a better way (DNO-147).
                 onPointerDown: (_) => _idleModel.onUserInteraction(),
