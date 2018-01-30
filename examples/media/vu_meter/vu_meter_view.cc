@@ -40,7 +40,7 @@ VuMeterView::VuMeterView(
       application_context->ConnectToEnvironmentService<media::AudioServer>();
   audio_server->CreateCapturer(capturer_.NewRequest(), false);
 
-  capturer_.set_connection_error_handler([this]() {
+  capturer_.set_error_handler([this]() {
     FXL_LOG(ERROR) << "Connection error occurred. Quitting.";
     Shutdown();
   });
@@ -190,7 +190,7 @@ void VuMeterView::OnPacketCaptured(media::MediaPacketPtr packet) {
 }
 
 void VuMeterView::Shutdown() {
-    capturer_.reset();
+    capturer_.Unbind();
     fsl::MessageLoop::GetCurrent()->PostQuitTask();
 }
 

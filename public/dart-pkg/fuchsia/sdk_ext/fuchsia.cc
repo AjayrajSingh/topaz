@@ -121,12 +121,12 @@ void Initialize(
 
   DART_CHECK_VALID(Dart_SetField(
       library, ToDart("_environment"),
-      ToDart(zircon::dart::Handle::Create(environment.PassHandle()))));
+      ToDart(zircon::dart::Handle::Create(environment.TakeChannel()))));
 
   if (outgoing_services) {
     DART_CHECK_VALID(Dart_SetField(
         library, ToDart("_outgoingServices"),
-        ToDart(zircon::dart::Handle::Create(outgoing_services.PassChannel()))));
+        ToDart(zircon::dart::Handle::Create(outgoing_services.TakeChannel()))));
   }
 }
 

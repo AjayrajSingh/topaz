@@ -59,9 +59,9 @@ DartApplicationController::DartApplicationController(
       application_(std::move(application)),
       startup_info_(std::move(startup_info)),
       binding_(this) {
-  if (controller.is_pending()) {
+  if (controller.is_valid()) {
     binding_.Bind(std::move(controller));
-    binding_.set_connection_error_handler([this] { Kill(); });
+    binding_.set_error_handler([this] { Kill(); });
   }
 }
 
@@ -425,7 +425,7 @@ void DartApplicationController::Kill() {
 }
 
 void DartApplicationController::Detach() {
-  binding_.set_connection_error_handler(fxl::Closure());
+  binding_.set_error_handler(fxl::Closure());
 }
 
 void DartApplicationController::Wait(const WaitCallback& callback) {

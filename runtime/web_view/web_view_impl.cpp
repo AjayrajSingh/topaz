@@ -122,8 +122,7 @@ void WebViewImpl::ClearCookies() {
 
 void WebViewImpl::SetWebRequestDelegate(
     ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) {
-  webRequestDelegate_ =
-      web_view::WebRequestDelegatePtr::Create(std::move(delegate));
+  webRequestDelegate_ = delegate.Bind();
 }
 
 bool WebViewImpl::HandleKeyboardEvent(const mozart::InputEventPtr& event) {

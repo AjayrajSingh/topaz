@@ -505,7 +505,7 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
                            OAuthTokenManagerApp* const app,
                            fidl::InterfaceRequest<TokenProviderFactory> request)
       : account_id_(account_id), binding_(this, std::move(request)), app_(app) {
-    binding_.set_connection_error_handler(
+    binding_.set_error_handler(
         [this] { app_->token_provider_factory_impls_.erase(account_id_); });
   }
 
@@ -991,7 +991,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
     app_->account_provider_context_->GetAuthenticationContext(
         account_->id, auth_context_.NewRequest());
 
-    auth_context_.set_connection_error_handler([this] {
+    auth_context_.set_error_handler([this] {
       callback_(nullptr, "Overlay cancelled by device shell.");
       Done();
     });
@@ -1022,7 +1022,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
     // code to long lived credential.
     // Also, de-register previously registered error callbacks since calling
     // StopOverlay() might cause this connection to be closed.
-    auth_context_.set_connection_error_handler([] {});
+    auth_context_.set_error_handler([] {});
     auth_context_->StopOverlay();
 
     auto code = uri.substr(prefix.size(), std::string::npos);
@@ -1135,7 +1135,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
     callback_(nullptr, error_message);
-    auth_context_.set_connection_error_handler([] {});
+    auth_context_.set_error_handler([] {});
     auth_context_->StopOverlay();
     Done();
   }
@@ -1147,7 +1147,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
     web_view_launch_info->service_request = web_view_services.NewRequest();
     app_->application_context_->launcher()->CreateApplication(
         std::move(web_view_launch_info), web_view_controller_.NewRequest());
-    web_view_controller_.set_connection_error_handler([this] {
+    web_view_controller_.set_error_handler([this] {
       FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
     });
 

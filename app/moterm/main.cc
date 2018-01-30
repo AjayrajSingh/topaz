@@ -47,9 +47,9 @@ class App : modular::Module, modular::Lifecycle {
     // view provider service.
     story_marker_ = application_context_
                         ->ConnectToEnvironmentService<modular::StoryMarker>();
-    story_marker_.set_connection_error_handler([this] {
+    story_marker_.set_error_handler([this] {
       history_.Initialize(nullptr);
-      story_marker_.reset();
+      story_marker_.Unbind();
     });
   }
 
@@ -81,7 +81,7 @@ class App : modular::Module, modular::Lifecycle {
           LogLedgerError(status, "GetRootPage");
         }));
 
-    story_marker_.reset();
+    story_marker_.Unbind();
     history_.Initialize(std::move(history_page));
   }
 

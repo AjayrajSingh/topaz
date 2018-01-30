@@ -56,7 +56,7 @@ void WebViewProvider::CreateView(
 void WebViewProvider::Initialize(
     fidl::InterfaceHandle<modular::ModuleContext> context,
     fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
-  auto context_ptr = modular::ModuleContextPtr::Create(std::move(context));
+  auto context_ptr = context.Bind();
   context_ptr->GetLink(nullptr, main_link_.NewRequest());
   main_link_->Watch(main_link_watcher_binding_.NewBinding());
 
