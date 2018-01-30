@@ -205,7 +205,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
         messageSender.ctrl.request(),
       );
       _messageSenders[messageQueueToken] = messageSender;
-      log.info('Added subscription for token $messageQueueToken');
+      log.fine('Added subscription for token $messageQueueToken');
     }
   }
 
@@ -233,9 +233,9 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     List<fidl.Contact> contacts,
     void callback(fidl.Status status),
   ) {
-    log.info('addAll called');
+    log.fine('addAll called');
     _saveContactsToLedger(contacts).then((bool saved) {
-      log.info('addAll completed');
+      log.fine('addAll completed');
       callback(saved ? fidl.Status.ok : fidl.Status.error);
     });
   }
@@ -346,7 +346,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
           'contact_list': _contactsStore.getAllContacts()
         };
         String json = JSON.encode(message);
-        log.info('Sending update to ${_messageSenders.length} subscribers');
+        log.fine('Sending update to ${_messageSenders.length} subscribers');
         for (MessageSenderProxy ms in _messageSenders.values) {
           ms.send(json);
         }
@@ -425,7 +425,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     _page.startTransaction(completer.complete);
     bool startTransactionOk = (await completer.future) == ledger.Status.ok;
     if (startTransactionOk) {
-      log.info('Started ledger transaction');
+      log.fine('Started ledger transaction');
       List<Future<ledger.Status>> putStatuses = <Future<ledger.Status>>[];
       for (fidl.Contact contact in (contacts ?? <fidl.Contact>[])) {
         Completer<ledger.Status> statusCompleter =
@@ -447,7 +447,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
 
       // TODO: determine what to do if the commit or rollback fails SO-1041
       if (allSucceeded) {
-        log.info('Ledger operations succeeded');
+        log.fine('Ledger operations succeeded');
         completer = new Completer<ledger.Status>();
         _page.commit((ledger.Status status) => completer.complete(status));
         bool commitOk = (await completer.future) == ledger.Status.ok;
@@ -459,7 +459,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
         _page.rollback((ledger.Status status) => completer.complete(status));
         await completer.future;
         updated = false;
-        log.info('Ledger operations failed, rolled back');
+        log.fine('Ledger operations failed, rolled back');
       }
     }
     return updated;

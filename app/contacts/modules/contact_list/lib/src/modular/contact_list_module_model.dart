@@ -255,7 +255,7 @@ class ContactListModuleModel extends ModuleModel {
     ack();
 
     Map<String, dynamic> updates = JSON.decode(data);
-    log.info('Decoded contact updates = $updates');
+    log.fine('Decoded contact updates = $updates');
 
     if (updates.containsKey('contact_list')) {
       List<ContactItem> updatedContacts = updates['contact_list']
