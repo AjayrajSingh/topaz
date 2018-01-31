@@ -7,11 +7,11 @@
 
 #include <zircon/syscalls.h>
 
-#include "third_party/dart/runtime/include/dart_api.h"
 #include "dart-pkg/zircon/sdk_ext/handle.h"
 #include "lib/tonic/dart_library_natives.h"
 #include "lib/tonic/dart_wrappable.h"
 #include "lib/tonic/typed_data/dart_byte_data.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 
 namespace zircon {
 namespace dart {
@@ -39,6 +39,7 @@ class System : public fxl::RefCountedThreadSafe<System>,
   static Dart_Handle SocketRead(fxl::RefPtr<Handle> socket, size_t size);
 
   static Dart_Handle VmoCreate(uint64_t size, uint32_t options);
+  static Dart_Handle VmoFromFile(std::string path);
   static Dart_Handle VmoGetSize(fxl::RefPtr<Handle> vmo);
   static zx_status_t VmoSetSize(fxl::RefPtr<Handle> vmo, uint64_t size);
   static Dart_Handle VmoWrite(fxl::RefPtr<Handle> vmo,
@@ -48,9 +49,16 @@ class System : public fxl::RefCountedThreadSafe<System>,
                              uint64_t offset,
                              size_t size);
 
+  static Dart_Handle VmoMap(fxl::RefPtr<Handle> vmo);
+
   static uint64_t ClockGet(uint32_t clock_id);
 
   static void RegisterNatives(tonic::DartLibraryNatives* natives);
+
+ private:
+  static void VmoMapFinalizer(void* isolate_callback_data,
+                              Dart_WeakPersistentHandle handle,
+                              void* peer);
 };
 
 }  // namespace dart

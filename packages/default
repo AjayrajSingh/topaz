@@ -8,6 +8,7 @@
         "topaz/packages/dart_examples",
         "topaz/packages/dart_runner",
         "topaz/packages/dart_unittests",
+        "topaz/packages/dart_target_unittests",
         "topaz/packages/dashboard",
         "topaz/packages/documents",
         "topaz/packages/examples",

@@ -40,4 +40,34 @@ class Vmo extends _HandleWrapper<Vmo> {
 
     return System.vmoRead(handle, vmoOffset, numBytes);
   }
+
+  /// Maps the Vmo into the process's root vmar, and returns it as a typed data
+  /// array.
+  ///
+  /// The returned [Uint8List] is read-only. Attempts to write to it will
+  /// crash the process.
+  // TODO(dartbug.com/32028): When read only typed-data arrays are added to the
+  // Dart SDK, return one of those instead.
+  Uint8List map() {
+    MapResult r = System.vmoMap(handle)..checkStatus();
+    return r.data;
+  }
+}
+
+class SizedVmo extends Vmo {
+  final int _size;
+
+  SizedVmo(Handle handle, this._size) : super(handle);
+
+  /// Uses fdio_get_vmo() to get a VMO for the file at `path` in the current
+  /// Isolates namespace.
+  ///
+  /// The returned Vmo is read-only.
+  factory SizedVmo.fromFile(String path) {
+    FromFileResult r = System.vmoFromFile(path)..checkStatus();
+    return new SizedVmo(r.handle, r.numBytes);
+  }
+
+  /// Size of the Vmo in bytes.
+  int get size => _size;
 }

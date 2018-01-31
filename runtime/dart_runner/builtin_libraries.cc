@@ -4,18 +4,18 @@
 
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 
-#include <zx/channel.h>
 #include <fdio/namespace.h>
+#include <zx/channel.h>
 
-#include "third_party/dart/runtime/bin/io_natives.h"
-#include "third_party/dart/runtime/include/dart_api.h"
 #include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"
+#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/logging/dart_error.h"
+#include "third_party/dart/runtime/bin/io_natives.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 
 using tonic::ToDart;
 
@@ -92,7 +92,9 @@ void ScheduleMicrotask(Dart_NativeArguments args) {
 
 void InitBuiltinLibrariesForIsolate(
     const std::string& script_uri,
-    fdio_ns_t* namespc, int stdoutfd, int stderrfd,
+    fdio_ns_t* namespc,
+    int stdoutfd,
+    int stderrfd,
     std::unique_ptr<app::ApplicationContext> context,
     fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
   // dart:fuchsia --------------------------------------------------------------
@@ -112,6 +114,12 @@ void InitBuiltinLibrariesForIsolate(
   Dart_Handle io_lib = Dart_LookupLibrary(ToDart("dart:io"));
   DART_CHECK_VALID(Dart_SetNativeResolver(io_lib, dart::bin::IONativeLookup,
                                           dart::bin::IONativeSymbol));
+
+  // dart:zircon ---------------------------------------------------------------
+
+  Dart_Handle zircon_lib = Dart_LookupLibrary(ToDart("dart:zircon"));
+  DART_CHECK_VALID(zircon_lib);
+  // NativeResolver already set by fuchsia::dart::Initialize().
 
   // Core libraries ------------------------------------------------------------
 
@@ -144,15 +152,21 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(Dart_Invoke(
       async_lib, ToDart("_setScheduleImmediateClosure"), 1, schedule_args));
 
-  // Set up the namespace.
+  // Set up the namespace in dart:io.
   Dart_Handle namespace_type =
       Dart_GetType(io_lib, ToDart("_Namespace"), 0, nullptr);
   DART_CHECK_VALID(namespace_type);
   Dart_Handle namespace_args[1];
-  namespace_args[0] = Dart_NewInteger(reinterpret_cast<intptr_t>(namespc));
+  namespace_args[0] = ToDart(reinterpret_cast<intptr_t>(namespc));
   DART_CHECK_VALID(namespace_args[0]);
-  DART_CHECK_VALID(Dart_Invoke(
-      namespace_type, ToDart("_setupNamespace"), 1, namespace_args));
+  DART_CHECK_VALID(Dart_Invoke(namespace_type, ToDart("_setupNamespace"), 1,
+                               namespace_args));
+
+  // Set up the namespace in dart:zircon.
+  namespace_type = Dart_GetType(zircon_lib, ToDart("_Namespace"), 0, nullptr);
+  DART_CHECK_VALID(namespace_type);
+  DART_CHECK_VALID(Dart_SetField(namespace_type, ToDart("_namespace"),
+                                 ToDart(reinterpret_cast<intptr_t>(namespc))));
 
   // Set up stdout and stderr.
   Dart_Handle stdio_args[3];

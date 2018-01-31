@@ -6,6 +6,14 @@
 
 #include <array>
 
+#include <fcntl.h>
+#include <fdio/io.h>
+#include <fdio/namespace.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <zircon/process.h>
+
+#include "lib/fxl/files/unique_fd.h"
 #include "lib/tonic/dart_binding_macros.h"
 #include "lib/tonic/dart_class_library.h"
 
@@ -21,6 +29,8 @@ constexpr char kHandlePairResult[] = "HandlePairResult";
 constexpr char kHandleResult[] = "HandleResult";
 constexpr char kReadResult[] = "ReadResult";
 constexpr char kWriteResult[] = "WriteResult";
+constexpr char kFromFileResult[] = "FromFileResult";
+constexpr char kMapResult[] = "MapResult";
 
 class ByteDataScope {
  public:
@@ -97,8 +107,8 @@ template <class... Args>
 Dart_Handle ConstructDartObject(const char* class_name, Args&&... args) {
   tonic::DartClassLibrary& class_library =
       tonic::DartState::Current()->class_library();
-  Dart_Handle type = Dart_HandleFromPersistent(
-      class_library.GetClass("zircon", class_name));
+  Dart_Handle type =
+      Dart_HandleFromPersistent(class_library.GetClass("zircon", class_name));
   FXL_DCHECK(!tonic::LogIfError(type));
 
   const char* cstr;
@@ -262,6 +272,42 @@ Dart_Handle System::VmoCreate(uint64_t size, uint32_t options) {
   }
 }
 
+Dart_Handle System::VmoFromFile(std::string path) {
+  // Grab the fdio_ns_t* out of the isolate.
+  Dart_Handle zircon_lib = Dart_LookupLibrary(ToDart("dart:zircon"));
+  FXL_DCHECK(!tonic::LogIfError(zircon_lib));
+  Dart_Handle namespace_type =
+      Dart_GetType(zircon_lib, ToDart("_Namespace"), 0, nullptr);
+  FXL_DCHECK(!tonic::LogIfError(namespace_type));
+  Dart_Handle namespace_field =
+      Dart_GetField(namespace_type, ToDart("_namespace"));
+  FXL_DCHECK(!tonic::LogIfError(namespace_field));
+  uint64_t fdio_ns_ptr;
+  Dart_Handle result = Dart_IntegerToUint64(namespace_field, &fdio_ns_ptr);
+  FXL_DCHECK(!tonic::LogIfError(result));
+
+  // Get a VMO for the file.
+  fdio_ns_t* ns = reinterpret_cast<fdio_ns_t*>(fdio_ns_ptr);
+  fxl::UniqueFD dirfd(fdio_ns_opendir(ns));
+  if (!dirfd.is_valid())
+    return ConstructDartObject(kFromFileResult, ToDart(ZX_ERR_NO_MEMORY));
+  fxl::UniqueFD fd(openat(dirfd.get(), path.c_str(), O_RDONLY));
+  if (!fd.is_valid())
+    return ConstructDartObject(kFromFileResult, ToDart(ZX_ERR_IO));
+
+  struct stat stat_struct;
+  if (fstat(fd.get(), &stat_struct) == -1)
+    return ConstructDartObject(kFromFileResult, ToDart(ZX_ERR_IO));
+  zx_handle_t vmo = ZX_HANDLE_INVALID;
+  zx_status_t status = fdio_get_vmo(fd.get(), &vmo);
+  if (status != ZX_OK)
+    return ConstructDartObject(kFromFileResult, ToDart(status));
+
+  return ConstructDartObject(kFromFileResult, ToDart(status),
+                             ToDart(Handle::Create(vmo)),
+                             ToDart(stat_struct.st_size));
+}
+
 Dart_Handle System::VmoGetSize(fxl::RefPtr<Handle> vmo) {
   if (!vmo || !vmo->is_valid()) {
     return ConstructDartObject(kGetSizeResult, ToDart(ZX_ERR_BAD_HANDLE));
@@ -311,16 +357,58 @@ Dart_Handle System::VmoRead(fxl::RefPtr<Handle> vmo,
     FXL_DCHECK(actual <= size);
     return ConstructDartObject(kReadResult, ToDart(status), bytes.dart_handle(),
                                ToDart(size));
-  } else {
-    return ConstructDartObject(kReadResult, ToDart(status));
   }
+  return ConstructDartObject(kReadResult, ToDart(status));
+}
+
+struct SizedRegion {
+  SizedRegion(void* r, size_t s) : region(r), size(s) {}
+  void* region;
+  size_t size;
+};
+
+void System::VmoMapFinalizer(void* isolate_callback_data,
+                             Dart_WeakPersistentHandle handle,
+                             void* peer) {
+  SizedRegion* r = reinterpret_cast<SizedRegion*>(peer);
+  zx_vmar_unmap(zx_vmar_root_self(), reinterpret_cast<uintptr_t>(r->region),
+                r->size);
+  delete r;
+}
+
+Dart_Handle System::VmoMap(fxl::RefPtr<Handle> vmo) {
+  if (!vmo || !vmo->is_valid())
+    return ConstructDartObject(kMapResult, ToDart(ZX_ERR_BAD_HANDLE));
+
+  uint64_t size;
+  zx_status_t status = zx_vmo_get_size(vmo->handle(), &size);
+  if (status != ZX_OK)
+    return ConstructDartObject(kMapResult, ToDart(status));
+
+  uintptr_t mapped_addr;
+  status = zx_vmar_map(zx_vmar_root_self(), 0, vmo->handle(), 0, size,
+                       ZX_VM_FLAG_PERM_READ, &mapped_addr);
+  if (status != ZX_OK)
+    return ConstructDartObject(kMapResult, ToDart(status));
+
+  void* data = reinterpret_cast<void*>(mapped_addr);
+  Dart_Handle object = Dart_NewExternalTypedData(Dart_TypedData_kUint8, data,
+                                                 static_cast<intptr_t>(size));
+  FXL_DCHECK(!tonic::LogIfError(object));
+
+  SizedRegion* r = new SizedRegion(data, size);
+  Dart_NewWeakPersistentHandle(object, reinterpret_cast<void*>(r),
+                               static_cast<intptr_t>(size) + sizeof(*r),
+                               System::VmoMapFinalizer);
+
+  return ConstructDartObject(kMapResult, ToDart(ZX_OK), object);
 }
 
 uint64_t System::ClockGet(uint32_t clock_id) {
   return zx_clock_get(clock_id);
 }
 
-  // clang-format: off
+// clang-format: off
 
 #define FOR_EACH_STATIC_BINDING(V) \
   V(System, ChannelCreate)         \
@@ -331,10 +419,12 @@ uint64_t System::ClockGet(uint32_t clock_id) {
   V(System, SocketWrite)           \
   V(System, SocketRead)            \
   V(System, VmoCreate)             \
+  V(System, VmoFromFile)           \
   V(System, VmoGetSize)            \
   V(System, VmoSetSize)            \
   V(System, VmoRead)               \
   V(System, VmoWrite)              \
+  V(System, VmoMap)                \
   V(System, ClockGet)
 
 // clang-format: on

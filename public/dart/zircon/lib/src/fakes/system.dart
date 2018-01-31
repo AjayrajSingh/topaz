@@ -6,6 +6,15 @@ part of zircon_fakes;
 
 // ignore_for_file: public_member_api_docs
 
+class _Namespace { // ignore: unused_element
+  // No public constructor - this only has static methods.
+  _Namespace._();
+
+  // Library private variable set by the embedder used to cache the
+  // namespace (as an fdio_ns_t*).
+  static int _namespace; // ignore: unused_field
+}
+
 /// An exception representing an error returned as an zx_status_t.
 class ZxStatusException extends Error {
   final int status;
@@ -69,6 +78,23 @@ class GetSizeResult extends _Result {
   String toString() => 'GetSizeResult(status=$status, size=$size)';
 }
 
+class FromFileResult extends _Result {
+  final Handle handle;
+  final int numBytes;
+  const FromFileResult(final int status, [this.handle, this.numBytes])
+      : super(status);
+  @override
+  String toString() =>
+      'FromFileResult(status=$status, handle=$handle, numBytes=$numBytes)';
+}
+
+class MapResult extends _Result {
+  final Uint8List data;
+  const MapResult(final int status, [this.data]) : super(status);
+  @override
+  String toString() => 'MapResult(status=$status, data=$data)';
+}
+
 class System {
   // No public constructor - this only has static methods.
   System._();
@@ -76,62 +102,80 @@ class System {
   // Channel operations.
   static HandlePairResult channelCreate([int options = 0]) {
     throw new UnimplementedError(
-        'Handle.channelCreate() is not implemented on this platform.');
+        'System.channelCreate() is not implemented on this platform.');
   }
+
   static int channelWrite(Handle channel, ByteData data, List<Handle> handles) {
     throw new UnimplementedError(
-        'Handle.channelWrite() is not implemented on this platform.');
+        'System.channelWrite() is not implemented on this platform.');
   }
+
   static ReadResult channelQueryAndRead(Handle channel) {
     throw new UnimplementedError(
-        'Handle.channelQueryAndRead() is not implemented on this platform.');
+        'System.channelQueryAndRead() is not implemented on this platform.');
   }
 
   // Eventpair operations.
   static HandlePairResult eventpairCreate([int options = 0]) {
     throw new UnimplementedError(
-        'Handle.eventpairCreate() is not implemented on this platform.');
+        'System.eventpairCreate() is not implemented on this platform.');
   }
 
   // Socket operations.
   static HandlePairResult socketCreate([int options = 0]) {
     throw new UnimplementedError(
-        'Handle.socketCreate() is not implemented on this platform.');
+        'System.socketCreate() is not implemented on this platform.');
   }
+
   static WriteResult socketWrite(Handle socket, ByteData data, int options) {
     throw new UnimplementedError(
-        'Handle.socketWrite() is not implemented on this platform.');
+        'System.socketWrite() is not implemented on this platform.');
   }
+
   static ReadResult socketRead(Handle socket, int size) {
     throw new UnimplementedError(
-        'Handle.socketRead() is not implemented on this platform.');
+        'System.socketRead() is not implemented on this platform.');
   }
 
   // Vmo operations.
   static HandleResult vmoCreate(int size, [int options = 0]) {
     throw new UnimplementedError(
-        'Handle.vmoCreate() is not implemented on this platform.');
+        'System.vmoCreate() is not implemented on this platform.');
   }
+
+  static FromFileResult vmoFromFile(String path) {
+    throw new UnimplementedError(
+        'System.vmoFromFile() is not implemented on this platform.');
+  }
+
   static GetSizeResult vmoGetSize(Handle vmo) {
     throw new UnimplementedError(
-        'Handle.vmoGetSize() is not implemented on this platform.');
+        'System.vmoGetSize() is not implemented on this platform.');
   }
+
   static int vmoSetSize(Handle vmo, int size) {
     throw new UnimplementedError(
-        'Handle.vmoSetSize() is not implemented on this platform.');
+        'System.vmoSetSize() is not implemented on this platform.');
   }
+
   static WriteResult vmoWrite(Handle vmo, int offset, ByteData bytes) {
     throw new UnimplementedError(
-        'Handle.vmoWrite() is not implemented on this platform.');
+        'System.vmoWrite() is not implemented on this platform.');
   }
+
   static ReadResult vmoRead(Handle vmo, int offset, int size) {
     throw new UnimplementedError(
-        'Handle.vmoRead() is not implemented on this platform.');
+        'System.vmoRead() is not implemented on this platform.');
+  }
+
+  static MapResult vmoMap(Handle vmo) {
+    throw new UnimplementedError(
+        'System.vmoMap() is not implemented on this platform.');
   }
 
   // Time operations.
   static int clockGet(int clockId) {
     throw new UnimplementedError(
-        'Handle.timeGet() is not implemented on this platform.');
+        'System.timeGet() is not implemented on this platform.');
   }
 }

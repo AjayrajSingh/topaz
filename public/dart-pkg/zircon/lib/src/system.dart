@@ -7,10 +7,21 @@ part of zircon;
 // ignore_for_file: native_function_body_in_non_sdk_code
 // ignore_for_file: public_member_api_docs
 
+class _Namespace { // ignore: unused_element
+  // No public constructor - this only has static methods.
+  _Namespace._();
+
+  // Library private variable set by the embedder used to cache the
+  // namespace (as an fdio_ns_t*).
+  static int _namespace; // ignore: unused_field
+}
+
 /// An exception representing an error returned as an zx_status_t.
 class ZxStatusException extends Error {
   final int status;
   ZxStatusException(this.status);
+  @override
+  String toString() => 'ZxStatusException($status)';
 }
 
 class _Result {
@@ -70,6 +81,23 @@ class GetSizeResult extends _Result {
   String toString() => 'GetSizeResult(status=$status, size=$size)';
 }
 
+class FromFileResult extends _Result {
+  final Handle handle;
+  final int numBytes;
+  const FromFileResult(final int status, [this.handle, this.numBytes])
+      : super(status);
+  @override
+  String toString() =>
+      'FromFileResult(status=$status, handle=$handle, numBytes=$numBytes)';
+}
+
+class MapResult extends _Result {
+  final Uint8List data;
+  const MapResult(final int status, [this.data]) : super(status);
+  @override
+  String toString() => 'MapResult(status=$status, data=$data)';
+}
+
 class System extends NativeFieldWrapperClass2 {
   // No public constructor - this only has static methods.
   System._();
@@ -97,12 +125,14 @@ class System extends NativeFieldWrapperClass2 {
   // Vmo operations.
   static HandleResult vmoCreate(int size, [int options = 0])
       native 'System_VmoCreate';
+  static FromFileResult vmoFromFile(String path) native 'System_VmoFromFile';
   static GetSizeResult vmoGetSize(Handle vmo) native 'System_VmoGetSize';
   static int vmoSetSize(Handle vmo, int size) native 'System_VmoSetSize';
   static WriteResult vmoWrite(Handle vmo, int offset, ByteData bytes)
       native 'System_VmoWrite';
   static ReadResult vmoRead(Handle vmo, int offset, int size)
       native 'System_VmoRead';
+  static MapResult vmoMap(Handle vmo) native 'System_VmoMap';
 
   // Time operations.
   static int clockGet(int clockId) native 'System_ClockGet';

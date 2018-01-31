@@ -52,4 +52,5 @@ dart_fuchsia_test("dart_zircon_test") {
   deps = [
     "//topaz/public/lib/fidl/dart",
   ]
+  sandbox = "//topaz/runtime/dart_runner/meta/sandbox"
 }
