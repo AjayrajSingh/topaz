@@ -6,6 +6,7 @@
 
 #include <thread>
 #include <utility>
+#include <sys/stat.h>
 
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/arraysize.h"
@@ -36,6 +37,22 @@ const char* kDartVMArgs[] = {
 #endif
     // clang-format on
 };
+
+const char* kDart2VMArgs[] = {
+    // clang-format off
+  "--strong",
+  "--reify_generic_functions",
+  "--limit_ints_to_64_bits",
+    // clang-format on
+};
+
+void PushBackAll(std::vector<const char*>* args,
+                 const char** argv,
+                 size_t argc) {
+  for (size_t i = 0; i < argc; ++i) {
+    args->push_back(argv[i]);
+  }
+}
 
 void IsolateShutdownCallback(void* callback_data) {
   fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
@@ -78,8 +95,14 @@ DartApplicationRunner::DartApplicationRunner(
     : binding_(this, std::move(app_runner)) {
   dart::bin::BootstrapDartIo();
 
-  // TODO(abarth): Make checked mode configurable.
-  FXL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
+  struct stat buf;
+  bool dart2 = stat("pkg/data/dart2", &buf) == 0;
+  std::vector<const char*> args;
+  PushBackAll(&args, kDartVMArgs, arraysize(kDartVMArgs));
+  if (dart2) {
+    PushBackAll(&args, kDart2VMArgs, arraysize(kDart2VMArgs));
+  }
+  FXL_CHECK(Dart_SetVMFlags(args.size(), args.data()));
 
   Dart_InitializeParams params = {};
   params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;

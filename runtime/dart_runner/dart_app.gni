@@ -187,7 +187,7 @@ template("dart_jit_app") {
   }
 }
 
-template("dart_jit_kernel_app") {
+template("dart2_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   dart_library_target_name = target_name + "_dart_library"
@@ -214,7 +214,7 @@ template("dart_jit_kernel_app") {
 
   _dart_kernel(kernel_target_name) {
     main_dart = invoker.main_dart
-    args = []
+    args = [ "--strong" ]
     dart_library_target_name = dart_library_target_name
   }
 
@@ -238,8 +238,7 @@ template("dart_jit_kernel_app") {
 
     meta = [
       {
-        path =
-            rebase_path("//topaz/runtime/dart_runner/meta/jit_kernel_runtime")
+        path = rebase_path("//topaz/runtime/dart_runner/meta/jit2_runtime")
         dest = "runtime"
       },
     ]
@@ -380,7 +379,7 @@ template("dart_aot_app") {
   }
 }
 
-template("dart_aot_kernel_app") {
+template("dart2_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   dart_library_target_name = target_name + "_dart_library"
@@ -408,7 +407,10 @@ template("dart_aot_kernel_app") {
   _dart_kernel(kernel_target_name) {
     dart_library_target_name = dart_library_target_name
     main_dart = invoker.main_dart
-    args = [ "--aot" ]
+    args = [
+      "--aot",
+      "--strong",
+    ]
   }
 
   assembly_path = "$target_gen_dir/${target_name}.S"
@@ -430,6 +432,9 @@ template("dart_aot_kernel_app") {
 
     script = _gen_snapshot
     args = [
+      "--strong",
+      "--reify_generic_functions",
+      "--limit_ints_to_64_bits",
       "--snapshot_kind=app-aot-assembly",
       "--assembly=" + rebase_path(assembly_path),
     ]
@@ -484,7 +489,7 @@ template("dart_aot_kernel_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/aot_runtime")
+        path = rebase_path("//topaz/runtime/dart_runner/meta/aot2_runtime")
         dest = "runtime"
       },
     ]

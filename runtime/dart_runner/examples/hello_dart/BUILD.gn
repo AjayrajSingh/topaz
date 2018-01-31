@@ -14,7 +14,7 @@ dart_jit_app("hello_dart_jit") {
   ]
 }
 
-dart_jit_kernel_app("hello_dart_jit_kernel") {
+dart2_jit_app("hello_dart2_jit") {
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
@@ -34,7 +34,7 @@ dart_aot_app("hello_dart_aot") {
   ]
 }
 
-dart_aot_kernel_app("hello_dart_aot_kernel") {
+dart2_aot_app("hello_dart2_aot") {
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."

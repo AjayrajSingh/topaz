@@ -72,10 +72,25 @@ runner("dart_jit_runner_bin") {
   }
 }
 
+# TODO(rmacnak): We could have dart_aot_runner and dart2_aot_runner be
+# identical binaries if we loaded the VM snapshot via dlopen.
+
 runner("dart_aot_runner_bin") {
   output_name = "dart_aot_runner"
   extra_defines = [ "AOT_RUNTIME" ]
   extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc" ]
+  if (is_debug) {
+    extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime" ]
+  } else {
+    extra_deps +=
+        [ "//third_party/dart/runtime:libdart_precompiled_runtime_product" ]
+  }
+}
+
+runner("dart2_aot_runner_bin") {
+  output_name = "dart2_aot_runner"
+  extra_defines = [ "AOT_RUNTIME" ]
+  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart2_aot_snapshot_cc" ]
   if (is_debug) {
     extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime" ]
   } else {
@@ -91,10 +106,34 @@ package("dart_aot_runner") {
 
   binary = "dart_aot_runner"
 
-  meta = [ {
-        path = rebase_path("meta/sandbox")
-        dest = "sandbox"
-      } ]
+  meta = [
+    {
+      path = rebase_path("meta/sandbox")
+      dest = "sandbox"
+    },
+  ]
+}
+
+package("dart2_aot_runner") {
+  deps = [
+    ":dart2_aot_runner_bin",
+  ]
+
+  binary = "dart2_aot_runner"
+
+  meta = [
+    {
+      path = rebase_path("meta/sandbox")
+      dest = "sandbox"
+    },
+  ]
+
+  resources = [
+    {
+      path = rebase_path("dart2")
+      dest = "dart2"
+    },
+  ]
 }
 
 package("dart_jit_runner") {
@@ -105,10 +144,12 @@ package("dart_jit_runner") {
 
   binary = "dart_jit_runner"
 
-  meta = [ {
-        path = rebase_path("meta/sandbox")
-        dest = "sandbox"
-      } ]
+  meta = [
+    {
+      path = rebase_path("meta/sandbox")
+      dest = "sandbox"
+    },
+  ]
 
   resources = [
     {
@@ -122,7 +163,7 @@ package("dart_jit_runner") {
   ]
 }
 
-package("dart_jit_kernel_runner") {
+package("dart2_jit_runner") {
   deps = [
     ":dart_jit_runner_bin",
     "kernel:kernel_core_snapshot",
@@ -130,12 +171,18 @@ package("dart_jit_kernel_runner") {
 
   binary = "dart_jit_runner"
 
-  meta = [ {
-        path = rebase_path("meta/sandbox")
-        dest = "sandbox"
-      } ]
+  meta = [
+    {
+      path = rebase_path("meta/sandbox")
+      dest = "sandbox"
+    },
+  ]
 
   resources = [
+    {
+      path = rebase_path("dart2")
+      dest = "dart2"
+    },
     {
       path = rebase_path("$target_gen_dir/kernel/vm_isolate_snapshot.bin")
       dest = "snapshot_vm_isolate.bin"
@@ -155,10 +202,12 @@ package("dart_script_runner") {
 
   binary = "dart_jit_runner"
 
-  meta = [ {
-        path = rebase_path("meta/sandbox")
-        dest = "sandbox"
-      } ]
+  meta = [
+    {
+      path = rebase_path("meta/sandbox")
+      dest = "sandbox"
+    },
+  ]
 
   resources = [
     {

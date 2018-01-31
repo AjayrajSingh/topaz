@@ -217,3 +217,44 @@ source_set("dart_aot_snapshot_cc") {
     "snapshot.h",
   ]
 }
+
+action("generate_dart2_aot_snapshot_assembly") {
+  if (is_debug) {
+    gen_snapshot_exe = "gen_snapshot"
+  } else {
+    gen_snapshot_exe = "gen_snapshot_product"
+  }
+  gen_snapshot_label =
+      "//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)"
+  gen_snapshot_dir = get_label_info(gen_snapshot_label, "root_out_dir")
+
+  snapshot_assembly = "$target_gen_dir/aot2_vm_snapshot.S"
+
+  deps = [
+    gen_snapshot_label,
+  ]
+
+  outputs = [
+    snapshot_assembly,
+  ]
+
+  script = "$gen_snapshot_dir/$gen_snapshot_exe"
+  args = [
+    "--strong",
+    "--reify_generic_functions",
+    "--limit_ints_to_64_bits",
+    "--snapshot_kind=vm-aot-assembly",
+    "--assembly=" + rebase_path(snapshot_assembly),
+  ]
+}
+
+source_set("dart2_aot_snapshot_cc") {
+  deps = [
+    ":generate_dart2_aot_snapshot_assembly",
+  ]
+
+  sources = [
+    "$target_gen_dir/aot2_vm_snapshot.S",
+    "snapshot.h",
+  ]
+}

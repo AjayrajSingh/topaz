@@ -61,7 +61,7 @@ action("kernel_core_snapshot") {
     gen_snapshot_label,
   ]
 
-  platform_dill = "$root_out_dir/runner_patched_sdk/platform.dill"
+  platform_dill = "$root_out_dir/runner_patched_sdk/platform_strong.dill"
   inputs = [
     platform_dill,
   ]
