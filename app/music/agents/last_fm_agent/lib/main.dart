@@ -14,9 +14,9 @@ import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:meta/meta.dart';
 
@@ -72,7 +72,7 @@ class ContextListenerImpl extends ContextListener {
         Artist artist = await _api.getArtist(data['name']);
         if (artist != null) {
           log.fine('found artist for: ${data['name']}');
-          _createProposal(artist, data);
+          await _createProposal(artist, data);
         } else {
           log.fine('no artist found for: ${data['name']}');
         }
@@ -83,32 +83,28 @@ class ContextListenerImpl extends ContextListener {
   }
 
   /// Creates a proposal for the given Last FM artist
-  void _createProposal(Artist artist, Map<String, dynamic> data) {
+  Future<Null> _createProposal(Artist artist, Map<String, dynamic> data) async {
     String headline = 'Learn more about ${artist.name}';
 
-    Proposal proposal = new Proposal(
-        id: 'Last FM Artist bio: ${artist.mbid}',
-        display: new SuggestionDisplay(
-            headline: headline,
-            subheadline: 'powered by Last.fm',
-            details: '',
-            color: 0xFFFF0080,
-            iconUrls: const <String>[],
-            imageType: SuggestionImageType.other,
-            imageUrl: artist.imageUrl,
-            annoyance: AnnoyanceType.none),
-        onSelected: <Action>[
-          new Action.withAddModuleToStory(new AddModuleToStory(
-              linkName: data['@source']['link_name'],
-              storyId: data['@source']['story_id'],
-              moduleName: 'Last FM: ${data['name']}',
-              modulePath: data['@source']['module_path'],
-              moduleUrl: 'last_fm_artist_bio',
-              surfaceRelation: new SurfaceRelation(
-                  arrangement: SurfaceArrangement.copresent,
-                  emphasis: 0.5,
-                  dependency: SurfaceDependency.dependent)))
-        ]);
+    Proposal proposal = await createProposal(
+      id: 'Last FM Artist bio: ${artist.mbid}',
+      headline: headline,
+      subheadline: 'powered by Last.fm',
+      color: 0xFFFF0080,
+      imageUrl: artist.imageUrl,
+      actions: <Action>[
+        new Action.withAddModuleToStory(new AddModuleToStory(
+            linkName: data['@source']['link_name'],
+            storyId: data['@source']['story_id'],
+            moduleName: 'Last FM: ${data['name']}',
+            modulePath: data['@source']['module_path'],
+            moduleUrl: 'last_fm_artist_bio',
+            surfaceRelation: new SurfaceRelation(
+                arrangement: SurfaceArrangement.copresent,
+                emphasis: 0.5,
+                dependency: SurfaceDependency.dependent)))
+      ],
+    );
 
     log.fine('proposing artist bio suggestion');
     _proposalPublisher.propose(proposal);

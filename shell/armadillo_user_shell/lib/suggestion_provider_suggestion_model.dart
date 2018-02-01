@@ -8,6 +8,7 @@ import 'package:armadillo/next.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.images.fidl/encoded_image.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
 import 'package:lib.suggestion.fidl/user_input.fidl.dart' as maxwell;
@@ -171,15 +172,23 @@ Suggestion _convert(maxwell.Suggestion suggestion) {
   return new Suggestion(
     id: new SuggestionId(suggestion.uuid),
     title: suggestion.display.headline,
-    description: suggestion.display.subheadline,
+    description: suggestion.display.subheadline ?? '',
     themeColor: new Color(suggestion.display.color),
     selectionType: SelectionType.launchStory,
-    imageUrl: suggestion.display.imageUrl,
-    imageType:
-        suggestion.display.imageType == maxwell.SuggestionImageType.person
+    image: suggestion.display.image == null
+        ? null
+        : suggestion.display.image.image,
+    imageType: suggestion.display.image == null
+        ? ImageType.other
+        : suggestion.display.image.imageType ==
+                maxwell.SuggestionImageType.person
             ? ImageType.person
             : ImageType.other,
-    iconUrls: suggestion.display.iconUrls,
+    icons: suggestion.display.icons == null
+        ? <EncodedImage>[]
+        : suggestion.display.icons
+            .map((maxwell.SuggestionDisplayImage image) => image.image)
+            .toList(),
     confidence: suggestion.confidence,
   );
 }

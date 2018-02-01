@@ -14,9 +14,9 @@ import 'package:lib.context.fidl/value_type.fidl.dart';
 import 'package:lib.decomposition.dart/decomposition.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:meta/meta.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
@@ -69,7 +69,7 @@ class ContextListenerImpl extends ContextListener {
         );
         if (artists != null && artists.isNotEmpty) {
           log.fine('found artist for: ${entity['name']}');
-          _createProposal(artists.first);
+          await _createProposal(artists.first);
         } else {
           log.fine('no artist found for: ${entity['name']}');
         }
@@ -80,7 +80,7 @@ class ContextListenerImpl extends ContextListener {
   }
 
   /// Creates a proposal for the given Spotify artist
-  void _createProposal(Artist artist) {
+  Future<Null> _createProposal(Artist artist) async {
     String headline = 'Listen to ${artist.name}';
 
     final Uri arg = new Uri(
@@ -89,24 +89,20 @@ class ContextListenerImpl extends ContextListener {
       pathSegments: <String>[artist.id],
     );
 
-    Proposal proposal = new Proposal(
-        id: 'Spotify Artist: ${artist.id}',
-        confidence: 0.0,
-        display: new SuggestionDisplay(
-            headline: headline,
-            subheadline: 'powered by Spotify',
-            details: '',
-            color: 0xFFFF0080,
-            iconUrls: const <String>[],
-            imageType: SuggestionImageType.other,
-            imageUrl: artist.defaultArtworkUrl ?? '',
-            annoyance: AnnoyanceType.none),
-        onSelected: <Action>[
-          new Action.withCreateStory(new CreateStory(
-              moduleId: 'music_artist',
-              initialData:
-                  JSON.encode(<String, dynamic>{'view': decomposeUri(arg)})))
-        ]);
+    Proposal proposal = await createProposal(
+      id: 'Spotify Artist: ${artist.id}',
+      confidence: 0.0,
+      headline: headline,
+      subheadline: 'powered by Spotify',
+      color: 0xFFFF0080,
+      imageUrl: artist.defaultArtworkUrl,
+      actions: <Action>[
+        new Action.withCreateStory(new CreateStory(
+            moduleId: 'music_artist',
+            initialData:
+                JSON.encode(<String, dynamic>{'view': decomposeUri(arg)})))
+      ],
+    );
 
     log.fine('proposing artist suggestion');
     _proposalPublisher.propose(proposal);

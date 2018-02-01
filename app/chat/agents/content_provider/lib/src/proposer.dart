@@ -84,12 +84,7 @@ class Proposer extends ContextListener {
           id: 'Message from ${message.sender}',
           display: new SuggestionDisplay(
               headline: 'Message from ${message.sender}',
-              subheadline: '',
-              details: '',
               color: 0xFFFF0080,
-              iconUrls: const <String>[],
-              imageType: SuggestionImageType.other,
-              imageUrl: '',
               annoyance: AnnoyanceType.none),
           onSelected: <Action>[
             const Action.withFocusStory(const FocusStory(storyId: ''))

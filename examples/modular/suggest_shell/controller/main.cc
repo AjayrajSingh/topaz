@@ -118,11 +118,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
     auto suggestion_display = maxwell::SuggestionDisplay::New();
     suggestion_display->headline = "Start a story with a new module";
     suggestion_display->subheadline = suggestion;
-    suggestion_display->details = "";
     suggestion_display->color = 0xffff0000;
-    suggestion_display->icon_urls.resize(0);
-    suggestion_display->image_url = "";
-    suggestion_display->image_type = maxwell::SuggestionImageType::OTHER;
 
     auto proposal = maxwell::Proposal::New();
     proposal->id = kProposalId;

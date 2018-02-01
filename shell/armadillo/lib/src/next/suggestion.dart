@@ -4,6 +4,7 @@
 
 import 'package:armadillo/recent.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.images.fidl/encoded_image.fidl.dart';
 import 'package:meta/meta.dart';
 
 import 'suggestion_layout.dart';
@@ -75,10 +76,10 @@ class Suggestion {
   final StoryId selectionStoryId;
 
   /// The main image of the suggestion.
-  final String imageUrl;
+  final EncodedImage image;
 
   /// List of icons URLs
-  final List<String> iconUrls;
+  final List<EncodedImage> icons;
 
   /// The type of image.
   final ImageType imageType;
@@ -96,9 +97,9 @@ class Suggestion {
     this.themeColor,
     this.selectionType,
     this.selectionStoryId,
-    this.imageUrl,
+    this.image,
     this.imageType,
-    this.iconUrls,
+    this.icons,
   }) {
     _suggestionLayout = new SuggestionLayout(suggestion: this);
     _suggestionKey = new GlobalObjectKey(this);

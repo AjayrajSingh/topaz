@@ -12,9 +12,9 @@ import 'package:lib.context.fidl/value_type.fidl.dart';
 import 'package:lib.decomposition.dart/decomposition.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 
 /// The Concert Agents subscribes to the hotel topic and makes proposals for
 /// upcoming concerts (concert list module).
@@ -48,12 +48,12 @@ class ContextListenerImpl extends ContextListener {
     // types, and handle multiple instances.
     dynamic data = JSON.decode(result.values[_kHotelTopic][0].content);
     if (data != null && data['name'] is String) {
-      _createProposal(data['name']);
+      await _createProposal(data['name']);
     }
   }
 
   /// Creates a concert list proposal
-  void _createProposal(String hotelName) {
+  Future<Null> _createProposal(String hotelName) async {
     String headline = 'Upcoming concerts near $hotelName this week';
 
     final Uri arg = new Uri(
@@ -61,24 +61,20 @@ class ContextListenerImpl extends ContextListener {
       pathSegments: <String>['metro_areas', '26330-us-sf-bay-area'],
     );
 
-    Proposal proposal = new Proposal(
-        id: 'Concerts Near Hotel',
-        display: new SuggestionDisplay(
-            headline: headline,
-            subheadline: 'powered by Songkick',
-            details: '',
-            color: 0xFF467187,
-            iconUrls: const <String>[],
-            imageType: SuggestionImageType.other,
-            imageUrl:
-                'https://images.unsplash.com/photo-1486591978090-58e619d37fe7?dpr=1&auto=format&fit=crop&w=300&h=300&q=80&cs=tinysrgb&crop=&bg=',
-            annoyance: AnnoyanceType.none),
-        onSelected: <Action>[
-          new Action.withCreateStory(new CreateStory(
-              moduleId: 'concert_event_list',
-              initialData:
-                  JSON.encode(<String, dynamic>{'view': decomposeUri(arg)})))
-        ]);
+    Proposal proposal = await createProposal(
+      id: 'Concerts Near Hotel',
+      headline: headline,
+      subheadline: 'powered by Songkick',
+      color: 0xFF467187,
+      imageUrl:
+          'https://images.unsplash.com/photo-1486591978090-58e619d37fe7?dpr=1&auto=format&fit=crop&w=300&h=300&q=80&cs=tinysrgb&crop=&bg=',
+      actions: <Action>[
+        new Action.withCreateStory(new CreateStory(
+            moduleId: 'concert_event_list',
+            initialData:
+                JSON.encode(<String, dynamic>{'view': decomposeUri(arg)})))
+      ],
+    );
 
     log.fine('proposing concert suggestion');
     _proposalPublisher.propose(proposal);

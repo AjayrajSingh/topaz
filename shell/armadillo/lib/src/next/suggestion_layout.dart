@@ -114,7 +114,7 @@ class SuggestionLayout {
     double textMaxWidth = math.max(
       0.0,
       suggestionWidth -
-          (_suggestion.imageUrl == null ? 0.0 : kSuggestionImageWidth) -
+          (_suggestion.image == null ? 0.0 : kSuggestionImageWidth) -
           ((isCircularSuggestionImage ? 1 : 2) * _kHorizontalMargin),
     );
 
@@ -196,7 +196,7 @@ class SuggestionLayout {
   }
 
   ImageSide get _imageSide =>
-      _suggestion.imageUrl != null && _suggestion.imageType == ImageType.person
+      _suggestion.image != null && _suggestion.imageType == ImageType.person
           ? ImageSide.left
           : ImageSide.right;
 
@@ -211,9 +211,9 @@ class SuggestionLayout {
 
   /// Returns true if the image should be circular.
   bool get isCircularSuggestionImage =>
-      (_suggestion.imageUrl != null &&
+      (_suggestion.image != null &&
           _suggestion.imageType == ImageType.person) ||
-      (_suggestion.imageUrl == null && _suggestion.iconUrls.isNotEmpty);
+      (_suggestion.image == null && _suggestion.icons.isNotEmpty);
 
   /// Returns the left text padding.
   double get leftTextPadding =>

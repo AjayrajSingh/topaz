@@ -10,7 +10,9 @@ dart_library("armadillo") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/proposal/dart",
     "//topaz/shell/keyboard",
     "//topaz/shell/widgets",
   ]

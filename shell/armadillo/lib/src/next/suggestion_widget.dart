@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:io';
-
 import 'package:armadillo/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.images.fidl/encoded_image.fidl.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 
 import 'suggestion.dart';
 import 'suggestion_layout.dart';
@@ -44,16 +44,14 @@ class SuggestionWidget extends StatelessWidget {
       : super(key: key);
 
   bool get _hasImage =>
-      (suggestion.imageUrl != null && suggestion.imageUrl.isNotEmpty) ||
-      suggestion.iconUrls.isNotEmpty;
+      (suggestion.image != null) || suggestion.icons.isNotEmpty;
 
   bool get _isCircular =>
-      (suggestion.imageUrl != null &&
-          suggestion.imageType == ImageType.person) ||
-      (suggestion.imageUrl == null && suggestion.iconUrls.isNotEmpty);
+      (suggestion.image != null && suggestion.imageType == ImageType.person) ||
+      (suggestion.image == null && suggestion.icons.isNotEmpty);
 
   ImageSide get _imageSide =>
-      suggestion.imageUrl != null && suggestion.imageType == ImageType.person
+      suggestion.image != null && suggestion.imageType == ImageType.person
           ? ImageSide.left
           : ImageSide.right;
 
@@ -117,21 +115,12 @@ class SuggestionWidget extends StatelessWidget {
     if (!_hasImage) {
       return new Container(width: 0.0);
     } else {
-      String imageUrl =
-          suggestion.imageUrl != null && suggestion.imageUrl.isNotEmpty
-              ? suggestion.imageUrl
-              : suggestion.iconUrls[0];
-      Widget image = imageUrl.startsWith('http')
-          ? new Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              alignment: FractionalOffset.center,
-            )
-          : new Image.file(
-              new File(imageUrl),
-              fit: BoxFit.cover,
-              alignment: FractionalOffset.center,
-            );
+      Widget image = _createImage(
+        image:
+            suggestion.image != null ? suggestion.image : suggestion.icons[0],
+        fit: BoxFit.cover,
+        alignment: FractionalOffset.center,
+      );
 
       return new Container(
         width: kSuggestionImageWidth,
@@ -166,5 +155,17 @@ class SuggestionWidget extends StatelessWidget {
               ),
       );
     }
+  }
+
+  Widget _createImage({
+    EncodedImage image,
+    BoxFit fit,
+    FractionalOffset alignment,
+  }) {
+    Uint8List imageData = readEncodedImage(image);
+    if (imageData != null) {
+      return new Image.memory(imageData, fit: fit, alignment: alignment);
+    }
+    return new Container();
   }
 }

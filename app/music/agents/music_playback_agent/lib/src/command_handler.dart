@@ -82,11 +82,10 @@ class CommandHandler implements QueryHandler {
               subheadline: '',
               details: '',
               color: 0xFFA5A700,
-              iconUrls: <String>[],
-              imageType: SuggestionImageType.other,
-              imageUrl: '',
               annoyance: AnnoyanceType.none),
-          onSelected: <Action>[new Action.withCustomAction(binding.wrap(action))],
+          onSelected: <Action>[
+            new Action.withCustomAction(binding.wrap(action))
+          ],
         ));
       }
     }

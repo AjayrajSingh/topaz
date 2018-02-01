@@ -2,12 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
@@ -66,10 +68,10 @@ class _ContextAwareProposer {
   final ContextListenerBinding _contextListenerBinding =
       new ContextListenerBinding();
 
-  void start(
+  Future<Null> start(
     ContextReader contextReader,
     ProposalPublisher proposalPublisher,
-  ) {
+  ) async {
     final Map<String, List<Map<String, String>>> proposals =
         convert.JSON.decode(
       new File(_kConfigFile).readAsStringSync(),
@@ -86,13 +88,13 @@ class _ContextAwareProposer {
 
     if (proposals.keys.contains('unknown')) {
       for (Map<String, String> proposal in proposals['unknown']) {
-        proposalPublisher.propose(_createProposal(proposal));
+        proposalPublisher.propose(await _createProposal(proposal));
       }
     }
 
     if (dataProposals.keys.contains('unknown')) {
       for (Map<String, String> proposal in dataProposals['unknown']) {
-        proposalPublisher.propose(_createProposal(proposal));
+        proposalPublisher.propose(await _createProposal(proposal));
       }
     }
 
@@ -109,7 +111,7 @@ class _ContextAwareProposer {
       _contextListenerBinding.wrap(
         new _ContextListenerImpl(
           proposalPublisher: proposalPublisher,
-          onTopicChanged: (String locationJson) {
+          onTopicChanged: (String locationJson) async {
             final Map<String, String> json = convert.JSON.decode(locationJson);
             if (json['location']?.isEmpty ?? true) {
               return;
@@ -134,14 +136,14 @@ class _ContextAwareProposer {
             if (proposals.keys.contains(json['location'])) {
               for (Map<String, String> proposal
                   in proposals[json['location']]) {
-                proposalPublisher.propose(_createProposal(proposal));
+                proposalPublisher.propose(await _createProposal(proposal));
               }
             }
 
             if (dataProposals.keys.contains(json['location'])) {
               for (Map<String, String> proposal
                   in dataProposals[json['location']]) {
-                proposalPublisher.propose(_createProposal(proposal));
+                proposalPublisher.propose(await _createProposal(proposal));
               }
             }
           },
@@ -177,21 +179,22 @@ class _QueryHandlerImpl extends QueryHandler {
   _QueryHandlerImpl({this.askProposals});
 
   @override
-  void onQuery(UserInput query, void callback(QueryResponse response)) {
+  Future<Null> onQuery(
+      UserInput query, void callback(QueryResponse response)) async {
     List<Proposal> proposals = <Proposal>[];
 
     String queryText = query.text?.toLowerCase() ?? '';
 
     if (queryText.startsWith('demo') ?? false) {
       proposals
-        ..addAll(askProposals.map(_createProposal))
+        ..addAll(await Future.wait(askProposals.map(_createProposal)))
         ..add(_launchEverythingProposal);
     }
 
     if (queryText.contains('launch') || queryText.contains('bring up')) {
       if (queryText.contains('shader')) {
         proposals.add(
-          _createAppProposal(
+          await _createAppProposal(
             id: 'Launch Shader Toy',
             appUrl: 'shadertoy_client',
             headline: 'Launch Shader Toy',
@@ -204,7 +207,7 @@ class _QueryHandlerImpl extends QueryHandler {
         );
       } else if (queryText.contains('perspective')) {
         proposals.add(
-          _createAppProposal(
+          await _createAppProposal(
             id: 'Launch Perspective 3D demo',
             appUrl: 'perspective',
             headline: 'Launch Perspective 3D demo',
@@ -216,7 +219,7 @@ class _QueryHandlerImpl extends QueryHandler {
         );
       } else if (queryText.contains('infinite')) {
         proposals.add(
-          _createAppProposal(
+          await _createAppProposal(
             id: 'Launch Infinite Scroller',
             appUrl: 'infinite_scroller',
             headline: 'Launch Infinite Scroller',
@@ -229,7 +232,7 @@ class _QueryHandlerImpl extends QueryHandler {
         );
       } else if (queryText.contains('spinning')) {
         proposals.add(
-          _createAppProposal(
+          await _createAppProposal(
             id: 'Launch Spinning Cube',
             appUrl: 'spinning_cube',
             headline: 'Launch Spinning Cube',
@@ -242,7 +245,7 @@ class _QueryHandlerImpl extends QueryHandler {
         );
       } else if (queryText.contains('video')) {
         proposals.add(
-          _createAppProposal(
+          await _createAppProposal(
             id: 'Launch Video',
             appUrl: 'video',
             headline: 'Launch Video',
@@ -255,7 +258,7 @@ class _QueryHandlerImpl extends QueryHandler {
         );
       } else if (queryText.contains('hotel')) {
         proposals.add(
-          _createAppProposal(
+          await _createAppProposal(
             id: 'Launch Hotel Confirmation',
             appUrl: 'hotel_confirmation',
             headline: 'Launch Hotel Confirmation',
@@ -268,7 +271,7 @@ class _QueryHandlerImpl extends QueryHandler {
         );
       } else if (queryText.contains('concert')) {
         proposals.add(
-          _createAppProposal(
+          await _createAppProposal(
             id: 'Launch Concert List',
             appUrl: 'concert_event_list',
             headline: 'Launch Concert List',
@@ -284,7 +287,7 @@ class _QueryHandlerImpl extends QueryHandler {
     if ((queryText.startsWith('per') ?? false) ||
         (queryText.contains('3d') ?? false)) {
       proposals.add(
-        _createAppProposal(
+        await _createAppProposal(
           id: 'Launch Perspective 3D demo',
           appUrl: 'perspective',
           headline: 'Launch Perspective 3D demo',
@@ -296,7 +299,8 @@ class _QueryHandlerImpl extends QueryHandler {
     }
 
     if ((query.text?.length ?? 0) >= 2) {
-      void scanDirectory(Directory directory, {bool recursive: true}) {
+      Future<Null> scanDirectory(Directory directory,
+          {bool recursive: true}) async {
         if (!directory.existsSync()) {
           return;
         }
@@ -342,7 +346,7 @@ class _QueryHandlerImpl extends QueryHandler {
           }
 
           proposals.add(
-            _createAppProposal(
+            await _createAppProposal(
               id: 'open $name',
               appUrl: binName,
               headline: 'Launch $name',
@@ -350,94 +354,93 @@ class _QueryHandlerImpl extends QueryHandler {
               // suggestions about their provenance, lack of safety, etc. that
               // would be useful for developers but not distracting in demos
               // subheadline: '(This is potentially unsafe)',
-              iconUrls: <String>[iconUrl],
+              iconUrl: iconUrl,
               color: color,
             ),
           );
+
           if (proposals.length > _kMaxProposals) {
             break;
           }
         }
       }
 
-      scanDirectory(new Directory('/pkgfs/packages/'), recursive: false);
-      scanDirectory(new Directory('/system/apps/'));
-      scanDirectory(new Directory('/system/bin/'));
-      scanDirectory(new Directory('/system/pkgs/'));
+      await Future.wait(<Future<Null>>[
+        scanDirectory(new Directory('/pkgfs/packages/'), recursive: false),
+        scanDirectory(new Directory('/system/apps/')),
+        scanDirectory(new Directory('/system/bin/')),
+        scanDirectory(new Directory('/system/pkgs/')),
+      ]);
     }
 
     callback(new QueryResponse(proposals: proposals));
   }
 
   Proposal get _launchEverythingProposal => new Proposal(
-      id: _kLaunchEverythingProposalId,
-      display: const SuggestionDisplay(
+        id: _kLaunchEverythingProposalId,
+        display: const SuggestionDisplay(
           headline: 'Launch everything',
-          subheadline: '',
-          details: '',
           color: 0xFFFF0080,
-          iconUrls: const <String>[],
-          imageType: SuggestionImageType.other,
-          imageUrl: '',
-          annoyance: AnnoyanceType.none),
-      onSelected: askProposals
-          .map(
-            (Map<String, String> proposal) => new Action.withCreateStory(
-                new CreateStory(
-                    moduleId: proposal['module_url'] ?? '',
-                    initialData: proposal['module_data'])),
-          )
-          .toList());
+          annoyance: AnnoyanceType.none,
+        ),
+        onSelected: askProposals
+            .map(
+              (Map<String, String> proposal) => new Action.withCreateStory(
+                    new CreateStory(
+                      moduleId: proposal['module_url'] ?? '',
+                      initialData: proposal['module_data'],
+                    ),
+                  ),
+            )
+            .toList(),
+      );
 }
 
-Proposal _createProposal(Map<String, String> proposal) => new Proposal(
-        id: proposal['id'],
-        display: new SuggestionDisplay(
-            headline: proposal['headline'] ?? '',
-            subheadline: proposal['subheadline'] ?? '',
-            details: '',
-            color: (proposal['color'] != null && proposal['color'].isNotEmpty)
-                ? int.parse(proposal['color'], onError: (_) => 0xFFFF0080)
-                : 0xFFFF0080,
-            iconUrls: proposal['icon_url'] != null
-                ? <String>[proposal['icon_url']]
-                : const <String>[],
-            imageType: 'person' == proposal['type']
-                ? SuggestionImageType.person
-                : SuggestionImageType.other,
-            imageUrl: proposal['image_url'] ?? '',
-            annoyance: AnnoyanceType.none),
-        onSelected: <Action>[
-          new Action.withCreateStory(new CreateStory(
-              moduleId: proposal['module_url'] ?? '',
-              initialData: proposal['module_data']))
-        ]);
+Future<Proposal> _createProposal(Map<String, String> proposal) async {
+  return createProposal(
+    id: proposal['id'],
+    headline: proposal['headline'] ?? '',
+    subheadline: proposal['subheadline'],
+    color: (proposal['color'] != null && proposal['color'].isNotEmpty)
+        ? int.parse(proposal['color'], onError: (_) => 0xFFFF0080)
+        : 0xFFFF0080,
+    iconUrls:
+        proposal['icon_url'] == null ? null : <String>[proposal['icon_url']],
+    imageUrl: proposal['image_url'],
+    imageType: 'person' == proposal['type']
+        ? SuggestionImageType.person
+        : SuggestionImageType.other,
+    actions: <Action>[
+      new Action.withCreateStory(new CreateStory(
+          moduleId: proposal['module_url'] ?? '',
+          initialData: proposal['module_data']))
+    ],
+  );
+}
 
-Proposal _createAppProposal({
+Future<Proposal> _createAppProposal({
   String id,
   String appUrl,
   String headline,
   String subheadline,
-  String imageUrl: '',
+  String imageUrl,
+  String iconUrl,
   SuggestionImageType imageType: SuggestionImageType.other,
-  List<String> iconUrls = const <String>[],
   int color,
   double confidence: 0.0,
   AnnoyanceType annoyanceType: AnnoyanceType.none,
-}) {
-  return new Proposal(
-      id: id,
-      confidence: confidence,
-      display: new SuggestionDisplay(
-          headline: headline,
-          subheadline: subheadline ?? '',
-          details: '',
-          color: color,
-          iconUrls: iconUrls,
-          imageType: imageType,
-          imageUrl: imageUrl,
-          annoyance: annoyanceType),
-      onSelected: <Action>[
-        new Action.withCreateStory(new CreateStory(moduleId: appUrl))
-      ]);
+}) async {
+  return createProposal(
+    id: id,
+    confidence: confidence,
+    headline: headline,
+    subheadline: subheadline,
+    color: color,
+    imageUrl: imageUrl,
+    imageType: imageType,
+    annoyanceType: annoyanceType,
+    actions: <Action>[
+      new Action.withCreateStory(new CreateStory(moduleId: appUrl))
+    ],
+  );
 }

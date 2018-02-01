@@ -2,13 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:lib.suggestion.fidl/user_input.fidl.dart';
 import 'package:lib.agent.fidl/agent_provider.fidl.dart';
+import 'package:lib.logging/logging.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.fidl/story_controller.fidl.dart';
 import 'package:lib.story.fidl/story_info.fidl.dart';
@@ -17,7 +19,6 @@ import 'package:lib.story.fidl/story_state.fidl.dart';
 import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:lib.user.fidl/user_shell.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
-import 'package:lib.logging/logging.dart';
 
 /// Manages the list of active agents and the proposals for showing them.
 class ActiveAgentsManager {
@@ -118,7 +119,8 @@ class _QueryHandlerImpl extends QueryHandler {
   _QueryHandlerImpl({this.customAction});
 
   @override
-  void onQuery(UserInput query, void callback(QueryResponse response)) {
+  Future<Null> onQuery(
+      UserInput query, void callback(QueryResponse response)) async {
     List<Proposal> proposals = <Proposal>[];
 
     if ((query.text?.toLowerCase()?.startsWith('act') ?? false) ||
@@ -128,20 +130,17 @@ class _QueryHandlerImpl extends QueryHandler {
       CustomActionBinding binding = new CustomActionBinding();
       _bindings.add(binding);
       proposals.add(
-        new Proposal(
-            id: 'View Active Agents',
-            display: new SuggestionDisplay(
-                headline: 'View Active Agents',
-                subheadline: '',
-                details: '',
-                color: 0xFFA5A700,
-                iconUrls: <String>['/system/data/sysui/AgentIcon.png'],
-                imageType: SuggestionImageType.other,
-                imageUrl: '',
-                annoyance: AnnoyanceType.none),
-            onSelected: <Action>[
-              new Action.withCustomAction(binding.wrap(customAction))
-            ]),
+        await createProposal(
+          id: 'View Active Agents',
+          headline: 'View Active Agents',
+          color: 0xFFA5A700,
+          iconUrls: <String>[
+            '/system/data/sysui/AgentIcon.png',
+          ],
+          actions: <Action>[
+            new Action.withCustomAction(binding.wrap(customAction))
+          ],
+        ),
       );
     }
     callback(new QueryResponse(proposals: proposals));

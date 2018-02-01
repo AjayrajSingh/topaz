@@ -27,6 +27,7 @@ flutter_app("armadillo_user_shell") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/media/dart",
+    "//topaz/public/lib/proposal/dart",
     "//topaz/public/lib/story/dart",
     "//topaz/public/lib/ui/flutter",
     "//topaz/shell/agents/home_work_agent:home_work_agent_dart_library",

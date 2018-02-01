@@ -2,22 +2,23 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:lib.story.dart/story.dart';
 import 'package:lib.story.fidl/story_controller.fidl.dart';
 import 'package:lib.story.fidl/story_info.fidl.dart';
 import 'package:lib.story.fidl/story_provider.fidl.dart';
 import 'package:lib.story.fidl/story_state.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:lib.suggestion.fidl/user_input.fidl.dart';
 import 'package:lib.user.fidl/focus.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
-import 'package:lib.story.dart/story.dart';
 
 const String _kWallpapersLinkKey = 'wallpapers';
 const String _kImageSelectorModulePath = 'gallery';
@@ -117,7 +118,10 @@ class _QueryHandlerImpl extends QueryHandler {
   _QueryHandlerImpl({this.customAction});
 
   @override
-  void onQuery(UserInput query, void callback(QueryResponse response)) {
+  Future<Null> onQuery(
+    UserInput query,
+    void callback(QueryResponse response),
+  ) async {
     List<Proposal> proposals = <Proposal>[];
 
     if ((query.text?.toLowerCase()?.startsWith('wal') ?? false) ||
@@ -126,20 +130,15 @@ class _QueryHandlerImpl extends QueryHandler {
       CustomActionBinding binding = new CustomActionBinding();
       _bindings.add(binding);
       proposals.add(
-        new Proposal(
-            id: _kChooseWallpaperSuggestionHeadline,
-            display: new SuggestionDisplay(
-                headline: _kChooseWallpaperSuggestionHeadline,
-                subheadline: '',
-                details: '',
-                color: _kChooseWallpaperSuggestionColor,
-                iconUrls: <String>[],
-                imageType: SuggestionImageType.other,
-                imageUrl: _kChooseWallpaperSuggestionImageUrl,
-                annoyance: AnnoyanceType.none),
-            onSelected: <Action>[
-              new Action.withCustomAction(binding.wrap(customAction))
-            ]),
+        await createProposal(
+          id: _kChooseWallpaperSuggestionHeadline,
+          headline: _kChooseWallpaperSuggestionHeadline,
+          color: _kChooseWallpaperSuggestionColor,
+          imageUrl: _kChooseWallpaperSuggestionImageUrl,
+          actions: <Action>[
+            new Action.withCustomAction(binding.wrap(customAction))
+          ],
+        ),
       );
     }
 

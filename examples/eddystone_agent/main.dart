@@ -12,9 +12,9 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.bluetooth.fidl/common.fidl.dart' as bt;
 import 'package:lib.bluetooth.fidl/low_energy.fidl.dart' as ble;
 import 'package:lib.logging/logging.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
@@ -28,31 +28,32 @@ const String kEddystoneUuid = '0000feaa-0000-1000-8000-00805f9b34fb';
 
 final Set<String> proposed = new Set<String>();
 
-void proposeUrl(String url) {
+Future<Null> proposeUrl(String url) async {
   // TODO(jamuraa): resolve this URL for a title or more info?
   // TODO(jamuraa): add icon for eddystone / physicalweb
-  String headline = 'Open nearby webpage';
-  Proposal proposal = new Proposal(
-      id: 'Eddystone-URL: $url',
-      confidence: 0.0,
-      display: new SuggestionDisplay(
-          headline: headline,
-          subheadline: '$url',
-          details: 'Eddystone nearby webpage detected',
-          color: 0xFF0000FF,
-          iconUrls: const <String>[],
-          imageUrl: '',
-          imageType: SuggestionImageType.other,
-          annoyance: AnnoyanceType.none),
-      onSelected: <Action>[
-        new Action.withCreateStory(new CreateStory(
-            moduleId: web_view.kWebViewURL,
-            initialData: JSON.encode({
-              'view': {'uri': url}
-            })))
-      ]);
   log.info('Proposing URL: $url');
-  _proposalPublisher.propose(proposal);
+  _proposalPublisher.propose(await createProposal(
+    id: 'Eddystone-URL: $url',
+    confidence: 0.0,
+    headline: 'Open nearby webpage',
+    subheadline: '$url',
+    details: 'Eddystone nearby webpage detected',
+    color: 0xFF0000FF,
+    actions: <Action>[
+      new Action.withCreateStory(
+        new CreateStory(
+          moduleId: web_view.kWebViewURL,
+          initialData: JSON.encode(
+            {
+              'view': {
+                'uri': url,
+              }
+            },
+          ),
+        ),
+      )
+    ],
+  ));
 }
 
 String toHexString(final Iterable<int> data) {

@@ -2,9 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:convert' show JSON;
+
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.decomposition.dart/decomposition.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
@@ -37,7 +40,10 @@ class _QueryHandlerImpl extends QueryHandler {
   static final RegExp _musicPatternPortugal = new RegExp(r'portugal|the man');
 
   @override
-  void onQuery(UserInput query, void callback(QueryResponse response)) {
+  Future<Null> onQuery(
+    UserInput query,
+    void callback(QueryResponse response),
+  ) async {
     List<Proposal> proposals = <Proposal>[];
     if (query.text?.contains(_urlSubPattern) ?? false) {
       final String url = query.text.startsWith('http')
@@ -47,7 +53,7 @@ class _QueryHandlerImpl extends QueryHandler {
               : 'https://${query.text}';
 
       proposals.add(
-        _createProposal(
+        await _createProposal(
           id: 'launch web_view',
           appUrl: web_view.kWebViewURL,
           headline: 'Go to ${query.text}',
@@ -60,7 +66,7 @@ class _QueryHandlerImpl extends QueryHandler {
     }
     if (query.text?.contains(_dashboardSubPattern) ?? false) {
       proposals.add(
-        _createProposal(
+        await _createProposal(
           id: 'launch dashboard',
           appUrl: 'dashboard',
           headline: 'View the Fuchsia Dashboard',
@@ -73,7 +79,7 @@ class _QueryHandlerImpl extends QueryHandler {
     if ((query.text?.isNotEmpty ?? false) &&
         _chatHeadline.toLowerCase().contains(query.text.toLowerCase())) {
       proposals.add(
-        _createProposal(
+        await _createProposal(
           id: 'open chat',
           appUrl: 'chat_conversation_list',
           headline: _chatHeadline,
@@ -84,7 +90,7 @@ class _QueryHandlerImpl extends QueryHandler {
     if ((query.text?.isNotEmpty ?? false) &&
         _emailHeadline.toLowerCase().contains(query.text.toLowerCase())) {
       proposals.add(
-        _createProposal(
+        await _createProposal(
           id: 'open email',
           appUrl: 'email/nav',
           headline: _emailHeadline,
@@ -95,7 +101,7 @@ class _QueryHandlerImpl extends QueryHandler {
     if ((query.text?.isNotEmpty ?? false) &&
         _youtubeHeadline.toLowerCase().contains(query.text.toLowerCase())) {
       proposals.add(
-        _createProposal(
+        await _createProposal(
           id: 'open youtube',
           appUrl: 'youtube_story',
           headline: _youtubeHeadline,
@@ -106,7 +112,7 @@ class _QueryHandlerImpl extends QueryHandler {
     if ((query.text?.isNotEmpty ?? false) &&
         _terminalHeadline.toLowerCase().contains(query.text.toLowerCase())) {
       proposals.add(
-        _createProposal(
+        await _createProposal(
           id: 'open terminal',
           appUrl: 'moterm',
           headline: _terminalHeadline,
@@ -117,7 +123,7 @@ class _QueryHandlerImpl extends QueryHandler {
 
     if (query.text?.contains(_musicPatternKanye) ?? false) {
       proposals.add(
-        _createProposal(
+        await _createProposal(
           id: 'Listen to Kanye',
           appUrl: 'music_artist',
           headline: 'Listen to Kanye',
@@ -134,7 +140,7 @@ class _QueryHandlerImpl extends QueryHandler {
 
     if (query.text?.contains(_musicPatternPortugal) ?? false) {
       proposals.add(
-        _createProposal(
+        await _createProposal(
           id: 'Listen to Portugal. The Man',
           appUrl: 'music_artist',
           headline: 'Listen to Portugal. The Man',
@@ -150,14 +156,16 @@ class _QueryHandlerImpl extends QueryHandler {
     }
 
     if (query.text?.startsWith('test s') ?? false) {
-      proposals..addAll(_kDummyProposals)..addAll(_kDummyInterruptions);
+      proposals
+        ..addAll(await Future.wait(_kDummyProposals))
+        ..addAll(await Future.wait(_kDummyInterruptions));
     }
 
     callback(new QueryResponse(proposals: proposals));
   }
 }
 
-final List<Proposal> _kDummyProposals = <Proposal>[
+final List<Future<Proposal>> _kDummyProposals = <Future<Proposal>>[
   _createUniqueDummyProposal(
     headline: 'Headline only',
   ),
@@ -389,7 +397,7 @@ final List<Proposal> _kDummyProposals = <Proposal>[
   ),
 ];
 
-final List<Proposal> _kDummyInterruptions = <Proposal>[
+final List<Future<Proposal>> _kDummyInterruptions = <Future<Proposal>>[
   _createUniqueDummyProposal(
     headline: 'Headline only',
     annoyanceType: AnnoyanceType.interrupt,
@@ -665,50 +673,53 @@ final List<Proposal> _kDummyInterruptions = <Proposal>[
   ),
 ];
 int _id = 0;
-Proposal _createUniqueDummyProposal({
+Future<Proposal> _createUniqueDummyProposal({
   String headline,
-  String subheadline: '',
+  String subheadline,
   String iconUrl,
-  String imageUrl: '',
+  String imageUrl,
   SuggestionImageType imageType: SuggestionImageType.other,
   AnnoyanceType annoyanceType: AnnoyanceType.none,
-}) =>
+}) async =>
     _createProposal(
       id: 'dummy ${_id++}',
       appUrl: 'file:///foo/bar',
       headline: headline,
       subheadline: subheadline,
       color: 0xFF000000,
-      iconUrls: iconUrl != null ? <String>[iconUrl] : <String>[],
+      iconUrl: iconUrl,
       imageType: imageType,
       imageUrl: imageUrl,
       annoyanceType: annoyanceType,
     );
 
-Proposal _createProposal({
+Future<Proposal> _createProposal({
   String id,
   String appUrl,
   String headline,
   String subheadline,
-  String imageUrl: '',
+  String imageUrl,
   String initialData,
   SuggestionImageType imageType: SuggestionImageType.other,
-  List<String> iconUrls = const <String>[],
+  String iconUrl,
   int color,
   AnnoyanceType annoyanceType: AnnoyanceType.none,
-}) =>
-    new Proposal(
-        id: id,
-        display: new SuggestionDisplay(
-            headline: headline,
-            subheadline: subheadline ?? '',
-            details: '',
-            color: color,
-            iconUrls: iconUrls,
-            imageType: imageType,
-            imageUrl: imageUrl,
-            annoyance: annoyanceType),
-        onSelected: <Action>[
-          new Action.withCreateStory(
-              new CreateStory(moduleId: appUrl, initialData: initialData))
-        ]);
+}) async =>
+    createProposal(
+      id: id,
+      headline: headline,
+      subheadline: subheadline,
+      color: color,
+      iconUrls: iconUrl == null ? null : <String>[iconUrl],
+      imageUrl: imageUrl,
+      imageType: imageType,
+      annoyanceType: annoyanceType,
+      actions: <Action>[
+        new Action.withCreateStory(
+          new CreateStory(
+            moduleId: appUrl,
+            initialData: initialData,
+          ),
+        )
+      ],
+    );

@@ -21,5 +21,6 @@ dart_app("last_fm_agent") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/decomposition/dart",
     "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/proposal/dart",
   ]
 }
