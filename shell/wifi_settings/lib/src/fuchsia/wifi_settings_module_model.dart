@@ -129,7 +129,8 @@ class WifiSettingsModuleModel extends ModuleModel {
       new wlan.ConnectConfig(
           ssid: accessPoint.name,
           passPhrase: password ?? '',
-          scanInterval: _kConnectionScanInterval),
+          scanInterval: _kConnectionScanInterval,
+          bssid: ''),
       (wlan.Error error) {
         _selectedAccessPoint = null;
         _password = null;
