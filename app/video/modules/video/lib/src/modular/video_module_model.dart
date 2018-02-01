@@ -305,6 +305,9 @@ class VideoModuleModel extends ModuleModel {
   @override
   void onNotify(String json) {
     Map<String, String> linkContents = JSON.decode(json);
+    if (linkContents == null) {
+      return;
+    }
     log.fine('Updating video asset according to Daisy Link data');
     if (linkContents['entityRef'] != null) {
       String entityRef = linkContents['entityRef'];
