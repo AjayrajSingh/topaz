@@ -76,11 +76,11 @@ source_set("skia_vmo") {
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
     "//third_party/skia",
-    "//zircon/system/ulib/zx",
+    "//zircon/public/lib/zx",
   ]
 
   deps = [
-    "//zircon/system/ulib/trace",
+    "//zircon/public/lib/trace",
   ]
 
   public_configs = [ ":config" ]

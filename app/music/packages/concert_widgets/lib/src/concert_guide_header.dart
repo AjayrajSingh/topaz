@@ -20,8 +20,8 @@ class ConcertGuideHeader extends StatelessWidget {
     return new LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return new Container(
-          decoration: new BoxDecoration(
-            image: new DecorationImage(
+          decoration: const BoxDecoration(
+            image: const DecorationImage(
               image: const AssetImage(
                 'packages/concert_widgets/res/concert_bg.jpg',
               ),

@@ -39,7 +39,7 @@ class StatusTrayWidget extends StatelessWidget {
                   ),
                   child: child,
                 ),
-            child: new Center(
+            child: const Center(
               child: const Text('3:14'),
             ),
           );

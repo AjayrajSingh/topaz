@@ -29,7 +29,7 @@ executable("bin") {
     "//peridot/public/lib/auth/fidl",
     "//third_party/rapidjson",
     "//topaz/runtime/web_runner/services",
-    "//zircon/system/ulib/trace-provider",
+    "//zircon/public/lib/trace-provider",
   ]
 }
 

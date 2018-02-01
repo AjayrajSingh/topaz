@@ -89,7 +89,7 @@ class _WidgetExplorerState extends State<WidgetExplorer> {
   Widget _buildContents() {
     WidgetSpecs specs = widget.widgetSpecs[selectedWidget];
     if (specs == null) {
-      return new Center(
+      return const Center(
         child: const Text('Please select a widget from the left pane.'),
       );
     }

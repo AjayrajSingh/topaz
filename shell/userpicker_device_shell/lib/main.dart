@@ -281,7 +281,7 @@ class _ElevatedCheckedModeBanner extends StatelessWidget {
                           height: _kHeight,
                           width: _kWidth,
                           color: _kColor,
-                          child: new Center(
+                          child: const Center(
                             child: const Text(
                               'SLOW MODE',
                               textAlign: TextAlign.center,

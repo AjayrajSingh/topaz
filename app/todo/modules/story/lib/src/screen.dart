@@ -53,7 +53,7 @@ class HomePage extends StatelessWidget {
       appBar: new AppBar(
         title: new Text(title),
       ),
-      body: new Center(
+      body: const Center(
         child: const Text('TODO: Make some UI.'),
       ),
     );

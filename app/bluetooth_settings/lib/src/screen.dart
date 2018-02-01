@@ -11,7 +11,7 @@ class _SettingsScaffold extends StatelessWidget {
   Widget _getDiscoveredDevicesWidget(
       BuildContext context, SettingsModuleModel moduleModel) {
     if (moduleModel.discoveredDevices.isEmpty) {
-      return new Center(child: const Text('No devices found'));
+      return const Center(child: const Text('No devices found'));
     }
 
     return new ListView(

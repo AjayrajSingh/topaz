@@ -23,7 +23,8 @@ executable("paint") {
     "//garnet/public/lib/ui/views/fidl",
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_view",
-    "//zircon/system/ulib/trace-provider",
+    "//zircon/public/lib/hid",
+    "//zircon/public/lib/trace-provider",
   ]
 }
 

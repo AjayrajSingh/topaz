@@ -20,6 +20,7 @@ executable("media_player") {
     "//garnet/public/lib/ui/view_framework:view_provider",
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_view",
+    "//zircon/public/lib/hid",
   ]
 }
 

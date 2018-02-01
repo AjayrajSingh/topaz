@@ -49,10 +49,10 @@ executable("bin") {
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_fonts",
     "//topaz/examples/ui/lib:skia_view",
-    "//zircon/system/ulib/trace-provider",
+    "//zircon/public/lib/hid",
+    "//zircon/public/lib/launchpad",
+    "//zircon/public/lib/trace-provider",
   ]
-
-  libs = [ "launchpad" ]
 }
 
 package("moterm") {

@@ -129,7 +129,7 @@ class Browser extends StatelessWidget {
       // Handles whether to display that loading is happening.
       Widget mainDocView;
       if (model.loading) {
-        mainDocView = new Center(child: const CircularProgressIndicator());
+        mainDocView = const Center(child: const CircularProgressIndicator());
       } else {
         mainDocView = new Expanded(
           child: new Container(

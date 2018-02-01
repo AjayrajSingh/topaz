@@ -14,6 +14,6 @@ source_set("sdk_ext") {
     "//third_party/dart/runtime:dart_api",
     "//topaz/lib/tonic",
     "//topaz/public/dart-pkg/zircon",
-    "//zircon/system/ulib/zx",
+    "//zircon/public/lib/zx",
   ]
 }

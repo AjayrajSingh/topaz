@@ -35,6 +35,7 @@ executable("web_view_bin") {
     "//third_party/boringssl",
     "//third_party/rapidjson",
     "//topaz/runtime/web_runner/services",
+    "//zircon/public/lib/hid",
   ]
 
   ldflags = [ "-Wl,-z,stack-size=1048576" ]

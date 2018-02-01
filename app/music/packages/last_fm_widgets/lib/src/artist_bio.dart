@@ -30,7 +30,7 @@ class ArtistBio extends StatelessWidget {
           padding: const EdgeInsets.all(32.0),
           decoration: new BoxDecoration(
             color: Colors.black,
-            image: new DecorationImage(
+            image: const DecorationImage(
               image: const AssetImage(
                 'packages/last_fm_widgets/res/background.jpg',
               ),

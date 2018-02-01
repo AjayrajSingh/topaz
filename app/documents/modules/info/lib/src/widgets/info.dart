@@ -61,7 +61,7 @@ class Info extends StatelessWidget {
       InfoModuleModel model,
     ) {
       if (model.doc == null) {
-        return new Center(
+        return const Center(
           child: const CircularProgressIndicator(),
         );
       }

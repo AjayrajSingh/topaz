@@ -39,7 +39,7 @@ class _ContactCardState extends State<ContactCard>
         ContactCardModel model,
       ) {
         return model.contact == null
-            ? new Center(child: const Text(_kEmptyContactMsg))
+            ? const Center(child: const Text(_kEmptyContactMsg))
             : new LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
                   bool isPortrait =

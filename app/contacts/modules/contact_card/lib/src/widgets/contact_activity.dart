@@ -38,7 +38,7 @@ class ContactActivity extends StatelessWidget {
       new Card(
         child: new Container(
           height: 100.0,
-          child: new Center(
+          child: const Center(
             child: const Text('No Activity Yet :('),
           ),
         ),
