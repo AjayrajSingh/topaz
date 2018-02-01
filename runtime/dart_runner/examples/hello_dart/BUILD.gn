@@ -33,3 +33,13 @@ dart_aot_app("hello_dart_aot") {
     "//topaz/runtime/dart_runner/examples/greeting",
   ]
 }
+
+dart_aot_kernel_app("hello_dart_aot_kernel") {
+  main_dart = "bin/hello_dart.dart"
+
+  source_dir = "."
+
+  deps = [
+    "//topaz/runtime/dart_runner/examples/greeting",
+  ]
+}

@@ -25,7 +25,7 @@ template("gen_snapshot_cc") {
     action("${name}_package_map") {
       dot_packages_file = "$target_gen_dir/${name}.packages"
       outputs = [
-        dot_packages_file
+        dot_packages_file,
       ]
       deps = []
       foreach(dep, dart_deps) {
@@ -36,20 +36,20 @@ template("gen_snapshot_cc") {
 
       script = "//build/dart/gen_dot_packages.py"
       args = [
-        "--out",
-        rebase_path(dot_packages_file, root_build_dir),
-        "--source-dir",
-        rebase_path("."),
-        "--root-build-dir",
-        rebase_path(root_build_dir),
-        "--root-gen-dir",
-        rebase_path(dart_root_gen_dir),
-        "--package-name",
-        "snapshot_root",
-        "--depfile",
-        rebase_path(depfile),
-        "--deps",
-      ] + dart_deps
+               "--out",
+               rebase_path(dot_packages_file, root_build_dir),
+               "--source-dir",
+               rebase_path("."),
+               "--root-build-dir",
+               rebase_path(root_build_dir),
+               "--root-gen-dir",
+               rebase_path(dart_root_gen_dir),
+               "--package-name",
+               "snapshot_root",
+               "--depfile",
+               rebase_path(depfile),
+               "--deps",
+             ] + dart_deps
     }
   }
 
@@ -181,22 +181,30 @@ gen_snapshot_cc("script_runner_snapshot") {
 }
 
 action("generate_aot_snapshot_assembly") {
-  aot_snapshotter_label =
-      "//topaz/runtime/dart_runner/snapshotter:aot_snapshotter($host_toolchain)"
-  aot_snapshotter_dir = get_label_info(aot_snapshotter_label, "root_out_dir")
+  if (is_debug) {
+    gen_snapshot_exe = "gen_snapshot"
+  } else {
+    gen_snapshot_exe = "gen_snapshot_product"
+  }
+  gen_snapshot_label =
+      "//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)"
+  gen_snapshot_dir = get_label_info(gen_snapshot_label, "root_out_dir")
 
   snapshot_assembly = "$target_gen_dir/aot_vm_snapshot.S"
 
   deps = [
-    aot_snapshotter_label,
+    gen_snapshot_label,
   ]
 
   outputs = [
     snapshot_assembly,
   ]
 
-  script = rebase_path("$aot_snapshotter_dir/dart_aot_snapshotter")
-  args = [ "--aot-vm-snapshot=" + rebase_path(snapshot_assembly) ]
+  script = "$gen_snapshot_dir/$gen_snapshot_exe"
+  args = [
+    "--snapshot_kind=vm-aot-assembly",
+    "--assembly=" + rebase_path(snapshot_assembly),
+  ]
 }
 
 source_set("dart_aot_snapshot_cc") {

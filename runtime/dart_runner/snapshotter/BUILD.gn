@@ -28,32 +28,3 @@ executable("snapshotter") {
            "//topaz/lib/tonic/file_loader",
          ] + dart_deps
 }
-
-executable("aot_snapshotter") {
-  output_name = "dart_aot_snapshotter"
-
-  sources = [
-    "main.cc",
-  ]
-
-  defines = [ "AOT_COMPILER" ]
-
-  if (is_debug) {
-    dart_deps = [
-      "//third_party/dart/runtime:libdart_with_precompiler",
-      "//third_party/dart/runtime/platform:libdart_platform",
-    ]
-  } else {
-    dart_deps = [
-      "//third_party/dart/runtime:libdart_with_precompiler_product",
-      "//third_party/dart/runtime/platform:libdart_platform_product",
-    ]
-  }
-
-  deps = [
-           "//topaz/runtime/dart_runner/embedder:snapshot",
-           "//garnet/public/lib/fxl",
-           "//topaz/lib/tonic/converter",
-           "//topaz/lib/tonic/file_loader",
-         ] + dart_deps
-}

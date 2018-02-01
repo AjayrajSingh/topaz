@@ -78,13 +78,13 @@ Future<void> main(List<String> args) async {
   final Uri filenameUri = Uri.base.resolveUri(new Uri.file(filename));
 
   final CompilerOptions compilerOptions = new CompilerOptions()
-      ..byteStore = new MemoryByteStore()
       ..sdkRoot = sdkRoot
       ..strongMode = strongMode
       ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
       ..target = new RunnerTarget(new TargetFlags(strongMode: strongMode))
       ..embedSourceText = embedSources
-      ..reportMessages = true;
+      ..reportMessages = true
+      ..setExitCodeOnProblem = true;
 
   Program program;
   if (!aot) {
@@ -92,8 +92,14 @@ Future<void> main(List<String> args) async {
         new IncrementalKernelGenerator(compilerOptions, filenameUri);
     program = await generator.computeDelta();
   } else {
-    throw "Unimplemented";
-    // program = await compileToKernel(filenameUri, compilerOptions, aot: true);
+    // Link in the platform to produce an output with no external references.
+    String platformKernelDill = strongMode ? 'platform_strong.dill'
+                                           : 'platform.dill';
+    compilerOptions.linkedDependencies = <Uri>[
+      sdkRoot.resolve(platformKernelDill)
+    ];
+
+    program = await compileToKernel(filenameUri, compilerOptions, aot: true);
   }
 
   final IOSink sink = new File(kernelBinaryFilename).openWrite();
