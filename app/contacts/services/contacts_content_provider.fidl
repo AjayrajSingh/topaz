@@ -43,7 +43,13 @@ interface ContactsContentProvider {
   Unsubscribe@4(string message_queue_token);
 
   // Add the array of contacts to the contact store
-  AddAll@5(array<Contact> contacts) => (Status status);
+  Add@5(array<Contact> contacts) => (Status status);
+
+  // Delete the array of contacts from the contact store
+  Delete@6(array<Contact> contacts) => (Status status);
+
+  // Returns all the contacts from a data provider source
+  GetContactsFromSource@7(string source_id) => (Status status, array<Contact> contacts);
 };
 
 // Service interface to be implemented by third-party contacts data providers

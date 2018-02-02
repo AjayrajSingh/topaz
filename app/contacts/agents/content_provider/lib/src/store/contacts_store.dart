@@ -17,10 +17,14 @@ class ContactsStore {
   final Map<String, fidl.Contact> _contactMap =
       new HashMap<String, fidl.Contact>();
 
-  /// Takes the displayName as the key and a set of contact ids as the value
-  /// in case there are multiple contacts with the same display name
-  final SplayTreeMap<String, Set<fidl.Contact>> _displayNameIndex =
-      new SplayTreeMap<String, Set<fidl.Contact>>(_compareDisplayNames);
+  /// Takes the displayName as the key and a set of [fidl.Contact.contactId]s as
+  /// the value in case there are multiple contacts with the same display name
+  final SplayTreeMap<String, Set<String>> _displayNameIndex =
+      new SplayTreeMap<String, Set<String>>(_compareDisplayNames);
+
+  /// Index on the contact and it's source. Key is the [fidl.Contact.sourceId]
+  /// and the value are a set of [fidl.Contact.contactId]s
+  final Map<String, Set<String>> _contactSourceIndex = <String, Set<String>>{};
 
   /// The prefix tree that allows prefix searching through all searchable fields
   final PrefixTree<Set<fidl.Contact>> _prefixTree =
@@ -72,8 +76,12 @@ class ContactsStore {
     _contactMap[id] = contact;
 
     // Add to the displayName index
-    _displayNameIndex[displayName] ??= new Set<fidl.Contact>();
-    _displayNameIndex[displayName].add(contact);
+    _displayNameIndex[displayName] ??= new Set<String>();
+    _displayNameIndex[displayName].add(contact.contactId);
+
+    // Add to the source index
+    _contactSourceIndex[contact.sourceId] ??= new Set<String>();
+    _contactSourceIndex[contact.sourceId].add(contact.contactId);
 
     // Add all searchable values to the prefix tree
     for (String value in searchableValues) {
@@ -95,10 +103,16 @@ class ContactsStore {
     _contactMap.remove(id);
 
     String displayName = contact.displayName;
-    Set<fidl.Contact> displayNameSet = _displayNameIndex[displayName]
-      ..remove(contact);
+    Set<String> displayNameSet = _displayNameIndex[displayName]
+      ..remove(contact.contactId);
     if (displayNameSet.isEmpty) {
       _displayNameIndex.remove(displayName);
+    }
+
+    Set<String> sourceContacts = _contactSourceIndex[contact.sourceId]
+      ..remove(contact.contactId);
+    if (sourceContacts.isEmpty) {
+      _contactSourceIndex.remove(contact.sourceId);
     }
 
     List<String> searchableValues = _getSearchableValues(contact);
@@ -116,10 +130,17 @@ class ContactsStore {
     }
   }
 
+  /// Returns the list of all the contacts from the source at [sourceId]
+  List<fidl.Contact> getContactsFromSource(String sourceId) {
+    return _contactSourceIndex[sourceId]?.map(getContact)?.toList() ??
+        <fidl.Contact>[];
+  }
+
   /// Return the list of all contacts sorted by displayName
   List<fidl.Contact> getAllContacts() {
     return _displayNameIndex.values
-        .expand((Set<fidl.Contact> contacts) => contacts)
+        .expand((Set<String> contactIds) => contactIds)
+        .map(getContact)
         .toList();
   }
 

@@ -29,6 +29,12 @@ import 'entity_helpers.dart';
 const String _kDataProvidersConfig =
     '/system/data/contacts/data_providers.json';
 
+/// Ledger operations
+enum _LedgerOperation {
+  put,
+  delete,
+}
+
 /// Private class to store information about a [fidl.ContactsDataProvider] agent
 class _DataProvider {
   final String sourceId;
@@ -229,15 +235,36 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   }
 
   @override
-  void addAll(
+  void add(
     List<fidl.Contact> contacts,
     void callback(fidl.Status status),
   ) {
-    log.fine('addAll called');
+    log.fine('add called');
     _saveContactsToLedger(contacts).then((bool saved) {
-      log.fine('addAll completed');
+      log.fine('add completed');
       callback(saved ? fidl.Status.ok : fidl.Status.error);
     });
+  }
+
+  @override
+  void delete(
+    List<fidl.Contact> contacts,
+    void callback(fidl.Status status),
+  ) {
+    log.fine('delete called');
+    _deleteContactsFromLedger(contacts).then((bool deleted) {
+      log.fine('delete completed');
+      callback(deleted ? fidl.Status.ok : fidl.Status.error);
+    });
+  }
+
+  @override
+  void getContactsFromSource(
+    String sourceId,
+    void callback(fidl.Status status, List<fidl.Contact> contacts),
+  ) {
+    log.fine('getContactsFromSource called');
+    callback(fidl.Status.ok, _contactsStore.getContactsFromSource(sourceId));
   }
 
   // Entity Provider methods
@@ -409,6 +436,21 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
 
   /// Saves the list of contacts to ledger and returns true if it was successful
   Future<bool> _saveContactsToLedger(List<fidl.Contact> contacts) async {
+    // TODO(meiyili): add retrieval timestamp to contacts to better resolve
+    // ledger conflicts SO-1117
+    return await _updateLedgerContacts(contacts, _LedgerOperation.put);
+  }
+
+  /// Deletes the list of contacts from ledger and returns true if it was
+  /// successful
+  Future<bool> _deleteContactsFromLedger(List<fidl.Contact> contacts) async {
+    return await _updateLedgerContacts(contacts, _LedgerOperation.delete);
+  }
+
+  Future<bool> _updateLedgerContacts(
+    List<fidl.Contact> contacts,
+    _LedgerOperation operation,
+  ) async {
     bool updated = false;
     if (_page == null) {
       // TODO(meiyili): handle ledger errors gracefully SO-810
@@ -426,21 +468,28 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     bool startTransactionOk = (await completer.future) == ledger.Status.ok;
     if (startTransactionOk) {
       log.fine('Started ledger transaction');
-      List<Future<ledger.Status>> putStatuses = <Future<ledger.Status>>[];
+      List<Future<ledger.Status>> opStatuses = <Future<ledger.Status>>[];
       for (fidl.Contact contact in (contacts ?? <fidl.Contact>[])) {
         Completer<ledger.Status> statusCompleter =
             new Completer<ledger.Status>();
-        putStatuses.add(statusCompleter.future);
+        opStatuses.add(statusCompleter.future);
         List<int> contactId = UTF8.encode(contact.contactId);
         List<int> ledgerValue = encodeLedgerValue(contact);
-        _page.put(
-          contactId,
-          ledgerValue,
-          (ledger.Status status) => statusCompleter.complete(status),
-        );
+        if (operation == _LedgerOperation.put) {
+          _page.put(
+            contactId,
+            ledgerValue,
+            (ledger.Status status) => statusCompleter.complete(status),
+          );
+        } else if (operation == _LedgerOperation.delete) {
+          _page.delete(
+            contactId,
+            (ledger.Status status) => statusCompleter.complete(status),
+          );
+        }
       }
 
-      List<ledger.Status> statuses = await Future.wait(putStatuses);
+      List<ledger.Status> statuses = await Future.wait(opStatuses);
       bool allSucceeded = statuses.every(
         (ledger.Status s) => s == ledger.Status.ok,
       );
@@ -449,14 +498,13 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
       if (allSucceeded) {
         log.fine('Ledger operations succeeded');
         completer = new Completer<ledger.Status>();
-        _page.commit((ledger.Status status) => completer.complete(status));
-        bool commitOk = (await completer.future) == ledger.Status.ok;
-        if (commitOk) {
+        _page.commit(completer.complete);
+        if ((await completer.future) == ledger.Status.ok) {
           updated = true;
         }
       } else {
         completer = new Completer<ledger.Status>();
-        _page.rollback((ledger.Status status) => completer.complete(status));
+        _page.rollback(completer.complete);
         await completer.future;
         updated = false;
         log.fine('Ledger operations failed, rolled back');
