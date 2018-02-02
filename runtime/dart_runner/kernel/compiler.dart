@@ -32,6 +32,8 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
       defaultsTo: true)  // TODO(dartbug.com/32007): Default to false.
   ..addOption('packages',
       help: 'Path to .packages file')
+  ..addOption('depfile',
+      help: 'Path to output Ninja depfile')
   ..addOption('output',
       help: 'Path to output dill file');
 
@@ -50,7 +52,7 @@ Uri _ensureFolderPath(String path) {
   return Uri.base.resolve(uriPath);
 }
 
-void main(List<String> args) async {
+Future<void> main(List<String> args) async {
   ArgResults options;
   try {
     options = _argParser.parse(args);
@@ -66,6 +68,7 @@ void main(List<String> args) async {
 
   final Uri sdkRoot = _ensureFolderPath(options['sdk-root']);
   final String packages = options['packages'];
+  final String depfile = options['depfile'];
   final String kernelBinaryFilename = options['output'];
   final bool strongMode = options['strong'];
   final bool aot = options['aot'];
@@ -99,4 +102,33 @@ void main(List<String> args) async {
                                false /* excludeUriToSource */);
   printer.writeProgramFile(program);
   await sink.close();
+
+  if (depfile != null) {
+    await writeDepfile(program, kernelBinaryFilename, depfile);
+  }
+}
+
+String escapePath(String path) {
+  return path.replaceAll(r'\', r'\\').replaceAll(r' ', r'\ ');
+}
+
+// https://ninja-build.org/manual.html#_depfile
+Future<void> writeDepfile(Program program, String output, String depfile) async {
+  var deps = new List<Uri>();
+  for (Library lib in program.libraries) {
+    deps.add(lib.fileUri);
+    for (LibraryPart part in lib.parts) {
+      deps.add(part.fileUri);
+    }
+  }
+
+  var file = new File(depfile).openWrite();
+  file.write(escapePath(output));
+  file.write(':');
+  for (Uri dep in deps) {
+    file.write(' ');
+    file.write(escapePath(dep.toFilePath()));
+  }
+  file.write('\n');
+  await file.close();
 }

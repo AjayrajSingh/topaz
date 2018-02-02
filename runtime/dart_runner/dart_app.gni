@@ -145,7 +145,6 @@ template("dart_jit_kernel_app") {
     }
   }
 
-  kernel_path = "$target_gen_dir/${target_name}_kernel.dil"
   kernel_compiler_label =
       "//topaz/runtime/dart_runner/kernel:kernel_compiler($host_toolchain)"
   kernel_compiler_out_dir = get_label_info(kernel_compiler_label, "root_out_dir")
@@ -153,13 +152,15 @@ template("dart_jit_kernel_app") {
 
   kernel_target_name = target_name + "_kernel"
 
+  kernel_path = "$target_gen_dir/${target_name}_kernel.dil"
+  depfile_path = "${kernel_path}.d"
+
   action(kernel_target_name) {
     if (defined(invoker.testonly)) {
       testonly = invoker.testonly
     }
 
-    # TODO(rmacnak): Produce a depfile.
-    # depfile = ...
+    depfile = depfile_path
 
     outputs = [
       kernel_path,
@@ -170,7 +171,6 @@ template("dart_jit_kernel_app") {
     dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
     rebased_packages_path =
         rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
-    rebased_kernel_path = rebase_path(kernel_path)
 
     script = kernel_compiler_bin
     args = [
@@ -178,8 +178,10 @@ template("dart_jit_kernel_app") {
       rebase_path("$root_out_dir/runner_patched_sdk"),
       "--packages",
       rebased_packages_path,
+      "--depfile",
+      rebase_path(depfile_path, root_out_dir),
       "--output",
-      rebased_kernel_path,
+      rebase_path(kernel_path, root_out_dir),
       rebase_path(invoker.main_dart),
     ]
 
