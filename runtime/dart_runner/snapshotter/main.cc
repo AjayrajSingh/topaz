@@ -185,6 +185,7 @@ std::vector<char> CreateSnapshot() {
       {"dart:zircon", "HandleWaiter", "HandleWaiter._"},
       {"dart:zircon", "ReadResult", "ReadResult."},
       {"dart:zircon", "WriteResult", "WriteResult."},
+      {"dart:zircon", "_Namespace", "_namespace"},
       {NULL, NULL, NULL}  // Must be terminated with NULL entries.
   };
   DART_CHECK_VALID(Dart_Precompile(content_handler_entry_points));
