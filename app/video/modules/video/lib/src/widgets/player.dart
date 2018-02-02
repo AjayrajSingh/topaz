@@ -71,40 +71,6 @@ class Player extends StatelessWidget {
     );
   }
 
-  Widget _buildInfo(VideoModuleModel moduleModel) {
-    return new Center(
-      child: new Container(
-        decoration: new BoxDecoration(
-          borderRadius: new BorderRadius.circular(3.0),
-          color: Colors.black,
-        ),
-        width: 200.0,
-        padding: const EdgeInsets.all(16.0),
-        child: new Column(
-          children: <Widget>[
-            new Text(
-              moduleModel.asset.title,
-              style: new TextStyle(
-                fontSize: 10.0,
-                color: Colors.grey[50],
-                letterSpacing: 0.02,
-              ),
-              softWrap: true,
-            ),
-            new Text(
-              moduleModel.asset.uri.toString(),
-              style: new TextStyle(
-                fontSize: 10.0,
-                color: Colors.grey[50],
-                letterSpacing: 0.02,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildPlayerMode(
       VideoModuleModel moduleModel, PlayerModel playerModel, bool smallScreen) {
     Widget _deviceChooser = new DeviceChooser(
@@ -195,15 +161,6 @@ class Player extends StatelessWidget {
               left: 0.0,
               right: 0.0,
               child: const Scrubber(),
-            ),
-            new Positioned(
-              top: 10.0,
-              right: 10.0,
-              child: new PhysicalModel(
-                elevation: 2.0,
-                color: Colors.black,
-                child: _buildInfo(moduleModel),
-              ),
             ),
             // TODO(maryxia) SO-609: transparency with PhysicalModel
             new Positioned(
