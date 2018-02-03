@@ -283,7 +283,6 @@ class BLERectModuleModel extends ModuleModel
     }
 
     _color = new Color.fromARGB(255, value[0], value[1], value[2]);
-    log.info('Color written: $_color');
 
     return true;
   }
@@ -295,14 +294,13 @@ class BLERectModuleModel extends ModuleModel
     }
 
     _scale = value[0].toDouble() / 100.0;
-    log.info('Scale written: $_scale');
 
     return true;
   }
 
   bool _writeRotate(final List<int> value) {
     if (value.length != 2) {
-      log.info('Malformed rotation value (size: ${value.length})');
+      log.info('Malformed rotation angle (size: ${value.length})');
       return false;
     }
 
@@ -310,7 +308,6 @@ class BLERectModuleModel extends ModuleModel
     ByteData bdata = new ByteData.view(buffer);
     double angle = bdata.getUint16(0, Endianness.LITTLE_ENDIAN).toDouble();
     _radians = angle * math.PI / 180.0;
-    log.info('Rotate written (angle: $angle, radians: $_radians)');
 
     return true;
   }
