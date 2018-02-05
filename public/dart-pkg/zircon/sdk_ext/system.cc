@@ -330,6 +330,7 @@ Dart_Handle System::VmoWrite(fxl::RefPtr<Handle> vmo,
                              uint64_t offset,
                              const tonic::DartByteData& data) {
   if (!vmo || !vmo->is_valid()) {
+    data.Release();
     return ConstructDartObject(kWriteResult, ToDart(ZX_ERR_BAD_HANDLE));
   }
 
@@ -337,6 +338,7 @@ Dart_Handle System::VmoWrite(fxl::RefPtr<Handle> vmo,
   zx_status_t status = zx_vmo_write(vmo->handle(), data.data(), offset,
                                     data.length_in_bytes(), &actual);
 
+  data.Release();
   return ConstructDartObject(kWriteResult, ToDart(status), ToDart(actual));
 }
 
