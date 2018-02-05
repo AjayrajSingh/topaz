@@ -337,7 +337,7 @@ class StoryCluster {
           }
         }
         return !hadErrors;
-      });
+      }());
       replace(
         panel: panel,
         withPanel: new Panel.fromLTRB(

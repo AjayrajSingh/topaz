@@ -14,16 +14,6 @@ dart_jit_app("hello_dart_jit") {
   ]
 }
 
-dart_jit_kernel_app("hello_dart_jit_kernel") {
-  main_dart = "bin/hello_dart.dart"
-
-  source_dir = "."
-
-  deps = [
-    "//topaz/runtime/dart_runner/examples/greeting",
-  ]
-}
-
 dart_aot_app("hello_dart_aot") {
   main_dart = "bin/hello_dart.dart"
 

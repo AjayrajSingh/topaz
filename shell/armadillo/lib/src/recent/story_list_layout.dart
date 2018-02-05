@@ -100,7 +100,7 @@ class StoryListLayout {
         }
       }
       return true;
-    });
+    }());
 
     // Convert the story list into [StoryMetadata]s determining juggling minutes
     // along the way.  See [_kJugglingThresholdMinutes].

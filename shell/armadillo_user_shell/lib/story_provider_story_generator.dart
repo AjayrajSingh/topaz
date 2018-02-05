@@ -625,7 +625,7 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
     assert(() {
       storyTitle = '[$storyTitle // ${storyInfo.id}]';
       return true;
-    });
+    }());
     return storyTitle;
   }
 }

@@ -326,7 +326,7 @@
     <project name="third_party/dart/third_party/pkg_tested/http_io"
              path="third_party/dart/third_party/pkg_tested/http_io"
              remote="https://dart.googlesource.com/http_io.git"
-             revision="bea7f236fbd62f6e1b47d4806a889f628c58d114"/>
+             revision="35dc43c9144cf7ed4236843dacd62ebaf89df21a"/>
 
     <project name="third_party/dart/third_party/pkg_tested/package_config"
              path="third_party/dart/third_party/pkg_tested/package_config"

@@ -71,7 +71,7 @@ class StoryPanels extends StatelessWidget {
                 .toList(),
           );
           return true;
-        }),
+        }()),
         super(key: key);
 
   /// Set elevation of this story cluster based on the state:

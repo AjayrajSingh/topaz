@@ -38,7 +38,7 @@ ViewContainerProxy _initViewContainer() {
       print('ViewContainerProxy: error: $error');
     });
     return true;
-  });
+  }());
 
   return proxy;
 }
@@ -395,7 +395,7 @@ class _RenderChildView extends RenderBox {
           _debugErrorMessage.layout(minWidth: size.width, maxWidth: size.width);
         }
         return true;
-      });
+      }());
     }
   }
 
@@ -421,7 +421,7 @@ class _RenderChildView extends RenderBox {
         _debugErrorMessage.paint(context.canvas, offset);
       }
       return true;
-    });
+    }());
   }
 
   @override

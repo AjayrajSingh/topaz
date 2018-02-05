@@ -257,7 +257,7 @@ class _ElevatedCheckedModeBanner extends StatelessWidget {
     assert(() {
       offstage = false;
       return true;
-    });
+    }());
     return offstage
         ? child
         : new Stack(

@@ -122,31 +122,6 @@ package("dart_jit_runner") {
   ]
 }
 
-package("dart_jit_kernel_runner") {
-  deps = [
-    ":dart_jit_runner_bin",
-    "kernel:kernel_core_snapshot",
-  ]
-
-  binary = "dart_jit_runner"
-
-  meta = [ {
-        path = rebase_path("meta/sandbox")
-        dest = "sandbox"
-      } ]
-
-  resources = [
-    {
-      path = rebase_path("$target_gen_dir/kernel/vm_isolate_snapshot.bin")
-      dest = "snapshot_vm_isolate.bin"
-    },
-    {
-      path = rebase_path("$target_gen_dir/kernel/isolate_snapshot.bin")
-      dest = "snapshot_isolate.bin"
-    },
-  ]
-}
-
 package("dart_script_runner") {
   deps = [
     ":dart_jit_runner_bin",
