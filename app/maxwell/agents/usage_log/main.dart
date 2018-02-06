@@ -34,7 +34,8 @@ enum Metric {
   moduleLaunched,
   modulePairsInStory,
 }
-const int _cobaltEncodingID = 1;
+const int _cobaltForculusEncodingID = 1;
+const int _cobaltNoOpEncodingID = 2;
 const String _existingModuleKey = 'existing_module';
 const String _addedModuleKey = 'added_module';
 
@@ -80,7 +81,7 @@ void _onContextUpdate(ContextUpdate update) {
 void _addStringObservation(Metric metric, String metricString) {
   int metricId = _getCobaltMetricID(metric);
   _encoder.addStringObservation(
-      metricId, _cobaltEncodingID, metricString,
+      metricId, _cobaltForculusEncodingID, metricString,
       (Status s) => _onAddObservationStatus(metricId, s));
 }
 
@@ -96,7 +97,7 @@ ObservationValue _getStringObservationValue(String name, String value) {
   return new ObservationValue(
       name: name,
       value: new Value.withStringValue(value),
-      encodingId: _cobaltEncodingID);
+      encodingId: _cobaltNoOpEncodingID);
 }
 
 void _onAddObservationStatus(int metricId, Status status) {
