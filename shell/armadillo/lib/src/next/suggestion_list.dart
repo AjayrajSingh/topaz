@@ -463,7 +463,7 @@ class _SuggestionListSliverGridLayout extends SliverGridLayout {
   /// An estimate of the scroll extent needed to fully display all the tiles if
   /// there are `childCount` children in total.
   @override
-  double estimateMaxScrollOffset(int childCount) {
+  double computeMaxScrollOffset(int childCount) {
     int columnCount = _getColumnCount(width);
     double maxScrollOffset = 0.0;
     for (int i = 0; i < math.min(childCount, columnCount); i++) {

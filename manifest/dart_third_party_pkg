@@ -11,7 +11,7 @@
     <project name="third_party/dart/third_party/pkg/async"
              path="third_party/dart/third_party/pkg/async"
              remote="https://dart.googlesource.com/async.git"
-             revision="2.0.2"/>
+             revision="corelib_2_2_1"/>
 
     <project name="third_party/dart/third_party/pkg/barback"
              path="third_party/dart/third_party/pkg/barback"
@@ -151,7 +151,7 @@
     <project name="third_party/dart/third_party/pkg/mime"
              path="third_party/dart/third_party/pkg/mime"
              remote="https://dart.googlesource.com/mime.git"
-             revision="0.9.4"/>
+             revision="0.9.6"/>
 
     <project name="third_party/dart/third_party/pkg/mockito"
              path="third_party/dart/third_party/pkg/mockito"
@@ -301,17 +301,17 @@
     <project name="third_party/dart/third_party/pkg/utf"
              path="third_party/dart/third_party/pkg/utf"
              remote="https://dart.googlesource.com/utf.git"
-             revision="0.9.0+3"/>
+             revision="0.9.0+4"/>
 
     <project name="third_party/dart/third_party/pkg/watcher"
              path="third_party/dart/third_party/pkg/watcher"
              remote="https://dart.googlesource.com/watcher.git"
-             revision="0.9.7+4"/>
+             revision="0.9.7+7"/>
 
     <project name="third_party/dart/third_party/pkg/web_socket_channel"
              path="third_party/dart/third_party/pkg/web_socket_channel"
              remote="https://dart.googlesource.com/web_socket_channel.git"
-             revision="1.0.6"/>
+             revision="corelib_2_2_1"/>
 
     <project name="third_party/dart/third_party/pkg/yaml"
              path="third_party/dart/third_party/pkg/yaml"
