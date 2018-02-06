@@ -46,6 +46,7 @@
              githooks="manifest/git-hooks"/>
     <project name="third_party/lua"
              path="third_party/lua"
+             revision="c010908ea10f0f979c15f2e37fe2a39583894ff1"
              remote="https://fuchsia.googlesource.com/third_party/lua"
              gerrithost="https://fuchsia-review.googlesource.com"
              githooks="manifest/git-hooks"/>
