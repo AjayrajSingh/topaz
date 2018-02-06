@@ -291,7 +291,11 @@ Dart_Handle System::VmoFromFile(std::string path) {
   fxl::UniqueFD dirfd(fdio_ns_opendir(ns));
   if (!dirfd.is_valid())
     return ConstructDartObject(kFromFileResult, ToDart(ZX_ERR_NO_MEMORY));
-  fxl::UniqueFD fd(openat(dirfd.get(), path.c_str(), O_RDONLY));
+
+  const char* c_path = path.c_str();
+  if (path.length() > 0 && c_path[0] == '/')
+    c_path = &c_path[1];
+  fxl::UniqueFD fd(openat(dirfd.get(), c_path, O_RDONLY));
   if (!fd.is_valid())
     return ConstructDartObject(kFromFileResult, ToDart(ZX_ERR_IO));
 
