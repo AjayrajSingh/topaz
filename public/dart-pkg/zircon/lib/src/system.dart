@@ -17,23 +17,24 @@ class _Namespace { // ignore: unused_element
 }
 
 /// An exception representing an error returned as an zx_status_t.
-class ZxStatusException extends Error {
+class ZxStatusException implements Exception {
+  final String message;
   final int status;
-  ZxStatusException(this.status);
+
+  ZxStatusException(this.status, [this.message]);
+
   @override
-  String toString() => 'ZxStatusException($status)';
+  String toString() {
+    if (message == null)
+      return 'ZxStatusException: status = $status';
+    else
+      return 'ZxStatusException: status = $status, "$message"';
+  }
 }
 
 class _Result {
   final int status;
   const _Result(this.status);
-
-  /// Throw an |ZxStatusException| if the |status| is not |ZX_OK|.
-  void checkStatus() {
-    if (status != 0) {
-      throw new ZxStatusException(status);
-    }
-  }
 }
 
 class HandleResult extends _Result {

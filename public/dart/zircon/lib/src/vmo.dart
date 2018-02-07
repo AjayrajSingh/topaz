@@ -49,7 +49,14 @@ class Vmo extends _HandleWrapper<Vmo> {
   // TODO(dartbug.com/32028): When read only typed-data arrays are added to the
   // Dart SDK, return one of those instead.
   Uint8List map() {
-    MapResult r = System.vmoMap(handle)..checkStatus();
+    if (handle == null) {
+      final int status = ZX.ERR_INVALID_ARGS;
+      throw new ZxStatusException(status, getStringForStatus(status));
+    }
+    MapResult r = System.vmoMap(handle);
+    if (r.status != ZX.OK) {
+      throw new ZxStatusException(r.status, getStringForStatus(r.status));
+    }
     return r.data;
   }
 }
@@ -60,11 +67,14 @@ class SizedVmo extends Vmo {
   SizedVmo(Handle handle, this._size) : super(handle);
 
   /// Uses fdio_get_vmo() to get a VMO for the file at `path` in the current
-  /// Isolates namespace.
+  /// Isolate's namespace.
   ///
   /// The returned Vmo is read-only.
   factory SizedVmo.fromFile(String path) {
-    FromFileResult r = System.vmoFromFile(path)..checkStatus();
+    FromFileResult r = System.vmoFromFile(path);
+    if (r.status != ZX.OK) {
+      throw new ZxStatusException(r.status, getStringForStatus(r.status));
+    }
     return new SizedVmo(r.handle, r.numBytes);
   }
 
