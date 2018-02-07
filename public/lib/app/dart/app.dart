@@ -71,6 +71,8 @@ typedef void ServiceConnector<T>(InterfaceRequest<T> request);
 typedef void DefaultServiceConnector<T>(
     String serviceName, InterfaceRequest<T> request);
 
+typedef void _ServiceConnectorThunk(Channel channel);
+
 class ServiceProviderImpl extends ServiceProvider {
   final ServiceProviderBinding _binding = new ServiceProviderBinding();
 
@@ -84,18 +86,20 @@ class ServiceProviderImpl extends ServiceProvider {
 
   DefaultServiceConnector<dynamic> defaultConnector;
 
-  final Map<String, ServiceConnector<dynamic>> _connectors =
-      <String, ServiceConnector<dynamic>>{};
+  final Map<String, _ServiceConnectorThunk> _connectorThunks =
+      <String, _ServiceConnectorThunk>{};
 
   void addServiceForName<T>(ServiceConnector<T> connector, String serviceName) {
-    _connectors[serviceName] = connector;
+    _connectorThunks[serviceName] = (Channel channel) {
+      connector(new InterfaceRequest<T>(channel));
+    };
   }
 
   @override
   void connectToService(String serviceName, Channel channel) {
-    final ServiceConnector<dynamic> connector = _connectors[serviceName];
-    if (connector != null) {
-      connector(new InterfaceRequest<dynamic>(channel));
+    final _ServiceConnectorThunk connectorThunk = _connectorThunks[serviceName];
+    if (connectorThunk != null) {
+      connectorThunk(channel);
     } else if (defaultConnector != null) {
       defaultConnector(serviceName, new InterfaceRequest<dynamic>(channel));
     } else {

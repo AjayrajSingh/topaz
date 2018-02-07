@@ -7,11 +7,13 @@
         "dart_jit_runner_test": "//topaz/runtime/dart_runner/integration:jit",
         "goodbye_dart_aot": "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart_aot",
         "goodbye_dart_jit": "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart_jit",
+        "goodbye_dart2_aot": "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart2_aot",
+        "goodbye_dart2_jit": "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart2_jit",
         "hello_app_dart_aot": "//topaz/runtime/dart_runner/examples/hello_app_dart:hello_app_dart_aot",
         "hello_app_dart_jit": "//topaz/runtime/dart_runner/examples/hello_app_dart:hello_app_dart_jit",
+        "hello_app_dart2_aot": "//topaz/runtime/dart_runner/examples/hello_app_dart:hello_app_dart2_aot",
+        "hello_app_dart2_jit": "//topaz/runtime/dart_runner/examples/hello_app_dart:hello_app_dart2_jit",
         "hello_dart_aot": "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart_aot",
-        "hello_dart_jit": "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart_jit",
-        "hello_dart2_aot": "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart2_aot",
-        "hello_dart2_jit": "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart2_jit"
+        "hello_dart_jit": "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart_jit"
     }
 }

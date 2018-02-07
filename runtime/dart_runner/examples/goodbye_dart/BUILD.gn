@@ -23,3 +23,23 @@ dart_aot_app("goodbye_dart_aot") {
     "//topaz/public/lib/fidl/dart",
   ]
 }
+
+dart2_jit_app("goodbye_dart2_jit") {
+  main_dart = "goodbye_dart.dart"
+
+  source_dir = "."
+  deps = [
+    "//topaz/public/dart/fuchsia",
+    "//topaz/public/lib/fidl/dart",
+  ]
+}
+
+dart2_aot_app("goodbye_dart2_aot") {
+  main_dart = "goodbye_dart.dart"
+
+  source_dir = "."
+  deps = [
+    "//topaz/public/dart/fuchsia",
+    "//topaz/public/lib/fidl/dart",
+  ]
+}

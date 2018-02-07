@@ -91,7 +91,10 @@ class ByteDataScope {
 };
 
 Dart_Handle MakeHandleList(const std::vector<zx_handle_t>& in_handles) {
-  Dart_Handle list = Dart_NewList(in_handles.size());
+  tonic::DartClassLibrary& class_library =
+      tonic::DartState::Current()->class_library();
+  Dart_Handle handle_type = class_library.GetClass("zircon", "Handle");
+  Dart_Handle list = Dart_NewListOfType(handle_type, in_handles.size());
   if (Dart_IsError(list))
     return list;
   for (size_t i = 0; i < in_handles.size(); i++) {
