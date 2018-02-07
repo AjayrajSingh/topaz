@@ -145,7 +145,7 @@ class ArmadilloUserShellModel extends UserShellModel {
     _attachSpeechToText();
 
     ContextQuery query =
-        new ContextQuery(selector: <String, ContextSelector>{});
+        new ContextQuery(selector: <String, ContextSelector>{});  // ignore: prefer_const_constructors
     for (String topic in contextTopics) {
       ContextSelector selector = new ContextSelector(
           type: ContextValueType.entity,

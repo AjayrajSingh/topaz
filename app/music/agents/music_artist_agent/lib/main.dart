@@ -121,7 +121,7 @@ Future<Null> main(List<dynamic> args) async {
       meta: new ContextMetadata(
           story: new StoryMetadata(
               focused: new FocusedState(state: FocusedStateState.focused)),
-          entity: new EntityMetadata(type: <String>[_kMusicArtistType])));
+          entity: new EntityMetadata(type: <String>[_kMusicArtistType]))); // ignore: prefer_const_constructors
 
   ContextQuery query = new ContextQuery(
       selector: <String, ContextSelector>{_kMusicArtistType: selector});

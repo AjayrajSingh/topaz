@@ -9,7 +9,7 @@ import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
 
 List<fidl.Contact> _createContactList() {
   return <fidl.Contact>[
-    new fidl.Contact(
+    const fidl.Contact(
       contactId: 'contact1',
       sourceContactId: '1',
       sourceId: 'test',
@@ -19,7 +19,7 @@ List<fidl.Contact> _createContactList() {
       ],
       phoneNumbers: <fidl.PhoneNumber>[],
     ),
-    new fidl.Contact(
+    const fidl.Contact(
       contactId: 'contact2',
       sourceContactId: '2',
       sourceId: 'test',
@@ -29,7 +29,7 @@ List<fidl.Contact> _createContactList() {
       ],
       phoneNumbers: <fidl.PhoneNumber>[],
     ),
-    new fidl.Contact(
+    const fidl.Contact(
       contactId: 'contact3',
       sourceContactId: '3',
       sourceId: 'test',
@@ -39,7 +39,7 @@ List<fidl.Contact> _createContactList() {
       ],
       phoneNumbers: <fidl.PhoneNumber>[],
     ),
-    new fidl.Contact(
+    const fidl.Contact(
       contactId: 'contact4',
       sourceContactId: '4',
       sourceId: 'test',
@@ -49,7 +49,7 @@ List<fidl.Contact> _createContactList() {
       ],
       phoneNumbers: <fidl.PhoneNumber>[],
     ),
-    new fidl.Contact(
+    const fidl.Contact(
       contactId: 'contact5',
       sourceContactId: '5',
       sourceId: 'test',
@@ -98,7 +98,7 @@ void main() {
 
         test('should throw if id is empty string', () {
           expect(() {
-            store.addContact(new fidl.Contact(
+            store.addContact(const fidl.Contact(
               contactId: '',
               sourceContactId: '1',
               sourceId: 'test',
@@ -113,7 +113,7 @@ void main() {
 
         test('should throw if displayName is empty string', () {
           expect(() {
-            store.addContact(new fidl.Contact(
+            store.addContact(const fidl.Contact(
               contactId: 'contact1',
               sourceContactId: '1',
               sourceId: 'test',
@@ -128,7 +128,7 @@ void main() {
 
         test('should throw if searchableValues is empty', () {
           expect(() {
-            store.addContact(new fidl.Contact(
+            store.addContact(const fidl.Contact(
               contactId: 'contact1',
               sourceContactId: '1',
               sourceId: 'test',
@@ -148,7 +148,7 @@ void main() {
 
       test('should be able to add a contact', () {
         ContactsStore store = new ContactsStore();
-        fidl.Contact contact = new fidl.Contact(
+        fidl.Contact contact = const fidl.Contact(
           contactId: 'contact1',
           sourceContactId: '1',
           sourceId: 'test',
@@ -255,7 +255,7 @@ void main() {
 
     group('removeContact', () {
       test('should remove the contact from the contact map', () {
-        fidl.Contact contact1 = new fidl.Contact(
+        fidl.Contact contact1 = const fidl.Contact(
           contactId: 'contact1',
           sourceContactId: '1',
           sourceId: 'test',
@@ -265,7 +265,7 @@ void main() {
           ],
           phoneNumbers: <fidl.PhoneNumber>[],
         );
-        fidl.Contact contact2 = new fidl.Contact(
+        fidl.Contact contact2 = const fidl.Contact(
           contactId: 'contact3',
           sourceContactId: '3',
           sourceId: 'test',
@@ -289,7 +289,7 @@ void main() {
 
       test('should remove the contact\'s display name from searchable values',
           () {
-        fidl.Contact contact1 = new fidl.Contact(
+        fidl.Contact contact1 = const fidl.Contact(
           contactId: 'contact1',
           sourceContactId: '1',
           sourceId: 'test',
@@ -299,7 +299,7 @@ void main() {
           ],
           phoneNumbers: <fidl.PhoneNumber>[],
         );
-        fidl.Contact contact2 = new fidl.Contact(
+        fidl.Contact contact2 = const fidl.Contact(
           contactId: 'contact2',
           sourceContactId: '2',
           sourceId: 'test',
@@ -334,7 +334,7 @@ void main() {
       });
 
       test('should remove the contact\'s searchable values', () {
-        fidl.Contact contact1 = new fidl.Contact(
+        fidl.Contact contact1 = const fidl.Contact(
           contactId: 'contact1',
           sourceContactId: '1',
           sourceId: 'test',
@@ -344,7 +344,7 @@ void main() {
           ],
           phoneNumbers: <fidl.PhoneNumber>[],
         );
-        fidl.Contact contact2 = new fidl.Contact(
+        fidl.Contact contact2 = const fidl.Contact(
           contactId: 'contact3',
           sourceContactId: '3',
           sourceId: 'test',
@@ -375,7 +375,7 @@ void main() {
       });
 
       test('should not remove other contacts with the same display name', () {
-        fidl.Contact contact1 = new fidl.Contact(
+        fidl.Contact contact1 = const fidl.Contact(
           contactId: 'contact1',
           sourceContactId: '1',
           sourceId: 'test',
@@ -385,7 +385,7 @@ void main() {
           ],
           phoneNumbers: <fidl.PhoneNumber>[],
         );
-        fidl.Contact contact2 = new fidl.Contact(
+        fidl.Contact contact2 = const fidl.Contact(
           contactId: 'contact2',
           sourceContactId: '2',
           sourceId: 'test',
@@ -413,7 +413,7 @@ void main() {
 
       test('should not remove other contacts with the same searchable value',
           () {
-        fidl.Contact contact1 = new fidl.Contact(
+        fidl.Contact contact1 = const fidl.Contact(
           contactId: 'contact1',
           sourceContactId: '1',
           sourceId: 'test',
@@ -424,7 +424,7 @@ void main() {
           ],
           phoneNumbers: <fidl.PhoneNumber>[],
         );
-        fidl.Contact contact2 = new fidl.Contact(
+        fidl.Contact contact2 = const fidl.Contact(
           contactId: 'contact2',
           sourceContactId: '2',
           sourceId: 'test',
@@ -476,7 +476,7 @@ void main() {
 
       test('should return contacts in case-insensitive alphabetical order', () {
         List<fidl.Contact> contacts = <fidl.Contact>[
-          new fidl.Contact(
+          const fidl.Contact(
             contactId: 'index-1',
             sourceContactId: '1',
             sourceId: 'test',
@@ -484,7 +484,7 @@ void main() {
             emails: <fidl.EmailAddress>[],
             phoneNumbers: <fidl.PhoneNumber>[],
           ),
-          new fidl.Contact(
+          const fidl.Contact(
             contactId: 'index-0',
             sourceContactId: '0',
             sourceId: 'test',
@@ -492,7 +492,7 @@ void main() {
             emails: <fidl.EmailAddress>[],
             phoneNumbers: <fidl.PhoneNumber>[],
           ),
-          new fidl.Contact(
+          const fidl.Contact(
             contactId: 'index-3',
             sourceContactId: '3',
             sourceId: 'test',
@@ -500,7 +500,7 @@ void main() {
             emails: <fidl.EmailAddress>[],
             phoneNumbers: <fidl.PhoneNumber>[],
           ),
-          new fidl.Contact(
+          const fidl.Contact(
             contactId: 'index-2',
             sourceContactId: '2',
             sourceId: 'test',
@@ -540,7 +540,7 @@ void main() {
       });
 
       test('should return the contact if it exists', () {
-        fidl.Contact orca = new fidl.Contact(
+        fidl.Contact orca = const fidl.Contact(
           contactId: 'contact123',
           sourceContactId: '123',
           sourceId: 'test',
@@ -618,7 +618,7 @@ void main() {
 
       setUp(() {
         store = new ContactsStore();
-        c = new fidl.Contact(
+        c = const fidl.Contact(
           contactId: 'contact123',
           sourceContactId: '123',
           sourceId: 'test',
