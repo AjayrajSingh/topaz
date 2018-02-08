@@ -22,9 +22,4 @@
              gerrithost="https://fuchsia-review.googlesource.com"
              githooks="manifest/git-hooks"/>
   </projects>
-  <hooks>
-    <hook name="prebuilt-dart-sdk"
-          project="dart/sdk"
-          action="tools/download_latest_dev_sdk.py"/>
-  </hooks>
 </manifest>

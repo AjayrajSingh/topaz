@@ -10,5 +10,8 @@
     <hook name="download-libwebkit"
           project="topaz"
           action="runtime/web_view/scripts/download-libwebkit.sh"/>
+    <hook name="prebuilt-dart-sdk"
+          project="topaz"
+          action="tools/download_dev_sdk.py"/>
   </hooks>
 </manifest>
