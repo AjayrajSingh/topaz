@@ -106,7 +106,8 @@ std::string FileLoader::GetFilePathForPackageURL(std::string url) {
   if (package_path.empty())
     return std::string();
   if (package_path.find(FileLoader::kFileURLPrefix) == 0u)
-    return package_path.substr(FileLoader::kFileURLPrefixLength) + library_path;
+    return SanitizePath(package_path.substr(FileLoader::kFileURLPrefixLength) +
+                        library_path);
   return files::GetDirectoryName(files::AbsolutePath(packages_)) +
     FileLoader::kPathSeparator + package_path + FileLoader::kPathSeparator +
     library_path;
