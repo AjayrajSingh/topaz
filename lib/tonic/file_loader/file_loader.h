@@ -60,9 +60,7 @@ class FileLoader {
   static const std::string kPathSeparator;
 
  private:
-  static void FindAndReplaceInPlace(std::string& str,
-    const std::string& findStr, const std::string& replaceStr);
-  static void SanitizeURIEscapedCharactersInPlace(std::string& str);
+  static std::string SanitizeURIEscapedCharacters(const std::string& str);
   static std::string SanitizePath(const std::string& path);
   static std::string CanonicalizeFileURL(const std::string& url);
 

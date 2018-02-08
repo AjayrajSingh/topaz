@@ -56,19 +56,24 @@ FileLoader::~FileLoader() {
     close(dirfd_);
 }
 
-void FileLoader::FindAndReplaceInPlace(std::string& str,
-    const std::string& findStr, const std::string& replaceStr) {
-  size_t pos = 0;
-  while ((pos = str.find(findStr, pos)) != std::string::npos) {
-    str.replace(pos, findStr.length(), replaceStr);
-    pos += replaceStr.length();
+std::string FileLoader::SanitizeURIEscapedCharacters(const std::string& str) {
+  std::string result;
+  result.reserve(str.size());
+  for (std::string::size_type i = 0; i < str.size(); ++i) {
+    if (str[i] == '%') {
+      if (i > str.size() - 3 || !isxdigit(str[i + 1]) || !isxdigit(str[i + 2]))
+        return "";
+      const std::string hex = str.substr(i + 1, 2);
+      const unsigned char c = strtoul(hex.c_str(), nullptr, 16);
+      if (!c)
+        return "";
+      result += c;
+      i += 2;
+    } else {
+      result += str[i];
+    }
   }
-}
-
-void FileLoader::SanitizeURIEscapedCharactersInPlace(std::string& str) {
-  // TODO(bkonyi): URIs may contain other escaped characters that need to be
-  // replaced. We may want to add replacements for those here at some point.
-  FindAndReplaceInPlace(str, "%20", " ");
+  return result;
 }
 
 bool FileLoader::LoadPackagesMap(const std::string& packages) {
@@ -169,6 +174,11 @@ std::string FileLoader::GetFilePathForURL(std::string url) {
 std::string FileLoader::Fetch(const std::string& url,
                               std::string* resolved_url) {
   std::string path = files::SimplifyPath(GetFilePathForURL(url));
+  if (path.empty()) {
+    std::cerr << "error: Unable to read Dart source '" << url << "'."
+              << std::endl;
+    PlatformExit(1);
+  }
   if (resolved_url)
     *resolved_url = GetFileURLForPath(path);
   std::string source;
@@ -188,6 +198,11 @@ std::string FileLoader::Fetch(const std::string& url,
 
 std::pair<uint8_t*, intptr_t> FileLoader::FetchBytes(const std::string& url) {
   std::string path = files::SimplifyPath(GetFilePathForURL(url));
+  if (path.empty()) {
+    std::cerr << "error: Unable to read Dart source '" << url << "'."
+              << std::endl;
+    PlatformExit(1);
+  }
   auto result = files::ReadFileToBytes(files::GetAbsoluteFilePath(path));
   if (result.first == nullptr) {
     // TODO(aam): Same as above the file loader should not explicitly log the error

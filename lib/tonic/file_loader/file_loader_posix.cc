@@ -29,9 +29,7 @@ const size_t kFileSchemeLength = FileLoader::kFileURLPrefixLength - 2;
 }  // namespace
 
 std::string FileLoader::SanitizePath(const std::string& url) {
-  std::string sanitized = url;
-  SanitizeURIEscapedCharactersInPlace(sanitized);
-  return sanitized;
+  return SanitizeURIEscapedCharacters(url);
 }
 
 std::string FileLoader::CanonicalizeFileURL(const std::string& url) {

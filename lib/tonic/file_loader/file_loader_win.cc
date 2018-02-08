@@ -17,6 +17,19 @@
 #include "lib/tonic/parsers/packages_map.h"
 
 namespace tonic {
+namespace {
+
+void FindAndReplaceInPlace(std::string& str,
+                           const std::string& findStr,
+                           const std::string& replaceStr) {
+  size_t pos = 0;
+  while ((pos = str.find(findStr, pos)) != std::string::npos) {
+    str.replace(pos, findStr.length(), replaceStr);
+    pos += replaceStr.length();
+  }
+}
+
+} // namespace
 
 const char FileLoader::kFileURLPrefix[] = "file:///";
 const size_t FileLoader::kFileURLPrefixLength = sizeof(FileLoader::kFileURLPrefix) - 1;
@@ -25,8 +38,7 @@ const std::string FileLoader::kPathSeparator = "\\";
 std::string FileLoader::SanitizePath(const std::string& url) {
   std::string sanitized = url;
   FindAndReplaceInPlace(sanitized, "/", FileLoader::kPathSeparator);
-  SanitizeURIEscapedCharactersInPlace(sanitized);
-  return sanitized;
+  return SanitizeURIEscapedCharacters(sanitized);
 }
 
 std::string FileLoader::CanonicalizeFileURL(const std::string& url) {
