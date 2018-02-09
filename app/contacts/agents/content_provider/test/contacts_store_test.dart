@@ -14,50 +14,50 @@ List<fidl.Contact> _createContactList() {
       sourceContactId: '1',
       sourceId: 'test',
       displayName: 'Armadillo',
-      emails: <fidl.EmailAddress>[
+      emails: const <fidl.EmailAddress>[
         const fidl.EmailAddress(value: 'mr_armadillo@example.com')
       ],
-      phoneNumbers: <fidl.PhoneNumber>[],
+      phoneNumbers: const <fidl.PhoneNumber>[],
     ),
     const fidl.Contact(
       contactId: 'contact2',
       sourceContactId: '2',
       sourceId: 'test',
       displayName: 'Blue Whale',
-      emails: <fidl.EmailAddress>[
+      emails: const <fidl.EmailAddress>[
         const fidl.EmailAddress(value: 'the_true_blue@example.com')
       ],
-      phoneNumbers: <fidl.PhoneNumber>[],
+      phoneNumbers: const <fidl.PhoneNumber>[],
     ),
     const fidl.Contact(
       contactId: 'contact3',
       sourceContactId: '3',
       sourceId: 'test',
       displayName: 'Capybara',
-      emails: <fidl.EmailAddress>[
+      emails: const <fidl.EmailAddress>[
         const fidl.EmailAddress(value: 'largest_rodent@example.com')
       ],
-      phoneNumbers: <fidl.PhoneNumber>[],
+      phoneNumbers: const <fidl.PhoneNumber>[],
     ),
     const fidl.Contact(
       contactId: 'contact4',
       sourceContactId: '4',
       sourceId: 'test',
       displayName: 'Dewey',
-      emails: <fidl.EmailAddress>[
+      emails: const <fidl.EmailAddress>[
         const fidl.EmailAddress(value: 'lady_of_the_sea@example.com')
       ],
-      phoneNumbers: <fidl.PhoneNumber>[],
+      phoneNumbers: const <fidl.PhoneNumber>[],
     ),
     const fidl.Contact(
       contactId: 'contact5',
       sourceContactId: '5',
       sourceId: 'test',
       displayName: 'latte lover',
-      emails: <fidl.EmailAddress>[
+      emails: const <fidl.EmailAddress>[
         const fidl.EmailAddress(value: 'LatteLover99@example.com')
       ],
-      phoneNumbers: <fidl.PhoneNumber>[],
+      phoneNumbers: const <fidl.PhoneNumber>[],
     ),
   ];
 }
@@ -103,10 +103,10 @@ void main() {
               sourceContactId: '1',
               sourceId: 'test',
               displayName: 'Armadillo',
-              emails: <fidl.EmailAddress>[
+              emails: const <fidl.EmailAddress>[
                 const fidl.EmailAddress(value: 'mr_armadillo@example.com')
               ],
-              phoneNumbers: <fidl.PhoneNumber>[],
+              phoneNumbers: const <fidl.PhoneNumber>[],
             ));
           }, throwsA(const isInstanceOf<ArgumentError>()));
         });
@@ -118,10 +118,10 @@ void main() {
               sourceContactId: '1',
               sourceId: 'test',
               displayName: '',
-              emails: <fidl.EmailAddress>[
+              emails: const <fidl.EmailAddress>[
                 const fidl.EmailAddress(value: 'mr_armadillo@example.com')
               ],
-              phoneNumbers: <fidl.PhoneNumber>[],
+              phoneNumbers: const <fidl.PhoneNumber>[],
             ));
           }, throwsA(const isInstanceOf<ArgumentError>()));
         });
@@ -133,8 +133,8 @@ void main() {
               sourceContactId: '1',
               sourceId: 'test',
               displayName: '   ',
-              emails: <fidl.EmailAddress>[],
-              phoneNumbers: <fidl.PhoneNumber>[],
+              emails: const <fidl.EmailAddress>[],
+              phoneNumbers: const <fidl.PhoneNumber>[],
             ));
           }, throwsA(const isInstanceOf<ArgumentError>()));
         });
@@ -153,10 +153,10 @@ void main() {
           sourceContactId: '1',
           sourceId: 'test',
           displayName: 'Armadillo',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'mr_armadillo@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         store.addContact(contact);
 
@@ -171,20 +171,20 @@ void main() {
           sourceContactId: '1',
           sourceId: 'test',
           displayName: displayName,
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'mr_armadillo@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         fidl.Contact contact2 = new fidl.Contact(
           contactId: 'contact2',
           sourceContactId: '2',
           sourceId: 'test',
           displayName: displayName,
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'the_other_armadillo@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
 
         store..addContact(contact1)..addContact(contact2);
@@ -203,7 +203,7 @@ void main() {
             sourceContactId: '1',
             sourceId: 'test',
             displayName: 'Mr. Armadillo',
-            emails: <fidl.EmailAddress>[
+            emails: const <fidl.EmailAddress>[
               const fidl.EmailAddress(value: 'mr_armadillo@example.com')
             ],
             phoneNumbers: <fidl.PhoneNumber>[],
@@ -213,10 +213,10 @@ void main() {
             sourceContactId: '2',
             sourceId: 'test',
             displayName: 'Mr. Other Armadillo',
-            emails: <fidl.EmailAddress>[
+            emails: const <fidl.EmailAddress>[
               const fidl.EmailAddress(value: 'the_other_armadillo@example.com')
             ],
-            phoneNumbers: <fidl.PhoneNumber>[],
+            phoneNumbers: const <fidl.PhoneNumber>[],
           );
 
           new ContactsStore()..addContact(contact1)..addContact(contact2);
@@ -230,20 +230,20 @@ void main() {
           sourceContactId: '1',
           sourceId: 'test',
           displayName: 'Mr. Armadillo',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'mr_armadillo@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         fidl.Contact updatedContact = new fidl.Contact(
           contactId: id,
           sourceContactId: '1',
           sourceId: 'test',
           displayName: 'Mr. Armadillo',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'the_other_armadillo@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         ContactsStore store = new ContactsStore()..addContact(contact);
         expect(store.getContact(id), equals(contact));
@@ -260,20 +260,20 @@ void main() {
           sourceContactId: '1',
           sourceId: 'test',
           displayName: 'Armadillo',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'mr_armadillo@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         fidl.Contact contact2 = const fidl.Contact(
           contactId: 'contact3',
           sourceContactId: '3',
           sourceId: 'test',
           displayName: 'Capybara',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'largest_rodent@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         ContactsStore store = new ContactsStore()
           ..addContact(contact1)
@@ -294,20 +294,20 @@ void main() {
           sourceContactId: '1',
           sourceId: 'test',
           displayName: 'Armadillo',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'mr_armadillo@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         fidl.Contact contact2 = const fidl.Contact(
           contactId: 'contact2',
           sourceContactId: '2',
           sourceId: 'test',
           displayName: 'Capybara',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'largest_rodent@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         ContactsStore store = new ContactsStore()
           ..addContact(contact1)
@@ -339,20 +339,20 @@ void main() {
           sourceContactId: '1',
           sourceId: 'test',
           displayName: 'Armadillo',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'mr_armadillo@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         fidl.Contact contact2 = const fidl.Contact(
           contactId: 'contact3',
           sourceContactId: '3',
           sourceId: 'test',
           displayName: 'Capybara',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'largest_rodent@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         ContactsStore store = new ContactsStore()
           ..addContact(contact1)
@@ -380,20 +380,20 @@ void main() {
           sourceContactId: '1',
           sourceId: 'test',
           displayName: 'Armadillo',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'armadillo@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         fidl.Contact contact2 = const fidl.Contact(
           contactId: 'contact2',
           sourceContactId: '2',
           sourceId: 'test',
           displayName: 'Armadillo',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'other_armadillo@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         ContactsStore store = new ContactsStore()
           ..addContact(contact1)
@@ -418,22 +418,22 @@ void main() {
           sourceContactId: '1',
           sourceId: 'test',
           displayName: 'Armadillo',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'armadillo@example.com'),
             const fidl.EmailAddress(value: 'test')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         fidl.Contact contact2 = const fidl.Contact(
           contactId: 'contact2',
           sourceContactId: '2',
           sourceId: 'test',
           displayName: 'Capybara',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'capybara@example.com'),
             const fidl.EmailAddress(value: 'test'),
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         ContactsStore store = new ContactsStore()
           ..addContact(contact1)
@@ -481,32 +481,32 @@ void main() {
             sourceContactId: '1',
             sourceId: 'test',
             displayName: 'Bobby Bonilla',
-            emails: <fidl.EmailAddress>[],
-            phoneNumbers: <fidl.PhoneNumber>[],
+            emails: const <fidl.EmailAddress>[],
+            phoneNumbers: const <fidl.PhoneNumber>[],
           ),
           const fidl.Contact(
             contactId: 'index-0',
             sourceContactId: '0',
             sourceId: 'test',
             displayName: 'aaron aalderks',
-            emails: <fidl.EmailAddress>[],
-            phoneNumbers: <fidl.PhoneNumber>[],
+            emails: const <fidl.EmailAddress>[],
+            phoneNumbers: const <fidl.PhoneNumber>[],
           ),
           const fidl.Contact(
             contactId: 'index-3',
             sourceContactId: '3',
             sourceId: 'test',
             displayName: 'Zeke zephyr',
-            emails: <fidl.EmailAddress>[],
-            phoneNumbers: <fidl.PhoneNumber>[],
+            emails: const <fidl.EmailAddress>[],
+            phoneNumbers: const <fidl.PhoneNumber>[],
           ),
           const fidl.Contact(
             contactId: 'index-2',
             sourceContactId: '2',
             sourceId: 'test',
             displayName: 'calvin coolidge',
-            emails: <fidl.EmailAddress>[],
-            phoneNumbers: <fidl.PhoneNumber>[],
+            emails: const <fidl.EmailAddress>[],
+            phoneNumbers: const <fidl.PhoneNumber>[],
           ),
         ];
         ContactsStore store = new ContactsStore();
@@ -545,10 +545,10 @@ void main() {
           sourceContactId: '123',
           sourceId: 'test',
           displayName: 'orca',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'not_actually_a_whale@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         store.addContact(orca);
 
@@ -623,10 +623,10 @@ void main() {
           sourceContactId: '123',
           sourceId: 'test',
           displayName: 'orca',
-          emails: <fidl.EmailAddress>[
+          emails: const <fidl.EmailAddress>[
             const fidl.EmailAddress(value: 'not_actually_a_whale@example.com')
           ],
-          phoneNumbers: <fidl.PhoneNumber>[],
+          phoneNumbers: const <fidl.PhoneNumber>[],
         );
         store.addContact(c);
       });
