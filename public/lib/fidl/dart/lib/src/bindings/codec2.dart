@@ -224,6 +224,10 @@ class Encoder {
     return offset;
   }
 
+  void encodeBool(bool value, int offset) {
+    _buffer.buffer.setInt8(offset, value ? 1 : 0);
+  }
+
   void encodeInt8(int value, int offset) {
     _buffer.buffer.setInt8(offset, value);
   }
@@ -333,7 +337,8 @@ class Encoder {
     }
   }
 
-  void encodeInt8Vector(Int8List value, int limit, int offset, bool nullable) {
+  void encodeInt8ListAsVector(
+      Int8List value, int limit, int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
       return;
@@ -341,7 +346,7 @@ class Encoder {
     _copyInt8(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint8Vector(
+  void encodeUint8ListAsVector(
       Uint8List value, int limit, int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
@@ -350,7 +355,7 @@ class Encoder {
     _copyUint8(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeInt16Vector(
+  void encodeInt16ListAsVector(
       Int16List value, int limit, int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
@@ -359,7 +364,7 @@ class Encoder {
     _copyInt16(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint16Vector(
+  void encodeUint16ListAsVector(
       Uint16List value, int limit, int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
@@ -368,7 +373,7 @@ class Encoder {
     _copyUint16(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeInt32Vector(
+  void encodeInt32ListAsVector(
       Int32List value, int limit, int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
@@ -377,7 +382,7 @@ class Encoder {
     _copyInt32(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint32Vector(
+  void encodeUint32ListAsVector(
       Uint32List value, int limit, int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
@@ -386,7 +391,7 @@ class Encoder {
     _copyUint32(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeInt64Vector(
+  void encodeInt64ListAsVector(
       Int64List value, int limit, int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
@@ -395,7 +400,7 @@ class Encoder {
     _copyInt64(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint64Vector(
+  void encodeUint64ListAsVector(
       Uint64List value, int limit, int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
@@ -404,7 +409,7 @@ class Encoder {
     _copyUint64(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeFloat32Vector(
+  void encodeFloat32ListAsVector(
       Float32List value, int limit, int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
@@ -413,7 +418,7 @@ class Encoder {
     _copyFloat32(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeFloat64Vector(
+  void encodeFloat64ListAsVector(
       Float64List value, int limit, int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
@@ -430,52 +435,52 @@ class Encoder {
     }
   }
 
-  void encodeInt8Array(Int8List value, int count, int offset) {
+  void encodeInt8ListAsArray(Int8List value, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
     _copyInt8(_buffer.buffer, value, offset);
   }
 
-  void encodeUint8Array(Uint8List value, int count, int offset) {
+  void encodeUint8ListAsArray(Uint8List value, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
     _copyUint8(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeInt16Array(Int16List value, int count, int offset) {
+  void encodeInt16ListAsArray(Int16List value, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
     _copyInt16(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint16Array(Uint16List value, int count, int offset) {
+  void encodeUint16ListAsArray(Uint16List value, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
     _copyUint16(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeInt32Array(Int32List value, int count, int offset) {
+  void encodeInt32ListAsArray(Int32List value, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
     _copyInt32(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint3Array(Uint32List value, int count, int offset) {
+  void encodeUint3ListAsArray(Uint32List value, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
     _copyUint32(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeInt64Array(Int64List value, int count, int offset) {
+  void encodeInt64ListAsArray(Int64List value, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
     _copyInt64(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint64Array(Uint64List value, int count, int offset) {
+  void encodeUint64ListAsArray(Uint64List value, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
     _copyUint64(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeFloat32Array(Float32List value, int count, int offset) {
+  void encodeFloat32ListAsArray(Float32List value, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
     _copyFloat32(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
 
-  void encodeFloat64Array(Float64List value, int count, int offset) {
+  void encodeFloat64ListAsArray(Float64List value, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
     _copyFloat64(_buffer.buffer, value, alloc(value.lengthInBytes));
   }
