@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -46,6 +47,8 @@ class MineDiggerState extends State<MineDigger> {
   bool alive;
   bool hasWon;
   int detectedCount;
+  Timer timer;
+  Stopwatch gameTime = new Stopwatch();
 
   // |cells| keeps track of the positions of the mines.
   List<List<bool>> cells;
@@ -58,10 +61,26 @@ class MineDiggerState extends State<MineDigger> {
     resetGame();
   }
 
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
   void resetGame() {
     alive = true;
     hasWon = false;
     detectedCount = 0;
+    gameTime.reset();
+
+    timer?.cancel();
+
+    timer = new Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+        setState((){
+          // time blah blah
+          });
+      });
+
     // Initialize matrices.
     cells = new List<List<bool>>.generate(rows, (int row) {
       return new List<bool>.filled(cols, false);
@@ -112,7 +131,7 @@ class MineDiggerState extends State<MineDigger> {
                 probe(ix, iy);
             },
             onLongPress: () {
-              // TODO(cpu): Add haptic feedback.
+              // TODO(cpu): Add audio or haptic feedback.
               flag(ix, iy);
             },
             child: new Listener(
@@ -149,6 +168,7 @@ class MineDiggerState extends State<MineDigger> {
       // all cells uncovered. Are all mines flagged?
       if ((detectedCount == totalMineCount) && alive) {
         hasWon = true;
+        gameTime.stop();
       }
     }
 
@@ -163,20 +183,32 @@ class MineDiggerState extends State<MineDigger> {
   Widget buildAppBar(BuildContext context) {
     String appBarCaption = hasWon ?
       'Awesome!!' : alive ?
-        'Mine Digger [$detectedCount-$totalMineCount]': 'Kaboom! [press here]';
+        'Dig! Dig!   [found:$detectedCount  total:$totalMineCount]':
+        'Kaboom! Try harder [press here]';
 
+    int elapsed = gameTime.elapsedMilliseconds ~/ 1000;
     return new AppBar(
       // FIXME: Strange to have the app bar be tapable.
       title: new Listener(
         onPointerDown: handleAppBarPointerDown,
-        child: new Text(appBarCaption, style: Theme.of(context).primaryTextTheme.title)
-      )
+        child: new Text(appBarCaption,
+          style: Theme.of(context).primaryTextTheme.title)
+      ),
+      centerTitle: true,
+      actions: <Widget>[
+        new Container(
+          child: new Text('$elapsed seconds'),
+          color: Colors.teal,
+          margin: const EdgeInsets.all(14.0),
+          padding: const EdgeInsets.all(2.0))
+        ]
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    // We build the board before we build the app bar because we compute the win state during build step.
+    // We build the board before we build the app bar because we compute the win state
+    // during build step.
     Widget board = buildBoard();
     return new MaterialApp(
       title: 'Mine Digger',
@@ -198,6 +230,7 @@ class MineDiggerState extends State<MineDigger> {
   void probe(int x, int y) {
     if (!alive)
       return;
+
     if (uiState[y][x] == CellState.flagged)
       return;
     setState(() {
@@ -206,15 +239,21 @@ class MineDiggerState extends State<MineDigger> {
         // Probed on a mine --> dead!!
         uiState[y][x] = CellState.exploded;
         alive = false;
+        timer.cancel();
       } else {
         // No mine, uncover nearby if possible.
         cull(x, y);
+        // Start the timer if needed.
+        if (!gameTime.isRunning)
+          gameTime.start();
       }
     });
   }
 
   // User action. The user is sure a mine is at this location.
   void flag(int x, int y) {
+    if (!alive)
+      return;
     setState(() {
       if (uiState[y][x] == CellState.flagged) {
         uiState[y][x] = CellState.covered;
@@ -298,7 +337,7 @@ class CoveredMineNode extends StatelessWidget {
     if (flagged) {
       text = buildInnerCell(new RichText(
         text: new TextSpan(
-          text: '\u2691',
+          text: 'm',    // TODO(cpu) this should be \u2691
           style: textStyles[5],
         ),
         textAlign: TextAlign.center,
@@ -342,7 +381,7 @@ class ExposedMineNode extends StatelessWidget {
       int color = state == CellState.exploded ? 3 : 0;
       text = new RichText(
         text: new TextSpan(
-          text: '\u2600',
+          text: '*',   // TODO(cpu) this should be \u2600
           style: textStyles[color],
         ),
         textAlign: TextAlign.center,
