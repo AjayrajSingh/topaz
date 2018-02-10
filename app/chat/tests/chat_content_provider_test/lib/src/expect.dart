@@ -43,7 +43,6 @@ Future<Null> _expect(
     reason ??= '$e at $trace';
   }
   fail(_format(actual, effectiveMatcher, reason, matchState, false));
-  return _emptyFuture;
 }
 
 String _format(
