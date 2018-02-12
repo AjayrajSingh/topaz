@@ -12,6 +12,7 @@ import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
 import '../widgets.dart';
+import 'video_progress.dart';
 
 const Duration _kOverlayAutoHideDuration = const Duration(seconds: 3);
 const Duration _kLoadingDuration = const Duration(seconds: 2);
@@ -71,6 +72,9 @@ class PlayerModel extends Model {
   /// Video asset for the player to currently play
   Asset _asset;
 
+  // This sends periodic progress events while video is playing
+  VideoProgressMonitor _videoProgressMonitor;
+
   /// Create a Player model
   PlayerModel({
     this.appContext,
@@ -87,6 +91,7 @@ class PlayerModel extends Model {
         assert(onPlayLocal != null) {
     _controller = new MediaPlayerController(appContext.environmentServices)
       ..addListener(_handleControllerChanged);
+    _videoProgressMonitor = new VideoProgressMonitor(_controller);
     notifyListeners();
   }
 
@@ -95,6 +100,7 @@ class PlayerModel extends Model {
 
   /// Sets whether casting failed
   set failedCast(bool cast) {
+    _videoProgressMonitor.stop();
     _failedCast = cast;
     notifyListeners();
   }
@@ -104,9 +110,13 @@ class PlayerModel extends Model {
 
   /// Sets the error message
   set errorMessage(String message) {
+    _videoProgressMonitor.stop();
     _errorMessage = message;
     notifyListeners();
   }
+
+  /// Return the current progress of the video player.
+  VideoProgress get videoProgress => _videoProgressMonitor?.progress;
 
   /// Returns whether media player controller is playing
   bool get playing => _controller.playing;
@@ -143,6 +153,7 @@ class PlayerModel extends Model {
   /// Seeks video to normalized position
   void normalizedSeek(double normalizedPosition) {
     _controller.normalizedSeek(normalizedPosition);
+    _videoProgressMonitor.updateProgress();
   }
 
   /// Returns media player controller video view connection
@@ -151,6 +162,7 @@ class PlayerModel extends Model {
 
   bool _controllerHasProblem() {
     if (_controller.problem != null) {
+      _videoProgressMonitor.stop();
       log.fine(_controller.problem);
       failedCast = true;
       if (_controller.problem.type == Problem.kProblemContainerNotSupported) {
@@ -182,6 +194,7 @@ class PlayerModel extends Model {
   void seek(Duration duration) {
     _locallyControlled = true;
     _controller.seek(duration);
+    _videoProgressMonitor.updateProgress();
     // TODO(maryxia) SO-589 seek after video has ended
   }
 
@@ -209,6 +222,7 @@ class PlayerModel extends Model {
       _controller.play();
       brieflyShowControlOverlay();
     }
+    _videoProgressMonitor.start();
   }
 
   /// Pauses video
@@ -216,6 +230,7 @@ class PlayerModel extends Model {
     _locallyControlled = true;
     _controller.pause();
     _progressTimer.cancel();
+    _videoProgressMonitor.stop();
   }
 
   /// Start playing video on remote device if it is playing locally

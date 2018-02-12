@@ -31,6 +31,8 @@ void main() {
   // Add listener in the case that the asset changes, from a Daisy
   videoModuleModel.addListener(
       () => playerModel.handleAssetChanged(videoModuleModel.asset));
+  playerModel.videoProgress.addListener(
+      () => videoModuleModel.handleProgressChanged(playerModel.videoProgress));
 
   ModuleWidget<VideoModuleModel> moduleWidget =
       new ModuleWidget<VideoModuleModel>(

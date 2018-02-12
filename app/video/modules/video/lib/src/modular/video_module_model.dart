@@ -20,6 +20,7 @@ import 'package:lib.entity.fidl/entity_resolver.fidl.dart';
 import 'package:entity_schemas/entities.dart' as entities;
 
 import '../widgets.dart';
+import 'video_progress.dart';
 
 const String _kRemoteDisplayMode = 'remoteDisplayMode';
 const String _kCastingDeviceName = 'castingDeviceName';
@@ -322,6 +323,14 @@ class VideoModuleModel extends ModuleModel {
         background: 'assets/video-background.png',
       );
     }
+  }
+
+  /// When a video is playing, the progress will be updated periodically to
+  /// reflect position in the video player.
+  void handleProgressChanged(VideoProgress progress) {
+    // TODO Add real progress handling here
+    // print('LBL progress: ${progress.normalizedProgress} of ${progress.duration}'
+    //     ' or ${progress.position.inMilliseconds} milliseconds');
   }
 
   void _setDisplayModeLink(String mode) {
