@@ -35,6 +35,8 @@ final Asset _kDefaultAsset = new Asset.movie(
   background: 'assets/video-background.png',
 );
 
+const String _kVideoProgressLinkName = 'videoProgress';
+
 /// The [ModuleModel] for the video player.
 class VideoModuleModel extends ModuleModel {
   final ComponentContextProxy _componentContextProxy =
@@ -57,6 +59,9 @@ class VideoModuleModel extends ModuleModel {
   final LinkProxy _remoteDeviceLink = new LinkProxy();
   final LinkWatcherBinding _remoteDeviceLinkWatcherBinding =
       new LinkWatcherBinding();
+
+  /// [Link] object for publishing video progress
+  final LinkProxy _videoProgressLink = new LinkProxy();
 
   /// Last version we received from NetConnector
   int lastVersion = 0;
@@ -106,6 +111,10 @@ class VideoModuleModel extends ModuleModel {
         ),
       ),
     );
+
+    // Create a Link for sending progress
+    moduleContext.getLink(
+        _kVideoProgressLinkName, _videoProgressLink.ctrl.request());
 
     notifyListeners();
 
@@ -328,9 +337,12 @@ class VideoModuleModel extends ModuleModel {
   /// When a video is playing, the progress will be updated periodically to
   /// reflect position in the video player.
   void handleProgressChanged(VideoProgress progress) {
-    // TODO Add real progress handling here
-    // print('LBL progress: ${progress.normalizedProgress} of ${progress.duration}'
-    //     ' or ${progress.position.inMilliseconds} milliseconds');
+    Map<String, dynamic> progressData = <String, dynamic>{
+      'context': 'videoProgress',
+      'durationMsec': progress.duration.inMilliseconds,
+      'normalizedProgress': progress.normalizedProgress,
+    };
+    _videoProgressLink.set(null, JSON.encode(progressData));
   }
 
   void _setDisplayModeLink(String mode) {
@@ -342,6 +354,7 @@ class VideoModuleModel extends ModuleModel {
   void onStop() {
     _remoteDeviceLinkWatcherBinding.close();
     _remoteDeviceLink.ctrl.close();
+    _videoProgressLink.ctrl.close();
     _netConnector.ctrl.close();
     _deviceMap.ctrl.close();
     _componentContextProxy.ctrl.close();
