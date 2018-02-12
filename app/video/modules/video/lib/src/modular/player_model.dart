@@ -187,6 +187,7 @@ class PlayerModel extends Model {
         ..open(_asset.uri, serviceName: _kServiceName);
       _controllerHasProblem();
       notifyListeners();
+      play();
     }
   }
 
