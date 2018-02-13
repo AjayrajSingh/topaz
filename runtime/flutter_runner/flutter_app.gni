@@ -29,6 +29,8 @@ flutter_tools_out_dir = get_label_info(flutter_tools_label, "root_out_dir")
 flutter_tools_bin = "$flutter_tools_out_dir/dart-tools/fuchsia_builder"
 
 template("flutter_source_app") {
+  assert(defined(invoker.package_name), "Must define package_name")
+
   not_needed(invoker, [ "flx", "main_dart", "manifest" ])
 
   dart_library_name = target_name + "_dart_library"
@@ -37,13 +39,9 @@ template("flutter_source_app") {
                            [
                              "deps",
                              "disable_analysis",
+                             "package_name",
                              "source_dir",
                            ])
-    if (defined(invoker.package_name)) {
-      package_name = invoker.package_name
-    } else {
-      infer_package_name = true
-    }
     # dart:mozart.internal imports package:zircon.
     deps += [ "//topaz/public/dart/zircon" ]
   }
@@ -51,6 +49,7 @@ template("flutter_source_app") {
   dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
   dot_packages = "$dart_target_gen_dir/$dart_library_name.packages"
   manifest = "$dart_target_gen_dir/$dart_library_name.manifest"
+  contents = "$dart_target_gen_dir/$dart_library_name.contents"
   manifest_dot_packages = "$dart_target_gen_dir/$dart_library_name.manifest.packages"
 
   action("${target_name}_sources_manifest") {
@@ -61,12 +60,16 @@ template("flutter_source_app") {
     ]
     script = "//build/dart/gen_dot_packages_resources.py"
     args = [
+      "--package",
+      invoker.package_name,
       "--dot-packages",
       rebase_path(dot_packages),
       "--dot-packages-out",
       rebase_path(manifest_dot_packages),
       "--manifest-out",
       rebase_path(manifest),
+      "--contents-out",
+      rebase_path(contents),
     ]
   }
 
