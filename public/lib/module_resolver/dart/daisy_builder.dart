@@ -13,11 +13,21 @@ class DaisyBuilder {
   DaisyBuilder.verb(String verb)
       : _daisy = new Daisy(verb: verb, nouns: <String, Noun>{});
 
+  DaisyBuilder.url(String url)
+      : _daisy = new Daisy(url: url, nouns: <String, Noun>{});
+
+  // Converts |value| to a JSON object and adds it to the Daisy. For typed
+  // data, prefer to use addNounFromEntityReference().
   void addNoun<T>(String name, T value) {
-    // We can accept various types of objects here (eventually Entity
-    // handles, or Entity references or an EntityClient wrapper).
-    // For now, assume everything should just be converted into JSON.
     _daisy.nouns[name] = new Noun.withJson(JSON.encode(value));
+  }
+
+  void addNounFromEntityReference(String name, String reference) {
+    _daisy.nouns[name] = new Noun.withEntityReference(reference);
+  }
+
+  void addNounFromLink(String name, String linkName) {
+    _daisy.nouns[name] = new Noun.withLinkName(linkName);
   }
 
   Daisy get daisy => _daisy;
