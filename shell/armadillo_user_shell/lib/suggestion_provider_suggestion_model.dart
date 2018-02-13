@@ -99,6 +99,9 @@ class MaxwellQueryListenerImpl extends maxwell.QueryListener {
   void onQueryComplete() {
     queryCompleteListener?.call();
   }
+
+  /// Clears the suggestion list in preparation for a new query.
+  void clear() => _suggestions.clear();
 }
 
 /// Called when an interruption occurs.
@@ -280,6 +283,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     if (_askText != text) {
       _askText = text;
 
+      _askListener.clear();
       /// A timer ensures that we don't make unneeded ask queries while the
       /// user is still typing/talking
       _askTextTimer?.cancel();
