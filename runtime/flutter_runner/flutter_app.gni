@@ -73,7 +73,7 @@ template("flutter_source_app") {
   package(target_name) {
     deps = [ ":${target_name}_sources_manifest" ]
 
-    extra = manifest
+    extra = [ manifest ]
 
     if (defined(invoker.output_name)) {
       package_name = invoker.output_name
