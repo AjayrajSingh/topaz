@@ -10,6 +10,8 @@ dart_app("mi_dashboard") {
 
   source_dir = "."
 
+  sandbox = "meta/sandbox"
+
   deps = [
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:debug_dart",
