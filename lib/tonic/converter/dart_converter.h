@@ -279,13 +279,20 @@ struct DartConverter<const char*> {
 ////////////////////////////////////////////////////////////////////////////////
 // Collections
 
+template <typename T, typename Enable = void>
+struct DartListFactory {
+  static Dart_Handle NewList(intptr_t length) {
+    return Dart_NewList(length);
+  }
+};
+
 template <typename T>
 struct DartConverter<std::vector<T>> {
   using ValueType = typename DartConverterTypes<T>::ValueType;
   using ConverterType = typename DartConverterTypes<T>::ConverterType;
 
   static Dart_Handle ToDart(const std::vector<ValueType>& val) {
-    Dart_Handle list = Dart_NewList(val.size());
+    Dart_Handle list = DartListFactory<ValueType>::NewList(val.size());
     if (Dart_IsError(list))
       return list;
     for (size_t i = 0; i < val.size(); i++) {

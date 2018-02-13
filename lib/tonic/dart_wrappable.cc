@@ -83,6 +83,12 @@ size_t DartWrappable::GetAllocationSize() {
   return GetDartWrapperInfo().size_in_bytes;
 }
 
+Dart_PersistentHandle DartWrappable::GetTypeForWrapper(
+    tonic::DartState* dart_state,
+    const tonic::DartWrapperInfo& wrapper_info) {
+  return dart_state->class_library().GetClass(wrapper_info);
+}
+
 DartWrappable* DartConverterWrappable::FromDart(Dart_Handle handle) {
   intptr_t peer = 0;
   Dart_Handle result =

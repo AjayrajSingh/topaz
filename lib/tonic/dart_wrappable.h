@@ -46,6 +46,9 @@ class DartWrappable {
  protected:
   virtual ~DartWrappable();
 
+  static Dart_PersistentHandle GetTypeForWrapper(
+      tonic::DartState* dart_state, const tonic::DartWrapperInfo& wrapper_info);
+
  private:
   static void FinalizeDartWrapper(void* isolate_callback_data,
                                   Dart_WeakPersistentHandle wrapper,
@@ -60,6 +63,9 @@ class DartWrappable {
  public:                                                              \
   const tonic::DartWrapperInfo& GetDartWrapperInfo() const override { \
     return dart_wrapper_info_;                                        \
+  }                                                                   \
+  static Dart_PersistentHandle GetDartType(tonic::DartState* dart_state) { \
+    return GetTypeForWrapper(dart_state, dart_wrapper_info_);         \
   }                                                                   \
                                                                       \
  private:                                                             \
@@ -168,6 +174,18 @@ inline T* GetReceiver(Dart_NativeArguments args) {
     Dart_ThrowException(ToDart("Object has been disposed."));
   return static_cast<T*>(reinterpret_cast<DartWrappable*>(receiver));
 }
+
+template <typename T>
+struct DartListFactory<
+    fxl::RefPtr<T>,
+    typename std::enable_if<
+        std::is_convertible<T*, const DartWrappable*>::value>::type> {
+  static Dart_Handle NewList(intptr_t length) {
+    Dart_PersistentHandle type = T::GetDartType(DartState::Current());
+    FXL_DCHECK(!LogIfError(type));
+    return Dart_NewListOfType(Dart_HandleFromPersistent(type), length);
+  }
+};
 
 }  // namespace tonic
 
