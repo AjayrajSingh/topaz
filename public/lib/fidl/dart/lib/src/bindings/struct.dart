@@ -65,4 +65,6 @@ abstract class Struct {
     encode(encoder);
     return new ServiceMessage(encoder.message, header);
   }
+
+  Map<dynamic, dynamic> toJson();
 }
