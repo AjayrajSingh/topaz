@@ -196,7 +196,10 @@ class Message {
   final int dataLength;
   final int handlesLength;
 
-  void closeAllHandles() {
+  int get txid => data.getUint32(0);
+  int get ordinal => data.getUint32(16);
+
+  void closeHandles() {
     if (handles != null) {
       for (int i = 0; i < handles.length; ++i) {
         handles[i].close();
@@ -209,17 +212,18 @@ class Message {
       'Message(numBytes=$dataLength, numHandles=$handlesLength)';
 }
 
+// ignore: one_member_abstracts
 abstract class Encodable {
-  int get encodedSize;
-
-  void encode(Encoder encoder, int offset);
-  Encodable decode(Decoder decoder, int offset);
+  void $encode(Encoder encoder, int offset);
 }
 
 class Encoder {
   _EncoderBuffer _buffer;
 
-  Encoder([int size = -1]) : _buffer = new _EncoderBuffer(size);
+  Encoder(int txid, int ordinal, {int size: -1})
+      : _buffer = new _EncoderBuffer(size) {
+    _encodeMessageHeader(txid, ordinal);
+  }
 
   Message get message {
     return new Message(_buffer.trimmed, _buffer.handles, _buffer.extent,
@@ -230,6 +234,14 @@ class Encoder {
     int offset = _buffer.extent;
     _buffer.claimMemory(_align(size));
     return offset;
+  }
+
+  void _encodeMessageHeader(int txid, int ordinal) {
+    alloc(32);
+    encodeUint32(txid, 0);
+    // Offset 8 is reserved0, which is always zero.
+    // Offset 16 is flags, which are currently always zero.
+    encodeUint32(ordinal, 24);
   }
 
   void encodeBool(bool value, int offset) {
@@ -290,15 +302,16 @@ class Encoder {
     }
   }
 
-  void encodeStruct(Encodable value, int offset, bool nullable) {
+  void encodeEncodable(
+      Encodable value, int encodedSize, int offset, bool nullable) {
     if (value == null) {
       _throwIfNotNullable(nullable);
       encodeUint64(_kAllocAbsent, offset);
     } else if (nullable) {
       encodeUint64(_kAllocPresent, offset);
-      value.encode(this, alloc(value.encodedSize));
+      value.$encode(this, alloc(encodedSize));
     } else {
-      value.encode(this, offset);
+      value.$encode(this, offset);
     }
   }
 
@@ -332,18 +345,17 @@ class Encoder {
     encodeUint64(_kAllocPresent, offset + 8); // data
   }
 
-  void encodeEncodableVector(
-      List<Encodable> value, int limit, int offset, bool nullable) {
+  void encodeEncodableVector(List<Encodable> value, int encodedSize, int limit,
+      int offset, bool nullable) {
     _encodeVectorPointer(value, limit, offset, nullable);
     if (value == null || value.isEmpty) {
       return;
     }
-    // All members of a FIDL array have the same size.
-    final int stride = _align(value[0].encodedSize);
+    final int stride = _align(encodedSize);
     final int count = value.length;
     final int base = alloc(stride * count);
     for (int i = 0; i < count; ++i) {
-      value[i].encode(this, base + i * stride);
+      value[i].$encode(this, base + i * stride);
     }
   }
 
@@ -437,11 +449,12 @@ class Encoder {
     _copyFloat64(_buffer.data, value, alloc(value.lengthInBytes));
   }
 
-  void encodeEncodableArray(List<Encodable> value, int count, int offset) {
+  void encodeEncodableArray(
+      List<Encodable> value, int encodedSize, int count, int offset) {
     _throwIfCountMismatch(value.length, count);
-    final int stride = _align(value[0].encodedSize);
+    final int stride = _align(encodedSize);
     for (int i = 0; i < count; ++i) {
-      value[i].encode(this, offset + i * stride);
+      value[i].$encode(this, offset + i * stride);
     }
   }
 
@@ -496,7 +509,7 @@ class Encoder {
   }
 }
 
-typedef dynamic DecodeCallback(Decoder decoder, int offset);
+typedef T DecodeCallback<T>(Decoder decoder, int offset);
 typedef dynamic DecodeArrayCallback(Decoder decoder, int count, int offset);
 
 Int8List _decodeInt8List(Decoder decoder, int count, int offset) {
@@ -607,8 +620,8 @@ class Decoder {
     }
   }
 
-  dynamic decodeStruct(
-      DecodeCallback decode, int encodedSize, int offset, bool nullable) {
+  T decodeEncodable<T>(
+      DecodeCallback<T> decode, int encodedSize, int offset, bool nullable) {
     if (!nullable) {
       return decode(this, offset);
     }
