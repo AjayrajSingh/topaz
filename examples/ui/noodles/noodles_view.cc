@@ -47,7 +47,7 @@ NoodlesView::NoodlesView(
 NoodlesView::~NoodlesView() {}
 
 void NoodlesView::OnSceneInvalidated(
-    scenic::PresentationInfoPtr presentation_info) {
+    ui_mozart::PresentationInfoPtr presentation_info) {
   SkCanvas* canvas = AcquireCanvas();
   if (!canvas)
     return;

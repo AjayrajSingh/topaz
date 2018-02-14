@@ -67,7 +67,7 @@ class WebViewImpl : public mozart::BaseView,
 
   // |BaseView|:
   void OnSceneInvalidated(
-      scenic::PresentationInfoPtr presentation_info) override;
+      ui_mozart::PresentationInfoPtr presentation_info) override;
 
   void CallIdle();
 

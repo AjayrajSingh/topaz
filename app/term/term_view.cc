@@ -113,7 +113,7 @@ void TermView::Blink() {
 }
 
 void TermView::OnSceneInvalidated(
-    scenic::PresentationInfoPtr presentation_info) {
+    ui_mozart::PresentationInfoPtr presentation_info) {
   if (!regular_typeface_)
     return;
 
