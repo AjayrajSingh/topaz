@@ -37,6 +37,9 @@ abstract class ContextModel extends Model {
   /// Whether the time zone picker is showing.
   bool _isTimezonePickerShowing = false;
 
+  /// Whether the wifi manager is showing.
+  bool _isWifiManagerShowing = false;
+
   /// The current timezone ID.
   String timezoneId = 'UTC';
 
@@ -62,6 +65,17 @@ abstract class ContextModel extends Model {
   set isTimezonePickerShowing(bool show) {
     if (_isTimezonePickerShowing != show) {
       _isTimezonePickerShowing = show;
+      notifyListeners();
+    }
+  }
+
+  /// The wifi manager is showing.
+  bool get isWifiManagerShowing => _isWifiManagerShowing;
+
+  /// Sets the wifi manager to show.
+  set isWifiManagerShowing(bool show) {
+    if (_isWifiManagerShowing != show) {
+      _isWifiManagerShowing = show;
       notifyListeners();
     }
   }

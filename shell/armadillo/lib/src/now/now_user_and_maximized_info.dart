@@ -32,9 +32,15 @@ class NowUserAndMaximizedContext extends StatelessWidget {
   /// Called when the user image is tapped.
   final VoidCallback onUserTapped;
 
+  /// Called when the wifi info is tapped.
+  final VoidCallback onWifiInfoTapped;
+
   /// Constructor.
   const NowUserAndMaximizedContext(
-      {this.onUserContextTapped, this.onUserTimeTapped, this.onUserTapped});
+      {this.onUserContextTapped,
+      this.onUserTimeTapped,
+      this.onUserTapped,
+      this.onWifiInfoTapped});
 
   @override
   Widget build(BuildContext context) =>
@@ -75,8 +81,10 @@ class NowUserAndMaximizedContext extends StatelessWidget {
                           startingXOffset: 16.0,
                           slideInProgress:
                               nowMinimizationModel.maximizedTextSlideInProgress,
-                          builder: (Color color) =>
-                              new ImportantInfo(textColor: color),
+                          builder: (Color color) => new ImportantInfo(
+                                textColor: color,
+                                onWifiInfoTapped: onWifiInfoTapped,
+                              ),
                         ),
                       ],
                     ),

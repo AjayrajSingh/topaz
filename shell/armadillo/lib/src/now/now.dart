@@ -17,6 +17,7 @@ import 'now_user_and_maximized_info.dart';
 import 'quick_settings.dart';
 import 'quick_settings_progress_model.dart';
 import 'timezone_picker.dart';
+import 'wifi_settings.dart';
 
 /// The distance above the lowest point we can scroll down to when
 /// recents scroll offset is 0.0.
@@ -220,6 +221,11 @@ class Now extends StatelessWidget {
                                       quickSettingsProgressModel.hide();
                                     }
                                   },
+                                  onWifiInfoTapped: () {
+                                    ContextModel
+                                        .of(context)
+                                        .isWifiManagerShowing = true;
+                                  },
                                 ),
                                 new Container(height: 32.0),
                                 // Quick Settings
@@ -258,6 +264,18 @@ class Now extends StatelessWidget {
                   child: child,
                 ),
             child: new TimezonePicker(),
+          ),
+          new ScopedModelDescendant<ContextModel>(
+            builder: (
+              BuildContext context,
+              Widget child,
+              ContextModel contextModel,
+            ) =>
+                new Offstage(
+                  offstage: !contextModel.isWifiManagerShowing,
+                  child: child,
+                ),
+            child: new WifiSettings(),
           ),
         ],
       );

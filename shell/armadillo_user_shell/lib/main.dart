@@ -193,6 +193,7 @@ Widget buildArmadilloUserShell({
   MaxwellVoiceModel voiceModel = new MaxwellVoiceModel();
 
   ArmadilloUserShellModel armadilloUserShellModel = new ArmadilloUserShellModel(
+    applicationContext: applicationContext,
     storyProviderStoryGenerator: storyProviderStoryGenerator,
     suggestionProviderSuggestionModel: suggestionProviderSuggestionModel,
     maxwellVoiceModel: voiceModel,
@@ -268,72 +269,75 @@ Widget buildArmadilloUserShell({
 
   Widget app = new ScopedModel<StoryDragTransitionModel>(
     model: storyDragTransitionModel,
-    child: _buildApp(
-      storyModel: storyModel,
-      storyProviderStoryGenerator: storyProviderStoryGenerator,
-      debugModel: debugModel,
-      armadillo: new Armadillo(
-        scopedModelBuilders: <WrapperBuilder>[
-          (_, Widget child) => new ScopedModel<ConductorModel>(
-                model: conductorModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<PowerModel>(
-                model: powerModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<VolumeModel>(
-                model: volumeModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<ContextModel>(
-                model: contextProviderContextModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<StoryModel>(
-                model: storyModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<SuggestionModel>(
-                model: suggestionProviderSuggestionModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<VoiceModel>(
-                model: voiceModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<QuickSettingsProgressModel>(
-                model: quickSettingsProgressModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<StoryClusterDragStateModel>(
-                model: storyClusterDragStateModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<StoryRearrangementScrimModel>(
-                model: storyRearrangementScrimModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<DebugModel>(
-                model: debugModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<PanelResizingModel>(
-                model: panelResizingModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<SizeModel>(
-                model: sizeModel,
-                child: child,
-              ),
-          (_, Widget child) => new ScopedModel<PeekModel>(
-                model: peekModel,
-                child: child,
-              ),
-        ],
-        conductor: conductor,
+    child: new ScopedModel<UserShellModel>(
+      model: armadilloUserShellModel,
+      child: _buildApp(
+        storyModel: storyModel,
+        storyProviderStoryGenerator: storyProviderStoryGenerator,
+        debugModel: debugModel,
+        armadillo: new Armadillo(
+          scopedModelBuilders: <WrapperBuilder>[
+            (_, Widget child) => new ScopedModel<ConductorModel>(
+                  model: conductorModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<PowerModel>(
+                  model: powerModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<VolumeModel>(
+                  model: volumeModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<ContextModel>(
+                  model: contextProviderContextModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<StoryModel>(
+                  model: storyModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<SuggestionModel>(
+                  model: suggestionProviderSuggestionModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<VoiceModel>(
+                  model: voiceModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<QuickSettingsProgressModel>(
+                  model: quickSettingsProgressModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<StoryClusterDragStateModel>(
+                  model: storyClusterDragStateModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<StoryRearrangementScrimModel>(
+                  model: storyRearrangementScrimModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<DebugModel>(
+                  model: debugModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<PanelResizingModel>(
+                  model: panelResizingModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<SizeModel>(
+                  model: sizeModel,
+                  child: child,
+                ),
+            (_, Widget child) => new ScopedModel<PeekModel>(
+                  model: peekModel,
+                  child: child,
+                ),
+          ],
+          conductor: conductor,
+        ),
+        hitTestModel: hitTestModel,
       ),
-      hitTestModel: hitTestModel,
     ),
   );
 

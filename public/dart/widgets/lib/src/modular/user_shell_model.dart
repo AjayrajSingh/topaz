@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/context_writer.fidl.dart';
 import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart';
@@ -45,8 +46,12 @@ class UserShellModel extends Model {
   /// effect when the [onNotify] callback is also provided. Defaults to `false`.
   final bool watchAll;
 
+  /// The [ApplicationContext] given to this app's [UserShell];
+  final ApplicationContext applicationContext;
+
   /// Creates a new instance of [UserShellModel].
-  UserShellModel({bool watchAll}) : watchAll = watchAll ?? false;
+  UserShellModel({bool watchAll, this.applicationContext})
+      : watchAll = watchAll ?? false;
 
   /// The [UserShellContext] given to this app's [UserShell].
   UserShellContext get userShellContext => _userShellContext;

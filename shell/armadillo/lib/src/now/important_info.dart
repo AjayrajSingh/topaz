@@ -37,13 +37,21 @@ const double _kUserSpacing = 32.0;
 
 /// Displays important info to the user.
 class ImportantInfo extends StatelessWidget {
-  /// The color of the text of the importnatn info.  This also colors the icons.
+  /// The color of the text of the important info.  This also colors the icons.
   final Color textColor;
+
+  /// Callback when user taps wifi info.
+  final VoidCallback onWifiInfoTapped;
+
+  /// Callback when user taps battery info.
+  final VoidCallback onBatteryInfoTapped;
 
   /// Constructor
   const ImportantInfo({
     Key key,
     this.textColor,
+    this.onWifiInfoTapped,
+    this.onBatteryInfoTapped,
   })
       : super(key: key);
 
@@ -63,43 +71,51 @@ class ImportantInfo extends StatelessWidget {
                           new LayoutId(
                             id: _ImportantInfoLayoutDelegateParts.batteryIcon,
                             child: powerModel.hasBattery
-                                ? new Image.asset(
-                                    powerModel.batteryImageUrl,
-                                    height: _kIconHeight,
-                                    color: textColor,
-                                    fit: BoxFit.cover,
-                                  )
+                                ? _getGestureDetector(
+                                    new Image.asset(
+                                      powerModel.batteryImageUrl,
+                                      height: _kIconHeight,
+                                      color: textColor,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    onBatteryInfoTapped)
                                 : Nothing.widget,
                           ),
                           new LayoutId(
                             id: _ImportantInfoLayoutDelegateParts.batteryText,
-                            child: new Text(
-                              powerModel.batteryText,
-                              softWrap: false,
-                              overflow: TextOverflow.fade,
-                              style: _kTextStyle.copyWith(color: textColor),
-                            ),
+                            child: _getGestureDetector(
+                                new Text(
+                                  powerModel.batteryText,
+                                  softWrap: false,
+                                  overflow: TextOverflow.fade,
+                                  style: _kTextStyle.copyWith(color: textColor),
+                                ),
+                                onBatteryInfoTapped),
                           ),
                         ]);
                       if (constraints.maxWidth > _kWidthThreshold) {
                         children.addAll(<LayoutId>[
                           new LayoutId(
                             id: _ImportantInfoLayoutDelegateParts.wifiIcon,
-                            child: new Image.asset(
-                              _kWifiImageGrey600,
-                              height: _kIconHeight,
-                              color: textColor,
-                              fit: BoxFit.cover,
-                            ),
+                            child: _getGestureDetector(
+                                new Image.asset(
+                                  _kWifiImageGrey600,
+                                  height: _kIconHeight,
+                                  color: textColor,
+                                  fit: BoxFit.cover,
+                                ),
+                                onWifiInfoTapped),
                           ),
                           new LayoutId(
                             id: _ImportantInfoLayoutDelegateParts.wifiText,
-                            child: new Text(
-                              contextModel.wifiNetwork,
-                              softWrap: false,
-                              overflow: TextOverflow.fade,
-                              style: _kTextStyle.copyWith(color: textColor),
-                            ),
+                            child: _getGestureDetector(
+                                new Text(
+                                  contextModel.wifiNetwork,
+                                  softWrap: false,
+                                  overflow: TextOverflow.fade,
+                                  style: _kTextStyle.copyWith(color: textColor),
+                                ),
+                                onWifiInfoTapped),
                           ),
                         ]);
                       }
@@ -246,4 +262,15 @@ class _ImportantInfoLayoutDelegate extends MultiChildLayoutDelegate {
 
   @override
   bool shouldRelayout(_ImportantInfoLayoutDelegate oldDelegate) => false;
+}
+
+Widget _getGestureDetector(Widget widget, VoidCallback tapCallback) {
+  return new GestureDetector(
+    child: new Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      child: widget,
+    ),
+    onTap: tapCallback,
+    behavior: HitTestBehavior.opaque,
+  );
 }
