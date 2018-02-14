@@ -20,6 +20,8 @@ flutter_source_app("hello_material_source") {
 
   package_name = "hello_material_source"
 
+  main_dart = "main.dart"
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]

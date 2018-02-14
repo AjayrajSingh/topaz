@@ -36,7 +36,7 @@ flutter_asset_tools_bin = "$flutter_asset_tools_out_dir/dart-tools/fuchsia_asset
 template("flutter_source_app") {
   assert(defined(invoker.package_name), "Must define package_name")
 
-  not_needed(invoker, [ "flx", "main_dart", "manifest" ])
+  not_needed(invoker, [ "flx", "manifest" ])
 
   dart_library_name = target_name + "_dart_library"
   dart_library(dart_library_name) {
@@ -58,15 +58,22 @@ template("flutter_source_app") {
   manifest_dot_packages = "$dart_target_gen_dir/$dart_library_name.manifest.packages"
 
   action("${target_name}_sources_manifest") {
-    deps = [ ":$dart_library_name" ]
+    deps = [
+      ":$dart_library_name",
+      gen_snapshot_label,
+    ]
     outputs = [
       manifest,
       manifest_dot_packages,
     ]
     script = "//build/dart/gen_dot_packages_resources.py"
     args = [
+      "--gen-snapshot",
+      rebase_path(gen_snapshot),
       "--package",
       invoker.package_name,
+      "--main-dart",
+      rebase_path(invoker.main_dart),
       "--dot-packages",
       rebase_path(dot_packages),
       "--dot-packages-out",
@@ -75,6 +82,10 @@ template("flutter_source_app") {
       rebase_path(manifest),
       "--contents-out",
       rebase_path(contents),
+      "--url-mapping=dart:zircon," + rebase_path(zircon_sdk_ext_lib),
+      "--url-mapping=dart:fuchsia," + rebase_path(fuchsia_sdk_ext_lib),
+      "--url-mapping=dart:mozart.internal," + rebase_path(mozart_dart_sdk_ext_lib),
+      "--url-mapping=dart:ui," + rebase_path(dart_ui_path),
     ]
   }
 
