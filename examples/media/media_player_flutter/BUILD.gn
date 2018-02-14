@@ -3,10 +3,10 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
-import("//build/package.gni")
 
 flutter_app("media_player_flutter") {
   main_dart = "lib/main.dart"
+  flx = false
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
@@ -20,24 +20,11 @@ flutter_app("media_player_flutter") {
     "//topaz/public/lib/media/flutter",
     "//topaz/public/lib/ui/flutter",
   ]
-}
 
-package("package") {
-  app = true
-  system_image = true
+  sandbox = "meta/sandbox"
 
-  package_name = "media_player_flutter"
-
-  deps = [
-    ":media_player_flutter",
-  ]
-
-  binaries = [ {
-        name = "media_player_flutter"
-        source = "gen/topaz/examples/media/media_player_flutter/media_player_flutter.flx"
-      } ]
   resources = [ {
         path = rebase_path("media_player_flutter.config")
-        dest = "media_player_flutter/media_player_flutter.config"
+        dest = "media_player_flutter.config"
       } ]
 }

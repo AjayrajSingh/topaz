@@ -4,6 +4,6 @@
     ],
     "packages": {
         "mondrian": "//topaz/shell/mondrian_story_shell:mondrian",
-        "mondrian_examples": "//topaz/shell/mondrian_story_shell/examples:mondrian_examples"
+        "example_manual_relationships": "//topaz/shell/mondrian_story_shell/examples/manual:example_manual_relationships"
     }
 }

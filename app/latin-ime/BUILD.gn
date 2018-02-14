@@ -2,12 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/package.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_app("app") {
+flutter_app("latin-ime") {
   main_dart = "main.dart"
-  output_name = "latin-ime"
+
+  flx = false
 
   manifest = "pubspec.yaml"
 
@@ -22,17 +22,4 @@ flutter_app("app") {
     "//topaz/public/lib/ui/flutter",
     "//topaz/shell/keyboard",
   ]
-}
-
-package("latin-ime") {
-  app = true
-  system_image = true
-
-  deps = [
-    ":app",
-  ]
-
-  binaries = [ {
-        name = "latin-ime"
-      } ]
 }

@@ -4,6 +4,6 @@
         "rust"
     ],
     "packages": {
-        "xi": "//topaz/app/xi"
+        "xi_app": "//topaz/app/xi/modules/xi_app"
     }
 }

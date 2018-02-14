@@ -12,6 +12,8 @@ group("view") {
 
 flutter_app("suggest_shell_view") {
   main_dart = "lib/main.dart"
+  flx = false
+
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",

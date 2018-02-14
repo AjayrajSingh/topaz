@@ -4,14 +4,10 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-group("manual") {
-  public_deps = [
-    ":example_manual_relationships",
-  ]
-}
-
 flutter_app("example_manual_relationships") {
   main_dart = "lib/main.dart"
+  flx = false
+
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",

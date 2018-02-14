@@ -3,12 +3,12 @@
         "dart"
     ],
     "packages": {
-        "basic_wm": "//topaz/examples/ui/basic_wm:package",
-        "hello_material": "//topaz/examples/ui/hello_material:hello_material",
+        "basic_wm": "//topaz/examples/ui/basic_wm",
+        "hello_material": "//topaz/examples/ui/hello_material",
         "hello_material_source": "//topaz/examples/ui/hello_material:hello_material_source",
         "jank": "//topaz/examples/ui/jank:package",
         "noodles": "//topaz/examples/ui/noodles:package",
         "paint": "//topaz/examples/ui/paint:package",
-        "sketchy_flutter": "//topaz/examples/ui/sketchy_flutter:package"
+        "sketchy_flutter": "//topaz/examples/ui/sketchy_flutter"
     }
 }

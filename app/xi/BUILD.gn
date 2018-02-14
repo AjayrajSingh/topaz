@@ -2,29 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/package.gni")
-
-package("xi") {
-  app = true
-  system_image = true
-
+group("xi") {
   deps = [
     # NOTE: comment out the `//topaz/app/xi/modules` line below to build only the
     # services before manually compiling xi-core.
     "//topaz/app/xi/modules",
     "//topaz/app/xi/services",
     "//topaz/app/xi/xi_flutter",
-  ]
-
-  binaries = [
-    # TODO(pylaligand): readd once xi-core compiles again.
-    # {
-    #   name = "xi-core"
-    # },
-
-    {
-      source = "gen/topaz/app/xi/modules/xi_app/xi_app.flx"
-      name = "xi_app"
-    },
   ]
 }

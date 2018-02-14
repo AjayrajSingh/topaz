@@ -2,11 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/package.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_app("app") {
+flutter_app("resolution_failed") {
   main_dart = "lib/main.dart"
+  flx = false
+
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",
@@ -19,17 +20,4 @@ flutter_app("app") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
   ]
-}
-
-package("resolution_failed") {
-  system_image = true
-
-  deps = [
-    ":app",
-  ]
-
-  binaries = [ {
-        name = "gen/topaz/app/maxwell/modules/resolution_failed/app.flx"
-        dest = "resolution_failed"
-      } ]
 }

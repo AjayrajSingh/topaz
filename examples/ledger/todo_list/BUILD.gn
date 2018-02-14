@@ -6,6 +6,7 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("todo_list") {
   main_dart = "lib/main.dart"
+  flx = false
 
   source_dir = "lib"
 

@@ -17,38 +17,7 @@ declare_args() {
 assert(armadillo_path_context_config != "")
 
 package("sysui") {
-  app = true
   system_image = true
-
-  deps = [
-    "capybara_user_shell",
-    "kernel_panic",
-    "userpicker_device_shell",
-    "wifi_settings",
-  ]
-
-  binaries = [
-    {
-      source = "gen/topaz/shell/capybara_user_shell/capybara_user_shell.flx"
-      name = "capybara_user_shell"
-    },
-
-    {
-      source = "gen/topaz/shell/kernel_panic/kernel_panic.flx"
-      name = "kernel_panic"
-    },
-
-    {
-      source =
-          "gen/topaz/shell/userpicker_device_shell/userpicker_device_shell.flx"
-      name = "userpicker_device_shell"
-    },
-
-    {
-      source = "gen/topaz/shell/wifi_settings/wifi_settings.flx"
-      name = "wifi_settings"
-    },
-  ]
 
   resources = [
     {

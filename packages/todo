@@ -4,6 +4,6 @@
         "dart"
     ],
     "packages": {
-        "todo": "//topaz/app/todo"
+        "todo_story": "//topaz/app/todo/modules/story:todo_story"
     }
 }

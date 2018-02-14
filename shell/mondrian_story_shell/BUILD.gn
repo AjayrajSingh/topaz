@@ -3,26 +3,13 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_test.gni")
-import("//build/package.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-package("mondrian") {
-  app = true
-  system_image = true
-
-  deps = [
-    ":flutter_mondrian",
-  ]
-
-  binaries = [ {
-        name = "gen/topaz/shell/mondrian_story_shell/flutter_mondrian.flx"
-        dest = "mondrian"
-      } ]
-}
-
-flutter_app("flutter_mondrian") {
+flutter_app("mondrian") {
   package_name = "mondrian"
   main_dart = "lib/main.dart"
+  flx = false
+
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",
@@ -42,7 +29,7 @@ flutter_app("flutter_mondrian") {
 
 dart_test("test") {
   deps = [
-    ":flutter_mondrian_dart_library",
+    ":mondrian_dart_library",
     "//third_party/dart-pkg/pub/test",
   ]
 }

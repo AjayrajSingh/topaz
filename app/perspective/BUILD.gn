@@ -3,12 +3,11 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
-import("//build/package.gni")
 
-flutter_app("perspective_app") {
+flutter_app("perspective") {
   main_dart = "lib/main.dart"
-  output_name = "perspective"
   package_name = "perspective"
+  flx = false
 
   manifest = "pubspec.yaml"
 
@@ -18,17 +17,4 @@ flutter_app("perspective_app") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/media/flutter",
   ]
-}
-
-package("perspective") {
-  app = true
-  system_image = true
-
-  deps = [
-    ":perspective_app",
-  ]
-
-  binaries = [ {
-        name = "perspective"
-      } ]
 }

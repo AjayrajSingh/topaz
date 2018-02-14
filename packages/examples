@@ -8,12 +8,14 @@
         "topaz/packages/ui_examples"
     ],
     "packages": {
-        "bluetooth_examples": "//topaz/examples/bluetooth:bluetooth_examples",
-        "eddystone_agent": "//topaz/examples/eddystone_agent:eddystone_agent",
+        "ble_rect": "//topaz/examples/bluetooth/ble_rect",
+        "ble_scanner": "//topaz/examples/bluetooth/ble_scanner",
+        "eddystone_advertiser": "//topaz/examples/bluetooth/eddystone_advertiser",
+        "eddystone_agent": "//topaz/examples/eddystone_agent",
+        "media_player_flutter": "//topaz/examples/media/media_player_flutter",
         "media_player": "//topaz/examples/media/media_player:package",
-        "media_player_flutter": "//topaz/examples/media/media_player_flutter:package",
-        "more_ledger_examples": "//topaz/examples/ledger",
         "mine_digger": "//topaz/examples/mine_digger",
+        "todo_list": "//topaz/examples/ledger/todo_list",
         "vu_meter": "//topaz/examples/media/vu_meter:package"
     }
 }

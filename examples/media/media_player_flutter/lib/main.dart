@@ -66,7 +66,7 @@ class ModuleImpl implements Module, Lifecycle {
 
 const List<String> _configFileNames = const <String>[
   '/data/media_player_flutter.config',
-  '/system/data/media_player_flutter/media_player_flutter.config',
+  '/pkg/data/media_player_flutter.config',
 ];
 
 List<Asset> _assets = <Asset>[];

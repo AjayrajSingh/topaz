@@ -18,7 +18,7 @@ The app will look for config files in two places, reading only the first file
 it finds:
 
 - /data/media_player_flutter.config
-- /system/data/media_player_flutter/media_player_flutter.config
+- /pkg/data/media_player_flutter.config
 
 Here's an example config file:
 

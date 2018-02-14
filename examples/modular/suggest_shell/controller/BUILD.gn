@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//garnet/public/lib/fidl/fidl.gni")
+import("//build/package.gni")
 
 group("controller") {
   public_deps = [
@@ -10,7 +10,9 @@ group("controller") {
   ]
 }
 
-executable("suggest_shell_controller") {
+executable("bin") {
+  output_name = "suggest_shell_controller"
+
   sources = [
     "main.cc",
   ]
@@ -27,4 +29,12 @@ executable("suggest_shell_controller") {
     "//peridot/public/lib/story/fidl",
     "//peridot/public/lib/suggestion/fidl",
   ]
+}
+
+package("suggest_shell_controller") {
+  deps = [
+    ":bin",
+  ]
+
+  binary = "suggest_shell_controller"
 }

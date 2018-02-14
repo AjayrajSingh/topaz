@@ -3,10 +3,10 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
-import("//build/package.gni")
 
 flutter_app("basic_wm") {
   main_dart = "main.dart"
+  flx = false
 
   source_dir = "."
 
@@ -18,20 +18,4 @@ flutter_app("basic_wm") {
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/ui/flutter",
   ]
-}
-
-package("package") {
-  app = true
-  system_image = true
-
-  package_name = "basic_wm"
-
-  deps = [
-    ":basic_wm",
-  ]
-
-  binaries = [ {
-        name = "basic_wm"
-        source = "gen/topaz/examples/ui/basic_wm/basic_wm.flx"
-      } ]
 }

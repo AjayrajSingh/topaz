@@ -2,11 +2,11 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/package.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_app("maxwell_btr") {
+flutter_app("basic_text_reporter") {
   main_dart = "lib/main.dart"
+  flx = false
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
@@ -21,19 +21,4 @@ flutter_app("maxwell_btr") {
     "//topaz/public/lib/decomposition/dart",
     "//topaz/public/lib/fidl/dart",
   ]
-}
-
-package("basic_text_reporter") {
-  app = true
-  system_image = true
-
-  deps = [
-    ":maxwell_btr",
-  ]
-
-  binaries = [ {
-        name =
-            "gen/topaz/app/maxwell/modules/basic_text_reporter/maxwell_btr.flx"
-        dest = "maxwell_btr"
-      } ]
 }

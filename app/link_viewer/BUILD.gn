@@ -3,11 +3,10 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
-import("//build/package.gni")
 
-flutter_app("link_viewer_app") {
+flutter_app("link_viewer") {
   main_dart = "lib/main.dart"
-  output_name = "link_viewer"
+  flx = false
 
   source_dir = "lib"
 
@@ -18,17 +17,4 @@ flutter_app("link_viewer_app") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
   ]
-}
-
-package("link_viewer") {
-  app = true
-  system_image = true
-
-  deps = [
-    ":link_viewer_app",
-  ]
-
-  binaries = [ {
-        name = "link_viewer"
-      } ]
 }

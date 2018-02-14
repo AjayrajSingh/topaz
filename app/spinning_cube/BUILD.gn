@@ -3,28 +3,14 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
-import("//build/package.gni")
 
-flutter_app("spinning_cube_app") {
+flutter_app("spinning_cube") {
   main_dart = "lib/main.dart"
-  output_name = "spinning_cube"
+  flx = false
 
   manifest = "pubspec.yaml"
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
-}
-
-package("spinning_cube") {
-  app = true
-  system_image = true
-
-  deps = [
-    ":spinning_cube_app",
-  ]
-
-  binaries = [ {
-        name = "spinning_cube"
-      } ]
 }

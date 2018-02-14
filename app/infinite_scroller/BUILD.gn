@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
-import("//build/package.gni")
 
 flutter_app("infinite_scroller") {
   main_dart = "lib/main.dart"
