@@ -55,6 +55,7 @@ action("kernel_core_snapshot") {
   gen_snapshot_label =
       "//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)"
   gen_snapshot_dir = get_label_info(gen_snapshot_label, "root_out_dir")
+  gen_snapshot = "$gen_snapshot_dir/$gen_snapshot_exe"
 
   deps = [
     ":kernel_platform_files",
@@ -78,32 +79,22 @@ action("kernel_core_snapshot") {
     isolate_snapshot_instructions,
   ]
 
-  script = "//third_party/dart/runtime/tools/create_snapshot_bin.py"
+  script = gen_snapshot
   args = [
-    "--executable",
-    rebase_path("$gen_snapshot_dir/$gen_snapshot_exe"),
-    "--script",
-    rebase_path(platform_dill),
-    "--snapshot_kind",
-    "core",
-    "--vm_flag",
+    "--snapshot_kind=core",
     "--strong",
-    "--vm_flag",
     "--reify_generic_functions",
-    "--vm_flag",
     "--limit_ints_to_64_bits",
-    "--vm_flag",
     "--await_is_keyword",
-    "--vm_flag",
     "--enable_mirrors=false",
-    "--vm_output_bin",
-    rebase_path(vm_snapshot_data, root_build_dir),
-    "--vm_instructions_output_bin",
-    rebase_path(vm_snapshot_instructions, root_build_dir),
-    "--isolate_output_bin",
-    rebase_path(isolate_snapshot_data, root_build_dir),
-    "--isolate_instructions_output_bin",
-    rebase_path(isolate_snapshot_instructions, root_build_dir),
+    "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
+    "--vm_snapshot_instructions=" +
+        rebase_path(vm_snapshot_instructions, root_build_dir),
+    "--isolate_snapshot_data=" +
+        rebase_path(isolate_snapshot_data, root_build_dir),
+    "--isolate_snapshot_instructions=" +
+        rebase_path(isolate_snapshot_instructions, root_build_dir),
+    rebase_path(platform_dill),
   ]
 }
 
