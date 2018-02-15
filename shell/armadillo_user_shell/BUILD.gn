@@ -10,8 +10,6 @@ flutter_app("armadillo_user_shell") {
 
   package_name = "armadillo_user_shell"
 
-  flx = false
-
   sandbox = "meta/sandbox"
 
   manifest = "pubspec.yaml"

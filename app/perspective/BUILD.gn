@@ -7,7 +7,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("perspective") {
   main_dart = "lib/main.dart"
   package_name = "perspective"
-  flx = false
 
   manifest = "pubspec.yaml"
 

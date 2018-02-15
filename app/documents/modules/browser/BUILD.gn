@@ -6,8 +6,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("documents_browser") {
   package_name = "browser"
-  flx = false
-
   main_dart = "lib/main.dart"
 
   deps = [

@@ -7,8 +7,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("contacts") {
   package_name = "contacts"
-  flx = false
-
   main_dart = "lib/modular_main.dart"
 
   deps = [

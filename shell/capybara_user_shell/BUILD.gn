@@ -7,7 +7,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("capybara_user_shell") {
   main_dart = "lib/main.dart"
-  flx = false
 
   package_name = "capybara_user_shell"
 

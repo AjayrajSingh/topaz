@@ -6,7 +6,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("basic_text_reporter") {
   main_dart = "lib/main.dart"
-  flx = false
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",

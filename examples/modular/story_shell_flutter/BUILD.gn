@@ -12,7 +12,6 @@ group("story_shell_flutter") {
 
 flutter_app("example_flutter_story_shell") {
   main_dart = "lib/main.dart"
-  flx = false
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",

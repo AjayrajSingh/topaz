@@ -12,7 +12,6 @@ group("parent_embed") {
 
 flutter_app("example_flutter_counter_parent_embed") {
   main_dart = "lib/main.dart"
-  flx = false
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",

@@ -9,8 +9,6 @@ flutter_app("bluetooth_settings") {
   manifest = "pubspec.yaml"
   source_dir = "lib"
 
-  flx = false
-
   deps = [
     "//garnet/public/lib/bluetooth/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",

@@ -12,7 +12,6 @@ group("todo_story") {
 
 flutter_app("example_todo_story") {
   main_dart = "lib/main.dart"
-  flx = false
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",

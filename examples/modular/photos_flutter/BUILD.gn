@@ -14,7 +14,6 @@ flutter_app("example_flutter_photos") {
   main_dart = "lib/main.dart"
 
   source_dir = "lib"
-  flx = false
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",

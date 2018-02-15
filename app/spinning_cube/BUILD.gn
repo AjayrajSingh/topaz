@@ -6,7 +6,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("spinning_cube") {
   main_dart = "lib/main.dart"
-  flx = false
 
   manifest = "pubspec.yaml"
 

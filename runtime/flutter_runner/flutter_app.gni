@@ -35,7 +35,6 @@ flutter_asset_tools_bin = "$flutter_asset_tools_out_dir/dart-tools/fuchsia_asset
 
 template("flutter_source_app") {
   assert(defined(invoker.package_name), "Must define package_name")
-
   not_needed(invoker, [ "flx" ])
 
   dart_library_name = target_name + "_dart_library"
@@ -126,6 +125,8 @@ template("flutter_source_app") {
   }
 
   package(target_name) {
+    forward_variables_from(invoker, [ "fuchsia_package_name" ])
+
     deps = [
       ":${target_name}_resources",
       ":${target_name}_sources",
@@ -136,9 +137,6 @@ template("flutter_source_app") {
       manifest,
     ]
 
-    if (defined(invoker.output_name)) {
-      package_name = invoker.output_name
-    }
     meta = [
       {
         path = rebase_path("//topaz/runtime/flutter_runner/meta/source_runtime")
@@ -159,6 +157,7 @@ template("flutter_source_app") {
 
 template("flutter_jit_app") {
   assert(defined(invoker.main_dart), "Must define main_dart")
+  not_needed(invoker, [ "flx" ])
 
   dart_library_name = target_name + "_dart_library"
 
@@ -256,155 +255,87 @@ template("flutter_jit_app") {
       deps += invoker.deps
     }
   }
-  # TODO(zarah): Remove flx flag and branch once all flx dependencies are removed.
-  if (defined(invoker.flx)) {
-    flx = invoker.flx
+
+  if (defined(invoker.resources)) {
+    invoker_resources = invoker.resources
   } else {
-    flx = true
+    invoker_resources = []
   }
 
-  if (flx) {
-    if (defined(invoker.output_name)) {
-      bundle_path = "$root_build_dir/${invoker.output_name}"
-    } else {
-      bundle_path = "$target_gen_dir/${target_name}.flx"
-    }
-    bundle_depfile = "$bundle_path.d"
-    action(target_name) {
-      depfile = bundle_depfile
-      inputs = [
-        snapshot_path,
-      ]
-      if (defined(invoker.manifest)) {
-        inputs += [ rebase_path(invoker.manifest) ]
-      }
+  asset_manifest = "$target_gen_dir/build/${target_name}_pkgassets"
 
-      outputs = [
-        bundle_path,
-      ]
+  action("${target_name}_resources") {
+    script = "//topaz/runtime/flutter_runner/build/asset_package.py"
 
-      script = "//topaz/runtime/flutter_runner/build/package.py"
+    args = [
+      "--flutter-root",
+      rebase_path(flutter_base),
+      "--flutter-tools",
+      rebase_path(flutter_asset_tools_bin),
+      "--working-dir",
+      rebase_path("$target_gen_dir/build"),
+      "--app-dir",
+      rebase_path("."),
+      "--packages",
+      rebase_path(dot_packages),
+      "--asset-manifest-out",
+      rebase_path(asset_manifest),
+    ]
 
-      args = [
-        "--flutter-root",
-        rebase_path(flutter_base),
-        "--flutter-tools",
-        rebase_path(flutter_tools_bin),
-        "--working-dir",
-        rebase_path("$target_gen_dir/$target_name/build"),
-        "--app-dir",
-        rebase_path("."),
-        "--packages",
-        rebase_path(dot_packages),
-        "--output-file",
-        rebase_path(bundle_path),
-        "--snapshot",
-        rebase_path(snapshot_path),
-        "--build-root",
-        rebase_path(root_build_dir),
-        "--depfile",
-        rebase_path(bundle_depfile),
-        "--interpreter",
-        "flutter_jit_runner",
-      ]
-      if (defined(invoker.manifest)) {
-        args += [
-          "--manifest",
-          rebase_path(invoker.manifest),
-        ]
-      }
-
-      deps = [
-        ":$script_snapshot_label",
-        flutter_tools_label,
-      ]
-    }
-  } else {
-    if (defined(invoker.resources)) {
-      invoker_resources = invoker.resources
-    } else {
-      invoker_resources = []
-    }
-
-    asset_manifest = "$target_gen_dir/build/${target_name}_pkgassets"
-
-    action("${target_name}_resources") {
-      script = "//topaz/runtime/flutter_runner/build/asset_package.py"
-
-      args = [
-        "--flutter-root",
-        rebase_path(flutter_base),
-        "--flutter-tools",
-        rebase_path(flutter_asset_tools_bin),
-        "--working-dir",
-        rebase_path("$target_gen_dir/build"),
-        "--app-dir",
-        rebase_path("."),
-        "--packages",
-        rebase_path(dot_packages),
-        "--asset-manifest-out",
-        rebase_path(asset_manifest),
-      ]
-
-      if (defined(invoker.manifest)) {
-        args += [
-          "--manifest",
-          rebase_path(invoker.manifest),
-        ]
-      }
-
-      deps = [
-        ":$script_snapshot_label",
-        flutter_asset_tools_label,
-      ]
-
-      outputs = [
-        asset_manifest,
+    if (defined(invoker.manifest)) {
+      args += [
+        "--manifest",
+        rebase_path(invoker.manifest),
       ]
     }
 
-    package(target_name) {
-      if (defined(invoker.fuchsia_package_name)) {
-        package_name = invoker.fuchsia_package_name
-      } else {
-        package_name = invoker.target_name
+    deps = [
+      ":$script_snapshot_label",
+      flutter_asset_tools_label,
+    ]
+
+    outputs = [
+      asset_manifest,
+    ]
+  }
+
+  package(target_name) {
+    forward_variables_from(invoker, [ "fuchsia_package_name" ])
+    extra = [ asset_manifest ]
+
+    deps = [
+      ":${target_name}_resources",
+      ":$script_snapshot_label",
+    ]
+
+    resources = [
+      {
+        path = rebase_path(snapshot_path)
+        dest = "snapshot_blob.bin"
       }
+    ] + invoker_resources
 
-      extra = [ asset_manifest ]
+    meta = [
+      {
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit_runtime")
+        dest = "runtime"
+      }
+    ]
 
-      deps = [
-        ":${target_name}_resources",
-        ":$script_snapshot_label",
-      ]
-
-      resources = [
+    if (defined(invoker.sandbox)) {
+      meta += [
         {
-          path = rebase_path(snapshot_path)
-          dest = "snapshot_blob.bin"
-        }
-      ] + invoker_resources
-
-      meta = [
-        {
-          path = rebase_path("//topaz/runtime/flutter_runner/meta/jit_runtime")
-          dest = "runtime"
+          path = rebase_path(invoker.sandbox)
+          dest = "sandbox"
         }
       ]
-
-      if (defined(invoker.sandbox)) {
-        meta += [
-          {
-            path = rebase_path(invoker.sandbox)
-            dest = "sandbox"
-          }
-        ]
-      }
     }
   }
 }
 
 template("flutter_aot_app") {
   assert(defined(invoker.main_dart), "Must define main_dart")
+  not_needed(invoker, [ "flx" ])
 
   dart_library_name = target_name + "_dart_library"
 
@@ -504,8 +435,8 @@ template("flutter_aot_app") {
   }
 
   dylib_label = target_name + "_dylib"
+  dylib_output_name = target_name
 
-  outer_target_name = target_name
   shared_library(dylib_label) {
     deps = [
       ":$assembly_label",
@@ -518,154 +449,86 @@ template("flutter_aot_app") {
       "-nostartfiles",
     ]
     output_dir = target_gen_dir
-    output_name = outer_target_name
+    output_name = dylib_output_name
   }
 
   dylib_path =
       get_label_info(":$dylib_label($shlib_toolchain)", "target_gen_dir") +
       "/lib.unstripped/lib$target_name.so"
 
-  if (defined(invoker.flx)) {
-    flx = invoker.flx
+  if (defined(invoker.resources)) {
+    invoker_resources = invoker.resources
   } else {
-    flx = true
+    invoker_resources = []
   }
-  if (flx) {
-    if (defined(invoker.output_name)) {
-      bundle_path = "$root_build_dir/${invoker.output_name}"
-    } else {
-      bundle_path = "$target_gen_dir/${target_name}.flx"
-    }
-    bundle_depfile = "$bundle_path.d"
-    action(target_name) {
-      depfile = bundle_depfile
 
-      inputs = [
-        dylib_path,
-      ]
-      if (defined(invoker.manifest)) {
-        inputs += [ rebase_path(invoker.manifest) ]
-      }
+  asset_manifest = "$target_gen_dir/build/${target_name}_pkgassets"
 
-      outputs = [
-        bundle_path,
-      ]
+  action("${target_name}_resources") {
+    script = "//topaz/runtime/flutter_runner/build/asset_package.py"
 
-      script = "//topaz/runtime/flutter_runner/build/package.py"
+    args = [
+      "--flutter-root",
+      rebase_path(flutter_base),
+      "--flutter-tools",
+      rebase_path(flutter_asset_tools_bin),
+      "--app-dir",
+      rebase_path("."),
+      "--working-dir",
+      rebase_path("$target_gen_dir/build"),
+      "--packages",
+      rebase_path(dot_packages),
+      "--asset-manifest-out",
+      rebase_path(asset_manifest),
+    ]
 
-      args = [
-        "--flutter-root",
-        rebase_path(flutter_base),
-        "--flutter-tools",
-        rebase_path(flutter_tools_bin),
-        "--working-dir",
-        rebase_path("$target_gen_dir/$target_name/build"),
-        "--app-dir",
-        rebase_path("."),
-        "--packages",
-        rebase_path(dot_packages),
-        "--output-file",
-        rebase_path(bundle_path),
-        "--dylib",
-        rebase_path(dylib_path),
-        "--build-root",
-        rebase_path(root_build_dir),
-        "--depfile",
-        rebase_path(bundle_depfile),
-        "--interpreter",
-        "flutter_aot_runner",
-      ]
-
-      if (defined(invoker.manifest)) {
-        args += [
-          "--manifest",
-          rebase_path(invoker.manifest),
-        ]
-      }
-
-      deps = [
-        ":$dylib_label",
-        flutter_tools_label,
-      ]
-    }
-  } else {
-    if (defined(invoker.resources)) {
-      invoker_resources = invoker.resources
-    } else {
-      invoker_resources = []
-    }
-
-    asset_manifest = "$target_gen_dir/build/${target_name}_pkgassets"
-
-    action("${target_name}_resources") {
-      script = "//topaz/runtime/flutter_runner/build/asset_package.py"
-
-      args = [
-        "--flutter-root",
-        rebase_path(flutter_base),
-        "--flutter-tools",
-        rebase_path(flutter_asset_tools_bin),
-        "--app-dir",
-        rebase_path("."),
-        "--working-dir",
-        rebase_path("$target_gen_dir/build"),
-        "--packages",
-        rebase_path(dot_packages),
-        "--asset-manifest-out",
-        rebase_path(asset_manifest),
-      ]
-
-      if (defined(invoker.manifest)) {
-        args += [
-          "--manifest",
-          rebase_path(invoker.manifest),
-        ]
-      }
-
-      deps = [
-        ":$dylib_label",
-        flutter_asset_tools_label,
-      ]
-
-      outputs = [
-        asset_manifest,
+    if (defined(invoker.manifest)) {
+      args += [
+        "--manifest",
+        rebase_path(invoker.manifest),
       ]
     }
 
-    package(target_name) {
-      if (defined(invoker.fuchsia_package_name)) {
-        package_name = invoker.fuchsia_package_name
-      } else {
-        package_name = invoker.target_name
-      }
-      extra = [ asset_manifest ]
-      deps = [
-        ":${target_name}_resources",
-        ":$dylib_label",
-      ]
+    deps = [
+      ":$dylib_label",
+      flutter_asset_tools_label,
+    ]
 
-      resources = [
+    outputs = [
+      asset_manifest,
+    ]
+  }
+
+  package(target_name) {
+    forward_variables_from(invoker, [ "fuchsia_package_name" ])
+    extra = [ asset_manifest ]
+
+    deps = [
+      ":${target_name}_resources",
+      ":$dylib_label",
+    ]
+
+    resources = [
+      {
+        path = rebase_path(dylib_path)
+        dest = "libapp.so"
+      }
+    ] + invoker_resources
+
+    meta = [
+      {
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/aot_runtime")
+        dest = "runtime"
+      }
+    ]
+
+    if (defined(invoker.sandbox)) {
+      meta += [
         {
-          path = rebase_path(dylib_path)
-          dest = "libapp.so"
-        }
-      ] + invoker_resources
-
-      meta = [
-        {
-          path = rebase_path("//topaz/runtime/flutter_runner/meta/aot_runtime")
-          dest = "runtime"
+          path = rebase_path(invoker.sandbox)
+          dest = "sandbox"
         }
       ]
-
-      if (defined(invoker.sandbox)) {
-        meta += [
-          {
-            path = rebase_path(invoker.sandbox)
-            dest = "sandbox"
-          }
-        ]
-      }
     }
   }
 }
@@ -680,8 +543,8 @@ template("flutter_aot_app") {
 #   package_name (optional)
 #     Name of the Dart package.
 #
-#   output_name (optional)
-#     Name of output to generate. Defaults to $target_name.flx.
+#   fuchsia_package_name (optional)
+#     Name of the Fuchsia package.
 #
 #   deps (optional)
 #     List of Dart packages the application depends on.
@@ -700,7 +563,6 @@ template("flutter_app") {
                                "fuchsia_package_name",
                                "flx",
                                "package_name",
-                               "output_name",
                                "deps",
                                "manifest",
                                "disable_analysis",
@@ -717,7 +579,6 @@ template("flutter_app") {
                                "fuchsia_package_name",
                                "flx",
                                "package_name",
-                               "output_name",
                                "deps",
                                "manifest",
                                "disable_analysis",

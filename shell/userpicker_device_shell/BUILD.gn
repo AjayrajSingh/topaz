@@ -7,7 +7,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("userpicker_device_shell") {
   main_dart = "lib/main.dart"
-  flx = false
 
   sandbox = "meta/sandbox"
 

@@ -6,7 +6,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("music_album") {
   package_name = "music_album"
-  flx = false
 
   main_dart = "lib/main.dart"
 
