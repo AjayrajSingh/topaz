@@ -132,18 +132,6 @@ class ConductorState extends State<Conductor> {
               QuickSettingsProgressModel.of(context).target = 0.0;
             },
           ),
-
-          // Suggestions Overlay.
-          // HACK: Add suggestions overlay before Now panel so that popups displayed
-          // by the Now panel can be dismissed. This is currently needed by wifi
-          // settings popup. An ideal solution would be to have a system-wide
-          // overlay management that can display popups on top of apps across
-          // process boundaries.
-          conductorModel.nextBuilder.build(
-            context,
-            onMinimizeNow: _minimizeNow,
-          ),
-
           // Now.
           conductorModel.nowBuilder.build(
             context,
@@ -155,6 +143,12 @@ class ConductorState extends State<Conductor> {
                 conductorModel.nextBuilder.onNowBarVerticalDragEnd,
             onMinimizedContextTapped: conductorModel.nextBuilder.show,
             recentsScrollOffset: _recentsScrollOffset,
+          ),
+
+          // Suggestions Overlay.
+          conductorModel.nextBuilder.build(
+            context,
+            onMinimizeNow: _minimizeNow,
           ),
         ],
       );
