@@ -31,6 +31,12 @@ class _MaxwellTranscriptionListenerImpl extends speech.TranscriptionListener {
   }
 
   @override
+  void onSpeechLevelUpdate(double speechLevel) {
+    // TODO(modsquad)
+    log.info('Speech level: $speechLevel');
+  }
+
+  @override
   void onError() => model._error = true;
 }
 
