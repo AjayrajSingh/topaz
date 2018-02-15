@@ -4,10 +4,10 @@
 
 import 'dart:async';
 
-import 'package:lib.story.fidl/link.fidl.dart' as fidl;
-import 'package:meta/meta.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.story.fidl/link.fidl.dart' as fidl;
+import 'package:meta/meta.dart';
 
 import 'link_watcher_impl.dart';
 
@@ -33,16 +33,12 @@ class LinkWatcherHost {
     impl = new LinkWatcherImpl(
       onNotify: onNotify,
     );
-    binding
-      ..onConnectionError = _handleConnectionError
-      ..onUnbind = _reset
-      ..onClose = _reset;
-  }
 
-  void _reset() {
-    // _wrap is reset so it can be called again without returning the previous,
-    // unbound interface handle.
-    _wrap = null;
+    binding
+      ..onBind = _handleBind
+      ..onClose = _handleClose
+      ..onConnectionError = _handleConnectionError
+      ..onUnbind = _handleUnbind;
   }
 
   Completer<InterfaceHandle<fidl.LinkWatcher>> _wrap;
@@ -93,5 +89,34 @@ class LinkWatcherHost {
 
     log.warning('binding connection failed outside of async control flow.');
     throw err;
+  }
+
+  void _handleBind() {
+    log.fine('binding ready');
+  }
+
+  void _handleUnbind() {
+    log.fine('binding unbound');
+    _reset();
+  }
+
+  void _handleClose() {
+    log.fine('binding closed');
+    _reset();
+  }
+
+  void _reset() {
+    // _wrap is reset so it can be called again without returning the previous,
+    // unbound interface handle.
+    _wrap = null;
+  }
+
+  /// Closes the underlying binding, usually called as a direct effect of
+  /// Lifecycle::terminate (see https://goo.gl/MmZ2dc) being triggered by the
+  /// framework.
+  Future<Null> terminate() async {
+    log.fine('terminate called, closing $binding');
+    binding.close();
+    return null;
   }
 }

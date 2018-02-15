@@ -6,8 +6,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:lib.fidl.dart/bindings.dart';
-import 'package:lib.story.fidl/link.fidl.dart' as fidl;
 import 'package:lib.logging/logging.dart';
+import 'package:lib.story.fidl/link.fidl.dart' as fidl;
 
 import 'link_watcher_host.dart';
 
@@ -29,9 +29,11 @@ class LinkClient {
   LinkClient({
     this.name,
   }) {
-    proxy.ctrl.onConnectionError = _handleConnectionError;
-    proxy.ctrl.onClose = _handleClose;
-    proxy.ctrl.onBind = _handleBind;
+    proxy.ctrl
+      ..onBind = _handleBind
+      ..onClose = _handleClose
+      ..onConnectionError = _handleConnectionError
+      ..onUnbind = _handleUnbind;
   }
 
   final Completer<Null> _bind = new Completer<Null>();
@@ -40,6 +42,7 @@ class LinkClient {
   Future<Null> get bound => _bind.future;
 
   void _handleBind() {
+    log.fine('proxy ready');
     _bind.complete(null);
   }
 
@@ -192,9 +195,23 @@ class LinkClient {
     return controller.stream;
   }
 
+  /// Closes the underlying proxy connection, should be called as a response to
+  /// Lifecycle::terminate (see https://goo.gl/MmZ2dc).
+  Future<Null> terminate() async {
+    log.info('terminate called');
+    proxy.ctrl.close();
+    return;
+  }
+
+  void _handleUnbind() {
+    log.fine('proxy unbound');
+  }
+
   void _handleClose() {
+    log.fine('proxy closed');
+
     for (LinkWatcherHost watcher in _watchers) {
-      watcher.binding.close();
+      watcher.terminate();
       _watchers.remove(watcher);
     }
 
@@ -204,13 +221,5 @@ class LinkClient {
   void _handleConnectionError() {
     Exception err = new Exception('binding connection failed');
     throw err;
-  }
-
-  /// Closes the underlying proxy connection, should be called as a response to
-  /// Lifecycle::terminate (see https://goo.gl/MmZ2dc).
-  Future<Null> terminate() async {
-    log.info('terminate called');
-    proxy.ctrl.close();
-    return;
   }
 }

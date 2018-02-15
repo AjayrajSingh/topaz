@@ -7,8 +7,8 @@ import 'dart:async';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart' as fidl;
-import 'package:meta/meta.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:meta/meta.dart';
 
 import 'lifecycle_impl.dart';
 
@@ -32,9 +32,14 @@ class LifecycleHost {
   })
       : assert(onTerminate != null) {
     impl = new LifecycleImpl(
-      onTerminate: onTerminate,
+      onTerminate: _handleTerminate,
     );
-    binding.onConnectionError = _handleConnectionError;
+
+    binding
+      ..onBind = _handleBind
+      ..onClose = _handleClose
+      ..onConnectionError = _handleConnectionError
+      ..onUnbind = _handleUnbind;
   }
 
   Completer<Null> _addService;
@@ -96,11 +101,31 @@ class LifecycleHost {
     throw err;
   }
 
-  /// Closes the underlying binding, should be called as a response to
-  /// Lifecycle::terminate (see https://goo.gl/MmZ2dc).
+  void _handleBind() {
+    log.fine('binding ready');
+  }
+
+  void _handleUnbind() {
+    log.fine('binding unbound');
+  }
+
+  void _handleClose() {
+    log.fine('binding closed');
+  }
+
+  Future<Null> _handleTerminate() async {
+    await Future.wait(<Future<Null>>[
+      terminate(),
+      onTerminate(),
+    ]);
+  }
+
+  /// Closes the underlying binding, usually called as a direct effect of
+  /// Lifecycle::terminate (see https://goo.gl/MmZ2dc) being triggered by the
+  /// framework.
   Future<Null> terminate() async {
-    log.info('terminate called');
+    log.fine('terminate called, closing $binding');
     binding.close();
-    return;
+    return null;
   }
 }

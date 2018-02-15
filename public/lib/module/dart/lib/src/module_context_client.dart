@@ -22,9 +22,11 @@ class ModuleContextClient {
 
   /// Constructor.
   ModuleContextClient() {
-    proxy.ctrl.onConnectionError = _handleConnectionError;
-    proxy.ctrl.onBind = _handleBind;
-    proxy.ctrl.onClose = _handleClose;
+    proxy.ctrl
+      ..onBind = _handleBind
+      ..onClose = _handleClose
+      ..onConnectionError = _handleConnectionError
+      ..onUnbind = _handleUnbind;
   }
 
   final Completer<Null> _bind = new Completer<Null>();
@@ -33,6 +35,7 @@ class ModuleContextClient {
   Future<Null> get bound => _bind.future;
 
   void _handleBind() {
+    log.fine('proxy ready');
     _bind.complete(null);
   }
 
@@ -112,17 +115,21 @@ class ModuleContextClient {
   }
 
   void _handleClose() {
-    log.fine('terminating link clients');
+    log.fine('proxy closed, terminating link clients');
 
     for (LinkClient link in _links) {
       link.terminate();
     }
   }
 
+  void _handleUnbind() {
+    log.fine('proxy unbound');
+  }
+
   /// Closes the underlying proxy connection, should be called as a response to
   /// Lifecycle::terminate (see https://goo.gl/MmZ2dc).
   Future<Null> terminate() async {
-    log.info('terminate called');
+    log.fine('terminate called');
     proxy.ctrl.close();
     return;
   }
