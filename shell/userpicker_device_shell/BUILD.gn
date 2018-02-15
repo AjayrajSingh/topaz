@@ -9,6 +9,8 @@ flutter_app("userpicker_device_shell") {
   main_dart = "lib/main.dart"
   flx = false
 
+  sandbox = "meta/sandbox"
+
   package_name = "userpicker_device_shell"
 
   manifest = "pubspec.yaml"
