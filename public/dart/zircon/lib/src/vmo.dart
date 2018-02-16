@@ -45,9 +45,7 @@ class Vmo extends _HandleWrapper<Vmo> {
   /// array.
   ///
   /// The returned [Uint8List] is read-only. Attempts to write to it will
-  /// crash the process.
-  // TODO(dartbug.com/32028): When read only typed-data arrays are added to the
-  // Dart SDK, return one of those instead.
+  /// result in an UnsupportedError exception.
   Uint8List map() {
     if (handle == null) {
       final int status = ZX.ERR_INVALID_ARGS;
@@ -57,7 +55,7 @@ class Vmo extends _HandleWrapper<Vmo> {
     if (r.status != ZX.OK) {
       throw new ZxStatusException(r.status, getStringForStatus(r.status));
     }
-    return r.data;
+    return new UnmodifiableUint8ListView(r.data);
   }
 }
 
