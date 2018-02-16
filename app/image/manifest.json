@@ -1,5 +1,5 @@
 {
-    "binary": "/system/apps/image",
+    "binary": "image",
     "local_name": "image",
     "verb": "com.google.fuchsia.play",
     "noun_constraints": [

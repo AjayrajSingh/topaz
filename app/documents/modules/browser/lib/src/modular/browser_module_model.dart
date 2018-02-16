@@ -19,7 +19,7 @@ import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 
-const String _kInfoModuleUrl = 'file:///system/apps/documents/info';
+const String _kInfoModuleUrl = 'documents_info';
 
 const SurfaceRelation _kSurfaceRelation = const SurfaceRelation(
   arrangement: SurfaceArrangement.copresent,

@@ -367,7 +367,6 @@ class _QueryHandlerImpl extends QueryHandler {
 
       await Future.wait(<Future<Null>>[
         scanDirectory(new Directory('/pkgfs/packages/'), recursive: false),
-        scanDirectory(new Directory('/system/apps/')),
         scanDirectory(new Directory('/system/bin/')),
         scanDirectory(new Directory('/system/pkgs/')),
       ]);

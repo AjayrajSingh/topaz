@@ -23,8 +23,7 @@
 namespace {
 
 constexpr char kSuggestion[] = "http://schema.domokit.org/suggestion";
-constexpr char kProposalId[] =
-    "file:///system/apps/suggest_shell_controller#proposal";
+constexpr char kProposalId[] = "suggest_shell_controller#proposal";
 
 // A Module that serves as the view controller in the suggest shell
 // story, i.e. that creates the module that shows the UI.
@@ -75,7 +74,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
 
     fidl::InterfaceHandle<mozart::ViewOwner> view;
     module_context_->StartModule("suggest_shell_view",
-                                 "file:///system/apps/suggest_shell_view",
+                                 "suggest_shell_view",
                                  kViewLink, nullptr,
                                  view_module_.NewRequest(), view.NewRequest());
 

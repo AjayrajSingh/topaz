@@ -118,7 +118,6 @@ if (use_prebuilt_webkit) {
 }
 
 package("web_view") {
-  app = true
   system_image = true
 
   deps = [

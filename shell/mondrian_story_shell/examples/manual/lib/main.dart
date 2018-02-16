@@ -18,7 +18,7 @@ import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.module.fidl/module_state.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 
-const String _kModuleUrl = 'file:///system/apps/example_manual_relationships';
+const String _kModuleUrl = 'example_manual_relationships';
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
 
 /// This is used for keeping the reference around.

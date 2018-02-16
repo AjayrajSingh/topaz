@@ -34,7 +34,6 @@ executable("bin") {
 }
 
 package("oauth_token_manager") {
-  app = true
   system_image = true
 
   deps = [

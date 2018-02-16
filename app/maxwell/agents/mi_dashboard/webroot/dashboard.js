@@ -276,7 +276,7 @@ function handleContextSubscribers(subscribers) {
     // Sample HTML to be created
     // <li class="mdc-list-item">
     //   <span class="mdc-list-item__text">
-    //     <span class="agent-url">file:///system/apps/agents/module_suggester</span>
+    //     <span class="agent-url">module_suggester</span>
     //     <span class="mdc-list-item__text__secondary">raw/text</span>
     //   </span>
     // </li>
@@ -442,7 +442,7 @@ function getOrCreateContextLinkElement(storyId) {
   if (linkElems == null) {
     // <li id="b234kj2jn5j34342l3k3-mdece" class="mdc-list-item module-list-item">
     //   <span class="module-url mdc-list-item__text">
-    //     file:///system/apps/maxwell_btr
+    //     basic_text_reporter
     //     <span class="module-path mdc-list-item__text__secondary">
     //       root
     //     </span>
@@ -473,7 +473,7 @@ function getOrCreateModuleOverviewElements(storyId,moduleHash) {
   if (moduleElems == null) {
     // <li id="b234kj2jn5j34342l3k3-mdece" class="mdc-list-item module-list-item">
     //   <span class="module-url mdc-list-item__text">
-    //     file:///system/apps/maxwell_btr
+    //     basic_text_reporter
     //     <span class="module-path mdc-list-item__text__secondary">
     //       root
     //     </span>

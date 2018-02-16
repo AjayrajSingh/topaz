@@ -1,4 +1,4 @@
 {
-    "system": [ "apps", "bin", "pkgs" ],
+    "system": [ "bin", "pkgs" ],
     "pkgfs": [ "packages" ]
 }

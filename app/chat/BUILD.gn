@@ -6,7 +6,6 @@ import("//build/package.gni")
 
 package("chat_tests") {
   testonly = true
-  app = true
   system_image = true
 
   deps = [
