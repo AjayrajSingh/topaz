@@ -86,6 +86,10 @@ void RunApplication(
     loop.Run();
     app.SendReturnCode();
   }
+
+  if (Dart_CurrentIsolate()) {
+    Dart_ShutdownIsolate();
+  }
 }
 
 }  // namespace
