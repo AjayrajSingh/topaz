@@ -99,6 +99,9 @@ template("gen_snapshot_cc") {
       args +=
           [ "--packages=" + rebase_path("$target_gen_dir/${name}.packages") ]
     }
+    if (is_debug) {
+      args += [ "--enable_asserts" ]
+    }
     args += [ rebase_path(snapshot_dart) ]
   }
 
@@ -186,6 +189,9 @@ action("generate_aot_snapshot_assembly") {
     "--snapshot_kind=vm-aot-assembly",
     "--assembly=" + rebase_path(snapshot_assembly),
   ]
+  if (is_debug) {
+    args += [ "--enable_asserts" ]
+  }
 }
 
 source_set("dart_aot_snapshot_cc") {
@@ -218,6 +224,9 @@ action("generate_dart2_aot_snapshot_assembly") {
     "--snapshot_kind=vm-aot-assembly",
     "--assembly=" + rebase_path(snapshot_assembly),
   ]
+  if (is_debug) {
+    args += [ "--enable_asserts" ]
+  }
 }
 
 source_set("dart2_aot_snapshot_cc") {

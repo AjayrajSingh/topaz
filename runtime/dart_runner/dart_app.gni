@@ -316,6 +316,9 @@ template("dart_aot_app") {
       args +=
           [ "--embedder_entry_points_manifest=" + rebase_path(entry_manifest) ]
     }
+    if (is_debug) {
+      args += [ "--enable_asserts" ]
+    }
     args += [ rebase_path(invoker.main_dart) ]
   }
 
@@ -441,6 +444,9 @@ template("dart2_aot_app") {
     foreach(entry_manifest, _entry_manifests) {
       args +=
           [ "--embedder_entry_points_manifest=" + rebase_path(entry_manifest) ]
+    }
+    if (is_debug) {
+      args += [ "--enable_asserts" ]
     }
     args += [ rebase_path(kernel_path) ]
   }

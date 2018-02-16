@@ -32,6 +32,7 @@ const char* kDartVMArgs[] = {
     "--await_is_keyword",
 #endif
 #if !defined(NDEBUG)
+    "--enable_asserts",
     "--systrace_timeline",
     "--timeline_streams=VM,Isolate,Compiler,Dart,GC,Embedder",
 #endif
