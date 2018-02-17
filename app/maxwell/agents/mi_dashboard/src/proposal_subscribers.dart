@@ -19,7 +19,6 @@ Function listEqual = const ListEquality<ProposalSummary>().equals;
 
 /// Helper for encoding some FIDL types.
 Object _toEncodable(Object object) {
-  print('_toEncoable($object)');
   if (object is fidl.Struct) {
     return object.toJson();
   }
