@@ -18,6 +18,7 @@ DartMessageHandler::DartMessageHandler()
     : handled_first_message_(false),
       isolate_exited_(false),
       isolate_had_uncaught_exception_error_(false),
+      isolate_had_fatal_error_(false),
       isolate_last_error_(kNoError),
       task_runner_(nullptr) {}
 
@@ -54,6 +55,7 @@ void DartMessageHandler::UnhandledError(Dart_Handle error) {
   // Remember that we had an uncaught exception error.
   isolate_had_uncaught_exception_error_ = true;
   if (Dart_IsFatalError(error)) {
+    isolate_had_fatal_error_ = true;
     // Stop handling messages.
     Dart_SetMessageNotifyCallback(nullptr);
     // Shut down the isolate.
@@ -62,7 +64,7 @@ void DartMessageHandler::UnhandledError(Dart_Handle error) {
 }
 
 void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
-  if (isolate_had_uncaught_exception_error_) {
+  if (isolate_had_fatal_error_) {
     // Don't handle any more messages.
     return;
   }

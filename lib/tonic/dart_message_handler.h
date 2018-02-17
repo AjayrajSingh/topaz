@@ -57,6 +57,7 @@ class DartMessageHandler {
   bool handled_first_message_;
   bool isolate_exited_;
   bool isolate_had_uncaught_exception_error_;
+  bool isolate_had_fatal_error_;
   DartErrorHandleType isolate_last_error_;
   fxl::RefPtr<fxl::TaskRunner> task_runner_;
 
