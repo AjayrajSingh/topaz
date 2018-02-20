@@ -49,6 +49,8 @@ executable("bin") {
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_fonts",
     "//topaz/examples/ui/lib:skia_view",
+    "//zircon/public/lib/async-cpp",
+    "//zircon/public/lib/async-default",
     "//zircon/public/lib/hid",
     "//zircon/public/lib/launchpad",
     "//zircon/public/lib/trace-provider",

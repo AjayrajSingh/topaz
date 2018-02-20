@@ -5,6 +5,8 @@
 #ifndef APPS_MOTERM_MOTERM_VIEW_H_
 #define APPS_MOTERM_MOTERM_VIEW_H_
 
+#include <async/cpp/auto_task.h>
+
 #include "examples/ui/lib/skia_font_loader.h"
 #include "examples/ui/lib/skia_view.h"
 #include "lib/app/cpp/application_context.h"
@@ -53,7 +55,7 @@ class MotermView : public mozart::SkiaView, public MotermModel::Delegate {
 
   void ComputeMetrics();
   void StartCommand();
-  void Blink(uint64_t blink_timer_id);
+  void Blink();
   void Resize();
   void OnCommandTerminated();
 
@@ -78,10 +80,9 @@ class MotermView : public mozart::SkiaView, public MotermModel::Delegate {
   // Keyboard state.
   bool keypad_application_mode_;
 
-  fxl::RefPtr<fxl::TaskRunner> task_runner_;
-  fxl::TimePoint last_key_;
+  async::AutoTask blink_task_;
+  zx::time last_key_;
   bool blink_on_ = true;
-  uint64_t blink_timer_id_ = 0;
   bool focused_ = false;
 
   History* history_;

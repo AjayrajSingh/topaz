@@ -4,24 +4,25 @@
 
 #include "topaz/app/moterm/moterm_view.h"
 
+#include <async/default.h>
 #include <unistd.h>
 
-#include "lib/ui/input/cpp/formatting.h"
-#include "topaz/app/moterm/command.h"
-#include "topaz/app/moterm/key_util.h"
-#include "topaz/app/moterm/moterm_model.h"
 #include "lib/fonts/fidl/font_provider.fidl.h"
+#include "lib/fsl/io/redirection.h"
+#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/strings/string_printf.h"
 #include "lib/fxl/time/time_delta.h"
-#include "lib/fsl/io/redirection.h"
-#include "lib/fsl/tasks/message_loop.h"
+#include "lib/ui/input/cpp/formatting.h"
 #include "third_party/skia/include/core/SkPaint.h"
+#include "topaz/app/moterm/command.h"
+#include "topaz/app/moterm/key_util.h"
+#include "topaz/app/moterm/moterm_model.h"
 
 namespace moterm {
 
 namespace {
-constexpr fxl::TimeDelta kBlinkInterval = fxl::TimeDelta::FromMilliseconds(500);
+constexpr zx::duration kBlinkInterval = zx::msec(500);
 }  // namespace
 
 MotermView::MotermView(
@@ -37,7 +38,7 @@ MotermView::MotermView(
       context_(context),
       font_loader_(
           context_->ConnectToEnvironmentService<fonts::FontProvider>()),
-      task_runner_(fsl::MessageLoop::GetCurrent()->task_runner()),
+      blink_task_(async_get_default()),
       history_(history),
       params_(moterm_params),
       weak_ptr_factory_(this) {
@@ -100,27 +101,27 @@ void MotermView::StartCommand() {
     exit(1);
   }
 
-  Blink(++blink_timer_id_);
+  Blink();
   InvalidateScene();
 }
 
-void MotermView::Blink(uint64_t blink_timer_id) {
-  if (blink_timer_id != blink_timer_id_)
-    return;
-
+void MotermView::Blink() {
   if (focused_) {
-    fxl::TimeDelta delta = fxl::TimePoint::Now() - last_key_;
+    zx::duration delta = zx::clock::get(ZX_CLOCK_MONOTONIC) - last_key_;
     if (delta > kBlinkInterval) {
       blink_on_ = !blink_on_;
       InvalidateScene();
     }
-    task_runner_->PostDelayedTask(
-        [ weak = weak_ptr_factory_.GetWeakPtr(), blink_timer_id ] {
-          if (weak) {
-            weak->Blink(blink_timer_id);
-          }
-        },
-        kBlinkInterval);
+    if (blink_task_.is_pending())
+      blink_task_.Cancel();
+    blink_task_.set_deadline(zx::deadline_after(kBlinkInterval).get());
+    blink_task_.set_handler([this](async_t* async, zx_status_t status) {
+      if (status != ZX_OK)
+        return ASYNC_TASK_FINISHED;
+      Blink();
+      return ASYNC_TASK_FINISHED;
+    });
+    blink_task_.Post();
   }
 }
 
@@ -265,7 +266,7 @@ bool MotermView::OnInputEvent(mozart::InputEventPtr event) {
     focused_ = focus->focused;
     blink_on_ = true;
     if (focused_) {
-      Blink(++blink_timer_id_);
+      Blink();
     } else {
       InvalidateScene();
     }
@@ -275,7 +276,7 @@ bool MotermView::OnInputEvent(mozart::InputEventPtr event) {
 }
 
 void MotermView::OnKeyPressed(mozart::InputEventPtr key_event) {
-  last_key_ = fxl::TimePoint::Now();
+  last_key_ = zx::clock::get(ZX_CLOCK_MONOTONIC);
   blink_on_ = true;
 
   std::string input_sequence =
