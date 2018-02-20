@@ -11,7 +11,7 @@
     <project name="third_party/dart/third_party/pkg/async"
              path="third_party/dart/third_party/pkg/async"
              remote="https://dart.googlesource.com/async.git"
-             revision="corelib_2_2_1"/>
+             revision="2.0.4"/>
 
     <project name="third_party/dart/third_party/pkg/barback"
              path="third_party/dart/third_party/pkg/barback"
@@ -66,7 +66,7 @@
     <project name="third_party/dart/third_party/pkg/dartdoc"
              path="third_party/dart/third_party/pkg/dartdoc"
              remote="https://dart.googlesource.com/dartdoc.git"
-             revision="v0.15.1"/>
+             revision="v0.16.0"/>
 
     <project name="third_party/dart/third_party/pkg/fixnum"
              path="third_party/dart/third_party/pkg/fixnum"
@@ -131,7 +131,7 @@
     <project name="third_party/dart/third_party/pkg/linter"
              path="third_party/dart/third_party/pkg/linter"
              remote="https://dart.googlesource.com/linter.git"
-             revision="0.1.42"/>
+             revision="0.1.43"/>
 
     <project name="third_party/dart/third_party/pkg/logging"
              path="third_party/dart/third_party/pkg/logging"
@@ -156,7 +156,7 @@
     <project name="third_party/dart/third_party/pkg/mockito"
              path="third_party/dart/third_party/pkg/mockito"
              remote="https://dart.googlesource.com/mockito.git"
-             revision="2.0.2"/>
+             revision="a92db054fba18bc2d605be7670aee74b7cadc00a"/>
 
     <project name="third_party/dart/third_party/pkg/mustache4dart"
              path="third_party/dart/third_party/pkg/mustache4dart"
@@ -311,7 +311,7 @@
     <project name="third_party/dart/third_party/pkg/web_socket_channel"
              path="third_party/dart/third_party/pkg/web_socket_channel"
              remote="https://dart.googlesource.com/web_socket_channel.git"
-             revision="corelib_2_2_1"/>
+             revision="1.0.7"/>
 
     <project name="third_party/dart/third_party/pkg/yaml"
              path="third_party/dart/third_party/pkg/yaml"

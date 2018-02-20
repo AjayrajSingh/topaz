@@ -11,7 +11,7 @@
     <project name="third_party/dart/third_party/pkg/async"
              path="third_party/dart/third_party/pkg/async"
              remote="https://dart.googlesource.com/async.git"
-             revision="corelib_2_2_1"/>
+             revision="2.0.4"/>
 
     <project name="third_party/dart/third_party/pkg/barback"
              path="third_party/dart/third_party/pkg/barback"
@@ -311,7 +311,7 @@
     <project name="third_party/dart/third_party/pkg/web_socket_channel"
              path="third_party/dart/third_party/pkg/web_socket_channel"
              remote="https://dart.googlesource.com/web_socket_channel.git"
-             revision="corelib_2_2_1"/>
+             revision="1.0.7"/>
 
     <project name="third_party/dart/third_party/pkg/yaml"
              path="third_party/dart/third_party/pkg/yaml"
