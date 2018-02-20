@@ -8,9 +8,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:front_end/src/api_prototype/byte_store.dart';
 import 'package:front_end/src/api_prototype/compiler_options.dart';
-import 'package:front_end/src/api_prototype/incremental_kernel_generator.dart';
 
 import 'package:kernel/binary/limited_ast_to_binary.dart';
 import 'package:kernel/target/targets.dart';
@@ -86,25 +84,20 @@ Future<void> main(List<String> args) async {
       ..reportMessages = true
       ..setExitCodeOnProblem = true;
 
-  Program program;
-  if (!aot) {
-    IncrementalKernelGenerator generator =
-        new IncrementalKernelGenerator(compilerOptions, filenameUri);
-    program = await generator.computeDelta();
-  } else {
+  if (aot) {
     // Link in the platform to produce an output with no external references.
     String platformKernelDill = strongMode ? 'platform_strong.dill'
                                            : 'platform.dill';
     compilerOptions.linkedDependencies = <Uri>[
       sdkRoot.resolve(platformKernelDill)
     ];
-
-    program = await compileToKernel(filenameUri, compilerOptions, aot: true);
   }
+
+  Program program = await compileToKernel(filenameUri, compilerOptions, aot: aot);
 
   final IOSink sink = new File(kernelBinaryFilename).openWrite();
   final BinaryPrinter printer =
-      new LimitedBinaryPrinter(sink, (_) => true /* predicate */,
+      new LimitedBinaryPrinter(sink, (Library lib) => aot || !lib.isExternal,
                                false /* excludeUriToSource */);
   printer.writeProgramFile(program);
   await sink.close();
