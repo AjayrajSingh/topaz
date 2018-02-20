@@ -79,6 +79,9 @@ class VideoProgressMonitor {
   }
 
   void _updateProgress() {
+    // We may not know the duration of the video initially
+    _progress.duration = _controller.duration;
+
     double normalizedProgress = _controller.normalizedProgress;
     if (normalizedProgress != _progress.normalizedProgress) {
       _progress.normalizedProgress = normalizedProgress;
