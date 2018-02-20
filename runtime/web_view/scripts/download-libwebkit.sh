@@ -7,7 +7,7 @@ set -e
 
 # This specifies the revision of //third_party/webkit to download prebuilts for. To roll, edit this
 # hash to refer to a master commit in that repository.
-readonly WEBKIT_REVISION="203d834b2b856defb83a58ce494b80d842bc85f1"
+readonly WEBKIT_REVISION="0960bec9f79f06122bdb9eebbde5b5e55fb1a259"
 
 readonly SCRIPT_ROOT="$(cd $(dirname ${BASH_SOURCE[0]} ) && pwd)"
 readonly FUCHSIA_ROOT="${SCRIPT_ROOT}/../../../.."
