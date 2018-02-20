@@ -162,3 +162,25 @@ package("web_view_test_package") {
         name = "web_view_test"
       } ]
 }
+
+executable("web_view_link_test") {
+  sources = [
+    "test_webview_link.cpp",
+  ]
+
+  deps = [
+    ":webkit",
+  ]
+}
+
+package("web_view_link_test_package") {
+  system_image = true
+
+  deps = [
+    ":web_view_link_test",
+  ]
+
+  tests = [ {
+        name = "web_view_link_test"
+      } ]
+}

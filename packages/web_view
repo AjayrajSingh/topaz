@@ -10,6 +10,7 @@
     ],
     "packages": {
         "web_view": "//topaz/runtime/web_view",
-        "web_view_test_package": "//topaz/runtime/web_view:web_view_test_package"
+        "web_view_test_package": "//topaz/runtime/web_view:web_view_test_package",
+        "web_view_link_test_package": "//topaz/runtime/web_view:web_view_link_test_package"
     }
 }
