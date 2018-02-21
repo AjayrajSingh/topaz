@@ -10,8 +10,6 @@ dart_app("mi_dashboard") {
 
   source_dir = "."
 
-  sandbox = "meta/sandbox"
-
   deps = [
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:debug_dart",
@@ -22,36 +20,32 @@ dart_app("mi_dashboard") {
     "//topaz/public/lib/context/dart",
     "//topaz/public/lib/fidl/dart",
   ]
-}
-
-package("mi_dashboard_resources") {
-  system_image = true
 
   resources = [
     {
       path = rebase_path(
               "//topaz/app/maxwell/agents/mi_dashboard/webroot/index.html")
-      dest = "mi_dashboard/webroot/index.html"
+      dest = "webroot/index.html"
     },
     {
       path = rebase_path(
               "//topaz/app/maxwell/agents/mi_dashboard/webroot/dashboard.js")
-      dest = "mi_dashboard/webroot/dashboard.js"
+      dest = "webroot/dashboard.js"
     },
     {
       path = rebase_path(
               "//topaz/app/maxwell/agents/mi_dashboard/webroot/dashboard.css")
-      dest = "mi_dashboard/webroot/dashboard.css"
+      dest = "webroot/dashboard.css"
     },
     {
       path = rebase_path(
               "//topaz/app/maxwell/agents/mi_dashboard/webroot/logo.png")
-      dest = "mi_dashboard/webroot/logo.png"
+      dest = "webroot/logo.png"
     },
     {
       path = rebase_path(
               "//topaz/app/maxwell/agents/mi_dashboard/dashboard.config")
-      dest = "mi_dashboard/dashboard.config"
+      dest = "dashboard.config"
     },
   ]
 }

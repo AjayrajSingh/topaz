@@ -168,6 +168,9 @@ template("dart_jit_app") {
         dest = "snapshot_blob.bin"
       },
     ]
+    if (defined(invoker.resources)) {
+      resources += invoker.resources
+    }
 
     meta = [
       {
@@ -235,6 +238,9 @@ template("dart2_jit_app") {
         dest = "kernel_blob.dill"
       },
     ]
+    if (defined(invoker.resources)) {
+      resources += invoker.resources
+    }
 
     meta = [
       {
@@ -363,6 +369,9 @@ template("dart_aot_app") {
         dest = "libapp.so"
       },
     ]
+    if (defined(invoker.resources)) {
+      resources += invoker.resources
+    }
 
     meta = [
       {
@@ -492,6 +501,9 @@ template("dart2_aot_app") {
         dest = "libapp.so"
       },
     ]
+    if (defined(invoker.resources)) {
+      resources += invoker.resources
+    }
 
     meta = [
       {
@@ -529,6 +541,9 @@ template("dart2_aot_app") {
 #
 #   disable_analysis (optional)
 #     Prevents analysis from being run on this target.
+#
+#   resources (optional)
+#     Resources for the package (see //build/package.gni)
 template("dart_app") {
   target(dart_default_app, target_name) {
     forward_variables_from(invoker, "*")

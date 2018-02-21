@@ -16,7 +16,7 @@ import 'src/proposal_subscribers.dart';
 
 // ignore_for_file: public_member_api_docs
 
-const String _configDir = '/system/data/mi_dashboard';
+const String _configDir = '/pkg/data/';
 const String _configFilename = 'dashboard.config';
 const String _defaultWebrootPath = 'webroot';
 const int _defaultPort = 4000;
