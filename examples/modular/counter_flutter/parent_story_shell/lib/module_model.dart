@@ -6,7 +6,7 @@ import 'dart:convert' show JSON;
 
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.module.fidl/module_controller.fidl.dart';
+import 'package:lib.module.fidl._module_controller/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.widgets/modular.dart';

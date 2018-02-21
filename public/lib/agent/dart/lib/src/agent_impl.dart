@@ -6,7 +6,7 @@ import 'dart:async';
 
 import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.agent.fidl/agent.fidl.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.agent.fidl/agent_context.fidl.dart';

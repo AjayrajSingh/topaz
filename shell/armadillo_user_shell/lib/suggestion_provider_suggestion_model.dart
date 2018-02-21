@@ -9,9 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.images.fidl/encoded_image.fidl.dart';
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart' as maxwell;
-import 'package:lib.suggestion.fidl/suggestion_provider.fidl.dart' as maxwell;
-import 'package:lib.suggestion.fidl/user_input.fidl.dart' as maxwell;
+import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart'
+    as maxwell;
+import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_provider.fidl.dart'
+    as maxwell;
+import 'package:lib.suggestion.fidl._suggestion_provider/user_input.fidl.dart'
+    as maxwell;
 import 'package:meta/meta.dart';
 
 import 'hit_test_model.dart';
@@ -284,6 +287,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
       _askText = text;
 
       _askListener.clear();
+
       /// A timer ensures that we don't make unneeded ask queries while the
       /// user is still typing/talking
       _askTextTimer?.cancel();

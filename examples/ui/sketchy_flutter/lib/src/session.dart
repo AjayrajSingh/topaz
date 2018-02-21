@@ -3,14 +3,14 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.ui.scenic.fidl/ops.fidl.dart';
-import 'package:lib.ui.scenic.fidl/presentation_info.fidl.dart';
+import 'package:lib.ui.scenic.fidl._presentation_info/presentation_info.fidl.dart';
 import 'package:lib.ui.scenic.fidl/scene_manager.fidl.dart';
 import 'package:lib.ui.scenic.fidl/session.fidl.dart';
 import 'package:zircon/zircon.dart' as zircon;
 
-export 'package:lib.ui.scenic.fidl/presentation_info.fidl.dart'
+export 'package:lib.ui.scenic.fidl._presentation_info/presentation_info.fidl.dart'
     show PresentationInfo;
 
 // ignore_for_file: public_member_api_docs

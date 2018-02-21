@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.media.flutter/media_player.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
 import 'package:lib.media.fidl/media_metadata.fidl.dart';

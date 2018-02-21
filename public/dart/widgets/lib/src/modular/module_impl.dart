@@ -4,7 +4,7 @@
 
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.module.fidl/module.fidl.dart';

@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:fuchsia/fuchsia.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';

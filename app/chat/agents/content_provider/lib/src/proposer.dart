@@ -9,7 +9,7 @@ import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
+import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 
 const String _kContactsJsonFile = '/system/data/modules/contacts.json';
