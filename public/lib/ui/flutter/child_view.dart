@@ -10,19 +10,20 @@ import 'dart:ui' as ui;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/application_controller.fidl.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.ui.geometry.fidl/geometry.fidl.dart' as fidl;
 import 'package:lib.ui.views.fidl/view_containers.fidl.dart';
 import 'package:lib.ui.views.fidl/view_properties.fidl.dart';
 import 'package:lib.ui.views.fidl/view_provider.fidl.dart';
-import 'package:lib.ui.views.fidl/view_token.fidl.dart';
+import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
-export 'package:lib.ui.views.fidl/view_token.fidl.dart' show ViewOwner;
+export 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart'
+    show ViewOwner;
 
 ViewContainerProxy _initViewContainer() {
   final Handle handle = MozartStartupInfo.takeViewContainer();

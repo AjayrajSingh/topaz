@@ -8,13 +8,13 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:lib.images.fidl/encoded_image.fidl.dart';
 import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
+import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:zircon/zircon.dart';
 
 export 'dart:typed_data' show Uint8List;
 export 'package:lib.suggestion.fidl/proposal.fidl.dart';
-export 'package:lib.suggestion.fidl/suggestion_display.fidl.dart';
+export 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart';
 
 /// Converts a url into a SizedVmo.  Null is returned if a SizedVmo couldn't
 /// be created from the given url.

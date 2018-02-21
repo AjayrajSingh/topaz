@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:lib.logging/logging.dart';
-import 'package:lib.user.fidl/focus.fidl.dart';
+import 'package:lib.user.fidl._focus/focus.fidl.dart';
 
 /// Called when we receive a request to focus on [storyId];
 typedef void OnFocusRequest(String storyId);

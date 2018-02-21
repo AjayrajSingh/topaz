@@ -8,7 +8,7 @@ import 'package:lib.app.fidl/application_controller.fidl.dart';
 import 'package:lib.app.fidl/application_environment.fidl.dart';
 import 'package:lib.app.fidl/application_environment_host.fidl.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';

@@ -9,7 +9,7 @@ import 'package:lib.media.fidl/media_renderer.fidl.dart';
 import 'package:lib.media.fidl/media_service.fidl.dart';
 import 'package:lib.media.fidl/video_renderer.fidl.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/service_provider.fidl.dart';
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
