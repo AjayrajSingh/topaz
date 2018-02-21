@@ -11,11 +11,12 @@
 
 #include "lib/fxl/logging.h"
 
+namespace term {
 namespace {
 
 // Moterm -> teken conversions:
 
-teken_pos_t MotermToTekenSize(const MotermModel::Size& size) {
+teken_pos_t MotermToTekenSize(const TermModel::Size& size) {
   FXL_DCHECK(size.rows <= std::numeric_limits<teken_unit_t>::max());
   FXL_DCHECK(size.columns <= std::numeric_limits<teken_unit_t>::max());
   teken_pos_t rv = {static_cast<teken_unit_t>(size.rows),
@@ -25,24 +26,24 @@ teken_pos_t MotermToTekenSize(const MotermModel::Size& size) {
 
 // Teken -> term conversions:
 
-MotermModel::Position TekenToMotermPosition(const teken_pos_t& position) {
-  return MotermModel::Position(static_cast<int>(position.tp_row),
-                               static_cast<int>(position.tp_col));
+TermModel::Position TekenToMotermPosition(const teken_pos_t& position) {
+  return TermModel::Position(static_cast<int>(position.tp_row),
+                             static_cast<int>(position.tp_col));
 }
 
-MotermModel::Size TekenToMotermSize(const teken_pos_t& size) {
-  return MotermModel::Size(size.tp_row, size.tp_col);
+TermModel::Size TekenToMotermSize(const teken_pos_t& size) {
+  return TermModel::Size(size.tp_row, size.tp_col);
 }
 
-MotermModel::Rectangle TekenToMotermRectangle(const teken_rect_t& rectangle) {
-  return MotermModel::Rectangle(
+TermModel::Rectangle TekenToMotermRectangle(const teken_rect_t& rectangle) {
+  return TermModel::Rectangle(
       static_cast<int>(rectangle.tr_begin.tp_row),
       static_cast<int>(rectangle.tr_begin.tp_col),
       rectangle.tr_end.tp_row - rectangle.tr_begin.tp_row,
       rectangle.tr_end.tp_col - rectangle.tr_begin.tp_col);
 }
 
-MotermModel::Color TekenToMotermColor(teken_color_t color, bool bold) {
+TermModel::Color TekenToMotermColor(teken_color_t color, bool bold) {
   static const uint8_t rgb[TC_NCOLORS][3] = {
       {0x00, 0x00, 0x00},  // Black.
       {0x80, 0x00, 0x00},  // Red.
@@ -64,15 +65,15 @@ MotermModel::Color TekenToMotermColor(teken_color_t color, bool bold) {
       {0xff, 0xff, 0xff}   // White.
   };
   FXL_DCHECK(color < static_cast<unsigned>(TC_NCOLORS));
-  return bold ? MotermModel::Color(bold_rgb[color][0], bold_rgb[color][1],
-                                   bold_rgb[color][2])
-              : MotermModel::Color(rgb[color][0], rgb[color][1], rgb[color][2]);
+  return bold ? TermModel::Color(bold_rgb[color][0], bold_rgb[color][1],
+                                 bold_rgb[color][2])
+              : TermModel::Color(rgb[color][0], rgb[color][1], rgb[color][2]);
 }
 
 // Utility functions:
 
-MotermModel::Rectangle EnclosingRectangle(const MotermModel::Rectangle& rect1,
-                                          const MotermModel::Rectangle& rect2) {
+TermModel::Rectangle EnclosingRectangle(const TermModel::Rectangle& rect1,
+                                        const TermModel::Rectangle& rect2) {
   if (rect1.IsEmpty())
     return rect2;
   if (rect2.IsEmpty())
@@ -89,18 +90,20 @@ MotermModel::Rectangle EnclosingRectangle(const MotermModel::Rectangle& rect1,
                rect2.position.column + static_cast<int>(rect2.size.columns));
   FXL_DCHECK(start_row <= end_row);
   FXL_DCHECK(start_col <= end_col);
-  return MotermModel::Rectangle(start_row, start_col,
-                                static_cast<unsigned>(end_row - start_row),
-                                static_cast<unsigned>(end_col - start_col));
+  return TermModel::Rectangle(start_row, start_col,
+                              static_cast<unsigned>(end_row - start_row),
+                              static_cast<unsigned>(end_col - start_col));
 }
 
 }  // namespace
 
-const MotermModel::Attributes MotermModel::kAttributesBold;
-const MotermModel::Attributes MotermModel::kAttributesUnderline;
-const MotermModel::Attributes MotermModel::kAttributesBlink;
+const TermModel::Attributes TermModel::kAttributesBold;
+const TermModel::Attributes TermModel::kAttributesUnderline;
+const TermModel::Attributes TermModel::kAttributesBlink;
 
-MotermModel::MotermModel(const Size& size, Delegate* delegate)
+TermModel::Delegate::~Delegate() = default;
+
+TermModel::TermModel(const Size& size, Delegate* delegate)
     : size_(size),
       delegate_(delegate),
       cursor_visible_(true),
@@ -116,21 +119,21 @@ MotermModel::MotermModel(const Size& size, Delegate* delegate)
   memset(attributes_.get(), 0, num_chars_ * sizeof(teken_attr_t));
 
   static const teken_funcs_t callbacks = {
-      &MotermModel::OnBellThunk,    &MotermModel::OnCursorThunk,
-      &MotermModel::OnPutcharThunk, &MotermModel::OnFillThunk,
-      &MotermModel::OnCopyThunk,    &MotermModel::OnParamThunk,
-      &MotermModel::OnRespondThunk};
+      &TermModel::OnBellThunk,    &TermModel::OnCursorThunk,
+      &TermModel::OnPutcharThunk, &TermModel::OnFillThunk,
+      &TermModel::OnCopyThunk,    &TermModel::OnParamThunk,
+      &TermModel::OnRespondThunk};
   teken_init(&terminal_, &callbacks, this);
 
   teken_pos_t s = MotermToTekenSize(size_);
   teken_set_winsize(&terminal_, &s);
 }
 
-MotermModel::~MotermModel() {}
+TermModel::~TermModel() {}
 
-void MotermModel::ProcessInput(const void* input_bytes,
-                               size_t num_input_bytes,
-                               StateChanges* state_changes) {
+void TermModel::ProcessInput(const void* input_bytes,
+                             size_t num_input_bytes,
+                             StateChanges* state_changes) {
   FXL_DCHECK(state_changes);
   FXL_DCHECK(!current_state_changes_);
   current_state_changes_ = state_changes;
@@ -164,23 +167,23 @@ void MotermModel::ProcessInput(const void* input_bytes,
   current_state_changes_ = nullptr;
 }
 
-MotermModel::Size MotermModel::GetSize() const {
+TermModel::Size TermModel::GetSize() const {
   // Teken isn't const-correct, sadly.
   return TekenToMotermSize(
       *teken_get_winsize(const_cast<teken_t*>(&terminal_)));
 }
 
-MotermModel::Position MotermModel::GetCursorPosition() const {
+TermModel::Position TermModel::GetCursorPosition() const {
   // Teken isn't const-correct, sadly.
   return TekenToMotermPosition(
       *teken_get_cursor(const_cast<teken_t*>(&terminal_)));
 }
 
-bool MotermModel::GetCursorVisibility() const {
+bool TermModel::GetCursorVisibility() const {
   return cursor_visible_;
 }
 
-MotermModel::CharacterInfo MotermModel::GetCharacterInfoAt(
+TermModel::CharacterInfo TermModel::GetCharacterInfoAt(
     const Position& position) const {
   FXL_DCHECK(position.row >= 0);
   FXL_DCHECK(position.row < static_cast<int>(GetSize().rows));
@@ -205,7 +208,7 @@ MotermModel::CharacterInfo MotermModel::GetCharacterInfoAt(
   return CharacterInfo(ch, attr, fg, bg);
 }
 
-void MotermModel::SetSize(const Size& size, bool reset) {
+void TermModel::SetSize(const Size& size, bool reset) {
   FXL_DCHECK(size.rows > 0u);
   FXL_DCHECK(size.columns > 0u);
   Size old_size = size_;
@@ -254,19 +257,19 @@ void MotermModel::SetSize(const Size& size, bool reset) {
   }
 }
 
-void MotermModel::OnBell() {
+void TermModel::OnBell() {
   FXL_DCHECK(current_state_changes_);
   current_state_changes_->bell_count++;
 }
 
-void MotermModel::OnCursor(const teken_pos_t* pos) {
+void TermModel::OnCursor(const teken_pos_t* pos) {
   FXL_DCHECK(current_state_changes_);
   // Don't do anything. We'll just compare initial and final cursor positions.
 }
 
-void MotermModel::OnPutchar(const teken_pos_t* pos,
-                            teken_char_t ch,
-                            const teken_attr_t* attr) {
+void TermModel::OnPutchar(const teken_pos_t* pos,
+                          teken_char_t ch,
+                          const teken_attr_t* attr) {
   character_at(pos->tp_row, pos->tp_col) = ch;
   attribute_at(pos->tp_row, pos->tp_col) = *attr;
 
@@ -277,9 +280,9 @@ void MotermModel::OnPutchar(const teken_pos_t* pos,
                          Rectangle(pos->tp_row, pos->tp_col, 1, 1));
 }
 
-void MotermModel::OnFill(const teken_rect_t* rect,
-                         teken_char_t ch,
-                         const teken_attr_t* attr) {
+void TermModel::OnFill(const teken_rect_t* rect,
+                       teken_char_t ch,
+                       const teken_attr_t* attr) {
   for (size_t row = rect->tr_begin.tp_row; row < rect->tr_end.tp_row; row++) {
     for (size_t col = rect->tr_begin.tp_col; col < rect->tr_end.tp_col; col++) {
       character_at(row, col) = ch;
@@ -293,7 +296,7 @@ void MotermModel::OnFill(const teken_rect_t* rect,
       current_state_changes_->dirty_rect, TekenToMotermRectangle(*rect));
 }
 
-void MotermModel::OnCopy(const teken_rect_t* rect, const teken_pos_t* pos) {
+void TermModel::OnCopy(const teken_rect_t* rect, const teken_pos_t* pos) {
   unsigned height = rect->tr_end.tp_row - rect->tr_begin.tp_row;
   unsigned width = rect->tr_end.tp_col - rect->tr_begin.tp_col;
 
@@ -332,7 +335,7 @@ void MotermModel::OnCopy(const teken_rect_t* rect, const teken_pos_t* pos) {
                 width, height));
 }
 
-void MotermModel::OnParam(int cmd, unsigned val) {
+void TermModel::OnParam(int cmd, unsigned val) {
   FXL_DCHECK(current_state_changes_);
 
   // Note: |val| is usually a "boolean", except for |TP_SETBELLPD| (for which
@@ -360,7 +363,7 @@ void MotermModel::OnParam(int cmd, unsigned val) {
   }
 }
 
-void MotermModel::OnRespond(const void* buf, size_t size) {
+void TermModel::OnRespond(const void* buf, size_t size) {
   if (delegate_)
     delegate_->OnResponse(buf, size);
   else
@@ -368,51 +371,53 @@ void MotermModel::OnRespond(const void* buf, size_t size) {
 }
 
 // static
-void MotermModel::OnBellThunk(void* ctx) {
+void TermModel::OnBellThunk(void* ctx) {
   FXL_DCHECK(ctx);
-  return static_cast<MotermModel*>(ctx)->OnBell();
+  return static_cast<TermModel*>(ctx)->OnBell();
 }
 
 // static
-void MotermModel::OnCursorThunk(void* ctx, const teken_pos_t* pos) {
+void TermModel::OnCursorThunk(void* ctx, const teken_pos_t* pos) {
   FXL_DCHECK(ctx);
-  return static_cast<MotermModel*>(ctx)->OnCursor(pos);
+  return static_cast<TermModel*>(ctx)->OnCursor(pos);
 }
 
 // static
-void MotermModel::OnPutcharThunk(void* ctx,
-                                 const teken_pos_t* pos,
-                                 teken_char_t ch,
-                                 const teken_attr_t* attr) {
+void TermModel::OnPutcharThunk(void* ctx,
+                               const teken_pos_t* pos,
+                               teken_char_t ch,
+                               const teken_attr_t* attr) {
   FXL_DCHECK(ctx);
-  return static_cast<MotermModel*>(ctx)->OnPutchar(pos, ch, attr);
+  return static_cast<TermModel*>(ctx)->OnPutchar(pos, ch, attr);
 }
 
 // static
-void MotermModel::OnFillThunk(void* ctx,
-                              const teken_rect_t* rect,
-                              teken_char_t ch,
-                              const teken_attr_t* attr) {
+void TermModel::OnFillThunk(void* ctx,
+                            const teken_rect_t* rect,
+                            teken_char_t ch,
+                            const teken_attr_t* attr) {
   FXL_DCHECK(ctx);
-  return static_cast<MotermModel*>(ctx)->OnFill(rect, ch, attr);
+  return static_cast<TermModel*>(ctx)->OnFill(rect, ch, attr);
 }
 
 // static
-void MotermModel::OnCopyThunk(void* ctx,
-                              const teken_rect_t* rect,
-                              const teken_pos_t* pos) {
+void TermModel::OnCopyThunk(void* ctx,
+                            const teken_rect_t* rect,
+                            const teken_pos_t* pos) {
   FXL_DCHECK(ctx);
-  return static_cast<MotermModel*>(ctx)->OnCopy(rect, pos);
+  return static_cast<TermModel*>(ctx)->OnCopy(rect, pos);
 }
 
 // static
-void MotermModel::OnParamThunk(void* ctx, int cmd, unsigned val) {
+void TermModel::OnParamThunk(void* ctx, int cmd, unsigned val) {
   FXL_DCHECK(ctx);
-  return static_cast<MotermModel*>(ctx)->OnParam(cmd, val);
+  return static_cast<TermModel*>(ctx)->OnParam(cmd, val);
 }
 
 // static
-void MotermModel::OnRespondThunk(void* ctx, const void* buf, size_t size) {
+void TermModel::OnRespondThunk(void* ctx, const void* buf, size_t size) {
   FXL_DCHECK(ctx);
-  return static_cast<MotermModel*>(ctx)->OnRespond(buf, size);
+  return static_cast<TermModel*>(ctx)->OnRespond(buf, size);
 }
+
+}  // namespace term

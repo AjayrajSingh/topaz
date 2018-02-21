@@ -9,6 +9,8 @@
 #include "lib/fxl/logging.h"
 #include "lib/ui/input/fidl/input_events.fidl.h"
 
+namespace term {
+
 // TODO(vtl): Handle more stuff and verify that we're consistent about the
 // sequences we generate.
 // TODO(vtl): In particular, our implementation of keypad_application_mode is
@@ -80,3 +82,5 @@ std::string GetInputSequenceForKeyPressedEvent(
   }
   return std::string();
 }
+
+}  // namespace term

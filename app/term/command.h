@@ -16,7 +16,6 @@
 
 #include "lib/fsl/io/redirection.h"
 #include "lib/fxl/files/unique_fd.h"
-#include "lib/fxl/functional/closure.h"
 
 namespace term {
 
@@ -30,7 +29,7 @@ class Command {
   bool Start(std::vector<std::string> command,
              std::vector<fsl::StartupHandle> startup_handles,
              ReceiveCallback receive_callback,
-             fxl::Closure termination_callback);
+             std::function<void()> termination_callback);
 
   void SendData(const void* bytes, size_t num_bytes);
 
@@ -45,7 +44,7 @@ class Command {
                                        zx_status_t status,
                                        const zx_packet_signal* signal);
 
-  fxl::Closure termination_callback_;
+  std::function<void()> termination_callback_;
   ReceiveCallback receive_callback_;
   zx::socket stdin_;
   zx::socket stdout_;

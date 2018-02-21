@@ -4,10 +4,10 @@
 
 #include "topaz/app/term/command.h"
 
+#include <async/default.h>
 #include <unistd.h>
 #include <zircon/status.h>
 
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
 
 namespace term {
@@ -41,7 +41,7 @@ Command::Command() = default;
 bool Command::Start(std::vector<std::string> command,
                     std::vector<fsl::StartupHandle> startup_handles,
                     ReceiveCallback receive_callback,
-                    fxl::Closure termination_callback) {
+                    std::function<void()> termination_callback) {
   FXL_DCHECK(!command.empty());
 
   zx_status_t status;
@@ -88,25 +88,22 @@ bool Command::Start(std::vector<std::string> command,
   termination_callback_ = std::move(termination_callback);
   receive_callback_ = std::move(receive_callback);
 
-  termination_waiter_ =
-      std::make_unique<async::AutoWait>(fsl::MessageLoop::GetCurrent()->async(),
-                                        process_.get(), ZX_PROCESS_TERMINATED);
+  termination_waiter_ = std::make_unique<async::AutoWait>(
+      async_get_default(), process_.get(), ZX_PROCESS_TERMINATED);
   termination_waiter_->set_handler(std::bind(
       &Command::OnProcessTerminated, this, process_.get(),
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
   termination_waiter_->Begin();
 
-  stdout_waiter_ =
-      std::make_unique<async::AutoWait>(fsl::MessageLoop::GetCurrent()->async(),
-                                        stdout_.get(), ZX_SOCKET_READABLE);
+  stdout_waiter_ = std::make_unique<async::AutoWait>(
+      async_get_default(), stdout_.get(), ZX_SOCKET_READABLE);
   stdout_waiter_->set_handler(std::bind(
       &Command::OnSocketReadable, this, &stdout_, std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3));
   stdout_waiter_->Begin();
 
-  stderr_waiter_ =
-      std::make_unique<async::AutoWait>(fsl::MessageLoop::GetCurrent()->async(),
-                                        stderr_.get(), ZX_SOCKET_READABLE);
+  stderr_waiter_ = std::make_unique<async::AutoWait>(
+      async_get_default(), stderr_.get(), ZX_SOCKET_READABLE);
   stderr_waiter_->set_handler(std::bind(
       &Command::OnSocketReadable, this, &stderr_, std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3));

@@ -11,6 +11,8 @@ namespace mozart {
 class InputEvent;
 }
 
+namespace term {
+
 // Gets an appropriate (VT100/xterm-ish) sequence of characters to generate for
 // the given key pressed event (|key_event| must have |action| value
 // |EventType::KEY_PRESSED|). |keypad_application_mode| indicates if the keypad
@@ -18,5 +20,7 @@ class InputEvent;
 std::string GetInputSequenceForKeyPressedEvent(
     const mozart::InputEvent& key_event,
     bool keypad_application_mode);
+
+}  // namespace term
 
 #endif  // TOPAZ_APP_TERM_KEY_UTIL_H_

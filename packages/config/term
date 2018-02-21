@@ -1,0 +1,8 @@
+{
+    "resources": [
+        {
+            "bootfs_path": "data/sysmgr/term.config",
+            "file": "topaz/app/term/config/term.config"
+        }
+    ]
+}

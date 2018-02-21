@@ -2,7 +2,19 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// |MotermModel| is a class providing a model for terminal emulation. The basic
+#ifndef TOPAZ_APP_TERM_TERM_MODEL_H_
+#define TOPAZ_APP_TERM_TERM_MODEL_H_
+
+#include <stddef.h>
+#include <stdint.h>
+
+#include <memory>
+
+#include "third_party/libteken/teken/teken.h"
+
+namespace term {
+
+// |TermModel| is a class providing a model for terminal emulation. The basic
 // operations are providing "input" bytes (this is input from the point of view
 // of the terminal; from the point of view of applications, it's output) and
 // determining what character to display at any given position (with what
@@ -17,19 +29,7 @@
 // The current implementation is on top of FreeBSD's libteken, though it would
 // be straightforward to replace it with another terminal emulation library (or
 // implement one directly).
-
-#ifndef TOPAZ_APP_TERM_TERM_MODEL_H_
-#define TOPAZ_APP_TERM_TERM_MODEL_H_
-
-#include <stddef.h>
-#include <stdint.h>
-
-#include <memory>
-
-#include "lib/fxl/macros.h"
-#include "third_party/libteken/teken/teken.h"
-
-class MotermModel {
+class TermModel {
  public:
   // Position: zero-based, starting from upper-left. (Quantities are signed to
   // allow for relative and off-screen positions.)
@@ -117,16 +117,20 @@ class MotermModel {
     virtual void OnSetKeypadMode(bool application_mode) = 0;
 
    protected:
-    Delegate() {}
-    virtual ~Delegate() {}
+    Delegate() = default;
+    virtual ~Delegate();
 
    private:
-    FXL_DISALLOW_COPY_AND_ASSIGN(Delegate);
+    Delegate(const Delegate&) = delete;
+    Delegate& operator=(const Delegate&) = delete;
   };
 
   // If non-null, |delegate| must outlive this object.
-  MotermModel(const Size& max_size, Delegate* delegate);
-  ~MotermModel();
+  TermModel(const Size& max_size, Delegate* delegate);
+  ~TermModel();
+
+  TermModel(const TermModel&) = delete;
+  TermModel& operator=(const TermModel&) = delete;
 
   // Process the given input bytes, reporting (additional) state changes to
   // |*state_changes| (note: this does not "reset" |*state_changes|, so that
@@ -192,8 +196,8 @@ class MotermModel {
   // Used by the callbacks. ("Usually" null, but must be non-null whenever a
   // callback may be called -- it'll point to a stack variable.)
   StateChanges* current_state_changes_;
-
-  FXL_DISALLOW_COPY_AND_ASSIGN(MotermModel);
 };
+
+}  // namespace term
 
 #endif  // TOPAZ_APP_TERM_TERM_MODEL_H_

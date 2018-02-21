@@ -5,14 +5,13 @@
 #include "topaz/app/term/term_view.h"
 
 #include <async/default.h>
+#include <async/loop.h>
 #include <unistd.h>
 
 #include "lib/fonts/fidl/font_provider.fidl.h"
 #include "lib/fsl/io/redirection.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/strings/string_printf.h"
-#include "lib/fxl/time/time_delta.h"
 #include "lib/ui/input/cpp/formatting.h"
 #include "third_party/skia/include/core/SkPaint.h"
 #include "topaz/app/term/command.h"
@@ -31,16 +30,13 @@ TermView::TermView(mozart::ViewManagerPtr view_manager,
                    fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
                    app::ApplicationContext* context,
                    const TermParams& term_params)
-    : SkiaView(std::move(view_manager),
-               std::move(view_owner_request),
-               "Moterm"),
-      model_(MotermModel::Size(24, 80), this),
+    : SkiaView(std::move(view_manager), std::move(view_owner_request), "Term"),
+      model_(TermModel::Size(24, 80), this),
       context_(context),
       font_loader_(
           context_->ConnectToEnvironmentService<fonts::FontProvider>()),
       blink_task_(async_get_default()),
-      params_(term_params),
-      weak_ptr_factory_(this) {
+      params_(term_params) {
   FXL_DCHECK(context_);
 
   auto font_request = fonts::FontRequest::New();
@@ -77,13 +73,13 @@ void TermView::ComputeMetrics() {
 }
 
 void TermView::StartCommand() {
-  command_.reset(new Command());
+  command_ = std::make_unique<Command>();
 
-  std::vector<std::string> command_to_run = params_.command;
-  if (command_to_run.empty())
-    command_to_run = {kShell};
+  std::vector<std::string> argv = params_.command;
+  if (argv.empty())
+    argv = {kShell};
 
-  bool success = command_->Start(command_to_run, {},
+  bool success = command_->Start(argv, {},
                                  [this](const void* bytes, size_t num_bytes) {
                                    OnDataReceived(bytes, num_bytes);
                                  },
@@ -140,9 +136,9 @@ void TermView::Resize() {
 
   uint32_t columns = std::max(logical_size().width / advance_width_, 1.f);
   uint32_t rows = std::max(logical_size().height / line_height_, 1.f);
-  MotermModel::Size current = model_.GetSize();
+  TermModel::Size current = model_.GetSize();
   if (current.columns != columns || current.rows != rows) {
-    model_.SetSize(MotermModel::Size(rows, columns), false);
+    model_.SetSize(TermModel::Size(rows, columns), false);
   }
   InvalidateScene();
 }
@@ -158,13 +154,13 @@ void TermView::DrawContent(SkCanvas* canvas) {
   fg_paint.setTextSize(params_.font_size);
   fg_paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
 
-  MotermModel::Size size = model_.GetSize();
+  TermModel::Size size = model_.GetSize();
   int y = 0;
   for (unsigned i = 0; i < size.rows; i++, y += line_height_) {
     int x = 0;
     for (unsigned j = 0; j < size.columns; j++, x += advance_width_) {
-      MotermModel::CharacterInfo ch =
-          model_.GetCharacterInfoAt(MotermModel::Position(i, j));
+      TermModel::CharacterInfo ch =
+          model_.GetCharacterInfoAt(TermModel::Position(i, j));
 
       // Paint the background.
       bg_paint.setColor(SkColorSetRGB(ch.background_color.red,
@@ -175,12 +171,12 @@ void TermView::DrawContent(SkCanvas* canvas) {
 
       // Paint the foreground.
       if (ch.code_point) {
-        if (!(ch.attributes & MotermModel::kAttributesBlink) || blink_on_) {
+        if (!(ch.attributes & TermModel::kAttributesBlink) || blink_on_) {
           uint32_t flags = SkPaint::kAntiAlias_Flag;
           // TODO(jpoichet): Use real bold font
-          if ((ch.attributes & MotermModel::kAttributesBold))
+          if ((ch.attributes & TermModel::kAttributesBold))
             flags |= SkPaint::kFakeBoldText_Flag;
-          // TODO(jpoichet): Account for MotermModel::kAttributesUnderline
+          // TODO(jpoichet): Account for TermModel::kAttributesUnderline
           // without using the deprecated flag SkPaint::kUnderlineText_Flag
           fg_paint.setFlags(flags);
           fg_paint.setColor(SkColorSetRGB(ch.foreground_color.red,
@@ -196,7 +192,7 @@ void TermView::DrawContent(SkCanvas* canvas) {
 
   if (model_.GetCursorVisibility() && blink_on_) {
     // Draw the cursor.
-    MotermModel::Position cursor_pos = model_.GetCursorPosition();
+    TermModel::Position cursor_pos = model_.GetCursorPosition();
     // TODO(jpoichet): Vary how we draw the cursor, depending on if we're
     // focused and/or active.
     SkPaint caret_paint;
@@ -292,7 +288,7 @@ void TermView::OnDataReceived(const void* bytes, size_t num_bytes) {
 
 void TermView::OnCommandTerminated() {
   FXL_LOG(INFO) << "Command terminated.";
-  fsl::MessageLoop::GetCurrent()->PostQuitTask();
+  async_loop_quit(async_get_default());
 }
 
 }  // namespace term

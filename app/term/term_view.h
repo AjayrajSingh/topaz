@@ -11,11 +11,6 @@
 #include "examples/ui/lib/skia_view.h"
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/fidl/application_environment.fidl.h"
-#include "lib/fxl/macros.h"
-#include "lib/fxl/memory/ref_ptr.h"
-#include "lib/fxl/memory/weak_ptr.h"
-#include "lib/fxl/tasks/task_runner.h"
-#include "lib/fxl/time/time_point.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 #include "topaz/app/term/command.h"
@@ -23,13 +18,17 @@
 #include "topaz/app/term/term_params.h"
 
 namespace term {
-class TermView : public mozart::SkiaView, public MotermModel::Delegate {
+
+class TermView : public mozart::SkiaView, public TermModel::Delegate {
  public:
   TermView(mozart::ViewManagerPtr view_manager,
            fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
            app::ApplicationContext* context,
            const TermParams& term_params);
   ~TermView() override;
+
+  TermView(const TermView&) = delete;
+  TermView& operator=(const TermView&) = delete;
 
  private:
   // |BaseView|:
@@ -38,7 +37,7 @@ class TermView : public mozart::SkiaView, public MotermModel::Delegate {
       scenic::PresentationInfoPtr presentation_info) override;
   bool OnInputEvent(mozart::InputEventPtr event) override;
 
-  // |MotermModel::Delegate|:
+  // |TermModel::Delegate|:
   void OnResponse(const void* buf, size_t size) override;
   void OnSetKeypadMode(bool application_mode) override;
 
@@ -59,9 +58,9 @@ class TermView : public mozart::SkiaView, public MotermModel::Delegate {
   // TODO(vtl): Consider the structure of this app. Do we really want the "view"
   // owning the model?
   // The terminal model.
-  MotermModel model_;
+  TermModel model_;
   // State changes to the model since last draw.
-  MotermModel::StateChanges model_state_changes_;
+  TermModel::StateChanges model_state_changes_;
 
   // If we skip drawing despite being forced to, we should force the next draw.
   bool force_next_draw_;
@@ -83,11 +82,8 @@ class TermView : public mozart::SkiaView, public MotermModel::Delegate {
 
   TermParams params_;
   std::unique_ptr<Command> command_;
-
-  fxl::WeakPtrFactory<TermView> weak_ptr_factory_;
-
-  FXL_DISALLOW_COPY_AND_ASSIGN(TermView);
 };
+
 }  // namespace term
 
 #endif  // TOPAZ_APP_TERM_TERM_VIEW_H_
