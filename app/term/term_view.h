@@ -19,20 +19,17 @@
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 #include "topaz/app/term/command.h"
-#include "topaz/app/term/history.h"
-#include "topaz/app/term/shell_controller.h"
 #include "topaz/app/term/term_model.h"
 #include "topaz/app/term/term_params.h"
 
 namespace term {
-class MotermView : public mozart::SkiaView, public MotermModel::Delegate {
+class TermView : public mozart::SkiaView, public MotermModel::Delegate {
  public:
-  MotermView(mozart::ViewManagerPtr view_manager,
-             fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-             app::ApplicationContext* context,
-             History* history,
-             const MotermParams& term_params);
-  ~MotermView() override;
+  TermView(mozart::ViewManagerPtr view_manager,
+           fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+           app::ApplicationContext* context,
+           const TermParams& term_params);
+  ~TermView() override;
 
  private:
   // |BaseView|:
@@ -65,7 +62,6 @@ class MotermView : public mozart::SkiaView, public MotermModel::Delegate {
   MotermModel model_;
   // State changes to the model since last draw.
   MotermModel::StateChanges model_state_changes_;
-  std::unique_ptr<ShellController> shell_controller_;
 
   // If we skip drawing despite being forced to, we should force the next draw.
   bool force_next_draw_;
@@ -85,14 +81,12 @@ class MotermView : public mozart::SkiaView, public MotermModel::Delegate {
   bool blink_on_ = true;
   bool focused_ = false;
 
-  History* history_;
-
-  MotermParams params_;
+  TermParams params_;
   std::unique_ptr<Command> command_;
 
-  fxl::WeakPtrFactory<MotermView> weak_ptr_factory_;
+  fxl::WeakPtrFactory<TermView> weak_ptr_factory_;
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(MotermView);
+  FXL_DISALLOW_COPY_AND_ASSIGN(TermView);
 };
 }  // namespace term
 

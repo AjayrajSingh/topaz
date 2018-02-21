@@ -20,17 +20,17 @@
 #include "topaz/app/term/term_model.h"
 
 namespace term {
-
 namespace {
+
 constexpr zx::duration kBlinkInterval = zx::msec(500);
+constexpr char kShell[] = "/boot/bin/sh";
+
 }  // namespace
 
-MotermView::MotermView(
-    mozart::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-    app::ApplicationContext* context,
-    History* history,
-    const MotermParams& term_params)
+TermView::TermView(mozart::ViewManagerPtr view_manager,
+                   fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+                   app::ApplicationContext* context,
+                   const TermParams& term_params)
     : SkiaView(std::move(view_manager),
                std::move(view_owner_request),
                "Moterm"),
@@ -39,11 +39,9 @@ MotermView::MotermView(
       font_loader_(
           context_->ConnectToEnvironmentService<fonts::FontProvider>()),
       blink_task_(async_get_default()),
-      history_(history),
       params_(term_params),
       weak_ptr_factory_(this) {
   FXL_DCHECK(context_);
-  FXL_DCHECK(history_);
 
   auto font_request = fonts::FontRequest::New();
   font_request->family = "RobotoMono";
@@ -56,9 +54,9 @@ MotermView::MotermView(
       });
 }
 
-MotermView::~MotermView() {}
+TermView::~TermView() {}
 
-void MotermView::ComputeMetrics() {
+void TermView::ComputeMetrics() {
   if (!regular_typeface_)
     return;
 
@@ -78,20 +76,14 @@ void MotermView::ComputeMetrics() {
   FXL_DCHECK(advance_width_ > 0);
 }
 
-void MotermView::StartCommand() {
+void TermView::StartCommand() {
   command_.reset(new Command());
 
   std::vector<std::string> command_to_run = params_.command;
-  std::vector<fsl::StartupHandle> startup_handles;
+  if (command_to_run.empty())
+    command_to_run = {kShell};
 
-  if (command_to_run.empty()) {
-    shell_controller_ = std::make_unique<ShellController>(history_);
-    command_to_run = shell_controller_->GetShellCommand();
-    startup_handles = shell_controller_->GetStartupHandles();
-    shell_controller_->Start();
-  }
-
-  bool success = command_->Start(command_to_run, std::move(startup_handles),
+  bool success = command_->Start(command_to_run, {},
                                  [this](const void* bytes, size_t num_bytes) {
                                    OnDataReceived(bytes, num_bytes);
                                  },
@@ -105,7 +97,7 @@ void MotermView::StartCommand() {
   InvalidateScene();
 }
 
-void MotermView::Blink() {
+void TermView::Blink() {
   if (focused_) {
     zx::duration delta = zx::clock::get(ZX_CLOCK_MONOTONIC) - last_key_;
     if (delta > kBlinkInterval) {
@@ -125,7 +117,7 @@ void MotermView::Blink() {
   }
 }
 
-void MotermView::OnSceneInvalidated(
+void TermView::OnSceneInvalidated(
     scenic::PresentationInfoPtr presentation_info) {
   if (!regular_typeface_)
     return;
@@ -137,12 +129,12 @@ void MotermView::OnSceneInvalidated(
   }
 }
 
-void MotermView::OnPropertiesChanged(mozart::ViewPropertiesPtr old_properties) {
+void TermView::OnPropertiesChanged(mozart::ViewPropertiesPtr old_properties) {
   ComputeMetrics();
   Resize();
 }
 
-void MotermView::Resize() {
+void TermView::Resize() {
   if (!has_logical_size() || !regular_typeface_)
     return;
 
@@ -155,7 +147,7 @@ void MotermView::Resize() {
   InvalidateScene();
 }
 
-void MotermView::DrawContent(SkCanvas* canvas) {
+void TermView::DrawContent(SkCanvas* canvas) {
   canvas->clear(SK_ColorBLACK);
 
   SkPaint bg_paint;
@@ -222,7 +214,7 @@ void MotermView::DrawContent(SkCanvas* canvas) {
   }
 }
 
-void MotermView::ScheduleDraw(bool force) {
+void TermView::ScheduleDraw(bool force) {
   if (!properties() ||
       (!model_state_changes_.IsDirty() && !force && !force_next_draw_)) {
     force_next_draw_ |= force;
@@ -233,15 +225,15 @@ void MotermView::ScheduleDraw(bool force) {
   InvalidateScene();
 }
 
-void MotermView::OnResponse(const void* buf, size_t size) {
+void TermView::OnResponse(const void* buf, size_t size) {
   SendData(buf, size);
 }
 
-void MotermView::OnSetKeypadMode(bool application_mode) {
+void TermView::OnSetKeypadMode(bool application_mode) {
   keypad_application_mode_ = application_mode;
 }
 
-bool MotermView::OnInputEvent(mozart::InputEventPtr event) {
+bool TermView::OnInputEvent(mozart::InputEventPtr event) {
   bool handled = false;
   if (event->is_keyboard()) {
     const mozart::KeyboardEventPtr& keyboard = event->get_keyboard();
@@ -275,7 +267,7 @@ bool MotermView::OnInputEvent(mozart::InputEventPtr event) {
   return handled;
 }
 
-void MotermView::OnKeyPressed(mozart::InputEventPtr key_event) {
+void TermView::OnKeyPressed(mozart::InputEventPtr key_event) {
   last_key_ = zx::clock::get(ZX_CLOCK_MONOTONIC);
   blink_on_ = true;
 
@@ -287,22 +279,19 @@ void MotermView::OnKeyPressed(mozart::InputEventPtr key_event) {
   SendData(input_sequence.data(), input_sequence.size());
 }
 
-void MotermView::SendData(const void* bytes, size_t num_bytes) {
+void TermView::SendData(const void* bytes, size_t num_bytes) {
   if (command_) {
     command_->SendData(bytes, num_bytes);
   }
 }
 
-void MotermView::OnDataReceived(const void* bytes, size_t num_bytes) {
+void TermView::OnDataReceived(const void* bytes, size_t num_bytes) {
   model_.ProcessInput(bytes, num_bytes, &model_state_changes_);
   ScheduleDraw(false);
 }
 
-void MotermView::OnCommandTerminated() {
+void TermView::OnCommandTerminated() {
   FXL_LOG(INFO) << "Command terminated.";
-  if (shell_controller_) {
-    shell_controller_->Terminate();
-  }
   fsl::MessageLoop::GetCurrent()->PostQuitTask();
 }
 

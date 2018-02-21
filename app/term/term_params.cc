@@ -8,11 +8,11 @@
 
 namespace term {
 
-MotermParams::MotermParams() {}
+TermParams::TermParams() {}
 
-MotermParams::~MotermParams() {}
+TermParams::~TermParams() {}
 
-bool MotermParams::Parse(const fxl::CommandLine& command_line) {
+bool TermParams::Parse(const fxl::CommandLine& command_line) {
   // --font-size=<size>
   std::string value;
   if (command_line.GetOptionValue("font-size", &value) &&

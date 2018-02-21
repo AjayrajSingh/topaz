@@ -9,9 +9,9 @@
 
 namespace term {
 
-struct MotermParams {
-  MotermParams();
-  ~MotermParams();
+struct TermParams {
+  TermParams();
+  ~TermParams();
 
   bool Parse(const fxl::CommandLine& command_line);
 

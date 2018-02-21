@@ -1,16 +1,3 @@
-# Fuchsia Terminal App (Moterm)
+# Fuchsia Terminal App (term)
 
-A module that displays a command line interface to the system.
-
-To run Moterm, start the device runner: `device_runner`, pull down from the top
-and select "Moterm" from the story suggestions. Then, click once within the
-terminal area before typing.
-
-## Terminal history
-
-Terminal history is persisted in Ledger and synced between term instances in
-real-time. In order to sync terminal history, [configure Ledger Cloud
-Sync](https://fuchsia.googlesource.com/ledger/+/HEAD/docs/user_guide.md#Cloud-Sync).
-
-**Caveat**: note that the history sync works only when term is run within a
-story, as described above, and not when run directly through `launch term`.
+A view that displays a command line interface to the system.
