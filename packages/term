@@ -3,6 +3,6 @@
         "cpp"
     ],
     "packages": {
-        "moterm": "//topaz/app/moterm"
+        "term": "//topaz/app/term"
     }
 }

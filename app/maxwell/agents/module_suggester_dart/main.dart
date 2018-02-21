@@ -114,7 +114,7 @@ class _QueryHandlerImpl extends QueryHandler {
       proposals.add(
         await _createProposal(
           id: 'open terminal',
-          appUrl: 'moterm',
+          appUrl: 'term',
           headline: _terminalHeadline,
           color: 0xFFE52D27 /* YouTube red from color spec */,
         ),

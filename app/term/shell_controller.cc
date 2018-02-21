@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/app/moterm/shell_controller.h"
+#include "topaz/app/term/shell_controller.h"
 
 #include <async/cpp/auto_wait.h>
 #include <async/default.h>
@@ -17,7 +17,7 @@
 #include "lib/fxl/logging.h"
 #include "lib/fxl/strings/split_string.h"
 
-namespace moterm {
+namespace term {
 
 namespace {
 constexpr char kShell[] = "/boot/bin/sh";
@@ -39,15 +39,12 @@ std::string SerializeHistory(const std::vector<std::string>& history) {
 }  // namespace
 
 ShellController::ShellController(History* history)
-  : history_(history),
-    wait_(async_get_default()) {
+    : history_(history), wait_(async_get_default()) {
   history_->RegisterClient(this);
   wait_.set_trigger(ZX_CHANNEL_READABLE | ZX_CHANNEL_PEER_CLOSED);
-  wait_.set_handler([this](async_t* async,
-                           zx_status_t status,
-                           const zx_packet_signal_t* signal) {
-    return ReadCommand();
-  });
+  wait_.set_handler(
+      [this](async_t* async, zx_status_t status,
+             const zx_packet_signal_t* signal) { return ReadCommand(); });
 }
 
 ShellController::~ShellController() {}
@@ -164,4 +161,4 @@ async_wait_result_t ShellController::ReadCommand() {
   }
 }
 
-}  // namespace moterm
+}  // namespace term

@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/app/moterm/ledger_helpers.h"
+#include "topaz/app/term/ledger_helpers.h"
 
 #include "lib/fxl/logging.h"
 
-namespace moterm {
+namespace term {
 
 void LogLedgerError(ledger::Status status, const std::string& description) {
   if (status != ledger::Status::OK) {
@@ -21,4 +21,4 @@ std::function<void(ledger::Status)> LogLedgerErrorCallback(
   };
 }
 
-}  // namespace moterm
+}  // namespace term

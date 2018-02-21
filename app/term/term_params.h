@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_MOTERM_MOTERM_PARAMS_H_
-#define APPS_MOTERM_MOTERM_PARAMS_H_
+#ifndef TOPAZ_APP_TERM_TERM_PARAMS_H_
+#define TOPAZ_APP_TERM_TERM_PARAMS_H_
 
 #include "lib/fxl/command_line.h"
 
-namespace moterm {
+namespace term {
 
 struct MotermParams {
   MotermParams();
@@ -19,6 +19,6 @@ struct MotermParams {
   uint32_t font_size = 12;
 };
 
-}  // namespace moterm
+}  // namespace term
 
-#endif  // APPS_MOTERM_MOTERM_PARAMS_H_
+#endif  // TOPAZ_APP_TERM_TERM_PARAMS_H_

@@ -23,7 +23,7 @@
         "topaz/packages/maxwell",
         "topaz/packages/mods",
         "topaz/packages/mondrian",
-        "topaz/packages/moterm",
+        "topaz/packages/term",
         "topaz/packages/oauth_token_manager",
         "topaz/packages/perspective",
         "topaz/packages/spinning_cube",

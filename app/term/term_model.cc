@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/app/moterm/moterm_model.h"
+#include "topaz/app/term/term_model.h"
 
 #include <string.h>
 
@@ -23,7 +23,7 @@ teken_pos_t MotermToTekenSize(const MotermModel::Size& size) {
   return rv;
 }
 
-// Teken -> moterm conversions:
+// Teken -> term conversions:
 
 MotermModel::Position TekenToMotermPosition(const teken_pos_t& position) {
   return MotermModel::Position(static_cast<int>(position.tp_row),

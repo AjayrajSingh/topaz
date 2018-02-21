@@ -2,17 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_MOTERM_HISTORY_H_
-#define APPS_MOTERM_HISTORY_H_
+#ifndef TOPAZ_APP_TERM_HISTORY_H_
+#define TOPAZ_APP_TERM_HISTORY_H_
 
 #include <string>
 #include <unordered_set>
 
-#include "lib/ledger/fidl/ledger.fidl.h"
 #include "lib/fidl/cpp/bindings/binding.h"
 #include "lib/fxl/macros.h"
+#include "lib/ledger/fidl/ledger.fidl.h"
 
-namespace moterm {
+namespace term {
 
 // Ledger-backed store for terminal history.
 class History : public ledger::PageWatcher {
@@ -74,6 +74,6 @@ class History : public ledger::PageWatcher {
   FXL_DISALLOW_COPY_AND_ASSIGN(History);
 };
 
-}  // namespace moterm
+}  // namespace term
 
-#endif  // APPS_MOTERM_HISTORY_H_
+#endif  // TOPAZ_APP_TERM_HISTORY_H_

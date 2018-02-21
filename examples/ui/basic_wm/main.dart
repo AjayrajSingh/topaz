@@ -172,7 +172,7 @@ class App extends StatelessWidget {
             child: new FloatingActionButton(
               onPressed: () {
                 addWindowForChildApplication(new ChildApplication.create(
-                  'moterm',
+                  'term',
                   title: 'Terminal',
                 ));
               },

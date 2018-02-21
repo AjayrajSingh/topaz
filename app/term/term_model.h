@@ -18,8 +18,8 @@
 // be straightforward to replace it with another terminal emulation library (or
 // implement one directly).
 
-#ifndef APPS_MOTERM_MOTERM_MODEL_H_
-#define APPS_MOTERM_MOTERM_MODEL_H_
+#ifndef TOPAZ_APP_TERM_TERM_MODEL_H_
+#define TOPAZ_APP_TERM_TERM_MODEL_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -196,4 +196,4 @@ class MotermModel {
   FXL_DISALLOW_COPY_AND_ASSIGN(MotermModel);
 };
 
-#endif  // APPS_MOTERM_MOTERM_MODEL_H_
+#endif  // TOPAZ_APP_TERM_TERM_MODEL_H_

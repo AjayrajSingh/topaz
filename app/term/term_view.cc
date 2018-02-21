@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/app/moterm/moterm_view.h"
+#include "topaz/app/term/term_view.h"
 
 #include <async/default.h>
 #include <unistd.h>
@@ -15,11 +15,11 @@
 #include "lib/fxl/time/time_delta.h"
 #include "lib/ui/input/cpp/formatting.h"
 #include "third_party/skia/include/core/SkPaint.h"
-#include "topaz/app/moterm/command.h"
-#include "topaz/app/moterm/key_util.h"
-#include "topaz/app/moterm/moterm_model.h"
+#include "topaz/app/term/command.h"
+#include "topaz/app/term/key_util.h"
+#include "topaz/app/term/term_model.h"
 
-namespace moterm {
+namespace term {
 
 namespace {
 constexpr zx::duration kBlinkInterval = zx::msec(500);
@@ -30,7 +30,7 @@ MotermView::MotermView(
     fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
     app::ApplicationContext* context,
     History* history,
-    const MotermParams& moterm_params)
+    const MotermParams& term_params)
     : SkiaView(std::move(view_manager),
                std::move(view_owner_request),
                "Moterm"),
@@ -40,7 +40,7 @@ MotermView::MotermView(
           context_->ConnectToEnvironmentService<fonts::FontProvider>()),
       blink_task_(async_get_default()),
       history_(history),
-      params_(moterm_params),
+      params_(term_params),
       weak_ptr_factory_(this) {
   FXL_DCHECK(context_);
   FXL_DCHECK(history_);
@@ -306,4 +306,4 @@ void MotermView::OnCommandTerminated() {
   fsl::MessageLoop::GetCurrent()->PostQuitTask();
 }
 
-}  // namespace moterm
+}  // namespace term

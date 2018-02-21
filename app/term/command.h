@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_MOTERM_COMMAND_H_
-#define APPS_MOTERM_COMMAND_H_
+#ifndef TOPAZ_APP_TERM_COMMAND_H_
+#define TOPAZ_APP_TERM_COMMAND_H_
 
 #include <async/cpp/auto_wait.h>
 #include <fdio/util.h>
@@ -18,7 +18,7 @@
 #include "lib/fxl/files/unique_fd.h"
 #include "lib/fxl/functional/closure.h"
 
-namespace moterm {
+namespace term {
 
 class Command {
  public:
@@ -57,6 +57,6 @@ class Command {
   zx::process process_;
 };
 
-}  // namespace moterm
+}  // namespace term
 
-#endif  // APPS_MOTERM_COMMAND_H_
+#endif  // TOPAZ_APP_TERM_COMMAND_H_

@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/app/moterm/key_util.h"
+#include "topaz/app/term/key_util.h"
 
 #include <hid/usages.h>
 
-#include "lib/ui/input/fidl/input_events.fidl.h"
 #include "lib/fxl/logging.h"
+#include "lib/ui/input/fidl/input_events.fidl.h"
 
 // TODO(vtl): Handle more stuff and verify that we're consistent about the
 // sequences we generate.

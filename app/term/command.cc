@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/app/moterm/command.h"
+#include "topaz/app/term/command.h"
 
 #include <unistd.h>
 #include <zircon/status.h>
@@ -10,7 +10,7 @@
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
 
-namespace moterm {
+namespace term {
 namespace {
 
 zx_status_t AddRedirectedSocket(
@@ -165,4 +165,4 @@ void Command::SendData(const void* bytes, size_t num_bytes) {
   }
 }
 
-}  // namespace moterm
+}  // namespace term

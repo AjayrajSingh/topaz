@@ -2,21 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_MOTERM_LEDGER_HELPERS_H_
-#define APPS_MOTERM_LEDGER_HELPERS_H_
+#ifndef TOPAZ_APP_TERM_LEDGER_HELPERS_H_
+#define TOPAZ_APP_TERM_LEDGER_HELPERS_H_
 
 #include <functional>
 #include <string>
 
 #include "lib/ledger/fidl/ledger.fidl.h"
 
-namespace moterm {
+namespace term {
 
 void LogLedgerError(ledger::Status status, const std::string& description);
 
 std::function<void(ledger::Status)> LogLedgerErrorCallback(
     std::string description);
 
-}  // namespace moterm
+}  // namespace term
 
-#endif  // APPS_MOTERM_LEDGER_HELPERS_H_
+#endif  // TOPAZ_APP_TERM_LEDGER_HELPERS_H_

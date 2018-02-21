@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_MOTERM_KEY_UTIL_H_
-#define APPS_MOTERM_KEY_UTIL_H_
+#ifndef TOPAZ_APP_TERM_KEY_UTIL_H_
+#define TOPAZ_APP_TERM_KEY_UTIL_H_
 
 #include <string>
 
@@ -15,7 +15,8 @@ class InputEvent;
 // the given key pressed event (|key_event| must have |action| value
 // |EventType::KEY_PRESSED|). |keypad_application_mode| indicates if the keypad
 // is in "application mode".
-std::string GetInputSequenceForKeyPressedEvent(const mozart::InputEvent& key_event,
-                                               bool keypad_application_mode);
+std::string GetInputSequenceForKeyPressedEvent(
+    const mozart::InputEvent& key_event,
+    bool keypad_application_mode);
 
-#endif  // APPS_MOTERM_KEY_UTIL_H_
+#endif  // TOPAZ_APP_TERM_KEY_UTIL_H_

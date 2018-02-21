@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/app/moterm/history.h"
+#include "topaz/app/term/history.h"
 
 #include <zircon/syscalls.h>
 
@@ -11,14 +11,14 @@
 #include <algorithm>
 #include <utility>
 
-#include "topaz/app/moterm/ledger_helpers.h"
+#include "lib/fsl/tasks/message_loop.h"
+#include "lib/fsl/vmo/strings.h"
 #include "lib/fxl/functional/make_copyable.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/strings/string_printf.h"
-#include "lib/fsl/tasks/message_loop.h"
-#include "lib/fsl/vmo/strings.h"
+#include "topaz/app/term/ledger_helpers.h"
 
-namespace moterm {
+namespace term {
 
 namespace {
 constexpr int kMaxHistorySize = 1000;
@@ -210,4 +210,4 @@ void History::Trim() {
              }));
 }
 
-}  // namespace moterm
+}  // namespace term

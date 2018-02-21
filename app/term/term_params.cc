@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/app/moterm/moterm_params.h"
+#include "topaz/app/term/term_params.h"
 
 #include "lib/fxl/strings/string_number_conversions.h"
 
-namespace moterm {
+namespace term {
 
 MotermParams::MotermParams() {}
 
@@ -27,4 +27,4 @@ bool MotermParams::Parse(const fxl::CommandLine& command_line) {
   return true;
 }
 
-}  // namespace moterm
+}  // namespace term

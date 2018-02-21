@@ -14,12 +14,12 @@
 #include "lib/module/fidl/module.fidl.h"
 #include "lib/story/fidl/story_marker.fidl.h"
 #include "lib/ui/view_framework/view_provider_service.h"
-#include "topaz/app/moterm/history.h"
-#include "topaz/app/moterm/ledger_helpers.h"
-#include "topaz/app/moterm/moterm_params.h"
-#include "topaz/app/moterm/moterm_view.h"
+#include "topaz/app/term/history.h"
+#include "topaz/app/term/ledger_helpers.h"
+#include "topaz/app/term/term_params.h"
+#include "topaz/app/term/term_view.h"
 
-namespace moterm {
+namespace term {
 
 class App : modular::Module, modular::Lifecycle {
  public:
@@ -38,12 +38,12 @@ class App : modular::Module, modular::Lifecycle {
           module_binding_.Bind(std::move(request));
         });
     application_context_->outgoing_services()->AddService<modular::Lifecycle>(
-      [this](fidl::InterfaceRequest<modular::Lifecycle> request) {
-        FXL_DCHECK(!lifecycle_binding_.is_bound());
-        lifecycle_binding_.Bind(std::move(request));
-      });
+        [this](fidl::InterfaceRequest<modular::Lifecycle> request) {
+          FXL_DCHECK(!lifecycle_binding_.is_bound());
+          lifecycle_binding_.Bind(std::move(request));
+        });
 
-    // TODO(ppi): drop this once FW-97 is fixed or moterm no longer supports
+    // TODO(ppi): drop this once FW-97 is fixed or term no longer supports
     // view provider service.
     story_marker_ = application_context_
                         ->ConnectToEnvironmentService<modular::StoryMarker>();
@@ -86,14 +86,11 @@ class App : modular::Module, modular::Lifecycle {
   }
 
   // |modular::Lifecycle|
-  void Terminate() override {
-    fsl::MessageLoop::GetCurrent()->QuitNow();
-  }
+  void Terminate() override { fsl::MessageLoop::GetCurrent()->QuitNow(); }
 
  private:
-  std::unique_ptr<moterm::MotermView> MakeView(
-      mozart::ViewContext view_context) {
-    return std::make_unique<moterm::MotermView>(
+  std::unique_ptr<term::MotermView> MakeView(mozart::ViewContext view_context) {
+    return std::make_unique<term::MotermView>(
         std::move(view_context.view_manager),
         std::move(view_context.view_owner_request),
         view_context.application_context, &history_, params_);
@@ -111,13 +108,13 @@ class App : modular::Module, modular::Lifecycle {
   FXL_DISALLOW_COPY_AND_ASSIGN(App);
 };
 
-}  // namespace moterm
+}  // namespace term
 
 int main(int argc, const char** argv) {
   srand(zx_clock_get(ZX_CLOCK_UTC));
 
   auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);
-  moterm::MotermParams params;
+  term::MotermParams params;
   if (!fxl::SetLogSettingsFromCommandLine(command_line) ||
       !params.Parse(command_line)) {
     FXL_LOG(ERROR) << "Missing or invalid parameters. See README.";
@@ -127,7 +124,7 @@ int main(int argc, const char** argv) {
   fsl::MessageLoop loop;
   trace::TraceProvider trace_provider(loop.async());
 
-  moterm::App app(std::move(params));
+  term::App app(std::move(params));
   loop.Run();
   return 0;
 }

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_MOTERM_SHELL_CONTROLLER_H_
-#define APPS_MOTERM_SHELL_CONTROLLER_H_
+#ifndef TOPAZ_APP_TERM_SHELL_CONTROLLER_H_
+#define TOPAZ_APP_TERM_SHELL_CONTROLLER_H_
 
 #include <async/cpp/auto_wait.h>
 #include <zx/channel.h>
@@ -14,12 +14,12 @@
 #include <string>
 #include <vector>
 
-#include "topaz/app/moterm/history.h"
-#include "lib/fxl/macros.h"
 #include "lib/fsl/io/redirection.h"
 #include "lib/fsl/vmo/strings.h"
+#include "lib/fxl/macros.h"
+#include "topaz/app/term/history.h"
 
-namespace moterm {
+namespace term {
 
 // Implements the controller protocol of the default shell. The controller
 // exchanges control messages with the shell over an zx::channel.
@@ -62,6 +62,6 @@ class ShellController : public History::Client {
   FXL_DISALLOW_COPY_AND_ASSIGN(ShellController);
 };
 
-}  // namespace moterm
+}  // namespace term
 
-#endif  // APPS_MOTERM_SHELL_CONTROLLER_H_
+#endif  // TOPAZ_APP_TERM_SHELL_CONTROLLER_H_

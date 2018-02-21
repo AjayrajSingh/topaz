@@ -5,7 +5,7 @@
 import("//build/package.gni")
 
 executable("bin") {
-  output_name = "moterm"
+  output_name = "term"
 
   sources = [
     "command.cc",
@@ -17,12 +17,12 @@ executable("bin") {
     "ledger_helpers.cc",
     "ledger_helpers.h",
     "main.cc",
-    "moterm_model.cc",
-    "moterm_model.h",
-    "moterm_params.cc",
-    "moterm_params.h",
-    "moterm_view.cc",
-    "moterm_view.h",
+    "term_model.cc",
+    "term_model.h",
+    "term_params.cc",
+    "term_params.h",
+    "term_view.cc",
+    "term_view.h",
     "shell_controller.cc",
     "shell_controller.h",
   ]
@@ -57,12 +57,12 @@ executable("bin") {
   ]
 }
 
-package("moterm") {
+package("term") {
   deps = [
     ":bin",
   ]
 
-  binary = "moterm"
+  binary = "term"
 
   meta = [ {
         path = rebase_path("meta/sandbox")

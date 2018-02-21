@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_MOTERM_MOTERM_VIEW_H_
-#define APPS_MOTERM_MOTERM_VIEW_H_
+#ifndef TOPAZ_APP_TERM_TERM_VIEW_H_
+#define TOPAZ_APP_TERM_TERM_VIEW_H_
 
 #include <async/cpp/auto_task.h>
 
@@ -18,20 +18,20 @@
 #include "lib/fxl/time/time_point.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkTypeface.h"
-#include "topaz/app/moterm/command.h"
-#include "topaz/app/moterm/history.h"
-#include "topaz/app/moterm/moterm_model.h"
-#include "topaz/app/moterm/moterm_params.h"
-#include "topaz/app/moterm/shell_controller.h"
+#include "topaz/app/term/command.h"
+#include "topaz/app/term/history.h"
+#include "topaz/app/term/shell_controller.h"
+#include "topaz/app/term/term_model.h"
+#include "topaz/app/term/term_params.h"
 
-namespace moterm {
+namespace term {
 class MotermView : public mozart::SkiaView, public MotermModel::Delegate {
  public:
   MotermView(mozart::ViewManagerPtr view_manager,
              fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
              app::ApplicationContext* context,
              History* history,
-             const MotermParams& moterm_params);
+             const MotermParams& term_params);
   ~MotermView() override;
 
  private:
@@ -94,6 +94,6 @@ class MotermView : public mozart::SkiaView, public MotermModel::Delegate {
 
   FXL_DISALLOW_COPY_AND_ASSIGN(MotermView);
 };
-}  // namespace moterm
+}  // namespace term
 
-#endif  // APPS_MOTERM_MOTERM_VIEW_H_
+#endif  // TOPAZ_APP_TERM_TERM_VIEW_H_
