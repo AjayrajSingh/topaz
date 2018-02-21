@@ -9,5 +9,8 @@ dart_library("dart") {
 
   deps = [
     "//peridot/public/lib/component/fidl:fidl_dart",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/lib/entity/dart",
+    "//topaz/public/lib/fidl/dart",
   ]
 }

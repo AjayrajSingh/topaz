@@ -5,16 +5,24 @@
 import 'dart:async';
 import 'dart:math' show Random;
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.widgets/model.dart' as m;
+import 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
 
 import 'src/color_model.dart';
 import 'src/parse_int.dart';
 
 /// The amount of time between color updates.
 const Duration _kUpdateDuration = const Duration(seconds: 5);
+
+/// This codec is used by the [ModuleDriver] to automatically translate values
+/// to and from an Entity's source data.
+final EntityCodec<Color> codec = new EntityCodec<Color>(
+  type: 'com.fuchsia.color',
+  encode: (Color color) => color.value.toString(),
+  decode: (String data) => new Color(parseInt(data)),
+);
 
 /// Main entry point to the color module.
 void main() {
@@ -26,32 +34,31 @@ void main() {
   /// Flutter's widget tree when attributes are updated.
   ColorModel model = new ColorModel();
 
-  /// The [ModuleDriver] provides an idomatic Dart API encapsulating boilerplate
-  /// and book keeping required for FIDL service interactions.
+  /// The [ModuleDriver] provides an idiomatic Dart API encapsulating
+  /// boilerplate and book keeping required for FIDL service interactions.
   ModuleDriver module = new ModuleDriver();
 
-  /// Listen to the data stream returned from [LinkClient#watch] and transform
-  /// it into color values that can be rendered by this module. Event's will
-  /// start firing as soon as the module is initialized.
-  module.link.watch(all: true).where((Object json) {
-    // TODO(SO-1124): use a JSON schema
-    return json != null &&
-        json is Map &&
-        (json['color'] is int || json['color'] is String);
-  }).map((Object json) {
-    // Downcast for the analyzer.
-    Map<String, Object> foo = json;
-    int value = parseInt(foo['color']);
-    return new Color(value);
-  }).listen((Color color) => model.color = color, onError: handleError);
+  /// Use [ColorEntity#watch] to access a stream of change events for the
+  /// 'color' Link's Entity updates. Since this module updates it's own Entity
+  /// value the `all` param is set to true.
+  module.watch('color', codec, all: true).listen(
+        (Color color) => model.color = color,
+        cancelOnError: true,
+        onError: handleError,
+        onDone: () => log.info('update stream closed'),
+      );
 
-  /// The module is ready to be started and handle incoming requests from the
-  /// framework.
-  module.start().then(handleModuleStart, onError: handleError);
+  /// When the module is ready (listeners and async event listeners have been
+  /// added etc.) it is connected to the Fuchsia's application framework via
+  /// [module#start()]. When a module is "started" it is expressly stating it is
+  /// in a state to handle incoming requests from the framework to it's
+  /// underlying interfaces (Module, Lifecycle, etc.) and that it is in a
+  /// position to handling UI rendering and input.
+  module.start().then(handleStart, onError: handleError);
 
-  runApp(new m.ScopedModel<ColorModel>(
+  runApp(new ScopedModel<ColorModel>(
     model: model,
-    child: new m.ScopedModelDescendant<ColorModel>(
+    child: new ScopedModelDescendant<ColorModel>(
       builder: (BuildContext context, Widget child, ColorModel model) {
         return new Container(color: model.color);
       },
@@ -62,17 +69,18 @@ void main() {
 /// Generic error handler.
 // TODO(SO-1123): hook up to a snackbar.
 void handleError(Error error, StackTrace stackTrace) {
-  log.severe('An error occured', error, stackTrace);
+  log.severe('An error ocurred', error, stackTrace);
 }
 
-/// Once the module is ready to interact with the rest of the system
-/// periodically update the color value stored in the Link that the module was
-/// started with.
-void handleModuleStart(ModuleDriver module) {
+///
+void handleStart(ModuleDriver module) {
+  /// Once the module is ready to interact with the rest of the system,
+  /// periodically update the color value stored in the Link that the module was
+  /// started with.
   log.info('module ready, link values will periodically update');
 
-  // Cycle through colors every x seconds:
-  new Timer.periodic(_kUpdateDuration, (_) {
+  /// Change the [entity]'s value to a random color periodically.
+  new Timer.periodic(_kUpdateDuration, (_) async {
     Random rand = new Random();
     Color color = new Color.fromRGBO(
       rand.nextInt(255), // red
@@ -81,8 +89,8 @@ void handleModuleStart(ModuleDriver module) {
       1.0,
     );
 
-    // TODO(SO-1124): use a JSON schema
-    Map<String, int> json = <String, int>{'color': color.value};
-    module.link.set(json: json);
+    return module.put('color', color, codec).then(
+        (String ref) => log.fine('updated entity: $ref'),
+        onError: handleError);
   });
 }

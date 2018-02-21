@@ -3,3 +3,4 @@
 // found in the LICENSE file.
 
 export 'src/entity_client.dart';
+export 'src/entity_resolver_client.dart';

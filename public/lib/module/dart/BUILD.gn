@@ -15,6 +15,7 @@ dart_library("dart") {
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/component/dart",
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/story/dart",
   ]

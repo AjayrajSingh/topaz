@@ -5,19 +5,23 @@
 import 'dart:async';
 
 import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.component.dart/component.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart' as fidl;
 import 'package:lib.story.dart/story.dart';
 import 'package:meta/meta.dart';
 
+export 'package:lib.component.dart/component.dart' show ComponentContextClient;
+
 /// Client wrapper for [fidl.ModuleContext].
 ///
 /// TODO(SO-1125): implement all methods for ModuleContextClient
 class ModuleContextClient {
+  ComponentContextClient _componentContext;
+
   /// The underlying [Proxy] used to send client requests to the
   /// [fidl.ModuleContext] service.
   final fidl.ModuleContextProxy proxy = new fidl.ModuleContextProxy();
-
   final List<LinkClient> _links = <LinkClient>[];
 
   /// Constructor.
@@ -40,6 +44,8 @@ class ModuleContextClient {
   }
 
   /// Connects the passed in [LinkClient] via [fidl.ModuleContextProxy#getLink].
+  // TODO(MS-1245): retrun an active link client automatically instead of passing one
+  // through.
   Future<Null> getLink({
     @required LinkClient linkClient,
   }) async {
@@ -109,6 +115,48 @@ class ModuleContextClient {
     return completer.future;
   }
 
+  /// See [fidl.ComponentContext#getComponentContext].
+  Future<ComponentContextClient> getComponentContext() async {
+    await bound;
+
+    if (_componentContext != null) {
+      return _componentContext;
+    } else {
+      _componentContext = new ComponentContextClient();
+    }
+
+    Completer<ComponentContextClient> completer =
+        new Completer<ComponentContextClient>();
+
+    // ignore: unawaited_futures
+    proxy.ctrl.error.then((ProxyError err) {
+      if (!completer.isCompleted) {
+        completer.completeError(err);
+      }
+    });
+
+    // ignore: unawaited_futures
+    _componentContext.proxy.ctrl.error.then((ProxyError err) {
+      if (!completer.isCompleted) {
+        completer.completeError(err);
+      }
+    });
+
+    try {
+      proxy.getComponentContext(_componentContext.proxy.ctrl.request());
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+    }
+
+    scheduleMicrotask(() {
+      if (!completer.isCompleted) {
+        completer.complete(_componentContext);
+      }
+    });
+
+    return completer.future;
+  }
+
   void _handleConnectionError() {
     Exception err = new Exception('binding connection failed');
     throw err;
@@ -116,10 +164,6 @@ class ModuleContextClient {
 
   void _handleClose() {
     log.fine('proxy closed, terminating link clients');
-
-    for (LinkClient link in _links) {
-      link.terminate();
-    }
   }
 
   void _handleUnbind() {
@@ -131,6 +175,9 @@ class ModuleContextClient {
   Future<Null> terminate() async {
     log.fine('terminate called');
     proxy.ctrl.close();
-    return;
+
+    return Future
+        .wait(_links.map((LinkClient link) => link.terminate()).toList())
+        .then((_) => null);
   }
 }

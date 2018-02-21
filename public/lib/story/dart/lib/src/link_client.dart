@@ -14,6 +14,20 @@ import 'link_watcher_host.dart';
 export 'package:lib.story.fidl/link.fidl.dart';
 export 'link_watcher_host.dart';
 
+/// When a value for a given [ref] is not found.
+class LinkClientNotFoundException extends Error {
+  /// The id/ref that was not found.
+  final String ref;
+
+  /// Constructor.
+  LinkClientNotFoundException(this.ref);
+
+  @override
+  String toString() {
+    return 'LinkClientNotFoundException: no value found for "$ref"';
+  }
+}
+
 /// Client wrapper for [fidl.Link].
 ///
 /// TODO(SO-1126): implement all methods for LinkClient
@@ -29,6 +43,11 @@ class LinkClient {
   LinkClient({
     this.name,
   }) {
+    if (name == null) {
+      /// TODO: add a better warning.
+      log.warning('default links will be deprecated soon');
+    }
+
     proxy.ctrl
       ..onBind = _handleBind
       ..onClose = _handleClose
@@ -138,47 +157,27 @@ class LinkClient {
   }
 
   final List<LinkWatcherHost> _watchers = <LinkWatcherHost>[];
+  final List<StreamController<String>> _streams = <StreamController<String>>[];
 
   /// Stream based API for [fidl.Link#watch] and [fidl.Link#watchAll].
-  Stream<Object> watch({bool all: false}) {
+  Stream<String> watch({bool all: false}) {
     log.fine('#watch(all: $all)');
 
     // TODO(SO-1127): connect the stream's control plane to the underlying link watcher
     // so that it properly responds to clients requesting listen, pause, resume,
     // cancel.
-    StreamController<Object> controller = new StreamController<Object>();
+    StreamController<String> controller = new StreamController<String>();
+    _streams.add(controller);
 
     // Get an initial value and emit it. Note that this call to #get is async
     // and will get the initial value once the module is "ready" and a proxy
     // connection to the proxy is successfully established.
     get().then(controller.add, onError: controller.addError);
 
-    void handleNotify(String data) {
-      log.finer('=> link value updated: $data');
-
-      if (data == null || data.isEmpty) {
-        // Subscribers to the update stream should filter invalid values like
-        // null and invalid JSON structures per thier contracts.
-        controller.add(null);
-      }
-
-      try {
-        Object json = JSON.decode(data);
-
-        if (json != null) {
-          controller.add(json);
-        }
-      } on Exception catch (err, stackTrace) {
-        controller
-          ..addError(err, stackTrace)
-          ..close();
-      }
-    }
-
     bound.then((_) {
       log.fine('link proxy bound, adding watcher');
 
-      LinkWatcherHost watcher = new LinkWatcherHost(onNotify: handleNotify);
+      LinkWatcherHost watcher = new LinkWatcherHost(onNotify: controller.add);
       _watchers.add(watcher);
 
       // Using Future#catchError allows any sync errors thrown within the onValue
@@ -193,6 +192,81 @@ class LinkClient {
     });
 
     return controller.stream;
+  }
+
+  /// See [fidl.Link#setEntity].
+  Future<Null> setEntity(String ref) async {
+    assert(ref != null);
+    assert(ref.isNotEmpty);
+
+    Completer<Null> completer = new Completer<Null>();
+
+    try {
+      await bound;
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+      return completer.future;
+    }
+
+    // ignore: unawaited_futures
+    proxy.ctrl.error.then((ProxyError err) {
+      if (!completer.isCompleted) {
+        completer.completeError(err);
+      }
+    });
+
+    try {
+      proxy.setEntity(ref);
+    } on Exception catch (err) {
+      completer.completeError(err);
+    }
+
+    // Since there is no async success path for proxy.set (it is fire and
+    // forget) the best way to check for success is pushing a job onto the end
+    // of the async call stack and checking that the completer didn't enounter
+    // and error, no errors at this stage == success.
+    scheduleMicrotask(() {
+      if (!completer.isCompleted) {
+        completer.complete(null);
+      }
+    });
+
+    return completer.future;
+  }
+
+  /// See [fidl.Link#getEntity].
+  Future<String> getEntity() async {
+    Completer<String> completer = new Completer<String>();
+
+    try {
+      await bound;
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+      return completer.future;
+    }
+
+    // ignore: unawaited_futures
+    proxy.ctrl.error.then((ProxyError err) {
+      if (!completer.isCompleted) {
+        completer.completeError(err);
+      }
+    });
+
+    void handleEntity(String ref) {
+      if (ref == null) {
+        completer.completeError(new LinkClientNotFoundException(name));
+      } else {
+        completer.complete(ref);
+      }
+    }
+
+    try {
+      proxy.getEntity(handleEntity);
+    } on Exception catch (err) {
+      completer.completeError(err);
+    }
+
+    return completer.future;
   }
 
   /// Closes the underlying proxy connection, should be called as a response to
@@ -213,6 +287,10 @@ class LinkClient {
     for (LinkWatcherHost watcher in _watchers) {
       watcher.terminate();
       _watchers.remove(watcher);
+    }
+
+    for (StreamController<String> stream in _streams) {
+      stream.close();
     }
 
     log.info('link watchers closed');

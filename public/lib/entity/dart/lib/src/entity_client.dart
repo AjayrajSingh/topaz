@@ -5,18 +5,33 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.entity.fidl/entity.fidl.dart';
 import 'package:json_schema/json_schema.dart' as json_schema;
+import 'package:lib.entity.fidl/entity.fidl.dart' as fidl;
+import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.logging/logging.dart';
 
-/// Provides an idiomatic way to access and type-validate data from an [Entity].
+/// Provides an idiomatic way to access and type-validate data from an [fidl.Entity].
 class EntityClient {
+  /// The underlying [Proxy] used to send client requests to the
+  /// [fidl.Entity] service.
+  final fidl.EntityProxy proxy;
+
   /// Constructor.
-  EntityClient.fromEntity(this._entity);
+  EntityClient() : proxy = new fidl.EntityProxy() {
+    proxy.ctrl
+      ..onBind = _handleBind
+      ..onClose = _handleClose
+      ..onConnectionError = _handleConnectionError
+      ..onUnbind = _handleUnbind;
+  }
+
+  /// Constructor.
+  EntityClient.fromEntity(this.proxy);
 
   /// List of types this entity supports.
   Future<List<String>> getTypes() {
     Completer<List<String>> result = new Completer<List<String>>();
-    _entity.getTypes(result.complete);
+    proxy.getTypes(result.complete);
     return result.future;
   }
 
@@ -36,9 +51,32 @@ class EntityClient {
   /// Returns the data associated with the given type without validating it.
   Future<String> getData(String type) {
     Completer<String> result = new Completer<String>();
-    _entity.getData(type, result.complete);
+    proxy.getData(type, result.complete);
     return result.future;
   }
 
-  final EntityProxy _entity;
+  /// Closes the underlying proxy connection, should be called as a response to
+  /// Lifecycle::terminate (see https://goo.gl/MmZ2dc).
+  Future<Null> terminate() async {
+    log.info('terminate called');
+    proxy.ctrl.close();
+    return;
+  }
+
+  void _handleBind() {
+    log.fine('proxy ready');
+  }
+
+  void _handleUnbind() {
+    log.fine('proxy unbound');
+  }
+
+  void _handleClose() {
+    log.fine('proxy closed');
+  }
+
+  void _handleConnectionError() {
+    Exception err = new Exception('binding connection failed');
+    throw err;
+  }
 }

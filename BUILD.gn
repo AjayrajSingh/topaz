@@ -14,6 +14,7 @@ group("dart_unittests") {
     "public/dart/fixtures:test",
     "public/dart/widgets:test",
     "public/dart/zircon:tests",
+    "public/lib/app_driver/dart:test",
     "shell:tests",
     "tools/dartfmt_extras:test",
     "tools/mod:test",
