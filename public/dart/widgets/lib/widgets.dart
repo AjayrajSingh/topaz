@@ -9,6 +9,7 @@
 
 export 'src/widgets/alphatar.dart';
 export 'src/widgets/fuchsia_spinner.dart';
+export 'src/widgets/maybe.dart';
 export 'src/widgets/mondrian_spinner.dart';
 export 'src/widgets/rk4_spring_simulation.dart';
 export 'src/widgets/simulated_positioned.dart';
