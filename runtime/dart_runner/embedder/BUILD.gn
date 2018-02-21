@@ -158,6 +158,7 @@ gen_snapshot_cc("script_runner_snapshot") {
   dart_deps = [
     "//peridot/public/lib/agent/fidl:fidl_dart",
     "//peridot/public/lib/clipboard/fidl:fidl_dart",
+    "//peridot/public/lib/daisy/fidl:fidl_dart",
     "//peridot/public/lib/device/fidl:fidl_dart",
     "//peridot/public/lib/entity/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",

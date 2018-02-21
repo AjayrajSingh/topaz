@@ -11,7 +11,7 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.module.fidl/module_state.fidl.dart';
-import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
+import 'package:lib.daisy.fidl/daisy.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl/view_token.fidl.dart';

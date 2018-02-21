@@ -35,6 +35,9 @@ import 'package:lib.agent.fidl/agent_provider.fidl.dart';
 // From //peridot/public/lib/clipboard
 import 'package:lib.clipboard.fidl/clipboard.fidl.dart';
 
+// From //peridot/public/lib/daisy
+import 'package:lib.daisy.fidl/daisy.fidl.dart';
+
 // From //peridot/public/lib/device
 import 'package:lib.device.fidl/device_shell.fidl.dart';
 import 'package:lib.device.fidl/device_runner_monitor.fidl.dart';
@@ -51,7 +54,6 @@ import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 
 // From //peridot/public/lib/module_resolver
-import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
 import 'package:lib.module_resolver.fidl/module_resolver.fidl.dart';
 
 // From //peridot/public/lib/resolver

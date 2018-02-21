@@ -4,7 +4,7 @@
 
 import 'dart:convert' show JSON;
 
-import 'package:lib.module_resolver.fidl/daisy.fidl.dart';
+import 'package:lib.daisy.fidl/daisy.fidl.dart';
 
 /// Dart-idiomatic wrapper to create a modular.Daisy.
 class DaisyBuilder {
