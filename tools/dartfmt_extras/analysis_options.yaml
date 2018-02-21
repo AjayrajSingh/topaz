@@ -2,11 +2,11 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# TODO(youngseokyoon): re-enable the include.
-# https://fuchsia.atlassian.net/browse/SO-947
-# include: ../analysis_options.yaml
+include: ../analysis_options.yaml
 analyzer:
   exclude:
+    - 'test/testdata/**.dart'
+    # TODO(https://github.com/dart-lang/sdk/issues/31344): remove these.
     - 'testdata/directives_test/after.dart'
     - 'testdata/directives_test/before.dart'
     - 'testdata/double_quotes_test/after.dart'
