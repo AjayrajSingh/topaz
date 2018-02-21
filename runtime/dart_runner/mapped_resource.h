@@ -15,6 +15,18 @@ namespace dart_runner {
 class MappedResource {
  public:
   MappedResource() : address_(nullptr), size_(0) {}
+  MappedResource(MappedResource&& other)
+      : address_(other.address_), size_(other.size_) {
+    other.address_ = nullptr;
+    other.size_ = 0;
+  }
+  MappedResource& operator=(MappedResource&& other) {
+    address_ = other.address_;
+    size_ = other.size_;
+    other.address_ = nullptr;
+    other.size_ = 0;
+    return *this;
+  }
   ~MappedResource();
 
   // Loads the content of a file from the given namespace and maps it into the

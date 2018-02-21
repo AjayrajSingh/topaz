@@ -16,8 +16,8 @@
 #include <utility>
 
 #include "lib/app/cpp/application_context.h"
-#include "lib/fidl/cpp/string.h"
 #include "lib/fidl/cpp/optional.h"
+#include "lib/fidl/cpp/string.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fsl/vmo/file.h"
 #include "lib/fxl/arraysize.h"
@@ -44,7 +44,8 @@ void AfterTask() {
 }  // namespace
 
 DartApplicationController::DartApplicationController(
-    std::string label, component::ApplicationPackage application,
+    std::string label,
+    component::ApplicationPackage application,
     component::ApplicationStartupInfo startup_info,
     fidl::InterfaceRequest<component::ApplicationController> controller)
     : label_(label),
@@ -117,7 +118,7 @@ bool DartApplicationController::Setup() {
 constexpr char kServiceRootPath[] = "/svc";
 
 bool DartApplicationController::SetupNamespace() {
-  component::FlatNamespace *flat = &startup_info_.flat_namespace;
+  component::FlatNamespace* flat = &startup_info_.flat_namespace;
   zx_status_t status = fdio_ns_create(&namespace_);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to create namespace";
@@ -187,12 +188,11 @@ bool DartApplicationController::SetupFromSource() {
 #if defined(AOT_RUNTIME)
   return false;
 #else
-  if (!application_.data ||
-      !MappedResource::LoadFromVmo(
-          url_,
-          fsl::SizedVmo(std::move(application_.data->vmo),
-                        application_.data->size),
-          script_)) {
+  if (!application_.data || !MappedResource::LoadFromVmo(
+                                url_,
+                                fsl::SizedVmo(std::move(application_.data->vmo),
+                                              application_.data->size),
+                                script_)) {
     return false;
   }
 
@@ -249,8 +249,9 @@ bool DartApplicationController::SetupFromSource() {
 }
 
 bool DartApplicationController::SetupFromKernel() {
-  if (!MappedResource::LoadFromNamespace(
-          namespace_, "pkg/data/kernel_blob.dill", script_)) {
+  MappedResource manifest;
+  if (!MappedResource::LoadFromNamespace(namespace_, "pkg/manifest",
+                                         manifest)) {
     return false;
   }
 
@@ -271,11 +272,38 @@ bool DartApplicationController::SetupFromKernel() {
   }
 
   Dart_EnterScope();
-  Dart_Handle root_library = Dart_LoadScriptFromKernel(
-      reinterpret_cast<const uint8_t*>(script_.address()), script_.size());
-  if (Dart_IsError(root_library)) {
-    FXL_LOG(ERROR) << "Failed to load script kernel: "
-                   << Dart_GetError(root_library);
+
+  std::string str(reinterpret_cast<const char*>(manifest.address()),
+                  manifest.size());
+  Dart_Handle library = Dart_Null();
+  for (size_t start = 0; start < manifest.size();) {
+    size_t end = str.find("\n", start);
+    if (end == std::string::npos) {
+      FXL_LOG(ERROR) << "Malformed manifest";
+      return false;
+    }
+
+    std::string path = "pkg/" + str.substr(start, end - start);
+    start = end + 1;
+
+    // TODO(rmacnak): Keep these in memory and remove copying from the VM.
+    MappedResource kernel;
+    if (!MappedResource::LoadFromNamespace(namespace_, path, kernel)) {
+      return false;
+    }
+    library = Dart_LoadLibraryFromKernel(
+        reinterpret_cast<const uint8_t*>(kernel.address()), kernel.size());
+    if (Dart_IsError(library)) {
+      FXL_LOG(ERROR) << "Failed to load kernel: " << Dart_GetError(library);
+      Dart_ExitScope();
+      return false;
+    }
+  }
+  Dart_SetRootLibrary(library);
+
+  Dart_Handle result = Dart_FinalizeLoading(false);
+  if (Dart_IsError(result)) {
+    FXL_LOG(ERROR) << "Failed to FinalizeLoading: " << Dart_GetError(result);
     Dart_ExitScope();
     return false;
   }

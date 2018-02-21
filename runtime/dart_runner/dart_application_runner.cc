@@ -35,7 +35,7 @@ const char* kDartVMArgs[] = {
 #if !defined(NDEBUG)
     "--enable_asserts",
     "--systrace_timeline",
-    "--timeline_streams=VM,Isolate,Compiler,Dart,GC,Embedder",
+    "--timeline_streams=VM,Isolate,Compiler,Dart,GC,Embedder,API",
 #endif
     // clang-format on
 };
@@ -106,7 +106,8 @@ void IsolateCleanupCallback(void* callback_data) {
 }
 
 void RunApplication(
-    DartApplicationRunner* runner, ControllerToken* token,
+    DartApplicationRunner* runner,
+    ControllerToken* token,
     component::ApplicationPackage application,
     component::ApplicationStartupInfo startup_info,
     ::fidl::InterfaceRequest<component::ApplicationController> controller) {

@@ -66,6 +66,9 @@ template("_dart_kernel") {
     outputs = [
       kernel_path,
     ]
+    if (defined(invoker.manifest)) {
+      outputs += [ invoker.manifest ]
+    }
 
     dart_target_gen_dir =
         get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
@@ -83,8 +86,14 @@ template("_dart_kernel") {
              rebase_path(depfile, root_build_dir),
              "--output",
              rebase_path(kernel_path, root_build_dir),
-             rebase_path(invoker.main_dart),
            ]
+    if (defined(invoker.manifest)) {
+      args += [
+        "--manifest",
+        rebase_path(invoker.manifest),
+      ]
+    }
+    args += [ rebase_path(invoker.main_dart) ]
   }
 }
 
@@ -248,10 +257,11 @@ template("dart2_jit_app") {
   }
 
   kernel_target_name = target_name + "_kernel"
-  kernel_path = "$target_gen_dir/${kernel_target_name}.dil"
+  manifest_path = "$target_gen_dir/${kernel_target_name}.manifest2"
 
   _dart_kernel(kernel_target_name) {
     main_dart = invoker.main_dart
+    manifest = manifest_path
     args = []
     dart_library_target_name = dart_library_target_name
   }
@@ -267,14 +277,10 @@ template("dart2_jit_app") {
       ":$kernel_target_name",
     ]
 
-    resources = [
-      {
-        path = rebase_path(kernel_path)
-        dest = "kernel_blob.dill"
-      },
-    ]
+    extra = [ manifest_path ]
+
     if (defined(invoker.resources)) {
-      resources += invoker.resources
+      resources = invoker.resources
     }
 
     meta = [
