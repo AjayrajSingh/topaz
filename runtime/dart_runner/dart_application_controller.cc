@@ -389,11 +389,6 @@ bool DartApplicationController::Main() {
   fidl::Array<fidl::String> arguments =
       std::move(startup_info_->launch_info->arguments);
 
-  if (startup_info_->launch_info->services) {
-    service_provider_bridge_.AddBinding(
-        std::move(startup_info_->launch_info->services));
-  }
-
   // TODO(abarth): Remove service_provider_bridge once we have an
   // implementation of rio.Directory in Dart.
   if (startup_info_->launch_info->service_request.is_valid()) {
