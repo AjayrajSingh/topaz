@@ -4,7 +4,7 @@
 
 import 'dart:io';
 
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.auth.fidl.account/account.fidl.dart';
 import 'package:lib.config.fidl/config.fidl.dart';
 import 'package:lib.device.fidl/device_shell.fidl.dart';

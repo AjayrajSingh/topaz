@@ -10,7 +10,7 @@ import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
 import 'package:lib.context.fidl/context_writer.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.module.fidl._module_controller/module_controller.fidl.dart';
+import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';

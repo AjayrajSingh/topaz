@@ -5,7 +5,7 @@
 import 'package:lib.media.fidl/audio_policy_service.fidl.dart';
 import 'package:lib.media.fidl/audio_renderer.fidl.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 
 /// Type for |AudioPolicy| update callbacks.
 typedef void UpdateCallback();

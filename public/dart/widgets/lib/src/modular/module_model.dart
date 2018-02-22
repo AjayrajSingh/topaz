@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';

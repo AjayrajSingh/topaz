@@ -12,7 +12,7 @@ import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.story.fidl/story_shell.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
+import 'package:lib.ui.views.fidl/view_token.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';

@@ -7,10 +7,10 @@ import 'dart:convert' show JSON;
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.module.fidl._module_controller/module_controller.fidl.dart';
+import 'package:lib.module.fidl/module_controller.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
+import 'package:lib.ui.views.fidl/view_token.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 
 const String _kChildModuleUrl = 'example_flutter_counter_child';

@@ -9,7 +9,7 @@ import 'dart:typed_data';
 import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.fidl/application_environment.fidl.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:zircon/zircon.dart';
 
@@ -28,6 +28,7 @@ class ApplicationContext {
     if (_context != null) {
       return _context;
     }
+
 
     final ApplicationContext context = new ApplicationContext();
 
@@ -217,8 +218,8 @@ class Services {
     final String serviceName = controller.serviceName;
     assert(serviceName != null,
         'controller.serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
-    _connectToService(
-        _directory, controller.request().passChannel(), serviceName);
+    _connectToService(_directory, controller.request().passChannel(),
+        serviceName);
   }
 
   InterfaceHandle<T> connectToServiceByName<T>(String serviceName) {

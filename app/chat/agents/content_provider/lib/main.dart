@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:lib.agent.dart/agent.dart';
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
+import 'package:lib.app.fidl/service_provider.fidl.dart';
 import 'package:lib.auth.fidl/token_provider.fidl.dart';
 import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/metadata.fidl.dart';
