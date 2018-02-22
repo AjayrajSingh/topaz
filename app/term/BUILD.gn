@@ -8,11 +8,11 @@ executable("bin") {
   output_name = "term"
 
   sources = [
-    "command.cc",
-    "command.h",
     "key_util.cc",
     "key_util.h",
     "main.cc",
+    "pty_server.cc",
+    "pty_server.h",
     "term_model.cc",
     "term_model.h",
     "term_params.cc",

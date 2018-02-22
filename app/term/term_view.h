@@ -13,7 +13,7 @@
 #include "lib/app/fidl/application_environment.fidl.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkTypeface.h"
-#include "topaz/app/term/command.h"
+#include "topaz/app/term/pty_server.h"
 #include "topaz/app/term/term_model.h"
 #include "topaz/app/term/term_params.h"
 
@@ -81,7 +81,7 @@ class TermView : public mozart::SkiaView, public TermModel::Delegate {
   bool focused_ = false;
 
   TermParams params_;
-  std::unique_ptr<Command> command_;
+  PTYServer pty_;
 };
 
 }  // namespace term

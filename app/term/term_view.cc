@@ -7,15 +7,15 @@
 #include <async/default.h>
 #include <async/loop.h>
 #include <unistd.h>
+#include <zircon/status.h>
 
 #include "lib/fonts/fidl/font_provider.fidl.h"
-#include "lib/fsl/io/redirection.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/strings/string_printf.h"
 #include "lib/ui/input/cpp/formatting.h"
 #include "third_party/skia/include/core/SkPaint.h"
-#include "topaz/app/term/command.h"
 #include "topaz/app/term/key_util.h"
+#include "topaz/app/term/pty_server.h"
 #include "topaz/app/term/term_model.h"
 
 namespace term {
@@ -73,19 +73,18 @@ void TermView::ComputeMetrics() {
 }
 
 void TermView::StartCommand() {
-  command_ = std::make_unique<Command>();
-
   std::vector<std::string> argv = params_.command;
   if (argv.empty())
     argv = {kShell};
 
-  bool success = command_->Start(argv, {},
-                                 [this](const void* bytes, size_t num_bytes) {
-                                   OnDataReceived(bytes, num_bytes);
-                                 },
-                                 [this] { OnCommandTerminated(); });
-  if (!success) {
-    FXL_LOG(ERROR) << "Error starting command.";
+  zx_status_t status = pty_.Run(argv,
+                                [this](const void* bytes, size_t num_bytes) {
+                                  OnDataReceived(bytes, num_bytes);
+                                },
+                                [this] { OnCommandTerminated(); });
+  if (status != ZX_OK) {
+    FXL_LOG(ERROR) << "Error starting command: " << status << " ("
+                   << zx_status_get_string(status) << ")";
     exit(1);
   }
 
@@ -139,6 +138,7 @@ void TermView::Resize() {
   TermModel::Size current = model_.GetSize();
   if (current.columns != columns || current.rows != rows) {
     model_.SetSize(TermModel::Size(rows, columns), false);
+    pty_.SetWindowSize(columns, rows);
   }
   InvalidateScene();
 }
@@ -276,9 +276,7 @@ void TermView::OnKeyPressed(mozart::InputEventPtr key_event) {
 }
 
 void TermView::SendData(const void* bytes, size_t num_bytes) {
-  if (command_) {
-    command_->SendData(bytes, num_bytes);
-  }
+  pty_.Write(bytes, num_bytes);
 }
 
 void TermView::OnDataReceived(const void* bytes, size_t num_bytes) {
@@ -287,7 +285,7 @@ void TermView::OnDataReceived(const void* bytes, size_t num_bytes) {
 }
 
 void TermView::OnCommandTerminated() {
-  FXL_LOG(INFO) << "Command terminated.";
+  FXL_LOG(INFO) << "PTY terminated.";
   async_loop_quit(async_get_default());
 }
 
