@@ -60,7 +60,6 @@ import 'package:lib.module_resolver.fidl/module_resolver.fidl.dart';
 import 'package:lib.resolver.fidl/resolver.fidl.dart';
 
 // From //peridot/public/lib/story
-import 'package:lib.story.fidl/chain.fidl.dart';
 import 'package:lib.story.fidl/create_link.fidl.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.story.fidl/link_change.fidl.dart';
