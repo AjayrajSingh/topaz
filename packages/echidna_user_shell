@@ -1,0 +1,11 @@
+{
+    "imports": [
+        "topaz/packages/term"
+    ],
+    "languages": [
+        "cpp"
+    ],
+    "packages": {
+        "echidna_user_shell": "//topaz/shell/echidna_user_shell"
+    }
+}

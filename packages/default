@@ -24,6 +24,7 @@
         "topaz/packages/mods",
         "topaz/packages/mondrian",
         "topaz/packages/term",
+        "topaz/packages/echidna_user_shell",
         "topaz/packages/oauth_token_manager",
         "topaz/packages/perspective",
         "topaz/packages/spinning_cube",

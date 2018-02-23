@@ -31,8 +31,8 @@ class App {
   App& operator=(const App&) = delete;
 
  private:
-  std::unique_ptr<term::TermView> MakeView(mozart::ViewContext view_context) {
-    return std::make_unique<term::TermView>(
+  std::unique_ptr<TermView> MakeView(mozart::ViewContext view_context) {
+    return std::make_unique<TermView>(
         std::move(view_context.view_manager),
         std::move(view_context.view_owner_request),
         view_context.application_context, params_);
