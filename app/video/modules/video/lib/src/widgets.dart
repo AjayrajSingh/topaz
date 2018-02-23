@@ -13,3 +13,4 @@ export 'widgets/screen.dart';
 export 'widgets/scrubber.dart';
 export 'widgets/standby.dart';
 export 'widgets/video_app.dart';
+export 'widgets/video_progress.dart';

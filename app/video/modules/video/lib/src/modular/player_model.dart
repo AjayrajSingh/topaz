@@ -12,7 +12,6 @@ import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
 import '../widgets.dart';
-import 'video_progress.dart';
 
 const Duration _kOverlayAutoHideDuration = const Duration(seconds: 3);
 const Duration _kLoadingDuration = const Duration(seconds: 2);

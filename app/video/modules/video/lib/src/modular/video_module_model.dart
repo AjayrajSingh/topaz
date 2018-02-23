@@ -20,7 +20,6 @@ import 'package:lib.entity.fidl/entity_resolver.fidl.dart';
 import 'package:entity_schemas/entities.dart' as entities;
 
 import '../widgets.dart';
-import 'video_progress.dart';
 
 const String _kRemoteDisplayMode = 'remoteDisplayMode';
 const String _kCastingDeviceName = 'castingDeviceName';
@@ -328,11 +327,11 @@ class VideoModuleModel extends ModuleModel {
   /// When a video is playing, the progress will be updated periodically to
   /// reflect position in the video player.
   void handleProgressChanged(VideoProgress progress) {
+    if (link == null) {
+      return;
+    }
     Map<String, dynamic> progressData = <String, dynamic>{
-      'video_progress': <String, dynamic>{
-        'duration_msec': progress.duration.inMilliseconds,
-        'normalized_progress': progress.normalizedProgress,
-      },
+      'video_progress': progress.toMap(),
     };
     link.set(null, JSON.encode(progressData));
   }
