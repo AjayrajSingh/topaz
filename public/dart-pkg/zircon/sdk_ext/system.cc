@@ -8,10 +8,13 @@
 
 #include <fcntl.h>
 #include <fdio/io.h>
+#include <fdio/limits.h>
 #include <fdio/namespace.h>
+#include <fdio/util.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <zircon/process.h>
+#include <zircon/processargs.h>
 
 #include "lib/fxl/files/unique_fd.h"
 #include "lib/tonic/dart_binding_macros.h"
@@ -125,6 +128,32 @@ Dart_Handle ConstructDartObject(const char* class_name, Args&&... args) {
   return object;
 }
 
+fxl::UniqueFD FdFromPath(std::string path) {
+  // Grab the fdio_ns_t* out of the isolate.
+  Dart_Handle zircon_lib = Dart_LookupLibrary(ToDart("dart:zircon"));
+  FXL_DCHECK(!tonic::LogIfError(zircon_lib));
+  Dart_Handle namespace_type =
+      Dart_GetType(zircon_lib, ToDart("_Namespace"), 0, nullptr);
+  FXL_DCHECK(!tonic::LogIfError(namespace_type));
+  Dart_Handle namespace_field =
+      Dart_GetField(namespace_type, ToDart("_namespace"));
+  FXL_DCHECK(!tonic::LogIfError(namespace_field));
+  uint64_t fdio_ns_ptr;
+  Dart_Handle result = Dart_IntegerToUint64(namespace_field, &fdio_ns_ptr);
+  FXL_DCHECK(!tonic::LogIfError(result));
+
+  // Get a VMO for the file.
+  fdio_ns_t* ns = reinterpret_cast<fdio_ns_t*>(fdio_ns_ptr);
+  fxl::UniqueFD dirfd(fdio_ns_opendir(ns));
+  if (!dirfd.is_valid())
+    return fxl::UniqueFD();
+
+  const char* c_path = path.c_str();
+  if (path.length() > 0 && c_path[0] == '/')
+    c_path = &c_path[1];
+  return fxl::UniqueFD(openat(dirfd.get(), c_path, O_RDONLY));
+}
+
 }  // namespace
 
 IMPLEMENT_WRAPPERTYPEINFO(zircon, System);
@@ -139,6 +168,24 @@ Dart_Handle System::ChannelCreate(uint32_t options) {
                                ToDart(Handle::Create(out0)),
                                ToDart(Handle::Create(out1)));
   }
+}
+
+Dart_Handle System::ChannelFromFile(std::string path) {
+  fxl::UniqueFD fd = FdFromPath(path);
+  if (!fd.is_valid()) {
+    return ConstructDartObject(kHandleResult, ToDart(ZX_ERR_IO));
+  }
+
+  // Get channel from fd.
+  zx_handle_t handles[FDIO_MAX_HANDLES];
+  uint32_t types[FDIO_MAX_HANDLES];
+  zx_status_t status = fdio_transfer_fd(fd.release(), 0, handles, types);
+  if (status != 1 || types[0] != PA_FDIO_REMOTE) {
+    return ConstructDartObject(kHandleResult, ToDart(ZX_ERR_IO));
+  }
+
+  return ConstructDartObject(kHandleResult, ToDart(ZX_OK),
+                             ToDart(Handle::Create(handles[0])));
 }
 
 zx_status_t System::ChannelWrite(fxl::RefPtr<Handle> channel,
@@ -276,29 +323,7 @@ Dart_Handle System::VmoCreate(uint64_t size, uint32_t options) {
 }
 
 Dart_Handle System::VmoFromFile(std::string path) {
-  // Grab the fdio_ns_t* out of the isolate.
-  Dart_Handle zircon_lib = Dart_LookupLibrary(ToDart("dart:zircon"));
-  FXL_DCHECK(!tonic::LogIfError(zircon_lib));
-  Dart_Handle namespace_type =
-      Dart_GetType(zircon_lib, ToDart("_Namespace"), 0, nullptr);
-  FXL_DCHECK(!tonic::LogIfError(namespace_type));
-  Dart_Handle namespace_field =
-      Dart_GetField(namespace_type, ToDart("_namespace"));
-  FXL_DCHECK(!tonic::LogIfError(namespace_field));
-  uint64_t fdio_ns_ptr;
-  Dart_Handle result = Dart_IntegerToUint64(namespace_field, &fdio_ns_ptr);
-  FXL_DCHECK(!tonic::LogIfError(result));
-
-  // Get a VMO for the file.
-  fdio_ns_t* ns = reinterpret_cast<fdio_ns_t*>(fdio_ns_ptr);
-  fxl::UniqueFD dirfd(fdio_ns_opendir(ns));
-  if (!dirfd.is_valid())
-    return ConstructDartObject(kFromFileResult, ToDart(ZX_ERR_NO_MEMORY));
-
-  const char* c_path = path.c_str();
-  if (path.length() > 0 && c_path[0] == '/')
-    c_path = &c_path[1];
-  fxl::UniqueFD fd(openat(dirfd.get(), c_path, O_RDONLY));
+  fxl::UniqueFD fd = FdFromPath(path);
   if (!fd.is_valid())
     return ConstructDartObject(kFromFileResult, ToDart(ZX_ERR_IO));
 
@@ -421,6 +446,7 @@ uint64_t System::ClockGet(uint32_t clock_id) {
 
 #define FOR_EACH_STATIC_BINDING(V) \
   V(System, ChannelCreate)         \
+  V(System, ChannelFromFile)       \
   V(System, ChannelWrite)          \
   V(System, ChannelQueryAndRead)   \
   V(System, EventpairCreate)       \

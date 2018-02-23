@@ -106,6 +106,8 @@ class System extends NativeFieldWrapperClass2 {
   // Channel operations.
   static HandlePairResult channelCreate([int options = 0])
       native 'System_ChannelCreate';
+  static HandleResult channelFromFile(String path)
+      native 'System_ChannelFromFile';
   static int channelWrite(Handle channel, ByteData data, List<Handle> handles)
       native 'System_ChannelWrite';
   static ReadResult channelQueryAndRead(Handle channel)

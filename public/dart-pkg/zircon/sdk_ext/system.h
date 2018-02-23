@@ -24,6 +24,7 @@ class System : public fxl::RefCountedThreadSafe<System>,
 
  public:
   static Dart_Handle ChannelCreate(uint32_t options);
+  static Dart_Handle ChannelFromFile(std::string path);
   static zx_status_t ChannelWrite(fxl::RefPtr<Handle> channel,
                                   const tonic::DartByteData& data,
                                   std::vector<Handle*> handles);

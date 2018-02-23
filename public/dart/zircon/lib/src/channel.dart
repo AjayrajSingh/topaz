@@ -10,6 +10,17 @@ part of zircon;
 class Channel extends _HandleWrapper<Channel> {
   Channel(Handle handle) : super(handle);
 
+  /// Gets a Channel for accessing the file at `path`.
+  ///
+  /// The returned Channel supports read-only fdio operations on the file.
+  factory Channel.fromFile(String path) {
+    HandleResult r = System.channelFromFile(path);
+    if (r.status != ZX.OK) {
+      throw new ZxStatusException(r.status, getStringForStatus(r.status));
+    }
+    return new Channel(r.handle);
+  }
+
   // Signals
   static const int READABLE = ZX.CHANNEL_READABLE;
   static const int WRITABLE = ZX.CHANNEL_WRITABLE;

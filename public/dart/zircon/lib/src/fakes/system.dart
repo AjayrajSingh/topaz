@@ -108,6 +108,11 @@ class System {
         'System.channelCreate() is not implemented on this platform.');
   }
 
+  static HandleResult channelFromFile(String path) {
+    throw new UnimplementedError(
+        'System.channelFromFile() is not implemented on this platform.');
+  }
+
   static int channelWrite(Handle channel, ByteData data, List<Handle> handles) {
     throw new UnimplementedError(
         'System.channelWrite() is not implemented on this platform.');
