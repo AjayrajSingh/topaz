@@ -5,7 +5,6 @@
 assert(is_fuchsia || is_fuchsia_host)
 
 import("//build/dart/dart_library.gni")
-import("//build/dart/dart_package.gni")
 import("//build/package.gni")
 import("//build/dart/toolchain.gni")
 import("//build/package.gni")
