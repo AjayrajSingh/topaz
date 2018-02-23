@@ -457,7 +457,7 @@ template("flutter_aot_app") {
 
   dylib_path =
       get_label_info(":$dylib_label($shlib_toolchain)", "target_gen_dir") +
-      "/lib.unstripped/lib$target_name.so"
+      "/lib$target_name.so"
 
   if (defined(invoker.resources)) {
     invoker_resources = invoker.resources
