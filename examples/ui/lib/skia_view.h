@@ -16,7 +16,7 @@ namespace mozart {
 class SkiaView : public BaseView {
  public:
   SkiaView(ViewManagerPtr view_manager,
-           fidl::InterfaceRequest<ViewOwner> view_owner_request,
+           f1dl::InterfaceRequest<ViewOwner> view_owner_request,
            const std::string& label);
   ~SkiaView() override;
 

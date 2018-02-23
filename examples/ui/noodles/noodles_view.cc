@@ -39,7 +39,7 @@ void Lissajous(SkPath* path, double ax, double ay, int wx, int wy, double p) {
 
 NoodlesView::NoodlesView(
     mozart::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request)
+    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request)
     : SkiaView(std::move(view_manager),
                std::move(view_owner_request),
                "Noodles") {}

@@ -22,7 +22,7 @@ class DartApplicationController : public app::ApplicationController {
   DartApplicationController(
       app::ApplicationPackagePtr application,
       app::ApplicationStartupInfoPtr startup_info,
-      fidl::InterfaceRequest<app::ApplicationController> controller);
+      f1dl::InterfaceRequest<app::ApplicationController> controller);
   ~DartApplicationController() override;
 
   bool Setup();
@@ -51,7 +51,7 @@ class DartApplicationController : public app::ApplicationController {
   app::ApplicationPackagePtr application_;
   app::ApplicationStartupInfoPtr startup_info_;
   app::ServiceProviderBridge service_provider_bridge_;
-  fidl::Binding<app::ApplicationController> binding_;
+  f1dl::Binding<app::ApplicationController> binding_;
 
   fdio_ns_t* namespace_ = nullptr;
   int stdoutfd_ = -1;

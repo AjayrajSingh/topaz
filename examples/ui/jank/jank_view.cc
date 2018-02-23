@@ -29,7 +29,7 @@ const JankView::Button JankView::kButtons[] = {
 };
 
 JankView::JankView(mozart::ViewManagerPtr view_manager,
-                   fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+                   f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
                    fonts::FontProviderPtr font_provider)
     : SkiaView(std::move(view_manager), std::move(view_owner_request), "Jank"),
       font_loader_(std::move(font_provider)) {

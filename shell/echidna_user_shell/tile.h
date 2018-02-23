@@ -38,7 +38,7 @@ class Tile {
     view_properties_ = std::move(view_properties);
   }
 
-  void CreateView(fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request);
+  void CreateView(f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request);
 
  private:
   app::ApplicationLauncher* launcher_;

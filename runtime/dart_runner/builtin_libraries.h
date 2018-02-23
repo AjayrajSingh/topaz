@@ -19,7 +19,7 @@ void InitBuiltinLibrariesForIsolate(
     const std::string& script_uri,
     fdio_ns_t* namespc, int stdoutfd, int stderrfd,
     std::unique_ptr<app::ApplicationContext> context,
-    fidl::InterfaceRequest<app::ServiceProvider> outgoing_services);
+    f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services);
 
 }  // namespace dart_content_handler
 

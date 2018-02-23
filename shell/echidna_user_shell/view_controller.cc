@@ -26,7 +26,7 @@ scenic::SceneManagerPtr GetSceneManager(mozart::ViewManager* view_manager) {
 }
 
 scenic::Metrics* GetLastMetrics(uint32_t node_id,
-                                const fidl::Array<scenic::EventPtr>& events) {
+                                const f1dl::Array<scenic::EventPtr>& events) {
   scenic::Metrics* result = nullptr;
   for (const auto& event : events) {
     if (event->is_metrics() && event->get_metrics()->node_id == node_id)
@@ -50,7 +50,7 @@ mozart::ViewPropertiesPtr CreateViewProperties(float width, float height) {
 ViewController::ViewController(
     app::ApplicationLauncher* launcher,
     mozart::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
     DisconnectCallback disconnect_handler)
     : launcher_(launcher),
       view_manager_(std::move(view_manager)),
@@ -82,7 +82,7 @@ ViewController::ViewController(
                         input_connection_.NewRequest());
   input_connection_->SetEventListener(input_listener_binding_.NewBinding());
 
-  session_.set_event_handler([this](fidl::Array<scenic::EventPtr> events) {
+  session_.set_event_handler([this](f1dl::Array<scenic::EventPtr> events) {
     OnSessionEvents(std::move(events));
   });
   parent_node_.SetEventMask(scenic::kMetricsEventMask);
@@ -99,7 +99,7 @@ uint32_t ViewController::AddTile(std::string url) {
   tile->node().ExportAsRequest(&token);
   container_node_.AddChild(tile->node());
 
-  fidl::InterfaceHandle<mozart::ViewOwner> view_owner;
+  f1dl::InterfaceHandle<mozart::ViewOwner> view_owner;
   tile->CreateView(view_owner.NewRequest());
 
   view_container_->AddChild(tile->key(), std::move(view_owner),
@@ -155,7 +155,7 @@ void ViewController::OnEvent(mozart::InputEventPtr event,
   callback(false);
 }
 
-void ViewController::OnSessionEvents(fidl::Array<scenic::EventPtr> events) {
+void ViewController::OnSessionEvents(f1dl::Array<scenic::EventPtr> events) {
   scenic::Metrics* new_metrics = GetLastMetrics(parent_node_.id(), events);
 
   if (!new_metrics || metrics_.Equals(*new_metrics))

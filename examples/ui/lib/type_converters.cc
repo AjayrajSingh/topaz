@@ -4,7 +4,7 @@
 
 #include "examples/ui/lib/type_converters.h"
 
-namespace fidl {
+namespace f1dl {
 
 SkIPoint TypeConverter<SkIPoint, mozart::Point>::Convert(
     const mozart::Point& input) {
@@ -163,4 +163,4 @@ mozart::TransformPtr TypeConverter<mozart::TransformPtr, SkMatrix44>::Convert(
   return output;
 }
 
-}  // namespace fidl
+}  // namespace f1dl

@@ -19,7 +19,7 @@ namespace examples {
 class JankView : public mozart::SkiaView {
  public:
   JankView(mozart::ViewManagerPtr view_manager,
-           fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+           f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
            fonts::FontProviderPtr font_provider);
   ~JankView() override;
 

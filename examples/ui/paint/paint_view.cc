@@ -16,7 +16,7 @@ namespace examples {
 
 PaintView::PaintView(
     mozart::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request)
+    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request)
     : SkiaView(std::move(view_manager),
                std::move(view_owner_request),
                "Paint") {}

@@ -36,8 +36,8 @@ class WebViewImpl : public mozart::BaseView,
  public:
   WebViewImpl(
       mozart::ViewManagerPtr view_manager,
-      fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-      fidl::InterfaceRequest<app::ServiceProvider> outgoing_services_request,
+      f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+      f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services_request,
       const std::string& url);
 
   ~WebViewImpl();
@@ -45,14 +45,14 @@ class WebViewImpl : public mozart::BaseView,
   void set_context_writer(maxwell::ContextWriterPtr context_writer);
 
   // |WebView|:
-  void SetUrl(const ::fidl::String& url) override;
+  void SetUrl(const ::f1dl::String& url) override;
 
  private:
   // |WebView|:
   void ClearCookies() override;
 
   void SetWebRequestDelegate(
-      ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) final;
+      ::f1dl::InterfaceHandle<web_view::WebRequestDelegate> delegate) final;
 
   bool HandleKeyboardEvent(const mozart::InputEventPtr& event);
 
@@ -92,7 +92,7 @@ class WebViewImpl : public mozart::BaseView,
   // others.
   app::ServiceProviderImpl outgoing_services_;
 
-  fidl::BindingSet<WebView> web_view_interface_bindings_;
+  f1dl::BindingSet<WebView> web_view_interface_bindings_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(WebViewImpl);
 };

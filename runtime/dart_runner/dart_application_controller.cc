@@ -69,7 +69,7 @@ void NopReleaseDill(uint8_t* dill) {
 DartApplicationController::DartApplicationController(
     app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
-    fidl::InterfaceRequest<app::ApplicationController> controller)
+    f1dl::InterfaceRequest<app::ApplicationController> controller)
     : url_(std::move(application->resolved_url)),
       application_(std::move(application)),
       startup_info_(std::move(startup_info)),
@@ -386,7 +386,7 @@ bool DartApplicationController::Main() {
   tonic::DartMicrotaskQueue::StartForCurrentThread();
   fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(AfterTask);
 
-  fidl::Array<fidl::String> arguments =
+  f1dl::Array<f1dl::String> arguments =
       std::move(startup_info_->launch_info->arguments);
 
   // TODO(abarth): Remove service_provider_bridge once we have an

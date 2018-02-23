@@ -39,8 +39,8 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
  private:
   // |SingleServiceApp|
   void CreateView(
-      fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-      fidl::InterfaceRequest<app::ServiceProvider> /*services*/) override {
+      f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+      f1dl::InterfaceRequest<app::ServiceProvider> /*services*/) override {
     view_ = std::make_unique<modular::ViewHost>(
         application_context()
             ->ConnectToEnvironmentService<mozart::ViewManager>(),
@@ -53,7 +53,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
     child_views_.clear();
   }
 
-  void ConnectView(fidl::InterfaceHandle<mozart::ViewOwner> view_owner) {
+  void ConnectView(f1dl::InterfaceHandle<mozart::ViewOwner> view_owner) {
     if (view_) {
       view_->ConnectView(std::move(view_owner));
     } else {
@@ -63,8 +63,8 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
 
   // |Module|
   void Initialize(
-      fidl::InterfaceHandle<modular::ModuleContext> module_context,
-      fidl::InterfaceRequest<app::ServiceProvider> /*outgoing_services*/)
+      f1dl::InterfaceHandle<modular::ModuleContext> module_context,
+      f1dl::InterfaceRequest<app::ServiceProvider> /*outgoing_services*/)
       override {
     module_context_.Bind(std::move(module_context));
 
@@ -72,7 +72,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
     module_context_->GetLink(kViewLink, view_link_.NewRequest());
     view_link_->Watch(link_watcher_binding_.NewBinding());
 
-    fidl::InterfaceHandle<mozart::ViewOwner> view;
+    f1dl::InterfaceHandle<mozart::ViewOwner> view;
     module_context_->StartModule("suggest_shell_view",
                                  "suggest_shell_view",
                                  kViewLink, nullptr,
@@ -85,7 +85,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
   }
 
   // |LinkWatcher|
-  void Notify(const fidl::String& json) override {
+  void Notify(const f1dl::String& json) override {
     rapidjson::Document doc;
     doc.Parse(json);
     FXL_CHECK(!doc.HasParseError());
@@ -128,14 +128,14 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
   }
 
   std::unique_ptr<modular::ViewHost> view_;
-  std::vector<fidl::InterfaceHandle<mozart::ViewOwner>> child_views_;
+  std::vector<f1dl::InterfaceHandle<mozart::ViewOwner>> child_views_;
 
   modular::ModuleContextPtr module_context_;
 
   modular::ModuleControllerPtr view_module_;
   modular::LinkPtr view_link_;
 
-  fidl::Binding<modular::LinkWatcher> link_watcher_binding_;
+  f1dl::Binding<modular::LinkWatcher> link_watcher_binding_;
   maxwell::ProposalPublisherPtr proposal_publisher_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(ControllerApp);

@@ -20,25 +20,25 @@ WebViewProvider::WebViewProvider(const std::string url)
   }
 
   context_->outgoing_services()->AddService<mozart::ViewProvider>(
-      [this](fidl::InterfaceRequest<ViewProvider> request) {
+      [this](f1dl::InterfaceRequest<ViewProvider> request) {
         FXL_LOG(INFO) << "Add ViewProvider binding";
         view_provider_binding_.Bind(std::move(request));
       });
   context_->outgoing_services()->AddService<modular::Module>(
-      [this](fidl::InterfaceRequest<modular::Module> request) {
+      [this](f1dl::InterfaceRequest<modular::Module> request) {
         FXL_LOG(INFO) << "got request for module service";
         module_binding_.Bind(std::move(request));
       });
   context_->outgoing_services()->AddService<modular::Lifecycle>(
-      [this](fidl::InterfaceRequest<modular::Lifecycle> request) {
+      [this](f1dl::InterfaceRequest<modular::Lifecycle> request) {
         FXL_LOG(INFO) << "got request for lifecycle service";
         lifecycle_binding_.Bind(std::move(request));
       });
 }
 
 void WebViewProvider::CreateView(
-    fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-    fidl::InterfaceRequest<app::ServiceProvider> view_services) {
+    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    f1dl::InterfaceRequest<app::ServiceProvider> view_services) {
   FXL_LOG(INFO) << "CreateView";
   FXL_DCHECK(!view_);
   view_ = std::make_unique<WebViewImpl>(
@@ -54,8 +54,8 @@ void WebViewProvider::CreateView(
 }
 
 void WebViewProvider::Initialize(
-    fidl::InterfaceHandle<modular::ModuleContext> context,
-    fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
+    f1dl::InterfaceHandle<modular::ModuleContext> context,
+    f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
   auto context_ptr = context.Bind();
   context_ptr->GetLink(nullptr, main_link_.NewRequest());
   main_link_->Watch(main_link_watcher_binding_.NewBinding());
@@ -75,7 +75,7 @@ void WebViewProvider::Terminate() {
   fsl::MessageLoop::GetCurrent()->QuitNow();
 }
 
-void WebViewProvider::Notify(const fidl::String& json) {
+void WebViewProvider::Notify(const f1dl::String& json) {
   modular::JsonDoc parsed_json;
   parsed_json.Parse(json.To<std::string>());
 

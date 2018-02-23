@@ -27,7 +27,7 @@ Tile::Tile(app::ApplicationLauncher* launcher,
 Tile::~Tile() = default;
 
 void Tile::CreateView(
-    fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request) {
+    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request) {
   app::Services services;
   auto launch_info = app::ApplicationLaunchInfo::New();
   launch_info->url = url_;

@@ -19,7 +19,7 @@ class App {
  public:
   App() : context_(app::ApplicationContext::CreateFromStartupInfo()) {
     context_->outgoing_services()->AddService<app::ApplicationRunner>(
-        [this](fidl::InterfaceRequest<app::ApplicationRunner> app_runner) {
+        [this](f1dl::InterfaceRequest<app::ApplicationRunner> app_runner) {
           new DartApplicationRunner(std::move(app_runner));
         });
   }

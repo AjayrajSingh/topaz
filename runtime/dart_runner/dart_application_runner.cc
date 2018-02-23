@@ -69,7 +69,7 @@ void IsolateCleanupCallback(void* callback_data) {
 void RunApplication(
     app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
-    ::fidl::InterfaceRequest<app::ApplicationController> controller) {
+    ::f1dl::InterfaceRequest<app::ApplicationController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   fsl::MessageLoop loop;
   DartApplicationController app(std::move(application), std::move(startup_info),
@@ -96,7 +96,7 @@ void RunApplication(
 }  // namespace
 
 DartApplicationRunner::DartApplicationRunner(
-    fidl::InterfaceRequest<app::ApplicationRunner> app_runner)
+    f1dl::InterfaceRequest<app::ApplicationRunner> app_runner)
     : binding_(this, std::move(app_runner)) {
   dart::bin::BootstrapDartIo();
 
@@ -139,7 +139,7 @@ DartApplicationRunner::~DartApplicationRunner() {
 void DartApplicationRunner::StartApplication(
     app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
-    ::fidl::InterfaceRequest<app::ApplicationController> controller) {
+    ::f1dl::InterfaceRequest<app::ApplicationController> controller) {
   std::thread thread(RunApplication, std::move(application),
                      std::move(startup_info), std::move(controller));
   thread.detach();

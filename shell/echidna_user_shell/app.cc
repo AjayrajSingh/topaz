@@ -11,7 +11,7 @@ namespace echidna_user_shell {
 
 App::App() : context_(app::ApplicationContext::CreateFromStartupInfo()) {
   context_->outgoing_services()->AddService<mozart::ViewProvider>(
-      [this](fidl::InterfaceRequest<mozart::ViewProvider> request) {
+      [this](f1dl::InterfaceRequest<mozart::ViewProvider> request) {
         bindings_.AddBinding(this, std::move(request));
       });
 }
@@ -19,8 +19,8 @@ App::App() : context_(app::ApplicationContext::CreateFromStartupInfo()) {
 App::~App() = default;
 
 void App::CreateView(
-    fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-    fidl::InterfaceRequest<app::ServiceProvider> view_services) {
+    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    f1dl::InterfaceRequest<app::ServiceProvider> view_services) {
   controllers_.push_back(std::make_unique<ViewController>(
       context_->launcher().get(),
       context_->ConnectToEnvironmentService<mozart::ViewManager>(),

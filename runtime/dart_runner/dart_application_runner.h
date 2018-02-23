@@ -15,7 +15,7 @@ namespace dart_content_handler {
 class DartApplicationRunner : public app::ApplicationRunner {
  public:
   explicit DartApplicationRunner(
-      fidl::InterfaceRequest<app::ApplicationRunner> app_runner);
+      f1dl::InterfaceRequest<app::ApplicationRunner> app_runner);
   ~DartApplicationRunner() override;
 
  private:
@@ -23,9 +23,9 @@ class DartApplicationRunner : public app::ApplicationRunner {
   void StartApplication(
       app::ApplicationPackagePtr application,
       app::ApplicationStartupInfoPtr startup_info,
-      ::fidl::InterfaceRequest<app::ApplicationController> controller) override;
+      ::f1dl::InterfaceRequest<app::ApplicationController> controller) override;
 
-  fidl::Binding<app::ApplicationRunner> binding_;
+  f1dl::Binding<app::ApplicationRunner> binding_;
 #if !defined(AOT_RUNTIME)
   MappedResource vm_snapshot_data_;
 #endif

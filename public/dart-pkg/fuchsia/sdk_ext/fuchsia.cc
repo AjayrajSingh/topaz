@@ -104,8 +104,8 @@ void SetReturnCode(Dart_NativeArguments arguments) {
 }  // namespace
 
 void Initialize(
-    fidl::InterfaceHandle<app::ApplicationEnvironment> environment,
-    fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
+    f1dl::InterfaceHandle<app::ApplicationEnvironment> environment,
+    f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
   zircon::dart::Initialize();
 
   Dart_Handle library = Dart_LookupLibrary(ToDart("dart:fuchsia"));

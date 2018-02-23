@@ -32,7 +32,7 @@ class ViewController : public mozart::ViewListener,
 
   ViewController(app::ApplicationLauncher* launcher,
                  mozart::ViewManagerPtr view_manager,
-                 fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+                 f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
                  DisconnectCallback disconnect_handler);
   ~ViewController();
 
@@ -63,7 +63,7 @@ class ViewController : public mozart::ViewListener,
   void OnEvent(mozart::InputEventPtr event,
                const OnEventCallback& callback) override;
 
-  void OnSessionEvents(fidl::Array<scenic::EventPtr> events);
+  void OnSessionEvents(f1dl::Array<scenic::EventPtr> events);
   void UpdatePhysicalSize();
 
   void MarkNeedsLayout();
@@ -76,9 +76,9 @@ class ViewController : public mozart::ViewListener,
 
   app::ApplicationLauncher* launcher_;
   mozart::ViewManagerPtr view_manager_;
-  fidl::Binding<ViewListener> view_listener_binding_;
-  fidl::Binding<ViewContainerListener> view_container_listener_binding_;
-  fidl::Binding<InputListener> input_listener_binding_;
+  f1dl::Binding<ViewListener> view_listener_binding_;
+  f1dl::Binding<ViewContainerListener> view_container_listener_binding_;
+  f1dl::Binding<InputListener> input_listener_binding_;
 
   mozart::ViewPtr view_;
   mozart::ViewContainerPtr view_container_;

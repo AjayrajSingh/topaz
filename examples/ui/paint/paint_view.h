@@ -18,7 +18,7 @@ namespace examples {
 class PaintView : public mozart::SkiaView {
  public:
   PaintView(mozart::ViewManagerPtr view_manager,
-            fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request);
+            f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request);
   ~PaintView() override;
 
  private:

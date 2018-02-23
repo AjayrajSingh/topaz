@@ -22,7 +22,7 @@ namespace term {
 class TermView : public mozart::SkiaView, public TermModel::Delegate {
  public:
   TermView(mozart::ViewManagerPtr view_manager,
-           fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+           f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
            app::ApplicationContext* context,
            const TermParams& term_params);
   ~TermView() override;

@@ -14,7 +14,7 @@
 #include "third_party/skia/include/core/SkRect.h"
 
 // The TypeConverter template is defined in the fidl namespace.
-namespace fidl {
+namespace f1dl {
 
 template <>
 struct TypeConverter<SkIPoint, mozart::Point> {
@@ -91,6 +91,6 @@ struct TypeConverter<mozart::TransformPtr, SkMatrix44> {
   static mozart::TransformPtr Convert(const SkMatrix44& input);
 };
 
-}  // namespace fidl
+}  // namespace f1dl
 
 #endif  // LIB_UI_SKIA_TYPE_CONVERTERS_H_

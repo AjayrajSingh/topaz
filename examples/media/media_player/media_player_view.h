@@ -22,7 +22,7 @@ namespace examples {
 class MediaPlayerView : public mozart::BaseView {
  public:
   MediaPlayerView(mozart::ViewManagerPtr view_manager,
-                  fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+                  f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
                   app::ApplicationContext* application_context,
                   const MediaPlayerParams& params);
 

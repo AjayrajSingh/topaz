@@ -27,7 +27,7 @@ constexpr char kShell[] = "/boot/bin/sh";
 }  // namespace
 
 TermView::TermView(mozart::ViewManagerPtr view_manager,
-                   fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+                   f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
                    app::ApplicationContext* context,
                    const TermParams& term_params)
     : SkiaView(std::move(view_manager), std::move(view_owner_request), "Term"),

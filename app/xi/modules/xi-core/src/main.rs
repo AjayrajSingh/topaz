@@ -28,7 +28,7 @@ use self::zircon::{Channel, HandleBase, Socket, Status, cprng_draw};
 use self::zircon::{ZX_SOCKET_READABLE, ZX_SOCKET_PEER_CLOSED, ZX_TIME_INFINITE};
 use self::mxruntime::{HandleType, get_startup_handle};
 
-use fidl::Server;
+use f1dl::Server;
 
 use xi_rpc::RpcLoop;
 
@@ -101,8 +101,8 @@ fn editor_main(sock: Socket, ledger: Ledger_Proxy) {
 struct JsonServer;
 
 impl Json for JsonServer {
-    fn connect_socket(&mut self, sock: Socket, sync_ledger: fidl::InterfacePtr<Ledger_Client>) {
-        let fidl::InterfacePtr { version, inner } = sync_ledger;
+    fn connect_socket(&mut self, sock: Socket, sync_ledger: f1dl::InterfacePtr<Ledger_Client>) {
+        let f1dl::InterfacePtr { version, inner } = sync_ledger;
         assert_eq!(Ledger_Metadata::VERSION, version);
         let ledger = Ledger_new_Proxy(inner);
         let _ = thread::spawn(move || editor_main(sock, ledger));

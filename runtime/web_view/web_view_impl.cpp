@@ -7,7 +7,6 @@
 #include <fdio/io.h>
 #include <hid/hid.h>
 #include <hid/usages.h>
-#include <zircon/device/console.h>
 #include <zircon/device/display.h>
 #include <zircon/pixelformat.h>
 #include <zircon/syscalls.h>
@@ -67,8 +66,8 @@ void TouchTracker::HandleEvent(const mozart::PointerEventPtr& pointer,
 
 WebViewImpl::WebViewImpl(
     mozart::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-    fidl::InterfaceRequest<app::ServiceProvider> outgoing_services_request,
+    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services_request,
     const std::string& url)
     : BaseView(std::move(view_manager),
                std::move(view_owner_request),
@@ -84,7 +83,7 @@ WebViewImpl::WebViewImpl(
   if (outgoing_services_request) {
     // Expose |WebView| interface to caller
     outgoing_services_.AddService<web_view::WebView>(
-        [this](fidl::InterfaceRequest<web_view::WebView> request) {
+        [this](f1dl::InterfaceRequest<web_view::WebView> request) {
           FXL_LOG(INFO) << "web view service request";
           web_view_interface_bindings_.AddBinding(this, std::move(request));
         });
@@ -107,7 +106,7 @@ void WebViewImpl::set_context_writer(maxwell::ContextWriterPtr context_writer) {
 }
 
 // |WebView|:
-void WebViewImpl::SetUrl(const ::fidl::String& url) {
+void WebViewImpl::SetUrl(const ::f1dl::String& url) {
   url_ = url;
   // Reset url_set_ so that the next OnDraw() knows to call
   // web_view_.setURL()
@@ -121,7 +120,7 @@ void WebViewImpl::ClearCookies() {
 }
 
 void WebViewImpl::SetWebRequestDelegate(
-    ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) {
+    ::f1dl::InterfaceHandle<web_view::WebRequestDelegate> delegate) {
   webRequestDelegate_ = delegate.Bind();
 }
 

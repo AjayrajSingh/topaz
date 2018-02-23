@@ -23,8 +23,8 @@ class App : public mozart::ViewProvider {
 
   // |mozart::ViewProvider|
   void CreateView(
-      fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-      fidl::InterfaceRequest<app::ServiceProvider> view_services) override;
+      f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+      f1dl::InterfaceRequest<app::ServiceProvider> view_services) override;
 
   void DestroyController(ViewController* controller);
 
@@ -33,7 +33,7 @@ class App : public mozart::ViewProvider {
   App& operator=(const App&) = delete;
 
   std::unique_ptr<app::ApplicationContext> context_;
-  fidl::BindingSet<mozart::ViewProvider> bindings_;
+  f1dl::BindingSet<mozart::ViewProvider> bindings_;
   std::vector<std::unique_ptr<ViewController>> controllers_;
 };
 

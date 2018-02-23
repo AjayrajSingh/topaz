@@ -409,7 +409,7 @@ class OAuthTokenManagerApp : AccountProvider {
  private:
   // |AccountProvider|
   void Initialize(
-      fidl::InterfaceHandle<AccountProviderContext> provider) override;
+      f1dl::InterfaceHandle<AccountProviderContext> provider) override;
 
   // |AccountProvider|
   void Terminate() override;
@@ -425,8 +425,8 @@ class OAuthTokenManagerApp : AccountProvider {
 
   // |AccountProvider|
   void GetTokenProviderFactory(
-      const fidl::String& account_id,
-      fidl::InterfaceRequest<TokenProviderFactory> request) override;
+      const f1dl::String& account_id,
+      f1dl::InterfaceRequest<TokenProviderFactory> request) override;
 
   // Generate a random account id.
   std::string GenerateAccountId();
@@ -446,7 +446,7 @@ class OAuthTokenManagerApp : AccountProvider {
 
   AccountProviderContextPtr account_provider_context_;
 
-  fidl::Binding<AccountProvider> binding_;
+  f1dl::Binding<AccountProvider> binding_;
 
   class TokenProviderFactoryImpl;
   // account_id -> TokenProviderFactoryImpl
@@ -501,9 +501,9 @@ class OAuthTokenManagerApp : AccountProvider {
 class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
                                                        TokenProvider {
  public:
-  TokenProviderFactoryImpl(const fidl::String& account_id,
+  TokenProviderFactoryImpl(const f1dl::String& account_id,
                            OAuthTokenManagerApp* const app,
-                           fidl::InterfaceRequest<TokenProviderFactory> request)
+                           f1dl::InterfaceRequest<TokenProviderFactory> request)
       : account_id_(account_id), binding_(this, std::move(request)), app_(app) {
     binding_.set_error_handler(
         [this] { app_->token_provider_factory_impls_.erase(account_id_); });
@@ -512,8 +512,8 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
  private:
   // |TokenProviderFactory|
   void GetTokenProvider(
-      const fidl::String& /*application_url*/,
-      fidl::InterfaceRequest<TokenProvider> request) override {
+      const f1dl::String& /*application_url*/,
+      f1dl::InterfaceRequest<TokenProvider> request) override {
     // TODO(alhaad/ukode): Current implementation is agnostic about which
     // agent is requesting what token. Fix this.
     token_provider_bindings_.AddBinding(this, std::move(request));
@@ -533,7 +533,7 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
 
   // |TokenProvider|
   void GetFirebaseAuthToken(
-      const fidl::String& firebase_api_key,
+      const f1dl::String& firebase_api_key,
       const GetFirebaseAuthTokenCallback& callback) override {
     FXL_DCHECK(app_);
 
@@ -560,8 +560,8 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
   }
 
   std::string account_id_;
-  fidl::Binding<TokenProviderFactory> binding_;
-  fidl::BindingSet<TokenProvider> token_provider_bindings_;
+  f1dl::Binding<TokenProviderFactory> binding_;
+  f1dl::BindingSet<TokenProvider> token_provider_bindings_;
 
   OAuthTokenManagerApp* const app_;
 
@@ -761,7 +761,7 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
 };
 
 class OAuthTokenManagerApp::GoogleOAuthTokensCall
-    : Operation<fidl::String, modular::auth::AuthErrPtr> {
+    : Operation<f1dl::String, modular::auth::AuthErrPtr> {
  public:
   GoogleOAuthTokensCall(OperationContainer* const container,
                         std::string account_id,
@@ -934,7 +934,7 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
   network::NetworkServicePtr network_service_;
   network::URLLoaderPtr url_loader_;
 
-  fidl::String result_;
+  f1dl::String result_;
   modular::auth::AuthErrPtr auth_err_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleOAuthTokensCall);
@@ -999,7 +999,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
   }
 
   // |web_view::WebRequestDelegate|
-  void WillSendRequest(const fidl::String& incoming_url) override {
+  void WillSendRequest(const f1dl::String& incoming_url) override {
     const std::string& uri = incoming_url.get();
     const std::string prefix = std::string{kRedirectUri} + "?code=";
     const std::string cancel_prefix =
@@ -1175,7 +1175,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
   network::NetworkServicePtr network_service_;
   network::URLLoaderPtr url_loader_;
 
-  fidl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
+  f1dl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleUserCredsCall);
 };
@@ -1473,7 +1473,7 @@ OAuthTokenManagerApp::OAuthTokenManagerApp()
     : application_context_(app::ApplicationContext::CreateFromStartupInfo()),
       binding_(this) {
   application_context_->outgoing_services()->AddService<AccountProvider>(
-      [this](fidl::InterfaceRequest<AccountProvider> request) {
+      [this](f1dl::InterfaceRequest<AccountProvider> request) {
         binding_.Bind(std::move(request));
       });
   // Reserialize existing users.
@@ -1487,7 +1487,7 @@ OAuthTokenManagerApp::OAuthTokenManagerApp()
 }
 
 void OAuthTokenManagerApp::Initialize(
-    fidl::InterfaceHandle<AccountProviderContext> provider) {
+    f1dl::InterfaceHandle<AccountProviderContext> provider) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::Initialize()";
   account_provider_context_.Bind(std::move(provider));
 }
@@ -1525,7 +1525,7 @@ void OAuthTokenManagerApp::AddAccount(IdentityProvider identity_provider,
     case IdentityProvider::GOOGLE:
       new GoogleUserCredsCall(
           &operation_queue_, std::move(account), this,
-          [this, callback](AccountPtr account, const fidl::String error_msg) {
+          [this, callback](AccountPtr account, const f1dl::String error_msg) {
             if (error_msg) {
               callback(nullptr, error_msg);
               return;
@@ -1550,8 +1550,8 @@ void OAuthTokenManagerApp::RemoveAccount(
 }
 
 void OAuthTokenManagerApp::GetTokenProviderFactory(
-    const fidl::String& account_id,
-    fidl::InterfaceRequest<TokenProviderFactory> request) {
+    const f1dl::String& account_id,
+    f1dl::InterfaceRequest<TokenProviderFactory> request) {
   new TokenProviderFactoryImpl(account_id, this, std::move(request));
 }
 

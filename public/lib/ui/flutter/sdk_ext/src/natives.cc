@@ -110,7 +110,7 @@ void Mozart_offerServiceProvider(Dart_NativeArguments args) {
   if (Dart_IsError(result)) {
     return;
   }
-  fidl::Array<fidl::String> services;
+  f1dl::Array<f1dl::String> services;
   services.resize(list_length);
   for (intptr_t index = 0; index < list_length; ++index) {
     Dart_Handle value = Dart_ListGetAt(list, index);
@@ -131,8 +131,8 @@ void Mozart_offerServiceProvider(Dart_NativeArguments args) {
   }
 
   NativesDelegate* delegate = reinterpret_cast<NativesDelegate*>(context);
-  fidl::InterfaceHandle<app::ServiceProvider> provider =
-      fidl::InterfaceHandle<app::ServiceProvider>(
+  f1dl::InterfaceHandle<app::ServiceProvider> provider =
+      f1dl::InterfaceHandle<app::ServiceProvider>(
           zx::channel(handle->ReleaseHandle()));
 
   View* view = delegate->GetMozartView();

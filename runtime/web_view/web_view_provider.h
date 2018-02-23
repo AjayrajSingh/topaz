@@ -23,29 +23,29 @@ class WebViewProvider : mozart::ViewProvider,
  private:
   // |ViewProvider|
   void CreateView(
-      fidl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-      fidl::InterfaceRequest<app::ServiceProvider> view_services) override;
+      f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+      f1dl::InterfaceRequest<app::ServiceProvider> view_services) override;
 
   // modular::Module
   void Initialize(
-      fidl::InterfaceHandle<modular::ModuleContext> context,
-      fidl::InterfaceRequest<app::ServiceProvider> outgoing_services) final;
+      f1dl::InterfaceHandle<modular::ModuleContext> context,
+      f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services) final;
 
   // modular::Terminate
   void Terminate() final;
 
   // modular::LinkWatcher
-  void Notify(const fidl::String& json) final;
+  void Notify(const f1dl::String& json) final;
 
   std::string url_;
   std::unique_ptr<app::ApplicationContext> context_;
   std::unique_ptr<WebViewImpl> view_;
   // Link state, used to gather URL updates for the story
   modular::LinkPtr main_link_;
-  fidl::Binding<ViewProvider> view_provider_binding_;
-  fidl::Binding<modular::Module> module_binding_;
-  fidl::Binding<modular::Lifecycle> lifecycle_binding_;
-  fidl::Binding<modular::LinkWatcher> main_link_watcher_binding_;
+  f1dl::Binding<ViewProvider> view_provider_binding_;
+  f1dl::Binding<modular::Module> module_binding_;
+  f1dl::Binding<modular::Lifecycle> lifecycle_binding_;
+  f1dl::Binding<modular::LinkWatcher> main_link_watcher_binding_;
 
   maxwell::ContextWriterPtr context_writer_;
 };
