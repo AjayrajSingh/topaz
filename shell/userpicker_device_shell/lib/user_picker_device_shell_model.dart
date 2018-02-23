@@ -169,6 +169,13 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Login with given user
   void login(String accountId) {
+    if (_serviceProviderBinding.isBound) {
+      log.warning(
+        'Ignoring unsupported attempt to log in'
+            ' while already logged in!',
+      );
+      return;
+    }
     onLogin?.call();
     _userControllerProxy?.ctrl?.close();
     _userControllerProxy = new UserControllerProxy();
