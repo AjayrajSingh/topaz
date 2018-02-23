@@ -7,6 +7,10 @@ import("//build/dart/dart_library.gni")
 dart_library("lib.logging") {
   package_name = "lib.logging"
 
+  sources = [
+    "logging.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/pub/logging",
     "//third_party/dart-pkg/pub/stack_trace",

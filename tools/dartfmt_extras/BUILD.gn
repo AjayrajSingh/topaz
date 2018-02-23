@@ -18,6 +18,12 @@ dart_tool("dartfmt_extras") {
 }
 
 dart_test("test") {
+  sources = [
+    "directives_test.dart",
+    "double_quotes_test.dart",
+    "util.dart",
+  ]
+
   deps = [
     ":dartfmt_extras_dart_library",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
