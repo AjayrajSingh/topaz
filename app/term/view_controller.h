@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef TOPAZ_APP_TERM_TERM_VIEW_H_
-#define TOPAZ_APP_TERM_TERM_VIEW_H_
+#ifndef TOPAZ_APP_TERM_VIEW_CONTROLLER_H_
+#define TOPAZ_APP_TERM_VIEW_CONTROLLER_H_
 
 #include <async/cpp/auto_task.h>
 
@@ -19,16 +19,19 @@
 
 namespace term {
 
-class TermView : public mozart::SkiaView, public TermModel::Delegate {
+class ViewController : public mozart::SkiaView, public TermModel::Delegate {
  public:
-  TermView(mozart::ViewManagerPtr view_manager,
-           f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-           app::ApplicationContext* context,
-           const TermParams& term_params);
-  ~TermView() override;
+  using DisconnectCallback = std::function<void(ViewController*)>;
 
-  TermView(const TermView&) = delete;
-  TermView& operator=(const TermView&) = delete;
+  ViewController(mozart::ViewManagerPtr view_manager,
+                 f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+                 app::ApplicationContext* context,
+                 const TermParams& term_params,
+                 DisconnectCallback disconnect_handler);
+  ~ViewController() override;
+
+  ViewController(const ViewController&) = delete;
+  ViewController& operator=(const ViewController&) = delete;
 
  private:
   // |BaseView|:
@@ -55,9 +58,8 @@ class TermView : public mozart::SkiaView, public TermModel::Delegate {
   void Resize();
   void OnCommandTerminated();
 
-  // TODO(vtl): Consider the structure of this app. Do we really want the "view"
-  // owning the model?
-  // The terminal model.
+  DisconnectCallback disconnect_;
+
   TermModel model_;
   // State changes to the model since last draw.
   TermModel::StateChanges model_state_changes_;
@@ -86,4 +88,4 @@ class TermView : public mozart::SkiaView, public TermModel::Delegate {
 
 }  // namespace term
 
-#endif  // TOPAZ_APP_TERM_TERM_VIEW_H_
+#endif  // TOPAZ_APP_TERM_VIEW_CONTROLLER_H_

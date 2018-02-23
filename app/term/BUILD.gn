@@ -8,6 +8,8 @@ executable("bin") {
   output_name = "term"
 
   sources = [
+    "app.cc",
+    "app.h",
     "key_util.cc",
     "key_util.h",
     "main.cc",
@@ -17,8 +19,8 @@ executable("bin") {
     "term_model.h",
     "term_params.cc",
     "term_params.h",
-    "term_view.cc",
-    "term_view.h",
+    "view_controller.cc",
+    "view_controller.h",
   ]
 
   deps = [

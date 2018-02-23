@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/app/term/term_view.h"
+#include "topaz/app/term/view_controller.h"
 
 #include <async/default.h>
 #include <async/loop.h>
@@ -26,11 +26,14 @@ constexpr char kShell[] = "/boot/bin/sh";
 
 }  // namespace
 
-TermView::TermView(mozart::ViewManagerPtr view_manager,
-                   f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-                   app::ApplicationContext* context,
-                   const TermParams& term_params)
+ViewController::ViewController(
+    mozart::ViewManagerPtr view_manager,
+    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    app::ApplicationContext* context,
+    const TermParams& term_params,
+    DisconnectCallback disconnect_handler)
     : SkiaView(std::move(view_manager), std::move(view_owner_request), "Term"),
+      disconnect_(std::move(disconnect_handler)),
       model_(TermModel::Size(24, 80), this),
       context_(context),
       font_loader_(
@@ -38,6 +41,8 @@ TermView::TermView(mozart::ViewManagerPtr view_manager,
       blink_task_(async_get_default()),
       params_(term_params) {
   FXL_DCHECK(context_);
+
+  SetReleaseHandler([this] { disconnect_(this); });
 
   auto font_request = fonts::FontRequest::New();
   font_request->family = "RobotoMono";
@@ -50,9 +55,9 @@ TermView::TermView(mozart::ViewManagerPtr view_manager,
       });
 }
 
-TermView::~TermView() {}
+ViewController::~ViewController() {}
 
-void TermView::ComputeMetrics() {
+void ViewController::ComputeMetrics() {
   if (!regular_typeface_)
     return;
 
@@ -72,7 +77,7 @@ void TermView::ComputeMetrics() {
   FXL_DCHECK(advance_width_ > 0);
 }
 
-void TermView::StartCommand() {
+void ViewController::StartCommand() {
   std::vector<std::string> argv = params_.command;
   if (argv.empty())
     argv = {kShell};
@@ -85,14 +90,14 @@ void TermView::StartCommand() {
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Error starting command: " << status << " ("
                    << zx_status_get_string(status) << ")";
-    exit(1);
+    disconnect_(this);
   }
 
   Blink();
   InvalidateScene();
 }
 
-void TermView::Blink() {
+void ViewController::Blink() {
   if (focused_) {
     zx::duration delta = zx::clock::get(ZX_CLOCK_MONOTONIC) - last_key_;
     if (delta > kBlinkInterval) {
@@ -112,7 +117,7 @@ void TermView::Blink() {
   }
 }
 
-void TermView::OnSceneInvalidated(
+void ViewController::OnSceneInvalidated(
     ui_mozart::PresentationInfoPtr presentation_info) {
   if (!regular_typeface_)
     return;
@@ -124,12 +129,13 @@ void TermView::OnSceneInvalidated(
   }
 }
 
-void TermView::OnPropertiesChanged(mozart::ViewPropertiesPtr old_properties) {
+void ViewController::OnPropertiesChanged(
+    mozart::ViewPropertiesPtr old_properties) {
   ComputeMetrics();
   Resize();
 }
 
-void TermView::Resize() {
+void ViewController::Resize() {
   if (!has_logical_size() || !regular_typeface_)
     return;
 
@@ -143,7 +149,7 @@ void TermView::Resize() {
   InvalidateScene();
 }
 
-void TermView::DrawContent(SkCanvas* canvas) {
+void ViewController::DrawContent(SkCanvas* canvas) {
   canvas->clear(SK_ColorBLACK);
 
   SkPaint bg_paint;
@@ -210,7 +216,7 @@ void TermView::DrawContent(SkCanvas* canvas) {
   }
 }
 
-void TermView::ScheduleDraw(bool force) {
+void ViewController::ScheduleDraw(bool force) {
   if (!properties() ||
       (!model_state_changes_.IsDirty() && !force && !force_next_draw_)) {
     force_next_draw_ |= force;
@@ -221,15 +227,15 @@ void TermView::ScheduleDraw(bool force) {
   InvalidateScene();
 }
 
-void TermView::OnResponse(const void* buf, size_t size) {
+void ViewController::OnResponse(const void* buf, size_t size) {
   SendData(buf, size);
 }
 
-void TermView::OnSetKeypadMode(bool application_mode) {
+void ViewController::OnSetKeypadMode(bool application_mode) {
   keypad_application_mode_ = application_mode;
 }
 
-bool TermView::OnInputEvent(mozart::InputEventPtr event) {
+bool ViewController::OnInputEvent(mozart::InputEventPtr event) {
   bool handled = false;
   if (event->is_keyboard()) {
     const mozart::KeyboardEventPtr& keyboard = event->get_keyboard();
@@ -263,7 +269,7 @@ bool TermView::OnInputEvent(mozart::InputEventPtr event) {
   return handled;
 }
 
-void TermView::OnKeyPressed(mozart::InputEventPtr key_event) {
+void ViewController::OnKeyPressed(mozart::InputEventPtr key_event) {
   last_key_ = zx::clock::get(ZX_CLOCK_MONOTONIC);
   blink_on_ = true;
 
@@ -275,18 +281,17 @@ void TermView::OnKeyPressed(mozart::InputEventPtr key_event) {
   SendData(input_sequence.data(), input_sequence.size());
 }
 
-void TermView::SendData(const void* bytes, size_t num_bytes) {
+void ViewController::SendData(const void* bytes, size_t num_bytes) {
   pty_.Write(bytes, num_bytes);
 }
 
-void TermView::OnDataReceived(const void* bytes, size_t num_bytes) {
+void ViewController::OnDataReceived(const void* bytes, size_t num_bytes) {
   model_.ProcessInput(bytes, num_bytes, &model_state_changes_);
   ScheduleDraw(false);
 }
 
-void TermView::OnCommandTerminated() {
-  FXL_LOG(INFO) << "PTY terminated.";
-  async_loop_quit(async_get_default());
+void ViewController::OnCommandTerminated() {
+  disconnect_(this);
 }
 
 }  // namespace term
