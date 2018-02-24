@@ -19,18 +19,20 @@ namespace {
 
 constexpr char kViewLabel[] = "echidna_user_shell";
 
-scenic::SceneManagerPtr GetSceneManager(mozart::ViewManager* view_manager) {
-  scenic::SceneManagerPtr scene_manager;
-  view_manager->GetSceneManager(scene_manager.NewRequest());
-  return scene_manager;
+ui_mozart::MozartPtr GetMozart(mozart::ViewManager* view_manager) {
+  ui_mozart::MozartPtr mozart;
+  view_manager->GetMozart(mozart.NewRequest());
+  return mozart;
 }
 
-scenic::Metrics* GetLastMetrics(uint32_t node_id,
-                                const f1dl::Array<scenic::EventPtr>& events) {
+scenic::Metrics* GetLastMetrics(
+    uint32_t node_id,
+    const f1dl::Array<ui_mozart::EventPtr>& events) {
   scenic::Metrics* result = nullptr;
   for (const auto& event : events) {
-    if (event->is_metrics() && event->get_metrics()->node_id == node_id)
-      result = event->get_metrics()->metrics.get();
+    if (event->is_scenic() && event->get_scenic()->is_metrics() &&
+        event->get_scenic()->get_metrics()->node_id == node_id)
+      result = event->get_scenic()->get_metrics()->metrics.get();
   }
   return result;
 }
@@ -57,7 +59,7 @@ ViewController::ViewController(
       view_listener_binding_(this),
       view_container_listener_binding_(this),
       input_listener_binding_(this),
-      session_(GetSceneManager(view_manager_.get()).get()),
+      session_(GetMozart(view_manager_.get()).get()),
       parent_node_(&session_),
       container_node_(&session_),
       begin_frame_task_(async_get_default(), 0u) {
@@ -82,7 +84,7 @@ ViewController::ViewController(
                         input_connection_.NewRequest());
   input_connection_->SetEventListener(input_listener_binding_.NewBinding());
 
-  session_.set_event_handler([this](f1dl::Array<scenic::EventPtr> events) {
+  session_.set_event_handler([this](f1dl::Array<ui_mozart::EventPtr> events) {
     OnSessionEvents(std::move(events));
   });
   parent_node_.SetEventMask(scenic::kMetricsEventMask);
@@ -155,7 +157,7 @@ void ViewController::OnEvent(mozart::InputEventPtr event,
   callback(false);
 }
 
-void ViewController::OnSessionEvents(f1dl::Array<scenic::EventPtr> events) {
+void ViewController::OnSessionEvents(f1dl::Array<ui_mozart::EventPtr> events) {
   scenic::Metrics* new_metrics = GetLastMetrics(parent_node_.id(), events);
 
   if (!new_metrics || metrics_.Equals(*new_metrics))
