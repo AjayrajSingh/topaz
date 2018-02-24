@@ -350,7 +350,7 @@ template("dart_aot_app") {
 
   dylib_path =
       get_label_info(":$dylib_target_name($shlib_toolchain)", "root_out_dir") +
-      "/lib.unstripped/lib$target_name.so"
+      "/lib$target_name.so"
 
   package(target_name) {
     forward_variables_from(invoker, [ "testonly" ])
@@ -482,7 +482,7 @@ template("dart2_aot_app") {
 
   dylib_path =
       get_label_info(":$dylib_target_name($shlib_toolchain)", "root_out_dir") +
-      "/lib.unstripped/lib$target_name.so"
+      "/lib$target_name.so"
 
   package(target_name) {
     forward_variables_from(invoker, [ "testonly" ])
