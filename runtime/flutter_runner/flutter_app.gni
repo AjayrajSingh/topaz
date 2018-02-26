@@ -33,6 +33,7 @@ flutter_asset_tools_out_dir = get_label_info(flutter_asset_tools_label, "root_ou
 flutter_asset_tools_bin = "$flutter_asset_tools_out_dir/dart-tools/fuchsia_asset_builder"
 
 template("flutter_source_app") {
+  assert(defined(invoker.main_dart), "Must define main_dart")
   assert(defined(invoker.package_name), "Must define package_name")
   not_needed(invoker, [ "flx" ])
 
@@ -47,6 +48,18 @@ template("flutter_source_app") {
                            ])
     # dart:mozart.internal imports package:zircon.
     deps += [ "//topaz/public/dart/zircon" ]
+
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+    source_base = "lib"
+    if (defined(invoker.source_dir)) {
+      source_base = invoker.source_dir
+    }
+    sources += [
+      rebase_path(invoker.main_dart, source_base),
+    ]
   }
 
   dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
@@ -176,6 +189,18 @@ template("flutter_jit_app") {
     }
     # dart:mozart.internal imports package:zircon.
     deps += [ "//topaz/public/dart/zircon" ]
+
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+    source_base = "lib"
+    if (defined(invoker.source_dir)) {
+      source_base = invoker.source_dir
+    }
+    sources += [
+      rebase_path(invoker.main_dart, source_base),
+    ]
   }
 
   flutter_core_snapshot_label = "//third_party/flutter/lib/snapshot:generate_snapshot_bin"
@@ -356,6 +381,18 @@ template("flutter_aot_app") {
     }
     # dart:mozart.internal imports package:zircon.
     deps += [ "//topaz/public/dart/zircon" ]
+
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+    source_base = "lib"
+    if (defined(invoker.source_dir)) {
+      source_base = invoker.source_dir
+    }
+    sources += [
+      rebase_path(invoker.main_dart, source_base),
+    ]
   }
 
   dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
@@ -574,6 +611,7 @@ template("flutter_app") {
                                "sandbox",
                                "source_dir",
                                "resources",
+                               "sources",
                              ])
     }
   } else {
@@ -590,6 +628,7 @@ template("flutter_app") {
                                "sandbox",
                                "source_dir",
                                "resources",
+                               "sources",
                              ])
     }
   }

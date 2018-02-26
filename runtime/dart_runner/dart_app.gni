@@ -93,7 +93,6 @@ template("dart_jit_app") {
                            [
                              "deps",
                              "disable_analysis",
-                             "extra_analyzer_sources",
                              "non_dart_deps",
                              "source_dir",
                            ])
@@ -103,6 +102,18 @@ template("dart_jit_app") {
     } else {
       infer_package_name = true
     }
+
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+    source_base = "lib"
+    if (defined(invoker.source_dir)) {
+      source_base = invoker.source_dir
+    }
+    sources += [
+      rebase_path(invoker.main_dart, source_base),
+    ]
   }
 
   snapshot_path = "$target_gen_dir/${target_name}_snapshot.bin"
@@ -200,7 +211,6 @@ template("dart2_jit_app") {
                            [
                              "deps",
                              "disable_analysis",
-                             "extra_analyzer_sources",
                              "non_dart_deps",
                              "source_dir",
                            ])
@@ -210,6 +220,18 @@ template("dart2_jit_app") {
     } else {
       infer_package_name = true
     }
+
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+    source_base = "lib"
+    if (defined(invoker.source_dir)) {
+      source_base = invoker.source_dir
+    }
+    sources += [
+      rebase_path(invoker.main_dart, source_base),
+    ]
   }
 
   kernel_target_name = target_name + "_kernel"
@@ -270,7 +292,6 @@ template("dart_aot_app") {
                            [
                              "deps",
                              "disable_analysis",
-                             "extra_analyzer_sources",
                              "non_dart_deps",
                              "source_dir",
                            ])
@@ -280,6 +301,18 @@ template("dart_aot_app") {
     } else {
       infer_package_name = true
     }
+
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+    source_base = "lib"
+    if (defined(invoker.source_dir)) {
+      source_base = invoker.source_dir
+    }
+    sources += [
+      rebase_path(invoker.main_dart, source_base),
+    ]
   }
 
   assembly_target_name = target_name + "_assembly"
@@ -401,7 +434,6 @@ template("dart2_aot_app") {
                            [
                              "deps",
                              "disable_analysis",
-                             "extra_analyzer_sources",
                              "non_dart_deps",
                              "source_dir",
                            ])
@@ -411,6 +443,18 @@ template("dart2_aot_app") {
     } else {
       infer_package_name = true
     }
+
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+    source_base = "lib"
+    if (defined(invoker.source_dir)) {
+      source_base = invoker.source_dir
+    }
+    sources += [
+      rebase_path(invoker.main_dart, source_base),
+    ]
   }
 
   kernel_target_name = target_name + "_kernel"
