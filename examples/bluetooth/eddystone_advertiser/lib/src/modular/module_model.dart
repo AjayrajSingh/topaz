@@ -41,9 +41,10 @@ class EddystoneModuleModel extends ModuleModel {
     log.info('Advertising url: $url');
     ble.AdvertisingData data = new ble.AdvertisingData(
       serviceUuids: const <String>[kEddystoneUuid],
-      serviceData: <String, List<int>>{
-        kEddystoneUuid: _eddystoneDataForUrl(url)
-      },
+      serviceData: <ble.ServiceDataEntry>[
+        new ble.ServiceDataEntry(
+          uuid: kEddystoneUuid,
+          data: _eddystoneDataForUrl(url))],
     );
     _peripheral.startAdvertising(data, null, null, 1000, false,
         (bt.Status status, String advertisementId) {

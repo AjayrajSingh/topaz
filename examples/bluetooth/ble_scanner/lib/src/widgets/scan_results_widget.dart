@@ -122,26 +122,26 @@ class ScanResultsState extends State<ScanResultsWidget> {
                   .toList())));
     }
 
-    device.advertisingData.serviceData
-        ?.forEach((final String uuid, final List<int> data) {
-      String title = 'Service Data ($uuid)';
+    for (final ble.ServiceDataEntry entry in device.advertisingData.serviceData)
+    {
+      String title = 'Service Data ($entry.uuid)';
       currentMaxTitleLength = max(currentMaxTitleLength, title.length);
       entries.add(new _AdvertisingDataEntry(
           title,
           (BuildContext context) =>
-              new Text(_toHexString(data), style: textStyle)));
-    });
+              new Text(_toHexString(entry.data), style: textStyle)));
+    }
 
-    device.advertisingData.manufacturerSpecificData
-        ?.forEach((final int manufacturerId, final List<int> data) {
+    for (final ble.ManufacturerSpecificDataEntry entry in
+        device.advertisingData.manufacturerSpecificData) {
       String title =
-          'Manufacturer Data (${getManufacturerName(manufacturerId)})';
+          'Manufacturer Data (${getManufacturerName(entry.companyId)})';
       currentMaxTitleLength = max(currentMaxTitleLength, title.length);
       entries.add(new _AdvertisingDataEntry(
           title,
           (BuildContext context) =>
-              new Text(_toHexString(data), style: textStyle)));
-    });
+              new Text(_toHexString(entry.data), style: textStyle)));
+    }
 
     for (String uri in device.advertisingData.uris ?? const <String>[]) {
       const String title = 'URI';

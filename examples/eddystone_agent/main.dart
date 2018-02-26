@@ -138,24 +138,25 @@ class EddystoneScanner implements ble.CentralDelegate {
   @override
   void onDeviceDiscovered(ble.RemoteDevice device) {
     ble.AdvertisingData ad = device.advertisingData;
-    ad.serviceData?.forEach((final String uuid, final List<int> data) {
-      if (uuid != kEddystoneUuid) {
-        log.info('Not Eddystone: $uuid');
+    for (final ble.ServiceDataEntry entry in ad.serviceData) {
+      if (entry.uuid != kEddystoneUuid) {
+        log.info('Not Eddystone: $entry.uuid');
         return;
       }
-      if (data.length < 4) {
+      if (entry.data.length < 4) {
         log.warning('invalid Eddystone format, dropping');
         return;
       }
-      if (data[0] == 0x10) {
+      if (entry.data[0] == 0x10) {
         // Eddystone-URL
-        String url = decodeEddystoneURL(data.getRange(2, data.length));
+        String url = decodeEddystoneURL(
+            entry.data.getRange(2, entry.data.length));
         if (url != null && !proposed.contains(url)) {
           proposed.add(url);
           proposeUrl(url);
         }
       }
-    });
+    }
   }
 
   // We never connect to any peripherals so this implementation does nothing.
