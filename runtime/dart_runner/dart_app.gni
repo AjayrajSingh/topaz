@@ -482,6 +482,9 @@ template("dart2_aot_app") {
       _gen_snapshot_label,
     ]
     inputs = _entry_manifests + [ kernel_path ]
+    if (defined(invoker.extra_entry_manifests)) {
+      inputs += invoker.extra_entry_manifests
+    }
     outputs = [
       assembly_path,
     ]
@@ -497,6 +500,12 @@ template("dart2_aot_app") {
     foreach(entry_manifest, _entry_manifests) {
       args +=
           [ "--embedder_entry_points_manifest=" + rebase_path(entry_manifest) ]
+    }
+    if (defined(invoker.extra_entry_manifests)) {
+      foreach(entry_manifest, invoker.extra_entry_manifests) {
+        args +=
+            [ "--embedder_entry_points_manifest=" + rebase_path(entry_manifest) ]
+      }
     }
     if (is_debug) {
       args += [ "--enable_asserts" ]
@@ -588,6 +597,9 @@ template("dart2_aot_app") {
 #
 #   resources (optional)
 #     Resources for the package (see //build/package.gni)
+#
+#   extra_entry_manifests (optional)
+#     List of AOT entry point manifest files. Most apps do not need this.
 template("dart_app") {
   target(dart_default_app, target_name) {
     forward_variables_from(invoker, "*")

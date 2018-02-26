@@ -120,6 +120,12 @@ package("dart2_aot_runner") {
   deps = [
     ":dart2_aot_runner_bin",
   ]
+  if (is_debug) {
+    deps += [
+      "vmservice",
+      "//third_party/dart/runtime/observatory:embedded_observatory_archive",
+    ]
+  }
 
   binary = "dart2_aot_runner"
 
@@ -136,6 +142,21 @@ package("dart2_aot_runner") {
       dest = "dart2"
     },
   ]
+  if (is_debug) {
+    resources += [
+      {
+        path = rebase_path(
+                get_label_info("vmservice:vmservice_dylib($shlib_toolchain)",
+                               "root_out_dir") + "/libvmservice.so")
+        dest = "libvmservice.so"
+      },
+      {
+        path = rebase_path(
+                "$root_gen_dir/observatory/embedded_archive_observatory.tar")
+        dest = "observatory.tar"
+      },
+    ]
+  }
 }
 
 package("dart_jit_runner") {

@@ -4,6 +4,10 @@
 
 #include "topaz/runtime/dart_runner/service_isolate.h"
 
+#include <dlfcn.h>
+#include <zircon/dlfcn.h>
+
+#include "lib/fsl/vmo/file.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_library_natives.h"
 #include "lib/tonic/dart_microtask_queue.h"
@@ -16,7 +20,7 @@
 namespace dart_content_handler {
 namespace {
 
-MappedResource isolate_snapshot_data;
+MappedResource mapped_isolate_snapshot_data;
 tonic::DartLibraryNatives* service_natives = nullptr;
 
 Dart_NativeFunction GetNativeFunction(Dart_Handle name,
@@ -60,7 +64,8 @@ void EmbedderInformationCallback(Dart_EmbedderInformation* info) {
   zx_status_t status = zx_object_get_info(
       process, ZX_INFO_TASK_STATS, &task_stats, sizeof(task_stats), NULL, NULL);
   if (status == ZX_OK) {
-    info->current_rss = task_stats.mem_private_bytes + task_stats.mem_shared_bytes;
+    info->current_rss =
+        task_stats.mem_private_bytes + task_stats.mem_shared_bytes;
   }
 }
 
@@ -71,19 +76,51 @@ Dart_Isolate CreateServiceIsolate(const char* uri,
                                   char** error) {
   Dart_SetEmbedderInformationCallback(EmbedderInformationCallback);
 
-  // TODO(rmacnak): For AOT, we'll need to compile the service library like
-  // another app.
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/snapshot_isolate.bin", isolate_snapshot_data)) {
-    *error = strdup("Failed to load core snapshot for service isolate");
+  void* isolate_snapshot_data = nullptr;
+  void* isolate_snapshot_instructions = nullptr;
+#if defined(AOT_RUNTIME)
+  fsl::SizedVmo dylib;
+  if (!fsl::VmoFromFilename("pkg/data/libvmservice.so", &dylib)) {
+    FXL_LOG(ERROR) << "Failed to read "
+                   << "pkg/data/libvmservice.so";
     return nullptr;
   }
 
+  dlerror();
+  void* shared_library = dlopen_vmo(dylib.vmo().get(), RTLD_LAZY);
+  if (shared_library == nullptr) {
+    FXL_LOG(ERROR) << "dlopen failed: " << dlerror();
+    return nullptr;
+  }
+
+  isolate_snapshot_data = dlsym(shared_library, "_kDartIsolateSnapshotData");
+  if (isolate_snapshot_data == nullptr) {
+    FXL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotData) failed: " << dlerror();
+    return nullptr;
+  }
+
+  isolate_snapshot_instructions =
+      dlsym(shared_library, "_kDartIsolateSnapshotInstructions");
+  if (isolate_snapshot_instructions == nullptr) {
+    FXL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotInstructions) failed: "
+                   << dlerror();
+    return nullptr;
+  }
+#else
+  if (!MappedResource::LoadFromNamespace(nullptr,
+                                         "pkg/data/snapshot_isolate.bin",
+                                         mapped_isolate_snapshot_data)) {
+    *error = strdup("Failed to load core snapshot for service isolate");
+    return nullptr;
+  }
+  isolate_snapshot_data = mapped_isolate_snapshot_data.address();
+#endif
+
   auto state = new tonic::DartState();
   Dart_Isolate isolate = Dart_CreateIsolate(
-      uri, "main",
-      reinterpret_cast<const uint8_t*>(isolate_snapshot_data.address()),
-      nullptr, nullptr, state, error);
+      uri, "main", reinterpret_cast<const uint8_t*>(isolate_snapshot_data),
+      reinterpret_cast<const uint8_t*>(isolate_snapshot_instructions), nullptr,
+      state, error);
   if (!isolate) {
     FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << *error;
     return nullptr;

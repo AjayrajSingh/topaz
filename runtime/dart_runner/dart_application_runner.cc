@@ -64,10 +64,7 @@ Dart_Isolate IsolateCreateCallback(const char* uri,
                                    void* callback_data,
                                    char** error) {
   if (std::string(uri) == DART_VM_SERVICE_ISOLATE_NAME) {
-#if defined(AOT_RUNTIME)
-    *error = strdup("The service isolate is not implemented in AOT mode");
-    return NULL;
-#elif defined(NDEBUG)
+#if defined(NDEBUG)
     *error = strdup("The service isolate is not implemented in release mode");
     return NULL;
 #else
@@ -160,7 +157,7 @@ DartApplicationRunner::DartApplicationRunner(
   params.create = IsolateCreateCallback;
   params.shutdown = IsolateShutdownCallback;
   params.cleanup = IsolateCleanupCallback;
-#if !defined(NDEBUG) && !defined(AOT_RUNTIME)
+#if !defined(NDEBUG)
   params.get_service_assets = GetVMServiceAssetsArchiveCallback;
 #endif
   char* error = Dart_Initialize(&params);
