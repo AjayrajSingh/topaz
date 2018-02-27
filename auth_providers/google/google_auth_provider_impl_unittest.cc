@@ -4,10 +4,10 @@
 
 #include "topaz/auth_providers/google/google_auth_provider_impl.h"
 
+#include "garnet/lib/gtest/test_with_message_loop.h"
 #include "garnet/lib/network_wrapper/fake_network_wrapper.h"
 #include "lib/fidl/cpp/bindings/binding.h"
 #include "lib/fxl/macros.h"
-#include "peridot/lib/gtest/test_with_message_loop.h"
 
 namespace google_auth_provider {
 
@@ -16,7 +16,8 @@ class GoogleAuthProviderImplTest : public gtest::TestWithMessageLoop {
   GoogleAuthProviderImplTest()
       : network_wrapper_(message_loop_.task_runner()),
         app_context_(app::ApplicationContext::CreateFromStartupInfo().get()),
-        google_auth_provider_impl_(message_loop_.task_runner(), app_context_,
+        google_auth_provider_impl_(message_loop_.task_runner(),
+                                   app_context_,
                                    &network_wrapper_,
                                    auth_provider_.NewRequest()) {}
 
