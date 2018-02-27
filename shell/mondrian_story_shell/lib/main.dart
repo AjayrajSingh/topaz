@@ -10,6 +10,7 @@ import 'package:fuchsia/fuchsia.dart' show exit;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.story.fidl/story_shell.fidl.dart';
+import 'package:lib.surface.fidl/container.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
@@ -62,7 +63,7 @@ class StoryShellImpl implements StoryShell, Lifecycle {
   /// @params view The [ViewOwner]
   /// @params viewId The ID of the view being added
   /// @params parentId The ID of the parent view
-  /// @params viewType The relationship between this view and its parent
+  /// @params surfaceRelation The relationship between this view and its parent
   @override
   void connectView(InterfaceHandle<ViewOwner> view, String viewId,
       String parentId, SurfaceRelation surfaceRelation) {
@@ -90,6 +91,21 @@ class StoryShellImpl implements StoryShell, Lifecycle {
     // TODO(alangardner, djmurphy): Make Mondrian not crash if the process
     // associated with viewId is closed after callback returns.
     callback();
+  }
+
+  /// Add a container node to the graph, with associated layout as a property,
+  /// and optionally specify a parent and a relationship to the parent
+  @override
+  void addContainer(
+      String containerName,
+      String parentId,
+      SurfaceRelation relation,
+      List<ContainerLayout> layout,
+      List<ContainerRelationEntry> relationships,
+      List<ContainerView> views) {
+    SurfaceProperties props =
+        new SurfaceProperties(containerLayouts: layout[0].surfaces);
+    _surfaceGraph.addSurface(containerName, props, parentId, relation);
   }
 
   /// Terminate the StoryShell.

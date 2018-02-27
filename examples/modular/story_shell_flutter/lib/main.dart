@@ -5,6 +5,7 @@
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.story.fidl/story_shell.fidl.dart';
+import 'package:lib.surface.fidl/container.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
@@ -101,6 +102,18 @@ class StoryShellImpl implements StoryShell, Lifecycle {
   @override
   void defocusView(String viewId, void callback()) {
     callback();
+  }
+
+  /// StoryShell
+  @override
+  void addContainer(
+      String containerName,
+      String parentId,
+      SurfaceRelation relation,
+      List<ContainerLayout> layout,
+      List<ContainerRelationEntry> relationships,
+      List<ContainerView> views) {
+    // Nothing
   }
 
   /// StoryShell
