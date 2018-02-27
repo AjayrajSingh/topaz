@@ -11,6 +11,7 @@ import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
+import '../../video_progress.dart';
 import '../widgets.dart';
 
 const Duration _kOverlayAutoHideDuration = const Duration(seconds: 3);

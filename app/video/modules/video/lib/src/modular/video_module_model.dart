@@ -6,19 +6,20 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert' show JSON;
 
+import 'package:entity_schemas/entities.dart' as entities;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.entity.fidl/entity.fidl.dart';
+import 'package:lib.entity.fidl/entity_resolver.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.netconnector.fidl/netconnector.fidl.dart';
+import 'package:lib.story.dart/story.dart';
 import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
-import 'package:lib.story.dart/story.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:lib.entity.fidl/entity.fidl.dart';
-import 'package:lib.entity.fidl/entity_resolver.fidl.dart';
-import 'package:entity_schemas/entities.dart' as entities;
 
+import '../../video_progress.dart';
 import '../widgets.dart';
 
 const String _kRemoteDisplayMode = 'remoteDisplayMode';
@@ -55,6 +56,9 @@ class VideoModuleModel extends ModuleModel {
   /// [Link] object for storing the remote displayMode and casting device name
   final LinkProxy _remoteDeviceLink = new LinkProxy();
   final LinkWatcherBinding _remoteDeviceLinkWatcherBinding =
+      new LinkWatcherBinding();
+  final LinkProxy _progressLink = new LinkProxy();
+  final LinkWatcherBinding _videoProgressLinkWatcherBinding =
       new LinkWatcherBinding();
 
   /// Last version we received from NetConnector
@@ -106,10 +110,24 @@ class VideoModuleModel extends ModuleModel {
       ),
     );
 
+    // named Link to send progress updates
+    moduleContext.getLink('video_progress', _progressLink.ctrl.request());
+    _progressLink.watchAll(
+      _videoProgressLinkWatcherBinding.wrap(
+        new LinkWatcherImpl(
+          onNotify: _handlProgressJson,
+        ),
+      ),
+    );
+
     notifyListeners();
 
     link.set(const <String>['preferredHeight'], JSON.encode(300.0));
     moduleContext.ready();
+  }
+
+  void _handlProgressJson(String json) {
+    print('LBL can see local json: $json');
   }
 
   /// Gets asset
@@ -304,15 +322,26 @@ class VideoModuleModel extends ModuleModel {
   /// onReady(), which points to the root link.
   @override
   void onNotify(String json) {
-    Map<String, String> linkContents = JSON.decode(json);
-    if (linkContents == null) {
+    if (json == null || json.isEmpty || json == 'null') {
       return;
     }
-    log.fine('Updating video asset according to Daisy Link data');
+    Object doc;
+    try {
+      doc = JSON.decode(json);
+    } on Exception catch(err, trace) {
+      log.warning('Exception interpreting json: $json', err, trace);
+      return;
+    }
+    if (doc == null || !(doc is Map)) {
+      return;
+    }
+    Map<String, String> linkContents = doc;
     if (linkContents['entityRef'] != null) {
+      log.fine('Updating video based on entityRef: $json');
       String entityRef = linkContents['entityRef'];
       _createAssetFromEntityRef(entityRef);
     } else if (linkContents['asset'] != null) {
+      log.fine('Updating video based on asset: $json');
       // TODO(maryxia) SO-1069: remove else-if once we have on-the-fly entities
       asset = new Asset.movie(
         uri: Uri.parse(linkContents['asset']),
@@ -327,13 +356,10 @@ class VideoModuleModel extends ModuleModel {
   /// When a video is playing, the progress will be updated periodically to
   /// reflect position in the video player.
   void handleProgressChanged(VideoProgress progress) {
-    if (link == null) {
-      return;
-    }
     Map<String, dynamic> progressData = <String, dynamic>{
       'video_progress': progress.toMap(),
     };
-    link.set(null, JSON.encode(progressData));
+    _progressLink?.set(null, JSON.encode(progressData));
   }
 
   void _setDisplayModeLink(String mode) {
@@ -345,6 +371,7 @@ class VideoModuleModel extends ModuleModel {
   void onStop() {
     _remoteDeviceLinkWatcherBinding.close();
     _remoteDeviceLink.ctrl.close();
+    _progressLink.ctrl.close();
     _netConnector.ctrl.close();
     _deviceMap.ctrl.close();
     _componentContextProxy.ctrl.close();
