@@ -3,8 +3,8 @@
         "dart"
     ],
     "packages": {
-        "dart_aot_runner_test": "//topaz/runtime/dart_runner/integration:aot",
-        "dart_jit_runner_test": "//topaz/runtime/dart_runner/integration:jit",
+        "dart_aot_runner_test": "//topaz/runtime/dart_runner/integration:dart_aot_runner_test",
+        "dart_jit_runner_test": "//topaz/runtime/dart_runner/integration:dart_jit_runner_test",
         "goodbye_dart_aot": "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart_aot",
         "goodbye_dart_jit": "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart_jit",
         "goodbye_dart2_aot": "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart2_aot",
