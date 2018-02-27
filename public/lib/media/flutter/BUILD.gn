@@ -9,6 +9,12 @@ dart_library("flutter") {
 
   source_dir = "."
 
+  sources = [
+    "media_player_controller.dart",
+    "media_player.dart",
+    "progress_notifier.dart",
+  ]
+
   deps = [
     "//garnet/public/lib/media/fidl:fidl_dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",

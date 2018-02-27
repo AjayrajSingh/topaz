@@ -7,6 +7,12 @@ import("//build/dart/dart_library.gni")
 dart_library("dart") {
   infer_package_name = true
 
+  sources = [
+    "audio_player_controller.dart",
+    "audio_policy.dart",
+    "timeline.dart",
+  ]
+
   source_dir = "."
 
   deps = [

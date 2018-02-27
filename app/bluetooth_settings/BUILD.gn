@@ -7,7 +7,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("bluetooth_settings") {
   main_dart = "lib/main.dart"
   manifest = "pubspec.yaml"
-  source_dir = "lib"
 
   deps = [
     "//garnet/public/lib/bluetooth/fidl:fidl_dart",

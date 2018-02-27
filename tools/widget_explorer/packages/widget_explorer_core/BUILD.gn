@@ -8,6 +8,10 @@ import("//build/dart/dart_test.gni")
 dart_library("widget_explorer_core") {
   package_name = "widget_explorer_core"
 
+  sources = [
+    "widget_specs.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/pub/cli_util",
     "//third_party/dart-pkg/pub/dart_style",

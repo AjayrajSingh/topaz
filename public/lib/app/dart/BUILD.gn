@@ -9,6 +9,10 @@ dart_library("dart") {
 
   source_dir = "."
 
+  sources = [
+    "app.dart",
+  ]
+
   deps = [
     "//garnet/public/lib/app/fidl:fidl_dart",
     "//topaz/public/dart/fuchsia",

@@ -9,6 +9,10 @@ dart_library("dart") {
 
   source_dir = "."
 
+  sources = [
+    "context_listener_impl.dart",
+  ]
+
   deps = [
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//topaz/public/lib/app/dart",

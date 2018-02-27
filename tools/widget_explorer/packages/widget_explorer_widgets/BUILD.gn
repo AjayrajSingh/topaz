@@ -7,6 +7,10 @@ import("//build/dart/dart_library.gni")
 dart_library("widget_explorer_widgets") {
   package_name = "widget_explorer_widgets"
 
+  sources = [
+    "widget_explorer_widgets.dart",
+  ]
+
   deps = [
     "../widget_explorer_core",
     "//third_party/dart-pkg/git/flutter/packages/flutter",

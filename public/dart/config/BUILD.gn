@@ -7,5 +7,7 @@ import("//build/dart/dart_library.gni")
 dart_library("config") {
   package_name = "config"
 
-  source_dir = "lib"
+  sources = [
+    "config.dart",
+  ]
 }
