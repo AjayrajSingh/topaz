@@ -88,6 +88,9 @@ class MaxwellQueryListenerImpl extends maxwell.QueryListener {
   /// List of suggestions
   List<Suggestion> get suggestions => _suggestions.toList();
 
+  /// Returns `true` if there are no suggestions.
+  bool get isEmpty => _suggestions.isEmpty;
+
   @override
   void onQueryResults(List<maxwell.Suggestion> suggestions) {
     _suggestions.clear();
@@ -286,7 +289,10 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
     if (_askText != text) {
       _askText = text;
 
-      _askListener.clear();
+      if (!_askListener.isEmpty) {
+        _askListener.clear();
+        _onAskSuggestionsChanged();
+      }
 
       /// A timer ensures that we don't make unneeded ask queries while the
       /// user is still typing/talking
