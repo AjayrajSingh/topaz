@@ -318,11 +318,10 @@ class ChatConversationListModuleModel extends ModuleModel {
 
     InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
     moduleContext
-      ..startDaisy(
+      ..embedDaisy(
         name, // mod name
         daisyBuilder.daisy,
-        name, // link name
-        null,
+        null,  // incomingServices
         _pickerModuleController.ctrl.request(),
         viewOwner.passRequest(),
         (StartDaisyStatus status) {

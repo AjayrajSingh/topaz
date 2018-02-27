@@ -217,11 +217,10 @@ class ModuleContextClient {
     }
 
     try {
-      proxy.startDaisyInShell(
+      proxy.startDaisy(
         module,
         daisy,
-        null,
-        null,
+        null, // incomingServices
         controller.proxy.ctrl.request(),
         surfaceRelation,
         handleDaisyStatus,

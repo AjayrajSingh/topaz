@@ -174,11 +174,10 @@ class BrowserModuleModel extends ModuleModel {
       log.fine('Created Daisy for $_currentDoc.id');
 
       // Open a new module using Module Resolution
-      moduleContext.startDaisyInShell(
+      moduleContext.startDaisy(
         'video',
         daisyBuilder.daisy,
-        null,
-        null,
+        null, // incomingServices
         _moduleController.ctrl.request(),
         _kSurfaceRelation,
         (StartDaisyStatus status) {

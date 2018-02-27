@@ -163,10 +163,9 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
     moduleController = new ModuleControllerProxy();
     InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
 
-    moduleContext.startDaisy(
+    moduleContext.embedDaisy(
       name, // module name
       daisy,
-      name, // link name
       null, // incomingServices
       moduleController.ctrl.request(),
       viewOwnerPair.passRequest(),
