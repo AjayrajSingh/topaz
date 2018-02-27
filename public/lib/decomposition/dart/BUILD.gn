@@ -8,4 +8,8 @@ dart_library("dart") {
   infer_package_name = true
 
   source_dir = "."
+
+  sources = [
+    "decomposition.dart",
+  ]
 }

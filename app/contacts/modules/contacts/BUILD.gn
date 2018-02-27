@@ -9,6 +9,12 @@ flutter_app("contacts") {
   package_name = "contacts"
   main_dart = "lib/modular_main.dart"
 
+  sources = [
+    "fixtures.dart",
+    "models.dart",
+    "widgets.dart",
+  ]
+
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
@@ -27,9 +33,18 @@ flutter_app("contacts") {
 }
 
 dart_test("test") {
+  sources = [
+    "models/contact_test.dart",
+    "models/entry_types_test.dart",
+    "widgets/address_details_group_test.dart",
+    "widgets/contact_list_item_test.dart",
+    "widgets/email_details_group_test.dart",
+    "widgets/phone_details_group_test.dart",
+  ]
+
   deps = [
+    ":contacts_dart_library",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/app/contacts/modules/contacts:contacts_dart_library",
   ]
 }
