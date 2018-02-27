@@ -15,12 +15,16 @@
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/tasks/task_runner.h"
+#include "lib/ui/views/fidl/view_provider.fidl.h"
+#include "topaz/runtime/web_runner/services/web_view.fidl.h"
 
 namespace google_auth_provider {
 
-class GoogleAuthProviderImpl : auth::AuthProvider {
+class GoogleAuthProviderImpl : auth::AuthProvider,
+                               web_view::WebRequestDelegate {
  public:
-  GoogleAuthProviderImpl(fxl::RefPtr<fxl::TaskRunner> task_runner,
+  GoogleAuthProviderImpl(fxl::RefPtr<fxl::TaskRunner> main_runner,
+                         app::ApplicationContext* app_context,
                          network_wrapper::NetworkWrapper* network_wrapper,
                          f1dl::InterfaceRequest<auth::AuthProvider> request);
 
@@ -55,6 +59,11 @@ class GoogleAuthProviderImpl : auth::AuthProvider {
       const f1dl::String& credential,
       const RevokeAppOrPersistentCredentialCallback& callback) override;
 
+  // |web_view::WebRequestDelegate|
+  void WillSendRequest(const f1dl::String& incoming_url) override;
+
+  mozart::ViewOwnerPtr SetupWebView();
+
   void Request(std::function<network::URLRequestPtr()> request_factory,
                std::function<void(network::URLResponsePtr response)> callback);
 
@@ -62,8 +71,15 @@ class GoogleAuthProviderImpl : auth::AuthProvider {
       std::function<void(network::URLResponsePtr response)> callback,
       network::URLResponsePtr response);
 
-  fxl::RefPtr<fxl::TaskRunner> task_runner_;
+  fxl::RefPtr<fxl::TaskRunner> main_runner_;
+  app::ApplicationContext* app_context_;
+  app::ApplicationControllerPtr web_view_controller_;
+  auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
+  web_view::WebViewPtr web_view_;
+  GetPersistentCredentialCallback get_persistent_credential_callback_;
+
+  f1dl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
   f1dl::Binding<auth::AuthProvider> binding_;
   callback::CancellableContainer requests_;
 

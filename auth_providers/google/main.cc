@@ -30,7 +30,8 @@ class GoogleAuthProviderApp {
               return application_context_
                   ->ConnectToEnvironmentService<network::NetworkService>();
             }),
-        factory_impl_(loop_.task_runner(), &network_wrapper_) {
+        factory_impl_(loop_.task_runner(), application_context_.get(),
+                      &network_wrapper_) {
     FXL_DCHECK(application_context_);
   }
 
