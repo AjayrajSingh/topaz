@@ -195,7 +195,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         viewOwner: viewOwner.passRequest(),
         services: serviceProvider.passHandle(),
         userController: _userControllerProxy.ctrl.request(),
-        userShellConfig: new AppConfig(url: _userShellChooser.appUrl));
+        userShellConfig:
+            new AppConfig(url: _userShellChooser.appUrl(accountId)));
     userProvider.login(params);
 
     _userControllerProxy.watch(_userWatcherImpl.getHandle());

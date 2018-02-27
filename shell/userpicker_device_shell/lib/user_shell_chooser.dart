@@ -23,5 +23,7 @@ class UserShellChooser {
   }
 
   /// Gets the current user shell's app url.
-  String get appUrl => _userShellAppUrl;
+  /// Temporarily use Armadillo shell if guest for backward compatibility
+  String appUrl(String user) =>
+      user == null ? 'armadillo_user_shell' : _userShellAppUrl;
 }
