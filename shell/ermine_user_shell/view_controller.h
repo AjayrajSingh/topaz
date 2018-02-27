@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef TOPAZ_SHELL_ECHIDNA_USER_SHELL_VIEW_CONTROLLER_H_
-#define TOPAZ_SHELL_ECHIDNA_USER_SHELL_VIEW_CONTROLLER_H_
+#ifndef TOPAZ_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_
+#define TOPAZ_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_
 
 #include <async/cpp/auto_task.h>
 
@@ -21,7 +21,7 @@
 #include "lib/ui/views/fidl/view_manager.fidl.h"
 #include "lib/ui/views/fidl/views.fidl.h"
 
-namespace echidna_user_shell {
+namespace ermine_user_shell {
 class Tile;
 
 class ViewController : public mozart::ViewListener,
@@ -103,6 +103,6 @@ class ViewController : public mozart::ViewListener,
   zx_time_t last_presentation_time_ = 0;
 };
 
-}  // namespace echidna_user_shell
+}  // namespace ermine_user_shell
 
-#endif  // TOPAZ_SHELL_ECHIDNA_USER_SHELL_VIEW_CONTROLLER_H_
+#endif  // TOPAZ_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_

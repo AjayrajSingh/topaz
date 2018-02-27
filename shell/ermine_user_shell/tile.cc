@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/shell/echidna_user_shell/tile.h"
+#include "topaz/shell/ermine_user_shell/tile.h"
 
 #include <utility>
 
 #include "lib/svc/cpp/services.h"
 #include "lib/ui/views/fidl/view_provider.fidl.h"
 
-namespace echidna_user_shell {
+namespace ermine_user_shell {
 namespace {
 
 uint32_t g_next_key = 1;
@@ -40,4 +40,4 @@ void Tile::CreateView(
   view_provider->CreateView(std::move(view_owner_request), nullptr);
 }
 
-}  // namespace echidna_user_shell
+}  // namespace ermine_user_shell

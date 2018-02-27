@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef TOPAZ_SHELL_ECHIDNA_USER_SHELL_FIND_UNIQUE_PTR_H_
-#define TOPAZ_SHELL_ECHIDNA_USER_SHELL_FIND_UNIQUE_PTR_H_
+#ifndef TOPAZ_SHELL_ERMINE_USER_SHELL_FIND_UNIQUE_PTR_H_
+#define TOPAZ_SHELL_ERMINE_USER_SHELL_FIND_UNIQUE_PTR_H_
 
 #include <algorithm>
 #include <memory>
 
-namespace echidna_user_shell {
+namespace ermine_user_shell {
 
 template <typename Iter, typename T>
 Iter FindUniquePtr(Iter begin, Iter end, T* object) {
@@ -17,6 +17,6 @@ Iter FindUniquePtr(Iter begin, Iter end, T* object) {
   });
 }
 
-}  // namespace echidna_user_shell
+}  // namespace ermine_user_shell
 
-#endif  // TOPAZ_SHELL_ECHIDNA_USER_SHELL_APP_H_
+#endif  // TOPAZ_SHELL_ERMINE_USER_SHELL_APP_H_

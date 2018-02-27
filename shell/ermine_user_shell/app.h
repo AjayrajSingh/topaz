@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef TOPAZ_SHELL_ECHIDNA_USER_SHELL_APP_H_
-#define TOPAZ_SHELL_ECHIDNA_USER_SHELL_APP_H_
+#ifndef TOPAZ_SHELL_ERMINE_USER_SHELL_APP_H_
+#define TOPAZ_SHELL_ERMINE_USER_SHELL_APP_H_
 
 #include "lib/app/cpp/application_context.h"
 #include "lib/fidl/cpp/bindings/binding_set.h"
@@ -13,7 +13,7 @@
 #include <memory>
 #include <vector>
 
-namespace echidna_user_shell {
+namespace ermine_user_shell {
 class ViewController;
 
 class App : public mozart::ViewProvider {
@@ -37,6 +37,6 @@ class App : public mozart::ViewProvider {
   std::vector<std::unique_ptr<ViewController>> controllers_;
 };
 
-}  // namespace echidna_user_shell
+}  // namespace ermine_user_shell
 
-#endif  // TOPAZ_SHELL_ECHIDNA_USER_SHELL_APP_H_
+#endif  // TOPAZ_SHELL_ERMINE_USER_SHELL_APP_H_

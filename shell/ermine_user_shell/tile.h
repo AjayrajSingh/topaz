@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef TOPAZ_SHELL_ECHIDNA_USER_SHELL_TILE_H_
-#define TOPAZ_SHELL_ECHIDNA_USER_SHELL_TILE_H_
+#ifndef TOPAZ_SHELL_ERMINE_USER_SHELL_TILE_H_
+#define TOPAZ_SHELL_ERMINE_USER_SHELL_TILE_H_
 
 #include <string>
 #include <utility>
@@ -15,7 +15,7 @@
 #include "lib/ui/scenic/client/session.h"
 #include "lib/ui/views/fidl/view_provider.fidl.h"
 
-namespace echidna_user_shell {
+namespace ermine_user_shell {
 
 class Tile {
  public:
@@ -50,6 +50,6 @@ class Tile {
   mozart::ViewPropertiesPtr view_properties_;
 };
 
-}  // namespace echidna_user_shell
+}  // namespace ermine_user_shell
 
-#endif  // TOPAZ_SHELL_ECHIDNA_USER_SHELL_TILE_H_
+#endif  // TOPAZ_SHELL_ERMINE_USER_SHELL_TILE_H_

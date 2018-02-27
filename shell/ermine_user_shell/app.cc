@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/shell/echidna_user_shell/app.h"
+#include "topaz/shell/ermine_user_shell/app.h"
 
-#include "topaz/shell/echidna_user_shell/find_unique_ptr.h"
-#include "topaz/shell/echidna_user_shell/view_controller.h"
+#include "topaz/shell/ermine_user_shell/find_unique_ptr.h"
+#include "topaz/shell/ermine_user_shell/view_controller.h"
 
-namespace echidna_user_shell {
+namespace ermine_user_shell {
 
 App::App() : context_(app::ApplicationContext::CreateFromStartupInfo()) {
   context_->outgoing_services()->AddService<mozart::ViewProvider>(
@@ -39,4 +39,4 @@ void App::DestroyController(ViewController* controller) {
   controllers_.erase(it);
 }
 
-}  // namespace echidna_user_shell
+}  // namespace ermine_user_shell

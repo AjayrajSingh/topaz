@@ -6,6 +6,6 @@
         "cpp"
     ],
     "packages": {
-        "echidna_user_shell": "//topaz/shell/echidna_user_shell"
+        "ermine_user_shell": "//topaz/shell/ermine_user_shell"
     }
 }

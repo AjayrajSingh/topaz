@@ -5,7 +5,7 @@
 #include <async/cpp/loop.h>
 #include <trace-provider/provider.h>
 
-#include "topaz/shell/echidna_user_shell/app.h"
+#include "topaz/shell/ermine_user_shell/app.h"
 
 int main(int argc, const char** argv) {
   async_loop_config_t config = {
@@ -15,7 +15,7 @@ int main(int argc, const char** argv) {
   async::Loop loop(&config);
   trace::TraceProvider trace_provider(loop.async());
 
-  echidna_user_shell::App app;
+  ermine_user_shell::App app;
   loop.Run();
   return 0;
 }

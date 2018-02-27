@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/shell/echidna_user_shell/view_controller.h"
+#include "topaz/shell/ermine_user_shell/view_controller.h"
 
 #include <async/default.h>
 
@@ -11,13 +11,13 @@
 
 #include "lib/app/cpp/connect.h"
 #include "lib/ui/scenic/fidl/scene_manager.fidl.h"
-#include "topaz/shell/echidna_user_shell/find_unique_ptr.h"
-#include "topaz/shell/echidna_user_shell/tile.h"
+#include "topaz/shell/ermine_user_shell/find_unique_ptr.h"
+#include "topaz/shell/ermine_user_shell/tile.h"
 
-namespace echidna_user_shell {
+namespace ermine_user_shell {
 namespace {
 
-constexpr char kViewLabel[] = "echidna_user_shell";
+constexpr char kViewLabel[] = "ermine_user_shell";
 
 ui_mozart::MozartPtr GetMozart(mozart::ViewManager* view_manager) {
   ui_mozart::MozartPtr mozart;
@@ -256,4 +256,4 @@ void ViewController::SetPropertiesIfNeeded(
   view_container_->SetChildProperties(tile->key(), std::move(properties));
 }
 
-}  // namespace echidna_user_shell
+}  // namespace ermine_user_shell

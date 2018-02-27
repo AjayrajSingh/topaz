@@ -1,0 +1,12 @@
+{
+    "imports": [
+        "garnet/packages/default",
+        "topaz/packages/ermine_user_shell"
+    ],
+    "resources": [
+        {
+            "bootfs_path": "data/sysmgr/ermine_user_shell.config",
+            "file": "topaz/shell/ermine_user_shell/config/ermine_user_shell.config"
+        }
+    ]
+}

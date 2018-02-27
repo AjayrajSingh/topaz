@@ -5,7 +5,7 @@
 import("//build/package.gni")
 
 executable("bin") {
-  output_name = "echidna_user_shell"
+  output_name = "ermine_user_shell"
 
   sources = [
     "app.cc",
@@ -33,10 +33,10 @@ executable("bin") {
   ]
 }
 
-package("echidna_user_shell") {
+package("ermine_user_shell") {
   deps = [
     ":bin",
   ]
 
-  binary = "echidna_user_shell"
+  binary = "ermine_user_shell"
 }
