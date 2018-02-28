@@ -5,6 +5,8 @@
 #ifndef APPS_DART_CONTENT_HANDLER_DART_APPLICATION_RUNNER_H_
 #define APPS_DART_CONTENT_HANDLER_DART_APPLICATION_RUNNER_H_
 
+#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/connect.h"
 #include "lib/app/fidl/application_runner.fidl.h"
 #include "lib/fidl/cpp/bindings/binding.h"
 #include "lib/fxl/macros.h"
@@ -14,8 +16,7 @@ namespace dart_content_handler {
 
 class DartApplicationRunner : public app::ApplicationRunner {
  public:
-  explicit DartApplicationRunner(
-      f1dl::InterfaceRequest<app::ApplicationRunner> app_runner);
+  explicit DartApplicationRunner();
   ~DartApplicationRunner() override;
 
  private:
@@ -25,7 +26,8 @@ class DartApplicationRunner : public app::ApplicationRunner {
       app::ApplicationStartupInfoPtr startup_info,
       ::f1dl::InterfaceRequest<app::ApplicationController> controller) override;
 
-  f1dl::Binding<app::ApplicationRunner> binding_;
+  std::unique_ptr<app::ApplicationContext> context_;
+  f1dl::BindingSet<app::ApplicationRunner> bindings_;
 #if !defined(AOT_RUNTIME)
   MappedResource vm_snapshot_data_;
 #endif

@@ -126,9 +126,13 @@ void RunApplication(
 
 }  // namespace
 
-DartApplicationRunner::DartApplicationRunner(
-    f1dl::InterfaceRequest<app::ApplicationRunner> app_runner)
-    : binding_(this, std::move(app_runner)) {
+DartApplicationRunner::DartApplicationRunner()
+    : context_(app::ApplicationContext::CreateFromStartupInfo()) {
+  context_->outgoing_services()->AddService<app::ApplicationRunner>(
+      [this](f1dl::InterfaceRequest<app::ApplicationRunner> request) {
+        bindings_.AddBinding(this, std::move(request));
+      });
+
   dart::bin::BootstrapDartIo();
 
   struct stat buf;
