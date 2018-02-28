@@ -78,6 +78,17 @@ DartApplicationController::DartApplicationController(
     binding_.Bind(std::move(controller));
     binding_.set_error_handler([this] { Kill(); });
   }
+
+  zx_status_t status = zx_timer_create(ZX_TIMER_SLACK_LATE, ZX_CLOCK_MONOTONIC, &idle_timer_);
+  if (status != ZX_OK) {
+    FXL_LOG(INFO) << "Idle timer creation failed: " << zx_status_get_string(status);
+  } else {
+    idle_wait_ = new async::AutoWait(fsl::MessageLoop::GetCurrent()->async(),
+                                     idle_timer_, ZX_TIMER_SIGNALED);
+    idle_wait_->set_handler(
+        fbl::BindMember(this, &DartApplicationController::OnIdleTimer));
+    idle_wait_->Begin();
+  }
 }
 
 DartApplicationController::~DartApplicationController() {
@@ -91,6 +102,10 @@ DartApplicationController::~DartApplicationController() {
   }
   close(stdoutfd_);
   close(stderrfd_);
+  delete idle_wait_;
+  idle_wait_ = nullptr;
+  zx_handle_close(idle_timer_);
+  idle_timer_ = ZX_HANDLE_INVALID;
 }
 
 bool DartApplicationController::Setup() {
@@ -372,7 +387,8 @@ bool DartApplicationController::CreateIsolate(
   state->SetIsolate(isolate_);
 
   state->message_handler().Initialize(
-      fsl::MessageLoop::GetCurrent()->task_runner());
+      fsl::MessageLoop::GetCurrent()->task_runner(),
+      [this] { MessageEpilogue(); });
 
   state->SetReturnCodeCallback(
       [this](uint32_t return_code) { return_code_ = return_code; });
@@ -478,6 +494,46 @@ void DartApplicationController::SendReturnCode() {
     iter(return_code_);
   }
   wait_callbacks_.clear();
+}
+
+const zx_duration_t kIdleWaitDuration = ZX_SEC(2);
+const zx_duration_t kIdleNotifyDuration = ZX_MSEC(500);
+const zx_duration_t kIdleSlack = ZX_SEC(1);
+
+void DartApplicationController::MessageEpilogue() {
+  idle_start_ = zx_clock_get(ZX_CLOCK_MONOTONIC);
+  zx_status_t status = zx_timer_set(idle_timer_, idle_start_ + kIdleWaitDuration, kIdleSlack);
+  if (status != ZX_OK) {
+    FXL_LOG(INFO) << "Idle timer set failed: " << zx_status_get_string(status);
+  }
+}
+
+async_wait_result_t DartApplicationController::OnIdleTimer(
+    async_t* async,
+    zx_status_t status,
+    const zx_packet_signal* signal) {
+  if ((status != ZX_OK) || !(signal->observed & ZX_TIMER_SIGNALED) ||
+      !Dart_CurrentIsolate()) {
+    // Timer closed or isolate shutdown.
+    return ASYNC_WAIT_FINISHED;
+  }
+
+  zx_time_t deadline = idle_start_ + kIdleWaitDuration;
+  zx_time_t now = zx_clock_get(ZX_CLOCK_MONOTONIC);
+  if (now >= deadline) {
+    // No Dart message has been processed for kIdleWaitDuration: assume we'll
+    // stay idle for kIdleNotifyDuration.
+    Dart_NotifyIdle(now + kIdleNotifyDuration);
+    idle_start_ = 0;
+    zx_timer_cancel(idle_timer_);  // De-assert signal.
+  } else {
+    // Early wakeup or message pushed idle time forward: reschedule.
+    zx_status_t status = zx_timer_set(idle_timer_, deadline, kIdleSlack);
+    if (status != ZX_OK) {
+      FXL_LOG(INFO) << "Idle timer set failed: " << zx_status_get_string(status);
+    }
+  }
+  return ASYNC_WAIT_AGAIN;
 }
 
 }  // namespace dart_content_handler

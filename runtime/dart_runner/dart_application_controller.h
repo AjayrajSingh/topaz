@@ -47,6 +47,11 @@ class DartApplicationController : public app::ApplicationController {
   void Detach() override;
   void Wait(const WaitCallback& callback) override;
 
+  // Idle notification.
+  void MessageEpilogue();
+  async_wait_result_t OnIdleTimer(async_t* async, zx_status_t status,
+                                  const zx_packet_signal* signal);
+
   std::string url_;
   app::ApplicationPackagePtr application_;
   app::ApplicationStartupInfoPtr startup_info_;
@@ -64,6 +69,10 @@ class DartApplicationController : public app::ApplicationController {
   Dart_Isolate isolate_;
   int32_t return_code_ = 0;
   std::vector<WaitCallback> wait_callbacks_;
+
+  zx_time_t idle_start_ = 0;
+  zx_handle_t idle_timer_ = ZX_HANDLE_INVALID;
+  async::AutoWait* idle_wait_ = nullptr;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(DartApplicationController);
 };
