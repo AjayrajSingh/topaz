@@ -7,8 +7,5 @@
         "topaz/packages/contacts",
         "topaz/packages/music",
         "topaz/packages/video"
-    ],
-    "packages": {
-        "config": "//topaz/packages:config"
-    }
+    ]
 }
