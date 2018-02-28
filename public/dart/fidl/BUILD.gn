@@ -10,7 +10,7 @@ dart_library("fidl") {
   source_dir = "lib"
 
   sources = [
-    "lib/fidl.dart",
+    "fidl.dart",
   ]
 
   deps = [

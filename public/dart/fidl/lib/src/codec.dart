@@ -7,27 +7,24 @@ import 'dart:typed_data';
 
 import 'package:zircon/zircon.dart';
 
+import 'error.dart';
+import 'types.dart';
+
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: avoid_positional_boolean_parameters
 // ignore_for_file: always_specify_types
 
 const int _kAlignment = 8;
 const int _kAlignmentMask = 0x7;
-const int _kAllocAbsent = 0;
-const int _kAllocPresent = 0xFFFFFFFFFFFFFFFF;
-const int _kHandleAbsent = 0;
-const int _kHandlePresent = 0xFFFFFFFF;
 
 int _align(int size) =>
     size + ((_kAlignment - (size & _kAlignmentMask)) & _kAlignmentMask);
 
-class FidlCodecError implements Exception {
-  FidlCodecError(this.message);
-
-  final String message;
-
-  @override
-  String toString() => message;
+void _throwIfNegative(int value) {
+  if (value < 0) {
+    throw new FidlError(
+        'Cannot encode a negative value for an unsigned type: $value');
+  }
 }
 
 void _copyInt8(ByteData data, Int8List value, int offset) {
@@ -108,39 +105,6 @@ void _copyFloat64(ByteData data, Float64List value, int offset) {
   }
 }
 
-void _throwIfNotNullable(bool nullable) {
-  if (!nullable) {
-    throw new FidlCodecError('Cannot encode a null for a non-nullable type');
-  }
-}
-
-void _throwIfNegative(int value) {
-  if (value < 0) {
-    throw new FidlCodecError(
-        'Cannot encode a negative value for an unsigned type: $value');
-  }
-}
-
-void _throwIfNotZero(int value) {
-  if (value != 0) {
-    throw new FidlCodecError('Expected zero, got: $value');
-  }
-}
-
-void _throwIfExceedsLimit(int count, int limit) {
-  if (limit != null && count > limit) {
-    throw new FidlCodecError(
-        'Cannot encode an object wth $count elements. Limited to $limit.');
-  }
-}
-
-void _throwIfCountMismatch(int count, int expectedCount) {
-  if (count != expectedCount) {
-    throw new FidlCodecError(
-        'Cannot encode an array of count $count. Expected $expectedCount.');
-  }
-}
-
 const Utf8Encoder _utf8Encoder = const Utf8Encoder();
 const Utf8Decoder _utf8Decoder = const Utf8Decoder();
 
@@ -214,7 +178,7 @@ class Message {
 
 // ignore: one_member_abstracts
 abstract class Encodable {
-  void $encode(Encoder encoder, int offset);
+  void $encode(Encoder encoder, int offset, covariant FidlType type);
 }
 
 class Encoder {
@@ -292,139 +256,128 @@ class Encoder {
     _buffer.data.setFloat64(offset, value, Endianness.LITTLE_ENDIAN);
   }
 
-  void encodeHandle(Handle value, int offset, bool nullable) {
-    if (!value.isValid) {
-      _throwIfNotNullable(nullable);
-      encodeUint32(_kHandleAbsent, offset);
-    } else {
-      encodeUint32(_kHandlePresent, offset);
-      _buffer.handles.add(value);
-    }
+  void encodeHandle(Handle value, int offset, HandleType type) {
+    int encoded = value.isValid ? kHandlePresent : kHandleAbsent;
+    type.validateEncoded(encoded);
+    encodeUint32(encoded, offset);
+    if (value.isValid) _buffer.handles.add(value);
   }
 
-  void encodeEncodable(
-      Encodable value, int encodedSize, int offset, bool nullable) {
+  // See fidl_string_t.
+  void encodeString(String value, int offset, StringType type) {
+    type.validate(value);
     if (value == null) {
-      _throwIfNotNullable(nullable);
-      encodeUint64(_kAllocAbsent, offset);
-    } else if (nullable) {
-      encodeUint64(_kAllocPresent, offset);
-      value.$encode(this, alloc(encodedSize));
-    } else {
-      value.$encode(this, offset);
-    }
-  }
-
-  void encodeString(String value, int limit, int offset, bool nullable) {
-    if (value == null) {
-      _throwIfNotNullable(nullable);
       encodeUint64(0, offset); // size
-      encodeUint64(_kAllocAbsent, offset + 8); // data
+      encodeUint64(kAllocAbsent, offset + 8); // data
       return null;
     }
     final Uint8List bytes = _convertToUTF8(value);
     final int size = bytes.lengthInBytes;
-    _throwIfExceedsLimit(size, limit);
     encodeUint64(size, offset); // size
-    encodeUint64(_kAllocPresent, offset + 8); // data
+    encodeUint64(kAllocPresent, offset + 8); // data
     _copyUint8(_buffer.data, bytes, alloc(size));
   }
 
-  // Encodes a fidl_vector_t.
-  void _encodeVectorPointer(
-      List<Object> value, int limit, int offset, bool nullable) {
+  void encodePointer(Encodable value, int offset, PointerType type) {
     if (value == null) {
-      _throwIfNotNullable(nullable);
+      encodeUint64(kAllocAbsent, offset);
+    } else {
+      encodeUint64(kAllocPresent, offset);
+      value.$encode(this, alloc(type.elementSize), type.element);
+    }
+  }
+
+  // See fidl_vector_t.
+  void _encodeVectorPointer(List<Object> value, int offset, VectorType type) {
+    type.validate(value);
+    if (value == null) {
       encodeUint64(0, offset); // count
-      encodeUint64(_kAllocAbsent, offset + 8); // data
+      encodeUint64(kAllocAbsent, offset + 8); // data
       return;
     }
     final int count = value.length;
-    _throwIfExceedsLimit(count, limit);
     encodeUint64(count, offset); // count
-    encodeUint64(_kAllocPresent, offset + 8); // data
+    encodeUint64(kAllocPresent, offset + 8); // data
   }
 
-  void encodeEncodableVector(List<Encodable> value, int encodedSize, int limit,
-      int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+  void encodeVector(List<Encodable> value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
-    final int stride = _align(encodedSize);
+    final int stride = type.elementSize;
     final int count = value.length;
     final int base = alloc(stride * count);
-    for (int i = 0; i < count; ++i) {
-      value[i].$encode(this, base + i * stride);
+    final FidlType element = type.element;
+    if (type.element is PointerType) {
+      for (int i = 0; i < count; ++i) {
+        encodePointer(value[i], base + i * stride, element);
+      }
+    } else {
+      for (int i = 0; i < count; ++i) {
+        value[i].$encode(this, base + i * stride, element);
+      }
     }
   }
 
-  void encodeInt8ListAsVector(
-      Int8List value, int limit, int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+  void encodeInt8ListAsVector(Int8List value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
     _copyInt8(_buffer.data, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint8ListAsVector(
-      Uint8List value, int limit, int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+  void encodeUint8ListAsVector(Uint8List value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
     _copyUint8(_buffer.data, value, alloc(value.lengthInBytes));
   }
 
-  void encodeInt16ListAsVector(
-      Int16List value, int limit, int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+  void encodeInt16ListAsVector(Int16List value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
     _copyInt16(_buffer.data, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint16ListAsVector(
-      Uint16List value, int limit, int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+  void encodeUint16ListAsVector(Uint16List value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
     _copyUint16(_buffer.data, value, alloc(value.lengthInBytes));
   }
 
-  void encodeInt32ListAsVector(
-      Int32List value, int limit, int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+  void encodeInt32ListAsVector(Int32List value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
     _copyInt32(_buffer.data, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint32ListAsVector(
-      Uint32List value, int limit, int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+  void encodeUint32ListAsVector(Uint32List value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
     _copyUint32(_buffer.data, value, alloc(value.lengthInBytes));
   }
 
-  void encodeInt64ListAsVector(
-      Int64List value, int limit, int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+  void encodeInt64ListAsVector(Int64List value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
     _copyInt64(_buffer.data, value, alloc(value.lengthInBytes));
   }
 
-  void encodeUint64ListAsVector(
-      Uint64List value, int limit, int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+  void encodeUint64ListAsVector(Uint64List value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
@@ -432,8 +385,8 @@ class Encoder {
   }
 
   void encodeFloat32ListAsVector(
-      Float32List value, int limit, int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+      Float32List value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
@@ -441,114 +394,133 @@ class Encoder {
   }
 
   void encodeFloat64ListAsVector(
-      Float64List value, int limit, int offset, bool nullable) {
-    _encodeVectorPointer(value, limit, offset, nullable);
+      Float64List value, int offset, VectorType type) {
+    _encodeVectorPointer(value, offset, type);
     if (value == null || value.isEmpty) {
       return;
     }
     _copyFloat64(_buffer.data, value, alloc(value.lengthInBytes));
   }
 
-  void encodeEncodableArray(
-      List<Encodable> value, int encodedSize, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
-    final int stride = _align(encodedSize);
-    for (int i = 0; i < count; ++i) {
-      value[i].$encode(this, offset + i * stride);
+  void encodeArray(List<Encodable> value, int offset, ArrayType type) {
+    type.validate(value);
+    final int stride = type.elementSize;
+    final PointerType element = type.element;
+    if (element is PointerType) {
+      for (int i = 0; i < type.count; ++i) {
+        encodePointer(value[i], offset + i * stride, element);
+      }
+    } else {
+      for (int i = 0; i < type.count; ++i) {
+        value[i].$encode(this, offset + i * stride, element);
+      }
     }
   }
 
-  void encodeInt8ListAsArray(Int8List value, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
+  void encodeInt8ListAsArray(Int8List value, int offset, ArrayType type) {
+    type.validate(value);
     _copyInt8(_buffer.data, value, offset);
   }
 
-  void encodeUint8ListAsArray(Uint8List value, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
-    _copyUint8(_buffer.data, value, alloc(value.lengthInBytes));
+  void encodeUint8ListAsArray(Uint8List value, int offset, ArrayType type) {
+    type.validate(value);
+    _copyUint8(_buffer.data, value, offset);
   }
 
-  void encodeInt16ListAsArray(Int16List value, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
-    _copyInt16(_buffer.data, value, alloc(value.lengthInBytes));
+  void encodeInt16ListAsArray(Int16List value, int offset, ArrayType type) {
+    type.validate(value);
+    _copyInt16(_buffer.data, value, offset);
   }
 
-  void encodeUint16ListAsArray(Uint16List value, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
-    _copyUint16(_buffer.data, value, alloc(value.lengthInBytes));
+  void encodeUint16ListAsArray(Uint16List value, int offset, ArrayType type) {
+    type.validate(value);
+    _copyUint16(_buffer.data, value, offset);
   }
 
-  void encodeInt32ListAsArray(Int32List value, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
-    _copyInt32(_buffer.data, value, alloc(value.lengthInBytes));
+  void encodeInt32ListAsArray(Int32List value, int offset, ArrayType type) {
+    type.validate(value);
+    _copyInt32(_buffer.data, value, offset);
   }
 
-  void encodeUint3ListAsArray(Uint32List value, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
-    _copyUint32(_buffer.data, value, alloc(value.lengthInBytes));
+  void encodeUint3ListAsArray(Uint32List value, int offset, ArrayType type) {
+    type.validate(value);
+    _copyUint32(_buffer.data, value, offset);
   }
 
-  void encodeInt64ListAsArray(Int64List value, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
-    _copyInt64(_buffer.data, value, alloc(value.lengthInBytes));
+  void encodeInt64ListAsArray(Int64List value, int offset, ArrayType type) {
+    type.validate(value);
+    _copyInt64(_buffer.data, value, offset);
   }
 
-  void encodeUint64ListAsArray(Uint64List value, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
-    _copyUint64(_buffer.data, value, alloc(value.lengthInBytes));
+  void encodeUint64ListAsArray(Uint64List value, int offset, ArrayType type) {
+    type.validate(value);
+    _copyUint64(_buffer.data, value, offset);
   }
 
-  void encodeFloat32ListAsArray(Float32List value, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
-    _copyFloat32(_buffer.data, value, alloc(value.lengthInBytes));
+  void encodeFloat32ListAsArray(Float32List value, int offset, ArrayType type) {
+    type.validate(value);
+    _copyFloat32(_buffer.data, value, offset);
   }
 
-  void encodeFloat64ListAsArray(Float64List value, int count, int offset) {
-    _throwIfCountMismatch(value.length, count);
-    _copyFloat64(_buffer.data, value, alloc(value.lengthInBytes));
+  void encodeFloat64ListAsArray(Float64List value, int offset, ArrayType type) {
+    type.validate(value);
+    _copyFloat64(_buffer.data, value, offset);
   }
 }
 
-typedef T DecodeCallback<T>(Decoder decoder, int offset);
-typedef dynamic DecodeArrayCallback(Decoder decoder, int count, int offset);
+typedef T DecodeCallback<T>(
+    Decoder decoder, int offset, covariant FidlType type);
 
-Int8List _decodeInt8List(Decoder decoder, int count, int offset) {
+typedef List<T> DecodeArrayCallback<T>(
+    Decoder decoder, int count, int offset, covariant FidlType type);
+
+Int8List _decodeInt8List(
+    Decoder decoder, int count, int offset, FidlType type) {
   return decoder._data.buffer.asInt8List(offset, count);
 }
 
-Uint8List _decodeUint8List(Decoder decoder, int count, int offset) {
+Uint8List _decodeUint8List(
+    Decoder decoder, int count, int offset, FidlType type) {
   return decoder._data.buffer.asUint8List(offset, count);
 }
 
-Int16List _decodeInt16List(Decoder decoder, int count, int offset) {
+Int16List _decodeInt16List(
+    Decoder decoder, int count, int offset, FidlType type) {
   return decoder._data.buffer.asInt16List(offset, count);
 }
 
-Uint16List _decodeUint16List(Decoder decoder, int count, int offset) {
+Uint16List _decodeUint16List(
+    Decoder decoder, int count, int offset, FidlType type) {
   return decoder._data.buffer.asUint16List(offset, count);
 }
 
-Int32List _decodeInt32List(Decoder decoder, int count, int offset) {
+Int32List _decodeInt32List(
+    Decoder decoder, int count, int offset, FidlType type) {
   return decoder._data.buffer.asInt32List(offset, count);
 }
 
-Uint32List _decodeUint32List(Decoder decoder, int count, int offset) {
+Uint32List _decodeUint32List(
+    Decoder decoder, int count, int offset, FidlType type) {
   return decoder._data.buffer.asUint32List(offset, count);
 }
 
-Int64List _decodeInt64List(Decoder decoder, int count, int offset) {
+Int64List _decodeInt64List(
+    Decoder decoder, int count, int offset, FidlType type) {
   return decoder._data.buffer.asInt64List(offset, count);
 }
 
-Uint64List _decodeUint64List(Decoder decoder, int count, int offset) {
+Uint64List _decodeUint64List(
+    Decoder decoder, int count, int offset, FidlType type) {
   return decoder._data.buffer.asUint64List(offset, count);
 }
 
-Float32List _decodeFloat32List(Decoder decoder, int count, int offset) {
+Float32List _decodeFloat32List(
+    Decoder decoder, int count, int offset, FidlType type) {
   return decoder._data.buffer.asFloat32List(offset, count);
 }
 
-Float64List _decodeFloat64List(Decoder decoder, int count, int offset) {
+Float64List _decodeFloat64List(
+    Decoder decoder, int count, int offset, FidlType type) {
   return decoder._data.buffer.asFloat64List(offset, count);
 }
 
@@ -567,14 +539,14 @@ class Decoder {
     final int result = _nextOffset;
     _nextOffset += _align(size);
     if (_nextOffset > _message.dataLength) {
-      throw new FidlCodecError('Cannot access out of range memory');
+      throw new FidlError('Cannot access out of range memory');
     }
     return result;
   }
 
   Handle claimHandle() {
     if (_nextHandle >= _message.handlesLength) {
-      throw new FidlCodecError('Cannot access out of range handle');
+      throw new FidlError('Cannot access out of range handle');
     }
     return _message.handles[_nextHandle++];
   }
@@ -609,148 +581,121 @@ class Decoder {
   double decodeFloat64(int offset) =>
       _data.getFloat64(offset, Endianness.LITTLE_ENDIAN);
 
-  Handle decodeHandle(int offset) {
+  Handle decodeHandle(int offset, HandleType type) {
     final int encoded = decodeInt32(offset);
-    if (encoded == _kHandleAbsent) {
-      return new Handle.invalid();
-    } else if (encoded == _kHandlePresent) {
-      return claimHandle();
-    } else {
-      throw new FidlCodecError('Invalid handle encoding.');
-    }
+    type.validateEncoded(encoded);
+    return encoded == kHandlePresent ? claimHandle() : new Handle.invalid();
   }
 
-  T decodeEncodable<T>(
-      DecodeCallback<T> decode, int encodedSize, int offset, bool nullable) {
-    if (!nullable) {
-      return decode(this, offset);
-    }
-    final int data = decodeUint64(offset);
-    if (data == _kAllocAbsent) {
-      return null;
-    } else if (data == _kAllocPresent) {
-      return decode(this, claimMemory(encodedSize));
-    } else {
-      throw new FidlCodecError('Invalid struct encoding.');
-    }
-  }
-
-  String decodeString(int limit, int offset, bool nullable) {
+  String decodeString(int offset, StringType type) {
     final int size = decodeUint64(offset);
     final int data = decodeUint64(offset + 8);
-    if (data == _kAllocAbsent) {
-      _throwIfNotNullable(nullable);
-      _throwIfNotZero(size);
+    type.validateEncoded(size, data);
+    if (data == kAllocAbsent) {
       return null;
-    } else if (data == _kAllocPresent) {
-      _throwIfExceedsLimit(size, limit);
-      final int offset = claimMemory(size);
-      final Uint8List bytes = _data.buffer.asUint8List(offset, size);
-      return _convertFromUTF8(bytes);
-    } else {
-      throw new FidlCodecError('Invalid string encoding.');
     }
+    final Uint8List bytes = _data.buffer.asUint8List(claimMemory(size), size);
+    return _convertFromUTF8(bytes);
   }
 
-  dynamic _decodeVector(DecodeArrayCallback decode, int stride, int limit,
-      int offset, bool nullable) {
+  T decodePointer<T>(DecodeCallback<T> decode, int offset, PointerType type) {
+    final int data = decodeUint64(offset);
+    type.validateEncoded(data);
+    if (data == kAllocAbsent) {
+      return null;
+    }
+    return decode(this, claimMemory(type.elementSize), type.element);
+  }
+
+  List<T> decodeVector<T>(
+      DecodeArrayCallback<T> decode, int offset, VectorType type) {
     final int count = decodeUint64(offset);
     final int data = decodeUint64(offset + 8);
-    if (data == _kAllocAbsent) {
-      _throwIfNotNullable(nullable);
-      _throwIfNotZero(count);
+    type.validateEncoded(count, data);
+    if (data == kAllocAbsent) {
       return null;
-    } else if (data == _kAllocPresent) {
-      _throwIfExceedsLimit(count, limit);
-      final int offset = claimMemory(count * stride);
-      return decode(this, count, offset);
-    } else {
-      throw new FidlCodecError('Invalid vector encoding.');
     }
+    final int base = claimMemory(count * type.elementSize);
+    return decode(this, count, base, type.element);
   }
 
-  dynamic decodeEncodableVector(DecodeArrayCallback decode, int encodedSize,
-      int limit, int offset, bool nullable) {
-    return _decodeVector(decode, _align(encodedSize), limit, offset, nullable);
+  Int8List decodeVectorAsInt8List(int offset, VectorType type) {
+    return decodeVector<int>(_decodeInt8List, offset, type);
   }
 
-  Int8List decodeVectorAsInt8List(int limit, int offset, bool nullable) {
-    return _decodeVector(_decodeInt8List, 1, limit, offset, nullable);
+  Uint8List decodeVectorAsUint8List(int offset, VectorType type) {
+    return decodeVector<int>(_decodeUint8List, offset, type);
   }
 
-  Uint8List decodeVectorAsUint8List(int limit, int offset, bool nullable) {
-    return _decodeVector(_decodeUint8List, 1, limit, offset, nullable);
+  Int16List decodeVectorAsInt16List(int offset, VectorType type) {
+    return decodeVector<int>(_decodeInt16List, offset, type);
   }
 
-  Int16List decodeVectorAsInt16List(int limit, int offset, bool nullable) {
-    return _decodeVector(_decodeInt16List, 2, limit, offset, nullable);
+  Uint16List decodeVectorAsUint16List(int offset, VectorType type) {
+    return decodeVector<int>(_decodeUint16List, offset, type);
   }
 
-  Uint16List decodeVectorAsUint16List(int limit, int offset, bool nullable) {
-    return _decodeVector(_decodeUint16List, 2, limit, offset, nullable);
+  Int32List decodeVectorAsInt32List(int offset, VectorType type) {
+    return decodeVector<int>(_decodeInt32List, offset, type);
   }
 
-  Int32List decodeVectorAsInt32List(int limit, int offset, bool nullable) {
-    return _decodeVector(_decodeInt32List, 4, limit, offset, nullable);
+  Uint32List decodeVectorAsUint32List(int offset, VectorType type) {
+    return decodeVector<int>(_decodeUint32List, offset, type);
   }
 
-  Uint32List decodeVectorAsUint32List(int limit, int offset, bool nullable) {
-    return _decodeVector(_decodeUint32List, 4, limit, offset, nullable);
+  Int64List decodeVectorAsInt64List(int offset, VectorType type) {
+    return decodeVector<int>(_decodeInt64List, offset, type);
   }
 
-  Int64List decodeVectorAsInt64List(int limit, int offset, bool nullable) {
-    return _decodeVector(_decodeInt64List, 8, limit, offset, nullable);
+  Uint64List decodeVectorAsUint64List(int offset, VectorType type) {
+    return decodeVector<int>(_decodeUint64List, offset, type);
   }
 
-  Uint64List decodeVectorAsUint64List(int limit, int offset, bool nullable) {
-    return _decodeVector(_decodeUint64List, 8, limit, offset, nullable);
+  Float32List decodeVectorAsFloat32List(int offset, VectorType type) {
+    return decodeVector<double>(_decodeFloat32List, offset, type);
   }
 
-  Float32List decodeVectorAsFloat32List(int limit, int offset, bool nullable) {
-    return _decodeVector(_decodeFloat32List, 4, limit, offset, nullable);
+  Float64List decodeVectorAsFloat64List(int offset, VectorType type) {
+    return decodeVector<double>(_decodeFloat64List, offset, type);
   }
 
-  Float64List decodeVectorAsFloat64List(int limit, int offset, bool nullable) {
-    return _decodeVector(_decodeFloat64List, 8, limit, offset, nullable);
+  Int8List decodeArrayAsInt8List(int offset, ArrayType type) {
+    return _data.buffer.asInt8List(offset, type.count);
   }
 
-  Int8List decodeArrayAsInt8List(int count, int offset) {
-    return _data.buffer.asInt8List(offset, count);
+  Uint8List decodeArrayAsUint8List(int offset, ArrayType type) {
+    return _data.buffer.asUint8List(offset, type.count);
   }
 
-  Uint8List decodeArrayAsUint8List(int count, int offset) {
-    return _data.buffer.asUint8List(offset, count);
+  Int16List decodeArrayAsInt16List(int offset, ArrayType type) {
+    return _data.buffer.asInt16List(offset, type.count);
   }
 
-  Int16List decodeArrayAsInt16List(int count, int offset) {
-    return _data.buffer.asInt16List(offset, count);
+  Uint16List decodeArrayAsUint16List(int offset, ArrayType type) {
+    return _data.buffer.asUint16List(offset, type.count);
   }
 
-  Uint16List decodeArrayAsUint16List(int count, int offset) {
-    return _data.buffer.asUint16List(offset, count);
+  Int32List decodeArrayAsInt32List(int offset, ArrayType type) {
+    return _data.buffer.asInt32List(offset, type.count);
   }
 
-  Int32List decodeArrayAsInt32List(int count, int offset) {
-    return _data.buffer.asInt32List(offset, count);
+  Uint32List decodeArrayAsUint32List(int offset, ArrayType type) {
+    return _data.buffer.asUint32List(offset, type.count);
   }
 
-  Uint32List decodeArrayAsUint32List(int count, int offset) {
-    return _data.buffer.asUint32List(offset, count);
+  Int64List decodeArrayAsInt64List(int offset, ArrayType type) {
+    return _data.buffer.asInt64List(offset, type.count);
   }
 
-  Int64List decodeArrayAsInt64List(int count, int offset) {
-    return _data.buffer.asInt64List(offset, count);
+  Uint64List decodeArrayAsUint64List(int offset, ArrayType type) {
+    return _data.buffer.asUint64List(offset, type.count);
   }
 
-  Uint64List decodeArrayAsUint64List(int count, int offset) {
-    return _data.buffer.asUint64List(offset, count);
+  Float32List decodeArrayAsFloat32List(int offset, ArrayType type) {
+    return _data.buffer.asFloat32List(offset, type.count);
   }
 
-  Float32List decodeArrayAsFloat32List(int count, int offset) {
-    return _data.buffer.asFloat32List(offset, count);
-  }
-
-  Float64List decodeArrayAsFloat64List(int count, int offset) {
-    return _data.buffer.asFloat64List(offset, count);
+  Float64List decodeArrayAsFloat64List(int offset, ArrayType type) {
+    return _data.buffer.asFloat64List(offset, type.count);
   }
 }

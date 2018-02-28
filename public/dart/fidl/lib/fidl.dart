@@ -5,3 +5,5 @@
 library fidl;
 
 import 'src/codec.dart';
+import 'src/error.dart';
+import 'src/types.dart';
