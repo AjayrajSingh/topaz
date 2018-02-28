@@ -6,7 +6,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.context.fidl/context_reader.fidl.dart';
 import 'package:lib.context.fidl/debug.fidl.dart';
+import 'package:lib.context.fidl/metadata.fidl.dart';
 import 'package:lib.user_intelligence.fidl/scope.fidl.dart';
 
 import 'data_handler.dart';
@@ -106,6 +108,67 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
     _send();
   }
 
+  static Map<String, dynamic> _encodeContextMetadata(ContextMetadata metadata) {
+    Map<String, dynamic> json = <String, dynamic>{};
+    if (metadata.story != null) {
+      json['story'] = <String, dynamic>{
+        'id': metadata.story.id,
+        'focused': <String, int>{
+          'state': metadata.story.focused.state.fidlEnumValue
+        }
+      };
+    }
+    if (metadata.mod != null) {
+      json['mod'] = <String, dynamic>{
+        'url': metadata.mod.url,
+        'path': metadata.mod.path
+      };
+    }
+    if (metadata.entity != null) {
+      json['entity'] = <String, dynamic>{
+        'topic': metadata.entity.topic,
+        'type': metadata.entity.type
+      };
+    }
+    if (metadata.link != null) {
+      json['link'] = <String, dynamic>{
+        'modulePath': metadata.link.modulePath,
+        'name': metadata.link.name
+      };
+    }
+
+    return json;
+  }
+
+  static Map<String, dynamic> _encodeContextDebugValue(
+      ContextDebugValue value) {
+    return <String, dynamic>{
+      'id': value.id,
+      'parentIds': value.parentIds,
+      'value': <String, dynamic>{
+        'type': value.value.type.fidlEnumValue,
+        'content': value.value.content,
+        'meta': _encodeContextMetadata(value.value.meta),
+      }
+    };
+  }
+
+  static Map<String, dynamic> _encodeContextDebugSubscription(
+      ContextDebugSubscription sub) {
+    return <String, dynamic>{
+      'id': sub.id,
+      // TODO(ianloic): add debugInfo if needed
+      'query': <String, dynamic>{
+        'selector': sub.query.selector.map((String key,
+                ContextSelector value) =>
+            new MapEntry<String, Map<String, dynamic>>(key, <String, dynamic>{
+              'meta': _encodeContextMetadata(value.meta),
+              'type': value.type.fidlEnumValue
+            }))
+      }
+    };
+  }
+
   String _encode() {
     // TODO(thatguy): It would be better to send the frontend updates as they
     // come in instead of storing a bunch of state here. In order to do that
@@ -113,9 +176,11 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
     // it is sent a complete state snapshot from the ContextEngine when it is
     // initialized in handleNewWebSocket().
     final String message = json.encode(<String, dynamic>{
-      'context.values': new List<ContextDebugValue>.from(_valuesCache.values),
-      'context.subscriptions':
-          new List<ContextDebugSubscription>.from(_subscriptionsCache.values)
+      'context.values':
+          _valuesCache.values.map(_encodeContextDebugValue).toList(),
+      'context.subscriptions': _subscriptionsCache.values
+          .map(_encodeContextDebugSubscription)
+          .toList(),
     });
     return message;
   }
