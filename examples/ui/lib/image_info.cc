@@ -16,6 +16,9 @@ SkImageInfo MakeSkImageInfo(const scenic::ImageInfo& image_info) {
     case scenic::ImageInfo::PixelFormat::BGRA_8:
       return SkImageInfo::Make(image_info.width, image_info.height,
                                kBGRA_8888_SkColorType, kOpaque_SkAlphaType);
+    case scenic::ImageInfo::PixelFormat::YUY2:
+      FXL_CHECK(false) << "Not implemented.";
+      return SkImageInfo();
   }
 
   FXL_NOTREACHED();
