@@ -35,7 +35,6 @@ flutter_asset_tools_bin = "$flutter_asset_tools_out_dir/dart-tools/fuchsia_asset
 template("flutter_source_app") {
   assert(defined(invoker.main_dart), "Must define main_dart")
   assert(defined(invoker.package_name), "Must define package_name")
-  not_needed(invoker, [ "flx" ])
 
   dart_library_name = target_name + "_dart_library"
   dart_library(dart_library_name) {
@@ -171,7 +170,6 @@ template("flutter_source_app") {
 
 template("flutter_jit_app") {
   assert(defined(invoker.main_dart), "Must define main_dart")
-  not_needed(invoker, [ "flx" ])
 
   dart_library_name = target_name + "_dart_library"
 
@@ -363,7 +361,6 @@ template("flutter_jit_app") {
 
 template("flutter_aot_app") {
   assert(defined(invoker.main_dart), "Must define main_dart")
-  not_needed(invoker, [ "flx" ])
 
   dart_library_name = target_name + "_dart_library"
 
@@ -603,7 +600,6 @@ template("flutter_app") {
                              [
                                "main_dart",
                                "fuchsia_package_name",
-                               "flx",
                                "package_name",
                                "deps",
                                "manifest",
@@ -620,7 +616,6 @@ template("flutter_app") {
                              [
                                "main_dart",
                                "fuchsia_package_name",
-                               "flx",
                                "package_name",
                                "deps",
                                "manifest",
