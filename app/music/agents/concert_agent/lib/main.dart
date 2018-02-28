@@ -39,16 +39,18 @@ class ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onContextUpdate(ContextUpdate result) async {
-    if (result.values[_kHotelTopic].isEmpty) {
-      return;
-    }
+    for (final ContextUpdateEntry entry in result.values) {
+      if (entry.key != _kHotelTopic) {
+        continue;
+      }
 
-    // TODO(thatguy): There can be more than one value. At some point, use the
-    // entity type in the ContextQuery instead of using topics as if they are
-    // types, and handle multiple instances.
-    dynamic data = JSON.decode(result.values[_kHotelTopic][0].content);
-    if (data != null && data['name'] is String) {
-      await _createProposal(data['name']);
+      // TODO(thatguy): There can be more than one value. At some point, use the
+      // entity type in the ContextQuery instead of using topics as if they are
+      // types, and handle multiple instances.
+      dynamic data = JSON.decode(entry.value[0].content);
+      if (data != null && data['name'] is String) {
+        await _createProposal(data['name']);
+      }
     }
   }
 
@@ -87,12 +89,13 @@ Future<Null> main(List<dynamic> args) async {
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
   ContextQuery query =
-      const ContextQuery(selector: const <String, ContextSelector>{
-    _kHotelTopic: const ContextSelector(
+      const ContextQuery(selector: const <ContextQueryEntry>[const
+        ContextQueryEntry(
+    key: _kHotelTopic, value: const ContextSelector(
         type: ContextValueType.entity,
         meta: const ContextMetadata(
             entity: const EntityMetadata(topic: _kHotelTopic)))
-  });
+  )]);
   _contextListenerImpl = new ContextListenerImpl();
   _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 }

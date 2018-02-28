@@ -26,8 +26,9 @@ const List<String> _kImageSelectorLinkPath = const <String>['root'];
 const String _kImageSelectorLinkName = 'selection';
 const String _kImageSelectorRootKey = 'image selection';
 const String _kImageSelectorImageListKey = 'selected images';
-const Map<String, String> _kImageSelectorStoryExtraInfo =
-    const <String, String>{'color': '0xFFA5A700'};
+const List<StoryInfoExtraEntry> _kImageSelectorStoryExtraInfo =
+    const <StoryInfoExtraEntry>[const StoryInfoExtraEntry(
+        key: 'color', value: '0xFFA5A700')];
 const int _kChooseWallpaperSuggestionColor = 0xFFA5A700;
 const String _kChooseWallpaperSuggestionHeadline = 'Change Wallpaper';
 const String _kChooseWallpaperSuggestionImageUrl =

@@ -148,12 +148,12 @@ class ArmadilloUserShellModel extends UserShellModel {
 
     ContextQuery query =
         // ignore: prefer_const_constructors
-        new ContextQuery(selector: <String, ContextSelector>{});
+        new ContextQuery(selector: <ContextQueryEntry>[]);
     for (String topic in contextTopics) {
       ContextSelector selector = new ContextSelector(
           type: ContextValueType.entity,
           meta: new ContextMetadata(entity: new EntityMetadata(topic: topic)));
-      query.selector[topic] = selector;
+      query.selector.add(new ContextQueryEntry(key: topic, value: selector));
     }
     contextReader.subscribe(
       query,
@@ -253,16 +253,17 @@ class _ContextListenerImpl extends ContextListener {
   @override
   void onContextUpdate(ContextUpdate update) {
     Map<String, String> values = <String, String>{};
-    for (String key in update.values.keys) {
-      if (update.values[key].isEmpty) {
-        return;
+    for (final ContextUpdateEntry entry in update.values) {
+      if (entry.value.isEmpty) {
+        continue;
       }
       // TODO(thatguy): The context engine can return multiple entries for a
       // given selector (in this case topics). The API doesn't make it easy to
       // get the one "authoritative" value for a topic (since that doesn't
       // really exist), so we just take the first value for now.
-      values[key] = update.values[key][0].content;
+      values[entry.key] = entry.value[0].content;
     }
+
     onContextUpdated?.call(values);
   }
 }

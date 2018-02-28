@@ -82,7 +82,8 @@ class ChatContentProviderAgent extends AgentImpl {
         meta: const ContextMetadata(
             entity: const EntityMetadata(topic: 'location/home_work')));
     ContextQuery query = new ContextQuery(
-        selector: <String, ContextSelector>{'location/home_work': selector});
+        selector: <ContextQueryEntry>[new ContextQueryEntry(
+          key: 'location/home_work', value: selector)]);
     _contextReader.subscribe(query, _proposerBinding.wrap(proposer));
 
     // Connect to the firebase db client agent and obtain the connector service.

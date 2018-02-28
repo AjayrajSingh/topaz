@@ -161,15 +161,15 @@ class EventListModuleModel extends ModuleModel {
     moduleContext
       ..getStoryId((String storyId) {
         _contextReaderProxy.subscribe(
-          new ContextQuery(selector: <String, ContextSelector>{
-            _kSelectorLabel: new ContextSelector(
+          new ContextQuery(selector: <ContextQueryEntry>[new ContextQueryEntry(
+            key: _kSelectorLabel, value: new ContextSelector(
                 type: ContextValueType.story,
                 meta: new ContextMetadata(
                     story: new StoryMetadata(
                         id: storyId,
                         focused: new FocusedState(
                             state: FocusedStateState.focused)))),
-          }),
+          )]),
           _contextListenerBinding.wrap(
             new _ContextListenerImpl(
               onStoryInFocusChanged: (bool storyInFocus) {
@@ -298,10 +298,16 @@ class _ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onContextUpdate(ContextUpdate result) async {
-    if (result.values[_kSelectorLabel].isEmpty) {
-      onStoryInFocusChanged?.call(false);
-    } else {
-      onStoryInFocusChanged?.call(true);
+    for (final ContextUpdateEntry entry in result.values) {
+      if (entry.key != _kSelectorLabel) {
+        continue;
+      }
+
+      if (entry.value.isEmpty) {
+        onStoryInFocusChanged?.call(false);
+      } else {
+        onStoryInFocusChanged?.call(true);
+      }
     }
   }
 }

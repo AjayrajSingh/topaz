@@ -52,30 +52,38 @@ class ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onContextUpdate(ContextUpdate result) async {
-    if (result.values[_kFocalEntitiesTopic].isEmpty) {
-      return;
-    }
-
     String outputText = '';
     int lastEnd = 0;
     final String allControllerText = _controller.text;
     // Without this, selection might be overwritten.
     final TextSelection oldSelection = _controller.selection;
-    for (ContextValue value in result.values[_kFocalEntitiesTopic]) {
-      final dynamic content = JSON.decode(value.content);
-      // TODO(thatguy): Give the Entity a type instead of this ad-hoc schema
-      // checking. Then use that type in the ContextQuery below.
-      if (!(content is Map<String, dynamic>) &&
-          content.containsKey('start') &&
-          content.containsKey('end')) {
-        final int start = content['start'];
-        final int end = content['end'];
-        outputText = '$outputText'
-            '${allControllerText.substring(lastEnd, start).toLowerCase()}'
-            '${allControllerText.substring(start, end).toUpperCase()}';
-        lastEnd = end;
+    bool found = false;
+    for (final ContextUpdateEntry entry in result.values) {
+      if (entry.key != _kFocalEntitiesTopic) {
+        continue;
+      }
+
+      found = true;
+      for (ContextValue value in entry.value) {
+        final dynamic content = JSON.decode(value.content);
+        // TODO(thatguy): Give the Entity a type instead of this ad-hoc schema
+        // checking. Then use that type in the ContextQuery below.
+        if (!(content is Map<String, dynamic>) &&
+            content.containsKey('start') &&
+            content.containsKey('end')) {
+          final int start = content['start'];
+          final int end = content['end'];
+          outputText = '$outputText'
+              '${allControllerText.substring(lastEnd, start).toLowerCase()}'
+              '${allControllerText.substring(start, end).toUpperCase()}';
+          lastEnd = end;
+        }
       }
     }
+    if (found == false) {
+      return;
+    }
+
     outputText = '$outputText'
         '${allControllerText.substring(lastEnd, allControllerText.length)}';
     if (outputText.length != allControllerText.length) {
@@ -142,7 +150,8 @@ class ModuleImpl implements Module, Lifecycle {
                 focused: new FocusedState(state: FocusedStateState.focused)),
             entity: const EntityMetadata(topic: _kFocalEntitiesTopic)));
     ContextQuery query = new ContextQuery(
-        selector: <String, ContextSelector>{_kFocalEntitiesTopic: selector});
+        selector: <ContextQueryEntry>[new ContextQueryEntry(
+          key: _kFocalEntitiesTopic, value:  selector)]);
 
     _contextReader.subscribe(query, _contextListenerImpl.getHandle());
 

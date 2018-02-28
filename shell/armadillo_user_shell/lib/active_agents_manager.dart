@@ -171,7 +171,9 @@ class _CustomAction extends CustomAction {
 
     storyProvider.createStoryWithInfo(
       'link_viewer',
-      <String, String>{'color': '0xFFA5A700'},
+      <StoryInfoExtraEntry>[
+        const StoryInfoExtraEntry(key: 'color', value: '0xFFA5A700'),
+      ],
       JSON.encode(
         <String, List<String>>{
           'Active Agents': agentProviderWatcherImpl.agents

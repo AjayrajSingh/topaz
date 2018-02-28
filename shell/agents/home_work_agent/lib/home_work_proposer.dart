@@ -99,12 +99,13 @@ class _ContextAwareProposer {
     }
 
     ContextQuery query =
-        const ContextQuery(selector: const <String, ContextSelector>{
-      _kLocationHomeWorkTopic: const ContextSelector(
+        const ContextQuery(selector: const <ContextQueryEntry>[const
+            ContextQueryEntry(
+      key: _kLocationHomeWorkTopic, value: const ContextSelector(
           type: ContextValueType.entity,
           meta: const ContextMetadata(
               entity: const EntityMetadata(topic: _kLocationHomeWorkTopic)))
-    });
+    )]);
 
     contextReader.subscribe(
       query,
@@ -167,8 +168,11 @@ class _ContextListenerImpl extends ContextListener {
 
   @override
   void onContextUpdate(ContextUpdate result) {
-    if (result.values[_kLocationHomeWorkTopic].isNotEmpty) {
-      onTopicChanged(result.values[_kLocationHomeWorkTopic][0].content);
+    for (final ContextUpdateEntry entry in result.values) {
+      if (entry.key != _kLocationHomeWorkTopic) {
+        continue;
+      }
+      onTopicChanged(entry.value[0].content);
     }
   }
 }

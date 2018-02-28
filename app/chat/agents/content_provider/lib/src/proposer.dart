@@ -68,16 +68,18 @@ class Proposer extends ContextListener {
   @override
   void onContextUpdate(ContextUpdate result) {
     log.fine('onUpdate: ${result.values}');
-    if (!(result?.values?.containsKey('location/home_work') ?? false)) {
-      return;
+    for (final ContextUpdateEntry entry in result.values) {
+      if (entry.key != 'location/home_work') {
+        continue;
+      }
+
+      if (entry.value.isEmpty) {
+        _currentLocation = 'unknown';
+      } else {
+        _currentLocation = entry.value[0]?.content ?? 'unknown';
+      }
+      log.fine('Current location: $_currentLocation');
     }
-    if (result.values['location/home_work'].isEmpty) {
-      _currentLocation = 'unknown';
-    } else {
-      _currentLocation =
-          result.values['location/home_work'][0]?.content ?? 'unknown';
-    }
-    log.fine('Current location: $_currentLocation');
   }
 
   Proposal _createProposal(Message message, bool interruptive) => new Proposal(

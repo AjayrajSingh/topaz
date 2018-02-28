@@ -60,21 +60,27 @@ class ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onContextUpdate(ContextUpdate result) async {
-    for (ContextValue value in result.values[_kMusicArtistType]) {
-      try {
-        Map<String, dynamic> entity = JSON.decode(value.content);
-        log.fine('artist update: ${entity['name']}');
-        List<Artist> artists = await _api.searchArtists(
-          entity['name'],
-        );
-        if (artists != null && artists.isNotEmpty) {
-          log.fine('found artist for: ${entity['name']}');
-          await _createProposal(artists.first);
-        } else {
-          log.fine('no artist found for: ${entity['name']}');
+    for (final ContextUpdateEntry entry in result.values) {
+      if (entry.key != _kMusicArtistType) {
+        continue;
+      }
+
+      for (ContextValue value in entry.value) {
+        try {
+          Map<String, dynamic> entity = JSON.decode(value.content);
+          log.fine('artist update: ${entity['name']}');
+          List<Artist> artists = await _api.searchArtists(
+            entity['name'],
+          );
+          if (artists != null && artists.isNotEmpty) {
+            log.fine('found artist for: ${entity['name']}');
+            await _createProposal(artists.first);
+          } else {
+            log.fine('no artist found for: ${entity['name']}');
+          }
+        } on Exception {
+          return;
         }
-      } on Exception {
-        return;
       }
     }
   }
@@ -124,7 +130,8 @@ Future<Null> main(List<dynamic> args) async {
           entity: new EntityMetadata(type: <String>[_kMusicArtistType]))); // ignore: prefer_const_constructors
 
   ContextQuery query = new ContextQuery(
-      selector: <String, ContextSelector>{_kMusicArtistType: selector});
+      selector: <ContextQueryEntry>[new ContextQueryEntry(key:
+        _kMusicArtistType, value: selector)]);
   _contextListenerImpl = new ContextListenerImpl(
     clientId: config.get('spotify_client_id'),
     clientSecret: config.get('spotify_client_secret'),

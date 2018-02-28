@@ -57,27 +57,29 @@ class ContextListenerImpl extends ContextListener {
 
   @override
   Future<Null> onContextUpdate(ContextUpdate result) async {
-    if (result.values[_kMusicArtistTopic].isEmpty) {
-      return;
-    }
+    for (final ContextUpdateEntry entry in result.values) {
+      if (entry.key != _kMusicArtistTopic) {
+        continue;
+      }
 
-    // TODO(thatguy): There can be more than one value. At some point, use the
-    // entity type in the ContextQuery instead of using topics as if they are
-    // types, and handle multiple instances.
-    dynamic data = JSON.decode(result.values[_kMusicArtistTopic][0].content);
+      // TODO(thatguy): There can be more than one value. At some point, use the
+      // entity type in the ContextQuery instead of using topics as if they are
+      // types, and handle multiple instances.
+      dynamic data = JSON.decode(entry.value[0].content);
 
-    if (_isValidArtistContextLink(data)) {
-      log.fine('artist update: ${data['name']}');
-      try {
-        Artist artist = await _api.getArtist(data['name']);
-        if (artist != null) {
-          log.fine('found artist for: ${data['name']}');
-          await _createProposal(artist, data);
-        } else {
-          log.fine('no artist found for: ${data['name']}');
+      if (_isValidArtistContextLink(data)) {
+        log.fine('artist update: ${data['name']}');
+        try {
+          Artist artist = await _api.getArtist(data['name']);
+          if (artist != null) {
+            log.fine('found artist for: ${data['name']}');
+            await _createProposal(artist, data);
+          } else {
+            log.fine('no artist found for: ${data['name']}');
+          }
+        } on Exception {
+          return;
         }
-      } on Exception {
-        return;
       }
     }
   }
@@ -135,12 +137,13 @@ Future<Null> main(List<dynamic> args) async {
   connectToService(_context.environmentServices, _contextReader.ctrl);
   connectToService(_context.environmentServices, _proposalPublisher.ctrl);
   ContextQuery query =
-      const ContextQuery(selector: const <String, ContextSelector>{
-    _kMusicArtistTopic: const ContextSelector(
+      const ContextQuery(selector: const <ContextQueryEntry>[const
+        ContextQueryEntry(
+    key: _kMusicArtistTopic, value: const ContextSelector(
         type: ContextValueType.entity,
         meta: const ContextMetadata(
             entity: const EntityMetadata(topic: _kMusicArtistTopic)))
-  });
+  )]);
   _contextListenerImpl = new ContextListenerImpl(
     apiKey: config.get('last_fm_api_key'),
   );

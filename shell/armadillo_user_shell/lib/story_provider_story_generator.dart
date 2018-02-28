@@ -95,9 +95,13 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
         _storyImportanceWatcherBinding.wrap(
           new StoryImportanceWatcherImpl(
             onImportanceChanged: () {
-              _storyProvider.getImportance((Map<String, double> importance) {
+              _storyProvider.getImportance((
+                    List<StoryImportanceEntry> importanceList) {
+                // TODO: Do something better than O(n^2).
                 for (Story story in _currentStories) {
-                  story.importance = importance[story.id.value] ?? 1.0;
+                  story.importance = importanceList.where(
+                      (StoryImportanceEntry e) => e.id == story.id.value) ??
+                    1.0;
                 }
                 notifyListeners();
               });
@@ -590,6 +594,8 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
       startingIndex: startingIndex,
     );
 
+    // TODO: Determine if we want to use color from story info.
+    final String color = _getStoryInfoExtraValue(storyInfo, 'color');
     return new Story(
         id: new StoryId(storyInfo.id),
         widget: new _StoryWidget(model: storyWidgetState),
@@ -603,18 +609,18 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
           minutes: 0,
         ),
         themeColor:
-            // TODO: Determine if we want to use color from story info.
-            storyInfo.extra['color'] == null
+            color == null
                 ? Colors.grey[500]
-                : new Color(int.parse(storyInfo.extra['color'])),
+                : new Color(int.parse(color)),
         onClusterIndexChanged: (int clusterIndex) {
           storyWidgetState.index = clusterIndex;
         });
   }
 
   String _getStoryTitle(StoryInfo storyInfo) {
-    if (storyInfo.extra['story_title'] != null) {
-      return storyInfo.extra['story_title'];
+    final String title = _getStoryInfoExtraValue(storyInfo, 'story_title');
+    if (title != null) {
+      return title;
     }
     String storyTitle = Uri
         .parse(storyInfo.url)
@@ -627,6 +633,15 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
       return true;
     }());
     return storyTitle;
+  }
+
+  String _getStoryInfoExtraValue(StoryInfo storyInfo, final String key) {
+    for (final StoryInfoExtraEntry entry in storyInfo.extra) {
+      if (entry.key == key) {
+        return entry.value;
+      }
+    }
+    return null;
   }
 }
 

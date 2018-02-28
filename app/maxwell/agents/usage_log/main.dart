@@ -57,24 +57,30 @@ int _getCobaltMetricID(Metric metric) {
 
 // ContextListener callback
 void _onContextUpdate(ContextUpdate update) {
-  for (ContextValue value in update.values['modules']) {
-    String modUrl = '${value.meta.mod.url}';
-    String storyId = '${value.meta.story?.id}';
-
-    if (storyId == null) {
-      return;
+  for (final ContextUpdateEntry entry in update.values) {
+    if (entry.key != 'modules') {
+      continue;
     }
 
-    // To record module launches, we only process each topic once
-    _storyModules.putIfAbsent(storyId, () => new LinkedHashSet<String>());
-    if (_storyModules[storyId].contains(modUrl)) {
-      return;
+    for (ContextValue value in entry.value) {
+      String modUrl = '${value.meta.mod.url}';
+      String storyId = '${value.meta.story?.id}';
+
+      if (storyId == null) {
+        return;
+      }
+
+      // To record module launches, we only process each topic once
+      _storyModules.putIfAbsent(storyId, () => new LinkedHashSet<String>());
+      if (_storyModules[storyId].contains(modUrl)) {
+        return;
+      }
+      _addStringObservation(Metric.moduleLaunched, value.meta.mod.url);
+      for (String existingMod in _storyModules[storyId]) {
+        _addModulePairObservation(existingMod, modUrl);
+      }
+      _storyModules[storyId].add(modUrl);
     }
-    _addStringObservation(Metric.moduleLaunched, value.meta.mod.url);
-    for (String existingMod in _storyModules[storyId]) {
-      _addModulePairObservation(existingMod, modUrl);
-    }
-    _storyModules[storyId].add(modUrl);
   }
 }
 
@@ -121,7 +127,8 @@ void main(List<String> args) {
   // Subscribe to all topics
   ContextSelector selector = new ContextSelector(type: ContextValueType.module);
   ContextQuery query = new ContextQuery(
-      selector: <String, ContextSelector>{'modules': selector});
+      selector: <ContextQueryEntry>[
+        new ContextQueryEntry(key: 'modules', value: selector)]);
   _contextReader.subscribe(query, _contextListener.getHandle());
 
   // Connect to Cobalt

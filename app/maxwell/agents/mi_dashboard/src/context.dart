@@ -159,12 +159,12 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
       'id': sub.id,
       // TODO(ianloic): add debugInfo if needed
       'query': <String, dynamic>{
-        'selector': sub.query.selector.map((String key,
-                ContextSelector value) =>
-            new MapEntry<String, Map<String, dynamic>>(key, <String, dynamic>{
-              'meta': _encodeContextMetadata(value.meta),
-              'type': value.type.fidlEnumValue
-            }))
+        'selector': sub.query.selector.map((ContextQueryEntry entry) =>
+            new MapEntry<String, Map<String, dynamic>>(entry.key,
+              <String, dynamic>{
+                'meta': _encodeContextMetadata(entry.value.meta),
+                'type': entry.value.type.fidlEnumValue
+              }))
       }
     };
   }
