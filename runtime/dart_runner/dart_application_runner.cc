@@ -98,12 +98,15 @@ void IsolateCleanupCallback(void* callback_data) {
 }
 
 void RunApplication(
+    DartApplicationRunner* runner,
+    ControllerToken* token,
     app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
     ::f1dl::InterfaceRequest<app::ApplicationController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   fsl::MessageLoop loop;
-  DartApplicationController app(std::move(application), std::move(startup_info),
+  DartApplicationController app(token->label(),
+                                std::move(application), std::move(startup_info),
                                 std::move(controller));
   bool success = app.Setup();
   int64_t end = Dart_TimelineGetMicros();
@@ -122,12 +125,33 @@ void RunApplication(
   if (Dart_CurrentIsolate()) {
     Dart_ShutdownIsolate();
   }
+
+  runner->PostRemoveController(token);
+}
+
+// Find the last path component that is longer than 1 character.
+// file:///system/pkgs/hello_dart_jit -> hello_dart_jit
+// file:///pkgfs/packages/hello_dart_jit/0 -> hello_dart_jit
+std::string GetLabelFromURL(const std::string& url) {
+  size_t last_slash = url.length();
+  for (size_t i = url.length() - 1; i > 0; i--) {
+    if (url[i] == '/') {
+      size_t component_length = last_slash - i - 1;
+      if (component_length > 1) {
+        return url.substr(i + 1, component_length);
+      } else {
+        last_slash = i;
+      }
+    }
+  }
+  return url;
 }
 
 }  // namespace
 
 DartApplicationRunner::DartApplicationRunner()
-    : context_(app::ApplicationContext::CreateFromStartupInfo()) {
+    : context_(app::ApplicationContext::CreateFromStartupInfo()),
+      loop_(fsl::MessageLoop::GetCurrent()) {
   context_->outgoing_services()->AddService<app::ApplicationRunner>(
       [this](f1dl::InterfaceRequest<app::ApplicationRunner> request) {
         bindings_.AddBinding(this, std::move(request));
@@ -179,9 +203,56 @@ void DartApplicationRunner::StartApplication(
     app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
     ::f1dl::InterfaceRequest<app::ApplicationController> controller) {
-  std::thread thread(RunApplication, std::move(application),
-                     std::move(startup_info), std::move(controller));
+  std::string label = GetLabelFromURL(application->resolved_url);
+  std::thread thread(RunApplication, this, AddController(label),
+                     std::move(application), std::move(startup_info), std::move(controller));
   thread.detach();
+}
+
+ControllerToken* DartApplicationRunner::AddController(std::string label) {
+  ControllerToken* token = new ControllerToken(label);
+  controllers_.push_back(token);
+  UpdateProcessLabel();
+  return token;
+}
+
+void DartApplicationRunner::RemoveController(ControllerToken* token) {
+  for (auto it = controllers_.begin(); it != controllers_.end(); ++it) {
+    if (*it == token) {
+      controllers_.erase(it);
+      break;
+    }
+  }
+  delete token;
+  if (controllers_.empty()) {
+    loop_->QuitNow();
+  } else {
+    UpdateProcessLabel();
+  }
+}
+
+void DartApplicationRunner::PostRemoveController(ControllerToken* token) {
+  loop_->task_runner()->PostTask([this, token] {
+    RemoveController(token);
+  });
+}
+
+void DartApplicationRunner::UpdateProcessLabel() {
+  FXL_CHECK(controllers_.size() > 0);
+  std::string base_label = "dart:" + controllers_[0]->label();
+  std::string label;
+  if (controllers_.size() < 2) {
+    label = base_label;
+  } else {
+    std::string suffix = " (+" + std::to_string(controllers_.size() - 1) + ")";
+    if (base_label.size() + suffix.size() <= ZX_MAX_NAME_LEN - 1) {
+      label = base_label + suffix;
+    } else {
+      label = base_label.substr(0, ZX_MAX_NAME_LEN - 1 - suffix.size() - 3) +
+              "..." + suffix;
+    }
+  }
+  zx::process::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
 }
 
 }  // namespace dart_content_handler

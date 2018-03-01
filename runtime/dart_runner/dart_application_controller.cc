@@ -12,7 +12,6 @@
 #include <sys/types.h>
 #include <zircon/dlfcn.h>
 #include <zircon/status.h>
-#include <zx/process.h>
 #include <zx/thread.h>
 #include <utility>
 
@@ -42,24 +41,6 @@ void AfterTask() {
   queue->RunMicrotasks();
 }
 
-// Find the last path component that is longer than 1 character.
-// file:///system/pkgs/hello_dart_jit -> hello_dart_jit
-// file:///pkgfs/packages/hello_dart_jit/0 -> hello_dart_jit
-std::string GetLabelFromURL(const std::string& url) {
-  size_t last_slash = url.length();
-  for (size_t i = url.length() - 1; i > 0; i--) {
-    if (url[i] == '/') {
-      size_t component_length = last_slash - i - 1;
-      if (component_length > 1) {
-        return url.substr(i + 1, component_length);
-      } else {
-        last_slash = i;
-      }
-    }
-  }
-  return url;
-}
-
 void NopReleaseDill(uint8_t* dill) {
   // Released by ~MappedResource.
 }
@@ -67,10 +48,12 @@ void NopReleaseDill(uint8_t* dill) {
 }  // namespace
 
 DartApplicationController::DartApplicationController(
+    std::string label,
     app::ApplicationPackagePtr application,
     app::ApplicationStartupInfoPtr startup_info,
     f1dl::InterfaceRequest<app::ApplicationController> controller)
-    : url_(std::move(application->resolved_url)),
+    : label_(label),
+      url_(std::move(application->resolved_url)),
       application_(std::move(application)),
       startup_info_(std::move(startup_info)),
       binding_(this) {
@@ -109,10 +92,8 @@ DartApplicationController::~DartApplicationController() {
 }
 
 bool DartApplicationController::Setup() {
-  // Name the process and thread after the url of the application being
-  // launched.
-  std::string label = "dart:" + GetLabelFromURL(url_);
-  zx::process::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
+  // Name the thread after the url of the application being launched.
+  std::string label = "dart:" + label_;
   zx::thread::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
   Dart_SetThreadName(label.c_str());
 
@@ -375,7 +356,7 @@ bool DartApplicationController::CreateIsolate(
 
   auto state = new tonic::DartState();  // Freed in IsolateShutdownCallback.
   isolate_ = Dart_CreateIsolate(
-      url_.c_str(), "main",
+      url_.c_str(), label_.c_str(),
       reinterpret_cast<const uint8_t*>(isolate_snapshot_data),
       reinterpret_cast<const uint8_t*>(isolate_snapshot_instructions), nullptr,
       state, &error);

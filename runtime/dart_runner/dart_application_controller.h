@@ -20,6 +20,7 @@ namespace dart_content_handler {
 class DartApplicationController : public app::ApplicationController {
  public:
   DartApplicationController(
+      std::string label,
       app::ApplicationPackagePtr application,
       app::ApplicationStartupInfoPtr startup_info,
       f1dl::InterfaceRequest<app::ApplicationController> controller);
@@ -52,6 +53,7 @@ class DartApplicationController : public app::ApplicationController {
   async_wait_result_t OnIdleTimer(async_t* async, zx_status_t status,
                                   const zx_packet_signal* signal);
 
+  std::string label_;
   std::string url_;
   app::ApplicationPackagePtr application_;
   app::ApplicationStartupInfoPtr startup_info_;
