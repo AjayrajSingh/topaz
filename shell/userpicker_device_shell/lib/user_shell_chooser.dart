@@ -10,7 +10,7 @@ class UserShellChooser {
 
   /// Constructor.
   UserShellChooser() {
-    File file = new File('/system/data/sysui/user_shell_to_launch2');
+    File file = new File('/system/data/sysui/user_shell_to_launch');
     file.exists().then((bool exists) {
       if (exists) {
         file.readAsString().then(
