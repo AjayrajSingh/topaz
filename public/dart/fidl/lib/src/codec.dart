@@ -8,11 +8,12 @@ import 'dart:typed_data';
 import 'package:zircon/zircon.dart';
 
 import 'error.dart';
+import 'message.dart';
 import 'types.dart';
 
-// ignore_for_file: public_member_api_docs
-// ignore_for_file: avoid_positional_boolean_parameters
 // ignore_for_file: always_specify_types
+// ignore_for_file: avoid_positional_boolean_parameters
+// ignore_for_file: public_member_api_docs
 
 const int _kAlignment = 8;
 const int _kAlignmentMask = 0x7;
@@ -146,38 +147,9 @@ class _EncoderBuffer {
   ByteData get trimmed => new ByteData.view(data.buffer, 0, extent);
 }
 
-class Message {
-  Message(this.data, this.handles, this.dataLength, this.handlesLength);
-  Message.fromReadResult(ReadResult result)
-      : data = result.bytes,
-        handles = result.handles,
-        dataLength = result.bytes.lengthInBytes,
-        handlesLength = result.handles.length,
-        assert(result.status == ZX.OK);
-
-  final ByteData data;
-  final List<Handle> handles;
-  final int dataLength;
-  final int handlesLength;
-
-  int get txid => data.getUint32(0);
-  int get ordinal => data.getUint32(16);
-
-  void closeHandles() {
-    if (handles != null) {
-      for (int i = 0; i < handles.length; ++i) {
-        handles[i].close();
-      }
-    }
-  }
-
-  @override
-  String toString() =>
-      'Message(numBytes=$dataLength, numHandles=$handlesLength)';
-}
-
-// ignore: one_member_abstracts
 abstract class Encodable {
+  const Encodable();
+
   void $encode(Encoder encoder, int offset, covariant FidlType type);
 }
 
@@ -260,7 +232,9 @@ class Encoder {
     int encoded = value.isValid ? kHandlePresent : kHandleAbsent;
     type.validateEncoded(encoded);
     encodeUint32(encoded, offset);
-    if (value.isValid) _buffer.handles.add(value);
+    if (value.isValid) {
+      _buffer.handles.add(value);
+    }
   }
 
   // See fidl_string_t.
@@ -468,11 +442,10 @@ class Encoder {
   }
 }
 
-typedef T DecodeCallback<T>(
-    Decoder decoder, int offset, covariant FidlType type);
+typedef T DecodeCallback<T>(Decoder decoder, int offset, FidlType type);
 
 typedef List<T> DecodeArrayCallback<T>(
-    Decoder decoder, int count, int offset, covariant FidlType type);
+    Decoder decoder, int count, int offset, FidlType type);
 
 Int8List _decodeInt8List(
     Decoder decoder, int count, int offset, FidlType type) {

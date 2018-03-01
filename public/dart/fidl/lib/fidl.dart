@@ -4,6 +4,8 @@
 
 library fidl;
 
-import 'src/codec.dart';
-import 'src/error.dart';
-import 'src/types.dart';
+export 'src/codec.dart';
+export 'src/error.dart';
+export 'src/interface.dart';
+export 'src/message.dart';
+export 'src/types.dart';
