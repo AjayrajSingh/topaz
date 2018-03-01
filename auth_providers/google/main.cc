@@ -5,6 +5,7 @@
 #include <trace-provider/provider.h>
 #include <memory>
 
+#include "garnet/lib/backoff/exponential_backoff.h"
 #include "garnet/lib/network_wrapper/network_wrapper_impl.h"
 #include "garnet/public/lib/auth/fidl/auth_provider_factory.fidl.h"
 #include "lib/app/cpp/application_context.h"
@@ -26,6 +27,7 @@ class GoogleAuthProviderApp {
         trace_provider_(loop_.async()),
         network_wrapper_(
             loop_.task_runner(),
+            std::make_unique<backoff::ExponentialBackoff>(),
             [this] {
               return application_context_
                   ->ConnectToEnvironmentService<network::NetworkService>();
