@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.component.dart/component.dart';
+import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.entity.dart/entity.dart';
 import 'package:lib.lifecycle.dart/lifecycle.dart';
 import 'package:lib.logging/logging.dart';
@@ -210,9 +211,9 @@ class ModuleDriver {
 
     try {
       ComponentContextClient componentContext = await getComponentContext();
-      String ref = await componentContext.createEntityWithData(<String, String>{
-        codec.type: codec.encode(value),
-      });
+      String ref = await componentContext.createEntityWithData(<TypeToDataEntry>[
+        new TypeToDataEntry(type: codec.type, data: codec.encode(value)),
+      ]);
       LinkClient link = await getLink(key);
       await link.setEntity(ref);
       completer.complete(ref);

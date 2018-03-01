@@ -31,7 +31,7 @@ class ComponentContextClient {
   final Completer<Null> _bind = new Completer<Null>();
 
   /// See [fidl.ComponentContext#createEntityWithData].
-  Future<String> createEntityWithData(Map<String, String> typeToData) {
+  Future<String> createEntityWithData(List<fidl.TypeToDataEntry> typeToData) {
     Completer<String> completer = new Completer<String>();
 
     // ignore: unawaited_futures
