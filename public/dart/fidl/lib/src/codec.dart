@@ -407,11 +407,11 @@ class Encoder {
     final int stride = type.elementSize;
     final PointerType element = type.element;
     if (element is PointerType) {
-      for (int i = 0; i < type.count; ++i) {
+      for (int i = 0; i < type.elementCount; ++i) {
         encodePointer(value[i], offset + i * stride, element);
       }
     } else {
-      for (int i = 0; i < type.count; ++i) {
+      for (int i = 0; i < type.elementCount; ++i) {
         value[i].$encode(this, offset + i * stride, element);
       }
     }
@@ -660,42 +660,42 @@ class Decoder {
   }
 
   Int8List decodeArrayAsInt8List(int offset, ArrayType type) {
-    return _data.buffer.asInt8List(offset, type.count);
+    return _data.buffer.asInt8List(offset, type.elementCount);
   }
 
   Uint8List decodeArrayAsUint8List(int offset, ArrayType type) {
-    return _data.buffer.asUint8List(offset, type.count);
+    return _data.buffer.asUint8List(offset, type.elementCount);
   }
 
   Int16List decodeArrayAsInt16List(int offset, ArrayType type) {
-    return _data.buffer.asInt16List(offset, type.count);
+    return _data.buffer.asInt16List(offset, type.elementCount);
   }
 
   Uint16List decodeArrayAsUint16List(int offset, ArrayType type) {
-    return _data.buffer.asUint16List(offset, type.count);
+    return _data.buffer.asUint16List(offset, type.elementCount);
   }
 
   Int32List decodeArrayAsInt32List(int offset, ArrayType type) {
-    return _data.buffer.asInt32List(offset, type.count);
+    return _data.buffer.asInt32List(offset, type.elementCount);
   }
 
   Uint32List decodeArrayAsUint32List(int offset, ArrayType type) {
-    return _data.buffer.asUint32List(offset, type.count);
+    return _data.buffer.asUint32List(offset, type.elementCount);
   }
 
   Int64List decodeArrayAsInt64List(int offset, ArrayType type) {
-    return _data.buffer.asInt64List(offset, type.count);
+    return _data.buffer.asInt64List(offset, type.elementCount);
   }
 
   Uint64List decodeArrayAsUint64List(int offset, ArrayType type) {
-    return _data.buffer.asUint64List(offset, type.count);
+    return _data.buffer.asUint64List(offset, type.elementCount);
   }
 
   Float32List decodeArrayAsFloat32List(int offset, ArrayType type) {
-    return _data.buffer.asFloat32List(offset, type.count);
+    return _data.buffer.asFloat32List(offset, type.elementCount);
   }
 
   Float64List decodeArrayAsFloat64List(int offset, ArrayType type) {
-    return _data.buffer.asFloat64List(offset, type.count);
+    return _data.buffer.asFloat64List(offset, type.elementCount);
   }
 }

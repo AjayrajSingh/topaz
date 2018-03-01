@@ -43,10 +43,6 @@ class FidlType {
   const FidlType();
 }
 
-class PrimitiveType extends FidlType {
-  const PrimitiveType();
-}
-
 class HandleType extends FidlType {
   const HandleType({this.nullable});
 
@@ -121,21 +117,25 @@ class MemberType extends FidlType {
 class StructType extends FidlType {
   const StructType({
     this.members,
-    this.size,
   });
 
   final List<MemberType> members;
-  final int size;
 }
 
 class UnionType extends FidlType {
   const UnionType({
     this.members,
-    this.size,
   });
 
   final List<MemberType> members;
-  final int size;
+}
+
+class MethodType extends FidlType {
+  const MethodType({
+    this.members,
+  });
+
+  final List<MemberType> members;
 }
 
 class VectorType extends FidlType {
@@ -174,15 +174,15 @@ class VectorType extends FidlType {
 class ArrayType extends FidlType {
   const ArrayType({
     this.element,
-    this.count,
+    this.elementCount,
     this.elementSize,
   });
 
   final FidlType element;
-  final int count;
+  final int elementCount;
   final int elementSize;
 
   void validate(List<Object> value) {
-    _throwIfCountMismatch(value.length, count);
+    _throwIfCountMismatch(value.length, elementCount);
   }
 }
