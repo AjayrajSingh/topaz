@@ -7,7 +7,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("image") {
   main_dart = "lib/main.dart"
-  source_dir = "lib"
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",

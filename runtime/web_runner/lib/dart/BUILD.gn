@@ -8,4 +8,8 @@ dart_library("web_view") {
   package_name = "web_view"
 
   source_dir = "."
+
+  sources = [
+    "web_view.dart",
+  ]
 }

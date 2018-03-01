@@ -237,10 +237,6 @@ template("flutter_jit_app") {
       snapshot_path,
     ]
 
-    if (defined(invoker.sources)) {
-      sources = invoker.sources
-    }
-
     script = "//topaz/runtime/flutter_runner/build/script_snapshot.py"
 
     args = [
@@ -416,10 +412,6 @@ template("flutter_aot_app") {
     outputs = [
       assembly_path,
     ]
-
-    if (defined(invoker.sources)) {
-      sources = invoker.sources
-    }
 
     script = "//topaz/runtime/flutter_runner/build/aot_snapshot.py"
     args = [

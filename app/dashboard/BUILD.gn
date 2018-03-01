@@ -8,7 +8,19 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("dashboard") {
   package_name = "dashboard"
   main_dart = "lib/main.dart"
-  source_dir = "lib"
+
+  sources = [
+    "buildbucket/build_bucket_service.dart",
+    "service/build_info.dart",
+    "service/build_service.dart",
+    "build_status_model.dart",
+    "build_status_widget.dart",
+    "chatter.dart",
+    "dashboard_app.dart",
+    "dashboard_module_model.dart",
+    "enums.dart",
+    "info_text.dart",
+  ]
 
   sandbox = "meta/sandbox"
 
