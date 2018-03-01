@@ -115,10 +115,13 @@ void SchemaOrgContext::EntitiesChanged() {
     std::string type = ExtractTypeFromEntity(entity_json);
     FXL_LOG(INFO) << "entity type: " << type;
     if (type.size()) {
-      f1dl::Map<f1dl::String, f1dl::String> type_data_map;
-      type_data_map.insert(type, modular::JsonValueToPrettyString(*i));
+      f1dl::Array<modular::TypeToDataEntryPtr> type_to_data_array;
+      modular::TypeToDataEntryPtr entry;
+      entry->type = type;
+      entry->data = modular::JsonValueToPrettyString(*i);
+      type_to_data_array.push_back(std::move(entry));
       component_context_->CreateEntityWithData(
-          std::move(type_data_map),
+          std::move(type_to_data_array),
           [this](const std::string& entity_reference) {
             maxwell::ContextValueWriterPtr value;
             context_writer_->CreateValue(value.NewRequest(),
