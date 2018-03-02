@@ -35,6 +35,7 @@ source_set("lib") {
 
   deps = [
     "//garnet/lib/network_wrapper",
+    "//garnet/public/lib/app/cpp",
     "//garnet/public/lib/auth/fidl",
     "//garnet/public/lib/fidl/cpp/bindings",
     "//garnet/public/lib/fxl",
