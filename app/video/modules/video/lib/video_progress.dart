@@ -6,6 +6,9 @@ import 'dart:async';
 import 'package:lib.media.flutter/media_player_controller.dart';
 import 'package:lib.widgets/model.dart';
 
+const String _kDurationKey = 'duration_msec';
+const String _kProgressKey = 'normalized_progress';
+
 /// Tracks progress of Video playback
 class VideoProgress extends Model {
   /// Constructor
@@ -13,8 +16,8 @@ class VideoProgress extends Model {
 
   //// Create a VideoProgress from a Map previously output by toMap()
   factory VideoProgress.fromMap(Map <String, dynamic> map) {
-    int durationMsec = map['duration'];
-    double normalizedProgress = map['normalized_progress'];
+    int durationMsec = map[_kDurationKey];
+    double normalizedProgress = map[_kProgressKey];
     if (durationMsec == null || normalizedProgress == null) {
       throw const FormatException('Missing required field for VideoProgress');
     }
@@ -24,8 +27,8 @@ class VideoProgress extends Model {
   /// Convert to a Map suitable for sending via json, etc. over a Link
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'duration': _durationMsec,
-      'normalized_progress': _normalizedProgress,
+      _kDurationKey: _durationMsec,
+      _kProgressKey: _normalizedProgress,
     };
   }
 
@@ -81,7 +84,7 @@ class VideoProgressMonitor {
     _started = true;
     _progress.durationMsec = _controller.duration.inMilliseconds;
     _timer =
-        new Timer.periodic(const Duration(milliseconds: 500), _handleTimer);
+        new Timer.periodic(const Duration(milliseconds: 250), _handleTimer);
   }
 
   /// Stop sending periodic progress events

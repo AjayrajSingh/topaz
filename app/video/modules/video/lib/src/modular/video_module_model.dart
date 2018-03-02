@@ -58,8 +58,6 @@ class VideoModuleModel extends ModuleModel {
   final LinkWatcherBinding _remoteDeviceLinkWatcherBinding =
       new LinkWatcherBinding();
   final LinkProxy _progressLink = new LinkProxy();
-  final LinkWatcherBinding _videoProgressLinkWatcherBinding =
-      new LinkWatcherBinding();
 
   /// Last version we received from NetConnector
   int lastVersion = 0;
@@ -110,24 +108,8 @@ class VideoModuleModel extends ModuleModel {
       ),
     );
 
-    // named Link to send progress updates
-    moduleContext.getLink('video_progress', _progressLink.ctrl.request());
-    _progressLink.watchAll(
-      _videoProgressLinkWatcherBinding.wrap(
-        new LinkWatcherImpl(
-          onNotify: _handlProgressJson,
-        ),
-      ),
-    );
-
-    notifyListeners();
-
     link.set(const <String>['preferredHeight'], JSON.encode(300.0));
     moduleContext.ready();
-  }
-
-  void _handlProgressJson(String json) {
-    print('LBL can see local json: $json');
   }
 
   /// Gets asset
@@ -356,10 +338,17 @@ class VideoModuleModel extends ModuleModel {
   /// When a video is playing, the progress will be updated periodically to
   /// reflect position in the video player.
   void handleProgressChanged(VideoProgress progress) {
-    Map<String, dynamic> progressData = <String, dynamic>{
+    Map<String, dynamic> progressMap = <String, dynamic>{
       'video_progress': progress.toMap(),
     };
-    _progressLink?.set(null, JSON.encode(progressData));
+    String json;
+    try {
+      json = JSON.encode(progressMap);
+    } on Exception catch (e, trace) {
+      log.fine('Exception encoding json', e, trace);
+      return;
+    }
+    link.set(null, json);
   }
 
   void _setDisplayModeLink(String mode) {
