@@ -7,8 +7,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("xi_app") {
   main_dart = "lib/main.dart"
 
-  source_dir = "lib"
-
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",

@@ -7,6 +7,10 @@ import("//build/dart/dart_library.gni")
 dart_library("xi_widgets") {
   package_name = "xi_widgets"
 
+  sources = [
+    "widgets.dart"
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/xi/packages/xi_client",

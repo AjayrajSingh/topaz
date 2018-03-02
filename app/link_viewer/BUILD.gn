@@ -6,7 +6,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("link_viewer") {
   main_dart = "lib/main.dart"
-  source_dir = "lib"
 
   deps = [
     "//peridot/public/lib/ledger/fidl:fidl_dart",
