@@ -64,7 +64,7 @@ class ConversationListWatcher extends BasePageWatcher {
     ResultState resultState,
   ) {
     // Process the changes independently.
-    pageChange.changes.forEach(_processEntry);
+    pageChange.changedEntries.forEach(_processEntry);
 
     // Process the deleted conversations.
     pageChange.deletedKeys.forEach(_processDeletedKey);

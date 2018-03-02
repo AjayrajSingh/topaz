@@ -38,7 +38,7 @@ class ContactsWatcher extends PageWatcher {
       void callback(InterfaceRequest<PageSnapshot> snapshotRequest)) {
     // Process the changed entries as they come in but only add the snapshot
     // of all changes if this is the final onChange call
-    _processEntriesCallback(pageChange.changes);
+    _processEntriesCallback(pageChange.changedEntries);
     if (resultState == ResultState.completed ||
         resultState == ResultState.partialCompleted) {
       PageSnapshotProxy snapshot = new PageSnapshotProxy();

@@ -31,7 +31,7 @@ class ConversationWatcher extends BasePageWatcher {
     PageChange pageChange,
     ResultState resultState,
   ) {
-    for (Entry entry in pageChange.changes) {
+    for (Entry entry in pageChange.changedEntries) {
       // If the entry key is zero, it contains the title.
       if (entry.key.length == 1 && entry.key[0] == 0) {
         // Skip processing the title entry. This is now better handled by the
