@@ -12,6 +12,7 @@ import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.story.fidl/story_shell.fidl.dart';
 import 'package:lib.surface.fidl._container/container.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:lib.module.fidl._module_data/module_manifest.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
 import 'package:lib.user.fidl/device_map.fidl.dart';
@@ -65,8 +66,13 @@ class StoryShellImpl implements StoryShell, Lifecycle {
   /// @params parentId The ID of the parent view
   /// @params surfaceRelation The relationship between this view and its parent
   @override
-  void connectView(InterfaceHandle<ViewOwner> view, String viewId,
-      String parentId, SurfaceRelation surfaceRelation) {
+  void connectView(
+    InterfaceHandle<ViewOwner> view,
+    String viewId,
+    String parentId,
+    SurfaceRelation surfaceRelation,
+    ModuleManifest manifest,
+  ) {
     log.fine('Connecting view $viewId with parent $parentId');
     _surfaceGraph
       ..addSurface(
@@ -74,6 +80,7 @@ class StoryShellImpl implements StoryShell, Lifecycle {
         new SurfaceProperties(),
         parentId,
         surfaceRelation ?? new SurfaceRelation(),
+        manifest != null ? manifest.compositionPattern : '',
       )
       ..connectView(viewId, view);
   }
@@ -105,7 +112,13 @@ class StoryShellImpl implements StoryShell, Lifecycle {
       List<ContainerView> views) {
     SurfaceProperties props =
         new SurfaceProperties(containerLayouts: layout[0].surfaces);
-    _surfaceGraph.addSurface(containerName, props, parentId, relation);
+    _surfaceGraph.addSurface(
+      containerName,
+      props,
+      parentId,
+      relation,
+      null /* module_manifest */,
+    );
   }
 
   /// Terminate the StoryShell.

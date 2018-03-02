@@ -4,6 +4,7 @@
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
+import 'package:lib.module.fidl._module_data/module_manifest.fidl.dart';
 import 'package:lib.story.fidl/story_shell.fidl.dart';
 import 'package:lib.surface.fidl._container/container.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
@@ -87,8 +88,12 @@ class StoryShellImpl implements StoryShell, Lifecycle {
 
   /// StoryShell
   @override
-  void connectView(InterfaceHandle<ViewOwner> view, String viewId,
-      String parentId, SurfaceRelation surfaceRelation) {
+  void connectView(
+      InterfaceHandle<ViewOwner> view,
+      String viewId,
+      String parentId,
+      SurfaceRelation surfaceRelation,
+      ModuleManifest moduleManifest) {
     _surfaceLayoutKey.currentState.addChild(view);
   }
 

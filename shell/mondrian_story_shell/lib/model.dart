@@ -21,7 +21,8 @@ typedef bool _SurfaceSpanningTreeCondition(Surface s);
 
 /// Details of a surface child view
 class Surface extends Model {
-  Surface._internal(this._graph, this._node, this.properties, this.relation);
+  Surface._internal(this._graph, this._node, this.properties, this.relation,
+      this.compositionPattern);
 
   final SurfaceGraph _graph;
   final Tree<String> _node;
@@ -37,6 +38,9 @@ class Surface extends Model {
 
   /// The relationship this node has with its parent
   final SurfaceRelation relation;
+
+  /// The pattern with which to compose this node with its parent
+  final String compositionPattern;
 
   /// Whether or not this surface is currently dismissed
   bool get dismissed => _graph.isDismissed(_node.value);
@@ -65,6 +69,9 @@ class Surface extends Model {
 
   /// The parent of this node
   Surface get parent => _surface(_node.parent);
+
+  /// The parentId of this node
+  String get parentId => _node.parent.value;
 
   /// The root surface
   Surface get root {
@@ -128,6 +135,17 @@ class Surface extends Model {
       }
     }
     return tree;
+  }
+
+  /// Gets the pattern spanning tree the current widget is part of
+  Tree<Surface> patternSpanningTree(String pattern) {
+    Tree<Surface> root = new Tree<Surface>(value: _surface(_node));
+    while (
+        root.ancestors.isNotEmpty && root.value.compositionPattern == pattern) {
+      root = root.ancestors.first;
+    }
+    return _spanningTree(
+        null, root.value, (Surface s) => s.compositionPattern == pattern);
   }
 
   /// Dismiss this node hiding it from layouts
@@ -230,6 +248,7 @@ class SurfaceGraph extends Model {
     SurfaceProperties properties,
     String parentId,
     SurfaceRelation relation,
+    String pattern,
   ) {
     Tree<String> node = _tree.find(id) ?? new Tree<String>(value: id);
     Tree<String> parent =
@@ -238,7 +257,8 @@ class SurfaceGraph extends Model {
     assert(relation != null);
     parent.add(node);
     Surface oldSurface = _surfaces[id];
-    _surfaces[id] = new Surface._internal(this, node, properties, relation);
+    _surfaces[id] =
+        new Surface._internal(this, node, properties, relation, pattern);
     oldSurface?.notifyListeners();
     notifyListeners();
   }

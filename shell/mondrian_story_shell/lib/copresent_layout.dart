@@ -8,29 +8,8 @@ import 'package:flutter/widgets.dart';
 
 import 'layout_model.dart';
 import 'model.dart';
+import 'positioned_surface.dart';
 import 'tree.dart';
-
-/// A pair of Surface and a Rect position.
-class PositionedSurface {
-  /// The constructor
-  PositionedSurface({this.surface, this.position});
-
-  /// The Surface
-  final Surface surface;
-
-  /// The Position
-  final Rect position;
-
-  @override
-  String toString() => 'PositionedSurface('
-      'surface: $surface, position: $position)';
-
-  @override
-  bool operator ==(Object o) => o is PositionedSurface && surface == o.surface;
-
-  @override
-  int get hashCode => surface.hashCode;
-}
 
 // Convenience comparator used to ensure more focused items get higher priority
 int _compareByOtherList(Surface l, Surface r, List<Surface> otherList) {

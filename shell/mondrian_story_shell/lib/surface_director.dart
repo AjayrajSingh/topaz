@@ -9,9 +9,11 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'child_view.dart';
-import 'copresent_layout.dart';
+import 'copresent_layout.dart' as copresent;
 import 'layout_model.dart';
 import 'model.dart';
+import 'pattern_layout.dart' as pattern;
+import 'positioned_surface.dart';
 import 'surface_form.dart';
 import 'surface_stage.dart';
 import 'tree.dart';
@@ -119,12 +121,27 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
                         maxHeight: constraints.maxHeight,
                         maxWidth: constraints.maxWidth - 12.0);
                     while (focusStack.isNotEmpty) {
-                      for (PositionedSurface ps in layoutSurfaces(
-                        context,
-                        adjustedConstraints,
-                        focusStack,
-                        layoutModel,
-                      )) {
+                      List<PositionedSurface> positionedSurfaces =
+                          <PositionedSurface>[];
+                      if (focusStack.isNotEmpty) {
+                        Surface last = focusStack.last;
+                        if (last.compositionPattern.isEmpty) {
+                          positionedSurfaces = copresent.layoutSurfaces(
+                            context,
+                            adjustedConstraints,
+                            focusStack,
+                            layoutModel,
+                          );
+                        } else {
+                          positionedSurfaces = pattern.layoutSurfaces(
+                            context,
+                            adjustedConstraints,
+                            focusStack,
+                            layoutModel,
+                          );
+                        }
+                      }
+                      for (PositionedSurface ps in positionedSurfaces) {
                         if (!placedSurfaces.keys.contains(ps.surface)) {
                           _prevForms.remove(ps.surface);
                           placedSurfaces[ps.surface] =
