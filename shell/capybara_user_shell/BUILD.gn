@@ -20,6 +20,10 @@ flutter_app("capybara_user_shell") {
 }
 
 dart_test("test") {
+  sources = [
+    "dummy_test.dart",
+  ]
+
   deps = [
     ":capybara_user_shell_dart_library",
     "//third_party/dart-pkg/pub/test",

@@ -42,6 +42,11 @@ flutter_app("dashboard") {
 }
 
 dart_test("dashboard_test") {
+  sources = [
+    "build_bucket_service_test.dart",
+    "enums_test.dart",
+  ]
+
   deps = [
     ":dashboard_dart_library",
     "//third_party/dart-pkg/pub/buildbucket",
