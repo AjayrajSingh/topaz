@@ -8,7 +8,9 @@ import("//build/dart/dart_test.gni")
 dart_library("concert_models") {
   package_name = "concert_models"
 
-  source_dir = "lib"
+  sources = [
+    "concert_models.dart"
+  ]
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
@@ -18,8 +20,8 @@ dart_library("concert_models") {
 
 dart_test("test") {
   deps = [
+    ":concert_models",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/app/music/packages/concert_models",
   ]
 }

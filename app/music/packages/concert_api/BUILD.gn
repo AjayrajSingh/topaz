@@ -7,7 +7,9 @@ import("//build/dart/dart_library.gni")
 dart_library("concert_api") {
   package_name = "concert_api"
 
-  source_dir = "lib"
+  sources = [
+    "api.dart"
+  ]
 
   deps = [
     "//topaz/app/music/packages/concert_models",

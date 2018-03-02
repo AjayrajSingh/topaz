@@ -7,7 +7,9 @@ import("//build/dart/dart_library.gni")
 dart_library("last_fm_api") {
   package_name = "last_fm_api"
 
-  source_dir = "lib"
+  sources = [
+    "api.dart"
+  ]
 
   deps = [
     "//topaz/app/music/packages/last_fm_models",

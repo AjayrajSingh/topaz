@@ -9,8 +9,6 @@ flutter_app("last_fm_artist_bio") {
 
   main_dart = "lib/main.dart"
 
-  source_dir = "lib"
-
   manifest = "pubspec.yaml"
 
   deps = [

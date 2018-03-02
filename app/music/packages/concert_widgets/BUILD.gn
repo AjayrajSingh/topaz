@@ -8,6 +8,10 @@ import("//build/dart/dart_test.gni")
 dart_library("concert_widgets") {
   package_name = "concert_widgets"
 
+  sources = [
+    "concert_widgets.dart"
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart/third_party/pkg/intl",

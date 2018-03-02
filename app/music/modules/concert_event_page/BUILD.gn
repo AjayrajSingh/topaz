@@ -9,8 +9,6 @@ flutter_app("concert_event_page") {
 
   main_dart = "lib/main.dart"
 
-  source_dir = "lib"
-
   manifest = "pubspec.yaml"
 
   deps = [

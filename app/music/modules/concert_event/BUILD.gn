@@ -9,7 +9,7 @@ flutter_app("concert_event") {
 
   main_dart = "lib/main.dart"
 
-  source_dir = "lib"
+  manifest = "pubspec.yaml"
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",

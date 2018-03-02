@@ -8,6 +8,10 @@ import("//build/dart/dart_test.gni")
 dart_library("music_widgets") {
   package_name = "music_widgets"
 
+  sources = [
+    "music_widgets.dart"
+  ]
+
   deps = [
     "//third_party/dart/third_party/pkg/intl",
     "//topaz/app/music/packages/music_models",
@@ -18,10 +22,10 @@ dart_library("music_widgets") {
 
 dart_test("test") {
   deps = [
+    ":music_widgets",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
     "//topaz/app/music/packages/music_models",
-    "//topaz/app/music/packages/music_widgets",
     "//topaz/public/lib/testing/flutter",
   ]
 }

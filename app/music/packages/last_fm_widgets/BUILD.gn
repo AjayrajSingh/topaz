@@ -8,6 +8,10 @@ import("//build/dart/dart_test.gni")
 dart_library("last_fm_widgets") {
   package_name = "last_fm_widgets"
 
+  sources = [
+    "last_fm_widgets.dart"
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/music/packages/last_fm_models",
