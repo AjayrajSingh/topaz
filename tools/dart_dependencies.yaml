@@ -6,8 +6,8 @@ name: modules
 dependencies:
   flutter_flux: ^4.0.1
   flutter_markdown: ^0.1.0
-  googleapis_auth: ^0.2.3
-  googleapis: ^0.46.0
+  googleapis_auth: ^0.2.4
+  googleapis: ^0.50.0
   html_unescape: ^0.1.5
   lorem: ^0.1.0
   markdown: ^1.0.0
