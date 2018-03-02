@@ -62,6 +62,9 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
   // |web_view::WebRequestDelegate|
   void WillSendRequest(const f1dl::String& incoming_url) override;
 
+  void GetUserProfile(const f1dl::String& credential,
+                      const f1dl::String& access_token);
+
   mozart::ViewOwnerPtr SetupWebView();
 
   void Request(std::function<network::URLRequestPtr()> request_factory,

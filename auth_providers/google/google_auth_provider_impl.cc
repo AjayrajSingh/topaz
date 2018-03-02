@@ -103,7 +103,7 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
     }
     auth_ui_context_ = nullptr;
     get_persistent_credential_callback_(AuthProviderStatus::INTERNAL_ERROR,
-                                        nullptr);
+                                        nullptr, nullptr);
     return;
   });
 
@@ -282,7 +282,7 @@ void GoogleAuthProviderImpl::WillSendRequest(const f1dl::String& incoming_url) {
   // user denied OAuth permissions
   if (cancel_pos == 0) {
     get_persistent_credential_callback_(AuthProviderStatus::USER_CANCELLED,
-                                        "User cancelled OAuth flow");
+                                        nullptr, nullptr);
     return;
   }
   auto pos = uri.find(prefix);
@@ -322,20 +322,77 @@ void GoogleAuthProviderImpl::WillSendRequest(const f1dl::String& incoming_url) {
           FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
           FXL_VLOG(1) << "Got response: "
                       << JsonValueToPrettyString(oauth_response.json_response);
-          get_persistent_credential_callback_(oauth_response.status, nullptr);
+          get_persistent_credential_callback_(oauth_response.status, nullptr,
+                                              nullptr);
           return;
         }
 
-        if (!oauth_response.json_response.HasMember("refresh_token")) {
+        if (!oauth_response.json_response.HasMember("refresh_token") ||
+            (!oauth_response.json_response.HasMember("access_token"))) {
           FXL_VLOG(1) << "Got response: "
                       << JsonValueToPrettyString(oauth_response.json_response);
           get_persistent_credential_callback_(
-              AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr);
+              AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr, nullptr);
         }
 
-        get_persistent_credential_callback_(
-            AuthProviderStatus::OK,
-            oauth_response.json_response["refresh_token"].GetString());
+        GetUserProfile(oauth_response.json_response["refresh_token"].GetString(),
+                       oauth_response.json_response["access_token"].GetString());
+      });
+}
+
+void GoogleAuthProviderImpl::GetUserProfile(
+    const f1dl::String& credential,
+    const f1dl::String& access_token) {
+  FXL_DCHECK(credential.get().size() > 0);
+  FXL_DCHECK(access_token.get().size() > 0);
+
+  auto request = OAuthRequestBuilder(kGooglePeopleGetEndpoint, "GET")
+                     .SetAuthorizationHeader(access_token.get());
+
+  auto request_factory = fxl::MakeCopyable(
+      [main_runner = main_runner_, request = std::move(request)] {
+        return request.Build();
+      });
+
+  Request(
+      std::move(request_factory),
+      [this, credential](network::URLResponsePtr response) mutable {
+        auth::UserProfileInfoPtr user_profile_info =
+            auth::UserProfileInfo::New();
+
+        auto oauth_response = ParseOAuthResponse(std::move(response));
+        if (oauth_response.status != AuthProviderStatus::OK) {
+          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
+          FXL_VLOG(1) << "Got response: "
+                      << JsonValueToPrettyString(oauth_response.json_response);
+
+          get_persistent_credential_callback_(oauth_response.status, credential,
+                                              std::move(user_profile_info));
+          return;
+        }
+
+        if (oauth_response.json_response.HasMember("id")) {
+          user_profile_info->id =
+              oauth_response.json_response["id"].GetString();
+        }
+
+        if (oauth_response.json_response.HasMember("displayName")) {
+          user_profile_info->display_name =
+              oauth_response.json_response["displayName"].GetString();
+        }
+
+        if (oauth_response.json_response.HasMember("url")) {
+          user_profile_info->url =
+              oauth_response.json_response["url"].GetString();
+        }
+
+        if (oauth_response.json_response.HasMember("image")) {
+          user_profile_info->image_url =
+              oauth_response.json_response["image"]["url"].GetString();
+        }
+
+        get_persistent_credential_callback_(oauth_response.status, credential,
+                                            std::move(user_profile_info));
       });
 }
 
