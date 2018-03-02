@@ -172,7 +172,9 @@ class _ContextListenerImpl extends ContextListener {
       if (entry.key != _kLocationHomeWorkTopic) {
         continue;
       }
-      onTopicChanged(entry.value[0].content);
+      if (entry.value.isNotEmpty) {
+        onTopicChanged(entry.value[0].content);
+      }
     }
   }
 }
