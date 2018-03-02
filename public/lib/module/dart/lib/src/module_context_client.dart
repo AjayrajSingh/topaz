@@ -173,13 +173,12 @@ class ModuleContextClient {
   }
 
   /// See [fidl.ModuleContext#startDaisy].
-  Future<ModuleControllerClient> startDaisy({
-    @required String moduleName,
+  Future<ModuleControllerClient> startModule({
+    @required String module,
     @required Daisy daisy,
     @required SurfaceRelation surfaceRelation,
-    String linkName,
   }) async {
-    assert(moduleName != null && moduleName.isNotEmpty);
+    assert(module != null && module.isNotEmpty);
     assert(daisy != null);
     assert(surfaceRelation != null);
 
@@ -219,9 +218,9 @@ class ModuleContextClient {
 
     try {
       proxy.startDaisyInShell(
-        moduleName,
+        module,
         daisy,
-        linkName,
+        null,
         null,
         controller.proxy.ctrl.request(),
         surfaceRelation,

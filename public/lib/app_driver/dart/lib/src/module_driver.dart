@@ -293,9 +293,8 @@ class ModuleDriver {
   }
 
   ///
-  Future<ModuleControllerClient> startDaisy({
-    @required String moduleName,
-    String linkName,
+  Future<ModuleControllerClient> startModule({
+    @required String module,
     @required Daisy daisy,
     SurfaceRelation surfaceRelation: const SurfaceRelation(
       arrangement: SurfaceArrangement.copresent,
@@ -303,14 +302,13 @@ class ModuleDriver {
       emphasis: 0.5,
     ),
   }) async {
-    assert(moduleName != null && moduleName.isNotEmpty);
+    assert(module != null && module.isNotEmpty);
     assert(daisy != null);
 
-    return moduleContext.startDaisy(
-      moduleName: moduleName,
+    return moduleContext.startModule(
+      module: module,
       daisy: daisy,
       surfaceRelation: surfaceRelation,
-      linkName: linkName,
     );
   }
 
