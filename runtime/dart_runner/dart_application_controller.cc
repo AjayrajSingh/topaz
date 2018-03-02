@@ -62,9 +62,11 @@ DartApplicationController::DartApplicationController(
     binding_.set_error_handler([this] { Kill(); });
   }
 
-  zx_status_t status = zx_timer_create(ZX_TIMER_SLACK_LATE, ZX_CLOCK_MONOTONIC, &idle_timer_);
+  zx_status_t status =
+      zx_timer_create(ZX_TIMER_SLACK_LATE, ZX_CLOCK_MONOTONIC, &idle_timer_);
   if (status != ZX_OK) {
-    FXL_LOG(INFO) << "Idle timer creation failed: " << zx_status_get_string(status);
+    FXL_LOG(INFO) << "Idle timer creation failed: "
+                  << zx_status_get_string(status);
   } else {
     idle_wait_ = new async::AutoWait(fsl::MessageLoop::GetCurrent()->async(),
                                      idle_timer_, ZX_TIMER_SIGNALED);
@@ -151,12 +153,13 @@ bool DartApplicationController::SetupFromScriptSnapshot() {
   return false;
 #else
   if (!MappedResource::LoadFromNamespace(
-          namespace_, "pkg/data/snapshot_blob.bin", script_)) {
+          namespace_, "pkg/data/script_snapshot.bin", script_)) {
     return false;
   }
 
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/snapshot_isolate.bin", isolate_snapshot_data_)) {
+  if (!MappedResource::LoadFromNamespace(nullptr,
+                                         "pkg/data/isolate_core_snapshot.bin",
+                                         isolate_snapshot_data_)) {
     return false;
   }
 
@@ -191,8 +194,9 @@ bool DartApplicationController::SetupFromSource() {
     return false;
   }
 
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/snapshot_isolate.bin", isolate_snapshot_data_)) {
+  if (!MappedResource::LoadFromNamespace(nullptr,
+                                         "pkg/data/isolate_core_snapshot.bin",
+                                         isolate_snapshot_data_)) {
     return false;
   }
 
@@ -242,8 +246,9 @@ bool DartApplicationController::SetupFromKernel() {
     return false;
   }
 
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/snapshot_isolate.bin", isolate_snapshot_data_)) {
+  if (!MappedResource::LoadFromNamespace(nullptr,
+                                         "pkg/data/isolate_core_snapshot.bin",
+                                         isolate_snapshot_data_)) {
     return false;
   }
 
@@ -483,7 +488,8 @@ const zx_duration_t kIdleSlack = ZX_SEC(1);
 
 void DartApplicationController::MessageEpilogue() {
   idle_start_ = zx_clock_get(ZX_CLOCK_MONOTONIC);
-  zx_status_t status = zx_timer_set(idle_timer_, idle_start_ + kIdleWaitDuration, kIdleSlack);
+  zx_status_t status =
+      zx_timer_set(idle_timer_, idle_start_ + kIdleWaitDuration, kIdleSlack);
   if (status != ZX_OK) {
     FXL_LOG(INFO) << "Idle timer set failed: " << zx_status_get_string(status);
   }
@@ -511,7 +517,8 @@ async_wait_result_t DartApplicationController::OnIdleTimer(
     // Early wakeup or message pushed idle time forward: reschedule.
     zx_status_t status = zx_timer_set(idle_timer_, deadline, kIdleSlack);
     if (status != ZX_OK) {
-      FXL_LOG(INFO) << "Idle timer set failed: " << zx_status_get_string(status);
+      FXL_LOG(INFO) << "Idle timer set failed: "
+                    << zx_status_get_string(status);
     }
   }
   return ASYNC_WAIT_AGAIN;

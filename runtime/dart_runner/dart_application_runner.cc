@@ -105,9 +105,8 @@ void RunApplication(
     ::f1dl::InterfaceRequest<app::ApplicationController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   fsl::MessageLoop loop;
-  DartApplicationController app(token->label(),
-                                std::move(application), std::move(startup_info),
-                                std::move(controller));
+  DartApplicationController app(token->label(), std::move(application),
+                                std::move(startup_info), std::move(controller));
   bool success = app.Setup();
   int64_t end = Dart_TimelineGetMicros();
   Dart_TimelineEvent("DartApplicationController::Setup", start, end,
@@ -174,8 +173,8 @@ DartApplicationRunner::DartApplicationRunner()
   params.vm_snapshot_data = ::_kDartVmSnapshotData;
   params.vm_snapshot_instructions = ::_kDartVmSnapshotInstructions;
 #else
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/snapshot_vm_isolate.bin", vm_snapshot_data_)) {
+  if (!MappedResource::LoadFromNamespace(nullptr, "pkg/data/vm_snapshot.bin",
+                                         vm_snapshot_data_)) {
     FXL_LOG(FATAL) << "Failed to load vm snapshot";
   }
   params.vm_snapshot_data =
@@ -205,7 +204,8 @@ void DartApplicationRunner::StartApplication(
     ::f1dl::InterfaceRequest<app::ApplicationController> controller) {
   std::string label = GetLabelFromURL(application->resolved_url);
   std::thread thread(RunApplication, this, AddController(label),
-                     std::move(application), std::move(startup_info), std::move(controller));
+                     std::move(application), std::move(startup_info),
+                     std::move(controller));
   thread.detach();
 }
 
@@ -232,9 +232,7 @@ void DartApplicationRunner::RemoveController(ControllerToken* token) {
 }
 
 void DartApplicationRunner::PostRemoveController(ControllerToken* token) {
-  loop_->task_runner()->PostTask([this, token] {
-    RemoveController(token);
-  });
+  loop_->task_runner()->PostTask([this, token] { RemoveController(token); });
 }
 
 void DartApplicationRunner::UpdateProcessLabel() {

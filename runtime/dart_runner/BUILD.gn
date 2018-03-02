@@ -182,11 +182,11 @@ package("dart_jit_runner") {
   resources = [
     {
       path = rebase_path("$target_gen_dir/embedder/snapshot_vm_isolate.bin")
-      dest = "snapshot_vm_isolate.bin"
+      dest = "vm_snapshot.bin"
     },
     {
       path = rebase_path("$target_gen_dir/embedder/snapshot_isolate.bin")
-      dest = "snapshot_isolate.bin"
+      dest = "isolate_core_snapshot.bin"
     },
   ]
 }
@@ -218,11 +218,11 @@ package("dart2_jit_runner") {
     },
     {
       path = rebase_path("$target_gen_dir/kernel/vm_isolate_snapshot.bin")
-      dest = "snapshot_vm_isolate.bin"
+      dest = "vm_snapshot.bin"
     },
     {
       path = rebase_path("$target_gen_dir/kernel/isolate_snapshot.bin")
-      dest = "snapshot_isolate.bin"
+      dest = "isolate_core_snapshot.bin"
     },
   ]
   if (is_debug) {
@@ -255,12 +255,12 @@ package("dart_script_runner") {
     {
       path = rebase_path(
               "$target_gen_dir/embedder/script_runner_snapshot_vm_isolate.bin")
-      dest = "snapshot_vm_isolate.bin"
+      dest = "vm_snapshot.bin"
     },
     {
       path = rebase_path(
               "$target_gen_dir/embedder/script_runner_snapshot_isolate.bin")
-      dest = "snapshot_isolate.bin"
+      dest = "isolate_core_snapshot.bin"
     },
   ]
 }

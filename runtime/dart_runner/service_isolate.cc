@@ -108,7 +108,7 @@ Dart_Isolate CreateServiceIsolate(const char* uri,
   }
 #else
   if (!MappedResource::LoadFromNamespace(nullptr,
-                                         "pkg/data/snapshot_isolate.bin",
+                                         "pkg/data/isolate_core_snapshot.bin",
                                          mapped_isolate_snapshot_data)) {
     *error = strdup("Failed to load core snapshot for service isolate");
     return nullptr;

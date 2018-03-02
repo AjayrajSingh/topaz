@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <trace/event.h>
 #include <zircon/status.h>
 
 #include "lib/fsl/vmo/file.h"
@@ -17,6 +18,8 @@ namespace dart_content_handler {
 bool MappedResource::LoadFromNamespace(fdio_ns_t* namespc,
                                        const std::string& path,
                                        MappedResource& resource) {
+  TRACE_DURATION("dart", "LoadFromNamespace", "path", path);
+
   // openat of a path with a leading '/' ignores the namespace fd.
   FXL_CHECK(path[0] != '/');
 

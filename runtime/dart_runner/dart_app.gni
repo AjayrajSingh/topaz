@@ -176,7 +176,7 @@ template("dart_jit_app") {
     resources = [
       {
         path = rebase_path(snapshot_path)
-        dest = "snapshot_blob.bin"
+        dest = "script_snapshot.bin"
       },
     ]
     if (defined(invoker.resources)) {
