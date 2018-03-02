@@ -9,6 +9,11 @@ flutter_app("contacts_picker") {
   package_name = "contacts_picker"
   main_dart = "lib/main.dart"
 
+  sources = [
+    "stores.dart",
+    "widgets.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/flutter_flux",
@@ -20,9 +25,15 @@ flutter_app("contacts_picker") {
 }
 
 dart_test("test") {
+  sources = [
+    "stores/contact_item_store_test.dart",
+    "widgets/contact_item_test.dart",
+    "widgets/contacts_picker_test.dart",
+  ]
+
   deps = [
+    ":contacts_picker_dart_library",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/app/contacts/modules/contacts_picker:contacts_picker_dart_library",
   ]
 }

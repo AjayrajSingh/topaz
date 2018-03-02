@@ -10,6 +10,10 @@ dart_app("contacts_content_provider") {
 
   package_name = "contacts_content_provider"
 
+  sources = [
+    "store.dart",
+  ]
+
   sandbox = "meta/sandbox"
 
   deps = [
@@ -23,9 +27,14 @@ dart_app("contacts_content_provider") {
 }
 
 dart_test("test") {
+  sources = [
+    "contacts_store_test.dart",
+    "prefix_tree_test.dart",
+  ]
+
   deps = [
+    ":contacts_content_provider_dart_library",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/app/contacts/agents/content_provider:contacts_content_provider_dart_library",
     "//topaz/app/contacts/services:services_dart",
     "//topaz/public/dart/fuchsia",
   ]

@@ -9,6 +9,10 @@ flutter_app("contact_list") {
   package_name = "contact_list"
   main_dart = "lib/main.dart"
 
+  sources = [
+    "models.dart",
+  ]
+
   deps = [
     "//garnet/public/lib/app/fidl:fidl_dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
@@ -26,8 +30,13 @@ flutter_app("contact_list") {
 }
 
 dart_test("test") {
+  sources = [
+    "models/contact_item_test.dart",
+    "models/contact_list_model_test.dart",
+  ]
+
   deps = [
+    ":contact_list_dart_library",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/app/contacts/modules/contact_list:contact_list_dart_library",
   ]
 }
