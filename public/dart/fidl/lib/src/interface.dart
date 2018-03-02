@@ -56,7 +56,16 @@ typedef void _VoidCallback();
 /// ```
 class InterfaceHandle<T> extends Encodable {
   /// Creates an interface handle that wraps the given channel.
-  InterfaceHandle(this._channel, this.version);
+  InterfaceHandle(this._channel);
+
+  factory InterfaceHandle.$decode(Decoder decoder, int offset, FidlType type) {
+    Channel channel;
+    Handle handle = decoder.decodeHandle(offset, type);
+    if (handle.isValid) {
+      channel = new Channel(handle);
+    }
+    return new InterfaceHandle<T>(channel);
+  }
 
   /// The underlying channel messages will be sent over when the interface
   /// handle is bound to a [Proxy].
@@ -64,10 +73,6 @@ class InterfaceHandle<T> extends Encodable {
   /// To take the channel from this object, use [passChannel].
   Channel get channel => _channel;
   Channel _channel;
-
-  /// The version of the interface this object expects at the remote end of the
-  /// channel.
-  final int version;
 
   /// Returns [channel] and sets [channel] to `null`.
   ///
@@ -84,6 +89,7 @@ class InterfaceHandle<T> extends Encodable {
     _channel = null;
   }
 
+  @override
   void $encode(Encoder encoder, int offset, FidlType type) {
     encoder.encodeHandle(_channel.handle, offset, type);
   }
@@ -131,6 +137,15 @@ class InterfaceRequest<T> extends Encodable {
   /// Creates an interface request that wraps the given channel.
   InterfaceRequest(this._channel);
 
+  factory InterfaceRequest.$decode(Decoder decoder, int offset, FidlType type) {
+    Channel channel;
+    Handle handle = decoder.decodeHandle(offset, type);
+    if (handle.isValid) {
+      channel = new Channel(handle);
+    }
+    return new InterfaceRequest<T>(channel);
+  }
+
   /// The underlying channel messages will be received over when the interface
   /// handle is bound to [Binding].
   ///
@@ -153,6 +168,7 @@ class InterfaceRequest<T> extends Encodable {
     _channel = null;
   }
 
+  @override
   void $encode(Encoder encoder, int offset, FidlType type) {
     encoder.encodeHandle(_channel.handle, offset, type);
   }
@@ -162,7 +178,7 @@ class InterfacePair<T> {
   InterfacePair() {
     ChannelPair pair = new ChannelPair();
     request = new InterfaceRequest<T>(pair.first);
-    handle = new InterfaceHandle<T>(pair.second, 0);
+    handle = new InterfaceHandle<T>(pair.second);
   }
 
   InterfaceRequest<T> request;
@@ -223,7 +239,7 @@ abstract class Binding<T> {
       onBind();
     }
 
-    return new InterfaceHandle<T>(pair.second, version);
+    return new InterfaceHandle<T>(pair.second);
   }
 
   /// Binds the given implementation to the given interface request.
@@ -303,9 +319,6 @@ abstract class Binding<T> {
   /// bound channel.
   @protected
   void handleMessage(Message message, MessageSink respond);
-
-  /// The version of [T] implemented by this object.
-  int get version;
 
   void _handleReadable() {
     final ReadResult result = _reader.channel.queryAndRead();
@@ -401,14 +414,10 @@ class ProxyController<T> {
   /// and sent to the returned channel.
   ///
   /// The proxy must not already have been bound.
-  ///
-  /// The `version` parameter must not be null.
-  InterfaceRequest<T> request({int version: 0}) {
-    assert(version != null);
+  InterfaceRequest<T> request() {
     assert(!isBound);
     ChannelPair pair = new ChannelPair();
     assert(pair.status == ZX.OK);
-    _version = version;
     _reader.bind(pair.first);
 
     if (onBind != null) {
@@ -431,7 +440,6 @@ class ProxyController<T> {
     assert(!isBound);
     assert(interfaceHandle != null);
     assert(interfaceHandle.channel != null);
-    _version = interfaceHandle.version;
     _reader.bind(interfaceHandle.passChannel());
 
     if (onBind != null) {
@@ -455,7 +463,7 @@ class ProxyController<T> {
       onUnbind();
     }
 
-    return new InterfaceHandle<T>(_reader.unbind(), _version);
+    return new InterfaceHandle<T>(_reader.unbind());
   }
 
   /// Whether this object is bound to a channel.
@@ -495,17 +503,12 @@ class ProxyController<T> {
   Future<ProxyError> get error => _errorCompleter.future;
   Completer<ProxyError> _errorCompleter = new Completer<ProxyError>();
 
-  /// Version of this interface that the remote side supports.
-  int get version => _version;
-  int _version = 0;
-
   int _nextTxid = 1;
   int _pendingResponsesCount = 0;
 
   void _reset() {
     _callbackMap.clear();
     _errorCompleter = new Completer<ProxyError>();
-    _version = 0;
     _nextTxid = 1;
     _pendingResponsesCount = 0;
   }

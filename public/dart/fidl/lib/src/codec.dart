@@ -156,9 +156,8 @@ abstract class Encodable {
 class Encoder {
   _EncoderBuffer _buffer;
 
-  Encoder(int txid, int ordinal, {int size: -1})
-      : _buffer = new _EncoderBuffer(size) {
-    _encodeMessageHeader(txid, ordinal);
+  Encoder(int ordinal, {int size: -1}) : _buffer = new _EncoderBuffer(size) {
+    _encodeMessageHeader(ordinal);
   }
 
   Message get message {
@@ -172,12 +171,9 @@ class Encoder {
     return offset;
   }
 
-  void _encodeMessageHeader(int txid, int ordinal) {
-    alloc(32);
-    encodeUint32(txid, 0);
-    // Offset 8 is reserved0, which is always zero.
-    // Offset 16 is flags, which are currently always zero.
-    encodeUint32(ordinal, 24);
+  void _encodeMessageHeader(int ordinal) {
+    alloc(kMessageHeaderSize);
+    encodeUint32(ordinal, kMessageOrdinalOffset);
   }
 
   void encodeBool(bool value, int offset) {

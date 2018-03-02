@@ -136,6 +136,16 @@ class MethodType extends FidlType {
   final List<MemberType> members;
 }
 
+class MethodType extends FidlType {
+  const MethodType({
+    this.request,
+    this.response,
+  });
+
+  final List<MemberType> request;
+  final List<MemberType> response;
+}
+
 class VectorType extends FidlType {
   const VectorType({
     this.element,
