@@ -13,6 +13,12 @@ group("todo_story") {
 flutter_app("example_todo_story") {
   main_dart = "lib/main.dart"
 
+  sources = [
+    "data.dart",
+    "generator.dart",
+    "view.dart",
+  ]
+
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",

@@ -13,7 +13,13 @@ group("photos_flutter") {
 flutter_app("example_flutter_photos") {
   main_dart = "lib/main.dart"
 
-  source_dir = "lib"
+  sources = [
+    "dummy_photo_storage.dart",
+    "home.dart",
+    "photo.dart",
+    "photo_storage.dart",
+    "photo_view.dart",
+  ]
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
