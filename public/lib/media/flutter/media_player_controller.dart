@@ -5,12 +5,12 @@
 import 'dart:async';
 
 import 'package:lib.media.dart/audio_player_controller.dart';
-import 'package:lib.media.fidl/media_renderer.fidl.dart';
-import 'package:lib.media.fidl/media_service.fidl.dart';
-import 'package:lib.media.fidl/video_renderer.fidl.dart';
+import 'package:lib.media.fidl/media_player.fidl.dart' as mp;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
+import 'package:lib.ui.geometry.fidl/geometry.fidl.dart' as geom;
+import 'package:lib.ui.views.fidl/view_manager.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 
 import 'package:flutter/foundation.dart';
@@ -19,45 +19,46 @@ import 'package:flutter/widgets.dart';
 /// Controller for MediaPlayer widgets.
 class MediaPlayerController extends AudioPlayerController
     implements Listenable {
-  final MediaServiceProxy _mediaService = new MediaServiceProxy();
-
   final List<VoidCallback> _listeners = <VoidCallback>[];
+
+  ServiceProvider _services;
 
   Timer _hideTimer;
 
   ChildViewConnection _videoViewConnection;
 
-  // We don't mess with this except during _activate, but it needs to stay in
-  // scope even after _activate returns.
-  VideoRendererProxy _videoRenderer;
-
   Size _videoSize = Size.zero;
 
   bool _disposed = false;
+  bool _wasActive;
 
   /// Constructs a MediaPlayerController.
   MediaPlayerController(ServiceProvider services) : super(services) {
     updateCallback = _notifyListeners;
-    connectToService(services, _mediaService.ctrl);
+    _services = services;
     _close(); // Initialize stuff.
   }
 
   @override
   void open(Uri uri, {String serviceName = 'media_player'}) {
-    bool wasActive = openOrConnected;
+    _wasActive = openOrConnected;
     super.open(uri, serviceName: serviceName);
+    scheduleMicrotask(_notifyListeners);
+  }
 
-    if (!wasActive) {
+  @override
+  void onMediaPlayerCreated(mp.MediaPlayerProxy mediaPlayer) {
+    if (!_wasActive) {
+      ViewManagerProxy viewManager = new ViewManagerProxy();
+      connectToService(_services, viewManager.ctrl);
+
       InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
-      _videoRenderer.createView(viewOwnerPair.passRequest());
+      mediaPlayer.createView(viewManager.ctrl.unbind(),
+                             viewOwnerPair.passRequest());
 
       _videoViewConnection =
           new ChildViewConnection(viewOwnerPair.passHandle());
-
-      _handleVideoRendererStatusUpdates(VideoRenderer.kInitialStatus, null);
     }
-
-    scheduleMicrotask(_notifyListeners);
   }
 
   @override
@@ -75,12 +76,6 @@ class MediaPlayerController extends AudioPlayerController
 
   void _close() {
     _videoViewConnection = null;
-
-    if (_videoRenderer != null) {
-      _videoRenderer.ctrl.close();
-    }
-
-    _videoRenderer = new VideoRendererProxy();
   }
 
   @override
@@ -118,19 +113,6 @@ class MediaPlayerController extends AudioPlayerController
     _listeners.clear();
   }
 
-  @override
-  InterfacePair<MediaRenderer> get videoMediaRenderer {
-    InterfacePair<MediaRenderer> videoMediaRenderer =
-        new InterfacePair<MediaRenderer>();
-
-    _mediaService.createVideoRenderer(
-      _videoRenderer.ctrl.request(),
-      videoMediaRenderer.passRequest(),
-    );
-
-    return videoMediaRenderer;
-  }
-
   /// Determines whether the control overlay should be shown.
   bool get shouldShowControlOverlay {
     return !hasVideo || !playing || _hideTimer != null;
@@ -164,25 +146,20 @@ class MediaPlayerController extends AudioPlayerController
   /// Gets the video view connection.
   ChildViewConnection get videoViewConnection => _videoViewConnection;
 
-  // Handles a status update from the video renderer and requests a new update.
-  // Call with kInitialStatus, null to initiate status updates.
-  void _handleVideoRendererStatusUpdates(
-      int version, VideoRendererStatus status) {
+  @override
+  void onVideoGeometryUpdated(geom.Size videoSize,
+                              geom.Size pixelAspectRatio) {
     if (!openOrConnected) {
       return;
     }
 
-    if (status != null) {
-      double pixelAspectRatio = status.pixelAspectRatio.width.toDouble() /
-          status.pixelAspectRatio.height.toDouble();
+    double ratio = pixelAspectRatio.width.toDouble() /
+        pixelAspectRatio.height.toDouble();
 
-      _videoSize = new Size(
-          status.videoSize.width.toDouble() * pixelAspectRatio,
-          status.videoSize.height.toDouble());
+    _videoSize = new Size(
+        videoSize.width.toDouble() * ratio,
+        videoSize.height.toDouble());
 
-      scheduleMicrotask(_notifyListeners);
-    }
-
-    _videoRenderer.getStatus(version, _handleVideoRendererStatusUpdates);
+    scheduleMicrotask(_notifyListeners);
   }
 }

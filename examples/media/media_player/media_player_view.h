@@ -12,7 +12,6 @@
 #include "lib/fxl/macros.h"
 #include "lib/media/fidl/media_player.fidl.h"
 #include "lib/media/fidl/net_media_player.fidl.h"
-#include "lib/media/fidl/video_renderer.fidl.h"
 #include "lib/media/timeline/timeline_function.h"
 #include "lib/ui/view_framework/base_view.h"
 #include "topaz/examples/media/media_player/media_player_params.h"
@@ -52,12 +51,6 @@ class MediaPlayerView : public mozart::BaseView {
       uint64_t version = media::MediaPlayer::kInitialStatus,
       media::MediaPlayerStatusPtr status = nullptr);
 
-  // Handles a status update from the vidoe renderer. When called with the
-  // default argument values, initiates status updates.
-  void HandleVideoRendererStatusUpdates(
-      uint64_t version = media::VideoRenderer::kInitialStatus,
-      media::VideoRendererStatusPtr status = nullptr);
-
   // Toggles between play and pause.
   void TogglePlayPause();
 
@@ -78,7 +71,6 @@ class MediaPlayerView : public mozart::BaseView {
   std::unique_ptr<scenic_lib::EntityNode> video_host_node_;
 
   media::NetMediaPlayerPtr net_media_player_;
-  media::VideoRendererPtr video_renderer_;
   mozart::ViewPropertiesPtr video_view_properties_;
   mozart::Size video_size_;
   mozart::Size pixel_aspect_ratio_;

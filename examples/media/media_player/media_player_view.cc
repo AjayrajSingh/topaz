@@ -8,22 +8,24 @@
 
 #include <iomanip>
 
-#include "topaz/examples/media/media_player/media_player_params.h"
 #include "lib/app/cpp/connect.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
-#include "lib/media/fidl/audio_renderer.fidl.h"
-#include "lib/media/fidl/media_service.fidl.h"
+#include "lib/media/fidl/media_player.fidl.h"
 #include "lib/media/fidl/net_media_service.fidl.h"
 #include "lib/media/timeline/fidl_type_conversions.h"
 #include "lib/media/timeline/timeline.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
+#include "topaz/examples/media/media_player/media_player_params.h"
 
 namespace examples {
 
 namespace {
 constexpr uint32_t kVideoChildKey = 0u;
+
+constexpr int32_t kDefaultWidth = 640;
+constexpr int32_t kDefaultHeight = 100;
 
 constexpr float kBackgroundElevation = 0.f;
 constexpr float kVideoElevation = 1.f;
@@ -44,6 +46,11 @@ bool Contains(const mozart::RectF& rect, float x, float y) {
   return rect.x <= x && rect.y <= y && rect.x + rect.width >= x &&
          rect.y + rect.height >= y;
 }
+
+bool operator!=(const mozart::Size& lhs, const mozart::Size& rhs) {
+  return lhs.width != rhs.width || lhs.height != rhs.height;
+}
+
 }  // namespace
 
 MediaPlayerView::MediaPlayerView(
@@ -65,34 +72,27 @@ MediaPlayerView::MediaPlayerView(
 
   parent_node().AddChild(controls_widget_);
 
-  auto media_service =
-      application_context->ConnectToEnvironmentService<media::MediaService>();
-
   auto net_media_service =
       application_context
           ->ConnectToEnvironmentService<media::NetMediaService>();
 
   // We start with a non-zero size so we get a progress bar regardless of
   // whether we get video.
-  video_size_.width = 640u;
-  video_size_.height = 100u;
-  pixel_aspect_ratio_.width = 1u;
-  pixel_aspect_ratio_.height = 1u;
+  video_size_.width = 0;
+  video_size_.height = 0;
+  pixel_aspect_ratio_.width = 1;
+  pixel_aspect_ratio_.height = 1;
 
   if (params.device_name().empty()) {
-    // Get an audio renderer.
-    media::AudioRendererPtr audio_renderer;
-    media::MediaRendererPtr audio_media_renderer;
-    media_service->CreateAudioRenderer(audio_renderer.NewRequest(),
-                                       audio_media_renderer.NewRequest());
-
-    // Get a video renderer.
-    media::MediaRendererPtr video_media_renderer;
-    media_service->CreateVideoRenderer(video_renderer_.NewRequest(),
-                                       video_media_renderer.NewRequest());
+    // Create a player from all that stuff.
+    media::MediaPlayerPtr media_player =
+        application_context->ConnectToEnvironmentService<media::MediaPlayer>();
 
     mozart::ViewOwnerPtr video_view_owner;
-    video_renderer_->CreateView(video_view_owner.NewRequest());
+    media_player->CreateView(
+        application_context->ConnectToEnvironmentService<mozart::ViewManager>()
+            .Unbind(),
+        video_view_owner.NewRequest());
 
     zx::eventpair video_host_import_token;
     video_host_node_.reset(new scenic_lib::EntityNode(session()));
@@ -101,17 +101,9 @@ MediaPlayerView::MediaPlayerView(
     GetViewContainer()->AddChild(kVideoChildKey, std::move(video_view_owner),
                                  std::move(video_host_import_token));
 
-    // Create a player from all that stuff.
-    media::MediaPlayerPtr media_player;
-    media_service->CreatePlayer(nullptr, std::move(audio_media_renderer),
-                                std::move(video_media_renderer),
-                                media_player.NewRequest());
-
     net_media_service->CreateNetMediaPlayer(
         params.service_name().empty() ? "media_player" : params.service_name(),
         std::move(media_player), net_media_player_.NewRequest());
-
-    HandleVideoRendererStatusUpdates();
   } else {
     // Create a player proxy.
     net_media_service->CreateNetMediaPlayerProxy(
@@ -201,8 +193,12 @@ void MediaPlayerView::Layout() {
       logical_size().height - kControlsHeight - kMargin * 3;
 
   // Shrink video to fit if needed.
-  uint32_t video_width = video_size_.width * pixel_aspect_ratio_.width;
-  uint32_t video_height = video_size_.height * pixel_aspect_ratio_.height;
+  uint32_t video_width =
+      (video_size_.width == 0 ? kDefaultWidth : video_size_.width) *
+      pixel_aspect_ratio_.width;
+  uint32_t video_height =
+      (video_size_.height == 0 ? kDefaultHeight : video_size_.height) *
+      pixel_aspect_ratio_.height;
 
   if (max_content_size.width * video_height <
       max_content_size.height * video_width) {
@@ -238,19 +234,17 @@ void MediaPlayerView::Layout() {
   progress_bar_rect_.height = controls_rect_.height;
 
   // Ask the view to fill the space.
-  if (video_renderer_) {
-    auto view_properties = mozart::ViewProperties::New();
-    view_properties->view_layout = mozart::ViewLayout::New();
-    view_properties->view_layout->size = mozart::SizeF::New();
-    view_properties->view_layout->size->width = content_rect_.width;
-    view_properties->view_layout->size->height = content_rect_.height;
-    view_properties->view_layout->inset = mozart::InsetF::New();
+  auto view_properties = mozart::ViewProperties::New();
+  view_properties->view_layout = mozart::ViewLayout::New();
+  view_properties->view_layout->size = mozart::SizeF::New();
+  view_properties->view_layout->size->width = content_rect_.width;
+  view_properties->view_layout->size->height = content_rect_.height;
+  view_properties->view_layout->inset = mozart::InsetF::New();
 
-    if (!video_view_properties_.Equals(view_properties)) {
-      video_view_properties_ = view_properties.Clone();
-      GetViewContainer()->SetChildProperties(kVideoChildKey,
-                                             std::move(view_properties));
-    }
+  if (!video_view_properties_.Equals(view_properties)) {
+    video_view_properties_ = view_properties.Clone();
+    GetViewContainer()->SetChildProperties(kVideoChildKey,
+                                           std::move(view_properties));
   }
 
   InvalidateScene();
@@ -386,6 +380,20 @@ void MediaPlayerView::HandlePlayerStatusUpdates(
       problem_shown_ = false;
     }
 
+    if (status->video_size && status->pixel_aspect_ratio &&
+        (video_size_ != *status->video_size ||
+         pixel_aspect_ratio_ != *status->pixel_aspect_ratio)) {
+      video_size_ = *status->video_size;
+      pixel_aspect_ratio_ = *status->pixel_aspect_ratio;
+
+      FXL_LOG(INFO) << "video size " << status->video_size->width << "x"
+                    << status->video_size->height << ", pixel aspect ratio "
+                    << status->pixel_aspect_ratio->width << "x"
+                    << status->pixel_aspect_ratio->height;
+
+      Layout();
+    }
+
     metadata_ = std::move(status->metadata);
 
     // TODO(dalesat): Display metadata on the screen.
@@ -418,35 +426,6 @@ void MediaPlayerView::HandlePlayerStatusUpdates(
   net_media_player_->GetStatus(
       version, [this](uint64_t version, media::MediaPlayerStatusPtr status) {
         HandlePlayerStatusUpdates(version, std::move(status));
-      });
-}
-
-void MediaPlayerView::HandleVideoRendererStatusUpdates(
-    uint64_t version,
-    media::VideoRendererStatusPtr status) {
-  if (status) {
-    // Process status received from the video renderer.
-    FXL_LOG(INFO) << "video size " << status->video_size->width << "x"
-                  << status->video_size->height << ", pixel aspect ratio "
-                  << status->pixel_aspect_ratio->width << "x"
-                  << status->pixel_aspect_ratio->height;
-
-    video_size_ = *status->video_size;
-    pixel_aspect_ratio_ = *status->pixel_aspect_ratio;
-
-    if (video_size_.width == 0 || video_size_.height == 0) {
-      // Use a non-zero size so we get a progress bar.
-      video_size_.width = 640u;
-      video_size_.height = 100u;
-    }
-
-    Layout();
-  }
-
-  // Request a status update.
-  video_renderer_->GetStatus(
-      version, [this](uint64_t version, media::VideoRendererStatusPtr status) {
-        HandleVideoRendererStatusUpdates(version, std::move(status));
       });
 }
 

@@ -5,31 +5,25 @@
 import 'dart:async';
 
 import 'package:lib.media.dart/timeline.dart';
-import 'package:lib.media.fidl/audio_renderer.fidl.dart';
 import 'package:lib.media.fidl/media_metadata.fidl.dart';
 import 'package:lib.media.fidl/media_player.fidl.dart' as mp;
-import 'package:lib.media.fidl/media_renderer.fidl.dart';
-import 'package:lib.media.fidl/media_service.fidl.dart';
 import 'package:lib.media.fidl/net_media_player.fidl.dart';
 import 'package:lib.media.fidl/net_media_service.fidl.dart';
 import 'package:lib.media.fidl/problem.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:lib.ui.geometry.fidl/geometry.fidl.dart' as geom;
 
 /// Type for |AudioPlayerController| update callbacks.
 typedef void UpdateCallback();
 
 /// Controller for audio-only playback.
 class AudioPlayerController {
-  final MediaServiceProxy _mediaService = new MediaServiceProxy();
   final NetMediaServiceProxy _netMediaService = new NetMediaServiceProxy();
 
-  NetMediaPlayerProxy _netMediaPlayer;
+  ServiceProvider _services;
 
-  // We don't mess with this except during _activate, but it needs to stay in
-  // scope even after _activate returns.
-  AudioRendererProxy _audioRenderer;
+  NetMediaPlayerProxy _netMediaPlayer;
 
   bool _active = false;
   bool _loading = false;
@@ -50,7 +44,7 @@ class AudioPlayerController {
 
   /// Constructs a AudioPlayerController.
   AudioPlayerController(ServiceProvider services) {
-    connectToService(services, _mediaService.ctrl);
+    _services = services;
     connectToService(services, _netMediaService.ctrl);
     _close(); // Initialize stuff.
   }
@@ -137,13 +131,7 @@ class AudioPlayerController {
       _netMediaPlayer.ctrl.onConnectionError = null;
     }
 
-    if (_audioRenderer != null) {
-      _audioRenderer.ctrl.close();
-    }
-
     _netMediaPlayer = new NetMediaPlayerProxy();
-
-    _audioRenderer = new AudioRendererProxy();
 
     _playing = false;
     _ended = false;
@@ -159,24 +147,13 @@ class AudioPlayerController {
 
   /// Creates a local player.
   void _createLocalPlayer(Uri uri, String serviceName) {
-    InterfacePair<MediaRenderer> audioMediaRenderer =
-        new InterfacePair<MediaRenderer>();
-    _mediaService.createAudioRenderer(
-      _audioRenderer.ctrl.request(),
-      audioMediaRenderer.passRequest(),
-    );
+    mp.MediaPlayerProxy mediaPlayer = new mp.MediaPlayerProxy();
+    connectToService(_services, mediaPlayer.ctrl);
 
-    InterfacePair<mp.MediaPlayer> mediaPlayer =
-        new InterfacePair<mp.MediaPlayer>();
-    _mediaService.createPlayer(
-      null,
-      audioMediaRenderer.passHandle(),
-      videoMediaRenderer?.passHandle(),
-      mediaPlayer.passRequest(),
-    );
+    onMediaPlayerCreated(mediaPlayer);
 
     _netMediaService.createNetMediaPlayer(
-        serviceName, mediaPlayer.passHandle(), _netMediaPlayer.ctrl.request());
+        serviceName, mediaPlayer.ctrl.unbind(), _netMediaPlayer.ctrl.request());
     _netMediaPlayer.ctrl.onConnectionError = _handleConnectionError;
 
     _netMediaPlayer.setUrl(uri.toString());
@@ -247,10 +224,6 @@ class AudioPlayerController {
     return _timelineFunction(referenceNanoseconds);
   }
 
-  /// Gets the video media renderer when creating a new local player. This
-  /// getter always returns null and is intended to be overridden by subclasses.
-  InterfacePair<MediaRenderer> get videoMediaRenderer => null;
-
   /// Starts or resumes playback.
   void play() {
     if (!_active || _playing) {
@@ -296,6 +269,12 @@ class AudioPlayerController {
     seek(new Duration(
         microseconds: (normalizedPosition * durationInMicroseconds).round()));
   }
+
+  // Overridden by subclasses to get access to the local player.
+  void onMediaPlayerCreated(mp.MediaPlayerProxy mediaPlayer) {}
+
+  void onVideoGeometryUpdated(geom.Size videoSize,
+                              geom.Size pixelAspectRatio) {}
 
   // Handles a status update from the player and requests a new update. Call
   // with kInitialStatus, null to initiate status updates.
@@ -348,6 +327,10 @@ class AudioPlayerController {
           _timelineFunction.referenceTime != 0 &&
           (!_progressBarReady || prepare)) {
         _prepareProgressBar();
+      }
+
+      if (status.videoSize != null && status.pixelAspectRatio != null) {
+        onVideoGeometryUpdated(status.videoSize, status.pixelAspectRatio);
       }
 
       if (updateCallback != null) {
