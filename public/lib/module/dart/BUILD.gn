@@ -7,6 +7,10 @@ import("//build/dart/dart_library.gni")
 dart_library("dart") {
   infer_package_name = true
 
+  sources = [
+    "module.dart",
+  ]
+
   deps = [
     "//peridot/public/lib/daisy/fidl:fidl_dart",
     "//peridot/public/lib/device/fidl:fidl_dart",

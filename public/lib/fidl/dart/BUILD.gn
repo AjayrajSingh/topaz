@@ -7,7 +7,9 @@ import("//build/dart/dart_library.gni")
 dart_library("dart") {
   package_name = "lib.fidl.dart"
 
-  source_dir = "lib"
+  sources = [
+    "bindings.dart",
+  ]
 
   deps = [
     "//topaz/public/dart/zircon",

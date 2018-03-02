@@ -7,7 +7,9 @@ import("//build/dart/dart_library.gni")
 dart_library("fuchsia") {
   package_name = "fuchsia"
 
-  source_dir = "lib"
+  sources = [
+    "fuchsia.dart"
+  ]
 
   deps = [
     "//topaz/public/dart/zircon",

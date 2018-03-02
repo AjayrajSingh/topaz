@@ -7,6 +7,10 @@ import("//build/dart/dart_library.gni")
 dart_library("dart") {
   infer_package_name = true
 
+  sources = [
+    "story.dart",
+  ]
+
   deps = [
     "//peridot/public/lib/story/fidl:fidl_dart",
     "//topaz/public/dart/logging:lib.logging",

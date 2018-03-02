@@ -8,6 +8,12 @@ import("//build/dart/dart_library.gni")
 dart_library("dart") {
   infer_package_name = true
 
+  sources = [
+    "app_driver.dart",
+    "entity_codec.dart",
+    "module_driver.dart",
+  ]
+
   deps = [
     "//peridot/public/lib/component/fidl:fidl_dart",
     "//topaz/public/dart/logging:lib.logging",
@@ -24,7 +30,6 @@ dart_test("test") {
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/app_driver/dart",
   ]
 }

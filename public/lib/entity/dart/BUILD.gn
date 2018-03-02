@@ -7,6 +7,10 @@ import("//build/dart/dart_library.gni")
 dart_library("dart") {
   infer_package_name = true
 
+  sources = [
+    "entity.dart",
+  ]
+
   deps = [
     "//peridot/public/lib/entity/fidl:fidl_dart",
     "//third_party/dart-pkg/pub/json_schema",

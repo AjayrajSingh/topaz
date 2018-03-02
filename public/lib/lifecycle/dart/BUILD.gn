@@ -7,6 +7,10 @@ import("//build/dart/dart_library.gni")
 dart_library("dart") {
   infer_package_name = true
 
+  sources = [
+    "lifecycle.dart",
+  ]
+
   deps = [
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
