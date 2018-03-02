@@ -12,6 +12,7 @@ import 'package:lib.lifecycle.dart/lifecycle.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.dart/module.dart';
 import 'package:lib.story.dart/story.dart';
+import 'package:meta/meta.dart';
 
 import 'entity_codec.dart';
 
@@ -211,7 +212,8 @@ class ModuleDriver {
 
     try {
       ComponentContextClient componentContext = await getComponentContext();
-      String ref = await componentContext.createEntityWithData(<TypeToDataEntry>[
+      String ref =
+          await componentContext.createEntityWithData(<TypeToDataEntry>[
         new TypeToDataEntry(type: codec.type, data: codec.encode(value)),
       ]);
       LinkClient link = await getLink(key);
@@ -289,8 +291,40 @@ class ModuleDriver {
 
     return _resolver.future;
   }
-}
 
-// abstract class EntityConverter<T> {}
+  ///
+  Future<ModuleControllerClient> startDaisy({
+    @required String moduleName,
+    String linkName,
+    @required Daisy daisy,
+    SurfaceRelation surfaceRelation: const SurfaceRelation(
+      arrangement: SurfaceArrangement.copresent,
+      dependency: SurfaceDependency.dependent,
+      emphasis: 0.5,
+    ),
+  }) async {
+    assert(moduleName != null && moduleName.isNotEmpty);
+    assert(daisy != null);
+
+    return moduleContext.startDaisy(
+      moduleName: moduleName,
+      daisy: daisy,
+      surfaceRelation: surfaceRelation,
+      linkName: linkName,
+    );
+  }
+
+  ///
+  Future<Null> embedDaisy() async {
+    Completer<Null> completer = new Completer<Null>();
+
+    log.fine('embeding daisy');
+
+    completer
+        .completeError(new StateError('TODO(): implement md.embedDaisy(...)'));
+
+    return completer.future;
+  }
+}
 
 /// [app-driver]: https://fuchsia.googlesource.com/peridot/+/master/public/lib/app_driver/cpp?autodive=0/

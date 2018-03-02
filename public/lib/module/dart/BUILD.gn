@@ -8,9 +8,11 @@ dart_library("dart") {
   infer_package_name = true
 
   deps = [
+    "//peridot/public/lib/daisy/fidl:fidl_dart",
     "//peridot/public/lib/device/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
+    "//peridot/public/lib/surface/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/logging:lib.logging",

@@ -4,14 +4,29 @@
 
 import 'dart:async';
 
-import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.component.dart/component.dart';
+import 'package:lib.daisy.fidl/daisy.fidl.dart';
+import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart' as fidl;
 import 'package:lib.story.dart/story.dart';
+import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:meta/meta.dart';
 
+import 'module_controller_client.dart';
+
 export 'package:lib.component.dart/component.dart' show ComponentContextClient;
+export 'package:lib.daisy.fidl/daisy.fidl.dart';
+export 'package:lib.surface.fidl/surface.fidl.dart';
+
+/// When Module resolution fails.
+class ResolutionException implements Exception {
+  /// Information about the failure.
+  final String message;
+
+  /// Create a new [ResolutionException].
+  ResolutionException(this.message);
+}
 
 /// Client wrapper for [fidl.ModuleContext].
 ///
@@ -153,6 +168,68 @@ class ModuleContextClient {
         completer.complete(_componentContext);
       }
     });
+
+    return completer.future;
+  }
+
+  /// See [fidl.ModuleContext#startDaisy].
+  Future<ModuleControllerClient> startDaisy({
+    @required String moduleName,
+    @required Daisy daisy,
+    @required SurfaceRelation surfaceRelation,
+    String linkName,
+  }) async {
+    assert(moduleName != null && moduleName.isNotEmpty);
+    assert(daisy != null);
+    assert(surfaceRelation != null);
+
+    Completer<ModuleControllerClient> completer =
+        new Completer<ModuleControllerClient>();
+
+    // TODO(): map results and reuse for subsequent calls, see getLink.
+    ModuleControllerClient controller = new ModuleControllerClient();
+
+    // ignore: unawaited_futures
+    proxy.ctrl.error.then((ProxyError err) {
+      if (!completer.isCompleted) {
+        completer.completeError(err);
+      }
+    });
+
+    // ignore: unawaited_futures
+    controller.proxy.ctrl.error.then((ProxyError err) {
+      if (!completer.isCompleted) {
+        completer.completeError(err);
+      }
+    });
+
+    void handleDaisyStatus(fidl.StartDaisyStatus status) {
+      switch (status) {
+        case fidl.StartDaisyStatus.success:
+          completer.complete(controller);
+          break;
+        case fidl.StartDaisyStatus.noModulesFound:
+          completer.completeError(new ResolutionException('no modules found'));
+          break;
+        default:
+          completer.completeError(
+              new ResolutionException('unknown status: $status'));
+      }
+    }
+
+    try {
+      proxy.startDaisyInShell(
+        moduleName,
+        daisy,
+        linkName,
+        null,
+        controller.proxy.ctrl.request(),
+        surfaceRelation,
+        handleDaisyStatus,
+      );
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+    }
 
     return completer.future;
   }
