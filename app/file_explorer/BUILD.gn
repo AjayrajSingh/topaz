@@ -9,6 +9,11 @@ flutter_app("file_explorer") {
 
   sandbox = "meta/sandbox"
 
+
+  sources = [
+    "folder_widget.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]
