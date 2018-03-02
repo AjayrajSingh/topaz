@@ -10,6 +10,10 @@ flutter_app("chat_conversation_info") {
 
   package_name = "chat_conversation_info"
 
+  sources = [
+    "widgets.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/chat/packages/chat_models",
@@ -21,10 +25,14 @@ flutter_app("chat_conversation_info") {
 }
 
 dart_test("test") {
+  sources = [
+    "participants_section_test.dart",
+  ]
+
   deps = [
+    ":chat_conversation_info_dart_library",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/app/chat/modules/conversation_info:chat_conversation_info_dart_library",
     "//topaz/public/dart/fixtures",
   ]
 }

@@ -10,6 +10,12 @@ flutter_app("chat_conversation") {
 
   main_dart = "lib/main.dart"
 
+  sources = [
+    "fixtures.dart",
+    "models.dart",
+    "widgets.dart",
+  ]
+
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/module/fidl:fidl_dart",
@@ -32,9 +38,14 @@ flutter_app("chat_conversation") {
 }
 
 dart_test("test") {
+  sources = [
+    "message_input_test.dart",
+    "section_test.dart",
+  ]
+
   deps = [
+    ":chat_conversation_dart_library",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/app/chat/modules/conversation:chat_conversation_dart_library",
   ]
 }

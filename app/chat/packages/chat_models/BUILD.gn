@@ -7,6 +7,10 @@ import("//build/dart/dart_library.gni")
 dart_library("chat_models") {
   package_name = "chat_models"
 
+  sources = [
+    "chat_models.dart",
+  ]
+
   deps = [
     "//topaz/public/dart/widgets:lib.widgets",
   ]
