@@ -1,0 +1,8 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "labels": [
+        "//topaz/examples/fidl/compiler"
+    ]
+}

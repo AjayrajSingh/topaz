@@ -7,8 +7,6 @@ import 'dart:typed_data';
 import 'package:zircon/zircon.dart';
 
 // ignore_for_file: public_member_api_docs
-// ignore_for_file: avoid_positional_boolean_parameters
-// ignore_for_file: always_specify_types
 
 const int kMessageHeaderSize = 16;
 const int kMessageTxidOffset = 0;

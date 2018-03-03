@@ -8,10 +8,8 @@ import 'dart:collection';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
-import 'codec.dart';
 import 'error.dart';
 import 'message.dart';
-import 'types.dart';
 
 // ignore_for_file: public_member_api_docs
 
@@ -54,18 +52,9 @@ typedef void _VoidCallback();
 ///   }
 /// }
 /// ```
-class InterfaceHandle<T> extends Encodable {
+class InterfaceHandle<T> {
   /// Creates an interface handle that wraps the given channel.
   InterfaceHandle(this._channel);
-
-  factory InterfaceHandle.$decode(Decoder decoder, int offset, FidlType type) {
-    Channel channel;
-    Handle handle = decoder.decodeHandle(offset, type);
-    if (handle.isValid) {
-      channel = new Channel(handle);
-    }
-    return new InterfaceHandle<T>(channel);
-  }
 
   /// The underlying channel messages will be sent over when the interface
   /// handle is bound to a [Proxy].
@@ -87,11 +76,6 @@ class InterfaceHandle<T> extends Encodable {
   void close() {
     _channel?.close();
     _channel = null;
-  }
-
-  @override
-  void $encode(Encoder encoder, int offset, FidlType type) {
-    encoder.encodeHandle(_channel.handle, offset, type);
   }
 }
 
@@ -133,18 +117,9 @@ class InterfaceHandle<T> extends Encodable {
 /// FooProxy foo = new FooProxy();
 /// InterfaceRequest<T> request = foo.ctrl.request();
 /// ```
-class InterfaceRequest<T> extends Encodable {
+class InterfaceRequest<T> {
   /// Creates an interface request that wraps the given channel.
   InterfaceRequest(this._channel);
-
-  factory InterfaceRequest.$decode(Decoder decoder, int offset, FidlType type) {
-    Channel channel;
-    Handle handle = decoder.decodeHandle(offset, type);
-    if (handle.isValid) {
-      channel = new Channel(handle);
-    }
-    return new InterfaceRequest<T>(channel);
-  }
 
   /// The underlying channel messages will be received over when the interface
   /// handle is bound to [Binding].
@@ -166,11 +141,6 @@ class InterfaceRequest<T> extends Encodable {
   void close() {
     _channel?.close();
     _channel = null;
-  }
-
-  @override
-  void $encode(Encoder encoder, int offset, FidlType type) {
-    encoder.encodeHandle(_channel.handle, offset, type);
   }
 }
 

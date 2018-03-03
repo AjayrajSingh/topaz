@@ -13,6 +13,7 @@
         "topaz/packages/documents",
         "topaz/packages/ermine_user_shell",
         "topaz/packages/examples",
+        "topaz/packages/fidl_examples",
         "topaz/packages/file_explorer",
         "topaz/packages/flutter",
         "topaz/packages/image",
