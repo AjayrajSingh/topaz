@@ -11,7 +11,7 @@ import 'package:lib.device.fidl/device_shell.fidl.dart';
 import 'package:lib.device.fidl/user_provider.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.input.fidl/input_events.fidl.dart'
-    show KeyboardEvent;
+    show KeyboardEvent, KeyboardEventPhase;
 import 'package:lib.ui.presentation.fidl/display_usage.fidl.dart';
 import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
 import 'package:lib.ui.scenic.fidl/renderer.fidl.dart';
@@ -31,7 +31,11 @@ export 'package:lib.widgets/model.dart'
 /// Contains all the relevant data for displaying the list of users and for
 /// logging in and creating new users.
 class UserPickerDeviceShellModel extends DeviceShellModel
-    implements Presentation, ServiceProvider, TickerProvider {
+    implements
+        Presentation,
+        ServiceProvider,
+        TickerProvider,
+        KeyboardCaptureListener {
   /// Called when the device shell stops.
   final VoidCallback onDeviceShellStopped;
 
@@ -53,6 +57,10 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   ChildViewConnection _childViewConnection;
   final Set<Account> _draggedUsers = new Set<Account>();
   final Set<Ticker> _tickers = new Set<Ticker>();
+  final KeyboardCaptureListenerBinding _keyboardCaptureListenerBinding =
+      new KeyboardCaptureListenerBinding();
+  String _currentUserShell = '';
+  String _currentAccountId = '';
 
   // Because this device shell only supports a single user logged in at a time,
   // we don't need to maintain separate ServiceProvider and Presentation
@@ -191,15 +199,27 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         new InterfacePair<ServiceProvider>();
     _serviceProviderBinding.bind(this, serviceProvider.passRequest());
 
+    _currentAccountId = accountId;
+    _currentUserShell =
+        _userShellChooser.getPrimaryUserShellAppUrl(_currentAccountId);
     final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
     final UserLoginParams params = new UserLoginParams(
         accountId: accountId,
         viewOwner: viewOwner.passRequest(),
         services: serviceProvider.passHandle(),
         userController: _userControllerProxy.ctrl.request(),
-        userShellConfig:
-            new AppConfig(url: _userShellChooser.appUrl(accountId)));
+        userShellConfig: new AppConfig(
+            url: _userShellChooser.getPrimaryUserShellAppUrl(accountId)));
     userProvider.login(params);
+    presentation.captureKeyboardEvent(
+        new KeyboardEvent(
+            deviceId: 0,
+            eventTime: 0,
+            hidUsage: 0,
+            codePoint: 32, // spacebar
+            modifiers: 8, // LCTRL
+            phase: KeyboardEventPhase.pressed),
+        _keyboardCaptureListenerBinding.wrap(this));
 
     _userControllerProxy.watch(_userWatcherImpl.getHandle());
     _loadingChildView = true;
@@ -219,6 +239,24 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       },
     );
     notifyListeners();
+  }
+
+  /// |KeyboardCaptureListener|.
+  @override
+  void onEvent(KeyboardEvent ev) {
+    log.info('Keyboard captured in device shell!');
+    if (_userControllerProxy.ctrl.isBound && _userShellChooser != null) {
+      String primaryShell =
+          _userShellChooser.getPrimaryUserShellAppUrl(_currentAccountId);
+      if (_currentUserShell == primaryShell) {
+        _currentUserShell =
+            _userShellChooser.getSecondaryUserShellAppUrl(_currentAccountId);
+      } else {
+        _currentUserShell = primaryShell;
+      }
+      _userControllerProxy.swapUserShell(
+          new AppConfig(url: _currentUserShell), () {});
+    }
   }
 
   /// Called when the the user shell logs out.
@@ -340,6 +378,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   @override
   void captureKeyboardEvent(KeyboardEvent eventToCapture,
       InterfaceHandle<KeyboardCaptureListener> listener) {
+    presentation.captureKeyboardEvent(eventToCapture, listener);
   }
 
   // |ServiceProvider|.

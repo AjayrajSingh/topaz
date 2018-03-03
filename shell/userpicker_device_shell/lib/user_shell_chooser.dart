@@ -6,7 +6,8 @@ import 'dart:io';
 
 /// Keeps track of the currently chosen user shell.
 class UserShellChooser {
-  String _userShellAppUrl = 'armadillo_user_shell';
+  final String _defaultUserShell = 'armadillo_user_shell';
+  List<String> _configuredUserShells = <String>[];
 
   /// Constructor.
   UserShellChooser() {
@@ -14,8 +15,8 @@ class UserShellChooser {
     file.exists().then((bool exists) {
       if (exists) {
         file.readAsString().then(
-          (String userShellAppUrl) {
-            _userShellAppUrl = userShellAppUrl;
+          (String userShellLaunchFileContents) {
+            _configuredUserShells = userShellLaunchFileContents.split('\n');
           },
         );
       }
@@ -23,7 +24,14 @@ class UserShellChooser {
   }
 
   /// Gets the current user shell's app url.
-  /// Temporarily use Armadillo shell if guest for backward compatibility
-  String appUrl(String user) =>
-      user == null ? 'armadillo_user_shell' : _userShellAppUrl;
+  /// Temporarily use the default user shell if guest for backward compatibility
+  String getPrimaryUserShellAppUrl(String user) => _configuredUserShells.isEmpty
+      ? _defaultUserShell
+      : _configuredUserShells[0];
+
+  /// Gets the secondary user shell's app url.
+  String getSecondaryUserShellAppUrl(String user) =>
+      _configuredUserShells.length > 1
+          ? _configuredUserShells[1]
+          : getPrimaryUserShellAppUrl(user);
 }
