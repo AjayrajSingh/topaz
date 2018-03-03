@@ -11,6 +11,10 @@ dart_app("home_work_agent") {
 
   sandbox = "meta/sandbox"
 
+  sources = [
+    "home_work_proposer.dart",
+  ]
+
   deps = [
     "//peridot/public/lib/context/fidl:fidl_dart",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",

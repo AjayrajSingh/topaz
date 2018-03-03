@@ -8,6 +8,12 @@ import("//build/dart/dart_test.gni")
 dart_library("keyboard") {
   package_name = "keyboard"
 
+  sources = [
+    "keyboard.dart",
+    "keys.dart",
+    "word_suggestion_service.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/shell/widgets",
@@ -16,8 +22,8 @@ dart_library("keyboard") {
 
 dart_test("test") {
   deps = [
+    ":keyboard",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/shell/keyboard",
   ]
 }

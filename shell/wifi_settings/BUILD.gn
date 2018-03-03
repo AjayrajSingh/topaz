@@ -9,8 +9,6 @@ flutter_app("wifi_settings") {
 
   manifest = "pubspec.yaml"
 
-  source_dir = "lib"
-
   deps = [
     "//garnet/public/lib/wlan/fidl:fidl_dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",

@@ -8,6 +8,14 @@ import("//build/dart/dart_test.gni")
 dart_library("armadillo") {
   package_name = "armadillo"
 
+  sources = [
+    "common.dart",
+    "next.dart",
+    "now.dart",
+    "overview.dart",
+    "recent.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
@@ -20,8 +28,8 @@ dart_library("armadillo") {
 
 dart_test("test") {
   deps = [
+    ":armadillo",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/shell/armadillo",
   ]
 }

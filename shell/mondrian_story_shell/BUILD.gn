@@ -9,6 +9,25 @@ flutter_app("mondrian") {
   package_name = "mondrian"
   main_dart = "lib/main.dart"
 
+  sources = [
+    "child_view.dart",
+    "copresent_layout.dart",
+    "flux.dart",
+    "isometric_widget.dart",
+    "layout_model.dart",
+    "logo.dart",
+    "model.dart",
+    "overview.dart",
+    "sim.dart",
+    "sized_surface.dart",
+    "surface_details.dart",
+    "surface_director.dart",
+    "surface_form.dart",
+    "surface_frame.dart",
+    "surface_stage.dart",
+    "tree.dart",
+  ]
+
   deps = [
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",

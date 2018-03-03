@@ -14,6 +14,27 @@ flutter_app("armadillo_user_shell") {
 
   manifest = "pubspec.yaml"
 
+  sources = [
+    "active_agents_manager.dart",
+    "armadillo_user_shell_model.dart",
+    "audio_policy_volume_model.dart",
+    "context_provider_context_model.dart",
+    "focus_request_watcher_impl.dart",
+    "focused_stories_tracker.dart",
+    "hit_test_model.dart",
+    "initial_focus_setter.dart",
+    "maxwell_hotword.dart",
+    "maxwell_voice_model.dart",
+    "power_manager_power_model.dart",
+    "rate_limited_retry.dart",
+    "story_importance_watcher_impl.dart",
+    "story_provider_story_generator.dart",
+    "story_provider_watcher_impl.dart",
+    "suggestion_provider_suggestion_model.dart",
+    "user_logoutter.dart",
+    "wallpaper_chooser.dart",
+  ]
+
   deps = [
     "//garnet/public/lib/power/fidl:fidl_dart",
     "//garnet/public/lib/time_service/fidl:fidl_dart",

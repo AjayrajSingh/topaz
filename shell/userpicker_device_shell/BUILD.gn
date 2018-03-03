@@ -14,6 +14,29 @@ flutter_app("userpicker_device_shell") {
 
   manifest = "pubspec.yaml"
 
+  sources = [
+    "authentication_context_impl.dart",
+    "authentication_overlay.dart",
+    "authentication_overlay_model.dart",
+    "child_constraints_changer.dart",
+    "circular_button.dart",
+    "clock.dart",
+    "constraints_model.dart",
+    "debug_text.dart",
+    "device_extender.dart",
+    "device_extension_state.dart",
+    "memory_indicator.dart",
+    "netstack_model.dart",
+    "rounded_corner_decoration.dart",
+    "soft_keyboard_container_impl.dart",
+    "user_list.dart",
+    "user_picker_device_shell_model.dart",
+    "user_picker_device_shell_screen.dart",
+    "user_picker_screen.dart",
+    "user_shell_chooser.dart",
+    "user_watcher_impl.dart",
+  ]
+
   deps = [
     "//garnet/public/lib/netstack/fidl:fidl_dart",
     "//garnet/public/lib/ui/input/fidl:fidl_dart",
