@@ -122,6 +122,23 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
       'x86_64-mac',
       'jiri',
     ],
+  ],
+  const <List<String>>[
+    const <String>[
+      'zircon-roller',
+      'zircon',
+      'roller',
+    ],
+    const <String>[
+      'garnet-roller',
+      'garnet',
+      'roller',
+    ],
+    const <String>[
+      'peridot-roller',
+      'peridot',
+      'roller',
+    ],
   ]
 ];
 
