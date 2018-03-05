@@ -40,7 +40,7 @@ class ContextListenerImpl extends ContextListener {
   @override
   Future<Null> onContextUpdate(ContextUpdate result) async {
     for (final ContextUpdateEntry entry in result.values) {
-      if (entry.key != _kHotelTopic) {
+      if (entry.key != _kHotelTopic || entry.value.isEmpty) {
         continue;
       }
 
