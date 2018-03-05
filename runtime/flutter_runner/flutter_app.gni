@@ -460,6 +460,8 @@ template("flutter_aot_app") {
       args += [ "--checked" ]
     }
 
+    pool = "//topaz/runtime/dart_runner:dart_aot_pool($target_toolchain)"
+
     deps = [
       ":$dart_library_name",
       "//third_party/flutter/lib/snapshot:generate_dart_ui",

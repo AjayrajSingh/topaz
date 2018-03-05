@@ -359,6 +359,8 @@ template("dart_aot_app") {
       args += [ "--enable_asserts" ]
     }
     args += [ rebase_path(invoker.main_dart) ]
+
+    pool = "//topaz/runtime/dart_runner:dart_aot_pool($target_toolchain)"
   }
 
   dylib_target_name = target_name + "_dylib"
@@ -511,6 +513,8 @@ template("dart2_aot_app") {
       args += [ "--enable_asserts" ]
     }
     args += [ rebase_path(kernel_path) ]
+
+    pool = "//topaz/runtime/dart_runner:dart_aot_pool($target_toolchain)"
   }
 
   dylib_target_name = target_name + "_dylib"

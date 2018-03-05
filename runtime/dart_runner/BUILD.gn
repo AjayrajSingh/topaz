@@ -4,6 +4,11 @@
 
 import("//build/package.gni")
 
+pool("dart_aot_pool") {
+  # AOT invocations of gen_snapshot can use ~450MB each.
+  depth = 16
+}
+
 template("runner") {
   invoker_output_name = invoker.output_name
   extra_defines = invoker.extra_defines
