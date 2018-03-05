@@ -27,6 +27,14 @@ dart_library("armadillo") {
 }
 
 dart_test("test") {
+  sources = [
+    "armadillo_drag_target_test.dart",
+    "candidate_info_test.dart",
+    "panel_test.dart",
+    "story_list_layout_test.dart",
+    "story_list_test.dart",
+  ]
+
   deps = [
     ":armadillo",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

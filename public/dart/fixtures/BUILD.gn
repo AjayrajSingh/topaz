@@ -20,6 +20,11 @@ dart_library("fixtures") {
 }
 
 dart_test("test") {
+  sources = [
+    "fixtures_name_test.dart",
+    "namespace_test.dart",
+  ]
+
   deps = [
     ":fixtures",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

@@ -21,6 +21,14 @@ dart_library("music_widgets") {
 }
 
 dart_test("test") {
+  sources = [
+    "hero_banner_scaffold_test.dart",
+    "player_test.dart",
+    "track_art_test.dart",
+    "track_list_item_test.dart",
+    "utils_test.dart",
+  ]
+
   deps = [
     ":music_widgets",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

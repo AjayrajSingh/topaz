@@ -20,6 +20,11 @@ dart_library("music_models") {
 }
 
 dart_test("test") {
+  sources = [
+    "album_test.dart",
+    "track_test.dart",
+  ]
+
   deps = [
     ":music_models",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

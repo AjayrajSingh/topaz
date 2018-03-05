@@ -54,6 +54,10 @@ flutter_app("userpicker_device_shell") {
 }
 
 dart_test("test") {
+  sources = [
+    "constraints_model_test.dart",
+  ]
+
   deps = [
     ":userpicker_device_shell_dart_library",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

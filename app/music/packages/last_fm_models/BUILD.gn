@@ -19,6 +19,10 @@ dart_library("last_fm_models") {
 }
 
 dart_test("test") {
+  sources = [
+    "artist_test.dart",
+  ]
+
   deps = [
     ":last_fm_models",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

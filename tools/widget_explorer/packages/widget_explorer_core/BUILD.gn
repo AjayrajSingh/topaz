@@ -23,6 +23,10 @@ dart_library("widget_explorer_core") {
 }
 
 dart_test("test") {
+  sources = [
+    "extract_test.dart",
+  ]
+
   deps = [
     ":widget_explorer_core",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

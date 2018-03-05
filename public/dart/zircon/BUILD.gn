@@ -8,10 +8,16 @@ import("//build/dart/dart_test.gni")
 dart_library("zircon") {
   package_name = "zircon"
 
-  source_dir = "lib"
+  sources = [
+    "zircon.dart",
+  ]
 }
 
 dart_test("tests") {
+  sources = [
+    "fidl_import_test.dart",
+  ]
+
   deps = [
     ":zircon",
     "//peridot/public/lib/story/fidl:fidl_dart",

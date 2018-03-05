@@ -35,6 +35,11 @@ dart_library("lib.widgets") {
 }
 
 dart_test("test") {
+  sources = [
+    "alphatar_test.dart",
+    "rk4_spring_simulation_test.dart",
+  ]
+
   deps = [
     ":lib.widgets",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

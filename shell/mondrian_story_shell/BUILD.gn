@@ -46,6 +46,10 @@ flutter_app("mondrian") {
 }
 
 dart_test("test") {
+  sources = [
+    "tree_test.dart",
+  ]
+
   deps = [
     ":mondrian_dart_library",
     "//third_party/dart-pkg/pub/test",

@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_library.gni")
-import("//build/dart/dart_test.gni")
 
 dart_library("widgets") {
   package_name = "sysui_widgets"

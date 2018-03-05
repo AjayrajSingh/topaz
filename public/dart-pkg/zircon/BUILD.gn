@@ -11,6 +11,7 @@ group("zircon") {
   public_deps = [
     ":sdk_ext",
   ]
+
   deps = [
     ":dart_zircon_test",
     ":package_for_analysis",
@@ -46,12 +47,16 @@ source_set("sdk_ext") {
 # This is just so that we can run dart analysis on these files.
 dart_library("package_for_analysis") {
   infer_package_name = true
-  source_dir = "lib"
+
+  sources = [
+    "zircon.dart",
+  ]
 }
 
 dart_fuchsia_test("dart_zircon_test") {
   deps = [
     "//topaz/public/lib/fidl/dart",
   ]
+
   sandbox = "//topaz/runtime/dart_runner/meta/sandbox"
 }

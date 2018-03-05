@@ -18,6 +18,10 @@ dart_library("utils") {
 }
 
 dart_test("test") {
+  sources = [
+    "utils_test.dart",
+  ]
+
   deps = [
     ":utils",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

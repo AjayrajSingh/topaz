@@ -19,6 +19,12 @@ dart_library("concert_models") {
 }
 
 dart_test("test") {
+  sources = [
+    "artist_test.dart",
+    "event_test.dart",
+    "venue_test.dart",
+  ]
+
   deps = [
     ":concert_models",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
