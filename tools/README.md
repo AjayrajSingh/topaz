@@ -69,7 +69,7 @@ Make sure to start from a "very clean build" (remove $FUCHSIA_DIR/out) if you ha
 
 This will clean and create a release build. To do this manually you can use:
 
-    fx clean-build x86-64 --release
+    fx clean-build x64 --release
 
 # Run
 

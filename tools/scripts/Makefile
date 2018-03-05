@@ -95,7 +95,7 @@ ifeq ($(FUCHSIA_VARIANT),release)
 endif
 
 BUILD_FLAGS := $(FX_SET_FLAGS)
-FUCHSIA_GEN_TARGET ?= x86-64
+FUCHSIA_GEN_TARGET ?= x64
 
 ################################################################################
 

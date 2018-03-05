@@ -7,5 +7,5 @@
 set -e
 
 echo "=== buidling Fuchsia"
-fx set x86-64 "$@"
+fx set x64 "$@"
 fx full-build

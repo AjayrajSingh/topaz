@@ -6,5 +6,5 @@
 # Exit this script if one command fails.
 set -e
 
-fx set x86-64 --packages topaz/packages/default,topaz/packages/xi
+fx set x64 --packages topaz/packages/default,topaz/packages/xi
 fx full-build

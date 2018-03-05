@@ -10,7 +10,7 @@ dependencies locally, add `use_prebuilt_webkit=false` to your GN arguments and
 add 'webkit' to your module set:
 
 ```
-fx set x86-64 --packages topaz/packages/default,topaz/packages/webkit --args use_prebuilt_webkit=false
+fx set x64 --packages topaz/packages/default,topaz/packages/webkit --args use_prebuilt_webkit=false
 ```
 
 ## Updating the Prebuilt WebKit

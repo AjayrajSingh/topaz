@@ -17,7 +17,7 @@ not connected to the rest of the documentation tree.
 In order to build this tool, add `topaz/packages/doc_checker` to your build
 packages. The tool is then available at:
 ```
-out/debug-x86-64/host_x64/dart-tools/doc_checker
+out/debug-x64/host_x64/dart-tools/doc_checker
 ```
 
 See the tool's help for how to hold it right.

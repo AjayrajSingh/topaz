@@ -113,7 +113,7 @@ Before the xi-core module can be built the fidl service should be built, this
 can be done by commenting out `"//topaz/app/xi/modules",` in the
 `topaz/app/xi/BUILD.gn` and then running:
 
-    fx set x86-64 --packages topaz/packages/default,topaz/packages/xi
+    fx set x64 --packages topaz/packages/default,topaz/packages/xi
     fx full-build
 
 This will error but it will generate the artifacts needed to continue.
@@ -140,7 +140,7 @@ The command above will generate the binary in `target/x86_64-unknown-fuchsia/deb
 
 First configure your build:
 
-    fx set x86-64 --packages topaz/packages/default,topaz/packages/xi
+    fx set x64 --packages topaz/packages/default,topaz/packages/xi
 
 Generate and build:
 
