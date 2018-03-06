@@ -127,8 +127,8 @@ package("dart2_aot_runner") {
   ]
   if (is_debug) {
     deps += [
-      "vmservice",
-      "//third_party/dart/runtime/observatory:embedded_observatory_archive",
+      "vmservice:vmservice_dylib($shlib_toolchain)",
+      "//third_party/dart/runtime/observatory:embedded_archive_observatory",
     ]
   }
 
@@ -198,7 +198,7 @@ package("dart2_jit_runner") {
   ]
   if (is_debug) {
     deps += [
-      "//third_party/dart/runtime/observatory:embedded_observatory_archive",
+      "//third_party/dart/runtime/observatory:embedded_archive_observatory",
     ]
   }
 
