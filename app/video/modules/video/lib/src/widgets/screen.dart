@@ -9,7 +9,6 @@ import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../modular/player_model.dart';
-import '../modular/video_module_model.dart';
 import 'loading.dart';
 
 /// The video screen for the video player
@@ -49,17 +48,15 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
     _thumbnailAnimationController.dispose();
   }
 
-  void _animateIntoThumbnail(VideoModuleModel model, PlayerModel playerModel) {
+  void _animateIntoThumbnail(PlayerModel playerModel) {
     _wasPlayingBefore = playerModel.playing;
     if (_wasPlayingBefore) {
       playerModel.pause();
     }
-    model.hideDeviceChooser = false;
     _thumbnailAnimationController.forward();
   }
 
-  void _animateIntoScreen(VideoModuleModel model, PlayerModel playerModel) {
-    model.hideDeviceChooser = true;
+  void _animateIntoScreen(PlayerModel playerModel) {
     _thumbnailAnimationController.reverse();
     if (_wasPlayingBefore) {
       playerModel.play();
@@ -75,7 +72,6 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
   }
 
   Widget _buildScreen(
-    VideoModuleModel model,
     PlayerModel playerModel,
     BuildContext context,
   ) {
@@ -147,9 +143,9 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
               );
             },
           ),
-          onDragStarted: () => _animateIntoThumbnail(model, playerModel),
+          onDragStarted: () => _animateIntoThumbnail(playerModel),
           onDraggableCanceled: (Velocity v, Offset o) =>
-              _animateIntoScreen(model, playerModel),
+              _animateIntoScreen(playerModel),
           child: playerModel.videoViewConnection != null
               ? new GestureDetector(
                   onTap: () => _toggleControlOverlay(playerModel),
@@ -159,7 +155,7 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
                         connection: playerModel.videoViewConnection),
                   ),
                 )
-              : new Loading(remoteDeviceName: model.remoteDeviceName),
+              : const Loading(remoteDeviceName: 'Unknown'),
         ),
       );
     });
@@ -168,17 +164,17 @@ class _ScreenState extends State<Screen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<VideoModuleModel>(builder: (
+    return new ScopedModelDescendant<PlayerModel>(builder: (
       BuildContext context,
       Widget child,
-      VideoModuleModel moduleModel,
+      PlayerModel playerModel,
     ) {
       return new ScopedModelDescendant<PlayerModel>(builder: (
         BuildContext context,
         Widget child,
         PlayerModel playerModel,
       ) {
-        return _buildScreen(moduleModel, playerModel, context);
+        return _buildScreen(playerModel, context);
       });
     });
   }

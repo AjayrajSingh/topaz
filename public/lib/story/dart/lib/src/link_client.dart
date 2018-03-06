@@ -253,11 +253,7 @@ class LinkClient {
     });
 
     void handleEntity(String ref) {
-      if (ref == null) {
-        completer.completeError(new LinkClientNotFoundException(name));
-      } else {
-        completer.complete(ref);
-      }
+      completer.complete(ref);
     }
 
     try {

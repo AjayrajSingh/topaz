@@ -77,28 +77,7 @@ class Scrubber extends StatelessWidget {
   }
 
   Widget _buildScrubberMode(PlayerModel model) {
-    switch (model.getDisplayMode()) {
-      case DisplayMode.remoteControl:
-        return new Container(
-          padding: const EdgeInsets.only(top: 40.0),
-          child: new Stack(
-            children: <Widget>[
-              const PlayControls(
-                primaryIconSize: 48.0,
-                secondaryIconSize: 48.0,
-                padding: 36.0,
-              ),
-              _buildProgress(model),
-              _buildDuration(model),
-              new Positioned(
-                left: 0.0,
-                right: 0.0,
-                top: 0.0,
-                child: _buildProgressBar(model),
-              ),
-            ],
-          ),
-        );
+    switch (model.displayMode) {
       case DisplayMode.localSmall:
         return new AnimatedCrossFade(
           duration: kPlayControlsAnimationTime,

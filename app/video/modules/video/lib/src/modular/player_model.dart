@@ -3,14 +3,14 @@
 // found in the LICENSE file.
 import 'dart:async';
 
-import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.media.fidl/problem.fidl.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:meta/meta.dart';
 
+import '../../asset.dart';
 import '../../video_progress.dart';
 import '../widgets.dart';
 
@@ -19,21 +19,8 @@ const Duration _kLoadingDuration = const Duration(seconds: 2);
 const Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
 const String _kServiceName = 'fling';
 
-/// Typedef for function to request focus for module
-typedef void RequestFocus();
-
-/// Typedef for function to get displayMode
-typedef DisplayMode DisplayModeGetter();
-
-/// Typedef for function to set displayMode
-typedef void DisplayModeSetter(DisplayMode mode);
-
-/// Typedef for updating device info when playing remotely
-typedef void PlayRemoteCallback(
-    String deviceName, String serviceName, Duration progress);
-
-/// Typedef for updating device info when playing locally
-typedef void PlayLocalCallback();
+/// Typedef for sending VideoProgress events
+typedef void SendVideoProgress(VideoProgress progress);
 
 /// The [Model] for the video player.
 class PlayerModel extends Model {
@@ -41,33 +28,11 @@ class PlayerModel extends Model {
   Timer _progressTimer;
   Timer _errorTimer;
   MediaPlayerController _controller;
-  bool _wasPlaying = false;
-  bool _locallyControlled = false;
   bool _showControlOverlay = true;
-  bool _failedCast = false;
-  String _errorMessage = 'UNABLE TO CAST';
-  // The video has ended but the user has not uncast.
-  // Replaying the video should still happen on remote device.
-  bool _replayRemotely = false;
+  DisplayMode _displayMode = kDefaultDisplayMode;
 
-  /// App context passed in from starting the app
-  final ApplicationContext appContext;
-
-  /// Function that calls ModuleContext.requestFocus(), which
-  /// focuses module (when cast onto remote device)
-  RequestFocus requestFocus;
-
-  /// Returns the module's displayMode
-  DisplayModeGetter getDisplayMode;
-
-  /// Sets the module's displayMode
-  DisplayModeSetter setDisplayMode;
-
-  /// Callback that updates device-specific info for remote play
-  PlayRemoteCallback onPlayRemote;
-
-  /// Callback that updates device-specific info for local play
-  PlayLocalCallback onPlayLocal;
+  /// Error related to video playback
+  String errorMessage = 'UNKNOWN VIDEO PLAYBACK ERROR';
 
   /// Video asset for the player to currently play
   Asset _asset;
@@ -75,43 +40,19 @@ class PlayerModel extends Model {
   // This sends periodic progress events while video is playing
   VideoProgressMonitor _videoProgressMonitor;
 
-  /// Create a Player model
-  PlayerModel({
-    this.appContext,
-    @required this.requestFocus,
-    @required this.getDisplayMode,
-    @required this.setDisplayMode,
-    @required this.onPlayRemote,
-    @required this.onPlayLocal,
-  })
-      : assert(requestFocus != null),
-        assert(getDisplayMode != null),
-        assert(setDisplayMode != null),
-        assert(onPlayRemote != null),
-        assert(onPlayLocal != null) {
-    _controller = new MediaPlayerController(appContext.environmentServices)
+  /// Used for media player
+  final ServiceProviderProxy environmentServices;
+
+  /// Create a Player model.
+  /// notifyProgress(progress) is called whenever the time in the video
+  /// is changing.
+  PlayerModel({this.environmentServices, SendVideoProgress notifyProgress}) {
+    _controller = new MediaPlayerController(environmentServices)
       ..addListener(_handleControllerChanged);
     _videoProgressMonitor = new VideoProgressMonitor(_controller);
-    notifyListeners();
-  }
-
-  /// Returns whether casting failed
-  bool get failedCast => _failedCast;
-
-  /// Sets whether casting failed
-  set failedCast(bool cast) {
-    _videoProgressMonitor.stop();
-    _failedCast = cast;
-    notifyListeners();
-  }
-
-  /// Gets the error message
-  String get errorMessage => _errorMessage;
-
-  /// Sets the error message
-  set errorMessage(String message) {
-    _videoProgressMonitor.stop();
-    _errorMessage = message;
+    _videoProgressMonitor.progress.addListener(() {
+      notifyProgress(_videoProgressMonitor.progress);
+    });
     notifyListeners();
   }
 
@@ -122,18 +63,8 @@ class PlayerModel extends Model {
   bool get playing => _controller.playing;
 
   /// Gets and sets whether we should show play controls and scrubber.
-  /// In remote control mode, we always show the control overlay with active
-  /// (i.e. actively moving, receiving timed notifications) progress bar.
   bool get showControlOverlay => _showControlOverlay;
   set showControlOverlay(bool show) {
-    if (getDisplayMode() == DisplayMode.remoteControl) {
-      if (!showControlOverlay) {
-        _showControlOverlay = true;
-        notifyListeners();
-      }
-      return;
-    }
-
     assert(show != null);
     if (showControlOverlay != show) {
       _showControlOverlay = show;
@@ -150,6 +81,13 @@ class PlayerModel extends Model {
   /// Returns media player controller normalized video progress
   double get normalizedProgress => _controller.normalizedProgress;
 
+  /// Set/return current displayMode
+  DisplayMode get displayMode => _displayMode;
+  set displayMode(DisplayMode mode) {
+    _displayMode = mode;
+    notifyListeners();
+  }
+
   /// Seeks video to normalized position
   void normalizedSeek(double normalizedPosition) {
     _controller.normalizedSeek(normalizedPosition);
@@ -164,7 +102,6 @@ class PlayerModel extends Model {
     if (_controller.problem != null) {
       _videoProgressMonitor.stop();
       log.fine(_controller.problem);
-      failedCast = true;
       if (_controller.problem.type == Problem.kProblemContainerNotSupported) {
         errorMessage = 'UNSUPPORTED VIDEO LINK';
       } else {
@@ -178,7 +115,7 @@ class PlayerModel extends Model {
   /// When the VideoModuleModel.onReady() has finished running, the
   /// Link with the video asset has been updated to the one the user
   /// had selected from the Daisy.
-  void handleAssetChanged(Asset asset) {
+  set asset(Asset asset) {
     if (asset != null && (_asset == null || (_asset.uri != asset.uri))) {
       log.fine('Updating video asset in the Player');
       _asset = asset;
@@ -193,7 +130,6 @@ class PlayerModel extends Model {
 
   /// Seeks to a duration in the video
   void seek(Duration duration) {
-    _locallyControlled = true;
     _controller.seek(duration);
     _videoProgressMonitor.updateProgress();
     // TODO(maryxia) SO-589 seek after video has ended
@@ -206,55 +142,26 @@ class PlayerModel extends Model {
     }
     _progressTimer = new Timer.periodic(
         _kProgressBarUpdateInterval, (Timer timer) => _notifyTimerListeners());
-    _locallyControlled = true;
-    if (_asset.type == AssetType.remote) {
-      Duration lastLocalTime = _controller.progress;
-      _controller.connectToRemote(
-        device: _asset.device,
-        service: _asset.service,
-      );
-
-      if (_replayRemotely) {
-        lastLocalTime = Duration.ZERO;
-        _replayRemotely = false;
-      }
-      _controller.seek(lastLocalTime);
-    } else {
-      _controller.play();
-      brieflyShowControlOverlay();
-    }
+    _controller.play();
+    brieflyShowControlOverlay();
     _videoProgressMonitor.start();
   }
 
   /// Pauses video
   void pause() {
-    _locallyControlled = true;
     _controller.pause();
     _progressTimer.cancel();
     _videoProgressMonitor.stop();
   }
 
-  /// Start playing video on remote device if it is playing locally
-  void playRemote(String deviceName) {
-    if (_asset.device == null) {
-      pause();
-      log.fine('Starting remote play on $deviceName');
-
-      onPlayRemote(deviceName, _kServiceName, _controller.progress);
-      play();
-    }
-  }
-
   /// Start playing video on local device if it is controlling remotely
   void playLocal() {
-    _replayRemotely = false;
     if (_asset.device != null) {
       pause();
       Duration progress = _controller.progress;
       _controller.close();
-      setDisplayMode(kDefaultDisplayMode);
+      displayMode = kDefaultDisplayMode;
       log.fine('Starting local play');
-      onPlayLocal();
       _controller
         ..open(_asset.uri, serviceName: _kServiceName)
         ..seek(progress);
@@ -266,37 +173,20 @@ class PlayerModel extends Model {
     // If unable to connect and cast to remote device, show loading screen for
     // 2 seconds and then return back to local video with error toast
     if (_controller.problem?.type == Problem.kProblemConnectionFailed) {
-      setDisplayMode(DisplayMode.localLarge);
+      displayMode = DisplayMode.localLarge;
       showControlOverlay = false; // hide play controls in loading screen
       _errorTimer = new Timer(_kLoadingDuration, () {
         _errorTimer?.cancel();
         _errorTimer = new Timer(_kOverlayAutoHideDuration, () {
           _errorTimer?.cancel();
           _errorTimer = null;
-          failedCast = false;
         });
-        failedCast = true;
         playLocal();
       });
-    } else if (_errorTimer == null && _failedCast) {
-      failedCast = false;
-    }
-    if (_controller.playing &&
-        !_locallyControlled &&
-        getDisplayMode() != DisplayMode.immersive) {
-      setDisplayMode(DisplayMode.immersive);
-      if (!_wasPlaying && _controller.playing) {
-        requestFocus();
-      }
-      _wasPlaying = _controller.playing;
-      notifyListeners();
     }
     if (showControlOverlay) {
       brieflyShowControlOverlay(); // restart the timer
       notifyListeners();
-    }
-    if (_controller.isRemote && _controller.ended) {
-      _replayRemotely = true;
     }
   }
 

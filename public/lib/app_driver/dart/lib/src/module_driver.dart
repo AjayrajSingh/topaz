@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
 import 'package:lib.entity.dart/entity.dart';
@@ -173,6 +174,9 @@ class ModuleDriver {
       // QUESTION: can the ref value change between updates to the same entity
       // values set by ComponentContext#createEntityWithData(...)?
       String ref = await link.getEntity();
+      if (ref == null) {
+        return null;
+      }
       EntityResolverClient resolver = await getResolver();
       EntityClient entity = await resolver.resolveEntity(ref);
       List<String> types = await entity.getTypes();
@@ -323,6 +327,11 @@ class ModuleDriver {
 
     return completer.future;
   }
+
+  /// Made available for video module to access MediaPlayer.
+  /// TODO MS-1287 Determine whether this should be refactored
+  ServiceProviderProxy get environmentServices =>
+      _applicationContext.environmentServices;
 }
 
 /// [app-driver]: https://fuchsia.googlesource.com/peridot/+/master/public/lib/app_driver/cpp?autodive=0/

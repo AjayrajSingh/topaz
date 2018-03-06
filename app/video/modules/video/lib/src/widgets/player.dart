@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../modular/player_model.dart';
-import '../modular/video_module_model.dart';
 import '../widgets.dart';
 
 /// Video player layout
@@ -25,82 +24,13 @@ class Player extends StatelessWidget {
     padding: 0.0,
   );
 
-  Widget _buildRetry(VideoModuleModel moduleModel, PlayerModel playerModel) {
-    return new AnimatedCrossFade(
-      duration: kPlayControlsAnimationTime,
-      firstChild: new Center(
-        child: new Container(
-          decoration: new BoxDecoration(
-            borderRadius: new BorderRadius.circular(3.0),
-            color: Colors.black,
-          ),
-          padding: const EdgeInsets.all(16.0),
-          child: new Row(
-            children: <Widget>[
-              new Text(
-                playerModel.errorMessage,
-                style: new TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.grey[50],
-                  letterSpacing: 0.02,
-                ),
-              ),
-              new GestureDetector(
-                onTap: () =>
-                    playerModel.playRemote(moduleModel.remoteDeviceName),
-                child: new Padding(
-                  padding: const EdgeInsets.only(left: 32.0),
-                  child: new Text(
-                    'RETRY',
-                    style: new TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.blue,
-                      letterSpacing: 0.02,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      secondChild: new Container(),
-      crossFadeState: playerModel.failedCast
-          ? CrossFadeState.showFirst
-          : CrossFadeState.showSecond,
-    );
-  }
-
-  Widget _buildPlayerMode(
-      VideoModuleModel moduleModel, PlayerModel playerModel, bool smallScreen) {
-    Widget _deviceChooser = new DeviceChooser(
-      playRemote: playerModel.playRemote,
-    );
-
-    switch (moduleModel.getDisplayMode()) {
-      case DisplayMode.remoteControl:
-        return new RemoteControl(
-          playLocal: playerModel.playLocal,
-          remoteDeviceName:
-              moduleModel.getDisplayName(moduleModel.remoteDeviceName),
-          asset: moduleModel.asset,
-          smallScreen: smallScreen,
-        );
-      case DisplayMode.immersive:
-        return new Center(
-          child: _screen,
-        );
-      case DisplayMode.standby:
-        return new Standby(
-          castingDeviceName: moduleModel.castingDeviceName,
-          asset: moduleModel.asset,
-        );
+  Widget _buildPlayerMode(PlayerModel playerModel, bool smallScreen) {
+    switch (playerModel.displayMode) {
       case DisplayMode.localSmall:
         return new Stack(
           children: <Widget>[
             new Column(
               children: <Widget>[
-                _deviceChooser,
                 new Expanded(
                   child: new Stack(
                     fit: StackFit.passthrough,
@@ -115,18 +45,6 @@ class Player extends StatelessWidget {
                 const Scrubber(),
               ],
             ),
-            new Positioned(
-              bottom: 40.0,
-              right: 48.0,
-              child: new PhysicalModel(
-                elevation: 2.0,
-                color: Colors.black,
-                child: new Offstage(
-                  offstage: !playerModel.failedCast,
-                  child: _buildRetry(moduleModel, playerModel),
-                ),
-              ),
-            ),
           ],
         );
       case DisplayMode.localLarge:
@@ -139,7 +57,6 @@ class Player extends StatelessWidget {
           children: <Widget>[
             new Column(
               children: <Widget>[
-                _deviceChooser,
                 new Expanded(
                   child: _screen,
                 ),
@@ -162,19 +79,6 @@ class Player extends StatelessWidget {
               right: 0.0,
               child: const Scrubber(),
             ),
-            // TODO(maryxia) SO-609: transparency with PhysicalModel
-            new Positioned(
-              bottom: 100.0,
-              right: 48.0,
-              child: new PhysicalModel(
-                elevation: 3.0,
-                color: Colors.black,
-                child: new Offstage(
-                  offstage: !playerModel.failedCast,
-                  child: _buildRetry(moduleModel, playerModel),
-                ),
-              ),
-            ),
           ],
         );
     }
@@ -182,24 +86,20 @@ class Player extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<VideoModuleModel>(builder: (
+    return new ScopedModelDescendant<PlayerModel>(builder: (
       BuildContext context,
       Widget child,
-      VideoModuleModel moduleModel,
+      PlayerModel playerModel,
     ) {
       Size size = MediaQuery.of(context).size;
       bool smallScreen = false;
       if (size.width + size.height <= 912.0) {
         smallScreen = true;
       }
-      if (moduleModel.getDisplayMode() != DisplayMode.remoteControl &&
-          moduleModel.getDisplayMode() != DisplayMode.immersive &&
-          moduleModel.getDisplayMode() != DisplayMode.standby) {
-        if (smallScreen) {
-          moduleModel.setDisplayMode(DisplayMode.localSmall);
-        } else {
-          moduleModel.setDisplayMode(DisplayMode.localLarge);
-        }
+      if (smallScreen) {
+        playerModel.displayMode = DisplayMode.localSmall;
+      } else {
+        playerModel.displayMode = DisplayMode.localLarge;
       }
       return new ScopedModelDescendant<PlayerModel>(builder: (
         BuildContext context,
@@ -208,7 +108,7 @@ class Player extends StatelessWidget {
       ) {
         return new Container(
           color: Colors.black,
-          child: _buildPlayerMode(moduleModel, playerModel, smallScreen),
+          child: _buildPlayerMode(playerModel, smallScreen),
         );
       });
     });

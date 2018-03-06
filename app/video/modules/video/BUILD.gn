@@ -14,14 +14,13 @@ flutter_app("video") {
   deps = [
     "//garnet/public/lib/netconnector/fidl:fidl_dart",
     "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/entity_schemas:entity_schemas",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/media/flutter",
   ]
