@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/rendering.dart';
-import 'package:lib.surface.fidl/container.fidl.dart';
+import 'package:lib.surface.fidl._container/container.fidl.dart';
 
 /// Inherent properties of a surface
 class SurfaceProperties {
