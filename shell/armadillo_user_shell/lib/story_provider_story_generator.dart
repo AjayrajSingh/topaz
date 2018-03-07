@@ -95,13 +95,15 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
         _storyImportanceWatcherBinding.wrap(
           new StoryImportanceWatcherImpl(
             onImportanceChanged: () {
-              _storyProvider.getImportance((
-                    List<StoryImportanceEntry> importanceList) {
+              _storyProvider
+                  .getImportance((List<StoryImportanceEntry> importanceList) {
                 // TODO: Do something better than O(n^2).
-                for (Story story in _currentStories) {
-                  story.importance = importanceList.where(
-                      (StoryImportanceEntry e) => e.id == story.id.value) ??
-                    1.0;
+                for (StoryImportanceEntry entry in importanceList) {
+                  for (Story story in _currentStories) {
+                    if (story.id.value == entry.id) {
+                      story.importance = entry.importance ?? 1.0;
+                    }
+                  }
                 }
                 notifyListeners();
               });
@@ -609,9 +611,7 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
           minutes: 0,
         ),
         themeColor:
-            color == null
-                ? Colors.grey[500]
-                : new Color(int.parse(color)),
+            color == null ? Colors.grey[500] : new Color(int.parse(color)),
         onClusterIndexChanged: (int clusterIndex) {
           storyWidgetState.index = clusterIndex;
         });
