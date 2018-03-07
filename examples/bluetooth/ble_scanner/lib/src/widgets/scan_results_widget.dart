@@ -122,8 +122,9 @@ class ScanResultsState extends State<ScanResultsWidget> {
                   .toList())));
     }
 
-    for (final ble.ServiceDataEntry entry in device.advertisingData.serviceData)
-    {
+    for (final ble.ServiceDataEntry entry
+        in device.advertisingData.serviceData ??
+            const <ble.ServiceDataEntry>[]) {
       String title = 'Service Data ($entry.uuid)';
       currentMaxTitleLength = max(currentMaxTitleLength, title.length);
       entries.add(new _AdvertisingDataEntry(
@@ -132,8 +133,9 @@ class ScanResultsState extends State<ScanResultsWidget> {
               new Text(_toHexString(entry.data), style: textStyle)));
     }
 
-    for (final ble.ManufacturerSpecificDataEntry entry in
-        device.advertisingData.manufacturerSpecificData) {
+    for (final ble.ManufacturerSpecificDataEntry entry
+        in device.advertisingData.manufacturerSpecificData ??
+            const <ble.ManufacturerSpecificDataEntry>[]) {
       String title =
           'Manufacturer Data (${getManufacturerName(entry.companyId)})';
       currentMaxTitleLength = max(currentMaxTitleLength, title.length);
