@@ -4,6 +4,7 @@
 
 import 'dart:math' as math;
 
+import 'package:lib.surface.fidl._container/container.fidl.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
@@ -131,7 +132,9 @@ class Surface extends Model {
     }
     for (Surface child in current.children) {
       if (child != previous && condition(child)) {
-        tree.add(_spanningTree(current, child, condition));
+        tree.add(
+          _spanningTree(current, child, condition),
+        );
       }
     }
     return tree;
@@ -146,6 +149,28 @@ class Surface extends Model {
     }
     return _spanningTree(
         null, root.value, (Surface s) => s.compositionPattern == pattern);
+  }
+
+  /// Gets the spanning tree of Surfaces participating in the Container
+  /// identified by containerId
+  Tree<Surface> containerSpanningTree(String containerId) {
+    log.info('looking for container: $containerId');
+    Tree<String> node = _node.root.find(containerId);
+    log.info('found: $node');
+    Tree<Surface> root = new Tree<Surface>(value: _surface(node));
+    log.info('root: $root');
+    if (root.value is SurfaceContainer) {
+      return _spanningTree(
+        null,
+        root.value,
+        (Surface s) =>
+            // TODO: (djmurphy) this will fail nested containers
+            s.properties.containerMembership != null &&
+            s.properties.containerMembership.contains(containerId),
+      );
+    } else {
+      return root;
+    }
   }
 
   /// Dismiss this node hiding it from layouts
@@ -214,6 +239,30 @@ class Surface extends Model {
     }
     return forest;
   }
+}
+
+/// Defines a Container root in the [Surface Graph], holds the layout description
+class SurfaceContainer extends Surface {
+  SurfaceContainer._internal(
+      SurfaceGraph graph,
+      Tree<String> node,
+      SurfaceProperties properties,
+      SurfaceRelation relation,
+      String compositionPattern,
+      this._layouts)
+      : super._internal(graph, node, properties, relation, compositionPattern) {
+    super._connection = null;
+  }
+
+  @override
+  set _connection(ChildViewConnection value) {
+    log.warning('Cannot set a child view connection on a Container');
+  }
+
+  /// returns the layouts for this container;
+  List<ContainerLayout> get layouts => _layouts;
+
+  List<ContainerLayout> _layouts;
 }
 
 /// Data structure to manage the relationships and relative focus of surfaces
@@ -324,6 +373,32 @@ class SurfaceGraph extends Model {
     _surfaces[id].connection.requestFocus();
     _lastFocusedSurface = _surfaces[id];
 
+    notifyListeners();
+  }
+
+  /// Add a container root to the surface graph
+  void addContainer(
+    String id,
+    SurfaceProperties properties,
+    String parentId,
+    SurfaceRelation relation,
+    List<ContainerLayout> layouts,
+  ) {
+    // TODO (djurphy): collisions/pathing - partial fix if we
+    // make the changes so container IDs are paths.
+    log.info('addContainer: $id');
+    Tree<String> node = _tree.find(id) ?? new Tree<String>(value: id);
+    log.info('found or made node: $node');
+    Tree<String> parent =
+        (parentId == kNoParent) ? _tree : _tree.find(parentId);
+    assert(parent != null);
+    assert(relation != null);
+    parent.add(node);
+    Surface oldSurface = _surfaces[id];
+    _surfaces[id] = new SurfaceContainer._internal(
+        this, node, properties, relation, '' /*pattern*/, layouts);
+    oldSurface?.notifyListeners();
+    log.info('_surfaces[id]: ${_surfaces[id]}');
     notifyListeners();
   }
 

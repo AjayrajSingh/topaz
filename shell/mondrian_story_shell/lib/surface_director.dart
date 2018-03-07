@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'child_view.dart';
+import 'container_layout.dart' as container;
 import 'copresent_layout.dart' as copresent;
 import 'layout_model.dart';
 import 'model.dart';
@@ -125,15 +126,29 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
                           <PositionedSurface>[];
                       if (focusStack.isNotEmpty) {
                         Surface last = focusStack.last;
-                        if (last.compositionPattern.isEmpty) {
-                          positionedSurfaces = copresent.layoutSurfaces(
+                        // purposefully giving compositionPattern top billing
+                        // here to avoid any codelab surprises but we will have
+                        // to harmonize this logic in future
+                        // TODO: (djmurphy, jphsiao)
+                        if (last.compositionPattern != null &&
+                            last.compositionPattern.isNotEmpty) {
+                          positionedSurfaces = pattern.layoutSurfaces(
                             context,
                             adjustedConstraints,
                             focusStack,
                             layoutModel,
                           );
+                        } else if (last.properties.containerMembership !=
+                                null &&
+                            last.properties.containerMembership.isNotEmpty) {
+                          positionedSurfaces = container.layoutSurfaces(
+                            context,
+                            adjustedConstraints,
+                            last,
+                            layoutModel,
+                          );
                         } else {
-                          positionedSurfaces = pattern.layoutSurfaces(
+                          positionedSurfaces = copresent.layoutSurfaces(
                             context,
                             adjustedConstraints,
                             focusStack,

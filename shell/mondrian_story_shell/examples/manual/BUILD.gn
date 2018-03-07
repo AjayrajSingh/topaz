@@ -17,5 +17,6 @@ flutter_app("example_manual_relationships") {
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
+    "//topaz/public/lib/module_resolver/dart",
   ]
 }

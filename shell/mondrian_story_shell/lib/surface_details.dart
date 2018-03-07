@@ -3,21 +3,23 @@
 // found in the LICENSE file.
 
 import 'package:flutter/rendering.dart';
-import 'package:lib.surface.fidl._container/container.fidl.dart';
 
 /// Inherent properties of a surface
 class SurfaceProperties {
   /// Const constructor
-  const SurfaceProperties(
-      {this.constraints: const BoxConstraints(),
-      this.containerLayouts: const <LayoutEntry>[]});
-
-  /// No specified properties
-  static const SurfaceProperties none = const SurfaceProperties();
+  SurfaceProperties(
+      {this.constraints: const BoxConstraints(), this.containerLabel});
 
   /// Recommended Min/Max size constraints
   final BoxConstraints constraints;
 
-  /// WIP - the layouts of a container
-  final List<LayoutEntry> containerLayouts;
+  /// Belongs to a container with label containerLabel
+  String containerLabel;
+
+  /// List of the containers this Surface is a member of
+  /// (To be able to support container-to-container transitions)
+  /// The container this Surface is currently participating in is
+  /// end of list. If this Surface is focused, that is the container that
+  /// will be laid out.
+  List<String> containerMembership;
 }

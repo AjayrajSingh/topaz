@@ -16,7 +16,9 @@ import 'package:lib.module.fidl/module.fidl.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
 import 'package:lib.module.fidl._module_controller/module_controller.fidl.dart';
 import 'package:lib.module.fidl._module_controller/module_state.fidl.dart';
+import 'package:lib.module_resolver.dart/daisy_builder.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:lib.surface.fidl._container/container.fidl.dart';
 
 const String _kModuleUrl = 'example_manual_relationships';
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
@@ -82,6 +84,56 @@ void startModuleInShellDeprecated(SurfaceRelation relation) {
   kChildModulesKey.currentState.refresh();
 }
 
+/// Starts a predefined test container
+void startContainerInShell() {
+  DaisyBuilder daisyBuilder =
+      new DaisyBuilder.url('example_manual_relationships');
+  const List<double> leftRect = const <double>[0.0, 0.0, 0.5, 1.0];
+  const List<double> trRect = const <double>[0.5, 0.0, 0.5, 0.5];
+  const List<double> brRect = const <double>[0.5, 0.5, 0.5, 0.5];
+  LayoutEntry left = const LayoutEntry(nodeName: 'left', rectangle: leftRect);
+  LayoutEntry tr = const LayoutEntry(nodeName: 'top_right', rectangle: trRect);
+  LayoutEntry br =
+      const LayoutEntry(nodeName: 'bottom_right', rectangle: brRect);
+  ContainerLayout main =
+      new ContainerLayout(surfaces: <LayoutEntry>[left, tr, br]);
+  List<ContainerLayout> layouts = <ContainerLayout>[main];
+  ContainerRelationEntry rootLeft = new ContainerRelationEntry(
+      nodeName: 'left',
+      parentNodeName: 'test',
+      relationship: new SurfaceRelation());
+  ContainerRelationEntry rootTr = new ContainerRelationEntry(
+      nodeName: 'top_right',
+      parentNodeName: 'test',
+      relationship: new SurfaceRelation());
+  ContainerRelationEntry rootBr = new ContainerRelationEntry(
+      nodeName: 'bottom_right',
+      parentNodeName: 'test',
+      relationship:
+          new SurfaceRelation(dependency: SurfaceDependency.dependent));
+  List<ContainerRelationEntry> relations = <ContainerRelationEntry>[
+    rootLeft,
+    rootTr,
+    rootBr
+  ];
+  ContainerNode leftNode =
+      new ContainerNode(nodeName: 'left', daisy: daisyBuilder.daisy);
+  ContainerNode trNode =
+      new ContainerNode(nodeName: 'top_right', daisy: daisyBuilder.daisy);
+  ContainerNode brNode =
+      new ContainerNode(nodeName: 'bottom_right', daisy: daisyBuilder.daisy);
+  List<ContainerNode> nodes = <ContainerNode>[leftNode, trNode, brNode];
+
+  _moduleContext.startContainerInShell(
+      'test',
+      new SurfaceRelation(
+          arrangement: SurfaceArrangement.sequential,
+          dependency: SurfaceDependency.none),
+      layouts,
+      relations,
+      nodes);
+}
+
 /// Button widget to start module
 class LaunchModuleButton extends StatelessWidget {
   /// The  relationship to introduce a new surface with
@@ -104,6 +156,25 @@ class LaunchModuleButton extends StatelessWidget {
         onPressed: () {
           startModuleInShellDeprecated(_relation);
         },
+      ),
+    );
+  }
+}
+
+/// Launch a (prebaked) Container
+class LaunchContainerButton extends StatelessWidget {
+  /// Construct a button [Widget] to add a predefined container to the story
+  const LaunchContainerButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: const RaisedButton(
+        child: const Center(
+          child: const Text('Launch Container'),
+        ),
+        onPressed: (startContainerInShell),
       ),
     );
   }
@@ -295,6 +366,7 @@ class MainWidget extends StatelessWidget {
                       new SurfaceRelation(
                           arrangement: SurfaceArrangement.sequential),
                       'Sequential'),
+                  const LaunchContainerButton(),
                 ],
               ),
               new Grouping(
