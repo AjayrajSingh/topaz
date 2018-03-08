@@ -8,7 +8,9 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.entity.dart/entity.dart';
+import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.lifecycle.dart/lifecycle.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.dart/module.dart';
@@ -19,6 +21,9 @@ import 'entity_codec.dart';
 
 export 'package:lib.story.dart/story.dart' show LinkClient;
 export 'entity_codec.dart';
+
+/// Function definition to handle [data] that is received from a message queue.
+typedef void OnReceiveMessage(String data, void ack());
 
 /// The [ModuleDriver] provides a high-level API for running a module in Dart
 /// code. The name and structure of this library is based on the peridot layer's
@@ -53,15 +58,29 @@ class ModuleDriver {
   /// will resolve once the Module has been initialized successfully.
   final ModuleContextClient moduleContext = new ModuleContextClient();
 
+  // Message queue proxies for receiving updates from the content provider
+  // TODO(meiyili): update to handle creating to multiple message queues MS-1288
+  MessageQueueProxy _messageQueue;
+  MessageReceiverImpl _messageQueueReceiver;
+
+  /// Message queue token completer
+  final Completer<String> _tokenCompleter = new Completer<String>();
+
   final ModuleHost _module = new ModuleHost();
   LifecycleHost _lifecycle;
 
   /// Shadow async completion of [start].
   Completer<ModuleDriver> _start;
 
+  // Allow the caller to specify a function to run on terminate
+  Function _onTerminateFromCaller;
+
   /// Create a new [ModuleDriver].
   ///
   ///     ModuleDriver module = new ModuleDriver();
+  ///
+  /// [onTerminateFromCaller] lets the caller specify a function to run in the
+  /// onTerminate call.
   ///
   /// Register for link updates:
   ///
@@ -72,7 +91,8 @@ class ModuleDriver {
   ///
   ///     module.start();
   ///
-  ModuleDriver() {
+  ModuleDriver({Function onTerminateFromCaller})
+      : _onTerminateFromCaller = onTerminateFromCaller {
     _lifecycle = new LifecycleHost(
       onTerminate: _handleTerminate,
     );
@@ -139,8 +159,75 @@ class ModuleDriver {
     return _start.future;
   }
 
+  /// Creates a message queue and returns a [Future] with the message queue
+  /// token that should be passed to agents we want to connect to. If a
+  /// message queue has already been created, it will return the token for the
+  /// token for the already created queue and ignore the new [onReceive] method.
+  ///
+  /// [name] is the name of the message queue.
+  /// [onReceive] should be supplied to handle the data from the message queue.
+  // TODO(meiyili): Update to allow creating multiple message queues MS-1288
+  Future<String> createMessageQueue({
+    @required String name,
+    @required OnReceiveMessage onReceive,
+  }) async {
+    assert(name != null && name.isNotEmpty);
+    assert(onReceive != null);
+    log.fine('#createMessageQueue(...)');
+
+    // Create a message queue that the module can pass to agents only if we
+    // haven't already created one
+    if (!_tokenCompleter.isCompleted) {
+      ComponentContextClient componentContext =
+          await moduleContext.getComponentContext();
+      _messageQueue = await componentContext.obtainMessageQueue(name)
+        ..getToken(_tokenCompleter.complete);
+
+      // TODO(jasoncampbell): create MessageReceiverHost around the impl MS-1301
+      _messageQueueReceiver = new MessageReceiverImpl(
+        messageQueue: _messageQueue,
+        onReceiveMessage: onReceive,
+      );
+    }
+
+    return _tokenCompleter.future;
+  }
+
+  /// Connect to the service specified by [serviceProxy] and implemented by the
+  /// agent at [agentUrl].
+  // TODO(meiyili): Investigate a way to have this method return the proxy
+  // instead for a more functional approach MS-1288
+  Future<Null> connectToAgentService(
+    String agentUrl,
+    Proxy<dynamic> serviceProxy,
+  ) async {
+    log.fine('#connectToAgentService(...)');
+    ComponentContextClient componentContext =
+        await moduleContext.getComponentContext();
+
+    ServiceProviderProxy serviceProviderProxy =
+        await componentContext.connectToAgent(agentUrl);
+    connectToService(serviceProviderProxy, serviceProxy.ctrl);
+
+    // Close all unnecessary bindings
+    serviceProviderProxy.ctrl.close();
+  }
+
+  /// Retrieve the story id of the story this module lives in
+  Future<String> getStoryId() {
+    log.fine('#getStoryId(...)');
+    return moduleContext.getStoryId();
+  }
+
   Future<Null> _handleTerminate() {
     log.info('closing service connections');
+
+    if (_onTerminateFromCaller != null) {
+      _onTerminateFromCaller();
+    }
+
+    _messageQueueReceiver?.close();
+    _messageQueue?.ctrl?.close();
 
     List<Future<Null>> futures = <Future<Null>>[
       moduleContext.terminate(),

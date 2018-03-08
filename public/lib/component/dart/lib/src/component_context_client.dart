@@ -4,7 +4,12 @@
 
 import 'dart:async';
 
+import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart'
+    as fidl;
+import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart'
+    as fidl;
 import 'package:lib.component.fidl/component_context.fidl.dart' as fidl;
+import 'package:lib.component.fidl/message_queue.fidl.dart' as fidl;
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.entity.dart/entity.dart';
@@ -16,6 +21,10 @@ class ComponentContextClient {
   final fidl.ComponentContextProxy proxy = new fidl.ComponentContextProxy();
 
   final EntityResolverClient _entityResolver = new EntityResolverClient();
+
+  // Keep track of agent controllers created to close the channels onTerminate
+  final List<fidl.AgentControllerProxy> _agentControllers =
+      <fidl.AgentControllerProxy>[];
 
   /// Constructor.
   ComponentContextClient() {
@@ -104,6 +113,69 @@ class ComponentContextClient {
     return completer.future;
   }
 
+  /// Obtain message queue
+  Future<fidl.MessageQueueProxy> obtainMessageQueue(String name) {
+    Completer<fidl.MessageQueueProxy> messageQueueCompleter =
+        new Completer<fidl.MessageQueueProxy>();
+
+    fidl.MessageQueueProxy queue = new fidl.MessageQueueProxy();
+    queue.ctrl.error.then((ProxyError err) {
+      if (!messageQueueCompleter.isCompleted) {
+        messageQueueCompleter.completeError(err);
+      }
+    });
+
+    // TODO(meiyili): handle errors MS-1288
+    proxy.obtainMessageQueue(name, queue.ctrl.request());
+
+    scheduleMicrotask(() {
+      if (!messageQueueCompleter.isCompleted) {
+        messageQueueCompleter.complete(queue);
+      }
+    });
+
+    return messageQueueCompleter.future;
+  }
+
+  /// Connect to an agent
+  Future<fidl.ServiceProviderProxy> connectToAgent(String url) {
+    Completer<fidl.ServiceProviderProxy> serviceCompleter =
+        new Completer<fidl.ServiceProviderProxy>();
+
+    // Connect to the agent and save off the agent controller proxy to be
+    // closed on terminate
+    fidl.ServiceProviderProxy serviceProviderProxy =
+        new fidl.ServiceProviderProxy();
+    serviceProviderProxy.ctrl.error.then((ProxyError err) {
+      if (!serviceCompleter.isCompleted) {
+        serviceCompleter.completeError(err);
+      }
+    });
+
+    fidl.AgentControllerProxy agentControllerProxy =
+        new fidl.AgentControllerProxy();
+    _agentControllers.add(agentControllerProxy);
+    agentControllerProxy.ctrl.error.then((ProxyError err) {
+      if (!serviceCompleter.isCompleted) {
+        serviceCompleter.completeError(err);
+      }
+    });
+
+    proxy.connectToAgent(
+      url,
+      serviceProviderProxy.ctrl.request(),
+      agentControllerProxy.ctrl.request(),
+    );
+
+    scheduleMicrotask(() {
+      if (!serviceCompleter.isCompleted) {
+        serviceCompleter.complete(serviceProviderProxy);
+      }
+    });
+
+    return serviceCompleter.future;
+  }
+
   void _handleConnectionError() {
     Exception err = new Exception('proxy connection failed');
     throw err;
@@ -120,6 +192,10 @@ class ComponentContextClient {
 
   void _handleClose() {
     log.fine('proxy closed');
+
+    for (fidl.AgentControllerProxy p in _agentControllers) {
+      p.ctrl.close();
+    }
   }
 
   /// Closes the underlying proxy connection, should be called as a response to
