@@ -14,7 +14,7 @@ flutter_app("xi_app") {
     "//peridot/public/lib/story/fidl:fidl_dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/xi/packages/widgets:xi_widgets",
-    "//topaz/app/xi/services:services_dart",
+    "//garnet/public/lib/xi/fidl:fidl_dart",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",

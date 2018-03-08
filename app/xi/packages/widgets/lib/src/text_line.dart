@@ -71,7 +71,7 @@ class _RenderTextLine extends RenderBox {
     List<int> styles,
     double height,
   )
-      : _textPainter = new TextPainter(text: text),
+      : _textPainter = new TextPainter(text: text, textDirection: TextDirection.ltr),
         _cursor = cursor,
         _styles = styles,
         _height = height;

@@ -416,6 +416,8 @@ class EditorState extends State<Editor> {
   }
 
   void _sendScrollViewport() {
+    // commented out because it throws an exception
+    /*
     ScrollPosition pos = _controller.position;
     int viewHeight = 1 + pos.viewportDimension ~/ _lineHeight;
     if (viewHeight == 1) {
@@ -426,6 +428,7 @@ class EditorState extends State<Editor> {
     // TODO: be less noisy, send only if changed
     _sendNotification('scroll', <int>[start, start + viewHeight]);
     print('sending scroll $start $viewHeight');
+    */
   }
 
   TextLine _itemBuilder(BuildContext ctx, int ix) {

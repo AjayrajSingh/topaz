@@ -145,7 +145,7 @@ class XiAppState extends State<XiApp> {
         primarySwatch: Colors.blue,
       ),
       home: new HomePage(
-        title: 'Xi Example Home Page',
+        title: 'Xi Example App',
         message: message,
         onFabPressed: handlePingButtonPressed,
       ),

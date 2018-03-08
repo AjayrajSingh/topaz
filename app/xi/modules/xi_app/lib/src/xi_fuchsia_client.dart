@@ -10,7 +10,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
-import 'package:topaz.app.xi.services/xi.fidl.dart' as service;
+import 'package:lib.xi.fidl/xi.fidl.dart' as service;
 import 'package:xi_client/client.dart';
 import 'package:zircon/zircon.dart';
 
@@ -20,12 +20,12 @@ final ApplicationContext kContext = new ApplicationContext.fromStartupInfo();
 /// Fuchsia specific [XiClient].
 class XiFuchsiaClient extends XiClient {
   /// Constructor.
-  XiFuchsiaClient(this._ledgerHandle);
+  XiFuchsiaClient(InterfaceHandle<Ledger> _ledgerHandle) {
+    // Note: _ledgerHandle is currently unused, but we're hoping to bring it back.
+  }
   final Services _services = new Services();
   final service.JsonProxy _jsonProxy = new service.JsonProxy();
-  final InterfaceHandle<Ledger> _ledgerHandle;
   final SocketReader _reader = new SocketReader();
-  final Uint8List _data = new Uint8List(4096);
 
   @override
   Future<Null> init() async {
@@ -34,7 +34,7 @@ class XiFuchsiaClient extends XiClient {
     }
 
     final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo(
-        url: 'xi-core',
+        url: 'xi_core',
         directoryRequest: _services.request());
     kContext.launcher.createApplication(launchInfo, null);
     // TODO(jasoncampbell): File a bug for how to get rid of the Dart warning
@@ -45,7 +45,7 @@ class XiFuchsiaClient extends XiClient {
     );
     _jsonProxy.ctrl.bind(handle);
     final SocketPair pair = new SocketPair();
-    _jsonProxy.connectSocket(pair.first, _ledgerHandle);
+    _jsonProxy.connectSocket(pair.first);
     _reader
       ..bind(pair.second)
       ..onReadable = handleRead;
@@ -88,9 +88,9 @@ class XiFuchsiaClient extends XiClient {
       return;
     }
 
-    int start = 0;
-    int end = result.numBytes;
-    List<int> fragment = new List<int>.from(_data.getRange(start, end));
+    String resultAsString = result.bytesAsUTF8String();
+    // TODO: use string directly, avoid re-roundtrip
+    List<int> fragment = utf8.encode(resultAsString);
     streamController.add(fragment);
   }
 }
