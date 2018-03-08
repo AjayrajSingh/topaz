@@ -19,6 +19,7 @@ import 'package:meta/meta.dart';
 
 import 'entity_codec.dart';
 
+export 'package:lib.module.dart/module.dart' show ModuleControllerClient;
 export 'package:lib.story.dart/story.dart' show LinkClient;
 export 'entity_codec.dart';
 
