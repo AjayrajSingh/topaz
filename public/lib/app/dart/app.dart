@@ -7,6 +7,7 @@ import 'dart:typed_data';
 // ignore_for_file: public_member_api_docs
 
 import 'package:fuchsia/fuchsia.dart';
+import 'package:fidl/fidl.dart' as fidl;
 import 'package:lib.app.fidl/application_environment.fidl.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
 import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
@@ -76,6 +77,7 @@ InterfaceHandle<T> connectToServiceByName<T>(
 }
 
 typedef void ServiceConnector<T>(InterfaceRequest<T> request);
+typedef void ServiceConnector2<T>(fidl.InterfaceRequest<T> request);
 typedef void DefaultServiceConnector<T>(
     String serviceName, InterfaceRequest<T> request);
 
@@ -100,6 +102,13 @@ class ServiceProviderImpl extends ServiceProvider {
   void addServiceForName<T>(ServiceConnector<T> connector, String serviceName) {
     _connectorThunks[serviceName] = (Channel channel) {
       connector(new InterfaceRequest<T>(channel));
+    };
+  }
+
+  void addServiceForName2<T>(
+      ServiceConnector2<T> connector, String serviceName) {
+    _connectorThunks[serviceName] = (Channel channel) {
+      connector(new fidl.InterfaceRequest<T>(channel));
     };
   }
 
@@ -225,6 +234,12 @@ class Services {
     final ChannelPair pair = new ChannelPair();
     _connectToService(_directory, pair.first, serviceName);
     return new InterfaceHandle<T>(pair.second, 0);
+  }
+
+  fidl.InterfaceHandle<T> connectToServiceByName2<T>(String serviceName) {
+    final ChannelPair pair = new ChannelPair();
+    _connectToService(_directory, pair.first, serviceName);
+    return new fidl.InterfaceHandle<T>(pair.second);
   }
 
   void close() {

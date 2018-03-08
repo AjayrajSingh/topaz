@@ -10,7 +10,7 @@ import 'package:zircon/zircon.dart';
 
 const int kMessageHeaderSize = 16;
 const int kMessageTxidOffset = 0;
-const int kMessageOrdinalOffset = 8;
+const int kMessageOrdinalOffset = 12;
 
 class Message {
   Message(this.data, this.handles, this.dataLength, this.handlesLength);
@@ -26,11 +26,13 @@ class Message {
   final int dataLength;
   final int handlesLength;
 
-  int get txid => data.getUint32(kMessageTxidOffset);
-  set txid(int value) => data.setUint32(kMessageTxidOffset, value);
+  int get txid => data.getUint32(kMessageTxidOffset, Endian.little);
+  set txid(int value) =>
+      data.setUint32(kMessageTxidOffset, value, Endian.little);
 
-  int get ordinal => data.getUint32(kMessageOrdinalOffset);
-  set ordinal(int value) => data.setUint32(kMessageOrdinalOffset, value);
+  int get ordinal => data.getUint32(kMessageOrdinalOffset, Endian.little);
+  set ordinal(int value) =>
+      data.setUint32(kMessageOrdinalOffset, value, Endian.little);
 
   void closeHandles() {
     if (handles != null) {
@@ -41,8 +43,9 @@ class Message {
   }
 
   @override
-  String toString() =>
-      'Message(numBytes=$dataLength, numHandles=$handlesLength)';
+  String toString() {
+    return 'Message(numBytes=$dataLength, numHandles=$handlesLength)';
+  }
 }
 
 typedef void MessageSink(Message message);

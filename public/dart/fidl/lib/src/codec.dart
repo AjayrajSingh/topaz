@@ -86,38 +86,37 @@ class Encoder {
   }
 
   void encodeInt16(int value, int offset) {
-    data.setInt16(offset, value, Endianness.LITTLE_ENDIAN);
+    data.setInt16(offset, value, Endian.little);
   }
 
   void encodeUint16(int value, int offset) {
     _throwIfNegative(value);
-    data.setUint16(offset, value, Endianness.LITTLE_ENDIAN);
+    data.setUint16(offset, value, Endian.little);
   }
 
   void encodeInt32(int value, int offset) {
-    data.setInt32(offset, value, Endianness.LITTLE_ENDIAN);
+    data.setInt32(offset, value, Endian.little);
   }
 
   void encodeUint32(int value, int offset) {
     _throwIfNegative(value);
-    data.setUint32(offset, value, Endianness.LITTLE_ENDIAN);
+    data.setUint32(offset, value, Endian.little);
   }
 
   void encodeInt64(int value, int offset) {
-    data.setInt64(offset, value, Endianness.LITTLE_ENDIAN);
+    data.setInt64(offset, value, Endian.little);
   }
 
   void encodeUint64(int value, int offset) {
-    _throwIfNegative(value);
-    data.setUint64(offset, value, Endianness.LITTLE_ENDIAN);
+    data.setUint64(offset, value, Endian.little);
   }
 
   void encodeFloat32(double value, int offset) {
-    data.setFloat32(offset, value, Endianness.LITTLE_ENDIAN);
+    data.setFloat32(offset, value, Endian.little);
   }
 
   void encodeFloat64(double value, int offset) {
-    data.setFloat64(offset, value, Endianness.LITTLE_ENDIAN);
+    data.setFloat64(offset, value, Endian.little);
   }
 }
 
@@ -154,27 +153,19 @@ class Decoder {
 
   int decodeUint8(int offset) => data.getUint8(offset);
 
-  int decodeInt16(int offset) =>
-      data.getInt16(offset, Endianness.LITTLE_ENDIAN);
+  int decodeInt16(int offset) => data.getInt16(offset, Endian.little);
 
-  int decodeUint16(int offset) =>
-      data.getUint16(offset, Endianness.LITTLE_ENDIAN);
+  int decodeUint16(int offset) => data.getUint16(offset, Endian.little);
 
-  int decodeInt32(int offset) =>
-      data.getInt32(offset, Endianness.LITTLE_ENDIAN);
+  int decodeInt32(int offset) => data.getInt32(offset, Endian.little);
 
-  int decodeUint32(int offset) =>
-      data.getUint32(offset, Endianness.LITTLE_ENDIAN);
+  int decodeUint32(int offset) => data.getUint32(offset, Endian.little);
 
-  int decodeInt64(int offset) =>
-      data.getInt64(offset, Endianness.LITTLE_ENDIAN);
+  int decodeInt64(int offset) => data.getInt64(offset, Endian.little);
 
-  int decodeUint64(int offset) =>
-      data.getUint64(offset, Endianness.LITTLE_ENDIAN);
+  int decodeUint64(int offset) => data.getUint64(offset, Endian.little);
 
-  double decodeFloat32(int offset) =>
-      data.getFloat32(offset, Endianness.LITTLE_ENDIAN);
+  double decodeFloat32(int offset) => data.getFloat32(offset, Endian.little);
 
-  double decodeFloat64(int offset) =>
-      data.getFloat64(offset, Endianness.LITTLE_ENDIAN);
+  double decodeFloat64(int offset) => data.getFloat64(offset, Endian.little);
 }

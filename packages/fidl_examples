@@ -4,5 +4,9 @@
     ],
     "labels": [
         "//topaz/examples/fidl/compiler"
-    ]
+    ],
+    "packages": {
+        "echo_client_dart": "//topaz/examples/fidl/echo_client_dart",
+        "echo_server_dart": "//topaz/examples/fidl/echo_server_dart"
+    }
 }
