@@ -400,7 +400,7 @@ mozart::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
   app::Services web_view_services;
   auto web_view_launch_info = app::ApplicationLaunchInfo::New();
   web_view_launch_info->url = kWebViewUrl;
-  web_view_launch_info->service_request = web_view_services.NewRequest();
+  web_view_launch_info->directory_request = web_view_services.NewRequest();
   app_context_->launcher()->CreateApplication(
       std::move(web_view_launch_info), web_view_controller_.NewRequest());
   web_view_controller_.set_error_handler([this] {

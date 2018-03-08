@@ -96,7 +96,7 @@ class ChildViewConnection {
       ChildViewConnectionCallback onUnavailable}) {
     final Services services = new Services();
     final ApplicationLaunchInfo launchInfo =
-        new ApplicationLaunchInfo(url: url, serviceRequest: services.request());
+        new ApplicationLaunchInfo(url: url, directoryRequest: services.request());
     try {
       launcher.createApplication(launchInfo, controller);
       return new ChildViewConnection.connect(services,

@@ -33,7 +33,7 @@ void main(List<String> args) {
     final ApplicationControllerProxy actl = new ApplicationControllerProxy();
 
     final ApplicationLaunchInfo info = new ApplicationLaunchInfo(
-        url: 'hello_app_dart_jit', serviceRequest: services.request());
+        url: 'hello_app_dart_jit', directoryRequest: services.request());
     context.launcher.createApplication(info, actl.ctrl.request());
     services
       ..connectToService(service.ctrl)

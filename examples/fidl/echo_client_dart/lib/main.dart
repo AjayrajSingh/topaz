@@ -14,7 +14,7 @@ void main(List<String> args) {
 
   final Services services = new Services();
   final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo(
-      url: 'echo_server_dart', serviceRequest: services.request());
+      url: 'echo_server_dart', directoryRequest: services.request());
   _context.launcher.createApplication(launchInfo, null);
 
   _echo = new EchoProxy();

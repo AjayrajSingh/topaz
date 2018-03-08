@@ -35,7 +35,7 @@ class XiFuchsiaClient extends XiClient {
 
     final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo(
         url: 'xi-core',
-        serviceRequest: _services.request());
+        directoryRequest: _services.request());
     kContext.launcher.createApplication(launchInfo, null);
     // TODO(jasoncampbell): File a bug for how to get rid of the Dart warning
     // "Unsafe implicit cast from InterfaceHandle<dynamic>"?

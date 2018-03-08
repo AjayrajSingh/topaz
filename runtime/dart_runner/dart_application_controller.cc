@@ -393,9 +393,9 @@ bool DartApplicationController::Main() {
 
   // TODO(abarth): Remove service_provider_bridge once we have an
   // implementation of rio.Directory in Dart.
-  if (startup_info_->launch_info->service_request.is_valid()) {
+  if (startup_info_->launch_info->directory_request.is_valid()) {
     service_provider_bridge_.ServeDirectory(
-        std::move(startup_info_->launch_info->service_request));
+        std::move(startup_info_->launch_info->directory_request));
   }
 
   app::ServiceProviderPtr service_provider;
