@@ -186,6 +186,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       );
       return;
     }
+    trace('logging in $accountId');
     onLogin?.call();
     _userControllerProxy?.ctrl?.close();
     _userControllerProxy = new UserControllerProxy();
@@ -204,12 +205,13 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         _userShellChooser.getPrimaryUserShellAppUrl(_currentAccountId);
     final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
     final UserLoginParams params = new UserLoginParams(
-        accountId: accountId,
-        viewOwner: viewOwner.passRequest(),
-        services: serviceProvider.passHandle(),
-        userController: _userControllerProxy.ctrl.request(),
-        userShellConfig: new AppConfig(
-            url: _userShellChooser.getPrimaryUserShellAppUrl(accountId)));
+      accountId: accountId,
+      viewOwner: viewOwner.passRequest(),
+      services: serviceProvider.passHandle(),
+      userController: _userControllerProxy.ctrl.request(),
+      userShellConfig: new AppConfig(
+          url: _userShellChooser.getPrimaryUserShellAppUrl(accountId)),
+    );
     userProvider.login(params);
     presentation.captureKeyboardEvent(
         new KeyboardEvent(
@@ -226,12 +228,14 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _childViewConnection = new ChildViewConnection(
       viewOwner.passHandle(),
       onAvailable: (ChildViewConnection connection) {
+        trace('user shell available');
         log.info('UserPickerDeviceShell: Child view connection available!');
         _loadingChildView = false;
         connection.requestFocus();
         notifyListeners();
       },
       onUnavailable: (ChildViewConnection connection) {
+        trace('user shell unavailable');
         log.info('UserPickerDeviceShell: Child view connection unavailable!');
         _loadingChildView = false;
         onLogout();
@@ -261,6 +265,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Called when the the user shell logs out.
   void onLogout() {
+    trace('logout');
     refreshUsers();
     _childViewConnection = null;
     _presentationBinding.close();

@@ -45,6 +45,7 @@ DeviceShellWidget<UserPickerDeviceShellModel> _deviceShellWidget;
 
 void main() {
   setupLogger(name: 'userpicker_device_shell');
+  trace('starting');
   GlobalKey screenManagerKey = new GlobalKey();
   ConstraintsModel constraintsModel = new ConstraintsModel();
   AuthenticationOverlayModel authenticationOverlayModel =
@@ -203,6 +204,8 @@ void main() {
       childConstraintsChangerKey.currentState.toggleConstraints();
     }
   });
+
+  trace('started');
 }
 
 /// Cancels any ongoing authorization flows in the device shell.
