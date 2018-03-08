@@ -13,7 +13,6 @@
 #include "lib/fxl/logging.h"
 #include "lib/media/fidl/media_player.fidl.h"
 #include "lib/media/fidl/net_media_service.fidl.h"
-#include "lib/media/timeline/fidl_type_conversions.h"
 #include "lib/media/timeline/timeline.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
@@ -357,7 +356,7 @@ void MediaPlayerView::HandlePlayerStatusUpdates(
     // Process status received from the player.
     if (status->timeline_transform) {
       timeline_function_ =
-          status->timeline_transform.To<media::TimelineFunction>();
+          static_cast<media::TimelineFunction>(status->timeline_transform);
     }
 
     previous_state_ = state_;
