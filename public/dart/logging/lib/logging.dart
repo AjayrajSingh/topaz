@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:developer' show Timeline;
 import 'dart:io';
 
 import 'package:logging/logging.dart';
@@ -81,6 +82,7 @@ void setupLogger({
     }
   });
 
+  _loggerName = scopeName;
   log = logger;
 }
 
@@ -93,11 +95,25 @@ Logger log = new Logger.detached('uninitialized')
     print('[${rec.level}] ${rec.message}');
   });
 
+/// The name of the logger.
+String _loggerName = 'uninitialized';
+
 /// A convenient function for displaying the stack trace of the caller in the
 /// console.
 void showStackTrace() {
   final Trace trace = new Trace.current(1);
   print('$trace');
+}
+
+/// Whether a message for [value]'s level is tracable in this logger.
+bool _isTraceable(Level value) => (value >= Level.INFO);
+
+/// Emits an instant trace with [name] prefixed with [log]'s name if [log]'s
+/// level is INFO or above.
+void trace(String name) {
+  if (_isTraceable(log.level)) {
+    Timeline.instantSync('$_loggerName $name');
+  }
 }
 
 /// From the given [Trace], finds the first [Frame] after the `logging` package
