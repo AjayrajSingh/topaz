@@ -13,7 +13,6 @@ analyzer:
     enableSuperMixins: true
   exclude:
     - '**/generated/**'
-    - '**.fidl.dart'
 linter:
   # Full list available at http://dart-lang.github.io/linter/lints/options/options.html.
   rules:
