@@ -102,12 +102,24 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     super.onReady(userProvider, deviceShellContext, presentation);
     _loadUsers();
     _userPickerScrollController.addListener(_scrollListener);
+    presentation.captureKeyboardEvent(
+      new KeyboardEvent(
+        deviceId: 0,
+        eventTime: 0,
+        hidUsage: 0,
+        codePoint: 32, // spacebar
+        modifiers: 8, // LCTRL
+        phase: KeyboardEventPhase.pressed,
+      ),
+      _keyboardCaptureListenerBinding.wrap(this),
+    );
   }
 
   @override
   void onStop() {
     _userControllerProxy?.ctrl?.close();
     _userWatcherImpl?.close();
+    _keyboardCaptureListenerBinding.close();
     onDeviceShellStopped?.call();
     for (Ticker ticker in _tickers) {
       ticker.dispose();
@@ -213,15 +225,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel
           url: _userShellChooser.getPrimaryUserShellAppUrl(accountId)),
     );
     userProvider.login(params);
-    presentation.captureKeyboardEvent(
-        new KeyboardEvent(
-            deviceId: 0,
-            eventTime: 0,
-            hidUsage: 0,
-            codePoint: 32, // spacebar
-            modifiers: 8, // LCTRL
-            phase: KeyboardEventPhase.pressed),
-        _keyboardCaptureListenerBinding.wrap(this));
 
     _userControllerProxy.watch(_userWatcherImpl.getHandle());
     _loadingChildView = true;
