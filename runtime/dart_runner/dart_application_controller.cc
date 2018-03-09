@@ -21,7 +21,6 @@
 #include "lib/fsl/vmo/file.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
-#include "lib/fxl/synchronization/mutex.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_message_handler.h"
 #include "lib/tonic/dart_microtask_queue.h"
