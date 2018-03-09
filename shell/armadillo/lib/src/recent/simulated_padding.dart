@@ -29,8 +29,8 @@ class SimulatedPadding extends StatelessWidget {
         animation: model,
         builder: (BuildContext context, Widget child) => new Padding(
               padding: new EdgeInsets.only(
-                left: width * model.left.clamp(0.0, double.INFINITY),
-                right: width * model.right.clamp(0.0, double.INFINITY),
+                left: width * model.left.clamp(0.0, double.infinity),
+                right: width * model.right.clamp(0.0, double.infinity),
               ),
               child: child,
             ),

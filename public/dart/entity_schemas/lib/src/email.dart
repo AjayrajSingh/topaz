@@ -27,9 +27,9 @@ class EmailAddress {
       : assert(value != null && value.isNotEmpty);
 
   /// Instantiate an email address from a json string
-  factory EmailAddress.fromJson(String json) {
+  factory EmailAddress.fromJson(String encodedJson) {
     try {
-      Map<String, String> decodedJson = JSON.decode(json);
+      Map<String, String> decodedJson = json.decode(encodedJson);
       return new EmailAddress(
         value: decodedJson['value'],
         label: decodedJson['label'] ?? '',
@@ -52,7 +52,7 @@ class EmailAddress {
 
   /// Helper function to encode an email address entity into a json string
   String toJson() {
-    return JSON.encode(<String, String>{
+    return json.encode(<String, String>{
       'label': label,
       'value': value,
     });

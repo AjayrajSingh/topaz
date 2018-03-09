@@ -65,7 +65,7 @@ class _Painter extends CustomPainter {
           radius: radius,
         ),
         0.0,
-        2 * PI,
+        2 * pi,
         false,
         new Paint()
           ..color = Colors.white

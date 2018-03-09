@@ -5,7 +5,7 @@
 // ignore_for_file: implementation_imports
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.dart/app.dart';
@@ -418,7 +418,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     await completer1.future.timeout(_kTimeout);
     expect(mqConversation1.messagesOfType('new_conversation'), hasLength(1));
     decoded =
-        JSON.decode(mqConversation1.messagesOfType('new_conversation').last);
+        json.decode(mqConversation1.messagesOfType('new_conversation').last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('new_conversation'));
     expect(
@@ -469,7 +469,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     await completer1.future.timeout(_kTimeout);
     expect(mqConversation1.messagesOfType('new_conversation'), hasLength(2));
     decoded =
-        JSON.decode(mqConversation1.messagesOfType('new_conversation').last);
+        json.decode(mqConversation1.messagesOfType('new_conversation').last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('new_conversation'));
     expect(
@@ -484,7 +484,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     await completer2.future.timeout(_kTimeout);
     expect(mqConversation2.messagesOfType('new_conversation'), hasLength(1));
     decoded =
-        JSON.decode(mqConversation1.messagesOfType('new_conversation').last);
+        json.decode(mqConversation1.messagesOfType('new_conversation').last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('new_conversation'));
     expect(
@@ -504,7 +504,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     await _chatContentProvider.sendMessage(
       conversation0.conversationId,
       'text',
-      JSON.encode('sample message1'),
+      json.encode('sample message1'),
       (ChatStatus s, List<int> mid) {
         status = s;
         messageId1 = mid;
@@ -514,7 +514,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
 
     await completer1.future.timeout(_kTimeout);
     expect(mqMessage1.receivedMessages, hasLength(1));
-    decoded = JSON.decode(mqMessage1.receivedMessages.last);
+    decoded = json.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('add'));
     expect(
@@ -547,7 +547,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     await _chatContentProvider.sendMessage(
       conversation0.conversationId,
       'text',
-      JSON.encode('sample message2'),
+      json.encode('sample message2'),
       (ChatStatus s, List<int> mid) {
         status = s;
         messageId2 = mid;
@@ -557,7 +557,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
 
     await completer1.future.timeout(_kTimeout);
     expect(mqMessage1.receivedMessages, hasLength(2));
-    decoded = JSON.decode(mqMessage1.receivedMessages.last);
+    decoded = json.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('add'));
     expect(
@@ -571,7 +571,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
 
     await completer2.future.timeout(_kTimeout);
     expect(mqMessage2.receivedMessages, hasLength(1));
-    decoded = JSON.decode(mqMessage1.receivedMessages.last);
+    decoded = json.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('add'));
     expect(
@@ -601,7 +601,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
 
     await completer1.future.timeout(_kTimeout);
     expect(mqMessage1.receivedMessages, hasLength(3));
-    decoded = JSON.decode(mqMessage1.receivedMessages.last);
+    decoded = json.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('delete'));
     expect(
@@ -615,7 +615,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
 
     await completer2.future.timeout(_kTimeout);
     expect(mqMessage2.receivedMessages, hasLength(2));
-    decoded = JSON.decode(mqMessage1.receivedMessages.last);
+    decoded = json.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('delete'));
     expect(
@@ -643,13 +643,13 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
               messageId: messageId1,
               sender: 'alice@example.com',
               timestamp: new DateTime.now().millisecondsSinceEpoch,
-              jsonPayload: JSON.encode('A message from Alice!')),
+              jsonPayload: json.encode('A message from Alice!')),
         )
         .timeout(_kTimeout);
 
     await completer1.future.timeout(_kTimeout);
     expect(mqMessage1.receivedMessages, hasLength(4));
-    decoded = JSON.decode(mqMessage1.receivedMessages.last);
+    decoded = json.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
     expect(
       decoded['conversation_id'],
@@ -662,7 +662,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
 
     await completer2.future.timeout(_kTimeout);
     expect(mqMessage2.receivedMessages, hasLength(3));
-    decoded = JSON.decode(mqMessage1.receivedMessages.last);
+    decoded = json.decode(mqMessage1.receivedMessages.last);
     expect(decoded, isMap);
     expect(
       decoded['conversation_id'],
@@ -697,7 +697,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     await completer1.future.timeout(_kTimeout);
     expect(mqConversation1.messagesOfType('conversation_meta'), hasLength(1));
     decoded =
-        JSON.decode(mqConversation1.messagesOfType('conversation_meta').last);
+        json.decode(mqConversation1.messagesOfType('conversation_meta').last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('conversation_meta'));
     expect(
@@ -708,7 +708,7 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
     await completer2.future.timeout(_kTimeout);
     expect(mqConversation2.messagesOfType('conversation_meta'), hasLength(1));
     decoded =
-        JSON.decode(mqConversation2.messagesOfType('conversation_meta').last);
+        json.decode(mqConversation2.messagesOfType('conversation_meta').last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('conversation_meta'));
     expect(
@@ -718,14 +718,14 @@ class ChatContentProviderTestModule implements Module, Lifecycle {
 
     await completer3.future.timeout(_kTimeout);
     expect(mqMessage1.messagesOfType('title'), hasLength(1));
-    decoded = JSON.decode(mqMessage1.messagesOfType('title').last);
+    decoded = json.decode(mqMessage1.messagesOfType('title').last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('title'));
     expect(decoded['title'], conversationTitle);
 
     await completer4.future.timeout(_kTimeout);
     expect(mqMessage2.messagesOfType('title'), hasLength(1));
-    decoded = JSON.decode(mqMessage2.messagesOfType('title').last);
+    decoded = json.decode(mqMessage2.messagesOfType('title').last);
     expect(decoded, isMap);
     expect(decoded['event'], equals('title'));
     expect(decoded['title'], conversationTitle);
@@ -773,7 +773,7 @@ class _MessageQueueWrapper {
   }
 
   Iterable<String> messagesOfType(String eventType) => receivedMessages
-      .where((String msg) => JSON.decode(msg)['event'] == eventType);
+      .where((String msg) => json.decode(msg)['event'] == eventType);
 
   void handleMessage(String message, void ack()) {
     receivedMessages.add(message);

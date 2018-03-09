@@ -753,15 +753,15 @@ String _getQualifiedTypeName(
 }
 
 String _doubleValueToCode(double value) {
-  if (value == double.NAN) {
+  if (value == double.nan) {
     return 'double.NAN';
-  } else if (value == double.INFINITY) {
+  } else if (value == double.infinity) {
     return 'double.INFINITY';
-  } else if (value == double.NEGATIVE_INFINITY) {
+  } else if (value == double.negativeInfinity) {
     return 'double.NEGATIVE_INFINITY';
-  } else if (value == double.MIN_POSITIVE) {
+  } else if (value == double.minPositive) {
     return 'double.MIN_POSITIVE';
-  } else if (value == double.MAX_FINITE) {
+  } else if (value == double.maxFinite) {
     return 'double.MAX_FINITE';
   } else if (value == null) {
     return 'null';

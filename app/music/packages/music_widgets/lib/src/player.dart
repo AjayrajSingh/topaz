@@ -154,12 +154,12 @@ class Player extends StatelessWidget {
 
   Widget _buildSmallPlayer(Color primaryColor) {
     return new ConstrainedBox(
-      constraints: new BoxConstraints(minWidth: double.INFINITY),
+      constraints: new BoxConstraints(minWidth: double.infinity),
       child: new Column(
         children: <Widget>[
           new PlaybackSlider(
-            duration: currentTrack?.duration ?? Duration.ZERO,
-            playbackPosition: playbackPosition ?? Duration.ZERO,
+            duration: currentTrack?.duration ?? Duration.zero,
+            playbackPosition: playbackPosition ?? Duration.zero,
             showTimeText: false,
           ),
           new Expanded(
@@ -253,8 +253,8 @@ class Player extends StatelessWidget {
             // offset white space from buttons for even visual spacing
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: new PlaybackSlider(
-              duration: currentTrack?.duration ?? Duration.ZERO,
-              playbackPosition: playbackPosition ?? Duration.ZERO,
+              duration: currentTrack?.duration ?? Duration.zero,
+              playbackPosition: playbackPosition ?? Duration.zero,
             ),
           ),
         ),

@@ -22,7 +22,7 @@ abstract class TickingModel extends Model {
     }
     if (handleTick(0.0)) {
       _ticker = new Ticker(_onTick);
-      _lastTick = Duration.ZERO;
+      _lastTick = Duration.zero;
       _ticker.start();
     }
   }

@@ -50,7 +50,7 @@ class XiFlutterClient extends XiClient {
 
     // Transform the unstructured stderr from the xi-core process and print
     // it.
-    process.stderr.transform(UTF8.decoder).listen(
+    process.stderr.transform(utf8.decoder).listen(
           (String data) => print('[xi-core stderr]: $data'),
           onError: onError,
           cancelOnError: true,

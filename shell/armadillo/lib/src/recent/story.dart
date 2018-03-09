@@ -93,7 +93,7 @@ class Story {
     this.title: '',
     this.icons: const <OpacityBuilder>[],
     DateTime lastInteraction,
-    this.cumulativeInteractionDuration: Duration.ZERO,
+    this.cumulativeInteractionDuration: Duration.zero,
     this.themeColor: Colors.black,
     this.importance: 1.0,
     this.onClusterIndexChanged,

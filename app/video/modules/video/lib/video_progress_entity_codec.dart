@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
@@ -28,11 +28,11 @@ class VideoProgressEntityCodec extends EntityCodec<VideoProgress> {
     if (data == null || !(data is String)) {
       return null;
     }
-    String json = data;
-    if (json.isEmpty || json == 'null') {
+    String encoded = data;
+    if (encoded.isEmpty || encoded == 'null') {
       return null;
     }
-    Object decode = JSON.decode(json);
+    Object decode = json.decode(encoded);
     if (decode == null || !(decode is Map)) {
       return null;
     }
@@ -50,7 +50,7 @@ class VideoProgressEntityCodec extends EntityCodec<VideoProgress> {
     if (progress == null) {
       return 'null';
     }
-    return JSON.encode(<String, dynamic>{
+    return json.encode(<String, dynamic>{
       _kDurationKey: progress.durationMsec,
       _kProgressKey: progress.normalizedProgress,
     });

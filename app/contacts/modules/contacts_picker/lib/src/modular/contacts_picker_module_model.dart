@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -165,7 +165,7 @@ class ContactsPickerModuleModel extends ModuleModel {
         // TODO: Use an output noun instead.
         link.set(
           const <String>['selectedContact'],
-          JSON.encode(entityReference),
+          json.encode(entityReference),
         );
       },
     );

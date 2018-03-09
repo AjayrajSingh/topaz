@@ -4,7 +4,7 @@
 
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert' show JSON, UTF8;
+import 'dart:convert' show json, utf8;
 import 'dart:math' show Random;
 import 'dart:typed_data' show Uint8List;
 
@@ -18,7 +18,7 @@ import 'package:zircon/zircon.dart' show ZX, ReadResult;
 // Ledger data.
 
 /// Encodes the given value first into a JSON string and then encode in UTF8.
-List<int> encodeLedgerValue(Object value) => UTF8.encode(JSON.encode(value));
+List<int> encodeLedgerValue(Object value) => utf8.encode(json.encode(value));
 
 /// Decodes the given [SizedVmoTransport] into a Dart Object. This assumes that
 /// the data held in the given [SizedVmoTransport] is encoded in JSON and UTF8.
@@ -33,7 +33,7 @@ dynamic decodeLedgerValue(SizedVmoTransport value) {
     throw new Exception('Unexpected count of bytes read.');
   }
 
-  return JSON.decode(readResult.bytesAsUTF8String());
+  return json.decode(readResult.bytesAsUTF8String());
 }
 
 /// Gets the full list of [Entry] objects from a given [PageSnapshot].

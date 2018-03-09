@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.ledger.fidl/ledger.fidl.dart';
@@ -74,6 +74,6 @@ class ConversationWatcher extends BasePageWatcher {
       'message_id': messageId,
     };
 
-    sendMessage(JSON.encode(notification));
+    sendMessage(json.encode(notification));
   }
 }

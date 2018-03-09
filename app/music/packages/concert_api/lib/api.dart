@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:concert_models/concert_models.dart';
 import 'package:http/http.dart' as http;
@@ -32,7 +32,7 @@ class Api {
     if (response.statusCode != 200) {
       return null;
     }
-    dynamic jsonData = JSON.decode(response.body);
+    dynamic jsonData = json.decode(response.body);
     List<Artist> artists = <Artist>[];
     if (jsonData['resultsPage'] is Map<String, dynamic> &&
         jsonData['resultsPage']['status'] == 'ok' &&
@@ -72,7 +72,7 @@ class Api {
     if (response.statusCode != 200) {
       return null;
     }
-    dynamic jsonData = JSON.decode(response.body);
+    dynamic jsonData = json.decode(response.body);
     List<Event> events = <Event>[];
     if (jsonData['resultsPage'] is Map<String, dynamic> &&
         jsonData['resultsPage']['status'] == 'ok' &&
@@ -102,7 +102,7 @@ class Api {
     if (response.statusCode != 200) {
       return null;
     }
-    dynamic jsonData = JSON.decode(response.body);
+    dynamic jsonData = json.decode(response.body);
     if (jsonData['resultsPage'] is Map<String, dynamic> &&
         jsonData['resultsPage']['status'] == 'ok' &&
         jsonData['resultsPage']['results'] is Map<String, dynamic> &&

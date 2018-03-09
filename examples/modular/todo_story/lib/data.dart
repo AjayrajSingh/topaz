@@ -70,8 +70,8 @@ class LinkConnector extends LinkWatcher {
     _parse(json);
   }
 
-  Future<Null> _parse(String json) async {
-    final dynamic decoded = JSON.decode(json);
+  Future<Null> _parse(String jsonData) async {
+    final dynamic decoded = json.decode(jsonData);
     if (decoded == null) {
       _items = <TodoItem>[];
       _callCallback();
@@ -123,6 +123,6 @@ class LinkConnector extends LinkWatcher {
     // This implementation can lose data because the Link needs an interface to
     // reconcile conflicts.
     (await _link).set(<String>['items'],
-        JSON.encode(_items.map((TodoItem item) => item.text).toList()));
+        json.encode(_items.map((TodoItem item) => item.text).toList()));
   }
 }

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.decomposition.dart/decomposition.dart';
@@ -58,7 +58,7 @@ class _QueryHandlerImpl extends QueryHandler {
           appUrl: web_view.kWebViewURL,
           headline: 'Go to ${query.text}',
           color: 0xff8080ff,
-          initialData: JSON.encode(<String, dynamic>{
+          initialData: json.encode(<String, dynamic>{
             'view': <String, dynamic>{'uri': url}
           }),
         ),
@@ -128,7 +128,7 @@ class _QueryHandlerImpl extends QueryHandler {
           appUrl: 'music_artist',
           headline: 'Listen to Kanye',
           color: 0xFF9C27B0, // Material Purple 500,
-          initialData: JSON.encode(<String, dynamic>{
+          initialData: json.encode(<String, dynamic>{
             'view': decomposeUri(new Uri(
                 scheme: 'spotify',
                 host: 'artist',
@@ -145,7 +145,7 @@ class _QueryHandlerImpl extends QueryHandler {
           appUrl: 'music_artist',
           headline: 'Listen to Portugal. The Man',
           color: 0xFF9C27B0, // Material Purple 500,
-          initialData: JSON.encode(<String, dynamic>{
+          initialData: json.encode(<String, dynamic>{
             'view': decomposeUri(new Uri(
                 scheme: 'spotify',
                 host: 'artist',

@@ -6,7 +6,7 @@
 // ignore_for_file: public_member_api_docs
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.bluetooth.fidl/common.fidl.dart' as bt;
@@ -43,7 +43,7 @@ Future<Null> proposeUrl(String url) async {
       new Action.withCreateStory(
         new CreateStory(
           moduleId: web_view.kWebViewURL,
-          initialData: JSON.encode(
+          initialData: json.encode(
             {
               'view': {
                 'uri': url,

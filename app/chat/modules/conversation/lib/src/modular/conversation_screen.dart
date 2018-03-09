@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show BASE64;
+import 'dart:convert' show base64;
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
@@ -40,7 +40,7 @@ class ChatConversationScreen extends StatelessWidget {
       body: new Material(
         child: new ChatConversation(
           key: model.conversationId != null
-              ? new ValueKey<String>(BASE64.encode(model.conversationId))
+              ? new ValueKey<String>(base64.encode(model.conversationId))
               : null,
           enabled: model.conversationId != null,
           sections: model.sections,

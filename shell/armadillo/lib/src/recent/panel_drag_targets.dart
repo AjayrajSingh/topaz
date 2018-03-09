@@ -521,7 +521,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
     StoryCluster storyCluster,
     bool initialTarget,
   ) {
-    double minScore = double.INFINITY;
+    double minScore = double.infinity;
     PanelDragTarget closestTarget;
     for (PanelDragTarget target in _targets
         .where((PanelDragTarget target) => storyCluster == null

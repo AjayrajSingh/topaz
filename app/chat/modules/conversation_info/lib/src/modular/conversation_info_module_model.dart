@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 import 'dart:typed_data';
 
 import 'package:chat_models/chat_models.dart';
@@ -254,7 +254,7 @@ class ConversationInfoModuleModel extends ModuleModel {
     try {
       ack();
 
-      Map<String, dynamic> decoded = JSON.decode(message);
+      Map<String, dynamic> decoded = json.decode(message);
       String event = decoded['event'];
       List<int> conversationId = decoded['conversation_id'];
 
@@ -304,8 +304,8 @@ class ConversationInfoModuleModel extends ModuleModel {
   }
 
   @override
-  Future<Null> onNotify(String json) async {
-    Object decodedJson = JSON.decode(json);
+  Future<Null> onNotify(String encoded) async {
+    Object decodedJson = json.decode(encoded);
 
     // See if the content provider url is provided. This must be done only once,
     // when the Link notification is provided for the first time.

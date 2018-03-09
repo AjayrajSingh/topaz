@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.daisy.fidl/daisy.fidl.dart';
 
@@ -19,7 +19,7 @@ class DaisyBuilder {
   // Converts |value| to a JSON object and adds it to the Daisy. For typed
   // data, prefer to use addNounFromEntityReference().
   void addNoun<T>(String name, T value) {
-    _addNoun(name, new Noun.withJson(JSON.encode(value)));
+    _addNoun(name, new Noun.withJson(json.encode(value)));
   }
 
   void addNounFromEntityReference(String name, String reference) {

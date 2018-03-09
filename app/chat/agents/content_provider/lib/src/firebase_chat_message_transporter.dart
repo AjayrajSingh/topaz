@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.logging/logging.dart';
 
@@ -74,7 +74,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter
     @required String jsonPayload,
   }) async {
     // Construct the message.
-    String key = await _encodeKey(JSON.encode(messageId));
+    String key = await _encodeKey(json.encode(messageId));
     String email = await currentUserEmail;
 
     List<String> participants =
@@ -114,7 +114,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter
 
     _firebaseClient.put(
       'emails/${await _encodeKey(recipient)}/$key',
-      JSON.encode(value),
+      json.encode(value),
       (FirebaseStatus status, HttpResponse resp) {
         response = resp;
         statusCompleter.complete(status);
@@ -168,7 +168,7 @@ class FirebaseChatMessageTransporter extends ChatMessageTransporter
     }
 
     try {
-      dynamic decoded = JSON.decode(data);
+      dynamic decoded = json.decode(data);
 
       // If the path is given as '/', the data may contain multiple messages.
       // Otherwise, the path would be the message key, and the data should be

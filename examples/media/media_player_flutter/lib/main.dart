@@ -115,7 +115,7 @@ void _play(Asset asset) {
 bool _playNext() {
   if (_leafAssetToPlay.loop) {
     // Looping leaf asset. Seek to the beginning.
-    _controller.seek(Duration.ZERO);
+    _controller.seek(Duration.zero);
     return true;
   }
 

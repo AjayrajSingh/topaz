@@ -306,8 +306,8 @@ class BLERectModuleModel extends ModuleModel
 
     ByteBuffer buffer = new Uint8List.fromList(value).buffer;
     ByteData bdata = new ByteData.view(buffer);
-    double angle = bdata.getUint16(0, Endianness.LITTLE_ENDIAN).toDouble();
-    _radians = angle * math.PI / 180.0;
+    double angle = bdata.getUint16(0, Endian.little).toDouble();
+    _radians = angle * math.pi / 180.0;
 
     return true;
   }

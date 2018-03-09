@@ -46,7 +46,7 @@ class StoryFullSizeSimulatedSizedBox extends StatelessWidget {
                           ? panel.height
                           : 1.0) -
                       (storyBarMaximizedHeight / sizeModel.storySize.height))
-                  .clamp(0.0, double.INFINITY),
+                  .clamp(0.0, double.infinity),
               size: sizeModel.storySize,
               child: child,
             ),

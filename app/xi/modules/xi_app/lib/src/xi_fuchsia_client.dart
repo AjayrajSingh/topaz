@@ -59,8 +59,8 @@ class XiFuchsiaClient extends XiClient {
       throw new StateError('Must call .init() first.');
     }
 
-    final List<int> utf8 = UTF8.encode('$data\n');
-    final Uint8List bytes = new Uint8List.fromList(utf8);
+    final List<int> ints = utf8.encode('$data\n');
+    final Uint8List bytes = new Uint8List.fromList(ints);
     final ByteData buffer = bytes.buffer.asByteData();
 
     final WriteResult result = _reader.socket.write(buffer);

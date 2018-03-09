@@ -49,8 +49,8 @@ class ArtistBioModuleModel extends ModuleModel {
 
   /// Look for the artist name in the link and update
   @override
-  void onNotify(String json) {
-    final dynamic doc = JSON.decode(json);
+  void onNotify(String encoded) {
+    final dynamic doc = json.decode(encoded);
     if (doc is Map && doc['name'] is String) {
       fetchArtist(doc['name']);
     }

@@ -12,7 +12,7 @@ import 'package:zircon/zircon.dart';
 /// Helper method to turn a [String] into a [ByteData] containing the
 /// text of the string encoded as UTF-8.
 ByteData utf8Bytes(final String text) {
-  return new ByteData.view(new Uint8List.fromList(UTF8.encode(text)).buffer);
+  return new ByteData.view(new Uint8List.fromList(utf8.encode(text)).buffer);
 }
 
 void main() {

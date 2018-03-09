@@ -56,7 +56,7 @@ abstract class XiClient {
     // TODO(jasoncampbell): add a transformation for automatic JSON
     // deserialization.
     streamController.stream
-        .transform(UTF8.decoder)
+        .transform(utf8.decoder)
         .transform(const LineSplitter())
         .listen(
           handleData,
@@ -87,12 +87,12 @@ abstract class XiClient {
   /// [listeners].
   void handleData(String data) {
     //print(data);
-    Map<String, dynamic> json = JSON.decode(data);
-    if (json.containsKey('result')) {
-      int id = json['id'];
+    Map<String, dynamic> decoded = json.decode(data);
+    if (decoded.containsKey('result')) {
+      int id = decoded['id'];
       XiRpcCallback callback = _pending.remove(id);
       if (callback != null) {
-        callback(json['result']);
+        callback(decoded['result']);
       } else {
         print('missing callback for id=$id');
       }
@@ -100,12 +100,12 @@ abstract class XiClient {
       // not a response, so it must be a request
       print('no handler registered for request');
     } else {
-      String method = json['method'];
-      dynamic params = json['params'];
-      if (json.containsKey('id')) {
+      String method = decoded['method'];
+      dynamic params = decoded['params'];
+      if (decoded.containsKey('id')) {
         Map<String, dynamic> response = <String, dynamic>{
           'result': _handler.handleRpc(method, params),
-          'id': json['id']
+          'id': decoded['id']
         };
         _sendJson(response);
       } else {
@@ -114,13 +114,13 @@ abstract class XiClient {
     }
     if (listeners.isNotEmpty) {
       for (XiClientListener callback in listeners) {
-        callback(json);
+        callback(decoded);
       }
     }
   }
 
-  void _sendJson(dynamic json) {
-    send(JSON.encode(json));
+  void _sendJson(dynamic decoded) {
+    send(json.encode(decoded));
   }
 
   /// Send an asynchronous notification to the core.

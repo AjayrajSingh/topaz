@@ -59,9 +59,9 @@ class Contact {
             new List<PhoneNumber>.unmodifiable(phoneNumbers ?? <PhoneNumber>[]);
 
   /// Instantiate a contact from a json string
-  factory Contact.fromJson(String json) {
+  factory Contact.fromJson(String encodedJson) {
     try {
-      Map<String, dynamic> decodedJson = JSON.decode(json);
+      Map<String, dynamic> decodedJson = json.decode(encodedJson);
       return new Contact(
         id: decodedJson['id'],
         displayName: decodedJson['displayName'],
@@ -120,20 +120,20 @@ class Contact {
 
   /// Helper function to encode a contact entity into a json string
   String toJson() {
-    Map<String, Object> json = <String, Object>{};
+    Map<String, Object> data = <String, Object>{};
 
-    json['id'] = id;
-    json['displayName'] = displayName;
-    json['givenName'] = givenName;
-    json['middleName'] = middleName;
-    json['familyName'] = familyName;
-    json['photoUrl'] = photoUrl;
-    json['emailAddresses'] =
+    data['id'] = id;
+    data['displayName'] = displayName;
+    data['givenName'] = givenName;
+    data['middleName'] = middleName;
+    data['familyName'] = familyName;
+    data['photoUrl'] = photoUrl;
+    data['emailAddresses'] =
         emailAddresses.map((EmailAddress e) => e.toJson()).toList();
-    json['phoneNumbers'] =
+    data['phoneNumbers'] =
         phoneNumbers.map((PhoneNumber n) => n.toJson()).toList();
 
-    return JSON.encode(json);
+    return json.encode(data);
   }
 
   /// Encode the entity into the data string to be passed around by the entity

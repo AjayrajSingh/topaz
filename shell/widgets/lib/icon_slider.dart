@@ -219,7 +219,7 @@ final Tween<double> _kLabelBalloonRadiusTween =
     new Tween<double>(begin: _kThumbRadius, end: _kLabelBalloonRadius);
 final Tween<double> _kLabelBalloonTipTween =
     new Tween<double>(begin: 0.0, end: -8.0);
-final double _kLabelBalloonTipAttachmentRatio = math.sin(math.PI / 4.0);
+final double _kLabelBalloonTipAttachmentRatio = math.sin(math.pi / 4.0);
 
 const double _kAdjustmentUnit =
     0.1; // Matches iOS implementation of material slider.

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -228,11 +228,11 @@ class ContactListModuleModel extends ModuleModel {
           link
             ..set(
               const <String>['selected_contact_id'],
-              JSON.encode(contact.id),
+              json.encode(contact.id),
             )
             ..set(
               const <String>['contact_entity_reference'],
-              JSON.encode(entityReference),
+              json.encode(entityReference),
             );
         } else {
           // TODO(meiyili): better error handling
@@ -254,7 +254,7 @@ class ContactListModuleModel extends ModuleModel {
   void _onReceiveMessage(String data, void ack()) {
     ack();
 
-    Map<String, dynamic> updates = JSON.decode(data);
+    Map<String, dynamic> updates = json.decode(data);
     log.fine('Decoded contact updates = $updates');
 
     if (updates.containsKey('contact_list')) {

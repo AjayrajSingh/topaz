@@ -63,7 +63,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
       };
 
   String _makeJsonMessage() {
-    return JSON.encode(<String, dynamic>{
+    return json.encode(<String, dynamic>{
       'suggestions': <String, dynamic>{
         'ask_query': _lastQuery,
         'ask_proposals': _lastAskProposals.map(_encodeProposalSummary).toList(),

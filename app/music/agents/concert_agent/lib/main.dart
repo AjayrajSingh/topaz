@@ -47,7 +47,7 @@ class ContextListenerImpl extends ContextListener {
       // TODO(thatguy): There can be more than one value. At some point, use the
       // entity type in the ContextQuery instead of using topics as if they are
       // types, and handle multiple instances.
-      dynamic data = JSON.decode(entry.value[0].content);
+      dynamic data = json.decode(entry.value[0].content);
       if (data != null && data['name'] is String) {
         await _createProposal(data['name']);
       }
@@ -74,7 +74,7 @@ class ContextListenerImpl extends ContextListener {
         new Action.withCreateStory(new CreateStory(
             moduleId: 'concert_event_list',
             initialData:
-                JSON.encode(<String, dynamic>{'view': decomposeUri(arg)})))
+                json.encode(<String, dynamic>{'view': decomposeUri(arg)})))
       ],
     );
 

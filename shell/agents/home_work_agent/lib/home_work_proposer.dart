@@ -46,7 +46,7 @@ class HomeWorkProposer {
         .getProposalPublisher(_proposalPublisherProxy.ctrl.request());
     _contextAwareProposer.start(contextReader, _proposalPublisherProxy);
 
-    final List<Map<String, String>> askProposals = convert.JSON.decode(
+    final List<Map<String, String>> askProposals = convert.json.decode(
       new File(_kAskProposalsFile).readAsStringSync(),
     );
 
@@ -73,7 +73,7 @@ class _ContextAwareProposer {
     ProposalPublisher proposalPublisher,
   ) async {
     final Map<String, List<Map<String, String>>> proposals =
-        convert.JSON.decode(
+        convert.json.decode(
       new File(_kConfigFile).readAsStringSync(),
     );
 
@@ -81,7 +81,7 @@ class _ContextAwareProposer {
 
     final Map<String, List<Map<String, String>>> dataProposals =
         dataProposalFile.existsSync()
-            ? convert.JSON.decode(
+            ? convert.json.decode(
                 dataProposalFile.readAsStringSync(),
               )
             : <String, List<Map<String, String>>>{};
@@ -113,7 +113,7 @@ class _ContextAwareProposer {
         new _ContextListenerImpl(
           proposalPublisher: proposalPublisher,
           onTopicChanged: (String locationJson) async {
-            final Map<String, String> json = convert.JSON.decode(locationJson);
+            final Map<String, String> json = convert.json.decode(locationJson);
             if (json['location']?.isEmpty ?? true) {
               return;
             }

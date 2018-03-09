@@ -16,7 +16,7 @@ Future<List<Asset>> readConfig(String fileName) async {
     throw new ArgumentError.value(fileName, 'fileName', 'File does not exist');
   }
 
-  return _convertAssetList(JSON.decode(await file.readAsString()));
+  return _convertAssetList(json.decode(await file.readAsString()));
 }
 
 String _convertString(Object json) {

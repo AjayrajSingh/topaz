@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show BASE64, JSON;
+import 'dart:convert' show base64, json;
 import 'dart:typed_data';
 
 import 'package:chat_models/chat_models.dart';
@@ -173,14 +173,14 @@ class ChatConversationModuleModel extends ModuleModel {
           .lastWhere((Message m) => m is TextMessage, orElse: () => null);
 
       if (lastTextMessage != null) {
-        String convId = BASE64.encode(conversationId);
+        String convId = base64.encode(conversationId);
         List<Embedder> embedders = embeddersForConversation[convId];
         if (embedders != null) {
           for (Embedder embedder in embedders) {
             // Set the link value.
             embedder.link?.updateObject(
               const <String>['lastMessage'],
-              JSON.encode(<String, String>{'content': lastTextMessage.text}),
+              json.encode(<String, String>{'content': lastTextMessage.text}),
             );
           }
         }
@@ -394,7 +394,7 @@ class ChatConversationModuleModel extends ModuleModel {
     try {
       ack();
 
-      Map<String, dynamic> decoded = JSON.decode(message);
+      Map<String, dynamic> decoded = json.decode(message);
       String event = decoded['event'];
       List<int> conversationId = decoded['conversation_id'];
       List<int> messageId = decoded['message_id'];
@@ -486,7 +486,7 @@ class ChatConversationModuleModel extends ModuleModel {
 
     ack();
 
-    Map<String, dynamic> decoded = JSON.decode(message);
+    Map<String, dynamic> decoded = json.decode(message);
     if (decoded['selected_images'] != null) {
       List<String> imageUrls = decoded['selected_images'];
       for (String imageUrl in imageUrls) {
@@ -514,8 +514,8 @@ class ChatConversationModuleModel extends ModuleModel {
     switch (m.type) {
       case 'command':
         // Create a new embedder if is hasn't been created yet.
-        String cid = BASE64.encode(conversationId);
-        String mid = BASE64.encode(m.messageId);
+        String cid = base64.encode(conversationId);
+        String mid = base64.encode(m.messageId);
         Embedder embedder = embedders[mid];
         if (embedder == null) {
           embedder = new Embedder(
@@ -688,8 +688,8 @@ class ChatConversationModuleModel extends ModuleModel {
   }
 
   @override
-  Future<Null> onNotify(String json) async {
-    Object decodedJson = JSON.decode(json);
+  Future<Null> onNotify(String encoded) async {
+    Object decodedJson = json.decode(encoded);
 
     // See if the content provider url is provided. This must be done only once,
     // when the Link notification is provided for the first time.
@@ -772,7 +772,7 @@ class ChatConversationModuleModel extends ModuleModel {
     _currentChildModuleName = name;
     _childLink.set(
       const <String>[],
-      JSON.encode(<String, String>{
+      json.encode(<String, String>{
         'name': name,
         'url': url,
         'linkName': linkName,
@@ -787,7 +787,7 @@ class ChatConversationModuleModel extends ModuleModel {
       _childModuleController.ctrl.close();
       _childModuleController = null;
       _currentChildModuleName = null;
-      _childLink.set(<String>[], JSON.encode(null));
+      _childLink.set(<String>[], json.encode(null));
     }
 
     // if (_galleryService != null) {
@@ -796,12 +796,12 @@ class ChatConversationModuleModel extends ModuleModel {
     // }
   }
 
-  Future<Null> _onNotifyChild(String json) async {
+  Future<Null> _onNotifyChild(String encoded) async {
     try {
       bool shouldCloseChildModule = true;
 
       if (json != null) {
-        dynamic decoded = JSON.decode(json);
+        dynamic decoded = json.decode(encoded);
         if (decoded is Map<String, String>) {
           String name = decoded['name'];
           String url = decoded['url'];
@@ -875,7 +875,7 @@ class ChatConversationModuleModel extends ModuleModel {
   void _publishMessageAsContext(String message) {
     _contextWriter.writeEntityTopic(
       _kConversationContextTopic,
-      JSON.encode(
+      json.encode(
         <String, String>{
           '@type': _kConversationContextType,
           'message': message,

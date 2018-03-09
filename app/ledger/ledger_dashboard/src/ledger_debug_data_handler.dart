@@ -126,7 +126,7 @@ class LedgerDebugDataHandler extends DataHandler {
       WebSocketHolder socketHolder,
       // ignore: avoid_annotating_with_dynamic
       dynamic event) {
-    dynamic request = JSON.decode(event);
+    dynamic request = json.decode(event);
     if (request['instance_name'] != null && isValidId(request['instance_name']))
       handlePagesRequest(socketHolder, request);
     else if (request['page_name'] != null && isValidId(request['page_name']))
@@ -238,7 +238,7 @@ class LedgerDebugDataHandler extends DataHandler {
       List<List<int>> listOfEncod,
       [ledger_fidl.Status s = ledger_fidl.Status.ok]) {
     if (s == ledger_fidl.Status.ok) {
-      String message = JSON.encode(<String, dynamic>{listName: listOfEncod});
+      String message = json.encode(<String, dynamic>{listName: listOfEncod});
       socketHolder.add(message);
     }
   }
@@ -265,7 +265,7 @@ class LedgerDebugDataHandler extends DataHandler {
           ..add(listOfEncod[i].priority);
         entriesList.add(singleEntry);
       }
-      String message = JSON.encode(<String, dynamic>{listName: entriesList});
+      String message = json.encode(<String, dynamic>{listName: entriesList});
       socketHolder.add(message);
       if (s == ledger_fidl.Status.partialResult) {
         recursiveGetEntries(socketHolder, nextToken);
@@ -280,7 +280,7 @@ class LedgerDebugDataHandler extends DataHandler {
       ..add(commit.parentsIds)
       ..add(commit.timestamp)
       ..add(commit.generation);
-      String message = JSON.encode(<String, dynamic>{'commit_obj': commitObj});
+      String message = json.encode(<String, dynamic>{'commit_obj': commitObj});
       socketHolder.add(message);
     }
   }

@@ -78,7 +78,7 @@ class _EncoderBuffer {
     Uint32List newBuffer = new Uint32List((newSize >> 2) + 1);
     int idx = 0;
     for (int i = 0; i < buffer.lengthInBytes; i += 4) {
-      newBuffer[idx] = buffer.getUint32(i, Endianness.LITTLE_ENDIAN);
+      newBuffer[idx] = buffer.getUint32(i, Endian.little);
       idx++;
     }
     buffer = newBuffer.buffer.asByteData();
@@ -151,40 +151,40 @@ class Encoder {
   }
 
   void encodeInt16(int value, int offset) =>
-      _buffer.buffer.setInt16(_base + offset, value, Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setInt16(_base + offset, value, Endian.little);
 
   void encodeUint16(int value, int offset) {
     if (value < 0) {
       throw new FidlCodecError('$kErrorUnsigned: $value');
     }
-    _buffer.buffer.setUint16(_base + offset, value, Endianness.LITTLE_ENDIAN);
+    _buffer.buffer.setUint16(_base + offset, value, Endian.little);
   }
 
   void encodeInt32(int value, int offset) =>
-      _buffer.buffer.setInt32(_base + offset, value, Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setInt32(_base + offset, value, Endian.little);
 
   void encodeUint32(int value, int offset) {
     if (value < 0) {
       throw new FidlCodecError('$kErrorUnsigned: $value');
     }
-    _buffer.buffer.setUint32(_base + offset, value, Endianness.LITTLE_ENDIAN);
+    _buffer.buffer.setUint32(_base + offset, value, Endian.little);
   }
 
   void encodeInt64(int value, int offset) =>
-      _buffer.buffer.setInt64(_base + offset, value, Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setInt64(_base + offset, value, Endian.little);
 
   void encodeUint64(int value, int offset) {
     if (value < 0) {
       throw new FidlCodecError('$kErrorUnsigned: $value');
     }
-    _buffer.buffer.setUint64(_base + offset, value, Endianness.LITTLE_ENDIAN);
+    _buffer.buffer.setUint64(_base + offset, value, Endian.little);
   }
 
   void encodeFloat(double value, int offset) => _buffer.buffer
-      .setFloat32(_base + offset, value, Endianness.LITTLE_ENDIAN);
+      .setFloat32(_base + offset, value, Endian.little);
 
   void encodeDouble(double value, int offset) => _buffer.buffer
-      .setFloat64(_base + offset, value, Endianness.LITTLE_ENDIAN);
+      .setFloat64(_base + offset, value, Endian.little);
 
   void encodeHandle(Handle value, int offset, bool nullable) {
     if ((value == null) || !value.isValid) {
@@ -230,7 +230,7 @@ class Encoder {
       throw new FidlCodecError(
           'Cannot encode a null pointer for a non-nullable type');
     }
-    _buffer.buffer.setUint64(_base + offset, 0, Endianness.LITTLE_ENDIAN);
+    _buffer.buffer.setUint64(_base + offset, 0, Endian.little);
   }
 
   void encodeInvalidHandle(int offset, bool nullable) {
@@ -238,7 +238,7 @@ class Encoder {
       throw new FidlCodecError(
           'Cannot encode a null pointer for a non-nullable type');
     }
-    _buffer.buffer.setInt32(_base + offset, -1, Endianness.LITTLE_ENDIAN);
+    _buffer.buffer.setInt32(_base + offset, -1, Endian.little);
   }
 
   void encodePointerToNextUnclaimed(int offset) =>
@@ -558,7 +558,7 @@ class Encoder {
     int end = start + (value.length << 1);
     int idx = 0;
     for (int i = start; i < end; i += 2) {
-      _buffer.buffer.setInt16(i, value[idx], Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setInt16(i, value[idx], Endian.little);
       idx++;
     }
   }
@@ -568,7 +568,7 @@ class Encoder {
     int end = start + (value.length << 1);
     int idx = 0;
     for (int i = start; i < end; i += 2) {
-      _buffer.buffer.setUint16(i, value[idx], Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setUint16(i, value[idx], Endian.little);
       idx++;
     }
   }
@@ -578,7 +578,7 @@ class Encoder {
     int end = start + (value.length << 2);
     int idx = 0;
     for (int i = start; i < end; i += 4) {
-      _buffer.buffer.setInt32(i, value[idx], Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setInt32(i, value[idx], Endian.little);
       idx++;
     }
   }
@@ -588,7 +588,7 @@ class Encoder {
     int end = start + (value.length << 2);
     int idx = 0;
     for (int i = start; i < end; i += 4) {
-      _buffer.buffer.setUint32(i, value[idx], Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setUint32(i, value[idx], Endian.little);
       idx++;
     }
   }
@@ -598,7 +598,7 @@ class Encoder {
     int end = start + (value.length << 3);
     int idx = 0;
     for (int i = start; i < end; i += 8) {
-      _buffer.buffer.setInt64(i, value[idx], Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setInt64(i, value[idx], Endian.little);
       idx++;
     }
   }
@@ -608,7 +608,7 @@ class Encoder {
     int end = start + (value.length << 3);
     int idx = 0;
     for (int i = start; i < end; i += 8) {
-      _buffer.buffer.setUint64(i, value[idx], Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setUint64(i, value[idx], Endian.little);
       idx++;
     }
   }
@@ -618,7 +618,7 @@ class Encoder {
     int end = start + (value.length << 2);
     int idx = 0;
     for (int i = start; i < end; i += 4) {
-      _buffer.buffer.setFloat32(i, value[idx], Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setFloat32(i, value[idx], Endian.little);
       idx++;
     }
   }
@@ -628,7 +628,7 @@ class Encoder {
     int end = start + (value.length << 3);
     int idx = 0;
     for (int i = start; i < end; i += 8) {
-      _buffer.buffer.setFloat64(i, value[idx], Endianness.LITTLE_ENDIAN);
+      _buffer.buffer.setFloat64(i, value[idx], Endian.little);
       idx++;
     }
   }
@@ -716,21 +716,21 @@ class Decoder {
   int decodeInt8(int offset) => _buffer.getInt8(_base + offset);
   int decodeUint8(int offset) => _buffer.getUint8(_base + offset);
   int decodeInt16(int offset) =>
-      _buffer.getInt16(_base + offset, Endianness.LITTLE_ENDIAN);
+      _buffer.getInt16(_base + offset, Endian.little);
   int decodeUint16(int offset) =>
-      _buffer.getUint16(_base + offset, Endianness.LITTLE_ENDIAN);
+      _buffer.getUint16(_base + offset, Endian.little);
   int decodeInt32(int offset) =>
-      _buffer.getInt32(_base + offset, Endianness.LITTLE_ENDIAN);
+      _buffer.getInt32(_base + offset, Endian.little);
   int decodeUint32(int offset) =>
-      _buffer.getUint32(_base + offset, Endianness.LITTLE_ENDIAN);
+      _buffer.getUint32(_base + offset, Endian.little);
   int decodeInt64(int offset) =>
-      _buffer.getInt64(_base + offset, Endianness.LITTLE_ENDIAN);
+      _buffer.getInt64(_base + offset, Endian.little);
   int decodeUint64(int offset) =>
-      _buffer.getUint64(_base + offset, Endianness.LITTLE_ENDIAN);
+      _buffer.getUint64(_base + offset, Endian.little);
   double decodeFloat(int offset) =>
-      _buffer.getFloat32(_base + offset, Endianness.LITTLE_ENDIAN);
+      _buffer.getFloat32(_base + offset, Endian.little);
   double decodeDouble(int offset) =>
-      _buffer.getFloat64(_base + offset, Endianness.LITTLE_ENDIAN);
+      _buffer.getFloat64(_base + offset, Endian.little);
 
   bool decodeBool(int offset, int bit) =>
       (decodeUint8(offset) & (1 << bit)) != 0;
@@ -931,7 +931,7 @@ class Decoder {
     Int16List result = new Int16List(header.numElements);
     int resultIdx = 0;
     for (int i = startByte; i < endByte; i += 2) {
-      result[resultIdx] = d._buffer.getInt16(i, Endianness.LITTLE_ENDIAN);
+      result[resultIdx] = d._buffer.getInt16(i, Endian.little);
       resultIdx++;
     }
     return result;
@@ -950,7 +950,7 @@ class Decoder {
     Uint16List result = new Uint16List(header.numElements);
     int resultIdx = 0;
     for (int i = startByte; i < endByte; i += 2) {
-      result[resultIdx] = d._buffer.getUint16(i, Endianness.LITTLE_ENDIAN);
+      result[resultIdx] = d._buffer.getUint16(i, Endian.little);
       resultIdx++;
     }
     return result;
@@ -968,7 +968,7 @@ class Decoder {
     Int32List result = new Int32List(header.numElements);
     int resultIdx = 0;
     for (int i = startByte; i < endByte; i += 4) {
-      result[resultIdx] = d._buffer.getInt32(i, Endianness.LITTLE_ENDIAN);
+      result[resultIdx] = d._buffer.getInt32(i, Endian.little);
       resultIdx++;
     }
     return result;
@@ -987,7 +987,7 @@ class Decoder {
     Uint32List result = new Uint32List(header.numElements);
     int resultIdx = 0;
     for (int i = startByte; i < endByte; i += 4) {
-      result[resultIdx] = d._buffer.getUint32(i, Endianness.LITTLE_ENDIAN);
+      result[resultIdx] = d._buffer.getUint32(i, Endian.little);
       resultIdx++;
     }
     return result;
@@ -1005,7 +1005,7 @@ class Decoder {
     Int64List result = new Int64List(header.numElements);
     int resultIdx = 0;
     for (int i = startByte; i < endByte; i += 8) {
-      result[resultIdx] = d._buffer.getInt64(i, Endianness.LITTLE_ENDIAN);
+      result[resultIdx] = d._buffer.getInt64(i, Endian.little);
       resultIdx++;
     }
     return result;
@@ -1024,7 +1024,7 @@ class Decoder {
     Uint64List result = new Uint64List(header.numElements);
     int resultIdx = 0;
     for (int i = startByte; i < endByte; i += 8) {
-      result[resultIdx] = d._buffer.getUint64(i, Endianness.LITTLE_ENDIAN);
+      result[resultIdx] = d._buffer.getUint64(i, Endian.little);
       resultIdx++;
     }
     return result;
@@ -1043,7 +1043,7 @@ class Decoder {
     Float32List result = new Float32List(header.numElements);
     int resultIdx = 0;
     for (int i = startByte; i < endByte; i += 4) {
-      result[resultIdx] = d._buffer.getFloat32(i, Endianness.LITTLE_ENDIAN);
+      result[resultIdx] = d._buffer.getFloat32(i, Endian.little);
       resultIdx++;
     }
     return result;
@@ -1062,7 +1062,7 @@ class Decoder {
     Float64List result = new Float64List(header.numElements);
     int resultIdx = 0;
     for (int i = startByte; i < endByte; i += 8) {
-      result[resultIdx] = d._buffer.getFloat64(i, Endianness.LITTLE_ENDIAN);
+      result[resultIdx] = d._buffer.getFloat64(i, Endian.little);
       resultIdx++;
     }
     return result;

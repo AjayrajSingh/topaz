@@ -91,7 +91,7 @@ class TodoListModuleModel extends ModuleModel implements ledger.PageWatcher {
 
   /// Adds a new todo item with the given [content].
   void addItem(String content) {
-    _page.put(_makeKey(), UTF8.encode(content), handleLedgerResponse('Put'));
+    _page.put(_makeKey(), utf8.encode(content), handleLedgerResponse('Put'));
   }
 
   void _readItems(ledger.PageSnapshotProxy snapshot) {

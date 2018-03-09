@@ -91,6 +91,6 @@ class KenichiEdgeScrolling {
             (_increaseScrollDeltaY - _startScrollDeltaY) *
             12 -
         6;
-    return 1 / (1 + math.pow(math.E, -t));
+    return 1 / (1 + math.pow(math.e, -t));
   }
 }

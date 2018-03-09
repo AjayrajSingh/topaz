@@ -224,7 +224,7 @@ class EditorState extends State<Editor> {
           ..pushStyle(style.getTextStyle())
           ..addText(_zeroWidthSpace);
     ui.Paragraph layout = builder.build()
-      ..layout(new ui.ParagraphConstraints(width: double.INFINITY));
+      ..layout(new ui.ParagraphConstraints(width: double.infinity));
     return layout.height;
   }
 

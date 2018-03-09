@@ -33,7 +33,7 @@ Future<Null> main(List<String> args) async {
 
   await reportFile
       .openRead()
-      .transform(UTF8.decoder)
+      .transform(utf8.decoder)
       .transform(const LineSplitter())
       .listen((String line) {
     if (line.startsWith('SF:')) {

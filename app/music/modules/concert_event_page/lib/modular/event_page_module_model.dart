@@ -90,8 +90,8 @@ class EventPageModuleModel extends ModuleModel {
 
   /// Fetch the event whenever the eventId is updated in the link
   @override
-  void onNotify(String json) {
-    final dynamic doc = JSON.decode(json);
+  void onNotify(String encoded) {
+    final dynamic doc = json.decode(encoded);
     if (doc is Map && doc['songkick:eventId'] is int) {
       fetchEvent(doc['songkick:eventId']);
     }
@@ -111,7 +111,7 @@ class EventPageModuleModel extends ModuleModel {
         // consumer of this context value only looks at the Entity type.
         writer.writeEntityTopic(
           _kMusicArtistTopic,
-          JSON.encode(
+          json.encode(
             <String, String>{
               '@type': _kMusicArtistType,
               'name': event.performances.first.artist.name,
@@ -134,14 +134,14 @@ class EventPageModuleModel extends ModuleModel {
         'longitude': event.venue.longitude,
         'latitude': event.venue.latitude,
       };
-      _contextLink.set(null, JSON.encode(contextLinkData));
+      _contextLink.set(null, json.encode(contextLinkData));
     }
   }
 
   /// Opens web view module to purchase tickets
   void purchaseTicket() {
     if (event != null && event.url != null) {
-      String linkData = JSON.encode(<String, Map<String, String>>{
+      String linkData = json.encode(<String, Map<String, String>>{
         'view': <String, String>{'uri': event.url},
       });
 

@@ -38,9 +38,9 @@ class ModuleDataModuleModel extends ModuleModel {
   }
 
   @override
-  void onNotify(String json) {
+  void onNotify(String encoded) {
     log.fine('LinkWatcherImpl.notify() $json');
-    dynamic doc = JSON.decode(json);
+    dynamic doc = json.decode(encoded);
     JsonEncoder encoder = const JsonEncoder.withIndent('  ');
     String prettyprint = encoder.convert(doc);
     setLinkValueAction(prettyprint);

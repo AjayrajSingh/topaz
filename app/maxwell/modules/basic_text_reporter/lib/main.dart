@@ -65,7 +65,7 @@ class ContextListenerImpl extends ContextListener {
 
       found = true;
       for (ContextValue value in entry.value) {
-        final dynamic content = JSON.decode(value.content);
+        final dynamic content = json.decode(value.content);
         // TODO(thatguy): Give the Entity a type instead of this ad-hoc schema
         // checking. Then use that type in the ContextQuery below.
         if (!(content is Map<String, dynamic>) &&
@@ -176,7 +176,7 @@ class ModuleImpl implements Module, Lifecycle {
   void publishText(String text) {
     _writer.writeEntityTopic(
       'raw/text',
-      JSON.encode(
+      json.encode(
         <String, String>{
           'text': text,
         },
@@ -187,7 +187,7 @@ class ModuleImpl implements Module, Lifecycle {
   void publishSelection(int start, int end) {
     _writer.writeEntityTopic(
       'raw/text_selection',
-      JSON.encode(
+      json.encode(
         <String, int>{
           'start': start,
           'end': end,

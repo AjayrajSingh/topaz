@@ -189,8 +189,8 @@ Future<Null> main() async {
 
 class _VideoModel extends Model {
   final MediaPlayerController controller;
-  Duration duration = Duration.ZERO;
-  Duration progress = Duration.ZERO;
+  Duration duration = Duration.zero;
+  Duration progress = Duration.zero;
   bool playing = false;
   bool showing = false;
   Timer _progressTimer;
@@ -234,8 +234,8 @@ class _VideoModel extends Model {
   void _resetPlayingState() {
     controller
       ..pause()
-      ..seek(Duration.ZERO);
-    progress = Duration.ZERO;
+      ..seek(Duration.zero);
+    progress = Duration.zero;
     playing = false;
   }
 
@@ -252,8 +252,8 @@ class _VideoModel extends Model {
 
   void skipBack() {
     Duration targetSeek = progress - _kVideoSkipAmount;
-    if (targetSeek < Duration.ZERO) {
-      targetSeek = Duration.ZERO;
+    if (targetSeek < Duration.zero) {
+      targetSeek = Duration.zero;
     }
     if (progress != targetSeek) {
       controller.seek(targetSeek);
@@ -467,7 +467,7 @@ class _VideoProgress extends StatelessWidget {
         alignment: FractionalOffset.centerLeft,
         child: new FractionallySizedBox(
           heightFactor: 1.0,
-          widthFactor: videoModel.duration == Duration.ZERO
+          widthFactor: videoModel.duration == Duration.zero
               ? 0.0
               : videoModel.progress.inMilliseconds >
                       videoModel.duration.inMilliseconds
@@ -875,7 +875,7 @@ class _Sun extends StatelessWidget {
                 ),
                 child: new Transform(
                   alignment: FractionalOffset.center,
-                  transform: new Matrix4.rotationZ(math.PI / 2.0),
+                  transform: new Matrix4.rotationZ(math.pi / 2.0),
                   child: new _SunRay(elevation: elevation),
                 ),
               ),
@@ -893,7 +893,7 @@ class _Sun extends StatelessWidget {
                 ),
                 child: new Transform(
                   alignment: FractionalOffset.center,
-                  transform: new Matrix4.rotationZ(math.PI / 2.0),
+                  transform: new Matrix4.rotationZ(math.pi / 2.0),
                   child: new _SunRay(elevation: elevation),
                 ),
               ),
@@ -953,7 +953,7 @@ class _Sun extends StatelessWidget {
                 ),
                 child: new Transform(
                   alignment: FractionalOffset.center,
-                  transform: new Matrix4.rotationZ(math.PI / 4.0),
+                  transform: new Matrix4.rotationZ(math.pi / 4.0),
                   child: new _SunRay(elevation: elevation),
                 ),
               ),
@@ -971,7 +971,7 @@ class _Sun extends StatelessWidget {
                 ),
                 child: new Transform(
                   alignment: FractionalOffset.center,
-                  transform: new Matrix4.rotationZ(math.PI / 4.0),
+                  transform: new Matrix4.rotationZ(math.pi / 4.0),
                   child: new _SunRay(elevation: elevation),
                 ),
               ),
@@ -989,7 +989,7 @@ class _Sun extends StatelessWidget {
                 ),
                 child: new Transform(
                   alignment: FractionalOffset.center,
-                  transform: new Matrix4.rotationZ(3.0 * math.PI / 4.0),
+                  transform: new Matrix4.rotationZ(3.0 * math.pi / 4.0),
                   child: new _SunRay(elevation: elevation),
                 ),
               ),
@@ -1007,7 +1007,7 @@ class _Sun extends StatelessWidget {
                 ),
                 child: new Transform(
                   alignment: FractionalOffset.center,
-                  transform: new Matrix4.rotationZ(3.0 * math.PI / 4.0),
+                  transform: new Matrix4.rotationZ(3.0 * math.pi / 4.0),
                   child: new _SunRay(elevation: elevation),
                 ),
               ),

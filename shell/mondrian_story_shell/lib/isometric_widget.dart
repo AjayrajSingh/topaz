@@ -9,8 +9,8 @@ import 'package:meta/meta.dart';
 
 /// 60-30 isometric projection matrix
 final Matrix4 _iso = new Matrix4.identity()
-  ..rotateX(60 * PI / 180.0)
-  ..rotateZ(30 * PI / 180.0);
+  ..rotateX(60 * pi / 180.0)
+  ..rotateZ(30 * pi / 180.0);
 
 /// Widget that performs an isometric transformation on a Widget,
 /// scaling it so that it fits within the bounds of its original rectangle

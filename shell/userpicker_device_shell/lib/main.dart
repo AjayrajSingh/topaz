@@ -274,7 +274,7 @@ class _ElevatedCheckedModeBanner extends StatelessWidget {
                     0.0,
                   ),
                   child: new Transform(
-                    transform: new Matrix4.rotationZ(math.PI / 4.0),
+                    transform: new Matrix4.rotationZ(math.pi / 4.0),
                     alignment: FractionalOffset.center,
                     child: new IgnorePointer(
                       child: new PhysicalModel(

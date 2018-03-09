@@ -105,7 +105,7 @@ class EventListModuleModel extends ModuleModel {
     Map<String, dynamic> data = <String, dynamic>{
       'songkick:eventId': event.id,
     };
-    _eventLink.set(null, JSON.encode(data));
+    _eventLink.set(null, json.encode(data));
   }
 
   /// Call when the current event page changes.
@@ -114,8 +114,8 @@ class EventListModuleModel extends ModuleModel {
     _registerEventsWithEventSelector();
   }
 
-  Future<Null> _onNotifyChild(String json) async {
-    Map<String, dynamic> decoded = JSON.decode(json);
+  Future<Null> _onNotifyChild(String encoded) async {
+    Map<String, dynamic> decoded = json.decode(encoded);
     if (decoded != null && decoded['songkick:eventId'] is int) {
       _selectedEventId = decoded['songkick:eventId'];
 
@@ -189,9 +189,9 @@ class EventListModuleModel extends ModuleModel {
   }
 
   @override
-  Future<Null> onNotify(String json) async {
+  Future<Null> onNotify(String encoded) async {
     try {
-      dynamic doc = JSON.decode(json);
+      dynamic doc = json.decode(encoded);
       dynamic uri = doc['view'];
       if (uri['host'] == 'www.songkick.com' &&
           uri['path segments'][0] == 'metro_areas') {
@@ -217,7 +217,7 @@ class EventListModuleModel extends ModuleModel {
 
   @override
   void onDeviceMapChange(DeviceMapEntry entry) {
-    Map<String, dynamic> profileMap = JSON.decode(entry.profile);
+    Map<String, dynamic> profileMap = json.decode(entry.profile);
     if (_deviceMode != profileMap['mode']) {
       _deviceMode = profileMap['mode'];
       notifyListeners();

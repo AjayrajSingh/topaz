@@ -41,7 +41,7 @@ class EntityClient {
   Future<String> getValidatedData(String type, String jsonTypeSchema) async {
     String data = await getData(type);
     json_schema.Schema schema =
-        await json_schema.Schema.createSchema(JSON.decode(jsonTypeSchema));
+        await json_schema.Schema.createSchema(json.decode(jsonTypeSchema));
     if (data != null && schema.validate(jsonTypeSchema)) {
       return data;
     }

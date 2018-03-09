@@ -46,8 +46,8 @@ class EventModuleModel extends ModuleModel {
 
   /// Update the event ID
   @override
-  void onNotify(String json) {
-    final dynamic doc = JSON.decode(json);
+  void onNotify(String encoded) {
+    final dynamic doc = json.decode(encoded);
     if (doc is Map && doc['songkick:eventId'] is int) {
       fetchEvent(doc['songkick:eventId']);
     }

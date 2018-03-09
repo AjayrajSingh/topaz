@@ -61,7 +61,7 @@ class WallpaperChooser {
       focusProvider: focusProvider,
       onWallpaperChosen: (List<String> images) {
         log.info('wallpaper chosen: $images');
-        link.set(<String>[_kWallpapersLinkKey], JSON.encode(images));
+        link.set(<String>[_kWallpapersLinkKey], json.encode(images));
         onWallpaperChosen(images);
       },
     );
@@ -73,8 +73,8 @@ class WallpaperChooser {
   }
 
   /// Called when the Link json changes.
-  void onLinkChanged(String json) {
-    dynamic decodedJson = JSON.decode(json);
+  void onLinkChanged(String encoded) {
+    dynamic decodedJson = json.decode(encoded);
     if (decodedJson == null ||
         !(decodedJson is Map) ||
         !decodedJson.containsKey(_kWallpapersLinkKey)) {
@@ -176,7 +176,7 @@ class _CustomAction extends CustomAction {
     storyProvider.createStoryWithInfo(
       _kImageSelectorModulePath,
       _kImageSelectorStoryExtraInfo,
-      JSON.encode(
+      json.encode(
         <String, List<String>>{},
       ),
       (String storyId) {
@@ -200,8 +200,8 @@ class _CustomAction extends CustomAction {
           linkProxy.watch(
             _linkWatcherBinding.wrap(
               new LinkWatcherImpl(
-                onNotify: (String json) {
-                  dynamic decodedJson = JSON.decode(json);
+                onNotify: (String encoded) {
+                  dynamic decodedJson = json.decode(encoded);
                   if (_lastDecodedJson != null && decodedJson == null) {
                     if (_lastDecodedJson is Map &&
                         _lastDecodedJson.containsKey(_kImageSelectorRootKey) &&

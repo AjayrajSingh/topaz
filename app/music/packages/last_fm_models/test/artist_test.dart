@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 import 'dart:io';
 
 import 'package:last_fm_models/last_fm_models.dart';
@@ -14,8 +14,8 @@ void main() {
     Artist artistFixture = fixtures.artist();
 
     String rawJson = await new File('mock_json/artist.json').readAsString();
-    dynamic json = JSON.decode(rawJson);
-    Artist artist = new Artist.fromJson(json);
+    dynamic decoded = json.decode(rawJson);
+    Artist artist = new Artist.fromJson(decoded);
 
     expect(artist.name, artistFixture.name);
     expect(artist.mbid, artistFixture.mbid);

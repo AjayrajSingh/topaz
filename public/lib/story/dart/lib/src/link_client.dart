@@ -84,15 +84,15 @@ class LinkClient {
       if (data == null || data.isEmpty) {
         completer.complete(null);
       } else {
-        Object json;
+        Object decoded;
 
         try {
-          json = JSON.decode(data);
+          decoded = json.decode(data);
         } on Exception catch (err) {
           completer.completeError(err);
         }
 
-        completer.complete(json);
+        completer.complete(decoded);
       }
     }
 
@@ -115,7 +115,7 @@ class LinkClient {
   /// Future based API for [fidl.Link#set].
   Future<Null> set({
     List<String> path,
-    Object json,
+    Object jsonData,
   }) async {
     log.fine('#set($path, $json)');
 
@@ -128,7 +128,7 @@ class LinkClient {
       return completer.future;
     }
 
-    String data = JSON.encode(json);
+    String data = json.encode(jsonData);
 
     // ignore: unawaited_futures
     proxy.ctrl.error.then((ProxyError err) {

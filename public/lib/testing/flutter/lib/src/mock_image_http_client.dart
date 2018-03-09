@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show BASE64;
+import 'dart:convert' show base64;
 
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart' as http;
 
 /// A BASE64 encoded 1x1 transparent PNG image.
-final List<int> _kTransparentImageBytes = BASE64.decode(
+final List<int> _kTransparentImageBytes = base64.decode(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
 );
 

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:http/http.dart' as http;
 import 'package:last_fm_models/last_fm_models.dart';
@@ -39,7 +39,7 @@ class LastFmApi {
     if (response.statusCode != 200) {
       return null;
     }
-    Map<String, dynamic> json = JSON.decode(response.body);
-    return new Artist.fromJson(json['artist']);
+    Map<String, dynamic> decoded = json.decode(response.body);
+    return new Artist.fromJson(decoded['artist']);
   }
 }

@@ -41,8 +41,8 @@ class FallbackImage extends StatelessWidget {
       return 40.0;
     } else {
       return max(
-            height ?? double.NEGATIVE_INFINITY,
-            width ?? double.NEGATIVE_INFINITY,
+            height ?? double.negativeInfinity,
+            width ?? double.negativeInfinity,
           ) /
           2.0;
     }
@@ -52,8 +52,8 @@ class FallbackImage extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> children = <Widget>[
       new Container(
-        height: height ?? double.INFINITY,
-        width: width ?? double.INFINITY,
+        height: height ?? double.infinity,
+        width: width ?? double.infinity,
         color: _kBackgroundColor,
         child: new Center(
           child: new Icon(
@@ -68,8 +68,8 @@ class FallbackImage extends StatelessWidget {
     if (url != null) {
       children.add(
         new Container(
-          height: height ?? double.INFINITY,
-          width: width ?? double.INFINITY,
+          height: height ?? double.infinity,
+          width: width ?? double.infinity,
           child: new Image.network(
             url,
             fit: BoxFit.cover,

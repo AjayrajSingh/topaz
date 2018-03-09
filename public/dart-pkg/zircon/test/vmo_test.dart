@@ -20,7 +20,7 @@ void main() {
 
     SizedVmo fileVmo = new SizedVmo.fromFile('tmp/testdata');
     Uint8List fileData = fileVmo.map();
-    String fileString = UTF8.decode(fileData.sublist(0, fileVmo.size));
+    String fileString = utf8.decode(fileData.sublist(0, fileVmo.size));
     expect(fileString, equals(fuchsia));
   });
 }

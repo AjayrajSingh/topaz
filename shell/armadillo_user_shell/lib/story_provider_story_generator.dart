@@ -134,14 +134,14 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
   }
 
   /// Called when the link changes.
-  void onLinkChanged(String json) {
-    dynamic decodedJson = JSON.decode(json);
+  void onLinkChanged(String encoded) {
+    dynamic decodedJson = json.decode(encoded);
     if (decodedJson == null ||
         !(decodedJson is Map) ||
         !decodedJson.containsKey(_kStoryClustersLinkKey)) {
       return;
     }
-    String storyClustersJson = JSON.encode(decodedJson[_kStoryClustersLinkKey]);
+    String storyClustersJson = json.encode(decodedJson[_kStoryClustersLinkKey]);
     if (storyClustersJson == _lastLinkJson) {
       return;
     }
@@ -321,8 +321,8 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
     return bestStoryCluster;
   }
 
-  List<StoryCluster> _getStoryClustersFromJson(String json) {
-    List<dynamic> decodedJson = JSON.decode(json);
+  List<StoryCluster> _getStoryClustersFromJson(String encoded) {
+    List<dynamic> decodedJson = json.decode(encoded);
 
     List<StoryCluster> jsonStoryClusters = <StoryCluster>[];
 
@@ -560,27 +560,27 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
           (StoryCluster storyCluster) =>
               storyCluster.stories.any((Story story) => story.isPlaceHolder),
         )) {
-      String json = JSON.encode(
+      String encoded = json.encode(
         _storyClusters
             .where((StoryCluster storyCluster) =>
                 !storyCluster.isPlaceholder &&
                 storyCluster.stories.any((Story story) => story.isPlaceHolder))
             .toList(),
       );
-      log.fine('Aborting link write, placeholder story found!\n$json');
+      log.fine('Aborting link write, placeholder story found!\n$encoded');
       return;
     }
 
-    String json = JSON.encode(
+    String encoded = json.encode(
       _storyClusters
           .where((StoryCluster storyCluster) => !storyCluster.isPlaceholder)
           .toList(),
     );
 
-    if (json != _lastLinkJson) {
+    if (encoded != _lastLinkJson) {
       log.fine('Writing to link!');
-      _link.set(<String>[_kStoryClustersLinkKey], json);
-      _lastLinkJson = json;
+      _link.set(<String>[_kStoryClustersLinkKey], encoded);
+      _lastLinkJson = encoded;
     }
   }
 

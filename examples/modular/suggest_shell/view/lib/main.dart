@@ -70,8 +70,8 @@ class _Module implements Module, Lifecycle, LinkWatcher {
 
   /// |LinkWatcher|
   @override
-  void notify(String json) {
-    dynamic doc = JSON.decode(json);
+  void notify(String jsonData) {
+    dynamic doc = json.decode(jsonData);
     if (doc is Map && doc[_kValue] is String) {
       _valueCallback(doc[_kValue]);
     }
@@ -79,7 +79,7 @@ class _Module implements Module, Lifecycle, LinkWatcher {
 
   // API below is exposed to _AppState. In addition, _AppState uses the
   // constructor argument to get notifications.
-  void setValue(String newValue) => _link.set(_jsonPath, JSON.encode(newValue));
+  void setValue(String newValue) => _link.set(_jsonPath, json.encode(newValue));
 }
 
 // Persistent external shared state of the app. Connected to the Story

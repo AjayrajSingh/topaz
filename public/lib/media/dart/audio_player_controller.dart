@@ -192,7 +192,7 @@ class AudioPlayerController {
   /// Gets current playback progress.
   Duration get progress {
     if (!_progressBarReady) {
-      return Duration.ZERO;
+      return Duration.zero;
     }
 
     return new Duration(

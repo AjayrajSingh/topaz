@@ -74,7 +74,7 @@ class Chatter {
       log.fine('Creating convo with id: $conversationId');
 
       linkProxy
-        ..set(<String>[], JSON.encode(conversationId))
+        ..set(<String>[], json.encode(conversationId))
         ..ctrl.close();
     });
   }

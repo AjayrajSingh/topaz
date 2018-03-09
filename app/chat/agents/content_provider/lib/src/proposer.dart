@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 import 'dart:io';
 
 import 'package:lib.context.fidl/context_reader.fidl.dart';
@@ -31,8 +31,8 @@ class Proposer extends ContextListener {
     if (!contactsJsonFile.existsSync()) {
       return;
     }
-    String json = contactsJsonFile.readAsStringSync();
-    final List<Map<String, dynamic>> decodedJson = JSON.decode(json);
+    String encoded = contactsJsonFile.readAsStringSync();
+    final List<Map<String, dynamic>> decodedJson = json.decode(encoded);
     for (Map<String, dynamic> contact in decodedJson) {
       List<String> context = contact['context'] ?? <String>[];
       String email = contact['email'];

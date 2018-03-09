@@ -59,7 +59,7 @@ void main(List<String> args) {
 
   // Read the config file from disk
   final File configFile = new File(path.join(_configDir, _configFilename));
-  configFile.readAsString(encoding: ASCII).then(parseConfigAndStart);
+  configFile.readAsString(encoding: ascii).then(parseConfigAndStart);
 }
 
 void addDataHandler(DataHandler handler) {
@@ -68,7 +68,7 @@ void addDataHandler(DataHandler handler) {
 
 void parseConfigAndStart(String configString) {
   // parse config file as JSON
-  Map<String, dynamic> configMap = JSON.decode(configString);
+  Map<String, dynamic> configMap = json.decode(configString);
 
   // port property
   if (configMap.containsKey(_portPropertyName))

@@ -4,7 +4,7 @@
 
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 import 'dart:math' as math;
 import 'dart:typed_data';
 
@@ -140,7 +140,7 @@ class ChatConversationListModuleModel extends ModuleModel {
 
       // Set the value to Link.
       if (updateLink) {
-        link.set(const <String>['conversation_id'], JSON.encode(id));
+        link.set(const <String>['conversation_id'], json.encode(id));
       }
 
       // Start the child conversation, if it hasn't been started yet.
@@ -332,8 +332,8 @@ class ChatConversationListModuleModel extends ModuleModel {
       ..getLink(name, _pickerLink.ctrl.request());
 
     // Register a LinkWatcher, which would read the selected contact.
-    LinkWatcherImpl watcher = new LinkWatcherImpl(onNotify: (String json) {
-      Object jsonObject = JSON.decode(json);
+    LinkWatcherImpl watcher = new LinkWatcherImpl(onNotify: (String encoded) {
+      Object jsonObject = json.decode(encoded);
       if (jsonObject is Map<String, Object> &&
           jsonObject['selectedContact'] is String) {
         String entityReference = jsonObject['selectedContact'];
@@ -460,7 +460,7 @@ class ChatConversationListModuleModel extends ModuleModel {
     try {
       ack();
 
-      Map<String, dynamic> decoded = JSON.decode(message);
+      Map<String, dynamic> decoded = json.decode(message);
       String event = decoded['event'];
       switch (event) {
         case 'new_conversation':
@@ -622,8 +622,8 @@ class ChatConversationListModuleModel extends ModuleModel {
   }
 
   @override
-  void onNotify(String json) {
-    Object decodedJson = JSON.decode(json);
+  void onNotify(String encoded) {
+    Object decodedJson = json.decode(encoded);
 
     // See if the content provider url is provided. This must be done only once,
     // when the Link notification is provided for the first time.
@@ -707,7 +707,7 @@ class ChatConversationListModuleModel extends ModuleModel {
     // Update the link data for contacts picker.
     _pickerLink.updateObject(
       const <String>['prefix'],
-      JSON.encode(<String, String>{'content': text}),
+      json.encode(<String, String>{'content': text}),
     );
 
     // Notify listeners so that the contacts picker can be shown or hidden

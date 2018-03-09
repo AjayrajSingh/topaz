@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.ledger.dart/ledger.dart';
@@ -105,7 +105,7 @@ class ConversationListWatcher extends BasePageWatcher {
       'status': statusString,
     };
 
-    sendMessage(JSON.encode(downloadStatusNotification));
+    sendMessage(json.encode(downloadStatusNotification));
     callback();
   }
 
@@ -142,12 +142,12 @@ class ConversationListWatcher extends BasePageWatcher {
 
     // Send the conversation_meta message to the conversation listeners as well.
     if (seen) {
-      _sendConversationMessage(entry.key, JSON.encode(notification));
+      _sendConversationMessage(entry.key, json.encode(notification));
     }
 
     _seenConversations.add(entry.key);
 
-    sendMessage(JSON.encode(notification));
+    sendMessage(json.encode(notification));
 
     Completer<Entry> completer = _conversationCompleters[entry.key];
     if (completer != null && !completer.isCompleted) {
@@ -162,7 +162,7 @@ class ConversationListWatcher extends BasePageWatcher {
       'conversation_id': conversationId,
     };
 
-    String message = JSON.encode(notification);
+    String message = json.encode(notification);
 
     sendMessage(message);
     _sendConversationMessage(conversationId, message);

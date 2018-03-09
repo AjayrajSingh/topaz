@@ -56,8 +56,8 @@ class AlbumModuleModel extends ModuleModel {
 
   /// Update the album ID
   @override
-  void onNotify(String json) {
-    final dynamic doc = JSON.decode(json);
+  void onNotify(String encoded) {
+    final dynamic doc = json.decode(encoded);
     String albumId;
 
     try {

@@ -61,7 +61,7 @@ class ReadResult extends _Result {
       : super(status);
   Uint8List bytesAsUint8List() =>
       bytes.buffer.asUint8List(bytes.offsetInBytes, numBytes);
-  String bytesAsUTF8String() => UTF8.decode(bytesAsUint8List());
+  String bytesAsUTF8String() => utf8.decode(bytesAsUint8List());
   @override
   String toString() =>
       'ReadResult(status=$status, bytes=$bytes, numBytes=$numBytes, handles=$handles)';

@@ -67,7 +67,7 @@ class ContextListenerImpl extends ContextListener {
 
       for (ContextValue value in entry.value) {
         try {
-          Map<String, dynamic> entity = JSON.decode(value.content);
+          Map<String, dynamic> entity = json.decode(value.content);
           log.fine('artist update: ${entity['name']}');
           List<Artist> artists = await _api.searchArtists(
             entity['name'],
@@ -106,7 +106,7 @@ class ContextListenerImpl extends ContextListener {
         new Action.withCreateStory(new CreateStory(
             moduleId: 'music_artist',
             initialData:
-                JSON.encode(<String, dynamic>{'view': decomposeUri(arg)})))
+                json.encode(<String, dynamic>{'view': decomposeUri(arg)})))
       ],
     );
 

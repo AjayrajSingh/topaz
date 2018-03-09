@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.logging/logging.dart';
@@ -98,8 +98,8 @@ class CounterParentModuleModel extends ModuleModel {
 
   /// Called when the [Link] data changes.
   @override
-  void onNotify(String json) {
-    dynamic decodedJson = JSON.decode(json);
+  void onNotify(String encodedJson) {
+    dynamic decodedJson = json.decode(encodedJson);
     if (decodedJson is Map<String, dynamic> &&
         decodedJson[_kCounterKey] is int) {
       counter = decodedJson[_kCounterKey];
@@ -116,12 +116,12 @@ class CounterParentModuleModel extends ModuleModel {
   /// that the [_counter] value and the [Link] value are always in sync.
   void increment() {
     log.info('increment');
-    link.set(<String>[_kCounterKey], JSON.encode(counter + 1));
+    link.set(<String>[_kCounterKey], json.encode(counter + 1));
   }
 
   /// Decrements the counter value by writing the new value to the [Link].
   void decrement() {
     log.info('decrement');
-    link.set(<String>[_kCounterKey], JSON.encode(counter - 1));
+    link.set(<String>[_kCounterKey], json.encode(counter - 1));
   }
 }

@@ -25,9 +25,9 @@ class ConstraintsModel extends Model {
   }
 
   /// Parses [json] for the [constraints] it contains.
-  void parseJson(String json) {
+  void parseJson(String encoded) {
     final Map<String, List<Map<String, String>>> decodedJson =
-        JSON.decode(json);
+        json.decode(encoded);
 
     // Load screen sizes.
     _currentConstraints = decodedJson['screen_sizes']

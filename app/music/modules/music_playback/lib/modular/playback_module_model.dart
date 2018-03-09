@@ -132,7 +132,7 @@ class PlaybackModuleModel extends ModuleModel {
 
   @override
   void onDeviceMapChange(DeviceMapEntry entry) {
-    Map<String, dynamic> profileMap = JSON.decode(entry.profile);
+    Map<String, dynamic> profileMap = json.decode(entry.profile);
     if (_deviceMode != profileMap['mode']) {
       _deviceMode = profileMap['mode'];
       notifyListeners();

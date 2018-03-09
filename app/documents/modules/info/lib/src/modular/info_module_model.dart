@@ -66,7 +66,7 @@ class InfoModuleModel extends ModuleModel {
   @override
   Future<Null> onNotify(String linkJson) async {
     log.fine('Received updated Link Data in Info Module');
-    Map<String, dynamic> linkData = JSON.decode(linkJson);
+    Map<String, dynamic> linkData = json.decode(linkJson);
     if (linkData['currentDocId'] == null) {
       log.severe('Link does not contain a currently-selected Document');
       return;

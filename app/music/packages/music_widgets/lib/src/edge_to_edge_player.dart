@@ -137,8 +137,8 @@ class EdgeToEdgePlayer extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           new PlaybackSlider(
-            duration: currentTrack?.duration ?? Duration.ZERO,
-            playbackPosition: playbackPosition ?? Duration.ZERO,
+            duration: currentTrack?.duration ?? Duration.zero,
+            playbackPosition: playbackPosition ?? Duration.zero,
             fontSize: 18.0,
           ),
           new Row(

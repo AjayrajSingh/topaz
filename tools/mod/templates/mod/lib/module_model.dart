@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart';
@@ -77,7 +77,7 @@ class __ProjectName__ModuleModel extends ModuleModel {
     //
     // This is important for correctly restoring the counter value and keeping
     // it in sync with other devices.
-    link.set(<String>['counter'], JSON.encode(counter + 1));
+    link.set(<String>['counter'], json.encode(counter + 1));
   }
 
   @override
@@ -98,11 +98,11 @@ class __ProjectName__ModuleModel extends ModuleModel {
   }
 
   @override
-  void onNotify(String json) {
+  void onNotify(String encodedJson) {
     // Process any data change notification from the Link.
-    log.info('Link data changed: $json');
+    log.info('Link data changed: $encodedJson');
 
-    dynamic decodedJson = JSON.decode(json);
+    dynamic decodedJson = json.decode(encodedJson);
     if (decodedJson is Map<String, dynamic> && decodedJson['counter'] is int) {
       counter = decodedJson['counter'];
     }

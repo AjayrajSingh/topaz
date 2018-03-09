@@ -232,7 +232,7 @@ class EventCard extends StatelessWidget {
           children: <Widget>[
             new Container(
               height: 160.0,
-              width: double.INFINITY,
+              width: double.infinity,
               child: new Image.network(
                 event.performances.first.artist.imageUrl,
                 fit: BoxFit.cover,

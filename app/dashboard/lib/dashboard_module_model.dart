@@ -123,7 +123,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
       _webviewLinkProxy
         ..set(
           <String>[],
-          JSON.encode(<String, Map<String, String>>{
+          json.encode(<String, Map<String, String>>{
             'view': <String, String>{'uri': url}
           }),
         );
@@ -137,7 +137,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
     _webviewLinkProxy
       ..set(
         <String>[],
-        JSON.encode(<String, Map<String, String>>{
+        json.encode(<String, Map<String, String>>{
           'view': <String, String>{'uri': url}
         }),
       );

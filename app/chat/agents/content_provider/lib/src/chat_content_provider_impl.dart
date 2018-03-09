@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show UTF8;
+import 'dart:convert' show utf8;
 import 'dart:typed_data';
 
 import 'package:lib.component.fidl/component_context.fidl.dart';
@@ -158,7 +158,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       : assert(componentContext != null),
         assert(chatMessageTransporter != null),
         deviceIdBytes = deviceId != null
-            ? new Uint8List.fromList(UTF8.encode(deviceId))
+            ? new Uint8List.fromList(utf8.encode(deviceId))
             : new Uint8List(0) {
     chatMessageTransporter.onReceived = _handleMessage;
   }

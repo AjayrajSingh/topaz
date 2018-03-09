@@ -83,7 +83,7 @@ class _AgentProviderWatcherImpl extends AgentProviderWatcher {
       ..clear()
       ..addAll(agentUrls);
     log.fine('agent urls: $agentUrls');
-    link.set(null, JSON.encode(agentUrls));
+    link.set(null, json.encode(agentUrls));
   }
 }
 
@@ -174,7 +174,7 @@ class _CustomAction extends CustomAction {
       <StoryInfoExtraEntry>[
         const StoryInfoExtraEntry(key: 'color', value: '0xFFA5A700'),
       ],
-      JSON.encode(
+      json.encode(
         <String, List<String>>{
           'Active Agents': agentProviderWatcherImpl.agents
         },

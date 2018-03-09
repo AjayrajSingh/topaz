@@ -331,7 +331,7 @@ class _SimAnimationController extends Animation<Offset>
     Duration lastElapsedDuration = elapsed;
     final double elapsedInSeconds =
         lastElapsedDuration.inMicroseconds.toDouble() /
-            Duration.MICROSECONDS_PER_SECOND;
+            Duration.microsecondsPerSecond;
     _value = new Offset(
       _xSimulation.x(elapsedInSeconds),
       _ySimulation.x(elapsedInSeconds),

@@ -52,25 +52,25 @@ class SplashPainter extends CustomPainter {
       ..arcTo(
         new Rect.fromCircle(center: splashOrigin, radius: outerRadius),
         0.0,
-        math.PI,
+        math.pi,
         true,
       )
       ..arcTo(
         new Rect.fromCircle(center: splashOrigin, radius: outerRadius),
-        math.PI,
-        math.PI,
+        math.pi,
+        math.pi,
         false,
       )
       ..arcTo(
         new Rect.fromCircle(center: splashOrigin, radius: innerRadius),
         0.0,
-        -math.PI,
+        -math.pi,
         true,
       )
       ..arcTo(
         new Rect.fromCircle(center: splashOrigin, radius: innerRadius),
-        -math.PI,
-        -math.PI,
+        -math.pi,
+        -math.pi,
         false,
       );
     canvas.drawPath(path, paint);

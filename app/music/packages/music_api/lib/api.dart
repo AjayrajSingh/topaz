@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show BASE64, JSON, UTF8;
+import 'dart:convert' show base64, json, utf8;
 
 import 'package:http/http.dart' as http;
 import 'package:lib.logging/logging.dart';
@@ -43,7 +43,7 @@ class Api {
       Uri uri = new Uri.https(_kAuthBaseUrl, '/api/token');
       Map<String, String> headers = <String, String>{};
       String encodedAuthorization =
-          BASE64.encode(UTF8.encode('$clientId:$clientSecret'));
+          base64.encode(utf8.encode('$clientId:$clientSecret'));
       headers['Authorization'] = 'Basic $encodedAuthorization';
       Map<String, String> body = <String, String>{};
       body['grant_type'] = 'client_credentials';
@@ -52,7 +52,7 @@ class Api {
       if (response.statusCode != 200) {
         return null;
       }
-      dynamic jsonData = JSON.decode(response.body);
+      dynamic jsonData = json.decode(response.body);
       if (jsonData['access_token'] is String && jsonData['expires_in'] is int) {
         _accessToken = jsonData['access_token'];
         _expirationTime = new DateTime.now()
@@ -76,7 +76,7 @@ class Api {
     if (response.statusCode != 200) {
       return null;
     }
-    return new Artist.fromJson(JSON.decode(response.body));
+    return new Artist.fromJson(json.decode(response.body));
   }
 
   /// Retrieves related artists for given artist id
@@ -90,7 +90,7 @@ class Api {
     if (response.statusCode != 200) {
       return null;
     }
-    dynamic jsonData = JSON.decode(response.body);
+    dynamic jsonData = json.decode(response.body);
     List<Artist> artists = <Artist>[];
     if (jsonData['artists'] is List) {
       jsonData['artists'].forEach((Object artistJson) {
@@ -111,7 +111,7 @@ class Api {
     if (response.statusCode != 200) {
       return null;
     }
-    return new Album.fromJson(JSON.decode(response.body));
+    return new Album.fromJson(json.decode(response.body));
   }
 
   /// Retreives albums for given artist id
@@ -128,7 +128,7 @@ class Api {
     if (response.statusCode != 200) {
       return null;
     }
-    dynamic jsonData = JSON.decode(response.body);
+    dynamic jsonData = json.decode(response.body);
     List<Album> simplifiedAlbums = <Album>[];
     if (jsonData['items'] is List) {
       jsonData['items'].forEach((Object albumJson) {
@@ -155,7 +155,7 @@ class Api {
     if (response.statusCode != 200) {
       return null;
     }
-    dynamic jsonData = JSON.decode(response.body);
+    dynamic jsonData = json.decode(response.body);
     List<Album> albums = <Album>[];
     if (jsonData['albums'] is List) {
       jsonData['albums'].forEach((Object albumJson) {
@@ -181,7 +181,7 @@ class Api {
       log.fine(response.statusCode);
       return null;
     }
-    dynamic jsonData = JSON.decode(response.body);
+    dynamic jsonData = json.decode(response.body);
     List<Artist> artists = <Artist>[];
     if (jsonData['artists']['items'] is List) {
       jsonData['artists']['items'].forEach((Object artistJson) {

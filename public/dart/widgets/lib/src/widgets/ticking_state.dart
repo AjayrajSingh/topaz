@@ -21,7 +21,7 @@ abstract class TickingState<T extends StatefulWidget> extends State<T>
       return;
     }
     _ticker = createTicker(_onTick);
-    _lastTick = Duration.ZERO;
+    _lastTick = Duration.zero;
     _ticker.start();
   }
 

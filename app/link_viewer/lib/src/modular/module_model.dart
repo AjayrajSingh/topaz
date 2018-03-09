@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
@@ -15,14 +15,14 @@ class LinkViewerModuleModel extends ModuleModel {
   String _lastJson;
 
   @override
-  void onNotify(String json) {
-    if (_lastJson == json) {
+  void onNotify(String encoded) {
+    if (_lastJson == encoded) {
       return;
     }
-    _lastJson = json;
+    _lastJson = encoded;
 
     log.fine('JSON: $json');
-    _decodedJson = JSON.decode(json);
+    _decodedJson = json.decode(encoded);
     notifyListeners();
   }
 }

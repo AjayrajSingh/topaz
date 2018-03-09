@@ -36,9 +36,9 @@ class Video {
         assert(thumbnailLocation != null);
 
   /// Instantiate a Video from a JSON string
-  factory Video.fromJson(String json) {
+  factory Video.fromJson(String encodedJson) {
     try {
-      Map<String, String> decodedJson = JSON.decode(json);
+      Map<String, String> decodedJson = json.decode(encodedJson);
       return new Video(
         location: decodedJson['location'],
         name: decodedJson['name'] ?? '',
@@ -61,7 +61,7 @@ class Video {
 
   /// Encodes a Video entity into a JSON string
   String toJson() {
-    return JSON.encode(<String, String>{
+    return json.encode(<String, String>{
       'location': location,
       'name': name,
       'description': description,

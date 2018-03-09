@@ -174,14 +174,14 @@ class ContextProviderContextModel extends ContextModel {
   /// Called when context changes.
   void onContextUpdated(Map<String, String> context) {
     if (context[_kLocationHomeWorkTopic] != null) {
-      Map<String, String> locationJson = convert.JSON.decode(
+      Map<String, String> locationJson = convert.json.decode(
         context[_kLocationHomeWorkTopic],
       );
       _location = locationJson['location'];
     }
 
     if (context[_kActivityWalking] != null) {
-      Map<String, String> activityJson = convert.JSON.decode(
+      Map<String, String> activityJson = convert.json.decode(
         context[_kActivityWalking],
       );
       _activity = activityJson['activity'];
@@ -193,7 +193,7 @@ class ContextProviderContextModel extends ContextModel {
   Future<Null> load() async {
     String json = new File(_kContextConfig).readAsStringSync();
     final Map<String, Map<String, String>> decodedJson =
-        convert.JSON.decode(json);
+        convert.json.decode(json);
     _contextualWifiNetworks = decodedJson['wifi_network'];
     _contextualLocations = decodedJson['location'];
     _contextualTimeOnly = decodedJson['time_only'];

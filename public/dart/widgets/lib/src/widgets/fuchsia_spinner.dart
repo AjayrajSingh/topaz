@@ -10,7 +10,7 @@ const Color _kDefaultColor = const Color(0xFF6EFAFA);
 
 const double _kInitialFractionalDiameter = 1.0 / 1.2;
 const double _kTargetFractionalDiameter = 1.0;
-const double _kRotationRadians = 6 * math.PI;
+const double _kRotationRadians = 6 * math.pi;
 const Curve _kDefaultCurve = const Cubic(0.3, 0.1, 0.3, 0.9);
 
 const Duration _kAnimationDuration = const Duration(seconds: 2);
@@ -119,8 +119,8 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
   /// See https://beesbuzz.biz/code/hsv_color_transforms.php for information
   /// about the constants used.
   Color _transformHue(Color original, double hueDegrees) {
-    double u = math.cos(hueDegrees * math.PI / 180.0);
-    double w = math.sin(hueDegrees * math.PI / 180.0);
+    double u = math.cos(hueDegrees * math.pi / 180.0);
+    double w = math.sin(hueDegrees * math.pi / 180.0);
     return new Color.fromARGB(
       original.alpha,
       ((.299 + .701 * u + .168 * w) * original.red +

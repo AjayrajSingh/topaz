@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -101,8 +101,8 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
   }
 
   @override
-  void notify(String json) {
-    Object jsonObject = JSON.decode(json);
+  void notify(String encoded) {
+    Object jsonObject = json.decode(encoded);
     if (jsonObject is Map<String, Object> &&
         jsonObject['preferredHeight'] != null) {
       num h = jsonObject['preferredHeight'];
@@ -182,7 +182,7 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
 
     try {
       if (additionalLinkData != null) {
-        link.updateObject(null, JSON.encode(additionalLinkData));
+        link.updateObject(null, json.encode(additionalLinkData));
       }
     } on Exception catch (e, stackTrace) {
       log.warning(

@@ -24,7 +24,7 @@ class Config {
     File file = new File(src);
 
     String data;
-    dynamic json;
+    dynamic decoded;
 
     try {
       data = await file.readAsString();
@@ -33,14 +33,14 @@ class Config {
     }
 
     try {
-      json = JSON.decode(data);
+      decoded = json.decode(data);
     } on Exception {
       String message = 'unable to decode JSON \n$data';
       throw new StateError(message);
     }
 
-    for (String key in json.keys) {
-      String value = json[key];
+    for (String key in decoded.keys) {
+      String value = decoded[key];
       put(key, value);
     }
   }

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:lib.auth.fidl/token_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
@@ -232,7 +232,7 @@ class FirebaseDbClientImpl implements FirebaseDbClient {
                 ? NotificationType.put
                 : NotificationType.patch;
 
-            Map<String, dynamic> decodedData = JSON.decode(event.data);
+            Map<String, dynamic> decodedData = json.decode(event.data);
             String path = decodedData['path'];
             Map<String, Object> data = decodedData['data'];
 
@@ -240,7 +240,7 @@ class FirebaseDbClientImpl implements FirebaseDbClient {
             watcher.dataChanged(
               type,
               path,
-              JSON.encode(data),
+              json.encode(data),
               completer.complete,
             );
             await completer.future;

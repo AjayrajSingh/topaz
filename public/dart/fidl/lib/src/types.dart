@@ -61,7 +61,7 @@ void _copyInt16(ByteData data, Int16List value, int offset) {
   final int count = value.length;
   const int stride = 2;
   for (int i = 0; i < count; ++i) {
-    data.setInt16(offset + i * stride, value[i], Endianness.LITTLE_ENDIAN);
+    data.setInt16(offset + i * stride, value[i], Endian.little);
   }
 }
 
@@ -69,7 +69,7 @@ void _copyUint16(ByteData data, Uint16List value, int offset) {
   final int count = value.length;
   const int stride = 2;
   for (int i = 0; i < count; ++i) {
-    data.setUint16(offset + i * stride, value[i], Endianness.LITTLE_ENDIAN);
+    data.setUint16(offset + i * stride, value[i], Endian.little);
   }
 }
 
@@ -77,7 +77,7 @@ void _copyInt32(ByteData data, Int32List value, int offset) {
   final int count = value.length;
   const int stride = 4;
   for (int i = 0; i < count; ++i) {
-    data.setInt32(offset + i * stride, value[i], Endianness.LITTLE_ENDIAN);
+    data.setInt32(offset + i * stride, value[i], Endian.little);
   }
 }
 
@@ -85,7 +85,7 @@ void _copyUint32(ByteData data, Uint32List value, int offset) {
   final int count = value.length;
   const int stride = 4;
   for (int i = 0; i < count; ++i) {
-    data.setUint32(offset + i * stride, value[i], Endianness.LITTLE_ENDIAN);
+    data.setUint32(offset + i * stride, value[i], Endian.little);
   }
 }
 
@@ -93,7 +93,7 @@ void _copyInt64(ByteData data, Int64List value, int offset) {
   final int count = value.length;
   const int stride = 8;
   for (int i = 0; i < count; ++i) {
-    data.setInt64(offset + i * stride, value[i], Endianness.LITTLE_ENDIAN);
+    data.setInt64(offset + i * stride, value[i], Endian.little);
   }
 }
 
@@ -101,7 +101,7 @@ void _copyUint64(ByteData data, Uint64List value, int offset) {
   final int count = value.length;
   const int stride = 8;
   for (int i = 0; i < count; ++i) {
-    data.setUint64(offset + i * stride, value[i], Endianness.LITTLE_ENDIAN);
+    data.setUint64(offset + i * stride, value[i], Endian.little);
   }
 }
 
@@ -109,7 +109,7 @@ void _copyFloat32(ByteData data, Float32List value, int offset) {
   final int count = value.length;
   const int stride = 8;
   for (int i = 0; i < count; ++i) {
-    data.setFloat32(offset + i * stride, value[i], Endianness.LITTLE_ENDIAN);
+    data.setFloat32(offset + i * stride, value[i], Endian.little);
   }
 }
 
@@ -117,7 +117,7 @@ void _copyFloat64(ByteData data, Float64List value, int offset) {
   final int count = value.length;
   const int stride = 8;
   for (int i = 0; i < count; ++i) {
-    data.setFloat64(offset + i * stride, value[i], Endianness.LITTLE_ENDIAN);
+    data.setFloat64(offset + i * stride, value[i], Endian.little);
   }
 }
 

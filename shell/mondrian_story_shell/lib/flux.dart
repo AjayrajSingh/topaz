@@ -73,8 +73,8 @@ class SimAnimationController<T> extends FluxAnimation<T>
   })
       : _value = sim.value(0.0),
         _velocity = sim.velocity(0.0),
-        _elapsed = Duration.ZERO,
-        _elapsedOffset = Duration.ZERO {
+        _elapsed = Duration.zero,
+        _elapsedOffset = Duration.zero {
     _ticker = vsync.createTicker(_tick);
   }
 
@@ -106,12 +106,12 @@ class SimAnimationController<T> extends FluxAnimation<T>
     assert(duration != null);
     stop();
     _elapsedOffset = duration;
-    _tick(Duration.ZERO);
+    _tick(Duration.zero);
   }
 
   double get _elapsedInSeconds =>
       (_elapsed + _elapsedOffset).inMicroseconds.toDouble() /
-      Duration.MICROSECONDS_PER_SECOND;
+      Duration.microsecondsPerSecond;
 
   /// Start the animation.
   TickerFuture start() {
@@ -125,7 +125,7 @@ class SimAnimationController<T> extends FluxAnimation<T>
   void stop({bool canceled: false}) {
     _ticker.stop(canceled: canceled);
     _elapsedOffset = elapsed;
-    _elapsed = Duration.ZERO;
+    _elapsed = Duration.zero;
   }
 
   @override

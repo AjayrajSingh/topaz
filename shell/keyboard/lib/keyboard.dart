@@ -254,7 +254,7 @@ const String _kKeyboardLayoutsJson = '['
     ']';
 
 final List<List<List<Map<String, String>>>> _kKeyboardLayouts =
-    JSON.decode(_kKeyboardLayoutsJson);
+    json.decode(_kKeyboardLayoutsJson);
 
 /// Displays a keyboard.
 class Keyboard extends StatefulWidget {

@@ -407,7 +407,7 @@ class _DeviceMapWatcherImpl extends DeviceMapWatcher {
   _DeviceMapWatcherImpl({this.onProfileChanged});
   @override
   void onDeviceMapChange(DeviceMapEntry entry) {
-    Object decodedJson = JSON.decode(entry.profile);
+    Object decodedJson = json.decode(entry.profile);
     if (decodedJson is Map<String, String>) {
       onProfileChanged(decodedJson);
     } else {

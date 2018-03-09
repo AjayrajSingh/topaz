@@ -372,10 +372,10 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
         Map<String, dynamic> message = <String, dynamic>{
           'contact_list': _contactsStore.getAllContacts()
         };
-        String json = JSON.encode(message);
+        String encoded = json.encode(message);
         log.fine('Sending update to ${_messageSenders.length} subscribers');
         for (MessageSenderProxy ms in _messageSenders.values) {
-          ms.send(json);
+          ms.send(encoded);
         }
       },
     );
@@ -405,7 +405,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   }
 
   fidl.Contact _getContactFromEntry(ledger.Entry entry) {
-    String contactId = UTF8.decode(entry.key);
+    String contactId = utf8.decode(entry.key);
     Map<String, dynamic> decodedValue = decodeLedgerValue(entry.value);
 
     List<fidl.EmailAddress> emails = <fidl.EmailAddress>[];
@@ -473,7 +473,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
         Completer<ledger.Status> statusCompleter =
             new Completer<ledger.Status>();
         opStatuses.add(statusCompleter.future);
-        List<int> contactId = UTF8.encode(contact.contactId);
+        List<int> contactId = utf8.encode(contact.contactId);
         List<int> ledgerValue = encodeLedgerValue(contact);
         if (operation == _LedgerOperation.put) {
           _page.put(
@@ -553,7 +553,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     }
 
     try {
-      Map<String, Object> config = JSON.decode(configFile.readAsStringSync());
+      Map<String, Object> config = json.decode(configFile.readAsStringSync());
       Object dataProviders = config['data_providers'];
       if (dataProviders is List) {
         for (Map<String, String> info in dataProviders) {

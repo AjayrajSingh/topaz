@@ -11,13 +11,13 @@ import 'package:vector_math/vector_math_64.dart';
 
 const double _kGemCornerRadius = 16.0;
 const double _kGemOpacity = 1.0;
-const double _kFaceRotation = math.PI / 2.0;
-const double _kPerspectiveFieldOfViewRadians = math.PI / 6.0;
+const double _kFaceRotation = math.pi / 2.0;
+const double _kPerspectiveFieldOfViewRadians = math.pi / 6.0;
 const double _kPerspectiveNearZ = 100.0;
 const double _kPerspectiveAspectRatio = 1.0;
 const double _kCubeScaleFactor = 50.0;
-const double _kCubeAnimationYRotation = 2.0 * math.PI;
-const double _kCubeAnimationXRotation = 6.0 * math.PI;
+const double _kCubeAnimationYRotation = 2.0 * math.pi;
+const double _kCubeAnimationXRotation = 6.0 * math.pi;
 
 /// Creates a spinning unicolor cube with rounded corners.
 class SpinningCubeGem extends StatelessWidget {

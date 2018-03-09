@@ -44,7 +44,7 @@ class ActionLogDataHandler extends ActionLogListener with DataHandler {
   bool handleRequest(String requestString, HttpRequest request) {
     // /data/action_log/all returns all of the actions in the log
     if (requestString == '/all') {
-      request.response.write(JSON.encode(_actionLogCache));
+      request.response.write(json.encode(_actionLogCache));
       request.response.close();
       return true;
     }
@@ -55,14 +55,14 @@ class ActionLogDataHandler extends ActionLogListener with DataHandler {
   void handleNewWebSocket(WebSocket socket) {
     // send all cached data to the socket
     String message =
-        JSON.encode(<String, dynamic>{'action_log.all': _actionLogCache});
+        json.encode(<String, dynamic>{'action_log.all': _actionLogCache});
     socket.add(message);
   }
 
   @override
   void onAction(UserAction action) {
     _actionLogCache.add(action);
-    _sendMessage(JSON.encode(<String, dynamic>{
+    _sendMessage(json.encode(<String, dynamic>{
       'action_log.new_action': <String, String>{
         'componentUrl': action.componentUrl,
         'method': action.method,

@@ -170,8 +170,8 @@ class ArtistModuleModel extends ModuleModel {
 
   /// Update the artist ID
   @override
-  Future<Null> onNotify(String json) async {
-    final dynamic doc = JSON.decode(json);
+  Future<Null> onNotify(String encoded) async {
+    final dynamic doc = json.decode(encoded);
     String artistId;
 
     try {
@@ -199,13 +199,13 @@ class ArtistModuleModel extends ModuleModel {
         'name': artist.name,
         'spotifyId': artist.id,
       };
-      _contextLink.set(null, JSON.encode(contextLinkData));
+      _contextLink.set(null, json.encode(contextLinkData));
     }
   }
 
   @override
   void onDeviceMapChange(DeviceMapEntry entry) {
-    Map<String, dynamic> profileMap = JSON.decode(entry.profile);
+    Map<String, dynamic> profileMap = json.decode(entry.profile);
     if (_deviceMode != profileMap['mode']) {
       _deviceMode = profileMap['mode'];
       notifyListeners();
@@ -221,7 +221,7 @@ class ArtistModuleModel extends ModuleModel {
     );
     _startModule(
       url: 'music_artist',
-      initialData: JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}),
+      initialData: json.encode(<String, dynamic>{'view': decomposeUri(arg)}),
     );
   }
 
@@ -234,7 +234,7 @@ class ArtistModuleModel extends ModuleModel {
     );
     _startModule(
       url: 'music_album',
-      initialData: JSON.encode(<String, dynamic>{'view': decomposeUri(arg)}),
+      initialData: json.encode(<String, dynamic>{'view': decomposeUri(arg)}),
     );
   }
 

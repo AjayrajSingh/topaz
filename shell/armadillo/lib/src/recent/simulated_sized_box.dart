@@ -65,8 +65,8 @@ class SimulatedSizedBoxState extends TickingState<SimulatedSizedBox> {
 
   @override
   Widget build(BuildContext context) => new SizedBox(
-        width: _widthSimulation.value.clamp(0.0, double.INFINITY),
-        height: _heightSimulation.value.clamp(0.0, double.INFINITY),
+        width: _widthSimulation.value.clamp(0.0, double.infinity),
+        height: _heightSimulation.value.clamp(0.0, double.infinity),
         child: widget.child,
       );
 
@@ -79,7 +79,7 @@ class SimulatedSizedBoxState extends TickingState<SimulatedSizedBox> {
 
   /// Gets the current size of the box.
   Size get size => new Size(
-        _widthSimulation.value.clamp(0.0, double.INFINITY),
-        _heightSimulation.value.clamp(0.0, double.INFINITY),
+        _widthSimulation.value.clamp(0.0, double.infinity),
+        _heightSimulation.value.clamp(0.0, double.infinity),
       );
 }

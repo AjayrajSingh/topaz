@@ -191,8 +191,8 @@ class _SmoothQrCodePainter extends CustomPainter {
                 ..arcTo(
                   new Rect.fromLTRB(x * pixelSize, y * pixelSize,
                       (x + 1) * pixelSize, (y + 1) * pixelSize),
-                  -math.PI / 2.0,
-                  -math.PI / 2.0,
+                  -math.pi / 2.0,
+                  -math.pi / 2.0,
                   false,
                 ),
               blackPaint,
@@ -207,8 +207,8 @@ class _SmoothQrCodePainter extends CustomPainter {
                 ..arcTo(
                   new Rect.fromLTRB(x * pixelSize, y * pixelSize,
                       (x + 1) * pixelSize, (y + 1) * pixelSize),
-                  math.PI / 2.0,
-                  math.PI / 2.0,
+                  math.pi / 2.0,
+                  math.pi / 2.0,
                   false,
                 ),
               blackPaint,
@@ -223,8 +223,8 @@ class _SmoothQrCodePainter extends CustomPainter {
                 ..arcTo(
                   new Rect.fromLTRB(x * pixelSize, y * pixelSize,
                       (x + 1) * pixelSize, (y + 1) * pixelSize),
-                  -math.PI / 2.0,
-                  math.PI / 2.0,
+                  -math.pi / 2.0,
+                  math.pi / 2.0,
                   false,
                 ),
               blackPaint,
@@ -239,8 +239,8 @@ class _SmoothQrCodePainter extends CustomPainter {
                 ..arcTo(
                   new Rect.fromLTRB(x * pixelSize, y * pixelSize,
                       (x + 1) * pixelSize, (y + 1) * pixelSize),
-                  math.PI / 2.0,
-                  -math.PI / 2.0,
+                  math.pi / 2.0,
+                  -math.pi / 2.0,
                   false,
                 ),
               blackPaint,

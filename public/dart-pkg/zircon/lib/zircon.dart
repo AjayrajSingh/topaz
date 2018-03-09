@@ -4,7 +4,7 @@
 
 library zircon;
 
-import 'dart:convert' show UTF8;
+import 'dart:convert' show utf8;
 import 'dart:nativewrappers';
 import 'dart:typed_data';
 

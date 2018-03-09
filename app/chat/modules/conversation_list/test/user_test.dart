@@ -11,9 +11,9 @@ void main() {
   test('User JSON encode/decode', () {
     User user = new User.fixture();
 
-    String encoded = JSON.encode(user);
-    Map<String, String> json = JSON.decode(encoded);
-    User hydrated = new User.fromJson(json);
+    String encoded = json.encode(user);
+    Map<String, String> decoded = json.decode(encoded);
+    User hydrated = new User.fromJson(decoded);
 
     expect(hydrated.id, equals(user.id));
     expect(hydrated.email, equals(user.email));

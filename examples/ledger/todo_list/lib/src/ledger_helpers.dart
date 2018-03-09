@@ -44,7 +44,7 @@ void _getEntriesRecursive(
     }
     if (entries != null) {
       for (final ledger.InlinedEntry entry in entries) {
-        items[entry.key] = UTF8.decode(entry.value);
+        items[entry.key] = utf8.decode(entry.value);
       }
     }
     if (status == ledger.Status.ok) {

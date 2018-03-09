@@ -4,7 +4,7 @@
 
 library zircon_fakes;
 
-import 'dart:convert' show UTF8;
+import 'dart:convert' show utf8;
 import 'dart:typed_data';
 
 part 'handle.dart';

@@ -27,9 +27,9 @@ class PhoneNumber {
       : assert(number != null && number.isNotEmpty);
 
   /// Instantiate a phone number from a json string
-  factory PhoneNumber.fromJson(String json) {
+  factory PhoneNumber.fromJson(String encodedJson) {
     try {
-      Map<String, String> decodedJson = JSON.decode(json);
+      Map<String, String> decodedJson = json.decode(encodedJson);
       return new PhoneNumber(
         number: decodedJson['number'],
         label: decodedJson['label'] ?? '',
@@ -52,7 +52,7 @@ class PhoneNumber {
 
   /// Helper function to encode a phone number entity into a json string
   String toJson() {
-    return JSON.encode(<String, String>{
+    return json.encode(<String, String>{
       'number': number,
       'label': label,
     });

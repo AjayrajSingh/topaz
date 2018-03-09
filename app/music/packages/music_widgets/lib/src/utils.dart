@@ -10,13 +10,13 @@ class DurationFormat {
 
   /// Constructor
   DurationFormat(Duration duration) : assert(duration != null) {
-    _hours = (duration.inSeconds / Duration.SECONDS_PER_HOUR).floor();
-    _minutes = ((duration.inSeconds - (_hours * Duration.SECONDS_PER_HOUR)) /
-            Duration.SECONDS_PER_MINUTE)
+    _hours = (duration.inSeconds / Duration.secondsPerHour).floor();
+    _minutes = ((duration.inSeconds - (_hours * Duration.secondsPerHour)) /
+            Duration.secondsPerMinute)
         .floor();
     _seconds = duration.inSeconds -
-        (_hours * Duration.SECONDS_PER_HOUR) -
-        (_minutes * Duration.SECONDS_PER_MINUTE);
+        (_hours * Duration.secondsPerHour) -
+        (_minutes * Duration.secondsPerMinute);
   }
 
   /// Returns the human-readable form of a given duration of the the typical
