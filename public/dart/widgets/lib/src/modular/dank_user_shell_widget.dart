@@ -10,8 +10,6 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.user.dart/user.dart';
 
-import '../widgets/window_media_query.dart';
-
 export 'package:lib.app.dart/app.dart' show ApplicationContext;
 
 /// A wrapper widget intended to be the root of the application that is
@@ -32,9 +30,6 @@ class DankUserShellWidget extends StatelessWidget {
   /// The [UserShellImpl] whose services to [advertise].
   final DankUserShellImpl _userShell;
 
-  /// Callback that is fired when the screen dimensions of the UserShell changes
-  final VoidCallback onWindowMetricsChanged;
-
   /// [Widget] for the rest of the User Shell
   final Widget child;
 
@@ -48,14 +43,12 @@ class DankUserShellWidget extends StatelessWidget {
   /// Constructor.
   factory DankUserShellWidget({
     ApplicationContext applicationContext,
-    VoidCallback onWindowMetricsChanged,
     Widget child,
     OnDankUserShellReady onReady,
     VoidCallback onStop,
   }) {
     return new DankUserShellWidget._create(
       applicationContext: applicationContext,
-      onWindowMetricsChanged: onWindowMetricsChanged,
       child: child,
       onReady: onReady,
       onStop: onStop,
@@ -69,7 +62,6 @@ class DankUserShellWidget extends StatelessWidget {
     UserShellBinding userShellBinding,
     LifecycleBinding lifecycleBinding,
     this.child,
-    this.onWindowMetricsChanged,
     this.onReady,
     this.onStop,
   })
@@ -88,18 +80,7 @@ class DankUserShellWidget extends StatelessWidget {
         );
 
   @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new Material(
-          child: new Directionality(
-        textDirection: TextDirection.ltr,
-        child: new WindowMediaQuery(
-          onWindowMetricsChanged: onWindowMetricsChanged,
-          child: child,
-        ),
-      )),
-    );
-  }
+  Widget build(BuildContext context) => child;
 
   /// Advertises [_userShell] as a [UserShell] to the rest of the system via
   /// the [ApplicationContext].
