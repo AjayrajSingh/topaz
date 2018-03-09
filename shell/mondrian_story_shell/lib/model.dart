@@ -376,6 +376,8 @@ class SurfaceGraph extends Model {
         .._connection = new ChildViewConnection(
           viewOwner,
           onAvailable: (ChildViewConnection connection) {
+            trace('surface $id available');
+
             // If this surface is the last focused one, also request input focus
             if (_lastFocusedSurface == surface) {
               connection.requestFocus();
@@ -384,6 +386,7 @@ class SurfaceGraph extends Model {
             surface.notifyListeners();
           },
           onUnavailable: (ChildViewConnection connection) {
+            trace('surface $id unavailable');
             surface._connection = null;
             if (_surfaces.containsValue(surface)) {
               removeSurface(id);

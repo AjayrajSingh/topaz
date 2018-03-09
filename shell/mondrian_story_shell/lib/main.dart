@@ -3,8 +3,10 @@
 // found in the LICENSE file.
 
 import 'dart:convert';
+import 'dart:ui' show window;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuchsia/fuchsia.dart' show exit;
 import 'package:lib.app.dart/app.dart';
@@ -73,6 +75,7 @@ class StoryShellImpl implements StoryShell, Lifecycle {
     SurfaceRelation surfaceRelation,
     ModuleManifest manifest,
   ) {
+    trace('connecting view $viewId with parent $parentId');
     log.fine('Connecting view $viewId with parent $parentId');
     _surfaceGraph
       ..addSurface(
@@ -88,12 +91,14 @@ class StoryShellImpl implements StoryShell, Lifecycle {
   /// Focus the view with this id
   @override
   void focusView(String viewId, String relativeViewId) {
+    trace('focusing view $viewId');
     _surfaceGraph.focusSurface(viewId, relativeViewId);
   }
 
   /// Defocus the view with this id
   @override
   void defocusView(String viewId, void callback()) {
+    trace('defocusing view $viewId');
     _surfaceGraph.dismissSurface(viewId);
     // TODO(alangardner, djmurphy): Make Mondrian not crash if the process
     // associated with viewId is closed after callback returns.
@@ -110,6 +115,7 @@ class StoryShellImpl implements StoryShell, Lifecycle {
       List<ContainerLayout> layout,
       List<ContainerRelationEntry> relationships,
       List<ContainerView> views) {
+    trace('adding container $containerName with parent $parentId');
     SurfaceProperties props =
         new SurfaceProperties(containerLayouts: layout[0].surfaces);
     _surfaceGraph.addSurface(
@@ -124,6 +130,7 @@ class StoryShellImpl implements StoryShell, Lifecycle {
   /// Terminate the StoryShell.
   @override
   void terminate() {
+    trace('terminating');
     log.info('StoryShellImpl::terminate call');
     _storyContext.ctrl.close();
     _storyShellBinding.close();
@@ -146,36 +153,40 @@ class MondrianState extends State<Mondrian> {
   bool _showOverview = false;
 
   @override
-  Widget build(BuildContext context) => new Stack(
-        children: <Widget>[
-          new ScopedModel<SurfaceGraph>(
-            model: _surfaceGraph,
-            child: _showOverview ? const Overview() : new SurfaceDirector(),
-          ),
-          new Positioned(
-            left: 0.0,
-            bottom: 0.0,
-            child: new GestureDetector(
-              child: new Container(
-                width: 40.0,
-                height: 40.0,
-                child: _showOverview ? const MondrianLogo() : null,
-              ),
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                setState(() {
-                  _showOverview = !_showOverview;
-                });
-              },
+  Widget build(BuildContext context) {
+    _traceFrame();
+    return new Stack(
+      children: <Widget>[
+        new ScopedModel<SurfaceGraph>(
+          model: _surfaceGraph,
+          child: _showOverview ? const Overview() : new SurfaceDirector(),
+        ),
+        new Positioned(
+          left: 0.0,
+          bottom: 0.0,
+          child: new GestureDetector(
+            child: new Container(
+              width: 40.0,
+              height: 40.0,
+              child: _showOverview ? const MondrianLogo() : null,
             ),
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              setState(() {
+                _showOverview = !_showOverview;
+              });
+            },
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 }
 
 /// Entry point.
 void main() {
   setupLogger(name: 'Mondrian');
+  trace('starting');
   log.info('Started');
 
   LayoutModel layoutModel = new LayoutModel();
@@ -211,13 +222,16 @@ void main() {
 
   _appContext.outgoingServices
     ..addServiceForName((InterfaceRequest<StoryShell> request) {
+      trace('story shell request');
       log.fine('Received binding request for StoryShell');
       _storyShellImpl.bindStoryShell(request);
     }, StoryShell.serviceName)
     ..addServiceForName((InterfaceRequest<Lifecycle> request) {
+      trace('lifecycle request');
       log.fine('Received binding request for Lifecycle');
       _storyShellImpl.bindLifecycle(request);
     }, Lifecycle.serviceName);
+  trace('started');
 }
 
 class _DeviceMapWatcherImpl extends DeviceMapWatcher {
@@ -226,6 +240,7 @@ class _DeviceMapWatcherImpl extends DeviceMapWatcher {
   _DeviceMapWatcherImpl({this.onProfileChanged});
   @override
   void onDeviceMapChange(DeviceMapEntry entry) {
+    trace('device map changed');
     Object decodedJson = json.decode(entry.profile);
     if (decodedJson is Map<String, String>) {
       onProfileChanged(decodedJson);
@@ -235,5 +250,21 @@ class _DeviceMapWatcherImpl extends DeviceMapWatcher {
             ' ${entry.profile}',
       );
     }
+  }
+}
+
+int _frameCounter = 1;
+void _traceFrame() {
+  Size size = window.physicalSize / window.devicePixelRatio;
+  trace('building, size: $size');
+  SchedulerBinding.instance.addPostFrameCallback(_frameCallback);
+}
+
+void _frameCallback(Duration duration) {
+  Size size = window.physicalSize / window.devicePixelRatio;
+  trace('frame $_frameCounter, size: $size');
+  _frameCounter++;
+  if (size.isEmpty) {
+    SchedulerBinding.instance.addPostFrameCallback(_frameCallback);
   }
 }
