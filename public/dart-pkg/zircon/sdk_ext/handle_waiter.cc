@@ -4,7 +4,7 @@
 
 #include "dart-pkg/zircon/sdk_ext/handle_waiter.h"
 
-#include <async/default.h>
+#include <lib/async/default.h>
 
 #include "dart-pkg/zircon/sdk_ext/handle.h"
 #include "lib/tonic/converter/dart_converter.h"

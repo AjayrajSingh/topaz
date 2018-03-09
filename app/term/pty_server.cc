@@ -4,11 +4,11 @@
 
 #include "topaz/app/term/pty_server.h"
 
-#include <async/default.h>
 #include <fcntl.h>
 #include <fdio/io.h>
 #include <fdio/private.h>
 #include <launchpad/launchpad.h>
+#include <lib/async/default.h>
 #include <poll.h>
 #include <unistd.h>
 #include <zircon/device/pty.h>

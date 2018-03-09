@@ -4,7 +4,7 @@
 
 #include "topaz/shell/ermine_user_shell/view_controller.h"
 
-#include <async/default.h>
+#include <lib/async/default.h>
 
 #include <algorithm>
 #include <utility>

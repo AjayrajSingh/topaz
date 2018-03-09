@@ -4,8 +4,8 @@
 
 #include "topaz/app/term/view_controller.h"
 
-#include <async/default.h>
-#include <async/loop.h>
+#include <lib/async/default.h>
+#include <lib/async/loop.h>
 #include <unistd.h>
 #include <zircon/status.h>
 
