@@ -7,6 +7,7 @@
 #include <string>
 
 #include "gtest/gtest.h"
+#include "lib/fxl/logging.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
 
 namespace auth_providers {
@@ -27,7 +28,7 @@ class OAuthRequestBuilderTest : public ::testing::Test {
 
 TEST_F(OAuthRequestBuilderTest, JsonEncodedPostRequest) {
   rapidjson::Document json_doc;
-  json_doc.Parse("{\"test_key\":\"test_val\"}");
+  json_doc.Parse(R"({"test_key":"test_val"})");
 
   // convert json document to string
   rapidjson::StringBuffer strbuf;
@@ -108,6 +109,22 @@ TEST_F(OAuthRequestBuilderTest, GetRequest) {
   auto req = OAuthRequestBuilder(kTestUrl, kGetMethod).Build();
 
   EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
+  EXPECT_EQ(req->method, kGetMethod);
+}
+
+TEST_F(OAuthRequestBuilderTest, GetRequestWithQueryParams) {
+  std::map<std::string, std::string> params;
+  params["foo1"] = "bar1";
+  params["foo2"] = "bar2";
+  params["foo3"] = "bar 3";
+  auto req =
+      OAuthRequestBuilder(kTestUrl, kGetMethod).SetQueryParams(params).Build();
+
+  EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
+  EXPECT_TRUE(req->url.get().find("foo1") != std::string::npos);
+  EXPECT_TRUE(req->url.get().find("foo2") != std::string::npos);
+  // check if the param values are url encoded
+  EXPECT_TRUE(req->url.get().find("bar%203") != std::string::npos);
   EXPECT_EQ(req->method, kGetMethod);
 }
 

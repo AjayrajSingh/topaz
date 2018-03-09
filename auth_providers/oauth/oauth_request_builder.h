@@ -16,7 +16,7 @@ namespace oauth {
 //     - https://tools.ietf.org/html/rfc6749
 class OAuthRequestBuilder {
  public:
-  OAuthRequestBuilder(std::string url, std::string method);
+  OAuthRequestBuilder(const std::string& url, const std::string& method);
 
   ~OAuthRequestBuilder();
 
@@ -34,6 +34,11 @@ class OAuthRequestBuilder {
   // content-length fields for posting JSON data.
   OAuthRequestBuilder& SetJsonBody(const std::string& body);
 
+  // Url encodes the query params which are appended to the url string while
+  // building the request.
+  OAuthRequestBuilder& SetQueryParams(
+      std::map<std::string, std::string> query_params);
+
   // Returns an HTTP |URLRequest| handle for the OAuth endpoint.
   network::URLRequestPtr Build() const;
 
@@ -43,6 +48,7 @@ class OAuthRequestBuilder {
 
   const std::string url_;
   const std::string method_;
+  std::string query_string_;
   std::string request_body_;
   std::map<std::string, std::string> http_headers_;
 };

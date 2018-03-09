@@ -199,16 +199,16 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
     return;
   }
 
-  std::string url =
-      kFirebaseAuthEndpoint + std::string("?key=") + firebase_api_key.get();
-
-  auto request = OAuthRequestBuilder(url, "POST")
+  std::map<std::string, std::string> query_params;
+  query_params["key"] = firebase_api_key.get();
+  auto request = OAuthRequestBuilder(kFirebaseAuthEndpoint, "POST")
+                     .SetQueryParams(query_params)
                      .SetJsonBody(
                          R"({"postBody": "id_token=)" + id_token.get() +
-                         "&providerId=google.com\"," +
-                         "   \"returnIdpCredential\": true," +
-                         "   \"returnSecureToken\": true," +
-                         R"(   "requestUri": "http://localhost")" + "}");
+                         R"(&providerId=google.com",)" +
+                         R"("returnIdpCredential": true,)" +
+                         R"("returnSecureToken": true,)" +
+                         R"("requestUri": "http://localhost"})");
 
   // Exchange credential to access token at Google OAuth token endpoint
   auto request_factory = fxl::MakeCopyable(

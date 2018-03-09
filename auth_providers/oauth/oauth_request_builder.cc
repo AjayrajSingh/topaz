@@ -43,10 +43,11 @@ std::string UrlEncode(const std::string& value) {
 
 }  // namespace
 
-OAuthRequestBuilder::OAuthRequestBuilder(std::string url, std::string method)
-    : url_(UrlEncode(url)), method_(method) {
-  FXL_CHECK(!url.empty());
-  FXL_CHECK(!method.empty());
+OAuthRequestBuilder::OAuthRequestBuilder(const std::string& url,
+                                         const std::string& method)
+    : url_(url), method_(method) {
+  FXL_CHECK(!url_.empty());
+  FXL_CHECK(!method_.empty());
 }
 
 OAuthRequestBuilder::~OAuthRequestBuilder() {}
@@ -74,13 +75,22 @@ OAuthRequestBuilder& OAuthRequestBuilder::SetJsonBody(const std::string& body) {
   return SetRequestBody(body);
 }
 
+OAuthRequestBuilder& OAuthRequestBuilder::SetQueryParams(
+    std::map<std::string, std::string> query_params) {
+  for (auto it = query_params.begin(); it != query_params.end(); ++it) {
+    query_string_ += (it == query_params.begin() ? "?" : "&");
+    query_string_ += UrlEncode(it->first) + "=" + UrlEncode(it->second);
+  }
+  return *this;
+}
+
 network::URLRequestPtr OAuthRequestBuilder::Build() const {
   fsl::SizedVmo data;
   auto result = fsl::VmoFromString(request_body_, &data);
-  FXL_DCHECK(result);
+  FXL_CHECK(result);
 
   auto request = network::URLRequest::New();
-  request->url = url_;
+  request->url = url_ + query_string_;
   request->method = method_;
   request->auto_follow_redirects = true;
   request->body = ::network::URLBody::New();
