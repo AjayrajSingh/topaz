@@ -3,11 +3,10 @@
         "cpp"
     ],
     "imports": [
-        "topaz/packages/curl",
-        "topaz/packages/sqlite"
+        "topaz/packages/prod/curl",
+        "topaz/packages/prod/sqlite"
     ],
     "labels": [
         "//topaz/runtime/web_view:webkit"
     ]
 }
-

@@ -1,0 +1,11 @@
+{
+    "languages": [
+        "dart"
+    ],
+    "imports": [
+        "topaz/packages/prod/chat",
+        "topaz/packages/prod/contacts",
+        "topaz/packages/prod/music",
+        "topaz/packages/prod/video"
+    ]
+}

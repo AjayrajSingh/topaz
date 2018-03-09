@@ -4,8 +4,7 @@
         "dart"
     ],
     "imports": [
-        "topaz/packages/modular_examples",
-        "topaz/packages/ui_examples"
+        "garnet/packages/drivers"
     ],
     "packages": {
         "ble_rect": "//topaz/examples/bluetooth/ble_rect",

@@ -1,0 +1,14 @@
+{
+    "languages": [
+        "cpp"
+    ],
+    "imports": [
+        "garnet/packages/fonts",
+        "garnet/packages/mozart",
+        "topaz/packages/prod/curl",
+        "topaz/packages/prod/sqlite"
+    ],
+    "packages": {
+        "web_view": "//topaz/runtime/web_view"
+    }
+}

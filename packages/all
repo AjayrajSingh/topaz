@@ -1,0 +1,8 @@
+{
+    "imports": [
+        "topaz/packages/examples/all",
+        "topaz/packages/prod/all",
+        "topaz/packages/tests/all",
+        "topaz/packages/tools/all"
+    ]
+}

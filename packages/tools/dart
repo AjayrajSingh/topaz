@@ -1,7 +1,4 @@
 {
-    "imports": [
-      "topaz/packages/doc_checker"
-    ],
     "languages": [
         "dart"
     ],

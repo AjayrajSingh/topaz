@@ -1,0 +1,32 @@
+{
+    "imports": [
+        "topaz/packages/prod/bluetooth_settings",
+        "topaz/packages/prod/chat",
+        "topaz/packages/prod/color",
+        "topaz/packages/prod/contacts",
+        "topaz/packages/prod/curl",
+        "topaz/packages/prod/dart",
+        "topaz/packages/prod/dart_runner",
+        "topaz/packages/prod/dashboard",
+        "topaz/packages/prod/documents",
+        "topaz/packages/prod/file_explorer",
+        "topaz/packages/prod/flutter",
+        "topaz/packages/prod/google_auth_provider",
+        "topaz/packages/prod/image",
+        "topaz/packages/prod/infinite_scroller",
+        "topaz/packages/prod/latin-ime",
+        "topaz/packages/prod/maxwell",
+        "topaz/packages/prod/mods",
+        "topaz/packages/prod/mondrian",
+        "topaz/packages/prod/music",
+        "topaz/packages/prod/oauth_token_manager",
+        "topaz/packages/prod/perspective",
+        "topaz/packages/prod/sqlite",
+        "topaz/packages/prod/sysui",
+        "topaz/packages/prod/todo",
+        "topaz/packages/prod/video",
+        "topaz/packages/prod/webkit",
+        "topaz/packages/prod/web_view",
+        "topaz/packages/prod/xi"
+    ]
+}
