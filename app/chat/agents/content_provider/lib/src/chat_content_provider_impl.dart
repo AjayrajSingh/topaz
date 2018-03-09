@@ -372,8 +372,13 @@ class ChatContentProviderImpl extends ChatContentProvider {
         _conversationsPage.put(
           conversationId,
           encodeLedgerValue(<String, dynamic>{
-            'participants':
-                participants.map((Participant p) => p.toJson()).toList(),
+            'participants': participants
+                .map((Participant p) => <String, String>{
+                      'email': p.email,
+                      'displayName': p.displayName,
+                      'photoUrl': p.photoUrl
+                    })
+                .toList(),
           }),
           statusCompleter.complete,
         );
@@ -569,7 +574,11 @@ class ChatContentProviderImpl extends ChatContentProvider {
         encodeLedgerValue(<String, dynamic>{
           'title': title,
           'participants': conversation.participants
-              .map((Participant p) => p.toJson())
+              .map((Participant p) => <String, String>{
+                    'email': p.email,
+                    'displayName': p.displayName,
+                    'photoUrl': p.photoUrl
+                  })
               .toList(),
         }),
         statusCompleter.complete,

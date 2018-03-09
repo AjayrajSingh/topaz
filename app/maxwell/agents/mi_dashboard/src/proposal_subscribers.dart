@@ -7,29 +7,15 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.fidl.dart/bindings.dart' as fidl;
+import 'package:lib.images.fidl/encoded_image.fidl.dart';
 import 'package:lib.suggestion.fidl._debug/debug.fidl.dart';
-import 'package:zircon/zircon.dart' as zircon;
+import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart';
 
 import 'data_handler.dart';
 
 // ignore_for_file: public_member_api_docs
 
 Function listEqual = const ListEquality<ProposalSummary>().equals;
-
-/// Helper for encoding some FIDL types.
-Object _toEncodable(Object object) {
-  if (object is fidl.Struct) {
-    return object.toJson();
-  }
-  if (object is fidl.FidlEnum) {
-    return object.toString();
-  }
-  if (object is zircon.Vmo) {
-    return 'Vmo(handle=${object.handle} size=${object.getSize()})';
-  }
-  return object;
-}
 
 class ProposalSubscribersDataHandler extends AskProposalListener
     with NextProposalListener, InterruptionProposalListener, DataHandler {
@@ -48,16 +34,45 @@ class ProposalSubscribersDataHandler extends AskProposalListener
 
   SendWebSocketMessage _sendMessage;
 
-  String makeJsonMessage() {
+  Map<String, dynamic> _encodeEncodedImage(EncodedImage ei) =>
+      <String, int>{'size': ei.size};
+
+  Map<String, dynamic> _encodeSuggestionDisplayImage(
+          SuggestionDisplayImage sdi) =>
+      <String, dynamic>{
+        'image': _encodeEncodedImage(sdi.image),
+        'type': sdi.imageType.fidlEnumValue,
+      };
+
+  Map<String, dynamic> _encodeSuggestionDisplay(SuggestionDisplay sd) =>
+      <String, dynamic>{
+        'headline': sd.headline,
+        'subheadline': sd.subheadline,
+        'details': sd.details,
+        'color': sd.color,
+        'annoyance': sd.annoyance.fidlEnumValue,
+        'icons': sd.icons.map(_encodeSuggestionDisplayImage).toList(),
+        'image': _encodeSuggestionDisplayImage(sd.image),
+      };
+
+  Map<String, dynamic> _encodeProposalSummary(ProposalSummary ps) =>
+      <String, dynamic>{
+        'id': ps.id,
+        'publisherUrl': ps.publisherUrl,
+        'display': _encodeSuggestionDisplay(ps.display),
+      };
+
+  String _makeJsonMessage() {
     return JSON.encode(<String, dynamic>{
       'suggestions': <String, dynamic>{
         'ask_query': _lastQuery,
-        'ask_proposals': _lastAskProposals,
-        'selection': _lastSelectedProposal,
-        'next_proposals': _currentNextProposals,
-        'interruption': _lastInterruptionProposal,
+        'ask_proposals': _lastAskProposals.map(_encodeProposalSummary).toList(),
+        'selection': _encodeProposalSummary(_lastSelectedProposal),
+        'next_proposals':
+            _currentNextProposals.map(_encodeProposalSummary).toList(),
+        'interruption': _encodeProposalSummary(_lastInterruptionProposal),
       }
-    }, toEncodable: _toEncodable);
+    });
   }
 
   @override
@@ -86,7 +101,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
 
   @override
   void handleNewWebSocket(WebSocket socket) {
-    socket.add(makeJsonMessage());
+    socket.add(_makeJsonMessage());
   }
 
   @override
@@ -94,7 +109,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
     if (!listEqual(_lastAskProposals, proposals) || (_lastQuery != query)) {
       _lastAskProposals = proposals;
       _lastQuery = query;
-      _sendMessage(makeJsonMessage());
+      _sendMessage(_makeJsonMessage());
     }
   }
 
@@ -102,7 +117,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
   void onProposalSelected(ProposalSummary selectedProposal) {
     if (_lastSelectedProposal != selectedProposal) {
       _lastSelectedProposal = selectedProposal;
-      _sendMessage(makeJsonMessage());
+      _sendMessage(_makeJsonMessage());
     }
   }
 
@@ -110,7 +125,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
   void onNextUpdate(List<ProposalSummary> proposals) {
     if (!listEqual(_currentNextProposals, proposals)) {
       _currentNextProposals = proposals;
-      _sendMessage(makeJsonMessage());
+      _sendMessage(_makeJsonMessage());
     }
   }
 
@@ -118,7 +133,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
   void onInterrupt(ProposalSummary interruptionProposal) {
     if (_lastInterruptionProposal != interruptionProposal) {
       _lastInterruptionProposal = interruptionProposal;
-      _sendMessage(makeJsonMessage());
+      _sendMessage(_makeJsonMessage());
     }
   }
 }

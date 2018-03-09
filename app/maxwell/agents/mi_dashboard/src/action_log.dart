@@ -62,7 +62,12 @@ class ActionLogDataHandler extends ActionLogListener with DataHandler {
   @override
   void onAction(UserAction action) {
     _actionLogCache.add(action);
-    _sendMessage(JSON
-        .encode(<String, dynamic>{'action_log.new_action': action.toJson()}));
+    _sendMessage(JSON.encode(<String, dynamic>{
+      'action_log.new_action': <String, String>{
+        'componentUrl': action.componentUrl,
+        'method': action.method,
+        'parameters': action.parameters,
+      }
+    }));
   }
 }
