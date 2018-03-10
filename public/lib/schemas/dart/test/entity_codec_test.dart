@@ -3,10 +3,9 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-// import 'dart:convert';
 
 import 'package:test/test.dart';
-import 'package:lib.app_driver.dart/entity_codec.dart';
+import 'package:lib.schemas.dart/entity_codec.dart';
 
 void main() {
   group('EntityCodec<T> streaming transform', () {
@@ -27,15 +26,7 @@ void main() {
 
       expect(results.length, equals(list.length));
     });
-
-    // test('codec.decoder.startChunkedConversion(sink)', () {
-
-    // }, skip: true);
   });
-
-  // test('wut', () {
-  //   expect(true, equals(false));
-  // });
 }
 
 class BasicExample {

@@ -4,8 +4,8 @@
 
 import 'dart:convert' show json;
 
-import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.schemas.dart/entity_codec.dart';
 
 import 'video_progress.dart';
 
@@ -13,14 +13,15 @@ const String _kDurationKey = 'duration_msec';
 const String _kProgressKey = 'normalized_progress';
 
 /// Codec for reading/writing VideoProgress Entities to a Link.
+// TODO(MS-1319): move to //topaz/public/lib/schemas
 class VideoProgressEntityCodec extends EntityCodec<VideoProgress> {
   /// Constuctor assigns the proper values to en/decode VideoProgress objects.
-  VideoProgressEntityCodec() :
-    super(
-      type: 'com.fucshia.video.progress',
-      encode: _toJson,
-      decode: _fromJson,
-    );
+  VideoProgressEntityCodec()
+      : super(
+          type: 'com.fucshia.video.progress',
+          encode: _toJson,
+          decode: _fromJson,
+        );
 
   // Create a VideoProgress from a Map previously output by toMap()
   static VideoProgress _fromJson(Object data) {
@@ -37,8 +38,10 @@ class VideoProgressEntityCodec extends EntityCodec<VideoProgress> {
       return null;
     }
     Map<String, dynamic> map = decode;
-    if (map[_kDurationKey] == null || !(map[_kDurationKey] is int) ||
-        map[_kProgressKey] == null || !(map[_kProgressKey] is double)) {
+    if (map[_kDurationKey] == null ||
+        !(map[_kDurationKey] is int) ||
+        map[_kProgressKey] == null ||
+        !(map[_kProgressKey] is double)) {
       return null;
     }
     return new VideoProgress(map[_kDurationKey], map[_kProgressKey]);

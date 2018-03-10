@@ -4,8 +4,8 @@
 
 import 'dart:convert' show json;
 
-import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.schemas.dart/entity_codec.dart';
 
 import 'asset.dart';
 
@@ -23,6 +23,7 @@ const String _kRemoteType = 'remote';
 /// Uri of the movie. When reading an Asset as an Entity, this class hard
 /// codes the same values that were in the original code from which it
 /// was ported.
+// TODO(MS-1319): move to //topaz/public/lib/schemas
 class AssetEntityCodec extends EntityCodec<Asset> {
   /// Constuctor assigns the proper values to en/decode VideoProgress objects.
   AssetEntityCodec()

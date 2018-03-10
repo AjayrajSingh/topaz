@@ -10,7 +10,6 @@ dart_library("dart") {
 
   sources = [
     "app_driver.dart",
-    "entity_codec.dart",
     "module_driver.dart",
   ]
 
@@ -22,18 +21,7 @@ dart_library("dart") {
     "//topaz/public/lib/entity/dart",
     "//topaz/public/lib/lifecycle/dart",
     "//topaz/public/lib/module/dart",
+    "//topaz/public/lib/schemas/dart",
     "//topaz/public/lib/story/dart",
-  ]
-}
-
-dart_test("test") {
-  sources = [
-    "entity_codec_test.dart",
-  ]
-
-  deps = [
-    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
-    "//third_party/dart-pkg/pub/test",
-    "//topaz/public/lib/app_driver/dart",
   ]
 }

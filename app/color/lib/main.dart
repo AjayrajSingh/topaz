@@ -9,20 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
+import 'package:lib.schemas.dart/com.fuchsia.color.dart';
 
 import 'src/color_model.dart';
-import 'src/parse_int.dart';
 
 /// The amount of time between color updates.
 const Duration _kUpdateDuration = const Duration(seconds: 5);
 
-/// This codec is used by the [ModuleDriver] to automatically translate values
-/// to and from an Entity's source data.
-final EntityCodec<Color> codec = new EntityCodec<Color>(
-  type: 'com.fuchsia.color',
-  encode: (Color color) => color.value.toString(),
-  decode: (String data) => new Color(parseInt(data)),
-);
+/// Used to translate raw Entity data into structured values.
+final ColorEntityCodec _kColorCodec = new ColorEntityCodec();
 
 /// Main entry point to the color module.
 void main() {
@@ -41,8 +36,8 @@ void main() {
   /// Use [ColorEntity#watch] to access a stream of change events for the
   /// 'color' Link's Entity updates. Since this module updates it's own Entity
   /// value the `all` param is set to true.
-  module.watch('color', codec, all: true).listen(
-        (Color color) => model.color = color,
+  module.watch('color', _kColorCodec, all: true).listen(
+        (ColorEntityData data) => model.color = new Color(data.value),
         cancelOnError: true,
         onError: handleError,
         onDone: () => log.info('update stream closed'),
@@ -79,17 +74,19 @@ void handleStart(ModuleDriver module) {
   /// started with.
   log.info('module ready, link values will periodically update');
 
+  final Random rand = new Random();
+
   /// Change the [entity]'s value to a random color periodically.
   new Timer.periodic(_kUpdateDuration, (_) async {
-    Random rand = new Random();
-    Color color = new Color.fromRGBO(
-      rand.nextInt(255), // red
-      rand.nextInt(255), // green
-      rand.nextInt(255), // red
-      1.0,
-    );
+    ColorEntityData value = new ColorEntityData(
+        value: (new Color.fromRGBO(
+                rand.nextInt(255), // red
+                rand.nextInt(255), // green
+                rand.nextInt(255), // red
+                1.0)
+            .value));
 
-    return module.put('color', color, codec).then(
+    return module.put('color', value, _kColorCodec).then(
         (String ref) => log.fine('updated entity: $ref'),
         onError: handleError);
   });

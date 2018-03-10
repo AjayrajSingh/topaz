@@ -16,12 +16,10 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.module.dart/module.dart';
 import 'package:lib.story.dart/story.dart';
 import 'package:meta/meta.dart';
-
-import 'entity_codec.dart';
+import 'package:lib.schemas.dart/entity_codec.dart';
 
 export 'package:lib.module.dart/module.dart' show ModuleControllerClient;
 export 'package:lib.story.dart/story.dart' show LinkClient;
-export 'entity_codec.dart';
 
 /// Function definition to handle [data] that is received from a message queue.
 typedef void OnReceiveMessage(String data, void ack());
