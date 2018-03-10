@@ -21,11 +21,6 @@
              path="third_party/freetype2"
              remote="https://fuchsia.googlesource.com/third_party/freetype2"
              gerrithost="https://fuchsia-review.googlesource.com"/>
-    <project name="third_party/git"
-             path="third_party/git"
-             remote="https://fuchsia.googlesource.com/third_party/git"
-             gerrithost="https://fuchsia-review.googlesource.com"
-             githooks="manifest/git-hooks"/>
     <project name="third_party/harfbuzz"
              path="third_party/harfbuzz"
              remote="https://fuchsia.googlesource.com/third_party/harfbuzz"
