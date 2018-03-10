@@ -10,7 +10,6 @@
 #include <utility>
 
 #include "lib/app/cpp/connect.h"
-#include "lib/ui/scenic/fidl/scene_manager.fidl.h"
 #include "topaz/shell/ermine_user_shell/find_unique_ptr.h"
 #include "topaz/shell/ermine_user_shell/tile.h"
 
