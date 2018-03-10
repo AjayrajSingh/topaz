@@ -76,7 +76,7 @@ class CounterParentModuleModel extends ModuleModel {
 
     // Start the child module and obtain the ViewOwner.
     InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
-    moduleContext.startModule(
+    moduleContext.startModuleDeprecated(
       'counter_child',
       _kChildModuleUrl,
       null, // null means that the child gets the same link as the parent.

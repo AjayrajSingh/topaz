@@ -31,8 +31,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
                       modular::LinkWatcher {
  public:
   ControllerApp(app::ApplicationContext* const application_context)
-      : SingleServiceApp(application_context),
-        link_watcher_binding_(this) {}
+      : SingleServiceApp(application_context), link_watcher_binding_(this) {}
 
   ~ControllerApp() override = default;
 
@@ -73,10 +72,9 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
     view_link_->Watch(link_watcher_binding_.NewBinding());
 
     f1dl::InterfaceHandle<mozart::ViewOwner> view;
-    module_context_->StartModule("suggest_shell_view",
-                                 "suggest_shell_view",
-                                 kViewLink, nullptr,
-                                 view_module_.NewRequest(), view.NewRequest());
+    module_context_->StartModuleDeprecated(
+        "suggest_shell_view", "suggest_shell_view", kViewLink, nullptr,
+        view_module_.NewRequest(), view.NewRequest());
 
     ConnectView(std::move(view));
 

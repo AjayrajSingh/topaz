@@ -51,7 +51,7 @@ class Chatter {
     const String chatLinkName = 'chatLink';
     moduleContext
       ..getLink(chatLinkName, linkProxy.ctrl.request())
-      ..startModuleInShell(
+      ..startModuleInShellDeprecated(
         'module:chat',
         _kChatConversationModuleUrl,
         chatLinkName,

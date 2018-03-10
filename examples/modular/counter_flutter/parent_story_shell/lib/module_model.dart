@@ -68,7 +68,7 @@ class CounterParentModuleModel extends ModuleModel {
     link.setSchema(_kJsonSchema);
 
     // Start the child module using story shell.
-    moduleContext.startModuleInShell(
+    moduleContext.startModuleInShellDeprecated(
       'counter_child',
       _kChildModuleUrl,
       null, // null means that the child gets the same link as the parent.

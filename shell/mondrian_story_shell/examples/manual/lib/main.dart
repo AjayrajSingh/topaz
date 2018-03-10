@@ -61,13 +61,13 @@ class _ModuleStopperWatcher extends ModuleWatcher {
 }
 
 /// Starts a new module
-void startModuleInShell(SurfaceRelation relation) {
+void startModuleInShellDeprecated(SurfaceRelation relation) {
   ModuleControllerProxy moduleController = new ModuleControllerProxy();
 
   _childId++;
   String name = 'C$_childId';
 
-  _moduleContext.startModuleInShell(
+  _moduleContext.startModuleInShellDeprecated(
     name,
     _kModuleUrl,
     null, // link
@@ -102,7 +102,7 @@ class LaunchModuleButton extends StatelessWidget {
           child: new Text(_display),
         ),
         onPressed: () {
-          startModuleInShell(_relation);
+          startModuleInShellDeprecated(_relation);
         },
       ),
     );

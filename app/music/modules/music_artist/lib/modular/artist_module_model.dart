@@ -271,7 +271,7 @@ class ArtistModuleModel extends ModuleModel {
         ..set(<String>[], initialData)
         ..ctrl.close();
 
-      moduleContext.startModuleInShell(
+      moduleContext.startModuleInShellDeprecated(
         moduleName,
         url,
         linkName,
@@ -286,7 +286,7 @@ class ArtistModuleModel extends ModuleModel {
   /// Starts the embedded Playback Module
   void _startPlaybackModule() {
     InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
-    moduleContext.startModule(
+    moduleContext.startModuleDeprecated(
       'Music Playback',
       _kPlaybackModuleUrl,
       '',

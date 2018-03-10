@@ -172,7 +172,7 @@ class ModuleContextClient {
     return completer.future;
   }
 
-  /// See [fidl.ModuleContext#startDaisy].
+  /// See [fidl.ModuleContext#startModule].
   Future<ModuleControllerClient> startModule({
     @required String module,
     @required Daisy daisy,
@@ -202,12 +202,12 @@ class ModuleContextClient {
       }
     });
 
-    void handleDaisyStatus(fidl.StartDaisyStatus status) {
+    void handleDaisyStatus(fidl.StartModuleStatus status) {
       switch (status) {
-        case fidl.StartDaisyStatus.success:
+        case fidl.StartModuleStatus.success:
           completer.complete(controller);
           break;
-        case fidl.StartDaisyStatus.noModulesFound:
+        case fidl.StartModuleStatus.noModulesFound:
           completer.completeError(new ResolutionException('no modules found'));
           break;
         default:
@@ -217,7 +217,7 @@ class ModuleContextClient {
     }
 
     try {
-      proxy.startDaisy(
+      proxy.startModule(
         module,
         daisy,
         null, // incomingServices

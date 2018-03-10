@@ -317,13 +317,13 @@ class ModuleDriver {
   }
 
   ///
-  Future<Null> embedDaisy() async {
+  Future<Null> embedModule() async {
     Completer<Null> completer = new Completer<Null>();
 
     log.fine('embeding daisy');
 
     completer
-        .completeError(new StateError('TODO(): implement md.embedDaisy(...)'));
+        .completeError(new StateError('TODO(): implement md.embedModule(...)'));
 
     return completer.future;
   }

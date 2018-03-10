@@ -149,7 +149,7 @@ class EventPageModuleModel extends ModuleModel {
         _webViewLink = new LinkProxy();
         moduleContext.getLink(_kWebViewLinkName, _webViewLink.ctrl.request());
         _webViewLink.set(null, linkData);
-        moduleContext.startModuleInShell(
+        moduleContext.startModuleInShellDeprecated(
           'Purchase Web View',
           web_view.kWebViewURL,
           _kWebViewLinkName,

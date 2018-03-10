@@ -121,7 +121,7 @@ class EventListModuleModel extends ModuleModel {
 
       // Start the Event Module if it hasn't been started
       if (!_startedEventModule) {
-        moduleContext.startModuleInShell(
+        moduleContext.startModuleInShellDeprecated(
           'event_module',
           'concert_event_page',
           'event_link',

@@ -141,7 +141,7 @@ class BrowserModuleModel extends ModuleModel {
         notifyListeners();
       });
     } else {
-      moduleContext.startModuleInShell(
+      moduleContext.startModuleInShellDeprecated(
         'info',
         _kInfoModuleUrl,
         null, // default link
@@ -174,13 +174,13 @@ class BrowserModuleModel extends ModuleModel {
       log.fine('Created Daisy for $_currentDoc.id');
 
       // Open a new module using Module Resolution
-      moduleContext.startDaisy(
+      moduleContext.startModule(
         'video',
         daisyBuilder.daisy,
         null, // incomingServices
         _moduleController.ctrl.request(),
         _kSurfaceRelation,
-        (StartDaisyStatus status) {
+        (StartModuleStatus status) {
           // Handle daisy resolution here
           log.info('Start daisy status = $status');
         },

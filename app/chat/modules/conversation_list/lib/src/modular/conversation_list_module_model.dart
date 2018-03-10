@@ -282,7 +282,7 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   /// Start the chat_conversation module in story shell.
   void _startConversationModule() {
-    moduleContext.startModuleInShell(
+    moduleContext.startModuleInShellDeprecated(
       'chat_conversation',
       _kChatConversationModuleUrl,
       null, // Pass on our default link to the child.
@@ -318,13 +318,13 @@ class ChatConversationListModuleModel extends ModuleModel {
 
     InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
     moduleContext
-      ..embedDaisy(
+      ..embedModule(
         name, // mod name
         daisyBuilder.daisy,
         null,  // incomingServices
         _pickerModuleController.ctrl.request(),
         viewOwner.passRequest(),
-        (StartDaisyStatus status) {
+        (StartModuleStatus status) {
           // Handle daisy resolution here
           log.info('Start daisy status = $status');
         },

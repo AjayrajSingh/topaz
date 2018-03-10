@@ -145,7 +145,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
     _webviewModuleControllerProxy?.ctrl?.close();
     _webviewModuleControllerProxy = new ModuleControllerProxy();
 
-    moduleContext.startModuleInShell(
+    moduleContext.startModuleInShellDeprecated(
       'module:web_view',
       web_view.kWebViewURL,
       webViewLinkName,

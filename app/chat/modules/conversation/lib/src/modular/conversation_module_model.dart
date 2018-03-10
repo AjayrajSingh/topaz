@@ -545,7 +545,7 @@ class ChatConversationModuleModel extends ModuleModel {
             log.fine('CommandMessage::onDelete');
             deleteMessage(m.messageId);
           },
-          onRefresh: embedder.restartDaisy,
+          onRefresh: embedder.restartModule,
           payload: m.jsonPayload,
           initializer: (CommandType commandType, List<String> args) {
             // Supports "/mod <verb> <message>".
@@ -589,7 +589,7 @@ class ChatConversationModuleModel extends ModuleModel {
                         ..addNoun('originalMessage', messageEntity)
                         ..addNoun('members', membersEntity);
 
-                  embedder.startDaisy(
+                  embedder.startModule(
                     daisy: daisyBuilder.daisy,
                     name: mid,
                     additionalLinkData: additionalLinkData,
@@ -606,7 +606,7 @@ class ChatConversationModuleModel extends ModuleModel {
                       new DaisyBuilder.verb('com.google.fuchsia.play')
                         ..addNoun('asset', args[0]);
 
-                  embedder.startDaisy(
+                  embedder.startModule(
                     daisy: daisyBuilder.daisy,
                     name: mid,
                   );
@@ -755,7 +755,7 @@ class ChatConversationModuleModel extends ModuleModel {
     _closeChildModule();
     _childModuleController = new ModuleControllerProxy();
 
-    moduleContext.startModuleInShell(
+    moduleContext.startModuleInShellDeprecated(
       name,
       url,
       linkName,

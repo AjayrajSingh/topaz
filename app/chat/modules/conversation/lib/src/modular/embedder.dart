@@ -131,16 +131,16 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
     _daisyStarted = false;
   }
 
-  /// Restarts the Daisy from the previous startDaisy call.
-  void restartDaisy() {
+  /// Restarts the Daisy from the previous startModule call.
+  void restartModule() {
     assert(daisyStarted);
 
     close();
-    startDaisy(daisy: daisy, name: name);
+    startModule(daisy: daisy, name: name);
   }
 
   /// Starts a Daisy.
-  void startDaisy({
+  void startModule({
     @required Daisy daisy,
     @required String name,
     Object additionalLinkData,
@@ -163,13 +163,13 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
     moduleController = new ModuleControllerProxy();
     InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
 
-    moduleContext.embedDaisy(
+    moduleContext.embedModule(
       name, // module name
       daisy,
       null, // incomingServices
       moduleController.ctrl.request(),
       viewOwnerPair.passRequest(),
-      (StartDaisyStatus status) {
+      (StartModuleStatus status) {
         // Handle daisy resolution here
         log.info('Start daisy status = $status');
       },

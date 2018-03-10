@@ -116,7 +116,7 @@ class ContactListModuleModel extends ModuleModel {
   }
 
   void _startContactCardModule() {
-    moduleContext.startModuleInShell(
+    moduleContext.startModuleInShellDeprecated(
       'contact_card',
       _kContactCardModuleUrl,
       null, // Passes default link to the child
