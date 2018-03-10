@@ -21,7 +21,6 @@
         "topaz/packages/latin-ime",
         "topaz/packages/ledger",
         "topaz/packages/link_viewer",
-        "topaz/packages/lua",
         "topaz/packages/maxwell",
         "topaz/packages/mods",
         "topaz/packages/mondrian",
