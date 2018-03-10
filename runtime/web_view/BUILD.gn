@@ -82,7 +82,8 @@ group("webkit") {
 }
 
 if (use_prebuilt_webkit) {
-  assert(current_toolchain_variant == "",
+  assert(toolchain_variant.name == "" || toolchain_variant.name == "debug" ||
+             toolchain_variant.name == "release",
          "Set use_prebuilt_webkit=false when selecting variants for web_view.")
 
   if (target_cpu == "x64") {
@@ -197,7 +198,9 @@ package("web_view_link_test_package") {
     ":web_view_link_test",
   ]
 
-  tests = [ {
-        name = "web_view_link_test"
-      } ]
+  tests = [
+    {
+      name = "web_view_link_test"
+    },
+  ]
 }
