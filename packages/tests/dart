@@ -3,8 +3,10 @@
         "cpp",
         "dart"
     ],
+    "imports": [
+        "topaz/packages/prod/dart"
+    ],
     "packages": {
-        "dart": "//third_party/dart/runtime/bin:package",
         "dart_aot_runner_test": "//topaz/runtime/dart_runner/integration:dart_aot_runner_test",
         "dart_jit_runner_test": "//topaz/runtime/dart_runner/integration:dart_jit_runner_test"
     }
