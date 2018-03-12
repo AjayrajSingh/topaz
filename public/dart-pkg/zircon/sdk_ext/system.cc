@@ -342,8 +342,8 @@ Dart_Handle System::VmoWrite(fxl::RefPtr<Handle> vmo,
   }
 
   size_t actual;
-  zx_status_t status = zx_vmo_write(vmo->handle(), data.data(), offset,
-                                    data.length_in_bytes(), &actual);
+  zx_status_t status = zx_vmo_write_old(vmo->handle(), data.data(), offset,
+                                        data.length_in_bytes(), &actual);
 
   data.Release();
   return ConstructDartObject(kWriteResult, ToDart(status), ToDart(actual));
@@ -360,7 +360,7 @@ Dart_Handle System::VmoRead(fxl::RefPtr<Handle> vmo,
   ByteDataScope bytes(size);
   size_t actual;
   zx_status_t status =
-      zx_vmo_read(vmo->handle(), bytes.data(), offset, size, &actual);
+      zx_vmo_read_old(vmo->handle(), bytes.data(), offset, size, &actual);
   bytes.Release();
   if (status == ZX_OK) {
     FXL_DCHECK(actual <= size);
