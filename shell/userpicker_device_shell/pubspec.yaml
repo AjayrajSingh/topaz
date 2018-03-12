@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+name: userpicker_device_shell
 flutter:
   assets:
     - packages/userpicker_device_shell/res/bg.jpg

@@ -3,13 +3,14 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/args.dart';
 
 import 'package:front_end/src/api_prototype/compiler_options.dart';
 
+import 'package:kernel/ast.dart';
+import 'package:kernel/binary/ast_to_binary.dart';
 import 'package:kernel/binary/limited_ast_to_binary.dart';
 import 'package:kernel/target/targets.dart';
 
@@ -17,8 +18,7 @@ import 'package:vm/kernel_front_end.dart' show compileToKernel;
 import 'package:vm/target/runner.dart';
 
 ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
-  ..addOption('sdk-root',
-      help: 'Path to runner_patched_sdk')
+  ..addOption('sdk-root', help: 'Path to runner_patched_sdk')
   ..addFlag('aot',
       help: 'Run compiler in AOT mode (enables whole-program transformations)',
       defaultsTo: false)
@@ -26,14 +26,10 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
       help: 'Run compiler in strong mode (uses strong mode semantics)',
       defaultsTo: false)
   ..addFlag('embed-sources',
-      help: 'Embed sources in the output dill file',
-      defaultsTo: false)
-  ..addOption('packages',
-      help: 'Path to .packages file')
-  ..addOption('depfile',
-      help: 'Path to output Ninja depfile')
-  ..addOption('output',
-      help: 'Path to output dill file');
+      help: 'Embed sources in the output dill file', defaultsTo: false)
+  ..addOption('packages', help: 'Path to .packages file')
+  ..addOption('depfile', help: 'Path to output Ninja depfile')
+  ..addOption('output', help: 'Path to output dill file');
 
 String _usage = '''
 Usage: compiler [options] [input.dart]
@@ -61,7 +57,6 @@ Future<void> main(List<String> args) async {
     print('ERROR: $error\n');
     print(_usage);
     exitCode = 1;
-    return;
   }
 
   final Uri sdkRoot = _ensureFolderPath(options['sdk-root']);
@@ -76,29 +71,29 @@ Future<void> main(List<String> args) async {
   final Uri filenameUri = Uri.base.resolveUri(new Uri.file(filename));
 
   final CompilerOptions compilerOptions = new CompilerOptions()
-      ..sdkRoot = sdkRoot
-      ..strongMode = strongMode
-      ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
-      ..target = new RunnerTarget(new TargetFlags(strongMode: strongMode))
-      ..embedSourceText = embedSources
-      ..reportMessages = true
-      ..setExitCodeOnProblem = true;
+    ..sdkRoot = sdkRoot
+    ..strongMode = strongMode
+    ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
+    ..target = new RunnerTarget(new TargetFlags(strongMode: strongMode))
+    ..embedSourceText = embedSources
+    ..reportMessages = true
+    ..setExitCodeOnProblem = true;
 
   if (aot) {
     // Link in the platform to produce an output with no external references.
-    String platformKernelDill = strongMode ? 'platform_strong.dill'
-                                           : 'platform.dill';
+    String platformKernelDill =
+        strongMode ? 'platform_strong.dill' : 'platform.dill';
     compilerOptions.linkedDependencies = <Uri>[
       sdkRoot.resolve(platformKernelDill)
     ];
   }
 
-  Program program = await compileToKernel(filenameUri, compilerOptions, aot: aot);
+  Program program =
+      await compileToKernel(filenameUri, compilerOptions, aot: aot);
 
   final IOSink sink = new File(kernelBinaryFilename).openWrite();
-  final BinaryPrinter printer =
-      new LimitedBinaryPrinter(sink, (Library lib) => aot || !lib.isExternal,
-                               false /* excludeUriToSource */);
+  final BinaryPrinter printer = new LimitedBinaryPrinter(sink,
+      (Library lib) => aot || !lib.isExternal, false /* excludeUriToSource */);
   printer.writeProgramFile(program);
   await sink.close();
 
@@ -112,7 +107,8 @@ String escapePath(String path) {
 }
 
 // https://ninja-build.org/manual.html#_depfile
-Future<void> writeDepfile(Program program, String output, String depfile) async {
+Future<void> writeDepfile(
+    Program program, String output, String depfile) async {
   var deps = new List<Uri>();
   for (Library lib in program.libraries) {
     deps.add(lib.fileUri);

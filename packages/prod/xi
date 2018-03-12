@@ -3,6 +3,9 @@
         "dart",
         "rust"
     ],
+    "labels": [
+        "//topaz/app/xi"
+    ],
     "packages": {
         "xi_app": "//topaz/app/xi/modules/xi_app"
     }

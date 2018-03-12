@@ -118,7 +118,8 @@ class BLERectModuleModel extends ModuleModel
         type: _colorUuid,
         properties: <gatt.CharacteristicProperty>[
           gatt.CharacteristicProperty.write,
-          gatt.CharacteristicProperty.reliableWrite],
+          gatt.CharacteristicProperty.reliableWrite
+        ],
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
           new gatt.Descriptor(
@@ -132,7 +133,8 @@ class BLERectModuleModel extends ModuleModel
         id: _scaleId,
         type: _scaleUuid,
         properties: <gatt.CharacteristicProperty>[
-          gatt.CharacteristicProperty.write],
+          gatt.CharacteristicProperty.write
+        ],
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
           new gatt.Descriptor(
@@ -146,7 +148,8 @@ class BLERectModuleModel extends ModuleModel
         id: _rotateId,
         type: _rotateUuid,
         properties: <gatt.CharacteristicProperty>[
-          gatt.CharacteristicProperty.writeWithoutResponse],
+          gatt.CharacteristicProperty.writeWithoutResponse
+        ],
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
           new gatt.Descriptor(
@@ -247,7 +250,11 @@ class BLERectModuleModel extends ModuleModel
 
   @override
   void onCharacteristicConfiguration(
-      int characteristicId, String peerId, bool notify, bool indicate) {}
+      int characteristicId,
+      String peerId,
+      // ignore: avoid_positional_boolean_parameters
+      bool notify,
+      bool indicate) {}
 
   @override
   void onReadValue(int id, int offset,

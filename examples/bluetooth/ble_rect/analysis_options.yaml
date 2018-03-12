@@ -3,8 +3,3 @@
 # found in the LICENSE file.
 
 include: ../../../tools/analysis_options.yaml
-
-analyzer:
-  errors:
-    avoid_positional_boolean_parameters: ignore
-    public_member_api_docs: ignore

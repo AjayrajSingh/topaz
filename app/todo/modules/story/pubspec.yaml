@@ -4,8 +4,6 @@
 
 name: todo_story
 description: A new flutter project.
-
-dependencies:
 dev_dependencies:
   test: any
   flutter_test:

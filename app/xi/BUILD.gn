@@ -7,7 +7,6 @@ group("xi") {
     # NOTE: comment out the `//topaz/app/xi/modules` line below to build only the
     # services before manually compiling xi-core.
     "//topaz/app/xi/modules",
-    "//topaz/app/xi/services",
     "//topaz/app/xi/xi_flutter",
   ]
 }

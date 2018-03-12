@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+name: wifi_settings
 flutter:
   assets:
     - assets/ic_signal_wifi_0_bar_white_48dp.png

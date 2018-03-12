@@ -31,5 +31,5 @@ void _setReturnCode(int returnCode) native 'SetReturnCode';
 
 void exit(int returnCode) {
   _setReturnCode(returnCode);
-  Isolate.current.kill(priority: Isolate.IMMEDIATE);
+  Isolate.current.kill(priority: Isolate.immediate);
 }

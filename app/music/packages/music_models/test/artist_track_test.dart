@@ -13,10 +13,10 @@ void main() {
     String rawJson = await new File('mock_json/artist.json').readAsString();
     dynamic decoded = json.decode(rawJson);
     Artist artist = new Artist.fromJson(decoded);
-    expect(artist.name, json['name']);
-    expect(artist.images[0].url, json['images'][0]['url']);
-    expect(artist.genres.contains(json['genres'][0]), true);
-    expect(artist.id, json['id']);
-    expect(artist.followersCount, json['followers']['total']);
+    expect(artist.name, decoded['name']);
+    expect(artist.images[0].url, decoded['images'][0]['url']);
+    expect(artist.genres.contains(decoded['genres'][0]), true);
+    expect(artist.id, decoded['id']);
+    expect(artist.followersCount, decoded['followers']['total']);
   });
 }
