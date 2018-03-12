@@ -19,7 +19,6 @@ import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
 
 import 'hit_test_model.dart';
-import 'story_importance_watcher_impl.dart';
 import 'story_provider_watcher_impl.dart';
 
 const int _kMaxActiveClusters = 6;
@@ -50,9 +49,6 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
   final StoryProviderWatcherBinding _storyProviderWatcherBinding =
       new StoryProviderWatcherBinding();
 
-  final StoryImportanceWatcherBinding _storyImportanceWatcherBinding =
-      new StoryImportanceWatcherBinding();
-
   /// Called the first time the [StoryProvider] returns stories.
   final VoidCallback onStoriesFirstAvailable;
 
@@ -72,7 +68,6 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
   /// Call to close all the handles opened by this story generator.
   void close() {
     _storyProviderWatcherBinding.close();
-    _storyImportanceWatcherBinding.close();
     for (StoryControllerProxy storyControllerProxy
         in _storyControllerMap.values) {
       storyControllerProxy.ctrl.close();
@@ -81,36 +76,15 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
 
   /// Sets the [StoryProvider] used to get and start stories.
   set storyProvider(StoryProviderProxy storyProvider) {
-    _storyProvider = storyProvider;
-    _storyProvider
+    _storyProvider = storyProvider
       ..watch(
-        _storyProviderWatcherBinding.wrap(
-          new StoryProviderWatcherImpl(
-            onStoryChanged: _onStoryChanged,
-            onStoryDeleted: _removeStory,
+          _storyProviderWatcherBinding.wrap(
+            new StoryProviderWatcherImpl(
+              onStoryChanged: _onStoryChanged,
+              onStoryDeleted: _removeStory,
+            ),
           ),
-        ),
-      )
-      ..watchImportance(
-        _storyImportanceWatcherBinding.wrap(
-          new StoryImportanceWatcherImpl(
-            onImportanceChanged: () {
-              _storyProvider
-                  .getImportance((List<StoryImportanceEntry> importanceList) {
-                // TODO: Do something better than O(n^2).
-                for (StoryImportanceEntry entry in importanceList) {
-                  for (Story story in _currentStories) {
-                    if (story.id.value == entry.id) {
-                      story.importance = entry.importance ?? 1.0;
-                    }
-                  }
-                }
-                notifyListeners();
-              });
-            },
-          ),
-        ),
-      );
+        );
     update();
   }
 

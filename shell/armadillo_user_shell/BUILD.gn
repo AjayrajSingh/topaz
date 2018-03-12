@@ -27,7 +27,6 @@ flutter_aot_app("armadillo_user_shell") {
     "maxwell_voice_model.dart",
     "power_manager_power_model.dart",
     "rate_limited_retry.dart",
-    "story_importance_watcher_impl.dart",
     "story_provider_story_generator.dart",
     "story_provider_watcher_impl.dart",
     "suggestion_provider_suggestion_model.dart",

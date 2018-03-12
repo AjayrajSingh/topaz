@@ -18,7 +18,6 @@ const double _kMultiColumnWidthThreshold = 500.0;
 const int _kJugglingThresholdMinutes = 120;
 const int _kMaxJugglingStoryCount = 4;
 const int _kMinSideMargin = 8;
-const double _kStoryRelevanceScaleFactor = 0.15;
 
 /// Indicates the size and position a story should have.
 abstract class StoryLayout {
@@ -106,26 +105,6 @@ class StoryListLayout {
     // along the way.  See [_kJugglingThresholdMinutes].
     int jugglingStoryCount = 0; // The number of stories being juggled.
 
-    double minImportance = double.infinity;
-    double maxImportance = -double.infinity;
-    for (double importance in storyClustersToLayout
-        .map((StoryCluster storyCluster) => storyCluster.importance)) {
-      minImportance = math.min(minImportance, importance);
-      maxImportance = math.max(maxImportance, importance);
-    }
-    double meanImportance = (maxImportance + minImportance) / 2.0;
-    double importanceToScaleFactor(double importance) {
-      if (importance > meanImportance) {
-        return 1.0 +
-            math.min(importance - meanImportance, _kStoryRelevanceScaleFactor);
-      } else if (importance < meanImportance) {
-        return 1.0 -
-            math.min(meanImportance - importance, _kStoryRelevanceScaleFactor);
-      } else {
-        return 1.0;
-      }
-    }
-
     List<_StoryMetadata> stories = new List<_StoryMetadata>.generate(
       storyClustersToLayout.length,
       (int index) {
@@ -155,9 +134,6 @@ class StoryListLayout {
           interactionMinutes:
               storyClusterToLayout.cumulativeInteractionDuration.inMinutes,
           jugglingMinutes: storyJugglingMinutes,
-          importanceScaleFactor: importanceToScaleFactor(
-            storyClusterToLayout.importance,
-          ),
         );
       },
     );
@@ -191,9 +167,8 @@ class StoryListLayout {
       // size.width in single column mode.
       story.size = new Size(
         width *
-            (_multiColumn ? jugglingScaling : 1.0) *
-            (_multiColumn ? story.importanceScaleFactor : 1.0),
-        height * story.importanceScaleFactor,
+            (_multiColumn ? jugglingScaling : 1.0),
+        height,
       );
 
       storyIndex++;
@@ -472,7 +447,6 @@ class StoryListLayout {
 class _StoryMetadata extends StoryLayout {
   final int interactionMinutes;
   final int jugglingMinutes;
-  final double importanceScaleFactor;
 
   @override
   Offset offset = Offset.zero;
@@ -483,7 +457,6 @@ class _StoryMetadata extends StoryLayout {
   _StoryMetadata({
     this.interactionMinutes,
     this.jugglingMinutes,
-    this.importanceScaleFactor,
   });
 
   double get right => offset.dx + size.width;

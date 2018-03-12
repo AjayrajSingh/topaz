@@ -80,9 +80,6 @@ class Story {
   /// The location of the story's widget within its cluster.
   Panel panel;
 
-  /// The importance of the story relative to other stories.
-  double importance;
-
   /// The index of the cluster this story is in.
   int _clusterIndex;
 
@@ -95,7 +92,6 @@ class Story {
     DateTime lastInteraction,
     this.cumulativeInteractionDuration: Duration.zero,
     this.themeColor: Colors.black,
-    this.importance: 1.0,
     this.onClusterIndexChanged,
     StoryClusterId clusterId,
     SimulatedPaddingModel simulatedPaddingState,
@@ -199,7 +195,6 @@ class Story {
         lastInteraction: lastInteraction,
         cumulativeInteractionDuration: cumulativeInteractionDuration,
         themeColor: themeColor,
-        importance: importance,
         onClusterIndexChanged: onClusterIndexChanged,
         clusterId: clusterId,
         simulatedPaddingState: simulatedPaddingModel,
