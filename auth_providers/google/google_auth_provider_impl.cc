@@ -114,7 +114,7 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
     const f1dl::String& credential, const f1dl::String& app_client_id,
     const f1dl::Array<f1dl::String> app_scopes,
     const GetAppAccessTokenCallback& callback) {
-  if (credential.empty()) {
+  if (credential->empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
     return;
   }
@@ -155,7 +155,7 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
 void GoogleAuthProviderImpl::GetAppIdToken(
     const f1dl::String& credential, const f1dl::String& audience,
     const GetAppIdTokenCallback& callback) {
-  if (credential.empty()) {
+  if (credential->empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
     return;
   }
@@ -194,7 +194,7 @@ void GoogleAuthProviderImpl::GetAppIdToken(
 void GoogleAuthProviderImpl::GetAppFirebaseToken(
     const f1dl::String& id_token, const f1dl::String& firebase_api_key,
     const GetAppFirebaseTokenCallback& callback) {
-  if (id_token.empty() || firebase_api_key.empty()) {
+  if (id_token->empty() || firebase_api_key->empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
     return;
   }
@@ -240,7 +240,7 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
 void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
     const f1dl::String& credential,
     const RevokeAppOrPersistentCredentialCallback& callback) {
-  if (credential.empty()) {
+  if (credential->empty()) {
     callback(AuthProviderStatus::BAD_REQUEST);
     return;
   }

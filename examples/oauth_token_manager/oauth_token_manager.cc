@@ -275,7 +275,7 @@ void Post(const std::string& request_body,
       failure_callback(
           Status::NETWORK_ERROR,
           "POST error: " + std::to_string(response->error->code) +
-              " , with description: " + response->error->description.data());
+              " , with description: " + response->error->description->data());
       return;
     }
 
@@ -356,7 +356,7 @@ void Get(
       failure_callback(
           Status::NETWORK_ERROR,
           "GET error: " + std::to_string(response->error->code) +
-              " ,with description: " + response->error->description.data());
+              " ,with description: " + response->error->description->data());
       return;
     }
 

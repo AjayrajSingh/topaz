@@ -135,7 +135,7 @@ bool DartApplicationController::SetupNamespace() {
     }
     zx::channel dir = std::move(flat->directories[i]);
     zx_handle_t dir_handle = dir.release();
-    const char* path = flat->paths[i].data();
+    const char* path = flat->paths[i]->data();
     status = fdio_ns_bind(namespace_, path, dir_handle);
     if (status != ZX_OK) {
       FXL_LOG(ERROR) << "Failed to bind " << flat->paths[i] << " to namespace";

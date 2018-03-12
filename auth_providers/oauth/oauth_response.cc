@@ -22,9 +22,9 @@ OAuthResponse ParseOAuthResponse(const network::URLResponsePtr response) {
     FXL_LOG(ERROR) << "Encountered error: " +
                           std::to_string(response->error->code) +
                           " ,with description: " +
-                          response->error->description.data();
+                          response->error->description->data();
     return OAuthResponse(AuthProviderStatus::NETWORK_ERROR,
-                         response->error->description.data(), std::move(out));
+                         response->error->description->data(), std::move(out));
   }
 
   std::string response_body;
