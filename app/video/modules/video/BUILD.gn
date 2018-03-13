@@ -10,6 +10,7 @@ flutter_app("video") {
   main_dart = "lib/main.dart"
 
   manifest = "pubspec.yaml"
+  module_manifest = "manifest.json"
 
   deps = [
     "//garnet/public/lib/netconnector/fidl:fidl_dart",

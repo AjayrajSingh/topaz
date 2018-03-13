@@ -5,9 +5,9 @@
 assert(is_fuchsia || is_fuchsia_host)
 
 import("//build/dart/dart_library.gni")
-import("//build/package.gni")
 import("//build/dart/toolchain.gni")
 import("//build/package.gni")
+import("//peridot/build/verify_module_manifest.gni")
 import("//third_party/flutter/lib/ui/dart_ui.gni")
 import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
 import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
@@ -17,7 +17,8 @@ declare_args() {
   flutter_app_default_is_jit = true
 }
 
-gen_snapshot_label = "//third_party/dart/runtime/bin:gen_snapshot($host_toolchain)"
+gen_snapshot_label =
+    "//third_party/dart/runtime/bin:gen_snapshot($host_toolchain)"
 gen_snapshot_dir = get_label_info(gen_snapshot_label, "root_out_dir")
 gen_snapshot = "$gen_snapshot_dir/gen_snapshot"
 
@@ -27,10 +28,11 @@ flutter_tools_label =
 flutter_tools_out_dir = get_label_info(flutter_tools_label, "root_out_dir")
 flutter_tools_bin = "$flutter_tools_out_dir/dart-tools/fuchsia_builder"
 
-flutter_asset_tools_label =
-    "$flutter_base/packages/flutter_tools:fuchsia_asset_builder($host_toolchain)"
-flutter_asset_tools_out_dir = get_label_info(flutter_asset_tools_label, "root_out_dir")
-flutter_asset_tools_bin = "$flutter_asset_tools_out_dir/dart-tools/fuchsia_asset_builder"
+flutter_asset_tools_label = "$flutter_base/packages/flutter_tools:fuchsia_asset_builder($host_toolchain)"
+flutter_asset_tools_out_dir =
+    get_label_info(flutter_asset_tools_label, "root_out_dir")
+flutter_asset_tools_bin =
+    "$flutter_asset_tools_out_dir/dart-tools/fuchsia_asset_builder"
 
 template("flutter_source_app") {
   assert(defined(invoker.main_dart), "Must define main_dart")
@@ -47,8 +49,10 @@ template("flutter_source_app") {
                              "deps",
                              "disable_analysis",
                              "source_dir",
+                             "non_dart_deps",
                            ])
     package_name = package_name
+
     # dart:mozart.internal imports package:zircon.
     deps += [ "//topaz/public/dart/zircon" ]
 
@@ -60,16 +64,16 @@ template("flutter_source_app") {
     if (defined(invoker.source_dir)) {
       source_base = invoker.source_dir
     }
-    sources += [
-      rebase_path(invoker.main_dart, source_base),
-    ]
+    sources += [ rebase_path(invoker.main_dart, source_base) ]
   }
 
-  dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+  dart_target_gen_dir =
+      get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
   dot_packages = "$dart_target_gen_dir/$dart_library_name.packages"
   manifest = "$dart_target_gen_dir/$dart_library_name.manifest"
   contents = "$dart_target_gen_dir/$dart_library_name.contents"
-  manifest_dot_packages = "$dart_target_gen_dir/$dart_library_name.manifest.packages"
+  manifest_dot_packages =
+      "$dart_target_gen_dir/$dart_library_name.manifest.packages"
 
   action("${target_name}_sources") {
     deps = [
@@ -98,7 +102,8 @@ template("flutter_source_app") {
       rebase_path(contents),
       "--url-mapping=dart:zircon," + rebase_path(zircon_sdk_ext_lib),
       "--url-mapping=dart:fuchsia," + rebase_path(fuchsia_sdk_ext_lib),
-      "--url-mapping=dart:mozart.internal," + rebase_path(mozart_dart_sdk_ext_lib),
+      "--url-mapping=dart:mozart.internal," +
+          rebase_path(mozart_dart_sdk_ext_lib),
       "--url-mapping=dart:ui," + rebase_path(dart_ui_path),
     ]
   }
@@ -139,6 +144,14 @@ template("flutter_source_app") {
     ]
   }
 
+  # Create a module manifest verification target.
+  if (defined(invoker.module_manifest)) {
+    verify_module_manifest("${target_name}_verify_manifest") {
+      original_target_name = invoker.target_name
+      module_manifest = invoker.module_manifest
+    }
+  }
+
   package(target_name) {
     if (defined(invoker.fuchsia_package_name)) {
       package_name = invoker.fuchsia_package_name
@@ -162,15 +175,24 @@ template("flutter_source_app") {
       {
         path = rebase_path("//topaz/runtime/flutter_runner/meta/source_runtime")
         dest = "runtime"
-      }
+      },
     ]
+    if (defined(invoker.module_manifest)) {
+      deps += [ ":${target_name}_verify_manifest" ]
+      meta += [
+        {
+          path = rebase_path(invoker.module_manifest)
+          dest = "module.json"
+        },
+      ]
+    }
 
     if (defined(invoker.sandbox)) {
       meta += [
         {
           path = rebase_path(invoker.sandbox)
           dest = "sandbox"
-        }
+        },
       ]
     }
   }
@@ -187,12 +209,14 @@ template("flutter_jit_app") {
                              "deps",
                              "disable_analysis",
                              "source_dir",
+                             "non_dart_deps",
                            ])
     if (defined(invoker.package_name)) {
       package_name = invoker.package_name
     } else {
       infer_package_name = true
     }
+
     # dart:mozart.internal imports package:zircon.
     deps += [ "//topaz/public/dart/zircon" ]
 
@@ -204,12 +228,11 @@ template("flutter_jit_app") {
     if (defined(invoker.source_dir)) {
       source_base = invoker.source_dir
     }
-    sources += [
-      rebase_path(invoker.main_dart, source_base),
-    ]
+    sources += [ rebase_path(invoker.main_dart, source_base) ]
   }
 
-  flutter_core_snapshot_label = "//third_party/flutter/lib/snapshot:generate_snapshot_bin"
+  flutter_core_snapshot_label =
+      "//third_party/flutter/lib/snapshot:generate_snapshot_bin"
   flutter_core_snapshot_gen_dir =
       get_label_info(flutter_core_snapshot_label, "target_gen_dir")
   flutter_core_snapshot_vm_data =
@@ -221,7 +244,8 @@ template("flutter_jit_app") {
   flutter_core_snapshot_isolate_instructions =
       "$flutter_core_snapshot_gen_dir/isolate_snapshot_instructions.bin"
 
-  dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+  dart_target_gen_dir =
+      get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
   dot_packages = "$dart_target_gen_dir/$dart_library_name.packages"
   snapshot_path = "$target_gen_dir/${target_name}_snapshot.bin"
   snapshot_depfile = "${snapshot_path}.d"
@@ -327,6 +351,14 @@ template("flutter_jit_app") {
     ]
   }
 
+  # Create a module manifest verification target.
+  if (defined(invoker.module_manifest)) {
+    verify_module_manifest("${target_name}_verify_manifest") {
+      original_target_name = invoker.target_name
+      module_manifest = invoker.module_manifest
+    }
+  }
+
   package(target_name) {
     if (defined(invoker.fuchsia_package_name)) {
       package_name = invoker.fuchsia_package_name
@@ -334,31 +366,45 @@ template("flutter_jit_app") {
     extra = [ asset_manifest ]
 
     deps = [
-      ":${target_name}_resources",
       ":$script_snapshot_label",
+      ":${target_name}_resources",
     ]
 
     resources = [
-      {
-        path = rebase_path(snapshot_path)
-        dest = "snapshot_blob.bin"
-      }
-    ] + invoker_resources
+                  {
+                    path = rebase_path(snapshot_path)
+                    dest = "snapshot_blob.bin"
+                  },
+                ] + invoker_resources
 
     meta = [
       {
         path = rebase_path("//topaz/runtime/flutter_runner/meta/jit_runtime")
         dest = "runtime"
-      }
+      },
     ]
+
+    if (defined(invoker.module_manifest)) {
+      deps += [ ":${target_name}_verify_manifest" ]
+      meta += [
+        {
+          path = rebase_path(invoker.module_manifest)
+          dest = "module.json"
+        },
+      ]
+    }
 
     if (defined(invoker.sandbox)) {
       meta += [
         {
           path = rebase_path(invoker.sandbox)
           dest = "sandbox"
-        }
+        },
       ]
+    }
+
+    if (defined(invoker.meta)) {
+      meta += invoker.meta
     }
   }
 }
@@ -374,12 +420,14 @@ template("flutter_aot_app") {
                              "deps",
                              "disable_analysis",
                              "source_dir",
+                             "non_dart_deps",
                            ])
     if (defined(invoker.package_name)) {
       package_name = invoker.package_name
     } else {
       infer_package_name = true
     }
+
     # dart:mozart.internal imports package:zircon.
     deps += [ "//topaz/public/dart/zircon" ]
 
@@ -391,12 +439,11 @@ template("flutter_aot_app") {
     if (defined(invoker.source_dir)) {
       source_base = invoker.source_dir
     }
-    sources += [
-      rebase_path(invoker.main_dart, source_base),
-    ]
+    sources += [ rebase_path(invoker.main_dart, source_base) ]
   }
 
-  dart_target_gen_dir = get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+  dart_target_gen_dir =
+      get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
   dot_packages = "$dart_target_gen_dir/$dart_library_name.packages"
   assembly_path = "$target_gen_dir/$target_name.S"
   assembly_depfile = "${assembly_path}.d"
@@ -447,7 +494,8 @@ template("flutter_aot_app") {
       "--entry-points-manifest",
       rebase_path("//third_party/flutter/runtime/dart_vm_entry_points.txt"),
       "--entry-points-manifest",
-      rebase_path("//third_party/flutter/runtime/dart_vm_entry_points_fuchsia.txt"),
+      rebase_path(
+          "//third_party/flutter/runtime/dart_vm_entry_points_fuchsia.txt"),
       "--entry-points-manifest",
       rebase_path("//third_party/dart/runtime/bin/dart_io_entries.txt"),
 
@@ -491,9 +539,8 @@ template("flutter_aot_app") {
     output_name = dylib_output_name
   }
 
-  dylib_path =
-      get_label_info(":$dylib_label($shlib_toolchain)", "target_gen_dir") +
-      "/lib$target_name.so"
+  dylib_path = get_label_info(":$dylib_label($shlib_toolchain)",
+                              "target_gen_dir") + "/lib$target_name.so"
 
   if (defined(invoker.resources)) {
     invoker_resources = invoker.resources
@@ -538,6 +585,14 @@ template("flutter_aot_app") {
     ]
   }
 
+  # Create a module manifest verification target.
+  if (defined(invoker.module_manifest)) {
+    verify_module_manifest("${target_name}_verify_manifest") {
+      original_target_name = invoker.target_name
+      module_manifest = invoker.module_manifest
+    }
+  }
+
   package(target_name) {
     if (defined(invoker.fuchsia_package_name)) {
       package_name = invoker.fuchsia_package_name
@@ -545,31 +600,45 @@ template("flutter_aot_app") {
     extra = [ asset_manifest ]
 
     deps = [
-      ":${target_name}_resources",
       ":$dylib_label",
+      ":${target_name}_resources",
     ]
 
     resources = [
-      {
-        path = rebase_path(dylib_path)
-        dest = "libapp.so"
-      }
-    ] + invoker_resources
+                  {
+                    path = rebase_path(dylib_path)
+                    dest = "libapp.so"
+                  },
+                ] + invoker_resources
 
     meta = [
       {
         path = rebase_path("//topaz/runtime/flutter_runner/meta/aot_runtime")
         dest = "runtime"
-      }
+      },
     ]
+
+    if (defined(invoker.module_manifest)) {
+      deps += [ ":${target_name}_verify_manifest" ]
+      meta += [
+        {
+          path = rebase_path(invoker.module_manifest)
+          dest = "module.json"
+        },
+      ]
+    }
 
     if (defined(invoker.sandbox)) {
       meta += [
         {
           path = rebase_path(invoker.sandbox)
           dest = "sandbox"
-        }
+        },
       ]
+    }
+
+    if (defined(invoker.meta)) {
+      meta += invoker.meta
     }
   }
 }
@@ -610,6 +679,7 @@ template("flutter_app") {
                                "source_dir",
                                "resources",
                                "sources",
+                               "module_manifest",
                              ])
     }
   } else {
@@ -626,6 +696,7 @@ template("flutter_app") {
                                "source_dir",
                                "resources",
                                "sources",
+                               "module_manifest",
                              ])
     }
   }

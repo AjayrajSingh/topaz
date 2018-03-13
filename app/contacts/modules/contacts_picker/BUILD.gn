@@ -8,6 +8,7 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("contacts_picker") {
   package_name = "contacts_picker"
   main_dart = "lib/main.dart"
+  module_manifest = "manifest.json"
 
   sources = [
     "stores.dart",

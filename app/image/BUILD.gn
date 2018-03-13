@@ -8,6 +8,8 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("image") {
   main_dart = "lib/main.dart"
 
+  module_manifest = "manifest.json"
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/logging:lib.logging",
