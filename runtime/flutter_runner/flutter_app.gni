@@ -14,7 +14,7 @@ import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
 import("//topaz/public/lib/ui/flutter/sdk_ext/sdk_ext.gni")
 
 declare_args() {
-  flutter_app_default_is_jit = is_debug
+  flutter_app_default_is_jit = true
 }
 
 gen_snapshot_label = "//third_party/dart/runtime/bin:gen_snapshot($host_toolchain)"
