@@ -87,7 +87,7 @@ void WebViewProvider::Terminate() {
 
 void WebViewProvider::Notify(const f1dl::String& json) {
   modular::JsonDoc parsed_json;
-  parsed_json.Parse(json.To<std::string>());
+  parsed_json.Parse(json);
 
   if (!parsed_json.IsObject()) {
     FXL_LOG(WARNING) << "Not an object: "
