@@ -148,13 +148,13 @@ Future<Null> main(List<String> args) async {
         continue;
       }
       final List<String> parts = link.split('#');
-      final String location =
-          parts[0].startsWith('/') ? parts[0].substring(1) : parts[0];
+      final String location = parts[0];
       if (location.isEmpty) {
         continue;
       }
-      final String absoluteLocation =
-          path.canonicalize(path.join(baseDir, location));
+      final String absoluteLocation = path.canonicalize(location.startsWith('/')
+          ? path.join(docsDir, location.substring(1))
+          : path.join(baseDir, location));
       if (path.isWithin(docsDir, absoluteLocation)) {
         final String relativeLocation =
             path.relative(absoluteLocation, from: docsDir);
