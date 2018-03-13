@@ -1,6 +1,6 @@
 {
     "imports": [
-        "peridot/packages/default",
+        "peridot/packages/dev_full",
         "topaz/packages/all"
     ]
 }
