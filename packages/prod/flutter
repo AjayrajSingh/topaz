@@ -5,8 +5,8 @@
     ],
     "imports": [
         "garnet/packages/fonts",
-        "garnet/packages/mozart",
-        "garnet/packages/icu_data"
+        "garnet/packages/icu_data",
+        "garnet/packages/scenic"
     ],
     "packages": {
         "flutter_aot_runner": "//third_party/flutter:flutter_aot_runner",

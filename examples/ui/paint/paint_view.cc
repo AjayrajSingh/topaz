@@ -24,7 +24,7 @@ PaintView::PaintView(
 PaintView::~PaintView() = default;
 
 void PaintView::OnSceneInvalidated(
-    ui_mozart::PresentationInfoPtr presentation_info) {
+    ui::PresentationInfoPtr presentation_info) {
   SkCanvas* canvas = AcquireCanvas();
   if (!canvas)
     return;

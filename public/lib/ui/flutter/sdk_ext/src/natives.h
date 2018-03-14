@@ -12,10 +12,10 @@ class View;
 
 class NativesDelegate {
  public:
-   virtual View* GetMozartView() = 0;
+  virtual View* GetMozartView() = 0;
 
  protected:
-   virtual ~NativesDelegate();
+  virtual ~NativesDelegate();
 };
 
 Dart_NativeFunction NativeLookup(Dart_Handle name,

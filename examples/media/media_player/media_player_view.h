@@ -33,7 +33,7 @@ class MediaPlayerView : public mozart::BaseView {
   // |BaseView|:
   void OnPropertiesChanged(mozart::ViewPropertiesPtr old_properties) override;
   void OnSceneInvalidated(
-      ui_mozart::PresentationInfoPtr presentation_info) override;
+      ui::PresentationInfoPtr presentation_info) override;
   void OnChildAttached(uint32_t child_key,
                        mozart::ViewInfoPtr child_view_info) override;
   void OnChildUnavailable(uint32_t child_key) override;

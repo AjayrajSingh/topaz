@@ -82,7 +82,7 @@ bool VuMeterView::OnInputEvent(mozart::InputEventPtr event) {
 }
 
 void VuMeterView::OnSceneInvalidated(
-    ui_mozart::PresentationInfoPtr presentation_info) {
+    ui::PresentationInfoPtr presentation_info) {
   SkCanvas* canvas = AcquireCanvas();
   if (canvas) {
     DrawContent(canvas);

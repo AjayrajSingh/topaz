@@ -52,7 +52,7 @@ class VuMeterView : public mozart::SkiaView {
 
   // |BaseView|:
   void OnSceneInvalidated(
-      ui_mozart::PresentationInfoPtr presentation_info) override;
+      ui::PresentationInfoPtr presentation_info) override;
   bool OnInputEvent(mozart::InputEventPtr event) override;
 
   // Draws the UI.

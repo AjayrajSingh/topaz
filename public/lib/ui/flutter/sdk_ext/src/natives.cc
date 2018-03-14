@@ -10,11 +10,11 @@
 #include <memory>
 #include <vector>
 
-#include "lib/ui/views/fidl/view_manager.fidl.h"
 #include "dart-pkg/zircon/sdk_ext/handle.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/macros.h"
+#include "lib/ui/views/fidl/view_manager.fidl.h"
 
 namespace mozart {
 
@@ -22,7 +22,7 @@ namespace mozart {
 #define DECLARE_FUNCTION(name, count) \
   extern void name(Dart_NativeArguments args);
 
-#define MOZART_NATIVE_LIST(V) V(Mozart_offerServiceProvider, 3)
+#define MOZART_NATIVE_LIST(V) V(Scenic_offerServiceProvider, 3)
 
 MOZART_NATIVE_LIST(DECLARE_FUNCTION);
 
@@ -72,7 +72,7 @@ const uint8_t* NativeSymbol(Dart_NativeFunction native_function) {
     }                                                            \
   }
 
-#define CHECK_HANDLE_ARGUMENT(args, num, result)                      \
+#define CHECK_HANDLE_ARGUMENT(args, num, result)                               \
   {                                                                            \
     Dart_Handle __arg = Dart_GetNativeArgument(args, num);                     \
     if (Dart_IsError(__arg)) {                                                 \
@@ -82,19 +82,18 @@ const uint8_t* NativeSymbol(Dart_NativeFunction native_function) {
     Dart_Handle __err = Dart_Null();                                           \
     *result = tonic::HandleTable::Current().Unwrap(__arg, &__err);             \
     if (Dart_IsError(__err)) {                                                 \
-      FXL_LOG(ERROR) << "Error unwrapping handle";  \
+      FXL_LOG(ERROR) << "Error unwrapping handle";                             \
       return;                                                                  \
     }                                                                          \
     if (*result == ZX_HANDLE_INVALID) {                                        \
-      FXL_LOG(INFO) << "Invalid handle from unwrap"; \
+      FXL_LOG(INFO) << "Invalid handle from unwrap";                           \
       return;                                                                  \
     }                                                                          \
   }
 
-
 NativesDelegate::~NativesDelegate() {}
 
-void Mozart_offerServiceProvider(Dart_NativeArguments args) {
+void Scenic_offerServiceProvider(Dart_NativeArguments args) {
   intptr_t context = 0;
   CHECK_INTEGER_ARGUMENT(args, 0, &context);
   fxl::RefPtr<zircon::dart::Handle> handle =

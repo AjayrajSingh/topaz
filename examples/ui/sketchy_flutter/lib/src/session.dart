@@ -4,14 +4,14 @@
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.ui.mozart.fidl/commands.fidl.dart';
-import 'package:lib.ui.mozart.fidl/mozart.fidl.dart';
-import 'package:lib.ui.mozart.fidl/session.fidl.dart';
-import 'package:lib.ui.mozart.fidl._presentation_info/presentation_info.fidl.dart';
-import 'package:lib.ui.scenic.fidl/ops.fidl.dart';
+import 'package:lib.ui.scenic.fidl/commands.fidl.dart';
+import 'package:lib.ui.scenic.fidl/scenic.fidl.dart';
+import 'package:lib.ui.scenic.fidl/session.fidl.dart';
+import 'package:lib.ui.scenic.fidl._presentation_info/presentation_info.fidl.dart';
+import 'package:lib.ui.gfx.fidl/ops.fidl.dart';
 import 'package:zircon/zircon.dart' as zircon;
 
-export 'package:lib.ui.mozart.fidl._presentation_info/presentation_info.fidl.dart'
+export 'package:lib.ui.scenic.fidl._presentation_info/presentation_info.fidl.dart'
     show PresentationInfo;
 
 // ignore_for_file: public_member_api_docs
@@ -23,14 +23,14 @@ class Session {
   final SessionProxy _session = new SessionProxy();
   List<Command> _ops = <Command>[];
 
-  Session.fromMozart(MozartProxy mozart) {
+  Session.fromScenic(ScenicProxy mozart) {
     mozart.createSession(_session.ctrl.request(), null);
   }
 
   factory Session.fromServiceProvider(ServiceProvider serviceProvider) {
-    final MozartProxy mozart = new MozartProxy();
+    final ScenicProxy mozart = new ScenicProxy();
     connectToService(serviceProvider, mozart.ctrl);
-    return new Session.fromMozart(mozart);
+    return new Session.fromScenic(mozart);
   }
 
   bool get hasEnqueuedOps => _ops.isNotEmpty;

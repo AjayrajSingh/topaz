@@ -11,7 +11,7 @@ int _context;
 
 Handle _viewContainer;
 
-class MozartStartupInfo {
+class ScenicStartupInfo {
   static Handle takeViewContainer() {
     final Handle handle = _viewContainer;
     _viewContainer = null;
@@ -19,11 +19,11 @@ class MozartStartupInfo {
   }
 }
 
-class Mozart {
+class Scenic {
   static void offerServiceProvider(Handle handle, List<String> services) {
     _offerServiceProvider(_context, handle, services);
   }
 
   static void _offerServiceProvider(int context, Handle handle,
-      List<String> services) native 'Mozart_offerServiceProvider';
+      List<String> services) native 'Scenic_offerServiceProvider';
 }

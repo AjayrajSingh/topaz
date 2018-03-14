@@ -37,7 +37,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   // |BaseView|:
   void OnPropertiesChanged(mozart::ViewPropertiesPtr old_properties) override;
   void OnSceneInvalidated(
-      ui_mozart::PresentationInfoPtr presentation_info) override;
+      ui::PresentationInfoPtr presentation_info) override;
   bool OnInputEvent(mozart::InputEventPtr event) override;
 
   // |TermModel::Delegate|:

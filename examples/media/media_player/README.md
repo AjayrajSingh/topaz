@@ -39,7 +39,7 @@ Note that the '--service' and '--remote' options are mutually exclusive. Unless
 you're using '--stay', A url or path must be supplied for local playback and
 may be supplied for remote control.
 
-The app responds to mouse clicks (touch on the Acer) and the keyboard. Mozart
+The app responds to mouse clicks (touch on the Acer) and the keyboard. Scenic
 requires a touch to focus the keyboard. Touching anywhere but the progress bar
 toggles between play and pause. Touching the progress bar does a seek to that
 point. The space bar toggles between play and pause. 'q' quits.

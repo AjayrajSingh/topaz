@@ -250,7 +250,7 @@ void MediaPlayerView::Layout() {
 }
 
 void MediaPlayerView::OnSceneInvalidated(
-    ui_mozart::PresentationInfoPtr presentation_info) {
+    ui::PresentationInfoPtr presentation_info) {
   if (!has_physical_size())
     return;
 

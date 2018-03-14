@@ -58,7 +58,7 @@ class ExpandSuggestion extends ExpansionBehavior {
     bool expansionWasDone = _expansionSimulation?.isDone ?? true;
     bool isDone = expansionWasDone;
 
-    // Hack(dayang): Removing opacity transition for now until Mozart 2 supports
+    // Hack(dayang): Removing opacity transition for now until Scenic 2 supports
     // opacity/transparency across physical models.
     // MZ-221
 
@@ -136,7 +136,7 @@ class ExpandSuggestion extends ExpansionBehavior {
   double get _expansionProgress =>
       _expansionSimulation.value / _kExpansionSimulationTarget;
 
-  // Hack(dayang): Removing opacity transition for now until Mozart 2 supports
+  // Hack(dayang): Removing opacity transition for now until Scenic 2 supports
   // opacity/transparency across physical models.
   // MZ-221
 

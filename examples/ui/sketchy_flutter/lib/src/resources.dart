@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.ui.scenic.fidl/nodes.fidl.dart' as scenic;
-import 'package:lib.ui.scenic.fidl/ops.fidl.dart' as scenic;
-import 'package:lib.ui.scenic.fidl/resources.fidl.dart' as scenic;
-import 'package:lib.ui.scenic.fidl/shapes.fidl.dart' as scenic;
-import 'package:lib.ui.scenic.fidl/types.fidl.dart' as scenic;
+import 'package:lib.ui.gfx.fidl/nodes.fidl.dart' as scenic;
+import 'package:lib.ui.gfx.fidl/ops.fidl.dart' as scenic;
+import 'package:lib.ui.gfx.fidl/resources.fidl.dart' as scenic;
+import 'package:lib.ui.gfx.fidl/shapes.fidl.dart' as scenic;
+import 'package:lib.ui.gfx.fidl/types.fidl.dart' as scenic;
 import 'package:zircon/zircon.dart';
 
 import 'session.dart';

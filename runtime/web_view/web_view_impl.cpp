@@ -235,7 +235,7 @@ bool WebViewImpl::OnInputEvent(mozart::InputEventPtr event) {
 
 // |BaseView|:
 void WebViewImpl::OnSceneInvalidated(
-    ui_mozart::PresentationInfoPtr presentation_info) {
+    ui::PresentationInfoPtr presentation_info) {
   if (!has_physical_size())
     return;
 

@@ -24,7 +24,7 @@ class PaintView : public mozart::SkiaView {
  private:
   // |BaseView|:
   void OnSceneInvalidated(
-      ui_mozart::PresentationInfoPtr presentation_info) override;
+      ui::PresentationInfoPtr presentation_info) override;
   bool OnInputEvent(mozart::InputEventPtr event) override;
 
   void DrawContent(SkCanvas* canvas);

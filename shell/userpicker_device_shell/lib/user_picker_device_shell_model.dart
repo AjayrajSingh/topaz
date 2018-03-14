@@ -14,7 +14,7 @@ import 'package:lib.ui.input.fidl/input_events.fidl.dart'
     show KeyboardEvent, KeyboardEventPhase;
 import 'package:lib.ui.presentation.fidl/display_usage.fidl.dart';
 import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
-import 'package:lib.ui.scenic.fidl/renderer.fidl.dart';
+import 'package:lib.ui.gfx.fidl/renderer.fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:lib.fidl.dart/bindings.dart';

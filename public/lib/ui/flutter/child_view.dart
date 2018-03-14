@@ -26,7 +26,7 @@ export 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart'
     show ViewOwner;
 
 ViewContainerProxy _initViewContainer() {
-  final Handle handle = MozartStartupInfo.takeViewContainer();
+  final Handle handle = ScenicStartupInfo.takeViewContainer();
   if (handle == null) {
     return null;
   }
@@ -392,7 +392,7 @@ class _RenderChildView extends RenderBox {
           _debugErrorMessage ??= new TextPainter(
               text: const TextSpan(
                   text:
-                      'Child views are supported only when running in Mozart.'));
+                      'Child views are supported only when running in Scenic.'));
           _debugErrorMessage.layout(minWidth: size.width, maxWidth: size.width);
         }
         return true;
@@ -529,12 +529,12 @@ class ChildView extends LeafRenderObjectWidget {
 }
 
 class View {
-  /// Provide services to Mozart throught |provider|.
+  /// Provide services to Scenic throught |provider|.
   ///
   /// |services| should contain the list of service names offered by the
   /// |provider|.
   static void offerServiceProvider(
       InterfaceHandle<ServiceProvider> provider, List<String> services) {
-    Mozart.offerServiceProvider(provider.passChannel().handle, services);
+    Scenic.offerServiceProvider(provider.passChannel().handle, services);
   }
 }

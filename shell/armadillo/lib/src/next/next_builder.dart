@@ -79,7 +79,7 @@ class NextBuilder {
                 new Listener(
                   behavior: HitTestBehavior.translucent,
                   onPointerDown: (_) {
-                    // TODO: remove this hack when Mozart focus is fixed (MZ-118)
+                    // TODO: remove this hack when Scenic focus is fixed (MZ-118)
                     // HACK: Due to a mozart focus issue we need to focus when the mozart
                     // window this widget is in is first tapped.
                     if (!_askFocusNode.hasFocus) {

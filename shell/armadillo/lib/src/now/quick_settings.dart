@@ -141,7 +141,7 @@ class QuickSettingsOverlayState extends TickingState<QuickSettingsOverlay> {
                     new Positioned(
                       bottom: lerpDouble(
                         // Hack(dayang): We are not able to use transparencies with
-                        // Mozart 2.
+                        // Scenic 2.
                         // MZ-221
                         -220.0,
                         8.0 + sizeModel.minimizedNowHeight,

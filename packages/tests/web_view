@@ -4,7 +4,7 @@
     ],
     "imports": [
         "garnet/packages/fonts",
-        "garnet/packages/mozart",
+        "garnet/packages/scenic",
         "topaz/packages/prod/curl",
         "topaz/packages/prod/sqlite"
     ],

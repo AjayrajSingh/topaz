@@ -1,4 +1,4 @@
-# Mozart Paint Example
+# Scenic Paint Example
 
 This directory contains a basic paint application using Skia to demonstrate
 input usage.

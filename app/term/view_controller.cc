@@ -118,7 +118,7 @@ void ViewController::Blink() {
 }
 
 void ViewController::OnSceneInvalidated(
-    ui_mozart::PresentationInfoPtr presentation_info) {
+    ui::PresentationInfoPtr presentation_info) {
   if (!regular_typeface_)
     return;
 
