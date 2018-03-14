@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:echo2/echo2.fidl.dart';
+import 'package:garnet.examples.fidl2.services._echo2/echo2.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl/application_launcher.fidl.dart';
 
