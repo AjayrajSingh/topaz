@@ -174,8 +174,8 @@ gen_snapshot_cc("script_runner_snapshot") {
   ]
 }
 
-action("generate_aot_snapshot_assembly") {
-  snapshot_assembly = "$target_gen_dir/aot_vm_snapshot.S"
+action("generate_aot1_snapshot_assembly") {
+  snapshot_assembly = "$target_gen_dir/aot1_vm_snapshot.S"
 
   deps = [
     _gen_snapshot_label,
@@ -195,13 +195,13 @@ action("generate_aot_snapshot_assembly") {
   }
 }
 
-source_set("dart_aot_snapshot_cc") {
+source_set("dart1_aot_snapshot_cc") {
   deps = [
-    ":generate_aot_snapshot_assembly",
+    ":generate_aot1_snapshot_assembly",
   ]
 
   sources = [
-    "$target_gen_dir/aot_vm_snapshot.S",
+    "$target_gen_dir/aot1_vm_snapshot.S",
     "snapshot.h",
   ]
 }

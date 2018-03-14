@@ -4,9 +4,9 @@
         "dart"
     ],
     "packages": {
-        "dart_aot_runner": "//topaz/runtime/dart_runner:dart_aot_runner",
-        "dart_jit_runner": "//topaz/runtime/dart_runner:dart_jit_runner",
-        "dart_script_runner": "//topaz/runtime/dart_runner:dart_script_runner",
+        "dart1_aot_runner": "//topaz/runtime/dart_runner:dart1_aot_runner",
+        "dart1_jit_runner": "//topaz/runtime/dart_runner:dart1_jit_runner",
+        "dart1_script_runner": "//topaz/runtime/dart_runner:dart1_script_runner",
         "dart2_aot_runner": "//topaz/runtime/dart_runner:dart2_aot_runner",
         "dart2_jit_runner": "//topaz/runtime/dart_runner:dart2_jit_runner"
     }

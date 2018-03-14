@@ -14,9 +14,13 @@ declare_args() {
   # possible. In a release build the default is AOT to save compilation time
   # and memory footprint.
   if (is_debug) {
-    dart_default_app = "dart_jit_app"
+    dart_default_app = "dart1_jit_app"
+    dart1_default_app = "dart1_jit_app"
+    dart2_default_app = "dart2_jit_app"
   } else {
-    dart_default_app = "dart_aot_app"
+    dart_default_app = "dart1_aot_app"
+    dart1_default_app = "dart1_aot_app"
+    dart2_default_app = "dart2_aot_app"
   }
 }
 
@@ -83,7 +87,7 @@ template("_dart_kernel") {
   }
 }
 
-template("dart_jit_app") {
+template("dart1_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   dart_library_target_name = target_name + "_dart_library"
@@ -185,7 +189,7 @@ template("dart_jit_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/jit_runtime")
+        path = rebase_path("//topaz/runtime/dart_runner/meta/jit1_runtime")
         dest = "runtime"
       },
     ]
@@ -282,7 +286,7 @@ template("dart2_jit_app") {
   }
 }
 
-template("dart_aot_app") {
+template("dart1_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   dart_library_target_name = target_name + "_dart_library"
@@ -410,7 +414,7 @@ template("dart_aot_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/aot_runtime")
+        path = rebase_path("//topaz/runtime/dart_runner/meta/aot1_runtime")
         dest = "runtime"
       },
     ]
@@ -605,7 +609,27 @@ template("dart2_aot_app") {
 #   extra_entry_manifests (optional)
 #     List of AOT entry point manifest files. Most apps do not need this.
 template("dart_app") {
-  target(dart_default_app, target_name) {
+  target(dart1_default_app, target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
+template("dart_jit_app") {
+  dart1_jit_app(target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
+template("dart_aot_app") {
+  dart1_aot_app(target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
+template("dart1_app") {
+  target(dart1_default_app, target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
+template("dart2_app") {
+  target(dart2_default_app, target_name) {
     forward_variables_from(invoker, "*")
   }
 }

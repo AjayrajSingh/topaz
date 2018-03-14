@@ -79,13 +79,13 @@ runner("dart_jit_runner_bin") {
   }
 }
 
-# TODO(rmacnak): We could have dart_aot_runner and dart2_aot_runner be
+# TODO(rmacnak): We could have dart1_aot_runner and dart2_aot_runner be
 # identical binaries if we loaded the VM snapshot via dlopen.
 
-runner("dart_aot_runner_bin") {
-  output_name = "dart_aot_runner"
+runner("dart1_aot_runner_bin") {
+  output_name = "dart1_aot_runner"
   extra_defines = [ "AOT_RUNTIME" ]
-  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc" ]
+  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart1_aot_snapshot_cc" ]
   if (is_debug) {
     extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime" ]
   } else {
@@ -106,12 +106,12 @@ runner("dart2_aot_runner_bin") {
   }
 }
 
-package("dart_aot_runner") {
+package("dart1_aot_runner") {
   deps = [
-    ":dart_aot_runner_bin",
+    ":dart1_aot_runner_bin",
   ]
 
-  binary = "dart_aot_runner"
+  binary = "dart1_aot_runner"
 
   meta = [
     {
@@ -164,7 +164,7 @@ package("dart2_aot_runner") {
   }
 }
 
-package("dart_jit_runner") {
+package("dart1_jit_runner") {
   deps = [
     ":dart_jit_runner_bin",
     "embedder:snapshot_bin",
@@ -236,7 +236,7 @@ package("dart2_jit_runner") {
   }
 }
 
-package("dart_script_runner") {
+package("dart1_script_runner") {
   deps = [
     ":dart_jit_runner_bin",
     "embedder:script_runner_snapshot_bin",
