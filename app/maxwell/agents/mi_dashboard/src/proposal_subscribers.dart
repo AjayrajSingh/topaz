@@ -51,16 +51,22 @@ class ProposalSubscribersDataHandler extends AskProposalListener
         'details': sd.details,
         'color': sd.color,
         'annoyance': sd.annoyance.fidlEnumValue,
-        'icons': sd.icons.map(_encodeSuggestionDisplayImage).toList(),
+        'icons': (sd.icons ?? <SuggestionDisplayImage>[])
+            .map(_encodeSuggestionDisplayImage)
+            .toList(),
         'image': _encodeSuggestionDisplayImage(sd.image),
       };
 
-  Map<String, dynamic> _encodeProposalSummary(ProposalSummary ps) =>
-      <String, dynamic>{
-        'id': ps.id,
-        'publisherUrl': ps.publisherUrl,
-        'display': _encodeSuggestionDisplay(ps.display),
-      };
+  dynamic _encodeProposalSummary(ProposalSummary ps) {
+    if (ps == null) {
+      return null;
+    }
+    return <String, dynamic>{
+      'id': ps.id,
+      'publisherUrl': ps.publisherUrl,
+      'display': _encodeSuggestionDisplay(ps.display),
+    };
+  }
 
   String _makeJsonMessage() {
     return json.encode(<String, dynamic>{
