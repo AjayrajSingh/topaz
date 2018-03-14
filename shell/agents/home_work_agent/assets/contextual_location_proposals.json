@@ -106,6 +106,13 @@
       "type": "other",
       "module_url": "image",
       "module_data": "{\"image_url\":\"/system/data/sysui/cc0_music.jpg\"}"
+    },
+    {
+      "id": "unknown_04",
+      "headline": "Launch Fuchsia Dashboard",
+      "color": "0xFFFF0080",
+      "type": "other",
+      "module_url": "dashboard"
     }
   ]
 }
