@@ -19,34 +19,30 @@ dart_app("ledger_dashboard") {
     "//topaz/public/lib/context/dart",
     "//topaz/public/lib/fidl/dart",
   ]
-}
-
-package("ledger_dashboard_resources") {
-  system_image = true
 
   resources = [
     {
       path =
           rebase_path("//topaz/app/ledger/ledger_dashboard/webroot/index.html")
-      dest = "ledger_dashboard/webroot/index.html"
+      dest = "webroot/index.html"
     },
     {
       path = rebase_path(
               "//topaz/app/ledger/ledger_dashboard/webroot/dashboard.js")
-      dest = "ledger_dashboard/webroot/dashboard.js"
+      dest = "webroot/dashboard.js"
     },
     {
       path = rebase_path(
               "//topaz/app/ledger/ledger_dashboard/webroot/dashboard.css")
-      dest = "ledger_dashboard/webroot/dashboard.css"
+      dest = "webroot/dashboard.css"
     },
     {
       path = rebase_path("//topaz/app/ledger/ledger_dashboard/webroot/logo.png")
-      dest = "ledger_dashboard/webroot/logo.png"
+      dest = "webroot/logo.png"
     },
     {
       path = rebase_path("//topaz/app/ledger/ledger_dashboard/dashboard.config")
-      dest = "ledger_dashboard/dashboard.config"
+      dest = "dashboard.config"
     },
   ]
 }

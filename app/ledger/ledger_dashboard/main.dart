@@ -16,7 +16,7 @@ import 'package:path/path.dart' as path;
 import 'src/data_handler.dart';
 import 'src/ledger_debug_data_handler.dart';
 
-const String _configDir = '/system/data/ledger_dashboard';
+const String _configDir = '/pkg/data';
 const String _configFilename = 'dashboard.config';
 const String _defaultWebrootPath = 'webroot';
 const int _defaultPort = 4001;

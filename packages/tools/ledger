@@ -3,7 +3,6 @@
         "dart"
     ],
     "packages": {
-        "ledger_dashboard_resources": "//topaz/app/ledger/ledger_dashboard:ledger_dashboard_resources",
         "ledger_dashboard": "//topaz/app/ledger/ledger_dashboard"
     }
 }
