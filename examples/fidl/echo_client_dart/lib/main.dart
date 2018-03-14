@@ -10,11 +10,16 @@ ApplicationContext _context;
 EchoProxy _echo;
 
 void main(List<String> args) {
+  String server = 'echo_server_dart';
+  if (args.length >= 2 && args[0] == '--server') {
+    server = args[1];
+  }
+
   _context = new ApplicationContext.fromStartupInfo();
 
   final Services services = new Services();
   final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo(
-      url: 'echo_server_dart', directoryRequest: services.request());
+      url: server, directoryRequest: services.request());
   _context.launcher.createApplication(launchInfo, null);
 
   _echo = new EchoProxy();
