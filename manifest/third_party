@@ -54,11 +54,6 @@
              remote="https://fuchsia.googlesource.com/third_party/libxml2"
              gerrithost="https://fuchsia-review.googlesource.com"
              githooks="manifest/git-hooks"/>
-    <project name="third_party/speccpu2000"
-             path="third_party/speccpu2000"
-             remote="https://fuchsia.googlesource.com/third_party/speccpu2000"
-             gerrithost="https://fuchsia-review.googlesource.com"
-             githooks="manifest/git-hooks"/>
     <project name="third_party/webkit"
              path="third_party/webkit"
              remote="https://fuchsia.googlesource.com/third_party/webkit"
