@@ -15,17 +15,9 @@ import 'src/widgets.dart';
 import 'video_progress.dart';
 import 'video_progress_entity_codec.dart';
 
-final String _kDefaultUrl = 'https://r1---sn-n4v7knl6.googlevideo.com/'
-    'videoplayback?ipbits=0&lmt=1405094805516164&ip=172.17.31.100&'
-    'sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm'
-    '%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&'
-    'ei=eEOpWuDqMMLX-gOC5obgDQ&itag=17&requiressl=yes&'
-    'id=o-AKlH_lVdVP16qwC1etzAonhDuHZIcu5HwZldftSUG6LR&mt=1521041439'
-    '&expire=1521063896&mime=video%2F3gpp&key=yt6&mm=31%2C26&'
-    'mn=sn-n4v7knl6%2Csn-woc7en76&clen=2787691&c=WEB&gir=yes&dur=273.345&'
-    'fvip=9&pl=20&source=youtube&mv=u&ms=au%2Conr&'
-    'signature=809E17D8CB7F7C759E00DC0044ADD85839971502.9B0837F2E40525EB23E214'
-    '683DBDCD87965DA1DE';
+final String _kDefaultUrl =
+    'https://storage.googleapis.com/fuchsia/assets/video/'
+    '656a7250025525ae5a44b43d23c51e38b466d146';
 
 bool _videoAssetInitialized;
 
