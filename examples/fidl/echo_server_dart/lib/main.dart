@@ -15,7 +15,7 @@ class _EchoImpl extends Echo {
 
   @override
   // ignore: non_constant_identifier_names
-  void EchoString(String value, void callback(String response)) {
+  void echoString(String value, void callback(String response)) {
     print('EchoString: $value');
     callback(value);
   }

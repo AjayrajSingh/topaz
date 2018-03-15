@@ -25,7 +25,7 @@ void main(List<String> args) {
   _echo = new EchoProxy();
   _echo.ctrl.bind(services.connectToServiceByName2<Echo>('echo2.Echo'));
 
-  _echo.EchoString('hello', (String response) {
+  _echo.echoString('hello', (String response) {
     print('***** Response: $response');
   });
 }
