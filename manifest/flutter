@@ -8,6 +8,6 @@
     <project name="external/github.com/flutter/engine"
              path="third_party/flutter"
              remote="https://chromium.googlesource.com/external/github.com/flutter/engine"
-             revision="c609dcdd3c96cd0874bfd76ae854b83b23d170e2"/>
+             revision="94bee9d744f5e76a410a6bed33392f0ce20085bd"/>
   </projects>
 </manifest>
