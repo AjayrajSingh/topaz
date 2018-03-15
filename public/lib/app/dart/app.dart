@@ -69,6 +69,15 @@ void connectToService<T>(
       serviceName, controller.request().passChannel());
 }
 
+void connectToService2<T>(
+    ServiceProvider serviceProvider, fidl.ProxyController<T> controller) {
+  final String serviceName = controller.serviceName;
+  assert(serviceName != null,
+      'controller.serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
+  serviceProvider.connectToService(
+      serviceName, controller.request().passChannel());
+}
+
 InterfaceHandle<T> connectToServiceByName<T>(
     ServiceProvider serviceProvider, String serviceName) {
   final ChannelPair pair = new ChannelPair();
@@ -223,6 +232,14 @@ class Services {
   }
 
   void connectToService<T>(ProxyController<T> controller) {
+    final String serviceName = controller.serviceName;
+    assert(serviceName != null,
+        'controller.serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
+    _connectToService(
+        _directory, controller.request().passChannel(), serviceName);
+  }
+
+  void connectToService2<T>(fidl.ProxyController<T> controller) {
     final String serviceName = controller.serviceName;
     assert(serviceName != null,
         'controller.serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
