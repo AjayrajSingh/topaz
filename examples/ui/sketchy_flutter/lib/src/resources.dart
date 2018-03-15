@@ -17,7 +17,7 @@ class Resource {
   final int id;
   final Session session;
 
-  Resource._create(this.session, scenic.Resource resource)
+  Resource._create(this.session, scenic.ResourceArgs resource)
       : id = session.nextResourceId() {
     session.enqueue(new scenic.Op.withCreateResource(
         new scenic.CreateResourceOp(id: id, resource: resource)));
@@ -33,7 +33,7 @@ class Resource {
 scenic.Value vector1(double val) => new scenic.Value.withVector1(val);
 
 class Node extends Resource {
-  Node._create(Session session, scenic.Resource resource)
+  Node._create(Session session, scenic.ResourceArgs resource)
       : super._create(session, resource);
 
   Node._import(Session session, Handle token, scenic.ImportSpec spec)
@@ -63,7 +63,7 @@ class Node extends Resource {
 }
 
 class ContainerNode extends Node {
-  ContainerNode._create(Session session, scenic.Resource resource)
+  ContainerNode._create(Session session, scenic.ResourceArgs resource)
       : super._create(session, resource);
 
   ContainerNode._import(Session session, Handle token, scenic.ImportSpec spec)
@@ -88,7 +88,7 @@ class ImportNode extends ContainerNode {
 class ShapeNode extends Node {
   ShapeNode(Session session)
       : super._create(session,
-            const scenic.Resource.withShapeNode(const scenic.ShapeNode()));
+            const scenic.ResourceArgs.withShapeNode(const scenic.ShapeNodeArgs()));
 
   void setMaterial(Material material) {
     session.enqueue(new scenic.Op.withSetMaterial(
@@ -104,7 +104,7 @@ class ShapeNode extends Node {
 class Material extends Resource {
   Material(Session session)
       : super._create(session,
-            const scenic.Resource.withMaterial(const scenic.Material()));
+            const scenic.ResourceArgs.withMaterial(const scenic.MaterialArgs()));
 
   void setColor(double red, double green, double blue, double alpha) {
     final scenic.ColorRgba color = new scenic.ColorRgba(
@@ -122,7 +122,7 @@ class Material extends Resource {
 }
 
 class Shape extends Resource {
-  Shape._create(Session session, scenic.Resource resource)
+  Shape._create(Session session, scenic.ResourceArgs resource)
       : super._create(session, resource);
 }
 
@@ -152,7 +152,7 @@ class RoundedRectangle extends Shape {
       scenic.Value topRightRadius,
       scenic.Value bottomLeftRadius,
       scenic.Value bottomRightRadius) {
-    final scenic.RoundedRectangle rect = new scenic.RoundedRectangle(
+    final scenic.RoundedRectangleArgs rect = new scenic.RoundedRectangleArgs(
         width: width,
         height: height,
         topLeftRadius: topLeftRadius,
@@ -161,9 +161,9 @@ class RoundedRectangle extends Shape {
         bottomRightRadius: bottomRightRadius);
 
     return new RoundedRectangle._create(
-        session, new scenic.Resource.withRoundedRectangle(rect));
+        session, new scenic.ResourceArgs.withRoundedRectangle(rect));
   }
 
-  RoundedRectangle._create(Session session, scenic.Resource resource)
+  RoundedRectangle._create(Session session, scenic.ResourceArgs resource)
       : super._create(session, resource);
 }
