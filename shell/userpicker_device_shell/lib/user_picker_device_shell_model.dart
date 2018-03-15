@@ -392,7 +392,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   // |ServiceProvider|.
   @override
   void connectToService(String serviceName, Channel channel) {
-    if (serviceName == 'mozart.Presentation') {
+    if (serviceName == 'ui.Presentation') {
       if (_presentationBinding.isBound) {
         log.warning(
             'UserPickerDeviceShell: Presentation service is already bound !');

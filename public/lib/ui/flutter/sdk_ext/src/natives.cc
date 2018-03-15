@@ -22,15 +22,15 @@ namespace mozart {
 #define DECLARE_FUNCTION(name, count) \
   extern void name(Dart_NativeArguments args);
 
-#define MOZART_NATIVE_LIST(V) V(Scenic_offerServiceProvider, 3)
+#define SCENIC_NATIVE_LIST(V) V(Scenic_offerServiceProvider, 3)
 
-MOZART_NATIVE_LIST(DECLARE_FUNCTION);
+SCENIC_NATIVE_LIST(DECLARE_FUNCTION);
 
 static struct NativeEntries {
   const char* name;
   Dart_NativeFunction function;
   int argument_count;
-} Entries[] = {MOZART_NATIVE_LIST(REGISTER_FUNCTION)};
+} Entries[] = {SCENIC_NATIVE_LIST(REGISTER_FUNCTION)};
 
 Dart_NativeFunction NativeLookup(Dart_Handle name,
                                  int argument_count,

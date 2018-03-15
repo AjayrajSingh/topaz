@@ -23,14 +23,14 @@ class Session {
   final SessionProxy _session = new SessionProxy();
   List<Command> _ops = <Command>[];
 
-  Session.fromScenic(ScenicProxy mozart) {
-    mozart.createSession(_session.ctrl.request(), null);
+  Session.fromScenic(ScenicProxy scenic) {
+    scenic.createSession(_session.ctrl.request(), null);
   }
 
   factory Session.fromServiceProvider(ServiceProvider serviceProvider) {
-    final ScenicProxy mozart = new ScenicProxy();
-    connectToService(serviceProvider, mozart.ctrl);
-    return new Session.fromScenic(mozart);
+    final ScenicProxy scenic = new ScenicProxy();
+    connectToService(serviceProvider, scenic.ctrl);
+    return new Session.fromScenic(scenic);
   }
 
   bool get hasEnqueuedOps => _ops.isNotEmpty;

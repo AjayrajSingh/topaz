@@ -53,7 +53,7 @@ class AuthenticationOverlayModel extends Model implements TickerProvider {
         );
         _transitionAnimation.reverse();
         // TODO(apwilson): Should not need to remove the child view
-        // connection but it causes a mozart deadlock in the compositor if you
+        // connection but it causes a scenic deadlock in the compositor if you
         // don't.
         _childViewConnection = null;
       },
@@ -65,7 +65,7 @@ class AuthenticationOverlayModel extends Model implements TickerProvider {
   void onStopOverlay() {
     _transitionAnimation.reverse();
     // TODO(apwilson): Should not need to remove the child view
-    // connection but it causes a mozart deadlock in the compositor if you
+    // connection but it causes a scenic deadlock in the compositor if you
     // don't.
     _childViewConnection = null;
     notifyListeners();

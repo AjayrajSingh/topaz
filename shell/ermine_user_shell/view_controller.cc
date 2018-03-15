@@ -19,14 +19,13 @@ namespace {
 constexpr char kViewLabel[] = "ermine_user_shell";
 
 ui::ScenicPtr GetScenic(mozart::ViewManager* view_manager) {
-  ui::ScenicPtr mozart;
-  view_manager->GetScenic(mozart.NewRequest());
-  return mozart;
+  ui::ScenicPtr scenic;
+  view_manager->GetScenic(scenic.NewRequest());
+  return scenic;
 }
 
-scenic::Metrics* GetLastMetrics(
-    uint32_t node_id,
-    const f1dl::Array<ui::EventPtr>& events) {
+scenic::Metrics* GetLastMetrics(uint32_t node_id,
+                                const f1dl::Array<ui::EventPtr>& events) {
   scenic::Metrics* result = nullptr;
   for (const auto& event : events) {
     if (event->is_scenic() && event->get_scenic()->is_metrics() &&
@@ -204,13 +203,12 @@ void ViewController::Present(zx_time_t presentation_time) {
   ZX_DEBUG_ASSERT(!present_pending_);
   present_pending_ = true;
   last_presentation_time_ = presentation_time;
-  session_.Present(
-      presentation_time, [this](ui::PresentationInfoPtr info) {
-        ZX_DEBUG_ASSERT(present_pending_);
-        present_pending_ = false;
-        if (needs_begin_frame_)
-          BeginFrame(info->presentation_time + info->presentation_interval);
-      });
+  session_.Present(presentation_time, [this](ui::PresentationInfoPtr info) {
+    ZX_DEBUG_ASSERT(present_pending_);
+    present_pending_ = false;
+    if (needs_begin_frame_)
+      BeginFrame(info->presentation_time + info->presentation_interval);
+  });
 }
 
 void ViewController::PerformLayout() {
