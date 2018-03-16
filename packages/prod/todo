@@ -1,9 +1,0 @@
-{
-    "languages": [
-        "cpp",
-        "dart"
-    ],
-    "packages": {
-        "todo_story": "//topaz/app/todo/modules/story:todo_story"
-    }
-}
