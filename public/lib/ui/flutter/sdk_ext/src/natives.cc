@@ -126,7 +126,7 @@ void Scenic_offerServiceProvider(Dart_NativeArguments args) {
     }
 
     buffer[length] = '\0';
-    services[index] = std::string(buffer);
+    services->at(index) = std::string(buffer);
   }
 
   NativesDelegate* delegate = reinterpret_cast<NativesDelegate*>(context);

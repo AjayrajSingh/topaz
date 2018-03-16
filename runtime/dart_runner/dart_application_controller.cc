@@ -128,17 +128,17 @@ bool DartApplicationController::SetupNamespace() {
     return false;
   }
 
-  for (size_t i = 0; i < flat->paths.size(); ++i) {
-    if (flat->paths[i] == kServiceRootPath) {
+  for (size_t i = 0; i < flat->paths->size(); ++i) {
+    if (flat->paths->at(i) == kServiceRootPath) {
       // Ownership of /svc goes to the ApplicationContext created below.
       continue;
     }
-    zx::channel dir = std::move(flat->directories[i]);
+    zx::channel dir = std::move(flat->directories->at(i));
     zx_handle_t dir_handle = dir.release();
-    const char* path = flat->paths[i]->data();
+    const char* path = flat->paths->at(i)->data();
     status = fdio_ns_bind(namespace_, path, dir_handle);
     if (status != ZX_OK) {
-      FXL_LOG(ERROR) << "Failed to bind " << flat->paths[i] << " to namespace";
+      FXL_LOG(ERROR) << "Failed to bind " << flat->paths->at(i) << " to namespace";
       zx_handle_close(dir_handle);
       return false;
     }
@@ -422,16 +422,16 @@ bool DartApplicationController::Main() {
   Dart_EnterIsolate(isolate_);
   Dart_EnterScope();
 
-  Dart_Handle dart_arguments = Dart_NewList(arguments.size());
+  Dart_Handle dart_arguments = Dart_NewList(arguments->size());
   if (Dart_IsError(dart_arguments)) {
     FXL_LOG(ERROR) << "Failed to allocate Dart arguments list: "
                    << Dart_GetError(dart_arguments);
     Dart_ExitScope();
     return false;
   }
-  for (size_t i = 0; i < arguments.size(); i++) {
+  for (size_t i = 0; i < arguments->size(); i++) {
     tonic::LogIfError(
-        Dart_ListSetAt(dart_arguments, i, ToDart(arguments[i].get())));
+        Dart_ListSetAt(dart_arguments, i, ToDart(arguments->at(i).get())));
   }
 
   Dart_Handle argv[] = {

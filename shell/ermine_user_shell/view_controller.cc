@@ -27,7 +27,7 @@ ui::ScenicPtr GetScenic(mozart::ViewManager* view_manager) {
 ui::gfx::Metrics* GetLastMetrics(uint32_t node_id,
                                  const f1dl::Array<ui::EventPtr>& events) {
   ui::gfx::Metrics* result = nullptr;
-  for (const auto& event : events) {
+  for (const auto& event : *events) {
     if (event->is_gfx() && event->get_gfx()->is_metrics() &&
         event->get_gfx()->get_metrics()->node_id == node_id)
       result = event->get_gfx()->get_metrics()->metrics.get();

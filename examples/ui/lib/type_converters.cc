@@ -114,34 +114,36 @@ SkMatrix TypeConverter<SkMatrix, mozart::TransformPtr>::Convert(
     return SkMatrix::I();
 
   // Drop 3D components during conversion from 4x4 to 3x3.
+  const auto& m = *input->matrix;
   SkMatrix output;
-  output.setAll(input->matrix[0], input->matrix[1], input->matrix[3],
-                input->matrix[4], input->matrix[5], input->matrix[7],
-                input->matrix[12], input->matrix[13], input->matrix[15]);
+  output.setAll(m[0], m[1], m[3],
+                m[4], m[5], m[7],
+                m[12], m[13], m[15]);
   return output;
 }
 
 mozart::TransformPtr TypeConverter<mozart::TransformPtr, SkMatrix>::Convert(
     const SkMatrix& input) {
   // Expand 3x3 to 4x4.
+  std::vector<float> m(16u);
+  m[0] = input[0];
+  m[1] = input[1];
+  m[2] = 0.f;
+  m[3] = input[2];
+  m[4] = input[3];
+  m[5] = input[4];
+  m[6] = 0.f;
+  m[7] = input[5];
+  m[8] = 0.f;
+  m[9] = 0.f;
+  m[10] = 1.f;
+  m[11] = 0.f;
+  m[12] = input[6];
+  m[13] = input[7];
+  m[14] = 0.f;
+  m[15] = input[8];
   auto output = mozart::Transform::New();
-  output->matrix.resize(16u);
-  output->matrix[0] = input[0];
-  output->matrix[1] = input[1];
-  output->matrix[2] = 0.f;
-  output->matrix[3] = input[2];
-  output->matrix[4] = input[3];
-  output->matrix[5] = input[4];
-  output->matrix[6] = 0.f;
-  output->matrix[7] = input[5];
-  output->matrix[8] = 0.f;
-  output->matrix[9] = 0.f;
-  output->matrix[10] = 1.f;
-  output->matrix[11] = 0.f;
-  output->matrix[12] = input[6];
-  output->matrix[13] = input[7];
-  output->matrix[14] = 0.f;
-  output->matrix[15] = input[8];
+  output->matrix.reset(std::move(m));
   return output;
 }
 
@@ -151,7 +153,7 @@ SkMatrix44 TypeConverter<SkMatrix44, mozart::TransformPtr>::Convert(
     return SkMatrix44::I();
 
   SkMatrix44 output(SkMatrix44::kUninitialized_Constructor);
-  output.setRowMajorf(input->matrix.data());
+  output.setRowMajorf(input->matrix->data());
   return output;
 }
 
@@ -159,7 +161,7 @@ mozart::TransformPtr TypeConverter<mozart::TransformPtr, SkMatrix44>::Convert(
     const SkMatrix44& input) {
   auto output = mozart::Transform::New();
   output->matrix.resize(16u);
-  input.asRowMajorf(output->matrix.data());
+  input.asRowMajorf(output->matrix->data());
   return output;
 }
 

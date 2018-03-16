@@ -42,7 +42,7 @@ TEST_F(OAuthRequestBuilderTest, JsonEncodedPostRequest) {
 
   EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
   EXPECT_EQ(req->method, kPostMethod);
-  for (const auto& header : req->headers) {
+  for (const auto& header : *req->headers) {
     auto hdr_name = header->name.get();
     if (hdr_name == "content-type") {
       EXPECT_EQ(header->value, "application/json");
@@ -60,7 +60,7 @@ TEST_F(OAuthRequestBuilderTest, UrlEncodedPostRequest) {
   EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
   EXPECT_EQ(req->method, kPostMethod);
   EXPECT_FALSE(req->body.is_null());
-  for (const auto& header : req->headers) {
+  for (const auto& header : *req->headers) {
     auto hdr_name = header->name.get();
     if (hdr_name == "content-type") {
       EXPECT_EQ(header->value, "application/x-www-form-urlencoded");
@@ -76,7 +76,7 @@ TEST_F(OAuthRequestBuilderTest, EmptyBodyPostRequest) {
 
   EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
   EXPECT_EQ(req->method, kPostMethod);
-  for (const auto& header : req->headers) {
+  for (const auto& header : *req->headers) {
     auto hdr_name = header->name.get();
     if (hdr_name == "content-type") {
       EXPECT_EQ(header->value, "application/x-www-form-urlencoded");
@@ -97,7 +97,7 @@ TEST_F(OAuthRequestBuilderTest, CheckAuthHeader) {
   EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
   EXPECT_EQ(req->method, kPostMethod);
   EXPECT_FALSE(req->body.is_null());
-  for (const auto& header : req->headers) {
+  for (const auto& header : *req->headers) {
     auto hdr_name = header->name.get();
     if (hdr_name == "Authorization") {
       EXPECT_TRUE(header->value.get().find("test_token") != std::string::npos);
