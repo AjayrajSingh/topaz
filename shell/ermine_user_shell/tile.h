@@ -19,8 +19,7 @@ namespace ermine_user_shell {
 
 class Tile {
  public:
-  Tile(app::ApplicationLauncher* launcher,
-       std::string url,
+  Tile(component::ApplicationLauncher* launcher, std::string url,
        scenic_lib::Session* session);
   ~Tile();
 
@@ -41,9 +40,9 @@ class Tile {
   void CreateView(f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request);
 
  private:
-  app::ApplicationLauncher* launcher_;
+  component::ApplicationLauncher* launcher_;
   std::string url_;
-  app::ApplicationControllerPtr controller_;
+  component::ApplicationControllerPtr controller_;
 
   const uint32_t key_;
   scenic_lib::EntityNode node_;

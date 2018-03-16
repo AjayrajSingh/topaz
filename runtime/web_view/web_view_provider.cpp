@@ -10,7 +10,7 @@
 
 WebViewProvider::WebViewProvider(const std::string url)
     : url_(url),
-      context_(app::ApplicationContext::CreateFromStartupInfo()),
+      context_(component::ApplicationContext::CreateFromStartupInfo()),
       view_provider_binding_(this),
       module_binding_(this),
       lifecycle_binding_(this),
@@ -38,7 +38,7 @@ WebViewProvider::WebViewProvider(const std::string url)
 
 void WebViewProvider::CreateView(
     f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-    f1dl::InterfaceRequest<app::ServiceProvider> view_services) {
+    f1dl::InterfaceRequest<component::ServiceProvider> view_services) {
   FXL_LOG(INFO) << "CreateView";
   FXL_DCHECK(!view_);
   view_ = std::make_unique<WebViewImpl>(
@@ -61,7 +61,7 @@ void WebViewProvider::CreateView(
 
 void WebViewProvider::Initialize(
     f1dl::InterfaceHandle<modular::ModuleContext> context,
-    f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services) {
+    f1dl::InterfaceRequest<component::ServiceProvider> outgoing_services) {
   auto context_ptr = context.Bind();
   context_ptr->GetLink(nullptr, main_link_.NewRequest());
   main_link_->Watch(main_link_watcher_binding_.NewBinding());

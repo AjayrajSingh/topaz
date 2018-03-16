@@ -7,7 +7,7 @@
 namespace google_auth_provider {
 
 FactoryImpl::FactoryImpl(fxl::RefPtr<fxl::TaskRunner> main_runner,
-                         app::ApplicationContext* app_context,
+                         component::ApplicationContext* app_context,
                          network_wrapper::NetworkWrapper* network_wrapper)
     : main_runner_(std::move(main_runner)),
       app_context_(app_context),

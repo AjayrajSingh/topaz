@@ -67,10 +67,10 @@ void TouchTracker::HandleEvent(const mozart::PointerEventPtr& pointer,
 WebViewImpl::WebViewImpl(
     mozart::ViewManagerPtr view_manager,
     f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-    f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services_request,
+    f1dl::InterfaceRequest<component::ServiceProvider>
+        outgoing_services_request,
     const std::string& url)
-    : BaseView(std::move(view_manager),
-               std::move(view_owner_request),
+    : BaseView(std::move(view_manager), std::move(view_owner_request),
                "WebView"),
       weak_factory_(this),
       url_(url),

@@ -16,8 +16,7 @@ uint32_t g_next_key = 1;
 
 }  // namespace
 
-Tile::Tile(app::ApplicationLauncher* launcher,
-           std::string url,
+Tile::Tile(component::ApplicationLauncher* launcher, std::string url,
            scenic_lib::Session* session)
     : launcher_(launcher),
       url_(std::move(url)),
@@ -28,8 +27,8 @@ Tile::~Tile() = default;
 
 void Tile::CreateView(
     f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request) {
-  app::Services services;
-  auto launch_info = app::ApplicationLaunchInfo::New();
+  component::Services services;
+  auto launch_info = component::ApplicationLaunchInfo::New();
   launch_info->url = url_;
   launch_info->directory_request = services.NewRequest();
 

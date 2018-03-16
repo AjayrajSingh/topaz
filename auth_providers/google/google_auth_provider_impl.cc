@@ -46,7 +46,7 @@ using modular::JsonValueToPrettyString;
 
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
     fxl::RefPtr<fxl::TaskRunner> main_runner,
-    app::ApplicationContext* app_context,
+    component::ApplicationContext* app_context,
     network_wrapper::NetworkWrapper* network_wrapper,
     f1dl::InterfaceRequest<auth::AuthProvider> request)
     : main_runner_(std::move(main_runner)),
@@ -397,8 +397,8 @@ void GoogleAuthProviderImpl::GetUserProfile(
 }
 
 mozart::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
-  app::Services web_view_services;
-  auto web_view_launch_info = app::ApplicationLaunchInfo::New();
+  component::Services web_view_services;
+  auto web_view_launch_info = component::ApplicationLaunchInfo::New();
   web_view_launch_info->url = kWebViewUrl;
   web_view_launch_info->directory_request = web_view_services.NewRequest();
   app_context_->launcher()->CreateApplication(
@@ -410,7 +410,7 @@ mozart::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
   mozart::ViewOwnerPtr view_owner;
   mozart::ViewProviderPtr view_provider;
   web_view_services.ConnectToService(view_provider.NewRequest());
-  app::ServiceProviderPtr web_view_moz_services;
+  component::ServiceProviderPtr web_view_moz_services;
   view_provider->CreateView(view_owner.NewRequest(),
                             web_view_moz_services.NewRequest());
 

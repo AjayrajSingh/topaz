@@ -11,8 +11,9 @@
 namespace fuchsia {
 namespace dart {
 
-void Initialize(f1dl::InterfaceHandle<app::ApplicationEnvironment> environment,
-                f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services);
+void Initialize(
+    f1dl::InterfaceHandle<component::ApplicationEnvironment> environment,
+    f1dl::InterfaceRequest<component::ServiceProvider> outgoing_services);
 
 }  // namespace dart
 }  // namespace fuchsia

@@ -442,7 +442,7 @@ class OAuthTokenManagerApp : AccountProvider {
                             const std::string& id_token,
                             const FirebaseTokenCallback& callback);
 
-  std::shared_ptr<app::ApplicationContext> application_context_;
+  std::shared_ptr<component::ApplicationContext> application_context_;
 
   AccountProviderContextPtr account_provider_context_;
 
@@ -1141,8 +1141,8 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
   }
 
   mozart::ViewOwnerPtr SetupWebView() {
-    app::Services web_view_services;
-    auto web_view_launch_info = app::ApplicationLaunchInfo::New();
+    component::Services web_view_services;
+    auto web_view_launch_info = component::ApplicationLaunchInfo::New();
     web_view_launch_info->url = kWebViewUrl;
     web_view_launch_info->directory_request = web_view_services.NewRequest();
     app_->application_context_->launcher()->CreateApplication(
@@ -1154,7 +1154,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
     mozart::ViewOwnerPtr view_owner;
     mozart::ViewProviderPtr view_provider;
     web_view_services.ConnectToService(view_provider.NewRequest());
-    app::ServiceProviderPtr web_view_moz_services;
+    component::ServiceProviderPtr web_view_moz_services;
     view_provider->CreateView(view_owner.NewRequest(),
                               web_view_moz_services.NewRequest());
 
@@ -1170,7 +1170,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
   AuthenticationContextPtr auth_context_;
 
   web_view::WebViewPtr web_view_;
-  app::ApplicationControllerPtr web_view_controller_;
+  component::ApplicationControllerPtr web_view_controller_;
 
   network::NetworkServicePtr network_service_;
   network::URLLoaderPtr url_loader_;
@@ -1470,7 +1470,8 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : Operation<> {
 };
 
 OAuthTokenManagerApp::OAuthTokenManagerApp()
-    : application_context_(app::ApplicationContext::CreateFromStartupInfo()),
+    : application_context_(
+          component::ApplicationContext::CreateFromStartupInfo()),
       binding_(this) {
   application_context_->outgoing_services()->AddService<AccountProvider>(
       [this](f1dl::InterfaceRequest<AccountProvider> request) {

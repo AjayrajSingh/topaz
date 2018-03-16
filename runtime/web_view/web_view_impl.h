@@ -38,11 +38,11 @@ class TouchTracker {
 class WebViewImpl : public mozart::BaseView,
                    public web_view::WebView {
  public:
-  WebViewImpl(
-      mozart::ViewManagerPtr view_manager,
-      f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-      f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services_request,
-      const std::string& url);
+  WebViewImpl(mozart::ViewManagerPtr view_manager,
+              f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+              f1dl::InterfaceRequest<component::ServiceProvider>
+                  outgoing_services_request,
+              const std::string& url);
 
   ~WebViewImpl();
 
@@ -103,7 +103,7 @@ class WebViewImpl : public mozart::BaseView,
 
   // We use this |ServiceProvider| to expose the |WebView| interface to
   // others.
-  app::ServiceProviderImpl outgoing_services_;
+  component::ServiceProviderImpl outgoing_services_;
 
   f1dl::BindingSet<WebView> web_view_interface_bindings_;
 

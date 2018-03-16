@@ -48,7 +48,7 @@ mozart::ViewPropertiesPtr CreateViewProperties(float width, float height) {
 }  // namespace
 
 ViewController::ViewController(
-    app::ApplicationLauncher* launcher,
+    component::ApplicationLauncher* launcher,
     mozart::ViewManagerPtr view_manager,
     f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
     DisconnectCallback disconnect_handler)
@@ -78,8 +78,8 @@ ViewController::ViewController(
   view_container_->SetListener(view_container_listener_binding_.NewBinding());
 
   view_->GetServiceProvider(view_service_provider_.NewRequest());
-  app::ConnectToService(view_service_provider_.get(),
-                        input_connection_.NewRequest());
+  component::ConnectToService(view_service_provider_.get(),
+                              input_connection_.NewRequest());
   input_connection_->SetEventListener(input_listener_binding_.NewBinding());
 
   session_.set_event_handler([this](f1dl::Array<ui::EventPtr> events) {

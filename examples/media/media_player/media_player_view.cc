@@ -55,10 +55,9 @@ bool operator!=(const mozart::Size& lhs, const mozart::Size& rhs) {
 MediaPlayerView::MediaPlayerView(
     mozart::ViewManagerPtr view_manager,
     f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-    app::ApplicationContext* application_context,
+    component::ApplicationContext* application_context,
     const MediaPlayerParams& params)
-    : mozart::BaseView(std::move(view_manager),
-                       std::move(view_owner_request),
+    : mozart::BaseView(std::move(view_manager), std::move(view_owner_request),
                        "Media Player"),
       background_node_(session()),
       controls_widget_(session()) {

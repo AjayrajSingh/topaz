@@ -29,8 +29,7 @@ constexpr char kShell[] = "/boot/bin/sh";
 ViewController::ViewController(
     mozart::ViewManagerPtr view_manager,
     f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-    app::ApplicationContext* context,
-    const TermParams& term_params,
+    component::ApplicationContext* context, const TermParams& term_params,
     DisconnectCallback disconnect_handler)
     : SkiaView(std::move(view_manager), std::move(view_owner_request), "Term"),
       disconnect_(std::move(disconnect_handler)),

@@ -25,10 +25,9 @@ namespace examples {
 VuMeterView::VuMeterView(
     mozart::ViewManagerPtr view_manager,
     f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-    app::ApplicationContext* application_context,
+    component::ApplicationContext* application_context,
     const VuMeterParams& params)
-    : mozart::SkiaView(std::move(view_manager),
-                       std::move(view_owner_request),
+    : mozart::SkiaView(std::move(view_manager), std::move(view_owner_request),
                        "VU Meter"),
       fast_left_(kFastDecay),
       fast_right_(kFastDecay),

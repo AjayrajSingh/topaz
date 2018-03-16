@@ -26,7 +26,7 @@ class ControllerToken {
   FXL_DISALLOW_COPY_AND_ASSIGN(ControllerToken);
 };
 
-class DartApplicationRunner : public app::ApplicationRunner {
+class DartApplicationRunner : public component::ApplicationRunner {
  public:
   explicit DartApplicationRunner();
   ~DartApplicationRunner() override;
@@ -34,19 +34,20 @@ class DartApplicationRunner : public app::ApplicationRunner {
   void PostRemoveController(ControllerToken* token);
 
  private:
-  // |app::ApplicationRunner| implementation:
+  // |component::ApplicationRunner| implementation:
   void StartApplication(
-      app::ApplicationPackagePtr application,
-      app::ApplicationStartupInfoPtr startup_info,
-      ::f1dl::InterfaceRequest<app::ApplicationController> controller) override;
+      component::ApplicationPackagePtr application,
+      component::ApplicationStartupInfoPtr startup_info,
+      ::f1dl::InterfaceRequest<component::ApplicationController> controller)
+      override;
 
   ControllerToken* AddController(std::string label);
   void RemoveController(ControllerToken* token);
   void UpdateProcessLabel();
 
-  std::unique_ptr<app::ApplicationContext> context_;
+  std::unique_ptr<component::ApplicationContext> context_;
   fsl::MessageLoop* loop_;
-  f1dl::BindingSet<app::ApplicationRunner> bindings_;
+  f1dl::BindingSet<component::ApplicationRunner> bindings_;
   std::vector<ControllerToken*> controllers_;
 #if !defined(AOT_RUNTIME)
   MappedResource vm_snapshot_data_;

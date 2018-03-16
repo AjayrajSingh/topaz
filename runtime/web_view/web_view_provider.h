@@ -23,14 +23,14 @@ class WebViewProvider : mozart::ViewProvider,
 
  private:
   // |ViewProvider|
-  void CreateView(
-      f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-      f1dl::InterfaceRequest<app::ServiceProvider> view_services) override;
+  void CreateView(f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+                  f1dl::InterfaceRequest<component::ServiceProvider>
+                      view_services) override;
 
   // modular::Module
-  void Initialize(
-      f1dl::InterfaceHandle<modular::ModuleContext> context,
-      f1dl::InterfaceRequest<app::ServiceProvider> outgoing_services) final;
+  void Initialize(f1dl::InterfaceHandle<modular::ModuleContext> context,
+                  f1dl::InterfaceRequest<component::ServiceProvider>
+                      outgoing_services) final;
 
   // modular::Terminate
   void Terminate() final;
@@ -39,7 +39,7 @@ class WebViewProvider : mozart::ViewProvider,
   void Notify(const f1dl::String& json) final;
 
   std::string url_;
-  std::unique_ptr<app::ApplicationContext> context_;
+  std::unique_ptr<component::ApplicationContext> context_;
   std::unique_ptr<WebViewImpl> view_;
   // Link state, used to gather URL updates for the story
   modular::LinkPtr main_link_;

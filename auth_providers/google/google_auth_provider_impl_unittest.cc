@@ -15,9 +15,9 @@ class GoogleAuthProviderImplTest : public gtest::TestWithMessageLoop {
  public:
   GoogleAuthProviderImplTest()
       : network_wrapper_(message_loop_.task_runner()),
-        app_context_(app::ApplicationContext::CreateFromStartupInfo().get()),
-        google_auth_provider_impl_(message_loop_.task_runner(),
-                                   app_context_,
+        app_context_(
+            component::ApplicationContext::CreateFromStartupInfo().get()),
+        google_auth_provider_impl_(message_loop_.task_runner(), app_context_,
                                    &network_wrapper_,
                                    auth_provider_.NewRequest()) {}
 
@@ -25,7 +25,7 @@ class GoogleAuthProviderImplTest : public gtest::TestWithMessageLoop {
 
  protected:
   network_wrapper::FakeNetworkWrapper network_wrapper_;
-  app::ApplicationContext* app_context_;
+  component::ApplicationContext* app_context_;
   auth::AuthProviderPtr auth_provider_;
   GoogleAuthProviderImpl google_auth_provider_impl_;
 

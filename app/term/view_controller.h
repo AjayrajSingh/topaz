@@ -25,7 +25,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
 
   ViewController(mozart::ViewManagerPtr view_manager,
                  f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-                 app::ApplicationContext* context,
+                 component::ApplicationContext* context,
                  const TermParams& term_params,
                  DisconnectCallback disconnect_handler);
   ~ViewController() override;
@@ -67,7 +67,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   // If we skip drawing despite being forced to, we should force the next draw.
   bool force_next_draw_;
 
-  app::ApplicationContext* context_;
+  component::ApplicationContext* context_;
   mozart::SkiaFontLoader font_loader_;
   sk_sp<SkTypeface> regular_typeface_;
 

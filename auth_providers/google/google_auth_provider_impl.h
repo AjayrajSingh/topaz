@@ -24,7 +24,7 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
                                web_view::WebRequestDelegate {
  public:
   GoogleAuthProviderImpl(fxl::RefPtr<fxl::TaskRunner> main_runner,
-                         app::ApplicationContext* app_context,
+                         component::ApplicationContext* app_context,
                          network_wrapper::NetworkWrapper* network_wrapper,
                          f1dl::InterfaceRequest<auth::AuthProvider> request);
 
@@ -75,8 +75,8 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
       network::URLResponsePtr response);
 
   fxl::RefPtr<fxl::TaskRunner> main_runner_;
-  app::ApplicationContext* app_context_;
-  app::ApplicationControllerPtr web_view_controller_;
+  component::ApplicationContext* app_context_;
+  component::ApplicationControllerPtr web_view_controller_;
   auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
   web_view::WebViewPtr web_view_;

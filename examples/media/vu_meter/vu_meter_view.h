@@ -20,7 +20,7 @@ class VuMeterView : public mozart::SkiaView {
  public:
   VuMeterView(mozart::ViewManagerPtr view_manager,
               f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-              app::ApplicationContext* application_context,
+              component::ApplicationContext* application_context,
               const VuMeterParams& params);
 
   ~VuMeterView() override;

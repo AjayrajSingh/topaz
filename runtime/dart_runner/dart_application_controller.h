@@ -17,13 +17,12 @@
 
 namespace dart_content_handler {
 
-class DartApplicationController : public app::ApplicationController {
+class DartApplicationController : public component::ApplicationController {
  public:
   DartApplicationController(
-      std::string label,
-      app::ApplicationPackagePtr application,
-      app::ApplicationStartupInfoPtr startup_info,
-      f1dl::InterfaceRequest<app::ApplicationController> controller);
+      std::string label, component::ApplicationPackagePtr application,
+      component::ApplicationStartupInfoPtr startup_info,
+      f1dl::InterfaceRequest<component::ApplicationController> controller);
   ~DartApplicationController() override;
 
   bool Setup();
@@ -41,7 +40,7 @@ class DartApplicationController : public app::ApplicationController {
   bool CreateIsolate(void* isolate_snapshot_data,
                      void* isolate_snapshot_instructions);
 
-  int SetupFileDescriptor(app::FileDescriptorPtr fd);
+  int SetupFileDescriptor(component::FileDescriptorPtr fd);
 
   // |ApplicationController|
   void Kill() override;
@@ -55,10 +54,10 @@ class DartApplicationController : public app::ApplicationController {
 
   std::string label_;
   std::string url_;
-  app::ApplicationPackagePtr application_;
-  app::ApplicationStartupInfoPtr startup_info_;
-  app::ServiceProviderBridge service_provider_bridge_;
-  f1dl::Binding<app::ApplicationController> binding_;
+  component::ApplicationPackagePtr application_;
+  component::ApplicationStartupInfoPtr startup_info_;
+  component::ServiceProviderBridge service_provider_bridge_;
+  f1dl::Binding<component::ApplicationController> binding_;
 
   fdio_ns_t* namespace_ = nullptr;
   int stdoutfd_ = -1;

@@ -47,10 +47,9 @@ void NopReleaseDill(uint8_t* dill) {
 }  // namespace
 
 DartApplicationController::DartApplicationController(
-    std::string label,
-    app::ApplicationPackagePtr application,
-    app::ApplicationStartupInfoPtr startup_info,
-    f1dl::InterfaceRequest<app::ApplicationController> controller)
+    std::string label, component::ApplicationPackagePtr application,
+    component::ApplicationStartupInfoPtr startup_info,
+    f1dl::InterfaceRequest<component::ApplicationController> controller)
     : label_(label),
       url_(std::move(application->resolved_url)),
       application_(std::move(application)),
@@ -121,7 +120,7 @@ bool DartApplicationController::Setup() {
 constexpr char kServiceRootPath[] = "/svc";
 
 bool DartApplicationController::SetupNamespace() {
-  app::FlatNamespacePtr& flat = *(&startup_info_->flat_namespace);
+  component::FlatNamespacePtr& flat = *(&startup_info_->flat_namespace);
   zx_status_t status = fdio_ns_create(&namespace_);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to create namespace";
@@ -319,7 +318,8 @@ bool DartApplicationController::SetupFromSharedLibrary() {
 #endif  // defined(AOT_RUNTIME)
 }
 
-int DartApplicationController::SetupFileDescriptor(app::FileDescriptorPtr fd) {
+int DartApplicationController::SetupFileDescriptor(
+    component::FileDescriptorPtr fd) {
   if (!fd) {
     return -1;
   }
@@ -397,7 +397,7 @@ bool DartApplicationController::Main() {
         std::move(startup_info_->launch_info->directory_request));
   }
 
-  app::ServiceProviderPtr service_provider;
+  component::ServiceProviderPtr service_provider;
   auto outgoing_services = service_provider.NewRequest();
   service_provider_bridge_.set_backend(std::move(service_provider));
 
@@ -406,7 +406,7 @@ bool DartApplicationController::Main() {
 
   InitBuiltinLibrariesForIsolate(
       url_, namespace_, stdoutfd_, stderrfd_,
-      app::ApplicationContext::CreateFrom(std::move(startup_info_)),
+      component::ApplicationContext::CreateFrom(std::move(startup_info_)),
       std::move(outgoing_services), false /* service_isolate */);
   namespace_ = nullptr;
 

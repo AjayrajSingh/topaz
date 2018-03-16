@@ -130,8 +130,8 @@ void Scenic_offerServiceProvider(Dart_NativeArguments args) {
   }
 
   NativesDelegate* delegate = reinterpret_cast<NativesDelegate*>(context);
-  f1dl::InterfaceHandle<app::ServiceProvider> provider =
-      f1dl::InterfaceHandle<app::ServiceProvider>(
+  f1dl::InterfaceHandle<component::ServiceProvider> provider =
+      f1dl::InterfaceHandle<component::ServiceProvider>(
           zx::channel(handle->ReleaseHandle()));
 
   View* view = delegate->GetMozartView();

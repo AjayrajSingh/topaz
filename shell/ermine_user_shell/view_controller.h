@@ -30,7 +30,7 @@ class ViewController : public mozart::ViewListener,
  public:
   using DisconnectCallback = std::function<void(ViewController*)>;
 
-  ViewController(app::ApplicationLauncher* launcher,
+  ViewController(component::ApplicationLauncher* launcher,
                  mozart::ViewManagerPtr view_manager,
                  f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
                  DisconnectCallback disconnect_handler);
@@ -74,7 +74,7 @@ class ViewController : public mozart::ViewListener,
   void PerformLayout();
   void SetPropertiesIfNeeded(Tile* tile, mozart::ViewPropertiesPtr properties);
 
-  app::ApplicationLauncher* launcher_;
+  component::ApplicationLauncher* launcher_;
   mozart::ViewManagerPtr view_manager_;
   f1dl::Binding<ViewListener> view_listener_binding_;
   f1dl::Binding<ViewContainerListener> view_container_listener_binding_;
@@ -82,7 +82,7 @@ class ViewController : public mozart::ViewListener,
 
   mozart::ViewPtr view_;
   mozart::ViewContainerPtr view_container_;
-  app::ServiceProviderPtr view_service_provider_;
+  component::ServiceProviderPtr view_service_provider_;
   mozart::InputConnectionPtr input_connection_;
 
   mozart::SizeF logical_size_;

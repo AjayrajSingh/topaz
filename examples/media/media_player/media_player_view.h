@@ -22,7 +22,7 @@ class MediaPlayerView : public mozart::BaseView {
  public:
   MediaPlayerView(mozart::ViewManagerPtr view_manager,
                   f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-                  app::ApplicationContext* application_context,
+                  component::ApplicationContext* application_context,
                   const MediaPlayerParams& params);
 
   ~MediaPlayerView() override;

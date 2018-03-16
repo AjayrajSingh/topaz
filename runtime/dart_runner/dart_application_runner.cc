@@ -98,11 +98,10 @@ void IsolateCleanupCallback(void* callback_data) {
 }
 
 void RunApplication(
-    DartApplicationRunner* runner,
-    ControllerToken* token,
-    app::ApplicationPackagePtr application,
-    app::ApplicationStartupInfoPtr startup_info,
-    ::f1dl::InterfaceRequest<app::ApplicationController> controller) {
+    DartApplicationRunner* runner, ControllerToken* token,
+    component::ApplicationPackagePtr application,
+    component::ApplicationStartupInfoPtr startup_info,
+    ::f1dl::InterfaceRequest<component::ApplicationController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   fsl::MessageLoop loop;
   DartApplicationController app(token->label(), std::move(application),
@@ -149,10 +148,10 @@ std::string GetLabelFromURL(const std::string& url) {
 }  // namespace
 
 DartApplicationRunner::DartApplicationRunner()
-    : context_(app::ApplicationContext::CreateFromStartupInfo()),
+    : context_(component::ApplicationContext::CreateFromStartupInfo()),
       loop_(fsl::MessageLoop::GetCurrent()) {
-  context_->outgoing_services()->AddService<app::ApplicationRunner>(
-      [this](f1dl::InterfaceRequest<app::ApplicationRunner> request) {
+  context_->outgoing_services()->AddService<component::ApplicationRunner>(
+      [this](f1dl::InterfaceRequest<component::ApplicationRunner> request) {
         bindings_.AddBinding(this, std::move(request));
       });
 
@@ -199,9 +198,9 @@ DartApplicationRunner::~DartApplicationRunner() {
 }
 
 void DartApplicationRunner::StartApplication(
-    app::ApplicationPackagePtr application,
-    app::ApplicationStartupInfoPtr startup_info,
-    ::f1dl::InterfaceRequest<app::ApplicationController> controller) {
+    component::ApplicationPackagePtr application,
+    component::ApplicationStartupInfoPtr startup_info,
+    ::f1dl::InterfaceRequest<component::ApplicationController> controller) {
   std::string label = GetLabelFromURL(application->resolved_url);
   std::thread thread(RunApplication, this, AddController(label),
                      std::move(application), std::move(startup_info),
