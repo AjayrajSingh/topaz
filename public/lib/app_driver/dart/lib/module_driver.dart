@@ -5,3 +5,4 @@
 // TODO(MS-1239): delete this file once dependants use the main app_driver.dart
 // import.
 export 'src/module_driver.dart';
+export 'src/service_client.dart';

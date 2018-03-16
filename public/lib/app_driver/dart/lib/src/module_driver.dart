@@ -18,6 +18,8 @@ import 'package:lib.story.dart/story.dart';
 import 'package:meta/meta.dart';
 import 'package:lib.schemas.dart/entity_codec.dart';
 
+import 'service_client.dart';
+
 export 'package:lib.module.dart/module.dart' show ModuleControllerClient;
 export 'package:lib.story.dart/story.dart' show LinkClient;
 
@@ -192,21 +194,33 @@ class ModuleDriver {
     return _tokenCompleter.future;
   }
 
-  /// Connect to the service specified by [serviceProxy] and implemented by the
-  /// agent at [agentUrl].
-  // TODO(meiyili): Investigate a way to have this method return the proxy
-  // instead for a more functional approach MS-1288
-  Future<Null> connectToAgentService(
-    String agentUrl,
-    Proxy<dynamic> serviceProxy,
+  /// Connect to the service specified by [client] and implemented by the
+  /// agent at [url].
+  ///
+  /// The [url] is required as multiple agents can implement the same
+  /// service interface.
+  Future<Null> connectToAgentService<T>(
+    String url,
+    ServiceClient<T> client,
+  ) async {
+    await connectToAgentServiceWithProxy(url, client.proxy);
+  }
+
+  /// Connect to the service specified by [proxy] and implemented by the
+  /// agent at [url].
+  /// DEPRECATED: please write a client for your service and use
+  /// connectToAgentService
+  Future<Null> connectToAgentServiceWithProxy(
+    String url,
+    Proxy<dynamic> proxy,
   ) async {
     log.fine('#connectToAgentService(...)');
     ComponentContextClient componentContext =
         await moduleContext.getComponentContext();
 
     ServiceProviderProxy serviceProviderProxy =
-        await componentContext.connectToAgent(agentUrl);
-    connectToService(serviceProviderProxy, serviceProxy.ctrl);
+        await componentContext.connectToAgent(url);
+    connectToService(serviceProviderProxy, proxy.ctrl);
 
     // Close all unnecessary bindings
     serviceProviderProxy.ctrl.close();
