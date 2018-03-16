@@ -11,7 +11,7 @@ var _toolbar = null;
 var _tabBar = null;
 var _webSocket = null;
 
-$(function() {
+$(function () {
   mdc.autoInit();
   _toolbar =
     new mdc.toolbar.MDCToolbar(document.querySelector('.mdc-toolbar'));
@@ -19,9 +19,9 @@ $(function() {
     new mdc.tabs.MDCTabBar(document.querySelector('#dashboard-tab-bar'));
 
   _tabBar.listen('MDCTabBar:change', function (t) {
-      var newPanelSelector = _tabBar.activeTab.root_.hash;
-      updateTabPanel(newPanelSelector);
-    });
+    var newPanelSelector = _tabBar.activeTab.root_.hash;
+    updateTabPanel(newPanelSelector);
+  });
 
   _tabBar.layout();
 
@@ -90,11 +90,11 @@ function makeProposalHtml(proposal) {
   var subheadline = document.createElement("span");
   $(item).addClass("mdc-list-item").addClass("proposal-item");
   $(headline)
-      .addClass("mdc-list-item__text")
-      .text(proposal.display.headline);
+    .addClass("mdc-list-item__text")
+    .text(proposal.display.headline);
   $(subheadline)
-      .addClass("mdc-list-item__text__secondary")
-      .text(proposal.publisherUrl);
+    .addClass("mdc-list-item__text__secondary")
+    .text(proposal.publisherUrl);
   $(headline).append(subheadline);
   $(item).append(headline);
   return item;
@@ -121,9 +121,9 @@ function updateLastQuery(query) {
 }
 
 function updateAgentProposals(proposals) {
-  proposals.forEach(function(proposal) {
+  proposals.forEach(function (proposal) {
     var agentElems = getOrCreateAgentElements(proposal.publisherUrl);
-    addProposalToAgent(proposal,agentElems);
+    addProposalToAgent(proposal, agentElems);
   });
 }
 
@@ -143,11 +143,11 @@ function handleSuggestionsUpdate(suggestions) {
   updateAgentProposals(suggestions.next_proposals);
 }
 
-function makeContextTopicRow(topic,topicValue) {
+function makeContextTopicRow(topic, topicValue) {
   var topicId = "topic-" + topic;
   var row = $("<tr/>")
     .append($("<td/>").addClass('wrappable').text(topic))
-    .append($("<td/>").attr("topic",topic)
+    .append($("<td/>").attr("topic", topic)
       .append($("<pre/>").text(topicValue)));
 
   return row;
@@ -170,6 +170,7 @@ function contextTypeToString(type) {
     case 2: return "MODULE";
     case 3: return "AGENT";
     case 4: return "ENTITY";
+    case 5: return "LINK";
     default: return "???";
   }
 }
@@ -206,6 +207,15 @@ function contextValueMetadataToList(meta) {
       ret.push(["entity", "type", meta.entity.type.join(", ")]);
     }
   }
+  if (meta.link) {
+    if (meta.link.module_path) {
+      ret.push(["link", "module_path", meta.link.module_path.join(":")]);
+    }
+    if (meta.link.name) {
+      ret.push(["link", "name", meta.link.name]);
+    }
+
+  }
 
   return ret;
 }
@@ -222,15 +232,15 @@ function handleContextUpdate(context) {
   // and a list of root elements.
   var contextTree = {};
   var rootValueIds = [];
-  $.each(context, function(idx, value) {
+  $.each(context, function (idx, value) {
     value.children = [];
     contextTree[value.id] = value;
 
     if (value.parentIds.length > 0) {
-      $.each(value.parentIds, function(idx, parentId) {
+      $.each(value.parentIds, function (idx, parentId) {
         if (contextTree[parentId] == null) {
           console.log(
-              'Value ID ' + value.id + ' has invalid parent: ' + parentId);
+            'Value ID ' + value.id + ' has invalid parent: ' + parentId);
           return;
         }
         contextTree[parentId].children.push(value.id);
@@ -241,11 +251,11 @@ function handleContextUpdate(context) {
   });
 
   // Rebuild the context display.
-  var buildValueDomRecursive = function(id) {
+  var buildValueDomRecursive = function (id) {
     var entry = contextTree[id];
     var div = $("<div/>");
     div.append($("<b/>").text(contextTypeToString(entry.value.type) + ' - ' + id));
-    $.each(contextValueMetadataToList(entry.value.meta), function(idx, pair) {
+    $.each(contextValueMetadataToList(entry.value.meta), function (idx, pair) {
       div.append("<br/>");
       div.append($("<span/>").html(pair[0] + "." + pair[1] + " = " + pair[2]));
     });
@@ -257,14 +267,14 @@ function handleContextUpdate(context) {
         div.append($("<pre/>").text(entry.value.content));
       }
     }
-    $.each(entry.children, function(idx, childId) {
+    $.each(entry.children, function (idx, childId) {
       div.append(buildValueDomRecursive(childId).addClass("context-indent"));
     });
     return div;
   };
 
   $("#context").empty();
-  $.each(rootValueIds, function(idx, id) {
+  $.each(rootValueIds, function (idx, id) {
     buildValueDomRecursive(id).addClass("context-root-value").appendTo("#context");
   });
 }
@@ -272,7 +282,7 @@ function handleContextUpdate(context) {
 function handleContextSubscribers(subscribers) {
   $("#contextSubscriptions").empty();
 
-  subscribers.forEach(function(update) {
+  subscribers.forEach(function (update) {
     // Sample HTML to be created
     // <li class="mdc-list-item">
     //   <span class="mdc-list-item__text">
@@ -285,8 +295,8 @@ function handleContextSubscribers(subscribers) {
 
     // TODO(thatguy): Make the client identity more useful.
     listElem.append($("<div/>").addClass("subscriber")
-                                .text(clientInfoToString(update.debugInfo.clientInfo)));
-    $.each(update.query.selector, function(key, selector) {
+      .text(clientInfoToString(update.debugInfo.clientInfo)));
+    $.each(update.query.selector, function (key, selector) {
       listElem.append(' ');
       $('<div/>')
         .addClass('mdc-list-item__text__secondary')
@@ -299,7 +309,7 @@ function handleContextSubscribers(subscribers) {
         .text("for type " + contextTypeToString(selector.type))
         .appendTo(listElem);
       var metadataValues = contextValueMetadataToList(selector.meta);
-      $.each(metadataValues, function(idx, parts) {
+      $.each(metadataValues, function (idx, parts) {
         $("<div/>")
           .addClass('mdc-list-item__text__secondary')
           .addClass("context-selector-metadata")
@@ -310,7 +320,7 @@ function handleContextSubscribers(subscribers) {
 
     $("#contextSubscriptions")
       .append($('<li/>').append(listElem))
-      .append($('<li/>').addClass('mdc-list-divider').attr('role','divider'));
+      .append($('<li/>').addClass('mdc-list-divider').attr('role', 'divider'));
 
     /*
      * TODO(thatguy): Update this.
@@ -360,7 +370,7 @@ function handleActionLogAdd(action) {
 
   $("#actionLog")
     .prepend($('<li/>').addClass('mdc-list-item').append(methodElem))
-    .prepend($('<li/>').addClass('mdc-list-divider').attr('role','divider'));
+    .prepend($('<li/>').addClass('mdc-list-divider').attr('role', 'divider'));
 
   // Assemble Action Log Overview Data
   methodElem = $('<span/>')
@@ -373,7 +383,7 @@ function handleActionLogAdd(action) {
   methodElem.append(" ").append(parametersElem);
   $('#actionLogOverview')
     .prepend($('<li/>').addClass('mdc-list-item').append(methodElem))
-    .prepend($('<li/>').addClass('mdc-list-divider').attr('role','divider'));
+    .prepend($('<li/>').addClass('mdc-list-divider').attr('role', 'divider'));
 }
 
 function attemptReconnect() {
@@ -390,9 +400,9 @@ function attemptReconnect() {
   }
 }
 
-function updateOverviewFromContext(context) {}
+function updateOverviewFromContext(context) { }
 
-function processComplexStoryTopic(storyId,complexTopic,rawValue) {
+function processComplexStoryTopic(storyId, complexTopic, rawValue) {
   var moduleRegex = /module\/([^\/]+)\/(.+)/;
   var moduleRegexResults = complexTopic.match(moduleRegex);
 
@@ -402,10 +412,10 @@ function processComplexStoryTopic(storyId,complexTopic,rawValue) {
 
     if (moduleTopic == 'meta') {
       // This topic contains information about the module
-      updateModuleInStory(storyId,moduleHash,rawValue);
+      updateModuleInStory(storyId, moduleHash, rawValue);
     } else if (moduleTopic.startsWith('explicit')) {
       // This topic contains informationa about a focal entity
-      updateFocalEntityInStory(storyId,moduleHash,moduleTopic,rawValue);
+      updateFocalEntityInStory(storyId, moduleHash, moduleTopic, rawValue);
     }
   } else {
     var linkRegex = /link\/(.+)/;
@@ -413,25 +423,25 @@ function processComplexStoryTopic(storyId,complexTopic,rawValue) {
 
     if (linkRegexResults != null && linkRegexResults[1] != null) {
       var entityElems = getOrCreateEntityOverviewElements(storyId,
-                          null, // null indicates a context link entity
-                          linkRegexResults[1]); // entity topic name
-      setEntityValue(rawValue,entityElems);
+        null, // null indicates a context link entity
+        linkRegexResults[1]); // entity topic name
+      setEntityValue(rawValue, entityElems);
     }
   }
 }
 
-function updateModuleInStory(storyId,moduleHash,rawData) {
+function updateModuleInStory(storyId, moduleHash, rawData) {
   var moduleData = JSON.parse(rawData);
-  var moduleElems = getOrCreateModuleOverviewElements(storyId,moduleHash);
+  var moduleElems = getOrCreateModuleOverviewElements(storyId, moduleHash);
   if (moduleData['url'] != null) {
-    setModuleUrl(moduleData['url'],moduleElems);
+    setModuleUrl(moduleData['url'], moduleElems);
   }
   if (moduleData['module_path'] != null) {
     var modulePath = moduleData['module_path'][0];
-    for(var i = 1; i < moduleData['module_path'].length; i++) {
+    for (var i = 1; i < moduleData['module_path'].length; i++) {
       modulePath += ' ' + moduleData['module_path'][i];
     }
-    setModulePath(modulePath,moduleElems);
+    setModulePath(modulePath, moduleElems);
   }
 }
 
@@ -452,7 +462,7 @@ function getOrCreateContextLinkElement(storyId) {
       .addClass('mdc-list-item__text')
       .text('context link');
 
-    var linkListElem = $('<li/>').attr('id',linkElemId)
+    var linkListElem = $('<li/>').attr('id', linkElemId)
       .addClass('mdc-list-item')
       .addClass('module-list-item')
       .addClass('context-link-item')
@@ -467,7 +477,7 @@ function getOrCreateContextLinkElement(storyId) {
   return linkElems;
 }
 
-function getOrCreateModuleOverviewElements(storyId,moduleHash) {
+function getOrCreateModuleOverviewElements(storyId, moduleHash) {
   var moduleElemId = storyId + '-' + moduleHash;
   var moduleElems = _modules[moduleElemId];
   if (moduleElems == null) {
@@ -479,7 +489,7 @@ function getOrCreateModuleOverviewElements(storyId,moduleHash) {
     //     </span>
     //   </span>
     // </li>
-    var moduleListElem = $('<li/>').attr('id',moduleElemId)
+    var moduleListElem = $('<li/>').attr('id', moduleElemId)
       .addClass('mdc-list-item')
       .addClass('module-list-item');
 
@@ -503,27 +513,27 @@ function getOrCreateModuleOverviewElements(storyId,moduleHash) {
   return moduleElems;
 }
 
-function setModuleUrl(moduleUrl,moduleElems) {
+function setModuleUrl(moduleUrl, moduleElems) {
   moduleElems.find('span')[0].firstChild.textContent = moduleUrl;
 }
 
-function setModulePath(modulePath,moduleElems) {
+function setModulePath(modulePath, moduleElems) {
   moduleElems.find('span')[1].firstChild.textContent = modulePath;
 }
 
-function updateFocalEntityInStory(storyId,moduleHash,entityTopic,rawValue) {
+function updateFocalEntityInStory(storyId, moduleHash, entityTopic, rawValue) {
   var entityTopicRegex = /explicit\/(.+)/;
   var entityTopicRegexResults = entityTopic.match(entityTopicRegex);
 
   if (entityTopicRegexResults != null && entityTopicRegexResults[1] != null) {
     var entityElems = getOrCreateEntityOverviewElements(storyId,
-                        moduleHash,
-                        entityTopicRegexResults[1]);
-    setEntityValue(rawValue,entityElems);
+      moduleHash,
+      entityTopicRegexResults[1]);
+    setEntityValue(rawValue, entityElems);
   }
 }
 
-function getOrCreateEntityOverviewElements(storyId,moduleHash,entityTopic) {
+function getOrCreateEntityOverviewElements(storyId, moduleHash, entityTopic) {
   var entityElemId;
   if (moduleHash == null || moduleHash == 'contextlink') {
     entityElemId = storyId + '-contextlink-' + entityTopic;
@@ -540,7 +550,7 @@ function getOrCreateEntityOverviewElements(storyId,moduleHash,entityTopic) {
     //     </span>
     //   </span>
     // </li>
-    var entityListElem = $('<li/>').attr('id',entityElemId)
+    var entityListElem = $('<li/>').attr('id', entityElemId)
       .addClass('mdc-list-item')
       .addClass('entity-list-item');
 
@@ -560,7 +570,7 @@ function getOrCreateEntityOverviewElements(storyId,moduleHash,entityTopic) {
     if (moduleHash == null || moduleHash == 'contextlink') {
       moduleElems = getOrCreateContextLinkElement(storyId);
     } else {
-      moduleElems = getOrCreateModuleOverviewElements(storyId,moduleHash);
+      moduleElems = getOrCreateModuleOverviewElements(storyId, moduleHash);
     }
     entityListElem.insertAfter(moduleElems);
 
@@ -569,11 +579,11 @@ function getOrCreateEntityOverviewElements(storyId,moduleHash,entityTopic) {
   return entityElems;
 }
 
-function setEntityName(entityName,entityElems) {
+function setEntityName(entityName, entityElems) {
   entityElems.find('span')[0].firstChild.textContent = entityName;
 }
 
-function setEntityValue(entityValue,entityElems) {
+function setEntityValue(entityValue, entityElems) {
   entityElems.find('span')[1].firstChild.textContent = entityValue;
 }
 
@@ -592,7 +602,7 @@ function getOrCreateStoryOverviewElements(storyId) {
     // </li>
     // </div>
     var storyDivItem = $('<div/>').addClass('story-list-group')
-      .attr('id',storyId);
+      .attr('id', storyId);
 
     var storyListItem = $('<li/>').addClass('mdc-list-item')
       .addClass('story-list-item');
@@ -607,7 +617,7 @@ function getOrCreateStoryOverviewElements(storyId) {
       .append(' ')
       .append(storyIdElem);
 
-    var divider = $('<li/>').addClass('mdc-list-divider').attr('role','divider');
+    var divider = $('<li/>').addClass('mdc-list-divider').attr('role', 'divider');
 
     storyListItem.append(storyNameElem);
     storyDivItem.append(divider)
@@ -659,7 +669,7 @@ function getOrCreateAgentElements(agentUrl) {
         </div> <!-- mdc_card -->
       </div>`);
 
-    agentElems.attr('id',agentCardId);
+    agentElems.attr('id', agentCardId);
     agentElems.find('h1').text(agentUrl);
 
     $('#agent-card-addpoint').append(agentElems);
@@ -667,15 +677,15 @@ function getOrCreateAgentElements(agentUrl) {
   return agentElems;
 }
 
-function addAgentContextTopic(topic,agentElems) {
+function addAgentContextTopic(topic, agentElems) {
   var tbody = agentElems.find('tbody');
   var contextRow = agentElems.find("td[topic^='" + topic + "']");
   if (contextRow.length == 0) {
-    tbody.append(makeContextTopicRow(topic,""));
+    tbody.append(makeContextTopicRow(topic, ""));
   }
 }
 
-function addProposalToAgent(proposal,agentElems) {
+function addProposalToAgent(proposal, agentElems) {
   var proposalItem = makeProposalHtml(proposal);
   // The secondary headline by default is the URL, which is redundant
   // on the agent page.  Change it to the subheadline.

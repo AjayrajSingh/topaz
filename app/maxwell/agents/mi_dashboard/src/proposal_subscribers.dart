@@ -38,11 +38,15 @@ class ProposalSubscribersDataHandler extends AskProposalListener
       <String, int>{'size': ei.size};
 
   Map<String, dynamic> _encodeSuggestionDisplayImage(
-          SuggestionDisplayImage sdi) =>
-      <String, dynamic>{
-        'image': _encodeEncodedImage(sdi.image),
-        'type': sdi.imageType.fidlEnumValue,
-      };
+      SuggestionDisplayImage sdi) {
+    if (sdi == null) {
+      return null;
+    }
+    return <String, dynamic>{
+      'image': _encodeEncodedImage(sdi.image),
+      'type': sdi.imageType.fidlEnumValue,
+    };
+  }
 
   Map<String, dynamic> _encodeSuggestionDisplay(SuggestionDisplay sd) =>
       <String, dynamic>{

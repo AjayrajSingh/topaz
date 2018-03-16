@@ -109,6 +109,9 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
   }
 
   static Map<String, dynamic> _encodeContextMetadata(ContextMetadata metadata) {
+    if (metadata == null) {
+      return null;
+    }
     Map<String, dynamic> json = <String, dynamic>{};
     if (metadata.story != null) {
       json['story'] = <String, dynamic>{
