@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.user.dart/user.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:fuchsia/fuchsia.dart' as fuchsia;
 
 import '../widgets/window_media_query.dart';
 import 'user_shell_model.dart';
@@ -84,6 +85,7 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
           onStop: () {
             userShellBinding.close();
             lifecycleBinding.close();
+            fuchsia.exit(0);
           },
         );
 
