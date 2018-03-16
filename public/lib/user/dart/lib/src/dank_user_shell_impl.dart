@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
 import 'package:lib.user.fidl/user_shell.fidl.dart';
 import 'package:lib.fidl.dart/bindings.dart';
@@ -47,5 +48,6 @@ class DankUserShellImpl implements UserShell, Lifecycle {
   void terminate() {
     _userShellContextProxy.ctrl.close();
     onStop?.call();
+    fuchsia.exit(0);
   }
 }

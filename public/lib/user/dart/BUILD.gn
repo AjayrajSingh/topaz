@@ -18,6 +18,7 @@ dart_library("dart") {
     "//peridot/public/lib/suggestion/fidl:fidl_dart",
     "//peridot/public/lib/user/fidl:fidl_dart",
     "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
+    "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/story/dart",
   ]
