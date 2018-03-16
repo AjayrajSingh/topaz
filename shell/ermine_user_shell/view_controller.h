@@ -87,7 +87,7 @@ class ViewController : public mozart::ViewListener,
 
   mozart::SizeF logical_size_;
   mozart::Size physical_size_;
-  scenic::Metrics metrics_;
+  ui::gfx::Metrics metrics_;
 
   scenic_lib::Session session_;
   scenic_lib::ImportNode parent_node_;

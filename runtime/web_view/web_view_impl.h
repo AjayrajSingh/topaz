@@ -24,7 +24,7 @@ class TouchTracker {
   TouchTracker(int x = 0, int y = 0);
 
   void HandleEvent(const mozart::PointerEventPtr& pointer,
-                   const scenic::Metrics& metrics,
+                   const ui::gfx::Metrics& metrics,
                    WebView& web_view);
 
  private:

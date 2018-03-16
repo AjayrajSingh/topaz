@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.ui.gfx.fidl/nodes.fidl.dart' as scenic;
-import 'package:lib.ui.gfx.fidl/ops.fidl.dart' as scenic;
-import 'package:lib.ui.gfx.fidl/resources.fidl.dart' as scenic;
-import 'package:lib.ui.gfx.fidl/shapes.fidl.dart' as scenic;
-import 'package:lib.ui.gfx.fidl/types.fidl.dart' as scenic;
+import 'package:lib.ui.gfx.fidl/nodes.fidl.dart' as ui_gfx;
+import 'package:lib.ui.gfx.fidl/commands.fidl.dart' as ui_gfx;
+import 'package:lib.ui.gfx.fidl/resources.fidl.dart' as ui_gfx;
+import 'package:lib.ui.gfx.fidl/shapes.fidl.dart' as ui_gfx;
+import 'package:lib.ui.gfx.fidl/types.fidl.dart' as ui_gfx;
 import 'package:zircon/zircon.dart';
 
 import 'session.dart';
@@ -17,112 +17,112 @@ class Resource {
   final int id;
   final Session session;
 
-  Resource._create(this.session, scenic.ResourceArgs resource)
+  Resource._create(this.session, ui_gfx.ResourceArgs resource)
       : id = session.nextResourceId() {
-    session.enqueue(new scenic.Op.withCreateResource(
-        new scenic.CreateResourceOp(id: id, resource: resource)));
+    session.enqueue(new ui_gfx.Command.withCreateResource(
+        new ui_gfx.CreateResourceCommand(id: id, resource: resource)));
   }
 
-  Resource._import(this.session, Handle token, scenic.ImportSpec spec)
+  Resource._import(this.session, Handle token, ui_gfx.ImportSpec spec)
       : id = session.nextResourceId() {
-    session.enqueue(new scenic.Op.withImportResource(
-        new scenic.ImportResourceOp(id: id, token: token, spec: spec)));
+    session.enqueue(new ui_gfx.Command.withImportResource(
+        new ui_gfx.ImportResourceCommand(id: id, token: token, spec: spec)));
   }
 }
 
-scenic.Value vector1(double val) => new scenic.Value.withVector1(val);
+ui_gfx.Value vector1(double val) => new ui_gfx.Value.withVector1(val);
 
 class Node extends Resource {
-  Node._create(Session session, scenic.ResourceArgs resource)
+  Node._create(Session session, ui_gfx.ResourceArgs resource)
       : super._create(session, resource);
 
-  Node._import(Session session, Handle token, scenic.ImportSpec spec)
+  Node._import(Session session, Handle token, ui_gfx.ImportSpec spec)
       : super._import(session, token, spec);
 
   void setRotation(double x, double y, double z, double w) {
-    final scenic.Quaternion quaternion =
-        new scenic.Quaternion(x: x, y: y, z: z, w: w);
+    final ui_gfx.Quaternion quaternion =
+        new ui_gfx.Quaternion(x: x, y: y, z: z, w: w);
     setRotationValue(
-        new scenic.QuaternionValue(value: quaternion, variableId: 0));
+        new ui_gfx.QuaternionValue(value: quaternion, variableId: 0));
   }
 
-  void setRotationValue(scenic.QuaternionValue rotation) {
-    session.enqueue(new scenic.Op.withSetRotation(
-        new scenic.SetRotationOp(id: id, value: rotation)));
+  void setRotationValue(ui_gfx.QuaternionValue rotation) {
+    session.enqueue(new ui_gfx.Command.withSetRotation(
+        new ui_gfx.SetRotationCommand(id: id, value: rotation)));
   }
 
   void setTranslation(double x, double y, double z) {
-    final scenic.Vec3 vec3 = new scenic.Vec3(x: x, y: y, z: z);
-    setTranslationValue(new scenic.Vector3Value(value: vec3, variableId: 0));
+    final ui_gfx.Vec3 vec3 = new ui_gfx.Vec3(x: x, y: y, z: z);
+    setTranslationValue(new ui_gfx.Vector3Value(value: vec3, variableId: 0));
   }
 
-  void setTranslationValue(scenic.Vector3Value vec3) {
-    session.enqueue(new scenic.Op.withSetTranslation(
-        new scenic.SetTranslationOp(id: id, value: vec3)));
+  void setTranslationValue(ui_gfx.Vector3Value vec3) {
+    session.enqueue(new ui_gfx.Command.withSetTranslation(
+        new ui_gfx.SetTranslationCommand(id: id, value: vec3)));
   }
 }
 
 class ContainerNode extends Node {
-  ContainerNode._create(Session session, scenic.ResourceArgs resource)
+  ContainerNode._create(Session session, ui_gfx.ResourceArgs resource)
       : super._create(session, resource);
 
-  ContainerNode._import(Session session, Handle token, scenic.ImportSpec spec)
+  ContainerNode._import(Session session, Handle token, ui_gfx.ImportSpec spec)
       : super._import(session, token, spec);
 
   void addChild(Node child) {
-    session.enqueue(new scenic.Op.withAddChild(
-        new scenic.AddChildOp(nodeId: id, childId: child.id)));
+    session.enqueue(new ui_gfx.Command.withAddChild(
+        new ui_gfx.AddChildCommand(nodeId: id, childId: child.id)));
   }
 
   void addPart(Node part) {
-    session.enqueue(new scenic.Op.withAddPart(
-        new scenic.AddPartOp(nodeId: id, partId: part.id)));
+    session.enqueue(new ui_gfx.Command.withAddPart(
+        new ui_gfx.AddPartCommand(nodeId: id, partId: part.id)));
   }
 }
 
 class ImportNode extends ContainerNode {
   ImportNode(Session session, Handle token)
-      : super._import(session, token, scenic.ImportSpec.node);
+      : super._import(session, token, ui_gfx.ImportSpec.node);
 }
 
 class ShapeNode extends Node {
   ShapeNode(Session session)
       : super._create(session,
-            const scenic.ResourceArgs.withShapeNode(const scenic.ShapeNodeArgs()));
+            const ui_gfx.ResourceArgs.withShapeNode(const ui_gfx.ShapeNodeArgs()));
 
   void setMaterial(Material material) {
-    session.enqueue(new scenic.Op.withSetMaterial(
-        new scenic.SetMaterialOp(nodeId: id, materialId: material.id)));
+    session.enqueue(new ui_gfx.Command.withSetMaterial(
+        new ui_gfx.SetMaterialCommand(nodeId: id, materialId: material.id)));
   }
 
   void setShape(Shape shape) {
-    session.enqueue(new scenic.Op.withSetShape(
-        new scenic.SetShapeOp(nodeId: id, shapeId: shape.id)));
+    session.enqueue(new ui_gfx.Command.withSetShape(
+        new ui_gfx.SetShapeCommand(nodeId: id, shapeId: shape.id)));
   }
 }
 
 class Material extends Resource {
   Material(Session session)
       : super._create(session,
-            const scenic.ResourceArgs.withMaterial(const scenic.MaterialArgs()));
+            const ui_gfx.ResourceArgs.withMaterial(const ui_gfx.MaterialArgs()));
 
   void setColor(double red, double green, double blue, double alpha) {
-    final scenic.ColorRgba color = new scenic.ColorRgba(
+    final ui_gfx.ColorRgba color = new ui_gfx.ColorRgba(
         red: (red * 255).round(),
         green: (green * 255).round(),
         blue: (blue * 255).round(),
         alpha: (alpha * 255).round());
-    setColorValue(new scenic.ColorRgbaValue(value: color, variableId: 0));
+    setColorValue(new ui_gfx.ColorRgbaValue(value: color, variableId: 0));
   }
 
-  void setColorValue(scenic.ColorRgbaValue color) {
-    session.enqueue(new scenic.Op.withSetColor(
-        new scenic.SetColorOp(materialId: id, color: color)));
+  void setColorValue(ui_gfx.ColorRgbaValue color) {
+    session.enqueue(new ui_gfx.Command.withSetColor(
+        new ui_gfx.SetColorCommand(materialId: id, color: color)));
   }
 }
 
 class Shape extends Resource {
-  Shape._create(Session session, scenic.ResourceArgs resource)
+  Shape._create(Session session, ui_gfx.ResourceArgs resource)
       : super._create(session, resource);
 }
 
@@ -146,13 +146,13 @@ class RoundedRectangle extends Shape {
 
   factory RoundedRectangle.fromValues(
       Session session,
-      scenic.Value width,
-      scenic.Value height,
-      scenic.Value topLeftRadius,
-      scenic.Value topRightRadius,
-      scenic.Value bottomLeftRadius,
-      scenic.Value bottomRightRadius) {
-    final scenic.RoundedRectangleArgs rect = new scenic.RoundedRectangleArgs(
+      ui_gfx.Value width,
+      ui_gfx.Value height,
+      ui_gfx.Value topLeftRadius,
+      ui_gfx.Value topRightRadius,
+      ui_gfx.Value bottomLeftRadius,
+      ui_gfx.Value bottomRightRadius) {
+    final ui_gfx.RoundedRectangleArgs rect = new ui_gfx.RoundedRectangleArgs(
         width: width,
         height: height,
         topLeftRadius: topLeftRadius,
@@ -161,9 +161,9 @@ class RoundedRectangle extends Shape {
         bottomRightRadius: bottomRightRadius);
 
     return new RoundedRectangle._create(
-        session, new scenic.ResourceArgs.withRoundedRectangle(rect));
+        session, new ui_gfx.ResourceArgs.withRoundedRectangle(rect));
   }
 
-  RoundedRectangle._create(Session session, scenic.ResourceArgs resource)
+  RoundedRectangle._create(Session session, ui_gfx.ResourceArgs resource)
       : super._create(session, resource);
 }

@@ -384,6 +384,12 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   // |Presentation|.
   @override
+  void setDisplaySizeInMm(num widthInMm, num heightInMm) {
+    presentation.setDisplaySizeInMm(widthInMm, heightInMm);
+  }
+
+  // |Presentation|.
+  @override
   void captureKeyboardEvent(KeyboardEvent eventToCapture,
       InterfaceHandle<KeyboardCaptureListener> listener) {
     presentation.captureKeyboardEvent(eventToCapture, listener);

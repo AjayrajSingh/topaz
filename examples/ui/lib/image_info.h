@@ -11,8 +11,8 @@
 namespace scenic_lib {
 namespace skia {
 
-// Creates Skia image information from a |scenic::ImageInfo| object.
-SkImageInfo MakeSkImageInfo(const scenic::ImageInfo& image_info);
+// Creates Skia image information from a |ui::gfx::ImageInfo| object.
+SkImageInfo MakeSkImageInfo(const ui::gfx::ImageInfo& image_info);
 
 }  // namespace skia
 }  // namespace scenic_lib

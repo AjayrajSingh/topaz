@@ -22,7 +22,7 @@ TouchTracker::TouchTracker(int x, int y)
     : start_x_(x), start_y_(y), last_x_(0), last_y_(0), is_drag_(false) {}
 
 void TouchTracker::HandleEvent(const mozart::PointerEventPtr& pointer,
-                               const scenic::Metrics& metrics,
+                               const ui::gfx::Metrics& metrics,
                                WebView& web_view) {
   const auto x = pointer->x * metrics.scale_x;
   const auto y = pointer->y * metrics.scale_y;
@@ -242,8 +242,8 @@ void WebViewImpl::OnSceneInvalidated(
   // Update the image.
   const scenic_lib::HostImage* image = image_cycler_.AcquireImage(
       physical_size().width, physical_size().height, physical_size().width * 4u,
-      scenic::ImageInfo::PixelFormat::BGRA_8,
-      scenic::ImageInfo::ColorSpace::SRGB);
+      ui::gfx::ImageInfo::PixelFormat::BGRA_8,
+      ui::gfx::ImageInfo::ColorSpace::SRGB);
   FXL_DCHECK(image);
 
   // Paint the webview.

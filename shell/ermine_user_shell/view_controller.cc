@@ -24,13 +24,13 @@ ui::ScenicPtr GetScenic(mozart::ViewManager* view_manager) {
   return scenic;
 }
 
-scenic::Metrics* GetLastMetrics(uint32_t node_id,
-                                const f1dl::Array<ui::EventPtr>& events) {
-  scenic::Metrics* result = nullptr;
+ui::gfx::Metrics* GetLastMetrics(uint32_t node_id,
+                                 const f1dl::Array<ui::EventPtr>& events) {
+  ui::gfx::Metrics* result = nullptr;
   for (const auto& event : events) {
-    if (event->is_scenic() && event->get_scenic()->is_metrics() &&
-        event->get_scenic()->get_metrics()->node_id == node_id)
-      result = event->get_scenic()->get_metrics()->metrics.get();
+    if (event->is_gfx() && event->get_gfx()->is_metrics() &&
+        event->get_gfx()->get_metrics()->node_id == node_id)
+      result = event->get_gfx()->get_metrics()->metrics.get();
   }
   return result;
 }
@@ -85,7 +85,7 @@ ViewController::ViewController(
   session_.set_event_handler([this](f1dl::Array<ui::EventPtr> events) {
     OnSessionEvents(std::move(events));
   });
-  parent_node_.SetEventMask(scenic::kMetricsEventMask);
+  parent_node_.SetEventMask(ui::gfx::kMetricsEventMask);
   parent_node_.AddChild(container_node_);
 }
 
@@ -156,7 +156,7 @@ void ViewController::OnEvent(mozart::InputEventPtr event,
 }
 
 void ViewController::OnSessionEvents(f1dl::Array<ui::EventPtr> events) {
-  scenic::Metrics* new_metrics = GetLastMetrics(parent_node_.id(), events);
+  ui::gfx::Metrics* new_metrics = GetLastMetrics(parent_node_.id(), events);
 
   if (!new_metrics || metrics_.Equals(*new_metrics))
     return;
