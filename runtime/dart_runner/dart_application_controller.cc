@@ -40,10 +40,6 @@ void AfterTask() {
   queue->RunMicrotasks();
 }
 
-void NopReleaseDill(uint8_t* dill) {
-  // Released by ~MappedResource.
-}
-
 }  // namespace
 
 DartApplicationController::DartApplicationController(
@@ -255,9 +251,8 @@ bool DartApplicationController::SetupFromKernel() {
   }
 
   Dart_EnterScope();
-  Dart_Handle root_library = Dart_LoadKernel(
-      Dart_ReadKernelBinary(reinterpret_cast<const uint8_t*>(script_.address()),
-                            script_.size(), NopReleaseDill));
+  Dart_Handle root_library = Dart_LoadScriptFromKernel(
+      reinterpret_cast<const uint8_t*>(script_.address()), script_.size());
   if (Dart_IsError(root_library)) {
     FXL_LOG(ERROR) << "Failed to load script kernel: "
                    << Dart_GetError(root_library);

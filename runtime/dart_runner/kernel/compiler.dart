@@ -70,8 +70,11 @@ Future<void> main(List<String> args) async {
   final String filename = options.rest[0];
   final Uri filenameUri = Uri.base.resolveUri(new Uri.file(filename));
 
+  Uri platformKernelDill = sdkRoot.resolve(strongMode ? 'platform_strong.dill'
+                                                      : 'platform.dill');
+
   final CompilerOptions compilerOptions = new CompilerOptions()
-    ..sdkRoot = sdkRoot
+    ..sdkSummary = platformKernelDill
     ..strongMode = strongMode
     ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
     ..target = new RunnerTarget(new TargetFlags(strongMode: strongMode))
@@ -81,20 +84,18 @@ Future<void> main(List<String> args) async {
 
   if (aot) {
     // Link in the platform to produce an output with no external references.
-    String platformKernelDill =
-        strongMode ? 'platform_strong.dill' : 'platform.dill';
     compilerOptions.linkedDependencies = <Uri>[
-      sdkRoot.resolve(platformKernelDill)
+      platformKernelDill
     ];
   }
 
-  Program program =
+  Component program =
       await compileToKernel(filenameUri, compilerOptions, aot: aot);
 
   final IOSink sink = new File(kernelBinaryFilename).openWrite();
   final BinaryPrinter printer = new LimitedBinaryPrinter(sink,
       (Library lib) => aot || !lib.isExternal, false /* excludeUriToSource */);
-  printer.writeProgramFile(program);
+  printer.writeComponentFile(program);
   await sink.close();
 
   if (depfile != null) {

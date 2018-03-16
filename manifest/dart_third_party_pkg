@@ -6,12 +6,12 @@
     <project name="third_party/dart/third_party/pkg/args"
              path="third_party/dart/third_party/pkg/args"
              remote="https://dart.googlesource.com/args.git"
-             revision="0.13.7"/>
+             revision="1.4.1"/>
 
     <project name="third_party/dart/third_party/pkg/async"
              path="third_party/dart/third_party/pkg/async"
              remote="https://dart.googlesource.com/async.git"
-             revision="2.0.4"/>
+             revision="2.0.6"/>
 
     <project name="third_party/dart/third_party/pkg/barback"
              path="third_party/dart/third_party/pkg/barback"
@@ -26,7 +26,7 @@
     <project name="third_party/dart/third_party/pkg/boolean_selector"
              path="third_party/dart/third_party/pkg/boolean_selector"
              remote="https://dart.googlesource.com/boolean_selector.git"
-             revision="1.0.2"/>
+             revision="1.0.3"/>
 
     <project name="third_party/dart/third_party/pkg/charcode"
              path="third_party/dart/third_party/pkg/charcode"
@@ -41,7 +41,7 @@
     <project name="third_party/dart/third_party/pkg/collection"
              path="third_party/dart/third_party/pkg/collection"
              remote="https://dart.googlesource.com/collection.git"
-             revision="1.14.5"/>
+             revision="1.14.6"/>
 
     <project name="third_party/dart/third_party/pkg/convert"
              path="third_party/dart/third_party/pkg/convert"
@@ -66,7 +66,7 @@
     <project name="third_party/dart/third_party/pkg/dartdoc"
              path="third_party/dart/third_party/pkg/dartdoc"
              remote="https://dart.googlesource.com/dartdoc.git"
-             revision="v0.17.0"/>
+             revision="v0.17.1+1"/>
 
     <project name="third_party/dart/third_party/pkg/fixnum"
              path="third_party/dart/third_party/pkg/fixnum"
@@ -86,12 +86,12 @@
     <project name="third_party/dart/third_party/pkg/html"
              path="third_party/dart/third_party/pkg/html"
              remote="https://dart.googlesource.com/html.git"
-             revision="0.13.2+2"/>
+             revision="0.13.3"/>
 
     <project name="third_party/dart/third_party/pkg/http"
              path="third_party/dart/third_party/pkg/http"
              remote="https://dart.googlesource.com/http.git"
-             revision="0.11.3+14"/>
+             revision="0.11.3+16"/>
 
     <project name="third_party/dart/third_party/pkg/http_multi_server"
              path="third_party/dart/third_party/pkg/http_multi_server"
@@ -131,7 +131,7 @@
     <project name="third_party/dart/third_party/pkg/linter"
              path="third_party/dart/third_party/pkg/linter"
              remote="https://dart.googlesource.com/linter.git"
-             revision="0.1.43"/>
+             revision="0.1.44"/>
 
     <project name="third_party/dart/third_party/pkg/logging"
              path="third_party/dart/third_party/pkg/logging"
@@ -141,7 +141,7 @@
     <project name="third_party/dart/third_party/pkg/markdown"
              path="third_party/dart/third_party/pkg/markdown"
              remote="https://dart.googlesource.com/markdown.git"
-             revision="1.0.0"/>
+             revision="1.1.1"/>
 
     <project name="third_party/dart/third_party/pkg/matcher"
              path="third_party/dart/third_party/pkg/matcher"
@@ -186,12 +186,12 @@
     <project name="third_party/dart/third_party/pkg/protobuf"
              path="third_party/dart/third_party/pkg/protobuf"
              remote="https://dart.googlesource.com/protobuf.git"
-             revision="0.7.0"/>
+             revision="0.7.1"/>
 
     <project name="third_party/dart/third_party/pkg/pub"
              path="third_party/dart/third_party/pkg/pub"
              remote="https://dart.googlesource.com/pub.git"
-             revision="73ff0d3d9f80f60d41e3135ac44597d011abb4f3"/>
+             revision="dbe8be2bb8bca9b26ba7bd583272c62f9a0153fd"/>
 
     <project name="third_party/dart/third_party/pkg/pub_semver"
              path="third_party/dart/third_party/pkg/pub_semver"
@@ -201,7 +201,7 @@
     <project name="third_party/dart/third_party/pkg/quiver"
              path="third_party/dart/third_party/pkg/quiver"
              remote="https://chromium.googlesource.com/external/github.com/google/quiver-dart.git"
-             revision="0.28.0"/>
+             revision="5aaa3f58c48608af5b027444d561270b53f15dbf"/>
 
     <project name="third_party/dart/third_party/pkg/resource"
              path="third_party/dart/third_party/pkg/resource"
@@ -211,7 +211,7 @@
     <project name="third_party/dart/third_party/pkg/shelf"
              path="third_party/dart/third_party/pkg/shelf"
              remote="https://dart.googlesource.com/shelf.git"
-             revision="0.7.1"/>
+             revision="0.7.2"/>
 
     <project name="third_party/dart/third_party/pkg/shelf_packages_handler"
              path="third_party/dart/third_party/pkg/shelf_packages_handler"
@@ -221,7 +221,7 @@
     <project name="third_party/dart/third_party/pkg/shelf_static"
              path="third_party/dart/third_party/pkg/shelf_static"
              remote="https://dart.googlesource.com/shelf_static.git"
-             revision="3558aa35a0d2f0f35868c3fd64b258e140db0122"/>
+             revision="v0.2.7"/>
 
     <project name="third_party/dart/third_party/pkg/shelf_web_socket"
              path="third_party/dart/third_party/pkg/shelf_web_socket"
@@ -246,12 +246,12 @@
     <project name="third_party/dart/third_party/pkg/stack_trace"
              path="third_party/dart/third_party/pkg/stack_trace"
              remote="https://dart.googlesource.com/stack_trace.git"
-             revision="1.9.0"/>
+             revision="1.9.2"/>
 
     <project name="third_party/dart/third_party/pkg/stream_channel"
              path="third_party/dart/third_party/pkg/stream_channel"
              remote="https://dart.googlesource.com/stream_channel.git"
-             revision="1.6.2"/>
+             revision="1.6.4"/>
 
     <project name="third_party/dart/third_party/pkg/string_scanner"
              path="third_party/dart/third_party/pkg/string_scanner"
