@@ -7,7 +7,7 @@ assert(is_fuchsia || is_fuchsia_host)
 import("//build/dart/dart_library.gni")
 import("//build/dart/toolchain.gni")
 import("//build/package.gni")
-import("//peridot/build/verify_module_manifest.gni")
+import("//peridot/build/module_manifest.gni")
 import("//third_party/flutter/lib/ui/dart_ui.gni")
 import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
 import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
@@ -144,11 +144,15 @@ template("flutter_source_app") {
     ]
   }
 
-  # Create a module manifest verification target.
+  # The module manifest verify & copy targets.
   if (defined(invoker.module_manifest)) {
     verify_module_manifest("${target_name}_verify_manifest") {
       original_target_name = invoker.target_name
       module_manifest = invoker.module_manifest
+    }
+    copy_module_manifest("${target_name}_copy_manifest") {
+      package_name = target_name
+      module_manifest = rebase_path(invoker.module_manifest)
     }
   }
 
@@ -178,7 +182,10 @@ template("flutter_source_app") {
       },
     ]
     if (defined(invoker.module_manifest)) {
-      deps += [ ":${target_name}_verify_manifest" ]
+      deps += [
+        ":${target_name}_copy_manifest",
+        ":${target_name}_verify_manifest",
+      ]
       meta += [
         {
           path = rebase_path(invoker.module_manifest)
@@ -351,11 +358,15 @@ template("flutter_jit_app") {
     ]
   }
 
-  # Create a module manifest verification target.
+  # The module manifest verify & copy targets.
   if (defined(invoker.module_manifest)) {
     verify_module_manifest("${target_name}_verify_manifest") {
       original_target_name = invoker.target_name
       module_manifest = invoker.module_manifest
+    }
+    copy_module_manifest("${target_name}_copy_manifest") {
+      package_name = target_name
+      module_manifest = rebase_path(invoker.module_manifest)
     }
   }
 
@@ -385,7 +396,10 @@ template("flutter_jit_app") {
     ]
 
     if (defined(invoker.module_manifest)) {
-      deps += [ ":${target_name}_verify_manifest" ]
+      deps += [
+        ":${target_name}_copy_manifest",
+        ":${target_name}_verify_manifest",
+      ]
       meta += [
         {
           path = rebase_path(invoker.module_manifest)
@@ -585,11 +599,15 @@ template("flutter_aot_app") {
     ]
   }
 
-  # Create a module manifest verification target.
+  # The module manifest verify & copy targets.
   if (defined(invoker.module_manifest)) {
     verify_module_manifest("${target_name}_verify_manifest") {
       original_target_name = invoker.target_name
       module_manifest = invoker.module_manifest
+    }
+    copy_module_manifest("${target_name}_copy_manifest") {
+      package_name = target_name
+      module_manifest = rebase_path(invoker.module_manifest)
     }
   }
 
@@ -619,7 +637,10 @@ template("flutter_aot_app") {
     ]
 
     if (defined(invoker.module_manifest)) {
-      deps += [ ":${target_name}_verify_manifest" ]
+      deps += [
+        ":${target_name}_copy_manifest",
+        ":${target_name}_verify_manifest",
+      ]
       meta += [
         {
           path = rebase_path(invoker.module_manifest)
