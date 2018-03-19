@@ -33,7 +33,7 @@ Future<SizedVmo> urlToVmo(String url) async {
         result.handle,
         response.bodyBytes.lengthInBytes,
       );
-      if (vmo.write(response.bodyBytes.buffer.asByteData()).status != 0) {
+      if (vmo.write(response.bodyBytes.buffer.asByteData()) != 0) {
         return null;
       }
       return vmo;

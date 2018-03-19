@@ -358,20 +358,19 @@ zx_status_t System::VmoSetSize(fxl::RefPtr<Handle> vmo, uint64_t size) {
   return zx_vmo_set_size(vmo->handle(), size);
 }
 
-Dart_Handle System::VmoWrite(fxl::RefPtr<Handle> vmo,
+zx_status_t System::VmoWrite(fxl::RefPtr<Handle> vmo,
                              uint64_t offset,
                              const tonic::DartByteData& data) {
   if (!vmo || !vmo->is_valid()) {
     data.Release();
-    return ConstructDartObject(kWriteResult, ToDart(ZX_ERR_BAD_HANDLE));
+    ZX_ERR_BAD_HANDLE;
   }
 
-  size_t actual;
-  zx_status_t status = zx_vmo_write_old(vmo->handle(), data.data(), offset,
-                                        data.length_in_bytes(), &actual);
+  zx_status_t status = zx_vmo_write(vmo->handle(), data.data(), offset,
+                                    data.length_in_bytes());
 
   data.Release();
-  return ConstructDartObject(kWriteResult, ToDart(status), ToDart(actual));
+  return status;
 }
 
 Dart_Handle System::VmoRead(fxl::RefPtr<Handle> vmo,
@@ -383,12 +382,10 @@ Dart_Handle System::VmoRead(fxl::RefPtr<Handle> vmo,
 
   // TODO: constrain size?
   ByteDataScope bytes(size);
-  size_t actual;
   zx_status_t status =
-      zx_vmo_read_old(vmo->handle(), bytes.data(), offset, size, &actual);
+      zx_vmo_read(vmo->handle(), bytes.data(), offset, size);
   bytes.Release();
   if (status == ZX_OK) {
-    FXL_DCHECK(actual <= size);
     return ConstructDartObject(kReadResult, ToDart(status), bytes.dart_handle(),
                                ToDart(size));
   }

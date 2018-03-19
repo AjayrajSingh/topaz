@@ -43,7 +43,7 @@ class System : public fxl::RefCountedThreadSafe<System>,
   static Dart_Handle VmoFromFile(std::string path);
   static Dart_Handle VmoGetSize(fxl::RefPtr<Handle> vmo);
   static zx_status_t VmoSetSize(fxl::RefPtr<Handle> vmo, uint64_t size);
-  static Dart_Handle VmoWrite(fxl::RefPtr<Handle> vmo,
+  static zx_status_t VmoWrite(fxl::RefPtr<Handle> vmo,
                               uint64_t offset,
                               const tonic::DartByteData& data);
   static Dart_Handle VmoRead(fxl::RefPtr<Handle> vmo,

@@ -131,7 +131,7 @@ class System extends NativeFieldWrapperClass2 {
   static FromFileResult vmoFromFile(String path) native 'System_VmoFromFile';
   static GetSizeResult vmoGetSize(Handle vmo) native 'System_VmoGetSize';
   static int vmoSetSize(Handle vmo, int size) native 'System_VmoSetSize';
-  static WriteResult vmoWrite(Handle vmo, int offset, ByteData bytes)
+  static int vmoWrite(Handle vmo, int offset, ByteData bytes)
       native 'System_VmoWrite';
   static ReadResult vmoRead(Handle vmo, int offset, int size)
       native 'System_VmoRead';

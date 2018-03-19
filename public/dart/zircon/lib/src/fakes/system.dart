@@ -166,7 +166,7 @@ class System {
         'System.vmoSetSize() is not implemented on this platform.');
   }
 
-  static WriteResult vmoWrite(Handle vmo, int offset, ByteData bytes) {
+  static int vmoWrite(Handle vmo, int offset, ByteData bytes) {
     throw new UnimplementedError(
         'System.vmoWrite() is not implemented on this platform.');
   }

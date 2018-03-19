@@ -25,9 +25,9 @@ class Vmo extends _HandleWrapper<Vmo> {
     return System.vmoSetSize(handle, size);
   }
 
-  WriteResult write(ByteData data, [int vmoOffset = 0]) {
+  int write(ByteData data, [int vmoOffset = 0]) {
     if (handle == null) {
-      return const WriteResult(ZX.ERR_INVALID_ARGS);
+      return ZX.ERR_INVALID_ARGS;
     }
 
     return System.vmoWrite(handle, vmoOffset, data);
