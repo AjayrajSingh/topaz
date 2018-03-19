@@ -40,11 +40,13 @@ const char* kDartVMArgs[] = {
     // clang-format on
 };
 
+// TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
 const char* kDart2VMArgs[] = {
     // clang-format off
-  "--strong",
-  "--reify_generic_functions",
-  "--limit_ints_to_64_bits",
+    "--limit_ints_to_64_bits",
+    "--reify_generic_functions",
+    "--strong",
+    "--sync_async",
     // clang-format on
 };
 

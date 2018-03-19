@@ -219,9 +219,11 @@ action("generate_dart2_aot_snapshot_assembly") {
 
   script = _gen_snapshot
   args = [
-    "--strong",
-    "--reify_generic_functions",
+    # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
     "--limit_ints_to_64_bits",
+    "--reify_generic_functions",
+    "--strong",
+    "--sync-async",
     "--snapshot_kind=vm-aot-assembly",
     "--assembly=" + rebase_path(snapshot_assembly),
   ]
