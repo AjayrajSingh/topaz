@@ -54,7 +54,7 @@ class _ScanFilterDialogState extends State<ScanFilterDialog> {
 
     return await showDialog<bool>(
             context: context,
-            child: new AlertDialog(
+            builder: (BuildContext context) => new AlertDialog(
                 content: new Text('Discard filters?', style: dialogTextStyle),
                 actions: <Widget>[
                   new FlatButton(
