@@ -47,11 +47,13 @@ To roll Flutter forward:
      names in its [DEPS](https://github.com/flutter/engine/blob/master/DEPS)
      file as `dart_revision` and write its hash into the `dart` manifest file
      in this directory.
-  5. Commit the manifest updates:
+  5. Update DEFAULT_DART_VERSION in //topaz/tools/download_dev_sdk.py to the
+     [current Dart SDK dev version](https://github.com/dart-lang/sdk/commits/dev).
+  6. Commit the manifest updates:
      ```
      $ git commit -a -m "[flutter] Rolls the Flutter triforce forward"
      ```
-  6. Run the command:
+  7. Run the command:
      ```
      $ jiri update -gc --local-manifest=true
      ```
