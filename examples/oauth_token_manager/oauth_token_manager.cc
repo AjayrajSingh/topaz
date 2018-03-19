@@ -425,7 +425,7 @@ class OAuthTokenManagerApp : AccountProvider {
 
   // |AccountProvider|
   void GetTokenProviderFactory(
-      const f1dl::String& account_id,
+      const f1dl::StringPtr& account_id,
       f1dl::InterfaceRequest<TokenProviderFactory> request) override;
 
   // Generate a random account id.
@@ -501,7 +501,7 @@ class OAuthTokenManagerApp : AccountProvider {
 class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
                                                        TokenProvider {
  public:
-  TokenProviderFactoryImpl(const f1dl::String& account_id,
+  TokenProviderFactoryImpl(const f1dl::StringPtr& account_id,
                            OAuthTokenManagerApp* const app,
                            f1dl::InterfaceRequest<TokenProviderFactory> request)
       : account_id_(account_id), binding_(this, std::move(request)), app_(app) {
@@ -512,7 +512,7 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
  private:
   // |TokenProviderFactory|
   void GetTokenProvider(
-      const f1dl::String& /*application_url*/,
+      const f1dl::StringPtr& /*application_url*/,
       f1dl::InterfaceRequest<TokenProvider> request) override {
     // TODO(alhaad/ukode): Current implementation is agnostic about which
     // agent is requesting what token. Fix this.
@@ -533,7 +533,7 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
 
   // |TokenProvider|
   void GetFirebaseAuthToken(
-      const f1dl::String& firebase_api_key,
+      const f1dl::StringPtr& firebase_api_key,
       const GetFirebaseAuthTokenCallback& callback) override {
     FXL_DCHECK(app_);
 
@@ -761,7 +761,7 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
 };
 
 class OAuthTokenManagerApp::GoogleOAuthTokensCall
-    : Operation<f1dl::String, modular::auth::AuthErrPtr> {
+    : Operation<f1dl::StringPtr, modular::auth::AuthErrPtr> {
  public:
   GoogleOAuthTokensCall(OperationContainer* const container,
                         std::string account_id,
@@ -934,7 +934,7 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
   network::NetworkServicePtr network_service_;
   network::URLLoaderPtr url_loader_;
 
-  f1dl::String result_;
+  f1dl::StringPtr result_;
   modular::auth::AuthErrPtr auth_err_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleOAuthTokensCall);
@@ -999,7 +999,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
   }
 
   // |web_view::WebRequestDelegate|
-  void WillSendRequest(const f1dl::String& incoming_url) override {
+  void WillSendRequest(const f1dl::StringPtr& incoming_url) override {
     const std::string& uri = incoming_url.get();
     const std::string prefix = std::string{kRedirectUri} + "?code=";
     const std::string cancel_prefix =
@@ -1526,7 +1526,7 @@ void OAuthTokenManagerApp::AddAccount(IdentityProvider identity_provider,
     case IdentityProvider::GOOGLE:
       new GoogleUserCredsCall(
           &operation_queue_, std::move(account), this,
-          [this, callback](AccountPtr account, const f1dl::String error_msg) {
+          [this, callback](AccountPtr account, const f1dl::StringPtr error_msg) {
             if (error_msg) {
               callback(nullptr, error_msg);
               return;
@@ -1551,7 +1551,7 @@ void OAuthTokenManagerApp::RemoveAccount(
 }
 
 void OAuthTokenManagerApp::GetTokenProviderFactory(
-    const f1dl::String& account_id,
+    const f1dl::StringPtr& account_id,
     f1dl::InterfaceRequest<TokenProviderFactory> request) {
   new TokenProviderFactoryImpl(account_id, this, std::move(request));
 }

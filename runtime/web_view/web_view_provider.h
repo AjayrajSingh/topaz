@@ -36,7 +36,7 @@ class WebViewProvider : mozart::ViewProvider,
   void Terminate() final;
 
   // modular::LinkWatcher
-  void Notify(const f1dl::String& json) final;
+  void Notify(const f1dl::StringPtr& json) final;
 
   std::string url_;
   std::unique_ptr<component::ApplicationContext> context_;

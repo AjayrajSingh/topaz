@@ -57,7 +57,7 @@ class WebViewImpl : public mozart::BaseView,
 #endif
 
   // |WebView|:
-  void SetUrl(const ::f1dl::String& url) override;
+  void SetUrl(const ::f1dl::StringPtr& url) override;
 
  private:
   // |WebView|:

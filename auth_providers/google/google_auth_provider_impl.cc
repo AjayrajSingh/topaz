@@ -111,8 +111,8 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
 }
 
 void GoogleAuthProviderImpl::GetAppAccessToken(
-    const f1dl::String& credential, const f1dl::String& app_client_id,
-    const f1dl::Array<f1dl::String> app_scopes,
+    const f1dl::StringPtr& credential, const f1dl::StringPtr& app_client_id,
+    const f1dl::VectorPtr<f1dl::StringPtr> app_scopes,
     const GetAppAccessTokenCallback& callback) {
   if (credential->empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
@@ -153,7 +153,7 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
 }
 
 void GoogleAuthProviderImpl::GetAppIdToken(
-    const f1dl::String& credential, const f1dl::String& audience,
+    const f1dl::StringPtr& credential, const f1dl::StringPtr& audience,
     const GetAppIdTokenCallback& callback) {
   if (credential->empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
@@ -192,7 +192,7 @@ void GoogleAuthProviderImpl::GetAppIdToken(
 }
 
 void GoogleAuthProviderImpl::GetAppFirebaseToken(
-    const f1dl::String& id_token, const f1dl::String& firebase_api_key,
+    const f1dl::StringPtr& id_token, const f1dl::StringPtr& firebase_api_key,
     const GetAppFirebaseTokenCallback& callback) {
   if (id_token->empty() || firebase_api_key->empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
@@ -238,7 +238,7 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
 }
 
 void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
-    const f1dl::String& credential,
+    const f1dl::StringPtr& credential,
     const RevokeAppOrPersistentCredentialCallback& callback) {
   if (credential->empty()) {
     callback(AuthProviderStatus::BAD_REQUEST);
@@ -270,7 +270,7 @@ void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
       });
 }
 
-void GoogleAuthProviderImpl::WillSendRequest(const f1dl::String& incoming_url) {
+void GoogleAuthProviderImpl::WillSendRequest(const f1dl::StringPtr& incoming_url) {
   FXL_DCHECK(get_persistent_credential_callback_);
 
   const std::string& uri = incoming_url.get();
@@ -341,8 +341,8 @@ void GoogleAuthProviderImpl::WillSendRequest(const f1dl::String& incoming_url) {
 }
 
 void GoogleAuthProviderImpl::GetUserProfile(
-    const f1dl::String& credential,
-    const f1dl::String& access_token) {
+    const f1dl::StringPtr& credential,
+    const f1dl::StringPtr& access_token) {
   FXL_DCHECK(credential.get().size() > 0);
   FXL_DCHECK(access_token.get().size() > 0);
 

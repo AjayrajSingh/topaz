@@ -109,7 +109,7 @@ void Scenic_offerServiceProvider(Dart_NativeArguments args) {
   if (Dart_IsError(result)) {
     return;
   }
-  f1dl::Array<f1dl::String> services;
+  f1dl::VectorPtr<f1dl::StringPtr> services;
   services.resize(list_length);
   for (intptr_t index = 0; index < list_length; ++index) {
     Dart_Handle value = Dart_ListGetAt(list, index);

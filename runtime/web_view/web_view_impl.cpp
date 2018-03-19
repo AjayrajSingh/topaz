@@ -103,7 +103,7 @@ WebViewImpl::WebViewImpl(
 WebViewImpl::~WebViewImpl() {}
 
 // |WebView|:
-void WebViewImpl::SetUrl(const ::f1dl::String& url) {
+void WebViewImpl::SetUrl(const ::f1dl::StringPtr& url) {
   url_ = url;
   // Reset url_set_ so that the next OnDraw() knows to call
   // web_view_.setURL()

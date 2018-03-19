@@ -39,31 +39,31 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
       const GetPersistentCredentialCallback& callback) override;
 
   // |AuthProvider|
-  void GetAppAccessToken(const f1dl::String& credential,
-                         const f1dl::String& app_client_id,
-                         const f1dl::Array<f1dl::String> app_scopes,
+  void GetAppAccessToken(const f1dl::StringPtr& credential,
+                         const f1dl::StringPtr& app_client_id,
+                         const f1dl::VectorPtr<f1dl::StringPtr> app_scopes,
                          const GetAppAccessTokenCallback& callback) override;
 
   // |AuthProvider|
-  void GetAppIdToken(const f1dl::String& credential,
-                     const f1dl::String& audience,
+  void GetAppIdToken(const f1dl::StringPtr& credential,
+                     const f1dl::StringPtr& audience,
                      const GetAppIdTokenCallback& callback) override;
 
   // |AuthProvider|
   void GetAppFirebaseToken(
-      const f1dl::String& id_token, const f1dl::String& firebase_api_key,
+      const f1dl::StringPtr& id_token, const f1dl::StringPtr& firebase_api_key,
       const GetAppFirebaseTokenCallback& callback) override;
 
   // |AuthProvider|
   void RevokeAppOrPersistentCredential(
-      const f1dl::String& credential,
+      const f1dl::StringPtr& credential,
       const RevokeAppOrPersistentCredentialCallback& callback) override;
 
   // |web_view::WebRequestDelegate|
-  void WillSendRequest(const f1dl::String& incoming_url) override;
+  void WillSendRequest(const f1dl::StringPtr& incoming_url) override;
 
-  void GetUserProfile(const f1dl::String& credential,
-                      const f1dl::String& access_token);
+  void GetUserProfile(const f1dl::StringPtr& credential,
+                      const f1dl::StringPtr& access_token);
 
   mozart::ViewOwnerPtr SetupWebView();
 

@@ -85,7 +85,7 @@ void WebViewProvider::Terminate() {
   fsl::MessageLoop::GetCurrent()->QuitNow();
 }
 
-void WebViewProvider::Notify(const f1dl::String& json) {
+void WebViewProvider::Notify(const f1dl::StringPtr& json) {
   modular::JsonDoc parsed_json;
   parsed_json.Parse(json);
 

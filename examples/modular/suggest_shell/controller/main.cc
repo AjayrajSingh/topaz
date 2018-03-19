@@ -84,7 +84,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
   }
 
   // |LinkWatcher|
-  void Notify(const f1dl::String& json) override {
+  void Notify(const f1dl::StringPtr& json) override {
     rapidjson::Document doc;
     doc.Parse(json);
     FXL_CHECK(!doc.HasParseError());

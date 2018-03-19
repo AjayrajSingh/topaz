@@ -382,7 +382,7 @@ bool DartApplicationController::Main() {
   tonic::DartMicrotaskQueue::StartForCurrentThread();
   fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(AfterTask);
 
-  f1dl::Array<f1dl::String> arguments =
+  f1dl::VectorPtr<f1dl::StringPtr> arguments =
       std::move(startup_info_->launch_info->arguments);
 
   // TODO(abarth): Remove service_provider_bridge once we have an

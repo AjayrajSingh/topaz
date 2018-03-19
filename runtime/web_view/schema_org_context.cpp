@@ -115,7 +115,7 @@ void SchemaOrgContext::EntitiesChanged() {
     std::string type = ExtractTypeFromEntity(entity_json);
     FXL_LOG(INFO) << "entity type: " << type;
     if (type.size()) {
-      f1dl::Array<modular::TypeToDataEntryPtr> type_to_data_array;
+      f1dl::VectorPtr<modular::TypeToDataEntryPtr> type_to_data_array;
       modular::TypeToDataEntryPtr entry = modular::TypeToDataEntry::New();
       entry->type = type;
       entry->data = modular::JsonValueToPrettyString(*i);

@@ -63,7 +63,7 @@ class ViewController : public mozart::ViewListener,
   void OnEvent(mozart::InputEventPtr event,
                const OnEventCallback& callback) override;
 
-  void OnSessionEvents(f1dl::Array<ui::EventPtr> events);
+  void OnSessionEvents(f1dl::VectorPtr<ui::EventPtr> events);
   void UpdatePhysicalSize();
 
   void MarkNeedsLayout();
