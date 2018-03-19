@@ -1,6 +1,6 @@
 {
     "imports": [
-        "garnet/packages/default",
+        "garnet/packages/garnet",
         "topaz/packages/tools/ermine_user_shell"
     ],
     "resources": [

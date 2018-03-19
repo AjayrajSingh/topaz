@@ -4,9 +4,9 @@
         "dart"
     ],
     "imports": [
-        "garnet/packages/fonts",
-        "garnet/packages/icu_data",
-        "garnet/packages/scenic"
+        "garnet/packages/prod/fonts",
+        "garnet/packages/prod/icu_data",
+        "garnet/packages/prod/scenic"
     ],
     "packages": {
         "flutter_aot_runner": "//third_party/flutter:flutter_aot_runner",

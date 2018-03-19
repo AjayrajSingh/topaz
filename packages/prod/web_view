@@ -3,8 +3,8 @@
         "cpp"
     ],
     "imports": [
-        "garnet/packages/fonts",
-        "garnet/packages/scenic",
+        "garnet/packages/prod/fonts",
+        "garnet/packages/prod/scenic",
         "topaz/packages/prod/curl",
         "topaz/packages/prod/sqlite"
     ],
