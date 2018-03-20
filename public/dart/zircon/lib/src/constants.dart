@@ -86,7 +86,6 @@ abstract class ZX {
   static const int SOCKET_WRITE_DISABLED = 1 << 5;
   static const int SOCKET_CONTROL_READABLE = 1 << 6;
   static const int SOCKET_CONTROL_WRITABLE = 1 << 7;
-  static const int PORT_READABLE = 1 << 0;
   static const int FIFO_READABLE = 1 << 0;
   static const int FIFO_WRITABLE = 1 << 1;
   static const int FIFO_PEER_CLOSED = 1 << 2;
