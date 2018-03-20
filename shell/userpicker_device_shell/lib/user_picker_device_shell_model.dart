@@ -74,8 +74,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     this.onDeviceShellStopped,
     this.onWifiTapped,
     this.onLogin,
-  })
-      : super() {
+  }) : super() {
     // Check for last kernel panic
     File lastPanic = new File('/boot/log/last-panic.txt');
     lastPanic.exists().then((bool exists) {
@@ -398,7 +397,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   // |ServiceProvider|.
   @override
   void connectToService(String serviceName, Channel channel) {
-    if (serviceName == 'ui.Presentation') {
+    // TODO(SCN-595) mozart.Presentation is being renamed to ui.Presentation.
+    if (serviceName == 'mozart.Presentation' ||
+        serviceName == 'ui.Presentation') {
       if (_presentationBinding.isBound) {
         log.warning(
             'UserPickerDeviceShell: Presentation service is already bound !');
