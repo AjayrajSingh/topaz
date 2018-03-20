@@ -1,8 +1,4 @@
 {
-    "imports": [
-        "garnet/packages/garnet",
-        "topaz/packages/tools/term"
-    ],
     "resources": [
         {
             "bootfs_path": "data/sysmgr/term.config",

@@ -23,6 +23,7 @@
         "topaz/packages/prod/perspective",
         "topaz/packages/prod/sqlite",
         "topaz/packages/prod/sysui",
+        "topaz/packages/prod/term",
         "topaz/packages/prod/video",
         "topaz/packages/prod/webkit",
         "topaz/packages/prod/web_view",

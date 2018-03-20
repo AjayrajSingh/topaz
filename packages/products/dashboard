@@ -1,0 +1,9 @@
+{
+    "imports": [
+        "garnet/packages/prod/scenic_tools",
+        "garnet/packages/products/graphical",
+        "topaz/packages/config/dashboard",
+        "topaz/packages/prod/dashboard",
+        "topaz/packages/prod/flutter"
+    ]
+}

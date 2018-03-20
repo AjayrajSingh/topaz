@@ -4,7 +4,6 @@
         "topaz/packages/tools/doc_checker",
         "topaz/packages/tools/ermine_user_shell",
         "topaz/packages/tools/ledger",
-        "topaz/packages/tools/link_viewer",
-        "topaz/packages/tools/term"
+        "topaz/packages/tools/link_viewer"
     ]
 }

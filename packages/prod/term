@@ -2,6 +2,9 @@
     "languages": [
         "cpp"
     ],
+    "imports": [
+        "garnet/packages/prod/fonts"
+    ],
     "packages": {
         "term": "//topaz/app/term"
     }

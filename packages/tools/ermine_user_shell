@@ -1,6 +1,6 @@
 {
     "imports": [
-        "topaz/packages/tools/term"
+        "topaz/packages/prod/term"
     ],
     "languages": [
         "cpp"
