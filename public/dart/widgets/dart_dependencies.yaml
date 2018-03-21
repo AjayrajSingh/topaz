@@ -4,5 +4,5 @@
 
 name: lib.widgets
 dependencies:
-  flutter_image: ^0.0.1
+  flutter_image: ^1.0.0
 

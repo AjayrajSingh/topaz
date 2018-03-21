@@ -4,7 +4,7 @@
 
 name: modules
 dependencies:
-  flutter_flux: ^4.0.1
+  flutter_flux: ^4.1.1
   flutter_markdown: ^0.1.0
   googleapis_auth: ^0.2.4
   googleapis: ^0.50.0

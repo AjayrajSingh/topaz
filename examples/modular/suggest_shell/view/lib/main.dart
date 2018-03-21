@@ -172,16 +172,17 @@ class _HomeScreenState extends State<_HomeScreen> {
     // HACK(mesch): Enter key presses as well as other control keys all
     // arrive as codePoint 0, so we don't use enter to finish input. We
     // just ignore all such key presses.
-    // ignore: undefined_getter
-    if (e.runtimeType == RawKeyDownEvent && e.data.codePoint != 0) {
-      setState(() {
-        // ignore: undefined_getter
-        _value += new String.fromCharCode(e.data.codePoint);
-        if (_value.endsWith('<<')) {
-          _state.sendValue(_value.substring(0, _value.length - 2));
-          _value = '';
-        }
-      });
+    if (e.runtimeType == RawKeyDownEvent) {
+      RawKeyEventDataFuchsia data = e.data;
+      if (data.codePoint != 0) {
+        setState(() {
+          _value += new String.fromCharCode(data.codePoint);
+          if (_value.endsWith('<<')) {
+            _state.sendValue(_value.substring(0, _value.length - 2));
+            _value = '';
+          }
+        });
+      }
     }
   }
 }

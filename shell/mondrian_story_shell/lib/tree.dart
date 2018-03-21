@@ -17,9 +17,13 @@ class Tree<T> extends Iterable<Tree<T>> {
   final T value;
 
   /// The longest path of edges to a leaf
-  int get height => _children.isEmpty
-      ? 0
-      : 1 + _children.fold(0, (int h, Tree<T> t) => max(h, t.height));
+  int get height {
+    int h = 0;
+    for (Tree<T> t in _children) {
+      h = max(h, t.height + 1);
+    }
+    return h;
+  }
 
   /// Direct descendents of this
   Iterable<Tree<T>> get children => _children.toList(growable: false);
@@ -27,7 +31,7 @@ class Tree<T> extends Iterable<Tree<T>> {
 
   /// Direct descendents of parent, except this
   Iterable<Tree<T>> get siblings => (_parent == null)
-      ? const Iterable<Tree<T>>.empty()
+      ? new Iterable<Tree<T>>.empty()  // ignore: prefer_const_constructors
       : _parent.children.where((Tree<T> node) => node != this);
 
   /// Direct ancestors of this, starting at parent to root
