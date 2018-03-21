@@ -15,7 +15,8 @@ import 'package:kernel/binary/limited_ast_to_binary.dart';
 import 'package:kernel/target/targets.dart';
 
 import 'package:vm/kernel_front_end.dart' show compileToKernel;
-import 'package:vm/target/dart_runner.dart';
+import 'package:vm/target/dart_runner.dart' show DartRunnerTarget;
+import 'package:vm/target/flutter_runner.dart' show FlutterRunnerTarget;
 
 ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addOption('sdk-root', help: 'Path to runner_patched_sdk')
@@ -24,6 +25,7 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
       defaultsTo: false)
   ..addFlag('embed-sources',
       help: 'Embed sources in the output dill file', defaultsTo: false)
+  ..addOption('target', help: 'Kernel target name')
   ..addOption('packages', help: 'Path to .packages file')
   ..addOption('depfile', help: 'Path to output Ninja depfile')
   ..addOption('output', help: 'Path to output dill file');
@@ -62,17 +64,33 @@ Future<void> main(List<String> args) async {
   final String kernelBinaryFilename = options['output'];
   final bool aot = options['aot'];
   final bool embedSources = options['embed-sources'];
+  final String targetName = options['target'];
 
   final String filename = options.rest[0];
   final Uri filenameUri = Uri.base.resolveUri(new Uri.file(filename));
 
   Uri platformKernelDill = sdkRoot.resolve('platform_strong.dill');
 
+  TargetFlags targetFlags = new TargetFlags(strongMode: true, syncAsync: true);
+  Target target;
+  switch (targetName) {
+    case 'dart_runner':
+      target = new DartRunnerTarget(targetFlags);
+      break;
+    case 'flutter_runner':
+      target = new FlutterRunnerTarget(targetFlags);
+      break;
+    default:
+      print("Unknown target: $targetName");
+      exitCode = 1;
+      return;
+  }
+
   final CompilerOptions compilerOptions = new CompilerOptions()
     ..sdkSummary = platformKernelDill
     ..strongMode = true
     ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
-    ..target = new DartRunnerTarget(new TargetFlags(strongMode: true, syncAsync: true))
+    ..target = target
     ..embedSourceText = embedSources
     ..reportMessages = true
     ..setExitCodeOnProblem = true;

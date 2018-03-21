@@ -26,7 +26,8 @@ export 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart'
     show ViewOwner;
 
 ViewContainerProxy _initViewContainer() {
-  final Handle handle = ScenicStartupInfo.takeViewContainer();
+  // Analyzer doesn't know Handle must be dart:zircon's Handle
+  final Handle handle = ScenicStartupInfo.takeViewContainer();  // ignore: invalid_assignment
   if (handle == null) {
     return null;
   }
@@ -535,6 +536,7 @@ class View {
   /// |provider|.
   static void offerServiceProvider(
       InterfaceHandle<ServiceProvider> provider, List<String> services) {
-    Scenic.offerServiceProvider(provider.passChannel().handle, services);
+    // Analyzer doesn't know Handle must be dart:zircon's Handle
+    Scenic.offerServiceProvider(provider.passChannel().handle, services); // ignore: argument_type_not_assignable
   }
 }

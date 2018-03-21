@@ -74,8 +74,9 @@ template("_dart_kernel") {
 
     script = _kernel_compiler
     args = invoker.args + [
+             "--target=dart_runner",
              "--sdk-root",
-             rebase_path("$root_out_dir/runner_patched_sdk"),
+             rebase_path("$root_out_dir/dart_runner_patched_sdk"),
              "--packages",
              rebased_packages_path,
              "--depfile",

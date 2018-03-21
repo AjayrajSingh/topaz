@@ -3,7 +3,10 @@
         "dart"
     ],
     "packages": {
-        "hello_material": "//topaz/examples/ui/hello_material",
+        "hello_material1_jit": "//topaz/examples/ui/hello_material:hello_material1_jit",
+        "hello_material2_jit": "//topaz/examples/ui/hello_material:hello_material2_jit",
+        "hello_material1_aot": "//topaz/examples/ui/hello_material:hello_material1_aot",
+        "hello_material2_aot": "//topaz/examples/ui/hello_material:hello_material2_aot",
         "hello_material_source": "//topaz/examples/ui/hello_material:hello_material_source",
         "jank": "//topaz/examples/ui/jank:package",
         "noodles": "//topaz/examples/ui/noodles:package",

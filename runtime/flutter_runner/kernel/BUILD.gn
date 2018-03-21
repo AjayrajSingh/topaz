@@ -11,12 +11,12 @@ compile_platform("kernel_platform_files") {
   ]
 
   outputs = [
-    "$root_out_dir/dart_runner_patched_sdk/platform_strong.dill",
-    "$root_out_dir/dart_runner_patched_sdk/vm_outline_strong.dill",
+    "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill",
+    "$root_out_dir/flutter_runner_patched_sdk/vm_outline_strong.dill",
   ]
 
   args = [
-    "--target=dart_runner",
+    "--target=flutter_runner",
     "--strong",
     "dart:core",
   ]
@@ -39,7 +39,7 @@ action("kernel_core_snapshot") {
     gen_snapshot_label,
   ]
 
-  platform_dill = "$root_out_dir/dart_runner_patched_sdk/platform_strong.dill"
+  platform_dill = "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
   inputs = [
     platform_dill,
   ]
@@ -58,12 +58,13 @@ action("kernel_core_snapshot") {
 
   script = gen_snapshot
   args = [
-    "--snapshot_kind=core",
-    "--strong",
-    "--reify_generic_functions",
+    # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
     "--limit_ints_to_64_bits",
-    "--await_is_keyword",
+    "--reify_generic_functions",
+    "--strong",
+    "--sync-async",
     "--enable_mirrors=false",
+    "--snapshot_kind=core",
     "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
     "--vm_snapshot_instructions=" +
         rebase_path(vm_snapshot_instructions, root_build_dir),
@@ -72,18 +73,5 @@ action("kernel_core_snapshot") {
     "--isolate_snapshot_instructions=" +
         rebase_path(isolate_snapshot_instructions, root_build_dir),
     rebase_path(platform_dill),
-  ]
-}
-
-dart_tool("kernel_compiler") {
-  main_dart = "compiler.dart"
-  source_dir = "."
-  disable_analysis = true
-
-  deps = [
-    "//third_party/dart-pkg/pub/args",
-    "//third_party/dart/pkg/front_end",
-    "//third_party/dart/pkg/kernel",
-    "//third_party/dart/pkg/vm",
   ]
 }
