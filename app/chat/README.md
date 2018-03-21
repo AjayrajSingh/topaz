@@ -4,10 +4,12 @@
 
 # Structure
 
-This repo contains code for running a [Fuchsia][fuchsia] specific set of Chat [modules][modular].
+This repo contains code for running a [Fuchsia][fuchsia] specific set of Chat
+[modules][modular].
 
 * **agents**: Fuchsia agents (background services) using Modular APIs.
-  * **content_provider**: The chat content provider agent which communicates with the firebase DB and the [Ledger][ledger] instance.
+  * **content_provider**: The chat content provider agent which communicates
+    with the firebase DB and the [Ledger][ledger] instance.
 * **modules**: Fuchsia application code using Modular APIs.
   * **conversation**: UI module for displaying chat messages for a conversatoin.
   * **conversation_list**: UI module for displaying the list of conversations.
@@ -20,11 +22,14 @@ This repo contains code for running a [Fuchsia][fuchsia] specific set of Chat [m
 
 This repo is already part of the default jiri manifest.
 
-Follow the instructions for setting up a fresh Fuchsia checkout.  Once you have the `jiri` tool installed and have imported the default manifest and updated return to these instructions.
+Follow the instructions for setting up a fresh Fuchsia checkout.  Once you have
+the `jiri` tool installed and have imported the default manifest and updated
+return to these instructions.
 
 ## Workflow
 
-There are Makefile tasks setup to help simplify common development tasks. Use `make help` to see what they are.
+There are Makefile tasks set up to help simplify common development tasks. Use
+`make help` to see what they are.
 
 When you have changes you are ready to see in action you can build with:
 
@@ -102,11 +107,12 @@ before running the chat modules correctly.
 ## Chat Agent Tests
 
 To run the chat agent tests, build fuchsia with
-`--packages peridot/packages/boot_test_modular,topaz/packages/default` option and boot into fuchsia using a
-target device or a QEMU instance.
+`--packages peridot/packages/products/test_modular,topaz/packages/default`
+option and boot into fuchsia using a target device or a QEMU instance.
 
 ```bash
-$ fx set x64 --packages build/gn/boot_test_modular
+$ fx set x64 --packages \
+peridot/packages/products/test_modular,topaz/packages/default
 $ fx full-build
 $ fx run <options> # when using QEMU.
 ```
