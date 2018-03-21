@@ -4,16 +4,19 @@
 
 #include "topaz/examples/media/media_player/media_player_view.h"
 
+#include <fcntl.h>
 #include <hid/usages.h>
 
 #include <iomanip>
 
+#include "garnet/bin/media/util/file_channel.h"
 #include "lib/app/cpp/connect.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
 #include "lib/media/fidl/media_player.fidl.h"
 #include "lib/media/fidl/net_media_service.fidl.h"
 #include "lib/media/timeline/timeline.h"
+#include "lib/url/gurl.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
 #include "topaz/examples/media/media_player/media_player_params.h"
@@ -57,7 +60,8 @@ MediaPlayerView::MediaPlayerView(
     f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
     component::ApplicationContext* application_context,
     const MediaPlayerParams& params)
-    : mozart::BaseView(std::move(view_manager), std::move(view_owner_request),
+    : mozart::BaseView(std::move(view_manager),
+                       std::move(view_owner_request),
                        "Media Player"),
       background_node_(session()),
       controls_widget_(session()) {
@@ -70,10 +74,6 @@ MediaPlayerView::MediaPlayerView(
 
   parent_node().AddChild(controls_widget_);
 
-  auto net_media_service =
-      application_context
-          ->ConnectToEnvironmentService<media::NetMediaService>();
-
   // We start with a non-zero size so we get a progress bar regardless of
   // whether we get video.
   video_size_.width = 0;
@@ -83,11 +83,11 @@ MediaPlayerView::MediaPlayerView(
 
   if (params.device_name().empty()) {
     // Create a player from all that stuff.
-    media::MediaPlayerPtr media_player =
+    media_player_ =
         application_context->ConnectToEnvironmentService<media::MediaPlayer>();
 
     mozart::ViewOwnerPtr video_view_owner;
-    media_player->CreateView(
+    media_player_->CreateView(
         application_context->ConnectToEnvironmentService<mozart::ViewManager>()
             .Unbind(),
         video_view_owner.NewRequest());
@@ -99,21 +99,40 @@ MediaPlayerView::MediaPlayerView(
     GetViewContainer()->AddChild(kVideoChildKey, std::move(video_view_owner),
                                  std::move(video_host_import_token));
 
-    net_media_service->CreateNetMediaPlayer(
-        params.service_name().empty() ? "media_player" : params.service_name(),
-        std::move(media_player), net_media_player_.NewRequest());
+    if (!params.service_name().empty()) {
+      auto net_media_service =
+          application_context
+              ->ConnectToEnvironmentService<media::NetMediaService>();
+
+      f1dl::InterfaceHandle<media::MediaPlayer> media_player_handle;
+      media_player_->AddBinding(media_player_handle.NewRequest());
+
+      net_media_service->PublishMediaPlayer(params.service_name(),
+                                            std::move(media_player_handle));
+    }
   } else {
     // Create a player proxy.
-    net_media_service->CreateNetMediaPlayerProxy(
-        params.device_name(), params.service_name(),
-        net_media_player_.NewRequest());
+    auto net_media_service =
+        application_context
+            ->ConnectToEnvironmentService<media::NetMediaService>();
+
+    net_media_service->CreateMediaPlayerProxy(params.device_name(),
+                                              params.service_name(),
+                                              media_player_.NewRequest());
   }
 
   if (!params.url().empty()) {
-    net_media_player_->SetUrl(params.url());
+    url::GURL url = url::GURL(params.url());
+
+    if (url.SchemeIsFile()) {
+      media_player_->SetFileSource(media::ChannelFromFd(
+          fxl::UniqueFD(open(url.path().c_str(), O_RDONLY))));
+    } else {
+      media_player_->SetHttpSource(params.url());
+    }
 
     // Get the first frames queued up so we can show something.
-    net_media_player_->Pause();
+    media_player_->Pause();
   }
 
   // These are for calculating frame rate.
@@ -133,10 +152,10 @@ bool MediaPlayerView::OnInputEvent(mozart::InputEventPtr event) {
     if (pointer->phase == mozart::PointerEvent::Phase::DOWN) {
       if (metadata_ && Contains(progress_bar_rect_, pointer->x, pointer->y)) {
         // User poked the progress bar...seek.
-        net_media_player_->Seek((pointer->x - progress_bar_rect_.x) *
-                                metadata_->duration / progress_bar_rect_.width);
+        media_player_->Seek((pointer->x - progress_bar_rect_.x) *
+                            metadata_->duration / progress_bar_rect_.width);
         if (state_ != State::kPlaying) {
-          net_media_player_->Play();
+          media_player_->Play();
         }
       } else {
         // User poked elsewhere.
@@ -421,7 +440,7 @@ void MediaPlayerView::HandlePlayerStatusUpdates(
   InvalidateScene();
 
   // Request a status update.
-  net_media_player_->GetStatus(
+  media_player_->GetStatus(
       version, [this](uint64_t version, media::MediaPlayerStatusPtr status) {
         HandlePlayerStatusUpdates(version, std::move(status));
       });
@@ -430,14 +449,14 @@ void MediaPlayerView::HandlePlayerStatusUpdates(
 void MediaPlayerView::TogglePlayPause() {
   switch (state_) {
     case State::kPaused:
-      net_media_player_->Play();
+      media_player_->Play();
       break;
     case State::kPlaying:
-      net_media_player_->Pause();
+      media_player_->Pause();
       break;
     case State::kEnded:
-      net_media_player_->Seek(0);
-      net_media_player_->Play();
+      media_player_->Seek(0);
+      media_player_->Play();
       break;
     default:
       break;

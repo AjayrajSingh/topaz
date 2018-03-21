@@ -11,7 +11,6 @@
 #include "lib/app/cpp/application_context.h"
 #include "lib/fxl/macros.h"
 #include "lib/media/fidl/media_player.fidl.h"
-#include "lib/media/fidl/net_media_player.fidl.h"
 #include "lib/media/timeline/timeline_function.h"
 #include "lib/ui/view_framework/base_view.h"
 #include "topaz/examples/media/media_player/media_player_params.h"
@@ -32,8 +31,7 @@ class MediaPlayerView : public mozart::BaseView {
 
   // |BaseView|:
   void OnPropertiesChanged(mozart::ViewPropertiesPtr old_properties) override;
-  void OnSceneInvalidated(
-      ui::PresentationInfoPtr presentation_info) override;
+  void OnSceneInvalidated(ui::PresentationInfoPtr presentation_info) override;
   void OnChildAttached(uint32_t child_key,
                        mozart::ViewInfoPtr child_view_info) override;
   void OnChildUnavailable(uint32_t child_key) override;
@@ -70,7 +68,7 @@ class MediaPlayerView : public mozart::BaseView {
   scenic_lib::skia::HostCanvasCycler controls_widget_;
   std::unique_ptr<scenic_lib::EntityNode> video_host_node_;
 
-  media::NetMediaPlayerPtr net_media_player_;
+  media::MediaPlayerPtr media_player_;
   mozart::ViewPropertiesPtr video_view_properties_;
   mozart::Size video_size_;
   mozart::Size pixel_aspect_ratio_;
