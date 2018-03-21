@@ -151,6 +151,15 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     onWifiTapped?.call();
   }
 
+  /// Call when reset is tapped.
+  void resetTapped() {
+    File dm = new File('/dev/misc/dmctl');
+    print('dmctl exists? ${dm.existsSync()}');
+    if (dm.existsSync()) {
+      dm.writeAsStringSync('reboot', flush: true);
+    }
+  }
+
   /// Permanently removes the user.
   void removeUser(Account account) {
     userProvider.removeUser(account.id, (String errorCode) {

@@ -112,6 +112,17 @@ class UserList extends StatelessWidget {
         ),
         _buildUserActionButton(
           child: new Text(
+            'RESET',
+            style: new TextStyle(
+              fontSize: fontSize,
+              color: Colors.white,
+            ),
+          ),
+          onTap: model.resetTapped,
+          isSmall: isSmall,
+        ),
+        _buildUserActionButton(
+          child: new Text(
             'WIFI',
             style: new TextStyle(
               fontSize: fontSize,

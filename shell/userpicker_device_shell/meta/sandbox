@@ -1,3 +1,4 @@
 {
+    "dev": [ "misc" ],
     "system": [ "data/sysui" ]
 }
