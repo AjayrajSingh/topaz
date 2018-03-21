@@ -27,6 +27,7 @@ executable("web_view_bin") {
     "//garnet/public/lib/ui/views/fidl",
     "//garnet/public/lib/url",
     "//peridot/lib/rapidjson",
+    "//peridot/public/lib/component/fidl",
     "//peridot/public/lib/context/fidl",
     "//peridot/public/lib/lifecycle/fidl",
     "//peridot/public/lib/module/fidl",
