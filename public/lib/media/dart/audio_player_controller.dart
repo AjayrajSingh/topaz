@@ -6,13 +6,13 @@ import 'dart:async';
 
 import 'package:lib.media.dart/timeline.dart';
 import 'package:lib.media.fidl/media_metadata.fidl.dart';
-import 'package:lib.media.fidl/media_player.fidl.dart' as mp;
-import 'package:lib.media.fidl/net_media_player.fidl.dart';
+import 'package:lib.media.fidl/media_player.fidl.dart';
 import 'package:lib.media.fidl/net_media_service.fidl.dart';
 import 'package:lib.media.fidl/problem.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.ui.geometry.fidl/geometry.fidl.dart' as geom;
+import 'package:zircon/zircon.dart';
 
 /// Type for |AudioPlayerController| update callbacks.
 typedef void UpdateCallback();
@@ -23,7 +23,7 @@ class AudioPlayerController {
 
   ServiceProvider _services;
 
-  NetMediaPlayerProxy _netMediaPlayer;
+  MediaPlayerProxy _mediaPlayer;
 
   bool _active = false;
   bool _loading = false;
@@ -45,7 +45,6 @@ class AudioPlayerController {
   /// Constructs a AudioPlayerController.
   AudioPlayerController(ServiceProvider services) {
     _services = services;
-    connectToService(services, _netMediaService.ctrl);
     _close(); // Initialize stuff.
   }
 
@@ -57,14 +56,15 @@ class AudioPlayerController {
   /// player will be created. If there is a player or player proxy, the URL
   /// will be set on it. |serviceName| indicates the name under which the
   /// player will be published via NetConnector. It only applies when creating
-  /// a new local player.
-  void open(Uri uri, {String serviceName = 'audio_player'}) {
+  /// a new local player. If |serviceName| is not specified, the player will
+  /// not be published.
+  void open(Uri uri, {String serviceName}) {
     if (uri == null) {
       throw new ArgumentError.notNull('uri');
     }
 
     if (_active) {
-      _netMediaPlayer.setUrl(uri.toString());
+      _mediaPlayer.setHttpSource(uri.toString());
       _hasVideo = false;
       _timelineFunction = null;
     } else {
@@ -72,7 +72,7 @@ class AudioPlayerController {
 
       _createLocalPlayer(uri, serviceName);
 
-      _handlePlayerStatusUpdates(NetMediaPlayer.kInitialStatus, null);
+      _handlePlayerStatusUpdates(MediaPlayer.kInitialStatus, null);
     }
 
     if (updateCallback != null) {
@@ -96,11 +96,15 @@ class AudioPlayerController {
     _active = true;
     _isRemote = true;
 
-    _netMediaService.createNetMediaPlayerProxy(
-        device, service, _netMediaPlayer.ctrl.request());
-    _netMediaPlayer.ctrl.onConnectionError = _handleConnectionError;
+    if (!_netMediaService.ctrl.isBound) {
+      connectToService(_services, _netMediaService.ctrl);
+    }
 
-    _handlePlayerStatusUpdates(NetMediaPlayer.kInitialStatus, null);
+    _netMediaService.createMediaPlayerProxy(
+        device, service, _mediaPlayer.ctrl.request());
+    _mediaPlayer.ctrl.onConnectionError = _handleConnectionError;
+
+    _handlePlayerStatusUpdates(MediaPlayer.kInitialStatus, null);
 
     if (updateCallback != null) {
       scheduleMicrotask(() {
@@ -126,12 +130,12 @@ class AudioPlayerController {
     _active = false;
     _isRemote = false;
 
-    if (_netMediaPlayer != null) {
-      _netMediaPlayer.ctrl.close();
-      _netMediaPlayer.ctrl.onConnectionError = null;
+    if (_mediaPlayer != null) {
+      _mediaPlayer.ctrl.close();
+      _mediaPlayer.ctrl.onConnectionError = null;
     }
 
-    _netMediaPlayer = new NetMediaPlayerProxy();
+    _mediaPlayer = new MediaPlayerProxy();
 
     _playing = false;
     _ended = false;
@@ -147,16 +151,28 @@ class AudioPlayerController {
 
   /// Creates a local player.
   void _createLocalPlayer(Uri uri, String serviceName) {
-    mp.MediaPlayerProxy mediaPlayer = new mp.MediaPlayerProxy();
-    connectToService(_services, mediaPlayer.ctrl);
+    connectToService(_services, _mediaPlayer.ctrl);
 
-    onMediaPlayerCreated(mediaPlayer);
+    onMediaPlayerCreated(_mediaPlayer);
 
-    _netMediaService.createNetMediaPlayer(
-        serviceName, mediaPlayer.ctrl.unbind(), _netMediaPlayer.ctrl.request());
-    _netMediaPlayer.ctrl.onConnectionError = _handleConnectionError;
+    if (serviceName != null) {
+      if (!_netMediaService.ctrl.isBound) {
+        connectToService(_services, _netMediaService.ctrl);
+      }
 
-    _netMediaPlayer.setUrl(uri.toString());
+      MediaPlayerProxy mediaPlayer = new MediaPlayerProxy();
+      _mediaPlayer.addBinding(mediaPlayer.ctrl.request());
+      _netMediaService.publishMediaPlayer(
+        serviceName, mediaPlayer.ctrl.unbind());
+    }
+
+    _mediaPlayer.ctrl.onConnectionError = _handleConnectionError;
+
+    if (uri.isScheme('FILE')) {
+      _mediaPlayer.setFileSource(new Channel.fromFile(uri.toFilePath()));
+    } else {
+      _mediaPlayer.setHttpSource(uri.toString());
+    }
   }
 
   /// Indicates whether the player open or connected (as opposed to closed).
@@ -231,10 +247,10 @@ class AudioPlayerController {
     }
 
     if (_ended) {
-      _netMediaPlayer.seek(0);
+      _mediaPlayer.seek(0);
     }
 
-    _netMediaPlayer.play();
+    _mediaPlayer.play();
   }
 
   /// Pauses playback.
@@ -243,7 +259,7 @@ class AudioPlayerController {
       return;
     }
 
-    _netMediaPlayer.pause();
+    _mediaPlayer.pause();
   }
 
   /// Seeks to a position expressed as a Duration.
@@ -254,7 +270,7 @@ class AudioPlayerController {
 
     int positionNanoseconds = (position.inMicroseconds * 1000).round();
 
-    _netMediaPlayer.seek(positionNanoseconds);
+    _mediaPlayer.seek(positionNanoseconds);
   }
 
   /// Seeks to a position expressed as a normalized value in the range 0.0 to
@@ -271,14 +287,14 @@ class AudioPlayerController {
   }
 
   // Overridden by subclasses to get access to the local player.
-  void onMediaPlayerCreated(mp.MediaPlayerProxy mediaPlayer) {}
+  void onMediaPlayerCreated(MediaPlayerProxy mediaPlayer) {}
 
   void onVideoGeometryUpdated(geom.Size videoSize,
                               geom.Size pixelAspectRatio) {}
 
   // Handles a status update from the player and requests a new update. Call
   // with kInitialStatus, null to initiate status updates.
-  void _handlePlayerStatusUpdates(int version, mp.MediaPlayerStatus status) {
+  void _handlePlayerStatusUpdates(int version, MediaPlayerStatus status) {
     if (!_active) {
       return;
     }
@@ -340,7 +356,7 @@ class AudioPlayerController {
       }
     }
 
-    _netMediaPlayer.getStatus(version, _handlePlayerStatusUpdates);
+    _mediaPlayer.getStatus(version, _handlePlayerStatusUpdates);
   }
 
   /// Called when the connection to the NetMediaPlayer fails.

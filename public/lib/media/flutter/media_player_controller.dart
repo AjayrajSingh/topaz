@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:lib.media.dart/audio_player_controller.dart';
-import 'package:lib.media.fidl/media_player.fidl.dart' as mp;
+import 'package:lib.media.fidl/media_player.fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
@@ -40,14 +40,14 @@ class MediaPlayerController extends AudioPlayerController
   }
 
   @override
-  void open(Uri uri, {String serviceName = 'media_player'}) {
+  void open(Uri uri, {String serviceName}) {
     _wasActive = openOrConnected;
     super.open(uri, serviceName: serviceName);
     scheduleMicrotask(_notifyListeners);
   }
 
   @override
-  void onMediaPlayerCreated(mp.MediaPlayerProxy mediaPlayer) {
+  void onMediaPlayerCreated(MediaPlayerProxy mediaPlayer) {
     if (!_wasActive) {
       ViewManagerProxy viewManager = new ViewManagerProxy();
       connectToService(_services, viewManager.ctrl);
