@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:garnet.examples.fidl2.services._echo2/echo2.fidl.dart';
 import 'package:fidl/fidl.dart';
+import 'package:fuchsia.fidl.echo2/echo2.dart';
 import 'package:lib.app.dart/app.dart';
 
 class _EchoImpl extends Echo {
