@@ -19,7 +19,7 @@ final String _kDefaultUrl =
     'https://storage.googleapis.com/fuchsia/assets/video/'
     '656a7250025525ae5a44b43d23c51e38b466d146';
 
-bool _videoAssetInitialized;
+bool _videoAssetInitialized = false;
 
 final AssetEntityCodec _assetCodec = new AssetEntityCodec();
 final VideoProgressEntityCodec _progressCodec = new VideoProgressEntityCodec();
