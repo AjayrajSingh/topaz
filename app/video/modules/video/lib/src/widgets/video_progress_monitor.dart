@@ -29,7 +29,7 @@ class VideoProgressMonitor {
     _started = true;
     _progress.durationMsec = _controller.duration.inMilliseconds;
     _timer =
-        new Timer.periodic(const Duration(milliseconds: 250), _handleTimer);
+        new Timer.periodic(const Duration(milliseconds: 1000), _handleTimer);
   }
 
   /// Stop sending periodic progress events
