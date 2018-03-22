@@ -26,18 +26,15 @@ bool MappedResource::LoadFromNamespace(fdio_ns_t* namespc,
   fsl::SizedVmo resource_vmo;
   if (namespc == nullptr) {
     if (!fsl::VmoFromFilename(path, &resource_vmo)) {
-      FXL_LOG(ERROR) << "Failed to open " << path;
       return false;
     }
   } else {
     fxl::UniqueFD root_dir(fdio_ns_opendir(namespc));
     if (!root_dir.is_valid()) {
-      FXL_LOG(ERROR) << "Failed to open namespace";
       return false;
     }
 
     if (!fsl::VmoFromFilenameAt(root_dir.get(), path, &resource_vmo)) {
-      FXL_LOG(ERROR) << "Failed to open " << path;
       return false;
     }
   }

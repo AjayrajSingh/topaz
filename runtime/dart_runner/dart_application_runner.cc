@@ -70,6 +70,12 @@ Dart_Isolate IsolateCreateCallback(const char* uri,
     *error = strdup("The service isolate is not implemented in release mode");
     return NULL;
 #else
+    struct stat buf;
+    bool dart2 = stat("pkg/data/dart2", &buf) == 0;
+    if (!dart2) {
+      *error = strdup("The service isolate is not implemented in Dart 1 mode");
+      return NULL;
+    }
     return CreateServiceIsolate(uri, flags, error);
 #endif
   }
