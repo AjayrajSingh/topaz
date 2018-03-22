@@ -22,9 +22,6 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addFlag('aot',
       help: 'Run compiler in AOT mode (enables whole-program transformations)',
       defaultsTo: false)
-  ..addFlag('strong',
-      help: 'Run compiler in strong mode (uses strong mode semantics)',
-      defaultsTo: false)
   ..addFlag('embed-sources',
       help: 'Embed sources in the output dill file', defaultsTo: false)
   ..addOption('packages', help: 'Path to .packages file')
@@ -63,21 +60,19 @@ Future<void> main(List<String> args) async {
   final String packages = options['packages'];
   final String depfile = options['depfile'];
   final String kernelBinaryFilename = options['output'];
-  final bool strongMode = options['strong'];
   final bool aot = options['aot'];
   final bool embedSources = options['embed-sources'];
 
   final String filename = options.rest[0];
   final Uri filenameUri = Uri.base.resolveUri(new Uri.file(filename));
 
-  Uri platformKernelDill = sdkRoot.resolve(strongMode ? 'platform_strong.dill'
-                                                      : 'platform.dill');
+  Uri platformKernelDill = sdkRoot.resolve('platform_strong.dill');
 
   final CompilerOptions compilerOptions = new CompilerOptions()
     ..sdkSummary = platformKernelDill
-    ..strongMode = strongMode
+    ..strongMode = true
     ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
-    ..target = new RunnerTarget(new TargetFlags(strongMode: strongMode))
+    ..target = new RunnerTarget(new TargetFlags(strongMode: true, syncAsync: true))
     ..embedSourceText = embedSources
     ..reportMessages = true
     ..setExitCodeOnProblem = true;

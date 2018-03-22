@@ -5,23 +5,7 @@
 import("//build/dart/dart_tool.gni")
 import("//third_party/dart/utils/compile_platform.gni")
 
-compile_platform("non_strong_platform") {
-  sources = [
-    "libraries.json",
-  ]
-
-  outputs = [
-    "$root_out_dir/runner_patched_sdk/platform.dill",
-    "$root_out_dir/runner_patched_sdk/vm_outline.dill",
-  ]
-
-  args = [
-    "--target=runner",
-    "dart:core",
-  ]
-}
-
-compile_platform("strong_platform") {
+compile_platform("kernel_platform_files") {
   sources = [
     "libraries.json",
   ]
@@ -35,13 +19,6 @@ compile_platform("strong_platform") {
     "--target=runner",
     "--strong",
     "dart:core",
-  ]
-}
-
-group("kernel_platform_files") {
-  public_deps = [
-    ":non_strong_platform",
-    ":strong_platform",
   ]
 }
 

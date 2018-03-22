@@ -243,7 +243,7 @@ template("dart2_jit_app") {
 
   _dart_kernel(kernel_target_name) {
     main_dart = invoker.main_dart
-    args = [ "--strong" ]
+    args = []
     dart_library_target_name = dart_library_target_name
   }
 
@@ -469,10 +469,7 @@ template("dart2_aot_app") {
   _dart_kernel(kernel_target_name) {
     dart_library_target_name = dart_library_target_name
     main_dart = invoker.main_dart
-    args = [
-      "--aot",
-      "--strong",
-    ]
+    args = [ "--aot" ]
   }
 
   assembly_path = "$target_gen_dir/${target_name}.S"
