@@ -64,8 +64,8 @@ class SizedVmo extends Vmo {
 
   SizedVmo(Handle handle, this._size) : super(handle);
 
-  /// Uses fdio_get_vmo() to get a VMO for the file at `path` in the current
-  /// Isolate's namespace.
+  /// Uses fdio_get_vmo_clone() to get a VMO for the file at `path` in the
+  /// current Isolate's namespace.
   ///
   /// The returned Vmo is read-only.
   factory SizedVmo.fromFile(String path) {

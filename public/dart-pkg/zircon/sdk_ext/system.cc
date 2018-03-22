@@ -331,7 +331,7 @@ Dart_Handle System::VmoFromFile(std::string path) {
   if (fstat(fd.get(), &stat_struct) == -1)
     return ConstructDartObject(kFromFileResult, ToDart(ZX_ERR_IO));
   zx_handle_t vmo = ZX_HANDLE_INVALID;
-  zx_status_t status = fdio_get_vmo(fd.get(), &vmo);
+  zx_status_t status = fdio_get_vmo_clone(fd.get(), &vmo);
   if (status != ZX_OK)
     return ConstructDartObject(kFromFileResult, ToDart(status));
 
