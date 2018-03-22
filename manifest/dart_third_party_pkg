@@ -28,6 +28,11 @@
              remote="https://dart.googlesource.com/boolean_selector.git"
              revision="1.0.3"/>
 
+    <project name="third_party/dart/third_party/pkg/browser"
+             path="third_party/dart/third_party/pkg/browser"
+             remote="https://dart.googlesource.com/browser.git"
+             revision="0.10.0+2"/>
+
     <project name="third_party/dart/third_party/pkg/charcode"
              path="third_party/dart/third_party/pkg/charcode"
              remote="https://dart.googlesource.com/charcode.git"
@@ -131,7 +136,7 @@
     <project name="third_party/dart/third_party/pkg/linter"
              path="third_party/dart/third_party/pkg/linter"
              remote="https://dart.googlesource.com/linter.git"
-             revision="0.1.44"/>
+             revision="0.1.45"/>
 
     <project name="third_party/dart/third_party/pkg/logging"
              path="third_party/dart/third_party/pkg/logging"
@@ -191,7 +196,7 @@
     <project name="third_party/dart/third_party/pkg/pub"
              path="third_party/dart/third_party/pkg/pub"
              remote="https://dart.googlesource.com/pub.git"
-             revision="dbe8be2bb8bca9b26ba7bd583272c62f9a0153fd"/>
+             revision="875d35005a7d33f367d70a3e31e9d3bad5d1ebd8"/>
 
     <project name="third_party/dart/third_party/pkg/pub_semver"
              path="third_party/dart/third_party/pkg/pub_semver"

@@ -15,7 +15,7 @@ import 'package:kernel/binary/limited_ast_to_binary.dart';
 import 'package:kernel/target/targets.dart';
 
 import 'package:vm/kernel_front_end.dart' show compileToKernel;
-import 'package:vm/target/runner.dart';
+import 'package:vm/target/dart_runner.dart';
 
 ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addOption('sdk-root', help: 'Path to runner_patched_sdk')
@@ -72,7 +72,7 @@ Future<void> main(List<String> args) async {
     ..sdkSummary = platformKernelDill
     ..strongMode = true
     ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
-    ..target = new RunnerTarget(new TargetFlags(strongMode: true, syncAsync: true))
+    ..target = new DartRunnerTarget(new TargetFlags(strongMode: true, syncAsync: true))
     ..embedSourceText = embedSources
     ..reportMessages = true
     ..setExitCodeOnProblem = true;

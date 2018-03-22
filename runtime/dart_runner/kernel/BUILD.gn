@@ -16,7 +16,7 @@ compile_platform("kernel_platform_files") {
   ]
 
   args = [
-    "--target=runner",
+    "--target=dart_runner",
     "--strong",
     "dart:core",
   ]
