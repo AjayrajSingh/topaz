@@ -23,6 +23,7 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
+import 'inset_manager.dart';
 import 'layout_model.dart';
 import 'logo.dart';
 import 'model.dart';
@@ -234,8 +235,12 @@ void main() {
   log.info('Started');
 
   LayoutModel layoutModel = new LayoutModel();
+  InsetManager insetManager = new InsetManager();
 
   _surfaceGraph = new SurfaceGraph();
+  _surfaceGraph.addListener(() {
+    insetManager.onSurfacesChanged(surfaces: _surfaceGraph.size);
+  });
   // Note: This implementation only supports one StoryShell at a time.
   // Initialize the one Flutter application we support
   runApp(
@@ -244,7 +249,10 @@ void main() {
       child: new WindowMediaQuery(
         child: new ScopedModel<LayoutModel>(
           model: layoutModel,
-          child: const Mondrian(),
+          child: new ScopedModel<InsetManager>(
+            model: insetManager,
+            child: const Mondrian(),
+          ),
         ),
       ),
     ),

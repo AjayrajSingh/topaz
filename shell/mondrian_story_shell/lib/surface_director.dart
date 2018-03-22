@@ -11,6 +11,7 @@ import 'package:lib.widgets/model.dart';
 import 'child_view.dart';
 import 'container_layout.dart' as container;
 import 'copresent_layout.dart' as copresent;
+import 'inset_manager.dart';
 import 'layout_model.dart';
 import 'model.dart';
 import 'pattern_layout.dart' as pattern;
@@ -99,115 +100,34 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           return new SizedBox(
             width: constraints.maxWidth,
             height: constraints.maxHeight,
-            child: new ScopedModelDescendant<LayoutModel>(
+            child: new ScopedModelDescendant<InsetManager>(
               builder: (
                 BuildContext context,
                 Widget child,
-                LayoutModel layoutModel,
+                InsetManager insetManager,
               ) {
-                return new ScopedModelDescendant<SurfaceGraph>(
+                return new ScopedModelDescendant<LayoutModel>(
                   builder: (
                     BuildContext context,
                     Widget child,
-                    SurfaceGraph graph,
+                    LayoutModel layoutModel,
                   ) {
-                    Map<Surface, SurfaceForm> placedSurfaces =
-                        <Surface, SurfaceForm>{};
-                    List<Surface> focusStack = graph.focusStack.toList();
-                    double depth = 0.0;
-                    // HACK(alangardner): Used to create illusion of symmetry
-                    BoxConstraints adjustedConstraints = new BoxConstraints(
-                        minWidth: constraints.minWidth,
-                        minHeight: constraints.minHeight,
-                        maxHeight: constraints.maxHeight,
-                        maxWidth: constraints.maxWidth - 12.0);
-                    while (focusStack.isNotEmpty) {
-                      List<PositionedSurface> positionedSurfaces =
-                          <PositionedSurface>[];
-                      if (focusStack.isNotEmpty) {
-                        Surface last = focusStack.last;
-                        // purposefully giving compositionPattern top billing
-                        // here to avoid any codelab surprises but we will have
-                        // to harmonize this logic in future
-                        // TODO: (djmurphy, jphsiao)
-                        if (last.compositionPattern != null &&
-                            last.compositionPattern.isNotEmpty) {
-                          positionedSurfaces = pattern.layoutSurfaces(
-                            context,
-                            adjustedConstraints,
-                            focusStack,
-                            layoutModel,
-                          );
-                        } else if (last.properties.containerMembership !=
-                                null &&
-                            last.properties.containerMembership.isNotEmpty) {
-                          positionedSurfaces = container.layoutSurfaces(
-                            context,
-                            adjustedConstraints,
-                            last,
-                            layoutModel,
-                          );
-                        } else {
-                          positionedSurfaces = copresent.layoutSurfaces(
-                            context,
-                            adjustedConstraints,
-                            focusStack,
-                            layoutModel,
-                          );
-                        }
-                      }
-                      for (PositionedSurface ps in positionedSurfaces) {
-                        if (!placedSurfaces.keys.contains(ps.surface)) {
-                          _prevForms.remove(ps.surface);
-                          placedSurfaces[ps.surface] =
-                              _form(ps, depth, offscreen);
-                        }
-                      }
-                      depth = (depth + 0.1).clamp(0.0, 1.0);
-                      while (focusStack.isNotEmpty &&
-                          placedSurfaces.keys.contains(focusStack.last)) {
-                        focusStack.removeLast();
-                      }
-                    }
-                    Forest<Surface> dependentSpanningTrees =
-                        new Forest<Surface>();
-                    // The actual node doesn't matter
-                    if (placedSurfaces.isNotEmpty) {
-                      // The actual surface doesn't matter
-                      dependentSpanningTrees =
-                          placedSurfaces.keys.first.getDependentSpanningTrees();
-
-                      /// prune non-visible surfaces
-                      for (Tree<Surface> t
-                          in dependentSpanningTrees.flatten()) {
-                        if (!placedSurfaces.keys.contains(t.value)) {
-                          dependentSpanningTrees.remove(t);
-                        }
-                      }
-                    }
-
-                    // Convert orphaned forms, to animate them out
-                    Iterable<Key> placedKeys =
-                        placedSurfaces.values.map((SurfaceForm f) => f.key);
-                    _orphanedForms.removeWhere(
-                        (SurfaceForm f) => placedKeys.contains(f.key));
-                    for (Surface s in _prevForms.keys) {
-                      _orphanedForms
-                          .add(_orphanedForm(s, _prevForms[s], offscreen));
-                    }
-                    _prevForms
-                      ..clear()
-                      ..addAll(placedSurfaces);
-
-                    /// Create form forest
-                    final Forest<SurfaceForm> formForest =
-                        dependentSpanningTrees
-                            .mapForest((Surface s) => placedSurfaces[s]);
-                    for (SurfaceForm orphan in _orphanedForms) {
-                      formForest.add(new Tree<SurfaceForm>(value: orphan));
-                    }
-
-                    return new SurfaceStage(forms: formForest);
+                    return new ScopedModelDescendant<SurfaceGraph>(
+                      builder: (
+                        BuildContext context,
+                        Widget child,
+                        SurfaceGraph graph,
+                      ) {
+                        return _buildStage(
+                          context,
+                          offscreen,
+                          constraints,
+                          insetManager,
+                          layoutModel,
+                          graph,
+                        );
+                      },
+                    );
                   },
                 );
               },
@@ -215,4 +135,103 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           );
         },
       );
+
+  Widget _buildStage(
+    BuildContext context,
+    Offset offscreen,
+    BoxConstraints constraints,
+    InsetManager insetManager,
+    LayoutModel layoutModel,
+    SurfaceGraph graph,
+  ) {
+    Map<Surface, SurfaceForm> placedSurfaces = <Surface, SurfaceForm>{};
+    List<Surface> focusStack = graph.focusStack.toList();
+    double depth = 0.0;
+    // HACK(alangardner): Used to create illusion of symmetry
+    BoxConstraints adjustedConstraints = new BoxConstraints(
+      minWidth: constraints.minWidth,
+      minHeight: constraints.minHeight,
+      maxHeight: constraints.maxHeight,
+      maxWidth: constraints.maxWidth - insetManager.value,
+    );
+    while (focusStack.isNotEmpty) {
+      List<PositionedSurface> positionedSurfaces = <PositionedSurface>[];
+      if (focusStack.isNotEmpty) {
+        Surface last = focusStack.last;
+        // purposefully giving compositionPattern top billing
+        // here to avoid any codelab surprises but we will have
+        // to harmonize this logic in future
+        // TODO: (djmurphy, jphsiao)
+        if (last.compositionPattern != null &&
+            last.compositionPattern.isNotEmpty) {
+          positionedSurfaces = pattern.layoutSurfaces(
+            context,
+            adjustedConstraints,
+            focusStack,
+            layoutModel,
+          );
+        } else if (last.properties.containerMembership != null &&
+            last.properties.containerMembership.isNotEmpty) {
+          positionedSurfaces = container.layoutSurfaces(
+            context,
+            adjustedConstraints,
+            last,
+            layoutModel,
+          );
+        } else {
+          positionedSurfaces = copresent.layoutSurfaces(
+            context,
+            adjustedConstraints,
+            focusStack,
+            layoutModel,
+          );
+        }
+      }
+      for (PositionedSurface ps in positionedSurfaces) {
+        if (!placedSurfaces.keys.contains(ps.surface)) {
+          _prevForms.remove(ps.surface);
+          placedSurfaces[ps.surface] = _form(ps, depth, offscreen);
+        }
+      }
+      depth = (depth + 0.1).clamp(0.0, 1.0);
+      while (focusStack.isNotEmpty &&
+          placedSurfaces.keys.contains(focusStack.last)) {
+        focusStack.removeLast();
+      }
+    }
+    Forest<Surface> dependentSpanningTrees = new Forest<Surface>();
+    // The actual node doesn't matter
+    if (placedSurfaces.isNotEmpty) {
+      // The actual surface doesn't matter
+      dependentSpanningTrees =
+          placedSurfaces.keys.first.getDependentSpanningTrees();
+
+      /// prune non-visible surfaces
+      for (Tree<Surface> t in dependentSpanningTrees.flatten()) {
+        if (!placedSurfaces.keys.contains(t.value)) {
+          dependentSpanningTrees.remove(t);
+        }
+      }
+    }
+
+    // Convert orphaned forms, to animate them out
+    Iterable<Key> placedKeys =
+        placedSurfaces.values.map((SurfaceForm f) => f.key);
+    _orphanedForms.removeWhere((SurfaceForm f) => placedKeys.contains(f.key));
+    for (Surface s in _prevForms.keys) {
+      _orphanedForms.add(_orphanedForm(s, _prevForms[s], offscreen));
+    }
+    _prevForms
+      ..clear()
+      ..addAll(placedSurfaces);
+
+    /// Create form forest
+    final Forest<SurfaceForm> formForest =
+        dependentSpanningTrees.mapForest((Surface s) => placedSurfaces[s]);
+    for (SurfaceForm orphan in _orphanedForms) {
+      formForest.add(new Tree<SurfaceForm>(value: orphan));
+    }
+
+    return new SurfaceStage(forms: formForest);
+  }
 }

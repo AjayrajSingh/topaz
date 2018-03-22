@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import 'inset_manager.dart';
+
 const Duration _scaleAnimationDuration = const Duration(seconds: 1);
 const double _scaleMinScale = 0.6;
 const Curve _scaleCurve = Curves.fastOutSlowIn;
@@ -30,15 +32,29 @@ class SurfaceFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) => new LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) =>
-            new AnimatedContainer(
-              duration: _scaleAnimationDuration,
-              curve: _scaleCurve,
-              transform: _scale(constraints.biggest.center(Offset.zero)),
-              margin: const EdgeInsets.only(left: 12.0, bottom: 12.0),
-              child: new PhysicalModel(
-                elevation: (1.0 - depth) * 125.0,
-                color: const Color(0x00000000),
-                child: child,
+            new ScopedModelDescendant<InsetManager>(
+              builder: (
+                BuildContext context,
+                Widget child,
+                InsetManager insetManager,
+              ) {
+                return new Container(
+                  padding: new EdgeInsets.only(
+                    left: insetManager.value,
+                    bottom: insetManager.value,
+                  ),
+                  child: child,
+                );
+              },
+              child: new AnimatedContainer(
+                duration: _scaleAnimationDuration,
+                curve: _scaleCurve,
+                transform: _scale(constraints.biggest.center(Offset.zero)),
+                child: new PhysicalModel(
+                  elevation: (1.0 - depth) * 125.0,
+                  color: const Color(0x00000000),
+                  child: child,
+                ),
               ),
             ),
       );
