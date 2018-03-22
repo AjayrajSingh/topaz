@@ -5,13 +5,14 @@
 // import 'dart:math';
 
 import 'package:flutter/widgets.dart';
+import 'package:lib.logging/logging.dart';
 
 import 'layout_model.dart';
 import 'model.dart';
 import 'positioned_surface.dart';
 
 const String _tickerPattern = 'ticker';
-const String _commentsRightPattern = 'comments_right';
+const String _commentsRightPattern = 'comments-right';
 
 const double _tickerHeightRatio = 0.15;
 const double _commentsWidthRatio = 0.30;
@@ -75,6 +76,15 @@ List<PositionedSurface> layoutSurfaces(
 
     size = new Size(
       commentsWidth,
+      totalHeight,
+    );
+    layout
+        .add(new PositionedSurface(surface: focused, position: offset & size));
+  } else {
+    // Pattern not recognized - show the newly added module
+    log.warning('unrecognized pattern $pattern');
+    Size size = new Size(
+      totalWidth,
       totalHeight,
     );
     layout
