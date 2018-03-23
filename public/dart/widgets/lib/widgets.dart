@@ -12,6 +12,7 @@ export 'src/widgets/conditional_builder.dart';
 export 'src/widgets/fuchsia_spinner.dart';
 export 'src/widgets/mondrian_spinner.dart';
 export 'src/widgets/rk4_spring_simulation.dart';
+export 'src/widgets/shadowed_text.dart';
 export 'src/widgets/simulated_positioned.dart';
 export 'src/widgets/text_placeholder.dart';
 export 'src/widgets/ticking_double_state.dart';
