@@ -67,8 +67,7 @@ class Asset {
     @required this.description,
     @required this.thumbnail,
     @required this.background,
-  })
-      : assert(uri != null),
+  })  : assert(uri != null),
         assert(title != null),
         assert(description != null),
         assert(thumbnail != null),
@@ -87,8 +86,7 @@ class Asset {
     this.title,
     this.artist,
     this.album,
-  })
-      : type = AssetType.song,
+  })  : type = AssetType.song,
         children = null,
         description = null,
         thumbnail = null,
@@ -101,8 +99,7 @@ class Asset {
   Asset.playlist({
     @required this.children,
     this.title,
-  })
-      : assert(children.isNotEmpty),
+  })  : assert(children.isNotEmpty),
         assert(children.every((Asset c) =>
             c.type == AssetType.movie || c.type == AssetType.song)),
         type = AssetType.playlist,
@@ -126,8 +123,7 @@ class Asset {
     @required this.thumbnail,
     @required this.background,
     @required this.uri,
-  })
-      : assert(device != null),
+  })  : assert(device != null),
         assert(service != null),
         assert(position != null),
         assert(title != null),
