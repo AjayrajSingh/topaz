@@ -10,15 +10,15 @@ dart_app("chat_content_provider") {
   sandbox = "meta/sandbox"
 
   deps = [
-    "//garnet/public/lib/app/fidl:fidl_dart",
-    "//peridot/public/lib/agent/fidl:fidl_dart",
-    "//peridot/public/lib/auth/fidl:fidl_dart",
-    "//peridot/public/lib/ledger/fidl:fidl_dart",
-    "//peridot/public/lib/suggestion/fidl:fidl_dart",
-    "//peridot/public/lib/user/fidl:fidl_dart",
+    "//garnet/public/lib/app/fidl:fidl",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib/auth/fidl",
+    "//peridot/public/lib/ledger/fidl",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/uuid",
-    "//topaz/app/chat/services:services_dart",
+    "//topaz/app/chat/services",
     "//topaz/public/dart/fixtures",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/agent/dart",

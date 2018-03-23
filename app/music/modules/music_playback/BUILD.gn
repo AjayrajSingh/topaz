@@ -16,10 +16,10 @@ flutter_app("music_playback") {
     "//third_party/dart/third_party/pkg/intl",
     "//topaz/app/music/packages/music_models",
     "//topaz/app/music/packages/music_widgets",
-    "//topaz/app/music/services/player:player_dart",
+    "//topaz/app/music/services/player:player",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/widgets/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/app_driver/dart",
   ]
 }

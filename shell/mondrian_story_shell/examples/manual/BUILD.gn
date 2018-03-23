@@ -8,10 +8,10 @@ flutter_app("example_manual_relationships") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//peridot/public/lib/lifecycle/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//garnet/public/lib/ui/views/fidl:v1",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/logging:lib.logging",

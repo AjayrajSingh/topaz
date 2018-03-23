@@ -14,7 +14,7 @@ dart_jit_app("dart_jit_runner_test") {
   deps = [
     "//third_party/dart-pkg/pub/test",
     "//topaz/public/lib/app/dart",
-    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces",
   ]
 }
 
@@ -28,6 +28,6 @@ dart_aot_app("dart_aot_runner_test") {
   deps = [
     "//third_party/dart-pkg/pub/test",
     "//topaz/public/lib/app/dart",
-    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces",
   ]
 }

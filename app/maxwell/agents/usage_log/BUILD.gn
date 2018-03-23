@@ -10,8 +10,8 @@ dart_app("usage_log") {
   source_dir = "."
 
   deps = [
-    "//garnet/public/lib/cobalt/fidl:fidl_dart",
-    "//peridot/public/lib/context/fidl:fidl_dart",
+    "//garnet/public/lib/cobalt/fidl:fidl",
+    "//peridot/public/lib:modular",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/context/dart",
     "//topaz/public/lib/fidl/dart",

@@ -17,7 +17,7 @@ dart_app("contacts_content_provider") {
   sandbox = "meta/sandbox"
 
   deps = [
-    "//topaz/app/contacts/services:services_dart",
+    "//topaz/app/contacts/services:services",
     "//topaz/public/dart/entity_schemas:entity_schemas",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/agent/dart",
@@ -35,7 +35,7 @@ dart_test("test") {
   deps = [
     ":contacts_content_provider_dart_library",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/app/contacts/services:services_dart",
+    "//topaz/app/contacts/services:services",
     "//topaz/public/dart/fuchsia",
   ]
 }

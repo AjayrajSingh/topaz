@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-module web_view;
+library web_view;
 
 interface WebRequestDelegate {
-   WillSendRequest@0(string url);
+   1: WillSendRequest(string url);
 };
 
 [ServiceName="web_view::WebView"]
 interface WebView {
-   ClearCookies@0();
-   SetUrl@1(string url);
-   SetWebRequestDelegate@2(WebRequestDelegate delegate);
+   1: ClearCookies();
+   2: SetUrl(string url);
+   3: SetWebRequestDelegate(WebRequestDelegate delegate);
 };

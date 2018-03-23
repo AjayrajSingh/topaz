@@ -10,7 +10,7 @@ flutter_app("wifi_settings") {
   manifest = "pubspec.yaml"
 
   deps = [
-    "//garnet/public/lib/wlan/fidl:fidl_dart",
+    "//garnet/public/lib/wlan/fidl:service",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",

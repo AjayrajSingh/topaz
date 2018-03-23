@@ -9,8 +9,8 @@ flutter_app("bluetooth_settings") {
   manifest = "pubspec.yaml"
 
   deps = [
-    "//garnet/public/lib/bluetooth/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
+    "//garnet/public/lib/bluetooth/fidl:fidl",
+    "//peridot/public/lib:modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",

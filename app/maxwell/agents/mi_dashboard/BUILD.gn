@@ -11,10 +11,10 @@ dart_app("mi_dashboard") {
   source_dir = "."
 
   deps = [
-    "//peridot/public/lib/context/fidl:fidl_dart",
-    "//peridot/public/lib/suggestion/fidl:debug_dart",
-    "//peridot/public/lib/suggestion/fidl:fidl_dart",
-    "//peridot/public/lib/user_intelligence/fidl:fidl_dart",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
     "//third_party/dart-pkg/pub/http",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/context/dart",

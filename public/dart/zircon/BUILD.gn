@@ -20,7 +20,7 @@ dart_test("tests") {
 
   deps = [
     ":zircon",
-    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//peridot/public/lib:modular",
     "//third_party/dart-pkg/pub/test",
   ]
 }

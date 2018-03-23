@@ -14,7 +14,7 @@ dart_library("dart") {
   ]
 
   deps = [
-    "//peridot/public/lib/context/fidl:fidl_dart",
+    "//peridot/public/lib:modular",
     "//topaz/public/lib/app/dart",
   ]
 }

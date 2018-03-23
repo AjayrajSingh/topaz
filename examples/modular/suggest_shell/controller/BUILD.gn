@@ -25,9 +25,9 @@ executable("bin") {
     "//peridot/lib/fidl:view_host",
     "//peridot/lib/rapidjson",
     "//peridot/public/lib/app_driver/cpp",
-    "//peridot/public/lib/module/fidl",
-    "//peridot/public/lib/story/fidl",
-    "//peridot/public/lib/suggestion/fidl",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
   ]
 }
 

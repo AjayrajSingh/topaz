@@ -14,12 +14,12 @@ flutter_app("contact_list") {
   ]
 
   deps = [
-    "//garnet/public/lib/app/fidl:fidl_dart",
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//garnet/public/lib/app/fidl:fidl",
+    "//garnet/public/lib/ui/views/fidl:v1",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/app/contacts/services:services_dart",
+    "//topaz/app/contacts/services:services",
     "//topaz/public/dart/fixtures",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",

@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-module music;
+library music;
 
-import "topaz/app/music/services/player/repeat_mode.fidl";
-import "topaz/app/music/services/player/status.fidl";
-import "topaz/app/music/services/player/track.fidl";
+// import "topaz/app/music/services/player/repeat_mode.fidl";
+// import "topaz/app/music/services/player/status.fidl";
+// import "topaz/app/music/services/player/track.fidl";
 
 [ServiceName="music.Player"]
 interface Player {
@@ -16,40 +16,40 @@ interface Player {
   const uint64 kInitialStatus = 0;
 
   // Play the given track
-  Play@0(Track track);
+  1: Play(Track track);
 
   // Sets the given track as the current track without playing it
-  SetTrack@1(Track track);
+  2: SetTrack(Track track);
 
   // Toggles between pause and play for the given track.
   // This will not do anything if no track is set.
-  TogglePlayPause@2();
+  3: TogglePlayPause();
 
   // Jumps to the next track in the play queue and plays the track
-  Next@3();
+  4: Next();
 
   // Jumps to the previous track in the play queue and plays the track
-  Previous@4();
+  5: Previous();
 
   // Adds the given track(s) to the end of the play queue
-  Enqueue@5(array<string> trackIds);
+  6: Enqueue(vector<string> trackIds);
 
   // Removes the given track(s) from the play queue
-  Dequeue@6(array<string> trackIds);
+  7: Dequeue(vector<string> trackIds);
 
   // Gets the playback status
-  GetStatus@7() => (PlayerStatus status);
+  8: GetStatus() -> (PlayerStatus @status);
 
   // Register the PlayerStatusListener to receive Status and Track updates.
   // The subscription will continue to stay open as long as the listener handle
   // is not closed.
-  AddPlayerListener@8(PlayerStatusListener listener);
+  9: AddPlayerListener(PlayerStatusListener listener);
 
   // Sets the repeat mode
-  SetRepeatMode@9(RepeatMode repeatMode);
+  10: SetRepeatMode(RepeatMode repeatMode);
 };
 
 interface PlayerStatusListener {
   // Receives an update for the track and playback status
-  OnUpdate@0(PlayerStatus status);
+  1: OnUpdate(PlayerStatus @status);
 };

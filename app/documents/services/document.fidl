@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-module document;
+library documents;
 
 struct Document {
   string id;
@@ -12,11 +12,11 @@ struct Document {
   string? thumbnailLocation;
   uint64 size;
   bool isFolder;
-  array<string>? owners;
+  vector<string>? owners;
   uint64 modified;
   uint64 opened;
   uint64 created;
-  array<string>? permissions;
+  vector<string>? permissions;
   string? description;
   string? currentDirectoryId;
 };
@@ -24,9 +24,9 @@ struct Document {
 [ServiceName="documents.DocumentInterface"]
 
 interface DocumentInterface {
-  Get@0(string documentId) => (Document? document);
-  GetMetadata@1(string documentId) => (Document? document);
-  CreateEntityReference@2(Document document) => (string entityReference);
-  List@3(string currentDirectoryId) => (array<Document>? documents);
-  GetContentProviderName@4() => (string contentProviderName);
+  1: Get(string documentId) -> (Document? document);
+  2: GetMetadata(string documentId) -> (Document? document);
+  3: CreateEntityReference(Document document) -> (string entityReference);
+  4: List(string currentDirectoryId) -> (vector<Document>? documents);
+  5: GetContentProviderName() -> (string contentProviderName);
 };

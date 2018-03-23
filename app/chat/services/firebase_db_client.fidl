@@ -2,28 +2,28 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-module firebase_db_client;
+library chat_content_provider;
 
 // Notification type to be used for |FirebaseDBWatcher|.
 enum NotificationType {
   // The JSON-encoded data is an object with two keys: path and data. The path
   // key points to a location relative to the request URL. The client should
   // replace all of the data at that location in its cache with data.
-  PUT,
+  PUT = 0;
 
   // The JSON-encoded data is an object with two keys: path and data. The path
   // key points to a location relative to the request URL. For each key in
   // data, the client should replace the corresponding key in its cache with
   // the data for that key in the message.
-  PATCH,
+  PATCH = 1;
 };
 
 // Status code for the |FirebaseDBClient|.
 enum FirebaseStatus {
-  OK = 0,
-  AUTHENTICATION_ERROR,
-  NETWORK_ERROR,
-  UNRECOVERABLE_ERROR,
+  OK = 0;
+  AUTHENTICATION_ERROR = 1;
+  NETWORK_ERROR = 2;
+  UNRECOVERABLE_ERROR = 3;
 };
 
 // A minimal struct representing an HTTP response object.
@@ -39,20 +39,20 @@ struct HttpResponse {
 // instance of a |FirebaseDBClient|.
 [ServiceName="firebase_db_client.FirebaseDBConnector"]
 interface FirebaseDBConnector {
-  GetClient@0(FirebaseDBWatcher? watcher, FirebaseDBClient &client);
+  1: GetClient(FirebaseDBWatcher? watcher, request<FirebaseDBClient> client);
 };
 
 // A watcher interface for a |FirebaseDBClient|.
 interface FirebaseDBWatcher {
   // Gets the intended listen path. Only the data changes under this path will
   // be notified.
-  GetListenPath@0() => (string path);
+  1: GetListenPath() -> (string path);
 
   // A callback method to be called when there are data changes under the listen
   // path specified by the |GetListenPath| method.
   //
   // The data is always given as a JSON-encoded string.
-  DataChanged@1(NotificationType type, string path, string data) => ();
+  2: DataChanged(NotificationType type, string path, string data) -> ();
 };
 
 // A Firebase DB client interface.
@@ -60,15 +60,15 @@ interface FirebaseDBClient {
   // Runs the initialization logic for this client. This method must be called
   // by any consumer of this interface, before sending any data change requests
   // or listening to data changes.
-  Initialize@0() => (FirebaseStatus status);
+  1: Initialize() -> (FirebaseStatus @status);
 
   // Sends a 'PUT' request to the specified |path| under the Firebase DB.
   // The |data| must be a JSON-encoded string.
-  Put@1(string path, string data)
-      => (FirebaseStatus status, HttpResponse? response);
+  2: Put(string path, string data)
+      -> (FirebaseStatus @status, HttpResponse? response);
 
   // Sends a 'DELETE' request to the specified |path|.
-  Delete@2(string path) => (FirebaseStatus status, HttpResponse? response);
+  3: Delete(string path) -> (FirebaseStatus @status, HttpResponse? response);
 
   // Returns the encoded version of the given string that can be used in
   // Firebase DB keys.
@@ -82,11 +82,11 @@ interface FirebaseDBClient {
   // NOTE: Originally, we were using `%` instead of `&`, but Firebase API
   // started to reject any `%` characters in a database path when using their
   // REST API, so we now have to use a different character.
-  EncodeKey@3(string key) => (string encoded_key);
+  4: EncodeKey(string key) -> (string encoded_key);
 
   // Returns the current user's email address.
-  GetCurrentUserEmail@4() => (string email);
+  5: GetCurrentUserEmail() -> (string email);
 
   // Closes all the underlying http connections.
-  Terminate@5() => ();
+  6: Terminate() -> ();
 };

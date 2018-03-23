@@ -12,11 +12,11 @@ dart_library("dart") {
   ]
 
   deps = [
-    "//peridot/public/lib/agent/fidl:fidl_dart",
-    "//peridot/public/lib/device/fidl:fidl_dart",
-    "//peridot/public/lib/lifecycle/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/user/fidl:fidl_dart",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
   ]

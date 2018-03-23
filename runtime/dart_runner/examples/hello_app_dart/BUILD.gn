@@ -12,7 +12,7 @@ dart1_jit_app("hello_app_dart1_jit") {
   deps = [
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces",
   ]
 }
 
@@ -24,7 +24,7 @@ dart1_aot_app("hello_app_dart1_aot") {
   deps = [
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces",
   ]
 }
 
@@ -36,7 +36,7 @@ dart2_jit_app("hello_app_dart2_jit") {
   deps = [
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces",
   ]
 }
 
@@ -48,6 +48,6 @@ dart2_aot_app("hello_app_dart2_aot") {
   deps = [
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",
-    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces_dart",
+    "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces",
   ]
 }

@@ -12,18 +12,13 @@ dart_library("dart") {
   ]
 
   deps = [
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//peridot/public/lib/daisy/fidl:fidl_dart",
-    "//peridot/public/lib/device/fidl:fidl_dart",
-    "//peridot/public/lib/lifecycle/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/surface/fidl:fidl_dart",
-    "//peridot/public/lib/user/fidl:fidl_dart",
+    "//garnet/public/lib/ui/views/fidl:v1",
+    "//peridot/public/lib:modular",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/story/dart",
     "//topaz/public/lib/ui/flutter",
   ]

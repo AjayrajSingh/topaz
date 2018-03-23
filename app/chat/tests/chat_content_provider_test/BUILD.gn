@@ -10,15 +10,15 @@ dart_app("chat_content_provider_test") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//garnet/public/lib/test_runner/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//garnet/public/lib/test_runner/fidl:fidl",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/matcher",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/test",
     "//topaz/app/chat/agents/content_provider:chat_content_provider_dart_library",
-    "//topaz/app/chat/services:services_dart",
+    "//topaz/app/chat/services:services",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/component/dart",

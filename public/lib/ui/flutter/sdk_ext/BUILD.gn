@@ -10,7 +10,7 @@ source_set("sdk_ext") {
 
   deps = [
     "//garnet/public/lib/fxl",
-    "//garnet/public/lib/ui/views/fidl",
+    "//garnet/public/lib/ui/views/fidl:v1",
     "//third_party/dart/runtime:dart_api",
     "//topaz/lib/tonic",
     "//topaz/public/dart-pkg/zircon",

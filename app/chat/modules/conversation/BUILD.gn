@@ -17,14 +17,14 @@ flutter_app("chat_conversation") {
   ]
 
   deps = [
-    "//garnet/public/lib/ui/views/fidl:fidl_dart",
-    "//peridot/public/lib/module/fidl:fidl_dart",
-    "//peridot/public/lib/module_resolver/fidl:fidl_dart",
-    "//peridot/public/lib/story/fidl:fidl_dart",
+    "//garnet/public/lib/ui/views/fidl:v1",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart/third_party/pkg/intl",
     "//topaz/app/chat/packages/chat_models",
-    "//topaz/app/chat/services:services_dart",
+    "//topaz/app/chat/services:services",
     "//topaz/public/dart/fixtures",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",

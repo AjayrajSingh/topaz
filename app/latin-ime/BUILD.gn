@@ -12,8 +12,8 @@ flutter_app("latin-ime") {
   source_dir = "."
 
   deps = [
-    "//garnet/public/lib/app/fidl:fidl_dart",
-    "//garnet/public/lib/ui/presentation/fidl:fidl_dart",
+    "//garnet/public/lib/app/fidl:fidl",
+    "//garnet/public/lib/ui/presentation/fidl:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/fidl/dart",

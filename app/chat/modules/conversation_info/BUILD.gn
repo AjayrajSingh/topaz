@@ -17,7 +17,7 @@ flutter_app("chat_conversation_info") {
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/chat/packages/chat_models",
-    "//topaz/app/chat/services:services_dart",
+    "//topaz/app/chat/services:services",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/component/dart",

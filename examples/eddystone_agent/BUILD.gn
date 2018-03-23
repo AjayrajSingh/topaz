@@ -10,9 +10,9 @@ dart_app("eddystone_agent") {
   source_dir = "."
 
   deps = [
-    "//garnet/public/lib/bluetooth/fidl:fidl_dart",
-    "//peridot/public/lib/context/fidl:fidl_dart",
-    "//peridot/public/lib/suggestion/fidl:fidl_dart",
+    "//garnet/public/lib/bluetooth/fidl:fidl",
+    "//peridot/public/lib:modular",
+    "//peridot/public/lib:modular",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

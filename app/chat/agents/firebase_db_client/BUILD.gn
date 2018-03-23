@@ -10,9 +10,9 @@ dart_app("firebase_db_client") {
   sandbox = "meta/sandbox"
 
   deps = [
-    "//peridot/public/lib/auth/fidl:fidl_dart",
+    "//peridot/public/lib/auth/fidl",
     "//third_party/dart-pkg/pub/eventsource",
-    "//topaz/app/chat/services:services_dart",
+    "//topaz/app/chat/services:services",
     "//topaz/public/dart/config",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/agent/dart",

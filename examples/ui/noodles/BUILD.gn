@@ -14,12 +14,12 @@ executable("noodles") {
   ]
 
   deps = [
-    "//garnet/public/lib/fidl/cpp/bindings",
+    "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
     "//garnet/public/lib/ui/scenic/fidl",
     "//garnet/public/lib/ui/view_framework:view_provider",
-    "//garnet/public/lib/ui/views/fidl",
+    "//garnet/public/lib/ui/views/fidl:v1",
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_view",
     "//zircon/public/lib/trace-provider",

@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-module music;
+library music;
 
 // Different modes of repeat for playback behavior
 enum RepeatMode {
   // Stops playing after the current track is finished
-  NONE = 0,
+  NONE = 0;
   // Repeats the entire queue
-  ALL,
+  ALL = 1;
   // Repeats only the current playing track
-  ONE,
+  ONE = 2;
 };
