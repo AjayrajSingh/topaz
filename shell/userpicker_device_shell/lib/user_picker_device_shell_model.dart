@@ -25,6 +25,9 @@ import 'user_watcher_impl.dart';
 export 'package:lib.widgets/model.dart'
     show ScopedModel, ScopedModelDescendant, ModelFinder;
 
+/// Function signature for GetPresentationMode callback
+typedef void GetPresentationModeCallback(PresentationMode mode);
+
 /// Contains all the relevant data for displaying the list of users and for
 /// logging in and creating new users.
 class UserPickerDeviceShellModel extends DeviceShellModel
@@ -32,7 +35,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         Presentation,
         ServiceProvider,
         TickerProvider,
-        KeyboardCaptureListener {
+        KeyboardCaptureListener,
+        PresentationModeListener {
   /// Called when the device shell stops.
   final VoidCallback onDeviceShellStopped;
 
@@ -56,6 +60,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   final Set<Ticker> _tickers = new Set<Ticker>();
   final KeyboardCaptureListenerBinding _keyboardCaptureListenerBinding =
       new KeyboardCaptureListenerBinding();
+  final PresentationModeListenerBinding _presentationModeListenerBinding =
+      new PresentationModeListenerBinding();
   String _currentUserShell = '';
   String _currentAccountId = '';
 
@@ -98,17 +104,19 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     super.onReady(userProvider, deviceShellContext, presentation);
     _loadUsers();
     _userPickerScrollController.addListener(_scrollListener);
-    presentation.captureKeyboardEvent(
-      new KeyboardEvent(
-        deviceId: 0,
-        eventTime: 0,
-        hidUsage: 0,
-        codePoint: 32, // spacebar
-        modifiers: 8, // LCTRL
-        phase: KeyboardEventPhase.pressed,
-      ),
-      _keyboardCaptureListenerBinding.wrap(this),
-    );
+    presentation
+      ..captureKeyboardEvent(
+        new KeyboardEvent(
+          deviceId: 0,
+          eventTime: 0,
+          hidUsage: 0,
+          codePoint: 32, // spacebar
+          modifiers: 8, // LCTRL
+          phase: KeyboardEventPhase.pressed,
+        ),
+        _keyboardCaptureListenerBinding.wrap(this),
+      );
+      //..setPresentationModeListener(_presentationModeListenerBinding.wrap(this));
   }
 
   @override
@@ -116,6 +124,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _userControllerProxy?.ctrl?.close();
     _userWatcherImpl?.close();
     _keyboardCaptureListenerBinding.close();
+    _presentationModeListenerBinding.close();
     onDeviceShellStopped?.call();
     for (Ticker ticker in _tickers) {
       ticker.dispose();
@@ -271,6 +280,14 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     }
   }
 
+  /// |PresentationModeListener|.
+  @override
+  void onModeChanged() {
+    getPresentationMode((PresentationMode mode) {
+      log.info('Presentation mode changed to: $mode');
+    });
+  }
+
   /// Called when the the user shell logs out.
   void onLogout() {
     trace('logout');
@@ -398,6 +415,18 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   void captureKeyboardEvent(KeyboardEvent eventToCapture,
       InterfaceHandle<KeyboardCaptureListener> listener) {
     presentation.captureKeyboardEvent(eventToCapture, listener);
+  }
+
+  /// |Presentation|.
+  @override
+  void getPresentationMode(GetPresentationModeCallback callback) {  // ignore: override_on_non_overriding_method
+    // presentation.getPresentationMode(callback);
+  }
+
+  /// |Presentation|.
+  @override
+  void setPresentationModeListener(InterfaceHandle<PresentationModeListener> listener) {  // ignore: override_on_non_overriding_method
+    // presentation.setPresentationModeListener(listener);
   }
 
   // |ServiceProvider|.
