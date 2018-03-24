@@ -440,6 +440,60 @@ class HandleType extends FidlType<Handle> {
       _decodeHandle(decoder, offset, nullable);
 }
 
+class ChannelType extends FidlType<Channel> {
+  const ChannelType({
+    this.nullable,
+  })
+      : super(encodedSize: 4);
+
+  final bool nullable;
+
+  @override
+  void encode(Encoder encoder, Channel value, int offset) {
+    _encodeHandle(encoder, value.handle, offset, nullable);
+  }
+
+  @override
+  Channel decode(Decoder decoder, int offset) =>
+      new Channel(_decodeHandle(decoder, offset, nullable));
+}
+
+class SocketType extends FidlType<Socket> {
+  const SocketType({
+    this.nullable,
+  })
+      : super(encodedSize: 4);
+
+  final bool nullable;
+
+  @override
+  void encode(Encoder encoder, Socket value, int offset) {
+    _encodeHandle(encoder, value.handle, offset, nullable);
+  }
+
+  @override
+  Socket decode(Decoder decoder, int offset) =>
+      new Socket(_decodeHandle(decoder, offset, nullable));
+}
+
+class VmoType extends FidlType<Vmo> {
+  const VmoType({
+    this.nullable,
+  })
+      : super(encodedSize: 4);
+
+  final bool nullable;
+
+  @override
+  void encode(Encoder encoder, Vmo value, int offset) {
+    _encodeHandle(encoder, value.handle, offset, nullable);
+  }
+
+  @override
+  Vmo decode(Decoder decoder, int offset) =>
+      new Vmo(_decodeHandle(decoder, offset, nullable));
+}
+
 class InterfaceHandleType<T> extends FidlType<InterfaceHandle<T>> {
   const InterfaceHandleType({
     this.nullable,
