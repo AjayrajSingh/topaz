@@ -353,7 +353,7 @@ class ProxyController<T> {
   /// Proxy controllers are not typically created directly. Instead, you
   /// typically obtain a [ProxyController<T>] object as the [Proxy<T>.ctrl]
   /// property of a `TProxy` object.
-  ProxyController({this.serviceName}) {
+  ProxyController({this.$serviceName}) {
     _reader
       ..onReadable = _handleReadable
       ..onError = _handleError;
@@ -375,7 +375,7 @@ class ProxyController<T> {
   ///
   /// This string is typically used with the `ServiceProvider` interface to
   /// request an implementation of [T].
-  final String serviceName;
+  final String $serviceName;
 
   /// Creates an interface request whose peer is bound to this interface proxy.
   ///
