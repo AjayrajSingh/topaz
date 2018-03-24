@@ -10,10 +10,10 @@ dart_app("music_artist_agent") {
   sandbox = "meta/sandbox"
 
   deps = [
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
     "//topaz/app/music/packages/music_api",
     "//topaz/app/music/packages/music_models",
     "//topaz/public/dart/config",

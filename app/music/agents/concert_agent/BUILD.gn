@@ -8,8 +8,8 @@ dart_app("concert_agent") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/decomposition/dart",

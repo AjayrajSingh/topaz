@@ -9,9 +9,9 @@ flutter_app("xi_app") {
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:v1",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/xi/packages/widgets:xi_widgets",
     "//garnet/public/lib/xi/fidl:fidl",

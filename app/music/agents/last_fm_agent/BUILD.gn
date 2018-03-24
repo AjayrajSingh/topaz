@@ -10,10 +10,10 @@ dart_app("last_fm_agent") {
   sandbox = "meta/sandbox"
 
   deps = [
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
     "//topaz/app/music/packages/last_fm_api",
     "//topaz/app/music/packages/last_fm_models",
     "//topaz/public/dart/config",

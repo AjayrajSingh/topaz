@@ -13,8 +13,8 @@ flutter_app("last_fm_artist_bio") {
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:v1",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/music/packages/last_fm_api",
     "//topaz/app/music/packages/last_fm_models",

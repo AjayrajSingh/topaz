@@ -10,8 +10,8 @@ dart_app("module_suggester") {
   source_dir = "."
 
   deps = [
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/decomposition/dart",
     "//topaz/public/lib/proposal/dart",

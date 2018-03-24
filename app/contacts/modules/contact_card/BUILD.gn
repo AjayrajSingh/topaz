@@ -9,7 +9,7 @@ flutter_app("contact_card") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/entity_schemas:entity_schemas",
     "//topaz/public/dart/logging:lib.logging",

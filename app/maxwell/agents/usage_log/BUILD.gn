@@ -11,7 +11,7 @@ dart_app("usage_log") {
 
   deps = [
     "//garnet/public/lib/cobalt/fidl:fidl",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/context/dart",
     "//topaz/public/lib/fidl/dart",

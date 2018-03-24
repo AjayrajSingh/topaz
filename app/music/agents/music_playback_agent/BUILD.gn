@@ -8,7 +8,7 @@ dart_app("music_playback_agent") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
     "//topaz/app/music/services/player:player",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/agent/dart",

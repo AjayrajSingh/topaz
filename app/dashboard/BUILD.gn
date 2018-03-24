@@ -25,8 +25,8 @@ flutter_app("dashboard") {
   sandbox = "meta/sandbox"
 
   deps = [
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/buildbucket",
     "//third_party/dart-pkg/pub/html",

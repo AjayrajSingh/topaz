@@ -9,9 +9,9 @@ flutter_app("media_player_flutter") {
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:v1",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/app/dart",

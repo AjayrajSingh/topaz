@@ -8,8 +8,8 @@ dart_app("documents_content_provider") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
     "//topaz/app/documents/services:services",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/entity_schemas:entity_schemas",

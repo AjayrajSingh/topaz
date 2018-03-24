@@ -11,7 +11,7 @@ flutter_app("ble_scanner") {
 
   deps = [
     "//garnet/public/lib/bluetooth/fidl:fidl",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",

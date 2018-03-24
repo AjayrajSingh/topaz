@@ -6,12 +6,9 @@ import 'dart:typed_data';
 
 // ignore_for_file: public_member_api_docs
 
+import 'package:fidl/fidl.dart';
 import 'package:fuchsia/fuchsia.dart';
-import 'package:fidl/fidl.dart' as fidl;
-import 'package:lib.app.fidl/application_environment.fidl.dart';
-import 'package:lib.app.fidl/application_launcher.fidl.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:zircon/zircon.dart';
 
 class ApplicationContext {
@@ -36,7 +33,7 @@ class ApplicationContext {
     if (environmentHandle != null) {
       context.environment
         ..ctrl.bind(new InterfaceHandle<ApplicationEnvironment>(
-            new Channel(environmentHandle), 0))
+            new Channel(environmentHandle)))
         ..getApplicationLauncher(context.launcher.ctrl.request())
         ..getServices(context.environmentServices.ctrl.request());
     }
@@ -62,16 +59,7 @@ class ApplicationContext {
 
 void connectToService<T>(
     ServiceProvider serviceProvider, ProxyController<T> controller) {
-  final String serviceName = controller.serviceName;
-  assert(serviceName != null,
-      'controller.serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
-  serviceProvider.connectToService(
-      serviceName, controller.request().passChannel());
-}
-
-void connectToService2<T>(
-    ServiceProvider serviceProvider, fidl.ProxyController<T> controller) {
-  final String serviceName = controller.serviceName;
+  final String serviceName = controller.$serviceName;
   assert(serviceName != null,
       'controller.serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
   serviceProvider.connectToService(
@@ -82,11 +70,10 @@ InterfaceHandle<T> connectToServiceByName<T>(
     ServiceProvider serviceProvider, String serviceName) {
   final ChannelPair pair = new ChannelPair();
   serviceProvider.connectToService(serviceName, pair.first);
-  return new InterfaceHandle<T>(pair.second, 0);
+  return new InterfaceHandle<T>(pair.second);
 }
 
 typedef void ServiceConnector<T>(InterfaceRequest<T> request);
-typedef void ServiceConnector2<T>(fidl.InterfaceRequest<T> request);
 typedef void DefaultServiceConnector<T>(
     String serviceName, InterfaceRequest<T> request);
 
@@ -111,13 +98,6 @@ class ServiceProviderImpl extends ServiceProvider {
   void addServiceForName<T>(ServiceConnector<T> connector, String serviceName) {
     _connectorThunks[serviceName] = (Channel channel) {
       connector(new InterfaceRequest<T>(channel));
-    };
-  }
-
-  void addServiceForName2<T>(
-      ServiceConnector2<T> connector, String serviceName) {
-    _connectorThunks[serviceName] = (Channel channel) {
-      connector(new fidl.InterfaceRequest<T>(channel));
     };
   }
 
@@ -232,15 +212,7 @@ class Services {
   }
 
   void connectToService<T>(ProxyController<T> controller) {
-    final String serviceName = controller.serviceName;
-    assert(serviceName != null,
-        'controller.serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
-    _connectToService(
-        _directory, controller.request().passChannel(), serviceName);
-  }
-
-  void connectToService2<T>(fidl.ProxyController<T> controller) {
-    final String serviceName = controller.serviceName;
+    final String serviceName = controller.$serviceName;
     assert(serviceName != null,
         'controller.serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
     _connectToService(
@@ -250,13 +222,7 @@ class Services {
   InterfaceHandle<T> connectToServiceByName<T>(String serviceName) {
     final ChannelPair pair = new ChannelPair();
     _connectToService(_directory, pair.first, serviceName);
-    return new InterfaceHandle<T>(pair.second, 0);
-  }
-
-  fidl.InterfaceHandle<T> connectToServiceByName2<T>(String serviceName) {
-    final ChannelPair pair = new ChannelPair();
-    _connectToService(_directory, pair.first, serviceName);
-    return new fidl.InterfaceHandle<T>(pair.second);
+    return new InterfaceHandle<T>(pair.second);
   }
 
   void close() {

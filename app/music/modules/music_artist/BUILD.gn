@@ -11,10 +11,10 @@ flutter_app("music_artist") {
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:v1",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
-    "//peridot/public/lib:modular",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
+    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart/third_party/pkg/intl",
     "//topaz/app/music/packages/music_api",
