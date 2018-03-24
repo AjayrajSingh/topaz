@@ -23,6 +23,6 @@ flutter_app("last_fm_artist_bio") {
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
   ]
 }

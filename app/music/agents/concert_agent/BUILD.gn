@@ -13,7 +13,7 @@ dart_app("concert_agent") {
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/decomposition/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/proposal/dart",
   ]
 }

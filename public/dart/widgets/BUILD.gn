@@ -26,7 +26,7 @@ dart_library("lib.widgets") {
     "//third_party/dart-pkg/pub/flutter_image",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/device/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/module/dart",
     "//topaz/public/lib/ui/flutter",
     "//topaz/public/lib/user/dart",

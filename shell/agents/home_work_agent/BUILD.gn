@@ -21,7 +21,7 @@ dart_app("home_work_agent") {
     "//peridot/public/lib:fidl",
     "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/proposal/dart",
   ]
 }

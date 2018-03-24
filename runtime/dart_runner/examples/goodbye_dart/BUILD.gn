@@ -10,7 +10,7 @@ dart1_jit_app("goodbye_dart1_jit") {
   source_dir = "."
   deps = [
     "//topaz/public/dart/fuchsia",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
   ]
 }
 
@@ -20,7 +20,7 @@ dart1_aot_app("goodbye_dart1_aot") {
   source_dir = "."
   deps = [
     "//topaz/public/dart/fuchsia",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
   ]
 }
 
@@ -30,7 +30,7 @@ dart2_jit_app("goodbye_dart2_jit") {
   source_dir = "."
   deps = [
     "//topaz/public/dart/fuchsia",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
   ]
 }
 
@@ -40,6 +40,6 @@ dart2_aot_app("goodbye_dart2_aot") {
   source_dir = "."
   deps = [
     "//topaz/public/dart/fuchsia",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
   ]
 }

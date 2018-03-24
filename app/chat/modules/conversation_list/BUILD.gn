@@ -30,7 +30,7 @@ flutter_app("chat_conversation_list") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/module_resolver/dart",
   ]
 }

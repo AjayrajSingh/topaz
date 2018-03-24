@@ -21,7 +21,7 @@ flutter_app("contacts_picker") {
     "//topaz/app/contacts/services:services",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
   ]
 }
 

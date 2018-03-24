@@ -14,6 +14,6 @@ dart_library("lib.logging") {
   deps = [
     "//third_party/dart-pkg/pub/logging",
     "//third_party/dart-pkg/pub/stack_trace",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
   ]
 }

@@ -15,6 +15,6 @@ dart_library("dart") {
     "//peridot/public/lib:fidl",
     "//peridot/public/lib:fidl",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
   ]
 }

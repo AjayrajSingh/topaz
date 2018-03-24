@@ -35,7 +35,7 @@ flutter_app("dashboard") {
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/ui/flutter",
     "//topaz/runtime/web_runner/lib/dart:web_view",
   ]

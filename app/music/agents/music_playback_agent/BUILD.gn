@@ -13,7 +13,7 @@ dart_app("music_playback_agent") {
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/media/dart",
   ]
 }

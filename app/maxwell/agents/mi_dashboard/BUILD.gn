@@ -18,7 +18,7 @@ dart_app("mi_dashboard") {
     "//third_party/dart-pkg/pub/http",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/context/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
   ]
 
   resources = [

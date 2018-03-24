@@ -15,6 +15,6 @@ dart_app("documents_content_provider") {
     "//topaz/public/dart/entity_schemas:entity_schemas",
     "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
   ]
 }

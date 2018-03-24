@@ -22,7 +22,7 @@ flutter_app("video") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/media/flutter",
     "//topaz/public/lib/schemas/dart",
   ]

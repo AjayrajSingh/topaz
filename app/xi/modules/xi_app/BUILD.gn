@@ -17,7 +17,7 @@ flutter_app("xi_app") {
     "//garnet/public/lib/xi/fidl:fidl",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/ui/flutter",
   ]
 }
