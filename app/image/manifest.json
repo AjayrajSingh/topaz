@@ -1,6 +1,6 @@
 {
     "binary": "image",
-    "local_name": "image",
+    "suggestion_headline": "Show image",
     "verb": "com.google.fuchsia.play",
     "noun_constraints": [
         {

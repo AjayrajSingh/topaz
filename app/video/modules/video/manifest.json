@@ -1,6 +1,6 @@
 {
     "binary": "video",
-    "local_name": "video",
+    "suggestion_headline": "Play the video",
     "verb": "com.google.fuchsia.preview",
     "noun_constraints": [
         {
