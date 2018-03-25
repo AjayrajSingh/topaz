@@ -5,9 +5,7 @@
     "noun_constraints": [
         {
             "name": "asset",
-            "types": [
-                "http://schema.org/image"
-            ]
+            "type": "http://schema.org/image"
         }
     ]
 }

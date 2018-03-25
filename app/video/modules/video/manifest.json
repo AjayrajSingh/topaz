@@ -5,9 +5,7 @@
     "noun_constraints": [
         {
             "name": "entityRef",
-            "types": [
-                "com.google.fuchsia.string"
-            ]
+            "type": "com.google.fuchsia.string"
         }
     ]
 }

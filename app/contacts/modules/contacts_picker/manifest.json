@@ -5,15 +5,11 @@
   "noun_constraints": [
     {
       "name": "prefix",
-      "types": [
-        "com.google.fuchsia.string"
-      ]
+      "type": "com.google.fuchsia.string"
     },
     {
       "name": "detailType",
-      "types": [
-        "com.google.fuchsia.string"
-      ]
+      "type": "com.google.fuchsia.string"
     }
   ]
 }
