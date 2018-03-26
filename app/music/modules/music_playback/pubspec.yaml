@@ -8,8 +8,6 @@ description: Music Playback Module
 dependencies:
   flutter:
     sdk: flutter
-  music_api:
-    path: ../../packages/music_api
   music_models:
     path: ../../packages/music_models
   music_widgets:

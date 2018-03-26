@@ -3,61 +3,53 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:music_widgets/music_widgets.dart';
+import 'package:topaz.app.music.services.player/player.fidl.dart';
 
-import 'modular/playback_module_model.dart';
+import 'models/playback_model.dart';
+import 'widgets/scaffold.dart';
 
 void main() {
   setupLogger();
 
-  ApplicationContext applicationContext =
-      new ApplicationContext.fromStartupInfo();
+  //TODO(chaselatta) MS-1424. Make this module use an Entity instead of a
+  //fidl service to get the current song which is being played.
 
-  PlaybackModuleModel playbackModuleModel = new PlaybackModuleModel();
+  PlaybackModel model = new PlaybackModel(
+    player: new PlayerProxy(),
+  );
 
-  ModuleWidget<PlaybackModuleModel> moduleWidget =
-      new ModuleWidget<PlaybackModuleModel>(
-    applicationContext: applicationContext,
-    moduleModel: playbackModuleModel,
-    child: new Scaffold(
-      backgroundColor: Colors.grey[300],
-      body: new ScopedModelDescendant<PlaybackModuleModel>(
-        builder: (
-          _,
-          __,
-          PlaybackModuleModel model,
-        ) {
-          if (model.deviceMode == 'null') {
-            return new Container(color: Colors.black);
-          } else if (model.deviceMode == 'edgeToEdge') {
-            return new EdgeToEdgePlayer(
-              currentTrack: playbackModuleModel.currentTrack,
-              playbackPosition: playbackModuleModel.playbackPosition,
-              isPlaying: playbackModuleModel.isPlaying,
-              onTogglePlay: playbackModuleModel.togglePlayPause,
-              onSkipNext: playbackModuleModel.next,
-              onSkipPrevious: playbackModuleModel.previous,
-            );
-          } else if (model.deviceMode == 'normal') {
-            return new Player(
-              currentTrack: playbackModuleModel.currentTrack,
-              playbackPosition: playbackModuleModel.playbackPosition,
-              isPlaying: playbackModuleModel.isPlaying,
-              onTogglePlay: playbackModuleModel.togglePlayPause,
-              onSkipNext: playbackModuleModel.next,
-              onSkipPrevious: playbackModuleModel.previous,
-              onToggleRepeat: playbackModuleModel.toggleRepeat,
-              isRepeated: playbackModuleModel.isRepeated,
-            );
-          }
-        },
+  // Start the Module Driver
+  new ModuleDriver(
+    onTerminateFromCaller: () {
+      model.disconnectFromPlayer();
+      model.player.ctrl.close();
+    },
+  )
+    ..connectToAgentServiceWithProxy('music_playback_agent', model.player).then(
+        (_) {
+      log.info('Connected to agent');
+    }, onError: (Error error) {
+      log.severe('failed to connect to agent with error', error);
+    })
+    ..start().then(_handleStart, onError: _handleError);
+
+  runApp(
+    new MaterialApp(
+      home: new ScopedModel<PlaybackModel>(
+        model: model,
+        child: new MusicPlaybackScaffold(),
       ),
     ),
   );
+}
 
-  runApp(moduleWidget);
-  moduleWidget.advertise();
+void _handleError(Error error, StackTrace stackTrace) {
+  log.severe('An error ocurred', error, stackTrace);
+}
+
+void _handleStart(ModuleDriver module) {
+  log.info('feedback module ready');
 }
