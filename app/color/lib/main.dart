@@ -8,7 +8,8 @@ import 'dart:math' show Random;
 import 'package:flutter/material.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
+import 'package:lib.widgets.dart/model.dart'
+    show ScopedModel, ScopedModelDescendant;
 import 'package:lib.schemas.dart/com.fuchsia.color.dart';
 
 import 'src/color_model.dart';
