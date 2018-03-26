@@ -6,15 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.media.flutter/media_progress.dart';
 import 'package:lib.schemas.dart/com/fuchsia/media/media.dart';
 import 'package:lib.widgets/model.dart' show ScopedModel;
 
-import 'asset.dart';
-import 'asset_entity_codec.dart';
+import 'src/asset.dart';
 import 'src/modular/player_model.dart';
 import 'src/widgets.dart';
-import 'video_progress.dart';
-import 'video_progress_entity_codec.dart';
 
 final String _kDefaultUrl =
     'https://storage.googleapis.com/fuchsia/assets/video/'
@@ -22,11 +20,6 @@ final String _kDefaultUrl =
 
 bool _videoAssetInitialized = false;
 
-// Deprecated Entity Codecs
-final AssetEntityCodec _assetCodec = new AssetEntityCodec();
-final VideoProgressEntityCodec _progressCodec = new VideoProgressEntityCodec();
-
-// Entity Codecs in public/schemas
 final AssetSpecifierEntityCodec _assetSpecifierCodec =
     new AssetSpecifierEntityCodec();
 final MediaProgressEntityCodec _mediaProgressCodec =
@@ -42,10 +35,8 @@ void main() {
 
   PlayerModel playerModel = new PlayerModel(
     environmentServices: moduleDriver.environmentServices,
-    notifyProgress: (VideoProgress progress) {
-      moduleDriver
-        ..put('video_progress', progress, _progressCodec)
-        ..put('media_progress', progress.toEntity(), _mediaProgressCodec);
+    notifyProgress: (MediaProgress progress) {
+      moduleDriver.put('media_progress', progress.toEntity(), _mediaProgressCodec);
     },
   );
 
@@ -53,13 +44,6 @@ void main() {
         (AssetSpecifierEntityData assetSpecifierEntityData) =>
             _handleAssetSpecifierChanged(
                 assetSpecifierEntityData, playerModel, moduleDriver),
-        cancelOnError: false,
-        onError: _handleAssetEntityError,
-        onDone: () => log.fine('video player update stream closed'),
-      );
-
-  moduleDriver.watch('set_asset', _assetCodec, all: true).listen(
-        (Asset asset) => _handleSetAsset(asset, playerModel, moduleDriver),
         cancelOnError: false,
         onError: _handleAssetEntityError,
         onDone: () => log.fine('video player update stream closed'),
@@ -93,54 +77,17 @@ void _handleAssetSpecifierChanged(AssetSpecifierEntityData assetSpecifierEntityD
     log.info('null AssetSpecifier received in video module');
     if (!_videoAssetInitialized) {
       log.fine('video module started. Setting default video.');
-      _handleSetAsset(
-          new Asset.movie(
-            uri: Uri.parse(_kDefaultUrl),
-            title: '',
-            description: '',
-            thumbnail: '',
-            background: '',
-          ),
+      _handleAssetSpecifierChanged(
+          new AssetSpecifierEntityData.movie(uri: _kDefaultUrl),
           playerModel,
           module);
     }
     return;
   }
-  _videoAssetInitialized = true;
-  _handleSetAsset(
-      new Asset.movie(
-        uri: Uri.parse(assetSpecifierEntityData.uri),
-        title: '',
-        description: '',
-        thumbnail: '',
-        background: '',
-      ),
-      playerModel,
-      module);
-}
 
-void _handleSetAsset(
-    Asset asset, PlayerModel playerModel, ModuleDriver module) {
-  if (asset == null) {
-    log.info('null Asset received in video module');
-    if (!_videoAssetInitialized) {
-      log.fine('video module started. Setting default video.');
-      _handleSetAsset(
-          new Asset.movie(
-            uri: Uri.parse(_kDefaultUrl),
-            title: '',
-            description: '',
-            thumbnail: '',
-            background: '',
-          ),
-          playerModel,
-          module);
-    }
-    return;
-  }
-  log.info('video module received Asset with uri: ${asset?.uri?.toString()}');
+  log.info('video module received Asset with uri: ${assetSpecifierEntityData?.uri}');
   _videoAssetInitialized = true;
-  playerModel.asset = asset;
+  playerModel.asset = new Asset.fromEntity(assetSpecifierEntityData);
 }
 
 // TODO(SO-1123): hook up to a snackbar.

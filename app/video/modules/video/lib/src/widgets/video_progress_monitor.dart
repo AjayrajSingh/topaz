@@ -6,9 +6,7 @@
 import 'dart:async';
 
 import 'package:lib.media.flutter/media_player_controller.dart';
-// import 'package:lib.widgets/model.dart';
-
-import '../../video_progress.dart';
+import 'package:lib.media.flutter/media_progress.dart';
 
 /// Listener class to publish video progress events
 class VideoProgressMonitor {
@@ -16,13 +14,13 @@ class VideoProgressMonitor {
   bool _started = false;
   MediaPlayerController _controller;
 
-  final VideoProgress _progress = new VideoProgress(0, 0.0);
+  final MediaProgress _progress = new MediaProgress(0, 0.0);
 
   /// Constructor
   VideoProgressMonitor(this._controller);
 
   /// Get last reported video progress
-  VideoProgress get progress => _progress;
+  MediaProgress get progress => _progress;
 
   /// Begin sending periodic progress events
   void start() {

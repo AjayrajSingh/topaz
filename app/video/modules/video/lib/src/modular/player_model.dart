@@ -7,11 +7,11 @@ import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.media.fidl/problem.fidl.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
+import 'package:lib.media.flutter/media_progress.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
-import '../../asset.dart';
-import '../../video_progress.dart';
+import '../asset.dart';
 import '../widgets.dart';
 
 const Duration _kOverlayAutoHideDuration = const Duration(seconds: 3);
@@ -19,8 +19,8 @@ const Duration _kLoadingDuration = const Duration(seconds: 2);
 const Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
 const String _kServiceName = 'fling';
 
-/// Typedef for sending VideoProgress events
-typedef void SendVideoProgress(VideoProgress progress);
+/// Typedef for sending MediaProgress events
+typedef void SendVideoProgress(MediaProgress progress);
 
 /// The [Model] for the video player.
 class PlayerModel extends Model {
@@ -57,7 +57,7 @@ class PlayerModel extends Model {
   }
 
   /// Return the current progress of the video player.
-  VideoProgress get videoProgress => _videoProgressMonitor?.progress;
+  MediaProgress get videoProgress => _videoProgressMonitor?.progress;
 
   /// Returns whether media player controller is playing
   bool get playing => _controller.playing;

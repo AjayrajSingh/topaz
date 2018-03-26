@@ -2,22 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:lib.schemas.dart/com/fuchsia/media/media.dart';
 import 'package:meta/meta.dart';
-
-/// The asset types.
-enum AssetType {
-  /// Individual assets containing both audio and video.
-  movie,
-
-  /// Individual assets containing only audio.
-  song,
-
-  /// Composite assets that consist of a list of other assets.
-  playlist,
-
-  /// Remote player
-  remote,
-}
 
 /// Describes an asset.
 class Asset {
@@ -59,6 +45,21 @@ class Asset {
 
   /// Position at which to start playing asset
   final Duration position;
+
+  /// Construct an Asset from an AssetEntityData object
+  Asset.fromEntity(AssetSpecifierEntityData data)
+      : type = data.type,
+        uri = Uri.parse(data.uri),
+        title = null,
+        description = null,
+        thumbnail = null,
+        background = null,
+        artist = null,
+        album = null,
+        children = null,
+        device = null,
+        service = null,
+        position = null;
 
   /// Constructs an asset describing a movie.
   Asset.movie({
