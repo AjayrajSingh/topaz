@@ -111,7 +111,7 @@
     <project name="third_party/dart/third_party/pkg/http_retry"
              path="third_party/dart/third_party/pkg/http_retry"
              remote="https://dart.googlesource.com/http_retry.git"
-             revision="0.1.0"/>
+             revision="0.1.1"/>
 
     <project name="third_party/dart/third_party/pkg/http_throttle"
              path="third_party/dart/third_party/pkg/http_throttle"

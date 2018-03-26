@@ -12,6 +12,7 @@ dart_library("music_api") {
   ]
 
   deps = [
+    "//third_party/dart-pkg/pub/http",
     "//topaz/app/music/packages/music_models",
     "//topaz/public/dart/logging:lib.logging",
   ]

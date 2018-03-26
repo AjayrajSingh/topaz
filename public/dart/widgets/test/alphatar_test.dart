@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lib.testing.flutter/testing.dart';
 import 'package:lib.widgets/widgets.dart';
@@ -16,37 +17,38 @@ void main() {
       'Alphatar should display the image when given, whether or not the '
       'fall-back letter is given, but also display fallback letter in '
       'the background', (WidgetTester tester) async {
-    createHttpClient = createMockImageHttpClient;
-    // First, try without providing a letter.
-    await tester.pumpWidget(
-      new MaterialApp(
-        home: new Material(
-          child: new Alphatar.withUrl(
-            avatarUrl: profileUrl,
-            retry: false,
+    await HttpOverrides.runZoned(() async {
+      // First, try without providing a letter.
+      await tester.pumpWidget(
+        new MaterialApp(
+          home: new Material(
+            child: new Alphatar.withUrl(
+              avatarUrl: profileUrl,
+              retry: false,
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    expect(find.byType(Image), findsOneWidget);
-    expect(find.byType(Icon), findsOneWidget);
+      expect(find.byType(Image), findsOneWidget);
+      expect(find.byType(Icon), findsOneWidget);
 
-    // Try again with a letter provided.
-    await tester.pumpWidget(
-      new MaterialApp(
-        home: new Material(
-          child: new Alphatar.withUrl(
-            avatarUrl: profileUrl,
-            letter: 'L',
-            retry: false,
+      // Try again with a letter provided.
+      await tester.pumpWidget(
+        new MaterialApp(
+          home: new Material(
+            child: new Alphatar.withUrl(
+              avatarUrl: profileUrl,
+              letter: 'L',
+              retry: false,
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    expect(find.byType(Image), findsOneWidget);
-    expect(find.byType(Text), findsOneWidget);
+      expect(find.byType(Image), findsOneWidget);
+      expect(find.byType(Text), findsOneWidget);
+    }, createHttpClient: createMockImageHttpClient);
   });
 
   testWidgets(
