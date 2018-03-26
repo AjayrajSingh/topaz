@@ -17,7 +17,7 @@
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 #include "topaz/runtime/dart_runner/dart_application_controller.h"
 
-namespace dart_content_handler {
+namespace dart_runner {
 namespace {
 
 MappedResource mapped_isolate_snapshot_data;
@@ -190,4 +190,4 @@ Dart_Handle GetVMServiceAssetsArchiveCallback() {
       observatory_tar.size());
 }
 
-}  // namespace dart_content_handler
+}  // namespace dart_runner

@@ -31,7 +31,7 @@
 
 using tonic::ToDart;
 
-namespace dart_content_handler {
+namespace dart_runner {
 namespace {
 
 void AfterTask() {
@@ -518,4 +518,4 @@ async_wait_result_t DartApplicationController::OnIdleTimer(
   return ASYNC_WAIT_AGAIN;
 }
 
-}  // namespace dart_content_handler
+}  // namespace dart_runner

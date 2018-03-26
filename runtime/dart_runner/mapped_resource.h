@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_DART_CONTENT_HANDLER_MAPPED_RESOURCE_H_
-#define APPS_DART_CONTENT_HANDLER_MAPPED_RESOURCE_H_
+#ifndef APPS_DART_RUNNER_MAPPED_RESOURCE_H_
+#define APPS_DART_RUNNER_MAPPED_RESOURCE_H_
 
 #include <fdio/namespace.h>
 
 #include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fxl/macros.h"
 
-namespace dart_content_handler {
+namespace dart_runner {
 
 class MappedResource {
  public:
@@ -43,6 +43,6 @@ class MappedResource {
   FXL_DISALLOW_COPY_AND_ASSIGN(MappedResource);
 };
 
-}  // namespace dart_content_handler
+}  // namespace dart_runner
 
-#endif  // APPS_DART_CONTENT_HANDLER_MAPPED_RESOURCE_H_
+#endif  // APPS_DART_RUNNER_MAPPED_RESOURCE_H_

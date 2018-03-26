@@ -13,7 +13,7 @@
 #include "lib/fsl/vmo/file.h"
 #include "lib/fxl/logging.h"
 
-namespace dart_content_handler {
+namespace dart_runner {
 
 bool MappedResource::LoadFromNamespace(fdio_ns_t* namespc,
                                        const std::string& path,
@@ -71,4 +71,4 @@ MappedResource::~MappedResource() {
   }
 }
 
-}  // namespace dart_content_handler
+}  // namespace dart_runner

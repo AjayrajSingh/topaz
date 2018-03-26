@@ -78,17 +78,17 @@ void InitDartVM() {
   FXL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
   Dart_InitializeParams params = {};
   params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
-  params.vm_snapshot_data = dart_content_handler::vm_isolate_snapshot_buffer;
+  params.vm_snapshot_data = dart_runner::vm_isolate_snapshot_buffer;
   char* error = Dart_Initialize(&params);
   if (error)
     FXL_LOG(FATAL) << error;
 }
 
 Dart_Isolate CreateDartIsolate() {
-  FXL_CHECK(dart_content_handler::isolate_snapshot_buffer);
+  FXL_CHECK(dart_runner::isolate_snapshot_buffer);
   char* error = nullptr;
   Dart_Isolate isolate = Dart_CreateIsolate(
-      "dart:snapshot", "main", dart_content_handler::isolate_snapshot_buffer,
+      "dart:snapshot", "main", dart_runner::isolate_snapshot_buffer,
       nullptr, nullptr, nullptr, &error);
   FXL_CHECK(isolate) << error;
   Dart_ExitIsolate();

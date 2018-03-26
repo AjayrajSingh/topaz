@@ -10,7 +10,7 @@
 int main(int argc, const char** argv) {
   fsl::MessageLoop loop;
   trace::TraceProvider provider(loop.async());
-  dart_content_handler::DartApplicationRunner runner;
+  dart_runner::DartApplicationRunner runner;
   loop.Run();
   return 0;
 }

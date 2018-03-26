@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_DART_CONTENT_HANDLER_DART_APPLICATION_CONTROLLER_H_
-#define APPS_DART_CONTENT_HANDLER_DART_APPLICATION_CONTROLLER_H_
+#ifndef APPS_DART_RUNNER_DART_APPLICATION_CONTROLLER_H_
+#define APPS_DART_RUNNER_DART_APPLICATION_CONTROLLER_H_
 
 #include <fdio/namespace.h>
 
@@ -15,7 +15,7 @@
 #include "third_party/dart/runtime/include/dart_api.h"
 #include "topaz/runtime/dart_runner/mapped_resource.h"
 
-namespace dart_content_handler {
+namespace dart_runner {
 
 class DartApplicationController : public component::ApplicationController {
  public:
@@ -78,6 +78,6 @@ class DartApplicationController : public component::ApplicationController {
   FXL_DISALLOW_COPY_AND_ASSIGN(DartApplicationController);
 };
 
-}  // namespace dart_content_handler
+}  // namespace dart_runner
 
-#endif  // APPS_DART_CONTENT_HANDLER_DART_APPLICATION_CONTROLLER_H_
+#endif  // APPS_DART_RUNNER_DART_APPLICATION_CONTROLLER_H_

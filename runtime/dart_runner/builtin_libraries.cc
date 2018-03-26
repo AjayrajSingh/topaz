@@ -19,7 +19,7 @@
 
 using tonic::ToDart;
 
-namespace dart_content_handler {
+namespace dart_runner {
 namespace {
 
 #define REGISTER_FUNCTION(name, count) {#name, name, count},
@@ -210,4 +210,4 @@ void InitBuiltinLibrariesForIsolate(
   DART_CHECK_VALID(Dart_Invoke(isolate_lib, setup_hooks, 0, nullptr));
 }
 
-}  // namespace dart_content_handler
+}  // namespace dart_runner

@@ -21,7 +21,7 @@ extern "C" uint8_t _kDartVmSnapshotData[];
 extern "C" uint8_t _kDartVmSnapshotInstructions[];
 #endif
 
-namespace dart_content_handler {
+namespace dart_runner {
 namespace {
 
 const char* kDartVMArgs[] = {
@@ -254,4 +254,4 @@ void DartApplicationRunner::UpdateProcessLabel() {
   zx::process::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
 }
 
-}  // namespace dart_content_handler
+}  // namespace dart_runner

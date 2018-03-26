@@ -4,9 +4,9 @@
 
 #include <stdint.h>
 
-namespace dart_content_handler {
+namespace dart_runner {
 
 extern uint8_t const* const vm_isolate_snapshot_buffer;
 extern uint8_t const* const isolate_snapshot_buffer;
 
-}  // namespace dart_content_handler
+}  // namespace dart_runner

@@ -7,7 +7,7 @@
 
 #include "topaz/runtime/dart_runner/embedder/snapshot.h"
 
-namespace dart_content_handler {
+namespace dart_runner {
 
 // The string on the next line will be filled in with the contents of the
 // generated snapshot binary file for the vm isolate. This string forms the
@@ -22,4 +22,4 @@ uint8_t const* const vm_isolate_snapshot_buffer = vm_isolate_snapshot_buffer_;
 static const uint8_t isolate_snapshot_buffer_[] = { % s};
 uint8_t const* const isolate_snapshot_buffer = isolate_snapshot_buffer_;
 
-}  // namespace dart_content_handler
+}  // namespace dart_runner

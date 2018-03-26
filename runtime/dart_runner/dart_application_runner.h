@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_DART_CONTENT_HANDLER_DART_APPLICATION_RUNNER_H_
-#define APPS_DART_CONTENT_HANDLER_DART_APPLICATION_RUNNER_H_
+#ifndef APPS_DART_RUNNER_DART_APPLICATION_RUNNER_H_
+#define APPS_DART_RUNNER_DART_APPLICATION_RUNNER_H_
 
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
@@ -13,7 +13,7 @@
 #include "lib/fxl/macros.h"
 #include "topaz/runtime/dart_runner/mapped_resource.h"
 
-namespace dart_content_handler {
+namespace dart_runner {
 
 class ControllerToken {
  public:
@@ -56,6 +56,6 @@ class DartApplicationRunner : public component::ApplicationRunner {
   FXL_DISALLOW_COPY_AND_ASSIGN(DartApplicationRunner);
 };
 
-}  // namespace dart_content_handler
+}  // namespace dart_runner
 
-#endif  // APPS_DART_CONTENT_HANDLER_DART_APPLICATION_RUNNER_H_
+#endif  // APPS_DART_RUNNER_DART_APPLICATION_RUNNER_H_
