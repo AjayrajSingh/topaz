@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//peridot/build/module_repository/manifest_package.gni")
-
 group("tests") {
   testonly = true
 
@@ -11,11 +9,5 @@ group("tests") {
     "agents/content_provider:test",
     "modules/contact_list:test",
     "modules/contacts_picker:test",
-  ]
-}
-
-module_manifest_package("contacts_picker_manifest") {
-  sources = [
-    "modules/contacts_picker/manifest.json",
   ]
 }

@@ -3,7 +3,6 @@
         "dart"
     ],
     "packages": {
-        "video": "//topaz/app/video/modules/video",
-        "video_manifest": "//topaz/app/video:video_manifest"
+        "video": "//topaz/app/video/modules/video"
     }
 }

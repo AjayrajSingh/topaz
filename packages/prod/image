@@ -3,7 +3,6 @@
         "dart"
     ],
     "packages": {
-        "image": "//topaz/app/image",
-        "image_manifest": "//topaz/app/image:image_manifest"
+        "image": "//topaz/app/image"
     }
 }

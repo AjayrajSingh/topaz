@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//peridot/build/module_repository/manifest_package.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("image") {
@@ -15,11 +14,5 @@ flutter_app("image") {
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
-  ]
-}
-
-module_manifest_package("image_manifest") {
-  sources = [
-    "manifest.json",
   ]
 }
