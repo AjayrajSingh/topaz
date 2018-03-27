@@ -4,4 +4,4 @@
 
 export 'finance/finance_entity_codec.dart';
 export 'recipe/recipe_entity_codec.dart';
-export 'song/song_entity_codec.dart';
+export 'lyrics/lyrics_entity_codec.dart';

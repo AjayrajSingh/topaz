@@ -13,6 +13,5 @@ const String _kRecipeEntityUri = 'com.fuchsia.codelab.recipe';
 /// modules.
 class RecipeEntityCodec extends StringListEntityCodec {
   /// Constuctor assigns the Entity type.
-  VideoIdEntityCodec()
-      : super(type: _kRecipeEntityUri);
+  RecipeEntityCodec() : super(_kRecipeEntityUri);
 }

@@ -13,6 +13,5 @@ const String _kFinanceEntityUri = 'com.fuchsia.codelab.finance';
 /// modules.
 class FinanceEntityCodec extends StringListEntityCodec {
   /// Constuctor assigns the Entity type.
-  VideoIdEntityCodec()
-      : super(type: _kFinanceEntityUri);
+  FinanceEntityCodec() : super(_kFinanceEntityUri);
 }

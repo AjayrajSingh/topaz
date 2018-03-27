@@ -11,7 +11,7 @@ import 'package:lib.schemas.dart/entity_codec.dart';
 /// modules.
 class StringListEntityCodec extends EntityCodec<List<String>> {
   /// Constuctor assigns the proper values to en/decode a the request.
-  VideoIdEntityCodec(String entityType)
+  StringListEntityCodec(String entityType)
       : super(
           type: entityType,
           encode: _encode,
@@ -21,7 +21,7 @@ class StringListEntityCodec extends EntityCodec<List<String>> {
   static String _encode(List<String> data) {
     log.fine('Encode data to json: $data');
     if (data == null) {
-      return "null";
+      return 'null';
     }
     return json.encode(data);
   }

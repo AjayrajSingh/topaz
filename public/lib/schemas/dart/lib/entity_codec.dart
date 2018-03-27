@@ -7,3 +7,4 @@
 // on the type you are working with by importing this package's files for that
 // type.
 export 'src/entity_codec.dart';
+export 'src/string_list_entity_codec.dart';

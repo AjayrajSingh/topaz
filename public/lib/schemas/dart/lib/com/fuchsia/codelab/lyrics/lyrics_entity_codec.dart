@@ -13,6 +13,5 @@ const String _kLyricsEntityUri = 'com.fuchsia.codelab.lyrics';
 /// modules.
 class LyricsEntityCodec extends StringListEntityCodec {
   /// Constuctor assigns the Entity type.
-  VideoIdEntityCodec()
-      : super(type: _kLyricsEntityUri);
+  LyricsEntityCodec() : super(_kLyricsEntityUri);
 }
