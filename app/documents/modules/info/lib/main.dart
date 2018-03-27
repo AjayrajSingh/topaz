@@ -4,24 +4,69 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.schemas.dart/com.fuchsia.documents.dart';
+import 'package:lib.widgets.dart/model.dart';
+import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
 
-import 'src/modular/info_module_model.dart';
 import 'src/widgets/info.dart';
 
+final DocumentsIdEntityCodec _kDocumentsIdsCodec = new DocumentsIdEntityCodec();
+
+typedef void _DocumentResolver(DocumentsIdEntityData data);
+
 void main() {
-  setupLogger();
+  setupLogger(name: 'documents_info');
 
-  ApplicationContext appContext = new ApplicationContext.fromStartupInfo();
+  final doc_fidl.DocumentInterfaceProxy docsInterfaceProxy =
+      new doc_fidl.DocumentInterfaceProxy();
 
-  ModuleWidget<InfoModuleModel> moduleWidget =
-      new ModuleWidget<InfoModuleModel>(
-    moduleModel: new InfoModuleModel(),
-    applicationContext: appContext,
-    child: const Info(),
-  )..advertise();
+  ValueModel<doc_fidl.Document> model = new ValueModel<doc_fidl.Document>();
 
-  runApp(moduleWidget);
+  ModuleDriver driver = new ModuleDriver(
+    onTerminateFromCaller: docsInterfaceProxy.ctrl.close,
+  );
+
+  // Connect to the service proxy
+  driver
+      .connectToAgentServiceWithProxy(
+          'documents_content_provider', docsInterfaceProxy)
+      .then((_) {
+    log.info('Connected to DocumentInterfaceProxy');
+  }, onError: _handleError);
+
+  // Listen to changes to the current document
+  driver
+      .watch('id', _kDocumentsIdsCodec)
+      .listen(_makeDocumentResolver(docsInterfaceProxy, model));
+
+  // Start the module
+  driver.start().then(_handleStart, onError: _handleError);
+
+  runApp(
+    new ScopedModel<ValueModel<doc_fidl.Document>>(
+      model: model,
+      child: new Info(),
+    ),
+  );
+}
+
+_DocumentResolver _makeDocumentResolver(doc_fidl.DocumentInterfaceProxy proxy,
+    ValueModel<doc_fidl.Document> model) {
+  void resolver(DocumentsIdEntityData data) {
+    proxy.getMetadata(data.id, (doc_fidl.Document doc) {
+      model.value = doc;
+    });
+  }
+
+  return resolver;
+}
+
+void _handleError(Error error, StackTrace stackTrace) {
+  log.severe('An error ocurred', error, stackTrace);
+}
+
+void _handleStart(ModuleDriver module) {
+  log.info('document info module ready');
 }

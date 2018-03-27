@@ -5,19 +5,12 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets.dart/model.dart';
 import 'package:utils/utils.dart' as utils;
-
-import '../modular/info_module_model.dart';
+import 'package:topaz.app.documents.services/document.fidl.dart';
 
 /// Document Info view
 class Info extends StatelessWidget {
-  /// Constructor
-  const Info({
-    Key key,
-  })
-      : super(key: key);
-
   Widget _createLabel(String label, String text) {
     return new Expanded(
       child: new Padding(
@@ -55,12 +48,13 @@ class Info extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<InfoModuleModel>(builder: (
+    return new ScopedModelDescendant<ValueModel<Document>>(builder: (
       BuildContext context,
       Widget child,
-      InfoModuleModel model,
+      ValueModel<Document> model,
     ) {
-      if (model.doc == null) {
+      Document doc = model.value;
+      if (doc == null) {
         return const Center(
           child: const CircularProgressIndicator(),
         );
@@ -92,7 +86,7 @@ class Info extends StatelessWidget {
             child: new Container(
               padding: const EdgeInsets.all(8.0),
               child: new Text(
-                model.doc.name,
+                doc.name,
                 textAlign: TextAlign.left,
                 style: new TextStyle(
                   color: Colors.black,
@@ -117,31 +111,29 @@ class Info extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 8.0),
               child: new Center(
                 child: utils.showThumbnailImage(
-                        model.doc.thumbnailLocation, model.doc.mimeType)
+                        doc.thumbnailLocation, doc.mimeType)
                     // TODO(maryxia) SO-969 check if image is .network or .file
                     ? new Image.network(
-                        model.doc.thumbnailLocation,
+                        doc.thumbnailLocation,
                         height: 200.0,
                       )
                     : new Icon(
-                        model.doc.isFolder
-                            ? Icons.folder
-                            : Icons.insert_drive_file,
+                        doc.isFolder ? Icons.folder : Icons.insert_drive_file,
                         size: 200.0,
                       ),
               ),
             ),
-            _createLabel('Type', model.doc.mimeType),
-            model.doc.isFolder
+            _createLabel('Type', doc.mimeType),
+            doc.isFolder
                 ? new Container()
-                : _createLabel('Size', utils.prettifyFileSize(model.doc.size)),
-            _createLabel('Location', model.doc.location),
-            _createLabel('Owner', model.doc.owners.join(', ')),
-            _createLabel('Modified', utils.prettifyDate(model.doc.modified)),
-            _createLabel('Opened', utils.prettifyDate(model.doc.opened)),
-            _createLabel('Created', utils.prettifyDate(model.doc.created)),
-            _createLabel('Permissions', model.doc.permissions.join(', ')),
-            _createLabel('Description', model.doc.description),
+                : _createLabel('Size', utils.prettifyFileSize(doc.size)),
+            _createLabel('Location', doc.location),
+            _createLabel('Owner', doc.owners.join(', ')),
+            _createLabel('Modified', utils.prettifyDate(doc.modified)),
+            _createLabel('Opened', utils.prettifyDate(doc.opened)),
+            _createLabel('Created', utils.prettifyDate(doc.created)),
+            _createLabel('Permissions', doc.permissions.join(', ')),
+            _createLabel('Description', doc.description),
           ],
         ),
       );

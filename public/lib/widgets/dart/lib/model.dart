@@ -3,3 +3,4 @@
 // found in the LICENSE file
 
 export 'src/model/model.dart';
+export 'src/model/value_model.dart';

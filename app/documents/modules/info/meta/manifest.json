@@ -1,0 +1,11 @@
+{
+  "binary": "documents_info",
+  "suggestion_headline": "Document Info",
+  "verb": "com.fuchsia.documents.show-info",
+  "noun_constraints": [
+    {
+      "name": "id",
+      "type": "com.fuchsia.documents.id"
+    }
+  ]
+}
