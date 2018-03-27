@@ -21,9 +21,10 @@ const RK4SpringDescription _kSimulationDesc =
 const double _kFadeInDurationFraction = 0.35;
 
 /// Keeps track of quick settings opening progress.
-class QuickSettingsProgressModel extends SpringModel {
+class QuickSettingsProgressModel extends TracingSpringModel {
   /// Constructor.
-  QuickSettingsProgressModel() : super(springDescription: _kSimulationDesc);
+  QuickSettingsProgressModel()
+      : super(springDescription: _kSimulationDesc, traceName: 'Quick Settings');
 
   /// Showing or heading toward showing.
   bool get showing => target == 1.0;
