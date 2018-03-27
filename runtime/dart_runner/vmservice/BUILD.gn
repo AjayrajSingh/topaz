@@ -9,7 +9,6 @@ dart2_aot_app("vmservice") {
 
   source_dir = "."
 
-  extra_entry_manifests = [
-    "//topaz/runtime/dart_runner/service_entry_points.txt",
-  ]
+  extra_entry_manifests =
+      [ "//topaz/runtime/dart_runner/service_entry_points.txt" ]
 }

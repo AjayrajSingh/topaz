@@ -38,8 +38,7 @@ const struct NativeEntry {
   int argument_count;
 } kBuiltinEntries[] = {BUILTIN_NATIVE_LIST(REGISTER_FUNCTION)};
 
-Dart_NativeFunction BuiltinNativeLookup(Dart_Handle name,
-                                        int argument_count,
+Dart_NativeFunction BuiltinNativeLookup(Dart_Handle name, int argument_count,
                                         bool* auto_setup_scope) {
   const char* function_name = nullptr;
   DART_CHECK_VALID(Dart_StringToCString(name, &function_name));
@@ -83,8 +82,7 @@ void Logger_PrintString(Dart_NativeArguments args) {
 
 void ScheduleMicrotask(Dart_NativeArguments args) {
   Dart_Handle closure = Dart_GetNativeArgument(args, 0);
-  if (tonic::LogIfError(closure) || !Dart_IsClosure(closure))
-    return;
+  if (tonic::LogIfError(closure) || !Dart_IsClosure(closure)) return;
   tonic::DartMicrotaskQueue::GetForCurrentThread()->ScheduleMicrotask(closure);
 }
 

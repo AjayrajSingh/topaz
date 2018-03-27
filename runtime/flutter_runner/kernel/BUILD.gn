@@ -39,7 +39,8 @@ action("kernel_core_snapshot") {
     gen_snapshot_label,
   ]
 
-  platform_dill = "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
+  platform_dill =
+      "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
   inputs = [
     platform_dill,
   ]

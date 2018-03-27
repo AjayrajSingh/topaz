@@ -9,8 +9,7 @@
 
 namespace dart_runner {
 
-Dart_Isolate CreateServiceIsolate(const char* uri,
-                                  Dart_IsolateFlags* flags,
+Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
                                   char** error);
 
 Dart_Handle GetVMServiceAssetsArchiveCallback();

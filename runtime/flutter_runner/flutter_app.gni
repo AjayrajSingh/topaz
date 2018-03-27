@@ -119,9 +119,7 @@ template("flutter2_jit_app") {
     if (defined(invoker.source_dir)) {
       source_base = invoker.source_dir
     }
-    sources += [
-      rebase_path(invoker.main_dart, source_base),
-    ]
+    sources += [ rebase_path(invoker.main_dart, source_base) ]
   }
 
   kernel_target_name = target_name + "_kernel"
@@ -207,10 +205,10 @@ template("flutter2_jit_app") {
     ]
 
     resources = [
-      {
-        path = rebase_path(kernel_path)
-        dest = "kernel_blob.dill"
-      },
+                  {
+                    path = rebase_path(kernel_path)
+                    dest = "kernel_blob.dill"
+                  },
                 ] + invoker_resources
 
     meta = [
@@ -520,8 +518,8 @@ template("flutter1_jit_app") {
 
     deps = [
       ":$dart_library_target_name",
-      flutter_core_snapshot_label,
       _gen_snapshot_label,
+      flutter_core_snapshot_label,
     ]
 
     if (defined(invoker.deps)) {
@@ -906,9 +904,7 @@ template("flutter2_aot_app") {
     if (defined(invoker.source_dir)) {
       source_base = invoker.source_dir
     }
-    sources += [
-      rebase_path(invoker.main_dart, source_base),
-    ]
+    sources += [ rebase_path(invoker.main_dart, source_base) ]
   }
 
   kernel_target_name = target_name + "_kernel"
@@ -956,8 +952,8 @@ template("flutter2_aot_app") {
     }
     if (defined(invoker.extra_entry_manifests)) {
       foreach(entry_manifest, invoker.extra_entry_manifests) {
-        args +=
-            [ "--embedder_entry_points_manifest=" + rebase_path(entry_manifest) ]
+        args += [ "--embedder_entry_points_manifest=" +
+                  rebase_path(entry_manifest) ]
       }
     }
     if (is_debug) {
@@ -988,9 +984,8 @@ template("flutter2_aot_app") {
     output_name = outer_target_name
   }
 
-  dylib_path =
-      get_label_info(":$dylib_target_name($shlib_toolchain)", "root_out_dir") +
-      "/lib$target_name.so"
+  dylib_path = get_label_info(":$dylib_target_name($shlib_toolchain)",
+                              "root_out_dir") + "/lib$target_name.so"
 
   if (defined(invoker.resources)) {
     invoker_resources = invoker.resources
@@ -1061,7 +1056,7 @@ template("flutter2_aot_app") {
       ":${target_name}_resources",
 
       # Fake dependency for testing until this is added to flutter_runner
-      "//topaz/runtime/dart_runner/embedder:dart2_aot_snapshot_cc"
+      "//topaz/runtime/dart_runner/embedder:dart2_aot_snapshot_cc",
     ]
 
     resources = [

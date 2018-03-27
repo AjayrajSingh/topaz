@@ -116,9 +116,7 @@ template("dart1_jit_app") {
     if (defined(invoker.source_dir)) {
       source_base = invoker.source_dir
     }
-    sources += [
-      rebase_path(invoker.main_dart, source_base),
-    ]
+    sources += [ rebase_path(invoker.main_dart, source_base) ]
   }
 
   snapshot_path = "$target_gen_dir/${target_name}_snapshot.bin"
@@ -234,9 +232,7 @@ template("dart2_jit_app") {
     if (defined(invoker.source_dir)) {
       source_base = invoker.source_dir
     }
-    sources += [
-      rebase_path(invoker.main_dart, source_base),
-    ]
+    sources += [ rebase_path(invoker.main_dart, source_base) ]
   }
 
   kernel_target_name = target_name + "_kernel"
@@ -315,9 +311,7 @@ template("dart1_aot_app") {
     if (defined(invoker.source_dir)) {
       source_base = invoker.source_dir
     }
-    sources += [
-      rebase_path(invoker.main_dart, source_base),
-    ]
+    sources += [ rebase_path(invoker.main_dart, source_base) ]
   }
 
   assembly_target_name = target_name + "_assembly"
@@ -388,9 +382,8 @@ template("dart1_aot_app") {
     output_name = outer_target_name
   }
 
-  dylib_path =
-      get_label_info(":$dylib_target_name($shlib_toolchain)", "root_out_dir") +
-      "/lib$target_name.so"
+  dylib_path = get_label_info(":$dylib_target_name($shlib_toolchain)",
+                              "root_out_dir") + "/lib$target_name.so"
 
   package(target_name) {
     forward_variables_from(invoker, [ "testonly" ])
@@ -459,9 +452,7 @@ template("dart2_aot_app") {
     if (defined(invoker.source_dir)) {
       source_base = invoker.source_dir
     }
-    sources += [
-      rebase_path(invoker.main_dart, source_base),
-    ]
+    sources += [ rebase_path(invoker.main_dart, source_base) ]
   }
 
   kernel_target_name = target_name + "_kernel"
@@ -509,8 +500,8 @@ template("dart2_aot_app") {
     }
     if (defined(invoker.extra_entry_manifests)) {
       foreach(entry_manifest, invoker.extra_entry_manifests) {
-        args +=
-            [ "--embedder_entry_points_manifest=" + rebase_path(entry_manifest) ]
+        args += [ "--embedder_entry_points_manifest=" +
+                  rebase_path(entry_manifest) ]
       }
     }
     if (is_debug) {
@@ -541,9 +532,8 @@ template("dart2_aot_app") {
     output_name = outer_target_name
   }
 
-  dylib_path =
-      get_label_info(":$dylib_target_name($shlib_toolchain)", "root_out_dir") +
-      "/lib$target_name.so"
+  dylib_path = get_label_info(":$dylib_target_name($shlib_toolchain)",
+                              "root_out_dir") + "/lib$target_name.so"
 
   package(target_name) {
     forward_variables_from(invoker, [ "testonly" ])

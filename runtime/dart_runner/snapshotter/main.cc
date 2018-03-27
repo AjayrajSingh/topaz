@@ -8,8 +8,6 @@
 #include <set>
 #include <string>
 
-#include "topaz/runtime/dart_runner/embedder/snapshot.h"
-#include "third_party/dart/runtime/include/dart_api.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/command_line.h"
 #include "lib/fxl/files/directory.h"
@@ -21,6 +19,8 @@
 #include "lib/fxl/logging.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/file_loader/file_loader.h"
+#include "third_party/dart/runtime/include/dart_api.h"
+#include "topaz/runtime/dart_runner/embedder/snapshot.h"
 
 namespace dart_snapshotter {
 namespace {
@@ -34,7 +34,7 @@ constexpr char kDepfile[] = "depfile";
 constexpr char kBuildOutput[] = "build-output";
 
 const char* kDartVMArgs[] = {
-// clang-format off
+    // clang-format off
     "--enable_mirrors=false",
     "--await_is_keyword",
     // clang-format on
@@ -80,16 +80,15 @@ void InitDartVM() {
   params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
   params.vm_snapshot_data = dart_runner::vm_isolate_snapshot_buffer;
   char* error = Dart_Initialize(&params);
-  if (error)
-    FXL_LOG(FATAL) << error;
+  if (error) FXL_LOG(FATAL) << error;
 }
 
 Dart_Isolate CreateDartIsolate() {
   FXL_CHECK(dart_runner::isolate_snapshot_buffer);
   char* error = nullptr;
   Dart_Isolate isolate = Dart_CreateIsolate(
-      "dart:snapshot", "main", dart_runner::isolate_snapshot_buffer,
-      nullptr, nullptr, nullptr, &error);
+      "dart:snapshot", "main", dart_runner::isolate_snapshot_buffer, nullptr,
+      nullptr, nullptr, &error);
   FXL_CHECK(isolate) << error;
   Dart_ExitIsolate();
   return isolate;
@@ -98,23 +97,18 @@ Dart_Isolate CreateDartIsolate() {
 tonic::FileLoader* g_loader = nullptr;
 
 tonic::FileLoader& GetLoader() {
-  if (!g_loader)
-    g_loader = new tonic::FileLoader();
+  if (!g_loader) g_loader = new tonic::FileLoader();
   return *g_loader;
 }
 
-Dart_Handle HandleLibraryTag(Dart_LibraryTag tag,
-                             Dart_Handle library,
+Dart_Handle HandleLibraryTag(Dart_LibraryTag tag, Dart_Handle library,
                              Dart_Handle url) {
   FXL_CHECK(Dart_IsLibrary(library));
   FXL_CHECK(Dart_IsString(url));
   tonic::FileLoader& loader = GetLoader();
-  if (tag == Dart_kCanonicalizeUrl)
-    return loader.CanonicalizeURL(library, url);
-  if (tag == Dart_kImportTag)
-    return loader.Import(url);
-  if (tag == Dart_kSourceTag)
-    return loader.Source(library, url);
+  if (tag == Dart_kCanonicalizeUrl) return loader.CanonicalizeURL(library, url);
+  if (tag == Dart_kImportTag) return loader.Import(url);
+  if (tag == Dart_kSourceTag) return loader.Source(library, url);
   return Dart_NewApiError("Unknown library tag.");
 }
 
@@ -126,16 +120,14 @@ std::vector<char> CreateSnapshot() {
   return std::vector<char>(begin, begin + size);
 }
 
-bool WriteDepfile(const std::string& path,
-                  const std::string& build_output,
+bool WriteDepfile(const std::string& path, const std::string& build_output,
                   const std::set<std::string>& deps) {
   std::string current_directory = files::GetCurrentDirectory();
   std::string output = build_output + ":";
   for (const auto& dep : deps) {
     std::string file = dep;
     FXL_DCHECK(!file.empty());
-    if (file[0] != '/')
-      file = current_directory + "/" + file;
+    if (file[0] != '/') file = current_directory + "/" + file;
 
     std::string resolved_file;
     if (files::ReadSymbolicLink(file, &resolved_file)) {
@@ -193,8 +185,7 @@ int CreateSnapshot(const fxl::CommandLine& command_line) {
   InitDartVM();
 
   tonic::FileLoader& loader = GetLoader();
-  if (!loader.LoadPackagesMap(packages))
-    return 1;
+  if (!loader.LoadPackagesMap(packages)) return 1;
 
   Dart_Isolate isolate = CreateDartIsolate();
   FXL_CHECK(isolate) << "Failed to create isolate.";

@@ -23,8 +23,7 @@ namespace {
 MappedResource mapped_isolate_snapshot_data;
 tonic::DartLibraryNatives* service_natives = nullptr;
 
-Dart_NativeFunction GetNativeFunction(Dart_Handle name,
-                                      int argument_count,
+Dart_NativeFunction GetNativeFunction(Dart_Handle name, int argument_count,
                                       bool* auto_setup_scope) {
   FXL_CHECK(service_natives);
   return service_natives->GetNativeFunction(name, argument_count,
@@ -71,8 +70,7 @@ void EmbedderInformationCallback(Dart_EmbedderInformation* info) {
 
 }  // namespace
 
-Dart_Isolate CreateServiceIsolate(const char* uri,
-                                  Dart_IsolateFlags* flags,
+Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
                                   char** error) {
   Dart_SetEmbedderInformationCallback(EmbedderInformationCallback);
 

@@ -133,7 +133,8 @@ bool DartApplicationController::SetupNamespace() {
     const char* path = flat->paths->at(i)->data();
     status = fdio_ns_bind(namespace_, path, dir_handle);
     if (status != ZX_OK) {
-      FXL_LOG(ERROR) << "Failed to bind " << flat->paths->at(i) << " to namespace";
+      FXL_LOG(ERROR) << "Failed to bind " << flat->paths->at(i)
+                     << " to namespace";
       zx_handle_close(dir_handle);
       return false;
     }
@@ -348,8 +349,7 @@ int DartApplicationController::SetupFileDescriptor(
 }
 
 bool DartApplicationController::CreateIsolate(
-    void* isolate_snapshot_data,
-    void* isolate_snapshot_instructions) {
+    void* isolate_snapshot_data, void* isolate_snapshot_instructions) {
   // Create the isolate from the snapshot.
   char* error = nullptr;
 
@@ -490,9 +490,7 @@ void DartApplicationController::MessageEpilogue() {
 }
 
 async_wait_result_t DartApplicationController::OnIdleTimer(
-    async_t* async,
-    zx_status_t status,
-    const zx_packet_signal* signal) {
+    async_t* async, zx_status_t status, const zx_packet_signal* signal) {
   if ((status != ZX_OK) || !(signal->observed & ZX_TIMER_SIGNALED) ||
       !Dart_CurrentIsolate()) {
     // Timer closed or isolate shutdown.
