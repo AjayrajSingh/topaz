@@ -14,14 +14,20 @@ import 'package:lib.fidl.dart/bindings.dart';
 import 'package:lib.lifecycle.dart/lifecycle.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.dart/module.dart';
-import 'package:lib.story.dart/story.dart';
-import 'package:meta/meta.dart';
 import 'package:lib.schemas.dart/entity_codec.dart';
+import 'package:lib.story.dart/story.dart';
+import 'package:lib.ui.flutter/child_view.dart';
+import 'package:meta/meta.dart';
 
 import 'service_client.dart';
 
-export 'package:lib.module.dart/module.dart' show ModuleControllerClient;
+export 'package:lib.daisy.fidl/daisy.fidl.dart' show Daisy;
+export 'package:lib.module_resolver.dart/daisy_builder.dart' show DaisyBuilder;
+export 'package:lib.module.dart/module.dart'
+    show ModuleControllerClient, EmbeddedModule;
 export 'package:lib.story.dart/story.dart' show LinkClient;
+export 'package:lib.ui.flutter/child_view.dart'
+    show ChildView, ChildViewConnection;
 
 /// Function definition to handle [data] that is received from a message queue.
 typedef void OnReceiveMessage(String data, void ack());
@@ -92,8 +98,17 @@ class ModuleDriver {
   ///
   ///     module.start();
   ///
-  ModuleDriver({Function onTerminateFromCaller})
-      : _onTerminateFromCaller = onTerminateFromCaller {
+  ModuleDriver({
+    // TODO(MS-1423): remove onTerminateFromCaller and only use onTerminate.
+    Function onTerminateFromCaller,
+    Function onTerminate,
+  }) : _onTerminateFromCaller = onTerminateFromCaller ?? onTerminate {
+    if (onTerminateFromCaller != null) {
+      log
+        ..warning('onTerminateFromCaller is deprecated, use onTerminate')
+        ..warning('=> see MS-1423');
+    }
+
     _lifecycle = new LifecycleHost(
       onTerminate: _handleTerminate,
     );
@@ -396,6 +411,18 @@ class ModuleDriver {
     return _resolver.future;
   }
 
+  /// # Start Module
+  ///
+  /// Start a module and display it based on the passed in [surfaceRelation].
+  ///
+  /// On successful resolution the Future completes with a
+  /// [ModuleControllerClient] that allows the parent module (the one calling
+  /// this method) to access methods for observing and controlling the Module.
+  ///
+  /// Related FIDL APIs:
+  ///
+  /// * [ModuleContext#StartModule](https://goo.gl/9T8Gkv).
+  /// * [ModuleController](https://goo.gl/ZXcYW3).
   ///
   Future<ModuleControllerClient> startModule({
     @required String module,
@@ -416,20 +443,50 @@ class ModuleDriver {
     );
   }
 
+  /// # Embed Module
   ///
-  Future<Null> embedModule() async {
-    Completer<Null> completer = new Completer<Null>();
+  /// Calls underlying framework APIs to start and configure a module instance
+  /// for embedding within a Flutter Widget tree.
+  ///
+  /// On successful resolution the Future completes with an [EmbeddedModule]
+  /// instance provding access to a [ChildView] Flutter Widget and a
+  /// [ModuleControllerClient].
+  ///
+  /// Related FIDL APIs:
+  ///
+  /// * [ModuleContext#EmbedModule](https://goo.gl/9T8Gkv).
+  /// * [ModuleController](https://goo.gl/ZXcYW3).
+  ///
+  Future<EmbeddedModule> embedModule({
+    @required String name,
+    @required Daisy daisy,
+  }) {
+    assert(name != null && name.isNotEmpty);
+    assert(daisy != null);
 
-    log.fine('embeding daisy');
+    log.fine('resolving module ("$name") for embedding...');
 
-    completer
-        .completeError(new StateError('TODO(): implement md.embedModule(...)'));
+    return moduleContext.embedModule(name: name, daisy: daisy);
+  }
 
-    return completer.future;
+  /// # Ready
+  ///
+  /// Used by modules to signal being "ready" to the framework and any parent
+  /// modules. This method SHOULD be used when the "autoReady" param is set to
+  /// false in [start].
+  ///
+  ///     driver.start(autoReady: false).then((ModuleDriver driver) async {
+  ///       // do more async work, e.g. embed modules and
+  ///       // wait for them to be ready.
+  ///       driver.ready().then(() => log.info('ready!'), onError: handleError);
+  ///     });
+  ///
+  Future<Null> ready() {
+    return moduleContext.ready();
   }
 
   /// Made available for video module to access MediaPlayer.
-  /// TODO MS-1287 Determine whether this should be refactored
+  /// TODO(MS-1287): Determine whether this should be refactored
   ServiceProviderProxy get environmentServices =>
       _applicationContext.environmentServices;
 }

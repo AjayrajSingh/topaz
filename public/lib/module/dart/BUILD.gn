@@ -12,6 +12,7 @@ dart_library("dart") {
   ]
 
   deps = [
+    "//garnet/public/lib/ui/views/fidl:fidl_dart",
     "//peridot/public/lib/daisy/fidl:fidl_dart",
     "//peridot/public/lib/device/fidl:fidl_dart",
     "//peridot/public/lib/lifecycle/fidl:fidl_dart",
@@ -24,5 +25,6 @@ dart_library("dart") {
     "//topaz/public/lib/component/dart",
     "//topaz/public/lib/fidl/dart",
     "//topaz/public/lib/story/dart",
+    "//topaz/public/lib/ui/flutter",
   ]
 }

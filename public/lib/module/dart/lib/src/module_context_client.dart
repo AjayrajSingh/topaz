@@ -11,6 +11,9 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.module.fidl/module_context.fidl.dart' as fidl;
 import 'package:lib.story.dart/story.dart';
 import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:lib.ui.flutter/child_view.dart';
+// See DNO-201 for details on the _view_token path.
+import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
 import 'package:meta/meta.dart';
 
 import 'module_controller_client.dart';
@@ -26,6 +29,31 @@ class ResolutionException implements Exception {
 
   /// Create a new [ResolutionException].
   ResolutionException(this.message);
+}
+
+/// Holds values nessecary for interacting with Model and View related FIDL APIs
+/// for modules started via [ModuleContextClient#embedModule].
+class EmbeddedModule {
+  /// The client for the ModuleController FIDL service connected to an embedded
+  /// module.
+  final ModuleControllerClient controller;
+
+  /// The underlying ChildViewConnection, stored as a value here to prevent GC.
+  final ChildViewConnection connection;
+
+  /// The Flutter Widget that renders the UI of the started module. Do not
+  /// assume the view is ready to display pixels to this view, check the
+  /// controller to prevent jank.
+  final ChildView view;
+
+  /// Constructor, for usage see [ModuleContextClient#embedModule].
+  EmbeddedModule({
+    @required this.controller,
+    @required this.connection,
+    @required this.view,
+  })  : assert(controller != null),
+        assert(connection != null),
+        assert(view != null);
 }
 
 /// Client wrapper for [fidl.ModuleContext].
@@ -116,6 +144,7 @@ class ModuleContextClient {
     });
 
     try {
+      await bound;
       proxy.ready();
     } on Exception catch (err, stackTrace) {
       completer.completeError(err, stackTrace);
@@ -223,6 +252,75 @@ class ModuleContextClient {
         null, // incomingServices
         controller.proxy.ctrl.request(),
         surfaceRelation,
+        handleDaisyStatus,
+      );
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+    }
+
+    return completer.future;
+  }
+
+  /// See [fidl.ModuleContext#embedModule].
+  Future<EmbeddedModule> embedModule({
+    @required String name,
+    @required Daisy daisy,
+  }) {
+    assert(name != null && name.isNotEmpty);
+    assert(daisy != null);
+
+    Completer<EmbeddedModule> completer = new Completer<EmbeddedModule>();
+    InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
+    ModuleControllerClient controller = new ModuleControllerClient();
+
+    void handleDaisyStatus(fidl.StartModuleStatus status) {
+      log.fine('resolved "$name" with status "$status"');
+
+      switch (status) {
+        case fidl.StartModuleStatus.success:
+          log.fine('configuring view for "$name"');
+
+          // TODO(MS-1437): viewOwner error handling.
+          ChildViewConnection connection =
+              new ChildViewConnection(viewOwner.passHandle());
+
+          EmbeddedModule result = new EmbeddedModule(
+            controller: controller,
+            connection: connection,
+            view: new ChildView(connection: connection),
+          );
+          completer.complete(result);
+          break;
+        case fidl.StartModuleStatus.noModulesFound:
+          completer.completeError(new ResolutionException('no modules found'));
+          break;
+        default:
+          completer.completeError(
+              new ResolutionException('unknown status: $status'));
+      }
+    }
+
+    // ignore: unawaited_futures
+    proxy.ctrl.error.then((ProxyError err) {
+      if (!completer.isCompleted) {
+        completer.completeError(err);
+      }
+    });
+
+    // ignore: unawaited_futures
+    controller.proxy.ctrl.error.then((ProxyError err) {
+      if (!completer.isCompleted) {
+        completer.completeError(err);
+      }
+    });
+
+    try {
+      proxy.embedModule(
+        name,
+        daisy,
+        null,
+        controller.proxy.ctrl.request(),
+        viewOwner.passRequest(),
         handleDaisyStatus,
       );
     } on Exception catch (err, stackTrace) {
