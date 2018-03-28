@@ -45,9 +45,16 @@ void main() {
   driver.start().then(_handleStart, onError: _handleError);
 
   runApp(
-    new ScopedModel<ValueModel<doc_fidl.Document>>(
-      model: model,
-      child: new Info(),
+    new MaterialApp(
+      home: new Material(
+        child: new Directionality(
+          textDirection: TextDirection.ltr,
+          child: new ScopedModel<ValueModel<doc_fidl.Document>>(
+            model: model,
+            child: new Info(),
+          ),
+        ),
+      ),
     ),
   );
 }

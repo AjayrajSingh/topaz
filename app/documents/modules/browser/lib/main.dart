@@ -3,25 +3,133 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.module_resolver.dart/daisy_builder.dart';
+import 'package:lib.schemas.dart/com.fuchsia.documents.dart';
+import 'package:lib.widgets.dart/model.dart';
 
-import 'src/modular/browser_module_model.dart';
+import 'src/models/browser_model.dart';
 import 'src/widgets/browser.dart';
 
+ModuleDriver _driver;
+ModuleControllerClient _videoModuleControllerClient;
+ModuleControllerClient _infoModuleControllerClient;
+
+const SurfaceRelation _kSurfaceRelation = const SurfaceRelation(
+  arrangement: SurfaceArrangement.copresent,
+  dependency: SurfaceDependency.dependent,
+  emphasis: 0.5,
+);
+
+final DocumentsIdEntityCodec _kDocumentsIdsCodec = new DocumentsIdEntityCodec();
+
 void main() {
-  setupLogger();
+  setupLogger(name: 'documents-browser');
 
-  ApplicationContext appContext = new ApplicationContext.fromStartupInfo();
+  final doc_fidl.DocumentInterfaceProxy docsInterfaceProxy =
+      new doc_fidl.DocumentInterfaceProxy();
 
-  ModuleWidget<BrowserModuleModel> moduleWidget =
-      new ModuleWidget<BrowserModuleModel>(
-    moduleModel: new BrowserModuleModel(),
-    applicationContext: appContext,
-    child: const Browser(),
-  )..advertise();
+  _driver = new ModuleDriver(
+    onTerminate: () {
+      docsInterfaceProxy.ctrl.close();
+      _videoModuleControllerClient?.terminate();
+      _infoModuleControllerClient?.terminate();
+    },
+  );
 
-  runApp(moduleWidget);
+  _driver
+      .connectToAgentServiceWithProxy(
+    'documents_content_provider',
+    docsInterfaceProxy,
+  )
+      .then(
+    (_) {
+      log.info('Connected to agent');
+    },
+    onError: _handleError,
+  );
+
+  BrowserModel model = new BrowserModel(
+    documentInterface: docsInterfaceProxy,
+    onResolveDocument: _resolveDocument,
+    onUpdateCurrentDocument: _updateCurrentDocument,
+    onToggleInfo: _handleToggleInfo,
+  );
+
+  _driver.start().then(
+        _handleStart,
+        onError: _handleError,
+      );
+
+  runApp(
+    new MaterialApp(
+      home: new Material(
+        child: new Directionality(
+          textDirection: TextDirection.ltr,
+          child: new ScopedModel<BrowserModel>(
+            model: model,
+            child: const Browser(),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+void _handleToggleInfo(bool show) {
+  if (show) {
+    DaisyBuilder daisyBuilder = new DaisyBuilder.url('documents_info')
+      ..addNounFromLink('id', 'id');
+
+    _driver
+        .startModule(
+      module: 'documents_info',
+      daisy: daisyBuilder.daisy,
+    )
+        .then(
+      (ModuleControllerClient client) {
+        _infoModuleControllerClient = client;
+        log.info('starting info module');
+      },
+      onError: _handleError,
+    );
+  } else {
+    _infoModuleControllerClient?.terminate();
+    _infoModuleControllerClient = null;
+  }
+}
+
+void _resolveDocument(String entityRef) {
+  DaisyBuilder daisyBuilder =
+      new DaisyBuilder.verb('com.google.fuchsia.preview')
+        ..addNounFromEntityReference('entity', entityRef);
+
+  _driver
+      .startModule(
+    module: 'video',
+    daisy: daisyBuilder.daisy,
+    surfaceRelation: _kSurfaceRelation,
+  )
+      .then((ModuleControllerClient client) {
+    _videoModuleControllerClient = client;
+  });
+}
+
+void _updateCurrentDocument(doc_fidl.Document doc) {
+  _driver
+      .put('id', new DocumentsIdEntityData(id: doc.id), _kDocumentsIdsCodec)
+      .then((_) {
+    log.info('updated entity with document id: ${doc.id}');
+  });
+}
+
+void _handleError(Error error, StackTrace stackTrace) {
+  log.severe('An error ocurred', error, stackTrace);
+}
+
+void _handleStart(ModuleDriver module) {
+  log.info('browser module ready');
 }

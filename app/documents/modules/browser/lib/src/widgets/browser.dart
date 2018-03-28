@@ -3,11 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/model.dart';
 import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
+import 'package:lib.widgets.dart/model.dart';
 import 'package:utils/utils.dart' as utils;
 
-import '../modular/browser_module_model.dart';
+import '../models/browser_model.dart';
 import './doc_list_item.dart';
 import './header.dart';
 import './image_viewer.dart';
@@ -22,8 +22,7 @@ class Browser extends StatelessWidget {
   /// Constructor
   const Browser({
     Key key,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   Widget _buildListViewHeader(String text, bool ascending) {
     return new Expanded(
@@ -44,7 +43,7 @@ class Browser extends StatelessWidget {
     );
   }
 
-  Widget _buildGridView(BrowserModuleModel model) {
+  Widget _buildGridView(BrowserModel model) {
     return new Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -79,7 +78,7 @@ class Browser extends StatelessWidget {
     );
   }
 
-  Widget _buildListView(BrowserModuleModel model) {
+  Widget _buildListView(BrowserModel model) {
     return new Column(
       children: <Widget>[
         new Container(
@@ -121,10 +120,10 @@ class Browser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<BrowserModuleModel>(builder: (
+    return new ScopedModelDescendant<BrowserModel>(builder: (
       BuildContext context,
       Widget child,
-      BrowserModuleModel model,
+      BrowserModel model,
     ) {
       // Handles whether to display that loading is happening.
       Widget mainDocView;

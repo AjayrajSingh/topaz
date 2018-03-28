@@ -7,7 +7,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import '../modular/browser_module_model.dart';
+import '../models/browser_model.dart';
 
 /// When tapping on the close icon
 typedef void OnCloseTapped();
@@ -17,14 +17,13 @@ typedef void OnCloseTapped();
 /// Has action icons for the current directory.
 class Header extends StatelessWidget {
   /// Module Model
-  final BrowserModuleModel model;
+  final BrowserModel model;
 
   /// Constructor
   const Header({
     Key key,
     @required this.model,
-  })
-      : assert(model != null),
+  })  : assert(model != null),
         super(key: key);
 
   @override

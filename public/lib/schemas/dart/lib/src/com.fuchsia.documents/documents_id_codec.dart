@@ -21,15 +21,13 @@ class DocumentsIdEntityCodec extends EntityCodec<DocumentsIdEntityData> {
 
 /// Encodes [DocumentsIdEntityData] into a [String].
 String _encode(DocumentsIdEntityData data) {
-  assert(data != null);
-
+  if (data == null) {
+    return null;
+  }
   return data.id;
 }
 
 /// Decodes [String] into a structured [DocumentsIdEntityData].
 DocumentsIdEntityData _decode(String data) {
-  assert(data != null);
-  assert(data.isNotEmpty);
-
   return new DocumentsIdEntityData(id: data);
 }

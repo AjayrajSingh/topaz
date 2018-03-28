@@ -1,41 +1,40 @@
-// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:collection/collection.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:lib.logging/logging.dart';
-import 'package:lib.module_resolver.dart/daisy_builder.dart';
-import 'package:lib.widgets/modular.dart';
 import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
-
-const String _kInfoModuleUrl = 'documents_info';
-
-const SurfaceRelation _kSurfaceRelation = const SurfaceRelation(
-  arrangement: SurfaceArrangement.copresent,
-  dependency: SurfaceDependency.dependent,
-  emphasis: 0.5,
-);
+import 'package:lib.logging/logging.dart';
+import 'package:lib.widgets.dart/model.dart';
+import 'package:meta/meta.dart';
 
 const String _kDefaultNavName = 'Documents';
 const String _kDefaultRootDir = 'root';
 
-/// The ModuleModel for the document browser
-class BrowserModuleModel extends ModuleModel {
-  // Interface Proxy. This is how we talk to the Doc FIDL
-  final doc_fidl.DocumentInterfaceProxy _docsInterfaceProxy =
-      new doc_fidl.DocumentInterfaceProxy();
+/// A method which is called when a document needs to be resolved.
+typedef void OnResolveDocument(String entityRef);
 
-  /// Used to talk to agents
-  final AgentControllerProxy _agentControllerProxy = new AgentControllerProxy();
+/// A method which is called when the current document is updated.
+/// The document may be null if the current document is being deselected.
+typedef void OnUpdateCurrentDocument(doc_fidl.Document doc);
 
-  /// Used to start and stop modules from within the Browser module
-  final ModuleControllerProxy _moduleController = new ModuleControllerProxy();
+/// A method which is called when is response to the [toggleInfo()] method.
+typedef void OnToggleInfo(bool showInfo);
+
+/// The model object for the Browser module
+class BrowserModel extends Model {
+  /// The document interface which is used to inflate documents
+  final doc_fidl.DocumentInterface documentInterface;
+
+  /// A method which is called in response to [resolveDocuement()] allowing
+  /// for users of this class to determine how the document should be resolved.
+  final OnResolveDocument onResolveDocument;
+
+  /// A method which is called when the current document is updated.
+  final OnUpdateCurrentDocument onUpdateCurrentDocument;
+
+  /// A method which is called in response to [toggleInfo()].
+  final OnToggleInfo onToggleInfo;
 
   /// List of all documents for this Document Provider
   List<doc_fidl.Document> documents = <doc_fidl.Document>[];
@@ -64,8 +63,16 @@ class BrowserModuleModel extends ModuleModel {
   // Id of the folder we're currently in, in the navigation path
   String _navId = _kDefaultRootDir;
 
-  /// Constructor
-  BrowserModuleModel();
+  /// The constructor for the [BrowserModel].
+  BrowserModel({
+    @required this.documentInterface,
+    @required this.onResolveDocument,
+    @required this.onUpdateCurrentDocument,
+    @required this.onToggleInfo,
+  })  : assert(documentInterface != null),
+        assert(onResolveDocument != null),
+        assert(onUpdateCurrentDocument != null),
+        assert(onToggleInfo != null);
 
   /// True if loading docs.
   bool get loading => _loading;
@@ -90,7 +97,7 @@ class BrowserModuleModel extends ModuleModel {
   // TODO(maryxia) SO-967 - no need to do a get() to download to a
   // document location if the file is publicly accessible
   void setPreviewDocLocation() {
-    _docsInterfaceProxy.get(_currentDoc.id, (doc_fidl.Document doc) {
+    documentInterface.get(_currentDoc.id, (doc_fidl.Document doc) {
       // Check that user has not navigated away to another doc
       if (_currentDoc.id == doc.id) {
         _currentDoc = doc;
@@ -106,14 +113,13 @@ class BrowserModuleModel extends ModuleModel {
   void listDocs(String currentDirectoryId, String currentDirectoryName) {
     _loading = true;
     notifyListeners();
-    _docsInterfaceProxy.list(currentDirectoryId,
-        (List<doc_fidl.Document> docs) {
+    documentInterface.list(currentDirectoryId, (List<doc_fidl.Document> docs) {
       documents = docs;
       _navName = currentDirectoryName;
       _navId = currentDirectoryId;
       _loading = false;
       notifyListeners();
-      log.fine('Retrieved list of documents for BrowserModuleModel');
+      log.fine('Retrieved list of documents for BrowserModel');
     });
   }
 
@@ -130,57 +136,20 @@ class BrowserModuleModel extends ModuleModel {
 
   /// Toggles the Info Module view for a [doc_fidl.Document]
   void toggleInfo() {
-    if (_infoModuleOpen) {
-      _moduleController.stop(() {
-        _infoModuleOpen = false;
-        notifyListeners();
-      });
-    } else {
-      moduleContext.startModuleInShellDeprecated(
-        'info',
-        _kInfoModuleUrl,
-        null, // default link
-        null,
-        _moduleController.ctrl.request(),
-        _kSurfaceRelation,
-        false,
-      );
-      _infoModuleOpen = true;
-      notifyListeners();
-    }
+    _infoModuleOpen = !_infoModuleOpen;
+    onToggleInfo(_infoModuleOpen);
+    notifyListeners();
   }
 
-  /// Resolves the [Document] into a new module.
-  ///
-  /// Creates an Entity Reference for the currently-selected doc.
-  /// Create a Daisy, passing in the Entity Reference.
-  /// The Resolver then figures out what relevant module to open.
+  /// Resolves the [Document] by creating an entity ref and passing it to
+  /// [onResolveDocument].
   void resolveDocument() {
     // Download the Document we want to resolve (currently, only video)
     // See SO-1084 for why we have to download the doc
     // Make Entity Ref for this doc
-    _docsInterfaceProxy.createEntityReference(_currentDoc, (String entityRef) {
+    documentInterface.createEntityReference(_currentDoc, (String entityRef) {
       log.fine('Retrieved an Entity Ref at $entityRef');
-      // Use DaisyBuilder to create a Daisy that stores an entityRef
-      // for this Document
-      DaisyBuilder daisyBuilder =
-          new DaisyBuilder.verb('com.google.fuchsia.preview')
-            ..addNoun('entityRef', entityRef);
-      log.fine('Created Daisy for $_currentDoc.id');
-
-      // Open a new module using Module Resolution
-      moduleContext.startModule(
-        'video',
-        daisyBuilder.daisy,
-        null, // incomingServices
-        _moduleController.ctrl.request(),
-        _kSurfaceRelation,
-        (StartModuleStatus status) {
-          // Handle daisy resolution here
-          log.info('Start daisy status = $status');
-        },
-      );
-      log.fine('Opened a new module');
+      onResolveDocument(entityRef);
       notifyListeners();
     });
   }
@@ -196,13 +165,8 @@ class BrowserModuleModel extends ModuleModel {
   ///
   /// Also updates the currentDocId in the Link accordingly
   void updateCurrentlySelectedDoc(doc_fidl.Document doc) {
-    if (_currentDoc == doc) {
-      _currentDoc = null;
-      link.set(const <String>['currentDocId'], json.encode(null));
-    } else {
-      _currentDoc = doc;
-      link.set(const <String>['currentDocId'], json.encode(doc.id));
-    }
+    _currentDoc = _currentDoc == doc ? null : doc;
+    onUpdateCurrentDocument(_currentDoc);
     notifyListeners();
   }
 
@@ -237,46 +201,5 @@ class BrowserModuleModel extends ModuleModel {
   set previewMode(bool show) {
     _previewMode = show;
     notifyListeners();
-  }
-
-  @override
-  Future<Null> onReady(
-    ModuleContext moduleContext,
-    Link link,
-  ) async {
-    super.onReady(moduleContext, link);
-
-    // The below is used to connect to the DocumentProvider service
-    ComponentContextProxy componentContext = new ComponentContextProxy();
-    moduleContext.getComponentContext(componentContext.ctrl.request());
-    ServiceProviderProxy serviceProviderProxy = new ServiceProviderProxy();
-
-    // The incomingServices here are the ones sent from outgoingServices in the
-    // DocumentsAgent
-    componentContext.connectToAgent(
-      // TODO(maryxia) SO-880 get this from file manifest and add a check for
-      // whether it can be found in the system
-      // launches the application at this location, as if it were an agent
-      'documents',
-      serviceProviderProxy.ctrl.request(),
-      _agentControllerProxy.ctrl.request(),
-    );
-    // Connect the DocumentsInterfaceProxy to a service that the agent manages.
-    // Otherwise, you've only connected to the Agent, and can't perform actions.
-    connectToService(serviceProviderProxy, _docsInterfaceProxy.ctrl);
-    serviceProviderProxy.ctrl.close();
-    componentContext.ctrl.close();
-    _docsInterfaceProxy.getContentProviderName((String name) {
-      listDocs(_kDefaultRootDir, name);
-    });
-    notifyListeners();
-    log.fine('BrowserModuleModel onReady complete');
-  }
-
-  @override
-  void onStop() {
-    _docsInterfaceProxy.ctrl.close();
-    _agentControllerProxy.ctrl.close();
-    _moduleController.ctrl.close();
   }
 }
