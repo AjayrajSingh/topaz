@@ -11,6 +11,7 @@ dart_library("dart") {
   sources = [
     "entity_codec.dart",
     "com.fuchsia.color.dart",
+    "com.fuchsia.contact.dart",
     "com.fuchsia.documents.dart",
   ]
 
