@@ -11,8 +11,9 @@ flutter_app("contact_card") {
   deps = [
     "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/dart/entity_schemas:entity_schemas",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/schemas/dart",
   ]
 }
