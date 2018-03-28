@@ -10,7 +10,6 @@ group("tests") {
   deps = [
     "agents/content_provider:test",
     "modules/contact_list:test",
-    "modules/contacts:test",
     "modules/contacts_picker:test",
   ]
 }
