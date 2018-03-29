@@ -16,7 +16,8 @@
 #include <utility>
 
 #include "lib/app/cpp/application_context.h"
-#include "lib/fidl/cpp/bindings/string.h"
+#include "lib/fidl/cpp/string.h"
+#include "lib/fidl/cpp/optional.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fsl/vmo/file.h"
 #include "lib/fxl/arraysize.h"
@@ -43,11 +44,11 @@ void AfterTask() {
 }  // namespace
 
 DartApplicationController::DartApplicationController(
-    std::string label, component::ApplicationPackagePtr application,
-    component::ApplicationStartupInfoPtr startup_info,
-    f1dl::InterfaceRequest<component::ApplicationController> controller)
+    std::string label, component::ApplicationPackage application,
+    component::ApplicationStartupInfo startup_info,
+    fidl::InterfaceRequest<component::ApplicationController> controller)
     : label_(label),
-      url_(std::move(application->resolved_url)),
+      url_(std::move(application.resolved_url)),
       application_(std::move(application)),
       startup_info_(std::move(startup_info)),
       binding_(this) {
@@ -116,7 +117,7 @@ bool DartApplicationController::Setup() {
 constexpr char kServiceRootPath[] = "/svc";
 
 bool DartApplicationController::SetupNamespace() {
-  component::FlatNamespacePtr& flat = *(&startup_info_->flat_namespace);
+  component::FlatNamespace *flat = &startup_info_.flat_namespace;
   zx_status_t status = fdio_ns_create(&namespace_);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to create namespace";
@@ -180,11 +181,11 @@ bool DartApplicationController::SetupFromSource() {
 #if defined(AOT_RUNTIME)
   return false;
 #else
-  if (!application_->data ||
+  if (!application_.data ||
       !MappedResource::LoadFromVmo(
           url_,
-          fsl::SizedVmo(std::move(application_->data->vmo),
-                        application_->data->size),
+          fsl::SizedVmo(std::move(application_.data->vmo),
+                        application_.data->size),
           script_)) {
     return false;
   }
@@ -382,22 +383,22 @@ bool DartApplicationController::Main() {
   tonic::DartMicrotaskQueue::StartForCurrentThread();
   fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(AfterTask);
 
-  f1dl::VectorPtr<f1dl::StringPtr> arguments =
-      std::move(startup_info_->launch_info->arguments);
+  fidl::VectorPtr<fidl::StringPtr> arguments =
+      std::move(startup_info_.launch_info.arguments);
 
   // TODO(abarth): Remove service_provider_bridge once we have an
   // implementation of rio.Directory in Dart.
-  if (startup_info_->launch_info->directory_request.is_valid()) {
+  if (startup_info_.launch_info.directory_request.is_valid()) {
     service_provider_bridge_.ServeDirectory(
-        std::move(startup_info_->launch_info->directory_request));
+        std::move(startup_info_.launch_info.directory_request));
   }
 
   component::ServiceProviderPtr service_provider;
   auto outgoing_services = service_provider.NewRequest();
   service_provider_bridge_.set_backend(std::move(service_provider));
 
-  stdoutfd_ = SetupFileDescriptor(std::move(startup_info_->launch_info->out));
-  stderrfd_ = SetupFileDescriptor(std::move(startup_info_->launch_info->err));
+  stdoutfd_ = SetupFileDescriptor(std::move(startup_info_.launch_info.out));
+  stderrfd_ = SetupFileDescriptor(std::move(startup_info_.launch_info.err));
 
   InitBuiltinLibrariesForIsolate(
       url_, namespace_, stdoutfd_, stderrfd_,
@@ -465,7 +466,7 @@ void DartApplicationController::Detach() {
   binding_.set_error_handler(fxl::Closure());
 }
 
-void DartApplicationController::Wait(const WaitCallback& callback) {
+void DartApplicationController::Wait(WaitCallback callback) {
   wait_callbacks_.push_back(callback);
 }
 

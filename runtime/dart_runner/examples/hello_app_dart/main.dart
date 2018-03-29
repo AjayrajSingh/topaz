@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:topaz.runtime.dart_runner.examples.hello_app_dart.interfaces/hello.fidl.dart';
+import 'package:topaz.runtime.dart_runner.examples.hello_app_dart.interfaces/interfaces.fidl.dart';
 
 class _HelloImpl extends Hello {
   final HelloBinding _binding = new HelloBinding();
@@ -24,5 +24,5 @@ void main(List<String> args) {
   ApplicationContext context = new ApplicationContext.fromStartupInfo();
 
   context.outgoingServices
-      .addServiceForName(new _HelloImpl().bind, Hello.serviceName);
+      .addServiceForName(new _HelloImpl().bind, Hello.$serviceName);
 }

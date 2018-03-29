@@ -104,9 +104,9 @@ void IsolateCleanupCallback(void* callback_data) {
 
 void RunApplication(
     DartApplicationRunner* runner, ControllerToken* token,
-    component::ApplicationPackagePtr application,
-    component::ApplicationStartupInfoPtr startup_info,
-    ::f1dl::InterfaceRequest<component::ApplicationController> controller) {
+    component::ApplicationPackage application,
+    component::ApplicationStartupInfo startup_info,
+    ::fidl::InterfaceRequest<component::ApplicationController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   fsl::MessageLoop loop;
   DartApplicationController app(token->label(), std::move(application),
@@ -155,7 +155,7 @@ DartApplicationRunner::DartApplicationRunner()
     : context_(component::ApplicationContext::CreateFromStartupInfo()),
       loop_(fsl::MessageLoop::GetCurrent()) {
   context_->outgoing_services()->AddService<component::ApplicationRunner>(
-      [this](f1dl::InterfaceRequest<component::ApplicationRunner> request) {
+      [this](fidl::InterfaceRequest<component::ApplicationRunner> request) {
         bindings_.AddBinding(this, std::move(request));
       });
 
@@ -200,10 +200,10 @@ DartApplicationRunner::~DartApplicationRunner() {
 }
 
 void DartApplicationRunner::StartApplication(
-    component::ApplicationPackagePtr application,
-    component::ApplicationStartupInfoPtr startup_info,
-    ::f1dl::InterfaceRequest<component::ApplicationController> controller) {
-  std::string label = GetLabelFromURL(application->resolved_url);
+    component::ApplicationPackage application,
+    component::ApplicationStartupInfo startup_info,
+    ::fidl::InterfaceRequest<component::ApplicationController> controller) {
+  std::string label = GetLabelFromURL(application.resolved_url);
   std::thread thread(RunApplication, this, AddController(label),
                      std::move(application), std::move(startup_info),
                      std::move(controller));

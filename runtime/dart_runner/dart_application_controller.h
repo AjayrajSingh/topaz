@@ -6,9 +6,11 @@
 #define APPS_DART_RUNNER_DART_APPLICATION_CONTROLLER_H_
 
 #include <fdio/namespace.h>
+#include <lib/async/cpp/auto_wait.h>
 
-#include "lib/app/fidl/application_runner.fidl.h"
-#include "lib/fidl/cpp/bindings/binding.h"
+
+#include <fuchsia/cpp/component.h>
+#include "lib/fidl/cpp/binding.h"
 #include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fxl/macros.h"
 #include "lib/svc/cpp/service_provider_bridge.h"
@@ -20,9 +22,9 @@ namespace dart_runner {
 class DartApplicationController : public component::ApplicationController {
  public:
   DartApplicationController(
-      std::string label, component::ApplicationPackagePtr application,
-      component::ApplicationStartupInfoPtr startup_info,
-      f1dl::InterfaceRequest<component::ApplicationController> controller);
+      std::string label, component::ApplicationPackage application,
+      component::ApplicationStartupInfo startup_info,
+      fidl::InterfaceRequest<component::ApplicationController> controller);
   ~DartApplicationController() override;
 
   bool Setup();
@@ -45,7 +47,7 @@ class DartApplicationController : public component::ApplicationController {
   // |ApplicationController|
   void Kill() override;
   void Detach() override;
-  void Wait(const WaitCallback& callback) override;
+  void Wait(WaitCallback callback) override;
 
   // Idle notification.
   void MessageEpilogue();
@@ -54,10 +56,10 @@ class DartApplicationController : public component::ApplicationController {
 
   std::string label_;
   std::string url_;
-  component::ApplicationPackagePtr application_;
-  component::ApplicationStartupInfoPtr startup_info_;
+  component::ApplicationPackage application_;
+  component::ApplicationStartupInfo startup_info_;
   component::ServiceProviderBridge service_provider_bridge_;
-  f1dl::Binding<component::ApplicationController> binding_;
+  fidl::Binding<component::ApplicationController> binding_;
 
   fdio_ns_t* namespace_ = nullptr;
   int stdoutfd_ = -1;

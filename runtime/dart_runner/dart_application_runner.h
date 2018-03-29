@@ -7,8 +7,8 @@
 
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
-#include "lib/app/fidl/application_runner.fidl.h"
-#include "lib/fidl/cpp/bindings/binding.h"
+#include <fuchsia/cpp/component.h>
+#include "lib/fidl/cpp/binding.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/macros.h"
 #include "topaz/runtime/dart_runner/mapped_resource.h"
@@ -36,9 +36,9 @@ class DartApplicationRunner : public component::ApplicationRunner {
  private:
   // |component::ApplicationRunner| implementation:
   void StartApplication(
-      component::ApplicationPackagePtr application,
-      component::ApplicationStartupInfoPtr startup_info,
-      ::f1dl::InterfaceRequest<component::ApplicationController> controller)
+      component::ApplicationPackage application,
+      component::ApplicationStartupInfo startup_info,
+      ::fidl::InterfaceRequest<component::ApplicationController> controller)
       override;
 
   ControllerToken* AddController(std::string label);
@@ -47,7 +47,7 @@ class DartApplicationRunner : public component::ApplicationRunner {
 
   std::unique_ptr<component::ApplicationContext> context_;
   fsl::MessageLoop* loop_;
-  f1dl::BindingSet<component::ApplicationRunner> bindings_;
+  fidl::BindingSet<component::ApplicationRunner> bindings_;
   std::vector<ControllerToken*> controllers_;
 #if !defined(AOT_RUNTIME)
   MappedResource vm_snapshot_data_;

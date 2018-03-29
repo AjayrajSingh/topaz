@@ -11,14 +11,14 @@
 #include <fdio/namespace.h>
 
 #include "lib/app/cpp/application_context.h"
-#include "lib/app/fidl/service_provider.fidl.h"
+#include <fuchsia/cpp/component.h>
 
 namespace dart_runner {
 
 void InitBuiltinLibrariesForIsolate(
     const std::string& script_uri, fdio_ns_t* namespc, int stdoutfd,
     int stderrfd, std::unique_ptr<component::ApplicationContext> context,
-    f1dl::InterfaceRequest<component::ServiceProvider> outgoing_services,
+    fidl::InterfaceRequest<component::ServiceProvider> outgoing_services,
     bool service_isolate);
 
 }  // namespace dart_runner
