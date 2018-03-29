@@ -10,6 +10,8 @@
 #include <utility>
 
 #include "lib/app/cpp/connect.h"
+#include "lib/fidl/cpp/clone.h"
+#include "lib/fidl/cpp/optional.h"
 #include "topaz/shell/ermine_user_shell/find_unique_ptr.h"
 #include "topaz/shell/ermine_user_shell/tile.h"
 
@@ -18,30 +20,28 @@ namespace {
 
 constexpr char kViewLabel[] = "ermine_user_shell";
 
-ui::ScenicPtr GetScenic(mozart::ViewManager* view_manager) {
+ui::ScenicPtr GetScenic(views_v1::ViewManager* view_manager) {
   ui::ScenicPtr scenic;
   view_manager->GetScenic(scenic.NewRequest());
   return scenic;
 }
 
-ui::gfx::Metrics* GetLastMetrics(uint32_t node_id,
-                                 const f1dl::VectorPtr<ui::EventPtr>& events) {
-  ui::gfx::Metrics* result = nullptr;
+const gfx::Metrics* GetLastMetrics(uint32_t node_id,
+                                   const fidl::VectorPtr<ui::Event>& events) {
+  const gfx::Metrics* result = nullptr;
   for (const auto& event : *events) {
-    if (event->is_gfx() && event->get_gfx()->is_metrics() &&
-        event->get_gfx()->get_metrics()->node_id == node_id)
-      result = event->get_gfx()->get_metrics()->metrics.get();
+    if (event.is_gfx() && event.gfx().is_metrics() &&
+        event.gfx().metrics().node_id == node_id)
+      result = &event.gfx().metrics().metrics;
   }
   return result;
 }
 
 views_v1::ViewProperties CreateViewProperties(float width, float height) {
-  auto properties = mozart::ViewProperties::New();
-  properties->view_layout = mozart::ViewLayout::New();
-  properties->view_layout->size = mozart::SizeF::New();
-  properties->view_layout->size->width = width;
-  properties->view_layout->size->height = height;
-  properties->view_layout->inset = mozart::InsetF::New();
+  views_v1::ViewProperties properties;
+  properties.view_layout = views_v1::ViewLayout::New();
+  properties.view_layout->size.width = width;
+  properties.view_layout->size.height = height;
   return properties;
 }
 
@@ -50,7 +50,7 @@ views_v1::ViewProperties CreateViewProperties(float width, float height) {
 ViewController::ViewController(
     component::ApplicationLauncher* launcher,
     views_v1::ViewManagerPtr view_manager,
-    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     DisconnectCallback disconnect_handler)
     : launcher_(launcher),
       view_manager_(std::move(view_manager)),
@@ -82,10 +82,10 @@ ViewController::ViewController(
                               input_connection_.NewRequest());
   input_connection_->SetEventListener(input_listener_binding_.NewBinding());
 
-  session_.set_event_handler([this](f1dl::VectorPtr<ui::EventPtr> events) {
+  session_.set_event_handler([this](fidl::VectorPtr<ui::Event> events) {
     OnSessionEvents(std::move(events));
   });
-  parent_node_.SetEventMask(ui::gfx::kMetricsEventMask);
+  parent_node_.SetEventMask(gfx::kMetricsEventMask);
   parent_node_.AddChild(container_node_);
 }
 
@@ -99,7 +99,7 @@ uint32_t ViewController::AddTile(std::string url) {
   tile->node().ExportAsRequest(&token);
   container_node_.AddChild(tile->node());
 
-  f1dl::InterfaceHandle<views_v1_token::ViewOwner> view_owner;
+  fidl::InterfaceHandle<views_v1_token::ViewOwner> view_owner;
   tile->CreateView(view_owner.NewRequest());
 
   view_container_->AddChild(tile->key(), std::move(view_owner),
@@ -126,9 +126,9 @@ zx_status_t ViewController::RemoveTile(uint32_t key) {
 
 void ViewController::OnPropertiesChanged(
     views_v1::ViewProperties properties,
-    const OnPropertiesChangedCallback& callback) {
-  if (!logical_size_.Equals(*properties->view_layout->size)) {
-    logical_size_ = *properties->view_layout->size;
+    OnPropertiesChangedCallback callback) {
+  if (properties.view_layout && logical_size_ != properties.view_layout->size) {
+    logical_size_ = properties.view_layout->size;
     UpdatePhysicalSize();
     MarkNeedsLayout();
   }
@@ -137,28 +137,28 @@ void ViewController::OnPropertiesChanged(
 }
 
 void ViewController::OnChildAttached(uint32_t child_key,
-                                     mozart::ViewInfoPtr child_view_info,
-                                     const OnChildAttachedCallback& callback) {
+                                     views_v1::ViewInfo child_view_info,
+                                     OnChildAttachedCallback callback) {
   callback();
 }
 
 void ViewController::OnChildUnavailable(
     uint32_t child_key,
-    const OnChildUnavailableCallback& callback) {
+    OnChildUnavailableCallback callback) {
   zx_status_t status = RemoveTile(child_key);
   ZX_DEBUG_ASSERT(status == ZX_OK);
   callback();
 }
 
 void ViewController::OnEvent(input::InputEvent event,
-                             const OnEventCallback& callback) {
+                             OnEventCallback callback) {
   callback(false);
 }
 
-void ViewController::OnSessionEvents(f1dl::VectorPtr<ui::EventPtr> events) {
-  ui::gfx::Metrics* new_metrics = GetLastMetrics(parent_node_.id(), events);
+void ViewController::OnSessionEvents(fidl::VectorPtr<ui::Event> events) {
+  const gfx::Metrics* new_metrics = GetLastMetrics(parent_node_.id(), events);
 
-  if (!new_metrics || metrics_.Equals(*new_metrics))
+  if (!new_metrics || metrics_ == *new_metrics)
     return;
 
   metrics_ = *new_metrics;
@@ -207,7 +207,7 @@ void ViewController::Present(zx_time_t presentation_time) {
     ZX_DEBUG_ASSERT(present_pending_);
     present_pending_ = false;
     if (needs_begin_frame_)
-      BeginFrame(info->presentation_time + info->presentation_interval);
+      BeginFrame(info.presentation_time + info.presentation_interval);
   });
 }
 
@@ -247,10 +247,10 @@ void ViewController::PerformLayout() {
 void ViewController::SetPropertiesIfNeeded(
     Tile* tile,
     views_v1::ViewProperties properties) {
-  if (tile->view_properties().Equals(properties))
+  if (tile->view_properties() == properties)
     return;
-  tile->set_view_properties(properties.Clone());
-  view_container_->SetChildProperties(tile->key(), std::move(properties));
+  tile->set_view_properties(fidl::Clone(properties));
+  view_container_->SetChildProperties(tile->key(), fidl::MakeOptional(std::move(properties)));
 }
 
 }  // namespace ermine_user_shell

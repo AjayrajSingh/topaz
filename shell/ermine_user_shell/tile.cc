@@ -6,8 +6,9 @@
 
 #include <utility>
 
+#include <fuchsia/cpp/views_v1.h>
+
 #include "lib/svc/cpp/services.h"
-#include "lib/ui/views/fidl/view_provider.fidl.h"
 
 namespace ermine_user_shell {
 namespace {
@@ -26,11 +27,11 @@ Tile::Tile(component::ApplicationLauncher* launcher, std::string url,
 Tile::~Tile() = default;
 
 void Tile::CreateView(
-    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request) {
+    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request) {
   component::Services services;
-  auto launch_info = component::ApplicationLaunchInfo::New();
-  launch_info->url = url_;
-  launch_info->directory_request = services.NewRequest();
+  component::ApplicationLaunchInfo launch_info;
+  launch_info.url = url_;
+  launch_info.directory_request = services.NewRequest();
 
   launcher_->CreateApplication(std::move(launch_info),
                                controller_.NewRequest());

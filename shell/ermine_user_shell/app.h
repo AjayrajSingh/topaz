@@ -5,25 +5,26 @@
 #ifndef TOPAZ_SHELL_ERMINE_USER_SHELL_APP_H_
 #define TOPAZ_SHELL_ERMINE_USER_SHELL_APP_H_
 
-#include "lib/app/cpp/application_context.h"
-#include "lib/fidl/cpp/bindings/binding_set.h"
-#include "lib/fidl/cpp/bindings/interface_request.h"
-#include "lib/ui/views/fidl/view_provider.fidl.h"
-
 #include <memory>
 #include <vector>
+
+#include <fuchsia/cpp/views_v1.h>
+
+#include "lib/app/cpp/application_context.h"
+#include "lib/fidl/cpp/binding_set.h"
+#include "lib/fidl/cpp/interface_request.h"
 
 namespace ermine_user_shell {
 class ViewController;
 
-class App : public mozart::ViewProviderService {
+class App : public views_v1::ViewProvider {
  public:
   App();
   ~App();
 
-  // |mozart::ViewProvider|
-  void CreateView(f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
-                  f1dl::InterfaceRequest<component::ServiceProvider>
+  // |views_v1::ViewProvider|
+  void CreateView(fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+                  fidl::InterfaceRequest<component::ServiceProvider>
                       view_services) override;
 
   void DestroyController(ViewController* controller);
@@ -33,7 +34,7 @@ class App : public mozart::ViewProviderService {
   App& operator=(const App&) = delete;
 
   std::unique_ptr<component::ApplicationContext> context_;
-  f1dl::BindingSet<views_v1::ViewProvider> bindings_;
+  fidl::BindingSet<views_v1::ViewProvider> bindings_;
   std::vector<std::unique_ptr<ViewController>> controllers_;
 };
 

@@ -11,28 +11,27 @@
 #include <memory>
 #include <vector>
 
+#include <fuchsia/cpp/input.h>
+#include <fuchsia/cpp/views_v1.h>
+
 #include "lib/app/cpp/application_context.h"
-#include "lib/fidl/cpp/bindings/binding.h"
-#include "lib/fidl/cpp/bindings/interface_request.h"
-#include "lib/ui/input/fidl/input_connection.fidl.h"
+#include "lib/fidl/cpp/binding.h"
+#include "lib/fidl/cpp/interface_request.h"
 #include "lib/ui/scenic/client/resources.h"
 #include "lib/ui/scenic/client/session.h"
-#include "lib/ui/scenic/fidl/events.fidl.h"
-#include "lib/ui/views/fidl/view_manager.fidl.h"
-#include "lib/ui/views/fidl/views.fidl.h"
 
 namespace ermine_user_shell {
 class Tile;
 
-class ViewController : public mozart::ViewListener,
-                       public mozart::ViewContainerListener,
-                       public mozart::InputListener {
+class ViewController : public views_v1::ViewListener,
+                       public views_v1::ViewContainerListener,
+                       public input::InputListener {
  public:
   using DisconnectCallback = std::function<void(ViewController*)>;
 
   ViewController(component::ApplicationLauncher* launcher,
                  views_v1::ViewManagerPtr view_manager,
-                 f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+                 fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                  DisconnectCallback disconnect_handler);
   ~ViewController();
 
@@ -47,23 +46,23 @@ class ViewController : public mozart::ViewListener,
     return logical_size_.width > 0.f && logical_size_.height > 0.f;
   }
 
-  // |mozart::ViewListener|:
+  // |views_v1::ViewListener|:
   void OnPropertiesChanged(
       views_v1::ViewProperties properties,
-      const OnPropertiesChangedCallback& callback) override;
+      OnPropertiesChangedCallback callback) override;
 
-  // |mozart::ViewContainerListener|:
+  // |views_v1::ViewContainerListener|:
   void OnChildAttached(uint32_t child_key,
-                       mozart::ViewInfoPtr child_view_info,
-                       const OnChildAttachedCallback& callback) override;
+                       views_v1::ViewInfo child_view_info,
+                       OnChildAttachedCallback callback) override;
   void OnChildUnavailable(uint32_t child_key,
-                          const OnChildUnavailableCallback& callback) override;
+                          OnChildUnavailableCallback callback) override;
 
-  // |mozart::InputListener|:
+  // |input::InputListener|:
   void OnEvent(input::InputEvent event,
-               const OnEventCallback& callback) override;
+               OnEventCallback callback) override;
 
-  void OnSessionEvents(f1dl::VectorPtr<ui::EventPtr> events);
+  void OnSessionEvents(fidl::VectorPtr<ui::Event> events);
   void UpdatePhysicalSize();
 
   void MarkNeedsLayout();
@@ -76,18 +75,18 @@ class ViewController : public mozart::ViewListener,
 
   component::ApplicationLauncher* launcher_;
   views_v1::ViewManagerPtr view_manager_;
-  f1dl::Binding<ViewListener> view_listener_binding_;
-  f1dl::Binding<ViewContainerListener> view_container_listener_binding_;
-  f1dl::Binding<InputListener> input_listener_binding_;
+  fidl::Binding<ViewListener> view_listener_binding_;
+  fidl::Binding<ViewContainerListener> view_container_listener_binding_;
+  fidl::Binding<InputListener> input_listener_binding_;
 
-  mozart::ViewPtr view_;
-  mozart::ViewContainerPtr view_container_;
+  views_v1::ViewPtr view_;
+  views_v1::ViewContainerPtr view_container_;
   component::ServiceProviderPtr view_service_provider_;
-  mozart::InputConnectionPtr input_connection_;
+  input::InputConnectionPtr input_connection_;
 
-  mozart::SizeF logical_size_;
-  mozart::Size physical_size_;
-  ui::gfx::Metrics metrics_;
+  geometry::SizeF logical_size_;
+  geometry::Size physical_size_;
+  gfx::Metrics metrics_;
 
   scenic_lib::Session session_;
   scenic_lib::ImportNode parent_node_;

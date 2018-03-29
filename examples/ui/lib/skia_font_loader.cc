@@ -17,7 +17,7 @@ SkiaFontLoader::SkiaFontLoader(fonts::FontProviderPtr font_provider)
 SkiaFontLoader::~SkiaFontLoader() {}
 
 void SkiaFontLoader::LoadFont(fonts::FontRequest request,
-                              const FontCallback& callback) {
+                              FontCallback callback) {
   // TODO(jeffbrown): Handle errors in case the font provider itself dies.
   font_provider_->GetFont(
       std::move(request), [this, callback](fonts::FontResponsePtr response) {
@@ -39,7 +39,7 @@ void SkiaFontLoader::LoadFont(fonts::FontRequest request,
       });
 }
 
-void SkiaFontLoader::LoadDefaultFont(const FontCallback& callback) {
+void SkiaFontLoader::LoadDefaultFont(FontCallback callback) {
   fonts::FontRequest request;
   request.family = "Roboto";
   LoadFont(std::move(request), callback);

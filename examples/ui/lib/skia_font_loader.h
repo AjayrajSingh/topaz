@@ -24,11 +24,11 @@ class SkiaFontLoader {
 
   // Loads the requested font and invokes the callback when done.
   // If the request fails, the callback will receive a null typeface.
-  void LoadFont(fonts::FontRequest request, const FontCallback& callback);
+  void LoadFont(fonts::FontRequest request, FontCallback callback);
 
   // Loads the default font and invokes the callback when done.
   // If the request fails, the callback will receive a null typeface.
-  void LoadDefaultFont(const FontCallback& callback);
+  void LoadDefaultFont(FontCallback callback);
 
  private:
   fonts::FontProviderPtr font_provider_;

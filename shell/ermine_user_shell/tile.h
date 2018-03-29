@@ -8,12 +8,12 @@
 #include <string>
 #include <utility>
 
-#include "lib/app/fidl/application_controller.fidl.h"
-#include "lib/app/fidl/application_launcher.fidl.h"
-#include "lib/fidl/cpp/bindings/interface_request.h"
+#include <fuchsia/cpp/component.h>
+#include <fuchsia/cpp/views_v1.h>
+
+#include "lib/fidl/cpp/interface_request.h"
 #include "lib/ui/scenic/client/resources.h"
 #include "lib/ui/scenic/client/session.h"
-#include "lib/ui/views/fidl/view_provider.fidl.h"
 
 namespace ermine_user_shell {
 
@@ -37,7 +37,7 @@ class Tile {
     view_properties_ = std::move(view_properties);
   }
 
-  void CreateView(f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request);
+  void CreateView(fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request);
 
  private:
   component::ApplicationLauncher* launcher_;
