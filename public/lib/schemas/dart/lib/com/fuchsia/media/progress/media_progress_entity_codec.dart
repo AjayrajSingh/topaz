@@ -18,7 +18,7 @@ class MediaProgressEntityCodec extends EntityCodec<MediaProgressEntityData> {
   /// Constuctor assigns the proper values to en/decode MediaProgress objects.
   MediaProgressEntityCodec()
       : super(
-          type: 'com.fucshia.media.progress',
+          type: 'com.fuchsia.media.progress',
           encode: _encode,
           decode: _decode,
         );
