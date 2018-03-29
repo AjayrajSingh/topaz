@@ -59,6 +59,7 @@ source_set("skia_type_converters") {
   ]
 
   public_deps = [
+    "//garnet/public/lib/fsl",
     "//garnet/public/lib/ui/geometry/fidl",
     "//third_party/skia",
   ]
