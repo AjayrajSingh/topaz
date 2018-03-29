@@ -23,7 +23,7 @@ class WebViewProvider : mozart::ViewProvider,
 
  private:
   // |ViewProvider|
-  void CreateView(f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+  void CreateView(f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                   f1dl::InterfaceRequest<component::ServiceProvider>
                       view_services) override;
 
@@ -53,5 +53,3 @@ class WebViewProvider : mozart::ViewProvider,
   modular::ComponentContextPtr component_context_;
 #endif
 };
-
-

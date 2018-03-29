@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <zircon/status.h>
 
-#include "lib/fonts/fidl/font_provider.fidl.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/strings/string_printf.h"
 #include "lib/ui/input/cpp/formatting.h"
@@ -27,8 +26,8 @@ constexpr char kShell[] = "/boot/bin/sh";
 }  // namespace
 
 ViewController::ViewController(
-    mozart::ViewManagerPtr view_manager,
-    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    views_v1::ViewManagerPtr view_manager,
+    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     component::ApplicationContext* context, const TermParams& term_params,
     DisconnectCallback disconnect_handler)
     : SkiaView(std::move(view_manager), std::move(view_owner_request), "Term"),
@@ -43,8 +42,8 @@ ViewController::ViewController(
 
   SetReleaseHandler([this] { disconnect_(this); });
 
-  auto font_request = fonts::FontRequest::New();
-  font_request->family = "RobotoMono";
+  fonts::FontRequest font_request;
+  font_request.family = "RobotoMono";
   font_loader_.LoadFont(
       std::move(font_request), [this](sk_sp<SkTypeface> typeface) {
         FXL_CHECK(typeface);  // TODO(jpoichet): Fail gracefully.
@@ -117,7 +116,7 @@ void ViewController::Blink() {
 }
 
 void ViewController::OnSceneInvalidated(
-    ui::PresentationInfoPtr presentation_info) {
+    images::PresentationInfo presentation_info) {
   if (!regular_typeface_)
     return;
 
@@ -129,7 +128,7 @@ void ViewController::OnSceneInvalidated(
 }
 
 void ViewController::OnPropertiesChanged(
-    mozart::ViewPropertiesPtr old_properties) {
+    views_v1::ViewProperties old_properties) {
   ComputeMetrics();
   Resize();
 }
@@ -216,8 +215,7 @@ void ViewController::DrawContent(SkCanvas* canvas) {
 }
 
 void ViewController::ScheduleDraw(bool force) {
-  if (!properties() ||
-      (!model_state_changes_.IsDirty() && !force && !force_next_draw_)) {
+  if (!model_state_changes_.IsDirty() && !force && !force_next_draw_) {
     force_next_draw_ |= force;
     return;
   }
@@ -234,19 +232,19 @@ void ViewController::OnSetKeypadMode(bool application_mode) {
   keypad_application_mode_ = application_mode;
 }
 
-bool ViewController::OnInputEvent(mozart::InputEventPtr event) {
+bool ViewController::OnInputEvent(input::InputEvent event) {
   bool handled = false;
-  if (event->is_keyboard()) {
-    const mozart::KeyboardEventPtr& keyboard = event->get_keyboard();
-    if (keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED ||
-        keyboard->phase == mozart::KeyboardEvent::Phase::REPEAT) {
-      if (keyboard->code_point == '+' &&
-          keyboard->modifiers & mozart::kModifierAlt) {
+  if (event.is_keyboard()) {
+    const input::KeyboardEvent& keyboard = event.keyboard();
+    if (keyboard.phase == input::KeyboardEventPhase::PRESSED ||
+        keyboard.phase == input::KeyboardEventPhase::REPEAT) {
+      if (keyboard.code_point == '+' &&
+          keyboard.modifiers & input::kModifierAlt) {
         params_.font_size++;
         ComputeMetrics();
         Resize();
-      } else if (keyboard->code_point == '-' &&
-                 keyboard->modifiers & mozart::kModifierAlt) {
+      } else if (keyboard.code_point == '-' &&
+                 keyboard.modifiers & input::kModifierAlt) {
         params_.font_size--;
         ComputeMetrics();
         Resize();
@@ -254,9 +252,9 @@ bool ViewController::OnInputEvent(mozart::InputEventPtr event) {
       OnKeyPressed(std::move(event));
       handled = true;
     }
-  } else if (event->is_focus()) {
-    const mozart::FocusEventPtr& focus = event->get_focus();
-    focused_ = focus->focused;
+  } else if (event.is_focus()) {
+    const input::FocusEvent& focus = event.focus();
+    focused_ = focus.focused;
     blink_on_ = true;
     if (focused_) {
       Blink();
@@ -268,12 +266,12 @@ bool ViewController::OnInputEvent(mozart::InputEventPtr event) {
   return handled;
 }
 
-void ViewController::OnKeyPressed(mozart::InputEventPtr key_event) {
+void ViewController::OnKeyPressed(input::InputEvent key_event) {
   last_key_ = zx::clock::get(ZX_CLOCK_MONOTONIC);
   blink_on_ = true;
 
   std::string input_sequence =
-      GetInputSequenceForKeyPressedEvent(*key_event, keypad_application_mode_);
+      GetInputSequenceForKeyPressedEvent(key_event, keypad_application_mode_);
   if (input_sequence.empty())
     return;
 

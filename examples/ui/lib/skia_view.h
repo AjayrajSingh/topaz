@@ -15,8 +15,8 @@ namespace mozart {
 // single full-size surface.
 class SkiaView : public BaseView {
  public:
-  SkiaView(ViewManagerPtr view_manager,
-           f1dl::InterfaceRequest<ViewOwner> view_owner_request,
+  SkiaView(views_v1::ViewManagerPtr view_manager,
+           fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
            const std::string& label);
   ~SkiaView() override;
 

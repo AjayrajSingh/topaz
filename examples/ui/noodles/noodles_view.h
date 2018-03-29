@@ -17,15 +17,15 @@ class Rasterizer;
 
 class NoodlesView : public mozart::SkiaView {
  public:
-  NoodlesView(mozart::ViewManagerPtr view_manager,
-              f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request);
+  NoodlesView(views_v1::ViewManagerPtr view_manager,
+              fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request);
 
   ~NoodlesView() override;
 
  private:
   // |BaseView|:
   void OnSceneInvalidated(
-      ui::PresentationInfoPtr presentation_info) override;
+      images::PresentationInfo presentation_info) override;
 
   void Draw(SkCanvas* canvas, float t);
 

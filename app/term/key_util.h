@@ -7,9 +7,7 @@
 
 #include <string>
 
-namespace mozart {
-class InputEvent;
-}
+#include <fuchsia/cpp/input.h>
 
 namespace term {
 
@@ -18,7 +16,7 @@ namespace term {
 // |EventType::KEY_PRESSED|). |keypad_application_mode| indicates if the keypad
 // is in "application mode".
 std::string GetInputSequenceForKeyPressedEvent(
-    const mozart::InputEvent& key_event,
+    const input::InputEvent& key_event,
     bool keypad_application_mode);
 
 }  // namespace term

@@ -9,14 +9,14 @@
 namespace scenic_lib {
 namespace skia {
 
-SkImageInfo MakeSkImageInfo(const ui::gfx::ImageInfo& image_info) {
-  FXL_DCHECK(image_info.tiling == ui::gfx::ImageInfo::Tiling::LINEAR);
+SkImageInfo MakeSkImageInfo(const images::ImageInfo& image_info) {
+  FXL_DCHECK(image_info.tiling == images::Tiling::LINEAR);
 
   switch (image_info.pixel_format) {
-    case ui::gfx::ImageInfo::PixelFormat::BGRA_8:
+    case images::PixelFormat::BGRA_8:
       return SkImageInfo::Make(image_info.width, image_info.height,
                                kBGRA_8888_SkColorType, kOpaque_SkAlphaType);
-    case ui::gfx::ImageInfo::PixelFormat::YUY2:
+    case images::PixelFormat::YUY2:
       FXL_CHECK(false) << "Not implemented.";
       return SkImageInfo();
   }

@@ -18,8 +18,8 @@ namespace examples {
 
 class VuMeterView : public mozart::SkiaView {
  public:
-  VuMeterView(mozart::ViewManagerPtr view_manager,
-              f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+  VuMeterView(views_v1::ViewManagerPtr view_manager,
+              f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
               component::ApplicationContext* application_context,
               const VuMeterParams& params);
 
@@ -52,8 +52,8 @@ class VuMeterView : public mozart::SkiaView {
 
   // |BaseView|:
   void OnSceneInvalidated(
-      ui::PresentationInfoPtr presentation_info) override;
-  bool OnInputEvent(mozart::InputEventPtr event) override;
+      images::PresentationInfo presentation_info) override;
+  bool OnInputEvent(input::InputEvent event) override;
 
   // Draws the UI.
   void DrawContent(SkCanvas* canvas);

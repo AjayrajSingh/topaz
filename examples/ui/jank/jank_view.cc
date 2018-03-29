@@ -28,8 +28,8 @@ const JankView::Button JankView::kButtons[] = {
     {"Crash!", Action::kCrash},
 };
 
-JankView::JankView(mozart::ViewManagerPtr view_manager,
-                   f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+JankView::JankView(views_v1::ViewManagerPtr view_manager,
+                   fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                    fonts::FontProviderPtr font_provider)
     : SkiaView(std::move(view_manager), std::move(view_owner_request), "Jank"),
       font_loader_(std::move(font_provider)) {
@@ -43,7 +43,7 @@ JankView::JankView(mozart::ViewManagerPtr view_manager,
 JankView::~JankView() = default;
 
 void JankView::OnSceneInvalidated(
-    ui::PresentationInfoPtr presentation_info) {
+    images::PresentationInfo presentation_info) {
   if (!typeface_)
     return;
 
@@ -100,12 +100,12 @@ void JankView::DrawButton(SkCanvas* canvas,
                    bounds.centerY() - textBounds.centerY(), textPaint);
 }
 
-bool JankView::OnInputEvent(mozart::InputEventPtr event) {
-  if (event->is_pointer()) {
-    const mozart::PointerEventPtr& pointer = event->get_pointer();
-    if (pointer->phase == mozart::PointerEvent::Phase::DOWN) {
-      SkScalar x = pointer->x;
-      SkScalar y = pointer->y;
+bool JankView::OnInputEvent(input::InputEvent event) {
+  if (event.is_pointer()) {
+    const input::PointerEvent& pointer = event.pointer();
+    if (pointer.phase == input::PointerEventPhase::DOWN) {
+      SkScalar x = pointer.x;
+      SkScalar y = pointer.y;
       if (x >= kMargin && x <= kButtonWidth + kMargin) {
         int index = (y - kMargin) / (kButtonHeight + kMargin);
         if (index >= 0 &&

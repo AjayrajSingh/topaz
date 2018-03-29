@@ -6,8 +6,8 @@
 
 namespace mozart {
 
-SkiaView::SkiaView(ViewManagerPtr view_manager,
-                   f1dl::InterfaceRequest<ViewOwner> view_owner_request,
+SkiaView::SkiaView(views_v1::ViewManagerPtr view_manager,
+                   fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                    const std::string& label)
     : BaseView(std::move(view_manager), std::move(view_owner_request), label),
       canvas_cycler_(session()) {

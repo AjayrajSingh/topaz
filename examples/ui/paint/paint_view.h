@@ -17,15 +17,15 @@ namespace examples {
 
 class PaintView : public mozart::SkiaView {
  public:
-  PaintView(mozart::ViewManagerPtr view_manager,
-            f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request);
+  PaintView(views_v1::ViewManagerPtr view_manager,
+            fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request);
   ~PaintView() override;
 
  private:
   // |BaseView|:
   void OnSceneInvalidated(
-      ui::PresentationInfoPtr presentation_info) override;
-  bool OnInputEvent(mozart::InputEventPtr event) override;
+      images::PresentationInfo presentation_info) override;
+  bool OnInputEvent(input::InputEvent event) override;
 
   void DrawContent(SkCanvas* canvas);
   SkPath CurrentPath(uint32_t pointer_id);

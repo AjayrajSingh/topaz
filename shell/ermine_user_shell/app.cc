@@ -10,8 +10,8 @@
 namespace ermine_user_shell {
 
 App::App() : context_(component::ApplicationContext::CreateFromStartupInfo()) {
-  context_->outgoing_services()->AddService<mozart::ViewProvider>(
-      [this](f1dl::InterfaceRequest<mozart::ViewProvider> request) {
+  context_->outgoing_services()->AddService<views_v1::ViewProvider>(
+      [this](f1dl::InterfaceRequest<views_v1::ViewProvider> request) {
         bindings_.AddBinding(this, std::move(request));
       });
 }
@@ -19,7 +19,7 @@ App::App() : context_(component::ApplicationContext::CreateFromStartupInfo()) {
 App::~App() = default;
 
 void App::CreateView(
-    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     f1dl::InterfaceRequest<component::ServiceProvider> view_services) {
   controllers_.push_back(std::make_unique<ViewController>(
       context_->launcher().get(),

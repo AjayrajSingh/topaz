@@ -27,13 +27,13 @@ SkCanvas* HostCanvasCycler::AcquireCanvas(float logical_width,
   FXL_DCHECK(!acquired_surface_);
 
   // Update the surface pool and content shape.
-  ui::gfx::ImageInfo image_info;
+  images::ImageInfo image_info;
   image_info.width = logical_width * scale_x;
   image_info.height = logical_height * scale_y;
   image_info.stride = image_info.width * 4u;
-  image_info.pixel_format = ui::gfx::ImageInfo::PixelFormat::BGRA_8;
-  image_info.color_space = ui::gfx::ImageInfo::ColorSpace::SRGB;
-  image_info.tiling = ui::gfx::ImageInfo::Tiling::LINEAR;
+  image_info.pixel_format = images::PixelFormat::BGRA_8;
+  image_info.color_space = images::ColorSpace::SRGB;
+  image_info.tiling = images::Tiling::LINEAR;
   reconfigured_ = surface_pool_.Configure(&image_info);
 
   // Acquire the surface.

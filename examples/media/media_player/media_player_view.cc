@@ -56,8 +56,8 @@ bool operator!=(const mozart::Size& lhs, const mozart::Size& rhs) {
 }  // namespace
 
 MediaPlayerView::MediaPlayerView(
-    mozart::ViewManagerPtr view_manager,
-    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    views_v1::ViewManagerPtr view_manager,
+    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     component::ApplicationContext* application_context,
     const MediaPlayerParams& params)
     : mozart::BaseView(std::move(view_manager),
@@ -86,7 +86,7 @@ MediaPlayerView::MediaPlayerView(
     media_player_ =
         application_context->ConnectToEnvironmentService<media::MediaPlayer>();
 
-    mozart::ViewOwnerPtr video_view_owner;
+    views_v1_token::ViewOwnerPtr video_view_owner;
     media_player_->CreateView(
         application_context->ConnectToEnvironmentService<mozart::ViewManager>()
             .Unbind(),
@@ -144,12 +144,12 @@ MediaPlayerView::MediaPlayerView(
 
 MediaPlayerView::~MediaPlayerView() {}
 
-bool MediaPlayerView::OnInputEvent(mozart::InputEventPtr event) {
+bool MediaPlayerView::OnInputEvent(input::InputEvent event) {
   FXL_DCHECK(event);
   bool handled = false;
   if (event->is_pointer()) {
     const auto& pointer = event->get_pointer();
-    if (pointer->phase == mozart::PointerEvent::Phase::DOWN) {
+    if (pointer->phase == input::PointerEventPhase::DOWN) {
       if (metadata_ && Contains(progress_bar_rect_, pointer->x, pointer->y)) {
         // User poked the progress bar...seek.
         media_player_->Seek((pointer->x - progress_bar_rect_.x) *
@@ -165,7 +165,7 @@ bool MediaPlayerView::OnInputEvent(mozart::InputEventPtr event) {
     }
   } else if (event->is_keyboard()) {
     auto& keyboard = event->get_keyboard();
-    if (keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED) {
+    if (keyboard->phase == input::KeyboardEventPhase::PRESSED) {
       switch (keyboard->hid_usage) {
         case HID_USAGE_KEY_SPACE:
           TogglePlayPause();
@@ -184,7 +184,7 @@ bool MediaPlayerView::OnInputEvent(mozart::InputEventPtr event) {
 }
 
 void MediaPlayerView::OnPropertiesChanged(
-    mozart::ViewPropertiesPtr old_properties) {
+    views_v1::ViewProperties old_properties) {
   FXL_DCHECK(properties());
 
   Layout();
@@ -268,7 +268,7 @@ void MediaPlayerView::Layout() {
 }
 
 void MediaPlayerView::OnSceneInvalidated(
-    ui::PresentationInfoPtr presentation_info) {
+    images::PresentationInfo presentation_info) {
   if (!has_physical_size())
     return;
 

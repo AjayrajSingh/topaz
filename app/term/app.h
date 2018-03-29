@@ -9,14 +9,14 @@
 
 namespace term {
 
-class App : public mozart::ViewProvider {
+class App : public views_v1::ViewProvider {
  public:
   explicit App(TermParams params);
   ~App();
 
-  // |mozart::ViewProvider|
-  void CreateView(f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-                  f1dl::InterfaceRequest<component::ServiceProvider>
+  // |mozart::ViewProviderService|
+  void CreateView(fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+                  fidl::InterfaceRequest<component::ServiceProvider>
                       view_services) override;
 
   void DestroyController(ViewController* controller);
@@ -27,7 +27,7 @@ class App : public mozart::ViewProvider {
 
   TermParams params_;
   std::unique_ptr<component::ApplicationContext> context_;
-  f1dl::BindingSet<mozart::ViewProvider> bindings_;
+  fidl::BindingSet<views_v1::ViewProvider> bindings_;
   std::vector<std::unique_ptr<ViewController>> controllers_;
 };
 

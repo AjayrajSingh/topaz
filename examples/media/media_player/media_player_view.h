@@ -19,8 +19,8 @@ namespace examples {
 
 class MediaPlayerView : public mozart::BaseView {
  public:
-  MediaPlayerView(mozart::ViewManagerPtr view_manager,
-                  f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+  MediaPlayerView(views_v1::ViewManagerPtr view_manager,
+                  f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                   component::ApplicationContext* application_context,
                   const MediaPlayerParams& params);
 
@@ -30,12 +30,12 @@ class MediaPlayerView : public mozart::BaseView {
   enum class State { kPaused, kPlaying, kEnded };
 
   // |BaseView|:
-  void OnPropertiesChanged(mozart::ViewPropertiesPtr old_properties) override;
-  void OnSceneInvalidated(ui::PresentationInfoPtr presentation_info) override;
+  void OnPropertiesChanged(views_v1::ViewProperties old_properties) override;
+  void OnSceneInvalidated(images::PresentationInfo presentation_info) override;
   void OnChildAttached(uint32_t child_key,
                        mozart::ViewInfoPtr child_view_info) override;
   void OnChildUnavailable(uint32_t child_key) override;
-  bool OnInputEvent(mozart::InputEventPtr event) override;
+  bool OnInputEvent(input::InputEvent event) override;
 
   // Perform a layout of the UI elements.
   void Layout();
@@ -69,7 +69,7 @@ class MediaPlayerView : public mozart::BaseView {
   std::unique_ptr<scenic_lib::EntityNode> video_host_node_;
 
   media::MediaPlayerPtr media_player_;
-  mozart::ViewPropertiesPtr video_view_properties_;
+  views_v1::ViewProperties video_view_properties_;
   mozart::Size video_size_;
   mozart::Size pixel_aspect_ratio_;
   State previous_state_ = State::kPaused;

@@ -29,15 +29,15 @@ class Tile {
   uint32_t key() const { return key_; }
   scenic_lib::EntityNode& node() { return node_; }
 
-  const mozart::ViewPropertiesPtr& view_properties() const {
+  const views_v1::ViewProperties& view_properties() const {
     return view_properties_;
   }
 
-  void set_view_properties(mozart::ViewPropertiesPtr view_properties) {
+  void set_view_properties(views_v1::ViewProperties view_properties) {
     view_properties_ = std::move(view_properties);
   }
 
-  void CreateView(f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request);
+  void CreateView(f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request);
 
  private:
   component::ApplicationLauncher* launcher_;
@@ -46,7 +46,7 @@ class Tile {
 
   const uint32_t key_;
   scenic_lib::EntityNode node_;
-  mozart::ViewPropertiesPtr view_properties_;
+  views_v1::ViewProperties view_properties_;
 };
 
 }  // namespace ermine_user_shell

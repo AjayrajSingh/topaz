@@ -19,7 +19,7 @@ WebViewProvider::WebViewProvider(const std::string url)
     FXL_LOG(WARNING) << "Could not load ICU data";
   }
 
-  context_->outgoing_services()->AddService<mozart::ViewProvider>(
+  context_->outgoing_services()->AddService<views_v1::ViewProvider>(
       [this](f1dl::InterfaceRequest<ViewProvider> request) {
         FXL_LOG(INFO) << "Add ViewProvider binding";
         view_provider_binding_.Bind(std::move(request));
@@ -37,7 +37,7 @@ WebViewProvider::WebViewProvider(const std::string url)
 }
 
 void WebViewProvider::CreateView(
-    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     f1dl::InterfaceRequest<component::ServiceProvider> view_services) {
   FXL_LOG(INFO) << "CreateView";
   FXL_DCHECK(!view_);

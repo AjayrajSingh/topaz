@@ -18,8 +18,8 @@ namespace examples {
 
 class JankView : public mozart::SkiaView {
  public:
-  JankView(mozart::ViewManagerPtr view_manager,
-           f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+  JankView(views_v1::ViewManagerPtr view_manager,
+           fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
            fonts::FontProviderPtr font_provider);
   ~JankView() override;
 
@@ -39,8 +39,8 @@ class JankView : public mozart::SkiaView {
 
   // |BaseView|:
   void OnSceneInvalidated(
-      ui::PresentationInfoPtr presentation_info) override;
-  bool OnInputEvent(mozart::InputEventPtr event) override;
+      images::PresentationInfo presentation_info) override;
+  bool OnInputEvent(input::InputEvent event) override;
 
   void DrawContent(SkCanvas* canvas);
   void DrawButton(SkCanvas* canvas, const char* label, const SkRect& bounds);

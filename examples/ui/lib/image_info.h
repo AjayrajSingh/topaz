@@ -5,14 +5,15 @@
 #ifndef LIB_UI_SCENIC_SKIA_IMAGE_INFO_H_
 #define LIB_UI_SCENIC_SKIA_IMAGE_INFO_H_
 
-#include "lib/images/fidl/image_info.fidl.h"
+#include <fuchsia/cpp/images.h>
+
 #include "third_party/skia/include/core/SkImageInfo.h"
 
 namespace scenic_lib {
 namespace skia {
 
-// Creates Skia image information from a |ui::gfx::ImageInfo| object.
-SkImageInfo MakeSkImageInfo(const ui::gfx::ImageInfo& image_info);
+// Creates Skia image information from a |images::ImageInfo| object.
+SkImageInfo MakeSkImageInfo(const images::ImageInfo& image_info);
 
 }  // namespace skia
 }  // namespace scenic_lib

@@ -16,13 +16,13 @@
 namespace ermine_user_shell {
 class ViewController;
 
-class App : public mozart::ViewProvider {
+class App : public mozart::ViewProviderService {
  public:
   App();
   ~App();
 
   // |mozart::ViewProvider|
-  void CreateView(f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+  void CreateView(f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                   f1dl::InterfaceRequest<component::ServiceProvider>
                       view_services) override;
 
@@ -33,7 +33,7 @@ class App : public mozart::ViewProvider {
   App& operator=(const App&) = delete;
 
   std::unique_ptr<component::ApplicationContext> context_;
-  f1dl::BindingSet<mozart::ViewProvider> bindings_;
+  f1dl::BindingSet<views_v1::ViewProvider> bindings_;
   std::vector<std::unique_ptr<ViewController>> controllers_;
 };
 

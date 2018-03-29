@@ -21,7 +21,7 @@ using namespace WebCore;
 TouchTracker::TouchTracker(int x, int y)
     : start_x_(x), start_y_(y), last_x_(0), last_y_(0), is_drag_(false) {}
 
-void TouchTracker::HandleEvent(const mozart::PointerEventPtr& pointer,
+void TouchTracker::HandleEvent(const input::PointerEventPtr& pointer,
                                const ui::gfx::Metrics& metrics,
                                WebView& web_view) {
   const auto x = pointer->x * metrics.scale_x;
@@ -40,11 +40,11 @@ void TouchTracker::HandleEvent(const mozart::PointerEventPtr& pointer,
 
   if (is_drag_) {
     switch (pointer->phase) {
-      case mozart::PointerEvent::Phase::MOVE:
+      case input::PointerEventPhase::MOVE:
         web_view.scrollPixels(delta_x, delta_y);
         break;
 
-      case mozart::PointerEvent::Phase::UP:
+      case input::PointerEventPhase::UP:
         web_view.scrollPixels(delta_x, delta_y);
         break;
 
@@ -53,7 +53,7 @@ void TouchTracker::HandleEvent(const mozart::PointerEventPtr& pointer,
     }
   } else {
     switch (pointer->phase) {
-      case mozart::PointerEvent::Phase::UP:
+      case input::PointerEventPhase::UP:
         web_view.handleMouseEvent(start_x_, start_y_, WebView::kMouseDown);
         web_view.handleMouseEvent(start_x_, start_y_, WebView::kMouseUp);
         break;
@@ -65,8 +65,8 @@ void TouchTracker::HandleEvent(const mozart::PointerEventPtr& pointer,
 }
 
 WebViewImpl::WebViewImpl(
-    mozart::ViewManagerPtr view_manager,
-    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    views_v1::ViewManagerPtr view_manager,
+    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     f1dl::InterfaceRequest<component::ServiceProvider>
         outgoing_services_request,
     const std::string& url)
@@ -121,22 +121,22 @@ void WebViewImpl::SetWebRequestDelegate(
   webRequestDelegate_ = delegate.Bind();
 }
 
-bool WebViewImpl::HandleKeyboardEvent(const mozart::InputEventPtr& event) {
+bool WebViewImpl::HandleKeyboardEvent(const input::InputEvent& event) {
   bool handled = true;
-  const mozart::KeyboardEventPtr& keyboard = event->get_keyboard();
-  bool pressed = keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED;
-  bool repeating = keyboard->phase == mozart::KeyboardEvent::Phase::REPEAT;
+  const input::KeyboardEventPtr& keyboard = event->get_keyboard();
+  bool pressed = keyboard->phase == input::KeyboardEventPhase::PRESSED;
+  bool repeating = keyboard->phase == input::KeyboardEventPhase::REPEAT;
   if (pressed && keyboard->code_point == 'c' &&
-      keyboard->modifiers & mozart::kModifierControl) {
+      keyboard->modifiers & input::kModifierControl) {
     exit(0);
   } else if (pressed && keyboard->code_point == '[' &&
-             keyboard->modifiers & mozart::kModifierControl) {
+             keyboard->modifiers & input::kModifierControl) {
     web_view_.goBack();
   } else if (pressed && keyboard->code_point == ']' &&
-             keyboard->modifiers & mozart::kModifierControl) {
+             keyboard->modifiers & input::kModifierControl) {
     web_view_.goForward();
   } else if (pressed && keyboard->code_point == 'r' &&
-             keyboard->modifiers & mozart::kModifierControl) {
+             keyboard->modifiers & input::kModifierControl) {
     web_view_.reload();
   } else {
     bool handled =
@@ -158,20 +158,20 @@ bool WebViewImpl::HandleKeyboardEvent(const mozart::InputEventPtr& event) {
   return handled;
 }
 
-bool WebViewImpl::HandleMouseEvent(const mozart::PointerEventPtr& pointer) {
+bool WebViewImpl::HandleMouseEvent(const input::PointerEventPtr& pointer) {
   bool handled = false;
-  if (pointer->buttons & mozart::kMousePrimaryButton) {
+  if (pointer->buttons & input::kMousePrimaryButton) {
     switch (pointer->phase) {
-      case mozart::PointerEvent::Phase::DOWN:
-      case mozart::PointerEvent::Phase::MOVE:
+      case input::PointerEventPhase::DOWN:
+      case input::PointerEventPhase::MOVE:
         web_view_.handleMouseEvent(
             pointer->x * metrics().scale_x, pointer->y * metrics().scale_y,
-            pointer->phase == mozart::PointerEvent::Phase::DOWN
+            pointer->phase == input::PointerEventPhase::DOWN
                 ? ::WebView::kMouseDown
                 : ::WebView::kMouseMoved);
         handled = true;
         break;
-      case mozart::PointerEvent::Phase::UP:
+      case input::PointerEventPhase::UP:
         web_view_.handleMouseEvent(pointer->x * metrics().scale_x,
                                    pointer->y * metrics().scale_y,
                                    ::WebView::kMouseUp);
@@ -184,25 +184,25 @@ bool WebViewImpl::HandleMouseEvent(const mozart::PointerEventPtr& pointer) {
   return handled;
 }
 
-void WebViewImpl::HandleTouchDown(const mozart::PointerEventPtr& pointer) {
+void WebViewImpl::HandleTouchDown(const input::PointerEventPtr& pointer) {
   const auto x = pointer->x * metrics().scale_x;
   const auto y = pointer->y * metrics().scale_y;
   touch_trackers_[pointer->pointer_id] = TouchTracker(x, y);
 }
 
-bool WebViewImpl::HandleTouchEvent(const mozart::PointerEventPtr& pointer) {
+bool WebViewImpl::HandleTouchEvent(const input::PointerEventPtr& pointer) {
   bool handled = false;
   auto pointer_id = pointer->pointer_id;
   switch (pointer->phase) {
-    case mozart::PointerEvent::Phase::DOWN:
+    case input::PointerEventPhase::DOWN:
       HandleTouchDown(pointer);
       handled = true;
       break;
-    case mozart::PointerEvent::Phase::MOVE:
+    case input::PointerEventPhase::MOVE:
       touch_trackers_[pointer_id].HandleEvent(pointer, metrics(), web_view_);
       handled = true;
       break;
-    case mozart::PointerEvent::Phase::UP:
+    case input::PointerEventPhase::UP:
       touch_trackers_[pointer_id].HandleEvent(pointer, metrics(), web_view_);
       touch_trackers_.erase(pointer_id);
       handled = true;
@@ -214,15 +214,15 @@ bool WebViewImpl::HandleTouchEvent(const mozart::PointerEventPtr& pointer) {
 }
 
 // |BaseView|:
-bool WebViewImpl::OnInputEvent(mozart::InputEventPtr event) {
+bool WebViewImpl::OnInputEvent(input::InputEvent event) {
   bool handled = false;
   web_view_.setFocused(true);
   web_view_.setVisible(true);
   if (event->is_pointer()) {
-    const mozart::PointerEventPtr& pointer = event->get_pointer();
-    if (pointer->type == mozart::PointerEvent::Type::TOUCH) {
+    const input::PointerEventPtr& pointer = event->get_pointer();
+    if (pointer->type == input::PointerEventType::TOUCH) {
       handled = HandleTouchEvent(pointer);
-    } else if (pointer->type == mozart::PointerEvent::Type::MOUSE) {
+    } else if (pointer->type == input::PointerEventType::MOUSE) {
       handled = HandleMouseEvent(pointer);
     }
   } else if (event->is_keyboard()) {
@@ -235,7 +235,7 @@ bool WebViewImpl::OnInputEvent(mozart::InputEventPtr event) {
 
 // |BaseView|:
 void WebViewImpl::OnSceneInvalidated(
-    ui::PresentationInfoPtr presentation_info) {
+    images::PresentationInfo presentation_info) {
   if (!has_physical_size())
     return;
 

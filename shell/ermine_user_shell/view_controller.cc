@@ -35,7 +35,7 @@ ui::gfx::Metrics* GetLastMetrics(uint32_t node_id,
   return result;
 }
 
-mozart::ViewPropertiesPtr CreateViewProperties(float width, float height) {
+views_v1::ViewProperties CreateViewProperties(float width, float height) {
   auto properties = mozart::ViewProperties::New();
   properties->view_layout = mozart::ViewLayout::New();
   properties->view_layout->size = mozart::SizeF::New();
@@ -49,8 +49,8 @@ mozart::ViewPropertiesPtr CreateViewProperties(float width, float height) {
 
 ViewController::ViewController(
     component::ApplicationLauncher* launcher,
-    mozart::ViewManagerPtr view_manager,
-    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    views_v1::ViewManagerPtr view_manager,
+    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     DisconnectCallback disconnect_handler)
     : launcher_(launcher),
       view_manager_(std::move(view_manager)),
@@ -99,7 +99,7 @@ uint32_t ViewController::AddTile(std::string url) {
   tile->node().ExportAsRequest(&token);
   container_node_.AddChild(tile->node());
 
-  f1dl::InterfaceHandle<mozart::ViewOwner> view_owner;
+  f1dl::InterfaceHandle<views_v1_token::ViewOwner> view_owner;
   tile->CreateView(view_owner.NewRequest());
 
   view_container_->AddChild(tile->key(), std::move(view_owner),
@@ -125,7 +125,7 @@ zx_status_t ViewController::RemoveTile(uint32_t key) {
 }
 
 void ViewController::OnPropertiesChanged(
-    mozart::ViewPropertiesPtr properties,
+    views_v1::ViewProperties properties,
     const OnPropertiesChangedCallback& callback) {
   if (!logical_size_.Equals(*properties->view_layout->size)) {
     logical_size_ = *properties->view_layout->size;
@@ -150,7 +150,7 @@ void ViewController::OnChildUnavailable(
   callback();
 }
 
-void ViewController::OnEvent(mozart::InputEventPtr event,
+void ViewController::OnEvent(input::InputEvent event,
                              const OnEventCallback& callback) {
   callback(false);
 }
@@ -203,7 +203,7 @@ void ViewController::Present(zx_time_t presentation_time) {
   ZX_DEBUG_ASSERT(!present_pending_);
   present_pending_ = true;
   last_presentation_time_ = presentation_time;
-  session_.Present(presentation_time, [this](ui::PresentationInfoPtr info) {
+  session_.Present(presentation_time, [this](images::PresentationInfo info) {
     ZX_DEBUG_ASSERT(present_pending_);
     present_pending_ = false;
     if (needs_begin_frame_)
@@ -246,7 +246,7 @@ void ViewController::PerformLayout() {
 
 void ViewController::SetPropertiesIfNeeded(
     Tile* tile,
-    mozart::ViewPropertiesPtr properties) {
+    views_v1::ViewProperties properties) {
   if (tile->view_properties().Equals(properties))
     return;
   tile->set_view_properties(properties.Clone());

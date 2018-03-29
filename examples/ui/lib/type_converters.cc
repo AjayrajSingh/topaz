@@ -4,42 +4,42 @@
 
 #include "examples/ui/lib/type_converters.h"
 
-namespace f1dl {
+namespace fxl {
 
-SkIPoint TypeConverter<SkIPoint, mozart::Point>::Convert(
-    const mozart::Point& input) {
+SkIPoint TypeConverter<SkIPoint, geometry::Point>::Convert(
+    const geometry::Point& input) {
   return SkIPoint::Make(input.x, input.y);
 }
 
-mozart::Point TypeConverter<mozart::Point, SkIPoint>::Convert(
+geometry::Point TypeConverter<geometry::Point, SkIPoint>::Convert(
     const SkIPoint& input) {
-  mozart::Point output;
+  geometry::Point output;
   output.x = input.x();
   output.y = input.y();
   return output;
 }
 
-SkPoint TypeConverter<SkPoint, mozart::PointF>::Convert(
-    const mozart::PointF& input) {
+SkPoint TypeConverter<SkPoint, geometry::PointF>::Convert(
+    const geometry::PointF& input) {
   return SkPoint::Make(input.x, input.y);
 }
 
-mozart::PointF TypeConverter<mozart::PointF, SkPoint>::Convert(
+geometry::PointF TypeConverter<geometry::PointF, SkPoint>::Convert(
     const SkPoint& input) {
-  mozart::PointF output;
+  geometry::PointF output;
   output.x = input.x();
   output.y = input.y();
   return output;
 }
 
-SkIRect TypeConverter<SkIRect, mozart::Rect>::Convert(
-    const mozart::Rect& input) {
+SkIRect TypeConverter<SkIRect, geometry::Rect>::Convert(
+    const geometry::Rect& input) {
   return SkIRect::MakeXYWH(input.x, input.y, input.width, input.height);
 }
 
-mozart::Rect TypeConverter<mozart::Rect, SkIRect>::Convert(
+geometry::Rect TypeConverter<geometry::Rect, SkIRect>::Convert(
     const SkIRect& input) {
-  mozart::Rect output;
+  geometry::Rect output;
   output.x = input.x();
   output.y = input.y();
   output.width = input.width();
@@ -47,14 +47,14 @@ mozart::Rect TypeConverter<mozart::Rect, SkIRect>::Convert(
   return output;
 }
 
-SkRect TypeConverter<SkRect, mozart::RectF>::Convert(
-    const mozart::RectF& input) {
+SkRect TypeConverter<SkRect, geometry::RectF>::Convert(
+    const geometry::RectF& input) {
   return SkRect::MakeXYWH(input.x, input.y, input.width, input.height);
 }
 
-mozart::RectF TypeConverter<mozart::RectF, SkRect>::Convert(
+geometry::RectF TypeConverter<geometry::RectF, SkRect>::Convert(
     const SkRect& input) {
-  mozart::RectF output;
+  geometry::RectF output;
   output.x = input.x();
   output.y = input.y();
   output.width = input.width();
@@ -62,23 +62,8 @@ mozart::RectF TypeConverter<mozart::RectF, SkRect>::Convert(
   return output;
 }
 
-SkRect TypeConverter<SkRect, mozart::RectFPtr>::Convert(
-    const mozart::RectFPtr& input) {
-  return SkRect::MakeXYWH(input->x, input->y, input->width, input->height);
-}
-
-mozart::RectFPtr TypeConverter<mozart::RectFPtr, SkRect>::Convert(
-    const SkRect& input) {
-  mozart::RectFPtr output = mozart::RectF::New();
-  output->x = input.x();
-  output->y = input.y();
-  output->width = input.width();
-  output->height = input.height();
-  return output;
-}
-
-SkRRect TypeConverter<SkRRect, mozart::RRectF>::Convert(
-    const mozart::RRectF& input) {
+SkRRect TypeConverter<SkRRect, geometry::RRectF>::Convert(
+    const geometry::RRectF& input) {
   SkVector radii[4] = {
       {input.top_left_radius_x, input.top_left_radius_y},
       {input.top_right_radius_x, input.top_right_radius_y},
@@ -90,9 +75,9 @@ SkRRect TypeConverter<SkRRect, mozart::RRectF>::Convert(
   return output;
 }
 
-mozart::RRectF TypeConverter<mozart::RRectF, SkRRect>::Convert(
+geometry::RRectF TypeConverter<geometry::RRectF, SkRRect>::Convert(
     const SkRRect& input) {
-  mozart::RRectF output;
+  geometry::RRectF output;
   output.x = input.rect().x();
   output.y = input.rect().y();
   output.width = input.rect().width();
@@ -108,13 +93,10 @@ mozart::RRectF TypeConverter<mozart::RRectF, SkRRect>::Convert(
   return output;
 }
 
-SkMatrix TypeConverter<SkMatrix, mozart::TransformPtr>::Convert(
-    const mozart::TransformPtr& input) {
-  if (!input)
-    return SkMatrix::I();
-
+SkMatrix TypeConverter<SkMatrix, geometry::Transform>::Convert(
+    const geometry::Transform& input) {
   // Drop 3D components during conversion from 4x4 to 3x3.
-  const auto& m = *input->matrix;
+  const auto& m = input.matrix;
   SkMatrix output;
   output.setAll(m[0], m[1], m[3],
                 m[4], m[5], m[7],
@@ -122,10 +104,11 @@ SkMatrix TypeConverter<SkMatrix, mozart::TransformPtr>::Convert(
   return output;
 }
 
-mozart::TransformPtr TypeConverter<mozart::TransformPtr, SkMatrix>::Convert(
+geometry::Transform TypeConverter<geometry::Transform, SkMatrix>::Convert(
     const SkMatrix& input) {
   // Expand 3x3 to 4x4.
-  std::vector<float> m(16u);
+  geometry::Transform output;
+  float* m = output.matrix.mutable_data();
   m[0] = input[0];
   m[1] = input[1];
   m[2] = 0.f;
@@ -142,27 +125,21 @@ mozart::TransformPtr TypeConverter<mozart::TransformPtr, SkMatrix>::Convert(
   m[13] = input[7];
   m[14] = 0.f;
   m[15] = input[8];
-  auto output = mozart::Transform::New();
-  output->matrix.reset(std::move(m));
   return output;
 }
 
-SkMatrix44 TypeConverter<SkMatrix44, mozart::TransformPtr>::Convert(
-    const mozart::TransformPtr& input) {
-  if (!input)
-    return SkMatrix44::I();
-
+SkMatrix44 TypeConverter<SkMatrix44, geometry::Transform>::Convert(
+    const geometry::Transform& input) {
   SkMatrix44 output(SkMatrix44::kUninitialized_Constructor);
-  output.setRowMajorf(input->matrix->data());
+  output.setRowMajorf(input.matrix.data());
   return output;
 }
 
-mozart::TransformPtr TypeConverter<mozart::TransformPtr, SkMatrix44>::Convert(
+geometry::Transform TypeConverter<geometry::Transform, SkMatrix44>::Convert(
     const SkMatrix44& input) {
-  auto output = mozart::Transform::New();
-  output->matrix.resize(16u);
-  input.asRowMajorf(output->matrix->data());
+  geometry::Transform output;
+  input.asRowMajorf(output.matrix.mutable_data());
   return output;
 }
 
-}  // namespace f1dl
+}  // namespace fxl

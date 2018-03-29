@@ -38,8 +38,8 @@ void Lissajous(SkPath* path, double ax, double ay, int wx, int wy, double p) {
 }  // namespace
 
 NoodlesView::NoodlesView(
-    mozart::ViewManagerPtr view_manager,
-    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request)
+    views_v1::ViewManagerPtr view_manager,
+    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request)
     : SkiaView(std::move(view_manager),
                std::move(view_owner_request),
                "Noodles") {}
@@ -47,13 +47,13 @@ NoodlesView::NoodlesView(
 NoodlesView::~NoodlesView() {}
 
 void NoodlesView::OnSceneInvalidated(
-    ui::PresentationInfoPtr presentation_info) {
+    images::PresentationInfo presentation_info) {
   SkCanvas* canvas = AcquireCanvas();
   if (!canvas)
     return;
 
   // Update the animation state.
-  uint64_t presentation_time = presentation_info->presentation_time;
+  uint64_t presentation_time = presentation_info.presentation_time;
   if (!start_time_ ||
       presentation_time - start_time_ >= ZX_SEC(kSecondsBetweenChanges)) {
     start_time_ = presentation_time;

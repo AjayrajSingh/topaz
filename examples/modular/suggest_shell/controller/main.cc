@@ -38,7 +38,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
  private:
   // |SingleServiceApp|
   void CreateView(
-      f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+      f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
       f1dl::InterfaceRequest<component::ServiceProvider> /*services*/)
       override {
     view_ = std::make_unique<modular::ViewHost>(
@@ -53,7 +53,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
     child_views_.clear();
   }
 
-  void ConnectView(f1dl::InterfaceHandle<mozart::ViewOwner> view_owner) {
+  void ConnectView(f1dl::InterfaceHandle<views_v1_token::ViewOwner> view_owner) {
     if (view_) {
       view_->ConnectView(std::move(view_owner));
     } else {
@@ -72,7 +72,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
     module_context_->GetLink(kViewLink, view_link_.NewRequest());
     view_link_->Watch(link_watcher_binding_.NewBinding());
 
-    f1dl::InterfaceHandle<mozart::ViewOwner> view;
+    f1dl::InterfaceHandle<views_v1_token::ViewOwner> view;
     module_context_->StartModuleDeprecated(
         "suggest_shell_view", "suggest_shell_view", kViewLink, nullptr,
         view_module_.NewRequest(), view.NewRequest());
@@ -127,7 +127,7 @@ class ControllerApp : public modular::SingleServiceApp<modular::Module>,
   }
 
   std::unique_ptr<modular::ViewHost> view_;
-  std::vector<f1dl::InterfaceHandle<mozart::ViewOwner>> child_views_;
+  std::vector<f1dl::InterfaceHandle<views_v1_token::ViewOwner>> child_views_;
 
   modular::ModuleContextPtr module_context_;
 

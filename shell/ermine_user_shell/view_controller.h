@@ -31,8 +31,8 @@ class ViewController : public mozart::ViewListener,
   using DisconnectCallback = std::function<void(ViewController*)>;
 
   ViewController(component::ApplicationLauncher* launcher,
-                 mozart::ViewManagerPtr view_manager,
-                 f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+                 views_v1::ViewManagerPtr view_manager,
+                 f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                  DisconnectCallback disconnect_handler);
   ~ViewController();
 
@@ -49,7 +49,7 @@ class ViewController : public mozart::ViewListener,
 
   // |mozart::ViewListener|:
   void OnPropertiesChanged(
-      mozart::ViewPropertiesPtr properties,
+      views_v1::ViewProperties properties,
       const OnPropertiesChangedCallback& callback) override;
 
   // |mozart::ViewContainerListener|:
@@ -60,7 +60,7 @@ class ViewController : public mozart::ViewListener,
                           const OnChildUnavailableCallback& callback) override;
 
   // |mozart::InputListener|:
-  void OnEvent(mozart::InputEventPtr event,
+  void OnEvent(input::InputEvent event,
                const OnEventCallback& callback) override;
 
   void OnSessionEvents(f1dl::VectorPtr<ui::EventPtr> events);
@@ -72,10 +72,10 @@ class ViewController : public mozart::ViewListener,
   void Present(zx_time_t presentation_time);
 
   void PerformLayout();
-  void SetPropertiesIfNeeded(Tile* tile, mozart::ViewPropertiesPtr properties);
+  void SetPropertiesIfNeeded(Tile* tile, views_v1::ViewProperties properties);
 
   component::ApplicationLauncher* launcher_;
-  mozart::ViewManagerPtr view_manager_;
+  views_v1::ViewManagerPtr view_manager_;
   f1dl::Binding<ViewListener> view_listener_binding_;
   f1dl::Binding<ViewContainerListener> view_container_listener_binding_;
   f1dl::Binding<InputListener> input_listener_binding_;

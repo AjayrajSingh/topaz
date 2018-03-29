@@ -10,7 +10,6 @@
 #include "examples/ui/lib/skia_font_loader.h"
 #include "examples/ui/lib/skia_view.h"
 #include "lib/app/cpp/application_context.h"
-#include "lib/app/fidl/application_environment.fidl.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 #include "topaz/app/term/pty_server.h"
@@ -23,8 +22,8 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
  public:
   using DisconnectCallback = std::function<void(ViewController*)>;
 
-  ViewController(mozart::ViewManagerPtr view_manager,
-                 f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+  ViewController(views_v1::ViewManagerPtr view_manager,
+                 fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                  component::ApplicationContext* context,
                  const TermParams& term_params,
                  DisconnectCallback disconnect_handler);
@@ -35,10 +34,10 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
 
  private:
   // |BaseView|:
-  void OnPropertiesChanged(mozart::ViewPropertiesPtr old_properties) override;
+  void OnPropertiesChanged(views_v1::ViewProperties old_properties) override;
   void OnSceneInvalidated(
-      ui::PresentationInfoPtr presentation_info) override;
-  bool OnInputEvent(mozart::InputEventPtr event) override;
+      images::PresentationInfo presentation_info) override;
+  bool OnInputEvent(input::InputEvent event) override;
 
   // |TermModel::Delegate|:
   void OnResponse(const void* buf, size_t size) override;
@@ -46,7 +45,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
 
   void ScheduleDraw(bool force);
   void DrawContent(SkCanvas* canvas);
-  void OnKeyPressed(mozart::InputEventPtr key_event);
+  void OnKeyPressed(input::InputEvent key_event);
 
   // stdin/stdout
   void OnDataReceived(const void* bytes, size_t num_bytes);

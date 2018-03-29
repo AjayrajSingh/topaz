@@ -23,8 +23,8 @@ constexpr uint64_t kBytesPerFrame = 4;
 namespace examples {
 
 VuMeterView::VuMeterView(
-    mozart::ViewManagerPtr view_manager,
-    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+    views_v1::ViewManagerPtr view_manager,
+    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     component::ApplicationContext* application_context,
     const VuMeterParams& params)
     : mozart::SkiaView(std::move(view_manager), std::move(view_owner_request),
@@ -51,18 +51,18 @@ VuMeterView::VuMeterView(
 
 VuMeterView::~VuMeterView() {}
 
-bool VuMeterView::OnInputEvent(mozart::InputEventPtr event) {
+bool VuMeterView::OnInputEvent(input::InputEvent event) {
   FXL_DCHECK(event);
   bool handled = false;
   if (event->is_pointer()) {
     auto& pointer = event->get_pointer();
-    if (pointer->phase == mozart::PointerEvent::Phase::DOWN) {
+    if (pointer->phase == input::PointerEventPhase::DOWN) {
       ToggleStartStop();
       handled = true;
     }
   } else if (event->is_keyboard()) {
     auto& keyboard = event->get_keyboard();
-    if (keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED) {
+    if (keyboard->phase == input::KeyboardEventPhase::PRESSED) {
       switch (keyboard->hid_usage) {
         case HID_USAGE_KEY_SPACE:
           ToggleStartStop();
@@ -81,7 +81,7 @@ bool VuMeterView::OnInputEvent(mozart::InputEventPtr event) {
 }
 
 void VuMeterView::OnSceneInvalidated(
-    ui::PresentationInfoPtr presentation_info) {
+    images::PresentationInfo presentation_info) {
   SkCanvas* canvas = AcquireCanvas();
   if (canvas) {
     DrawContent(canvas);

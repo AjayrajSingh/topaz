@@ -16,14 +16,14 @@ SkiaFontLoader::SkiaFontLoader(fonts::FontProviderPtr font_provider)
 
 SkiaFontLoader::~SkiaFontLoader() {}
 
-void SkiaFontLoader::LoadFont(fonts::FontRequestPtr request,
+void SkiaFontLoader::LoadFont(fonts::FontRequest request,
                               const FontCallback& callback) {
   // TODO(jeffbrown): Handle errors in case the font provider itself dies.
   font_provider_->GetFont(
       std::move(request), [this, callback](fonts::FontResponsePtr response) {
         if (response) {
           fsl::SizedVmo vmo;
-          if (!fsl::SizedVmo::FromTransport(std::move(response->data->vmo),
+          if (!fsl::SizedVmo::FromTransport(std::move(response->data.vmo),
                                             &vmo)) {
             callback(nullptr);
             return;
@@ -40,9 +40,9 @@ void SkiaFontLoader::LoadFont(fonts::FontRequestPtr request,
 }
 
 void SkiaFontLoader::LoadDefaultFont(const FontCallback& callback) {
-  auto font_request = fonts::FontRequest::New();
-  font_request->family = "Roboto";
-  LoadFont(std::move(font_request), callback);
+  fonts::FontRequest request;
+  request.family = "Roboto";
+  LoadFont(std::move(request), callback);
 }
 
 }  // namespace mozart

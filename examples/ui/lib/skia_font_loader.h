@@ -7,7 +7,8 @@
 
 #include <functional>
 
-#include "lib/fonts/fidl/font_provider.fidl.h"
+#include <fuchsia/cpp/fonts.h>
+
 #include "lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 
@@ -23,7 +24,7 @@ class SkiaFontLoader {
 
   // Loads the requested font and invokes the callback when done.
   // If the request fails, the callback will receive a null typeface.
-  void LoadFont(fonts::FontRequestPtr request, const FontCallback& callback);
+  void LoadFont(fonts::FontRequest request, const FontCallback& callback);
 
   // Loads the default font and invokes the callback when done.
   // If the request fails, the callback will receive a null typeface.

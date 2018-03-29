@@ -65,7 +65,7 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
   void GetUserProfile(const f1dl::StringPtr& credential,
                       const f1dl::StringPtr& access_token);
 
-  mozart::ViewOwnerPtr SetupWebView();
+  views_v1_token::ViewOwnerPtr SetupWebView();
 
   void Request(std::function<network::URLRequestPtr()> request_factory,
                std::function<void(network::URLResponsePtr response)> callback);

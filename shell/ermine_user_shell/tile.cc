@@ -26,7 +26,7 @@ Tile::Tile(component::ApplicationLauncher* launcher, std::string url,
 Tile::~Tile() = default;
 
 void Tile::CreateView(
-    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request) {
+    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request) {
   component::Services services;
   auto launch_info = component::ApplicationLaunchInfo::New();
   launch_info->url = url_;
@@ -35,7 +35,7 @@ void Tile::CreateView(
   launcher_->CreateApplication(std::move(launch_info),
                                controller_.NewRequest());
 
-  auto view_provider = services.ConnectToService<mozart::ViewProvider>();
+  auto view_provider = services.ConnectToService<views_v1::ViewProvider>();
   view_provider->CreateView(std::move(view_owner_request), nullptr);
 }
 

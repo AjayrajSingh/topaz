@@ -23,7 +23,7 @@ class TouchTracker {
  public:
   TouchTracker(int x = 0, int y = 0);
 
-  void HandleEvent(const mozart::PointerEventPtr& pointer,
+  void HandleEvent(const input::PointerEventPtr& pointer,
                    const ui::gfx::Metrics& metrics,
                    WebView& web_view);
 
@@ -38,8 +38,8 @@ class TouchTracker {
 class WebViewImpl : public mozart::BaseView,
                    public web_view::WebView {
  public:
-  WebViewImpl(mozart::ViewManagerPtr view_manager,
-              f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
+  WebViewImpl(views_v1::ViewManagerPtr view_manager,
+              f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
               f1dl::InterfaceRequest<component::ServiceProvider>
                   outgoing_services_request,
               const std::string& url);
@@ -66,20 +66,20 @@ class WebViewImpl : public mozart::BaseView,
   void SetWebRequestDelegate(
       ::f1dl::InterfaceHandle<web_view::WebRequestDelegate> delegate) final;
 
-  bool HandleKeyboardEvent(const mozart::InputEventPtr& event);
+  bool HandleKeyboardEvent(const input::InputEvent& event);
 
-  bool HandleMouseEvent(const mozart::PointerEventPtr& pointer);
+  bool HandleMouseEvent(const input::PointerEventPtr& pointer);
 
-  void HandleTouchDown(const mozart::PointerEventPtr& pointer);
+  void HandleTouchDown(const input::PointerEventPtr& pointer);
 
-  bool HandleTouchEvent(const mozart::PointerEventPtr& pointer);
+  bool HandleTouchEvent(const input::PointerEventPtr& pointer);
 
   // |BaseView|:
-  bool OnInputEvent(mozart::InputEventPtr event) override;
+  bool OnInputEvent(input::InputEvent event) override;
 
   // |BaseView|:
   void OnSceneInvalidated(
-      ui::PresentationInfoPtr presentation_info) override;
+      images::PresentationInfo presentation_info) override;
 
   void CallIdle();
 

@@ -396,7 +396,7 @@ void GoogleAuthProviderImpl::GetUserProfile(
       });
 }
 
-mozart::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
+views_v1_token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
   component::Services web_view_services;
   auto web_view_launch_info = component::ApplicationLaunchInfo::New();
   web_view_launch_info->url = kWebViewUrl;
@@ -407,8 +407,8 @@ mozart::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
     FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
   });
 
-  mozart::ViewOwnerPtr view_owner;
-  mozart::ViewProviderPtr view_provider;
+  views_v1_token::ViewOwnerPtr view_owner;
+  views_v1::ViewProviderPtr view_provider;
   web_view_services.ConnectToService(view_provider.NewRequest());
   component::ServiceProviderPtr web_view_moz_services;
   view_provider->CreateView(view_owner.NewRequest(),

@@ -4,10 +4,10 @@
 
 #include "topaz/app/term/key_util.h"
 
+#include <fuchsia/cpp/input.h>
 #include <hid/usages.h>
 
 #include "lib/fxl/logging.h"
-#include "lib/ui/input/fidl/input_events.fidl.h"
 
 namespace term {
 
@@ -16,25 +16,25 @@ namespace term {
 // TODO(vtl): In particular, our implementation of keypad_application_mode is
 // incomplete.
 std::string GetInputSequenceForKeyPressedEvent(
-    const mozart::InputEvent& key_event,
+    const input::InputEvent& key_event,
     bool keypad_application_mode) {
   if (key_event.is_keyboard()) {
-    const mozart::KeyboardEventPtr& keyboard = key_event.get_keyboard();
-    FXL_DCHECK(keyboard->phase == mozart::KeyboardEvent::Phase::PRESSED ||
-               keyboard->phase == mozart::KeyboardEvent::Phase::REPEAT);
+    const input::KeyboardEvent& keyboard = key_event.keyboard();
+    FXL_DCHECK(keyboard.phase == input::KeyboardEventPhase::PRESSED ||
+               keyboard.phase == input::KeyboardEventPhase::REPEAT);
 
-    if (keyboard->code_point) {
-      if (keyboard->code_point > 128) {
+    if (keyboard.code_point) {
+      if (keyboard.code_point > 128) {
         FXL_NOTIMPLEMENTED();
         return std::string();
       }
 
-      uint32_t non_control = (mozart::kModifierShift | mozart::kModifierAlt |
-                              mozart::kModifierSuper);
-      if (keyboard->modifiers) {
-        if ((keyboard->modifiers & mozart::kModifierControl) &&
-            !(keyboard->modifiers & non_control)) {
-          char c = static_cast<char>(keyboard->code_point);
+      uint32_t non_control = (input::kModifierShift | input::kModifierAlt |
+                              input::kModifierSuper);
+      if (keyboard.modifiers) {
+        if ((keyboard.modifiers & input::kModifierControl) &&
+            !(keyboard.modifiers & non_control)) {
+          char c = static_cast<char>(keyboard.code_point);
           if (c >= 'a' && c <= 'z') {
             c -= 96;
           } else if (c >= '@' && c <= '_') {
@@ -43,10 +43,10 @@ std::string GetInputSequenceForKeyPressedEvent(
           return std::string(1, c);
         }
       }
-      return std::string(1, static_cast<char>(keyboard->code_point));
+      return std::string(1, static_cast<char>(keyboard.code_point));
     }
 
-    switch (keyboard->hid_usage) {
+    switch (keyboard.hid_usage) {
       case HID_USAGE_KEY_BACKSPACE:
         // Have backspace send DEL instead of BS.
         return std::string("\x7f");
@@ -77,7 +77,7 @@ std::string GetInputSequenceForKeyPressedEvent(
       case HID_USAGE_KEY_TAB:
         return std::string("\t");
       default:
-        FXL_NOTIMPLEMENTED() << " hid_usage = " << keyboard->hid_usage;
+        FXL_NOTIMPLEMENTED() << " hid_usage = " << keyboard.hid_usage;
     }
   }
   return std::string();

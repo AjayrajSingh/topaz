@@ -23,8 +23,8 @@ Iter FindUniquePtr(Iter begin, Iter end, T* object) {
 App::App(TermParams params)
     : params_(std::move(params)),
       context_(component::ApplicationContext::CreateFromStartupInfo()) {
-  context_->outgoing_services()->AddService<mozart::ViewProvider>(
-      [this](f1dl::InterfaceRequest<mozart::ViewProvider> request) {
+  context_->outgoing_services()->AddService<views_v1::ViewProvider>(
+      [this](fidl::InterfaceRequest<views_v1::ViewProvider> request) {
         bindings_.AddBinding(this, std::move(request));
       });
 }
@@ -32,10 +32,10 @@ App::App(TermParams params)
 App::~App() = default;
 
 void App::CreateView(
-    f1dl::InterfaceRequest<mozart::ViewOwner> view_owner_request,
-    f1dl::InterfaceRequest<component::ServiceProvider> view_services) {
+    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<component::ServiceProvider> view_services) {
   controllers_.push_back(std::make_unique<ViewController>(
-      context_->ConnectToEnvironmentService<mozart::ViewManager>(),
+      context_->ConnectToEnvironmentService<views_v1::ViewManager>(),
       std::move(view_owner_request), context_.get(), params_,
       [this](ViewController* controller) { DestroyController(controller); }));
 }
