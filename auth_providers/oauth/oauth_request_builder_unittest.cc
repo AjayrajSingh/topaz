@@ -40,14 +40,14 @@ TEST_F(OAuthRequestBuilderTest, JsonEncodedPostRequest) {
                  .SetJsonBody(strbuf.GetString())
                  .Build();
 
-  EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
-  EXPECT_EQ(req->method, kPostMethod);
-  for (const auto& header : *req->headers) {
-    auto hdr_name = header->name.get();
+  EXPECT_TRUE(req.url.get().find("example.org") != std::string::npos);
+  EXPECT_EQ(req.method, kPostMethod);
+  for (const auto& header : *req.headers) {
+    auto hdr_name = header.name.get();
     if (hdr_name == "content-type") {
-      EXPECT_EQ(header->value, "application/json");
+      EXPECT_EQ(header.value, "application/json");
     } else if (hdr_name == "content-length") {
-      EXPECT_TRUE(atoi(header->value.get().c_str()) > 0);
+      EXPECT_TRUE(atoi(header.value.get().c_str()) > 0);
     }
   }
 }
@@ -57,15 +57,15 @@ TEST_F(OAuthRequestBuilderTest, UrlEncodedPostRequest) {
                  .SetUrlEncodedBody("test_data")
                  .Build();
 
-  EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
-  EXPECT_EQ(req->method, kPostMethod);
-  EXPECT_FALSE(req->body.is_null());
-  for (const auto& header : *req->headers) {
-    auto hdr_name = header->name.get();
+  EXPECT_TRUE(req.url.get().find("example.org") != std::string::npos);
+  EXPECT_EQ(req.method, kPostMethod);
+  EXPECT_TRUE(req.body);
+  for (const auto& header : *req.headers) {
+    auto hdr_name = header.name.get();
     if (hdr_name == "content-type") {
-      EXPECT_EQ(header->value, "application/x-www-form-urlencoded");
+      EXPECT_EQ(header.value, "application/x-www-form-urlencoded");
     } else if (hdr_name == "content-length") {
-      EXPECT_TRUE(atoi(header->value.get().c_str()) > 0);
+      EXPECT_TRUE(atoi(header.value.get().c_str()) > 0);
     }
   }
 }
@@ -74,14 +74,14 @@ TEST_F(OAuthRequestBuilderTest, EmptyBodyPostRequest) {
   auto req =
       OAuthRequestBuilder(kTestUrl, kPostMethod).SetUrlEncodedBody("").Build();
 
-  EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
-  EXPECT_EQ(req->method, kPostMethod);
-  for (const auto& header : *req->headers) {
-    auto hdr_name = header->name.get();
+  EXPECT_TRUE(req.url.get().find("example.org") != std::string::npos);
+  EXPECT_EQ(req.method, kPostMethod);
+  for (const auto& header : *req.headers) {
+    auto hdr_name = header.name.get();
     if (hdr_name == "content-type") {
-      EXPECT_EQ(header->value, "application/x-www-form-urlencoded");
+      EXPECT_EQ(header.value, "application/x-www-form-urlencoded");
     } else if (hdr_name == "content-length") {
-      EXPECT_TRUE(atoi(header->value.get().c_str()) == 0);
+      EXPECT_TRUE(atoi(header.value.get().c_str()) == 0);
     } else {
       ASSERT_TRUE("This header should never been set");
     }
@@ -94,13 +94,13 @@ TEST_F(OAuthRequestBuilderTest, CheckAuthHeader) {
                  .SetAuthorizationHeader("test_token")
                  .Build();
 
-  EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
-  EXPECT_EQ(req->method, kPostMethod);
-  EXPECT_FALSE(req->body.is_null());
-  for (const auto& header : *req->headers) {
-    auto hdr_name = header->name.get();
+  EXPECT_TRUE(req.url.get().find("example.org") != std::string::npos);
+  EXPECT_EQ(req.method, kPostMethod);
+  EXPECT_TRUE(req.body);
+  for (const auto& header : *req.headers) {
+    auto hdr_name = header.name.get();
     if (hdr_name == "Authorization") {
-      EXPECT_TRUE(header->value.get().find("test_token") != std::string::npos);
+      EXPECT_TRUE(header.value.get().find("test_token") != std::string::npos);
     }
   }
 }
@@ -108,8 +108,8 @@ TEST_F(OAuthRequestBuilderTest, CheckAuthHeader) {
 TEST_F(OAuthRequestBuilderTest, GetRequest) {
   auto req = OAuthRequestBuilder(kTestUrl, kGetMethod).Build();
 
-  EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
-  EXPECT_EQ(req->method, kGetMethod);
+  EXPECT_TRUE(req.url.get().find("example.org") != std::string::npos);
+  EXPECT_EQ(req.method, kGetMethod);
 }
 
 TEST_F(OAuthRequestBuilderTest, GetRequestWithQueryParams) {
@@ -120,12 +120,12 @@ TEST_F(OAuthRequestBuilderTest, GetRequestWithQueryParams) {
   auto req =
       OAuthRequestBuilder(kTestUrl, kGetMethod).SetQueryParams(params).Build();
 
-  EXPECT_TRUE(req->url.get().find("example.org") != std::string::npos);
-  EXPECT_TRUE(req->url.get().find("foo1") != std::string::npos);
-  EXPECT_TRUE(req->url.get().find("foo2") != std::string::npos);
+  EXPECT_TRUE(req.url.get().find("example.org") != std::string::npos);
+  EXPECT_TRUE(req.url.get().find("foo1") != std::string::npos);
+  EXPECT_TRUE(req.url.get().find("foo2") != std::string::npos);
   // check if the param values are url encoded
-  EXPECT_TRUE(req->url.get().find("bar%203") != std::string::npos);
-  EXPECT_EQ(req->method, kGetMethod);
+  EXPECT_TRUE(req.url.get().find("bar%203") != std::string::npos);
+  EXPECT_EQ(req.method, kGetMethod);
 }
 
 }  // namespace

@@ -14,27 +14,25 @@ namespace oauth {
 
 using auth::AuthProviderStatus;
 
-OAuthResponse ParseOAuthResponse(const network::URLResponsePtr response) {
-  FXL_CHECK(response);
-
+OAuthResponse ParseOAuthResponse(network::URLResponse response) {
   rapidjson::Document out;
-  if (response->error) {
+  if (response.error) {
     FXL_LOG(ERROR) << "Encountered error: " +
-                          std::to_string(response->error->code) +
+                          std::to_string(response.error->code) +
                           " ,with description: " +
-                          response->error->description->data();
+                          response.error->description->data();
     return OAuthResponse(AuthProviderStatus::NETWORK_ERROR,
-                         response->error->description->data(), std::move(out));
+                         response.error->description->data(), std::move(out));
   }
 
   std::string response_body;
-  if (!response->body.is_null()) {
-    FXL_DCHECK(response->body->is_stream());
-    if (!fsl::BlockingCopyToString(std::move(response->body->get_stream()),
+  if (response.body) {
+    FXL_DCHECK(response.body->is_stream());
+    if (!fsl::BlockingCopyToString(std::move(response.body->stream()),
                                    &response_body)) {
       FXL_LOG(ERROR) << "Internal error while reading response from socket,"
                         "network returned: " +
-                            std::to_string(response->status_code);
+                            std::to_string(response.status_code);
       return OAuthResponse(AuthProviderStatus::NETWORK_ERROR,
                            "Error reading response from socket",
                            std::move(out));
@@ -51,7 +49,7 @@ OAuthResponse ParseOAuthResponse(const network::URLResponsePtr response) {
         "Error in parsing json response[" + response_body + "]: " + error_msg,
         std::move(out));
   }
-  switch (response->status_code) {
+  switch (response.status_code) {
     case 200:  // Success
       return OAuthResponse(AuthProviderStatus::OK, "", std::move(out));
     case 400:  // Bad request errors
@@ -66,7 +64,7 @@ OAuthResponse ParseOAuthResponse(const network::URLResponsePtr response) {
 
       return OAuthResponse(status,
                            "OAuth backend returned error: " +
-                               std::to_string(response->status_code),
+                               std::to_string(response.status_code),
                            std::move(out));
   }
 }

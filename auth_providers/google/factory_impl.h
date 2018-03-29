@@ -5,10 +5,10 @@
 #ifndef TOPAZ_AUTH_PROVIDERS_GOOGLE_FACTORY_IMPL_H_
 #define TOPAZ_AUTH_PROVIDERS_GOOGLE_FACTORY_IMPL_H_
 
+#include <fuchsia/cpp/auth.h>
+
 #include "garnet/lib/callback/auto_cleanable.h"
 #include "garnet/lib/network_wrapper/network_wrapper.h"
-#include "garnet/public/lib/auth/fidl/auth_provider.fidl.h"
-#include "garnet/public/lib/auth/fidl/auth_provider_factory.fidl.h"
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/tasks/task_runner.h"
@@ -24,12 +24,12 @@ class FactoryImpl : public auth::AuthProviderFactory {
 
   ~FactoryImpl() override;
 
-  void Bind(f1dl::InterfaceRequest<auth::AuthProviderFactory> request);
+  void Bind(fidl::InterfaceRequest<auth::AuthProviderFactory> request);
 
  private:
   // Factory:
-  void GetAuthProvider(f1dl::InterfaceRequest<auth::AuthProvider> auth_provider,
-                       const GetAuthProviderCallback& callback) override;
+  void GetAuthProvider(fidl::InterfaceRequest<auth::AuthProvider> auth_provider,
+                       GetAuthProviderCallback callback) override;
 
   fxl::RefPtr<fxl::TaskRunner> main_runner_;
   component::ApplicationContext* const app_context_;
@@ -37,7 +37,7 @@ class FactoryImpl : public auth::AuthProviderFactory {
 
   callback::AutoCleanableSet<GoogleAuthProviderImpl> providers_;
 
-  f1dl::BindingSet<auth::AuthProviderFactory> factory_bindings_;
+  fidl::BindingSet<auth::AuthProviderFactory> factory_bindings_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(FactoryImpl);
 };

@@ -5,8 +5,8 @@
 #ifndef TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_RESPONSE_H_
 #define TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_RESPONSE_H_
 
-#include "garnet/public/lib/auth/fidl/auth_provider.fidl.h"
-#include "lib/network/fidl/network_service.fidl.h"
+#include <fuchsia/cpp/auth.h>
+#include <fuchsia/cpp/network.h>
 
 #include "third_party/rapidjson/rapidjson/document.h"
 
@@ -26,7 +26,7 @@ struct OAuthResponse {
         json_response(std::move(json_response)) {}
 };
 
-OAuthResponse ParseOAuthResponse(network::URLResponsePtr response);
+OAuthResponse ParseOAuthResponse(network::URLResponse response);
 
 }  // namespace oauth
 }  // namespace auth_providers

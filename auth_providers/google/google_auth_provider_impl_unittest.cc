@@ -6,7 +6,7 @@
 
 #include "garnet/lib/gtest/test_with_message_loop.h"
 #include "garnet/lib/network_wrapper/fake_network_wrapper.h"
-#include "lib/fidl/cpp/bindings/binding.h"
+#include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
 
 namespace google_auth_provider {

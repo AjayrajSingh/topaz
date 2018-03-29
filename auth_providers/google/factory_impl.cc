@@ -19,13 +19,13 @@ FactoryImpl::FactoryImpl(fxl::RefPtr<fxl::TaskRunner> main_runner,
 FactoryImpl::~FactoryImpl() {}
 
 void FactoryImpl::Bind(
-    f1dl::InterfaceRequest<auth::AuthProviderFactory> request) {
+    fidl::InterfaceRequest<auth::AuthProviderFactory> request) {
   factory_bindings_.AddBinding(this, std::move(request));
 }
 
 void FactoryImpl::GetAuthProvider(
-    f1dl::InterfaceRequest<auth::AuthProvider> auth_provider,
-    const GetAuthProviderCallback& callback) {
+    fidl::InterfaceRequest<auth::AuthProvider> auth_provider,
+    GetAuthProviderCallback callback) {
   providers_.emplace(main_runner_, app_context_, network_wrapper_,
                      std::move(auth_provider));
   callback(auth::AuthProviderStatus::OK);

@@ -84,22 +84,22 @@ OAuthRequestBuilder& OAuthRequestBuilder::SetQueryParams(
   return *this;
 }
 
-network::URLRequestPtr OAuthRequestBuilder::Build() const {
+network::URLRequest OAuthRequestBuilder::Build() const {
   fsl::SizedVmo data;
   auto result = fsl::VmoFromString(request_body_, &data);
   FXL_CHECK(result);
 
-  auto request = network::URLRequest::New();
-  request->url = url_ + query_string_;
-  request->method = method_;
-  request->auto_follow_redirects = true;
-  request->body = ::network::URLBody::New();
-  request->body->set_sized_buffer(std::move(data).ToTransport());
+  network::URLRequest request;
+  request.url = url_ + query_string_;
+  request.method = method_;
+  request.auto_follow_redirects = true;
+  request.body = ::network::URLBody::New();
+  request.body->set_sized_buffer(std::move(data).ToTransport());
   for (const auto& http_header : http_headers_) {
-    ::network::HttpHeaderPtr hdr = ::network::HttpHeader::New();
-    hdr->name = http_header.first;
-    hdr->value = http_header.second;
-    request->headers.push_back(std::move(hdr));
+    ::network::HttpHeader hdr;
+    hdr.name = http_header.first;
+    hdr.value = http_header.second;
+    request.headers.push_back(std::move(hdr));
   }
 
   return request;

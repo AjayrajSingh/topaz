@@ -12,14 +12,17 @@
 #include <memory>
 #include <utility>
 
+#include <fuchsia/cpp/modular_auth.h>
+#include <fuchsia/cpp/network.h>
+#include <fuchsia/cpp/views_v1.h>
+#include <fuchsia/cpp/web_view.h>
 #include <trace-provider/provider.h>
 
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
-#include "lib/auth/fidl/account_provider.fidl.h"
-#include "lib/auth/fidl/token_provider.fidl.h"
-#include "lib/fidl/cpp/bindings/interface_request.h"
-#include "lib/fidl/cpp/bindings/string.h"
+#include "lib/fidl/cpp/interface_request.h"
+#include "lib/fidl/cpp/optional.h"
+#include "lib/fidl/cpp/string.h"
 #include "lib/fsl/socket/strings.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fsl/vmo/strings.h"
@@ -31,10 +34,7 @@
 #include "lib/fxl/macros.h"
 #include "lib/fxl/strings/join_strings.h"
 #include "lib/fxl/strings/string_number_conversions.h"
-#include "lib/network/fidl/network_service.fidl.h"
 #include "lib/svc/cpp/services.h"
-#include "lib/ui/views/fidl/view_provider.fidl.h"
-#include "lib/ui/views/fidl/view_token.fidl.h"
 #include "topaz/examples/oauth_token_manager/credentials_generated.h"
 #include "lib/async/cpp/operation.h"
 #include "third_party/rapidjson/rapidjson/document.h"
@@ -43,17 +43,16 @@
 #include "third_party/rapidjson/rapidjson/prettywriter.h"
 #include "third_party/rapidjson/rapidjson/stringbuffer.h"
 #include "third_party/rapidjson/rapidjson/writer.h"
-#include "topaz/runtime/web_runner/services/web_view.fidl.h"
 
 namespace modular {
 namespace auth {
 
 using ShortLivedTokenCallback =
-    std::function<void(std::string, modular::auth::AuthErrPtr)>;
+    std::function<void(std::string, modular_auth::AuthErr)>;
 
 using FirebaseTokenCallback =
-    std::function<void(modular::auth::FirebaseTokenPtr,
-                       modular::auth::AuthErrPtr)>;
+    std::function<void(modular_auth::FirebaseTokenPtr,
+                       modular_auth::AuthErr)>;
 
 namespace {
 
@@ -220,7 +219,7 @@ void Post(const std::string& request_body,
           network::URLLoader* const url_loader,
           const std::string& url,
           const std::function<void()>& success_callback,
-          const std::function<void(Status, std::string)>& failure_callback,
+          const std::function<void(modular_auth::Status, std::string)>& failure_callback,
           const std::function<bool(rapidjson::Document)>& set_token_callback) {
   std::string encoded_request_body(request_body);
   if (url.find(kFirebaseAuthEndpoint) == std::string::npos) {
@@ -232,70 +231,70 @@ void Post(const std::string& request_body,
   FXL_VLOG(1) << "Post Data:" << encoded_request_body;
   FXL_DCHECK(result);
 
-  network::URLRequestPtr request(network::URLRequest::New());
-  request->url = url;
-  request->method = "POST";
-  request->auto_follow_redirects = true;
+  network::URLRequest request;
+  request.url = url;
+  request.method = "POST";
+  request.auto_follow_redirects = true;
 
   // Content-length header.
-  network::HttpHeaderPtr content_length_header = network::HttpHeader::New();
-  content_length_header->name = "Content-length";
+  network::HttpHeader content_length_header;
+  content_length_header.name = "Content-length";
   uint64_t data_size = encoded_request_body.length();
-  content_length_header->value = fxl::NumberToString(data_size);
-  request->headers.push_back(std::move(content_length_header));
+  content_length_header.value = fxl::NumberToString(data_size);
+  request.headers.push_back(std::move(content_length_header));
 
   // content-type header.
-  network::HttpHeaderPtr content_type_header = network::HttpHeader::New();
-  content_type_header->name = "content-type";
+  network::HttpHeader content_type_header;
+  content_type_header.name = "content-type";
   if (url.find("identitytoolkit") != std::string::npos) {
     // set accept header
-    network::HttpHeaderPtr accept_header = network::HttpHeader::New();
-    accept_header->name = "accept";
-    accept_header->value = "application/json";
-    request->headers.push_back(std::move(accept_header));
+    network::HttpHeader accept_header;
+    accept_header.name = "accept";
+    accept_header.value = "application/json";
+    request.headers.push_back(std::move(accept_header));
 
     // set content_type header
-    content_type_header->value = "application/json";
+    content_type_header.value = "application/json";
   } else {
-    content_type_header->value = "application/x-www-form-urlencoded";
+    content_type_header.value = "application/x-www-form-urlencoded";
   }
-  request->headers.push_back(std::move(content_type_header));
+  request.headers.push_back(std::move(content_type_header));
 
-  request->body = network::URLBody::New();
-  request->body->set_sized_buffer(std::move(data).ToTransport());
+  request.body = network::URLBody::New();
+  request.body->set_sized_buffer(std::move(data).ToTransport());
 
   url_loader->Start(std::move(request), [success_callback, failure_callback,
                                          set_token_callback](
-                                            network::URLResponsePtr response) {
+                                           network::URLResponse response) {
 
     FXL_VLOG(1) << "URL Loader response:"
-                << std::to_string(response->status_code);
+                << std::to_string(response.status_code);
 
-    if (!response->error.is_null()) {
+    if (response.error) {
       failure_callback(
-          Status::NETWORK_ERROR,
-          "POST error: " + std::to_string(response->error->code) +
-              " , with description: " + response->error->description->data());
+          modular_auth::Status::NETWORK_ERROR,
+          "POST error: " + std::to_string(response.error->code) +
+              " , with description: " + response.error->description->data());
       return;
     }
 
     std::string response_body;
-    if (!response->body.is_null()) {
-      FXL_DCHECK(response->body->is_stream());
+    if (response.body) {
+      FXL_DCHECK(response.body->is_stream());
       // TODO(alhaad/ukode): Use non-blocking variant.
-      if (!fsl::BlockingCopyToString(std::move(response->body->get_stream()),
+      if (!fsl::BlockingCopyToString(std::move(response.body->stream()),
                                      &response_body)) {
-        failure_callback(Status::NETWORK_ERROR,
+        failure_callback(modular_auth::Status::NETWORK_ERROR,
                          "Failed to read response from socket with status:" +
-                             std::to_string(response->status_code));
+                             std::to_string(response.status_code));
         return;
       }
     }
 
-    if (response->status_code != 200) {
+    if (response.status_code != 200) {
       failure_callback(
-          Status::OAUTH_SERVER_ERROR,
-          "Received status code:" + std::to_string(response->status_code) +
+          modular_auth::Status::OAUTH_SERVER_ERROR,
+          "Received status code:" + std::to_string(response.status_code) +
               ", and response body:" + response_body);
       return;
     }
@@ -304,7 +303,7 @@ void Post(const std::string& request_body,
     rapidjson::ParseResult ok = doc.Parse(response_body);
     if (!ok) {
       std::string error_msg = GetParseError_En(ok.Code());
-      failure_callback(Status::BAD_RESPONSE, "JSON parse error: " + error_msg);
+      failure_callback(modular_auth::Status::BAD_RESPONSE, "JSON parse error: " + error_msg);
       return;
     };
     auto result = set_token_callback(std::move(doc));
@@ -312,7 +311,7 @@ void Post(const std::string& request_body,
       success_callback();
     } else {
       failure_callback(
-          Status::BAD_RESPONSE,
+          modular_auth::Status::BAD_RESPONSE,
           "Invalid response: " + JsonValueToPrettyString(doc));
     }
     return;
@@ -325,58 +324,58 @@ void Get(
     const std::string& url,
     const std::string& access_token,
     const std::function<void()>& success_callback,
-    const std::function<void(Status status, std::string)>& failure_callback,
+    const std::function<void(modular_auth::Status status, std::string)>& failure_callback,
     const std::function<bool(rapidjson::Document)>& set_token_callback) {
-  network::URLRequestPtr request(network::URLRequest::New());
-  request->url = url;
-  request->method = "GET";
-  request->auto_follow_redirects = true;
+  network::URLRequest request;
+  request.url = url;
+  request.method = "GET";
+  request.auto_follow_redirects = true;
 
   // Set Authorization header.
-  network::HttpHeaderPtr auth_header = network::HttpHeader::New();
-  auth_header->name = "Authorization";
-  auth_header->value = "Bearer " + access_token;
-  request->headers.push_back(std::move(auth_header));
+  network::HttpHeader auth_header;
+  auth_header.name = "Authorization";
+  auth_header.value = "Bearer " + access_token;
+  request.headers.push_back(std::move(auth_header));
 
   // set content-type header to json.
-  network::HttpHeaderPtr content_type_header = network::HttpHeader::New();
-  content_type_header->name = "content-type";
-  content_type_header->value = "application/json";
+  network::HttpHeader content_type_header;
+  content_type_header.name = "content-type";
+  content_type_header.value = "application/json";
 
   // set accept header to json
-  network::HttpHeaderPtr accept_header = network::HttpHeader::New();
-  accept_header->name = "accept";
-  accept_header->value = "application/json";
-  request->headers.push_back(std::move(accept_header));
+  network::HttpHeader accept_header;
+  accept_header.name = "accept";
+  accept_header.value = "application/json";
+  request.headers.push_back(std::move(accept_header));
 
   url_loader->Start(std::move(request), [success_callback, failure_callback,
                                          set_token_callback](
-                                            network::URLResponsePtr response) {
-    if (!response->error.is_null()) {
+                                            network::URLResponse response) {
+    if (response.error) {
       failure_callback(
-          Status::NETWORK_ERROR,
-          "GET error: " + std::to_string(response->error->code) +
-              " ,with description: " + response->error->description->data());
+          modular_auth::Status::NETWORK_ERROR,
+          "GET error: " + std::to_string(response.error->code) +
+              " ,with description: " + response.error->description->data());
       return;
     }
 
     std::string response_body;
-    if (!response->body.is_null()) {
-      FXL_DCHECK(response->body->is_stream());
+    if (response.body) {
+      FXL_DCHECK(response.body->is_stream());
       // TODO(alhaad/ukode): Use non-blocking variant.
-      if (!fsl::BlockingCopyToString(std::move(response->body->get_stream()),
+      if (!fsl::BlockingCopyToString(std::move(response.body->stream()),
                                      &response_body)) {
-        failure_callback(Status::NETWORK_ERROR,
+        failure_callback(modular_auth::Status::NETWORK_ERROR,
                          "Failed to read response from socket with status:" +
-                             std::to_string(response->status_code));
+                             std::to_string(response.status_code));
         return;
       }
     }
 
-    if (response->status_code != 200) {
+    if (response.status_code != 200) {
       failure_callback(
-          Status::OAUTH_SERVER_ERROR,
-          "Status code: " + std::to_string(response->status_code) +
+          modular_auth::Status::OAUTH_SERVER_ERROR,
+          "Status code: " + std::to_string(response.status_code) +
               " while fetching tokens with error description:" + response_body);
       return;
     }
@@ -385,7 +384,7 @@ void Get(
     rapidjson::ParseResult ok = doc.Parse(response_body);
     if (!ok) {
       std::string error_msg = GetParseError_En(ok.Code());
-      failure_callback(Status::BAD_RESPONSE, "JSON parse error: " + error_msg);
+      failure_callback(modular_auth::Status::BAD_RESPONSE, "JSON parse error: " + error_msg);
       return;
     };
     auto result = set_token_callback(std::move(doc));
@@ -393,7 +392,7 @@ void Get(
       success_callback();
     } else {
       failure_callback(
-          Status::BAD_RESPONSE,
+          modular_auth::Status::BAD_RESPONSE,
           "Invalid response: " + JsonValueToPrettyString(doc));
     }
   });
@@ -402,31 +401,31 @@ void Get(
 }  // namespace
 
 // Implementation of the OAuth Token Manager app.
-class OAuthTokenManagerApp : AccountProvider {
+class OAuthTokenManagerApp : modular_auth::AccountProvider {
  public:
   OAuthTokenManagerApp();
 
  private:
   // |AccountProvider|
   void Initialize(
-      f1dl::InterfaceHandle<AccountProviderContext> provider) override;
+      fidl::InterfaceHandle<modular_auth::AccountProviderContext> provider) override;
 
   // |AccountProvider|
   void Terminate() override;
 
   // |AccountProvider|
-  void AddAccount(IdentityProvider identity_provider,
-                  const AddAccountCallback& callback) override;
+  void AddAccount(modular_auth::IdentityProvider identity_provider,
+                  AddAccountCallback callback) override;
 
   // |AccountProvider|
-  void RemoveAccount(AccountPtr account,
+  void RemoveAccount(modular_auth::Account account,
                      bool revoke_all,
-                     const RemoveAccountCallback& callback) override;
+                     RemoveAccountCallback callback) override;
 
   // |AccountProvider|
   void GetTokenProviderFactory(
-      const f1dl::StringPtr& account_id,
-      f1dl::InterfaceRequest<TokenProviderFactory> request) override;
+      fidl::StringPtr account_id,
+      fidl::InterfaceRequest<modular_auth::TokenProviderFactory> request) override;
 
   // Generate a random account id.
   std::string GenerateAccountId();
@@ -434,19 +433,19 @@ class OAuthTokenManagerApp : AccountProvider {
   // Refresh access and id tokens.
   void RefreshToken(const std::string& account_id,
                     const TokenType& token_type,
-                    const ShortLivedTokenCallback& callback);
+                    ShortLivedTokenCallback callback);
 
   // Refresh firebase tokens.
   void RefreshFirebaseToken(const std::string& account_id,
                             const std::string& firebase_api_key,
                             const std::string& id_token,
-                            const FirebaseTokenCallback& callback);
+                            FirebaseTokenCallback callback);
 
   std::shared_ptr<component::ApplicationContext> application_context_;
 
-  AccountProviderContextPtr account_provider_context_;
+  modular_auth::AccountProviderContextPtr account_provider_context_;
 
-  f1dl::Binding<AccountProvider> binding_;
+  fidl::Binding<modular_auth::AccountProvider> binding_;
 
   class TokenProviderFactoryImpl;
   // account_id -> TokenProviderFactoryImpl
@@ -498,12 +497,12 @@ class OAuthTokenManagerApp : AccountProvider {
   FXL_DISALLOW_COPY_AND_ASSIGN(OAuthTokenManagerApp);
 };
 
-class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
-                                                       TokenProvider {
+class OAuthTokenManagerApp::TokenProviderFactoryImpl : modular_auth::TokenProviderFactory,
+                                                       modular_auth::TokenProvider {
  public:
-  TokenProviderFactoryImpl(const f1dl::StringPtr& account_id,
+  TokenProviderFactoryImpl(const fidl::StringPtr& account_id,
                            OAuthTokenManagerApp* const app,
-                           f1dl::InterfaceRequest<TokenProviderFactory> request)
+                           fidl::InterfaceRequest<modular_auth::TokenProviderFactory> request)
       : account_id_(account_id), binding_(this, std::move(request)), app_(app) {
     binding_.set_error_handler(
         [this] { app_->token_provider_factory_impls_.erase(account_id_); });
@@ -512,40 +511,37 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
  private:
   // |TokenProviderFactory|
   void GetTokenProvider(
-      const f1dl::StringPtr& /*application_url*/,
-      f1dl::InterfaceRequest<TokenProvider> request) override {
+      fidl::StringPtr /*application_url*/,
+      fidl::InterfaceRequest<modular_auth::TokenProvider> request) override {
     // TODO(alhaad/ukode): Current implementation is agnostic about which
     // agent is requesting what token. Fix this.
     token_provider_bindings_.AddBinding(this, std::move(request));
   }
 
   // |TokenProvider|
-  void GetAccessToken(const GetAccessTokenCallback& callback) override {
+  void GetAccessToken(GetAccessTokenCallback callback) override {
     FXL_DCHECK(app_);
     app_->RefreshToken(account_id_, ACCESS_TOKEN, callback);
   }
 
   // |TokenProvider|
-  void GetIdToken(const GetIdTokenCallback& callback) override {
+  void GetIdToken(GetIdTokenCallback callback) override {
     FXL_DCHECK(app_);
     app_->RefreshToken(account_id_, ID_TOKEN, callback);
   }
 
   // |TokenProvider|
   void GetFirebaseAuthToken(
-      const f1dl::StringPtr& firebase_api_key,
-      const GetFirebaseAuthTokenCallback& callback) override {
+      fidl::StringPtr firebase_api_key,
+      GetFirebaseAuthTokenCallback callback) override {
     FXL_DCHECK(app_);
 
     // Oauth id token is used as input to fetch firebase auth token.
     GetIdToken([ this, firebase_api_key = firebase_api_key, callback ](
-        const std::string id_token, const modular::auth::AuthErrPtr auth_err) {
-      if (auth_err->status != Status::OK) {
+        const std::string id_token, const modular_auth::AuthErr auth_err) {
+      if (auth_err.status != modular_auth::Status::OK) {
         FXL_LOG(ERROR) << "Error in refreshing Idtoken.";
-        modular::auth::AuthErrPtr ae = auth::AuthErr::New();
-        ae->status = auth_err->status;
-        ae->message = auth_err->message;
-        callback(nullptr, std::move(ae));
+        callback(nullptr, std::move(auth_err));
         return;
       }
 
@@ -555,13 +551,13 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
   }
 
   // |TokenProvider|
-  void GetClientId(const GetClientIdCallback& callback) override {
+  void GetClientId(GetClientIdCallback callback) override {
     callback(kClientId);
   }
 
   std::string account_id_;
-  f1dl::Binding<TokenProviderFactory> binding_;
-  f1dl::BindingSet<TokenProvider> token_provider_bindings_;
+  fidl::Binding<modular_auth::TokenProviderFactory> binding_;
+  fidl::BindingSet<modular_auth::TokenProvider> token_provider_bindings_;
 
   OAuthTokenManagerApp* const app_;
 
@@ -569,14 +565,14 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl : TokenProviderFactory,
 };
 
 class OAuthTokenManagerApp::GoogleFirebaseTokensCall
-    : Operation<modular::auth::FirebaseTokenPtr, modular::auth::AuthErrPtr> {
+    : Operation<modular_auth::FirebaseTokenPtr, modular_auth::AuthErr> {
  public:
   GoogleFirebaseTokensCall(OperationContainer* const container,
                            std::string account_id,
                            std::string firebase_api_key,
                            std::string id_token,
                            OAuthTokenManagerApp* const app,
-                           const FirebaseTokenCallback& callback)
+                           FirebaseTokenCallback callback)
       : Operation("OAuthTokenManagerApp::GoogleFirebaseTokensCall",
                   container,
                   callback),
@@ -592,12 +588,12 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
     FlowToken flow{this, &firebase_token_, &auth_err_};
 
     if (account_id_.empty()) {
-      Failure(flow, Status::BAD_REQUEST, "Account id is empty");
+      Failure(flow, modular_auth::Status::BAD_REQUEST, "Account id is empty");
       return;
     }
 
     if (firebase_api_key_.empty()) {
-      Failure(flow, Status::BAD_REQUEST, "Firebase Api key is empty");
+      Failure(flow, modular_auth::Status::BAD_REQUEST, "Firebase Api key is empty");
       return;
     }
 
@@ -648,7 +644,7 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
            FXL_CHECK(flow);
            Success(*flow);
          },
-         [this, branch](const Status status, const std::string error_message) {
+         [this, branch](const modular_auth::Status status, const std::string error_message) {
            std::unique_ptr<FlowToken> flow = branch.Continue();
            FXL_CHECK(flow);
            Failure(*flow, status, error_message);
@@ -717,7 +713,7 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
 
   void Success(FlowToken /*flow*/) {
     // Set firebase token
-    firebase_token_ = auth::FirebaseToken::New();
+    firebase_token_ = modular_auth::FirebaseToken::New();
     if (id_token_.empty()) {
       firebase_token_->id_token = "";
       firebase_token_->local_id = "";
@@ -731,19 +727,17 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
     }
 
     // Set status to success
-    auth_err_ = auth::AuthErr::New();
-    auth_err_->status = Status::OK;
-    auth_err_->message = "";
+    auth_err_.status = modular_auth::Status::OK;
+    auth_err_.message = "";
   }
 
   void Failure(FlowToken /*flow*/,
-               const Status& status,
+               const modular_auth::Status& status,
                const std::string& error_message) {
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
-    auth_err_ = auth::AuthErr::New();
-    auth_err_->status = status;
-    auth_err_->message = error_message;
+    auth_err_.status = status;
+    auth_err_.message = error_message;
   }
 
   const std::string account_id_;
@@ -751,8 +745,8 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
   const std::string id_token_;
   OAuthTokenManagerApp* const app_;
 
-  modular::auth::FirebaseTokenPtr firebase_token_;
-  modular::auth::AuthErrPtr auth_err_;
+  modular_auth::FirebaseTokenPtr firebase_token_;
+  modular_auth::AuthErr auth_err_;
 
   network::NetworkServicePtr network_service_;
   network::URLLoaderPtr url_loader_;
@@ -761,13 +755,13 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
 };
 
 class OAuthTokenManagerApp::GoogleOAuthTokensCall
-    : Operation<f1dl::StringPtr, modular::auth::AuthErrPtr> {
+    : Operation<fidl::StringPtr, modular_auth::AuthErr> {
  public:
   GoogleOAuthTokensCall(OperationContainer* const container,
                         std::string account_id,
                         const TokenType& token_type,
                         OAuthTokenManagerApp* const app,
-                        const ShortLivedTokenCallback& callback)
+                        ShortLivedTokenCallback callback)
       : Operation("OAuthTokenManagerApp::GoogleOAuthTokensCall",
                   container,
                   callback),
@@ -782,7 +776,7 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
     FlowToken flow{this, &result_, &auth_err_};
 
     if (account_id_.empty()) {
-      Failure(flow, Status::BAD_REQUEST, "Account id is empty.");
+      Failure(flow, modular_auth::Status::BAD_REQUEST, "Account id is empty.");
       return;
     }
 
@@ -829,7 +823,7 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
            FXL_CHECK(flow);
            Success(*flow);
          },
-         [this, branch](const Status status, const std::string error_message) {
+         [this, branch](const modular_auth::Status status, const std::string error_message) {
            std::unique_ptr<FlowToken> flow = branch.Continue();
            FXL_CHECK(flow);
            Failure(*flow, status, error_message);
@@ -906,24 +900,22 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
           result_ = app_->oauth_tokens_[account_id_].id_token;
           break;
         case FIREBASE_JWT_TOKEN:
-          Failure(flow, Status::INTERNAL_ERROR, "invalid token type");
+          Failure(flow, modular_auth::Status::INTERNAL_ERROR, "invalid token type");
       }
     }
 
     // Set status to success
-    auth_err_ = auth::AuthErr::New();
-    auth_err_->status = Status::OK;
-    auth_err_->message = "";
+    auth_err_.status = modular_auth::Status::OK;
+    auth_err_.message = "";
   }
 
   void Failure(FlowToken /*flow*/,
-               const Status& status,
+               const modular_auth::Status& status,
                const std::string& error_message) {
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
-    auth_err_ = auth::AuthErr::New();
-    auth_err_->status = status;
-    auth_err_->message = error_message;
+    auth_err_.status = status;
+    auth_err_.message = error_message;
   }
 
   const std::string account_id_;
@@ -934,8 +926,8 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
   network::NetworkServicePtr network_service_;
   network::URLLoaderPtr url_loader_;
 
-  f1dl::StringPtr result_;
-  modular::auth::AuthErrPtr auth_err_;
+  fidl::StringPtr result_;
+  modular_auth::AuthErr auth_err_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleOAuthTokensCall);
 };
@@ -946,7 +938,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
                                                   web_view::WebRequestDelegate {
  public:
   GoogleUserCredsCall(OperationContainer* const container,
-                      AccountPtr account,
+                      modular_auth::AccountPtr account,
                       OAuthTokenManagerApp* const app,
                       AddAccountCallback callback)
       : Operation("OAuthTokenManagerApp::GoogleUserCredsCall",
@@ -999,7 +991,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
   }
 
   // |web_view::WebRequestDelegate|
-  void WillSendRequest(const f1dl::StringPtr& incoming_url) override {
+  void WillSendRequest(fidl::StringPtr incoming_url) override {
     const std::string& uri = incoming_url.get();
     const std::string prefix = std::string{kRedirectUri} + "?code=";
     const std::string cancel_prefix =
@@ -1008,7 +1000,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
     auto cancel_pos = uri.find(cancel_prefix);
     // user denied OAuth permissions
     if (cancel_pos == 0) {
-      Failure(Status::USER_CANCELLED, "User cancelled OAuth flow");
+      Failure(modular_auth::Status::USER_CANCELLED, "User cancelled OAuth flow");
       return;
     }
 
@@ -1039,7 +1031,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
 
     Post(request_body, url_loader_.get(), kGoogleOAuthTokenEndpoint,
          [this] { Success(); },
-         [this](const Status status, const std::string error_message) {
+         [this](const modular_auth::Status status, const std::string error_message) {
            Failure(status, error_message);
          },
          [this](rapidjson::Document doc) {
@@ -1131,7 +1123,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
     Done();
   }
 
-  void Failure(const Status& status, const std::string& error_message) {
+  void Failure(const modular_auth::Status& status, const std::string& error_message) {
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
     callback_(nullptr, error_message);
@@ -1142,9 +1134,9 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
 
   views_v1_token::ViewOwnerPtr SetupWebView() {
     component::Services web_view_services;
-    auto web_view_launch_info = component::ApplicationLaunchInfo::New();
-    web_view_launch_info->url = kWebViewUrl;
-    web_view_launch_info->directory_request = web_view_services.NewRequest();
+    component::ApplicationLaunchInfo web_view_launch_info;
+    web_view_launch_info.url = kWebViewUrl;
+    web_view_launch_info.directory_request = web_view_services.NewRequest();
     app_->application_context_->launcher()->CreateApplication(
         std::move(web_view_launch_info), web_view_controller_.NewRequest());
     web_view_controller_.set_error_handler([this] {
@@ -1163,11 +1155,11 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
     return view_owner;
   }
 
-  AccountPtr account_;
+  modular_auth::AccountPtr account_;
   OAuthTokenManagerApp* const app_;
   const AddAccountCallback callback_;
 
-  AuthenticationContextPtr auth_context_;
+  modular_auth::AuthenticationContextPtr auth_context_;
 
   web_view::WebViewPtr web_view_;
   component::ApplicationControllerPtr web_view_controller_;
@@ -1175,19 +1167,19 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : Operation<>,
   network::NetworkServicePtr network_service_;
   network::URLLoaderPtr url_loader_;
 
-  f1dl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
+  fidl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleUserCredsCall);
 };
 
 class OAuthTokenManagerApp::GoogleRevokeTokensCall
-    : Operation<modular::auth::AuthErrPtr> {
+    : Operation<modular_auth::AuthErr> {
  public:
   GoogleRevokeTokensCall(OperationContainer* const container,
-                         AccountPtr account,
+                         modular_auth::AccountPtr account,
                          bool revoke_all,
                          OAuthTokenManagerApp* const app,
-                         const RemoveAccountCallback& callback)
+                         RemoveAccountCallback callback)
       : Operation("OAuthTokenManagerApp::GoogleRevokeTokensCall",
                   container,
                   callback),
@@ -1204,18 +1196,18 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
     FlowToken flow{this, &auth_err_};
 
     if (!account_) {
-      Failure(flow, Status::BAD_REQUEST, "Account is null.");
+      Failure(flow, modular_auth::Status::BAD_REQUEST, "Account is null.");
       return;
     }
 
     switch (account_->identity_provider) {
-      case IdentityProvider::DEV:
+      case modular_auth::IdentityProvider::DEV:
         Success(flow);  // guest mode
         return;
-      case IdentityProvider::GOOGLE:
+      case modular_auth::IdentityProvider::GOOGLE:
         break;
       default:
-        Failure(flow, Status::BAD_REQUEST, "Unsupported IDP.");
+        Failure(flow, modular_auth::Status::BAD_REQUEST, "Unsupported IDP.");
         return;
     }
 
@@ -1230,7 +1222,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
     // delete local cache first.
     if (app_->oauth_tokens_.find(account_->id) != app_->oauth_tokens_.end()) {
       if (!app_->oauth_tokens_.erase(account_->id)) {
-        Failure(flow, Status::INTERNAL_ERROR,
+        Failure(flow, modular_auth::Status::INTERNAL_ERROR,
                 "Unable to delete cached tokens for account:" +
                     std::string(account_->id));
         return;
@@ -1239,7 +1231,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
 
     // delete user credentials from local persistent storage.
     if (!DeleteCredentials()) {
-      Failure(flow, Status::INTERNAL_ERROR,
+      Failure(flow, modular_auth::Status::INTERNAL_ERROR,
               "Unable to delete persistent credentials for account:" +
                   std::string(account_->id));
       return;
@@ -1270,7 +1262,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
            FXL_CHECK(flow);
            Success(*flow);
          },
-         [this, branch](const Status status, const std::string error_message) {
+         [this, branch](const modular_auth::Status status, const std::string error_message) {
            std::unique_ptr<FlowToken> flow = branch.Continue();
            FXL_CHECK(flow);
            Failure(*flow, status, error_message);
@@ -1337,22 +1329,20 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
 
   void Success(FlowToken /*flow*/) {
     // Set status to success
-    auth_err_ = auth::AuthErr::New();
-    auth_err_->status = Status::OK;
-    auth_err_->message = "";
+    auth_err_.status = modular_auth::Status::OK;
+    auth_err_.message = "";
   }
 
   void Failure(FlowToken /*flow*/,
-               const Status& status,
+               const modular_auth::Status& status,
                const std::string& error_message) {
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
-    auth_err_ = auth::AuthErr::New();
-    auth_err_->status = status;
-    auth_err_->message = error_message;
+    auth_err_.status = status;
+    auth_err_.message = error_message;
   }
 
-  AccountPtr account_;
+  modular_auth::AccountPtr account_;
   // By default, RemoveAccount deletes account only from the device where the
   // user performed the operation.
   bool revoke_all_ = false;
@@ -1362,7 +1352,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
   network::NetworkServicePtr network_service_;
   network::URLLoaderPtr url_loader_;
 
-  modular::auth::AuthErrPtr auth_err_;
+  modular_auth::AuthErr auth_err_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleRevokeTokensCall);
 };
@@ -1370,7 +1360,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
 class OAuthTokenManagerApp::GoogleProfileAttributesCall : Operation<> {
  public:
   GoogleProfileAttributesCall(OperationContainer* const container,
-                              AccountPtr account,
+                              modular_auth::AccountPtr account,
                               OAuthTokenManagerApp* const app,
                               AddAccountCallback callback)
       : Operation("OAuthTokenManagerApp::GoogleProfileAttributesCall",
@@ -1386,7 +1376,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : Operation<> {
   // |Operation|
   void Run() override {
     if (!account_) {
-      Failure(Status::BAD_REQUEST, "Account is null.");
+      Failure(modular_auth::Status::BAD_REQUEST, "Account is null.");
       return;
     }
 
@@ -1406,7 +1396,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : Operation<> {
     // https://developers.google.com/+/web/api/rest/latest/people/get api.
     Get(url_loader_.get(), kGooglePeopleGetEndpoint, access_token,
         [this] { Success(); },
-        [this](const Status status, const std::string error_message) {
+        [this](const modular_auth::Status status, const std::string error_message) {
           Failure(status, error_message);
         },
         [this](rapidjson::Document doc) {
@@ -1450,7 +1440,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : Operation<> {
     Done();
   }
 
-  void Failure(const Status& status, const std::string& error_message) {
+  void Failure(const modular_auth::Status& status, const std::string& error_message) {
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
 
@@ -1459,7 +1449,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : Operation<> {
     Done();
   }
 
-  AccountPtr account_;
+  modular_auth::AccountPtr account_;
   OAuthTokenManagerApp* const app_;
   const AddAccountCallback callback_;
 
@@ -1474,7 +1464,7 @@ OAuthTokenManagerApp::OAuthTokenManagerApp()
           component::ApplicationContext::CreateFromStartupInfo()),
       binding_(this) {
   application_context_->outgoing_services()->AddService<AccountProvider>(
-      [this](f1dl::InterfaceRequest<AccountProvider> request) {
+      [this](fidl::InterfaceRequest<AccountProvider> request) {
         binding_.Bind(std::move(request));
       });
   // Reserialize existing users.
@@ -1488,7 +1478,7 @@ OAuthTokenManagerApp::OAuthTokenManagerApp()
 }
 
 void OAuthTokenManagerApp::Initialize(
-    f1dl::InterfaceHandle<AccountProviderContext> provider) {
+    fidl::InterfaceHandle<modular_auth::AccountProviderContext> provider) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::Initialize()";
   account_provider_context_.Bind(std::move(provider));
 }
@@ -1509,10 +1499,10 @@ std::string OAuthTokenManagerApp::GenerateAccountId() {
   return std::to_string(random_number);
 }
 
-void OAuthTokenManagerApp::AddAccount(IdentityProvider identity_provider,
-                                      const AddAccountCallback& callback) {
+void OAuthTokenManagerApp::AddAccount(modular_auth::IdentityProvider identity_provider,
+                                      AddAccountCallback callback) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::AddAccount()";
-  auto account = auth::Account::New();
+  auto account = modular_auth::Account::New();
   account->id = GenerateAccountId();
   account->identity_provider = identity_provider;
   account->display_name = "";
@@ -1520,13 +1510,13 @@ void OAuthTokenManagerApp::AddAccount(IdentityProvider identity_provider,
   account->image_url = "";
 
   switch (identity_provider) {
-    case IdentityProvider::DEV:
+    case modular_auth::IdentityProvider::DEV:
       callback(std::move(account), nullptr);
       return;
-    case IdentityProvider::GOOGLE:
+    case modular_auth::IdentityProvider::GOOGLE:
       new GoogleUserCredsCall(
           &operation_queue_, std::move(account), this,
-          [this, callback](AccountPtr account, const f1dl::StringPtr error_msg) {
+          [this, callback](modular_auth::AccountPtr account, const fidl::StringPtr error_msg) {
             if (error_msg) {
               callback(nullptr, error_msg);
               return;
@@ -1542,24 +1532,24 @@ void OAuthTokenManagerApp::AddAccount(IdentityProvider identity_provider,
 }
 
 void OAuthTokenManagerApp::RemoveAccount(
-    AccountPtr account,
+    modular_auth::Account account,
     bool revoke_all,
-    const RemoveAccountCallback& callback) {
+    RemoveAccountCallback callback) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::RemoveAccount()";
-  new GoogleRevokeTokensCall(&operation_queue_, std::move(account), revoke_all,
+  new GoogleRevokeTokensCall(&operation_queue_, fidl::MakeOptional(std::move(account)), revoke_all,
                              this, callback);
 }
 
 void OAuthTokenManagerApp::GetTokenProviderFactory(
-    const f1dl::StringPtr& account_id,
-    f1dl::InterfaceRequest<TokenProviderFactory> request) {
+    fidl::StringPtr account_id,
+    fidl::InterfaceRequest<modular_auth::TokenProviderFactory> request) {
   new TokenProviderFactoryImpl(account_id, this, std::move(request));
 }
 
 void OAuthTokenManagerApp::RefreshToken(
     const std::string& account_id,
     const TokenType& token_type,
-    const ShortLivedTokenCallback& callback) {
+    ShortLivedTokenCallback callback) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::RefreshToken()";
   new GoogleOAuthTokensCall(&operation_queue_, account_id, token_type, this,
                             callback);
@@ -1569,7 +1559,7 @@ void OAuthTokenManagerApp::RefreshFirebaseToken(
     const std::string& account_id,
     const std::string& firebase_api_key,
     const std::string& id_token,
-    const FirebaseTokenCallback& callback) {
+    FirebaseTokenCallback callback) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::RefreshFirebaseToken()";
   new GoogleFirebaseTokensCall(&operation_queue_, account_id, firebase_api_key,
                                id_token, this, callback);

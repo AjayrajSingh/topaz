@@ -5,13 +5,13 @@
 #include <trace-provider/provider.h>
 #include <memory>
 
+#include <fuchsia/cpp/auth.h>
+
 #include "garnet/lib/backoff/exponential_backoff.h"
 #include "garnet/lib/network_wrapper/network_wrapper_impl.h"
-#include "garnet/public/lib/auth/fidl/auth_provider_factory.fidl.h"
 #include "lib/app/cpp/application_context.h"
-#include "lib/auth/fidl/token_manager.fidl.h"
-#include "lib/fidl/cpp/bindings/binding_set.h"
-#include "lib/fidl/cpp/bindings/interface_request.h"
+#include "lib/fidl/cpp/binding_set.h"
+#include "lib/fidl/cpp/interface_request.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fsl/vmo/strings.h"
 #include "lib/fxl/command_line.h"
@@ -43,7 +43,7 @@ class GoogleAuthProviderApp {
   void Run() {
     application_context_->outgoing_services()
         ->AddService<auth::AuthProviderFactory>(
-            [this](f1dl::InterfaceRequest<auth::AuthProviderFactory> request) {
+            [this](fidl::InterfaceRequest<auth::AuthProviderFactory> request) {
               factory_impl_.Bind(std::move(request));
             });
     loop_.Run();

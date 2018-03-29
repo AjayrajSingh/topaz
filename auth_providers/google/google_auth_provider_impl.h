@@ -7,16 +7,17 @@
 // |auth_provider.fidl| interface and is typically invoked by the Token Manager
 // service in Garnet layer.
 
+#include <fuchsia/cpp/views_v1.h>
+#include <fuchsia/cpp/web_view.h>
+#include <fuchsia/cpp/auth.h>
+
 #include "garnet/lib/callback/cancellable.h"
 #include "garnet/lib/network_wrapper/network_wrapper.h"
-#include "garnet/public/lib/auth/fidl/auth_provider.fidl.h"
 #include "lib/app/cpp/application_context.h"
-#include "lib/fidl/cpp/bindings/binding.h"
+#include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/tasks/task_runner.h"
-#include "lib/ui/views/fidl/view_provider.fidl.h"
-#include "topaz/runtime/web_runner/services/web_view.fidl.h"
 
 namespace google_auth_provider {
 
@@ -26,7 +27,7 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
   GoogleAuthProviderImpl(fxl::RefPtr<fxl::TaskRunner> main_runner,
                          component::ApplicationContext* app_context,
                          network_wrapper::NetworkWrapper* network_wrapper,
-                         f1dl::InterfaceRequest<auth::AuthProvider> request);
+                         fidl::InterfaceRequest<auth::AuthProvider> request);
 
   ~GoogleAuthProviderImpl() override;
 
@@ -35,44 +36,44 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
  private:
   // |AuthProvider|
   void GetPersistentCredential(
-      f1dl::InterfaceHandle<auth::AuthenticationUIContext> auth_ui_context,
-      const GetPersistentCredentialCallback& callback) override;
+      fidl::InterfaceHandle<auth::AuthenticationUIContext> auth_ui_context,
+      GetPersistentCredentialCallback callback) override;
 
   // |AuthProvider|
-  void GetAppAccessToken(const f1dl::StringPtr& credential,
-                         const f1dl::StringPtr& app_client_id,
-                         const f1dl::VectorPtr<f1dl::StringPtr> app_scopes,
-                         const GetAppAccessTokenCallback& callback) override;
+  void GetAppAccessToken(fidl::StringPtr credential,
+                         fidl::StringPtr app_client_id,
+                         const fidl::VectorPtr<fidl::StringPtr> app_scopes,
+                         GetAppAccessTokenCallback callback) override;
 
   // |AuthProvider|
-  void GetAppIdToken(const f1dl::StringPtr& credential,
-                     const f1dl::StringPtr& audience,
-                     const GetAppIdTokenCallback& callback) override;
+  void GetAppIdToken(fidl::StringPtr credential,
+                     fidl::StringPtr audience,
+                     GetAppIdTokenCallback callback) override;
 
   // |AuthProvider|
   void GetAppFirebaseToken(
-      const f1dl::StringPtr& id_token, const f1dl::StringPtr& firebase_api_key,
-      const GetAppFirebaseTokenCallback& callback) override;
+      fidl::StringPtr id_token, fidl::StringPtr firebase_api_key,
+      GetAppFirebaseTokenCallback callback) override;
 
   // |AuthProvider|
   void RevokeAppOrPersistentCredential(
-      const f1dl::StringPtr& credential,
-      const RevokeAppOrPersistentCredentialCallback& callback) override;
+      fidl::StringPtr credential,
+      RevokeAppOrPersistentCredentialCallback callback) override;
 
   // |web_view::WebRequestDelegate|
-  void WillSendRequest(const f1dl::StringPtr& incoming_url) override;
+  void WillSendRequest(fidl::StringPtr incoming_url) override;
 
-  void GetUserProfile(const f1dl::StringPtr& credential,
-                      const f1dl::StringPtr& access_token);
+  void GetUserProfile(fidl::StringPtr credential,
+                      fidl::StringPtr access_token);
 
   views_v1_token::ViewOwnerPtr SetupWebView();
 
-  void Request(std::function<network::URLRequestPtr()> request_factory,
-               std::function<void(network::URLResponsePtr response)> callback);
+  void Request(std::function<network::URLRequest()> request_factory,
+               std::function<void(network::URLResponse response)> callback);
 
   void OnResponse(
-      std::function<void(network::URLResponsePtr response)> callback,
-      network::URLResponsePtr response);
+      std::function<void(network::URLResponse response)> callback,
+      network::URLResponse response);
 
   fxl::RefPtr<fxl::TaskRunner> main_runner_;
   component::ApplicationContext* app_context_;
@@ -82,8 +83,8 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
   web_view::WebViewPtr web_view_;
   GetPersistentCredentialCallback get_persistent_credential_callback_;
 
-  f1dl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
-  f1dl::Binding<auth::AuthProvider> binding_;
+  fidl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
+  fidl::Binding<auth::AuthProvider> binding_;
   callback::CancellableContainer requests_;
 
   fxl::Closure on_empty_;

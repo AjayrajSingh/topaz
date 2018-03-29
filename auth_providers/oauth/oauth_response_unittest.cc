@@ -19,24 +19,24 @@ using auth::AuthProviderStatus;
 
 namespace {
 
-network::URLResponsePtr FakeError(int32_t code, std::string reason) {
-  auto response = network::URLResponse::New();
-  response->error = network::NetworkError::New();
-  response->error->code = code;
-  response->error->description = reason;
+network::URLResponse FakeError(int32_t code, std::string reason) {
+  network::URLResponse response;
+  response.error = network::NetworkError::New();
+  response.error->code = code;
+  response.error->description = reason;
   return response;
 }
 
-network::URLResponsePtr FakeSuccess(int32_t code, const std::string& body) {
-  auto response = network::URLResponse::New();
-  response->body = network::URLBody::New();
-  response->body->set_stream(fsl::WriteStringToSocket(body));
-  response->status_code = code;
+network::URLResponse FakeSuccess(int32_t code, const std::string& body) {
+  network::URLResponse response;
+  response.body = network::URLBody::New();
+  response.body->set_stream(fsl::WriteStringToSocket(body));
+  response.status_code = code;
 
-  network::HttpHeaderPtr content_length_header = network::HttpHeader::New();
-  content_length_header->name = "content-length";
-  content_length_header->value = fxl::NumberToString(body.size());
-  response->headers.push_back(std::move(content_length_header));
+  network::HttpHeader content_length_header;
+  content_length_header.name = "content-length";
+  content_length_header.value = fxl::NumberToString(body.size());
+  response.headers.push_back(std::move(content_length_header));
 
   return response;
 }
