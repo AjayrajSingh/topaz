@@ -12,7 +12,8 @@ group("fuchsia") {
   ]
 
   deps = [
-    ":package_for_analysis",
+    # TODO(ianloic): re-enable after fidl2 transition
+    #":package_for_analysis",
   ]
 }
 
