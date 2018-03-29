@@ -62,7 +62,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       new KeyboardCaptureListenerBinding();
   final PresentationModeListenerBinding _presentationModeListenerBinding =
       new PresentationModeListenerBinding();
-  String _currentUserShell = '';
   String _currentAccountId = '';
 
   // Because this device shell only supports a single user logged in at a time,
@@ -116,7 +115,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         ),
         _keyboardCaptureListenerBinding.wrap(this),
       );
-      //..setPresentationModeListener(_presentationModeListenerBinding.wrap(this));
+    //..setPresentationModeListener(_presentationModeListenerBinding.wrap(this));
   }
 
   @override
@@ -227,17 +226,20 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _serviceProviderBinding.bind(this, serviceProvider.passRequest());
 
     _currentAccountId = accountId;
-    _currentUserShell =
-        _userShellChooser.getPrimaryUserShellAppUrl(_currentAccountId);
+    UserShellInfo info = _userShellChooser.getNextUserShellInfo(
+      _currentAccountId,
+    );
     final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
     final UserLoginParams params = new UserLoginParams(
       accountId: accountId,
       viewOwner: viewOwner.passRequest(),
       services: serviceProvider.passHandle(),
       userController: _userControllerProxy.ctrl.request(),
-      userShellConfig: new AppConfig(
-          url: _userShellChooser.getPrimaryUserShellAppUrl(accountId)),
+      userShellConfig: new AppConfig(url: info.name),
     );
+
+    _updatePresentation(info);
+
     userProvider.login(params);
 
     _userControllerProxy.watch(_userWatcherImpl.getHandle());
@@ -267,17 +269,19 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   void onEvent(KeyboardEvent ev) {
     log.info('Keyboard captured in device shell!');
     if (_userControllerProxy.ctrl.isBound && _userShellChooser != null) {
-      String primaryShell =
-          _userShellChooser.getPrimaryUserShellAppUrl(_currentAccountId);
-      if (_currentUserShell == primaryShell) {
-        _currentUserShell =
-            _userShellChooser.getSecondaryUserShellAppUrl(_currentAccountId);
-      } else {
-        _currentUserShell = primaryShell;
-      }
-      _userControllerProxy.swapUserShell(
-          new AppConfig(url: _currentUserShell), () {});
+      UserShellInfo info = _userShellChooser.getNextUserShellInfo(
+        _currentAccountId,
+      );
+
+      _updatePresentation(info);
+
+      _userControllerProxy.swapUserShell(new AppConfig(url: info.name), () {});
     }
+  }
+
+  void _updatePresentation(UserShellInfo info) {
+    setDisplayUsage(info.displayUsage);
+    setDisplaySizeInMm(info.screenWidthMm, info.screenHeightMm);
   }
 
   /// |PresentationModeListener|.
@@ -291,6 +295,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   /// Called when the the user shell logs out.
   void onLogout() {
     trace('logout');
+    setDisplayUsage(DisplayUsage.kClose);
+    setDisplaySizeInMm(0.0, 0.0);
     refreshUsers();
     _childViewConnection = null;
     _presentationBinding.close();
@@ -419,13 +425,16 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// |Presentation|.
   @override
-  void getPresentationMode(GetPresentationModeCallback callback) {  // ignore: override_on_non_overriding_method
+  // ignore: override_on_non_overriding_method
+  void getPresentationMode(GetPresentationModeCallback callback) {
     // presentation.getPresentationMode(callback);
   }
 
   /// |Presentation|.
   @override
-  void setPresentationModeListener(InterfaceHandle<PresentationModeListener> listener) {  // ignore: override_on_non_overriding_method
+  // ignore: override_on_non_overriding_method
+  void setPresentationModeListener(
+      InterfaceHandle<PresentationModeListener> listener) {
     // presentation.setPresentationModeListener(listener);
   }
 
