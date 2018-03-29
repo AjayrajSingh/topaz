@@ -122,11 +122,6 @@ template("dart1_jit_app") {
   snapshot_path = "$target_gen_dir/${target_name}_snapshot.bin"
   depfile_path = "${snapshot_path}.d"
 
-  dart_snapshotter_label =
-      "//topaz/runtime/dart_runner/snapshotter($host_toolchain)"
-  dart_snapshotter_dir = get_label_info(dart_snapshotter_label, "root_out_dir")
-  dart_snapshotter = "$dart_snapshotter_dir/dart_snapshotter"
-
   snapshot_target_name = target_name + "_snapshot"
 
   action(snapshot_target_name) {
@@ -134,34 +129,51 @@ template("dart1_jit_app") {
       testonly = invoker.testonly
     }
 
-    depfile = depfile_path
+    core_snapshot_label =
+        "//topaz/runtime/dart_runner/embedder:jit_runner_snapshot"
+    core_snapshot_gen_dir =
+        get_label_info(core_snapshot_label, "target_gen_dir")
+    vm_snapshot_data = "$core_snapshot_gen_dir/jit_runner_snapshot_vm_data.bin"
+    vm_snapshot_instructions =
+        "$core_snapshot_gen_dir/jit_runner_snapshot_vm_instructions.bin"
+    isolate_snapshot_data =
+        "$core_snapshot_gen_dir/jit_runner_snapshot_isolate_data.bin"
+    isolate_snapshot_instructions =
+        "$core_snapshot_gen_dir/jit_runner_snapshot_isolate_instructions.bin"
 
+    deps = [
+      ":$dart_library_target_name",
+      _gen_snapshot_label,
+      core_snapshot_label,
+    ]
+    depfile = depfile_path
+    inputs = [
+      vm_snapshot_data,
+      vm_snapshot_instructions,
+      isolate_snapshot_data,
+      isolate_snapshot_instructions,
+    ]
     outputs = [
       snapshot_path,
     ]
-
-    inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files
 
     dart_target_gen_dir =
         get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
     rebased_packages_path =
         rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
-    rebased_snapshot_path = rebase_path(snapshot_path)
-    rebased_depfile_path = rebase_path(depfile_path)
-    rebased_build_output_path = rebase_path(snapshot_path, root_build_dir)
 
-    script = dart_snapshotter
+    script = _gen_snapshot
     args = [
-      "--packages=$rebased_packages_path",
-      "--snapshot=$rebased_snapshot_path",
-      "--depfile=$rebased_depfile_path",
-      "--build-output=$rebased_build_output_path",
+      "--snapshot_kind=script",
+      "--dependencies=" + rebase_path(depfile),
+      "--packages=" + rebased_packages_path,
+      "--vm_snapshot_data=" + rebase_path(vm_snapshot_data),
+      "--vm_snapshot_instructions=" + rebase_path(vm_snapshot_instructions),
+      "--isolate_snapshot_data=" + rebase_path(isolate_snapshot_data),
+      "--isolate_snapshot_instructions=" +
+          rebase_path(isolate_snapshot_instructions),
+      "--script_snapshot=" + rebase_path(snapshot_path),
       rebase_path(invoker.main_dart),
-    ]
-
-    deps = [
-      ":$dart_library_target_name",
-      dart_snapshotter_label,
     ]
   }
 

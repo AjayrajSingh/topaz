@@ -167,7 +167,7 @@ package("dart2_aot_runner") {
 package("dart1_jit_runner") {
   deps = [
     ":dart_jit_runner_bin",
-    "embedder:snapshot_bin",
+    "embedder:jit_runner_snapshot",
   ]
 
   binary = "dart_jit_runner"
@@ -181,12 +181,24 @@ package("dart1_jit_runner") {
 
   resources = [
     {
-      path = rebase_path("$target_gen_dir/embedder/snapshot_vm_isolate.bin")
-      dest = "vm_snapshot.bin"
+      path = rebase_path(
+              "$target_gen_dir/embedder/jit_runner_snapshot_vm_data.bin")
+      dest = "vm_snapshot_data.bin"
     },
     {
-      path = rebase_path("$target_gen_dir/embedder/snapshot_isolate.bin")
-      dest = "isolate_core_snapshot.bin"
+      path = rebase_path(
+              "$target_gen_dir/embedder/jit_runner_snapshot_vm_instructions.bin")
+      dest = "vm_snapshot_instructions.bin"
+    },
+    {
+      path = rebase_path(
+              "$target_gen_dir/embedder/jit_runner_snapshot_isolate_data.bin")
+      dest = "isolate_core_snapshot_data.bin"
+    },
+    {
+      path = rebase_path(
+              "$target_gen_dir/embedder/jit_runner_snapshot_isolate_instructions.bin")
+      dest = "isolate_core_snapshot_instructions.bin"
     },
   ]
 }
@@ -217,12 +229,20 @@ package("dart2_jit_runner") {
       dest = "dart2"
     },
     {
-      path = rebase_path("$target_gen_dir/kernel/vm_isolate_snapshot.bin")
-      dest = "vm_snapshot.bin"
+      path = rebase_path("$target_gen_dir/kernel/vm_data.bin")
+      dest = "vm_snapshot_data.bin"
     },
     {
-      path = rebase_path("$target_gen_dir/kernel/isolate_snapshot.bin")
-      dest = "isolate_core_snapshot.bin"
+      path = rebase_path("$target_gen_dir/kernel/vm_instructions.bin")
+      dest = "vm_snapshot_instructions.bin"
+    },
+    {
+      path = rebase_path("$target_gen_dir/kernel/isolate_data.bin")
+      dest = "isolate_core_snapshot_data.bin"
+    },
+    {
+      path = rebase_path("$target_gen_dir/kernel/isolate_instructions.bin")
+      dest = "isolate_core_snapshot_instructions.bin"
     },
   ]
   if (is_debug) {
@@ -239,7 +259,7 @@ package("dart2_jit_runner") {
 package("dart1_script_runner") {
   deps = [
     ":dart_jit_runner_bin",
-    "embedder:script_runner_snapshot_bin",
+    "embedder:script_runner_snapshot",
   ]
 
   binary = "dart_jit_runner"
@@ -254,13 +274,23 @@ package("dart1_script_runner") {
   resources = [
     {
       path = rebase_path(
-              "$target_gen_dir/embedder/script_runner_snapshot_vm_isolate.bin")
-      dest = "vm_snapshot.bin"
+              "$target_gen_dir/embedder/script_runner_snapshot_vm_data.bin")
+      dest = "vm_snapshot_data.bin"
     },
     {
       path = rebase_path(
-              "$target_gen_dir/embedder/script_runner_snapshot_isolate.bin")
-      dest = "isolate_core_snapshot.bin"
+              "$target_gen_dir/embedder/script_runner_snapshot_vm_instructions.bin")
+      dest = "vm_snapshot_instructions.bin"
+    },
+    {
+      path = rebase_path(
+              "$target_gen_dir/embedder/script_runner_snapshot_isolate_data.bin")
+      dest = "isolate_core_snapshot_data.bin"
+    },
+    {
+      path = rebase_path(
+              "$target_gen_dir/embedder/script_runner_snapshot_isolate_instructions.bin")
+      dest = "isolate_core_snapshot_instructions.bin"
     },
   ]
 }

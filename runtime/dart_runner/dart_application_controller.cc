@@ -153,13 +153,19 @@ bool DartApplicationController::SetupFromScriptSnapshot() {
     return false;
   }
 
-  if (!MappedResource::LoadFromNamespace(nullptr,
-                                         "pkg/data/isolate_core_snapshot.bin",
-                                         isolate_snapshot_data_)) {
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/isolate_core_snapshot_data.bin",
+          isolate_snapshot_data_)) {
+    return false;
+  }
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/isolate_core_snapshot_instructions.bin",
+          isolate_snapshot_instructions_, true /* executable */)) {
     return false;
   }
 
-  if (!CreateIsolate(isolate_snapshot_data_.address(), nullptr)) {
+  if (!CreateIsolate(isolate_snapshot_data_.address(),
+                     isolate_snapshot_instructions_.address())) {
     return false;
   }
 
@@ -190,13 +196,19 @@ bool DartApplicationController::SetupFromSource() {
     return false;
   }
 
-  if (!MappedResource::LoadFromNamespace(nullptr,
-                                         "pkg/data/isolate_core_snapshot.bin",
-                                         isolate_snapshot_data_)) {
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/isolate_core_snapshot_data.bin",
+          isolate_snapshot_data_)) {
+    return false;
+  }
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/isolate_core_snapshot_instructions.bin",
+          isolate_snapshot_instructions_, true /* executable */)) {
     return false;
   }
 
-  if (!CreateIsolate(isolate_snapshot_data_.address(), nullptr)) {
+  if (!CreateIsolate(isolate_snapshot_data_.address(),
+                     isolate_snapshot_instructions_.address())) {
     return false;
   }
 
@@ -242,13 +254,19 @@ bool DartApplicationController::SetupFromKernel() {
     return false;
   }
 
-  if (!MappedResource::LoadFromNamespace(nullptr,
-                                         "pkg/data/isolate_core_snapshot.bin",
-                                         isolate_snapshot_data_)) {
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/isolate_core_snapshot_data.bin",
+          isolate_snapshot_data_)) {
+    return false;
+  }
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/isolate_core_snapshot_instructions.bin",
+          isolate_snapshot_instructions_, true /* executable */)) {
     return false;
   }
 
-  if (!CreateIsolate(isolate_snapshot_data_.address(), nullptr)) {
+  if (!CreateIsolate(isolate_snapshot_data_.address(),
+                     isolate_snapshot_instructions_.address())) {
     return false;
   }
 
@@ -350,7 +368,8 @@ int DartApplicationController::SetupFileDescriptor(
 }
 
 bool DartApplicationController::CreateIsolate(
-    void* isolate_snapshot_data, void* isolate_snapshot_instructions) {
+    void* isolate_snapshot_data,
+    void* isolate_snapshot_instructions) {
   // Create the isolate from the snapshot.
   char* error = nullptr;
 
@@ -491,7 +510,9 @@ void DartApplicationController::MessageEpilogue() {
 }
 
 async_wait_result_t DartApplicationController::OnIdleTimer(
-    async_t* async, zx_status_t status, const zx_packet_signal* signal) {
+    async_t* async,
+    zx_status_t status,
+    const zx_packet_signal* signal) {
   if ((status != ZX_OK) || !(signal->observed & ZX_TIMER_SIGNALED) ||
       !Dart_CurrentIsolate()) {
     // Timer closed or isolate shutdown.

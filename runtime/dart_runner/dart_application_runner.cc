@@ -50,18 +50,21 @@ const char* kDart2VMArgs[] = {
     // clang-format on
 };
 
-void PushBackAll(std::vector<const char*>* args, const char** argv,
+void PushBackAll(std::vector<const char*>* args,
+                 const char** argv,
                  size_t argc) {
   for (size_t i = 0; i < argc; ++i) {
     args->push_back(argv[i]);
   }
 }
 
-Dart_Isolate IsolateCreateCallback(const char* uri, const char* main,
+Dart_Isolate IsolateCreateCallback(const char* uri,
+                                   const char* main,
                                    const char* package_root,
                                    const char* package_config,
                                    Dart_IsolateFlags* flags,
-                                   void* callback_data, char** error) {
+                                   void* callback_data,
+                                   char** error) {
   if (std::string(uri) == DART_VM_SERVICE_ISOLATE_NAME) {
 #if defined(NDEBUG)
     *error = strdup("The service isolate is not implemented in release mode");
@@ -117,7 +120,8 @@ void RunApplication(
                      Dart_Timeline_Event_Duration, 0, NULL, NULL);
   if (success) {
     loop.task_runner()->PostTask([&loop, &app] {
-      if (!app.Main()) loop.PostQuitTask();
+      if (!app.Main())
+        loop.PostQuitTask();
     });
 
     loop.Run();
@@ -176,13 +180,19 @@ DartApplicationRunner::DartApplicationRunner()
   params.vm_snapshot_data = ::_kDartVmSnapshotData;
   params.vm_snapshot_instructions = ::_kDartVmSnapshotInstructions;
 #else
-  if (!MappedResource::LoadFromNamespace(nullptr, "pkg/data/vm_snapshot.bin",
-                                         vm_snapshot_data_)) {
-    FXL_LOG(FATAL) << "Failed to load vm snapshot";
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/vm_snapshot_data.bin", vm_snapshot_data_)) {
+    FXL_LOG(FATAL) << "Failed to load vm snapshot data";
+  }
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/vm_snapshot_instructions.bin",
+          vm_snapshot_instructions_, true /* executable */)) {
+    FXL_LOG(FATAL) << "Failed to load vm snapshot instructions";
   }
   params.vm_snapshot_data =
       reinterpret_cast<const uint8_t*>(vm_snapshot_data_.address());
-  params.vm_snapshot_instructions = NULL;
+  params.vm_snapshot_instructions =
+      reinterpret_cast<const uint8_t*>(vm_snapshot_instructions_.address());
 #endif
   params.create = IsolateCreateCallback;
   params.shutdown = IsolateShutdownCallback;
@@ -191,12 +201,14 @@ DartApplicationRunner::DartApplicationRunner()
   params.get_service_assets = GetVMServiceAssetsArchiveCallback;
 #endif
   char* error = Dart_Initialize(&params);
-  if (error) FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
+  if (error)
+    FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
 }
 
 DartApplicationRunner::~DartApplicationRunner() {
   char* error = Dart_Cleanup();
-  if (error) FXL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
+  if (error)
+    FXL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
 }
 
 void DartApplicationRunner::StartApplication(

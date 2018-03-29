@@ -17,7 +17,8 @@ namespace dart_runner {
 
 bool MappedResource::LoadFromNamespace(fdio_ns_t* namespc,
                                        const std::string& path,
-                                       MappedResource& resource) {
+                                       MappedResource& resource,
+                                       bool executable) {
   TRACE_DURATION("dart", "LoadFromNamespace", "path", path);
 
   // openat of a path with a leading '/' ignores the namespace fd.
@@ -44,11 +45,19 @@ bool MappedResource::LoadFromNamespace(fdio_ns_t* namespc,
 
 bool MappedResource::LoadFromVmo(const std::string& path,
                                  fsl::SizedVmo resource_vmo,
-                                 MappedResource& resource) {
+                                 MappedResource& resource,
+                                 bool executable) {
+  if (resource_vmo.size() == 0) {
+    return true;
+  }
+
+  uint32_t flags = ZX_VM_FLAG_PERM_READ;
+  if (executable) {
+    flags |= ZX_VM_FLAG_PERM_EXECUTE;
+  }
   uintptr_t addr;
-  zx_status_t status =
-      zx::vmar::root_self().map(0, resource_vmo.vmo(), 0, resource_vmo.size(),
-                                ZX_VM_FLAG_PERM_READ, &addr);
+  zx_status_t status = zx::vmar::root_self().map(
+      0, resource_vmo.vmo(), 0, resource_vmo.size(), flags, &addr);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to map " << path << ": "
                    << zx_status_get_string(status);

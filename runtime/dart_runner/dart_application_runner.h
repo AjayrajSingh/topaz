@@ -51,6 +51,7 @@ class DartApplicationRunner : public component::ApplicationRunner {
   std::vector<ControllerToken*> controllers_;
 #if !defined(AOT_RUNTIME)
   MappedResource vm_snapshot_data_;
+  MappedResource vm_snapshot_instructions_;
 #endif
 
   FXL_DISALLOW_COPY_AND_ASSIGN(DartApplicationRunner);

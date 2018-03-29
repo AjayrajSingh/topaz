@@ -21,9 +21,11 @@ namespace dart_runner {
 namespace {
 
 MappedResource mapped_isolate_snapshot_data;
+MappedResource mapped_isolate_snapshot_instructions;
 tonic::DartLibraryNatives* service_natives = nullptr;
 
-Dart_NativeFunction GetNativeFunction(Dart_Handle name, int argument_count,
+Dart_NativeFunction GetNativeFunction(Dart_Handle name,
+                                      int argument_count,
                                       bool* auto_setup_scope) {
   FXL_CHECK(service_natives);
   return service_natives->GetNativeFunction(name, argument_count,
@@ -70,7 +72,8 @@ void EmbedderInformationCallback(Dart_EmbedderInformation* info) {
 
 }  // namespace
 
-Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
+Dart_Isolate CreateServiceIsolate(const char* uri,
+                                  Dart_IsolateFlags* flags,
                                   char** error) {
   Dart_SetEmbedderInformationCallback(EmbedderInformationCallback);
 
@@ -105,13 +108,21 @@ Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
     return nullptr;
   }
 #else
-  if (!MappedResource::LoadFromNamespace(nullptr,
-                                         "pkg/data/isolate_core_snapshot.bin",
-                                         mapped_isolate_snapshot_data)) {
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/isolate_core_snapshot_data.bin",
+          mapped_isolate_snapshot_data)) {
     *error = strdup("Failed to load core snapshot for service isolate");
     return nullptr;
   }
   isolate_snapshot_data = mapped_isolate_snapshot_data.address();
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/isolate_core_snapshot_instructions.bin",
+          mapped_isolate_snapshot_instructions, true /* executable */)) {
+    *error = strdup("Failed to load core snapshot for service isolate");
+    return nullptr;
+  }
+  isolate_snapshot_instructions =
+      mapped_isolate_snapshot_instructions.address();
 #endif
 
   auto state = new tonic::DartState();

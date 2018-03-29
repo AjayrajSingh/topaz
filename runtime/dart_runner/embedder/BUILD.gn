@@ -27,7 +27,7 @@ _gen_snapshot = "$_gen_snapshot_dir/$_gen_snapshot_exe"
 #
 #   dart_deps (optional)
 #     dart_library() targets imported by 'snapshot_dart'.
-template("gen_snapshot_cc") {
+template("core_snapshot") {
   assert(defined(invoker.snapshot_dart), "Must define main_dart")
   snapshot_dart = invoker.snapshot_dart
   name = target_name
@@ -46,7 +46,7 @@ template("gen_snapshot_cc") {
     }
   }
 
-  action("${name}_bin") {
+  action(name) {
     deps = [
       _gen_snapshot_label,
     ]
@@ -59,20 +59,27 @@ template("gen_snapshot_cc") {
                snapshot_dart,
              ]
 
-    vm_isolate_snapshot = "$target_gen_dir/${name}_vm_isolate.bin"
-    isolate_snapshot = "$target_gen_dir/${name}_isolate.bin"
+    vm_data = "$target_gen_dir/${name}_vm_data.bin"
+    vm_instructions = "$target_gen_dir/${name}_vm_instructions.bin"
+    isolate_data = "$target_gen_dir/${name}_isolate_data.bin"
+    isolate_instructions = "$target_gen_dir/${name}_isolate_instructions.bin"
 
     outputs = [
-      vm_isolate_snapshot,
-      isolate_snapshot,
+      vm_data,
+      vm_instructions,
+      isolate_data,
+      isolate_instructions,
     ]
 
     script = _gen_snapshot
     args = [
       "--snapshot_kind=core",
-      "--vm_snapshot_data=" + rebase_path(vm_isolate_snapshot, root_build_dir),
-      "--isolate_snapshot_data=" +
-          rebase_path(isolate_snapshot, root_build_dir),
+      "--vm_snapshot_data=" + rebase_path(vm_data, root_build_dir),
+      "--vm_snapshot_instructions=" +
+          rebase_path(vm_instructions, root_build_dir),
+      "--isolate_snapshot_data=" + rebase_path(isolate_data, root_build_dir),
+      "--isolate_snapshot_instructions=" +
+          rebase_path(isolate_instructions, root_build_dir),
       "--url_mapping=dart:fuchsia.builtin," + rebase_path("builtin.dart"),
       "--url_mapping=dart:zircon," + rebase_path(zircon_sdk_ext_lib),
       "--url_mapping=dart:fuchsia," + rebase_path(fuchsia_sdk_ext_lib),
@@ -89,56 +96,13 @@ template("gen_snapshot_cc") {
     }
     args += [ rebase_path(snapshot_dart) ]
   }
-
-  action("${name}_file") {
-    deps = [
-      ":${name}_bin",
-    ]
-    vm_input_bin = "$target_gen_dir/${name}_vm_isolate.bin"
-    input_bin = "$target_gen_dir/${name}_isolate.bin"
-    snapshot_template = "snapshot.cc.tmpl"
-    snapshot_file = "$target_gen_dir/dart_${name}.cc"
-
-    inputs = [
-      snapshot_template,
-      vm_input_bin,
-      input_bin,
-    ]
-
-    outputs = [
-      snapshot_file,
-    ]
-
-    script = "//third_party/dart/runtime/tools/create_snapshot_file.py"
-    args = [
-      "--vm_input_bin",
-      rebase_path(vm_input_bin),
-      "--input_bin",
-      rebase_path(input_bin),
-      "--input_cc",
-      rebase_path(snapshot_template),
-      "--output",
-      rebase_path(snapshot_file),
-    ]
-  }
-
-  source_set(name) {
-    deps = [
-      ":${name}_file",
-    ]
-
-    sources = [
-      "$target_gen_dir/dart_${name}.cc",
-      "snapshot.h",
-    ]
-  }
 }
 
-gen_snapshot_cc("snapshot") {
+core_snapshot("jit_runner_snapshot") {
   snapshot_dart = "snapshot.dart"
 }
 
-gen_snapshot_cc("script_runner_snapshot") {
+core_snapshot("script_runner_snapshot") {
   snapshot_dart = "script_runner_snapshot.dart"
   dart_deps = [
     "//peridot/public/lib/resolver/fidl",
