@@ -120,6 +120,7 @@ class PlayerModel extends Model {
       log.fine('Updating video asset in the Player');
       _asset = asset;
       _controller
+	..pause()
         ..close()
         ..open(_asset.uri, serviceName: _kServiceName);
       _controllerHasProblem();
