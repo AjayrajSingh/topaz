@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 /// The type of detail to show with the contact's display name
-enum DetailTypeEntityData {
+enum DetailType {
   /// Primary email of the contact
   email,
 
@@ -12,4 +12,19 @@ enum DetailTypeEntityData {
 
   /// Custom contact information
   custom,
+}
+
+/// Data for filtering a list of contacts
+class FilterEntityData {
+  /// The prefix used to filter contacts
+  String prefix;
+
+  /// Detail to show with the contact's display name
+  DetailType detailType;
+
+  /// Constructor
+  FilterEntityData({
+    this.prefix = '',
+    this.detailType: DetailType.email,
+  });
 }
