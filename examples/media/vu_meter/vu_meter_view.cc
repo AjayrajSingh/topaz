@@ -13,7 +13,6 @@
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
 #include "lib/media/audio/types.h"
-#include "lib/media/fidl/audio_server.fidl.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
 
@@ -24,7 +23,7 @@ namespace examples {
 
 VuMeterView::VuMeterView(
     views_v1::ViewManagerPtr view_manager,
-    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     component::ApplicationContext* application_context,
     const VuMeterParams& params)
     : mozart::SkiaView(std::move(view_manager), std::move(view_owner_request),
@@ -44,7 +43,7 @@ VuMeterView::VuMeterView(
     Shutdown();
   });
 
-  capturer_->GetMediaType([this](media::MediaTypePtr type) {
+  capturer_->GetMediaType([this](media::MediaType type) {
     OnDefaultFormatFetched(std::move(type));
   });
 }
@@ -52,18 +51,17 @@ VuMeterView::VuMeterView(
 VuMeterView::~VuMeterView() {}
 
 bool VuMeterView::OnInputEvent(input::InputEvent event) {
-  FXL_DCHECK(event);
   bool handled = false;
-  if (event->is_pointer()) {
-    auto& pointer = event->get_pointer();
-    if (pointer->phase == input::PointerEventPhase::DOWN) {
+  if (event.is_pointer()) {
+    auto& pointer = event.pointer();
+    if (pointer.phase == input::PointerEventPhase::DOWN) {
       ToggleStartStop();
       handled = true;
     }
-  } else if (event->is_keyboard()) {
-    auto& keyboard = event->get_keyboard();
-    if (keyboard->phase == input::KeyboardEventPhase::PRESSED) {
-      switch (keyboard->hid_usage) {
+  } else if (event.is_keyboard()) {
+    auto& keyboard = event.keyboard();
+    if (keyboard.phase == input::KeyboardEventPhase::PRESSED) {
+      switch (keyboard.hid_usage) {
         case HID_USAGE_KEY_SPACE:
           ToggleStartStop();
           handled = true;
@@ -122,7 +120,7 @@ void VuMeterView::SendCaptureRequest() {
   // clang-format off
   capturer_->CaptureAt(
       0, payload_buffer_.size() / kBytesPerFrame,
-      [this](media::MediaPacketPtr packet) {
+      [this](media::MediaPacket packet) {
         OnPacketCaptured(std::move(packet));
       });
   // clang-format on
@@ -130,12 +128,11 @@ void VuMeterView::SendCaptureRequest() {
   request_in_flight_ = true;
 }
 
-void VuMeterView::OnDefaultFormatFetched(media::MediaTypePtr default_type) {
+void VuMeterView::OnDefaultFormatFetched(media::MediaType default_type) {
   // Set the media type, keep the default sample rate but make sure that we
   // normalize to stereo 16-bit LPCM.
-  FXL_DCHECK(!default_type->details.is_null());
-  FXL_DCHECK(default_type->details->is_audio());
-  const auto& audio_details = *(default_type->details->get_audio());
+  FXL_DCHECK(default_type.details.is_audio());
+  const auto& audio_details = default_type.details.audio();
   capturer_->SetMediaType(media::CreateLpcmMediaType(
         media::AudioSampleFormat::SIGNED_16, 2, audio_details.frames_per_second));
 
@@ -162,7 +159,7 @@ void VuMeterView::OnDefaultFormatFetched(media::MediaTypePtr default_type) {
   ToggleStartStop();
 }
 
-void VuMeterView::OnPacketCaptured(media::MediaPacketPtr packet) {
+void VuMeterView::OnPacketCaptured(media::MediaPacket packet) {
   request_in_flight_ = false;
   if (!started_) {
     return;

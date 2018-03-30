@@ -7,10 +7,11 @@
 #include <memory>
 #include <queue>
 
+#include <fuchsia/cpp/media.h>
+
 #include "examples/ui/lib/host_canvas_cycler.h"
 #include "lib/app/cpp/application_context.h"
 #include "lib/fxl/macros.h"
-#include "lib/media/fidl/media_player.fidl.h"
 #include "lib/media/timeline/timeline_function.h"
 #include "lib/ui/view_framework/base_view.h"
 #include "topaz/examples/media/media_player/media_player_params.h"
@@ -20,7 +21,7 @@ namespace examples {
 class MediaPlayerView : public mozart::BaseView {
  public:
   MediaPlayerView(views_v1::ViewManagerPtr view_manager,
-                  f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+                  fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                   component::ApplicationContext* application_context,
                   const MediaPlayerParams& params);
 
@@ -33,7 +34,7 @@ class MediaPlayerView : public mozart::BaseView {
   void OnPropertiesChanged(views_v1::ViewProperties old_properties) override;
   void OnSceneInvalidated(images::PresentationInfo presentation_info) override;
   void OnChildAttached(uint32_t child_key,
-                       mozart::ViewInfoPtr child_view_info) override;
+                       views_v1::ViewInfo child_view_info) override;
   void OnChildUnavailable(uint32_t child_key) override;
   bool OnInputEvent(input::InputEvent event) override;
 
@@ -46,7 +47,7 @@ class MediaPlayerView : public mozart::BaseView {
   // Handles a status update from the player. When called with the default
   // argument values, initiates status updates.
   void HandlePlayerStatusUpdates(
-      uint64_t version = media::MediaPlayer::kInitialStatus,
+      uint64_t version = media::kInitialStatus,
       media::MediaPlayerStatusPtr status = nullptr);
 
   // Toggles between play and pause.
@@ -69,16 +70,15 @@ class MediaPlayerView : public mozart::BaseView {
   std::unique_ptr<scenic_lib::EntityNode> video_host_node_;
 
   media::MediaPlayerPtr media_player_;
-  views_v1::ViewProperties video_view_properties_;
-  mozart::Size video_size_;
-  mozart::Size pixel_aspect_ratio_;
+  geometry::Size video_size_;
+  geometry::Size pixel_aspect_ratio_;
   State previous_state_ = State::kPaused;
   State state_ = State::kPaused;
   media::TimelineFunction timeline_function_;
   media::MediaMetadataPtr metadata_;
-  mozart::RectF content_rect_;
-  mozart::RectF controls_rect_;
-  mozart::RectF progress_bar_rect_;
+  geometry::RectF content_rect_;
+  geometry::RectF controls_rect_;
+  geometry::RectF progress_bar_rect_;
   bool metadata_shown_ = false;
   bool problem_shown_ = false;
 

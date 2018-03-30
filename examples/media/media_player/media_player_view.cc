@@ -11,10 +11,9 @@
 
 #include "garnet/bin/media/util/file_channel.h"
 #include "lib/app/cpp/connect.h"
+#include "lib/fidl/cpp/optional.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
-#include "lib/media/fidl/media_player.fidl.h"
-#include "lib/media/fidl/net_media_service.fidl.h"
 #include "lib/media/timeline/timeline.h"
 #include "lib/url/gurl.h"
 #include "third_party/skia/include/core/SkColor.h"
@@ -44,20 +43,16 @@ constexpr SkColor kProgressBarBackgroundColor = 0xffb39ddb;  // Deep Purple 200
 constexpr SkColor kProgressBarSymbolColor = 0xffffffff;
 
 // Determines whether the rectangle contains the point x,y.
-bool Contains(const mozart::RectF& rect, float x, float y) {
+bool Contains(const geometry::RectF& rect, float x, float y) {
   return rect.x <= x && rect.y <= y && rect.x + rect.width >= x &&
          rect.y + rect.height >= y;
-}
-
-bool operator!=(const mozart::Size& lhs, const mozart::Size& rhs) {
-  return lhs.width != rhs.width || lhs.height != rhs.height;
 }
 
 }  // namespace
 
 MediaPlayerView::MediaPlayerView(
     views_v1::ViewManagerPtr view_manager,
-    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     component::ApplicationContext* application_context,
     const MediaPlayerParams& params)
     : mozart::BaseView(std::move(view_manager),
@@ -88,7 +83,7 @@ MediaPlayerView::MediaPlayerView(
 
     views_v1_token::ViewOwnerPtr video_view_owner;
     media_player_->CreateView(
-        application_context->ConnectToEnvironmentService<mozart::ViewManager>()
+        application_context->ConnectToEnvironmentService<views_v1::ViewManager>()
             .Unbind(),
         video_view_owner.NewRequest());
 
@@ -104,7 +99,7 @@ MediaPlayerView::MediaPlayerView(
           application_context
               ->ConnectToEnvironmentService<media::NetMediaService>();
 
-      f1dl::InterfaceHandle<media::MediaPlayer> media_player_handle;
+      fidl::InterfaceHandle<media::MediaPlayer> media_player_handle;
       media_player_->AddBinding(media_player_handle.NewRequest());
 
       net_media_service->PublishMediaPlayer(params.service_name(),
@@ -145,14 +140,13 @@ MediaPlayerView::MediaPlayerView(
 MediaPlayerView::~MediaPlayerView() {}
 
 bool MediaPlayerView::OnInputEvent(input::InputEvent event) {
-  FXL_DCHECK(event);
   bool handled = false;
-  if (event->is_pointer()) {
-    const auto& pointer = event->get_pointer();
-    if (pointer->phase == input::PointerEventPhase::DOWN) {
-      if (metadata_ && Contains(progress_bar_rect_, pointer->x, pointer->y)) {
+  if (event.is_pointer()) {
+    const auto& pointer = event.pointer();
+    if (pointer.phase == input::PointerEventPhase::DOWN) {
+      if (metadata_ && Contains(progress_bar_rect_, pointer.x, pointer.y)) {
         // User poked the progress bar...seek.
-        media_player_->Seek((pointer->x - progress_bar_rect_.x) *
+        media_player_->Seek((pointer.x - progress_bar_rect_.x) *
                             metadata_->duration / progress_bar_rect_.width);
         if (state_ != State::kPlaying) {
           media_player_->Play();
@@ -163,10 +157,10 @@ bool MediaPlayerView::OnInputEvent(input::InputEvent event) {
       }
       handled = true;
     }
-  } else if (event->is_keyboard()) {
-    auto& keyboard = event->get_keyboard();
-    if (keyboard->phase == input::KeyboardEventPhase::PRESSED) {
-      switch (keyboard->hid_usage) {
+  } else if (event.is_keyboard()) {
+    auto& keyboard = event.keyboard();
+    if (keyboard.phase == input::KeyboardEventPhase::PRESSED) {
+      switch (keyboard.hid_usage) {
         case HID_USAGE_KEY_SPACE:
           TogglePlayPause();
           handled = true;
@@ -185,8 +179,6 @@ bool MediaPlayerView::OnInputEvent(input::InputEvent event) {
 
 void MediaPlayerView::OnPropertiesChanged(
     views_v1::ViewProperties old_properties) {
-  FXL_DCHECK(properties());
-
   Layout();
 }
 
@@ -204,7 +196,7 @@ void MediaPlayerView::Layout() {
 
   // Compute maximum size of video content after reserving space
   // for decorations.
-  mozart::SizeF max_content_size;
+  geometry::SizeF max_content_size;
   max_content_size.width = logical_size().width - kMargin * 2;
   max_content_size.height =
       logical_size().height - kControlsHeight - kMargin * 3;
@@ -227,7 +219,7 @@ void MediaPlayerView::Layout() {
   }
 
   // Add back in the decorations and center within view.
-  mozart::RectF ui_rect;
+  geometry::RectF ui_rect;
   ui_rect.width = content_rect_.width;
   ui_rect.height = content_rect_.height + kControlsHeight + kMargin;
   ui_rect.x = (logical_size().width - ui_rect.width) / 2;
@@ -251,18 +243,12 @@ void MediaPlayerView::Layout() {
   progress_bar_rect_.height = controls_rect_.height;
 
   // Ask the view to fill the space.
-  auto view_properties = mozart::ViewProperties::New();
-  view_properties->view_layout = mozart::ViewLayout::New();
-  view_properties->view_layout->size = mozart::SizeF::New();
-  view_properties->view_layout->size->width = content_rect_.width;
-  view_properties->view_layout->size->height = content_rect_.height;
-  view_properties->view_layout->inset = mozart::InsetF::New();
-
-  if (!video_view_properties_.Equals(view_properties)) {
-    video_view_properties_ = view_properties.Clone();
-    GetViewContainer()->SetChildProperties(kVideoChildKey,
-                                           std::move(view_properties));
-  }
+  views_v1::ViewProperties view_properties;
+  view_properties.view_layout = views_v1::ViewLayout::New();
+  view_properties.view_layout->size.width = content_rect_.width;
+  view_properties.view_layout->size.height = content_rect_.height;
+  GetViewContainer()->SetChildProperties(kVideoChildKey,
+                                         fidl::MakeOptional(std::move(view_properties)));
 
   InvalidateScene();
 }
@@ -307,7 +293,7 @@ void MediaPlayerView::OnSceneInvalidated(
 }
 
 void MediaPlayerView::OnChildAttached(uint32_t child_key,
-                                      mozart::ViewInfoPtr child_view_info) {
+                                      views_v1::ViewInfo child_view_info) {
   FXL_DCHECK(child_key == kVideoChildKey);
 
   parent_node().AddChild(*video_host_node_);
@@ -373,8 +359,7 @@ void MediaPlayerView::HandlePlayerStatusUpdates(
   if (status) {
     // Process status received from the player.
     if (status->timeline_transform) {
-      timeline_function_ =
-          static_cast<media::TimelineFunction>(status->timeline_transform);
+      timeline_function_ = media::TimelineFunction(*status->timeline_transform);
     }
 
     previous_state_ = state_;
@@ -441,8 +426,8 @@ void MediaPlayerView::HandlePlayerStatusUpdates(
 
   // Request a status update.
   media_player_->GetStatus(
-      version, [this](uint64_t version, media::MediaPlayerStatusPtr status) {
-        HandlePlayerStatusUpdates(version, std::move(status));
+      version, [this](uint64_t version, media::MediaPlayerStatus status) {
+        HandlePlayerStatusUpdates(version, fidl::MakeOptional(std::move(status)));
       });
 }
 

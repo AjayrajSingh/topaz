@@ -6,12 +6,13 @@
 
 #include <memory>
 #include <queue>
+
 #include <fbl/vmo_mapper.h>
+#include <fuchsia/cpp/media.h>
 
 #include "examples/ui/lib/skia_view.h"
 #include "lib/app/cpp/application_context.h"
 #include "lib/fxl/macros.h"
-#include "lib/media/fidl/audio_capturer.fidl.h"
 #include "topaz/examples/media/vu_meter/vu_meter_params.h"
 
 namespace examples {
@@ -19,7 +20,7 @@ namespace examples {
 class VuMeterView : public mozart::SkiaView {
  public:
   VuMeterView(views_v1::ViewManagerPtr view_manager,
-              f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+              fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
               component::ApplicationContext* application_context,
               const VuMeterParams& params);
 
@@ -70,8 +71,8 @@ class VuMeterView : public mozart::SkiaView {
   // Shutdown the app
   void Shutdown();
 
-  void OnDefaultFormatFetched(media::MediaTypePtr default_type);
-  void OnPacketCaptured(media::MediaPacketPtr packet);
+  void OnDefaultFormatFetched(media::MediaType default_type);
+  void OnPacketCaptured(media::MediaPacket packet);
 
   media::AudioCapturerPtr capturer_;
   fbl::VmoMapper payload_buffer_;
