@@ -160,7 +160,7 @@ class ContactsPickerModuleModel extends ModuleModel {
 
         // Set the result in the Link.
         // TODO: Use an output noun instead.
-        link.set(
+        link.set_(
           const <String>['selectedContact'],
           json.encode(entityReference),
         );

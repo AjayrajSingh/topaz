@@ -10,7 +10,7 @@ import 'package:lib.agent.dart/agent.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.auth/auth.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';

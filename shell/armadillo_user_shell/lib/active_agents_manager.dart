@@ -72,7 +72,7 @@ class _AgentProviderWatcherImpl extends AgentProviderWatcher {
       ..clear()
       ..addAll(agentUrls);
     log.fine('agent urls: $agentUrls');
-    link.set(null, json.encode(agentUrls));
+    link.set_(null, json.encode(agentUrls));
   }
 }
 

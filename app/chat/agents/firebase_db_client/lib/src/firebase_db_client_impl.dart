@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:convert' show json;
 
-import 'package:fuchsia.fidl.auth/auth.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
 import 'package:lib.logging/logging.dart';
 
 import 'package:config/config.dart';

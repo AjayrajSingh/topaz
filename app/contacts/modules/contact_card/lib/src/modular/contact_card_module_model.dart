@@ -5,7 +5,6 @@
 import 'dart:async';
 
 import 'package:entity_schemas/entities.dart' as entities;
-import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';

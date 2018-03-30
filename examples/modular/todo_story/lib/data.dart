@@ -122,7 +122,7 @@ class LinkConnector extends LinkWatcher {
   Future<Null> _setLink() async {
     // This implementation can lose data because the Link needs an interface to
     // reconcile conflicts.
-    (await _link).set(<String>['items'],
+    (await _link).set_(<String>['items'],
         json.encode(_items.map((TodoItem item) => item.text).toList()));
   }
 }

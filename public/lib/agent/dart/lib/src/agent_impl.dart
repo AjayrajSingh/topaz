@@ -8,12 +8,12 @@ import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:fuchsia.fidl.auth/auth.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';
 
 export 'package:fuchsia.fidl.modular/modular.dart';
-export 'package:fuchsia.fidl.auth/auth.dart';
+export 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
 
 /// A base class for implementing an [Agent] which receives common services and
 /// also helps exposing services through an outgoing [ServiceProvider].

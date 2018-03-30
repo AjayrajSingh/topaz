@@ -102,7 +102,7 @@ class PlayerModel extends Model {
     if (_controller.problem != null) {
       _videoProgressMonitor.stop();
       log.fine(_controller.problem);
-      if (_controller.problem.type == Problem.kProblemContainerNotSupported) {
+      if (_controller.problem.type == kProblemContainerNotSupported) {
         errorMessage = 'UNSUPPORTED VIDEO LINK';
       } else {
         errorMessage = 'ERROR LOADING/PLAYING VIDEO';
@@ -172,7 +172,7 @@ class PlayerModel extends Model {
   void _handleControllerChanged() {
     // If unable to connect and cast to remote device, show loading screen for
     // 2 seconds and then return back to local video with error toast
-    if (_controller.problem?.type == Problem.kProblemConnectionFailed) {
+    if (_controller.problem?.type == kProblemConnectionFailed) {
       displayMode = DisplayMode.localLarge;
       showControlOverlay = false; // hide play controls in loading screen
       _errorTimer = new Timer(_kLoadingDuration, () {

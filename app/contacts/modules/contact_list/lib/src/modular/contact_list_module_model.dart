@@ -220,11 +220,11 @@ class ContactListModuleModel extends ModuleModel {
           log.fine('Link set: contact_entity_reference to $entityReference, '
               'contact id to ${contact.id}');
           link
-            ..set(
+            ..set_(
               const <String>['selected_contact_id'],
               json.encode(contact.id),
             )
-            ..set(
+            ..set_(
               const <String>['contact_entity_reference'],
               json.encode(entityReference),
             );
