@@ -598,11 +598,6 @@ template("dart2_aot_app") {
 #
 #   extra_entry_manifests (optional)
 #     List of AOT entry point manifest files. Most apps do not need this.
-template("dart_app") {
-  target(dart1_default_app, target_name) {
-    forward_variables_from(invoker, "*")
-  }
-}
 template("dart_jit_app") {
   dart1_jit_app(target_name) {
     forward_variables_from(invoker, "*")
@@ -620,6 +615,11 @@ template("dart1_app") {
 }
 template("dart2_app") {
   target(dart2_default_app, target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
+template("dart_app") {
+  target(dart_default_app, target_name) {
     forward_variables_from(invoker, "*")
   }
 }
