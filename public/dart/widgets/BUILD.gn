@@ -16,11 +16,9 @@ dart_library("lib.widgets") {
   ]
 
   deps = [
-    "//garnet/public/lib/ui/presentation/fidl:fidl",
+    "//garnet/public/lib/cobalt/fidl",
+    "//garnet/public/lib/ui/presentation/fidl",
     "//garnet/public/lib/ui/views/fidl:v1",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
     "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/flutter_image",

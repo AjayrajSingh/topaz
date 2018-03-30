@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fuchsia.fidl.cobalt/cobalt.dart';
 import 'package:lib.logging/logging.dart';
 
 import '../widgets/rk4_spring_simulation.dart';
@@ -15,17 +16,27 @@ const RK4SpringDescription _kSimulationDesc =
 /// Models the progress of a spring simulation.
 class TracingSpringModel extends SpringModel {
   final FrameRateTracer _frameRateTracer;
+  final Map<double, int> _targetToCobaltMetricIdMap;
 
   /// Constructor.
   TracingSpringModel({
     RK4SpringDescription springDescription: _kSimulationDesc,
     String traceName: 'TracingSpringModel',
-  })  : _frameRateTracer = new FrameRateTracer(name: traceName),
+    CobaltEncoder cobaltEncoder,
+    Map<double, int> targetToCobaltMetricIdMap: const <double, int>{},
+  })  : _frameRateTracer = new FrameRateTracer(
+          name: traceName,
+          cobaltEncoder: cobaltEncoder,
+        ),
+        _targetToCobaltMetricIdMap = targetToCobaltMetricIdMap,
         super(springDescription: springDescription);
 
   @override
   set target(double target) {
-    _frameRateTracer.start(targetName: '$target');
+    _frameRateTracer.start(
+      targetName: '$target',
+      cobaltMetricId: _targetToCobaltMetricIdMap[target],
+    );
     super.target = target;
   }
 
