@@ -8,8 +8,9 @@ import 'dart:ui';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bt;
-import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as gatt;
-import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as ble;
+import 'package:fuchsia.fidl.bluetooth_gatt/bluetooth_gatt.dart' as gatt;
+import 'package:fuchsia.fidl.bluetooth_low_energy/bluetooth_low_energy.dart'
+    as ble;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
@@ -258,7 +259,7 @@ class BLERectModuleModel extends ModuleModel
 
   @override
   void onReadValue(int id, int offset,
-      void callback(List<int> value, gatt.ErrorCode status)) {
+      void callback(Uint8List value, gatt.ErrorCode status)) {
     if (offset != 0) {
       callback(null, gatt.ErrorCode.invalidOffset);
       return;

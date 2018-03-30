@@ -5,7 +5,8 @@
 import 'dart:async';
 
 import 'package:fuchsia.fidl.bluetooth/bluetooth.dart';
-import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as ble;
+import 'package:fuchsia.fidl.bluetooth_low_energy/bluetooth_low_energy.dart'
+    as ble;
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -55,19 +56,20 @@ class _ScanFilterDialogState extends State<ScanFilterDialog> {
     return await showDialog<bool>(
             context: context,
             builder: (BuildContext context) => new AlertDialog(
-                content: new Text('Discard filters?', style: dialogTextStyle),
-                actions: <Widget>[
-                  new FlatButton(
-                      child: const Text('CANCEL'),
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                      }),
-                  new FlatButton(
-                      child: const Text('DISCARD'),
-                      onPressed: () {
-                        Navigator.of(context).pop(true);
-                      })
-                ])) ??
+                    content:
+                        new Text('Discard filters?', style: dialogTextStyle),
+                    actions: <Widget>[
+                      new FlatButton(
+                          child: const Text('CANCEL'),
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          }),
+                      new FlatButton(
+                          child: const Text('DISCARD'),
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          })
+                    ])) ??
         false;
   }
 

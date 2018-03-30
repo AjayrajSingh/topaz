@@ -5,7 +5,8 @@
 import 'dart:async';
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bt;
-import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as ble;
+import 'package:fuchsia.fidl.bluetooth_low_energy/bluetooth_low_energy.dart'
+    as ble;
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
@@ -42,8 +43,8 @@ class EddystoneModuleModel extends ModuleModel {
       serviceUuids: const <String>[kEddystoneUuid],
       serviceData: <ble.ServiceDataEntry>[
         new ble.ServiceDataEntry(
-          uuid: kEddystoneUuid,
-          data: _eddystoneDataForUrl(url))],
+            uuid: kEddystoneUuid, data: _eddystoneDataForUrl(url))
+      ],
     );
     _peripheral.startAdvertising(data, null, null, 1000, false,
         (bt.Status status, String advertisementId) {

@@ -10,7 +10,8 @@ flutter_app("ble_rect") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//garnet/public/lib/bluetooth/fidl:fidl",
+    "//garnet/public/lib/bluetooth/fidl:bluetooth_gatt",
+    "//garnet/public/lib/bluetooth/fidl:bluetooth_low_energy",
     "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/logging:lib.logging",
