@@ -20,29 +20,29 @@ WebViewProvider::WebViewProvider(const std::string url)
   }
 
   context_->outgoing_services()->AddService<views_v1::ViewProvider>(
-      [this](f1dl::InterfaceRequest<ViewProvider> request) {
+      [this](fidl::InterfaceRequest<ViewProvider> request) {
         FXL_LOG(INFO) << "Add ViewProvider binding";
         view_provider_binding_.Bind(std::move(request));
       });
   context_->outgoing_services()->AddService<modular::Module>(
-      [this](f1dl::InterfaceRequest<modular::Module> request) {
+      [this](fidl::InterfaceRequest<modular::Module> request) {
         FXL_LOG(INFO) << "got request for module service";
         module_binding_.Bind(std::move(request));
       });
   context_->outgoing_services()->AddService<modular::Lifecycle>(
-      [this](f1dl::InterfaceRequest<modular::Lifecycle> request) {
+      [this](fidl::InterfaceRequest<modular::Lifecycle> request) {
         FXL_LOG(INFO) << "got request for lifecycle service";
         lifecycle_binding_.Bind(std::move(request));
       });
 }
 
 void WebViewProvider::CreateView(
-    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
-    f1dl::InterfaceRequest<component::ServiceProvider> view_services) {
+    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<component::ServiceProvider> view_services) {
   FXL_LOG(INFO) << "CreateView";
   FXL_DCHECK(!view_);
   view_ = std::make_unique<WebViewImpl>(
-      context_->ConnectToEnvironmentService<mozart::ViewManager>(),
+      context_->ConnectToEnvironmentService<views_v1::ViewManager>(),
       std::move(view_owner_request), std::move(view_services), url_);
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   if (context_writer_) {
@@ -60,14 +60,14 @@ void WebViewProvider::CreateView(
 }
 
 void WebViewProvider::Initialize(
-    f1dl::InterfaceHandle<modular::ModuleContext> context,
-    f1dl::InterfaceRequest<component::ServiceProvider> outgoing_services) {
+    fidl::InterfaceHandle<modular::ModuleContext> context,
+    fidl::InterfaceRequest<component::ServiceProvider> outgoing_services) {
   auto context_ptr = context.Bind();
   context_ptr->GetLink(nullptr, main_link_.NewRequest());
   main_link_->Watch(main_link_watcher_binding_.NewBinding());
 
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
-  maxwell::IntelligenceServicesPtr intelligence_services;
+  modular::IntelligenceServicesPtr intelligence_services;
   context_ptr->GetIntelligenceServices(intelligence_services.NewRequest());
   intelligence_services->GetContextWriter(context_writer_.NewRequest());
   context_ptr->GetComponentContext(component_context_.NewRequest());
@@ -85,7 +85,7 @@ void WebViewProvider::Terminate() {
   fsl::MessageLoop::GetCurrent()->QuitNow();
 }
 
-void WebViewProvider::Notify(const f1dl::StringPtr& json) {
+void WebViewProvider::Notify(fidl::StringPtr json) {
   modular::JsonDoc parsed_json;
   parsed_json.Parse(json);
 

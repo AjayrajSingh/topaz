@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "topaz/runtime/web_runner/services/web_view.fidl.h"
+#include <fuchsia/cpp/web_view.h>
 
 #include "lib/app/cpp/service_provider_impl.h"
-#include "lib/fidl/cpp/bindings/binding_set.h"
+#include "lib/fidl/cpp/binding_set.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
 #include "lib/ui/scenic/client/host_image_cycler.h"
@@ -23,8 +23,8 @@ class TouchTracker {
  public:
   TouchTracker(int x = 0, int y = 0);
 
-  void HandleEvent(const input::PointerEventPtr& pointer,
-                   const ui::gfx::Metrics& metrics,
+  void HandleEvent(const input::PointerEvent& pointer,
+                   const gfx::Metrics& metrics,
                    WebView& web_view);
 
  private:
@@ -39,15 +39,15 @@ class WebViewImpl : public mozart::BaseView,
                    public web_view::WebView {
  public:
   WebViewImpl(views_v1::ViewManagerPtr view_manager,
-              f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
-              f1dl::InterfaceRequest<component::ServiceProvider>
+              fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+              fidl::InterfaceRequest<component::ServiceProvider>
                   outgoing_services_request,
               const std::string& url);
 
   ~WebViewImpl();
 
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
-  void set_context_writer(maxwell::ContextWriterPtr context_writer) {
+  void set_context_writer(modular::ContextWriterPtr context_writer) {
     schema_org_.set_context_writer(std::move(context_writer));
   }
 
@@ -57,22 +57,19 @@ class WebViewImpl : public mozart::BaseView,
 #endif
 
   // |WebView|:
-  void SetUrl(const ::f1dl::StringPtr& url) override;
+  void SetUrl(fidl::StringPtr url) override;
 
  private:
   // |WebView|:
   void ClearCookies() override;
 
   void SetWebRequestDelegate(
-      ::f1dl::InterfaceHandle<web_view::WebRequestDelegate> delegate) final;
+      ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) final;
 
   bool HandleKeyboardEvent(const input::InputEvent& event);
-
-  bool HandleMouseEvent(const input::PointerEventPtr& pointer);
-
-  void HandleTouchDown(const input::PointerEventPtr& pointer);
-
-  bool HandleTouchEvent(const input::PointerEventPtr& pointer);
+  bool HandleMouseEvent(const input::PointerEvent& pointer);
+  void HandleTouchDown(const input::PointerEvent& pointer);
+  bool HandleTouchEvent(const input::PointerEvent& pointer);
 
   // |BaseView|:
   bool OnInputEvent(input::InputEvent event) override;
@@ -105,8 +102,7 @@ class WebViewImpl : public mozart::BaseView,
   // others.
   component::ServiceProviderImpl outgoing_services_;
 
-  f1dl::BindingSet<WebView> web_view_interface_bindings_;
+  fidl::BindingSet<WebView> web_view_interface_bindings_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(WebViewImpl);
 };
-

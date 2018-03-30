@@ -115,7 +115,7 @@ void SchemaOrgContext::EntitiesChanged() {
     std::string type = ExtractTypeFromEntity(entity_json);
     FXL_LOG(INFO) << "entity type: " << type;
     if (type.size()) {
-      f1dl::VectorPtr<modular::TypeToDataEntryPtr> type_to_data_array;
+      fidl::VectorPtr<modular::TypeToDataEntryPtr> type_to_data_array;
       modular::TypeToDataEntryPtr entry = modular::TypeToDataEntry::New();
       entry->type = type;
       entry->data = modular::JsonValueToPrettyString(*i);
@@ -123,9 +123,9 @@ void SchemaOrgContext::EntitiesChanged() {
       component_context_->CreateEntityWithData(
           std::move(type_to_data_array),
           [this](const std::string& entity_reference) {
-            maxwell::ContextValueWriterPtr value;
+            modular::ContextValueWriterPtr value;
             context_writer_->CreateValue(value.NewRequest(),
-                                         maxwell::ContextValueType::ENTITY);
+                                         modular::ContextValueType::ENTITY);
             value->Set(entity_reference, nullptr /* metadata */);
             // TODO: there's a potential race here if EntitiesChanged is
             // called while there are outstanding CreateEntityWithData

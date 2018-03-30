@@ -4,16 +4,13 @@
 
 #pragma once
 
+#include <fuchsia/cpp/modular.h>
+#include <fuchsia/cpp/views_v1.h>
+
 #include "lib/app/cpp/application_context.h"
-#include "lib/app/fidl/service_provider.fidl.h"
-#include "lib/component/fidl/component_context.fidl.h"
-#include "lib/lifecycle/fidl/lifecycle.fidl.h"
-#include "lib/module/fidl/module.fidl.h"
-#include "lib/story/fidl/link.fidl.h"
-#include "lib/ui/views/fidl/view_provider.fidl.h"
 #include "topaz/runtime/web_view/web_view_impl.h"
 
-class WebViewProvider : mozart::ViewProvider,
+class WebViewProvider : views_v1::ViewProvider,
                         modular::Module,
                         modular::Lifecycle,
                         modular::LinkWatcher
@@ -23,33 +20,33 @@ class WebViewProvider : mozart::ViewProvider,
 
  private:
   // |ViewProvider|
-  void CreateView(f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
-                  f1dl::InterfaceRequest<component::ServiceProvider>
+  void CreateView(fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+                  fidl::InterfaceRequest<component::ServiceProvider>
                       view_services) override;
 
   // modular::Module
-  void Initialize(f1dl::InterfaceHandle<modular::ModuleContext> context,
-                  f1dl::InterfaceRequest<component::ServiceProvider>
+  void Initialize(fidl::InterfaceHandle<modular::ModuleContext> context,
+                  fidl::InterfaceRequest<component::ServiceProvider>
                       outgoing_services) final;
 
   // modular::Terminate
   void Terminate() final;
 
   // modular::LinkWatcher
-  void Notify(const f1dl::StringPtr& json) final;
+  void Notify(fidl::StringPtr json) final;
 
   std::string url_;
   std::unique_ptr<component::ApplicationContext> context_;
   std::unique_ptr<WebViewImpl> view_;
   // Link state, used to gather URL updates for the story
   modular::LinkPtr main_link_;
-  f1dl::Binding<ViewProvider> view_provider_binding_;
-  f1dl::Binding<modular::Module> module_binding_;
-  f1dl::Binding<modular::Lifecycle> lifecycle_binding_;
-  f1dl::Binding<modular::LinkWatcher> main_link_watcher_binding_;
+  fidl::Binding<ViewProvider> view_provider_binding_;
+  fidl::Binding<modular::Module> module_binding_;
+  fidl::Binding<modular::Lifecycle> lifecycle_binding_;
+  fidl::Binding<modular::LinkWatcher> main_link_watcher_binding_;
 
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
-  maxwell::ContextWriterPtr context_writer_;
+  modular::ContextWriterPtr context_writer_;
   modular::ComponentContextPtr component_context_;
 #endif
 };

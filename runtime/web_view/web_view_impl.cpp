@@ -13,7 +13,6 @@
 #include <zircon/types.h>
 
 #include "lib/fsl/tasks/message_loop.h"
-#include "peridot/public/lib/context/fidl/value_type.fidl.h"
 #include "topaz/runtime/web_view/schema_org_context.h"
 
 using namespace WebCore;
@@ -21,11 +20,11 @@ using namespace WebCore;
 TouchTracker::TouchTracker(int x, int y)
     : start_x_(x), start_y_(y), last_x_(0), last_y_(0), is_drag_(false) {}
 
-void TouchTracker::HandleEvent(const input::PointerEventPtr& pointer,
-                               const ui::gfx::Metrics& metrics,
+void TouchTracker::HandleEvent(const input::PointerEvent& pointer,
+                               const gfx::Metrics& metrics,
                                WebView& web_view) {
-  const auto x = pointer->x * metrics.scale_x;
-  const auto y = pointer->y * metrics.scale_y;
+  const auto x = pointer.x * metrics.scale_x;
+  const auto y = pointer.y * metrics.scale_y;
   const int kDragThreshhold = 50 * metrics.scale_x;
   auto delta_x = last_x_ - x;
   auto delta_y = last_y_ - y;
@@ -39,7 +38,7 @@ void TouchTracker::HandleEvent(const input::PointerEventPtr& pointer,
   }
 
   if (is_drag_) {
-    switch (pointer->phase) {
+    switch (pointer.phase) {
       case input::PointerEventPhase::MOVE:
         web_view.scrollPixels(delta_x, delta_y);
         break;
@@ -52,7 +51,7 @@ void TouchTracker::HandleEvent(const input::PointerEventPtr& pointer,
         break;
     }
   } else {
-    switch (pointer->phase) {
+    switch (pointer.phase) {
       case input::PointerEventPhase::UP:
         web_view.handleMouseEvent(start_x_, start_y_, WebView::kMouseDown);
         web_view.handleMouseEvent(start_x_, start_y_, WebView::kMouseUp);
@@ -66,8 +65,8 @@ void TouchTracker::HandleEvent(const input::PointerEventPtr& pointer,
 
 WebViewImpl::WebViewImpl(
     views_v1::ViewManagerPtr view_manager,
-    f1dl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
-    f1dl::InterfaceRequest<component::ServiceProvider>
+    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<component::ServiceProvider>
         outgoing_services_request,
     const std::string& url)
     : BaseView(std::move(view_manager), std::move(view_owner_request),
@@ -86,7 +85,7 @@ WebViewImpl::WebViewImpl(
   if (outgoing_services_request) {
     // Expose |WebView| interface to caller
     outgoing_services_.AddService<web_view::WebView>(
-        [this](f1dl::InterfaceRequest<web_view::WebView> request) {
+        [this](fidl::InterfaceRequest<web_view::WebView> request) {
           FXL_LOG(INFO) << "web view service request";
           web_view_interface_bindings_.AddBinding(this, std::move(request));
         });
@@ -103,7 +102,7 @@ WebViewImpl::WebViewImpl(
 WebViewImpl::~WebViewImpl() {}
 
 // |WebView|:
-void WebViewImpl::SetUrl(const ::f1dl::StringPtr& url) {
+void WebViewImpl::SetUrl(fidl::StringPtr url) {
   url_ = url;
   // Reset url_set_ so that the next OnDraw() knows to call
   // web_view_.setURL()
@@ -117,39 +116,39 @@ void WebViewImpl::ClearCookies() {
 }
 
 void WebViewImpl::SetWebRequestDelegate(
-    ::f1dl::InterfaceHandle<web_view::WebRequestDelegate> delegate) {
+    ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) {
   webRequestDelegate_ = delegate.Bind();
 }
 
 bool WebViewImpl::HandleKeyboardEvent(const input::InputEvent& event) {
   bool handled = true;
-  const input::KeyboardEventPtr& keyboard = event->get_keyboard();
-  bool pressed = keyboard->phase == input::KeyboardEventPhase::PRESSED;
-  bool repeating = keyboard->phase == input::KeyboardEventPhase::REPEAT;
-  if (pressed && keyboard->code_point == 'c' &&
-      keyboard->modifiers & input::kModifierControl) {
+  const input::KeyboardEvent& keyboard = event.keyboard();
+  bool pressed = keyboard.phase == input::KeyboardEventPhase::PRESSED;
+  bool repeating = keyboard.phase == input::KeyboardEventPhase::REPEAT;
+  if (pressed && keyboard.code_point == 'c' &&
+      keyboard.modifiers & input::kModifierControl) {
     exit(0);
-  } else if (pressed && keyboard->code_point == '[' &&
-             keyboard->modifiers & input::kModifierControl) {
+  } else if (pressed && keyboard.code_point == '[' &&
+             keyboard.modifiers & input::kModifierControl) {
     web_view_.goBack();
-  } else if (pressed && keyboard->code_point == ']' &&
-             keyboard->modifiers & input::kModifierControl) {
+  } else if (pressed && keyboard.code_point == ']' &&
+             keyboard.modifiers & input::kModifierControl) {
     web_view_.goForward();
-  } else if (pressed && keyboard->code_point == 'r' &&
-             keyboard->modifiers & input::kModifierControl) {
+  } else if (pressed && keyboard.code_point == 'r' &&
+             keyboard.modifiers & input::kModifierControl) {
     web_view_.reload();
   } else {
     bool handled =
-        web_view_.handleKeyEvent(keyboard->hid_usage, keyboard->code_point,
+        web_view_.handleKeyEvent(keyboard.hid_usage, keyboard.code_point,
                                  pressed || repeating, repeating);
     if (!handled) {
       if (pressed || repeating) {
-        if (keyboard->hid_usage == HID_USAGE_KEY_DOWN) {
-        } else if (keyboard->hid_usage == HID_USAGE_KEY_UP) {
+        if (keyboard.hid_usage == HID_USAGE_KEY_DOWN) {
+        } else if (keyboard.hid_usage == HID_USAGE_KEY_UP) {
           web_view_.scrollUpOneLine();
-        } else if (keyboard->hid_usage == HID_USAGE_KEY_RIGHT) {
+        } else if (keyboard.hid_usage == HID_USAGE_KEY_RIGHT) {
           web_view_.scrollRightOneLine();
-        } else if (keyboard->hid_usage == HID_USAGE_KEY_LEFT) {
+        } else if (keyboard.hid_usage == HID_USAGE_KEY_LEFT) {
           web_view_.scrollLeftOneLine();
         }
       }
@@ -158,22 +157,22 @@ bool WebViewImpl::HandleKeyboardEvent(const input::InputEvent& event) {
   return handled;
 }
 
-bool WebViewImpl::HandleMouseEvent(const input::PointerEventPtr& pointer) {
+bool WebViewImpl::HandleMouseEvent(const input::PointerEvent& pointer) {
   bool handled = false;
-  if (pointer->buttons & input::kMousePrimaryButton) {
-    switch (pointer->phase) {
+  if (pointer.buttons & input::kMousePrimaryButton) {
+    switch (pointer.phase) {
       case input::PointerEventPhase::DOWN:
       case input::PointerEventPhase::MOVE:
         web_view_.handleMouseEvent(
-            pointer->x * metrics().scale_x, pointer->y * metrics().scale_y,
-            pointer->phase == input::PointerEventPhase::DOWN
+            pointer.x * metrics().scale_x, pointer.y * metrics().scale_y,
+            pointer.phase == input::PointerEventPhase::DOWN
                 ? ::WebView::kMouseDown
                 : ::WebView::kMouseMoved);
         handled = true;
         break;
       case input::PointerEventPhase::UP:
-        web_view_.handleMouseEvent(pointer->x * metrics().scale_x,
-                                   pointer->y * metrics().scale_y,
+        web_view_.handleMouseEvent(pointer.x * metrics().scale_x,
+                                   pointer.y * metrics().scale_y,
                                    ::WebView::kMouseUp);
         handled = true;
         break;
@@ -184,16 +183,16 @@ bool WebViewImpl::HandleMouseEvent(const input::PointerEventPtr& pointer) {
   return handled;
 }
 
-void WebViewImpl::HandleTouchDown(const input::PointerEventPtr& pointer) {
-  const auto x = pointer->x * metrics().scale_x;
-  const auto y = pointer->y * metrics().scale_y;
-  touch_trackers_[pointer->pointer_id] = TouchTracker(x, y);
+void WebViewImpl::HandleTouchDown(const input::PointerEvent& pointer) {
+  const auto x = pointer.x * metrics().scale_x;
+  const auto y = pointer.y * metrics().scale_y;
+  touch_trackers_[pointer.pointer_id] = TouchTracker(x, y);
 }
 
-bool WebViewImpl::HandleTouchEvent(const input::PointerEventPtr& pointer) {
+bool WebViewImpl::HandleTouchEvent(const input::PointerEvent& pointer) {
   bool handled = false;
-  auto pointer_id = pointer->pointer_id;
-  switch (pointer->phase) {
+  auto pointer_id = pointer.pointer_id;
+  switch (pointer.phase) {
     case input::PointerEventPhase::DOWN:
       HandleTouchDown(pointer);
       handled = true;
@@ -218,14 +217,14 @@ bool WebViewImpl::OnInputEvent(input::InputEvent event) {
   bool handled = false;
   web_view_.setFocused(true);
   web_view_.setVisible(true);
-  if (event->is_pointer()) {
-    const input::PointerEventPtr& pointer = event->get_pointer();
-    if (pointer->type == input::PointerEventType::TOUCH) {
+  if (event.is_pointer()) {
+    const input::PointerEvent& pointer = event.pointer();
+    if (pointer.type == input::PointerEventType::TOUCH) {
       handled = HandleTouchEvent(pointer);
-    } else if (pointer->type == input::PointerEventType::MOUSE) {
+    } else if (pointer.type == input::PointerEventType::MOUSE) {
       handled = HandleMouseEvent(pointer);
     }
-  } else if (event->is_keyboard()) {
+  } else if (event.is_keyboard()) {
     handled = HandleKeyboardEvent(event);
   }
 
@@ -242,8 +241,8 @@ void WebViewImpl::OnSceneInvalidated(
   // Update the image.
   const scenic_lib::HostImage* image = image_cycler_.AcquireImage(
       physical_size().width, physical_size().height, physical_size().width * 4u,
-      ui::gfx::ImageInfo::PixelFormat::BGRA_8,
-      ui::gfx::ImageInfo::ColorSpace::SRGB);
+      images::PixelFormat::BGRA_8,
+      images::ColorSpace::SRGB);
   FXL_DCHECK(image);
 
   // Paint the webview.
