@@ -6,13 +6,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
-import 'package:lib.component.fidl/component_context.fidl.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.module.fidl._module_controller/module_controller.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
     as chat;
 import 'package:collection/collection.dart';

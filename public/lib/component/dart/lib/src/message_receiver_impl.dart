@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.component.fidl/message_queue.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:meta/meta.dart';
 
 /// This is the function type that [MessageReceiverImpl] accepts; messages will

@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.agent.fidl/agent_context.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.media.dart/audio_player_controller.dart';
 import 'package:topaz.app.music.services.player/player.fidl.dart';

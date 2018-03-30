@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.user.fidl/user_shell.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 
 /// Performs the logging out of the user.
 class UserLogoutter {

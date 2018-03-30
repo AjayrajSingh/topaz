@@ -2,13 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.agent.fidl/agent_context.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
-import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/user_input.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 
 /// Typedef for VoidCallback
 typedef void VoidCallback();

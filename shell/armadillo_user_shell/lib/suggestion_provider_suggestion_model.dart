@@ -8,12 +8,8 @@ import 'package:armadillo/next.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.images.fidl/encoded_image.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart'
-    as maxwell;
-import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_provider.fidl.dart'
-    as maxwell;
-import 'package:lib.suggestion.fidl._suggestion_provider/user_input.fidl.dart'
+import 'package:fuchsia.fidl.images/images.dart';
+import 'package:fuchsia.fidl.modular/modular.dart'
     as maxwell;
 import 'package:meta/meta.dart';
 

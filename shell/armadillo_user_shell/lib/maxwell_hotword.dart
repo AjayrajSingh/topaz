@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.speech.fidl/speech_to_text.fidl.dart' as speech;
+import 'package:fuchsia.fidl.speech/speech.dart' as speech;
 import 'package:lib.logging/logging.dart';
 
 import 'rate_limited_retry.dart';

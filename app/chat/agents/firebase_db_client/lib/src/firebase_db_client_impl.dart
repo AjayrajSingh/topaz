@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:convert' show json;
 
-import 'package:lib.auth.fidl/token_provider.fidl.dart';
+import 'package:fuchsia.fidl.auth/auth.dart';
 import 'package:lib.logging/logging.dart';
 
 import 'package:config/config.dart';

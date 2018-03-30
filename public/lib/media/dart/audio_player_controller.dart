@@ -5,13 +5,10 @@
 import 'dart:async';
 
 import 'package:lib.media.dart/timeline.dart';
-import 'package:lib.media.fidl/media_metadata.fidl.dart';
-import 'package:lib.media.fidl/media_player.fidl.dart';
-import 'package:lib.media.fidl/net_media_service.fidl.dart';
-import 'package:lib.media.fidl/problem.fidl.dart';
+import 'package:fuchsia.fidl.media/media.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.ui.geometry.fidl/geometry.fidl.dart' as geom;
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.geometry/geometry.dart' as geom;
 import 'package:zircon/zircon.dart';
 
 /// Type for |AudioPlayerController| update callbacks.

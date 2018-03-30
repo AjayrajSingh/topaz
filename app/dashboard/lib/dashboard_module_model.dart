@@ -6,12 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.module.fidl._module_controller/module_controller.fidl.dart';
-import 'package:lib.module.fidl._module_controller/module_state.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.surface.fidl/surface.fidl.dart';
-import 'package:lib.user.fidl/device_map.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';

@@ -6,12 +6,9 @@
 // ignore_for_file: import_duplicated_library_named
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.ui.scenic.fidl/commands.fidl.dart' as scenic;
-import 'package:lib.ui.scenic.fidl/scenic.fidl.dart';
-import 'package:lib.ui.scenic.fidl/session.fidl.dart';
-import 'package:lib.ui.scenic.fidl._presentation_info/presentation_info.fidl.dart';
-import 'package:lib.ui.gfx.fidl/commands.fidl.dart' as ui_gfx;
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.images/images.dart';
+import 'package:fuchsia.fidl.gfx/gfx.dart' as ui_gfx;
 import 'package:zircon/zircon.dart' as zircon;
 
 export 'package:lib.ui.scenic.fidl._presentation_info/presentation_info.fidl.dart'
@@ -27,7 +24,7 @@ class Session {
   List<scenic.Command> _commands = <scenic.Command>[];
 
   Session.fromScenic(ScenicProxy scenic) {
-    scenic.createSession(_session.ctrl.request(), null);
+    ui_gfx.createSession(_session.ctrl.request(), null);
   }
 
   factory Session.fromServiceProvider(ServiceProvider serviceProvider) {

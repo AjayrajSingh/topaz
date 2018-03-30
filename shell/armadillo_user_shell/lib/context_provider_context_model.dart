@@ -9,7 +9,7 @@ import 'dart:io';
 import 'package:armadillo/now.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.time_service.fidl/time_service.fidl.dart';
+import 'package:fuchsia.fidl.time_service/time_service.dart';
 import 'package:meta/meta.dart';
 
 export 'package:lib.widgets/model.dart'

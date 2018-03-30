@@ -7,18 +7,9 @@ import 'dart:convert';
 
 import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.context.fidl/context_writer.fidl.dart';
-import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.context.fidl/metadata.fidl.dart';
-import 'package:lib.context.fidl/value.fidl.dart';
-import 'package:lib.context.fidl/value_type.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
-import 'package:lib.module.fidl/module.fidl.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl/fidl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

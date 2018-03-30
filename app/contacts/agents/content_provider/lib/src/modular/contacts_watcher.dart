@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.fidl.dart/bindings.dart';
-import 'package:lib.ledger.fidl/ledger.fidl.dart';
+import 'package:fidl/fidl.dart';
+import 'package:fuchsia.fidl.ledger/ledger.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 

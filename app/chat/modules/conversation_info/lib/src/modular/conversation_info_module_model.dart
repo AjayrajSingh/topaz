@@ -9,15 +9,11 @@ import 'dart:typed_data';
 import 'package:chat_models/chat_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.component.dart/component.dart';
-import 'package:lib.component.fidl/component_context.fidl.dart';
-import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
     as fidl;

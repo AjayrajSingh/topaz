@@ -2,9 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.device.fidl/device_shell.fidl.dart';
-import 'package:lib.device.fidl/user_provider.fidl.dart';
-import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fuchsia.fidl.presentation/presentation.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 

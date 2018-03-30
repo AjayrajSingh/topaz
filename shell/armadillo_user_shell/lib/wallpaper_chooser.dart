@@ -8,17 +8,8 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.proposal.dart/proposal.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.story.dart/story.dart';
-import 'package:lib.story.fidl/story_controller.fidl.dart';
-import 'package:lib.story.fidl/story_info.fidl.dart';
-import 'package:lib.story.fidl/story_provider.fidl.dart';
-import 'package:lib.story.fidl/story_state.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/user_input.fidl.dart';
-import 'package:lib.user.fidl._focus/focus.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 
 const String _kWallpapersLinkKey = 'wallpapers';
 const String _kImageSelectorModulePath = 'gallery';

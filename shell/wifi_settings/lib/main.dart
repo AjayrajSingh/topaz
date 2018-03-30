@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:lib.wlan.fidl/wlan_service.fidl.dart';
+import 'package:fuchsia.fidl.wlan/wlan.dart';
 
 import 'src/fuchsia/wifi_settings_module_model.dart';
 import 'src/wlan_info.dart';

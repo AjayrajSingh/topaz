@@ -7,16 +7,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:entity_schemas/entities.dart' as entities;
-import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
-import 'package:lib.agent.fidl/agent_context.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.component.fidl/component_context.fidl.dart';
-import 'package:lib.component.fidl/message_queue.fidl.dart';
-import 'package:lib.entity.fidl/entity_provider.fidl.dart';
-import 'package:lib.entity.fidl/entity_reference_factory.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.ledger.dart/ledger.dart';
-import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
+import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger;
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'

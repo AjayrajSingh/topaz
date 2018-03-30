@@ -6,8 +6,8 @@ import 'dart:async';
 
 import 'package:lib.agent.dart/agent.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.entity.fidl/entity_provider.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart';

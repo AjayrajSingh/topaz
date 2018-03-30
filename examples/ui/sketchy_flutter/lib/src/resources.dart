@@ -2,11 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.ui.gfx.fidl/nodes.fidl.dart' as ui_gfx;
-import 'package:lib.ui.gfx.fidl/commands.fidl.dart' as ui_gfx;
-import 'package:lib.ui.gfx.fidl/resources.fidl.dart' as ui_gfx;
-import 'package:lib.ui.gfx.fidl/shapes.fidl.dart' as ui_gfx;
-import 'package:lib.ui.gfx.fidl/types.fidl.dart' as ui_gfx;
+import 'package:fuchsia.fidl.gfx/gfx.dart' as ui_gfx;
 import 'package:zircon/zircon.dart';
 
 import 'session.dart';

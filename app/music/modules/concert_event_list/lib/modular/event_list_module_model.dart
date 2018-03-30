@@ -10,17 +10,9 @@ import 'package:concert_api/api.dart';
 import 'package:concert_models/concert_models.dart';
 import 'package:concert_widgets/concert_widgets.dart';
 import 'package:flutter/widgets.dart' show ValueChanged;
-import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.context.fidl/metadata.fidl.dart';
-import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.module.fidl._module_controller/module_controller.fidl.dart';
 import 'package:lib.story.dart/story.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.surface.fidl/surface.fidl.dart';
-import 'package:lib.user.fidl/device_map.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'event_selector.dart';

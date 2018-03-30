@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.bluetooth.fidl/common.fidl.dart' as common;
-import 'package:lib.bluetooth.fidl/control.fidl.dart' as bluetooth;
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bluetooth;
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
@@ -82,7 +80,7 @@ class SettingsModuleModel extends ModuleModel
   /// adapter. This affects the entire system as the active adapter currently in use by all current
   /// Bluetooth service clients will change.
   void setActiveAdapter(String id) {
-    _adapterManager.setActiveAdapter(id, (common.Status status) {
+    _adapterManager.setActiveAdapter(id, (bluetooth.Status status) {
       notifyListeners();
     });
   }
@@ -100,7 +98,7 @@ class SettingsModuleModel extends ModuleModel
     assert(!_isDiscoveryRequestPending);
 
     _isDiscoveryRequestPending = true;
-    void cb(common.Status status) {
+    void cb(bluetooth.Status status) {
       _isDiscoveryRequestPending = false;
       notifyListeners();
     }

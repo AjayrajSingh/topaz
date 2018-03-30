@@ -4,7 +4,7 @@
 
 import 'dart:convert' show json;
 
-import 'package:lib.daisy.fidl/daisy.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 
 /// Dart-idiomatic wrapper to create a modular.Daisy.
 class DaisyBuilder {

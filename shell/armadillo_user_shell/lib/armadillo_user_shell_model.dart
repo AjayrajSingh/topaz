@@ -4,20 +4,11 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:home_work_agent/home_work_proposer.dart';
-import 'package:lib.auth.fidl.account/account.fidl.dart';
-import 'package:lib.context.fidl/context_writer.fidl.dart';
-import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.context.fidl/metadata.fidl.dart';
-import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:fuchsia.fidl.auth/auth.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.speech.fidl/speech_to_text.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.story.fidl/story_provider.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_provider.fidl.dart';
-import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
-import 'package:lib.user.fidl._focus/focus.fidl.dart';
-import 'package:lib.user.fidl/user_shell.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
+import 'package:fuchsia.fidl.speech/speech.dart';
+import 'package:fuchsia.fidl.presentation/presentation.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'active_agents_manager.dart';

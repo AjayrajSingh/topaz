@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
+import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger;
 
 /// Callback type that takes a status of a completed Ledger operation.
 typedef bool OnLedgerResponse(ledger.Status status);

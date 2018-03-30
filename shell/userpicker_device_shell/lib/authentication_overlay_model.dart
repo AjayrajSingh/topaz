@@ -4,7 +4,7 @@
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';

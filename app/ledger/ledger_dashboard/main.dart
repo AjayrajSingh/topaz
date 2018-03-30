@@ -8,8 +8,8 @@ import 'dart:io';
 
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.fidl.dart/bindings.dart';
-import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
+import 'package:fidl/fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 
 import 'package:path/path.dart' as path;
 

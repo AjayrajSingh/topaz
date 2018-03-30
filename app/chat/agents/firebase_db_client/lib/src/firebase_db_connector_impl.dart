@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.auth.fidl/token_provider.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.auth/auth.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 
 import 'package:topaz.app.chat.services/firebase_db_client.fidl.dart';

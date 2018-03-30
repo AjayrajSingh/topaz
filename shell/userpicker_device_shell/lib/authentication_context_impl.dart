@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.device.fidl/device_shell.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
+import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 
 /// Called when an aunthentication overlay needs to be started.
 typedef void OnStartOverlay(InterfaceHandle<ViewOwner> viewOwner);

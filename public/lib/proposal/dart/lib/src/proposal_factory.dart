@@ -6,9 +6,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
-import 'package:lib.images.fidl/encoded_image.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart';
+import 'package:fuchsia.fidl.images/images.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:zircon/zircon.dart';
 

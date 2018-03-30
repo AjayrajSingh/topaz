@@ -5,15 +5,14 @@
 import 'dart:async';
 
 import 'package:lib.component.dart/component.dart';
-import 'package:lib.daisy.fidl/daisy.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart' as fidl;
+import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
 import 'package:lib.story.dart/story.dart';
-import 'package:lib.surface.fidl/surface.fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 // See DNO-201 for details on the _view_token path.
-import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
+import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
 import 'package:meta/meta.dart';
 
 import 'module_controller_client.dart';

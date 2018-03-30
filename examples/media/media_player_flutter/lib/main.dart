@@ -6,18 +6,15 @@ import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.media.flutter/media_player.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
-import 'package:lib.media.fidl/media_metadata.fidl.dart';
-import 'package:lib.media.fidl/problem.fidl.dart';
-import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
-import 'package:lib.module.fidl/module.fidl.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart';
+import 'package:fuchsia.fidl.media/media.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuchsia/fuchsia.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 
 import 'asset.dart';
 import 'config.dart';

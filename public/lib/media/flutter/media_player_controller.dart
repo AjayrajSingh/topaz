@@ -5,13 +5,13 @@
 import 'dart:async';
 
 import 'package:lib.media.dart/audio_player_controller.dart';
-import 'package:lib.media.fidl/media_player.fidl.dart';
+import 'package:fuchsia.fidl.media/media.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.ui.geometry.fidl/geometry.fidl.dart' as geom;
-import 'package:lib.ui.views.fidl/view_manager.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.geometry/geometry.dart' as geom;
+import 'package:fuchsia.fidl.views_v1/views_v1.dart';
+import 'package:fidl/fidl.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';

@@ -4,9 +4,9 @@
 
 import 'dart:async';
 
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.story.fidl/link.fidl.dart' as fidl;
+import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
 import 'package:meta/meta.dart';
 
 import 'link_watcher_impl.dart';

@@ -6,16 +6,8 @@ import 'dart:async';
 import 'dart:convert' as convert;
 import 'dart:io';
 
-import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.context.fidl/metadata.fidl.dart';
-import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.proposal.dart/proposal.dart';
-import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
-import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/user_input.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
 
 const String _kConfigFile =
     '/system/data/sysui/contextual_location_proposals.json';

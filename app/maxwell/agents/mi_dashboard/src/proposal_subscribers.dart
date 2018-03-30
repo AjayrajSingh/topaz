@@ -7,9 +7,8 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.images.fidl/encoded_image.fidl.dart';
-import 'package:lib.suggestion.fidl._debug/debug.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart';
+import 'package:fuchsia.fidl.images/images.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 
 import 'data_handler.dart';
 

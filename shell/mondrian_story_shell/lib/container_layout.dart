@@ -5,7 +5,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'package:lib.logging/logging.dart';
-import 'package:lib.surface.fidl._container/container.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 
 import 'layout_model.dart';
 import 'model.dart';

@@ -9,12 +9,11 @@ import 'dart:async';
 import 'dart:convert' show json;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.bluetooth.fidl/common.fidl.dart' as bt;
-import 'package:lib.bluetooth.fidl/low_energy.fidl.dart' as ble;
+import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bt;
+import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as ble;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.proposal.dart/proposal.dart';
-import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();

@@ -4,20 +4,17 @@
 
 import 'dart:io';
 
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.auth.fidl.account/account.fidl.dart';
-import 'package:lib.config.fidl/config.fidl.dart';
-import 'package:lib.device.fidl/device_shell.fidl.dart';
-import 'package:lib.device.fidl/user_provider.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.auth/auth.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.ui.input.fidl/input_events.fidl.dart'
+import 'package:fuchsia.fidl.input/input.dart'
     show KeyboardEvent, KeyboardEventPhase;
-import 'package:lib.ui.presentation.fidl/display_usage.fidl.dart';
-import 'package:lib.ui.presentation.fidl/presentation.fidl.dart';
-import 'package:lib.ui.gfx.fidl/renderer.fidl.dart';
+import 'package:fuchsia.fidl.presentation/presentation.dart';
+import 'package:fuchsia.fidl.gfx/gfx.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:zircon/zircon.dart' show Channel;

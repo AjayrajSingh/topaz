@@ -6,15 +6,11 @@ import 'dart:convert' show json;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.module.fidl._module_controller/module_controller.fidl.dart';
-import 'package:lib.module.fidl._module_controller/module_state.fidl.dart';
-import 'package:lib.daisy.fidl/daisy.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
+import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';

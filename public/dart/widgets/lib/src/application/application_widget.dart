@@ -3,12 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/application_controller.fidl.dart';
-import 'package:lib.app.fidl/application_launcher.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.ui.views.fidl/view_provider.fidl.dart';
+import 'package:fuchsia.fidl.views_v1/views_v1.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';
 
 /// A [Widget] that displays the view of the application it launches.

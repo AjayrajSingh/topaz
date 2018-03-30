@@ -6,8 +6,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:json_schema/json_schema.dart' as json_schema;
-import 'package:lib.entity.fidl/entity.fidl.dart' as fidl;
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 
 /// Provides an idiomatic way to access and type-validate data from an [fidl.Entity].

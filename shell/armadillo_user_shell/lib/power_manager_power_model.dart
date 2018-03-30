@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:armadillo/now.dart';
-import 'package:lib.power.fidl/power_manager.fidl.dart';
+import 'package:fuchsia.fidl.power/power.dart';
 
 /// Provides battery and charging information.
 class PowerManagerPowerModel extends PowerModel {

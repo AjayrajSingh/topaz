@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl/fidl.dart';
 
 /// Signature for callbacks that handle context updates.
 typedef void UpdateCallback(ContextUpdate value);

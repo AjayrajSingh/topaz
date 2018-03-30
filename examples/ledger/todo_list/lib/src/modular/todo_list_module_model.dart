@@ -5,11 +5,10 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:lib.component.fidl/component_context.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
-import 'package:lib.ledger.fidl/ledger.fidl.dart' as ledger;
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fidl/fidl.dart';
+import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger;
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.widgets/modular.dart';
 
 import '../ledger_helpers.dart';

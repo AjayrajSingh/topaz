@@ -4,9 +4,9 @@
 
 import 'dart:async';
 
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.entity.fidl/entity_resolver.fidl.dart' as fidl;
+import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
 
 import 'entity_client.dart';
 

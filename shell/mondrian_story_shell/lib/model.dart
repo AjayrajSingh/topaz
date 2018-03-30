@@ -4,11 +4,11 @@
 
 import 'dart:math' as math;
 
-import 'package:lib.surface.fidl._container/container.fidl.dart';
-import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart';
 

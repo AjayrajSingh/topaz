@@ -5,19 +5,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.component.fidl/component_context.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.decomposition.dart/decomposition.dart';
-import 'package:lib.fidl.dart/bindings.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.module.fidl._module_controller/module_controller.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
-import 'package:lib.user.fidl/device_map.fidl.dart';
+import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:music_api/api.dart';

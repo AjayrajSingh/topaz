@@ -4,7 +4,7 @@
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.netstack.fidl/netstack.fidl.dart' as net;
+import 'package:fuchsia.fidl.netstack/netstack.dart' as net;
 import 'package:lib.widgets/model.dart';
 
 const String _kLoopbackInterfaceName = 'en1';

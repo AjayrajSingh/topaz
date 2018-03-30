@@ -6,8 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.action_log.fidl/listener.fidl.dart';
-import 'package:lib.action_log.fidl/user.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 
 import 'data_handler.dart';
 

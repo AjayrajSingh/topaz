@@ -6,15 +6,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.context.fidl/metadata.fidl.dart';
-import 'package:lib.context.fidl/value_type.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.decomposition.dart/decomposition.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.proposal.dart/proposal.dart';
-import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
 
 /// The Concert Agents subscribes to the hotel topic and makes proposals for
 /// upcoming concerts (concert list module).

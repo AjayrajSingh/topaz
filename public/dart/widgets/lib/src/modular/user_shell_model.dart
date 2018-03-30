@@ -3,14 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.context.fidl/context_writer.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_provider.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.story.fidl/story_provider.fidl.dart';
-import 'package:lib.user.fidl._focus/focus.fidl.dart';
-import 'package:lib.user.fidl/user_shell.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 

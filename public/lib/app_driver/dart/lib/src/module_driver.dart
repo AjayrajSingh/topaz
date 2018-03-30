@@ -5,12 +5,10 @@
 import 'dart:async';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.component.dart/component.dart';
-import 'package:lib.component.fidl/component_context.fidl.dart';
-import 'package:lib.component.fidl/message_queue.fidl.dart';
 import 'package:lib.entity.dart/entity.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.lifecycle.dart/lifecycle.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.dart/module.dart';

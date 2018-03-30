@@ -6,10 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.context.fidl/debug.fidl.dart';
-import 'package:lib.context.fidl/metadata.fidl.dart';
-import 'package:lib.user_intelligence.fidl/scope.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 
 import 'data_handler.dart';
 

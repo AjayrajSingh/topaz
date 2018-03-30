@@ -5,8 +5,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl/fidl.dart';
 
 // ignore_for_file: public_member_api_docs
 

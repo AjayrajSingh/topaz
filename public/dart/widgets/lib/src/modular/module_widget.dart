@@ -3,11 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
-import 'package:lib.module.fidl/module.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';
 
 import '../widgets/window_media_query.dart';

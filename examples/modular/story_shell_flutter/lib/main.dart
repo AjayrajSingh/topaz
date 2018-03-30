@@ -3,14 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
-import 'package:lib.module.fidl._module_data/module_manifest.fidl.dart';
-import 'package:lib.story.fidl/story_shell.fidl.dart';
-import 'package:lib.surface.fidl._container/container.fidl.dart';
-import 'package:lib.surface.fidl/surface.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
+import 'package:fidl/fidl.dart';
 
 import 'package:flutter/widgets.dart';
 

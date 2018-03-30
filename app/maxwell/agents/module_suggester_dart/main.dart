@@ -8,11 +8,7 @@ import 'dart:convert' show json;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.decomposition.dart/decomposition.dart';
 import 'package:lib.proposal.dart/proposal.dart';
-import 'package:lib.suggestion.fidl/query_handler.fidl.dart';
-import 'package:lib.suggestion.fidl/proposal.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/suggestion_display.fidl.dart';
-import 'package:lib.suggestion.fidl._suggestion_provider/user_input.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
 final IntelligenceServicesProxy _intelligenceServices =

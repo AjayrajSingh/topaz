@@ -5,9 +5,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.story.fidl/link.fidl.dart' as fidl;
+import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
 
 import 'link_watcher_host.dart';
 

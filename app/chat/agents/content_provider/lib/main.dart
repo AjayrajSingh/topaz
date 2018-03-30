@@ -4,19 +4,14 @@
 
 import 'dart:async';
 
-import 'package:lib.agent.dart/agent.dart';
-import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.auth.fidl/token_provider.fidl.dart';
-import 'package:lib.context.fidl/context_reader.fidl.dart';
-import 'package:lib.context.fidl/metadata.fidl.dart';
-import 'package:lib.context.fidl/value_type.fidl.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.suggestion.fidl/proposal_publisher.fidl.dart';
-import 'package:lib.user.fidl/device_map.fidl.dart';
-import 'package:lib.user_intelligence.fidl/intelligence_services.fidl.dart';
+import 'package:lib.agent.dart/agent.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.auth/auth.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
 import 'package:topaz.app.chat.services/firebase_db_client.fidl.dart';

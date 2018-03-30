@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
 

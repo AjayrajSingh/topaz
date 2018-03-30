@@ -5,7 +5,7 @@
 import 'dart:convert' show json;
 
 import 'package:lib.logging/logging.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.widgets/modular.dart';
 
 const String _kCounterKey = 'counter';

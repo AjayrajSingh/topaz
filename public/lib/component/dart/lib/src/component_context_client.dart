@@ -4,13 +4,10 @@
 
 import 'dart:async';
 
-import 'package:lib.agent.fidl.agent_controller/agent_controller.fidl.dart'
+import 'package:fuchsia.fidl.modular/modular.dart'
     as fidl;
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart'
-    as fidl;
-import 'package:lib.component.fidl/component_context.fidl.dart' as fidl;
-import 'package:lib.component.fidl/message_queue.fidl.dart' as fidl;
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fuchsia.fidl.component/component.dart' as fidl;
+import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.entity.dart/entity.dart';
 

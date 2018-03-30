@@ -4,11 +4,8 @@
 
 import 'dart:async';
 
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.module.fidl/module.fidl.dart';
-import 'package:lib.module.fidl/module_context.fidl.dart';
-import 'package:lib.story.fidl/link.fidl.dart';
-import 'package:lib.user.fidl/device_map.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 

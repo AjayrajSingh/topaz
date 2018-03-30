@@ -8,21 +8,17 @@ import 'dart:mozart.internal';
 import 'dart:ui' as ui;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/application_controller.fidl.dart';
-import 'package:lib.app.fidl/application_launcher.fidl.dart';
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
-import 'package:lib.ui.geometry.fidl/geometry.fidl.dart' as fidl;
-import 'package:lib.ui.views.fidl/view_containers.fidl.dart';
-import 'package:lib.ui.views.fidl/view_properties.fidl.dart';
-import 'package:lib.ui.views.fidl/view_provider.fidl.dart';
-import 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.geometry/geometry.dart' as fidl;
+import 'package:fuchsia.fidl.views_v1/views_v1.dart';
+import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
-export 'package:lib.ui.views.fidl._view_token/view_token.fidl.dart'
+export 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart'
     show ViewOwner;
 
 ViewContainerProxy _initViewContainer() {
@@ -32,7 +28,7 @@ ViewContainerProxy _initViewContainer() {
     return null;
   }
   final ViewContainerProxy proxy = new ViewContainerProxy()
-    ..ctrl.bind(new InterfaceHandle<ViewContainer>(new Channel(handle), 0))
+    ..ctrl.bind(new InterfaceHandle<ViewContainer>(new Channel(handle)))
     ..setListener(_ViewContainerListenerImpl.instance.createInterfaceHandle());
 
   assert(() {
@@ -184,7 +180,7 @@ class ChildViewConnection {
     final ChannelPair pair = new ChannelPair();
     assert(pair.status == ZX.OK);
     _ViewContainerListenerImpl.instance._connections.remove(_viewKey);
-    _viewOwner = new InterfaceHandle<ViewOwner>(pair.first, 0);
+    _viewOwner = new InterfaceHandle<ViewOwner>(pair.first);
     _viewContainer.removeChild(
         _viewKey, new InterfaceRequest<ViewOwner>(pair.second));
     _viewKey = null;

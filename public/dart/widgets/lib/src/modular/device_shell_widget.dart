@@ -3,12 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.device.fidl/device_shell.fidl.dart';
-import 'package:lib.lifecycle.fidl/lifecycle.fidl.dart';
-import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fuchsia.fidl.input/input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 import 'package:lib.device.dart/device.dart';
 import 'package:meta/meta.dart';
 

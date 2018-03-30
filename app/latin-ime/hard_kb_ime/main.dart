@@ -4,14 +4,10 @@
 
 import 'dart:math';
 
-import 'package:lib.fidl.dart/bindings.dart';
+import 'package:fidl/fidl.dart';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.ui.input.fidl/ime_service.fidl.dart';
-import 'package:lib.ui.input.fidl/input_connection.fidl.dart';
-import 'package:lib.ui.input.fidl/input_events.fidl.dart';
-import 'package:lib.ui.input.fidl/text_editing.fidl.dart';
-import 'package:lib.ui.input.fidl/text_input.fidl.dart';
+import 'package:fuchsia.fidl.input/input.dart';
 
 // ignore_for_file: public_member_api_docs
 

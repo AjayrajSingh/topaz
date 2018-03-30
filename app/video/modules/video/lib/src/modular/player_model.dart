@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 import 'dart:async';
 
-import 'package:lib.app.fidl._service_provider/service_provider.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.media.fidl/problem.fidl.dart';
+import 'package:fuchsia.fidl.media/media.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
 import 'package:lib.media.flutter/media_progress.dart';
 import 'package:lib.ui.flutter/child_view.dart';
