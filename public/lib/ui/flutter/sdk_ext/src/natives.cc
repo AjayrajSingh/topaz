@@ -14,7 +14,6 @@
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/macros.h"
-#include "lib/ui/views/fidl/view_manager.fidl.h"
 
 namespace mozart {
 
@@ -109,7 +108,7 @@ void Scenic_offerServiceProvider(Dart_NativeArguments args) {
   if (Dart_IsError(result)) {
     return;
   }
-  f1dl::VectorPtr<f1dl::StringPtr> services;
+  fidl::VectorPtr<fidl::StringPtr> services;
   services.resize(list_length);
   for (intptr_t index = 0; index < list_length; ++index) {
     Dart_Handle value = Dart_ListGetAt(list, index);
@@ -130,11 +129,11 @@ void Scenic_offerServiceProvider(Dart_NativeArguments args) {
   }
 
   NativesDelegate* delegate = reinterpret_cast<NativesDelegate*>(context);
-  f1dl::InterfaceHandle<component::ServiceProvider> provider =
-      f1dl::InterfaceHandle<component::ServiceProvider>(
+  fidl::InterfaceHandle<component::ServiceProvider> provider =
+      fidl::InterfaceHandle<component::ServiceProvider>(
           zx::channel(handle->ReleaseHandle()));
 
-  View* view = delegate->GetMozartView();
+  views_v1::View* view = delegate->GetMozartView();
   view->OfferServiceProvider(std::move(provider), std::move(services));
 }
 
