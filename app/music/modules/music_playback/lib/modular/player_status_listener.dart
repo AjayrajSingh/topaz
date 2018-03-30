@@ -3,8 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fidl/fidl.dart';
-import 'package:topaz.app.music.services.player/player.fidl.dart';
-import 'package:topaz.app.music.services.player/status.fidl.dart';
+import 'package:fuchsia.fidl.music/music.dart';
 
 /// Function signature for PlayerStatusListener callabck
 typedef void PlayerStatusUpdateCallback(PlayerStatus playerStatus);

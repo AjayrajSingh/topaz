@@ -7,10 +7,7 @@ import 'dart:async';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 import 'package:music_models/music_models.dart';
-import 'package:topaz.app.music.services.player/player.fidl.dart'
-    as player_fidl;
-import 'package:topaz.app.music.services.player/repeat_mode.fidl.dart';
-import 'package:topaz.app.music.services.player/status.fidl.dart';
+import 'package:fuchsia.fidl.music/music.dart';
 
 import '../modular/player_status_listener.dart';
 
@@ -21,7 +18,7 @@ class PlaybackModel extends Model {
   /// The [PlayerProxy] which this model interacts with.
   /// This proxy should already be connected before the model is initialized
   /// TODO(chaselatta) MS-1427 decouple PlayerProxy from playback model
-  final player_fidl.PlayerProxy player;
+  final PlayerProxy player;
 
   PlayerStatusListenerImpl _statusListener;
 

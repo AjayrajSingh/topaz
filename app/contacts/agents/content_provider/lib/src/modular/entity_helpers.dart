@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:entity_schemas/entities.dart' as entities;
-import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
+import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
     as fidl;
 
 /// Converts a [fidl.Contact] into a [entities.Contact] entity

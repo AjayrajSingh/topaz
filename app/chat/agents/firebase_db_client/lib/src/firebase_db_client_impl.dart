@@ -12,7 +12,7 @@ import 'package:config/config.dart';
 import 'package:eventsource/eventsource.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
-import 'package:topaz.app.chat.services/firebase_db_client.fidl.dart';
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
 
 import 'exceptions.dart';
 

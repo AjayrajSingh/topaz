@@ -272,12 +272,12 @@ void main() {
       trace('story shell request');
       log.fine('Received binding request for StoryShell');
       _storyShellImpl.bindStoryShell(request);
-    }, StoryShell.serviceName)
+    }, StoryShell.$serviceName)
     ..addServiceForName((InterfaceRequest<Lifecycle> request) {
       trace('lifecycle request');
       log.fine('Received binding request for Lifecycle');
       _storyShellImpl.bindLifecycle(request);
-    }, Lifecycle.serviceName);
+    }, Lifecycle.$serviceName);
   trace('started');
 }
 

@@ -70,7 +70,7 @@ void main(List<String> args) {
   appContext.outgoingServices
     ..addServiceForName(
       lifeCycleImpl.bindLifecycle,
-      Lifecycle.serviceName,
+      Lifecycle.$serviceName,
     );
 
   appContext.close();

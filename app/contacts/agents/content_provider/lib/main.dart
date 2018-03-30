@@ -10,7 +10,7 @@ import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
-import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart';
+import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart';
 
 import 'src/modular/contacts_content_provider_impl.dart';
 
@@ -46,7 +46,7 @@ class ContactsContentProviderAgent extends AgentImpl {
           new EntityProviderBinding()..bind(_contentProviderImpl, request),
         );
       },
-      EntityProvider.serviceName,
+      EntityProvider.$serviceName,
     );
 
     log.fine('Added entity provider implementation to outgoing services');
@@ -77,7 +77,7 @@ class ContactsContentProviderAgent extends AgentImpl {
             ..bind(_contentProviderImpl, request),
         );
       },
-      ContactsContentProvider.serviceName,
+      ContactsContentProvider.$serviceName,
     );
     log.fine('onReady end');
   }

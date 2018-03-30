@@ -405,13 +405,13 @@ Future<Null> main() async {
         _log('Received binding request for Module');
         _module.bindModule(request);
       },
-      Module.serviceName,
+      Module.$serviceName,
     )
     ..addServiceForName(
       (InterfaceRequest<Lifecycle> request) {
         _module.bindLifecycle(request);
       },
-      Lifecycle.serviceName,
+      Lifecycle.$serviceName,
     );
 
   await _readConfig();

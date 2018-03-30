@@ -4,7 +4,7 @@
 
 import 'dart:collection';
 
-import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
+import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
     as fidl;
 
 import 'prefix_tree.dart';

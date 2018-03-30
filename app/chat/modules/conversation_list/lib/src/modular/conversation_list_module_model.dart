@@ -22,7 +22,7 @@ import 'package:lib.story.dart/story.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
     as chat_fidl;
 
 import '../models.dart';

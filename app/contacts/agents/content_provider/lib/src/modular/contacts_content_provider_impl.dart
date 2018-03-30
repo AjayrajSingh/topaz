@@ -14,7 +14,7 @@ import 'package:lib.ledger.dart/ledger.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger;
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
-import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
+import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
     as fidl;
 
 import '../store/contacts_store.dart';

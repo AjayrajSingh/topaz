@@ -12,15 +12,3 @@ dart_library("zircon") {
     "zircon.dart",
   ]
 }
-
-dart_test("tests") {
-  sources = [
-    "fidl_import_test.dart",
-  ]
-
-  deps = [
-    ":zircon",
-    "//peridot/public/lib:fidl",
-    "//third_party/dart-pkg/pub/test",
-  ]
-}

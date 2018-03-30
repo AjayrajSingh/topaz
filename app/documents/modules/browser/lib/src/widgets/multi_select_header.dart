@@ -7,7 +7,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
+import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
 
 const double _kDefaultFontSize = 14.0;
 

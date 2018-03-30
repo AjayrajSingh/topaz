@@ -18,8 +18,7 @@ import 'package:meta/meta.dart';
 import 'module_controller_client.dart';
 
 export 'package:lib.component.dart/component.dart' show ComponentContextClient;
-export 'package:lib.daisy.fidl/daisy.fidl.dart';
-export 'package:lib.surface.fidl/surface.fidl.dart';
+export 'package:fuchsia.fidl.modular/modular.dart';
 
 /// When Module resolution fails.
 class ResolutionException implements Exception {

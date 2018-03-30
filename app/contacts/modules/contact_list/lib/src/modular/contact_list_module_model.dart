@@ -12,7 +12,7 @@ import 'package:lib.component.dart/component.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
-import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
+import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
     as contacts_fidl;
 
 import '../../models.dart';
@@ -190,7 +190,7 @@ class ContactListModuleModel extends ModuleModel {
 
     _ContactListResponse response = await responseCompleter.future;
     if (response.status != contacts_fidl.Status.ok) {
-      log.severe('${contacts_fidl.ContactsContentProvider.serviceName}'
+      log.severe('${contacts_fidl.ContactsContentProvider.$serviceName}'
           '::threw an error');
 
       // TODO(meiyili) SO-731, SO-732: throw error to notify UI

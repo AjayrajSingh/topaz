@@ -421,13 +421,13 @@ void main() {
         log.info('Received binding request for Module');
         _module.bindModule(request);
       },
-      Module.serviceName,
+      Module.$serviceName,
     )
     ..addServiceForName(
       (InterfaceRequest<Lifecycle> request) {
         _module.bindLifecycle(request);
       },
-      Lifecycle.serviceName,
+      Lifecycle.$serviceName,
     );
 
   Color randomColor =

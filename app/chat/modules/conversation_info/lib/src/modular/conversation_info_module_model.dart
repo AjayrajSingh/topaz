@@ -15,7 +15,7 @@ import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
     as fidl;
 
 const String _kChatContentProviderUrl = 'chat_content_provider';

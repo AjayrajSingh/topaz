@@ -10,7 +10,7 @@ import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:entity_schemas/entities.dart' as entities;
 import 'package:meta/meta.dart';
-import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
+import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
 
 /// This is a concrete implementation of the generic Document FIDL interface
 /// Currently, it can only take in one hardcoded Document Provider.

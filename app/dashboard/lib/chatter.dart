@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
     as chat;
 import 'package:collection/collection.dart';
 import 'package:lib.logging/logging.dart';

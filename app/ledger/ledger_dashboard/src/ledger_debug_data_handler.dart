@@ -7,7 +7,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:peridot.bin.ledger.fidl/debug.fidl.dart';
+import 'package:fuchsia.fidl.ledger_internal/ledger_internal.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger_fidl;
 
 import 'data_handler.dart';

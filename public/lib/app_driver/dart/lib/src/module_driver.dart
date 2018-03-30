@@ -19,7 +19,7 @@ import 'package:meta/meta.dart';
 
 import 'service_client.dart';
 
-export 'package:lib.daisy.fidl/daisy.fidl.dart' show Daisy;
+export 'package:fuchsia.fidl.modular/modular.dart' show Daisy;
 export 'package:lib.module_resolver.dart/daisy_builder.dart' show DaisyBuilder;
 export 'package:lib.module.dart/module.dart'
     show ModuleControllerClient, EmbeddedModule;

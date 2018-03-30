@@ -11,7 +11,7 @@ import 'package:fuchsia.fidl.images/images.dart';
 import 'package:fuchsia.fidl.gfx/gfx.dart' as ui_gfx;
 import 'package:zircon/zircon.dart' as zircon;
 
-export 'package:lib.ui.scenic.fidl._presentation_info/presentation_info.fidl.dart'
+export 'package:fuchsia.fidl.images/images.dart'
     show PresentationInfo;
 
 // ignore_for_file: public_member_api_docs

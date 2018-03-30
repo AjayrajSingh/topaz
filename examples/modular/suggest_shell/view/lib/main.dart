@@ -88,10 +88,10 @@ class _AppState {
       ..addServiceForName((InterfaceRequest<Module> request) {
         _log('Service request for Module');
         _module.bindModule(request);
-      }, Module.serviceName)
+      }, Module.$serviceName)
       ..addServiceForName((InterfaceRequest<Lifecycle> request) {
         _module.bindLifecycle(request);
-      }, Lifecycle.serviceName);
+      }, Lifecycle.$serviceName);
   }
 
   // NOTE(mesch): _context is a constructor argument and only used

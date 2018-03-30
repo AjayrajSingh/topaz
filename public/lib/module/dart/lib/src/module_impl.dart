@@ -7,7 +7,7 @@ import 'package:fidl/fidl.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:meta/meta.dart';
 
-export 'package:lib.module.fidl/module_context.fidl.dart' show ModuleContext;
+export 'package:fuchsia.fidl.modular/modular.dart' show ModuleContext;
 export 'package:fuchsia.fidl.component/component.dart'
     show ServiceProvider;
 

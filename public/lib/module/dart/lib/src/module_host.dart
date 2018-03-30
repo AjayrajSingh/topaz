@@ -86,7 +86,7 @@ class ModuleHost {
           _initialize.completeError(err, stackTrace);
         }
       },
-      fidl.Module.serviceName,
+      fidl.Module.$serviceName,
     );
 
     return _initialize.future;

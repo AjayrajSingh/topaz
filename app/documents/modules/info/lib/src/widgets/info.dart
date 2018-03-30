@@ -7,7 +7,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets.dart/model.dart';
 import 'package:utils/utils.dart' as utils;
-import 'package:topaz.app.documents.services/document.fidl.dart';
+import 'package:fuchsia.fidl.documents/documents.dart';
 
 /// Document Info view
 class Info extends StatelessWidget {

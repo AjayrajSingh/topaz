@@ -10,7 +10,7 @@ import 'package:fuchsia.fidl.auth/auth.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:meta/meta.dart';
-import 'package:topaz.app.chat.services/firebase_db_client.fidl.dart';
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
 
 import 'src/firebase_db_connector_impl.dart';
 
@@ -51,7 +51,7 @@ class FirebaseDBClientAgent extends AgentImpl {
           new FirebaseDbConnectorBinding()..bind(_connectorImpl, request),
         );
       },
-      FirebaseDbConnector.serviceName,
+      FirebaseDbConnector.$serviceName,
     );
 
     log.fine('onReady end.');

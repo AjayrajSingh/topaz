@@ -19,7 +19,7 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.module_resolver.dart/daisy_builder.dart';
 import 'package:lib.story.dart/story.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart'
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
     as chat_fidl;
 
 import '../models.dart';

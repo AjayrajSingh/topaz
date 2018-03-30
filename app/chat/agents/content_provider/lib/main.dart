@@ -13,8 +13,7 @@ import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fuchsia.fidl.auth/auth.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:meta/meta.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
-import 'package:topaz.app.chat.services/firebase_db_client.fidl.dart';
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
 
 import 'src/chat_content_provider_impl.dart';
 import 'src/firebase_chat_message_transporter.dart';
@@ -109,7 +108,7 @@ class ChatContentProviderAgent extends AgentImpl {
         log.fine('Received a ChatContentProvider request');
         _contentProviderImpl.addBinding(request);
       },
-      ChatContentProvider.serviceName,
+      ChatContentProvider.$serviceName,
     );
 
     proposer.load();

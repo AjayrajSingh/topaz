@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia.fidl.presentation/presentation.dart';
 import 'package:meta/meta.dart';

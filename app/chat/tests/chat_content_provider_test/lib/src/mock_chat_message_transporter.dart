@@ -8,7 +8,7 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 import 'package:topaz.app.chat.agents.content_provider._chat_content_provider_dart_library/src/chat_message_transporter.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
 
 /// A mock [ChatMessageTransporter] implementation for testing.
 class MockChatMessageTransporter extends ChatMessageTransporter {

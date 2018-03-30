@@ -13,7 +13,6 @@ group("dart_unittests") {
     "app/music:tests",
     "public/dart/fixtures:test",
     "public/dart/widgets:test",
-    "public/dart/zircon:tests",
     "public/lib/schemas/dart:test",
     "shell:tests",
     "tools/dartfmt_extras:test",

@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:fuchsia' as fuchsia;
 
+import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
 import 'package:meta/meta.dart';
 

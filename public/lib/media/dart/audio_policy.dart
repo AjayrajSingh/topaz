@@ -30,7 +30,7 @@ class AudioPolicy {
   /// Constructs a AudioPolicy object.
   AudioPolicy(ServiceProvider services) {
     connectToService(services, _audioPolicyService.ctrl);
-    _handleServiceUpdates(AudioPolicyService.kInitialStatus, null);
+    _handleServiceUpdates(kInitialStatus, null);
   }
 
   /// Called when properties have changed significantly.
@@ -50,7 +50,7 @@ class AudioPolicy {
   /// implicitly set to true. When gain is changed from -160db to a higher
   /// value, |systemAudioMuted| is implicitly set to false.
   set systemAudioGainDb(double value) {
-    double clampedValue = value.clamp(AudioRenderer.kMutedGain, _unityGain);
+    double clampedValue = value.clamp(kMutedGain, _unityGain);
     if (_systemAudioGainDb == clampedValue) {
       return;
     }
@@ -58,7 +58,7 @@ class AudioPolicy {
     _systemAudioGainDb = clampedValue;
     _systemAudioPerceivedLevel = gainToLevel(clampedValue);
 
-    if (_systemAudioGainDb == AudioRenderer.kMutedGain) {
+    if (_systemAudioGainDb == kMutedGain) {
       _systemAudioMuted = true;
     }
 
@@ -72,7 +72,7 @@ class AudioPolicy {
   /// Sets system-wide audio muted state. Setting this value to false when
   /// |systemAudioGainDb| is -160db has no effect.
   set systemAudioMuted(bool value) {
-    bool muted = value || _systemAudioGainDb == AudioRenderer.kMutedGain;
+    bool muted = value || _systemAudioGainDb == kMutedGain;
     if (_systemAudioMuted == muted) {
       return;
     }
@@ -138,7 +138,7 @@ class AudioPolicy {
   /// db.
   static double levelToGain(double level) {
     if (level <= 0.0) {
-      return AudioRenderer.kMutedGain;
+      return kMutedGain;
     }
 
     if (level >= 1.0) {

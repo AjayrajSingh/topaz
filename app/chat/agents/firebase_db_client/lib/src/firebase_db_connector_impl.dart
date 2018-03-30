@@ -6,7 +6,7 @@ import 'package:fuchsia.fidl.auth/auth.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 
-import 'package:topaz.app.chat.services/firebase_db_client.fidl.dart';
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
 
 import 'firebase_db_client_impl.dart';
 

@@ -4,7 +4,7 @@
 
 import 'package:contacts_content_provider/store.dart';
 import 'package:test/test.dart';
-import 'package:topaz.app.contacts.services/contacts_content_provider.fidl.dart'
+import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
     as fidl;
 
 List<fidl.Contact> _createContactList() {

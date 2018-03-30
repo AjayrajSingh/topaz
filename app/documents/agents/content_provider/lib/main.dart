@@ -11,9 +11,9 @@ import 'package:lib.logging/logging.dart';
 import 'package:lib.agent.dart/agent.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:meta/meta.dart';
-import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
+import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
 
-import 'src/documents_content_provider_impl.dart';
+import 'src/documents_impl.dart';
 
 /// Documents Agent instance
 // ignore: unused_element
@@ -50,7 +50,7 @@ class DocumentsAgent extends AgentImpl {
     // to an Agent, and then connect to one of its Services.
     outgoingServices.addServiceForName(
       _addBinding,
-      doc_fidl.DocumentInterface.serviceName,
+      doc_fidl.DocumentInterface.$serviceName,
     );
   }
 
@@ -82,14 +82,14 @@ class DocumentsAgent extends AgentImpl {
             ..bind(_documentsContentProviderImpl, request),
         );
       },
-      EntityProvider.serviceName,
+      EntityProvider.$serviceName,
     );
   }
 }
 
 /// Main entry point.
 Future<Null> main(List<String> args) async {
-  setupLogger(name: 'documents_content_provider');
+  setupLogger(name: 'documents');
 
   _agent = new DocumentsAgent(
     applicationContext: new ApplicationContext.fromStartupInfo(),

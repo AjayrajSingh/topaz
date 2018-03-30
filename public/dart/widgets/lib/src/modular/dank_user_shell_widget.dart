@@ -88,12 +88,12 @@ class DankUserShellWidget extends StatelessWidget {
       ..addServiceForName(
         (InterfaceRequest<UserShell> request) =>
             _userShellBinding.bind(_userShell, request),
-        UserShell.serviceName,
+        UserShell.$serviceName,
       )
       ..addServiceForName(
         (InterfaceRequest<Lifecycle> request) =>
             _lifecycleBinding.bind(_userShell, request),
-        Lifecycle.serviceName,
+        Lifecycle.$serviceName,
       );
   }
 }

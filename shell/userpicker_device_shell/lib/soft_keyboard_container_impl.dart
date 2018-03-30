@@ -69,7 +69,7 @@ class SoftKeyboardContainerImpl extends SoftKeyboardContainer {
     );
     View.offerServiceProvider(
       serviceProvider.passHandle(),
-      <String>[SoftKeyboardContainer.serviceName],
+      <String>[SoftKeyboardContainer.$serviceName],
     );
   }
 }
@@ -83,7 +83,7 @@ class _SoftKeyboardContainerServiceProviderImpl extends ServiceProvider {
 
   @override
   void connectToService(String serviceName, Channel channel) {
-    if (serviceName == SoftKeyboardContainer.serviceName) {
+    if (serviceName == SoftKeyboardContainer.$serviceName) {
       _binding.bind(
         softKeyboardContainer,
         new InterfaceRequest<SoftKeyboardContainer>(channel),

@@ -11,7 +11,7 @@ import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
 
 import 'link_watcher_host.dart';
 
-export 'package:lib.story.fidl/link.fidl.dart';
+export 'package:fuchsia.fidl.modular/modular.dart';
 export 'link_watcher_host.dart';
 
 /// When a value for a given [ref] is not found.
@@ -104,7 +104,7 @@ class LinkClient {
     });
 
     try {
-      proxy.get(path, callback);
+      proxy.get_(path, callback);
     } on Exception catch (err) {
       completer.completeError(err);
     }
@@ -138,7 +138,7 @@ class LinkClient {
     });
 
     try {
-      proxy.set(path, data);
+      proxy.set_(path, data);
     } on Exception catch (err) {
       completer.completeError(err);
     }

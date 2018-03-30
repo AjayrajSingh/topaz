@@ -11,7 +11,7 @@ import 'package:meta/meta.dart';
 
 import 'link_watcher_impl.dart';
 
-export 'package:lib.story.fidl/link.fidl.dart';
+export 'package:fuchsia.fidl.modular/modular.dart';
 
 /// Hosts a [LinkWatcherImpl] and manages the underlying [binding].
 class LinkWatcherHost {

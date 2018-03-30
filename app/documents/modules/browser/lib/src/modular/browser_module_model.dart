@@ -12,7 +12,7 @@ import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module_resolver.dart/daisy_builder.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
+import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
 
 const String _kInfoModuleUrl = 'documents_info';
 
@@ -257,7 +257,7 @@ class BrowserModuleModel extends ModuleModel {
       // TODO(maryxia) SO-880 get this from file manifest and add a check for
       // whether it can be found in the system
       // launches the application at this location, as if it were an agent
-      'documents_content_provider',
+      'documents',
       serviceProviderProxy.ctrl.request(),
       _agentControllerProxy.ctrl.request(),
     );

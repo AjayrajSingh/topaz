@@ -8,8 +8,7 @@ import 'dart:convert' show json;
 import 'package:lib.logging/logging.dart';
 
 import 'package:meta/meta.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
-import 'package:topaz.app.chat.services/firebase_db_client.fidl.dart';
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
 
 import 'chat_message_transporter.dart';
 

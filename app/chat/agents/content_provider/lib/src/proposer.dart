@@ -7,7 +7,7 @@ import 'dart:io';
 
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
 
 const String _kContactsJsonFile = '/system/data/modules/contacts.json';
 

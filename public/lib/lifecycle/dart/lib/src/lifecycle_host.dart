@@ -82,7 +82,7 @@ class LifecycleHost {
           }
         });
       },
-      fidl.Lifecycle.serviceName,
+      fidl.Lifecycle.$serviceName,
     );
 
     return _addService.future;

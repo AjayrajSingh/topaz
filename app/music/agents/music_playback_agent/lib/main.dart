@@ -10,7 +10,7 @@ import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.agent.dart/agent.dart';
 import 'package:meta/meta.dart';
-import 'package:topaz.app.music.services.player/player.fidl.dart';
+import 'package:fuchsia.fidl.music/music.dart';
 
 import 'src/player_impl.dart';
 
@@ -42,7 +42,7 @@ class MusicPlaybackAgent extends AgentImpl {
         log.fine('Received a Player request');
         _playerImpl.addBinding(request);
       },
-      Player.serviceName,
+      Player.$serviceName,
     );
   }
 }

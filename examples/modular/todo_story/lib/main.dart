@@ -78,11 +78,11 @@ void main() {
         _log('Received binding request for Module');
         module.bindModule(request);
       },
-      Module.serviceName,
+      Module.$serviceName,
     )
     ..addServiceForName(
       module.bindLifecycle,
-      Lifecycle.serviceName,
+      Lifecycle.$serviceName,
     );
 
   runApp(new MaterialApp(

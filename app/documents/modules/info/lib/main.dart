@@ -8,7 +8,7 @@ import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.schemas.dart/com.fuchsia.documents.dart';
 import 'package:lib.widgets.dart/model.dart';
-import 'package:topaz.app.documents.services/document.fidl.dart' as doc_fidl;
+import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
 
 import 'src/widgets/info.dart';
 
@@ -31,7 +31,7 @@ void main() {
   // Connect to the service proxy
   driver
       .connectToAgentServiceWithProxy(
-          'documents_content_provider', docsInterfaceProxy)
+          'documents', docsInterfaceProxy)
       .then((_) {
     log.info('Connected to DocumentInterfaceProxy');
   }, onError: _handleError);

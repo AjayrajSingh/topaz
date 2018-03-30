@@ -69,7 +69,7 @@ class AudioPlayerController {
 
       _createLocalPlayer(uri, serviceName);
 
-      _handlePlayerStatusUpdates(MediaPlayer.kInitialStatus, null);
+      _handlePlayerStatusUpdates(kInitialStatus, null);
     }
 
     if (updateCallback != null) {
@@ -101,7 +101,7 @@ class AudioPlayerController {
         device, service, _mediaPlayer.ctrl.request());
     _mediaPlayer.ctrl.onConnectionError = _handleConnectionError;
 
-    _handlePlayerStatusUpdates(MediaPlayer.kInitialStatus, null);
+    _handlePlayerStatusUpdates(kInitialStatus, null);
 
     if (updateCallback != null) {
       scheduleMicrotask(() {
@@ -358,7 +358,7 @@ class AudioPlayerController {
 
   /// Called when the connection to the NetMediaPlayer fails.
   void _handleConnectionError() {
-    _problem = new Problem(type: Problem.kProblemConnectionFailed);
+    _problem = new Problem(type: kProblemConnectionFailed);
 
     if (updateCallback != null) {
       scheduleMicrotask(() {

@@ -149,6 +149,6 @@ void main(List<String> args) {
 
   context.outgoingServices.addServiceForName(
     new ImeServiceImpl().bind,
-    ImeService.serviceName,
+    ImeService.$serviceName,
   );
 }

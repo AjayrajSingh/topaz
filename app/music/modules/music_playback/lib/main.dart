@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:topaz.app.music.services.player/player.fidl.dart';
+import 'package:fuchsia.fidl.music/music.dart';
 
 import 'models/playback_model.dart';
 import 'widgets/scaffold.dart';

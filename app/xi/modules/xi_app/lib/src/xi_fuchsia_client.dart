@@ -41,7 +41,7 @@ class XiFuchsiaClient extends XiClient {
     // "Unsafe implicit cast from InterfaceHandle<dynamic>"?
     // ignore: STRONG_MODE_DOWN_CAST_COMPOSITE
     InterfaceHandle<service.Json> handle = _services.connectToServiceByName(
-      service.Json.serviceName,
+      service.Json.$serviceName,
     );
     _jsonProxy.ctrl.bind(handle);
     final SocketPair pair = new SocketPair();

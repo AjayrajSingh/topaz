@@ -12,10 +12,8 @@ import 'package:fuchsia.fidl.auth/auth.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';
 
-export 'package:lib.agent.fidl/agent.fidl.dart';
-export 'package:lib.agent.fidl/agent_context.fidl.dart';
-export 'package:lib.auth.fidl/token_provider.fidl.dart';
-export 'package:lib.component.fidl/component_context.fidl.dart';
+export 'package:fuchsia.fidl.modular/modular.dart';
+export 'package:fuchsia.fidl.auth/auth.dart';
 
 /// A base class for implementing an [Agent] which receives common services and
 /// also helps exposing services through an outgoing [ServiceProvider].
@@ -104,11 +102,11 @@ abstract class AgentImpl implements Agent, Lifecycle {
       ..addServiceForName((InterfaceRequest<Agent> request) {
         assert(!_agentBinding.isBound);
         _agentBinding.bind(this, request);
-      }, Agent.serviceName)
+      }, Agent.$serviceName)
       ..addServiceForName((InterfaceRequest<Lifecycle> request) {
         assert(!_lifecycleBinding.isBound);
         _lifecycleBinding.bind(this, request);
-      }, Lifecycle.serviceName);
+      }, Lifecycle.$serviceName);
   }
 
   /// Performs additional initializations.

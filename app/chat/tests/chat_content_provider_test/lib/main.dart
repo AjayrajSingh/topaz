@@ -19,7 +19,7 @@ import 'package:fuchsia.fidl.test_runner/test_runner.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart' hide expect;
 import 'package:topaz.app.chat.agents.content_provider._chat_content_provider_dart_library/src/chat_content_provider_impl.dart';
-import 'package:topaz.app.chat.services/chat_content_provider.fidl.dart';
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
 
 import 'src/expect.dart';
 import 'src/mock_chat_message_transporter.dart';
@@ -797,12 +797,12 @@ Future<Null> main(List<String> args) async {
       (InterfaceRequest<Module> request) {
         _module.bindModule(request);
       },
-      Module.serviceName,
+      Module.$serviceName,
     )
     ..addServiceForName(
       (InterfaceRequest<Lifecycle> request) {
         _module.bindLifecycle(request);
       },
-      Lifecycle.serviceName,
+      Lifecycle.$serviceName,
     );
 }

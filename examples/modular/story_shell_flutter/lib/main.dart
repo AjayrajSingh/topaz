@@ -143,9 +143,9 @@ void main() {
     ..addServiceForName((InterfaceRequest<StoryShell> request) {
       _log('Received binding request for StoryShell');
       _storyShellImpl.bindStoryShell(request);
-    }, StoryShell.serviceName)
+    }, StoryShell.$serviceName)
     ..addServiceForName((InterfaceRequest<Lifecycle> request) {
       _log('Received binding request for Lifecycle');
       _storyShellImpl.bindLifecycle(request);
-    }, Lifecycle.serviceName);
+    }, Lifecycle.$serviceName);
 }

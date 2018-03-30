@@ -4,6 +4,7 @@
 
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
 import 'package:fuchsia.fidl.input/input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -83,12 +84,12 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
         DeviceShellBinding binding = new DeviceShellBinding()
           ..bind(_deviceShell, request);
         _deviceShellBindingSet.add(binding);
-      }, DeviceShell.serviceName)
+      }, DeviceShell.$serviceName)
       ..addServiceForName((InterfaceRequest<Lifecycle> request) {
         LifecycleBinding binding = new LifecycleBinding()
           ..bind(_deviceShell, request);
         _lifecycleBindingSet.add(binding);
-      }, Lifecycle.serviceName);
+      }, Lifecycle.$serviceName);
 
     if (softKeyboardContainer != null) {
       applicationContext.outgoingServices.addServiceForName(
@@ -98,7 +99,7 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
                 ..bind(softKeyboardContainer, request);
           _softKeyboardContainerBindingSet.add(binding);
         },
-        SoftKeyboardContainer.serviceName,
+        SoftKeyboardContainer.$serviceName,
       );
     }
   }

@@ -65,11 +65,11 @@ void main() {
         _log('Received binding request for Module');
         _moduleImpl.bindModule(request);
       },
-      Module.serviceName,
+      Module.$serviceName,
     )
     ..addServiceForName(
       _moduleImpl.bindLifecycle,
-      Lifecycle.serviceName,
+      Lifecycle.$serviceName,
     );
   final DummyPhotoStorage storage = new DummyPhotoStorage();
   runApp(new MaterialApp(

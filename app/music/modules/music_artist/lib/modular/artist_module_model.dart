@@ -17,10 +17,8 @@ import 'package:meta/meta.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
-import 'package:topaz.app.music.services.player/player.fidl.dart'
-    as player_fidl;
-import 'package:topaz.app.music.services.player/status.fidl.dart';
-import 'package:topaz.app.music.services.player/track.fidl.dart' as track_fidl;
+import 'package:fuchsia.fidl.music/music.dart';
+import 'package:fuchsia.fidl.music/music.dart' as music;
 
 const String _kPlayerUrl = 'music_playback_agent';
 
@@ -73,7 +71,7 @@ class ArtistModuleModel extends ModuleModel {
   final AgentControllerProxy _playbackAgentController =
       new AgentControllerProxy();
 
-  final player_fidl.PlayerProxy _player = new player_fidl.PlayerProxy();
+  final music.PlayerProxy _player = new music.PlayerProxy();
 
   final LinkProxy _contextLink = new LinkProxy();
 
@@ -109,7 +107,7 @@ class ArtistModuleModel extends ModuleModel {
     // in the playback queue.
     _player.getStatus((PlayerStatus playerStatus) {
       if (albums.isNotEmpty && albums.first.tracks.isNotEmpty) {
-        track_fidl.Track firstTrack = _convertTrackToFidl(
+        music.Track firstTrack = _convertTrackToFidl(
           albums.first.tracks.first,
           albums.first,
         );
@@ -235,13 +233,13 @@ class ArtistModuleModel extends ModuleModel {
   /// Plays the given track
   void playTrack(Track track, Album album) {
     if (track.playbackUrl != null) {
-      track_fidl.Track trackFidl = _convertTrackToFidl(track, album);
+      music.Track trackFidl = _convertTrackToFidl(track, album);
       _player.play(trackFidl);
     }
   }
 
-  track_fidl.Track _convertTrackToFidl(Track track, Album album) {
-    return new track_fidl.Track(
+  music.Track _convertTrackToFidl(Track track, Album album) {
+    return new music.Track(
         title: track.name,
         id: track.id,
         artist: track.artists.first?.name,

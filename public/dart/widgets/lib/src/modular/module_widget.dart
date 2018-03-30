@@ -101,12 +101,12 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
       ..addServiceForName(
         (InterfaceRequest<Module> request) =>
             _moduleBinding.bind(_module, request),
-        Module.serviceName,
+        Module.$serviceName,
       )
       ..addServiceForName(
         (InterfaceRequest<Lifecycle> request) =>
             _lifecycleBinding.bind(_module, request),
-        Lifecycle.serviceName,
+        Lifecycle.$serviceName,
       );
   }
 }
