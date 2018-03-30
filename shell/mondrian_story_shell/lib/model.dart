@@ -21,7 +21,8 @@ typedef bool _SurfaceSpanningTreeCondition(Surface s);
 
 /// Details of a surface child view
 class Surface extends Model {
-  Surface._internal(this._graph, this._node, this.properties, this.relation,
+  /// Public constructor
+  Surface(this._graph, this._node, this.properties, this.relation,
       this.compositionPattern);
 
   final SurfaceGraph _graph;
@@ -249,7 +250,7 @@ class SurfaceContainer extends Surface {
       SurfaceRelation relation,
       String compositionPattern,
       this._layouts)
-      : super._internal(graph, node, properties, relation, compositionPattern) {
+      : super(graph, node, properties, relation, compositionPattern) {
     super._connection = null;
   }
 
@@ -305,8 +306,7 @@ class SurfaceGraph extends Model {
     assert(relation != null);
     parent.add(node);
     Surface oldSurface = _surfaces[id];
-    _surfaces[id] =
-        new Surface._internal(this, node, properties, relation, pattern);
+    _surfaces[id] = new Surface(this, node, properties, relation, pattern);
     oldSurface?.notifyListeners();
     notifyListeners();
   }

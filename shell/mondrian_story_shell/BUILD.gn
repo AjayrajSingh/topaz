@@ -52,6 +52,7 @@ dart_test("test") {
 
   deps = [
     ":mondrian_dart_library",
+    "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",
   ]
 }
