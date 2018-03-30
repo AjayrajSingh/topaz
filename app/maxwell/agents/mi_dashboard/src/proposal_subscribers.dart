@@ -43,7 +43,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
     }
     return <String, dynamic>{
       'image': _encodeEncodedImage(sdi.image),
-      'type': sdi.imageType.fidlEnumValue,
+      'type': sdi.imageType.value,
     };
   }
 
@@ -53,7 +53,7 @@ class ProposalSubscribersDataHandler extends AskProposalListener
         'subheadline': sd.subheadline,
         'details': sd.details,
         'color': sd.color,
-        'annoyance': sd.annoyance.fidlEnumValue,
+        'annoyance': sd.annoyance.value,
         'icons': (sd.icons ?? <SuggestionDisplayImage>[])
             .map(_encodeSuggestionDisplayImage)
             .toList(),

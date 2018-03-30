@@ -5,7 +5,6 @@
 import 'dart:async';
 
 import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.agent.dart/agent.dart';
@@ -13,7 +12,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:meta/meta.dart';
 import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
 
-import 'src/documents_impl.dart';
+import 'src/documents_content_provider_impl.dart';
 
 /// Documents Agent instance
 // ignore: unused_element

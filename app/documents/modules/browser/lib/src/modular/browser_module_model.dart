@@ -198,10 +198,10 @@ class BrowserModuleModel extends ModuleModel {
   void updateCurrentlySelectedDoc(doc_fidl.Document doc) {
     if (_currentDoc == doc) {
       _currentDoc = null;
-      link.set_(const <String>['currentDocId'], json.encode(null));
+      link.set(const <String>['currentDocId'], json.encode(null));
     } else {
       _currentDoc = doc;
-      link.set_(const <String>['currentDocId'], json.encode(doc.id));
+      link.set(const <String>['currentDocId'], json.encode(doc.id));
     }
     notifyListeners();
   }

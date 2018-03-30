@@ -132,7 +132,7 @@ class ChatConversationListModuleModel extends ModuleModel {
 
       // Set the value to Link.
       if (updateLink) {
-        link.set_(const <String>['conversation_id'], json.encode(id));
+        link.set(const <String>['conversation_id'], json.encode(id));
       }
 
       // Start the child conversation, if it hasn't been started yet.

@@ -107,13 +107,13 @@ class CounterParentModuleModel extends ModuleModel {
   /// that the [_counter] value and the [Link] value are always in sync.
   void increment() {
     log.info('increment');
-    link.set_(<String>[_kCounterKey], json.encode(counter + 1));
+    link.set(<String>[_kCounterKey], json.encode(counter + 1));
   }
 
   /// Decrements the counter value by writing the new value to the [Link].
   void decrement() {
     log.info('decrement');
-    link.set_(<String>[_kCounterKey], json.encode(counter - 1));
+    link.set(<String>[_kCounterKey], json.encode(counter - 1));
   }
 
   /// Re-focuses the child module.

@@ -104,7 +104,7 @@ class LinkClient {
     });
 
     try {
-      proxy.get_(path, callback);
+      proxy.get(path, callback);
     } on Exception catch (err) {
       completer.completeError(err);
     }
@@ -138,7 +138,7 @@ class LinkClient {
     });
 
     try {
-      proxy.set_(path, data);
+      proxy.set(path, data);
     } on Exception catch (err) {
       completer.completeError(err);
     }

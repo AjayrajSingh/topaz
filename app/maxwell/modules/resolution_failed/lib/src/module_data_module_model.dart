@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.widgets/modular.dart';

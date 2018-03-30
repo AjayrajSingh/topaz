@@ -17,7 +17,6 @@ import 'package:meta/meta.dart';
 import 'package:music_api/api.dart';
 import 'package:music_models/music_models.dart';
 import 'package:music_widgets/music_widgets.dart';
-import 'package:fuchsia.fidl.music/music.dart';
 import 'package:fuchsia.fidl.music/music.dart' as music;
 
 const String _kPlayerUrl = 'music_playback_agent';
@@ -105,7 +104,7 @@ class ArtistModuleModel extends ModuleModel {
 
     // Set the first track of the first album for playback if there is no track
     // in the playback queue.
-    _player.getStatus((PlayerStatus playerStatus) {
+    _player.getStatus((music.PlayerStatus playerStatus) {
       if (albums.isNotEmpty && albums.first.tracks.isNotEmpty) {
         music.Track firstTrack = _convertTrackToFidl(
           albums.first.tracks.first,

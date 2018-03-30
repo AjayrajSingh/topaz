@@ -52,7 +52,7 @@ class WallpaperChooser {
       focusProvider: focusProvider,
       onWallpaperChosen: (List<String> images) {
         log.info('wallpaper chosen: $images');
-        link.set_(<String>[_kWallpapersLinkKey], json.encode(images));
+        link.set(<String>[_kWallpapersLinkKey], json.encode(images));
         onWallpaperChosen(images);
       },
     );

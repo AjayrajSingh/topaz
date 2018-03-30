@@ -762,7 +762,7 @@ class ChatConversationModuleModel extends ModuleModel {
 
     // Write to the child link so that this can be rehydrated later.
     _currentChildModuleName = name;
-    _childLink.set_(
+    _childLink.set(
       const <String>[],
       json.encode(<String, String>{
         'name': name,
@@ -779,7 +779,7 @@ class ChatConversationModuleModel extends ModuleModel {
       _childModuleController.ctrl.close();
       _childModuleController = null;
       _currentChildModuleName = null;
-      _childLink.set_(<String>[], json.encode(null));
+      _childLink.set(<String>[], json.encode(null));
     }
 
     // if (_galleryService != null) {

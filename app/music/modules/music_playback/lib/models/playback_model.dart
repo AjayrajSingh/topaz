@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 import 'package:music_models/music_models.dart';
-import 'package:fuchsia.fidl.music/music.dart';
+import 'package:fuchsia.fidl.music/music.dart' as music;
 
 import '../modular/player_status_listener.dart';
 
@@ -18,7 +18,7 @@ class PlaybackModel extends Model {
   /// The [PlayerProxy] which this model interacts with.
   /// This proxy should already be connected before the model is initialized
   /// TODO(chaselatta) MS-1427 decouple PlayerProxy from playback model
-  final PlayerProxy player;
+  final music.PlayerProxy player;
 
   PlayerStatusListenerImpl _statusListener;
 
@@ -37,7 +37,7 @@ class PlaybackModel extends Model {
         assert(player != null) {
     // Attach listener to player status updates
     _statusListener = new PlayerStatusListenerImpl(
-      onStatusUpdate: (PlayerStatus status) {
+      onStatusUpdate: (music.PlayerStatus status) {
         _updatePlaybackStatus(status);
         if (status.isPlaying) {
           _ensureProgressTimer();
@@ -52,7 +52,7 @@ class PlaybackModel extends Model {
       ..addPlayerListener(_statusListener.getHandle())
 
       // Get status at initialization
-      ..getStatus((PlayerStatus status) {
+      ..getStatus((music.PlayerStatus status) {
         _updatePlaybackStatus(status);
         if (status.isPlaying) {
           _ensureProgressTimer();
@@ -76,8 +76,8 @@ class PlaybackModel extends Model {
   ///
   /// TODO(dayang): Support Repeat All
   /// https://fuchsia.atlassian.net/browse/SO-513
-  bool get isRepeated => _repeatMode == RepeatMode.one;
-  RepeatMode _repeatMode = RepeatMode.none;
+  bool get isRepeated => _repeatMode == music.RepeatMode.one;
+  music.RepeatMode _repeatMode = music.RepeatMode.none;
 
   /// Toggle play/pause for the current track
   void togglePlayPause() => player.togglePlayPause();
@@ -123,7 +123,7 @@ class PlaybackModel extends Model {
     _progressTimer = null;
   }
 
-  void _updatePlaybackStatus(PlayerStatus status) {
+  void _updatePlaybackStatus(music.PlayerStatus status) {
     _isPlaying = status.isPlaying;
     _repeatMode = status.repeatMode;
     _playbackPosition =
@@ -155,11 +155,11 @@ class PlaybackModel extends Model {
   /// Toggle the repeat mode
   /// Currently only repeat one is supported because of the lack of play queues
   void toggleRepeat() {
-    if (_repeatMode == RepeatMode.none) {
-      player.setRepeatMode(RepeatMode.one);
+    if (_repeatMode == music.RepeatMode.none) {
+      player.setRepeatMode(music.RepeatMode.one);
     }
-    if (_repeatMode == RepeatMode.one) {
-      player.setRepeatMode(RepeatMode.none);
+    if (_repeatMode == music.RepeatMode.one) {
+      player.setRepeatMode(music.RepeatMode.none);
     }
   }
 

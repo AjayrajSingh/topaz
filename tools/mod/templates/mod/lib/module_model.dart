@@ -76,7 +76,7 @@ class __ProjectName__ModuleModel extends ModuleModel {
     //
     // This is important for correctly restoring the counter value and keeping
     // it in sync with other devices.
-    link.set_(<String>['counter'], json.encode(counter + 1));
+    link.set(<String>['counter'], json.encode(counter + 1));
   }
 
   @override

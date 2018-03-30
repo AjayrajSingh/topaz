@@ -114,7 +114,7 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
       json['story'] = <String, dynamic>{
         'id': metadata.story.id,
         'focused': <String, int>{
-          'state': metadata.story.focused.state.fidlEnumValue
+          'state': metadata.story.focused.state.value
         }
       };
     }
@@ -146,7 +146,7 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
       'id': value.id,
       'parentIds': value.parentIds,
       'value': <String, dynamic>{
-        'type': value.value.type.fidlEnumValue,
+        'type': value.value.type.value,
         'content': value.value.content,
         'meta': _encodeContextMetadata(value.value.meta),
       }
@@ -164,7 +164,7 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
                   'key': entry.key,
                   'value': <String, dynamic>{
                     'meta': _encodeContextMetadata(entry.value.meta),
-                    'type': entry.value.type.fidlEnumValue
+                    'type': entry.value.type.value
                   }
                 })
             .toList()

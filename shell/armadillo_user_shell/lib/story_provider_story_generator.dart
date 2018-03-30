@@ -549,7 +549,7 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
 
     if (encoded != _lastLinkJson) {
       log.fine('Writing to link!');
-      _link.set_(<String>[_kStoryClustersLinkKey], encoded);
+      _link.set(<String>[_kStoryClustersLinkKey], encoded);
       _lastLinkJson = encoded;
     }
   }

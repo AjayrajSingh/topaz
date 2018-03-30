@@ -76,7 +76,7 @@ class _Module implements Module, Lifecycle, LinkWatcher {
 
   // API below is exposed to _AppState. In addition, _AppState uses the
   // constructor argument to get notifications.
-  void setValue(String newValue) => _link.set_(_jsonPath, json.encode(newValue));
+  void setValue(String newValue) => _link.set(_jsonPath, json.encode(newValue));
 }
 
 // Persistent external shared state of the app. Connected to the Story
