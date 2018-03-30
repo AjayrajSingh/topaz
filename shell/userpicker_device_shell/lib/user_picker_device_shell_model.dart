@@ -5,8 +5,8 @@
 import 'dart:io';
 
 import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.auth/auth.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:fuchsia.fidl.input/input.dart'
     show KeyboardEvent, KeyboardEventPhase;

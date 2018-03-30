@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fuchsia.fidl.images/images.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 
-import 'suggestion.dart';
+import 'suggestion.dart' as suggest;
 import 'suggestion_layout.dart';
 
 /// Gives each suggestion a slight rounded edge.
@@ -22,7 +22,7 @@ const double _kPersonImageDiameter = 48.0;
 /// Displays a [Suggestion].
 class SuggestionWidget extends StatelessWidget {
   /// The suggestion to display.
-  final Suggestion suggestion;
+  final suggest.Suggestion suggestion;
 
   /// Called with the suggestion is tapped.
   final VoidCallback onSelected;
@@ -47,13 +47,13 @@ class SuggestionWidget extends StatelessWidget {
       (suggestion.image != null) || suggestion.icons.isNotEmpty;
 
   bool get _isCircular =>
-      (suggestion.image != null && suggestion.imageType == ImageType.person) ||
+      (suggestion.image != null && suggestion.imageType == suggest.ImageType.person) ||
       (suggestion.image == null && suggestion.icons.isNotEmpty);
 
-  ImageSide get _imageSide =>
-      suggestion.image != null && suggestion.imageType == ImageType.person
-          ? ImageSide.left
-          : ImageSide.right;
+  suggest.ImageSide get _imageSide =>
+      suggestion.image != null && suggestion.imageType == suggest.ImageType.person
+          ? suggest.ImageSide.left
+          : suggest.ImageSide.right;
 
   @override
   Widget build(BuildContext context) => new LayoutBuilder(
@@ -71,7 +71,7 @@ class SuggestionWidget extends StatelessWidget {
             suggestion.suggestionLayout.suggestionText,
           );
 
-          List<Widget> rowChildren = _imageSide == ImageSide.left
+          List<Widget> rowChildren = _imageSide == suggest.ImageSide.left
               ? <Widget>[image, textAndIcons]
               : <Widget>[textAndIcons, image];
 
@@ -134,7 +134,7 @@ class SuggestionWidget extends StatelessWidget {
                 child: new SizedBox(
                   width: _kPersonImageDiameter,
                   height: _kPersonImageDiameter,
-                  child: _imageSide == ImageSide.left
+                  child: _imageSide == suggest.ImageSide.left
                       ? new ClipOval(
                           child: image,
                         )

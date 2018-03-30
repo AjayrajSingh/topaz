@@ -8,7 +8,7 @@ import 'dart:ui' as ui;
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.media.dart/audio_policy.dart';
-import 'package:fuchsia.fidl.time_service/time_service.dart';
+import 'package:fuchsia.fidl.time_zone/time_zone.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:armadillo/common.dart';
 import 'package:armadillo/overview.dart';
@@ -18,7 +18,7 @@ import 'package:armadillo/recent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:fuchsia.fidl.power/power.dart';
+import 'package:fuchsia.fidl.power_manager/power_manager.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:lib.widgets/widgets.dart';
@@ -151,13 +151,13 @@ Widget buildArmadilloUserShell({
     },
   );
 
-  TimeServiceProxy timeServiceProxy = new TimeServiceProxy();
+  TimezoneProxy timezoneProxy = new TimezoneProxy();
   connectToService(
-      applicationContext.environmentServices, timeServiceProxy.ctrl);
+      applicationContext.environmentServices, timezoneProxy.ctrl);
 
   ContextProviderContextModel contextProviderContextModel =
       new ContextProviderContextModel(
-    timeService: timeServiceProxy,
+    timezone: timezoneProxy,
   );
 
   DeviceMapProxy deviceMapProxy = new DeviceMapProxy();
@@ -209,7 +209,7 @@ Widget buildArmadilloUserShell({
       powerModel.close();
       deviceMapProxy.ctrl.close();
       deviceMapWatcher.close();
-      timeServiceProxy.ctrl.close();
+      timezoneProxy.ctrl.close();
     },
     onWallpaperChosen: contextProviderContextModel.onWallpaperChosen,
   );

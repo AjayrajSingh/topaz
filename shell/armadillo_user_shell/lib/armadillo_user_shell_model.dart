@@ -4,7 +4,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:home_work_agent/home_work_proposer.dart';
-import 'package:fuchsia.fidl.auth/auth.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:fuchsia.fidl.speech/speech.dart';

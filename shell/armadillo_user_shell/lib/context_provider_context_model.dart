@@ -9,7 +9,7 @@ import 'dart:io';
 import 'package:armadillo/now.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:fuchsia.fidl.time_service/time_service.dart';
+import 'package:fuchsia.fidl.time_zone/time_zone.dart';
 import 'package:meta/meta.dart';
 
 export 'package:lib.widgets/model.dart'
@@ -32,7 +32,7 @@ const String _kModeEdgeToEdge = 'edgeToEdge';
 /// Provides assets and text based on context.
 class ContextProviderContextModel extends ContextModel {
   /// Provides time zone information.
-  final TimeService timeService;
+  final Timezone timezone;
 
   Map<String, String> _contextualWifiNetworks = <String, String>{};
   Map<String, String> _contextualLocations = <String, String>{};
@@ -47,13 +47,13 @@ class ContextProviderContextModel extends ContextModel {
   DeviceMode _deviceMode = DeviceMode.normal;
 
   /// Constructor.
-  ContextProviderContextModel({@required this.timeService})
-      : assert(timeService != null) {
+  ContextProviderContextModel({@required this.timezone})
+      : assert(timezone != null) {
     // Gets the current timezone ID so that the correct zone can be
     // highlighted in the timezone picker when timezoneId is retrieved
     // through the 'get' function.  This must be called as the timezone persists
     // in non-volatile storage.
-    timeService.getTimezoneId((String zoneId) {
+    timezone.getTimezoneId((String zoneId) {
       super.timezoneId = zoneId;
     });
   }
@@ -61,7 +61,7 @@ class ContextProviderContextModel extends ContextModel {
   @override
   set timezoneId(String newTimezoneId) {
     if (super.timezoneId != newTimezoneId) {
-      timeService.setTimezone(
+      timezone.setTimezone(
         newTimezoneId,
         (bool status) {
           if (status) {

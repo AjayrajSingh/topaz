@@ -5,7 +5,6 @@
 import 'dart:math' as math;
 
 import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
 import 'package:fidl/fidl.dart';

@@ -130,11 +130,11 @@ class InterfaceInfo {
 
   /// Returns true if we have an ip.
   bool get hasIp =>
-      ((_interface.addr.ipv4?.length ?? 0) == 4 &&
-          _interface.addr.ipv4[0] != 0) ||
-      ((_interface.addr.ipv6?.length ?? 0) == 6 &&
-          _interface.addr.ipv6[0] != 0 &&
-          (_interface.addr.ipv6[0] << 8 | _interface.addr.ipv6[1]) != 0xfe80);
+      ((_interface.addr.ipv4?.addr?.length ?? 0) == 4 &&
+          _interface.addr.ipv4.addr[0] != 0) ||
+      ((_interface.addr.ipv6?.addr?.length ?? 0) == 6 &&
+          _interface.addr.ipv6.addr[0] != 0 &&
+          (_interface.addr.ipv6.addr[0] << 8 | _interface.addr.ipv6.addr[1]) != 0xfe80);
 
   void _update(net.NetInterface interface, net.NetInterfaceStats stats) {
     _interface = interface;

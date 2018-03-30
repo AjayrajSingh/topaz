@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -85,10 +86,10 @@ void startContainerInShell() {
   const List<double> leftRect = const <double>[0.0, 0.0, 0.5, 1.0];
   const List<double> trRect = const <double>[0.5, 0.0, 0.5, 0.5];
   const List<double> brRect = const <double>[0.5, 0.5, 0.5, 0.5];
-  LayoutEntry left = const LayoutEntry(nodeName: 'left', rectangle: leftRect);
-  LayoutEntry tr = const LayoutEntry(nodeName: 'top_right', rectangle: trRect);
+  LayoutEntry left = new LayoutEntry(nodeName: 'left', rectangle: new Float32List.fromList(leftRect));
+  LayoutEntry tr = new LayoutEntry(nodeName: 'top_right', rectangle: new Float32List.fromList(trRect));
   LayoutEntry br =
-      const LayoutEntry(nodeName: 'bottom_right', rectangle: brRect);
+      new LayoutEntry(nodeName: 'bottom_right', rectangle: new Float32List.fromList(brRect));
   ContainerLayout main =
       new ContainerLayout(surfaces: <LayoutEntry>[left, tr, br]);
   List<ContainerLayout> layouts = <ContainerLayout>[main];
