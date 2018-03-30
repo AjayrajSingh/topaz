@@ -12,6 +12,7 @@ dart_library("lib.logging") {
   ]
 
   deps = [
+    "//garnet/public/lib/cobalt/fidl",
     "//third_party/dart-pkg/pub/logging",
     "//third_party/dart-pkg/pub/stack_trace",
     "//topaz/public/dart/fidl",
