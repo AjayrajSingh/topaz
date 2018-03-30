@@ -314,8 +314,7 @@ template("flutter_source_app") {
       rebase_path(contents),
       "--url-mapping=dart:zircon," + rebase_path(zircon_sdk_ext_lib),
       "--url-mapping=dart:fuchsia," + rebase_path(fuchsia_sdk_ext_lib),
-      "--url-mapping=dart:mozart.internal," +
-          rebase_path(mozart_dart_sdk_ext_lib),
+      "--url-mapping=dart:mozart.internal," + rebase_path(mozart_dart_sdk_ext_lib),
       "--url-mapping=dart:ui," + rebase_path(dart_ui_path),
     ]
   }

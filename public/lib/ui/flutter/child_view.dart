@@ -4,7 +4,6 @@
 
 import 'dart:async';
 import 'dart:collection';
-import 'dart:mozart.internal';
 import 'dart:ui' as ui;
 
 import 'package:lib.app.dart/app.dart';
@@ -16,14 +15,14 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';
+import 'package:mozart/mozart.dart';
 import 'package:zircon/zircon.dart';
 
-export 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart'
-    show ViewOwner;
+export 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart' show ViewOwner;
 
 ViewContainerProxy _initViewContainer() {
   // Analyzer doesn't know Handle must be dart:zircon's Handle
-  final Handle handle = ScenicStartupInfo.takeViewContainer();  // ignore: invalid_assignment
+  final Handle handle = ScenicStartupInfo.takeViewContainer();
   if (handle == null) {
     return null;
   }
@@ -92,8 +91,8 @@ class ChildViewConnection {
       ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable}) {
     final Services services = new Services();
-    final ApplicationLaunchInfo launchInfo =
-        new ApplicationLaunchInfo(url: url, directoryRequest: services.request());
+    final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo(
+        url: url, directoryRequest: services.request());
     try {
       launcher.createApplication(launchInfo, controller);
       return new ChildViewConnection.connect(services,
@@ -288,8 +287,7 @@ class _RenderChildView extends RenderBox {
     ChildViewConnection connection,
     @required double scale,
     bool hitTestable: true,
-  })
-      : _connection = connection,
+  })  : _connection = connection,
         _scale = scale,
         _hitTestable = hitTestable,
         assert(scale != null),
@@ -533,6 +531,6 @@ class View {
   static void offerServiceProvider(
       InterfaceHandle<ServiceProvider> provider, List<String> services) {
     // Analyzer doesn't know Handle must be dart:zircon's Handle
-    Scenic.offerServiceProvider(provider.passChannel().handle, services); // ignore: argument_type_not_assignable
+    Scenic.offerServiceProvider(provider.passChannel().handle, services);
   }
 }
