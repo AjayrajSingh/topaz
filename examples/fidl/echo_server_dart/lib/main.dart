@@ -27,5 +27,5 @@ _EchoImpl _echo;
 void main(List<String> args) {
   _context = new ApplicationContext.fromStartupInfo();
   _echo = new _EchoImpl();
-  _context.outgoingServices.addServiceForName2<Echo>(_echo.bind, 'echo2.Echo');
+  _context.outgoingServices.addServiceForName<Echo>(_echo.bind, 'echo2.Echo');
 }

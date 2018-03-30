@@ -4,7 +4,7 @@
 
 import 'package:fuchsia.fidl.echo2/echo2.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.fidl/application_launcher.fidl.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 
 ApplicationContext _context;
 EchoProxy _echo;
@@ -23,7 +23,7 @@ void main(List<String> args) {
   _context.launcher.createApplication(launchInfo, null);
 
   _echo = new EchoProxy();
-  _echo.ctrl.bind(services.connectToServiceByName2<Echo>('echo2.Echo'));
+  _echo.ctrl.bind(services.connectToServiceByName<Echo>('echo2.Echo'));
 
   _echo.echoString('hello', (String response) {
     print('***** Response: $response');

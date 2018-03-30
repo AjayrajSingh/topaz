@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:io' as io;
 
-import 'package:topaz.runtime.dart_runner.examples.hello_app_dart.interfaces/interfaces.fidl.dart';
+import 'package:fuchsia.fidl.hello_app_dart/hello_app_dart.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.component/component.dart';
 import 'package:test/test.dart';
