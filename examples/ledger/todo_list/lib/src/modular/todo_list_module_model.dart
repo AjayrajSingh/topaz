@@ -5,7 +5,6 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger;
 import 'package:fuchsia.fidl.modular/modular.dart';

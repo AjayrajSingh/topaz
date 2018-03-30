@@ -10,7 +10,8 @@ import 'dart:convert' show json;
 
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bt;
-import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as ble;
+import 'package:fuchsia.fidl.bluetooth_low_energy/bluetooth_low_energy.dart'
+    as ble;
 import 'package:lib.logging/logging.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
@@ -148,8 +149,8 @@ class EddystoneScanner implements ble.CentralDelegate {
       }
       if (entry.data[0] == 0x10) {
         // Eddystone-URL
-        String url = decodeEddystoneURL(
-            entry.data.getRange(2, entry.data.length));
+        String url =
+            decodeEddystoneURL(entry.data.getRange(2, entry.data.length));
         if (url != null && !proposed.contains(url)) {
           proposed.add(url);
           proposeUrl(url);
