@@ -6,7 +6,8 @@ library fuchsia;
 
 import 'dart:isolate';
 
-import 'package:zircon/zircon.dart';
+import 'package:zircon/zircon.dart'
+  if (dart.library.zircon) 'dart:zircon';
 
 // ignore_for_file: native_function_body_in_non_sdk_code
 // ignore_for_file: public_member_api_docs
