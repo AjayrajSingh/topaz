@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/dart/dart_library.gni")
 import("//build/dart/toolchain.gni")
 import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
 import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
@@ -33,34 +34,15 @@ template("gen_snapshot_cc") {
 
   if (defined(invoker.dart_deps)) {
     dart_deps = invoker.dart_deps
-    action("${name}_package_map") {
-      dot_packages_file = "$target_gen_dir/${name}.packages"
-      outputs = [
-        dot_packages_file,
-      ]
-      deps = []
-      foreach(dep, dart_deps) {
-        deps += [ "$dep($dart_toolchain)" ]
-      }
 
-      depfile = "$dot_packages_file.d"
+    dart_library("${name}_package_map") {
+      sources = []
 
-      script = "//build/dart/gen_dot_packages.py"
-      args = [
-               "--out",
-               rebase_path(dot_packages_file, root_build_dir),
-               "--source-dir",
-               rebase_path("."),
-               "--root-build-dir",
-               rebase_path(root_build_dir),
-               "--root-gen-dir",
-               rebase_path(dart_root_gen_dir),
-               "--package-name",
-               "snapshot_root",
-               "--depfile",
-               rebase_path(depfile),
-               "--deps",
-             ] + dart_deps
+      package_name = "i_am_gen_snapshot_cc"
+
+      disable_analysis = true
+
+      deps = dart_deps
     }
   }
 
@@ -96,8 +78,11 @@ template("gen_snapshot_cc") {
       "--url_mapping=dart:fuchsia," + rebase_path(fuchsia_sdk_ext_lib),
     ]
     if (defined(invoker.dart_deps)) {
+      package_gen_dir = get_label_info(":bogus($dart_toolchain)",
+          "target_gen_dir")
+      package_file = "$package_gen_dir/${name}_package_map.packages"
       args +=
-          [ "--packages=" + rebase_path("$target_gen_dir/${name}.packages") ]
+          [ "--packages=" + rebase_path(package_file) ]
     }
     if (is_debug) {
       args += [ "--enable_asserts" ]
