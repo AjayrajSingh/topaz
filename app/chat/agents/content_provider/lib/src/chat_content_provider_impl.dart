@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:convert' show utf8;
 import 'dart:typed_data';
 
-import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fidl/fidl.dart' show InterfaceRequest;
 import 'package:fuchsia.fidl.fsl/fsl.dart';
 import 'package:lib.ledger.dart/ledger.dart';
@@ -215,7 +214,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
       await Future.forEach(_kReservedPages, (_ReservedPage pageInfo) {
         PageProxy page = new PageProxy();
-        _ledger.getPage(pageInfo.id, page.ctrl.request(), (Status status) {
+        _ledger.getPage(new PageId(id: pageInfo.id), page.ctrl.request(), (Status status) {
           if (status != Status.ok) {
             throw new Exception(
               'Ledger::GetPage() returned an error status: $status',
@@ -362,7 +361,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         // Get the ID of that page, which will be used as the conversation id.
         Completer<Uint8List> idCompleter = new Completer<Uint8List>();
         newConversationPage.getId(
-          (List<int> id) => idCompleter.complete(new Uint8List.fromList(id)),
+          (PageId id) => idCompleter.complete(id.id),
         );
         Uint8List conversationId = await idCompleter.future;
 
@@ -771,13 +770,13 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
   @override
   Future<Null> sendMessage(
-    List<int> conversationId,
+    Uint8List conversationId,
     String type,
     String jsonPayload,
-    void callback(ChatStatus chatStatus, List<int> messageId),
+    void callback(ChatStatus chatStatus, Uint8List messageId),
   ) async {
     if (_unrecoverable) {
-      callback(ChatStatus.unrecoverableError, const <int>[]);
+      callback(ChatStatus.unrecoverableError, new Uint8List(0));
       return;
     }
 
@@ -785,7 +784,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       try {
         await _ledgerReady.future;
       } on Exception {
-        callback(ChatStatus.ledgerNotInitialized, const <int>[]);
+        callback(ChatStatus.ledgerNotInitialized, new Uint8List(0));
         return;
       }
 
@@ -824,7 +823,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       try {
         Completer<Status> statusCompleter = new Completer<Status>();
         _ledger.getPage(
-          conversationId,
+          new PageId(id: conversationId),
           conversationPage.ctrl.request(),
           statusCompleter.complete,
         );
@@ -832,7 +831,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         Status status = await statusCompleter.future;
         if (status != Status.ok) {
           log.severe('Ledger::GetPage() returned an error status: $status');
-          callback(ChatStatus.ledgerOperationError, const <int>[]);
+          callback(ChatStatus.ledgerOperationError, new Uint8List(0));
           return;
         }
 
@@ -847,7 +846,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         status = await statusCompleter.future;
         if (status != Status.ok) {
           log.severe('Page::Put() returned an error status: $status');
-          callback(ChatStatus.ledgerOperationError, const <int>[]);
+          callback(ChatStatus.ledgerOperationError, new Uint8List(0));
           return;
         }
       } finally {
@@ -868,20 +867,20 @@ class ChatContentProviderImpl extends ChatContentProvider {
           jsonPayload: jsonPayload,
         );
       } on ChatAuthenticationException {
-        callback(ChatStatus.authenticationError, const <int>[]);
+        callback(ChatStatus.authenticationError, new Uint8List(0));
         return;
       } on ChatAuthorizationException {
-        callback(ChatStatus.permissionError, const <int>[]);
+        callback(ChatStatus.permissionError, new Uint8List(0));
         return;
       } on ChatNetworkException {
-        callback(ChatStatus.networkError, const <int>[]);
+        callback(ChatStatus.networkError, new Uint8List(0));
         return;
       }
 
       callback(ChatStatus.ok, messageId);
     } on Exception catch (e, stackTrace) {
       log.severe('Sending ChatStatus.unknownError caused by', e, stackTrace);
-      callback(ChatStatus.unknownError, const <int>[]);
+      callback(ChatStatus.unknownError, new Uint8List(0));
     }
   }
 
@@ -911,7 +910,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       try {
         Completer<Status> statusCompleter = new Completer<Status>();
         _ledger.getPage(
-          conversationId,
+          new PageId(id: conversationId),
           conversationPage.ctrl.request(),
           statusCompleter.complete,
         );
@@ -1033,7 +1032,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
     try {
       Completer<Status> statusCompleter = new Completer<Status>();
       _ledger.getPage(
-        conversationId,
+        new PageId(id: conversationId),
         conversationPage.ctrl.request(),
         statusCompleter.complete,
       );
@@ -1086,7 +1085,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         // Request a new page from Ledger.
         Completer<Status> statusCompleter = new Completer<Status>();
         _ledger.getPage(
-          conversation.conversationId,
+          new PageId(id: conversation.conversationId),
           conversationPage.ctrl.request(),
           statusCompleter.complete,
         );

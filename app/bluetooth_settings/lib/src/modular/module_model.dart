@@ -3,30 +3,31 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bluetooth;
+import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bt;
+import 'package:fuchsia.fidl.bluetooth_control/bluetooth_control.dart' as bt_ctl;
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 /// The [ModuleModel] for the Settings example.
 class SettingsModuleModel extends ModuleModel
-    implements bluetooth.AdapterManagerDelegate, bluetooth.AdapterDelegate {
+    implements bt_ctl.AdapterManagerDelegate, bt_ctl.AdapterDelegate {
   // Members that maintain the FIDL service connections.
-  final bluetooth.AdapterManagerProxy _adapterManager =
-      new bluetooth.AdapterManagerProxy();
-  final bluetooth.AdapterDelegateBinding _adBinding =
-      new bluetooth.AdapterDelegateBinding();
-  final bluetooth.AdapterManagerDelegateBinding _amdBinding =
-      new bluetooth.AdapterManagerDelegateBinding();
+  final bt_ctl.AdapterManagerProxy _adapterManager =
+      new bt_ctl.AdapterManagerProxy();
+  final bt_ctl.AdapterDelegateBinding _adBinding =
+      new bt_ctl.AdapterDelegateBinding();
+  final bt_ctl.AdapterManagerDelegateBinding _amdBinding =
+      new bt_ctl.AdapterManagerDelegateBinding();
 
   // Contains information about the Bluetooth adapters that are on the system.
-  final Map<String, bluetooth.AdapterInfo> _adapters =
-      <String, bluetooth.AdapterInfo>{};
+  final Map<String, bt_ctl.AdapterInfo> _adapters =
+      <String, bt_ctl.AdapterInfo>{};
 
   // The current system's active Bluetooth adapter. We assign these fields when the AdapterManager
   // service notifies us.
   String _activeAdapterId;
-  bluetooth.AdapterProxy _activeAdapter;
+  bt_ctl.AdapterProxy _activeAdapter;
 
   // True if we have an active discovery session.
   bool _isDiscovering = false;
@@ -35,8 +36,8 @@ class SettingsModuleModel extends ModuleModel
   bool _isDiscoveryRequestPending = false;
 
   // Devices found during discovery.
-  final Map<String, bluetooth.RemoteDevice> _discoveredDevices =
-      <String, bluetooth.RemoteDevice>{};
+  final Map<String, bt_ctl.RemoteDevice> _discoveredDevices =
+      <String, bt_ctl.RemoteDevice>{};
 
   /// Constructor
   SettingsModuleModel(this.applicationContext) : super();
@@ -46,7 +47,7 @@ class SettingsModuleModel extends ModuleModel
   final ApplicationContext applicationContext;
 
   /// Public accessors for the private fields above.
-  Iterable<bluetooth.AdapterInfo> get adapters => _adapters.values;
+  Iterable<bt_ctl.AdapterInfo> get adapters => _adapters.values;
 
   /// Returns true if at least one adapter exists on the system.
   bool get isBluetoothAvailable => _adapters.isNotEmpty;
@@ -59,7 +60,7 @@ class SettingsModuleModel extends ModuleModel
       hasActiveAdapter && (_activeAdapterId == adapterId);
 
   /// Returns information about the current active adapter.
-  bluetooth.AdapterInfo get activeAdapterInfo =>
+  bt_ctl.AdapterInfo get activeAdapterInfo =>
       hasActiveAdapter ? _adapters[_activeAdapterId] : null;
 
   /// Returns true if a request to start/stop discovery is currently pending.
@@ -69,7 +70,7 @@ class SettingsModuleModel extends ModuleModel
   bool get isDiscovering => _isDiscovering;
 
   /// Returns a list of Bluetooth devices that have been discovered.
-  Iterable<bluetooth.RemoteDevice> get discoveredDevices =>
+  Iterable<bt_ctl.RemoteDevice> get discoveredDevices =>
       _discoveredDevices.values;
 
   /// Returns a string that describes the current active adapter which can be displayed to the user.
@@ -80,7 +81,7 @@ class SettingsModuleModel extends ModuleModel
   /// adapter. This affects the entire system as the active adapter currently in use by all current
   /// Bluetooth service clients will change.
   void setActiveAdapter(String id) {
-    _adapterManager.setActiveAdapter(id, (bluetooth.Status status) {
+    _adapterManager.setActiveAdapter(id, (bt.Status status) {
       notifyListeners();
     });
   }
@@ -98,7 +99,7 @@ class SettingsModuleModel extends ModuleModel
     assert(!_isDiscoveryRequestPending);
 
     _isDiscoveryRequestPending = true;
-    void cb(bluetooth.Status status) {
+    void cb(bt.Status status) {
       _isDiscoveryRequestPending = false;
       notifyListeners();
     }
@@ -133,10 +134,10 @@ class SettingsModuleModel extends ModuleModel
     super.onStop();
   }
 
-  // bluetooth.AdapterManagerDelegate overrides:
+  // bt_ctl.AdapterManagerDelegate overrides:
 
   @override
-  void onActiveAdapterChanged(bluetooth.AdapterInfo activeAdapter) {
+  void onActiveAdapterChanged(bt_ctl.AdapterInfo activeAdapter) {
     log.info('onActiveAdapterChanged: ${activeAdapter?.identifier ?? 'null'}');
 
     // Reset the state of all running procedures as the active adapter has changed.
@@ -154,7 +155,7 @@ class SettingsModuleModel extends ModuleModel
     if (_activeAdapterId == null) {
       _activeAdapter = null;
     } else {
-      _activeAdapter = new bluetooth.AdapterProxy();
+      _activeAdapter = new bt_ctl.AdapterProxy();
       _adapterManager.getActiveAdapter(_activeAdapter.ctrl.request());
       _activeAdapter.setDelegate(_adBinding.wrap(this));
     }
@@ -163,7 +164,7 @@ class SettingsModuleModel extends ModuleModel
   }
 
   @override
-  void onAdapterAdded(bluetooth.AdapterInfo adapter) {
+  void onAdapterAdded(bt_ctl.AdapterInfo adapter) {
     log.info('onAdapterAdded: ${adapter.identifier}');
     _adapters[adapter.identifier] = adapter;
     notifyListeners();
@@ -179,10 +180,10 @@ class SettingsModuleModel extends ModuleModel
     notifyListeners();
   }
 
-  // bluetooth.AdapterDelegate overrides:
+  // bt_ctl.AdapterDelegate overrides:
 
   @override
-  void onAdapterStateChanged(bluetooth.AdapterState state) {
+  void onAdapterStateChanged(bt_ctl.AdapterState state) {
     log.info('onAdapterStateChanged');
     if (state.discovering == null) {
       return;
@@ -195,7 +196,7 @@ class SettingsModuleModel extends ModuleModel
   }
 
   @override
-  void onDeviceDiscovered(bluetooth.RemoteDevice device) {
+  void onDeviceDiscovered(bt_ctl.RemoteDevice device) {
     _discoveredDevices[device.identifier] = device;
     notifyListeners();
   }

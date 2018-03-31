@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart';
 import 'package:lib.logging/logging.dart';

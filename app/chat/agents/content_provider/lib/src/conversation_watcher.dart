@@ -4,7 +4,7 @@
 
 import 'dart:convert' show json;
 
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart';
 import 'package:meta/meta.dart';
 

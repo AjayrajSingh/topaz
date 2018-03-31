@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bluetooth;
+import 'package:fuchsia.fidl.bluetooth_control/bluetooth_control.dart' as bt_ctl;
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'modular/module_model.dart';
@@ -19,7 +19,7 @@ class _SettingsScaffold extends StatelessWidget {
             .divideTiles(
                 context: context,
                 tiles: moduleModel.discoveredDevices
-                    .map((bluetooth.RemoteDevice device) {
+                    .map((bt_ctl.RemoteDevice device) {
                   return new ListTile(
                       title: new Text(device.name ?? '(unknown)'),
                       subtitle: new Text(device.address));
@@ -33,7 +33,7 @@ class _SettingsScaffold extends StatelessWidget {
         itemBuilder: (BuildContext context) {
           int index = 0;
           return moduleModel.adapters
-              .map((bluetooth.AdapterInfo adapter) => new PopupMenuItem<int>(
+              .map((bt_ctl.AdapterInfo adapter) => new PopupMenuItem<int>(
                     enabled: !moduleModel.isActiveAdapter(adapter.identifier),
                     value: index++,
                     child: new Text(adapter.address +
