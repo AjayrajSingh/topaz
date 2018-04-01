@@ -162,7 +162,6 @@ gen_snapshot_cc("script_runner_snapshot") {
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/zircon",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/fidl/dart",
   ]
 }
 
