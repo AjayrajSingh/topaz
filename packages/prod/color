@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "color": "//topaz/app/color"
     }

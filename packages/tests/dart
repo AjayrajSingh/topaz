@@ -1,8 +1,4 @@
 {
-    "languages": [
-        "cpp",
-        "dart"
-    ],
     "imports": [
         "topaz/packages/prod/dart"
     ],

@@ -1,8 +1,4 @@
 {
-    "languages": [
-        "cpp",
-        "dart"
-    ],
     "labels": [
         "//third_party/dart:create_sdk"
     ],

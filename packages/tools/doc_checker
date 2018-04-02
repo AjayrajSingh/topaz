@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "labels": [
         "//topaz/tools/doc_checker(//build/toolchain:host_x64)"
     ]

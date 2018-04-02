@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "image": "//topaz/app/image"
     }

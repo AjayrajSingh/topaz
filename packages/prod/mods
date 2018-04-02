@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "imports": [
         "topaz/packages/prod/chat",
         "topaz/packages/prod/contacts",

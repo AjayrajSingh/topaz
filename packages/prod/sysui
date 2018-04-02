@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "armadillo_user_shell": "//topaz/shell/armadillo_user_shell",
         "capybara_user_shell": "//topaz/shell/capybara_user_shell",

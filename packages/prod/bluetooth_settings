@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "bluetooth_settings": "//topaz/app/bluetooth_settings"
     }

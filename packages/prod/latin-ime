@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "latin-ime": "//topaz/app/latin-ime"
     }

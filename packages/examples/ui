@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "hello_material1_jit": "//topaz/examples/ui/hello_material:hello_material1_jit",
         "hello_material2_jit": "//topaz/examples/ui/hello_material:hello_material2_jit",

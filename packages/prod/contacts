@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "contact_card": "//topaz/app/contacts/modules/contact_card",
         "contact_list": "//topaz/app/contacts/modules/contact_list",

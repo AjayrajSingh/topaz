@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "example_manual_relationships": "//topaz/shell/mondrian_story_shell/examples/manual:example_manual_relationships"
     }

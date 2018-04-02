@@ -1,8 +1,4 @@
 {
-    "languages": [
-        "dart",
-        "rust"
-    ],
     "labels": [
         "//topaz/app/xi"
     ],

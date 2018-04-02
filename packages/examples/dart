@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "goodbye_dart1_aot": "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart1_aot",
         "goodbye_dart1_jit": "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart1_jit",

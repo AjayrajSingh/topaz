@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "cpp"
-    ],
     "packages": {
         "auth_provider_tests": "//topaz/auth_providers:tests"
     }

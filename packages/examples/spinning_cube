@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "spinning_cube": "//topaz/app/spinning_cube"
     }

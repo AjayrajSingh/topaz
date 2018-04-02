@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "mondrian": "//topaz/shell/mondrian_story_shell:mondrian"
     }

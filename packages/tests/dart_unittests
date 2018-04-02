@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "labels": [
         "//topaz:dart_unittests"
     ]

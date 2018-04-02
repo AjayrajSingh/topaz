@@ -2,9 +2,6 @@
     "imports": [
         "topaz/packages/prod/term"
     ],
-    "languages": [
-        "cpp"
-    ],
     "packages": {
         "ermine_user_shell": "//topaz/shell/ermine_user_shell"
     }

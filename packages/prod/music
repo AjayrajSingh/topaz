@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "concert_agent": "//topaz/app/music/agents/concert_agent",
         "concert_event_list": "//topaz/app/music/modules/concert_event_list",

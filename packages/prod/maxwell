@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "basic_text_reporter": "//topaz/app/maxwell/modules/basic_text_reporter",
         "mi_dashboard": "//topaz/app/maxwell/agents/mi_dashboard",

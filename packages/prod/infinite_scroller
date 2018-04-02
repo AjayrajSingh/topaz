@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "infinite_scroller": "//topaz/app/infinite_scroller"
     }

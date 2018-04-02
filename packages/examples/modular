@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "dart"
-    ],
     "packages": {
         "example_flutter_counter_child": "//topaz/examples/modular/counter_flutter/child:example_flutter_counter_child",
         "example_flutter_counter_parent_embed": "//topaz/examples/modular/counter_flutter/parent_embed:example_flutter_counter_parent_embed",

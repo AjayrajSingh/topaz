@@ -1,7 +1,4 @@
 {
-    "languages": [
-        "cpp"
-    ],
     "imports": [
         "topaz/packages/prod/curl",
         "topaz/packages/prod/sqlite"

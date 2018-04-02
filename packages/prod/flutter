@@ -1,8 +1,4 @@
 {
-    "languages": [
-        "cpp",
-        "dart"
-    ],
     "imports": [
         "garnet/packages/prod/fonts",
         "garnet/packages/prod/icu_data",

@@ -1,8 +1,4 @@
 {
-    "languages": [
-        "cpp",
-        "dart"
-    ],
     "packages": {
         "dart1_aot_runner": "//topaz/runtime/dart_runner:dart1_aot_runner",
         "dart1_jit_runner": "//topaz/runtime/dart_runner:dart1_jit_runner",
