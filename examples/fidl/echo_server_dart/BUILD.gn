@@ -10,6 +10,6 @@ dart_app("echo_server_dart") {
   deps = [
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
-    "//garnet/examples/fidl2/services:echo2",
+    "//garnet/examples/fidl/services:echo2",
   ]
 }
