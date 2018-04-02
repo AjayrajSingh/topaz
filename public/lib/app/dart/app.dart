@@ -61,7 +61,7 @@ void connectToService<T>(
     ServiceProvider serviceProvider, ProxyController<T> controller) {
   final String serviceName = controller.$serviceName;
   assert(serviceName != null,
-      'controller.$serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
+      'controller.\$serviceName must not be null. Check the FIDL file for a missing [ServiceName="<name>"]');
   serviceProvider.connectToService(
       serviceName, controller.request().passChannel());
 }

@@ -10,10 +10,6 @@ group("fuchsia") {
   public_deps = [
     ":sdk_ext",
   ]
-
-  deps = [
-    ":package_for_analysis",
-  ]
 }
 
 source_set("sdk_ext") {
@@ -33,19 +29,5 @@ source_set("sdk_ext") {
     "//garnet/public/lib/app/fidl",
     "//topaz/lib/tonic",
     "//topaz/public/dart-pkg/zircon",
-  ]
-}
-
-# This is just so that we can run dart analysis on these files.
-dart_library("package_for_analysis") {
-  infer_package_name = true
-
-  sources = [
-    "fuchsia.dart",
-  ]
-
-  deps = [
-    "//topaz/public/dart/zircon",
-    "//topaz/public/dart/fidl",
   ]
 }
