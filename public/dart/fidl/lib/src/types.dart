@@ -406,10 +406,11 @@ void _validateEncodedHandle(int encoded, bool nullable) {
 }
 
 void _encodeHandle(Encoder encoder, Handle value, int offset, bool nullable) {
-  int encoded = value.isValid ? kHandlePresent : kHandleAbsent;
+  int encoded =
+      (value != null && value.isValid) ? kHandlePresent : kHandleAbsent;
   _validateEncodedHandle(encoded, nullable);
   encoder.encodeUint32(encoded, offset);
-  if (value.isValid) {
+  if (encoded == kHandlePresent) {
     encoder.addHandle(value);
   }
 }
@@ -425,8 +426,7 @@ Handle _decodeHandle(Decoder decoder, int offset, bool nullable) {
 class HandleType extends FidlType<Handle> {
   const HandleType({
     this.nullable,
-  })
-      : super(encodedSize: 4);
+  }) : super(encodedSize: 4);
 
   final bool nullable;
 
@@ -443,14 +443,13 @@ class HandleType extends FidlType<Handle> {
 class ChannelType extends FidlType<Channel> {
   const ChannelType({
     this.nullable,
-  })
-      : super(encodedSize: 4);
+  }) : super(encodedSize: 4);
 
   final bool nullable;
 
   @override
   void encode(Encoder encoder, Channel value, int offset) {
-    _encodeHandle(encoder, value.handle, offset, nullable);
+    _encodeHandle(encoder, value?.handle, offset, nullable);
   }
 
   @override
@@ -461,14 +460,13 @@ class ChannelType extends FidlType<Channel> {
 class SocketType extends FidlType<Socket> {
   const SocketType({
     this.nullable,
-  })
-      : super(encodedSize: 4);
+  }) : super(encodedSize: 4);
 
   final bool nullable;
 
   @override
   void encode(Encoder encoder, Socket value, int offset) {
-    _encodeHandle(encoder, value.handle, offset, nullable);
+    _encodeHandle(encoder, value?.handle, offset, nullable);
   }
 
   @override
@@ -479,14 +477,13 @@ class SocketType extends FidlType<Socket> {
 class VmoType extends FidlType<Vmo> {
   const VmoType({
     this.nullable,
-  })
-      : super(encodedSize: 4);
+  }) : super(encodedSize: 4);
 
   final bool nullable;
 
   @override
   void encode(Encoder encoder, Vmo value, int offset) {
-    _encodeHandle(encoder, value.handle, offset, nullable);
+    _encodeHandle(encoder, value?.handle, offset, nullable);
   }
 
   @override
@@ -497,14 +494,13 @@ class VmoType extends FidlType<Vmo> {
 class InterfaceHandleType<T> extends FidlType<InterfaceHandle<T>> {
   const InterfaceHandleType({
     this.nullable,
-  })
-      : super(encodedSize: 4);
+  }) : super(encodedSize: 4);
 
   final bool nullable;
 
   @override
   void encode(Encoder encoder, InterfaceHandle<T> value, int offset) {
-    _encodeHandle(encoder, value.channel.handle, offset, nullable);
+    _encodeHandle(encoder, value?.channel?.handle, offset, nullable);
   }
 
   @override
@@ -517,14 +513,13 @@ class InterfaceHandleType<T> extends FidlType<InterfaceHandle<T>> {
 class InterfaceRequestType<T> extends FidlType<InterfaceRequest<T>> {
   const InterfaceRequestType({
     this.nullable,
-  })
-      : super(encodedSize: 4);
+  }) : super(encodedSize: 4);
 
   final bool nullable;
 
   @override
   void encode(Encoder encoder, InterfaceRequest<T> value, int offset) {
-    _encodeHandle(encoder, value.channel.handle, offset, nullable);
+    _encodeHandle(encoder, value?.channel?.handle, offset, nullable);
   }
 
   @override
@@ -538,8 +533,7 @@ class StringType extends FidlType<String> {
   const StringType({
     this.maybeElementCount,
     this.nullable,
-  })
-      : super(encodedSize: 16);
+  }) : super(encodedSize: 16);
 
   final int maybeElementCount;
   final bool nullable;
@@ -599,8 +593,7 @@ class StringType extends FidlType<String> {
 class PointerType<T> extends FidlType<T> {
   const PointerType({
     this.element,
-  })
-      : super(encodedSize: 8);
+  }) : super(encodedSize: 8);
 
   final FidlType element;
 
@@ -654,8 +647,7 @@ class StructType<T extends Struct> extends FidlType<T> {
     int encodedSize,
     this.members,
     this.ctor,
-  })
-      : super(encodedSize: encodedSize);
+  }) : super(encodedSize: encodedSize);
 
   final List<MemberType> members;
   final StructFactory<T> ctor;
@@ -689,8 +681,7 @@ class UnionType<T extends Union> extends FidlType<T> {
     int encodedSize,
     this.members,
     this.ctor,
-  })
-      : super(encodedSize: encodedSize);
+  }) : super(encodedSize: encodedSize);
 
   final List<MemberType> members;
   final UnionFactory<T> ctor;
@@ -761,8 +752,7 @@ class VectorType<T extends List> extends FidlType<T> {
     this.element,
     this.maybeElementCount,
     this.nullable,
-  })
-      : super(encodedSize: 16);
+  }) : super(encodedSize: 16);
 
   final FidlType element;
   final int maybeElementCount;
