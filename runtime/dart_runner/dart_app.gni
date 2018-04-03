@@ -14,11 +14,11 @@ declare_args() {
   # possible. In a release build the default is AOT to save compilation time
   # and memory footprint.
   if (is_debug) {
-    dart_default_app = "dart1_jit_app"
+    dart_default_app = "dart2_jit_app"
     dart1_default_app = "dart1_jit_app"
     dart2_default_app = "dart2_jit_app"
   } else {
-    dart_default_app = "dart1_aot_app"
+    dart_default_app = "dart2_aot_app"
     dart1_default_app = "dart1_aot_app"
     dart2_default_app = "dart2_aot_app"
   }
@@ -617,12 +617,12 @@ template("dart2_aot_app") {
 #   extra_entry_manifests (optional)
 #     List of AOT entry point manifest files. Most apps do not need this.
 template("dart_jit_app") {
-  dart1_jit_app(target_name) {
+  dart2_jit_app(target_name) {
     forward_variables_from(invoker, "*")
   }
 }
 template("dart_aot_app") {
-  dart1_aot_app(target_name) {
+  dart2_aot_app(target_name) {
     forward_variables_from(invoker, "*")
   }
 }
