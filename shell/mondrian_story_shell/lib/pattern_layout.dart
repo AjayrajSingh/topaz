@@ -11,6 +11,7 @@ import 'layout_model.dart';
 import 'model.dart';
 import 'positioned_surface.dart';
 
+const String _parentId = 'parent';
 const String _tickerPattern = 'ticker';
 const String _commentsRightPattern = 'comments-right';
 
@@ -27,68 +28,111 @@ List<PositionedSurface> layoutSurfaces(
   if (focusStack.isEmpty) {
     return <PositionedSurface>[];
   }
-  Surface focused = focusStack.last;
-  String pattern = focused.compositionPattern;
 
   final double totalWidth = constraints.biggest.width;
   final double totalHeight = constraints.biggest.height;
-
   final List<PositionedSurface> layout = <PositionedSurface>[];
+  Surface focused = focusStack.last;
+  String pattern = focused.compositionPattern;
 
-  // TODO(jphsiao): Handle new children that are brought in
-  Surface parent = focused.parent;
-
-  Offset offset = Offset.zero;
-  if (parent == null) {
-    Size size = new Size(
-      totalWidth,
-      totalHeight,
-    );
-    layout
-        .add(new PositionedSurface(surface: focused, position: offset & size));
-  } else if (pattern == _tickerPattern) {
-    // TODO(jphsiao): Match the parent's width
-    double tickerHeight = totalHeight * _tickerHeightRatio;
-
-    Size size = new Size(
-      totalWidth,
-      totalHeight - tickerHeight,
-    );
-    layout.add(new PositionedSurface(surface: parent, position: offset & size));
-    offset += size.bottomLeft(Offset.zero);
-
-    size = new Size(
-      totalWidth,
-      tickerHeight,
-    );
-    layout
-        .add(new PositionedSurface(surface: focused, position: offset & size));
-  } else if (pattern == _commentsRightPattern) {
-    // TODO(jphsiao): Determine proper height of the parent and comments
-    double commentsWidth = totalWidth * _commentsWidthRatio;
-
-    Size size = new Size(
-      totalWidth - commentsWidth,
-      totalHeight,
-    );
-    layout.add(new PositionedSurface(surface: parent, position: offset & size));
-    offset += size.topRight(Offset.zero);
-
-    size = new Size(
-      commentsWidth,
-      totalHeight,
-    );
-    layout
-        .add(new PositionedSurface(surface: focused, position: offset & size));
-  } else {
-    // Pattern not recognized - show the newly added module
+  if (!_isSupportedPattern(pattern)) {
     log.warning('unrecognized pattern $pattern');
+
     Size size = new Size(
       totalWidth,
       totalHeight,
     );
-    layout
-        .add(new PositionedSurface(surface: focused, position: offset & size));
+    layout.add(
+        new PositionedSurface(surface: focused, position: Offset.zero & size));
+    return layout;
   }
+
+  Map<String, Surface> patternSurfaces = <String, Surface>{};
+  // This is really a list not a stack. Reverse it to get to the 'top' items first.
+  for (Surface surface in focusStack.reversed) {
+    if (surface.compositionPattern != null) {
+      String pattern = surface.compositionPattern;
+      patternSurfaces.putIfAbsent(pattern, () => surface);
+    } else {
+      // TODO (jphsiao): Once we have better signals for figuring out which module
+      // to compose the pattern module with we can identify the 'source' more definitively.
+      // For now, the surface without a pattern is likely the source.
+      patternSurfaces.putIfAbsent(_parentId, () => surface);
+    }
+  }
+
+  if (patternSurfaces.containsKey(_commentsRightPattern)) {
+    // Comments-right gets laid out first
+    _layoutCommentsRight(patternSurfaces[_parentId],
+            patternSurfaces[_commentsRightPattern], totalHeight, totalWidth)
+        .forEach(layout.add);
+  }
+  if (patternSurfaces.containsKey(_tickerPattern)) {
+    double availableWidth = totalWidth;
+    double availableHeight = totalHeight;
+    if (layout.isNotEmpty && layout[0].surface == patternSurfaces[_parentId]) {
+      availableHeight = layout[0].position.height;
+      availableWidth = layout[0].position.width;
+    }
+    List<PositionedSurface> tickerSurfaces = _layoutTicker(
+        patternSurfaces[_parentId],
+        patternSurfaces[_tickerPattern],
+        availableHeight,
+        availableWidth);
+    if (layout.isNotEmpty) {
+      layout[0] = tickerSurfaces[0];
+    } else {
+      layout.add(tickerSurfaces[0]);
+    }
+    layout.add(tickerSurfaces[1]);
+  }
+  return layout;
+}
+
+bool _isSupportedPattern(String pattern) {
+  return (pattern == _tickerPattern || pattern == _commentsRightPattern);
+}
+
+List<PositionedSurface> _layoutTicker(Surface tickerSource, Surface ticker,
+    double availableHeight, double availableWidth) {
+  List<PositionedSurface> layout = <PositionedSurface>[];
+  Offset offset = Offset.zero;
+  double tickerHeight = availableHeight * _tickerHeightRatio;
+
+  Size size = new Size(
+    availableWidth,
+    availableHeight - tickerHeight,
+  );
+  layout.add(
+      new PositionedSurface(surface: tickerSource, position: offset & size));
+  offset += size.bottomLeft(Offset.zero);
+
+  size = new Size(
+    availableWidth,
+    tickerHeight,
+  );
+  layout.add(new PositionedSurface(surface: ticker, position: offset & size));
+  return layout;
+}
+
+List<PositionedSurface> _layoutCommentsRight(Surface commentsSource,
+    Surface comments, double availableHeight, double availableWidth) {
+  List<PositionedSurface> layout = <PositionedSurface>[];
+  Offset offset = Offset.zero;
+  double commentsWidth = availableWidth * _commentsWidthRatio;
+
+  Size size = new Size(
+    availableWidth - commentsWidth,
+    availableHeight,
+  );
+  layout.add(
+      new PositionedSurface(surface: commentsSource, position: offset & size));
+  offset += size.topRight(Offset.zero);
+
+  size = new Size(
+    commentsWidth,
+    availableHeight,
+  );
+  layout.add(new PositionedSurface(surface: comments, position: offset & size));
   return layout;
 }
