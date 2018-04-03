@@ -579,7 +579,7 @@ class StringType extends FidlType<String> {
   }
 
   void validateEncoded(int size, int data) {
-    if (data == kHandleAbsent) {
+    if (data == kAllocAbsent) {
       _throwIfNotNullable(nullable);
       _throwIfNotZero(size);
     } else if (data == kAllocPresent) {
@@ -618,7 +618,7 @@ class PointerType<T> extends FidlType<T> {
   }
 
   void validateEncoded(int encoded) {
-    if (encoded != kHandleAbsent && encoded != kHandlePresent) {
+    if (encoded != kAllocAbsent && encoded != kAllocPresent) {
       throw new FidlError('Invalid pointer encoding: $encoded.');
     }
   }
