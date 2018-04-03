@@ -34,6 +34,28 @@ class Message {
   set ordinal(int value) =>
       data.setUint32(kMessageOrdinalOffset, value, Endian.little);
 
+  void hexDump() {
+    Uint8List list = new Uint8List.view(data.buffer, 0);
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < list.length; ++i) {
+      if (i > 0) {
+        if (i % 8 == 0)
+          buffer.write(' ');
+        if (i % 32 == 0)
+          buffer.write('\n');
+      }
+      int v = list[i];
+      String s = v.toRadixString(16);
+      if (s.length == 1)
+        buffer.write('0$s ');
+      else
+        buffer.write('$s ');
+    }
+    print('==================================================\n'
+          '$buffer\n'
+          '==================================================');
+  }
+
   void closeHandles() {
     if (handles != null) {
       for (int i = 0; i < handles.length; ++i) {

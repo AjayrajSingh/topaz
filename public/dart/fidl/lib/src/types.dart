@@ -401,7 +401,7 @@ void _validateEncodedHandle(int encoded, bool nullable) {
   } else if (encoded == kHandlePresent) {
     // Nothing to validate.
   } else {
-    throw new FidlError('Invalid handle encoding.');
+    throw new FidlError('Invalid handle encoding: $encoded.');
   }
 }
 
@@ -416,7 +416,7 @@ void _encodeHandle(Encoder encoder, Handle value, int offset, bool nullable) {
 }
 
 Handle _decodeHandle(Decoder decoder, int offset, bool nullable) {
-  final int encoded = decoder.decodeInt32(offset);
+  final int encoded = decoder.decodeUint32(offset);
   _validateEncodedHandle(encoded, nullable);
   return encoded == kHandlePresent
       ? decoder.claimHandle()
@@ -585,7 +585,7 @@ class StringType extends FidlType<String> {
     } else if (data == kAllocPresent) {
       _throwIfExceedsLimit(size, maybeElementCount);
     } else {
-      throw new FidlError('Invalid string encoding.');
+      throw new FidlError('Invalid string encoding: $data.');
     }
   }
 }
@@ -619,7 +619,7 @@ class PointerType<T> extends FidlType<T> {
 
   void validateEncoded(int encoded) {
     if (encoded != kHandleAbsent && encoded != kHandlePresent) {
-      throw new FidlError('Invalid pointer encoding.');
+      throw new FidlError('Invalid pointer encoding: $encoded.');
     }
   }
 }
@@ -802,7 +802,7 @@ class VectorType<T extends List> extends FidlType<T> {
     } else if (data == kAllocPresent) {
       _throwIfExceedsLimit(count, maybeElementCount);
     } else {
-      throw new FidlError('Invalid vector encoding.');
+      throw new FidlError('Invalid vector encoding: $data.');
     }
   }
 }

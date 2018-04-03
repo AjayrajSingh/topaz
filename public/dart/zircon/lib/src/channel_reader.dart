@@ -109,6 +109,7 @@ class ChannelReader {
       rethrow;
       // ignore: avoid_catches_without_on_clauses
     } catch (e, s) {
+      print(e);
       close();
       _errorSoon(new ChannelReaderError(e, s));
     }
