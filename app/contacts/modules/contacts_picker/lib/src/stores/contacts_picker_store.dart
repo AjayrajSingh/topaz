@@ -5,14 +5,17 @@
 import 'dart:collection';
 
 import 'package:flutter_flux/flutter_flux.dart';
+import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
+    as fidl;
 import 'package:lib.logging/logging.dart';
+import 'package:lib.schemas.dart/com.fuchsia.contact.dart';
 
 import 'contact_item_store.dart';
 
 /// Holds the data in the contacts store
 class ContactsPickerStore extends Store {
   List<ContactItemStore> _contacts = <ContactItemStore>[];
-  String _prefix = '';
+  FilterEntityData _filter = new FilterEntityData();
 
   /// Constructor
   ContactsPickerStore() {
@@ -20,19 +23,20 @@ class ContactsPickerStore extends Store {
       updateContactsListAction,
 
       // ignore: strong_mode_uses_dynamic_as_bottom
-      (List<ContactItemStore> contacts) {
-        _contacts = contacts;
+      (List<fidl.Contact> contacts) {
+        _contacts = contacts.map(_transformContact).toList();
         log.fine('ContactsPickerStore: contacts updated');
       },
     );
 
     triggerOnAction(
-      updatePrefixAction,
+      updateFilterAction,
 
       // ignore: strong_mode_uses_dynamic_as_bottom
-      (String prefix) {
-        _prefix = prefix;
-        log.fine('ContactsPickerStore: prefix updated to $prefix');
+      (FilterEntityData filter) {
+        _filter = filter;
+        log.fine(
+            'ContactsPickerStore: filter updated, prefix = ${filter.prefix}');
       },
     );
   }
@@ -42,7 +46,39 @@ class ContactsPickerStore extends Store {
       new UnmodifiableListView<ContactItemStore>(_contacts);
 
   /// The prefix that the search results reflect
-  String get prefix => _prefix;
+  String get prefix => _filter.prefix;
+
+  /// Transform a FIDL Contact object into a ContactItemStore
+  ContactItemStore _transformContact(fidl.Contact c) {
+    // TODO(meiyili): change how emails and phone numbers are stored and update
+    // to handle the "custom" detail type as well
+    String detail = '';
+    if (_filter.detailType == DetailType.email && c.emails.isNotEmpty) {
+      detail = c.emails[0].value;
+    } else if (_filter.detailType == DetailType.phoneNumber &&
+        c.phoneNumbers.isNotEmpty) {
+      detail = c.phoneNumbers[0].value;
+    }
+
+    List<String> nameComponents = <String>[c.displayName];
+    bool isMatchedOnName = false;
+    int matchedNameIndex = -1;
+    for (int i = 0; i < nameComponents.length; i++) {
+      if (nameComponents[i].toLowerCase().startsWith(prefix)) {
+        isMatchedOnName = true;
+        matchedNameIndex = i;
+      }
+    }
+
+    return new ContactItemStore(
+      id: c.contactId,
+      names: nameComponents,
+      detail: detail,
+      photoUrl: c.photoUrl,
+      isMatchedOnName: isMatchedOnName,
+      matchedNameIndex: matchedNameIndex,
+    );
+  }
 }
 
 /// Token to be used to subscribe to the [ContactsPickerStore]'s data
@@ -50,8 +86,8 @@ final StoreToken contactsPickerStoreToken =
     new StoreToken(new ContactsPickerStore());
 
 /// Action to update the list of contacts in the [ContactsPickerStore]
-Action<List<ContactItemStore>> updateContactsListAction =
-    new Action<List<ContactItemStore>>();
+Action<List<fidl.Contact>> updateContactsListAction =
+    new Action<List<fidl.Contact>>();
 
 /// Action to update the prefix in [ContactsPickerStore]
-Action<String> updatePrefixAction = new Action<String>();
+Action<FilterEntityData> updateFilterAction = new Action<FilterEntityData>();

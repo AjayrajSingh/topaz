@@ -14,14 +14,17 @@ class FilterEntityCodec extends EntityCodec<FilterEntityData> {
   /// Creates an instance of the codec
   FilterEntityCodec()
       : super(
-          type: 'com.fuchsia.contact.detail_type',
+          type: 'com.fuchsia.contact.filter',
           encode: _encode,
           decode: _decode,
         );
 }
 
 String _encode(FilterEntityData entity) {
-  assert(entity != null);
+  if (entity == null) {
+    return null;
+  }
+
   return json.encode(<String, String>{
     'prefix': entity.prefix,
     'detailType': entity.detailType.toString()
@@ -29,8 +32,9 @@ String _encode(FilterEntityData entity) {
 }
 
 FilterEntityData _decode(String data) {
-  assert(data != null);
-  assert(data.isNotEmpty);
+  if (data == null || data.isEmpty) {
+    return null;
+  }
 
   FilterEntityData filter = new FilterEntityData();
   try {

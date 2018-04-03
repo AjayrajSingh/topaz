@@ -4,12 +4,8 @@
   "action": "com.google.fuchsia.pick-contacts",
   "parameters": [
     {
-      "name": "prefix",
-      "type": "com.google.fuchsia.string"
-    },
-    {
-      "name": "detailType",
-      "type": "com.google.fuchsia.string"
+      "name": "filter",
+      "type": "com.fuchsia.contact.filter"
     }
   ]
 }

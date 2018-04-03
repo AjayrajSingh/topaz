@@ -44,8 +44,7 @@ class ContactItemStore {
     this.matchedNameIndex: -1,
     this.detail: '',
     this.photoUrl: '',
-  })
-      : assert(id != null && id.isNotEmpty),
+  })  : assert(id != null && id.isNotEmpty),
         assert(names != null && names.isNotEmpty),
         assert(isMatchedOnName != null) {
     if (isMatchedOnName &&

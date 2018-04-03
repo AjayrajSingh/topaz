@@ -7,18 +7,22 @@ import 'package:contacts_picker/stores.dart';
 import 'package:contacts_picker/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
+    as fidl;
 
-List<ContactItemStore> _contacts = <ContactItemStore>[
+List<fidl.Contact> _contacts = <fidl.Contact>[
   createContact('Alpha', '1'),
   createContact('Beta', '2'),
   createContact('Gamma', '3'),
 ];
 
-ContactItemStore createContact(String name, String id) => new ContactItemStore(
-      id: id,
-      names: <String>[name],
-      isMatchedOnName: true,
-      matchedNameIndex: 0,
+fidl.Contact createContact(String name, String id) => new fidl.Contact(
+      contactId: id,
+      sourceContactId: id,
+      sourceId: 'test',
+      displayName: name,
+      emails: <fidl.EmailAddress>[],
+      phoneNumbers: <fidl.PhoneNumber>[],
     );
 
 Finder findByRichText(String text) {

@@ -38,8 +38,7 @@ class ContactItem extends StatelessWidget {
     @required this.matchedPrefix,
     @required this.contact,
     this.onTap,
-  })
-      : assert(contact != null),
+  })  : assert(contact != null),
         assert(matchedPrefix != null),
         super(key: key);
 

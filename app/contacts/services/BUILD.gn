@@ -2,11 +2,27 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/dart/dart_library.gni")
 import("//garnet/public/lib/fidl/build/fidl/fidl.gni")
 
 fidl("services") {
   name = "contacts_content_provider"
   sources = [
-    "contacts_content_provider.fidl",
+    "fidl/contacts_content_provider.fidl",
+  ]
+}
+
+dart_library("contacts_services") {
+  package_name = "contacts_services"
+
+  sources = [
+    "client.dart"
+  ]
+
+  deps = [
+    "//topaz/app/contacts/services:services",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/lib/app_driver/dart",
   ]
 }

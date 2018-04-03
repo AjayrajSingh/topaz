@@ -3,12 +3,25 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.schemas.dart/com.fuchsia.contact.dart';
+import 'package:lib.schemas.dart/entity_codec.dart';
+import 'package:contacts_services/client.dart';
 
-import 'src/modular/contacts_picker_module_model.dart';
 import 'src/widgets/contacts_picker.dart';
+import 'stores.dart';
+
+const String _kContactsContentProviderUrl = 'contacts_content_provider';
+
+class _StringCodec extends EntityCodec<String> {
+  _StringCodec()
+      : super(
+          type: 'com.fuchsia.string',
+          encode: (String s) => s,
+          decode: (String s) => s,
+        );
+}
 
 /*
   This Module will experiment with the use of the Flutter Flux framework.
@@ -17,20 +30,39 @@ import 'src/widgets/contacts_picker.dart';
 */
 void main() {
   setupLogger(name: 'contacts/contacts_picker');
+  ContactsContentProviderServiceClient serviceClient =
+      new ContactsContentProviderServiceClient();
+  FilterEntityCodec codec = new FilterEntityCodec();
+  ModuleDriver module = new ModuleDriver()
+    ..start().then((_) {
+      log.fine('Contacts picker started...');
+    })
+    ..connectToAgentService(_kContactsContentProviderUrl, serviceClient)
+    ..watch('filter', codec).listen((FilterEntityData filter) async {
+      if (filter != null) {
+        log.fine('Received new data in link: $filter');
+        await updateContactsListAction(
+          await serviceClient.getContactList(prefix: filter?.prefix ?? ''),
+        );
+        await updateFilterAction(filter);
+      }
+    });
 
-  ContactsPickerModuleModel moduleModel = new ContactsPickerModuleModel();
-  ModuleWidget<ContactsPickerModuleModel> moduleWidget =
-      new ModuleWidget<ContactsPickerModuleModel>(
-    moduleModel: moduleModel,
-    applicationContext: new ApplicationContext.fromStartupInfo(),
-    child: new MaterialApp(
-      title: 'Contacts Picker',
-      theme: new ThemeData(primarySwatch: Colors.blue),
+  runApp(
+    new MaterialApp(
       home: new ContactsPicker(
-        onContactTapped: moduleModel.handleContactTapped,
+        onContactTapped: (ContactItemStore contact) {
+          serviceClient.getEntityReference(contact.id).then(
+            (String entityReference) {
+              module.put(
+                'selected_contact',
+                entityReference,
+                new _StringCodec(),
+              );
+            },
+          );
+        },
       ),
     ),
-  )..advertise();
-
-  runApp(moduleWidget);
+  );
 }

@@ -4,4 +4,3 @@
 
 export 'src/stores/contact_item_store.dart';
 export 'src/stores/contacts_picker_store.dart';
-export 'src/stores/link_data.dart';
