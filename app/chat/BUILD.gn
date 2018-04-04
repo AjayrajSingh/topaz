@@ -12,10 +12,12 @@ package("chat_tests") {
     "tests/chat_content_provider_test",
   ]
 
-  resources = [ {
-        path = rebase_path("tests/chat_tests.json")
-        dest = "apps/chat_tests/chat_tests.json"
-      } ]
+  resources = [
+    {
+      path = rebase_path("tests/chat_tests.json")
+      dest = "apps/chat_tests/chat_tests.json"
+    },
+  ]
 }
 
 group("tests") {

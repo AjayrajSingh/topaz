@@ -32,7 +32,9 @@ package("package") {
     ":vu_meter",
   ]
 
-  binaries = [ {
-        name = "vu_meter"
-      } ]
+  binaries = [
+    {
+      name = "vu_meter"
+    },
+  ]
 }

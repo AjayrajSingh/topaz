@@ -8,8 +8,8 @@ dart_app("echo_server_dart") {
   main_dart = "lib/main.dart"
 
   deps = [
+    "//garnet/examples/fidl/services:echo2",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
-    "//garnet/examples/fidl/services:echo2",
   ]
 }

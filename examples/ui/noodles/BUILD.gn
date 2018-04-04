@@ -34,7 +34,9 @@ package("package") {
     ":noodles",
   ]
 
-  binaries = [ {
-        name = "noodles_view"
-      } ]
+  binaries = [
+    {
+      name = "noodles_view"
+    },
+  ]
 }

@@ -7,6 +7,6 @@ import("//build/dart/toolchain.gni")
 
 group("compiler") {
   deps = [
-    "//garnet/go/src/fidl/examples($dart_toolchain)"
+    "//garnet/go/src/fidl/examples($dart_toolchain)",
   ]
 }

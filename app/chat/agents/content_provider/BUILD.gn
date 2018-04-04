@@ -14,16 +14,14 @@ dart_app("chat_content_provider") {
     "//peridot/public/lib:fidl",
     "//peridot/public/lib/auth/fidl",
     "//peridot/public/lib/ledger/fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/uuid",
     "//topaz/app/chat/services",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/fixtures",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/dart/fidl",
     "//topaz/public/lib/ledger/dart",
   ]
 }

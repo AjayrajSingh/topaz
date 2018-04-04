@@ -8,7 +8,7 @@ dart_library("concert_widgets") {
   package_name = "concert_widgets"
 
   sources = [
-    "concert_widgets.dart"
+    "concert_widgets.dart",
   ]
 
   deps = [

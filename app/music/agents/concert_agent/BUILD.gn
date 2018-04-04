@@ -9,11 +9,10 @@ dart_app("concert_agent") {
 
   deps = [
     "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/decomposition/dart",
-    "//topaz/public/dart/fidl",
     "//topaz/public/lib/proposal/dart",
   ]
 }

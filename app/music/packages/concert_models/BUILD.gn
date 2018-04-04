@@ -9,7 +9,7 @@ dart_library("concert_models") {
   package_name = "concert_models"
 
   sources = [
-    "concert_models.dart"
+    "concert_models.dart",
   ]
 
   deps = [

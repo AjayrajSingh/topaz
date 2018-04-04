@@ -17,11 +17,9 @@ dart_app("home_work_agent") {
 
   deps = [
     "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/dart/fidl",
     "//topaz/public/lib/proposal/dart",
   ]
 }

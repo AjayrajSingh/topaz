@@ -8,7 +8,7 @@ dart_library("fuchsia") {
   package_name = "fuchsia"
 
   sources = [
-    "fuchsia.dart"
+    "fuchsia.dart",
   ]
 
   deps = [

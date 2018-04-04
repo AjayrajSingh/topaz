@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-
 import("//build/package.gni")
 
 executable("paint") {
@@ -36,7 +35,9 @@ package("package") {
     ":paint",
   ]
 
-  binaries = [ {
-        name = "paint_view"
-      } ]
+  binaries = [
+    {
+      name = "paint_view"
+    },
+  ]
 }

@@ -19,9 +19,9 @@ flutter_app("contacts_picker") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/flutter_flux",
     "//topaz/app/contacts/services:services",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/dart/fidl",
   ]
 }
 

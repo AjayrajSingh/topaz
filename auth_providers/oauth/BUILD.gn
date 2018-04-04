@@ -6,17 +6,17 @@ import("//build/package.gni")
 
 source_set("oauth") {
   sources = [
-    "oauth_request_builder.h",
     "oauth_request_builder.cc",
-    "oauth_response.h",
+    "oauth_request_builder.h",
     "oauth_response.cc",
+    "oauth_response.h",
   ]
 
   deps = [
     "//garnet/lib/network_wrapper",
+    "//garnet/public/lib/auth/fidl",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
-    "//garnet/public/lib/auth/fidl",
     "//peridot/lib/rapidjson",
   ]
 }
@@ -38,4 +38,3 @@ source_set("unittests") {
     "//third_party/googletest:gtest",
   ]
 }
-

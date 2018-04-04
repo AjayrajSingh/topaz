@@ -55,8 +55,10 @@ package("term") {
 
   binary = "term"
 
-  meta = [ {
-        path = rebase_path("meta/sandbox")
-        dest = "sandbox"
-      } ]
+  meta = [
+    {
+      path = rebase_path("meta/sandbox")
+      dest = "sandbox"
+    },
+  ]
 }

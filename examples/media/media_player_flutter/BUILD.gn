@@ -10,20 +10,20 @@ flutter_app("media_player_flutter") {
   deps = [
     "//garnet/public/lib/ui/views/fidl:v1",
     "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/dart/fidl",
     "//topaz/public/lib/media/flutter",
     "//topaz/public/lib/ui/flutter",
   ]
 
   sandbox = "meta/sandbox"
 
-  resources = [ {
-        path = rebase_path("media_player_flutter.config")
-        dest = "media_player_flutter.config"
-      } ]
+  resources = [
+    {
+      path = rebase_path("media_player_flutter.config")
+      dest = "media_player_flutter.config"
+    },
+  ]
 }

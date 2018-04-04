@@ -9,7 +9,6 @@ flutter_app("file_explorer") {
 
   sandbox = "meta/sandbox"
 
-
   sources = [
     "folder_widget.dart",
   ]

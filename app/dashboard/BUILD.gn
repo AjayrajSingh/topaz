@@ -10,32 +10,31 @@ flutter_app("dashboard") {
   main_dart = "lib/main.dart"
 
   sources = [
-    "buildbucket/build_bucket_service.dart",
-    "service/build_info.dart",
-    "service/build_service.dart",
     "build_status_model.dart",
     "build_status_widget.dart",
+    "buildbucket/build_bucket_service.dart",
     "chatter.dart",
     "dashboard_app.dart",
     "dashboard_module_model.dart",
     "enums.dart",
     "info_text.dart",
+    "service/build_info.dart",
+    "service/build_service.dart",
   ]
 
   sandbox = "meta/sandbox"
 
   deps = [
     "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/buildbucket",
     "//third_party/dart-pkg/pub/html",
     "//third_party/dart-pkg/pub/http",
     "//topaz/app/chat/services:services",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/dart/fidl",
     "//topaz/public/lib/ui/flutter",
     "//topaz/runtime/web_runner/lib/dart:web_view",
   ]

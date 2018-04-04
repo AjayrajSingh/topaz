@@ -24,22 +24,21 @@ executable("bin") {
 }
 
 source_set("lib") {
-
   sources = [
     "constants.h",
-    "factory_impl.h",
     "factory_impl.cc",
-    "google_auth_provider_impl.h",
+    "factory_impl.h",
     "google_auth_provider_impl.cc",
+    "google_auth_provider_impl.h",
   ]
 
   deps = [
+    "//garnet/lib/callback",
     "//garnet/lib/network_wrapper",
     "//garnet/public/lib/app/cpp",
     "//garnet/public/lib/auth/fidl",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl",
-    "//garnet/lib/callback",
     "//peridot/lib/rapidjson",
     "//topaz/auth_providers/oauth",
     "//topaz/runtime/web_runner/services",
@@ -55,12 +54,12 @@ source_set("unittests") {
 
   deps = [
     ":lib",
+    "//garnet/lib/gtest:gtest",
     "//garnet/lib/network_wrapper:fake",
     "//garnet/public/lib/auth/fidl",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl:fxl_printers",
     "//garnet/public/lib/test_runner/cpp:gtest_main",
-    "//garnet/lib/gtest:gtest",
   ]
 }
 
@@ -72,8 +71,9 @@ package("google_auth_provider") {
     ":bin",
   ]
 
-  binaries = [ {
-        name = "google_auth_provider"
-  } ]
+  binaries = [
+    {
+      name = "google_auth_provider"
+    },
+  ]
 }
-

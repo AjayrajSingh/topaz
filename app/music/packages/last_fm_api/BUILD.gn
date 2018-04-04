@@ -8,7 +8,7 @@ dart_library("last_fm_api") {
   package_name = "last_fm_api"
 
   sources = [
-    "api.dart"
+    "api.dart",
   ]
 
   deps = [

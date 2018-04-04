@@ -8,7 +8,7 @@ dart_library("xi_widgets") {
   package_name = "xi_widgets"
 
   sources = [
-    "widgets.dart"
+    "widgets.dart",
   ]
 
   deps = [

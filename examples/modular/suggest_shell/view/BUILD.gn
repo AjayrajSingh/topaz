@@ -16,12 +16,10 @@ flutter_app("suggest_shell_view") {
   deps = [
     "//garnet/public/lib/ui/views/fidl:v1",
     "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/dart/fidl",
     "//topaz/public/lib/ui/flutter",
   ]
 }

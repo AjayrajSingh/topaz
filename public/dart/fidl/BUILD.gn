@@ -14,7 +14,7 @@ dart_library("fidl") {
   ]
 
   deps = [
-    "//topaz/public/dart/zircon",
     "//third_party/dart-pkg/pub/meta",
+    "//topaz/public/dart/zircon",
   ]
 }

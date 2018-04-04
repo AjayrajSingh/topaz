@@ -12,13 +12,10 @@ dart_app("mi_dashboard") {
 
   deps = [
     "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/pub/http",
+    "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/context/dart",
-    "//topaz/public/dart/fidl",
   ]
 
   resources = [

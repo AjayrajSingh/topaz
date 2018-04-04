@@ -85,11 +85,10 @@ template("core_snapshot") {
       "--url_mapping=dart:fuchsia," + rebase_path(fuchsia_sdk_ext_lib),
     ]
     if (defined(invoker.dart_deps)) {
-      package_gen_dir = get_label_info(":bogus($dart_toolchain)",
-          "target_gen_dir")
+      package_gen_dir =
+          get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
       package_file = "$package_gen_dir/${name}_package_map.packages"
-      args +=
-          [ "--packages=" + rebase_path(package_file) ]
+      args += [ "--packages=" + rebase_path(package_file) ]
     }
     if (is_debug) {
       args += [ "--enable_asserts" ]

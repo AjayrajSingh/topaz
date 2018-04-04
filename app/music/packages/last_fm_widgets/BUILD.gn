@@ -8,7 +8,7 @@ dart_library("last_fm_widgets") {
   package_name = "last_fm_widgets"
 
   sources = [
-    "last_fm_widgets.dart"
+    "last_fm_widgets.dart",
   ]
 
   deps = [

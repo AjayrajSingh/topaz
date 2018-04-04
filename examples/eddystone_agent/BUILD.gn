@@ -13,12 +13,11 @@ dart_app("eddystone_agent") {
     "//garnet/public/lib/bluetooth/fidl:bluetooth",
     "//garnet/public/lib/bluetooth/fidl:bluetooth_low_energy",
     "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/decomposition/dart",
-    "//topaz/public/dart/fidl",
     "//topaz/public/lib/proposal/dart",
     "//topaz/runtime/web_runner/lib/dart:web_view",
   ]

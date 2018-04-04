@@ -9,22 +9,22 @@ dart_library("dart") {
   infer_package_name = true
 
   sources = [
-    "entity_codec.dart",
     "com.fuchsia.color.dart",
     "com.fuchsia.contact.dart",
     "com.fuchsia.documents.dart",
+    "entity_codec.dart",
   ]
 
   deps = [
-      "//third_party/dart-pkg/pub/json_schema",
-      "//topaz/public/dart/logging:lib.logging",
-      "//topaz/public/lib/app/dart",
+    "//third_party/dart-pkg/pub/json_schema",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/lib/app/dart",
   ]
 }
 
 dart_test("test") {
   sources = [
-      "entity_codec_test.dart"
+    "entity_codec_test.dart",
   ]
 
   deps = [

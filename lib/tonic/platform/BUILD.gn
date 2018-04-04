@@ -9,13 +9,11 @@ source_set("platform") {
     set_sources_assignment_filter([ "*_win.cc" ])
   }
 
- sources = [
+  sources = [
     "platform_utils.h",
     "platform_utils_posix.cc",
     "platform_utils_win.cc",
   ]
 
-  public_configs = [
-    "//topaz/lib/tonic:config",
-  ]
+  public_configs = [ "//topaz/lib/tonic:config" ]
 }

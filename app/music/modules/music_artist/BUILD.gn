@@ -12,9 +12,6 @@ flutter_app("music_artist") {
   deps = [
     "//garnet/public/lib/ui/views/fidl:v1",
     "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart/third_party/pkg/intl",
     "//topaz/app/music/packages/music_api",
@@ -22,10 +19,10 @@ flutter_app("music_artist") {
     "//topaz/app/music/packages/music_widgets",
     "//topaz/app/music/services/player:player",
     "//topaz/public/dart/config",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/decomposition/dart",
-    "//topaz/public/dart/fidl",
   ]
 }

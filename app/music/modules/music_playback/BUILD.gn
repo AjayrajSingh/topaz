@@ -17,9 +17,9 @@ flutter_app("music_playback") {
     "//topaz/app/music/packages/music_models",
     "//topaz/app/music/packages/music_widgets",
     "//topaz/app/music/services/player:player",
-    "//topaz/public/dart/logging:lib.logging",
-    "//topaz/public/lib/widgets/dart",
-    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/dart/fidl",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/widgets/dart",
   ]
 }

@@ -40,7 +40,9 @@ package("oauth_token_manager") {
     ":bin",
   ]
 
-  binaries = [ {
-        name = "oauth_token_manager"
-      } ]
+  binaries = [
+    {
+      name = "oauth_token_manager"
+    },
+  ]
 }

@@ -14,11 +14,11 @@ dart_library("dart") {
   deps = [
     "//garnet/public/lib/ui/views/fidl:v1",
     "//peridot/public/lib:fidl",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
-    "//topaz/public/dart/fidl",
     "//topaz/public/lib/story/dart",
     "//topaz/public/lib/ui/flutter",
   ]

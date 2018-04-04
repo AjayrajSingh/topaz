@@ -8,7 +8,7 @@ dart_library("concert_api") {
   package_name = "concert_api"
 
   sources = [
-    "api.dart"
+    "api.dart",
   ]
 
   deps = [

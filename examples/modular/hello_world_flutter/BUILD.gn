@@ -15,8 +15,8 @@ flutter_app("example_flutter_hello_world") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/dart/fidl",
   ]
 }

@@ -17,7 +17,7 @@ dart_library("dart") {
 
   deps = [
     "//garnet/public/lib/media/fidl:fidl",
-    "//topaz/public/lib/app/dart",
     "//topaz/public/dart/fidl",
+    "//topaz/public/lib/app/dart",
   ]
 }

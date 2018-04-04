@@ -9,7 +9,7 @@ dart_library("last_fm_models") {
   package_name = "last_fm_models"
 
   sources = [
-    "last_fm_models.dart"
+    "last_fm_models.dart",
   ]
 
   deps = [

@@ -35,7 +35,9 @@ package("package") {
     ":jank",
   ]
 
-  binaries = [ {
-        name = "jank_view"
-      } ]
+  binaries = [
+    {
+      name = "jank_view"
+    },
+  ]
 }

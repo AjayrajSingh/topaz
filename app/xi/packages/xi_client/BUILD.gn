@@ -8,7 +8,7 @@ dart_library("xi_client") {
   package_name = "xi_client"
 
   sources = [
-    "client.dart"
+    "client.dart",
   ]
 
   deps = [

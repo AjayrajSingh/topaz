@@ -10,8 +10,8 @@ dart_library("flutter") {
   source_dir = "."
 
   sources = [
-    "media_player_controller.dart",
     "media_player.dart",
+    "media_player_controller.dart",
     "progress_notifier.dart",
   ]
 
@@ -19,8 +19,8 @@ dart_library("flutter") {
     "//garnet/public/lib/media/fidl:fidl",
     "//garnet/public/lib/ui/views/fidl:v1",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/lib/app/dart",
     "//topaz/public/dart/fidl",
+    "//topaz/public/lib/app/dart",
     "//topaz/public/lib/media/dart",
     "//topaz/public/lib/ui/flutter",
   ]
