@@ -554,7 +554,8 @@ class StringType extends FidlType<String> {
     encoder
       ..encodeUint64(size, offset) // size
       ..encodeUint64(kAllocPresent, offset + 8); // data
-    _copyUint8(encoder.data, bytes, encoder.alloc(size));
+    int childOffset = encoder.alloc(size);
+    _copyUint8(encoder.data, bytes, childOffset);
   }
 
   @override
@@ -603,7 +604,8 @@ class PointerType<T> extends FidlType<T> {
       encoder.encodeUint64(kAllocAbsent, offset);
     } else {
       encoder.encodeUint64(kAllocPresent, offset);
-      element.encode(encoder, value, encoder.alloc(element.encodedSize));
+      int childOffset = encoder.alloc(element.encodedSize);
+      element.encode(encoder, value, childOffset);
     }
   }
 
@@ -770,8 +772,8 @@ class VectorType<T extends List> extends FidlType<T> {
       encoder
         ..encodeUint64(count, offset) // count
         ..encodeUint64(kAllocPresent, offset + 8); // data
-      element.encodeArray(
-          encoder, value, encoder.alloc(count * element.encodedSize));
+      int childOffset = encoder.alloc(count * element.encodedSize);
+      element.encodeArray(encoder, value, childOffset);
     }
   }
 
