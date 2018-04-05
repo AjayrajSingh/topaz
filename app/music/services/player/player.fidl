@@ -8,12 +8,12 @@ library music;
 // import "topaz/app/music/services/player/status.fidl";
 // import "topaz/app/music/services/player/track.fidl";
 
+// Special value for GetStatus version_last_seen parameter to get the current
+// status immediately.
+const uint64 kInitialStatus = 0;
+
 [ServiceName="music.Player"]
 interface Player {
-
-  // Special value for GetStatus version_last_seen parameter to get the current
-  // status immediately.
-  const uint64 kInitialStatus = 0;
 
   // Play the given track
   1: Play(Track track);
