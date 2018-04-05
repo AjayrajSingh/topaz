@@ -11,14 +11,13 @@ import 'package:lib.widgets/modular.dart';
 
 /// The [ModuleModel] for the Settings example.
 class SettingsModuleModel extends ModuleModel
-    implements bt_ctl.AdapterManagerDelegate, bt_ctl.AdapterDelegate {
+    implements bt_ctl.ControlDelegate, bt_ctl.RemoteDeviceDelegate {
   // Members that maintain the FIDL service connections.
-  final bt_ctl.AdapterManagerProxy _adapterManager =
-      new bt_ctl.AdapterManagerProxy();
-  final bt_ctl.AdapterDelegateBinding _adBinding =
-      new bt_ctl.AdapterDelegateBinding();
-  final bt_ctl.AdapterManagerDelegateBinding _amdBinding =
-      new bt_ctl.AdapterManagerDelegateBinding();
+  final bt_ctl.ControlProxy _control = new bt_ctl.ControlProxy();
+  final bt_ctl.ControlDelegateBinding _controlBinding =
+      new bt_ctl.ControlDelegateBinding();
+  final bt_ctl.RemoteDeviceDelegateBinding _deviceBinding =
+      new bt_ctl.RemoteDeviceDelegateBinding();
 
   // Contains information about the Bluetooth adapters that are on the system.
   final Map<String, bt_ctl.AdapterInfo> _adapters =
@@ -26,16 +25,15 @@ class SettingsModuleModel extends ModuleModel
 
   // The current system's active Bluetooth adapter. We assign these fields when the AdapterManager
   // service notifies us.
-  String _activeAdapterId;
-  bt_ctl.AdapterProxy _activeAdapter;
+  bt_ctl.AdapterInfo _activeAdapter;
 
-  // True if we have an active discovery session.
+  // True if discovery is active.
   bool _isDiscovering = false;
 
-  // True if a request to start/stop discovery is currently pending.
+  // True if a request to stop/start discovery is currently pending.
   bool _isDiscoveryRequestPending = false;
 
-  // Devices found during discovery.
+  // Devices tracked
   final Map<String, bt_ctl.RemoteDevice> _discoveredDevices =
       <String, bt_ctl.RemoteDevice>{};
 
@@ -53,15 +51,14 @@ class SettingsModuleModel extends ModuleModel
   bool get isBluetoothAvailable => _adapters.isNotEmpty;
 
   /// Returns true if an active adapter exists on the current system.
-  bool get hasActiveAdapter => _activeAdapterId != null;
+  bool get hasActiveAdapter => _activeAdapter != null;
 
   /// Returns true, if the adapter with the given ID is the current active adapter.
   bool isActiveAdapter(String adapterId) =>
-      hasActiveAdapter && (_activeAdapterId == adapterId);
+      hasActiveAdapter && (_activeAdapter.identifier == adapterId);
 
   /// Returns information about the current active adapter.
-  bt_ctl.AdapterInfo get activeAdapterInfo =>
-      hasActiveAdapter ? _adapters[_activeAdapterId] : null;
+  bt_ctl.AdapterInfo get activeAdapterInfo => _activeAdapter;
 
   /// Returns true if a request to start/stop discovery is currently pending.
   bool get isDiscoveryRequestPending => _isDiscoveryRequestPending;
@@ -81,7 +78,7 @@ class SettingsModuleModel extends ModuleModel
   /// adapter. This affects the entire system as the active adapter currently in use by all current
   /// Bluetooth service clients will change.
   void setActiveAdapter(String id) {
-    _adapterManager.setActiveAdapter(id, (bt.Status status) {
+    _control.setActiveAdapter(id, (bt.Status status) {
       notifyListeners();
     });
   }
@@ -99,17 +96,20 @@ class SettingsModuleModel extends ModuleModel
     assert(!_isDiscoveryRequestPending);
 
     _isDiscoveryRequestPending = true;
-    void cb(bt.Status status) {
-      _isDiscoveryRequestPending = false;
-      notifyListeners();
-    }
-
     if (isDiscovering) {
       log.info('Stop discovery');
-      _activeAdapter.stopDiscovery(cb);
+      // Stopping requesting discovery can't fail.
+      _control.requestDiscovery(false, (bt.Status status) {});
+      _isDiscoveryRequestPending = false;
+      _isDiscovering = false;
+      notifyListeners();
     } else {
       log.info('Start discovery');
-      _activeAdapter.startDiscovery(cb);
+      _control.requestDiscovery(false, (bt.Status status) {
+        _isDiscoveryRequestPending = false;
+        _isDiscovering = true;
+        notifyListeners();
+      });
     }
 
     notifyListeners();
@@ -122,50 +122,36 @@ class SettingsModuleModel extends ModuleModel
   ) {
     super.onReady(moduleContext, link);
 
-    connectToService(
-        applicationContext.environmentServices, _adapterManager.ctrl);
-    _adapterManager.setDelegate(_amdBinding.wrap(this));
+    connectToService(applicationContext.environmentServices, _control.ctrl);
+    _control
+      ..setDelegate(_controlBinding.wrap(this))
+      ..setRemoteDeviceDelegate(_deviceBinding.wrap(this), true)
+      ..getKnownRemoteDevices((List<bt_ctl.RemoteDevice> devices) {
+        for (bt_ctl.RemoteDevice device in devices) {
+          _discoveredDevices[device.identifier] = device;
+        }
+      });
   }
 
   @override
   void onStop() {
-    _activeAdapter.ctrl.close();
-    _adapterManager.ctrl.close();
+    _control.ctrl.close();
     super.onStop();
   }
 
   // bt_ctl.AdapterManagerDelegate overrides:
-
   @override
   void onActiveAdapterChanged(bt_ctl.AdapterInfo activeAdapter) {
     log.info('onActiveAdapterChanged: ${activeAdapter?.identifier ?? 'null'}');
 
-    // Reset the state of all running procedures as the active adapter has changed.
-    _isDiscovering = false;
-    _isDiscoveryRequestPending = false;
-    _discoveredDevices.clear();
-
-    // Clean up our current Adapter interface connection if there is one.
-    if (_activeAdapter != null) {
-      _adBinding.close();
-      _activeAdapter.ctrl.close();
-    }
-
-    _activeAdapterId = activeAdapter?.identifier;
-    if (_activeAdapterId == null) {
-      _activeAdapter = null;
-    } else {
-      _activeAdapter = new bt_ctl.AdapterProxy();
-      _adapterManager.getActiveAdapter(_activeAdapter.ctrl.request());
-      _activeAdapter.setDelegate(_adBinding.wrap(this));
-    }
+    _activeAdapter = activeAdapter;
 
     notifyListeners();
   }
 
   @override
-  void onAdapterAdded(bt_ctl.AdapterInfo adapter) {
-    log.info('onAdapterAdded: ${adapter.identifier}');
+  void onAdapterUpdated(bt_ctl.AdapterInfo adapter) {
+    log.info('onAdapterUpdated: ${adapter.identifier}');
     _adapters[adapter.identifier] = adapter;
     notifyListeners();
   }
@@ -175,29 +161,21 @@ class SettingsModuleModel extends ModuleModel
     log.info('onAdapterRemoved: $identifier');
     _adapters.remove(identifier);
     if (_adapters.isEmpty) {
-      _activeAdapterId = null;
+      _activeAdapter = null;
     }
     notifyListeners();
   }
 
-  // bt_ctl.AdapterDelegate overrides:
-
+  // bt_ctl.RemoteDeviceDelegate overrides:
   @override
-  void onAdapterStateChanged(bt_ctl.AdapterState state) {
-    log.info('onAdapterStateChanged');
-    if (state.discovering == null) {
-      return;
-    }
-
-    _isDiscovering = state.discovering.value;
-    log.info(
-        'Adapter state change: ${_isDiscovering ? '' : 'not'} discovering');
-    notifyListeners();
-  }
-
-  @override
-  void onDeviceDiscovered(bt_ctl.RemoteDevice device) {
+  void onDeviceUpdated(bt_ctl.RemoteDevice device) {
     _discoveredDevices[device.identifier] = device;
+    notifyListeners();
+  }
+
+  @override
+  void onDeviceRemoved(String identifier) {
+    _discoveredDevices.remove(identifier);
     notifyListeners();
   }
 }
