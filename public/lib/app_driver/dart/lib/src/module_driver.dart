@@ -4,11 +4,12 @@
 
 import 'dart:async';
 
-import 'package:lib.app.dart/app.dart';
+import 'package:fidl/fidl.dart';
+import 'package:fuchsia.fidl.cobalt/cobalt.dart';
 import 'package:fuchsia.fidl.component/component.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.entity.dart/entity.dart';
-import 'package:fidl/fidl.dart';
 import 'package:lib.lifecycle.dart/lifecycle.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.module.dart/module.dart';
@@ -29,6 +30,9 @@ export 'package:lib.ui.flutter/child_view.dart'
 
 /// Function definition to handle [data] that is received from a message queue.
 typedef void OnReceiveMessage(String data, void ack());
+
+const int _kCobaltProjectId = 104;
+const int _kFirstLinkDataMetricId = 1;
 
 /// The [ModuleDriver] provides a high-level API for running a module in Dart
 /// code. The name and structure of this library is based on the peridot layer's
@@ -72,6 +76,9 @@ class ModuleDriver {
   final Completer<String> _tokenCompleter = new Completer<String>();
 
   final ModuleHost _module = new ModuleHost();
+  final CobaltEncoderProxy _encoder = new CobaltEncoderProxy();
+  final DateTime _initializationTime;
+  final Set<String> _firstObservationSent = new Set<String>();
   LifecycleHost _lifecycle;
 
   /// Shadow async completion of [start].
@@ -100,7 +107,8 @@ class ModuleDriver {
     // TODO(MS-1423): remove onTerminateFromCaller and only use onTerminate.
     Function onTerminateFromCaller,
     Function onTerminate,
-  }) : _onTerminateFromCaller = onTerminateFromCaller ?? onTerminate {
+  })  : _onTerminateFromCaller = onTerminateFromCaller ?? onTerminate,
+        _initializationTime = new DateTime.now() {
     if (onTerminateFromCaller != null) {
       log
         ..warning('onTerminateFromCaller is deprecated, use onTerminate')
@@ -110,7 +118,27 @@ class ModuleDriver {
     _lifecycle = new LifecycleHost(
       onTerminate: _handleTerminate,
     );
+
+    // Connect to Cobalt
+    CobaltEncoderFactoryProxy encoderFactory = new CobaltEncoderFactoryProxy();
+    connectToService(
+      environmentServices,
+      encoderFactory.ctrl,
+    );
+    encoderFactory.getEncoder(_kCobaltProjectId, _encoder.ctrl.request());
+    encoderFactory.ctrl.close();
+
+    // Observe time to default link
+    // TODO(meiyili): remove once default link is deprecated
+    link.watch().listen((String data) => _observeLinkData('default', data));
   }
+
+  String _moduleName;
+
+  /// Module name to use for metrics, if it is not set will use default package
+  /// name for the module
+  String get moduleName => _moduleName;
+  set moduleName(String name) => _moduleName = name.trim();
 
   /// Start the module and connect to dependent services on module
   /// initialization.
@@ -254,6 +282,7 @@ class ModuleDriver {
 
     _messageQueueReceiver?.close();
     _messageQueue?.ctrl?.close();
+    _encoder.ctrl.close();
 
     List<Future<Null>> futures = <Future<Null>>[
       moduleContext.terminate(),
@@ -358,6 +387,7 @@ class ModuleDriver {
       try {
         LinkClient client = _links[name] = new LinkClient(name: name);
         await moduleContext.getLink(linkClient: client);
+        client.watch().listen((String data) => _observeLinkData(name, data));
         completer.complete(client);
       } on Exception catch (err, stackTrace) {
         completer.completeError(err, stackTrace);
@@ -365,6 +395,51 @@ class ModuleDriver {
     }
 
     return completer.future;
+  }
+
+  /// Log a cobalt metric when the link data first becomes non-null.
+  void _observeLinkData(String linkName, String data) {
+    if (!_firstObservationSent.contains(linkName) && data != null) {
+      _firstObservationSent.add(linkName);
+
+      // TODO(meiyili): grab module package name from module context once it has
+      // been added to peridot
+      _encoder.addMultipartObservation(
+        _kFirstLinkDataMetricId,
+        <ObservationValue>[
+          new ObservationValue(
+            name: 'module_name',
+            value: new Value.withStringValue(
+              moduleName == null || moduleName.isEmpty
+                  ? 'moduleNameNotSet_temp_value'
+                  : moduleName,
+            ),
+            encodingId: 1,
+          ),
+          new ObservationValue(
+            name: 'link_name',
+            value: new Value.withStringValue(linkName),
+            encodingId: 1,
+          ),
+          new ObservationValue(
+            name: 'elapsed_millis',
+            value: new Value.withIntValue(
+              new DateTime.now().difference(_initializationTime).inMilliseconds,
+            ),
+            encodingId: 1,
+          )
+        ],
+        (Status status) {
+          if (status != Status.ok) {
+            log.warning(
+              'Failed to observe frame rate metric '
+                  '$_kCobaltProjectId, '
+                  '$_kFirstLinkDataMetricId: $status. ',
+            );
+          }
+        },
+      );
+    }
   }
 
   /// Cache for [getComponentContext].
@@ -487,6 +562,9 @@ class ModuleDriver {
   /// TODO(MS-1287): Determine whether this should be refactored
   ServiceProviderProxy get environmentServices =>
       _applicationContext.environmentServices;
+
+  /// The [CobaltEncoderProxy] for sending Cobalt metrics
+  CobaltEncoderProxy get cobaltEncoder => _encoder;
 }
 
 /// [app-driver]: https://fuchsia.googlesource.com/peridot/+/master/public/lib/app_driver/cpp?autodive=0/
