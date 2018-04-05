@@ -74,13 +74,13 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
   set storyProvider(StoryProviderProxy storyProvider) {
     _storyProvider = storyProvider
       ..watch(
-          _storyProviderWatcherBinding.wrap(
-            new StoryProviderWatcherImpl(
-              onStoryChanged: _onStoryChanged,
-              onStoryDeleted: _removeStory,
-            ),
+        _storyProviderWatcherBinding.wrap(
+          new StoryProviderWatcherImpl(
+            onStoryChanged: _onStoryChanged,
+            onStoryDeleted: _removeStory,
           ),
-        );
+        ),
+      );
     update();
   }
 
@@ -345,23 +345,27 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
   /// If stories do exist, we resume them.
   /// If set, [callback] will be called when the stories have been updated.
   void update([VoidCallback callback]) {
-    _storyProvider.previousStories((List<String> storyIds) {
-      if (storyIds.isEmpty && _storyClusters.isEmpty) {
+    _storyProvider.previousStories((List<StoryInfo> storyInfos) {
+      if (storyInfos.isEmpty && _storyClusters.isEmpty) {
         _onUpdateComplete(callback);
         return;
       }
 
       // Remove any stories that aren't in the previous story list.
       for (Story story in _currentStories
-          .where((Story story) => !storyIds.contains(story.id.value))
+          .where((Story story) => !storyInfos
+              .map((StoryInfo info) => info.id)
+              .contains(story.id.value))
           .toList()) {
         log.info('Story ${story.id.value} has been removed!');
         _removeStoryFromClusters(story);
       }
 
       // Add only those stories we don't already know about.
-      final List<String> storiesToAdd =
-          storyIds.where((String storyId) => !containsStory(storyId)).toList();
+      final List<String> storiesToAdd = storyInfos
+          .map((StoryInfo info) => info.id)
+          .where((String storyId) => !containsStory(storyId))
+          .toList();
 
       if (storiesToAdd.isEmpty) {
         _onUpdateComplete(callback);
