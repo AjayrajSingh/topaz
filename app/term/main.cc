@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include <lib/async/cpp/loop.h>
+#include <lib/async-loop/cpp/loop.h>
 #include <trace-provider/provider.h>
 
 #include "lib/fxl/log_settings_command_line.h"
@@ -19,11 +19,7 @@ int main(int argc, const char** argv) {
     return 1;
   }
 
-  async_loop_config_t config = {
-      .make_default_for_current_thread = true,
-  };
-
-  async::Loop loop(&config);
+  async::Loop loop(&kAsyncLoopConfigMakeDefault);
   trace::TraceProvider trace_provider(loop.async());
 
   term::App app(std::move(params));
