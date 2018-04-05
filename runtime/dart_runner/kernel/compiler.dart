@@ -133,7 +133,8 @@ Future<void> writeDepfile(
   for (Library lib in program.libraries) {
     deps.add(lib.fileUri);
     for (LibraryPart part in lib.parts) {
-      deps.add(part.fileUri);
+      final Uri fileUri = lib.fileUri.resolve(part.partUri);
+      deps.add(fileUri);
     }
   }
 

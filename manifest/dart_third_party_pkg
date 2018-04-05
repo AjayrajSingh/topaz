@@ -28,11 +28,6 @@
              remote="https://dart.googlesource.com/boolean_selector.git"
              revision="1.0.3"/>
 
-    <project name="third_party/dart/third_party/pkg/browser"
-             path="third_party/dart/third_party/pkg/browser"
-             remote="https://dart.googlesource.com/browser.git"
-             revision="0.10.0+2"/>
-
     <project name="third_party/dart/third_party/pkg/charcode"
              path="third_party/dart/third_party/pkg/charcode"
              remote="https://dart.googlesource.com/charcode.git"
@@ -71,7 +66,7 @@
     <project name="third_party/dart/third_party/pkg/dartdoc"
              path="third_party/dart/third_party/pkg/dartdoc"
              remote="https://dart.googlesource.com/dartdoc.git"
-             revision="v0.17.1+1"/>
+             revision="v0.18.1"/>
 
     <project name="third_party/dart/third_party/pkg/fixnum"
              path="third_party/dart/third_party/pkg/fixnum"
@@ -136,7 +131,7 @@
     <project name="third_party/dart/third_party/pkg/linter"
              path="third_party/dart/third_party/pkg/linter"
              remote="https://dart.googlesource.com/linter.git"
-             revision="0.1.45"/>
+             revision="0.1.46"/>
 
     <project name="third_party/dart/third_party/pkg/logging"
              path="third_party/dart/third_party/pkg/logging"
@@ -196,12 +191,12 @@
     <project name="third_party/dart/third_party/pkg/pub"
              path="third_party/dart/third_party/pkg/pub"
              remote="https://dart.googlesource.com/pub.git"
-             revision="875d35005a7d33f367d70a3e31e9d3bad5d1ebd8"/>
+             revision="4947e0b3cb3ec77e4e8fe0d3141ce4dc60f43256"/>
 
     <project name="third_party/dart/third_party/pkg/pub_semver"
              path="third_party/dart/third_party/pkg/pub_semver"
              remote="https://dart.googlesource.com/pub_semver.git"
-             revision="1.3.2"/>
+             revision="1.3.4"/>
 
     <project name="third_party/dart/third_party/pkg/quiver"
              path="third_party/dart/third_party/pkg/quiver"
@@ -286,7 +281,7 @@
     <project name="third_party/dart/third_party/pkg/test_reflective_loader"
              path="third_party/dart/third_party/pkg/test_reflective_loader"
              remote="https://dart.googlesource.com/test_reflective_loader.git"
-             revision="0.1.3"/>
+             revision="0.1.4"/>
 
     <project name="third_party/dart/third_party/pkg/tuple"
              path="third_party/dart/third_party/pkg/tuple"
@@ -312,6 +307,11 @@
              path="third_party/dart/third_party/pkg/watcher"
              remote="https://dart.googlesource.com/watcher.git"
              revision="0.9.7+7"/>
+
+    <project name="third_party/dart/third_party/pkg/web_components"
+             path="third_party/dart/third_party/pkg/web_components"
+             remote="https://dart.googlesource.com/web-components.git"
+             revision="8f57dac273412a7172c8ade6f361b407e2e4ed02"/>
 
     <project name="third_party/dart/third_party/pkg/web_socket_channel"
              path="third_party/dart/third_party/pkg/web_socket_channel"
