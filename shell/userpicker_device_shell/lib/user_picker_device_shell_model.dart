@@ -142,9 +142,10 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         <RendererParam>[
           const RendererParam.withShadowTechnique(ShadowTechnique.unshadowed)
         ],
-      );
+      )
+      ..setPresentationModeListener(
+          _presentationModeListenerBinding.wrap(this));
     _currentShadowTechnique = ShadowTechnique.unshadowed;
-    //..setPresentationModeListener(_presentationModeListenerBinding.wrap(this));
   }
 
   @override
@@ -496,17 +497,14 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// |Presentation|.
   @override
-  // ignore: override_on_non_overriding_method
   void getPresentationMode(GetPresentationModeCallback callback) {
-    // presentation.getPresentationMode(callback);
+    presentation.getPresentationMode(callback);
   }
 
   /// |Presentation|.
   @override
-  // ignore: override_on_non_overriding_method
-  void setPresentationModeListener(
-      InterfaceHandle<PresentationModeListener> listener) {
-    // presentation.setPresentationModeListener(listener);
+  void setPresentationModeListener(InterfaceHandle<PresentationModeListener> listener) {
+    presentation.setPresentationModeListener(listener);
   }
 
   // |ServiceProvider|.
