@@ -6,7 +6,9 @@ import("//build/dart/dart_test.gni")
 import("//build/dart/dart_library.gni")
 
 dart_library("dart") {
-  infer_package_name = true
+  package_name = "lib.schemas.dart"
+
+  sdk_candidate = true
 
   sources = [
     "com.fuchsia.color.dart",

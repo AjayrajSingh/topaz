@@ -7,6 +7,8 @@ import("//build/dart/dart_library.gni")
 dart_library("mozart") {
   package_name = "mozart"
 
+  sdk_candidate = true
+
   sources = [
     "mozart.dart",
   ]

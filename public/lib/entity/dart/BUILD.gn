@@ -5,7 +5,9 @@
 import("//build/dart/dart_library.gni")
 
 dart_library("dart") {
-  infer_package_name = true
+  package_name = "lib.entity.dart"
+
+  sdk_candidate = true
 
   sources = [
     "entity.dart",

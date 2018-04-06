@@ -5,7 +5,9 @@
 import("//build/dart/dart_library.gni")
 
 dart_library("flutter") {
-  infer_package_name = true
+  package_name = "lib.ui.flutter"
+
+  sdk_candidate = true
 
   sources = [
     "child_view.dart",

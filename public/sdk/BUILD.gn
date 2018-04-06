@@ -7,6 +7,12 @@ import("//build/sdk/sdk.gni")
 
 sdk("dart") {
   deps = [
-    "//topaz/public/dart/fixtures:fixtures_sdk($dart_toolchain)",
+    "//topaz/public/dart/config:config_sdk($dart_toolchain)",
+    "//topaz/public/dart/fidl:fidl_sdk($dart_toolchain)",
+    "//topaz/public/dart/logging:lib.logging_sdk($dart_toolchain)",
+    "//topaz/public/dart/widgets:lib.widgets_sdk($dart_toolchain)",
+    "//topaz/public/lib/app/dart:dart_sdk($dart_toolchain)",
+    "//topaz/public/lib/app_driver/dart:dart_sdk($dart_toolchain)",
+    "//topaz/public/lib/schemas/dart:dart_sdk($dart_toolchain)",
   ]
 }

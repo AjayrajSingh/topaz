@@ -7,6 +7,8 @@ import("//build/dart/dart_library.gni")
 dart_library("lib.logging") {
   package_name = "lib.logging"
 
+  sdk_candidate = true
+
   sources = [
     "logging.dart",
   ]

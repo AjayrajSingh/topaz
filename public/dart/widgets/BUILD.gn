@@ -8,6 +8,8 @@ import("//build/dart/dart_test.gni")
 dart_library("lib.widgets") {
   package_name = "lib.widgets"
 
+  sdk_candidate = true
+
   sources = [
     "application.dart",
     "model.dart",
