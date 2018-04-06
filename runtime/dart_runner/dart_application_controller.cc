@@ -94,11 +94,7 @@ bool DartApplicationController::Setup() {
     return false;
   }
 
-  if (SetupFromScriptSnapshot()) {
-    FXL_LOG(INFO) << url_ << " is running from a script snapshot";
-  } else if (SetupFromSource()) {
-    FXL_LOG(INFO) << url_ << " is running from source";
-  } else if (SetupFromSharedLibrary()) {
+  if (SetupFromSharedLibrary()) {
     FXL_LOG(INFO) << url_ << " is running from a shared library";
   } else if (SetupFromKernel()) {
     FXL_LOG(INFO) << url_ << " is running from kernel";
@@ -138,109 +134,6 @@ bool DartApplicationController::SetupNamespace() {
   }
 
   return true;
-}
-
-bool DartApplicationController::SetupFromScriptSnapshot() {
-#if defined(AOT_RUNTIME)
-  return false;
-#else
-  if (!MappedResource::LoadFromNamespace(
-          namespace_, "pkg/data/script_snapshot.bin", script_)) {
-    return false;
-  }
-
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/isolate_core_snapshot_data.bin",
-          isolate_snapshot_data_)) {
-    return false;
-  }
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/isolate_core_snapshot_instructions.bin",
-          isolate_snapshot_instructions_, true /* executable */)) {
-    return false;
-  }
-
-  if (!CreateIsolate(isolate_snapshot_data_.address(),
-                     isolate_snapshot_instructions_.address())) {
-    return false;
-  }
-
-  Dart_EnterScope();
-  Dart_Handle root_library = Dart_LoadScriptFromSnapshot(
-      reinterpret_cast<const uint8_t*>(script_.address()), script_.size());
-  if (Dart_IsError(root_library)) {
-    FXL_LOG(ERROR) << "Failed to load script snapshot: "
-                   << Dart_GetError(root_library);
-    Dart_ExitScope();
-    return false;
-  }
-
-  return true;
-#endif  // !defined(AOT_RUNTIME)
-}
-
-bool DartApplicationController::SetupFromSource() {
-#if defined(AOT_RUNTIME)
-  return false;
-#else
-  if (!application_.data || !MappedResource::LoadFromVmo(
-                                url_,
-                                fsl::SizedVmo(std::move(application_.data->vmo),
-                                              application_.data->size),
-                                script_)) {
-    return false;
-  }
-
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/isolate_core_snapshot_data.bin",
-          isolate_snapshot_data_)) {
-    return false;
-  }
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/isolate_core_snapshot_instructions.bin",
-          isolate_snapshot_instructions_, true /* executable */)) {
-    return false;
-  }
-
-  if (!CreateIsolate(isolate_snapshot_data_.address(),
-                     isolate_snapshot_instructions_.address())) {
-    return false;
-  }
-
-  Dart_Handle status =
-      Dart_SetLibraryTagHandler(tonic::DartState::HandleLibraryTag);
-  if (Dart_IsError(status)) {
-    FXL_LOG(ERROR) << "Dart_SetLibraryTagHandler failed: "
-                   << Dart_GetError(status);
-    return false;
-  }
-
-  Dart_EnterScope();
-  Dart_Handle url = Dart_NewStringFromUTF8(
-      reinterpret_cast<const uint8_t*>(url_.data()), url_.length());
-  if (Dart_IsError(url)) {
-    FXL_LOG(ERROR) << "Failed to make string for url: " << Dart_GetError(url);
-    Dart_ExitScope();
-    return false;
-  }
-
-  Dart_Handle script = Dart_NewStringFromUTF8(
-      reinterpret_cast<const uint8_t*>(script_.address()), script_.size());
-  if (Dart_IsError(script)) {
-    FXL_LOG(ERROR) << "Failed to make string for script: "
-                   << Dart_GetError(script);
-    Dart_ExitScope();
-    return false;
-  }
-  Dart_Handle root_library = Dart_LoadScript(url, url, script, 0, 0);
-  if (Dart_IsError(root_library)) {
-    FXL_LOG(ERROR) << "Failed to load script: " << Dart_GetError(root_library);
-    Dart_ExitScope();
-    return false;
-  }
-
-  return true;
-#endif  // !defined(AOT_RUNTIME)
 }
 
 bool DartApplicationController::SetupFromKernel() {

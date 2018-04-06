@@ -34,8 +34,6 @@ class DartApplicationController : public component::ApplicationController {
  private:
   bool SetupNamespace();
 
-  bool SetupFromScriptSnapshot();
-  bool SetupFromSource();
   bool SetupFromKernel();
   bool SetupFromSharedLibrary();
 

@@ -26,6 +26,11 @@ namespace {
 
 const char* kDartVMArgs[] = {
 // clang-format off
+    // TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
+    "--limit_ints_to_64_bits",
+    "--reify_generic_functions",
+    "--strong",
+    "--sync_async",
 #if defined(AOT_RUNTIME)
     "--precompilation",
 #else
@@ -40,24 +45,6 @@ const char* kDartVMArgs[] = {
     // clang-format on
 };
 
-// TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
-const char* kDart2VMArgs[] = {
-    // clang-format off
-    "--limit_ints_to_64_bits",
-    "--reify_generic_functions",
-    "--strong",
-    "--sync_async",
-    // clang-format on
-};
-
-void PushBackAll(std::vector<const char*>* args,
-                 const char** argv,
-                 size_t argc) {
-  for (size_t i = 0; i < argc; ++i) {
-    args->push_back(argv[i]);
-  }
-}
-
 Dart_Isolate IsolateCreateCallback(const char* uri,
                                    const char* main,
                                    const char* package_root,
@@ -70,12 +57,6 @@ Dart_Isolate IsolateCreateCallback(const char* uri,
     *error = strdup("The service isolate is not implemented in release mode");
     return NULL;
 #else
-    struct stat buf;
-    bool dart2 = stat("pkg/data/dart2", &buf) == 0;
-    if (!dart2) {
-      *error = strdup("The service isolate is not implemented in Dart 1 mode");
-      return NULL;
-    }
     return CreateServiceIsolate(uri, flags, error);
 #endif
   }
@@ -166,14 +147,7 @@ DartApplicationRunner::DartApplicationRunner()
 
   dart::bin::BootstrapDartIo();
 
-  struct stat buf;
-  bool dart2 = stat("pkg/data/dart2", &buf) == 0;
-  std::vector<const char*> args;
-  PushBackAll(&args, kDartVMArgs, arraysize(kDartVMArgs));
-  if (dart2) {
-    PushBackAll(&args, kDart2VMArgs, arraysize(kDart2VMArgs));
-  }
-  FXL_CHECK(Dart_SetVMFlags(args.size(), args.data()));
+  FXL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
 
   Dart_InitializeParams params = {};
   params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;

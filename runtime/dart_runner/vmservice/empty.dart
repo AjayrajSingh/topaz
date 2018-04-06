@@ -3,5 +3,5 @@
 // found in the LICENSE file.
 
 // This entry point is never invoked. Its purpose is to allow the vmservice's
-// Dart code to built with dart2_aot_app.
+// Dart code to built with dart_aot_app.
 void main(List<String> args) {}

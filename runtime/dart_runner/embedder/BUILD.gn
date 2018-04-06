@@ -18,135 +18,8 @@ _gen_snapshot_label =
 _gen_snapshot_dir = get_label_info(_gen_snapshot_label, "root_out_dir")
 _gen_snapshot = "$_gen_snapshot_dir/$_gen_snapshot_exe"
 
-# Using a .dart snapshot file, and an optional list of dart_library()
-# dependencies, generates a .cc containing the core snapshot for a dart_runner.
-#  Parameters
-#   snapshot_dart
-#     The path to a .dart file describing what will go in the core snapshot
-#     e.g. snapshot.dart in this directory
-#
-#   dart_deps (optional)
-#     dart_library() targets imported by 'snapshot_dart'.
-template("core_snapshot") {
-  assert(defined(invoker.snapshot_dart), "Must define main_dart")
-  snapshot_dart = invoker.snapshot_dart
-  name = target_name
-
-  if (defined(invoker.dart_deps)) {
-    dart_deps = invoker.dart_deps
-
-    dart_library("${name}_package_map") {
-      sources = []
-
-      package_name = "i_am_gen_snapshot_cc"
-
-      disable_analysis = true
-
-      deps = dart_deps
-    }
-  }
-
-  action(name) {
-    deps = [
-      _gen_snapshot_label,
-    ]
-    if (defined(invoker.dart_deps)) {
-      deps += [ ":${name}_package_map" ]
-    }
-
-    inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files + [
-               "builtin.dart",
-               snapshot_dart,
-             ]
-
-    vm_data = "$target_gen_dir/${name}_vm_data.bin"
-    vm_instructions = "$target_gen_dir/${name}_vm_instructions.bin"
-    isolate_data = "$target_gen_dir/${name}_isolate_data.bin"
-    isolate_instructions = "$target_gen_dir/${name}_isolate_instructions.bin"
-
-    outputs = [
-      vm_data,
-      vm_instructions,
-      isolate_data,
-      isolate_instructions,
-    ]
-
-    script = _gen_snapshot
-    args = [
-      "--snapshot_kind=core",
-      "--vm_snapshot_data=" + rebase_path(vm_data, root_build_dir),
-      "--vm_snapshot_instructions=" +
-          rebase_path(vm_instructions, root_build_dir),
-      "--isolate_snapshot_data=" + rebase_path(isolate_data, root_build_dir),
-      "--isolate_snapshot_instructions=" +
-          rebase_path(isolate_instructions, root_build_dir),
-      "--url_mapping=dart:fuchsia.builtin," + rebase_path("builtin.dart"),
-      "--url_mapping=dart:zircon," + rebase_path(zircon_sdk_ext_lib),
-      "--url_mapping=dart:fuchsia," + rebase_path(fuchsia_sdk_ext_lib),
-    ]
-    if (defined(invoker.dart_deps)) {
-      package_gen_dir =
-          get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-      package_file = "$package_gen_dir/${name}_package_map.packages"
-      args += [ "--packages=" + rebase_path(package_file) ]
-    }
-    if (is_debug) {
-      args += [ "--enable_asserts" ]
-    }
-    args += [ rebase_path(snapshot_dart) ]
-  }
-}
-
-core_snapshot("jit_runner_snapshot") {
-  snapshot_dart = "snapshot.dart"
-}
-
-core_snapshot("script_runner_snapshot") {
-  snapshot_dart = "script_runner_snapshot.dart"
-  dart_deps = [
-    "//peridot/public/lib/resolver/fidl",
-    "//peridot/public/lib:fidl",
-    "//topaz/public/dart/fidl",
-    "//topaz/public/dart/fuchsia",
-    "//topaz/public/dart/zircon",
-    "//topaz/public/lib/app/dart",
-  ]
-}
-
-action("generate_aot1_snapshot_assembly") {
-  snapshot_assembly = "$target_gen_dir/aot1_vm_snapshot.S"
-
-  deps = [
-    _gen_snapshot_label,
-  ]
-
-  outputs = [
-    snapshot_assembly,
-  ]
-
-  script = _gen_snapshot
-  args = [
-    "--snapshot_kind=vm-aot-assembly",
-    "--assembly=" + rebase_path(snapshot_assembly),
-  ]
-  if (is_debug) {
-    args += [ "--enable_asserts" ]
-  }
-}
-
-source_set("dart1_aot_snapshot_cc") {
-  deps = [
-    ":generate_aot1_snapshot_assembly",
-  ]
-
-  sources = [
-    "$target_gen_dir/aot1_vm_snapshot.S",
-    "snapshot.h",
-  ]
-}
-
-action("generate_dart2_aot_snapshot_assembly") {
-  snapshot_assembly = "$target_gen_dir/aot2_vm_snapshot.S"
+action("generate_dart_aot_snapshot_assembly") {
+  snapshot_assembly = "$target_gen_dir/aot_vm_snapshot.S"
 
   deps = [
     _gen_snapshot_label,
@@ -171,13 +44,13 @@ action("generate_dart2_aot_snapshot_assembly") {
   }
 }
 
-source_set("dart2_aot_snapshot_cc") {
+source_set("dart_aot_snapshot_cc") {
   deps = [
-    ":generate_dart2_aot_snapshot_assembly",
+    ":generate_dart_aot_snapshot_assembly",
   ]
 
   sources = [
-    "$target_gen_dir/aot2_vm_snapshot.S",
+    "$target_gen_dir/aot_vm_snapshot.S",
     "snapshot.h",
   ]
 }

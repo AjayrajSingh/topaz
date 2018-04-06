@@ -79,13 +79,10 @@ runner("dart_jit_runner_bin") {
   }
 }
 
-# TODO(rmacnak): We could have dart1_aot_runner and dart2_aot_runner be
-# identical binaries if we loaded the VM snapshot via dlopen.
-
-runner("dart1_aot_runner_bin") {
-  output_name = "dart1_aot_runner"
+runner("dart_aot_runner_bin") {
+  output_name = "dart_aot_runner"
   extra_defines = [ "AOT_RUNTIME" ]
-  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart1_aot_snapshot_cc" ]
+  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc" ]
   if (is_debug) {
     extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime" ]
   } else {
@@ -94,36 +91,9 @@ runner("dart1_aot_runner_bin") {
   }
 }
 
-runner("dart2_aot_runner_bin") {
-  output_name = "dart2_aot_runner"
-  extra_defines = [ "AOT_RUNTIME" ]
-  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart2_aot_snapshot_cc" ]
-  if (is_debug) {
-    extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime" ]
-  } else {
-    extra_deps +=
-        [ "//third_party/dart/runtime:libdart_precompiled_runtime_product" ]
-  }
-}
-
-package("dart1_aot_runner") {
+package("dart_aot_runner") {
   deps = [
-    ":dart1_aot_runner_bin",
-  ]
-
-  binary = "dart1_aot_runner"
-
-  meta = [
-    {
-      path = rebase_path("meta/sandbox")
-      dest = "sandbox"
-    },
-  ]
-}
-
-package("dart2_aot_runner") {
-  deps = [
-    ":dart2_aot_runner_bin",
+    ":dart_aot_runner_bin",
   ]
   if (is_debug) {
     deps += [
@@ -132,7 +102,7 @@ package("dart2_aot_runner") {
     ]
   }
 
-  binary = "dart2_aot_runner"
+  binary = "dart_aot_runner"
 
   meta = [
     {
@@ -141,12 +111,7 @@ package("dart2_aot_runner") {
     },
   ]
 
-  resources = [
-    {
-      path = rebase_path("dart2")
-      dest = "dart2"
-    },
-  ]
+  resources = []
   if (is_debug) {
     resources += [
       {
@@ -164,46 +129,7 @@ package("dart2_aot_runner") {
   }
 }
 
-package("dart1_jit_runner") {
-  deps = [
-    ":dart_jit_runner_bin",
-    "embedder:jit_runner_snapshot",
-  ]
-
-  binary = "dart_jit_runner"
-
-  meta = [
-    {
-      path = rebase_path("meta/sandbox")
-      dest = "sandbox"
-    },
-  ]
-
-  resources = [
-    {
-      path = rebase_path(
-              "$target_gen_dir/embedder/jit_runner_snapshot_vm_data.bin")
-      dest = "vm_snapshot_data.bin"
-    },
-    {
-      path = rebase_path(
-              "$target_gen_dir/embedder/jit_runner_snapshot_vm_instructions.bin")
-      dest = "vm_snapshot_instructions.bin"
-    },
-    {
-      path = rebase_path(
-              "$target_gen_dir/embedder/jit_runner_snapshot_isolate_data.bin")
-      dest = "isolate_core_snapshot_data.bin"
-    },
-    {
-      path = rebase_path(
-              "$target_gen_dir/embedder/jit_runner_snapshot_isolate_instructions.bin")
-      dest = "isolate_core_snapshot_instructions.bin"
-    },
-  ]
-}
-
-package("dart2_jit_runner") {
+package("dart_jit_runner") {
   deps = [
     ":dart_jit_runner_bin",
     "kernel:kernel_core_snapshot",
@@ -224,10 +150,6 @@ package("dart2_jit_runner") {
   ]
 
   resources = [
-    {
-      path = rebase_path("dart2")
-      dest = "dart2"
-    },
     {
       path = rebase_path("$target_gen_dir/kernel/vm_data.bin")
       dest = "vm_snapshot_data.bin"
@@ -254,43 +176,4 @@ package("dart2_jit_runner") {
       },
     ]
   }
-}
-
-package("dart1_script_runner") {
-  deps = [
-    ":dart_jit_runner_bin",
-    "embedder:script_runner_snapshot",
-  ]
-
-  binary = "dart_jit_runner"
-
-  meta = [
-    {
-      path = rebase_path("meta/sandbox")
-      dest = "sandbox"
-    },
-  ]
-
-  resources = [
-    {
-      path = rebase_path(
-              "$target_gen_dir/embedder/script_runner_snapshot_vm_data.bin")
-      dest = "vm_snapshot_data.bin"
-    },
-    {
-      path = rebase_path(
-              "$target_gen_dir/embedder/script_runner_snapshot_vm_instructions.bin")
-      dest = "vm_snapshot_instructions.bin"
-    },
-    {
-      path = rebase_path(
-              "$target_gen_dir/embedder/script_runner_snapshot_isolate_data.bin")
-      dest = "isolate_core_snapshot_data.bin"
-    },
-    {
-      path = rebase_path(
-              "$target_gen_dir/embedder/script_runner_snapshot_isolate_instructions.bin")
-      dest = "isolate_core_snapshot_instructions.bin"
-    },
-  ]
 }

@@ -4,7 +4,7 @@
 
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
-dart1_jit_app("goodbye_dart1_jit") {
+dart_jit_app("goodbye_dart_jit") {
   main_dart = "goodbye_dart.dart"
 
   source_dir = "."
@@ -14,27 +14,7 @@ dart1_jit_app("goodbye_dart1_jit") {
   ]
 }
 
-dart1_aot_app("goodbye_dart1_aot") {
-  main_dart = "goodbye_dart.dart"
-
-  source_dir = "."
-  deps = [
-    "//topaz/public/dart/fidl",
-    "//topaz/public/dart/fuchsia",
-  ]
-}
-
-dart2_jit_app("goodbye_dart2_jit") {
-  main_dart = "goodbye_dart.dart"
-
-  source_dir = "."
-  deps = [
-    "//topaz/public/dart/fidl",
-    "//topaz/public/dart/fuchsia",
-  ]
-}
-
-dart2_aot_app("goodbye_dart2_aot") {
+dart_aot_app("goodbye_dart_aot") {
   main_dart = "goodbye_dart.dart"
 
   source_dir = "."

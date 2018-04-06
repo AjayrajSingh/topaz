@@ -14,13 +14,9 @@ declare_args() {
   # possible. In a release build the default is AOT to save compilation time
   # and memory footprint.
   if (is_debug) {
-    dart_default_app = "dart2_jit_app"
-    dart1_default_app = "dart1_jit_app"
-    dart2_default_app = "dart2_jit_app"
+    dart_default_app = "dart_jit_app"
   } else {
-    dart_default_app = "dart2_aot_app"
-    dart1_default_app = "dart1_aot_app"
-    dart2_default_app = "dart2_aot_app"
+    dart_default_app = "dart_aot_app"
   }
 }
 
@@ -97,135 +93,7 @@ template("_dart_kernel") {
   }
 }
 
-template("dart1_jit_app") {
-  assert(defined(invoker.main_dart), "Must specify main_dart file")
-
-  dart_library_target_name = target_name + "_dart_library"
-
-  dart_library(dart_library_target_name) {
-    forward_variables_from(invoker,
-                           [
-                             "deps",
-                             "disable_analysis",
-                             "non_dart_deps",
-                             "source_dir",
-                           ])
-
-    if (defined(invoker.package_name)) {
-      package_name = invoker.package_name
-    } else {
-      infer_package_name = true
-    }
-
-    sources = []
-    if (defined(invoker.sources)) {
-      sources += invoker.sources
-    }
-    source_base = "lib"
-    if (defined(invoker.source_dir)) {
-      source_base = invoker.source_dir
-    }
-    sources += [ rebase_path(invoker.main_dart, source_base) ]
-  }
-
-  snapshot_path = "$target_gen_dir/${target_name}_snapshot.bin"
-  depfile_path = "${snapshot_path}.d"
-
-  snapshot_target_name = target_name + "_snapshot"
-
-  action(snapshot_target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
-    }
-
-    core_snapshot_label =
-        "//topaz/runtime/dart_runner/embedder:jit_runner_snapshot"
-    core_snapshot_gen_dir =
-        get_label_info(core_snapshot_label, "target_gen_dir")
-    vm_snapshot_data = "$core_snapshot_gen_dir/jit_runner_snapshot_vm_data.bin"
-    vm_snapshot_instructions =
-        "$core_snapshot_gen_dir/jit_runner_snapshot_vm_instructions.bin"
-    isolate_snapshot_data =
-        "$core_snapshot_gen_dir/jit_runner_snapshot_isolate_data.bin"
-    isolate_snapshot_instructions =
-        "$core_snapshot_gen_dir/jit_runner_snapshot_isolate_instructions.bin"
-
-    deps = [
-      ":$dart_library_target_name",
-      _gen_snapshot_label,
-      core_snapshot_label,
-    ]
-    depfile = depfile_path
-    inputs = [
-      vm_snapshot_data,
-      vm_snapshot_instructions,
-      isolate_snapshot_data,
-      isolate_snapshot_instructions,
-    ]
-    outputs = [
-      snapshot_path,
-    ]
-
-    dart_target_gen_dir =
-        get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-    rebased_packages_path =
-        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
-
-    script = _gen_snapshot
-    args = [
-      "--snapshot_kind=script",
-      "--dependencies=" + rebase_path(depfile),
-      "--packages=" + rebased_packages_path,
-      "--vm_snapshot_data=" + rebase_path(vm_snapshot_data),
-      "--vm_snapshot_instructions=" + rebase_path(vm_snapshot_instructions),
-      "--isolate_snapshot_data=" + rebase_path(isolate_snapshot_data),
-      "--isolate_snapshot_instructions=" +
-          rebase_path(isolate_snapshot_instructions),
-      "--script_snapshot=" + rebase_path(snapshot_path, root_build_dir),
-      rebase_path(invoker.main_dart),
-    ]
-  }
-
-  package(target_name) {
-    forward_variables_from(invoker, [ "testonly" ])
-
-    if (defined(invoker.fuchsia_package_name)) {
-      package_name = invoker.fuchsia_package_name
-    }
-
-    deps = [
-      ":$snapshot_target_name",
-    ]
-
-    resources = [
-      {
-        path = rebase_path(snapshot_path)
-        dest = "script_snapshot.bin"
-      },
-    ]
-    if (defined(invoker.resources)) {
-      resources += invoker.resources
-    }
-
-    meta = [
-      {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/jit1_runtime")
-        dest = "runtime"
-      },
-    ]
-
-    if (defined(invoker.sandbox)) {
-      meta += [
-        {
-          path = rebase_path(invoker.sandbox)
-          dest = "sandbox"
-        },
-      ]
-    }
-  }
-}
-
-template("dart2_jit_app") {
+template("dart_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   dart_library_target_name = target_name + "_dart_library"
@@ -285,7 +153,7 @@ template("dart2_jit_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/jit2_runtime")
+        path = rebase_path("//topaz/runtime/dart_runner/meta/jit_runtime")
         dest = "runtime"
       },
     ]
@@ -301,148 +169,7 @@ template("dart2_jit_app") {
   }
 }
 
-template("dart1_aot_app") {
-  assert(defined(invoker.main_dart), "Must specify main_dart file")
-
-  dart_library_target_name = target_name + "_dart_library"
-
-  dart_library(dart_library_target_name) {
-    forward_variables_from(invoker,
-                           [
-                             "deps",
-                             "disable_analysis",
-                             "non_dart_deps",
-                             "source_dir",
-                           ])
-
-    if (defined(invoker.package_name)) {
-      package_name = invoker.package_name
-    } else {
-      infer_package_name = true
-    }
-
-    sources = []
-    if (defined(invoker.sources)) {
-      sources += invoker.sources
-    }
-    source_base = "lib"
-    if (defined(invoker.source_dir)) {
-      source_base = invoker.source_dir
-    }
-    sources += [ rebase_path(invoker.main_dart, source_base) ]
-  }
-
-  assembly_target_name = target_name + "_assembly"
-  assembly_path = "$target_gen_dir/${target_name}.S"
-  depfile_path = "${assembly_path}.d"
-
-  action(assembly_target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
-    }
-
-    depfile = depfile_path
-    deps = [
-      ":$dart_library_target_name",
-      _gen_snapshot_label,
-    ]
-    inputs = zircon_sdk_ext_files + fuchsia_sdk_ext_files + _entry_manifests +
-             [ invoker.main_dart ]
-    outputs = [
-      assembly_path,
-    ]
-
-    dart_target_gen_dir =
-        get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-    rebased_packages_path =
-        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
-
-    script = _gen_snapshot
-    args = [
-      "--snapshot_kind=app-aot-assembly",
-      "--dependencies=" + rebase_path(depfile),
-      "--assembly=" + rebase_path(assembly_path, root_build_dir),
-      "--packages=" + rebased_packages_path,
-      "--url_mapping=dart:fuchsia.builtin," +
-          rebase_path("//topaz/runtime/dart_runner/embedder/builtin.dart"),
-      "--url_mapping=dart:zircon," + rebase_path(zircon_sdk_ext_lib),
-      "--url_mapping=dart:fuchsia," + rebase_path(fuchsia_sdk_ext_lib),
-    ]
-    foreach(entry_manifest, _entry_manifests) {
-      args +=
-          [ "--embedder_entry_points_manifest=" + rebase_path(entry_manifest) ]
-    }
-    if (is_debug) {
-      args += [ "--enable_asserts" ]
-    }
-    args += [ rebase_path(invoker.main_dart) ]
-
-    pool = "//topaz/runtime/dart_runner:dart_aot_pool($target_toolchain)"
-  }
-
-  dylib_target_name = target_name + "_dylib"
-  outer_target_name = target_name
-  shared_library(dylib_target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
-    }
-
-    deps = [
-      ":$assembly_target_name",
-    ]
-    sources = [
-      assembly_path,
-    ]
-    cflags = [
-      "-nostdlib",
-      "-nostartfiles",
-    ]
-    output_name = outer_target_name
-  }
-
-  dylib_path = get_label_info(":$dylib_target_name($shlib_toolchain)",
-                              "root_out_dir") + "/lib$target_name.so"
-
-  package(target_name) {
-    forward_variables_from(invoker, [ "testonly" ])
-
-    if (defined(invoker.fuchsia_package_name)) {
-      package_name = invoker.fuchsia_package_name
-    }
-
-    deps = [
-      ":$dylib_target_name",
-    ]
-
-    resources = [
-      {
-        path = rebase_path(dylib_path)
-        dest = "libapp.so"
-      },
-    ]
-    if (defined(invoker.resources)) {
-      resources += invoker.resources
-    }
-
-    meta = [
-      {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/aot1_runtime")
-        dest = "runtime"
-      },
-    ]
-
-    if (defined(invoker.sandbox)) {
-      meta += [
-        {
-          path = rebase_path(invoker.sandbox)
-          dest = "sandbox"
-        },
-      ]
-    }
-  }
-}
-
-template("dart2_aot_app") {
+template("dart_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   dart_library_target_name = target_name + "_dart_library"
@@ -576,7 +303,7 @@ template("dart2_aot_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/aot2_runtime")
+        path = rebase_path("//topaz/runtime/dart_runner/meta/aot_runtime")
         dest = "runtime"
       },
     ]
@@ -616,26 +343,6 @@ template("dart2_aot_app") {
 #
 #   extra_entry_manifests (optional)
 #     List of AOT entry point manifest files. Most apps do not need this.
-template("dart_jit_app") {
-  dart2_jit_app(target_name) {
-    forward_variables_from(invoker, "*")
-  }
-}
-template("dart_aot_app") {
-  dart2_aot_app(target_name) {
-    forward_variables_from(invoker, "*")
-  }
-}
-template("dart1_app") {
-  target(dart1_default_app, target_name) {
-    forward_variables_from(invoker, "*")
-  }
-}
-template("dart2_app") {
-  target(dart2_default_app, target_name) {
-    forward_variables_from(invoker, "*")
-  }
-}
 template("dart_app") {
   target(dart_default_app, target_name) {
     forward_variables_from(invoker, "*")
