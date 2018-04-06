@@ -7,7 +7,7 @@ import 'dart:convert' show utf8;
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart' show InterfaceRequest;
-import 'package:fuchsia.fidl.fsl/fsl.dart';
+import 'package:fuchsia.fidl.mem/mem.dart';
 import 'package:lib.ledger.dart/ledger.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart';
 import 'package:lib.logging/logging.dart';
@@ -42,7 +42,7 @@ Conversation _createConversationFromLedgerEntry(Entry entry) =>
 
 /// Creates a [Conversation] object from the given ledger entry's key-value.
 Conversation _createConversationFromLedgerKeyValue(
-    List<int> key, SizedVmoTransport value) {
+    List<int> key, Buffer value) {
   Map<String, dynamic> decodedValue = decodeLedgerValue(value);
   return new Conversation(
       conversationId: key,
@@ -67,7 +67,7 @@ Message _createMessageFromLedgerEntry(Entry entry) =>
 
 /// Creates a [Message] object from the given ledger entry's key-value.
 Message _createMessageFromLedgerKeyValue(
-    List<int> key, SizedVmoTransport value) {
+    List<int> key, Buffer value) {
   Map<String, dynamic> decodedValue = decodeLedgerValue(value);
   return new Message(
       messageId: key,
@@ -714,10 +714,9 @@ class ChatContentProviderImpl extends ChatContentProvider {
           await _getConversationWatcher(conversationId);
 
       Completer<Status> statusCompleter = new Completer<Status>();
-      Completer<SizedVmoTransport> valueCompleter =
-          new Completer<SizedVmoTransport>();
+      Completer<Buffer> valueCompleter = new Completer<Buffer>();
       watcher.pageSnapshot.get(messageId,
-          (Status status, SizedVmoTransport value) {
+          (Status status, Buffer value) {
         statusCompleter.complete(status);
         valueCompleter.complete(value);
       });
@@ -735,7 +734,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
         return;
       }
 
-      SizedVmoTransport value = await valueCompleter.future;
+      Buffer value = await valueCompleter.future;
       try {
         Message message = _createMessageFromLedgerKeyValue(messageId, value);
         callback(ChatStatus.ok, message);
@@ -972,10 +971,9 @@ class ChatContentProviderImpl extends ChatContentProvider {
     }
 
     Completer<Status> statusCompleter = new Completer<Status>();
-    Completer<SizedVmoTransport> valueCompleter =
-        new Completer<SizedVmoTransport>();
+    Completer<Buffer> valueCompleter = new Completer<Buffer>();
     _conversationListWatcher.pageSnapshot.get(conversationId,
-        (Status status, SizedVmoTransport value) {
+        (Status status, Buffer value) {
       statusCompleter.complete(status);
       valueCompleter.complete(value);
     });
@@ -1003,7 +1001,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       );
     }
 
-    SizedVmoTransport value = await valueCompleter.future;
+    Buffer value = await valueCompleter.future;
     Conversation conversation =
         _createConversationFromLedgerKeyValue(conversationId, value);
     _conversationCache[conversationId] = conversation;

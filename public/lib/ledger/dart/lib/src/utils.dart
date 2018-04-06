@@ -9,7 +9,7 @@ import 'dart:math' show Random;
 import 'dart:typed_data' show Uint8List;
 
 import 'package:collection/collection.dart';
-import 'package:fuchsia.fidl.fsl/fsl.dart';
+import 'package:fuchsia.fidl.mem/mem.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart';
 import 'package:quiver/core.dart' as quiver;
 import 'package:zircon/zircon.dart' show ZX, ReadResult;
@@ -20,11 +20,11 @@ import 'package:zircon/zircon.dart' show ZX, ReadResult;
 /// Encodes the given value first into a JSON string and then encode in UTF8.
 List<int> encodeLedgerValue(Object value) => utf8.encode(json.encode(value));
 
-/// Decodes the given [SizedVmoTransport] into a Dart Object. This assumes that
-/// the data held in the given [SizedVmoTransport] is encoded in JSON and UTF8.
+/// Decodes the given [Buffer] into a Dart Object. This assumes that
+/// the data held in the given [Buffer] is encoded in JSON and UTF8.
 ///
 /// This throws an exception when it fails to decode the given data.
-dynamic decodeLedgerValue(SizedVmoTransport value) {
+dynamic decodeLedgerValue(Buffer value) {
   ReadResult readResult = value.vmo.read(value.size);
   if (readResult.status != ZX.OK) {
     throw new Exception('Unable to read from vmo: ${readResult.status}');

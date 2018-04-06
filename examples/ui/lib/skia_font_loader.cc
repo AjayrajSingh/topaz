@@ -23,7 +23,7 @@ void SkiaFontLoader::LoadFont(fonts::FontRequest request,
       std::move(request), [this, callback](fonts::FontResponsePtr response) {
         if (response) {
           fsl::SizedVmo vmo;
-          if (!fsl::SizedVmo::FromTransport(std::move(response->data.vmo),
+          if (!fsl::SizedVmo::FromTransport(std::move(response->data.buffer),
                                             &vmo)) {
             callback(nullptr);
             return;
