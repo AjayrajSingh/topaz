@@ -104,7 +104,7 @@ void ViewController::Blink() {
     }
     if (blink_task_.is_pending())
       blink_task_.Cancel();
-    blink_task_.set_deadline(zx::deadline_after(kBlinkInterval).get());
+    blink_task_.set_deadline(zx::deadline_after(kBlinkInterval));
     blink_task_.set_handler([this](async_t* async, zx_status_t status) {
       if (status != ZX_OK)
         return ASYNC_TASK_FINISHED;

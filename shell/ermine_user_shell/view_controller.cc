@@ -60,7 +60,7 @@ ViewController::ViewController(
       session_(GetScenic(view_manager_.get()).get()),
       parent_node_(&session_),
       container_node_(&session_),
-      begin_frame_task_(async_get_default(), 0u) {
+      begin_frame_task_(async_get_default()) {
   begin_frame_task_.set_handler([this](async_t* async, zx_status_t status) {
     if (status == ZX_OK && needs_begin_frame_)
       BeginFrame(last_presentation_time_);
