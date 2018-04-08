@@ -40,3 +40,14 @@ package("ermine_user_shell") {
 
   binary = "ermine_user_shell"
 }
+
+package("config") {
+  system_image = true
+  package_name = "ermine_user_shell_config"
+  resources = [
+    {
+      dest = "sysmgr/ermine_user_shell.config"
+      path = rebase_path("config/ermine_user_shell.config")
+    },
+  ]
+}

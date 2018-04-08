@@ -1,8 +1,5 @@
 {
-    "resources": [
-        {
-            "bootfs_path": "data/sysmgr/dashboard.config",
-            "file": "topaz/app/dashboard/config/dashboard.config"
-        }
-    ]
+    "packages": {
+        "dashboard_config": "//topaz/app/dashboard:config"
+    }
 }

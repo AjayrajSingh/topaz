@@ -61,3 +61,14 @@ group("tests") {
     ":dashboard_test",
   ]
 }
+
+package("config") {
+  system_image = true
+  package_name = "dashboard_config"
+  resources = [
+    {
+      dest = "sysmgr/dashboard.config"
+      path = rebase_path("config/dashboard.config")
+    },
+  ]
+}

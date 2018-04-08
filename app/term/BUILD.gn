@@ -62,3 +62,14 @@ package("term") {
     },
   ]
 }
+
+package("config") {
+  system_image = true
+  package_name = "term_config"
+  resources = [
+    {
+      dest = "sysmgr/term.config"
+      path = rebase_path("config/term.config")
+    },
+  ]
+}
