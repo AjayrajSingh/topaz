@@ -6,7 +6,6 @@ group("dart_unittests") {
   testonly = true
 
   deps = [
-    "app/chat:tests",
     "app/contacts:tests",
     "app/dashboard:tests",
     "app/documents/packages/utils:test",

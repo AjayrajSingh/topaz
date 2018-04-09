@@ -1,6 +1,5 @@
 {
     "imports": [
-        "topaz/packages/tests/chat",
         "topaz/packages/tests/dart",
         "topaz/packages/tests/dart_target_unittests",
         "topaz/packages/tests/dart_unittests",
