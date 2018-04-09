@@ -3,7 +3,6 @@
         "concert_agent": "//topaz/app/music/agents/concert_agent",
         "concert_event_list": "//topaz/app/music/modules/concert_event_list",
         "concert_event_page": "//topaz/app/music/modules/concert_event_page",
-        "concert_event": "//topaz/app/music/modules/concert_event",
         "last_fm_agent": "//topaz/app/music/agents/last_fm_agent",
         "last_fm_artist_bio": "//topaz/app/music/modules/last_fm_artist_bio",
         "music_album": "//topaz/app/music/modules/music_album",

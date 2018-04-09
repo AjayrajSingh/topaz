@@ -63,9 +63,6 @@ class ArtistModuleScreen extends StatelessWidget {
                       model.playTrack(track, album),
                 ),
               ),
-              // Hack(dayang@): Embedding the Playback Module for now until this
-              // can be done with Mondrian
-              // https://fuchsia.atlassian.net/browse/SO-490
               new Container(
                 height: 64.0,
                 decoration: new BoxDecoration(
