@@ -50,7 +50,8 @@ List<PositionedSurface> layoutSurfaces(
   Map<String, Surface> patternSurfaces = <String, Surface>{};
   // This is really a list not a stack. Reverse it to get to the 'top' items first.
   for (Surface surface in focusStack.reversed) {
-    if (surface.compositionPattern != null) {
+    if (surface.compositionPattern != null &&
+        surface.compositionPattern.isNotEmpty) {
       String pattern = surface.compositionPattern;
       patternSurfaces.putIfAbsent(pattern, () => surface);
     } else {

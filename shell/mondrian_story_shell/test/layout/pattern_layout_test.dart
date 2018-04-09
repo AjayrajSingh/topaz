@@ -26,6 +26,7 @@ void main() {
 
   void assertSurfaceProperties(PositionedSurface surface,
       {double height, double width, Offset topLeft, Offset bottomRight}) {
+    expect(surface.surface, isNotNull);
     Rect position = surface.position;
     if (height != null) {
       expect(position.height, height);
@@ -42,6 +43,32 @@ void main() {
   }
 
   test('Ticker pattern with 2 surfaces', () {
+    Tree<String> tree = new MockTree();
+    when(tree.parent).thenReturn(firstSurface);
+    Surface patternSurface = new MockSurface();
+    when(patternSurface.parent).thenReturn(firstSurface);
+    when(patternSurface.compositionPattern).thenReturn('ticker');
+    List<Surface> surfaces = [
+      firstSurface,
+      patternSurface,
+    ];
+    List<PositionedSurface> positionedSurfaces = pattern_layout.layoutSurfaces(
+        null /* BuildContext */, constraints, surfaces, layoutModel);
+    expect(positionedSurfaces.length, 2);
+
+    assertSurfaceProperties(positionedSurfaces[0],
+        height: maxHeight * 0.85,
+        width: maxWidth,
+        topLeft: const Offset(0.0, 0.0));
+
+    assertSurfaceProperties(positionedSurfaces[1],
+        height: maxHeight * 0.15,
+        width: maxWidth,
+        topLeft: const Offset(0.0, maxHeight * 0.85));
+  });
+
+  test('Ticker pattern with 2 surfaces and empty composition pattern', () {
+    when(firstSurface.compositionPattern).thenReturn('');
     Tree<String> tree = new MockTree();
     when(tree.parent).thenReturn(firstSurface);
     Surface patternSurface = new MockSurface();
