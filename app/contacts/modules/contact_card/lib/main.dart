@@ -12,6 +12,8 @@ import 'package:lib.schemas.dart/com.fuchsia.contact.dart';
 import 'src/models/contact_card_model.dart';
 import 'src/widgets/contact_card.dart';
 
+const String _kSelectedContactLinkName = 'contact';
+
 void main() {
   setupLogger(name: 'contacts/card');
 
@@ -19,8 +21,10 @@ void main() {
   ContactEntityCodec codec = new ContactEntityCodec();
 
   new ModuleDriver()
-    ..watch('contact', codec).listen(
-      (ContactEntityData entity) => model.contact = entity,
+    ..watch(_kSelectedContactLinkName, codec).listen(
+      (ContactEntityData entity) {
+        model.contact = entity;
+      },
       onError: (Object err, StackTrace stackTrace) {
         model.error = true;
         log.warning('$err: $stackTrace');

@@ -41,8 +41,7 @@ class ContactList extends StatefulWidget {
     @required this.onQueryCleared,
     @required this.onContactTapped,
     @required this.onRefreshContacts,
-  })
-      : assert(onQueryChanged != null),
+  })  : assert(onQueryChanged != null),
         assert(onQueryCleared != null),
         assert(onContactTapped != null),
         assert(onRefreshContacts != null),

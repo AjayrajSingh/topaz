@@ -18,10 +18,10 @@ dart_app("contacts_content_provider") {
 
   deps = [
     "//topaz/app/contacts/services:services",
-    "//topaz/public/dart/entity_schemas:entity_schemas",
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/ledger/dart",
   ]
 }

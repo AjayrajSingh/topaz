@@ -6,13 +6,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:entity_schemas/entities.dart' as entities;
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.component/component.dart';
-import 'package:lib.ledger.dart/ledger.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger;
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.ledger.dart/ledger.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.schemas.dart/com.fuchsia.contact.dart' as entities;
 import 'package:meta/meta.dart';
 import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
     as fidl;
@@ -42,8 +42,7 @@ class _DataProvider {
     @required this.agentUrl,
     @required this.dataProviderProxy,
     @required this.agentControllerProxy,
-  })
-      : assert(sourceId != null && sourceId.isNotEmpty),
+  })  : assert(sourceId != null && sourceId.isNotEmpty),
         assert(agentUrl != null && agentUrl.isNotEmpty),
         assert(dataProviderProxy != null),
         assert(agentControllerProxy != null);
@@ -53,6 +52,9 @@ class _DataProvider {
 /// Initial stub implementation
 class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     implements EntityProvider {
+  final entities.ContactEntityCodec _contactCodec =
+      new entities.ContactEntityCodec();
+
   /// Map of [fidl.ContactsDataProvider] sourceIds to the [_DataProvider]
   /// information
   final Map<String, _DataProvider> _dataProviders = <String, _DataProvider>{};
@@ -84,8 +86,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   ContactsContentProviderImpl({
     @required ComponentContext componentContext,
     @required AgentContext agentContext,
-  })
-      : assert(componentContext != null),
+  })  : assert(componentContext != null),
         assert(agentContext != null),
         _componentContext = componentContext,
         _agentContext = agentContext {
@@ -127,6 +128,8 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     String messageQueueToken,
     void callback(fidl.Status status, List<fidl.Contact> contacts),
   ) async {
+    log.fine('getContactList called with prefix = \"$prefix\", '
+        'token = \"$messageQueueToken\"');
     if (messageQueueToken != null) {
       _subscribe(messageQueueToken);
     }
@@ -272,7 +275,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     List<String> types = <String>[];
     if (_contactsStore.containsContact(cookie)) {
       log.fine('contacts store has the contact');
-      types.add(entities.Contact.getType());
+      types.add(_contactCodec.type);
     }
     callback(types);
   }
@@ -285,8 +288,8 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
 
     String data;
     fidl.Contact contact = _contactsStore.getContact(cookie);
-    if (contact != null && type == entities.Contact.getType()) {
-      data = getEntityFromContact(contact).toData();
+    if (contact != null && type == _contactCodec.type) {
+      data = _contactCodec.encode(getEntityFromContact(contact));
     }
 
     log.fine('Retrieved contact = $contact');
@@ -365,7 +368,10 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
 
         // Notify all subscribers that the list of contacts has changed
         Map<String, dynamic> message = <String, dynamic>{
-          'contact_list': _contactsStore.getAllContacts()
+          'contact_list': _contactsStore
+              .getAllContacts()
+              .map(_convertContactToJsonEncodable)
+              .toList()
         };
         String encoded = json.encode(message);
         log.fine('Sending update to ${_messageSenders.length} subscribers');
@@ -469,7 +475,9 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
             new Completer<ledger.Status>();
         opStatuses.add(statusCompleter.future);
         List<int> contactId = utf8.encode(contact.contactId);
-        List<int> ledgerValue = encodeLedgerValue(contact);
+        List<int> ledgerValue = encodeLedgerValue(
+          _convertContactToJsonEncodable(contact),
+        );
         if (operation == _LedgerOperation.put) {
           _page.put(
             contactId,
@@ -506,6 +514,38 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
       }
     }
     return updated;
+  }
+
+  Map<String, dynamic> _convertContactToJsonEncodable(fidl.Contact c) {
+    List<Map<String, String>> emails = <Map<String, String>>[];
+    for (fidl.EmailAddress e in c.emails) {
+      emails.add(<String, String>{
+        'label': e.label,
+        'value': e.value,
+      });
+    }
+
+    List<Map<String, String>> phoneNumbers = <Map<String, String>>[];
+    for (fidl.PhoneNumber p in c.phoneNumbers) {
+      phoneNumbers.add(<String, String>{
+        'label': p.label,
+        'value': p.value,
+      });
+    }
+    Map<String, dynamic> jsonEncodable = <String, dynamic>{
+      'contactId': c.contactId,
+      'sourceContactId': c.sourceContactId,
+      'sourceId': c.sourceId,
+      'displayName': c.displayName,
+      'givenName': c.givenName,
+      'middleName': c.middleName,
+      'familyName': c.familyName,
+      'photoUrl': c.photoUrl,
+      'emails': emails,
+      'phoneNumbers': phoneNumbers,
+    };
+
+    return jsonEncodable;
   }
 
   /// Handles response status, throws an exception if the status is not ok
@@ -551,7 +591,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
       Map<String, Object> config = json.decode(configFile.readAsStringSync());
       Object dataProviders = config['data_providers'];
       if (dataProviders is List) {
-        for (Map<String, String> info in dataProviders) {
+        for (Map<String, dynamic> info in dataProviders) {
           String sourceId = info['source_id'] ?? '';
           String agentUrl = info['agent_url'] ?? '';
           _DataProvider provider = _connectToDataProvider(sourceId, agentUrl);

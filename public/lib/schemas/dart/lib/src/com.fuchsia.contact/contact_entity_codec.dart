@@ -43,11 +43,14 @@ String _encode(ContactEntityData contact) {
 
 /// Decodes [String] into a structured [ContactEntityData]
 ContactEntityData _decode(String data) {
-  assert(data != null);
-  assert(data.isNotEmpty);
+  if (data == null || data.isEmpty) {
+    return null;
+  }
 
   try {
     Map<String, dynamic> decodedJson = json.decode(data);
+    EmailEntityCodec emailCodec = new EmailEntityCodec();
+    PhoneNumberEntityCodec phoneNumberCodec = new PhoneNumberEntityCodec();
     return new ContactEntityData(
       id: decodedJson['id'],
       displayName: decodedJson['displayName'],
@@ -56,11 +59,10 @@ ContactEntityData _decode(String data) {
       middleName: decodedJson['middleName'] ?? '',
       photoUrl: decodedJson['photoUrl'] ?? '',
       emailAddresses: decodedJson['emailAddresses']
-          .map((String emailJson) => new EmailEntityCodec()..decode(emailJson))
+          .map((String emailJson) => emailCodec.decode(emailJson))
           .toList(),
       phoneNumbers: decodedJson['phoneNumbers']
-          .map((String numberJson) =>
-              new PhoneNumberEntityCodec()..decode(numberJson))
+          .map((String numberJson) => phoneNumberCodec.decode(numberJson))
           .toList(),
     );
   } on Exception catch (e) {

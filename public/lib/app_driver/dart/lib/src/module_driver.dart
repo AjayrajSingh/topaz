@@ -244,6 +244,7 @@ class ModuleDriver {
     String url,
     ServiceClient<T> client,
   ) async {
+    await _start.future;
     await connectToAgentServiceWithProxy(url, client.proxy);
   }
 

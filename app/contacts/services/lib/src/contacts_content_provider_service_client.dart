@@ -74,4 +74,24 @@ class ContactsContentProviderServiceClient
 
     return completer.future;
   }
+
+  /// Force a request to retrieve the latest contacts from the cloud
+  Future<List<fidl.Contact>> refreshContacts() {
+    Completer<List<fidl.Contact>> completer =
+        new Completer<List<fidl.Contact>>();
+
+    try {
+      _proxy.refreshContacts((fidl.Status status, List<fidl.Contact> contacts) {
+        if (status == fidl.Status.ok) {
+          completer.complete(contacts);
+        } else {
+          completer.completeError(status);
+        }
+      });
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+    }
+
+    return completer.future;
+  }
 }

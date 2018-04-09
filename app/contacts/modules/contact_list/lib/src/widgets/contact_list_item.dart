@@ -30,8 +30,7 @@ class ContactListItem extends StatelessWidget {
     @required this.contact,
     @required this.onContactTapped,
     this.isFirstInCategory = false,
-  })
-      : assert(contact != null),
+  })  : assert(contact != null),
         super(key: key);
 
   @override

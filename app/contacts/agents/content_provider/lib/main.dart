@@ -29,8 +29,7 @@ class ContactsContentProviderAgent extends AgentImpl {
   /// Create a new instance of [ContactsContentProviderAgent].
   ContactsContentProviderAgent({
     @required ApplicationContext applicationContext,
-  })
-      : super(applicationContext: applicationContext);
+  }) : super(applicationContext: applicationContext);
 
   @override
   void advertise() {

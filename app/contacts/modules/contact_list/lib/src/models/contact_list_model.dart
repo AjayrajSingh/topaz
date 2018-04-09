@@ -15,6 +15,7 @@ class ContactListModel extends Model {
   List<ContactItem> _searchResults = <ContactItem>[];
   List<ContactItem> _contacts;
   Set<ContactItem> _firstItems;
+  bool _error;
 
   /// Creates an instance of the [ContactListModel].
   ContactListModel({List<ContactItem> contactList}) {
@@ -42,6 +43,13 @@ class ContactListModel extends Model {
   /// Store of [ContactItem]s that are the first in their category
   Set<ContactItem> get firstItems =>
       new UnmodifiableSetView<ContactItem>(_firstItems);
+
+  /// Whether or not there was an error
+  bool get error => _error;
+  set error(bool value) {
+    _error = value;
+    notifyListeners();
+  }
 
   /// Go through list and set the flag for all items that are the first in its
   /// category.

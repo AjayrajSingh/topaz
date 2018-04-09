@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:entity_schemas/entities.dart' as entities;
+import 'package:lib.schemas.dart/com.fuchsia.contact.dart' as entities;
 import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
     as fidl;
 
-/// Converts a [fidl.Contact] into a [entities.Contact] entity
-entities.Contact getEntityFromContact(fidl.Contact contact) {
-  return new entities.Contact(
+/// Converts a [fidl.Contact] into a [entities.ContactEntityData] entity
+entities.ContactEntityData getEntityFromContact(fidl.Contact contact) {
+  return new entities.ContactEntityData(
     id: contact.contactId,
     displayName: contact.displayName,
     givenName: contact.givenName,
@@ -20,12 +20,19 @@ entities.Contact getEntityFromContact(fidl.Contact contact) {
   );
 }
 
-/// Converts a [fidl.EmailAddress] into a [entities.EmailAddress] entity
-entities.EmailAddress getEntityFromEmail(fidl.EmailAddress email) {
-  return new entities.EmailAddress(value: email.value, label: email.label);
+/// Converts a [fidl.EmailAddress] into a [entities.EmailEntityData] entity
+entities.EmailEntityData getEntityFromEmail(fidl.EmailAddress email) {
+  return new entities.EmailEntityData(
+    value: email.value,
+    label: email.label,
+  );
 }
 
-/// Converts a [fidl.PhoneNumber] into a [entities.PhoneNumber] entity
-entities.PhoneNumber getEntityFromPhoneNumber(fidl.PhoneNumber number) {
-  return new entities.PhoneNumber(number: number.value, label: number.label);
+/// Converts a [fidl.PhoneNumber] into a [entities.PhoneNumberEntityData] entity
+entities.PhoneNumberEntityData getEntityFromPhoneNumber(
+    fidl.PhoneNumber number) {
+  return new entities.PhoneNumberEntityData(
+    number: number.value,
+    label: number.label,
+  );
 }
