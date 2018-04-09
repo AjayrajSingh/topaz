@@ -38,6 +38,9 @@ class UserShellInfo {
 class UserShellChooser {
   final UserShellInfo _defaultUserShell = new UserShellInfo(
     name: 'armadillo_user_shell',
+    displayUsage: DisplayUsage.kUnknown,
+    screenHeightMm: 0.0,
+    screenWidthMm: 0.0,
   );
   final List<UserShellInfo> _configuredUserShells = <UserShellInfo>[];
   int _nextUserShellIndex = -1;
