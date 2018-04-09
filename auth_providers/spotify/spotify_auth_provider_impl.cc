@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/auth_providers/google/google_auth_provider_impl.h"
+#include "topaz/auth_providers/spotify/spotify_auth_provider_impl.h"
 
 #include <fuchsia/cpp/network.h>
 #include <fuchsia/cpp/views_v1_token.h>
@@ -16,28 +16,11 @@
 #include "lib/svc/cpp/services.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
 #include "third_party/rapidjson/rapidjson/document.h"
-#include "topaz/auth_providers/google/constants.h"
+#include "topaz/auth_providers/spotify/constants.h"
 #include "topaz/auth_providers/oauth/oauth_request_builder.h"
 #include "topaz/auth_providers/oauth/oauth_response.h"
 
-namespace google_auth_provider {
-
-namespace {
-
-std::string GetClientId(const std::string& app_client_id) {
-  // By default, use the client_id of the invoking application.
-  std::string client_id = app_client_id;
-
-  // Use hard-coded Fuchsia client_id for downscoped tokens, if |app_client_id|
-  // is missing.
-  if (app_client_id.empty()) {
-    client_id = kFuchsiaClientId;
-  }
-
-  return client_id;
-}
-
-}  // namespace
+namespace spotify_auth_provider {
 
 using auth::AuthProviderStatus;
 using auth::AuthTokenPtr;
@@ -45,7 +28,7 @@ using auth_providers::oauth::OAuthRequestBuilder;
 using auth_providers::oauth::ParseOAuthResponse;
 using modular::JsonValueToPrettyString;
 
-GoogleAuthProviderImpl::GoogleAuthProviderImpl(
+SpotifyAuthProviderImpl::SpotifyAuthProviderImpl(
     fxl::RefPtr<fxl::TaskRunner> main_runner,
     component::ApplicationContext* app_context,
     network_wrapper::NetworkWrapper* network_wrapper,
@@ -64,9 +47,9 @@ GoogleAuthProviderImpl::GoogleAuthProviderImpl(
   });
 }
 
-GoogleAuthProviderImpl::~GoogleAuthProviderImpl() {}
+SpotifyAuthProviderImpl::~SpotifyAuthProviderImpl() {}
 
-void GoogleAuthProviderImpl::GetPersistentCredential(
+void SpotifyAuthProviderImpl::GetPersistentCredential(
     fidl::InterfaceHandle<auth::AuthenticationUIContext> auth_ui_context,
     GetPersistentCredentialCallback callback) {
   FXL_DCHECK(auth_ui_context);
@@ -85,12 +68,15 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
   const std::vector<std::string> scopes(kScopes.begin(), kScopes.end());
   std::string scopes_str = fxl::JoinStrings(scopes, "+");
 
-  std::string url = kGoogleOAuthAuthEndpoint;
+  std::string url = kSpotifyOAuthAuthEndpoint;
   url += "?scope=" + scopes_str;
   url += "&response_type=code&redirect_uri=";
   url += kRedirectUri;
+  // TODO: Client_id and secret should be passed as api args for
+  // GetPersistentCredential. Need to fix the fidl interface in Garnet before
+  // fixing it here.
   url += "&client_id=";
-  url += kFuchsiaClientId;
+  url += "TODO";
 
   web_view_->SetUrl(url);
 
@@ -111,19 +97,24 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
   auth_ui_context_->StartOverlay(std::move(view_owner));
 }
 
-void GoogleAuthProviderImpl::GetAppAccessToken(
-    fidl::StringPtr credential, fidl::StringPtr app_client_id,
+void SpotifyAuthProviderImpl::GetAppAccessToken(
+    const fidl::StringPtr credential, const fidl::StringPtr app_client_id,
     const fidl::VectorPtr<fidl::StringPtr> app_scopes,
-    GetAppAccessTokenCallback callback) {
+    const GetAppAccessTokenCallback callback) {
   if (credential->empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
     return;
   }
 
+  if (app_client_id->empty()) {
+    callback(AuthProviderStatus::BAD_REQUEST, nullptr);
+    return;
+  }
+
   auto request =
-      OAuthRequestBuilder(kGoogleOAuthTokenEndpoint, "POST")
+      OAuthRequestBuilder(kSpotifyOAuthTokenEndpoint, "POST")
           .SetUrlEncodedBody("refresh_token=" + credential.get() +
-                             "&client_id=" + GetClientId(app_client_id.get()) +
+                             "&client_id=" + app_client_id.get() +
                              "&grant_type=refresh_token");
 
   auto request_factory = fxl::MakeCopyable(
@@ -153,125 +144,30 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
       });
 }
 
-void GoogleAuthProviderImpl::GetAppIdToken(
-    fidl::StringPtr credential, fidl::StringPtr audience,
-    GetAppIdTokenCallback callback) {
-  if (credential->empty()) {
-    callback(AuthProviderStatus::BAD_REQUEST, nullptr);
-    return;
-  }
-
-  auto request =
-      OAuthRequestBuilder(kGoogleOAuthTokenEndpoint, "POST")
-          .SetUrlEncodedBody("refresh_token=" + credential.get() +
-                             "&client_id=" + GetClientId(audience.get()) +
-                             "&grant_type=refresh_token");
-
-  auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
-  Request(
-      std::move(request_factory), [callback](network::URLResponse response) {
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          callback(oauth_response.status, nullptr);
-          return;
-        }
-
-        AuthTokenPtr id_token = auth::AuthToken::New();
-        id_token->token = oauth_response.json_response["id_token"].GetString();
-        id_token->token_type = auth::TokenType::ID_TOKEN;
-        id_token->expires_in =
-            oauth_response.json_response["expires_in"].GetUint64();
-
-        callback(AuthProviderStatus::OK, std::move(id_token));
-      });
+void SpotifyAuthProviderImpl::GetAppIdToken(
+    const fidl::StringPtr credential, const fidl::StringPtr audience,
+    const GetAppIdTokenCallback callback) {
+  // Id Tokens are not supported by Spotify.
+  callback(AuthProviderStatus::BAD_REQUEST, nullptr);
 }
 
-void GoogleAuthProviderImpl::GetAppFirebaseToken(
-    fidl::StringPtr id_token, fidl::StringPtr firebase_api_key,
-    GetAppFirebaseTokenCallback callback) {
-  if (id_token->empty() || firebase_api_key->empty()) {
-    callback(AuthProviderStatus::BAD_REQUEST, nullptr);
-    return;
-  }
-
-  std::map<std::string, std::string> query_params;
-  query_params["key"] = firebase_api_key.get();
-  auto request = OAuthRequestBuilder(kFirebaseAuthEndpoint, "POST")
-                     .SetQueryParams(query_params)
-                     .SetJsonBody(
-                         R"({"postBody": "id_token=)" + id_token.get() +
-                         R"(&providerId=google.com",)" +
-                         R"("returnIdpCredential": true,)" +
-                         R"("returnSecureToken": true,)" +
-                         R"("requestUri": "http://localhost"})");
-
-  // Exchange credential to access token at Google OAuth token endpoint
-  auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
-  Request(
-      std::move(request_factory), [callback](network::URLResponse response) {
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          callback(oauth_response.status, nullptr);
-          return;
-        }
-
-        auth::FirebaseTokenPtr fb_token = auth::FirebaseToken::New();
-        fb_token->id_token =
-            oauth_response.json_response["id_token"].GetString();
-        fb_token->email = oauth_response.json_response["email"].GetString();
-        fb_token->local_id =
-            oauth_response.json_response["local_id"].GetString();
-
-        callback(AuthProviderStatus::OK, std::move(fb_token));
-      });
+void SpotifyAuthProviderImpl::GetAppFirebaseToken(
+    const fidl::StringPtr id_token, const fidl::StringPtr firebase_api_key,
+    const GetAppFirebaseTokenCallback callback) {
+  // Firebase Token doesn't exist for Spotify.
+  callback(AuthProviderStatus::BAD_REQUEST, nullptr);
 }
 
-void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
-    fidl::StringPtr credential,
-    RevokeAppOrPersistentCredentialCallback callback) {
-  if (credential->empty()) {
-    callback(AuthProviderStatus::BAD_REQUEST);
-    return;
-  }
-
-  std::string url =
-      kGoogleRevokeTokenEndpoint + std::string("?token=") + credential.get();
-  auto request = OAuthRequestBuilder(url, "POST").SetUrlEncodedBody("");
-
-  auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
-
-  Request(
-      std::move(request_factory),
-      [callback](network::URLResponse response) {
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          callback(oauth_response.status);
-          return;
-        }
-
-        callback(AuthProviderStatus::OK);
-      });
+void SpotifyAuthProviderImpl::RevokeAppOrPersistentCredential(
+    const fidl::StringPtr credential,
+    const RevokeAppOrPersistentCredentialCallback callback) {
+  // There is no programmatic way to revoke tokens. Instead, Spotify users have
+  // to manually revoke access from this page here:
+  // <https://www.spotify.com/account/>
+  callback(AuthProviderStatus::BAD_REQUEST);
 }
 
-void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
+void SpotifyAuthProviderImpl::WillSendRequest(const fidl::StringPtr incoming_url) {
   FXL_DCHECK(get_persistent_credential_callback_);
 
   const std::string& uri = incoming_url.get();
@@ -304,9 +200,9 @@ void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
   code.pop_back();
 
   auto request =
-      OAuthRequestBuilder(kGoogleOAuthTokenEndpoint, "POST")
+      OAuthRequestBuilder(kSpotifyOAuthTokenEndpoint, "POST")
           .SetUrlEncodedBody("code=" + code + "&redirect_uri=" + kRedirectUri +
-                             "&client_id=" + kFuchsiaClientId +
+                             "&client_id=" + "TODO" +
                              "&grant_type=authorization_code");
 
   auto request_factory = fxl::MakeCopyable(
@@ -314,7 +210,7 @@ void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
         return request.Build();
       });
 
-  // Generate long lived credentials
+  // Generate long lived credentials (OAuth refresh token)
   Request(
       std::move(request_factory),
       [this](network::URLResponse response) {
@@ -341,13 +237,13 @@ void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
       });
 }
 
-void GoogleAuthProviderImpl::GetUserProfile(
-    fidl::StringPtr credential,
-    fidl::StringPtr access_token) {
+void SpotifyAuthProviderImpl::GetUserProfile(
+    const fidl::StringPtr credential,
+    const fidl::StringPtr access_token) {
   FXL_DCHECK(credential.get().size() > 0);
   FXL_DCHECK(access_token.get().size() > 0);
 
-  auto request = OAuthRequestBuilder(kGooglePeopleGetEndpoint, "GET")
+  auto request = OAuthRequestBuilder(kSpotifyPeopleGetEndpoint, "GET")
                      .SetAuthorizationHeader(access_token.get());
 
   auto request_factory = fxl::MakeCopyable(
@@ -397,7 +293,7 @@ void GoogleAuthProviderImpl::GetUserProfile(
       });
 }
 
-views_v1_token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
+views_v1_token::ViewOwnerPtr SpotifyAuthProviderImpl::SetupWebView() {
   component::Services web_view_services;
   component::ApplicationLaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
@@ -420,7 +316,7 @@ views_v1_token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
   return view_owner;
 }
 
-void GoogleAuthProviderImpl::Request(
+void SpotifyAuthProviderImpl::Request(
     std::function<network::URLRequest()> request_factory,
     std::function<void(network::URLResponse response)> callback) {
   requests_.emplace(network_wrapper_->Request(
@@ -431,10 +327,10 @@ void GoogleAuthProviderImpl::Request(
       }));
 }
 
-void GoogleAuthProviderImpl::OnResponse(
+void SpotifyAuthProviderImpl::OnResponse(
     std::function<void(network::URLResponse response)> callback,
     network::URLResponse response) {
   callback(std::move(response));
 }
 
-}  // namespace google_auth_provider
+}  // namespace spotify_auth_provider

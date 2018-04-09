@@ -10,6 +10,7 @@
 #include "lib/fxl/macros.h"
 
 namespace google_auth_provider {
+namespace {
 
 class GoogleAuthProviderImplTest : public gtest::TestWithMessageLoop {
  public:
@@ -44,4 +45,5 @@ TEST_F(GoogleAuthProviderImplTest, EmptyWhenClientDisconnected) {
   EXPECT_TRUE(on_empty_called);
 }
 
+}  // namespace
 }  // namespace google_auth_provider

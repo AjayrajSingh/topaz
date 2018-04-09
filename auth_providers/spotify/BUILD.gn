@@ -5,7 +5,7 @@
 import("//build/package.gni")
 
 executable("bin") {
-  output_name = "google_auth_provider"
+  output_name = "spotify_auth_provider"
 
   sources = [
     "main.cc",
@@ -26,19 +26,19 @@ executable("bin") {
 source_set("lib") {
   sources = [
     "constants.h",
-    "factory_impl.cc",
     "factory_impl.h",
-    "google_auth_provider_impl.cc",
-    "google_auth_provider_impl.h",
+    "factory_impl.cc",
+    "spotify_auth_provider_impl.h",
+    "spotify_auth_provider_impl.cc",
   ]
 
   deps = [
-    "//garnet/lib/callback",
     "//garnet/lib/network_wrapper",
     "//garnet/public/lib/app/cpp",
     "//garnet/public/lib/auth/fidl",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl",
+    "//garnet/lib/callback",
     "//peridot/lib/rapidjson",
     "//topaz/auth_providers/oauth",
     "//topaz/runtime/web_runner/services",
@@ -50,30 +50,30 @@ source_set("unittests") {
 
   sources = [
     "factory_impl_unittest.cc",
-    "google_auth_provider_impl_unittest.cc",
+    "spotify_auth_provider_impl_unittest.cc",
   ]
 
   deps = [
     ":lib",
-    "//garnet/lib/gtest:gtest",
     "//garnet/lib/network_wrapper:fake",
     "//garnet/public/lib/auth/fidl",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl:fxl_printers",
     "//garnet/public/lib/test_runner/cpp:gtest_main",
+    "//garnet/lib/gtest:gtest",
   ]
 }
 
-package("google_auth_provider") {
+package("spotify_auth_provider") {
+  app = true
   deprecated_system_image = true
 
   deps = [
     ":bin",
   ]
 
-  binaries = [
-    {
-      name = "google_auth_provider"
-    },
-  ]
+  binaries = [ {
+        name = "spotify_auth_provider"
+  } ]
 }
+
