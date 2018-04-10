@@ -27,5 +27,8 @@
         "topaz/packages/prod/webkit",
         "topaz/packages/prod/web_view",
         "topaz/packages/prod/xi"
-    ]
+    ],
+    "packages": {
+        "topaz_modules_index": "//topaz:topaz_modules_index"
+    }
 }

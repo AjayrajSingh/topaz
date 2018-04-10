@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//peridot/build/module_manifest.gni")
+
 group("dart_unittests") {
   testonly = true
 
@@ -17,5 +19,17 @@ group("dart_unittests") {
     "tools/dartfmt_extras:test",
     "tools/mod:test",
     "tools/widget_explorer:tests",
+  ]
+}
+
+# This target, if included in the built image, will cause the listed module
+# packages (which must also be included in the built image) to have their
+# manifests indexed by the on-device module resolver when the user logs in.
+initial_module_packages("topaz_modules_index") {
+  packages = [
+    "image",
+    "contacts_picker",
+    "documents_info",
+    "video",
   ]
 }
