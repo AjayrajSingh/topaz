@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/examples/media/media_player/media_player_view.h"
+#include "topaz/examples/media/media_player_skia/media_player_view.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/command_line.h"
 #include "lib/ui/view_framework/view_provider_app.h"

@@ -8,7 +8,7 @@
         "eddystone_advertiser": "//topaz/examples/bluetooth/eddystone_advertiser",
         "eddystone_agent": "//topaz/examples/eddystone_agent",
         "media_player_flutter": "//topaz/examples/media/media_player_flutter",
-        "media_player": "//topaz/examples/media/media_player:package",
+        "media_player_skia": "//topaz/examples/media/media_player_skia:package",
         "mine_digger": "//topaz/examples/mine_digger",
         "todo_list": "//topaz/examples/ledger/todo_list",
         "vu_meter": "//topaz/examples/media/vu_meter:package"

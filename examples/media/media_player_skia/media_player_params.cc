@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/examples/media/media_player/media_player_params.h"
+#include "topaz/examples/media/media_player_skia/media_player_params.h"
 
 #include <iostream>
 
@@ -70,11 +70,11 @@ MediaPlayerParams::MediaPlayerParams(const fxl::CommandLine& command_line) {
 }
 
 void MediaPlayerParams::Usage() {
-  std::cerr << "media_player usage:\n";
-  std::cerr << "    launch media_player [ options ] [ url-or-path ]\n";
+  std::cerr << "media_player_skia usage:\n";
+  std::cerr << "    launch media_player_skia [ options ] [ url-or-path ]\n";
   std::cerr << "options:\n";
   std::cerr << "    --service=<service>         set the service name "
-               "(default is media_player)\n";
+               "(default is media_player_skia)\n";
   std::cerr << "    --remote=<device>#<service> control a remote player\n";
   std::cerr << "    --stay                      used to start the player with "
                "no content for remote control";

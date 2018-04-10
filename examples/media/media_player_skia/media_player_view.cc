@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/examples/media/media_player/media_player_view.h"
+#include "topaz/examples/media/media_player_skia/media_player_view.h"
 
 #include <fcntl.h>
 #include <hid/usages.h>
@@ -18,7 +18,7 @@
 #include "lib/url/gurl.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
-#include "topaz/examples/media/media_player/media_player_params.h"
+#include "topaz/examples/media/media_player_skia/media_player_params.h"
 
 namespace examples {
 

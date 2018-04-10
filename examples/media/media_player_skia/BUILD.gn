@@ -4,7 +4,7 @@
 
 import("//build/package.gni")
 
-executable("media_player") {
+executable("media_player_skia") {
   sources = [
     "main.cc",
     "media_player_params.cc",
@@ -28,15 +28,15 @@ executable("media_player") {
 
 package("package") {
   deprecated_system_image = true
-  package_name = "media_player"
+  package_name = "media_player_skia"
 
   deps = [
-    ":media_player",
+    ":media_player_skia",
   ]
 
   binaries = [
     {
-      name = "media_player"
+      name = "media_player_skia"
     },
   ]
 }

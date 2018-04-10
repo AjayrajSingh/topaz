@@ -14,7 +14,7 @@
 #include "lib/fxl/macros.h"
 #include "lib/media/timeline/timeline_function.h"
 #include "lib/ui/view_framework/base_view.h"
-#include "topaz/examples/media/media_player/media_player_params.h"
+#include "topaz/examples/media/media_player_skia/media_player_params.h"
 
 namespace examples {
 
