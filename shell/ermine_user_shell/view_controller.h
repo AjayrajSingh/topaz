@@ -5,7 +5,7 @@
 #ifndef TOPAZ_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_
 #define TOPAZ_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_
 
-#include <lib/async/cpp/auto_task.h>
+#include <lib/async/cpp/task.h>
 
 #include <functional>
 #include <memory>

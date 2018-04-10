@@ -36,7 +36,11 @@ ViewController::ViewController(
       context_(context),
       font_loader_(
           context_->ConnectToEnvironmentService<fonts::FontProvider>()),
-      blink_task_(async_get_default()),
+      blink_task_(
+          [this](async_t* async, async::AutoTask* task, zx_status_t status) {
+            if (status == ZX_OK)
+              Blink();
+          }),
       params_(term_params) {
   FXL_DCHECK(context_);
 
@@ -102,16 +106,8 @@ void ViewController::Blink() {
       blink_on_ = !blink_on_;
       InvalidateScene();
     }
-    if (blink_task_.is_pending())
-      blink_task_.Cancel();
-    blink_task_.set_deadline(zx::deadline_after(kBlinkInterval));
-    blink_task_.set_handler([this](async_t* async, zx_status_t status) {
-      if (status != ZX_OK)
-        return ASYNC_TASK_FINISHED;
-      Blink();
-      return ASYNC_TASK_FINISHED;
-    });
-    blink_task_.Post();
+    blink_task_.Cancel();
+    blink_task_.PostDelayed(async_get_default(), kBlinkInterval);
   }
 }
 

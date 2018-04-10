@@ -60,13 +60,11 @@ ViewController::ViewController(
       session_(GetScenic(view_manager_.get()).get()),
       parent_node_(&session_),
       container_node_(&session_),
-      begin_frame_task_(async_get_default()) {
-  begin_frame_task_.set_handler([this](async_t* async, zx_status_t status) {
-    if (status == ZX_OK && needs_begin_frame_)
-      BeginFrame(last_presentation_time_);
-    return ASYNC_TASK_FINISHED;
-  });
-
+      begin_frame_task_(
+          [this](async_t* async, async::AutoTask* task, zx_status_t status) {
+            if (status == ZX_OK && needs_begin_frame_)
+              BeginFrame(last_presentation_time_);
+          }) {
   zx::eventpair parent_export_token;
   parent_node_.BindAsRequest(&parent_export_token);
   view_manager_->CreateView(view_.NewRequest(), std::move(view_owner_request),
@@ -184,7 +182,7 @@ void ViewController::RequestBeginFrame() {
   needs_begin_frame_ = true;
   if (present_pending_ || begin_frame_task_.is_pending())
     return;
-  zx_status_t status = begin_frame_task_.Post();
+  zx_status_t status = begin_frame_task_.Post(async_get_default());
   ZX_DEBUG_ASSERT(status == ZX_OK);
 }
 

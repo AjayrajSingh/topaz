@@ -5,7 +5,7 @@
 #ifndef TOPAZ_APP_TERM_VIEW_CONTROLLER_H_
 #define TOPAZ_APP_TERM_VIEW_CONTROLLER_H_
 
-#include <lib/async/cpp/auto_task.h>
+#include <lib/async/cpp/task.h>
 
 #include "examples/ui/lib/skia_font_loader.h"
 #include "examples/ui/lib/skia_view.h"
