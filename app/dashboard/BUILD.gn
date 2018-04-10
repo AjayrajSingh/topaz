@@ -63,7 +63,7 @@ group("tests") {
 }
 
 package("config") {
-  system_image = true
+  deprecated_system_image = true
   package_name = "dashboard_config"
   resources = [
     {

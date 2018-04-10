@@ -42,7 +42,7 @@ package("ermine_user_shell") {
 }
 
 package("config") {
-  system_image = true
+  deprecated_system_image = true
   package_name = "ermine_user_shell_config"
   resources = [
     {

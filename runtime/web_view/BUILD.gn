@@ -123,7 +123,7 @@ if (use_prebuilt_webkit) {
 }
 
 package("web_view") {
-  system_image = true
+  deprecated_system_image = true
 
   deps = [
     ":web_view_bin",
@@ -164,7 +164,7 @@ executable("web_view_test") {
 }
 
 package("web_view_test_package") {
-  system_image = true
+  deprecated_system_image = true
 
   deps = [
     ":web_view_test",
@@ -188,7 +188,7 @@ executable("web_view_link_test") {
 }
 
 package("web_view_link_test_package") {
-  system_image = true
+  deprecated_system_image = true
 
   deps = [
     ":web_view_link_test",

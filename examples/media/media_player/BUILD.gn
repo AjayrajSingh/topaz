@@ -27,7 +27,7 @@ executable("media_player") {
 }
 
 package("package") {
-  system_image = true
+  deprecated_system_image = true
   package_name = "media_player"
 
   deps = [

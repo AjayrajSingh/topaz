@@ -6,7 +6,7 @@ import("//build/package.gni")
 
 package("chat_tests") {
   testonly = true
-  system_image = true
+  deprecated_system_image = true
 
   deps = [
     "tests/chat_content_provider_test",

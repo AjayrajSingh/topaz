@@ -17,7 +17,7 @@ declare_args() {
 assert(armadillo_path_context_config != "")
 
 package("sysui") {
-  system_image = true
+  deprecated_system_image = true
 
   resources = [
     {

@@ -25,7 +25,7 @@ executable("vu_meter") {
 }
 
 package("package") {
-  system_image = true
+  deprecated_system_image = true
   package_name = "vu_meter"
 
   deps = [

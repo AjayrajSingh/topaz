@@ -6,7 +6,7 @@ import("//build/package.gni")
 
 package("tests") {
   testonly = true
-  system_image = true
+  deprecated_system_image = true
 
   package_name = "auth_provider_tests"
 
