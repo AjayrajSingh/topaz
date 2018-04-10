@@ -14,7 +14,7 @@ namespace google_auth_provider {
 class GoogleAuthProviderImplTest : public gtest::TestWithMessageLoop {
  public:
   GoogleAuthProviderImplTest()
-      : network_wrapper_(message_loop_.task_runner()),
+      : network_wrapper_(message_loop_.async()),
         app_context_(
             component::ApplicationContext::CreateFromStartupInfo().get()),
         google_auth_provider_impl_(message_loop_.task_runner(), app_context_,
