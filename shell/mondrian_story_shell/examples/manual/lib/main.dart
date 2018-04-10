@@ -58,20 +58,20 @@ class _ModuleStopperWatcher extends ModuleWatcher {
 }
 
 /// Starts a new module
-void startModuleInShellDeprecated(SurfaceRelation relation) {
+void startChildModule(SurfaceRelation relation) {
   ModuleControllerProxy moduleController = new ModuleControllerProxy();
 
   _childId++;
   String name = 'C$_childId';
 
-  _moduleContext.startModuleInShellDeprecated(
+  DaisyBuilder daisyBuilder = new DaisyBuilder.url(_kModuleUrl);
+  _moduleContext.startModule(
     name,
-    _kModuleUrl,
-    null, // link
+    daisyBuilder.daisy,
     null, // incomingServices,
     moduleController.ctrl.request(),
     relation,
-    true,
+    (StartModuleStatus status) {}
   );
   log.info('Started sub-module $name');
 
@@ -149,7 +149,7 @@ class LaunchModuleButton extends StatelessWidget {
           child: new Text(_display),
         ),
         onPressed: () {
-          startModuleInShellDeprecated(_relation);
+          startChildModule(_relation);
         },
       ),
     );
