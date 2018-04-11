@@ -6,9 +6,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:fuchsia.fidl.cobalt/cobalt.dart';
+import 'package:fuchsia.fidl.netstack/netstack.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:fuchsia.fidl.netstack/netstack.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
@@ -40,6 +41,8 @@ const bool _kEnableDebugInfo = false;
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
 
+const int _kCobaltProjectId = 103;
+
 /// The main device shell widget.
 DeviceShellWidget<UserPickerDeviceShellModel> _deviceShellWidget;
 
@@ -53,6 +56,14 @@ void main() {
 
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
+
+  // Connect to Cobalt
+  CobaltEncoderProxy encoder = new CobaltEncoderProxy();
+
+  CobaltEncoderFactoryProxy encoderFactory = new CobaltEncoderFactoryProxy();
+  connectToService(applicationContext.environmentServices, encoderFactory.ctrl);
+  encoderFactory.getEncoder(_kCobaltProjectId, encoder.ctrl.request());
+  encoderFactory.ctrl.close();
 
   NetstackProxy netstackProxy = new NetstackProxy();
   connectToService(applicationContext.environmentServices, netstackProxy.ctrl);
@@ -70,6 +81,7 @@ void main() {
     onWifiTapped: () {
       wifiInfoOverlayModel.showing = !wifiInfoOverlayModel.showing;
     },
+    encoder: encoder,
   );
 
   SoftKeyboardContainerImpl softKeyboardContainerImpl = _kAdvertiseImeService

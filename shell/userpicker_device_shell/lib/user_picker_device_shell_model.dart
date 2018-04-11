@@ -4,10 +4,10 @@
 
 import 'dart:io';
 
+import 'package:fuchsia.fidl.cobalt/cobalt.dart' as cobalt;
 import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:fuchsia.fidl.input/input.dart'
     show KeyboardEvent, KeyboardEventPhase;
 import 'package:fuchsia.fidl.presentation/presentation.dart';
@@ -17,6 +17,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:zircon/zircon.dart' show Channel;
 
 import 'user_shell_chooser.dart';
@@ -27,6 +28,10 @@ export 'package:lib.widgets/model.dart'
 
 /// Function signature for GetPresentationMode callback
 typedef void GetPresentationModeCallback(PresentationMode mode);
+
+const Duration _kCobaltTimerTimeout = const Duration(seconds: 20);
+const int _kNoOpEncodingId = 1;
+const int _kUserShellLoginTimeMetricId = 14;
 
 /// Contains all the relevant data for displaying the list of users and for
 /// logging in and creating new users.
@@ -45,6 +50,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Called when a user is logging in.
   final VoidCallback onLogin;
+
+  /// Encodes metrics into cobalt.
+  final cobalt.CobaltEncoder encoder;
 
   bool _showingUserActions = false;
   bool _addingUser = false;
@@ -76,6 +84,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     this.onDeviceShellStopped,
     this.onWifiTapped,
     this.onLogin,
+    this.encoder,
   }) : super() {
     // Check for last kernel panic
     File lastPanic = new File('/boot/log/last-panic.txt');
@@ -212,11 +221,39 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       return;
     }
     trace('logging in $accountId');
+    encoder.startTimer(
+      _kUserShellLoginTimeMetricId,
+      _kNoOpEncodingId,
+      'user_shell_login_timer_id',
+      new DateTime.now().millisecondsSinceEpoch,
+      _kCobaltTimerTimeout.inSeconds,
+      (cobalt.Status status) {
+        if (status != cobalt.Status.ok) {
+          log.warning(
+            'Failed to start timer metric '
+                '$_kUserShellLoginTimeMetricId: $status. ',
+          );
+        }
+      },
+    );
     onLogin?.call();
     _userControllerProxy?.ctrl?.close();
     _userControllerProxy = new UserControllerProxy();
     _userWatcherImpl?.close();
     _userWatcherImpl = new UserWatcherImpl(onUserLogout: () {
+      encoder.endTimer(
+        'user_shell_log_out_timer_id',
+        new DateTime.now().millisecondsSinceEpoch,
+        _kCobaltTimerTimeout.inSeconds,
+        (cobalt.Status status) {
+          if (status != cobalt.Status.ok) {
+            log.warning(
+              'Failed to end timer metric '
+                  'user_shell_log_out_timer_id: $status. ',
+            );
+          }
+        },
+      );
       log.info('UserPickerDeviceShell: User logged out!');
       onLogout();
     });
