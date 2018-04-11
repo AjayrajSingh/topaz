@@ -27,7 +27,7 @@ class GoogleAuthProviderApp {
             component::ApplicationContext::CreateFromStartupInfo()),
         trace_provider_(loop_.async()),
         network_wrapper_(
-            loop_.task_runner(),
+            loop_.async(),
             std::make_unique<backoff::ExponentialBackoff>(),
             [this] {
               return application_context_
