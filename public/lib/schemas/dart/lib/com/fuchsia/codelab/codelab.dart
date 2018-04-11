@@ -3,5 +3,5 @@
 // found in the LICENSE file.
 
 export 'finance/finance_entity_codec.dart';
-export 'recipe/recipe_entity_codec.dart';
 export 'lyrics/lyrics_entity_codec.dart';
+export 'recipe/recipe_entity_codec.dart';

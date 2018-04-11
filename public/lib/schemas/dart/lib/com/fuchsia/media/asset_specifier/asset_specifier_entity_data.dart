@@ -49,5 +49,6 @@ class AssetSpecifierEntityData {
   })  : assert(children.isNotEmpty),
         assert(children.every((AssetSpecifierEntityData c) =>
             c.type == AssetType.movie || c.type == AssetType.song)),
-        type = AssetType.playlist;
+        type = AssetType.playlist,
+        uri = null;
 }
