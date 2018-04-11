@@ -20,8 +20,8 @@ import 'package:meta/meta.dart';
 
 import 'service_client.dart';
 
-export 'package:fuchsia.fidl.modular/modular.dart' show Daisy;
-export 'package:lib.module_resolver.dart/daisy_builder.dart' show DaisyBuilder;
+export 'package:fuchsia.fidl.modular/modular.dart' show Intent;
+export 'package:lib.module_resolver.dart/intent_builder.dart' show IntentBuilder;
 export 'package:lib.module.dart/module.dart'
     show ModuleControllerClient, EmbeddedModule;
 export 'package:lib.story.dart/story.dart' show LinkClient;
@@ -499,7 +499,7 @@ class ModuleDriver {
   ///
   Future<ModuleControllerClient> startModule({
     @required String module,
-    @required Daisy daisy,
+    @required Intent intent,
     SurfaceRelation surfaceRelation: const SurfaceRelation(
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
@@ -507,11 +507,11 @@ class ModuleDriver {
     ),
   }) async {
     assert(module != null && module.isNotEmpty);
-    assert(daisy != null);
+    assert(intent != null);
 
     return moduleContext.startModule(
       module: module,
-      daisy: daisy,
+      intent: intent,
       surfaceRelation: surfaceRelation,
     );
   }
@@ -532,14 +532,14 @@ class ModuleDriver {
   ///
   Future<EmbeddedModule> embedModule({
     @required String name,
-    @required Daisy daisy,
+    @required Intent intent,
   }) {
     assert(name != null && name.isNotEmpty);
-    assert(daisy != null);
+    assert(intent != null);
 
     log.fine('resolving module ("$name") for embedding...');
 
-    return moduleContext.embedModule(name: name, daisy: daisy);
+    return moduleContext.embedModule(name: name, intent: intent);
   }
 
   /// # Ready

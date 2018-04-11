@@ -17,7 +17,7 @@ import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
 /// In the future, it would return back a list of Document Providers and their
 /// documents
 /// This also implements the EntityProvider because each document can be
-/// made into an Entity, which we can then pass in a Daisy.
+/// made into an Entity, which we can then pass in a Intent.
 // TODO SO-880(maryxia) retrieve document providers from a list
 class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface
     implements EntityProvider {

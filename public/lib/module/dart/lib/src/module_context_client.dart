@@ -202,11 +202,11 @@ class ModuleContextClient {
   /// See [fidl.ModuleContext#startModule].
   Future<ModuleControllerClient> startModule({
     @required String module,
-    @required Daisy daisy,
+    @required Intent intent,
     @required SurfaceRelation surfaceRelation,
   }) async {
     assert(module != null && module.isNotEmpty);
-    assert(daisy != null);
+    assert(intent != null);
     assert(surfaceRelation != null);
 
     Completer<ModuleControllerClient> completer =
@@ -229,7 +229,7 @@ class ModuleContextClient {
       }
     });
 
-    void handleDaisyStatus(fidl.StartModuleStatus status) {
+    void handleIntentStatus(fidl.StartModuleStatus status) {
       switch (status) {
         case fidl.StartModuleStatus.success:
           completer.complete(controller);
@@ -246,11 +246,11 @@ class ModuleContextClient {
     try {
       proxy.startModule(
         module,
-        daisy,
+        intent,
         null, // incomingServices
         controller.proxy.ctrl.request(),
         surfaceRelation,
-        handleDaisyStatus,
+        handleIntentStatus,
       );
     } on Exception catch (err, stackTrace) {
       completer.completeError(err, stackTrace);
@@ -262,16 +262,16 @@ class ModuleContextClient {
   /// See [fidl.ModuleContext#embedModule].
   Future<EmbeddedModule> embedModule({
     @required String name,
-    @required Daisy daisy,
+    @required Intent intent,
   }) {
     assert(name != null && name.isNotEmpty);
-    assert(daisy != null);
+    assert(intent != null);
 
     Completer<EmbeddedModule> completer = new Completer<EmbeddedModule>();
     InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
     ModuleControllerClient controller = new ModuleControllerClient();
 
-    void handleDaisyStatus(fidl.StartModuleStatus status) {
+    void handleIntentStatus(fidl.StartModuleStatus status) {
       log.fine('resolved "$name" with status "$status"');
 
       switch (status) {
@@ -315,11 +315,11 @@ class ModuleContextClient {
     try {
       proxy.embedModule(
         name,
-        daisy,
+        intent,
         null,
         controller.proxy.ctrl.request(),
         viewOwner.passRequest(),
-        handleDaisyStatus,
+        handleIntentStatus,
       );
     } on Exception catch (err, stackTrace) {
       completer.completeError(err, stackTrace);

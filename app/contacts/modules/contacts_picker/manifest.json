@@ -1,8 +1,8 @@
 {
   "binary": "contacts_picker",
   "suggestion_headline": "Pick contacts",
-  "verb": "com.google.fuchsia.pick-contacts",
-  "noun_constraints": [
+  "action": "com.google.fuchsia.pick-contacts",
+  "parameters": [
     {
       "name": "prefix",
       "type": "com.google.fuchsia.string"

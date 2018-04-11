@@ -16,7 +16,7 @@ import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:fidl/fidl.dart' hide Message;
 import 'package:lib.logging/logging.dart';
-import 'package:lib.module_resolver.dart/daisy_builder.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.story.dart/story.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
@@ -541,7 +541,7 @@ class ChatConversationModuleModel extends ModuleModel {
           payload: m.jsonPayload,
           initializer: (CommandType commandType, List<String> args) {
             // Supports "/mod <verb> <message>".
-            if (args.isNotEmpty && !embedder.daisyStarted) {
+            if (args.isNotEmpty && !embedder.intentStarted) {
               switch (commandType) {
                 case CommandType.mod:
                   String verb = args.first;
@@ -575,14 +575,14 @@ class ChatConversationModuleModel extends ModuleModel {
                     },
                   };
 
-                  // Create a Daisy.
-                  DaisyBuilder daisyBuilder =
-                      new DaisyBuilder.verb('com.google.fuchsia.codelab.$verb')
-                        ..addNoun('originalMessage', messageEntity)
-                        ..addNoun('members', membersEntity);
+                  // Create a Intent.
+                  IntentBuilder intentBuilder =
+                      new IntentBuilder.verb('com.google.fuchsia.codelab.$verb')
+                        ..addParameter('originalMessage', messageEntity)
+                        ..addParameter('members', membersEntity);
 
                   embedder.startModule(
-                    daisy: daisyBuilder.daisy,
+                    intent: intentBuilder.intent,
                     name: mid,
                     additionalLinkData: additionalLinkData,
                   );
@@ -594,12 +594,12 @@ class ChatConversationModuleModel extends ModuleModel {
                     break;
                   }
 
-                  DaisyBuilder daisyBuilder =
-                      new DaisyBuilder.verb('com.google.fuchsia.play')
-                        ..addNoun('asset', args[0]);
+                  IntentBuilder intentBuilder =
+                      new IntentBuilder.verb('com.google.fuchsia.play')
+                        ..addParameter('asset', args[0]);
 
                   embedder.startModule(
-                    daisy: daisyBuilder.daisy,
+                    intent: intentBuilder.intent,
                     name: mid,
                   );
                   break;

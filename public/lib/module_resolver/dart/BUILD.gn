@@ -12,7 +12,7 @@ dart_library("dart") {
   source_dir = "."
 
   sources = [
-    "daisy_builder.dart",
+    "intent_builder.dart",
   ]
 
   deps = [

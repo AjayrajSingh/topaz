@@ -1,8 +1,8 @@
 {
     "binary": "video",
     "suggestion_headline": "Play the video",
-    "verb": "com.google.fuchsia.preview",
-    "noun_constraints": [
+    "action": "com.google.fuchsia.preview",
+    "parameters": [
         {
             "name": "entityRef",
             "type": "com.google.fuchsia.string"

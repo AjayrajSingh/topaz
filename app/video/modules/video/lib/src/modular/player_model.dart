@@ -114,7 +114,7 @@ class PlayerModel extends Model {
 
   /// When the VideoModuleModel.onReady() has finished running, the
   /// Link with the video asset has been updated to the one the user
-  /// had selected from the Daisy.
+  /// had selected from the Intent.
   set asset(Asset asset) {
     if (asset != null && (_asset == null || (_asset.uri != asset.uri))) {
       log.fine('Updating video asset in the Player');

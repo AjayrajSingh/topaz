@@ -6,7 +6,7 @@ import 'dart:async';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.module_resolver.dart/daisy_builder.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
@@ -116,15 +116,15 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
       <String, Map<String, String>>{
         'view': <String, String>{'uri': url}
       };
-    DaisyBuilder daisyBuilder = new DaisyBuilder.url(web_view.kWebViewURL)
-    ..addNoun(null, webviewLinkData);
+    IntentBuilder intentBuilder = new IntentBuilder.handler(web_view.kWebViewURL)
+    ..addParameter(null, webviewLinkData);
 
     _webviewModuleControllerProxy?.ctrl?.close();
     _webviewModuleControllerProxy = new ModuleControllerProxy();
 
     moduleContext.startModule(
       'module:web_view',
-      daisyBuilder.daisy,
+      intentBuilder.intent,
       null, // incomingServices,
       _webviewModuleControllerProxy.ctrl.request(),
       const SurfaceRelation(arrangement: SurfaceArrangement.copresent),

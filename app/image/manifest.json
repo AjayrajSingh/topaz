@@ -1,8 +1,8 @@
 {
     "binary": "image",
     "suggestion_headline": "Show image",
-    "verb": "com.google.fuchsia.play",
-    "noun_constraints": [
+    "action": "com.google.fuchsia.play",
+    "parameters": [
         {
             "name": "asset",
             "type": "http://schema.org/image"

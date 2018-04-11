@@ -13,7 +13,7 @@ import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.module_resolver.dart/daisy_builder.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
 
 const String _kModuleUrl = 'example_manual_relationships';
 final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
@@ -64,10 +64,10 @@ void startChildModule(SurfaceRelation relation) {
   _childId++;
   String name = 'C$_childId';
 
-  DaisyBuilder daisyBuilder = new DaisyBuilder.url(_kModuleUrl);
+  IntentBuilder intentBuilder = new IntentBuilder.handler(_kModuleUrl);
   _moduleContext.startModule(
     name,
-    daisyBuilder.daisy,
+    intentBuilder.intent,
     null, // incomingServices,
     moduleController.ctrl.request(),
     relation,
@@ -81,8 +81,8 @@ void startChildModule(SurfaceRelation relation) {
 
 /// Starts a predefined test container
 void startContainerInShell() {
-  DaisyBuilder daisyBuilder =
-      new DaisyBuilder.url('example_manual_relationships');
+  IntentBuilder intentBuilder =
+      new IntentBuilder.handler('example_manual_relationships');
   const List<double> leftRect = const <double>[0.0, 0.0, 0.5, 1.0];
   const List<double> trRect = const <double>[0.5, 0.0, 0.5, 0.5];
   const List<double> brRect = const <double>[0.5, 0.5, 0.5, 0.5];
@@ -112,11 +112,11 @@ void startContainerInShell() {
     rootBr
   ];
   ContainerNode leftNode =
-      new ContainerNode(nodeName: 'left', daisy: daisyBuilder.daisy);
+      new ContainerNode(nodeName: 'left', intent: intentBuilder.intent);
   ContainerNode trNode =
-      new ContainerNode(nodeName: 'top_right', daisy: daisyBuilder.daisy);
+      new ContainerNode(nodeName: 'top_right', intent: intentBuilder.intent);
   ContainerNode brNode =
-      new ContainerNode(nodeName: 'bottom_right', daisy: daisyBuilder.daisy);
+      new ContainerNode(nodeName: 'bottom_right', intent: intentBuilder.intent);
   List<ContainerNode> nodes = <ContainerNode>[leftNode, trNode, brNode];
 
   _moduleContext.startContainerInShell(

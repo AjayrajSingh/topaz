@@ -38,8 +38,8 @@ abstract class EmbedderModel extends Model {
   /// The current status of the Module being embedded.
   EmbedderModelStatus status;
 
-  /// Indicates whether the daisy has been started.
-  bool get daisyStarted;
+  /// Indicates whether the intent has been started.
+  bool get intentStarted;
 
   /// Gets the desired height of this embedded module.
   double get height;

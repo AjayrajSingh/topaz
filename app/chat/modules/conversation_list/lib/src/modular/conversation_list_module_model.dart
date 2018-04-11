@@ -17,7 +17,7 @@ import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.module_resolver.dart/daisy_builder.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.story.dart/story.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/modular.dart';
@@ -290,7 +290,7 @@ class ChatConversationListModuleModel extends ModuleModel {
     _conversationModuleStarted = true;
   }
 
-  /// Starts the contacts picker using Daisy.
+  /// Starts the contacts picker using Intent.
   void _startContactsPicker() {
     String name = 'contacts_picker';
 
@@ -303,22 +303,22 @@ class ChatConversationListModuleModel extends ModuleModel {
       'content': 'email',
     };
 
-    DaisyBuilder daisyBuilder =
-        new DaisyBuilder.verb('com.google.fuchsia.pick-contacts')
-          ..addNoun('prefix', prefixEntity)
-          ..addNoun('detailType', detailTypeEntity);
+    IntentBuilder intentBuilder =
+        new IntentBuilder.verb('com.google.fuchsia.pick-contacts')
+          ..addParameter('prefix', prefixEntity)
+          ..addParameter('detailType', detailTypeEntity);
 
     InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
     moduleContext
       ..embedModule(
         name, // mod name
-        daisyBuilder.daisy,
+        intentBuilder.intent,
         null,  // incomingServices
         _pickerModuleController.ctrl.request(),
         viewOwner.passRequest(),
         (StartModuleStatus status) {
-          // Handle daisy resolution here
-          log.info('Start daisy status = $status');
+          // Handle intent resolution here
+          log.info('Start intent status = $status');
         },
       )
       ..getLink(name, _pickerLink.ctrl.request());

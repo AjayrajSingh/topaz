@@ -27,10 +27,10 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
   /// The [ModuleContext] used to grab links etc.
   final ModuleContext moduleContext;
 
-  /// The [Daisy] to use when restarting the Daisy.
-  Daisy daisy;
+  /// The [Intent] to use when restarting the Intent.
+  Intent intent;
 
-  /// The name of the embedded mod for restarting Daisy.
+  /// The name of the embedded mod for restarting Intent.
   String name;
 
   /// The client for the link used by the embedded module.
@@ -59,8 +59,8 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
         super();
 
   @override
-  bool get daisyStarted => _daisyStarted;
-  bool _daisyStarted = false;
+  bool get intentStarted => _intentStarted;
+  bool _intentStarted = false;
 
   /// Gets the desired height of this embedded mod.
   @override
@@ -124,50 +124,50 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
     watcherBinding?.close();
     watcherBinding = null;
 
-    _daisyStarted = false;
+    _intentStarted = false;
   }
 
-  /// Restarts the Daisy from the previous startModule call.
+  /// Restarts the Intent from the previous startModule call.
   void restartModule() {
-    assert(daisyStarted);
+    assert(intentStarted);
 
     close();
-    startModule(daisy: daisy, name: name);
+    startModule(intent: intent, name: name);
   }
 
-  /// Starts a Daisy.
+  /// Starts a Intent.
   void startModule({
-    @required Daisy daisy,
+    @required Intent intent,
     @required String name,
     Object additionalLinkData,
   }) {
-    if (daisyStarted) {
+    if (intentStarted) {
       return;
     }
 
     // Remember the values for refreshing later.
-    this.daisy = daisy;
+    this.intent = intent;
     this.name = name;
 
-    _daisyStarted = true;
+    _intentStarted = true;
 
     status = EmbedderModelStatus.resolving;
     notifyListeners();
 
-    log..info('Starting Daisy: $daisy')..info('=> name: $name');
+    log..info('Starting Intent: $intent')..info('=> name: $name');
 
     moduleController = new ModuleControllerProxy();
     InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
 
     moduleContext.embedModule(
       name, // module name
-      daisy,
+      intent,
       null, // incomingServices
       moduleController.ctrl.request(),
       viewOwnerPair.passRequest(),
       (StartModuleStatus status) {
-        // Handle daisy resolution here
-        log.info('Start daisy status = $status');
+        // Handle intent resolution here
+        log.info('Start intent status = $status');
       },
     );
 

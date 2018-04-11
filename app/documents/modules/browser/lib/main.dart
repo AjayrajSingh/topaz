@@ -7,7 +7,7 @@ import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:lib.module_resolver.dart/daisy_builder.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.schemas.dart/com.fuchsia.documents.dart';
 import 'package:lib.widgets.dart/model.dart';
 
@@ -81,13 +81,13 @@ void main() {
 
 void _handleToggleInfo(bool show) {
   if (show) {
-    DaisyBuilder daisyBuilder = new DaisyBuilder.url('documents_info')
-      ..addNounFromLink('id', 'id');
+    IntentBuilder intentBuilder = new IntentBuilder.handler('documents_info')
+      ..addParameterFromLink('id', 'id');
 
     _driver
         .startModule(
       module: 'documents_info',
-      daisy: daisyBuilder.daisy,
+      intent: intentBuilder.intent,
     )
         .then(
       (ModuleControllerClient client) {
@@ -103,14 +103,14 @@ void _handleToggleInfo(bool show) {
 }
 
 void _resolveDocument(String entityRef) {
-  DaisyBuilder daisyBuilder =
-      new DaisyBuilder.verb('com.google.fuchsia.preview')
-        ..addNounFromEntityReference('entity', entityRef);
+  IntentBuilder intentBuilder =
+      new IntentBuilder.action('com.google.fuchsia.preview')
+        ..addParameterFromEntityReference('entity', entityRef);
 
   _driver
       .startModule(
     module: 'video',
-    daisy: daisyBuilder.daisy,
+    intent: intentBuilder.intent,
     surfaceRelation: _kSurfaceRelation,
   )
       .then((ModuleControllerClient client) {
