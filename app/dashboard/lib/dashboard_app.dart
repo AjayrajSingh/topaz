@@ -8,7 +8,6 @@ import 'package:lib.widgets/model.dart';
 
 import 'package:dashboard/build_status_model.dart';
 import 'package:dashboard/build_status_widget.dart';
-import 'package:dashboard/dashboard_module_model.dart';
 import 'package:dashboard/info_text.dart';
 
 const double _kSpaceBetween = 4.0;
@@ -119,6 +118,9 @@ class DashboardApp extends StatelessWidget {
             child: new Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
+                /*
+                // TODO: Re-add this when we have a working chat app.
+                // MS-1461
                 new Padding(
                   padding: const EdgeInsets.only(
                     bottom: 16.0,
@@ -132,6 +134,7 @@ class DashboardApp extends StatelessWidget {
                     child: new Icon(Icons.chat),
                   ),
                 ),
+                */
                 new Padding(
                   padding: const EdgeInsets.only(
                     bottom: 16.0,

@@ -12,6 +12,7 @@ import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
     as chat;
 import 'package:collection/collection.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.module_resolver.dart/daisy_builder.dart';
 
 const String _kChatContentProviderUrl = 'chat_content_provider';
 const String _kChatConversationModuleUrl = 'chat_conversation';
@@ -42,21 +43,23 @@ class Chatter {
     }
     _chatModuleControllerProxy = new ModuleControllerProxy();
 
-    LinkProxy linkProxy = new LinkProxy();
     const String chatLinkName = 'chatLink';
+    DaisyBuilder daisyBuilder = new DaisyBuilder.url(_kChatConversationModuleUrl)
+      ..addNounFromLink(null /* default link */, chatLinkName);
+
+    LinkProxy linkProxy = new LinkProxy();
     moduleContext
       ..getLink(chatLinkName, linkProxy.ctrl.request())
-      ..startModuleInShellDeprecated(
+      ..startModule(
         'module:chat',
-        _kChatConversationModuleUrl,
-        chatLinkName,
+        daisyBuilder.daisy,
         null, // incomingServices,
         _chatModuleControllerProxy.ctrl.request(),
         const SurfaceRelation(
           arrangement: SurfaceArrangement.copresent,
           emphasis: 0.5,
         ),
-        true,
+        (StartModuleStatus status) {}
       );
 
     _getConversationId().then((List<int> conversationId) {

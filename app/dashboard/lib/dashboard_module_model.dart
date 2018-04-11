@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.module_resolver.dart/daisy_builder.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +32,6 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   List<String> _devices;
   ModuleWatcherBinding _webviewModuleWatcherBinding;
   ModuleControllerProxy _webviewModuleControllerProxy;
-  LinkProxy _webviewLinkProxy;
   Timer _deviceMapTimer;
   Chatter _chatter;
 
@@ -110,44 +109,26 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
 
   /// Starts a web view module pointing to the given [buildName].
   void launchWebView(String buildName) {
-    const String webViewLinkName = 'web_view';
     final String url =
         'https://luci-scheduler.appspot.com/jobs/fuchsia/$buildName';
 
-    if (_webviewLinkProxy != null) {
-      _webviewLinkProxy
-        ..set(
-          <String>[],
-          json.encode(<String, Map<String, String>>{
-            'view': <String, String>{'uri': url}
-          }),
-        );
-      _webviewModuleControllerProxy.focus();
-      return;
-    }
-    _webviewLinkProxy?.ctrl?.close();
-    _webviewLinkProxy = new LinkProxy();
-
-    moduleContext.getLink(webViewLinkName, _webviewLinkProxy.ctrl.request());
-    _webviewLinkProxy
-      ..set(
-        <String>[],
-        json.encode(<String, Map<String, String>>{
-          'view': <String, String>{'uri': url}
-        }),
-      );
+    final Map<String, Map<String, String>> webviewLinkData =
+      <String, Map<String, String>>{
+        'view': <String, String>{'uri': url}
+      };
+    DaisyBuilder daisyBuilder = new DaisyBuilder.url(web_view.kWebViewURL)
+    ..addNoun(null, webviewLinkData);
 
     _webviewModuleControllerProxy?.ctrl?.close();
     _webviewModuleControllerProxy = new ModuleControllerProxy();
 
-    moduleContext.startModuleInShellDeprecated(
+    moduleContext.startModule(
       'module:web_view',
-      web_view.kWebViewURL,
-      webViewLinkName,
+      daisyBuilder.daisy,
       null, // incomingServices,
       _webviewModuleControllerProxy.ctrl.request(),
       const SurfaceRelation(arrangement: SurfaceArrangement.copresent),
-      true,
+      (StartModuleStatus status) {}
     );
     _webviewModuleWatcherBinding = new ModuleWatcherBinding();
     _webviewModuleControllerProxy.watch(
@@ -161,8 +142,6 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   void closeWebView() {
     _webviewModuleControllerProxy?.ctrl?.close();
     _webviewModuleControllerProxy = null;
-    _webviewLinkProxy?.ctrl?.close();
-    _webviewLinkProxy = null;
     _webviewModuleWatcherBinding?.close();
     _webviewModuleWatcherBinding = null;
   }
