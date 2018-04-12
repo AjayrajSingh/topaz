@@ -13,5 +13,8 @@
     <hook name="prebuilt-dart-sdk"
           project="topaz"
           action="tools/download_dev_sdk.py"/>
+    <hook name="prebuilt-dart-sdk-update"
+          project="topaz"
+          action="tools/prebuilt-dart-sdk/update.py"/>
   </hooks>
 </manifest>
