@@ -3,8 +3,5 @@
 # found in the LICENSE file.
 
 group("modules") {
-  deps = [
-    "basic_text_reporter",
-    "resolution_failed",
-  ]
+  deps = []
 }

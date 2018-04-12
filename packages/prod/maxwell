@@ -1,9 +1,7 @@
 {
     "packages": {
-        "basic_text_reporter": "//topaz/app/maxwell/modules/basic_text_reporter",
         "mi_dashboard": "//topaz/app/maxwell/agents/mi_dashboard",
         "module_suggester": "//topaz/app/maxwell/agents/module_suggester_dart:module_suggester",
-        "resolution_failed": "//topaz/app/maxwell/modules/resolution_failed",
         "usage_log": "//topaz/app/maxwell/agents/usage_log"
     }
 }
