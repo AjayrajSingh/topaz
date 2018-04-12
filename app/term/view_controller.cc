@@ -36,11 +36,6 @@ ViewController::ViewController(
       context_(context),
       font_loader_(
           context_->ConnectToEnvironmentService<fonts::FontProvider>()),
-      blink_task_(
-          [this](async_t* async, async::AutoTask* task, zx_status_t status) {
-            if (status == ZX_OK)
-              Blink();
-          }),
       params_(term_params) {
   FXL_DCHECK(context_);
 

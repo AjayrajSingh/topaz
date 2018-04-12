@@ -8,6 +8,6 @@ int parseInt(Object value, {int onError(String source)}) {
   if (value is int) {
     return value;
   } else {
-    return int.parse(value, onError: onError);
+    return int.tryParse(value) ?? onError(value);
   }
 }

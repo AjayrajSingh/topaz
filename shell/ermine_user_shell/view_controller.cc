@@ -61,8 +61,8 @@ ViewController::ViewController(
       parent_node_(&session_),
       container_node_(&session_),
       begin_frame_task_(
-          [this](async_t* async, async::AutoTask* task, zx_status_t status) {
-            if (status == ZX_OK && needs_begin_frame_)
+          [this] {
+            if (needs_begin_frame_)
               BeginFrame(last_presentation_time_);
           }) {
   zx::eventpair parent_export_token;

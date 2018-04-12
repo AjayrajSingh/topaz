@@ -399,7 +399,7 @@ Future<Proposal> _createProposal(Map<String, String> proposal) async {
     headline: proposal['headline'] ?? '',
     subheadline: proposal['subheadline'],
     color: (proposal['color'] != null && proposal['color'].isNotEmpty)
-        ? int.parse(proposal['color'], onError: (_) => 0xFFFF0080)
+        ? (int.tryParse(proposal['color']) ?? 0xFFFF0080)
         : 0xFFFF0080,
     iconUrls:
         proposal['icon_url'] == null ? null : <String>[proposal['icon_url']],

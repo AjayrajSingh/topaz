@@ -76,7 +76,8 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   // Keyboard state.
   bool keypad_application_mode_;
 
-  async::AutoTask blink_task_;
+  async::TaskClosureMethod<ViewController, &ViewController::Blink>
+      blink_task_{this};
   zx::time last_key_;
   bool blink_on_ = true;
   bool focused_ = false;

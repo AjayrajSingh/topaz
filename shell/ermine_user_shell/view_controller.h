@@ -94,7 +94,7 @@ class ViewController : public views_v1::ViewListener,
 
   std::vector<std::unique_ptr<Tile>> tiles_;
 
-  async::AutoTask begin_frame_task_;
+  async::TaskClosure begin_frame_task_;
   bool needs_layout_ = false;
   bool needs_begin_frame_ = false;
   bool present_pending_ = false;

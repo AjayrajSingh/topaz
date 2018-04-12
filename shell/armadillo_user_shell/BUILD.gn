@@ -35,8 +35,8 @@ flutter_aot_app("armadillo_user_shell") {
   ]
 
   deps = [
-    "//garnet/public/lib/power_manager/fidl:fidl",
-    "//garnet/public/lib/time_zone/fidl:fidl",
+    "//garnet/public/lib/power_manager/fidl",
+    "//garnet/public/lib/time_zone/fidl",
     "//peridot/public/lib:fidl",
     "//peridot/public/lib/speech/fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",

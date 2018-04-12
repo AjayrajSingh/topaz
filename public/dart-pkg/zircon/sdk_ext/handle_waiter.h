@@ -6,7 +6,7 @@
 #define DART_PKG_ZIRCON_SDK_EXT_HANDLE_WAITER_H_
 
 #include <zx/handle.h>
-#include <lib/async/cpp/auto_wait.h>
+#include <lib/async/cpp/wait.h>
 
 #include "lib/tonic/dart_wrappable.h"
 
@@ -42,9 +42,10 @@ class HandleWaiter : public fxl::RefCountedThreadSafe<HandleWaiter>,
                         Dart_Handle callback);
   ~HandleWaiter();
 
-  void OnWaitComplete(zx_status_t status, zx_signals_t pending);
+  void OnWaitComplete(async_t* async, async::WaitBase* wait,
+                      zx_status_t status, const zx_packet_signal_t* signal);
 
-  async::AutoWait wait_;
+  async::WaitMethod<HandleWaiter, &HandleWaiter::OnWaitComplete> wait_;
   Handle* handle_;
   tonic::DartPersistentValue callback_;
 };

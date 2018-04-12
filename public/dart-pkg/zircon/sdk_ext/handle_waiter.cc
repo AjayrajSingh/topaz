@@ -41,18 +41,13 @@ fxl::RefPtr<HandleWaiter> HandleWaiter::Create(Handle* handle,
 HandleWaiter::HandleWaiter(Handle* handle,
                            zx_signals_t signals,
                            Dart_Handle callback)
-    : wait_(async_get_default(), handle->handle(), signals),
+    : wait_(this, handle->handle(), signals),
       handle_(handle),
       callback_(DartState::Current(), callback) {
   FXL_CHECK(handle_ != nullptr);
   FXL_CHECK(handle_->is_valid());
 
-  wait_.set_handler([this](async_t* async, zx_status_t status,
-                           const zx_packet_signal_t* signal) {
-    OnWaitComplete(status, signal->observed);
-    return ASYNC_WAIT_FINISHED;
-  });
-  zx_status_t status = wait_.Begin();
+  zx_status_t status = wait_.Begin(async_get_default());
   FXL_DCHECK(status == ZX_OK);
 }
 
@@ -73,7 +68,10 @@ void HandleWaiter::Cancel() {
   FXL_DCHECK(!wait_.is_pending());
 }
 
-void HandleWaiter::OnWaitComplete(zx_status_t status, zx_signals_t pending) {
+void HandleWaiter::OnWaitComplete(async_t* async,
+                                  async::WaitBase* wait,
+                                  zx_status_t status,
+                                  const zx_packet_signal_t* signal) {
   FXL_DCHECK(handle_);
 
   FXL_DCHECK(!callback_.is_empty());
@@ -91,7 +89,7 @@ void HandleWaiter::OnWaitComplete(zx_status_t status, zx_signals_t pending) {
   DartState* state = callback_.dart_state().get();
   DartState::Scope scope(state);
 
-  std::vector<Dart_Handle> args{ToDart(status), ToDart(pending)};
+  std::vector<Dart_Handle> args{ToDart(status), ToDart(signal->observed)};
   FXL_DCHECK(!callback_.is_empty());
   Dart_Handle result =
       Dart_InvokeClosure(callback_.Release(), args.size(), args.data());

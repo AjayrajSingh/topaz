@@ -6,8 +6,8 @@
 #define APPS_DART_RUNNER_DART_APPLICATION_CONTROLLER_H_
 
 #include <fdio/namespace.h>
-#include <lib/async/cpp/auto_wait.h>
-
+#include <lib/async/cpp/wait.h>
+#include <lib/zx/timer.h>
 
 #include <fuchsia/cpp/component.h>
 #include "lib/fidl/cpp/binding.h"
@@ -51,8 +51,10 @@ class DartApplicationController : public component::ApplicationController {
 
   // Idle notification.
   void MessageEpilogue();
-  async_wait_result_t OnIdleTimer(async_t* async, zx_status_t status,
-                                  const zx_packet_signal* signal);
+  void OnIdleTimer(async_t* async,
+                   async::WaitBase* wait,
+                   zx_status_t status,
+                   const zx_packet_signal* signal);
 
   std::string label_;
   std::string url_;
@@ -73,9 +75,10 @@ class DartApplicationController : public component::ApplicationController {
   int32_t return_code_ = 0;
   std::vector<WaitCallback> wait_callbacks_;
 
-  zx_time_t idle_start_ = 0;
-  zx_handle_t idle_timer_ = ZX_HANDLE_INVALID;
-  async::AutoWait* idle_wait_ = nullptr;
+  zx::time idle_start_{0};
+  zx::timer idle_timer_;
+  async::WaitMethod<DartApplicationController,
+                    &DartApplicationController::OnIdleTimer> idle_wait_{this};
 
   FXL_DISALLOW_COPY_AND_ASSIGN(DartApplicationController);
 };
