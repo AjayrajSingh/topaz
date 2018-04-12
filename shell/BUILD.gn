@@ -295,6 +295,5 @@ group("tests") {
     "capybara_user_shell:test",
     "keyboard:test",
     "mondrian_story_shell:test",
-    "userpicker_device_shell:test",
   ]
 }

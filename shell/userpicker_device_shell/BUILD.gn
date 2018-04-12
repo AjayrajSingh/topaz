@@ -18,10 +18,8 @@ flutter_aot_app("userpicker_device_shell") {
     "authentication_context_impl.dart",
     "authentication_overlay.dart",
     "authentication_overlay_model.dart",
-    "child_constraints_changer.dart",
     "circular_button.dart",
     "clock.dart",
-    "constraints_model.dart",
     "debug_text.dart",
     "device_extender.dart",
     "device_extension_state.dart",
@@ -51,17 +49,5 @@ flutter_aot_app("userpicker_device_shell") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/ui/flutter",
     "//topaz/shell/widgets",
-  ]
-}
-
-dart_test("test") {
-  sources = [
-    "constraints_model_test.dart",
-  ]
-
-  deps = [
-    ":userpicker_device_shell_dart_library",
-    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
-    "//third_party/dart-pkg/pub/test",
   ]
 }

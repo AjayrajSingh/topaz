@@ -4,7 +4,6 @@
 
 import 'dart:math' as math;
 
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:fuchsia.fidl.cobalt/cobalt.dart';
 import 'package:fuchsia.fidl.netstack/netstack.dart';
@@ -18,8 +17,6 @@ import 'package:meta/meta.dart';
 import 'authentication_context_impl.dart';
 import 'authentication_overlay.dart';
 import 'authentication_overlay_model.dart';
-import 'child_constraints_changer.dart';
-import 'constraints_model.dart';
 import 'debug_text.dart';
 import 'netstack_model.dart';
 import 'soft_keyboard_container_impl.dart';
@@ -50,7 +47,6 @@ void main() {
   setupLogger(name: 'userpicker_device_shell');
   trace('starting');
   GlobalKey screenManagerKey = new GlobalKey();
-  ConstraintsModel constraintsModel = new ConstraintsModel();
   AuthenticationOverlayModel authenticationOverlayModel =
       new AuthenticationOverlayModel();
 
@@ -107,13 +103,7 @@ void main() {
     ],
   );
 
-  GlobalKey<ChildConstraintsChangerState> childConstraintsChangerKey =
-      new GlobalKey<ChildConstraintsChangerState>();
-  Widget app = new ChildConstraintsChanger(
-    key: childConstraintsChangerKey,
-    constraintsModel: constraintsModel,
-    child: softKeyboardContainerImpl?.wrap(child: mainWidget) ?? mainWidget,
-  );
+  Widget app = softKeyboardContainerImpl?.wrap(child: mainWidget) ?? mainWidget;
 
   List<OverlayEntry> overlays = <OverlayEntry>[
     new OverlayEntry(
@@ -201,22 +191,8 @@ void main() {
 
   runApp(_deviceShellWidget);
 
-  constraintsModel.load(rootBundle);
   _deviceShellWidget.advertise();
   softKeyboardContainerImpl?.advertise();
-  RawKeyboard.instance.addListener((RawKeyEvent event) {
-    final bool isDown = event is RawKeyDownEvent;
-    final RawKeyEventDataFuchsia data = event.data;
-    // Flip through constraints with Ctrl-`.
-    // Trigger on up to avoid repeats.
-    if (!isDown &&
-            (data.codePoint == 96) && // `
-            (data.modifiers & 24) != 0 // Ctrl down
-        ) {
-      childConstraintsChangerKey.currentState.toggleConstraints();
-    }
-  });
-
   trace('started');
 }
 
