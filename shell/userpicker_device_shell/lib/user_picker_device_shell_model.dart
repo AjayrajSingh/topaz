@@ -66,11 +66,14 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   ChildViewConnection _childViewConnection;
   final Set<Account> _draggedUsers = new Set<Account>();
   final Set<Ticker> _tickers = new Set<Ticker>();
-  final KeyboardCaptureListenerBinding _keyboardCaptureListenerBinding =
+  final KeyboardCaptureListenerBinding _keyboardCaptureListenerBindingSpaceBar =
+      new KeyboardCaptureListenerBinding();
+  final KeyboardCaptureListenerBinding _keyboardCaptureListenerBindingS =
       new KeyboardCaptureListenerBinding();
   final PresentationModeListenerBinding _presentationModeListenerBinding =
       new PresentationModeListenerBinding();
   String _currentAccountId = '';
+  ShadowTechnique _currentShadowTechnique = ShadowTechnique.screenSpace;
 
   // Because this device shell only supports a single user logged in at a time,
   // we don't need to maintain separate ServiceProvider and Presentation
@@ -122,8 +125,25 @@ class UserPickerDeviceShellModel extends DeviceShellModel
           modifiers: 8, // LCTRL
           phase: KeyboardEventPhase.pressed,
         ),
-        _keyboardCaptureListenerBinding.wrap(this),
+        _keyboardCaptureListenerBindingSpaceBar.wrap(this),
+      )
+      ..captureKeyboardEvent(
+        new KeyboardEvent(
+          deviceId: 0,
+          eventTime: 0,
+          hidUsage: 0,
+          codePoint: 115, // s
+          modifiers: 8, // LCTRL
+          phase: KeyboardEventPhase.pressed,
+        ),
+        _keyboardCaptureListenerBindingS.wrap(this),
+      )
+      ..setRendererParams(
+        <RendererParam>[
+          const RendererParam.withShadowTechnique(ShadowTechnique.unshadowed)
+        ],
       );
+    _currentShadowTechnique = ShadowTechnique.unshadowed;
     //..setPresentationModeListener(_presentationModeListenerBinding.wrap(this));
   }
 
@@ -131,7 +151,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   void onStop() {
     _userControllerProxy?.ctrl?.close();
     _userWatcherImpl?.close();
-    _keyboardCaptureListenerBinding.close();
+    _keyboardCaptureListenerBindingSpaceBar.close();
+    _keyboardCaptureListenerBindingS.close();
     _presentationModeListenerBinding.close();
     onDeviceShellStopped?.call();
     for (Ticker ticker in _tickers) {
@@ -305,7 +326,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   @override
   void onEvent(KeyboardEvent ev) {
     log.info('Keyboard captured in device shell!');
-    if (_userControllerProxy.ctrl.isBound && _userShellChooser != null) {
+    if (ev.codePoint == 32 &&
+        _userControllerProxy.ctrl.isBound &&
+        _userShellChooser != null) {
       UserShellInfo info = _userShellChooser.getNextUserShellInfo(
         _currentAccountId,
       );
@@ -313,6 +336,17 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       _updatePresentation(info);
 
       _userControllerProxy.swapUserShell(new AppConfig(url: info.name), () {});
+    } else if (ev.codePoint == 115) {
+      if (_currentShadowTechnique == ShadowTechnique.unshadowed) {
+        _currentShadowTechnique = ShadowTechnique.screenSpace;
+      } else {
+        _currentShadowTechnique = ShadowTechnique.unshadowed;
+      }
+      presentation.setRendererParams(
+        <RendererParam>[
+          new RendererParam.withShadowTechnique(_currentShadowTechnique)
+        ],
+      );
     }
   }
 
