@@ -4,36 +4,91 @@
 
 import 'dart:async';
 
-import 'package:config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
+import 'package:fuchsia.fidl.music_configuration/music_configuration.dart';
 
 import 'modular/artist_module_model.dart';
 import 'modular/artist_module_screen.dart';
+import 'run_mod.dart';
 
-Future<Null> main() async {
+const String _kSpotifyClientSecretKey = 'spotify_client_secret';
+const String _kSppotifyClientIdKey = 'spotify_client_id';
+
+ModuleDriver _driver;
+
+void main() {
   setupLogger();
 
-  Config config = await Config.read('/system/data/modules/config.json')
-    ..validate(<String>['spotify_client_id', 'spotify_client_secret']);
+  _driver = new ModuleDriver()..start();
 
-  ApplicationContext applicationContext =
-      new ApplicationContext.fromStartupInfo();
+  Completer<Widget> initializedModuleView = runModuleScaffoldAsync();
 
-  ArtistModuleModel artistModuleModel = new ArtistModuleModel(
-    clientId: config.get('spotify_client_id'),
-    clientSecret: config.get('spotify_client_secret'),
+  _connectToConfigAgent().then(_fetchConfigKeys).then(_buildModuleWidget).then(
+      initializedModuleView.complete,
+      onError: initializedModuleView.completeError);
+}
+
+Future<MusicConfigurationProviderProxy> _connectToConfigAgent() async {
+  final MusicConfigurationProviderProxy configProxy =
+      new MusicConfigurationProviderProxy();
+
+  await _driver.connectToAgentServiceWithProxy(
+    'music_configuration_agent',
+    configProxy,
+  );
+
+  return configProxy;
+}
+
+Future<Map<String, String>> _fetchConfigKeys(
+    MusicConfigurationProviderProxy proxy) async {
+  List<String> values = await Future.wait(
+    <Future<String>>[
+      _getApiKey(
+        proxy: proxy,
+        key: _kSppotifyClientIdKey,
+      ),
+      _getApiKey(
+        proxy: proxy,
+        key: _kSpotifyClientSecretKey,
+      ),
+    ],
+  );
+
+  return <String, String>{
+    _kSppotifyClientIdKey: values[0],
+    _kSpotifyClientSecretKey: values[1],
+  };
+}
+
+Widget _buildModuleWidget(Map<String, String> keys) {
+  String spotifyClientId = keys[_kSppotifyClientIdKey];
+  String spotifyClientSecret = keys[_kSpotifyClientSecretKey];
+
+  ArtistModuleModel model = new ArtistModuleModel(
+    clientId: spotifyClientId,
+    clientSecret: spotifyClientSecret,
   );
 
   ModuleWidget<ArtistModuleModel> moduleWidget =
       new ModuleWidget<ArtistModuleModel>(
-    applicationContext: applicationContext,
-    moduleModel: artistModuleModel,
+    applicationContext: new ApplicationContext.fromStartupInfo(),
+    moduleModel: model,
     child: const ArtistModuleScreen(),
-  );
+  )..advertise();
 
-  runApp(moduleWidget);
-  moduleWidget.advertise();
+  return moduleWidget;
+}
+
+Future<String> _getApiKey({
+  String key,
+  MusicConfigurationProviderProxy proxy,
+}) async {
+  Completer<String> c = new Completer<String>();
+  proxy.get(key, c.complete);
+  return c.future;
 }
