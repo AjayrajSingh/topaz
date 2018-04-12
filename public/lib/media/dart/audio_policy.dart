@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fuchsia.fidl.audio_policy/audio_policy.dart' as audio_policy;
 import 'package:fuchsia.fidl.media/media.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.component/component.dart';
@@ -20,8 +21,8 @@ class AudioPolicy {
   static const double _minDbDiff = 0.006;
   static const double _minPerceivedDiff = 0.0001;
 
-  final AudioPolicyServiceProxy _audioPolicyService =
-      new AudioPolicyServiceProxy();
+  final audio_policy.AudioPolicyProxy _audioPolicyService =
+      new audio_policy.AudioPolicyProxy();
 
   double _systemAudioGainDb = _initialGain;
   bool _systemAudioMuted = false;
@@ -97,7 +98,7 @@ class AudioPolicy {
 
   // Handles a status update from the audio policy service. Call with
   // kInitialStatus, null to initiate status updates.
-  void _handleServiceUpdates(int version, AudioPolicyStatus status) {
+  void _handleServiceUpdates(int version, audio_policy.AudioPolicyStatus status) {
     if (status != null) {
       bool callUpdate = _systemAudioMuted != status.systemAudioMuted ||
           (_systemAudioGainDb - status.systemAudioGainDb).abs() > _minDbDiff;
