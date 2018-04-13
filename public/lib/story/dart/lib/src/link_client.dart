@@ -80,22 +80,6 @@ class LinkClient {
       return completer.future;
     }
 
-    void callback(String data) {
-      if (data == null || data.isEmpty) {
-        completer.complete(null);
-      } else {
-        Object decoded;
-
-        try {
-          decoded = json.decode(data);
-        } on Exception catch (err) {
-          completer.completeError(err);
-        }
-
-        completer.complete(decoded);
-      }
-    }
-
     // ignore: unawaited_futures
     proxy.ctrl.error.then((ProxyError err) {
       if (!completer.isCompleted) {
@@ -104,7 +88,7 @@ class LinkClient {
     });
 
     try {
-      proxy.get(path, callback);
+      proxy.get(path, completer.complete);
     } on Exception catch (err) {
       completer.completeError(err);
     }
