@@ -153,11 +153,6 @@ class LinkClient {
     StreamController<String> controller = new StreamController<String>();
     _streams.add(controller);
 
-    // Get an initial value and emit it. Note that this call to #get is async
-    // and will get the initial value once the module is "ready" and a proxy
-    // connection to the proxy is successfully established.
-    get().then(controller.add, onError: controller.addError);
-
     bound.then((_) {
       log.fine('link proxy bound, adding watcher');
 
