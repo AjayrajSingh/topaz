@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
+
 import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bt;
+import 'package:fuchsia.fidl.bluetooth_gatt/bluetooth_gatt.dart' as gatt;
 import 'package:fuchsia.fidl.bluetooth_low_energy/bluetooth_low_energy.dart'
     as ble;
 import 'package:fuchsia.fidl.modular/modular.dart';
@@ -20,6 +22,9 @@ class BLEScannerModuleModel extends ModuleModel implements ble.CentralDelegate {
   final ble.CentralProxy _central = new ble.CentralProxy();
   final ble.CentralDelegateBinding _delegateBinding =
       new ble.CentralDelegateBinding();
+
+  // GATT client proxy to the currently connected peripheral.
+  final gatt.ClientProxy _gattClient = new gatt.ClientProxy();
 
   // True if we have an active scan session.
   bool _isScanning = false;
@@ -101,7 +106,11 @@ class BLEScannerModuleModel extends ModuleModel implements ble.CentralDelegate {
     _connectedDevices[id] = ConnectionState.connecting;
     notifyListeners();
 
-    _central.connectPeripheral(id, (bt.Status status) {
+    // Close any existing GATT client connection.
+    _gattClient.ctrl.close();
+
+    _central.connectPeripheral(id, _gattClient.ctrl.request(),
+        (bt.Status status) {
       if (status.error != null) {
         log.info(
             'Failed to connect to device with (id: $id): ${status.error.description}');

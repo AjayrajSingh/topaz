@@ -18,7 +18,7 @@ typedef bool _ValueWriteFunc(List<int> value);
 
 /// The [ModuleModel] for the GATT Server example.
 class BLERectModuleModel extends ModuleModel
-    implements ble.PeripheralDelegate, gatt.ServiceDelegate {
+    implements ble.PeripheralDelegate, gatt.LocalServiceDelegate {
   // Custom UUID for our service.
   static const String _serviceUuid = '548c2932-f58c-4c0b-9a4d-92110695a591';
 
@@ -70,12 +70,12 @@ class BLERectModuleModel extends ModuleModel
   final gatt.ServerProxy _server = new gatt.ServerProxy();
 
   // The delegate binding.
-  final gatt.ServiceDelegateBinding _serviceDelegate =
-      new gatt.ServiceDelegateBinding();
+  final gatt.LocalServiceDelegateBinding _serviceDelegate =
+      new gatt.LocalServiceDelegateBinding();
 
-  // The gatt.Service interface can be used to perform service actions, such as
-  // sending characteristic value notifications.
-  final gatt.ServiceProxy _service = new gatt.ServiceProxy();
+  // The gatt.LocalService interface can be used to perform service actions,
+  // such as sending characteristic value notifications.
+  final gatt.LocalServiceProxy _service = new gatt.LocalServiceProxy();
 
   // The currently connected BLE central, if any.
   ble.RemoteDevice _currentCentral;
@@ -117,10 +117,7 @@ class BLERectModuleModel extends ModuleModel
     final gatt.Characteristic color = new gatt.Characteristic(
         id: _colorId,
         type: _colorUuid,
-        properties: <gatt.CharacteristicProperty>[
-          gatt.CharacteristicProperty.write,
-          gatt.CharacteristicProperty.reliableWrite
-        ],
+        properties: gatt.kPropertyWrite | gatt.kPropertyReliableWrite,
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
           new gatt.Descriptor(
@@ -133,9 +130,7 @@ class BLERectModuleModel extends ModuleModel
     final gatt.Characteristic scale = new gatt.Characteristic(
         id: _scaleId,
         type: _scaleUuid,
-        properties: <gatt.CharacteristicProperty>[
-          gatt.CharacteristicProperty.write
-        ],
+        properties: gatt.kPropertyWrite,
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
           new gatt.Descriptor(
@@ -148,9 +143,7 @@ class BLERectModuleModel extends ModuleModel
     final gatt.Characteristic rotate = new gatt.Characteristic(
         id: _rotateId,
         type: _rotateUuid,
-        properties: <gatt.CharacteristicProperty>[
-          gatt.CharacteristicProperty.writeWithoutResponse
-        ],
+        properties: gatt.kPropertyWriteWithoutResponse,
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
           new gatt.Descriptor(
