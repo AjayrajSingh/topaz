@@ -16,7 +16,7 @@ def main():
                       help='The root of the Flutter SDK')
   parser.add_argument('--flutter-tools', type=str, required=True,
                       help='The executable for the Flutter tool')
-  parser.add_argument('--working-dir', type=str, required=True,
+  parser.add_argument('--asset-dir', type=str, required=True,
                       help='The directory where to put intermediate files')
   parser.add_argument('--app-dir', type=str, required=True,
                       help='The root of the app')
@@ -33,7 +33,7 @@ def main():
 
   call_args = [
     args.flutter_tools,
-    '--working-dir=%s' % args.working_dir,
+    '--asset-dir=%s' % args.asset_dir,
     '--packages=%s' % args.packages,
   ]
   if 'manifest' in args:
