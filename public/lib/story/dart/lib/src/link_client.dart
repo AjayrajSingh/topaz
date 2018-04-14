@@ -142,6 +142,7 @@ class LinkClient {
 
   final List<LinkWatcherHost> _watchers = <LinkWatcherHost>[];
   final List<StreamController<String>> _streams = <StreamController<String>>[];
+  bool _receivedInitialValue = false;
 
   /// Stream based API for [fidl.Link#watch] and [fidl.Link#watchAll].
   Stream<String> watch({bool all: false}) {
@@ -156,7 +157,15 @@ class LinkClient {
     bound.then((_) {
       log.fine('link proxy bound, adding watcher');
 
-      LinkWatcherHost watcher = new LinkWatcherHost(onNotify: controller.add);
+      LinkWatcherHost watcher = new LinkWatcherHost(onNotify: (String data) {
+        // TODO: remove when MI4-940 is done
+        bool isInitialNullData =
+            (data == null || data == 'null') && !_receivedInitialValue;
+        if (!isInitialNullData) {
+          _receivedInitialValue = true;
+          controller.add(data);
+        }
+      });
       _watchers.add(watcher);
 
       // Using Future#catchError allows any sync errors thrown within the onValue
