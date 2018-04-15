@@ -181,7 +181,7 @@ template("dart1_jit_app") {
       "--isolate_snapshot_data=" + rebase_path(isolate_snapshot_data),
       "--isolate_snapshot_instructions=" +
           rebase_path(isolate_snapshot_instructions),
-      "--script_snapshot=" + rebase_path(snapshot_path),
+      "--script_snapshot=" + rebase_path(snapshot_path, root_build_dir),
       rebase_path(invoker.main_dart),
     ]
   }
