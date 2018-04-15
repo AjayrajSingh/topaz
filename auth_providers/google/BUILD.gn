@@ -64,7 +64,6 @@ source_set("unittests") {
 }
 
 package("google_auth_provider") {
-  app = true
   deprecated_system_image = true
 
   deps = [
