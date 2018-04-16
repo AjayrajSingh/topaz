@@ -29,6 +29,9 @@ export 'package:lib.widgets/model.dart'
 /// Function signature for GetPresentationMode callback
 typedef void GetPresentationModeCallback(PresentationMode mode);
 
+/// HACKY way to retrofit.
+typedef void SetupCallback(VoidCallback startLogin);
+
 const Duration _kCobaltTimerTimeout = const Duration(seconds: 20);
 const int _kNoOpEncodingId = 1;
 const int _kUserShellLoginTimeMetricId = 14;
@@ -52,6 +55,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Called when wifi is tapped.
   final VoidCallback onWifiTapped;
+
+  /// Called when setup is tapped
+  final SetupCallback onSetup;
 
   /// Called when a user is logging in.
   final VoidCallback onLogin;
@@ -96,6 +102,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     this.onWifiTapped,
     this.onLogin,
     this.encoder,
+    this.onSetup,
   }) : super() {
     // Check for last kernel panic
     File lastPanic = new File('/boot/log/last-panic.txt');
@@ -250,6 +257,27 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         notifyListeners();
       },
     );
+  }
+
+  /// Start the setup flow to create a new user and login with that user
+  void startSetupFlow() {
+    _addingUser = true;
+    notifyListeners();
+
+    onSetup?.call((){
+      userProvider.addUser(
+        IdentityProvider.google,
+            (Account account, String errorCode) {
+          if (errorCode == null) {
+            login(account.id);
+          } else {
+            log.warning('ERROR adding user!  $errorCode');
+          }
+          _addingUser = false;
+          notifyListeners();
+        },
+      );
+    });
   }
 
   /// Login with given user

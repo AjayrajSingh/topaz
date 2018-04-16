@@ -18,18 +18,32 @@ class TimezonePicker extends StatelessWidget {
         Widget child,
         ContextModel contextModel,
       ) =>
-              new tz.TimezonePicker(
-                  currentTimezoneId: contextModel.timezoneId,
-                  onTap: (String timezoneId) {
-                    contextModel.timezoneId = timezoneId;
-                    new Timer(
-                      const Duration(milliseconds: 300),
-                      () {
-                        contextModel.isTimezonePickerShowing = false;
-                      },
-                    );
-                  },
-                  onTapOutside: () {
+              new Stack(children: <Widget>[
+                new Listener(
+                  behavior: HitTestBehavior.opaque,
+                  onPointerDown: (PointerDownEvent pointerDownEvent) {
                     contextModel.isTimezonePickerShowing = false;
-                  }));
+                  },
+                ),
+                new Center(
+                    child: new Material(
+                        color: Colors.white,
+                        borderRadius: new BorderRadius.circular(8.0),
+                        elevation: 899.0,
+                        child: new FractionallySizedBox(
+                            heightFactor: 0.7,
+                            widthFactor: 0.7,
+                            child: new tz.TimezonePicker(
+                                currentTimezoneId: contextModel.timezoneId,
+                                onTap: (String timezoneId) {
+                                  contextModel.timezoneId = timezoneId;
+                                  new Timer(
+                                    const Duration(milliseconds: 300),
+                                    () {
+                                      contextModel.isTimezonePickerShowing =
+                                          false;
+                                    },
+                                  );
+                                }))))
+              ]));
 }

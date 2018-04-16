@@ -133,28 +133,29 @@ class UserList extends StatelessWidget {
           isSmall: isSmall,
         ),
         new ScopedModelDescendant<NetstackModel>(
-          builder: (
-            BuildContext context,
-            Widget child,
-            NetstackModel netstackModel,
-          ) =>
-              _buildUserActionButton(
-                isDisabled: !netstackModel.hasIp,
-                child: new Text(
-                  'LOGIN',
-                  style: new TextStyle(
-                    fontSize: fontSize,
-                    color: netstackModel.hasIp ? Colors.white : Colors.grey,
-                  ),
-                ),
-                onTap: () {
-                  model
-                    ..createAndLoginUser()
-                    ..hideUserActions();
-                },
-                isSmall: isSmall,
-              ),
-        ),
+            builder: (
+          BuildContext context,
+          Widget child,
+          NetstackModel netstackModel,
+        ) =>
+                new Row(children: <Widget>[
+                  _buildUserActionButton(
+                    isDisabled: !netstackModel.hasIp,
+                    child: new Text(
+                      'LOGIN',
+                      style: new TextStyle(
+                        fontSize: fontSize,
+                        color: netstackModel.hasIp ? Colors.white : Colors.grey,
+                      ),
+                    ),
+                    onTap: () {
+                      model
+                        ..startSetupFlow()
+                        ..hideUserActions();
+                    },
+                    isSmall: isSmall,
+                  )
+                ])),
         _buildUserActionButton(
           child: new Text(
             'GUEST',

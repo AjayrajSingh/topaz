@@ -16,13 +16,13 @@ import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 
 import 'authentication_context_impl.dart';
-import 'authentication_overlay.dart';
-import 'authentication_overlay_model.dart';
 import 'debug_text.dart';
 import 'netstack_model.dart';
 import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
 import 'user_picker_device_shell_screen.dart';
+import 'user_setup.dart';
+import 'user_setup_model.dart';
 
 /// Set to true to have this BaseShell provide IME services.
 const bool _kAdvertiseImeService = false;
@@ -48,9 +48,6 @@ void main() {
   setupLogger(name: 'userpicker_device_shell');
   trace('starting');
   GlobalKey screenManagerKey = new GlobalKey();
-  AuthenticationOverlayModel authenticationOverlayModel =
-      new AuthenticationOverlayModel();
-
   ApplicationContext applicationContext =
       new ApplicationContext.fromStartupInfo();
 
@@ -69,6 +66,9 @@ void main() {
   // to be read is solved.
   _getTimeZone(applicationContext);
 
+  UserSetupModel userSetupModel =
+      new UserSetupModel(applicationContext, _cancelAuthenticationFlow);
+
   _OverlayModel wifiInfoOverlayModel = new _OverlayModel();
 
   UserPickerDeviceShellModel userPickerDeviceShellModel =
@@ -82,6 +82,7 @@ void main() {
     onWifiTapped: () {
       wifiInfoOverlayModel.showing = !wifiInfoOverlayModel.showing;
     },
+    onSetup: userSetupModel.start,
     encoder: encoder,
   );
 
@@ -101,10 +102,8 @@ void main() {
         key: screenManagerKey,
         launcher: applicationContext.launcher,
       ),
-      new ScopedModel<AuthenticationOverlayModel>(
-        model: authenticationOverlayModel,
-        child: const AuthenticationOverlay(onCancel: _cancelAuthenticationFlow),
-      ),
+      new ScopedModel<UserSetupModel>(
+          model: userSetupModel, child: const UserSetup()),
     ],
   );
 
@@ -179,8 +178,8 @@ void main() {
     softKeyboardContainer: softKeyboardContainerImpl,
     deviceShellModel: userPickerDeviceShellModel,
     authenticationContext: new AuthenticationContextImpl(
-        onStartOverlay: authenticationOverlayModel.onStartOverlay,
-        onStopOverlay: authenticationOverlayModel.onStopOverlay),
+        onStartOverlay: userSetupModel.authModel.onStartOverlay,
+        onStopOverlay: userSetupModel.endAuthFlow),
     child: new LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) =>
           (constraints.biggest == Size.zero)
@@ -210,7 +209,7 @@ void _cancelAuthenticationFlow() {
 void _getTimeZone(ApplicationContext context) {
   final TimezoneProxy _timeZoneProxy = new TimezoneProxy();
   connectToService(context.environmentServices, _timeZoneProxy.ctrl);
-  _timeZoneProxy.getTimezoneId((String tz){});
+  _timeZoneProxy.getTimezoneId((String tz) {});
 }
 
 Widget _buildPerformanceOverlay({Widget child}) => new Stack(

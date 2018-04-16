@@ -587,62 +587,37 @@ typedef void OnTapOutside();
 class TimezonePicker extends StatelessWidget {
   final String _currentTimezoneId;
   final OnTimezoneTap _onTap;
-  final OnTapOutside _onTapOutside;
 
   /// Creates a new TimezonePicker widget
   const TimezonePicker(
       {String currentTimezoneId,
-      OnTimezoneTap onTap,
-      OnTapOutside onTapOutside})
+      OnTimezoneTap onTap})
       : _currentTimezoneId = currentTimezoneId,
-        _onTap = onTap,
-        _onTapOutside = onTapOutside;
+        _onTap = onTap;
 
   @override
-  Widget build(BuildContext context) => new Stack(
-        children: <Widget>[
-          new Listener(
-            behavior: HitTestBehavior.opaque,
-            onPointerDown: (PointerDownEvent pointerDownEvent) {
-              _onTapOutside?.call();
-            },
-          ),
-          new Center(
-            child: new Material(
-              color: Colors.white,
-              borderRadius: new BorderRadius.circular(8.0),
-              elevation: 899.0,
-              child: new FractionallySizedBox(
-                heightFactor: 0.7,
-                widthFactor: 0.7,
-                child: new Container(
-                  padding: const EdgeInsets.all(16.0),
-                  child: new ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: _kTimeZones.length,
-                    itemBuilder: (BuildContext context, int index) =>
-                        new Material(
-                          color: _currentTimezoneId == _kTimeZones[index].zoneId
-                              ? Colors.grey[500]
-                              : Colors.transparent,
-                          child: new InkWell(
-                            onTap: () {
-                              _onTap?.call(_kTimeZones[index].zoneId);
-                            },
-                            child: new Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: new Text(
-                                '${_kTimeZones[index].zoneId}',
-                                style: new TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ),
-                        ),
+  Widget build(BuildContext context) => new Container(
+        padding: const EdgeInsets.all(16.0),
+        child: new ListView.builder(
+          physics: const BouncingScrollPhysics(),
+          itemCount: _kTimeZones.length,
+          itemBuilder: (BuildContext context, int index) => new Material(
+                color: _currentTimezoneId == _kTimeZones[index].zoneId
+                    ? Colors.grey[500]
+                    : Colors.transparent,
+                child: new InkWell(
+                  onTap: () {
+                    _onTap?.call(_kTimeZones[index].zoneId);
+                  },
+                  child: new Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: new Text(
+                      '${_kTimeZones[index].zoneId}',
+                      style: new TextStyle(color: Colors.black),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ],
+        ),
       );
 }
