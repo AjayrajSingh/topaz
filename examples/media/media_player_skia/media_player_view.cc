@@ -20,6 +20,9 @@
 #include "third_party/skia/include/core/SkPath.h"
 #include "topaz/examples/media/media_player_skia/media_player_params.h"
 
+using media_player::MediaPlayer;
+using media_player::NetMediaService;
+
 namespace examples {
 
 namespace {
@@ -79,7 +82,7 @@ MediaPlayerView::MediaPlayerView(
   if (params.device_name().empty()) {
     // Create a player from all that stuff.
     media_player_ =
-        application_context->ConnectToEnvironmentService<media::MediaPlayer>();
+        application_context->ConnectToEnvironmentService<MediaPlayer>();
 
     views_v1_token::ViewOwnerPtr video_view_owner;
     media_player_->CreateView(
@@ -97,9 +100,9 @@ MediaPlayerView::MediaPlayerView(
     if (!params.service_name().empty()) {
       auto net_media_service =
           application_context
-              ->ConnectToEnvironmentService<media::NetMediaService>();
+              ->ConnectToEnvironmentService<NetMediaService>();
 
-      fidl::InterfaceHandle<media::MediaPlayer> media_player_handle;
+      fidl::InterfaceHandle<MediaPlayer> media_player_handle;
       media_player_->AddBinding(media_player_handle.NewRequest());
 
       net_media_service->PublishMediaPlayer(params.service_name(),
@@ -109,7 +112,7 @@ MediaPlayerView::MediaPlayerView(
     // Create a player proxy.
     auto net_media_service =
         application_context
-            ->ConnectToEnvironmentService<media::NetMediaService>();
+            ->ConnectToEnvironmentService<NetMediaService>();
 
     net_media_service->CreateMediaPlayerProxy(params.device_name(),
                                               params.service_name(),
@@ -355,7 +358,7 @@ void MediaPlayerView::DrawControls(SkCanvas* canvas, const SkISize& size) {
 
 void MediaPlayerView::HandlePlayerStatusUpdates(
     uint64_t version,
-    media::MediaPlayerStatusPtr status) {
+    media_player::MediaPlayerStatusPtr status) {
   if (status) {
     // Process status received from the player.
     if (status->timeline_transform) {
@@ -426,7 +429,7 @@ void MediaPlayerView::HandlePlayerStatusUpdates(
 
   // Request a status update.
   media_player_->GetStatus(
-      version, [this](uint64_t version, media::MediaPlayerStatus status) {
+      version, [this](uint64_t version, media_player::MediaPlayerStatus status) {
         HandlePlayerStatusUpdates(version, fidl::MakeOptional(std::move(status)));
       });
 }

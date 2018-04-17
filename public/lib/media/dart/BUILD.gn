@@ -16,8 +16,10 @@ dart_library("dart") {
   source_dir = "."
 
   deps = [
-    "//garnet/public/lib/media/fidl",
     "//garnet/public/lib/audio_policy/fidl",
+    "//garnet/public/lib/media/fidl",
+    "//garnet/public/lib/media/fidl:media_player",
+    "//garnet/public/lib/ui/geometry/fidl",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
   ]

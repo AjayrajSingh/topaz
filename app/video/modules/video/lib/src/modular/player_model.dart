@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:fuchsia.fidl.media/media.dart';
+import 'package:fuchsia.fidl.media_player/media_player.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
 import 'package:lib.media.flutter/media_progress.dart';
 import 'package:lib.ui.flutter/child_view.dart';

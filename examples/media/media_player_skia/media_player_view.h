@@ -8,6 +8,7 @@
 #include <queue>
 
 #include <fuchsia/cpp/media.h>
+#include <fuchsia/cpp/media_player.h>
 
 #include "examples/ui/lib/host_canvas_cycler.h"
 #include "lib/app/cpp/application_context.h"
@@ -48,7 +49,7 @@ class MediaPlayerView : public mozart::BaseView {
   // argument values, initiates status updates.
   void HandlePlayerStatusUpdates(
       uint64_t version = media::kInitialStatus,
-      media::MediaPlayerStatusPtr status = nullptr);
+      media_player::MediaPlayerStatusPtr status = nullptr);
 
   // Toggles between play and pause.
   void TogglePlayPause();
@@ -69,13 +70,13 @@ class MediaPlayerView : public mozart::BaseView {
   scenic_lib::skia::HostCanvasCycler controls_widget_;
   std::unique_ptr<scenic_lib::EntityNode> video_host_node_;
 
-  media::MediaPlayerPtr media_player_;
+  media_player::MediaPlayerPtr media_player_;
   geometry::Size video_size_;
   geometry::Size pixel_aspect_ratio_;
   State previous_state_ = State::kPaused;
   State state_ = State::kPaused;
   media::TimelineFunction timeline_function_;
-  media::MediaMetadataPtr metadata_;
+  media_player::MediaMetadataPtr metadata_;
   geometry::RectF content_rect_;
   geometry::RectF controls_rect_;
   geometry::RectF progress_bar_rect_;

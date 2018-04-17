@@ -9,7 +9,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.media.flutter/media_player.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
-import 'package:fuchsia.fidl.media/media.dart' as media;
+import 'package:fuchsia.fidl.media_player/media_player.dart' as media_player;
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -139,7 +139,7 @@ void _playLeafAsset(Asset asset) {
 
   _leafAssetToPlay = asset;
 
-  if (_controller.problem?.type == media.kProblemConnectionFailed) {
+  if (_controller.problem?.type == media_player.kProblemConnectionFailed) {
     _controller.close();
   }
 
@@ -202,7 +202,7 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
 
   /// Adds a problem description to list [to] if there is a problem.
   void _addProblem(List<Widget> to) {
-    media.Problem problem = _controller.problem;
+    media_player.Problem problem = _controller.problem;
     if (problem != null) {
       String text;
 
@@ -210,16 +210,16 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
         text = problem.details;
       } else {
         switch (problem.type) {
-          case media.kProblemInternal:
+          case media_player.kProblemInternal:
             text = 'Internal error';
             break;
-          case media.kProblemAssetNotFound:
+          case media_player.kProblemAssetNotFound:
             text = 'The requested content was not found';
             break;
-          case media.kProblemMediaTypeNotSupported:
+          case media_player.kProblemMediaTypeNotSupported:
             text = 'The requested content is in an unsupported format';
             break;
-          case media.kProblemConnectionFailed:
+          case media_player.kProblemConnectionFailed:
             text = 'Connection to player failed';
             break;
           default:
@@ -242,7 +242,7 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
       new MediaPlayer(_controller),
     ];
 
-    media.MediaMetadata metadata = _controller.metadata;
+    media_player.MediaMetadata metadata = _controller.metadata;
     if (metadata != null) {
       _addLabel(metadata.title ?? _leafAssetToPlay.title ?? '(untitled)',
           Colors.white, 20.0, columnChildren);

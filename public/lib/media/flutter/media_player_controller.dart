@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:lib.media.dart/audio_player_controller.dart';
-import 'package:fuchsia.fidl.media/media.dart';
+import 'package:fuchsia.fidl.media_player/media_player.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.ui.flutter/child_view.dart';
