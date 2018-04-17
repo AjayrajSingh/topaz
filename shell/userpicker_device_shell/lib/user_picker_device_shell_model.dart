@@ -32,6 +32,11 @@ typedef void GetPresentationModeCallback(PresentationMode mode);
 const Duration _kCobaltTimerTimeout = const Duration(seconds: 20);
 const int _kNoOpEncodingId = 1;
 const int _kUserShellLoginTimeMetricId = 14;
+const int _kKeyModifierLeftCtrl = 8;
+const int _kKeyModifierRightAlt = 64;
+const int _kKeyCodeSpacebar = 32;
+const int _kKeyCodeL = 108;
+const int _kKeyCodeS = 115;
 
 /// Contains all the relevant data for displaying the list of users and for
 /// logging in and creating new users.
@@ -70,10 +75,13 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       new KeyboardCaptureListenerBinding();
   final KeyboardCaptureListenerBinding _keyboardCaptureListenerBindingS =
       new KeyboardCaptureListenerBinding();
+  final KeyboardCaptureListenerBinding _keyboardCaptureListenerBindingL =
+      new KeyboardCaptureListenerBinding();
   final PresentationModeListenerBinding _presentationModeListenerBinding =
       new PresentationModeListenerBinding();
   String _currentAccountId = '';
-  ShadowTechnique _currentShadowTechnique = ShadowTechnique.screenSpace;
+  ShadowTechnique _currentShadowTechnique = ShadowTechnique.unshadowed;
+  bool _currentClippingEnabled = true;
 
   // Because this device shell only supports a single user logged in at a time,
   // we don't need to maintain separate ServiceProvider and Presentation
@@ -115,14 +123,15 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     super.onReady(userProvider, deviceShellContext, presentation);
     _loadUsers();
     _userPickerScrollController.addListener(_scrollListener);
+    enableClipping(_currentClippingEnabled);
     presentation
       ..captureKeyboardEvent(
         new KeyboardEvent(
           deviceId: 0,
           eventTime: 0,
           hidUsage: 0,
-          codePoint: 32, // spacebar
-          modifiers: 8, // LCTRL
+          codePoint: _kKeyCodeSpacebar,
+          modifiers: _kKeyModifierLeftCtrl,
           phase: KeyboardEventPhase.pressed,
         ),
         _keyboardCaptureListenerBindingSpaceBar.wrap(this),
@@ -132,20 +141,30 @@ class UserPickerDeviceShellModel extends DeviceShellModel
           deviceId: 0,
           eventTime: 0,
           hidUsage: 0,
-          codePoint: 115, // s
-          modifiers: 8, // LCTRL
+          codePoint: _kKeyCodeS,
+          modifiers: _kKeyModifierLeftCtrl,
           phase: KeyboardEventPhase.pressed,
         ),
         _keyboardCaptureListenerBindingS.wrap(this),
       )
+      ..captureKeyboardEvent(
+        new KeyboardEvent(
+          deviceId: 0,
+          eventTime: 0,
+          hidUsage: 0,
+          codePoint: _kKeyCodeL,
+          modifiers: _kKeyModifierRightAlt,
+          phase: KeyboardEventPhase.pressed,
+        ),
+        _keyboardCaptureListenerBindingL.wrap(this),
+      )
       ..setRendererParams(
         <RendererParam>[
-          const RendererParam.withShadowTechnique(ShadowTechnique.unshadowed)
+          new RendererParam.withShadowTechnique(_currentShadowTechnique)
         ],
       )
       ..setPresentationModeListener(
           _presentationModeListenerBinding.wrap(this));
-    _currentShadowTechnique = ShadowTechnique.unshadowed;
   }
 
   @override
@@ -327,7 +346,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   @override
   void onEvent(KeyboardEvent ev) {
     log.info('Keyboard captured in device shell!');
-    if (ev.codePoint == 32 &&
+    if (ev.codePoint == _kKeyCodeSpacebar &&
         _userControllerProxy.ctrl.isBound &&
         _userShellChooser != null) {
       UserShellInfo info = _userShellChooser.getNextUserShellInfo(
@@ -337,9 +356,12 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       _updatePresentation(info);
 
       _userControllerProxy.swapUserShell(new AppConfig(url: info.name), () {});
-    } else if (ev.codePoint == 115) {
+    } else if (ev.codePoint == _kKeyCodeS) {
+      // Toggles from unshadowed -> screenSpace -> shadowMap
       if (_currentShadowTechnique == ShadowTechnique.unshadowed) {
         _currentShadowTechnique = ShadowTechnique.screenSpace;
+      } else if (_currentShadowTechnique == ShadowTechnique.screenSpace) {
+        _currentShadowTechnique = ShadowTechnique.shadowMap;
       } else {
         _currentShadowTechnique = ShadowTechnique.unshadowed;
       }
@@ -348,6 +370,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
           new RendererParam.withShadowTechnique(_currentShadowTechnique)
         ],
       );
+    } else if (ev.codePoint == _kKeyCodeL) {
+      _currentClippingEnabled = !_currentClippingEnabled;
+      enableClipping(_currentClippingEnabled);
     }
   }
 
@@ -503,7 +528,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// |Presentation|.
   @override
-  void setPresentationModeListener(InterfaceHandle<PresentationModeListener> listener) {
+  void setPresentationModeListener(
+      InterfaceHandle<PresentationModeListener> listener) {
     presentation.setPresentationModeListener(listener);
   }
 
