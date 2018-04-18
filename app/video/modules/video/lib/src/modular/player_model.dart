@@ -120,7 +120,7 @@ class PlayerModel extends Model {
       log.fine('Updating video asset in the Player');
       _asset = asset;
       _controller
-	..pause()
+        ..pause()
         ..close()
         ..open(_asset.uri, serviceName: _kServiceName);
       _controllerHasProblem();
@@ -208,5 +208,12 @@ class PlayerModel extends Model {
     if (_controller.playing && showControlOverlay) {
       notifyListeners();
     }
+  }
+
+  ///
+  void terminate() {
+    _controller
+      ..pause()
+      ..close();
   }
 }

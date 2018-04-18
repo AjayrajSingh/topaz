@@ -31,9 +31,12 @@ void main() {
     level: Level.INFO,
   );
 
-  ModuleDriver moduleDriver = new ModuleDriver();
+  PlayerModel playerModel;
+  ModuleDriver moduleDriver = new ModuleDriver(onTerminate: () {
+    playerModel?.terminate();
+  });
 
-  PlayerModel playerModel = new PlayerModel(
+  playerModel = new PlayerModel(
     environmentServices: moduleDriver.environmentServices,
     notifyProgress: (MediaProgress progress) {
       moduleDriver.put('media_progress', progress.toEntity(), _mediaProgressCodec);
