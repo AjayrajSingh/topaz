@@ -18,6 +18,7 @@ dart_library("dart") {
     "com/fuchsia/codelab/finance/finance_entity_codec.dart",
     "com/fuchsia/codelab/lyrics/lyrics_entity_codec.dart",
     "com/fuchsia/codelab/recipe/recipe_entity_codec.dart",
+    "com.fuchsia.intent.dart",
     "com/fuchsia/media/asset_specifier/asset_specifier_entity_codec.dart",
     "com/fuchsia/media/asset_specifier/asset_specifier_entity_data.dart",
     "com/fuchsia/media/captions/captions_entity_codec.dart",
