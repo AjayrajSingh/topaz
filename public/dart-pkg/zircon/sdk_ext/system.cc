@@ -16,6 +16,7 @@
 #include <zircon/process.h>
 #include <zircon/processargs.h>
 
+#include "lib/fsl/io/fd.h"
 #include "lib/fxl/files/unique_fd.h"
 #include "lib/tonic/dart_binding_macros.h"
 #include "lib/tonic/dart_class_library.h"
@@ -177,15 +178,13 @@ Dart_Handle System::ChannelFromFile(std::string path) {
   }
 
   // Get channel from fd.
-  zx_handle_t handles[FDIO_MAX_HANDLES];
-  uint32_t types[FDIO_MAX_HANDLES];
-  zx_status_t status = fdio_transfer_fd(fd.release(), 0, handles, types);
-  if (status != 1 || types[0] != PA_FDIO_REMOTE) {
+  zx::channel channel = fsl::CloneChannelFromFileDescriptor(fd.get());
+  if (!channel) {
     return ConstructDartObject(kHandleResult, ToDart(ZX_ERR_IO));
   }
 
   return ConstructDartObject(kHandleResult, ToDart(ZX_OK),
-                             ToDart(Handle::Create(handles[0])));
+                             ToDart(Handle::Create(channel.release())));
 }
 
 zx_status_t System::ChannelWrite(fxl::RefPtr<Handle> channel,
@@ -366,8 +365,8 @@ zx_status_t System::VmoWrite(fxl::RefPtr<Handle> vmo,
     ZX_ERR_BAD_HANDLE;
   }
 
-  zx_status_t status = zx_vmo_write(vmo->handle(), data.data(), offset,
-                                    data.length_in_bytes());
+  zx_status_t status =
+      zx_vmo_write(vmo->handle(), data.data(), offset, data.length_in_bytes());
 
   data.Release();
   return status;
@@ -382,8 +381,7 @@ Dart_Handle System::VmoRead(fxl::RefPtr<Handle> vmo,
 
   // TODO: constrain size?
   ByteDataScope bytes(size);
-  zx_status_t status =
-      zx_vmo_read(vmo->handle(), bytes.data(), offset, size);
+  zx_status_t status = zx_vmo_read(vmo->handle(), bytes.data(), offset, size);
   bytes.Release();
   if (status == ZX_OK) {
     return ConstructDartObject(kReadResult, ToDart(status), bytes.dart_handle(),

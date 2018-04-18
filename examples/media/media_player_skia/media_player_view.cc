@@ -9,9 +9,9 @@
 
 #include <iomanip>
 
-#include "garnet/bin/media/util/file_channel.h"
 #include "lib/app/cpp/connect.h"
 #include "lib/fidl/cpp/optional.h"
+#include "lib/fsl/io/fd.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
 #include "lib/media/timeline/timeline.h"
@@ -86,7 +86,8 @@ MediaPlayerView::MediaPlayerView(
 
     views_v1_token::ViewOwnerPtr video_view_owner;
     media_player_->CreateView(
-        application_context->ConnectToEnvironmentService<views_v1::ViewManager>()
+        application_context
+            ->ConnectToEnvironmentService<views_v1::ViewManager>()
             .Unbind(),
         video_view_owner.NewRequest());
 
@@ -99,8 +100,7 @@ MediaPlayerView::MediaPlayerView(
 
     if (!params.service_name().empty()) {
       auto net_media_service =
-          application_context
-              ->ConnectToEnvironmentService<NetMediaService>();
+          application_context->ConnectToEnvironmentService<NetMediaService>();
 
       fidl::InterfaceHandle<MediaPlayer> media_player_handle;
       media_player_->AddBinding(media_player_handle.NewRequest());
@@ -111,8 +111,7 @@ MediaPlayerView::MediaPlayerView(
   } else {
     // Create a player proxy.
     auto net_media_service =
-        application_context
-            ->ConnectToEnvironmentService<NetMediaService>();
+        application_context->ConnectToEnvironmentService<NetMediaService>();
 
     net_media_service->CreateMediaPlayerProxy(params.device_name(),
                                               params.service_name(),
@@ -123,8 +122,8 @@ MediaPlayerView::MediaPlayerView(
     url::GURL url = url::GURL(params.url());
 
     if (url.SchemeIsFile()) {
-      media_player_->SetFileSource(media::ChannelFromFd(
-          fxl::UniqueFD(open(url.path().c_str(), O_RDONLY))));
+      media_player_->SetFileSource(fsl::CloneChannelFromFileDescriptor(
+          fxl::UniqueFD(open(url.path().c_str(), O_RDONLY)).get()));
     } else {
       media_player_->SetHttpSource(params.url());
     }
@@ -250,8 +249,8 @@ void MediaPlayerView::Layout() {
   view_properties.view_layout = views_v1::ViewLayout::New();
   view_properties.view_layout->size.width = content_rect_.width;
   view_properties.view_layout->size.height = content_rect_.height;
-  GetViewContainer()->SetChildProperties(kVideoChildKey,
-                                         fidl::MakeOptional(std::move(view_properties)));
+  GetViewContainer()->SetChildProperties(
+      kVideoChildKey, fidl::MakeOptional(std::move(view_properties)));
 
   InvalidateScene();
 }
@@ -429,8 +428,10 @@ void MediaPlayerView::HandlePlayerStatusUpdates(
 
   // Request a status update.
   media_player_->GetStatus(
-      version, [this](uint64_t version, media_player::MediaPlayerStatus status) {
-        HandlePlayerStatusUpdates(version, fidl::MakeOptional(std::move(status)));
+      version,
+      [this](uint64_t version, media_player::MediaPlayerStatus status) {
+        HandlePlayerStatusUpdates(version,
+                                  fidl::MakeOptional(std::move(status)));
       });
 }
 
