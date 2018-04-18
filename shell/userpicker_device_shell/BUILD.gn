@@ -37,6 +37,7 @@ flutter_aot_app("userpicker_device_shell") {
 
   deps = [
     "//garnet/public/lib/netstack/fidl:fidl",
+    "//garnet/public/lib/time_zone/fidl:fidl",
     "//garnet/public/lib/ui/input/fidl:fidl",
     "//garnet/public/lib/ui/views/fidl:v1",
     "//peridot/public/lib:fidl",

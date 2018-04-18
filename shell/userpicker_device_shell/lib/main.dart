@@ -7,6 +7,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:fuchsia.fidl.cobalt/cobalt.dart';
 import 'package:fuchsia.fidl.netstack/netstack.dart';
+import 'package:fuchsia.fidl.time_zone/time_zone.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/application.dart';
@@ -63,6 +64,10 @@ void main() {
 
   NetstackProxy netstackProxy = new NetstackProxy();
   connectToService(applicationContext.environmentServices, netstackProxy.ctrl);
+
+  // This should be removed once the underlying issue causing timezone not
+  // to be read is solved.
+  _getTimeZone(applicationContext);
 
   _OverlayModel wifiInfoOverlayModel = new _OverlayModel();
 
@@ -199,6 +204,13 @@ void main() {
 /// Cancels any ongoing authorization flows in the device shell.
 void _cancelAuthenticationFlow() {
   _deviceShellWidget.cancelAuthenticationFlow();
+}
+
+/// Temporary fix to correctly keep timezone correct.
+void _getTimeZone(ApplicationContext context) {
+  final TimezoneProxy _timeZoneProxy = new TimezoneProxy();
+  connectToService(context.environmentServices, _timeZoneProxy.ctrl);
+  _timeZoneProxy.getTimezoneId((String tz){});
 }
 
 Widget _buildPerformanceOverlay({Widget child}) => new Stack(
