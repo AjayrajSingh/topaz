@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:convert' show json;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.decomposition.dart/decomposition.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:web_view/web_view.dart' as web_view;
@@ -32,8 +31,6 @@ class _QueryHandlerImpl extends QueryHandler {
   static final String _emailHeadline = 'Open Email';
   static final String _youtubeHeadline = 'Open YouTube';
   static final String _terminalHeadline = 'Open Terminal';
-  static final RegExp _musicPatternKanye = new RegExp(r'kanye|yeezus');
-  static final RegExp _musicPatternPortugal = new RegExp(r'portugal|the man');
 
   @override
   Future<Null> onQuery(
@@ -113,40 +110,6 @@ class _QueryHandlerImpl extends QueryHandler {
           appUrl: 'term',
           headline: _terminalHeadline,
           color: 0xFFE52D27 /* YouTube red from color spec */,
-        ),
-      );
-    }
-
-    if (query.text?.contains(_musicPatternKanye) ?? false) {
-      proposals.add(
-        await _createProposal(
-          id: 'Listen to Kanye',
-          appUrl: 'music_artist',
-          headline: 'Listen to Kanye',
-          color: 0xFF9C27B0, // Material Purple 500,
-          initialData: json.encode(<String, dynamic>{
-            'view': decomposeUri(new Uri(
-                scheme: 'spotify',
-                host: 'artist',
-                path: '5K4W6rqBFWDnAN6FQUkS6x'))
-          }),
-        ),
-      );
-    }
-
-    if (query.text?.contains(_musicPatternPortugal) ?? false) {
-      proposals.add(
-        await _createProposal(
-          id: 'Listen to Portugal. The Man',
-          appUrl: 'music_artist',
-          headline: 'Listen to Portugal. The Man',
-          color: 0xFF9C27B0, // Material Purple 500,
-          initialData: json.encode(<String, dynamic>{
-            'view': decomposeUri(new Uri(
-                scheme: 'spotify',
-                host: 'artist',
-                path: '4kI8Ie27vjvonwaB2ePh8T'))
-          }),
         ),
       );
     }

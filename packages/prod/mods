@@ -1,7 +1,6 @@
 {
     "imports": [
         "topaz/packages/prod/contacts",
-        "topaz/packages/prod/music",
         "topaz/packages/prod/video"
     ]
 }

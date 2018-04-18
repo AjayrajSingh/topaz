@@ -17,7 +17,6 @@
         "topaz/packages/prod/maxwell",
         "topaz/packages/prod/mods",
         "topaz/packages/prod/mondrian",
-        "topaz/packages/prod/music",
         "topaz/packages/prod/oauth_token_manager",
         "topaz/packages/prod/perspective",
         "topaz/packages/prod/sqlite",

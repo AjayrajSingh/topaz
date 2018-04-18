@@ -43,15 +43,6 @@
     "module_data": "{\"image_url\":\"/system/data/sysui/story_fluxMemories.png\"}"
   },
   {
-    "id": "ask_06",
-    "headline": "Listen to Portugal the Man",
-    "subheadline": "Play now",
-    "color": "0xFF3E2723",
-    "image_url": "/system/data/sysui/1-portugal-the-man.jpeg",
-    "module_url": "music_artist",
-    "module_data": "{\"view\": {\"uri\": \"spotify://artist/4kI8Ie27vjvonwaB2ePh8T\", \"scheme\": \"spotify\", \"host\": \"artist\", \"path\": \"/4kI8Ie27vjvonwaB2ePh8T\", \"path segments\": [\"4kI8Ie27vjvonwaB2ePh8T\"], \"query parameters\": {}}}"
-  },
-  {
     "id": "ask_07",
     "headline": "Reply to Danielle",
     "color": "0xFF9C26B0",
