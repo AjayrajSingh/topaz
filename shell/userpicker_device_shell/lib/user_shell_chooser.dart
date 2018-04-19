@@ -43,7 +43,7 @@ class UserShellChooser {
     screenWidthMm: 0.0,
   );
   final List<UserShellInfo> _configuredUserShells = <UserShellInfo>[];
-  int _nextUserShellIndex = -1;
+  int _userShellIndex = 0;
 
   /// Constructor.
   UserShellChooser() {
@@ -99,13 +99,16 @@ class UserShellChooser {
     }
   }
 
-  /// Gets the current user shell's app url.
-  /// Temporarily use the default user shell if guest for backward compatibility
+  /// Switch to next shell and returns the user shell info
   UserShellInfo getNextUserShellInfo(String user) {
+    _userShellIndex = (_userShellIndex + 1) % _configuredUserShells.length;
+    return getCurrentUserShellInfo(user);
+  }
+
+  /// Gets the user shell info of the current shell
+  UserShellInfo getCurrentUserShellInfo(String user) {
     if (_configuredUserShells.isNotEmpty) {
-      _nextUserShellIndex =
-          (_nextUserShellIndex + 1) % _configuredUserShells.length;
-      return _configuredUserShells[_nextUserShellIndex];
+      return _configuredUserShells[_userShellIndex];
     }
     return _defaultUserShell;
   }

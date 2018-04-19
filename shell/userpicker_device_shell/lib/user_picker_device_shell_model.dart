@@ -332,7 +332,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _serviceProviderBinding.bind(this, serviceProvider.passRequest());
 
     _currentAccountId = accountId;
-    UserShellInfo info = _userShellChooser.getNextUserShellInfo(
+    UserShellInfo info = _userShellChooser.getCurrentUserShellInfo(
       _currentAccountId,
     );
     final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
