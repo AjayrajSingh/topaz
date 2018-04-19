@@ -14,6 +14,9 @@ class _Timezone {
 // Note: these timezones were generated from a script using ICU data.
 // These should ideally be loaded ad hoc or stored somewhere.
 const List<_Timezone> _kTimeZones = const <_Timezone>[
+  const _Timezone(zoneId: 'US/Eastern'),
+  const _Timezone(zoneId: 'US/Pacific'),
+  const _Timezone(zoneId: 'Europe/Paris'),
   const _Timezone(zoneId: 'Africa/Abidjan'),
   const _Timezone(zoneId: 'Africa/Accra'),
   const _Timezone(zoneId: 'Africa/Addis_Ababa'),
@@ -442,7 +445,6 @@ const List<_Timezone> _kTimeZones = const <_Timezone>[
   const _Timezone(zoneId: 'Europe/Moscow'),
   const _Timezone(zoneId: 'Europe/Nicosia'),
   const _Timezone(zoneId: 'Europe/Oslo'),
-  const _Timezone(zoneId: 'Europe/Paris'),
   const _Timezone(zoneId: 'Europe/Podgorica'),
   const _Timezone(zoneId: 'Europe/Prague'),
   const _Timezone(zoneId: 'Europe/Riga'),
@@ -561,7 +563,6 @@ const List<_Timezone> _kTimeZones = const <_Timezone>[
   const _Timezone(zoneId: 'US/Arizona'),
   const _Timezone(zoneId: 'US/Central'),
   const _Timezone(zoneId: 'US/East-Indiana'),
-  const _Timezone(zoneId: 'US/Eastern'),
   const _Timezone(zoneId: 'US/Hawaii'),
   const _Timezone(zoneId: 'US/Indiana-Starke'),
   const _Timezone(zoneId: 'US/Michigan'),
