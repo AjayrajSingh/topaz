@@ -1,0 +1,22 @@
+# Copyright 2018 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_test.gni")
+import("//build/dart/dart_library.gni")
+
+dart_library("dart") {
+  package_name = "lib.mod.dart"
+
+  sdk_candidate = true
+
+  sources = [
+    "mod.dart",
+    "flutter.dart",
+  ]
+
+  deps = [
+    "//topaz/public/dart/logging:lib.logging",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+  ]
+}
