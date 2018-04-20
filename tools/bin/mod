@@ -11,16 +11,16 @@ SNAPSHOT_PATH=${MOD_TOOL_DIR}/bin/mod.dart.snapshot
 UNAME_OUT="$(uname -s)"
 case "${UNAME_OUT}" in
   Linux*)
-    PLATFORM=linux
+    PLATFORM=linux-x64
     LAST_MODIFIED_FILE=$(find ${MOD_TOOL_DIR} -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ")
     ;;
   Darwin*)
-    PLATFORM=mac
+    PLATFORM=mac-x64
     LAST_MODIFIED_FILE=$(find ${MOD_TOOL_DIR} -type f -print0 | xargs -0 stat -f "%m %N" | sort -rn | head -1 | cut -f2- -d" ")
     ;;
 esac
 
-DART_BIN=${FUCHSIA_DIR}/third_party/dart/tools/sdks/${PLATFORM}/dart-sdk/bin
+DART_BIN=${FUCHSIA_DIR}/topaz/tools/prebuilt-dart-sdk/${PLATFORM}/bin
 DART=${DART_BIN}/dart
 PUB=${DART_BIN}/pub
 

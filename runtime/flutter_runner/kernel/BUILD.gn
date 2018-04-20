@@ -23,20 +23,8 @@ compile_platform("kernel_platform_files") {
 }
 
 action("kernel_core_snapshot") {
-  if (is_debug) {
-    gen_snapshot_exe = "gen_snapshot"
-  } else {
-    gen_snapshot_exe = "gen_snapshot_product"
-  }
-
-  gen_snapshot_label =
-      "//third_party/dart/runtime/bin:$gen_snapshot_exe($host_toolchain)"
-  gen_snapshot_dir = get_label_info(gen_snapshot_label, "root_out_dir")
-  gen_snapshot = "$gen_snapshot_dir/$gen_snapshot_exe"
-
   deps = [
     ":kernel_platform_files",
-    gen_snapshot_label,
   ]
 
   platform_dill =
@@ -57,7 +45,12 @@ action("kernel_core_snapshot") {
     isolate_snapshot_instructions,
   ]
 
-  script = gen_snapshot
+  if (is_debug) {
+    script = gen_snapshot
+  } else {
+    script = gen_snapshot_product
+  }
+
   args = [
     # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
     "--limit_ints_to_64_bits",

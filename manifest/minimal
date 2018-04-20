@@ -10,6 +10,9 @@
     <hook name="download-libwebkit"
           project="topaz"
           action="runtime/web_view/scripts/download-libwebkit.sh"/>
+    <!-- TODO(mcgrathr,zra): Remove this and tools/download_dev_sdk.py,
+         tools/utils.py when dart/sdk has been updated to find
+         tools/prebuilt-dart-sdk instead. -->
     <hook name="prebuilt-dart-sdk"
           project="topaz"
           action="tools/download_dev_sdk.py"/>

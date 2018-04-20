@@ -19,11 +19,6 @@ declare_args() {
   flutter2_default_app = "flutter2_jit_app"
 }
 
-_gen_snapshot_label =
-    "//third_party/dart/runtime/bin:gen_snapshot($host_toolchain)"
-_gen_snapshot_dir = get_label_info(_gen_snapshot_label, "root_out_dir")
-_gen_snapshot = "$_gen_snapshot_dir/gen_snapshot"
-
 flutter_base = "//third_party/dart-pkg/git/flutter"
 flutter_tools_label =
     "$flutter_base/packages/flutter_tools:fuchsia_builder($host_toolchain)"
@@ -301,16 +296,22 @@ template("flutter_source_app") {
   action("${target_name}_sources") {
     deps = [
       ":$dart_library_target_name",
-      _gen_snapshot_label,
     ]
     outputs = [
       manifest,
       manifest_dot_packages,
+      contents,
     ]
     script = "//build/dart/gen_dot_packages_resources.py"
+    inputs = [
+      gen_snapshot,
+    ]
+    sources = [
+      dot_packages,
+    ]
     args = [
       "--gen-snapshot",
-      rebase_path(_gen_snapshot),
+      rebase_path(gen_snapshot),
       "--package",
       package_name,
       "--main-dart",
@@ -325,7 +326,8 @@ template("flutter_source_app") {
       rebase_path(contents),
       "--url-mapping=dart:zircon," + rebase_path(zircon_sdk_ext_lib),
       "--url-mapping=dart:fuchsia," + rebase_path(fuchsia_sdk_ext_lib),
-      "--url-mapping=dart:mozart.internal," + rebase_path(mozart_dart_sdk_ext_lib),
+      "--url-mapping=dart:mozart.internal," +
+          rebase_path(mozart_dart_sdk_ext_lib),
       "--url-mapping=dart:ui," + rebase_path(dart_ui_path),
     ]
   }
@@ -486,12 +488,13 @@ template("flutter1_jit_app") {
   action(script_snapshot_label) {
     depfile = snapshot_depfile
 
-    inputs = [
-      main_dart,
-      flutter_core_snapshot_vm_data,
-      flutter_core_snapshot_vm_instructions,
+    sources = [
+      dot_packages,
       flutter_core_snapshot_isolate_data,
       flutter_core_snapshot_isolate_instructions,
+      flutter_core_snapshot_vm_data,
+      flutter_core_snapshot_vm_instructions,
+      main_dart,
     ]
 
     outputs = [
@@ -499,10 +502,13 @@ template("flutter1_jit_app") {
     ]
 
     script = "//topaz/runtime/flutter_runner/build/script_snapshot.py"
+    inputs = [
+      gen_snapshot,
+    ]
 
     args = [
       "--snapshotter-path",
-      rebase_path(_gen_snapshot),
+      rebase_path(gen_snapshot),
       "--vm-snapshot-data",
       rebase_path(flutter_core_snapshot_vm_data),
       "--vm-snapshot-instructions",
@@ -528,7 +534,6 @@ template("flutter1_jit_app") {
 
     deps = [
       ":$dart_library_target_name",
-      _gen_snapshot_label,
       flutter_core_snapshot_label,
     ]
 
@@ -691,23 +696,28 @@ template("flutter1_aot_app") {
   action(assembly_label) {
     depfile = assembly_depfile
 
-    inputs = fuchsia_sdk_ext_files + zircon_sdk_ext_files +
-             mozart_dart_sdk_ext_files +
-             [
-               main_dart,
-               "//third_party/flutter/runtime/dart_vm_entry_points.txt",
-               "//third_party/flutter/runtime/dart_vm_entry_points_fuchsia.txt",
-               "//third_party/dart/runtime/bin/dart_io_entries.txt",
-             ]
+    sources =
+        fuchsia_sdk_ext_files + zircon_sdk_ext_files +
+        mozart_dart_sdk_ext_files +
+        [
+          dot_packages,
+          main_dart,
+          "//third_party/flutter/runtime/dart_vm_entry_points.txt",
+          "//third_party/flutter/runtime/dart_vm_entry_points_fuchsia.txt",
+          "//third_party/dart/runtime/bin/dart_io_entries.txt",
+        ]
 
     outputs = [
       assembly_path,
     ]
 
     script = "//topaz/runtime/flutter_runner/build/aot_snapshot.py"
+    inputs = [
+      gen_snapshot,
+    ]
     args = [
       "--snapshotter-path",
-      rebase_path(_gen_snapshot),
+      rebase_path(gen_snapshot),
       "--assembly",
       rebase_path(assembly_path, root_build_dir),
       "--packages",
@@ -749,7 +759,6 @@ template("flutter1_aot_app") {
     deps = [
       ":$dart_library_target_name",
       "//third_party/flutter/lib/snapshot:generate_dart_ui",
-      _gen_snapshot_label,
     ]
 
     if (defined(invoker.deps)) {
@@ -936,7 +945,6 @@ template("flutter2_aot_app") {
 
     deps = [
       ":$kernel_target_name",
-      _gen_snapshot_label,
     ]
     inputs = _entry_manifests + [ kernel_path ]
     if (defined(invoker.extra_entry_manifests)) {
@@ -946,7 +954,7 @@ template("flutter2_aot_app") {
       assembly_path,
     ]
 
-    script = _gen_snapshot
+    script = gen_snapshot
     args = [
       # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
       "--limit_ints_to_64_bits",
