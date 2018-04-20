@@ -30,7 +30,7 @@ void setupLogger({
   Logger logger,
   String name,
   Level level,
-  bool forceShowCodeLocation: false,
+  bool forceShowCodeLocation,
 }) {
   final String scopeName = name ??
       Platform.script?.pathSegments?.lastWhere((_) => true, orElse: () => null);
@@ -56,9 +56,7 @@ void setupLogger({
       return true;
     }());
 
-    final bool showCodeLocation =
-        (forceShowCodeLocation ?? false) || inCheckedMode;
-    if (showCodeLocation) {
+    if (forceShowCodeLocation ?? inCheckedMode) {
       final Trace trace = new Trace.current();
       final Frame callerFrame = _findCallerFrame(trace);
       if (callerFrame != null) {
