@@ -11,6 +11,7 @@
         "media_player_skia": "//topaz/examples/media/media_player_skia:package",
         "mine_digger": "//topaz/examples/mine_digger",
         "todo_list": "//topaz/examples/ledger/todo_list",
+        "todo_list_sledge": "//topaz/examples/ledger/todo_list_sledge",
         "vu_meter": "//topaz/examples/media/vu_meter:package"
     }
 }
