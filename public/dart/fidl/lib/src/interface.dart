@@ -296,7 +296,7 @@ abstract class Binding<T> {
       throw new FidlError('Unexpected empty message or error: $result');
 
     final Message message = new Message.fromReadResult(result);
-    handleMessage(message, _sendResponse);
+    handleMessage(message, sendMessage);
   }
 
   /// Always called when the channel underneath closes. If [onConnectionError]
@@ -307,8 +307,13 @@ abstract class Binding<T> {
     }
   }
 
-  void _sendResponse(Message response) {
+  /// Sends the given message over the bound channel.
+  ///
+  /// If the channel is not bound, the handles inside the message are closed and
+  /// the message itself is discarded.
+  void sendMessage(Message response) {
     if (!_reader.isBound) {
+      response.closeHandles();
       return;
     }
     _reader.channel.write(response.data, response.handles);
