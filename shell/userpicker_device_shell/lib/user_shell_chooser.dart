@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -45,37 +46,29 @@ class UserShellChooser {
   final List<UserShellInfo> _configuredUserShells = <UserShellInfo>[];
   int _userShellIndex = 0;
 
-  /// Constructor.
-  UserShellChooser() {
-    File file = new File('/system/data/sysui/user_shell_to_launch');
-    file.exists().then((bool exists) {
-      if (exists) {
-        file.readAsString().then(
-          (String userShellLaunchFileContents) {
-            try {
-              List<Map<String, String>> decodedJson =
-                  json.decode(userShellLaunchFileContents);
-              for (Map<String, String> userShellInfo in decodedJson) {
-                _configuredUserShells.add(
-                  new UserShellInfo(
-                    name: userShellInfo['name'],
-                    screenWidthMm: _parseDouble(userShellInfo['screen_width']),
-                    screenHeightMm: _parseDouble(
-                      userShellInfo['screen_height'],
-                    ),
-                    displayUsage: _parseDisplayUsage(
-                      userShellInfo['display_usage'],
-                    ),
+  /// Load available shells from the filesystem.
+  Future<void> init() async {
+    try {
+      File file = new File('/system/data/sysui/user_shell_to_launch');
+      if (await file.exists()) {
+        List<Map<String, String>> decodedJson =
+            json.decode(await file.readAsString());
+
+        _configuredUserShells.addAll(decodedJson
+            .map((Map<String, String> userShellInfo) => new UserShellInfo(
+                  name: userShellInfo['name'],
+                  screenWidthMm: _parseDouble(userShellInfo['screen_width']),
+                  screenHeightMm: _parseDouble(
+                    userShellInfo['screen_height'],
                   ),
-                );
-              }
-            } on Exception {
-              // do nothing, we will use default user shell.
-            }
-          },
-        );
+                  displayUsage: _parseDisplayUsage(
+                    userShellInfo['display_usage'],
+                  ),
+                )));
       }
-    });
+
+      /// If there is an exception just use the default shell
+    } on Exception catch (_) {}
   }
 
   double _parseDouble(String doubleString) {
@@ -102,11 +95,11 @@ class UserShellChooser {
   /// Switch to next shell and returns the user shell info
   UserShellInfo getNextUserShellInfo(String user) {
     _userShellIndex = (_userShellIndex + 1) % _configuredUserShells.length;
-    return getCurrentUserShellInfo(user);
+    return getCurrentUserShellInfo();
   }
 
   /// Gets the user shell info of the current shell
-  UserShellInfo getCurrentUserShellInfo(String user) {
+  UserShellInfo getCurrentUserShellInfo() {
     if (_configuredUserShells.isNotEmpty) {
       return _configuredUserShells[_userShellIndex];
     }

@@ -172,6 +172,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       )
       ..setPresentationModeListener(
           _presentationModeListenerBinding.wrap(this));
+
+    _userShellChooser.init().then((_) async =>
+        _updatePresentation(_userShellChooser.getCurrentUserShellInfo()));
   }
 
   @override
@@ -264,10 +267,10 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _addingUser = true;
     notifyListeners();
 
-    onSetup?.call((){
+    onSetup?.call(() {
       userProvider.addUser(
         IdentityProvider.google,
-            (Account account, String errorCode) {
+        (Account account, String errorCode) {
           if (errorCode == null) {
             login(account.id);
           } else {
@@ -332,9 +335,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _serviceProviderBinding.bind(this, serviceProvider.passRequest());
 
     _currentAccountId = accountId;
-    UserShellInfo info = _userShellChooser.getCurrentUserShellInfo(
-      _currentAccountId,
-    );
+    UserShellInfo info = _userShellChooser.getCurrentUserShellInfo();
     final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
     final UserLoginParams params = new UserLoginParams(
       accountId: accountId,
