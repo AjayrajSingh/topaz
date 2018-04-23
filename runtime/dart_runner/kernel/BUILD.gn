@@ -29,7 +29,7 @@ template("create_kernel_core_snapshot") {
     product_suffix = "_product"
   }
   action(target_name) {
-    deps = [
+    deps = gen_snapshot_deps + [
       ":kernel_platform_files",
     ]
 

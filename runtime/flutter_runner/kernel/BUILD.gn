@@ -23,7 +23,7 @@ compile_platform("kernel_platform_files") {
 }
 
 action("kernel_core_snapshot") {
-  deps = [
+  deps = gen_snapshot_deps + [
     ":kernel_platform_files",
   ]
 

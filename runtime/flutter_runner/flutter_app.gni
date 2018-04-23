@@ -294,7 +294,7 @@ template("flutter_source_app") {
       "$dart_target_gen_dir/$dart_library_target_name.manifest.packages"
 
   action("${target_name}_sources") {
-    deps = [
+    deps = gen_snapshot_deps + [
       ":$dart_library_target_name",
     ]
     outputs = [
@@ -532,7 +532,7 @@ template("flutter1_jit_app") {
       args += [ "--checked" ]
     }
 
-    deps = [
+    deps = gen_snapshot_deps + [
       ":$dart_library_target_name",
       flutter_core_snapshot_label,
     ]
@@ -756,7 +756,7 @@ template("flutter1_aot_app") {
 
     pool = "//topaz/runtime/dart_runner:dart_aot_pool($target_toolchain)"
 
-    deps = [
+    deps = gen_snapshot_deps + [
       ":$dart_library_target_name",
       "//third_party/flutter/lib/snapshot:generate_dart_ui",
     ]
@@ -943,7 +943,7 @@ template("flutter2_aot_app") {
       testonly = invoker.testonly
     }
 
-    deps = [
+    deps = gen_snapshot_deps + [
       ":$kernel_target_name",
     ]
     inputs = _entry_manifests + [ kernel_path ]

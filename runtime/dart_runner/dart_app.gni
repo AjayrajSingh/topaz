@@ -227,7 +227,7 @@ template("dart_aot_app") {
       testonly = invoker.testonly
     }
 
-    deps = [
+    deps = gen_snapshot_deps + [
       ":$kernel_target_name",
     ]
     inputs = _entry_manifests + [ kernel_path ]

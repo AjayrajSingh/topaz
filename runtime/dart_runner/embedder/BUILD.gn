@@ -20,6 +20,7 @@ template("create_aot_snapshot") {
       snapshot_assembly,
     ]
 
+    deps = gen_snapshot_deps
     if (invoker.product) {
       script = gen_snapshot_product
     } else {
