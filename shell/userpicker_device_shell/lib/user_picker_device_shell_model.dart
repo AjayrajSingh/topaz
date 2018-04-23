@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:zircon/zircon.dart' show Channel;
@@ -46,10 +47,10 @@ const Duration _kShowLoadingSpinnerDelay = const Duration(milliseconds: 500);
 /// Contains all the relevant data for displaying the list of users and for
 /// logging in and creating new users.
 class UserPickerDeviceShellModel extends DeviceShellModel
+    with TickerProviderModelMixin
     implements
         Presentation,
         ServiceProvider,
-        TickerProvider,
         KeyboardCaptureListener,
         PresentationModeListener {
   /// Called when the device shell stops.
@@ -78,7 +79,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   final UserShellChooser _userShellChooser = new UserShellChooser();
   ChildViewConnection _childViewConnection;
   final Set<Account> _draggedUsers = new Set<Account>();
-  final Set<Ticker> _tickers = new Set<Ticker>();
   final KeyboardCaptureListenerBinding _keyboardCaptureListenerBindingSpaceBar =
       new KeyboardCaptureListenerBinding();
   final KeyboardCaptureListenerBinding _keyboardCaptureListenerBindingS =
@@ -187,9 +187,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _keyboardCaptureListenerBindingS.close();
     _presentationModeListenerBinding.close();
     onDeviceShellStopped?.call();
-    for (Ticker ticker in _tickers) {
-      ticker.dispose();
-    }
+    super.dispose();
     super.onStop();
   }
 
@@ -520,13 +518,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       _showingLoadingSpinner = false;
       notifyListeners();
     }
-  }
-
-  @override
-  Ticker createTicker(TickerCallback onTick) {
-    Ticker ticker = new Ticker(onTick);
-    _tickers.add(ticker);
-    return ticker;
   }
 
   // |Presentation|.

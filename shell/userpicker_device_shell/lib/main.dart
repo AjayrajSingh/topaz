@@ -66,6 +66,9 @@ void main() {
   // to be read is solved.
   _getTimeZone(applicationContext);
 
+  NetstackModel netstackModel = new NetstackModel(netstack: netstackProxy)
+    ..start();
+
   UserSetupModel userSetupModel =
       new UserSetupModel(applicationContext, _cancelAuthenticationFlow);
 
@@ -75,6 +78,7 @@ void main() {
       new UserPickerDeviceShellModel(
     onDeviceShellStopped: () {
       netstackProxy.ctrl.close();
+      netstackModel.dispose();
     },
     onLogin: () {
       wifiInfoOverlayModel.showing = false;
@@ -145,11 +149,6 @@ void main() {
       ),
     );
   }
-
-  NetstackModel netstackModel = new NetstackModel(
-    netstack: netstackProxy,
-    tickerProvider: userPickerDeviceShellModel,
-  )..start();
 
   if (_kEnableNetworkingIndicators) {
     overlays.add(

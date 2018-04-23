@@ -10,22 +10,18 @@ import 'package:lib.widgets/model.dart';
 const String _kLoopbackInterfaceName = 'en1';
 
 /// Provides netstack information.
-class NetstackModel extends Model implements net.NotificationListener {
+class NetstackModel extends Model
+    with TickerProviderModelMixin
+    implements net.NotificationListener {
   /// The netstack containing networking information for the device.
   final net.Netstack netstack;
 
   final Map<int, InterfaceInfo> _interfaces = <int, InterfaceInfo>{};
 
-  /// Ticker provider for animations.
-  final TickerProvider tickerProvider;
-
   net.NotificationListenerBinding _binding;
 
   /// Constructor.
-  NetstackModel({
-    this.netstack,
-    this.tickerProvider,
-  });
+  NetstackModel({this.netstack});
 
   /// Starts listening for netstack interfaces.
   void start() {
@@ -65,7 +61,7 @@ class NetstackModel extends Model implements net.NotificationListener {
             _interfaces[interface.id] = new InterfaceInfo(
               interface,
               stats,
-              tickerProvider,
+              this,
             );
           } else {
             _interfaces[interface.id]._update(interface, stats);
@@ -134,7 +130,8 @@ class InterfaceInfo {
           _interface.addr.ipv4.addr[0] != 0) ||
       ((_interface.addr.ipv6?.addr?.length ?? 0) == 6 &&
           _interface.addr.ipv6.addr[0] != 0 &&
-          (_interface.addr.ipv6.addr[0] << 8 | _interface.addr.ipv6.addr[1]) != 0xfe80);
+          (_interface.addr.ipv6.addr[0] << 8 | _interface.addr.ipv6.addr[1]) !=
+              0xfe80);
 
   void _update(net.NetInterface interface, net.NetInterfaceStats stats) {
     _interface = interface;

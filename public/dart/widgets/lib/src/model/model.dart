@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
 /// Base class for classes that provide data via [InheritedWidget]s.
@@ -173,4 +174,25 @@ class ScopedModelDescendant<T extends Model> extends StatelessWidget {
         child,
         new ModelFinder<T>().of(context, rebuildOnChange: true),
       );
+}
+
+/// Mixin to enable a model to provide tickers for animations.
+abstract class TickerProviderModelMixin extends Model
+    implements TickerProvider {
+  final Set<Ticker> _tickers = new Set<Ticker>();
+
+  /// Creates a ticker with the given callback.
+  @override
+  Ticker createTicker(TickerCallback onTick) {
+    Ticker ticker = new Ticker(onTick);
+    _tickers.add(ticker);
+    return ticker;
+  }
+
+  /// Closes out any active tickers.
+  void dispose() {
+    for (Ticker ticker in _tickers) {
+      ticker.dispose();
+    }
+  }
 }
