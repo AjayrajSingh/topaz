@@ -40,14 +40,10 @@ Future<Null> main() async {
     fuchsiaRoot: fuchsiaRoot,
   );
 
-  Map<String, WidgetSpecs> widgetMap =
-      new Map<String, WidgetSpecs>.fromIterable(
-    widgetSpecs,
-    // ignore: strong_mode_uses_dynamic_as_bottom
-    key: (WidgetSpecs ws) => ws.name,
-    // ignore: strong_mode_uses_dynamic_as_bottom
-    value: (WidgetSpecs ws) => ws,
-  );
+  Map<String, WidgetSpecs> widgetMap = <String, WidgetSpecs>{};
+  for (WidgetSpecs ws in widgetSpecs) {
+    widgetMap[ws.name] = ws;
+  }
 
   test('extractWidgetSpecs() should extract only public flutter widgets.', () {
     expect(
