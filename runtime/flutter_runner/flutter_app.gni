@@ -205,9 +205,6 @@ template("flutter2_jit_app") {
     deps = [
       ":$kernel_target_name",
       ":${target_name}_resources",
-
-      # Fake dependency for testing until this is added to flutter_runner
-      "//topaz/runtime/flutter_runner/kernel:kernel_core_snapshot",
     ]
 
     resources = [
@@ -219,7 +216,7 @@ template("flutter2_jit_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit_runtime")
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit2_runtime")
         dest = "runtime"
       },
     ]
@@ -1087,7 +1084,7 @@ template("flutter2_aot_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/aot_runtime")
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/aot2_runtime")
         dest = "runtime"
       },
     ]
