@@ -7,7 +7,6 @@
 #include <fdio/io.h>
 #include <hid/hid.h>
 #include <hid/usages.h>
-#include <zircon/device/display.h>
 #include <zircon/pixelformat.h>
 #include <zircon/syscalls.h>
 #include <zircon/types.h>
