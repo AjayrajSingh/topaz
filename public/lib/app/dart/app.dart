@@ -190,8 +190,8 @@ void _connectToService(Channel directory, Channel request, String servicePath) {
 
   // data.
   for (int i = 0; i < servicePath.length; i++) {
-    // This would not work for non-ASCII. This will be fixed when we move to
-    // FIDL2.
+    // TODO(ZX-1358) This would not work for non-ASCII. This will be
+    // fixed when we move to FIDL.
     byteData.setUint8(offset, servicePath.codeUnitAt(i));
     offset += 1;
   }
