@@ -25,11 +25,11 @@ class IntentEntityCodec extends EntityCodec<IntentEntityData> {
 
 /// Encodes [IntentEntityData] into a [String].
 String _encode(IntentEntityData intent) {
-  Map<String, Object> data = <String, Object>{'nouns': intent.nouns};
-  if (intent.verb != null) {
-    data['verb'] = intent.verb;
-  } else if (intent.url != null) {
-    data['url'] = intent.url;
+  Map<String, Object> data = <String, Object>{'parameters': intent.parameters};
+  if (intent.action != null) {
+    data['action'] = intent.action;
+  } else if (intent.handler != null) {
+    data['handler'] = intent.handler;
   }
   return json.encode(data);
 }
@@ -41,18 +41,18 @@ IntentEntityData _decode(String data) {
 
   try {
     Map<String, dynamic> decodedJson = json.decode(data);
-    if (!decodedJson.containsKey('verb') && !decodedJson.containsKey('url')) {
-      throw new Exception('Invalid IntentEntityData: data does not contain verb'
-          ' or url.');
+    if (!decodedJson.containsKey('action') && !decodedJson.containsKey('handler')) {
+      throw new Exception('Invalid IntentEntityData: data does not contain action'
+          ' or handler.');
     }
 
     IntentEntityData entity;
-    if (decodedJson.containsKey('verb')) {
-      entity = new IntentEntityData.fromVerb(decodedJson['verb']);
+    if (decodedJson.containsKey('action')) {
+      entity = new IntentEntityData.fromAction(decodedJson['action']);
     } else {
-      entity = new IntentEntityData.fromUrl(decodedJson['url']);
+      entity = new IntentEntityData.fromHandler(decodedJson['handler']);
     }
-    entity.nouns.addAll(decodedJson['nouns']);
+    entity.parameters.addAll(decodedJson['parameters']);
     return entity;
   } on Exception catch (e) {
     log.warning('$_kType entity error when decoding from json string: $json'

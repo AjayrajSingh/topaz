@@ -4,22 +4,22 @@
 
 /// Holds structured data decoded from the Entity's data.
 class IntentEntityData {
-  /// Create an [IntentEntityData] with a verb
-  IntentEntityData.fromVerb(this.verb)
-      : assert(verb.isNotEmpty),
-        url = null;
+  /// Create an [IntentEntityData] with a generic action.
+  IntentEntityData.fromAction(this.action)
+      : assert(action.isNotEmpty),
+        handler = null;
 
-  /// Create an [IntentEntityData] with a url
-  IntentEntityData.fromUrl(this.url)
-      : assert(url.isNotEmpty),
-        verb = null;
+  /// Create an [IntentEntityData] with an explicit handler.
+  IntentEntityData.fromHandler(this.handler)
+      : assert(handler.isNotEmpty),
+        action = null;
 
-  /// The verb of an Intent
-  final String verb;
+  /// The action of an Intent
+  final String action;
 
   /// The package name of the module
-  final String url;
+  final String handler;
 
-  /// The map of nouns names and their data (JSON object)
-  final Map<String, String> nouns = <String, String>{};
+  /// The map of parameter names and their data (JSON object)
+  final Map<String, String> parameters = <String, String>{};
 }
