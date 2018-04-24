@@ -542,7 +542,12 @@ class ProxyController<T> {
       return;
     }
 
-    message.txid = _nextTxid++;
+    const int _kUserspaceTxidMask = 0x7FFFFFFF;
+
+    int txid = _nextTxid++ & _kUserspaceTxidMask;
+    while (txid == 0 || _callbackMap.containsKey(txid))
+      txid = _nextTxid++ & _kUserspaceTxidMask;
+    message.txid = txid;
     final int status = _reader.channel.write(message.data, message.handles);
 
     if (status != ZX.OK) {
