@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:fuchsia.fidl.cobalt/cobalt.dart' as cobalt;
@@ -40,6 +41,7 @@ const int _kKeyModifierRightAlt = 64;
 const int _kKeyCodeSpacebar = 32;
 const int _kKeyCodeL = 108;
 const int _kKeyCodeS = 115;
+const Duration _kShowLoadingSpinnerDelay = const Duration(milliseconds: 500);
 
 /// Contains all the relevant data for displaying the list of users and for
 /// logging in and creating new users.
@@ -207,6 +209,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   void _loadUsers() {
     userProvider.previousUsers((List<Account> accounts) {
       _accounts = new List<Account>.from(accounts);
+      _updateShowLoadingSpinner();
       notifyListeners();
     });
   }
@@ -246,6 +249,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   /// Create a new user and login with that user
   void createAndLoginUser() {
     _addingUser = true;
+    _updateShowLoadingSpinner();
     notifyListeners();
 
     userProvider.addUser(
@@ -257,6 +261,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
           log.warning('ERROR adding user!  $errorCode');
         }
         _addingUser = false;
+        _updateShowLoadingSpinner();
         notifyListeners();
       },
     );
@@ -265,6 +270,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   /// Start the setup flow to create a new user and login with that user
   void startSetupFlow() {
     _addingUser = true;
+    _updateShowLoadingSpinner();
     notifyListeners();
 
     onSetup?.call(() {
@@ -277,6 +283,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
             log.warning('ERROR adding user!  $errorCode');
           }
           _addingUser = false;
+          _updateShowLoadingSpinner();
           notifyListeners();
         },
       );
@@ -351,12 +358,14 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
     _userControllerProxy.watch(_userWatcherImpl.getHandle());
     _loadingChildView = true;
+    _updateShowLoadingSpinner();
     _childViewConnection = new ChildViewConnection(
       viewOwner.passHandle(),
       onAvailable: (ChildViewConnection connection) {
         trace('user shell available');
         log.info('UserPickerDeviceShell: Child view connection available!');
         _loadingChildView = false;
+        _updateShowLoadingSpinner();
         connection.requestFocus();
         notifyListeners();
       },
@@ -364,6 +373,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         trace('user shell unavailable');
         log.info('UserPickerDeviceShell: Child view connection unavailable!');
         _loadingChildView = false;
+        _updateShowLoadingSpinner();
         onLogout();
         notifyListeners();
       },
@@ -463,8 +473,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   }
 
   /// Show the loading spinner if true
-  bool get showingLoadingSpinner =>
-      _accounts == null || _addingUser || _loadingChildView;
+  bool get showingLoadingSpinner => _showingLoadingSpinner;
 
   /// Show the system clock if true
   bool get showingClock =>
@@ -489,6 +498,29 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// Returns the authenticated child view connection
   ChildViewConnection get childViewConnection => _childViewConnection;
+
+  bool _showingLoadingSpinner = true;
+  Timer _showLoadingSpinnerTimer;
+
+  void _updateShowLoadingSpinner() {
+    if (_accounts == null || _addingUser || _loadingChildView) {
+      if (_showingLoadingSpinner == null) {
+        _showLoadingSpinnerTimer = new Timer(
+          _kShowLoadingSpinnerDelay,
+          () {
+            _showingLoadingSpinner = true;
+            _showLoadingSpinnerTimer = null;
+            notifyListeners();
+          },
+        );
+      }
+    } else {
+      _showLoadingSpinnerTimer?.cancel();
+      _showLoadingSpinnerTimer = null;
+      _showingLoadingSpinner = false;
+      notifyListeners();
+    }
+  }
 
   @override
   Ticker createTicker(TickerCallback onTick) {
