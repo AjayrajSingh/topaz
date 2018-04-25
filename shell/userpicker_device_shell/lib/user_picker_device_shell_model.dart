@@ -429,8 +429,6 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   /// Called when the the user shell logs out.
   void onLogout() {
     trace('logout');
-    setDisplayUsage(DisplayUsage.kClose);
-    setDisplaySizeInMm(0.0, 0.0);
     refreshUsers();
     _childViewConnection = null;
     _presentationBinding.close();
