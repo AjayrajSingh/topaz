@@ -36,28 +36,30 @@ class BuildBucketService implements BuildService {
 
   @override
   Stream<BuildInfo> getBuildByName(String buildName) async* {
-    // Create a new HTTP client per request to prevent opening infinite sockets.
-    final http.Client httpClient = new http.Client();
-    final Timer timeout = new Timer(_timeoutDuration, () {
-      _timeoutCount++;
-      httpClient.close();
-      throw new TimeoutException(
-          '$buildName exceeded ${_timeoutDuration.inSeconds} seconds');
-    });
+    http.Client httpClient;
+    ApiSearchResponseMessage response;
+    try {
+      // Create a new HTTP client per request to prevent opening infinite sockets.
+      httpClient = new http.Client();
 
-    final Future<ApiSearchResponseMessage> request =
-        _createApi(httpClient).search(
-      bucket: _allBuckets,
-      tag: <String>['builder:$buildName'],
-      status: BuildStatusEnum.completed.value,
-    );
-    _requestCount++;
+      final Future<ApiSearchResponseMessage> request =
+          _createApi(httpClient).search(
+        bucket: _allBuckets,
+        tag: <String>['builder:$buildName'],
+        status: BuildStatusEnum.completed.value,
+      );
+      _requestCount++;
 
-    final ApiSearchResponseMessage response = await request;
-    httpClient.close();
-    timeout.cancel();
+      response = await request.timeout(_timeoutDuration, onTimeout: () {
+        _timeoutCount++;
+        throw new TimeoutException(
+            '$buildName exceeded ${_timeoutDuration.inSeconds} seconds');
+      });
+    } finally {
+      httpClient?.close();
+    }
 
-    if (response.error != null) {
+    if (response?.error != null) {
       throw new BuildServiceException(response.error.toJson().toString());
     }
 
