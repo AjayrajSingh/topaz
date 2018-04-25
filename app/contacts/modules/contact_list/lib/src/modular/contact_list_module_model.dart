@@ -10,6 +10,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.component/component.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.logging/logging.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
@@ -110,10 +111,11 @@ class ContactListModuleModel extends ModuleModel {
   }
 
   void _startContactCardModule() {
-    moduleContext.startModuleInShellDeprecated(
+    IntentBuilder intentBuilder = new IntentBuilder.handler(_kContactCardModuleUrl)
+      ..addParameterFromLink(null, null);  // pass on our default link
+    moduleContext.startModule(
       'contact_card',
-      _kContactCardModuleUrl,
-      null, // Passes default link to the child
+      intentBuilder.intent,
       null,
       _contactCardModuleController.ctrl.request(),
       const SurfaceRelation(
@@ -121,7 +123,7 @@ class ContactListModuleModel extends ModuleModel {
         dependency: SurfaceDependency.dependent,
         emphasis: 2.0,
       ),
-      false,
+      (StartModuleStatus status) {},
     );
   }
 

@@ -25,6 +25,7 @@ flutter_app("contact_list") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
+    "//topaz/public/lib/module_resolver/dart",
   ]
 }
 
