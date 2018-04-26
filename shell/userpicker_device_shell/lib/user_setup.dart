@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.ui.flutter/child_view.dart';
@@ -51,7 +52,7 @@ class UserSetup extends StatelessWidget {
       const TextStyle(fontSize: 30.0, color: Colors.white);
 
   static const TextStyle _blackText =
-      const TextStyle(fontSize: 20.0, color: Colors.black);
+      const TextStyle(fontSize: 14.0, color: Colors.white);
 
   static final Map<SetupStage, ScopedModelDescendantBuilder<UserSetupModel>>
       _widgetBuilders =
@@ -79,28 +80,27 @@ class UserSetup extends StatelessWidget {
             model.currentStage == SetupStage.complete)
           return new Offstage(offstage: true);
 
-        return new Stack(fit: StackFit.passthrough, children: <Widget>[
-          new GestureDetector(onTap: () {
-            if (model.currentStage == SetupStage.userAuth) {
-              model.cancelAuthenticationFlow();
-              model.reset();
-            }
-          }),
-          new FractionallySizedBox(
-              heightFactor: 0.9,
-              widthFactor: 0.75,
-              child: new Material(
-                  color: Colors.white,
-                  child: new Column(children: <Widget>[
-                    new AppBar(
-                        title: new Text(
-                            _stageTitles[model.currentStage] ?? 'Placeholder')),
-                    new Expanded(
-                        child: (_widgetBuilders[model.currentStage] ??
-                                _placeholderStage)
-                            .call(context, child, model))
-                  ])))
-        ]);
+        return new Stack(
+          children: <Widget>[
+            new Material(
+              color: Colors.black,
+              child: new Container(),
+            ),
+            new Material(
+                color: Colors.white,
+                borderRadius: new BorderRadius.circular(28.0),
+                child: new Column(children: <Widget>[
+                  new AppBar(
+                      title: new Text(
+                          _stageTitles[model.currentStage] ?? 'Placeholder')),
+                  new Expanded(
+                      child: (_widgetBuilders[model.currentStage] ??
+                              _placeholderStage)
+                          .call(context, child, model)),
+                  _controlBar(model),
+                ]))
+          ],
+        );
       });
 
   static Widget _placeholderStage(
@@ -130,19 +130,45 @@ class UserSetup extends StatelessWidget {
       );
 
   static Widget _buildTimeZone(
-      BuildContext context, Widget child, UserSetupModel model) {
-    return new Column(children: <Widget>[
-      new Expanded(
-          child: new TimezonePicker(
-              onTap: (String newTimeZone) {
-                model.currentTimezone = newTimeZone;
-              },
-              currentTimezoneId: model.currentTimezone)),
-      new FlatButton(
-          onPressed: () {
-            model.nextStep();
+          BuildContext context, Widget child, UserSetupModel model) =>
+      new TimezonePicker(
+          onTap: (String newTimeZone) {
+            model.currentTimezone = newTimeZone;
           },
-          child: new Text('Next', style: _blackText))
-    ]);
+          currentTimezoneId: model.currentTimezone);
+
+  static Widget _controlBar(UserSetupModel model) {
+    return new Container(
+        padding: const EdgeInsets.all(8.0),
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            _textButton(
+                text: 'Cancel',
+                onPressed: () {
+                  model.reset();
+                  model.cancelAuthenticationFlow();
+                }),
+            _textButton(
+                text: 'Next',
+                visible: model.currentStage != SetupStage.userAuth,
+                onPressed: () => model.nextStep()),
+            _textButton(text: 'Guest', onPressed: () => model.loginAsGuest()),
+          ].where((Widget widget) => widget != null).toList(),
+        ));
   }
+
+  static Widget _textButton(
+          {@required String text,
+          bool disabled = false,
+          bool visible = true,
+          VoidCallback onPressed}) =>
+      visible
+          ? new RaisedButton(
+              color: Colors.blueAccent,
+              shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(28.0)),
+              onPressed: disabled ? null : onPressed,
+              child: new Text(text, style: _blackText))
+          : null;
 }

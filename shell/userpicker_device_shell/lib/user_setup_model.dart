@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/foundation.dart';
 import 'package:fuchsia.fidl.time_zone/time_zone.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/model.dart';
@@ -32,23 +33,19 @@ const List<SetupStage> _stages = const <SetupStage>[
   SetupStage.complete
 ];
 
-/// Callback to cancel authentication flow
-typedef void CancelAuthentication();
-
-/// Callback to add new user
-typedef void AddNewUser();
-
 /// Model that contains all the state needed to set up a new user
 class UserSetupModel extends Model {
   final AuthenticationOverlayModel _authModel;
 
   /// Callback to cancel adding a new user.
-  final CancelAuthentication cancelAuthenticationFlow;
+  final VoidCallback cancelAuthenticationFlow;
 
   final TimezoneProxy _timeZoneProxy;
 
   /// Callback to add a new user.
-  AddNewUser addNewUser;
+  VoidCallback addNewUser;
+
+  VoidCallback _loginAsGuest;
 
   int _currentIndex;
 
@@ -80,9 +77,13 @@ class UserSetupModel extends Model {
   }
 
   /// Begin setup phase
-  void start(AddNewUser addNewUser) {
+  void start({
+    @required VoidCallback addNewUser,
+    @required VoidCallback loginAsGuest,
+  }) {
     // This should be refactored into the model
     this.addNewUser = addNewUser;
+    _loginAsGuest = loginAsGuest;
 
     _currentIndex = _stages.indexOf(SetupStage.notStarted);
     nextStep();
@@ -101,7 +102,7 @@ class UserSetupModel extends Model {
     if (currentStage == SetupStage.userAuth) {
       addNewUser();
     }
-    
+
     notifyListeners();
   }
 
@@ -131,5 +132,12 @@ class UserSetupModel extends Model {
       _currentTimezone = newTimezone;
       notifyListeners();
     });
+  }
+
+  /// Ends the setup flow and immediately logs in as guest
+  void loginAsGuest() {
+    _currentIndex = _stages.indexOf(SetupStage.complete);
+    notifyListeners();
+    _loginAsGuest();
   }
 }

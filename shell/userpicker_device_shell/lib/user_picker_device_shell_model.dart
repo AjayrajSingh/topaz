@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:fuchsia.fidl.cobalt/cobalt.dart' as cobalt;
 import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
@@ -32,7 +33,8 @@ export 'package:lib.widgets/model.dart'
 typedef void GetPresentationModeCallback(PresentationMode mode);
 
 /// HACKY way to retrofit.
-typedef void SetupCallback(VoidCallback startLogin);
+typedef void SetupCallback(
+    {@required VoidCallback addNewUser, @required VoidCallback loginAsGuest});
 
 const Duration _kCobaltTimerTimeout = const Duration(seconds: 20);
 const int _kNoOpEncodingId = 1;
@@ -271,7 +273,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _updateShowLoadingSpinner();
     notifyListeners();
 
-    onSetup?.call(() {
+    onSetup?.call(addNewUser: () {
       userProvider.addUser(
         IdentityProvider.google,
         (Account account, String errorCode) {
@@ -285,6 +287,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
           notifyListeners();
         },
       );
+    }, loginAsGuest: () {
+      login(null);
+      hideUserActions();
     });
   }
 
