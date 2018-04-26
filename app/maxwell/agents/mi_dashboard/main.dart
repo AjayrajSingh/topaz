@@ -187,7 +187,6 @@ void send404(HttpResponse response) {
     ..close();
 }
 
-// ignore: avoid_annotating_with_dynamic
 void handleWebsocketRequest(dynamic event) {
   print('[INFO] websocket event was received!');
 }

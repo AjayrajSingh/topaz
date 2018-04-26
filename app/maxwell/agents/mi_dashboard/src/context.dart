@@ -16,7 +16,6 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
   @override
   String get name => 'context';
 
-  // ignore: avoid_annotating_with_dynamic
   final JsonCodec json = new JsonCodec(toEncodable: (dynamic object) {
     if (object is ComponentScope) {
       switch (object.tag) {

@@ -45,20 +45,19 @@ class UserShellChooser {
     try {
       File file = new File('/system/data/sysui/user_shell_to_launch');
       if (await file.exists()) {
-        List<Map<String, String>> decodedJson =
-            json.decode(await file.readAsString());
+        dynamic decodedJson = json.decode(await file.readAsString());
 
-        _configuredUserShells.addAll(decodedJson
-            .map((Map<String, String> userShellInfo) => new UserShellInfo(
-                  name: userShellInfo['name'],
-                  screenWidthMm: _parseDouble(userShellInfo['screen_width']),
-                  screenHeightMm: _parseDouble(
-                    userShellInfo['screen_height'],
-                  ),
-                  displayUsage: _parseDisplayUsage(
-                    userShellInfo['display_usage'],
-                  ),
-                )));
+        _configuredUserShells.addAll(decodedJson.map<UserShellInfo>(
+          (dynamic userShellInfo) => new UserShellInfo(
+            name: userShellInfo['name'],
+            screenWidthMm: _parseDouble(userShellInfo['screen_width']),
+            screenHeightMm: _parseDouble(
+              userShellInfo['screen_height'],
+            ),
+            displayUsage: _parseDisplayUsage(
+              userShellInfo['display_usage'],
+            ),
+         )));
       }
 
       /// If there is an exception just use the default shell

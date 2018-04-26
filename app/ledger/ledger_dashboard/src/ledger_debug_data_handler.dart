@@ -115,7 +115,6 @@ class LedgerDebugDataHandler extends DataHandler {
     WebSocketHolder socketHolder = new WebSocketHolder(socket);
     _activeWebsockets.add(socketHolder);
     socket.listen(
-        // ignore: avoid_annotating_with_dynamic
         ((dynamic event) => handleWebsocketRequest(socketHolder, event)),
         onDone: (() => handleWebsocketClose(socketHolder)));
     //Send the ledger instances list
@@ -125,7 +124,6 @@ class LedgerDebugDataHandler extends DataHandler {
 
   void handleWebsocketRequest(
       WebSocketHolder socketHolder,
-      // ignore: avoid_annotating_with_dynamic
       dynamic event) {
     dynamic request = json.decode(event);
     if (request['instance_name'] != null && isValidId(request['instance_name']))

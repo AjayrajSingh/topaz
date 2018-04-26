@@ -261,7 +261,6 @@ class EditorState extends State<Editor> {
 
   // Send a notification to the core. If params are not given,
   // an empty array will be sent.
-  // ignore: avoid_annotating_with_dynamic
   void _sendNotification(String method, [dynamic params]) {
     _xiAppState.sendNotification(method, params ?? <dynamic>[]);
   }

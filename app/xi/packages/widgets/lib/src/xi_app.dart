@@ -9,8 +9,6 @@ import 'package:xi_client/client.dart';
 import 'editor.dart';
 import 'home_page.dart';
 
-// ignore_for_file: avoid_annotating_with_dynamic
-
 /// Top-level Widget.
 class XiApp extends StatefulWidget {
   /// The client API interface to the xi-core Fuchsia service.

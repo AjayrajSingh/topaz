@@ -14,7 +14,7 @@ import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
 import("//topaz/public/lib/ui/flutter/sdk_ext/sdk_ext.gni")
 
 declare_args() {
-  flutter_default_app = "flutter1_jit_app"
+  flutter_default_app = "flutter2_jit_app"
   flutter1_default_app = "flutter1_jit_app"
   flutter2_default_app = "flutter2_jit_app"
 }
@@ -1142,12 +1142,12 @@ template("flutter2_aot_app") {
 #   aot (optional, flutter_app() only)
 #     A boolean. Whether to AOT compile the app. Default is false.
 template("flutter_jit_app") {
-  flutter1_jit_app(target_name) {
+  flutter2_jit_app(target_name) {
     forward_variables_from(invoker, "*", ["aot"])
   }
 }
 template("flutter_aot_app") {
-  flutter1_aot_app(target_name) {
+  flutter2_aot_app(target_name) {
     forward_variables_from(invoker, "*", ["aot"])
   }
 }

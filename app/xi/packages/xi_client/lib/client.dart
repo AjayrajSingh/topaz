@@ -5,8 +5,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-// ignore_for_file: avoid_annotating_with_dynamic
-
 /// A callback for data sent by xi-core.
 ///
 /// TODO(jasoncampbell): Allow typed structures to be sent instead of strings.
