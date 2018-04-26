@@ -8,7 +8,7 @@ interface WebRequestDelegate {
    1: WillSendRequest(string url);
 };
 
-[ServiceName="web_view::WebView"]
+[Discoverable]
 interface WebView {
    1: ClearCookies();
    2: SetUrl(string url);

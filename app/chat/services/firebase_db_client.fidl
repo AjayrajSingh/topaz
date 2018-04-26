@@ -37,7 +37,7 @@ struct HttpResponse {
 
 // A |FirebaseDBConnector| service, which exposes a method for obtaining a new
 // instance of a |FirebaseDBClient|.
-[ServiceName="firebase_db_client.FirebaseDBConnector"]
+[Discoverable]
 interface FirebaseDBConnector {
   1: GetClient(FirebaseDBWatcher? watcher, request<FirebaseDBClient> client);
 };

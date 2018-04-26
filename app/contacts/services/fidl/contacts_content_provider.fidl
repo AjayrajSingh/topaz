@@ -12,7 +12,7 @@ enum Status {
 
 // This service is implemented by an application that is meant to store contacts
 // for a given user.
-[ServiceName="contacts_content_provider.ContactsContentProvider"]
+[Discoverable]
 interface ContactsContentProvider {
   // Returns a list of the user's contacts in alphabetical order.
   // If the prefix is an empty string, it will return all contacts.
@@ -56,7 +56,7 @@ interface ContactsContentProvider {
 // that wish to feed contacts data into the contacts content provider.
 // It provides capabilities to allow the ContactsContentProvider to pull
 // contacts from it.
-[ServiceName="contacts_content_provider.ContactsDataProvider"]
+[Discoverable]
 interface ContactsDataProvider {
   // Returns a list of the user's contacts.
   2: GetContactList() -> (Status @status, vector<Contact> contacts);

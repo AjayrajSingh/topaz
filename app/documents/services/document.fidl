@@ -21,8 +21,7 @@ struct Document {
   string? currentDirectoryId;
 };
 
-[ServiceName="documents.DocumentInterface"]
-
+[Discoverable]
 interface DocumentInterface {
   1: Get(string documentId) -> (Document? document);
   2: GetMetadata(string documentId) -> (Document? document);

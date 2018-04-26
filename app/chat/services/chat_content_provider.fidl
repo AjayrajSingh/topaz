@@ -68,7 +68,7 @@ struct Message {
   string json_payload;
 };
 
-[ServiceName="chat_content_provider.ChatContentProvider"]
+[Discoverable]
 interface ChatContentProvider {
   // Returns the email of the currently logged in user.
   1: CurrentUserEmail()  -> (string email);
