@@ -15,111 +15,111 @@ import 'package:dashboard/service/build_service.dart';
 const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   const <List<String>>[
     const <String>[
-      'topaz-aarch64-linux-debug',
-      'aarch64-linux-debug',
+      'topaz-arm64-debug-qemu_kvm',
+      'arm64-debug-qemu_kvm',
       'topaz',
     ],
     const <String>[
-      'topaz-aarch64-linux-release',
-      'aarch64-linux-release',
+      'topaz-arm64-release-qemu_kvm',
+      'arm64-release-qemu_kvm',
       'topaz'
     ],
     const <String>[
-      'topaz-x86_64-linux-debug',
-      'x86_64-linux-debug',
+      'topaz-x64-debug-qemu_kvm',
+      'x64-debug-qemu_kvm',
       'topaz',
     ],
     const <String>[
-      'topaz-x86_64-linux-release',
-      'x86_64-linux-release',
+      'topaz-x64-release-qemu_kvm',
+      'x64-release-qemu_kvm',
       'topaz'
     ],
   ],
   const <List<String>>[
     const <String>[
-      'peridot-aarch64-linux-debug',
-      'aarch64-linux-debug',
+      'peridot-arm64-debug-qemu_kvm',
+      'arm64-debug-qemu_kvm',
       'peridot'
     ],
     const <String>[
-      'peridot-aarch64-linux-release',
-      'aarch64-linux-release',
+      'peridot-arm64-release-qemu_kvm',
+      'arm64-release-qemu_kvm',
       'peridot'
     ],
     const <String>[
-      'peridot-x86_64-linux-debug',
-      'x86_64-linux-debug',
+      'peridot-x64-debug-qemu_kvm',
+      'x64-debug-qemu_kvm',
       'peridot'
     ],
     const <String>[
-      'peridot-x86_64-linux-release',
-      'x86_64-linux-release',
+      'peridot-x64-release-qemu_kvm',
+      'x64-release-qemu_kvm',
       'peridot'
     ],
   ],
   const <List<String>>[
     const <String>[
-      'garnet-aarch64-linux-debug',
-      'aarch64-linux-debug',
+      'garnet-arm64-debug-qemu_kvm',
+      'arm64-debug-qemu_kvm',
       'garnet'
     ],
     const <String>[
-      'garnet-aarch64-linux-release',
-      'aarch64-linux-release',
+      'garnet-arm64-release-qemu_kvm',
+      'arm64-release-qemu_kvm',
       'garnet'
     ],
     const <String>[
-      'garnet-x86_64-linux-debug',
-      'x86_64-linux-debug',
+      'garnet-x64-debug-qemu_kvm',
+      'x64-debug-qemu_kvm',
       'garnet',
     ],
     const <String>[
-      'garnet-x86_64-linux-release',
-      'x86_64-linux-release',
+      'garnet-x64-release-qemu_kvm',
+      'x64-release-qemu_kvm',
       'garnet'
     ],
   ],
   const <List<String>>[
     const <String>[
-      'zircon-pc-x86-64-clang',
-      'zircon-pc-x86-64-clang',
+      'zircon-x64-clang-qemu_kvm',
+      'x64-clang-qemu_kvm',
       'zircon'
     ],
     const <String>[
-      'zircon-pc-x86-64-gcc',
-      'zircon-pc-x86-64-gcc',
+      'zircon-x64-gcc-qemu_kvm',
+      'x64-gcc-qemu_kvm',
       'zircon',
     ],
     const <String>[
-      'zircon-qemu-arm64-clang',
-      'zircon-qemu-arm64-clang',
+      'zircon-arm64-clang-qemu_kvm',
+      'arm64-clang-qemu_kvm',
       'zircon'
     ],
     const <String>[
-      'zircon-qemu-arm64-gcc',
-      'zircon-qemu-arm64-gcc',
+      'zircon-arm64-gcc-qemu_kvm',
+      'arm64-gcc-qemu_kvm',
       'zircon',
     ],
   ],
   const <List<String>>[
     const <String>[
-      'web_view-x86_64-linux',
-      'x86_64-linux',
+      'web_view-x64-linux',
+      'x64-linux',
       'web_view',
     ],
     const <String>[
-      'web_view-aarch64-linux',
-      'aarch64-linux',
+      'web_view-arm64-linux',
+      'arm64-linux',
       'web_view',
     ],
     const <String>[
-      'jiri-x86_64-linux',
-      'x86_64-linux',
+      'jiri-x64-linux',
+      'x64-linux',
       'jiri',
     ],
     const <String>[
-      'jiri-x86_64-mac',
-      'x86_64-mac',
+      'jiri-x64-mac',
+      'x64-mac',
       'jiri',
     ],
   ],
