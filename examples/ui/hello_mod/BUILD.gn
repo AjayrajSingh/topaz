@@ -1,0 +1,18 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+flutter_app("hello_mod") {
+  main_dart = "main.dart"
+  package_name = "hello_mod"
+
+  fuchsia_package_name = "hello_mod"
+
+
+  deps = [
+    "//topaz/public/lib/run_mod/dart",
+    "//topaz/public/lib/widgets/dart",
+  ]
+}
