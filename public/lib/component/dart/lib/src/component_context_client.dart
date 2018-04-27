@@ -4,12 +4,11 @@
 
 import 'dart:async';
 
-import 'package:fuchsia.fidl.modular/modular.dart'
-    as fidl;
-import 'package:fuchsia.fidl.component/component.dart' as fidl;
 import 'package:fidl/fidl.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:fuchsia.fidl.component/component.dart' as fidl;
+import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
 import 'package:lib.entity.dart/entity.dart';
+import 'package:lib.logging/logging.dart';
 
 /// A client wrapper for [fidl.ComponentContext].
 class ComponentContextClient {
@@ -171,6 +170,17 @@ class ComponentContextClient {
     });
 
     return serviceCompleter.future;
+  }
+
+  /// See [fidl.ComponentContext#getPackageName].
+  Future<String> getPackageName() {
+    Completer<String> completer = new Completer<String>();
+    try {
+      proxy.getPackageName(completer.complete);
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+    }
+    return completer.future;
   }
 
   void _handleConnectionError() {

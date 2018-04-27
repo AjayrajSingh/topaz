@@ -21,7 +21,8 @@ import 'package:meta/meta.dart';
 import 'service_client.dart';
 
 export 'package:fuchsia.fidl.modular/modular.dart' show Intent;
-export 'package:lib.module_resolver.dart/intent_builder.dart' show IntentBuilder;
+export 'package:lib.module_resolver.dart/intent_builder.dart'
+    show IntentBuilder;
 export 'package:lib.module.dart/module.dart'
     show ModuleControllerClient, EmbeddedModule;
 export 'package:lib.story.dart/story.dart' show LinkClient;
@@ -80,6 +81,7 @@ class ModuleDriver {
   final DateTime _initializationTime;
   final Set<String> _firstObservationSent = new Set<String>();
   LifecycleHost _lifecycle;
+  String _packageName = 'modulePackageNameNotYetSet';
 
   /// Shadow async completion of [start].
   Completer<ModuleDriver> _start;
@@ -127,6 +129,18 @@ class ModuleDriver {
     );
     encoderFactory.getEncoder(_kCobaltProjectId, _encoder.ctrl.request());
     encoderFactory.ctrl.close();
+
+    // Grab the current module's package name
+    getComponentContext().then((ComponentContextClient componentContext) async {
+      try {
+        String packageName = await componentContext.getPackageName();
+        _packageName = packageName;
+      } on Exception catch (err, stackTrace) {
+        log.warning(
+          'Error retrieving module package name: $err\n$stackTrace',
+        );
+      }
+    });
 
     // Observe time to default link
     // TODO(meiyili): remove once default link is deprecated
@@ -257,8 +271,7 @@ class ModuleDriver {
     Proxy<dynamic> proxy,
   ) async {
     log.fine('#connectToAgentService(...)');
-    ComponentContextClient componentContext =
-        await moduleContext.getComponentContext();
+    ComponentContextClient componentContext = await getComponentContext();
 
     ServiceProviderProxy serviceProviderProxy =
         await componentContext.connectToAgent(url);
@@ -403,8 +416,6 @@ class ModuleDriver {
     if (!_firstObservationSent.contains(linkName) && data != null) {
       _firstObservationSent.add(linkName);
 
-      // TODO(meiyili): grab module package name from module context once it has
-      // been added to peridot
       _encoder.addMultipartObservation(
         _kFirstLinkDataMetricId,
         <ObservationValue>[
@@ -412,7 +423,7 @@ class ModuleDriver {
             name: 'module_name',
             value: new Value.withStringValue(
               moduleName == null || moduleName.isEmpty
-                  ? 'moduleNameNotSet_temp_value'
+                  ? _packageName
                   : moduleName,
             ),
             encodingId: 1,
