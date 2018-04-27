@@ -36,5 +36,6 @@ dart_test("contacts_content_provider_tests") {
     "//third_party/dart-pkg/pub/test",
     "//topaz/app/contacts/services:services",
     "//topaz/public/dart/fuchsia",
+    "//topaz/public/lib/testing/flutter",
   ]
 }
