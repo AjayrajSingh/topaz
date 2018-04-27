@@ -8,6 +8,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'authentication_overlay_model.dart';
+import 'netstack_model.dart';
 
 /// Enum of the possible stages that are displayed during user setup.
 ///
@@ -22,6 +23,9 @@ enum SetupStage {
   /// When selecting the time zone.
   timeZone,
 
+  /// When connecting to wireless internet.
+  wifi,
+
   /// When the setup is complete.
   complete,
 }
@@ -29,6 +33,7 @@ enum SetupStage {
 const List<SetupStage> _stages = const <SetupStage>[
   SetupStage.notStarted,
   SetupStage.timeZone,
+  SetupStage.wifi,
   SetupStage.userAuth,
   SetupStage.complete
 ];
@@ -36,6 +41,10 @@ const List<SetupStage> _stages = const <SetupStage>[
 /// Model that contains all the state needed to set up a new user
 class UserSetupModel extends Model {
   final AuthenticationOverlayModel _authModel;
+  final NetstackModel _netstackModel;
+
+  /// ApplicationContext to allow setup to launch apps
+  final ApplicationContext applicationContext;
 
   /// Callback to cancel adding a new user.
   final VoidCallback cancelAuthenticationFlow;
@@ -50,8 +59,8 @@ class UserSetupModel extends Model {
   int _currentIndex;
 
   /// Create a new [UserSetupModel]
-  UserSetupModel(
-      ApplicationContext applicationContext, this.cancelAuthenticationFlow)
+  UserSetupModel(this.applicationContext, this._netstackModel,
+      this.cancelAuthenticationFlow)
       : _currentIndex = _stages.indexOf(SetupStage.notStarted),
         _authModel = new AuthenticationOverlayModel(),
         _timeZoneProxy = new TimezoneProxy() {
@@ -91,11 +100,10 @@ class UserSetupModel extends Model {
 
   /// Moves to the next stage in the setup flow.
   void nextStep() {
-    assert(currentStage != SetupStage.complete);
-
-    /// Eventually, this should find the next usable stage as opposed to
-    /// just the next stage.
-    _currentIndex++;
+    do {
+      assert(currentStage != SetupStage.complete);
+      _currentIndex++;
+    } while (_shouldSkipStage);
 
     // This will be refactored into the model, and then called when
     // building the userAuth widget.
@@ -133,6 +141,10 @@ class UserSetupModel extends Model {
       notifyListeners();
     });
   }
+
+  /// If the stage isn't needed due to current conditions.
+  bool get _shouldSkipStage =>
+      currentStage == SetupStage.wifi && _netstackModel.hasIp;
 
   /// Ends the setup flow and immediately logs in as guest
   void loginAsGuest() {

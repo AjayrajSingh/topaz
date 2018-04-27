@@ -6,9 +6,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.ui.flutter/child_view.dart';
+import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:timezone/timezone_picker.dart';
 
+import 'netstack_model.dart';
 import 'user_setup_model.dart';
 
 /// Callback to cancel the authentication flow
@@ -54,16 +56,11 @@ class UserSetup extends StatelessWidget {
   static const TextStyle _blackText =
       const TextStyle(fontSize: 14.0, color: Colors.white);
 
-  static final Map<SetupStage, ScopedModelDescendantBuilder<UserSetupModel>>
-      _widgetBuilders =
-      const <SetupStage, ScopedModelDescendantBuilder<UserSetupModel>>{
-    SetupStage.timeZone: _buildTimeZone,
-    SetupStage.userAuth: _buildUserAuth
-  };
-
-  static final Map<SetupStage, String> _stageTitles = <SetupStage, String>{
+  static const Map<SetupStage, String> _stageTitles =
+      const <SetupStage, String>{
     SetupStage.timeZone: 'Select your time zone',
-    SetupStage.userAuth: 'Log in to your account'
+    SetupStage.userAuth: 'Log in to your account',
+    SetupStage.wifi: 'Connect to the internet',
   };
 
   /// Builds a new UserSetup widget that orchestrates the steps required
@@ -80,28 +77,37 @@ class UserSetup extends StatelessWidget {
             model.currentStage == SetupStage.complete)
           return new Offstage(offstage: true);
 
-        return new Stack(
-          children: <Widget>[
-            new Material(
-              color: Colors.black,
-              child: new Container(),
-            ),
-            new Material(
-                color: Colors.white,
-                borderRadius: new BorderRadius.circular(28.0),
-                child: new Column(children: <Widget>[
-                  new AppBar(
-                      title: new Text(
-                          _stageTitles[model.currentStage] ?? 'Placeholder')),
-                  new Expanded(
-                      child: (_widgetBuilders[model.currentStage] ??
-                              _placeholderStage)
-                          .call(context, child, model)),
-                  _controlBar(model),
-                ]))
-          ],
-        );
+        return new Material(
+            color: Colors.white,
+            child: new Column(children: <Widget>[
+              new AppBar(
+                  title: new Text(
+                      _stageTitles[model.currentStage] ?? 'Placeholder')),
+              new Expanded(
+                  child: _getWidgetBuilder(model.currentStage)
+                      .call(context, child, model)),
+              _controlBar(model),
+            ]));
       });
+
+  ScopedModelDescendantBuilder<UserSetupModel> _getWidgetBuilder(
+      SetupStage stage) {
+    switch (stage) {
+      case SetupStage.timeZone:
+        return _buildTimeZone;
+      case SetupStage.userAuth:
+        return _buildUserAuth;
+      case SetupStage.wifi:
+        return _buildWifi;
+      default:
+        return _placeholderStage;
+    }
+  }
+
+  static Widget _buildWifi(
+          BuildContext context, Widget child, UserSetupModel model) =>
+      new ApplicationWidget(
+          url: 'wifi_settings', launcher: model.applicationContext.launcher);
 
   static Widget _placeholderStage(
           BuildContext context, Widget child, UserSetupModel model) =>
@@ -149,10 +155,15 @@ class UserSetup extends StatelessWidget {
                   model.reset();
                   model.cancelAuthenticationFlow();
                 }),
-            _textButton(
-                text: 'Next',
-                visible: model.currentStage != SetupStage.userAuth,
-                onPressed: () => model.nextStep()),
+            new ScopedModelDescendant<NetstackModel>(
+                builder: (BuildContext context, Widget child,
+                        NetstackModel netModel) =>
+                    _textButton(
+                        text: 'Next',
+                        visible: model.currentStage != SetupStage.userAuth,
+                        disabled: model.currentStage == SetupStage.wifi &&
+                            netModel.hasIp,
+                        onPressed: () => model.nextStep())),
             _textButton(text: 'Guest', onPressed: () => model.loginAsGuest()),
           ].where((Widget widget) => widget != null).toList(),
         ));

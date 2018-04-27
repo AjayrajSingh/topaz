@@ -69,8 +69,8 @@ void main() {
   NetstackModel netstackModel = new NetstackModel(netstack: netstackProxy)
     ..start();
 
-  UserSetupModel userSetupModel =
-      new UserSetupModel(applicationContext, _cancelAuthenticationFlow);
+  UserSetupModel userSetupModel = new UserSetupModel(
+      applicationContext, netstackModel, _cancelAuthenticationFlow);
 
   _OverlayModel wifiInfoOverlayModel = new _OverlayModel();
 
