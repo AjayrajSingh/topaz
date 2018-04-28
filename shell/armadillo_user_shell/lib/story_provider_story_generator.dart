@@ -592,14 +592,18 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
   }
 
   String _getStoryTitle(StoryInfo storyInfo) {
-    final String title = _getStoryInfoExtraValue(storyInfo, 'story_title');
-    if (title != null) {
-      return title;
+    String storyTitle;
+    final String extraTitle = _getStoryInfoExtraValue(storyInfo, 'story_title');
+    if (extraTitle != null) {
+      storyTitle = extraTitle;
+    } else if (storyInfo.url != null) {
+      storyTitle = Uri
+          .parse(storyInfo.url)
+          .pathSegments[Uri.parse(storyInfo.url).pathSegments.length - 1]
+          ?.toUpperCase();
+    } else {
+      storyTitle = '<no title>';
     }
-    String storyTitle = Uri
-        .parse(storyInfo.url)
-        .pathSegments[Uri.parse(storyInfo.url).pathSegments.length - 1]
-        ?.toUpperCase();
 
     // Add story ID to title only when we're in debug mode.
     assert(() {
