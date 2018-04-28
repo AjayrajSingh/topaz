@@ -15,5 +15,7 @@ flutter_app("wifi_settings") {
     "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/schemas/dart",
   ]
 }

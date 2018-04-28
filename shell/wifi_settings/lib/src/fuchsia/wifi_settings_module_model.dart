@@ -5,19 +5,22 @@
 import 'dart:async';
 
 import 'package:fuchsia.fidl.wlan_service/wlan_service.dart' as wlan;
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.schemas.dart/com.fuchsia.status.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'access_point.dart';
 
 const int _kConnectionScanInterval = 3;
 
 /// The model for the wifi settings module.
-class WifiSettingsModuleModel extends ModuleModel {
+class WifiSettingsModuleModel extends Model {
   /// The wlan containing wifi information for the device.
-  final wlan.WlanProxy wlanProxy;
+  final wlan.WlanProxy _wlanProxy;
 
   /// How often to poll the wlan for wifi information.
-  final Duration updatePeriod;
+  final Duration _updatePeriod = const Duration(seconds: 20);
 
   List<AccessPoint> _accessPoints = <AccessPoint>[];
 
@@ -31,29 +34,73 @@ class WifiSettingsModuleModel extends ModuleModel {
 
   Timer _updateTimer;
 
+  final StatusEntityCodec _kStatusCodec = new StatusEntityCodec();
+
+  ModuleDriver _moduleDriver;
+
   /// Constructor.
-  WifiSettingsModuleModel({
-    this.wlanProxy,
-    this.updatePeriod: const Duration(seconds: 20),
-  }) {
+  WifiSettingsModuleModel() : _wlanProxy = new wlan.WlanProxy() {
+    ApplicationContext applicationContext =
+        new ApplicationContext.fromStartupInfo();
+
+    connectToService(applicationContext.environmentServices, _wlanProxy.ctrl);
+
+    _moduleDriver = new ModuleDriver(onTerminate: _onTerminate)..start();
+
+    _updateStatus();
+    addListener(_updateStatus);
+
     _update();
-    _updateTimer = new Timer.periodic(updatePeriod, (_) {
+    _updateTimer = new Timer.periodic(_updatePeriod, (_) {
       _update();
     });
   }
 
-  @override
-  void onStop() {
-    super.onStop();
-    wlanProxy.ctrl.close();
+  void _onTerminate() {
+    _wlanProxy.ctrl.close();
     _updateTimer.cancel();
+  }
+
+  void _updateStatus() {
+    if (_selectedAccessPoint != null) {
+      _moduleDriver.put(
+          'status',
+          new StatusEntityData(value: _selectedAccessPoint.name),
+          _kStatusCodec);
+    } else {
+      _wlanProxy.status((wlan.WlanStatus status) {
+        String value = 'Off';
+
+        switch (status.state) {
+          case wlan.State.associated:
+            value = status.currentAp.ssid;
+            break;
+          case wlan.State.associating:
+          case wlan.State.joining:
+            value = 'Connecting to ${status.currentAp.ssid}';
+            break;
+          case wlan.State.authenticating:
+            value = 'Authenticating...';
+            break;
+          case wlan.State.bss:
+          case wlan.State.querying:
+          case wlan.State.scanning:
+            value = 'Scanning...';
+            break;
+          default:
+            value = 'Off';
+        }
+        _moduleDriver.put(
+            'status', new StatusEntityData(value: value), _kStatusCodec);
+      });
+    }
   }
 
   void _update() {
     if (_selectedAccessPoint != null) {
       return;
     }
-    wlanProxy.scan(const wlan.ScanRequest(timeout: 15),
+    _wlanProxy.scan(const wlan.ScanRequest(timeout: 15),
         (wlan.ScanResult scanResult) {
       if (_selectedAccessPoint != null) {
         return;
@@ -125,7 +172,7 @@ class WifiSettingsModuleModel extends ModuleModel {
   }
 
   void _connect(AccessPoint accessPoint, [String password]) {
-    wlanProxy.connect(
+    _wlanProxy.connect(
       new wlan.ConnectConfig(
           ssid: accessPoint.name,
           passPhrase: password ?? '',

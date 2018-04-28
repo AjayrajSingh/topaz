@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:fuchsia.fidl.wlan_service/wlan_service.dart';
 
 import 'src/fuchsia/wifi_settings_module_model.dart';
 import 'src/wlan_info.dart';
@@ -15,26 +13,18 @@ import 'src/wlan_info.dart';
 void main() {
   setupLogger();
 
-  ApplicationContext applicationContext =
-      new ApplicationContext.fromStartupInfo();
-
-  WlanProxy wlanProxy = new WlanProxy();
-  connectToService(applicationContext.environmentServices, wlanProxy.ctrl);
-
-  ModuleWidget<WifiSettingsModuleModel> moduleWidget =
-      new ModuleWidget<WifiSettingsModuleModel>(
-    applicationContext: applicationContext,
-    moduleModel: new WifiSettingsModuleModel(wlanProxy: wlanProxy),
-    child: new MaterialApp(
-      home: new Material(
-        color: Colors.grey[900],
-        child: new Container(
-          padding: const EdgeInsets.all(8.0),
+  Widget app = new MaterialApp(
+    home: new Material(
+      color: Colors.grey[900],
+      child: new Container(
+        padding: const EdgeInsets.all(8.0),
+        child: new ScopedModel<WifiSettingsModuleModel>(
+          model: new WifiSettingsModuleModel(),
           child: const WlanInfo(),
         ),
       ),
     ),
-  )..advertise();
+  );
 
-  runApp(moduleWidget);
+  runApp(app);
 }

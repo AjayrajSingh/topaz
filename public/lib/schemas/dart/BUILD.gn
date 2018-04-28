@@ -25,6 +25,7 @@ dart_library("dart") {
     "com/fuchsia/media/media.dart",
     "com/fuchsia/media/progress/media_progress_entity_codec.dart",
     "com/fuchsia/media/progress/media_progress_entity_data.dart",
+    "com.fuchsia.status.dart",
     "com/google/youtube/video_id_entity_codec.dart",
     "entity_codec.dart",
   ]
