@@ -23,7 +23,7 @@ void main(List<String> args) {
   _context.launcher.createApplication(launchInfo, null);
 
   _echo = new EchoProxy();
-  _echo.ctrl.bind(services.connectToServiceByName<Echo>('echo2.Echo'));
+  _echo.ctrl.bind(services.connectToServiceByName<Echo>(Echo.$serviceName));
 
   _echo.echoString('hello', (String response) {
     print('***** Response: $response');
