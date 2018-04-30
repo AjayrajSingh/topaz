@@ -614,9 +614,11 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
   }
 
   String _getStoryInfoExtraValue(StoryInfo storyInfo, final String key) {
-    for (final StoryInfoExtraEntry entry in storyInfo.extra) {
-      if (entry.key == key) {
-        return entry.value;
+    if (storyInfo.extra != null) {
+      for (final StoryInfoExtraEntry entry in storyInfo.extra) {
+        if (entry.key == key) {
+          return entry.value;
+        }
       }
     }
     return null;
