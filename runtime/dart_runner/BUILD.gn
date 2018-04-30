@@ -10,6 +10,11 @@ pool("dart_aot_pool") {
 }
 
 template("runner") {
+  assert(defined(invoker.product), "The parameter 'product' must be defined")
+  product_suffix = ""
+  if (invoker.product) {
+    product_suffix = "_product"
+  }
   invoker_output_name = invoker.output_name
   extra_defines = invoker.extra_defines
   extra_deps = invoker.extra_deps
@@ -33,26 +38,14 @@ template("runner") {
 
     defines = extra_defines
 
-    # In a debug build, we use a build of Dart in which it is possible to
-    # spawn a vmservice isolate, use the Observatory, attach the debugger, etc.
-    # In a release build, we use a stripped-down build of Dart that leaves out
-    # those features.
-    if (is_debug) {
-      dart_deps = [
-        "//third_party/dart/runtime/bin:embedded_dart_io",
+    dart_deps = [
+      "//third_party/dart/runtime/bin:embedded_dart_io${product_suffix}",
 
-        # TODO(abarth): We shouldn't need to depend on libdart_builtin but we
-        # fail to link otherwise.
-        "//third_party/dart/runtime/bin:libdart_builtin",
-        "//third_party/dart/runtime/platform:libdart_platform",
-      ]
-    } else {
-      dart_deps = [
-        "//third_party/dart/runtime/bin:embedded_dart_io_product",
-        "//third_party/dart/runtime/bin:libdart_builtin_product",
-        "//third_party/dart/runtime/platform:libdart_platform_product",
-      ]
-    }
+      # TODO(abarth): We shouldn't need to depend on libdart_builtin but we
+      # fail to link otherwise.
+      "//third_party/dart/runtime/bin:libdart_builtin${product_suffix}",
+      "//third_party/dart/runtime/platform:libdart_platform${product_suffix}",
+    ]
 
     deps = [
              "//garnet/public/lib/app/cpp",
@@ -68,112 +61,151 @@ template("runner") {
 
 runner("dart_jit_runner_bin") {
   output_name = "dart_jit_runner"
+  product = false
   extra_defines = []
-  extra_deps = []
-  if (is_debug) {
-    extra_deps += [ "//third_party/dart/runtime:libdart_jit" ]
-  } else {
-    # Since the Dart content handlers don't have a vmservice, it is safe to
-    # link against the PRODUCT mode libraries in a Fuchsia release build.
-    extra_deps += [ "//third_party/dart/runtime:libdart_jit_product" ]
-  }
+  extra_deps = [ "//third_party/dart/runtime:libdart_jit" ]
+}
+
+runner("dart_jit_product_runner_bin") {
+  output_name = "dart_jit_product_runner"
+  product = true
+  extra_defines = [ "DART_PRODUCT" ]
+  extra_deps = [ "//third_party/dart/runtime:libdart_jit_product" ]
 }
 
 runner("dart_aot_runner_bin") {
   output_name = "dart_aot_runner"
+  product = false
   extra_defines = [ "AOT_RUNTIME" ]
-  extra_deps = [ "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc" ]
-  if (is_debug) {
-    extra_deps += [ "//third_party/dart/runtime:libdart_precompiled_runtime" ]
-  } else {
-    extra_deps +=
-        [ "//third_party/dart/runtime:libdart_precompiled_runtime_product" ]
+  extra_deps = [
+    "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc",
+    "//third_party/dart/runtime:libdart_precompiled_runtime",
+  ]
+}
+
+runner("dart_aot_product_runner_bin") {
+  output_name = "dart_aot_product_runner"
+  product = true
+  extra_defines = [ "AOT_RUNTIME", "DART_PRODUCT" ]
+  extra_deps = [
+    "//topaz/runtime/dart_runner/embedder:dart_aot_product_snapshot_cc",
+    "//third_party/dart/runtime:libdart_precompiled_runtime_product",
+  ]
+}
+
+template("aot_runner_package") {
+  assert(defined(invoker.product), "The parameter 'product' must be defined")
+  product_suffix = ""
+  if (invoker.product) {
+    product_suffix = "_product"
+  }
+  package(target_name) {
+    deps = [
+      ":dart_aot${product_suffix}_runner_bin",
+    ]
+    if (!invoker.product) {
+      deps += [
+        "vmservice:vmservice_dylib($shlib_toolchain)",
+        "//third_party/dart/runtime/observatory:embedded_archive_observatory",
+      ]
+    }
+
+    binary = "dart_aot${product_suffix}_runner"
+
+    meta = [
+      {
+        path = rebase_path("meta/sandbox")
+        dest = "sandbox"
+      },
+    ]
+
+    resources = []
+    if (!invoker.product) {
+      resources += [
+        {
+          path = rebase_path(
+                  get_label_info("vmservice:vmservice_dylib($shlib_toolchain)",
+                                 "root_out_dir") + "/libvmservice.so")
+          dest = "libvmservice.so"
+        },
+        {
+          path = rebase_path(
+                  "$root_gen_dir/observatory/embedded_archive_observatory.tar")
+          dest = "observatory.tar"
+        },
+      ]
+    }
   }
 }
 
-package("dart_aot_runner") {
-  deps = [
-    ":dart_aot_runner_bin",
-  ]
-  if (is_debug) {
-    deps += [
-      "vmservice:vmservice_dylib($shlib_toolchain)",
-      "//third_party/dart/runtime/observatory:embedded_archive_observatory",
-    ]
+template("jit_runner_package") {
+  assert(defined(invoker.product), "The parameter 'product' must be defined")
+  product_suffix = ""
+  if (invoker.product) {
+    product_suffix = "_product"
   }
+  package(target_name) {
+    deps = [
+      ":dart_jit${product_suffix}_runner_bin",
+      "kernel:kernel_core_snapshot${product_suffix}",
+    ]
+    if (!invoker.product) {
+      deps += [
+        "//third_party/dart/runtime/observatory:embedded_archive_observatory",
+      ]
+    }
 
-  binary = "dart_aot_runner"
+    binary = "dart_jit${product_suffix}_runner"
 
-  meta = [
-    {
-      path = rebase_path("meta/sandbox")
-      dest = "sandbox"
-    },
-  ]
-
-  resources = []
-  if (is_debug) {
-    resources += [
+    meta = [
       {
-        path = rebase_path(
-                get_label_info("vmservice:vmservice_dylib($shlib_toolchain)",
-                               "root_out_dir") + "/libvmservice.so")
-        dest = "libvmservice.so"
-      },
-      {
-        path = rebase_path(
-                "$root_gen_dir/observatory/embedded_archive_observatory.tar")
-        dest = "observatory.tar"
+        path = rebase_path("meta/sandbox")
+        dest = "sandbox"
       },
     ]
+
+    resources = [
+      {
+        path = rebase_path("$target_gen_dir/kernel/vm_data${product_suffix}.bin")
+        dest = "vm_snapshot_data.bin"
+      },
+      {
+        path = rebase_path("$target_gen_dir/kernel/vm_instructions${product_suffix}.bin")
+        dest = "vm_snapshot_instructions.bin"
+      },
+      {
+        path = rebase_path("$target_gen_dir/kernel/isolate_data${product_suffix}.bin")
+        dest = "isolate_core_snapshot_data.bin"
+      },
+      {
+        path = rebase_path("$target_gen_dir/kernel/isolate_instructions${product_suffix}.bin")
+        dest = "isolate_core_snapshot_instructions.bin"
+      },
+    ]
+    if (!invoker.product) {
+      resources += [
+        {
+          path = rebase_path(
+                  "$root_gen_dir/observatory/embedded_archive_observatory.tar")
+          dest = "observatory.tar"
+        },
+      ]
+    }
   }
 }
 
-package("dart_jit_runner") {
-  deps = [
-    ":dart_jit_runner_bin",
-    "kernel:kernel_core_snapshot",
-  ]
-  if (is_debug) {
-    deps += [
-      "//third_party/dart/runtime/observatory:embedded_archive_observatory",
-    ]
-  }
+aot_runner_package("dart_aot_runner") {
+  product = false
+}
 
-  binary = "dart_jit_runner"
+aot_runner_package("dart_aot_product_runner") {
+  product = true
+}
 
-  meta = [
-    {
-      path = rebase_path("meta/sandbox")
-      dest = "sandbox"
-    },
-  ]
+jit_runner_package("dart_jit_runner") {
+  product = false
+}
 
-  resources = [
-    {
-      path = rebase_path("$target_gen_dir/kernel/vm_data.bin")
-      dest = "vm_snapshot_data.bin"
-    },
-    {
-      path = rebase_path("$target_gen_dir/kernel/vm_instructions.bin")
-      dest = "vm_snapshot_instructions.bin"
-    },
-    {
-      path = rebase_path("$target_gen_dir/kernel/isolate_data.bin")
-      dest = "isolate_core_snapshot_data.bin"
-    },
-    {
-      path = rebase_path("$target_gen_dir/kernel/isolate_instructions.bin")
-      dest = "isolate_core_snapshot_instructions.bin"
-    },
-  ]
-  if (is_debug) {
-    resources += [
-      {
-        path = rebase_path(
-                "$root_gen_dir/observatory/embedded_archive_observatory.tar")
-        dest = "observatory.tar"
-      },
-    ]
-  }
+jit_runner_package("dart_jit_product_runner") {
+  product = true
 }

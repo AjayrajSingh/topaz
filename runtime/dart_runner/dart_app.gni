@@ -86,6 +86,16 @@ template("_dart_kernel") {
 template("dart_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
+  product = !is_debug
+  if (defined(invoker.product)) {
+    product = invoker.product
+  }
+
+  product_suffix = ""
+  if (product) {
+    product_suffix = "_product"
+  }
+
   dart_library_target_name = target_name + "_dart_library"
 
   dart_library(dart_library_target_name) {
@@ -143,7 +153,7 @@ template("dart_jit_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/jit_runtime")
+        path = rebase_path("//topaz/runtime/dart_runner/meta/jit${product_suffix}_runtime")
         dest = "runtime"
       },
     ]
@@ -161,6 +171,16 @@ template("dart_jit_app") {
 
 template("dart_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
+
+  product = !is_debug
+  if (defined(invoker.product)) {
+    product = invoker.product
+  }
+
+  product_suffix = ""
+  if (product) {
+    product_suffix = "_product"
+  }
 
   dart_library_target_name = target_name + "_dart_library"
 
@@ -218,10 +238,10 @@ template("dart_aot_app") {
       assembly_path,
     ]
 
-    if (is_debug) {
-      script = gen_snapshot
-    } else {
+    if (product) {
       script = gen_snapshot_product
+    } else {
+      script = gen_snapshot
     }
 
     args = [
@@ -243,7 +263,7 @@ template("dart_aot_app") {
                   rebase_path(entry_manifest) ]
       }
     }
-    if (is_debug) {
+    if (is_debug && !product) {
       args += [ "--enable_asserts" ]
     }
     args += [ rebase_path(kernel_path) ]
@@ -297,7 +317,7 @@ template("dart_aot_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/aot_runtime")
+        path = rebase_path("//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime")
         dest = "runtime"
       },
     ]
@@ -337,6 +357,10 @@ template("dart_aot_app") {
 #
 #   extra_entry_manifests (optional)
 #     List of AOT entry point manifest files. Most apps do not need this.
+#
+#   product (optional)
+#     A boolean. Whether to build/run the app in a stripped-down Dart VM.
+#     Defaults to !is_debug.
 template("dart_app") {
   target(dart_default_app, target_name) {
     forward_variables_from(invoker, "*")

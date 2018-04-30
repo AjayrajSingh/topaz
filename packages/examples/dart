@@ -5,6 +5,8 @@
         "hello_app_dart_aot": "//topaz/runtime/dart_runner/examples/hello_app_dart:hello_app_dart_aot",
         "hello_app_dart_jit": "//topaz/runtime/dart_runner/examples/hello_app_dart:hello_app_dart_jit",
         "hello_dart_aot": "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart_aot",
-        "hello_dart_jit": "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart_jit"
+        "hello_dart_jit": "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart_jit",
+        "hello_dart_aot_product": "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart_aot_product",
+        "hello_dart_jit_product": "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart_jit_product"
     }
 }

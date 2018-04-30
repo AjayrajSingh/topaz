@@ -22,49 +22,66 @@ compile_platform("kernel_platform_files") {
   ]
 }
 
-action("kernel_core_snapshot") {
-  deps = [
-    ":kernel_platform_files",
-  ]
-
-  platform_dill = "$root_out_dir/dart_runner_patched_sdk/platform_strong.dill"
-  inputs = [
-    platform_dill,
-  ]
-
-  vm_snapshot_data = "$target_gen_dir/vm_data.bin"
-  vm_snapshot_instructions = "$target_gen_dir/vm_instructions.bin"
-  isolate_snapshot_data = "$target_gen_dir/isolate_data.bin"
-  isolate_snapshot_instructions = "$target_gen_dir/isolate_instructions.bin"
-  outputs = [
-    vm_snapshot_data,
-    vm_snapshot_instructions,
-    isolate_snapshot_data,
-    isolate_snapshot_instructions,
-  ]
-
-  if (is_debug) {
-    script = gen_snapshot
-  } else {
-    script = gen_snapshot_product
+template("create_kernel_core_snapshot") {
+  assert(defined(invoker.product), "The parameter 'product' must be defined")
+  product_suffix = ""
+  if (invoker.product) {
+    product_suffix = "_product"
   }
+  action(target_name) {
+    deps = [
+      ":kernel_platform_files",
+    ]
 
-  args = [
-    "--snapshot_kind=core",
-    "--strong",
-    "--reify_generic_functions",
-    "--limit_ints_to_64_bits",
-    "--await_is_keyword",
-    "--enable_mirrors=false",
-    "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
-    "--vm_snapshot_instructions=" +
-        rebase_path(vm_snapshot_instructions, root_build_dir),
-    "--isolate_snapshot_data=" +
-        rebase_path(isolate_snapshot_data, root_build_dir),
-    "--isolate_snapshot_instructions=" +
-        rebase_path(isolate_snapshot_instructions, root_build_dir),
-    rebase_path(platform_dill),
-  ]
+    platform_dill = "$root_out_dir/dart_runner_patched_sdk/platform_strong.dill"
+    inputs = [
+      platform_dill,
+    ]
+
+    vm_snapshot_data = "$target_gen_dir/vm_data${product_suffix}.bin"
+    vm_snapshot_instructions =
+        "$target_gen_dir/vm_instructions${product_suffix}.bin"
+    isolate_snapshot_data = "$target_gen_dir/isolate_data${product_suffix}.bin"
+    isolate_snapshot_instructions =
+        "$target_gen_dir/isolate_instructions${product_suffix}.bin"
+    outputs = [
+      vm_snapshot_data,
+      vm_snapshot_instructions,
+      isolate_snapshot_data,
+      isolate_snapshot_instructions,
+    ]
+
+    if (invoker.product) {
+      script = gen_snapshot_product
+    } else {
+      script = gen_snapshot
+    }
+
+    args = [
+      "--snapshot_kind=core",
+      "--strong",
+      "--reify_generic_functions",
+      "--limit_ints_to_64_bits",
+      "--await_is_keyword",
+      "--enable_mirrors=false",
+      "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
+      "--vm_snapshot_instructions=" +
+          rebase_path(vm_snapshot_instructions, root_build_dir),
+      "--isolate_snapshot_data=" +
+          rebase_path(isolate_snapshot_data, root_build_dir),
+      "--isolate_snapshot_instructions=" +
+          rebase_path(isolate_snapshot_instructions, root_build_dir),
+      rebase_path(platform_dill),
+    ]
+  }
+}
+
+create_kernel_core_snapshot("kernel_core_snapshot") {
+  product = false
+}
+
+create_kernel_core_snapshot("kernel_core_snapshot_product") {
+  product = true
 }
 
 dart_tool("kernel_compiler") {

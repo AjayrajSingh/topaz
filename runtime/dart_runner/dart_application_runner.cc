@@ -37,7 +37,7 @@ const char* kDartVMArgs[] = {
     "--enable_mirrors=false",
     "--await_is_keyword",
 #endif
-#if !defined(NDEBUG)
+#if !defined(NDEBUG) && !defined(DART_PRODUCT)
     "--enable_asserts",
     "--systrace_timeline",
     "--timeline_streams=VM,Isolate,Compiler,Dart,GC,Embedder,API",
@@ -53,8 +53,8 @@ Dart_Isolate IsolateCreateCallback(const char* uri,
                                    void* callback_data,
                                    char** error) {
   if (std::string(uri) == DART_VM_SERVICE_ISOLATE_NAME) {
-#if defined(NDEBUG)
-    *error = strdup("The service isolate is not implemented in release mode");
+#if defined(DART_PRODUCT)
+    *error = strdup("The service isolate is not implemented in product mode");
     return NULL;
 #else
     return CreateServiceIsolate(uri, flags, error);
@@ -172,7 +172,7 @@ DartApplicationRunner::DartApplicationRunner()
   params.create = IsolateCreateCallback;
   params.shutdown = IsolateShutdownCallback;
   params.cleanup = IsolateCleanupCallback;
-#if !defined(NDEBUG)
+#if !defined(DART_PRODUCT)
   params.get_service_assets = GetVMServiceAssetsArchiveCallback;
 #endif
   char* error = Dart_Initialize(&params);
