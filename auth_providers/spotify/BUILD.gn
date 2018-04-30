@@ -66,7 +66,6 @@ source_set("unittests") {
 }
 
 package("spotify_auth_provider") {
-  app = true
   deprecated_system_image = true
 
   deps = [
@@ -77,4 +76,3 @@ package("spotify_auth_provider") {
         name = "spotify_auth_provider"
   } ]
 }
-
