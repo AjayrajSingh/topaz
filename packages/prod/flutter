@@ -1,11 +1,6 @@
 {
     "imports": [
-        "garnet/packages/prod/fonts",
-        "garnet/packages/prod/icu_data",
-        "garnet/packages/prod/scenic"
-    ],
-    "packages": {
-        "flutter_aot_runner": "//third_party/flutter:flutter_aot_runner",
-        "flutter_jit_runner": "//third_party/flutter:flutter_jit_runner"
-    }
+        "topaz/packages/prod/flutter_aot",
+        "topaz/packages/prod/flutter_jit"
+    ]
 }

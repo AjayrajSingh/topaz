@@ -1,6 +1,6 @@
 {
-    "packages": {
-        "dart_aot_runner": "//topaz/runtime/dart_runner:dart_aot_runner",
-        "dart_jit_runner": "//topaz/runtime/dart_runner:dart_jit_runner"
-    }
+    "imports": [
+        "topaz/packages/prod/dart_aot_runner",
+        "topaz/packages/prod/dart_jit_runner"
+    ]
 }
