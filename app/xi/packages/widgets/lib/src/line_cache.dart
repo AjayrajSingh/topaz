@@ -43,7 +43,8 @@ class Line {
   // TODO: should conversion to utf-8 offset happen here or be caller's
   // responsibility?
   int getIndexForHorizontal(double horizontal) {
-    TextPainter textPainter = new TextPainter(text: text)..layout();
+    TextPainter textPainter =
+        new TextPainter(text: text, textDirection: TextDirection.ltr)..layout();
     Offset offset = new Offset(horizontal, 0.0);
     TextPosition pos = textPainter.getPositionForOffset(offset);
     return pos.offset;

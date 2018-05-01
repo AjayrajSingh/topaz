@@ -185,6 +185,10 @@ class LineCol {
 
   /// The column, as a utf-8 offset from beginning of line
   final int col;
+  @override
+  String toString() {
+    return 'line: $line, col: $col';
+  }
 }
 
 final String _zeroWidthSpace = '\u{200b}';
