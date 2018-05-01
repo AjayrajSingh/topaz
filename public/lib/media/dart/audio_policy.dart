@@ -2,9 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fidl/fidl.dart';
 import 'package:fuchsia.fidl.audio_policy/audio_policy.dart' as audio_policy;
 import 'package:fuchsia.fidl.media/media.dart';
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.logging/logging.dart';
 import 'package:fuchsia.fidl.component/component.dart';
 
 /// Type for |AudioPolicy| update callbacks.
@@ -31,6 +33,9 @@ class AudioPolicy {
   /// Constructs a AudioPolicy object.
   AudioPolicy(ServiceProvider services) {
     connectToService(services, _audioPolicyService.ctrl);
+    _audioPolicyService.ctrl.onConnectionError = _handleConnectionError;
+    _audioPolicyService.ctrl.error
+        .then((ProxyError error) => _handleConnectionError(error: error));
     _handleServiceUpdates(kInitialStatus, null);
   }
 
@@ -98,7 +103,8 @@ class AudioPolicy {
 
   // Handles a status update from the audio policy service. Call with
   // kInitialStatus, null to initiate status updates.
-  void _handleServiceUpdates(int version, audio_policy.AudioPolicyStatus status) {
+  void _handleServiceUpdates(
+      int version, audio_policy.AudioPolicyStatus status) {
     if (status != null) {
       bool callUpdate = _systemAudioMuted != status.systemAudioMuted ||
           (_systemAudioGainDb - status.systemAudioGainDb).abs() > _minDbDiff;
@@ -119,6 +125,11 @@ class AudioPolicy {
     }
 
     _audioPolicyService.getStatus(version, _handleServiceUpdates);
+  }
+
+  /// Handles connection error to the audio policy service.
+  void _handleConnectionError({ProxyError error}) {
+    log.severe('Unable to connect to Audio Policy service', error);
   }
 
   /// Converts a gain in db to an audio 'level' in the range 0.0 to 1.0
