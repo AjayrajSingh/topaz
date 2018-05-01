@@ -88,6 +88,10 @@ abstract class XiClient {
   void handleData(String data) {
     //print(data);
     Map<String, dynamic> decoded = json.decode(data);
+    //TODO: plumb errors back through to caller
+    if (decoded.containsKey('error')) {
+      throw new UnimplementedError("xi client doesn't handle errors");
+    }
     if (decoded.containsKey('result')) {
       int id = decoded['id'];
       XiRpcCallback callback = _pending.remove(id);

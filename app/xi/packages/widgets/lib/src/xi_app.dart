@@ -77,21 +77,21 @@ class XiAppState extends State<XiApp> {
   /// Allows parent [Widget]s in either vanilla Flutter or Fuchsia to modify
   /// the [HomePage]'s [message].
   String message;
-  String _tabId;
+  String _viewId;
   List<_PendingNotification> _pendingReqs;
   EditorState _editorState;
 
   /// Route a notification to the xi core. Called by [Editor] widget. If the tab
   /// has not yet initialized, notifications are queued up until it has.
   void sendNotification(String method, dynamic params) {
-    if (_tabId == null) {
+    if (_viewId == null) {
       _pendingReqs ??= <_PendingNotification>[];
       _pendingReqs.add(new _PendingNotification(method, params));
     } else {
       Map<String, dynamic> innerParams = <String, dynamic>{
         'method': method,
         'params': params,
-        'view_id': _tabId
+        'view_id': _viewId
       };
       widget.xi.sendNotification('edit', innerParams);
     }
@@ -107,22 +107,22 @@ class XiAppState extends State<XiApp> {
   void initState() {
     super.initState();
     widget.xi.onMessage(handleMessage);
-    widget.xi.init().then((Null _) =>
-        // Arguably the new_tab should be sent by the editor (and the editor should plumb
-        // the tab id through to the connectEditor call). However, that would require holding
-        // a pending queue of new_tab requests, waiting for init to complete. This is easier.
-        widget.xi.sendRpc(
-            'new_view', <String, dynamic>{'file_path': '/data/test_xi_sync'},
-            (dynamic id) {
-          _tabId = id;
-          print('id = $id');
-          if (_pendingReqs != null) {
-            for (_PendingNotification pending in _pendingReqs) {
-              sendNotification(pending.method, pending.params);
-            }
-            _pendingReqs = null;
+    widget.xi.init().then((Null _) {
+      widget.xi.sendNotification('client_started', <String, dynamic>{});
+      // Arguably new_view should be sent by the editor (and the editor should plumb
+      // the view id through to the connectEditor call). However, that would require holding
+      // a pending queue of new_view requests, waiting for init to complete. This is easier.
+      return widget.xi.sendRpc('new_view', <String, dynamic>{}, (dynamic id) {
+        _viewId = id;
+        print('id = $id');
+        if (_pendingReqs != null) {
+          for (_PendingNotification pending in _pendingReqs) {
+            sendNotification(pending.method, pending.params);
           }
-        }));
+          _pendingReqs = null;
+        }
+      });
+    });
   }
 
   /// Handle messages from xi-core.

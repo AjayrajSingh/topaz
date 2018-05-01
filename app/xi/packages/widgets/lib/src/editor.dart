@@ -397,16 +397,20 @@ class EditorState extends State<Editor> {
   void _handleTapDown(TapDownDetails details) {
     _requestKeyboard();
     _lastTapLocation = _getLineColFromGlobal(details.globalPosition);
-    _sendNotification(
-        'click', <int>[_lastTapLocation.line, _lastTapLocation.col, 0, 1]);
+    _sendNotification('gesture', <String, dynamic>{
+      'line': _lastTapLocation.line,
+      'col': _lastTapLocation.col,
+      'ty': 'point_select'
+    });
   }
 
   void _handleLongPress() {
     if (_lastTapLocation != null) {
-      // Send a double-click, as this implements word selection, same as a long
-      // press.
-      _sendNotification(
-          'click', <int>[_lastTapLocation.line, _lastTapLocation.col, 0, 2]);
+      _sendNotification('gesture', <String, dynamic>{
+        'line': _lastTapLocation.line,
+        'col': _lastTapLocation.col,
+        'ty': 'word_select'
+      });
     }
   }
 
