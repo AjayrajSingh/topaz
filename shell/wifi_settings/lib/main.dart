@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
+import 'src/fuchsia/wifi_settings_model.dart';
 import 'src/fuchsia/wifi_settings_module_model.dart';
 import 'src/wlan_info.dart';
 
@@ -18,7 +19,7 @@ void main() {
       color: Colors.grey[900],
       child: new Container(
         padding: const EdgeInsets.all(8.0),
-        child: new ScopedModel<WifiSettingsModuleModel>(
+        child: new ScopedModel<WifiSettingsModel>(
           model: new WifiSettingsModuleModel(),
           child: const WlanInfo(),
         ),

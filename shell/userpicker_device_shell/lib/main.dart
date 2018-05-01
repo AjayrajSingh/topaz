@@ -69,8 +69,8 @@ void main() {
   NetstackModel netstackModel = new NetstackModel(netstack: netstackProxy)
     ..start();
 
-  UserSetupModel userSetupModel = new UserSetupModel(
-      applicationContext, netstackModel, _cancelAuthenticationFlow);
+  UserSetupModel userSetupModel =
+      new UserSetupModel(applicationContext, _cancelAuthenticationFlow);
 
   _OverlayModel wifiInfoOverlayModel = new _OverlayModel();
 
@@ -130,7 +130,7 @@ void main() {
       builder: (BuildContext context) => new ScopedModel<_OverlayModel>(
             model: wifiInfoOverlayModel,
             child: new _WifiInfo(
-              wifiApplicationWidget: new ApplicationWidget(
+              wifiWidget: new ApplicationWidget(
                 url: 'wifi_settings',
                 launcher: applicationContext.launcher,
               ),
@@ -366,10 +366,9 @@ class _NetstackInfo extends StatelessWidget {
 }
 
 class _WifiInfo extends StatelessWidget {
-  final ApplicationWidget wifiApplicationWidget;
+  final Widget wifiWidget;
 
-  const _WifiInfo({@required this.wifiApplicationWidget})
-      : assert(wifiApplicationWidget != null);
+  const _WifiInfo({@required this.wifiWidget}) : assert(wifiWidget != null);
 
   @override
   Widget build(BuildContext context) =>
@@ -399,7 +398,7 @@ class _WifiInfo extends StatelessWidget {
                           color: Colors.grey[900],
                           elevation: _kIndicatorElevation,
                           borderRadius: new BorderRadius.circular(8.0),
-                          child: wifiApplicationWidget,
+                          child: wifiWidget,
                         ),
                       ),
                     ),

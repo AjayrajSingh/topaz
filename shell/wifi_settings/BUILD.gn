@@ -19,3 +19,19 @@ flutter_aot_app("wifi_settings") {
     "//topaz/public/lib/schemas/dart",
   ]
 }
+
+dart_library("lib") {
+  package_name = "wifi_settings"
+
+  sources = [
+    "widget.dart",
+  ]
+
+  deps = [
+    "//garnet/public/lib/wlan/fidl:service",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/schemas/dart",
+  ]
+}

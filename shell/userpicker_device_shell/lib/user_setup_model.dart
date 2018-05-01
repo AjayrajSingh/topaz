@@ -4,11 +4,11 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:fuchsia.fidl.time_zone/time_zone.dart';
+import 'package:fuchsia.fidl.wlan_service/wlan_service.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'authentication_overlay_model.dart';
-import 'netstack_model.dart';
 
 /// Enum of the possible stages that are displayed during user setup.
 ///
@@ -41,7 +41,6 @@ const List<SetupStage> _stages = const <SetupStage>[
 /// Model that contains all the state needed to set up a new user
 class UserSetupModel extends Model {
   final AuthenticationOverlayModel _authModel;
-  final NetstackModel _netstackModel;
 
   /// ApplicationContext to allow setup to launch apps
   final ApplicationContext applicationContext;
@@ -51,6 +50,9 @@ class UserSetupModel extends Model {
 
   final TimezoneProxy _timeZoneProxy;
 
+  /// Proxy for connection to wifi
+  final WlanProxy wlanProxy;
+
   /// Callback to add a new user.
   VoidCallback addNewUser;
 
@@ -59,13 +61,16 @@ class UserSetupModel extends Model {
   int _currentIndex;
 
   /// Create a new [UserSetupModel]
-  UserSetupModel(this.applicationContext, this._netstackModel,
-      this.cancelAuthenticationFlow)
+  UserSetupModel(this.applicationContext, this.cancelAuthenticationFlow)
       : _currentIndex = _stages.indexOf(SetupStage.notStarted),
         _authModel = new AuthenticationOverlayModel(),
-        _timeZoneProxy = new TimezoneProxy() {
+        _timeZoneProxy = new TimezoneProxy(),
+        wlanProxy = new WlanProxy() {
+    /// todo: change lifespan of proxies
     connectToService(
         applicationContext.environmentServices, _timeZoneProxy.ctrl);
+
+    connectToService(applicationContext.environmentServices, wlanProxy.ctrl);
 
     _timeZoneProxy.getTimezoneId((String tz) {
       _currentTimezone = tz;
@@ -143,8 +148,9 @@ class UserSetupModel extends Model {
   }
 
   /// If the stage isn't needed due to current conditions.
-  bool get _shouldSkipStage =>
-      currentStage == SetupStage.wifi && _netstackModel.hasIp;
+  ///
+  /// TODO: Disable wifi stage if already connected to network.
+  bool get _shouldSkipStage => false;
 
   /// Ends the setup flow and immediately logs in as guest
   void loginAsGuest() {

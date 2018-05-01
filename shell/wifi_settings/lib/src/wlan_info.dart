@@ -7,7 +7,7 @@ import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
 import 'fuchsia/access_point.dart';
-import 'fuchsia/wifi_settings_module_model.dart';
+import 'fuchsia/wifi_settings_model.dart';
 
 const TextStyle _kTextStyle = const TextStyle(
   color: Colors.white,
@@ -21,11 +21,11 @@ class WlanInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      new ScopedModelDescendant<WifiSettingsModuleModel>(
+      new ScopedModelDescendant<WifiSettingsModel>(
         builder: (
           BuildContext context,
           Widget child,
-          WifiSettingsModuleModel model,
+          WifiSettingsModel model,
         ) {
           if (_hasConnectionResult(model)) {
             return new Center(
@@ -137,18 +137,18 @@ class WlanInfo extends StatelessWidget {
         },
       );
 
-  bool _hasConnectionResult(WifiSettingsModuleModel model) =>
+  bool _hasConnectionResult(WifiSettingsModel model) =>
       model.connectionResultMessage != null;
 
-  bool _isInError(WifiSettingsModuleModel model) => model.errorMessage != null;
+  bool _isInError(WifiSettingsModel model) => model.errorMessage != null;
 
-  bool _areNetworksAvailable(WifiSettingsModuleModel model) =>
+  bool _areNetworksAvailable(WifiSettingsModel model) =>
       model.accessPoints.isNotEmpty && model.errorMessage == null;
 
-  bool _isSecureNetworkSelected(WifiSettingsModuleModel model) =>
+  bool _isSecureNetworkSelected(WifiSettingsModel model) =>
       model.selectedAccessPoint?.isSecure ?? false;
 
-  bool _isConnecting(WifiSettingsModuleModel model) =>
+  bool _isConnecting(WifiSettingsModel model) =>
       model.selectedAccessPoint != null &&
       (!model.selectedAccessPoint.isSecure || model.passwordEntered);
 }
