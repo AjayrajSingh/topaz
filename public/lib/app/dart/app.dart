@@ -127,7 +127,6 @@ void _connectToService(Channel directory, Channel request, String servicePath) {
   //   union {
   //     int64_t off;
   //     uint32_t mode;
-  //     uint32_t protocol;
   //     uint32_t op;
   //   } arg2;
   //   int32_t reserved1;
@@ -159,8 +158,8 @@ void _connectToService(Channel directory, Channel request, String servicePath) {
   byteData.setUint32(offset, servicePath.length, Endian.little);
   offset += 4;
 
-  // arg -> ZX_FS_RIGHT_READABLE | ZX_FS_RIGHT_WRITABLE | ZX_FS_FLAG_PIPELINE
-  byteData.setInt32(offset, 0x80000003, Endian.little);
+  // arg -> ZX_FS_RIGHT_READABLE | ZX_FS_RIGHT_WRITABLE
+  byteData.setInt32(offset, 0x00000003, Endian.little);
   offset += 4;
 
   // arg2 -> 493 (inside a 64 bit union)
