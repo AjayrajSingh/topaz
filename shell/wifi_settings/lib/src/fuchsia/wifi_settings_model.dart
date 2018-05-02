@@ -6,6 +6,8 @@ import 'dart:async';
 
 import 'package:fuchsia.fidl.wlan_service/wlan_service.dart' as wlan;
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.schemas.dart/com.fuchsia.status.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'access_point.dart';
@@ -17,125 +19,117 @@ const int _kConnectionScanInterval = 3;
 /// All subclasses must connect the [WlanProxy] in their constructor
 class WifiSettingsModel extends Model {
   /// How often to poll the wlan for wifi information.
-  final Duration _updatePeriod = const Duration(seconds: 20);
+  final Duration _updatePeriod = const Duration(seconds: 3);
+
+  /// How often to poll the wlan for available wifi networks.
+  final Duration _scanPeriod = const Duration(seconds: 20);
 
   final wlan.WlanProxy _wlanProxy;
 
-  List<AccessPoint> _accessPoints = <AccessPoint>[];
+  /// Whether or not we've ever gotten the wifi status. Before this,
+  /// we show the loading screen.
+  bool _loading;
+  bool _connecting;
 
-  String _errorMessage;
+  wlan.WlanStatus _status;
+  wlan.ScanResult _scanResult;
+
+  AccessPoint _selectedAccessPoint;
+  AccessPoint _failedAccessPoint;
 
   String _connectionResultMessage;
 
-  AccessPoint _selectedAccessPoint;
-
-  String _password;
-
   Timer _updateTimer;
+  Timer _scanTimer;
+
+  final StatusEntityCodec _statusCodec = new StatusEntityCodec();
+  ModuleDriver _moduleDriver;
 
   /// Constructor.
-  WifiSettingsModel() : _wlanProxy = new wlan.WlanProxy() {
+  WifiSettingsModel()
+      : _wlanProxy = new wlan.WlanProxy(),
+        _loading = true,
+        _connecting = false {
     ApplicationContext applicationContext =
         new ApplicationContext.fromStartupInfo();
 
     connectToService(applicationContext.environmentServices, _wlanProxy.ctrl);
+    _initStatusUpdater();
 
     _update();
+    _scan();
     _updateTimer = new Timer.periodic(_updatePeriod, (_) {
       _update();
     });
-  }
-
-  /// Shuts down the model
-  void close() {
-    _updateTimer.cancel();
-    _wlanProxy.ctrl.close();
-  }
-
-  /// Returns either the currently connected wifi network, or the current wifi status.
-  Future<String> get statusLabel async {
-    if (_selectedAccessPoint != null) {
-      return _selectedAccessPoint.name;
-    }
-    Completer<String> completer = new Completer<String>();
-
-    _wlanProxy.status((wlan.WlanStatus status) {
-      String value;
-      switch (status.state) {
-        case wlan.State.associated:
-          value = status.currentAp.ssid;
-          break;
-        case wlan.State.associating:
-        case wlan.State.joining:
-          value = 'Connecting to ${status.currentAp.ssid}';
-          break;
-        case wlan.State.authenticating:
-          value = 'Authenticating...';
-          break;
-        case wlan.State.bss:
-        case wlan.State.querying:
-        case wlan.State.scanning:
-          value = 'Scanning...';
-          break;
-        default:
-          value = 'Off';
-
-          completer.complete(value);
-      }
-    });
-    return completer.future;
-  }
-
-  void _update() {
-    if (_selectedAccessPoint != null) {
-      return;
-    }
-    _wlanProxy.scan(const wlan.ScanRequest(timeout: 15),
-        (wlan.ScanResult scanResult) {
-      if (_selectedAccessPoint != null) {
-        return;
-      }
-      if (scanResult.error.code == wlan.ErrCode.ok) {
-        // First sort APs by signal strength so when we de-dupe we drop the
-        // weakest ones
-        scanResult.aps.sort((wlan.Ap a, wlan.Ap b) => b.lastRssi - a.lastRssi);
-
-        Set<String> seenNames = new Set<String>();
-        List<AccessPoint> accessPoints = <AccessPoint>[];
-        for (wlan.Ap ap in scanResult.aps) {
-          // Dedupe: if we've seen this ssid before, skip it.
-          if (seenNames.contains(ap.ssid)) {
-            continue;
-          }
-          seenNames.add(ap.ssid);
-
-          accessPoints.add(
-            new AccessPoint(
-              name: ap.ssid,
-              signalStrength: ap.lastRssi.toDouble(),
-              isSecure: ap.isSecure,
-            ),
-          );
-        }
-        _accessPoints = accessPoints;
-        _errorMessage = null;
-        notifyListeners();
-      } else if (_errorMessage != scanResult.error.description) {
-        _accessPoints = <AccessPoint>[];
-        _errorMessage = scanResult.error.description;
-        notifyListeners();
-      }
+    _scanTimer = new Timer.periodic(_scanPeriod, (_) {
+      _scan();
     });
   }
 
-  /// The current list of access points.
-  List<AccessPoint> get accessPoints => _accessPoints.toList();
+  /// The current list of available access points.
+  ///
+  /// Since scanning only works if there are no connected networks,
+  /// this will only containb access points when unconnected.
+  Iterable<AccessPoint> get accessPoints =>
+      _scanResult?.aps?.map((wlan.Ap ap) => new AccessPoint(
+            name: ap.ssid,
+            signalStrength: ap.lastRssi.toDouble(),
+            isSecure: ap.isSecure,
+          ));
 
-  /// The most recent error message.  'null' if there is no error.
-  String get errorMessage => _errorMessage;
+  /// The access point that is either connected, or in the process of being
+  /// connected.
+  AccessPoint get connectedAccessPoint => _status?.currentAp != null
+      ? new AccessPoint(
+          name: _status.currentAp.ssid,
+          isSecure: _status.currentAp.isSecure,
+          signalStrength: _status.currentAp.lastRssi.toDouble())
+      : null;
+
+  /// A string describing the connection status of either the currently
+  /// connected network, or the last attempted network depending
+  /// on if connection was successful.
+  String get connectionStatusMessage {
+    String value;
+    switch (state) {
+      case wlan.State.associated:
+        value = 'Connected';
+        break;
+      case wlan.State.associating:
+      case wlan.State.joining:
+        value = 'Connecting';
+        break;
+      case wlan.State.authenticating:
+        value = 'Authenticating...';
+        break;
+      case wlan.State.bss:
+      case wlan.State.querying:
+      case wlan.State.scanning:
+        value = 'Scanning...';
+        break;
+      default:
+        value = 'Unknown';
+    }
+    return selectedAccessPoint != null ? 'Connecting' : value;
+  }
 
   /// Connection result message.  'null' if there is no connection result message.
   String get connectionResultMessage => _connectionResultMessage;
+
+  /// The last network that was unsuccessfully connected to.
+  AccessPoint get failedAccessPoint => _failedAccessPoint;
+
+  /// The most recent error message.  'null' if there is no error.
+  String get errorMessage => _scanResult?.error?.description;
+
+  /// Whether or not the app has been loaded with the initial state
+  bool get loading => _loading;
+
+  /// Returns true if a connection is in progress
+  bool get connecting => _connecting;
+
+  /// Gets the currently selected access point.
+  AccessPoint get selectedAccessPoint => _selectedAccessPoint;
 
   /// Sets the currently selected access point.
   set selectedAccessPoint(AccessPoint accessPoint) {
@@ -148,20 +142,38 @@ class WifiSettingsModel extends Model {
     }
   }
 
-  /// Gets the currently selected access point.
-  AccessPoint get selectedAccessPoint => _selectedAccessPoint;
+  /// The current state of the network
+  wlan.State get state => _status?.state;
 
-  /// Returns true if the password for a secure network has been entered.
-  bool get passwordEntered => _password?.isEmpty ?? false;
+  /// Cleans up the model state.
+  void dispose() {
+    _updateTimer.cancel();
+    _scanTimer.cancel();
+    _wlanProxy.ctrl.close();
+  }
 
   /// Called when the password for a secure network has been set.
   void onPasswordEntered(String password) {
-    _password = password;
     _connect(_selectedAccessPoint, password);
+  }
+
+  /// Called when the user dismisses the password dialog
+  void onPasswordCanceled() {
+    _selectedAccessPoint = null;
     notifyListeners();
   }
 
+  /// Disconnects from the current network.
+  void disconnect() {
+    _wlanProxy.disconnect((wlan.Error error) {
+      _selectedAccessPoint = null;
+      _loading = true;
+      _update();
+    });
+  }
+
   void _connect(AccessPoint accessPoint, [String password]) {
+    _connecting = true;
     _wlanProxy.connect(
       new wlan.ConnectConfig(
           ssid: accessPoint.name,
@@ -169,22 +181,111 @@ class WifiSettingsModel extends Model {
           scanInterval: _kConnectionScanInterval,
           bssid: ''),
       (wlan.Error error) {
-        _selectedAccessPoint = null;
-        _password = null;
         if (error.code == wlan.ErrCode.ok) {
-          _connectionResultMessage =
-              'Associated successfully with ${accessPoint.name}!';
-        } else {
-          _connectionResultMessage =
-              'Failed to associate with ${accessPoint.name}!\n'
-              '${error.description}';
-        }
-        notifyListeners();
-        new Timer(const Duration(seconds: 5), () {
           _connectionResultMessage = null;
-          notifyListeners();
-        });
+          _failedAccessPoint = null;
+          new Timer(const Duration(seconds: 15), () {
+            // There seems to be a period of time in between connected and
+            // the status giving us a correct result. Thus, we don't deselect
+            // the selected one unless there's a big issue.
+            // TODO: investigate
+            _selectedAccessPoint = null;
+            _connecting = false;
+            notifyListeners();
+          });
+        } else {
+          _connectionResultMessage = error.description;
+          print(
+              'ERIC DUBUG: ${error.description}, ${error.code}, failed: ${selectedAccessPoint.name}');
+          _failedAccessPoint = selectedAccessPoint;
+          _selectedAccessPoint = null;
+          _connecting = false;
+        }
+        _update();
       },
     );
+    notifyListeners();
+  }
+
+  void _scan() {
+    _wlanProxy.scan(const wlan.ScanRequest(timeout: 15),
+        (wlan.ScanResult scanResult) {
+      _scanResult = _dedupe(scanResult);
+      notifyListeners();
+    });
+  }
+
+  void _update() {
+    _wlanProxy.status((wlan.WlanStatus status) {
+      _status = status;
+      _loading = false;
+      notifyListeners();
+    });
+  }
+
+  wlan.ScanResult _dedupe(wlan.ScanResult scanResult) {
+    if (scanResult.error.code == wlan.ErrCode.ok) {
+      // First sort APs by signal strength so when we de-dupe we drop the
+      // weakest ones
+      scanResult.aps.sort((wlan.Ap a, wlan.Ap b) => b.lastRssi - a.lastRssi);
+      Set<String> seenNames = new Set<String>();
+
+      for (wlan.Ap ap in scanResult.aps) {
+        // Dedupe: if we've seen this ssid before, skip it.
+        if (seenNames.contains(ap.ssid)) {
+          scanResult.aps.remove(ap);
+        }
+        seenNames.add(ap.ssid);
+      }
+    }
+    return scanResult;
+  }
+
+  void _updateStatus() {
+    _moduleDriver.put(
+        'status', new StatusEntityData(value: _statusLabel), _statusCodec);
+  }
+
+  /// Brodcasts settings as a mod.
+  ///
+  /// Will be replaced with an agent.
+  Future<void> _initStatusUpdater() async {
+    try {
+      _moduleDriver = new ModuleDriver(onTerminate: dispose);
+      await _moduleDriver.start();
+      _updateStatus();
+      addListener(_updateStatus);
+      // If the device shell runs this, then there will be an exception, which we ignore
+      // TODO: remove mod specific code and move to an agent instead
+    } on Exception catch (_) {}
+  }
+
+  /// Returns either the currently connected wifi network, or the current wifi status.
+  String get _statusLabel {
+    if (state == null) {
+      return null;
+    }
+
+    String value;
+    switch (state) {
+      case wlan.State.associated:
+        value = connectedAccessPoint.name;
+        break;
+      case wlan.State.associating:
+      case wlan.State.joining:
+        value = 'Connecting to ${connectedAccessPoint.name}';
+        break;
+      case wlan.State.authenticating:
+        value = 'Authenticating...';
+        break;
+      case wlan.State.bss:
+      case wlan.State.querying:
+      case wlan.State.scanning:
+        value = 'Scanning...';
+        break;
+      default:
+        value = 'Off';
+    }
+    return value;
   }
 }

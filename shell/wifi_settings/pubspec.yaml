@@ -5,12 +5,12 @@
 name: wifi_settings
 flutter:
   assets:
-    - assets/ic_signal_wifi_0_bar_white_48dp.png
-    - assets/ic_signal_wifi_1_bar_lock_white_48dp.png
-    - assets/ic_signal_wifi_1_bar_white_48dp.png
-    - assets/ic_signal_wifi_2_bar_lock_white_48dp.png
-    - assets/ic_signal_wifi_2_bar_white_48dp.png
-    - assets/ic_signal_wifi_3_bar_lock_white_48dp.png
-    - assets/ic_signal_wifi_3_bar_white_48dp.png
-    - assets/ic_signal_wifi_4_bar_lock_white_48dp.png
-    - assets/ic_signal_wifi_4_bar_white_48dp.png
+    - assets/ic_signal_wifi_0_bar_grey600_48dp.png
+    - assets/ic_signal_wifi_1_bar_lock_grey600_48dp.png
+    - assets/ic_signal_wifi_1_bar_grey600_48dp.png
+    - assets/ic_signal_wifi_2_bar_lock_grey600_48dp.png
+    - assets/ic_signal_wifi_2_bar_grey600_48dp.png
+    - assets/ic_signal_wifi_3_bar_lock_grey600_48dp.png
+    - assets/ic_signal_wifi_3_bar_grey600_48dp.png
+    - assets/ic_signal_wifi_4_bar_lock_grey600_48dp.png
+    - assets/ic_signal_wifi_4_bar_grey600_48dp.png

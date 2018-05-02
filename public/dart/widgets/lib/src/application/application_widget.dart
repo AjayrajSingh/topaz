@@ -31,8 +31,7 @@ class ApplicationWidget extends StatefulWidget {
     @required this.launcher,
     this.onDone,
     this.hitTestable: true,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   _ApplicationWidgetState createState() => new _ApplicationWidgetState();

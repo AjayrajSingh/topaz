@@ -16,7 +16,7 @@ class AccessPoint {
   final bool isSecure;
 
   /// Constructor.
-  AccessPoint({this.name, this.signalStrength, this.isSecure});
+  const AccessPoint({this.name, this.signalStrength, this.isSecure});
 
   /// The image url for an icon representing the signal strength for this access
   /// point.
@@ -29,7 +29,7 @@ class AccessPoint {
         '$bars'
         '_bar_'
         '${isSecure && bars > 0 ? 'lock_' : ''}'
-        'white_48dp.png';
+        'grey600_48dp.png';
   }
 
   int _getInt8(int uint8) {

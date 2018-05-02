@@ -49,6 +49,5 @@ flutter_aot_app("userpicker_device_shell") {
     "//topaz/public/lib/ui/flutter",
     "//topaz/shell/timezone",
     "//topaz/shell/widgets",
-    "//topaz/shell/wifi_settings:lib",
   ]
 }
