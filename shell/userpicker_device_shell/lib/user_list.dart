@@ -17,7 +17,7 @@ const double _kButtonWidthSmall = 116.0;
 const double _kButtonFontSizeLarge = 16.0;
 const double _kButtonFontSizeSmall = 14.0;
 
-const TextStyle _kTextStyle = const TextStyle(
+final TextStyle _kTextStyle = new TextStyle(
   color: Colors.white,
   fontSize: 10.0,
   letterSpacing: 1.0,

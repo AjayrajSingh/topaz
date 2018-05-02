@@ -16,7 +16,6 @@ import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 
 import 'authentication_context_impl.dart';
-import 'debug_text.dart';
 import 'netstack_model.dart';
 import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
@@ -32,9 +31,6 @@ const bool _kShowPerformanceOverlay = false;
 
 /// Set to true to enable network activity overlay.
 const bool _kEnableNetworkingIndicators = false;
-
-/// Set to true to enable debug info overlay.
-const bool _kEnableDebugInfo = false;
 
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
@@ -138,17 +134,6 @@ void main() {
           ),
     ),
   ];
-
-  if (_kEnableDebugInfo) {
-    overlays.add(
-      new OverlayEntry(
-        builder: (BuildContext context) => new Align(
-              alignment: FractionalOffset.topCenter,
-              child: new DebugText(),
-            ),
-      ),
-    );
-  }
 
   if (_kEnableNetworkingIndicators) {
     overlays.add(

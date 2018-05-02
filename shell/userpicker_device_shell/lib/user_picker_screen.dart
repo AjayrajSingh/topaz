@@ -25,72 +25,39 @@ class UserPickerScreen extends StatelessWidget {
       ) {
         return new Material(
           color: Colors.grey[900],
-          child: new Container(
-            child: new Stack(
-              fit: StackFit.passthrough,
-              children: <Widget>[
-                new FractionallySizedBox(
-                  heightFactor: 1.1,
-                  alignment: FractionalOffset.topCenter,
-                  child: new Stack(
-                    fit: StackFit.passthrough,
-                    children: <Widget>[
-                      new Image.asset(
-                        'packages/userpicker_device_shell/res/bg.jpg',
-                        fit: BoxFit.cover,
-                      ),
-                      new Container(color: Colors.black.withAlpha(125)),
-                    ],
-                  ),
+          child: new Stack(
+            fit: StackFit.passthrough,
+            children: <Widget>[
+              /// Add user picker for selecting users and adding new users
+              new Align(
+                alignment: FractionalOffset.bottomRight,
+                child: new RepaintBoundary(
+                  child: new UserList(),
                 ),
+              ),
 
-                /// Add Fuchsia logo.
-                new Align(
-                  alignment: FractionalOffset.topLeft,
+              // Add user removal target
+              new Align(
+                alignment: FractionalOffset.center,
+                child: new RepaintBoundary(
                   child: new Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 16.0,
-                    ),
-                    child: new Image.asset(
-                      'packages/userpicker_device_shell/res/Fuchsia_Logo_40dp_Accent.png',
-                      width: 40.0,
-                      height: 40.0,
-                    ),
-                  ),
-                ),
-
-                /// Add user picker for selecting users and adding new users
-                new Align(
-                  alignment: FractionalOffset.bottomRight,
-                  child: new RepaintBoundary(
-                    child: new UserList(),
-                  ),
-                ),
-
-                // Add user removal target
-                new Align(
-                  alignment: FractionalOffset.center,
-                  child: new RepaintBoundary(
-                    child: new Container(
-                      child: new DragTarget<Account>(
-                        onWillAccept: (Account data) => true,
-                        onAccept: model.removeUser,
-                        builder: (
-                          _,
-                          List<Account> candidateData,
-                          __,
-                        ) =>
-                            new _UserRemovalTarget(
-                              show: model.showingRemoveUserTarget,
-                              grow: candidateData.isNotEmpty,
-                            ),
-                      ),
+                    child: new DragTarget<Account>(
+                      onWillAccept: (Account data) => true,
+                      onAccept: model.removeUser,
+                      builder: (
+                        _,
+                        List<Account> candidateData,
+                        __,
+                      ) =>
+                          new _UserRemovalTarget(
+                            show: model.showingRemoveUserTarget,
+                            grow: candidateData.isNotEmpty,
+                          ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
