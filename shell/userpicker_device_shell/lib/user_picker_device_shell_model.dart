@@ -12,8 +12,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:fuchsia.fidl.cobalt/cobalt.dart' as cobalt;
 import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fuchsia.fidl.gfx/gfx.dart';
-import 'package:fuchsia.fidl.input/input.dart'
-    show KeyboardEvent, KeyboardEventPhase;
+import 'package:fuchsia.fidl.input/input.dart' as input;
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
 import 'package:fuchsia.fidl.presentation/presentation.dart';
@@ -53,7 +52,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     implements
         Presentation,
         ServiceProvider,
-        KeyboardCaptureListener,
+        KeyboardCaptureListenerHack,
+        PointerCaptureListenerHack,
         PresentationModeListener {
   /// Called when the device shell stops.
   final VoidCallback onDeviceShellStopped;
@@ -81,14 +81,17 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   final UserShellChooser _userShellChooser = new UserShellChooser();
   ChildViewConnection _childViewConnection;
   final Set<Account> _draggedUsers = new Set<Account>();
-  final KeyboardCaptureListenerBinding _keyboardCaptureListenerBindingSpaceBar =
-      new KeyboardCaptureListenerBinding();
-  final KeyboardCaptureListenerBinding _keyboardCaptureListenerBindingS =
-      new KeyboardCaptureListenerBinding();
-  final KeyboardCaptureListenerBinding _keyboardCaptureListenerBindingL =
-      new KeyboardCaptureListenerBinding();
+  final KeyboardCaptureListenerHackBinding
+      _keyboardCaptureListenerBindingSpaceBar =
+      new KeyboardCaptureListenerHackBinding();
+  final KeyboardCaptureListenerHackBinding _keyboardCaptureListenerBindingS =
+      new KeyboardCaptureListenerHackBinding();
+  final KeyboardCaptureListenerHackBinding _keyboardCaptureListenerBindingL =
+      new KeyboardCaptureListenerHackBinding();
   final PresentationModeListenerBinding _presentationModeListenerBinding =
       new PresentationModeListenerBinding();
+  final PointerCaptureListenerHackBinding _pointerCaptureListenerBinding =
+      new PointerCaptureListenerHackBinding();
   String _currentAccountId = '';
   ShadowTechnique _currentShadowTechnique = ShadowTechnique.unshadowed;
   bool _currentClippingEnabled = true;
@@ -136,39 +139,40 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     _userPickerScrollController.addListener(_scrollListener);
     enableClipping(_currentClippingEnabled);
     presentation
-      ..captureKeyboardEvent(
-        new KeyboardEvent(
+      ..captureKeyboardEventHack(
+        new input.KeyboardEvent(
           deviceId: 0,
           eventTime: 0,
           hidUsage: 0,
           codePoint: _kKeyCodeSpacebar,
           modifiers: _kKeyModifierLeftCtrl,
-          phase: KeyboardEventPhase.pressed,
+          phase: input.KeyboardEventPhase.pressed,
         ),
         _keyboardCaptureListenerBindingSpaceBar.wrap(this),
       )
-      ..captureKeyboardEvent(
-        new KeyboardEvent(
+      ..captureKeyboardEventHack(
+        new input.KeyboardEvent(
           deviceId: 0,
           eventTime: 0,
           hidUsage: 0,
           codePoint: _kKeyCodeS,
           modifiers: _kKeyModifierLeftCtrl,
-          phase: KeyboardEventPhase.pressed,
+          phase: input.KeyboardEventPhase.pressed,
         ),
         _keyboardCaptureListenerBindingS.wrap(this),
       )
-      ..captureKeyboardEvent(
-        new KeyboardEvent(
+      ..captureKeyboardEventHack(
+        new input.KeyboardEvent(
           deviceId: 0,
           eventTime: 0,
           hidUsage: 0,
           codePoint: _kKeyCodeL,
           modifiers: _kKeyModifierRightAlt,
-          phase: KeyboardEventPhase.pressed,
+          phase: input.KeyboardEventPhase.pressed,
         ),
         _keyboardCaptureListenerBindingL.wrap(this),
       )
+      ..capturePointerEventsHack(_pointerCaptureListenerBinding.wrap(this))
       ..setRendererParams(
         <RendererParam>[
           new RendererParam.withShadowTechnique(_currentShadowTechnique)
@@ -386,7 +390,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   /// |KeyboardCaptureListener|.
   @override
-  void onEvent(KeyboardEvent ev) {
+  void onEvent(input.KeyboardEvent ev) {
     log.info('Keyboard captured in device shell!');
     if (ev.codePoint == _kKeyCodeSpacebar &&
         (_userControllerProxy?.ctrl?.isBound ?? false) &&
@@ -417,6 +421,10 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       enableClipping(_currentClippingEnabled);
     }
   }
+
+  /// |PointerCaptureListener|.
+  @override
+  void onPointerEvent(input.PointerEvent event) {}
 
   void _updatePresentation(UserShellInfo info) {
     setDisplayUsage(info.displayUsage);
@@ -570,9 +578,16 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   // |Presentation|.
   @override
-  void captureKeyboardEvent(KeyboardEvent eventToCapture,
-      InterfaceHandle<KeyboardCaptureListener> listener) {
-    presentation.captureKeyboardEvent(eventToCapture, listener);
+  void captureKeyboardEventHack(input.KeyboardEvent eventToCapture,
+      InterfaceHandle<KeyboardCaptureListenerHack> listener) {
+    presentation.captureKeyboardEventHack(eventToCapture, listener);
+  }
+
+  // |Presentation|.
+  @override
+  void capturePointerEventsHack(
+      InterfaceHandle<PointerCaptureListenerHack> listener) {
+    presentation.capturePointerEventsHack(listener);
   }
 
   /// |Presentation|.
