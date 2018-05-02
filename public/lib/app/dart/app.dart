@@ -195,7 +195,8 @@ void _connectToService(Channel directory, Channel request, String servicePath) {
     offset += 1;
   }
 
-  assert(directory.write(byteData, handles) == ZX.OK);
+  final int status = directory.write(byteData, handles);
+  assert(status == ZX.OK);
 }
 
 class Services {
