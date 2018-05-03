@@ -16,88 +16,88 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   const <List<String>>[
     const <String>[
       'topaz-arm64-debug-qemu_kvm',
-      'arm64-debug-qemu_kvm',
+      'arm64-debug',
       'topaz',
     ],
     const <String>[
       'topaz-arm64-release-qemu_kvm',
-      'arm64-release-qemu_kvm',
-      'topaz'
+      'arm64-release',
+      'topaz',
     ],
     const <String>[
       'topaz-x64-debug-qemu_kvm',
-      'x64-debug-qemu_kvm',
+      'x64-debug',
       'topaz',
     ],
     const <String>[
       'topaz-x64-release-qemu_kvm',
-      'x64-release-qemu_kvm',
-      'topaz'
+      'x64-release',
+      'topaz',
     ],
   ],
   const <List<String>>[
     const <String>[
       'peridot-arm64-debug-qemu_kvm',
-      'arm64-debug-qemu_kvm',
-      'peridot'
+      'arm64-debug',
+      'peridot',
     ],
     const <String>[
       'peridot-arm64-release-qemu_kvm',
-      'arm64-release-qemu_kvm',
-      'peridot'
+      'arm64-releas',
+      'peridot',
     ],
     const <String>[
       'peridot-x64-debug-qemu_kvm',
-      'x64-debug-qemu_kvm',
-      'peridot'
+      'x64-debug',
+      'peridot',
     ],
     const <String>[
       'peridot-x64-release-qemu_kvm',
-      'x64-release-qemu_kvm',
-      'peridot'
+      'x64-release',
+      'peridot',
     ],
   ],
   const <List<String>>[
     const <String>[
       'garnet-arm64-debug-qemu_kvm',
-      'arm64-debug-qemu_kvm',
-      'garnet'
+      'arm64-debug',
+      'garnet',
     ],
     const <String>[
       'garnet-arm64-release-qemu_kvm',
-      'arm64-release-qemu_kvm',
-      'garnet'
+      'arm64-release',
+      'garnet',
     ],
     const <String>[
       'garnet-x64-debug-qemu_kvm',
-      'x64-debug-qemu_kvm',
+      'x64-debug',
       'garnet',
     ],
     const <String>[
       'garnet-x64-release-qemu_kvm',
-      'x64-release-qemu_kvm',
-      'garnet'
+      'x64-release',
+      'garnet',
     ],
   ],
   const <List<String>>[
     const <String>[
-      'zircon-x64-clang-qemu_kvm',
-      'x64-clang-qemu_kvm',
-      'zircon'
-    ],
-    const <String>[
-      'zircon-x64-gcc-qemu_kvm',
-      'x64-gcc-qemu_kvm',
+      'zircon-arm64-clang-qemu_kvm',
+      'arm64-clang',
       'zircon',
     ],
     const <String>[
-      'zircon-arm64-clang-qemu_kvm',
-      'arm64-clang-qemu_kvm',
-      'zircon'
+      'zircon-arm64-gcc-qemu_kvm',
+      'arm64-gcc',
+      'zircon',
     ],
     const <String>[
-      'zircon-arm64-gcc-qemu_kvm',
-      'arm64-gcc-qemu_kvm',
+      'zircon-x64-clang-qemu_kvm',
+      'x64-clang',
+      'zircon',
+    ],
+    const <String>[
+      'zircon-x64-gcc-qemu_kvm',
+      'x64-gcc',
       'zircon',
     ],
   ],
