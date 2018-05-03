@@ -10,20 +10,20 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:entity_schemas/entities.dart' as entities;
+import 'package:fidl/fidl.dart';
 import 'package:flutter/material.dart';
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
+    as chat_fidl;
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.component.dart/component.dart';
-import 'package:fidl/fidl.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.story.dart/story.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
-import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
-    as chat_fidl;
 
 import '../models.dart';
 

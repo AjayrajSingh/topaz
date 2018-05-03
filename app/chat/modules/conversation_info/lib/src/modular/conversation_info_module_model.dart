@@ -9,14 +9,14 @@ import 'dart:typed_data';
 import 'package:chat_models/chat_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:lib.component.dart/component.dart';
-import 'package:lib.logging/logging.dart';
-import 'package:lib.widgets/modular.dart';
 import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
     as fidl;
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.component.dart/component.dart';
+import 'package:lib.widgets/modular.dart';
 
 const String _kChatContentProviderUrl = 'chat_content_provider';
 

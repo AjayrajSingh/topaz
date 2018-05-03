@@ -7,8 +7,8 @@ import 'dart:async';
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia.fidl.component/component.dart' as fidl;
 import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.entity.dart/entity.dart';
-import 'package:lib.logging/logging.dart';
 
 /// A client wrapper for [fidl.ComponentContext].
 class ComponentContextClient {

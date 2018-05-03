@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:test/test.dart';
 
 const String _fileName = 'stdout_with_location_test.dart';

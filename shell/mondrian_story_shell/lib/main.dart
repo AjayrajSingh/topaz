@@ -5,16 +5,16 @@
 import 'dart:convert';
 import 'dart:ui' show window;
 
+import 'package:fidl/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
 import 'package:fuchsia/fuchsia.dart' show exit;
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
-import 'package:fidl/fidl.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 

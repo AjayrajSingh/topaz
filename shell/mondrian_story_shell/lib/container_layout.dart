@@ -3,9 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-
-import 'package:lib.logging/logging.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app.dart/logging.dart';
 
 import 'layout_model.dart';
 import 'model.dart';

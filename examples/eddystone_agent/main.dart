@@ -8,13 +8,13 @@
 import 'dart:async';
 import 'dart:convert' show json;
 
-import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bt;
 import 'package:fuchsia.fidl.bluetooth_low_energy/bluetooth_low_energy.dart'
     as ble;
-import 'package:lib.logging/logging.dart';
-import 'package:lib.proposal.dart/proposal.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();

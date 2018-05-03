@@ -5,7 +5,7 @@
 import 'package:chat_models/chat_models.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'src/modular/conversation_info_module_model.dart';

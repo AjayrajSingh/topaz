@@ -8,8 +8,8 @@ import 'dart:io';
 
 import 'package:armadillo/now.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:fuchsia.fidl.time_zone/time_zone.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 
 export 'package:lib.widgets/model.dart'

@@ -7,19 +7,19 @@
 import 'dart:async';
 import 'dart:convert' show json;
 
-import 'package:fuchsia/fuchsia.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:lib.component.dart/component.dart';
 import 'package:fidl/fidl.dart' hide Message;
+import 'package:fuchsia/fuchsia.dart';
+import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
+import 'package:fuchsia.fidl.component/component.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger_fidl;
 import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:fuchsia.fidl.test_runner/test_runner.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.component.dart/component.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart' hide expect;
 import 'package:topaz.app.chat.agents.content_provider._chat_content_provider_dart_library/src/chat_content_provider_impl.dart';
-import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
 
 import 'src/expect.dart';
 import 'src/mock_chat_message_transporter.dart';

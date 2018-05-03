@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fuchsia.fidl.cobalt/cobalt.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 
 import '../widgets/rk4_spring_simulation.dart';
 import 'spring_model.dart';

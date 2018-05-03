@@ -5,19 +5,19 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:fidl/fidl.dart';
 import 'package:flutter/foundation.dart';
-import 'package:fuchsia.fidl.cobalt/cobalt.dart' as cobalt;
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
-import 'package:fuchsia.fidl.input/input.dart'
-    show KeyboardEvent, KeyboardEventPhase;
-import 'package:fuchsia.fidl.presentation/presentation.dart';
-import 'package:fuchsia.fidl.gfx/gfx.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:fidl/fidl.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:fuchsia.fidl.cobalt/cobalt.dart' as cobalt;
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.gfx/gfx.dart';
+import 'package:fuchsia.fidl.input/input.dart'
+    show KeyboardEvent, KeyboardEventPhase;
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
+import 'package:fuchsia.fidl.presentation/presentation.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:lib.ui.flutter/child_view.dart';

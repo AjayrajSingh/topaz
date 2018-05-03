@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 
 /// Manages the list of active agents and the proposals for showing them.

@@ -5,14 +5,14 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
 
+import 'package:fidl/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';
 
 const String _kModuleUrl = 'example_manual_relationships';

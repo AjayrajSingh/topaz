@@ -6,12 +6,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:fidl/fidl.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
+import 'package:lib.app.dart/logging.dart';
 
 import 'link_watcher_host.dart';
 
 export 'package:fuchsia.fidl.modular/modular.dart';
+
 export 'link_watcher_host.dart';
 
 /// When a value for a given [ref] is not found.

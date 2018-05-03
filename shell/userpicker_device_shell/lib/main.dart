@@ -9,7 +9,7 @@ import 'package:fuchsia.fidl.cobalt/cobalt.dart';
 import 'package:fuchsia.fidl.netstack/netstack.dart';
 import 'package:fuchsia.fidl.time_zone/time_zone.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';

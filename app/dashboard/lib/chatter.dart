@@ -5,13 +5,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:collection/collection.dart';
 import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
     as chat;
-import 'package:collection/collection.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';
 
 const String _kChatContentProviderUrl = 'chat_content_provider';

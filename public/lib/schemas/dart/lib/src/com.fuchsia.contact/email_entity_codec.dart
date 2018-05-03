@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 
 import '../entity_codec.dart';
 import 'email_entity_data.dart';

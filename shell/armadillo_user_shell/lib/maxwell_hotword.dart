@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fuchsia.fidl.speech/speech.dart' as speech;
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 
 import 'rate_limited_retry.dart';
 

@@ -5,7 +5,7 @@
 // import 'dart:math';
 
 import 'package:flutter/widgets.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 
 import 'layout_model.dart';
 import 'model.dart';

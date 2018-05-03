@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.logging/logging.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app.dart/logging.dart';
 
 /// Called when we receive a request to focus on [storyId];
 typedef void OnFocusRequest(String storyId);

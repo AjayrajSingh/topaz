@@ -9,7 +9,7 @@ import 'package:fuchsia.fidl.bluetooth_gatt/bluetooth_gatt.dart' as gatt;
 import 'package:fuchsia.fidl.bluetooth_low_energy/bluetooth_low_energy.dart'
     as ble;
 import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 // ignore_for_file: public_member_api_docs

@@ -7,13 +7,13 @@ import 'dart:convert' show utf8;
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart' show InterfaceRequest;
-import 'package:fuchsia.fidl.mem/mem.dart';
-import 'package:lib.ledger.dart/ledger.dart';
-import 'package:fuchsia.fidl.ledger/ledger.dart';
-import 'package:lib.logging/logging.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:meta/meta.dart';
 import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
+import 'package:fuchsia.fidl.ledger/ledger.dart';
+import 'package:fuchsia.fidl.mem/mem.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.ledger.dart/ledger.dart';
+import 'package:meta/meta.dart';
 
 import 'chat_message_transporter.dart';
 import 'conversation_list_watcher.dart';

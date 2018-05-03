@@ -5,14 +5,14 @@
 import 'dart:async';
 import 'dart:convert' show json;
 
-import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
-import 'package:lib.logging/logging.dart';
 
 import 'package:config/config.dart';
 import 'package:eventsource/eventsource.dart';
-import 'package:http/http.dart' as http;
-import 'package:meta/meta.dart';
 import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
+import 'package:http/http.dart' as http;
+import 'package:lib.app.dart/logging.dart';
+import 'package:meta/meta.dart';
 
 import 'exceptions.dart';
 

@@ -2,11 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
 import 'package:fidl/fidl.dart';
-import 'package:lib.logging/logging.dart';
-
 import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
+import 'package:lib.app.dart/logging.dart';
 
 import 'firebase_db_client_impl.dart';
 

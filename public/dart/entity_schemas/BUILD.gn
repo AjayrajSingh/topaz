@@ -12,6 +12,6 @@ dart_library("entity_schemas") {
   ]
 
   deps = [
-    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/lib/app/dart",
   ]
 }

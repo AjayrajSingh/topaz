@@ -7,15 +7,15 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
+    as fidl;
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger;
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ledger.dart/ledger.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:lib.schemas.dart/com.fuchsia.contact.dart' as entities;
 import 'package:meta/meta.dart';
-import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
-    as fidl;
 
 import '../store/contacts_store.dart';
 import 'contacts_watcher.dart';

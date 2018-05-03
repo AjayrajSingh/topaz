@@ -5,7 +5,7 @@
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:test/test.dart';
 
 /// Convert from little endian format bytes to an integer of specified length.

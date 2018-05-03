@@ -17,6 +17,6 @@ dart_library("dart") {
     "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/pub/json_schema",
     "//topaz/public/dart/fidl",
-    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/lib/app/dart",
   ]
 }

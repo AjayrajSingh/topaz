@@ -5,10 +5,10 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:http/http.dart' as http;
 import 'package:fuchsia.fidl.images/images.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:http/http.dart' as http;
+import 'package:lib.app.dart/logging.dart';
 import 'package:zircon/zircon.dart';
 
 export 'dart:typed_data' show Uint8List;

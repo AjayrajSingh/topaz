@@ -4,7 +4,7 @@
 
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 
 /// Callback to be run with the updated contact entries

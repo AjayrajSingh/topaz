@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:test/test.dart';
 
 void main() {

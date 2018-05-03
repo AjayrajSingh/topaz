@@ -15,6 +15,6 @@ dart_library("dart") {
 
   deps = [
     "//peridot/public/lib:fidl",
-    "//topaz/public/dart/logging:lib.logging",
+    "//topaz/public/lib/app/dart",
   ]
 }

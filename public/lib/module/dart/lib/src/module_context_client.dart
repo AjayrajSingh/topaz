@@ -4,21 +4,20 @@
 
 import 'dart:async';
 
-import 'package:lib.component.dart/component.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:fidl/fidl.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
-import 'package:lib.story.dart/story.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 // See DNO-201 for details on the _view_token path.
 import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.component.dart/component.dart';
+import 'package:lib.story.dart/story.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:meta/meta.dart';
 
 import 'module_controller_client.dart';
 
-export 'package:lib.component.dart/component.dart' show ComponentContextClient;
 export 'package:fuchsia.fidl.modular/modular.dart';
+export 'package:lib.component.dart/component.dart' show ComponentContextClient;
 
 /// When Module resolution fails.
 class ResolutionException implements Exception {

@@ -12,8 +12,8 @@ group("dart_unittests") {
     "app/dashboard:tests",
     "app/documents/packages/utils:test",
     "public/dart/fixtures:test",
-    "public/dart/logging:test",
     "public/dart/widgets:test",
+    "public/lib/app/dart:test",
     "public/lib/schemas/dart:test",
     "shell:tests",
     "tools/dartfmt_extras:test",
@@ -27,9 +27,9 @@ group("dart_unittests") {
 # manifests indexed by the on-device module resolver when the user logs in.
 initial_module_packages("topaz_modules_index") {
   packages = [
-    "image",
     "contacts_picker",
     "documents_info",
+    "image",
     "video",
   ]
 }

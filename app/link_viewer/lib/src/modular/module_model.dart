@@ -4,7 +4,7 @@
 
 import 'dart:convert' show json;
 
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 /// The model for the link viewer module.

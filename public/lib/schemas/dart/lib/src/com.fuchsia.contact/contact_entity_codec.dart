@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 
 import '../../com.fuchsia.contact.dart';
 import '../entity_codec.dart';

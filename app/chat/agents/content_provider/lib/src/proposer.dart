@@ -5,9 +5,9 @@
 import 'dart:convert' show json;
 import 'dart:io';
 
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app.dart/logging.dart';
 
 const String _kContactsJsonFile = '/system/data/modules/contacts.json';
 

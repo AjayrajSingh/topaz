@@ -5,10 +5,10 @@
 import 'dart:async';
 import 'dart:convert' show json;
 
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.ledger.dart/ledger.dart';
 import 'package:fuchsia.fidl.ledger/ledger.dart';
-import 'package:lib.logging/logging.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.ledger.dart/ledger.dart';
 import 'package:meta/meta.dart';
 
 import 'base_page_watcher.dart';

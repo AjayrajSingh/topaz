@@ -5,14 +5,14 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:lib.logging/logging.dart';
-import 'package:lib.agent.dart/agent.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
-import 'package:meta/meta.dart';
 import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
+import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
+import 'package:lib.agent.dart/agent.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:meta/meta.dart';
 
 import 'src/chat_content_provider_impl.dart';
 import 'src/firebase_chat_message_transporter.dart';

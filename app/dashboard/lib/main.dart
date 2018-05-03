@@ -2,15 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/app.dart';
-import 'package:flutter/widgets.dart';
-import 'package:lib.logging/logging.dart';
-import 'package:lib.widgets/modular.dart';
-
 import 'package:dashboard/build_status_model.dart';
 import 'package:dashboard/dashboard_app.dart';
 import 'package:dashboard/dashboard_module_model.dart';
 import 'package:dashboard/service/build_service.dart';
+import 'package:flutter/widgets.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.widgets/modular.dart';
 
 const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   const <List<String>>[

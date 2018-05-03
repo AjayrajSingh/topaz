@@ -4,7 +4,7 @@
 
 import 'package:collection/collection.dart';
 import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets.dart/model.dart';
 import 'package:meta/meta.dart';
 

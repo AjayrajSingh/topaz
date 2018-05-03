@@ -4,11 +4,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
-import 'package:lib.logging/logging.dart';
 import 'package:lib.schemas.dart/com.fuchsia.documents.dart';
 import 'package:lib.widgets.dart/model.dart';
-import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
 
 import 'src/widgets/info.dart';
 

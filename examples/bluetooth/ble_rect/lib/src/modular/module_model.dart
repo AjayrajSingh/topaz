@@ -11,7 +11,7 @@ import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bt;
 import 'package:fuchsia.fidl.bluetooth_gatt/bluetooth_gatt.dart' as gatt;
 import 'package:fuchsia.fidl.bluetooth_low_energy/bluetooth_low_energy.dart'
     as ble;
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 typedef bool _ValueWriteFunc(List<int> value);
