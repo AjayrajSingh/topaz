@@ -24,6 +24,8 @@ enum DartErrorHandleType {
 
 DartErrorHandleType GetErrorHandleType(Dart_Handle handle);
 
+int GetErrorExitCode(Dart_Handle handle);
+
 }  // namespace tonic
 
 #endif  // LIB_TONIC_DART_ERROR_H_

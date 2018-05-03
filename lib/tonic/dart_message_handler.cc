@@ -20,20 +20,16 @@ DartMessageHandler::DartMessageHandler()
       isolate_had_uncaught_exception_error_(false),
       isolate_had_fatal_error_(false),
       isolate_last_error_(kNoError),
-      task_runner_(nullptr),
-      message_epilogue_(nullptr) {}
+      task_runner_(nullptr) {}
 
 DartMessageHandler::~DartMessageHandler() {
   task_runner_ = nullptr;
-  message_epilogue_ = nullptr;
 }
 
-void DartMessageHandler::Initialize(const fxl::RefPtr<fxl::TaskRunner>& runner,
-                                    std::function<void()> message_epilogue) {
+void DartMessageHandler::Initialize(const fxl::RefPtr<fxl::TaskRunner>& runner) {
   // Only can be called once.
   FXL_CHECK(!task_runner_);
   task_runner_ = runner;
-  message_epilogue_ = message_epilogue;
   FXL_CHECK(task_runner_);
   Dart_SetMessageNotifyCallback(MessageNotifyCallback);
 }
@@ -97,10 +93,12 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
       Dart_SetPausedOnStart(false);
       // We've resumed, handle normal messages that are in the queue.
       result = Dart_HandleMessage();
-      if (message_epilogue_) {
-        message_epilogue_();
-      }
       error = LogIfError(result);
+      dart_state->MessageEpilogue(result);
+      if (!Dart_CurrentIsolate()) {
+        isolate_exited_ = true;
+        return;
+      }
     }
   } else if (Dart_IsPausedOnExit()) {
     // We are paused on isolate exit. Only handle service messages until we are
@@ -115,9 +113,6 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
   } else {
     // We are processing messages normally.
     result = Dart_HandleMessage();
-    if (message_epilogue_) {
-      message_epilogue_();
-    }
     // If the Dart program has set a return code, then it is intending to shut
     // down by way of a fatal error, and so there is no need to emit a log
     // message.
@@ -126,6 +121,11 @@ void DartMessageHandler::OnHandleMessage(DartState* dart_state) {
       error = true;
     } else {
       error = LogIfError(result);
+    }
+    dart_state->MessageEpilogue(result);
+    if (!Dart_CurrentIsolate()) {
+      isolate_exited_ = true;
+      return;
     }
   }
 

@@ -31,4 +31,16 @@ DartErrorHandleType GetErrorHandleType(Dart_Handle handle) {
   }
 }
 
+int GetErrorExitCode(Dart_Handle handle) {
+  if (Dart_IsCompilationError(handle)) {
+    return 254;  // dart::bin::kCompilationErrorExitCode
+  } else if (Dart_IsApiError(handle)) {
+    return 253;  // dart::bin::kApiErrorExitCode
+  } else if (Dart_IsError(handle)) {
+    return 255;  // dart::bin::kErrorExitCode
+  } else {
+    return 0;
+  }
+}
+
 }  // namespace tonic

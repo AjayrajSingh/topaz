@@ -48,7 +48,7 @@ class DartApplicationController : public component::ApplicationController {
   void Wait(WaitCallback callback) override;
 
   // Idle notification.
-  void MessageEpilogue();
+  void MessageEpilogue(Dart_Handle result);
   void OnIdleTimer(async_t* async,
                    async::WaitBase* wait,
                    zx_status_t status,

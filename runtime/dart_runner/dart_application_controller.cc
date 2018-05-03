@@ -289,7 +289,12 @@ bool DartApplicationController::CreateIsolate(
   // Create the isolate from the snapshot.
   char* error = nullptr;
 
-  auto state = new tonic::DartState();  // Freed in IsolateShutdownCallback.
+  // TODO(dart_runner): Pass if we start using tonic's loader.
+  intptr_t namespace_fd = -1;
+  // Freed in IsolateShutdownCallback.
+  auto state = new tonic::DartState(namespace_fd,
+      [this](Dart_Handle result) { MessageEpilogue(result); });
+
   isolate_ = Dart_CreateIsolate(
       url_.c_str(), label_.c_str(),
       reinterpret_cast<const uint8_t*>(isolate_snapshot_data),
@@ -303,8 +308,7 @@ bool DartApplicationController::CreateIsolate(
   state->SetIsolate(isolate_);
 
   state->message_handler().Initialize(
-      fsl::MessageLoop::GetCurrent()->task_runner(),
-      [this] { MessageEpilogue(); });
+      fsl::MessageLoop::GetCurrent()->task_runner());
 
   state->SetReturnCodeCallback(
       [this](uint32_t return_code) { return_code_ = return_code; });
@@ -369,10 +373,11 @@ bool DartApplicationController::Main() {
       dart_arguments,
   };
 
-  Dart_Handle main =
+  Dart_Handle main_result =
       Dart_Invoke(Dart_RootLibrary(), ToDart("main"), arraysize(argv), argv);
-  if (Dart_IsError(main)) {
-    FXL_LOG(ERROR) << Dart_GetError(main);
+  if (Dart_IsError(main_result)) {
+    FXL_LOG(ERROR) << Dart_GetError(main_result);
+    return_code_ = tonic::GetErrorExitCode(main_result);
     Dart_ExitScope();
     return false;
   }
@@ -416,7 +421,13 @@ const zx::duration kIdleWaitDuration = zx::sec(2);
 const zx::duration kIdleNotifyDuration = zx::msec(500);
 const zx::duration kIdleSlack = zx::sec(1);
 
-void DartApplicationController::MessageEpilogue() {
+void DartApplicationController::MessageEpilogue(Dart_Handle result) {
+  return_code_ = tonic::GetErrorExitCode(result);
+  if (return_code_ != 0) {
+    Dart_ShutdownIsolate();
+    return;
+  }
+
   idle_start_ = zx::clock::get(ZX_CLOCK_MONOTONIC);
   zx_status_t status =
       idle_timer_.set(idle_start_ + kIdleWaitDuration, kIdleSlack);
