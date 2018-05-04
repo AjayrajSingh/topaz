@@ -13,7 +13,6 @@ group("zircon") {
   ]
 
   deps = [
-    ":dart_zircon_test",
     ":package_for_analysis",
   ]
 }

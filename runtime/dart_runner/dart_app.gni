@@ -135,15 +135,20 @@ template("dart_jit_app") {
   }
 
   package(target_name) {
-    forward_variables_from(invoker, [ "testonly" ])
+    forward_variables_from(invoker, [ "testonly", "tests"])
 
     if (defined(invoker.fuchsia_package_name)) {
       package_name = invoker.fuchsia_package_name
     }
 
+    non_dart_deps = []
+    if (defined(invoker.non_dart_deps)) {
+      non_dart_deps = invoker.non_dart_deps
+    }
+
     deps = [
       ":$kernel_target_name",
-    ]
+    ] + non_dart_deps
 
     extra = [ manifest_path ]
 
@@ -295,15 +300,21 @@ template("dart_aot_app") {
                               "root_out_dir") + "/lib$target_name.so"
 
   package(target_name) {
-    forward_variables_from(invoker, [ "testonly" ])
+    forward_variables_from(invoker, [ "testonly", "tests" ])
 
     if (defined(invoker.fuchsia_package_name)) {
       package_name = invoker.fuchsia_package_name
     }
 
+    non_dart_deps = []
+    if (defined(invoker.non_dart_deps)) {
+      non_dart_deps = invoker.non_dart_deps
+    }
+
     deps = [
       ":$dylib_target_name",
-    ]
+    ] + non_dart_deps
+
 
     resources = [
       {
@@ -354,6 +365,9 @@ template("dart_aot_app") {
 #
 #   resources (optional)
 #     Resources for the package (see //build/package.gni)
+#
+#   tests (optional)
+#     List of tests forwarded for the package. See the definition in //build/package.gni.
 #
 #   extra_entry_manifests (optional)
 #     List of AOT entry point manifest files. Most apps do not need this.
