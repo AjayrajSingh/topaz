@@ -25,16 +25,16 @@ void main() {
   ValueModel<doc_fidl.Document> model = new ValueModel<doc_fidl.Document>();
 
   ModuleDriver driver = new ModuleDriver(
-    onTerminateFromCaller: docsInterfaceProxy.ctrl.close,
+    onTerminate: docsInterfaceProxy.ctrl.close,
   );
 
   // Connect to the service proxy
-  driver
-      .connectToAgentServiceWithProxy(
-          'documents', docsInterfaceProxy)
-      .then((_) {
-    log.info('Connected to DocumentInterfaceProxy');
-  }, onError: _handleError);
+  driver.connectToAgentServiceWithProxy('documents', docsInterfaceProxy).then(
+    (_) {
+      log.info('Connected to DocumentInterfaceProxy');
+    },
+    onError: _handleError,
+  );
 
   // Listen to changes to the current document
   driver

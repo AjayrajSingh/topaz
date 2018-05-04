@@ -32,6 +32,12 @@ export 'package:lib.ui.flutter/child_view.dart'
 /// Function definition to handle [data] that is received from a message queue.
 typedef void OnReceiveMessage(String data, void ack());
 
+/// Function to run when the module terminates
+typedef void OnTerminate();
+
+/// Function to run when the module terminates asynchronously
+typedef Future<Null> OnTerminateAsync();
+
 const int _kCobaltProjectId = 104;
 const int _kFirstLinkDataMetricId = 1;
 
@@ -86,14 +92,14 @@ class ModuleDriver {
   /// Shadow async completion of [start].
   Completer<ModuleDriver> _start;
 
-  // Allow the caller to specify a function to run on terminate
-  Function _onTerminateFromCaller;
+  // Methods to run when the module is being torn down
+  final List<OnTerminateAsync> _onTerminatesAsync = <OnTerminateAsync>[];
 
   /// Create a new [ModuleDriver].
   ///
   ///     ModuleDriver module = new ModuleDriver();
   ///
-  /// [onTerminateFromCaller] lets the caller specify a function to run in the
+  /// [onTerminate] lets the caller specify a function to run in the
   /// onTerminate call.
   ///
   /// Register for link updates:
@@ -106,17 +112,15 @@ class ModuleDriver {
   ///     module.start();
   ///
   ModuleDriver({
-    // TODO(MS-1423): remove onTerminateFromCaller and only use onTerminate.
-    Function onTerminateFromCaller,
-    Function onTerminate,
-  })  : _onTerminateFromCaller = onTerminateFromCaller ?? onTerminate,
-        _initializationTime = new DateTime.now() {
-    if (onTerminateFromCaller != null) {
-      log
-        ..warning('onTerminateFromCaller is deprecated, use onTerminate')
-        ..warning('=> see MS-1423');
+    // TODO(MS-1521): consider removing
+    OnTerminate onTerminate,
+  }) : _initializationTime = new DateTime.now() {
+    if (onTerminate != null) {
+      _onTerminatesAsync.add(() async {
+        onTerminate();
+        return null;
+      });
     }
-
     _lifecycle = new LifecycleHost(
       onTerminate: _handleTerminate,
     );
@@ -153,6 +157,18 @@ class ModuleDriver {
   /// name for the module
   String get moduleName => _moduleName;
   set moduleName(String name) => _moduleName = name.trim();
+
+  /// Add other methods to run on terminate
+  void addOnTerminateHandler(OnTerminate onTerminate) => _onTerminatesAsync.add(
+        () async {
+          onTerminate();
+          return null;
+        },
+      );
+
+  /// Add a method to run on terminate asynchronously
+  void addOnTerminateAsyncHandler(OnTerminateAsync onTerminate) =>
+      _onTerminatesAsync.add(onTerminate);
 
   /// Start the module and connect to dependent services on module
   /// initialization.
@@ -290,10 +306,6 @@ class ModuleDriver {
   Future<Null> _handleTerminate() {
     log.info('closing service connections');
 
-    if (_onTerminateFromCaller != null) {
-      _onTerminateFromCaller();
-    }
-
     _messageQueueReceiver?.close();
     _messageQueue?.ctrl?.close();
     _encoder.ctrl.close();
@@ -302,7 +314,9 @@ class ModuleDriver {
       moduleContext.terminate(),
       _module.terminate(),
       _lifecycle.terminate(),
-    ];
+    ]..addAll(
+        _onTerminatesAsync.map((OnTerminateAsync onTerminate) => onTerminate()),
+      );
 
     return Future.wait(futures).then((_) {
       log.info('successfully closed all service connections');
