@@ -6,6 +6,7 @@
 
 #include <fuchsia/cpp/modular.h>
 #include <fuchsia/cpp/views_v1.h>
+#include <lib/async-loop/cpp/loop.h>
 
 #include "lib/app/cpp/application_context.h"
 #include "topaz/runtime/web_view/web_view_impl.h"
@@ -16,7 +17,7 @@ class WebViewProvider : views_v1::ViewProvider,
                         modular::LinkWatcher
 {
  public:
-  WebViewProvider(const std::string url);
+  WebViewProvider(async::Loop* loop, const std::string url);
 
  private:
   // |ViewProvider|
@@ -35,6 +36,7 @@ class WebViewProvider : views_v1::ViewProvider,
   // modular::LinkWatcher
   void Notify(fidl::StringPtr json) final;
 
+  async::Loop* const loop_;
   std::string url_;
   std::unique_ptr<component::ApplicationContext> context_;
   std::unique_ptr<WebViewImpl> view_;

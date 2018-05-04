@@ -7,11 +7,12 @@
 #include <fdio/io.h>
 #include <hid/hid.h>
 #include <hid/usages.h>
+#include <lib/async/cpp/task.h>
+#include <lib/async/default.h>
 #include <zircon/pixelformat.h>
 #include <zircon/syscalls.h>
 #include <zircon/types.h>
 
-#include "lib/fsl/tasks/message_loop.h"
 #include "topaz/runtime/web_view/schema_org_context.h"
 
 using namespace WebCore;
@@ -91,7 +92,7 @@ WebViewImpl::WebViewImpl(
     outgoing_services_.AddBinding(std::move(outgoing_services_request));
   }
 
-  fsl::MessageLoop::GetCurrent()->task_runner()->PostTask(
+  async::PostTask(async_get_default(),
       ([weak = weak_factory_.GetWeakPtr()]() {
         if (weak)
           weak->CallIdle();
@@ -283,7 +284,7 @@ void WebViewImpl::OnSceneInvalidated(
 void WebViewImpl::CallIdle() {
   web_view_.iterateEventLoop();
   InvalidateScene();
-  fsl::MessageLoop::GetCurrent()->task_runner()->PostTask(
+async::PostTask(async_get_default(),
       ([weak = weak_factory_.GetWeakPtr()]() {
         if (weak)
           weak->CallIdle();

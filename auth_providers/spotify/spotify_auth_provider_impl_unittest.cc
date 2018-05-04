@@ -6,7 +6,7 @@
 
 #include "garnet/lib/callback/capture.h"
 #include "garnet/lib/callback/set_when_called.h"
-#include "garnet/lib/gtest/test_with_message_loop.h"
+#include "garnet/lib/gtest/test_with_loop.h"
 #include "garnet/lib/network_wrapper/fake_network_wrapper.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
@@ -15,13 +15,13 @@
 namespace spotify_auth_provider {
 namespace {
 
-class SpotifyAuthProviderImplTest : public gtest::TestWithMessageLoop {
+class SpotifyAuthProviderImplTest : public gtest::TestWithLoop {
  public:
   SpotifyAuthProviderImplTest()
-      : network_wrapper_(message_loop_.async()),
+      : network_wrapper_(dispatcher()),
         app_context_(
             component::ApplicationContext::CreateFromStartupInfo().get()),
-        spotify_auth_provider_impl_(message_loop_.task_runner(), app_context_,
+        spotify_auth_provider_impl_(app_context_,
                                    &network_wrapper_,
                                    auth_provider_.NewRequest()) {}
 
@@ -41,7 +41,7 @@ TEST_F(SpotifyAuthProviderImplTest, EmptyWhenClientDisconnected) {
   bool on_empty_called = false;
   spotify_auth_provider_impl_.set_on_empty([this, &on_empty_called] {
     on_empty_called = true;
-    message_loop_.PostQuitTask();
+    QuitLoop();
   });
   auth_provider_.Unbind();
   RunLoopUntilIdle();

@@ -10,7 +10,6 @@
 
 #include "topaz/examples/media/vu_meter/vu_meter_params.h"
 #include "lib/app/cpp/connect.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
 #include "lib/media/audio/types.h"
 #include "third_party/skia/include/core/SkColor.h"
@@ -22,16 +21,19 @@ constexpr uint64_t kBytesPerFrame = 4;
 namespace examples {
 
 VuMeterView::VuMeterView(
+    async::Loop* loop,
     views_v1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     component::ApplicationContext* application_context,
     const VuMeterParams& params)
     : mozart::SkiaView(std::move(view_manager), std::move(view_owner_request),
                        "VU Meter"),
+      loop_(loop),
       fast_left_(kFastDecay),
       fast_right_(kFastDecay),
       slow_left_(kSlowDecay),
       slow_right_(kSlowDecay) {
+  FXL_DCHECK(loop);
   FXL_DCHECK(params.is_valid());
 
   auto audio_server =
@@ -187,7 +189,7 @@ void VuMeterView::OnPacketCaptured(media::MediaPacket packet) {
 
 void VuMeterView::Shutdown() {
     capturer_.Unbind();
-    fsl::MessageLoop::GetCurrent()->PostQuitTask();
+    loop_->Quit();
 }
 
 }  // namespace examples

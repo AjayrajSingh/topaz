@@ -12,7 +12,6 @@
 #include "lib/app/cpp/connect.h"
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fsl/io/fd.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/logging.h"
 #include "lib/media/timeline/timeline.h"
 #include "lib/url/gurl.h"
@@ -54,6 +53,7 @@ bool Contains(const geometry::RectF& rect, float x, float y) {
 }  // namespace
 
 MediaPlayerView::MediaPlayerView(
+    async::Loop* loop,
     views_v1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
     component::ApplicationContext* application_context,
@@ -61,8 +61,11 @@ MediaPlayerView::MediaPlayerView(
     : mozart::BaseView(std::move(view_manager),
                        std::move(view_owner_request),
                        "Media Player"),
+
+      loop_(loop),
       background_node_(session()),
       controls_widget_(session()) {
+  FXL_DCHECK(loop);
   FXL_DCHECK(params.is_valid());
 
   scenic_lib::Material background_material(session());
@@ -168,7 +171,7 @@ bool MediaPlayerView::OnInputEvent(input::InputEvent event) {
           handled = true;
           break;
         case HID_USAGE_KEY_Q:
-          fsl::MessageLoop::GetCurrent()->PostQuitTask();
+          loop_->Quit();
           handled = true;
           break;
         default:

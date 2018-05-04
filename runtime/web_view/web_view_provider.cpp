@@ -4,17 +4,18 @@
 
 #include "topaz/runtime/web_view/web_view_provider.h"
 
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/icu_data/cpp/icu_data.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
 
-WebViewProvider::WebViewProvider(const std::string url)
-    : url_(url),
+WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
+    : loop_(loop),
+      url_(url),
       context_(component::ApplicationContext::CreateFromStartupInfo()),
       view_provider_binding_(this),
       module_binding_(this),
       lifecycle_binding_(this),
       main_link_watcher_binding_(this) {
+  FXL_DCHECK(loop);
   if (!icu_data::Initialize(context_.get())) {
     FXL_LOG(WARNING) << "Could not load ICU data";
   }
@@ -82,7 +83,7 @@ void WebViewProvider::Initialize(
 }
 
 void WebViewProvider::Terminate() {
-  fsl::MessageLoop::GetCurrent()->QuitNow();
+  loop_->Quit();
 }
 
 void WebViewProvider::Notify(fidl::StringPtr json) {

@@ -29,12 +29,10 @@ using auth_providers::oauth::ParseOAuthResponse;
 using modular::JsonValueToPrettyString;
 
 SpotifyAuthProviderImpl::SpotifyAuthProviderImpl(
-    fxl::RefPtr<fxl::TaskRunner> main_runner,
     component::ApplicationContext* app_context,
     network_wrapper::NetworkWrapper* network_wrapper,
     fidl::InterfaceRequest<auth::AuthProvider> request)
-    : main_runner_(std::move(main_runner)),
-      app_context_(app_context),
+    : app_context_(app_context),
       network_wrapper_(network_wrapper),
       binding_(this, std::move(request)) {
   FXL_DCHECK(network_wrapper_);
@@ -118,9 +116,7 @@ void SpotifyAuthProviderImpl::GetAppAccessToken(
                              "&grant_type=refresh_token");
 
   auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
+      [request = std::move(request)] { return request.Build(); });
 
   Request(
       std::move(request_factory), [callback](network::URLResponse response) {
@@ -206,9 +202,7 @@ void SpotifyAuthProviderImpl::WillSendRequest(const fidl::StringPtr incoming_url
                              "&grant_type=authorization_code");
 
   auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
+      [request = std::move(request)] { return request.Build(); });
 
   // Generate long lived credentials (OAuth refresh token)
   Request(
@@ -247,9 +241,7 @@ void SpotifyAuthProviderImpl::GetUserProfile(
                      .SetAuthorizationHeader(access_token.get());
 
   auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
+      [request = std::move(request)] { return request.Build(); });
 
   Request(
       std::move(request_factory),

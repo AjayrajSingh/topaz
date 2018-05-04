@@ -11,15 +11,13 @@
 #include "garnet/lib/network_wrapper/network_wrapper.h"
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
-#include "lib/fxl/tasks/task_runner.h"
 #include "topaz/auth_providers/spotify/spotify_auth_provider_impl.h"
 
 namespace spotify_auth_provider {
 
 class FactoryImpl : public auth::AuthProviderFactory {
  public:
-  FactoryImpl(fxl::RefPtr<fxl::TaskRunner> main_runner,
-              component::ApplicationContext* app_context,
+  FactoryImpl(component::ApplicationContext* app_context,
               network_wrapper::NetworkWrapper* network_wrapper);
 
   ~FactoryImpl() override;
@@ -31,7 +29,6 @@ class FactoryImpl : public auth::AuthProviderFactory {
   void GetAuthProvider(fidl::InterfaceRequest<auth::AuthProvider> auth_provider,
                        GetAuthProviderCallback callback) override;
 
-  fxl::RefPtr<fxl::TaskRunner> main_runner_;
   component::ApplicationContext* const app_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
 

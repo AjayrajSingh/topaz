@@ -46,14 +46,15 @@ using auth_providers::oauth::ParseOAuthResponse;
 using modular::JsonValueToPrettyString;
 
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
-    fxl::RefPtr<fxl::TaskRunner> main_runner,
+    async_t* const main_dispatcher,
     component::ApplicationContext* app_context,
     network_wrapper::NetworkWrapper* network_wrapper,
     fidl::InterfaceRequest<auth::AuthProvider> request)
-    : main_runner_(std::move(main_runner)),
+    : main_dispatcher_(main_dispatcher),
       app_context_(app_context),
       network_wrapper_(network_wrapper),
       binding_(this, std::move(request)) {
+  FXL_DCHECK(main_dispatcher_);
   FXL_DCHECK(network_wrapper_);
 
   // The class shuts down when the client connection is disconnected.
@@ -127,9 +128,7 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
                              "&grant_type=refresh_token");
 
   auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
+      [request = std::move(request)] { return request.Build(); });
 
   Request(
       std::move(request_factory), [callback](network::URLResponse response) {
@@ -168,9 +167,7 @@ void GoogleAuthProviderImpl::GetAppIdToken(
                              "&grant_type=refresh_token");
 
   auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
+      [request = std::move(request)] { return request.Build(); });
   Request(
       std::move(request_factory), [callback](network::URLResponse response) {
         auto oauth_response = ParseOAuthResponse(std::move(response));
@@ -213,9 +210,7 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
 
   // Exchange credential to access token at Google OAuth token endpoint
   auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
+      [request = std::move(request)] { return request.Build(); });
   Request(
       std::move(request_factory), [callback](network::URLResponse response) {
         auto oauth_response = ParseOAuthResponse(std::move(response));
@@ -251,9 +246,7 @@ void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
   auto request = OAuthRequestBuilder(url, "POST").SetUrlEncodedBody("");
 
   auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
+      [request = std::move(request)] { return request.Build(); });
 
   Request(
       std::move(request_factory),
@@ -310,9 +303,7 @@ void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
                              "&grant_type=authorization_code");
 
   auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
+      [request = std::move(request)] { return request.Build(); });
 
   // Generate long lived credentials
   Request(
@@ -351,9 +342,7 @@ void GoogleAuthProviderImpl::GetUserProfile(
                      .SetAuthorizationHeader(access_token.get());
 
   auto request_factory = fxl::MakeCopyable(
-      [main_runner = main_runner_, request = std::move(request)] {
-        return request.Build();
-      });
+      [request = std::move(request)] { return request.Build(); });
 
   Request(
       std::move(request_factory),

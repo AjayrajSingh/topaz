@@ -6,21 +6,20 @@
 
 #include "garnet/lib/callback/capture.h"
 #include "garnet/lib/callback/set_when_called.h"
-#include "garnet/lib/gtest/test_with_message_loop.h"
+#include "garnet/lib/gtest/test_with_loop.h"
 #include "garnet/lib/network_wrapper/fake_network_wrapper.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
 
 namespace spotify_auth_provider {
 
-class SpotifyFactoryImplTest : public gtest::TestWithMessageLoop {
+class SpotifyFactoryImplTest : public gtest::TestWithLoop {
  public:
   SpotifyFactoryImplTest()
-      : network_wrapper_(message_loop_.async()),
+      : network_wrapper_(dispatcher()),
         app_context_(
             component::ApplicationContext::CreateFromStartupInfo().get()),
-        factory_impl_(message_loop_.task_runner(), app_context_,
-                      &network_wrapper_) {
+        factory_impl_(app_context_, &network_wrapper_) {
     factory_impl_.Bind(factory_.NewRequest());
   }
 

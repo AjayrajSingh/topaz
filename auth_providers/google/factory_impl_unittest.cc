@@ -6,20 +6,20 @@
 
 #include "garnet/lib/callback/capture.h"
 #include "garnet/lib/callback/set_when_called.h"
-#include "garnet/lib/gtest/test_with_message_loop.h"
+#include "garnet/lib/gtest/test_with_loop.h"
 #include "garnet/lib/network_wrapper/fake_network_wrapper.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
 
 namespace google_auth_provider {
 
-class GoogleFactoryImplTest : public gtest::TestWithMessageLoop {
+class GoogleFactoryImplTest : public gtest::TestWithLoop {
  public:
   GoogleFactoryImplTest()
-      : network_wrapper_(message_loop_.async()),
+      : network_wrapper_(dispatcher()),
         app_context_(
             component::ApplicationContext::CreateFromStartupInfo().get()),
-        factory_impl_(message_loop_.task_runner(), app_context_,
+        factory_impl_(dispatcher(), app_context_,
                       &network_wrapper_) {
     factory_impl_.Bind(factory_.NewRequest());
   }

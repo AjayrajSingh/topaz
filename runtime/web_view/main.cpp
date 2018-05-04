@@ -24,20 +24,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+ #include <assert.h>
+ #include <dirent.h>
+ #include <fcntl.h>
+ #include <math.h>
+ #include <stdlib.h>
+
 #include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <map>
 #include <vector>
 
-#include <fcntl.h>
-#include <math.h>
+#include <lib/async-loop/cpp/loop.h>
 
-#include <assert.h>
-#include <dirent.h>
-#include <stdlib.h>
-
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/command_line.h"
 #include "lib/fxl/logging.h"
 #include "topaz/runtime/web_view/web_view_provider.h"
@@ -58,9 +58,9 @@ int main(int argc, const char** argv) {
     url = urls.front();
   }
 
-  fsl::MessageLoop loop;
+  async::Loop loop(&kAsyncLoopConfigMakeDefault);
 
-  WebViewProvider view_provider(url);
+  WebViewProvider view_provider(&loop, url);
 
   loop.Run();
 

@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <lib/async-loop/cpp/loop.h>
+
 #include "topaz/examples/media/media_player_skia/media_player_view.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/command_line.h"
 #include "lib/ui/view_framework/view_provider_app.h"
 
@@ -14,13 +15,15 @@ int main(int argc, const char** argv) {
     return 1;
   }
 
-  fsl::MessageLoop loop;
+  async::Loop loop(&kAsyncLoopConfigMakeDefault);
 
-  mozart::ViewProviderApp app([&params](mozart::ViewContext view_context) {
-    return std::make_unique<examples::MediaPlayerView>(
-        std::move(view_context.view_manager),
-        std::move(view_context.view_owner_request),
-        view_context.application_context, params);
+  mozart::ViewProviderApp app(
+    [&loop, &params](mozart::ViewContext view_context) {
+      return std::make_unique<examples::MediaPlayerView>(
+          &loop,
+          std::move(view_context.view_manager),
+          std::move(view_context.view_owner_request),
+          view_context.application_context, params);
   });
 
   loop.Run();

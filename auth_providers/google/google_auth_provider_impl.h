@@ -17,14 +17,13 @@
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
-#include "lib/fxl/tasks/task_runner.h"
 
 namespace google_auth_provider {
 
 class GoogleAuthProviderImpl : auth::AuthProvider,
                                web_view::WebRequestDelegate {
  public:
-  GoogleAuthProviderImpl(fxl::RefPtr<fxl::TaskRunner> main_runner,
+  GoogleAuthProviderImpl(async_t* main_dispatcher,
                          component::ApplicationContext* app_context,
                          network_wrapper::NetworkWrapper* network_wrapper,
                          fidl::InterfaceRequest<auth::AuthProvider> request);
@@ -75,7 +74,7 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
       std::function<void(network::URLResponse response)> callback,
       network::URLResponse response);
 
-  fxl::RefPtr<fxl::TaskRunner> main_runner_;
+  async_t* const main_dispatcher_;
   component::ApplicationContext* app_context_;
   component::ApplicationControllerPtr web_view_controller_;
   auth::AuthenticationUIContextPtr auth_ui_context_;

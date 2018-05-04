@@ -6,13 +6,13 @@
 #include <memory>
 
 #include <fuchsia/cpp/auth.h>
+#include <lib/async-loop/cpp/loop.h>
 
 #include "garnet/lib/backoff/exponential_backoff.h"
 #include "garnet/lib/network_wrapper/network_wrapper_impl.h"
 #include "lib/app/cpp/application_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fidl/cpp/interface_request.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fsl/vmo/strings.h"
 #include "lib/fxl/command_line.h"
 #include "lib/fxl/log_settings_command_line.h"
@@ -23,7 +23,8 @@ namespace {
 class SpotifyAuthProviderApp {
  public:
   SpotifyAuthProviderApp()
-      : application_context_(
+      : loop_(&kAsyncLoopConfigMakeDefault),
+        application_context_(
             component::ApplicationContext::CreateFromStartupInfo()),
         trace_provider_(loop_.async()),
         network_wrapper_(
@@ -32,12 +33,11 @@ class SpotifyAuthProviderApp {
               return application_context_
                   ->ConnectToEnvironmentService<network::NetworkService>();
             }),
-        factory_impl_(loop_.task_runner(), application_context_.get(),
-                      &network_wrapper_) {
+        factory_impl_(application_context_.get(), &network_wrapper_) {
     FXL_DCHECK(application_context_);
   }
 
-  ~SpotifyAuthProviderApp() { loop_.QuitNow(); }
+  ~SpotifyAuthProviderApp() { loop_.Quit(); }
 
   void Run() {
     application_context_->outgoing_services()
@@ -49,7 +49,7 @@ class SpotifyAuthProviderApp {
   }
 
  private:
-  fsl::MessageLoop loop_;
+  async::Loop loop_;
   std::unique_ptr<component::ApplicationContext> application_context_;
   trace::TraceProvider trace_provider_;
   network_wrapper::NetworkWrapperImpl network_wrapper_;

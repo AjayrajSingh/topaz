@@ -9,6 +9,7 @@
 
 #include <fuchsia/cpp/media.h>
 #include <fuchsia/cpp/media_player.h>
+#include <lib/async-loop/cpp/loop.h>
 
 #include "examples/ui/lib/host_canvas_cycler.h"
 #include "lib/app/cpp/application_context.h"
@@ -21,7 +22,8 @@ namespace examples {
 
 class MediaPlayerView : public mozart::BaseView {
  public:
-  MediaPlayerView(views_v1::ViewManagerPtr view_manager,
+  MediaPlayerView(async::Loop* loop,
+                  views_v1::ViewManagerPtr view_manager,
                   fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                   component::ApplicationContext* application_context,
                   const MediaPlayerParams& params);
@@ -65,6 +67,8 @@ class MediaPlayerView : public mozart::BaseView {
 
     return float(1000000000.0 / double(frame_time_ - prev_frame_time_));
   }
+
+  async::Loop* const loop_;
 
   scenic_lib::ShapeNode background_node_;
   scenic_lib::skia::HostCanvasCycler controls_widget_;

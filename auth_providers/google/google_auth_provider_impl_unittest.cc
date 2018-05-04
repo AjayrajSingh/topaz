@@ -4,7 +4,7 @@
 
 #include "topaz/auth_providers/google/google_auth_provider_impl.h"
 
-#include "garnet/lib/gtest/test_with_message_loop.h"
+#include "garnet/lib/gtest/test_with_loop.h"
 #include "garnet/lib/network_wrapper/fake_network_wrapper.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
@@ -12,13 +12,13 @@
 namespace google_auth_provider {
 namespace {
 
-class GoogleAuthProviderImplTest : public gtest::TestWithMessageLoop {
+class GoogleAuthProviderImplTest : public gtest::TestWithLoop {
  public:
   GoogleAuthProviderImplTest()
-      : network_wrapper_(message_loop_.async()),
+      : network_wrapper_(dispatcher()),
         app_context_(
             component::ApplicationContext::CreateFromStartupInfo().get()),
-        google_auth_provider_impl_(message_loop_.task_runner(), app_context_,
+        google_auth_provider_impl_(dispatcher(), app_context_,
                                    &network_wrapper_,
                                    auth_provider_.NewRequest()) {}
 
@@ -38,10 +38,10 @@ TEST_F(GoogleAuthProviderImplTest, EmptyWhenClientDisconnected) {
   bool on_empty_called = false;
   google_auth_provider_impl_.set_on_empty([this, &on_empty_called] {
     on_empty_called = true;
-    message_loop_.PostQuitTask();
+    QuitLoop();
   });
   auth_provider_.Unbind();
-  EXPECT_FALSE(RunLoopWithTimeout());
+  RunLoopUntilIdle();
   EXPECT_TRUE(on_empty_called);
 }
 

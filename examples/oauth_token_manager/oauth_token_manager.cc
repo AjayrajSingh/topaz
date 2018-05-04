@@ -16,6 +16,7 @@
 #include <fuchsia/cpp/network.h>
 #include <fuchsia/cpp/views_v1.h>
 #include <fuchsia/cpp/web_view.h>
+#include <lib/async-loop/cpp/loop.h>
 #include <trace-provider/provider.h>
 
 #include "lib/app/cpp/application_context.h"
@@ -24,7 +25,6 @@
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fidl/cpp/string.h"
 #include "lib/fsl/socket/strings.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fsl/vmo/strings.h"
 #include "lib/fxl/command_line.h"
 #include "lib/fxl/files/directory.h"
@@ -34,6 +34,7 @@
 #include "lib/fxl/macros.h"
 #include "lib/fxl/strings/join_strings.h"
 #include "lib/fxl/strings/string_number_conversions.h"
+#include "lib/fxl/time/time_point.h"
 #include "lib/svc/cpp/services.h"
 #include "topaz/examples/oauth_token_manager/credentials_generated.h"
 #include "lib/async/cpp/operation.h"
@@ -403,7 +404,7 @@ void Get(
 // Implementation of the OAuth Token Manager app.
 class OAuthTokenManagerApp : modular_auth::AccountProvider {
  public:
-  OAuthTokenManagerApp();
+  OAuthTokenManagerApp(async::Loop* loop);
 
  private:
   // |AccountProvider|
@@ -440,6 +441,7 @@ class OAuthTokenManagerApp : modular_auth::AccountProvider {
                             const std::string& firebase_api_key,
                             const std::string& id_token,
                             FirebaseTokenCallback callback);
+  async::Loop* const loop_;
 
   std::shared_ptr<component::ApplicationContext> application_context_;
 
@@ -1459,8 +1461,9 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : Operation<> {
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleProfileAttributesCall);
 };
 
-OAuthTokenManagerApp::OAuthTokenManagerApp()
-    : application_context_(
+OAuthTokenManagerApp::OAuthTokenManagerApp(async::Loop* loop)
+    : loop_(loop),
+      application_context_(
           component::ApplicationContext::CreateFromStartupInfo()),
       binding_(this) {
   application_context_->outgoing_services()->AddService<AccountProvider>(
@@ -1485,7 +1488,7 @@ void OAuthTokenManagerApp::Initialize(
 
 void OAuthTokenManagerApp::Terminate() {
   FXL_LOG(INFO) << "OAuthTokenManagerApp::Terminate()";
-  fsl::MessageLoop::GetCurrent()->QuitNow();
+  loop_->Quit();
 }
 
 // TODO(alhaad): Check if account id already exists.
@@ -1574,10 +1577,10 @@ int main(int argc, const char** argv) {
     return 1;
   }
 
-  fsl::MessageLoop loop;
+  async::Loop loop(&kAsyncLoopConfigMakeDefault);
   trace::TraceProvider trace_provider(loop.async());
 
-  modular::auth::OAuthTokenManagerApp app;
+  modular::auth::OAuthTokenManagerApp app(&loop);
   loop.Run();
   return 0;
 }

@@ -9,6 +9,7 @@
 
 #include <fbl/vmo_mapper.h>
 #include <fuchsia/cpp/media.h>
+#include <lib/async-loop/cpp/loop.h>
 
 #include "examples/ui/lib/skia_view.h"
 #include "lib/app/cpp/application_context.h"
@@ -19,7 +20,8 @@ namespace examples {
 
 class VuMeterView : public mozart::SkiaView {
  public:
-  VuMeterView(views_v1::ViewManagerPtr view_manager,
+  VuMeterView(async::Loop* loop,
+              views_v1::ViewManagerPtr view_manager,
               fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
               component::ApplicationContext* application_context,
               const VuMeterParams& params);
@@ -74,6 +76,7 @@ class VuMeterView : public mozart::SkiaView {
   void OnDefaultFormatFetched(media::MediaType default_type);
   void OnPacketCaptured(media::MediaPacket packet);
 
+  async::Loop* const loop_;
   media::AudioCapturerPtr capturer_;
   fbl::VmoMapper payload_buffer_;
   bool started_ = false;
