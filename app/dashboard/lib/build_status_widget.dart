@@ -139,6 +139,19 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
               );
             }
 
+            stackChildren.add(
+              new Align(
+                alignment: FractionalOffset.topLeft,
+                child: new Container(
+                  margin: const EdgeInsets.only(top: 8.0),
+                  child: new Text(
+                    _statusTextFromBuildStatus(model),
+                    style: _getStatusStyle(backgroundColor),
+                  ),
+                ),
+              ),
+            );
+
             return new Material(
               elevation: 2.0,
               color: backgroundColor,
@@ -168,6 +181,16 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
     }
   }
 
+  String _statusTextFromBuildStatus(BuildStatusModel model) {
+    if (model.buildResult == BuildResultEnum.success) {
+      return 'passing 🙆';
+    } else if (model.buildResult == BuildResultEnum.failure) {
+      return 'failing 🙅';
+    } else {
+      return 'unknown 🤷';
+    }
+  }
+
   Color _getTextColor(Color backgroundColor) {
     // See http://www.w3.org/TR/AERT#color-contrast for the details of this
     // algorithm.
@@ -183,6 +206,7 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
   double get _fontSize => _size.height / 6.0;
   double get _timerFontSize => _size.height / 10.0;
   double get _errorFontSize => _size.height / 10.0;
+  double get _statusFontSize => _timerFontSize;
   TextStyle _getImportantStyle(Color backgroundColor) => new TextStyle(
         color: _getTextColor(backgroundColor),
         fontSize: _fontSize,
@@ -203,5 +227,10 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
         color: Colors.red[900],
         fontWeight: FontWeight.w900,
         fontSize: _errorFontSize,
+      );
+
+  TextStyle _getStatusStyle(Color backgroundColor) =>
+      _getImportantStyle(backgroundColor).copyWith(
+        fontSize: _statusFontSize,
       );
 }
