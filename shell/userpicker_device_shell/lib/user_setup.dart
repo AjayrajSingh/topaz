@@ -182,19 +182,22 @@ class UserSetup extends StatelessWidget {
   static Widget _controlBar(UserSetupModel model) {
     return new Container(
         padding: const EdgeInsets.all(8.0),
-        child: new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            new ScopedModelDescendant<NetstackModel>(
-                builder: (BuildContext context, Widget child,
-                        NetstackModel netModel) =>
+        child: new ScopedModelDescendant<NetstackModel>(
+            builder: (
+          BuildContext context,
+          Widget child,
+          NetstackModel netModel,
+        ) =>
+                new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
                     model.currentStage != SetupStage.userAuth
                         ? new IconButton(
                             onPressed: model.nextStep,
                             icon: new Icon(Icons.arrow_forward),
                           )
-                        : null)
-          ].where((Widget widget) => widget != null).toList(),
-        ));
+                        : new Container(),
+                  ],
+                )));
   }
 }

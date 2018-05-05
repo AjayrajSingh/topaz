@@ -110,7 +110,7 @@ class WifiSettingsModel extends Model {
       default:
         value = 'Unknown';
     }
-    return selectedAccessPoint != null ? 'Connecting' : value;
+    return value;
   }
 
   /// Connection result message.  'null' if there is no connection result message.
@@ -195,8 +195,6 @@ class WifiSettingsModel extends Model {
           });
         } else {
           _connectionResultMessage = error.description;
-          print(
-              'ERIC DUBUG: ${error.description}, ${error.code}, failed: ${selectedAccessPoint.name}');
           _failedAccessPoint = selectedAccessPoint;
           _selectedAccessPoint = null;
           _connecting = false;
