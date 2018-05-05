@@ -246,7 +246,7 @@ class WifiSettingsModel extends Model {
         'status', new StatusEntityData(value: _statusLabel), _statusCodec);
   }
 
-  /// Brodcasts settings as a mod.
+  /// Broadcasts settings as a mod.
   ///
   /// Will be replaced with an agent.
   Future<void> _initStatusUpdater() async {

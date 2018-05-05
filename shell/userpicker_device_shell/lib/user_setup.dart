@@ -50,15 +50,14 @@ Widget _buildUserActionButton({
 
 /// Widget that handles the steps required to set up a new user.
 class UserSetup extends StatelessWidget {
-  static const TextStyle _textStyle =
-      const TextStyle(fontSize: 30.0, color: Colors.white);
+  static const TextStyle _textStyle = const TextStyle(
+      fontSize: 24.0, color: Colors.white, fontWeight: FontWeight.w200);
 
-  static const TextStyle _blackText =
-      const TextStyle(fontSize: 14.0, color: Colors.white);
+  static const TextStyle _whiteText = const TextStyle(
+      fontSize: 14.0, color: Colors.white, fontWeight: FontWeight.w200);
 
   static const Map<SetupStage, String> _stageTitles =
       const <SetupStage, String>{
-    SetupStage.timeZone: 'Select your time zone',
     SetupStage.userAuth: 'Log in to your account',
     SetupStage.wifi: 'Connect to the internet',
   };
@@ -79,22 +78,20 @@ class UserSetup extends StatelessWidget {
 
         return new Material(
             color: Colors.white,
-            child: new Column(children: <Widget>[
-              new AppBar(
-                  title: new Text(
-                      _stageTitles[model.currentStage] ?? 'Placeholder')),
-              new Expanded(
-                  child: _getWidgetBuilder(model.currentStage)
-                      .call(context, child, model)),
-              _controlBar(model),
-            ]));
+            child: model.currentStage == SetupStage.welcome
+                ? _buildWelcomeScreen(context, child, model)
+                : new Column(children: <Widget>[
+                    _buildAppBar(model),
+                    new Expanded(
+                        child: _getWidgetBuilder(model.currentStage)
+                            .call(context, child, model)),
+                    _controlBar(model),
+                  ]));
       });
 
   ScopedModelDescendantBuilder<UserSetupModel> _getWidgetBuilder(
       SetupStage stage) {
     switch (stage) {
-      case SetupStage.timeZone:
-        return _buildTimeZone;
       case SetupStage.userAuth:
         return _buildUserAuth;
       case SetupStage.wifi:
@@ -103,6 +100,30 @@ class UserSetup extends StatelessWidget {
         return _placeholderStage;
     }
   }
+
+  static Widget _buildAppBar(UserSetupModel model) => new AppBar(
+        backgroundColor: Colors.blue,
+        leading: new IconButton(
+            color: Colors.white,
+            onPressed: model.previousStep,
+            icon: new Icon(Icons.arrow_back)),
+        title: new Text(
+          _stageTitles[model.currentStage] ?? 'Placeholder',
+          style: _textStyle,
+        ),
+        actions: <Widget>[
+          new Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new FlatButton(
+                  color: Colors.blue,
+                  child: new Text('Finish Later', style: _whiteText),
+                  onPressed: model.loginAsGuest,
+                )
+              ])
+        ],
+      );
 
   static Widget _buildWifi(
           BuildContext context, Widget child, UserSetupModel model) =>
@@ -135,13 +156,28 @@ class UserSetup extends StatelessWidget {
         child: new ChildView(connection: model.authModel.childViewConnection),
       );
 
-  static Widget _buildTimeZone(
+  static Widget _buildWelcomeScreen(
           BuildContext context, Widget child, UserSetupModel model) =>
-      new TimezonePicker(
-          onTap: (String newTimeZone) {
-            model.currentTimezone = newTimeZone;
-          },
-          currentTimezoneId: model.currentTimezone);
+      new Column(children: <Widget>[
+        new Padding(
+          padding: new EdgeInsets.only(top: 16.0),
+        ),
+        new Text('Welcome',
+            style: const TextStyle(
+                fontSize: 36.0,
+                color: Colors.black,
+                fontWeight: FontWeight.w200)),
+        new Expanded(
+            child: new TimezonePicker(
+                onTap: (String newTimeZone) {
+                  model.currentTimezone = newTimeZone;
+                },
+                currentTimezoneId: model.currentTimezone)),
+        new IconButton(
+          onPressed: model.nextStep,
+          icon: new Icon(Icons.arrow_forward),
+        )
+      ]);
 
   static Widget _controlBar(UserSetupModel model) {
     return new Container(
@@ -149,36 +185,16 @@ class UserSetup extends StatelessWidget {
         child: new Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            _textButton(
-                text: 'Cancel',
-                onPressed: () {
-                  model.reset();
-                  model.cancelAuthenticationFlow();
-                }),
             new ScopedModelDescendant<NetstackModel>(
                 builder: (BuildContext context, Widget child,
                         NetstackModel netModel) =>
-                    _textButton(
-                        text: 'Next',
-                        visible: model.currentStage != SetupStage.userAuth,
-                        disabled: false,
-                        onPressed: () => model.nextStep())),
-            _textButton(text: 'Guest', onPressed: () => model.loginAsGuest()),
+                    model.currentStage != SetupStage.userAuth
+                        ? new IconButton(
+                            onPressed: model.nextStep,
+                            icon: new Icon(Icons.arrow_forward),
+                          )
+                        : null)
           ].where((Widget widget) => widget != null).toList(),
         ));
   }
-
-  static Widget _textButton(
-          {@required String text,
-          bool disabled = false,
-          bool visible = true,
-          VoidCallback onPressed}) =>
-      visible
-          ? new RaisedButton(
-              color: Colors.blueAccent,
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(28.0)),
-              onPressed: disabled ? null : onPressed,
-              child: new Text(text, style: _blackText))
-          : null;
 }

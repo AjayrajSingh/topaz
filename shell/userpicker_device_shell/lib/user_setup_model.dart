@@ -20,8 +20,8 @@ enum SetupStage {
   /// When logging in to a new user.
   userAuth,
 
-  /// When selecting the time zone.
-  timeZone,
+  /// The first screen shown, including a timezone picker.
+  welcome,
 
   /// When connecting to wireless internet.
   wifi,
@@ -32,7 +32,7 @@ enum SetupStage {
 
 const List<SetupStage> _stages = const <SetupStage>[
   SetupStage.notStarted,
-  SetupStage.timeZone,
+  SetupStage.welcome,
   SetupStage.wifi,
   SetupStage.userAuth,
   SetupStage.complete
