@@ -10,7 +10,6 @@ import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:timezone/timezone_picker.dart';
 
-import 'netstack_model.dart';
 import 'user_setup_model.dart';
 
 /// Callback to cancel the authentication flow
@@ -85,7 +84,6 @@ class UserSetup extends StatelessWidget {
                     new Expanded(
                         child: _getWidgetBuilder(model.currentStage)
                             .call(context, child, model)),
-                    _controlBar(model),
                   ]));
       });
 
@@ -116,11 +114,16 @@ class UserSetup extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                new FlatButton(
-                  color: Colors.blue,
-                  child: new Text('Finish Later', style: _whiteText),
-                  onPressed: model.loginAsGuest,
-                )
+                model.shouldShowNextStep
+                    ? new IconButton(
+                        color: Colors.white,
+                        onPressed: model.nextStep,
+                        icon: new Icon(Icons.arrow_forward))
+                    : new FlatButton(
+                        color: Colors.blue,
+                        child: new Text('Finish Later', style: _whiteText),
+                        onPressed: model.loginAsGuest,
+                      )
               ])
         ],
       );
@@ -178,26 +181,4 @@ class UserSetup extends StatelessWidget {
           icon: new Icon(Icons.arrow_forward),
         )
       ]);
-
-  static Widget _controlBar(UserSetupModel model) {
-    return new Container(
-        padding: const EdgeInsets.all(8.0),
-        child: new ScopedModelDescendant<NetstackModel>(
-            builder: (
-          BuildContext context,
-          Widget child,
-          NetstackModel netModel,
-        ) =>
-                new Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    model.currentStage != SetupStage.userAuth
-                        ? new IconButton(
-                            onPressed: model.nextStep,
-                            icon: new Icon(Icons.arrow_forward),
-                          )
-                        : new Container(),
-                  ],
-                )));
-  }
 }

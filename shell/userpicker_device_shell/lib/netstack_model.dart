@@ -78,6 +78,15 @@ class NetstackModel extends Model
   /// Returns true if the netstack has an ip.
   bool get hasIp =>
       interfaces.any((InterfaceInfo interfaceInfo) => interfaceInfo.hasIp);
+
+  /// Returns true if the netstack has an IPV4 address.
+  ///
+  /// Needed because IPV6 always has an address, and routing for it isn't reliable
+  /// right now.
+  bool get hasIpV4 {
+    return interfaces
+        .any((InterfaceInfo interfaceInfo) => interfaceInfo.hasIpV4);
+  }
 }
 
 const Duration _kRevealAnimationDuration = const Duration(milliseconds: 200);
@@ -126,12 +135,20 @@ class InterfaceInfo {
 
   /// Returns true if we have an ip.
   bool get hasIp =>
-      ((_interface.addr.ipv4?.addr?.length ?? 0) == 4 &&
-          _interface.addr.ipv4.addr[0] != 0) ||
-      ((_interface.addr.ipv6?.addr?.length ?? 0) == 6 &&
+      hasIpV4 ||
+      (!_isLo &&
+          (_interface.addr.ipv6?.addr?.length ?? 0) == 6 &&
           _interface.addr.ipv6.addr[0] != 0 &&
           (_interface.addr.ipv6.addr[0] << 8 | _interface.addr.ipv6.addr[1]) !=
               0xfe80);
+
+  /// Returns true if there is an IpV4 address.
+  bool get hasIpV4 => (!_isLo &&
+      (_interface.addr.ipv4?.addr?.length ?? 0) == 4 &&
+      _interface.addr.ipv4.addr[0] != 0);
+
+  /// Returns true if this interface is the local interface
+  bool get _isLo => _interface.hwaddr.every((int value) => value == 0);
 
   void _update(net.NetInterface interface, net.NetInterfaceStats stats) {
     _interface = interface;

@@ -4,11 +4,11 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:fuchsia.fidl.time_zone/time_zone.dart';
-import 'package:fuchsia.fidl.wlan_service/wlan_service.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'authentication_overlay_model.dart';
+import 'netstack_model.dart';
 
 /// Enum of the possible stages that are displayed during user setup.
 ///
@@ -41,6 +41,9 @@ const List<SetupStage> _stages = const <SetupStage>[
 /// Model that contains all the state needed to set up a new user
 class UserSetupModel extends Model {
   final AuthenticationOverlayModel _authModel;
+  final TimezoneProxy _timeZoneProxy;
+  VoidCallback _loginAsGuest;
+  final NetstackModel _netstackModel;
 
   /// ApplicationContext to allow setup to launch apps
   final ApplicationContext applicationContext;
@@ -48,34 +51,32 @@ class UserSetupModel extends Model {
   /// Callback to cancel adding a new user.
   final VoidCallback cancelAuthenticationFlow;
 
-  final TimezoneProxy _timeZoneProxy;
-
-  /// Proxy for connection to wifi
-  final WlanProxy wlanProxy;
-
   /// Callback to add a new user.
   VoidCallback addNewUser;
 
-  VoidCallback _loginAsGuest;
-
   int _currentIndex;
 
+  /// Whether or not the user has connected to wifi and moved
+  /// to the next step automatically.
+  bool _connectedToWifi;
+
   /// Create a new [UserSetupModel]
-  UserSetupModel(this.applicationContext, this.cancelAuthenticationFlow)
+  UserSetupModel(this.applicationContext, this._netstackModel,
+      this.cancelAuthenticationFlow)
       : _currentIndex = _stages.indexOf(SetupStage.notStarted),
         _authModel = new AuthenticationOverlayModel(),
         _timeZoneProxy = new TimezoneProxy(),
-        wlanProxy = new WlanProxy() {
+        _connectedToWifi = false {
     /// todo: change lifespan of proxies
     connectToService(
         applicationContext.environmentServices, _timeZoneProxy.ctrl);
-
-    connectToService(applicationContext.environmentServices, wlanProxy.ctrl);
 
     _timeZoneProxy.getTimezoneId((String tz) {
       _currentTimezone = tz;
       notifyListeners();
     });
+
+    addListener(_onStepChanged);
   }
 
   /// The overlay model for the authentication flow
@@ -110,21 +111,36 @@ class UserSetupModel extends Model {
       _currentIndex++;
     } while (_shouldSkipStage);
 
-    // This will be refactored into the model, and then called when
-    // building the userAuth widget.
-    if (currentStage == SetupStage.userAuth) {
-      addNewUser();
-    }
-
     notifyListeners();
   }
 
   /// Moves to the previous step in the setup flow
   void previousStep() {
-    assert(currentStage != SetupStage.notStarted);
+    do {
+      assert(currentStage != SetupStage.notStarted);
+      _currentIndex--;
+    } while (_shouldSkipStage);
 
-    _currentIndex--;
     notifyListeners();
+  }
+
+  void _onStepChanged() {
+    _netstackModel.removeListener(_wifiListener);
+
+    // This will be refactored into the model, and then called when
+    // building the userAuth widget.
+    if (currentStage == SetupStage.userAuth) {
+      addNewUser();
+    } else if (currentStage == SetupStage.wifi && !_connectedToWifi) {
+      _netstackModel.addListener(_wifiListener);
+    }
+  }
+
+  void _wifiListener() {
+    if (_netstackModel.hasIp) {
+      _connectedToWifi = true;
+      nextStep();
+    }
   }
 
   /// Function called with the authentication flow is completed.
@@ -147,10 +163,19 @@ class UserSetupModel extends Model {
     });
   }
 
+  /// Next step button should only be shown if the user has
+  /// connected to wifi but gone back
+  bool get shouldShowNextStep =>
+      currentStage == SetupStage.wifi && _connectedToWifi;
+
   /// If the stage isn't needed due to current conditions.
   ///
-  /// TODO: Disable wifi stage if already connected to network.
-  bool get _shouldSkipStage => false;
+  /// Does not apply to going backwards, as a user may
+  /// need to connect to a different wifi network
+  bool get _shouldSkipStage =>
+      currentStage == SetupStage.wifi &&
+      !_connectedToWifi &&
+      _netstackModel.hasIp;
 
   /// Ends the setup flow and immediately logs in as guest
   void loginAsGuest() {

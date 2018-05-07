@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
-import 'netstack_model.dart';
 import 'user_picker_device_shell_model.dart';
 
 const double _kUserAvatarSizeLarge = 56.0;
@@ -132,30 +131,21 @@ class UserList extends StatelessWidget {
           onTap: model.wifiTapped,
           isSmall: isSmall,
         ),
-        new ScopedModelDescendant<NetstackModel>(
-            builder: (
-          BuildContext context,
-          Widget child,
-          NetstackModel netstackModel,
-        ) =>
-                new Row(children: <Widget>[
-                  _buildUserActionButton(
-                    isDisabled: !netstackModel.hasIp,
-                    child: new Text(
-                      'LOGIN',
-                      style: new TextStyle(
-                        fontSize: fontSize,
-                        color: netstackModel.hasIp ? Colors.white : Colors.grey,
-                      ),
-                    ),
-                    onTap: () {
-                      model
-                        ..startSetupFlow()
-                        ..hideUserActions();
-                    },
-                    isSmall: isSmall,
-                  )
-                ])),
+        _buildUserActionButton(
+          child: new Text(
+            'LOGIN',
+            style: new TextStyle(
+              fontSize: fontSize,
+              color: Colors.white,
+            ),
+          ),
+          onTap: () {
+            model
+              ..startSetupFlow()
+              ..hideUserActions();
+          },
+          isSmall: isSmall,
+        ),
         _buildUserActionButton(
           child: new Text(
             'GUEST',
