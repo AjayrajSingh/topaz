@@ -202,14 +202,15 @@ class EditorState extends State<Editor> {
   // location of last tap (used to expand selection on long press)
   LineCol _lastTapLocation;
   final FocusNode _focusNode = new FocusNode();
+  TextStyle _defaultStyle;
 
   /// Creates a new editor state.
   EditorState() {
     Color color = const Color(0xFF000000);
-    TextStyle style = new TextStyle(color: color);
+    _defaultStyle = new TextStyle(color: color);
     // TODO: make style configurable
-    _lineHeight = _lineHeightForStyle(style);
-    _lines = new LineCache(style);
+    _lineHeight = _lineHeightForStyle(_defaultStyle);
+    _lines = new LineCache(_defaultStyle);
   }
 
   XiAppState get _xiAppState =>
@@ -230,6 +231,13 @@ class EditorState extends State<Editor> {
     ui.Paragraph layout = builder.build()
       ..layout(new ui.ParagraphConstraints(width: double.infinity));
     return layout.height;
+  }
+
+  double _measureWidth(String s) {
+    TextSpan span = new TextSpan(text: s, style: _defaultStyle);
+    TextPainter painter =
+        new TextPainter(text: span, textDirection: TextDirection.ltr)..layout();
+    return painter.width;
   }
 
   /// Handler for "update" method from core
@@ -323,6 +331,9 @@ class EditorState extends State<Editor> {
     } else if (hidUsage == 0x3A) {
       // Keyboard F1
       _sendNotification('debug_rewrap');
+    } else if (hidUsage == 0x3B) {
+      // Keyboard F2
+      _sendNotification('debug_wrap_width');
     } else if (hidUsage == 0x50) {
       // Keyboard LeftArrow
       _doMovement('left', modifiers);
@@ -436,6 +447,21 @@ class EditorState extends State<Editor> {
       _sendNotification('scroll', <int>[start, start + viewHeight]);
       print('sending scroll $start $viewHeight');
     }
+  }
+
+  /// Implement measure_widths rpc request, measuring the width of strings
+  /// using the font used for text display.
+  dynamic measureWidths(List<Map<String, dynamic>> params) {
+    List<List<double>> result = <List<double>>[];
+    for (Map<String, dynamic> req in params) {
+      List<double> inner = <double>[];
+      List<String> strings = req['strings'];
+      for (String s in strings) {
+        inner.add(_measureWidth(s));
+      }
+      result.add(inner);
+    }
+    return result;
   }
 
   TextLine _itemBuilder(BuildContext ctx, int ix) {

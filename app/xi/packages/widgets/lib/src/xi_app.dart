@@ -20,8 +20,7 @@ class XiApp extends StatefulWidget {
   const XiApp({
     Key key,
     @required this.xi,
-  })
-      : assert(xi != null),
+  })  : assert(xi != null),
         super(key: key);
 
   @override
@@ -61,7 +60,13 @@ class XiAppHandler extends XiRpcHandler {
 
   @override
   dynamic handleRpc(String method, dynamic params) {
-    print('rpc method=$method');
+    switch (method) {
+      case 'measure_width':
+        return _editorState.measureWidths(params);
+        break;
+      default:
+        print('rpc request, unknown method $method, params=$params');
+    }
     return null;
   }
 }
