@@ -4,12 +4,12 @@
 
 #include "topaz/auth_providers/spotify/spotify_auth_provider_impl.h"
 
-#include "garnet/lib/callback/capture.h"
-#include "garnet/lib/callback/set_when_called.h"
-#include "garnet/lib/gtest/test_with_loop.h"
-#include "garnet/lib/network_wrapper/fake_network_wrapper.h"
+#include "lib/callback/capture.h"
+#include "lib/callback/set_when_called.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
+#include "lib/gtest/test_with_loop.h"
+#include "lib/network_wrapper/fake_network_wrapper.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
 
 namespace spotify_auth_provider {
@@ -22,8 +22,8 @@ class SpotifyAuthProviderImplTest : public gtest::TestWithLoop {
         app_context_(
             component::ApplicationContext::CreateFromStartupInfo().get()),
         spotify_auth_provider_impl_(app_context_,
-                                   &network_wrapper_,
-                                   auth_provider_.NewRequest()) {}
+                                    &network_wrapper_,
+                                    auth_provider_.NewRequest()) {}
 
   ~SpotifyAuthProviderImplTest() override {}
 

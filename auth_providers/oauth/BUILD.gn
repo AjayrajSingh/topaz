@@ -13,10 +13,10 @@ source_set("oauth") {
   ]
 
   deps = [
-    "//garnet/lib/network_wrapper",
     "//garnet/public/lib/auth/fidl",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
+    "//garnet/public/lib/network_wrapper",
     "//peridot/lib/rapidjson",
   ]
 }

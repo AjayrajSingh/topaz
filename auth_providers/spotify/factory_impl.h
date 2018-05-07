@@ -7,10 +7,10 @@
 
 #include <fuchsia/cpp/auth.h>
 
-#include "garnet/lib/callback/auto_cleanable.h"
-#include "garnet/lib/network_wrapper/network_wrapper.h"
+#include "lib/callback/auto_cleanable.h"
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
+#include "lib/network_wrapper/network_wrapper.h"
 #include "topaz/auth_providers/spotify/spotify_auth_provider_impl.h"
 
 namespace spotify_auth_provider {
@@ -41,4 +41,4 @@ class FactoryImpl : public auth::AuthProviderFactory {
 
 }  // namespace spotify_auth_provider
 
-#endif // TOPAZ_AUTH_PROVIDERS_SPOTIFY_FACTORY_IMPL_H_
+#endif  // TOPAZ_AUTH_PROVIDERS_SPOTIFY_FACTORY_IMPL_H_

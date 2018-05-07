@@ -4,12 +4,12 @@
 
 #include "topaz/auth_providers/google/factory_impl.h"
 
-#include "garnet/lib/callback/capture.h"
-#include "garnet/lib/callback/set_when_called.h"
-#include "garnet/lib/gtest/test_with_loop.h"
-#include "garnet/lib/network_wrapper/fake_network_wrapper.h"
+#include "lib/callback/capture.h"
+#include "lib/callback/set_when_called.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
+#include "lib/gtest/test_with_loop.h"
+#include "lib/network_wrapper/fake_network_wrapper.h"
 
 namespace google_auth_provider {
 
@@ -19,8 +19,7 @@ class GoogleFactoryImplTest : public gtest::TestWithLoop {
       : network_wrapper_(dispatcher()),
         app_context_(
             component::ApplicationContext::CreateFromStartupInfo().get()),
-        factory_impl_(dispatcher(), app_context_,
-                      &network_wrapper_) {
+        factory_impl_(dispatcher(), app_context_, &network_wrapper_) {
     factory_impl_.Bind(factory_.NewRequest());
   }
 

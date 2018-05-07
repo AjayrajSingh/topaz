@@ -7,19 +7,19 @@
 // |auth_provider.fidl| interface and is typically invoked by the Token Manager
 // service in Garnet layer.
 
-#ifndef TOPAZ_AUTH_PROVIDERS_SPOTIFY_AUTH_PROVIDER_IMPL_H_
-#define TOPAZ_AUTH_PROVIDERS_SPOTIFY_AUTH_PROVIDER_IMPL_H_
+#ifndef TOPAZ_AUTH_PROVIDERS_SPOTIFY_SPOTIFY_AUTH_PROVIDER_IMPL_H_
+#define TOPAZ_AUTH_PROVIDERS_SPOTIFY_SPOTIFY_AUTH_PROVIDER_IMPL_H_
 
+#include <fuchsia/cpp/auth.h>
 #include <fuchsia/cpp/views_v1.h>
 #include <fuchsia/cpp/web_view.h>
-#include <fuchsia/cpp/auth.h>
 
-#include "garnet/lib/callback/cancellable.h"
-#include "garnet/lib/network_wrapper/network_wrapper.h"
 #include "lib/app/cpp/application_context.h"
+#include "lib/callback/cancellable.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
+#include "lib/network_wrapper/network_wrapper.h"
 
 namespace spotify_auth_provider {
 
@@ -52,9 +52,9 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
                      const GetAppIdTokenCallback callback) override;
 
   // |AuthProvider|
-  void GetAppFirebaseToken(
-      const fidl::StringPtr id_token, const fidl::StringPtr firebase_api_key,
-      const GetAppFirebaseTokenCallback callback) override;
+  void GetAppFirebaseToken(const fidl::StringPtr id_token,
+                           const fidl::StringPtr firebase_api_key,
+                           const GetAppFirebaseTokenCallback callback) override;
 
   // |AuthProvider|
   void RevokeAppOrPersistentCredential(
@@ -72,9 +72,8 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
   void Request(std::function<network::URLRequest()> request_factory,
                std::function<void(network::URLResponse response)> callback);
 
-  void OnResponse(
-      std::function<void(network::URLResponse response)> callback,
-      network::URLResponse response);
+  void OnResponse(std::function<void(network::URLResponse response)> callback,
+                  network::URLResponse response);
 
   component::ApplicationContext* app_context_;
   component::ApplicationControllerPtr web_view_controller_;
@@ -94,4 +93,4 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
 
 }  // namespace spotify_auth_provider
 
-#endif // TOPAZ_AUTH_PROVIDERS_SPOTIFY_AUTH_PROVIDER_IMPL_H_
+#endif  // TOPAZ_AUTH_PROVIDERS_SPOTIFY_SPOTIFY_AUTH_PROVIDER_IMPL_H_

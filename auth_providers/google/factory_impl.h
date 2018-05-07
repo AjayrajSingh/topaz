@@ -8,10 +8,10 @@
 #include <fuchsia/cpp/auth.h>
 #include <lib/async/dispatcher.h>
 
-#include "garnet/lib/callback/auto_cleanable.h"
-#include "garnet/lib/network_wrapper/network_wrapper.h"
+#include "lib/callback/auto_cleanable.h"
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
+#include "lib/network_wrapper/network_wrapper.h"
 #include "topaz/auth_providers/google/google_auth_provider_impl.h"
 
 namespace google_auth_provider {
@@ -44,4 +44,4 @@ class FactoryImpl : public auth::AuthProviderFactory {
 
 }  // namespace google_auth_provider
 
-#endif // TOPAZ_AUTH_PROVIDERS_GOOGLE_FACTORY_IMPL_H_
+#endif  // TOPAZ_AUTH_PROVIDERS_GOOGLE_FACTORY_IMPL_H_

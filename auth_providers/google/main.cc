@@ -8,14 +8,14 @@
 #include <fuchsia/cpp/auth.h>
 #include <lib/async-loop/cpp/loop.h>
 
-#include "garnet/lib/backoff/exponential_backoff.h"
-#include "garnet/lib/network_wrapper/network_wrapper_impl.h"
 #include "lib/app/cpp/application_context.h"
+#include "lib/backoff/exponential_backoff.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fsl/vmo/strings.h"
 #include "lib/fxl/command_line.h"
 #include "lib/fxl/log_settings_command_line.h"
+#include "lib/network_wrapper/network_wrapper_impl.h"
 #include "topaz/auth_providers/google/factory_impl.h"
 
 namespace {
@@ -34,7 +34,8 @@ class GoogleAuthProviderApp {
               return application_context_
                   ->ConnectToEnvironmentService<network::NetworkService>();
             }),
-        factory_impl_(loop_.async(), application_context_.get(),
+        factory_impl_(loop_.async(),
+                      application_context_.get(),
                       &network_wrapper_) {
     FXL_DCHECK(application_context_);
   }
@@ -61,7 +62,7 @@ class GoogleAuthProviderApp {
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleAuthProviderApp);
 };
 
-}
+}  // namespace
 
 int main(int argc, const char** argv) {
   auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);

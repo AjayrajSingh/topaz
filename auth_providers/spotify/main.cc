@@ -8,14 +8,14 @@
 #include <fuchsia/cpp/auth.h>
 #include <lib/async-loop/cpp/loop.h>
 
-#include "garnet/lib/backoff/exponential_backoff.h"
-#include "garnet/lib/network_wrapper/network_wrapper_impl.h"
 #include "lib/app/cpp/application_context.h"
+#include "lib/backoff/exponential_backoff.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fsl/vmo/strings.h"
 #include "lib/fxl/command_line.h"
 #include "lib/fxl/log_settings_command_line.h"
+#include "lib/network_wrapper/network_wrapper_impl.h"
 #include "topaz/auth_providers/spotify/factory_impl.h"
 
 namespace {
@@ -28,7 +28,8 @@ class SpotifyAuthProviderApp {
             component::ApplicationContext::CreateFromStartupInfo()),
         trace_provider_(loop_.async()),
         network_wrapper_(
-            loop_.async(), std::make_unique<backoff::ExponentialBackoff>(),
+            loop_.async(),
+            std::make_unique<backoff::ExponentialBackoff>(),
             [this] {
               return application_context_
                   ->ConnectToEnvironmentService<network::NetworkService>();
@@ -59,7 +60,7 @@ class SpotifyAuthProviderApp {
   FXL_DISALLOW_COPY_AND_ASSIGN(SpotifyAuthProviderApp);
 };
 
-}
+}  // namespace
 
 int main(int argc, const char** argv) {
   auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);

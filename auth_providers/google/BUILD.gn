@@ -13,12 +13,12 @@ executable("bin") {
 
   deps = [
     ":lib",
-    "//garnet/lib/network_wrapper",
     "//garnet/public/lib/app/cpp",
     "//garnet/public/lib/auth/fidl",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
+    "//garnet/public/lib/network_wrapper",
     "//zircon/public/lib/trace-provider",
   ]
 }
@@ -33,12 +33,12 @@ source_set("lib") {
   ]
 
   deps = [
-    "//garnet/lib/callback",
-    "//garnet/lib/network_wrapper",
     "//garnet/public/lib/app/cpp",
     "//garnet/public/lib/auth/fidl",
+    "//garnet/public/lib/callback",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl",
+    "//garnet/public/lib/network_wrapper",
     "//peridot/lib/rapidjson",
     "//topaz/auth_providers/oauth",
     "//topaz/runtime/web_runner/services",
@@ -55,11 +55,11 @@ source_set("unittests") {
 
   deps = [
     ":lib",
-    "//garnet/lib/gtest:gtest",
-    "//garnet/lib/network_wrapper:fake",
     "//garnet/public/lib/auth/fidl",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl:fxl_printers",
+    "//garnet/public/lib/gtest:gtest",
+    "//garnet/public/lib/network_wrapper:fake",
     "//garnet/public/lib/test_runner/cpp:gtest_main",
   ]
 }

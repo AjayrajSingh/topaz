@@ -4,12 +4,12 @@
 
 #include "topaz/auth_providers/spotify/factory_impl.h"
 
-#include "garnet/lib/callback/capture.h"
-#include "garnet/lib/callback/set_when_called.h"
-#include "garnet/lib/gtest/test_with_loop.h"
-#include "garnet/lib/network_wrapper/fake_network_wrapper.h"
+#include "lib/callback/capture.h"
+#include "lib/callback/set_when_called.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
+#include "lib/gtest/test_with_loop.h"
+#include "lib/network_wrapper/fake_network_wrapper.h"
 
 namespace spotify_auth_provider {
 
@@ -49,4 +49,4 @@ TEST_F(SpotifyFactoryImplTest, GetAuthProvider) {
   EXPECT_EQ(auth::AuthProviderStatus::OK, status);
 }
 
-} // namespace spotify_auth_provider
+}  // namespace spotify_auth_provider

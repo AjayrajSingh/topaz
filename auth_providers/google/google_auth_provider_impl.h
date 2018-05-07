@@ -7,16 +7,16 @@
 // |auth_provider.fidl| interface and is typically invoked by the Token Manager
 // service in Garnet layer.
 
+#include <fuchsia/cpp/auth.h>
 #include <fuchsia/cpp/views_v1.h>
 #include <fuchsia/cpp/web_view.h>
-#include <fuchsia/cpp/auth.h>
 
-#include "garnet/lib/callback/cancellable.h"
-#include "garnet/lib/network_wrapper/network_wrapper.h"
 #include "lib/app/cpp/application_context.h"
+#include "lib/callback/cancellable.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
+#include "lib/network_wrapper/network_wrapper.h"
 
 namespace google_auth_provider {
 
@@ -50,9 +50,9 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
                      GetAppIdTokenCallback callback) override;
 
   // |AuthProvider|
-  void GetAppFirebaseToken(
-      fidl::StringPtr id_token, fidl::StringPtr firebase_api_key,
-      GetAppFirebaseTokenCallback callback) override;
+  void GetAppFirebaseToken(fidl::StringPtr id_token,
+                           fidl::StringPtr firebase_api_key,
+                           GetAppFirebaseTokenCallback callback) override;
 
   // |AuthProvider|
   void RevokeAppOrPersistentCredential(
@@ -62,17 +62,15 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
   // |web_view::WebRequestDelegate|
   void WillSendRequest(fidl::StringPtr incoming_url) override;
 
-  void GetUserProfile(fidl::StringPtr credential,
-                      fidl::StringPtr access_token);
+  void GetUserProfile(fidl::StringPtr credential, fidl::StringPtr access_token);
 
   views_v1_token::ViewOwnerPtr SetupWebView();
 
   void Request(std::function<network::URLRequest()> request_factory,
                std::function<void(network::URLResponse response)> callback);
 
-  void OnResponse(
-      std::function<void(network::URLResponse response)> callback,
-      network::URLResponse response);
+  void OnResponse(std::function<void(network::URLResponse response)> callback,
+                  network::URLResponse response);
 
   async_t* const main_dispatcher_;
   component::ApplicationContext* app_context_;
