@@ -424,19 +424,18 @@ class EditorState extends State<Editor> {
   }
 
   void _sendScrollViewport() {
-    // commented out because it throws an exception
-    /*
-    ScrollPosition pos = _controller.position;
-    int viewHeight = 1 + pos.viewportDimension ~/ _lineHeight;
-    if (viewHeight == 1) {
-      // TODO: horrible hack, remove when we reliably get viewport height
-      viewHeight = 42;
+    if (_controller.hasClients) {
+      ScrollPosition pos = _controller.position;
+      int viewHeight = 1 + pos.viewportDimension ~/ _lineHeight;
+      if (viewHeight == 1) {
+        // TODO: horrible hack, remove when we reliably get viewport height
+        viewHeight = 42;
+      }
+      int start = pos.pixels ~/ _lineHeight;
+      // TODO: be less noisy, send only if changed
+      _sendNotification('scroll', <int>[start, start + viewHeight]);
+      print('sending scroll $start $viewHeight');
     }
-    int start = pos.pixels ~/ _lineHeight;
-    // TODO: be less noisy, send only if changed
-    _sendNotification('scroll', <int>[start, start + viewHeight]);
-    print('sending scroll $start $viewHeight');
-    */
   }
 
   TextLine _itemBuilder(BuildContext ctx, int ix) {
