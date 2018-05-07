@@ -23,7 +23,7 @@ Iter FindUniquePtr(Iter begin, Iter end, T* object) {
 App::App(TermParams params)
     : params_(std::move(params)),
       context_(component::ApplicationContext::CreateFromStartupInfo()) {
-  context_->outgoing_services()->AddService<views_v1::ViewProvider>(
+  context_->outgoing().AddPublicService<views_v1::ViewProvider>(
       [this](fidl::InterfaceRequest<views_v1::ViewProvider> request) {
         bindings_.AddBinding(this, std::move(request));
       });

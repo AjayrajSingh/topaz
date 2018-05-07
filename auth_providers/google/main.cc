@@ -43,8 +43,8 @@ class GoogleAuthProviderApp {
   ~GoogleAuthProviderApp() { loop_.Quit(); }
 
   void Run() {
-    application_context_->outgoing_services()
-        ->AddService<auth::AuthProviderFactory>(
+    application_context_->outgoing()
+        .AddPublicService<auth::AuthProviderFactory>(
             [this](fidl::InterfaceRequest<auth::AuthProviderFactory> request) {
               factory_impl_.Bind(std::move(request));
             });

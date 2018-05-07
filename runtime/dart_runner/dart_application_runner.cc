@@ -140,7 +140,7 @@ std::string GetLabelFromURL(const std::string& url) {
 DartApplicationRunner::DartApplicationRunner()
     : context_(component::ApplicationContext::CreateFromStartupInfo()),
       loop_(fsl::MessageLoop::GetCurrent()) {
-  context_->outgoing_services()->AddService<component::ApplicationRunner>(
+  context_->outgoing().AddPublicService<component::ApplicationRunner>(
       [this](fidl::InterfaceRequest<component::ApplicationRunner> request) {
         bindings_.AddBinding(this, std::move(request));
       });

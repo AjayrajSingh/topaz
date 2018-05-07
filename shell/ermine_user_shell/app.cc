@@ -10,7 +10,7 @@
 namespace ermine_user_shell {
 
 App::App() : context_(component::ApplicationContext::CreateFromStartupInfo()) {
-  context_->outgoing_services()->AddService<views_v1::ViewProvider>(
+  context_->outgoing().AddPublicService<views_v1::ViewProvider>(
       [this](fidl::InterfaceRequest<views_v1::ViewProvider> request) {
         bindings_.AddBinding(this, std::move(request));
       });

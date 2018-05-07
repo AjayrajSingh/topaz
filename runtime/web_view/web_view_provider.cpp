@@ -20,17 +20,17 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
     FXL_LOG(WARNING) << "Could not load ICU data";
   }
 
-  context_->outgoing_services()->AddService<views_v1::ViewProvider>(
+  context_->outgoing().AddPublicService<views_v1::ViewProvider>(
       [this](fidl::InterfaceRequest<ViewProvider> request) {
         FXL_LOG(INFO) << "Add ViewProvider binding";
         view_provider_binding_.Bind(std::move(request));
       });
-  context_->outgoing_services()->AddService<modular::Module>(
+  context_->outgoing().AddPublicService<modular::Module>(
       [this](fidl::InterfaceRequest<modular::Module> request) {
         FXL_LOG(INFO) << "got request for module service";
         module_binding_.Bind(std::move(request));
       });
-  context_->outgoing_services()->AddService<modular::Lifecycle>(
+  context_->outgoing().AddPublicService<modular::Lifecycle>(
       [this](fidl::InterfaceRequest<modular::Lifecycle> request) {
         FXL_LOG(INFO) << "got request for lifecycle service";
         lifecycle_binding_.Bind(std::move(request));
