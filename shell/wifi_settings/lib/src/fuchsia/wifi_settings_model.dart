@@ -174,6 +174,8 @@ class WifiSettingsModel extends Model {
 
   void _connect(AccessPoint accessPoint, [String password]) {
     _connecting = true;
+    _scanResult = null;
+
     _wlanProxy.connect(
       new wlan.ConnectConfig(
           ssid: accessPoint.name,
@@ -184,15 +186,6 @@ class WifiSettingsModel extends Model {
         if (error.code == wlan.ErrCode.ok) {
           _connectionResultMessage = null;
           _failedAccessPoint = null;
-          new Timer(const Duration(seconds: 15), () {
-            // There seems to be a period of time in between connected and
-            // the status giving us a correct result. Thus, we don't deselect
-            // the selected one unless there's a big issue.
-            // TODO: investigate
-            _selectedAccessPoint = null;
-            _connecting = false;
-            notifyListeners();
-          });
         } else {
           _connectionResultMessage = error.description;
           _failedAccessPoint = selectedAccessPoint;
@@ -206,17 +199,26 @@ class WifiSettingsModel extends Model {
   }
 
   void _scan() {
-    _wlanProxy.scan(const wlan.ScanRequest(timeout: 15),
-        (wlan.ScanResult scanResult) {
-      _scanResult = _dedupe(scanResult);
-      notifyListeners();
-    });
+    if (!_connecting) {
+      _wlanProxy.scan(const wlan.ScanRequest(timeout: 15),
+          (wlan.ScanResult scanResult) {
+        _scanResult = _dedupe(scanResult);
+        notifyListeners();
+      });
+    }
   }
 
   void _update() {
     _wlanProxy.status((wlan.WlanStatus status) {
       _status = status;
       _loading = false;
+
+      if (status.state == wlan.State.associated ||
+          status.error.code != wlan.ErrCode.ok) {
+        _selectedAccessPoint = null;
+        _connecting = false;
+      }
+
       notifyListeners();
     });
   }
