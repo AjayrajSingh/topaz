@@ -5,6 +5,11 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:meta/meta.dart';
+
+/// A Builder which is inkoked when the [FutureWidget] needs to display a
+/// child which which represents an error state.
+typedef Widget ErrorBuilder(BuildContext context, Error error);
 
 /// A widget that provides a [child] widget when it's [Future] completes.
 class FutureWidget extends StatefulWidget {
@@ -12,10 +17,18 @@ class FutureWidget extends StatefulWidget {
   final FutureOr<Widget> child;
 
   /// Holds the [Widget] that is a place holder until [child] future completes.
-  final Widget placeHolder;
+  final Widget loadingWidget;
+
+  /// A builder which is invoked when the [Future] results in an error and
+  /// the Widget needs to display an error widget.
+  final ErrorBuilder errorBuilder;
 
   /// Constructor.
-  const FutureWidget({this.child, this.placeHolder});
+  const FutureWidget({
+    @required this.child,
+    this.loadingWidget = const Offstage(),
+    this.errorBuilder = _emptyErrorBuilder,
+  }) : assert(child != null);
 
   @override
   _FutureWidgetState createState() => new _FutureWidgetState();
@@ -23,6 +36,7 @@ class FutureWidget extends StatefulWidget {
 
 class _FutureWidgetState extends State<FutureWidget> {
   Widget _child;
+  Error _error;
 
   @override
   void initState() {
@@ -39,7 +53,9 @@ class _FutureWidgetState extends State<FutureWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => _child;
+  Widget build(BuildContext context) {
+    return _error != null ? widget.errorBuilder(context, _error) : _child;
+  }
 
   void _initWidget() {
     if (widget.child is Widget) {
@@ -53,11 +69,24 @@ class _FutureWidgetState extends State<FutureWidget> {
           setState(() => _child = child);
         }
       });
-      _child = widget.placeHolder;
+      _child = widget.loadingWidget;
     }
   }
 
   void _loadWidget(Future<Widget> child, void callback(Widget widget)) {
-    child.then(callback);
+    child.then(callback, onError: (Error error) {
+      // Since this future can fire at any time we need to ensure that we are
+      // mounted before calling setState since it is considered an error to call
+      // setState when mounted is false
+      if (mounted) {
+        setState(() => _error = error);
+      } else {
+        _error = error;
+      }
+    });
   }
+}
+
+Widget _emptyErrorBuilder(BuildContext context, Error error) {
+  return const Offstage();
 }
