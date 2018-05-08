@@ -4,3 +4,5 @@
 
 export 'src/com.fuchsia.location/geolocation_entity_codec.dart';
 export 'src/com.fuchsia.location/geolocation_entity_data.dart';
+export 'src/com.fuchsia.location/street_location_entity_codec.dart';
+export 'src/com.fuchsia.location/street_location_entity_data.dart';
