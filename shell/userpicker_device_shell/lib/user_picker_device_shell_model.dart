@@ -389,7 +389,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   void onEvent(KeyboardEvent ev) {
     log.info('Keyboard captured in device shell!');
     if (ev.codePoint == _kKeyCodeSpacebar &&
-        _userControllerProxy.ctrl.isBound &&
+        (_userControllerProxy?.ctrl?.isBound ?? false) &&
         _userShellChooser != null) {
       UserShellInfo info = _userShellChooser.getNextUserShellInfo(
         _currentAccountId,
