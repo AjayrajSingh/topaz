@@ -5,7 +5,7 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 import("//build/package.gni")
 
-flutter_aot_app("armadillo_user_shell") {
+flutter_app("armadillo_user_shell") {
   main_dart = "lib/main.dart"
 
   package_name = "armadillo_user_shell"
@@ -13,6 +13,9 @@ flutter_aot_app("armadillo_user_shell") {
   sandbox = "meta/sandbox"
 
   manifest = "pubspec.yaml"
+
+  # AOT in release, JIT in debug
+  aot = !is_debug
 
   sources = [
     "active_agents_manager.dart",

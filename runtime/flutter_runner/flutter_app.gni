@@ -1140,28 +1140,37 @@ template("flutter2_aot_app") {
 #
 #   disable_analysis (optional)
 #     Prevents analysis from being run on this target.
-template("flutter_app") {
-  target(flutter_default_app, target_name) {
-    forward_variables_from(invoker, "*")
-  }
-}
+#
+#   aot (optional, flutter_app() only)
+#     A boolean. Whether to AOT compile the app. Default is false.
 template("flutter_jit_app") {
   flutter1_jit_app(target_name) {
-    forward_variables_from(invoker, "*")
+    forward_variables_from(invoker, "*", ["aot"])
   }
 }
 template("flutter_aot_app") {
   flutter1_aot_app(target_name) {
-    forward_variables_from(invoker, "*")
+    forward_variables_from(invoker, "*", ["aot"])
   }
 }
 template("flutter1_app") {
   target(flutter1_default_app, target_name) {
-    forward_variables_from(invoker, "*")
+    forward_variables_from(invoker, "*", ["aot"])
   }
 }
 template("flutter2_app") {
   target(flutter2_default_app, target_name) {
-    forward_variables_from(invoker, "*")
+    forward_variables_from(invoker, "*", ["aot"])
+  }
+}
+template("flutter_app") {
+  if (defined(invoker.aot) && invoker.aot) {
+    flutter_aot_app(target_name) {
+      forward_variables_from(invoker, "*", ["aot"])
+    }
+  } else {
+    target(flutter_default_app, target_name) {
+      forward_variables_from(invoker, "*", ["aot"])
+    }
   }
 }
