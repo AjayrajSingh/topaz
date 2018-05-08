@@ -41,7 +41,7 @@ flutter_app("dashboard") {
   ]
 }
 
-dart_test("dashboard_test") {
+dart_test("dashboard_tests") {
   sources = [
     "build_bucket_service_test.dart",
     "enums_test.dart",
@@ -59,7 +59,7 @@ group("tests") {
   testonly = true
 
   deps = [
-    ":dashboard_test",
+    ":dashboard_tests",
   ]
 }
 

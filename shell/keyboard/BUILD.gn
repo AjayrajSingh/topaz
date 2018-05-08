@@ -20,7 +20,7 @@ dart_library("keyboard") {
   ]
 }
 
-dart_test("test") {
+dart_test("keyboard_tests") {
   sources = [
     "keyboard_test.dart",
     "keys_test.dart",

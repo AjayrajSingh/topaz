@@ -43,7 +43,7 @@ flutter_aot_app("mondrian") {
   ]
 }
 
-dart_test("test") {
+dart_test("mondrian_story_shell_tests") {
   sources = [
     "tree_test.dart",
   ]

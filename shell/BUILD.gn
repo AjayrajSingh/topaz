@@ -291,9 +291,9 @@ group("tests") {
   testonly = true
 
   deps = [
-    "armadillo:test",
-    "capybara_user_shell:test",
-    "keyboard:test",
-    "mondrian_story_shell:test",
+    "armadillo:armadillo_tests",
+    "capybara_user_shell:capybara_user_shell_tests",
+    "keyboard:keyboard_tests",
+    "mondrian_story_shell:mondrian_story_shell_tests",
   ]
 }

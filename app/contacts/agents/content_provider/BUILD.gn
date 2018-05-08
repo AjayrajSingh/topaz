@@ -26,7 +26,7 @@ dart_app("contacts_content_provider") {
   ]
 }
 
-dart_test("test") {
+dart_test("contacts_content_provider_tests") {
   sources = [
     "contacts_store_test.dart",
     "prefix_tree_test.dart",

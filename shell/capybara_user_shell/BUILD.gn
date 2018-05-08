@@ -19,7 +19,7 @@ flutter_aot_app("capybara_user_shell") {
   ]
 }
 
-dart_test("test") {
+dart_test("capybara_user_shell_tests") {
   sources = [
     "dummy_test.dart",
   ]

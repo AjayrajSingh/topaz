@@ -27,7 +27,7 @@ flutter_app("contacts_picker") {
   ]
 }
 
-dart_test("test") {
+dart_test("contacts_picker_tests") {
   sources = [
     "stores/contact_item_store_test.dart",
     "widgets/contact_item_test.dart",

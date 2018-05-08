@@ -17,7 +17,7 @@ dart_tool("widget_explorer_gen") {
   ]
 }
 
-dart_test("test") {
+dart_test("widget_explorer_gen_tests") {
   sources = [
     "gen_test.dart",
   ]

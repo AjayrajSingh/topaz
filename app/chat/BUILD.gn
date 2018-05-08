@@ -24,8 +24,8 @@ group("tests") {
   testonly = true
 
   deps = [
-    "modules/conversation:test",
-    "modules/conversation_info:test",
-    "modules/conversation_list:test",
+    "modules/conversation:chat_conversation_tests",
+    "modules/conversation_info:chat_conversation_info_tests",
+    "modules/conversation_list:chat_conversation_list_tests",
   ]
 }

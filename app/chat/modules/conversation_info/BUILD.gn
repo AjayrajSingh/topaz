@@ -24,7 +24,7 @@ flutter_app("chat_conversation_info") {
   ]
 }
 
-dart_test("test") {
+dart_test("chat_conversation_info_tests") {
   sources = [
     "participants_section_test.dart",
   ]

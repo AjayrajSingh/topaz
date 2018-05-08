@@ -17,7 +17,7 @@ dart_library("utils") {
   ]
 }
 
-dart_test("test") {
+dart_test("document_util_tests") {
   sources = [
     "utils_test.dart",
   ]

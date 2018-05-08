@@ -22,7 +22,7 @@ dart_library("lib.logging") {
   ]
 }
 
-dart_test("test") {
+dart_test("dart_logging_tests") {
   sources = [
     "stdout_test.dart",
   ]

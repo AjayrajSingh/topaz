@@ -35,7 +35,7 @@ flutter_app("chat_conversation") {
   ]
 }
 
-dart_test("test") {
+dart_test("chat_conversation_tests") {
   sources = [
     "message_input_test.dart",
     "section_test.dart",

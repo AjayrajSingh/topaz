@@ -10,15 +10,23 @@ group("dart_unittests") {
   deps = [
     "app/contacts:tests",
     "app/dashboard:tests",
-    "app/documents/packages/utils:test",
-    "public/dart/fixtures:test",
-    "public/dart/widgets:test",
-    "public/lib/app/dart:test",
-    "public/lib/schemas/dart:test",
+    "app/documents/packages/utils:document_util_tests",
+    "public/dart/fixtures:dart_fixture_tests",
+    "public/dart/widgets:dart_widget_tests",
+    "public/lib/app/dart:dart_app_tests",
+    "public/lib/schemas/dart:dart_schema_tests",
     "shell:tests",
-    "tools/dartfmt_extras:test",
-    "tools/mod:test",
+    "tools/dartfmt_extras:dartfmt_extras_tests",
+    "tools/mod:mod_tests",
     "tools/widget_explorer:tests",
+  ]
+}
+
+group("host_dart_unittests") {
+  testonly = true
+
+  deps = [
+    ":dart_unittests($host_toolchain)"
   ]
 }
 

@@ -4,8 +4,8 @@
 
 group("modules") {
   public_deps = [
-    "conversation:chat_conversation",
-    "conversation_info:chat_conversation_info",
-    "conversation_list:chat_conversation_list",
+    "conversation:chat_conversation_tests",
+    "conversation_info:chat_conversation_info_tests",
+    "conversation_list:chat_conversation_list_tests",
   ]
 }

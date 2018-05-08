@@ -28,7 +28,7 @@ dart_library("dart") {
   ]
 }
 
-dart_test("test") {
+dart_test("dart_app_tests") {
   sources = [
     "log_writer_test.dart",
     "socket_validate.dart",
@@ -50,4 +50,3 @@ dart_test("test") {
     "//topaz/public/lib/app/dart",
   ]
 }
-

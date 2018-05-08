@@ -22,7 +22,7 @@ dart_library("widget_explorer_core") {
   ]
 }
 
-dart_test("test") {
+dart_test("widget_explorer_core_tests") {
   sources = [
     "extract_test.dart",
   ]

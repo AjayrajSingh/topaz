@@ -27,7 +27,7 @@ dart_library("armadillo") {
   ]
 }
 
-dart_test("test") {
+dart_test("armadillo_tests") {
   sources = [
     "armadillo_drag_target_test.dart",
     "candidate_info_test.dart",

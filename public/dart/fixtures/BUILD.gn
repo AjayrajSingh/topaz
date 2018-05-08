@@ -19,7 +19,7 @@ dart_library("fixtures") {
   ]
 }
 
-dart_test("test") {
+dart_test("dart_fixture_tests") {
   sources = [
     "fixtures_name_test.dart",
     "namespace_test.dart",

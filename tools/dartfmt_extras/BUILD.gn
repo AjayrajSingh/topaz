@@ -17,7 +17,7 @@ dart_tool("dartfmt_extras") {
   ]
 }
 
-dart_test("test") {
+dart_test("dartfmt_extras_tests") {
   sources = [
     "directives_test.dart",
     "double_quotes_test.dart",

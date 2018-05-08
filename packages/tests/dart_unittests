@@ -1,5 +1,6 @@
 {
     "labels": [
-        "//topaz:dart_unittests"
+        "//topaz:dart_unittests",
+        "//topaz:host_dart_unittests"
     ]
 }

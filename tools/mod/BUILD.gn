@@ -21,7 +21,7 @@ dart_tool("mod") {
   ]
 }
 
-dart_test("test") {
+dart_test("mod_tests") {
   sources = [
     "commands/create_test.dart",
   ]
