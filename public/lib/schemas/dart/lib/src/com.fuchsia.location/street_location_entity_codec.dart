@@ -47,7 +47,7 @@ StreetLocationEntityData _decode(String data) {
   Map<String, Object> map = json.decode(data);
 
   String streetAddress;
-  Street locality;
+  String locality;
 
   try {
     Map<String, double> location = map['location'];
