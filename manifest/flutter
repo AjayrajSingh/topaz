@@ -4,10 +4,10 @@
     <project name="external/github.com/flutter/flutter"
              path="third_party/dart-pkg/git/flutter"
              remote="https://chromium.googlesource.com/external/github.com/flutter/flutter"
-             revision="1c3f6a851fcf33e8ef1bbb52bdae5ed116e463f4"/>
+             revision="e4f553324a6636bd2d4d8b15311013eb4e606842"/>
     <project name="external/github.com/flutter/engine"
              path="third_party/flutter"
              remote="https://chromium.googlesource.com/external/github.com/flutter/engine"
-             revision="37e5df053024c1158b436ff0cd843116c25bdf14"/>
+             revision="e9fb4761a69bf73fe316034394cfab05fa8ccdb1"/>
   </projects>
 </manifest>

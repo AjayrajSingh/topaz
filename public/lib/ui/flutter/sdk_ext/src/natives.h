@@ -7,13 +7,15 @@
 
 #include "third_party/dart/runtime/include/dart_api.h"
 
-#include <fuchsia/cpp/views_v1.h>
+#include <fuchsia/cpp/component.h>
 
 namespace mozart {
 
 class NativesDelegate {
  public:
-  virtual views_v1::View* GetMozartView() = 0;
+  virtual void OfferServiceProvider(
+      fidl::InterfaceHandle<component::ServiceProvider>,
+      fidl::VectorPtr<fidl::StringPtr> services) = 0;
 
  protected:
   virtual ~NativesDelegate();
