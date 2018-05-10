@@ -22,7 +22,7 @@ class WifiSettingsModel extends Model {
   final Duration _updatePeriod = const Duration(seconds: 3);
 
   /// How often to poll the wlan for available wifi networks.
-  final Duration _scanPeriod = const Duration(seconds: 20);
+  final Duration _scanPeriod = const Duration(seconds: 40);
 
   final wlan.WlanProxy _wlanProxy;
 
@@ -32,7 +32,7 @@ class WifiSettingsModel extends Model {
   bool _connecting;
 
   wlan.WlanStatus _status;
-  wlan.ScanResult _scanResult;
+  List<wlan.Ap> _scannedAps;
 
   AccessPoint _selectedAccessPoint;
   AccessPoint _failedAccessPoint;
@@ -71,7 +71,7 @@ class WifiSettingsModel extends Model {
   /// Since scanning only works if there are no connected networks,
   /// this will only containb access points when unconnected.
   Iterable<AccessPoint> get accessPoints =>
-      _scanResult?.aps?.map((wlan.Ap ap) => new AccessPoint(
+      _scannedAps?.map((wlan.Ap ap) => new AccessPoint(
             name: ap.ssid,
             signalStrength: ap.lastRssi.toDouble(),
             isSecure: ap.isSecure,
@@ -97,15 +97,13 @@ class WifiSettingsModel extends Model {
         break;
       case wlan.State.associating:
       case wlan.State.joining:
+      case wlan.State.scanning:
+      case wlan.State.bss:
+      case wlan.State.querying:
         value = 'Connecting';
         break;
       case wlan.State.authenticating:
         value = 'Authenticating...';
-        break;
-      case wlan.State.bss:
-      case wlan.State.querying:
-      case wlan.State.scanning:
-        value = 'Scanning...';
         break;
       default:
         value = 'Unknown';
@@ -120,7 +118,7 @@ class WifiSettingsModel extends Model {
   AccessPoint get failedAccessPoint => _failedAccessPoint;
 
   /// The most recent error message.  'null' if there is no error.
-  String get errorMessage => _scanResult?.error?.description;
+  String get errorMessage => _status?.error?.description;
 
   /// Whether or not the app has been loaded with the initial state
   bool get loading => _loading;
@@ -174,7 +172,7 @@ class WifiSettingsModel extends Model {
 
   void _connect(AccessPoint accessPoint, [String password]) {
     _connecting = true;
-    _scanResult = null;
+    _scannedAps = null;
 
     _wlanProxy.connect(
       new wlan.ConnectConfig(
@@ -200,9 +198,9 @@ class WifiSettingsModel extends Model {
 
   void _scan() {
     if (!_connecting) {
-      _wlanProxy.scan(const wlan.ScanRequest(timeout: 15),
+      _wlanProxy.scan(const wlan.ScanRequest(timeout: 25),
           (wlan.ScanResult scanResult) {
-        _scanResult = _dedupe(scanResult);
+        _scannedAps = _dedupeAndRemoveIncompatible(scanResult);
         notifyListeners();
       });
     }
@@ -223,7 +221,10 @@ class WifiSettingsModel extends Model {
     });
   }
 
-  wlan.ScanResult _dedupe(wlan.ScanResult scanResult) {
+  /// Remove duplicate and incompatible networks
+  List<wlan.Ap> _dedupeAndRemoveIncompatible(wlan.ScanResult scanResult) {
+    List<wlan.Ap> aps = <wlan.Ap>[];
+
     if (scanResult.error.code == wlan.ErrCode.ok) {
       // First sort APs by signal strength so when we de-dupe we drop the
       // weakest ones
@@ -232,13 +233,13 @@ class WifiSettingsModel extends Model {
 
       for (wlan.Ap ap in scanResult.aps) {
         // Dedupe: if we've seen this ssid before, skip it.
-        if (seenNames.contains(ap.ssid)) {
-          scanResult.aps.remove(ap);
+        if (!seenNames.contains(ap.ssid) && ap.isCompatible) {
+          aps.add(ap);
         }
         seenNames.add(ap.ssid);
       }
     }
-    return scanResult;
+    return aps;
   }
 
   void _updateStatus() {

@@ -79,26 +79,30 @@ class WlanManager extends StatelessWidget {
   }
 
   Widget _buildCurrentNetwork(WifiSettingsModel model, double scale) {
+    List<Widget> widgets = <Widget>[
+      new Text('Current Network', style: _titleTextStyle(scale)),
+      new Padding(padding: new EdgeInsets.only(top: 16.0 * scale)),
+      new AccessPointWidget(
+          scale: scale,
+          accessPoint: model.connectedAccessPoint ?? model.selectedAccessPoint,
+          status: model.connectionStatusMessage),
+    ];
+
+    if (model.connectedAccessPoint != null) {
+      widgets.addAll(<Widget>[
+        new Padding(padding: new EdgeInsets.only(top: 16.0 * scale)),
+        new FlatButton(
+            child: new Text('Disconnect', style: _textStyle(scale)),
+            onPressed: model.disconnect)
+      ]);
+    }
+
     return new Center(
         child: new FractionallySizedBox(
             widthFactor: 0.4,
             child: new Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  new Text('Current Network', style: _titleTextStyle(scale)),
-                  new Padding(padding: new EdgeInsets.only(top: 16.0 * scale)),
-                  new AccessPointWidget(
-                      scale: scale,
-                      accessPoint: model.connectedAccessPoint ??
-                          model.selectedAccessPoint,
-                      status: model.connectionStatusMessage),
-                  new Padding(padding: new EdgeInsets.only(top: 16.0 * scale)),
-                  new FlatButton(
-                      child: new Text('Disconnect', style: _textStyle(scale)),
-                      onPressed: () {
-                        model.disconnect();
-                      }),
-                ])));
+                children: widgets)));
   }
 
   Widget _buildAvailableNetworks(WifiSettingsModel model, double scale) {
