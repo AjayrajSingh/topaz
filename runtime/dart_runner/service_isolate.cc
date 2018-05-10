@@ -129,7 +129,7 @@ Dart_Isolate CreateServiceIsolate(const char* uri,
   Dart_Isolate isolate = Dart_CreateIsolate(
       uri, "main", reinterpret_cast<const uint8_t*>(isolate_snapshot_data),
       reinterpret_cast<const uint8_t*>(isolate_snapshot_instructions), nullptr,
-      nullptr, nullptr, state, error);
+      state, error);
   if (!isolate) {
     FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << *error;
     return nullptr;
@@ -175,10 +175,11 @@ Dart_Isolate CreateServiceIsolate(const char* uri,
   // Make runnable.
   Dart_ExitScope();
   Dart_ExitIsolate();
-  *error = Dart_IsolateMakeRunnable(isolate);
-  if (*error != nullptr) {
+  bool retval = Dart_IsolateMakeRunnable(isolate);
+  if (!retval) {
     Dart_EnterIsolate(isolate);
     Dart_ShutdownIsolate();
+    *error = strdup("Invalid isolate state - Unable to make it runnable.");
     return nullptr;
   }
   return isolate;

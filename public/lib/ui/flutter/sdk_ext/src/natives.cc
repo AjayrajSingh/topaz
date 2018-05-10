@@ -133,7 +133,8 @@ void Scenic_offerServiceProvider(Dart_NativeArguments args) {
       fidl::InterfaceHandle<component::ServiceProvider>(
           zx::channel(handle->ReleaseHandle()));
 
-  delegate->OfferServiceProvider(std::move(provider), std::move(services));
+  views_v1::View* view = delegate->GetMozartView();
+  view->OfferServiceProvider(std::move(provider), std::move(services));
 }
 
 }  // namespace mozart

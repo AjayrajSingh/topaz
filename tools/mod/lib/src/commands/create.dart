@@ -79,7 +79,7 @@ The project name must be lowercase_with_underscores.
     );
 
     if (await FileSystemEntity.type(projectPath) !=
-        FileSystemEntityType.notFound) {
+        FileSystemEntityType.NOT_FOUND) {
       throw new UsageException('"$projectName" already exists.', usage);
     }
 

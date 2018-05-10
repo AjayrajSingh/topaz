@@ -1,4 +1,7 @@
 {
+    "imports": [
+        "topaz/packages/prod/dart"
+    ],
     "packages": {
         "dart_aot_runner_test": "//topaz/runtime/dart_runner/integration:dart_aot_runner_test",
         "dart_jit_runner_test": "//topaz/runtime/dart_runner/integration:dart_jit_runner_test"

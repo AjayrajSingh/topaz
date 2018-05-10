@@ -66,7 +66,7 @@
     <project name="third_party/dart/third_party/pkg/dartdoc"
              path="third_party/dart/third_party/pkg/dartdoc"
              remote="https://dart.googlesource.com/dartdoc.git"
-             revision="v0.19.0"/>
+             revision="v0.18.1"/>
 
     <project name="third_party/dart/third_party/pkg/fixnum"
              path="third_party/dart/third_party/pkg/fixnum"
@@ -156,7 +156,7 @@
     <project name="third_party/dart/third_party/pkg/mustache4dart"
              path="third_party/dart/third_party/pkg/mustache4dart"
              remote="https://chromium.googlesource.com/external/github.com/valotas/mustache4dart.git"
-             revision="v2.1.1"/>
+             revision="v2.1.0"/>
 
     <project name="third_party/dart/third_party/pkg/oauth2"
              path="third_party/dart/third_party/pkg/oauth2"
@@ -321,7 +321,7 @@
     <project name="third_party/dart/third_party/pkg_tested/dart_style"
              path="third_party/dart/third_party/pkg_tested/dart_style"
              remote="https://dart.googlesource.com/dart_style.git"
-             revision="1.0.12"/>
+             revision="1.0.11"/>
 
     <project name="third_party/dart/third_party/pkg_tested/http_io"
              path="third_party/dart/third_party/pkg_tested/http_io"

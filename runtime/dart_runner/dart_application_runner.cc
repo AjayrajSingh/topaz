@@ -147,10 +147,7 @@ DartApplicationRunner::DartApplicationRunner()
 
   dart::bin::BootstrapDartIo();
 
-  char* error = Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs);
-  if (error) {
-    FXL_LOG(FATAL) << "Dart_SetVMFlags failed: " << error;
-  }
+  FXL_CHECK(Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs));
 
   Dart_InitializeParams params = {};
   params.version = DART_INITIALIZE_PARAMS_CURRENT_VERSION;
@@ -178,7 +175,7 @@ DartApplicationRunner::DartApplicationRunner()
 #if !defined(DART_PRODUCT)
   params.get_service_assets = GetVMServiceAssetsArchiveCallback;
 #endif
-  error = Dart_Initialize(&params);
+  char* error = Dart_Initialize(&params);
   if (error)
     FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
 }
