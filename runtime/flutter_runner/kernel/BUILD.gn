@@ -58,6 +58,7 @@ action("kernel_core_snapshot") {
     "--strong",
     "--sync-async",
     "--enable_mirrors=false",
+    "--deterministic",
     "--snapshot_kind=core",
     "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
     "--vm_snapshot_instructions=" +

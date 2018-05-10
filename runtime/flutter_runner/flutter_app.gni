@@ -961,6 +961,7 @@ template("flutter2_aot_app") {
       "--reify_generic_functions",
       "--strong",
       "--sync-async",
+      "--deterministic",
       "--snapshot_kind=app-aot-assembly",
       "--assembly=" + rebase_path(assembly_path),
     ]

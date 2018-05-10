@@ -41,6 +41,7 @@ def main():
     args.snapshotter_path,
     '--enable_mirrors=false',
     '--await_is_keyword',
+    '--deterministic',
     '--snapshot_kind=script',
     '--vm_snapshot_data=%s' % args.vm_snapshot_data,
     '--vm_snapshot_instructions=%s' % args.vm_snapshot_instructions,

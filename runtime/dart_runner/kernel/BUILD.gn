@@ -58,12 +58,13 @@ template("create_kernel_core_snapshot") {
     }
 
     args = [
-      "--snapshot_kind=core",
       "--strong",
       "--reify_generic_functions",
       "--limit_ints_to_64_bits",
       "--await_is_keyword",
       "--enable_mirrors=false",
+      "--deterministic",
+      "--snapshot_kind=core",
       "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
       "--vm_snapshot_instructions=" +
           rebase_path(vm_snapshot_instructions, root_build_dir),

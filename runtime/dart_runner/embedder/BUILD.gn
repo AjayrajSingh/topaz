@@ -33,6 +33,7 @@ template("create_aot_snapshot") {
       "--reify_generic_functions",
       "--strong",
       "--sync-async",
+      "--deterministic",
       "--snapshot_kind=vm-aot-assembly",
       "--assembly=" + rebase_path(snapshot_assembly),
     ]
