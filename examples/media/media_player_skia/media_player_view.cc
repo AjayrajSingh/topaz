@@ -10,6 +10,7 @@
 #include <iomanip>
 
 #include "lib/app/cpp/connect.h"
+#include "lib/fidl/cpp/clone.h"
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fsl/io/fd.h"
 #include "lib/fxl/logging.h"
@@ -86,6 +87,10 @@ MediaPlayerView::MediaPlayerView(
     // Create a player from all that stuff.
     media_player_ =
         application_context->ConnectToEnvironmentService<MediaPlayer>();
+    media_player_.events().StatusChanged =
+        [this](media_player::MediaPlayerStatus status) {
+          HandleStatusChanged(status);
+        };
 
     views_v1_token::ViewOwnerPtr video_view_owner;
     media_player_->CreateView(
@@ -138,8 +143,6 @@ MediaPlayerView::MediaPlayerView(
   // These are for calculating frame rate.
   frame_time_ = media::Timeline::local_now();
   prev_frame_time_ = frame_time_;
-
-  HandlePlayerStatusUpdates();
 }
 
 MediaPlayerView::~MediaPlayerView() {}
@@ -358,84 +361,71 @@ void MediaPlayerView::DrawControls(SkCanvas* canvas, const SkISize& size) {
   }
 }
 
-void MediaPlayerView::HandlePlayerStatusUpdates(
-    uint64_t version,
-    media_player::MediaPlayerStatusPtr status) {
-  if (status) {
-    // Process status received from the player.
-    if (status->timeline_transform) {
-      timeline_function_ = media::TimelineFunction(*status->timeline_transform);
-    }
-
-    previous_state_ = state_;
-    if (status->end_of_stream) {
-      state_ = State::kEnded;
-    } else if (timeline_function_.subject_delta() == 0) {
-      state_ = State::kPaused;
-    } else {
-      state_ = State::kPlaying;
-    }
-
-    // TODO(dalesat): Display problems on the screen.
-    if (status->problem) {
-      if (!problem_shown_) {
-        FXL_DLOG(INFO) << "PROBLEM: " << status->problem->type << ", "
-                       << status->problem->details;
-        problem_shown_ = true;
-      }
-    } else {
-      problem_shown_ = false;
-    }
-
-    if (status->video_size && status->pixel_aspect_ratio &&
-        (video_size_ != *status->video_size ||
-         pixel_aspect_ratio_ != *status->pixel_aspect_ratio)) {
-      video_size_ = *status->video_size;
-      pixel_aspect_ratio_ = *status->pixel_aspect_ratio;
-
-      FXL_LOG(INFO) << "video size " << status->video_size->width << "x"
-                    << status->video_size->height << ", pixel aspect ratio "
-                    << status->pixel_aspect_ratio->width << "x"
-                    << status->pixel_aspect_ratio->height;
-
-      Layout();
-    }
-
-    metadata_ = std::move(status->metadata);
-
-    // TODO(dalesat): Display metadata on the screen.
-    if (metadata_ && !metadata_shown_) {
-      FXL_DLOG(INFO) << "duration   " << std::fixed << std::setprecision(1)
-                     << double(metadata_->duration) / 1000000000.0
-                     << " seconds";
-      FXL_DLOG(INFO) << "title      "
-                     << (metadata_->title ? metadata_->title : "<none>");
-      FXL_DLOG(INFO) << "artist     "
-                     << (metadata_->artist ? metadata_->artist : "<none>");
-      FXL_DLOG(INFO) << "album      "
-                     << (metadata_->album ? metadata_->album : "<none>");
-      FXL_DLOG(INFO) << "publisher  "
-                     << (metadata_->publisher ? metadata_->publisher
-                                              : "<none>");
-      FXL_DLOG(INFO) << "genre      "
-                     << (metadata_->genre ? metadata_->genre : "<none>");
-      FXL_DLOG(INFO) << "composer   "
-                     << (metadata_->composer ? metadata_->composer : "<none>");
-      metadata_shown_ = true;
-    }
-
-    // TODO(dalesat): Display frame rate on the screen.
+void MediaPlayerView::HandleStatusChanged(
+    const media_player::MediaPlayerStatus& status) {
+  // Process status received from the player.
+  if (status.timeline_transform) {
+    timeline_function_ = media::TimelineFunction(*status.timeline_transform);
   }
 
-  InvalidateScene();
+  previous_state_ = state_;
+  if (status.end_of_stream) {
+    state_ = State::kEnded;
+  } else if (timeline_function_.subject_delta() == 0) {
+    state_ = State::kPaused;
+  } else {
+    state_ = State::kPlaying;
+  }
 
-  // Request a status update.
-  media_player_->GetStatus(
-      version,
-      [this](uint64_t version, media_player::MediaPlayerStatus status) {
-        HandlePlayerStatusUpdates(version,
-                                  fidl::MakeOptional(std::move(status)));
-      });
+  // TODO(dalesat): Display problems on the screen.
+  if (status.problem) {
+    if (!problem_shown_) {
+      FXL_DLOG(INFO) << "PROBLEM: " << status.problem->type << ", "
+                     << status.problem->details;
+      problem_shown_ = true;
+    }
+  } else {
+    problem_shown_ = false;
+  }
+
+  if (status.video_size && status.pixel_aspect_ratio &&
+      (video_size_ != *status.video_size ||
+       pixel_aspect_ratio_ != *status.pixel_aspect_ratio)) {
+    video_size_ = *status.video_size;
+    pixel_aspect_ratio_ = *status.pixel_aspect_ratio;
+
+    FXL_LOG(INFO) << "video size " << status.video_size->width << "x"
+                  << status.video_size->height << ", pixel aspect ratio "
+                  << status.pixel_aspect_ratio->width << "x"
+                  << status.pixel_aspect_ratio->height;
+
+    Layout();
+  }
+
+  metadata_ = fidl::Clone(status.metadata);
+
+  // TODO(dalesat): Display metadata on the screen.
+  if (metadata_ && !metadata_shown_) {
+    FXL_DLOG(INFO) << "duration   " << std::fixed << std::setprecision(1)
+                   << double(metadata_->duration) / 1000000000.0 << " seconds";
+    FXL_DLOG(INFO) << "title      "
+                   << (metadata_->title ? metadata_->title : "<none>");
+    FXL_DLOG(INFO) << "artist     "
+                   << (metadata_->artist ? metadata_->artist : "<none>");
+    FXL_DLOG(INFO) << "album      "
+                   << (metadata_->album ? metadata_->album : "<none>");
+    FXL_DLOG(INFO) << "publisher  "
+                   << (metadata_->publisher ? metadata_->publisher : "<none>");
+    FXL_DLOG(INFO) << "genre      "
+                   << (metadata_->genre ? metadata_->genre : "<none>");
+    FXL_DLOG(INFO) << "composer   "
+                   << (metadata_->composer ? metadata_->composer : "<none>");
+    metadata_shown_ = true;
+  }
+
+  // TODO(dalesat): Display frame rate on the screen.
+
+  InvalidateScene();
 }
 
 void MediaPlayerView::TogglePlayPause() {

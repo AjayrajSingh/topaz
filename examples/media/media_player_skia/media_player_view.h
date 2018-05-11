@@ -49,9 +49,7 @@ class MediaPlayerView : public mozart::BaseView {
 
   // Handles a status update from the player. When called with the default
   // argument values, initiates status updates.
-  void HandlePlayerStatusUpdates(
-      uint64_t version = media::kInitialStatus,
-      media_player::MediaPlayerStatusPtr status = nullptr);
+  void HandleStatusChanged(const media_player::MediaPlayerStatus& status);
 
   // Toggles between play and pause.
   void TogglePlayPause();
