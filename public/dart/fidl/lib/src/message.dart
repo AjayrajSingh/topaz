@@ -35,25 +35,34 @@ class Message {
       data.setUint32(kMessageOrdinalOffset, value, Endian.little);
 
   void hexDump() {
+    const int width = 16;
     Uint8List list = new Uint8List.view(data.buffer, 0);
     StringBuffer buffer = new StringBuffer();
-    for (int i = 0; i < list.length; ++i) {
-      if (i > 0) {
-        if (i % 8 == 0)
-          buffer.write(' ');
-        if (i % 32 == 0)
-          buffer.write('\n');
+    final RegExp isPrintable = new RegExp(r'\w');
+    for (int i = 0; i < dataLength; i += width) {
+      StringBuffer hex = new StringBuffer();
+      StringBuffer printable = new StringBuffer();
+      for (int j = 0; j < width && i + j < dataLength; j++) {
+        int v = list[i + j];
+        String s = v.toRadixString(16);
+        if (s.length == 1)
+          hex.write('0$s ');
+        else
+          hex.write('$s ');
+
+        s = new String.fromCharCode(v);
+        if (isPrintable.hasMatch(s)) {
+          printable.write(s);
+        } else {
+          printable.write('.');
+        }
       }
-      int v = list[i];
-      String s = v.toRadixString(16);
-      if (s.length == 1)
-        buffer.write('0$s ');
-      else
-        buffer.write('$s ');
+      buffer.write('${hex.toString().padRight(3*width)} $printable\n');
     }
+
     print('==================================================\n'
-          '$buffer\n'
-          '==================================================');
+        '$buffer'
+        '==================================================');
   }
 
   void closeHandles() {
