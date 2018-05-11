@@ -5,7 +5,6 @@
 import 'dart:async';
 
 import 'package:lib.media.dart/timeline.dart';
-import 'package:fuchsia.fidl.media/media.dart';
 import 'package:fuchsia.fidl.media_player/media_player.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fuchsia.fidl.component/component.dart';
@@ -69,8 +68,6 @@ class AudioPlayerController {
       _active = true;
 
       _createLocalPlayer(uri, serviceName);
-
-      _handlePlayerStatusUpdates(kInitialStatus, null);
     }
 
     if (updateCallback != null) {
@@ -101,8 +98,7 @@ class AudioPlayerController {
     _netMediaService.createMediaPlayerProxy(
         device, service, _mediaPlayer.ctrl.request());
     _mediaPlayer.ctrl.onConnectionError = _handleConnectionError;
-
-    _handlePlayerStatusUpdates(kInitialStatus, null);
+    _mediaPlayer.statusChanged = _handleStatusChanged;
 
     if (updateCallback != null) {
       scheduleMicrotask(() {
@@ -150,6 +146,7 @@ class AudioPlayerController {
   /// Creates a local player.
   void _createLocalPlayer(Uri uri, String serviceName) {
     connectToService(_services, _mediaPlayer.ctrl);
+    _mediaPlayer.statusChanged = _handleStatusChanged;
 
     onMediaPlayerCreated(_mediaPlayer);
 
@@ -290,9 +287,8 @@ class AudioPlayerController {
   void onVideoGeometryUpdated(geom.Size videoSize,
                               geom.Size pixelAspectRatio) {}
 
-  // Handles a status update from the player and requests a new update. Call
-  // with kInitialStatus, null to initiate status updates.
-  void _handlePlayerStatusUpdates(int version, MediaPlayerStatus status) {
+  // Handles a status update from the player.
+  void _handleStatusChanged(MediaPlayerStatus status) {
     if (!_active) {
       return;
     }
@@ -302,59 +298,55 @@ class AudioPlayerController {
     // the progress bar.
     bool prepare = false;
 
-    if (status != null) {
-      if (status.timelineTransform != null) {
-        TimelineFunction oldTimelineFunction = _timelineFunction;
+    if (status.timelineTransform != null) {
+      TimelineFunction oldTimelineFunction = _timelineFunction;
 
-        _timelineFunction =
-            new TimelineFunction.fromTransform(status.timelineTransform);
+      _timelineFunction =
+          new TimelineFunction.fromTransform(status.timelineTransform);
 
-        prepare = oldTimelineFunction != _timelineFunction;
-      }
-
-      _hasVideo = status.contentHasVideo;
-      _ended = status.endOfStream;
-
-      _playing = !ended &&
-          _timelineFunction != null &&
-          _timelineFunction.subjectDelta != 0;
-
-      _problem = status.problem;
-      _metadata = status.metadata;
-
-      if (_metadata != null) {
-        _loading = false;
-        _durationNanoseconds = _metadata.duration;
-      }
-
-      if (_progressBarReady && _progressNanoseconds < 0) {
-        // We thought the progress bar was ready, but we're getting negative
-        // progress values. That means our assumption about reference time
-        // correlation is probably wrong. We need to prepare the progress bar
-        // again. See the comment in |_prepareProgressBar|.
-        // TODO(dalesat): Remove once we're given access to presentation time.
-        // https://fuchsia.atlassian.net/browse/US-130
-        _progressBarReady = false;
-      }
-
-      if (_timelineFunction != null &&
-          _timelineFunction.referenceTime != 0 &&
-          (!_progressBarReady || prepare)) {
-        _prepareProgressBar();
-      }
-
-      if (status.videoSize != null && status.pixelAspectRatio != null) {
-        onVideoGeometryUpdated(status.videoSize, status.pixelAspectRatio);
-      }
-
-      if (updateCallback != null) {
-        scheduleMicrotask(() {
-          updateCallback();
-        });
-      }
+      prepare = oldTimelineFunction != _timelineFunction;
     }
 
-    _mediaPlayer.getStatus(version, _handlePlayerStatusUpdates);
+    _hasVideo = status.contentHasVideo;
+    _ended = status.endOfStream;
+
+    _playing = !ended &&
+        _timelineFunction != null &&
+        _timelineFunction.subjectDelta != 0;
+
+    _problem = status.problem;
+    _metadata = status.metadata;
+
+    if (_metadata != null) {
+      _loading = false;
+      _durationNanoseconds = _metadata.duration;
+    }
+
+    if (_progressBarReady && _progressNanoseconds < 0) {
+      // We thought the progress bar was ready, but we're getting negative
+      // progress values. That means our assumption about reference time
+      // correlation is probably wrong. We need to prepare the progress bar
+      // again. See the comment in |_prepareProgressBar|.
+      // TODO(dalesat): Remove once we're given access to presentation time.
+      // https://fuchsia.atlassian.net/browse/US-130
+      _progressBarReady = false;
+    }
+
+    if (_timelineFunction != null &&
+        _timelineFunction.referenceTime != 0 &&
+        (!_progressBarReady || prepare)) {
+      _prepareProgressBar();
+    }
+
+    if (status.videoSize != null && status.pixelAspectRatio != null) {
+      onVideoGeometryUpdated(status.videoSize, status.pixelAspectRatio);
+    }
+
+    if (updateCallback != null) {
+      scheduleMicrotask(() {
+        updateCallback();
+      });
+    }
   }
 
   /// Called when the connection to the NetMediaPlayer fails.
