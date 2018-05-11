@@ -107,7 +107,7 @@ void _copyUint64(ByteData data, Uint64List value, int offset) {
 
 void _copyFloat32(ByteData data, Float32List value, int offset) {
   final int count = value.length;
-  const int stride = 8;
+  const int stride = 4;
   for (int i = 0; i < count; ++i) {
     data.setFloat32(offset + i * stride, value[i], Endian.little);
   }
