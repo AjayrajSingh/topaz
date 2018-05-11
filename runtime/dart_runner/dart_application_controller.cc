@@ -138,7 +138,7 @@ bool DartApplicationController::SetupNamespace() {
 
 bool DartApplicationController::SetupFromKernel() {
   MappedResource manifest;
-  if (!MappedResource::LoadFromNamespace(namespace_, "pkg/manifest",
+  if (!MappedResource::LoadFromNamespace(namespace_, "pkg/data/app.dilplist",
                                          manifest)) {
     return false;
   }
@@ -171,7 +171,7 @@ bool DartApplicationController::SetupFromKernel() {
       return false;
     }
 
-    std::string path = "pkg/" + str.substr(start, end - start);
+    std::string path = "pkg/data/" + str.substr(start, end - start);
     start = end + 1;
 
     // TODO(rmacnak): Keep these in memory and remove copying from the VM.

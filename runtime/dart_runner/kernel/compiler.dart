@@ -162,8 +162,8 @@ Future writePackages(Component program, String output, String packageManifestFil
   }
 
   final IOSink packageManifest = new File(packageManifestFilename).openWrite();
-  final String loadManifestFilename = packageManifestFilename+"-load";
-  final IOSink loadManifest = new File(loadManifestFilename).openWrite();
+  final String kernelListFilename = packageManifestFilename+".dilplist";
+  final IOSink kernelList = new File(kernelListFilename).openWrite();
 
   final packages = new Set<String>();
   for (Library lib in program.libraries) {
@@ -173,17 +173,17 @@ Future writePackages(Component program, String output, String packageManifestFil
   packages.remove(null);
 
   for (String package in packages) {
-    await writePackage(program, output, package, packageManifest, loadManifest);
+    await writePackage(program, output, package, packageManifest, kernelList);
   }
-  await writePackage(program, output, "main", packageManifest, loadManifest);
+  await writePackage(program, output, "main", packageManifest, kernelList);
 
-  packageManifest.write("manifest=$loadManifestFilename\n");
+  packageManifest.write("data/app.dilplist=$kernelListFilename\n");
   await packageManifest.close();
-  await loadManifest.close();
+  await kernelList.close();
 }
 
 Future writePackage(Component program, String output, String package,
-                    IOSink packageManifest, IOSink loadManifest) async {
+                    IOSink packageManifest, IOSink kernelList) async {
   final String filenameInPackage = package + ".dilp";
   final String filenameInBuild = output + "-" + package + ".dilp";
   final IOSink sink = new File(filenameInBuild).openWrite();
@@ -202,8 +202,8 @@ Future writePackage(Component program, String output, String package,
 
   await sink.close();
 
-  packageManifest.write("$filenameInPackage=$filenameInBuild\n");
-  loadManifest.write("$filenameInPackage\n");
+  packageManifest.write("data/$filenameInPackage=$filenameInBuild\n");
+  kernelList.write("$filenameInPackage\n");
 }
 
 String packageFor(Library lib) {
