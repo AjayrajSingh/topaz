@@ -165,7 +165,7 @@ class _ModuleWatcherImpl extends ModuleWatcher {
   @override
   void onStateChange(ModuleState newState) {
     /// If our module was stopped by the framework, notify this.
-    if (newState == ModuleState.stopped || newState == ModuleState.done) {
+    if (newState == ModuleState.stopped) {
       onStop();
     }
   }
