@@ -67,14 +67,15 @@ Future<SuggestionDisplayImage> createSuggestionDisplayImage({
 }
 
 /// Creates a proposal.
+// TODO(miguelfrde): we should use a Builder pattern here instead.
 Future<Proposal> createProposal({
   String id,
+  String storyId,
+  bool storyAffinity: false,
   double confidence: 0.0,
-  String appUrl,
   String headline,
   String subheadline,
   String details,
-  String initialData,
   String imageUrl,
   SuggestionImageType imageType: SuggestionImageType.other,
   List<String> iconUrls,
@@ -99,6 +100,8 @@ Future<Proposal> createProposal({
 
   return new Proposal(
     id: id,
+    storyId: storyId,
+    storyAffinity: storyAffinity,
     confidence: confidence,
     display: new SuggestionDisplay(
       headline: headline,

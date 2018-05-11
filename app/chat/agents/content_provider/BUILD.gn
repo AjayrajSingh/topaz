@@ -23,5 +23,6 @@ dart_app("chat_content_provider") {
     "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/ledger/dart",
+    "//topaz/public/lib/proposal/dart",
   ]
 }

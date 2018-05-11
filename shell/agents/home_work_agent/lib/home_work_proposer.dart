@@ -186,7 +186,7 @@ class _QueryHandlerImpl extends QueryHandler {
     if (queryText.startsWith('demo') ?? false) {
       proposals
         ..addAll(await Future.wait(askProposals.map(_createProposal)))
-        ..add(_launchEverythingProposal);
+        ..add(await _launchEverythingProposal);
     }
 
     if (queryText.contains('launch') || queryText.contains('bring up')) {
@@ -373,14 +373,12 @@ class _QueryHandlerImpl extends QueryHandler {
     callback(new QueryResponse(proposals: proposals));
   }
 
-  Proposal get _launchEverythingProposal => new Proposal(
+  Future<Proposal> get _launchEverythingProposal async =>
+    createProposal(
         id: _kLaunchEverythingProposalId,
-        display: const SuggestionDisplay(
-          headline: 'Launch everything',
-          color: 0xFFFF0080,
-          annoyance: AnnoyanceType.none,
-        ),
-        onSelected: askProposals
+        headline: 'Launch everything',
+        color: 0xFFFF0080,
+        actions: askProposals
             .map(
               (Map<String, String> proposal) => new Action.withCreateStory(
                     new CreateStory(

@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
 import 'package:fuchsia.fidl.modular/modular.dart';
 import 'package:lib.app.dart/logging.dart';
+import 'package:lib.proposal.dart/proposal.dart';
 
 const String _kContactsJsonFile = '/system/data/modules/contacts.json';
 
@@ -51,14 +52,14 @@ class Proposer extends ContextListener {
     // if the story the conversation is a part of isn't visible.
     if (_currentLocation == 'work' && _workContacts.contains(message.sender)) {
       log.fine('Sending interruptive suggestion for ${message.sender}');
-      proposalPublisher.propose(_createProposal(message, true));
+      proposalPublisher.propose(await _createProposal(message, true));
     } else if (_currentLocation == 'home' &&
         _homeContacts.contains(message.sender)) {
       log.fine('Sending interruptive suggestion for ${message.sender}');
-      proposalPublisher.propose(_createProposal(message, true));
+      proposalPublisher.propose(await _createProposal(message, true));
     } else {
       log.fine('Sending normal suggestion for ${message.sender}');
-      proposalPublisher.propose(_createProposal(message, false));
+      proposalPublisher.propose(await _createProposal(message, false));
     }
   }
 
@@ -79,13 +80,12 @@ class Proposer extends ContextListener {
     }
   }
 
-  Proposal _createProposal(Message message, bool interruptive) => new Proposal(
+  Future<Proposal> _createProposal(Message message, bool interruptive) async =>
+    createProposal(
           id: 'Message from ${message.sender}',
-          display: new SuggestionDisplay(
-              headline: 'Message from ${message.sender}',
-              color: 0xFFFF0080,
-              annoyance: AnnoyanceType.none),
-          onSelected: <Action>[
+          headline: 'Message from ${message.sender}',
+          color: 0xFFFF0080,
+          actions: <Action>[
             const Action.withFocusStory(const FocusStory(storyId: ''))
           ]);
 }
