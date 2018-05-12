@@ -37,15 +37,10 @@ class _ModuleStopperWatcher extends ModuleWatcher {
   }
   @override
   void onStateChange(ModuleState newState) {
+    // NOTE(mesch): There used to be code here that would stop the module when
+    // it's Done(), indicated by the module state being DONE, but this state no
+    // longer exists.
     log.info('Module state changed to $newState');
-    if (newState == ModuleState.done) {
-      _moduleController.stop(() {
-        log.info('Module stopped!');
-        _binding.unbind();
-        _watchers.remove(this);
-        kChildModulesKey.currentState.refresh();
-      });
-    }
   }
 
   void focus() {
@@ -346,8 +341,10 @@ class MainWidget extends StatelessWidget {
                     child: new RaisedButton(
                       child: const Text('Close'),
                       onPressed: () {
-                        log.info('Module done...');
-                        _moduleContext.done();
+                        // NOTE(mesch): There used to be code here that calls
+                        // ModuleContext.Done(), but that method no longer
+                        // exists.
+                        log.warning('Module done is no longer supported.');
                       },
                     ),
                   ),
