@@ -414,8 +414,7 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
 
   void _onStoryChanged(StoryInfo storyInfo, StoryState storyState) {
     if (!_storyControllerMap.containsKey(storyInfo.id)) {
-      assert(
-          storyState == StoryState.initial || storyState == StoryState.stopped);
+      assert(storyState == StoryState.stopped);
       _getController(storyInfo.id);
       _startStory(storyInfo, 0);
     } else {

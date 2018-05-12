@@ -172,9 +172,7 @@ class ModuleDriver {
 
   /// Start the module and connect to dependent services on module
   /// initialization.
-  Future<ModuleDriver> start({
-    bool autoReady: true,
-  }) async {
+  Future<ModuleDriver> start() async {
     log.fine('#start(...)');
 
     // Fail fast on subsequent (accidental) calls to #start() instead of
@@ -214,14 +212,6 @@ class ModuleDriver {
     } on Exception catch (err, stackTrace) {
       _start.completeError(err, stackTrace);
       return _start.future;
-    }
-
-    if (autoReady) {
-      try {
-        await moduleContext.ready();
-      } on Exception catch (err, stackTrace) {
-        _start.completeError(err, stackTrace);
-      }
     }
 
     /// Return the instance of this module driver to enable simpler composition
@@ -566,22 +556,6 @@ class ModuleDriver {
     log.fine('resolving module ("$name") for embedding...');
 
     return moduleContext.embedModule(name: name, intent: intent);
-  }
-
-  /// # Ready
-  ///
-  /// Used by modules to signal being "ready" to the framework and any parent
-  /// modules. This method SHOULD be used when the "autoReady" param is set to
-  /// false in [start].
-  ///
-  ///     driver.start(autoReady: false).then((ModuleDriver driver) async {
-  ///       // do more async work, e.g. embed modules and
-  ///       // wait for them to be ready.
-  ///       driver.ready().then(() => log.info('ready!'), onError: handleError);
-  ///     });
-  ///
-  Future<Null> ready() {
-    return moduleContext.ready();
   }
 
   /// Made available for video module to access MediaPlayer.

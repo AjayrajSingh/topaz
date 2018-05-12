@@ -131,33 +131,6 @@ class ModuleContextClient {
     return completer.future;
   }
 
-  /// See [fidl.ModuleContext#ready].
-  Future<Null> ready() async {
-    Completer<Null> completer = new Completer<Null>();
-
-    // ignore: unawaited_futures
-    proxy.ctrl.error.then((ProxyError err) {
-      if (!completer.isCompleted) {
-        completer.completeError(err);
-      }
-    });
-
-    try {
-      await bound;
-      proxy.ready();
-    } on Exception catch (err, stackTrace) {
-      completer.completeError(err, stackTrace);
-    }
-
-    scheduleMicrotask(() {
-      if (!completer.isCompleted) {
-        completer.complete(null);
-      }
-    });
-
-    return completer.future;
-  }
-
   /// See [fidl.ComponentContext#getComponentContext].
   Future<ComponentContextClient> getComponentContext() async {
     await bound;
