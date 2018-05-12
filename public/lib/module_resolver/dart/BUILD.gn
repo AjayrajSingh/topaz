@@ -7,7 +7,7 @@ import("//build/dart/dart_library.gni")
 dart_library("dart") {
   package_name = "lib.module_resolver.dart"
 
-  sdk_candidate = true
+  sdk_category = "partner"
 
   source_dir = "."
 

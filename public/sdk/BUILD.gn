@@ -6,6 +6,8 @@ import("//build/dart/toolchain.gni")
 import("//build/sdk/sdk.gni")
 
 sdk("dart") {
+  category = "partner"
+
   deps = [
     "//topaz/public/dart/config:config_sdk($dart_toolchain)",
     "//topaz/public/dart/fidl:fidl_sdk($dart_toolchain)",

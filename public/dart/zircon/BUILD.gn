@@ -8,7 +8,7 @@ import("//build/dart/dart_test.gni")
 dart_library("zircon") {
   package_name = "zircon"
 
-  sdk_candidate = true
+  sdk_category = "partner"
 
   sources = [
     "zircon.dart",

@@ -7,7 +7,7 @@ import("//build/dart/dart_library.gni")
 dart_library("widget_explorer_meta") {
   package_name = "widget_explorer_meta"
 
-  sdk_candidate = true
+  sdk_category = "partner"
 
   sources = [
     "widgets_meta.dart",
