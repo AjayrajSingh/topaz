@@ -4,11 +4,11 @@
 
 import 'package:lib.app.dart/app.dart';
 
-import 'package:fuchsia.fidl.bluetooth/bluetooth.dart' as bt;
-import 'package:fuchsia.fidl.bluetooth_gatt/bluetooth_gatt.dart' as gatt;
-import 'package:fuchsia.fidl.bluetooth_low_energy/bluetooth_low_energy.dart'
+import 'package:fidl_bluetooth/fidl.dart' as bt;
+import 'package:fidl_bluetooth_gatt/fidl.dart' as gatt;
+import 'package:fidl_bluetooth_low_energy/fidl.dart'
     as ble;
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
 

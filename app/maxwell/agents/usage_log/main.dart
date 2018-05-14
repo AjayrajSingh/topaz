@@ -19,9 +19,9 @@
 import 'dart:collection';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.cobalt/cobalt.dart';
+import 'package:fidl_cobalt/fidl.dart';
 import 'package:lib.context.dart/context_listener_impl.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';
 
 // The project ID of the usage_log registered in Cobalt.
 const int _cobaltProjectID = 101;

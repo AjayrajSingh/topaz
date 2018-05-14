@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:convert' show json;
 
-import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
+import 'package:fidl_chat_content_provider/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 

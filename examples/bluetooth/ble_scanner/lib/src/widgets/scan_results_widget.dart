@@ -4,7 +4,7 @@
 
 import 'dart:math';
 
-import 'package:fuchsia.fidl.bluetooth_low_energy/bluetooth_low_energy.dart'
+import 'package:fidl_bluetooth_low_energy/fidl.dart'
     as ble;
 
 import 'package:flutter/material.dart';

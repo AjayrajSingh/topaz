@@ -4,9 +4,9 @@
 
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fidl_component/fidl.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.story.dart/story.dart';
 
 /// Called when [Module.initialize] occurs.

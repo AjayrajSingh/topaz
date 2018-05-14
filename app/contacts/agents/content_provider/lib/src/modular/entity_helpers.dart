@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:lib.schemas.dart/com.fuchsia.contact.dart' as entities;
-import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
+import 'package:fidl_contacts_content_provider/fidl.dart'
     as fidl;
 
 /// Converts a [fidl.Contact] into a [entities.ContactEntityData] entity

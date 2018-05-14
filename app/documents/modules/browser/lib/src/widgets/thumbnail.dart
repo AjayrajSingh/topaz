@@ -7,7 +7,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:utils/utils.dart' as utils;
-import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
+import 'package:fidl_documents/fidl.dart' as doc_fidl;
 
 import './selectable_item.dart';
 

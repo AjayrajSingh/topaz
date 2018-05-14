@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fidl_component/fidl.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:meta/meta.dart';
 
-export 'package:fuchsia.fidl.modular/modular.dart' show ModuleContext;
-export 'package:fuchsia.fidl.component/component.dart'
+export 'package:fidl_modular/fidl.dart' show ModuleContext;
+export 'package:fidl_component/fidl.dart'
     show ServiceProvider;
 
 /// Callback for [ModuleImpl#onInitialize].

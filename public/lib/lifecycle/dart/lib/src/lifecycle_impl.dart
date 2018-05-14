@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
-import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
+import 'package:fidl_modular/fidl.dart' as fidl;
 import 'package:meta/meta.dart';
 
 /// Callback for [LifecycleImpl#onTerminate].

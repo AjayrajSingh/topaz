@@ -5,8 +5,8 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
-import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
+import 'package:fidl_chat_content_provider/fidl.dart';
+import 'package:fidl_modular_auth/fidl.dart';
 import 'package:lib.agent.dart/agent.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';

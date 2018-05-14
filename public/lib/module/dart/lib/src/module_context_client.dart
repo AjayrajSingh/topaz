@@ -5,9 +5,9 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.modular/modular.dart' as fidl;
+import 'package:fidl_modular/fidl.dart' as fidl;
 // See DNO-201 for details on the _view_token path.
-import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
+import 'package:fidl_views_v1_token/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.story.dart/story.dart';
@@ -16,7 +16,7 @@ import 'package:meta/meta.dart';
 
 import 'module_controller_client.dart';
 
-export 'package:fuchsia.fidl.modular/modular.dart';
+export 'package:fidl_modular/fidl.dart';
 export 'package:lib.component.dart/component.dart' show ComponentContextClient;
 
 /// When Module resolution fails.

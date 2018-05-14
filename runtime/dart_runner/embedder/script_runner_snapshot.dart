@@ -28,4 +28,4 @@ import 'package:lib.app.dart/app.dart';
 import 'package:fidl/fidl.dart';
 
 // From //peridot/public/lib:fidl
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';

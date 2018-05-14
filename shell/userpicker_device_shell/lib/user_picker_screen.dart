@@ -4,7 +4,7 @@
 
 import 'dart:ui' show lerpDouble;
 
-import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
+import 'package:fidl_modular_auth/fidl.dart';
 import 'package:flutter/material.dart';
 
 import 'user_list.dart';

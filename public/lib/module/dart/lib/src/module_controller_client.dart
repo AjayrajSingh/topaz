@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:lib.app.dart/logging.dart';
 // This import should not need the "._module_controller" in the path, see
 // DNO-201
-import 'package:fuchsia.fidl.modular/modular.dart'
+import 'package:fidl_modular/fidl.dart'
     as fidl;
 
 /// Client wrapper for [fidl.ModuleController].

@@ -5,9 +5,9 @@
 import 'dart:async';
 import 'dart:io' as io;
 
-import 'package:fuchsia.fidl.hello_app_dart/hello_app_dart.dart';
+import 'package:fidl_hello_app_dart/fidl.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fidl_component/fidl.dart';
 import 'package:test/test.dart';
 
 void main(List<String> args) {

@@ -5,8 +5,8 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.cobalt/cobalt.dart';
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fidl_cobalt/fidl.dart';
+import 'package:fidl_component/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.component.dart/component.dart';
@@ -20,7 +20,7 @@ import 'package:meta/meta.dart';
 
 import 'service_client.dart';
 
-export 'package:fuchsia.fidl.modular/modular.dart' show Intent;
+export 'package:fidl_modular/fidl.dart' show Intent;
 export 'package:lib.module_resolver.dart/intent_builder.dart'
     show IntentBuilder;
 export 'package:lib.module.dart/module.dart'

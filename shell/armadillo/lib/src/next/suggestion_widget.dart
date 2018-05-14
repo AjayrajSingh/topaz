@@ -5,7 +5,7 @@
 import 'package:armadillo/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fuchsia.fidl.images/images.dart';
+import 'package:fidl_images/fidl.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 
 import 'suggestion.dart' as suggest;

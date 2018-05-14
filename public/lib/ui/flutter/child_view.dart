@@ -7,10 +7,10 @@ import 'dart:collection';
 import 'dart:ui' as ui;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.geometry/geometry.dart' as fidl;
-import 'package:fuchsia.fidl.views_v1/views_v1.dart';
-import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
+import 'package:fidl_component/fidl.dart';
+import 'package:fidl_geometry/fidl.dart' as fidl;
+import 'package:fidl_views_v1/fidl.dart';
+import 'package:fidl_views_v1_token/fidl.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
@@ -18,7 +18,7 @@ import 'package:meta/meta.dart';
 import 'package:mozart/mozart.dart';
 import 'package:zircon/zircon.dart';
 
-export 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart' show ViewOwner;
+export 'package:fidl_views_v1_token/fidl.dart' show ViewOwner;
 
 ViewContainerProxy _initViewContainer() {
   // Analyzer doesn't know Handle must be dart:zircon's Handle

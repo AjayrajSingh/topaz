@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.ledger/ledger.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_ledger/fidl.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 

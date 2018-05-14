@@ -6,10 +6,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
-import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
+import 'package:fidl_chat_content_provider/fidl.dart'
     as chat;
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_component/fidl.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';

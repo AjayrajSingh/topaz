@@ -5,14 +5,14 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:fuchsia.fidl.images/images.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_images/fidl.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:http/http.dart' as http;
 import 'package:lib.app.dart/logging.dart';
 import 'package:zircon/zircon.dart';
 
 export 'dart:typed_data' show Uint8List;
-export 'package:fuchsia.fidl.modular/modular.dart';
+export 'package:fidl_modular/fidl.dart';
 
 /// Converts a url into a SizedVmo.  Null is returned if a SizedVmo couldn't
 /// be created from the given url.

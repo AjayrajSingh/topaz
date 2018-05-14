@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
-import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
+import 'package:fidl_chat_content_provider/fidl.dart';
+import 'package:fidl_modular_auth/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 
 import 'firebase_db_client_impl.dart';

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/foundation.dart';
-import 'package:fuchsia.fidl.time_zone/time_zone.dart';
+import 'package:fidl_time_zone/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/model.dart';
 

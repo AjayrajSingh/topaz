@@ -8,7 +8,7 @@ import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia/fuchsia.dart';
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fidl_component/fidl.dart';
 import 'package:zircon/zircon.dart';
 
 class ApplicationContext {

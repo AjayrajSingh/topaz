@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert' show json;
 
 import 'package:contacts_services/client.dart';
-import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
+import 'package:fidl_contacts_content_provider/fidl.dart'
     as contacts_fidl;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';

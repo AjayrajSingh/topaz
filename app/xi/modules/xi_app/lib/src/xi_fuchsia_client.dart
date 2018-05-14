@@ -7,10 +7,10 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.ledger/ledger.dart';
+import 'package:fidl_component/fidl.dart';
+import 'package:fidl_ledger/fidl.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.xi/xi.dart' as service;
+import 'package:fidl_xi/fidl.dart' as service;
 import 'package:xi_client/client.dart';
 import 'package:zircon/zircon.dart';
 

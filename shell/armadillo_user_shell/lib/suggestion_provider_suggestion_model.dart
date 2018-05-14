@@ -7,8 +7,8 @@ import 'dart:async';
 import 'package:armadillo/next.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fuchsia.fidl.images/images.dart';
-import 'package:fuchsia.fidl.modular/modular.dart' as maxwell;
+import 'package:fidl_images/fidl.dart';
+import 'package:fidl_modular/fidl.dart' as maxwell;
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 

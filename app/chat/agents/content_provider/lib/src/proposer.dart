@@ -5,8 +5,8 @@
 import 'dart:convert' show json;
 import 'dart:io';
 
-import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_chat_content_provider/fidl.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 

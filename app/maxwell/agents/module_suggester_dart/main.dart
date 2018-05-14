@@ -7,7 +7,7 @@ import 'dart:convert' show json;
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.proposal.dart/proposal.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
 final IntelligenceServicesProxy _intelligenceServices =

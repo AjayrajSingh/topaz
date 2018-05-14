@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fidl_component/fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:fuchsia.fidl.views_v1/views_v1.dart';
+import 'package:fidl_views_v1/fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';

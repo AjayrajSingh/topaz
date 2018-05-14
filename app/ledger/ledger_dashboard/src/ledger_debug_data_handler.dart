@@ -8,8 +8,8 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.ledger_internal/ledger_internal.dart';
-import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger_fidl;
+import 'package:fidl_ledger_internal/fidl.dart';
+import 'package:fidl_ledger/fidl.dart' as ledger_fidl;
 
 import 'data_handler.dart';
 

@@ -4,8 +4,8 @@
 
 import 'package:armadillo/next.dart';
 
-import 'package:fuchsia.fidl.modular/modular.dart' as maxwell;
-import 'package:fuchsia.fidl.speech/speech.dart' as speech;
+import 'package:fidl_modular/fidl.dart' as maxwell;
+import 'package:fidl_speech/fidl.dart' as speech;
 import 'package:lib.app.dart/logging.dart';
 
 import 'maxwell_hotword.dart';

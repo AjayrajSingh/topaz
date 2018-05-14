@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';

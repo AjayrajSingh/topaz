@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert' as convert;
 import 'dart:io';
 
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 
 const String _kConfigFile =

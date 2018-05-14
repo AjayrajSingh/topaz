@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_documents/fidl.dart' as doc_fidl;
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';

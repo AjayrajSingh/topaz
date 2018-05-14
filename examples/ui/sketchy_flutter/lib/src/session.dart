@@ -6,13 +6,13 @@
 // ignore_for_file: import_duplicated_library_named
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.images/images.dart';
-import 'package:fuchsia.fidl.gfx/gfx.dart' as gfx;
-import 'package:fuchsia.fidl.ui/ui.dart' as ui;
+import 'package:fidl_component/fidl.dart';
+import 'package:fidl_images/fidl.dart';
+import 'package:fidl_gfx/fidl.dart' as gfx;
+import 'package:fidl_ui/fidl.dart' as ui;
 import 'package:zircon/zircon.dart' as zircon;
 
-export 'package:fuchsia.fidl.images/images.dart' show PresentationInfo;
+export 'package:fidl_images/fidl.dart' show PresentationInfo;
 
 // ignore_for_file: public_member_api_docs
 

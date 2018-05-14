@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fuchsia.fidl.bluetooth_control/bluetooth_control.dart' as bt_ctl;
+import 'package:fidl_bluetooth_control/fidl.dart' as bt_ctl;
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'modular/module_model.dart';

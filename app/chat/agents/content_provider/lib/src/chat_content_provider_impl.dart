@@ -7,10 +7,10 @@ import 'dart:convert' show utf8;
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart' show InterfaceRequest;
-import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
-import 'package:fuchsia.fidl.ledger/ledger.dart';
-import 'package:fuchsia.fidl.mem/mem.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_chat_content_provider/fidl.dart';
+import 'package:fidl_ledger/fidl.dart';
+import 'package:fidl_mem/fidl.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ledger.dart/ledger.dart';
 import 'package:meta/meta.dart';

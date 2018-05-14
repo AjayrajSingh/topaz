@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.input/input.dart';
+import 'package:fidl_component/fidl.dart';
+import 'package:fidl_input/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';

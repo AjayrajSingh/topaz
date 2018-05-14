@@ -7,7 +7,7 @@ import 'package:contacts_picker/stores.dart';
 import 'package:contacts_picker/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
+import 'package:fidl_contacts_content_provider/fidl.dart'
     as fidl;
 
 List<fidl.Contact> _contacts = <fidl.Contact>[

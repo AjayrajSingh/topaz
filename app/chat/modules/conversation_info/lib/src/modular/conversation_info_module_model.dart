@@ -9,10 +9,10 @@ import 'dart:typed_data';
 import 'package:chat_models/chat_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart'
+import 'package:fidl_chat_content_provider/fidl.dart'
     as fidl;
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_component/fidl.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.component.dart/component.dart';

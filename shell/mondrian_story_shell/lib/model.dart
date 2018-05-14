@@ -5,8 +5,8 @@
 import 'dart:math' as math;
 
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:fuchsia.fidl.views_v1_token/views_v1_token.dart';
+import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_views_v1_token/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';

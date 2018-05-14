@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fuchsia.fidl.documents/documents.dart' as doc_fidl;
+import 'package:fidl_documents/fidl.dart' as doc_fidl;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.schemas.dart/com.fuchsia.documents.dart';

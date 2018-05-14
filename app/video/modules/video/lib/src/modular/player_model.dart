@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 import 'dart:async';
 
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.media_player/media_player.dart';
+import 'package:fidl_component/fidl.dart';
+import 'package:fidl_media_player/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
 import 'package:lib.media.flutter/media_progress.dart';

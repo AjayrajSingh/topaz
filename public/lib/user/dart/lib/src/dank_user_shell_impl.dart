@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:fidl/fidl.dart';
 
 import 'user_shell_impl.dart';

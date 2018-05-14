@@ -4,7 +4,7 @@
 
 import 'package:armadillo/recent.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fuchsia.fidl.images/images.dart';
+import 'package:fidl_images/fidl.dart';
 import 'package:meta/meta.dart';
 
 import 'suggestion_layout.dart';

@@ -8,8 +8,8 @@ import 'dart:convert' show json;
 
 import 'package:config/config.dart';
 import 'package:eventsource/eventsource.dart';
-import 'package:fuchsia.fidl.chat_content_provider/chat_content_provider.dart';
-import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
+import 'package:fidl_chat_content_provider/fidl.dart';
+import 'package:fidl_modular_auth/fidl.dart';
 import 'package:http/http.dart' as http;
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';

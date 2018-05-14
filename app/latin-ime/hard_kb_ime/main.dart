@@ -7,7 +7,7 @@ import 'dart:math';
 import 'package:fidl/fidl.dart';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.input/input.dart';
+import 'package:fidl_input/fidl.dart';
 
 // ignore_for_file: public_member_api_docs
 

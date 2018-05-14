@@ -9,8 +9,8 @@ import 'dart:math' show Random;
 import 'dart:typed_data' show Uint8List;
 
 import 'package:collection/collection.dart';
-import 'package:fuchsia.fidl.mem/mem.dart';
-import 'package:fuchsia.fidl.ledger/ledger.dart';
+import 'package:fidl_mem/fidl.dart';
+import 'package:fidl_ledger/fidl.dart';
 import 'package:quiver/core.dart' as quiver;
 import 'package:zircon/zircon.dart' show ZX, ReadResult;
 

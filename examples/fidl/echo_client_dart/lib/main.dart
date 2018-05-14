@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fuchsia.fidl.echo2/echo2.dart';
+import 'package:fidl_echo2/fidl.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fidl_component/fidl.dart';
 
 ApplicationContext _context;
 EchoProxy _echo;

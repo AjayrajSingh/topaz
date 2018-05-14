@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:lib.app_driver.dart/module_driver.dart';
-import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
+import 'package:fidl_contacts_content_provider/fidl.dart'
     as fidl;
 
 /// Client wrapper class for the [fidl.ContactsContentProvider] service

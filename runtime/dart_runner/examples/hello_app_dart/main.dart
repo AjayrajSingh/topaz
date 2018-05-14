@@ -5,7 +5,7 @@
 import 'package:fidl/fidl.dart';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.hello_app_dart/hello_app_dart.dart';
+import 'package:fidl_hello_app_dart/fidl.dart';
 
 class _HelloImpl extends Hello {
   final HelloBinding _binding = new HelloBinding();

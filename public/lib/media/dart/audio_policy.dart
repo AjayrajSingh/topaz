@@ -3,11 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.audio_policy/audio_policy.dart' as audio_policy;
-import 'package:fuchsia.fidl.media/media.dart';
+import 'package:fidl_audio_policy/fidl.dart' as audio_policy;
+import 'package:fidl_media/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.logging/logging.dart';
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fidl_component/fidl.dart';
 
 /// Type for |AudioPolicy| update callbacks.
 typedef void UpdateCallback();

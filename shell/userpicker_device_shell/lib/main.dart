@@ -5,8 +5,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:fuchsia.fidl.cobalt/cobalt.dart';
-import 'package:fuchsia.fidl.netstack/netstack.dart';
+import 'package:fidl_cobalt/fidl.dart';
+import 'package:fidl_netstack/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/application.dart';

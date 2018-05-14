@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:fuchsia.fidl.presentation/presentation.dart';
+import 'package:fidl_presentation/fidl.dart';
 
 /// Gives information about screen size and device usage a user shell is expected
 /// to run with.

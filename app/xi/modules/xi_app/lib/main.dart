@@ -4,10 +4,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:fuchsia/fuchsia.dart';
-import 'package:fuchsia.fidl.component/component.dart';
+import 'package:fidl_component/fidl.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.ledger/ledger.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_ledger/fidl.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:xi_widgets/widgets.dart';
 
 import 'src/xi_fuchsia_client.dart';

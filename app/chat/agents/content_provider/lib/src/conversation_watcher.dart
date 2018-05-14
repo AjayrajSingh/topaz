@@ -4,8 +4,8 @@
 
 import 'dart:convert' show json;
 
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:fuchsia.fidl.ledger/ledger.dart';
+import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_ledger/fidl.dart';
 import 'package:meta/meta.dart';
 
 import 'base_page_watcher.dart';

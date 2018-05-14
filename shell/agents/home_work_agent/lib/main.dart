@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.agent.dart/agent.dart';
 import 'package:meta/meta.dart';
 

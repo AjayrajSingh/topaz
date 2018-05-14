@@ -5,8 +5,8 @@
 import 'dart:async';
 import 'dart:convert' show json;
 
-import 'package:fuchsia.fidl.ledger/ledger.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_ledger/fidl.dart';
+import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ledger.dart/ledger.dart';
 import 'package:meta/meta.dart';

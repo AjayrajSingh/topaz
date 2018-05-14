@@ -6,11 +6,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:fuchsia.fidl.component/component.dart';
-import 'package:fuchsia.fidl.contacts_content_provider/contacts_content_provider.dart'
+import 'package:fidl_component/fidl.dart';
+import 'package:fidl_contacts_content_provider/fidl.dart'
     as fidl;
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:fuchsia.fidl.ledger/ledger.dart' as ledger;
+import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_ledger/fidl.dart' as ledger;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ledger.dart/ledger.dart';

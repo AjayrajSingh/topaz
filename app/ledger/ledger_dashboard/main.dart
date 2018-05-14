@@ -9,7 +9,7 @@ import 'dart:io';
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:fidl_modular/fidl.dart';
 
 import 'package:path/path.dart' as path;
 

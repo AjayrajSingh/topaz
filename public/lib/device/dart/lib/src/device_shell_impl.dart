@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fuchsia.fidl.modular/modular.dart';
-import 'package:fuchsia.fidl.modular_auth/modular_auth.dart';
+import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_modular_auth/fidl.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia.fidl.presentation/presentation.dart';
+import 'package:fidl_presentation/fidl.dart';
 import 'package:meta/meta.dart';
 
 /// Called when [DeviceShell.initialize] occurs.
