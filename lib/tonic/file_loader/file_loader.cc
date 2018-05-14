@@ -242,25 +242,21 @@ Dart_Handle FileLoader::Import(Dart_Handle url) {
 }
 
 namespace {
-void ReleaseFetchedBytes(uint8_t* buffer) {
-  free(buffer);
+void MallocFinalizer(void* isolate_callback_data,
+                     Dart_WeakPersistentHandle handle,
+                     void* peer) {
+  free(peer);
 }
-}
+}  // namespace
 
 Dart_Handle FileLoader::Kernel(Dart_Handle url) {
   std::string url_string = StdStringFromDart(url);
   std::pair<uint8_t*, intptr_t> fetched_result = FetchBytes(url_string);
-  // TODO(aam): With dartbug.com/28057 addressed, there should be no need
-  // to pass ownership of fetched program through Dart_ReadKernelBinary.
-  void* kernel_program = Dart_ReadKernelBinary(
-      fetched_result.first,
-      fetched_result.second,
-      ReleaseFetchedBytes
-  );
-  if (kernel_program == NULL) {
-    return Dart_NewApiError("Failed to read kernel binary");
-  }
-  return Dart_NewExternalTypedData(Dart_TypedData_kUint64, kernel_program, 1);
+  Dart_Handle result = Dart_NewExternalTypedData(
+      Dart_TypedData_kUint8, fetched_result.first, fetched_result.second);
+  Dart_NewWeakPersistentHandle(result, fetched_result.first,
+                               fetched_result.second, MallocFinalizer);
+  return result;
 }
 
 Dart_Handle FileLoader::Source(Dart_Handle library, Dart_Handle url) {
