@@ -41,6 +41,17 @@ package("ermine_user_shell") {
   binary = "ermine_user_shell"
 }
 
+package("launch_ermine") {
+  deprecated_system_image = true
+
+  resources = [
+    {
+      path = rebase_path("assets/launch_ermine_only.json")
+      dest = "sysui/user_shell_to_launch"
+    },
+  ]
+}
+
 package("config") {
   deprecated_system_image = true
   package_name = "ermine_user_shell_config"

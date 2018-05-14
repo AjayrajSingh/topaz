@@ -92,9 +92,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       new PresentationModeListenerBinding();
   final PointerCaptureListenerHackBinding _pointerCaptureListenerBinding =
       new PointerCaptureListenerHackBinding();
-  String _currentAccountId = '';
   ShadowTechnique _currentShadowTechnique = ShadowTechnique.unshadowed;
   bool _currentClippingEnabled = true;
+  bool _hasConfiguredUserShells = false;
 
   // Because this device shell only supports a single user logged in at a time,
   // we don't need to maintain separate ServiceProvider and Presentation
@@ -127,6 +127,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   /// Scroll Controller for the user picker
   ScrollController get userPickerScrollController =>
       _userPickerScrollController;
+
+  /// True if a user shell has been configured.
+  bool get hasConfiguredUserShells => _hasConfiguredUserShells;
 
   @override
   void onReady(
@@ -181,8 +184,11 @@ class UserPickerDeviceShellModel extends DeviceShellModel
       ..setPresentationModeListener(
           _presentationModeListenerBinding.wrap(this));
 
-    _userShellChooser.init().then((_) async =>
-        _updatePresentation(_userShellChooser.getCurrentUserShellInfo()));
+    _userShellChooser.init().then((_) async {
+      _hasConfiguredUserShells = _userShellChooser.currentUserShell != null;
+      _updatePresentation(_userShellChooser.currentUserShell);
+      notifyListeners();
+    });
   }
 
   @override
@@ -348,8 +354,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         new InterfacePair<ServiceProvider>();
     _serviceProviderBinding.bind(this, serviceProvider.passRequest());
 
-    _currentAccountId = accountId;
-    UserShellInfo info = _userShellChooser.getCurrentUserShellInfo();
+    UserShellInfo info = _userShellChooser.currentUserShell;
     final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
     final UserLoginParams params = new UserLoginParams(
       accountId: accountId,
@@ -395,13 +400,13 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     if (ev.codePoint == _kKeyCodeSpacebar &&
         (_userControllerProxy?.ctrl?.isBound ?? false) &&
         _userShellChooser != null) {
-      UserShellInfo info = _userShellChooser.getNextUserShellInfo(
-        _currentAccountId,
-      );
-
-      _updatePresentation(info);
-
-      _userControllerProxy.swapUserShell(new AppConfig(url: info.name), () {});
+      if (_userShellChooser.swapUserShells()) {
+        _updatePresentation(_userShellChooser.currentUserShell);
+        _userControllerProxy.swapUserShell(
+          new AppConfig(url: _userShellChooser.currentUserShell.name),
+          () {},
+        );
+      }
     } else if (ev.codePoint == _kKeyCodeS) {
       // Toggles from unshadowed -> screenSpace -> shadowMap
       if (_currentShadowTechnique == ShadowTechnique.unshadowed) {

@@ -37,12 +37,6 @@ class UserShellInfo {
 
 /// Keeps track of the currently chosen user shell.
 class UserShellChooser {
-  final UserShellInfo _defaultUserShell = new UserShellInfo(
-    name: 'armadillo_user_shell',
-    displayUsage: DisplayUsage.kUnknown,
-    screenHeightMm: 0.0,
-    screenWidthMm: 0.0,
-  );
   final List<UserShellInfo> _configuredUserShells = <UserShellInfo>[];
   int _userShellIndex = 0;
 
@@ -92,17 +86,21 @@ class UserShellChooser {
     }
   }
 
-  /// Switch to next shell and returns the user shell info
-  UserShellInfo getNextUserShellInfo(String user) {
+  /// Switch to next shell.  Returns false if no user shells are configured or
+  /// there's only one user shell.
+  bool swapUserShells() {
+    if (_configuredUserShells.length <= 1) {
+      return false;
+    }
     _userShellIndex = (_userShellIndex + 1) % _configuredUserShells.length;
-    return getCurrentUserShellInfo();
+    return true;
   }
 
-  /// Gets the user shell info of the current shell
-  UserShellInfo getCurrentUserShellInfo() {
+  /// Gets the user shell info of the current shell.
+  UserShellInfo get currentUserShell {
     if (_configuredUserShells.isNotEmpty) {
       return _configuredUserShells[_userShellIndex];
     }
-    return _defaultUserShell;
+    return null;
   }
 }

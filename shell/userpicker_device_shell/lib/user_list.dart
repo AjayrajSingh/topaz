@@ -30,6 +30,12 @@ final BorderRadius _kButtonBorderRadiusLarge =
 
 /// Shows the list of users and allows the user to add new users
 class UserList extends StatelessWidget {
+  /// True if login should be disabled.
+  final bool loginDisabled;
+
+  /// Constructor.
+  const UserList({this.loginDisabled: false});
+
   Widget _buildUserCircle({
     Account account,
     VoidCallback onTap,
@@ -102,6 +108,47 @@ class UserList extends StatelessWidget {
     bool isSmall,
   }) {
     double fontSize = isSmall ? _kButtonFontSizeSmall : _kButtonFontSizeLarge;
+
+    if (loginDisabled) {
+      return new Row(
+        children: <Widget>[
+          _buildUserActionButton(
+            child: new Text(
+              'RESET',
+              style: new TextStyle(
+                fontSize: fontSize,
+                color: Colors.white,
+              ),
+            ),
+            onTap: model.resetTapped,
+            isSmall: isSmall,
+          ),
+          _buildUserActionButton(
+            child: new Text(
+              'WIFI',
+              style: new TextStyle(
+                fontSize: fontSize,
+                color: Colors.white,
+              ),
+            ),
+            onTap: model.wifiTapped,
+            isSmall: isSmall,
+          ),
+          _buildUserActionButton(
+            child: new Text(
+              'LOGIN DISABLED => No UserShell configured',
+              style: new TextStyle(
+                fontSize: fontSize,
+                color: Colors.white,
+              ),
+            ),
+            onTap: () {},
+            isSmall: isSmall,
+            isDisabled: true,
+          ),
+        ],
+      );
+    }
     return new Row(
       children: <Widget>[
         _buildIconButton(
