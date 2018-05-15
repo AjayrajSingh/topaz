@@ -32,7 +32,6 @@ dart_library("dart") {
 
   deps = [
     "//third_party/dart-pkg/pub/json_schema",
-    "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app/dart",
   ]
 }

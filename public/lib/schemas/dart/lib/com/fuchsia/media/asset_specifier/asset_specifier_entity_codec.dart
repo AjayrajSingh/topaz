@@ -4,7 +4,7 @@
 
 import 'dart:convert' show json;
 
-import 'package:lib.logging/logging.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.schemas.dart/entity_codec.dart';
 
 import 'asset_specifier_entity_data.dart';

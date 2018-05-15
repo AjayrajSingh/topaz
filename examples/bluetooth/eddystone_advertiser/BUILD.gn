@@ -15,7 +15,6 @@ flutter_app("eddystone_advertiser") {
     "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
-    "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
   ]

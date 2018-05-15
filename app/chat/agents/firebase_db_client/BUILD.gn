@@ -14,7 +14,6 @@ dart_app("firebase_db_client") {
     "//third_party/dart-pkg/pub/eventsource",
     "//topaz/app/chat/services:services",
     "//topaz/public/dart/config",
-    "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/agent/dart",
   ]
 }

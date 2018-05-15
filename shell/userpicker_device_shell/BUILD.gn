@@ -43,7 +43,6 @@ flutter_aot_app("userpicker_device_shell") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/http",
     "//topaz/public/dart/fidl",
-    "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/ui/flutter",

@@ -12,7 +12,6 @@ flutter_aot_app("wifi_settings") {
   deps = [
     "//garnet/public/lib/wlan/fidl:service",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/app_driver/dart",

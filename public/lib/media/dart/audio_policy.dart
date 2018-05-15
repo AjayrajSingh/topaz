@@ -4,10 +4,10 @@
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_audio_policy/fidl.dart' as audio_policy;
+import 'package:fidl_component/fidl.dart';
 import 'package:fidl_media/fidl.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.logging/logging.dart';
-import 'package:fidl_component/fidl.dart';
+import 'package:lib.app.dart/logging.dart';
 
 /// Type for |AudioPolicy| update callbacks.
 typedef void UpdateCallback();

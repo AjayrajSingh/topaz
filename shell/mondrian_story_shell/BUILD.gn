@@ -36,7 +36,6 @@ flutter_aot_app("mondrian") {
     "//third_party/dart-pkg/pub/quiver",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
-    "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/ui/flutter",

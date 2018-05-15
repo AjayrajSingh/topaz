@@ -14,7 +14,6 @@ flutter_app("documents_info") {
     "//topaz/app/documents/packages/utils:utils",
     "//topaz/app/documents/services:services",
     "//topaz/public/dart/entity_schemas:entity_schemas",
-    "//topaz/public/dart/logging:lib.logging",
     "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/schemas/dart",
     "//topaz/public/lib/widgets/dart",
