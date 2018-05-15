@@ -44,7 +44,6 @@ template("runner") {
       # TODO(abarth): We shouldn't need to depend on libdart_builtin but we
       # fail to link otherwise.
       "//third_party/dart/runtime/bin:libdart_builtin${product_suffix}",
-      "//third_party/dart/runtime/platform:libdart_platform${product_suffix}",
     ]
 
     deps = [
@@ -63,14 +62,20 @@ runner("dart_jit_runner_bin") {
   output_name = "dart_jit_runner"
   product = false
   extra_defines = []
-  extra_deps = [ "//third_party/dart/runtime:libdart_jit" ]
+  extra_deps = [
+    "//third_party/dart/runtime:libdart_jit",
+    "//third_party/dart/runtime/platform:libdart_platform_jit",
+  ]
 }
 
 runner("dart_jit_product_runner_bin") {
   output_name = "dart_jit_product_runner"
   product = true
   extra_defines = [ "DART_PRODUCT" ]
-  extra_deps = [ "//third_party/dart/runtime:libdart_jit_product" ]
+  extra_deps = [
+    "//third_party/dart/runtime:libdart_jit_product",
+    "//third_party/dart/runtime/platform:libdart_platform_jit_product",
+  ]
 }
 
 runner("dart_aot_runner_bin") {
@@ -80,6 +85,7 @@ runner("dart_aot_runner_bin") {
   extra_deps = [
     "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc",
     "//third_party/dart/runtime:libdart_precompiled_runtime",
+    "//third_party/dart/runtime/platform:libdart_platform_precompiled_runtime",
   ]
 }
 
@@ -90,6 +96,7 @@ runner("dart_aot_product_runner_bin") {
   extra_deps = [
     "//topaz/runtime/dart_runner/embedder:dart_aot_product_snapshot_cc",
     "//third_party/dart/runtime:libdart_precompiled_runtime_product",
+    "//third_party/dart/runtime/platform:libdart_platform_precompiled_runtime_product",
   ]
 }
 
