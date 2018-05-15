@@ -28,9 +28,11 @@
         "topaz/packages/prod/sqlite",
         "topaz/packages/prod/sysui",
         "topaz/packages/prod/term",
+        "topaz/packages/prod/userpicker_device_shell",
         "topaz/packages/prod/video",
         "topaz/packages/prod/web_view",
         "topaz/packages/prod/webkit",
+        "topaz/packages/prod/wifi_settings",
         "topaz/packages/prod/xi"
     ],
     "packages": {

@@ -1,0 +1,5 @@
+{
+    "packages": {
+        "wifi_settings": "//topaz/shell/wifi_settings"
+    }
+}
