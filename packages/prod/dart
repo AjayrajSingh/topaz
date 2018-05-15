@@ -1,8 +1,0 @@
-{
-    "labels": [
-        "//third_party/dart:create_sdk"
-    ],
-    "packages": {
-        "dart": "//third_party/dart/runtime/bin:package"
-    }
-}

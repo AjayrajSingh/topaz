@@ -99,7 +99,7 @@ void parseConfigAndStart(String configString) {
 
   // Start the web server
   print('[INFO] Starting LEDGER Dashboard web server on port $_port...');
-  HttpServer.bind(InternetAddress.ANY_IP_V6, _port).then((HttpServer server) {
+  HttpServer.bind(InternetAddress.anyIPv6, _port).then((HttpServer server) {
     server.listen(handleRequest);
     // ignore: always_specify_types
   }).catchError((error) {

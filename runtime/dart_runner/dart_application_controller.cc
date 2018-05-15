@@ -299,7 +299,7 @@ bool DartApplicationController::CreateIsolate(
       url_.c_str(), label_.c_str(),
       reinterpret_cast<const uint8_t*>(isolate_snapshot_data),
       reinterpret_cast<const uint8_t*>(isolate_snapshot_instructions), nullptr,
-      state, &error);
+      nullptr, nullptr, state, &error);
   if (!isolate_) {
     FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
     return false;
@@ -347,11 +347,12 @@ bool DartApplicationController::Main() {
 
   Dart_ExitScope();
   Dart_ExitIsolate();
-  bool retval = Dart_IsolateMakeRunnable(isolate_);
-  if (!retval) {
+  char* error = Dart_IsolateMakeRunnable(isolate_);
+  if (error != nullptr) {
     Dart_EnterIsolate(isolate_);
     Dart_ShutdownIsolate();
-    FXL_LOG(ERROR) << "Unable to make isolate runnable";
+    FXL_LOG(ERROR) << "Unable to make isolate runnable: " << error;
+    free(error);
     return false;
   }
   Dart_EnterIsolate(isolate_);
@@ -436,11 +437,10 @@ void DartApplicationController::MessageEpilogue(Dart_Handle result) {
   }
 }
 
-void DartApplicationController::OnIdleTimer(
-    async_t* async,
-    async::WaitBase* wait,
-    zx_status_t status,
-    const zx_packet_signal* signal) {
+void DartApplicationController::OnIdleTimer(async_t* async,
+                                            async::WaitBase* wait,
+                                            zx_status_t status,
+                                            const zx_packet_signal* signal) {
   if ((status != ZX_OK) || !(signal->observed & ZX_TIMER_SIGNALED) ||
       !Dart_CurrentIsolate()) {
     // Timer closed or isolate shutdown.
@@ -463,7 +463,7 @@ void DartApplicationController::OnIdleTimer(
                     << zx_status_get_string(status);
     }
   }
-  wait->Begin(async); // ignore errors
+  wait->Begin(async);  // ignore errors
 }
 
 }  // namespace dart_runner
