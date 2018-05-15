@@ -4,7 +4,7 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_app("video") {
+flutter_aot_app("video") {
   package_name = "video"
 
   main_dart = "lib/main.dart"
