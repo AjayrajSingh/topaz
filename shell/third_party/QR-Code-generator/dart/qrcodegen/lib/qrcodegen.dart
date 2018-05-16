@@ -678,10 +678,10 @@ class QrCode {
   /*---- Private tables of constants for QrCode ----*/
 
   // For use in getPenaltyScore(), when evaluating which mask is best.
-  static final int _kPenaltyN1 = 3;
-  static final int _kPenaltyN2 = 3;
-  static final int _kPenaltyN3 = 40;
-  static final int _kPenaltyN4 = 10;
+  static const int _kPenaltyN1 = 3;
+  static const int _kPenaltyN2 = 3;
+  static const int _kPenaltyN3 = 40;
+  static const int _kPenaltyN4 = 10;
 
   static final List<List<int>> _kEccCodewordsPerBlock = <List<int>>[
     // Version: (note that index 0 is for padding, and is set to an illegal value)
@@ -1200,7 +1200,7 @@ class _QrSegment {
       new RegExp('r/^[A-Z0-9 \$%*+.\/:-]*\$/');
 
 // (Private) The set of all legal characters in alphanumeric mode, where each character value maps to the index in the string.
-  static final String kAlphanumericCharset =
+  static const String kAlphanumericCharset =
       '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ \$%*+-./:';
 
 /*---- Public helper enumeration ----*/

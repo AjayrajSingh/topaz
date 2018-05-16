@@ -99,8 +99,7 @@ class StoryCluster {
     this.storyLayout,
     this.onStoryClusterChanged,
     StoryClusterEntranceTransitionModel storyClusterEntranceTransitionModel,
-  })
-      : _stories = stories,
+  })  : _stories = stories,
         title = _getClusterTitle(stories),
         _lastInteraction = _getClusterLastInteraction(stories),
         _cumulativeInteractionDuration =
@@ -358,15 +357,15 @@ class StoryCluster {
 
   /// Replaces the [Story.panel] of the story with [panel] with [withPanel]/
   void replace({Panel panel, Panel withPanel}) {
-    _stories.where((Story story) => story.panel == panel).single
-      ..panel = withPanel;
+    _stories.where((Story story) => story.panel == panel).single.panel =
+        withPanel;
     _panelsModel.notifyListeners();
   }
 
   /// Replaces the [Story.panel] of the story with [storyId] with [withPanel]/
   void replaceStoryPanel({StoryId storyId, Panel withPanel}) {
-    _stories.where((Story story) => story.id == storyId).single
-      ..panel = withPanel;
+    _stories.where((Story story) => story.id == storyId).single.panel =
+        withPanel;
     _panelsModel.notifyListeners();
   }
 

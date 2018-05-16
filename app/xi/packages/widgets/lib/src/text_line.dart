@@ -29,7 +29,7 @@ bool listEq<T>(List<T> l1, List<T> l2) {
 // We want to use some reasonable value for width, in case this widget gets
 // used by itself instead of inside Editor. TODO: is there a more principled
 // way to set this?
-final double _nominalWidth = 200.0;
+const double _nominalWidth = 200.0;
 
 /// A widget that draws one line of text, with cursor and styles.
 class TextLine extends LeafRenderObjectWidget {
@@ -70,8 +70,8 @@ class _RenderTextLine extends RenderBox {
     List<int> cursor,
     List<int> styles,
     double height,
-  )
-      : _textPainter = new TextPainter(text: text, textDirection: TextDirection.ltr),
+  )   : _textPainter =
+            new TextPainter(text: text, textDirection: TextDirection.ltr),
         _cursor = cursor,
         _styles = styles,
         _height = height;

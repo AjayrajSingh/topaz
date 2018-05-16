@@ -57,8 +57,7 @@ class RK4SpringSimulation {
   RK4SpringSimulation({
     double initValue: 0.0,
     this.desc: const RK4SpringDescription(),
-  })
-      : _startValue = initValue,
+  })  : _startValue = initValue,
         _targetValue = initValue,
         _velocity = 0.0,
         _accelerationMultipler = 0.0,
@@ -104,7 +103,7 @@ class RK4SpringSimulation {
       return;
     }
     double secondsRemaining = seconds;
-    final double _kMaxStepSize = 1 / 60;
+    const double _kMaxStepSize = 1 / 60;
     while (secondsRemaining > 0.0) {
       double stepSize =
           secondsRemaining > _kMaxStepSize ? _kMaxStepSize : secondsRemaining;

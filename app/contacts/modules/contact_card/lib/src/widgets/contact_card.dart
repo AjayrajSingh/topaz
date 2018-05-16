@@ -94,7 +94,7 @@ class _ContactCardState extends State<ContactCard>
           labelColor: Colors.blue,
           unselectedLabelColor: Colors.grey[500],
           controller: _controller,
-          tabs: <Tab>[
+          tabs: const <Tab>[
             const Tab(text: 'Details'),
             const Tab(text: 'Activity'),
           ],

@@ -12,8 +12,6 @@ import '../modular/player_model.dart';
 
 /// The play controls in the video player
 class PlayControls extends StatelessWidget {
-  final double _kZoomTimeInMicroseconds = 3000000.0;
-
   /// Size of the play/pause icons
   final double primaryIconSize;
 
@@ -29,8 +27,9 @@ class PlayControls extends StatelessWidget {
     @required this.primaryIconSize,
     @required this.secondaryIconSize,
     @required this.padding,
-  })
-      : super(key: key);
+  }) : super(key: key);
+
+  double get _kZoomTimeInMicroseconds => 3000000.0;
 
   Widget _createIconButton(
       {Icon icon, double iconSize, VoidCallback callback}) {

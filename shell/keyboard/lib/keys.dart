@@ -47,8 +47,7 @@ class TextKey extends StatefulWidget {
     this.horizontalAlign: 0.5,
     this.height,
     this.flex: 2,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   TextKeyState createState() => new TextKeyState();
@@ -138,8 +137,7 @@ class ImageKey extends StatefulWidget {
     this.height, {
     this.flex: 2,
     Key key,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   _ImageKeyState createState() => new _ImageKeyState();
@@ -147,7 +145,7 @@ class ImageKey extends StatefulWidget {
 
 /// Holds the current down state of the [ImageKey].
 class _ImageKeyState extends State<ImageKey> {
-  static final double _kPadding = 20.0 / 3.0;
+  static const double _kPadding = 20.0 / 3.0;
 
   bool _down = false;
 

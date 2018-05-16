@@ -14,7 +14,7 @@ import 'src/asset.dart';
 import 'src/modular/player_model.dart';
 import 'src/widgets.dart';
 
-final String _kDefaultUrl =
+const String _kDefaultUrl =
     'https://storage.googleapis.com/fuchsia/assets/video/'
     '656a7250025525ae5a44b43d23c51e38b466d146';
 
@@ -39,7 +39,8 @@ void main() {
   playerModel = new PlayerModel(
     environmentServices: moduleDriver.environmentServices,
     notifyProgress: (MediaProgress progress) {
-      moduleDriver.put('media_progress', progress.toEntity(), _mediaProgressCodec);
+      moduleDriver.put(
+          'media_progress', progress.toEntity(), _mediaProgressCodec);
     },
   );
 
@@ -74,8 +75,10 @@ void _handleStart(ModuleDriver module, PlayerModel playerModel) {}
 
 // This method converts AssetSpecifierEntityData to an Asset and uses the legacy
 // method (until step 3 of MS-1308).
-void _handleAssetSpecifierChanged(AssetSpecifierEntityData assetSpecifierEntityData,
-    PlayerModel playerModel, ModuleDriver module) {
+void _handleAssetSpecifierChanged(
+    AssetSpecifierEntityData assetSpecifierEntityData,
+    PlayerModel playerModel,
+    ModuleDriver module) {
   if (assetSpecifierEntityData == null) {
     log.info('null AssetSpecifier received in video module');
     if (!_videoAssetInitialized) {
@@ -88,7 +91,8 @@ void _handleAssetSpecifierChanged(AssetSpecifierEntityData assetSpecifierEntityD
     return;
   }
 
-  log.info('video module received Asset with uri: ${assetSpecifierEntityData?.uri}');
+  log.info(
+      'video module received Asset with uri: ${assetSpecifierEntityData?.uri}');
   _videoAssetInitialized = true;
   playerModel.asset = new Asset.fromEntity(assetSpecifierEntityData);
 }

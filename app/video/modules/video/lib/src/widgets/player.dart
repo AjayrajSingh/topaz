@@ -13,16 +13,15 @@ class Player extends StatelessWidget {
   /// Constructor for the video player layout
   const Player({
     Key key,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
-  final Widget _screen = const Screen();
+  Widget get _screen => const Screen();
 
-  final Widget _playControls = const PlayControls(
-    primaryIconSize: 80.0,
-    secondaryIconSize: 64.0,
-    padding: 0.0,
-  );
+  Widget get _playControls => const PlayControls(
+        primaryIconSize: 80.0,
+        secondaryIconSize: 64.0,
+        padding: 0.0,
+      );
 
   Widget _buildPlayerMode(PlayerModel playerModel, bool smallScreen) {
     switch (playerModel.displayMode) {

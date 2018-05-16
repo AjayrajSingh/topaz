@@ -14,7 +14,7 @@ import 'quick_settings.dart';
 /// Builds now.
 class NowBuilder {
   /// How far Now should raise when quick settings is activated inline.
-  static final double kQuickSettingsHeightBump = 120.0;
+  static const double kQuickSettingsHeightBump = 120.0;
 
   /// The simulation for the minimization to a bar.
   final NowMinimizationModel _nowMinimizationModel = new NowMinimizationModel();

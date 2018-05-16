@@ -96,10 +96,10 @@ final Color _kPhotoListCheckIconColor = Colors.grey[100];
 final Color _kPhotoListTitleColor = Colors.grey[900];
 final Color _kSearchBoxBackgroundColor = Colors.grey[50];
 final Color _kSearchBoxTextColor = Colors.grey[600];
-final Color _kSunColor = Colors.yellow;
+const Color _kSunColor = Colors.yellow;
 
-final Duration _kVideoSkipAmount = const Duration(seconds: 10);
-final Duration _kVideoProgressTimeout = const Duration(milliseconds: 250);
+const Duration _kVideoSkipAmount = const Duration(seconds: 10);
+const Duration _kVideoProgressTimeout = const Duration(milliseconds: 250);
 
 final ApplicationContext _applicationContext =
     new ApplicationContext.fromStartupInfo();

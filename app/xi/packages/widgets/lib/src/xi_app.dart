@@ -112,6 +112,8 @@ class XiAppState extends State<XiApp> {
   void initState() {
     super.initState();
     widget.xi.onMessage(handleMessage);
+
+    /// ignore: void_checks
     widget.xi.init().then((Null _) {
       widget.xi.sendNotification('client_started', <String, dynamic>{});
       // Arguably new_view should be sent by the editor (and the editor should plumb

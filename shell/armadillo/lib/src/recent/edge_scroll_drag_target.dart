@@ -153,7 +153,7 @@ class EdgeScrollDragTargetModel extends TickingModel {
 
     double cumulativeScrollDelta = 0.0;
     double secondsRemaining = seconds;
-    final double _kMaxStepSize = 1 / 60;
+    const double _kMaxStepSize = 1 / 60;
     while (secondsRemaining > 0.0) {
       double stepSize =
           secondsRemaining > _kMaxStepSize ? _kMaxStepSize : secondsRemaining;

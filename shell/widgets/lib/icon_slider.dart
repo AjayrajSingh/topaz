@@ -60,8 +60,7 @@ class IconSlider extends StatefulWidget {
     this.label,
     this.activeColor,
     this.thumbImage,
-  })
-      : assert(value != null),
+  })  : assert(value != null),
         assert(min != null),
         assert(max != null),
         assert(value >= min && value <= max),
@@ -210,7 +209,7 @@ final ColorTween _kTrackColorTween =
     new ColorTween(begin: _kInactiveTrackColor, end: _kActiveTrackColor);
 final ColorTween _kTickColorTween =
     new ColorTween(begin: Colors.transparent, end: Colors.black54);
-final Duration _kDiscreteTransitionDuration = const Duration(milliseconds: 500);
+const Duration _kDiscreteTransitionDuration = const Duration(milliseconds: 500);
 
 const double _kLabelBalloonRadius = 14.0;
 final Tween<double> _kLabelBalloonCenterTween =
@@ -245,8 +244,7 @@ class _RenderIconSlider extends RenderConstrainedBox {
     ImageConfiguration configuration,
     this.onChanged,
     TickerProvider vsync,
-  })
-      : _value = value,
+  })  : _value = value,
         _divisions = divisions,
         _activeColor = activeColor,
         _textTheme = textTheme,

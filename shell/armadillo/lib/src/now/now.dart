@@ -36,7 +36,7 @@ const double _kOverscrollDelayOffset = 0.0;
 const double _kScrollFactor = 0.8;
 
 // initialized in showQuickSettings
-final double _kQuickSettingsMaximizedHeight = 200.0;
+const double _kQuickSettingsMaximizedHeight = 200.0;
 
 /// Shows the user, the user's context, and important settings.  When minimized
 /// also shows an affordance for seeing missed interruptions.
@@ -90,8 +90,7 @@ class Now extends StatelessWidget {
     this.onUserContextTapped,
     this.onMinimizedContextTapped,
     this.recentsScrollOffset,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) =>

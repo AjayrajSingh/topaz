@@ -191,7 +191,7 @@ class LineCol {
   }
 }
 
-final String _zeroWidthSpace = '\u{200b}';
+const String _zeroWidthSpace = '\u{200b}';
 
 /// State for editor tab
 class EditorState extends State<Editor> {

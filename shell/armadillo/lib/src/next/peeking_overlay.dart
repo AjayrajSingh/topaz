@@ -44,8 +44,7 @@ class PeekingOverlay extends StatefulWidget {
     this.onHide,
     this.onShow,
     this.child,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   PeekingOverlayState createState() => new PeekingOverlayState();
@@ -61,7 +60,7 @@ class PeekingOverlay extends StatefulWidget {
 /// The [createWidget] [Widget] will be clipped to [value] but will be given
 /// [maxValue] to be laid out in.
 class PeekingOverlayState extends TickingDoubleState<PeekingOverlay> {
-  static final double _kSnapVelocityThreshold = 500.0;
+  static const double _kSnapVelocityThreshold = 500.0;
   bool _hiding = true;
   bool _peeking;
 
@@ -220,8 +219,7 @@ class _HorizontalExpandingBox extends StatefulWidget {
     @required this.height,
     @required this.width,
     @required this.child,
-  })
-      : assert(height != null),
+  })  : assert(height != null),
         assert(width != null),
         assert(child != null);
 

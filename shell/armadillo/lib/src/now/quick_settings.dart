@@ -62,8 +62,7 @@ class QuickSettingsOverlay extends StatefulWidget {
     Key key,
     this.onProgressChanged,
     this.onLogoutSelected,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   QuickSettingsOverlayState createState() => new QuickSettingsOverlayState();
@@ -249,7 +248,7 @@ class _QuickSettingsState extends State<QuickSettings> {
 
   Widget _airplaneModeToggleIcon() => new ToggleIcon(
         key: _kAirplaneModeToggle,
-        imageList: <String>[
+        imageList: const <String>[
           _kAirplaneModeInactiveGrey600,
           _kAirplaneModeActiveBlack,
         ],
@@ -260,7 +259,7 @@ class _QuickSettingsState extends State<QuickSettings> {
 
   Widget _doNotDisturbToggleIcon() => new ToggleIcon(
         key: _kDoNotDisturbModeToggle,
-        imageList: <String>[
+        imageList: const <String>[
           _kDoNoDisturbOnBlack,
           _kDoNoDisturbOffGrey600,
         ],
@@ -271,7 +270,7 @@ class _QuickSettingsState extends State<QuickSettings> {
 
   Widget _screenRotationToggleIcon() => new ToggleIcon(
         key: _kScreenRotationToggle,
-        imageList: <String>[
+        imageList: const <String>[
           _kScreenLockRotationBlack,
           _kScreenRotationBlack,
         ],

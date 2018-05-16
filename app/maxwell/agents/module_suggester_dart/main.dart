@@ -27,10 +27,10 @@ class _QueryHandlerImpl extends QueryHandler {
   static final RegExp _urlSubPattern =
       new RegExp(r'\.[a-z]{2}|(?:\d{1,3}\.){3}\d{1,3}|localhost');
   static final RegExp _dashboardSubPattern = new RegExp(r'^das|^fuc|^bui|^sta');
-  static final String _chatHeadline = 'Open Chat';
-  static final String _emailHeadline = 'Open Email';
-  static final String _youtubeHeadline = 'Open YouTube';
-  static final String _terminalHeadline = 'Open Terminal';
+  static const String _chatHeadline = 'Open Chat';
+  static const String _emailHeadline = 'Open Email';
+  static const String _youtubeHeadline = 'Open YouTube';
+  static const String _terminalHeadline = 'Open Terminal';
 
   @override
   Future<Null> onQuery(

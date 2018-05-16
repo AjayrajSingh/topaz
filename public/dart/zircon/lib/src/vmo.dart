@@ -48,7 +48,7 @@ class Vmo extends _HandleWrapper<Vmo> {
   /// result in an UnsupportedError exception.
   Uint8List map() {
     if (handle == null) {
-      final int status = ZX.ERR_INVALID_ARGS;
+      const int status = ZX.ERR_INVALID_ARGS;
       throw new ZxStatusException(status, getStringForStatus(status));
     }
     MapResult r = System.vmoMap(handle);

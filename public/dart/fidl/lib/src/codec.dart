@@ -147,7 +147,7 @@ class Decoder {
     return _message.handles[_nextHandle++];
   }
 
-  bool decodeBool(int offset) => data.getInt8(offset) != 0 ? true : false;
+  bool decodeBool(int offset) => data.getInt8(offset) != 0;
 
   int decodeInt8(int offset) => data.getInt8(offset);
 
