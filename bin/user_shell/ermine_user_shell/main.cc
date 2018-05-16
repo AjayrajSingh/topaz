@@ -5,7 +5,7 @@
 #include <lib/async-loop/cpp/loop.h>
 #include <trace-provider/provider.h>
 
-#include "topaz/shell/ermine_user_shell/app.h"
+#include "topaz/bin/user_shell/ermine_user_shell/app.h"
 
 int main(int argc, const char** argv) {
   async::Loop loop(&kAsyncLoopConfigMakeDefault);

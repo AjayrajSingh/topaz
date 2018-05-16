@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/shell/ermine_user_shell/app.h"
+#include "topaz/bin/user_shell/ermine_user_shell/app.h"
 
-#include "topaz/shell/ermine_user_shell/find_unique_ptr.h"
-#include "topaz/shell/ermine_user_shell/view_controller.h"
+#include "topaz/bin/user_shell/ermine_user_shell/find_unique_ptr.h"
+#include "topaz/bin/user_shell/ermine_user_shell/view_controller.h"
 
 namespace ermine_user_shell {
 

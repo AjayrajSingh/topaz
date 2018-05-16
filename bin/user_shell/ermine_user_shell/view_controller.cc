@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/shell/ermine_user_shell/view_controller.h"
+#include "topaz/bin/user_shell/ermine_user_shell/view_controller.h"
 
 #include <lib/async/default.h>
 
@@ -12,8 +12,8 @@
 #include "lib/app/cpp/connect.h"
 #include "lib/fidl/cpp/clone.h"
 #include "lib/fidl/cpp/optional.h"
-#include "topaz/shell/ermine_user_shell/find_unique_ptr.h"
-#include "topaz/shell/ermine_user_shell/tile.h"
+#include "topaz/bin/user_shell/ermine_user_shell/find_unique_ptr.h"
+#include "topaz/bin/user_shell/ermine_user_shell/tile.h"
 
 namespace ermine_user_shell {
 namespace {
@@ -60,11 +60,10 @@ ViewController::ViewController(
       session_(GetScenic(view_manager_.get()).get()),
       parent_node_(&session_),
       container_node_(&session_),
-      begin_frame_task_(
-          [this] {
-            if (needs_begin_frame_)
-              BeginFrame(last_presentation_time_);
-          }) {
+      begin_frame_task_([this] {
+        if (needs_begin_frame_)
+          BeginFrame(last_presentation_time_);
+      }) {
   zx::eventpair parent_export_token;
   parent_node_.BindAsRequest(&parent_export_token);
   view_manager_->CreateView(view_.NewRequest(), std::move(view_owner_request),
@@ -122,9 +121,8 @@ zx_status_t ViewController::RemoveTile(uint32_t key) {
   return ZX_OK;
 }
 
-void ViewController::OnPropertiesChanged(
-    views_v1::ViewProperties properties,
-    OnPropertiesChangedCallback callback) {
+void ViewController::OnPropertiesChanged(views_v1::ViewProperties properties,
+                                         OnPropertiesChangedCallback callback) {
   if (properties.view_layout && logical_size_ != properties.view_layout->size) {
     logical_size_ = properties.view_layout->size;
     UpdatePhysicalSize();
@@ -140,9 +138,8 @@ void ViewController::OnChildAttached(uint32_t child_key,
   callback();
 }
 
-void ViewController::OnChildUnavailable(
-    uint32_t child_key,
-    OnChildUnavailableCallback callback) {
+void ViewController::OnChildUnavailable(uint32_t child_key,
+                                        OnChildUnavailableCallback callback) {
   zx_status_t status = RemoveTile(child_key);
   ZX_DEBUG_ASSERT(status == ZX_OK);
   callback();
@@ -243,12 +240,12 @@ void ViewController::PerformLayout() {
 }
 
 void ViewController::SetPropertiesIfNeeded(
-    Tile* tile,
-    views_v1::ViewProperties properties) {
+    Tile* tile, views_v1::ViewProperties properties) {
   if (tile->view_properties() == properties)
     return;
   tile->set_view_properties(fidl::Clone(properties));
-  view_container_->SetChildProperties(tile->key(), fidl::MakeOptional(std::move(properties)));
+  view_container_->SetChildProperties(
+      tile->key(), fidl::MakeOptional(std::move(properties)));
 }
 
 }  // namespace ermine_user_shell

@@ -4,6 +4,6 @@
         "topaz/packages/tools/ermine_user_shell"
     ],
     "packages": {
-        "ermine_user_shell_config": "//topaz/shell/ermine_user_shell:config"
+        "ermine_user_shell_config": "//topaz/bin/user_shell/ermine_user_shell:config"
     }
 }

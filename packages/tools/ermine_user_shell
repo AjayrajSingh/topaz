@@ -3,7 +3,7 @@
         "topaz/packages/prod/term"
     ],
     "packages": {
-        "ermine_user_shell": "//topaz/shell/ermine_user_shell",
-        "launch_ermine": "//topaz/shell/ermine_user_shell:launch_ermine"
+        "ermine_user_shell": "//topaz/bin/user_shell/ermine_user_shell",
+        "launch_ermine": "//topaz/bin/user_shell/ermine_user_shell:launch_ermine"
     }
 }
