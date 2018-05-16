@@ -7,9 +7,9 @@
 // |auth_provider.fidl| interface and is typically invoked by the Token Manager
 // service in Garnet layer.
 
-#include <fuchsia/cpp/auth.h>
-#include <fuchsia/cpp/views_v1.h>
-#include <fuchsia/cpp/web_view.h>
+#include <auth/cpp/fidl.h>
+#include <views_v1/cpp/fidl.h>
+#include <web_view/cpp/fidl.h>
 
 #include "lib/app/cpp/application_context.h"
 #include "lib/callback/cancellable.h"

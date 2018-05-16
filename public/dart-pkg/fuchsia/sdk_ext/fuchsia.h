@@ -5,8 +5,8 @@
 #ifndef DART_PKG_FUCHSIA_SDK_EXT_FUCHSIA_H_
 #define DART_PKG_FUCHSIA_SDK_EXT_FUCHSIA_H_
 
-#include <fuchsia/cpp/component.h>
-#include <fuchsia/cpp/component.h>
+#include <component/cpp/fidl.h>
+#include <component/cpp/fidl.h>
 
 namespace fuchsia {
 namespace dart {

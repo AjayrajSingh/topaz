@@ -7,8 +7,8 @@
 #include <memory>
 #include <queue>
 
-#include <fuchsia/cpp/media.h>
-#include <fuchsia/cpp/media_player.h>
+#include <media/cpp/fidl.h>
+#include <media_player/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 
 #include "examples/ui/lib/host_canvas_cycler.h"

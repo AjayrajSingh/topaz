@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include <fuchsia/cpp/input.h>
+#include <input/cpp/fidl.h>
 
 namespace term {
 

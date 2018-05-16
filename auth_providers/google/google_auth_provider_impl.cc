@@ -4,8 +4,8 @@
 
 #include "topaz/auth_providers/google/google_auth_provider_impl.h"
 
-#include <fuchsia/cpp/network.h>
-#include <fuchsia/cpp/views_v1_token.h>
+#include <network/cpp/fidl.h>
+#include <views_v1_token/cpp/fidl.h>
 
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"

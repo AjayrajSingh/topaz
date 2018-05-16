@@ -5,7 +5,7 @@
 #ifndef LIB_UI_SKIA_TYPE_CONVERTERS_H_
 #define LIB_UI_SKIA_TYPE_CONVERTERS_H_
 
-#include <fuchsia/cpp/geometry.h>
+#include <geometry/cpp/fidl.h>
 
 #include "lib/fsl/types/type_converters.h"
 #include "third_party/skia/include/core/SkMatrix.h"

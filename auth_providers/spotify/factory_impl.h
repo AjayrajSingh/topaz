@@ -5,7 +5,7 @@
 #ifndef TOPAZ_AUTH_PROVIDERS_SPOTIFY_FACTORY_IMPL_H_
 #define TOPAZ_AUTH_PROVIDERS_SPOTIFY_FACTORY_IMPL_H_
 
-#include <fuchsia/cpp/auth.h>
+#include <auth/cpp/fidl.h>
 
 #include "lib/callback/auto_cleanable.h"
 #include "lib/fxl/functional/closure.h"

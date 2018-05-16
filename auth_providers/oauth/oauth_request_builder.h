@@ -5,7 +5,7 @@
 #ifndef TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_REQUEST_BUILDER_H_
 #define TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_REQUEST_BUILDER_H_
 
-#include <fuchsia/cpp/network.h>
+#include <network/cpp/fidl.h>
 
 namespace auth_providers {
 namespace oauth {

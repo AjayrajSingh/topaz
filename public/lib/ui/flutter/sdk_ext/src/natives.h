@@ -7,7 +7,7 @@
 
 #include "third_party/dart/runtime/include/dart_api.h"
 
-#include <fuchsia/cpp/component.h>
+#include <component/cpp/fidl.h>
 
 namespace mozart {
 

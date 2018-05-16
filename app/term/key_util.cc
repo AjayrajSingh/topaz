@@ -4,7 +4,7 @@
 
 #include "topaz/app/term/key_util.h"
 
-#include <fuchsia/cpp/input.h>
+#include <input/cpp/fidl.h>
 #include <hid/usages.h>
 
 #include "lib/fxl/logging.h"

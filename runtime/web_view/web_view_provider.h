@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <fuchsia/cpp/modular.h>
-#include <fuchsia/cpp/views_v1.h>
+#include <modular/cpp/fidl.h>
+#include <views_v1/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 
 #include "lib/app/cpp/application_context.h"

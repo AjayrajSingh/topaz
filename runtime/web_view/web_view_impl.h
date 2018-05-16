@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <fuchsia/cpp/web_view.h>
+#include <web_view/cpp/fidl.h>
 
 #include "lib/app/cpp/service_provider_impl.h"
 #include "lib/fidl/cpp/binding_set.h"

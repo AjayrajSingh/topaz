@@ -5,7 +5,7 @@
 #ifndef LIB_UI_SCENIC_SKIA_IMAGE_INFO_H_
 #define LIB_UI_SCENIC_SKIA_IMAGE_INFO_H_
 
-#include <fuchsia/cpp/images.h>
+#include <images/cpp/fidl.h>
 
 #include "third_party/skia/include/core/SkImageInfo.h"
 

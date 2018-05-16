@@ -12,10 +12,10 @@
 #include <memory>
 #include <utility>
 
-#include <fuchsia/cpp/modular_auth.h>
-#include <fuchsia/cpp/network.h>
-#include <fuchsia/cpp/views_v1.h>
-#include <fuchsia/cpp/web_view.h>
+#include <modular_auth/cpp/fidl.h>
+#include <network/cpp/fidl.h>
+#include <views_v1/cpp/fidl.h>
+#include <web_view/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 #include <trace-provider/provider.h>
 

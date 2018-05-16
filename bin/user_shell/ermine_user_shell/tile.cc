@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include <fuchsia/cpp/views_v1.h>
+#include <views_v1/cpp/fidl.h>
 
 #include "lib/svc/cpp/services.h"
 

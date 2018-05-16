@@ -5,7 +5,7 @@
 #include <trace-provider/provider.h>
 #include <memory>
 
-#include <fuchsia/cpp/auth.h>
+#include <auth/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 
 #include "lib/app/cpp/application_context.h"

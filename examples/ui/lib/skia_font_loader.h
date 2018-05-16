@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include <fuchsia/cpp/fonts.h>
+#include <fonts/cpp/fidl.h>
 
 #include "lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkTypeface.h"

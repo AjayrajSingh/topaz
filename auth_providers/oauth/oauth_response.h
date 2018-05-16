@@ -5,8 +5,8 @@
 #ifndef TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_RESPONSE_H_
 #define TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_RESPONSE_H_
 
-#include <fuchsia/cpp/auth.h>
-#include <fuchsia/cpp/network.h>
+#include <auth/cpp/fidl.h>
+#include <network/cpp/fidl.h>
 
 #include "third_party/rapidjson/rapidjson/document.h"
 
