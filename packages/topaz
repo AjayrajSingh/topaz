@@ -1,5 +1,6 @@
 {
     "imports": [
+        "peridot/packages/config/device_runner",
         "peridot/packages/peridot",
         "topaz/packages/prod/all"
     ]
