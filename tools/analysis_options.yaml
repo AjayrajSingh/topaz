@@ -99,7 +99,9 @@ linter:
     - prefer_is_empty
     - prefer_is_not_empty
     - prefer_single_quotes
-    - public_member_api_docs
+    # This seems to create some cruft.
+    # Disable and evaluate if this is causing underdocumentation
+    # - public_member_api_docs
     - recursive_getters
     - slash_for_doc_comments
     - sort_constructors_first
