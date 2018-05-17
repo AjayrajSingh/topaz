@@ -44,13 +44,13 @@ StreetLocationEntityData _decode(String data) {
   }
 
   // TODO(MS-1428): use a schema to validate decoded value.
-  Map<String, Object> map = json.decode(data);
+  dynamic map = json.decode(data);
 
   String streetAddress;
   String locality;
 
   try {
-    Map<String, double> location = map['location'];
+    dynamic location = map['location'];
     streetAddress = location['streetAddress'];
     locality = location['locality'];
     // ignore: avoid_catches_without_on_clauses
