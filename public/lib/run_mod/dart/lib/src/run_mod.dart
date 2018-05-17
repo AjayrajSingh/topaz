@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lib.widgets/widgets.dart';
 import 'package:meta/meta.dart';
 
 import 'widgets/mod_failure_widget.dart';
@@ -83,21 +84,16 @@ class _ModuleRunner {
   }) : assert(child != null);
 
   void run() {
-    if (child is Future) {
-      _runWithFuture(child);
-    } else {
-      runApp(child);
-    }
+    runApp(
+      new FutureWidget(
+        child: child,
+        loadingWidget: loadingWidget ?? const ModLoadingWidget(),
+        errorBuilder: _errorBuilder,
+      ),
+    );
   }
 
-  void _runWithFuture(Future<Widget> widgetFuture) {
-    runApp(loadingWidget ?? const ModLoadingWidget());
-
-    widgetFuture.then(
-      runApp,
-      onError: (Error error) {
-        runApp(const ModFailureWidget());
-      },
-    );
+  Widget _errorBuilder(BuildContext context, Error error) {
+    return new ModFailureWidget();
   }
 }
