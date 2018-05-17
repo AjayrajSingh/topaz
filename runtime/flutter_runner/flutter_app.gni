@@ -127,12 +127,11 @@ template("flutter2_jit_app") {
   }
 
   kernel_target_name = target_name + "_kernel"
-  kernel_path = "$target_gen_dir/${kernel_target_name}.dil"
-  manifest_path = "$target_gen_dir/${kernel_target_name}.manifest2"
+  kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
 
   _dart_kernel(kernel_target_name) {
     main_dart = invoker.main_dart
-    manifest = manifest_path
+    manifest = kernel_manifest
     args = []
     dart_library_target_name = dart_library_target_name
   }
@@ -200,17 +199,14 @@ template("flutter2_jit_app") {
     if (defined(invoker.fuchsia_package_name)) {
       package_name = invoker.fuchsia_package_name
     }
-    extra = [ asset_manifest ]
+    extra = [ asset_manifest, kernel_manifest ]
 
     deps = [
       ":$kernel_target_name",
       ":${target_name}_resources",
     ]
 
-    resources = [ {
-                  path = rebase_path(kernel_path)
-                  dest = "kernel_blob.dill"
-                } ] + invoker_resources
+    resources = invoker_resources
 
     meta = [ {
           path = rebase_path("//topaz/runtime/flutter_runner/meta/jit2_runtime")

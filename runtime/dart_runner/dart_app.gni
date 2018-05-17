@@ -125,11 +125,11 @@ template("dart_jit_app") {
   }
 
   kernel_target_name = target_name + "_kernel"
-  manifest_path = "$target_gen_dir/${kernel_target_name}.manifest2"
+  kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
 
   _dart_kernel(kernel_target_name) {
     main_dart = invoker.main_dart
-    manifest = manifest_path
+    manifest = kernel_manifest
     args = []
     dart_library_target_name = dart_library_target_name
   }
@@ -150,7 +150,7 @@ template("dart_jit_app") {
       ":$kernel_target_name",
     ] + non_dart_deps
 
-    extra = [ manifest_path ]
+    extra = [ kernel_manifest ]
 
     if (defined(invoker.resources)) {
       resources = invoker.resources
