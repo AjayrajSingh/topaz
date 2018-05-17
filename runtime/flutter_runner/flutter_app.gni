@@ -40,7 +40,7 @@ _kernel_compiler = "$_kernel_compiler_out_dir/dart-tools/kernel_compiler"
 _entry_manifests = [
   "//third_party/dart/runtime/bin/dart_io_entries.txt",
   "//third_party/flutter/runtime/dart_vm_entry_points.txt",
-  "//third_party/flutter/runtime/dart_vm_entry_points_fuchsia.txt",
+  "//topaz/runtime/flutter_runner/dart_vm_entry_points_fuchsia.txt",
 ]
 
 template("_dart_kernel") {
@@ -207,40 +207,32 @@ template("flutter2_jit_app") {
       ":${target_name}_resources",
     ]
 
-    resources = [
-                  {
-                    path = rebase_path(kernel_path)
-                    dest = "kernel_blob.dill"
-                  },
-                ] + invoker_resources
+    resources = [ {
+                  path = rebase_path(kernel_path)
+                  dest = "kernel_blob.dill"
+                } ] + invoker_resources
 
-    meta = [
-      {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit2_runtime")
-        dest = "runtime"
-      },
-    ]
+    meta = [ {
+          path = rebase_path("//topaz/runtime/flutter_runner/meta/jit2_runtime")
+          dest = "runtime"
+        } ]
 
     if (defined(invoker.module_manifest)) {
       deps += [
         ":${target_name}_copy_manifest",
         ":${target_name}_verify_manifest",
       ]
-      meta += [
-        {
-          path = rebase_path(invoker.module_manifest)
-          dest = "module.json"
-        },
-      ]
+      meta += [ {
+            path = rebase_path(invoker.module_manifest)
+            dest = "module.json"
+          } ]
     }
 
     if (defined(invoker.sandbox)) {
-      meta += [
-        {
-          path = rebase_path(invoker.sandbox)
-          dest = "sandbox"
-        },
-      ]
+      meta += [ {
+            path = rebase_path(invoker.sandbox)
+            dest = "sandbox"
+          } ]
     }
 
     if (defined(invoker.meta)) {
@@ -291,9 +283,7 @@ template("flutter_source_app") {
       "$dart_target_gen_dir/$dart_library_target_name.manifest.packages"
 
   action("${target_name}_sources") {
-    deps = gen_snapshot_deps + [
-      ":$dart_library_target_name",
-    ]
+    deps = gen_snapshot_deps + [ ":$dart_library_target_name" ]
     outputs = [
       manifest,
       manifest_dot_packages,
@@ -396,32 +386,27 @@ template("flutter_source_app") {
       resources = invoker.resources
     }
 
-    meta = [
-      {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/source_runtime")
-        dest = "runtime"
-      },
-    ]
+    meta = [ {
+          path =
+              rebase_path("//topaz/runtime/flutter_runner/meta/source_runtime")
+          dest = "runtime"
+        } ]
     if (defined(invoker.module_manifest)) {
       deps += [
         ":${target_name}_copy_manifest",
         ":${target_name}_verify_manifest",
       ]
-      meta += [
-        {
-          path = rebase_path(invoker.module_manifest)
-          dest = "module.json"
-        },
-      ]
+      meta += [ {
+            path = rebase_path(invoker.module_manifest)
+            dest = "module.json"
+          } ]
     }
 
     if (defined(invoker.sandbox)) {
-      meta += [
-        {
-          path = rebase_path(invoker.sandbox)
-          dest = "sandbox"
-        },
-      ]
+      meta += [ {
+            path = rebase_path(invoker.sandbox)
+            dest = "sandbox"
+          } ]
     }
   }
 }
@@ -530,9 +515,9 @@ template("flutter1_jit_app") {
     }
 
     deps = gen_snapshot_deps + [
-      ":$dart_library_target_name",
-      flutter_core_snapshot_label,
-    ]
+             ":$dart_library_target_name",
+             flutter_core_snapshot_label,
+           ]
 
     if (defined(invoker.deps)) {
       deps += invoker.deps
@@ -605,40 +590,32 @@ template("flutter1_jit_app") {
       ":${target_name}_resources",
     ]
 
-    resources = [
-                  {
-                    path = rebase_path(snapshot_path)
-                    dest = "snapshot_blob.bin"
-                  },
-                ] + invoker_resources
+    resources = [ {
+                  path = rebase_path(snapshot_path)
+                  dest = "snapshot_blob.bin"
+                } ] + invoker_resources
 
-    meta = [
-      {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit_runtime")
-        dest = "runtime"
-      },
-    ]
+    meta = [ {
+          path = rebase_path("//topaz/runtime/flutter_runner/meta/jit_runtime")
+          dest = "runtime"
+        } ]
 
     if (defined(invoker.module_manifest)) {
       deps += [
         ":${target_name}_copy_manifest",
         ":${target_name}_verify_manifest",
       ]
-      meta += [
-        {
-          path = rebase_path(invoker.module_manifest)
-          dest = "module.json"
-        },
-      ]
+      meta += [ {
+            path = rebase_path(invoker.module_manifest)
+            dest = "module.json"
+          } ]
     }
 
     if (defined(invoker.sandbox)) {
-      meta += [
-        {
-          path = rebase_path(invoker.sandbox)
-          dest = "sandbox"
-        },
-      ]
+      meta += [ {
+            path = rebase_path(invoker.sandbox)
+            dest = "sandbox"
+          } ]
     }
 
     if (defined(invoker.meta)) {
@@ -700,7 +677,7 @@ template("flutter1_aot_app") {
           dot_packages,
           main_dart,
           "//third_party/flutter/runtime/dart_vm_entry_points.txt",
-          "//third_party/flutter/runtime/dart_vm_entry_points_fuchsia.txt",
+          "//topaz/runtime/flutter_runner/dart_vm_entry_points_fuchsia.txt",
           "//third_party/dart/runtime/bin/dart_io_entries.txt",
         ]
 
@@ -738,7 +715,7 @@ template("flutter1_aot_app") {
       rebase_path("//third_party/flutter/runtime/dart_vm_entry_points.txt"),
       "--entry-points-manifest",
       rebase_path(
-          "//third_party/flutter/runtime/dart_vm_entry_points_fuchsia.txt"),
+          "//topaz/runtime/flutter_runner/dart_vm_entry_points_fuchsia.txt"),
       "--entry-points-manifest",
       rebase_path("//third_party/dart/runtime/bin/dart_io_entries.txt"),
 
@@ -754,9 +731,9 @@ template("flutter1_aot_app") {
     pool = "//topaz/runtime/dart_runner:dart_aot_pool($target_toolchain)"
 
     deps = gen_snapshot_deps + [
-      ":$dart_library_target_name",
-      "//third_party/flutter/lib/snapshot:generate_dart_ui",
-    ]
+             ":$dart_library_target_name",
+             "//third_party/flutter/lib/snapshot:generate_dart_ui",
+           ]
 
     if (defined(invoker.deps)) {
       deps += invoker.deps
@@ -850,40 +827,32 @@ template("flutter1_aot_app") {
       ":${target_name}_resources",
     ]
 
-    resources = [
-                  {
-                    path = rebase_path(dylib_path)
-                    dest = "libapp.so"
-                  },
-                ] + invoker_resources
+    resources = [ {
+                  path = rebase_path(dylib_path)
+                  dest = "libapp.so"
+                } ] + invoker_resources
 
-    meta = [
-      {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/aot_runtime")
-        dest = "runtime"
-      },
-    ]
+    meta = [ {
+          path = rebase_path("//topaz/runtime/flutter_runner/meta/aot_runtime")
+          dest = "runtime"
+        } ]
 
     if (defined(invoker.module_manifest)) {
       deps += [
         ":${target_name}_copy_manifest",
         ":${target_name}_verify_manifest",
       ]
-      meta += [
-        {
-          path = rebase_path(invoker.module_manifest)
-          dest = "module.json"
-        },
-      ]
+      meta += [ {
+            path = rebase_path(invoker.module_manifest)
+            dest = "module.json"
+          } ]
     }
 
     if (defined(invoker.sandbox)) {
-      meta += [
-        {
-          path = rebase_path(invoker.sandbox)
-          dest = "sandbox"
-        },
-      ]
+      meta += [ {
+            path = rebase_path(invoker.sandbox)
+            dest = "sandbox"
+          } ]
     }
 
     if (defined(invoker.meta)) {
@@ -940,9 +909,7 @@ template("flutter2_aot_app") {
       testonly = invoker.testonly
     }
 
-    deps = gen_snapshot_deps + [
-      ":$kernel_target_name",
-    ]
+    deps = gen_snapshot_deps + [ ":$kernel_target_name" ]
     inputs = _entry_manifests + [ kernel_path ]
     if (defined(invoker.extra_entry_manifests)) {
       inputs += invoker.extra_entry_manifests
@@ -1075,40 +1042,32 @@ template("flutter2_aot_app") {
       "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc",
     ]
 
-    resources = [
-                  {
-                    path = rebase_path(dylib_path)
-                    dest = "libapp.so"
-                  },
-                ] + invoker_resources
+    resources = [ {
+                  path = rebase_path(dylib_path)
+                  dest = "libapp.so"
+                } ] + invoker_resources
 
-    meta = [
-      {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/aot2_runtime")
-        dest = "runtime"
-      },
-    ]
+    meta = [ {
+          path = rebase_path("//topaz/runtime/flutter_runner/meta/aot2_runtime")
+          dest = "runtime"
+        } ]
 
     if (defined(invoker.module_manifest)) {
       deps += [
         ":${target_name}_copy_manifest",
         ":${target_name}_verify_manifest",
       ]
-      meta += [
-        {
-          path = rebase_path(invoker.module_manifest)
-          dest = "module.json"
-        },
-      ]
+      meta += [ {
+            path = rebase_path(invoker.module_manifest)
+            dest = "module.json"
+          } ]
     }
 
     if (defined(invoker.sandbox)) {
-      meta += [
-        {
-          path = rebase_path(invoker.sandbox)
-          dest = "sandbox"
-        },
-      ]
+      meta += [ {
+            path = rebase_path(invoker.sandbox)
+            dest = "sandbox"
+          } ]
     }
 
     if (defined(invoker.meta)) {
@@ -1143,32 +1102,32 @@ template("flutter2_aot_app") {
 #     A boolean. Whether to AOT compile the app. Default is false.
 template("flutter_jit_app") {
   flutter2_jit_app(target_name) {
-    forward_variables_from(invoker, "*", ["aot"])
+    forward_variables_from(invoker, "*", [ "aot" ])
   }
 }
 template("flutter_aot_app") {
   flutter2_aot_app(target_name) {
-    forward_variables_from(invoker, "*", ["aot"])
+    forward_variables_from(invoker, "*", [ "aot" ])
   }
 }
 template("flutter1_app") {
   target(flutter1_default_app, target_name) {
-    forward_variables_from(invoker, "*", ["aot"])
+    forward_variables_from(invoker, "*", [ "aot" ])
   }
 }
 template("flutter2_app") {
   target(flutter2_default_app, target_name) {
-    forward_variables_from(invoker, "*", ["aot"])
+    forward_variables_from(invoker, "*", [ "aot" ])
   }
 }
 template("flutter_app") {
   if (defined(invoker.aot) && invoker.aot) {
     flutter_aot_app(target_name) {
-      forward_variables_from(invoker, "*", ["aot"])
+      forward_variables_from(invoker, "*", [ "aot" ])
     }
   } else {
     target(flutter_default_app, target_name) {
-      forward_variables_from(invoker, "*", ["aot"])
+      forward_variables_from(invoker, "*", [ "aot" ])
     }
   }
 }
