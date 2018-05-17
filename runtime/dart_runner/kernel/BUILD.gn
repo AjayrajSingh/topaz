@@ -34,8 +34,10 @@ template("create_kernel_core_snapshot") {
     ]
 
     platform_dill = "$root_out_dir/dart_runner_patched_sdk/platform_strong.dill"
+    compilation_trace = "//topaz/runtime/flutter_runner/compilation_trace.txt"
     inputs = [
       platform_dill,
+      compilation_trace,
     ]
 
     vm_snapshot_data = "$target_gen_dir/vm_data${product_suffix}.bin"
@@ -58,13 +60,15 @@ template("create_kernel_core_snapshot") {
     }
 
     args = [
-      "--strong",
-      "--reify_generic_functions",
-      "--limit_ints_to_64_bits",
-      "--await_is_keyword",
+      # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
       "--enable_mirrors=false",
+      "--limit_ints_to_64_bits",
+      "--reify_generic_functions",
+      "--strong",
+      "--sync-async",
       "--deterministic",
-      "--snapshot_kind=core",
+      "--snapshot_kind=core-jit",
+      "--load_compilation_trace=" + rebase_path(compilation_trace, root_build_dir),
       "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
       "--vm_snapshot_instructions=" +
           rebase_path(vm_snapshot_instructions, root_build_dir),
@@ -72,8 +76,11 @@ template("create_kernel_core_snapshot") {
           rebase_path(isolate_snapshot_data, root_build_dir),
       "--isolate_snapshot_instructions=" +
           rebase_path(isolate_snapshot_instructions, root_build_dir),
-      rebase_path(platform_dill),
     ]
+    if (is_debug && !invoker.product) {
+      args += [ "--enable_asserts" ]
+    }
+    args += [ rebase_path(platform_dill) ]
   }
 }
 

@@ -1,0 +1,3 @@
+The compilation trace lists functions that will be compiled in the core
+snapshot. It is derived by unioning the output of Dart_SaveCompilationTrace
+after startup from a few apps.
