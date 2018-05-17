@@ -268,11 +268,10 @@ class LinkClient {
 
   void _handleClose() {
     log.fine('proxy closed');
-
     for (LinkWatcherHost watcher in _watchers) {
       watcher.terminate();
-      _watchers.remove(watcher);
     }
+    _watchers.clear();
 
     for (StreamController<String> stream in _streams) {
       stream.close();
