@@ -1,15 +1,12 @@
 {
     "packages": {
-        "hello_material1_jit": "//topaz/examples/ui/hello_material:hello_material1_jit",
-        "hello_material2_jit": "//topaz/examples/ui/hello_material:hello_material2_jit",
-        "hello_material1_aot": "//topaz/examples/ui/hello_material:hello_material1_aot",
-        "hello_material2_aot": "//topaz/examples/ui/hello_material:hello_material2_aot",
-        "hello_material_source": "//topaz/examples/ui/hello_material:hello_material_source",
+        "async_hello_mod": "//topaz/examples/ui/async_hello_mod",
+        "hello_material_aot": "//topaz/examples/ui/hello_material:hello_material_aot",
+        "hello_material_jit": "//topaz/examples/ui/hello_material:hello_material_jit",
+        "hello_mod": "//topaz/examples/ui/hello_mod",
         "jank": "//topaz/examples/ui/jank:package",
         "noodles": "//topaz/examples/ui/noodles:package",
         "paint": "//topaz/examples/ui/paint:package",
-        "async_hello_mod": "//topaz/examples/ui/async_hello_mod",
-        "hello_mod": "//topaz/examples/ui/hello_mod",
         "sketchy_flutter": "//topaz/examples/ui/sketchy_flutter"
     }
 }

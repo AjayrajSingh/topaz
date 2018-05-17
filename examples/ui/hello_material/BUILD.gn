@@ -4,7 +4,7 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter1_jit_app("hello_material1_jit") {
+flutter_jit_app("hello_material_jit") {
   main_dart = "main.dart"
 
   source_dir = "."
@@ -14,42 +14,10 @@ flutter1_jit_app("hello_material1_jit") {
   ]
 }
 
-flutter2_jit_app("hello_material2_jit") {
+flutter_aot_app("hello_material_aot") {
   main_dart = "main.dart"
 
   source_dir = "."
-
-  deps = [
-    "//third_party/dart-pkg/git/flutter/packages/flutter",
-  ]
-}
-
-flutter1_aot_app("hello_material1_aot") {
-  main_dart = "main.dart"
-
-  source_dir = "."
-
-  deps = [
-    "//third_party/dart-pkg/git/flutter/packages/flutter",
-  ]
-}
-
-flutter2_aot_app("hello_material2_aot") {
-  main_dart = "main.dart"
-
-  source_dir = "."
-
-  deps = [
-    "//third_party/dart-pkg/git/flutter/packages/flutter",
-  ]
-}
-
-flutter_source_app("hello_material_source") {
-  source_dir = "."
-
-  package_name = "hello_material_source"
-
-  main_dart = "main.dart"
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",

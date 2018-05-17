@@ -5,7 +5,6 @@
         "garnet/packages/prod/scenic"
     ],
     "packages": {
-        "flutter_jit_runner": "//topaz/runtime/flutter_runner:flutter_jit_runner",
-        "flutter2_jit_runner": "//topaz/runtime/flutter_runner:flutter2_jit_runner"
+        "flutter_jit_runner": "//topaz/runtime/flutter_runner:flutter_jit_runner"
     }
 }

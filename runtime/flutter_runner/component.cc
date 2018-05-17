@@ -136,9 +136,7 @@ Application::Application(TerminationCallback termination_callback,
 
   settings_.assets_dir = application_assets_directory_.get();
 
-  // Compare flutter1_jit_app in flutter_app.gni.
-  settings_.script_snapshot_path = "snapshot_blob.bin";
-  // Compare flutter2_jit_app in flutter_app.gni.
+  // Compare flutter_jit_app in flutter_app.gni.
   settings_.application_kernel_list_asset = "app.dilplist";
 
   settings_.log_tag = debug_label_ + std::string{"(flutter)"};
@@ -227,71 +225,31 @@ void Application::AttemptVMLaunchWithCurrentSettings(
     return;
   }
 
-  fxl::RefPtr<blink::DartSnapshot> vm_snapshot;
+  // Compare flutter_aot_app in flutter_app.gni.
+  fxl::RefPtr<blink::DartSnapshot> vm_snapshot =
+      fxl::MakeRefCounted<blink::DartSnapshot>(
+          CreateWithContentsOfFile(
+              application_assets_directory_.get() /* /pkg/data */,
+              "vm_snapshot_data.bin", false),
+          CreateWithContentsOfFile(
+              application_assets_directory_.get() /* /pkg/data */,
+              "vm_snapshot_instructions.bin", true));
 
-  fsl::SizedVmo dylib_vmo;
+  isolate_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
+      CreateWithContentsOfFile(
+          application_assets_directory_.get() /* /pkg/data */,
+          "isolate_snapshot_data.bin", false),
+      CreateWithContentsOfFile(
+          application_assets_directory_.get() /* /pkg/data */,
+          "isolate_snapshot_instructions.bin", true));
 
-  if (fsl::VmoFromFilenameAt(
-          application_assets_directory_.get() /* /pkg/data */, "libapp.so",
-          &dylib_vmo)) {
-    // Dart 1 still generating a dylib.
-    dlerror();
-
-    auto library_handle = dlopen_vmo(dylib_vmo.vmo().get(), RTLD_LAZY);
-
-    if (library_handle == nullptr) {
-      FXL_LOG(ERROR) << "Could not open dylib: " << dlerror();
-      return;
-    }
-
-    auto lib =
-        fml::NativeLibrary::CreateWithHandle(library_handle,  // library handle
-                                             true  // close the handle when done
-        );
-
-    auto symbol = [](const char* str) {
-      return std::string{"_"} + std::string{str};
-    };
-
-    vm_snapshot = fxl::MakeRefCounted<blink::DartSnapshot>(
-        blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
-            lib, symbol(blink::DartSnapshot::kVMDataSymbol).c_str()),
-        blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
-            lib, symbol(blink::DartSnapshot::kVMInstructionsSymbol).c_str()));
-
-    isolate_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
-        blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
-            lib, symbol(blink::DartSnapshot::kIsolateDataSymbol).c_str()),
-        blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
-            lib,
-            symbol(blink::DartSnapshot::kIsolateInstructionsSymbol).c_str()));
-  } else {
-    // Dart 2 using blobs to allow sharing.
-    // Compare flutter2_aot_app in flutter_app.gni.
-    vm_snapshot = fxl::MakeRefCounted<blink::DartSnapshot>(
-        CreateWithContentsOfFile(
-            application_assets_directory_.get() /* /pkg/data */,
-            "vm_snapshot_data.bin", false),
-        CreateWithContentsOfFile(
-            application_assets_directory_.get() /* /pkg/data */,
-            "vm_snapshot_instructions.bin", true));
-
-    isolate_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
-        CreateWithContentsOfFile(
-            application_assets_directory_.get() /* /pkg/data */,
-            "isolate_snapshot_data.bin", false),
-        CreateWithContentsOfFile(
-            application_assets_directory_.get() /* /pkg/data */,
-            "isolate_snapshot_instructions.bin", true));
-
-    shared_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
-        CreateWithContentsOfFile(
-            application_assets_directory_.get() /* /pkg/data */,
-            "shared_snapshot_data.bin", false),
-        CreateWithContentsOfFile(
-            application_assets_directory_.get() /* /pkg/data */,
-            "shared_snapshot_instructions.bin", true));
-  }
+  shared_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
+      CreateWithContentsOfFile(
+          application_assets_directory_.get() /* /pkg/data */,
+          "shared_snapshot_data.bin", false),
+      CreateWithContentsOfFile(
+          application_assets_directory_.get() /* /pkg/data */,
+          "shared_snapshot_instructions.bin", true));
 
   blink::DartVM::ForProcess(settings_,               //
                             std::move(vm_snapshot),  //
