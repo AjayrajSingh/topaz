@@ -4,14 +4,16 @@
 
 import("//build/dart/dart_library.gni")
 
-dart_library("timezone") {
-  package_name = "timezone"
+dart_library("lib.settings") {
+  package_name = "lib.settings"
 
   sources = [
+    "widgets.dart",
     "timezone_picker.dart",
   ]
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/widgets:lib.widgets",
   ]
 }

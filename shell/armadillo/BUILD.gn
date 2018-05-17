@@ -19,10 +19,10 @@ dart_library("armadillo") {
   deps = [
     "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/lib/settings:lib.settings",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/proposal/dart",
     "//topaz/shell/keyboard",
-    "//topaz/shell/timezone",
     "//topaz/shell/widgets",
   ]
 }

@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:timezone/timezone_picker.dart' as tz;
+import 'package:lib.settings/timezone_picker.dart' as tz;
 
 import 'context_model.dart';
 

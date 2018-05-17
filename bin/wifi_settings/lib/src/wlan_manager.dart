@@ -5,8 +5,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.settings/widgets.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:lib.widgets/widgets.dart';
 
 import 'fuchsia/access_point.dart';
 import 'fuchsia/wifi_settings_model.dart';
@@ -48,7 +48,7 @@ class WlanManager extends StatelessWidget {
     Widget widget;
 
     if (model.loading) {
-      widget = _loading();
+      widget = new SettingsPage(scale: scale, isLoading: true);
     } else if (model.connecting || model.connectedAccessPoint != null) {
       widget = _padded(_buildCurrentNetwork(model, scale));
     } else if ((model.selectedAccessPoint?.isSecure ?? false) &&
@@ -66,16 +66,6 @@ class WlanManager extends StatelessWidget {
 
   Widget _padded(Widget child) {
     return new Container(padding: const EdgeInsets.all(12.0), child: child);
-  }
-
-  Widget _loading() {
-    return new Center(
-      child: new Container(
-        width: 64.0,
-        height: 64.0,
-        child: new FuchsiaSpinner(),
-      ),
-    );
   }
 
   Widget _buildCurrentNetwork(WifiSettingsModel model, double scale) {
@@ -107,10 +97,11 @@ class WlanManager extends StatelessWidget {
 
   Widget _buildAvailableNetworks(WifiSettingsModel model, double scale) {
     if (model.accessPoints == null || model.accessPoints.isEmpty) {
-      return new Column(children: <Widget>[
-        new Text('Scanning...', style: _titleTextStyle(scale)),
-        new Expanded(child: _loading())
-      ]);
+      return new SettingsPage(
+        scale: scale,
+        title: 'Scanning...',
+        isLoading: true,
+      );
     }
 
     return new Column(mainAxisSize: MainAxisSize.max, children: <Widget>[

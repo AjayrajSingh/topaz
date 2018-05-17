@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:timezone/timezone_picker.dart';
+import 'package:lib.settings/timezone_picker.dart';
 
 import 'user_setup_model.dart';
 

@@ -42,11 +42,11 @@ flutter_aot_app("userpicker_device_shell") {
     "//peridot/public/lib/auth/fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/http",
+    "//topaz/lib/settings:lib.settings",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/ui/flutter",
-    "//topaz/shell/timezone",
     "//topaz/shell/widgets",
   ]
 }
