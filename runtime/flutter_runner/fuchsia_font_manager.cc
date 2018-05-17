@@ -32,7 +32,7 @@ void UnmapMemory(const void* buffer, void* context) {
   zx::vmar::root_self().unmap(reinterpret_cast<uintptr_t>(buffer), size);
 }
 
-sk_sp<SkData> MakeSkDataFromBuffer(const mem::Buffer& data) {
+sk_sp<SkData> MakeSkDataFromBuffer(const fuchsia::mem::Buffer& data) {
   if (!fsl::SizedVmo::IsSizeValid(data.vmo, data.size) ||
       data.size > std::numeric_limits<size_t>::max()) {
     return nullptr;

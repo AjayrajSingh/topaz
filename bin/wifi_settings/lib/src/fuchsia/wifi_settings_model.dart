@@ -73,7 +73,7 @@ class WifiSettingsModel extends Model {
   Iterable<AccessPoint> get accessPoints =>
       _scannedAps?.map((wlan.Ap ap) => new AccessPoint(
             name: ap.ssid,
-            signalStrength: ap.lastRssi.toDouble(),
+            signalStrength: ap.rssiDbm.toDouble(),
             isSecure: ap.isSecure,
           ));
 
@@ -83,7 +83,7 @@ class WifiSettingsModel extends Model {
       ? new AccessPoint(
           name: _status.currentAp.ssid,
           isSecure: _status.currentAp.isSecure,
-          signalStrength: _status.currentAp.lastRssi.toDouble())
+          signalStrength: _status.currentAp.rssiDbm.toDouble())
       : null;
 
   /// A string describing the connection status of either the currently
@@ -228,7 +228,7 @@ class WifiSettingsModel extends Model {
     if (scanResult.error.code == wlan.ErrCode.ok) {
       // First sort APs by signal strength so when we de-dupe we drop the
       // weakest ones
-      scanResult.aps.sort((wlan.Ap a, wlan.Ap b) => b.lastRssi - a.lastRssi);
+      scanResult.aps.sort((wlan.Ap a, wlan.Ap b) => b.rssiDbm - a.rssiDbm);
       Set<String> seenNames = new Set<String>();
 
       for (wlan.Ap ap in scanResult.aps) {
