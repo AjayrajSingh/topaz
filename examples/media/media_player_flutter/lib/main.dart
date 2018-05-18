@@ -216,9 +216,6 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
           case media_player.kProblemAssetNotFound:
             text = 'The requested content was not found';
             break;
-          case media_player.kProblemMediaTypeNotSupported:
-            text = 'The requested content is in an unsupported format';
-            break;
           case media_player.kProblemConnectionFailed:
             text = 'Connection to player failed';
             break;
