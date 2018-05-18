@@ -152,7 +152,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
       minWidth: constraints.minWidth,
       minHeight: constraints.minHeight,
       maxHeight: constraints.maxHeight,
-      maxWidth: constraints.maxWidth - insetManager.value,
+      maxWidth: constraints.maxWidth,
     );
     while (focusStack.isNotEmpty) {
       List<PositionedSurface> positionedSurfaces = <PositionedSurface>[];

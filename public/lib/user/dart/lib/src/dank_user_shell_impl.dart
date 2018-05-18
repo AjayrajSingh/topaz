@@ -4,6 +4,7 @@
 
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_presentation/fidl.dart';
 import 'package:fidl/fidl.dart';
 
 import 'user_shell_impl.dart';
@@ -16,7 +17,12 @@ typedef OnDankUserShellReady = void Function(
 /// Implements a [UserShell].
 /// This is a lightweight version that passes the [UserShellContextProxy]
 /// through the [onReady] callback.
-class DankUserShellImpl implements UserShell, Lifecycle {
+class DankUserShellImpl
+    implements
+        UserShell,
+        UserShellPresentationProvider,
+        FocusWatcher,
+        Lifecycle {
   /// Constructor.
   DankUserShellImpl({
     this.onReady,
@@ -26,6 +32,16 @@ class DankUserShellImpl implements UserShell, Lifecycle {
   /// Binding for the actual UserShell interface object.
   final UserShellContextProxy _userShellContextProxy =
       new UserShellContextProxy();
+
+  /// Binding for the [FocusProvider] proxy.
+  final FocusProviderProxy _focusProviderProxy = new FocusProviderProxy();
+
+  /// Mapping of story id to [StoryVisualStateWatcher] handle.
+  final Map<String, StoryVisualStateWatcherProxy> _visualStateWatchers =
+      <String, StoryVisualStateWatcherProxy>{};
+
+  /// Binding for [FocusWatcher] implemented by this UserShell.
+  final FocusWatcherBinding _focusWatcherBinding = new FocusWatcherBinding();
 
   /// Called when [initialize] occurs.
   final OnDankUserShellReady onReady;
@@ -39,14 +55,50 @@ class DankUserShellImpl implements UserShell, Lifecycle {
   ) {
     if (onReady != null) {
       _userShellContextProxy.ctrl.bind(userShellContextHandle);
+      _userShellContextProxy
+          .getFocusProvider(_focusProviderProxy.ctrl.request());
+      _focusProviderProxy.watch(_focusWatcherBinding.wrap(this));
+
       onReady(_userShellContextProxy);
     }
   }
 
   @override
   void terminate() {
+    _focusWatcherBinding.close();
+    for (StoryVisualStateWatcherProxy watcher in _visualStateWatchers.values) {
+      watcher.ctrl.close();
+    }
+    _focusProviderProxy.ctrl.close();
     _userShellContextProxy.ctrl.close();
     onStop?.call();
     fuchsia.exit(0);
+  }
+
+  @override
+  void getPresentation(String storyId, InterfaceRequest<Presentation> request) {
+    _userShellContextProxy.getPresentation(request);
+  }
+
+  @override
+  void watchVisualState(
+      String storyId, InterfaceHandle<StoryVisualStateWatcher> watcherHandle) {
+    _visualStateWatchers[storyId] = new StoryVisualStateWatcherProxy()
+      ..ctrl.bind(watcherHandle);
+    _focusProviderProxy.query((List<FocusInfo> focusedStories) =>
+        focusedStories.forEach(onFocusChange));
+  }
+
+  @override
+  void onFocusChange(FocusInfo focusInfo) =>
+      _setFocus(focusInfo.focusedStoryId);
+
+  void _setFocus(String storyId) {
+    for (MapEntry<String, StoryVisualStateWatcherProxy> entry
+        in _visualStateWatchers.entries) {
+      entry.value.onVisualStateChange(entry.key == storyId
+          ? StoryVisualState.maximized
+          : StoryVisualState.minimized);
+    }
   }
 }

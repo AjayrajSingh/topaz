@@ -26,6 +26,11 @@ class DankUserShellWidget extends StatelessWidget {
   /// The binding for the [Lifecycle] service implemented by [UserShellImpl].
   final LifecycleBinding _lifecycleBinding;
 
+  /// The binding for the [UserShellPresentationProvider] service implemented
+  /// by [UserShellImpl].
+  final List<UserShellPresentationProviderBinding>
+      _presentationProviderBindings;
+
   /// The [UserShellImpl] whose services to [advertise].
   final DankUserShellImpl _userShell;
 
@@ -53,6 +58,8 @@ class DankUserShellWidget extends StatelessWidget {
       onStop: onStop,
       userShellBinding: new UserShellBinding(),
       lifecycleBinding: new LifecycleBinding(),
+      presentationProviderBindings: const <
+          UserShellPresentationProviderBinding>[],
     );
   }
 
@@ -60,17 +67,22 @@ class DankUserShellWidget extends StatelessWidget {
     ApplicationContext applicationContext,
     UserShellBinding userShellBinding,
     LifecycleBinding lifecycleBinding,
+    List<UserShellPresentationProviderBinding> presentationProviderBindings,
     this.child,
     this.onReady,
     this.onStop,
-  })
-      : _applicationContext = applicationContext,
+  })  : _applicationContext = applicationContext,
         _userShellBinding = userShellBinding,
         _lifecycleBinding = lifecycleBinding,
+        _presentationProviderBindings = presentationProviderBindings,
         _userShell = new DankUserShellImpl(
           onStop: () {
             userShellBinding.close();
             lifecycleBinding.close();
+            for (UserShellPresentationProviderBinding binding
+                in presentationProviderBindings) {
+              binding.close();
+            }
             onStop?.call();
           },
           onReady: (UserShellContext userShellContext) {
@@ -94,6 +106,13 @@ class DankUserShellWidget extends StatelessWidget {
         (InterfaceRequest<Lifecycle> request) =>
             _lifecycleBinding.bind(_userShell, request),
         Lifecycle.$serviceName,
+      )
+      ..addServiceForName(
+        (InterfaceRequest<UserShellPresentationProvider> request) =>
+            _presentationProviderBindings.add(
+                new UserShellPresentationProviderBinding()
+                  ..bind(_userShell, request)),
+        UserShellPresentationProvider.$serviceName,
       );
   }
 }

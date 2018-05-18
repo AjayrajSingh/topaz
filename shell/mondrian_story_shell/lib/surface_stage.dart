@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/widgets.dart';
@@ -19,6 +20,9 @@ const SpringDescription _kSimSpringDescription = const SpringDescription(
   stiffness: 220.0,
   damping: 29.0,
 );
+
+// Distance from left edge of surface where panning can be initiated.
+const double _kPanStartXOffset = 32.0;
 
 /// Stages determine how things move, and how they can be manipulated
 class SurfaceStage extends StatelessWidget {
@@ -101,6 +105,9 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
           );
   }
 
+  // Returns true if panning was initiated [_kPanStartXOffset] from left edge.
+  bool _panning = false;
+
   @override
   Widget build(BuildContext context) {
     final SurfaceForm form = widget.form;
@@ -112,10 +119,17 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
             child: new GestureDetector(
               behavior: HitTestBehavior.opaque,
               onPanStart: (DragStartDetails details) {
+                Offset diff = details.globalPosition - form.position.topLeft;
+                if (diff.dx < _kPanStartXOffset) {
+                  _panning = true;
+                }
                 _animation.update(value: animation.value, velocity: Rect.zero);
                 form.onDragStarted();
               },
               onPanUpdate: (DragUpdateDetails details) {
+                if (!_panning) {
+                  return;
+                }
                 _animation.update(
                     value: animation.value.shift(form.dragFriction(
                         animation.value.center - form.position.center,
@@ -123,6 +137,10 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
                     velocity: Rect.zero);
               },
               onPanEnd: (DragEndDetails details) {
+                if (!_panning) {
+                  return;
+                }
+                _panning = false;
                 _animation
                   ..update(
                       value: animation.value,

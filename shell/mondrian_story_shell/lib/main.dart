@@ -10,12 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_presentation/fidl.dart';
 import 'package:fidl_views_v1_token/fidl.dart';
 import 'package:fuchsia/fuchsia.dart' show exit;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/utils.dart';
 import 'package:lib.widgets/widgets.dart';
 
 import 'inset_manager.dart';
@@ -36,15 +38,20 @@ StoryShellImpl _storyShellImpl;
 SurfaceGraph _surfaceGraph;
 
 /// An implementation of the [StoryShell] interface.
-class StoryShellImpl implements StoryShell, Lifecycle {
+class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   final StoryShellBinding _storyShellBinding = new StoryShellBinding();
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
   final StoryContextProxy _storyContext = new StoryContextProxy();
+  final PointerEventsListener _pointerEventsListener =
+      new PointerEventsListener();
+  final StoryVisualStateWatcherBinding _visualStateWatcherBinding =
+      new StoryVisualStateWatcherBinding();
 
   /// StoryShell
   @override
   void initialize(InterfaceHandle<StoryContext> contextHandle) {
     _storyContext.ctrl.bind(contextHandle);
+    _storyContext.watchVisualState(_visualStateWatcherBinding.wrap(this));
   }
 
   /// Bind an [InterfaceRequest] for a [StoryShell] interface to this object.
@@ -172,10 +179,24 @@ class StoryShellImpl implements StoryShell, Lifecycle {
   void terminate() {
     trace('terminating');
     log.info('StoryShellImpl::terminate call');
+    _pointerEventsListener.stop();
+    _visualStateWatcherBinding.close();
     _storyContext.ctrl.close();
     _storyShellBinding.close();
     _lifecycleBinding.close();
     exit(0);
+  }
+
+  @override
+  void onVisualStateChange(StoryVisualState visualState) {
+    log.info('Story visual state is: $visualState');
+    _pointerEventsListener.stop();
+    if (visualState == StoryVisualState.maximized) {
+      PresentationProxy presentationProxy = new PresentationProxy();
+      _storyContext.getPresentation(presentationProxy.ctrl.request());
+      _pointerEventsListener.listen(presentationProxy);
+      presentationProxy.ctrl.close();
+    }
   }
 }
 

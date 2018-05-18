@@ -99,11 +99,11 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   bool _hasConfiguredUserShells = false;
 
   // Because this device shell only supports a single user logged in at a time,
-  // we don't need to maintain separate ServiceProvider and Presentation
-  // bindings for each logged-in user.
-  final PresentationBinding _presentationBinding = new PresentationBinding();
+  // we don't need to maintain separate ServiceProvider for each logged-in user.
   final ServiceProviderBinding _serviceProviderBinding =
       new ServiceProviderBinding();
+  final List<PresentationBinding> _presentationBindings =
+      <PresentationBinding>[];
 
   /// Constructor
   UserPickerDeviceShellModel({
@@ -449,8 +449,10 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     trace('logout');
     refreshUsers();
     _childViewConnection = null;
-    _presentationBinding.close();
     _serviceProviderBinding.close();
+    for (PresentationBinding presentationBinding in _presentationBindings) {
+      presentationBinding.close();
+    }
     notifyListeners();
   }
 
@@ -614,13 +616,8 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     // TODO(SCN-595) mozart.Presentation is being renamed to ui.Presentation.
     if (serviceName == 'mozart.Presentation' ||
         serviceName == 'ui.Presentation') {
-      if (_presentationBinding.isBound) {
-        log.warning(
-            'UserPickerDeviceShell: Presentation service is already bound !');
-      } else {
-        _presentationBinding.bind(
-            this, new InterfaceRequest<Presentation>(channel));
-      }
+      _presentationBindings.add(new PresentationBinding()
+        ..bind(this, new InterfaceRequest<Presentation>(channel)));
     } else {
       log.warning(
           'UserPickerDeviceShell: received request for unknown service: $serviceName !');
