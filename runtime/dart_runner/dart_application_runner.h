@@ -37,7 +37,7 @@ class DartApplicationRunner : public component::ApplicationRunner {
   // |component::ApplicationRunner| implementation:
   void StartApplication(
       component::ApplicationPackage application,
-      component::ApplicationStartupInfo startup_info,
+      component::StartupInfo startup_info,
       ::fidl::InterfaceRequest<component::ApplicationController> controller)
       override;
 

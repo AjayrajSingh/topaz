@@ -47,7 +47,7 @@ void AfterTask() {
 DartApplicationController::DartApplicationController(
     std::string label,
     component::ApplicationPackage application,
-    component::ApplicationStartupInfo startup_info,
+    component::StartupInfo startup_info,
     fidl::InterfaceRequest<component::ApplicationController> controller)
     : label_(label),
       url_(std::move(application.resolved_url)),

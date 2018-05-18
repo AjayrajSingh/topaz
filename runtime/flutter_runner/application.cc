@@ -22,7 +22,7 @@ std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
 Application::Create(
     TerminationCallback termination_callback,
     component::ApplicationPackage package,
-    component::ApplicationStartupInfo startup_info,
+    component::StartupInfo startup_info,
     fidl::InterfaceRequest<component::ApplicationController> controller) {
   auto thread = std::make_unique<fsl::Thread>();
   std::unique_ptr<Application> application;
@@ -53,7 +53,7 @@ static std::string DebugLabelForURL(const std::string& url) {
 Application::Application(
     TerminationCallback termination_callback,
     component::ApplicationPackage,
-    component::ApplicationStartupInfo startup_info,
+    component::StartupInfo startup_info,
     fidl::InterfaceRequest<component::ApplicationController>
         application_controller_request)
     : termination_callback_(termination_callback),
