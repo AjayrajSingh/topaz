@@ -23,13 +23,17 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addFlag('aot',
       help: 'Run compiler in AOT mode (enables whole-program transformations)',
       defaultsTo: false)
-  ..addFlag('embed-sources',
-      help: 'Embed sources in the output dill file', defaultsTo: false)
-  ..addOption('target', help: 'Kernel target name')
-  ..addOption('packages', help: 'Path to .packages file')
+  ..addFlag('drop-ast', help: 'Drop AST for members with bytecode',
+      defaultsTo: false)
+  ..addFlag('embed-sources', help: 'Embed sources in the output dill file',
+      defaultsTo: false)
+  ..addFlag('gen-bytecode', help: 'Generate bytecode',
+      defaultsTo: false)
   ..addOption('depfile', help: 'Path to output Ninja depfile')
   ..addOption('manifest', help: 'Path to output Fuchsia package manifest')
-  ..addOption('output', help: 'Path to output dill file');
+  ..addOption('output', help: 'Path to output dill file')
+  ..addOption('packages', help: 'Path to .packages file')
+  ..addOption('target', help: 'Kernel target name');
 
 String _usage = '''
 Usage: compiler [options] [input.dart]
@@ -66,6 +70,8 @@ Future<void> main(List<String> args) async {
   final bool aot = options['aot'];
   final bool embedSources = options['embed-sources'];
   final String targetName = options['target'];
+  final bool genBytecode = options['gen-bytecode'];
+  final bool dropAST = options['drop-ast'];
 
   final String filename = options.rest[0];
   final Uri filenameUri = Uri.base.resolveUri(new Uri.file(filename));
@@ -104,7 +110,11 @@ Future<void> main(List<String> args) async {
   }
 
   Component program =
-      await compileToKernel(filenameUri, compilerOptions, aot: aot);
+      await compileToKernel(filenameUri, compilerOptions,
+        aot: aot,
+        genBytecode: genBytecode,
+        dropAST: dropAST,
+      );
 
   final IOSink sink = new File(kernelBinaryFilename).openWrite();
   final BinaryPrinter printer = new LimitedBinaryPrinter(sink,

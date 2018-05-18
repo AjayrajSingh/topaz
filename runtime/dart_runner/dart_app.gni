@@ -96,6 +96,11 @@ template("dart_jit_app") {
     product_suffix = "_product"
   }
 
+  dbc = false
+  if (defined(invoker.dbc) && invoker.dbc) {
+    dbc = true
+  }
+
   dart_library_target_name = target_name + "_dart_library"
 
   dart_library(dart_library_target_name) {
@@ -130,7 +135,14 @@ template("dart_jit_app") {
   _dart_kernel(kernel_target_name) {
     main_dart = invoker.main_dart
     manifest = kernel_manifest
-    args = []
+    if (dbc) {
+      args = [
+        "--gen-bytecode",
+        "--drop-ast",
+      ]
+    } else {
+      args = []
+    }
     dart_library_target_name = dart_library_target_name
   }
 
@@ -156,9 +168,14 @@ template("dart_jit_app") {
       resources = invoker.resources
     }
 
+    runner_name = "jit"
+    if (dbc) {
+      runner_name = "dbc"
+    }
+
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/jit${product_suffix}_runtime")
+        path = rebase_path("//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime")
         dest = "runtime"
       },
     ]
