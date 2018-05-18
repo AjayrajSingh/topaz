@@ -2,6 +2,7 @@
     "imports": [
         "topaz/packages/tests/dart",
         "topaz/packages/tests/dart_unittests",
+        "topaz/packages/tests/dart_target_unittests",
         "topaz/packages/tests/auth_provider_unittests",
         "topaz/packages/tests/web_view"
     ]

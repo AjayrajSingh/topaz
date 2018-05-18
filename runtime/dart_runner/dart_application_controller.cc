@@ -423,6 +423,17 @@ const zx::duration kIdleNotifyDuration = zx::msec(500);
 const zx::duration kIdleSlack = zx::sec(1);
 
 void DartApplicationController::MessageEpilogue(Dart_Handle result) {
+  auto dart_state = tonic::DartState::Current();
+  // If the Dart program has set a return code, then it is intending to shut
+  // down by way of a fatal error, and so there is no need to override
+  // return_code_.
+  if (dart_state->has_set_return_code() && Dart_IsError(result) &&
+      Dart_IsFatalError(result)) {
+    Dart_ShutdownIsolate();
+    return;
+  }
+
+  // Otherwise, see if there was any other error.
   return_code_ = tonic::GetErrorExitCode(result);
   if (return_code_ != 0) {
     Dart_ShutdownIsolate();

@@ -77,7 +77,14 @@ void DartMicrotaskQueue::RunMicrotasks() {
       if (!dart_state.get())
         continue;
       DartState::Scope dart_scope(dart_state.get());
-      Dart_Handle result = DartInvokeVoid(callback.value());
+      Dart_Handle result = Dart_InvokeClosure(callback.value(), 0, nullptr);
+      // If the Dart program has set a return code, then it is intending to shut
+      // down by way of a fatal error, and so there is no need to emit a log
+      // message.
+      if (!dart_state->has_set_return_code() || !Dart_IsError(result) ||
+          !Dart_IsFatalError(result)) {
+        LogIfError(result);
+      }
       DartErrorHandleType error = GetErrorHandleType(result);
       if (error != kNoError)
         last_error_ = error;
