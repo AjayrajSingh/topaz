@@ -46,12 +46,12 @@ void AfterTask() {
 
 DartApplicationController::DartApplicationController(
     std::string label,
-    component::ApplicationPackage application,
+    component::Package package,
     component::StartupInfo startup_info,
     fidl::InterfaceRequest<component::ApplicationController> controller)
     : label_(label),
-      url_(std::move(application.resolved_url)),
-      application_(std::move(application)),
+      url_(std::move(package.resolved_url)),
+      package_(std::move(package)),
       startup_info_(std::move(startup_info)),
       binding_(this) {
   if (controller.is_valid()) {
@@ -85,7 +85,7 @@ DartApplicationController::~DartApplicationController() {
 }
 
 bool DartApplicationController::Setup() {
-  // Name the thread after the url of the application being launched.
+  // Name the thread after the url of the component being launched.
   std::string label = "dart:" + label_;
   zx::thread::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
   Dart_SetThreadName(label.c_str());

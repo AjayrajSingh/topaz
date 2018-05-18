@@ -63,7 +63,7 @@ void ApplicationRunner::RegisterApplication(
 }
 
 void ApplicationRunner::StartApplication(
-    component::ApplicationPackage package,
+    component::Package package,
     component::StartupInfo startup_info,
     fidl::InterfaceRequest<component::ApplicationController> controller) {
   // Notes on application termination: Application typically terminate on the

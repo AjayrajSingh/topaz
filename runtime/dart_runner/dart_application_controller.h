@@ -22,7 +22,7 @@ namespace dart_runner {
 class DartApplicationController : public component::ApplicationController {
  public:
   DartApplicationController(
-      std::string label, component::ApplicationPackage application,
+      std::string label, component::Package package,
       component::StartupInfo startup_info,
       fidl::InterfaceRequest<component::ApplicationController> controller);
   ~DartApplicationController() override;
@@ -56,7 +56,7 @@ class DartApplicationController : public component::ApplicationController {
 
   std::string label_;
   std::string url_;
-  component::ApplicationPackage application_;
+  component::Package package_;
   component::StartupInfo startup_info_;
   component::ServiceProviderBridge service_provider_bridge_;
   fidl::Binding<component::ApplicationController> binding_;

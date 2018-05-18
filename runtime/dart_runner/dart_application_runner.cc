@@ -86,12 +86,12 @@ void IsolateCleanupCallback(void* callback_data) {
 
 void RunApplication(
     DartApplicationRunner* runner, ControllerToken* token,
-    component::ApplicationPackage application,
+    component::Package package,
     component::StartupInfo startup_info,
     ::fidl::InterfaceRequest<component::ApplicationController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   fsl::MessageLoop loop;
-  DartApplicationController app(token->label(), std::move(application),
+  DartApplicationController app(token->label(), std::move(package),
                                 std::move(startup_info), std::move(controller));
   bool success = app.Setup();
   int64_t end = Dart_TimelineGetMicros();
@@ -187,12 +187,12 @@ DartApplicationRunner::~DartApplicationRunner() {
 }
 
 void DartApplicationRunner::StartApplication(
-    component::ApplicationPackage application,
+    component::Package package,
     component::StartupInfo startup_info,
     ::fidl::InterfaceRequest<component::ApplicationController> controller) {
-  std::string label = GetLabelFromURL(application.resolved_url);
+  std::string label = GetLabelFromURL(package.resolved_url);
   std::thread thread(RunApplication, this, AddController(label),
-                     std::move(application), std::move(startup_info),
+                     std::move(package), std::move(startup_info),
                      std::move(controller));
   thread.detach();
 }

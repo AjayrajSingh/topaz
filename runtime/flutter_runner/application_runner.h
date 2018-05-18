@@ -43,7 +43,7 @@ class ApplicationRunner final : public component::ApplicationRunner {
       active_applications_;
 
   // |component::ApplicationRunner|
-  void StartApplication(component::ApplicationPackage application,
+  void StartApplication(component::Package package,
                         component::StartupInfo startup_info,
                         fidl::InterfaceRequest<component::ApplicationController>
                             controller) override;

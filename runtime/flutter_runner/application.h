@@ -38,7 +38,7 @@ class Application final : public Engine::Delegate,
   // This is a synchronous operation.
   static std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
   Create(TerminationCallback termination_callback,
-         component::ApplicationPackage package,
+         component::Package package,
          component::StartupInfo startup_info,
          fidl::InterfaceRequest<component::ApplicationController> controller);
 
@@ -67,7 +67,7 @@ class Application final : public Engine::Delegate,
 
   Application(
       TerminationCallback termination_callback,
-      component::ApplicationPackage package,
+      component::Package package,
       component::StartupInfo startup_info,
       fidl::InterfaceRequest<component::ApplicationController> controller);
 
