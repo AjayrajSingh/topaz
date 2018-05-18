@@ -84,7 +84,7 @@ class SettingsSection extends StatelessWidget {
 
   /// Constructor.
   const SettingsSection(
-      {@required this.title, @required this.child, @required this.scale});
+      {this.title, @required this.child, @required this.scale});
 
   @override
   Widget build(BuildContext context) {
@@ -101,14 +101,14 @@ class SettingsSection extends StatelessWidget {
 /// A list of items such as devices or toggles.
 class SettingsItemList extends StatelessWidget {
   /// A list of child items in a settings item
-  final List<SettingsItem> items;
+  final Iterable<SettingsItem> items;
 
   /// Constructs a new list with the settings items
   const SettingsItemList({@required this.items});
 
   @override
   Widget build(BuildContext context) {
-    return new Column(children: items);
+    return new Column(mainAxisSize: MainAxisSize.min, children: items.toList());
   }
 }
 
@@ -124,6 +124,28 @@ abstract class SettingsItem extends StatelessWidget {
 
   /// Total height of a single settings item.
   double get height => _unscaledHeight * scale;
+}
+
+/// Simple text based button shown in settings
+class SettingsButton extends SettingsItem {
+  /// Label the button is displayed with
+  final String text;
+
+  /// Action taken when button is pressed
+  final VoidCallback onTap;
+
+  /// Constructor.
+  const SettingsButton(
+      {@required this.text, @required this.onTap, @required double scale})
+      : super(scale);
+
+  @override
+  Widget build(BuildContext context) {
+    return new FlatButton(
+      child: new Text(text, style: _textStyle(scale)),
+      onPressed: onTap,
+    );
+  }
 }
 
 /// A tile that can be used to display a
@@ -163,7 +185,7 @@ class SettingsTile extends SettingsItem {
     return new ListTile(
         leading: _buildLogo(),
         title: _title(),
-        subtitle: _subTitle(),
+        subtitle: description != null ? _subTitle() : null,
         onTap: onTap);
   }
 
@@ -189,4 +211,36 @@ class SettingsTile extends SettingsItem {
   Widget _title() => new Text(text, style: _textStyle(scale));
 
   Widget _subTitle() => new Text(description, style: _textStyle(scale));
+}
+
+/// Widget that displays a popup which is dismissable by tapping outside of the
+/// child widget.
+///
+/// The child widget should  therefore be smaller than the full size of the screen.
+class SettingsPopup extends StatelessWidget {
+  /// The child should leave some space for the user to dismiss the popup.
+  final Widget child;
+
+  /// Called when user taps outside of displayed popup
+  final VoidCallback onDismiss;
+
+  /// Constructor.
+  const SettingsPopup({@required this.child, @required this.onDismiss});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget overlayCancel = new Opacity(
+        opacity: 0.4,
+        child: new Material(
+            color: Colors.grey[900],
+            child: new GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onDismiss,
+            )));
+
+    return new Stack(children: <Widget>[
+      overlayCancel,
+      new Center(child: child),
+    ]);
+  }
 }
