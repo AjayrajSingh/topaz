@@ -216,6 +216,15 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
           case media_player.kProblemAssetNotFound:
             text = 'The requested content was not found';
             break;
+          case media_player.kProblemContainerNotSupported:
+            text = 'The requested content uses an unsupported container format';
+            break;
+          case media_player.kProblemAudioEncodingNotSupported:
+            text = 'The requested content uses an unsupported audio encoding';
+            break;
+          case media_player.kProblemVideoEncodingNotSupported:
+            text = 'The requested content uses an unsupported video encoding';
+            break;
           case media_player.kProblemConnectionFailed:
             text = 'Connection to player failed';
             break;
