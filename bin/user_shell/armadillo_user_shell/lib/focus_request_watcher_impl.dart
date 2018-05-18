@@ -6,7 +6,7 @@ import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 
 /// Called when we receive a request to focus on [storyId];
-typedef void OnFocusRequest(String storyId);
+typedef OnFocusRequest = void Function(String storyId);
 
 /// Listens for requests to change the currently focused story.
 class FocusRequestWatcherImpl extends FocusRequestWatcher {

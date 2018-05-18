@@ -73,11 +73,11 @@ InterfaceHandle<T> connectToServiceByName<T>(
   return new InterfaceHandle<T>(pair.second);
 }
 
-typedef void ServiceConnector<T>(InterfaceRequest<T> request);
-typedef void DefaultServiceConnector<T>(
+typedef ServiceConnector<T> = void Function(InterfaceRequest<T> request);
+typedef DefaultServiceConnector<T> = void Function(
     String serviceName, InterfaceRequest<T> request);
 
-typedef void _ServiceConnectorThunk(Channel channel);
+typedef _ServiceConnectorThunk = void Function(Channel channel);
 
 class ServiceProviderImpl extends ServiceProvider {
   final ServiceProviderBinding _binding = new ServiceProviderBinding();

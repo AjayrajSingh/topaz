@@ -9,7 +9,8 @@ import 'package:lib.widgets/model.dart';
 
 /// Callback function signature for the action to submit the new conversation
 /// form
-typedef void NewConversationFormSubmitCallback(List<String> participants);
+typedef NewConversationFormSubmitCallback = void Function(
+    List<String> participants);
 
 /// The model for the new conversation form.
 class FormModel extends Model {

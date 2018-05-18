@@ -81,8 +81,7 @@ class PanelDragTargets extends StatefulWidget {
     this.onAccept,
     this.onVerticalEdgeHover,
     this.currentSize,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   _PanelDragTargetsState createState() => new _PanelDragTargetsState();
@@ -524,15 +523,15 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
     double minScore = double.infinity;
     PanelDragTarget closestTarget;
     for (PanelDragTarget target in _targets
-        .where((PanelDragTarget target) => storyCluster == null
-            ? true
-            : target.canAccept(storyCluster.realStories.length))
+        .where((PanelDragTarget target) =>
+            storyCluster == null ||
+            target.canAccept(storyCluster.realStories.length))
         .where((PanelDragTarget target) =>
             target.isValidInDirection(dragDirection))
         .where((PanelDragTarget target) => target.withinRange(point))
         .where(
           (PanelDragTarget target) =>
-              (!initialTarget || target.initiallyTargetable),
+              !initialTarget || target.initiallyTargetable,
         )) {
       double targetScore = target.distanceFrom(point);
       targetScore *=
@@ -580,7 +579,7 @@ class _PanelDragTargetsState extends TickingState<PanelDragTargets> {
   void _onLeaveCluster({
     BuildContext context,
     StoryCluster storyCluster,
-    bool preview: false,
+    bool preview = false,
   }) {
     panelEventHandler.onLeaveCluster(
         context: context, storyCluster: storyCluster, preview: preview);

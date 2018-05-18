@@ -11,7 +11,6 @@
         "topaz/packages/prod/dart_runner",
         "topaz/packages/prod/dashboard",
         "topaz/packages/prod/documents",
-        "topaz/packages/prod/file_explorer",
         "topaz/packages/prod/flutter",
         "topaz/packages/prod/flutter_aot",
         "topaz/packages/prod/flutter_jit",

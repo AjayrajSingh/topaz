@@ -17,15 +17,14 @@ const double _kRowHeight = 44.0;
 class DocListItem extends SelectableItem {
   /// Constructor
   const DocListItem({
-    Key key,
     @required doc_fidl.Document doc,
     @required bool selected,
+    Key key,
     VoidCallback onPressed,
     VoidCallback onDoubleTap,
     VoidCallback onLongPress,
     bool hideCheckbox,
-  })
-      : assert(doc != null),
+  })  : assert(doc != null),
         assert(selected != null),
         super(
           key: key,

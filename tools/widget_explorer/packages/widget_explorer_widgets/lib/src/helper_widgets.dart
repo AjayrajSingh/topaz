@@ -20,7 +20,7 @@ final TextStyle _kCodeStyle = new TextStyle(
 );
 
 /// A function type to be used as setState() function.
-typedef void SetStateFunc(VoidCallback fn);
+typedef SetStateFunc = void Function(VoidCallback fn);
 
 /// A class containing all the generated state values and widget builders.
 ///
@@ -51,7 +51,7 @@ abstract class GeneratedState {
 }
 
 /// Builder function for the [GeneratedState].
-typedef GeneratedState GeneratedStateBuilder(SetStateFunc setState);
+typedef GeneratedStateBuilder = GeneratedState Function(SetStateFunc setState);
 
 /// A widget that wraps the target widget and its size control panel.
 class WidgetExplorerWrapper extends StatefulWidget {
@@ -74,8 +74,7 @@ class WidgetExplorerWrapper extends StatefulWidget {
     @required this.width,
     @required this.height,
     @required this.stateBuilder,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   WidgetExplorerWrapperState createState() => new WidgetExplorerWrapperState();
@@ -189,8 +188,7 @@ class _TopMargined extends StatelessWidget {
   const _TopMargined({
     Key key,
     @required this.child,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   final Widget child;
 
@@ -244,8 +242,7 @@ class RegenerateButton extends StatelessWidget {
     Key key,
     @required this.onPressed,
     this.codeToDisplay,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -292,8 +289,7 @@ class ConfigKeyText extends StatelessWidget {
     Key key,
     @required this.configKey,
     @required this.configValue,
-  })
-      : assert(configKey != null),
+  })  : assert(configKey != null),
         super(key: key);
 
   @override

@@ -11,7 +11,7 @@ const double _kStepSize = 40.0;
 const double _kTargetMargin = 1.0;
 
 /// Returns the closest target to the given [point].
-typedef PanelDragTarget ClosestTargetGetter(Offset point);
+typedef ClosestTargetGetter = PanelDragTarget Function(Offset point);
 
 /// When [enabled] is true, this widget draws the influence of the given
 /// [targets] by drawing a bunch of points that will accept

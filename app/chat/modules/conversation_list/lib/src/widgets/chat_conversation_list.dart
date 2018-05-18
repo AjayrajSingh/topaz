@@ -13,7 +13,7 @@ import 'chat_conversation_list_item.dart';
 const double _kSpinnerSize = 48.0;
 
 /// Callback function signature for an action on a conversation
-typedef void ConversationActionCallback(Conversation message);
+typedef ConversationActionCallback = void Function(Conversation message);
 
 /// UI Widget that represents a list of chat conversations
 class ChatConversationList extends StatelessWidget {
@@ -50,8 +50,7 @@ class ChatConversationList extends StatelessWidget {
     this.onDismiss,
     this.selectedId,
     bool shouldDisplaySpinner,
-  })
-      : assert(conversations != null),
+  })  : assert(conversations != null),
         shouldDisplaySpinner = shouldDisplaySpinner ?? false,
         super(key: key);
 

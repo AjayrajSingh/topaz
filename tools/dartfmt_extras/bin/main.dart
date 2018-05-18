@@ -38,7 +38,7 @@ Future<Null> main(List<String> args) async {
     // Existence check.
     String fullPath = path.join(basePath, relativePath);
     File dartFile = new File(fullPath);
-    if (!await dartFile.exists()) {
+    if (!dartFile.existsSync()) {
       stderr.writeln('The file ${args[0]} does not exist.');
       exit(1);
     }

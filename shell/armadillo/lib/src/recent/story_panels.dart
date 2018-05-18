@@ -60,9 +60,8 @@ class StoryPanels extends StatelessWidget {
     this.focusProgress,
     this.overlayKey,
     this.currentSize,
-    this.isBeingDragged: false,
-  })
-      : assert(() {
+    this.isBeingDragged = false,
+  })  : assert(() {
           Panel.haveFullCoverage(
             storyCluster.stories
                 .map(
@@ -129,7 +128,7 @@ class StoryPanels extends StatelessWidget {
               storyBarMaximizedHeight: SizeModel.kStoryBarMaximizedHeight,
               focusProgress: focusProgress,
               displayMode: storyCluster.displayMode,
-              isFocused: (storyCluster.focusedStoryId == story.id),
+              isFocused: storyCluster.focusedStoryId == story.id,
               panel: story.panel,
               currentSize: currentSize,
               childContainerKey: story.positionedKey,
@@ -145,7 +144,7 @@ class StoryPanels extends StatelessWidget {
                       currentSize,
                       storyDragTransitionModel.value,
                       focusProgress,
-                      (storyCluster.focusedStoryId == story.id),
+                      storyCluster.focusedStoryId == story.id,
                     ),
               ),
             );
@@ -364,7 +363,7 @@ class StoryPanels extends StatelessWidget {
                     if (storyCluster.displayMode == DisplayMode.tabs) {
                       for (Story story in storyCluster.stories) {
                         bool storyFocused =
-                            (storyCluster.focusedStoryId == story.id);
+                            storyCluster.focusedStoryId == story.id;
                         story.simulatedFractionallySizedBoxModel
                             .jump(storyFocused ? 1.0 : 0.0);
                         if (storyFocused) {
@@ -464,7 +463,7 @@ class StoryPanels extends StatelessWidget {
   void _setStoryBarPadding({
     Story story,
     double width,
-    bool growFocused: _kGrowFocusedTab,
+    bool growFocused = _kGrowFocusedTab,
   }) {
     if (storyCluster.displayMode == DisplayMode.panels) {
       story.simulatedPaddingModel.update(

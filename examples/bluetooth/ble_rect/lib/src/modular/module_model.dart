@@ -9,12 +9,11 @@ import 'dart:ui';
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_bluetooth/fidl.dart' as bt;
 import 'package:fidl_bluetooth_gatt/fidl.dart' as gatt;
-import 'package:fidl_bluetooth_low_energy/fidl.dart'
-    as ble;
+import 'package:fidl_bluetooth_low_energy/fidl.dart' as ble;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
-typedef bool _ValueWriteFunc(List<int> value);
+typedef _ValueWriteFunc = bool Function(List<int> value);
 
 /// The [ModuleModel] for the GATT Server example.
 class BLERectModuleModel extends ModuleModel

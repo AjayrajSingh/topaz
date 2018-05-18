@@ -6,7 +6,6 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:armadillo/common.dart';
 import 'package:armadillo/now.dart';
-import 'package:armadillo/overview.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
@@ -127,7 +126,7 @@ class RecentsBuilder {
   }
 
   /// Call to reset the recents scrolling to 0.0.
-  void resetScroll({bool jump: false}) {
+  void resetScroll({bool jump = false}) {
     if (jump) {
       _scrollController.jumpTo(0.0);
     } else {

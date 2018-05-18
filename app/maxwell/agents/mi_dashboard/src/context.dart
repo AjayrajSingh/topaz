@@ -16,7 +16,7 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
   @override
   String get name => 'context';
 
-  final JsonCodec json = new JsonCodec(toEncodable: (dynamic object) {
+  final JsonCodec json = new JsonCodec(toEncodable: (object) {
     if (object is ComponentScope) {
       switch (object.tag) {
         case ComponentScopeTag.globalScope:
@@ -112,9 +112,7 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
     if (metadata.story != null) {
       json['story'] = <String, dynamic>{
         'id': metadata.story.id,
-        'focused': <String, int>{
-          'state': metadata.story.focused.state.value
-        }
+        'focused': <String, int>{'state': metadata.story.focused.state.value}
       };
     }
     if (metadata.mod != null) {

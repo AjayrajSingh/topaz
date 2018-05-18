@@ -112,10 +112,8 @@ class PowerManagerPowerModel extends PowerModel {
   }
 }
 
-typedef void _OnBatteryStatusChanged(BatteryStatus batteryStatus);
-
 class _PowerManagerWatcherImpl extends PowerManagerWatcher {
-  final _OnBatteryStatusChanged onBatteryStatusChanged;
+  final void Function(BatteryStatus batteryStatus) onBatteryStatusChanged;
 
   _PowerManagerWatcherImpl({this.onBatteryStatusChanged});
 

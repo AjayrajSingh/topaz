@@ -21,7 +21,7 @@ const double _kMaxLockVelocityMagnitude = 500.0;
 const double _kStickyDistance = 40.0;
 
 /// Returns a timestamp representing current time.
-typedef DateTime TimestampEmitter();
+typedef TimestampEmitter = DateTime Function();
 
 /// Manages the metadata associated with a dragged candidate in
 /// [PanelDragTargets].
@@ -49,10 +49,9 @@ class CandidateInfo {
   /// Constructor.
   CandidateInfo({
     @required Offset initialLockPoint,
-    this.timestampEmitter: _defaultTimestampEmitter,
-    this.minLockDuration: _kMinLockDuration,
-  })
-      : _lockPoint = initialLockPoint,
+    this.timestampEmitter = _defaultTimestampEmitter,
+    this.minLockDuration = _kMinLockDuration,
+  })  : _lockPoint = initialLockPoint,
         assert(initialLockPoint != null),
         assert(timestampEmitter != null),
         assert(minLockDuration != null);

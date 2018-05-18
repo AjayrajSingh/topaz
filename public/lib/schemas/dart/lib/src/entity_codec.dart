@@ -35,8 +35,7 @@ class EntityCodec<T> extends Codec<T, String> {
     @required this.type,
     @required _EncodeEntity<T> encode,
     @required _DecodeEntity<T> decode,
-  })
-      : assert(type != null),
+  })  : assert(type != null),
         assert(type.isEmpty == false),
         assert(encode != null),
         assert(decode != null),
@@ -50,7 +49,7 @@ class EntityCodec<T> extends Codec<T, String> {
   _EntityDecoder<T> get decoder => _decoder;
 }
 
-typedef String _EncodeEntity<T>(T value);
+typedef _EncodeEntity<T> = String Function(T value);
 
 class _EntityEncoder<T> extends Converter<T, String> {
   final _EncodeEntity<T> encode;
@@ -63,7 +62,7 @@ class _EntityEncoder<T> extends Converter<T, String> {
   }
 }
 
-typedef T _DecodeEntity<T>(String data);
+typedef _DecodeEntity<T> = T Function(String data);
 
 class _EntityDecoder<T> extends Converter<String, T> {
   final _DecodeEntity<T> decode;

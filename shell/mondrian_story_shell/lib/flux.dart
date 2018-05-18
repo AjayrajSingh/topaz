@@ -26,7 +26,7 @@ abstract class FluxAnimation<T> extends Animation<T> {
 }
 
 /// A function which returns a FluxAnimation from an initial value and velocity.
-typedef FluxAnimation<T> FluxAnimationInit<T>(T value, T velocity);
+typedef FluxAnimationInit<T> = FluxAnimation<T> Function(T value, T velocity);
 
 class _FluxAnimationWrapper<T> extends FluxAnimation<T> {
   _FluxAnimationWrapper(this.animation, this._velocity)
@@ -70,8 +70,7 @@ class SimAnimationController<T> extends FluxAnimation<T>
   SimAnimationController({
     @required TickerProvider vsync,
     @required this.sim,
-  })
-      : _value = sim.value(0.0),
+  })  : _value = sim.value(0.0),
         _velocity = sim.velocity(0.0),
         _elapsed = Duration.zero,
         _elapsedOffset = Duration.zero {
@@ -122,7 +121,7 @@ class SimAnimationController<T> extends FluxAnimation<T>
   }
 
   /// Stop the animation, optionally marking it as cancelled.
-  void stop({bool canceled: false}) {
+  void stop({bool canceled = false}) {
     _ticker.stop(canceled: canceled);
     _elapsedOffset = elapsed;
     _elapsed = Duration.zero;
@@ -169,8 +168,7 @@ class ManualAnimation<T> extends FluxAnimation<T>
     @required T value,
     @required T velocity,
     FluxAnimationInit<T> builder,
-  })
-      : _value = value,
+  })  : _value = value,
         _velocity = velocity,
         _builder = builder,
         _delegate = null,
@@ -278,8 +276,7 @@ class MovingTargetAnimation<T> extends FluxAnimation<T>
     @required this.simulate,
     @required T value,
     @required T velocity,
-  })
-      : _vsync = vsync,
+  })  : _vsync = vsync,
         assert(target != null),
         target = new FluxAnimation<T>.fromAnimation(target, velocity),
         assert(vsync != null),
@@ -376,7 +373,7 @@ class MovingTargetAnimation<T> extends FluxAnimation<T>
 }
 
 /// A generic transform function from one value to another of the same type.
-typedef T Transform<T>(T value);
+typedef Transform<T> = T Function(T value);
 
 /// A transformation wrapper for an animation.
 class TransformedAnimation<T> extends FluxAnimation<T>

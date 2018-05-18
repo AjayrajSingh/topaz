@@ -13,7 +13,7 @@ import 'message.dart';
 
 // ignore_for_file: public_member_api_docs
 
-typedef void _VoidCallback();
+typedef _VoidCallback = void Function();
 
 /// A channel over which messages from interface T can be sent.
 ///

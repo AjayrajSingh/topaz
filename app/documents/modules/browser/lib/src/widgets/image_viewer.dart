@@ -18,11 +18,10 @@ class ImageViewer extends StatelessWidget {
 
   /// Constructor
   const ImageViewer({
-    Key key,
     @required this.onClosePressed,
     @required this.location,
-  })
-      : assert(onClosePressed != null),
+    Key key,
+  })  : assert(onClosePressed != null),
         assert(location != null),
         super(key: key);
 
@@ -44,7 +43,7 @@ class ImageViewer extends StatelessWidget {
           top: 8.0,
           right: 8.0,
           child: new IconButton(
-            icon: new Icon(Icons.close),
+            icon: const Icon(Icons.close),
             color: Colors.grey[50],
             onPressed: onClosePressed,
           ),

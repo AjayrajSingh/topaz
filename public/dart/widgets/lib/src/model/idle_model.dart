@@ -22,7 +22,7 @@ class IdleModel extends SpringModel {
   Duration _timeout;
 
   /// Constructor.
-  IdleModel({Duration timeout: _kIdleModeTimeout})
+  IdleModel({Duration timeout = _kIdleModeTimeout})
       : assert(timeout != null),
         _timeout = timeout,
         super(springDescription: _kSimulationDesc) {

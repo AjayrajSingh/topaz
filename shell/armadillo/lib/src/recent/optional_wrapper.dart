@@ -19,7 +19,7 @@ class OptionalWrapper extends StatelessWidget {
   final bool useWrapper;
 
   /// Constructor.
-  const OptionalWrapper({this.builder, this.child, this.useWrapper: true});
+  const OptionalWrapper({this.builder, this.child, this.useWrapper = true});
 
   @override
   Widget build(BuildContext context) =>

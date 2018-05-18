@@ -17,15 +17,14 @@ class StoryClusterEntranceTransitionModel extends SpringModel {
 
   /// [delay] is the time to delay the transition.
   StoryClusterEntranceTransitionModel({
-    double delay: 0.0,
-    bool completed: true,
-  })
-      : super(springDescription: _kSimulationDesc) {
+    double delay = 0.0,
+    bool completed = true,
+  }) : super(springDescription: _kSimulationDesc) {
     reset(delay: delay, completed: completed);
   }
 
   /// Resets the simulation.
-  void reset({double delay: 0.0, bool completed: true}) {
+  void reset({double delay = 0.0, bool completed = true}) {
     _remainingDelay = completed ? 0.0 : delay;
     jump(completed ? 1.0 : 0.0);
     target = 1.0;

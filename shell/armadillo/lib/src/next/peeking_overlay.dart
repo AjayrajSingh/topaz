@@ -16,7 +16,8 @@ import 'peek_model.dart';
 const double _kStartOverlayTransitionHeight = 28.0;
 
 /// Builds the child which floats vertically above this overlay.
-typedef Widget ChildAboveBuilder(BuildContext context, double overlayHeight);
+typedef ChildAboveBuilder = Widget Function(
+    BuildContext context, double overlayHeight);
 
 /// A bottom aligned overlay which peeks up over the bottom.
 class PeekingOverlay extends StatefulWidget {
@@ -39,7 +40,7 @@ class PeekingOverlay extends StatefulWidget {
   /// Constructor.
   const PeekingOverlay({
     Key key,
-    this.peekHeight: _kStartOverlayTransitionHeight,
+    this.peekHeight = _kStartOverlayTransitionHeight,
     this.dragHandleHeight,
     this.onHide,
     this.onShow,

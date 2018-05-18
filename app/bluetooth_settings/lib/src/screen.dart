@@ -57,7 +57,7 @@ class _SettingsScaffold extends StatelessWidget {
           title: new Text(
               'Bluetooth Settings (${moduleModel.activeAdapterDescription})'),
           bottom: moduleModel.isDiscovering
-              ? new PreferredSize(
+              ? const PreferredSize(
                   child: const LinearProgressIndicator(),
                   preferredSize: Size.zero)
               : null,
@@ -68,7 +68,7 @@ class _SettingsScaffold extends StatelessWidget {
                         !moduleModel.isDiscoveryRequestPending)
                     ? () => moduleModel.toggleDiscovery()
                     : null,
-                icon: new Icon(Icons.bluetooth_searching)),
+                icon: const Icon(Icons.bluetooth_searching)),
             _getPopUpMenuButton(moduleModel),
           ],
         ),

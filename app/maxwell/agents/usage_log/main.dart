@@ -84,17 +84,19 @@ void _onContextUpdate(ContextUpdate update) {
 
 void _addStringObservation(Metric metric, String metricString) {
   int metricId = _getCobaltMetricID(metric);
-  _encoder.addStringObservation(
-      metricId, _cobaltForculusEncodingID, metricString,
-      (Status s) => _onAddObservationStatus(metricId, s));
+  _encoder.addStringObservation(metricId, _cobaltForculusEncodingID,
+      metricString, (Status s) => _onAddObservationStatus(metricId, s));
 }
 
 void _addModulePairObservation(String existingMod, String newMod) {
   int metricId = _getCobaltMetricID(Metric.modulePairsInStory);
-  _encoder.addMultipartObservation(metricId, <ObservationValue>[
-    _getStringObservationValue(_existingModuleKey, existingMod),
-    _getStringObservationValue(_addedModuleKey, newMod)
-  ], (Status s) => _onAddObservationStatus(metricId, s));
+  _encoder.addMultipartObservation(
+      metricId,
+      <ObservationValue>[
+        _getStringObservationValue(_existingModuleKey, existingMod),
+        _getStringObservationValue(_addedModuleKey, newMod)
+      ],
+      (Status s) => _onAddObservationStatus(metricId, s));
 }
 
 ObservationValue _getStringObservationValue(String name, String value) {
@@ -123,10 +125,11 @@ void main(List<String> args) {
   assert(_contextReader.ctrl.isBound);
 
   // Subscribe to all topics
-  ContextSelector selector = new ContextSelector(type: ContextValueType.module);
-  ContextQuery query = new ContextQuery(
-      selector: <ContextQueryEntry>[
-        new ContextQueryEntry(key: 'modules', value: selector)]);
+  ContextSelector selector =
+      const ContextSelector(type: ContextValueType.module);
+  ContextQuery query = new ContextQuery(selector: <ContextQueryEntry>[
+    new ContextQueryEntry(key: 'modules', value: selector)
+  ]);
   _contextReader.subscribe(query, _contextListener.getHandle());
 
   // Connect to Cobalt

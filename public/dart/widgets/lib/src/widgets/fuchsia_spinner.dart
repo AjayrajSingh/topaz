@@ -22,7 +22,7 @@ class FuchsiaSpinner extends StatefulWidget {
 
   /// Constructor.
   const FuchsiaSpinner({
-    this.color: _kDefaultColor,
+    this.color = _kDefaultColor,
   });
 
   @override

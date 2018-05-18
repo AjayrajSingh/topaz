@@ -30,13 +30,13 @@ export 'package:lib.ui.flutter/child_view.dart'
     show ChildView, ChildViewConnection;
 
 /// Function definition to handle [data] that is received from a message queue.
-typedef void OnReceiveMessage(String data, void ack());
+typedef OnReceiveMessage = void Function(String data, void Function() ack);
 
 /// Function to run when the module terminates
-typedef void OnTerminate();
+typedef OnTerminate = void Function();
 
 /// Function to run when the module terminates asynchronously
-typedef Future<Null> OnTerminateAsync();
+typedef OnTerminateAsync = Future<Null> Function();
 
 const int _kCobaltProjectId = 104;
 const int _kFirstLinkDataMetricId = 1;
@@ -318,7 +318,7 @@ class ModuleDriver {
 
   /// Watch for Entity updates from Link with the name [key] and automatically
   /// decode values using [codec].
-  Stream<T> watch<T>(String key, EntityCodec<T> codec, {bool all: false}) {
+  Stream<T> watch<T>(String key, EntityCodec<T> codec, {bool all = false}) {
     StreamController<String> controller = new StreamController<String>(
       onListen: () => log.info('watch stream ($key): listening'),
       onPause: () => log.info('watch stream ($key): paused'),
@@ -516,7 +516,7 @@ class ModuleDriver {
   Future<ModuleControllerClient> startModule({
     @required String module,
     @required Intent intent,
-    SurfaceRelation surfaceRelation: const SurfaceRelation(
+    SurfaceRelation surfaceRelation = const SurfaceRelation(
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
       emphasis: 0.5,

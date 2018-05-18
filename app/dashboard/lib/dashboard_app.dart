@@ -15,7 +15,7 @@ const double _kSpaceBetween = 4.0;
 const Color _kFuchsiaColor = const Color(0xFFFF0080);
 
 /// Callback to launch a module that displays the [url].
-typedef void OnLaunchUrl(String url);
+typedef OnLaunchUrl = void Function(String url);
 
 /// Displays the fuchsia dashboard.
 class DashboardApp extends StatelessWidget {
@@ -144,7 +144,7 @@ class DashboardApp extends StatelessWidget {
                     backgroundColor: _kFuchsiaColor,
                     onPressed: () => onRefresh?.call(),
                     tooltip: 'Refresh',
-                    child: new Icon(Icons.refresh),
+                    child: const Icon(Icons.refresh),
                   ),
                 ),
               ],

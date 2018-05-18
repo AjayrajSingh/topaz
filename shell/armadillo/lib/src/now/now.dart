@@ -382,9 +382,9 @@ class Now extends StatelessWidget {
   ) =>
       lerpDouble(
         lerpDouble(100.0, 20.0, quickSettingsProgressModel.value),
-        ((sizeModel.minimizedNowHeight -
+        (sizeModel.minimizedNowHeight -
                 nowMinimizationModel.userImageDiameter) /
-            2.0),
+            2.0,
         nowMinimizationModel.value,
       );
 

@@ -9,7 +9,7 @@ import 'package:fidl/fidl.dart';
 import 'user_shell_impl.dart';
 
 /// Called when [UserShell.initialize] occurs.
-typedef void OnDankUserShellReady(
+typedef OnDankUserShellReady = void Function(
   UserShellContext userShellContext,
 );
 

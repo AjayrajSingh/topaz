@@ -12,7 +12,7 @@ import 'package:fidl_geometry/fidl.dart' as geom;
 import 'package:zircon/zircon.dart';
 
 /// Type for |AudioPlayerController| update callbacks.
-typedef void UpdateCallback();
+typedef UpdateCallback = void Function();
 
 /// Controller for audio-only playback.
 class AudioPlayerController {
@@ -158,7 +158,7 @@ class AudioPlayerController {
       MediaPlayerProxy mediaPlayer = new MediaPlayerProxy();
       _mediaPlayer.addBinding(mediaPlayer.ctrl.request());
       _netMediaService.publishMediaPlayer(
-        serviceName, mediaPlayer.ctrl.unbind());
+          serviceName, mediaPlayer.ctrl.unbind());
     }
 
     _mediaPlayer.ctrl.onConnectionError = _handleConnectionError;
@@ -284,8 +284,8 @@ class AudioPlayerController {
   // Overridden by subclasses to get access to the local player.
   void onMediaPlayerCreated(MediaPlayerProxy mediaPlayer) {}
 
-  void onVideoGeometryUpdated(geom.Size videoSize,
-                              geom.Size pixelAspectRatio) {}
+  void onVideoGeometryUpdated(
+      geom.Size videoSize, geom.Size pixelAspectRatio) {}
 
   // Handles a status update from the player.
   void _handleStatusChanged(MediaPlayerStatus status) {
@@ -351,7 +351,7 @@ class AudioPlayerController {
 
   /// Called when the connection to the NetMediaPlayer fails.
   void _handleConnectionError() {
-    _problem = new Problem(type: kProblemConnectionFailed);
+    _problem = const Problem(type: kProblemConnectionFailed);
 
     if (updateCallback != null) {
       scheduleMicrotask(() {

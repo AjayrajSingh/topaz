@@ -194,11 +194,11 @@ Widget _buildPerformanceOverlay({Widget child}) => new Stack(
           right: 0.0,
           child: new IgnorePointer(child: new PerformanceOverlay.allEnabled()),
         ),
-        new Align(
+        const Align(
           alignment: FractionalOffset.bottomCenter,
-          child: new Text(
+          child: const Text(
             'Base shell performance',
-            style: new TextStyle(color: Colors.black),
+            style: const TextStyle(color: Colors.black),
           ),
         ),
       ],

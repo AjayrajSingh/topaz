@@ -48,11 +48,10 @@ class SimulatedPaddingModel extends TickingModel {
 
   /// Constructor.
   SimulatedPaddingModel({
-    this.springDescription: _kDefaultSimulationDesc,
-    double fractionalLeftPadding: 0.0,
-    double fractionalRightPadding: 0.0,
-  })
-      : _leftSimulation = new RK4SpringSimulation(
+    this.springDescription = _kDefaultSimulationDesc,
+    double fractionalLeftPadding = 0.0,
+    double fractionalRightPadding = 0.0,
+  })  : _leftSimulation = new RK4SpringSimulation(
           initValue: fractionalLeftPadding,
           desc: springDescription,
         ),

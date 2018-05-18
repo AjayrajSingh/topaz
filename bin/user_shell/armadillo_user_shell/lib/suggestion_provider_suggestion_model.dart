@@ -106,7 +106,7 @@ class MaxwellQueryListenerImpl extends maxwell.QueryListener {
 }
 
 /// Called when an interruption occurs.
-typedef void OnInterruption(Suggestion interruption);
+typedef OnInterruption = void Function(Suggestion interruption);
 
 /// Listens for interruptions from maxwell.
 class MaxwellInterruptionListenerImpl extends maxwell.InterruptionListener {
@@ -275,7 +275,7 @@ class SuggestionProviderSuggestionModel extends SuggestionModel {
   void onSuggestionSelected(Suggestion suggestion) {
     _suggestionProviderProxy.notifyInteraction(
       suggestion.id.value,
-      new maxwell.Interaction(type: maxwell.InteractionType.selected),
+      const maxwell.Interaction(type: maxwell.InteractionType.selected),
     );
   }
 

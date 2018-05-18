@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:armadillo/common.dart';
-import 'package:armadillo/overview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';

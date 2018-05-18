@@ -21,9 +21,9 @@ class RK4SpringDescription {
 
   /// Constructor.
   const RK4SpringDescription({
-    this.tension: 300.0,
-    this.friction: 25.0,
-    this.startingVelocity: 0.0,
+    this.tension = 300.0,
+    this.friction = 25.0,
+    this.startingVelocity = 0.0,
   });
 }
 
@@ -55,8 +55,8 @@ class RK4SpringSimulation {
   /// [initValue] is the value the simulation will begin with.
   /// [desc] specifies the parameters of the simulation and is optional.
   RK4SpringSimulation({
-    double initValue: 0.0,
-    this.desc: const RK4SpringDescription(),
+    double initValue = 0.0,
+    this.desc = const RK4SpringDescription(),
   })  : _startValue = initValue,
         _targetValue = initValue,
         _velocity = 0.0,

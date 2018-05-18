@@ -44,9 +44,8 @@ class _SurfaceInstance extends StatefulWidget {
   /// SurfaceLayout
   _SurfaceInstance({
     @required this.form,
-    this.dependents: const <_SurfaceInstance>[],
-  })
-      : super(key: form.key);
+    this.dependents = const <_SurfaceInstance>[],
+  }) : super(key: form.key);
 
   /// The form of this Surface
   final SurfaceForm form;
@@ -153,8 +152,7 @@ class PositionedLayoutDelegate extends SingleChildLayoutDelegate {
   /// Constructor
   PositionedLayoutDelegate({
     @required this.animation,
-  })
-      : super(relayout: animation);
+  }) : super(relayout: animation);
 
   /// The animation for the center position
   final Animation<Rect> animation;

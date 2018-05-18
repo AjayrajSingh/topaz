@@ -41,9 +41,9 @@ class ContactItemStore {
     @required this.id,
     @required this.names,
     @required this.isMatchedOnName,
-    this.matchedNameIndex: -1,
-    this.detail: '',
-    this.photoUrl: '',
+    this.matchedNameIndex = -1,
+    this.detail = '',
+    this.photoUrl = '',
   })  : assert(id != null && id.isNotEmpty),
         assert(names != null && names.isNotEmpty),
         assert(isMatchedOnName != null) {

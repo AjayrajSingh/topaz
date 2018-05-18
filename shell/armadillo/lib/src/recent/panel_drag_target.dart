@@ -10,7 +10,8 @@ import 'story_cluster.dart';
 
 /// Called when [storyCluster] has locked onto the [PanelDragTarget] by being
 /// dragged over or near the target.
-typedef void OnPanelEvent(BuildContext context, StoryCluster storyCluster);
+typedef OnPanelEvent = void Function(
+    BuildContext context, StoryCluster storyCluster);
 
 /// Used by [PanelDragTargets] as a potential target.
 abstract class PanelDragTarget {
@@ -48,7 +49,7 @@ abstract class PanelDragTarget {
   double distanceFrom(Offset p);
 
   /// Returns a visual representation of the target. For debug purposes only.
-  Widget build({bool highlighted: false});
+  Widget build({bool highlighted = false});
 
   /// Returns true if the target has the same visual influence as [other].
   /// For debug purposes only.

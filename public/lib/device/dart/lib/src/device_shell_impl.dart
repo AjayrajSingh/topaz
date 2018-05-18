@@ -9,14 +9,14 @@ import 'package:fidl_presentation/fidl.dart';
 import 'package:meta/meta.dart';
 
 /// Called when [DeviceShell.initialize] occurs.
-typedef void OnDeviceShellReady(
+typedef OnDeviceShellReady = void Function(
   UserProvider userProvider,
   DeviceShellContext deviceShellContext,
   Presentation presentation,
 );
 
 /// Called when [Lifecycle.terminate] occurs.
-typedef void OnDeviceShellStop();
+typedef OnDeviceShellStop = void Function();
 
 /// Implements a DeviceShell for receiving the services a [DeviceShell] needs to
 /// operate.

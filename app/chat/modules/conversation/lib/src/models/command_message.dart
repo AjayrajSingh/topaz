@@ -11,7 +11,8 @@ import 'package:meta/meta.dart';
 import 'message.dart';
 
 /// Function signature for an additional command initialization.
-typedef void CommandInitializer(CommandType commandType, List<String> args);
+typedef CommandInitializer = void Function(
+    CommandType commandType, List<String> args);
 
 /// Enum for supported command types.
 enum CommandType {
@@ -50,8 +51,7 @@ class CommandMessage extends Message {
     this.onRefresh,
     @required this.payload,
     CommandInitializer initializer,
-  })
-      : assert(embedder != null),
+  })  : assert(embedder != null),
         assert(payload != null),
         assert(payload.isNotEmpty),
         assert(CommandMessage.isCommand(payload)),

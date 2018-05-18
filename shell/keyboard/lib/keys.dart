@@ -11,7 +11,7 @@ const int _kTurquoiseAccentColorValue = 0x8068EFAD;
 const int _kUnselectedColorValue = 0xFF000000;
 
 /// Called when a key is pressed.
-typedef void OnText(String text);
+typedef OnText = void Function(String text);
 
 /// A key that is represented by a string.  The [TextKey] is expected to have
 /// a [Row] as a parent.
@@ -43,10 +43,10 @@ class TextKey extends StatefulWidget {
     GlobalKey key,
     this.onText,
     this.style,
-    this.verticalAlign: 0.5,
-    this.horizontalAlign: 0.5,
+    this.verticalAlign = 0.5,
+    this.horizontalAlign = 0.5,
     this.height,
-    this.flex: 2,
+    this.flex = 2,
   }) : super(key: key);
 
   @override
@@ -135,7 +135,7 @@ class ImageKey extends StatefulWidget {
     this.onKeyPressed,
     this.color,
     this.height, {
-    this.flex: 2,
+    this.flex = 2,
     Key key,
   }) : super(key: key);
 
@@ -169,7 +169,7 @@ class _ImageKeyState extends State<ImageKey> {
           child: new Container(
             color: new Color(
                 _down ? _kTurquoiseAccentColorValue : _kUnselectedColorValue),
-            padding: new EdgeInsets.all(_kPadding),
+            padding: const EdgeInsets.all(_kPadding),
             height: widget.height,
             child: new Container(
               child: new Image(

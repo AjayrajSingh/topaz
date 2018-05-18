@@ -17,7 +17,7 @@ void main(List<String> args) {
   // TODO(rosswang): nested environments and determinism
 
   test('schedule delayed futures',
-      () => new Future<Null>.delayed(new Duration(seconds: 1)));
+      () => new Future<Null>.delayed(const Duration(seconds: 1)));
 
   test('start hello_dart', () {
     final ApplicationLaunchInfo info =
@@ -45,7 +45,7 @@ void main(List<String> args) {
     expect(await hello.future, equals('hola from Dart!'));
 
     actl.ctrl.close();
-    expect(service.ctrl.error.timeout(new Duration(seconds: 2)),
+    expect(service.ctrl.error.timeout(const Duration(seconds: 2)),
         throwsA(anything));
   });
 

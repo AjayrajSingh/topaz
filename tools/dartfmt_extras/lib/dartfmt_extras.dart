@@ -188,7 +188,7 @@ Future<Null> fixDirectives(
   await file.writeAsString(code);
 }
 
-typedef bool _ConditionFn(UriBasedDirective directive);
+typedef _ConditionFn = bool Function(UriBasedDirective directive);
 
 class _Condition<T extends UriBasedDirective> {
   final String prefix;

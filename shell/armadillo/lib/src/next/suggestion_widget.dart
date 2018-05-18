@@ -38,22 +38,22 @@ class SuggestionWidget extends StatelessWidget {
     Key key,
     this.suggestion,
     this.onSelected,
-    this.visible: true,
-    this.shadow: false,
-  })
-      : super(key: key);
+    this.visible = true,
+    this.shadow = false,
+  }) : super(key: key);
 
   bool get _hasImage =>
       (suggestion.image != null) || suggestion.icons.isNotEmpty;
 
   bool get _isCircular =>
-      (suggestion.image != null && suggestion.imageType == suggest.ImageType.person) ||
+      (suggestion.image != null &&
+          suggestion.imageType == suggest.ImageType.person) ||
       (suggestion.image == null && suggestion.icons.isNotEmpty);
 
-  suggest.ImageSide get _imageSide =>
-      suggestion.image != null && suggestion.imageType == suggest.ImageType.person
-          ? suggest.ImageSide.left
-          : suggest.ImageSide.right;
+  suggest.ImageSide get _imageSide => suggestion.image != null &&
+          suggestion.imageType == suggest.ImageType.person
+      ? suggest.ImageSide.left
+      : suggest.ImageSide.right;
 
   @override
   Widget build(BuildContext context) => new LayoutBuilder(
@@ -142,14 +142,14 @@ class SuggestionWidget extends StatelessWidget {
                 ),
               )
             : new ClipRRect(
-                borderRadius: new BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topRight: const Radius.circular(kSuggestionCornerRadius),
                   bottomRight: const Radius.circular(
                     kSuggestionCornerRadius,
                   ),
                 ),
                 child: new Container(
-                  constraints: new BoxConstraints.expand(),
+                  constraints: const BoxConstraints.expand(),
                   child: image,
                 ),
               ),

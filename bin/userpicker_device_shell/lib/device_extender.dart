@@ -19,7 +19,7 @@ class DeviceExtender extends StatelessWidget {
   final List<Widget> deviceExtensions;
 
   /// Constructor.
-  const DeviceExtender({this.child, this.deviceExtensions: const <Widget>[]});
+  const DeviceExtender({this.child, this.deviceExtensions = const <Widget>[]});
 
   @override
   Widget build(BuildContext context) {

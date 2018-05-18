@@ -5,13 +5,15 @@
 import 'dart:async';
 import 'dart:convert';
 
+/// ignore_for_file: avoid_annotating_with_dynamic
+
 /// A callback for data sent by xi-core.
 ///
 /// TODO(jasoncampbell): Allow typed structures to be sent instead of strings.
-typedef void XiClientListener(dynamic data);
+typedef XiClientListener = void Function(dynamic data);
 
 /// Callback for receiving result from a json-rpc request
-typedef void XiRpcCallback(dynamic data);
+typedef XiRpcCallback = void Function(dynamic data);
 
 /// Handler, for handling requests (both notification and RPC) from core
 abstract class XiRpcHandler {

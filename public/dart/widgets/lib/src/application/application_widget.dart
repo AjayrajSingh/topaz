@@ -26,11 +26,11 @@ class ApplicationWidget extends StatefulWidget {
 
   /// Constructor.
   const ApplicationWidget({
-    Key key,
     @required this.url,
     @required this.launcher,
+    Key key,
     this.onDone,
-    this.hitTestable: true,
+    this.hitTestable = true,
   }) : super(key: key);
 
   @override

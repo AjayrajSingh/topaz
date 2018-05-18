@@ -31,23 +31,21 @@ class _KernelPanicReaderState extends State<_KernelPanicReader> {
     super.initState();
 
     File lastPanic = new File('/boot/log/last-panic.txt');
-    lastPanic.exists().then((bool exists) {
-      if (exists) {
-        lastPanic.readAsString().then((String lastPanicString) {
-          if (lastPanicString.isEmpty) {
-            exit(0);
-          } else {
-            setState(
-              () {
-                _lastPanicString = lastPanicString;
-              },
-            );
-          }
-        });
-      } else {
-        exit(0);
-      }
-    });
+    if (lastPanic.existsSync()) {
+      lastPanic.readAsString().then((String lastPanicString) {
+        if (lastPanicString.isEmpty) {
+          exit(0);
+        } else {
+          setState(
+            () {
+              _lastPanicString = lastPanicString;
+            },
+          );
+        }
+      });
+    } else {
+      exit(0);
+    }
   }
 
   @override

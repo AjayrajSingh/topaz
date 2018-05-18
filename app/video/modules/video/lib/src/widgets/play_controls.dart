@@ -23,10 +23,10 @@ class PlayControls extends StatelessWidget {
 
   /// Constructor for the play controls in the video player
   const PlayControls({
-    Key key,
     @required this.primaryIconSize,
     @required this.secondaryIconSize,
     @required this.padding,
+    Key key,
   }) : super(key: key);
 
   double get _kZoomTimeInMicroseconds => 3000000.0;
@@ -81,7 +81,7 @@ class PlayControls extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           _createIconButton(
-              icon: new Icon(Icons.fast_rewind),
+              icon: const Icon(Icons.fast_rewind),
               iconSize: secondaryIconSize,
               callback: model.progress.inMicroseconds == 0
                   ? null
@@ -91,7 +91,7 @@ class PlayControls extends StatelessWidget {
               iconSize: primaryIconSize,
               callback: () => _togglePlayPause(model)),
           _createIconButton(
-              icon: new Icon(Icons.fast_forward),
+              icon: const Icon(Icons.fast_forward),
               iconSize: secondaryIconSize,
               callback:
                   model.progress.inMicroseconds == model.duration.inMicroseconds

@@ -10,19 +10,19 @@ import 'package:fidl_modular/fidl.dart';
 import 'package:lib.story.dart/story.dart';
 
 /// Called when [Module.initialize] occurs.
-typedef void OnModuleReady(
+typedef OnModuleReady = void Function(
   ModuleContext moduleContext,
   Link link,
 );
 
 /// Called at the beginning of [Lifecycle.terminate].
-typedef void OnModuleStopping();
+typedef OnModuleStopping = void Function();
 
 /// Called at the conclusion of [Lifecycle.terminate].
-typedef void OnModuleStop();
+typedef OnModuleStop = void Function();
 
 /// Called when the device map entry for the current device changes.
-typedef void OnDeviceMapChange(DeviceMapEntry deviceMapEntry);
+typedef OnDeviceMapChange = void Function(DeviceMapEntry deviceMapEntry);
 
 /// Implements a Module for receiving the services a [Module] needs to
 /// operate.  When [initialize] is called, the services it receives are routed
@@ -76,8 +76,7 @@ class ModuleImpl implements Module, Lifecycle {
     this.onNotify,
     this.onDeviceMapChange,
     bool watchAll,
-  })
-      : watchAll = watchAll ?? false;
+  }) : watchAll = watchAll ?? false;
 
   @override
   void initialize(

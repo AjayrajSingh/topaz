@@ -22,7 +22,7 @@ class IsoMetric extends StatelessWidget {
   final double scaleFactor;
 
   /// Constructor
-  const IsoMetric({@required this.child, this.scaleFactor: 4.0});
+  const IsoMetric({@required this.child, this.scaleFactor = 4.0});
 
   @override
   Widget build(BuildContext context) => new LayoutBuilder(

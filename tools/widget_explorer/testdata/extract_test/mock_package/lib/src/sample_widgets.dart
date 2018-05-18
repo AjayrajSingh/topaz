@@ -30,18 +30,17 @@ class Widget01 extends StatefulWidget {
     @ExampleValue(10.0) this.doubleParam,
     @ExampleValue('example string value!') this.stringParam,
     this.noExampleValueParam,
-  })
-      : super(key: key);
+  }) : super(key: key);
 }
 
 /// This is a private [StatefulWidget].
 class _Widget02 extends StatefulWidget {}
 
 /// A callback function with no parameters.
-typedef void CallbackWithNoParams();
+typedef CallbackWithNoParams = void Function();
 
 /// A callback function with two parameters.
-typedef void CallbackWithParams(int foo, String bar);
+typedef CallbackWithParams = void Function(int foo, String bar);
 
 /// This is a public [StatelessWidget].
 class Widget03 extends StatelessWidget {
@@ -56,8 +55,7 @@ class Widget03 extends StatelessWidget {
     Key key,
     this.callbackWithNoParams,
     this.callbackWithParams,
-  })
-      : super(key: key);
+  }) : super(key: key);
 }
 
 /// This is a private [StatelessWidget].

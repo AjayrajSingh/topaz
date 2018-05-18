@@ -9,7 +9,7 @@ import 'package:meta/meta.dart';
 
 /// A Builder which is invoked when the [FutureWidget] needs to display a
 /// child which represents an error state.
-typedef Widget ErrorBuilder(BuildContext context, Error error);
+typedef ErrorBuilder = Widget Function(BuildContext context, Error error);
 
 /// A widget that provides a [child] widget when it's [Future] completes.
 class FutureWidget extends StatefulWidget {

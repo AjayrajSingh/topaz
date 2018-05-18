@@ -31,7 +31,7 @@ abstract class DeviceExtensionState<T extends StatefulWidget>
   }
 
   /// Hides if showing, shows if hiding.
-  void toggle() => (active) ? hide() : show();
+  void toggle() => active ? hide() : show();
 
   @override
   Widget build(BuildContext context) {

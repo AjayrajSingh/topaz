@@ -17,15 +17,14 @@ const double _kThumbnailSize = 100.0;
 class Thumbnail extends SelectableItem {
   /// Constructor
   const Thumbnail({
-    Key key,
     @required doc_fidl.Document doc,
     @required bool selected,
+    Key key,
     VoidCallback onPressed,
     VoidCallback onDoubleTap,
     VoidCallback onLongPress,
     bool hideCheckbox,
-  })
-      : assert(doc != null),
+  })  : assert(doc != null),
         assert(selected != null),
         super(
           key: key,

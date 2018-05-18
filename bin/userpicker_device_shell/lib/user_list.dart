@@ -16,7 +16,7 @@ const double _kButtonWidthSmall = 116.0;
 const double _kButtonFontSizeLarge = 16.0;
 const double _kButtonFontSizeSmall = 14.0;
 
-final TextStyle _kTextStyle = new TextStyle(
+const TextStyle _kTextStyle = const TextStyle(
   color: Colors.white,
   fontSize: 10.0,
   letterSpacing: 1.0,
@@ -34,7 +34,7 @@ class UserList extends StatelessWidget {
   final bool loginDisabled;
 
   /// Constructor.
-  const UserList({this.loginDisabled: false});
+  const UserList({this.loginDisabled = false});
 
   Widget _buildUserCircle({
     Account account,
@@ -81,12 +81,12 @@ class UserList extends StatelessWidget {
     VoidCallback onTap,
     bool isSmall,
     double width,
-    bool isDisabled: false,
+    bool isDisabled = false,
   }) {
     return new GestureDetector(
       onTap: isDisabled ? null : () => onTap?.call(),
       child: new Container(
-        height: (isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge),
+        height: isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge,
         width: width ?? (isSmall ? _kButtonWidthSmall : _kButtonWidthLarge),
         alignment: FractionalOffset.center,
         margin: const EdgeInsets.only(left: 16.0),
@@ -230,7 +230,7 @@ class UserList extends StatelessWidget {
   Widget _buildUserEntry({
     Account account,
     VoidCallback onTap,
-    bool removable: true,
+    bool removable = true,
     bool isSmall,
     UserPickerDeviceShellModel model,
   }) {
@@ -337,7 +337,7 @@ class UserList extends StatelessWidget {
               24.0 +
               (model.showingUserActions ? 24.0 : 0.0),
           child: new AnimatedOpacity(
-            duration: new Duration(milliseconds: 250),
+            duration: const Duration(milliseconds: 250),
             opacity: model.showingRemoveUserTarget ? 0.0 : 1.0,
             child: new ListView(
               controller: model.userPickerScrollController,
@@ -372,7 +372,7 @@ class UserList extends StatelessWidget {
                 child: new Container(
                   width: 64.0,
                   height: 64.0,
-                  child: new FuchsiaSpinner(),
+                  child: const FuchsiaSpinner(),
                 ),
               ),
             ],

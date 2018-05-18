@@ -10,7 +10,7 @@ import 'package:meta/meta.dart';
 import '../models/browser_model.dart';
 
 /// When tapping on the close icon
-typedef void OnCloseTapped();
+typedef OnCloseTapped = void Function();
 
 /// The header bar. Tells us what Document Provider we are in (if at root
 /// directory), or what directory we're currently browsing.
@@ -21,8 +21,8 @@ class Header extends StatelessWidget {
 
   /// Constructor
   const Header({
-    Key key,
     @required this.model,
+    Key key,
   })  : assert(model != null),
         super(key: key);
 
@@ -35,12 +35,12 @@ class Header extends StatelessWidget {
 
     Widget headerActions = new Row(children: <Widget>[
       new IconButton(
-        icon: new Icon(Icons.refresh),
+        icon: const Icon(Icons.refresh),
         tooltip: 'Refresh list of documents',
         onPressed: () => model.listDocs(model.navId, model.navName),
       ),
       new IconButton(
-        icon: new Icon(Icons.open_in_new),
+        icon: const Icon(Icons.open_in_new),
         tooltip: 'Preview document',
         // TODO(maryxia) SO-662 open the file with correct module
         onPressed: model.canBePreviewed(model.currentDoc)
@@ -67,8 +67,8 @@ class Header extends StatelessWidget {
         tooltip: 'Document info',
         onPressed: model.currentDoc != null ? model.toggleInfo : null,
       ),
-      new IconButton(
-        icon: new Icon(Icons.create_new_folder),
+      const IconButton(
+        icon: const Icon(Icons.create_new_folder),
         tooltip: 'Create new...',
         onPressed: null,
       ),

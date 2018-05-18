@@ -53,18 +53,17 @@ class SimulatedTransform extends StatefulWidget {
   /// Constructor.
   const SimulatedTransform({
     Key key,
-    this.initDx: 0.0,
-    this.initDy: 0.0,
-    this.targetDx: 0.0,
-    this.targetDy: 0.0,
-    this.initScale: 1.0,
-    this.targetScale: 1.0,
-    this.initOpacity: 1.0,
-    this.targetOpacity: 1.0,
-    this.springDescription: _kDefaultSimulationDesc,
+    this.initDx = 0.0,
+    this.initDy = 0.0,
+    this.targetDx = 0.0,
+    this.targetDy = 0.0,
+    this.initScale = 1.0,
+    this.targetScale = 1.0,
+    this.initOpacity = 1.0,
+    this.targetOpacity = 1.0,
+    this.springDescription = _kDefaultSimulationDesc,
     this.child,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   _SimulatedTranslationTransformState createState() =>

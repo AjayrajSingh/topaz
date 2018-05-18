@@ -17,8 +17,6 @@ import 'tree.dart';
 /// The parentId that means no parent
 const String kNoParent = '';
 
-typedef bool _SurfaceSpanningTreeCondition(Surface s);
-
 /// Details of a surface child view
 class Surface extends Model {
   /// Public constructor
@@ -47,7 +45,7 @@ class Surface extends Model {
   bool get dismissed => _graph.isDismissed(_node.value);
 
   /// Return the min width of this Surface
-  double minWidth({double min: 0.0}) =>
+  double minWidth({double min = 0.0}) =>
       math.max(properties?.constraints?.minWidth ?? 0.0, min);
 
   /// Return the absolute emphasis given some root displayed Surface
@@ -122,8 +120,8 @@ class Surface extends Model {
           s.relation.arrangement == SurfaceArrangement.copresent ||
           s.relation.arrangement == SurfaceArrangement.none);
 
-  Tree<Surface> _spanningTree(Surface previous, Surface current,
-      _SurfaceSpanningTreeCondition condition) {
+  Tree<Surface> _spanningTree(
+      Surface previous, Surface current, bool condition(Surface s)) {
     Tree<Surface> tree = new Tree<Surface>(value: current);
     if (current.parent != previous &&
         current.parent != null &&
@@ -196,7 +194,7 @@ class Surface extends Model {
       : _graph._surfaces[node.value];
 
   Iterable<Surface> _surfaces(Iterable<Tree<String>> nodes) => nodes
-      .where((Tree<String> node) => (node != null && node.value != null))
+      .where((Tree<String> node) => node != null && node.value != null)
       .map(_surface);
 
   @override
@@ -480,7 +478,7 @@ class SurfaceGraph extends Model {
   @override
   String toString() => 'Tree:\n${_tree.children.map(_toString).join('\n')}';
 
-  String _toString(Tree<String> node, {String prefix: ''}) {
+  String _toString(Tree<String> node, {String prefix = ''}) {
     String nodeString = '$prefix${_surfaces[node.value]}';
     if (node.children.isNotEmpty) {
       nodeString =

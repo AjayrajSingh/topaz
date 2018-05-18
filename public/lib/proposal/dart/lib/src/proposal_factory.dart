@@ -54,7 +54,7 @@ Future<SizedVmo> urlToVmo(String url) async {
 /// Creates a SuggestionDIsplayImage from an image url.
 Future<SuggestionDisplayImage> createSuggestionDisplayImage({
   String url,
-  SuggestionImageType imageType: SuggestionImageType.other,
+  SuggestionImageType imageType = SuggestionImageType.other,
 }) async {
   SizedVmo image = await urlToVmo(url);
   if (image == null) {
@@ -71,16 +71,16 @@ Future<SuggestionDisplayImage> createSuggestionDisplayImage({
 Future<Proposal> createProposal({
   String id,
   String storyId,
-  bool storyAffinity: false,
-  double confidence: 0.0,
+  bool storyAffinity = false,
+  double confidence = 0.0,
   String headline,
   String subheadline,
   String details,
   String imageUrl,
-  SuggestionImageType imageType: SuggestionImageType.other,
+  SuggestionImageType imageType = SuggestionImageType.other,
   List<String> iconUrls,
   int color,
-  AnnoyanceType annoyanceType: AnnoyanceType.none,
+  AnnoyanceType annoyanceType = AnnoyanceType.none,
   List<Action> actions,
 }) async {
   List<SuggestionDisplayImage> icons = iconUrls == null

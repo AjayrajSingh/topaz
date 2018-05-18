@@ -9,7 +9,7 @@ import 'package:fidl_modular/fidl.dart' as fidl;
 import 'package:meta/meta.dart';
 
 /// Callback for [LifecycleImpl#onTerminate].
-typedef Future<Null> LifecycleTerminateCallback();
+typedef LifecycleTerminateCallback = Future<Null> Function();
 
 /// Impl for [fidl.Lifecycle].
 class LifecycleImpl extends fidl.Lifecycle {
@@ -19,8 +19,7 @@ class LifecycleImpl extends fidl.Lifecycle {
   /// Constructor.
   LifecycleImpl({
     @required this.onTerminate,
-  })
-      : assert(onTerminate != null);
+  }) : assert(onTerminate != null);
 
   @override
   Future<Null> terminate() async {

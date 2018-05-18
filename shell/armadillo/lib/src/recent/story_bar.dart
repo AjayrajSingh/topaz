@@ -5,7 +5,6 @@
 import 'dart:math' as math;
 
 import 'package:armadillo/common.dart';
-import 'package:armadillo/overview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
@@ -38,7 +37,7 @@ class StoryBar extends StatelessWidget {
   /// Constructor.
   const StoryBar({
     this.story,
-    this.showTitleOnly: _kShowTitleOnly,
+    this.showTitleOnly = _kShowTitleOnly,
     this.elevation,
     this.borderRadius,
   });
@@ -187,7 +186,7 @@ class StoryBarHeightModel extends SpringModel {
   /// Maximizes the height of the story bar when shown.  If [jumpToFinish] is
   /// true the story bar height will jump to its maximized value instead of
   /// transitioning to it.
-  void maximize({bool jumpToFinish: false}) {
+  void maximize({bool jumpToFinish = false}) {
     if (jumpToFinish) {
       jump(SizeModel.kStoryBarMaximizedHeight);
     }

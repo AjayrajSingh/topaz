@@ -16,7 +16,7 @@ export 'package:fidl_images/fidl.dart' show PresentationInfo;
 
 // ignore_for_file: public_member_api_docs
 
-typedef void SessionPresentCallback(PresentationInfo info);
+typedef SessionPresentCallback = void Function(PresentationInfo info);
 
 class Session {
   int _nextResourceId = 1;

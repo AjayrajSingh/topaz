@@ -20,7 +20,7 @@ const Duration _kProgressBarUpdateInterval = const Duration(milliseconds: 100);
 const String _kServiceName = 'fling';
 
 /// Typedef for sending MediaProgress events
-typedef void SendVideoProgress(MediaProgress progress);
+typedef SendVideoProgress = void Function(MediaProgress progress);
 
 /// The [Model] for the video player.
 class PlayerModel extends Model {

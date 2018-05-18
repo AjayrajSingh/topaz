@@ -10,7 +10,7 @@ import 'package:lib.widgets/model.dart';
 import 'model.dart';
 
 /// Signature of window interaction callbacks.
-typedef void WindowInteractionCallback();
+typedef WindowInteractionCallback = void Function();
 
 /// A window container.
 class Window extends StatefulWidget {
@@ -27,8 +27,8 @@ class Window extends StatefulWidget {
   const Window(
       {Key key,
       this.onWindowInteraction,
-      this.initialPosition: Offset.zero,
-      this.initialSize: Size.zero})
+      this.initialPosition = Offset.zero,
+      this.initialSize = Size.zero})
       : super(key: key);
 
   @override

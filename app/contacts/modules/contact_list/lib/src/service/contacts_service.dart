@@ -6,8 +6,7 @@ import 'dart:async';
 import 'dart:convert' show json;
 
 import 'package:contacts_services/client.dart';
-import 'package:fidl_contacts_content_provider/fidl.dart'
-    as contacts_fidl;
+import 'package:fidl_contacts_content_provider/fidl.dart' as contacts_fidl;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:meta/meta.dart';
@@ -15,10 +14,10 @@ import 'package:meta/meta.dart';
 import '../../models.dart';
 
 /// Call back definition for [ContactsService]'s subscribe method.
-typedef void OnSubscribeCallback(List<ContactItem> newContactList);
+typedef OnSubscribeCallback = void Function(List<ContactItem> newContactList);
 
 /// A call to update a link specified by [name] with new [data].
-typedef void UpdateLink(String name, String data);
+typedef UpdateLink = void Function(String name, String data);
 
 class _ContactListResponse {
   final contacts_fidl.Status status;
@@ -79,8 +78,8 @@ class ContactsService {
 
   /// Call the content provider to retrieve the list of contacts
   Future<List<ContactItem>> _getContactList({
-    String prefix: '',
-    bool refresh: false,
+    String prefix = '',
+    bool refresh = false,
     String token,
   }) async {
     List<ContactItem> contactList = <ContactItem>[];

@@ -7,7 +7,8 @@ import 'package:meta/meta.dart';
 
 /// Function that returns a stylized widget with the specified text and
 /// color.
-typedef Widget TextBuilder(BuildContext context, String text, Color color);
+typedef TextBuilder = Widget Function(
+    BuildContext context, String text, Color color);
 
 /// Text overlaid over another copy of text with shadow color.
 class ShadowedText extends StatelessWidget {

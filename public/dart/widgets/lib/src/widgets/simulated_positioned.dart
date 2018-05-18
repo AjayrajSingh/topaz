@@ -23,9 +23,8 @@ class SimulatedDragEndDetails extends DragEndDetails {
   SimulatedDragEndDetails({
     Velocity velocity,
     double primaryVelocity,
-    this.offset: Offset.zero,
-  })
-      : super(
+    this.offset = Offset.zero,
+  }) : super(
           velocity: velocity,
           primaryVelocity: primaryVelocity,
         );
@@ -35,13 +34,15 @@ class SimulatedDragEndDetails extends DragEndDetails {
 }
 
 /// Callback to get SimulatedDragStartDetails onDragStart
-typedef void SimulatedDragStartCallback(SimulatedDragStartDetails details);
+typedef SimulatedDragStartCallback = void Function(
+    SimulatedDragStartDetails details);
 
 /// Callback to get SimulatedDragEndDetails onDragEnd
-typedef void SimulatedDragEndCallback(SimulatedDragEndDetails details);
+typedef SimulatedDragEndCallback = void Function(
+    SimulatedDragEndDetails details);
 
 /// Called to determine a new offset from an ongoing drag.
-typedef Offset DragOffsetTransform(
+typedef DragOffsetTransform = Offset Function(
   Offset currentOffset,
   DragUpdateDetails details,
 );
@@ -61,18 +62,17 @@ class SimulatedPositioned extends StatefulWidget {
   /// TODO(apwilson): Rename rect to target, initRect to init, and onRectReached
   /// to onTargetReached.  Or maybe use a tween?
   const SimulatedPositioned({
-    Key key,
     @required this.rect,
-    Rect initRect,
     @required this.child,
-    this.hitTestBehavior: HitTestBehavior.deferToChild,
-    this.draggable: true,
+    Key key,
+    Rect initRect,
+    this.hitTestBehavior = HitTestBehavior.deferToChild,
+    this.draggable = true,
     this.onDragStart,
     this.onDragEnd,
     this.onRectReached,
     DragOffsetTransform dragOffsetTransform,
-  })
-      : this.initRect = initRect ?? rect,
+  })  : this.initRect = initRect ?? rect,
         this.dragOffsetTransform =
             dragOffsetTransform ?? _kDirectDragOffsetTransform,
         assert(hitTestBehavior != null),
@@ -246,12 +246,11 @@ class _SimAnimationController extends Animation<Offset>
         AnimationLocalListenersMixin,
         AnimationLocalStatusListenersMixin {
   _SimAnimationController({
-    Offset target,
-    Offset position: Offset.zero,
-    Offset velocity: Offset.zero,
     @required TickerProvider vsync,
-  })
-      : _status = AnimationStatus.dismissed,
+    Offset target,
+    Offset position = Offset.zero,
+    Offset velocity = Offset.zero,
+  })  : _status = AnimationStatus.dismissed,
         assert(vsync != null),
         assert(position != null),
         assert(velocity != null) {
@@ -317,7 +316,7 @@ class _SimAnimationController extends Animation<Offset>
   Offset get velocity => _velocity;
   Offset _velocity;
 
-  void stop({bool canceled: true}) {
+  void stop({bool canceled = true}) {
     _ticker.stop(canceled: canceled);
   }
 

@@ -36,11 +36,11 @@ class ContactList extends StatefulWidget {
 
   /// Creates a new instance of [ContactList]
   const ContactList({
-    Key key,
     @required this.onQueryChanged,
     @required this.onQueryCleared,
     @required this.onContactTapped,
     @required this.onRefreshContacts,
+    Key key,
   })  : assert(onQueryChanged != null),
         assert(onQueryCleared != null),
         assert(onContactTapped != null),
@@ -107,7 +107,7 @@ class _ContactListState extends State<ContactList>
       floatingActionButton: new FloatingActionButton(
         onPressed: widget.onRefreshContacts,
         tooltip: 'Refresh contact list',
-        child: new Icon(Icons.refresh),
+        child: const Icon(Icons.refresh),
       ),
     );
   }
@@ -130,7 +130,7 @@ class _ContactListState extends State<ContactList>
               children: <Widget>[
                 new Text(_kContacts, style: theme.textTheme.title),
                 new IconButton(
-                  icon: new Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                   tooltip: _kSearchFieldHint,
                   onPressed: _showSearchTextField,
                   color: theme.textTheme.title.color,
@@ -175,7 +175,7 @@ class _ContactListState extends State<ContactList>
           child: new Row(
             children: <Widget>[
               new IconButton(
-                icon: new Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 tooltip: _kBackHint,
                 onPressed: _hideSearchTextField,
                 color: theme.textTheme.subhead.color,
@@ -184,7 +184,7 @@ class _ContactListState extends State<ContactList>
                 child: textField,
               ),
               new IconButton(
-                icon: new Icon(Icons.close),
+                icon: const Icon(Icons.close),
                 tooltip: _kClearHint,
                 onPressed: _clearTextField,
                 color: theme.textTheme.subhead.color,

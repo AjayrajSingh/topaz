@@ -40,7 +40,7 @@ class IdleModeBuilder {
         children: <Widget>[
           new RichText(
             text: new TextSpan(
-              style: new TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.w200,
                 color: Colors.white,
               ),

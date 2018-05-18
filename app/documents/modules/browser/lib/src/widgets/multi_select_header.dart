@@ -22,11 +22,10 @@ class MultiSelectHeader extends StatelessWidget {
 
   /// Constructor
   const MultiSelectHeader({
-    Key key,
     @required this.onClosePressed,
     @required this.documents,
-  })
-      : assert(onClosePressed != null),
+    Key key,
+  })  : assert(onClosePressed != null),
         assert(documents != null),
         super(key: key);
 
@@ -39,7 +38,7 @@ class MultiSelectHeader extends StatelessWidget {
       child: new Row(
         children: <Widget>[
           new IconButton(
-            icon: new Icon(Icons.close),
+            icon: const Icon(Icons.close),
             color: Colors.black,
             onPressed: onClosePressed,
           ),
@@ -51,13 +50,13 @@ class MultiSelectHeader extends StatelessWidget {
               ),
             ),
           ),
-          new IconButton(
-            icon: new Icon(Icons.create_new_folder),
+          const IconButton(
+            icon: const Icon(Icons.create_new_folder),
             color: Colors.black,
             onPressed: null, // TODO SO-816
           ),
-          new IconButton(
-            icon: new Icon(Icons.more_vert),
+          const IconButton(
+            icon: const Icon(Icons.more_vert),
             color: Colors.black,
             onPressed: null, // TODO SO-816
           ),

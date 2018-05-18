@@ -24,7 +24,7 @@ abstract class TickingDoubleState<T extends StatefulWidget>
   double _maxValue = 0.0;
 
   /// Constructor.
-  TickingDoubleState({this.springDescription: _kSimulationDesc});
+  TickingDoubleState({this.springDescription = _kSimulationDesc});
 
   /// Returns the minimum value this [Widget] should have.
   double get minValue => _minValue;
@@ -52,7 +52,7 @@ abstract class TickingDoubleState<T extends StatefulWidget>
   /// an animation from the current value to this new value unless [force]
   /// is set to true at which point the widget's value will jump directly to
   /// the new value.
-  void setValue(double value, {bool force: false}) {
+  void setValue(double value, {bool force = false}) {
     double newValue = value.clamp(_minValue, _maxValue);
     if (force) {
       _springSimulation =

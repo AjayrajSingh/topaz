@@ -26,9 +26,9 @@ class ContactListItem extends StatelessWidget {
 
   /// Constructor
   const ContactListItem({
-    Key key,
     @required this.contact,
     @required this.onContactTapped,
+    Key key,
     this.isFirstInCategory = false,
   })  : assert(contact != null),
         super(key: key);

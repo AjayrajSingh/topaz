@@ -55,7 +55,7 @@ class KenichiEdgeScrolling {
           math.pow(math.max(0.0, _currentY) / _startScrollDeltaY, _kC) * _kD;
     } else {
       friction = math.pow(
-              math.max(0.0, (_screenH - _currentY)) / _startScrollDeltaY, _kC) *
+              math.max(0.0, _screenH - _currentY) / _startScrollDeltaY, _kC) *
           _kD;
     }
     _velocity -= _velocity * friction * time * 60;

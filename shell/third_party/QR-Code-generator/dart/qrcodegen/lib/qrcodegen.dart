@@ -158,10 +158,10 @@ class QrCode {
   factory QrCode._encodeSegments(
       {List<_QrSegment> segs,
       _Ecc initialEcl,
-      int minVersion: 1,
-      int maxVersion: 40,
-      int mask: -1,
-      bool boostEcl: true}) {
+      int minVersion = 1,
+      int maxVersion = 40,
+      int mask = -1,
+      bool boostEcl = true}) {
     if (!(1 <= minVersion && minVersion <= maxVersion && maxVersion <= 40) ||
         mask < -1 ||
         mask > 7) {
@@ -1226,11 +1226,9 @@ enum _ModeEnum {
   eci,
 }
 
-typedef int _NumCharCountBits(int ver);
-
 // Private constructor.
 class _Mode {
-  _NumCharCountBits numCharCountBits;
+  int Function(int ver) numCharCountBits;
 
   // (Package-private) An unsigned 4-bit integer value (range 0 to 15) representing the mode indicator bits for this mode object.
   final int modeBits;

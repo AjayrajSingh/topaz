@@ -107,24 +107,23 @@ class PanelResizingModel extends TickingModel {
   }
 
   bool _areEqual(Map<Side, List<Panel>> a, Map<Side, List<Panel>> b) =>
-      (a.keys.length != b.keys.length)
-          ? false
-          : a.keys.every((Side side) {
-              List<Panel> aPanels = a[side];
-              List<Panel> bPanels = b[side];
-              if (bPanels == null) {
-                return false;
-              }
-              if (bPanels.length != aPanels.length) {
-                return false;
-              }
-              for (int i = 0; i < aPanels.length; i++) {
-                if (aPanels[i] != bPanels[i]) {
-                  return false;
-                }
-              }
-              return true;
-            });
+      (a.keys.length == b.keys.length) &&
+      a.keys.every((Side side) {
+        List<Panel> aPanels = a[side];
+        List<Panel> bPanels = b[side];
+        if (bPanels == null) {
+          return false;
+        }
+        if (bPanels.length != aPanels.length) {
+          return false;
+        }
+        for (int i = 0; i < aPanels.length; i++) {
+          if (aPanels[i] != bPanels[i]) {
+            return false;
+          }
+        }
+        return true;
+      });
 
   double _getProgress(Panel panel, Side side) {
     List<ResizingState> panelStates = _states

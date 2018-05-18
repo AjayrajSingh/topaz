@@ -53,7 +53,7 @@ class StoryModel extends Model {
 
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
-  static StoryModel of(BuildContext context, {bool rebuildOnChange: false}) =>
+  static StoryModel of(BuildContext context, {bool rebuildOnChange = false}) =>
       new ModelFinder<StoryModel>()
           .of(context, rebuildOnChange: rebuildOnChange);
 

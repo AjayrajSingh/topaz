@@ -91,7 +91,7 @@ List<PositionedSurface> layoutSurfaces(
 }
 
 bool _isSupportedPattern(String pattern) {
-  return (pattern == _tickerPattern || pattern == _commentsRightPattern);
+  return pattern == _tickerPattern || pattern == _commentsRightPattern;
 }
 
 List<PositionedSurface> _layoutTicker(Surface tickerSource, Surface ticker,

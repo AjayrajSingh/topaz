@@ -10,4 +10,4 @@ abstract class Struct {
   List<Object> get $fields;
 }
 
-typedef T StructFactory<T>(List<Object> argv);
+typedef StructFactory<T> = T Function(List<Object> argv);

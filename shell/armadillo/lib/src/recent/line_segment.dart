@@ -54,16 +54,15 @@ class LineSegment extends PanelDragTarget {
   LineSegment(
     Offset a,
     Offset b, {
-    Color color: material.Colors.white,
+    Color color = material.Colors.white,
     OnPanelEvent onHover,
     OnPanelEvent onDrop,
-    this.maxStoriesCanAccept: 1,
+    this.maxStoriesCanAccept = 1,
     this.name,
-    bool initiallyTargetable: true,
-    this.directionallyTargetable: false,
-    this.validityDistance: double.infinity,
-  })
-      : this.a = (a.dx < b.dx || a.dy < b.dy) ? a : b,
+    bool initiallyTargetable = true,
+    this.directionallyTargetable = false,
+    this.validityDistance = double.infinity,
+  })  : this.a = (a.dx < b.dx || a.dy < b.dy) ? a : b,
         this.b = (a.dx < b.dx || a.dy < b.dy) ? b : a,
         assert(a.dx == b.dx || a.dy == b.dy),
         super(
@@ -78,14 +77,14 @@ class LineSegment extends PanelDragTarget {
     double x,
     double top,
     double bottom,
-    Color color: material.Colors.white,
+    Color color = material.Colors.white,
     OnPanelEvent onHover,
     OnPanelEvent onDrop,
-    int maxStoriesCanAccept: 1,
+    int maxStoriesCanAccept = 1,
     String name,
-    bool initiallyTargetable: true,
-    bool directionallyTargetable: false,
-    double validityDistance: double.infinity,
+    bool initiallyTargetable = true,
+    bool directionallyTargetable = false,
+    double validityDistance = double.infinity,
   }) =>
       new LineSegment(
         new Offset(x, top),
@@ -105,14 +104,14 @@ class LineSegment extends PanelDragTarget {
     double y,
     double left,
     double right,
-    Color color: material.Colors.white,
+    Color color = material.Colors.white,
     OnPanelEvent onHover,
     OnPanelEvent onDrop,
-    int maxStoriesCanAccept: 1,
+    int maxStoriesCanAccept = 1,
     String name,
-    bool initiallyTargetable: true,
-    bool directionallyTargetable: false,
-    double validityDistance: double.infinity,
+    bool initiallyTargetable = true,
+    bool directionallyTargetable = false,
+    double validityDistance = double.infinity,
   }) =>
       new LineSegment(
         new Offset(left, y),
@@ -229,22 +228,23 @@ class LineSegment extends PanelDragTarget {
   }
 
   @override
-  Widget build({bool highlighted: false}) => validityDistance != double.infinity
-      ? new Stack(
-          fit: StackFit.passthrough,
-          children: <Widget>[
-            _buildValidityDistanceWidget(highlighted: highlighted),
-            _buildLineWidget(highlighted: highlighted),
-          ],
-        )
-      : new Stack(
-          fit: StackFit.passthrough,
-          children: <Widget>[
-            _buildLineWidget(highlighted: highlighted),
-          ],
-        );
+  Widget build({bool highlighted = false}) =>
+      validityDistance != double.infinity
+          ? new Stack(
+              fit: StackFit.passthrough,
+              children: <Widget>[
+                _buildValidityDistanceWidget(highlighted: highlighted),
+                _buildLineWidget(highlighted: highlighted),
+              ],
+            )
+          : new Stack(
+              fit: StackFit.passthrough,
+              children: <Widget>[
+                _buildLineWidget(highlighted: highlighted),
+              ],
+            );
 
-  Positioned _buildLineWidget({bool highlighted: false}) => new Positioned(
+  Positioned _buildLineWidget({bool highlighted = false}) => new Positioned(
         left: a.dx - _kLineWidth / 2.0,
         top: a.dy - _kLineWidth / 2.0,
         width: isHorizontal ? b.dx - a.dx + _kLineWidth : _kLineWidth,
@@ -254,7 +254,7 @@ class LineSegment extends PanelDragTarget {
         ),
       );
 
-  Positioned _buildValidityDistanceWidget({bool highlighted: false}) =>
+  Positioned _buildValidityDistanceWidget({bool highlighted = false}) =>
       new Positioned(
         left: a.dx - _kLineWidth / 2.0 - validityDistance,
         top: a.dy - _kLineWidth / 2.0 - validityDistance,

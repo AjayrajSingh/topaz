@@ -53,5 +53,5 @@ class PeekModel extends Model {
   }
 
   /// Returns true if the [PeekingOverlay] should be peeking.
-  bool get peek => (!_nowMinimized && !_isDragging && !_quickSettingsOpen);
+  bool get peek => !_nowMinimized && !_isDragging && !_quickSettingsOpen;
 }

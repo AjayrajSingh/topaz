@@ -20,7 +20,7 @@ class _Node<T> {
   String label;
   bool isWord;
 
-  _Node({this.label, this.value, this.isWord: false});
+  _Node({this.label, this.value, this.isWord = false});
 
   @override
   String toString() {

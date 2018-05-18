@@ -12,7 +12,7 @@ import 'asset.dart';
 Future<List<Asset>> readConfig(String fileName) async {
   File file = new File(fileName);
 
-  if (!(await file.exists())) {
+  if (!file.existsSync()) {
     throw new ArgumentError.value(fileName, 'fileName', 'File does not exist');
   }
 

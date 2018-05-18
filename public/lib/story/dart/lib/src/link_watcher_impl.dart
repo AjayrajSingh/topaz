@@ -6,7 +6,7 @@ import 'package:fidl_modular/fidl.dart';
 import 'package:meta/meta.dart';
 
 /// Handler for when [LinkWatcher#notify] is called by the framework.
-typedef void LinkWatcherNotifyCallback(String data);
+typedef LinkWatcherNotifyCallback = void Function(String data);
 
 /// Implements [LinkWatcher] for receiving update notifications from a [Link].
 class LinkWatcherImpl extends LinkWatcher {
@@ -16,8 +16,7 @@ class LinkWatcherImpl extends LinkWatcher {
   /// Creates a new instance of [LinkWatcherImpl].
   LinkWatcherImpl({
     @required this.onNotify,
-  })
-      : assert(onNotify != null);
+  }) : assert(onNotify != null);
 
   @override
   void notify(String data) {

@@ -14,7 +14,7 @@ import 'package:dashboard/dashboard_module_model.dart';
 
 const double _kFontSize = 20.0;
 
-final TextStyle _kImportantStyle = new TextStyle(
+const TextStyle _kImportantStyle = const TextStyle(
   color: Colors.black,
   fontSize: _kFontSize,
   fontWeight: FontWeight.w500,
@@ -55,10 +55,7 @@ class _InfoTextState extends State<InfoText> {
       const Duration(minutes: 1),
       (_) => setState(() {}),
     );
-    new File('/data/dashboard_target').exists().then((bool exists) {
-      if (!exists) {
-        return;
-      }
+    if (new File('/data/dashboard_target').existsSync()) {
       new File('/data/dashboard_target')
           .readAsString()
           .then((String timestamp) {
@@ -73,7 +70,7 @@ class _InfoTextState extends State<InfoText> {
               'Error: Could not parse ${timestamp.trim()} as a DateTime!');
         }
       });
-    });
+    }
   }
 
   @override

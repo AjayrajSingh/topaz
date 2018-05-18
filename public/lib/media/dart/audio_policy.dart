@@ -10,7 +10,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 
 /// Type for |AudioPolicy| update callbacks.
-typedef void UpdateCallback();
+typedef UpdateCallback = void Function();
 
 /// System audio policy.
 class AudioPolicy {

@@ -14,7 +14,7 @@ const TextStyle _kDetailStyle = const TextStyle(color: Colors.grey);
 const TextStyle _kBoldStyle = const TextStyle(fontWeight: FontWeight.bold);
 
 /// Callback type that passes in a contact item.
-typedef void ContactItemCallback(ContactItemStore contact);
+typedef ContactItemCallback = void Function(ContactItemStore contact);
 
 /// A UI widget representing the list item in the contact list
 ///
@@ -34,9 +34,9 @@ class ContactItem extends StatelessWidget {
 
   /// Constructor
   const ContactItem({
-    Key key,
     @required this.matchedPrefix,
     @required this.contact,
+    Key key,
     this.onTap,
   })  : assert(contact != null),
         assert(matchedPrefix != null),

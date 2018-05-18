@@ -66,8 +66,7 @@ Message _createMessageFromLedgerEntry(Entry entry) =>
     _createMessageFromLedgerKeyValue(entry.key, entry.value);
 
 /// Creates a [Message] object from the given ledger entry's key-value.
-Message _createMessageFromLedgerKeyValue(
-    List<int> key, Buffer value) {
+Message _createMessageFromLedgerKeyValue(List<int> key, Buffer value) {
   Map<String, dynamic> decodedValue = decodeLedgerValue(value);
   return new Message(
       messageId: key,
@@ -85,7 +84,8 @@ class _KeyNotFoundException implements Exception {
 }
 
 /// Called when a new message is received.
-typedef void OnMessageReceived(Conversation conversation, Message message);
+typedef OnMessageReceived = void Function(
+    Conversation conversation, Message message);
 
 /// Implementation of the [ChatContentProvider] fidl interface.
 class ChatContentProviderImpl extends ChatContentProvider {
@@ -152,8 +152,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
     @required this.chatMessageTransporter,
     this.deviceId,
     this.onMessageReceived,
-  })
-      : assert(componentContext != null),
+  })  : assert(componentContext != null),
         assert(chatMessageTransporter != null),
         deviceIdBytes = deviceId != null
             ? new Uint8List.fromList(utf8.encode(deviceId))
@@ -214,7 +213,8 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
       await Future.forEach(_kReservedPages, (_ReservedPage pageInfo) {
         PageProxy page = new PageProxy();
-        _ledger.getPage(new PageId(id: pageInfo.id), page.ctrl.request(), (Status status) {
+        _ledger.getPage(new PageId(id: pageInfo.id), page.ctrl.request(),
+            (Status status) {
           if (status != Status.ok) {
             throw new Exception(
               'Ledger::GetPage() returned an error status: $status',
@@ -715,8 +715,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
 
       Completer<Status> statusCompleter = new Completer<Status>();
       Completer<Buffer> valueCompleter = new Completer<Buffer>();
-      watcher.pageSnapshot.get(messageId,
-          (Status status, Buffer value) {
+      watcher.pageSnapshot.get(messageId, (Status status, Buffer value) {
         statusCompleter.complete(status);
         valueCompleter.complete(value);
       });

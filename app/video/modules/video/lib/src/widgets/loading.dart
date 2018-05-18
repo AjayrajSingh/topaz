@@ -12,10 +12,9 @@ class Loading extends StatelessWidget {
 
   /// Constructor for the loading screen
   const Loading({
-    Key key,
     @required this.remoteDeviceName,
-  })
-      : assert(remoteDeviceName != null),
+    Key key,
+  })  : assert(remoteDeviceName != null),
         super(key: key);
 
   @override

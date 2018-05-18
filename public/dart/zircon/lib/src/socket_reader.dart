@@ -16,8 +16,8 @@ class SocketReaderError extends Error {
   String toString() => error.toString();
 }
 
-typedef void SocketReaderReadableHandler();
-typedef void SocketReaderErrorHandler(SocketReaderError error);
+typedef SocketReaderReadableHandler = void Function();
+typedef SocketReaderErrorHandler = void Function(SocketReaderError error);
 
 class SocketReader {
   Socket get socket => _socket;

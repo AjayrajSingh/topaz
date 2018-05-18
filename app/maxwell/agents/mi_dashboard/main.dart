@@ -134,17 +134,15 @@ void handleRequest(HttpRequest request) {
         requestPath = '${requestPath}index.html';
       }
       final File requestFile = new File(requestPath);
-      requestFile.exists().then((bool exists) {
-        if (exists) {
-          // Make sure the referenced file is within the webroot
-          if (requestFile.uri.path.startsWith(_webrootDirectory.path)) {
-            sendFile(requestFile, request.response);
-            return;
-          }
-        } else {
-          send404(request.response);
+      if (requestFile.existsSync()) {
+        // Make sure the referenced file is within the webroot
+        if (requestFile.uri.path.startsWith(_webrootDirectory.path)) {
+          sendFile(requestFile, request.response);
+          return;
         }
-      });
+      } else {
+        send404(request.response);
+      }
     }
   }
 }
@@ -187,6 +185,7 @@ void send404(HttpResponse response) {
     ..close();
 }
 
+// ignore: avoid_annotating_with_dynamic
 void handleWebsocketRequest(dynamic event) {
   print('[INFO] websocket event was received!');
 }

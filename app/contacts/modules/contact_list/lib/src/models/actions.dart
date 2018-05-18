@@ -5,13 +5,13 @@
 import 'contact_item.dart';
 
 /// The action to search the contacts store with a given prefix
-typedef void SearchContactsAction(String prefix);
+typedef SearchContactsAction = void Function(String prefix);
 
 /// The action to clear the search results
-typedef void ClearSearchResultsAction();
+typedef ClearSearchResultsAction = void Function();
 
 /// The function that will be called when a contact is tapped
-typedef void ContactTappedAction(ContactItem contact);
+typedef ContactTappedAction = void Function(ContactItem contact);
 
 /// The action to refresh the list of contacts
-typedef void RefreshContactsAction();
+typedef RefreshContactsAction = void Function();

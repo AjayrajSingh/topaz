@@ -5,7 +5,6 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 
 import 'cluster_layout.dart';
 import 'display_mode.dart';
@@ -62,38 +61,38 @@ final Color _kDebugRightStoryEdgeTargetColor = Colors.blue[700];
 /// would result in the stories of [storyCluster] being placed to one side of
 /// the target cluster.  If [preview] is true the resulting changes in the
 /// target story cluster are temporary.
-typedef void OnPanelsEvent({
-  @required BuildContext context,
-  @required StoryCluster storyCluster,
-  @required bool preview,
+typedef OnPanelsEvent = void Function({
+  BuildContext context,
+  StoryCluster storyCluster,
+  bool preview,
 });
 
 /// Called when [storyCluster] is hovering over or dropped upon a target which
 /// would result in the stories of [storyCluster] being placed to one side of
 /// [storyId]'s panel in the target cluster.  If [preview] is true the resulting
 /// changes in the target story cluster are temporary.
-typedef void OnAddToPanelEvent({
-  @required BuildContext context,
-  @required StoryCluster storyCluster,
-  @required StoryId storyId,
-  @required bool preview,
+typedef OnAddToPanelEvent = void Function({
+  BuildContext context,
+  StoryCluster storyCluster,
+  StoryId storyId,
+  bool preview,
 });
 
 /// Called when [storyCluster] is being added to the target cluster's story bar
 /// at the specified [targetIndex].
-typedef void OnStoryBarEvent({
-  @required BuildContext context,
-  @required StoryCluster storyCluster,
-  @required int targetIndex,
+typedef OnStoryBarEvent = void Function({
+  BuildContext context,
+  StoryCluster storyCluster,
+  int targetIndex,
 });
 
 /// Called when [storyCluster] is being removed from the target cluster. If
 /// [preview] is true the resulting changes in the target story cluster are
 /// temporary.
-typedef void OnLeaveClusterEvent({
-  @required BuildContext context,
-  @required StoryCluster storyCluster,
-  @required bool preview,
+typedef OnLeaveClusterEvent = void Function({
+  BuildContext context,
+  StoryCluster storyCluster,
+  bool preview,
 });
 
 /// Generates targets for [PanelDragTargets].

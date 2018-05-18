@@ -11,4 +11,4 @@ abstract class Union {
   Object get $data;
 }
 
-typedef T UnionFactory<T>(int index, Object data);
+typedef UnionFactory<T> = T Function(int index, Object data);

@@ -5,4 +5,4 @@
 import 'package:flutter/widgets.dart';
 
 /// Returns a [Widget] tree that returns [child] wrapped by other [Widget]s.
-typedef Widget WrapperBuilder(BuildContext context, Widget child);
+typedef WrapperBuilder = Widget Function(BuildContext context, Widget child);

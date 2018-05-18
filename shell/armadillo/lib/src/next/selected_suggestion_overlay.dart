@@ -10,7 +10,7 @@ import 'suggestion.dart';
 
 /// Called when the [Widget] representing [Suggestion] has fully expanded to
 /// fill its parent.
-typedef void OnSuggestionExpanded(Suggestion suggestion);
+typedef OnSuggestionExpanded = void Function(Suggestion suggestion);
 
 /// When a Suggestion is selected, the suggestion is brought into this overlay
 /// and an animation fills the overlay such that we can prepare the story that

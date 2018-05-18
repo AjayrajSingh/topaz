@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'package:fidl_ledger/fidl.dart' as ledger;
 
 /// Callback type that takes a status of a completed Ledger operation.
-typedef bool OnLedgerResponse(ledger.Status status);
+typedef OnLedgerResponse = bool Function(ledger.Status status);
 
 /// Creates a callback that takes a Ledger status and logs an error if the
 /// status is not OK.

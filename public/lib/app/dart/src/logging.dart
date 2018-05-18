@@ -22,7 +22,7 @@ const int _socketBufferLength = 2032;
 
 /// Method to write a single log message to a single output medium.
 /// Solutions are provided to write to stdout and a fuchsia Socket.
-typedef void LogWriter(LogWriterMessage message);
+typedef LogWriter = void Function(LogWriterMessage message);
 
 /// Sets up the default logger for the current Dart application.
 ///

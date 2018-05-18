@@ -112,7 +112,7 @@ class Suggestion {
   int get hashCode => id.hashCode;
 
   @override
-  bool operator ==(Object other) => (other is Suggestion && other.id == id);
+  bool operator ==(Object other) => other is Suggestion && other.id == id;
 
   @override
   String toString() => 'Suggestion(title: $title)';

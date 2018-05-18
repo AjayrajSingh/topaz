@@ -85,7 +85,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
         onPositioned: () {
           // TODO(alangardner): Callback to notify framework
           setState(() {
-            _orphanedForms.removeWhere((SurfaceForm f) => (f.key == form.key));
+            _orphanedForms.removeWhere((SurfaceForm f) => f.key == form.key);
           });
         },
       );

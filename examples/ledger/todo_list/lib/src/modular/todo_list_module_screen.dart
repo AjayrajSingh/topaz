@@ -40,7 +40,7 @@ class _TodoItem extends StatelessWidget {
 }
 
 /// Callback type for an item becoming done.
-typedef void ItemDoneCallback(List<int> id);
+typedef ItemDoneCallback = void Function(List<int> id);
 
 /// The top level widget for the todo list module
 class TodoListModuleScreen extends StatelessWidget {

@@ -29,11 +29,13 @@ export 'package:lib.widgets/model.dart'
     show ScopedModel, ScopedModelDescendant, ModelFinder;
 
 /// Function signature for GetPresentationMode callback
-typedef void GetPresentationModeCallback(PresentationMode mode);
+typedef GetPresentationModeCallback = void Function(PresentationMode mode);
 
 /// HACKY way to retrofit.
-typedef void SetupCallback(
-    {@required VoidCallback addNewUser, @required VoidCallback loginAsGuest});
+typedef SetupCallback = void Function({
+  VoidCallback addNewUser,
+  VoidCallback loginAsGuest,
+});
 
 const Duration _kCobaltTimerTimeout = const Duration(seconds: 20);
 const int _kNoOpEncodingId = 1;
@@ -113,12 +115,10 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   }) : super() {
     // Check for last kernel panic
     File lastPanic = new File('/boot/log/last-panic.txt');
-    lastPanic.exists().then((bool exists) {
-      if (exists) {
-        _showingKernelPanic = true;
-        notifyListeners();
-      }
-    });
+    if (lastPanic.existsSync()) {
+      _showingKernelPanic = true;
+      notifyListeners();
+    }
   }
 
   /// The list of previously logged in accounts.
@@ -143,7 +143,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
     enableClipping(_currentClippingEnabled);
     presentation
       ..captureKeyboardEventHack(
-        new input.KeyboardEvent(
+        const input.KeyboardEvent(
           deviceId: 0,
           eventTime: 0,
           hidUsage: 0,
@@ -154,7 +154,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         _keyboardCaptureListenerBindingSpaceBar.wrap(this),
       )
       ..captureKeyboardEventHack(
-        new input.KeyboardEvent(
+        const input.KeyboardEvent(
           deviceId: 0,
           eventTime: 0,
           hidUsage: 0,
@@ -165,7 +165,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
         _keyboardCaptureListenerBindingS.wrap(this),
       )
       ..captureKeyboardEventHack(
-        new input.KeyboardEvent(
+        const input.KeyboardEvent(
           deviceId: 0,
           eventTime: 0,
           hidUsage: 0,

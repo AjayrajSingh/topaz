@@ -26,7 +26,7 @@ class Info extends StatelessWidget {
                 child: new Text(
                   text ?? '',
                   textAlign: TextAlign.left,
-                  style: new TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 10.0,
                   ),
@@ -88,7 +88,7 @@ class Info extends StatelessWidget {
               child: new Text(
                 doc.name,
                 textAlign: TextAlign.left,
-                style: new TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 14.0,
                 ),

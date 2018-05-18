@@ -16,10 +16,6 @@ import 'story_cluster_drag_state_model.dart';
 const Color _kDraggableHoverColor = const Color(0x00FFFF00);
 const Color _kNoDraggableHoverColor = const Color(0x00FFFF00);
 
-/// Called whenever an [ArmadilloDragTarget] child of [EdgeScrollDragTarget] is
-/// built.
-typedef void _BuildCallback(bool hasDraggableAbove, List<Offset> points);
-
 /// Creates disablable drag targets which cause the given [ScrollController] to
 /// scroll when a draggable hovers over them.  The drag targets are placed
 /// at the top and bottom of this widget's parent such that dragging a candidate
@@ -75,7 +71,7 @@ class EdgeScrollDragTarget extends StatelessWidget {
 
   Widget _buildDragTarget({
     Key key,
-    _BuildCallback onBuild,
+    void onBuild(bool hasDraggableAbove, List<Offset> points),
   }) =>
       new ArmadilloDragTarget<StoryClusterDragData>(
         onWillAccept: (_, __) => false,

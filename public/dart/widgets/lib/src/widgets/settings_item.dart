@@ -26,7 +26,7 @@ class SettingsItem extends StatelessWidget {
     @required this.iconUrl,
     @required this.label,
     this.details,
-    this.isError: false,
+    this.isError = false,
     this.scale,
     this.onTap,
   });
@@ -75,7 +75,7 @@ class SettingsItem extends StatelessWidget {
   }
 }
 
-TextStyle _textStyle(double scale, {bool isError: false}) => new TextStyle(
+TextStyle _textStyle(double scale, {bool isError = false}) => new TextStyle(
       color: isError ? Colors.grey[900] : Colors.redAccent,
       fontSize: 24.0 * scale,
       fontWeight: FontWeight.w200,

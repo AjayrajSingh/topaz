@@ -578,11 +578,11 @@ const List<_Timezone> _kTimeZones = const <_Timezone>[
 ];
 
 /// Callback when user picks a timezone.
-typedef void OnTimezoneTap(String timeZoneId);
+typedef OnTimezoneTap = void Function(String timeZoneId);
 
 /// Calback when the user taps outside the timezone picker, usually dismissing
 /// the picker.
-typedef void OnTapOutside();
+typedef OnTapOutside = void Function();
 
 /// Allows the selection of timezone.
 class TimezonePicker extends StatelessWidget {
@@ -590,9 +590,7 @@ class TimezonePicker extends StatelessWidget {
   final OnTimezoneTap _onTap;
 
   /// Creates a new TimezonePicker widget
-  const TimezonePicker(
-      {String currentTimezoneId,
-      OnTimezoneTap onTap})
+  const TimezonePicker({String currentTimezoneId, OnTimezoneTap onTap})
       : _currentTimezoneId = currentTimezoneId,
         _onTap = onTap;
 
@@ -614,7 +612,7 @@ class TimezonePicker extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: new Text(
                       '${_kTimeZones[index].zoneId}',
-                      style: new TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black),
                     ),
                   ),
                 ),

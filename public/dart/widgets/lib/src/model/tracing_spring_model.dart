@@ -20,10 +20,10 @@ class TracingSpringModel extends SpringModel {
 
   /// Constructor.
   TracingSpringModel({
-    RK4SpringDescription springDescription: _kSimulationDesc,
-    String traceName: 'TracingSpringModel',
+    RK4SpringDescription springDescription = _kSimulationDesc,
+    String traceName = 'TracingSpringModel',
     CobaltEncoder cobaltEncoder,
-    Map<double, int> targetToCobaltMetricIdMap: const <double, int>{},
+    Map<double, int> targetToCobaltMetricIdMap = const <double, int>{},
   })  : _frameRateTracer = new FrameRateTracer(
           name: traceName,
           cobaltEncoder: cobaltEncoder,

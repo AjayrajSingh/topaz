@@ -25,6 +25,6 @@ class FilterEntityData {
   /// Constructor
   FilterEntityData({
     this.prefix = '',
-    this.detailType: DetailType.email,
+    this.detailType = DetailType.email,
   });
 }

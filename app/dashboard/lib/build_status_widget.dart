@@ -100,7 +100,7 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
                     margin: const EdgeInsets.only(bottom: 8.0),
                     width: 16.0,
                     height: 16.0,
-                    child: new FuchsiaSpinner(),
+                    child: const FuchsiaSpinner(),
                   ),
                 ),
               );

@@ -19,8 +19,6 @@ const TextStyle _kTextStyle = const TextStyle(
   fontWeight: FontWeight.w300,
 );
 
-typedef Widget _QuickSettingsTextBuilder(Color color);
-
 /// Displays the user and maximized quick settings text.
 class NowUserAndMaximizedContext extends StatelessWidget {
   /// Called when the user's context text is tapped.
@@ -96,8 +94,8 @@ class NowUserAndMaximizedContext extends StatelessWidget {
 
   Widget _buildQuickSettingsText({
     double startingXOffset,
-    double slideInProgress: 1.0,
-    _QuickSettingsTextBuilder builder,
+    double slideInProgress = 1.0,
+    Widget builder(Color color),
   }) =>
       new Opacity(
         opacity: slideInProgress,

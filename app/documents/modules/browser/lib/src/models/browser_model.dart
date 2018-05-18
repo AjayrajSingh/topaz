@@ -12,14 +12,14 @@ const String _kDefaultNavName = 'Documents';
 const String _kDefaultRootDir = 'root';
 
 /// A method which is called when a document needs to be resolved.
-typedef void OnResolveDocument(String entityRef);
+typedef OnResolveDocument = void Function(String entityRef);
 
 /// A method which is called when the current document is updated.
 /// The document may be null if the current document is being deselected.
-typedef void OnUpdateCurrentDocument(doc_fidl.Document doc);
+typedef OnUpdateCurrentDocument = void Function(doc_fidl.Document doc);
 
 /// A method which is called when is response to the [toggleInfo()] method.
-typedef void OnToggleInfo(bool showInfo);
+typedef OnToggleInfo = void Function(bool showInfo);
 
 /// The model object for the Browser module
 class BrowserModel extends Model {

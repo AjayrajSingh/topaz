@@ -8,7 +8,7 @@ import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
 /// Signature of tab ownership change callbacks.
-typedef void OwnershipChangeCallback(TabData data);
+typedef OwnershipChangeCallback = void Function(TabData data);
 
 /// Representation of tab ids.
 class TabId {
@@ -35,7 +35,7 @@ class TabData {
 }
 
 /// Signature of the callback to claim a tab owned by a window.
-typedef TabData ClaimTabCallback(TabId id);
+typedef ClaimTabCallback = TabData Function(TabId id);
 
 /// Representation of window ids.
 class WindowId {
@@ -55,7 +55,7 @@ class WindowData extends Model {
   final ClaimTabCallback claimTab;
 
   /// Constructor.
-  WindowData({@required this.claimTab, this.tabs: const <TabData>[]})
+  WindowData({@required this.claimTab, this.tabs = const <TabData>[]})
       : id = new WindowId();
 
   /// Returns true if this window contains the given tab.

@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
 
 /// Called when an aunthentication overlay needs to be started.
-typedef void OnStartOverlay(InterfaceHandle<ViewOwner> viewOwner);
+typedef OnStartOverlay = void Function(InterfaceHandle<ViewOwner> viewOwner);
 
 /// An [AuthenticationContext] which calls its callbacks to show an overlay.
 class AuthenticationContextImpl extends AuthenticationContext {

@@ -4,8 +4,7 @@
 
 import 'dart:collection';
 
-import 'package:fidl_contacts_content_provider/fidl.dart'
-    as fidl;
+import 'package:fidl_contacts_content_provider/fidl.dart' as fidl;
 
 import 'prefix_tree.dart';
 
@@ -60,7 +59,7 @@ class ContactsStore {
   ///
   /// [updateIfExists] allows the caller to update the value instead of adding
   /// it if it already exists in the contacts store.
-  void addContact(fidl.Contact contact, {bool updateIfExists: false}) {
+  void addContact(fidl.Contact contact, {bool updateIfExists = false}) {
     _validateContact(contact, updateIfExists);
 
     String id = contact.contactId;

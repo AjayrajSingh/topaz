@@ -23,7 +23,7 @@ class SizedSurface {
   SizedSurface({
     @required this.surface,
     @required this.rect,
-    this.dependency: SurfaceDependency.dependent,
+    this.dependency = SurfaceDependency.dependent,
   });
 
   @override

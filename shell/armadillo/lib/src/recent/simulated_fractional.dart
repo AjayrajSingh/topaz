@@ -40,16 +40,15 @@ class SimulatedFractional extends StatefulWidget {
 
   /// Constructor.
   const SimulatedFractional({
-    Key key,
     @required this.fractionalWidth,
     @required this.fractionalHeight,
     @required this.size,
     @required this.child,
+    Key key,
     this.fractionalTop,
     this.fractionalLeft,
-    this.springDescription: _kDefaultSimulationDesc,
-  })
-      : assert(fractionalWidth != null),
+    this.springDescription = _kDefaultSimulationDesc,
+  })  : assert(fractionalWidth != null),
         assert(fractionalHeight != null),
         assert(size != null),
         assert(springDescription != null),

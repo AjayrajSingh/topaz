@@ -112,12 +112,12 @@ class _MediaPlayerState extends State<MediaPlayer> {
             borderRadius: new BorderRadius.circular(60.0),
             child: new IconButton(
               icon: widget.controller.problem != null
-                  ? new Icon(Icons.error_outline)
+                  ? const Icon(Icons.error_outline)
                   : widget.controller.loading
-                      ? new Icon(Icons.hourglass_empty)
+                      ? const Icon(Icons.hourglass_empty)
                       : widget.controller.playing
-                          ? new Icon(Icons.pause)
-                          : new Icon(Icons.play_arrow),
+                          ? const Icon(Icons.pause)
+                          : const Icon(Icons.play_arrow),
               iconSize: 60.0,
               onPressed: () {
                 if (widget.controller.playing) {
@@ -144,7 +144,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
                     width: 65.0,
                     child: new Text(
                       _durationToString(widget.controller.progress),
-                      style: new TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -185,7 +185,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
               width: 65.0,
               child: new Text(
                 _durationToString(widget.controller.duration),
-                style: new TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
               ),
             ),

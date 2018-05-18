@@ -637,8 +637,8 @@ Future<Proposal> _createUniqueDummyProposal({
   String subheadline,
   String iconUrl,
   String imageUrl,
-  SuggestionImageType imageType: SuggestionImageType.other,
-  AnnoyanceType annoyanceType: AnnoyanceType.none,
+  SuggestionImageType imageType = SuggestionImageType.other,
+  AnnoyanceType annoyanceType = AnnoyanceType.none,
 }) async =>
     _createProposal(
       id: 'dummy ${_id++}',
@@ -659,10 +659,10 @@ Future<Proposal> _createProposal({
   String subheadline,
   String imageUrl,
   String initialData,
-  SuggestionImageType imageType: SuggestionImageType.other,
+  SuggestionImageType imageType = SuggestionImageType.other,
   String iconUrl,
   int color,
-  AnnoyanceType annoyanceType: AnnoyanceType.none,
+  AnnoyanceType annoyanceType = AnnoyanceType.none,
 }) async =>
     createProposal(
       id: id,

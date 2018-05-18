@@ -40,17 +40,17 @@ const double _kMaxAcceptanceSpeed = 1000.0;
 /// over this [DragTarget] and that has passed [ArmadilloDragTarget.onWillAccept]. The
 /// `rejectedData` argument contains the list of drag data that is hovering over
 /// this [ArmadilloDragTarget] and that will not be accepted by the [ArmadilloDragTarget].
-typedef Widget ArmadilloDragTargetBuilder<T>(
+typedef ArmadilloDragTargetBuilder<T> = Widget Function(
   BuildContext context,
   Map<T, Offset> candidateData,
   Map<dynamic, Offset> rejectedData,
 );
 
 /// Signature for determining whether the given data will be accepted by a [ArmadilloDragTarget].
-typedef bool ArmadilloDragTargetWillAccept<T>(T data, Offset point);
+typedef ArmadilloDragTargetWillAccept<T> = bool Function(T data, Offset point);
 
 /// Signature for causing a [ArmadilloDragTarget] to accept the given data.
-typedef void ArmadilloDragTargetAccept<T>(
+typedef ArmadilloDragTargetAccept<T> = void Function(
   T data,
   Offset point,
   Velocity velocity,
@@ -60,14 +60,14 @@ typedef void ArmadilloDragTargetAccept<T>(
 /// [ArmadilloLongPressDraggable] is being dragged.
 /// [localDragStartPoint] indicates where the drag started in the draggable's
 /// local coordinate space.
-typedef Widget FeedbackBuilder(
+typedef FeedbackBuilder = Widget Function(
   Offset localDragStartPoint,
   Size initialSize,
 );
 
 /// Called when a drag starts.  The returned [Size] should be the size of the
 /// dragged widget.
-typedef Size OnDragStarted();
+typedef OnDragStarted = Size Function();
 
 /// A widget that can be dragged from to a [ArmadilloDragTarget] starting from long press.
 ///
@@ -85,17 +85,16 @@ class ArmadilloLongPressDraggable<T> extends StatefulWidget {
   ///
   /// The [child] and [feedbackBuilder] arguments must not be null.
   const ArmadilloLongPressDraggable({
-    Key key,
     @required this.overlayKey,
     @required this.child,
     @required this.feedbackBuilder,
     @required this.data,
+    Key key,
     this.childWhenDragging,
     this.onDragStarted,
     this.onDragEnded,
     this.onDismiss,
-  })
-      : assert(overlayKey != null),
+  })  : assert(overlayKey != null),
         assert(child != null),
         assert(feedbackBuilder != null),
         super(key: key);
@@ -286,8 +285,7 @@ class _DragAvatarWidget extends StatefulWidget {
     this.initialSize,
     this.feedbackBuilder,
     this.onDismiss,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   _DragAvatarWidgetState createState() => new _DragAvatarWidgetState();
@@ -353,7 +351,7 @@ class _DragAvatarWidgetState extends TickingState<_DragAvatarWidget> {
     if (_returnSimulation?.isDone ?? false) {
       _onReturnSimulationDone();
     }
-    return !(isDone);
+    return !isDone;
   }
 
   void updatePosition(Offset position) => setState(() {
@@ -416,8 +414,7 @@ class ArmadilloDragTarget<T> extends StatefulWidget {
     Key key,
     this.onWillAccept,
     this.onAccept,
-  })
-      : assert(builder != null),
+  })  : assert(builder != null),
         super(key: key);
 
   @override
@@ -486,7 +483,6 @@ class _DragTargetState<T> extends State<ArmadilloDragTarget<T>> {
 }
 
 enum _DragEndKind { dropped, canceled }
-typedef void _OnDragEnd(bool wasAccepted, Velocity velocity);
 
 // The lifetime of this object is a little dubious right now. Specifically, it
 // lives as long as the pointer is down. Arguably it should self-immolate if the
@@ -496,7 +492,7 @@ typedef void _OnDragEnd(bool wasAccepted, Velocity velocity);
 class _DragAvatar<T> extends Drag {
   final T data;
   final ValueChanged<Offset> onDragUpdate;
-  final _OnDragEnd onDragEnd;
+  final void Function(bool wasAccepted, Velocity velocity) onDragEnd;
   final List<_DragTargetState<T>> _activeTargets = <_DragTargetState<T>>[];
   final List<_DragTargetState<T>> _enteredTargets = <_DragTargetState<T>>[];
 

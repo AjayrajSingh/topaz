@@ -20,11 +20,10 @@ class MessageInput extends StatefulWidget {
   /// Constructor
   const MessageInput({
     Key key,
-    this.enabled: true,
+    this.enabled = true,
     this.onSubmitMessage,
     this.onTapSharePhoto,
-  })
-      : assert(enabled != null),
+  })  : assert(enabled != null),
         super(key: key);
 
   @override

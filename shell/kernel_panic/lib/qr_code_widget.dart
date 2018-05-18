@@ -202,7 +202,7 @@ class _SmoothQrCodePainter extends CustomPainter {
             canvas.drawPath(
               new Path()
                 ..moveTo(x * pixelSize, (y + 0.5) * pixelSize)
-                ..relativeLineTo(0.0, (0.5 * pixelSize))
+                ..relativeLineTo(0.0, 0.5 * pixelSize)
                 //..relativeLineTo(0.5 * pixelSize, 0.0)
                 ..arcTo(
                   new Rect.fromLTRB(x * pixelSize, y * pixelSize,

@@ -90,14 +90,15 @@ class _ContextAwareProposer {
       }
     }
 
-    ContextQuery query =
-        const ContextQuery(selector: const <ContextQueryEntry>[const
-            ContextQueryEntry(
-      key: _kLocationHomeWorkTopic, value: const ContextSelector(
-          type: ContextValueType.entity,
-          meta: const ContextMetadata(
-              entity: const EntityMetadata(topic: _kLocationHomeWorkTopic)))
-    )]);
+    ContextQuery query = const ContextQuery(selector: const <ContextQueryEntry>[
+      const ContextQueryEntry(
+          key: _kLocationHomeWorkTopic,
+          value: const ContextSelector(
+              type: ContextValueType.entity,
+              meta: const ContextMetadata(
+                  entity:
+                      const EntityMetadata(topic: _kLocationHomeWorkTopic))))
+    ]);
 
     contextReader.subscribe(
       query,
@@ -150,11 +151,9 @@ class _ContextAwareProposer {
   }
 }
 
-typedef void _OnTopicChanged(String topicValue);
-
 class _ContextListenerImpl extends ContextListener {
   final ProposalPublisher proposalPublisher;
-  final _OnTopicChanged onTopicChanged;
+  final void Function(String topicValue) onTopicChanged;
 
   _ContextListenerImpl({this.proposalPublisher, this.onTopicChanged});
 
@@ -298,7 +297,7 @@ class _QueryHandlerImpl extends QueryHandler {
 
     if ((query.text?.length ?? 0) >= 2) {
       Future<Null> scanDirectory(Directory directory,
-          {bool recursive: true}) async {
+          {bool recursive = true}) async {
         if (!directory.existsSync()) {
           return;
         }
@@ -373,8 +372,7 @@ class _QueryHandlerImpl extends QueryHandler {
     callback(new QueryResponse(proposals: proposals));
   }
 
-  Future<Proposal> get _launchEverythingProposal async =>
-    createProposal(
+  Future<Proposal> get _launchEverythingProposal async => createProposal(
         id: _kLaunchEverythingProposalId,
         headline: 'Launch everything',
         color: 0xFFFF0080,
@@ -420,10 +418,10 @@ Future<Proposal> _createAppProposal({
   String subheadline,
   String imageUrl,
   String iconUrl,
-  SuggestionImageType imageType: SuggestionImageType.other,
+  SuggestionImageType imageType = SuggestionImageType.other,
   int color,
-  double confidence: 0.0,
-  AnnoyanceType annoyanceType: AnnoyanceType.none,
+  double confidence = 0.0,
+  AnnoyanceType annoyanceType = AnnoyanceType.none,
 }) async {
   return createProposal(
     id: id,

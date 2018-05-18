@@ -71,7 +71,8 @@ class _ViewContainerListenerImpl extends ViewContainerListener {
       new HashMap<int, ChildViewConnection>();
 }
 
-typedef void ChildViewConnectionCallback(ChildViewConnection connection);
+typedef ChildViewConnectionCallback = void Function(
+    ChildViewConnection connection);
 void _emptyConnectionCallback(ChildViewConnection c) {}
 
 /// A connection with a child view.
@@ -284,9 +285,9 @@ class _RenderChildView extends RenderBox {
   ///
   /// The [scale] argument must not be null.
   _RenderChildView({
-    ChildViewConnection connection,
     @required double scale,
-    bool hitTestable: true,
+    ChildViewConnection connection,
+    bool hitTestable = true,
   })  : _connection = connection,
         _scale = scale,
         _hitTestable = hitTestable,
@@ -440,11 +441,11 @@ class ChildSceneLayer extends Layer {
   ///
   /// All of the arguments must not be null.
   ChildSceneLayer({
-    this.offset: Offset.zero,
-    this.width: 0.0,
-    this.height: 0.0,
+    this.offset = Offset.zero,
+    this.width = 0.0,
+    this.height = 0.0,
     this.sceneHost,
-    this.hitTestable: true,
+    this.hitTestable = true,
   });
 
   /// Offset from parent in the parent's coordinate system.
@@ -494,7 +495,7 @@ class ChildSceneLayer extends Layer {
 @immutable
 class ChildView extends LeafRenderObjectWidget {
   /// Creates a widget that is replaced by content from another process.
-  ChildView({this.connection, this.hitTestable: true})
+  ChildView({this.connection, this.hitTestable = true})
       : super(key: new GlobalObjectKey(connection));
 
   /// A connection to the child whose content will replace this widget.

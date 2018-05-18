@@ -52,7 +52,7 @@ class Encoder {
     _extent += claimSize;
     if (_extent > data.lengthInBytes) {
       int newSize = data.lengthInBytes + claimSize;
-      newSize += (newSize >> 1);
+      newSize += newSize >> 1;
       _grow(newSize);
     }
   }

@@ -30,10 +30,9 @@ class ChatGroupAvatar extends StatelessWidget {
   const ChatGroupAvatar({
     Key key,
     @required this.users,
-    this.size: 40.0,
+    this.size = 40.0,
     bool selected,
-  })
-      : assert(users != null),
+  })  : assert(users != null),
         selected = selected ?? false,
         super(key: key);
 

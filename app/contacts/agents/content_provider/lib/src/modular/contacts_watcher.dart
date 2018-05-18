@@ -8,7 +8,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 
 /// Callback to be run with the updated contact entries
-typedef void ProcessEntriesCallback(List<Entry> entries);
+typedef ProcessEntriesCallback = void Function(List<Entry> entries);
 
 /// A [PageWatcher] implementation that looks for changes to the list of
 /// contacts stored in Ledger
@@ -26,8 +26,7 @@ class ContactsWatcher extends PageWatcher {
   ContactsWatcher({
     @required PageSnapshotProxy initialSnapshot,
     @required ProcessEntriesCallback processEntriesCallback,
-  })
-      : assert(initialSnapshot != null),
+  })  : assert(initialSnapshot != null),
         assert(processEntriesCallback != null),
         _processEntriesCallback = processEntriesCallback {
     _pageSnapshots.add(initialSnapshot);

@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 
 /// Callback.
-typedef void NewItemCallback(String content);
+typedef NewItemCallback = void Function(String content);
 
 /// Widget for entering a new todo item.
 class NewItemInput extends StatefulWidget {

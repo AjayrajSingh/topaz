@@ -28,10 +28,9 @@ class SimulatedSizedBox extends StatefulWidget {
     Key key,
     this.width,
     this.height,
-    this.springDescription: _kDefaultSimulationDesc,
+    this.springDescription = _kDefaultSimulationDesc,
     this.child,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   SimulatedSizedBoxState createState() => new SimulatedSizedBoxState();

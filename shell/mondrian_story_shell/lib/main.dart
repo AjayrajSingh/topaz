@@ -78,7 +78,7 @@ class StoryShellImpl implements StoryShell, Lifecycle {
         viewId,
         new SurfaceProperties(),
         parentId,
-        surfaceRelation ?? new SurfaceRelation(),
+        surfaceRelation ?? const SurfaceRelation(),
         manifest != null ? manifest.compositionPattern : '',
       )
       ..connectView(viewId, view);

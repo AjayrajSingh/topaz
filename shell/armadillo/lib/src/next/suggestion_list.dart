@@ -40,7 +40,8 @@ const ListEquality<Suggestion> _kSuggestionListEquality =
 
 /// Called when a suggestion is selected.  [globalBounds] indicates the location
 /// of the widget representing [suggestion] was on screen when it was selected.
-typedef void OnSuggestionSelected(Suggestion suggestion, Rect globalBounds);
+typedef OnSuggestionSelected = void Function(
+    Suggestion suggestion, Rect globalBounds);
 
 /// Displays a list of suggestions and provides a mechanism for asking for
 /// new things to do.
@@ -68,8 +69,7 @@ class SuggestionList extends StatefulWidget {
     this.onAskingEnded,
     this.onSuggestionSelected,
     this.askFocusNode,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   SuggestionListState createState() => new SuggestionListState();

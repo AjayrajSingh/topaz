@@ -5,7 +5,7 @@
 import 'package:fidl_modular/fidl.dart';
 
 /// Calling this causes [storyId] to be focused.
-typedef void StoryFocuser(String storyId);
+typedef StoryFocuser = void Function(String storyId);
 
 /// Manages initial story focus after launch.
 class InitialFocusSetter {

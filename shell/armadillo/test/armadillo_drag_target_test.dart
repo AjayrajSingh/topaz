@@ -68,7 +68,7 @@ void main() {
       tester.getCenter(find.byKey(draggableKey)),
     );
 
-    await tester.pump(new Duration(milliseconds: 150));
+    await tester.pump(const Duration(milliseconds: 150));
 
     // Verify the drag hasn't started yet.
     expect(find.byKey(overlayKey), findsOneWidget);
@@ -77,7 +77,7 @@ void main() {
     expect(find.byKey(childWhenDraggingKey), findsNothing);
     expect(ongoingDrags, 0);
 
-    await tester.pump(new Duration(milliseconds: 150));
+    await tester.pump(const Duration(milliseconds: 150));
 
     // Verify the drag has started and childWhenDragging replaces child in the tree.
     expect(ongoingDrags, 1);
@@ -99,13 +99,13 @@ void main() {
     // Start and finish 'animate back' animation.
     await tester.pump();
 
-    await tester.pump(new Duration(milliseconds: 350));
+    await tester.pump(const Duration(milliseconds: 350));
 
     // Still animating...
     expect(find.byKey(childKey), findsNothing);
     expect(find.byKey(childWhenDraggingKey), findsOneWidget);
 
-    await tester.pump(new Duration(milliseconds: 350));
+    await tester.pump(const Duration(milliseconds: 350));
 
     // Verify we have replaced childWhenDragging with child.
     expect(find.byKey(childKey), findsOneWidget);
@@ -166,7 +166,7 @@ void main() {
       pointer: 1,
     );
 
-    await tester.pump(new Duration(milliseconds: 1));
+    await tester.pump(const Duration(milliseconds: 1));
 
     // Start a second drag.
     TestGesture gesture2 = await tester.startGesture(
@@ -174,12 +174,12 @@ void main() {
       pointer: 2,
     );
 
-    await tester.pump(new Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 300));
 
     // Verify only one of the drags triggers dragging.
     expect(ongoingDrags, 1);
 
-    await tester.pump(new Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 300));
 
     // Still only one drag.
     expect(ongoingDrags, 1);
@@ -308,7 +308,7 @@ void main() {
       tester.getCenter(find.byKey(draggableKey)),
     );
 
-    await tester.pump(new Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(unacceptingCandidateData.isEmpty, isTrue);
     expect(unacceptingRejectedData.isEmpty, isTrue);
@@ -492,7 +492,7 @@ void main() {
       tester.getCenter(find.byKey(draggableKey)),
     );
 
-    await tester.pump(new Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(unacceptingCandidateData.isEmpty, isTrue);
     expect(unacceptingRejectedData.isEmpty, isTrue);

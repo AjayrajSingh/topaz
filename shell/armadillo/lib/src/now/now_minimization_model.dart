@@ -65,7 +65,7 @@ class NowMinimizationModel extends SpringModel {
     double fallAwayProgress = (1.0 -
             math.min(
               1.0,
-              (value / _kFallAwayDurationFraction),
+              value / _kFallAwayDurationFraction,
             ))
         .clamp(0.0, 1.0);
     return fallAwayProgress < 0.8 ? 0.0 : ((fallAwayProgress - 0.8) / 0.2);

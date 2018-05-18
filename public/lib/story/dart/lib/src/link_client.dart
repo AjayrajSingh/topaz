@@ -146,7 +146,7 @@ class LinkClient {
   bool _receivedInitialValue = false;
 
   /// Stream based API for [fidl.Link#watch] and [fidl.Link#watchAll].
-  Stream<String> watch({bool all: false}) {
+  Stream<String> watch({bool all = false}) {
     log.fine('#watch(all: $all)');
 
     // TODO(SO-1127): connect the stream's control plane to the underlying link watcher

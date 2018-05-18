@@ -66,7 +66,7 @@ class Api {
   }
 }
 
-typedef Future<String> TextFetcher();
+typedef TextFetcher = Future<String> Function();
 
 /// Models
 class MyModel extends Model {

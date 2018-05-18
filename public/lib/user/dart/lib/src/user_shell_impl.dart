@@ -7,7 +7,7 @@ import 'package:fidl/fidl.dart';
 import 'package:lib.story.dart/story.dart';
 
 /// Called when [UserShell.initialize] occurs.
-typedef void OnUserShellReady(
+typedef OnUserShellReady = void Function(
   UserShellContext userShellContext,
   FocusProvider focusProvider,
   FocusController focusController,
@@ -21,10 +21,10 @@ typedef void OnUserShellReady(
 );
 
 /// Called at the beginning of [Lifecycle.terminate].
-typedef void OnUserShellStopping();
+typedef OnUserShellStopping = void Function();
 
 /// Called at the conclusion of [Lifecycle.terminate].
-typedef void OnUserShellStop();
+typedef OnUserShellStop = void Function();
 
 /// Implements a UserShell for receiving the services a [UserShell] needs to
 /// operate.
@@ -73,8 +73,7 @@ class UserShellImpl implements UserShell, Lifecycle {
     this.onStop,
     this.onNotify,
     bool watchAll,
-  })
-      : watchAll = watchAll ?? false;
+  }) : watchAll = watchAll ?? false;
 
   @override
   void initialize(

@@ -6,4 +6,4 @@ import 'package:flutter/widgets.dart';
 
 /// Builds some animated content.
 /// [animation]'s range is from 0.0 to 1.0.
-typedef Widget AnimatedContentBuilder(Animation<double> animation);
+typedef AnimatedContentBuilder = Widget Function(Animation<double> animation);

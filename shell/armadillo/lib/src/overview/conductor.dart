@@ -214,7 +214,7 @@ class ConductorState extends State<Conductor> {
   }
 
   /// Called to request the conductor focus on the cluster with [storyId].
-  void requestStoryFocus(StoryId storyId, {bool jumpToFinish: true}) {
+  void requestStoryFocus(StoryId storyId, {bool jumpToFinish = true}) {
     onStoryClusterFocusStarted();
     StoryModel storyModel = StoryModel.of(context);
     StoryCluster storyCluster = storyModel.storyClusterWithStory(storyId);

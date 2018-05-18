@@ -38,7 +38,7 @@ enum DismissalReason {
 }
 
 /// Called when an interruption is no longer showing.
-typedef void OnInterruptionDismissed(
+typedef OnInterruptionDismissed = void Function(
   Suggestion interruption,
   DismissalReason dismissalReason,
 );
@@ -56,8 +56,7 @@ class InterruptionOverlay extends StatefulWidget {
     Key key,
     this.onSuggestionSelected,
     this.onInterruptionDismissed,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   InterruptionOverlayState createState() => new InterruptionOverlayState();

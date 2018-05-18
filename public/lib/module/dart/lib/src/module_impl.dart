@@ -8,11 +8,10 @@ import 'package:fidl_modular/fidl.dart';
 import 'package:meta/meta.dart';
 
 export 'package:fidl_modular/fidl.dart' show ModuleContext;
-export 'package:fidl_component/fidl.dart'
-    show ServiceProvider;
+export 'package:fidl_component/fidl.dart' show ServiceProvider;
 
 /// Callback for [ModuleImpl#onInitialize].
-typedef void ModulelInitializeCallback(
+typedef ModulelInitializeCallback = void Function(
   InterfaceHandle<ModuleContext> moduleContextHandle,
   InterfaceRequest<ServiceProvider> outgoingServicesRequest,
 );
@@ -25,8 +24,7 @@ class ModuleImpl implements Module {
   /// Constructor.
   ModuleImpl({
     @required this.onInitialize,
-  })
-      : assert(onInitialize != null);
+  }) : assert(onInitialize != null);
 
   @override
   void initialize(

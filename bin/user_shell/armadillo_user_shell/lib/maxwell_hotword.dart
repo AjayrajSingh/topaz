@@ -11,7 +11,7 @@ import 'rate_limited_retry.dart';
 abstract class MaxwellHotword extends speech.HotwordListener {
   /// Retry limit for hotword detector failures.
   static final RateThreshold kMaxRetry =
-      new RateThreshold(5, new Duration(seconds: 1));
+      new RateThreshold(5, const Duration(seconds: 1));
 
   bool _startPending = false;
   speech.SpeechToTextProxy _speechToText;

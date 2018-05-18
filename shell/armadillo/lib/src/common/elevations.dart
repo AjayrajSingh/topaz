@@ -23,7 +23,7 @@ class Elevations {
 
   /// Elevation for story cluster when it is being dragged
   static const double draggedStoryCluster =
-      (3 * _storyShellWithModuleMaxElevation);
+      3 * _storyShellWithModuleMaxElevation;
 
   /// Elevation for story cluster when it is focused
   static const double focusedStoryCluster = _storyShellWithModuleMaxElevation;

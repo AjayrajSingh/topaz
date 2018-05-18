@@ -6,7 +6,6 @@ import 'dart:io';
 import 'dart:ui' show lerpDouble;
 
 import 'package:armadillo/common.dart';
-import 'package:armadillo/overview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -210,7 +209,7 @@ class _QuickSettingsState extends State<QuickSettings> {
     });
   }
 
-  Widget _divider({double opacity: 1.0}) => new Divider(
+  Widget _divider({double opacity = 1.0}) => new Divider(
         height: 4.0,
         color: Colors.grey[300].withOpacity(opacity),
       );

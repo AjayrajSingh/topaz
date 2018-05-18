@@ -17,7 +17,7 @@ class ConditionalBuilder extends StatelessWidget {
 
   /// Constructor.
   const ConditionalBuilder(
-      {this.condition, this.builder, this.placeHolder: const Offstage()});
+      {this.condition, this.builder, this.placeHolder = const Offstage()});
 
   @override
   Widget build(BuildContext context) =>

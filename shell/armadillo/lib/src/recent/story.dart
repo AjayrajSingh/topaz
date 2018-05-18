@@ -20,7 +20,7 @@ class StoryId extends ValueKey<String> {
 }
 
 /// A builder that is called for different values of [opacity].
-typedef Widget OpacityBuilder(BuildContext context, double opacity);
+typedef OpacityBuilder = Widget Function(BuildContext context, double opacity);
 
 /// The representation of a Story.  A Story's contents are display as a [Widget]
 /// provided by [widget] while the size of a story in the [StoryList] is
@@ -87,11 +87,11 @@ class Story {
   Story({
     this.id,
     this.widget,
-    this.title: '',
-    this.icons: const <OpacityBuilder>[],
+    this.title = '',
+    this.icons = const <OpacityBuilder>[],
     DateTime lastInteraction,
-    this.cumulativeInteractionDuration: Duration.zero,
-    this.themeColor: Colors.black,
+    this.cumulativeInteractionDuration = Duration.zero,
+    this.themeColor = Colors.black,
     this.onClusterIndexChanged,
     StoryClusterId clusterId,
     SimulatedPaddingModel simulatedPaddingState,
@@ -102,8 +102,7 @@ class Story {
     int clusterIndex,
     StoryBarHeightModel storyBarHeightModel,
     StoryBarFocusModel storyBarFocusModel,
-  })
-      : clusterId = clusterId ?? new StoryClusterId(),
+  })  : clusterId = clusterId ?? new StoryClusterId(),
         simulatedPaddingModel =
             simulatedPaddingState ?? new SimulatedPaddingModel(),
         clusterDraggableKey = clusterDraggableKey ??
@@ -146,7 +145,7 @@ class Story {
   bool get isPlaceHolder => false;
 
   /// Maximizes the story's story bar.
-  void maximizeStoryBar({bool jumpToFinish: false}) {
+  void maximizeStoryBar({bool jumpToFinish = false}) {
     _storyBarHeightModel.maximize(jumpToFinish: jumpToFinish);
     _storyBarFocusModel.maximize();
   }
@@ -180,7 +179,7 @@ class Story {
   int get hashCode => id.hashCode;
 
   @override
-  bool operator ==(Object other) => (other is Story && other.id == id);
+  bool operator ==(Object other) => other is Story && other.id == id;
 
   @override
   String toString() => 'Story( id: $id, title: $title, panel: $panel )';

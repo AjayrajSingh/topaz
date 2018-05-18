@@ -38,7 +38,7 @@ abstract class Sim<T> {
 }
 
 /// Generates a Sim with given params.
-typedef Sim<T> Simulate<T>(T start, T end, T velocity);
+typedef Simulate<T> = Sim<T> Function(T start, T end, T velocity);
 
 // TODO(alangardner): Chaining operations
 
@@ -85,15 +85,13 @@ class Independent2DSim extends Sim<Offset> {
     @required this.xSim,
     @required this.ySim,
     Tolerance tolerance,
-  })
-      : super(tolerance: tolerance);
+  }) : super(tolerance: tolerance);
 
   /// Convenience constructor when the simulation is symetric on each axis.
   Independent2DSim.symmetric({
     @required Simulation sim,
     Tolerance tolerance,
-  })
-      : xSim = sim,
+  })  : xSim = sim,
         ySim = sim,
         super(tolerance: tolerance);
 
@@ -126,8 +124,7 @@ class IndependentRectSim extends Sim<Rect> {
     @required this.positionSim,
     FractionalOffset origin,
     Tolerance tolerance,
-  })
-      : origin = origin ?? FractionalOffset.center,
+  })  : origin = origin ?? FractionalOffset.center,
         super(tolerance: tolerance);
 
   /// The Size Sim

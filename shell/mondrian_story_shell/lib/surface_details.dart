@@ -8,7 +8,7 @@ import 'package:flutter/rendering.dart';
 class SurfaceProperties {
   /// Const constructor
   SurfaceProperties(
-      {this.constraints: const BoxConstraints(), this.containerLabel});
+      {this.constraints = const BoxConstraints(), this.containerLabel});
 
   /// Recommended Min/Max size constraints
   final BoxConstraints constraints;

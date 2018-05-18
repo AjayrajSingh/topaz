@@ -21,7 +21,7 @@ class EddystoneScreen extends StatefulWidget {
   _EddystoneState createState() => new _EddystoneState();
 }
 
-typedef void RemoveCallback();
+typedef RemoveCallback = void Function();
 
 class AdvertisedListItem extends StatelessWidget {
   AdvertisedListItem({this.url, this.onRemove})

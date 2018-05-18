@@ -143,9 +143,10 @@ class InterfaceInfo {
               0xfe80);
 
   /// Returns true if there is an IpV4 address.
-  bool get hasIpV4 => (!_isLo &&
+  bool get hasIpV4 =>
+      !_isLo &&
       (_interface.addr.ipv4?.addr?.length ?? 0) == 4 &&
-      _interface.addr.ipv4.addr[0] != 0);
+      _interface.addr.ipv4.addr[0] != 0;
 
   /// Returns true if this interface is the local interface
   bool get _isLo => _interface.hwaddr.every((int value) => value == 0);

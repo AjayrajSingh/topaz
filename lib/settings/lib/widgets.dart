@@ -39,8 +39,12 @@ class SettingsPage extends StatelessWidget {
   final double scale;
 
   /// Constructor.
-  const SettingsPage(
-      {this.isLoading: false, this.title, @required this.scale, this.sections});
+  const SettingsPage({
+    @required this.scale,
+    this.isLoading = false,
+    this.title,
+    this.sections,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +60,7 @@ class SettingsPage extends StatelessWidget {
             child: new Container(
           width: 64.0,
           height: 64.0,
-          child: new FuchsiaSpinner(),
+          child: const FuchsiaSpinner(),
         )),
       ));
       return new Column(children: children);
@@ -171,14 +175,14 @@ class SettingsTile extends SettingsItem {
   final VoidCallback onTap;
 
   /// Constructs a new settings item
-  const SettingsTile(
-      {@required this.text,
-      this.assetUrl,
-      this.iconData,
-      this.description,
-      this.onTap,
-      @required double scale})
-      : super(scale);
+  const SettingsTile({
+    @required this.text,
+    @required double scale,
+    this.assetUrl,
+    this.iconData,
+    this.description,
+    this.onTap,
+  }) : super(scale);
 
   @override
   Widget build(BuildContext context) {

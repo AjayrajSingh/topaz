@@ -23,7 +23,7 @@ class KernelPanic extends StatelessWidget {
   final VoidCallback onDismiss;
 
   /// Constructor.
-  const KernelPanic({Key key, @required this.kernelPanic, this.onDismiss})
+  const KernelPanic({@required this.kernelPanic, Key key, this.onDismiss})
       : super(key: key);
 
   @override
@@ -46,25 +46,25 @@ class KernelPanic extends StatelessWidget {
                             children: <Widget>[
                               new Text(
                                 'Panic occurred at $_kBootTimeStamp',
-                                style: new TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'RobotoMono',
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              new Divider(color: Colors.white),
-                              new Text(
+                              const Divider(color: Colors.white),
+                              const Text(
                                 'Tap anywhere to dismiss.',
-                                style: new TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'RobotoMono',
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              new Divider(color: Colors.white),
+                              const Divider(color: Colors.white),
                               new Text(
                                 kernelPanic,
-                                style: new TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'RobotoMono',
                                   fontWeight: FontWeight.w500,

@@ -5,10 +5,10 @@
 import 'package:fidl_modular/fidl.dart';
 
 /// Called when the story with [storyInfo] has changed.
-typedef void OnStoryChanged(StoryInfo storyInfo, StoryState state);
+typedef OnStoryChanged = void Function(StoryInfo storyInfo, StoryState state);
 
 /// Called when the story with [storyId] has been deleted.
-typedef void OnStoryDeleted(String storyId);
+typedef OnStoryDeleted = void Function(String storyId);
 
 /// Watches for changes to the [StoryProvider].
 class StoryProviderWatcherImpl extends StoryProviderWatcher {

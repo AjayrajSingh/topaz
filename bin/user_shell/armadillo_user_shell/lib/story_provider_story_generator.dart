@@ -428,8 +428,8 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
           // Ignore if we're going back in time.
           if (lastInteraction.isAfter(story.lastInteraction)) {
             bool lastInteractionChanged =
-                (lastInteraction != story.lastInteraction ||
-                    lastInteraction != storyCluster.lastInteraction);
+                lastInteraction != story.lastInteraction ||
+                    lastInteraction != storyCluster.lastInteraction;
             story.lastInteraction = lastInteraction;
             storyCluster.lastInteraction = lastInteraction;
             if (lastInteractionChanged) {
@@ -442,7 +442,7 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
     _onLinkUpdate();
   }
 
-  void _removeStory(String storyId, {bool notify: true}) {
+  void _removeStory(String storyId, {bool notify = true}) {
     if (_storyControllerMap.containsKey(storyId)) {
       _storyControllerMap[storyId].ctrl.close();
       _storyControllerMap.remove(storyId);
@@ -580,7 +580,7 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
         lastInteraction: new DateTime.fromMicrosecondsSinceEpoch(
           (storyInfo.lastFocusTime / 1000).round(),
         ),
-        cumulativeInteractionDuration: new Duration(
+        cumulativeInteractionDuration: const Duration(
           minutes: 0,
         ),
         themeColor:

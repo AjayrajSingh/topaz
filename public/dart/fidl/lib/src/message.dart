@@ -79,4 +79,4 @@ class Message {
   }
 }
 
-typedef void MessageSink(Message message);
+typedef MessageSink = void Function(Message message);

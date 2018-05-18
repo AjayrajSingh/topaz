@@ -8,7 +8,7 @@ import 'package:args/command_runner.dart';
 import 'package:path/path.dart' as path;
 
 /// Function signature for a log printer.
-typedef void LogPrinter(String msg);
+typedef LogPrinter = void Function(String msg);
 
 /// The mod tool command runner.
 class ModCommandRunner extends CommandRunner<Null> {

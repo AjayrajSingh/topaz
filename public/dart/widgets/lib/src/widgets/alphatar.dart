@@ -55,10 +55,9 @@ class Alphatar extends StatelessWidget {
     Key key,
     this.avatarImage,
     @ExampleValue('G') this.letter,
-    @sizeParam this.size: 40.0,
+    @sizeParam this.size = 40.0,
     Color backgroundColor,
-  })
-      : backgroundColor = backgroundColor ?? _pickRandomColor(),
+  })  : backgroundColor = backgroundColor ?? _pickRandomColor(),
         assert(avatarImage != null || letter != null),
         super(key: key);
 
@@ -69,9 +68,9 @@ class Alphatar extends StatelessWidget {
     Key key,
     String avatarUrl,
     String letter,
-    double size: 40.0,
+    double size = 40.0,
     Color backgroundColor,
-    bool retry: true,
+    bool retry = true,
   }) {
     assert(avatarUrl != null || letter != null);
     assert(retry != null);
@@ -102,10 +101,10 @@ class Alphatar extends StatelessWidget {
 
   /// Creates a new [Alphatar] based on the given name.
   factory Alphatar.fromName({
-    Key key,
     @required String name,
+    Key key,
     Image avatarImage,
-    double size: 40.0,
+    double size = 40.0,
     Color backgroundColor,
   }) {
     assert(name != null);
@@ -120,12 +119,12 @@ class Alphatar extends StatelessWidget {
 
   /// Creates a new [Alphatar] based on the given name and avatar image url.
   factory Alphatar.fromNameAndUrl({
-    Key key,
     @required String name,
     @required String avatarUrl,
-    double size: 40.0,
+    Key key,
+    double size = 40.0,
     Color backgroundColor,
-    bool retry: true,
+    bool retry = true,
   }) {
     assert(name != null);
     return new Alphatar.withUrl(

@@ -24,10 +24,6 @@ import 'wallpaper_chooser.dart';
 
 const String _kLocationTopic = 'location/home_work';
 
-typedef void _OnContextUpdated(Map<String, String> context);
-typedef void _OnUserUpdated(String userName, String userImageUrl);
-typedef void _OnStop();
-
 /// Connects [UserShell]'s services to Armadillo's associated classes.
 class ArmadilloUserShellModel extends UserShellModel {
   /// Receives the [StoryProvider].
@@ -50,10 +46,10 @@ class ArmadilloUserShellModel extends UserShellModel {
   final UserLogoutter userLogoutter;
 
   /// Called when the context updates.
-  final _OnContextUpdated onContextUpdated;
+  final void Function(Map<String, String> context) onContextUpdated;
 
   /// Called when the user information changes
-  final _OnUserUpdated onUserUpdated;
+  final void Function(String userName, String userImageUrl) onUserUpdated;
 
   /// The list of context topics to listen for changes to.
   final List<String> contextTopics;
@@ -71,7 +67,7 @@ class ArmadilloUserShellModel extends UserShellModel {
   final WallpaperChooser _wallpaperChooser;
 
   /// Called when the [UserShell] stops.
-  final _OnStop onUserShellStopped;
+  final void Function() onUserShellStopped;
 
   /// Allows control over various presentation parameters, such as lighting.
   final PresentationProxy _presentation = new PresentationProxy();
@@ -87,11 +83,10 @@ class ArmadilloUserShellModel extends UserShellModel {
     this.userLogoutter,
     this.onContextUpdated,
     this.onUserUpdated,
-    this.contextTopics: const <String>[],
+    this.contextTopics = const <String>[],
     this.onUserShellStopped,
     ValueChanged<List<String>> onWallpaperChosen,
-  })
-      : _wallpaperChooser = new WallpaperChooser(
+  })  : _wallpaperChooser = new WallpaperChooser(
           onWallpaperChosen: onWallpaperChosen,
         ),
         super(applicationContext: applicationContext);
@@ -237,7 +232,7 @@ class ArmadilloUserShellModel extends UserShellModel {
 }
 
 class _ContextListenerImpl extends ContextListener {
-  final _OnContextUpdated onContextUpdated;
+  final void Function(Map<String, String> context) onContextUpdated;
 
   _ContextListenerImpl(this.onContextUpdated);
 

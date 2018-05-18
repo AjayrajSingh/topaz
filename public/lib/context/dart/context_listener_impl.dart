@@ -6,7 +6,7 @@ import 'package:fidl_modular/fidl.dart';
 import 'package:fidl/fidl.dart';
 
 /// Signature for callbacks that handle context updates.
-typedef void UpdateCallback(ContextUpdate value);
+typedef UpdateCallback = void Function(ContextUpdate value);
 
 /// Functional wrapper class for [ContextListener], using callbacks to
 /// implement interface methods.

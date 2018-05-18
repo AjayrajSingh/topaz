@@ -15,7 +15,7 @@ const Curve _scaleCurve = Curves.fastOutSlowIn;
 class SurfaceFrame extends StatelessWidget {
   /// Constructor
   const SurfaceFrame(
-      {Key key, this.child, this.interactable: true, this.depth: 0.0})
+      {Key key, this.child, this.interactable = true, this.depth = 0.0})
       : assert(-1.0 <= depth && depth <= 1.0),
         super(key: key);
 

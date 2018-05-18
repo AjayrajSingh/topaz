@@ -83,7 +83,7 @@ const double _kSearchBoxRelativeElevation = 3 * _kElevationStep;
 final BorderRadius _kAlbumMakerBorderRadius = new BorderRadius.circular(16.0);
 final BorderRadius _kPhotoListBorderRadius = new BorderRadius.circular(16.0);
 final BorderRadius _kSearchBoxBorderRadius = new BorderRadius.circular(8.0);
-final BorderRadius _kVideoPlayerBorderRadius = new BorderRadius.only(
+const BorderRadius _kVideoPlayerBorderRadius = const BorderRadius.only(
   bottomLeft: const Radius.circular(16.0),
   bottomRight: const Radius.circular(16.0),
 );
@@ -358,7 +358,7 @@ class _Video extends StatelessWidget {
           }
         },
         child: videoModel.controller.videoViewConnection == null
-            ? new Center(child: new FuchsiaSpinner())
+            ? const Center(child: const FuchsiaSpinner())
             : new ChildView(
                 connection: videoModel.controller.videoViewConnection,
               ),
@@ -418,7 +418,7 @@ class _VideoTime extends StatelessWidget {
         ),
         child: new Text(
           _toTimeString(time),
-          style: new TextStyle(
+          style: const TextStyle(
             fontSize: _kVideoPlayerTextSize,
             color: Colors.white,
             fontFamily: 'RobotoRegular',
@@ -483,12 +483,12 @@ class _VideoProgress extends StatelessWidget {
 
 class _AutoMagicButton extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => new PhysicalModel(
+  Widget build(BuildContext context) => const PhysicalModel(
         shape: BoxShape.circle,
         color: _kAutoMagicButtonBackgroundColor,
         elevation: _kAutoMagicElevation,
-        child: new Center(
-          child: new Icon(
+        child: const Center(
+          child: const Icon(
             Icons.create,
             color: Colors.white,
             size: _kAutoMagicIconSize,
@@ -546,9 +546,9 @@ class _AlbumMaker extends StatelessWidget {
             ),
 
             // The sun.
-            new Positioned.fill(
+            const Positioned.fill(
               bottom: _kSunBottomOffset,
-              child: new Align(
+              child: const Align(
                 alignment: FractionalOffset.bottomCenter,
                 child: const _Sun(elevation: _kSunRelativeElevation),
               ),
@@ -644,9 +644,9 @@ class _PhotoList extends StatelessWidget {
                 'packages/perspective/res/module-b-gallery-photos/4.png',
                 fit: BoxFit.fitWidth,
               ),
-              new Positioned.fill(
-                child: new Center(
-                  child: new Icon(
+              const Positioned.fill(
+                child: const Center(
+                  child: const Icon(
                     Icons.play_circle_filled,
                     color: Colors.white,
                     size: _kPhotoListVideoIconSize,
@@ -734,15 +734,15 @@ class _PhotoListHeader extends StatelessWidget {
         color: _kPhotoListTitleColor,
         child: new Stack(
           children: <Widget>[
-            new Align(
+            const Align(
               alignment: FractionalOffset.centerLeft,
-              child: new Padding(
+              child: const Padding(
                 padding: const EdgeInsets.only(
                   left: _kPhotoListTitleLeftPadding,
                 ),
-                child: new Text(
+                child: const Text(
                   'Capture.',
-                  style: new TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: _kPhotoListTitleFontSize,
                     fontFamily: 'RobotoMedium',
@@ -758,19 +758,19 @@ class _PhotoListHeader extends StatelessWidget {
                 ),
                 child: new Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    new Text(
+                  children: const <Widget>[
+                    const Text(
                       'French Polynesia',
-                      style: new TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: _kPhotoListDescriptionFontSize,
                         fontFamily: 'Roboto',
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    new Text(
+                    const Text(
                       'June 2017',
-                      style: new TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: _kPhotoListDescriptionFontSize,
                         fontFamily: 'RobotoRegular',

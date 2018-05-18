@@ -39,15 +39,14 @@ class ChatConversation extends StatefulWidget {
   /// Constructor
   const ChatConversation({
     Key key,
-    this.enabled: true,
+    this.enabled = true,
     @required this.sections,
     this.title,
     this.onSubmitMessage,
     this.onTapSharePhoto,
     this.onTapInfo,
     this.scrollController,
-  })
-      : assert(enabled != null),
+  })  : assert(enabled != null),
         assert(sections != null),
         super(key: key);
 

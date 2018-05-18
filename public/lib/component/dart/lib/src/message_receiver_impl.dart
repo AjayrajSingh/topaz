@@ -10,7 +10,8 @@ import 'package:meta/meta.dart';
 /// must call on receipt of the message. This callback will have the same
 /// signature as [MessageReader.onReceive] fidl method (see its documentation
 /// for details).
-typedef void MessageReceiverCallback(String message, void ack());
+typedef MessageReceiverCallback = void Function(
+    String message, void Function() ack);
 
 /// Helper class for receiving messages on a given message queue.
 class MessageReceiverImpl extends MessageReader {
@@ -22,14 +23,13 @@ class MessageReceiverImpl extends MessageReader {
   MessageReceiverImpl({
     @required MessageQueue messageQueue,
     @required MessageReceiverCallback onReceiveMessage,
-  })
-      : _onReceiveMessage = onReceiveMessage {
+  }) : _onReceiveMessage = onReceiveMessage {
     messageQueue.registerReceiver(_binding.wrap(this));
   }
 
   /// Not public; it simply implements [MessageReader.onReceive].
   @override
-  void onReceive(String message, void ack()) {
+  void onReceive(String message, void Function() ack) {
     _onReceiveMessage?.call(message, ack);
   }
 

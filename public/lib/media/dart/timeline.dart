@@ -20,8 +20,8 @@ class TimelineRate {
 
   /// Constructs a TimelineRate from a subject delta and a reference delta.
   factory TimelineRate({
-    int subjectDelta: 0,
-    int referenceDelta: 1,
+    int subjectDelta = 0,
+    int referenceDelta = 1,
   }) {
     assert(referenceDelta != 0);
     int gcd = subjectDelta.gcd(referenceDelta);
@@ -96,9 +96,9 @@ class TimelineFunction {
   /// Constructs a TimelineFunction from a pair of correlated values and a
   /// TimelineRate.
   const TimelineFunction({
-    this.subjectTime: 0,
-    this.referenceTime: 0,
-    this.rate: TimelineRate.zero,
+    this.subjectTime = 0,
+    this.referenceTime = 0,
+    this.rate = TimelineRate.zero,
   });
 
   /// Constructs a TimelineFunction from a FIDL TimelineTransform struct.

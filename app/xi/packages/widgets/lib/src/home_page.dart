@@ -8,19 +8,18 @@ import 'package:meta/meta.dart';
 import 'editor.dart';
 
 /// Callback for when the FAB is pressed.
-typedef void HomePageFabPressed();
+typedef HomePageFabPressed = void Function();
 
 /// Example [Widget] that shows a button to ping xi-core and display a
 /// [message]. [HomePage] is the
 class HomePage extends StatefulWidget {
   /// [HomePage] constructor.
   const HomePage({
-    Key key,
-    this.title: 'Home Page',
-    this.message: '',
     @required this.onFabPressed,
-  })
-      : assert(onFabPressed != null),
+    Key key,
+    this.title = 'Home Page',
+    this.message = '',
+  })  : assert(onFabPressed != null),
         super(key: key);
 
   /// Callback for when the [FloatingActionButton] child [Widget] is pressed.
@@ -55,7 +54,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: new FloatingActionButton(
         onPressed: handleFabPressed,
         tooltip: 'Ping xi-core',
-        child: new Icon(Icons.refresh),
+        child: const Icon(Icons.refresh),
       ),
     );
   }

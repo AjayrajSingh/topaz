@@ -62,10 +62,11 @@ double getSpanSpan(double initialSpan, int index, int count) {
 }
 
 /// Returns the results of [Panel.split]
-typedef void PanelSplitResultCallback(Panel a, Panel b);
+typedef PanelSplitResultCallback = void Function(Panel a, Panel b);
 
 /// Returns the results of [Panel.absorb]
-typedef void PanelAbsorbedResultCallback(Panel combined, Panel remainder);
+typedef PanelAbsorbedResultCallback = void Function(
+    Panel combined, Panel remainder);
 
 /// A representation of a sub-area of a 1.0 x 1.0 grid with gridlines every
 /// 1.0 / [_kGridLines].
@@ -84,11 +85,10 @@ class Panel {
   /// [origin]'s dx + [widthFactor] and [origin]'s dy + [heightFactor] both must
   /// be in the range [0.0, 1.0].
   Panel({
-    FractionalOffset origin: FractionalOffset.topLeft,
-    double heightFactor: 1.0,
-    double widthFactor: 1.0,
-  })
-      : _origin = new FractionalOffset(
+    FractionalOffset origin = FractionalOffset.topLeft,
+    double heightFactor = 1.0,
+    double widthFactor = 1.0,
+  })  : _origin = new FractionalOffset(
           toGridValue(origin.dx),
           toGridValue(origin.dy),
         ),
@@ -241,7 +241,7 @@ class Panel {
   }
 
   /// Returns true if [other's] origin aligns with [_origin] in an axis.
-  bool isOriginAligned(Panel other) => (left == other.left || top == other.top);
+  bool isOriginAligned(Panel other) => left == other.left || top == other.top;
 
   /// Returns true if [isOriginAligned] returns true and [other] shares
   /// an edge with this panel.
@@ -340,7 +340,7 @@ class Panel {
 
     Rect intersection = fractionalRect.intersect(otherFractionalRect);
 
-    return (intersection.width > 0.0 && intersection.height > 0.0);
+    return intersection.width > 0.0 && intersection.height > 0.0;
   }
 
   /// Returns true if [other] is above `this` [Panel].

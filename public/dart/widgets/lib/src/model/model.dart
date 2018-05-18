@@ -56,7 +56,7 @@ class ModelFinder<T extends Model> {
   ///
   /// [Widget]s who call [of] with a [rebuildOnChange] of true will be rebuilt
   /// whenever there's a change to the returned model.
-  T of(BuildContext context, {bool rebuildOnChange: false}) {
+  T of(BuildContext context, {bool rebuildOnChange = false}) {
     // ignore: prefer_const_constructors
     final Type type = new _InheritedModel<T>.forRuntimeType().runtimeType;
     Widget widget = rebuildOnChange
@@ -145,11 +145,11 @@ class _InheritedModel<T extends Model> extends InheritedWidget {
 
   @override
   bool updateShouldNotify(_InheritedModel<T> oldWidget) =>
-      (oldWidget.version != version);
+      oldWidget.version != version;
 }
 
 /// Builds a child for a [ScopedModelDescendant].
-typedef Widget ScopedModelDescendantBuilder<T extends Model>(
+typedef ScopedModelDescendantBuilder<T extends Model> = Widget Function(
   BuildContext context,
   Widget child,
   T model,

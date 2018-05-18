@@ -30,15 +30,14 @@ abstract class SelectableItem extends StatelessWidget {
 
   /// Constructor
   const SelectableItem({
-    Key key,
     @required this.doc,
     @required this.selected,
+    Key key,
     this.onPressed,
     this.onDoubleTap,
     this.onLongPress,
     this.hideCheckbox,
-  })
-      : assert(doc != null),
+  })  : assert(doc != null),
         assert(selected != null),
         super(key: key);
 }

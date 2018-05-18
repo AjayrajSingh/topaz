@@ -22,8 +22,7 @@ class SurfaceForm {
     VoidCallback onDragStarted,
     DragCallback onDrag,
     DragCallback onDragFinished,
-  })
-      : this.withParts(
+  }) : this.withParts(
             key: key,
             parts: <Widget, Rect>{child: Offset.zero & position.size},
             position: position,
@@ -41,14 +40,13 @@ class SurfaceForm {
     @required this.parts,
     @required this.position,
     @required this.initPosition,
-    this.depth: 0.0,
+    this.depth = 0.0,
     DragFriction friction,
     VoidCallback onPositioned,
     VoidCallback onDragStarted,
     DragCallback onDrag,
     DragCallback onDragFinished,
-  })
-      : dragFriction = friction ?? kDragFrictionNone,
+  })  : dragFriction = friction ?? kDragFrictionNone,
         onPositioned = onPositioned ?? (() {}),
         onDragStarted = onDragStarted ?? (() {}),
         onDrag = onDrag ?? kDragCallbackNone,
@@ -93,7 +91,7 @@ class SurfaceForm {
 /// offset: the form offset vector from the target position
 /// delta: the incremental manipulation vector
 /// returns the form incremental offset
-typedef Offset DragFriction(Offset offset, Offset delta);
+typedef DragFriction = Offset Function(Offset offset, Offset delta);
 
 /// No friction. Moves exactly with cursor.
 Offset kDragFrictionNone(Offset offset, Offset delta) => delta;
@@ -102,7 +100,7 @@ Offset kDragFrictionNone(Offset offset, Offset delta) => delta;
 Offset kDragFrictionInfinite(Offset offset, Offset delta) => Offset.zero;
 
 /// The position of the form relative to its target position.
-typedef void DragCallback(Offset offset, Velocity velocity);
+typedef DragCallback = void Function(Offset offset, Velocity velocity);
 
 /// No callback.
 void kDragCallbackNone(Offset offset, Velocity velocity) {}

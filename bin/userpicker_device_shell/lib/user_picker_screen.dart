@@ -176,10 +176,10 @@ class _UserRemovalTargetState extends State<_UserRemovalTarget>
                         lerpDouble(0, 100.0, _scaleCurvedAnimation.value)
                             .toInt()),
                   ),
-                  child: new Center(
-                    child: new Text(
+                  child: const Center(
+                    child: const Text(
                       'REMOVE',
-                      style: new TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16.0,
                       ),

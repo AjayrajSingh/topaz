@@ -15,7 +15,7 @@ import './multi_select_header.dart';
 import './thumbnail.dart';
 
 /// Function to call when we toggle on the Image Preview
-typedef void OnPreviewImageToggled(bool show);
+typedef OnPreviewImageToggled = void Function(bool show);
 
 /// Document Browser
 class Browser extends StatelessWidget {

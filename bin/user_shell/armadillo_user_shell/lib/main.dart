@@ -55,10 +55,10 @@ Future<Null> main() async {
 
 /// Builds the armadillo user shell.
 Widget buildArmadilloUserShell({
-  String logName: 'armadillo',
   @required SizeModel sizeModel,
   @required ConductorModel conductorModel,
   @required ApplicationContext applicationContext,
+  String logName = 'armadillo',
 }) {
   setupLogger(name: logName);
 
@@ -152,8 +152,7 @@ Widget buildArmadilloUserShell({
   );
 
   TimezoneProxy timezoneProxy = new TimezoneProxy();
-  connectToService(
-      applicationContext.environmentServices, timezoneProxy.ctrl);
+  connectToService(applicationContext.environmentServices, timezoneProxy.ctrl);
 
   ContextProviderContextModel contextProviderContextModel =
       new ContextProviderContextModel(
@@ -391,11 +390,11 @@ Widget _buildPerformanceOverlay({Widget child}) => new Stack(
           right: 0.0,
           child: new IgnorePointer(child: new PerformanceOverlay.allEnabled()),
         ),
-        new Align(
+        const Align(
           alignment: FractionalOffset.topCenter,
-          child: new Text(
+          child: const Text(
             'User shell performance',
-            style: new TextStyle(color: Colors.black),
+            style: const TextStyle(color: Colors.black),
           ),
         ),
       ],

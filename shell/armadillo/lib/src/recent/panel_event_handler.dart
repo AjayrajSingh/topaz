@@ -33,7 +33,7 @@ class PanelEventHandler {
   void onLeaveCluster({
     BuildContext context,
     StoryCluster storyCluster,
-    bool preview: false,
+    bool preview = false,
   }) {
     if (preview) {
       targetStoryCluster.removePreviews();
@@ -99,7 +99,7 @@ class PanelEventHandler {
   void onAddClusterToLeftOfPanels({
     BuildContext context,
     StoryCluster storyCluster,
-    bool preview: false,
+    bool preview = false,
   }) {
     targetStoryCluster.displayMode = DisplayMode.panels;
 
@@ -123,7 +123,7 @@ class PanelEventHandler {
       panels: targetStoryCluster.panels
           .where((Panel panel) => panel.left == 0)
           .toList(),
-      leftDelta: (_kAddedStorySpan * storiesToAdd.length),
+      leftDelta: _kAddedStorySpan * storiesToAdd.length,
       widthFactorDelta: -(_kAddedStorySpan * storiesToAdd.length),
     );
 
@@ -148,8 +148,8 @@ class PanelEventHandler {
   void onAddClusterToRightOfPanels({
     BuildContext context,
     StoryCluster storyCluster,
-    bool preview: false,
-    DisplayMode displayMode: DisplayMode.panels,
+    bool preview = false,
+    DisplayMode displayMode = DisplayMode.panels,
   }) {
     targetStoryCluster.displayMode = displayMode;
 
@@ -197,7 +197,7 @@ class PanelEventHandler {
   void onAddClusterAbovePanels({
     BuildContext context,
     StoryCluster storyCluster,
-    bool preview: false,
+    bool preview = false,
   }) {
     targetStoryCluster.displayMode = DisplayMode.panels;
 
@@ -221,7 +221,7 @@ class PanelEventHandler {
       panels: targetStoryCluster.panels
           .where((Panel panel) => panel.top == 0.0)
           .toList(),
-      topDelta: (_kAddedStorySpan * storiesToAdd.length),
+      topDelta: _kAddedStorySpan * storiesToAdd.length,
       heightFactorDelta: -(_kAddedStorySpan * storiesToAdd.length),
     );
 
@@ -246,7 +246,7 @@ class PanelEventHandler {
   void onAddClusterBelowPanels({
     BuildContext context,
     StoryCluster storyCluster,
-    bool preview: false,
+    bool preview = false,
   }) {
     targetStoryCluster.displayMode = DisplayMode.panels;
 
@@ -301,7 +301,7 @@ class PanelEventHandler {
     BuildContext context,
     StoryCluster storyCluster,
     StoryId storyId,
-    bool preview: false,
+    bool preview = false,
   }) {
     targetStoryCluster.displayMode = DisplayMode.panels;
 
@@ -333,7 +333,7 @@ class PanelEventHandler {
     // 2) Make room for new stories.
     _makeRoom(
       panels: <Panel>[panel],
-      leftDelta: (_kAddedStorySpan * storiesToAdd.length),
+      leftDelta: _kAddedStorySpan * storiesToAdd.length,
       widthFactorDelta: -(_kAddedStorySpan * storiesToAdd.length),
     );
 
@@ -352,7 +352,7 @@ class PanelEventHandler {
     BuildContext context,
     StoryCluster storyCluster,
     StoryId storyId,
-    bool preview: false,
+    bool preview = false,
   }) {
     targetStoryCluster.displayMode = DisplayMode.panels;
 
@@ -402,7 +402,7 @@ class PanelEventHandler {
     BuildContext context,
     StoryCluster storyCluster,
     StoryId storyId,
-    bool preview: false,
+    bool preview = false,
   }) {
     targetStoryCluster.displayMode = DisplayMode.panels;
 
@@ -434,7 +434,7 @@ class PanelEventHandler {
     // 2) Make room for new stories.
     _makeRoom(
       panels: <Panel>[panel],
-      topDelta: (_kAddedStorySpan * storiesToAdd.length),
+      topDelta: _kAddedStorySpan * storiesToAdd.length,
       heightFactorDelta: -(_kAddedStorySpan * storiesToAdd.length),
     );
 
@@ -453,7 +453,7 @@ class PanelEventHandler {
     BuildContext context,
     StoryCluster storyCluster,
     StoryId storyId,
-    bool preview: false,
+    bool preview = false,
   }) {
     targetStoryCluster.displayMode = DisplayMode.panels;
 
@@ -560,10 +560,10 @@ class PanelEventHandler {
   /// Resizes the existing panels just enough to add new ones.
   void _makeRoom({
     List<Panel> panels,
-    double topDelta: 0.0,
-    double leftDelta: 0.0,
-    double widthFactorDelta: 0.0,
-    double heightFactorDelta: 0.0,
+    double topDelta = 0.0,
+    double leftDelta = 0.0,
+    double widthFactorDelta = 0.0,
+    double heightFactorDelta = 0.0,
   }) {
     for (Panel panel in panels) {
       targetStoryCluster.replace(

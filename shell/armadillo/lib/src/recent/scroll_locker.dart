@@ -58,7 +58,7 @@ class ScrollLockerModel extends Model {
 
 class _LockingScrollBehavior extends ScrollBehavior {
   final bool lock;
-  const _LockingScrollBehavior({this.lock: false});
+  const _LockingScrollBehavior({this.lock = false});
 
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) => lock

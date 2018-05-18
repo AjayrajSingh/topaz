@@ -23,11 +23,10 @@ class ParticipantsSection extends StatelessWidget {
   /// Creates a new instance of [ParticipantsSection].
   const ParticipantsSection({
     Key key,
-    this.editingEnabled: false,
+    this.editingEnabled = false,
     this.onAddTapped,
     this.onRemoveTapped,
-  })
-      : assert(editingEnabled != null),
+  })  : assert(editingEnabled != null),
         super(key: key);
 
   @override

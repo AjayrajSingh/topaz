@@ -16,8 +16,8 @@ class ChannelReaderError {
   String toString() => error.toString();
 }
 
-typedef void ChannelReaderReadableHandler();
-typedef void ChannelReaderErrorHandler(ChannelReaderError error);
+typedef ChannelReaderReadableHandler = void Function();
+typedef ChannelReaderErrorHandler = void Function(ChannelReaderError error);
 
 class ChannelReader {
   Channel get channel => _channel;

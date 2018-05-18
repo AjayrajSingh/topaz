@@ -10,4 +10,4 @@ abstract class Enum {
   int get value;
 }
 
-typedef T EnumFactory<T>(int value);
+typedef EnumFactory<T> = T Function(int value);

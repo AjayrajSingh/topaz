@@ -25,7 +25,7 @@ class ContactActivity extends StatelessWidget {
           margin: const EdgeInsets.only(left: 10.0, bottom: 8.0),
           child: new Text(
             _kActivityTitle.toUpperCase(),
-            style: new TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 20.0,
               fontWeight: FontWeight.bold,

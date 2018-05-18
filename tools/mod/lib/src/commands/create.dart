@@ -78,7 +78,7 @@ The project name must be lowercase_with_underscores.
       templateValues['project_name'],
     );
 
-    if (await FileSystemEntity.type(projectPath) !=
+    if (FileSystemEntity.typeSync(projectPath) !=
         FileSystemEntityType.notFound) {
       throw new UsageException('"$projectName" already exists.', usage);
     }

@@ -73,10 +73,9 @@ class LabelText extends StatelessWidget {
 
   /// Constructor
   const LabelText({
-    Key key,
     @required this.text,
-  })
-      : assert(text != null),
+    Key key,
+  })  : assert(text != null),
         super(key: key);
 
   @override

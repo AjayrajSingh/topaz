@@ -14,8 +14,6 @@ import 'src/widgets/info.dart';
 
 final DocumentsIdEntityCodec _kDocumentsIdsCodec = new DocumentsIdEntityCodec();
 
-typedef void _DocumentResolver(DocumentsIdEntityData data);
-
 void main() {
   setupLogger(name: 'documents_info');
 
@@ -59,7 +57,8 @@ void main() {
   );
 }
 
-_DocumentResolver _makeDocumentResolver(doc_fidl.DocumentInterfaceProxy proxy,
+void Function(DocumentsIdEntityData data) _makeDocumentResolver(
+    doc_fidl.DocumentInterfaceProxy proxy,
     ValueModel<doc_fidl.Document> model) {
   void resolver(DocumentsIdEntityData data) {
     proxy.getMetadata(data.id, (doc_fidl.Document doc) {

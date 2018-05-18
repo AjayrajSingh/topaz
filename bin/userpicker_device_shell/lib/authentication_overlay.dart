@@ -10,7 +10,7 @@ import 'authentication_overlay_model.dart';
 
 /// Signature for callback used to indicate that the user cancelled the authorization
 /// flow.
-typedef void AuthenticationCancelCallback();
+typedef AuthenticationCancelCallback = void Function();
 
 /// Displays the authentication window.
 class AuthenticationOverlay extends StatelessWidget {

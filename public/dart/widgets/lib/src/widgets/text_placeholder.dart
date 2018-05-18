@@ -12,9 +12,8 @@ class TextPlaceholder extends StatelessWidget {
   /// Constructor
   const TextPlaceholder({
     @required this.style,
-    this.width: 80.0,
-  })
-      : assert(style != null);
+    this.width = 80.0,
+  }) : assert(style != null);
 
   /// Style of the text that this placeholder is used for
   final TextStyle style;

@@ -116,7 +116,7 @@ class _Entry extends StatelessWidget {
   final String prefix;
   final String value;
 
-  const _Entry({this.indentLevel, this.prefix: '', this.value: ''});
+  const _Entry({this.indentLevel, this.prefix = '', this.value = ''});
 
   @override
   Widget build(BuildContext context) {

@@ -56,11 +56,11 @@ class _RenderBox extends RenderBox {
 
 class _Layer extends Layer {
   _Layer({
-    this.offset: Offset.zero,
-    this.width: 0.0,
-    this.height: 0.0,
+    this.offset = Offset.zero,
+    this.width = 0.0,
+    this.height = 0.0,
     this.sceneHost,
-    this.hitTestable: true,
+    this.hitTestable = true,
   });
 
   /// Offset from parent in the parent's coordinate system.

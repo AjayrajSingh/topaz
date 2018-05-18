@@ -28,7 +28,7 @@ export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
 /// Called when something related to [storyCluster] happens.
-typedef void OnStoryClusterEvent(StoryCluster storyCluster);
+typedef OnStoryClusterEvent = void Function(StoryCluster storyCluster);
 
 /// A data model representing a list of [Story]s.
 class StoryCluster {
@@ -232,7 +232,7 @@ class StoryCluster {
   int get hashCode => id.hashCode;
 
   @override
-  bool operator ==(Object other) => (other is StoryCluster && other.id == id);
+  bool operator ==(Object other) => other is StoryCluster && other.id == id;
 
   @override
   String toString() {
@@ -457,7 +457,7 @@ class StoryCluster {
 
   /// Maximizes the story bars for all the stories within the cluster.
   /// See [Story.maximizeStoryBar].
-  void maximizeStoryBars({bool jumpToFinish: false}) {
+  void maximizeStoryBars({bool jumpToFinish = false}) {
     for (Story story in stories) {
       story.maximizeStoryBar(jumpToFinish: jumpToFinish);
     }
@@ -616,7 +616,7 @@ class StoryCluster {
 
   static Duration _getClusterCumulativeInteractionDuration(
       List<Story> stories) {
-    Duration largestDuration = new Duration();
+    Duration largestDuration = const Duration();
     for (Story story in stories.where((Story story) => !story.isPlaceHolder)) {
       if (largestDuration < story.cumulativeInteractionDuration) {
         largestDuration = story.cumulativeInteractionDuration;

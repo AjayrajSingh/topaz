@@ -56,8 +56,7 @@ class StoryPositioned extends StatelessWidget {
     this.currentSize,
     this.focusProgress,
     this.childContainerKey,
-  })
-      : assert(child != null);
+  }) : assert(child != null);
 
   @override
   Widget build(BuildContext context) =>
@@ -98,7 +97,7 @@ class StoryPositioned extends StatelessWidget {
                     fractionalTop: 0.0,
                     fractionalLeft: 0.0,
                     fractionalWidth: 1.0,
-                    fractionalHeight: (isFocused)
+                    fractionalHeight: isFocused
                         ? 1.0
                         : storyBarMaximizedHeight / currentSize.height,
                     size: currentSize,

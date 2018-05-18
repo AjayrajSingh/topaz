@@ -12,7 +12,8 @@ import 'model.dart';
 /// Frame for child views
 class MondrianChildView extends StatelessWidget {
   /// Constructor
-  const MondrianChildView({Key key, this.interactable: true}) : super(key: key);
+  const MondrianChildView({Key key, this.interactable = true})
+      : super(key: key);
 
   /// If true then ChildView hit tests will go through
   final bool interactable;

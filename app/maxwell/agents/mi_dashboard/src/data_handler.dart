@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:lib.app.dart/app.dart';
 
 /// Signature for method that sends WebSocket messages
-typedef void SendWebSocketMessage(String message);
+typedef SendWebSocketMessage = void Function(String message);
 
 /// Handles data.
 abstract class DataHandler {

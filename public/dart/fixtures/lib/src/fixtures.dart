@@ -58,7 +58,7 @@ class Fixtures {
   ///
   ///     Fixtures fixtures = new Fixtures(threshold: 5000);
   ///
-  Fixtures({this.nameThreshold: 1000});
+  Fixtures({this.nameThreshold = 1000});
 
   /// Gets the global [Uuid] generator.
   ///

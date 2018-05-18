@@ -13,7 +13,7 @@ import 'package:lib.settings/timezone_picker.dart';
 import 'user_setup_model.dart';
 
 /// Callback to cancel the authentication flow
-typedef void CancelAuthentication();
+typedef CancelAuthentication = void Function();
 
 /// Move to a common place?
 const double _kUserAvatarSizeLarge = 112.0;
@@ -26,7 +26,7 @@ Widget _buildUserActionButton({
   VoidCallback onTap,
   bool isSmall,
   double width,
-  bool isDisabled: false,
+  bool isDisabled = false,
 }) {
   return new GestureDetector(
     onTap: () => onTap?.call(),
@@ -73,7 +73,7 @@ class UserSetup extends StatelessWidget {
       ) {
         if (model.currentStage == SetupStage.notStarted ||
             model.currentStage == SetupStage.complete)
-          return new Offstage(offstage: true);
+          return const Offstage(offstage: true);
 
         return new Material(
             color: Colors.white,
@@ -104,7 +104,7 @@ class UserSetup extends StatelessWidget {
         leading: new IconButton(
             color: Colors.white,
             onPressed: model.previousStep,
-            icon: new Icon(Icons.arrow_back)),
+            icon: const Icon(Icons.arrow_back)),
         title: new Text(
           _stageTitles[model.currentStage] ?? 'Placeholder',
           style: _textStyle,
@@ -118,10 +118,10 @@ class UserSetup extends StatelessWidget {
                     ? new IconButton(
                         color: Colors.white,
                         onPressed: model.nextStep,
-                        icon: new Icon(Icons.arrow_forward))
+                        icon: const Icon(Icons.arrow_forward))
                     : new FlatButton(
                         color: Colors.blue,
-                        child: new Text('Finish Later', style: _whiteText),
+                        child: const Text('Finish Later', style: _whiteText),
                         onPressed: model.loginAsGuest,
                       )
               ])
@@ -162,10 +162,10 @@ class UserSetup extends StatelessWidget {
   static Widget _buildWelcomeScreen(
           BuildContext context, Widget child, UserSetupModel model) =>
       new Column(children: <Widget>[
-        new Padding(
-          padding: new EdgeInsets.only(top: 16.0),
+        const Padding(
+          padding: const EdgeInsets.only(top: 16.0),
         ),
-        new Text('Welcome',
+        const Text('Welcome',
             style: const TextStyle(
                 fontSize: 36.0,
                 color: Colors.black,
@@ -178,7 +178,7 @@ class UserSetup extends StatelessWidget {
                 currentTimezoneId: model.currentTimezone)),
         new IconButton(
           onPressed: model.nextStep,
-          icon: new Icon(Icons.arrow_forward),
+          icon: const Icon(Icons.arrow_forward),
         )
       ]);
 }

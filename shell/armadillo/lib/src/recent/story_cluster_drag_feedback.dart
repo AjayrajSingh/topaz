@@ -6,7 +6,6 @@ import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:armadillo/common.dart';
-import 'package:armadillo/overview.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -42,14 +41,13 @@ class StoryClusterDragFeedback extends StatefulWidget {
 
   /// Constructor.
   const StoryClusterDragFeedback({
-    Key key,
     @required this.overlayKey,
     @required this.storyCluster,
     @required this.localDragStartPoint,
     @required this.initialSize,
-    this.initDx: 0.0,
-  })
-      : assert(overlayKey != null),
+    Key key,
+    this.initDx = 0.0,
+  })  : assert(overlayKey != null),
         assert(storyCluster != null),
         assert(localDragStartPoint != null),
         assert(initialSize != null),

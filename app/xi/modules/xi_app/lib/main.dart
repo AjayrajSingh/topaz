@@ -12,6 +12,8 @@ import 'package:xi_widgets/widgets.dart';
 
 import 'src/xi_fuchsia_client.dart';
 
+/// ignore_for_file: avoid_annotating_with_dynamic
+
 void _log(String msg) {
   print('[xi_app] $msg');
 }

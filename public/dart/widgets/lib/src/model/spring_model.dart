@@ -18,7 +18,7 @@ class SpringModel extends TickingModel {
   RK4SpringSimulation _simulation;
 
   /// Constructor.
-  SpringModel({this.springDescription: _kSimulationDesc}) {
+  SpringModel({this.springDescription = _kSimulationDesc}) {
     _simulation = new RK4SpringSimulation(
       initValue: 0.0,
       desc: springDescription,
