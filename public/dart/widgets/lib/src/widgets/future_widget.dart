@@ -7,8 +7,8 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
-/// A Builder which is inkoked when the [FutureWidget] needs to display a
-/// child which which represents an error state.
+/// A Builder which is invoked when the [FutureWidget] needs to display a
+/// child which represents an error state.
 typedef Widget ErrorBuilder(BuildContext context, Error error);
 
 /// A widget that provides a [child] widget when it's [Future] completes.
