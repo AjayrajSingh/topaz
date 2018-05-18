@@ -92,7 +92,7 @@ class ChildViewConnection {
       ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable}) {
     final Services services = new Services();
-    final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo(
+    final LaunchInfo launchInfo = new LaunchInfo(
         url: url, directoryRequest: services.request());
     try {
       launcher.createApplication(launchInfo, controller);

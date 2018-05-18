@@ -80,7 +80,7 @@ class _ApplicationWidgetState extends State<ApplicationWidget> {
 
     Services incomingServices = new Services();
     widget.launcher.createApplication(
-      new ApplicationLaunchInfo(
+      new LaunchInfo(
           url: widget.url, directoryRequest: incomingServices.request()),
       _applicationController.ctrl.request(),
     );

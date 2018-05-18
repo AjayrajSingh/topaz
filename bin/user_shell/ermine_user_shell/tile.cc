@@ -29,7 +29,7 @@ Tile::~Tile() = default;
 void Tile::CreateView(
     fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request) {
   component::Services services;
-  component::ApplicationLaunchInfo launch_info;
+  component::LaunchInfo launch_info;
   launch_info.url = url_;
   launch_info.directory_request = services.NewRequest();
 

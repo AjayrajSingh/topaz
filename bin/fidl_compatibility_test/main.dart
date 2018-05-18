@@ -16,7 +16,7 @@ class EchoImpl implements Echo {
     assert(value.forwardToServer.isNotEmpty);
 
     final Services services = new Services();
-    final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo(
+    final LaunchInfo launchInfo = new LaunchInfo(
         url: value.forwardToServer, directoryRequest: services.request());
     final ApplicationControllerProxy controller =
         new ApplicationControllerProxy();

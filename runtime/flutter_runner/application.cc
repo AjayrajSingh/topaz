@@ -62,26 +62,26 @@ Application::Application(
   application_controller_.set_error_handler([this]() { Kill(); });
 
   FXL_DCHECK(fdio_ns_.is_valid());
-  // ApplicationLaunchInfo::url non-optional.
+  // LaunchInfo::url non-optional.
   auto& launch_info = startup_info.launch_info;
 
-  // ApplicationLaunchInfo::arguments optional.
+  // LaunchInfo::arguments optional.
   if (auto& arguments = launch_info.arguments) {
     settings_ = shell::SettingsFromCommandLine(
         fxl::CommandLineFromIterators(arguments->begin(), arguments->end()));
   }
 
-  // TODO: ApplicationLaunchInfo::out.
+  // TODO: LaunchInfo::out.
 
-  // TODO: ApplicationLaunchInfo::err.
+  // TODO: LaunchInfo::err.
 
-  // ApplicationLaunchInfo::service_request optional.
+  // LaunchInfo::service_request optional.
   if (launch_info.directory_request) {
     service_provider_bridge_.ServeDirectory(
         std::move(launch_info.directory_request));
   }
 
-  // ApplicationLaunchInfo::flat_namespace optional.
+  // LaunchInfo::flat_namespace optional.
   for (size_t i = 0; i < startup_info.flat_namespace.paths->size(); ++i) {
     const auto& path = startup_info.flat_namespace.paths->at(i);
     if (path == "/svc") {
@@ -102,7 +102,7 @@ Application::Application(
   application_assets_directory_.reset(
       openat(application_directory_.get(), "pkg/data", O_RDONLY | O_DIRECTORY));
 
-  // TODO: ApplicationLaunchInfo::additional_services optional.
+  // TODO: LaunchInfo::additional_services optional.
 
   // All launch arguments have been read. Perform service binding and
   // final settings configuration. The next call will be to create a view

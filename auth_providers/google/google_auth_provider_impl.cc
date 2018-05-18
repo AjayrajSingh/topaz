@@ -388,7 +388,7 @@ void GoogleAuthProviderImpl::GetUserProfile(
 
 views_v1_token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
   component::Services web_view_services;
-  component::ApplicationLaunchInfo web_view_launch_info;
+  component::LaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
   web_view_launch_info.directory_request = web_view_services.NewRequest();
   app_context_->launcher()->CreateApplication(

@@ -18,7 +18,7 @@ void main(List<String> args) {
   _context = new ApplicationContext.fromStartupInfo();
 
   final Services services = new Services();
-  final ApplicationLaunchInfo launchInfo = new ApplicationLaunchInfo(
+  final LaunchInfo launchInfo = new LaunchInfo(
       url: server, directoryRequest: services.request());
   _context.launcher.createApplication(launchInfo, null);
 
