@@ -23,7 +23,7 @@ class ModuleModel extends Model {
   final Completer<Null> _readyCompleter = new Completer<Null>();
 
   /// Indicates whether the [LinkWatcher] should watch for all changes including
-  /// the changes made by this [Module]. If `true`, it calls [Link.watchAll] to
+  /// the changes made by this Module. If `true`, it calls [Link.watchAll] to
   /// register the [LinkWatcher], and [Link.watch] otherwise. Only takes effect
   /// when the [onNotify] callback is also provided. Defaults to `false`.
   final bool watchAll;
@@ -31,10 +31,10 @@ class ModuleModel extends Model {
   /// Creates a new instance of [ModuleModel].
   ModuleModel({bool watchAll}) : watchAll = watchAll ?? false;
 
-  /// The [ModuleContext] given to this [Module].
+  /// The [ModuleContext] given to this Module.
   ModuleContext get moduleContext => _moduleContext;
 
-  /// The [Link] given to this [Module].
+  /// The [Link] given to this Module.
   Link get link => _link;
 
   /// The [ServiceProvider] exposed to the parent module. Modules should
@@ -45,7 +45,7 @@ class ModuleModel extends Model {
   /// Gets a [Future] object which completes when [onReady] is called.
   Future<Null> get ready => _readyCompleter.future;
 
-  /// Called when this [Module] is given its [ModuleContext],
+  /// Called when this Module is given its [ModuleContext],
   /// [Link], an incoming services [ServiceProvider].
   @mustCallSuper
   void onReady(
@@ -60,7 +60,7 @@ class ModuleModel extends Model {
     notifyListeners();
   }
 
-  /// Called when the [Module] stops.
+  /// Called when the Module stops.
   void onStop() => null;
 
   /// Called when [LinkWatcher.notify] is called.

@@ -53,7 +53,6 @@ class Chatter {
       ..startModule(
         'module:chat',
         intentBuilder.intent,
-        null, // incomingServices,
         _chatModuleControllerProxy.ctrl.request(),
         const SurfaceRelation(
           arrangement: SurfaceArrangement.copresent,

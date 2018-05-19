@@ -221,7 +221,6 @@ class ModuleContextClient {
       proxy.startModule(
         module,
         intent,
-        null, // incomingServices
         controller.proxy.ctrl.request(),
         surfaceRelation,
         handleIntentStatus,
@@ -290,7 +289,6 @@ class ModuleContextClient {
       proxy.embedModule(
         name,
         intent,
-        null,
         controller.proxy.ctrl.request(),
         viewOwner.passRequest(),
         handleIntentStatus,

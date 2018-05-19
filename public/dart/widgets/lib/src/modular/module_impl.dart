@@ -4,12 +4,10 @@
 
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_component/fidl.dart';
-import 'package:fidl/fidl.dart';
 import 'package:fidl_modular/fidl.dart';
 import 'package:lib.story.dart/story.dart';
 
-/// Called when [Module.initialize] occurs.
+/// Called when Module connects to its [ModuleContext].
 typedef OnModuleReady = void Function(
   ModuleContext moduleContext,
   Link link,
@@ -24,14 +22,11 @@ typedef OnModuleStop = void Function();
 /// Called when the device map entry for the current device changes.
 typedef OnDeviceMapChange = void Function(DeviceMapEntry deviceMapEntry);
 
-/// Implements a Module for receiving the services a [Module] needs to
-/// operate.  When [initialize] is called, the services it receives are routed
-/// by this class to the various classes which need them.
-class ModuleImpl implements Module, Lifecycle {
+/// Implements the [Lifecycle] service a Module needs to provide and connects to
+/// the [ModuleContext] it needs to use.
+class ModuleImpl implements Lifecycle {
   final ModuleContextProxy _moduleContextProxy = new ModuleContextProxy();
   final LinkProxy _linkProxy = new LinkProxy();
-  final ServiceProviderBinding _outgoingServiceProviderBinding =
-      new ServiceProviderBinding();
   final DeviceMapProxy _deviceMapProxy = new DeviceMapProxy();
   final DeviceMapWatcherBinding _deviceMapWatcherBinding =
       new DeviceMapWatcherBinding();
@@ -39,13 +34,10 @@ class ModuleImpl implements Module, Lifecycle {
   LinkWatcherBinding _linkWatcherBinding;
   LinkWatcherImpl _linkWatcherImpl;
 
-  /// The [ServiceProvider] to provide when outgoing services are requested.
-  final ServiceProvider outgoingServiceProvider;
-
   /// The application context to use to get various system services.
   final ApplicationContext applicationContext;
 
-  /// Called when [Module] is initialied with its services.
+  /// Called when the Module connects to its [ModuleContext] service.
   final OnModuleReady onReady;
 
   /// Called at the beginning of [Lifecycle.terminate].
@@ -61,40 +53,30 @@ class ModuleImpl implements Module, Lifecycle {
   final OnDeviceMapChange onDeviceMapChange;
 
   /// Indicates whether the [LinkWatcher] should watch for all changes including
-  /// the changes made by this [Module]. If `true`, it calls [Link.watchAll] to
+  /// the changes made by this Module. If `true`, it calls [Link.watchAll] to
   /// register the [LinkWatcher], and [Link.watch] otherwise. Only takes effect
   /// when the [onNotify] callback is also provided. Defaults to `false`.
   final bool watchAll;
 
-  /// Constuctor.
+  /// Constructor.
   ModuleImpl({
     this.applicationContext,
-    this.outgoingServiceProvider,
     this.onReady,
     this.onStopping,
     this.onStop,
     this.onNotify,
     this.onDeviceMapChange,
     bool watchAll,
-  }) : watchAll = watchAll ?? false;
+  }) : watchAll = watchAll ?? false {
 
-  @override
-  void initialize(
-    InterfaceHandle<ModuleContext> moduleContext,
-    InterfaceRequest<ServiceProvider> outgoingServices,
-  ) {
+    connectToService(
+        applicationContext.environmentServices,
+        _moduleContextProxy.ctrl);
+
+    _moduleContextProxy.getLink(null, _linkProxy.ctrl.request());
+
     if (onReady != null) {
-      _moduleContextProxy.ctrl.bind(moduleContext);
-      _moduleContextProxy.getLink(null, _linkProxy.ctrl.request());
-
       onReady(_moduleContextProxy, _linkProxy);
-    }
-
-    if (outgoingServices != null && outgoingServiceProvider != null) {
-      _outgoingServiceProviderBinding.bind(
-        outgoingServiceProvider,
-        outgoingServices,
-      );
     }
 
     if (onNotify != null) {
@@ -127,7 +109,6 @@ class ModuleImpl implements Module, Lifecycle {
     _linkWatcherBinding?.close();
     _moduleContextProxy.ctrl.close();
     _linkProxy.ctrl.close();
-    _outgoingServiceProviderBinding.close();
     _deviceMapProxy.ctrl.close();
     _deviceMapWatcherBinding.close();
     onStop?.call();

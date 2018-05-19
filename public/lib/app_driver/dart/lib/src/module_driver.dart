@@ -45,7 +45,7 @@ const int _kFirstLinkDataMetricId = 1;
 /// code. The name and structure of this library is based on the peridot layer's
 /// [AppDriver][app-driver]. A Module has two primary events:
 ///
-/// * initialize: managed by the internal [ModuleHost].
+/// * initialize: managed by the constructor.
 /// * terminate: managed by the internal [LifecycleHost].
 ///
 /// Initialization
@@ -54,7 +54,7 @@ const int _kFirstLinkDataMetricId = 1;
 /// successfully initalized additional service clients are connected providing
 /// access to The Module's Link and ModuleContext services.
 ///
-/// Termintaion
+/// Termination
 ///
 /// Module termination is triggered by the system, all service hosts and clients
 /// will automatically have their underlying connections closed including any
@@ -82,7 +82,6 @@ class ModuleDriver {
   /// Message queue token completer
   final Completer<String> _tokenCompleter = new Completer<String>();
 
-  final ModuleHost _module = new ModuleHost();
   final CobaltEncoderProxy _encoder = new CobaltEncoderProxy();
   final DateTime _initializationTime;
   final Set<String> _firstObservationSent = new Set<String>();
@@ -194,18 +193,7 @@ class ModuleDriver {
       return _start.future;
     }
 
-    ModuleHostInitializeResult result;
-    try {
-      result = await _module.initialize(
-        applicationContext: _applicationContext,
-      );
-    } on Exception catch (err, stackTrace) {
-      _start.completeError(err, stackTrace);
-      return _start.future;
-    }
-
-    // TODO(SO-1121): add error handling/checking.
-    moduleContext.proxy.ctrl.bind(result.moduleContextHandle);
+    connectToService(environmentServices, moduleContext.proxy.ctrl);
 
     try {
       await moduleContext.getLink(linkClient: link);
@@ -302,7 +290,6 @@ class ModuleDriver {
 
     List<Future<Null>> futures = <Future<Null>>[
       moduleContext.terminate(),
-      _module.terminate(),
       _lifecycle.terminate(),
     ]..addAll(
         _onTerminatesAsync.map((OnTerminateAsync onTerminate) => onTerminate()),

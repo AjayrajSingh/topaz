@@ -12,7 +12,6 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
       url_(url),
       context_(component::ApplicationContext::CreateFromStartupInfo()),
       view_provider_binding_(this),
-      module_binding_(this),
       lifecycle_binding_(this),
       main_link_watcher_binding_(this) {
   FXL_DCHECK(loop);
@@ -25,16 +24,27 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
         FXL_LOG(INFO) << "Add ViewProvider binding";
         view_provider_binding_.Bind(std::move(request));
       });
-  context_->outgoing().AddPublicService<modular::Module>(
-      [this](fidl::InterfaceRequest<modular::Module> request) {
-        FXL_LOG(INFO) << "got request for module service";
-        module_binding_.Bind(std::move(request));
-      });
   context_->outgoing().AddPublicService<modular::Lifecycle>(
       [this](fidl::InterfaceRequest<modular::Lifecycle> request) {
         FXL_LOG(INFO) << "got request for lifecycle service";
         lifecycle_binding_.Bind(std::move(request));
       });
+
+  context_->ConnectToEnvironmentService(module_context_.NewRequest());
+  module_context_->GetLink(nullptr, main_link_.NewRequest());
+  main_link_->Watch(main_link_watcher_binding_.NewBinding());
+
+#ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
+  modular::IntelligenceServicesPtr intelligence_services;
+  module_context_->GetIntelligenceServices(intelligence_services.NewRequest());
+  intelligence_services->GetContextWriter(context_writer_.NewRequest());
+  context_ptr->GetComponentContext(component_context_.NewRequest());
+
+  if (view_) {
+    view_->set_context_writer(std::move(context_writer_));
+    view_->set_component_context(std::move(component_context_));
+  }
+#endif
 }
 
 void WebViewProvider::CreateView(
@@ -58,28 +68,6 @@ void WebViewProvider::CreateView(
     FXL_LOG(INFO) << "release handler";
     view_ = nullptr;
   });
-}
-
-void WebViewProvider::Initialize(
-    fidl::InterfaceHandle<modular::ModuleContext> context,
-    fidl::InterfaceRequest<component::ServiceProvider> outgoing_services) {
-  auto context_ptr = context.Bind();
-  context_ptr->GetLink(nullptr, main_link_.NewRequest());
-  main_link_->Watch(main_link_watcher_binding_.NewBinding());
-
-#ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
-  modular::IntelligenceServicesPtr intelligence_services;
-  context_ptr->GetIntelligenceServices(intelligence_services.NewRequest());
-  intelligence_services->GetContextWriter(context_writer_.NewRequest());
-  context_ptr->GetComponentContext(component_context_.NewRequest());
-
-  if (view_) {
-    view_->set_context_writer(std::move(context_writer_));
-    view_->set_component_context(std::move(component_context_));
-  }
-#endif
-
-  FXL_LOG(INFO) << "Initialize()";
 }
 
 void WebViewProvider::Terminate() {

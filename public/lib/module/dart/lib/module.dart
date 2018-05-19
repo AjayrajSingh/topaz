@@ -4,5 +4,3 @@
 
 export 'src/module_context_client.dart';
 export 'src/module_controller_client.dart';
-export 'src/module_host.dart';
-export 'src/module_impl.dart';

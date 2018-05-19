@@ -125,7 +125,6 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
     moduleContext.startModule(
       'module:web_view',
       intentBuilder.intent,
-      null, // incomingServices,
       _webviewModuleControllerProxy.ctrl.request(),
       const SurfaceRelation(arrangement: SurfaceArrangement.copresent),
       (StartModuleStatus status) {}

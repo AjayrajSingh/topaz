@@ -8,7 +8,6 @@ import 'dart:typed_data';
 import 'package:fidl/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fidl_component/fidl.dart';
 import 'package:fidl_modular/fidl.dart';
 import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.dart/app.dart';
@@ -63,7 +62,6 @@ void startChildModule(SurfaceRelation relation) {
   _moduleContext.startModule(
       name,
       intentBuilder.intent,
-      null, // incomingServices,
       moduleController.ctrl.request(),
       relation,
       (StartModuleStatus status) {});
@@ -376,14 +374,13 @@ class MainWidget extends StatelessWidget {
   }
 }
 
-/// Module Service
-class ModuleImpl implements Module, Lifecycle {
-  final ModuleBinding _moduleBinding = new ModuleBinding();
+/// Module related Services: Lifecycle and ModuleContext
+class ModuleImpl implements Lifecycle {
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
 
-  /// Bind an [InterfaceRequest] for a [Module] to this
-  void bindModule(InterfaceRequest<Module> request) {
-    _moduleBinding.bind(this, request);
+  ModuleImpl() {
+    log.info('ModuleImpl::initialize call');
+    connectToService(_appContext.environmentServices, _moduleContext.ctrl);
   }
 
   /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
@@ -392,18 +389,9 @@ class ModuleImpl implements Module, Lifecycle {
   }
 
   @override
-  void initialize(InterfaceHandle<ModuleContext> moduleContextHandle,
-      InterfaceRequest<ServiceProvider> outgoingServices) {
-    log.info('ModuleImpl::initialize call');
-
-    _moduleContext.ctrl.bind(moduleContextHandle);
-  }
-
-  @override
   void terminate() {
     log.info('ModuleImpl::terminate call');
     _moduleContext.ctrl.close();
-    _moduleBinding.close();
     _lifecycleBinding.close();
     exit(0);
   }
@@ -415,14 +403,7 @@ void main() {
 
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices
-    ..addServiceForName(
-      (InterfaceRequest<Module> request) {
-        log.info('Received binding request for Module');
-        _module.bindModule(request);
-      },
-      Module.$serviceName,
-    )
-    ..addServiceForName(
+    .addServiceForName(
       (InterfaceRequest<Lifecycle> request) {
         _module.bindLifecycle(request);
       },

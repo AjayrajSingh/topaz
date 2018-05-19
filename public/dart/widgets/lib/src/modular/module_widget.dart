@@ -13,27 +13,24 @@ import '../widgets/window_media_query.dart';
 import 'module_impl.dart';
 import 'module_model.dart';
 
-/// A wrapper widget intended to be the root of the application that is
-/// a [Module].  Its main purpose is to hold the [ApplicationContext] and
-/// [Module] instances so they aren't garbage collected.
-/// For convenience, [advertise] does the advertising of the app as a
-/// [Module] to the rest of the system via the [ApplicationContext].
-/// Also for convienence, the [ModuleModel] given to this widget will be
-/// made available to [child] and [child]'s descendants.
+/// A wrapper widget intended to be the root of the application that is a
+/// Module. Its main purpose is to hold the [ApplicationContext] and
+/// [ModuleImpl] instances so they aren't garbage collected. For convenience,
+/// [advertise] does the advertising of the app as a Module to the rest of the
+/// system via the [ApplicationContext]. Also for convienence, the [ModuleModel]
+/// given to this widget will be made available to [child] and [child]'s
+/// descendants.
 class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
-  /// The binding for the [Module] service implemented by [ModuleImpl].
-  final ModuleBinding _moduleBinding;
-
   /// The binding for the [Lifecycle] service implemented by [ModuleImpl].
   final LifecycleBinding _lifecycleBinding;
 
   /// The [ModuleImpl] whose services to [advertise].
   final ModuleImpl _module;
 
-  /// The [ApplicationContext] to [advertise] its [Module] services to.
+  /// The [ApplicationContext] to [advertise] its Module services to.
   final ApplicationContext applicationContext;
 
-  /// The [ModuleModel] to notify when the [Module] is ready.
+  /// The [ModuleModel] to notify when the Module is ready.
   final T _moduleModel;
 
   /// The rest of the application.
@@ -49,7 +46,6 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
         applicationContext: applicationContext,
         moduleModel: moduleModel,
         child: child,
-        moduleBinding: new ModuleBinding(),
         lifecycleBinding: new LifecycleBinding(),
       );
 
@@ -57,24 +53,20 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
     @required this.applicationContext,
     @required T moduleModel,
     @required this.child,
-    @required ModuleBinding moduleBinding,
     @required LifecycleBinding lifecycleBinding,
   })
       : _moduleModel = moduleModel,
-        _moduleBinding = moduleBinding,
         _lifecycleBinding = lifecycleBinding,
         _module = new ModuleImpl(
           applicationContext: applicationContext,
           onReady: moduleModel?.onReady,
           onStopping: moduleModel?.onStop,
           onStop: () {
-            moduleBinding.close();
             lifecycleBinding.close();
           },
           onNotify: moduleModel?.onNotify,
           onDeviceMapChange: moduleModel?.onDeviceMapChange,
           watchAll: moduleModel?.watchAll,
-          outgoingServiceProvider: moduleModel?.outgoingServiceProvider,
         );
 
   @override
@@ -94,16 +86,11 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
         ),
       );
 
-  /// Advertises [_module] as a [Module] to the rest of the system via the
+  /// Advertises [_module] as a Module to the rest of the system via the
   /// [applicationContext].
   void advertise() {
     applicationContext.outgoingServices
-      ..addServiceForName(
-        (InterfaceRequest<Module> request) =>
-            _moduleBinding.bind(_module, request),
-        Module.$serviceName,
-      )
-      ..addServiceForName(
+      .addServiceForName(
         (InterfaceRequest<Lifecycle> request) =>
             _lifecycleBinding.bind(_module, request),
         Lifecycle.$serviceName,

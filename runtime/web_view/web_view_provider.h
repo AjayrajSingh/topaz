@@ -12,7 +12,6 @@
 #include "topaz/runtime/web_view/web_view_impl.h"
 
 class WebViewProvider : views_v1::ViewProvider,
-                        modular::Module,
                         modular::Lifecycle,
                         modular::LinkWatcher
 {
@@ -24,11 +23,6 @@ class WebViewProvider : views_v1::ViewProvider,
   void CreateView(fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
                   fidl::InterfaceRequest<component::ServiceProvider>
                       view_services) override;
-
-  // modular::Module
-  void Initialize(fidl::InterfaceHandle<modular::ModuleContext> context,
-                  fidl::InterfaceRequest<component::ServiceProvider>
-                      outgoing_services) final;
 
   // modular::Terminate
   void Terminate() final;
@@ -43,9 +37,9 @@ class WebViewProvider : views_v1::ViewProvider,
   // Link state, used to gather URL updates for the story
   modular::LinkPtr main_link_;
   fidl::Binding<ViewProvider> view_provider_binding_;
-  fidl::Binding<modular::Module> module_binding_;
   fidl::Binding<modular::Lifecycle> lifecycle_binding_;
   fidl::Binding<modular::LinkWatcher> main_link_watcher_binding_;
+  modular::ModuleContextPtr module_context_;
 
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   modular::ContextWriterPtr context_writer_;

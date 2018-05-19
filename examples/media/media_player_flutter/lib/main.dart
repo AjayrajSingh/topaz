@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_component/fidl.dart';
 import 'package:lib.media.flutter/media_player.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
 import 'package:fidl_media_player/fidl.dart' as media_player;
@@ -29,33 +28,20 @@ void _log(String msg) {
   print('[media_player_flutter Module] $msg');
 }
 
-/// An implementation of the [Module] interface.
-class ModuleImpl implements Module, Lifecycle {
-  final ModuleBinding _moduleBinding = new ModuleBinding();
+/// An implementation of the [Lifecycle] interface, which controls the lifetime
+/// of the module.
+class ModuleImpl implements Lifecycle {
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
 
-  /// Bind an [InterfaceRequest] for a [Module] interface to this object.
-  void bindModule(InterfaceRequest<Module> request) {
-    _moduleBinding.bind(this, request);
-  }
-
-  /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
+  /// Binds an [InterfaceRequest] for a [Lifecycle] interface to this object.
   void bindLifecycle(InterfaceRequest<Lifecycle> request) {
     _lifecycleBinding.bind(this, request);
-  }
-
-  /// Implementation of the Initialize(Story story, Link link) method.
-  @override
-  void initialize(InterfaceHandle<ModuleContext> moduleContextHandle,
-      InterfaceRequest<ServiceProvider> outgoingServices) {
-    _log('ModuleImpl::initialize call');
   }
 
   /// Implementation of Lifecycle.Terminate method.
   @override
   void terminate() {
     _log('ModuleImpl::Terminate call');
-    _moduleBinding.close();
     _lifecycleBinding.close();
     exit(0);
   }
@@ -406,14 +392,7 @@ Future<Null> main() async {
 
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
   _appContext.outgoingServices
-    ..addServiceForName(
-      (InterfaceRequest<Module> request) {
-        _log('Received binding request for Module');
-        _module.bindModule(request);
-      },
-      Module.$serviceName,
-    )
-    ..addServiceForName(
+    .addServiceForName(
       (InterfaceRequest<Lifecycle> request) {
         _module.bindLifecycle(request);
       },

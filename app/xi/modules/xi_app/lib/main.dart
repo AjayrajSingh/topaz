@@ -4,10 +4,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:fuchsia/fuchsia.dart';
-import 'package:fidl_component/fidl.dart';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_ledger/fidl.dart';
 import 'package:fidl_modular/fidl.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:xi_widgets/widgets.dart';
 
 import 'src/xi_fuchsia_client.dart';
@@ -26,36 +26,25 @@ dynamic _handleResponse(String description) {
   };
 }
 
-/// An implementation of the [Module] interface.
-class ModuleImpl implements Module, Lifecycle {
+/// An implementation of the [Lifecycle] interface, which controls the lifetime
+/// of the module. Also manages the ModuleContext connection.
+class ModuleImpl implements Lifecycle {
   /// Constructor.
-  ModuleImpl(this._ledgerRequest);
+  ModuleImpl(this._ledgerRequest) {
+    _log('ModuleImpl::init call');
+    connectToService(kContext.environmentServices, _moduleContext.ctrl);
+    _moduleContext.getComponentContext(_componentContext.ctrl.request());
+    _componentContext.getLedger(_ledgerRequest, _handleResponse('getLedger'));
+  }
 
-  final ModuleBinding _moduleBinding = new ModuleBinding();
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
-
   final ModuleContextProxy _moduleContext = new ModuleContextProxy();
   final ComponentContextProxy _componentContext = new ComponentContextProxy();
   final InterfaceRequest<Ledger> _ledgerRequest;
 
-  /// Bind an [InterfaceRequest] for a [Module] interface to this object.
-  void bindModule(InterfaceRequest<Module> request) {
-    _moduleBinding.bind(this, request);
-  }
-
   /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
   void bindLifecycle(InterfaceRequest<Lifecycle> request) {
     _lifecycleBinding.bind(this, request);
-  }
-
-  @override
-  void initialize(InterfaceHandle<ModuleContext> moduleContextHandle,
-      InterfaceRequest<ServiceProvider> outgoingServices) {
-    _log('ModuleImpl::initialize call');
-
-    _moduleContext.ctrl.bind(moduleContextHandle);
-    _moduleContext.getComponentContext(_componentContext.ctrl.request());
-    _componentContext.getLedger(_ledgerRequest, _handleResponse('getLedger'));
   }
 
   @override
@@ -64,7 +53,7 @@ class ModuleImpl implements Module, Lifecycle {
 
     // Cleaning up.
     _moduleContext.ctrl.close();
-    _moduleBinding.close();
+    _componentContext.ctrl.close();
     _lifecycleBinding.close();
     exit(0);
   }
@@ -78,14 +67,7 @@ void main() {
   final ModuleImpl module = new ModuleImpl(pair.passRequest());
 
   kContext.outgoingServices
-    ..addServiceForName(
-      (InterfaceRequest<Module> request) {
-        _log('Received binding request for Module');
-        module.bindModule(request);
-      },
-      Module.$serviceName,
-    )
-    ..addServiceForName(
+    .addServiceForName(
       module.bindLifecycle,
       Lifecycle.$serviceName,
     );
