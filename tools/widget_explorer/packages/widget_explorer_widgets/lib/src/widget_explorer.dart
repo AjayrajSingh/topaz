@@ -34,12 +34,11 @@ class WidgetExplorer extends StatefulWidget {
 
   /// Creates a new instance of [WidgetExplorer].
   const WidgetExplorer({
-    Key key,
-    this.config,
     @required this.widgetSpecs,
     @required this.stateBuilders,
-  })
-      : assert(widgetSpecs != null),
+    Key key,
+    this.config,
+  })  : assert(widgetSpecs != null),
         assert(stateBuilders != null),
         super(key: key);
 

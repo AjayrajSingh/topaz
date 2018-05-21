@@ -128,7 +128,7 @@ class _Entry extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          new Text(prefix, style: new TextStyle(color: Colors.yellow)),
+          new Text(prefix, style: const TextStyle(color: Colors.yellow)),
           new Flexible(
             child: new Text(
               value,

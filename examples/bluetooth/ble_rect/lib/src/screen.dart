@@ -51,7 +51,7 @@ class BLERectScreen extends StatelessWidget {
     }
 
     if (!model.isCentralConnected) {
-      return new Row(children: <Widget>[
+      return new Row(children: const <Widget>[
         const Text('Waiting for connection...'),
         const CircularProgressIndicator(),
       ]);

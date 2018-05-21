@@ -14,7 +14,7 @@ final TextStyle _kInfoStyle = new TextStyle(
   fontStyle: FontStyle.italic,
 );
 
-final TextStyle _kCodeStyle = new TextStyle(
+const TextStyle _kCodeStyle = const TextStyle(
   fontFamily: 'monospace',
   fontWeight: FontWeight.bold,
 );
@@ -69,11 +69,11 @@ class WidgetExplorerWrapper extends StatefulWidget {
 
   /// Creates a new instance of [WidgetExplorerWrapper].
   const WidgetExplorerWrapper({
-    Key key,
     @required this.config,
     @required this.width,
     @required this.height,
     @required this.stateBuilder,
+    Key key,
   }) : super(key: key);
 
   @override
@@ -133,13 +133,13 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
               margin: const EdgeInsets.all(_kMargin),
               child: new ListBody(
                 children: <Widget>[
-                  new Text(
+                  const Text(
                     'Parameters',
-                    style: new TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   new Table(
                     children: genState.buildParameterTableRows(context),
-                    columnWidths: <int, TableColumnWidth>{
+                    columnWidths: const <int, TableColumnWidth>{
                       0: const IntrinsicColumnWidth(),
                       1: const FixedColumnWidth(_kMargin),
                       2: const IntrinsicColumnWidth(),
@@ -186,8 +186,8 @@ class WidgetExplorerWrapperState extends State<WidgetExplorerWrapper> {
 /// Wrapper widget which gives some top margin to a given child.
 class _TopMargined extends StatelessWidget {
   const _TopMargined({
-    Key key,
     @required this.child,
+    Key key,
   }) : super(key: key);
 
   final Widget child;
@@ -239,8 +239,8 @@ class RegenerateButton extends StatelessWidget {
 
   /// Creates a new instance of [RegenerateButton].
   const RegenerateButton({
-    Key key,
     @required this.onPressed,
+    Key key,
     this.codeToDisplay,
   }) : super(key: key);
 
@@ -286,9 +286,9 @@ class ConfigKeyText extends StatelessWidget {
 
   /// Creates a new instance of [ConfigKeyText].
   const ConfigKeyText({
-    Key key,
     @required this.configKey,
     @required this.configValue,
+    Key key,
   })  : assert(configKey != null),
         super(key: key);
 
@@ -323,6 +323,7 @@ class TextFieldWithInitialValue extends StatefulWidget {
 
   /// Creates a new instance of [TextFieldWithInitialValue].
   const TextFieldWithInitialValue({
+    // ignore: avoid_unused_constructor_parameters
     Key key,
     this.initialValue,
     this.keyboardType,

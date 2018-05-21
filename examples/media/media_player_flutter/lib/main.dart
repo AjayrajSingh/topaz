@@ -386,7 +386,7 @@ class _ChooserScreenState extends State<_ChooserScreen> {
               elevation: 2.0,
               color: Colors.transparent,
               child: new IconButton(
-                icon: new Icon(Icons.close),
+                icon: const Icon(Icons.close),
                 iconSize: 60.0,
                 onPressed: () {
                   io.exit(0);

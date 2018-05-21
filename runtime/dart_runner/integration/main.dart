@@ -20,7 +20,7 @@ void main(List<String> args) {
       () => new Future<Null>.delayed(const Duration(seconds: 1)));
 
   test('start hello_dart', () {
-    final ApplicationLaunchInfo info =
+    const ApplicationLaunchInfo info =
         const ApplicationLaunchInfo(url: 'hello_dart_jit');
     context.launcher.createApplication(info, null);
   });

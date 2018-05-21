@@ -5,8 +5,7 @@
 import 'dart:async';
 
 import 'package:fidl_bluetooth/fidl.dart';
-import 'package:fidl_bluetooth_low_energy/fidl.dart'
-    as ble;
+import 'package:fidl_bluetooth_low_energy/fidl.dart' as ble;
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -28,7 +27,7 @@ enum DismissDialogAction {
 class ScanFilterDialog extends StatefulWidget {
   final BLEScannerModuleModel moduleModel;
 
-  const ScanFilterDialog({Key key, @required this.moduleModel})
+  const ScanFilterDialog({@required this.moduleModel, Key key})
       : super(key: key);
 
   @override

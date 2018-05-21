@@ -94,6 +94,6 @@ class _ModuleRunner {
   }
 
   Widget _errorBuilder(BuildContext context, Error error) {
-    return new ModFailureWidget();
+    return const ModFailureWidget();
   }
 }

@@ -111,7 +111,7 @@ final List<Story> _kDummyStories = <Story>[
   ),
 ];
 
-final Size _k1280x900Size = const Size(1280.0, 800.0);
+const Size _k1280x900Size = const Size(1280.0, 800.0);
 final List<Rect> _kExpectedRectsFor1280x800 = <Rect>[
   new Rect.fromLTWH(-480.0, -192.0, 240.0, 150.0),
   new Rect.fromLTWH(-192.0, -192.0, 336.0, 210.0),
@@ -139,7 +139,7 @@ final List<Rect> _kExpectedRectsFor1280x800 = <Rect>[
   new Rect.fromLTWH(0.0, -2592.0, 240.0, 150.0),
 ];
 
-final Size _k360x640Size = const Size(360.0, 640.0);
+const Size _k360x640Size = const Size(360.0, 640.0);
 final List<Rect> _kExpectedRectsFor360x640 = <Rect>[
   new Rect.fromLTWH(-172.0, -155.5, 344.0, 107.5),
   new Rect.fromLTWH(-172.0, -311.0, 344.0, 107.5),

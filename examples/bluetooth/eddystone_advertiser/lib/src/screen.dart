@@ -14,7 +14,7 @@ import 'modular/module_model.dart';
 class EddystoneScreen extends StatefulWidget {
   final EddystoneModuleModel moduleModel;
 
-  const EddystoneScreen({Key key, @required this.moduleModel})
+  const EddystoneScreen({@required this.moduleModel, Key key})
       : super(key: key);
 
   @override

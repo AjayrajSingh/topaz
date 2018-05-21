@@ -40,7 +40,7 @@ class _NewItemInputState extends State<NewItemInput> {
       new SizedBox(
           width: 72.0,
           child: new IconButton(
-              icon: new Icon(Icons.add),
+              icon: const Icon(Icons.add),
               onPressed: () {
                 onNewItem(_controller.text);
                 _controller.text = '';

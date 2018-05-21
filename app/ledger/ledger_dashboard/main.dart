@@ -68,7 +68,7 @@ void main(List<String> args) {
 
   final LifecycleImpl lifeCycleImpl = new LifecycleImpl();
   appContext.outgoingServices
-    ..addServiceForName(
+    .addServiceForName(
       lifeCycleImpl.bindLifecycle,
       Lifecycle.$serviceName,
     );

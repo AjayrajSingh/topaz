@@ -9,8 +9,7 @@ import 'dart:async';
 import 'dart:convert' show json;
 
 import 'package:fidl_bluetooth/fidl.dart' as bt;
-import 'package:fidl_bluetooth_low_energy/fidl.dart'
-    as ble;
+import 'package:fidl_bluetooth_low_energy/fidl.dart' as ble;
 import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
@@ -66,13 +65,13 @@ String decodeEddystoneURL(Iterable<int> encoded) {
   if (encoded.length < 2) {
     return null;
   }
-  final Map<int, String> prefixes = const {
+  const Map<int, String> prefixes = const {
     0: 'http://www.',
     1: 'https://www.',
     2: 'http://',
     3: 'https://',
   };
-  final Map<int, String> expansions = const {
+  const Map<int, String> expansions = const {
     0: '.com/',
     1: '.org/',
     2: '.edu/',

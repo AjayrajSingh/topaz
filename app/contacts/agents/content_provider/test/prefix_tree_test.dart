@@ -187,13 +187,13 @@ void main() {
     group('putIfAbsent', () {
       test('should throw if key is null', () {
         expect(() {
-          new PrefixTree<double>()..putIfAbsent(null, () => 0.0);
+          new PrefixTree<double>().putIfAbsent(null, () => 0.0);
         }, throwsA(const isInstanceOf<ArgumentError>()));
       });
 
       test('should throw if key is empty', () {
         expect(() {
-          new PrefixTree<double>()..putIfAbsent('', () => 0.0);
+          new PrefixTree<double>().putIfAbsent('', () => 0.0);
         }, throwsA(const isInstanceOf<ArgumentError>()));
       });
 
@@ -219,13 +219,13 @@ void main() {
     group('remove', () {
       test('should throw if key is null', () {
         expect(() {
-          new PrefixTree<double>()..remove(null);
+          new PrefixTree<double>().remove(null);
         }, throwsA(const isInstanceOf<ArgumentError>()));
       });
 
       test('should throw if key is empty', () {
         expect(() {
-          new PrefixTree<double>()..remove('');
+          new PrefixTree<double>().remove('');
         }, throwsA(const isInstanceOf<ArgumentError>()));
       });
 

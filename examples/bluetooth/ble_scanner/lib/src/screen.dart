@@ -23,7 +23,7 @@ class BLEScannerScreen extends StatelessWidget {
           appBar: new AppBar(
               title: const Text('BLE Scanner'),
               bottom: moduleModel.isScanning
-                  ? new PreferredSize(
+                  ? const PreferredSize(
                       child: const LinearProgressIndicator(),
                       preferredSize: Size.zero)
                   : null,
@@ -33,7 +33,7 @@ class BLEScannerScreen extends StatelessWidget {
                     onPressed: moduleModel.isScanRequestPending
                         ? null
                         : () => moduleModel.toggleScan(),
-                    icon: new Icon(Icons.bluetooth_searching)),
+                    icon: const Icon(Icons.bluetooth_searching)),
                 new ScanFilterButton(),
               ]),
           body: new ScanResultsWidget());

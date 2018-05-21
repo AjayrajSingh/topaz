@@ -24,5 +24,5 @@ class BluetoothSettings extends StatelessWidget {
       ) =>
               new LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) =>
-                      new Material(child: null)));
+                      const Material(child: null)));
 }

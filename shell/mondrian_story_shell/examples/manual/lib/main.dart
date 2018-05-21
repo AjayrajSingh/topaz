@@ -61,13 +61,12 @@ void startChildModule(SurfaceRelation relation) {
 
   IntentBuilder intentBuilder = new IntentBuilder.handler(_kModuleUrl);
   _moduleContext.startModule(
-    name,
-    intentBuilder.intent,
-    null, // incomingServices,
-    moduleController.ctrl.request(),
-    relation,
-    (StartModuleStatus status) {}
-  );
+      name,
+      intentBuilder.intent,
+      null, // incomingServices,
+      moduleController.ctrl.request(),
+      relation,
+      (StartModuleStatus status) {});
   log.info('Started sub-module $name');
 
   _watchers.add(new _ModuleStopperWatcher(moduleController, name));
@@ -81,26 +80,28 @@ void startContainerInShell() {
   const List<double> leftRect = const <double>[0.0, 0.0, 0.5, 1.0];
   const List<double> trRect = const <double>[0.5, 0.0, 0.5, 0.5];
   const List<double> brRect = const <double>[0.5, 0.5, 0.5, 0.5];
-  LayoutEntry left = new LayoutEntry(nodeName: 'left', rectangle: new Float32List.fromList(leftRect));
-  LayoutEntry tr = new LayoutEntry(nodeName: 'top_right', rectangle: new Float32List.fromList(trRect));
-  LayoutEntry br =
-      new LayoutEntry(nodeName: 'bottom_right', rectangle: new Float32List.fromList(brRect));
+  LayoutEntry left = new LayoutEntry(
+      nodeName: 'left', rectangle: new Float32List.fromList(leftRect));
+  LayoutEntry tr = new LayoutEntry(
+      nodeName: 'top_right', rectangle: new Float32List.fromList(trRect));
+  LayoutEntry br = new LayoutEntry(
+      nodeName: 'bottom_right', rectangle: new Float32List.fromList(brRect));
   ContainerLayout main =
       new ContainerLayout(surfaces: <LayoutEntry>[left, tr, br]);
   List<ContainerLayout> layouts = <ContainerLayout>[main];
-  ContainerRelationEntry rootLeft = new ContainerRelationEntry(
+  ContainerRelationEntry rootLeft = const ContainerRelationEntry(
       nodeName: 'left',
       parentNodeName: 'test',
-      relationship: new SurfaceRelation());
-  ContainerRelationEntry rootTr = new ContainerRelationEntry(
+      relationship: const SurfaceRelation());
+  ContainerRelationEntry rootTr = const ContainerRelationEntry(
       nodeName: 'top_right',
       parentNodeName: 'test',
-      relationship: new SurfaceRelation());
-  ContainerRelationEntry rootBr = new ContainerRelationEntry(
+      relationship: const SurfaceRelation());
+  ContainerRelationEntry rootBr = const ContainerRelationEntry(
       nodeName: 'bottom_right',
       parentNodeName: 'test',
       relationship:
-          new SurfaceRelation(dependency: SurfaceDependency.dependent));
+          const SurfaceRelation(dependency: SurfaceDependency.dependent));
   List<ContainerRelationEntry> relations = <ContainerRelationEntry>[
     rootLeft,
     rootTr,
@@ -116,7 +117,7 @@ void startContainerInShell() {
 
   _moduleContext.startContainerInShell(
       'test',
-      new SurfaceRelation(
+      const SurfaceRelation(
           arrangement: SurfaceArrangement.sequential,
           dependency: SurfaceDependency.none),
       layouts,
@@ -211,7 +212,7 @@ class CopresentLauncherState extends State<CopresentLauncher> {
   @override
   Widget build(BuildContext context) => new Container(
         alignment: FractionalOffset.center,
-        constraints: new BoxConstraints(maxWidth: 200.0),
+        constraints: const BoxConstraints(maxWidth: 200.0),
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -308,7 +309,7 @@ class ChildModulesViewState extends State<ChildModulesView> {
   Widget build(BuildContext context) => new Container(
         alignment: FractionalOffset.center,
         height: 60.0,
-        constraints: new BoxConstraints(maxWidth: 200.0),
+        constraints: const BoxConstraints(maxWidth: 200.0),
         child: new Scrollbar(
           child: new ListView.builder(
             itemCount: _watchers.length,
@@ -328,7 +329,7 @@ class MainWidget extends StatelessWidget {
     return new Scaffold(
       body: new Center(
         child: new Container(
-          constraints: new BoxConstraints(maxWidth: 200.0),
+          constraints: const BoxConstraints(maxWidth: 200.0),
           child: new Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -350,12 +351,12 @@ class MainWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              new Grouping(
-                children: <Widget>[
+              const Grouping(
+                children: const <Widget>[
                   const CopresentLauncher(),
                   const Divider(),
-                  new LaunchModuleButton(
-                      new SurfaceRelation(
+                  const LaunchModuleButton(
+                      const SurfaceRelation(
                           arrangement: SurfaceArrangement.sequential),
                       'Sequential'),
                   const LaunchContainerButton(),

@@ -52,6 +52,7 @@ Future<Null> main(List<String> args) async {
 /// if it fails to find the fuchsia root.
 String findFuchsiaRoot() {
   Directory current = Directory.current;
+  // ignore: literal_only_boolean_expressions
   while (true) {
     FileSystemEntity jiriRoot = current.listSync().firstWhere(
           (FileSystemEntity entity) =>

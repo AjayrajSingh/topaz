@@ -7,8 +7,7 @@ import 'package:contacts_picker/stores.dart';
 import 'package:contacts_picker/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fidl_contacts_content_provider/fidl.dart'
-    as fidl;
+import 'package:fidl_contacts_content_provider/fidl.dart' as fidl;
 
 List<fidl.Contact> _contacts = <fidl.Contact>[
   createContact('Alpha', '1'),
@@ -39,6 +38,7 @@ Finder findByRichText(String text) {
 void main() {
   // HACK: The store must be created first, before we can use the actions.
   // This line guarantees that the ContactsPickerStore is correctly created.
+  // ignore: unnecessary_statements
   contactsPickerStoreToken;
 
   updateContactsListAction(_contacts);
@@ -65,7 +65,7 @@ void main() {
         ),
       ));
 
-      final MapEquality<String, int> mapEquality =
+      const MapEquality<String, int> mapEquality =
           const MapEquality<String, int>();
 
       expect(

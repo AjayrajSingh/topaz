@@ -4,8 +4,7 @@
 
 import 'dart:async';
 import 'package:fidl_bluetooth/fidl.dart' as bt;
-import 'package:fidl_bluetooth_low_energy/fidl.dart'
-    as ble;
+import 'package:fidl_bluetooth_low_energy/fidl.dart' as ble;
 import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
@@ -126,7 +125,7 @@ class EddystoneModuleModel extends ModuleModel {
     String left = url;
     // Scheme
 
-    final Map<String, int> expansions = const <String, int>{
+    const Map<String, int> expansions = const <String, int>{
       '.com/': 0,
       '.org/': 1,
       '.edu/': 2,

@@ -102,7 +102,7 @@ class _SketchyExampleState extends State<SketchyExample> {
           setState(_addShapeNode);
         },
         tooltip: 'Add RoundedRectangle',
-        child: new Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

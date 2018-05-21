@@ -64,7 +64,7 @@ void main() {
     final WriteResult writeResult = System.socketWrite(pair.first, data, 0);
     expect(writeResult.status, equals(ZX.OK));
 
-    final int shortLength = 'Hello'.length;
+    const int shortLength = 'Hello'.length;
     final ReadResult shortReadResult =
         System.socketRead(pair.second, shortLength);
     expect(shortReadResult.status, equals(ZX.OK));

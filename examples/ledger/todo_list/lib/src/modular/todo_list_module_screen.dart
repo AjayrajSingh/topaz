@@ -24,7 +24,7 @@ class _TodoItem extends StatelessWidget {
       new SizedBox(
         width: 72.0,
         child: new IconButton(
-          icon: new Icon(Icons.done),
+          icon: const Icon(Icons.done),
           color: themeData.primaryColor,
           onPressed: onDone,
         ),

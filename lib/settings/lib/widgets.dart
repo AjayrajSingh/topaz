@@ -87,8 +87,11 @@ class SettingsSection extends StatelessWidget {
   final double scale;
 
   /// Constructor.
-  const SettingsSection(
-      {this.title, @required this.child, @required this.scale});
+  const SettingsSection({
+    @required this.child,
+    @required this.scale,
+    this.title,
+  });
 
   @override
   Widget build(BuildContext context) {

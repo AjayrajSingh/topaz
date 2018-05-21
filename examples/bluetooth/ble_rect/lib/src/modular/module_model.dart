@@ -13,8 +13,6 @@ import 'package:fidl_bluetooth_low_energy/fidl.dart' as ble;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
-typedef _ValueWriteFunc = bool Function(List<int> value);
-
 /// The [ModuleModel] for the GATT Server example.
 class BLERectModuleModel extends ModuleModel
     implements ble.PeripheralDelegate, gatt.LocalServiceDelegate {
@@ -98,60 +96,60 @@ class BLERectModuleModel extends ModuleModel
   // Publishes our GATT service.
   void _publishService() {
     // Our characteristics have the lowest security requirement.
-    final gatt.SecurityRequirements sec = const gatt.SecurityRequirements(
+    const gatt.SecurityRequirements sec = const gatt.SecurityRequirements(
       encryptionRequired: false,
       authenticationRequired: false,
       authorizationRequired: false,
     );
 
     // Reads are allowed without security. Writes are not allowed.
-    final gatt.AttributePermissions readOnlyPermissions =
-        new gatt.AttributePermissions(read: sec);
+    const gatt.AttributePermissions readOnlyPermissions =
+        const gatt.AttributePermissions(read: sec);
 
     // Writes are allowed without security. Reads are not allowed.
-    final gatt.AttributePermissions writeOnlyPermissions =
-        new gatt.AttributePermissions(write: sec);
+    const gatt.AttributePermissions writeOnlyPermissions =
+        const gatt.AttributePermissions(write: sec);
 
     // Color
-    final gatt.Characteristic color = new gatt.Characteristic(
+    const gatt.Characteristic color = const gatt.Characteristic(
         id: _colorId,
         type: _colorUuid,
         properties: gatt.kPropertyWrite | gatt.kPropertyReliableWrite,
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
-          new gatt.Descriptor(
+          const gatt.Descriptor(
               id: _colorDescId,
               type: _descUuid,
               permissions: readOnlyPermissions)
         ]);
 
     // Scale
-    final gatt.Characteristic scale = new gatt.Characteristic(
+    const gatt.Characteristic scale = const gatt.Characteristic(
         id: _scaleId,
         type: _scaleUuid,
         properties: gatt.kPropertyWrite,
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
-          new gatt.Descriptor(
+          const gatt.Descriptor(
               id: _scaleDescId,
               type: _descUuid,
               permissions: readOnlyPermissions)
         ]);
 
     // Rotate
-    final gatt.Characteristic rotate = new gatt.Characteristic(
+    const gatt.Characteristic rotate = const gatt.Characteristic(
         id: _rotateId,
         type: _rotateUuid,
         properties: gatt.kPropertyWriteWithoutResponse,
         permissions: writeOnlyPermissions,
         descriptors: <gatt.Descriptor>[
-          new gatt.Descriptor(
+          const gatt.Descriptor(
               id: _rotateDescId,
               type: _descUuid,
               permissions: readOnlyPermissions)
         ]);
 
-    final gatt.ServiceInfo service = new gatt.ServiceInfo(
+    const gatt.ServiceInfo service = const gatt.ServiceInfo(
         id: 0,
         primary: true,
         type: _serviceUuid,
@@ -175,7 +173,7 @@ class BLERectModuleModel extends ModuleModel
   void _startAdvertising() {
     _currentCentral = null;
 
-    final ble.AdvertisingData data = const ble.AdvertisingData(
+    const ble.AdvertisingData data = const ble.AdvertisingData(
       name: 'BLE Rect',
       serviceUuids: const <String>[_serviceUuid],
     );
@@ -320,7 +318,7 @@ class BLERectModuleModel extends ModuleModel
       return;
     }
 
-    _ValueWriteFunc func;
+    bool Function(List<int> value) func;
     if (id == _colorId) {
       func = _writeColor;
     } else if (id == _scaleId) {
