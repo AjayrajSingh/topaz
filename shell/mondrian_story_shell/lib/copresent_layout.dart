@@ -37,8 +37,10 @@ List<PositionedSurface> layoutSurfaces(
   Surface focused = focusStack.last;
 
   final double totalWidth = constraints.biggest.width;
+  final double screenWidth =
+      context != null ? MediaQuery.of(context).size.width : totalWidth;
   final double absoluteMinWidth = max(
-    MediaQuery.of(context).size.width * layoutModel.minScreenRatio,
+    screenWidth * layoutModel.minScreenRatio,
     layoutModel.minScreenWidth,
   );
   Tree<Surface> copresTree = focused.copresentSpanningTree;

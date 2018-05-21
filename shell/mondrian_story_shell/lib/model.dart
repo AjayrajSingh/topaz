@@ -112,6 +112,8 @@ class Surface extends Model {
         (Surface s) => s.relation.dependency == SurfaceDependency.dependent);
   }
 
+  // TODO(jphsiao) SY-497: move spanning treee logic to make it testable.
+
   /// Spans the full tree of all copresenting surfaces starting with this
   Tree<Surface> get copresentSpanningTree => _spanningTree(
       null,
@@ -202,7 +204,7 @@ class Surface extends Model {
     String edgeLabel = relation?.arrangement?.toString() ?? '';
     String edgeArrow = '$edgeLabel->'.padLeft(6, '-');
     String disconnected = _connection == null ? '[DISCONNECTED]' : '';
-    return '${edgeArrow}Surface${_node.value} $disconnected';
+    return '${edgeArrow}Surface ${_node.value} $disconnected';
   }
 
   List<Tree<Surface>> _endsOfChain({Tree<Surface> current}) {
@@ -289,8 +291,10 @@ class SurfaceGraph extends Model {
       .where(_surfaces.containsKey)
       .map((String id) => _surfaces[id]);
 
-  /// Add [Surface] to graph
-  void addSurface(
+  /// Add a [Surface] to the graph with the given parameters.
+  ///
+  /// Returns the surface that was added to the graph.
+  Surface addSurface(
     String id,
     SurfaceProperties properties,
     String parentId,
@@ -304,9 +308,12 @@ class SurfaceGraph extends Model {
     assert(relation != null);
     parent.add(node);
     Surface oldSurface = _surfaces[id];
-    _surfaces[id] = new Surface(this, node, properties, relation, pattern);
+    Surface updatedSurface =
+        new Surface(this, node, properties, relation, pattern);
+    _surfaces[id] = updatedSurface;
     oldSurface?.notifyListeners();
     notifyListeners();
+    return updatedSurface;
   }
 
   /// Removes [Surface] from graph

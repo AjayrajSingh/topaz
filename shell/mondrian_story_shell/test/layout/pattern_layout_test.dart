@@ -11,6 +11,8 @@ import 'package:mondrian/positioned_surface.dart';
 import 'package:mondrian/tree.dart';
 import 'package:test/test.dart';
 
+import '../layout_test_utils.dart' as test_util;
+
 const double maxHeight = 100.0;
 const double maxWidth = 100.0;
 
@@ -23,24 +25,6 @@ void main() {
       const BoxConstraints(maxHeight: maxHeight, maxWidth: maxWidth);
   Surface firstSurface = new MockSurface();
   LayoutModel layoutModel = new LayoutModel();
-
-  void assertSurfaceProperties(PositionedSurface surface,
-      {double height, double width, Offset topLeft, Offset bottomRight}) {
-    expect(surface.surface, isNotNull);
-    Rect position = surface.position;
-    if (height != null) {
-      expect(position.height, height);
-    }
-    if (width != null) {
-      expect(position.width, width);
-    }
-    if (topLeft != null) {
-      expect(position.topLeft, topLeft);
-    }
-    if (bottomRight != null) {
-      expect(position.bottomRight, bottomRight);
-    }
-  }
 
   test('Ticker pattern with 2 surfaces', () {
     Tree<String> tree = new MockTree();
@@ -56,12 +40,12 @@ void main() {
         null /* BuildContext */, constraints, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
-    assertSurfaceProperties(positionedSurfaces[0],
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
         height: maxHeight * 0.85,
         width: maxWidth,
         topLeft: const Offset(0.0, 0.0));
 
-    assertSurfaceProperties(positionedSurfaces[1],
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
         height: maxHeight * 0.15,
         width: maxWidth,
         topLeft: const Offset(0.0, maxHeight * 0.85));
@@ -82,12 +66,12 @@ void main() {
         null /* BuildContext */, constraints, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
-    assertSurfaceProperties(positionedSurfaces[0],
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
         height: maxHeight * 0.85,
         width: maxWidth,
         topLeft: const Offset(0.0, 0.0));
 
-    assertSurfaceProperties(positionedSurfaces[1],
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
         height: maxHeight * 0.15,
         width: maxWidth,
         topLeft: const Offset(0.0, maxHeight * 0.85));
@@ -110,12 +94,12 @@ void main() {
         null /* BuildContext */, constraints, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
-    assertSurfaceProperties(positionedSurfaces[0],
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
         height: maxHeight * 0.85,
         width: maxWidth,
         topLeft: const Offset(0.0, 0.0));
 
-    assertSurfaceProperties(positionedSurfaces[1],
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
         height: maxHeight * 0.15,
         width: maxWidth,
         topLeft: const Offset(0.0, maxHeight * 0.85));
@@ -134,12 +118,12 @@ void main() {
         null /* BuildContext */, constraints, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
-    assertSurfaceProperties(positionedSurfaces[0],
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
         height: maxHeight,
         width: maxWidth * 0.7,
         topLeft: const Offset(0.0, 0.0));
 
-    assertSurfaceProperties(positionedSurfaces[1],
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
         height: maxHeight,
         width: maxWidth * 0.3,
         topLeft: const Offset(maxWidth * 0.7, 0.0));
@@ -162,12 +146,12 @@ void main() {
         null /* BuildContext */, constraints, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
-    assertSurfaceProperties(positionedSurfaces[0],
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
         height: maxHeight,
         width: maxWidth * 0.7,
         topLeft: const Offset(0.0, 0.0));
 
-    assertSurfaceProperties(positionedSurfaces[1],
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
         height: maxHeight,
         width: maxWidth * 0.3,
         topLeft: const Offset(maxWidth * 0.7, 0.0));
@@ -186,7 +170,7 @@ void main() {
         null /* BuildContext */, constraints, surfaces, layoutModel);
     expect(positionedSurfaces.length, 1);
 
-    assertSurfaceProperties(positionedSurfaces.first,
+    test_util.assertSurfaceProperties(positionedSurfaces.first,
         height: maxHeight, width: maxWidth, topLeft: const Offset(0.0, 0.0));
   });
 
@@ -204,17 +188,17 @@ void main() {
         null /* BuildContext */, constraints, surfaces, layoutModel);
     expect(positionedSurfaces.length, 3);
 
-    assertSurfaceProperties(positionedSurfaces[0],
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
         height: maxHeight * 0.85,
         width: maxWidth * 0.7,
         topLeft: const Offset(0.0, 0.0));
 
-    assertSurfaceProperties(positionedSurfaces[1],
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
         height: maxHeight,
         width: maxWidth * 0.3,
         topLeft: const Offset(maxWidth * 0.7, 0.0));
 
-    assertSurfaceProperties(positionedSurfaces[2],
+    test_util.assertSurfaceProperties(positionedSurfaces[2],
         height: maxHeight * 0.15,
         width: maxWidth * 0.7,
         topLeft: const Offset(0.0, maxHeight * 0.85));
@@ -234,17 +218,17 @@ void main() {
         null /* BuildContext */, constraints, surfaces, layoutModel);
     expect(positionedSurfaces.length, 3);
 
-    assertSurfaceProperties(positionedSurfaces[0],
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
         height: maxHeight * 0.85,
         width: maxWidth * 0.7,
         topLeft: const Offset(0.0, 0.0));
 
-    assertSurfaceProperties(positionedSurfaces[1],
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
         height: maxHeight,
         width: maxWidth * 0.3,
         topLeft: const Offset(maxWidth * 0.7, 0.0));
 
-    assertSurfaceProperties(positionedSurfaces[2],
+    test_util.assertSurfaceProperties(positionedSurfaces[2],
         height: maxHeight * 0.15,
         width: maxWidth * 0.7,
         topLeft: const Offset(0.0, maxHeight * 0.85));
@@ -270,18 +254,18 @@ void main() {
         null /* BuildContext */, constraints, surfaces, layoutModel);
     expect(positionedSurfaces.length, 3);
 
-    assertSurfaceProperties(positionedSurfaces[0],
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
         height: maxHeight * 0.85,
         width: maxWidth * 0.7,
         topLeft: const Offset(0.0, 0.0));
 
-    assertSurfaceProperties(positionedSurfaces[1],
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
         height: maxHeight,
         width: maxWidth * 0.3,
         topLeft: const Offset(maxWidth * 0.7, 0.0));
     expect(positionedSurfaces[1].surface, commentsSurface2);
 
-    assertSurfaceProperties(positionedSurfaces[2],
+    test_util.assertSurfaceProperties(positionedSurfaces[2],
         height: maxHeight * 0.15,
         width: maxWidth * 0.7,
         topLeft: const Offset(0.0, maxHeight * 0.85));
