@@ -4,9 +4,6 @@
 
 #include "topaz/runtime/dart_runner/service_isolate.h"
 
-#include <dlfcn.h>
-#include <zircon/dlfcn.h>
-
 #include "lib/fsl/vmo/file.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/dart_library_natives.h"
@@ -22,10 +19,11 @@ namespace {
 
 MappedResource mapped_isolate_snapshot_data;
 MappedResource mapped_isolate_snapshot_instructions;
+MappedResource mapped_shared_snapshot_data;
+MappedResource mapped_shared_snapshot_instructions;
 tonic::DartLibraryNatives* service_natives = nullptr;
 
-Dart_NativeFunction GetNativeFunction(Dart_Handle name,
-                                      int argument_count,
+Dart_NativeFunction GetNativeFunction(Dart_Handle name, int argument_count,
                                       bool* auto_setup_scope) {
   FXL_CHECK(service_natives);
   return service_natives->GetNativeFunction(name, argument_count,
@@ -72,64 +70,61 @@ void EmbedderInformationCallback(Dart_EmbedderInformation* info) {
 
 }  // namespace
 
-Dart_Isolate CreateServiceIsolate(const char* uri,
-                                  Dart_IsolateFlags* flags,
+Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
                                   char** error) {
   Dart_SetEmbedderInformationCallback(EmbedderInformationCallback);
 
-  void* isolate_snapshot_data = nullptr;
-  void* isolate_snapshot_instructions = nullptr;
 #if defined(AOT_RUNTIME)
-  fsl::SizedVmo dylib;
-  if (!fsl::VmoFromFilename("pkg/data/libvmservice.so", &dylib)) {
-    FXL_LOG(ERROR) << "Failed to read "
-                   << "pkg/data/libvmservice.so";
-    return nullptr;
-  }
-
-  dlerror();
-  void* shared_library = dlopen_vmo(dylib.vmo().get(), RTLD_LAZY);
-  if (shared_library == nullptr) {
-    FXL_LOG(ERROR) << "dlopen failed: " << dlerror();
-    return nullptr;
-  }
-
-  isolate_snapshot_data = dlsym(shared_library, "_kDartIsolateSnapshotData");
-  if (isolate_snapshot_data == nullptr) {
-    FXL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotData) failed: " << dlerror();
-    return nullptr;
-  }
-
-  isolate_snapshot_instructions =
-      dlsym(shared_library, "_kDartIsolateSnapshotInstructions");
-  if (isolate_snapshot_instructions == nullptr) {
-    FXL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotInstructions) failed: "
-                   << dlerror();
-    return nullptr;
-  }
+  // The VM service was compiled as a separate app.
+  const char* snapshot_data_path =
+      "pkg/data/vmservice_isolate_snapshot_data.bin";
+  const char* snapshot_instructions_path =
+      "pkg/data/vmservice_isolate_snapshot_instructions.bin";
 #else
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/isolate_core_snapshot_data.bin",
-          mapped_isolate_snapshot_data)) {
-    *error = strdup("Failed to load core snapshot for service isolate");
+  // The VM service is embedded in the core snapshot.
+  const char* snapshot_data_path = "pkg/data/isolate_core_snapshot_data.bin";
+  const char* snapshot_instructions_path =
+      "pkg/data/isolate_core_snapshot_instructions.bin";
+#endif
+
+  if (!MappedResource::LoadFromNamespace(nullptr, snapshot_data_path,
+                                         mapped_isolate_snapshot_data)) {
+    *error = strdup("Failed to load snapshot for service isolate");
+    FXL_LOG(ERROR) << *error;
     return nullptr;
   }
-  isolate_snapshot_data = mapped_isolate_snapshot_data.address();
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/isolate_core_snapshot_instructions.bin",
-          mapped_isolate_snapshot_instructions, true /* executable */)) {
-    *error = strdup("Failed to load core snapshot for service isolate");
+  if (!MappedResource::LoadFromNamespace(nullptr, snapshot_instructions_path,
+                                         mapped_isolate_snapshot_instructions,
+                                         true /* executable */)) {
+    *error = strdup("Failed to load snapshot for service isolate");
+    FXL_LOG(ERROR) << *error;
     return nullptr;
   }
-  isolate_snapshot_instructions =
-      mapped_isolate_snapshot_instructions.address();
+
+#if defined(AOT_RUNTIME)
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/vmservice_shared_snapshot_data.bin",
+          mapped_shared_snapshot_data)) {
+    *error = strdup("Failed to load snapshot for service isolate");
+    FXL_LOG(ERROR) << *error;
+    return nullptr;
+  }
+  if (!MappedResource::LoadFromNamespace(
+          nullptr, "pkg/data/vmservice_shared_snapshot_instructions.bin",
+          mapped_shared_snapshot_instructions, true /* executable */)) {
+    *error = strdup("Failed to load snapshot for service isolate");
+    FXL_LOG(ERROR) << *error;
+    return nullptr;
+  }
 #endif
 
   auto state = new tonic::DartState();
-  Dart_Isolate isolate = Dart_CreateIsolate(
-      uri, "main", reinterpret_cast<const uint8_t*>(isolate_snapshot_data),
-      reinterpret_cast<const uint8_t*>(isolate_snapshot_instructions), nullptr,
-      nullptr, nullptr, state, error);
+  Dart_Isolate isolate =
+      Dart_CreateIsolate(uri, "main", mapped_isolate_snapshot_data.address(),
+                         mapped_isolate_snapshot_instructions.address(),
+                         mapped_shared_snapshot_data.address(),
+                         mapped_shared_snapshot_instructions.address(),
+                         nullptr /* flags */, state, error);
   if (!isolate) {
     FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << *error;
     return nullptr;
@@ -169,6 +164,12 @@ Dart_Isolate CreateServiceIsolate(const char* uri,
                          Dart_NewBoolean(true));
   SHUTDOWN_ON_ERROR(result);
 
+  // _originCheckDisabled = false
+  result =
+      Dart_SetField(library, Dart_NewStringFromCString("_originCheckDisabled"),
+                    Dart_NewBoolean(false));
+  SHUTDOWN_ON_ERROR(result);
+
   InitBuiltinLibrariesForIsolate(std::string(uri), nullptr, fileno(stdout),
                                  fileno(stderr), nullptr, nullptr, true);
 
@@ -177,12 +178,13 @@ Dart_Isolate CreateServiceIsolate(const char* uri,
   Dart_ExitIsolate();
   *error = Dart_IsolateMakeRunnable(isolate);
   if (*error != nullptr) {
+    FXL_LOG(ERROR) << *error;
     Dart_EnterIsolate(isolate);
     Dart_ShutdownIsolate();
     return nullptr;
   }
   return isolate;
-}
+}  // namespace dart_runner
 
 Dart_Handle GetVMServiceAssetsArchiveCallback() {
   MappedResource observatory_tar;

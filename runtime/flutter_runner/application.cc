@@ -6,6 +6,7 @@
 
 #include <dlfcn.h>
 #include <zircon/dlfcn.h>
+#include <zircon/status.h>
 
 #include <sstream>
 
@@ -20,8 +21,7 @@ namespace flutter {
 
 std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
 Application::Create(
-    TerminationCallback termination_callback,
-    component::Package package,
+    TerminationCallback termination_callback, component::Package package,
     component::StartupInfo startup_info,
     fidl::InterfaceRequest<component::ApplicationController> controller) {
   auto thread = std::make_unique<fsl::Thread>();
@@ -51,8 +51,7 @@ static std::string DebugLabelForURL(const std::string& url) {
 }
 
 Application::Application(
-    TerminationCallback termination_callback,
-    component::Package,
+    TerminationCallback termination_callback, component::Package,
     component::StartupInfo startup_info,
     fidl::InterfaceRequest<component::ApplicationController>
         application_controller_request)
@@ -123,6 +122,7 @@ Application::Application(
   application_context_ =
       component::ApplicationContext::CreateFrom(std::move(startup_info));
 
+  // Compare flutter_jit_runner in BUILD.gn.
   settings_.vm_snapshot_data_path = "pkg/data/vm_snapshot_data.bin";
   settings_.vm_snapshot_instr_path = "pkg/data/vm_snapshot_instructions.bin";
   settings_.isolate_snapshot_data_path =
@@ -136,8 +136,9 @@ Application::Application(
 
   settings_.assets_dir = application_assets_directory_.get();
 
+  // Compare flutter1_jit_app in flutter_app.gni.
   settings_.script_snapshot_path = "snapshot_blob.bin";
-  settings_.application_kernel_asset = "kernel_blob.dill";
+  // Compare flutter2_jit_app in flutter_app.gni.
   settings_.application_kernel_list_asset = "app.dilplist";
 
   settings_.log_tag = debug_label_ + std::string{"(flutter)"};
@@ -162,8 +163,61 @@ Application::Application(
 
 Application::~Application() = default;
 
-const std::string& Application::GetDebugLabel() const {
-  return debug_label_;
+const std::string& Application::GetDebugLabel() const { return debug_label_; }
+
+class FileInNamespaceBuffer final : public blink::DartSnapshotBuffer {
+ public:
+  FileInNamespaceBuffer(int namespace_fd, const char* path, bool executable)
+      : address_(nullptr), size_(0) {
+    fsl::SizedVmo vmo;
+    if (!fsl::VmoFromFilenameAt(namespace_fd, path, &vmo)) {
+      return;
+    }
+    if (vmo.size() == 0) {
+      return;
+    }
+
+    uint32_t flags = ZX_VM_FLAG_PERM_READ;
+    if (executable) {
+      flags |= ZX_VM_FLAG_PERM_EXECUTE;
+    }
+    uintptr_t addr;
+    zx_status_t status =
+        zx::vmar::root_self().map(0, vmo.vmo(), 0, vmo.size(), flags, &addr);
+    if (status != ZX_OK) {
+      FXL_LOG(FATAL) << "Failed to map " << path << ": "
+                     << zx_status_get_string(status);
+    }
+
+    address_ = reinterpret_cast<void*>(addr);
+    size_ = vmo.size();
+  }
+
+  ~FileInNamespaceBuffer() {
+    if (address_ != nullptr) {
+      zx::vmar::root_self().unmap(reinterpret_cast<uintptr_t>(address_), size_);
+      address_ = nullptr;
+      size_ = 0;
+    }
+  }
+
+  const uint8_t* GetSnapshotPointer() const override {
+    return reinterpret_cast<const uint8_t*>(address_);
+  }
+  size_t GetSnapshotSize() const override { return size_; }
+
+ private:
+  void* address_;
+  size_t size_;
+
+  FXL_DISALLOW_COPY_AND_ASSIGN(FileInNamespaceBuffer);
+};
+
+std::unique_ptr<blink::DartSnapshotBuffer> CreateWithContentsOfFile(
+    int namespace_fd, const char* file_path, bool executable) {
+  auto source = std::make_unique<FileInNamespaceBuffer>(namespace_fd, file_path,
+                                                        executable);
+  return source->GetSnapshotPointer() == nullptr ? nullptr : std::move(source);
 }
 
 void Application::AttemptVMLaunchWithCurrentSettings(
@@ -173,51 +227,79 @@ void Application::AttemptVMLaunchWithCurrentSettings(
     return;
   }
 
+  fxl::RefPtr<blink::DartSnapshot> vm_snapshot;
+
+
   fsl::SizedVmo dylib_vmo;
 
-  if (!fsl::VmoFromFilenameAt(
-          application_assets_directory_.get() /* /pkg/data */, "libapp.so",
-          &dylib_vmo)) {
-    FXL_LOG(ERROR) << "Dylib containing VM and isolate snapshots does not "
-                      "exist. Will not be able to launch VM.";
-    return;
+  if (fsl::VmoFromFilenameAt(
+            application_assets_directory_.get() /* /pkg/data */, "libapp.so",
+            &dylib_vmo)) {
+    // Dart 1 still generating a dylib.
+    dlerror();
+
+    auto library_handle = dlopen_vmo(dylib_vmo.vmo().get(), RTLD_LAZY);
+
+    if (library_handle == nullptr) {
+      FXL_LOG(ERROR) << "Could not open dylib: " << dlerror();
+      return;
+    }
+
+    auto lib =
+        fml::NativeLibrary::CreateWithHandle(library_handle,  // library handle
+                                             true  // close the handle when done
+        );
+
+    auto symbol = [](const char* str) {
+      return std::string{"_"} + std::string{str};
+    };
+
+    vm_snapshot = fxl::MakeRefCounted<blink::DartSnapshot>(
+        blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
+            lib, symbol(blink::DartSnapshot::kVMDataSymbol).c_str()),
+        blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
+            lib, symbol(blink::DartSnapshot::kVMInstructionsSymbol).c_str()));
+
+    isolate_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
+        blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
+            lib, symbol(blink::DartSnapshot::kIsolateDataSymbol).c_str()),
+        blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
+            lib,
+            symbol(blink::DartSnapshot::kIsolateInstructionsSymbol).c_str()));
+
+    shared_snapshot_ = blink::DartSnapshot::Empty();
+  } else {
+    // Dart 2 using blobs to allow sharing.
+    // Compare flutter2_aot_app in flutter_app.gni.
+    vm_snapshot = fxl::MakeRefCounted<blink::DartSnapshot>(
+        CreateWithContentsOfFile(
+            application_assets_directory_.get() /* /pkg/data */,
+            "vm_snapshot_data.bin", false),
+        CreateWithContentsOfFile(
+            application_assets_directory_.get() /* /pkg/data */,
+            "vm_snapshot_instructions.bin", true));
+
+    isolate_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
+        CreateWithContentsOfFile(
+            application_assets_directory_.get() /* /pkg/data */,
+            "isolate_snapshot_data.bin", false),
+        CreateWithContentsOfFile(
+            application_assets_directory_.get() /* /pkg/data */,
+            "isolate_snapshot_instructions.bin", true));
+
+    shared_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
+        CreateWithContentsOfFile(
+            application_assets_directory_.get() /* /pkg/data */,
+            "shared_snapshot_data.bin", false),
+        CreateWithContentsOfFile(
+            application_assets_directory_.get() /* /pkg/data */,
+            "shared_snapshot_instructions.bin", true));
   }
-
-  dlerror();
-
-  auto library_handle = dlopen_vmo(dylib_vmo.vmo().get(), RTLD_LAZY);
-
-  if (library_handle == nullptr) {
-    FXL_LOG(ERROR) << "Could not open dylib: " << dlerror();
-    return;
-  }
-
-  auto lib =
-      fml::NativeLibrary::CreateWithHandle(library_handle,  // library handle
-                                           true  // close the handle when done
-      );
-
-  auto symbol = [](const char* str) {
-    return std::string{"_"} + std::string{str};
-  };
-
-  fxl::RefPtr<blink::DartSnapshot> vm_snapshot =
-      fxl::MakeRefCounted<blink::DartSnapshot>(
-          blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
-              lib, symbol(blink::DartSnapshot::kVMDataSymbol).c_str()),
-          blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
-              lib, symbol(blink::DartSnapshot::kVMInstructionsSymbol).c_str()));
-
-  isolate_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
-      blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
-          lib, symbol(blink::DartSnapshot::kIsolateDataSymbol).c_str()),
-      blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
-          lib,
-          symbol(blink::DartSnapshot::kIsolateInstructionsSymbol).c_str()));
 
   blink::DartVM::ForProcess(settings_,               //
                             std::move(vm_snapshot),  //
-                            isolate_snapshot_        //
+                            isolate_snapshot_,       //
+                            shared_snapshot_         //
   );
   if (blink::DartVM::ForProcessIfInitialized()) {
     FXL_DLOG(INFO) << "VM successfully initialized for AOT mode.";
@@ -299,6 +381,7 @@ void Application::CreateView(
       *application_context_,                 // application context
       settings_,                             // settings
       std::move(isolate_snapshot_),          // isolate snapshot
+      std::move(shared_snapshot_),           // shared snapshot
       std::move(view_owner),                 // view owner
       std::move(fdio_ns_),                   // FDIO namespace
       std::move(outgoing_services_request_)  // outgoing request

@@ -27,11 +27,11 @@ class Engine final : public mozart::NativesDelegate {
     virtual void OnEngineTerminate(const Engine* holder) = 0;
   };
 
-  Engine(Delegate& delegate,
-         std::string thread_label,
+  Engine(Delegate& delegate, std::string thread_label,
          component::ApplicationContext& application_context,
          blink::Settings settings,
          fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
+         fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
          fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner,
          UniqueFDIONS fdio_ns,
          fidl::InterfaceRequest<component::ServiceProvider>

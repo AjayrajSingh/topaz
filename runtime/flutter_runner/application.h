@@ -37,8 +37,7 @@ class Application final : public Engine::Delegate,
   // application on it. The application can be accessed only on this thread.
   // This is a synchronous operation.
   static std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
-  Create(TerminationCallback termination_callback,
-         component::Package package,
+  Create(TerminationCallback termination_callback, component::Package package,
          component::StartupInfo startup_info,
          fidl::InterfaceRequest<component::ApplicationController> controller);
 
@@ -61,13 +60,13 @@ class Application final : public Engine::Delegate,
   std::unique_ptr<component::ApplicationContext> application_context_;
   fidl::BindingSet<views_v1::ViewProvider> shells_bindings_;
   fxl::RefPtr<blink::DartSnapshot> isolate_snapshot_;
+  fxl::RefPtr<blink::DartSnapshot> shared_snapshot_;
   std::set<std::unique_ptr<Engine>> shell_holders_;
   std::vector<WaitCallback> wait_callbacks_;
   std::pair<bool, uint32_t> last_return_code_;
 
   Application(
-      TerminationCallback termination_callback,
-      component::Package package,
+      TerminationCallback termination_callback, component::Package package,
       component::StartupInfo startup_info,
       fidl::InterfaceRequest<component::ApplicationController> controller);
 

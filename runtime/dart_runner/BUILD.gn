@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/package.gni")
+import("dart_app.gni")
 
 pool("dart_aot_pool") {
   # AOT invocations of gen_snapshot can use ~450MB each.
@@ -112,7 +113,10 @@ runner("dart_aot_runner_bin") {
 runner("dart_aot_product_runner_bin") {
   output_name = "dart_aot_product_runner"
   product = true
-  extra_defines = [ "AOT_RUNTIME", "DART_PRODUCT" ]
+  extra_defines = [
+    "AOT_RUNTIME",
+    "DART_PRODUCT",
+  ]
   extra_deps = [
     "//topaz/runtime/dart_runner/embedder:dart_aot_product_snapshot_cc",
     "//third_party/dart/runtime:libdart_precompiled_runtime_product",
@@ -132,9 +136,21 @@ template("aot_runner_package") {
     ]
     if (!invoker.product) {
       deps += [
-        "vmservice:vmservice_dylib($shlib_toolchain)",
+        "vmservice:vmservice_snapshot",
         "//third_party/dart/runtime/observatory:embedded_archive_observatory",
       ]
+
+      if (dart_aot_sharing_basis != "") {
+        deps += [ get_label_info(dart_aot_sharing_basis, "label_no_toolchain") +
+                  "_snapshot" ]
+        prefix = get_label_info(dart_aot_sharing_basis, "target_gen_dir") + "/" +
+                 get_label_info(dart_aot_sharing_basis, "name")
+        shared_snapshot_data_path = "${prefix}_data.aotsnapshot"
+        shared_snapshot_instructions_path = "${prefix}_instructions.aotsnapshot"
+      } else {
+        shared_snapshot_data_path = "//topaz/runtime/dart_runner/empty"
+        shared_snapshot_instructions_path = "//topaz/runtime/dart_runner/empty"
+      }
     }
 
     binary = "dart_aot${product_suffix}_runner"
@@ -150,10 +166,24 @@ template("aot_runner_package") {
     if (!invoker.product) {
       resources += [
         {
-          path = rebase_path(
-                  get_label_info("vmservice:vmservice_dylib($shlib_toolchain)",
-                                 "root_out_dir") + "/libvmservice.so")
-          dest = "libvmservice.so"
+          path = rebase_path(get_label_info("vmservice:vmservice_snapshot",
+                                            "target_gen_dir") +
+                             "/vmservice_data.aotsnapshot")
+          dest = "vmservice_isolate_snapshot_data.bin"
+        },
+        {
+          path = rebase_path(get_label_info("vmservice:vmservice_snapshot",
+                                            "target_gen_dir") +
+                             "/vmservice_instructions.aotsnapshot")
+          dest = "vmservice_isolate_snapshot_instructions.bin"
+        },
+        {
+          path = rebase_path(shared_snapshot_data_path)
+          dest = "vmservice_shared_snapshot_data.bin"
+        },
+        {
+          path = rebase_path(shared_snapshot_instructions_path)
+          dest = "vmservice_shared_snapshot_instructions.bin"
         },
         {
           path = rebase_path(
@@ -197,19 +227,23 @@ template("jit_runner_package") {
 
     resources = [
       {
-        path = rebase_path("$target_gen_dir/kernel/vm_data${product_suffix}.bin")
+        path =
+            rebase_path("$target_gen_dir/kernel/vm_data${product_suffix}.bin")
         dest = "vm_snapshot_data.bin"
       },
       {
-        path = rebase_path("$target_gen_dir/kernel/vm_instructions${product_suffix}.bin")
+        path = rebase_path(
+                "$target_gen_dir/kernel/vm_instructions${product_suffix}.bin")
         dest = "vm_snapshot_instructions.bin"
       },
       {
-        path = rebase_path("$target_gen_dir/kernel/isolate_data${product_suffix}.bin")
+        path = rebase_path(
+                "$target_gen_dir/kernel/isolate_data${product_suffix}.bin")
         dest = "isolate_core_snapshot_data.bin"
       },
       {
-        path = rebase_path("$target_gen_dir/kernel/isolate_instructions${product_suffix}.bin")
+        path = rebase_path(
+                "$target_gen_dir/kernel/isolate_instructions${product_suffix}.bin")
         dest = "isolate_core_snapshot_instructions.bin"
       },
     ]

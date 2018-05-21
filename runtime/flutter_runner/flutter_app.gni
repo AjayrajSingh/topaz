@@ -17,6 +17,17 @@ declare_args() {
   flutter_default_app = "flutter2_jit_app"
   flutter1_default_app = "flutter1_jit_app"
   flutter2_default_app = "flutter2_jit_app"
+
+  # When AOT compiling, an app will reference objects in the sharing basis's
+  # snapshot when available instead of writing the objects in its own snapshot.
+  # The snapshot of the sharing basis app will be included in every other app's
+  # package and deduplicated by blobfs.
+  if (is_debug) {
+    # Armadillo is not AOT compiled in debug builds
+    flutter_aot_sharing_basis = ""
+  } else {
+    flutter_aot_sharing_basis = "//topaz/bin/user_shell/armadillo_user_shell"
+  }
 }
 
 flutter_base = "//third_party/dart-pkg/git/flutter"
@@ -202,7 +213,10 @@ template("flutter2_jit_app") {
     if (defined(invoker.fuchsia_package_name)) {
       package_name = invoker.fuchsia_package_name
     }
-    extra = [ asset_manifest, kernel_manifest ]
+    extra = [
+      asset_manifest,
+      kernel_manifest,
+    ]
 
     deps = [
       ":$kernel_target_name",
@@ -211,27 +225,33 @@ template("flutter2_jit_app") {
 
     resources = invoker_resources
 
-    meta = [ {
-          path = rebase_path("//topaz/runtime/flutter_runner/meta/jit2_runtime")
-          dest = "runtime"
-        } ]
+    meta = [
+      {
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit2_runtime")
+        dest = "runtime"
+      },
+    ]
 
     if (defined(invoker.module_manifest)) {
       deps += [
         ":${target_name}_copy_manifest",
         ":${target_name}_verify_manifest",
       ]
-      meta += [ {
-            path = rebase_path(invoker.module_manifest)
-            dest = "module.json"
-          } ]
+      meta += [
+        {
+          path = rebase_path(invoker.module_manifest)
+          dest = "module.json"
+        },
+      ]
     }
 
     if (defined(invoker.sandbox)) {
-      meta += [ {
-            path = rebase_path(invoker.sandbox)
-            dest = "sandbox"
-          } ]
+      meta += [
+        {
+          path = rebase_path(invoker.sandbox)
+          dest = "sandbox"
+        },
+      ]
     }
 
     if (defined(invoker.meta)) {
@@ -385,27 +405,32 @@ template("flutter_source_app") {
       resources = invoker.resources
     }
 
-    meta = [ {
-          path =
-              rebase_path("//topaz/runtime/flutter_runner/meta/source_runtime")
-          dest = "runtime"
-        } ]
+    meta = [
+      {
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/source_runtime")
+        dest = "runtime"
+      },
+    ]
     if (defined(invoker.module_manifest)) {
       deps += [
         ":${target_name}_copy_manifest",
         ":${target_name}_verify_manifest",
       ]
-      meta += [ {
-            path = rebase_path(invoker.module_manifest)
-            dest = "module.json"
-          } ]
+      meta += [
+        {
+          path = rebase_path(invoker.module_manifest)
+          dest = "module.json"
+        },
+      ]
     }
 
     if (defined(invoker.sandbox)) {
-      meta += [ {
-            path = rebase_path(invoker.sandbox)
-            dest = "sandbox"
-          } ]
+      meta += [
+        {
+          path = rebase_path(invoker.sandbox)
+          dest = "sandbox"
+        },
+      ]
     }
   }
 }
@@ -589,32 +614,40 @@ template("flutter1_jit_app") {
       ":${target_name}_resources",
     ]
 
-    resources = [ {
-                  path = rebase_path(snapshot_path)
-                  dest = "snapshot_blob.bin"
-                } ] + invoker_resources
+    resources = [
+                  {
+                    path = rebase_path(snapshot_path)
+                    dest = "snapshot_blob.bin"
+                  },
+                ] + invoker_resources
 
-    meta = [ {
-          path = rebase_path("//topaz/runtime/flutter_runner/meta/jit_runtime")
-          dest = "runtime"
-        } ]
+    meta = [
+      {
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit_runtime")
+        dest = "runtime"
+      },
+    ]
 
     if (defined(invoker.module_manifest)) {
       deps += [
         ":${target_name}_copy_manifest",
         ":${target_name}_verify_manifest",
       ]
-      meta += [ {
-            path = rebase_path(invoker.module_manifest)
-            dest = "module.json"
-          } ]
+      meta += [
+        {
+          path = rebase_path(invoker.module_manifest)
+          dest = "module.json"
+        },
+      ]
     }
 
     if (defined(invoker.sandbox)) {
-      meta += [ {
-            path = rebase_path(invoker.sandbox)
-            dest = "sandbox"
-          } ]
+      meta += [
+        {
+          path = rebase_path(invoker.sandbox)
+          dest = "sandbox"
+        },
+      ]
     }
 
     if (defined(invoker.meta)) {
@@ -826,32 +859,40 @@ template("flutter1_aot_app") {
       ":${target_name}_resources",
     ]
 
-    resources = [ {
-                  path = rebase_path(dylib_path)
-                  dest = "libapp.so"
-                } ] + invoker_resources
+    resources = [
+                  {
+                    path = rebase_path(dylib_path)
+                    dest = "libapp.so"
+                  },
+                ] + invoker_resources
 
-    meta = [ {
-          path = rebase_path("//topaz/runtime/flutter_runner/meta/aot_runtime")
-          dest = "runtime"
-        } ]
+    meta = [
+      {
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/aot_runtime")
+        dest = "runtime"
+      },
+    ]
 
     if (defined(invoker.module_manifest)) {
       deps += [
         ":${target_name}_copy_manifest",
         ":${target_name}_verify_manifest",
       ]
-      meta += [ {
-            path = rebase_path(invoker.module_manifest)
-            dest = "module.json"
-          } ]
+      meta += [
+        {
+          path = rebase_path(invoker.module_manifest)
+          dest = "module.json"
+        },
+      ]
     }
 
     if (defined(invoker.sandbox)) {
-      meta += [ {
-            path = rebase_path(invoker.sandbox)
-            dest = "sandbox"
-          } ]
+      meta += [
+        {
+          path = rebase_path(invoker.sandbox)
+          dest = "sandbox"
+        },
+      ]
     }
 
     if (defined(invoker.meta)) {
@@ -900,21 +941,52 @@ template("flutter2_aot_app") {
     args = [ "--aot" ]
   }
 
-  assembly_path = "$target_gen_dir/${target_name}.S"
-  assembly_target_name = target_name + "_assembly"
+  # TODO(rmacnak): Don't bake the VM service into each app.
+  vm_snapshot_data_path = "$target_gen_dir/${target_name}_vm_data.aotsnapshot"
+  vm_snapshot_instructions_path =
+      "$target_gen_dir/${target_name}_vm_instructions.aotsnapshot"
+  snapshot_data_path = "$target_gen_dir/${target_name}_data.aotsnapshot"
+  snapshot_instructions_path =
+      "$target_gen_dir/${target_name}_instructions.aotsnapshot"
+  snapshot_target_name = target_name + "_snapshot"
 
-  action(assembly_target_name) {
+  if (flutter_aot_sharing_basis != "" &&
+      get_label_info(":$target_name", "label_no_toolchain") !=
+      get_label_info(flutter_aot_sharing_basis, "label_no_toolchain")) {
+    # Note: The use of "label_no_toolchain" is to ensure we are comparing fully
+    # qualified target names. We don't actually care about the toolchain.
+    shared_snapshot_deps =
+        [ get_label_info(flutter_aot_sharing_basis, "label_no_toolchain") +
+          "_snapshot" ]
+    prefix = get_label_info(flutter_aot_sharing_basis, "target_gen_dir") + "/" +
+             get_label_info(flutter_aot_sharing_basis, "name")
+    shared_snapshot_data_path = "${prefix}_data.aotsnapshot"
+    shared_snapshot_instructions_path = "${prefix}_instructions.aotsnapshot"
+  } else {
+    shared_snapshot_deps = []
+    shared_snapshot_data_path = "//topaz/runtime/dart_runner/empty"
+    shared_snapshot_instructions_path = "//topaz/runtime/dart_runner/empty"
+  }
+
+  action(snapshot_target_name) {
     if (defined(invoker.testonly)) {
       testonly = invoker.testonly
     }
 
-    deps = gen_snapshot_deps + [ ":$kernel_target_name" ]
-    inputs = _entry_manifests + [ kernel_path ]
+    deps = gen_snapshot_deps + shared_snapshot_deps + [ ":$kernel_target_name" ]
+    inputs = _entry_manifests + [
+               shared_snapshot_data_path,
+               shared_snapshot_instructions_path,
+               kernel_path,
+             ]
     if (defined(invoker.extra_entry_manifests)) {
       inputs += invoker.extra_entry_manifests
     }
     outputs = [
-      assembly_path,
+      vm_snapshot_data_path,
+      vm_snapshot_instructions_path,
+      snapshot_data_path,
+      snapshot_instructions_path,
     ]
 
     script = gen_snapshot
@@ -925,8 +997,15 @@ template("flutter2_aot_app") {
       "--strong",
       "--sync-async",
       "--deterministic",
-      "--snapshot_kind=app-aot-assembly",
-      "--assembly=" + rebase_path(assembly_path),
+      "--snapshot_kind=app-aot-blobs",
+      "--vm_snapshot_data=" + rebase_path(vm_snapshot_data_path),
+      "--vm_snapshot_instructions=" +
+          rebase_path(vm_snapshot_instructions_path),
+      "--isolate_snapshot_data=" + rebase_path(snapshot_data_path),
+      "--isolate_snapshot_instructions=" +
+          rebase_path(snapshot_instructions_path),
+      "--shared_data=" + rebase_path(shared_snapshot_data_path),
+      "--shared_instructions=" + rebase_path(shared_snapshot_instructions_path),
     ]
     foreach(entry_manifest, _entry_manifests) {
       args +=
@@ -945,29 +1024,6 @@ template("flutter2_aot_app") {
 
     pool = "//topaz/runtime/dart_runner:dart_aot_pool($target_toolchain)"
   }
-
-  dylib_target_name = target_name + "_dylib"
-  outer_target_name = target_name
-  shared_library(dylib_target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
-    }
-
-    deps = [
-      ":$assembly_target_name",
-    ]
-    sources = [
-      assembly_path,
-    ]
-    cflags = [
-      "-nostdlib",
-      "-nostartfiles",
-    ]
-    output_name = outer_target_name
-  }
-
-  dylib_path = get_label_info(":$dylib_target_name($shlib_toolchain)",
-                              "root_out_dir") + "/lib$target_name.so"
 
   if (defined(invoker.resources)) {
     invoker_resources = invoker.resources
@@ -1033,40 +1089,65 @@ template("flutter2_aot_app") {
     }
     extra = [ asset_manifest ]
 
-    deps = [
-      ":$dylib_target_name",
-      ":${target_name}_resources",
+    deps = shared_snapshot_deps + [
+             ":$snapshot_target_name",
+             ":${target_name}_resources",
+           ]
 
-      # Fake dependency for testing until this is added to flutter_runner
-      "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc",
+    resources = [
+                  {
+                    path = rebase_path(vm_snapshot_data_path)
+                    dest = "vm_snapshot_data.bin"
+                  },
+                  {
+                    path = rebase_path(vm_snapshot_instructions_path)
+                    dest = "vm_snapshot_instructions.bin"
+                  },
+                  {
+                    path = rebase_path(snapshot_data_path)
+                    dest = "isolate_snapshot_data.bin"
+                  },
+                  {
+                    path = rebase_path(snapshot_instructions_path)
+                    dest = "isolate_snapshot_instructions.bin"
+                  },
+                  {
+                    path = rebase_path(shared_snapshot_data_path)
+                    dest = "shared_snapshot_data.bin"
+                  },
+                  {
+                    path = rebase_path(shared_snapshot_instructions_path)
+                    dest = "shared_snapshot_instructions.bin"
+                  },
+                ] + invoker_resources
+
+    meta = [
+      {
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/aot2_runtime")
+        dest = "runtime"
+      },
     ]
-
-    resources = [ {
-                  path = rebase_path(dylib_path)
-                  dest = "libapp.so"
-                } ] + invoker_resources
-
-    meta = [ {
-          path = rebase_path("//topaz/runtime/flutter_runner/meta/aot2_runtime")
-          dest = "runtime"
-        } ]
 
     if (defined(invoker.module_manifest)) {
       deps += [
         ":${target_name}_copy_manifest",
         ":${target_name}_verify_manifest",
       ]
-      meta += [ {
-            path = rebase_path(invoker.module_manifest)
-            dest = "module.json"
-          } ]
+      meta += [
+        {
+          path = rebase_path(invoker.module_manifest)
+          dest = "module.json"
+        },
+      ]
     }
 
     if (defined(invoker.sandbox)) {
-      meta += [ {
-            path = rebase_path(invoker.sandbox)
-            dest = "sandbox"
-          } ]
+      meta += [
+        {
+          path = rebase_path(invoker.sandbox)
+          dest = "sandbox"
+        },
+      ]
     }
 
     if (defined(invoker.meta)) {

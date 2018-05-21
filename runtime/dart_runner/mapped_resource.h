@@ -34,21 +34,20 @@ class MappedResource {
   // namespace is used (in which case, ./pkg means the dart_runner's package).
   // The content is unmapped when the MappedResource goes out of scope. Returns
   // true on success.
-  static bool LoadFromNamespace(fdio_ns_t* namespc,
-                                const std::string& path,
+  static bool LoadFromNamespace(fdio_ns_t* namespc, const std::string& path,
                                 MappedResource& resource,
                                 bool executable = false);
 
   // Maps a VMO into the current process's address space. The content is
   // unmapped when the MappedResource goes out of scope. Returns true on
   // success. The path is used only for error messages.
-  static bool LoadFromVmo(const std::string& path,
-                          fsl::SizedVmo resource_vmo,
-                          MappedResource& resource,
-                          bool executable = false);
+  static bool LoadFromVmo(const std::string& path, fsl::SizedVmo resource_vmo,
+                          MappedResource& resource, bool executable = false);
 
-  void* address() { return address_; }
-  size_t size() { return size_; }
+  const uint8_t* address() const {
+    return reinterpret_cast<const uint8_t*>(address_);
+  }
+  size_t size() const { return size_; }
 
  private:
   void* address_;

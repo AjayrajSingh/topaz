@@ -18,6 +18,18 @@ declare_args() {
   } else {
     dart_default_app = "dart_aot_app"
   }
+
+  # When AOT compiling, an app will reference objects in the sharing basis's
+  # snapshot when available instead of writing the objects in its own snapshot.
+  # The snapshot of the sharing basis app will be included in every other app's
+  # package and deduplicated by blobfs.
+  if (is_debug) {
+    # module_suggester is not AOT compiled in debug builds
+    dart_aot_sharing_basis = ""
+  } else {
+    dart_aot_sharing_basis =
+        "//topaz/app/maxwell/agents/module_suggester_dart:module_suggester"
+  }
 }
 
 _kernel_compiler_label =
@@ -150,7 +162,11 @@ template("dart_jit_app") {
   }
 
   package(target_name) {
-    forward_variables_from(invoker, [ "testonly", "tests"])
+    forward_variables_from(invoker,
+                           [
+                             "testonly",
+                             "tests",
+                           ])
 
     if (defined(invoker.fuchsia_package_name)) {
       package_name = invoker.fuchsia_package_name
@@ -161,9 +177,7 @@ template("dart_jit_app") {
       non_dart_deps = invoker.non_dart_deps
     }
 
-    deps = [
-      ":$kernel_target_name",
-    ] + non_dart_deps
+    deps = [ ":$kernel_target_name" ] + non_dart_deps
 
     extra = [ kernel_manifest ]
 
@@ -178,7 +192,8 @@ template("dart_jit_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime")
+        path = rebase_path(
+                "//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime")
         dest = "runtime"
       },
     ]
@@ -244,23 +259,52 @@ template("dart_aot_app") {
     args = [ "--aot" ]
   }
 
-  assembly_path = "$target_gen_dir/${target_name}.S"
-  assembly_target_name = target_name + "_assembly"
+  # TODO(rmacnak): VM snapshot is ignored. Allow skipping its generation.
+  vm_snapshot_data_path = "$target_gen_dir/${target_name}_vm_data.aotsnapshot"
+  vm_snapshot_instructions_path =
+      "$target_gen_dir/${target_name}_vm_instructions.aotsnapshot"
+  snapshot_data_path = "$target_gen_dir/${target_name}_data.aotsnapshot"
+  snapshot_instructions_path =
+      "$target_gen_dir/${target_name}_instructions.aotsnapshot"
+  snapshot_target_name = target_name + "_snapshot"
 
-  action(assembly_target_name) {
+  if (dart_aot_sharing_basis != "" &&
+      get_label_info(":$target_name", "label_no_toolchain") !=
+      get_label_info(dart_aot_sharing_basis, "label_no_toolchain")) {
+    # Note: The use of "label_no_toolchain" is to ensure we are comparing fully
+    # qualified target names. We don't actually care about the toolchain.
+    shared_snapshot_deps =
+        [ get_label_info(dart_aot_sharing_basis, "label_no_toolchain") +
+          "_snapshot" ]
+    prefix = get_label_info(dart_aot_sharing_basis, "target_gen_dir") + "/" +
+             get_label_info(dart_aot_sharing_basis, "name")
+    shared_snapshot_data_path = "${prefix}_data.aotsnapshot"
+    shared_snapshot_instructions_path = "${prefix}_instructions.aotsnapshot"
+  } else {
+    shared_snapshot_deps = []
+    shared_snapshot_data_path = "//topaz/runtime/dart_runner/empty"
+    shared_snapshot_instructions_path = "//topaz/runtime/dart_runner/empty"
+  }
+
+  action(snapshot_target_name) {
     if (defined(invoker.testonly)) {
       testonly = invoker.testonly
     }
 
-    deps = gen_snapshot_deps + [
-      ":$kernel_target_name",
-    ]
-    inputs = _entry_manifests + [ kernel_path ]
+    deps = gen_snapshot_deps + shared_snapshot_deps + [ ":$kernel_target_name" ]
+    inputs = _entry_manifests + [
+               shared_snapshot_data_path,
+               shared_snapshot_instructions_path,
+               kernel_path,
+             ]
     if (defined(invoker.extra_entry_manifests)) {
       inputs += invoker.extra_entry_manifests
     }
     outputs = [
-      assembly_path,
+      vm_snapshot_data_path,
+      vm_snapshot_instructions_path,
+      snapshot_data_path,
+      snapshot_instructions_path,
     ]
 
     if (product) {
@@ -276,8 +320,15 @@ template("dart_aot_app") {
       "--strong",
       "--sync-async",
       "--deterministic",
-      "--snapshot_kind=app-aot-assembly",
-      "--assembly=" + rebase_path(assembly_path),
+      "--snapshot_kind=app-aot-blobs",
+      "--vm_snapshot_data=" + rebase_path(vm_snapshot_data_path),
+      "--vm_snapshot_instructions=" +
+          rebase_path(vm_snapshot_instructions_path),
+      "--isolate_snapshot_data=" + rebase_path(snapshot_data_path),
+      "--isolate_snapshot_instructions=" +
+          rebase_path(snapshot_instructions_path),
+      "--shared_data=" + rebase_path(shared_snapshot_data_path),
+      "--shared_instructions=" + rebase_path(shared_snapshot_instructions_path),
     ]
     foreach(entry_manifest, _entry_manifests) {
       args +=
@@ -297,31 +348,12 @@ template("dart_aot_app") {
     pool = "//topaz/runtime/dart_runner:dart_aot_pool($target_toolchain)"
   }
 
-  dylib_target_name = target_name + "_dylib"
-  outer_target_name = target_name
-  shared_library(dylib_target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
-    }
-
-    deps = [
-      ":$assembly_target_name",
-    ]
-    sources = [
-      assembly_path,
-    ]
-    cflags = [
-      "-nostdlib",
-      "-nostartfiles",
-    ]
-    output_name = outer_target_name
-  }
-
-  dylib_path = get_label_info(":$dylib_target_name($shlib_toolchain)",
-                              "root_out_dir") + "/lib$target_name.so"
-
   package(target_name) {
-    forward_variables_from(invoker, [ "testonly", "tests" ])
+    forward_variables_from(invoker,
+                           [
+                             "testonly",
+                             "tests",
+                           ])
 
     if (defined(invoker.fuchsia_package_name)) {
       package_name = invoker.fuchsia_package_name
@@ -332,15 +364,24 @@ template("dart_aot_app") {
       non_dart_deps = invoker.non_dart_deps
     }
 
-    deps = [
-      ":$dylib_target_name",
-    ] + non_dart_deps
-
+    deps = [ ":$snapshot_target_name" ] + non_dart_deps + shared_snapshot_deps
 
     resources = [
       {
-        path = rebase_path(dylib_path)
-        dest = "libapp.so"
+        path = rebase_path(snapshot_data_path)
+        dest = "isolate_snapshot_data.bin"
+      },
+      {
+        path = rebase_path(snapshot_instructions_path)
+        dest = "isolate_snapshot_instructions.bin"
+      },
+      {
+        path = rebase_path(shared_snapshot_data_path)
+        dest = "shared_snapshot_data.bin"
+      },
+      {
+        path = rebase_path(shared_snapshot_instructions_path)
+        dest = "shared_snapshot_instructions.bin"
       },
     ]
     if (defined(invoker.resources)) {
@@ -349,7 +390,8 @@ template("dart_aot_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime")
+        path = rebase_path(
+                "//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime")
         dest = "runtime"
       },
     ]

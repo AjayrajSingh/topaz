@@ -86,8 +86,7 @@ void IsolateCleanupCallback(void* callback_data) {
 
 void RunApplication(
     DartApplicationRunner* runner, ControllerToken* token,
-    component::Package package,
-    component::StartupInfo startup_info,
+    component::Package package, component::StartupInfo startup_info,
     ::fidl::InterfaceRequest<component::ApplicationController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   fsl::MessageLoop loop;
@@ -99,8 +98,7 @@ void RunApplication(
                      Dart_Timeline_Event_Duration, 0, NULL, NULL);
   if (success) {
     loop.task_runner()->PostTask([&loop, &app] {
-      if (!app.Main())
-        loop.PostQuitTask();
+      if (!app.Main()) loop.PostQuitTask();
     });
 
     loop.Run();
@@ -164,10 +162,8 @@ DartApplicationRunner::DartApplicationRunner()
           vm_snapshot_instructions_, true /* executable */)) {
     FXL_LOG(FATAL) << "Failed to load vm snapshot instructions";
   }
-  params.vm_snapshot_data =
-      reinterpret_cast<const uint8_t*>(vm_snapshot_data_.address());
-  params.vm_snapshot_instructions =
-      reinterpret_cast<const uint8_t*>(vm_snapshot_instructions_.address());
+  params.vm_snapshot_data = vm_snapshot_data_.address();
+  params.vm_snapshot_instructions = vm_snapshot_instructions_.address();
 #endif
   params.create = IsolateCreateCallback;
   params.shutdown = IsolateShutdownCallback;
@@ -176,19 +172,16 @@ DartApplicationRunner::DartApplicationRunner()
   params.get_service_assets = GetVMServiceAssetsArchiveCallback;
 #endif
   error = Dart_Initialize(&params);
-  if (error)
-    FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
+  if (error) FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
 }
 
 DartApplicationRunner::~DartApplicationRunner() {
   char* error = Dart_Cleanup();
-  if (error)
-    FXL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
+  if (error) FXL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
 }
 
 void DartApplicationRunner::StartApplication(
-    component::Package package,
-    component::StartupInfo startup_info,
+    component::Package package, component::StartupInfo startup_info,
     ::fidl::InterfaceRequest<component::ApplicationController> controller) {
   std::string label = GetLabelFromURL(package.resolved_url);
   std::thread thread(RunApplication, this, AddController(label),

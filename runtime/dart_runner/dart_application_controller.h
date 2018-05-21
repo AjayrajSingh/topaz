@@ -35,10 +35,12 @@ class DartApplicationController : public component::ApplicationController {
   bool SetupNamespace();
 
   bool SetupFromKernel();
-  bool SetupFromSharedLibrary();
+  bool SetupFromAppSnapshot();
 
-  bool CreateIsolate(void* isolate_snapshot_data,
-                     void* isolate_snapshot_instructions);
+  bool CreateIsolate(const uint8_t* isolate_snapshot_data,
+                     const uint8_t* isolate_snapshot_instructions,
+                     const uint8_t* shared_snapshot_data,
+                     const uint8_t* shared_snapshot_instructions);
 
   int SetupFileDescriptor(component::FileDescriptorPtr fd);
 
@@ -49,9 +51,7 @@ class DartApplicationController : public component::ApplicationController {
 
   // Idle notification.
   void MessageEpilogue(Dart_Handle result);
-  void OnIdleTimer(async_t* async,
-                   async::WaitBase* wait,
-                   zx_status_t status,
+  void OnIdleTimer(async_t* async, async::WaitBase* wait, zx_status_t status,
                    const zx_packet_signal* signal);
 
   std::string label_;
@@ -66,8 +66,8 @@ class DartApplicationController : public component::ApplicationController {
   int stderrfd_ = -1;
   MappedResource isolate_snapshot_data_;
   MappedResource isolate_snapshot_instructions_;
-  MappedResource script_;  // Snapshot, source or DIL file.
-  void* shared_library_ = nullptr;
+  MappedResource shared_snapshot_data_;
+  MappedResource shared_snapshot_instructions_;
 
   Dart_Isolate isolate_;
   int32_t return_code_ = 0;
@@ -76,7 +76,8 @@ class DartApplicationController : public component::ApplicationController {
   zx::time idle_start_{0};
   zx::timer idle_timer_;
   async::WaitMethod<DartApplicationController,
-                    &DartApplicationController::OnIdleTimer> idle_wait_{this};
+                    &DartApplicationController::OnIdleTimer>
+      idle_wait_{this};
 
   FXL_DISALLOW_COPY_AND_ASSIGN(DartApplicationController);
 };

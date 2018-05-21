@@ -34,11 +34,11 @@ static void UpdateNativeThreadLabelNames(const std::string& label,
   set_thread_name(runners.GetIOTaskRunner(), label, ".io");
 }
 
-Engine::Engine(Delegate& delegate,
-               std::string thread_label,
+Engine::Engine(Delegate& delegate, std::string thread_label,
                component::ApplicationContext& application_context,
                blink::Settings settings,
                fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
+               fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
                fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner,
                UniqueFDIONS fdio_ns,
                fidl::InterfaceRequest<component::ServiceProvider>
@@ -185,6 +185,7 @@ Engine::Engine(Delegate& delegate,
       task_runners,                 // host task runners
       settings_,                    // shell launch settings
       std::move(isolate_snapshot),  // isolate snapshot
+      std::move(shared_snapshot),   // shared snapshot
       on_create_platform_view,      // platform view create callback
       on_create_rasterizer          // rasterizer create callback
   );

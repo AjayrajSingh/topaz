@@ -4,13 +4,11 @@
 
 #include "topaz/runtime/dart_runner/dart_application_controller.h"
 
-#include <dlfcn.h>
 #include <fcntl.h>
 #include <fdio/namespace.h>
 #include <fdio/util.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <zircon/dlfcn.h>
 #include <zircon/status.h>
 #include <zx/thread.h>
 #include <zx/time.h>
@@ -45,8 +43,7 @@ void AfterTask() {
 }  // namespace
 
 DartApplicationController::DartApplicationController(
-    std::string label,
-    component::Package package,
+    std::string label, component::Package package,
     component::StartupInfo startup_info,
     fidl::InterfaceRequest<component::ApplicationController> controller)
     : label_(label),
@@ -76,10 +73,6 @@ DartApplicationController::~DartApplicationController() {
     fdio_ns_destroy(namespace_);
     namespace_ = nullptr;
   }
-  if (shared_library_) {
-    dlclose(shared_library_);
-    shared_library_ = nullptr;
-  }
   close(stdoutfd_);
   close(stderrfd_);
 }
@@ -94,8 +87,8 @@ bool DartApplicationController::Setup() {
     return false;
   }
 
-  if (SetupFromSharedLibrary()) {
-    FXL_LOG(INFO) << url_ << " is running from a shared library";
+  if (SetupFromAppSnapshot()) {
+    FXL_LOG(INFO) << url_ << " is running from an app snapshot";
   } else if (SetupFromKernel()) {
     FXL_LOG(INFO) << url_ << " is running from kernel";
   } else {
@@ -155,7 +148,8 @@ bool DartApplicationController::SetupFromKernel() {
   }
 
   if (!CreateIsolate(isolate_snapshot_data_.address(),
-                     isolate_snapshot_instructions_.address())) {
+                     isolate_snapshot_instructions_.address(), nullptr,
+                     nullptr)) {
     return false;
   }
 
@@ -179,8 +173,7 @@ bool DartApplicationController::SetupFromKernel() {
     if (!MappedResource::LoadFromNamespace(namespace_, path, kernel)) {
       return false;
     }
-    library = Dart_LoadLibraryFromKernel(
-        reinterpret_cast<const uint8_t*>(kernel.address()), kernel.size());
+    library = Dart_LoadLibraryFromKernel(kernel.address(), kernel.size());
     if (Dart_IsError(library)) {
       FXL_LOG(ERROR) << "Failed to load kernel: " << Dart_GetError(library);
       Dart_ExitScope();
@@ -199,53 +192,41 @@ bool DartApplicationController::SetupFromKernel() {
   return true;
 }
 
-bool DartApplicationController::SetupFromSharedLibrary() {
+bool DartApplicationController::SetupFromAppSnapshot() {
 #if !defined(AOT_RUNTIME)
   // If we start generating app-jit snapshots, the code below should be able
   // handle that case without modification.
   return false;
 #else
-  const std::string& path = "pkg/data/libapp.so";
 
-  fxl::UniqueFD root_dir(fdio_ns_opendir(namespace_));
-  if (!root_dir.is_valid()) {
-    FXL_LOG(ERROR) << "Failed to open namespace";
+  if (!MappedResource::LoadFromNamespace(namespace_,
+                                         "pkg/data/isolate_snapshot_data.bin",
+                                         isolate_snapshot_data_)) {
     return false;
   }
 
-  fsl::SizedVmo dylib;
-  if (!fsl::VmoFromFilenameAt(root_dir.get(), path, &dylib)) {
-    FXL_LOG(ERROR) << "Failed to read " << path;
+  if (!MappedResource::LoadFromNamespace(
+          namespace_, "pkg/data/isolate_snapshot_instructions.bin",
+          isolate_snapshot_instructions_, true /* executable */)) {
     return false;
   }
 
-  dlerror();
-  shared_library_ = dlopen_vmo(dylib.vmo().get(), RTLD_LAZY);
-  if (shared_library_ == nullptr) {
-    FXL_LOG(ERROR) << "dlopen failed: " << dlerror();
+  if (!MappedResource::LoadFromNamespace(namespace_,
+                                         "pkg/data/shared_snapshot_data.bin",
+                                         shared_snapshot_data_)) {
     return false;
   }
 
-  void* isolate_snapshot_data =
-      dlsym(shared_library_, "_kDartIsolateSnapshotData");
-  if (isolate_snapshot_data == nullptr) {
-    FXL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotData) failed: " << dlerror();
+  if (!MappedResource::LoadFromNamespace(
+          namespace_, "pkg/data/shared_snapshot_instructions.bin",
+          shared_snapshot_instructions_, true /* executable */)) {
     return false;
   }
 
-  void* isolate_snapshot_instructions =
-      dlsym(shared_library_, "_kDartIsolateSnapshotInstructions");
-  if (isolate_snapshot_instructions == nullptr) {
-    FXL_LOG(ERROR) << "dlsym(_kDartIsolateSnapshotInstructions) failed: "
-                   << dlerror();
-    return false;
-  }
-
-  if (!CreateIsolate(isolate_snapshot_data, isolate_snapshot_instructions)) {
-    return false;
-  }
-
-  return true;
+  return CreateIsolate(isolate_snapshot_data_.address(),
+                       isolate_snapshot_instructions_.address(),
+                       shared_snapshot_data_.address(),
+                       shared_snapshot_instructions_.address());
 #endif  // defined(AOT_RUNTIME)
 }
 
@@ -284,22 +265,23 @@ int DartApplicationController::SetupFileDescriptor(
 }
 
 bool DartApplicationController::CreateIsolate(
-    void* isolate_snapshot_data,
-    void* isolate_snapshot_instructions) {
+    const uint8_t* isolate_snapshot_data,
+    const uint8_t* isolate_snapshot_instructions,
+    const uint8_t* shared_snapshot_data,
+    const uint8_t* shared_snapshot_instructions) {
   // Create the isolate from the snapshot.
   char* error = nullptr;
 
   // TODO(dart_runner): Pass if we start using tonic's loader.
   intptr_t namespace_fd = -1;
   // Freed in IsolateShutdownCallback.
-  auto state = new tonic::DartState(namespace_fd,
-      [this](Dart_Handle result) { MessageEpilogue(result); });
+  auto state = new tonic::DartState(
+      namespace_fd, [this](Dart_Handle result) { MessageEpilogue(result); });
 
   isolate_ = Dart_CreateIsolate(
-      url_.c_str(), label_.c_str(),
-      reinterpret_cast<const uint8_t*>(isolate_snapshot_data),
-      reinterpret_cast<const uint8_t*>(isolate_snapshot_instructions), nullptr,
-      nullptr, nullptr, state, &error);
+      url_.c_str(), label_.c_str(), isolate_snapshot_data,
+      isolate_snapshot_instructions, shared_snapshot_data,
+      shared_snapshot_instructions, nullptr /* flags */, state, &error);
   if (!isolate_) {
     FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << error;
     return false;

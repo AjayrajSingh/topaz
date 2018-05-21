@@ -40,13 +40,12 @@ bool MappedResource::LoadFromNamespace(fdio_ns_t* namespc,
     }
   }
 
-  return LoadFromVmo(path, std::move(resource_vmo), resource);
+  return LoadFromVmo(path, std::move(resource_vmo), resource, executable);
 }
 
 bool MappedResource::LoadFromVmo(const std::string& path,
                                  fsl::SizedVmo resource_vmo,
-                                 MappedResource& resource,
-                                 bool executable) {
+                                 MappedResource& resource, bool executable) {
   if (resource_vmo.size() == 0) {
     return true;
   }
