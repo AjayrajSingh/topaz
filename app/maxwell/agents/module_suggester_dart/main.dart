@@ -96,7 +96,7 @@ class _QueryHandlerImpl extends QueryHandler {
       proposals.add(
         await _createProposal(
           id: 'open youtube',
-          appUrl: 'youtube_story',
+          appUrl: 'youtube_player',
           headline: _youtubeHeadline,
           color: 0xFFE52D27 /* YouTube red from color spec */,
         ),
