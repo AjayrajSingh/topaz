@@ -21,7 +21,8 @@ linter:
     # The cruft/value ratio of this rule seems low.
     # - always_put_required_named_parameters_first
     - always_require_non_null_named_parameters
-    - always_specify_types
+    # No longer useful with Dart 2.
+    # - always_specify_types
     - annotate_overrides
     # Contradicts always_specify_types
     # - avoid_annotating_with_dynamic
