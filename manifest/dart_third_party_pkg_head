@@ -13,11 +13,6 @@
              remote="https://dart.googlesource.com/async.git"
              revision="2.0.6"/>
 
-    <project name="third_party/dart/third_party/pkg/barback"
-             path="third_party/dart/third_party/pkg/barback"
-             remote="https://dart.googlesource.com/barback.git"
-             revision="0.15.2+14"/>
-
     <project name="third_party/dart/third_party/pkg/bazel_worker"
              path="third_party/dart/third_party/pkg/bazel_worker"
              remote="https://dart.googlesource.com/bazel_worker.git"
@@ -261,7 +256,7 @@
     <project name="third_party/dart/third_party/pkg/test"
              path="third_party/dart/third_party/pkg/test"
              remote="https://dart.googlesource.com/test.git"
-             revision="0.12.30+1"/>
+             revision="0.12.38"/>
 
     <project name="third_party/dart/third_party/pkg/test_descriptor"
              path="third_party/dart/third_party/pkg/test_descriptor"
@@ -321,7 +316,7 @@
     <project name="third_party/dart/third_party/pkg_tested/dart_style"
              path="third_party/dart/third_party/pkg_tested/dart_style"
              remote="https://dart.googlesource.com/dart_style.git"
-             revision="1.0.12"/>
+             revision="1.0.14"/>
 
     <project name="third_party/dart/third_party/pkg_tested/http_io"
              path="third_party/dart/third_party/pkg_tested/http_io"
