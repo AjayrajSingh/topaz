@@ -240,19 +240,6 @@ class _QueryHandlerImpl extends QueryHandler {
             confidence: 1.0,
           ),
         );
-      } else if (queryText.contains('video')) {
-        proposals.add(
-          await _createAppProposal(
-            id: 'Launch Video',
-            appUrl: 'video',
-            headline: 'Launch Video',
-            imageType: SuggestionImageType.other,
-            imageUrl:
-                'https://www.gstatic.com/images/icons/material/system/2x/web_asset_grey600_48dp.png',
-            color: 0xFF4A78C0,
-            confidence: 1.0,
-          ),
-        );
       } else if (queryText.contains('hotel')) {
         proposals.add(
           await _createAppProposal(

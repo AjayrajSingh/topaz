@@ -51,21 +51,6 @@
     "module_url": "chat_conversation_list"
   },
   {
-    "id": "ask_08",
-    "headline": "Watch Discover Tahiti",
-    "color": "0xFF424242",
-    "image_url": "/system/data/sysui/tahiti_240.png",
-    "module_url": "video"
-  },
-  {
-    "id": "ask_09",
-    "headline": "Nonch Harpin' Live in Concert",
-    "subheadline": "Watch performance",
-    "color": "0xFFC62828",
-    "image_url": "/system/data/sysui/9-nonch-harpin.png",
-    "module_url": "youtube_story"
-  },
-  {
     "id": "ask_10",
     "headline": "View hotel confirmation",
     "color": "0xFFE64A19",
