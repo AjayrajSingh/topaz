@@ -11,7 +11,7 @@
 namespace flutter {
 
 SessionConnection::SessionConnection(
-    fidl::InterfaceHandle<ui::Scenic> scenic_handle,
+    fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic_handle,
     std::string debug_label,
     zx::eventpair import_token,
     OnMetricsUpdate session_metrics_did_change_callback,
@@ -40,7 +40,8 @@ SessionConnection::SessionConnection(
 
 SessionConnection::~SessionConnection() = default;
 
-void SessionConnection::OnSessionEvents(fidl::VectorPtr<ui::Event> events) {
+void SessionConnection::OnSessionEvents(
+    fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
   using Type = gfx::Event::Tag;
 
   for (auto& raw_event : *events) {

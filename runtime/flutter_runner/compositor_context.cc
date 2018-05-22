@@ -56,7 +56,7 @@ class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
 };
 
 CompositorContext::CompositorContext(
-    fidl::InterfaceHandle<ui::Scenic> scenic,
+    fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic,
     std::string debug_label,
     zx::eventpair import_token,
     OnMetricsUpdate session_metrics_did_change_callback,

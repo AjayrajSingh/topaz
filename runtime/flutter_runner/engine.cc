@@ -68,7 +68,7 @@ Engine::Engine(Delegate& delegate,
   }
 
   // Setup the session connection.
-  fidl::InterfaceHandle<ui::Scenic> scenic;
+  fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic;
   view_manager->GetScenic(scenic.NewRequest());
 
   // Grab the parent environent services. The platform view may want to access

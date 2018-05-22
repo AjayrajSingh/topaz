@@ -62,7 +62,7 @@ class ViewController : public views_v1::ViewListener,
   void OnEvent(input::InputEvent event,
                OnEventCallback callback) override;
 
-  void OnSessionEvents(fidl::VectorPtr<ui::Event> events);
+  void OnSessionEvents(fidl::VectorPtr<fuchsia::ui::scenic::Event> events);
   void UpdatePhysicalSize();
 
   void MarkNeedsLayout();

@@ -20,14 +20,14 @@ namespace {
 
 constexpr char kViewLabel[] = "ermine_user_shell";
 
-ui::ScenicPtr GetScenic(views_v1::ViewManager* view_manager) {
-  ui::ScenicPtr scenic;
+fuchsia::ui::scenic::ScenicPtr GetScenic(views_v1::ViewManager* view_manager) {
+  fuchsia::ui::scenic::ScenicPtr scenic;
   view_manager->GetScenic(scenic.NewRequest());
   return scenic;
 }
 
-const gfx::Metrics* GetLastMetrics(uint32_t node_id,
-                                   const fidl::VectorPtr<ui::Event>& events) {
+const gfx::Metrics* GetLastMetrics(
+    uint32_t node_id, const fidl::VectorPtr<fuchsia::ui::scenic::Event>& events) {
   const gfx::Metrics* result = nullptr;
   for (const auto& event : *events) {
     if (event.is_gfx() && event.gfx().is_metrics() &&
@@ -79,9 +79,10 @@ ViewController::ViewController(
                               input_connection_.NewRequest());
   input_connection_->SetEventListener(input_listener_binding_.NewBinding());
 
-  session_.set_event_handler([this](fidl::VectorPtr<ui::Event> events) {
-    OnSessionEvents(std::move(events));
-  });
+  session_.set_event_handler(
+      [this](fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
+        OnSessionEvents(std::move(events));
+      });
   parent_node_.SetEventMask(gfx::kMetricsEventMask);
   parent_node_.AddChild(container_node_);
 }
@@ -150,7 +151,8 @@ void ViewController::OnEvent(input::InputEvent event,
   callback(false);
 }
 
-void ViewController::OnSessionEvents(fidl::VectorPtr<ui::Event> events) {
+void ViewController::OnSessionEvents(
+    fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
   const gfx::Metrics* new_metrics = GetLastMetrics(parent_node_.id(), events);
 
   if (!new_metrics || metrics_ == *new_metrics)

@@ -5,7 +5,7 @@
 #pragma once
 
 #include <component/cpp/fidl.h>
-#include <ui/cpp/fidl.h>
+#include <fuchsia/ui/scenic/cpp/fidl.h>
 #include <views_v1/cpp/fidl.h>
 
 #include "lib/fxl/macros.h"

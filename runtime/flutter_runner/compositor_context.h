@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <ui/cpp/fidl.h>
+#include <fuchsia/ui/scenic/cpp/fidl.h>
 
 #include "flutter/flow/compositor_context.h"
 #include "lib/fxl/macros.h"
@@ -16,7 +16,7 @@ namespace flutter {
 // Fuchsia.
 class CompositorContext final : public flow::CompositorContext {
  public:
-  CompositorContext(fidl::InterfaceHandle<ui::Scenic> scenic,
+  CompositorContext(fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic,
                     std::string debug_label,
                     zx::eventpair import_token,
                     OnMetricsUpdate session_metrics_did_change_callback,
