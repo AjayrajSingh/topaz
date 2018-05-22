@@ -25,7 +25,7 @@ namespace dart_runner {
 namespace {
 
 const char* kDartVMArgs[] = {
-// clang-format off
+    // clang-format off
     // TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
     "--limit_ints_to_64_bits",
     "--reify_generic_functions",
@@ -45,13 +45,11 @@ const char* kDartVMArgs[] = {
     // clang-format on
 };
 
-Dart_Isolate IsolateCreateCallback(const char* uri,
-                                   const char* main,
+Dart_Isolate IsolateCreateCallback(const char* uri, const char* main,
                                    const char* package_root,
                                    const char* package_config,
                                    Dart_IsolateFlags* flags,
-                                   void* callback_data,
-                                   char** error) {
+                                   void* callback_data, char** error) {
   if (std::string(uri) == DART_VM_SERVICE_ISOLATE_NAME) {
 #if defined(DART_PRODUCT)
     *error = strdup("The service isolate is not implemented in product mode");
@@ -87,8 +85,7 @@ void IsolateCleanupCallback(void* callback_data) {
 }
 
 void RunApplication(
-    DartApplicationRunner* runner,
-    ControllerToken* token,
+    DartApplicationRunner* runner, ControllerToken* token,
     component::ApplicationPackage application,
     component::ApplicationStartupInfo startup_info,
     ::fidl::InterfaceRequest<component::ApplicationController> controller) {
@@ -215,11 +212,7 @@ void DartApplicationRunner::RemoveController(ControllerToken* token) {
     }
   }
   delete token;
-  if (controllers_.empty()) {
-    loop_->QuitNow();
-  } else {
-    UpdateProcessLabel();
-  }
+  UpdateProcessLabel();
 }
 
 void DartApplicationRunner::PostRemoveController(ControllerToken* token) {
@@ -227,18 +220,22 @@ void DartApplicationRunner::PostRemoveController(ControllerToken* token) {
 }
 
 void DartApplicationRunner::UpdateProcessLabel() {
-  FXL_CHECK(controllers_.size() > 0);
-  std::string base_label = "dart:" + controllers_[0]->label();
   std::string label;
-  if (controllers_.size() < 2) {
-    label = base_label;
+  if (controllers_.empty()) {
+    label = "dart_runner";
   } else {
-    std::string suffix = " (+" + std::to_string(controllers_.size() - 1) + ")";
-    if (base_label.size() + suffix.size() <= ZX_MAX_NAME_LEN - 1) {
-      label = base_label + suffix;
+    std::string base_label = "dart:" + controllers_[0]->label();
+    if (controllers_.size() < 2) {
+      label = base_label;
     } else {
-      label = base_label.substr(0, ZX_MAX_NAME_LEN - 1 - suffix.size() - 3) +
-              "..." + suffix;
+      std::string suffix =
+          " (+" + std::to_string(controllers_.size() - 1) + ")";
+      if (base_label.size() + suffix.size() <= ZX_MAX_NAME_LEN - 1) {
+        label = base_label + suffix;
+      } else {
+        label = base_label.substr(0, ZX_MAX_NAME_LEN - 1 - suffix.size() - 3) +
+                "..." + suffix;
+      }
     }
   }
   zx::process::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
