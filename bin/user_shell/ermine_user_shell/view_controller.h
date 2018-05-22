@@ -84,8 +84,8 @@ class ViewController : public views_v1::ViewListener,
   component::ServiceProviderPtr view_service_provider_;
   input::InputConnectionPtr input_connection_;
 
-  geometry::SizeF logical_size_;
-  geometry::Size physical_size_;
+  fuchsia::math::SizeF logical_size_;
+  fuchsia::math::Size physical_size_;
   gfx::Metrics metrics_;
 
   scenic_lib::Session session_;

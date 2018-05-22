@@ -6,40 +6,40 @@
 
 namespace fxl {
 
-SkIPoint TypeConverter<SkIPoint, geometry::Point>::Convert(
-    const geometry::Point& input) {
+SkIPoint TypeConverter<SkIPoint, fuchsia::math::Point>::Convert(
+    const fuchsia::math::Point& input) {
   return SkIPoint::Make(input.x, input.y);
 }
 
-geometry::Point TypeConverter<geometry::Point, SkIPoint>::Convert(
+fuchsia::math::Point TypeConverter<fuchsia::math::Point, SkIPoint>::Convert(
     const SkIPoint& input) {
-  geometry::Point output;
+  fuchsia::math::Point output;
   output.x = input.x();
   output.y = input.y();
   return output;
 }
 
-SkPoint TypeConverter<SkPoint, geometry::PointF>::Convert(
-    const geometry::PointF& input) {
+SkPoint TypeConverter<SkPoint, fuchsia::math::PointF>::Convert(
+    const fuchsia::math::PointF& input) {
   return SkPoint::Make(input.x, input.y);
 }
 
-geometry::PointF TypeConverter<geometry::PointF, SkPoint>::Convert(
+fuchsia::math::PointF TypeConverter<fuchsia::math::PointF, SkPoint>::Convert(
     const SkPoint& input) {
-  geometry::PointF output;
+  fuchsia::math::PointF output;
   output.x = input.x();
   output.y = input.y();
   return output;
 }
 
-SkIRect TypeConverter<SkIRect, geometry::Rect>::Convert(
-    const geometry::Rect& input) {
+SkIRect TypeConverter<SkIRect, fuchsia::math::Rect>::Convert(
+    const fuchsia::math::Rect& input) {
   return SkIRect::MakeXYWH(input.x, input.y, input.width, input.height);
 }
 
-geometry::Rect TypeConverter<geometry::Rect, SkIRect>::Convert(
+fuchsia::math::Rect TypeConverter<fuchsia::math::Rect, SkIRect>::Convert(
     const SkIRect& input) {
-  geometry::Rect output;
+  fuchsia::math::Rect output;
   output.x = input.x();
   output.y = input.y();
   output.width = input.width();
@@ -47,14 +47,14 @@ geometry::Rect TypeConverter<geometry::Rect, SkIRect>::Convert(
   return output;
 }
 
-SkRect TypeConverter<SkRect, geometry::RectF>::Convert(
-    const geometry::RectF& input) {
+SkRect TypeConverter<SkRect, fuchsia::math::RectF>::Convert(
+    const fuchsia::math::RectF& input) {
   return SkRect::MakeXYWH(input.x, input.y, input.width, input.height);
 }
 
-geometry::RectF TypeConverter<geometry::RectF, SkRect>::Convert(
+fuchsia::math::RectF TypeConverter<fuchsia::math::RectF, SkRect>::Convert(
     const SkRect& input) {
-  geometry::RectF output;
+  fuchsia::math::RectF output;
   output.x = input.x();
   output.y = input.y();
   output.width = input.width();
@@ -62,8 +62,8 @@ geometry::RectF TypeConverter<geometry::RectF, SkRect>::Convert(
   return output;
 }
 
-SkRRect TypeConverter<SkRRect, geometry::RRectF>::Convert(
-    const geometry::RRectF& input) {
+SkRRect TypeConverter<SkRRect, fuchsia::math::RRectF>::Convert(
+    const fuchsia::math::RRectF& input) {
   SkVector radii[4] = {
       {input.top_left_radius_x, input.top_left_radius_y},
       {input.top_right_radius_x, input.top_right_radius_y},
@@ -75,9 +75,9 @@ SkRRect TypeConverter<SkRRect, geometry::RRectF>::Convert(
   return output;
 }
 
-geometry::RRectF TypeConverter<geometry::RRectF, SkRRect>::Convert(
+fuchsia::math::RRectF TypeConverter<fuchsia::math::RRectF, SkRRect>::Convert(
     const SkRRect& input) {
-  geometry::RRectF output;
+  fuchsia::math::RRectF output;
   output.x = input.rect().x();
   output.y = input.rect().y();
   output.width = input.rect().width();
@@ -93,8 +93,8 @@ geometry::RRectF TypeConverter<geometry::RRectF, SkRRect>::Convert(
   return output;
 }
 
-SkMatrix TypeConverter<SkMatrix, geometry::Transform>::Convert(
-    const geometry::Transform& input) {
+SkMatrix TypeConverter<SkMatrix, fuchsia::math::Transform>::Convert(
+    const fuchsia::math::Transform& input) {
   // Drop 3D components during conversion from 4x4 to 3x3.
   const auto& m = input.matrix;
   SkMatrix output;
@@ -104,10 +104,10 @@ SkMatrix TypeConverter<SkMatrix, geometry::Transform>::Convert(
   return output;
 }
 
-geometry::Transform TypeConverter<geometry::Transform, SkMatrix>::Convert(
+fuchsia::math::Transform TypeConverter<fuchsia::math::Transform, SkMatrix>::Convert(
     const SkMatrix& input) {
   // Expand 3x3 to 4x4.
-  geometry::Transform output;
+  fuchsia::math::Transform output;
   float* m = output.matrix.mutable_data();
   m[0] = input[0];
   m[1] = input[1];
@@ -128,16 +128,16 @@ geometry::Transform TypeConverter<geometry::Transform, SkMatrix>::Convert(
   return output;
 }
 
-SkMatrix44 TypeConverter<SkMatrix44, geometry::Transform>::Convert(
-    const geometry::Transform& input) {
+SkMatrix44 TypeConverter<SkMatrix44, fuchsia::math::Transform>::Convert(
+    const fuchsia::math::Transform& input) {
   SkMatrix44 output(SkMatrix44::kUninitialized_Constructor);
   output.setRowMajorf(input.matrix.data());
   return output;
 }
 
-geometry::Transform TypeConverter<geometry::Transform, SkMatrix44>::Convert(
+fuchsia::math::Transform TypeConverter<fuchsia::math::Transform, SkMatrix44>::Convert(
     const SkMatrix44& input) {
-  geometry::Transform output;
+  fuchsia::math::Transform output;
   input.asRowMajorf(output.matrix.mutable_data());
   return output;
 }

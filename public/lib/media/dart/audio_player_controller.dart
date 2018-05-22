@@ -8,7 +8,7 @@ import 'package:lib.media.dart/timeline.dart';
 import 'package:fidl_media_player/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_component/fidl.dart';
-import 'package:fidl_geometry/fidl.dart' as geom;
+import 'package:fidl_fuchsia_math/fidl.dart' as geom;
 import 'package:zircon/zircon.dart';
 
 /// Type for |AudioPlayerController| update callbacks.

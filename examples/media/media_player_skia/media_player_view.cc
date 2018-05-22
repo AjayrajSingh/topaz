@@ -46,7 +46,7 @@ constexpr SkColor kProgressBarBackgroundColor = 0xffb39ddb;  // Deep Purple 200
 constexpr SkColor kProgressBarSymbolColor = 0xffffffff;
 
 // Determines whether the rectangle contains the point x,y.
-bool Contains(const geometry::RectF& rect, float x, float y) {
+bool Contains(const fuchsia::math::RectF& rect, float x, float y) {
   return rect.x <= x && rect.y <= y && rect.x + rect.width >= x &&
          rect.y + rect.height >= y;
 }
@@ -204,7 +204,7 @@ void MediaPlayerView::Layout() {
 
   // Compute maximum size of video content after reserving space
   // for decorations.
-  geometry::SizeF max_content_size;
+  fuchsia::math::SizeF max_content_size;
   max_content_size.width = logical_size().width - kMargin * 2;
   max_content_size.height =
       logical_size().height - kControlsHeight - kMargin * 3;
@@ -227,7 +227,7 @@ void MediaPlayerView::Layout() {
   }
 
   // Add back in the decorations and center within view.
-  geometry::RectF ui_rect;
+  fuchsia::math::RectF ui_rect;
   ui_rect.width = content_rect_.width;
   ui_rect.height = content_rect_.height + kControlsHeight + kMargin;
   ui_rect.x = (logical_size().width - ui_rect.width) / 2;
