@@ -5,10 +5,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:fidl_time_zone/fidl.dart';
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.device_shell/netstack_model.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'authentication_overlay_model.dart';
-import 'netstack_model.dart';
 
 /// Enum of the possible stages that are displayed during user setup.
 ///

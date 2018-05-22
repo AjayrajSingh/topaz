@@ -17,12 +17,12 @@ import 'package:fidl_modular/fidl.dart';
 import 'package:fidl_modular_auth/fidl.dart';
 import 'package:fidl_presentation/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
+import 'package:lib.device_shell/user_shell_chooser.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:zircon/zircon.dart' show Channel;
 
-import 'user_shell_chooser.dart';
 import 'user_watcher_impl.dart';
 
 export 'package:lib.widgets/model.dart'

@@ -1,0 +1,20 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_library.gni")
+
+dart_library("lib.device_shell") {
+  package_name = "lib.device_shell"
+
+  sources = [
+    "netstack_model.dart",
+    "user_shell_chooser.dart",
+  ]
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//garnet/public/lib/netstack/fidl:fidl",
+    "//topaz/public/dart/widgets:lib.widgets",
+  ]
+}

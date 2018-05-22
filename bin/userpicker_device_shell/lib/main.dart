@@ -9,13 +9,13 @@ import 'package:fidl_cobalt/fidl.dart';
 import 'package:fidl_netstack/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
+import 'package:lib.device_shell/netstack_model.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 
 import 'authentication_context_impl.dart';
-import 'netstack_model.dart';
 import 'soft_keyboard_container_impl.dart';
 import 'user_picker_device_shell_model.dart';
 import 'user_picker_device_shell_screen.dart';

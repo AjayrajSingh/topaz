@@ -8,37 +8,18 @@ import 'dart:io';
 
 import 'package:fidl_presentation/fidl.dart';
 
-/// Gives information about screen size and device usage a user shell is expected
-/// to run with.
-class UserShellInfo {
-  /// The name of the user shell's package.
-  final String name;
-
-  /// The width of the screen the user shell expects to run with.  If null, the
-  /// native screen width is expected.
-  final double screenWidthMm;
-
-  /// The height of the screen the user shell expects to run with.  If null, the
-  /// native screen height is expected.
-  final double screenHeightMm;
-
-  /// The display usage the user shell expects to run with.  If null, the
-  /// native display usage is expected.
-  final DisplayUsage displayUsage;
-
-  /// Constructor.
-  UserShellInfo({
-    this.name,
-    this.screenWidthMm,
-    this.screenHeightMm,
-    this.displayUsage,
-  });
-}
-
 /// Keeps track of the currently chosen user shell.
 class UserShellChooser {
   final List<UserShellInfo> _configuredUserShells = <UserShellInfo>[];
   int _userShellIndex = 0;
+
+  /// Gets the user shell info of the current shell.
+  UserShellInfo get currentUserShell {
+    if (_configuredUserShells.isNotEmpty) {
+      return _configuredUserShells[_userShellIndex];
+    }
+    return null;
+  }
 
   /// Load available shells from the filesystem.
   Future<void> init() async {
@@ -64,8 +45,14 @@ class UserShellChooser {
     } on Exception catch (_) {}
   }
 
-  double _parseDouble(String doubleString) {
-    return (doubleString?.isEmpty ?? true) ? 0.0 : double.parse(doubleString);
+  /// Switch to next shell.  Returns false if no user shells are configured or
+  /// there's only one user shell.
+  bool swapUserShells() {
+    if (_configuredUserShells.length <= 1) {
+      return false;
+    }
+    _userShellIndex = (_userShellIndex + 1) % _configuredUserShells.length;
+    return true;
   }
 
   DisplayUsage _parseDisplayUsage(String displayUsage) {
@@ -85,21 +72,34 @@ class UserShellChooser {
     }
   }
 
-  /// Switch to next shell.  Returns false if no user shells are configured or
-  /// there's only one user shell.
-  bool swapUserShells() {
-    if (_configuredUserShells.length <= 1) {
-      return false;
-    }
-    _userShellIndex = (_userShellIndex + 1) % _configuredUserShells.length;
-    return true;
+  double _parseDouble(String doubleString) {
+    return (doubleString?.isEmpty ?? true) ? 0.0 : double.parse(doubleString);
   }
+}
 
-  /// Gets the user shell info of the current shell.
-  UserShellInfo get currentUserShell {
-    if (_configuredUserShells.isNotEmpty) {
-      return _configuredUserShells[_userShellIndex];
-    }
-    return null;
-  }
+/// Gives information about screen size and device usage a user shell is expected
+/// to run with.
+class UserShellInfo {
+  /// The name of the user shell's package.
+  final String name;
+
+  /// The width of the screen the user shell expects to run with.  If null, the
+  /// native screen width is expected.
+  final double screenWidthMm;
+
+  /// The height of the screen the user shell expects to run with.  If null, the
+  /// native screen height is expected.
+  final double screenHeightMm;
+
+  /// The display usage the user shell expects to run with.  If null, the
+  /// native display usage is expected.
+  final DisplayUsage displayUsage;
+
+  /// Constructor.
+  UserShellInfo({
+    this.name,
+    this.screenWidthMm,
+    this.screenHeightMm,
+    this.displayUsage,
+  });
 }
