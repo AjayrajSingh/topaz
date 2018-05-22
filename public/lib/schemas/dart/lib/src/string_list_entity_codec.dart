@@ -41,10 +41,11 @@ class StringListEntityCodec extends EntityCodec<List<String>> {
     if (encoded == 'null') {
       return null;
     }
-    Object decoded = json.decode(encoded);
+    dynamic decoded = json.decode(encoded);
     if (decoded == null || decoded is! List) {
       throw const FormatException('Decoding Entity with invalid data');
     }
-    return decoded;
+    // Ensure the type is a List<String>, otherwise you get a List<dynamic>
+    return decoded.cast<String>();
   }
 }
