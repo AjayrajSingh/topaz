@@ -137,11 +137,11 @@ class PointerEventsListener implements PointerCaptureListenerHack {
   }
 
   bool _inside(PointerEvent event) {
-    return event == null
-        ? false
-        : event.x * ui.window.devicePixelRatio < ui.window.physicalSize.width &&
-            event.y * ui.window.devicePixelRatio <
-                ui.window.physicalSize.height;
+    return event != null &&
+        event.x * ui.window.devicePixelRatio >= 0 &&
+        event.x * ui.window.devicePixelRatio < ui.window.physicalSize.width &&
+        event.y * ui.window.devicePixelRatio >= 0 &&
+        event.y * ui.window.devicePixelRatio < ui.window.physicalSize.height;
   }
 
   bool _outside(PointerEvent event) => !_inside(event);
