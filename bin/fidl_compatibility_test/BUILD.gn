@@ -2,15 +2,38 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//topaz/runtime/dart_runner/dart_app.gni")
+import("//build/package.gni")
 
-dart_app("fidl_compatibility_test_server_dart") {
-  main_dart = "main.dart"
+executable("fidl_compatibility_test") {
+  testonly = true
 
-  source_dir = "."
+  sources = [
+    "compatibility_test.cc",
+  ]
 
   deps = [
+    "//garnet/public/lib/app/cpp",
     "//garnet/public/lib/fidl/compatibility_test:compatibility_test_service",
-    "//topaz/public/lib/app/dart",
+    "//garnet/public/lib/fidl/compatibility_test:echo_client_app",
+    "//garnet/public/lib/fidl/cpp",
+    "//third_party/googletest:gtest",
+    "//zircon/public/lib/async-default",
+    "//zircon/public/lib/async-loop-cpp",
+  ]
+}
+
+package("package") {
+  package_name = "fidl_compatibility_test"
+
+  deps = [
+    ":fidl_compatibility_test",
+  ]
+
+  testonly = true
+
+  tests = [
+    {
+      name = "fidl_compatibility_test"
+    },
   ]
 }

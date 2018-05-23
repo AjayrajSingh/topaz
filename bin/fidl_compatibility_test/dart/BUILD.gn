@@ -1,0 +1,16 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/dart_runner/dart_app.gni")
+
+dart_app("fidl_compatibility_test_server_dart") {
+  main_dart = "main.dart"
+
+  source_dir = "."
+
+  deps = [
+    "//garnet/public/lib/fidl/compatibility_test:compatibility_test_service",
+    "//topaz/public/lib/app/dart",
+  ]
+}
