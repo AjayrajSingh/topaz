@@ -24,12 +24,13 @@ class UserShellChooser {
   /// Load available shells from the filesystem.
   Future<void> init() async {
     try {
-      File file = new File('/system/data/sysui/user_shell_to_launch');
+      File file = new File('/system/data/sysui/device_shell_config.json');
       if (file.existsSync()) {
         dynamic decodedJson = json.decode(await file.readAsString());
 
         _configuredUserShells.addAll(
-            decodedJson.map<UserShellInfo>((userShellInfo) => new UserShellInfo(
+          decodedJson.map<UserShellInfo>(
+            (userShellInfo) => new UserShellInfo(
                   name: userShellInfo['name'],
                   screenWidthMm: _parseDouble(userShellInfo['screen_width']),
                   screenHeightMm: _parseDouble(
@@ -38,7 +39,10 @@ class UserShellChooser {
                   displayUsage: _parseDisplayUsage(
                     userShellInfo['display_usage'],
                   ),
-                )));
+                  autoLogin: userShellInfo['auto_login'] ?? false,
+                ),
+          ),
+        );
       }
 
       /// If there is an exception just use the default shell
@@ -95,11 +99,15 @@ class UserShellInfo {
   /// native display usage is expected.
   final DisplayUsage displayUsage;
 
+  /// True if this user shell supports autologging in.
+  final bool autoLogin;
+
   /// Constructor.
   UserShellInfo({
     this.name,
     this.screenWidthMm,
     this.screenHeightMm,
     this.displayUsage,
+    this.autoLogin,
   });
 }

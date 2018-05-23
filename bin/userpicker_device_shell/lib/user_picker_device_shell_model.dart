@@ -434,6 +434,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   void _updatePresentation(UserShellInfo info) {
     setDisplayUsage(info.displayUsage);
     setDisplaySizeInMm(info.screenWidthMm, info.screenHeightMm);
+    if (info.autoLogin) {
+      login(null);
+    }
   }
 
   /// |PresentationModeListener|.

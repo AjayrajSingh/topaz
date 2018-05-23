@@ -1,6 +1,7 @@
 [
     {
         "name": "ermine_user_shell",
-        "display_usage": "close"
+        "display_usage": "close",
+        "auto_login": "true"
     }
 ]
