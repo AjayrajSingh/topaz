@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:fidl_images/fidl.dart';
+import 'package:fidl_fuchsia_images/fidl.dart';
 import 'package:fidl_modular/fidl.dart';
 import 'package:http/http.dart' as http;
 import 'package:lib.app.dart/logging.dart';

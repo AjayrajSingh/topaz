@@ -19,7 +19,7 @@ sk_sp<SkSurface> MakeSkSurface(const HostImage& image) {
   return MakeSkSurface(image.info(), image.data(), image.memory_offset());
 }
 
-sk_sp<SkSurface> MakeSkSurface(const images::ImageInfo& image_info,
+sk_sp<SkSurface> MakeSkSurface(const fuchsia::images::ImageInfo& image_info,
                                fxl::RefPtr<HostData> data,
                                off_t memory_offset) {
   return MakeSkSurface(MakeSkImageInfo(image_info), image_info.stride,
@@ -41,7 +41,7 @@ HostSkSurfacePool::HostSkSurfacePool(Session* session, uint32_t num_images)
 
 HostSkSurfacePool::~HostSkSurfacePool() = default;
 
-bool HostSkSurfacePool::Configure(const images::ImageInfo* image_info) {
+bool HostSkSurfacePool::Configure(const fuchsia::images::ImageInfo* image_info) {
   if (!image_pool_.Configure(std::move(image_info)))
     return false;
 

@@ -36,7 +36,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   // |BaseView|:
   void OnPropertiesChanged(views_v1::ViewProperties old_properties) override;
   void OnSceneInvalidated(
-      images::PresentationInfo presentation_info) override;
+      fuchsia::images::PresentationInfo presentation_info) override;
   bool OnInputEvent(input::InputEvent event) override;
 
   // |TermModel::Delegate|:

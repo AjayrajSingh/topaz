@@ -16,7 +16,7 @@ namespace skia {
 sk_sp<SkSurface> MakeSkSurface(const HostImage& image);
 
 // Creates a Skia surface backed by host-accessible shared memory.
-sk_sp<SkSurface> MakeSkSurface(const images::ImageInfo& image_info,
+sk_sp<SkSurface> MakeSkSurface(const fuchsia::images::ImageInfo& image_info,
                                fxl::RefPtr<HostData> data,
                                off_t memory_offset);
 sk_sp<SkSurface> MakeSkSurface(SkImageInfo image_info,
@@ -38,7 +38,7 @@ class HostSkSurfacePool {
 
   // Gets information about the images in the pool, or nullptr if the
   // pool is not configured.
-  const images::ImageInfo* image_info() const {
+  const fuchsia::images::ImageInfo* image_info() const {
     return image_pool_.image_info();
   }
 
@@ -47,7 +47,7 @@ class HostSkSurfacePool {
   // If |image_info| is nullptr, the pool reverts to an non-configured state;
   // all images are released but the memory is retained for recycling.
   // Returns true if the configuration changed.
-  bool Configure(const images::ImageInfo* image_info);
+  bool Configure(const fuchsia::images::ImageInfo* image_info);
 
   // Gets the surface backed by the image with the specified index.
   // The |index| must be between 0 and |num_images() - 1|.

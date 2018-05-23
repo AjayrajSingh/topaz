@@ -81,7 +81,7 @@ bool VuMeterView::OnInputEvent(input::InputEvent event) {
 }
 
 void VuMeterView::OnSceneInvalidated(
-    images::PresentationInfo presentation_info) {
+    fuchsia::images::PresentationInfo presentation_info) {
   SkCanvas* canvas = AcquireCanvas();
   if (canvas) {
     DrawContent(canvas);

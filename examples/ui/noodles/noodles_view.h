@@ -25,7 +25,7 @@ class NoodlesView : public mozart::SkiaView {
  private:
   // |BaseView|:
   void OnSceneInvalidated(
-      images::PresentationInfo presentation_info) override;
+      fuchsia::images::PresentationInfo presentation_info) override;
 
   void Draw(SkCanvas* canvas, float t);
 

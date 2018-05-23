@@ -200,7 +200,7 @@ void ViewController::Present(zx_time_t presentation_time) {
   ZX_DEBUG_ASSERT(!present_pending_);
   present_pending_ = true;
   last_presentation_time_ = presentation_time;
-  session_.Present(presentation_time, [this](images::PresentationInfo info) {
+  session_.Present(presentation_time, [this](fuchsia::images::PresentationInfo info) {
     ZX_DEBUG_ASSERT(present_pending_);
     present_pending_ = false;
     if (needs_begin_frame_)

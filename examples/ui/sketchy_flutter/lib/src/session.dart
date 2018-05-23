@@ -7,12 +7,12 @@
 
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_component/fidl.dart';
-import 'package:fidl_images/fidl.dart';
+import 'package:fidl_fuchsia_images/fidl.dart';
 import 'package:fidl_gfx/fidl.dart' as gfx;
 import 'package:fidl_fuchsia_ui_scenic/fidl.dart' as ui_scenic;
 import 'package:zircon/zircon.dart' as zircon;
 
-export 'package:fidl_images/fidl.dart' show PresentationInfo;
+export 'package:fidl_fuchsia_images/fidl.dart' show PresentationInfo;
 
 // ignore_for_file: public_member_api_docs
 

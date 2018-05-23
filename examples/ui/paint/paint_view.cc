@@ -24,7 +24,7 @@ PaintView::PaintView(
 PaintView::~PaintView() = default;
 
 void PaintView::OnSceneInvalidated(
-    images::PresentationInfo presentation_info) {
+    fuchsia::images::PresentationInfo presentation_info) {
   SkCanvas* canvas = AcquireCanvas();
   if (!canvas)
     return;

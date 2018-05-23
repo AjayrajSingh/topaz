@@ -262,7 +262,7 @@ void MediaPlayerView::Layout() {
 }
 
 void MediaPlayerView::OnSceneInvalidated(
-    images::PresentationInfo presentation_info) {
+    fuchsia::images::PresentationInfo presentation_info) {
   if (!has_physical_size())
     return;
 

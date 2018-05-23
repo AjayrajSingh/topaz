@@ -39,7 +39,7 @@ class JankView : public mozart::SkiaView {
 
   // |BaseView|:
   void OnSceneInvalidated(
-      images::PresentationInfo presentation_info) override;
+      fuchsia::images::PresentationInfo presentation_info) override;
   bool OnInputEvent(input::InputEvent event) override;
 
   void DrawContent(SkCanvas* canvas);

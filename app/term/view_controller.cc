@@ -107,7 +107,7 @@ void ViewController::Blink() {
 }
 
 void ViewController::OnSceneInvalidated(
-    images::PresentationInfo presentation_info) {
+    fuchsia::images::PresentationInfo presentation_info) {
   if (!regular_typeface_)
     return;
 

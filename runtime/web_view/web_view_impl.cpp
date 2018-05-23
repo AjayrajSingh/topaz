@@ -234,15 +234,15 @@ bool WebViewImpl::OnInputEvent(input::InputEvent event) {
 
 // |BaseView|:
 void WebViewImpl::OnSceneInvalidated(
-    images::PresentationInfo presentation_info) {
+    fuchsia::images::PresentationInfo presentation_info) {
   if (!has_physical_size())
     return;
 
   // Update the image.
   const scenic_lib::HostImage* image = image_cycler_.AcquireImage(
       physical_size().width, physical_size().height, physical_size().width * 4u,
-      images::PixelFormat::BGRA_8,
-      images::ColorSpace::SRGB);
+      fuchsia::images::PixelFormat::BGRA_8,
+      fuchsia::images::ColorSpace::SRGB);
   FXL_DCHECK(image);
 
   // Paint the webview.

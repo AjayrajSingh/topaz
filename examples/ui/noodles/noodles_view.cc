@@ -47,7 +47,7 @@ NoodlesView::NoodlesView(
 NoodlesView::~NoodlesView() {}
 
 void NoodlesView::OnSceneInvalidated(
-    images::PresentationInfo presentation_info) {
+    fuchsia::images::PresentationInfo presentation_info) {
   SkCanvas* canvas = AcquireCanvas();
   if (!canvas)
     return;

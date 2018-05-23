@@ -299,15 +299,15 @@ bool VulkanSurface::PushSessionImageSetupOps(scenic_lib::Session* session,
   }
 
   scenic_lib::Memory memory(session, std::move(exported_vmo),
-                            images::MemoryType::VK_DEVICE_MEMORY);
+                            fuchsia::images::MemoryType::VK_DEVICE_MEMORY);
 
-  images::ImageInfo image_info;
+  fuchsia::images::ImageInfo image_info;
   image_info.width = sk_surface_->width();
   image_info.height = sk_surface_->height();
   image_info.stride = 4 * sk_surface_->width();
-  image_info.pixel_format = images::PixelFormat::BGRA_8;
-  image_info.color_space = images::ColorSpace::SRGB;
-  image_info.tiling = images::Tiling::LINEAR;
+  image_info.pixel_format = fuchsia::images::PixelFormat::BGRA_8;
+  image_info.color_space = fuchsia::images::ColorSpace::SRGB;
+  image_info.tiling = fuchsia::images::Tiling::LINEAR;
 
   session_image_ = std::make_unique<scenic_lib::Image>(
       memory, 0 /* memory offset */, std::move(image_info));

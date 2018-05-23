@@ -43,7 +43,7 @@ JankView::JankView(views_v1::ViewManagerPtr view_manager,
 JankView::~JankView() = default;
 
 void JankView::OnSceneInvalidated(
-    images::PresentationInfo presentation_info) {
+    fuchsia::images::PresentationInfo presentation_info) {
   if (!typeface_)
     return;
 
