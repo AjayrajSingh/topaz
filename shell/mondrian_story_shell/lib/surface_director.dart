@@ -190,7 +190,9 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
       for (PositionedSurface ps in positionedSurfaces) {
         if (!placedSurfaces.keys.contains(ps.surface)) {
           _prevForms.remove(ps.surface);
-          placedSurfaces[ps.surface] = _form(ps, depth, offscreen);
+          Offset surfaceOrigin =
+              positionedSurfaces.length > 1 ? offscreen : Offset.zero;
+          placedSurfaces[ps.surface] = _form(ps, depth, surfaceOrigin);
         }
       }
       depth = (depth + 0.1).clamp(0.0, 1.0);
