@@ -44,12 +44,12 @@ class CaptionsEntityCodec extends EntityCodec<List<String>> {
     if (encoded == 'null') {
       return null;
     }
-    Object decoded = json.decode(encoded);
+    dynamic decoded = json.decode(encoded);
     if (decoded == null || decoded is! List) {
       throw const FormatException('Decoding Entity with invalid data');
     }
-    List<Object> list = decoded;
-    for (Object obj in list) {
+    List<String> list = decoded.cast<String>();
+    for (String obj in list) {
       if (obj is! String) {
         throw const FormatException('Captions contained non-String data');
       }

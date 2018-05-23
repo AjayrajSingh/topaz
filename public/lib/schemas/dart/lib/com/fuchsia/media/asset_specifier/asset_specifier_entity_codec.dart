@@ -68,11 +68,11 @@ class AssetSpecifierEntityCodec extends EntityCodec<AssetSpecifierEntityData> {
     if (encoded == 'null') {
       return null;
     }
-    Object decode = json.decode(encoded);
+    dynamic decode = json.decode(encoded);
     if (decode == null || decode is! Map) {
       throw const FormatException('Decoding Entity with invalid data');
     }
-    Map<String, dynamic> map = decode;
+    Map<String, dynamic> map = decode.cast<String, dynamic>();
     if (map[_kAssetTypeKey] is! String) {
       throw const FormatException('Converting Entity with invalid values');
     }

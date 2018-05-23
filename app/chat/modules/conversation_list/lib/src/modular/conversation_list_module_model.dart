@@ -12,8 +12,7 @@ import 'package:collection/collection.dart';
 import 'package:entity_schemas/entities.dart' as entities;
 import 'package:fidl/fidl.dart';
 import 'package:flutter/material.dart';
-import 'package:fidl_chat_content_provider/fidl.dart'
-    as chat_fidl;
+import 'package:fidl_chat_content_provider/fidl.dart' as chat_fidl;
 import 'package:fidl_component/fidl.dart';
 import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -313,7 +312,7 @@ class ChatConversationListModuleModel extends ModuleModel {
       ..embedModule(
         name, // mod name
         intentBuilder.intent,
-        null,  // incomingServices
+        null, // incomingServices
         _pickerModuleController.ctrl.request(),
         viewOwner.passRequest(),
         (StartModuleStatus status) {
@@ -325,7 +324,7 @@ class ChatConversationListModuleModel extends ModuleModel {
 
     // Register a LinkWatcher, which would read the selected contact.
     LinkWatcherImpl watcher = new LinkWatcherImpl(onNotify: (String encoded) {
-      Object jsonObject = json.decode(encoded);
+      dynamic jsonObject = json.decode(encoded);
       if (jsonObject is Map<String, Object> &&
           jsonObject['selectedContact'] is String) {
         String entityReference = jsonObject['selectedContact'];
@@ -456,8 +455,9 @@ class ChatConversationListModuleModel extends ModuleModel {
       String event = decoded['event'];
       switch (event) {
         case 'new_conversation':
-          List<int> conversationId = decoded['conversation_id'];
-          List<Map<String, String>> participants = decoded['participants'];
+          List<int> conversationId = decoded['conversation_id'].cast<int>();
+          List<Map<String, String>> participants =
+              decoded['participants'].cast<Map<String, String>>();
           String title = decoded['title'];
 
           Conversation newConversation = new Conversation(
@@ -615,7 +615,7 @@ class ChatConversationListModuleModel extends ModuleModel {
 
   @override
   void onNotify(String encoded) {
-    Object decodedJson = json.decode(encoded);
+    dynamic decodedJson = json.decode(encoded);
 
     // See if the content provider url is provided. This must be done only once,
     // when the Link notification is provided for the first time.
@@ -629,7 +629,7 @@ class ChatConversationListModuleModel extends ModuleModel {
 
     List<int> conversationId;
     if (decodedJson is Map && decodedJson['conversation_id'] is List<int>) {
-      conversationId = decodedJson['conversation_id'];
+      conversationId = decodedJson['conversation_id'].cast<int>();
     }
 
     setConversationId(conversationId, updateLink: false);

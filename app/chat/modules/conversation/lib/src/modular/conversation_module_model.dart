@@ -11,8 +11,7 @@ import 'package:collection/collection.dart';
 import 'package:fidl/fidl.dart' hide Message;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fidl_chat_content_provider/fidl.dart'
-    as chat_fidl;
+import 'package:fidl_chat_content_provider/fidl.dart' as chat_fidl;
 import 'package:fidl_component/fidl.dart';
 import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -388,8 +387,8 @@ class ChatConversationModuleModel extends ModuleModel {
 
       Map<String, dynamic> decoded = json.decode(message);
       String event = decoded['event'];
-      List<int> conversationId = decoded['conversation_id'];
-      List<int> messageId = decoded['message_id'];
+      List<int> conversationId = decoded['conversation_id'].cast<int>();
+      List<int> messageId = decoded['message_id'].cast<int>();
 
       switch (event) {
         case 'add':
@@ -480,7 +479,7 @@ class ChatConversationModuleModel extends ModuleModel {
 
     Map<String, dynamic> decoded = json.decode(message);
     if (decoded['selected_images'] != null) {
-      List<String> imageUrls = decoded['selected_images'];
+      List<String> imageUrls = decoded['selected_images'].cast<String>();
       for (String imageUrl in imageUrls) {
         log.fine('sending image url message: $imageUrl');
         _chatContentProvider.sendMessage(
@@ -681,7 +680,7 @@ class ChatConversationModuleModel extends ModuleModel {
 
   @override
   Future<Null> onNotify(String encoded) async {
-    Object decodedJson = json.decode(encoded);
+    dynamic decodedJson = json.decode(encoded);
 
     // See if the content provider url is provided. This must be done only once,
     // when the Link notification is provided for the first time.
@@ -695,7 +694,7 @@ class ChatConversationModuleModel extends ModuleModel {
 
     List<int> conversationId;
     if (decodedJson is Map && decodedJson['conversation_id'] is List<int>) {
-      conversationId = decodedJson['conversation_id'];
+      conversationId = decodedJson['conversation_id'].cast<int>();
     }
 
     // The conversation ID must be set after the module model initialization is

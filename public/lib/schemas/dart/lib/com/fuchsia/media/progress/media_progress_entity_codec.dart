@@ -39,11 +39,11 @@ class MediaProgressEntityCodec extends EntityCodec<MediaProgressEntityData> {
     if (encoded == 'null') {
       return null;
     }
-    Object decode = json.decode(encoded);
+    dynamic decode = json.decode(encoded);
     if (decode == null || decode is! Map) {
       throw const FormatException('Decoding Entity with invalid data');
     }
-    Map<String, dynamic> map = decode;
+    Map<String, dynamic> map = decode.cast<String, dynamic>();
     if (map[_kDurationKey] == null ||
         map[_kDurationKey] is! int ||
         map[_kProgressKey] == null ||

@@ -50,8 +50,7 @@ class Contact {
     this.photoUrl,
     List<EmailAddress> emailAddresses,
     List<PhoneNumber> phoneNumbers,
-  })
-      : assert(id != null && id.isNotEmpty),
+  })  : assert(id != null && id.isNotEmpty),
         assert(displayName != null && displayName.isNotEmpty),
         emailAddresses = new List<EmailAddress>.unmodifiable(
             emailAddresses ?? <EmailAddress>[]),

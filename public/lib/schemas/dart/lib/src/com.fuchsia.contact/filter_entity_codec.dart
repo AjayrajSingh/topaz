@@ -38,25 +38,23 @@ FilterEntityData _decode(String data) {
 
   FilterEntityData filter = new FilterEntityData();
   try {
-    Object decoded = json.decode(data);
-    if (decoded is Map<String, String>) {
-      filter.prefix = decoded['prefix'];
-      DetailType detailType;
-      switch (data) {
-        case 'email':
-          detailType = DetailType.email;
-          break;
+    Map<String, String> decoded = json.decode(data).cast<String, String>();
+    filter.prefix = decoded['prefix'];
+    DetailType detailType;
+    switch (data) {
+      case 'email':
+        detailType = DetailType.email;
+        break;
 
-        case 'phoneNumber':
-          detailType = DetailType.phoneNumber;
-          break;
+      case 'phoneNumber':
+        detailType = DetailType.phoneNumber;
+        break;
 
-        default:
-          detailType = DetailType.custom;
-          break;
-      }
-      filter.detailType = detailType;
+      default:
+        detailType = DetailType.custom;
+        break;
     }
+    filter.detailType = detailType;
   } on Exception catch (err, stackTrace) {
     log.warning('Error parsing FilterEntityData: $err\n$stackTrace');
   }

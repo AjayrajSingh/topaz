@@ -9,8 +9,7 @@ import 'dart:typed_data';
 import 'package:chat_models/chat_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:fidl_chat_content_provider/fidl.dart'
-    as fidl;
+import 'package:fidl_chat_content_provider/fidl.dart' as fidl;
 import 'package:fidl_component/fidl.dart';
 import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -252,7 +251,7 @@ class ConversationInfoModuleModel extends ModuleModel {
 
       Map<String, dynamic> decoded = json.decode(message);
       String event = decoded['event'];
-      List<int> conversationId = decoded['conversation_id'];
+      List<int> conversationId = decoded['conversation_id'].cast<int>();
 
       switch (event) {
         // Ignore these events.
@@ -301,7 +300,7 @@ class ConversationInfoModuleModel extends ModuleModel {
 
   @override
   Future<Null> onNotify(String encoded) async {
-    Object decodedJson = json.decode(encoded);
+    dynamic decodedJson = json.decode(encoded);
 
     // See if the content provider url is provided. This must be done only once,
     // when the Link notification is provided for the first time.
@@ -315,7 +314,7 @@ class ConversationInfoModuleModel extends ModuleModel {
 
     List<int> conversationId;
     if (decodedJson is Map && decodedJson['conversation_id'] is List<int>) {
-      conversationId = decodedJson['conversation_id'];
+      conversationId = decodedJson['conversation_id'].cast<int>();
     }
 
     // The conversation ID must be set after the module model initialization is

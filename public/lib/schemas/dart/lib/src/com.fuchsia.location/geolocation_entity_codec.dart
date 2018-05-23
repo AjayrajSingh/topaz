@@ -45,14 +45,14 @@ GeolocationEntityData _decode(String data) {
   }
 
   // TODO(MS-1428): use a schema to validate decoded value.
-  Map<String, Object> map = json.decode(data);
+  Map<String, dynamic> map = json.decode(data);
 
   double lat;
   double long;
   double accuracy;
 
   try {
-    Map<String, double> location = map['location'];
+    Map<String, double> location = map['location'].cast<String, double>();
     lat = location['lat'];
     long = location['long'];
     accuracy = map['accuracy'];

@@ -7,8 +7,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:fidl_component/fidl.dart';
-import 'package:fidl_contacts_content_provider/fidl.dart'
-    as fidl;
+import 'package:fidl_contacts_content_provider/fidl.dart' as fidl;
 import 'package:fidl_modular/fidl.dart';
 import 'package:fidl_ledger/fidl.dart' as ledger;
 import 'package:lib.app.dart/app.dart';
@@ -588,10 +587,11 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     }
 
     try {
-      Map<String, Object> config = json.decode(configFile.readAsStringSync());
-      Object dataProviders = config['data_providers'];
+      Map<String, dynamic> config = json.decode(configFile.readAsStringSync());
+      dynamic dataProviders = config['data_providers'];
       if (dataProviders is List) {
-        for (Map<String, dynamic> info in dataProviders) {
+        for (Map<String, dynamic> info
+            in dataProviders.cast<Map<String, dynamic>>()) {
           String sourceId = info['source_id'] ?? '';
           String agentUrl = info['agent_url'] ?? '';
           _DataProvider provider = _connectToDataProvider(sourceId, agentUrl);
