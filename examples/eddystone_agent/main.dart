@@ -13,6 +13,7 @@ import 'package:fidl_bluetooth_low_energy/fidl.dart' as ble;
 import 'package:fidl_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
@@ -41,15 +42,17 @@ Future<Null> proposeUrl(String url) async {
     actions: <Action>[
       new Action.withCreateStory(
         new CreateStory(
-          moduleId: web_view.kWebViewURL,
-          initialData: json.encode(
-            {
-              'view': {
-                'uri': url,
-              }
-            },
-          ),
-        ),
+            intent: (new IntentBuilder.handler(web_view.kWebViewURL)
+                  ..addParameter(
+                      null,
+                      json.encode(
+                        {
+                          'view': {
+                            'uri': url,
+                          }
+                        },
+                      )))
+                .intent),
       )
     ],
   ));

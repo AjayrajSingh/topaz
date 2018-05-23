@@ -17,6 +17,7 @@ dart_app("eddystone_agent") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/decomposition/dart",
+    "//topaz/public/lib/module_resolver/dart",
     "//topaz/public/lib/proposal/dart",
     "//topaz/runtime/web_runner/lib/dart:web_view",
   ]

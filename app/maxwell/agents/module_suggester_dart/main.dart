@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:convert' show json;
 
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 import 'package:fidl_modular/fidl.dart';
 import 'package:web_view/web_view.dart' as web_view;
@@ -676,9 +677,9 @@ Future<Proposal> _createProposal({
       actions: <Action>[
         new Action.withCreateStory(
           new CreateStory(
-            moduleId: appUrl,
-            initialData: initialData,
-          ),
+              intent: (new IntentBuilder.handler(appUrl)
+                    ..addParameter(null, initialData))
+                  .intent),
         )
       ],
     );

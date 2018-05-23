@@ -7,6 +7,7 @@ import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:fidl_modular/fidl.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 
 const String _kConfigFile =
@@ -367,9 +368,10 @@ class _QueryHandlerImpl extends QueryHandler {
             .map(
               (Map<String, String> proposal) => new Action.withCreateStory(
                     new CreateStory(
-                      moduleId: proposal['module_url'] ?? '',
-                      initialData: proposal['module_data'],
-                    ),
+                        intent: (new IntentBuilder.handler(
+                                proposal['module_url'] ?? '')
+                              ..addParameter(null, proposal['module_data']))
+                            .intent),
                   ),
             )
             .toList(),
@@ -392,8 +394,9 @@ Future<Proposal> _createProposal(Map<String, String> proposal) async {
         : SuggestionImageType.other,
     actions: <Action>[
       new Action.withCreateStory(new CreateStory(
-          moduleId: proposal['module_url'] ?? '',
-          initialData: proposal['module_data']))
+          intent: (new IntentBuilder.handler(proposal['module_url'] ?? '')
+                ..addParameter(null, proposal['module_data']))
+              .intent))
     ],
   );
 }
@@ -420,7 +423,8 @@ Future<Proposal> _createAppProposal({
     imageType: imageType,
     annoyanceType: annoyanceType,
     actions: <Action>[
-      new Action.withCreateStory(new CreateStory(moduleId: appUrl))
+      new Action.withCreateStory(
+          new CreateStory(intent: (new IntentBuilder.handler(appUrl)).intent))
     ],
   );
 }

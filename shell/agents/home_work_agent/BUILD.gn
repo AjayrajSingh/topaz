@@ -20,6 +20,7 @@ dart_app("home_work_agent") {
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/module_resolver/dart",
     "//topaz/public/lib/proposal/dart",
   ]
 }
