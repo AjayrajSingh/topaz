@@ -26,9 +26,9 @@ fuchsia::ui::scenic::ScenicPtr GetScenic(views_v1::ViewManager* view_manager) {
   return scenic;
 }
 
-const gfx::Metrics* GetLastMetrics(
-    uint32_t node_id, const fidl::VectorPtr<fuchsia::ui::scenic::Event>& events) {
-  const gfx::Metrics* result = nullptr;
+const fuchsia::ui::gfx::Metrics* GetLastMetrics(uint32_t node_id,
+                                   const fidl::VectorPtr<fuchsia::ui::scenic::Event>& events) {
+  const fuchsia::ui::gfx::Metrics* result = nullptr;
   for (const auto& event : *events) {
     if (event.is_gfx() && event.gfx().is_metrics() &&
         event.gfx().metrics().node_id == node_id)
@@ -83,7 +83,7 @@ ViewController::ViewController(
       [this](fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
         OnSessionEvents(std::move(events));
       });
-  parent_node_.SetEventMask(gfx::kMetricsEventMask);
+  parent_node_.SetEventMask(fuchsia::ui::gfx::kMetricsEventMask);
   parent_node_.AddChild(container_node_);
 }
 
@@ -153,7 +153,7 @@ void ViewController::OnEvent(input::InputEvent event,
 
 void ViewController::OnSessionEvents(
     fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
-  const gfx::Metrics* new_metrics = GetLastMetrics(parent_node_.id(), events);
+  const fuchsia::ui::gfx::Metrics* new_metrics = GetLastMetrics(parent_node_.id(), events);
 
   if (!new_metrics || metrics_ == *new_metrics)
     return;

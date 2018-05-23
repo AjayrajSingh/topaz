@@ -30,7 +30,7 @@ SessionConnection::SessionConnection(
                                        this, std::placeholders::_1));
 
   root_node_.Bind(std::move(import_token));
-  root_node_.SetEventMask(gfx::kMetricsEventMask);
+  root_node_.SetEventMask(fuchsia::ui::gfx::kMetricsEventMask);
 
   // Signal is initially high inidicating availability of the session.
   ToggleSignal(vsync_event_handle_, true);
@@ -42,7 +42,7 @@ SessionConnection::~SessionConnection() = default;
 
 void SessionConnection::OnSessionEvents(
     fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
-  using Type = gfx::Event::Tag;
+  using Type = fuchsia::ui::gfx::Event::Tag;
 
   for (auto& raw_event : *events) {
     if (!raw_event.is_gfx()) {

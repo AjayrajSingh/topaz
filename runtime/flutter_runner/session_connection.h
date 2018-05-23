@@ -34,7 +34,7 @@ class SessionConnection final {
 
   bool has_metrics() const { return scene_update_context_.has_metrics(); }
 
-  const gfx::MetricsPtr& metrics() const {
+  const fuchsia::ui::gfx::MetricsPtr& metrics() const {
     return scene_update_context_.metrics();
   }
 

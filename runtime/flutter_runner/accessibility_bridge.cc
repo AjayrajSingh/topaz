@@ -60,7 +60,7 @@ void AccessibilityBridge::UpdateVisitedForNodeAndChildren(
   }
 
   visited_nodes->push_back(id);
-  for (const int child : it->second.children) {
+  for (const int child : it->second.childrenInTraversalOrder) {
     UpdateVisitedForNodeAndChildren(child, visited_nodes);
   }
 }

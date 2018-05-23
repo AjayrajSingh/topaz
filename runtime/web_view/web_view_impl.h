@@ -24,7 +24,7 @@ class TouchTracker {
   TouchTracker(int x = 0, int y = 0);
 
   void HandleEvent(const input::PointerEvent& pointer,
-                   const gfx::Metrics& metrics,
+                   const fuchsia::ui::gfx::Metrics& metrics,
                    WebView& web_view);
 
  private:

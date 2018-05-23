@@ -21,7 +21,7 @@ TouchTracker::TouchTracker(int x, int y)
     : start_x_(x), start_y_(y), last_x_(0), last_y_(0), is_drag_(false) {}
 
 void TouchTracker::HandleEvent(const input::PointerEvent& pointer,
-                               const gfx::Metrics& metrics,
+                               const fuchsia::ui::gfx::Metrics& metrics,
                                WebView& web_view) {
   const auto x = pointer.x * metrics.scale_x;
   const auto y = pointer.y * metrics.scale_y;

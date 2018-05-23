@@ -86,7 +86,7 @@ class ViewController : public views_v1::ViewListener,
 
   fuchsia::math::SizeF logical_size_;
   fuchsia::math::Size physical_size_;
-  gfx::Metrics metrics_;
+  fuchsia::ui::gfx::Metrics metrics_;
 
   scenic_lib::Session session_;
   scenic_lib::ImportNode parent_node_;

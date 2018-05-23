@@ -8,7 +8,7 @@
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_component/fidl.dart';
 import 'package:fidl_fuchsia_images/fidl.dart';
-import 'package:fidl_gfx/fidl.dart' as gfx;
+import 'package:fidl_fuchsia_ui_gfx/fidl.dart' as gfx;
 import 'package:fidl_fuchsia_ui_scenic/fidl.dart' as ui_scenic;
 import 'package:zircon/zircon.dart' as zircon;
 
