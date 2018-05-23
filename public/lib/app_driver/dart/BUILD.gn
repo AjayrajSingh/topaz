@@ -16,7 +16,6 @@ dart_library("dart") {
   ]
 
   deps = [
-    "//garnet/public/lib/cobalt/fidl",
     "//peridot/public/lib:fidl",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
@@ -26,5 +25,6 @@ dart_library("dart") {
     "//topaz/public/lib/module_resolver/dart",
     "//topaz/public/lib/schemas/dart",
     "//topaz/public/lib/story/dart",
+    "//zircon/public/fidl/cobalt:cobalt",
   ]
 }

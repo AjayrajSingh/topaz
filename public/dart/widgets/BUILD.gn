@@ -18,7 +18,6 @@ dart_library("lib.widgets") {
   ]
 
   deps = [
-    "//garnet/public/lib/cobalt/fidl",
     "//garnet/public/lib/ui/presentation/fidl",
     "//garnet/public/lib/ui/views/fidl:v1",
     "//peridot/public/lib:fidl",
@@ -31,6 +30,7 @@ dart_library("lib.widgets") {
     "//topaz/public/lib/ui/flutter",
     "//topaz/public/lib/user/dart",
     "//topaz/tools/widget_explorer/packages/widget_explorer_meta",
+    "//zircon/public/fidl/cobalt:cobalt",
   ]
 }
 
