@@ -39,7 +39,9 @@ class UserShellChooser {
                   displayUsage: _parseDisplayUsage(
                     userShellInfo['display_usage'],
                   ),
-                  autoLogin: userShellInfo['auto_login'] ?? false,
+                  autoLogin:
+                      (userShellInfo['auto_login'] ?? 'false').toLowerCase() ==
+                          'true',
                 ),
           ),
         );
