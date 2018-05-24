@@ -91,6 +91,9 @@ template("_dart_kernel") {
         rebase_path(invoker.manifest),
       ]
     }
+    if (is_debug) {
+      args += [ "--embed-sources" ]
+    }
     args += [ rebase_path(invoker.main_dart) ]
   }
 }
