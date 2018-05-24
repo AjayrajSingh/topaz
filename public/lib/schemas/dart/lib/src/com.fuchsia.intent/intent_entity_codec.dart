@@ -25,7 +25,7 @@ class IntentEntityCodec extends EntityCodec<IntentEntityData> {
 
 /// Encodes [IntentEntityData] into a [String].
 String _encode(IntentEntityData intent) {
-  Map<String, Object> data = <String, Object>{'parameters': intent.parameters};
+  Map<String, dynamic> data = <String, dynamic>{'parameters': intent.parameters};
   if (intent.action != null) {
     data['action'] = intent.action;
   } else if (intent.handler != null) {
@@ -52,7 +52,7 @@ IntentEntityData _decode(String data) {
     } else {
       entity = new IntentEntityData.fromHandler(decodedJson['handler']);
     }
-    entity.parameters.addAll(decodedJson['parameters']);
+    entity.parameters.addAll(decodedJson['parameters'].cast<String, String>());
     return entity;
   } on Exception catch (e) {
     log.warning('$_kType entity error when decoding from json string: $json'
