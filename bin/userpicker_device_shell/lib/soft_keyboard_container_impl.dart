@@ -4,7 +4,7 @@
 
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:fidl_component/fidl.dart';
-import 'package:fidl_input/fidl.dart';
+import 'package:fidl_fuchsia_ui_input/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';

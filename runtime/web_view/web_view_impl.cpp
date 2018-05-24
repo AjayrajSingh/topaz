@@ -20,7 +20,7 @@ using namespace WebCore;
 TouchTracker::TouchTracker(int x, int y)
     : start_x_(x), start_y_(y), last_x_(0), last_y_(0), is_drag_(false) {}
 
-void TouchTracker::HandleEvent(const input::PointerEvent& pointer,
+void TouchTracker::HandleEvent(const fuchsia::ui::input::PointerEvent& pointer,
                                const fuchsia::ui::gfx::Metrics& metrics,
                                WebView& web_view) {
   const auto x = pointer.x * metrics.scale_x;
@@ -39,11 +39,11 @@ void TouchTracker::HandleEvent(const input::PointerEvent& pointer,
 
   if (is_drag_) {
     switch (pointer.phase) {
-      case input::PointerEventPhase::MOVE:
+      case fuchsia::ui::input::PointerEventPhase::MOVE:
         web_view.scrollPixels(delta_x, delta_y);
         break;
 
-      case input::PointerEventPhase::UP:
+      case fuchsia::ui::input::PointerEventPhase::UP:
         web_view.scrollPixels(delta_x, delta_y);
         break;
 
@@ -52,7 +52,7 @@ void TouchTracker::HandleEvent(const input::PointerEvent& pointer,
     }
   } else {
     switch (pointer.phase) {
-      case input::PointerEventPhase::UP:
+      case fuchsia::ui::input::PointerEventPhase::UP:
         web_view.handleMouseEvent(start_x_, start_y_, WebView::kMouseDown);
         web_view.handleMouseEvent(start_x_, start_y_, WebView::kMouseUp);
         break;
@@ -120,22 +120,22 @@ void WebViewImpl::SetWebRequestDelegate(
   webRequestDelegate_ = delegate.Bind();
 }
 
-bool WebViewImpl::HandleKeyboardEvent(const input::InputEvent& event) {
+bool WebViewImpl::HandleKeyboardEvent(const fuchsia::ui::input::InputEvent& event) {
   bool handled = true;
-  const input::KeyboardEvent& keyboard = event.keyboard();
-  bool pressed = keyboard.phase == input::KeyboardEventPhase::PRESSED;
-  bool repeating = keyboard.phase == input::KeyboardEventPhase::REPEAT;
+  const fuchsia::ui::input::KeyboardEvent& keyboard = event.keyboard();
+  bool pressed = keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::PRESSED;
+  bool repeating = keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::REPEAT;
   if (pressed && keyboard.code_point == 'c' &&
-      keyboard.modifiers & input::kModifierControl) {
+      keyboard.modifiers & fuchsia::ui::input::kModifierControl) {
     exit(0);
   } else if (pressed && keyboard.code_point == '[' &&
-             keyboard.modifiers & input::kModifierControl) {
+             keyboard.modifiers & fuchsia::ui::input::kModifierControl) {
     web_view_.goBack();
   } else if (pressed && keyboard.code_point == ']' &&
-             keyboard.modifiers & input::kModifierControl) {
+             keyboard.modifiers & fuchsia::ui::input::kModifierControl) {
     web_view_.goForward();
   } else if (pressed && keyboard.code_point == 'r' &&
-             keyboard.modifiers & input::kModifierControl) {
+             keyboard.modifiers & fuchsia::ui::input::kModifierControl) {
     web_view_.reload();
   } else {
     bool handled =
@@ -157,20 +157,20 @@ bool WebViewImpl::HandleKeyboardEvent(const input::InputEvent& event) {
   return handled;
 }
 
-bool WebViewImpl::HandleMouseEvent(const input::PointerEvent& pointer) {
+bool WebViewImpl::HandleMouseEvent(const fuchsia::ui::input::PointerEvent& pointer) {
   bool handled = false;
-  if (pointer.buttons & input::kMousePrimaryButton) {
+  if (pointer.buttons & fuchsia::ui::input::kMousePrimaryButton) {
     switch (pointer.phase) {
-      case input::PointerEventPhase::DOWN:
-      case input::PointerEventPhase::MOVE:
+      case fuchsia::ui::input::PointerEventPhase::DOWN:
+      case fuchsia::ui::input::PointerEventPhase::MOVE:
         web_view_.handleMouseEvent(
             pointer.x * metrics().scale_x, pointer.y * metrics().scale_y,
-            pointer.phase == input::PointerEventPhase::DOWN
+            pointer.phase == fuchsia::ui::input::PointerEventPhase::DOWN
                 ? ::WebView::kMouseDown
                 : ::WebView::kMouseMoved);
         handled = true;
         break;
-      case input::PointerEventPhase::UP:
+      case fuchsia::ui::input::PointerEventPhase::UP:
         web_view_.handleMouseEvent(pointer.x * metrics().scale_x,
                                    pointer.y * metrics().scale_y,
                                    ::WebView::kMouseUp);
@@ -183,25 +183,25 @@ bool WebViewImpl::HandleMouseEvent(const input::PointerEvent& pointer) {
   return handled;
 }
 
-void WebViewImpl::HandleTouchDown(const input::PointerEvent& pointer) {
+void WebViewImpl::HandleTouchDown(const fuchsia::ui::input::PointerEvent& pointer) {
   const auto x = pointer.x * metrics().scale_x;
   const auto y = pointer.y * metrics().scale_y;
   touch_trackers_[pointer.pointer_id] = TouchTracker(x, y);
 }
 
-bool WebViewImpl::HandleTouchEvent(const input::PointerEvent& pointer) {
+bool WebViewImpl::HandleTouchEvent(const fuchsia::ui::input::PointerEvent& pointer) {
   bool handled = false;
   auto pointer_id = pointer.pointer_id;
   switch (pointer.phase) {
-    case input::PointerEventPhase::DOWN:
+    case fuchsia::ui::input::PointerEventPhase::DOWN:
       HandleTouchDown(pointer);
       handled = true;
       break;
-    case input::PointerEventPhase::MOVE:
+    case fuchsia::ui::input::PointerEventPhase::MOVE:
       touch_trackers_[pointer_id].HandleEvent(pointer, metrics(), web_view_);
       handled = true;
       break;
-    case input::PointerEventPhase::UP:
+    case fuchsia::ui::input::PointerEventPhase::UP:
       touch_trackers_[pointer_id].HandleEvent(pointer, metrics(), web_view_);
       touch_trackers_.erase(pointer_id);
       handled = true;
@@ -213,15 +213,15 @@ bool WebViewImpl::HandleTouchEvent(const input::PointerEvent& pointer) {
 }
 
 // |BaseView|:
-bool WebViewImpl::OnInputEvent(input::InputEvent event) {
+bool WebViewImpl::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   bool handled = false;
   web_view_.setFocused(true);
   web_view_.setVisible(true);
   if (event.is_pointer()) {
-    const input::PointerEvent& pointer = event.pointer();
-    if (pointer.type == input::PointerEventType::TOUCH) {
+    const fuchsia::ui::input::PointerEvent& pointer = event.pointer();
+    if (pointer.type == fuchsia::ui::input::PointerEventType::TOUCH) {
       handled = HandleTouchEvent(pointer);
-    } else if (pointer.type == input::PointerEventType::MOUSE) {
+    } else if (pointer.type == fuchsia::ui::input::PointerEventType::MOUSE) {
       handled = HandleMouseEvent(pointer);
     }
   } else if (event.is_keyboard()) {

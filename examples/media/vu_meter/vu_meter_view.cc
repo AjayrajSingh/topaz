@@ -52,17 +52,17 @@ VuMeterView::VuMeterView(
 
 VuMeterView::~VuMeterView() {}
 
-bool VuMeterView::OnInputEvent(input::InputEvent event) {
+bool VuMeterView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   bool handled = false;
   if (event.is_pointer()) {
     auto& pointer = event.pointer();
-    if (pointer.phase == input::PointerEventPhase::DOWN) {
+    if (pointer.phase == fuchsia::ui::input::PointerEventPhase::DOWN) {
       ToggleStartStop();
       handled = true;
     }
   } else if (event.is_keyboard()) {
     auto& keyboard = event.keyboard();
-    if (keyboard.phase == input::KeyboardEventPhase::PRESSED) {
+    if (keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::PRESSED) {
       switch (keyboard.hid_usage) {
         case HID_USAGE_KEY_SPACE:
           ToggleStartStop();

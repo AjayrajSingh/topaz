@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 
-#include <input/cpp/fidl.h>
+#include <fuchsia/ui/input/cpp/fidl.h>
 #include <views_v1/cpp/fidl.h>
 
 #include "lib/app/cpp/application_context.h"
@@ -25,7 +25,7 @@ class Tile;
 
 class ViewController : public views_v1::ViewListener,
                        public views_v1::ViewContainerListener,
-                       public input::InputListener {
+                       public fuchsia::ui::input::InputListener {
  public:
   using DisconnectCallback = std::function<void(ViewController*)>;
 
@@ -58,8 +58,8 @@ class ViewController : public views_v1::ViewListener,
   void OnChildUnavailable(uint32_t child_key,
                           OnChildUnavailableCallback callback) override;
 
-  // |input::InputListener|:
-  void OnEvent(input::InputEvent event,
+  // |fuchsia::ui::input::InputListener|:
+  void OnEvent(fuchsia::ui::input::InputEvent event,
                OnEventCallback callback) override;
 
   void OnSessionEvents(fidl::VectorPtr<fuchsia::ui::scenic::Event> events);
@@ -82,7 +82,7 @@ class ViewController : public views_v1::ViewListener,
   views_v1::ViewPtr view_;
   views_v1::ViewContainerPtr view_container_;
   component::ServiceProviderPtr view_service_provider_;
-  input::InputConnectionPtr input_connection_;
+  fuchsia::ui::input::InputConnectionPtr input_connection_;
 
   fuchsia::math::SizeF logical_size_;
   fuchsia::math::Size physical_size_;

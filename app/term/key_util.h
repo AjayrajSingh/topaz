@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include <input/cpp/fidl.h>
+#include <fuchsia/ui/input/cpp/fidl.h>
 
 namespace term {
 
@@ -16,7 +16,7 @@ namespace term {
 // |EventType::KEY_PRESSED|). |keypad_application_mode| indicates if the keypad
 // is in "application mode".
 std::string GetInputSequenceForKeyPressedEvent(
-    const input::InputEvent& key_event,
+    const fuchsia::ui::input::InputEvent& key_event,
     bool keypad_application_mode);
 
 }  // namespace term

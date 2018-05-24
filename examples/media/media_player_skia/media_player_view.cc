@@ -147,11 +147,11 @@ MediaPlayerView::MediaPlayerView(
 
 MediaPlayerView::~MediaPlayerView() {}
 
-bool MediaPlayerView::OnInputEvent(input::InputEvent event) {
+bool MediaPlayerView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   bool handled = false;
   if (event.is_pointer()) {
     const auto& pointer = event.pointer();
-    if (pointer.phase == input::PointerEventPhase::DOWN) {
+    if (pointer.phase == fuchsia::ui::input::PointerEventPhase::DOWN) {
       if (metadata_ && Contains(progress_bar_rect_, pointer.x, pointer.y)) {
         // User poked the progress bar...seek.
         media_player_->Seek((pointer.x - progress_bar_rect_.x) *
@@ -167,7 +167,7 @@ bool MediaPlayerView::OnInputEvent(input::InputEvent event) {
     }
   } else if (event.is_keyboard()) {
     auto& keyboard = event.keyboard();
-    if (keyboard.phase == input::KeyboardEventPhase::PRESSED) {
+    if (keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::PRESSED) {
       switch (keyboard.hid_usage) {
         case HID_USAGE_KEY_SPACE:
           TogglePlayPause();

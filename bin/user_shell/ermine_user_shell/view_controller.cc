@@ -146,7 +146,7 @@ void ViewController::OnChildUnavailable(uint32_t child_key,
   callback();
 }
 
-void ViewController::OnEvent(input::InputEvent event,
+void ViewController::OnEvent(fuchsia::ui::input::InputEvent event,
                              OnEventCallback callback) {
   callback(false);
 }

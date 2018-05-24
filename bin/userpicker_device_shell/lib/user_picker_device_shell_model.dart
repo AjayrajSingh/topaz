@@ -12,7 +12,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:fidl_cobalt/fidl.dart' as cobalt;
 import 'package:fidl_component/fidl.dart';
 import 'package:fidl_fuchsia_ui_gfx/fidl.dart';
-import 'package:fidl_input/fidl.dart' as input;
+import 'package:fidl_fuchsia_ui_input/fidl.dart' as input;
 import 'package:fidl_modular/fidl.dart';
 import 'package:fidl_modular_auth/fidl.dart';
 import 'package:fidl_presentation/fidl.dart';

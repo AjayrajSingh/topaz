@@ -170,9 +170,9 @@ void PlatformView::FlushViewportMetrics() {
   SetViewportMetrics(metrics);
 }
 
-// |input::InputMethodEditorClient|
-void PlatformView::DidUpdateState(input::TextInputState state,
-                                  std::unique_ptr<input::InputEvent>) {
+// |fuchsia::ui::input::InputMethodEditorClient|
+void PlatformView::DidUpdateState(fuchsia::ui::input::TextInputState state,
+                                  std::unique_ptr<fuchsia::ui::input::InputEvent>) {
   rapidjson::Document document;
   auto& allocator = document.GetAllocator();
   rapidjson::Value encoded_state(rapidjson::kObjectType);
@@ -180,12 +180,12 @@ void PlatformView::DidUpdateState(input::TextInputState state,
   encoded_state.AddMember("selectionBase", state.selection.base, allocator);
   encoded_state.AddMember("selectionExtent", state.selection.extent, allocator);
   switch (state.selection.affinity) {
-    case input::TextAffinity::UPSTREAM:
+    case fuchsia::ui::input::TextAffinity::UPSTREAM:
       encoded_state.AddMember("selectionAffinity",
                               rapidjson::Value("TextAffinity.upstream"),
                               allocator);
       break;
-    case input::TextAffinity::DOWNSTREAM:
+    case fuchsia::ui::input::TextAffinity::DOWNSTREAM:
       encoded_state.AddMember("selectionAffinity",
                               rapidjson::Value("TextAffinity.downstream"),
                               allocator);
@@ -217,8 +217,8 @@ void PlatformView::DidUpdateState(input::TextInputState state,
   );
 }
 
-// |input::InputMethodEditorClient|
-void PlatformView::OnAction(input::InputMethodAction action) {
+// |fuchsia::ui::input::InputMethodEditorClient|
+void PlatformView::OnAction(fuchsia::ui::input::InputMethodAction action) {
   rapidjson::Document document;
   auto& allocator = document.GetAllocator();
 
@@ -245,9 +245,9 @@ void PlatformView::OnAction(input::InputMethodAction action) {
   );
 }
 
-// |input::InputListener|
-void PlatformView::OnEvent(input::InputEvent event, OnEventCallback callback) {
-  using Type = input::InputEvent::Tag;
+// |fuchsia::ui::input::InputListener|
+void PlatformView::OnEvent(fuchsia::ui::input::InputEvent event, OnEventCallback callback) {
+  using Type = fuchsia::ui::input::InputEvent::Tag;
   switch (event.Which()) {
     case Type::kPointer:
       callback(OnHandlePointerEvent(event.pointer()));
@@ -266,21 +266,21 @@ void PlatformView::OnEvent(input::InputEvent event, OnEventCallback callback) {
 }
 
 static blink::PointerData::Change GetChangeFromPointerEventPhase(
-    input::PointerEventPhase phase) {
+    fuchsia::ui::input::PointerEventPhase phase) {
   switch (phase) {
-    case input::PointerEventPhase::ADD:
+    case fuchsia::ui::input::PointerEventPhase::ADD:
       return blink::PointerData::Change::kAdd;
-    case input::PointerEventPhase::HOVER:
+    case fuchsia::ui::input::PointerEventPhase::HOVER:
       return blink::PointerData::Change::kHover;
-    case input::PointerEventPhase::DOWN:
+    case fuchsia::ui::input::PointerEventPhase::DOWN:
       return blink::PointerData::Change::kDown;
-    case input::PointerEventPhase::MOVE:
+    case fuchsia::ui::input::PointerEventPhase::MOVE:
       return blink::PointerData::Change::kMove;
-    case input::PointerEventPhase::UP:
+    case fuchsia::ui::input::PointerEventPhase::UP:
       return blink::PointerData::Change::kUp;
-    case input::PointerEventPhase::REMOVE:
+    case fuchsia::ui::input::PointerEventPhase::REMOVE:
       return blink::PointerData::Change::kRemove;
-    case input::PointerEventPhase::CANCEL:
+    case fuchsia::ui::input::PointerEventPhase::CANCEL:
       return blink::PointerData::Change::kCancel;
     default:
       return blink::PointerData::Change::kCancel;
@@ -288,18 +288,18 @@ static blink::PointerData::Change GetChangeFromPointerEventPhase(
 }
 
 static blink::PointerData::DeviceKind GetKindFromPointerType(
-    input::PointerEventType type) {
+    fuchsia::ui::input::PointerEventType type) {
   switch (type) {
-    case input::PointerEventType::TOUCH:
+    case fuchsia::ui::input::PointerEventType::TOUCH:
       return blink::PointerData::DeviceKind::kTouch;
-    case input::PointerEventType::MOUSE:
+    case fuchsia::ui::input::PointerEventType::MOUSE:
       return blink::PointerData::DeviceKind::kMouse;
     default:
       return blink::PointerData::DeviceKind::kTouch;
   }
 }
 
-bool PlatformView::OnHandlePointerEvent(const input::PointerEvent& pointer) {
+bool PlatformView::OnHandlePointerEvent(const fuchsia::ui::input::PointerEvent& pointer) {
   blink::PointerData pointer_data;
   pointer_data.time_stamp = pointer.event_time / 1000;
   pointer_data.change = GetChangeFromPointerEventPhase(pointer.phase);
@@ -346,13 +346,13 @@ bool PlatformView::OnHandlePointerEvent(const input::PointerEvent& pointer) {
   return true;
 }
 
-bool PlatformView::OnHandleKeyboardEvent(const input::KeyboardEvent& keyboard) {
+bool PlatformView::OnHandleKeyboardEvent(const fuchsia::ui::input::KeyboardEvent& keyboard) {
   const char* type = nullptr;
-  if (keyboard.phase == input::KeyboardEventPhase::PRESSED) {
+  if (keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::PRESSED) {
     type = "keydown";
-  } else if (keyboard.phase == input::KeyboardEventPhase::REPEAT) {
+  } else if (keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::REPEAT) {
     type = "keydown";  // TODO change this to keyrepeat
-  } else if (keyboard.phase == input::KeyboardEventPhase::RELEASED) {
+  } else if (keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::RELEASED) {
     type = "keyup";
   }
 
@@ -383,7 +383,7 @@ bool PlatformView::OnHandleKeyboardEvent(const input::KeyboardEvent& keyboard) {
   return true;
 }
 
-bool PlatformView::OnHandleFocusEvent(const input::FocusEvent& focus) {
+bool PlatformView::OnHandleFocusEvent(const fuchsia::ui::input::FocusEvent& focus) {
   if (!focus.focused && current_text_input_client_ != 0) {
     current_text_input_client_ = 0;
     if (ime_) {
@@ -516,11 +516,11 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
     // TODO(abarth): Read the keyboard type from the configuration.
     current_text_input_client_ = args->value[0].GetInt();
 
-    auto initial_text_input_state = input::TextInputState{};
+    auto initial_text_input_state = fuchsia::ui::input::TextInputState{};
     initial_text_input_state.text = "";
     input_connection_->GetInputMethodEditor(
-        input::KeyboardType::TEXT,       // keyboard type
-        input::InputMethodAction::DONE,  // input method action
+        fuchsia::ui::input::KeyboardType::TEXT,       // keyboard type
+        fuchsia::ui::input::InputMethodAction::DONE,  // input method action
         initial_text_input_state,        // initial state
         ime_client_.NewBinding(),        // client
         ime_.NewRequest()                // editor
@@ -532,7 +532,7 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
         return;
       }
       const auto& args = args_it->value;
-      input::TextInputState state;
+      fuchsia::ui::input::TextInputState state;
       state.text = "";
       // TODO(abarth): Deserialize state.
       auto text = args.FindMember("text");
@@ -549,9 +549,9 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
       if (selection_affinity != args.MemberEnd() &&
           selection_affinity->value.IsString() &&
           selection_affinity->value == "TextAffinity.upstream")
-        state.selection.affinity = input::TextAffinity::UPSTREAM;
+        state.selection.affinity = fuchsia::ui::input::TextAffinity::UPSTREAM;
       else
-        state.selection.affinity = input::TextAffinity::DOWNSTREAM;
+        state.selection.affinity = fuchsia::ui::input::TextAffinity::DOWNSTREAM;
       // We ignore selectionIsDirectional because that concept doesn't exist on
       // Fuchsia.
       auto composing_base = args.FindMember("composingBase");

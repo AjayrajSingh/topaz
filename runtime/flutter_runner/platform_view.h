@@ -7,7 +7,7 @@
 #include <map>
 #include <set>
 
-#include <input/cpp/fidl.h>
+#include <fuchsia/ui/input/cpp/fidl.h>
 #include <modular/cpp/fidl.h>
 #include <views_v1/cpp/fidl.h>
 #include <views_v1_token/cpp/fidl.h>
@@ -25,8 +25,8 @@ namespace flutter {
 // all platform specific integrations.
 class PlatformView final : public shell::PlatformView,
                            public views_v1::ViewListener,
-                           public input::InputMethodEditorClient,
-                           public input::InputListener {
+                           public fuchsia::ui::input::InputMethodEditorClient,
+                           public fuchsia::ui::input::InputListener {
  public:
   PlatformView(PlatformView::Delegate& delegate,
                std::string debug_label,
@@ -57,11 +57,11 @@ class PlatformView final : public shell::PlatformView,
   fidl::InterfaceHandle<views_v1::ViewContainer> view_container_;
   component::ServiceProviderPtr service_provider_;
   fidl::Binding<views_v1::ViewListener> view_listener_;
-  input::InputConnectionPtr input_connection_;
-  fidl::Binding<input::InputListener> input_listener_;
+  fuchsia::ui::input::InputConnectionPtr input_connection_;
+  fidl::Binding<fuchsia::ui::input::InputListener> input_listener_;
   int current_text_input_client_ = 0;
-  fidl::Binding<input::InputMethodEditorClient> ime_client_;
-  input::InputMethodEditorPtr ime_;
+  fidl::Binding<fuchsia::ui::input::InputMethodEditorClient> ime_client_;
+  fuchsia::ui::input::InputMethodEditorPtr ime_;
   component::ServiceProviderPtr parent_environment_service_provider_;
   modular::ClipboardPtr clipboard_;
   AccessibilityBridge accessibility_bridge_;
@@ -85,21 +85,21 @@ class PlatformView final : public shell::PlatformView,
   void OnPropertiesChanged(views_v1::ViewProperties properties,
                            OnPropertiesChangedCallback callback) override;
 
-  // |input::InputMethodEditorClient|
-  void DidUpdateState(input::TextInputState state,
-                      std::unique_ptr<input::InputEvent> event) override;
+  // |fuchsia::ui::input::InputMethodEditorClient|
+  void DidUpdateState(fuchsia::ui::input::TextInputState state,
+                      std::unique_ptr<fuchsia::ui::input::InputEvent> event) override;
 
-  // |input::InputMethodEditorClient|
-  void OnAction(input::InputMethodAction action) override;
+  // |fuchsia::ui::input::InputMethodEditorClient|
+  void OnAction(fuchsia::ui::input::InputMethodAction action) override;
 
-  // |input::InputListener|
-  void OnEvent(input::InputEvent event, OnEventCallback callback) override;
+  // |fuchsia::ui::input::InputListener|
+  void OnEvent(fuchsia::ui::input::InputEvent event, OnEventCallback callback) override;
 
-  bool OnHandlePointerEvent(const input::PointerEvent& pointer);
+  bool OnHandlePointerEvent(const fuchsia::ui::input::PointerEvent& pointer);
 
-  bool OnHandleKeyboardEvent(const input::KeyboardEvent& keyboard);
+  bool OnHandleKeyboardEvent(const fuchsia::ui::input::KeyboardEvent& keyboard);
 
-  bool OnHandleFocusEvent(const input::FocusEvent& focus);
+  bool OnHandleFocusEvent(const fuchsia::ui::input::FocusEvent& focus);
 
   // |shell::PlatformView|
   std::unique_ptr<shell::VsyncWaiter> CreateVSyncWaiter() override;

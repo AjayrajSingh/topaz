@@ -223,19 +223,19 @@ void ViewController::OnSetKeypadMode(bool application_mode) {
   keypad_application_mode_ = application_mode;
 }
 
-bool ViewController::OnInputEvent(input::InputEvent event) {
+bool ViewController::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   bool handled = false;
   if (event.is_keyboard()) {
-    const input::KeyboardEvent& keyboard = event.keyboard();
-    if (keyboard.phase == input::KeyboardEventPhase::PRESSED ||
-        keyboard.phase == input::KeyboardEventPhase::REPEAT) {
+    const fuchsia::ui::input::KeyboardEvent& keyboard = event.keyboard();
+    if (keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::PRESSED ||
+        keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::REPEAT) {
       if (keyboard.code_point == '+' &&
-          keyboard.modifiers & input::kModifierAlt) {
+          keyboard.modifiers & fuchsia::ui::input::kModifierAlt) {
         params_.font_size++;
         ComputeMetrics();
         Resize();
       } else if (keyboard.code_point == '-' &&
-                 keyboard.modifiers & input::kModifierAlt) {
+                 keyboard.modifiers & fuchsia::ui::input::kModifierAlt) {
         params_.font_size--;
         ComputeMetrics();
         Resize();
@@ -244,7 +244,7 @@ bool ViewController::OnInputEvent(input::InputEvent event) {
       handled = true;
     }
   } else if (event.is_focus()) {
-    const input::FocusEvent& focus = event.focus();
+    const fuchsia::ui::input::FocusEvent& focus = event.focus();
     focused_ = focus.focused;
     blink_on_ = true;
     if (focused_) {
@@ -257,7 +257,7 @@ bool ViewController::OnInputEvent(input::InputEvent event) {
   return handled;
 }
 
-void ViewController::OnKeyPressed(input::InputEvent key_event) {
+void ViewController::OnKeyPressed(fuchsia::ui::input::InputEvent key_event) {
   last_key_ = zx::clock::get(ZX_CLOCK_MONOTONIC);
   blink_on_ = true;
 

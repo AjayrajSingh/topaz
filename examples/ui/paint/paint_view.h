@@ -25,7 +25,7 @@ class PaintView : public mozart::SkiaView {
   // |BaseView|:
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
-  bool OnInputEvent(input::InputEvent event) override;
+  bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 
   void DrawContent(SkCanvas* canvas);
   SkPath CurrentPath(uint32_t pointer_id);

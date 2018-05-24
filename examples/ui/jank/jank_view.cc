@@ -100,10 +100,10 @@ void JankView::DrawButton(SkCanvas* canvas,
                    bounds.centerY() - textBounds.centerY(), textPaint);
 }
 
-bool JankView::OnInputEvent(input::InputEvent event) {
+bool JankView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   if (event.is_pointer()) {
-    const input::PointerEvent& pointer = event.pointer();
-    if (pointer.phase == input::PointerEventPhase::DOWN) {
+    const fuchsia::ui::input::PointerEvent& pointer = event.pointer();
+    if (pointer.phase == fuchsia::ui::input::PointerEventPhase::DOWN) {
       SkScalar x = pointer.x;
       SkScalar y = pointer.y;
       if (x >= kMargin && x <= kButtonWidth + kMargin) {

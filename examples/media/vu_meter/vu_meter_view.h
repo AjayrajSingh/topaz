@@ -56,7 +56,7 @@ class VuMeterView : public mozart::SkiaView {
   // |BaseView|:
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
-  bool OnInputEvent(input::InputEvent event) override;
+  bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 
   // Draws the UI.
   void DrawContent(SkCanvas* canvas);

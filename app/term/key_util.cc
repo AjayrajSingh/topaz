@@ -4,7 +4,7 @@
 
 #include "topaz/app/term/key_util.h"
 
-#include <input/cpp/fidl.h>
+#include <fuchsia/ui/input/cpp/fidl.h>
 #include <hid/usages.h>
 
 #include "lib/fxl/logging.h"
@@ -16,12 +16,12 @@ namespace term {
 // TODO(vtl): In particular, our implementation of keypad_application_mode is
 // incomplete.
 std::string GetInputSequenceForKeyPressedEvent(
-    const input::InputEvent& key_event,
+    const fuchsia::ui::input::InputEvent& key_event,
     bool keypad_application_mode) {
   if (key_event.is_keyboard()) {
-    const input::KeyboardEvent& keyboard = key_event.keyboard();
-    FXL_DCHECK(keyboard.phase == input::KeyboardEventPhase::PRESSED ||
-               keyboard.phase == input::KeyboardEventPhase::REPEAT);
+    const fuchsia::ui::input::KeyboardEvent& keyboard = key_event.keyboard();
+    FXL_DCHECK(keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::PRESSED ||
+               keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::REPEAT);
 
     if (keyboard.code_point) {
       if (keyboard.code_point > 128) {
@@ -29,10 +29,10 @@ std::string GetInputSequenceForKeyPressedEvent(
         return std::string();
       }
 
-      uint32_t non_control = (input::kModifierShift | input::kModifierAlt |
-                              input::kModifierSuper);
+      uint32_t non_control = (fuchsia::ui::input::kModifierShift | fuchsia::ui::input::kModifierAlt |
+                              fuchsia::ui::input::kModifierSuper);
       if (keyboard.modifiers) {
-        if ((keyboard.modifiers & input::kModifierControl) &&
+        if ((keyboard.modifiers & fuchsia::ui::input::kModifierControl) &&
             !(keyboard.modifiers & non_control)) {
           char c = static_cast<char>(keyboard.code_point);
           if (c >= 'a' && c <= 'z') {

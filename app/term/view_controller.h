@@ -37,7 +37,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   void OnPropertiesChanged(views_v1::ViewProperties old_properties) override;
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
-  bool OnInputEvent(input::InputEvent event) override;
+  bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 
   // |TermModel::Delegate|:
   void OnResponse(const void* buf, size_t size) override;
@@ -45,7 +45,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
 
   void ScheduleDraw(bool force);
   void DrawContent(SkCanvas* canvas);
-  void OnKeyPressed(input::InputEvent key_event);
+  void OnKeyPressed(fuchsia::ui::input::InputEvent key_event);
 
   // stdin/stdout
   void OnDataReceived(const void* bytes, size_t num_bytes);

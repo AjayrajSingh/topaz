@@ -39,7 +39,7 @@ class MediaPlayerView : public mozart::BaseView {
   void OnChildAttached(uint32_t child_key,
                        views_v1::ViewInfo child_view_info) override;
   void OnChildUnavailable(uint32_t child_key) override;
-  bool OnInputEvent(input::InputEvent event) override;
+  bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 
   // Perform a layout of the UI elements.
   void Layout();

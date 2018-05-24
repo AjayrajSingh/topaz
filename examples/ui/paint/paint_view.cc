@@ -69,20 +69,20 @@ SkPath PaintView::CurrentPath(uint32_t pointer_id) {
   return path;
 }
 
-bool PaintView::OnInputEvent(input::InputEvent event) {
+bool PaintView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   bool handled = false;
   if (event.is_pointer()) {
-    const input::PointerEvent& pointer = event.pointer();
+    const fuchsia::ui::input::PointerEvent& pointer = event.pointer();
     uint32_t pointer_id = pointer.device_id * 32 + pointer.pointer_id;
     switch (pointer.phase) {
-      case input::PointerEventPhase::DOWN:
-      case input::PointerEventPhase::MOVE:
+      case fuchsia::ui::input::PointerEventPhase::DOWN:
+      case fuchsia::ui::input::PointerEventPhase::MOVE:
         // On down + move, keep appending points to the path being built
         // For mouse only draw if left button is pressed
-        if (pointer.type == input::PointerEventType::TOUCH ||
-            pointer.type == input::PointerEventType::STYLUS ||
-            (pointer.type == input::PointerEventType::MOUSE &&
-             pointer.buttons & input::kMousePrimaryButton)) {
+        if (pointer.type == fuchsia::ui::input::PointerEventType::TOUCH ||
+            pointer.type == fuchsia::ui::input::PointerEventType::STYLUS ||
+            (pointer.type == fuchsia::ui::input::PointerEventType::MOUSE &&
+             pointer.buttons & fuchsia::ui::input::kMousePrimaryButton)) {
           if (!points_.count(pointer_id)) {
             points_[pointer_id] = std::vector<SkPoint>();
           }
@@ -91,7 +91,7 @@ bool PaintView::OnInputEvent(input::InputEvent event) {
         }
         handled = true;
         break;
-      case input::PointerEventPhase::UP:
+      case fuchsia::ui::input::PointerEventPhase::UP:
         // Path is done, add it to the list of paths and reset the list of
         // points
         paths_.push_back(CurrentPath(pointer_id));
@@ -102,7 +102,7 @@ bool PaintView::OnInputEvent(input::InputEvent event) {
         break;
     }
   } else if (event.is_keyboard()) {
-    const input::KeyboardEvent& keyboard = event.keyboard();
+    const fuchsia::ui::input::KeyboardEvent& keyboard = event.keyboard();
     if (keyboard.hid_usage == HID_USAGE_KEY_ESC) {
       // clear
       paths_.clear();

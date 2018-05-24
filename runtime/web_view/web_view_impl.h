@@ -23,7 +23,7 @@ class TouchTracker {
  public:
   TouchTracker(int x = 0, int y = 0);
 
-  void HandleEvent(const input::PointerEvent& pointer,
+  void HandleEvent(const fuchsia::ui::input::PointerEvent& pointer,
                    const fuchsia::ui::gfx::Metrics& metrics,
                    WebView& web_view);
 
@@ -66,13 +66,13 @@ class WebViewImpl : public mozart::BaseView,
   void SetWebRequestDelegate(
       ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) final;
 
-  bool HandleKeyboardEvent(const input::InputEvent& event);
-  bool HandleMouseEvent(const input::PointerEvent& pointer);
-  void HandleTouchDown(const input::PointerEvent& pointer);
-  bool HandleTouchEvent(const input::PointerEvent& pointer);
+  bool HandleKeyboardEvent(const fuchsia::ui::input::InputEvent& event);
+  bool HandleMouseEvent(const fuchsia::ui::input::PointerEvent& pointer);
+  void HandleTouchDown(const fuchsia::ui::input::PointerEvent& pointer);
+  bool HandleTouchEvent(const fuchsia::ui::input::PointerEvent& pointer);
 
   // |BaseView|:
-  bool OnInputEvent(input::InputEvent event) override;
+  bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 
   // |BaseView|:
   void OnSceneInvalidated(
