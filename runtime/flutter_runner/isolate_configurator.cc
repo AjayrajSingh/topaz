@@ -17,13 +17,13 @@ namespace flutter {
 IsolateConfigurator::IsolateConfigurator(
     UniqueFDIONS fdio_ns,
     fidl::InterfaceHandle<views_v1::ViewContainer> view_container,
-    fidl::InterfaceHandle<component::ApplicationEnvironment>
-        application_environment,
+    fidl::InterfaceHandle<component::Environment>
+        environment,
     fidl::InterfaceRequest<component::ServiceProvider>
         outgoing_services_request)
     : fdio_ns_(std::move(fdio_ns)),
       view_container_(std::move(view_container)),
-      application_environment_(std::move(application_environment)),
+      environment_(std::move(environment)),
       outgoing_services_request_(std::move(outgoing_services_request)) {}
 
 IsolateConfigurator::~IsolateConfigurator() = default;
@@ -48,7 +48,7 @@ bool IsolateConfigurator::ConfigureCurrentIsolate(
 }
 
 void IsolateConfigurator::BindFuchsia() {
-  fuchsia::dart::Initialize(std::move(application_environment_),
+  fuchsia::dart::Initialize(std::move(environment_),
                             std::move(outgoing_services_request_));
 }
 

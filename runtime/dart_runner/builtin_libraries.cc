@@ -95,7 +95,7 @@ void InitBuiltinLibrariesForIsolate(
     bool service_isolate) {
   // dart:fuchsia --------------------------------------------------------------
   if (!service_isolate) {
-    fidl::InterfaceHandle<component::ApplicationEnvironment> environment;
+    fidl::InterfaceHandle<component::Environment> environment;
     context->ConnectToEnvironmentService(environment.NewRequest());
     fuchsia::dart::Initialize(std::move(environment),
                               std::move(outgoing_services));

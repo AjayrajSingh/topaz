@@ -12,7 +12,7 @@ namespace fuchsia {
 namespace dart {
 
 void Initialize(
-    fidl::InterfaceHandle<component::ApplicationEnvironment> environment,
+    fidl::InterfaceHandle<component::Environment> environment,
     fidl::InterfaceRequest<component::ServiceProvider> outgoing_services);
 
 }  // namespace dart

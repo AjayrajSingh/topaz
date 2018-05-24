@@ -16,8 +16,8 @@ class ApplicationContext {
 
   ApplicationContext();
 
-  final ApplicationEnvironmentProxy environment =
-      new ApplicationEnvironmentProxy();
+  final EnvironmentProxy environment =
+      new EnvironmentProxy();
   final ApplicationLauncherProxy launcher = new ApplicationLauncherProxy();
   final ServiceProviderProxy environmentServices = new ServiceProviderProxy();
   final ServiceProviderImpl outgoingServices = new ServiceProviderImpl();
@@ -32,7 +32,7 @@ class ApplicationContext {
     final Handle environmentHandle = MxStartupInfo.takeEnvironment();
     if (environmentHandle != null) {
       context.environment
-        ..ctrl.bind(new InterfaceHandle<ApplicationEnvironment>(
+        ..ctrl.bind(new InterfaceHandle<Environment>(
             new Channel(environmentHandle)))
         ..getApplicationLauncher(context.launcher.ctrl.request())
         ..getServices(context.environmentServices.ctrl.request());

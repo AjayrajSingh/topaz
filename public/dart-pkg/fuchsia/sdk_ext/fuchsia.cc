@@ -104,7 +104,7 @@ void SetReturnCode(Dart_NativeArguments arguments) {
 }  // namespace
 
 void Initialize(
-    fidl::InterfaceHandle<component::ApplicationEnvironment> environment,
+    fidl::InterfaceHandle<component::Environment> environment,
     fidl::InterfaceRequest<component::ServiceProvider> outgoing_services) {
   zircon::dart::Initialize();
 

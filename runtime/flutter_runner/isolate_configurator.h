@@ -22,8 +22,8 @@ class IsolateConfigurator final {
   IsolateConfigurator(
       UniqueFDIONS fdio_ns,
       fidl::InterfaceHandle<views_v1::ViewContainer> view_container,
-      fidl::InterfaceHandle<component::ApplicationEnvironment>
-          application_environment,
+      fidl::InterfaceHandle<component::Environment>
+          environment,
       fidl::InterfaceRequest<component::ServiceProvider>
           outgoing_services_request);
 
@@ -37,8 +37,8 @@ class IsolateConfigurator final {
   bool used_ = false;
   UniqueFDIONS fdio_ns_;
   fidl::InterfaceHandle<views_v1::ViewContainer> view_container_;
-  fidl::InterfaceHandle<component::ApplicationEnvironment>
-      application_environment_;
+  fidl::InterfaceHandle<component::Environment>
+      environment_;
   fidl::InterfaceRequest<component::ServiceProvider> outgoing_services_request_;
 
   void BindFuchsia();

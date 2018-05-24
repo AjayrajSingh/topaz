@@ -90,7 +90,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
       }
 
       // Doing 'dart.io.kill()' will exit other isolates shared with this
-      // ApplicationEnvironment's dart runner, so we only exit this isolate.
+      // Environment's dart runner, so we only exit this isolate.
       exit(0);
     });
   }

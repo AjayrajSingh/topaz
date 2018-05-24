@@ -203,14 +203,14 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
         static_cast<PlatformView*>(shell_->GetPlatformView().get())
             ->TakeViewContainer();
 
-    component::ApplicationEnvironmentPtr application_environment;
+    component::EnvironmentPtr environment;
     application_context.ConnectToEnvironmentService(
-        application_environment.NewRequest());
+        environment.NewRequest());
 
     isolate_configurator_ = std::make_unique<IsolateConfigurator>(
         std::move(fdio_ns),                   //
         std::move(view_container),            //
-        std::move(application_environment),   //
+        std::move(environment),   //
         std::move(outgoing_services_request)  //
     );
   }
