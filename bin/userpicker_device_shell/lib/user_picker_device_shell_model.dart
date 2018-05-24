@@ -588,6 +588,12 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   // |Presentation|.
   @override
+  void setDisplayRotation(double displayRotationDegrees, bool animate) {  // ignore: override_on_non_overriding_method, avoid_positional_boolean_parameters
+    // presentation.setDisplayRotation(displayRotationDegrees, animate);
+  }
+
+  // |Presentation|.
+  @override
   void captureKeyboardEventHack(input.KeyboardEvent eventToCapture,
       InterfaceHandle<KeyboardCaptureListenerHack> listener) {
     presentation.captureKeyboardEventHack(eventToCapture, listener);
