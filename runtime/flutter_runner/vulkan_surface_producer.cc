@@ -44,7 +44,7 @@ bool VulkanSurfaceProducer::Initialize(scenic_lib::Session* mozart_session) {
       VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
   };
   application_ = std::make_unique<vulkan::VulkanApplication>(
-      *vk_, "FlutterApplicationRunner", std::move(extensions));
+      *vk_, "FlutterRunner", std::move(extensions));
 
   if (!application_->IsValid() || !vk_->AreInstanceProcsSetup()) {
     // Make certain the application instance was created and it setup the

@@ -1,3 +1,3 @@
 # Dart Application Runner
 
-An ApplicationRunner that runs Dart programs.
+An Runner that runs Dart programs.

@@ -5,7 +5,7 @@
 #include <trace-provider/provider.h>
 #include <cstdlib>
 
-#include "application_runner.h"
+#include "runner.h"
 #include "lib/fsl/tasks/message_loop.h"
 
 int main(int argc, char const* argv[]) {
@@ -16,7 +16,7 @@ int main(int argc, char const* argv[]) {
 
   FXL_DLOG(INFO) << "Flutter application services initialized.";
 
-  flutter::ApplicationRunner runner;
+  flutter::Runner runner;
 
   loop.Run();
 

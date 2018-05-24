@@ -26,16 +26,16 @@ class ControllerToken {
   FXL_DISALLOW_COPY_AND_ASSIGN(ControllerToken);
 };
 
-class DartApplicationRunner : public component::ApplicationRunner {
+class DartRunner : public component::Runner {
  public:
-  explicit DartApplicationRunner();
-  ~DartApplicationRunner() override;
+  explicit DartRunner();
+  ~DartRunner() override;
 
   void PostRemoveController(ControllerToken* token);
 
  private:
-  // |component::ApplicationRunner| implementation:
-  void StartApplication(
+  // |component::Runner| implementation:
+  void StartComponent(
       component::Package package,
       component::StartupInfo startup_info,
       ::fidl::InterfaceRequest<component::ApplicationController> controller)
@@ -47,14 +47,14 @@ class DartApplicationRunner : public component::ApplicationRunner {
 
   std::unique_ptr<component::ApplicationContext> context_;
   fsl::MessageLoop* loop_;
-  fidl::BindingSet<component::ApplicationRunner> bindings_;
+  fidl::BindingSet<component::Runner> bindings_;
   std::vector<ControllerToken*> controllers_;
 #if !defined(AOT_RUNTIME)
   MappedResource vm_snapshot_data_;
   MappedResource vm_snapshot_instructions_;
 #endif
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(DartApplicationRunner);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartRunner);
 };
 
 }  // namespace dart_runner

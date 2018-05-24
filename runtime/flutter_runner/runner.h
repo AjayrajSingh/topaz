@@ -17,13 +17,13 @@
 
 namespace flutter {
 
-// Publishes the |component::ApplicationRunner| service and runs applications on
+// Publishes the |component::Runner| service and runs applications on
 // their own threads.
-class ApplicationRunner final : public component::ApplicationRunner {
+class Runner final : public component::Runner {
  public:
-  ApplicationRunner();
+  Runner();
 
-  ~ApplicationRunner();
+  ~Runner();
 
  private:
   struct ActiveApplication {
@@ -38,18 +38,18 @@ class ApplicationRunner final : public component::ApplicationRunner {
   };
 
   std::unique_ptr<component::ApplicationContext> host_context_;
-  fidl::BindingSet<component::ApplicationRunner> active_applications_bindings_;
+  fidl::BindingSet<component::Runner> active_applications_bindings_;
   std::unordered_map<const Application*, ActiveApplication>
       active_applications_;
 
-  // |component::ApplicationRunner|
-  void StartApplication(component::Package package,
+  // |component::Runner|
+  void StartComponent(component::Package package,
                         component::StartupInfo startup_info,
                         fidl::InterfaceRequest<component::ApplicationController>
                             controller) override;
 
   void RegisterApplication(
-      fidl::InterfaceRequest<component::ApplicationRunner> request);
+      fidl::InterfaceRequest<component::Runner> request);
 
   void UnregisterApplication(const Application* application);
 
@@ -59,7 +59,7 @@ class ApplicationRunner final : public component::ApplicationRunner {
 
   void SetupGlobalFonts();
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(ApplicationRunner);
+  FXL_DISALLOW_COPY_AND_ASSIGN(Runner);
 };
 
 }  // namespace flutter

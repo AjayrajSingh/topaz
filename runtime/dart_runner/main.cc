@@ -5,12 +5,12 @@
 #include <trace-provider/provider.h>
 
 #include "lib/fsl/tasks/message_loop.h"
-#include "topaz/runtime/dart_runner/dart_application_runner.h"
+#include "topaz/runtime/dart_runner/dart_runner.h"
 
 int main(int argc, const char** argv) {
   fsl::MessageLoop loop;
   trace::TraceProvider provider(loop.async());
-  dart_runner::DartApplicationRunner runner;
+  dart_runner::DartRunner runner;
   loop.Run();
   return 0;
 }

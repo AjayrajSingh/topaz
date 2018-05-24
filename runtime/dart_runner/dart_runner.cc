@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/runtime/dart_runner/dart_application_runner.h"
+#include "topaz/runtime/dart_runner/dart_runner.h"
 
 #include <sys/stat.h>
 #include <thread>
@@ -85,7 +85,7 @@ void IsolateCleanupCallback(void* callback_data) {
 }
 
 void RunApplication(
-    DartApplicationRunner* runner, ControllerToken* token,
+    DartRunner* runner, ControllerToken* token,
     component::Package package, component::StartupInfo startup_info,
     ::fidl::InterfaceRequest<component::ApplicationController> controller) {
   int64_t start = Dart_TimelineGetMicros();
@@ -132,11 +132,11 @@ std::string GetLabelFromURL(const std::string& url) {
 
 }  // namespace
 
-DartApplicationRunner::DartApplicationRunner()
+DartRunner::DartRunner()
     : context_(component::ApplicationContext::CreateFromStartupInfo()),
       loop_(fsl::MessageLoop::GetCurrent()) {
-  context_->outgoing().AddPublicService<component::ApplicationRunner>(
-      [this](fidl::InterfaceRequest<component::ApplicationRunner> request) {
+  context_->outgoing().AddPublicService<component::Runner>(
+      [this](fidl::InterfaceRequest<component::Runner> request) {
         bindings_.AddBinding(this, std::move(request));
       });
 
@@ -175,12 +175,12 @@ DartApplicationRunner::DartApplicationRunner()
   if (error) FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
 }
 
-DartApplicationRunner::~DartApplicationRunner() {
+DartRunner::~DartRunner() {
   char* error = Dart_Cleanup();
   if (error) FXL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
 }
 
-void DartApplicationRunner::StartApplication(
+void DartRunner::StartComponent(
     component::Package package, component::StartupInfo startup_info,
     ::fidl::InterfaceRequest<component::ApplicationController> controller) {
   std::string label = GetLabelFromURL(package.resolved_url);
@@ -190,14 +190,14 @@ void DartApplicationRunner::StartApplication(
   thread.detach();
 }
 
-ControllerToken* DartApplicationRunner::AddController(std::string label) {
+ControllerToken* DartRunner::AddController(std::string label) {
   ControllerToken* token = new ControllerToken(label);
   controllers_.push_back(token);
   UpdateProcessLabel();
   return token;
 }
 
-void DartApplicationRunner::RemoveController(ControllerToken* token) {
+void DartRunner::RemoveController(ControllerToken* token) {
   for (auto it = controllers_.begin(); it != controllers_.end(); ++it) {
     if (*it == token) {
       controllers_.erase(it);
@@ -208,11 +208,11 @@ void DartApplicationRunner::RemoveController(ControllerToken* token) {
   UpdateProcessLabel();
 }
 
-void DartApplicationRunner::PostRemoveController(ControllerToken* token) {
+void DartRunner::PostRemoveController(ControllerToken* token) {
   loop_->task_runner()->PostTask([this, token] { RemoveController(token); });
 }
 
-void DartApplicationRunner::UpdateProcessLabel() {
+void DartRunner::UpdateProcessLabel() {
   std::string label;
   if (controllers_.empty()) {
     label = "dart_runner";

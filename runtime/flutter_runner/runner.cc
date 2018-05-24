@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "application_runner.h"
+#include "runner.h"
 
 #include <zircon/types.h>
 
@@ -35,7 +35,7 @@ static void SetThreadName(const std::string& thread_name) {
                                   thread_name.size());
 }
 
-ApplicationRunner::ApplicationRunner()
+Runner::Runner()
     : host_context_(component::ApplicationContext::CreateFromStartupInfo()) {
   SkGraphics::Init();
 
@@ -47,22 +47,22 @@ ApplicationRunner::ApplicationRunner()
 
   SetThreadName("io.flutter.runner.main");
 
-  host_context_->outgoing_services()->AddService<component::ApplicationRunner>(
-      std::bind(&ApplicationRunner::RegisterApplication, this,
+  host_context_->outgoing_services()->AddService<component::Runner>(
+      std::bind(&Runner::RegisterApplication, this,
                 std::placeholders::_1));
 }
 
-ApplicationRunner::~ApplicationRunner() {
+Runner::~Runner() {
   host_context_->outgoing_services()
-      ->RemoveService<component::ApplicationRunner>();
+      ->RemoveService<component::Runner>();
 }
 
-void ApplicationRunner::RegisterApplication(
-    fidl::InterfaceRequest<component::ApplicationRunner> request) {
+void Runner::RegisterApplication(
+    fidl::InterfaceRequest<component::Runner> request) {
   active_applications_bindings_.AddBinding(this, std::move(request));
 }
 
-void ApplicationRunner::StartApplication(
+void Runner::StartComponent(
     component::Package package,
     component::StartupInfo startup_info,
     fidl::InterfaceRequest<component::ApplicationController> controller) {
@@ -94,7 +94,7 @@ void ApplicationRunner::StartApplication(
   active_applications_[key] = std::move(thread_application_pair);
 }
 
-void ApplicationRunner::OnApplicationTerminate(const Application* application) {
+void Runner::OnApplicationTerminate(const Application* application) {
   auto& active_application = active_applications_.at(application);
 
   // Grab the items out of the entry because we will have to rethread the
@@ -118,13 +118,13 @@ void ApplicationRunner::OnApplicationTerminate(const Application* application) {
   application_destruction_thread->Join();
 }
 
-void ApplicationRunner::SetupICU() {
+void Runner::SetupICU() {
   if (!icu_data::Initialize(host_context_.get())) {
     FXL_LOG(ERROR) << "Could not initialize ICU data.";
   }
 }
 
-void ApplicationRunner::SetupGlobalFonts() {
+void Runner::SetupGlobalFonts() {
   // Fuchsia does not have per application (shell) fonts. Instead, all fonts
   // must be obtained from the font provider.
   auto process_font_collection =
