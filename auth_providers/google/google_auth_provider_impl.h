@@ -45,8 +45,7 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
                          GetAppAccessTokenCallback callback) override;
 
   // |AuthProvider|
-  void GetAppIdToken(fidl::StringPtr credential,
-                     fidl::StringPtr audience,
+  void GetAppIdToken(fidl::StringPtr credential, fidl::StringPtr audience,
                      GetAppIdTokenCallback callback) override;
 
   // |AuthProvider|
@@ -74,7 +73,7 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
 
   async_t* const main_dispatcher_;
   component::ApplicationContext* app_context_;
-  component::ApplicationControllerPtr web_view_controller_;
+  component::ComponentControllerPtr web_view_controller_;
   auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
   web_view::WebViewPtr web_view_;

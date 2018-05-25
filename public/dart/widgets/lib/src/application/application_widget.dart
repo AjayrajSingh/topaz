@@ -38,7 +38,7 @@ class ApplicationWidget extends StatefulWidget {
 }
 
 class _ApplicationWidgetState extends State<ApplicationWidget> {
-  ApplicationControllerProxy _applicationController;
+  ComponentControllerProxy _applicationController;
   ChildViewConnection _connection;
 
   @override
@@ -76,7 +76,7 @@ class _ApplicationWidgetState extends State<ApplicationWidget> {
   }
 
   void _launchApp() {
-    _applicationController = new ApplicationControllerProxy();
+    _applicationController = new ComponentControllerProxy();
 
     Services incomingServices = new Services();
     widget.launcher.createApplication(

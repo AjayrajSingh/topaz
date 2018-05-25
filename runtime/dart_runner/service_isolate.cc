@@ -12,7 +12,7 @@
 #include "lib/tonic/typed_data/uint8_list.h"
 #include "third_party/dart/runtime/bin/embedded_dart_io.h"
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
-#include "topaz/runtime/dart_runner/dart_application_controller.h"
+#include "topaz/runtime/dart_runner/dart_component_controller.h"
 
 namespace dart_runner {
 namespace {

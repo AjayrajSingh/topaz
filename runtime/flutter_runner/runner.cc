@@ -48,13 +48,11 @@ Runner::Runner()
   SetThreadName("io.flutter.runner.main");
 
   host_context_->outgoing_services()->AddService<component::Runner>(
-      std::bind(&Runner::RegisterApplication, this,
-                std::placeholders::_1));
+      std::bind(&Runner::RegisterApplication, this, std::placeholders::_1));
 }
 
 Runner::~Runner() {
-  host_context_->outgoing_services()
-      ->RemoveService<component::Runner>();
+  host_context_->outgoing_services()->RemoveService<component::Runner>();
 }
 
 void Runner::RegisterApplication(
@@ -63,9 +61,8 @@ void Runner::RegisterApplication(
 }
 
 void Runner::StartComponent(
-    component::Package package,
-    component::StartupInfo startup_info,
-    fidl::InterfaceRequest<component::ApplicationController> controller) {
+    component::Package package, component::StartupInfo startup_info,
+    fidl::InterfaceRequest<component::ComponentController> controller) {
   // Notes on application termination: Application typically terminate on the
   // thread on which they were created. This usually means the thread was
   // specifically created to host the application. But we want to ensure that

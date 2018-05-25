@@ -26,8 +26,8 @@ template("runner") {
     sources = [
       "builtin_libraries.cc",
       "builtin_libraries.h",
-      "dart_application_controller.cc",
-      "dart_application_controller.h",
+      "dart_component_controller.cc",
+      "dart_component_controller.h",
       "dart_runner.cc",
       "dart_runner.h",
       "main.cc",
@@ -143,8 +143,8 @@ template("aot_runner_package") {
       if (dart_aot_sharing_basis != "") {
         deps += [ get_label_info(dart_aot_sharing_basis, "label_no_toolchain") +
                   "_snapshot" ]
-        prefix = get_label_info(dart_aot_sharing_basis, "target_gen_dir") + "/" +
-                 get_label_info(dart_aot_sharing_basis, "name")
+        prefix = get_label_info(dart_aot_sharing_basis, "target_gen_dir") +
+                 "/" + get_label_info(dart_aot_sharing_basis, "name")
         shared_snapshot_data_path = "${prefix}_data.aotsnapshot"
         shared_snapshot_instructions_path = "${prefix}_instructions.aotsnapshot"
       } else {

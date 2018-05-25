@@ -2,14 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#pragma once
+#ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_RUNNER_H_
+#define TOPAZ_RUNTIME_FLUTTER_RUNNER_RUNNER_H_
 
 #include <memory>
 #include <unordered_map>
 
 #include <component/cpp/fidl.h>
 
-#include "application.h"
+#include "component.h"
 #include "lib/app/cpp/application_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fsl/tasks/message_loop.h"
@@ -30,8 +31,9 @@ class Runner final : public component::Runner {
     std::unique_ptr<fsl::Thread> thread;
     std::unique_ptr<Application> application;
 
-    ActiveApplication(std::pair<std::unique_ptr<fsl::Thread>,
-                                std::unique_ptr<Application>> pair)
+    ActiveApplication(
+        std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
+            pair)
         : thread(std::move(pair.first)), application(std::move(pair.second)) {}
 
     ActiveApplication() = default;
@@ -44,12 +46,11 @@ class Runner final : public component::Runner {
 
   // |component::Runner|
   void StartComponent(component::Package package,
-                        component::StartupInfo startup_info,
-                        fidl::InterfaceRequest<component::ApplicationController>
-                            controller) override;
+                      component::StartupInfo startup_info,
+                      fidl::InterfaceRequest<component::ComponentController>
+                          controller) override;
 
-  void RegisterApplication(
-      fidl::InterfaceRequest<component::Runner> request);
+  void RegisterApplication(fidl::InterfaceRequest<component::Runner> request);
 
   void UnregisterApplication(const Application* application);
 
@@ -63,3 +64,5 @@ class Runner final : public component::Runner {
 };
 
 }  // namespace flutter
+
+#endif  // TOPAZ_RUNTIME_FLUTTER_RUNNER_RUNNER_H_

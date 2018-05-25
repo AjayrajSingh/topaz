@@ -12,12 +12,12 @@
 #include <memory>
 #include <utility>
 
+#include <lib/async-loop/cpp/loop.h>
 #include <modular_auth/cpp/fidl.h>
 #include <network/cpp/fidl.h>
+#include <trace-provider/provider.h>
 #include <views_v1/cpp/fidl.h>
 #include <web_view/cpp/fidl.h>
-#include <lib/async-loop/cpp/loop.h>
-#include <trace-provider/provider.h>
 
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
@@ -1148,7 +1148,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
   modular_auth::AuthenticationContextPtr auth_context_;
 
   web_view::WebViewPtr web_view_;
-  component::ApplicationControllerPtr web_view_controller_;
+  component::ComponentControllerPtr web_view_controller_;
 
   network::NetworkServicePtr network_service_;
   network::URLLoaderPtr url_loader_;

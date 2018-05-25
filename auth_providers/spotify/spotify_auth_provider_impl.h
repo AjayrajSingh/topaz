@@ -76,7 +76,7 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
                   network::URLResponse response);
 
   component::ApplicationContext* app_context_;
-  component::ApplicationControllerPtr web_view_controller_;
+  component::ComponentControllerPtr web_view_controller_;
   auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
   web_view::WebViewPtr web_view_;

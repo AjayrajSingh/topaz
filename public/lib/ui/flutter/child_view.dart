@@ -87,13 +87,13 @@ class ChildViewConnection {
         assert(_viewOwner != null);
 
   factory ChildViewConnection.launch(String url, ApplicationLauncher launcher,
-      {InterfaceRequest<ApplicationController> controller,
+      {InterfaceRequest<ComponentController> controller,
       InterfaceRequest<ServiceProvider> childServices,
       ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable}) {
     final Services services = new Services();
-    final LaunchInfo launchInfo = new LaunchInfo(
-        url: url, directoryRequest: services.request());
+    final LaunchInfo launchInfo =
+        new LaunchInfo(url: url, directoryRequest: services.request());
     try {
       launcher.createApplication(launchInfo, controller);
       return new ChildViewConnection.connect(services,

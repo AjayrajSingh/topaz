@@ -18,8 +18,7 @@ class EchoImpl implements Echo {
     final Services services = new Services();
     final LaunchInfo launchInfo = new LaunchInfo(
         url: value.forwardToServer, directoryRequest: services.request());
-    final ApplicationControllerProxy controller =
-        new ApplicationControllerProxy();
+    final ComponentControllerProxy controller = new ComponentControllerProxy();
     context.launcher.createApplication(launchInfo, controller.ctrl.request());
 
     final Struct newValue = new Struct(

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "application.h"
+#include "component.h"
 
 #include <dlfcn.h>
 #include <zircon/dlfcn.h>
@@ -23,7 +23,7 @@ std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
 Application::Create(
     TerminationCallback termination_callback, component::Package package,
     component::StartupInfo startup_info,
-    fidl::InterfaceRequest<component::ApplicationController> controller) {
+    fidl::InterfaceRequest<component::ComponentController> controller) {
   auto thread = std::make_unique<fsl::Thread>();
   std::unique_ptr<Application> application;
 
@@ -50,11 +50,11 @@ static std::string DebugLabelForURL(const std::string& url) {
   }
 }
 
-Application::Application(
-    TerminationCallback termination_callback, component::Package,
-    component::StartupInfo startup_info,
-    fidl::InterfaceRequest<component::ApplicationController>
-        application_controller_request)
+Application::Application(TerminationCallback termination_callback,
+                         component::Package,
+                         component::StartupInfo startup_info,
+                         fidl::InterfaceRequest<component::ComponentController>
+                             application_controller_request)
     : termination_callback_(termination_callback),
       debug_label_(DebugLabelForURL(startup_info.launch_info.url)),
       application_controller_(this) {
@@ -229,12 +229,11 @@ void Application::AttemptVMLaunchWithCurrentSettings(
 
   fxl::RefPtr<blink::DartSnapshot> vm_snapshot;
 
-
   fsl::SizedVmo dylib_vmo;
 
   if (fsl::VmoFromFilenameAt(
-            application_assets_directory_.get() /* /pkg/data */, "libapp.so",
-            &dylib_vmo)) {
+          application_assets_directory_.get() /* /pkg/data */, "libapp.so",
+          &dylib_vmo)) {
     // Dart 1 still generating a dylib.
     dlerror();
 
@@ -306,7 +305,7 @@ void Application::AttemptVMLaunchWithCurrentSettings(
   }
 }
 
-// |component::ApplicationController|
+// |component::ComponentController|
 void Application::Kill() {
   if (last_return_code_.first) {
     for (auto wait_callback : wait_callbacks_) {
@@ -320,12 +319,12 @@ void Application::Kill() {
   // collected.
 }
 
-// |component::ApplicationController|
+// |component::ComponentController|
 void Application::Detach() {
   application_controller_.set_error_handler(nullptr);
 }
 
-// |component::ApplicationController|
+// |component::ComponentController|
 void Application::Wait(WaitCallback callback) {
   wait_callbacks_.emplace_back(std::move(callback));
 }

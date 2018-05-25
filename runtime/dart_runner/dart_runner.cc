@@ -13,7 +13,7 @@
 #include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/dart_state.h"
 #include "third_party/dart/runtime/bin/embedded_dart_io.h"
-#include "topaz/runtime/dart_runner/dart_application_controller.h"
+#include "topaz/runtime/dart_runner/dart_component_controller.h"
 #include "topaz/runtime/dart_runner/service_isolate.h"
 
 #if defined(AOT_RUNTIME)
@@ -85,20 +85,21 @@ void IsolateCleanupCallback(void* callback_data) {
 }
 
 void RunApplication(
-    DartRunner* runner, ControllerToken* token,
-    component::Package package, component::StartupInfo startup_info,
-    ::fidl::InterfaceRequest<component::ApplicationController> controller) {
+    DartRunner* runner, ControllerToken* token, component::Package package,
+    component::StartupInfo startup_info,
+    ::fidl::InterfaceRequest<component::ComponentController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   fsl::MessageLoop loop;
-  DartApplicationController app(token->label(), std::move(package),
-                                std::move(startup_info), std::move(controller));
+  DartComponentController app(token->label(), std::move(package),
+                              std::move(startup_info), std::move(controller));
   bool success = app.Setup();
   int64_t end = Dart_TimelineGetMicros();
-  Dart_TimelineEvent("DartApplicationController::Setup", start, end,
+  Dart_TimelineEvent("DartComponentController::Setup", start, end,
                      Dart_Timeline_Event_Duration, 0, NULL, NULL);
   if (success) {
     loop.task_runner()->PostTask([&loop, &app] {
-      if (!app.Main()) loop.PostQuitTask();
+      if (!app.Main())
+        loop.PostQuitTask();
     });
 
     loop.Run();
@@ -172,17 +173,19 @@ DartRunner::DartRunner()
   params.get_service_assets = GetVMServiceAssetsArchiveCallback;
 #endif
   error = Dart_Initialize(&params);
-  if (error) FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
+  if (error)
+    FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
 }
 
 DartRunner::~DartRunner() {
   char* error = Dart_Cleanup();
-  if (error) FXL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
+  if (error)
+    FXL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
 }
 
 void DartRunner::StartComponent(
     component::Package package, component::StartupInfo startup_info,
-    ::fidl::InterfaceRequest<component::ApplicationController> controller) {
+    ::fidl::InterfaceRequest<component::ComponentController> controller) {
   std::string label = GetLabelFromURL(package.resolved_url);
   std::thread thread(RunApplication, this, AddController(label),
                      std::move(package), std::move(startup_info),

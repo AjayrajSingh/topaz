@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/runtime/dart_runner/dart_application_controller.h"
+#include "topaz/runtime/dart_runner/dart_component_controller.h"
 
 #include <fcntl.h>
 #include <fdio/namespace.h>
@@ -42,10 +42,10 @@ void AfterTask() {
 
 }  // namespace
 
-DartApplicationController::DartApplicationController(
+DartComponentController::DartComponentController(
     std::string label, component::Package package,
     component::StartupInfo startup_info,
-    fidl::InterfaceRequest<component::ApplicationController> controller)
+    fidl::InterfaceRequest<component::ComponentController> controller)
     : label_(label),
       url_(std::move(package.resolved_url)),
       package_(std::move(package)),
@@ -68,7 +68,7 @@ DartApplicationController::DartApplicationController(
   }
 }
 
-DartApplicationController::~DartApplicationController() {
+DartComponentController::~DartComponentController() {
   if (namespace_) {
     fdio_ns_destroy(namespace_);
     namespace_ = nullptr;
@@ -77,7 +77,7 @@ DartApplicationController::~DartApplicationController() {
   close(stderrfd_);
 }
 
-bool DartApplicationController::Setup() {
+bool DartComponentController::Setup() {
   // Name the thread after the url of the component being launched.
   std::string label = "dart:" + label_;
   zx::thread::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
@@ -101,7 +101,7 @@ bool DartApplicationController::Setup() {
 
 constexpr char kServiceRootPath[] = "/svc";
 
-bool DartApplicationController::SetupNamespace() {
+bool DartComponentController::SetupNamespace() {
   component::FlatNamespace* flat = &startup_info_.flat_namespace;
   zx_status_t status = fdio_ns_create(&namespace_);
   if (status != ZX_OK) {
@@ -129,7 +129,7 @@ bool DartApplicationController::SetupNamespace() {
   return true;
 }
 
-bool DartApplicationController::SetupFromKernel() {
+bool DartComponentController::SetupFromKernel() {
   MappedResource manifest;
   if (!MappedResource::LoadFromNamespace(namespace_, "pkg/data/app.dilplist",
                                          manifest)) {
@@ -192,7 +192,7 @@ bool DartApplicationController::SetupFromKernel() {
   return true;
 }
 
-bool DartApplicationController::SetupFromAppSnapshot() {
+bool DartComponentController::SetupFromAppSnapshot() {
 #if !defined(AOT_RUNTIME)
   // If we start generating app-jit snapshots, the code below should be able
   // handle that case without modification.
@@ -230,7 +230,7 @@ bool DartApplicationController::SetupFromAppSnapshot() {
 #endif  // defined(AOT_RUNTIME)
 }
 
-int DartApplicationController::SetupFileDescriptor(
+int DartComponentController::SetupFileDescriptor(
     component::FileDescriptorPtr fd) {
   if (!fd) {
     return -1;
@@ -264,7 +264,7 @@ int DartApplicationController::SetupFileDescriptor(
   return outfd;
 }
 
-bool DartApplicationController::CreateIsolate(
+bool DartComponentController::CreateIsolate(
     const uint8_t* isolate_snapshot_data,
     const uint8_t* isolate_snapshot_instructions,
     const uint8_t* shared_snapshot_data,
@@ -298,7 +298,7 @@ bool DartApplicationController::CreateIsolate(
   return true;
 }
 
-bool DartApplicationController::Main() {
+bool DartComponentController::Main() {
   Dart_EnterScope();
 
   tonic::DartMicrotaskQueue::StartForCurrentThread();
@@ -369,7 +369,7 @@ bool DartApplicationController::Main() {
   return true;
 }
 
-void DartApplicationController::Kill() {
+void DartComponentController::Kill() {
   if (Dart_CurrentIsolate()) {
     fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
     tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
@@ -385,15 +385,15 @@ void DartApplicationController::Kill() {
   }
 }
 
-void DartApplicationController::Detach() {
+void DartComponentController::Detach() {
   binding_.set_error_handler(fxl::Closure());
 }
 
-void DartApplicationController::Wait(WaitCallback callback) {
+void DartComponentController::Wait(WaitCallback callback) {
   wait_callbacks_.push_back(callback);
 }
 
-void DartApplicationController::SendReturnCode() {
+void DartComponentController::SendReturnCode() {
   for (const auto& iter : wait_callbacks_) {
     iter(return_code_);
   }
@@ -404,7 +404,7 @@ const zx::duration kIdleWaitDuration = zx::sec(2);
 const zx::duration kIdleNotifyDuration = zx::msec(500);
 const zx::duration kIdleSlack = zx::sec(1);
 
-void DartApplicationController::MessageEpilogue(Dart_Handle result) {
+void DartComponentController::MessageEpilogue(Dart_Handle result) {
   auto dart_state = tonic::DartState::Current();
   // If the Dart program has set a return code, then it is intending to shut
   // down by way of a fatal error, and so there is no need to override
@@ -430,10 +430,9 @@ void DartApplicationController::MessageEpilogue(Dart_Handle result) {
   }
 }
 
-void DartApplicationController::OnIdleTimer(async_t* async,
-                                            async::WaitBase* wait,
-                                            zx_status_t status,
-                                            const zx_packet_signal* signal) {
+void DartComponentController::OnIdleTimer(async_t* async, async::WaitBase* wait,
+                                          zx_status_t status,
+                                          const zx_packet_signal* signal) {
   if ((status != ZX_OK) || !(signal->observed & ZX_TIMER_SIGNALED) ||
       !Dart_CurrentIsolate()) {
     // Timer closed or isolate shutdown.

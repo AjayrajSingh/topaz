@@ -27,10 +27,8 @@ template("flutter_runner") {
     sources = [
       "accessibility_bridge.cc",
       "accessibility_bridge.h",
-      "application.cc",
-      "application.h",
-      "runner.cc",
-      "runner.h",
+      "component.cc",
+      "component.h",
       "compositor_context.cc",
       "compositor_context.h",
       "engine.cc",
@@ -42,6 +40,8 @@ template("flutter_runner") {
       "main.cc",
       "platform_view.cc",
       "platform_view.h",
+      "runner.cc",
+      "runner.h",
       "session_connection.cc",
       "session_connection.h",
       "surface.cc",
@@ -138,16 +138,20 @@ package("flutter_aot_runner") {
 
   binary = "flutter_aot_runner"
 
-  resources = [ {
-        path = rebase_path(
-                "$root_gen_dir/observatory/embedded_archive_observatory.tar")
-        dest = "observatory.tar"
-      } ]
+  resources = [
+    {
+      path = rebase_path(
+              "$root_gen_dir/observatory/embedded_archive_observatory.tar")
+      dest = "observatory.tar"
+    },
+  ]
 
-  meta = [ {
-        path = rebase_path("meta/sandbox")
-        dest = "sandbox"
-      } ]
+  meta = [
+    {
+      path = rebase_path("meta/sandbox")
+      dest = "sandbox"
+    },
+  ]
 }
 
 package("flutter2_aot_runner") {
@@ -158,16 +162,20 @@ package("flutter2_aot_runner") {
 
   binary = "flutter_aot_runner"
 
-  resources = [ {
-        path = rebase_path(
-                "$root_gen_dir/observatory/embedded_archive_observatory.tar")
-        dest = "observatory.tar"
-      } ]
+  resources = [
+    {
+      path = rebase_path(
+              "$root_gen_dir/observatory/embedded_archive_observatory.tar")
+      dest = "observatory.tar"
+    },
+  ]
 
-  meta = [ {
-        path = rebase_path("meta/sandbox")
-        dest = "sandbox"
-      } ]
+  meta = [
+    {
+      path = rebase_path("meta/sandbox")
+      dest = "sandbox"
+    },
+  ]
 }
 
 package("flutter_jit_runner") {
@@ -201,16 +209,20 @@ package("flutter_jit_runner") {
     },
   ]
 
-  resources += [ {
-        path = rebase_path(
-                "$root_gen_dir/observatory/embedded_archive_observatory.tar")
-        dest = "observatory.tar"
-      } ]
+  resources += [
+    {
+      path = rebase_path(
+              "$root_gen_dir/observatory/embedded_archive_observatory.tar")
+      dest = "observatory.tar"
+    },
+  ]
 
-  meta = [ {
-        path = rebase_path("meta/sandbox")
-        dest = "sandbox"
-      } ]
+  meta = [
+    {
+      path = rebase_path("meta/sandbox")
+      dest = "sandbox"
+    },
+  ]
 }
 
 package("flutter2_jit_runner") {
@@ -244,14 +256,18 @@ package("flutter2_jit_runner") {
     },
   ]
 
-  resources += [ {
-        path = rebase_path(
-                "$root_gen_dir/observatory/embedded_archive_observatory.tar")
-        dest = "observatory.tar"
-      } ]
+  resources += [
+    {
+      path = rebase_path(
+              "$root_gen_dir/observatory/embedded_archive_observatory.tar")
+      dest = "observatory.tar"
+    },
+  ]
 
-  meta = [ {
-        path = rebase_path("meta/sandbox")
-        dest = "sandbox"
-      } ]
+  meta = [
+    {
+      path = rebase_path("meta/sandbox")
+      dest = "sandbox"
+    },
+  ]
 }

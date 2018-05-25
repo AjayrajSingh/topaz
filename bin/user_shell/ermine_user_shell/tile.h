@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef TOPAZ_SHELL_ERMINE_USER_SHELL_TILE_H_
-#define TOPAZ_SHELL_ERMINE_USER_SHELL_TILE_H_
+#ifndef TOPAZ_BIN_USER_SHELL_ERMINE_USER_SHELL_TILE_H_
+#define TOPAZ_BIN_USER_SHELL_ERMINE_USER_SHELL_TILE_H_
 
 #include <string>
 #include <utility>
@@ -37,12 +37,13 @@ class Tile {
     view_properties_ = std::move(view_properties);
   }
 
-  void CreateView(fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request);
+  void CreateView(
+      fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request);
 
  private:
   component::ApplicationLauncher* launcher_;
   std::string url_;
-  component::ApplicationControllerPtr controller_;
+  component::ComponentControllerPtr controller_;
 
   const uint32_t key_;
   scenic_lib::EntityNode node_;
@@ -51,4 +52,4 @@ class Tile {
 
 }  // namespace ermine_user_shell
 
-#endif  // TOPAZ_SHELL_ERMINE_USER_SHELL_TILE_H_
+#endif  // TOPAZ_BIN_USER_SHELL_ERMINE_USER_SHELL_TILE_H_

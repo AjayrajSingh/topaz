@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_DART_RUNNER_DART_APPLICATION_RUNNER_H_
-#define APPS_DART_RUNNER_DART_APPLICATION_RUNNER_H_
+#ifndef TOPAZ_RUNTIME_DART_RUNNER_DART_RUNNER_H_
+#define TOPAZ_RUNTIME_DART_RUNNER_DART_RUNNER_H_
 
+#include <component/cpp/fidl.h>
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
-#include <component/cpp/fidl.h>
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/macros.h"
@@ -35,11 +35,10 @@ class DartRunner : public component::Runner {
 
  private:
   // |component::Runner| implementation:
-  void StartComponent(
-      component::Package package,
-      component::StartupInfo startup_info,
-      ::fidl::InterfaceRequest<component::ApplicationController> controller)
-      override;
+  void StartComponent(component::Package package,
+                      component::StartupInfo startup_info,
+                      ::fidl::InterfaceRequest<component::ComponentController>
+                          controller) override;
 
   ControllerToken* AddController(std::string label);
   void RemoveController(ControllerToken* token);
@@ -59,4 +58,4 @@ class DartRunner : public component::Runner {
 
 }  // namespace dart_runner
 
-#endif  // APPS_DART_RUNNER_DART_APPLICATION_RUNNER_H_
+#endif  // TOPAZ_RUNTIME_DART_RUNNER_DART_RUNNER_H_

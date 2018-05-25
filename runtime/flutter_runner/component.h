@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#pragma once
+#ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_COMPONENT_H_
+#define TOPAZ_RUNTIME_FLUTTER_RUNNER_COMPONENT_H_
 
 #include <array>
 #include <memory>
@@ -28,7 +29,7 @@ namespace flutter {
 // Represents an instance of a Flutter application that contains one of more
 // Flutter engine instances.
 class Application final : public Engine::Delegate,
-                          public component::ApplicationController,
+                          public component::ComponentController,
                           public views_v1::ViewProvider {
  public:
   using TerminationCallback = std::function<void(const Application*)>;
@@ -39,7 +40,7 @@ class Application final : public Engine::Delegate,
   static std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
   Create(TerminationCallback termination_callback, component::Package package,
          component::StartupInfo startup_info,
-         fidl::InterfaceRequest<component::ApplicationController> controller);
+         fidl::InterfaceRequest<component::ComponentController> controller);
 
   // Must be called on the same thread returned from the create call. The thread
   // may be collected after.
@@ -54,7 +55,7 @@ class Application final : public Engine::Delegate,
   UniqueFDIONS fdio_ns_ = UniqueFDIONSCreate();
   fxl::UniqueFD application_directory_;
   fxl::UniqueFD application_assets_directory_;
-  fidl::Binding<component::ApplicationController> application_controller_;
+  fidl::Binding<component::ComponentController> application_controller_;
   fidl::InterfaceRequest<component::ServiceProvider> outgoing_services_request_;
   component::ServiceProviderBridge service_provider_bridge_;
   std::unique_ptr<component::ApplicationContext> application_context_;
@@ -68,15 +69,15 @@ class Application final : public Engine::Delegate,
   Application(
       TerminationCallback termination_callback, component::Package package,
       component::StartupInfo startup_info,
-      fidl::InterfaceRequest<component::ApplicationController> controller);
+      fidl::InterfaceRequest<component::ComponentController> controller);
 
-  // |component::ApplicationController|
+  // |component::ComponentController|
   void Kill() override;
 
-  // |component::ApplicationController|
+  // |component::ComponentController|
   void Detach() override;
 
-  // |component::ApplicationController|
+  // |component::ComponentController|
   void Wait(WaitCallback callback) override;
 
   // |views_v1::ViewProvider|
@@ -96,3 +97,5 @@ class Application final : public Engine::Delegate,
 };
 
 }  // namespace flutter
+
+#endif  // TOPAZ_RUNTIME_FLUTTER_RUNNER_COMPONENT_H_

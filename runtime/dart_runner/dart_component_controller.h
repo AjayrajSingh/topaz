@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef APPS_DART_RUNNER_DART_APPLICATION_CONTROLLER_H_
-#define APPS_DART_RUNNER_DART_APPLICATION_CONTROLLER_H_
+#ifndef TOPAZ_RUNTIME_DART_RUNNER_DART_COMPONENT_CONTROLLER_H_
+#define TOPAZ_RUNTIME_DART_RUNNER_DART_COMPONENT_CONTROLLER_H_
 
 #include <fdio/namespace.h>
 #include <lib/async/cpp/wait.h>
@@ -19,13 +19,13 @@
 
 namespace dart_runner {
 
-class DartApplicationController : public component::ApplicationController {
+class DartComponentController : public component::ComponentController {
  public:
-  DartApplicationController(
+  DartComponentController(
       std::string label, component::Package package,
       component::StartupInfo startup_info,
-      fidl::InterfaceRequest<component::ApplicationController> controller);
-  ~DartApplicationController() override;
+      fidl::InterfaceRequest<component::ComponentController> controller);
+  ~DartComponentController() override;
 
   bool Setup();
   bool Main();
@@ -44,7 +44,7 @@ class DartApplicationController : public component::ApplicationController {
 
   int SetupFileDescriptor(component::FileDescriptorPtr fd);
 
-  // |ApplicationController|
+  // |ComponentController|
   void Kill() override;
   void Detach() override;
   void Wait(WaitCallback callback) override;
@@ -59,7 +59,7 @@ class DartApplicationController : public component::ApplicationController {
   component::Package package_;
   component::StartupInfo startup_info_;
   component::ServiceProviderBridge service_provider_bridge_;
-  fidl::Binding<component::ApplicationController> binding_;
+  fidl::Binding<component::ComponentController> binding_;
 
   fdio_ns_t* namespace_ = nullptr;
   int stdoutfd_ = -1;
@@ -75,13 +75,13 @@ class DartApplicationController : public component::ApplicationController {
 
   zx::time idle_start_{0};
   zx::timer idle_timer_;
-  async::WaitMethod<DartApplicationController,
-                    &DartApplicationController::OnIdleTimer>
+  async::WaitMethod<DartComponentController,
+                    &DartComponentController::OnIdleTimer>
       idle_wait_{this};
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(DartApplicationController);
+  FXL_DISALLOW_COPY_AND_ASSIGN(DartComponentController);
 };
 
 }  // namespace dart_runner
 
-#endif  // APPS_DART_RUNNER_DART_APPLICATION_CONTROLLER_H_
+#endif  // TOPAZ_RUNTIME_DART_RUNNER_DART_COMPONENT_CONTROLLER_H_
