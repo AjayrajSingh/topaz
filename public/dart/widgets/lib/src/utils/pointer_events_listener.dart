@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:fidl_fuchsia_ui_input/fidl.dart';
 import 'package:fidl_presentation/fidl.dart';
+import 'package:lib.app.dart/logging.dart';
 
 /// Listens for pointer events and injects them into Flutter input pipeline.
 class PointerEventsListener implements PointerCaptureListenerHack {
@@ -17,6 +18,10 @@ class PointerEventsListener implements PointerCaptureListenerHack {
   // determine the correct [PointerDataPacket] to generate at boundary condition
   // of the screen rect.
   final Map<int, PointerEvent> _lastPointerEvent = <int, PointerEvent>{};
+
+  // Flag to remember that a down event was seen before a move event.
+  // TODO(sanjayc): Should really convert to a FSM for PointerEvent.
+  final Map<int, bool> _downEvent = <int, bool>{};
 
   // Holds the [onPointerDataCallback] assigned to [ui.window] at
   // the start of the program.
@@ -37,13 +42,37 @@ class PointerEventsListener implements PointerCaptureListenerHack {
   /// [ui.window.onPointerDataPacket] callback.
   void stop() {
     if (_originalCallback != null) {
+      _cleanupPointerEvents();
       _pointerCaptureListenerBinding.close();
 
       // Restore the original pointer events callback on the window.
       ui.window.onPointerDataPacket = _originalCallback;
       _originalCallback = null;
       _lastPointerEvent.clear();
+      _downEvent.clear();
     }
+  }
+
+  void _cleanupPointerEvents() {
+    for (PointerEvent lastEvent in _lastPointerEvent.values) {
+      if (lastEvent.phase != PointerEventPhase.remove) {
+        onPointerEvent(_clone(lastEvent, PointerEventPhase.remove));
+      }
+    }
+  }
+
+  PointerEvent _clone(PointerEvent event, [PointerEventPhase phase]) {
+    return new PointerEvent(
+        buttons: event.buttons,
+        deviceId: event.deviceId,
+        eventTime: event.eventTime,
+        phase: phase ?? event.phase,
+        pointerId: event.pointerId,
+        radiusMajor: event.radiusMajor,
+        radiusMinor: event.radiusMinor,
+        type: event.type,
+        x: event.x,
+        y: event.y);
   }
 
   /// |PointerCaptureListener|.
@@ -78,8 +107,9 @@ class PointerEventsListener implements PointerCaptureListenerHack {
       physicalY: event.y * ui.window.devicePixelRatio,
     );
 
-    _originalCallback(
-        new ui.PointerDataPacket(data: <ui.PointerData>[pointerData]));
+    _originalCallback(new ui.PointerDataPacket(
+      data: <ui.PointerData>[pointerData],
+    ));
 
     // Remember this event for checking boundary condition on the next event.
     _lastPointerEvent[event.pointerId] = event;
@@ -94,8 +124,23 @@ class PointerEventsListener implements PointerCaptureListenerHack {
       case PointerEventPhase.hover:
         return ui.PointerChange.hover;
       case PointerEventPhase.down:
+        _downEvent[event.pointerId] = true;
         return ui.PointerChange.down;
       case PointerEventPhase.move:
+        // If move is the first event, convert to `add` event. Otherwise,
+        // flutter pointer state machine throws an exception.
+        if (event.type != PointerEventType.mouse &&
+            _lastPointerEvent[event.pointerId] == null) {
+          return ui.PointerChange.add;
+        }
+
+        // If move event was seen before down event, convert to `down` event.
+        if (event.type != PointerEventType.mouse &&
+            _downEvent[event.pointerId] != true) {
+          _downEvent[event.pointerId] = true;
+          return ui.PointerChange.down;
+        }
+
         // For mouse, return a hover event if no buttons were pressed.
         if (event.type == PointerEventType.mouse && event.buttons == 0) {
           return ui.PointerChange.hover;
@@ -113,6 +158,7 @@ class PointerEventsListener implements PointerCaptureListenerHack {
 
         return ui.PointerChange.move;
       case PointerEventPhase.up:
+        _downEvent[event.pointerId] = false;
         return ui.PointerChange.up;
       case PointerEventPhase.remove:
         return ui.PointerChange.remove;

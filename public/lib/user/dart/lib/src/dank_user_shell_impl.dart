@@ -83,10 +83,15 @@ class DankUserShellImpl
   @override
   void watchVisualState(
       String storyId, InterfaceHandle<StoryVisualStateWatcher> watcherHandle) {
-    _visualStateWatchers[storyId] = new StoryVisualStateWatcherProxy()
-      ..ctrl.bind(watcherHandle);
-    _focusProviderProxy.query((List<FocusInfo> focusedStories) =>
-        focusedStories.forEach(onFocusChange));
+    StoryVisualStateWatcherProxy watcherProxy =
+        new StoryVisualStateWatcherProxy();
+    watcherProxy.ctrl
+      ..bind(watcherHandle)
+      ..onClose = () => _visualStateWatchers.remove(storyId);
+    watcherProxy.ctrl.onConnectionError =
+        () => _visualStateWatchers.remove(storyId);
+
+    _visualStateWatchers[storyId] = watcherProxy;
   }
 
   @override

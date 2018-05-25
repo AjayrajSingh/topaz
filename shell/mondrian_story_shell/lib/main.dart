@@ -37,6 +37,8 @@ StoryShellImpl _storyShellImpl;
 
 SurfaceGraph _surfaceGraph;
 
+StoryVisualState _visualState;
+
 /// An implementation of the [StoryShell] interface.
 class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   final StoryShellBinding _storyShellBinding = new StoryShellBinding();
@@ -189,7 +191,11 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
 
   @override
   void onVisualStateChange(StoryVisualState visualState) {
-    log.info('Story visual state is: $visualState');
+    if (_visualState == visualState) {
+      return;
+    }
+    _visualState = visualState;
+
     _pointerEventsListener.stop();
     if (visualState == StoryVisualState.maximized) {
       PresentationProxy presentationProxy = new PresentationProxy();
