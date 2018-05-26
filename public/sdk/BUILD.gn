@@ -9,12 +9,12 @@ sdk("dart") {
   category = "partner"
 
   deps = [
-#    "//topaz/public/dart/config:config_sdk($dart_toolchain)",
-#    "//topaz/public/dart/fidl:fidl_sdk($dart_toolchain)",
-#    "//topaz/public/dart/widgets:lib.widgets_sdk($dart_toolchain)",
-#    "//topaz/public/lib/app/dart:dart_sdk($dart_toolchain)",
-#    "//topaz/public/lib/app_driver/dart:dart_sdk($dart_toolchain)",
-#    "//topaz/public/lib/schemas/dart:dart_sdk($dart_toolchain)",
+    "//topaz/public/dart/config:config_sdk($dart_toolchain)",
+    "//topaz/public/dart/fidl:fidl_sdk($dart_toolchain)",
+    "//topaz/public/dart/widgets:lib.widgets_sdk($dart_toolchain)",
+    "//topaz/public/lib/app/dart:dart_sdk($dart_toolchain)",
+    "//topaz/public/lib/app_driver/dart:dart_sdk($dart_toolchain)",
+    "//topaz/public/lib/schemas/dart:dart_sdk($dart_toolchain)",
   ]
 }
 
