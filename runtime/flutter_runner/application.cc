@@ -266,8 +266,6 @@ void Application::AttemptVMLaunchWithCurrentSettings(
         blink::DartSnapshotBuffer::CreateWithSymbolInLibrary(
             lib,
             symbol(blink::DartSnapshot::kIsolateInstructionsSymbol).c_str()));
-
-    shared_snapshot_ = blink::DartSnapshot::Empty();
   } else {
     // Dart 2 using blobs to allow sharing.
     // Compare flutter2_aot_app in flutter_app.gni.

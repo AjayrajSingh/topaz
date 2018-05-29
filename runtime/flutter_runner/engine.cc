@@ -180,6 +180,9 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
     isolate_snapshot =
         blink::DartVM::ForProcess(settings_)->GetIsolateSnapshot();
   }
+  if (!shared_snapshot) {
+    shared_snapshot = blink::DartSnapshot::Empty();
+  }
 
   shell_ = shell::Shell::Create(
       task_runners,                 // host task runners
