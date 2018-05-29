@@ -1,0 +1,30 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+# The main app (does not support any test code, and is not drivable).
+flutter_app("driver_example_mod") {
+  main_dart = "lib/main.dart"
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/widgets/dart",
+  ]
+}
+
+# The tester app, which contains the driver extension code.
+flutter_app("driver_example_mod_wrapper") {
+  main_dart = "lib/main_driver_wrapper.dart"
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/widgets/dart",
+  ]
+}
