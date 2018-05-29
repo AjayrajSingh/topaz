@@ -17,7 +17,7 @@ class SpotifyFactoryImplTest : public gtest::TestWithLoop {
  public:
   SpotifyFactoryImplTest()
       : network_wrapper_(dispatcher()),
-        context_(component::StartupContext::CreateFromStartupInfo().get()),
+        context_(fuchsia::sys::StartupContext::CreateFromStartupInfo().get()),
         factory_impl_(context_, &network_wrapper_) {
     factory_impl_.Bind(factory_.NewRequest());
   }
@@ -26,7 +26,7 @@ class SpotifyFactoryImplTest : public gtest::TestWithLoop {
 
  protected:
   network_wrapper::FakeNetworkWrapper network_wrapper_;
-  component::StartupContext* context_;
+  fuchsia::sys::StartupContext* context_;
   auth::AuthProviderPtr auth_provider_;
   auth::AuthProviderFactoryPtr factory_;
 

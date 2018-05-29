@@ -29,7 +29,7 @@ using auth_providers::oauth::ParseOAuthResponse;
 using fuchsia::modular::JsonValueToPrettyString;
 
 SpotifyAuthProviderImpl::SpotifyAuthProviderImpl(
-    component::StartupContext* context,
+    fuchsia::sys::StartupContext* context,
     network_wrapper::NetworkWrapper* network_wrapper,
     fidl::InterfaceRequest<auth::AuthProvider> request)
     : context_(context),
@@ -280,8 +280,8 @@ void SpotifyAuthProviderImpl::GetUserProfile(
 
 fuchsia::ui::views_v1_token::ViewOwnerPtr
 SpotifyAuthProviderImpl::SetupWebView() {
-  component::Services web_view_services;
-  component::LaunchInfo web_view_launch_info;
+  fuchsia::sys::Services web_view_services;
+  fuchsia::sys::LaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
   web_view_launch_info.directory_request = web_view_services.NewRequest();
   context_->launcher()->CreateApplication(std::move(web_view_launch_info),
@@ -293,7 +293,7 @@ SpotifyAuthProviderImpl::SetupWebView() {
   fuchsia::ui::views_v1_token::ViewOwnerPtr view_owner;
   fuchsia::ui::views_v1::ViewProviderPtr view_provider;
   web_view_services.ConnectToService(view_provider.NewRequest());
-  component::ServiceProviderPtr web_view_moz_services;
+  fuchsia::sys::ServiceProviderPtr web_view_moz_services;
   view_provider->CreateView(view_owner.NewRequest(),
                             web_view_moz_services.NewRequest());
 

@@ -36,12 +36,12 @@ static void UpdateNativeThreadLabelNames(const std::string& label,
 
 Engine::Engine(
     Delegate& delegate, std::string thread_label,
-    component::StartupContext& startup_context, blink::Settings settings,
+    fuchsia::sys::StartupContext& startup_context, blink::Settings settings,
     fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
     fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
     UniqueFDIONS fdio_ns,
-    fidl::InterfaceRequest<component::ServiceProvider>
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
         outgoing_services_request)
     : delegate_(delegate),
       thread_label_(std::move(thread_label)),
@@ -73,7 +73,7 @@ Engine::Engine(
 
   // Grab the parent environent services. The platform view may want to access
   // some of these services.
-  fidl::InterfaceHandle<component::ServiceProvider>
+  fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
       parent_environment_service_provider;
   startup_context.environment()->GetServices(
       parent_environment_service_provider.NewRequest());
@@ -207,7 +207,7 @@ Engine::Engine(
         static_cast<PlatformView*>(shell_->GetPlatformView().get())
             ->TakeViewContainer();
 
-    component::EnvironmentPtr environment;
+    fuchsia::sys::EnvironmentPtr environment;
     startup_context.ConnectToEnvironmentService(environment.NewRequest());
 
     isolate_configurator_ = std::make_unique<IsolateConfigurator>(
@@ -315,7 +315,7 @@ void Engine::OnSessionMetricsDidChange(double device_pixel_ratio) {
 
 // |mozart::NativesDelegate|
 void Engine::OfferServiceProvider(
-    fidl::InterfaceHandle<component::ServiceProvider> service_provider,
+    fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
     fidl::VectorPtr<fidl::StringPtr> services) {
   if (!shell_) {
     return;

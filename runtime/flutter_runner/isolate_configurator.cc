@@ -17,9 +17,9 @@ namespace flutter {
 IsolateConfigurator::IsolateConfigurator(
     UniqueFDIONS fdio_ns,
     fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer> view_container,
-    fidl::InterfaceHandle<component::Environment>
+    fidl::InterfaceHandle<fuchsia::sys::Environment>
         environment,
-    fidl::InterfaceRequest<component::ServiceProvider>
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
         outgoing_services_request)
     : fdio_ns_(std::move(fdio_ns)),
       view_container_(std::move(view_container)),

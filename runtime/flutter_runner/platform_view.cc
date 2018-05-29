@@ -31,7 +31,7 @@ void SetInterfaceErrorHandler(fidl::InterfacePtr<T>& interface,
 PlatformView::PlatformView(
     PlatformView::Delegate& delegate, std::string debug_label,
     blink::TaskRunners task_runners,
-    fidl::InterfaceHandle<component::ServiceProvider>
+    fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
         parent_environment_service_provider_handle,
     fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewManager> view_manager_handle,
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
@@ -74,7 +74,7 @@ PlatformView::PlatformView(
   view_->GetContainer(view_container_.NewRequest());
 
   // Get the input connection from the services of the view.
-  component::ConnectToService(service_provider_.get(),
+  fuchsia::sys::ConnectToService(service_provider_.get(),
                               input_connection_.NewRequest());
 
   // Set the input listener on the input connection.
@@ -83,7 +83,7 @@ PlatformView::PlatformView(
   // Access the clipboard.
   parent_environment_service_provider_ =
       parent_environment_service_provider_handle.Bind();
-  component::ConnectToService(parent_environment_service_provider_.get(),
+  fuchsia::sys::ConnectToService(parent_environment_service_provider_.get(),
                               clipboard_.NewRequest());
 
   // Finally! Register the native platform message handlers.
@@ -93,7 +93,7 @@ PlatformView::PlatformView(
 PlatformView::~PlatformView() = default;
 
 void PlatformView::OfferServiceProvider(
-    fidl::InterfaceHandle<component::ServiceProvider> service_provider,
+    fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
     fidl::VectorPtr<fidl::StringPtr> services) {
   view_->OfferServiceProvider(std::move(service_provider), std::move(services));
 }

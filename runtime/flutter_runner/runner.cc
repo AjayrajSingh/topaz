@@ -36,7 +36,7 @@ static void SetThreadName(const std::string& thread_name) {
 }
 
 Runner::Runner()
-    : host_context_(component::StartupContext::CreateFromStartupInfo()) {
+    : host_context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()) {
   SkGraphics::Init();
 
   SetupICU();
@@ -47,22 +47,22 @@ Runner::Runner()
 
   SetThreadName("io.flutter.runner.main");
 
-  host_context_->outgoing_services()->AddService<component::Runner>(
+  host_context_->outgoing_services()->AddService<fuchsia::sys::Runner>(
       std::bind(&Runner::RegisterApplication, this, std::placeholders::_1));
 }
 
 Runner::~Runner() {
-  host_context_->outgoing_services()->RemoveService<component::Runner>();
+  host_context_->outgoing_services()->RemoveService<fuchsia::sys::Runner>();
 }
 
 void Runner::RegisterApplication(
-    fidl::InterfaceRequest<component::Runner> request) {
+    fidl::InterfaceRequest<fuchsia::sys::Runner> request) {
   active_applications_bindings_.AddBinding(this, std::move(request));
 }
 
 void Runner::StartComponent(
-    component::Package package, component::StartupInfo startup_info,
-    fidl::InterfaceRequest<component::ComponentController> controller) {
+    fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
+    fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   // Notes on application termination: Application typically terminate on the
   // thread on which they were created. This usually means the thread was
   // specifically created to host the application. But we want to ensure that

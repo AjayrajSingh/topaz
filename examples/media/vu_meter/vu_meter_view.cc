@@ -24,7 +24,7 @@ VuMeterView::VuMeterView(
     async::Loop* loop, fuchsia::ui::views_v1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
         view_owner_request,
-    component::StartupContext* startup_context, const VuMeterParams& params)
+    fuchsia::sys::StartupContext* startup_context, const VuMeterParams& params)
     : mozart::SkiaView(std::move(view_manager), std::move(view_owner_request),
                        "VU Meter"),
       loop_(loop),

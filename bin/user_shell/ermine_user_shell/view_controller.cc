@@ -48,7 +48,7 @@ fuchsia::ui::views_v1::ViewProperties CreateViewProperties(float width, float he
 }  // namespace
 
 ViewController::ViewController(
-    component::ApplicationLauncher* launcher,
+    fuchsia::sys::ApplicationLauncher* launcher,
     fuchsia::ui::views_v1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
     DisconnectCallback disconnect_handler)
@@ -75,7 +75,7 @@ ViewController::ViewController(
   view_container_->SetListener(view_container_listener_binding_.NewBinding());
 
   view_->GetServiceProvider(view_service_provider_.NewRequest());
-  component::ConnectToService(view_service_provider_.get(),
+  fuchsia::sys::ConnectToService(view_service_provider_.get(),
                               input_connection_.NewRequest());
   input_connection_->SetEventListener(input_listener_binding_.NewBinding());
 

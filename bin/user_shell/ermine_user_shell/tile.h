@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 
-#include <component/cpp/fidl.h>
+#include <fuchsia/sys/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 
 #include "lib/fidl/cpp/interface_request.h"
@@ -19,7 +19,7 @@ namespace ermine_user_shell {
 
 class Tile {
  public:
-  Tile(component::ApplicationLauncher* launcher, std::string url,
+  Tile(fuchsia::sys::ApplicationLauncher* launcher, std::string url,
        scenic_lib::Session* session);
   ~Tile();
 
@@ -41,9 +41,9 @@ class Tile {
       fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request);
 
  private:
-  component::ApplicationLauncher* launcher_;
+  fuchsia::sys::ApplicationLauncher* launcher_;
   std::string url_;
-  component::ComponentControllerPtr controller_;
+  fuchsia::sys::ComponentControllerPtr controller_;
 
   const uint32_t key_;
   scenic_lib::EntityNode node_;

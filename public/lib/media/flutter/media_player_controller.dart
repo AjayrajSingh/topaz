@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:lib.media.dart/audio_player_controller.dart';
 import 'package:fidl_media_player/fidl.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_component/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:fidl_fuchsia_math/fidl.dart' as geom;
 import 'package:fidl_fuchsia_ui_views_v1/fidl.dart';

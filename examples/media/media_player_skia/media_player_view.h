@@ -27,7 +27,7 @@ class MediaPlayerView : public mozart::BaseView {
                   fuchsia::ui::views_v1::ViewManagerPtr view_manager,
                   fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
                       view_owner_request,
-                  component::StartupContext* startup_context,
+                  fuchsia::sys::StartupContext* startup_context,
                   const MediaPlayerParams& params);
 
   ~MediaPlayerView() override;

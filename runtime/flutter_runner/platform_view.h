@@ -31,7 +31,7 @@ class PlatformView final : public shell::PlatformView,
   PlatformView(
       PlatformView::Delegate& delegate, std::string debug_label,
       blink::TaskRunners task_runners,
-      fidl::InterfaceHandle<component::ServiceProvider>
+      fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
           parent_environment_service_provider,
       fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewManager> view_manager,
       fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
@@ -48,7 +48,7 @@ class PlatformView final : public shell::PlatformView,
   TakeViewContainer();
 
   void OfferServiceProvider(
-      fidl::InterfaceHandle<component::ServiceProvider> service_provider,
+      fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
       fidl::VectorPtr<fidl::StringPtr> services);
 
  private:
@@ -56,14 +56,14 @@ class PlatformView final : public shell::PlatformView,
   fuchsia::ui::views_v1::ViewManagerPtr view_manager_;
   fuchsia::ui::views_v1::ViewPtr view_;
   fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer> view_container_;
-  component::ServiceProviderPtr service_provider_;
+  fuchsia::sys::ServiceProviderPtr service_provider_;
   fidl::Binding<fuchsia::ui::views_v1::ViewListener> view_listener_;
   fuchsia::ui::input::InputConnectionPtr input_connection_;
   fidl::Binding<fuchsia::ui::input::InputListener> input_listener_;
   int current_text_input_client_ = 0;
   fidl::Binding<fuchsia::ui::input::InputMethodEditorClient> ime_client_;
   fuchsia::ui::input::InputMethodEditorPtr ime_;
-  component::ServiceProviderPtr parent_environment_service_provider_;
+  fuchsia::sys::ServiceProviderPtr parent_environment_service_provider_;
   fuchsia::modular::ClipboardPtr clipboard_;
   AccessibilityBridge accessibility_bridge_;
   std::unique_ptr<Surface> surface_;

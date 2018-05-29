@@ -124,6 +124,12 @@ runner("dart_aot_product_runner_bin") {
   ]
 }
 
+observatory_target =
+    "//third_party/dart/runtime/observatory:observatory_archive"
+observatory_archive_dir = get_label_info(observatory_target, "target_gen_dir")
+observatory_archive_name = get_label_info(observatory_target, "name")
+observatory_archive_file = "${observatory_archive_dir}/${observatory_archive_name}.tar"
+
 template("aot_runner_package") {
   assert(defined(invoker.product), "The parameter 'product' must be defined")
   product_suffix = ""
@@ -137,7 +143,7 @@ template("aot_runner_package") {
     if (!invoker.product) {
       deps += [
         "vmservice:vmservice_snapshot",
-        "//third_party/dart/runtime/observatory:embedded_archive_observatory",
+        observatory_target,
       ]
 
       if (dart_aot_sharing_basis != "") {
@@ -186,8 +192,7 @@ template("aot_runner_package") {
           dest = "vmservice_shared_snapshot_instructions.bin"
         },
         {
-          path = rebase_path(
-                  "$root_gen_dir/observatory/embedded_archive_observatory.tar")
+          path = rebase_path(observatory_archive_file)
           dest = "observatory.tar"
         },
       ]
@@ -212,7 +217,7 @@ template("jit_runner_package") {
     ]
     if (!invoker.product) {
       deps += [
-        "//third_party/dart/runtime/observatory:embedded_archive_observatory",
+        observatory_target,
       ]
     }
 
@@ -250,8 +255,7 @@ template("jit_runner_package") {
     if (!invoker.product) {
       resources += [
         {
-          path = rebase_path(
-                  "$root_gen_dir/observatory/embedded_archive_observatory.tar")
+          path = rebase_path(observatory_archive_file)
           dest = "observatory.tar"
         },
       ]

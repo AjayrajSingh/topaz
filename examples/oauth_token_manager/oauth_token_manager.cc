@@ -440,7 +440,7 @@ class OAuthTokenManagerApp : modular_auth::AccountProvider {
                             FirebaseTokenCallback callback);
   async::Loop* const loop_;
 
-  std::shared_ptr<component::StartupContext> startup_context_;
+  std::shared_ptr<fuchsia::sys::StartupContext> startup_context_;
 
   modular_auth::AccountProviderContextPtr account_provider_context_;
 
@@ -1120,8 +1120,8 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
   }
 
   fuchsia::ui::views_v1_token::ViewOwnerPtr SetupWebView() {
-    component::Services web_view_services;
-    component::LaunchInfo web_view_launch_info;
+    fuchsia::sys::Services web_view_services;
+    fuchsia::sys::LaunchInfo web_view_launch_info;
     web_view_launch_info.url = kWebViewUrl;
     web_view_launch_info.directory_request = web_view_services.NewRequest();
     app_->startup_context_->launcher()->CreateApplication(
@@ -1133,7 +1133,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
     fuchsia::ui::views_v1_token::ViewOwnerPtr view_owner;
     fuchsia::ui::views_v1::ViewProviderPtr view_provider;
     web_view_services.ConnectToService(view_provider.NewRequest());
-    component::ServiceProviderPtr web_view_moz_services;
+    fuchsia::sys::ServiceProviderPtr web_view_moz_services;
     view_provider->CreateView(view_owner.NewRequest(),
                               web_view_moz_services.NewRequest());
 
@@ -1149,7 +1149,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
   modular_auth::AuthenticationContextPtr auth_context_;
 
   web_view::WebViewPtr web_view_;
-  component::ComponentControllerPtr web_view_controller_;
+  fuchsia::sys::ComponentControllerPtr web_view_controller_;
 
   network::NetworkServicePtr network_service_;
   network::URLLoaderPtr url_loader_;
@@ -1439,7 +1439,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
 
 OAuthTokenManagerApp::OAuthTokenManagerApp(async::Loop* loop)
     : loop_(loop),
-      startup_context_(component::StartupContext::CreateFromStartupInfo()),
+      startup_context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()),
       binding_(this) {
   startup_context_->outgoing().AddPublicService<AccountProvider>(
       [this](fidl::InterfaceRequest<AccountProvider> request) {

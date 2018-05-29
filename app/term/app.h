@@ -17,7 +17,7 @@ class App : public fuchsia::ui::views_v1::ViewProvider {
   // |mozart::ViewProviderService|
   void CreateView(fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
                       view_owner_request,
-                  fidl::InterfaceRequest<component::ServiceProvider>
+                  fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
                       view_services) override;
 
   void DestroyController(ViewController* controller);
@@ -27,7 +27,7 @@ class App : public fuchsia::ui::views_v1::ViewProvider {
   App& operator=(const App&) = delete;
 
   TermParams params_;
-  std::unique_ptr<component::StartupContext> context_;
+  std::unique_ptr<fuchsia::sys::StartupContext> context_;
   fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> bindings_;
   std::vector<std::unique_ptr<ViewController>> controllers_;
 };

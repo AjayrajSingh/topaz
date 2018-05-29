@@ -46,7 +46,7 @@ using auth_providers::oauth::ParseOAuthResponse;
 using fuchsia::modular::JsonValueToPrettyString;
 
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
-    async_t* const main_dispatcher, component::StartupContext* context,
+    async_t* const main_dispatcher, fuchsia::sys::StartupContext* context,
     network_wrapper::NetworkWrapper* network_wrapper,
     fidl::InterfaceRequest<auth::AuthProvider> request)
     : main_dispatcher_(main_dispatcher),
@@ -377,8 +377,8 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
 
 fuchsia::ui::views_v1_token::ViewOwnerPtr
 GoogleAuthProviderImpl::SetupWebView() {
-  component::Services web_view_services;
-  component::LaunchInfo web_view_launch_info;
+  fuchsia::sys::Services web_view_services;
+  fuchsia::sys::LaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
   web_view_launch_info.directory_request = web_view_services.NewRequest();
   context_->launcher()->CreateApplication(std::move(web_view_launch_info),
@@ -390,7 +390,7 @@ GoogleAuthProviderImpl::SetupWebView() {
   fuchsia::ui::views_v1_token::ViewOwnerPtr view_owner;
   fuchsia::ui::views_v1::ViewProviderPtr view_provider;
   web_view_services.ConnectToService(view_provider.NewRequest());
-  component::ServiceProviderPtr web_view_moz_services;
+  fuchsia::sys::ServiceProviderPtr web_view_moz_services;
   view_provider->CreateView(view_owner.NewRequest(),
                             web_view_moz_services.NewRequest());
 

@@ -6,7 +6,7 @@
 // ignore_for_file: import_duplicated_library_named
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_component/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_images/fidl.dart';
 import 'package:fidl_fuchsia_ui_gfx/fidl.dart' as gfx;
 import 'package:fidl_fuchsia_ui_scenic/fidl.dart' as ui_scenic;

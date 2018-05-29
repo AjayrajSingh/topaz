@@ -85,9 +85,9 @@ void IsolateCleanupCallback(void* callback_data) {
 }
 
 void RunApplication(
-    DartRunner* runner, ControllerToken* token, component::Package package,
-    component::StartupInfo startup_info,
-    ::fidl::InterfaceRequest<component::ComponentController> controller) {
+    DartRunner* runner, ControllerToken* token, fuchsia::sys::Package package,
+    fuchsia::sys::StartupInfo startup_info,
+    ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   fsl::MessageLoop loop;
   DartComponentController app(token->label(), std::move(package),
@@ -134,10 +134,10 @@ std::string GetLabelFromURL(const std::string& url) {
 }  // namespace
 
 DartRunner::DartRunner()
-    : context_(component::StartupContext::CreateFromStartupInfo()),
+    : context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()),
       loop_(fsl::MessageLoop::GetCurrent()) {
-  context_->outgoing().AddPublicService<component::Runner>(
-      [this](fidl::InterfaceRequest<component::Runner> request) {
+  context_->outgoing().AddPublicService<fuchsia::sys::Runner>(
+      [this](fidl::InterfaceRequest<fuchsia::sys::Runner> request) {
         bindings_.AddBinding(this, std::move(request));
       });
 
@@ -184,8 +184,8 @@ DartRunner::~DartRunner() {
 }
 
 void DartRunner::StartComponent(
-    component::Package package, component::StartupInfo startup_info,
-    ::fidl::InterfaceRequest<component::ComponentController> controller) {
+    fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
+    ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   std::string label = GetLabelFromURL(package.resolved_url);
   std::thread thread(RunApplication, this, AddController(label),
                      std::move(package), std::move(startup_info),

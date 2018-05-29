@@ -4,7 +4,7 @@
 
 import 'package:fidl_echo2/fidl.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_component/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 
 StartupContext _context;
 EchoProxy _echo;

@@ -29,7 +29,7 @@ ViewController::ViewController(
     fuchsia::ui::views_v1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
         view_owner_request,
-    component::StartupContext* context, const TermParams& term_params,
+    fuchsia::sys::StartupContext* context, const TermParams& term_params,
     DisconnectCallback disconnect_handler)
     : SkiaView(std::move(view_manager), std::move(view_owner_request), "Term"),
       disconnect_(std::move(disconnect_handler)),

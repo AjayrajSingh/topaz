@@ -9,7 +9,7 @@
 #include <lib/async/cpp/wait.h>
 #include <lib/zx/timer.h>
 
-#include <component/cpp/fidl.h>
+#include <fuchsia/sys/cpp/fidl.h>
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fxl/macros.h"
@@ -19,12 +19,12 @@
 
 namespace dart_runner {
 
-class DartComponentController : public component::ComponentController {
+class DartComponentController : public fuchsia::sys::ComponentController {
  public:
   DartComponentController(
-      std::string label, component::Package package,
-      component::StartupInfo startup_info,
-      fidl::InterfaceRequest<component::ComponentController> controller);
+      std::string label, fuchsia::sys::Package package,
+      fuchsia::sys::StartupInfo startup_info,
+      fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller);
   ~DartComponentController() override;
 
   bool Setup();
@@ -42,7 +42,7 @@ class DartComponentController : public component::ComponentController {
                      const uint8_t* shared_snapshot_data,
                      const uint8_t* shared_snapshot_instructions);
 
-  int SetupFileDescriptor(component::FileDescriptorPtr fd);
+  int SetupFileDescriptor(fuchsia::sys::FileDescriptorPtr fd);
 
   // |ComponentController|
   void Kill() override;
@@ -56,10 +56,10 @@ class DartComponentController : public component::ComponentController {
 
   std::string label_;
   std::string url_;
-  component::Package package_;
-  component::StartupInfo startup_info_;
-  component::ServiceProviderBridge service_provider_bridge_;
-  fidl::Binding<component::ComponentController> binding_;
+  fuchsia::sys::Package package_;
+  fuchsia::sys::StartupInfo startup_info_;
+  fuchsia::sys::ServiceProviderBridge service_provider_bridge_;
+  fidl::Binding<fuchsia::sys::ComponentController> binding_;
 
   fdio_ns_t* namespace_ = nullptr;
   int stdoutfd_ = -1;

@@ -9,7 +9,7 @@
 #include <memory>
 #include <set>
 
-#include <component/cpp/fidl.h>
+#include <fuchsia/sys/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/ui/views_v1_token/cpp/fidl.h>
 
@@ -29,7 +29,7 @@ namespace flutter {
 // Represents an instance of a Flutter application that contains one of more
 // Flutter engine instances.
 class Application final : public Engine::Delegate,
-                          public component::ComponentController,
+                          public fuchsia::sys::ComponentController,
                           public fuchsia::ui::views_v1::ViewProvider {
  public:
   using TerminationCallback = std::function<void(const Application*)>;
@@ -38,9 +38,9 @@ class Application final : public Engine::Delegate,
   // application on it. The application can be accessed only on this thread.
   // This is a synchronous operation.
   static std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
-  Create(TerminationCallback termination_callback, component::Package package,
-         component::StartupInfo startup_info,
-         fidl::InterfaceRequest<component::ComponentController> controller);
+  Create(TerminationCallback termination_callback, fuchsia::sys::Package package,
+         fuchsia::sys::StartupInfo startup_info,
+         fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller);
 
   // Must be called on the same thread returned from the create call. The thread
   // may be collected after.
@@ -55,10 +55,10 @@ class Application final : public Engine::Delegate,
   UniqueFDIONS fdio_ns_ = UniqueFDIONSCreate();
   fxl::UniqueFD application_directory_;
   fxl::UniqueFD application_assets_directory_;
-  fidl::Binding<component::ComponentController> application_controller_;
-  fidl::InterfaceRequest<component::ServiceProvider> outgoing_services_request_;
-  component::ServiceProviderBridge service_provider_bridge_;
-  std::unique_ptr<component::StartupContext> startup_context_;
+  fidl::Binding<fuchsia::sys::ComponentController> application_controller_;
+  fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services_request_;
+  fuchsia::sys::ServiceProviderBridge service_provider_bridge_;
+  std::unique_ptr<fuchsia::sys::StartupContext> startup_context_;
   fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> shells_bindings_;
   fxl::RefPtr<blink::DartSnapshot> isolate_snapshot_;
   fxl::RefPtr<blink::DartSnapshot> shared_snapshot_;
@@ -67,23 +67,23 @@ class Application final : public Engine::Delegate,
   std::pair<bool, uint32_t> last_return_code_;
 
   Application(
-      TerminationCallback termination_callback, component::Package package,
-      component::StartupInfo startup_info,
-      fidl::InterfaceRequest<component::ComponentController> controller);
+      TerminationCallback termination_callback, fuchsia::sys::Package package,
+      fuchsia::sys::StartupInfo startup_info,
+      fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller);
 
-  // |component::ComponentController|
+  // |fuchsia::sys::ComponentController|
   void Kill() override;
 
-  // |component::ComponentController|
+  // |fuchsia::sys::ComponentController|
   void Detach() override;
 
-  // |component::ComponentController|
+  // |fuchsia::sys::ComponentController|
   void Wait(WaitCallback callback) override;
 
   // |fuchsia::ui::views_v1::ViewProvider|
   void CreateView(
       fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
-      fidl::InterfaceRequest<component::ServiceProvider> services) override;
+      fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> services) override;
 
   // |flutter::Engine::Delegate|
   void OnEngineTerminate(const Engine* holder) override;

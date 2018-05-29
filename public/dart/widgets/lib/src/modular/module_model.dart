@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:fidl_component/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';

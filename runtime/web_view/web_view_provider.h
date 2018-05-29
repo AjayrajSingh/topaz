@@ -22,7 +22,7 @@ class WebViewProvider : fuchsia::ui::views_v1::ViewProvider,
   // |ViewProvider|
   void CreateView(fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
                       view_owner_request,
-                  fidl::InterfaceRequest<component::ServiceProvider>
+                  fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
                       view_services) override;
 
   // fuchsia::modular::Terminate
@@ -33,7 +33,7 @@ class WebViewProvider : fuchsia::ui::views_v1::ViewProvider,
 
   async::Loop* const loop_;
   std::string url_;
-  std::unique_ptr<component::StartupContext> context_;
+  std::unique_ptr<fuchsia::sys::StartupContext> context_;
   std::unique_ptr<WebViewImpl> view_;
   // Link state, used to gather URL updates for the story
   fuchsia::modular::LinkPtr main_link_;

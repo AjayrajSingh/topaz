@@ -24,7 +24,7 @@ class GoogleAuthProviderApp {
  public:
   GoogleAuthProviderApp()
       : loop_(&kAsyncLoopConfigMakeDefault),
-        startup_context_(component::StartupContext::CreateFromStartupInfo()),
+        startup_context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()),
         trace_provider_(loop_.async()),
         network_wrapper_(
             loop_.async(), std::make_unique<backoff::ExponentialBackoff>(),
@@ -49,7 +49,7 @@ class GoogleAuthProviderApp {
 
  private:
   async::Loop loop_;
-  std::unique_ptr<component::StartupContext> startup_context_;
+  std::unique_ptr<fuchsia::sys::StartupContext> startup_context_;
   trace::TraceProvider trace_provider_;
   network_wrapper::NetworkWrapperImpl network_wrapper_;
 

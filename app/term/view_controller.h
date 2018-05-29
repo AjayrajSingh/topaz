@@ -25,7 +25,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   ViewController(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
                  fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
                      view_owner_request,
-                 component::StartupContext* context,
+                 fuchsia::sys::StartupContext* context,
                  const TermParams& term_params,
                  DisconnectCallback disconnect_handler);
   ~ViewController() override;
@@ -68,7 +68,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   // If we skip drawing despite being forced to, we should force the next draw.
   bool force_next_draw_;
 
-  component::StartupContext* context_;
+  fuchsia::sys::StartupContext* context_;
   mozart::SkiaFontLoader font_loader_;
   sk_sp<SkTypeface> regular_typeface_;
 

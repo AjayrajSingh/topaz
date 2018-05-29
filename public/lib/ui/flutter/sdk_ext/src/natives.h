@@ -7,14 +7,14 @@
 
 #include "third_party/dart/runtime/include/dart_api.h"
 
-#include <component/cpp/fidl.h>
+#include <fuchsia/sys/cpp/fidl.h>
 
 namespace mozart {
 
 class NativesDelegate {
  public:
   virtual void OfferServiceProvider(
-      fidl::InterfaceHandle<component::ServiceProvider>,
+      fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>,
       fidl::VectorPtr<fidl::StringPtr> services) = 0;
 
  protected:

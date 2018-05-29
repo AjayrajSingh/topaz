@@ -21,9 +21,9 @@ namespace flutter {
 
 std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
 Application::Create(
-    TerminationCallback termination_callback, component::Package package,
-    component::StartupInfo startup_info,
-    fidl::InterfaceRequest<component::ComponentController> controller) {
+    TerminationCallback termination_callback, fuchsia::sys::Package package,
+    fuchsia::sys::StartupInfo startup_info,
+    fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   auto thread = std::make_unique<fsl::Thread>();
   std::unique_ptr<Application> application;
 
@@ -51,9 +51,9 @@ static std::string DebugLabelForURL(const std::string& url) {
 }
 
 Application::Application(TerminationCallback termination_callback,
-                         component::Package,
-                         component::StartupInfo startup_info,
-                         fidl::InterfaceRequest<component::ComponentController>
+                         fuchsia::sys::Package,
+                         fuchsia::sys::StartupInfo startup_info,
+                         fidl::InterfaceRequest<fuchsia::sys::ComponentController>
                              application_controller_request)
     : termination_callback_(termination_callback),
       debug_label_(DebugLabelForURL(startup_info.launch_info.url)),
@@ -110,7 +110,7 @@ Application::Application(TerminationCallback termination_callback,
   service_provider_bridge_.AddService<fuchsia::ui::views_v1::ViewProvider>(
       std::bind(&Application::CreateShellForView, this, std::placeholders::_1));
 
-  component::ServiceProviderPtr outgoing_services;
+  fuchsia::sys::ServiceProviderPtr outgoing_services;
   outgoing_services_request_ = outgoing_services.NewRequest();
   service_provider_bridge_.set_backend(std::move(outgoing_services));
 
@@ -120,7 +120,7 @@ Application::Application(TerminationCallback termination_callback,
   }
 
   startup_context_ =
-      component::StartupContext::CreateFrom(std::move(startup_info));
+      fuchsia::sys::StartupContext::CreateFrom(std::move(startup_info));
 
   // Compare flutter_jit_runner in BUILD.gn.
   settings_.vm_snapshot_data_path = "pkg/data/vm_snapshot_data.bin";
@@ -305,7 +305,7 @@ void Application::AttemptVMLaunchWithCurrentSettings(
   }
 }
 
-// |component::ComponentController|
+// |fuchsia::sys::ComponentController|
 void Application::Kill() {
   if (last_return_code_.first) {
     for (auto wait_callback : wait_callbacks_) {
@@ -319,12 +319,12 @@ void Application::Kill() {
   // collected.
 }
 
-// |component::ComponentController|
+// |fuchsia::sys::ComponentController|
 void Application::Detach() {
   application_controller_.set_error_handler(nullptr);
 }
 
-// |component::ComponentController|
+// |fuchsia::sys::ComponentController|
 void Application::Wait(WaitCallback callback) {
   wait_callbacks_.emplace_back(std::move(callback));
 }
@@ -366,7 +366,7 @@ void Application::CreateShellForView(
 // |fuchsia::ui::views_v1::ViewProvider|
 void Application::CreateView(
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
-    fidl::InterfaceRequest<component::ServiceProvider>) {
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>) {
   if (!startup_context_) {
     FXL_DLOG(ERROR) << "Application context was invalid when attempting to "
                        "create a shell for a view provider request.";

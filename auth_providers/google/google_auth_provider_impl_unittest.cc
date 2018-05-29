@@ -16,7 +16,7 @@ class GoogleAuthProviderImplTest : public gtest::TestWithLoop {
  public:
   GoogleAuthProviderImplTest()
       : network_wrapper_(dispatcher()),
-        context_(component::StartupContext::CreateFromStartupInfo().get()),
+        context_(fuchsia::sys::StartupContext::CreateFromStartupInfo().get()),
         google_auth_provider_impl_(dispatcher(), context_, &network_wrapper_,
                                    auth_provider_.NewRequest()) {}
 
@@ -24,7 +24,7 @@ class GoogleAuthProviderImplTest : public gtest::TestWithLoop {
 
  protected:
   network_wrapper::FakeNetworkWrapper network_wrapper_;
-  component::StartupContext* context_;
+  fuchsia::sys::StartupContext* context_;
   auth::AuthProviderPtr auth_provider_;
   GoogleAuthProviderImpl google_auth_provider_impl_;
 

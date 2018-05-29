@@ -30,12 +30,12 @@ class Engine final : public mozart::NativesDelegate {
 
   Engine(
       Delegate& delegate, std::string thread_label,
-      component::StartupContext& startup_context, blink::Settings settings,
+      fuchsia::sys::StartupContext& startup_context, blink::Settings settings,
       fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
       fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
       fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
       UniqueFDIONS fdio_ns,
-      fidl::InterfaceRequest<component::ServiceProvider>
+      fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
           outgoing_services_request);
 
   ~Engine();
@@ -64,7 +64,7 @@ class Engine final : public mozart::NativesDelegate {
 
   // |mozart::NativesDelegate|
   void OfferServiceProvider(
-      fidl::InterfaceHandle<component::ServiceProvider> service_provider,
+      fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
       fidl::VectorPtr<fidl::StringPtr> services);
 
   FXL_DISALLOW_COPY_AND_ASSIGN(Engine);

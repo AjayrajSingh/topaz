@@ -10,15 +10,15 @@
 
 #include <fdio/namespace.h>
 
-#include <component/cpp/fidl.h>
+#include <fuchsia/sys/cpp/fidl.h>
 #include "lib/app/cpp/startup_context.h"
 
 namespace dart_runner {
 
 void InitBuiltinLibrariesForIsolate(
     const std::string& script_uri, fdio_ns_t* namespc, int stdoutfd,
-    int stderrfd, std::unique_ptr<component::StartupContext> context,
-    fidl::InterfaceRequest<component::ServiceProvider> outgoing_services,
+    int stderrfd, std::unique_ptr<fuchsia::sys::StartupContext> context,
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services,
     bool service_isolate);
 
 }  // namespace dart_runner

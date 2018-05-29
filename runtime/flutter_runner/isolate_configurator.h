@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <component/cpp/fidl.h>
+#include <fuchsia/sys/cpp/fidl.h>
 #include <fuchsia/ui/scenic/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 
@@ -22,9 +22,9 @@ class IsolateConfigurator final {
   IsolateConfigurator(
       UniqueFDIONS fdio_ns,
       fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer> view_container,
-      fidl::InterfaceHandle<component::Environment>
+      fidl::InterfaceHandle<fuchsia::sys::Environment>
           environment,
-      fidl::InterfaceRequest<component::ServiceProvider>
+      fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
           outgoing_services_request);
 
   ~IsolateConfigurator();
@@ -37,9 +37,9 @@ class IsolateConfigurator final {
   bool used_ = false;
   UniqueFDIONS fdio_ns_;
   fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer> view_container_;
-  fidl::InterfaceHandle<component::Environment>
+  fidl::InterfaceHandle<fuchsia::sys::Environment>
       environment_;
-  fidl::InterfaceRequest<component::ServiceProvider> outgoing_services_request_;
+  fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services_request_;
 
   void BindFuchsia();
 

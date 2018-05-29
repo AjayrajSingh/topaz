@@ -5,7 +5,7 @@
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_fidl_test_compatibility/fidl.dart';
 import 'package:fidl/fidl.dart' show InterfaceRequest;
-import 'package:fidl_component/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 
 class EchoImpl implements Echo {
   final StartupContext context;

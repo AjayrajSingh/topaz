@@ -7,7 +7,7 @@
 namespace google_auth_provider {
 
 FactoryImpl::FactoryImpl(async_t* main_dispatcher,
-                         component::StartupContext* context,
+                         fuchsia::sys::StartupContext* context,
                          network_wrapper::NetworkWrapper* network_wrapper)
     : main_dispatcher_(main_dispatcher),
       context_(context),

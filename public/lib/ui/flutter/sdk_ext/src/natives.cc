@@ -129,8 +129,8 @@ void Scenic_offerServiceProvider(Dart_NativeArguments args) {
   }
 
   NativesDelegate* delegate = reinterpret_cast<NativesDelegate*>(context);
-  fidl::InterfaceHandle<component::ServiceProvider> provider =
-      fidl::InterfaceHandle<component::ServiceProvider>(
+  fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> provider =
+      fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>(
           zx::channel(handle->ReleaseHandle()));
 
   delegate->OfferServiceProvider(std::move(provider), std::move(services));

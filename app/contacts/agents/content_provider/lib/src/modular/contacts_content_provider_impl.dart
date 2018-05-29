@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:fidl_component/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_contacts_content_provider/fidl.dart' as fidl;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_ledger/fidl.dart' as ledger;

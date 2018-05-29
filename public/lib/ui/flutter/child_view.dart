@@ -7,7 +7,7 @@ import 'dart:collection';
 import 'dart:ui' as ui;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_component/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_math/fidl.dart' as fidl;
 import 'package:fidl_fuchsia_ui_views_v1/fidl.dart';
 import 'package:fidl_fuchsia_ui_views_v1_token/fidl.dart';

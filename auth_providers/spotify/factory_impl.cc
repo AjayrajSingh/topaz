@@ -6,7 +6,7 @@
 
 namespace spotify_auth_provider {
 
-FactoryImpl::FactoryImpl(component::StartupContext* context,
+FactoryImpl::FactoryImpl(fuchsia::sys::StartupContext* context,
                          network_wrapper::NetworkWrapper* network_wrapper)
     : context_(context), network_wrapper_(network_wrapper) {
   FXL_DCHECK(context_);

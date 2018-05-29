@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_component/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_ledger/fidl.dart';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_xi/fidl.dart' as service;

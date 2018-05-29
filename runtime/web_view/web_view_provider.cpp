@@ -10,7 +10,7 @@
 WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
     : loop_(loop),
       url_(url),
-      context_(component::StartupContext::CreateFromStartupInfo()),
+      context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()),
       view_provider_binding_(this),
       lifecycle_binding_(this),
       main_link_watcher_binding_(this) {
@@ -50,7 +50,7 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
 void WebViewProvider::CreateView(
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
         view_owner_request,
-    fidl::InterfaceRequest<component::ServiceProvider> view_services) {
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> view_services) {
   FXL_LOG(INFO) << "CreateView";
   FXL_DCHECK(!view_);
   view_ = std::make_unique<WebViewImpl>(

@@ -5,7 +5,7 @@
 #ifndef TOPAZ_RUNTIME_DART_RUNNER_DART_RUNNER_H_
 #define TOPAZ_RUNTIME_DART_RUNNER_DART_RUNNER_H_
 
-#include <component/cpp/fidl.h>
+#include <fuchsia/sys/cpp/fidl.h>
 #include "lib/app/cpp/connect.h"
 #include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding.h"
@@ -26,7 +26,7 @@ class ControllerToken {
   FXL_DISALLOW_COPY_AND_ASSIGN(ControllerToken);
 };
 
-class DartRunner : public component::Runner {
+class DartRunner : public fuchsia::sys::Runner {
  public:
   explicit DartRunner();
   ~DartRunner() override;
@@ -34,19 +34,19 @@ class DartRunner : public component::Runner {
   void PostRemoveController(ControllerToken* token);
 
  private:
-  // |component::Runner| implementation:
-  void StartComponent(component::Package package,
-                      component::StartupInfo startup_info,
-                      ::fidl::InterfaceRequest<component::ComponentController>
+  // |fuchsia::sys::Runner| implementation:
+  void StartComponent(fuchsia::sys::Package package,
+                      fuchsia::sys::StartupInfo startup_info,
+                      ::fidl::InterfaceRequest<fuchsia::sys::ComponentController>
                           controller) override;
 
   ControllerToken* AddController(std::string label);
   void RemoveController(ControllerToken* token);
   void UpdateProcessLabel();
 
-  std::unique_ptr<component::StartupContext> context_;
+  std::unique_ptr<fuchsia::sys::StartupContext> context_;
   fsl::MessageLoop* loop_;
-  fidl::BindingSet<component::Runner> bindings_;
+  fidl::BindingSet<fuchsia::sys::Runner> bindings_;
   std::vector<ControllerToken*> controllers_;
 #if !defined(AOT_RUNTIME)
   MappedResource vm_snapshot_data_;

@@ -8,7 +8,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include <component/cpp/fidl.h>
+#include <fuchsia/sys/cpp/fidl.h>
 
 #include "component.h"
 #include "lib/app/cpp/startup_context.h"
@@ -18,9 +18,9 @@
 
 namespace flutter {
 
-// Publishes the |component::Runner| service and runs applications on
+// Publishes the |fuchsia::sys::Runner| service and runs applications on
 // their own threads.
-class Runner final : public component::Runner {
+class Runner final : public fuchsia::sys::Runner {
  public:
   Runner();
 
@@ -39,18 +39,18 @@ class Runner final : public component::Runner {
     ActiveApplication() = default;
   };
 
-  std::unique_ptr<component::StartupContext> host_context_;
-  fidl::BindingSet<component::Runner> active_applications_bindings_;
+  std::unique_ptr<fuchsia::sys::StartupContext> host_context_;
+  fidl::BindingSet<fuchsia::sys::Runner> active_applications_bindings_;
   std::unordered_map<const Application*, ActiveApplication>
       active_applications_;
 
-  // |component::Runner|
-  void StartComponent(component::Package package,
-                      component::StartupInfo startup_info,
-                      fidl::InterfaceRequest<component::ComponentController>
+  // |fuchsia::sys::Runner|
+  void StartComponent(fuchsia::sys::Package package,
+                      fuchsia::sys::StartupInfo startup_info,
+                      fidl::InterfaceRequest<fuchsia::sys::ComponentController>
                           controller) override;
 
-  void RegisterApplication(fidl::InterfaceRequest<component::Runner> request);
+  void RegisterApplication(fidl::InterfaceRequest<fuchsia::sys::Runner> request);
 
   void UnregisterApplication(const Application* application);
 

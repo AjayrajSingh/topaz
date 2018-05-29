@@ -10,7 +10,7 @@ import 'dart:convert' show json;
 import 'package:fidl/fidl.dart' hide Message;
 import 'package:fuchsia/fuchsia.dart';
 import 'package:fidl_chat_content_provider/fidl.dart';
-import 'package:fidl_component/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_ledger/fidl.dart' as ledger_fidl;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_test_runner/fidl.dart';

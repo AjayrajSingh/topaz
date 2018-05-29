@@ -43,9 +43,9 @@ void AfterTask() {
 }  // namespace
 
 DartComponentController::DartComponentController(
-    std::string label, component::Package package,
-    component::StartupInfo startup_info,
-    fidl::InterfaceRequest<component::ComponentController> controller)
+    std::string label, fuchsia::sys::Package package,
+    fuchsia::sys::StartupInfo startup_info,
+    fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller)
     : label_(label),
       url_(std::move(package.resolved_url)),
       package_(std::move(package)),
@@ -102,7 +102,7 @@ bool DartComponentController::Setup() {
 constexpr char kServiceRootPath[] = "/svc";
 
 bool DartComponentController::SetupNamespace() {
-  component::FlatNamespace* flat = &startup_info_.flat_namespace;
+  fuchsia::sys::FlatNamespace* flat = &startup_info_.flat_namespace;
   zx_status_t status = fdio_ns_create(&namespace_);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to create namespace";
@@ -231,7 +231,7 @@ bool DartComponentController::SetupFromAppSnapshot() {
 }
 
 int DartComponentController::SetupFileDescriptor(
-    component::FileDescriptorPtr fd) {
+    fuchsia::sys::FileDescriptorPtr fd) {
   if (!fd) {
     return -1;
   }
@@ -314,7 +314,7 @@ bool DartComponentController::Main() {
         std::move(startup_info_.launch_info.directory_request));
   }
 
-  component::ServiceProviderPtr service_provider;
+  fuchsia::sys::ServiceProviderPtr service_provider;
   auto outgoing_services = service_provider.NewRequest();
   service_provider_bridge_.set_backend(std::move(service_provider));
 
@@ -323,7 +323,7 @@ bool DartComponentController::Main() {
 
   InitBuiltinLibrariesForIsolate(
       url_, namespace_, stdoutfd_, stderrfd_,
-      component::StartupContext::CreateFrom(std::move(startup_info_)),
+      fuchsia::sys::StartupContext::CreateFrom(std::move(startup_info_)),
       std::move(outgoing_services), false /* service_isolate */);
   namespace_ = nullptr;
 

@@ -57,7 +57,7 @@ MediaPlayerView::MediaPlayerView(
     async::Loop* loop, fuchsia::ui::views_v1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
         view_owner_request,
-    component::StartupContext* startup_context, const MediaPlayerParams& params)
+    fuchsia::sys::StartupContext* startup_context, const MediaPlayerParams& params)
     : mozart::BaseView(std::move(view_manager), std::move(view_owner_request),
                        "Media Player"),
 

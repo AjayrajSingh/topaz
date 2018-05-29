@@ -5,15 +5,15 @@
 #ifndef DART_PKG_FUCHSIA_SDK_EXT_FUCHSIA_H_
 #define DART_PKG_FUCHSIA_SDK_EXT_FUCHSIA_H_
 
-#include <component/cpp/fidl.h>
-#include <component/cpp/fidl.h>
+#include <fuchsia/sys/cpp/fidl.h>
+#include <fuchsia/sys/cpp/fidl.h>
 
 namespace fuchsia {
 namespace dart {
 
 void Initialize(
-    fidl::InterfaceHandle<component::Environment> environment,
-    fidl::InterfaceRequest<component::ServiceProvider> outgoing_services);
+    fidl::InterfaceHandle<fuchsia::sys::Environment> environment,
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services);
 
 }  // namespace dart
 }  // namespace fuchsia

@@ -26,7 +26,7 @@ namespace spotify_auth_provider {
 class SpotifyAuthProviderImpl : public auth::AuthProvider,
                                 web_view::WebRequestDelegate {
  public:
-  SpotifyAuthProviderImpl(component::StartupContext* context,
+  SpotifyAuthProviderImpl(fuchsia::sys::StartupContext* context,
                           network_wrapper::NetworkWrapper* network_wrapper,
                           fidl::InterfaceRequest<auth::AuthProvider> request);
 
@@ -75,8 +75,8 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
   void OnResponse(std::function<void(network::URLResponse response)> callback,
                   network::URLResponse response);
 
-  component::StartupContext* context_;
-  component::ComponentControllerPtr web_view_controller_;
+  fuchsia::sys::StartupContext* context_;
+  fuchsia::sys::ComponentControllerPtr web_view_controller_;
   auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
   web_view::WebViewPtr web_view_;
