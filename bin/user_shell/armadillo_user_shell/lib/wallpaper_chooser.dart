@@ -161,7 +161,7 @@ class _CustomAction extends CustomAction {
   });
 
   @override
-  void execute(void callback(List<Action> actions)) {
+  void execute() {
     stop();
 
     storyProvider.createStoryWithInfo(
@@ -183,7 +183,6 @@ class _CustomAction extends CustomAction {
             _kImageSelectorLinkName,
             linkProxy.ctrl.request(),
           );
-          callback(null);
           storyControllerProxy?.ctrl?.close();
           storyControllerProxy = null;
 
