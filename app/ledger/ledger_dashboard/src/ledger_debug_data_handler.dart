@@ -215,12 +215,12 @@ class LedgerDebugDataHandler extends DataHandler {
     }
   }
 
-  void recursiveGetEntries(WebSocketHolder socketHolder, List<int> nextToken) {
+  void recursiveGetEntries(WebSocketHolder socketHolder, ledger_fidl.Token nextToken) {
     socketHolder.pageSnapshot?.getEntries(
         null,
         nextToken,
         (ledger_fidl.Status s, List<ledger_fidl.Entry> listOfEntries,
-                List<int> nextToken) =>
+                ledger_fidl.Token nextToken) =>
             sendEntries(
                 socketHolder, 'entries_list', listOfEntries, s, nextToken));
   }
@@ -252,7 +252,7 @@ class LedgerDebugDataHandler extends DataHandler {
       String listName,
       List<ledger_fidl.Entry> listOfEncod,
       ledger_fidl.Status s,
-      List<int> nextToken) {
+      ledger_fidl.Token nextToken) {
     if ((s == ledger_fidl.Status.ok) ||
         (s == ledger_fidl.Status.partialResult)) {
       List<List<Object>> entriesList = <List<Object>>[];

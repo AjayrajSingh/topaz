@@ -34,10 +34,10 @@ void getEntriesFromSnapshot(ledger.PageSnapshotProxy snapshot,
 void _getEntriesRecursive(
     ledger.PageSnapshotProxy snapshot,
     Map<List<int>, String> items,
-    List<int> token,
+    ledger.Token token,
     void callback(ledger.Status status, Map<List<int>, String> items)) {
   snapshot.getEntriesInline(null, token, (ledger.Status status,
-      List<ledger.InlinedEntry> entries, List<int> nextToken) {
+      List<ledger.InlinedEntry> entries, ledger.Token nextToken) {
     if (status != ledger.Status.ok && status != ledger.Status.partialResult) {
       callback(status, <List<int>, String>{});
       return;

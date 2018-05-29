@@ -54,14 +54,14 @@ Future<Null> _getFullEntriesRecursively(
   PageSnapshot snapshot,
   List<Entry> result, {
   List<int> keyPrefix,
-  List<int> token,
+  Token token,
 }) async {
   Completer<Status> statusCompleter = new Completer<Status>();
   List<Entry> entries;
-  List<int> nextToken;
+  Token nextToken;
 
   snapshot.getEntries(keyPrefix, token,
-      (Status status, List<Entry> entriesResult, List<int> nextTokenResult) {
+      (Status status, List<Entry> entriesResult, Token nextTokenResult) {
     entries = entriesResult;
     nextToken = nextTokenResult;
     statusCompleter.complete(status);
