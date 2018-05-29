@@ -27,7 +27,6 @@ int _compareByOtherList(Surface l, Surface r, List<Surface> otherList) {
 /// Returns in the order they should stacked
 List<PositionedSurface> layoutSurfaces(
   BuildContext context,
-  BoxConstraints constraints,
   List<Surface> focusStack,
   LayoutModel layoutModel,
 ) {
@@ -36,13 +35,6 @@ List<PositionedSurface> layoutSurfaces(
   }
   Surface focused = focusStack.last;
 
-  final double totalWidth = constraints.biggest.width;
-  final double screenWidth =
-      context != null ? MediaQuery.of(context).size.width : totalWidth;
-  final double absoluteMinWidth = max(
-    screenWidth * layoutModel.minScreenRatio,
-    layoutModel.minScreenWidth,
-  );
   Tree<Surface> copresTree = focused.copresentSpanningTree;
 
   int focusOrder(Tree<Surface> l, Tree<Surface> r) =>
@@ -61,8 +53,8 @@ List<PositionedSurface> layoutSurfaces(
   for (Tree<Surface> node
       in copresTree.flatten(orderChildren: focusOrder).skipWhile(
     (Tree<Surface> node) {
-      double minWidth = node.value.minWidth(min: absoluteMinWidth);
-      if (totalMinWidth + minWidth > totalWidth) {
+      double minWidth = node.value.minWidth(min: layoutModel.minScreenRatio);
+      if (totalMinWidth + minWidth > 1.0) {
         return false;
       }
       totalMinWidth += minWidth;
@@ -92,11 +84,10 @@ List<PositionedSurface> layoutSurfaces(
 
       // Calculate min width available
       double tightestFitEmphasis = tightestFit.absoluteEmphasis(top);
-      double extraWidth = emphasis / totalEmphasis * totalWidth -
-          node.value.minWidth(min: absoluteMinWidth);
-      double tightestFitExtraWidth =
-          tightestFitEmphasis / totalEmphasis * totalWidth -
-              tightestFit.minWidth(min: absoluteMinWidth);
+      double extraWidth = emphasis / totalEmphasis -
+          node.value.minWidth(min: layoutModel.minScreenRatio);
+      double tightestFitExtraWidth = tightestFitEmphasis / totalEmphasis -
+          tightestFit.minWidth(min: layoutModel.minScreenRatio);
 
       // Break if smallest or this doesn't fit
       if (min(tightestFitExtraWidth, extraWidth) < 0.0) {
@@ -124,16 +115,22 @@ List<PositionedSurface> layoutSurfaces(
 
   // Layout rects for arrangement
   final List<PositionedSurface> layout = <PositionedSurface>[];
-  final double totalHeight = constraints.biggest.height;
-  Offset offset = Offset.zero;
+  double fractionalWidthOffset = 0.0;
   for (Surface surface in arrangement) {
-    Size size = new Size(
-      surface.absoluteEmphasis(top) / totalEmphasis * totalWidth,
-      totalHeight,
+    double fractionalWidth = surface.absoluteEmphasis(top) / totalEmphasis;
+    double fractionalHeight = 1.0;
+    layout.add(
+      new PositionedSurface(
+        surface: surface,
+        position: new Rect.fromLTWH(
+          fractionalWidthOffset,
+          0.0,
+          fractionalWidth,
+          fractionalHeight,
+        ),
+      ),
     );
-    layout
-        .add(new PositionedSurface(surface: surface, position: offset & size));
-    offset += size.topRight(Offset.zero);
+    fractionalWidthOffset += fractionalWidth;
   }
   return layout;
 }

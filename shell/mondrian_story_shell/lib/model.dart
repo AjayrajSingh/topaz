@@ -45,8 +45,7 @@ class Surface extends Model {
   bool get dismissed => _graph.isDismissed(_node.value);
 
   /// Return the min width of this Surface
-  double minWidth({double min = 0.0}) =>
-      math.max(properties?.constraints?.minWidth ?? 0.0, min);
+  double minWidth({double min = 0.0}) => math.max(0.0, min);
 
   /// Return the absolute emphasis given some root displayed Surface
   double absoluteEmphasis(Surface relative) {

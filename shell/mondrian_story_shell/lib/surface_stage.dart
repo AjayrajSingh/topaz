@@ -110,57 +110,104 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
 
   @override
   Widget build(BuildContext context) {
+    Size parentSize = MediaQuery.of(context).size;
     final SurfaceForm form = widget.form;
     return new Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          new CustomSingleChildLayout(
-            delegate: new PositionedLayoutDelegate(animation: animation),
-            child: new GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onPanStart: (DragStartDetails details) {
-                Offset diff = details.globalPosition - form.position.topLeft;
-                if (diff.dx < _kPanStartXOffset) {
-                  _panning = true;
-                }
-                _animation.update(value: animation.value, velocity: Rect.zero);
-                form.onDragStarted();
-              },
-              onPanUpdate: (DragUpdateDetails details) {
-                if (!_panning) {
-                  return;
-                }
-                _animation.update(
-                    value: animation.value.shift(form.dragFriction(
+      fit: StackFit.expand,
+      children: <Widget>[
+        new CustomSingleChildLayout(
+          delegate: new PositionedLayoutDelegate(animation: animation),
+          child: new GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onPanStart: (DragStartDetails details) {
+              Offset diff = details.globalPosition -
+                  _toAbsolute(
+                    form.position.topLeft,
+                    parentSize,
+                  );
+              if (diff.dx < _kPanStartXOffset) {
+                _panning = true;
+              }
+              _animation.update(
+                value: animation.value,
+                velocity: Rect.zero,
+              );
+              form.onDragStarted();
+            },
+            onPanUpdate: (DragUpdateDetails details) {
+              if (!_panning) {
+                return;
+              }
+              _animation.update(
+                value: animation.value.shift(
+                  _toFractional(
+                    form.dragFriction(
+                      _toAbsolute(
                         animation.value.center - form.position.center,
-                        details.delta)),
-                    velocity: Rect.zero);
-              },
-              onPanEnd: (DragEndDetails details) {
-                if (!_panning) {
-                  return;
-                }
-                _panning = false;
-                _animation
-                  ..update(
-                      value: animation.value,
-                      velocity: Rect.zero.shift(form.dragFriction(
+                        parentSize,
+                      ),
+                      details.delta,
+                    ),
+                    parentSize,
+                  ),
+                ),
+                velocity: Rect.zero,
+              );
+            },
+            onPanEnd: (DragEndDetails details) {
+              if (!_panning) {
+                return;
+              }
+              _panning = false;
+              _animation
+                ..update(
+                  value: animation.value,
+                  velocity: Rect.zero.shift(
+                    _toFractional(
+                      form.dragFriction(
+                        _toAbsolute(
                           animation.value.center - form.position.center,
-                          details.velocity.pixelsPerSecond)))
-                  ..done();
-                form.onDragFinished(
-                    animation.value.center - form.position.center,
-                    details.velocity);
-              },
-              child: new SurfaceFrame(
-                child: form.parts.keys.first,
-                depth: form.depth,
-                // HACK(alangardner): May need explicit interactable parameter
-                interactable: form.dragFriction != kDragFrictionInfinite,
-              ),
+                          parentSize,
+                        ),
+                        details.velocity.pixelsPerSecond,
+                      ),
+                      parentSize,
+                    ),
+                  ),
+                )
+                ..done();
+              form.onDragFinished(
+                _toAbsolute(
+                  animation.value.center - form.position.center,
+                  parentSize,
+                ),
+                details.velocity,
+              );
+            },
+            child: new SurfaceFrame(
+              child: form.parts.keys.first,
+              depth: form.depth,
+              // HACK(alangardner): May need explicit interactable parameter
+              interactable: form.dragFriction != kDragFrictionInfinite,
             ),
           ),
-        ]..addAll(widget.dependents));
+        ),
+      ]..addAll(widget.dependents),
+    );
+  }
+
+  Offset _toFractional(Offset absoluteOffset, Size size) {
+    return new Offset(
+      absoluteOffset.dx / size.width,
+      absoluteOffset.dy / size.height,
+    );
+  }
+
+  Offset _toAbsolute(Offset fractionalOffset, Size size) {
+    return new Offset(
+      fractionalOffset.dx * size.width,
+      fractionalOffset.dy * size.height,
+    );
   }
 }
 
@@ -178,13 +225,19 @@ class PositionedLayoutDelegate extends SingleChildLayoutDelegate {
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
       new BoxConstraints.tightFor(
-        width: animation.value.size.width,
-        height: animation.value.size.height,
+        width: animation.value.size.width * constraints.maxWidth,
+        height: animation.value.size.height * constraints.maxHeight,
       );
 
   @override
-  Offset getPositionForChild(Size size, Size childSize) =>
-      animation.value.center - childSize.center(Offset.zero);
+  Offset getPositionForChild(Size size, Size childSize) {
+    Offset fractionalOffset =
+        (animation.value.center - animation.value.size.center(Offset.zero));
+    return new Offset(
+      size.width * fractionalOffset.dx,
+      size.height * fractionalOffset.dy,
+    );
+  }
 
   @override
   bool shouldRelayout(PositionedLayoutDelegate old) =>

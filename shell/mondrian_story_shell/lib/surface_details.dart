@@ -2,16 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/rendering.dart';
-
 /// Inherent properties of a surface
 class SurfaceProperties {
   /// Const constructor
-  SurfaceProperties(
-      {this.constraints = const BoxConstraints(), this.containerLabel});
-
-  /// Recommended Min/Max size constraints
-  final BoxConstraints constraints;
+  SurfaceProperties({this.containerLabel});
 
   /// Belongs to a container with label containerLabel
   String containerLabel;

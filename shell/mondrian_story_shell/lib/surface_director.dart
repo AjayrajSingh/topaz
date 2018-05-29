@@ -31,7 +31,11 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
   final List<Surface> _draggedSurfaces = <Surface>[];
   final List<SurfaceForm> _orphanedForms = <SurfaceForm>[];
 
-  SurfaceForm _form(PositionedSurface ps, double depth, Offset offscreen) =>
+  SurfaceForm _form(
+    PositionedSurface ps,
+    double depth,
+    FractionalOffset offscreen,
+  ) =>
       new SurfaceForm.single(
         key: new GlobalObjectKey(ps.surface),
         child: new ScopedModel<Surface>(
@@ -41,7 +45,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           ),
         ),
         position: ps.position,
-        initPosition: ps.position.shift(offscreen),
+        initPosition: ps.position.shift(new Offset(offscreen.dx, offscreen.dy)),
         depth: _draggedSurfaces.contains(ps.surface) ? -0.1 : depth,
         friction: depth > 0.0
             ? kDragFrictionInfinite
@@ -69,7 +73,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
       );
 
   SurfaceForm _orphanedForm(
-          Surface surface, SurfaceForm form, Offset offscreen) =>
+          Surface surface, SurfaceForm form, FractionalOffset offscreen) =>
       new SurfaceForm.single(
         key: form.key,
         child: new ScopedModel<Surface>(
@@ -78,7 +82,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
             interactable: false,
           ),
         ),
-        position: form.position.shift(offscreen),
+        position: form.position.shift(new Offset(offscreen.dx, offscreen.dy)),
         initPosition: form.initPosition,
         depth: form.depth,
         friction: kDragFrictionInfinite,
@@ -96,7 +100,6 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           if (constraints.biggest.isInfinite || constraints.biggest.isEmpty) {
             return new Container();
           }
-          final Offset offscreen = constraints.biggest.topRight(Offset.zero);
           return new SizedBox(
             width: constraints.maxWidth,
             height: constraints.maxHeight,
@@ -120,8 +123,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
                       ) {
                         return _buildStage(
                           context,
-                          offscreen,
-                          constraints,
+                          FractionalOffset.topRight,
                           insetManager,
                           layoutModel,
                           graph,
@@ -138,8 +140,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
 
   Widget _buildStage(
     BuildContext context,
-    Offset offscreen,
-    BoxConstraints constraints,
+    FractionalOffset offscreen,
     InsetManager insetManager,
     LayoutModel layoutModel,
     SurfaceGraph graph,
@@ -147,13 +148,6 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
     Map<Surface, SurfaceForm> placedSurfaces = <Surface, SurfaceForm>{};
     List<Surface> focusStack = graph.focusStack.toList();
     double depth = 0.0;
-    // HACK(alangardner): Used to create illusion of symmetry
-    BoxConstraints adjustedConstraints = new BoxConstraints(
-      minWidth: constraints.minWidth,
-      minHeight: constraints.minHeight,
-      maxHeight: constraints.maxHeight,
-      maxWidth: constraints.maxWidth,
-    );
     while (focusStack.isNotEmpty) {
       List<PositionedSurface> positionedSurfaces = <PositionedSurface>[];
       if (focusStack.isNotEmpty) {
@@ -166,7 +160,6 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
             last.compositionPattern.isNotEmpty) {
           positionedSurfaces = pattern.layoutSurfaces(
             context,
-            adjustedConstraints,
             focusStack,
             layoutModel,
           );
@@ -174,14 +167,12 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
             last.properties.containerMembership.isNotEmpty) {
           positionedSurfaces = container.layoutSurfaces(
             context,
-            adjustedConstraints,
             last,
             layoutModel,
           );
         } else {
           positionedSurfaces = copresent.layoutSurfaces(
             context,
-            adjustedConstraints,
             focusStack,
             layoutModel,
           );
@@ -190,8 +181,9 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
       for (PositionedSurface ps in positionedSurfaces) {
         if (!placedSurfaces.keys.contains(ps.surface)) {
           _prevForms.remove(ps.surface);
-          Offset surfaceOrigin =
-              positionedSurfaces.length > 1 ? offscreen : Offset.zero;
+          FractionalOffset surfaceOrigin = positionedSurfaces.length > 1
+              ? offscreen
+              : FractionalOffset.topLeft;
           placedSurfaces[ps.surface] = _form(ps, depth, surfaceOrigin);
         }
       }

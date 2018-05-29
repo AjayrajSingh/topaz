@@ -21,7 +21,6 @@ const double _commentsWidthRatio = 0.30;
 /// Returns in the order they should stacked
 List<PositionedSurface> layoutSurfaces(
   BuildContext context,
-  BoxConstraints constraints,
   List<Surface> focusStack,
   LayoutModel layoutModel,
 ) {
@@ -29,8 +28,6 @@ List<PositionedSurface> layoutSurfaces(
     return <PositionedSurface>[];
   }
 
-  final double totalWidth = constraints.biggest.width;
-  final double totalHeight = constraints.biggest.height;
   final List<PositionedSurface> layout = <PositionedSurface>[];
   Surface focused = focusStack.last;
   String pattern = focused.compositionPattern;
@@ -38,12 +35,12 @@ List<PositionedSurface> layoutSurfaces(
   if (!_isSupportedPattern(pattern)) {
     log.warning('unrecognized pattern $pattern');
 
-    Size size = new Size(
-      totalWidth,
-      totalHeight,
-    );
     layout.add(
-        new PositionedSurface(surface: focused, position: Offset.zero & size));
+      new PositionedSurface(
+        surface: focused,
+        position: new Rect.fromLTWH(0.0, 0.0, 1.0, 1.0),
+      ),
+    );
     return layout;
   }
 
@@ -64,22 +61,24 @@ List<PositionedSurface> layoutSurfaces(
 
   if (patternSurfaces.containsKey(_commentsRightPattern)) {
     // Comments-right gets laid out first
-    _layoutCommentsRight(patternSurfaces[_parentId],
-            patternSurfaces[_commentsRightPattern], totalHeight, totalWidth)
-        .forEach(layout.add);
+    _layoutCommentsRight(
+      patternSurfaces[_parentId],
+      patternSurfaces[_commentsRightPattern],
+    ).forEach(layout.add);
   }
   if (patternSurfaces.containsKey(_tickerPattern)) {
-    double availableWidth = totalWidth;
-    double availableHeight = totalHeight;
+    double availableWidth = 1.0;
+    double availableHeight = 1.0;
     if (layout.isNotEmpty && layout[0].surface == patternSurfaces[_parentId]) {
       availableHeight = layout[0].position.height;
       availableWidth = layout[0].position.width;
     }
     List<PositionedSurface> tickerSurfaces = _layoutTicker(
-        patternSurfaces[_parentId],
-        patternSurfaces[_tickerPattern],
-        availableHeight,
-        availableWidth);
+      patternSurfaces[_parentId],
+      patternSurfaces[_tickerPattern],
+      availableHeight,
+      availableWidth,
+    );
     if (layout.isNotEmpty) {
       layout[0] = tickerSurfaces[0];
     } else {
@@ -96,44 +95,50 @@ bool _isSupportedPattern(String pattern) {
 
 List<PositionedSurface> _layoutTicker(Surface tickerSource, Surface ticker,
     double availableHeight, double availableWidth) {
-  List<PositionedSurface> layout = <PositionedSurface>[];
-  Offset offset = Offset.zero;
-  double tickerHeight = availableHeight * _tickerHeightRatio;
-
-  Size size = new Size(
-    availableWidth,
-    availableHeight - tickerHeight,
-  );
-  layout.add(
-      new PositionedSurface(surface: tickerSource, position: offset & size));
-  offset += size.bottomLeft(Offset.zero);
-
-  size = new Size(
-    availableWidth,
-    tickerHeight,
-  );
-  layout.add(new PositionedSurface(surface: ticker, position: offset & size));
-  return layout;
+  return <PositionedSurface>[
+    new PositionedSurface(
+      surface: tickerSource,
+      position: new Rect.fromLTWH(
+        0.0,
+        0.0,
+        availableWidth,
+        availableHeight * (1.0 - _tickerHeightRatio),
+      ),
+    ),
+    new PositionedSurface(
+      surface: ticker,
+      position: new Rect.fromLTWH(
+        0.0,
+        availableHeight * (1.0 - _tickerHeightRatio),
+        availableWidth,
+        availableHeight * _tickerHeightRatio,
+      ),
+    ),
+  ];
 }
 
-List<PositionedSurface> _layoutCommentsRight(Surface commentsSource,
-    Surface comments, double availableHeight, double availableWidth) {
-  List<PositionedSurface> layout = <PositionedSurface>[];
-  Offset offset = Offset.zero;
-  double commentsWidth = availableWidth * _commentsWidthRatio;
-
-  Size size = new Size(
-    availableWidth - commentsWidth,
-    availableHeight,
-  );
-  layout.add(
-      new PositionedSurface(surface: commentsSource, position: offset & size));
-  offset += size.topRight(Offset.zero);
-
-  size = new Size(
-    commentsWidth,
-    availableHeight,
-  );
-  layout.add(new PositionedSurface(surface: comments, position: offset & size));
-  return layout;
+List<PositionedSurface> _layoutCommentsRight(
+  Surface commentsSource,
+  Surface comments,
+) {
+  return <PositionedSurface>[
+    new PositionedSurface(
+      surface: commentsSource,
+      position: new Rect.fromLTWH(
+        0.0,
+        0.0,
+        1.0 - _commentsWidthRatio,
+        1.0,
+      ),
+    ),
+    new PositionedSurface(
+      surface: comments,
+      position: new Rect.fromLTWH(
+        1.0 - _commentsWidthRatio,
+        0.0,
+        _commentsWidthRatio,
+        1.0,
+      ),
+    ),
+  ];
 }

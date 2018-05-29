@@ -14,20 +14,16 @@ import 'tree.dart';
 /// Returns in the order they should stacked
 List<PositionedSurface> layoutSurfaces(
   BuildContext context,
-  BoxConstraints constraints,
   Surface focusedSurface,
   LayoutModel layoutModel,
 ) {
-  final double totalWidth = constraints.biggest.width;
-  final double totalHeight = constraints.biggest.height;
-  final Size fullsize = new Size(totalWidth, totalHeight);
-
   final List<PositionedSurface> layout = <PositionedSurface>[];
 
   // We only execute this layout if containerMembership exists
   String containerId = focusedSurface.properties.containerMembership.last;
   // get the spanning tree of container nodes
-  Tree<Surface> spanningTree = focusedSurface.containerSpanningTree(containerId);
+  Tree<Surface> spanningTree =
+      focusedSurface.containerSpanningTree(containerId);
   Map<String, Surface> nodeMap = <String, Surface>{};
   List<Surface> containerSurfaces =
       spanningTree.map((Tree<Surface> t) => t.value).toList(growable: false);
@@ -40,10 +36,10 @@ List<PositionedSurface> layoutSurfaces(
 
   for (LayoutEntry entry in layoutSpec.surfaces) {
     Rect rect = new Rect.fromLTWH(
-      entry.rectangle[0] * totalWidth,
-      entry.rectangle[1] * totalHeight,
-      entry.rectangle[2] * totalWidth,
-      entry.rectangle[3] * totalHeight,
+      entry.rectangle[0],
+      entry.rectangle[1],
+      entry.rectangle[2],
+      entry.rectangle[3],
     );
     String label = entry.nodeName;
     layout.add(
@@ -56,7 +52,12 @@ List<PositionedSurface> layoutSurfaces(
   if (layout.isEmpty) {
     log.warning('''Container $containerId with surfaces $containerSurfaces
     could not be laid out. Falling back on focused surface.''');
-    layout.add(new PositionedSurface(surface: focusedSurface, position: Offset.zero & fullsize));
+    layout.add(
+      new PositionedSurface(
+        surface: focusedSurface,
+        position: new Rect.fromLTWH(0.0, 0.0, 1.0, 1.0),
+      ),
+    );
   }
   return layout;
 }
