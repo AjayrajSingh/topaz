@@ -588,8 +588,9 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   // |Presentation|.
   @override
-  void setDisplayRotation(double displayRotationDegrees, bool animate) {  // ignore: override_on_non_overriding_method, avoid_positional_boolean_parameters
-    // presentation.setDisplayRotation(displayRotationDegrees, animate);
+    // ignore: avoid_positional_boolean_parameters
+  void setDisplayRotation(double displayRotationDegrees, bool animate) {
+    presentation.setDisplayRotation(displayRotationDegrees, animate);
   }
 
   // |Presentation|.
