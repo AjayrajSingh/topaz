@@ -11,7 +11,7 @@
     <project name="third_party/dart/third_party/pkg/async"
              path="third_party/dart/third_party/pkg/async"
              remote="https://dart.googlesource.com/async.git"
-             revision="2.0.6"/>
+             revision="2.0.7"/>
 
     <project name="third_party/dart/third_party/pkg/bazel_worker"
              path="third_party/dart/third_party/pkg/bazel_worker"
@@ -36,7 +36,7 @@
     <project name="third_party/dart/third_party/pkg/collection"
              path="third_party/dart/third_party/pkg/collection"
              remote="https://dart.googlesource.com/collection.git"
-             revision="1.14.6"/>
+             revision="1.14.9"/>
 
     <project name="third_party/dart/third_party/pkg/convert"
              path="third_party/dart/third_party/pkg/convert"
@@ -61,7 +61,7 @@
     <project name="third_party/dart/third_party/pkg/dartdoc"
              path="third_party/dart/third_party/pkg/dartdoc"
              remote="https://dart.googlesource.com/dartdoc.git"
-             revision="v0.19.0"/>
+             revision="v0.19.1"/>
 
     <project name="third_party/dart/third_party/pkg/fixnum"
              path="third_party/dart/third_party/pkg/fixnum"
@@ -106,7 +106,7 @@
     <project name="third_party/dart/third_party/pkg/http_throttle"
              path="third_party/dart/third_party/pkg/http_throttle"
              remote="https://dart.googlesource.com/http_throttle.git"
-             revision="1.0.1"/>
+             revision="1.0.2"/>
 
     <project name="third_party/dart/third_party/pkg/intl"
              path="third_party/dart/third_party/pkg/intl"
@@ -121,7 +121,7 @@
     <project name="third_party/dart/third_party/pkg/linter"
              path="third_party/dart/third_party/pkg/linter"
              remote="https://dart.googlesource.com/linter.git"
-             revision="0.1.50"/>
+             revision="0.1.51"/>
 
     <project name="third_party/dart/third_party/pkg/logging"
              path="third_party/dart/third_party/pkg/logging"
@@ -131,7 +131,7 @@
     <project name="third_party/dart/third_party/pkg/markdown"
              path="third_party/dart/third_party/pkg/markdown"
              remote="https://dart.googlesource.com/markdown.git"
-             revision="1.1.1"/>
+             revision="2.0.0"/>
 
     <project name="third_party/dart/third_party/pkg/matcher"
              path="third_party/dart/third_party/pkg/matcher"
@@ -151,7 +151,7 @@
     <project name="third_party/dart/third_party/pkg/mustache4dart"
              path="third_party/dart/third_party/pkg/mustache4dart"
              remote="https://chromium.googlesource.com/external/github.com/valotas/mustache4dart.git"
-             revision="v2.1.1"/>
+             revision="v2.1.2"/>
 
     <project name="third_party/dart/third_party/pkg/oauth2"
              path="third_party/dart/third_party/pkg/oauth2"
@@ -181,7 +181,7 @@
     <project name="third_party/dart/third_party/pkg/pub"
              path="third_party/dart/third_party/pkg/pub"
              remote="https://dart.googlesource.com/pub.git"
-             revision="0c172864be2d2043a9d630e07f6b4eae7472653f"/>
+             revision="7bdcf4e4de85a7a8c7a322511b8198f1b6cb0a73"/>
 
     <project name="third_party/dart/third_party/pkg/pub_semver"
              path="third_party/dart/third_party/pkg/pub_semver"
@@ -296,7 +296,7 @@
     <project name="third_party/dart/third_party/pkg/watcher"
              path="third_party/dart/third_party/pkg/watcher"
              remote="https://dart.googlesource.com/watcher.git"
-             revision="0.9.7+7"/>
+             revision="0.9.7+8"/>
 
     <project name="third_party/dart/third_party/pkg/web_components"
              path="third_party/dart/third_party/pkg/web_components"

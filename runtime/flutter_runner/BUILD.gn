@@ -5,6 +5,13 @@
 assert(is_fuchsia)
 
 import("//build/vulkan/config.gni")
+import("$flutter_root/shell/gpu/gpu.gni")
+
+shell_gpu_configuration("fuchsia_gpu_configuration") {
+  enable_software = false
+  enable_gl = false
+  enable_vulkan = true
+}
 
 template("flutter_runner") {
   invoker_output_name = invoker.output_name
@@ -55,6 +62,7 @@ template("flutter_runner") {
     # The use of these dependencies is temporary and will be moved behind the
     # embedder API.
     flutter_deps = [
+      ":fuchsia_gpu_configuration",
       "$flutter_root/assets",
       "$flutter_root/common",
       "$flutter_root/flow",
@@ -65,7 +73,6 @@ template("flutter_runner") {
       "$flutter_root/vulkan",
       "$flutter_root/fml",
       "$flutter_root/shell/common",
-      "$flutter_root/shell/gpu",
     ]
 
     deps = [

@@ -51,7 +51,8 @@ action("kernel_core_snapshot") {
     "--limit_ints_to_64_bits",
     "--reify_generic_functions",
     "--strong",
-    "--sync-async",
+    # Re-enable once enabled in //third_party/flutter/runtime/dart_vm.cc
+    # "--sync-async",
     "--enable_mirrors=false",
     "--deterministic",
     "--snapshot_kind=core",

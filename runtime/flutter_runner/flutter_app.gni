@@ -995,7 +995,8 @@ template("flutter2_aot_app") {
       "--limit_ints_to_64_bits",
       "--reify_generic_functions",
       "--strong",
-      "--sync-async",
+      # Re-enable once enabled in //third_party/flutter/runtime/dart_vm.cc
+      # "--sync-async",
       "--deterministic",
       "--snapshot_kind=app-aot-blobs",
       "--vm_snapshot_data=" + rebase_path(vm_snapshot_data_path),
