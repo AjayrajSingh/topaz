@@ -66,7 +66,8 @@ class DankUserShellImpl
   @override
   void terminate() {
     _focusWatcherBinding.close();
-    for (StoryVisualStateWatcherProxy watcher in _visualStateWatchers.values) {
+    for (StoryVisualStateWatcherProxy watcher
+        in _visualStateWatchers.values.toList()) {
       watcher.ctrl.close();
     }
     _focusProviderProxy.ctrl.close();

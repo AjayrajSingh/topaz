@@ -54,8 +54,9 @@ class PointerEventsListener implements PointerCaptureListenerHack {
   }
 
   void _cleanupPointerEvents() {
-    for (PointerEvent lastEvent in _lastPointerEvent.values) {
-      if (lastEvent.phase != PointerEventPhase.remove) {
+    for (PointerEvent lastEvent in _lastPointerEvent.values.toList()) {
+      if (lastEvent.phase != PointerEventPhase.remove &&
+          lastEvent.type != PointerEventType.mouse) {
         onPointerEvent(_clone(lastEvent, PointerEventPhase.remove));
       }
     }
