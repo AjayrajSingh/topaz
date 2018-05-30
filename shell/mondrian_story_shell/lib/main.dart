@@ -315,8 +315,9 @@ class _DeviceMapWatcherImpl extends DeviceMapWatcher {
   @override
   void onDeviceMapChange(DeviceMapEntry entry) {
     trace('device map changed');
-    Object decodedJson = json.decode(entry.profile);
-    if (decodedJson is Map<String, String>) {
+    dynamic decodedJson = json.decode(entry.profile);
+    if (decodedJson is Map) {
+      decodedJson = decodedJson.cast<String, String>();
       onProfileChanged(decodedJson);
     } else {
       log.severe(
