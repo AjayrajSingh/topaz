@@ -34,10 +34,12 @@ class SurfaceFrame extends StatelessWidget {
               duration: _scaleAnimationDuration,
               curve: _scaleCurve,
               transform: _scale(constraints.biggest.center(Offset.zero)),
-              child: new PhysicalModel(
-                elevation: (1.0 - depth) * 125.0,
-                color: const Color(0x00000000),
-                child: child,
+              child: new IgnorePointer(
+                child: new PhysicalModel(
+                  elevation: (1.0 - depth) * 125.0,
+                  color: const Color(0x00000000),
+                  child: child,
+                ),
               ),
             ),
       );

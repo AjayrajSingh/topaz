@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 import 'flux.dart';
+import 'gestures.dart';
 import 'sim.dart';
 import 'surface_form.dart';
 import 'surface_frame.dart';
@@ -21,8 +22,7 @@ const SpringDescription _kSimSpringDescription = const SpringDescription(
   damping: 29.0,
 );
 
-// Distance from left edge of surface where panning can be initiated.
-const double _kPanStartXOffset = 32.0;
+const double _kGestureWidth = 32.0;
 
 /// Stages determine how things move, and how they can be manipulated
 class SurfaceStage extends StatelessWidget {
@@ -33,14 +33,62 @@ class SurfaceStage extends StatelessWidget {
   final Forest<SurfaceForm> forms;
 
   @override
-  Widget build(BuildContext context) => new Stack(
+  Widget build(BuildContext context) {
+    List children = <Widget>[]
+      ..addAll(
+        forms
+            .reduceForest(
+              (SurfaceForm f, Iterable<_SurfaceInstance> children) =>
+                  new _SurfaceInstance(
+                    form: f,
+                    dependents: children.toList(),
+                  ),
+            )
+            .toList()
+              ..sort(
+                (_SurfaceInstance a, _SurfaceInstance b) =>
+                    b.form.depth.compareTo(a.form.depth),
+              ),
+      )
+      // We add ignoring unidirectional horizontal drag detectors on the
+      // edges so the ones added by the surfaces along the edges have
+      // something to fight in the gesture arena (otherwise they always win
+      // and accept gestures in the wrong direction).  This prevents drags
+      // toward the edges of the screen from moving or dismissing the
+      // associated surfaces.
+      ..addAll([
+        new Positioned(
+          left: -_kGestureWidth,
+          top: _kGestureWidth,
+          bottom: _kGestureWidth,
+          width: 2.0 * _kGestureWidth,
+          child: _createIgnoringGestureDetector(Direction.left),
+        ),
+        new Positioned(
+          right: -_kGestureWidth,
+          top: _kGestureWidth,
+          bottom: _kGestureWidth,
+          width: 2.0 * _kGestureWidth,
+          child: _createIgnoringGestureDetector(Direction.right),
+        ),
+      ]);
+    return new Stack(
       fit: StackFit.expand,
-      children: forms
-          .reduceForest((SurfaceForm f, Iterable<_SurfaceInstance> children) =>
-              new _SurfaceInstance(form: f, dependents: children.toList()))
-          .toList()
-            ..sort((_SurfaceInstance a, _SurfaceInstance b) =>
-                b.form.depth.compareTo(a.form.depth)));
+      children: children,
+    );
+  }
+
+  /// This gesture detector fights in the arena and ignores the horizontal drags
+  /// in the given [direction] if it wins.
+  Widget _createIgnoringGestureDetector(Direction direction) {
+    return new UnidirectionalHorizontalGestureDetector(
+      direction: direction,
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragStart: (DragStartDetails details) {},
+      onHorizontalDragUpdate: (DragUpdateDetails details) {},
+      onHorizontalDragEnd: (DragEndDetails details) {},
+    );
+  }
 }
 
 /// Instantiation of a Surface in SurfaceStage
@@ -48,6 +96,7 @@ class _SurfaceInstance extends StatefulWidget {
   /// SurfaceLayout
   _SurfaceInstance({
     @required this.form,
+    this.isDebugMode = false,
     this.dependents = const <_SurfaceInstance>[],
   }) : super(key: form.key);
 
@@ -56,6 +105,8 @@ class _SurfaceInstance extends StatefulWidget {
 
   /// Dependent surfaces
   final List<_SurfaceInstance> dependents;
+
+  final bool isDebugMode;
 
   @override
   _SurfaceInstanceState createState() => new _SurfaceInstanceState();
@@ -105,94 +156,122 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
           );
   }
 
-  // Returns true if panning was initiated [_kPanStartXOffset] from left edge.
-  bool _panning = false;
-
   @override
   Widget build(BuildContext context) {
-    Size parentSize = MediaQuery.of(context).size;
-    final SurfaceForm form = widget.form;
-    return new Stack(
-      fit: StackFit.expand,
-      children: <Widget>[
-        new CustomSingleChildLayout(
-          delegate: new PositionedLayoutDelegate(animation: animation),
-          child: new GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onPanStart: (DragStartDetails details) {
-              Offset diff = details.globalPosition -
-                  _toAbsolute(
-                    form.position.topLeft,
-                    parentSize,
-                  );
-              if (diff.dx < _kPanStartXOffset) {
-                _panning = true;
-              }
-              _animation.update(
-                value: animation.value,
-                velocity: Rect.zero,
-              );
-              form.onDragStarted();
-            },
-            onPanUpdate: (DragUpdateDetails details) {
-              if (!_panning) {
-                return;
-              }
-              _animation.update(
-                value: animation.value.shift(
-                  _toFractional(
-                    form.dragFriction(
-                      _toAbsolute(
-                        animation.value.center - form.position.center,
-                        parentSize,
-                      ),
-                      details.delta,
-                    ),
-                    parentSize,
-                  ),
-                ),
-                velocity: Rect.zero,
-              );
-            },
-            onPanEnd: (DragEndDetails details) {
-              if (!_panning) {
-                return;
-              }
-              _panning = false;
-              _animation
-                ..update(
-                  value: animation.value,
-                  velocity: Rect.zero.shift(
-                    _toFractional(
-                      form.dragFriction(
-                        _toAbsolute(
-                          animation.value.center - form.position.center,
-                          parentSize,
-                        ),
-                        details.velocity.pixelsPerSecond,
-                      ),
-                      parentSize,
-                    ),
-                  ),
-                )
-                ..done();
-              form.onDragFinished(
+    return new AnimatedBuilder(
+      animation: _animation,
+      builder: (BuildContext context, Widget child) {
+        Size parentSize = MediaQuery.of(context).size;
+        final SurfaceForm form = widget.form;
+        Offset fractionalOffset =
+            (animation.value.center - animation.value.size.center(Offset.zero));
+        double left = parentSize.width * fractionalOffset.dx;
+        double top = parentSize.height * fractionalOffset.dy;
+        double right = parentSize.width *
+            (1.0 - (fractionalOffset.dx + animation.value.size.width));
+        double bottom = parentSize.height *
+            (1.0 - (fractionalOffset.dy + animation.value.size.height));
+        return new Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            new Positioned(
+              left: left,
+              top: top,
+              bottom: bottom,
+              right: right,
+              child: new SurfaceFrame(
+                child: form.parts.keys.first,
+                depth: form.depth,
+                // HACK(alangardner): May need explicit interactable parameter
+                interactable: form.dragFriction != kDragFrictionInfinite,
+              ),
+            ),
+            new Positioned(
+              left: left - _kGestureWidth,
+              top: top + _kGestureWidth,
+              bottom: bottom + _kGestureWidth,
+              width: 2.0 * _kGestureWidth,
+              child: _createGestureDetector(
+                parentSize,
+                form,
+                Direction.right,
+              ),
+            ),
+            new Positioned(
+              right: right - _kGestureWidth,
+              top: top + _kGestureWidth,
+              bottom: bottom + _kGestureWidth,
+              width: 2.0 * _kGestureWidth,
+              child: _createGestureDetector(
+                parentSize,
+                form,
+                Direction.left,
+              ),
+            ),
+          ]..addAll(widget.dependents),
+        );
+      },
+    );
+  }
+
+  Widget _createGestureDetector(
+    Size parentSize,
+    SurfaceForm form,
+    Direction direction,
+  ) {
+    return new UnidirectionalHorizontalGestureDetector(
+      direction: direction,
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragStart: (DragStartDetails details) {
+        _animation.update(
+          value: animation.value,
+          velocity: Rect.zero,
+        );
+        form.onDragStarted();
+      },
+      onHorizontalDragUpdate: (DragUpdateDetails details) {
+        _animation.update(
+          value: animation.value.shift(
+            _toFractional(
+              form.dragFriction(
                 _toAbsolute(
                   animation.value.center - form.position.center,
                   parentSize,
                 ),
-                details.velocity,
-              );
-            },
-            child: new SurfaceFrame(
-              child: form.parts.keys.first,
-              depth: form.depth,
-              // HACK(alangardner): May need explicit interactable parameter
-              interactable: form.dragFriction != kDragFrictionInfinite,
+                details.delta,
+              ),
+              parentSize,
             ),
           ),
-        ),
-      ]..addAll(widget.dependents),
+          velocity: Rect.zero,
+        );
+      },
+      onHorizontalDragEnd: (DragEndDetails details) {
+        _animation
+          ..update(
+            value: animation.value,
+            velocity: Rect.zero.shift(
+              _toFractional(
+                form.dragFriction(
+                  _toAbsolute(
+                    animation.value.center - form.position.center,
+                    parentSize,
+                  ),
+                  details.velocity.pixelsPerSecond,
+                ),
+                parentSize,
+              ),
+            ),
+          )
+          ..done();
+        form.onDragFinished(
+          _toAbsolute(
+            animation.value.center - form.position.center,
+            parentSize,
+          ),
+          details.velocity,
+        );
+      },
     );
   }
 
@@ -209,39 +288,6 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
       fractionalOffset.dy * size.height,
     );
   }
-}
-
-/// A delegate for CustomSingleChildLayout that positions its child centered at
-/// the positionAnimation.value offset, and with the sizeAnimation.value size.
-class PositionedLayoutDelegate extends SingleChildLayoutDelegate {
-  /// Constructor
-  PositionedLayoutDelegate({
-    @required this.animation,
-  }) : super(relayout: animation);
-
-  /// The animation for the center position
-  final Animation<Rect> animation;
-
-  @override
-  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
-      new BoxConstraints.tightFor(
-        width: animation.value.size.width * constraints.maxWidth,
-        height: animation.value.size.height * constraints.maxHeight,
-      );
-
-  @override
-  Offset getPositionForChild(Size size, Size childSize) {
-    Offset fractionalOffset =
-        (animation.value.center - animation.value.size.center(Offset.zero));
-    return new Offset(
-      size.width * fractionalOffset.dx,
-      size.height * fractionalOffset.dy,
-    );
-  }
-
-  @override
-  bool shouldRelayout(PositionedLayoutDelegate old) =>
-      old.animation.value != animation.value;
 }
 
 const double _kEpsilon = 1e-2;
