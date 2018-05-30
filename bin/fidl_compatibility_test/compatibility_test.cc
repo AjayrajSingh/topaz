@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include <compatibility_test_service/cpp/fidl.h>
+#include <fidl/test/compatibility/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 #include <lib/async/default.h>
 #include <stdio.h>
@@ -70,8 +70,8 @@ zx::handle Handle() {
   return ::testing::AssertionSuccess();
 }
 
-void ExpectEq(const compatibility_test_service::Struct& a,
-              const compatibility_test_service::Struct& b) {
+void ExpectEq(const fidl::test::compatibility::Struct& a,
+              const fidl::test::compatibility::Struct& b) {
   // primitive types
   EXPECT_EQ(a.primitive_types.b, b.primitive_types.b);
   EXPECT_EQ(a.primitive_types.i8, b.primitive_types.i8);
@@ -98,7 +98,7 @@ void ExpectEq(const compatibility_test_service::Struct& a,
   EXPECT_EQ(a.arrays.f32_0[0], b.arrays.f32_0[0]);
   EXPECT_EQ(a.arrays.f64_0[0], b.arrays.f64_0[0]);
   EXPECT_TRUE(HandlesEq(a.arrays.handle_0[0], b.arrays.handle_0[0]));
-  for (uint32_t i = 0; i < compatibility_test_service::arrays_size; ++i) {
+  for (uint32_t i = 0; i < fidl::test::compatibility::arrays_size; ++i) {
     EXPECT_EQ(a.arrays.b_1[i], b.arrays.b_1[i]);
     EXPECT_EQ(a.arrays.i8_1[i], b.arrays.i8_1[i]);
     EXPECT_EQ(a.arrays.i16_1[i], b.arrays.i16_1[i]);
@@ -113,7 +113,7 @@ void ExpectEq(const compatibility_test_service::Struct& a,
     EXPECT_TRUE(HandlesEq(a.arrays.handle_1[i], b.arrays.handle_1[i]));
   }
   // arrays_2d
-  for (uint32_t i = 0; i < compatibility_test_service::arrays_size; ++i) {
+  for (uint32_t i = 0; i < fidl::test::compatibility::arrays_size; ++i) {
     for (uint32_t j = 0; j < kArbitraryConstant; ++j) {
       EXPECT_EQ(a.arrays_2d.b[i][j], b.arrays_2d.b[i][j]);
       EXPECT_EQ(a.arrays_2d.i8[i][j], b.arrays_2d.i8[i][j]);
@@ -190,12 +190,12 @@ void ExpectEq(const compatibility_test_service::Struct& a,
   EXPECT_EQ(a.vectors.u64_sized_1.get(), b.vectors.u64_sized_1.get());
   EXPECT_EQ(a.vectors.f32_sized_1.get(), b.vectors.f32_sized_1.get());
   EXPECT_EQ(a.vectors.f64_sized_1.get(), b.vectors.f64_sized_1.get());
-  for (uint32_t i = 0; i < compatibility_test_service::vectors_size; ++i) {
+  for (uint32_t i = 0; i < fidl::test::compatibility::vectors_size; ++i) {
     EXPECT_TRUE(HandlesEq(a.vectors.handle_sized_1.get()[i],
                           b.vectors.handle_sized_1.get()[i]));
   }
 
-  for (uint32_t i = 0; i < compatibility_test_service::vectors_size; ++i) {
+  for (uint32_t i = 0; i < fidl::test::compatibility::vectors_size; ++i) {
     EXPECT_EQ(a.vectors.b_sized_2.get()[i].get(),
               b.vectors.b_sized_2.get()[i].get());
     EXPECT_EQ(a.vectors.i8_sized_2.get()[i].get(),
@@ -358,7 +358,7 @@ void ExpectEq(const compatibility_test_service::Struct& a,
   EXPECT_EQ(a.vectors.handle_nullable_sized_2.is_null(),
             b.vectors.handle_nullable_sized_2.is_null());
 
-  for (uint32_t i = 0; i < compatibility_test_service::vectors_size; ++i) {
+  for (uint32_t i = 0; i < fidl::test::compatibility::vectors_size; ++i) {
     for (uint8_t j = 0; j < kArbitraryConstant; ++j) {
       EXPECT_TRUE(
           HandlesEq(a.vectors.handle_nullable_sized_2.get()[i].get()[j],
@@ -483,7 +483,7 @@ std::string RandomUTF8(size_t count) {
   return random_string;
 }
 
-void Initialize(compatibility_test_service::Struct* s) {
+void Initialize(fidl::test::compatibility::Struct* s) {
   // Prepare randomness.
   std::default_random_engine rand_engine;
   // Using randomness to avoid having to come up with varied values by hand.
@@ -501,7 +501,7 @@ void Initialize(compatibility_test_service::Struct* s) {
   std::uniform_real_distribution<float> float_distribution;
   std::uniform_real_distribution<double> double_distribution;
   std::string random_string =
-      RandomUTF8(compatibility_test_service::strings_size);
+      RandomUTF8(fidl::test::compatibility::strings_size);
   std::string random_short_string = RandomUTF8(kArbitraryConstant);
 
   // primitive_types
@@ -531,7 +531,7 @@ void Initialize(compatibility_test_service::Struct* s) {
   s->arrays.f64_0[0] = double_distribution(rand_engine);
   s->arrays.handle_0[0] = Handle();
 
-  for (uint32_t i = 0; i < compatibility_test_service::arrays_size; ++i) {
+  for (uint32_t i = 0; i < fidl::test::compatibility::arrays_size; ++i) {
     s->arrays.b_1[i] = bool_distribution(rand_engine);
     s->arrays.i8_1[i] = int8_distribution(rand_engine);
     s->arrays.i16_1[i] = int16_distribution(rand_engine);
@@ -547,7 +547,7 @@ void Initialize(compatibility_test_service::Struct* s) {
   }
 
   // arrays_2d
-  for (uint32_t i = 0; i < compatibility_test_service::arrays_size; ++i) {
+  for (uint32_t i = 0; i < fidl::test::compatibility::arrays_size; ++i) {
     for (uint32_t j = 0; j < kArbitraryConstant; ++j) {
       s->arrays_2d.b[i][j] = bool_distribution(rand_engine);
       s->arrays_2d.i8[i][j] = int8_distribution(rand_engine);
@@ -698,41 +698,41 @@ void Initialize(compatibility_test_service::Struct* s) {
   }
 
   s->vectors.b_sized_1 = VectorPtr<bool>(
-      std::vector<bool>(compatibility_test_service::vectors_size,
+      std::vector<bool>(fidl::test::compatibility::vectors_size,
                         bool_distribution(rand_engine)));
   s->vectors.i8_sized_1 = VectorPtr<int8_t>(
-      std::vector<int8_t>(compatibility_test_service::vectors_size,
+      std::vector<int8_t>(fidl::test::compatibility::vectors_size,
                           int8_distribution(rand_engine)));
   s->vectors.i16_sized_1 = VectorPtr<int16_t>(
-      std::vector<int16_t>(compatibility_test_service::vectors_size,
+      std::vector<int16_t>(fidl::test::compatibility::vectors_size,
                            int16_distribution(rand_engine)));
   s->vectors.i32_sized_1 = VectorPtr<int32_t>(
-      std::vector<int32_t>(compatibility_test_service::vectors_size,
+      std::vector<int32_t>(fidl::test::compatibility::vectors_size,
                            int32_distribution(rand_engine)));
   s->vectors.i64_sized_1 = VectorPtr<int64_t>(
-      std::vector<int64_t>(compatibility_test_service::vectors_size,
+      std::vector<int64_t>(fidl::test::compatibility::vectors_size,
                            int64_distribution(rand_engine)));
   s->vectors.u8_sized_1 = VectorPtr<uint8_t>(
-      std::vector<uint8_t>(compatibility_test_service::vectors_size,
+      std::vector<uint8_t>(fidl::test::compatibility::vectors_size,
                            uint8_distribution(rand_engine)));
   s->vectors.u16_sized_1 = VectorPtr<uint16_t>(
-      std::vector<uint16_t>(compatibility_test_service::vectors_size,
+      std::vector<uint16_t>(fidl::test::compatibility::vectors_size,
                             uint16_distribution(rand_engine)));
   s->vectors.u32_sized_1 = VectorPtr<uint32_t>(
-      std::vector<uint32_t>(compatibility_test_service::vectors_size,
+      std::vector<uint32_t>(fidl::test::compatibility::vectors_size,
                             uint32_distribution(rand_engine)));
   s->vectors.u64_sized_1 = VectorPtr<uint64_t>(
-      std::vector<uint64_t>(compatibility_test_service::vectors_size,
+      std::vector<uint64_t>(fidl::test::compatibility::vectors_size,
                             uint64_distribution(rand_engine)));
   s->vectors.f32_sized_1 = VectorPtr<float>(
-      std::vector<float>(compatibility_test_service::vectors_size,
+      std::vector<float>(fidl::test::compatibility::vectors_size,
                          float_distribution(rand_engine)));
   s->vectors.f64_sized_1 = VectorPtr<double>(
-      std::vector<double>(compatibility_test_service::vectors_size,
+      std::vector<double>(fidl::test::compatibility::vectors_size,
                           double_distribution(rand_engine)));
   {
     std::vector<zx::handle> underlying_vec;
-    for (uint32_t i = 0; i < compatibility_test_service::vectors_size; ++i) {
+    for (uint32_t i = 0; i < fidl::test::compatibility::vectors_size; ++i) {
       underlying_vec.emplace_back(Handle());
     }
     s->vectors.handle_sized_1 =
@@ -751,7 +751,7 @@ void Initialize(compatibility_test_service::Struct* s) {
     std::vector<VectorPtr<float>> float_outer_vector;
     std::vector<VectorPtr<double>> double_outer_vector;
     std::vector<VectorPtr<zx::handle>> handle_outer_vector;
-    for (uint32_t i = 0; i < compatibility_test_service::vectors_size; ++i) {
+    for (uint32_t i = 0; i < fidl::test::compatibility::vectors_size; ++i) {
       bool_outer_vector.emplace_back(VectorPtr<bool>(std::vector<bool>(
           kArbitraryConstant, bool_distribution(rand_engine))));
       int8_outer_vector.emplace_back(VectorPtr<int8_t>(std::vector<int8_t>(
@@ -826,11 +826,11 @@ void Initialize(compatibility_test_service::Struct* s) {
   s->vectors.i16_nullable_sized_0 =
       VectorPtr<int16_t>(std::vector<int16_t>{int16_distribution(rand_engine)});
   s->vectors.f64_nullable_sized_1 = VectorPtr<double>(
-      std::vector<double>(compatibility_test_service::vectors_size,
+      std::vector<double>(fidl::test::compatibility::vectors_size,
                           double_distribution(rand_engine)));
   {
     std::vector<VectorPtr<zx::handle>> handle_outer_vector;
-    for (uint32_t i = 0; i < compatibility_test_service::vectors_size; ++i) {
+    for (uint32_t i = 0; i < fidl::test::compatibility::vectors_size; ++i) {
       std::vector<zx::handle> handle_inner_vector;
       for (uint8_t i = 0; i < kArbitraryConstant; ++i) {
         handle_inner_vector.emplace_back(Handle());
@@ -889,22 +889,22 @@ void Initialize(compatibility_test_service::Struct* s) {
   s->strings.nullable_size_0_s = fidl::StringPtr(random_short_string);
 
   // enums
-  s->default_enum = compatibility_test_service::default_enum::kOne;
-  s->i8_enum = compatibility_test_service::i8_enum::kNegativeOne;
-  s->i16_enum = compatibility_test_service::i16_enum::kNegativeOne;
-  s->i32_enum = compatibility_test_service::i32_enum::kNegativeOne;
-  s->i64_enum = compatibility_test_service::i64_enum::kNegativeOne;
-  s->u8_enum = compatibility_test_service::u8_enum::kOne;
-  s->u16_enum = compatibility_test_service::u16_enum::kTwo;
-  s->u32_enum = compatibility_test_service::u32_enum::kThree;
-  s->u64_enum = compatibility_test_service::u64_enum::kFour;
+  s->default_enum = fidl::test::compatibility::default_enum::kOne;
+  s->i8_enum = fidl::test::compatibility::i8_enum::kNegativeOne;
+  s->i16_enum = fidl::test::compatibility::i16_enum::kNegativeOne;
+  s->i32_enum = fidl::test::compatibility::i32_enum::kNegativeOne;
+  s->i64_enum = fidl::test::compatibility::i64_enum::kNegativeOne;
+  s->u8_enum = fidl::test::compatibility::u8_enum::kOne;
+  s->u16_enum = fidl::test::compatibility::u16_enum::kTwo;
+  s->u32_enum = fidl::test::compatibility::u32_enum::kThree;
+  s->u64_enum = fidl::test::compatibility::u64_enum::kFour;
 
   // structs
   s->structs.s.s = fidl::StringPtr(random_string);
 
   // unions
   s->unions.u.set_s(fidl::StringPtr(random_string));
-  s->unions.nullable_u = compatibility_test_service::this_is_a_union::New();
+  s->unions.nullable_u = fidl::test::compatibility::this_is_a_union::New();
   s->unions.nullable_u->set_b(bool_distribution(rand_engine));
 
   // bool
@@ -925,17 +925,17 @@ class CompatibilityTest
 TEST_P(CompatibilityTest, Struct) {
   RecordProperty("proxy_url", proxy_url_);
   RecordProperty("server_url", server_url_);
-  compatibility_test_service::Struct sent;
+  fidl::test::compatibility::Struct sent;
   Initialize(&sent);
   sent.forward_to_server = server_url_;
-  compatibility_test_service::EchoClientApp app;
+  fidl::test::compatibility::EchoClientApp app;
   app.Start(proxy_url_);
 
-  compatibility_test_service::Struct sent_clone;
+  fidl::test::compatibility::Struct sent_clone;
   sent.Clone(&sent_clone);
-  compatibility_test_service::Struct resp_clone;
+  fidl::test::compatibility::Struct resp_clone;
   app.echo()->EchoStruct(
-      std::move(sent), [&resp_clone](compatibility_test_service::Struct resp) {
+      std::move(sent), [&resp_clone](fidl::test::compatibility::Struct resp) {
         ASSERT_EQ(ZX_OK, resp.Clone(&resp_clone));
       });
 
