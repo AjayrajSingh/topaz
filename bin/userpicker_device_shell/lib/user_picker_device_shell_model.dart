@@ -444,6 +444,19 @@ class UserPickerDeviceShellModel extends DeviceShellModel
   void onModeChanged() {
     getPresentationMode((PresentationMode mode) {
       log.info('Presentation mode changed to: $mode');
+      switch (mode) {
+        case PresentationMode.tent:
+          setDisplayRotation(180.0, true);
+          break;
+        case PresentationMode.tablet:
+          // TODO(sanjayc): Figure out up/down orientation.
+          setDisplayRotation(90.0, true);
+          break;
+        case PresentationMode.laptop:
+        default:
+          setDisplayRotation(0.0, true);
+          break;
+      }
     });
   }
 
@@ -588,7 +601,7 @@ class UserPickerDeviceShellModel extends DeviceShellModel
 
   // |Presentation|.
   @override
-    // ignore: avoid_positional_boolean_parameters
+  // ignore: avoid_positional_boolean_parameters
   void setDisplayRotation(double displayRotationDegrees, bool animate) {
     presentation.setDisplayRotation(displayRotationDegrees, animate);
   }
