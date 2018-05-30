@@ -5,7 +5,8 @@
 import("//build/fidl/fidl.gni")
 
 fidl("interfaces") {
-  name = "hello_app_dart"
+  name = "fuchsia.examples.hello"
+
   sources = [
     "hello.fidl",
   ]

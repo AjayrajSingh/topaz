@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:io' as io;
 
-import 'package:fidl_hello_app_dart/fidl.dart';
+import 'package:fidl_fuchsia_examples_hello/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_component/fidl.dart';
 import 'package:test/test.dart';
