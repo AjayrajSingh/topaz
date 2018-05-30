@@ -4,7 +4,7 @@
 
 import 'package:armadillo/next.dart';
 
-import 'package:fidl_modular/fidl.dart' as maxwell;
+import 'package:fidl_fuchsia_modular/fidl.dart' as maxwell;
 import 'package:fidl_speech/fidl.dart' as speech;
 import 'package:lib.app.dart/logging.dart';
 

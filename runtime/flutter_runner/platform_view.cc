@@ -29,15 +29,15 @@ void SetInterfaceErrorHandler(fidl::InterfacePtr<T>& interface,
 }
 
 PlatformView::PlatformView(
-    PlatformView::Delegate& delegate,
-    std::string debug_label,
+    PlatformView::Delegate& delegate, std::string debug_label,
     blink::TaskRunners task_runners,
     fidl::InterfaceHandle<component::ServiceProvider>
         parent_environment_service_provider_handle,
     fidl::InterfaceHandle<views_v1::ViewManager> view_manager_handle,
     fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner,
     zx::eventpair export_token,
-    fidl::InterfaceHandle<modular::ContextWriter> accessibility_context_writer,
+    fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
+        accessibility_context_writer,
     zx_handle_t vsync_event_handle)
     : shell::PlatformView(delegate, std::move(task_runners)),
       debug_label_(std::move(debug_label)),

@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_modular/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_modular/fidl.dart' as fidl;
 import 'package:json_schema/json_schema.dart' as json_schema;
 import 'package:lib.app.dart/logging.dart';
 

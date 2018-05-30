@@ -10,7 +10,7 @@ import 'package:fidl/fidl.dart' show InterfaceRequest;
 import 'package:fidl_chat_content_provider/fidl.dart';
 import 'package:fidl_ledger/fidl.dart';
 import 'package:fidl_fuchsia_mem/fidl.dart';
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ledger.dart/ledger.dart';
 import 'package:meta/meta.dart';

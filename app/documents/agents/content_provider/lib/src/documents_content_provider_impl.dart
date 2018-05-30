@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:entity_schemas/entities.dart' as entities;
 import 'package:fidl_component/fidl.dart';
 import 'package:fidl_documents/fidl.dart' as doc_fidl;
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';

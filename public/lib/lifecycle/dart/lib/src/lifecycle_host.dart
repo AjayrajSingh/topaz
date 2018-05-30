@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_modular/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_modular/fidl.dart' as fidl;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';

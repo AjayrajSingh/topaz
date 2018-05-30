@@ -8,7 +8,7 @@ import 'dart:io';
 
 import 'package:fidl_component/fidl.dart';
 import 'package:fidl_contacts_content_provider/fidl.dart' as fidl;
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_ledger/fidl.dart' as ledger;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';

@@ -8,7 +8,7 @@ import 'package:collection/collection.dart';
 
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_fuchsia_images/fidl.dart';
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 
 import 'data_handler.dart';
 

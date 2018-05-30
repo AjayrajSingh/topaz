@@ -4,7 +4,7 @@
 
 import 'dart:convert' show json;
 
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 
 /// Dart-idiomatic wrapper to create a modular.Intent.
 class IntentBuilder {

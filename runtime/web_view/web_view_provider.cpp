@@ -24,8 +24,8 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
         FXL_LOG(INFO) << "Add ViewProvider binding";
         view_provider_binding_.Bind(std::move(request));
       });
-  context_->outgoing().AddPublicService<modular::Lifecycle>(
-      [this](fidl::InterfaceRequest<modular::Lifecycle> request) {
+  context_->outgoing().AddPublicService<fuchsia::modular::Lifecycle>(
+      [this](fidl::InterfaceRequest<fuchsia::modular::Lifecycle> request) {
         FXL_LOG(INFO) << "got request for lifecycle service";
         lifecycle_binding_.Bind(std::move(request));
       });
@@ -35,7 +35,7 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
   main_link_->Watch(main_link_watcher_binding_.NewBinding());
 
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
-  modular::IntelligenceServicesPtr intelligence_services;
+  fuchsia::modular::IntelligenceServicesPtr intelligence_services;
   module_context_->GetIntelligenceServices(intelligence_services.NewRequest());
   intelligence_services->GetContextWriter(context_writer_.NewRequest());
   context_ptr->GetComponentContext(component_context_.NewRequest());
@@ -75,12 +75,12 @@ void WebViewProvider::Terminate() {
 }
 
 void WebViewProvider::Notify(fidl::StringPtr json) {
-  modular::JsonDoc parsed_json;
+  fuchsia::modular::JsonDoc parsed_json;
   parsed_json.Parse(json);
 
   if (!parsed_json.IsObject()) {
     FXL_LOG(WARNING) << "Not an object: "
-                     << modular::JsonValueToPrettyString(parsed_json);
+                     << fuchsia::modular::JsonValueToPrettyString(parsed_json);
     return;
   }
 

@@ -9,7 +9,7 @@ import 'package:fidl/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_presentation/fidl.dart';
 import 'package:fidl_views_v1_token/fidl.dart';
 import 'package:fuchsia/fuchsia.dart' show exit;

@@ -26,7 +26,7 @@ using auth::AuthProviderStatus;
 using auth::AuthTokenPtr;
 using auth_providers::oauth::OAuthRequestBuilder;
 using auth_providers::oauth::ParseOAuthResponse;
-using modular::JsonValueToPrettyString;
+using fuchsia::modular::JsonValueToPrettyString;
 
 SpotifyAuthProviderImpl::SpotifyAuthProviderImpl(
     component::ApplicationContext* app_context,

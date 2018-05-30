@@ -6,12 +6,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_modular/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_modular/fidl.dart' as fidl;
 import 'package:lib.app.dart/logging.dart';
 
 import 'link_watcher_host.dart';
 
-export 'package:fidl_modular/fidl.dart';
+export 'package:fidl_fuchsia_modular/fidl.dart';
 
 export 'link_watcher_host.dart';
 

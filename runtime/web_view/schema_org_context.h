@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include <modular/cpp/fidl.h>
+#include <fuchsia/modular/cpp/fidl.h>
 
 class WebView;
 
@@ -15,10 +15,11 @@ class SchemaOrgContext {
  public:
   SchemaOrgContext(WebView& web_view);
 
-  void set_context_writer(modular::ContextWriterPtr context_writer) {
+  void set_context_writer(fuchsia::modular::ContextWriterPtr context_writer) {
     context_writer_ = std::move(context_writer);
   }
-  void set_component_context(modular::ComponentContextPtr component_context) {
+  void set_component_context(
+      fuchsia::modular::ComponentContextPtr component_context) {
     component_context_ = std::move(component_context);
   }
 
@@ -29,7 +30,7 @@ class SchemaOrgContext {
   WebView& web_view_;
   std::string script_ = "";
 
-  modular::ComponentContextPtr component_context_;
-  modular::ContextWriterPtr context_writer_;
-  std::vector<modular::ContextValueWriterPtr> context_values_;
+  fuchsia::modular::ComponentContextPtr component_context_;
+  fuchsia::modular::ContextWriterPtr context_writer_;
+  std::vector<fuchsia::modular::ContextValueWriterPtr> context_values_;
 };

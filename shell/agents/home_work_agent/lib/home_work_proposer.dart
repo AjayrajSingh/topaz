@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert' as convert;
 import 'dart:io';
 
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 

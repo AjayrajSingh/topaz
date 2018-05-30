@@ -47,11 +47,12 @@ class WebViewImpl : public mozart::BaseView,
   ~WebViewImpl();
 
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
-  void set_context_writer(modular::ContextWriterPtr context_writer) {
+  void set_context_writer(fuchsia::modular::ContextWriterPtr context_writer) {
     schema_org_.set_context_writer(std::move(context_writer));
   }
 
-  void set_component_context(modular::ComponentContextPtr component_context) {
+  void set_component_context(
+      fuchsia::modular::ComponentContextPtr component_context) {
     schema_org_.set_component_context(std::move(component_context));
   }
 #endif

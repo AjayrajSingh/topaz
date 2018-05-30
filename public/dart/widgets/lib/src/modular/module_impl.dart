@@ -4,7 +4,7 @@
 
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.story.dart/story.dart';
 
 /// Called when Module connects to its [ModuleContext].

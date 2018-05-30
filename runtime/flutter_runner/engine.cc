@@ -96,7 +96,8 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 
   // Grab the accessibilty context writer that can understand the semtics tree
   // on the platform view.
-  fidl::InterfaceHandle<modular::ContextWriter> accessibility_context_writer;
+  fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
+      accessibility_context_writer;
   application_context.ConnectToEnvironmentService(
       accessibility_context_writer.NewRequest());
 

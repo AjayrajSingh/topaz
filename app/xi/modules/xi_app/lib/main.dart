@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fuchsia/fuchsia.dart';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_ledger/fidl.dart';
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:xi_widgets/widgets.dart';
 

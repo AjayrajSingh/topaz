@@ -9,7 +9,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.media.flutter/media_player.dart';
 import 'package:lib.media.flutter/media_player_controller.dart';
 import 'package:fidl_media_player/fidl.dart' as media_player;
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuchsia/fuchsia.dart';

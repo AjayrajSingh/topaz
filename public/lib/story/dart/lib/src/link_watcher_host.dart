@@ -5,13 +5,13 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_modular/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_modular/fidl.dart' as fidl;
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 
 import 'link_watcher_impl.dart';
 
-export 'package:fidl_modular/fidl.dart';
+export 'package:fidl_fuchsia_modular/fidl.dart';
 
 /// Hosts a [LinkWatcherImpl] and manages the underlying [binding].
 class LinkWatcherHost {

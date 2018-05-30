@@ -9,7 +9,7 @@ import 'dart:convert';
 import 'package:armadillo/recent.dart';
 import 'package:fidl/fidl.dart' as bindings;
 import 'package:flutter/material.dart';
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_views_v1_token/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';

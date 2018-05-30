@@ -4,7 +4,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:fidl_modular_auth/fidl.dart';
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_presentation/fidl.dart';
 import 'package:fidl_speech/fidl.dart';
 import 'package:home_work_agent/home_work_proposer.dart';

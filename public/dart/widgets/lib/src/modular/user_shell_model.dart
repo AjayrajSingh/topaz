@@ -3,11 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
-export 'package:fidl_modular/fidl.dart'
+export 'package:fidl_fuchsia_modular/fidl.dart'
     show ContextReader, ContextWriter, SuggestionProvider, Link, StoryProvider,
     FocusProvider, FocusController, VisibleStoriesController,
     UserShellContext, IntelligenceServices;

@@ -45,6 +45,7 @@
 #include "third_party/rapidjson/rapidjson/writer.h"
 #include "topaz/examples/oauth_token_manager/credentials_generated.h"
 
+namespace fuchsia {
 namespace modular {
 namespace auth {
 
@@ -1543,6 +1544,7 @@ void OAuthTokenManagerApp::RefreshFirebaseToken(
 
 }  // namespace auth
 }  // namespace modular
+}  // namespace fuchsia
 
 int main(int argc, const char** argv) {
   auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);
@@ -1553,7 +1555,7 @@ int main(int argc, const char** argv) {
   async::Loop loop(&kAsyncLoopConfigMakeDefault);
   trace::TraceProvider trace_provider(loop.async());
 
-  modular::auth::OAuthTokenManagerApp app(&loop);
+  fuchsia::modular::auth::OAuthTokenManagerApp app(&loop);
   loop.Run();
   return 0;
 }

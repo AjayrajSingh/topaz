@@ -20,7 +20,7 @@ import 'package:meta/meta.dart';
 
 import 'service_client.dart';
 
-export 'package:fidl_modular/fidl.dart' show Intent;
+export 'package:fidl_fuchsia_modular/fidl.dart' show Intent;
 export 'package:lib.module_resolver.dart/intent_builder.dart'
     show IntentBuilder;
 export 'package:lib.module.dart/module.dart'

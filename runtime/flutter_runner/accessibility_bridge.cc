@@ -14,7 +14,7 @@
 namespace flutter {
 
 AccessibilityBridge::AccessibilityBridge(
-    fidl::InterfaceHandle<modular::ContextWriter> writer)
+    fidl::InterfaceHandle<fuchsia::modular::ContextWriter> writer)
     : writer_(writer.Bind()) {}
 
 AccessibilityBridge::~AccessibilityBridge() = default;

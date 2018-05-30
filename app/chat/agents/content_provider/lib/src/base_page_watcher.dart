@@ -4,7 +4,7 @@
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_ledger/fidl.dart';
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 

@@ -4,7 +4,7 @@
 
 import 'dart:convert' show json;
 
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_ledger/fidl.dart';
 import 'package:meta/meta.dart';
 

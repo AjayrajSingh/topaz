@@ -7,8 +7,8 @@
 #include <map>
 #include <set>
 
+#include <fuchsia/modular/cpp/fidl.h>
 #include <fuchsia/ui/input/cpp/fidl.h>
-#include <modular/cpp/fidl.h>
 #include <views_v1/cpp/fidl.h>
 #include <views_v1_token/cpp/fidl.h>
 
@@ -28,15 +28,14 @@ class PlatformView final : public shell::PlatformView,
                            public fuchsia::ui::input::InputMethodEditorClient,
                            public fuchsia::ui::input::InputListener {
  public:
-  PlatformView(PlatformView::Delegate& delegate,
-               std::string debug_label,
+  PlatformView(PlatformView::Delegate& delegate, std::string debug_label,
                blink::TaskRunners task_runners,
                fidl::InterfaceHandle<component::ServiceProvider>
                    parent_environment_service_provider,
                fidl::InterfaceHandle<views_v1::ViewManager> view_manager,
                fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner,
                zx::eventpair export_token,
-               fidl::InterfaceHandle<modular::ContextWriter>
+               fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
                    accessibility_context_writer,
                zx_handle_t vsync_event_handle);
 
@@ -63,7 +62,7 @@ class PlatformView final : public shell::PlatformView,
   fidl::Binding<fuchsia::ui::input::InputMethodEditorClient> ime_client_;
   fuchsia::ui::input::InputMethodEditorPtr ime_;
   component::ServiceProviderPtr parent_environment_service_provider_;
-  modular::ClipboardPtr clipboard_;
+  fuchsia::modular::ClipboardPtr clipboard_;
   AccessibilityBridge accessibility_bridge_;
   std::unique_ptr<Surface> surface_;
   blink::LogicalMetrics metrics_;

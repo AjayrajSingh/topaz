@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'package:fidl_bluetooth/fidl.dart' as bt;
 import 'package:fidl_bluetooth_low_energy/fidl.dart' as ble;
-import 'package:fidl_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
