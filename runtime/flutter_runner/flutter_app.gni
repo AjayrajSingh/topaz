@@ -4,14 +4,9 @@
 
 assert(is_fuchsia || is_fuchsia_host)
 
-import("//build/dart/dart_library.gni")
-import("//build/dart/toolchain.gni")
 import("//build/package.gni")
 import("//peridot/build/module_manifest.gni")
-import("//third_party/flutter/lib/ui/dart_ui.gni")
-import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
-import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
-import("//topaz/public/lib/ui/flutter/sdk_ext/sdk_ext.gni")
+import("//topaz/runtime/dart/dart_kernel.gni")
 
 declare_args() {
   flutter_default_app = "flutter_jit_app"
@@ -40,112 +35,37 @@ flutter_asset_tools_out_dir =
 flutter_asset_tools_bin =
     "$flutter_asset_tools_out_dir/dart-tools/fuchsia_asset_builder"
 
-_kernel_compiler_label =
-    "//topaz/runtime/dart_runner/kernel:kernel_compiler($host_toolchain)"
-_kernel_compiler_out_dir =
-    get_label_info(_kernel_compiler_label, "root_out_dir")
-_kernel_compiler = "$_kernel_compiler_out_dir/dart-tools/kernel_compiler"
-
 _entry_manifests = [
   "//third_party/dart/runtime/bin/dart_io_entries.txt",
   "//third_party/flutter/runtime/dart_vm_entry_points.txt",
   "//topaz/runtime/flutter_runner/dart_vm_entry_points_fuchsia.txt",
 ]
 
-template("_dart_kernel") {
-  assert(defined(invoker.dart_library_target_name),
-         "Must specify dart_library_target_name")
-  dart_library_target_name = invoker.dart_library_target_name
-
-  action(target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
-    }
-
-    kernel_path = "$target_gen_dir/${target_name}.dil"
-
-    depfile = "${kernel_path}.d"
-    deps = [
-      ":$dart_library_target_name",
-      "//topaz/runtime/flutter_runner/kernel:kernel_platform_files",
-      _kernel_compiler_label,
-    ]
-    outputs = [
-      kernel_path,
-    ]
-    if (defined(invoker.manifest)) {
-      outputs += [ invoker.manifest ]
-    }
-
-    dart_target_gen_dir =
-        get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-    rebased_packages_path =
-        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
-
-    script = _kernel_compiler
-    args = invoker.args + [
-             "--target=flutter_runner",
-             "--sdk-root",
-             rebase_path("$root_out_dir/flutter_runner_patched_sdk"),
-             "--packages",
-             rebased_packages_path,
-             "--depfile",
-             rebase_path(depfile, root_build_dir),
-             "--output",
-             rebase_path(kernel_path, root_build_dir),
-           ]
-    if (defined(invoker.manifest)) {
-      args += [
-        "--manifest",
-        rebase_path(invoker.manifest),
-      ]
-    }
-    if (is_debug) {
-      args += [ "--embed-sources" ]
-    }
-    args += [ rebase_path(invoker.main_dart) ]
-  }
-}
-
 template("flutter_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
-  dart_library_target_name = target_name + "_dart_library"
+  kernel_target_name = target_name + "_kernel"
+  kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
 
-  dart_library(dart_library_target_name) {
+  dart_kernel(target_name) {
+    platform_name = "flutter_runner"
+    platform_deps =
+        [ "//topaz/runtime/flutter_runner/kernel:kernel_platform_files" ]
+    platform_path = "$root_out_dir/flutter_runner_patched_sdk"
+
     forward_variables_from(invoker,
                            [
                              "deps",
                              "disable_analysis",
                              "non_dart_deps",
+                             "sources",
                              "source_dir",
+                             "package_name",
                            ])
 
-    if (defined(invoker.package_name)) {
-      package_name = invoker.package_name
-    } else {
-      infer_package_name = true
-    }
-
-    sources = []
-    if (defined(invoker.sources)) {
-      sources += invoker.sources
-    }
-    source_base = "lib"
-    if (defined(invoker.source_dir)) {
-      source_base = invoker.source_dir
-    }
-    sources += [ rebase_path(invoker.main_dart, source_base) ]
-  }
-
-  kernel_target_name = target_name + "_kernel"
-  kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
-
-  _dart_kernel(kernel_target_name) {
     main_dart = invoker.main_dart
     manifest = kernel_manifest
     args = []
-    dart_library_target_name = dart_library_target_name
   }
 
   if (defined(invoker.resources)) {
@@ -156,6 +76,7 @@ template("flutter_jit_app") {
 
   asset_manifest = "$target_gen_dir/build/${target_name}_pkgassets"
 
+  dart_library_target_name = "${target_name}_dart_library"
   dart_target_gen_dir =
       get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
   dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
@@ -262,38 +183,25 @@ template("flutter_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   dart_library_target_name = target_name + "_dart_library"
+  kernel_target_name = target_name + "_kernel"
+  kernel_path = "$target_gen_dir/${kernel_target_name}.dil"
 
-  dart_library(dart_library_target_name) {
+  dart_kernel(target_name) {
+    platform_name = "flutter_runner"
+    platform_deps =
+        [ "//topaz/runtime/flutter_runner/kernel:kernel_platform_files" ]
+    platform_path = "$root_out_dir/flutter_runner_patched_sdk"
+
     forward_variables_from(invoker,
                            [
                              "deps",
                              "disable_analysis",
                              "non_dart_deps",
+                             "sources",
                              "source_dir",
+                             "package_name",
                            ])
 
-    if (defined(invoker.package_name)) {
-      package_name = invoker.package_name
-    } else {
-      infer_package_name = true
-    }
-
-    sources = []
-    if (defined(invoker.sources)) {
-      sources += invoker.sources
-    }
-    source_base = "lib"
-    if (defined(invoker.source_dir)) {
-      source_base = invoker.source_dir
-    }
-    sources += [ rebase_path(invoker.main_dart, source_base) ]
-  }
-
-  kernel_target_name = target_name + "_kernel"
-  kernel_path = "$target_gen_dir/${kernel_target_name}.dil"
-
-  _dart_kernel(kernel_target_name) {
-    dart_library_target_name = dart_library_target_name
     main_dart = invoker.main_dart
     args = [ "--aot" ]
   }
@@ -351,6 +259,7 @@ template("flutter_aot_app") {
       # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
       "--reify_generic_functions",
       "--strong",
+
       # Re-enable once enabled in //third_party/flutter/runtime/dart_vm.cc
       # "--sync-async",
       "--deterministic",

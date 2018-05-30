@@ -14,8 +14,8 @@ dependencies:
 
 dependency_overrides:
   front_end:
-    path: ../../../../third_party/dart/pkg/front_end/
+    path: ../../../third_party/dart/pkg/front_end/
   kernel:
-    path: ../../../../third_party/dart/pkg/kernel/
+    path: ../../../third_party/dart/pkg/kernel/
   vm:
-    path: ../../../../third_party/dart/pkg/vm/
+    path: ../../../third_party/dart/pkg/vm/

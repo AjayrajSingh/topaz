@@ -2,11 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_library.gni")
-import("//build/dart/toolchain.gni")
 import("//build/package.gni")
-import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
-import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
+import("//topaz/runtime/dart/dart_kernel.gni")
 
 declare_args() {
   # Controls whether dart_app() targets generate JIT or AOT Dart snapshots.
@@ -32,71 +29,10 @@ declare_args() {
   }
 }
 
-_kernel_compiler_label =
-    "//topaz/runtime/dart_runner/kernel:kernel_compiler($host_toolchain)"
-_kernel_compiler_out_dir =
-    get_label_info(_kernel_compiler_label, "root_out_dir")
-_kernel_compiler = "$_kernel_compiler_out_dir/dart-tools/kernel_compiler"
-
 _entry_manifests = [
   "//third_party/dart/runtime/bin/dart_io_entries.txt",
   "//topaz/runtime/dart_runner/entry_points.txt",
 ]
-
-template("_dart_kernel") {
-  assert(defined(invoker.dart_library_target_name),
-         "Must specify dart_library_target_name")
-  dart_library_target_name = invoker.dart_library_target_name
-
-  action(target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
-    }
-
-    kernel_path = "$target_gen_dir/${target_name}.dil"
-
-    depfile = "${kernel_path}.d"
-    deps = [
-      ":$dart_library_target_name",
-      "//topaz/runtime/dart_runner/kernel:kernel_platform_files",
-      _kernel_compiler_label,
-    ]
-    outputs = [
-      kernel_path,
-    ]
-    if (defined(invoker.manifest)) {
-      outputs += [ invoker.manifest ]
-    }
-
-    dart_target_gen_dir =
-        get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-    rebased_packages_path =
-        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
-
-    script = _kernel_compiler
-    args = invoker.args + [
-             "--target=dart_runner",
-             "--sdk-root",
-             rebase_path("$root_out_dir/dart_runner_patched_sdk"),
-             "--packages",
-             rebased_packages_path,
-             "--depfile",
-             rebase_path(depfile, root_build_dir),
-             "--output",
-             rebase_path(kernel_path, root_build_dir),
-           ]
-    if (defined(invoker.manifest)) {
-      args += [
-        "--manifest",
-        rebase_path(invoker.manifest),
-      ]
-    }
-    if (is_debug) {
-      args += [ "--embed-sources" ]
-    }
-    args += [ rebase_path(invoker.main_dart) ]
-  }
-}
 
 template("dart_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
@@ -116,49 +52,34 @@ template("dart_jit_app") {
     dbc = true
   }
 
-  dart_library_target_name = target_name + "_dart_library"
+  kernel_target_name = target_name + "_kernel"
+  kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
 
-  dart_library(dart_library_target_name) {
+  dart_kernel(target_name) {
+    platform_name = "dart_runner"
+    platform_deps =
+        [ "//topaz/runtime/dart_runner/kernel:kernel_platform_files" ]
+    platform_path = "$root_out_dir/dart_runner_patched_sdk"
+
     forward_variables_from(invoker,
                            [
                              "deps",
                              "disable_analysis",
                              "non_dart_deps",
+                             "sources",
                              "source_dir",
+                             "package_name",
                            ])
 
-    if (defined(invoker.package_name)) {
-      package_name = invoker.package_name
-    } else {
-      infer_package_name = true
-    }
-
-    sources = []
-    if (defined(invoker.sources)) {
-      sources += invoker.sources
-    }
-    source_base = "lib"
-    if (defined(invoker.source_dir)) {
-      source_base = invoker.source_dir
-    }
-    sources += [ rebase_path(invoker.main_dart, source_base) ]
-  }
-
-  kernel_target_name = target_name + "_kernel"
-  kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
-
-  _dart_kernel(kernel_target_name) {
     main_dart = invoker.main_dart
     manifest = kernel_manifest
+    args = []
     if (dbc) {
-      args = [
+      args += [
         "--gen-bytecode",
         "--drop-ast",
       ]
-    } else {
-      args = []
     }
-    dart_library_target_name = dart_library_target_name
   }
 
   package(target_name) {
@@ -226,39 +147,25 @@ template("dart_aot_app") {
     product_suffix = "_product"
   }
 
-  dart_library_target_name = target_name + "_dart_library"
+  kernel_target_name = target_name + "_kernel"
+  kernel_path = "$target_gen_dir/${kernel_target_name}.dil"
 
-  dart_library(dart_library_target_name) {
+  dart_kernel(target_name) {
+    platform_name = "dart_runner"
+    platform_deps =
+        [ "//topaz/runtime/dart_runner/kernel:kernel_platform_files" ]
+    platform_path = "$root_out_dir/dart_runner_patched_sdk"
+
     forward_variables_from(invoker,
                            [
                              "deps",
                              "disable_analysis",
                              "non_dart_deps",
+                             "sources",
                              "source_dir",
+                             "package_name",
                            ])
 
-    if (defined(invoker.package_name)) {
-      package_name = invoker.package_name
-    } else {
-      infer_package_name = true
-    }
-
-    sources = []
-    if (defined(invoker.sources)) {
-      sources += invoker.sources
-    }
-    source_base = "lib"
-    if (defined(invoker.source_dir)) {
-      source_base = invoker.source_dir
-    }
-    sources += [ rebase_path(invoker.main_dart, source_base) ]
-  }
-
-  kernel_target_name = target_name + "_kernel"
-  kernel_path = "$target_gen_dir/${kernel_target_name}.dil"
-
-  _dart_kernel(kernel_target_name) {
-    dart_library_target_name = dart_library_target_name
     main_dart = invoker.main_dart
     args = [ "--aot" ]
   }

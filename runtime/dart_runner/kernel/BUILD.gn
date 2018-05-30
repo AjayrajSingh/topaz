@@ -29,9 +29,7 @@ template("create_kernel_core_snapshot") {
     product_suffix = "_product"
   }
   action(target_name) {
-    deps = gen_snapshot_deps + [
-      ":kernel_platform_files",
-    ]
+    deps = gen_snapshot_deps + [ ":kernel_platform_files" ]
 
     platform_dill = "$root_out_dir/dart_runner_patched_sdk/platform_strong.dill"
     compilation_trace = "//topaz/runtime/flutter_runner/compilation_trace.txt"
@@ -67,7 +65,8 @@ template("create_kernel_core_snapshot") {
       "--sync-async",
       "--deterministic",
       "--snapshot_kind=core-jit",
-      "--load_compilation_trace=" + rebase_path(compilation_trace, root_build_dir),
+      "--load_compilation_trace=" +
+          rebase_path(compilation_trace, root_build_dir),
       "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
       "--vm_snapshot_instructions=" +
           rebase_path(vm_snapshot_instructions, root_build_dir),
@@ -89,17 +88,4 @@ create_kernel_core_snapshot("kernel_core_snapshot") {
 
 create_kernel_core_snapshot("kernel_core_snapshot_product") {
   product = true
-}
-
-dart_tool("kernel_compiler") {
-  main_dart = "compiler.dart"
-  source_dir = "."
-  disable_analysis = true
-
-  deps = [
-    "//third_party/dart-pkg/pub/args",
-    "//third_party/dart/pkg/front_end",
-    "//third_party/dart/pkg/kernel",
-    "//third_party/dart/pkg/vm",
-  ]
 }
