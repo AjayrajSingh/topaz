@@ -9,10 +9,11 @@ import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:logging/logging.dart';
+import 'package:logging/logging.dart' show Level;
 import 'package:stack_trace/stack_trace.dart';
 
-export 'package:logging/logging.dart';
+import 'fuchsia_log_record.dart';
+import 'fuchsia_logger.dart';
 
 const int _maxGlobalTags = 3;
 const int _maxCombinedTags = 5;
@@ -49,7 +50,7 @@ typedef LogWriter = void Function(LogWriterMessage message);
 ///
 /// [logWriter] is intended only for testing purposes.
 void setupLogger({
-  Logger logger,
+  FuchsiaLogger logger,
   String name,
   Level level,
   bool forceShowCodeLocation,
@@ -61,17 +62,12 @@ void setupLogger({
       Platform.script?.pathSegments?.lastWhere((_) => true, orElse: () => null);
   final List<String> approvedTags = _verifyGlobalTags(globalTags);
 
-  // Use the root logger by default.
-  logger ??= Logger.root;
-
-  // Use the INFO level by default.
-  logger.level = level ?? Level.INFO;
+  log = logger ?? new FuchsiaLogger(level ?? Level.INFO);
 
   LogWriter activeLogWriter =
       logWriter ?? (logSocket == null ? writeLogToStdout : writeLogToSocket);
   _logSocket = logSocket;
   _loggerName = scopeName;
-  log = logger;
 
   bool inCheckedMode = false;
   assert(() {
@@ -79,7 +75,7 @@ void setupLogger({
     return true;
   }());
 
-  logger.onRecord.listen((LogRecord rec) {
+  log.onRecord.listen((FuchsiaLogRecord rec) {
     String codeLocation;
     if (forceShowCodeLocation ?? inCheckedMode) {
       final Trace trace = new Trace.current();
@@ -106,8 +102,8 @@ void setupLogger({
 /// All information required to construct a log message to either stdout or
 /// Zircon logging Socket.
 class LogWriterMessage {
-  /// LogRecord from dart.Logger
-  final LogRecord logRecord;
+  /// Log record created by fuchsiaLogger
+  final FuchsiaLogRecord logRecord;
 
   /// Name from the logger, typically the module name
   final String scopeName;
@@ -125,8 +121,8 @@ class LogWriterMessage {
 
 /// The default logger to be used by dart applications. Each application should
 /// call [setupLogger()] in their main function to properly configure it.
-Logger log = new Logger.detached('uninitialized')
-  ..onRecord.listen((LogRecord rec) {
+FuchsiaLogger log = new FuchsiaLogger(Level.ALL)
+  ..onRecord.listen((FuchsiaLogRecord rec) {
     print('WARNING: The logger is not initialized properly.');
     print('WARNING: Please call setupLogger() from your main function.');
     print('[${rec.level}] ${rec.message}');
@@ -190,8 +186,7 @@ void writeLogToSocket(LogWriterMessage message) {
   ByteData bytes = new ByteData(_socketBufferLength)
     ..setUint64(0, pid, Endian.little)
     ..setUint64(8, Isolate.current.hashCode, Endian.little)
-    ..setUint64(
-        16, message.logRecord.time.microsecondsSinceEpoch, Endian.little)
+    ..setUint64(16, message.logRecord.systemTime, Endian.little)
     ..setUint32(24, message.logRecord.level.value, Endian.little)
     ..setUint32(28, 0, Endian.little); // TODO droppedLogs
   int byteOffset = 32;
@@ -277,8 +272,7 @@ int _setString(ByteData bytes, int firstByteOffset, String value, int maxLen) {
 /// A convenient function for displaying the stack trace of the caller in the
 /// console.
 void showStackTrace() {
-  final Trace trace = new Trace.current(1);
-  print('$trace');
+  print(new Trace.current(1).toString());
 }
 
 /// Whether a message for [value]'s level is tracable in this logger.
@@ -292,25 +286,26 @@ void trace(String name) {
   }
 }
 
-/// From the given [Trace], finds the first [Frame] after the `logging` package
-/// and returns that frame. If no such [Frame] is found, returns `null`.
+/// From the given [Trace], finds the last [Frame] from this package
+/// (lib.app.dart) and then the next [Frame] not in this package. That frame
+/// represents whomever called the log function and is returned.
+/// If no such [Frame] is found, returns `null`.
 ///
 /// SEE: https://github.com/dart-lang/logging/issues/32
 Frame _findCallerFrame(Trace trace) {
   bool foundLogging = false;
+  Frame matchedFrame;
 
   for (int i = 0; i < trace.frames.length; ++i) {
     final Frame frame = trace.frames[i];
-
-    final bool loggingPackage = frame.package == 'logging';
+    final bool loggingPackage = frame.package == 'lib.app.dart';
     if (foundLogging && !loggingPackage) {
-      return frame;
+      matchedFrame = frame;
     }
-
     foundLogging = loggingPackage;
   }
 
-  return null;
+  return matchedFrame;
 }
 
 /// Remaps the level string to the ones used in FTL.

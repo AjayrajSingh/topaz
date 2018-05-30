@@ -29,17 +29,21 @@ dart_library("dart") {
 }
 
 dart_test("dart_app_tests") {
+  source_dir = "."
+
   sources = [
-    "log_writer_test.dart",
-    "socket_validate.dart",
-    "socket_with_location_test.dart",
-    "socket_with_tags_test.dart",
-    "stdout_with_exception.dart",
-    "socket_test.dart",
-    "socket_with_exception_test.dart",
-    "socket_with_stacktrace_test.dart",
-    "stdout_test.dart",
-    "stdout_with_location.dart",
+    "test/fuchsia_log_record_test.dart",
+    "test/legacy_logger_test.dart",
+    "test/log_writer_test.dart",
+    "test/socket_validate.dart",
+    "test/socket_with_location_test.dart",
+    "test/socket_with_tags_test.dart",
+    "test/socket_with_exception_test.dart",
+    "test/socket_with_stacktrace_test.dart",
+    "test/socket_test.dart",
+    "test/stdout_test.dart",
+    "test/stdout_with_exception.dart",
+    "test/stdout_with_location.dart",
   ]
 
   deps = [

@@ -46,7 +46,7 @@ void _testSimpleMessage() {
 
   log.info('hello');
   expect(logger.logMessages.length, equals(1));
-  expect(logger.logMessages[0].scopeName, equals('listener.dart'));
+  expect(logger.logMessages[0].scopeName, equals('main.dart'));
   expect(logger.logMessages[0].tags.isEmpty, equals(true));
   expect(logger.logMessages[0].logRecord.message, equals('hello'));
   expect(logger.logMessages[0].logRecord.level, equals(Level.INFO));

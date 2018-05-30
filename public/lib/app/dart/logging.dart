@@ -7,5 +7,7 @@
 // FIDL related files here will break some of the host-side flutter tests we
 // have. (See: https://fuchsia.atlassian.net/browse/SO-435)
 
+export 'package:logging/logging.dart' show Level;
+
 export 'src/frame_rate_tracer.dart';
 export 'src/logging.dart';
