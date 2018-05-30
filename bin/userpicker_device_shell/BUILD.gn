@@ -8,7 +8,12 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_aot_app("userpicker_device_shell") {
   main_dart = "lib/main.dart"
 
-  sandbox = "meta/sandbox"
+  meta = [
+    {
+      path = rebase_path("meta/userpicker_device_shell.cmx")
+      dest = "userpicker_device_shell.cmx"
+    },
+  ]
 
   package_name = "userpicker_device_shell"
 
