@@ -206,6 +206,10 @@ template("dart_jit_app") {
         },
       ]
     }
+
+    if (defined(invoker.meta)) {
+      meta += invoker.meta
+    }
   }
 }
 
@@ -403,6 +407,10 @@ template("dart_aot_app") {
           dest = "sandbox"
         },
       ]
+    }
+
+    if (defined(invoker.meta)) {
+      meta += invoker.meta
     }
   }
 }
