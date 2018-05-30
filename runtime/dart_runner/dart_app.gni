@@ -4,6 +4,7 @@
 
 import("//build/package.gni")
 import("//topaz/runtime/dart/dart_kernel.gni")
+import("//third_party/dart/build/dart/dart_action.gni")
 
 declare_args() {
   # Controls whether dart_app() targets generate JIT or AOT Dart snapshots.
@@ -197,6 +198,10 @@ template("dart_aot_app") {
     shared_snapshot_instructions_path = "//topaz/runtime/dart_runner/empty"
   }
 
+  stats_target_name = "${target_name}_stats"
+  stats_json_path = "$target_gen_dir/${target_name}/stats/symbol_sizes.json"
+  stats_html_dir = "$target_gen_dir/${target_name}/stats"
+
   action(snapshot_target_name) {
     if (defined(invoker.testonly)) {
       testonly = invoker.testonly
@@ -216,6 +221,7 @@ template("dart_aot_app") {
       vm_snapshot_instructions_path,
       snapshot_data_path,
       snapshot_instructions_path,
+      stats_json_path,
     ]
 
     if (product) {
@@ -239,6 +245,7 @@ template("dart_aot_app") {
           rebase_path(snapshot_instructions_path),
       "--shared_data=" + rebase_path(shared_snapshot_data_path),
       "--shared_instructions=" + rebase_path(shared_snapshot_instructions_path),
+      "--print-instructions-sizes-to=" + rebase_path(stats_json_path),
     ]
     foreach(entry_manifest, _entry_manifests) {
       args +=
@@ -258,6 +265,27 @@ template("dart_aot_app") {
     pool = "//topaz/runtime/dart_runner:dart_aot_pool($target_toolchain)"
   }
 
+  dart_action(stats_target_name) {
+    if (defined(invoker.testonly)) {
+      testonly = invoker.testonly
+    }
+
+    deps = [
+      ":$snapshot_target_name",
+    ]
+    script = "//third_party/dart/pkg/vm/bin/run_binary_size_analysis.dart"
+    inputs = [
+      stats_json_path,
+    ]
+    outputs = [
+      "$stats_html_dir/index.html",
+    ]
+    args = [
+      rebase_path(stats_json_path),
+      rebase_path(stats_html_dir),
+    ]
+  }
+
   package(target_name) {
     forward_variables_from(invoker,
                            [
@@ -274,7 +302,10 @@ template("dart_aot_app") {
       non_dart_deps = invoker.non_dart_deps
     }
 
-    deps = [ ":$snapshot_target_name" ] + non_dart_deps + shared_snapshot_deps
+    deps = [
+             ":$snapshot_target_name",
+             ":$stats_target_name",
+           ] + non_dart_deps + shared_snapshot_deps
 
     resources = [
       {
