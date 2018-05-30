@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <fdio/io.h>
 #include <fdio/private.h>
-#include <launchpad/launchpad.h>
+#include <fdio/spawn.h>
 #include <lib/async/default.h>
 #include <poll.h>
 #include <unistd.h>
@@ -21,9 +21,10 @@ namespace {
 
 std::vector<const char*> GetArgv(const std::vector<std::string>& command) {
   std::vector<const char*> argv;
-  argv.reserve(command.size());
+  argv.reserve(command.size() + 1);
   for (const auto& arg : command)
     argv.push_back(arg.c_str());
+  argv.push_back(nullptr);
   return argv;
 }
 
@@ -57,22 +58,22 @@ zx_status_t PTYServer::Run(std::vector<std::string> command,
     return ZX_ERR_NOT_FOUND;
   }
 
+  fdio_spawn_action_t action;
+  action.action = FDIO_SPAWN_ACTION_TRANSFER_FD;
+  action.fd.local_fd = client_fd;
+  action.fd.target_fd = FDIO_FLAG_USE_FOR_STDIO;
+
   auto argv = GetArgv(command);
-  launchpad_t* lp;
-  launchpad_create(0, argv[0], &lp);
-  launchpad_load_from_file(lp, argv[0]);
-  launchpad_set_args(lp, argv.size(), argv.data());
-  launchpad_transfer_fd(lp, client_fd, FDIO_FLAG_USE_FOR_STDIO);
-  launchpad_clone(
-      lp, LP_CLONE_FDIO_NAMESPACE | LP_CLONE_ENVIRON | LP_CLONE_DEFAULT_JOB);
 
   zx_handle_t proc;
-  const char* errmsg;
-  zx_status_t status = launchpad_go(lp, &proc, &errmsg);
+  char err_msg[FDIO_SPAWN_ERR_MSG_MAX_LENGTH];
+  zx_status_t status = fdio_spawn_etc(
+      ZX_HANDLE_INVALID, FDIO_SPAWN_CLONE_ALL & ~FDIO_SPAWN_CLONE_STDIO,
+      argv[0], argv.data(), nullptr, 1, &action, &proc, err_msg);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Cannot run executable " << argv[0] << " due to error "
                    << status << " (" << zx_status_get_string(status)
-                   << "): " << errmsg;
+                   << "): " << err_msg;
     return status;
   }
   process_.reset(proc);
@@ -110,7 +111,8 @@ void PTYServer::Write(const void* bytes, size_t num_bytes) {
   ssize_t remaining = num_bytes;
   ssize_t pos = 0;
   while (remaining) {
-    ssize_t len = write(pty_.get(), static_cast<const char*>(bytes) + pos, remaining);
+    ssize_t len =
+        write(pty_.get(), static_cast<const char*>(bytes) + pos, remaining);
     if (len < 0) {
       FXL_LOG(ERROR) << "Failed to send";
       return;
