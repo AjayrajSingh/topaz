@@ -23,14 +23,6 @@ group("dart_unittests") {
   ]
 }
 
-group("host_dart_unittests") {
-  testonly = true
-
-  deps = [
-    ":dart_unittests($host_toolchain)"
-  ]
-}
-
 # This target, if included in the built image, will cause the listed module
 # packages (which must also be included in the built image) to have their
 # manifests indexed by the on-device module resolver when the user logs in.

@@ -1,6 +1,25 @@
 {
+    "host_tests" : [
+      "//topaz/app/contacts/agents/content_provider:contacts_content_provider_tests",
+      "//topaz/app/contacts/modules/contact_list:contact_list_tests",
+      "//topaz/app/contacts/modules/contacts_picker:contacts_picker_tests",
+      "//topaz/app/dashboard:dashboard_tests",
+      "//topaz/app/documents/packages/utils:document_util_tests",
+      "//topaz/bin/user_shell/capybara_user_shell:capybara_user_shell_tests",
+      "//topaz/public/dart/fixtures:dart_fixture_tests",
+      "//topaz/public/dart/sledge:dart_sledge_tests",
+      "//topaz/public/dart/widgets:dart_widget_tests",
+      "//topaz/public/lib/app/dart:dart_app_tests",
+      "//topaz/public/lib/schemas/dart:dart_schema_tests",
+      "//topaz/shell/armadillo:armadillo_tests",
+      "//topaz/shell/keyboard:keyboard_tests",
+      "//topaz/shell/mondrian_story_shell:mondrian_story_shell_tests",
+      "//topaz/tools/dartfmt_extras:dartfmt_extras_tests",
+      "//topaz/tools/mod:mod_tests",
+      "//topaz/tools/widget_explorer/packages/widget_explorer_core:widget_explorer_core_tests",
+      "//topaz/tools/widget_explorer/tools/widget_explorer_gen:widget_explorer_gen_tests"
+    ],
     "labels": [
-        "//topaz:dart_unittests",
-        "//topaz:host_dart_unittests"
+        "//topaz:dart_unittests"
     ]
 }
