@@ -12,15 +12,15 @@
 #include <memory>
 #include <utility>
 
+#include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 #include <modular_auth/cpp/fidl.h>
 #include <network/cpp/fidl.h>
 #include <trace-provider/provider.h>
-#include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <web_view/cpp/fidl.h>
 
-#include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/async/cpp/operation.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fidl/cpp/optional.h"
@@ -440,7 +440,7 @@ class OAuthTokenManagerApp : modular_auth::AccountProvider {
                             FirebaseTokenCallback callback);
   async::Loop* const loop_;
 
-  std::shared_ptr<component::ApplicationContext> application_context_;
+  std::shared_ptr<component::StartupContext> startup_context_;
 
   modular_auth::AccountProviderContextPtr account_provider_context_;
 
@@ -622,7 +622,7 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
         "   \"returnSecureToken\": true," +
         R"(   "requestUri": "http://localhost")" + "}";
 
-    app_->application_context_->ConnectToEnvironmentService(
+    app_->startup_context_->ConnectToEnvironmentService(
         network_service_.NewRequest());
     network_service_->CreateURLLoader(url_loader_.NewRequest());
 
@@ -797,7 +797,7 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
                                      "&client_id=" + kClientId +
                                      "&grant_type=refresh_token";
 
-    app_->application_context_->ConnectToEnvironmentService(
+    app_->startup_context_->ConnectToEnvironmentService(
         network_service_.NewRequest());
     network_service_->CreateURLLoader(url_loader_.NewRequest());
 
@@ -1010,7 +1010,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
         "code=" + code + "&redirect_uri=" + kRedirectUri +
         "&client_id=" + kClientId + "&grant_type=authorization_code";
 
-    app_->application_context_->ConnectToEnvironmentService(
+    app_->startup_context_->ConnectToEnvironmentService(
         network_service_.NewRequest());
     network_service_->CreateURLLoader(url_loader_.NewRequest());
 
@@ -1124,7 +1124,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
     component::LaunchInfo web_view_launch_info;
     web_view_launch_info.url = kWebViewUrl;
     web_view_launch_info.directory_request = web_view_services.NewRequest();
-    app_->application_context_->launcher()->CreateApplication(
+    app_->startup_context_->launcher()->CreateApplication(
         std::move(web_view_launch_info), web_view_controller_.NewRequest());
     web_view_controller_.set_error_handler([this] {
       FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
@@ -1224,7 +1224,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
     }
 
     // revoke persistent tokens on backend IDP server.
-    app_->application_context_->ConnectToEnvironmentService(
+    app_->startup_context_->ConnectToEnvironmentService(
         network_service_.NewRequest());
     network_service_->CreateURLLoader(url_loader_.NewRequest());
 
@@ -1364,7 +1364,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
 
     const std::string access_token =
         app_->oauth_tokens_[account_->id].access_token;
-    app_->application_context_->ConnectToEnvironmentService(
+    app_->startup_context_->ConnectToEnvironmentService(
         network_service_.NewRequest());
     network_service_->CreateURLLoader(url_loader_.NewRequest());
 
@@ -1439,10 +1439,9 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
 
 OAuthTokenManagerApp::OAuthTokenManagerApp(async::Loop* loop)
     : loop_(loop),
-      application_context_(
-          component::ApplicationContext::CreateFromStartupInfo()),
+      startup_context_(component::StartupContext::CreateFromStartupInfo()),
       binding_(this) {
-  application_context_->outgoing().AddPublicService<AccountProvider>(
+  startup_context_->outgoing().AddPublicService<AccountProvider>(
       [this](fidl::InterfaceRequest<AccountProvider> request) {
         binding_.Bind(std::move(request));
       });

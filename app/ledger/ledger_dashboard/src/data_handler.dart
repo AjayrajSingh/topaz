@@ -11,7 +11,7 @@ abstract class DataHandler {
   String get name;
 
   /// Initialize the data handler
-  void init(ApplicationContext appContext);
+  void init(StartupContext context);
 
   /// Handle an HTTP request for data from this handler
   bool handleRequest(String requestString, HttpRequest request);

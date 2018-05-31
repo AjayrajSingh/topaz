@@ -14,8 +14,8 @@ import 'package:fidl_fuchsia_xi/fidl.dart' as service;
 import 'package:xi_client/client.dart';
 import 'package:zircon/zircon.dart';
 
-/// [ApplicationContext] exported here so it can be used in `main.dart`.
-final ApplicationContext kContext = new ApplicationContext.fromStartupInfo();
+/// [StartupContext] exported here so it can be used in `main.dart`.
+final StartupContext kContext = new StartupContext.fromStartupInfo();
 
 /// Fuchsia specific [XiClient].
 class XiFuchsiaClient extends XiClient {
@@ -34,8 +34,8 @@ class XiFuchsiaClient extends XiClient {
       return;
     }
 
-    final LaunchInfo launchInfo = new LaunchInfo(
-        url: 'xi_core', directoryRequest: _services.request());
+    final LaunchInfo launchInfo =
+        new LaunchInfo(url: 'xi_core', directoryRequest: _services.request());
     kContext.launcher.createApplication(launchInfo, null);
     // TODO(jasoncampbell): File a bug for how to get rid of the Dart warning
     // "Unsafe implicit cast from InterfaceHandle<dynamic>"?

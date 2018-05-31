@@ -14,7 +14,7 @@
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <web_view/cpp/fidl.h>
 
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/callback/cancellable.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/functional/closure.h"
@@ -26,7 +26,7 @@ namespace spotify_auth_provider {
 class SpotifyAuthProviderImpl : public auth::AuthProvider,
                                 web_view::WebRequestDelegate {
  public:
-  SpotifyAuthProviderImpl(component::ApplicationContext* app_context,
+  SpotifyAuthProviderImpl(component::StartupContext* context,
                           network_wrapper::NetworkWrapper* network_wrapper,
                           fidl::InterfaceRequest<auth::AuthProvider> request);
 
@@ -75,7 +75,7 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
   void OnResponse(std::function<void(network::URLResponse response)> callback,
                   network::URLResponse response);
 
-  component::ApplicationContext* app_context_;
+  component::StartupContext* context_;
   component::ComponentControllerPtr web_view_controller_;
   auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;

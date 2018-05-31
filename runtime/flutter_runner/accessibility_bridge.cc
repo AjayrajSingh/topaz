@@ -6,7 +6,7 @@
 
 #include <unordered_set>
 
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "third_party/rapidjson/rapidjson/document.h"
 #include "third_party/rapidjson/rapidjson/stringbuffer.h"
 #include "third_party/rapidjson/rapidjson/writer.h"
@@ -51,8 +51,7 @@ void AccessibilityBridge::UpdateSemantics(
 }
 
 void AccessibilityBridge::UpdateVisitedForNodeAndChildren(
-    const int id,
-    std::vector<int>* visited_nodes) {
+    const int id, std::vector<int>* visited_nodes) {
   std::map<int, blink::SemanticsNode>::const_iterator it =
       semantics_nodes_.find(id);
   if (it == semantics_nodes_.end()) {

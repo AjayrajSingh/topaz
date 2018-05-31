@@ -101,12 +101,11 @@ const Color _kSunColor = Colors.yellow;
 const Duration _kVideoSkipAmount = const Duration(seconds: 10);
 const Duration _kVideoProgressTimeout = const Duration(milliseconds: 250);
 
-final ApplicationContext _applicationContext =
-    new ApplicationContext.fromStartupInfo();
+final StartupContext _startupContext = new StartupContext.fromStartupInfo();
 
 Future<Null> main() async {
   MediaPlayerController controller = new MediaPlayerController(
-    _applicationContext.environmentServices,
+    _startupContext.environmentServices,
   )..open(_kVideoUri);
 
   _VideoModel videoModel = new _VideoModel(controller: controller);

@@ -55,25 +55,23 @@ class LifecycleImpl implements Lifecycle {
 }
 
 void main(List<String> args) {
-  final ApplicationContext appContext =
-      new ApplicationContext.fromStartupInfo();
+  final StartupContext context = new StartupContext.fromStartupInfo();
 
   // Assemble the list of DataHandlers
   addDataHandler(new LedgerDebugDataHandler());
 
   // Initialize the DataHandlers
   _dataHandlerMap.forEach((String name, DataHandler handler) {
-    handler.init(appContext);
+    handler.init(context);
   });
 
   final LifecycleImpl lifeCycleImpl = new LifecycleImpl();
-  appContext.outgoingServices
-    .addServiceForName(
-      lifeCycleImpl.bindLifecycle,
-      Lifecycle.$serviceName,
-    );
+  context.outgoingServices.addServiceForName(
+    lifeCycleImpl.bindLifecycle,
+    Lifecycle.$serviceName,
+  );
 
-  appContext.close();
+  context.close();
 
   // Read the config file from disk
   final File configFile = new File(path.join(_configDir, _configFilename));

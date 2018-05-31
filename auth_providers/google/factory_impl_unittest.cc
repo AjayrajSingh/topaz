@@ -17,9 +17,8 @@ class GoogleFactoryImplTest : public gtest::TestWithLoop {
  public:
   GoogleFactoryImplTest()
       : network_wrapper_(dispatcher()),
-        app_context_(
-            component::ApplicationContext::CreateFromStartupInfo().get()),
-        factory_impl_(dispatcher(), app_context_, &network_wrapper_) {
+        context_(component::StartupContext::CreateFromStartupInfo().get()),
+        factory_impl_(dispatcher(), context_, &network_wrapper_) {
     factory_impl_.Bind(factory_.NewRequest());
   }
 
@@ -27,7 +26,7 @@ class GoogleFactoryImplTest : public gtest::TestWithLoop {
 
  protected:
   network_wrapper::FakeNetworkWrapper network_wrapper_;
-  component::ApplicationContext* app_context_;
+  component::StartupContext* context_;
   auth::AuthProviderPtr auth_provider_;
   auth::AuthProviderFactoryPtr factory_;
 

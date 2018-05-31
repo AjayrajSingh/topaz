@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef TOPAZ_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_
-#define TOPAZ_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_
+#ifndef TOPAZ_BIN_USER_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_
+#define TOPAZ_BIN_USER_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_
 
 #include <lib/async/cpp/task.h>
 
@@ -14,7 +14,7 @@
 #include <fuchsia/ui/input/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/ui/scenic/client/resources.h"
@@ -31,7 +31,8 @@ class ViewController : public fuchsia::ui::views_v1::ViewListener,
 
   ViewController(component::ApplicationLauncher* launcher,
                  fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-                 fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
+                 fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+                     view_owner_request,
                  DisconnectCallback disconnect_handler);
   ~ViewController();
 
@@ -47,9 +48,8 @@ class ViewController : public fuchsia::ui::views_v1::ViewListener,
   }
 
   // |fuchsia::ui::views_v1::ViewListener|:
-  void OnPropertiesChanged(
-      fuchsia::ui::views_v1::ViewProperties properties,
-      OnPropertiesChangedCallback callback) override;
+  void OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties properties,
+                           OnPropertiesChangedCallback callback) override;
 
   // |fuchsia::ui::views_v1::ViewContainerListener|:
   void OnChildAttached(uint32_t child_key,
@@ -71,7 +71,8 @@ class ViewController : public fuchsia::ui::views_v1::ViewListener,
   void Present(zx_time_t presentation_time);
 
   void PerformLayout();
-  void SetPropertiesIfNeeded(Tile* tile, fuchsia::ui::views_v1::ViewProperties properties);
+  void SetPropertiesIfNeeded(Tile* tile,
+                             fuchsia::ui::views_v1::ViewProperties properties);
 
   component::ApplicationLauncher* launcher_;
   fuchsia::ui::views_v1::ViewManagerPtr view_manager_;
@@ -104,4 +105,4 @@ class ViewController : public fuchsia::ui::views_v1::ViewListener,
 
 }  // namespace ermine_user_shell
 
-#endif  // TOPAZ_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_
+#endif  // TOPAZ_BIN_USER_SHELL_ERMINE_USER_SHELL_VIEW_CONTROLLER_H_

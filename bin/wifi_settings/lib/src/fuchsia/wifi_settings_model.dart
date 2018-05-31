@@ -50,10 +50,9 @@ class WifiSettingsModel extends Model {
       : _wlanProxy = new wlan.WlanProxy(),
         _loading = true,
         _connecting = false {
-    ApplicationContext applicationContext =
-        new ApplicationContext.fromStartupInfo();
+    StartupContext startupContext = new StartupContext.fromStartupInfo();
 
-    connectToService(applicationContext.environmentServices, _wlanProxy.ctrl);
+    connectToService(startupContext.environmentServices, _wlanProxy.ctrl);
     _initStatusUpdater();
 
     _update();

@@ -11,7 +11,7 @@
 #include <component/cpp/fidl.h>
 
 #include "component.h"
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/macros.h"
@@ -39,7 +39,7 @@ class Runner final : public component::Runner {
     ActiveApplication() = default;
   };
 
-  std::unique_ptr<component::ApplicationContext> host_context_;
+  std::unique_ptr<component::StartupContext> host_context_;
   fidl::BindingSet<component::Runner> active_applications_bindings_;
   std::unordered_map<const Application*, ActiveApplication>
       active_applications_;

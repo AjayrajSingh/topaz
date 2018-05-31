@@ -18,8 +18,7 @@ namespace google_auth_provider {
 
 class FactoryImpl : public auth::AuthProviderFactory {
  public:
-  FactoryImpl(async_t* main_dispatcher,
-              component::ApplicationContext* app_context,
+  FactoryImpl(async_t* main_dispatcher, component::StartupContext* context,
               network_wrapper::NetworkWrapper* network_wrapper);
 
   ~FactoryImpl() override;
@@ -32,7 +31,7 @@ class FactoryImpl : public auth::AuthProviderFactory {
                        GetAuthProviderCallback callback) override;
 
   async_t* const main_dispatcher_;
-  component::ApplicationContext* const app_context_;
+  component::StartupContext* const context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
 
   callback::AutoCleanableSet<GoogleAuthProviderImpl> providers_;

@@ -8,9 +8,17 @@ import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
 export 'package:fidl_fuchsia_modular/fidl.dart'
-    show ContextReader, ContextWriter, SuggestionProvider, Link, StoryProvider,
-    FocusProvider, FocusController, VisibleStoriesController,
-    UserShellContext, IntelligenceServices;
+    show
+        ContextReader,
+        ContextWriter,
+        SuggestionProvider,
+        Link,
+        StoryProvider,
+        FocusProvider,
+        FocusController,
+        VisibleStoriesController,
+        UserShellContext,
+        IntelligenceServices;
 export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
 
 /// The [Model] that provides services provided to this app's [UserShell].
@@ -32,11 +40,11 @@ class UserShellModel extends Model {
   /// effect when the [onNotify] callback is also provided. Defaults to `false`.
   final bool watchAll;
 
-  /// The [ApplicationContext] given to this app's [UserShell];
-  final ApplicationContext applicationContext;
+  /// The [StartupContext] given to this app's [UserShell];
+  final StartupContext startupContext;
 
   /// Creates a new instance of [UserShellModel].
-  UserShellModel({bool watchAll, this.applicationContext})
+  UserShellModel({bool watchAll, this.startupContext})
       : watchAll = watchAll ?? false;
 
   /// The [UserShellContext] given to this app's [UserShell].

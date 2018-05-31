@@ -22,7 +22,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   final DeviceMapProxy _deviceMapProxy = new DeviceMapProxy();
 
   /// The application context for this module.
-  final ApplicationContext applicationContext;
+  final StartupContext startupContext;
 
   /// The models that get the various build statuses.
   final List<List<BuildStatusModel>> buildStatusModels;
@@ -36,7 +36,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   Chatter _chatter;
 
   /// Constructor.
-  DashboardModuleModel({this.applicationContext, this.buildStatusModels}) {
+  DashboardModuleModel({this.startupContext, this.buildStatusModels}) {
     // ignore: avoid_function_literals_in_foreach_calls
     buildStatusModels.expand((List<BuildStatusModel> models) => models).forEach(
           (BuildStatusModel buildStatusModel) =>
@@ -88,7 +88,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   /// Starts loading the device map from the environment.
   void loadDeviceMap() {
     connectToService(
-      applicationContext.environmentServices,
+      startupContext.environmentServices,
       _deviceMapProxy.ctrl,
     );
     _deviceMapTimer?.cancel();
@@ -113,22 +113,22 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
         'https://luci-scheduler.appspot.com/jobs/fuchsia/$buildName';
 
     final Map<String, Map<String, String>> webviewLinkData =
-      <String, Map<String, String>>{
-        'view': <String, String>{'uri': url}
-      };
-    IntentBuilder intentBuilder = new IntentBuilder.handler(web_view.kWebViewURL)
-    ..addParameter(null, webviewLinkData);
+        <String, Map<String, String>>{
+      'view': <String, String>{'uri': url}
+    };
+    IntentBuilder intentBuilder =
+        new IntentBuilder.handler(web_view.kWebViewURL)
+          ..addParameter(null, webviewLinkData);
 
     _webviewModuleControllerProxy?.ctrl?.close();
     _webviewModuleControllerProxy = new ModuleControllerProxy();
 
     moduleContext.startModule(
-      'module:web_view',
-      intentBuilder.intent,
-      _webviewModuleControllerProxy.ctrl.request(),
-      const SurfaceRelation(arrangement: SurfaceArrangement.copresent),
-      (StartModuleStatus status) {}
-    );
+        'module:web_view',
+        intentBuilder.intent,
+        _webviewModuleControllerProxy.ctrl.request(),
+        const SurfaceRelation(arrangement: SurfaceArrangement.copresent),
+        (StartModuleStatus status) {});
     _webviewModuleWatcherBinding = new ModuleWatcherBinding();
     _webviewModuleControllerProxy.watch(
       _webviewModuleWatcherBinding.wrap(

@@ -18,7 +18,7 @@ void main() {
 
   ModuleWidget<ConversationInfoModuleModel> moduleWidget =
       new ModuleWidget<ConversationInfoModuleModel>(
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    startupContext: new StartupContext.fromStartupInfo(),
     moduleModel: new ConversationInfoModuleModel(userModel: userModel),
     child: new ScopedModel<UserModel>(
       model: userModel,

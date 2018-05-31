@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef TOPAZ_SHELL_ERMINE_USER_SHELL_APP_H_
-#define TOPAZ_SHELL_ERMINE_USER_SHELL_APP_H_
+#ifndef TOPAZ_BIN_USER_SHELL_ERMINE_USER_SHELL_APP_H_
+#define TOPAZ_BIN_USER_SHELL_ERMINE_USER_SHELL_APP_H_
 
 #include <memory>
 #include <vector>
 
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fidl/cpp/interface_request.h"
 
@@ -23,7 +23,8 @@ class App : public fuchsia::ui::views_v1::ViewProvider {
   ~App();
 
   // |fuchsia::ui::views_v1::ViewProvider|
-  void CreateView(fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
+  void CreateView(fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+                      view_owner_request,
                   fidl::InterfaceRequest<component::ServiceProvider>
                       view_services) override;
 
@@ -33,11 +34,11 @@ class App : public fuchsia::ui::views_v1::ViewProvider {
   App(const App&) = delete;
   App& operator=(const App&) = delete;
 
-  std::unique_ptr<component::ApplicationContext> context_;
+  std::unique_ptr<component::StartupContext> context_;
   fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> bindings_;
   std::vector<std::unique_ptr<ViewController>> controllers_;
 };
 
 }  // namespace ermine_user_shell
 
-#endif  // TOPAZ_SHELL_ERMINE_USER_SHELL_APP_H_
+#endif  // TOPAZ_BIN_USER_SHELL_ERMINE_USER_SHELL_APP_H_

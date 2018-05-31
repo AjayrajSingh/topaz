@@ -42,8 +42,7 @@ void _sendMessage(String message) {
 final Map<String, DataHandler> _dataHandlerMap = <String, DataHandler>{};
 
 void main(List<String> args) {
-  final ApplicationContext appContext =
-      new ApplicationContext.fromStartupInfo();
+  final StartupContext context = new StartupContext.fromStartupInfo();
 
   // Assemble the list of DataHandlers
   addDataHandler(new ActionLogDataHandler());
@@ -52,10 +51,10 @@ void main(List<String> args) {
 
   // Initialize the DataHandlers
   _dataHandlerMap.forEach((String name, DataHandler handler) {
-    handler.init(appContext, _sendMessage);
+    handler.init(context, _sendMessage);
   });
 
-  appContext.close();
+  context.close();
 
   // Read the config file from disk
   final File configFile = new File(path.join(_configDir, _configFilename));

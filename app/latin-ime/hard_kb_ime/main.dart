@@ -145,7 +145,7 @@ class ImeServiceImpl extends ImeService {
 }
 
 void main(List<String> args) {
-  ApplicationContext context = new ApplicationContext.fromStartupInfo();
+  StartupContext context = new StartupContext.fromStartupInfo();
 
   context.outgoingServices.addServiceForName(
     new ImeServiceImpl().bind,

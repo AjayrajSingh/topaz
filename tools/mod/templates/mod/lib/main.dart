@@ -15,12 +15,12 @@ void main() {
   // as a parameter.
   ModuleWidget<__ProjectName__ModuleModel> moduleWidget =
       new ModuleWidget<__ProjectName__ModuleModel>(
-    // The ApplicationContext encapsulates how this module (application) can
+    // The StartupContext encapsulates how this module (application) can
     // exchange services with the outside world. For example, the Module service
     // is exposed via this application context. Similarly, this module can
     // access other services provided by the environment via application
     // context.
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    startupContext: new StartupContext.fromStartupInfo(),
     moduleModel: new __ProjectName__ModuleModel(),
     child: new MaterialApp(
       home: const HomePage(),

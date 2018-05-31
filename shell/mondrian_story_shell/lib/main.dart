@@ -28,7 +28,7 @@ import 'overview.dart';
 import 'surface_details.dart';
 import 'surface_director.dart';
 
-final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
+final StartupContext _context = new StartupContext.fromStartupInfo();
 final DeviceMapWatcherBinding _deviceMapWatcher = new DeviceMapWatcherBinding();
 
 /// This is used for keeping the reference around.
@@ -282,7 +282,7 @@ void main() {
 
   DeviceMapProxy deviceMapProxy = new DeviceMapProxy();
 
-  connectToService(_appContext.environmentServices, deviceMapProxy.ctrl);
+  connectToService(_context.environmentServices, deviceMapProxy.ctrl);
 
   deviceMapProxy.watchDeviceMap(
     _deviceMapWatcher.wrap(
@@ -294,7 +294,7 @@ void main() {
 
   _storyShellImpl = new StoryShellImpl();
 
-  _appContext.outgoingServices
+  _context.outgoingServices
     ..addServiceForName((InterfaceRequest<StoryShell> request) {
       trace('story shell request');
       log.fine('Received binding request for StoryShell');

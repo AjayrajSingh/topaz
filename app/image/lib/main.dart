@@ -17,7 +17,7 @@ void main() {
 
   ModuleWidget<ImageModuleModel> moduleWidget =
       new ModuleWidget<ImageModuleModel>(
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    startupContext: new StartupContext.fromStartupInfo(),
     moduleModel: new ImageModuleModel(),
     child: new ScopedModelDescendant<ImageModuleModel>(
       builder: (_, __, ImageModuleModel model) => new Stack(

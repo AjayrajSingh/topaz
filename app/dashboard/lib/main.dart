@@ -163,17 +163,16 @@ void main() {
     buildStatusModels.add(categoryModels);
   }
 
-  ApplicationContext applicationContext =
-      new ApplicationContext.fromStartupInfo();
+  StartupContext startupContext = new StartupContext.fromStartupInfo();
 
   DashboardModuleModel dashboardModuleModel = new DashboardModuleModel(
-    applicationContext: applicationContext,
+    startupContext: startupContext,
     buildStatusModels: buildStatusModels,
   );
 
   ModuleWidget<DashboardModuleModel> moduleWidget =
       new ModuleWidget<DashboardModuleModel>(
-    applicationContext: applicationContext,
+    startupContext: startupContext,
     moduleModel: dashboardModuleModel,
     child: new DashboardApp(
       buildService: buildService,

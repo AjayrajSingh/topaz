@@ -74,7 +74,7 @@ class ArmadilloUserShellModel extends UserShellModel {
 
   /// Constructor.
   ArmadilloUserShellModel({
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     this.storyProviderStoryGenerator,
     this.suggestionProviderSuggestionModel,
     this.maxwellVoiceModel,
@@ -89,7 +89,7 @@ class ArmadilloUserShellModel extends UserShellModel {
   })  : _wallpaperChooser = new WallpaperChooser(
           onWallpaperChosen: onWallpaperChosen,
         ),
-        super(applicationContext: applicationContext);
+        super(startupContext: startupContext);
 
   @override
   void onReady(

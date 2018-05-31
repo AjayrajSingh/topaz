@@ -116,12 +116,11 @@ void _onAddObservationStatus(int metricId, Status status) {
 }
 
 void main(List<String> args) {
-  final ApplicationContext appContext =
-      new ApplicationContext.fromStartupInfo();
+  final StartupContext context = new StartupContext.fromStartupInfo();
 
   // Connect to the ContextReader
   _contextListener = new ContextListenerImpl(_onContextUpdate);
-  connectToService(appContext.environmentServices, _contextReader.ctrl);
+  connectToService(context.environmentServices, _contextReader.ctrl);
   assert(_contextReader.ctrl.isBound);
 
   // Subscribe to all topics
@@ -135,12 +134,12 @@ void main(List<String> args) {
   // Connect to Cobalt
   final CobaltEncoderFactoryProxy encoderFactory =
       new CobaltEncoderFactoryProxy();
-  connectToService(appContext.environmentServices, encoderFactory.ctrl);
+  connectToService(context.environmentServices, encoderFactory.ctrl);
   assert(encoderFactory.ctrl.isBound);
 
   // Get an encoder
   encoderFactory.getEncoder(_cobaltProjectID, _encoder.ctrl.request());
 
-  appContext.close();
+  context.close();
   encoderFactory.ctrl.close();
 }

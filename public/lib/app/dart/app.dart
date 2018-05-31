@@ -11,29 +11,28 @@ import 'package:fuchsia/fuchsia.dart';
 import 'package:fidl_component/fidl.dart';
 import 'package:zircon/zircon.dart';
 
-class ApplicationContext {
-  static ApplicationContext _context;
+class StartupContext {
+  static StartupContext _context;
 
-  ApplicationContext();
+  StartupContext();
 
-  final EnvironmentProxy environment =
-      new EnvironmentProxy();
+  final EnvironmentProxy environment = new EnvironmentProxy();
   final ApplicationLauncherProxy launcher = new ApplicationLauncherProxy();
   final ServiceProviderProxy environmentServices = new ServiceProviderProxy();
   final ServiceProviderImpl outgoingServices = new ServiceProviderImpl();
 
-  factory ApplicationContext.fromStartupInfo() {
+  factory StartupContext.fromStartupInfo() {
     if (_context != null) {
       return _context;
     }
 
-    final ApplicationContext context = new ApplicationContext();
+    final StartupContext context = new StartupContext();
 
     final Handle environmentHandle = MxStartupInfo.takeEnvironment();
     if (environmentHandle != null) {
       context.environment
-        ..ctrl.bind(new InterfaceHandle<Environment>(
-            new Channel(environmentHandle)))
+        ..ctrl.bind(
+            new InterfaceHandle<Environment>(new Channel(environmentHandle)))
         ..getApplicationLauncher(context.launcher.ctrl.request())
         ..getServices(context.environmentServices.ctrl.request());
     }

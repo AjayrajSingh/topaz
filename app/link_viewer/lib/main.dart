@@ -22,7 +22,7 @@ void main() {
 
   ModuleWidget<LinkViewerModuleModel> moduleWidget =
       new ModuleWidget<LinkViewerModuleModel>(
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    startupContext: new StartupContext.fromStartupInfo(),
     moduleModel: new LinkViewerModuleModel(),
     child: new Center(
       child: new PhysicalModel(

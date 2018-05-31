@@ -26,13 +26,13 @@ class ActionLogDataHandler extends ActionLogListener with DataHandler {
   SendWebSocketMessage _sendMessage;
 
   @override
-  void init(ApplicationContext appContext, SendWebSocketMessage sender) {
+  void init(StartupContext context, SendWebSocketMessage sender) {
     _sendMessage = sender;
 
     // Connect to the ActionLog
     _actionLog = new UserActionLogProxy();
     _actionLogListener = new ActionLogListenerBinding();
-    connectToService(appContext.environmentServices, _actionLog.ctrl);
+    connectToService(context.environmentServices, _actionLog.ctrl);
     assert(_actionLog.ctrl.isBound);
 
     // Subscribe to ActionLog Actions

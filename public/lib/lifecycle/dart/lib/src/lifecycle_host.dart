@@ -29,8 +29,7 @@ class LifecycleHost {
   /// Constructor.
   LifecycleHost({
     @required this.onTerminate,
-  })
-      : assert(onTerminate != null) {
+  }) : assert(onTerminate != null) {
     impl = new LifecycleImpl(
       onTerminate: _handleTerminate,
     );
@@ -45,11 +44,11 @@ class LifecycleHost {
   Completer<Null> _addService;
 
   /// Connect this LifecycleHost's impl to the
-  /// [ApplicationContext#outgoingServices].
+  /// [StartupContext#outgoingServices].
   Future<Null> addService({
-    @required ApplicationContext applicationContext,
+    @required StartupContext startupContext,
   }) {
-    assert(applicationContext != null);
+    assert(startupContext != null);
 
     log.fine('starting lifecycle host');
 
@@ -63,7 +62,7 @@ class LifecycleHost {
       _addService = new Completer<Null>();
     }
 
-    applicationContext.outgoingServices.addServiceForName(
+    startupContext.outgoingServices.addServiceForName(
       (InterfaceRequest<fidl.Lifecycle> request) {
         try {
           binding.bind(impl, request);

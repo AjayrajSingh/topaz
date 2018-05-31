@@ -15,7 +15,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';
 
 const String _kModuleUrl = 'example_manual_relationships';
-final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
+final StartupContext _context = new StartupContext.fromStartupInfo();
 
 /// This is used for keeping the reference around.
 ModuleImpl _module = new ModuleImpl();
@@ -59,12 +59,8 @@ void startChildModule(SurfaceRelation relation) {
   String name = 'C$_childId';
 
   IntentBuilder intentBuilder = new IntentBuilder.handler(_kModuleUrl);
-  _moduleContext.startModule(
-      name,
-      intentBuilder.intent,
-      moduleController.ctrl.request(),
-      relation,
-      (StartModuleStatus status) {});
+  _moduleContext.startModule(name, intentBuilder.intent,
+      moduleController.ctrl.request(), relation, (StartModuleStatus status) {});
   log.info('Started sub-module $name');
 
   _watchers.add(new _ModuleStopperWatcher(moduleController, name));
@@ -380,7 +376,7 @@ class ModuleImpl implements Lifecycle {
 
   ModuleImpl() {
     log.info('ModuleImpl::initialize call');
-    connectToService(_appContext.environmentServices, _moduleContext.ctrl);
+    connectToService(_context.environmentServices, _moduleContext.ctrl);
   }
 
   /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
@@ -402,13 +398,12 @@ void main() {
   setupLogger(name: 'exampleManualRelationships');
 
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
-  _appContext.outgoingServices
-    .addServiceForName(
-      (InterfaceRequest<Lifecycle> request) {
-        _module.bindLifecycle(request);
-      },
-      Lifecycle.$serviceName,
-    );
+  _context.outgoingServices.addServiceForName(
+    (InterfaceRequest<Lifecycle> request) {
+      _module.bindLifecycle(request);
+    },
+    Lifecycle.$serviceName,
+  );
 
   Color randomColor =
       new Color(0xFF000000 + new math.Random().nextInt(0xFFFFFF));

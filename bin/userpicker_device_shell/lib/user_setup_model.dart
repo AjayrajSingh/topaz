@@ -45,8 +45,8 @@ class UserSetupModel extends Model {
   VoidCallback _loginAsGuest;
   final NetstackModel _netstackModel;
 
-  /// ApplicationContext to allow setup to launch apps
-  final ApplicationContext applicationContext;
+  /// StartupContext to allow setup to launch apps
+  final StartupContext startupContext;
 
   /// Callback to cancel adding a new user.
   final VoidCallback cancelAuthenticationFlow;
@@ -61,15 +61,14 @@ class UserSetupModel extends Model {
   bool _connectedToWifi;
 
   /// Create a new [UserSetupModel]
-  UserSetupModel(this.applicationContext, this._netstackModel,
-      this.cancelAuthenticationFlow)
+  UserSetupModel(
+      this.startupContext, this._netstackModel, this.cancelAuthenticationFlow)
       : _currentIndex = _stages.indexOf(SetupStage.notStarted),
         _authModel = new AuthenticationOverlayModel(),
         _timeZoneProxy = new TimezoneProxy(),
         _connectedToWifi = false {
     /// todo: change lifespan of proxies
-    connectToService(
-        applicationContext.environmentServices, _timeZoneProxy.ctrl);
+    connectToService(startupContext.environmentServices, _timeZoneProxy.ctrl);
 
     _timeZoneProxy.getTimezoneId((String tz) {
       _currentTimezone = tz;

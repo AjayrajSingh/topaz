@@ -15,7 +15,7 @@ abstract class DataHandler {
   String get name;
 
   /// Initialize the data handler
-  void init(ApplicationContext appContext, SendWebSocketMessage sender);
+  void init(StartupContext context, SendWebSocketMessage sender);
 
   /// Handle an HTTP request for data from this handler
   bool handleRequest(String requestString, HttpRequest request);

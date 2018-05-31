@@ -23,11 +23,11 @@ class EddystoneModuleModel extends ModuleModel {
   static const String kEddystoneUuid = '0000feaa-0000-1000-8000-00805f9b34fb';
 
   /// Constructor
-  EddystoneModuleModel(this.applicationContext) : super();
+  EddystoneModuleModel(this.startupContext) : super();
 
-  /// We use the |applicationContext| to obtain a handle to the "bluetooth::low_energy::Central"
+  /// We use the |startupContext| to obtain a handle to the "bluetooth::low_energy::Central"
   /// environment service.
-  final ApplicationContext applicationContext;
+  final StartupContext startupContext;
 
   /// True if we have an active scan session.
   bool get isAdvertising => _activeAdvertisements.isNotEmpty;
@@ -81,7 +81,7 @@ class EddystoneModuleModel extends ModuleModel {
   ) {
     super.onReady(moduleContext, link);
 
-    connectToService(applicationContext.environmentServices, _peripheral.ctrl);
+    connectToService(startupContext.environmentServices, _peripheral.ctrl);
   }
 
   @override

@@ -9,7 +9,7 @@
 
 #include "examples/ui/lib/skia_font_loader.h"
 #include "examples/ui/lib/skia_view.h"
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 #include "topaz/app/term/pty_server.h"
@@ -23,8 +23,9 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   using DisconnectCallback = std::function<void(ViewController*)>;
 
   ViewController(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-                 fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
-                 component::ApplicationContext* context,
+                 fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+                     view_owner_request,
+                 component::StartupContext* context,
                  const TermParams& term_params,
                  DisconnectCallback disconnect_handler);
   ~ViewController() override;
@@ -34,7 +35,8 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
 
  private:
   // |BaseView|:
-  void OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties old_properties) override;
+  void OnPropertiesChanged(
+      fuchsia::ui::views_v1::ViewProperties old_properties) override;
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
@@ -66,7 +68,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   // If we skip drawing despite being forced to, we should force the next draw.
   bool force_next_draw_;
 
-  component::ApplicationContext* context_;
+  component::StartupContext* context_;
   mozart::SkiaFontLoader font_loader_;
   sk_sp<SkTypeface> regular_typeface_;
 
@@ -76,8 +78,8 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   // Keyboard state.
   bool keypad_application_mode_;
 
-  async::TaskClosureMethod<ViewController, &ViewController::Blink>
-      blink_task_{this};
+  async::TaskClosureMethod<ViewController, &ViewController::Blink> blink_task_{
+      this};
   zx::time last_key_;
   bool blink_on_ = true;
   bool focused_ = false;

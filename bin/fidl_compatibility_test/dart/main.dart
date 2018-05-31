@@ -8,7 +8,7 @@ import 'package:fidl/fidl.dart' show InterfaceRequest;
 import 'package:fidl_component/fidl.dart';
 
 class EchoImpl implements Echo {
-  final ApplicationContext context;
+  final StartupContext context;
 
   EchoImpl(this.context);
 
@@ -63,7 +63,7 @@ class EchoImpl implements Echo {
 final EchoBinding _echoBinding = new EchoBinding();
 
 void main(List<String> args) {
-  final ApplicationContext context = new ApplicationContext.fromStartupInfo();
+  final StartupContext context = new StartupContext.fromStartupInfo();
   final EchoImpl echoImpl = new EchoImpl(context);
   context.outgoingServices.addServiceForName(
       (InterfaceRequest<Echo> request) => _echoBinding.bind(echoImpl, request),

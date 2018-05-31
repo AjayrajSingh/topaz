@@ -10,7 +10,7 @@
 WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
     : loop_(loop),
       url_(url),
-      context_(component::ApplicationContext::CreateFromStartupInfo()),
+      context_(component::StartupContext::CreateFromStartupInfo()),
       view_provider_binding_(this),
       lifecycle_binding_(this),
       main_link_watcher_binding_(this) {
@@ -48,12 +48,14 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
 }
 
 void WebViewProvider::CreateView(
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+        view_owner_request,
     fidl::InterfaceRequest<component::ServiceProvider> view_services) {
   FXL_LOG(INFO) << "CreateView";
   FXL_DCHECK(!view_);
   view_ = std::make_unique<WebViewImpl>(
-      context_->ConnectToEnvironmentService<fuchsia::ui::views_v1::ViewManager>(),
+      context_
+          ->ConnectToEnvironmentService<fuchsia::ui::views_v1::ViewManager>(),
       std::move(view_owner_request), std::move(view_services), url_);
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   if (context_writer_) {
@@ -70,9 +72,7 @@ void WebViewProvider::CreateView(
   });
 }
 
-void WebViewProvider::Terminate() {
-  loop_->Quit();
-}
+void WebViewProvider::Terminate() { loop_->Quit(); }
 
 void WebViewProvider::Notify(fidl::StringPtr json) {
   fuchsia::modular::JsonDoc parsed_json;

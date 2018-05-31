@@ -131,7 +131,7 @@ class UserSetup extends StatelessWidget {
   static Widget _buildWifi(
           BuildContext context, Widget child, UserSetupModel model) =>
       new ApplicationWidget(
-          url: 'wifi_settings', launcher: model.applicationContext.launcher);
+          url: 'wifi_settings', launcher: model.startupContext.launcher);
 
   static Widget _placeholderStage(
           BuildContext context, Widget child, UserSetupModel model) =>

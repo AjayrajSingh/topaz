@@ -24,12 +24,12 @@ class FirebaseDBClientAgent extends AgentImpl {
       <FirebaseDbConnectorBinding>[];
 
   /// Creates a new instance of [FirebaseDBClientAgent].
-  FirebaseDBClientAgent({@required ApplicationContext applicationContext})
-      : super(applicationContext: applicationContext);
+  FirebaseDBClientAgent({@required StartupContext startupContext})
+      : super(startupContext: startupContext);
 
   @override
   Future<Null> onReady(
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
     TokenProvider tokenProvider,
@@ -68,6 +68,6 @@ Future<Null> main(List<String> args) async {
   setupLogger(name: 'chat/firebase_db_client');
 
   _agent = new FirebaseDBClientAgent(
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    startupContext: new StartupContext.fromStartupInfo(),
   )..advertise();
 }

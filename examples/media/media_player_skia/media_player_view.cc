@@ -54,13 +54,11 @@ bool Contains(const fuchsia::math::RectF& rect, float x, float y) {
 }  // namespace
 
 MediaPlayerView::MediaPlayerView(
-    async::Loop* loop,
-    fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
-    component::ApplicationContext* application_context,
-    const MediaPlayerParams& params)
-    : mozart::BaseView(std::move(view_manager),
-                       std::move(view_owner_request),
+    async::Loop* loop, fuchsia::ui::views_v1::ViewManagerPtr view_manager,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+        view_owner_request,
+    component::StartupContext* startup_context, const MediaPlayerParams& params)
+    : mozart::BaseView(std::move(view_manager), std::move(view_owner_request),
                        "Media Player"),
 
       loop_(loop),
@@ -85,8 +83,7 @@ MediaPlayerView::MediaPlayerView(
 
   if (params.device_name().empty()) {
     // Create a player from all that stuff.
-    media_player_ =
-        application_context->ConnectToEnvironmentService<MediaPlayer>();
+    media_player_ = startup_context->ConnectToEnvironmentService<MediaPlayer>();
     media_player_.events().StatusChanged =
         [this](media_player::MediaPlayerStatus status) {
           HandleStatusChanged(status);
@@ -94,7 +91,7 @@ MediaPlayerView::MediaPlayerView(
 
     fuchsia::ui::views_v1_token::ViewOwnerPtr video_view_owner;
     media_player_->CreateView(
-        application_context
+        startup_context
             ->ConnectToEnvironmentService<fuchsia::ui::views_v1::ViewManager>()
             .Unbind(),
         video_view_owner.NewRequest());
@@ -108,7 +105,7 @@ MediaPlayerView::MediaPlayerView(
 
     if (!params.service_name().empty()) {
       auto net_media_service =
-          application_context->ConnectToEnvironmentService<NetMediaService>();
+          startup_context->ConnectToEnvironmentService<NetMediaService>();
 
       fidl::InterfaceHandle<MediaPlayer> media_player_handle;
       media_player_->AddBinding(media_player_handle.NewRequest());
@@ -119,7 +116,7 @@ MediaPlayerView::MediaPlayerView(
   } else {
     // Create a player proxy.
     auto net_media_service =
-        application_context->ConnectToEnvironmentService<NetMediaService>();
+        startup_context->ConnectToEnvironmentService<NetMediaService>();
 
     net_media_service->CreateMediaPlayerProxy(params.device_name(),
                                               params.service_name(),
@@ -300,8 +297,8 @@ void MediaPlayerView::OnSceneInvalidated(
   }
 }
 
-void MediaPlayerView::OnChildAttached(uint32_t child_key,
-                                      fuchsia::ui::views_v1::ViewInfo child_view_info) {
+void MediaPlayerView::OnChildAttached(
+    uint32_t child_key, fuchsia::ui::views_v1::ViewInfo child_view_info) {
   FXL_DCHECK(child_key == kVideoChildKey);
 
   parent_node().AddChild(*video_host_node_);

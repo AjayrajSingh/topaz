@@ -11,7 +11,7 @@ import 'package:fidl_component/fidl.dart';
 import 'package:test/test.dart';
 
 void main(List<String> args) {
-  final ApplicationContext context = new ApplicationContext.fromStartupInfo();
+  final StartupContext context = new StartupContext.fromStartupInfo();
   tearDownAll(context.close);
 
   // TODO(rosswang): nested environments and determinism

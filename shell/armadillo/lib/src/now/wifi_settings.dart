@@ -45,7 +45,7 @@ class WifiSettings extends StatelessWidget {
                       borderRadius: new BorderRadius.circular(4.0),
                       child: new ApplicationWidget(
                         url: 'wifi_settings',
-                        launcher: userShellModel.applicationContext.launcher,
+                        launcher: userShellModel.startupContext.launcher,
                       ),
                     ),
                   ),

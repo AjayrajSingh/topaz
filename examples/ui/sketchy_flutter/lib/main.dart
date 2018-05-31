@@ -24,37 +24,37 @@ class SketchyExampleApp extends StatelessWidget {
       title: 'Sketchy Example',
       home: new SketchyExample(
           title: 'Sketchy Example (hit the button to add more rectangles)',
-          applicationContext: new ApplicationContext.fromStartupInfo()),
+          startupContext: new StartupContext.fromStartupInfo()),
     );
   }
 }
 
 class SketchyExample extends StatefulWidget {
-  const SketchyExample({Key key, this.title, this.applicationContext})
+  const SketchyExample({Key key, this.title, this.startupContext})
       : super(key: key);
 
   final String title;
-  final ApplicationContext applicationContext;
+  final StartupContext startupContext;
 
   @override
   _SketchyExampleState createState() =>
-      new _SketchyExampleState(applicationContext);
+      new _SketchyExampleState(startupContext);
 }
 
 class _SketchyExampleState extends State<SketchyExample> {
-  factory _SketchyExampleState(ApplicationContext applicationContext) {
+  factory _SketchyExampleState(StartupContext startupContext) {
     final HandlePairResult tokenPair = System.eventpairCreate();
     assert(tokenPair.status == ZX.OK);
 
     return new _SketchyExampleState._internal(
-        applicationContext,
+        startupContext,
         new scenic.Session.fromServiceProvider(
-            applicationContext.environmentServices),
+            startupContext.environmentServices),
         tokenPair);
   }
 
   _SketchyExampleState._internal(
-      this.applicationContext, this.session, HandlePairResult tokenPair)
+      this.startupContext, this.session, HandlePairResult tokenPair)
       : sceneHost = new SceneHost(tokenPair.first),
         rect = new scenic.RoundedRectangle(
             session, 100.0, 100.0, 10.0, 10.0, 10.0, 10.0),
@@ -65,7 +65,7 @@ class _SketchyExampleState extends State<SketchyExample> {
     _addShapeNode();
   }
 
-  final ApplicationContext applicationContext;
+  final StartupContext startupContext;
   final SceneHost sceneHost;
   final scenic.Session session;
   final scenic.RoundedRectangle rect;

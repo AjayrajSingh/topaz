@@ -6,11 +6,10 @@
 
 namespace spotify_auth_provider {
 
-FactoryImpl::FactoryImpl(component::ApplicationContext* app_context,
+FactoryImpl::FactoryImpl(component::StartupContext* context,
                          network_wrapper::NetworkWrapper* network_wrapper)
-    : app_context_(app_context),
-      network_wrapper_(network_wrapper) {
-  FXL_DCHECK(app_context_);
+    : context_(context), network_wrapper_(network_wrapper) {
+  FXL_DCHECK(context_);
   FXL_DCHECK(network_wrapper_);
 }
 
@@ -24,7 +23,7 @@ void FactoryImpl::Bind(
 void FactoryImpl::GetAuthProvider(
     fidl::InterfaceRequest<auth::AuthProvider> auth_provider,
     GetAuthProviderCallback callback) {
-  providers_.emplace(app_context_, network_wrapper_, std::move(auth_provider));
+  providers_.emplace(context_, network_wrapper_, std::move(auth_provider));
   callback(auth::AuthProviderStatus::OK);
 }
 

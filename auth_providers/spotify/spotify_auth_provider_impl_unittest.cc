@@ -19,17 +19,15 @@ class SpotifyAuthProviderImplTest : public gtest::TestWithLoop {
  public:
   SpotifyAuthProviderImplTest()
       : network_wrapper_(dispatcher()),
-        app_context_(
-            component::ApplicationContext::CreateFromStartupInfo().get()),
-        spotify_auth_provider_impl_(app_context_,
-                                    &network_wrapper_,
+        context_(component::StartupContext::CreateFromStartupInfo().get()),
+        spotify_auth_provider_impl_(context_, &network_wrapper_,
                                     auth_provider_.NewRequest()) {}
 
   ~SpotifyAuthProviderImplTest() override {}
 
  protected:
   network_wrapper::FakeNetworkWrapper network_wrapper_;
-  component::ApplicationContext* app_context_;
+  component::StartupContext* context_;
   auth::AuthProviderPtr auth_provider_;
   SpotifyAuthProviderImpl spotify_auth_provider_impl_;
 

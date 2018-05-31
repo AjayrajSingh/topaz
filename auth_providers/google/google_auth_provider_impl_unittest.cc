@@ -16,18 +16,15 @@ class GoogleAuthProviderImplTest : public gtest::TestWithLoop {
  public:
   GoogleAuthProviderImplTest()
       : network_wrapper_(dispatcher()),
-        app_context_(
-            component::ApplicationContext::CreateFromStartupInfo().get()),
-        google_auth_provider_impl_(dispatcher(),
-                                   app_context_,
-                                   &network_wrapper_,
+        context_(component::StartupContext::CreateFromStartupInfo().get()),
+        google_auth_provider_impl_(dispatcher(), context_, &network_wrapper_,
                                    auth_provider_.NewRequest()) {}
 
   ~GoogleAuthProviderImplTest() override {}
 
  protected:
   network_wrapper::FakeNetworkWrapper network_wrapper_;
-  component::ApplicationContext* app_context_;
+  component::StartupContext* context_;
   auth::AuthProviderPtr auth_provider_;
   GoogleAuthProviderImpl google_auth_provider_impl_;
 

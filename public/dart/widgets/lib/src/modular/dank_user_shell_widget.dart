@@ -9,16 +9,16 @@ import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.user.dart/user.dart';
 
-export 'package:lib.app.dart/app.dart' show ApplicationContext;
+export 'package:lib.app.dart/app.dart' show StartupContext;
 
 /// A wrapper widget intended to be the root of the application that is
-/// a [UserShell].  Its main purpose is to hold the [ApplicationContext] and
+/// a [UserShell].  Its main purpose is to hold the [StartupContext] and
 /// [UserShell] instances so they aren't garbage collected.
 /// For convenience, [advertise] does the advertising of the app as a
-/// [UserShell] to the rest of the system via the [ApplicationContext].
+/// [UserShell] to the rest of the system via the [StartupContext].
 class DankUserShellWidget extends StatelessWidget {
-  /// The [ApplicationContext] to [advertise] its [UserShell] services to.
-  final ApplicationContext _applicationContext;
+  /// The [StartupContext] to [advertise] its [UserShell] services to.
+  final StartupContext _startupContext;
 
   /// The binding for the [UserShell] service implemented by [UserShellImpl].
   final UserShellBinding _userShellBinding;
@@ -45,13 +45,13 @@ class DankUserShellWidget extends StatelessWidget {
 
   /// Constructor.
   factory DankUserShellWidget({
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     Widget child,
     OnDankUserShellReady onReady,
     VoidCallback onStop,
   }) {
     return new DankUserShellWidget._create(
-      applicationContext: applicationContext,
+      startupContext: startupContext,
       child: child,
       onReady: onReady,
       onStop: onStop,
@@ -63,14 +63,14 @@ class DankUserShellWidget extends StatelessWidget {
   }
 
   DankUserShellWidget._create({
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     UserShellBinding userShellBinding,
     LifecycleBinding lifecycleBinding,
     _UserShellPresentationProviderBindings presentationProviderBindings,
     this.child,
     this.onReady,
     this.onStop,
-  })  : _applicationContext = applicationContext,
+  })  : _startupContext = startupContext,
         _userShellBinding = userShellBinding,
         _lifecycleBinding = lifecycleBinding,
         _presentationProviderBindings = presentationProviderBindings,
@@ -90,9 +90,9 @@ class DankUserShellWidget extends StatelessWidget {
   Widget build(BuildContext context) => child;
 
   /// Advertises [_userShell] as a [UserShell] to the rest of the system via
-  /// the [ApplicationContext].
+  /// the [StartupContext].
   void advertise() {
-    _applicationContext.outgoingServices
+    _startupContext.outgoingServices
       ..addServiceForName(
         (InterfaceRequest<UserShell> request) =>
             _userShellBinding.bind(_userShell, request),

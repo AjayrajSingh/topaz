@@ -85,14 +85,14 @@ class ProposalSubscribersDataHandler extends AskProposalListener
   }
 
   @override
-  void init(ApplicationContext appContext, SendWebSocketMessage sender) {
+  void init(StartupContext context, SendWebSocketMessage sender) {
     _sendMessage = sender;
 
     final SuggestionDebugProxy suggestionDebug = new SuggestionDebugProxy();
     _askListenerBinding = new AskProposalListenerBinding();
     _nextListenerBinding = new NextProposalListenerBinding();
     _interruptionListenerBinding = new InterruptionProposalListenerBinding();
-    connectToService(appContext.environmentServices, suggestionDebug.ctrl);
+    connectToService(context.environmentServices, suggestionDebug.ctrl);
     assert(suggestionDebug.ctrl.isBound);
 
     // Watch for Ask, Next, and Interruption proposal changes.

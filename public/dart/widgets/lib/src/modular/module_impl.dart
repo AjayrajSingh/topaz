@@ -35,7 +35,7 @@ class ModuleImpl implements Lifecycle {
   LinkWatcherImpl _linkWatcherImpl;
 
   /// The application context to use to get various system services.
-  final ApplicationContext applicationContext;
+  final StartupContext startupContext;
 
   /// Called when the Module connects to its [ModuleContext] service.
   final OnModuleReady onReady;
@@ -60,7 +60,7 @@ class ModuleImpl implements Lifecycle {
 
   /// Constructor.
   ModuleImpl({
-    this.applicationContext,
+    this.startupContext,
     this.onReady,
     this.onStopping,
     this.onStop,
@@ -68,10 +68,8 @@ class ModuleImpl implements Lifecycle {
     this.onDeviceMapChange,
     bool watchAll,
   }) : watchAll = watchAll ?? false {
-
     connectToService(
-        applicationContext.environmentServices,
-        _moduleContextProxy.ctrl);
+        startupContext.environmentServices, _moduleContextProxy.ctrl);
 
     _moduleContextProxy.getLink(null, _linkProxy.ctrl.request());
 
@@ -92,7 +90,7 @@ class ModuleImpl implements Lifecycle {
 
     if (onDeviceMapChange != null) {
       connectToService(
-        applicationContext.environmentServices,
+        startupContext.environmentServices,
         _deviceMapProxy.ctrl,
       );
       _deviceMapProxy.watchDeviceMap(

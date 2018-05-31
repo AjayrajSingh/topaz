@@ -14,19 +14,19 @@ import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import '../widgets/window_media_query.dart';
 import 'user_shell_model.dart';
 
-export 'package:lib.app.dart/app.dart' show ApplicationContext;
+export 'package:lib.app.dart/app.dart' show StartupContext;
 export 'user_shell_model.dart' show UserShellModel;
 
 /// A wrapper widget intended to be the root of the application that is
-/// a [UserShell].  Its main purpose is to hold the [ApplicationContext] and
+/// a [UserShell].  Its main purpose is to hold the [StartupContext] and
 /// [UserShell] instances so they aren't garbage collected.
 /// For convenience, [advertise] does the advertising of the app as a
-/// [UserShell] to the rest of the system via the [ApplicationContext].
+/// [UserShell] to the rest of the system via the [StartupContext].
 /// Also for convienence, the [UserShellModel] given to this widget as well as
 /// an [IdleModel] will be made available to [_child] and [_child]'s descendants.
 class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
-  /// The [ApplicationContext] to [advertise] its [UserShell] services to.
-  final ApplicationContext _applicationContext;
+  /// The [StartupContext] to [advertise] its [UserShell] services to.
+  final StartupContext _startupContext;
 
   /// The binding for the [UserShell] service implemented by [UserShellImpl].
   final UserShellBinding _userShellBinding;
@@ -48,13 +48,13 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
 
   /// Constructor.
   factory UserShellWidget({
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     T userShellModel,
     VoidCallback onWindowMetricsChanged,
     Widget child,
   }) =>
       new UserShellWidget<T>._create(
-        applicationContext: applicationContext,
+        startupContext: startupContext,
         userShellModel: userShellModel,
         onWindowMetricsChanged: onWindowMetricsChanged,
         child: child,
@@ -63,14 +63,13 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
       );
 
   UserShellWidget._create({
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     T userShellModel,
     VoidCallback onWindowMetricsChanged,
     Widget child,
     UserShellBinding userShellBinding,
     LifecycleBinding lifecycleBinding,
-  })
-      : _applicationContext = applicationContext,
+  })  : _startupContext = startupContext,
         _userShellModel = userShellModel,
         _onWindowMetricsChanged = onWindowMetricsChanged,
         _child = child,
@@ -118,9 +117,9 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
       );
 
   /// Advertises [_userShell] as a [UserShell] to the rest of the system via
-  /// the [ApplicationContext].
+  /// the [StartupContext].
   void advertise() {
-    _applicationContext.outgoingServices
+    _startupContext.outgoingServices
       ..addServiceForName(
         (InterfaceRequest<UserShell> request) =>
             _userShellBinding.bind(_userShell, request),

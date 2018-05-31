@@ -43,25 +43,24 @@ void main() {
   setupLogger(name: 'userpicker_device_shell');
   trace('starting');
   GlobalKey screenManagerKey = new GlobalKey();
-  ApplicationContext applicationContext =
-      new ApplicationContext.fromStartupInfo();
+  StartupContext startupContext = new StartupContext.fromStartupInfo();
 
   // Connect to Cobalt
   CobaltEncoderProxy encoder = new CobaltEncoderProxy();
 
   CobaltEncoderFactoryProxy encoderFactory = new CobaltEncoderFactoryProxy();
-  connectToService(applicationContext.environmentServices, encoderFactory.ctrl);
+  connectToService(startupContext.environmentServices, encoderFactory.ctrl);
   encoderFactory.getEncoder(_kCobaltProjectId, encoder.ctrl.request());
   encoderFactory.ctrl.close();
 
   NetstackProxy netstackProxy = new NetstackProxy();
-  connectToService(applicationContext.environmentServices, netstackProxy.ctrl);
+  connectToService(startupContext.environmentServices, netstackProxy.ctrl);
 
   NetstackModel netstackModel = new NetstackModel(netstack: netstackProxy)
     ..start();
 
   UserSetupModel userSetupModel = new UserSetupModel(
-      applicationContext, netstackModel, _cancelAuthenticationFlow);
+      startupContext, netstackModel, _cancelAuthenticationFlow);
 
   _OverlayModel wifiInfoOverlayModel = new _OverlayModel();
 
@@ -85,7 +84,7 @@ void main() {
       ? new SoftKeyboardContainerImpl(
           child: new ApplicationWidget(
             url: 'latin-ime',
-            launcher: applicationContext.launcher,
+            launcher: startupContext.launcher,
           ),
         )
       : null;
@@ -95,7 +94,7 @@ void main() {
     children: <Widget>[
       new UserPickerDeviceShellScreen(
         key: screenManagerKey,
-        launcher: applicationContext.launcher,
+        launcher: startupContext.launcher,
       ),
       new ScopedModel<UserSetupModel>(
           model: userSetupModel, child: const UserSetup()),
@@ -123,7 +122,7 @@ void main() {
             child: new _WifiInfo(
               wifiWidget: new ApplicationWidget(
                 url: 'wifi_settings',
-                launcher: applicationContext.launcher,
+                launcher: startupContext.launcher,
               ),
             ),
           ),
@@ -153,7 +152,7 @@ void main() {
   }
 
   _deviceShellWidget = new DeviceShellWidget<UserPickerDeviceShellModel>(
-    applicationContext: applicationContext,
+    startupContext: startupContext,
     softKeyboardContainer: softKeyboardContainerImpl,
     deviceShellModel: userPickerDeviceShellModel,
     authenticationContext: new AuthenticationContextImpl(

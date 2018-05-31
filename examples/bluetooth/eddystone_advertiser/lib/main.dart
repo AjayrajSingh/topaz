@@ -14,14 +14,14 @@ import 'src/screen.dart';
 void main() {
   setupLogger();
 
-  ApplicationContext appContext = new ApplicationContext.fromStartupInfo();
+  StartupContext context = new StartupContext.fromStartupInfo();
 
-  EddystoneModuleModel model = new EddystoneModuleModel(appContext);
+  EddystoneModuleModel model = new EddystoneModuleModel(context);
 
   ModuleWidget<EddystoneModuleModel> moduleWidget =
       new ModuleWidget<EddystoneModuleModel>(
           moduleModel: model,
-          applicationContext: appContext,
+          startupContext: context,
           child: new EddystoneScreen(moduleModel: model))
         ..advertise();
 

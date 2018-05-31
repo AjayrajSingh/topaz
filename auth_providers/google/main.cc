@@ -8,7 +8,7 @@
 #include <auth/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/backoff/exponential_backoff.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fidl/cpp/interface_request.h"
@@ -24,36 +24,32 @@ class GoogleAuthProviderApp {
  public:
   GoogleAuthProviderApp()
       : loop_(&kAsyncLoopConfigMakeDefault),
-        application_context_(
-            component::ApplicationContext::CreateFromStartupInfo()),
+        startup_context_(component::StartupContext::CreateFromStartupInfo()),
         trace_provider_(loop_.async()),
         network_wrapper_(
-            loop_.async(),
-            std::make_unique<backoff::ExponentialBackoff>(),
+            loop_.async(), std::make_unique<backoff::ExponentialBackoff>(),
             [this] {
-              return application_context_
+              return startup_context_
                   ->ConnectToEnvironmentService<network::NetworkService>();
             }),
-        factory_impl_(loop_.async(),
-                      application_context_.get(),
+        factory_impl_(loop_.async(), startup_context_.get(),
                       &network_wrapper_) {
-    FXL_DCHECK(application_context_);
+    FXL_DCHECK(startup_context_);
   }
 
   ~GoogleAuthProviderApp() { loop_.Quit(); }
 
   void Run() {
-    application_context_->outgoing()
-        .AddPublicService<auth::AuthProviderFactory>(
-            [this](fidl::InterfaceRequest<auth::AuthProviderFactory> request) {
-              factory_impl_.Bind(std::move(request));
-            });
+    startup_context_->outgoing().AddPublicService<auth::AuthProviderFactory>(
+        [this](fidl::InterfaceRequest<auth::AuthProviderFactory> request) {
+          factory_impl_.Bind(std::move(request));
+        });
     loop_.Run();
   }
 
  private:
   async::Loop loop_;
-  std::unique_ptr<component::ApplicationContext> application_context_;
+  std::unique_ptr<component::StartupContext> startup_context_;
   trace::TraceProvider trace_provider_;
   network_wrapper::NetworkWrapperImpl network_wrapper_;
 

@@ -48,7 +48,7 @@ Future<Null> main() async {
     buildArmadilloUserShell(
       sizeModel: new SizeModel(),
       conductorModel: new ConductorModel(),
-      applicationContext: new ApplicationContext.fromStartupInfo(),
+      startupContext: new StartupContext.fromStartupInfo(),
     ),
   );
 }
@@ -57,7 +57,7 @@ Future<Null> main() async {
 Widget buildArmadilloUserShell({
   @required SizeModel sizeModel,
   @required ConductorModel conductorModel,
-  @required ApplicationContext applicationContext,
+  @required StartupContext startupContext,
   String logName = 'armadillo',
 }) {
   setupLogger(name: logName);
@@ -152,7 +152,7 @@ Widget buildArmadilloUserShell({
   );
 
   TimezoneProxy timezoneProxy = new TimezoneProxy();
-  connectToService(applicationContext.environmentServices, timezoneProxy.ctrl);
+  connectToService(startupContext.environmentServices, timezoneProxy.ctrl);
 
   ContextProviderContextModel contextProviderContextModel =
       new ContextProviderContextModel(
@@ -162,7 +162,7 @@ Widget buildArmadilloUserShell({
   DeviceMapProxy deviceMapProxy = new DeviceMapProxy();
   DeviceMapWatcherBinding deviceMapWatcher = new DeviceMapWatcherBinding();
 
-  connectToService(applicationContext.environmentServices, deviceMapProxy.ctrl);
+  connectToService(startupContext.environmentServices, deviceMapProxy.ctrl);
 
   deviceMapProxy.watchDeviceMap(
     deviceMapWatcher.wrap(
@@ -173,7 +173,7 @@ Widget buildArmadilloUserShell({
   );
 
   AudioPolicy audioPolicy = new AudioPolicy(
-    applicationContext.environmentServices,
+    startupContext.environmentServices,
   );
   VolumeModel volumeModel = new AudioPolicyVolumeModel(
     audioPolicy: audioPolicy,
@@ -181,7 +181,7 @@ Widget buildArmadilloUserShell({
 
   PowerManagerProxy powerManagerProxy = new PowerManagerProxy();
   connectToService(
-    applicationContext.environmentServices,
+    startupContext.environmentServices,
     powerManagerProxy.ctrl,
   );
 
@@ -192,7 +192,7 @@ Widget buildArmadilloUserShell({
   MaxwellVoiceModel voiceModel = new MaxwellVoiceModel();
 
   ArmadilloUserShellModel armadilloUserShellModel = new ArmadilloUserShellModel(
-    applicationContext: applicationContext,
+    startupContext: startupContext,
     storyProviderStoryGenerator: storyProviderStoryGenerator,
     suggestionProviderSuggestionModel: suggestionProviderSuggestionModel,
     maxwellVoiceModel: voiceModel,
@@ -342,7 +342,7 @@ Widget buildArmadilloUserShell({
 
   UserShellWidget<ArmadilloUserShellModel> userShellWidget =
       new UserShellWidget<ArmadilloUserShellModel>(
-    applicationContext: applicationContext,
+    startupContext: startupContext,
     userShellModel: armadilloUserShellModel,
     child:
         _kShowPerformanceOverlay ? _buildPerformanceOverlay(child: app) : app,

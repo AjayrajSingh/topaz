@@ -52,11 +52,11 @@ class ContextDataHandler extends ContextDebugListener with DataHandler {
   SendWebSocketMessage _sendMessage;
 
   @override
-  void init(ApplicationContext appContext, SendWebSocketMessage sender) {
+  void init(StartupContext context, SendWebSocketMessage sender) {
     _sendMessage = sender;
 
     final ContextDebugProxy contextDebug = new ContextDebugProxy();
-    connectToService(appContext.environmentServices, contextDebug.ctrl);
+    connectToService(context.environmentServices, contextDebug.ctrl);
     assert(contextDebug.ctrl.isBound);
 
     // Watch subscription changes.

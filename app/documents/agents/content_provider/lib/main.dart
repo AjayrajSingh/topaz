@@ -25,13 +25,12 @@ class DocumentsAgent extends AgentImpl {
 
   /// Creates a new instance of [DocumentsAgent].
   DocumentsAgent({
-    @required ApplicationContext applicationContext,
-  })
-      : super(applicationContext: applicationContext);
+    @required StartupContext startupContext,
+  }) : super(startupContext: startupContext);
 
   @override
   Future<Null> onReady(
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
     TokenProvider tokenProvider,
@@ -74,7 +73,7 @@ class DocumentsAgent extends AgentImpl {
   @override
   void advertise() {
     super.advertise();
-    applicationContext.outgoingServices.addServiceForName(
+    startupContext.outgoingServices.addServiceForName(
       (InterfaceRequest<EntityProvider> request) {
         _bindings.add(
           new EntityProviderBinding()
@@ -91,6 +90,6 @@ Future<Null> main(List<String> args) async {
   setupLogger(name: 'documents');
 
   _agent = new DocumentsAgent(
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    startupContext: new StartupContext.fromStartupInfo(),
   )..advertise();
 }

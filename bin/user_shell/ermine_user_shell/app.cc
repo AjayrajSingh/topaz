@@ -9,9 +9,10 @@
 
 namespace ermine_user_shell {
 
-App::App() : context_(component::ApplicationContext::CreateFromStartupInfo()) {
+App::App() : context_(component::StartupContext::CreateFromStartupInfo()) {
   context_->outgoing().AddPublicService<fuchsia::ui::views_v1::ViewProvider>(
-      [this](fidl::InterfaceRequest<fuchsia::ui::views_v1::ViewProvider> request) {
+      [this](
+          fidl::InterfaceRequest<fuchsia::ui::views_v1::ViewProvider> request) {
         bindings_.AddBinding(this, std::move(request));
       });
 }
@@ -19,11 +20,13 @@ App::App() : context_(component::ApplicationContext::CreateFromStartupInfo()) {
 App::~App() = default;
 
 void App::CreateView(
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+        view_owner_request,
     fidl::InterfaceRequest<component::ServiceProvider> view_services) {
   controllers_.push_back(std::make_unique<ViewController>(
       context_->launcher().get(),
-      context_->ConnectToEnvironmentService<fuchsia::ui::views_v1::ViewManager>(),
+      context_
+          ->ConnectToEnvironmentService<fuchsia::ui::views_v1::ViewManager>(),
       std::move(view_owner_request),
       [this](ViewController* controller) { DestroyController(controller); }));
 

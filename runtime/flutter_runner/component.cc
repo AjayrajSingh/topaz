@@ -119,8 +119,8 @@ Application::Application(TerminationCallback termination_callback,
     application_controller_.Bind(std::move(application_controller_request));
   }
 
-  application_context_ =
-      component::ApplicationContext::CreateFrom(std::move(startup_info));
+  startup_context_ =
+      component::StartupContext::CreateFrom(std::move(startup_info));
 
   // Compare flutter_jit_runner in BUILD.gn.
   settings_.vm_snapshot_data_path = "pkg/data/vm_snapshot_data.bin";
@@ -358,7 +358,8 @@ void Application::OnEngineTerminate(const Engine* shell_holder) {
 }
 
 void Application::CreateShellForView(
-    fidl::InterfaceRequest<fuchsia::ui::views_v1::ViewProvider> view_provider_request) {
+    fidl::InterfaceRequest<fuchsia::ui::views_v1::ViewProvider>
+        view_provider_request) {
   shells_bindings_.AddBinding(this, std::move(view_provider_request));
 }
 
@@ -366,7 +367,7 @@ void Application::CreateShellForView(
 void Application::CreateView(
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
     fidl::InterfaceRequest<component::ServiceProvider>) {
-  if (!application_context_) {
+  if (!startup_context_) {
     FXL_DLOG(ERROR) << "Application context was invalid when attempting to "
                        "create a shell for a view provider request.";
     return;
@@ -375,7 +376,7 @@ void Application::CreateView(
   shell_holders_.emplace(std::make_unique<Engine>(
       *this,                                 // delegate
       debug_label_,                          // thread label
-      *application_context_,                 // application context
+      *startup_context_,                     // application context
       settings_,                             // settings
       std::move(isolate_snapshot_),          // isolate snapshot
       std::move(shared_snapshot_),           // shared snapshot

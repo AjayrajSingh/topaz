@@ -13,8 +13,7 @@ import 'widgets/todo_widget.dart';
 void main() {
   placeholder();
 
-  ApplicationContext applicationContext =
-      new ApplicationContext.fromStartupInfo();
+  StartupContext startupContext = new StartupContext.fromStartupInfo();
 
   TodoModule todoModule = new TodoModule();
 
@@ -22,7 +21,7 @@ void main() {
       home: new TodoWidget(), theme: new ThemeData(primarySwatch: Colors.red));
 
   ModuleWidget<TodoModule> todoWidget = new ModuleWidget<TodoModule>(
-    applicationContext: applicationContext,
+    startupContext: startupContext,
     moduleModel: todoModule,
     child: materialApp,
   );

@@ -7,12 +7,12 @@
 namespace google_auth_provider {
 
 FactoryImpl::FactoryImpl(async_t* main_dispatcher,
-                         component::ApplicationContext* app_context,
+                         component::StartupContext* context,
                          network_wrapper::NetworkWrapper* network_wrapper)
     : main_dispatcher_(main_dispatcher),
-      app_context_(app_context),
+      context_(context),
       network_wrapper_(network_wrapper) {
-  FXL_DCHECK(app_context_);
+  FXL_DCHECK(context_);
   FXL_DCHECK(network_wrapper_);
 }
 
@@ -26,7 +26,7 @@ void FactoryImpl::Bind(
 void FactoryImpl::GetAuthProvider(
     fidl::InterfaceRequest<auth::AuthProvider> auth_provider,
     GetAuthProviderCallback callback) {
-  providers_.emplace(main_dispatcher_, app_context_, network_wrapper_,
+  providers_.emplace(main_dispatcher_, context_, network_wrapper_,
                      std::move(auth_provider));
   callback(auth::AuthProviderStatus::OK);
 }

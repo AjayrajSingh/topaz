@@ -21,7 +21,7 @@ class _HelloImpl extends Hello {
 }
 
 void main(List<String> args) {
-  ApplicationContext context = new ApplicationContext.fromStartupInfo();
+  StartupContext context = new StartupContext.fromStartupInfo();
 
   context.outgoingServices
       .addServiceForName(new _HelloImpl().bind, Hello.$serviceName);

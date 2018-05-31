@@ -14,14 +14,14 @@ import 'src/screen.dart';
 void main() {
   setupLogger();
 
-  ApplicationContext appContext = new ApplicationContext.fromStartupInfo();
+  StartupContext context = new StartupContext.fromStartupInfo();
 
-  BLERectModuleModel model = new BLERectModuleModel(appContext);
+  BLERectModuleModel model = new BLERectModuleModel(context);
 
   ModuleWidget<BLERectModuleModel> moduleWidget =
       new ModuleWidget<BLERectModuleModel>(
           moduleModel: model,
-          applicationContext: appContext,
+          startupContext: context,
           child: new BLERectScreen());
 
   model.start();

@@ -38,11 +38,11 @@ class SettingsModuleModel extends ModuleModel
       <String, bt_ctl.RemoteDevice>{};
 
   /// Constructor
-  SettingsModuleModel(this.applicationContext) : super();
+  SettingsModuleModel(this.startupContext) : super();
 
-  /// We use the |applicationContext| to obtain a handle to the "bluetooth::control::AdapterManager"
+  /// We use the |startupContext| to obtain a handle to the "bluetooth::control::AdapterManager"
   /// environment service.
-  final ApplicationContext applicationContext;
+  final StartupContext startupContext;
 
   /// Public accessors for the private fields above.
   Iterable<bt_ctl.AdapterInfo> get adapters => _adapters.values;
@@ -122,7 +122,7 @@ class SettingsModuleModel extends ModuleModel
   ) {
     super.onReady(moduleContext, link);
 
-    connectToService(applicationContext.environmentServices, _control.ctrl);
+    connectToService(startupContext.environmentServices, _control.ctrl);
     _control
       ..setDelegate(_controlBinding.wrap(this))
       ..setRemoteDeviceDelegate(_deviceBinding.wrap(this), true)

@@ -8,12 +8,12 @@
 
 #include <iomanip>
 
-#include "topaz/examples/media/vu_meter/vu_meter_params.h"
 #include "lib/app/cpp/connect.h"
 #include "lib/fxl/logging.h"
 #include "lib/media/audio/types.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
+#include "topaz/examples/media/vu_meter/vu_meter_params.h"
 
 constexpr zx_duration_t kCaptureDuration = ZX_MSEC(20);
 constexpr uint64_t kBytesPerFrame = 4;
@@ -21,11 +21,10 @@ constexpr uint64_t kBytesPerFrame = 4;
 namespace examples {
 
 VuMeterView::VuMeterView(
-    async::Loop* loop,
-    fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
-    component::ApplicationContext* application_context,
-    const VuMeterParams& params)
+    async::Loop* loop, fuchsia::ui::views_v1::ViewManagerPtr view_manager,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+        view_owner_request,
+    component::StartupContext* startup_context, const VuMeterParams& params)
     : mozart::SkiaView(std::move(view_manager), std::move(view_owner_request),
                        "VU Meter"),
       loop_(loop),
@@ -37,7 +36,7 @@ VuMeterView::VuMeterView(
   FXL_DCHECK(params.is_valid());
 
   auto audio_server =
-      application_context->ConnectToEnvironmentService<media::AudioServer>();
+      startup_context->ConnectToEnvironmentService<media::AudioServer>();
   audio_server->CreateCapturer(capturer_.NewRequest(), false);
 
   capturer_.set_error_handler([this]() {
@@ -136,19 +135,18 @@ void VuMeterView::OnDefaultFormatFetched(media::MediaType default_type) {
   FXL_DCHECK(default_type.details.is_audio());
   const auto& audio_details = default_type.details.audio();
   capturer_->SetMediaType(media::CreateLpcmMediaType(
-        media::AudioSampleFormat::SIGNED_16, 2, audio_details.frames_per_second));
+      media::AudioSampleFormat::SIGNED_16, 2, audio_details.frames_per_second));
 
   uint64_t payload_buffer_size =
-    kBytesPerFrame * ((kCaptureDuration * audio_details.frames_per_second) / ZX_SEC(1));
+      kBytesPerFrame *
+      ((kCaptureDuration * audio_details.frames_per_second) / ZX_SEC(1));
 
-  constexpr zx_rights_t rights = ZX_RIGHT_TRANSFER | ZX_RIGHT_READ | ZX_RIGHT_WRITE | ZX_RIGHT_MAP;
+  constexpr zx_rights_t rights =
+      ZX_RIGHT_TRANSFER | ZX_RIGHT_READ | ZX_RIGHT_WRITE | ZX_RIGHT_MAP;
   zx_status_t zx_res;
   zx::vmo vmo;
-  zx_res = payload_buffer_.CreateAndMap(payload_buffer_size,
-                                        ZX_VM_FLAG_PERM_READ,
-                                        nullptr,
-                                        &vmo,
-                                        rights);
+  zx_res = payload_buffer_.CreateAndMap(
+      payload_buffer_size, ZX_VM_FLAG_PERM_READ, nullptr, &vmo, rights);
   if (zx_res != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to create payload buffer (res " << zx_res << ")";
     Shutdown();
@@ -168,19 +166,20 @@ void VuMeterView::OnPacketCaptured(media::MediaPacket packet) {
   }
 
   // TODO(dalesat): Synchronize display and captured audio.
-  uint32_t frame_count = static_cast<uint32_t>(payload_buffer_.size() / kBytesPerFrame);
+  uint32_t frame_count =
+      static_cast<uint32_t>(payload_buffer_.size() / kBytesPerFrame);
   int16_t* samples = reinterpret_cast<int16_t*>(payload_buffer_.start());
 
   for (uint32_t i = 0; i < frame_count; ++i) {
-      int16_t abs_sample = std::abs(samples[0]);
-      fast_left_.Process(abs_sample);
-      slow_left_.Process(abs_sample);
+    int16_t abs_sample = std::abs(samples[0]);
+    fast_left_.Process(abs_sample);
+    slow_left_.Process(abs_sample);
 
-      abs_sample = std::abs(samples[1]);
-      fast_right_.Process(abs_sample);
-      slow_right_.Process(abs_sample);
+    abs_sample = std::abs(samples[1]);
+    fast_right_.Process(abs_sample);
+    slow_right_.Process(abs_sample);
 
-      samples += 2;
+    samples += 2;
   }
 
   InvalidateScene();
@@ -188,8 +187,8 @@ void VuMeterView::OnPacketCaptured(media::MediaPacket packet) {
 }
 
 void VuMeterView::Shutdown() {
-    capturer_.Unbind();
-    loop_->Quit();
+  capturer_.Unbind();
+  loop_->Quit();
 }
 
 }  // namespace examples

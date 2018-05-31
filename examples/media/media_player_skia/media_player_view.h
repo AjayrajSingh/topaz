@@ -2,17 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#pragma once
+#ifndef TOPAZ_EXAMPLES_MEDIA_MEDIA_PLAYER_SKIA_MEDIA_PLAYER_VIEW_H_
+#define TOPAZ_EXAMPLES_MEDIA_MEDIA_PLAYER_SKIA_MEDIA_PLAYER_VIEW_H_
 
 #include <memory>
 #include <queue>
 
+#include <lib/async-loop/cpp/loop.h>
 #include <media/cpp/fidl.h>
 #include <media_player/cpp/fidl.h>
-#include <lib/async-loop/cpp/loop.h>
 
 #include "examples/ui/lib/host_canvas_cycler.h"
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/fxl/macros.h"
 #include "lib/media/timeline/timeline_function.h"
 #include "lib/ui/view_framework/base_view.h"
@@ -24,8 +25,9 @@ class MediaPlayerView : public mozart::BaseView {
  public:
   MediaPlayerView(async::Loop* loop,
                   fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-                  fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
-                  component::ApplicationContext* application_context,
+                  fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+                      view_owner_request,
+                  component::StartupContext* startup_context,
                   const MediaPlayerParams& params);
 
   ~MediaPlayerView() override;
@@ -34,10 +36,13 @@ class MediaPlayerView : public mozart::BaseView {
   enum class State { kPaused, kPlaying, kEnded };
 
   // |BaseView|:
-  void OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties old_properties) override;
-  void OnSceneInvalidated(fuchsia::images::PresentationInfo presentation_info) override;
-  void OnChildAttached(uint32_t child_key,
-                       fuchsia::ui::views_v1::ViewInfo child_view_info) override;
+  void OnPropertiesChanged(
+      fuchsia::ui::views_v1::ViewProperties old_properties) override;
+  void OnSceneInvalidated(
+      fuchsia::images::PresentationInfo presentation_info) override;
+  void OnChildAttached(
+      uint32_t child_key,
+      fuchsia::ui::views_v1::ViewInfo child_view_info) override;
   void OnChildUnavailable(uint32_t child_key) override;
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 
@@ -92,3 +97,5 @@ class MediaPlayerView : public mozart::BaseView {
 };
 
 }  // namespace examples
+
+#endif  // TOPAZ_EXAMPLES_MEDIA_MEDIA_PLAYER_SKIA_MEDIA_PLAYER_VIEW_H_

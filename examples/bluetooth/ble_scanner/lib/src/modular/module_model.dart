@@ -6,8 +6,7 @@ import 'package:lib.app.dart/app.dart';
 
 import 'package:fidl_bluetooth/fidl.dart' as bt;
 import 'package:fidl_bluetooth_gatt/fidl.dart' as gatt;
-import 'package:fidl_bluetooth_low_energy/fidl.dart'
-    as ble;
+import 'package:fidl_bluetooth_low_energy/fidl.dart' as ble;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
@@ -44,11 +43,11 @@ class BLEScannerModuleModel extends ModuleModel implements ble.CentralDelegate {
       <String, ConnectionState>{};
 
   /// Constructor
-  BLEScannerModuleModel(this.applicationContext) : super();
+  BLEScannerModuleModel(this.startupContext) : super();
 
-  /// We use the |applicationContext| to obtain a handle to the "bluetooth::low_energy::Central"
+  /// We use the |startupContext| to obtain a handle to the "bluetooth::low_energy::Central"
   /// environment service.
-  final ApplicationContext applicationContext;
+  final StartupContext startupContext;
 
   /// True if we have an active scan session.
   bool get isScanning => _isScanning;
@@ -146,7 +145,7 @@ class BLEScannerModuleModel extends ModuleModel implements ble.CentralDelegate {
   ) {
     super.onReady(moduleContext, link);
 
-    connectToService(applicationContext.environmentServices, _central.ctrl);
+    connectToService(startupContext.environmentServices, _central.ctrl);
     _central.setDelegate(_delegateBinding.wrap(this));
   }
 

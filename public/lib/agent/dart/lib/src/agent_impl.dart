@@ -20,7 +20,7 @@ export 'package:fidl_modular_auth/fidl.dart';
 abstract class AgentImpl implements Agent, Lifecycle {
   final AgentBinding _agentBinding = new AgentBinding();
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
-  final ApplicationContext _applicationContext;
+  final StartupContext _startupContext;
 
   final AgentContextProxy _agentContext = new AgentContextProxy();
   final ComponentContextProxy _componentContext = new ComponentContextProxy();
@@ -33,17 +33,16 @@ abstract class AgentImpl implements Agent, Lifecycle {
   final Completer<Null> _readyCompleter = new Completer<Null>();
 
   /// Creates a new instance of [AgentImpl].
-  AgentImpl({@required ApplicationContext applicationContext})
-      : _applicationContext = applicationContext,
-        assert(applicationContext != null) {
-    connectToService(
-        _applicationContext.environmentServices, _agentContext.ctrl);
+  AgentImpl({@required StartupContext startupContext})
+      : _startupContext = startupContext,
+        assert(startupContext != null) {
+    connectToService(_startupContext.environmentServices, _agentContext.ctrl);
     _agentContext
       ..getComponentContext(_componentContext.ctrl.request())
       ..getTokenProvider(_tokenProvider.ctrl.request());
 
     onReady(
-      _applicationContext,
+      _startupContext,
       _agentContext,
       _componentContext,
       _tokenProvider,
@@ -96,9 +95,9 @@ abstract class AgentImpl implements Agent, Lifecycle {
   }
 
   /// Advertises this [AgentImpl] as an [Agent] to the rest of the system via
-  /// the [_applicationContext].
+  /// the [_startupContext].
   void advertise() {
-    _applicationContext.outgoingServices
+    _startupContext.outgoingServices
       ..addServiceForName((InterfaceRequest<Agent> request) {
         assert(!_agentBinding.isBound);
         _agentBinding.bind(this, request);
@@ -115,7 +114,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
   /// Note: Completing the future with an error will raise an unhandled
   /// exception. Subclasses should handle recoverable errors internally.
   Future<Null> onReady(
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
     TokenProvider tokenProvider,
@@ -137,5 +136,5 @@ abstract class AgentImpl implements Agent, Lifecycle {
   Future<Null> onRunTask(String taskId) async => null;
 
   /// The Application Context
-  ApplicationContext get applicationContext => _applicationContext;
+  StartupContext get startupContext => _startupContext;
 }

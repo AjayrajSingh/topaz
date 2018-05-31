@@ -17,7 +17,7 @@ namespace spotify_auth_provider {
 
 class FactoryImpl : public auth::AuthProviderFactory {
  public:
-  FactoryImpl(component::ApplicationContext* app_context,
+  FactoryImpl(component::StartupContext* context,
               network_wrapper::NetworkWrapper* network_wrapper);
 
   ~FactoryImpl() override;
@@ -29,7 +29,7 @@ class FactoryImpl : public auth::AuthProviderFactory {
   void GetAuthProvider(fidl::InterfaceRequest<auth::AuthProvider> auth_provider,
                        GetAuthProviderCallback callback) override;
 
-  component::ApplicationContext* const app_context_;
+  component::StartupContext* const context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
 
   callback::AutoCleanableSet<SpotifyAuthProviderImpl> providers_;

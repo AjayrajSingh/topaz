@@ -18,9 +18,9 @@ import 'package:fidl/fidl.dart';
 import 'asset.dart';
 import 'config.dart';
 
-final ApplicationContext _appContext = new ApplicationContext.fromStartupInfo();
+final StartupContext _context = new StartupContext.fromStartupInfo();
 final MediaPlayerController _controller =
-    new MediaPlayerController(_appContext.environmentServices);
+    new MediaPlayerController(_context.environmentServices);
 
 ModuleImpl _module = new ModuleImpl();
 
@@ -391,13 +391,12 @@ Future<Null> main() async {
   _log('Module started');
 
   /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
-  _appContext.outgoingServices
-    .addServiceForName(
-      (InterfaceRequest<Lifecycle> request) {
-        _module.bindLifecycle(request);
-      },
-      Lifecycle.$serviceName,
-    );
+  _context.outgoingServices.addServiceForName(
+    (InterfaceRequest<Lifecycle> request) {
+      _module.bindLifecycle(request);
+    },
+    Lifecycle.$serviceName,
+  );
 
   await _readConfig();
 

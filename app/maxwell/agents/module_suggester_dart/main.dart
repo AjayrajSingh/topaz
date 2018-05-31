@@ -16,7 +16,7 @@ final IntelligenceServicesProxy _intelligenceServices =
 final QueryHandlerBinding _queryHandlerBinding = new QueryHandlerBinding();
 
 void main(List<String> args) {
-  final ApplicationContext context = new ApplicationContext.fromStartupInfo();
+  final StartupContext context = new StartupContext.fromStartupInfo();
   connectToService(context.environmentServices, _intelligenceServices.ctrl);
   _intelligenceServices.registerQueryHandler(
     _queryHandlerBinding.wrap(new _QueryHandlerImpl()),

@@ -34,15 +34,15 @@ static void UpdateNativeThreadLabelNames(const std::string& label,
   set_thread_name(runners.GetIOTaskRunner(), label, ".io");
 }
 
-Engine::Engine(Delegate& delegate, std::string thread_label,
-               component::ApplicationContext& application_context,
-               blink::Settings settings,
-               fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
-               fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
-               fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
-               UniqueFDIONS fdio_ns,
-               fidl::InterfaceRequest<component::ServiceProvider>
-                   outgoing_services_request)
+Engine::Engine(
+    Delegate& delegate, std::string thread_label,
+    component::StartupContext& startup_context, blink::Settings settings,
+    fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
+    fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
+    UniqueFDIONS fdio_ns,
+    fidl::InterfaceRequest<component::ServiceProvider>
+        outgoing_services_request)
     : delegate_(delegate),
       thread_label_(std::move(thread_label)),
       settings_(std::move(settings)),
@@ -59,7 +59,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   }
 
   fuchsia::ui::views_v1::ViewManagerPtr view_manager;
-  application_context.ConnectToEnvironmentService(view_manager.NewRequest());
+  startup_context.ConnectToEnvironmentService(view_manager.NewRequest());
 
   zx::eventpair import_token, export_token;
   if (zx::eventpair::create(0u, &import_token, &export_token) != ZX_OK) {
@@ -75,7 +75,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   // some of these services.
   fidl::InterfaceHandle<component::ServiceProvider>
       parent_environment_service_provider;
-  application_context.environment()->GetServices(
+  startup_context.environment()->GetServices(
       parent_environment_service_provider.NewRequest());
 
   // We need to manually schedule a frame when the session metrics change.
@@ -98,7 +98,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   // on the platform view.
   fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
       accessibility_context_writer;
-  application_context.ConnectToEnvironmentService(
+  startup_context.ConnectToEnvironmentService(
       accessibility_context_writer.NewRequest());
 
   // Create the compositor context from the scenic pointer to create the
@@ -208,13 +208,12 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
             ->TakeViewContainer();
 
     component::EnvironmentPtr environment;
-    application_context.ConnectToEnvironmentService(
-        environment.NewRequest());
+    startup_context.ConnectToEnvironmentService(environment.NewRequest());
 
     isolate_configurator_ = std::make_unique<IsolateConfigurator>(
         std::move(fdio_ns),                   //
         std::move(view_container),            //
-        std::move(environment),   //
+        std::move(environment),               //
         std::move(outgoing_services_request)  //
     );
   }

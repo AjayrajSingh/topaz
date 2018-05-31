@@ -14,12 +14,12 @@ import 'src/screen.dart';
 void main() {
   setupLogger();
 
-  ApplicationContext appContext = new ApplicationContext.fromStartupInfo();
+  StartupContext context = new StartupContext.fromStartupInfo();
 
   ModuleWidget<BLEScannerModuleModel> moduleWidget =
       new ModuleWidget<BLEScannerModuleModel>(
-          moduleModel: new BLEScannerModuleModel(appContext),
-          applicationContext: appContext,
+          moduleModel: new BLEScannerModuleModel(context),
+          startupContext: context,
           child: new BLEScannerScreen())
         ..advertise();
 

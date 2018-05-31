@@ -13,14 +13,13 @@ import 'src/modular/todo_list_module_screen.dart';
 /// Main entry point to the todo list module.
 void main() {
   setupLogger();
-  ApplicationContext applicationContext =
-      new ApplicationContext.fromStartupInfo();
+  StartupContext startupContext = new StartupContext.fromStartupInfo();
 
   TodoListModuleModel todoListModuleModel = new TodoListModuleModel();
 
   ModuleWidget<TodoListModuleModel> moduleWidget =
       new ModuleWidget<TodoListModuleModel>(
-    applicationContext: applicationContext,
+    startupContext: startupContext,
     moduleModel: todoListModuleModel,
     child: new TodoListModuleScreen(
         onNewItem: (String content) => todoListModuleModel.addItem(content),

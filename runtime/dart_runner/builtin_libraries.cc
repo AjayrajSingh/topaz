@@ -82,7 +82,8 @@ void Logger_PrintString(Dart_NativeArguments args) {
 
 void ScheduleMicrotask(Dart_NativeArguments args) {
   Dart_Handle closure = Dart_GetNativeArgument(args, 0);
-  if (tonic::LogIfError(closure) || !Dart_IsClosure(closure)) return;
+  if (tonic::LogIfError(closure) || !Dart_IsClosure(closure))
+    return;
   tonic::DartMicrotaskQueue::GetForCurrentThread()->ScheduleMicrotask(closure);
 }
 
@@ -90,7 +91,7 @@ void ScheduleMicrotask(Dart_NativeArguments args) {
 
 void InitBuiltinLibrariesForIsolate(
     const std::string& script_uri, fdio_ns_t* namespc, int stdoutfd,
-    int stderrfd, std::unique_ptr<component::ApplicationContext> context,
+    int stderrfd, std::unique_ptr<component::StartupContext> context,
     fidl::InterfaceRequest<component::ServiceProvider> outgoing_services,
     bool service_isolate) {
   // dart:fuchsia --------------------------------------------------------------

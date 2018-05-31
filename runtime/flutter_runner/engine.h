@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#pragma once
+#ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_
+#define TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_
 
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/ui/views_v1_token/cpp/fidl.h>
@@ -10,7 +11,7 @@
 
 #include "flutter/shell/common/shell.h"
 #include "isolate_configurator.h"
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/fsl/threading/thread.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
@@ -27,15 +28,15 @@ class Engine final : public mozart::NativesDelegate {
     virtual void OnEngineTerminate(const Engine* holder) = 0;
   };
 
-  Engine(Delegate& delegate, std::string thread_label,
-         component::ApplicationContext& application_context,
-         blink::Settings settings,
-         fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
-         fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
-         fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
-         UniqueFDIONS fdio_ns,
-         fidl::InterfaceRequest<component::ServiceProvider>
-             outgoing_services_request);
+  Engine(
+      Delegate& delegate, std::string thread_label,
+      component::StartupContext& startup_context, blink::Settings settings,
+      fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
+      fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
+      fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
+      UniqueFDIONS fdio_ns,
+      fidl::InterfaceRequest<component::ServiceProvider>
+          outgoing_services_request);
 
   ~Engine();
 
@@ -70,3 +71,5 @@ class Engine final : public mozart::NativesDelegate {
 };
 
 }  // namespace flutter
+
+#endif  // TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_

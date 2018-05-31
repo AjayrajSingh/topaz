@@ -18,7 +18,7 @@ import 'package:lib.proposal.dart/proposal.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
-final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
+final StartupContext _context = new StartupContext.fromStartupInfo();
 
 final ble.CentralDelegateBinding _delegateBinding =
     new ble.CentralDelegateBinding();

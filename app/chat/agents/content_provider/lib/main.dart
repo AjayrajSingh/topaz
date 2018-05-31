@@ -38,12 +38,12 @@ class ChatContentProviderAgent extends AgentImpl {
       new AgentControllerProxy();
 
   /// Creates a new instance of [ChatContentProviderAgent].
-  ChatContentProviderAgent({@required ApplicationContext applicationContext})
-      : super(applicationContext: applicationContext);
+  ChatContentProviderAgent({@required StartupContext startupContext})
+      : super(startupContext: startupContext);
 
   @override
   Future<Null> onReady(
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
     TokenProvider tokenProvider,
@@ -53,7 +53,7 @@ class ChatContentProviderAgent extends AgentImpl {
 
     // Get the device id.
     DeviceMapProxy deviceMap = new DeviceMapProxy();
-    connectToService(applicationContext.environmentServices, deviceMap.ctrl);
+    connectToService(startupContext.environmentServices, deviceMap.ctrl);
     Completer<DeviceMapEntry> entryCompleter = new Completer<DeviceMapEntry>();
     deviceMap.getCurrentDevice(entryCompleter.complete);
     DeviceMapEntry entry = await entryCompleter.future.timeout(_kTimeout);
@@ -74,9 +74,9 @@ class ChatContentProviderAgent extends AgentImpl {
         type: ContextValueType.entity,
         meta: const ContextMetadata(
             entity: const EntityMetadata(topic: 'location/home_work')));
-    ContextQuery query = new ContextQuery(
-        selector: <ContextQueryEntry>[new ContextQueryEntry(
-          key: 'location/home_work', value: selector)]);
+    ContextQuery query = new ContextQuery(selector: <ContextQueryEntry>[
+      new ContextQueryEntry(key: 'location/home_work', value: selector)
+    ]);
     _contextReader.subscribe(query, _proposerBinding.wrap(proposer));
 
     // Connect to the firebase db client agent and obtain the connector service.
@@ -129,6 +129,6 @@ Future<Null> main(List<String> args) async {
   setupLogger(name: 'chat/agent');
 
   _agent = new ChatContentProviderAgent(
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    startupContext: new StartupContext.fromStartupInfo(),
   )..advertise();
 }

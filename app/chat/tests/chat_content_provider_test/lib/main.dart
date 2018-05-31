@@ -26,7 +26,7 @@ import 'src/mock_chat_message_transporter.dart';
 
 const Duration _kTimeout = const Duration(seconds: 1);
 
-final ApplicationContext _context = new ApplicationContext.fromStartupInfo();
+final StartupContext _context = new StartupContext.fromStartupInfo();
 ChatContentProviderTestModule _module = new ChatContentProviderTestModule();
 
 /// Implementation of the [Module] interface which tests the functionalities of
@@ -759,8 +759,7 @@ class _MessageQueueWrapper {
   _MessageQueueWrapper({
     @required this.queue,
     @required this.token,
-  })
-      : assert(queue != null),
+  })  : assert(queue != null),
         assert(token != null) {
     _queueReceiver = new MessageReceiverImpl(
       messageQueue: queue,

@@ -14,7 +14,7 @@
 #include <zx/time.h>
 #include <utility>
 
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fidl/cpp/string.h"
 #include "lib/fsl/tasks/message_loop.h"
@@ -111,7 +111,7 @@ bool DartComponentController::SetupNamespace() {
 
   for (size_t i = 0; i < flat->paths->size(); ++i) {
     if (flat->paths->at(i) == kServiceRootPath) {
-      // Ownership of /svc goes to the ApplicationContext created below.
+      // Ownership of /svc goes to the StartupContext created below.
       continue;
     }
     zx::channel dir = std::move(flat->directories->at(i));
@@ -323,7 +323,7 @@ bool DartComponentController::Main() {
 
   InitBuiltinLibrariesForIsolate(
       url_, namespace_, stdoutfd_, stderrfd_,
-      component::ApplicationContext::CreateFrom(std::move(startup_info_)),
+      component::StartupContext::CreateFrom(std::move(startup_info_)),
       std::move(outgoing_services), false /* service_isolate */);
   namespace_ = nullptr;
 

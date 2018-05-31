@@ -14,10 +14,10 @@ import 'module_impl.dart';
 import 'module_model.dart';
 
 /// A wrapper widget intended to be the root of the application that is a
-/// Module. Its main purpose is to hold the [ApplicationContext] and
+/// Module. Its main purpose is to hold the [StartupContext] and
 /// [ModuleImpl] instances so they aren't garbage collected. For convenience,
 /// [advertise] does the advertising of the app as a Module to the rest of the
-/// system via the [ApplicationContext]. Also for convienence, the [ModuleModel]
+/// system via the [StartupContext]. Also for convienence, the [ModuleModel]
 /// given to this widget will be made available to [child] and [child]'s
 /// descendants.
 class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
@@ -27,8 +27,8 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
   /// The [ModuleImpl] whose services to [advertise].
   final ModuleImpl _module;
 
-  /// The [ApplicationContext] to [advertise] its Module services to.
-  final ApplicationContext applicationContext;
+  /// The [StartupContext] to [advertise] its Module services to.
+  final StartupContext startupContext;
 
   /// The [ModuleModel] to notify when the Module is ready.
   final T _moduleModel;
@@ -38,27 +38,26 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
 
   /// Constructor.
   factory ModuleWidget({
-    @required ApplicationContext applicationContext,
+    @required StartupContext startupContext,
     @required T moduleModel,
     @required Widget child,
   }) =>
       new ModuleWidget<T>._create(
-        applicationContext: applicationContext,
+        startupContext: startupContext,
         moduleModel: moduleModel,
         child: child,
         lifecycleBinding: new LifecycleBinding(),
       );
 
   ModuleWidget._create({
-    @required this.applicationContext,
+    @required this.startupContext,
     @required T moduleModel,
     @required this.child,
     @required LifecycleBinding lifecycleBinding,
-  })
-      : _moduleModel = moduleModel,
+  })  : _moduleModel = moduleModel,
         _lifecycleBinding = lifecycleBinding,
         _module = new ModuleImpl(
-          applicationContext: applicationContext,
+          startupContext: startupContext,
           onReady: moduleModel?.onReady,
           onStopping: moduleModel?.onStop,
           onStop: () {
@@ -87,13 +86,12 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
       );
 
   /// Advertises [_module] as a Module to the rest of the system via the
-  /// [applicationContext].
+  /// [startupContext].
   void advertise() {
-    applicationContext.outgoingServices
-      .addServiceForName(
-        (InterfaceRequest<Lifecycle> request) =>
-            _lifecycleBinding.bind(_module, request),
-        Lifecycle.$serviceName,
-      );
+    startupContext.outgoingServices.addServiceForName(
+      (InterfaceRequest<Lifecycle> request) =>
+          _lifecycleBinding.bind(_module, request),
+      Lifecycle.$serviceName,
+    );
   }
 }

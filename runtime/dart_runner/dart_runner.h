@@ -6,8 +6,8 @@
 #define TOPAZ_RUNTIME_DART_RUNNER_DART_RUNNER_H_
 
 #include <component/cpp/fidl.h>
-#include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/macros.h"
@@ -44,7 +44,7 @@ class DartRunner : public component::Runner {
   void RemoveController(ControllerToken* token);
   void UpdateProcessLabel();
 
-  std::unique_ptr<component::ApplicationContext> context_;
+  std::unique_ptr<component::StartupContext> context_;
   fsl::MessageLoop* loop_;
   fidl::BindingSet<component::Runner> bindings_;
   std::vector<ControllerToken*> controllers_;

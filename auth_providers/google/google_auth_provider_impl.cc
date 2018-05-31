@@ -4,11 +4,11 @@
 
 #include "topaz/auth_providers/google/google_auth_provider_impl.h"
 
-#include <network/cpp/fidl.h>
 #include <fuchsia/ui/views_v1_token/cpp/fidl.h>
+#include <network/cpp/fidl.h>
 
-#include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fxl/functional/make_copyable.h"
 #include "lib/fxl/logging.h"
@@ -46,12 +46,11 @@ using auth_providers::oauth::ParseOAuthResponse;
 using fuchsia::modular::JsonValueToPrettyString;
 
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
-    async_t* const main_dispatcher,
-    component::ApplicationContext* app_context,
+    async_t* const main_dispatcher, component::StartupContext* context,
     network_wrapper::NetworkWrapper* network_wrapper,
     fidl::InterfaceRequest<auth::AuthProvider> request)
     : main_dispatcher_(main_dispatcher),
-      app_context_(app_context),
+      context_(context),
       network_wrapper_(network_wrapper),
       binding_(this, std::move(request)) {
   FXL_DCHECK(main_dispatcher_);
@@ -152,9 +151,9 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
       });
 }
 
-void GoogleAuthProviderImpl::GetAppIdToken(
-    fidl::StringPtr credential, fidl::StringPtr audience,
-    GetAppIdTokenCallback callback) {
+void GoogleAuthProviderImpl::GetAppIdToken(fidl::StringPtr credential,
+                                           fidl::StringPtr audience,
+                                           GetAppIdTokenCallback callback) {
   if (credential->empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
     return;
@@ -199,38 +198,36 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
 
   std::map<std::string, std::string> query_params;
   query_params["key"] = firebase_api_key.get();
-  auto request = OAuthRequestBuilder(kFirebaseAuthEndpoint, "POST")
-                     .SetQueryParams(query_params)
-                     .SetJsonBody(
-                         R"({"postBody": "id_token=)" + id_token.get() +
-                         R"(&providerId=google.com",)" +
-                         R"("returnIdpCredential": true,)" +
-                         R"("returnSecureToken": true,)" +
-                         R"("requestUri": "http://localhost"})");
+  auto request =
+      OAuthRequestBuilder(kFirebaseAuthEndpoint, "POST")
+          .SetQueryParams(query_params)
+          .SetJsonBody(R"({"postBody": "id_token=)" + id_token.get() +
+                       R"(&providerId=google.com",)" +
+                       R"("returnIdpCredential": true,)" +
+                       R"("returnSecureToken": true,)" +
+                       R"("requestUri": "http://localhost"})");
 
   // Exchange credential to access token at Google OAuth token endpoint
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
-  Request(
-      std::move(request_factory), [callback](network::URLResponse response) {
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          callback(oauth_response.status, nullptr);
-          return;
-        }
+  Request(std::move(request_factory), [callback](
+                                          network::URLResponse response) {
+    auto oauth_response = ParseOAuthResponse(std::move(response));
+    if (oauth_response.status != AuthProviderStatus::OK) {
+      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
+      callback(oauth_response.status, nullptr);
+      return;
+    }
 
-        auth::FirebaseTokenPtr fb_token = auth::FirebaseToken::New();
-        fb_token->id_token =
-            oauth_response.json_response["id_token"].GetString();
-        fb_token->email = oauth_response.json_response["email"].GetString();
-        fb_token->local_id =
-            oauth_response.json_response["local_id"].GetString();
+    auth::FirebaseTokenPtr fb_token = auth::FirebaseToken::New();
+    fb_token->id_token = oauth_response.json_response["id_token"].GetString();
+    fb_token->email = oauth_response.json_response["email"].GetString();
+    fb_token->local_id = oauth_response.json_response["local_id"].GetString();
 
-        callback(AuthProviderStatus::OK, std::move(fb_token));
-      });
+    callback(AuthProviderStatus::OK, std::move(fb_token));
+  });
 }
 
 void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
@@ -249,8 +246,7 @@ void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
       [request = std::move(request)] { return request.Build(); });
 
   Request(
-      std::move(request_factory),
-      [callback](network::URLResponse response) {
+      std::move(request_factory), [callback](network::URLResponse response) {
         auto oauth_response = ParseOAuthResponse(std::move(response));
         if (oauth_response.status != AuthProviderStatus::OK) {
           FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
@@ -306,35 +302,32 @@ void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
       [request = std::move(request)] { return request.Build(); });
 
   // Generate long lived credentials
-  Request(
-      std::move(request_factory),
-      [this](network::URLResponse response) {
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          get_persistent_credential_callback_(oauth_response.status, nullptr,
-                                              nullptr);
-          return;
-        }
+  Request(std::move(request_factory), [this](network::URLResponse response) {
+    auto oauth_response = ParseOAuthResponse(std::move(response));
+    if (oauth_response.status != AuthProviderStatus::OK) {
+      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
+      get_persistent_credential_callback_(oauth_response.status, nullptr,
+                                          nullptr);
+      return;
+    }
 
-        if (!oauth_response.json_response.HasMember("refresh_token") ||
-            (!oauth_response.json_response.HasMember("access_token"))) {
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          get_persistent_credential_callback_(
-              AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr, nullptr);
-        }
+    if (!oauth_response.json_response.HasMember("refresh_token") ||
+        (!oauth_response.json_response.HasMember("access_token"))) {
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
+      get_persistent_credential_callback_(
+          AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr, nullptr);
+    }
 
-        GetUserProfile(oauth_response.json_response["refresh_token"].GetString(),
-                       oauth_response.json_response["access_token"].GetString());
-      });
+    GetUserProfile(oauth_response.json_response["refresh_token"].GetString(),
+                   oauth_response.json_response["access_token"].GetString());
+  });
 }
 
-void GoogleAuthProviderImpl::GetUserProfile(
-    fidl::StringPtr credential,
-    fidl::StringPtr access_token) {
+void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
+                                            fidl::StringPtr access_token) {
   FXL_DCHECK(credential.get().size() > 0);
   FXL_DCHECK(access_token.get().size() > 0);
 
@@ -344,55 +337,52 @@ void GoogleAuthProviderImpl::GetUserProfile(
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
 
-  Request(
-      std::move(request_factory),
-      [this, credential](network::URLResponse response) {
-        auth::UserProfileInfoPtr user_profile_info =
-            auth::UserProfileInfo::New();
+  Request(std::move(request_factory), [this, credential](
+                                          network::URLResponse response) {
+    auth::UserProfileInfoPtr user_profile_info = auth::UserProfileInfo::New();
 
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
+    auto oauth_response = ParseOAuthResponse(std::move(response));
+    if (oauth_response.status != AuthProviderStatus::OK) {
+      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
 
-          get_persistent_credential_callback_(oauth_response.status, credential,
-                                              std::move(user_profile_info));
-          return;
-        }
+      get_persistent_credential_callback_(oauth_response.status, credential,
+                                          std::move(user_profile_info));
+      return;
+    }
 
-        if (oauth_response.json_response.HasMember("id")) {
-          user_profile_info->id =
-              oauth_response.json_response["id"].GetString();
-        }
+    if (oauth_response.json_response.HasMember("id")) {
+      user_profile_info->id = oauth_response.json_response["id"].GetString();
+    }
 
-        if (oauth_response.json_response.HasMember("displayName")) {
-          user_profile_info->display_name =
-              oauth_response.json_response["displayName"].GetString();
-        }
+    if (oauth_response.json_response.HasMember("displayName")) {
+      user_profile_info->display_name =
+          oauth_response.json_response["displayName"].GetString();
+    }
 
-        if (oauth_response.json_response.HasMember("url")) {
-          user_profile_info->url =
-              oauth_response.json_response["url"].GetString();
-        }
+    if (oauth_response.json_response.HasMember("url")) {
+      user_profile_info->url = oauth_response.json_response["url"].GetString();
+    }
 
-        if (oauth_response.json_response.HasMember("image")) {
-          user_profile_info->image_url =
-              oauth_response.json_response["image"]["url"].GetString();
-        }
+    if (oauth_response.json_response.HasMember("image")) {
+      user_profile_info->image_url =
+          oauth_response.json_response["image"]["url"].GetString();
+    }
 
-        get_persistent_credential_callback_(oauth_response.status, credential,
-                                            std::move(user_profile_info));
-      });
+    get_persistent_credential_callback_(oauth_response.status, credential,
+                                        std::move(user_profile_info));
+  });
 }
 
-fuchsia::ui::views_v1_token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
+fuchsia::ui::views_v1_token::ViewOwnerPtr
+GoogleAuthProviderImpl::SetupWebView() {
   component::Services web_view_services;
   component::LaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
   web_view_launch_info.directory_request = web_view_services.NewRequest();
-  app_context_->launcher()->CreateApplication(
-      std::move(web_view_launch_info), web_view_controller_.NewRequest());
+  context_->launcher()->CreateApplication(std::move(web_view_launch_info),
+                                          web_view_controller_.NewRequest());
   web_view_controller_.set_error_handler([this] {
     FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
   });
@@ -413,9 +403,8 @@ void GoogleAuthProviderImpl::Request(
     std::function<network::URLRequest()> request_factory,
     std::function<void(network::URLResponse response)> callback) {
   requests_.emplace(network_wrapper_->Request(
-      std::move(request_factory),
-      [this, callback = std::move(callback)](
-          network::URLResponse response) mutable {
+      std::move(request_factory), [this, callback = std::move(callback)](
+                                      network::URLResponse response) mutable {
         OnResponse(std::move(callback), std::move(response));
       }));
 }

@@ -20,11 +20,12 @@ class _EchoImpl extends Echo {
   }
 }
 
-ApplicationContext _context;
+StartupContext _context;
 _EchoImpl _echo;
 
 void main(List<String> args) {
-  _context = new ApplicationContext.fromStartupInfo();
+  _context = new StartupContext.fromStartupInfo();
   _echo = new _EchoImpl();
-  _context.outgoingServices.addServiceForName<Echo>(_echo.bind, Echo.$serviceName);
+  _context.outgoingServices
+      .addServiceForName<Echo>(_echo.bind, Echo.$serviceName);
 }

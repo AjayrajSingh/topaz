@@ -2,17 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#pragma once
+#ifndef TOPAZ_EXAMPLES_MEDIA_VU_METER_VU_METER_VIEW_H_
+#define TOPAZ_EXAMPLES_MEDIA_VU_METER_VU_METER_VIEW_H_
 
 #include <memory>
 #include <queue>
 
 #include <fbl/vmo_mapper.h>
-#include <media/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
+#include <media/cpp/fidl.h>
 
 #include "examples/ui/lib/skia_view.h"
-#include "lib/app/cpp/application_context.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/fxl/macros.h"
 #include "topaz/examples/media/vu_meter/vu_meter_params.h"
 
@@ -22,8 +23,9 @@ class VuMeterView : public mozart::SkiaView {
  public:
   VuMeterView(async::Loop* loop,
               fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-              fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
-              component::ApplicationContext* application_context,
+              fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+                  view_owner_request,
+              component::StartupContext* startup_context,
               const VuMeterParams& params);
 
   ~VuMeterView() override;
@@ -91,3 +93,5 @@ class VuMeterView : public mozart::SkiaView {
 };
 
 }  // namespace examples
+
+#endif  // TOPAZ_EXAMPLES_MEDIA_VU_METER_VU_METER_VIEW_H_

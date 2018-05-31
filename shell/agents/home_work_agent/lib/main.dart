@@ -22,12 +22,12 @@ class HomeWorkAgent extends AgentImpl {
   final HomeWorkProposer _homeWorkProposer = new HomeWorkProposer();
 
   /// Constructor.
-  HomeWorkAgent({@required ApplicationContext applicationContext})
-      : super(applicationContext: applicationContext);
+  HomeWorkAgent({@required StartupContext startupContext})
+      : super(startupContext: startupContext);
 
   @override
   Future<Null> onReady(
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
     TokenProvider tokenProvider,
@@ -51,9 +51,8 @@ class HomeWorkAgent extends AgentImpl {
 }
 
 Future<Null> main(List<dynamic> args) async {
-  ApplicationContext applicationContext =
-      new ApplicationContext.fromStartupInfo();
+  StartupContext startupContext = new StartupContext.fromStartupInfo();
   _agent = new HomeWorkAgent(
-    applicationContext: applicationContext,
+    startupContext: startupContext,
   )..advertise();
 }

@@ -4,11 +4,11 @@
 
 #include "topaz/auth_providers/spotify/spotify_auth_provider_impl.h"
 
-#include <network/cpp/fidl.h>
 #include <fuchsia/ui/views_v1_token/cpp/fidl.h>
+#include <network/cpp/fidl.h>
 
-#include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
+#include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fxl/functional/make_copyable.h"
 #include "lib/fxl/logging.h"
@@ -16,9 +16,9 @@
 #include "lib/svc/cpp/services.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
 #include "third_party/rapidjson/rapidjson/document.h"
-#include "topaz/auth_providers/spotify/constants.h"
 #include "topaz/auth_providers/oauth/oauth_request_builder.h"
 #include "topaz/auth_providers/oauth/oauth_response.h"
+#include "topaz/auth_providers/spotify/constants.h"
 
 namespace spotify_auth_provider {
 
@@ -29,10 +29,10 @@ using auth_providers::oauth::ParseOAuthResponse;
 using fuchsia::modular::JsonValueToPrettyString;
 
 SpotifyAuthProviderImpl::SpotifyAuthProviderImpl(
-    component::ApplicationContext* app_context,
+    component::StartupContext* context,
     network_wrapper::NetworkWrapper* network_wrapper,
     fidl::InterfaceRequest<auth::AuthProvider> request)
-    : app_context_(app_context),
+    : context_(context),
       network_wrapper_(network_wrapper),
       binding_(this, std::move(request)) {
   FXL_DCHECK(network_wrapper_);
@@ -109,11 +109,10 @@ void SpotifyAuthProviderImpl::GetAppAccessToken(
     return;
   }
 
-  auto request =
-      OAuthRequestBuilder(kSpotifyOAuthTokenEndpoint, "POST")
-          .SetUrlEncodedBody("refresh_token=" + credential.get() +
-                             "&client_id=" + app_client_id.get() +
-                             "&grant_type=refresh_token");
+  auto request = OAuthRequestBuilder(kSpotifyOAuthTokenEndpoint, "POST")
+                     .SetUrlEncodedBody("refresh_token=" + credential.get() +
+                                        "&client_id=" + app_client_id.get() +
+                                        "&grant_type=refresh_token");
 
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
@@ -163,7 +162,8 @@ void SpotifyAuthProviderImpl::RevokeAppOrPersistentCredential(
   callback(AuthProviderStatus::BAD_REQUEST);
 }
 
-void SpotifyAuthProviderImpl::WillSendRequest(const fidl::StringPtr incoming_url) {
+void SpotifyAuthProviderImpl::WillSendRequest(
+    const fidl::StringPtr incoming_url) {
   FXL_DCHECK(get_persistent_credential_callback_);
 
   const std::string& uri = incoming_url.get();
@@ -205,35 +205,32 @@ void SpotifyAuthProviderImpl::WillSendRequest(const fidl::StringPtr incoming_url
       [request = std::move(request)] { return request.Build(); });
 
   // Generate long lived credentials (OAuth refresh token)
-  Request(
-      std::move(request_factory),
-      [this](network::URLResponse response) {
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          get_persistent_credential_callback_(oauth_response.status, nullptr,
-                                              nullptr);
-          return;
-        }
+  Request(std::move(request_factory), [this](network::URLResponse response) {
+    auto oauth_response = ParseOAuthResponse(std::move(response));
+    if (oauth_response.status != AuthProviderStatus::OK) {
+      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
+      get_persistent_credential_callback_(oauth_response.status, nullptr,
+                                          nullptr);
+      return;
+    }
 
-        if (!oauth_response.json_response.HasMember("refresh_token") ||
-            (!oauth_response.json_response.HasMember("access_token"))) {
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          get_persistent_credential_callback_(
-              AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr, nullptr);
-        }
+    if (!oauth_response.json_response.HasMember("refresh_token") ||
+        (!oauth_response.json_response.HasMember("access_token"))) {
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
+      get_persistent_credential_callback_(
+          AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr, nullptr);
+    }
 
-        GetUserProfile(oauth_response.json_response["refresh_token"].GetString(),
-                       oauth_response.json_response["access_token"].GetString());
-      });
+    GetUserProfile(oauth_response.json_response["refresh_token"].GetString(),
+                   oauth_response.json_response["access_token"].GetString());
+  });
 }
 
 void SpotifyAuthProviderImpl::GetUserProfile(
-    const fidl::StringPtr credential,
-    const fidl::StringPtr access_token) {
+    const fidl::StringPtr credential, const fidl::StringPtr access_token) {
   FXL_DCHECK(credential.get().size() > 0);
   FXL_DCHECK(access_token.get().size() > 0);
 
@@ -243,55 +240,52 @@ void SpotifyAuthProviderImpl::GetUserProfile(
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
 
-  Request(
-      std::move(request_factory),
-      [this, credential](network::URLResponse response) {
-        auth::UserProfileInfoPtr user_profile_info =
-            auth::UserProfileInfo::New();
+  Request(std::move(request_factory), [this, credential](
+                                          network::URLResponse response) {
+    auth::UserProfileInfoPtr user_profile_info = auth::UserProfileInfo::New();
 
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
+    auto oauth_response = ParseOAuthResponse(std::move(response));
+    if (oauth_response.status != AuthProviderStatus::OK) {
+      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
 
-          get_persistent_credential_callback_(oauth_response.status, credential,
-                                              std::move(user_profile_info));
-          return;
-        }
+      get_persistent_credential_callback_(oauth_response.status, credential,
+                                          std::move(user_profile_info));
+      return;
+    }
 
-        if (oauth_response.json_response.HasMember("id")) {
-          user_profile_info->id =
-              oauth_response.json_response["id"].GetString();
-        }
+    if (oauth_response.json_response.HasMember("id")) {
+      user_profile_info->id = oauth_response.json_response["id"].GetString();
+    }
 
-        if (oauth_response.json_response.HasMember("displayName")) {
-          user_profile_info->display_name =
-              oauth_response.json_response["displayName"].GetString();
-        }
+    if (oauth_response.json_response.HasMember("displayName")) {
+      user_profile_info->display_name =
+          oauth_response.json_response["displayName"].GetString();
+    }
 
-        if (oauth_response.json_response.HasMember("url")) {
-          user_profile_info->url =
-              oauth_response.json_response["url"].GetString();
-        }
+    if (oauth_response.json_response.HasMember("url")) {
+      user_profile_info->url = oauth_response.json_response["url"].GetString();
+    }
 
-        if (oauth_response.json_response.HasMember("image")) {
-          user_profile_info->image_url =
-              oauth_response.json_response["image"]["url"].GetString();
-        }
+    if (oauth_response.json_response.HasMember("image")) {
+      user_profile_info->image_url =
+          oauth_response.json_response["image"]["url"].GetString();
+    }
 
-        get_persistent_credential_callback_(oauth_response.status, credential,
-                                            std::move(user_profile_info));
-      });
+    get_persistent_credential_callback_(oauth_response.status, credential,
+                                        std::move(user_profile_info));
+  });
 }
 
-fuchsia::ui::views_v1_token::ViewOwnerPtr SpotifyAuthProviderImpl::SetupWebView() {
+fuchsia::ui::views_v1_token::ViewOwnerPtr
+SpotifyAuthProviderImpl::SetupWebView() {
   component::Services web_view_services;
   component::LaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
   web_view_launch_info.directory_request = web_view_services.NewRequest();
-  app_context_->launcher()->CreateApplication(
-      std::move(web_view_launch_info), web_view_controller_.NewRequest());
+  context_->launcher()->CreateApplication(std::move(web_view_launch_info),
+                                          web_view_controller_.NewRequest());
   web_view_controller_.set_error_handler([this] {
     FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
   });
@@ -312,9 +306,8 @@ void SpotifyAuthProviderImpl::Request(
     std::function<network::URLRequest()> request_factory,
     std::function<void(network::URLResponse response)> callback) {
   requests_.emplace(network_wrapper_->Request(
-      std::move(request_factory),
-      [this, callback = std::move(callback)](
-          network::URLResponse response) mutable {
+      std::move(request_factory), [this, callback = std::move(callback)](
+                                      network::URLResponse response) mutable {
         OnResponse(std::move(callback), std::move(response));
       }));
 }

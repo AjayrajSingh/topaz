@@ -93,14 +93,13 @@ class LedgerDebugDataHandler extends DataHandler {
   List<WebSocketHolder> _activeWebsockets;
 
   @override
-  void init(ApplicationContext appContext) {
+  void init(StartupContext context) {
     _ledgerRepositoryDebug = new LedgerRepositoryDebugProxy();
     _ledgerRepositoryDebug.ctrl.onConnectionError = () {
       print(
           'Connection Error on Ledger Repository Debug: ${_ledgerRepositoryDebug.hashCode}');
     };
-    connectToService(
-        appContext.environmentServices, _ledgerRepositoryDebug.ctrl);
+    connectToService(context.environmentServices, _ledgerRepositoryDebug.ctrl);
     assert(_ledgerRepositoryDebug.ctrl.isBound);
     _activeWebsockets = <WebSocketHolder>[];
   }
@@ -215,7 +214,8 @@ class LedgerDebugDataHandler extends DataHandler {
     }
   }
 
-  void recursiveGetEntries(WebSocketHolder socketHolder, ledger_fidl.Token nextToken) {
+  void recursiveGetEntries(
+      WebSocketHolder socketHolder, ledger_fidl.Token nextToken) {
     socketHolder.pageSnapshot?.getEntries(
         new Uint8List(0),
         nextToken,

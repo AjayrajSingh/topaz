@@ -6,7 +6,7 @@ import 'package:fidl_echo2/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_component/fidl.dart';
 
-ApplicationContext _context;
+StartupContext _context;
 EchoProxy _echo;
 
 void main(List<String> args) {
@@ -15,11 +15,11 @@ void main(List<String> args) {
     server = args[1];
   }
 
-  _context = new ApplicationContext.fromStartupInfo();
+  _context = new StartupContext.fromStartupInfo();
 
   final Services services = new Services();
-  final LaunchInfo launchInfo = new LaunchInfo(
-      url: server, directoryRequest: services.request());
+  final LaunchInfo launchInfo =
+      new LaunchInfo(url: server, directoryRequest: services.request());
   _context.launcher.createApplication(launchInfo, null);
 
   _echo = new EchoProxy();

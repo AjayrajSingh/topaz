@@ -42,10 +42,10 @@ class BLERectModuleModel extends ModuleModel
   static const String _descUuid = '00002901-0000-1000-8000-00805F9B34FB';
 
   /// Constructor.
-  BLERectModuleModel(this.applicationContext) : super();
+  BLERectModuleModel(this.startupContext) : super();
 
-  /// We use the |applicationContext| to obtain handles to environment services.
-  final ApplicationContext applicationContext;
+  /// We use the |startupContext| to obtain handles to environment services.
+  final StartupContext startupContext;
 
   /// Returns the last FIDL status.
   bt.Status get lastStatus => _lastStatus;
@@ -198,8 +198,8 @@ class BLERectModuleModel extends ModuleModel
 
   /// Connect to the BLE environment services and bootstrap the GATT service.
   void start() {
-    connectToService(applicationContext.environmentServices, _server.ctrl);
-    connectToService(applicationContext.environmentServices, _peripheral.ctrl);
+    connectToService(startupContext.environmentServices, _server.ctrl);
+    connectToService(startupContext.environmentServices, _peripheral.ctrl);
 
     _publishService();
     _startAdvertising();

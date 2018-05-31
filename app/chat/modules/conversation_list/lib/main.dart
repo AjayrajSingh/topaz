@@ -18,7 +18,7 @@ void main() {
 
   ModuleWidget<ChatConversationListModuleModel> moduleWidget =
       new ModuleWidget<ChatConversationListModuleModel>(
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    startupContext: new StartupContext.fromStartupInfo(),
     moduleModel: new ChatConversationListModuleModel(formModel: formModel),
     child: new ScopedModel<FormModel>(
       model: formModel,

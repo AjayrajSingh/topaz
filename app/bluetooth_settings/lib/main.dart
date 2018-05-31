@@ -13,12 +13,12 @@ import 'src/screen.dart';
 void main() {
   setupLogger();
 
-  ApplicationContext appContext = new ApplicationContext.fromStartupInfo();
+  StartupContext context = new StartupContext.fromStartupInfo();
 
   ModuleWidget<SettingsModuleModel> moduleWidget =
       new ModuleWidget<SettingsModuleModel>(
-          moduleModel: new SettingsModuleModel(appContext),
-          applicationContext: appContext,
+          moduleModel: new SettingsModuleModel(context),
+          startupContext: context,
           child: const SettingsScreen())
         ..advertise();
 

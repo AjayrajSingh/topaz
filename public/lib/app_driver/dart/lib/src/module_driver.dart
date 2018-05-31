@@ -61,8 +61,7 @@ const int _kFirstLinkDataMetricId = 1;
 /// added by making calls to exposed APIs (e.g. [link], [moduleContext]).
 ///
 class ModuleDriver {
-  final ApplicationContext _applicationContext =
-      new ApplicationContext.fromStartupInfo();
+  final StartupContext _startupContext = new StartupContext.fromStartupInfo();
 
   /// A [LinkClient] for this module's default Link. Async results for
   /// LinkClient methods will resolve once the Module has been initialized
@@ -187,7 +186,7 @@ class ModuleDriver {
     }
 
     try {
-      await _lifecycle.addService(applicationContext: _applicationContext);
+      await _lifecycle.addService(startupContext: _startupContext);
     } on Exception catch (err, stackTrace) {
       _start.completeError(err, stackTrace);
       return _start.future;
@@ -548,7 +547,7 @@ class ModuleDriver {
   /// Made available for video module to access MediaPlayer.
   /// TODO(MS-1287): Determine whether this should be refactored
   ServiceProviderProxy get environmentServices =>
-      _applicationContext.environmentServices;
+      _startupContext.environmentServices;
 
   /// The [CobaltEncoderProxy] for sending Cobalt metrics
   CobaltEncoderProxy get cobaltEncoder => _encoder;

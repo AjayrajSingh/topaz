@@ -28,8 +28,8 @@ class ContactsContentProviderAgent extends AgentImpl {
 
   /// Create a new instance of [ContactsContentProviderAgent].
   ContactsContentProviderAgent({
-    @required ApplicationContext applicationContext,
-  }) : super(applicationContext: applicationContext);
+    @required StartupContext startupContext,
+  }) : super(startupContext: startupContext);
 
   @override
   void advertise() {
@@ -38,7 +38,7 @@ class ContactsContentProviderAgent extends AgentImpl {
     // Add impl for processing Entity Provider service requests to the
     // application context outgoing services which differs from the
     // ServiceProviderImpl's outgoing services
-    applicationContext.outgoingServices.addServiceForName(
+    startupContext.outgoingServices.addServiceForName(
       (InterfaceRequest<EntityProvider> request) {
         log.fine('Received an EntityProvider request');
         _bindings.add(
@@ -53,7 +53,7 @@ class ContactsContentProviderAgent extends AgentImpl {
 
   @override
   Future<Null> onReady(
-    ApplicationContext applicationContext,
+    StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
     TokenProvider tokenProvider,
@@ -95,6 +95,6 @@ Future<Null> main(List<String> args) async {
   setupLogger(name: 'contacts/agent');
 
   _agent = new ContactsContentProviderAgent(
-    applicationContext: new ApplicationContext.fromStartupInfo(),
+    startupContext: new StartupContext.fromStartupInfo(),
   )..advertise();
 }
