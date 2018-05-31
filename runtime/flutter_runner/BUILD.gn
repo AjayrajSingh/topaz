@@ -148,8 +148,8 @@ package("flutter_aot_runner") {
 
   meta = [
     {
-      path = rebase_path("meta/sandbox")
-      dest = "sandbox"
+      path = rebase_path("meta/flutter_aot_runner.cmx")
+      dest = "flutter_aot_runner.cmx"
     },
   ]
 }
@@ -172,8 +172,8 @@ package("flutter2_aot_runner") {
 
   meta = [
     {
-      path = rebase_path("meta/sandbox")
-      dest = "sandbox"
+      path = rebase_path("meta/flutter2_aot_runner.cmx")
+      dest = "flutter2_aot_runner.cmx"
     },
   ]
 }
@@ -219,8 +219,8 @@ package("flutter_jit_runner") {
 
   meta = [
     {
-      path = rebase_path("meta/sandbox")
-      dest = "sandbox"
+      path = rebase_path("meta/flutter_jit_runner.cmx")
+      dest = "flutter_jit_runner.cmx"
     },
   ]
 }
@@ -266,8 +266,8 @@ package("flutter2_jit_runner") {
 
   meta = [
     {
-      path = rebase_path("meta/sandbox")
-      dest = "sandbox"
+      path = rebase_path("meta/flutter2_jit_runner.cmx")
+      dest = "flutter2_jit_runner.cmx"
     },
   ]
 }
