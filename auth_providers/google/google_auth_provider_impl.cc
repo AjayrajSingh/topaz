@@ -5,7 +5,7 @@
 #include "topaz/auth_providers/google/google_auth_provider_impl.h"
 
 #include <network/cpp/fidl.h>
-#include <views_v1_token/cpp/fidl.h>
+#include <fuchsia/ui/views_v1_token/cpp/fidl.h>
 
 #include "lib/app/cpp/application_context.h"
 #include "lib/app/cpp/connect.h"
@@ -386,7 +386,7 @@ void GoogleAuthProviderImpl::GetUserProfile(
       });
 }
 
-views_v1_token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
+fuchsia::ui::views_v1_token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
   component::Services web_view_services;
   component::LaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
@@ -397,8 +397,8 @@ views_v1_token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
     FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
   });
 
-  views_v1_token::ViewOwnerPtr view_owner;
-  views_v1::ViewProviderPtr view_provider;
+  fuchsia::ui::views_v1_token::ViewOwnerPtr view_owner;
+  fuchsia::ui::views_v1::ViewProviderPtr view_provider;
   web_view_services.ConnectToService(view_provider.NewRequest());
   component::ServiceProviderPtr web_view_moz_services;
   view_provider->CreateView(view_owner.NewRequest(),

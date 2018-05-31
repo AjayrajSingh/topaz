@@ -39,7 +39,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
                blink::Settings settings,
                fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
                fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
-               fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner,
+               fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
                UniqueFDIONS fdio_ns,
                fidl::InterfaceRequest<component::ServiceProvider>
                    outgoing_services_request)
@@ -58,7 +58,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
     thread.Run();
   }
 
-  views_v1::ViewManagerPtr view_manager;
+  fuchsia::ui::views_v1::ViewManagerPtr view_manager;
   application_context.ConnectToEnvironmentService(view_manager.NewRequest());
 
   zx::eventpair import_token, export_token;

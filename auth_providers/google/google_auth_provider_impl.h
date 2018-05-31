@@ -8,7 +8,7 @@
 // service in Garnet layer.
 
 #include <auth/cpp/fidl.h>
-#include <views_v1/cpp/fidl.h>
+#include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <web_view/cpp/fidl.h>
 
 #include "lib/app/cpp/application_context.h"
@@ -63,7 +63,7 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
 
   void GetUserProfile(fidl::StringPtr credential, fidl::StringPtr access_token);
 
-  views_v1_token::ViewOwnerPtr SetupWebView();
+  fuchsia::ui::views_v1_token::ViewOwnerPtr SetupWebView();
 
   void Request(std::function<network::URLRequest()> request_factory,
                std::function<void(network::URLResponse response)> callback);

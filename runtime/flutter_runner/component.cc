@@ -107,7 +107,7 @@ Application::Application(TerminationCallback termination_callback,
   // final settings configuration. The next call will be to create a view
   // for this application.
 
-  service_provider_bridge_.AddService<views_v1::ViewProvider>(
+  service_provider_bridge_.AddService<fuchsia::ui::views_v1::ViewProvider>(
       std::bind(&Application::CreateShellForView, this, std::placeholders::_1));
 
   component::ServiceProviderPtr outgoing_services;
@@ -358,13 +358,13 @@ void Application::OnEngineTerminate(const Engine* shell_holder) {
 }
 
 void Application::CreateShellForView(
-    fidl::InterfaceRequest<views_v1::ViewProvider> view_provider_request) {
+    fidl::InterfaceRequest<fuchsia::ui::views_v1::ViewProvider> view_provider_request) {
   shells_bindings_.AddBinding(this, std::move(view_provider_request));
 }
 
-// |views_v1::ViewProvider|
+// |fuchsia::ui::views_v1::ViewProvider|
 void Application::CreateView(
-    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
     fidl::InterfaceRequest<component::ServiceProvider>) {
   if (!application_context_) {
     FXL_DLOG(ERROR) << "Application context was invalid when attempting to "

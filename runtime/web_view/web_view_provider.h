@@ -5,13 +5,13 @@
 #pragma once
 
 #include <fuchsia/modular/cpp/fidl.h>
+#include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
-#include <views_v1/cpp/fidl.h>
 
 #include "lib/app/cpp/application_context.h"
 #include "topaz/runtime/web_view/web_view_impl.h"
 
-class WebViewProvider : views_v1::ViewProvider,
+class WebViewProvider : fuchsia::ui::views_v1::ViewProvider,
                         fuchsia::modular::Lifecycle,
                         fuchsia::modular::LinkWatcher {
  public:
@@ -19,7 +19,8 @@ class WebViewProvider : views_v1::ViewProvider,
 
  private:
   // |ViewProvider|
-  void CreateView(fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+  void CreateView(fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+                      view_owner_request,
                   fidl::InterfaceRequest<component::ServiceProvider>
                       view_services) override;
 

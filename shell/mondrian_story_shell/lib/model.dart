@@ -6,7 +6,7 @@ import 'dart:math' as math;
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_views_v1_token/fidl.dart';
+import 'package:fidl_fuchsia_ui_views_v1_token/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';

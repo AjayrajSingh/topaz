@@ -33,8 +33,8 @@ PlatformView::PlatformView(
     blink::TaskRunners task_runners,
     fidl::InterfaceHandle<component::ServiceProvider>
         parent_environment_service_provider_handle,
-    fidl::InterfaceHandle<views_v1::ViewManager> view_manager_handle,
-    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner,
+    fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewManager> view_manager_handle,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
     zx::eventpair export_token,
     fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
         accessibility_context_writer,
@@ -109,13 +109,13 @@ void PlatformView::RegisterPlatformMessageHandlers() {
                 std::placeholders::_1);
 }
 
-fidl::InterfaceHandle<views_v1::ViewContainer>
+fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer>
 PlatformView::TakeViewContainer() {
   return std::move(view_container_);
 }
 
-// |views_v1::ViewListener|
-void PlatformView::OnPropertiesChanged(views_v1::ViewProperties properties,
+// |fuchsia::ui::views_v1::ViewListener|
+void PlatformView::OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties properties,
                                        OnPropertiesChangedCallback callback) {
   if (properties.view_layout) {
     UpdateViewportMetrics(*properties.view_layout);
@@ -123,7 +123,7 @@ void PlatformView::OnPropertiesChanged(views_v1::ViewProperties properties,
   callback();
 }
 
-void PlatformView::UpdateViewportMetrics(const views_v1::ViewLayout& layout) {
+void PlatformView::UpdateViewportMetrics(const fuchsia::ui::views_v1::ViewLayout& layout) {
   metrics_.size.width = layout.size.width;
   metrics_.size.height = layout.size.height;
   metrics_.padding.left = layout.inset.left;

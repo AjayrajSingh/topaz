@@ -10,8 +10,8 @@
 #include <set>
 
 #include <component/cpp/fidl.h>
-#include <views_v1/cpp/fidl.h>
-#include <views_v1_token/cpp/fidl.h>
+#include <fuchsia/ui/views_v1/cpp/fidl.h>
+#include <fuchsia/ui/views_v1_token/cpp/fidl.h>
 
 #include "engine.h"
 #include "flutter/common/settings.h"
@@ -30,7 +30,7 @@ namespace flutter {
 // Flutter engine instances.
 class Application final : public Engine::Delegate,
                           public component::ComponentController,
-                          public views_v1::ViewProvider {
+                          public fuchsia::ui::views_v1::ViewProvider {
  public:
   using TerminationCallback = std::function<void(const Application*)>;
 
@@ -59,7 +59,7 @@ class Application final : public Engine::Delegate,
   fidl::InterfaceRequest<component::ServiceProvider> outgoing_services_request_;
   component::ServiceProviderBridge service_provider_bridge_;
   std::unique_ptr<component::ApplicationContext> application_context_;
-  fidl::BindingSet<views_v1::ViewProvider> shells_bindings_;
+  fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> shells_bindings_;
   fxl::RefPtr<blink::DartSnapshot> isolate_snapshot_;
   fxl::RefPtr<blink::DartSnapshot> shared_snapshot_;
   std::set<std::unique_ptr<Engine>> shell_holders_;
@@ -80,16 +80,16 @@ class Application final : public Engine::Delegate,
   // |component::ComponentController|
   void Wait(WaitCallback callback) override;
 
-  // |views_v1::ViewProvider|
+  // |fuchsia::ui::views_v1::ViewProvider|
   void CreateView(
-      fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner,
+      fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
       fidl::InterfaceRequest<component::ServiceProvider> services) override;
 
   // |flutter::Engine::Delegate|
   void OnEngineTerminate(const Engine* holder) override;
 
   void CreateShellForView(
-      fidl::InterfaceRequest<views_v1::ViewProvider> view_provider_request);
+      fidl::InterfaceRequest<fuchsia::ui::views_v1::ViewProvider> view_provider_request);
 
   void AttemptVMLaunchWithCurrentSettings(const blink::Settings& settings);
 

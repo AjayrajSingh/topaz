@@ -20,7 +20,7 @@ namespace {
 
 constexpr char kViewLabel[] = "ermine_user_shell";
 
-fuchsia::ui::scenic::ScenicPtr GetScenic(views_v1::ViewManager* view_manager) {
+fuchsia::ui::scenic::ScenicPtr GetScenic(fuchsia::ui::views_v1::ViewManager* view_manager) {
   fuchsia::ui::scenic::ScenicPtr scenic;
   view_manager->GetScenic(scenic.NewRequest());
   return scenic;
@@ -37,9 +37,9 @@ const fuchsia::ui::gfx::Metrics* GetLastMetrics(uint32_t node_id,
   return result;
 }
 
-views_v1::ViewProperties CreateViewProperties(float width, float height) {
-  views_v1::ViewProperties properties;
-  properties.view_layout = views_v1::ViewLayout::New();
+fuchsia::ui::views_v1::ViewProperties CreateViewProperties(float width, float height) {
+  fuchsia::ui::views_v1::ViewProperties properties;
+  properties.view_layout = fuchsia::ui::views_v1::ViewLayout::New();
   properties.view_layout->size.width = width;
   properties.view_layout->size.height = height;
   return properties;
@@ -49,8 +49,8 @@ views_v1::ViewProperties CreateViewProperties(float width, float height) {
 
 ViewController::ViewController(
     component::ApplicationLauncher* launcher,
-    views_v1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+    fuchsia::ui::views_v1::ViewManagerPtr view_manager,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
     DisconnectCallback disconnect_handler)
     : launcher_(launcher),
       view_manager_(std::move(view_manager)),
@@ -97,7 +97,7 @@ uint32_t ViewController::AddTile(std::string url) {
   tile->node().ExportAsRequest(&token);
   container_node_.AddChild(tile->node());
 
-  fidl::InterfaceHandle<views_v1_token::ViewOwner> view_owner;
+  fidl::InterfaceHandle<fuchsia::ui::views_v1_token::ViewOwner> view_owner;
   tile->CreateView(view_owner.NewRequest());
 
   view_container_->AddChild(tile->key(), std::move(view_owner),
@@ -122,7 +122,7 @@ zx_status_t ViewController::RemoveTile(uint32_t key) {
   return ZX_OK;
 }
 
-void ViewController::OnPropertiesChanged(views_v1::ViewProperties properties,
+void ViewController::OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties properties,
                                          OnPropertiesChangedCallback callback) {
   if (properties.view_layout && logical_size_ != properties.view_layout->size) {
     logical_size_ = properties.view_layout->size;
@@ -134,7 +134,7 @@ void ViewController::OnPropertiesChanged(views_v1::ViewProperties properties,
 }
 
 void ViewController::OnChildAttached(uint32_t child_key,
-                                     views_v1::ViewInfo child_view_info,
+                                     fuchsia::ui::views_v1::ViewInfo child_view_info,
                                      OnChildAttachedCallback callback) {
   callback();
 }
@@ -242,7 +242,7 @@ void ViewController::PerformLayout() {
 }
 
 void ViewController::SetPropertiesIfNeeded(
-    Tile* tile, views_v1::ViewProperties properties) {
+    Tile* tile, fuchsia::ui::views_v1::ViewProperties properties) {
   if (tile->view_properties() == properties)
     return;
   tile->set_view_properties(fidl::Clone(properties));

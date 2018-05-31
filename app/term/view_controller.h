@@ -22,8 +22,8 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
  public:
   using DisconnectCallback = std::function<void(ViewController*)>;
 
-  ViewController(views_v1::ViewManagerPtr view_manager,
-                 fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+  ViewController(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
+                 fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
                  component::ApplicationContext* context,
                  const TermParams& term_params,
                  DisconnectCallback disconnect_handler);
@@ -34,7 +34,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
 
  private:
   // |BaseView|:
-  void OnPropertiesChanged(views_v1::ViewProperties old_properties) override;
+  void OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties old_properties) override;
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;

@@ -9,13 +9,13 @@
 
 namespace term {
 
-class App : public views_v1::ViewProvider {
+class App : public fuchsia::ui::views_v1::ViewProvider {
  public:
   explicit App(TermParams params);
   ~App();
 
   // |mozart::ViewProviderService|
-  void CreateView(fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+  void CreateView(fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
                   fidl::InterfaceRequest<component::ServiceProvider>
                       view_services) override;
 
@@ -27,7 +27,7 @@ class App : public views_v1::ViewProvider {
 
   TermParams params_;
   std::unique_ptr<component::ApplicationContext> context_;
-  fidl::BindingSet<views_v1::ViewProvider> bindings_;
+  fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> bindings_;
   std::vector<std::unique_ptr<ViewController>> controllers_;
 };
 

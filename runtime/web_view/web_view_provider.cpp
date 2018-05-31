@@ -19,7 +19,7 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
     FXL_LOG(WARNING) << "Could not load ICU data";
   }
 
-  context_->outgoing().AddPublicService<views_v1::ViewProvider>(
+  context_->outgoing().AddPublicService<fuchsia::ui::views_v1::ViewProvider>(
       [this](fidl::InterfaceRequest<ViewProvider> request) {
         FXL_LOG(INFO) << "Add ViewProvider binding";
         view_provider_binding_.Bind(std::move(request));
@@ -48,12 +48,12 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
 }
 
 void WebViewProvider::CreateView(
-    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
     fidl::InterfaceRequest<component::ServiceProvider> view_services) {
   FXL_LOG(INFO) << "CreateView";
   FXL_DCHECK(!view_);
   view_ = std::make_unique<WebViewImpl>(
-      context_->ConnectToEnvironmentService<views_v1::ViewManager>(),
+      context_->ConnectToEnvironmentService<fuchsia::ui::views_v1::ViewManager>(),
       std::move(view_owner_request), std::move(view_services), url_);
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   if (context_writer_) {

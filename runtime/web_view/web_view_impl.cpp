@@ -64,8 +64,8 @@ void TouchTracker::HandleEvent(const fuchsia::ui::input::PointerEvent& pointer,
 }
 
 WebViewImpl::WebViewImpl(
-    views_v1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+    fuchsia::ui::views_v1::ViewManagerPtr view_manager,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
     fidl::InterfaceRequest<component::ServiceProvider>
         outgoing_services_request,
     const std::string& url)

@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include <views_v1/cpp/fidl.h>
+#include <fuchsia/ui/views_v1/cpp/fidl.h>
 
 #include "lib/svc/cpp/services.h"
 
@@ -27,7 +27,7 @@ Tile::Tile(component::ApplicationLauncher* launcher, std::string url,
 Tile::~Tile() = default;
 
 void Tile::CreateView(
-    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request) {
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request) {
   component::Services services;
   component::LaunchInfo launch_info;
   launch_info.url = url_;
@@ -36,7 +36,7 @@ void Tile::CreateView(
   launcher_->CreateApplication(std::move(launch_info),
                                controller_.NewRequest());
 
-  auto view_provider = services.ConnectToService<views_v1::ViewProvider>();
+  auto view_provider = services.ConnectToService<fuchsia::ui::views_v1::ViewProvider>();
   view_provider->CreateView(std::move(view_owner_request), nullptr);
 }
 

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <views_v1/cpp/fidl.h>
-#include <views_v1_token/cpp/fidl.h>
+#include <fuchsia/ui/views_v1/cpp/fidl.h>
+#include <fuchsia/ui/views_v1_token/cpp/fidl.h>
 #include <zx/event.h>
 
 #include "flutter/shell/common/shell.h"
@@ -32,7 +32,7 @@ class Engine final : public mozart::NativesDelegate {
          blink::Settings settings,
          fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
          fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
-         fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner,
+         fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
          UniqueFDIONS fdio_ns,
          fidl::InterfaceRequest<component::ServiceProvider>
              outgoing_services_request);

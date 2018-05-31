@@ -23,8 +23,8 @@ namespace examples {
 class MediaPlayerView : public mozart::BaseView {
  public:
   MediaPlayerView(async::Loop* loop,
-                  views_v1::ViewManagerPtr view_manager,
-                  fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+                  fuchsia::ui::views_v1::ViewManagerPtr view_manager,
+                  fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
                   component::ApplicationContext* application_context,
                   const MediaPlayerParams& params);
 
@@ -34,10 +34,10 @@ class MediaPlayerView : public mozart::BaseView {
   enum class State { kPaused, kPlaying, kEnded };
 
   // |BaseView|:
-  void OnPropertiesChanged(views_v1::ViewProperties old_properties) override;
+  void OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties old_properties) override;
   void OnSceneInvalidated(fuchsia::images::PresentationInfo presentation_info) override;
   void OnChildAttached(uint32_t child_key,
-                       views_v1::ViewInfo child_view_info) override;
+                       fuchsia::ui::views_v1::ViewInfo child_view_info) override;
   void OnChildUnavailable(uint32_t child_key) override;
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 

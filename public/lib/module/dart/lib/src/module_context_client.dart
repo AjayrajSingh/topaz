@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart' as fidl;
 // See DNO-201 for details on the _view_token path.
-import 'package:fidl_views_v1_token/fidl.dart';
+import 'package:fidl_fuchsia_ui_views_v1_token/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.story.dart/story.dart';

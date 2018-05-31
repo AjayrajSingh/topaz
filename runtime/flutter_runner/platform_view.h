@@ -9,8 +9,8 @@
 
 #include <fuchsia/modular/cpp/fidl.h>
 #include <fuchsia/ui/input/cpp/fidl.h>
-#include <views_v1/cpp/fidl.h>
-#include <views_v1_token/cpp/fidl.h>
+#include <fuchsia/ui/views_v1/cpp/fidl.h>
+#include <fuchsia/ui/views_v1_token/cpp/fidl.h>
 
 #include "accessibility_bridge.h"
 #include "flutter/lib/ui/window/viewport_metrics.h"
@@ -24,26 +24,28 @@ namespace flutter {
 // The per engine component residing on the platform thread is responsible for
 // all platform specific integrations.
 class PlatformView final : public shell::PlatformView,
-                           public views_v1::ViewListener,
+                           public fuchsia::ui::views_v1::ViewListener,
                            public fuchsia::ui::input::InputMethodEditorClient,
                            public fuchsia::ui::input::InputListener {
  public:
-  PlatformView(PlatformView::Delegate& delegate, std::string debug_label,
-               blink::TaskRunners task_runners,
-               fidl::InterfaceHandle<component::ServiceProvider>
-                   parent_environment_service_provider,
-               fidl::InterfaceHandle<views_v1::ViewManager> view_manager,
-               fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner,
-               zx::eventpair export_token,
-               fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
-                   accessibility_context_writer,
-               zx_handle_t vsync_event_handle);
+  PlatformView(
+      PlatformView::Delegate& delegate, std::string debug_label,
+      blink::TaskRunners task_runners,
+      fidl::InterfaceHandle<component::ServiceProvider>
+          parent_environment_service_provider,
+      fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewManager> view_manager,
+      fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
+      zx::eventpair export_token,
+      fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
+          accessibility_context_writer,
+      zx_handle_t vsync_event_handle);
 
   ~PlatformView();
 
   void UpdateViewportMetrics(double pixel_ratio);
 
-  fidl::InterfaceHandle<views_v1::ViewContainer> TakeViewContainer();
+  fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer>
+  TakeViewContainer();
 
   void OfferServiceProvider(
       fidl::InterfaceHandle<component::ServiceProvider> service_provider,
@@ -51,11 +53,11 @@ class PlatformView final : public shell::PlatformView,
 
  private:
   const std::string debug_label_;
-  views_v1::ViewManagerPtr view_manager_;
-  views_v1::ViewPtr view_;
-  fidl::InterfaceHandle<views_v1::ViewContainer> view_container_;
+  fuchsia::ui::views_v1::ViewManagerPtr view_manager_;
+  fuchsia::ui::views_v1::ViewPtr view_;
+  fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer> view_container_;
   component::ServiceProviderPtr service_provider_;
-  fidl::Binding<views_v1::ViewListener> view_listener_;
+  fidl::Binding<fuchsia::ui::views_v1::ViewListener> view_listener_;
   fuchsia::ui::input::InputConnectionPtr input_connection_;
   fidl::Binding<fuchsia::ui::input::InputListener> input_listener_;
   int current_text_input_client_ = 0;
@@ -76,23 +78,25 @@ class PlatformView final : public shell::PlatformView,
 
   void RegisterPlatformMessageHandlers();
 
-  void UpdateViewportMetrics(const views_v1::ViewLayout& layout);
+  void UpdateViewportMetrics(const fuchsia::ui::views_v1::ViewLayout& layout);
 
   void FlushViewportMetrics();
 
-  // |views_v1::ViewListener|
-  void OnPropertiesChanged(views_v1::ViewProperties properties,
+  // |fuchsia::ui::views_v1::ViewListener|
+  void OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties properties,
                            OnPropertiesChangedCallback callback) override;
 
   // |fuchsia::ui::input::InputMethodEditorClient|
-  void DidUpdateState(fuchsia::ui::input::TextInputState state,
-                      std::unique_ptr<fuchsia::ui::input::InputEvent> event) override;
+  void DidUpdateState(
+      fuchsia::ui::input::TextInputState state,
+      std::unique_ptr<fuchsia::ui::input::InputEvent> event) override;
 
   // |fuchsia::ui::input::InputMethodEditorClient|
   void OnAction(fuchsia::ui::input::InputMethodAction action) override;
 
   // |fuchsia::ui::input::InputListener|
-  void OnEvent(fuchsia::ui::input::InputEvent event, OnEventCallback callback) override;
+  void OnEvent(fuchsia::ui::input::InputEvent event,
+               OnEventCallback callback) override;
 
   bool OnHandlePointerEvent(const fuchsia::ui::input::PointerEvent& pointer);
 

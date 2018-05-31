@@ -15,8 +15,8 @@
 namespace examples {
 
 PaintView::PaintView(
-    views_v1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request)
+    fuchsia::ui::views_v1::ViewManagerPtr view_manager,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request)
     : SkiaView(std::move(view_manager),
                std::move(view_owner_request),
                "Paint") {}

@@ -38,8 +38,8 @@ class TouchTracker {
 class WebViewImpl : public mozart::BaseView,
                    public web_view::WebView {
  public:
-  WebViewImpl(views_v1::ViewManagerPtr view_manager,
-              fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request,
+  WebViewImpl(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
+              fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
               fidl::InterfaceRequest<component::ServiceProvider>
                   outgoing_services_request,
               const std::string& url);

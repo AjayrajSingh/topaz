@@ -9,7 +9,7 @@
 #include <utility>
 
 #include <component/cpp/fidl.h>
-#include <views_v1/cpp/fidl.h>
+#include <fuchsia/ui/views_v1/cpp/fidl.h>
 
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/ui/scenic/client/resources.h"
@@ -29,16 +29,16 @@ class Tile {
   uint32_t key() const { return key_; }
   scenic_lib::EntityNode& node() { return node_; }
 
-  const views_v1::ViewProperties& view_properties() const {
+  const fuchsia::ui::views_v1::ViewProperties& view_properties() const {
     return view_properties_;
   }
 
-  void set_view_properties(views_v1::ViewProperties view_properties) {
+  void set_view_properties(fuchsia::ui::views_v1::ViewProperties view_properties) {
     view_properties_ = std::move(view_properties);
   }
 
   void CreateView(
-      fidl::InterfaceRequest<views_v1_token::ViewOwner> view_owner_request);
+      fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request);
 
  private:
   component::ApplicationLauncher* launcher_;
@@ -47,7 +47,7 @@ class Tile {
 
   const uint32_t key_;
   scenic_lib::EntityNode node_;
-  views_v1::ViewProperties view_properties_;
+  fuchsia::ui::views_v1::ViewProperties view_properties_;
 };
 
 }  // namespace ermine_user_shell
