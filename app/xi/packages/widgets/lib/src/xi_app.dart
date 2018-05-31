@@ -42,11 +42,12 @@ class XiAppHandler extends XiRpcHandler {
       case 'update':
         Map<String, dynamic> update = params['update'];
         //print('update, update=$update');
-        List<Map<String, dynamic>> ops = update['ops'];
+        List<dynamic> opsList = update['ops'];
+        List<Map<String, dynamic>> ops = opsList.cast();
         _editorState.update(ops);
         break;
       case 'scroll_to':
-        Map<String, int> scrollInfo = params;
+        Map<String, dynamic> scrollInfo = params;
         int line = scrollInfo['line'];
         int col = scrollInfo['col'];
         // TODO: dispatch based on tab

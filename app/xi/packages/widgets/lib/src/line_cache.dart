@@ -142,14 +142,17 @@ int _utf8ToUtf16Offset(String s, int utf8Offset) {
 
 // Transform a list of utf-8 offsets to utf-16 offsets
 List<int> _transformCursor(String s, Map<String, dynamic> json) {
-  return json['cursor']
+  List<dynamic> cursorList = json['cursor'];
+  List<int> cursor = cursorList?.cast();
+  return cursor
       ?.map((int offset) => _utf8ToUtf16Offset(s, offset))
       ?.toList();
 }
 
 // Convert style triples from utf-8 to utf-16 and relative to absolute offsets.
 List<int> _transformStyles(String s, Map<String, dynamic> json) {
-  List<int> styles = json['styles'];
+  List<dynamic> stylesList = json['styles'];
+  List<int> styles = stylesList?.cast();
   if (styles == null) {
     return null;
   }

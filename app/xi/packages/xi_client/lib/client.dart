@@ -150,10 +150,10 @@ abstract class XiClient {
   }
 
   /// Generic error handler that can be used or everyone by implementations of [XiClient].
-  void onError(Error error) {
+  void onError(Object error, StackTrace stackTrace) {
     print('[XiClient ERROR]: $error');
-    if (error.stackTrace != null) {
-      print(error.stackTrace);
+    if (stackTrace != null) {
+      print(stackTrace);
     }
 
     streamController.close();
