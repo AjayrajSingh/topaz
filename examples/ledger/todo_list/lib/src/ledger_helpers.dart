@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:convert';
+import 'dart:typed_data' show Uint8List;
 
 import 'package:fidl_ledger/fidl.dart' as ledger;
 
@@ -36,7 +37,7 @@ void _getEntriesRecursive(
     Map<List<int>, String> items,
     ledger.Token token,
     void callback(ledger.Status status, Map<List<int>, String> items)) {
-  snapshot.getEntriesInline(null, token, (ledger.Status status,
+  snapshot.getEntriesInline(new Uint8List(0), token, (ledger.Status status,
       List<ledger.InlinedEntry> entries, ledger.Token nextToken) {
     if (status != ledger.Status.ok && status != ledger.Status.partialResult) {
       callback(status, <List<int>, String>{});

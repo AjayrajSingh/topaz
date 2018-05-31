@@ -60,7 +60,7 @@ Future<Null> _getFullEntriesRecursively(
   List<Entry> entries;
   Token nextToken;
 
-  snapshot.getEntries(keyPrefix, token,
+  snapshot.getEntries(keyPrefix ?? new Uint8List(0), token,
       (Status status, List<Entry> entriesResult, Token nextTokenResult) {
     entries = entriesResult;
     nextToken = nextTokenResult;

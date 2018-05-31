@@ -5,7 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
+import 'dart:typed_data' show Uint8List;
 
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_ledger_internal/fidl.dart';
@@ -217,7 +217,7 @@ class LedgerDebugDataHandler extends DataHandler {
 
   void recursiveGetEntries(WebSocketHolder socketHolder, ledger_fidl.Token nextToken) {
     socketHolder.pageSnapshot?.getEntries(
-        null,
+        new Uint8List(0),
         nextToken,
         (ledger_fidl.Status s, List<ledger_fidl.Entry> listOfEntries,
                 ledger_fidl.Token nextToken) =>

@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:fidl_component/fidl.dart';
 import 'package:fidl_contacts_content_provider/fidl.dart' as fidl;
@@ -383,7 +384,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     Completer<ledger.Status> statusCompleter = new Completer<ledger.Status>();
     page.getSnapshot(
       snapshot.ctrl.request(),
-      null,
+      new Uint8List(0),
       _contactsWatcher.pageWatcherHandle,
       statusCompleter.complete,
     );

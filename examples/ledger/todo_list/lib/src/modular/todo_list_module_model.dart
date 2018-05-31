@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data' show Uint8List;
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_ledger/fidl.dart' as ledger;
@@ -48,7 +49,7 @@ class TodoListModuleModel extends ModuleModel implements ledger.PageWatcher {
     ledger.PageSnapshotProxy snapshot = new ledger.PageSnapshotProxy();
     _page.getSnapshot(
       snapshot.ctrl.request(),
-      null,
+      new Uint8List(0),
       _pageWatcherBinding.wrap(this),
       handleLedgerResponse('Watch'),
     );

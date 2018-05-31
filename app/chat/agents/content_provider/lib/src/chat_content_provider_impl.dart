@@ -233,7 +233,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       statusCompleter = new Completer<Status>();
       _conversationsPage.getSnapshot(
         conversationsPageSnapshot.ctrl.request(),
-        null,
+        new Uint8List(0),
         _conversationListWatcher.pageWatcherHandle,
         statusCompleter.complete,
       );
@@ -1044,7 +1044,7 @@ class ChatContentProviderImpl extends ChatContentProvider {
       statusCompleter = new Completer<Status>();
       conversationPage.getSnapshot(
         snapshot.ctrl.request(),
-        null,
+        new Uint8List(),
         watcher.pageWatcherHandle,
         statusCompleter.complete,
       );
