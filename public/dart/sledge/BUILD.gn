@@ -16,6 +16,7 @@ dart_library("sledge") {
 dart_test("dart_sledge_tests") {
   sources = [
     "schema_test.dart",
+    "values/pos_neg_counter_test.dart",
   ]
 
   deps = [

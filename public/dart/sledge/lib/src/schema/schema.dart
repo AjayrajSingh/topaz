@@ -6,6 +6,7 @@ import '../document/base_value.dart';
 import '../document/value_node.dart';
 import 'base_type.dart';
 
+export 'types/pos_neg_counter_type.dart';
 export 'types/trivial_types.dart';
 
 /// Stores the schema of Sledge documents.

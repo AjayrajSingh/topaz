@@ -50,4 +50,29 @@ void main() {
     expect(doc.foo.someBool.value, equals(true));
     expect(doc.foo.someInteger.value, equals(42));
   });
+
+  test('Integration of PosNegCounter with Sledge', () {
+    // Create Schema.
+    Map<String, BaseType> schemaDescription = <String, BaseType>{
+      'cnt': new IntCounter(),
+      'cnt_d': new DoubleCounter()
+    };
+    Schema schema = new Schema(schemaDescription);
+
+    // Create a new Sledge document.
+    Sledge sledge = new Sledge();
+    dynamic doc = sledge.newDocument(schema);
+
+    // Modify and get value of PosNegCounter.
+    expect(doc.cnt.value, equals(0));
+    expect(doc.cnt_d.value, equals(0.0));
+    doc.cnt.add(5);
+    expect(doc.cnt.value, equals(5));
+    doc.cnt.add(-3);
+    doc.cnt_d.add(-5.2);
+    expect(doc.cnt.value, equals(2));
+    expect(doc.cnt_d.value, equals(-5.2));
+    doc.cnt_d.add(3.12);
+    expect(doc.cnt_d.value, equals(-2.08));
+  });
 }
