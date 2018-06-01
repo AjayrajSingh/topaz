@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fuchsia.fidl.modular/modular.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mondrian/layout_model.dart';
 import 'package:mondrian/model.dart';
 import 'package:mondrian/copresent_layout.dart' as copresent_layout;
 import 'package:mondrian/positioned_surface.dart';
 import 'package:mondrian/surface_details.dart';
-import 'package:test/test.dart';
 
 import '../layout_test_utils.dart' as test_util;
 
@@ -18,8 +18,6 @@ const double maxHeight = 400.0;
 const double maxWidth = 400.0;
 
 void main() {
-  BoxConstraints constraints =
-      const BoxConstraints(maxHeight: maxHeight, maxWidth: maxWidth);
   LayoutModel layoutModel = new LayoutModel();
 
   test('Single surface', () {
@@ -39,7 +37,7 @@ void main() {
     ];
     List<PositionedSurface> positionedSurfaces =
         copresent_layout.layoutSurfaces(
-            null /* BuildContext */, constraints, surfaces, layoutModel);
+            null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 1);
 
     expect(positionedSurfaces[0].surface, root);
@@ -76,7 +74,7 @@ void main() {
     ];
     List<PositionedSurface> positionedSurfaces =
         copresent_layout.layoutSurfaces(
-            null /* BuildContext */, constraints, surfaces, layoutModel);
+            null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
     expect(positionedSurfaces[0].surface, root);
@@ -121,7 +119,7 @@ void main() {
     ];
     List<PositionedSurface> positionedSurfaces =
         copresent_layout.layoutSurfaces(
-            null /* BuildContext */, constraints, surfaces, layoutModel);
+            null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 1);
 
     expect(positionedSurfaces[0].surface, sequentialSurface);

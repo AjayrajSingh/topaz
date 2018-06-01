@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mondrian/positioned_surface.dart';
-import 'package:test/test.dart';
 
 /// Utility function to assert properties of a [PositionedSurface].
 void assertSurfaceProperties(PositionedSurface surface,

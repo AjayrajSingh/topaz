@@ -3,13 +3,13 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mondrian/layout_model.dart';
 import 'package:mondrian/model.dart';
 import 'package:mondrian/pattern_layout.dart' as pattern_layout;
 import 'package:mondrian/positioned_surface.dart';
 import 'package:mondrian/tree.dart';
-import 'package:test/test.dart';
 
 import '../layout_test_utils.dart' as test_util;
 
@@ -21,8 +21,6 @@ class MockTree extends Mock implements Tree<String> {}
 class MockSurface extends Mock implements Surface {}
 
 void main() {
-  BoxConstraints constraints =
-      const BoxConstraints(maxHeight: maxHeight, maxWidth: maxWidth);
   Surface firstSurface = new MockSurface();
   LayoutModel layoutModel = new LayoutModel();
 
@@ -37,7 +35,7 @@ void main() {
       patternSurface,
     ];
     List<PositionedSurface> positionedSurfaces = pattern_layout.layoutSurfaces(
-        null /* BuildContext */, constraints, surfaces, layoutModel);
+        null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
@@ -63,7 +61,7 @@ void main() {
       patternSurface,
     ];
     List<PositionedSurface> positionedSurfaces = pattern_layout.layoutSurfaces(
-        null /* BuildContext */, constraints, surfaces, layoutModel);
+        null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
@@ -91,7 +89,7 @@ void main() {
       tickerSurface3,
     ];
     List<PositionedSurface> positionedSurfaces = pattern_layout.layoutSurfaces(
-        null /* BuildContext */, constraints, surfaces, layoutModel);
+        null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
@@ -115,7 +113,7 @@ void main() {
       patternSurface,
     ];
     List<PositionedSurface> positionedSurfaces = pattern_layout.layoutSurfaces(
-        null /* BuildContext */, constraints, surfaces, layoutModel);
+        null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
@@ -143,7 +141,7 @@ void main() {
       commentsSurface3,
     ];
     List<PositionedSurface> positionedSurfaces = pattern_layout.layoutSurfaces(
-        null /* BuildContext */, constraints, surfaces, layoutModel);
+        null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
@@ -167,7 +165,7 @@ void main() {
       patternSurface,
     ];
     List<PositionedSurface> positionedSurfaces = pattern_layout.layoutSurfaces(
-        null /* BuildContext */, constraints, surfaces, layoutModel);
+        null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 1);
 
     test_util.assertSurfaceProperties(positionedSurfaces.first,
@@ -185,7 +183,7 @@ void main() {
       tickerSurface,
     ];
     List<PositionedSurface> positionedSurfaces = pattern_layout.layoutSurfaces(
-        null /* BuildContext */, constraints, surfaces, layoutModel);
+        null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 3);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
@@ -215,7 +213,7 @@ void main() {
       commentsSurface,
     ];
     List<PositionedSurface> positionedSurfaces = pattern_layout.layoutSurfaces(
-        null /* BuildContext */, constraints, surfaces, layoutModel);
+        null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 3);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
@@ -251,7 +249,7 @@ void main() {
       commentsSurface2,
     ];
     List<PositionedSurface> positionedSurfaces = pattern_layout.layoutSurfaces(
-        null /* BuildContext */, constraints, surfaces, layoutModel);
+        null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 3);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
