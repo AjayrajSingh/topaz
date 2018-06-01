@@ -6,12 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/widgets.dart';
 
-TextStyle _titleTextStyle(double scale) => new TextStyle(
-      color: Colors.grey[900],
-      fontSize: 48.0 * scale,
-      fontWeight: FontWeight.w200,
-    );
-
 TextStyle _subTitleTextStyle(double scale) => new TextStyle(
       color: Colors.grey[900],
       fontSize: 48.0 * scale,
@@ -23,6 +17,62 @@ TextStyle _textStyle(double scale) => new TextStyle(
       fontSize: 24.0 * scale,
       fontWeight: FontWeight.w200,
     );
+
+TextStyle _titleTextStyle(double scale) => new TextStyle(
+      color: Colors.grey[900],
+      fontSize: 48.0 * scale,
+      fontWeight: FontWeight.w200,
+    );
+
+/// Simple text based button shown in settings
+class SettingsButton extends SettingsItem {
+  /// Label the button is displayed with
+  final String text;
+
+  /// Action taken when button is pressed
+  final VoidCallback onTap;
+
+  /// Constructor.
+  const SettingsButton(
+      {@required this.text, @required this.onTap, @required double scale})
+      : super(scale);
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      child: SettingsText(text: text, scale: scale),
+      onPressed: onTap,
+    );
+  }
+}
+
+/// A settings item should have a flexible width but height as specified
+abstract class SettingsItem extends StatelessWidget {
+  static const double _unscaledHeight = 48.0;
+
+  /// Scaling factor to render widget
+  final double scale;
+
+  /// Builds a new settings item with the specified scale.
+  const SettingsItem(this.scale);
+
+  /// Total height of a single settings item.
+  double get height => _unscaledHeight * scale;
+}
+
+/// A list of items such as devices or toggles.
+class SettingsItemList extends StatelessWidget {
+  /// A list of child items in a settings item
+  final Iterable<SettingsItem> items;
+
+  /// Constructs a new list with the settings items
+  const SettingsItemList({@required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(mainAxisSize: MainAxisSize.min, children: items.toList());
+  }
+}
 
 /// A single page displayed in a settings app.
 class SettingsPage extends StatelessWidget {
@@ -73,10 +123,45 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
+/// Widget that displays a popup which is dismissable by tapping outside of the
+/// child widget.
+///
+/// The child widget should  therefore be smaller than the full size of the screen.
+class SettingsPopup extends StatelessWidget {
+  /// The child should leave some space for the user to dismiss the popup.
+  final Widget child;
+
+  /// Called when user taps outside of displayed popup
+  final VoidCallback onDismiss;
+
+  /// Constructor.
+  const SettingsPopup({@required this.child, @required this.onDismiss});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget overlayCancel = Opacity(
+        opacity: 0.4,
+        child: Material(
+            color: Colors.grey[900],
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onDismiss,
+            )));
+
+    return Stack(children: <Widget>[
+      overlayCancel,
+      Center(child: child),
+    ]);
+  }
+}
+
 /// A subsection of a settings page, with an optional title.
 ///
 /// All subsections should be fixed height widgets.
 class SettingsSection extends StatelessWidget {
+  static const SettingsSection _emptySection =
+      SettingsSection(scale: 1.0, child: Offstage(offstage: true));
+
   /// String displayed at the top of the section
   final String title;
 
@@ -86,73 +171,87 @@ class SettingsSection extends StatelessWidget {
   /// Scale at which to render the text
   final double scale;
 
-  /// Constructor.
   const SettingsSection({
     @required this.child,
     @required this.scale,
     this.title,
   });
 
+  /// Returns an empty section with no title.
+  factory SettingsSection.empty() => _emptySection;
+
+  /// Returns a section with just some text describing why the section
+  /// has an error.
+  ///
+  /// Used when the underlying settings are unavailable or not operational.
+  factory SettingsSection.error({
+    @required double scale,
+    @required String description,
+    String title,
+  }) {
+    return SettingsSection(
+      scale: scale,
+      title: title,
+      child: Container(
+        padding: EdgeInsets.only(top: 8.0 * scale, bottom: 16.0 * scale),
+        child: SettingsText(
+          scale: scale,
+          text: description,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (title != null) {
-      return new Column(children: <Widget>[
-        new Text(title, style: _subTitleTextStyle(scale)),
-        child
-      ]);
+      return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(title, style: _subTitleTextStyle(scale)),
+            child
+          ]);
     }
     return child;
   }
 }
 
-/// A list of items such as devices or toggles.
-class SettingsItemList extends StatelessWidget {
-  /// A list of child items in a settings item
-  final Iterable<SettingsItem> items;
+/// Function called when a settings switch tile is toggled.
+typedef OnSwitch = void Function(bool value);
 
-  /// Constructs a new list with the settings items
-  const SettingsItemList({@required this.items});
+/// A settings item containing a switch with some description.
+///
+/// Can be used for all on and off settings.
+class SettingsSwitchTile extends SettingsItem {
+  /// Whether the switch is on or off.
+  final bool state;
 
-  @override
-  Widget build(BuildContext context) {
-    return new Column(mainAxisSize: MainAxisSize.min, children: items.toList());
-  }
-}
-
-/// A settings item should have a flexible width but height as specified
-abstract class SettingsItem extends StatelessWidget {
-  static const double _unscaledHeight = 48.0;
-
-  /// Scaling factor to render widget
-  final double scale;
-
-  /// Builds a new settings item with the specified scale.
-  const SettingsItem(this.scale);
-
-  /// Total height of a single settings item.
-  double get height => _unscaledHeight * scale;
-}
-
-/// Simple text based button shown in settings
-class SettingsButton extends SettingsItem {
-  /// Label the button is displayed with
   final String text;
 
-  /// Action taken when button is pressed
-  final VoidCallback onTap;
+  /// Function called when user toggles the switch.
+  final OnSwitch onSwitch;
 
-  /// Constructor.
-  const SettingsButton(
-      {@required this.text, @required this.onTap, @required double scale})
+  const SettingsSwitchTile({this.state, this.text, this.onSwitch, double scale})
       : super(scale);
 
   @override
   Widget build(BuildContext context) {
-    return new FlatButton(
-      child: new Text(text, style: _textStyle(scale)),
-      onPressed: onTap,
+    return SwitchListTile(
+      title: SettingsText(text: text, scale: scale),
+      value: state,
+      onChanged: onSwitch,
     );
   }
+}
+
+/// Text with style consistent for the body of a settings page.
+class SettingsText extends SettingsItem {
+  final String text;
+
+  const SettingsText({this.text, double scale}) : super(scale);
+
+  @override
+  Widget build(BuildContext context) => Text(text, style: _textStyle(scale));
 }
 
 /// A tile that can be used to display a
@@ -189,7 +288,7 @@ class SettingsTile extends SettingsItem {
 
   @override
   Widget build(BuildContext context) {
-    return new ListTile(
+    return ListTile(
         leading: _buildLogo(),
         title: _title(),
         subtitle: description != null ? _subTitle() : null,
@@ -201,53 +300,18 @@ class SettingsTile extends SettingsItem {
     assert(iconData == null || assetUrl == null);
 
     Widget logo = iconData != null
-        ? new Icon(iconData, size: height, color: Colors.grey[900])
-        : new Image.asset(
+        ? Icon(iconData, size: height, color: Colors.grey[900])
+        : Image.asset(
             assetUrl,
             height: height,
             width: height,
           );
 
-    return new Container(
-        padding: new EdgeInsets.only(
-          right: 16.0 * scale,
-        ),
-        child: logo);
+    return Container(
+        padding: EdgeInsets.only(right: 16.0 * scale), child: logo);
   }
 
-  Widget _title() => new Text(text, style: _textStyle(scale));
+  Widget _subTitle() => SettingsText(text: description, scale: scale);
 
-  Widget _subTitle() => new Text(description, style: _textStyle(scale));
-}
-
-/// Widget that displays a popup which is dismissable by tapping outside of the
-/// child widget.
-///
-/// The child widget should  therefore be smaller than the full size of the screen.
-class SettingsPopup extends StatelessWidget {
-  /// The child should leave some space for the user to dismiss the popup.
-  final Widget child;
-
-  /// Called when user taps outside of displayed popup
-  final VoidCallback onDismiss;
-
-  /// Constructor.
-  const SettingsPopup({@required this.child, @required this.onDismiss});
-
-  @override
-  Widget build(BuildContext context) {
-    Widget overlayCancel = new Opacity(
-        opacity: 0.4,
-        child: new Material(
-            color: Colors.grey[900],
-            child: new GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: onDismiss,
-            )));
-
-    return new Stack(children: <Widget>[
-      overlayCancel,
-      new Center(child: child),
-    ]);
-  }
+  Widget _title() => SettingsText(text: text, scale: scale);
 }
