@@ -18,6 +18,7 @@
 #include "gtest/gtest.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fxl/files/path.h"
+#include "lib/fxl/strings/split_string.h"
 #include "lib/fxl/strings/utf_codecs.h"
 
 using fidl::VectorPtr;
@@ -29,6 +30,13 @@ namespace {
 constexpr uint8_t kArbitraryVectorSize = 3;
 // This is used as a literal constant in compatibility_test_service.fidl.
 constexpr uint8_t kArbitraryConstant = 2;
+
+constexpr char kServersEnvVarName[] = "FIDL_COMPATIBILITY_TEST_SERVERS";
+constexpr char kUsage[] = (
+    "Usage:\n  FIDL_COMPATIBILITY_TEST_SERVERS=foo_server,bar_server "
+    "fidl_compatibility_test\n"
+    "You must set the environment variable FIDL_COMPATIBILITY_TEST_SERVERS to a"
+    "comma-separated list of server URLs when running this test.");
 
 zx::handle Handle() {
   zx_handle_t raw_event;
@@ -912,14 +920,14 @@ void Initialize(fidl::test::compatibility::Struct* s) {
 }
 
 class CompatibilityTest
-    : public ::testing::TestWithParam<std::tuple<const char*, const char*>> {
+    : public ::testing::TestWithParam<std::tuple<std::string, std::string>> {
  protected:
   void SetUp() override {
     proxy_url_ = ::testing::get<0>(GetParam());
     server_url_ = ::testing::get<1>(GetParam());
   }
-  const char* proxy_url_;
-  const char* server_url_;
+  std::string proxy_url_;
+  std::string server_url_;
 };
 
 TEST_P(CompatibilityTest, Struct) {
@@ -946,14 +954,25 @@ TEST_P(CompatibilityTest, Struct) {
   ExpectEq(sent_clone, resp_clone);
 }
 
+// It'd be better to take these on the command-line but googletest doesn't
+// support instantiating tests after main() is called.
+std::vector<std::string> ServerURLsFromEnv() {
+  const char* servers_raw = getenv(kServersEnvVarName);
+  FXL_CHECK(servers_raw != nullptr) << kUsage;
+  std::vector<std::string> servers = fxl::SplitStringCopy(
+      fxl::StringView(servers_raw, strlen(servers_raw)), ",",
+      fxl::WhiteSpaceHandling::kTrimWhitespace,
+      fxl::SplitResult::kSplitWantNonEmpty);
+  FXL_CHECK(!servers.empty()) << kUsage;
+  return servers;
+}
+
 }  // namespace
 
-const auto kServerURLValues =
-    ::testing::Values("fidl_compatibility_test_server_cpp",
-                      "fidl_compatibility_test_server_dart");
-
-INSTANTIATE_TEST_CASE_P(CompatibilityTest, CompatibilityTest,
-                        ::testing::Combine(kServerURLValues, kServerURLValues));
+INSTANTIATE_TEST_CASE_P(
+    CompatibilityTest, CompatibilityTest,
+    ::testing::Combine(::testing::ValuesIn(ServerURLsFromEnv()),
+                       ::testing::ValuesIn(ServerURLsFromEnv())));
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);

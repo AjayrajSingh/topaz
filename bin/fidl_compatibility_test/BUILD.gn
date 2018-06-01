@@ -22,18 +22,32 @@ executable("fidl_compatibility_test") {
   ]
 }
 
+copy("run_fidl_compatibility_test_topaz_sh") {
+  sources = [ "run_fidl_compatibility_test_topaz.sh" ]
+  outputs = [ "${root_build_dir}/run_fidl_compatibility_test_topaz.sh" ]
+}
+
 package("package") {
   package_name = "fidl_compatibility_test"
 
   deps = [
     ":fidl_compatibility_test",
+    ":run_fidl_compatibility_test_topaz_sh",
   ]
 
   testonly = true
 
-  tests = [
+  # Declare it as a binary so humans and automation don't try to run it
+  # directly as a test, which would fail.
+  binaries = [
     {
       name = "fidl_compatibility_test"
+    },
+  ]
+
+  tests = [
+    {
+      name = "run_fidl_compatibility_test_topaz.sh"
     },
   ]
 }
