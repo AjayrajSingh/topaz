@@ -8,14 +8,17 @@ import 'todo_item_widget.dart';
 
 /// The widget holding a list of Todos.
 class TodoListWidget extends StatelessWidget {
-  // TODO: Retrieve the list of items from Sledge.
-  final List<TodoItem> _todoItems = new List<TodoItem>(3);
-
   @override
   Widget build(BuildContext context) {
+    // TODO: Retrieve the list of items from Sledge.
+    final List<TodoItem> todoItems = <TodoItem>[]
+      ..add(new TodoItem('foo'))
+      ..add(new TodoItem('bar'))
+      ..add(new TodoItem('baz'));
+
     return new ListView(
         shrinkWrap: true,
-        children: _todoItems
+        children: todoItems
             .map((TodoItem todoItem) => new TodoItemWidget(todoItem))
             .toList());
   }

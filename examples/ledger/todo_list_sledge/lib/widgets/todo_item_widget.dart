@@ -20,7 +20,6 @@ class TodoItemWidget extends StatelessWidget {
   /// Main constructor.
   const TodoItemWidget(this._todoItem);
 
-
   void _handleDeleteButtonBeingPressed() {}
 
   @override
