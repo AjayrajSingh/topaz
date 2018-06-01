@@ -86,7 +86,7 @@ class ChildViewConnection {
         _onUnavailableCallback = onUnavailable ?? _emptyConnectionCallback,
         assert(_viewOwner != null);
 
-  factory ChildViewConnection.launch(String url, ApplicationLauncher launcher,
+  factory ChildViewConnection.launch(String url, Launcher launcher,
       {InterfaceRequest<ComponentController> controller,
       InterfaceRequest<ServiceProvider> childServices,
       ChildViewConnectionCallback onAvailable,
@@ -95,7 +95,7 @@ class ChildViewConnection {
     final LaunchInfo launchInfo =
         new LaunchInfo(url: url, directoryRequest: services.request());
     try {
-      launcher.createApplication(launchInfo, controller);
+      launcher.createComponent(launchInfo, controller);
       return new ChildViewConnection.connect(services,
           childServices: childServices,
           onAvailable: onAvailable,

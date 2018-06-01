@@ -20,14 +20,16 @@ namespace {
 
 constexpr char kViewLabel[] = "ermine_user_shell";
 
-fuchsia::ui::scenic::ScenicPtr GetScenic(fuchsia::ui::views_v1::ViewManager* view_manager) {
+fuchsia::ui::scenic::ScenicPtr GetScenic(
+    fuchsia::ui::views_v1::ViewManager* view_manager) {
   fuchsia::ui::scenic::ScenicPtr scenic;
   view_manager->GetScenic(scenic.NewRequest());
   return scenic;
 }
 
-const fuchsia::ui::gfx::Metrics* GetLastMetrics(uint32_t node_id,
-                                   const fidl::VectorPtr<fuchsia::ui::scenic::Event>& events) {
+const fuchsia::ui::gfx::Metrics* GetLastMetrics(
+    uint32_t node_id,
+    const fidl::VectorPtr<fuchsia::ui::scenic::Event>& events) {
   const fuchsia::ui::gfx::Metrics* result = nullptr;
   for (const auto& event : *events) {
     if (event.is_gfx() && event.gfx().is_metrics() &&
@@ -37,7 +39,8 @@ const fuchsia::ui::gfx::Metrics* GetLastMetrics(uint32_t node_id,
   return result;
 }
 
-fuchsia::ui::views_v1::ViewProperties CreateViewProperties(float width, float height) {
+fuchsia::ui::views_v1::ViewProperties CreateViewProperties(float width,
+                                                           float height) {
   fuchsia::ui::views_v1::ViewProperties properties;
   properties.view_layout = fuchsia::ui::views_v1::ViewLayout::New();
   properties.view_layout->size.width = width;
@@ -48,9 +51,10 @@ fuchsia::ui::views_v1::ViewProperties CreateViewProperties(float width, float he
 }  // namespace
 
 ViewController::ViewController(
-    fuchsia::sys::ApplicationLauncher* launcher,
+    fuchsia::sys::Launcher* launcher,
     fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+        view_owner_request,
     DisconnectCallback disconnect_handler)
     : launcher_(launcher),
       view_manager_(std::move(view_manager)),
@@ -76,7 +80,7 @@ ViewController::ViewController(
 
   view_->GetServiceProvider(view_service_provider_.NewRequest());
   fuchsia::sys::ConnectToService(view_service_provider_.get(),
-                              input_connection_.NewRequest());
+                                 input_connection_.NewRequest());
   input_connection_->SetEventListener(input_listener_binding_.NewBinding());
 
   session_.set_event_handler(
@@ -122,8 +126,9 @@ zx_status_t ViewController::RemoveTile(uint32_t key) {
   return ZX_OK;
 }
 
-void ViewController::OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties properties,
-                                         OnPropertiesChangedCallback callback) {
+void ViewController::OnPropertiesChanged(
+    fuchsia::ui::views_v1::ViewProperties properties,
+    OnPropertiesChangedCallback callback) {
   if (properties.view_layout && logical_size_ != properties.view_layout->size) {
     logical_size_ = properties.view_layout->size;
     UpdatePhysicalSize();
@@ -133,9 +138,9 @@ void ViewController::OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties p
   callback();
 }
 
-void ViewController::OnChildAttached(uint32_t child_key,
-                                     fuchsia::ui::views_v1::ViewInfo child_view_info,
-                                     OnChildAttachedCallback callback) {
+void ViewController::OnChildAttached(
+    uint32_t child_key, fuchsia::ui::views_v1::ViewInfo child_view_info,
+    OnChildAttachedCallback callback) {
   callback();
 }
 
@@ -153,7 +158,8 @@ void ViewController::OnEvent(fuchsia::ui::input::InputEvent event,
 
 void ViewController::OnSessionEvents(
     fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
-  const fuchsia::ui::gfx::Metrics* new_metrics = GetLastMetrics(parent_node_.id(), events);
+  const fuchsia::ui::gfx::Metrics* new_metrics =
+      GetLastMetrics(parent_node_.id(), events);
 
   if (!new_metrics || metrics_ == *new_metrics)
     return;
@@ -200,12 +206,13 @@ void ViewController::Present(zx_time_t presentation_time) {
   ZX_DEBUG_ASSERT(!present_pending_);
   present_pending_ = true;
   last_presentation_time_ = presentation_time;
-  session_.Present(presentation_time, [this](fuchsia::images::PresentationInfo info) {
-    ZX_DEBUG_ASSERT(present_pending_);
-    present_pending_ = false;
-    if (needs_begin_frame_)
-      BeginFrame(info.presentation_time + info.presentation_interval);
-  });
+  session_.Present(
+      presentation_time, [this](fuchsia::images::PresentationInfo info) {
+        ZX_DEBUG_ASSERT(present_pending_);
+        present_pending_ = false;
+        if (needs_begin_frame_)
+          BeginFrame(info.presentation_time + info.presentation_interval);
+      });
 }
 
 void ViewController::PerformLayout() {

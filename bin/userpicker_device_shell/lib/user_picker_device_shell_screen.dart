@@ -16,14 +16,13 @@ const double _kKernelPanicElevation = 799.9;
 /// The root widget which displays all the other windows of this app.
 class UserPickerDeviceShellScreen extends StatelessWidget {
   /// Launcher to launch the kernel panic module if needed.
-  final ApplicationLauncher launcher;
+  final Launcher launcher;
 
   /// Constructor.
   const UserPickerDeviceShellScreen({
     @required this.launcher,
     Key key,
-  })
-      : super(key: key);
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return new ScopedModelDescendant<UserPickerDeviceShellModel>(

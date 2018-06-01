@@ -19,7 +19,7 @@ namespace ermine_user_shell {
 
 class Tile {
  public:
-  Tile(fuchsia::sys::ApplicationLauncher* launcher, std::string url,
+  Tile(fuchsia::sys::Launcher* launcher, std::string url,
        scenic_lib::Session* session);
   ~Tile();
 
@@ -33,15 +33,16 @@ class Tile {
     return view_properties_;
   }
 
-  void set_view_properties(fuchsia::ui::views_v1::ViewProperties view_properties) {
+  void set_view_properties(
+      fuchsia::ui::views_v1::ViewProperties view_properties) {
     view_properties_ = std::move(view_properties);
   }
 
-  void CreateView(
-      fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request);
+  void CreateView(fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+                      view_owner_request);
 
  private:
-  fuchsia::sys::ApplicationLauncher* launcher_;
+  fuchsia::sys::Launcher* launcher_;
   std::string url_;
   fuchsia::sys::ComponentControllerPtr controller_;
 

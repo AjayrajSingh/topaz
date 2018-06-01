@@ -15,8 +15,8 @@ class ApplicationWidget extends StatefulWidget {
   /// The application to launch.
   final String url;
 
-  /// The [ApplicationLauncher] used to launch the application.
-  final ApplicationLauncher launcher;
+  /// The [Launcher] used to launch the application.
+  final Launcher launcher;
 
   /// Called if the application terminates.
   final VoidCallback onDone;
@@ -79,7 +79,7 @@ class _ApplicationWidgetState extends State<ApplicationWidget> {
     _applicationController = new ComponentControllerProxy();
 
     Services incomingServices = new Services();
-    widget.launcher.createApplication(
+    widget.launcher.createComponent(
       new LaunchInfo(
           url: widget.url, directoryRequest: incomingServices.request()),
       _applicationController.ctrl.request(),

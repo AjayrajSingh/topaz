@@ -29,7 +29,7 @@ class ViewController : public fuchsia::ui::views_v1::ViewListener,
  public:
   using DisconnectCallback = std::function<void(ViewController*)>;
 
-  ViewController(fuchsia::sys::ApplicationLauncher* launcher,
+  ViewController(fuchsia::sys::Launcher* launcher,
                  fuchsia::ui::views_v1::ViewManagerPtr view_manager,
                  fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
                      view_owner_request,
@@ -74,7 +74,7 @@ class ViewController : public fuchsia::ui::views_v1::ViewListener,
   void SetPropertiesIfNeeded(Tile* tile,
                              fuchsia::ui::views_v1::ViewProperties properties);
 
-  fuchsia::sys::ApplicationLauncher* launcher_;
+  fuchsia::sys::Launcher* launcher_;
   fuchsia::ui::views_v1::ViewManagerPtr view_manager_;
   fidl::Binding<ViewListener> view_listener_binding_;
   fidl::Binding<ViewContainerListener> view_container_listener_binding_;

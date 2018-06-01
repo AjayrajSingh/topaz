@@ -21,7 +21,7 @@ void main(List<String> args) {
 
   test('start hello_dart', () {
     const LaunchInfo info = const LaunchInfo(url: 'hello_dart_jit');
-    context.launcher.createApplication(info, null);
+    context.launcher.createComponent(info, null);
   });
 
   test('communicate with a fidl service (hello_app_dart)', () async {
@@ -32,7 +32,7 @@ void main(List<String> args) {
 
     final LaunchInfo info = new LaunchInfo(
         url: 'hello_app_dart_jit', directoryRequest: services.request());
-    context.launcher.createApplication(info, actl.ctrl.request());
+    context.launcher.createComponent(info, actl.ctrl.request());
     services
       ..connectToService(service.ctrl)
       ..close();

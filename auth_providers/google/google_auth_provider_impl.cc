@@ -381,8 +381,8 @@ GoogleAuthProviderImpl::SetupWebView() {
   fuchsia::sys::LaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
   web_view_launch_info.directory_request = web_view_services.NewRequest();
-  context_->launcher()->CreateApplication(std::move(web_view_launch_info),
-                                          web_view_controller_.NewRequest());
+  context_->launcher()->CreateComponent(std::move(web_view_launch_info),
+                                        web_view_controller_.NewRequest());
   web_view_controller_.set_error_handler([this] {
     FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
   });

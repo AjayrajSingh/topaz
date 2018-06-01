@@ -17,7 +17,7 @@ class StartupContext {
   StartupContext();
 
   final EnvironmentProxy environment = new EnvironmentProxy();
-  final ApplicationLauncherProxy launcher = new ApplicationLauncherProxy();
+  final LauncherProxy launcher = new LauncherProxy();
   final ServiceProviderProxy environmentServices = new ServiceProviderProxy();
   final ServiceProviderImpl outgoingServices = new ServiceProviderImpl();
 
@@ -33,7 +33,7 @@ class StartupContext {
       context.environment
         ..ctrl.bind(
             new InterfaceHandle<Environment>(new Channel(environmentHandle)))
-        ..getApplicationLauncher(context.launcher.ctrl.request())
+        ..getLauncher(context.launcher.ctrl.request())
         ..getServices(context.environmentServices.ctrl.request());
     }
 

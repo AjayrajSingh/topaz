@@ -20,7 +20,7 @@ void main(List<String> args) {
   final Services services = new Services();
   final LaunchInfo launchInfo =
       new LaunchInfo(url: server, directoryRequest: services.request());
-  _context.launcher.createApplication(launchInfo, null);
+  _context.launcher.createComponent(launchInfo, null);
 
   _echo = new EchoProxy();
   _echo.ctrl.bind(services.connectToServiceByName<Echo>(Echo.$serviceName));
