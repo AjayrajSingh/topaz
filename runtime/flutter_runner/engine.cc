@@ -164,6 +164,8 @@ Engine::Engine(
 
   settings_.verbose_logging = true;
 
+  settings_.advisory_script_uri = thread_label_;
+
   settings_.root_isolate_create_callback =
       std::bind(&Engine::OnMainIsolateStart, this);
 
