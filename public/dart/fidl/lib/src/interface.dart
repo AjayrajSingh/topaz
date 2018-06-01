@@ -395,6 +395,7 @@ class ProxyController<T> {
     assert(pair.status == ZX.OK);
     _reader.bind(pair.first);
 
+    _boundCompleter.complete();
     if (onBind != null) {
       onBind();
     }
@@ -417,6 +418,7 @@ class ProxyController<T> {
     assert(interfaceHandle.channel != null);
     _reader.bind(interfaceHandle.passChannel());
 
+    _boundCompleter.complete();
     if (onBind != null) {
       onBind();
     }
@@ -478,12 +480,20 @@ class ProxyController<T> {
   Future<ProxyError> get error => _errorCompleter.future;
   Completer<ProxyError> _errorCompleter = new Completer<ProxyError>();
 
+  /// A future that completes when the proxy is bound.
+  Future<Null> get bound => _boundCompleter.future;
+  Completer<Null> _boundCompleter = new Completer<Null>();
+
   int _nextTxid = 1;
   int _pendingResponsesCount = 0;
 
   void _reset() {
     _callbackMap.clear();
     _errorCompleter = new Completer<ProxyError>();
+    if (!_boundCompleter.isCompleted) {
+      _boundCompleter.completeError('The proxy closed.');
+    }
+    _boundCompleter = new Completer<Null>();
     _nextTxid = 1;
     _pendingResponsesCount = 0;
   }
@@ -582,6 +592,95 @@ class ProxyController<T> {
       _errorCompleter.complete(new ProxyError(message));
     }
   }
+}
+
+/// A wrapper for ProxyController that does type conversion.
+///
+/// This is used by the Future based bindings to convert between the callback
+/// interfaces and Futures based interfaces. Most calls are just dispatched to
+/// the inner controller.
+class ProxyControllerWrapper<OUTER, INNER> implements ProxyController<OUTER> {
+  final ProxyController<INNER> _inner;
+  ProxyControllerWrapper(this._inner);
+
+  // Dispatch some calls with type conversion.
+  @override
+  InterfaceRequest<OUTER> request() =>
+      new InterfaceRequest<OUTER>(_inner.request().passChannel());
+  @override
+  void bind(InterfaceHandle<OUTER> interfaceHandle) =>
+      _inner.bind(new InterfaceHandle<INNER>(interfaceHandle.passChannel()));
+  @override
+  InterfaceHandle<OUTER> unbind() =>
+      new InterfaceHandle<OUTER>(_inner.unbind().passChannel());
+
+  // Dispatch most calls directly to the inner ProxyController<INNER>.
+  @override
+  String get $serviceName => _inner.$serviceName;
+  @override
+  _VoidCallback get onBind => _inner.onBind;
+  @override
+  set onBind(_VoidCallback cb) => _inner.onBind = cb;
+  @override
+  _VoidCallback get onUnbind => _inner.onUnbind;
+  @override
+  set onUnbind(_VoidCallback cb) => _inner.onUnbind = cb;
+  @override
+  _VoidCallback get onClose => _inner.onClose;
+  @override
+  set onClose(_VoidCallback cb) => _inner.onClose = cb;
+  @override
+  _VoidCallback get onConnectionError => _inner.onConnectionError;
+  @override
+  set onConnectionError(_VoidCallback cb) => _inner.onConnectionError = cb;
+  @override
+  bool get isBound => _inner.isBound;
+  @override
+  void close() => _inner.close();
+  @override
+  MessageSink get onResponse => _inner.onResponse;
+  @override
+  set onResponse(MessageSink cb) => _inner.onResponse = cb;
+  @override
+  Future<ProxyError> get error => _inner.error;
+  @override
+  Future<Null> get bound => _inner.bound;
+  @override
+  void sendMessage(Message message) => _inner.sendMessage(message);
+  @override
+  void sendMessageWithResponse(Message message, Function callback) =>
+      _inner.sendMessageWithResponse(message, callback);
+  @override
+  Function getCallback(int txid) => _inner.getCallback(txid);
+  @override
+  void proxyError(String message) => _inner.proxyError(message);
+  @override
+  ChannelReader get _reader => _inner._reader;
+  @override
+  HashMap<int, Function> get _callbackMap => _inner._callbackMap;
+  @override
+  Completer<ProxyError> get _errorCompleter => _inner._errorCompleter;
+  @override
+  set _errorCompleter(Completer<ProxyError> val) =>
+      _inner._errorCompleter = val;
+  @override
+  Completer<Null> get _boundCompleter => _inner._boundCompleter;
+  @override
+  set _boundCompleter(Completer<Null> val) => _inner._boundCompleter = val;
+  @override
+  int get _nextTxid => _inner._nextTxid;
+  @override
+  set _nextTxid(int val) => _inner._nextTxid = val;
+  @override
+  int get _pendingResponsesCount => _inner._pendingResponsesCount;
+  @override
+  set _pendingResponsesCount(int val) => _inner._pendingResponsesCount = val;
+  @override
+  void _reset() => _inner._reset();
+  @override
+  void _handleReadable() => _inner._handleReadable();
+  @override
+  void _handleError(ChannelReaderError error) => _inner._handleError(error);
 }
 
 /// Sends messages to a remote implementation of [T]
