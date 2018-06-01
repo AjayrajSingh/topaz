@@ -14,7 +14,12 @@ dart_app("contacts_content_provider") {
     "store.dart",
   ]
 
-  sandbox = "meta/sandbox"
+  meta = [
+    {
+      path = rebase_path("meta/contacts_content_provider.cmx")
+      dest = "contacts_content_provider.cmx"
+    },
+  ]
 
   deps = [
     "//topaz/app/contacts/services:services",

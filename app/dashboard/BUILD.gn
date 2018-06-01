@@ -22,7 +22,12 @@ flutter1_aot_app("dashboard") {
     "service/build_service.dart",
   ]
 
-  sandbox = "meta/sandbox"
+  meta = [
+    {
+      path = rebase_path("meta/dashboard.cmx")
+      dest = "dashboard.cmx"
+    },
+  ]
 
   deps = [
     "//peridot/public/lib:fidl",

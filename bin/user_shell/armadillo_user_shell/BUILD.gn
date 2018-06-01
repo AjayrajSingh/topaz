@@ -10,7 +10,12 @@ flutter_app("armadillo_user_shell") {
 
   package_name = "armadillo_user_shell"
 
-  sandbox = "meta/sandbox"
+  meta = [
+    {
+      path = rebase_path("meta/armadillo_user_shell.cmx")
+      dest = "armadillo_user_shell.cmx"
+    },
+  ]
 
   manifest = "pubspec.yaml"
 

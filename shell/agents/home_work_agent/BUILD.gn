@@ -9,7 +9,12 @@ dart_app("home_work_agent") {
 
   package_name = "home_work_agent"
 
-  sandbox = "meta/sandbox"
+  meta = [
+    {
+      path = rebase_path("meta/home_work_agent.cmx")
+      dest = "home_work_agent.cmx"
+    },
+  ]
 
   sources = [
     "home_work_proposer.dart",

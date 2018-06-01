@@ -7,7 +7,12 @@ import("//topaz/runtime/dart_runner/dart_app.gni")
 dart_app("chat_content_provider") {
   main_dart = "lib/main.dart"
 
-  sandbox = "meta/sandbox"
+  meta = [
+    {
+      path = rebase_path("meta/chat_content_provider.cmx")
+      dest = "chat_content_provider.cmx"
+    },
+  ]
 
   deps = [
     "//garnet/public/lib/app/fidl:fidl",
