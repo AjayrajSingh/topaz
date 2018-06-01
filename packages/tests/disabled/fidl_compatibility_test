@@ -1,7 +1,7 @@
 {
     "imports": [
         "garnet/packages/tests/fidl_compatibility_test_server_cpp",
-        "topaz/packages/tests/fidl_compatibility_test_server_dart"
+        "topaz/packages/tests/disabled/fidl_compatibility_test_server_dart"
     ],
     "packages": {
         "fidl_compatibility_test": "//topaz/bin/fidl_compatibility_test:package"

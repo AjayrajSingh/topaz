@@ -5,8 +5,6 @@
         "topaz/packages/tests/dart_target_unittests",
         "topaz/packages/tests/dart_unittests",
         "topaz/packages/tests/examples/all",
-        "topaz/packages/tests/fidl_compatibility_test",
-        "topaz/packages/tests/fidl_compatibility_test_server_dart",
         "topaz/packages/tests/web_view"
     ]
 }
