@@ -376,6 +376,33 @@ class ModuleDriver {
     return completer.future;
   }
 
+  /// Retrieve the current value stored on the Link with the name [key].
+  /// The value is converted from an Entity and decoded using [codec].
+  Future<T> get<T>(String key, EntityCodec<T> codec) async {
+    Completer<T> completer = new Completer<T>();
+
+    try {
+      LinkClient link = await getLink(key);
+      String entityRef = await link.getEntity();
+      if (entityRef == null) {
+        return null;
+      }
+      EntityResolverClient resolver = await getResolver();
+      EntityClient entity = await resolver.resolveEntity(entityRef);
+      List<String> types = await entity.getTypes();
+      if (!types.contains(codec.type)) {
+        throw new EntityTypeException(codec.type);
+      }
+
+      String data = await entity.getData(codec.type);
+      completer.complete(codec.decoder.convert(data));
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+    }
+
+    return completer.future;
+  }
+
   final Map<String, LinkClient> _links = <String, LinkClient>{};
 
   /// Async access to the underlying [LinkClient] with the name [name].
