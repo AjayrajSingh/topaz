@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_netstack/fidl.dart' as net;
+import 'package:fidl_fuchsia_netstack/fidl.dart' as net;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
