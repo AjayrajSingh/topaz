@@ -58,5 +58,10 @@ dart_fuchsia_test("dart_zircon_test") {
     "//topaz/public/dart/fidl",
   ]
 
-  sandbox = "//topaz/runtime/dart_runner/meta/sandbox"
+  meta = [
+    {
+      path = "//topaz/runtime/dart_runner/meta/dart_zircon_test.cmx"
+      dest = "dart_zircon_test.cmx"
+    },
+  ]
 }
