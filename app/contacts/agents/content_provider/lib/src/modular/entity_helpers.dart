@@ -2,9 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fidl_fuchsia_contacts_content_provider/fidl.dart' as fidl;
 import 'package:lib.schemas.dart/com.fuchsia.contact.dart' as entities;
-import 'package:fidl_contacts_content_provider/fidl.dart'
-    as fidl;
 
 /// Converts a [fidl.Contact] into a [entities.ContactEntityData] entity
 entities.ContactEntityData getEntityFromContact(fidl.Contact contact) {

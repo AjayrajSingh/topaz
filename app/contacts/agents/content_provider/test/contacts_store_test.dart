@@ -3,9 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:contacts_content_provider/store.dart';
+import 'package:fidl_fuchsia_contacts_content_provider/fidl.dart' as fidl;
 import 'package:test/test.dart';
-import 'package:fidl_contacts_content_provider/fidl.dart'
-    as fidl;
 
 List<fidl.Contact> _createContactList() {
   return <fidl.Contact>[
