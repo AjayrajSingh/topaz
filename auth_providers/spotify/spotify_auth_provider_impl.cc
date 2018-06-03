@@ -119,26 +119,25 @@ void SpotifyAuthProviderImpl::GetAppAccessToken(
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
 
-  Request(
-      std::move(request_factory), [callback](http::URLResponse response) {
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          callback(oauth_response.status, nullptr);
-          return;
-        }
+  Request(std::move(request_factory), [callback](http::URLResponse response) {
+    auto oauth_response = ParseOAuthResponse(std::move(response));
+    if (oauth_response.status != AuthProviderStatus::OK) {
+      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
+      callback(oauth_response.status, nullptr);
+      return;
+    }
 
-        AuthTokenPtr access_token = auth::AuthToken::New();
-        access_token->token_type = auth::TokenType::ACCESS_TOKEN;
-        access_token->token =
-            oauth_response.json_response["access_token"].GetString();
-        access_token->expires_in =
-            oauth_response.json_response["expires_in"].GetUint64();
+    AuthTokenPtr access_token = auth::AuthToken::New();
+    access_token->token_type = auth::TokenType::ACCESS_TOKEN;
+    access_token->token =
+        oauth_response.json_response["access_token"].GetString();
+    access_token->expires_in =
+        oauth_response.json_response["expires_in"].GetUint64();
 
-        callback(AuthProviderStatus::OK, std::move(access_token));
-      });
+    callback(AuthProviderStatus::OK, std::move(access_token));
+  });
 }
 
 void SpotifyAuthProviderImpl::GetAppIdToken(
@@ -242,8 +241,8 @@ void SpotifyAuthProviderImpl::GetUserProfile(
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
 
-  Request(std::move(request_factory), [this, credential](
-                                          http::URLResponse response) {
+  Request(std::move(request_factory), [this,
+                                       credential](http::URLResponse response) {
     auth::UserProfileInfoPtr user_profile_info = auth::UserProfileInfo::New();
 
     auto oauth_response = ParseOAuthResponse(std::move(response));

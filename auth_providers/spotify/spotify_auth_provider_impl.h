@@ -69,11 +69,15 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
 
   fuchsia::ui::views_v1_token::ViewOwnerPtr SetupWebView();
 
-  void Request(std::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,
-               std::function<void(::fuchsia::net::oldhttp::URLResponse response)> callback);
+  void Request(
+      std::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,
+      std::function<void(::fuchsia::net::oldhttp::URLResponse response)>
+          callback);
 
-  void OnResponse(std::function<void(::fuchsia::net::oldhttp::URLResponse response)> callback,
-                  ::fuchsia::net::oldhttp::URLResponse response);
+  void OnResponse(
+      std::function<void(::fuchsia::net::oldhttp::URLResponse response)>
+          callback,
+      ::fuchsia::net::oldhttp::URLResponse response);
 
   fuchsia::sys::StartupContext* context_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;

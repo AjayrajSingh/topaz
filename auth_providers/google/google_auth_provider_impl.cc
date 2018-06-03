@@ -131,26 +131,25 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
 
-  Request(
-      std::move(request_factory), [callback](http::URLResponse response) {
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          callback(oauth_response.status, nullptr);
-          return;
-        }
+  Request(std::move(request_factory), [callback](http::URLResponse response) {
+    auto oauth_response = ParseOAuthResponse(std::move(response));
+    if (oauth_response.status != AuthProviderStatus::OK) {
+      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
+      callback(oauth_response.status, nullptr);
+      return;
+    }
 
-        AuthTokenPtr access_token = auth::AuthToken::New();
-        access_token->token_type = auth::TokenType::ACCESS_TOKEN;
-        access_token->token =
-            oauth_response.json_response["access_token"].GetString();
-        access_token->expires_in =
-            oauth_response.json_response["expires_in"].GetUint64();
+    AuthTokenPtr access_token = auth::AuthToken::New();
+    access_token->token_type = auth::TokenType::ACCESS_TOKEN;
+    access_token->token =
+        oauth_response.json_response["access_token"].GetString();
+    access_token->expires_in =
+        oauth_response.json_response["expires_in"].GetUint64();
 
-        callback(AuthProviderStatus::OK, std::move(access_token));
-      });
+    callback(AuthProviderStatus::OK, std::move(access_token));
+  });
 }
 
 void GoogleAuthProviderImpl::GetAppIdToken(fidl::StringPtr credential,
@@ -169,25 +168,24 @@ void GoogleAuthProviderImpl::GetAppIdToken(fidl::StringPtr credential,
 
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
-  Request(
-      std::move(request_factory), [callback](http::URLResponse response) {
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          callback(oauth_response.status, nullptr);
-          return;
-        }
+  Request(std::move(request_factory), [callback](http::URLResponse response) {
+    auto oauth_response = ParseOAuthResponse(std::move(response));
+    if (oauth_response.status != AuthProviderStatus::OK) {
+      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
+      callback(oauth_response.status, nullptr);
+      return;
+    }
 
-        AuthTokenPtr id_token = auth::AuthToken::New();
-        id_token->token = oauth_response.json_response["id_token"].GetString();
-        id_token->token_type = auth::TokenType::ID_TOKEN;
-        id_token->expires_in =
-            oauth_response.json_response["expires_in"].GetUint64();
+    AuthTokenPtr id_token = auth::AuthToken::New();
+    id_token->token = oauth_response.json_response["id_token"].GetString();
+    id_token->token_type = auth::TokenType::ID_TOKEN;
+    id_token->expires_in =
+        oauth_response.json_response["expires_in"].GetUint64();
 
-        callback(AuthProviderStatus::OK, std::move(id_token));
-      });
+    callback(AuthProviderStatus::OK, std::move(id_token));
+  });
 }
 
 void GoogleAuthProviderImpl::GetAppFirebaseToken(
@@ -212,8 +210,7 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
   // Exchange credential to access token at Google OAuth token endpoint
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
-  Request(std::move(request_factory), [callback](
-                                          http::URLResponse response) {
+  Request(std::move(request_factory), [callback](http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
       FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
@@ -247,19 +244,18 @@ void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
 
-  Request(
-      std::move(request_factory), [callback](http::URLResponse response) {
-        auto oauth_response = ParseOAuthResponse(std::move(response));
-        if (oauth_response.status != AuthProviderStatus::OK) {
-          FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-          FXL_VLOG(1) << "Got response: "
-                      << JsonValueToPrettyString(oauth_response.json_response);
-          callback(oauth_response.status);
-          return;
-        }
+  Request(std::move(request_factory), [callback](http::URLResponse response) {
+    auto oauth_response = ParseOAuthResponse(std::move(response));
+    if (oauth_response.status != AuthProviderStatus::OK) {
+      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response: "
+                  << JsonValueToPrettyString(oauth_response.json_response);
+      callback(oauth_response.status);
+      return;
+    }
 
-        callback(AuthProviderStatus::OK);
-      });
+    callback(AuthProviderStatus::OK);
+  });
 }
 
 void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
@@ -339,8 +335,8 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
 
-  Request(std::move(request_factory), [this, credential](
-                                          http::URLResponse response) {
+  Request(std::move(request_factory), [this,
+                                       credential](http::URLResponse response) {
     auth::UserProfileInfoPtr user_profile_info = auth::UserProfileInfo::New();
 
     auto oauth_response = ParseOAuthResponse(std::move(response));
