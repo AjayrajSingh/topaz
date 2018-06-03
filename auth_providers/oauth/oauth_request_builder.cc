@@ -17,6 +17,8 @@
 namespace auth_providers {
 namespace oauth {
 
+namespace http = ::fuchsia::net::oldhttp;
+
 namespace {
 
 std::string UrlEncode(const std::string& value) {
@@ -84,19 +86,19 @@ OAuthRequestBuilder& OAuthRequestBuilder::SetQueryParams(
   return *this;
 }
 
-network::URLRequest OAuthRequestBuilder::Build() const {
+http::URLRequest OAuthRequestBuilder::Build() const {
   fsl::SizedVmo data;
   auto result = fsl::VmoFromString(request_body_, &data);
   FXL_CHECK(result);
 
-  network::URLRequest request;
+  http::URLRequest request;
   request.url = url_ + query_string_;
   request.method = method_;
   request.auto_follow_redirects = true;
-  request.body = ::network::URLBody::New();
+  request.body = http::URLBody::New();
   request.body->set_sized_buffer(std::move(data).ToTransport());
   for (const auto& http_header : http_headers_) {
-    ::network::HttpHeader hdr;
+    http::HttpHeader hdr;
     hdr.name = http_header.first;
     hdr.value = http_header.second;
     request.headers.push_back(std::move(hdr));

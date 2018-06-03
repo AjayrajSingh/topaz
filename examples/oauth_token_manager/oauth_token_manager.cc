@@ -12,10 +12,10 @@
 #include <memory>
 #include <utility>
 
+#include <fuchsia/net/oldhttp/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 #include <modular_auth/cpp/fidl.h>
-#include <network/cpp/fidl.h>
 #include <trace-provider/provider.h>
 #include <web_view/cpp/fidl.h>
 
@@ -48,6 +48,8 @@
 namespace fuchsia {
 namespace modular {
 namespace auth {
+
+namespace http = ::fuchsia::net::oldhttp;
 
 using ShortLivedTokenCallback =
     std::function<void(std::string, modular_auth::AuthErr)>;
@@ -217,7 +219,7 @@ std::string GetRefreshTokenFromCredsFile(const std::string& account_id) {
 }
 
 // Exactly one of success_callback and failure_callback is ever invoked.
-void Post(const std::string& request_body, network::URLLoader* const url_loader,
+void Post(const std::string& request_body, http::URLLoader* const url_loader,
           const std::string& url, const std::function<void()>& success_callback,
           const std::function<void(modular_auth::Status, std::string)>&
               failure_callback,
@@ -232,24 +234,24 @@ void Post(const std::string& request_body, network::URLLoader* const url_loader,
   FXL_VLOG(1) << "Post Data:" << encoded_request_body;
   FXL_DCHECK(result);
 
-  network::URLRequest request;
+  http::URLRequest request;
   request.url = url;
   request.method = "POST";
   request.auto_follow_redirects = true;
 
   // Content-length header.
-  network::HttpHeader content_length_header;
+  http::HttpHeader content_length_header;
   content_length_header.name = "Content-length";
   uint64_t data_size = encoded_request_body.length();
   content_length_header.value = fxl::NumberToString(data_size);
   request.headers.push_back(std::move(content_length_header));
 
   // content-type header.
-  network::HttpHeader content_type_header;
+  http::HttpHeader content_type_header;
   content_type_header.name = "content-type";
   if (url.find("identitytoolkit") != std::string::npos) {
     // set accept header
-    network::HttpHeader accept_header;
+    http::HttpHeader accept_header;
     accept_header.name = "accept";
     accept_header.value = "application/json";
     request.headers.push_back(std::move(accept_header));
@@ -261,12 +263,12 @@ void Post(const std::string& request_body, network::URLLoader* const url_loader,
   }
   request.headers.push_back(std::move(content_type_header));
 
-  request.body = network::URLBody::New();
+  request.body = http::URLBody::New();
   request.body->set_sized_buffer(std::move(data).ToTransport());
 
   url_loader->Start(std::move(request), [success_callback, failure_callback,
                                          set_token_callback](
-                                            network::URLResponse response) {
+                                            http::URLResponse response) {
     FXL_VLOG(1) << "URL Loader response:"
                 << std::to_string(response.status_code);
 
@@ -319,37 +321,37 @@ void Post(const std::string& request_body, network::URLLoader* const url_loader,
 }
 
 // Exactly one of success_callback and failure_callback is ever invoked.
-void Get(network::URLLoader* const url_loader, const std::string& url,
+void Get(http::URLLoader* const url_loader, const std::string& url,
          const std::string& access_token,
          const std::function<void()>& success_callback,
          const std::function<void(modular_auth::Status status, std::string)>&
              failure_callback,
          const std::function<bool(rapidjson::Document)>& set_token_callback) {
-  network::URLRequest request;
+  http::URLRequest request;
   request.url = url;
   request.method = "GET";
   request.auto_follow_redirects = true;
 
   // Set Authorization header.
-  network::HttpHeader auth_header;
+  http::HttpHeader auth_header;
   auth_header.name = "Authorization";
   auth_header.value = "Bearer " + access_token;
   request.headers.push_back(std::move(auth_header));
 
   // set content-type header to json.
-  network::HttpHeader content_type_header;
+  http::HttpHeader content_type_header;
   content_type_header.name = "content-type";
   content_type_header.value = "application/json";
 
   // set accept header to json
-  network::HttpHeader accept_header;
+  http::HttpHeader accept_header;
   accept_header.name = "accept";
   accept_header.value = "application/json";
   request.headers.push_back(std::move(accept_header));
 
   url_loader->Start(std::move(request), [success_callback, failure_callback,
                                          set_token_callback](
-                                            network::URLResponse response) {
+                                            http::URLResponse response) {
     if (response.error) {
       failure_callback(
           modular_auth::Status::NETWORK_ERROR,
@@ -623,8 +625,8 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
         R"(   "requestUri": "http://localhost")" + "}";
 
     app_->startup_context_->ConnectToEnvironmentService(
-        network_service_.NewRequest());
-    network_service_->CreateURLLoader(url_loader_.NewRequest());
+        http_service_.NewRequest());
+    http_service_->CreateURLLoader(url_loader_.NewRequest());
 
     std::string url(kFirebaseAuthEndpoint);
     url += "?key=" + UrlEncode(firebase_api_key_);
@@ -742,8 +744,8 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
   modular_auth::FirebaseTokenPtr firebase_token_;
   modular_auth::AuthErr auth_err_;
 
-  network::NetworkServicePtr network_service_;
-  network::URLLoaderPtr url_loader_;
+  http::HttpServicePtr http_service_;
+  http::URLLoaderPtr url_loader_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleFirebaseTokensCall);
 };
@@ -798,8 +800,8 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
                                      "&grant_type=refresh_token";
 
     app_->startup_context_->ConnectToEnvironmentService(
-        network_service_.NewRequest());
-    network_service_->CreateURLLoader(url_loader_.NewRequest());
+        http_service_.NewRequest());
+    http_service_->CreateURLLoader(url_loader_.NewRequest());
 
     // This flow exlusively branches below, so we need to put it in a shared
     // container from which it can be removed once for all branches.
@@ -912,8 +914,8 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
   TokenType token_type_;
   OAuthTokenManagerApp* const app_;
 
-  network::NetworkServicePtr network_service_;
-  network::URLLoaderPtr url_loader_;
+  http::HttpServicePtr http_service_;
+  http::URLLoaderPtr url_loader_;
 
   fidl::StringPtr result_;
   modular_auth::AuthErr auth_err_;
@@ -1011,8 +1013,8 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
         "&client_id=" + kClientId + "&grant_type=authorization_code";
 
     app_->startup_context_->ConnectToEnvironmentService(
-        network_service_.NewRequest());
-    network_service_->CreateURLLoader(url_loader_.NewRequest());
+        http_service_.NewRequest());
+    http_service_->CreateURLLoader(url_loader_.NewRequest());
 
     Post(request_body, url_loader_.get(), kGoogleOAuthTokenEndpoint,
          [this] { Success(); },
@@ -1151,8 +1153,8 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
   web_view::WebViewPtr web_view_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
 
-  network::NetworkServicePtr network_service_;
-  network::URLLoaderPtr url_loader_;
+  http::HttpServicePtr http_service_;
+  http::URLLoaderPtr url_loader_;
 
   fidl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
 
@@ -1225,8 +1227,8 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
 
     // revoke persistent tokens on backend IDP server.
     app_->startup_context_->ConnectToEnvironmentService(
-        network_service_.NewRequest());
-    network_service_->CreateURLLoader(url_loader_.NewRequest());
+        http_service_.NewRequest());
+    http_service_->CreateURLLoader(url_loader_.NewRequest());
 
     std::string url = kGoogleRevokeTokenEndpoint + std::string("?token=");
     url += refresh_token;
@@ -1330,8 +1332,8 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
   OAuthTokenManagerApp* const app_;
   const RemoveAccountCallback callback_;
 
-  network::NetworkServicePtr network_service_;
-  network::URLLoaderPtr url_loader_;
+  http::HttpServicePtr http_service_;
+  http::URLLoaderPtr url_loader_;
 
   modular_auth::AuthErr auth_err_;
 
@@ -1365,8 +1367,8 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
     const std::string access_token =
         app_->oauth_tokens_[account_->id].access_token;
     app_->startup_context_->ConnectToEnvironmentService(
-        network_service_.NewRequest());
-    network_service_->CreateURLLoader(url_loader_.NewRequest());
+        http_service_.NewRequest());
+    http_service_->CreateURLLoader(url_loader_.NewRequest());
 
     // Fetch profile atrributes for the provisioned user using
     // https://developers.google.com/+/web/api/rest/latest/people/get api.
@@ -1431,8 +1433,8 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
   OAuthTokenManagerApp* const app_;
   const AddAccountCallback callback_;
 
-  network::NetworkServicePtr network_service_;
-  network::URLLoaderPtr url_loader_;
+  http::HttpServicePtr http_service_;
+  http::URLLoaderPtr url_loader_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleProfileAttributesCall);
 };

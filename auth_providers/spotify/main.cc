@@ -20,6 +20,8 @@
 
 namespace {
 
+namespace http = ::fuchsia::net::oldhttp;
+
 class SpotifyAuthProviderApp {
  public:
   SpotifyAuthProviderApp()
@@ -30,7 +32,7 @@ class SpotifyAuthProviderApp {
             loop_.async(), std::make_unique<backoff::ExponentialBackoff>(),
             [this] {
               return startup_context_
-                  ->ConnectToEnvironmentService<network::NetworkService>();
+                  ->ConnectToEnvironmentService<http::HttpService>();
             }),
         factory_impl_(startup_context_.get(), &network_wrapper_) {
     FXL_DCHECK(startup_context_);

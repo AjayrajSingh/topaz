@@ -4,8 +4,8 @@
 
 #include "topaz/auth_providers/google/google_auth_provider_impl.h"
 
+#include <fuchsia/net/oldhttp/cpp/fidl.h>
 #include <fuchsia/ui/views_v1_token/cpp/fidl.h>
-#include <network/cpp/fidl.h>
 
 #include "lib/app/cpp/connect.h"
 #include "lib/app/cpp/startup_context.h"
@@ -21,6 +21,8 @@
 #include "topaz/auth_providers/oauth/oauth_response.h"
 
 namespace google_auth_provider {
+
+namespace http = ::fuchsia::net::oldhttp;
 
 namespace {
 
@@ -130,7 +132,7 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
       [request = std::move(request)] { return request.Build(); });
 
   Request(
-      std::move(request_factory), [callback](network::URLResponse response) {
+      std::move(request_factory), [callback](http::URLResponse response) {
         auto oauth_response = ParseOAuthResponse(std::move(response));
         if (oauth_response.status != AuthProviderStatus::OK) {
           FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
@@ -168,7 +170,7 @@ void GoogleAuthProviderImpl::GetAppIdToken(fidl::StringPtr credential,
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
   Request(
-      std::move(request_factory), [callback](network::URLResponse response) {
+      std::move(request_factory), [callback](http::URLResponse response) {
         auto oauth_response = ParseOAuthResponse(std::move(response));
         if (oauth_response.status != AuthProviderStatus::OK) {
           FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
@@ -211,7 +213,7 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
   Request(std::move(request_factory), [callback](
-                                          network::URLResponse response) {
+                                          http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
       FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
@@ -246,7 +248,7 @@ void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
       [request = std::move(request)] { return request.Build(); });
 
   Request(
-      std::move(request_factory), [callback](network::URLResponse response) {
+      std::move(request_factory), [callback](http::URLResponse response) {
         auto oauth_response = ParseOAuthResponse(std::move(response));
         if (oauth_response.status != AuthProviderStatus::OK) {
           FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
@@ -302,7 +304,7 @@ void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
       [request = std::move(request)] { return request.Build(); });
 
   // Generate long lived credentials
-  Request(std::move(request_factory), [this](network::URLResponse response) {
+  Request(std::move(request_factory), [this](http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
       FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
@@ -338,7 +340,7 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
       [request = std::move(request)] { return request.Build(); });
 
   Request(std::move(request_factory), [this, credential](
-                                          network::URLResponse response) {
+                                          http::URLResponse response) {
     auth::UserProfileInfoPtr user_profile_info = auth::UserProfileInfo::New();
 
     auto oauth_response = ParseOAuthResponse(std::move(response));
@@ -400,18 +402,18 @@ GoogleAuthProviderImpl::SetupWebView() {
 }
 
 void GoogleAuthProviderImpl::Request(
-    std::function<network::URLRequest()> request_factory,
-    std::function<void(network::URLResponse response)> callback) {
+    std::function<http::URLRequest()> request_factory,
+    std::function<void(http::URLResponse response)> callback) {
   requests_.emplace(network_wrapper_->Request(
       std::move(request_factory), [this, callback = std::move(callback)](
-                                      network::URLResponse response) mutable {
+                                      http::URLResponse response) mutable {
         OnResponse(std::move(callback), std::move(response));
       }));
 }
 
 void GoogleAuthProviderImpl::OnResponse(
-    std::function<void(network::URLResponse response)> callback,
-    network::URLResponse response) {
+    std::function<void(http::URLResponse response)> callback,
+    http::URLResponse response) {
   callback(std::move(response));
 }
 

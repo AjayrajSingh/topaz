@@ -5,7 +5,7 @@
 #ifndef TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_REQUEST_BUILDER_H_
 #define TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_REQUEST_BUILDER_H_
 
-#include <network/cpp/fidl.h>
+#include <fuchsia/net/oldhttp/cpp/fidl.h>
 
 namespace auth_providers {
 namespace oauth {
@@ -40,7 +40,7 @@ class OAuthRequestBuilder {
       std::map<std::string, std::string> query_params);
 
   // Returns an HTTP |URLRequest| handle for the OAuth endpoint.
-  network::URLRequest Build() const;
+  ::fuchsia::net::oldhttp::URLRequest Build() const;
 
  private:
   // Sets the HTTP request body field to |body|.

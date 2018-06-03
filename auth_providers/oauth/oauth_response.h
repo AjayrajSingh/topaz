@@ -6,7 +6,7 @@
 #define TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_RESPONSE_H_
 
 #include <auth/cpp/fidl.h>
-#include <network/cpp/fidl.h>
+#include <fuchsia/net/oldhttp/cpp/fidl.h>
 
 #include "third_party/rapidjson/rapidjson/document.h"
 
@@ -26,7 +26,7 @@ struct OAuthResponse {
         json_response(std::move(json_response)) {}
 };
 
-OAuthResponse ParseOAuthResponse(network::URLResponse response);
+OAuthResponse ParseOAuthResponse(::fuchsia::net::oldhttp::URLResponse response);
 
 }  // namespace oauth
 }  // namespace auth_providers

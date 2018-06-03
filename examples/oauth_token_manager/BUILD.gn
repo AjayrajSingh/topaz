@@ -24,7 +24,7 @@ executable("bin") {
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
-    "//garnet/public/lib/network/fidl",
+    "//garnet/public/lib/net/oldhttp/fidl",
     "//peridot/public/lib/async/cpp:operation",
     "//peridot/public/lib/auth/fidl",
     "//third_party/rapidjson",

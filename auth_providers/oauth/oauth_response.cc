@@ -12,9 +12,11 @@
 namespace auth_providers {
 namespace oauth {
 
+namespace http = ::fuchsia::net::oldhttp;
+
 using auth::AuthProviderStatus;
 
-OAuthResponse ParseOAuthResponse(network::URLResponse response) {
+OAuthResponse ParseOAuthResponse(http::URLResponse response) {
   rapidjson::Document out;
   if (response.error) {
     FXL_LOG(ERROR) << "Encountered error: " +

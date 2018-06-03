@@ -19,21 +19,23 @@ using auth::AuthProviderStatus;
 
 namespace {
 
-network::URLResponse FakeError(int32_t code, std::string reason) {
-  network::URLResponse response;
-  response.error = network::NetworkError::New();
+namespace http = ::fuchsia::net::oldhttp;
+
+http::URLResponse FakeError(int32_t code, std::string reason) {
+  http::URLResponse response;
+  response.error = http::HttpError::New();
   response.error->code = code;
   response.error->description = reason;
   return response;
 }
 
-network::URLResponse FakeSuccess(int32_t code, const std::string& body) {
-  network::URLResponse response;
-  response.body = network::URLBody::New();
+http::URLResponse FakeSuccess(int32_t code, const std::string& body) {
+  http::URLResponse response;
+  response.body = http::URLBody::New();
   response.body->set_stream(fsl::WriteStringToSocket(body));
   response.status_code = code;
 
-  network::HttpHeader content_length_header;
+  http::HttpHeader content_length_header;
   content_length_header.name = "content-length";
   content_length_header.value = fxl::NumberToString(body.size());
   response.headers.push_back(std::move(content_length_header));

@@ -22,6 +22,8 @@
 
 namespace spotify_auth_provider {
 
+namespace http = ::fuchsia::net::oldhttp;
+
 using auth::AuthProviderStatus;
 using auth::AuthTokenPtr;
 using auth_providers::oauth::OAuthRequestBuilder;
@@ -118,7 +120,7 @@ void SpotifyAuthProviderImpl::GetAppAccessToken(
       [request = std::move(request)] { return request.Build(); });
 
   Request(
-      std::move(request_factory), [callback](network::URLResponse response) {
+      std::move(request_factory), [callback](http::URLResponse response) {
         auto oauth_response = ParseOAuthResponse(std::move(response));
         if (oauth_response.status != AuthProviderStatus::OK) {
           FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
@@ -205,7 +207,7 @@ void SpotifyAuthProviderImpl::WillSendRequest(
       [request = std::move(request)] { return request.Build(); });
 
   // Generate long lived credentials (OAuth refresh token)
-  Request(std::move(request_factory), [this](network::URLResponse response) {
+  Request(std::move(request_factory), [this](http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
       FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
@@ -241,7 +243,7 @@ void SpotifyAuthProviderImpl::GetUserProfile(
       [request = std::move(request)] { return request.Build(); });
 
   Request(std::move(request_factory), [this, credential](
-                                          network::URLResponse response) {
+                                          http::URLResponse response) {
     auth::UserProfileInfoPtr user_profile_info = auth::UserProfileInfo::New();
 
     auto oauth_response = ParseOAuthResponse(std::move(response));
@@ -303,18 +305,18 @@ SpotifyAuthProviderImpl::SetupWebView() {
 }
 
 void SpotifyAuthProviderImpl::Request(
-    std::function<network::URLRequest()> request_factory,
-    std::function<void(network::URLResponse response)> callback) {
+    std::function<http::URLRequest()> request_factory,
+    std::function<void(http::URLResponse response)> callback) {
   requests_.emplace(network_wrapper_->Request(
       std::move(request_factory), [this, callback = std::move(callback)](
-                                      network::URLResponse response) mutable {
+                                      http::URLResponse response) mutable {
         OnResponse(std::move(callback), std::move(response));
       }));
 }
 
 void SpotifyAuthProviderImpl::OnResponse(
-    std::function<void(network::URLResponse response)> callback,
-    network::URLResponse response) {
+    std::function<void(http::URLResponse response)> callback,
+    http::URLResponse response) {
   callback(std::move(response));
 }
 
