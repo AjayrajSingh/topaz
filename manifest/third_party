@@ -12,11 +12,6 @@
              remote="https://fuchsia.googlesource.com/third_party/cairo"
              gerrithost="https://fuchsia-review.googlesource.com"
              historydepth="1"/>
-    <project name="third_party/curl"
-             path="third_party/curl"
-             remote="https://fuchsia.googlesource.com/third_party/curl"
-             gerrithost="https://fuchsia-review.googlesource.com"
-             revision="8b3d7e5dbce3607c7a735e9cd84b47da991fbbfd"/>
     <project name="third_party/freetype2"
              path="third_party/freetype2"
              remote="https://fuchsia.googlesource.com/third_party/freetype2"

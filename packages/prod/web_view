@@ -2,7 +2,7 @@
     "imports": [
         "garnet/packages/prod/fonts",
         "garnet/packages/prod/scenic",
-        "topaz/packages/prod/curl",
+        "garnet/packages/tools/curl",
         "topaz/packages/prod/sqlite"
     ],
     "packages": {

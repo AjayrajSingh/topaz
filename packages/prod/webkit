@@ -1,6 +1,6 @@
 {
     "imports": [
-        "topaz/packages/prod/curl",
+        "garnet/packages/tools/curl",
         "topaz/packages/prod/sqlite"
     ],
     "labels": [
