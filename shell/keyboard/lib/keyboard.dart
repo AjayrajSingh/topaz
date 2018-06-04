@@ -253,8 +253,8 @@ const String _kKeyboardLayoutsJson = '['
     ']'
     ']';
 
-final List<List<List<Map<String, String>>>> _kKeyboardLayouts =
-    json.decode(_kKeyboardLayoutsJson);
+final List<List<dynamic>> _kKeyboardLayouts =
+    json.decode(_kKeyboardLayoutsJson).cast<List<dynamic>>();
 
 /// Displays a keyboard.
 class Keyboard extends StatefulWidget {
@@ -300,11 +300,14 @@ class KeyboardState extends State<Keyboard> {
   void initState() {
     super.initState();
     _keyboards = <Widget>[];
-    for (List<List<Map<String, String>>> keyboard in _kKeyboardLayouts) {
+    for (List<dynamic> keyboard in _kKeyboardLayouts) {
       _keyboards.add(
-        new IntrinsicHeight(
-          child: new Column(
-            children: keyboard.map(_makeRow).toList(),
+        new Directionality(
+          textDirection: TextDirection.ltr,
+          child: new IntrinsicHeight(
+            child: new Column(
+              children: keyboard.map(_makeRow).toList(),
+            ),
           ),
         ),
       );
@@ -353,25 +356,31 @@ class KeyboardState extends State<Keyboard> {
     }
   }
 
-  Row _makeRow(List<Map<String, String>> jsonRow) => new Row(
-      children: jsonRow.map(_makeKey).toList(),
-      mainAxisAlignment: MainAxisAlignment.center);
+  Row _makeRow(dynamic jsonRow) {
+    List<dynamic> row = jsonRow;
+    return new Row(
+      children: row.map(_makeKey).toList(),
+      mainAxisAlignment: MainAxisAlignment.center,
+    );
+  }
 
-  Widget _makeKey(Map<String, String> jsonKey) {
-    String visualType = jsonKey[_kKeyVisualType] ?? _kKeyVisualTypeText;
-    String action = jsonKey[_kKeyAction] ?? _kKeyActionEmitText;
-    int width = int.parse(jsonKey[_kKeyWidth] ?? '1');
+  Widget _makeKey(dynamic jsonKey) {
+    Map<String, dynamic> keyMap = jsonKey;
+    Map<String, String> key = keyMap.cast();
+    String visualType = key[_kKeyVisualType] ?? _kKeyVisualTypeText;
+    String action = key[_kKeyAction] ?? _kKeyActionEmitText;
+    int width = int.parse(key[_kKeyWidth] ?? '1');
 
     switch (visualType) {
       case _kKeyVisualTypeImage:
-        String image = jsonKey[_kKeyImage];
+        String image = key[_kKeyImage];
         return _createImageKey(image, width, action);
       case _kKeyVisualTypeText:
       case _kKeyVisualTypeActionText:
       default:
-        String type = jsonKey[_kKeyType] ?? _kKeyTypeNormal;
-        String text = jsonKey[_kKeyText];
-        double align = double.parse(jsonKey[_kKeyAlign] ?? '0.5');
+        String type = key[_kKeyType] ?? _kKeyTypeNormal;
+        String text = key[_kKeyText];
+        double align = double.parse(key[_kKeyAlign] ?? '0.5');
         return _createTextKey(text, width, action, align, type, visualType);
     }
   }
@@ -393,7 +402,7 @@ class KeyboardState extends State<Keyboard> {
                   )
             : _kDefaultTextStyle;
     bool isSuggestion = type == _kKeyTypeSuggestion;
-    GlobalKey key = isSuggestion ? new GlobalKey() : null;
+    GlobalKey<TextKeyState> key = isSuggestion ? new GlobalKey() : null;
     TextKey textKey = new TextKey(
       isSuggestion ? '' : text,
       key: key,
