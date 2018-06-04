@@ -9,14 +9,8 @@ import 'package:mondrian/layout_model.dart';
 import 'package:mondrian/model.dart';
 import 'package:mondrian/pattern_layout.dart' as pattern_layout;
 import 'package:mondrian/positioned_surface.dart';
-import 'package:mondrian/tree.dart';
 
 import '../layout_test_utils.dart' as test_util;
-
-const double maxHeight = 100.0;
-const double maxWidth = 100.0;
-
-class MockTree extends Mock implements Tree<String> {}
 
 class MockSurface extends Mock implements Surface {}
 
@@ -25,10 +19,7 @@ void main() {
   LayoutModel layoutModel = new LayoutModel();
 
   test('Ticker pattern with 2 surfaces', () {
-    Tree<String> tree = new MockTree();
-    when(tree.parent).thenReturn(firstSurface);
     Surface patternSurface = new MockSurface();
-    when(patternSurface.parent).thenReturn(firstSurface);
     when(patternSurface.compositionPattern).thenReturn('ticker');
     List<Surface> surfaces = [
       firstSurface,
@@ -39,22 +30,15 @@ void main() {
     expect(positionedSurfaces.length, 2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight * 0.85,
-        width: maxWidth,
-        topLeft: const Offset(0.0, 0.0));
+        height: 0.85, width: 1.0, topLeft: const Offset(0.0, 0.0));
 
     test_util.assertSurfaceProperties(positionedSurfaces[1],
-        height: maxHeight * 0.15,
-        width: maxWidth,
-        topLeft: const Offset(0.0, maxHeight * 0.85));
+        height: 0.15, width: 1.0, topLeft: const Offset(0.0, 0.85));
   });
 
   test('Ticker pattern with 2 surfaces and empty composition pattern', () {
     when(firstSurface.compositionPattern).thenReturn('');
-    Tree<String> tree = new MockTree();
-    when(tree.parent).thenReturn(firstSurface);
     Surface patternSurface = new MockSurface();
-    when(patternSurface.parent).thenReturn(firstSurface);
     when(patternSurface.compositionPattern).thenReturn('ticker');
     List<Surface> surfaces = [
       firstSurface,
@@ -65,14 +49,10 @@ void main() {
     expect(positionedSurfaces.length, 2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight * 0.85,
-        width: maxWidth,
-        topLeft: const Offset(0.0, 0.0));
+        height: 0.85, width: 1.0, topLeft: const Offset(0.0, 0.0));
 
     test_util.assertSurfaceProperties(positionedSurfaces[1],
-        height: maxHeight * 0.15,
-        width: maxWidth,
-        topLeft: const Offset(0.0, maxHeight * 0.85));
+        height: 0.15, width: 1.0, topLeft: const Offset(0.0, 0.85));
   });
 
   test('Multiple tickers', () {
@@ -93,20 +73,15 @@ void main() {
     expect(positionedSurfaces.length, 2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight * 0.85,
-        width: maxWidth,
-        topLeft: const Offset(0.0, 0.0));
+        height: 0.85, width: 1.0, topLeft: const Offset(0.0, 0.0));
 
     test_util.assertSurfaceProperties(positionedSurfaces[1],
-        height: maxHeight * 0.15,
-        width: maxWidth,
-        topLeft: const Offset(0.0, maxHeight * 0.85));
+        height: 0.15, width: 1.0, topLeft: const Offset(0.0, 0.85));
     expect(positionedSurfaces[1].surface, tickerSurface3);
   });
 
   test('Comments-right pattern with 2 surfaces', () {
     Surface patternSurface = new MockSurface();
-    when(patternSurface.parent).thenReturn(firstSurface);
     when(patternSurface.compositionPattern).thenReturn('comments-right');
     List<Surface> surfaces = [
       firstSurface,
@@ -117,14 +92,10 @@ void main() {
     expect(positionedSurfaces.length, 2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight,
-        width: maxWidth * 0.7,
-        topLeft: const Offset(0.0, 0.0));
+        height: 1.0, width: 0.7, topLeft: const Offset(0.0, 0.0));
 
     test_util.assertSurfaceProperties(positionedSurfaces[1],
-        height: maxHeight,
-        width: maxWidth * 0.3,
-        topLeft: const Offset(maxWidth * 0.7, 0.0));
+        height: 1.0, width: 0.3, topLeft: const Offset(0.7, 0.0));
   });
 
   test('Multiple comments-right', () {
@@ -145,20 +116,15 @@ void main() {
     expect(positionedSurfaces.length, 2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight,
-        width: maxWidth * 0.7,
-        topLeft: const Offset(0.0, 0.0));
+        height: 1.0, width: 0.7, topLeft: const Offset(0.0, 0.0));
 
     test_util.assertSurfaceProperties(positionedSurfaces[1],
-        height: maxHeight,
-        width: maxWidth * 0.3,
-        topLeft: const Offset(maxWidth * 0.7, 0.0));
+        height: 1.0, width: 0.3, topLeft: const Offset(0.7, 0.0));
     expect(positionedSurfaces[1].surface, commentsSurface3);
   });
 
   test('Undefined pattern', () {
     Surface patternSurface = new MockSurface();
-    when(patternSurface.parent).thenReturn(firstSurface);
     when(patternSurface.compositionPattern).thenReturn('undefined');
     List<Surface> surfaces = [
       firstSurface,
@@ -169,7 +135,7 @@ void main() {
     expect(positionedSurfaces.length, 1);
 
     test_util.assertSurfaceProperties(positionedSurfaces.first,
-        height: maxHeight, width: maxWidth, topLeft: const Offset(0.0, 0.0));
+        height: 1.0, width: 1.0, topLeft: const Offset(0.0, 0.0));
   });
 
   test('Comments and ticker', () {
@@ -187,19 +153,13 @@ void main() {
     expect(positionedSurfaces.length, 3);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight * 0.85,
-        width: maxWidth * 0.7,
-        topLeft: const Offset(0.0, 0.0));
+        height: 0.85, width: 0.7, topLeft: const Offset(0.0, 0.0));
 
     test_util.assertSurfaceProperties(positionedSurfaces[1],
-        height: maxHeight,
-        width: maxWidth * 0.3,
-        topLeft: const Offset(maxWidth * 0.7, 0.0));
+        height: 1.0, width: 0.3, topLeft: const Offset(0.7, 0.0));
 
     test_util.assertSurfaceProperties(positionedSurfaces[2],
-        height: maxHeight * 0.15,
-        width: maxWidth * 0.7,
-        topLeft: const Offset(0.0, maxHeight * 0.85));
+        height: 0.15, width: 0.7, topLeft: const Offset(0.0, 0.85));
   });
 
   test('Ticker and comments', () {
@@ -217,19 +177,13 @@ void main() {
     expect(positionedSurfaces.length, 3);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight * 0.85,
-        width: maxWidth * 0.7,
-        topLeft: const Offset(0.0, 0.0));
+        height: 0.85, width: 0.7, topLeft: const Offset(0.0, 0.0));
 
     test_util.assertSurfaceProperties(positionedSurfaces[1],
-        height: maxHeight,
-        width: maxWidth * 0.3,
-        topLeft: const Offset(maxWidth * 0.7, 0.0));
+        height: 1.0, width: 0.3, topLeft: const Offset(0.7, 0.0));
 
     test_util.assertSurfaceProperties(positionedSurfaces[2],
-        height: maxHeight * 0.15,
-        width: maxWidth * 0.7,
-        topLeft: const Offset(0.0, maxHeight * 0.85));
+        height: 0.15, width: 0.7, topLeft: const Offset(0.0, 0.85));
   });
 
   test('Multiple ticker and comments', () {
@@ -253,20 +207,14 @@ void main() {
     expect(positionedSurfaces.length, 3);
 
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight * 0.85,
-        width: maxWidth * 0.7,
-        topLeft: const Offset(0.0, 0.0));
+        height: 0.85, width: 0.7, topLeft: const Offset(0.0, 0.0));
 
     test_util.assertSurfaceProperties(positionedSurfaces[1],
-        height: maxHeight,
-        width: maxWidth * 0.3,
-        topLeft: const Offset(maxWidth * 0.7, 0.0));
+        height: 1.0, width: 0.3, topLeft: const Offset(0.7, 0.0));
     expect(positionedSurfaces[1].surface, commentsSurface2);
 
     test_util.assertSurfaceProperties(positionedSurfaces[2],
-        height: maxHeight * 0.15,
-        width: maxWidth * 0.7,
-        topLeft: const Offset(0.0, maxHeight * 0.85));
+        height: 0.15, width: 0.7, topLeft: const Offset(0.0, 0.85));
     expect(positionedSurfaces[2].surface, tickerSurface2);
   });
 }

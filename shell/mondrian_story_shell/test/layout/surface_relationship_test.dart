@@ -5,7 +5,6 @@
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:mondrian/layout_model.dart';
 import 'package:mondrian/model.dart';
 import 'package:mondrian/copresent_layout.dart' as copresent_layout;
@@ -13,9 +12,6 @@ import 'package:mondrian/positioned_surface.dart';
 import 'package:mondrian/surface_details.dart';
 
 import '../layout_test_utils.dart' as test_util;
-
-const double maxHeight = 400.0;
-const double maxWidth = 400.0;
 
 void main() {
   LayoutModel layoutModel = new LayoutModel();
@@ -35,14 +31,13 @@ void main() {
     List<Surface> surfaces = [
       root,
     ];
-    List<PositionedSurface> positionedSurfaces =
-        copresent_layout.layoutSurfaces(
-            null /* BuildContext */, surfaces, layoutModel);
+    List<PositionedSurface> positionedSurfaces = copresent_layout
+        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 1);
 
     expect(positionedSurfaces[0].surface, root);
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight, width: maxWidth, topLeft: const Offset(0.0, 0.0));
+        height: 1.0, width: 1.0, topLeft: const Offset(0.0, 0.0));
   });
 
   test('Copresent 2 surfaces', () {
@@ -72,22 +67,17 @@ void main() {
       root,
       copresentSurface,
     ];
-    List<PositionedSurface> positionedSurfaces =
-        copresent_layout.layoutSurfaces(
-            null /* BuildContext */, surfaces, layoutModel);
+    List<PositionedSurface> positionedSurfaces = copresent_layout
+        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
     expect(positionedSurfaces[0].surface, root);
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight,
-        width: maxWidth * 0.5,
-        topLeft: const Offset(0.0, 0.0));
+        height: 1.0, width: 0.5, topLeft: const Offset(0.0, 0.0));
 
     expect(positionedSurfaces[1].surface, copresentSurface);
     test_util.assertSurfaceProperties(positionedSurfaces[1],
-        height: maxHeight,
-        width: maxWidth * 0.5,
-        topLeft: const Offset(maxWidth * 0.5, 0.0));
+        height: 1.0, width: 0.5, topLeft: const Offset(0.5, 0.0));
   });
 
   test('Sequential surfaces', () {
@@ -117,13 +107,12 @@ void main() {
       root,
       sequentialSurface,
     ];
-    List<PositionedSurface> positionedSurfaces =
-        copresent_layout.layoutSurfaces(
-            null /* BuildContext */, surfaces, layoutModel);
+    List<PositionedSurface> positionedSurfaces = copresent_layout
+        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
     expect(positionedSurfaces.length, 1);
 
     expect(positionedSurfaces[0].surface, sequentialSurface);
     test_util.assertSurfaceProperties(positionedSurfaces[0],
-        height: maxHeight, width: maxWidth, topLeft: const Offset(0.0, 0.0));
+        height: 1.0, width: 1.0, topLeft: const Offset(0.0, 0.0));
   });
 }

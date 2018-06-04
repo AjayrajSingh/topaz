@@ -45,6 +45,8 @@ flutter_aot_app("mondrian") {
 dart_test("mondrian_story_shell_tests") {
   sources = [
     "tree_test.dart",
+    "layout/pattern_layout_test.dart",
+    "layout/surface_relationship_test.dart",
   ]
 
   deps = [
