@@ -11,10 +11,6 @@ flutter_aot_app("bluetooth_settings") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//garnet/public/lib/bluetooth/fidl:bluetooth",
-    "//garnet/public/lib/bluetooth/fidl:bluetooth_control",
-    "//garnet/public/lib/bluetooth/fidl:bluetooth_gatt",
-    "//garnet/public/lib/bluetooth/fidl:bluetooth_low_energy",
     "//topaz/lib/settings:lib.settings",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
