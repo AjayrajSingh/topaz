@@ -5,7 +5,7 @@
 #include "topaz/auth_providers/spotify/spotify_auth_provider_impl.h"
 
 #include <fuchsia/ui/views_v1_token/cpp/fidl.h>
-#include <network/cpp/fidl.h>
+#include <fuchsia/net/oldhttp/cpp/fidl.h>
 
 #include "lib/app/cpp/connect.h"
 #include "lib/app/cpp/startup_context.h"
