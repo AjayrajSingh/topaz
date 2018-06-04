@@ -4,7 +4,7 @@
 
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_presentation/fidl.dart';
+import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:fidl/fidl.dart';
 
 import 'user_shell_impl.dart';

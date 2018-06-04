@@ -15,7 +15,7 @@ import 'package:fidl_fuchsia_ui_gfx/fidl.dart';
 import 'package:fidl_fuchsia_ui_input/fidl.dart' as input;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_modular_auth/fidl.dart';
-import 'package:fidl_presentation/fidl.dart';
+import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.device_shell/user_shell_chooser.dart';
 import 'package:lib.widgets/model.dart';

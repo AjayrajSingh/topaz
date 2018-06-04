@@ -13,7 +13,7 @@ flutter_app("latin-ime") {
 
   deps = [
     "//garnet/public/lib/app/fidl:fidl",
-    "//garnet/public/lib/ui/presentation/fidl:fidl",
+    "//garnet/public/lib/ui/policy/fidl:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",

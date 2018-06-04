@@ -5,7 +5,7 @@
 import 'dart:ui' as ui;
 
 import 'package:fidl_fuchsia_ui_input/fidl.dart';
-import 'package:fidl_presentation/fidl.dart';
+import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 
 /// Listens for pointer events and injects them into Flutter input pipeline.

@@ -5,7 +5,7 @@
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_modular_auth/fidl.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fidl_presentation/fidl.dart';
+import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:meta/meta.dart';
 
 /// Called when [DeviceShell.initialize] occurs.

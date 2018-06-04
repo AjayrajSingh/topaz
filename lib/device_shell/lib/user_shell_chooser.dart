@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:fidl_presentation/fidl.dart';
+import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 
 /// Keeps track of the currently chosen user shell.
 class UserShellChooser {
