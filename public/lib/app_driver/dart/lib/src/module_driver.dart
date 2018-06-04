@@ -88,7 +88,10 @@ class ModuleDriver {
   String _packageName = 'modulePackageNameNotYetSet';
 
   /// Shadow async completion of [start].
-  Completer<ModuleDriver> _start;
+  final _start = Completer<ModuleDriver>();
+
+  /// A flag indicating if the user has called [start] yet.
+  var _hasCalledStart = false;
 
   // Methods to run when the module is being torn down
   final List<OnTerminateAsync> _onTerminatesAsync = <OnTerminateAsync>[];
@@ -175,14 +178,14 @@ class ModuleDriver {
 
     // Fail fast on subsequent (accidental) calls to #start() instead of
     // triggering deeper errors by re-binding the impl.
-    if (_start != null) {
+    if (_hasCalledStart == true) {
       Exception err =
           new Exception('moduleDrive.start(...) should only be called once.');
 
       _start.completeError(err);
       return _start.future;
     } else {
-      _start = new Completer<ModuleDriver>();
+      _hasCalledStart = true;
     }
 
     try {
@@ -247,7 +250,7 @@ class ModuleDriver {
   ///
   /// The [url] is required as multiple agents can implement the same
   /// service interface.
-  Future<Null> connectToAgentService<T>(
+  Future<void> connectToAgentService<T>(
     String url,
     ServiceClient<T> client,
   ) async {
@@ -259,7 +262,7 @@ class ModuleDriver {
   /// agent at [url].
   /// DEPRECATED: please write a client for your service and use
   /// connectToAgentService
-  Future<Null> connectToAgentServiceWithProxy(
+  Future<void> connectToAgentServiceWithProxy(
     String url,
     Proxy<dynamic> proxy,
   ) async {
