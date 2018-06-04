@@ -6,23 +6,26 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/widgets.dart';
 
-TextStyle _subTitleTextStyle(double scale) => new TextStyle(
+TextStyle _subTitleTextStyle(double scale) => TextStyle(
       color: Colors.grey[900],
       fontSize: 48.0 * scale,
       fontWeight: FontWeight.w200,
     );
 
-TextStyle _textStyle(double scale) => new TextStyle(
+TextStyle _textStyle(double scale) => TextStyle(
       color: Colors.grey[900],
       fontSize: 24.0 * scale,
       fontWeight: FontWeight.w200,
     );
 
-TextStyle _titleTextStyle(double scale) => new TextStyle(
+TextStyle _titleTextStyle(double scale) => TextStyle(
       color: Colors.grey[900],
       fontSize: 48.0 * scale,
       fontWeight: FontWeight.w200,
     );
+
+// Padding that is used as an edge inset for settings lists.
+const double _listPadding = 28.0;
 
 /// Simple text based button shown in settings
 class SettingsButton extends SettingsItem {
@@ -100,26 +103,37 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Widget> children = <Widget>[];
 
+    final verticalInsets = EdgeInsets.only(
+        top: _listPadding * scale, bottom: _listPadding * scale);
+
     if (title != null) {
-      children.add(new Text(title, style: _titleTextStyle(scale)));
+      children.add(
+        Container(
+            padding: EdgeInsets.only(
+                left: _listPadding * scale, right: _listPadding * scale),
+            child: Text(title, style: _titleTextStyle(scale))),
+      );
     }
 
     if (isLoading) {
-      children.add(new Expanded(
-        child: new Center(
-            child: new Container(
+      children.add(Expanded(
+        child: Center(
+            child: Container(
           width: 64.0,
           height: 64.0,
           child: const FuchsiaSpinner(),
         )),
       ));
-      return new Column(children: children);
+      return Container(
+        padding: verticalInsets,
+        child: Column(children: children),
+      );
+    } else {
+      return ListView(
+          physics: const BouncingScrollPhysics(),
+          padding: verticalInsets,
+          children: children..addAll(sections));
     }
-
-    children.addAll(sections);
-
-    return new ListView(
-        padding: new EdgeInsets.all(16.0 * scale), children: children);
   }
 }
 
@@ -254,7 +268,8 @@ class SettingsText extends SettingsItem {
   Widget build(BuildContext context) => Text(text, style: _textStyle(scale));
 }
 
-/// A tile that can be used to display a
+/// A tile that can be used to display a setting with icon, text, and optional
+/// description.
 class SettingsTile extends SettingsItem {
   /// The asset to be displayed
   ///
@@ -308,7 +323,11 @@ class SettingsTile extends SettingsItem {
           );
 
     return Container(
-        padding: EdgeInsets.only(right: 16.0 * scale), child: logo);
+        padding: EdgeInsets.only(
+          left: _listPadding * scale,
+          right: 16.0 * scale,
+        ),
+        child: logo);
   }
 
   Widget _subTitle() => SettingsText(text: description, scale: scale);

@@ -49,22 +49,18 @@ class WlanManager extends StatelessWidget {
     if (model.loading) {
       widget = new SettingsPage(scale: scale, isLoading: true);
     } else if (model.connecting || model.connectedAccessPoint != null) {
-      widget = _padded(_buildCurrentNetwork(model, scale));
+      widget = _buildCurrentNetwork(model, scale);
     } else if ((model.selectedAccessPoint?.isSecure ?? false) &&
         !model.connecting) {
       widget = new Stack(children: <Widget>[
-        _padded(_buildAvailableNetworks(model, scale)),
+        _buildAvailableNetworks(model, scale),
         _buildPasswordBox(model, scale),
       ]);
     } else {
-      widget = _padded(_buildAvailableNetworks(model, scale));
+      widget = _buildAvailableNetworks(model, scale);
     }
 
     return widget;
-  }
-
-  Widget _padded(Widget child) {
-    return new Container(padding: const EdgeInsets.all(12.0), child: child);
   }
 
   Widget _buildCurrentNetwork(WifiSettingsModel model, double scale) {
