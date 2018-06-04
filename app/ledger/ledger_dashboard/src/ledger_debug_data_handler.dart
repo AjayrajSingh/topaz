@@ -8,7 +8,7 @@ import 'dart:math';
 import 'dart:typed_data' show Uint8List;
 
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_ledger_internal/fidl.dart';
+import 'package:fidl_fuchsia_ledger_internal/fidl.dart';
 import 'package:fidl_ledger/fidl.dart' as ledger_fidl;
 
 import 'data_handler.dart';
