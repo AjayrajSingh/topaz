@@ -47,9 +47,10 @@ abstract class AgentImpl implements Agent, Lifecycle {
       _componentContext,
       _tokenProvider,
       _outgoingServicesImpl,
-    ).catchError((Exception e) {
-      throw e;
-    }).whenComplete(_readyCompleter.complete);
+    ).then(
+      _readyCompleter.complete,
+      onError: _readyCompleter.completeError,
+    );
   }
 
   @override
